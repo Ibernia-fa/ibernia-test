@@ -1,30 +1,39 @@
-
-.table-responsive table {
+/* General Table Styling */
+table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: collapse; /* Ensures consistent spacing between cells */
   }
   
-  th.mat-header-cell {
-    font-weight: bold;
-    color: #333;
-    border-bottom: 2px solid #ddd;
-  }
-  
-  .mat-cell {
-    padding: 8px;
-  }
-  
-  .mat-header-row {
-    background-color: #f3f4f6;
-  }
-  
-  .expanded-row td {
+  /* Detail Row Styling */
+  tr.example-detail-row {
     background-color: #f9f9f9;
-    padding: 16px;
-    border: 1px solid #ddd;
   }
   
-  .expanded-content {
-    padding: 8px 16px;
+  .example-detail-row td {
+    padding: 8px 16px; /* Matches padding of the regular rows for consistency */
     font-size: 14px;
+    color: #333; /* Text color */
+    border: none; /* Matches table border styling */
   }
+  
+  /* Styling Regular Rows */
+  .example-element-row td {
+    border-bottom: 0; /* Removes bottom border when expanded */
+  }
+  
+  .example-element-row:not(.example-expanded-row):hover {
+    background-color: #f1f1f1; /* Subtle hover effect */
+  }
+  
+  .example-element-row:not(.example-expanded-row):active {
+    background-color: #e8e8e8; /* Subtle active row effect */
+  }
+  
+  /* Styling for Expanded Cells */
+  .expanded-cell {
+    background-color: #f9f9f9;
+    font-size: 13px;
+    font-style: italic;
+    border: none; /* Removes cell borders for cleaner look */
+  }
+  

@@ -29,129 +29,72 @@ import { NgScrollbarModule } from 'ngx-scrollbar';
 import { MaterialModule } from 'src/app/material.module';
 import { AppBreadcrumbComponent } from 'src/app/layouts/full/shared/breadcrumb/breadcrumb.component';
 import { Router, RouterModule } from '@angular/router';
-
-export interface Employee {
+import { HighlightLineNumbers } from 'ngx-highlightjs/line-numbers';
+import { Highlight, HighlightAuto } from 'ngx-highlightjs';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import {
+  animate,
+  state,
+  style,
+  transition,
+  trigger,
+} from '@angular/animations';
+export interface PeriodicElement {
+  name: string;
+  position: string;
   id: number;
-  Name: string;
-  Position: string;
-  Email: string;
-  Mobile: number;
-  DateOfJoining: Date;
-  Salary: number;
-  Projects: number;
-  imagePath: string;
+  project: string;
+  symbol: string;
+  description: string;
 }
-
-const employees = [
+const ELEMENT_DATA: PeriodicElement[] = [
   {
     id: 1,
-    Name: 'Johnathan Deo',
-    Position: 'Seo Expert',
-    Email: 'r@gmail.com',
-    Mobile: 9786838,
-    DateOfJoining: new Date('01-2-2020'),
-    Salary: 12000,
-    Projects: 10,
-    imagePath: 'assets/images/profile/user-2.jpg',
+    position: 'Front end Developer',
+    name: 'Andrew McDownland',
+    project: 'Elite Admin',
+    symbol: 'H',
+    description:
+      'Hydrogen is a chemical element with symbol H and atomic number 1. With a standard atomic weight of 1.008, hydrogen is the lightest element on the periodic table.',
   },
   {
     id: 2,
-    Name: 'Mark Zukerburg',
-    Position: 'Web Developer',
-    Email: 'mark@gmail.com',
-    Mobile: 8786838,
-    DateOfJoining: new Date('04-2-2020'),
-    Salary: 12000,
-    Projects: 10,
-    imagePath: 'assets/images/profile/user-3.jpg',
+    position: 'Web Designer',
+    name: 'Helium',
+    project: 'Real Homes Theme',
+    symbol: 'He',
+    description:
+      'Helium is a chemical element with symbol He and atomic number 2. It is a colorless, odorless, tasteless, non-toxic, inert, monatomic gas, the first in the noble gas group in the periodic table. Its boiling point is the lowest among all the elements.',
   },
   {
     id: 3,
-    Name: 'Sam smith',
-    Position: 'Web Designer',
-    Email: 'sam@gmail.com',
-    Mobile: 7788838,
-    DateOfJoining: new Date('02-2-2020'),
-    Salary: 12000,
-    Projects: 10,
-    imagePath: 'assets/images/profile/user-4.jpg',
+    position: 'Project Manager',
+    name: 'Lithium',
+    project: 'MedicalPro Theme',
+    symbol: 'Li',
+    description:
+      'Lithium is a chemical element with symbol Li and atomic number 3. It is a soft, silvery-white alkali metal. Under standard conditions, it is the lightest metal and the lightest solid element.',
   },
   {
     id: 4,
-    Name: 'John Deo',
-    Position: 'Tester',
-    Email: 'john@gmail.com',
-    Mobile: 8786838,
-    DateOfJoining: new Date('03-2-2020'),
-    Salary: 12000,
-    Projects: 11,
-    imagePath: 'assets/images/profile/user-5.jpg',
+    position: 'Medical Assistant',
+    name: 'Beryllium',
+    project: 'Hosting Press HTML ',
+    symbol: 'Be',
+    description:
+      'Beryllium is a chemical element with symbol Be and atomic number 4. It is a relatively rare element in the universe, usually occurring as a product of the spallation of larger atomic nuclei that have collided with cosmic rays.',
   },
   {
     id: 5,
-    Name: 'Genilia',
-    Position: 'Actor',
-    Email: 'genilia@gmail.com',
-    Mobile: 8786838,
-    DateOfJoining: new Date('05-2-2020'),
-    Salary: 12000,
-    Projects: 19,
-    imagePath: 'assets/images/profile/user-6.jpg',
+    position: 'Librarian',
+    name: 'Boron',
+    project: 'Flexy Admin',
+    symbol: 'B',
+    description:
+      'Boron is a chemical element with symbol B and atomic number 5. Produced entirely by cosmic ray spallation and supernovae and not by stellar nucleosynthesis, it is a low-abundance element in the Solar system and in the Earths crust.',
   },
-  {
-    id: 6,
-    Name: 'Jack Sparrow',
-    Position: 'Content Writer',
-    Email: 'jac@gmail.com',
-    Mobile: 8786838,
-    DateOfJoining: new Date('05-21-2020'),
-    Salary: 12000,
-    Projects: 5,
-    imagePath: 'assets/images/profile/user-7.jpg',
-  },
-  {
-    id: 7,
-    Name: 'Tom Cruise',
-    Position: 'Actor',
-    Email: 'tom@gmail.com',
-    Mobile: 8786838,
-    DateOfJoining: new Date('02-15-2019'),
-    Salary: 12000,
-    Projects: 9,
-    imagePath: 'assets/images/profile/user-3.jpg',
-  },
-  {
-    id: 8,
-    Name: 'Hary Porter',
-    Position: 'Actor',
-    Email: 'hary@gmail.com',
-    Mobile: 8786838,
-    DateOfJoining: new Date('07-3-2019'),
-    Salary: 12000,
-    Projects: 7,
-    imagePath: 'assets/images/profile/user-6.jpg',
-  },
-  {
-    id: 9,
-    Name: 'Kristen Ronaldo',
-    Position: 'Player',
-    Email: 'kristen@gmail.com',
-    Mobile: 8786838,
-    DateOfJoining: new Date('01-15-2019'),
-    Salary: 12000,
-    Projects: 1,
-    imagePath: 'assets/images/profile/user-5.jpg',
-  },
-  // {
-  //   Name: 'John Doe',
-  //   DateOfBirth: '17 Jun 1965 (58)',
-  //   LastUpdated: new Date(),
-  //   Notes: 'Lorem ipsum dolor sit amet.',
-  //   PartnerName: 'Jane Doe',
-  //   PartnerDOB: '17 Jul 1968 (55)',
-  //   AdditionalInfo: 'Some additional details about the client.',
-  //   expanded: false,
-  // },
 ];
 
 @Component({
@@ -164,12 +107,50 @@ const employees = [
     AppBreadcrumbComponent,
     RouterModule,
     CommonModule,
+
+    MatCardModule,
+    MatTableModule,
+    MatIconModule,
+    MatButtonModule,
+    MatDividerModule,
+    Highlight,
+    HighlightAuto,
+    HighlightLineNumbers,
   ],
+  // imports: [
+  //   MatCardModule,
+  //   MatTableModule,
+  //   MatIconModule,
+  //   MatButtonModule,
+  //   CommonModule,
+  //   MatDividerModule,
+  //   AppBreadcrumbComponent,
+  //   Highlight,
+  //   HighlightAuto,
+  //   HighlightLineNumbers,
+  // ],
   providers: [DatePipe],
   templateUrl: './client-list.component.html',
-  styleUrl: './client-list.component.scss'
+  styleUrl: './client-list.component.scss',
+  animations: [
+    trigger('detailExpand', [
+      state('collapsed', style({ height: '0px', minHeight: '0' })),
+      state('expanded', style({ height: '*' })),
+      transition(
+        'expanded <=> collapsed',
+        animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')
+      ),
+    ]),
+  ],
 })
 export class ClientListComponent implements AfterViewInit {
+  dataSource = new MatTableDataSource(ELEMENT_DATA);
+  columnsToDisplay = ['id', 'name', 'project', 'symbol', 'position', 'action'];
+  columnsToDisplayWithExpand = ['expand', ...this.columnsToDisplay];
+  columnsToDisplayWithCheckbox = ['select', ...this.columnsToDisplay];
+
+  expandedElement: PeriodicElement | null = null;
+
   @ViewChild(MatTable, { static: true }) table: MatTable<any> =
     Object.create(null);
   searchText: any;
@@ -199,13 +180,15 @@ export class ClientListComponent implements AfterViewInit {
   //   // Expand the current row
   //   element.expanded = !element.expanded;
   // }
-  dataSource = new MatTableDataSource(employees);
+  // dataSource = new MatTableDataSource(employees);
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator =
     Object.create(null);
 
-  constructor(public dialog: MatDialog, 
-    public datePipe: DatePipe, 
-    private router: Router) {}
+  constructor(
+    public dialog: MatDialog,
+    public datePipe: DatePipe,
+    private router: Router
+  ) {}
 
   ngAfterViewInit(): void {
     this.dataSource.paginator = this.paginator;
@@ -216,66 +199,65 @@ export class ClientListComponent implements AfterViewInit {
   }
 
   openDialog(action: string, obj: any): void {
-    // obj.action = action;
-    // const dialogRef = this.dialog.open(AppKichenSinkDialogContentComponent, {
-    //   data: obj,
-    // });
-    // dialogRef.afterClosed().subscribe((result) => {
-    //   if (result.event === 'Add') {
-    //     this.addRowData(result.data);
-    //   } else if (result.event === 'Update') {
-    //     this.updateRowData(result.data);
-    //   } else if (result.event === 'Delete') {
-    //     this.deleteRowData(result.data);
-    //   }
-    // });
+  // obj.action = action;
+  // const dialogRef = this.dialog.open(AppKichenSinkDialogContentComponent, {
+  //   data: obj,
+  // });
+  // dialogRef.afterClosed().subscribe((result) => {
+  //   if (result.event === 'Add') {
+  //     this.addRowData(result.data);
+  //   } else if (result.event === 'Update') {
+  //     this.updateRowData(result.data);
+  //   } else if (result.event === 'Delete') {
+  //     this.deleteRowData(result.data);
+  //   }
+  // });
   }
 
   // tslint:disable-next-line - Disables all
-  addRowData(row_obj: Employee): void {
-    // this.dataSource.data.unshift({
-    //   id: employees.length + 1,
-    //   Name: row_obj.Name,
-    //   Position: row_obj.Position,
-    //   Email: row_obj.Email,
-    //   Mobile: row_obj.Mobile,
-
-    //   DateOfJoining: new Date(),
-    //   Salary: row_obj.Salary,
-    //   Projects: row_obj.Projects,
-    //   imagePath: row_obj.imagePath,
-    // });
-    // this.dialog.open(AppAddKichenSinkComponent);
-    // this.table.renderRows();
-  }
+  // addRowData(row_obj: Employee): void {
+  // this.dataSource.data.unshift({
+  //   id: employees.length + 1,
+  //   Name: row_obj.Name,
+  //   Position: row_obj.Position,
+  //   Email: row_obj.Email,
+  //   Mobile: row_obj.Mobile,
+  //   DateOfJoining: new Date(),
+  //   Salary: row_obj.Salary,
+  //   Projects: row_obj.Projects,
+  //   imagePath: row_obj.imagePath,
+  // });
+  // this.dialog.open(AppAddKichenSinkComponent);
+  // this.table.renderRows();
+  // }
 
   redirectToAdd() {
     this.router.navigate(['/clients/add']);
   }
 
   // tslint:disable-next-line - Disables all
-  updateRowData(row_obj: Employee): boolean | any {
-    this.dataSource.data = this.dataSource.data.filter((value: any) => {
-      if (value.id === row_obj.id) {
-        value.Name = row_obj.Name;
-        value.Position = row_obj.Position;
-        value.Email = row_obj.Email;
-        value.Mobile = row_obj.Mobile;
-        value.DateOfJoining = row_obj.DateOfJoining;
-        value.Salary = row_obj.Salary;
-        value.Projects = row_obj.Projects;
-        value.imagePath = row_obj.imagePath;
-      }
-      return true;
-    });
-  }
+  // updateRowData(row_obj: Employee): boolean | any {
+  //   this.dataSource.data = this.dataSource.data.filter((value: any) => {
+  //     if (value.id === row_obj.id) {
+  //       value.Name = row_obj.Name;
+  //       value.Position = row_obj.Position;
+  //       value.Email = row_obj.Email;
+  //       value.Mobile = row_obj.Mobile;
+  //       value.DateOfJoining = row_obj.DateOfJoining;
+  //       value.Salary = row_obj.Salary;
+  //       value.Projects = row_obj.Projects;
+  //       value.imagePath = row_obj.imagePath;
+  //     }
+  //     return true;
+  //   });
+  // }
 
-  // tslint:disable-next-line - Disables all
-  deleteRowData(row_obj: Employee): boolean | any {
-    this.dataSource.data = this.dataSource.data.filter((value: any) => {
-      return value.id !== row_obj.id;
-    });
-  }
+  // // tslint:disable-next-line - Disables all
+  // deleteRowData(row_obj: Employee): boolean | any {
+  //   this.dataSource.data = this.dataSource.data.filter((value: any) => {
+  //     return value.id !== row_obj.id;
+  //   });
+  // }
 }
 
 // @Component({
