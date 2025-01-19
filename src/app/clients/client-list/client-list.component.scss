@@ -1,0 +1,30 @@
+
+.table-responsive table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  th.mat-header-cell {
+    font-weight: bold;
+    color: #333;
+    border-bottom: 2px solid #ddd;
+  }
+  
+  .mat-cell {
+    padding: 8px;
+  }
+  
+  .mat-header-row {
+    background-color: #f3f4f6;
+  }
+  
+  .expanded-row td {
+    background-color: #f9f9f9;
+    padding: 16px;
+    border: 1px solid #ddd;
+  }
+  
+  .expanded-content {
+    padding: 8px 16px;
+    font-size: 14px;
+  }

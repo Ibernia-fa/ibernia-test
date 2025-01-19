@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { RouterModule } from '@angular/router';
 import { Router, NavigationEnd, ActivatedRoute, Data } from '@angular/router';
@@ -13,6 +13,9 @@ import { TablerIconsModule } from 'angular-tabler-icons';
 })
 export class AppBreadcrumbComponent {
   // @Input() layout;
+  @Input() title = '';
+  @Input() routeForBack = '';
+  @Input() showBackIcon = false;
   pageInfo: Data | any = Object.create(null);
   myurl: any = this.router.url.slice(1).split('/');
   constructor(
@@ -39,5 +42,9 @@ export class AppBreadcrumbComponent {
         this.titleService.setTitle(event['title'] + ' - Angular 19');
         this.pageInfo = event;
       });
+  }
+
+  ngOnInit() {
+    this.titleService.setTitle(this.title);
   }
 }

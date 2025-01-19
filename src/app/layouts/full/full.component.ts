@@ -18,7 +18,6 @@ import { TablerIconsModule } from 'angular-tabler-icons';
 import { HeaderComponent } from './vertical/header/header.component';
 import { AppHorizontalHeaderComponent } from './horizontal/header/header.component';
 import { AppHorizontalSidebarComponent } from './horizontal/sidebar/sidebar.component';
-import { AppBreadcrumbComponent } from './shared/breadcrumb/breadcrumb.component';
 import { CustomizerComponent } from './shared/customizer/customizer.component';
 
 const MOBILE_VIEW = 'screen and (max-width: 768px)';
@@ -54,7 +53,6 @@ interface quicklinks {
         HeaderComponent,
         AppHorizontalHeaderComponent,
         AppHorizontalSidebarComponent,
-        AppBreadcrumbComponent,
         CustomizerComponent,
     ],
     templateUrl: './full.component.html',
@@ -218,7 +216,7 @@ export class FullComponent implements OnInit {
       .subscribe((e) => {
         
         var currentRoute = e.urlAfterRedirects;
-        this.hideSidebar = this.options.sidebarHiddenOnRoutes.includes(currentRoute);
+        this.hideSidebar = this.options.sidebarHiddenOnRoutes.find(x => currentRoute.includes(x)) ? true : false;
 
         this.content?.scrollTo({ top: 0 });
       });

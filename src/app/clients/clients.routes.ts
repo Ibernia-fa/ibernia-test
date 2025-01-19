@@ -11,13 +11,13 @@ export const ClientsRoutes: Routes = [
       {
         path: '',
         component: ClientListComponent,
-        data: {
-          title: 'Clients',
+        // data: {
+        //   title: 'Clients',
           // urls: [
           //   { title: 'Dashboard', url: '/dashboards/dashboard1' },
           //   { title: 'Analytical' },
           // ],
-        },
+        // },
       },
       {
         path: 'add',

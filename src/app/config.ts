@@ -20,7 +20,7 @@ export const defaults: AppSettings = {
   boxed: true,
   horizontal: false,
   cardBorder: false,
-  activeTheme: 'blue_theme',
+  activeTheme: 'project_theme',
   language: 'en-us',
   navPos: 'side',
   sidebarHiddenOnRoutes: [

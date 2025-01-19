@@ -4,29 +4,29 @@
   <div class="branding">
     <app-branding></app-branding>
   </div>
-  <ng-container *ngIf="!hideSidebarToggle">
-    @if(showToggle) {
-    <button
-      mat-icon-button
-      (click)="toggleCollapsed.emit()"
-      class="d-flex justify-content-center"
-    >
-      <i-tabler name="menu-2" class="icon-20 d-flex"></i-tabler>
-    </button>
-    }
-  
-    <!-- Mobile Menu -->
-    @if(!showToggle) {
-    <button
-      mat-icon-button
-      (click)="toggleMobileNav.emit()"
-      class="d-flex justify-content-center"
-    >
-      <i-tabler name="menu-2" class="icon-20 d-flex"></i-tabler>
-    </button>
-    }
-    <!-- --------------------------------------------------------------- -->
-  </ng-container>
+  @if (!hideSidebarToggle) {
+      @if(showToggle) {
+      <button
+        mat-icon-button
+        (click)="toggleCollapsed.emit()"
+        class="d-flex justify-content-center"
+      >
+        <i-tabler name="menu-2" class="icon-20 d-flex"></i-tabler>
+      </button>
+      }
+    
+      <!-- Mobile Menu -->
+      @if(!showToggle) {
+      <button
+        mat-icon-button
+        (click)="toggleMobileNav.emit()"
+        class="d-flex justify-content-center"
+      >
+        <i-tabler name="menu-2" class="icon-20 d-flex"></i-tabler>
+      </button>
+      }
+      <!-- --------------------------------------------------------------- -->
+  }
 
   <!-- --------------------------------------------------------------- -->
   <!--  Search -->

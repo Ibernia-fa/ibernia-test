@@ -10,8 +10,8 @@
       <!-- ============================================================== -->
       <!-- Vertical Sidebar -->
       <!-- ============================================================== -->
-      @if (!options.horizontal) {
-      <mat-sidenav *ngIf="!hideSidebar" #leftsidenav id="horizontalOptionFalse" [mode]="isOver ? 'over' : 'side'"
+      @if (!options.horizontal && !hideSidebar) {
+      <mat-sidenav #leftsidenav id="horizontalOptionFalse" [mode]="isOver ? 'over' : 'side'"
         [opened]="options.navPos === 'side' && options.sidenavOpened && !isOver && !resView"
         (openedChange)="onSidenavOpenedChange($event)" (closedStart)="onSidenavClosedStart()" class="sidebarNav">
         <div class="flex-layout">
@@ -47,8 +47,8 @@
       <!-- ============================================================== -->
       <!-- horizontal Sidebar -->
       <!-- ============================================================== -->
-      @if (resView) {
-      <mat-sidenav *ngIf="!hideSidebar" #leftsidenav [mode]="'over'" [opened]="options.sidenavOpened && !isTablet"
+      @if (resView && !hideSidebar) {
+      <mat-sidenav #leftsidenav [mode]="'over'" [opened]="options.sidenavOpened && !isTablet"
         (openedChange)="onSidenavOpenedChange($event)" (closedStart)="onSidenavClosedStart()" id="resView" class="sidebarNav">
         <app-sidebar> </app-sidebar>
         <ng-scrollbar class="position-relative" style="height: 100%">
@@ -96,7 +96,7 @@
         <main class="pageWrapper" [ngClass]="{
           maxWidth: options.boxed
         }">
-          <app-breadcrumb></app-breadcrumb>
+          <!-- <app-breadcrumb></app-breadcrumb> -->
           <!-- ============================================================== -->
           <!-- Outlet -->
           <!-- ============================================================== -->

@@ -36,8 +36,9 @@ body {
 
 .pageWrapper {
   padding: 24px;
+  padding-top: calc($header-height + 24px);
   min-height: calc(100vh - 70px);
-
+  // top: calc(100vh - $header-height);
   margin: 0 auto;
 
   &.maxWidth {

@@ -27,6 +27,8 @@ import { NgxPaginationModule } from 'ngx-pagination';
 import { MatNativeDateModule } from '@angular/material/core';
 import { NgScrollbarModule } from 'ngx-scrollbar';
 import { MaterialModule } from 'src/app/material.module';
+import { AppBreadcrumbComponent } from 'src/app/layouts/full/shared/breadcrumb/breadcrumb.component';
+import { Router, RouterModule } from '@angular/router';
 
 export interface Employee {
   id: number;
@@ -140,6 +142,16 @@ const employees = [
     Projects: 1,
     imagePath: 'assets/images/profile/user-5.jpg',
   },
+  // {
+  //   Name: 'John Doe',
+  //   DateOfBirth: '17 Jun 1965 (58)',
+  //   LastUpdated: new Date(),
+  //   Notes: 'Lorem ipsum dolor sit amet.',
+  //   PartnerName: 'Jane Doe',
+  //   PartnerDOB: '17 Jul 1968 (55)',
+  //   AdditionalInfo: 'Some additional details about the client.',
+  //   expanded: false,
+  // },
 ];
 
 @Component({
@@ -149,6 +161,8 @@ const employees = [
     TablerIconsModule,
     MatNativeDateModule,
     NgScrollbarModule,
+    AppBreadcrumbComponent,
+    RouterModule,
     CommonModule,
   ],
   providers: [DatePipe],
@@ -169,11 +183,29 @@ export class ClientListComponent implements AfterViewInit {
     'projects',
     'action',
   ];
+  // displayedColumns: string[] = [
+  //   'client',
+  //   'dob',
+  //   'lastUpdated',
+  //   'notes',
+  //   'expandedDetail',
+  //   'action',
+  // ];
+
+  // isExpandedRow = (index: number, element: any) => element.expanded;
+  // toggleRow(element: any) {
+  //   // Close all rows
+  //   // this.dataSource.forEach(row => (row.expanded = false));
+  //   // Expand the current row
+  //   element.expanded = !element.expanded;
+  // }
   dataSource = new MatTableDataSource(employees);
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator =
     Object.create(null);
 
-  constructor(public dialog: MatDialog, public datePipe: DatePipe) {}
+  constructor(public dialog: MatDialog, 
+    public datePipe: DatePipe, 
+    private router: Router) {}
 
   ngAfterViewInit(): void {
     this.dataSource.paginator = this.paginator;
@@ -215,6 +247,10 @@ export class ClientListComponent implements AfterViewInit {
     // });
     // this.dialog.open(AppAddKichenSinkComponent);
     // this.table.renderRows();
+  }
+
+  redirectToAdd() {
+    this.router.navigate(['/clients/add']);
   }
 
   // tslint:disable-next-line - Disables all
