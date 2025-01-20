@@ -94,7 +94,7 @@
             </div>
         </div>
     </div>
-    <mat-checkbox class="example-margin" (change)="togglePartnerSection(!showPartner)">Add a partner or spouse</mat-checkbox>
+    <mat-checkbox class="example-margin" [checked]="showPartner" (change)="togglePartnerSection(!showPartner)">Add a partner or spouse</mat-checkbox>
     @if(showPartner) {
         <ng-container formGroupName="partner">
             <div class="row">
@@ -205,7 +205,7 @@
     </div>
     <div class="row justify-content-end">
         <div class="col-sm-12">
-            <button mat-flat-button class="btn-submit" type="submit" [disabled]="clientForm.invalid">ADD A NEW CLIENT</button>
+            <button mat-flat-button class="btn-submit" type="submit" [disabled]="clientForm.invalid">UPDATE CLIENT</button>
         </div>
     </div>
 </form>

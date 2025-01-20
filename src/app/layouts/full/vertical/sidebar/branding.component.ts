@@ -6,16 +6,18 @@ import { CoreService } from 'src/app/services/core.service';
   imports: [],
   template: `
     <a href="/" class="logodark">
+      <!-- src="./assets/images/logos/dark-logo.svg" -->
       <img
-        src="./assets/images/logos/dark-logo.svg"
+        src="./assets/images/logos/logo.png"
         class="align-middle m-2"
         alt="logo"
       />
     </a>
 
     <a href="/" class="logolight">
+      <!-- src="./assets/images/logos/light-logo.svg" -->
       <img
-        src="./assets/images/logos/light-logo.svg"
+        src="./assets/images/logos/logo.png"
         class="align-middle m-2"
         alt="logo"
       />

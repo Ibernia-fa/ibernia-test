@@ -7,6 +7,11 @@ import { MatInputModule } from '@angular/material/input';
 import { AppBreadcrumbComponent } from 'src/app/layouts/full/shared/breadcrumb/breadcrumb.component';
 import { MaterialModule } from 'src/app/material.module';
 import { FiveDayRangeSelectionStrategy } from 'src/app/pages/forms/form-elements';
+import { ClientHttpService } from '../client-http.service';
+import { Client } from '../client';
+import { catchError, filter, map } from 'rxjs';
+import { Router, RouterModule } from '@angular/router';
+import { ToastrModule, ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-client-add',
@@ -16,9 +21,13 @@ import { FiveDayRangeSelectionStrategy } from 'src/app/pages/forms/form-elements
     MatFormFieldModule,
     MatInputModule,
     MatDatepickerModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    RouterModule,
+    ToastrModule
   ],
   providers: [
+    ClientHttpService,
+    ToastrService,
     provideNativeDateAdapter(),
     {
       provide: MAT_DATE_RANGE_SELECTION_STRATEGY,
@@ -32,7 +41,10 @@ export class ClientAddComponent {
   clientForm: FormGroup;
   showPartner: boolean = false;
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder,
+    private clientHttpService: ClientHttpService,
+    private toastr: ToastrService,
+  private router: Router) {
     this.clientForm = this.fb.group({
       name: ['', Validators.required],
       dob: ['', Validators.required],
@@ -72,6 +84,44 @@ export class ClientAddComponent {
 
   onSubmit() {
     if (this.clientForm.valid) {
+      var client: Client = {
+        id: '',
+        clientDetails: {
+          birthDate: this.clientForm.controls['dob'].value,
+          email: this.clientForm.controls['email'].value,
+          gender: this.clientForm.controls['gender'].value,
+          name: this.clientForm.controls['name'].value,
+          phone: this.clientForm.controls['phone'].value,
+          preferredCurrency: this.clientForm.controls['currency'].value
+        },
+        partnerDetail: {
+          birthDate: this.clientForm.controls['partner.dob']?.value,
+          email: this.clientForm.controls['partner.email']?.value,
+          gender: this.clientForm.controls['partner.gender']?.value,
+          name: this.clientForm.controls['partner.name']?.value,
+          phone: this.clientForm.controls['partner.phone']?.value,
+          preferredCurrency: this.clientForm.controls['partner.currency']?.value
+        },
+        financialAdvisor: {
+          advisorId: "678c93f32be72db4b9631be1",
+          advisorName: "Matteo"
+        },
+        lastUpdated: new Date(),
+        notes: this.clientForm.controls['notes'].value
+      } 
+      this.clientHttpService.addClient(client).pipe(
+        filter((res) => !!res),
+        map((res) => {
+          this.router.navigate(['/clients']);
+          this.toastr.success('Client created successfully', 'Success!');
+        }),
+        catchError((err) => {
+          console.error(err);
+          this.toastr.error("An error occured while saving client", "Error!");
+          throw err
+        })
+      )
+      .subscribe();
       console.log('Form Data:', this.clientForm.value);
       // Submit form data to the API or service
     } else {
