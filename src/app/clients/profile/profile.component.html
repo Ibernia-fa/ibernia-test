@@ -14,7 +14,7 @@
                             {{client.clientDetails.name}}'s Profile
                         </h4>
                         <div class="m-l-60 d-flex align-items-center overflow-hidden">
-                            {{client.clientDetails.birthDate | date}}
+                            {{client.clientDetails.birthDate | date}} ({{client.clientDetails.birthDate | ageCalculator}})
                             <!-- <ul class="breadcrumb">
                       @for (url of pageInfo?.['urls']; track url.url;let index = $index,last
                       = $last ) { @if(!last){

@@ -7,6 +7,7 @@ import { Client } from '../client';
 import { map, switchMap } from 'rxjs';
 import { CommonModule, DatePipe } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
+import { AgeCalculatorPipe } from 'src/app/pipe/age-calculator.pipe';
 
 @Component({
   selector: 'app-profile',
@@ -14,12 +15,14 @@ import { MatButtonModule } from '@angular/material/button';
     MatCardModule,
     TablerIconsModule,
     CommonModule,
-    MatButtonModule
+    MatButtonModule,
+    AgeCalculatorPipe
   ],
   providers: [
     ClientHttpService,
     RouterModule,
-    DatePipe
+    DatePipe,
+    AgeCalculatorPipe
   ],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss'

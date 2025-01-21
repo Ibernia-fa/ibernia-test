@@ -49,6 +49,8 @@ import { ToastrModule, ToastrService } from 'ngx-toastr';
 import { DialogComponent } from 'src/app/dialog/dialog.component';
 import { trackByHourSegment } from 'angular-calendar/modules/common/util';
 import { MatSort, Sort } from '@angular/material/sort';
+import { TimeAgoPipe } from 'src/app/pipe/time-ago.pipe';
+import { AgeCalculatorPipe } from 'src/app/pipe/age-calculator.pipe';
 
 @Component({
   selector: 'app-client-list',
@@ -70,6 +72,8 @@ import { MatSort, Sort } from '@angular/material/sort';
     Highlight,
     HighlightAuto,
     HighlightLineNumbers,
+    TimeAgoPipe,
+    AgeCalculatorPipe
   ],
   // imports: [
   //   MatCardModule,
@@ -83,7 +87,7 @@ import { MatSort, Sort } from '@angular/material/sort';
   //   HighlightAuto,
   //   HighlightLineNumbers,
   // ],
-  providers: [DatePipe, ClientHttpService, ToastrService],
+  providers: [DatePipe, ClientHttpService, ToastrService, TimeAgoPipe, AgeCalculatorPipe],
   templateUrl: './client-list.component.html',
   styleUrl: './client-list.component.scss',
   animations: [
@@ -169,6 +173,28 @@ export class ClientListComponent implements OnInit, AfterViewInit {
     this.dataSource = new MatTableDataSource(this.clients);
   }
 
+  timeAgo(value: Date | string | number) {
+    console.log(value)
+    if (!value) return 'Invalid date';
+
+    const date = new Date(value);
+    const now = new Date();
+    const diffInMs = now.getTime() - date.getTime();
+    const diffInSeconds = Math.floor(diffInMs / 1000);
+    const diffInMinutes = Math.floor(diffInSeconds / 60);
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    const diffInDays = Math.floor(diffInHours / 24);
+
+    if (diffInSeconds < 60) {
+      return `${diffInSeconds} seconds ago`;
+    } else if (diffInMinutes < 60) {
+      return `${diffInMinutes} minutes ago`;
+    } else if (diffInHours < 24) {
+      return `${diffInHours} hours ago`;
+    } else {
+      return `${diffInDays} days ago`;
+    }
+  }
 
   sortList<T>(list: T[], field: string, direction: 'asc' | 'desc' = 'asc'): T[] {
     const resolveField = (obj: any, path: string) =>

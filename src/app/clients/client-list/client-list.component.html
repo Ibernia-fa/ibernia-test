@@ -52,7 +52,7 @@
               Date(s) of birth
             </th>
             <td mat-cell *matCellDef="let element" class="p-x-24 f-s-14 p-l-0">
-              {{ element.clientDetails.birthDate | date }} @if(element.partnerDetail?.birthDate && element.partnerDetail?.name) { <br> {{element.partnerDetail?.birthDate | date}} }
+              {{ element.clientDetails.birthDate | date }} ({{ element.clientDetails.birthDate | ageCalculator }}) @if(element.partnerDetail?.birthDate && element.partnerDetail?.name) { <br> {{element.partnerDetail?.birthDate | date}} ({{element.partnerDetail?.birthDate | ageCalculator}}) }
             </td>
           </ng-container>
           <ng-container matColumnDef="last_updated">
@@ -60,7 +60,7 @@
               Last Updated
             </th>
             <td mat-cell *matCellDef="let element" class="p-x-24 f-s-14 p-l-0">
-              {{ element.lastUpdated | date }}
+              {{ element.lastUpdated | date }} <br> {{element.lastUpdated | timeAgo}}
             </td>
           </ng-container>
           <ng-container matColumnDef="notes">
@@ -119,7 +119,7 @@
               Date(s) of birth
             </th>
             <td mat-cell *matCellDef="let element" class="p-x-24 f-s-14 p-l-0">
-              {{ element.clientDetails.birthDate | date }}
+              {{ element.clientDetails.birthDate | date }}  ({{ element.clientDetails.birthDate | ageCalculator }}) 
             </td>
           </ng-container>
           <ng-container matColumnDef="last_updated_client">
@@ -127,7 +127,7 @@
               Last Updated
             </th>
             <td mat-cell *matCellDef="let element" class="p-x-24 f-s-14 p-l-0">
-              {{ element.lastUpdated | date }}
+              {{ element.lastUpdated | date }} <br> {{element.lastUpdated | timeAgo}}
             </td>
           </ng-container>
           <ng-container matColumnDef="notes_client">
@@ -159,7 +159,7 @@
               Date(s) of birth
             </th>
             <td mat-cell *matCellDef="let element" class="p-x-24 f-s-14 p-l-0">
-              {{ element.partnerDetail?.birthDate | date }}
+              {{ element.partnerDetail?.birthDate | date }}  ({{ element.partnerDetail?.birthDate | ageCalculator }})
             </td>
           </ng-container>
           <ng-container matColumnDef="last_updated_partner">
@@ -167,7 +167,7 @@
               Last Updated
             </th>
             <td mat-cell *matCellDef="let element" class="p-x-24 f-s-14 p-l-0">
-              {{ element.lastUpdated | date }}
+              {{ element.lastUpdated | date }} <br> {{ element.lastUpdated | timeAgo }}
             </td>
           </ng-container>
           <ng-container matColumnDef="notes_partner">
