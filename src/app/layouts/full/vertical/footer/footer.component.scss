@@ -1,0 +1,39 @@
+.footer-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #ffffff; /* Background color */
+    height: 60px; /* Fixed height */
+    padding: 0 20px; /* Padding for spacing */
+    border-top: 1px solid #ddd; /* Light top border */
+    font-size: 14px; /* Font size */
+    color: #6c757d; /* Text color */
+    position: fixed; /* Keep the footer fixed */
+    bottom: 0; /* Stick to the bottom of the page */
+    width: 100%; /* Adjust based on your sidebar width */
+    z-index: 1000; /* Ensure it stays on top of other elements */
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); /* Optional shadow for elevation */
+  }
+  
+  .footer-content {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .footer-content nav {
+    display: flex;
+    gap: 20px; /* Spacing between links */
+  }
+  
+  .footer-content nav a {
+    color: #6c757d; /* Link color */
+    text-decoration: none;
+    font-weight: 500;
+  }
+  
+  .footer-content nav a:hover {
+    text-decoration: underline; /* Hover effect for links */
+  }
+  
