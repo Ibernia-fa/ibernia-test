@@ -12,6 +12,7 @@ import { Client } from '../client';
 import { catchError, filter, map } from 'rxjs';
 import { Router, RouterModule } from '@angular/router';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
+import { MatSelectModule } from '@angular/material/select';
 
 @Component({
   selector: 'app-client-add',
@@ -23,7 +24,8 @@ import { ToastrModule, ToastrService } from 'ngx-toastr';
     MatDatepickerModule,
     ReactiveFormsModule,
     RouterModule,
-    ToastrModule
+    ToastrModule,
+    MatSelectModule
   ],
   providers: [
     ClientHttpService,

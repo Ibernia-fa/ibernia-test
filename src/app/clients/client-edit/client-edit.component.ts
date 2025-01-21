@@ -20,6 +20,7 @@ import { FiveDayRangeSelectionStrategy } from 'src/app/pages/forms/form-elements
 import { ClientHttpService } from '../client-http.service';
 import { catchError, filter, map, switchMap } from 'rxjs';
 import { Client } from '../client';
+import { MatSelectModule } from '@angular/material/select';
 
 @Component({
   selector: 'app-client-edit',
@@ -32,6 +33,7 @@ import { Client } from '../client';
     ReactiveFormsModule,
     ToastrModule,
     RouterModule,
+    MatSelectModule
   ],
   providers: [
     ClientHttpService,
