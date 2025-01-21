@@ -47,6 +47,7 @@ import { Client } from '../client';
 })
 export class ClientEditComponent {
   clientForm: FormGroup;
+  clientId: string;
   showPartner: boolean = false;
 
   constructor(
@@ -81,8 +82,8 @@ export class ClientEditComponent {
   getClient() {
     this.activatedRoute.params.pipe(
       switchMap((params) => {
-        var clientId = params['id']
-        return this.clientHttpService.getClient(clientId);
+        this.clientId = params['id']
+        return this.clientHttpService.getClient(this.clientId);
       }),
       map((res) => {
         this.clientForm.controls['dob'].patchValue(res.clientDetails.birthDate);
@@ -128,7 +129,7 @@ export class ClientEditComponent {
   onSubmit() {
     if (this.clientForm.valid) {
       var client: Client = {
-        id: '',
+        id: this.clientId,
         clientDetails: {
           birthDate: this.clientForm.controls['dob'].value,
           email: this.clientForm.controls['email'].value,
