@@ -15,7 +15,7 @@ export class TimeAgoPipe implements PipeTransform {
     const diffInHours = Math.floor(diffInMinutes / 60);
     const diffInDays = Math.floor(diffInHours / 24);
 
-    if (diffInSeconds < 60) {
+    if (diffInSeconds < 60 && diffInSeconds > 0) {
       return `${diffInSeconds} seconds ago`;
     } else if (diffInMinutes < 60) {
       return `${diffInMinutes} minutes ago`;
