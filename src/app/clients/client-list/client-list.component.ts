@@ -257,9 +257,6 @@ export class ClientListComponent implements OnInit, AfterViewInit {
   redirectToAdd() {
     this.router.navigate(['/clients/add']);
   }
-  redirectToFinancial() {
-    this.router.navigate(['/finances']);
-  }
 
   // tslint:disable-next-line - Disables all
   // updateRowData(row_obj: Employee): boolean | any {

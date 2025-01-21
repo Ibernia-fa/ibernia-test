@@ -1,0 +1,51 @@
+@if(client) {
+    <mat-card class="cardWithShadow">
+        <mat-card-content>
+    
+            <div class="m-b-20 overflow-hidden">
+                <div class="row">
+                    <div class="col-sm-8">
+    
+                        <h4 class="page-title m-t-16 f-s-32 f-w-500 m-b-16">
+                            <!-- @if(showBackIcon) { -->
+                            <a class="m-r-24"><i-tabler name="user" class="icon-25 color-primary"></i-tabler></a>
+                            <!-- } -->
+                            <!-- {{ pageInfo?.['title'] }} -->
+                            {{client.clientDetails.name}}'s Profile
+                        </h4>
+                        <div class="m-l-60 d-flex align-items-center overflow-hidden">
+                            {{client.clientDetails.birthDate | date}}
+                            <!-- <ul class="breadcrumb">
+                      @for (url of pageInfo?.['urls']; track url.url;let index = $index,last
+                      = $last ) { @if(!last){
+            
+                      <li class="breadcrumb-item" [routerLink]="url.url">
+                        <a [routerLink]="url.url">{{ url.title }}</a>
+                      </li>
+                      }@else {
+                      <li class="breadcrumb-item">
+                        <i-tabler name="circle-filled" class="icon-8"></i-tabler>
+                      </li>
+                      <li class="breadcrumb-item active f-s-14">{{ url.title }}</li>
+                      } }
+                    </ul> -->
+                        </div>
+                    </div>
+                    <div class="col-sm-4 text-right position-relative m-t-16">
+                        <button mat-stroked-button (click)="onEditClicked()">
+                            Edit
+                        </button>
+                  <!-- <div class="breadcrumb-icon">
+                    <img
+                      src="/assets/images/breadcrumb/ChatBc.png"
+                      alt="breadcrumb"
+                      width="165"
+                    />
+                  </div> -->
+                </div>
+                </div>
+            </div>
+        </mat-card-content>
+    </mat-card>
+
+}

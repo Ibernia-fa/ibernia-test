@@ -82,33 +82,60 @@ export class ClientAddComponent {
     }
   }
 
+  getClientFormInfo() {
+    return {
+      id: '',
+      clientDetails: {
+        birthDate: this.clientForm.controls['dob'].value,
+        email: this.clientForm.controls['email'].value,
+        gender: this.clientForm.controls['gender'].value,
+        name: this.clientForm.controls['name'].value,
+        phone: this.clientForm.controls['phone'].value,
+        preferredCurrency: this.clientForm.controls['currency'].value
+      },
+      partnerDetail: this.clientForm.controls['partner.name'] ? {
+        birthDate: this.clientForm.controls['partner.dob']?.value,
+        email: this.clientForm.controls['partner.email']?.value,
+        gender: this.clientForm.controls['partner.gender']?.value,
+        name: this.clientForm.controls['partner.name']?.value,
+        phone: this.clientForm.controls['partner.phone']?.value,
+        preferredCurrency: this.clientForm.controls['partner.currency']?.value
+      } : null,
+      financialAdvisor: {
+        advisorId: "678c93f32be72db4b9631be1",
+        advisorName: "Matteo"
+      },
+      lastUpdated: new Date(),
+      notes: this.clientForm.controls['notes'].value
+    } 
+  }
+
+  onAddNewClientClicked() {
+    if (this.clientForm.valid) {
+      var client: Client = this.getClientFormInfo()
+      this.clientHttpService.addClient(client).pipe(
+        filter((res) => !!res),
+        map((res) => {
+          this.router.navigate(['/clients/' + res.id +'/profile']);
+          this.toastr.success('Client created successfully', 'Success!');
+        }),
+        catchError((err) => {
+          console.error(err);
+          this.toastr.error("An error occured while saving client", "Error!");
+          throw err
+        })
+      )
+      .subscribe();
+      console.log('Form Data:', this.clientForm.value);
+      // Submit form data to the API or service
+    } else {
+      console.error('Form is invalid');
+    }
+  }
+
   onSubmit() {
     if (this.clientForm.valid) {
-      var client: Client = {
-        id: '',
-        clientDetails: {
-          birthDate: this.clientForm.controls['dob'].value,
-          email: this.clientForm.controls['email'].value,
-          gender: this.clientForm.controls['gender'].value,
-          name: this.clientForm.controls['name'].value,
-          phone: this.clientForm.controls['phone'].value,
-          preferredCurrency: this.clientForm.controls['currency'].value
-        },
-        partnerDetail: this.clientForm.controls['partner.name'] ? {
-          birthDate: this.clientForm.controls['partner.dob']?.value,
-          email: this.clientForm.controls['partner.email']?.value,
-          gender: this.clientForm.controls['partner.gender']?.value,
-          name: this.clientForm.controls['partner.name']?.value,
-          phone: this.clientForm.controls['partner.phone']?.value,
-          preferredCurrency: this.clientForm.controls['partner.currency']?.value
-        } : null,
-        financialAdvisor: {
-          advisorId: "678c93f32be72db4b9631be1",
-          advisorName: "Matteo"
-        },
-        lastUpdated: new Date(),
-        notes: this.clientForm.controls['notes'].value
-      } 
+      var client: Client = this.getClientFormInfo()
       this.clientHttpService.addClient(client).pipe(
         filter((res) => !!res),
         map((res) => {

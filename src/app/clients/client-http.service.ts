@@ -24,7 +24,7 @@ export class ClientHttpService {
   }
 
   addClient(client: Client) {
-    return this.httpClient.post(`${environment.apiUrl}api/v1/Clients`, client)
+    return this.httpClient.post<Client>(`${environment.apiUrl}api/v1/Clients`, client)
   }
   
   updateClient(client: Client) {
