@@ -48,6 +48,7 @@ import { Client } from '../client';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
 import { DialogComponent } from 'src/app/dialog/dialog.component';
 import { trackByHourSegment } from 'angular-calendar/modules/common/util';
+import { MatSort, Sort } from '@angular/material/sort';
 
 @Component({
   selector: 'app-client-list',
@@ -108,7 +109,9 @@ export class ClientListComponent implements OnInit, AfterViewInit {
 
   @ViewChild(MatTable, { static: true }) table: MatTable<any> =
     Object.create(null);
+  @ViewChild(MatSort) sort: MatSort;
   searchText: any;
+  clients: Array<Client>;
   
   // displayedColumns: string[] = [
   //   'client',
@@ -151,17 +154,51 @@ export class ClientListComponent implements OnInit, AfterViewInit {
     }
   }
 
+  announceSortChange(sortState: Sort) {
+    // This example uses English messages. If your application supports
+    // multiple language, you would internationalize these strings.
+    // Furthermore, you can customize the message to add additional
+    // details about the values being sorted.
+    if(sortState.active === 'last_updated') {
+      this.clients = this.sortList(this.clients, 'lastUpdated', sortState.direction === 'asc' ? 'asc' : 'desc' )
+    }
+    if(sortState.active === 'client') {
+      this.clients = this.sortList(this.clients, 'clientDetails.name', sortState.direction === 'asc' ? 'asc' : 'desc' )
+    }
+
+    this.dataSource = new MatTableDataSource(this.clients);
+  }
+
+
+  sortList<T>(list: T[], field: string, direction: 'asc' | 'desc' = 'asc'): T[] {
+    const resolveField = (obj: any, path: string) =>
+        path.split('.').reduce((value, key) => value[key], obj);
+
+    return list.sort((a, b) => {
+        const valueA = resolveField(a, field);
+        const valueB = resolveField(b, field);
+        const factor = direction === 'asc' ? 1 : -1;
+
+        if (valueA > valueB) return 1 * factor;
+        if (valueA < valueB) return -1 * factor;
+        return 0;
+    });
+  }
   getClients() {
     this.clientHttpService.getClients().pipe(
       filter(clients => !!clients)
     ).subscribe((clients) => {
       console.log(clients);
       this.dataSource = new MatTableDataSource(clients)
+      this.clients = clients;
+      this.dataSource.paginator = this.paginator;
+      this.dataSource.sort = this.sort;
     });
   }
 
   ngAfterViewInit(): void {
     this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
   }
 
   applyFilter(filterValue: string): void {
@@ -170,6 +207,9 @@ export class ClientListComponent implements OnInit, AfterViewInit {
         filter((clients) => !!clients),
         map((clients) => {
           this.dataSource = new MatTableDataSource(clients);
+          this.clients = clients;
+          this.dataSource.paginator = this.paginator;
+          this.dataSource.sort = this.sort;
         })
       ).subscribe();
     }
