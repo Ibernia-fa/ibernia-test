@@ -14,14 +14,19 @@ export const routes: Routes = [
         pathMatch: 'full',
       },
       {
-        path: 'starter',
-        loadChildren: () =>
-          import('./pages/pages.routes').then((m) => m.PagesRoutes),
-      },
-      {
         path: 'clients',
         loadChildren: () =>
           import('./clients/clients.routes').then((m) => m.ClientsRoutes),
+      },
+      {
+        path: 'finances',
+        loadChildren: () =>
+          import('./financial-workflow/financial-workflow.routes').then((m) => m.FinancialWorkflowRoutes),
+      },
+      {
+        path: 'starter',
+        loadChildren: () =>
+          import('./pages/pages.routes').then((m) => m.PagesRoutes),
       },
       {
         path: 'dashboards',

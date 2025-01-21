@@ -138,7 +138,7 @@ export class ClientEditComponent {
           phone: this.clientForm.controls['phone'].value,
           preferredCurrency: this.clientForm.controls['currency'].value,
         },
-        partnerDetail: {
+        partnerDetail: this.clientForm.controls['partner.name'] ? {
           birthDate: this.clientForm.controls['partner.dob']?.value,
           email: this.clientForm.controls['partner.email']?.value,
           gender: this.clientForm.controls['partner.gender']?.value,
@@ -146,7 +146,7 @@ export class ClientEditComponent {
           phone: this.clientForm.controls['partner.phone']?.value,
           preferredCurrency:
             this.clientForm.controls['partner.currency']?.value,
-        },
+        } : null,
         financialAdvisor: {
           advisorId: '678c93f32be72db4b9631be1',
           advisorName: 'Matteo',

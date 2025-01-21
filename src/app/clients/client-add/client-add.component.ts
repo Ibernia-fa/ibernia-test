@@ -112,7 +112,7 @@ export class ClientAddComponent {
       this.clientHttpService.addClient(client).pipe(
         filter((res) => !!res),
         map((res) => {
-          this.router.navigate(['/clients']);
+          this.router.navigate(['/finances']);
           this.toastr.success('Client created successfully', 'Success!');
         }),
         catchError((err) => {

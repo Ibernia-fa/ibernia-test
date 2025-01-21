@@ -43,18 +43,6 @@
         <div class="col-6">
             <div class="row">
                 <div class="col-sm-12 d-flex align-items-center">
-                    <mat-label class="f-s-14 f-w-600 d-block m-b-5">Gender:</mat-label>
-                </div>
-                <div class="col-sm-12">
-                    <mat-form-field appearance="outline" class="w-100">
-                        <input matInput placeholder="Male/Female" formControlName="gender"/>
-                    </mat-form-field>
-                </div>
-            </div>
-        </div>
-        <div class="col-6">
-            <div class="row">
-                <div class="col-sm-12 d-flex align-items-center">
                     <mat-label class="f-s-14 f-w-600 d-block m-b-5">Currency:</mat-label>
                 </div>
                 <div class="col-sm-12">
@@ -64,6 +52,19 @@
                 </div>
             </div>
         </div>
+        <div class="col-6">
+            <div class="row">
+                <div class="col-sm-12 d-flex align-items-center">
+                    <mat-label class="f-s-14 f-w-600 d-block m-b-5">Gender:</mat-label>
+                </div>
+                <div class="col-sm-12">
+                    <mat-form-field appearance="outline" class="w-100">
+                        <input matInput placeholder="Male/Female" formControlName="gender"/>
+                    </mat-form-field>
+                </div>
+            </div>
+        </div>
+        
     </div>
     <div class="row">
         <div class="col-6">
@@ -140,18 +141,6 @@
                 <div class="col-6">
                     <div class="row">
                         <div class="col-sm-12 d-flex align-items-center">
-                            <mat-label class="f-s-14 f-w-600 d-block m-b-5">Gender:</mat-label>
-                        </div>
-                        <div class="col-sm-12">
-                            <mat-form-field appearance="outline" class="w-100">
-                                <input matInput placeholder="Male/Female" formControlName="gender"/>
-                            </mat-form-field>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-6">
-                    <div class="row">
-                        <div class="col-sm-12 d-flex align-items-center">
                             <mat-label class="f-s-14 f-w-600 d-block m-b-5">Currency:</mat-label>
                         </div>
                         <div class="col-sm-12">
@@ -161,6 +150,19 @@
                         </div>
                     </div>
                 </div>
+                <div class="col-6">
+                    <div class="row">
+                        <div class="col-sm-12 d-flex align-items-center">
+                            <mat-label class="f-s-14 f-w-600 d-block m-b-5">Gender:</mat-label>
+                        </div>
+                        <div class="col-sm-12">
+                            <mat-form-field appearance="outline" class="w-100">
+                                <input matInput placeholder="Male/Female" formControlName="gender"/>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+                
             </div>
             <div class="row">
                 <div class="col-6">
@@ -205,7 +207,7 @@
     </div>
     <div class="row justify-content-end">
         <div class="col-sm-12">
-            <button mat-flat-button class="btn-submit" type="submit" [disabled]="clientForm.invalid">ADD A NEW CLIENT</button>
+            <button mat-flat-button class="btn-submit" type="submit" [disabled]="clientForm.invalid">Add new client and start the model</button>
         </div>
     </div>
 </form>
