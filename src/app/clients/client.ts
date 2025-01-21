@@ -1,7 +1,7 @@
 export interface Client {
     id: string,
     clientDetails: Details,
-    partnerDetail: Details,
+    partnerDetail: Details | null,
     financialAdvisor: FinancialAdvisor,
     lastUpdated: Date,
     notes: string
