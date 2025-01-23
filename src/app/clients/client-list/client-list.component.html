@@ -28,59 +28,76 @@
     <div class="row">
         <div class="col-sm-8">
             <h4 class="page-title m-t-16 f-s-32 f-w-500 m-b-16">
-                <i-tabler name="briefcase" class="icon-25 color-primary m-r-20"></i-tabler>
+              <div class="icon-circle m-r-20">
+                <i-tabler name="briefcase" class="icon-25 color-primary"></i-tabler>
+              </div>
                 Matteo's Clients
             </h4>
         </div>
     </div>
 </div>
   @if(dataSource.data.length > 0) {
-    <mat-card-content>
+    <mat-card-content id="pad-0">
       <div class="table-responsive-sm">
         <table mat-table matSort (matSortChange)="announceSortChange($event)" [dataSource]="dataSource" multiTemplateDataRows>
           <!-- @for(column of columnsToDisplay; track column) { -->
           <ng-container matColumnDef="client">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-client">
               Client
             </th>
-            <td mat-cell *matCellDef="let element" class="p-x-24 f-s-14 p-l-0">
+            <td mat-cell *matCellDef="let element" class="p-x-24 f-s-14 p-l-0 column-client">
               {{ element.clientDetails.name }} @if(element.partnerDetail?.name) { & {{element.partnerDetail?.name}} }
             </td>
           </ng-container>
           <ng-container matColumnDef="dob">
-            <th mat-header-cell *matHeaderCellDef class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0">
+            <th mat-header-cell *matHeaderCellDef class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-dob">
               Date(s) of birth
             </th>
-            <td mat-cell *matCellDef="let element" class="p-x-24 f-s-14 p-l-0">
+            <td mat-cell *matCellDef="let element" class="p-x-24 f-s-14 p-l-0 column-dob">
               {{ element.clientDetails.birthDate | date }} ({{ element.clientDetails.birthDate | ageCalculator }}) @if(element.partnerDetail?.birthDate && element.partnerDetail?.name) { <br> {{element.partnerDetail?.birthDate | date}} ({{element.partnerDetail?.birthDate | ageCalculator}}) }
             </td>
           </ng-container>
           <ng-container matColumnDef="last_updated">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-last_updated">
               Last Updated
             </th>
-            <td mat-cell *matCellDef="let element" class="p-x-24 f-s-14 p-l-0">
+            <td mat-cell *matCellDef="let element" class="p-x-24 f-s-14 p-l-0 column-last_updated">
               {{ element.lastUpdated | date }} <br> {{element.lastUpdated | timeAgo}}
             </td>
           </ng-container>
           <ng-container matColumnDef="notes">
-            <th mat-header-cell *matHeaderCellDef class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0">
+            <th mat-header-cell *matHeaderCellDef class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-notes">
               Notes
             </th>
-            <td mat-cell *matCellDef="let element" class="p-x-24 f-s-14 p-l-0">
+            <td mat-cell *matCellDef="let element" class="p-x-24 f-s-14 p-l-0 column-notes">
               {{ element.notes }}
             </td>
           </ng-container>
           <ng-container matColumnDef="action">
-            <th mat-header-cell *matHeaderCellDef class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0">
-              Action
+            <th mat-header-cell *matHeaderCellDef class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-action">
+              
             </th>
-            <td mat-cell *matCellDef="let element" class="action-link">
-              <a [routerLink]="['./' + element.id + '/edit']" class="m-t-15 m-r-10 cursor-pointer"><i-tabler name="pencil-minus"
+            <td mat-cell class="column-action" *matCellDef="let element">
+              <button mat-icon-button [matMenuTriggerFor]="menu">
+                <mat-icon>
+                  <i-tabler name="dots-vertical" class="icon-20"></i-tabler>
+                </mat-icon>
+                </button>
+                <mat-menu #menu="matMenu" class="cardWithShadow">
+                  <button (click)="redirectToEdit(element.id)" mat-menu-item>
+                    <span class="m-t-15 m-r-10 cursor-pointer">Edit</span>
+                  </button>
+                  <button (click)="openDialog('Delete', element)" mat-menu-item>
+                    <span class="m-t-15 m-r-10 cursor-pointer">
+                      Delete
+                    </span>
+                  </button>
+                </mat-menu>
+              <!-- <a [routerLink]="['./' + element.id + '/edit']" class="m-t-15 m-r-10 cursor-pointer"><i-tabler name="pencil-minus"
                 class="icon-18"></i-tabler></a>
                 <a (click)="openDialog('Delete', element)" class="m-t-15 m-r-10 cursor-pointer">
                   <i-tabler name="trash-filled" class="icon-18"></i-tabler>
-                </a>
+                </a> -->
               </td>
             </ng-container>
             <!-- } -->
@@ -91,10 +108,10 @@
               
             </ng-container> -->
             <ng-container matColumnDef="expand">
-              <th mat-header-cell *matHeaderCellDef aria-label="row actions">
+              <th mat-header-cell *matHeaderCellDef aria-label="row actions" class="column-expand">
                 &nbsp;
               </th>
-              <td mat-cell *matCellDef="let element">
+              <td mat-cell *matCellDef="let element" class="column-expand">
                 @if(element.partnerDetail?.name) {
                   <button mat-icon-button aria-label="expand row" (click)="rowExpandClicked(element, $event)">
                   @if(expandedPartnerElement !== element) {
@@ -316,5 +333,10 @@
         </table>
       </div>
     </mat-card-content>
+  }
+  @else {
+    <div class="h-300">
+      <mat-spinner></mat-spinner>
+    </div>
   }
 </mat-card>

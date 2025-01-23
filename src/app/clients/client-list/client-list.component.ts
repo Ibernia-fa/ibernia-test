@@ -51,6 +51,8 @@ import { trackByHourSegment } from 'angular-calendar/modules/common/util';
 import { MatSort, Sort } from '@angular/material/sort';
 import { TimeAgoPipe } from 'src/app/pipe/time-ago.pipe';
 import { AgeCalculatorPipe } from 'src/app/pipe/age-calculator.pipe';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-client-list',
@@ -73,7 +75,9 @@ import { AgeCalculatorPipe } from 'src/app/pipe/age-calculator.pipe';
     HighlightAuto,
     HighlightLineNumbers,
     TimeAgoPipe,
-    AgeCalculatorPipe
+    AgeCalculatorPipe,
+    MatMenuModule,
+    MatProgressSpinnerModule
   ],
   // imports: [
   //   MatCardModule,
@@ -282,6 +286,10 @@ export class ClientListComponent implements OnInit, AfterViewInit {
 
   redirectToAdd() {
     this.router.navigate(['/clients/add']);
+  }
+  
+  redirectToEdit(id: string) {
+    this.router.navigate(['/clients/' + id +'/edit']);
   }
 
   // tslint:disable-next-line - Disables all

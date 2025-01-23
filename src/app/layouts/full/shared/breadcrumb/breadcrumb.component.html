@@ -5,7 +5,9 @@
       
       <h4 class="page-title m-t-16 f-s-32 f-w-500 m-b-16">
         @if(showBackIcon) {
-          <a class="m-r-24" [routerLink]="routeForBack"><i-tabler name="arrow-left" class="icon-25"></i-tabler></a>
+          <div class="icon-circle m-r-20">
+            <a [routerLink]="routeForBack"><i-tabler name="arrow-left" class="icon-25"></i-tabler></a>
+          </div>
         }
         <!-- {{ pageInfo?.['title'] }} -->
         {{ title }}

@@ -41,3 +41,62 @@ table {
     display: flex;
   }
   
+  .mat-mdc-header-row {
+    background: rgba(247, 251, 255, 1) !important;
+  }
+
+  .h-300 {
+    align-items: center;
+    justify-content: center;
+    height: 300px;
+    display: flex;
+  }
+
+
+.column-expand {
+    width: 10%
+}
+
+.column-client {
+    width: 20%;
+}
+
+.column-dob {
+    width: 20%;
+}
+
+.column-last_updated {
+    width: 20%;
+}
+
+.column-notes {
+    width: 20%;
+}
+
+.column-action {
+    width: 10%
+}
+
+
+.mat-mdc-row:nth-child(even) {
+  background-color: rgba(249, 249, 249, 1); /* Black background for even rows */
+  // color: #000; /* White text for contrast */
+}
+
+.mat-mdc-row:nth-child(odd) {
+  background-color: #fff; /* White background for odd rows */
+  // color: #000; /* Black text for contrast */
+}
+
+.mat-mdc-row {
+  transition: background-color 0.3s ease; /* Optional: Smooth color transition */
+}
+
+.mat-mdc-row:hover {
+  background-color: #e0e0e0; /* Optional: Highlight row on hover */
+}
+
+#pad-0 {
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+}
