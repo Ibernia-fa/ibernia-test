@@ -606,7 +606,7 @@ export const navItems: NavItem[] = [
   {
     displayName: 'Goals & Events',
     iconName: 'clock',
-    route: '',
+    route: '/finances',
   },
   {
     displayName: 'Saving Pots',
