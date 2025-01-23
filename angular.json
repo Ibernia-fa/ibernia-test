@@ -19,7 +19,7 @@
           "options": {
             "allowedCommonJsDependencies": ["apexcharts", "bezier-easing"],
             "outputPath": {
-              "base": "dist/Modernize"
+              "base": "dist/ibernia-app"
             },
             "index": "src/index.html",
             "polyfills": ["zone.js"],
