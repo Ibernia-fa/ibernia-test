@@ -10,7 +10,7 @@
   left: 0;
   height: calc(100vh - $header-height); /* Occupy the full viewport height */
   display: flex;
-  flex-direction: column; 
+  flex-direction: column;
   // overflow-x: hidden;
   border-right: 1px solid $borderColor;
   border-radius: 0px !important;
@@ -21,7 +21,6 @@
   overflow-y: auto; /* Enable vertical scrolling */
   overflow-x: hidden; /* Prevent horizontal scrolling */
 }
-
 
 .profile-bar {
   flex-shrink: 0; /* Prevent the profile bar from shrinking */

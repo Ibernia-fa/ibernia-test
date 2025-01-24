@@ -53,3 +53,47 @@ html .topbar {
     }
   }
 }
+
+// New Styles
+.top-navigation-bar {
+  position: fixed;
+  top: 0;
+  z-index: 9;
+  width: 100%;
+  padding: 16px 32px !important;
+  // height: $header-height;
+}
+.nav-btns {
+  gap: 16px;
+}
+.header-profile-icon .f-s-20 {
+  font-size: 14px !important;
+  line-height: 20px !important;
+  color: #1c1c1c;
+  font-family: "Inter", serif !important;
+}
+.header-profile-icon {
+  gap: 8px;
+}
+
+.header-profile-button {
+  background: transparent;
+  border: none;
+  outline: none;
+  cursor: pointer;
+}
+.header-profile-button .pic-riple {
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  z-index: -1;
+  height: 41px;
+  width: 41px;
+  background: transparent;
+  border-radius: 9999px;
+  transition: all 0.2s ease;
+}
+.header-profile-button:hover .pic-riple {
+  background: #e3e4e4;
+}
+// End New Styles
