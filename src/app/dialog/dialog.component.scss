@@ -1,13 +1,28 @@
 .mat-mdc-dialog-actions {
-    justify-content: var(--mat-dialog-actions-alignment, center);
+  justify-content: var(--mat-dialog-actions-alignment, center);
 }
 
 .icon-center {
-    margin: 20px;
-    display: flex;
-    justify-content: var(--mat-dialog-actions-alignment, center);
+  margin: 20px;
+  display: flex;
+  justify-content: var(--mat-dialog-actions-alignment, center);
 }
 
 .color-primary {
-    color: var(--mat-sys-primary);
+  color: var(--mat-sys-primary);
+}
+
+.modal-heading {
+  max-width: 288px;
+  margin: 0 auto;
+  h2 {
+    text-align: center;
+    line-height: 36px;
+    font-size: 24px;
+  }
+}
+.dialog-del-btn {
+  button {
+    width: 100%;
+  }
 }

@@ -6,10 +6,10 @@ import { filter, map, mergeMap } from 'rxjs/operators';
 import { TablerIconsModule } from 'angular-tabler-icons';
 
 @Component({
-    selector: 'app-breadcrumb',
-    imports: [RouterModule, TablerIconsModule],
-    templateUrl: './breadcrumb.component.html',
-    styleUrls: []
+  selector: 'app-breadcrumb',
+  imports: [RouterModule, TablerIconsModule],
+  templateUrl: './breadcrumb.component.html',
+  styleUrls: ['./breadcrumb.component.scss'],
 })
 export class AppBreadcrumbComponent {
   // @Input() layout;

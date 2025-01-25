@@ -62,15 +62,25 @@ html .topbar {
   width: 100%;
   padding: 16px 32px !important;
   // height: $header-height;
+  @media (max-width: 640px) {
+    padding: 16px 16px !important;
+    height: 64px !important;
+  }
 }
 .nav-btns {
   gap: 16px;
+  @media (max-width: 640px) {
+    gap: 0 !important;
+  }
 }
 .header-profile-icon .f-s-20 {
   font-size: 14px !important;
   line-height: 20px !important;
   color: #1c1c1c;
   font-family: "Inter", serif !important;
+  @media (max-width: 640px) {
+    display: none;
+  }
 }
 .header-profile-icon {
   gap: 8px;

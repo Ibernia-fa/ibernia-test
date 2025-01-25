@@ -1,35 +1,43 @@
 @if(pageInfo?.['title'] != 'Analytical' && pageInfo?.['title'] != 'eCommerce'){
-<div class="m-b-20 overflow-hidden">
-  <div class="row">
-    <div class="col-sm-8">
-      
-      <h4 class="page-title m-t-16 f-s-32 f-w-500 m-b-16">
-        @if(showBackIcon) {
-          <div class="icon-circle m-r-20">
-            <a [routerLink]="routeForBack"><i-tabler name="arrow-left" class="icon-25"></i-tabler></a>
-          </div>
-        }
-        <!-- {{ pageInfo?.['title'] }} -->
-        {{ title }}
-      </h4>
-      <div class="d-flex align-items-center overflow-hidden">
-        <ul class="breadcrumb">
-          @for (url of pageInfo?.['urls']; track url.url;let index = $index,last
-          = $last ) { @if(!last){
+<!-- <div class="m-b-20 overflow-hidden"> -->
+<!-- <div class="row"> -->
+<!-- <div class="col-sm-8"> -->
+<div class="breadcrumb-new">
+  <div class="d-flex align-items-center gap-2">
+    @if(showBackIcon) {
+    <!-- <div class="icon-circle m-r-20"> -->
+    <a
+      [routerLink]="routeForBack"
+      class="icon-back-new rounded-circle d-flex align-items-center justify-content-center"
+    >
+      <i-tabler name="arrow-left" class="icon-25"></i-tabler>
+    </a>
+    <!-- </div> -->
+    }
+    <h4 class="page-title f-s-32 f-w-500">
+      <!-- {{ pageInfo?.['title'] }} -->
+      {{ title }}
+    </h4>
+    <div class="d-flex align-items-center">
+      <ul class="breadcrumb">
+        @for (url of pageInfo?.['urls']; track url.url;let index = $index,last =
+        $last ) { @if(!last){
 
-          <li class="breadcrumb-item" [routerLink]="url.url">
-            <a [routerLink]="url.url">{{ url.title }}</a>
-          </li>
-          }@else {
-          <li class="breadcrumb-item">
-            <i-tabler name="circle-filled" class="icon-8"></i-tabler>
-          </li>
-          <li class="breadcrumb-item active f-s-14">{{ url.title }}</li>
-          } }
-        </ul>
-      </div>
+        <li class="breadcrumb-item" [routerLink]="url.url">
+          <a [routerLink]="url.url">{{ url.title }}</a>
+        </li>
+        }@else {
+        <li class="breadcrumb-item">
+          <i-tabler name="circle-filled" class="icon-8"></i-tabler>
+        </li>
+        <li class="breadcrumb-item active f-s-14">{{ url.title }}</li>
+        } }
+      </ul>
     </div>
-    <!-- <div class="col-sm-4 text-right position-relative">
+  </div>
+</div>
+<!-- </div> -->
+<!-- <div class="col-sm-4 text-right position-relative">
       <div class="breadcrumb-icon">
         <img
           src="/assets/images/breadcrumb/ChatBc.png"
@@ -38,6 +46,6 @@
         />
       </div>
     </div> -->
-  </div>
-</div>
+<!-- </div> -->
+<!-- </div> -->
 }
