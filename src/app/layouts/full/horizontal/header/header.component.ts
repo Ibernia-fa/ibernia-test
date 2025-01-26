@@ -1,14 +1,17 @@
 import { Component, Output, EventEmitter, Input } from '@angular/core';
 import { CoreService } from 'src/app/services/core.service';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { navItems } from '../../vertical/sidebar/sidebar-data';
 import { TranslateService } from '@ngx-translate/core';
 import { RouterModule } from '@angular/router';
 import { TablerIconsModule } from 'angular-tabler-icons';
-import { MaterialModule } from 'src/app/material.module';
 import { BrandingComponent } from '../../vertical/sidebar/branding.component';
 import { FormsModule } from '@angular/forms';
 import { AppSettings } from 'src/app/config';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatMenuModule } from '@angular/material/menu';
 
 interface notifications {
   id: number;
@@ -40,9 +43,15 @@ interface quicklinks {
 }
 
 @Component({
-    selector: 'app-horizontal-header',
-    imports: [RouterModule, TablerIconsModule, MaterialModule, BrandingComponent],
-    templateUrl: './header.component.html'
+  selector: 'app-horizontal-header',
+  imports: [
+    RouterModule,
+    TablerIconsModule,
+    BrandingComponent,
+    MatToolbarModule,
+    MatMenuModule
+  ],
+  templateUrl: './header.component.html',
 })
 export class AppHorizontalHeaderComponent {
   @Input() showToggle = true;
@@ -280,9 +289,17 @@ export class AppHorizontalHeaderComponent {
 }
 
 @Component({
-    selector: 'app-search-dialog',
-    imports: [RouterModule, MaterialModule, TablerIconsModule, FormsModule],
-    templateUrl: 'search-dialog.component.html'
+  selector: 'app-search-dialog',
+  imports: [
+    RouterModule,
+    TablerIconsModule,
+    FormsModule,
+    MatFormFieldModule,
+    MatDividerModule,
+    MatDialogModule,
+    MatToolbarModule,
+  ],
+  templateUrl: 'search-dialog.component.html',
 })
 export class AppHorizontalSearchDialogComponent {
   searchText: string = '';

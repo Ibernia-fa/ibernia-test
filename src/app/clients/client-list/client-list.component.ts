@@ -27,7 +27,6 @@ import { TablerIconsModule } from 'angular-tabler-icons';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { MatNativeDateModule } from '@angular/material/core';
 import { NgScrollbarModule } from 'ngx-scrollbar';
-import { MaterialModule } from 'src/app/material.module';
 import { AppBreadcrumbComponent } from 'src/app/layouts/full/shared/breadcrumb/breadcrumb.component';
 import { Router, RouterModule } from '@angular/router';
 import { HighlightLineNumbers } from 'ngx-highlightjs/line-numbers';
@@ -47,8 +46,7 @@ import { catchError, filter, map } from 'rxjs';
 import { Client } from '../client';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
 import { DialogComponent } from 'src/app/dialog/dialog.component';
-import { trackByHourSegment } from 'angular-calendar/modules/common/util';
-import { MatSort, Sort } from '@angular/material/sort';
+import { MatSort, MatSortModule, Sort } from '@angular/material/sort';
 import { TimeAgoPipe } from 'src/app/pipe/time-ago.pipe';
 import { AgeCalculatorPipe } from 'src/app/pipe/age-calculator.pipe';
 import { MatMenuModule } from '@angular/material/menu';
@@ -57,7 +55,6 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 @Component({
   selector: 'app-client-list',
   imports: [
-    MaterialModule,
     TablerIconsModule,
     MatNativeDateModule,
     NgScrollbarModule,
@@ -67,14 +64,13 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
     MatCardModule,
     MatTableModule,
+    MatSortModule,
     MatIconModule,
     MatButtonModule,
     MatDividerModule,
     ToastrModule,
-    Highlight,
-    HighlightAuto,
-    HighlightLineNumbers,
     TimeAgoPipe,
+    MatFormFieldModule,
     AgeCalculatorPipe,
     MatMenuModule,
     MatProgressSpinnerModule,

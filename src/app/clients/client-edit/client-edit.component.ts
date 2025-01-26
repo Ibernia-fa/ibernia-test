@@ -15,25 +15,27 @@ import { MatInputModule } from '@angular/material/input';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
 import { AppBreadcrumbComponent } from 'src/app/layouts/full/shared/breadcrumb/breadcrumb.component';
-import { MaterialModule } from 'src/app/material.module';
 import { FiveDayRangeSelectionStrategy } from 'src/app/pages/forms/form-elements';
 import { ClientHttpService } from '../client-http.service';
 import { catchError, filter, map, switchMap } from 'rxjs';
 import { Client } from '../client';
 import { MatSelectModule } from '@angular/material/select';
+import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-client-edit',
   imports: [
     AppBreadcrumbComponent,
-    MaterialModule,
     MatFormFieldModule,
     MatInputModule,
     MatDatepickerModule,
     ReactiveFormsModule,
     ToastrModule,
     RouterModule,
-    MatSelectModule
+    MatSelectModule,
+    MatButtonModule,
+    MatCardModule,
   ],
   providers: [
     ClientHttpService,

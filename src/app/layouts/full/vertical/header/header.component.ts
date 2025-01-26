@@ -6,17 +6,20 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import { CoreService } from 'src/app/services/core.service';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { navItems } from '../sidebar/sidebar-data';
 import { TranslateService } from '@ngx-translate/core';
 import { TablerIconsModule } from 'angular-tabler-icons';
-import { MaterialModule } from 'src/app/material.module';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgScrollbarModule } from 'ngx-scrollbar';
 import { AppSettings } from 'src/app/config';
 import { BrandingComponent } from '../sidebar/branding.component';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatButtonModule } from '@angular/material/button';
 
 interface notifications {
   id: number;
@@ -55,7 +58,8 @@ interface quicklinks {
         NgScrollbarModule,
         BrandingComponent,
         TablerIconsModule,
-        MaterialModule,
+        MatToolbarModule,
+        MatButtonModule
     ],
     templateUrl: './header.component.html',
     encapsulation: ViewEncapsulation.None
@@ -297,9 +301,17 @@ export class HeaderComponent {
 }
 
 @Component({
-    selector: 'search-dialog',
-    imports: [RouterModule, MaterialModule, TablerIconsModule, FormsModule],
-    templateUrl: 'search-dialog.component.html'
+  selector: 'search-dialog',
+  imports: [
+    RouterModule,
+    TablerIconsModule,
+    FormsModule,
+    MatFormFieldModule,
+    MatDividerModule,
+    MatDialogModule,
+    MatToolbarModule,
+  ],
+  templateUrl: 'search-dialog.component.html',
 })
 export class AppSearchDialogComponent {
   searchText: string = '';

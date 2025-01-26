@@ -15,7 +15,7 @@
           <div class="w-100 form-field">
             <mat-label class="f-s-14 f-w-600 d-block">Client Name</mat-label>
             <input matInput placeholder="John Deo" formControlName="name" />
-            @if(clientForm.get('name')?.hasError('required')) {
+            @if(clientForm.get('name')?.touched && clientForm.get('name')?.hasError('required')) {
             <mat-error>Name is required</mat-error>
             }
           </div>
@@ -98,7 +98,7 @@
               </div>
               <mat-datepicker #picker></mat-datepicker>
             </div>
-            @if(clientForm.get('dob')?.hasError('required')) {
+            @if(clientForm.get('dob')?.touched && clientForm.get('dob')?.hasError('required')) {
             <mat-error>Date Of Birth is required</mat-error>
             }
             <!-- </mat-form-field> -->
@@ -183,7 +183,7 @@
             <div class="w-100 form-field">
               <mat-label class="f-s-14 f-w-600 d-block">Partner Name</mat-label>
               <input matInput placeholder="John Deo" formControlName="name" />
-              @if(clientForm.get('partner.name')?.hasError('required')) {
+              @if(clientForm.get('partner.name')?.touched && clientForm.get('partner.name')?.hasError('required')) {
               <span class="field-error d-block">Name is required</span>
               }
             </div>
@@ -269,7 +269,7 @@
                 </div>
                 <mat-datepicker #partnerPicker></mat-datepicker>
               </div>
-              @if(clientForm.get('partner.dob')?.hasError('required')) {
+              @if(clientForm.get('partner.dob')?.touched && clientForm.get('partner.dob')?.hasError('required')) {
               <span class="field-error d-block">Date Of Birth is required</span>
               }
 

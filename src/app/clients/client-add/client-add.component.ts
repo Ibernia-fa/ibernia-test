@@ -5,7 +5,6 @@ import { MAT_DATE_RANGE_SELECTION_STRATEGY, MatDatepickerModule } from '@angular
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { AppBreadcrumbComponent } from 'src/app/layouts/full/shared/breadcrumb/breadcrumb.component';
-import { MaterialModule } from 'src/app/material.module';
 import { FiveDayRangeSelectionStrategy } from 'src/app/pages/forms/form-elements';
 import { ClientHttpService } from '../client-http.service';
 import { Client } from '../client';
@@ -13,19 +12,22 @@ import { catchError, filter, map } from 'rxjs';
 import { Router, RouterModule } from '@angular/router';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
 import { MatSelectModule } from '@angular/material/select';
+import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-client-add',
   imports: [
     AppBreadcrumbComponent,
-    MaterialModule,
     MatFormFieldModule,
     MatInputModule,
     MatDatepickerModule,
     ReactiveFormsModule,
     RouterModule,
     ToastrModule,
-    MatSelectModule
+    MatSelectModule,
+    MatButtonModule,
+    MatCardModule
   ],
   providers: [
     ClientHttpService,

@@ -7,11 +7,10 @@ import {
   ViewChild,
 } from '@angular/core';
 import { TablerIconsModule } from 'angular-tabler-icons';
-import { MaterialModule } from 'src/app/material.module';
 
 @Component({
     selector: 'app-sidebar',
-    imports: [TablerIconsModule, MaterialModule],
+    imports: [TablerIconsModule],
     templateUrl: './sidebar.component.html'
 })
 export class SidebarComponent implements OnInit {

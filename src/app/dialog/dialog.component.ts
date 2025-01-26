@@ -2,16 +2,21 @@ import { DatePipe } from '@angular/common';
 import { Component, Inject, Optional } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { MaterialModule } from '../material.module';
 import { Employee } from '../pages/apps/employee/employee';
 import { TablerIconsModule } from 'angular-tabler-icons';
+import { MatFormFieldModule } from '@angular/material/form-field';
 
 @Component({
   selector: 'app-dialog',
-  imports: [MatDialogModule, FormsModule, MaterialModule, TablerIconsModule],
+  imports: [
+    MatDialogModule,
+    FormsModule,
+    TablerIconsModule,
+    MatFormFieldModule,
+  ],
   providers: [DatePipe],
   templateUrl: './dialog.component.html',
-  styleUrl: './dialog.component.scss'
+  styleUrl: './dialog.component.scss',
 })
 export class DialogComponent {
   action: string;

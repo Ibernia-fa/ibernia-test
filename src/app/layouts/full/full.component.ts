@@ -1,7 +1,7 @@
 import { BreakpointObserver, MediaMatcher } from '@angular/cdk/layout';
 import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { MatSidenav, MatSidenavContent } from '@angular/material/sidenav';
+import { MatSidenav, MatSidenavContent, MatSidenavModule } from '@angular/material/sidenav';
 import { CoreService } from 'src/app/services/core.service';
 import { AppSettings } from 'src/app/config';
 import { filter } from 'rxjs/operators';
@@ -10,7 +10,6 @@ import { navItems } from './vertical/sidebar/sidebar-data';
 import { NavService } from '../../services/nav.service';
 import { AppNavItemComponent } from './vertical/sidebar/nav-item/nav-item.component';
 import { RouterModule } from '@angular/router';
-import { MaterialModule } from 'src/app/material.module';
 import { CommonModule } from '@angular/common';
 import { SidebarComponent } from './vertical/sidebar/sidebar.component';
 import { NgScrollbarModule } from 'ngx-scrollbar';
@@ -19,6 +18,9 @@ import { HeaderComponent } from './vertical/header/header.component';
 import { AppHorizontalHeaderComponent } from './horizontal/header/header.component';
 import { AppHorizontalSidebarComponent } from './horizontal/sidebar/sidebar.component';
 import { CustomizerComponent } from './shared/customizer/customizer.component';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatListModule } from '@angular/material/list';
 
 const MOBILE_VIEW = 'screen and (max-width: 768px)';
 const TABLET_VIEW = 'screen and (min-width: 769px) and (max-width: 1024px)';
@@ -45,7 +47,6 @@ interface quicklinks {
     imports: [
         RouterModule,
         AppNavItemComponent,
-        MaterialModule,
         CommonModule,
         SidebarComponent,
         NgScrollbarModule,
@@ -54,6 +55,10 @@ interface quicklinks {
         AppHorizontalHeaderComponent,
         AppHorizontalSidebarComponent,
         CustomizerComponent,
+        MatSidenavModule,
+        MatExpansionModule,
+        MatDividerModule,
+        MatListModule
     ],
     templateUrl: './full.component.html',
     styleUrls: [],
