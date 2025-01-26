@@ -61,7 +61,9 @@ html .topbar {
   z-index: 9;
   width: 100%;
   padding: 16px 32px !important;
+  border-bottom: 1px solid #e7e7eb;
   // height: $header-height;
+  height: 65px !important;
   @media (max-width: 640px) {
     padding: 16px 16px !important;
     height: 64px !important;

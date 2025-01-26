@@ -13,3 +13,14 @@
     supporting-text-tracking: unset,
   )
 );
+
+.cdk-overlay-dark-backdrop {
+  background: #3a3a4740;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.mat-mdc-dialog-surface {
+  border-radius: 12px !important;
+  box-shadow: none !important;
+  padding: 32px !important;
+}

@@ -1,12 +1,14 @@
 @use "../variables" as *;
 
 .mat-drawer.sidebarNav {
-  width: $sidenav-desktop;
+  // width: $sidenav-desktop;
+  width: 295px;
   flex-shrink: 0;
   transition: swift-ease-out(width);
   // position: absolute;
   position: fixed; /* Keep the sidebar in place */
-  top: $header-height;
+  // top: $header-height;
+  top: 65px;
   left: 0;
   height: calc(100vh - $header-height); /* Occupy the full viewport height */
   display: flex;
@@ -25,8 +27,49 @@
 .profile-bar {
   flex-shrink: 0; /* Prevent the profile bar from shrinking */
   // background-color: #f5f5f5; /* Optional */
-  padding: 16px; /* Adjust padding as needed */
   // border-top: 1px solid #ddd; /* Optional border to separate sections */
+  padding: 16px !important; /* Adjust padding as needed */
+  .flex-column {
+    flex-direction: column;
+  }
+  .rounded {
+    border-radius: 8px !important;
+  }
+  h4 {
+    font-size: 14px;
+    font-family: "Ubuntu", serif;
+    color: #1c1c1c;
+    line-height: 20px;
+  }
+  .gap-2 {
+    gap: 2px !important;
+  }
+  .gap-16 {
+    gap: 16px !important;
+  }
+  span {
+    color: #9495a2 !important;
+  }
+  .p-16 {
+    padding: 16px 12px !important; /* Adjust padding as needed */
+  }
+  .content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  button {
+    padding: 12px 24px !important;
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 18px;
+    border-radius: 4px;
+    min-height: 48px;
+    border: 1px solid #516ce8 !important;
+    span {
+      color: #516ce8 !important;
+    }
+  }
 }
 
 .branding {
@@ -77,7 +120,7 @@
         }
 
         &.mdc-list {
-          padding: 0 24px;
+          padding: 0 16px;
           max-width: $sidenav-desktop;
 
           .mdc-list-group__subheader {
@@ -128,23 +171,70 @@
   z-index: 9;
 }
 
+.nav-caption {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  p {
+    color: #b7b6c2;
+    font-size: 12px;
+    line-height: 14px;
+    font-weight: 300 !important;
+    margin: 0;
+  }
+  span {
+    height: 1px;
+    flex: 1;
+    display: block;
+    background-color: #e7e7eb;
+  }
+}
+
 .sidebar-list {
   &.mdc-list {
-    padding: 0 24px;
+    // padding: 0 24px;
+    padding: 16px 16px 0 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 
     .mdc-list-group__subheader {
-      margin: 12px 0;
+      // margin: 12px 0;
       text-transform: uppercase;
       font-size: 0.75rem;
       font-weight: 700;
-      margin-top: 24px;
+      margin: 0 !important;
+      padding: 10px 0;
+      // margin-top: 24px;
     }
 
     .menu-list-item {
-      height: 45px;
-      padding: 8px 10px !important;
-      margin-bottom: 2px;
-
+      // height: 45px;
+      height: 36px;
+      // padding: 8px 10px !important;
+      padding: 8px !important;
+      // margin-bottom: 2px;
+      border-radius: 4px;
+      border-left: 2px solid transparent;
+      position: relative;
+      overflow: unset;
+      &::after {
+        content: "";
+        width: 1px;
+        height: 100%;
+        background-color: #e7e7eb;
+        position: absolute;
+        top: 26px;
+        left: 16px;
+        z-index: -1;
+      }
+      // .connecting-line {
+      //   height: 20px;
+      //   width: 2px;
+      //   position: absolute;
+      //   top: 100%;
+      //   background-color: red;
+      // }
       &.twoline {
         height: 60px;
         align-items: center;
@@ -168,19 +258,24 @@
       }
 
       &.activeMenu {
-        background-color: var(--mat-sys-primary);
+        // background-color: var(--mat-sys-primary);
+        background-color: #f7f7f7;
+        border-left: 2px solid #516ce8;
 
         .mdc-list-item__primary-text {
-          color: $white !important;
+          // color: $white !important;
+          color: #516ce8 !important;
         }
 
         .mat-mdc-list-item-icon {
-          color: $white !important;
+          color: #516ce8 !important;
+          // color: $white !important;
         }
       }
 
       .mdc-list-item__start {
-        margin-right: 14px;
+        // margin-right: 14px;
+        margin-right: 8px;
         margin-left: 0 !important;
         width: 20px;
         height: 20px;
@@ -191,7 +286,9 @@
       .mdc-list-item__primary-text {
         display: flex;
         align-items: center;
-        justify-content: space-between;
+        // justify-content: space-between;
+        gap: 8px;
+        color: #787889;
 
         .arrow-icon {
           display: flex;

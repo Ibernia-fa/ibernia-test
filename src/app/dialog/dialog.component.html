@@ -1,6 +1,10 @@
 <!-- <h2 class="f-w-500" mat-dialog-title>{{action}}</h2> -->
-<div class="icon-center">
-  <i-tabler name="info-square-filled" class="icon-30 color-primary"></i-tabler>
+<div class="icon-center position-relative">
+  <img src="assets/images/svgs/Info-rect-icon.svg" alt="Info-rect-icon" />
+
+  <button type="button" class="close-icon">
+    <img src="assets/images/svgs/close-line-cion.svg" alt="close-line-cion" />
+  </button>
 </div>
 
 @if(action !== 'Delete') {
@@ -134,16 +138,18 @@
   </form>
 </mat-dialog-content>
 } @else {
-<div class="p-x-24">
+<div class="">
   @if(local_data.text) {
-  <h2 class="f-w-500 f-s-28">{{ local_data.text }}</h2>
+  <div class="modal-heading">
+    <h2 class="f-w-700">{{ local_data.text }}</h2>
+  </div>
   } @else {
   <p>
     Sure to delete <span class="f-w-600">{{ local_data.Name }}</span> ?
   </p>
   }
 </div>
-<div class="dialog-del-btn p-b-24 p-x-24">
+<div class="dialog-del-btn">
   <button (click)="doAction()" mat-flat-button class="bg-primary text-white">
     {{ action }}
   </button>

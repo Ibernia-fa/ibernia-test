@@ -25,3 +25,53 @@ html {
     width: 300px;
   }
 }
+
+// Form Fields
+.form-field {
+  padding: 0 !important;
+}
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.form-field .f-s-14 {
+  line-height: 16px;
+}
+.form-field input,
+.form-field .select-option {
+  width: 100%;
+  display: block;
+  background-color: #ffffff;
+  border: 1px solid #e7e7eb;
+  border-radius: 4px;
+  padding: 8px 16px;
+  outline: none;
+  min-height: 46px;
+  line-height: 16px;
+  font-size: 14px;
+  font-family: "Ubuntu", serif;
+  letter-spacing: "2%";
+  transition: all 0.2s linear;
+  &::placeholder {
+    color: #b7b6c2;
+  }
+  &:focus {
+    outline: none;
+    border: 1px solid #516ce8;
+    transition: border 0.2s linear;
+  }
+}
+.field-error {
+  color: #fa896b;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 400;
+}
+.date-picker-position {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  transform: translateY(-50%);
+}
+// End Form Fields

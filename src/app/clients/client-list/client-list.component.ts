@@ -77,7 +77,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     TimeAgoPipe,
     AgeCalculatorPipe,
     MatMenuModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
   ],
   // imports: [
   //   MatCardModule,
@@ -91,7 +91,13 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
   //   HighlightAuto,
   //   HighlightLineNumbers,
   // ],
-  providers: [DatePipe, ClientHttpService, ToastrService, TimeAgoPipe, AgeCalculatorPipe],
+  providers: [
+    DatePipe,
+    ClientHttpService,
+    ToastrService,
+    TimeAgoPipe,
+    AgeCalculatorPipe,
+  ],
   templateUrl: './client-list.component.html',
   styleUrl: './client-list.component.scss',
   animations: [
@@ -106,11 +112,27 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
   ],
 })
 export class ClientListComponent implements OnInit, AfterViewInit {
-  dataSource: MatTableDataSource<Client> = new MatTableDataSource(new Array<Client>());
+  dataSource: MatTableDataSource<Client> = new MatTableDataSource(
+    new Array<Client>()
+  );
   columnsToDisplay = ['client', 'dob', 'last_updated', 'notes', 'action'];
-  columnsToDisplayWithExpand = ['expand', ...this.columnsToDisplay ];
-  clientColumnsToDisplayWithCheckbox = ['select', 'name_client', 'dob_client', 'last_updated_client', 'notes_client', 'action_client'];
-  partnerColumnsToDisplayWithCheckbox = ['select', 'name_partner', 'dob_partner', 'last_updated_partner', 'notes_partner', 'action_partner'];
+  columnsToDisplayWithExpand = ['expand', ...this.columnsToDisplay];
+  clientColumnsToDisplayWithCheckbox = [
+    'select',
+    'name_client',
+    'dob_client',
+    'last_updated_client',
+    'notes_client',
+    'action_client',
+  ];
+  partnerColumnsToDisplayWithCheckbox = [
+    'select',
+    'name_partner',
+    'dob_partner',
+    'last_updated_partner',
+    'notes_partner',
+    'action_partner',
+  ];
 
   expandedClientElement: Client | null = null;
   expandedPartnerElement: Client | null = null;
@@ -120,7 +142,7 @@ export class ClientListComponent implements OnInit, AfterViewInit {
   @ViewChild(MatSort) sort: MatSort;
   searchText: any;
   clients: Array<Client>;
-  
+
   // displayedColumns: string[] = [
   //   'client',
   //   'dob',
@@ -147,17 +169,21 @@ export class ClientListComponent implements OnInit, AfterViewInit {
     private router: Router,
     private clientHttpService: ClientHttpService,
     private toastr: ToastrService
-  ) {
-  }
+  ) {}
 
   ngOnInit() {
     this.getClients();
   }
 
   rowExpandClicked(element: any, event?: any) {
-    if(element.partnerDetail.name) {
-      this.expandedClientElement = this.expandedClientElement === element ? null : element
-      this.expandedPartnerElement = this.expandedPartnerElement === element && !element?.partnerDetails?.name ? null : element
+    if (element.partnerDetail.name) {
+      this.expandedClientElement =
+        this.expandedClientElement === element ? null : element;
+      this.expandedPartnerElement =
+        this.expandedPartnerElement === element &&
+        !element?.partnerDetails?.name
+          ? null
+          : element;
       event?.stopPropagation();
     }
   }
@@ -167,18 +193,26 @@ export class ClientListComponent implements OnInit, AfterViewInit {
     // multiple language, you would internationalize these strings.
     // Furthermore, you can customize the message to add additional
     // details about the values being sorted.
-    if(sortState.active === 'last_updated') {
-      this.clients = this.sortList(this.clients, 'lastUpdated', sortState.direction === 'asc' ? 'asc' : 'desc' )
+    if (sortState.active === 'last_updated') {
+      this.clients = this.sortList(
+        this.clients,
+        'lastUpdated',
+        sortState.direction === 'asc' ? 'asc' : 'desc'
+      );
     }
-    if(sortState.active === 'client') {
-      this.clients = this.sortList(this.clients, 'clientDetails.name', sortState.direction === 'asc' ? 'asc' : 'desc' )
+    if (sortState.active === 'client') {
+      this.clients = this.sortList(
+        this.clients,
+        'clientDetails.name',
+        sortState.direction === 'asc' ? 'asc' : 'desc'
+      );
     }
 
     this.dataSource = new MatTableDataSource(this.clients);
   }
 
   timeAgo(value: Date | string | number) {
-    console.log(value)
+    console.log(value);
     if (!value) return 'Invalid date';
 
     const date = new Date(value);
@@ -200,30 +234,35 @@ export class ClientListComponent implements OnInit, AfterViewInit {
     }
   }
 
-  sortList<T>(list: T[], field: string, direction: 'asc' | 'desc' = 'asc'): T[] {
+  sortList<T>(
+    list: T[],
+    field: string,
+    direction: 'asc' | 'desc' = 'asc'
+  ): T[] {
     const resolveField = (obj: any, path: string) =>
-        path.split('.').reduce((value, key) => value[key], obj);
+      path.split('.').reduce((value, key) => value[key], obj);
 
     return list.sort((a, b) => {
-        const valueA = resolveField(a, field);
-        const valueB = resolveField(b, field);
-        const factor = direction === 'asc' ? 1 : -1;
+      const valueA = resolveField(a, field);
+      const valueB = resolveField(b, field);
+      const factor = direction === 'asc' ? 1 : -1;
 
-        if (valueA > valueB) return 1 * factor;
-        if (valueA < valueB) return -1 * factor;
-        return 0;
+      if (valueA > valueB) return 1 * factor;
+      if (valueA < valueB) return -1 * factor;
+      return 0;
     });
   }
   getClients() {
-    this.clientHttpService.getClients().pipe(
-      filter(clients => !!clients)
-    ).subscribe((clients) => {
-      console.log(clients);
-      this.dataSource = new MatTableDataSource(clients)
-      this.clients = clients;
-      this.dataSource.paginator = this.paginator;
-      this.dataSource.sort = this.sort;
-    });
+    this.clientHttpService
+      .getClients()
+      .pipe(filter((clients) => !!clients))
+      .subscribe((clients) => {
+        console.log(clients);
+        this.dataSource = new MatTableDataSource(clients);
+        this.clients = clients;
+        this.dataSource.paginator = this.paginator;
+        this.dataSource.sort = this.sort;
+      });
   }
 
   ngAfterViewInit(): void {
@@ -232,39 +271,42 @@ export class ClientListComponent implements OnInit, AfterViewInit {
   }
 
   applyFilter(filterValue: string): void {
-    if(filterValue) {
-      this.clientHttpService.searchClients(filterValue).pipe(
-        filter((clients) => !!clients),
-        map((clients) => {
-          this.dataSource = new MatTableDataSource(clients);
-          this.clients = clients;
-          this.dataSource.paginator = this.paginator;
-          this.dataSource.sort = this.sort;
-        })
-      ).subscribe();
-    }
-    else {
+    if (filterValue) {
+      this.clientHttpService
+        .searchClients(filterValue)
+        .pipe(
+          filter((clients) => !!clients),
+          map((clients) => {
+            this.dataSource = new MatTableDataSource(clients);
+            this.clients = clients;
+            this.dataSource.paginator = this.paginator;
+            this.dataSource.sort = this.sort;
+          })
+        )
+        .subscribe();
+    } else {
       this.getClients();
     }
     // this.dataSource.filter = filterValue.trim().toLowerCase();
   }
 
   openDialog(action: string, obj: any): void {
-  obj.action = action;
-  obj.text = "Are you sure you want to delete this client?"
-  const dialogRef = this.dialog.open(DialogComponent, {
-    data: obj,
-  });
-  dialogRef.afterClosed().subscribe((result) => {
-    // if (result.event === 'Add') {
-    //   this.addRowData(result.data);
-    // } else if (result.event === 'Update') {
-    //   this.updateRowData(result.data);
-    // } else 
-    if (result.event === 'Delete') {
-      this.deleteRowData(result.data);
-    }
-  });
+    obj.action = action;
+    obj.text = 'Are you sure you want to delete this client?';
+    const dialogRef = this.dialog.open(DialogComponent, {
+      data: obj,
+      width: '460px',
+    });
+    dialogRef.afterClosed().subscribe((result) => {
+      // if (result.event === 'Add') {
+      //   this.addRowData(result.data);
+      // } else if (result.event === 'Update') {
+      //   this.updateRowData(result.data);
+      // } else
+      if (result.event === 'Delete') {
+        this.deleteRowData(result.data);
+      }
+    });
   }
 
   // tslint:disable-next-line - Disables all
@@ -287,9 +329,9 @@ export class ClientListComponent implements OnInit, AfterViewInit {
   redirectToAdd() {
     this.router.navigate(['/clients/add']);
   }
-  
+
   redirectToEdit(id: string) {
-    this.router.navigate(['/clients/' + id +'/edit']);
+    this.router.navigate(['/clients/' + id + '/edit']);
   }
 
   // tslint:disable-next-line - Disables all
@@ -311,16 +353,19 @@ export class ClientListComponent implements OnInit, AfterViewInit {
 
   // // tslint:disable-next-line - Disables all
   deleteRowData(client: Client): boolean | any {
-    this.clientHttpService.deleteClient(client.id).pipe(
-      map((res) => {
-        this.toastr.success('Client deleted successfully', 'Success!');
-        this.getClients();
-      }),
-      catchError((err) => {
-        console.error(err);
-        this.toastr.error('An error occured while saving client', 'Error!');
-        throw err;
-      })
-    ).subscribe();
+    this.clientHttpService
+      .deleteClient(client.id)
+      .pipe(
+        map((res) => {
+          this.toastr.success('Client deleted successfully', 'Success!');
+          this.getClients();
+        }),
+        catchError((err) => {
+          console.error(err);
+          this.toastr.error('An error occured while saving client', 'Error!');
+          throw err;
+        })
+      )
+      .subscribe();
   }
 }

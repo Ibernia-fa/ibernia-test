@@ -605,27 +605,32 @@ export const navItems: NavItem[] = [
   // },
   {
     displayName: 'Goals & Events',
-    iconName: 'clock',
+    // iconName: 'clock',
+    iconName: '/assets/images/svgs/clock-icon.svg',
     route: '/finances',
   },
   {
     displayName: 'Saving Pots',
-    iconName: 'folder',
+    // iconName: 'folder',
+    iconName: '/assets/images/svgs/file-icon.svg',
     route: '',
   },
   {
     displayName: 'Incomes & Expenses',
-    iconName: 'wallet',
+    // iconName: 'wallet',
+    iconName: '/assets/images/svgs/ticket-icon.svg',
     route: '',
   },
   {
     displayName: 'Contributions & Withdrawals',
-    iconName: 'circle-percentage',
+    // iconName: 'circle-percentage',
+    iconName: '/assets/images/svgs/discount-icon.svg',
     route: '',
   },
   {
     displayName: 'Cashflow Model',
-    iconName: 'trending-up',
+    // iconName: 'trending-up',
+    iconName: '/assets/images/svgs/wallet-icon.svg',
     route: '',
   },
   {
@@ -633,7 +638,8 @@ export const navItems: NavItem[] = [
   },
   {
     displayName: 'Emergencies',
-    iconName: 'info-square-rounded',
+    // iconName: 'info-square-rounded',
+    iconName: '/assets/images/svgs/danger-square-icon.svg',
     route: '',
   },
 ];

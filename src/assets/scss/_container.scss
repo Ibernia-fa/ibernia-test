@@ -20,10 +20,14 @@ body {
   flex: 1;
   height: 100%;
 }
-
-.app-container {
-  padding-bottom: 60px;
+.sidenavContainer {
+  padding-top: 65px;
+  height: calc(100dvh - 60px);
+  background-color: #fafafa !important;
 }
+// .app-container {
+//   padding-bottom: 60px;
+// }
 .container {
   max-width: 1200px;
   padding-left: 24px;
@@ -38,17 +42,19 @@ body {
 }
 
 .pageWrapper {
-  padding: 24px;
-  padding-top: calc($header-height + 24px);
-  min-height: calc(100vh - 70px);
+  padding: 32px 24px;
+  // padding-top: calc($header-height + 24px);
+  // min-height: calc(100vh - 70px);
   // top: calc(100vh - $header-height);
   margin: 0 auto;
 
   &.maxWidth {
     max-width: $boxedWidth;
   }
+  @media (max-width: "768px") {
+    padding: 24px 16px;
+  }
 }
-
 
 .icon-circle {
   display: inline-flex; /* Centers the icon inside the circle */
@@ -60,7 +66,6 @@ body {
   border-radius: 50%; /* Makes it a circle */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: Adds a subtle shadow */
 }
-
 
 .w-100 {
   width: 100%;
@@ -153,7 +158,6 @@ td.hljs-ln-line.hljs-ln-numbers {
     flex-direction: row !important;
   }
 }
-
 
 .color-primary {
   color: var(--mat-sys-primary);

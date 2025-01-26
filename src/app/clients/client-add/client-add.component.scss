@@ -7,6 +7,7 @@
   border: 1px solid #e7e7eb;
   border-radius: 12px;
   font-family: "Ubuntu", serif;
+  box-shadow: none;
 }
 .add-client-content-wrapper {
   padding: 24px;
@@ -144,7 +145,7 @@
       transition: opacity 0.3s linear;
     }
     &:disabled {
-      background-color: #ccc;
+      background-color: #e5e5e7;
       color: #636363c7;
       cursor: not-allowed !important;
     }
