@@ -1,47 +1,157 @@
-<mat-card class="cardWithShadow">
+<div class="d-flex gap-24" style="flex-direction: column">
+  <mat-card class="cardWithShadow">
     <mat-card-content>
+      <div class="d-flex flex-column gap-32 timeline-wrapper">
+        <div
+          class="card-main-wrapper d-flex align-items-center justify-content-between w-100"
+        >
+          <div class="d-flex align-items-center gap-16">
+            <!-- Icon  -->
+            <div
+              class="icon rounded-circle d-flex align-items-center justify-content-center"
+            >
+              <img src="assets/images/svgs/clock-icon.svg" alt="clock" />
+            </div>
+            <!-- End Icon  -->
+            <!-- headings  -->
+            <div
+              class="d-flex flex-column justify-content-between gap-4 headings"
+            >
+              <h4 class="page-title f-w-500">Timeline</h4>
+              <span class="sub-title">John Devidson</span>
+            </div>
+            <!-- End headings  -->
+          </div>
 
-        <div class="m-b-20 overflow-hidden">
-            <div class="row">
-                <div class="col-sm-8">
-
-                    <h4 class="page-title m-t-16 f-s-32 f-w-500 m-b-16">
-                        <!-- @if(showBackIcon) { -->
-                        <div class="icon-circle m-r-20">
-                          <i-tabler name="clock-filled" class="icon-25 color-primary"></i-tabler>
-                        </div>
-                        <!-- } -->
-                        <!-- {{ pageInfo?.['title'] }} -->
-                        Timeline
-                    </h4>
-                    <div class="m-l-60 d-flex align-items-center overflow-hidden">
-                        John Devidson
-                        <!-- <ul class="breadcrumb">
-                  @for (url of pageInfo?.['urls']; track url.url;let index = $index,last
-                  = $last ) { @if(!last){
-        
-                  <li class="breadcrumb-item" [routerLink]="url.url">
-                    <a [routerLink]="url.url">{{ url.title }}</a>
-                  </li>
-                  }@else {
-                  <li class="breadcrumb-item">
-                    <i-tabler name="circle-filled" class="icon-8"></i-tabler>
-                  </li>
-                  <li class="breadcrumb-item active f-s-14">{{ url.title }}</li>
-                  } }
-                </ul> -->
-                    </div>
-                </div>
-                <!-- <div class="col-sm-4 text-right position-relative">
-              <div class="breadcrumb-icon">
+          <div class="d-flex align-items-center gap-12">
+            <img
+              src="/assets/images/svgs/chart-histogram-two-icon.svg"
+              alt="chart"
+            />
+            <span class="f-s-16">Cashflow Simulator #1</span>
+          </div>
+        </div>
+        <!-- Date Fields  -->
+        <div class="row justify-content-between align-items-end flex-nowrap">
+          <div class="col-6">
+            <div class="w-100 form-field gap-12">
+              <div class="d-flex gap-8 align-items-center">
+                <mat-label class="f-s-16 f-w-400 d-block"
+                  >Forecast start date:</mat-label
+                >
                 <img
-                  src="/assets/images/breadcrumb/ChatBc.png"
-                  alt="breadcrumb"
-                  width="165"
+                  src="assets/images/svgs/help-circle-icon.svg"
+                  alt="help-circle-icon"
                 />
               </div>
-            </div> -->
+              <div class="position-relative">
+                <input
+                  matInput
+                  [matDatepicker]="picker"
+                  formControlName="start_date"
+                />
+                <div class="date-picker-position">
+                  <mat-datepicker-toggle matIconSuffix [for]="picker">
+                    <mat-icon matDatepickerToggleIcon>
+                      <svg
+                        width="25"
+                        height="24"
+                        viewBox="0 0 25 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M5.5 18.89H6.91421L16.2279 9.57629L14.8137 8.16207L5.5 17.4758V18.89ZM21.5 20.89H3.5V16.6474L16.935 3.21233C17.3256 2.8218 17.9587 2.8218 18.3492 3.21233L21.1777 6.04075C21.5682 6.43128 21.5682 7.06444 21.1777 7.45497L9.74264 18.89H21.5V20.89ZM16.2279 6.74786L17.6421 8.16207L19.0563 6.74786L17.6421 5.33365L16.2279 6.74786Z"
+                          fill="#48475D"
+                        />
+                      </svg>
+                    </mat-icon>
+                  </mat-datepicker-toggle>
+                </div>
+                <mat-datepicker #picker></mat-datepicker>
+              </div>
             </div>
+          </div>
+          <div class="d-flex justify-content-end align-items-end">
+            <img
+              src="assets/images/svgs/chevron-right-date-icon.svg"
+              alt="chevron-right-date-icon"
+            />
+          </div>
+          <div class="col-6">
+            <div class="w-100 form-field gap-12">
+              <div class="d-flex gap-8 align-items-center">
+                <mat-label class="f-s-16 f-w-400 d-block"
+                  >Forecast end date:</mat-label
+                >
+                <img
+                  src="assets/images/svgs/help-circle-icon.svg"
+                  alt="help-circle-icon"
+                />
+              </div>
+              <div class="position-relative">
+                <input
+                  matInput
+                  [matDatepicker]="pickerend"
+                  formControlName="end_date"
+                />
+                <div class="date-picker-position">
+                  <mat-datepicker-toggle matIconSuffix [for]="pickerend">
+                    <mat-icon matDatepickerToggleIcon>
+                      <svg
+                        width="25"
+                        height="24"
+                        viewBox="0 0 25 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M5.5 18.89H6.91421L16.2279 9.57629L14.8137 8.16207L5.5 17.4758V18.89ZM21.5 20.89H3.5V16.6474L16.935 3.21233C17.3256 2.8218 17.9587 2.8218 18.3492 3.21233L21.1777 6.04075C21.5682 6.43128 21.5682 7.06444 21.1777 7.45497L9.74264 18.89H21.5V20.89ZM16.2279 6.74786L17.6421 8.16207L19.0563 6.74786L17.6421 5.33365L16.2279 6.74786Z"
+                          fill="#48475D"
+                        />
+                      </svg>
+                    </mat-icon>
+                  </mat-datepicker-toggle>
+                </div>
+                <mat-datepicker #pickerend></mat-datepicker>
+              </div>
+            </div>
+          </div>
         </div>
+        <!-- End Date Fields  -->
+      </div>
     </mat-card-content>
-</mat-card>
+  </mat-card>
+
+  <!-- Event Section  -->
+  <mat-card class="cardWithShadow">
+    <mat-card-content>
+      <div
+        class="d-flex align-items-center justify-content-between event-main-wrapper"
+      >
+        <div class="d-flex flex-column gap-6" style="flex-direction: column">
+          <h4 class="f-s-22 f-w-400">Events</h4>
+          <p class="m-0">
+            Drag new events onto the timeline, or drag to re-arrange existing
+            events. <br />
+            The start and end date of transactions such as incomes can be linked
+            to events.
+          </p>
+        </div>
+        <button type="button" class="button-icon">
+          <span>New Event</span>
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 14 14"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path d="M6 6V0H8V6H14V8H8V14H6V8H0V6H6Z" fill="white" />
+          </svg>
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+  <!-- Event Section  -->
+</div>

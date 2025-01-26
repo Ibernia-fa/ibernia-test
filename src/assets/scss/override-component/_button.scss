@@ -134,3 +134,42 @@ html {
     }
   }
 }
+
+// New Styles
+// icon button Styles
+.button-icon {
+  background-color: #516ce8;
+  padding: 12px 24px;
+  border-radius: 4px;
+  outline: none;
+  border: none;
+  height: 100%;
+  min-height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  font-family: "Ubuntu", serif;
+  transition: all 0.3s linear;
+
+  @media (max-width: 520px) {
+    width: 100%;
+  }
+}
+.button-icon:focus {
+  border: none;
+  outline: none;
+}
+.button-icon span {
+  font-size: 14px;
+  line-height: 16px;
+  font-weight: 700;
+  color: white;
+  display: block;
+}
+.button-icon:hover {
+  opacity: 0.9;
+  transition: opacity 0.3s linear;
+}
+// End New Styles

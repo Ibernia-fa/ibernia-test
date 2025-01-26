@@ -1,13 +1,46 @@
 .mat-mdc-dialog-actions {
-    justify-content: var(--mat-dialog-actions-alignment, center);
+  justify-content: var(--mat-dialog-actions-alignment, center);
 }
 
 .icon-center {
-    margin: 20px;
-    display: flex;
-    justify-content: var(--mat-dialog-actions-alignment, center);
+  display: flex;
+  justify-content: var(--mat-dialog-actions-alignment, center);
+}
+.close-icon {
+  position: absolute;
+  padding: 0;
+  margin: 0;
+  border: none;
+  outline: none;
+  background-color: transparent;
+  cursor: pointer;
+  right: 0;
+  top: 24px;
+}
+.color-primary {
+  color: var(--mat-sys-primary);
 }
 
-.color-primary {
-    color: var(--mat-sys-primary);
+.modal-heading {
+  max-width: 288px;
+  margin-top: 32px;
+  margin-left: auto;
+  margin-right: auto;
+  h2 {
+    text-align: center;
+    line-height: 36px;
+    font-size: 24px;
+  }
+}
+.dialog-del-btn {
+  margin-top: 32px;
+  button {
+    width: 100%;
+    border-radius: 4px;
+    min-height: 48px;
+    font-size: 16px;
+    line-height: 18px;
+    padding: 12px 24px;
+    background-color: #516ce8 !important;
+  }
 }

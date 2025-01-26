@@ -1,9 +1,10 @@
-<mat-toolbar class="topbar">
+<!-- <mat-toolbar class="topbar"> -->
+<mat-toolbar class="top-navigation-bar">
   <!-- --------------------------------------------------------------- -->
   <!-- Desktop Menu -->
-  <div class="branding">
-    <app-branding></app-branding>
-  </div>
+  <!-- <div class="branding"> -->
+  <app-branding style="margin-top: 8px"></app-branding>
+  <!-- </div> -->
   <!-- @if (!hideSidebarToggle) {
       @if(showToggle) {
       <button
@@ -14,9 +15,9 @@
         <i-tabler name="menu-2" class="icon-20 d-flex"></i-tabler>
       </button>
       } -->
-    
-      <!-- Mobile Menu -->
-      <!-- @if(!showToggle) {
+
+  <!-- Mobile Menu -->
+  <!-- @if(!showToggle) {
       <button
         mat-icon-button
         (click)="toggleMobileNav.emit()"
@@ -25,7 +26,7 @@
         <i-tabler name="menu-2" class="icon-20 d-flex"></i-tabler>
       </button>
       } -->
-      <!-- --------------------------------------------------------------- -->
+  <!-- --------------------------------------------------------------- -->
   <!-- } -->
 
   <!-- --------------------------------------------------------------- -->
@@ -40,10 +41,10 @@
   </button> -->
 
   <!-- <div class="d-none d-lg-flex"> -->
-    <!-- --------------------------------------------------------------- -->
-    <!--  Links -->
-    <!-- --------------------------------------------------------------- -->
-    <!-- <button
+  <!-- --------------------------------------------------------------- -->
+  <!--  Links -->
+  <!-- --------------------------------------------------------------- -->
+  <!-- <button
       mat-button
       [matMenuTriggerFor]="appsmenu"
       aria-label="Notifications"
@@ -120,7 +121,7 @@
     <a mat-button [routerLink]="['/apps/email/inbox']">Email</a>
   </div> -->
 
-  <span class="flex-1-auto"></span> 
+  <span class="flex-1-auto"></span>
 
   <!-- Mobile Menu -->
   <!-- <button
@@ -173,38 +174,91 @@
     aria-label="Notifications" class="m-x-5"
   > -->
   <!-- <div class="d-flex justify-content-center"> -->
-    <!-- [matMenuTriggerFor]="notificationmenu" -->
+  <!-- [matMenuTriggerFor]="notificationmenu" -->
+  <div class="d-flex align-items-center nav-btns">
     <button
-    mat-icon-button
-    aria-label="Notifications" class="d-flex justify-content-center"
-  >
-    <i-tabler class="d-flex icon-22" [name]="'settings'"></i-tabler>
-  </button>
-  <!-- </div> -->
-  <!-- <div class="d-flex justify-content-center m-x-5"> -->
-    <button
-    mat-icon-button
-    aria-label="Notifications" class="m-x-5"
-  >
-    <i-tabler
-      class="d-flex"
-      name="bell"
-      matBadgeColor="primary"
-      ></i-tabler>
-</button>
-  <!-- </div> -->
-   <div class="d-flex justify-content-center align-items-center">
-     <button  mat-icon-button class="m-l-8 m-r-5">
-       <img
-       src="/assets/images/profile/user-1.jpg"
-       class="rounded-circle object-cover icon-35 profile-dd"
-       width="35"
-     /> 
-    </button>
-    <span class="f-w-500 f-s-20">Matteo Rhye</span>
-   </div>
+      mat-icon-button
+      aria-label="Notifications"
+      class="d-flex justify-content-center"
+    >
+      <!-- <i-tabler class="d-flex icon-22" [name]="'settings'"></i-tabler> -->
 
-      <!-- matBadge="1  " -->
+      <svg
+        width="20"
+        height="22"
+        viewBox="0 0 20 22"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          fill-rule="evenodd"
+          clip-rule="evenodd"
+          d="M18.8074 6.62361L18.185 5.54352C17.6584 4.6296 16.4914 4.31432 15.5763 4.83872C15.1406 5.09534 14.6208 5.16815 14.1314 5.04109C13.6421 4.91402 13.2233 4.59752 12.9676 4.16137C12.803 3.88415 12.7146 3.56839 12.7113 3.24604C12.7261 2.72922 12.5311 2.2284 12.1708 1.85767C11.8104 1.48694 11.3153 1.27786 10.7982 1.27808H9.54423C9.0377 1.27808 8.55205 1.47991 8.19473 1.83895C7.83742 2.19798 7.63791 2.68459 7.64034 3.19112C7.62533 4.23693 6.77321 5.07681 5.7273 5.0767C5.40494 5.07336 5.08919 4.98494 4.81197 4.82041C3.89679 4.29601 2.72985 4.61129 2.20327 5.52522L1.53508 6.62361C1.00914 7.53639 1.32013 8.70261 2.23073 9.23231C2.82263 9.57404 3.18726 10.2056 3.18726 10.8891C3.18726 11.5725 2.82263 12.2041 2.23073 12.5458C1.32129 13.0719 1.00996 14.2353 1.53508 15.1454L2.16666 16.2346C2.41338 16.6798 2.82734 17.0083 3.31693 17.1474C3.80652 17.2866 4.33137 17.2249 4.77535 16.976C5.21181 16.7213 5.73192 16.6516 6.22007 16.7822C6.70822 16.9128 7.12397 17.233 7.3749 17.6717C7.53943 17.9489 7.62784 18.2646 7.63119 18.587C7.63119 19.6435 8.48769 20.5 9.54423 20.5H10.7982C11.8512 20.5 12.7062 19.6491 12.7113 18.5962C12.7088 18.088 12.9096 17.6 13.2689 17.2407C13.6282 16.8814 14.1162 16.6807 14.6243 16.6831C14.9459 16.6917 15.2604 16.7798 15.5397 16.9394C16.4524 17.4653 17.6186 17.1544 18.1483 16.2438L18.8074 15.1454C19.0625 14.7075 19.1325 14.186 19.0019 13.6964C18.8714 13.2067 18.551 12.7894 18.1117 12.5367C17.6725 12.284 17.3521 11.8666 17.2215 11.3769C17.091 10.8873 17.161 10.3658 17.4161 9.92796C17.582 9.63834 17.8221 9.3982 18.1117 9.23231C19.0169 8.70289 19.3271 7.54349 18.8074 6.63277V6.62361Z"
+          stroke="#1C1C1C"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M10.1752 13.5252C11.6311 13.5252 12.8114 12.345 12.8114 10.8891C12.8114 9.43318 11.6311 8.25293 10.1752 8.25293C8.71931 8.25293 7.53906 9.43318 7.53906 10.8891C7.53906 12.345 8.71931 13.5252 10.1752 13.5252Z"
+          stroke="#1C1C1C"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+    </button>
+    <!-- </div> -->
+    <!-- <div class="d-flex justify-content-center m-x-5"> -->
+    <button mat-icon-button aria-label="Notifications" class="m-x-5">
+      <!-- <i-tabler class="d-flex" name="bell" matBadgeColor="primary"></i-tabler> -->
+
+      <svg
+        width="20"
+        height="22"
+        viewBox="0 0 20 22"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          fill-rule="evenodd"
+          clip-rule="evenodd"
+          d="M10 16.8476C15.6392 16.8476 18.2481 16.1242 18.5 13.2205C18.5 10.3188 16.6812 10.5054 16.6812 6.94511C16.6812 4.16414 14.0452 1 10 1C5.95477 1 3.31885 4.16414 3.31885 6.94511C3.31885 10.5054 1.5 10.3188 1.5 13.2205C1.75295 16.1352 4.36177 16.8476 10 16.8476Z"
+          stroke="#1C1C1C"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M12.3889 19.8572C11.0247 21.3719 8.89672 21.3899 7.51953 19.8572"
+          stroke="#1C1C1C"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+    </button>
+    <!-- </div> -->
+    <button type="button" class="header-profile-button">
+      <div
+        class="d-flex justify-content-center align-items-center header-profile-icon"
+      >
+        <!-- <button mat-icon-button> profile-dd -->
+        <div class="position-relative">
+          <img
+            src="/assets/images/profile/user-1.jpg"
+            class="rounded-circle object-cover icon-35"
+            width="35"
+          />
+          <span class="pic-riple"></span>
+        </div>
+        <!-- </button> -->
+        <span class="f-w-500 f-s-20">Matteo Rhye</span>
+      </div>
+    </button>
+  </div>
+
+  <!-- matBadge="1  " -->
   <!-- </button> -->
   <!--<mat-menu #notificationmenu="matMenu" class="topbar-dd cardWithShadow">
     <div class="d-flex align-items-center p-x-32 p-y-16">
@@ -245,7 +299,7 @@
     [matMenuTriggerFor]="profilemenu"
     aria-label="Notifications" class="m-l-8"
   > -->
-    <!-- <img
+  <!-- <img
       src="/assets/images/profile/user-1.jpg"
       class="rounded-circle object-cover icon-35 profile-dd m-l-8"
       width="35"
@@ -298,8 +352,8 @@
         </a>
         } -->
 
-        <!-- upgrade -->
-        <!-- <div
+  <!-- upgrade -->
+  <!-- <div
           class="p-24 overflow-hidden bg-light-primary rounded position-relative m-y-16"
         >
           <div class="d-flex align-items-center">
