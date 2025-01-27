@@ -11,7 +11,8 @@
           <div class="w-100 form-field">
             <mat-label class="f-s-14 f-w-600 d-block">Client Name</mat-label>
             <input matInput placeholder="John Deo" formControlName="name" />
-            @if(clientForm.get('name')?.touched && clientForm.get('name')?.hasError('required')) {
+            @if(clientForm.get('name')?.touched &&
+            clientForm.get('name')?.hasError('required')) {
             <span class="field-error d-block">Name is required</span>
             }
           </div>
@@ -31,73 +32,17 @@
               <div class="date-picker-position">
                 <mat-datepicker-toggle matIconSuffix [for]="picker">
                   <mat-icon matDatepickerToggleIcon>
-                    <svg
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M8 2V5"
-                        stroke="#1C1C1C"
-                        stroke-width="2"
-                        stroke-miterlimit="10"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      />
-                      <path
-                        d="M16 2V5"
-                        stroke="#1C1C1C"
-                        stroke-width="2"
-                        stroke-miterlimit="10"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      />
-                      <path
-                        d="M3.5 9.08997H20.5"
-                        stroke="#1C1C1C"
-                        stroke-width="2"
-                        stroke-miterlimit="10"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      />
-                      <path
-                        d="M21 8.5V17C21 20 19.5 22 16 22H8C4.5 22 3 20 3 17V8.5C3 5.5 4.5 3.5 8 3.5H16C19.5 3.5 21 5.5 21 8.5Z"
-                        stroke="#1C1C1C"
-                        stroke-width="2"
-                        stroke-miterlimit="10"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      />
-                      <path
-                        d="M11.9945 13.7H12.0035"
-                        stroke="#1C1C1C"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      />
-                      <path
-                        d="M8.29529 13.7H8.30427"
-                        stroke="#1C1C1C"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      />
-                      <path
-                        d="M8.29529 16.7H8.30427"
-                        stroke="#1C1C1C"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      />
-                    </svg>
+                    <img
+                      src="assets/images/svgs/datepicker-icon.svg"
+                      alt="datepicker-icon"
+                    />
                   </mat-icon>
                 </mat-datepicker-toggle>
               </div>
               <mat-datepicker #picker></mat-datepicker>
             </div>
-            @if(clientForm.get('dob')?.touched && clientForm.get('dob')?.hasError('required')) {
+            @if(clientForm.get('dob')?.touched &&
+            clientForm.get('dob')?.hasError('required')) {
             <!-- <mat-error>Date Of Birth is required</mat-error> -->
             <span class="field-error d-block">Date Of Birth is required</span>
             }
@@ -187,7 +132,8 @@
             <div class="w-100 form-field">
               <mat-label class="f-s-14 f-w-600 d-block">Partner Name</mat-label>
               <input matInput placeholder="John Deo" formControlName="name" />
-              @if(clientForm.get('partner.name')?.touched && clientForm.get('partner.name')?.hasError('required')) {
+              @if(clientForm.get('partner.name')?.touched &&
+              clientForm.get('partner.name')?.hasError('required')) {
               <span class="field-error d-block">Name is required</span>
               }
             </div>
@@ -207,73 +153,17 @@
                 <div class="date-picker-position">
                   <mat-datepicker-toggle matIconSuffix [for]="partnerPicker">
                     <mat-icon matDatepickerToggleIcon>
-                      <svg
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M8 2V5"
-                          stroke="#1C1C1C"
-                          stroke-width="2"
-                          stroke-miterlimit="10"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        />
-                        <path
-                          d="M16 2V5"
-                          stroke="#1C1C1C"
-                          stroke-width="2"
-                          stroke-miterlimit="10"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        />
-                        <path
-                          d="M3.5 9.08997H20.5"
-                          stroke="#1C1C1C"
-                          stroke-width="2"
-                          stroke-miterlimit="10"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        />
-                        <path
-                          d="M21 8.5V17C21 20 19.5 22 16 22H8C4.5 22 3 20 3 17V8.5C3 5.5 4.5 3.5 8 3.5H16C19.5 3.5 21 5.5 21 8.5Z"
-                          stroke="#1C1C1C"
-                          stroke-width="2"
-                          stroke-miterlimit="10"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        />
-                        <path
-                          d="M11.9945 13.7H12.0035"
-                          stroke="#1C1C1C"
-                          stroke-width="2"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        />
-                        <path
-                          d="M8.29529 13.7H8.30427"
-                          stroke="#1C1C1C"
-                          stroke-width="2"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        />
-                        <path
-                          d="M8.29529 16.7H8.30427"
-                          stroke="#1C1C1C"
-                          stroke-width="2"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        />
-                      </svg>
+                      <img
+                        src="assets/images/svgs/datepicker-icon.svg"
+                        alt="datepicker-icon"
+                      />
                     </mat-icon>
                   </mat-datepicker-toggle>
                 </div>
                 <mat-datepicker #partnerPicker></mat-datepicker>
               </div>
-              @if(clientForm.get('partner.dob')?.touched && clientForm.get('partner.dob')?.hasError('required')) {
+              @if(clientForm.get('partner.dob')?.touched &&
+              clientForm.get('partner.dob')?.hasError('required')) {
 
               <span class="field-error d-block">Date Of Birth is required</span>
               }

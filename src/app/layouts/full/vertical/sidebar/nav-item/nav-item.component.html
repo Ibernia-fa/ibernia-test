@@ -23,7 +23,18 @@
     name="{{ item.iconName }}"
     matListItemIcon
   ></i-tabler> -->
-  <img [src]="item.iconName" alt="item" />
+  <!-- <div
+    style="
+      flex: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+     
+    "
+  > -->
+  <img style="flex: none" [src]="item.iconName" alt="item" />
+  <!-- </div> -->
   <span class="hide-menu">{{ item.displayName | translate }}</span>
   <!-- <span class="connecting-line"></span> -->
   @if(item.children && item.children.length) {

@@ -66,6 +66,8 @@
     border-radius: 4px;
     min-height: 48px;
     border: 1px solid #516ce8 !important;
+    color: #516ce8 !important;
+    cursor: pointer;
     span {
       color: #516ce8 !important;
     }
@@ -78,17 +80,28 @@
 
 .sidebarNav-mini {
   .sidebarNav {
-    width: $sidenav-mini;
+    // width: $sidenav-mini;
+    width: 74px;
 
     .profile-bar {
       display: none;
     }
 
     .sidebar-list {
+      align-items: center;
+      justify-content: center;
+      display: flex;
       .menu-list-item {
         padding: 8px 17px;
+        justify-content: center;
 
         .mdc-list-item__content {
+          // display: none;
+          display: flex;
+          // align-items: center;
+          // justify-content: center;
+        }
+        .hide-menu {
           display: none;
         }
 
@@ -98,20 +111,29 @@
         }
       }
     }
-
     &:hover {
-      width: $sidenav-desktop;
+      // width: $sidenav-desktop;
+      width: 295px;
 
       .profile-bar {
         display: block;
       }
 
       .sidebar-list {
+        align-items: stretch;
+        justify-content: stretch;
+        display: flex;
         .menu-list-item {
           padding: 8px 10px;
-
+          width: 100%;
           .mdc-list-item__content {
-            display: inline;
+            // display: inline;
+            display: flex;
+            // align-items: center;
+            // justify-content: center;
+          }
+          .hide-menu {
+            display: block;
           }
 
           .mdc-list-item__start {
@@ -120,8 +142,10 @@
         }
 
         &.mdc-list {
-          padding: 0 16px;
-          max-width: $sidenav-desktop;
+          // padding: 0 16px;
+          // max-width: $sidenav-desktop;
+          padding: 16px;
+          max-width: 100%;
 
           .mdc-list-group__subheader {
             text-align: left;
@@ -143,7 +167,8 @@
 
   .sidebar-list {
     &.mdc-list {
-      padding: 0 12px;
+      // padding: 0 12px;
+      padding: 16px 4px;
 
       .mdc-list-group__subheader {
         text-align: center;
@@ -228,6 +253,7 @@
         left: 16px;
         z-index: -1;
       }
+
       // .connecting-line {
       //   height: 20px;
       //   width: 2px;

@@ -9,7 +9,7 @@ import { TablerIconsModule } from 'angular-tabler-icons';
   selector: 'app-breadcrumb',
   imports: [RouterModule, TablerIconsModule],
   templateUrl: './breadcrumb.component.html',
-  styleUrls: ['./breadcrumb.component.scss'],
+  styleUrl: './breadcrumb.component.scss',
 })
 export class AppBreadcrumbComponent {
   // @Input() layout;
