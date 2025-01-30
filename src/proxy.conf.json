@@ -1,0 +1,6 @@
+{
+    "/api": {
+      "target": "https://api.ibernia.it/",
+      "secure": false
+    }
+  }
