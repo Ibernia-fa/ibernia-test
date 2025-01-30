@@ -34,7 +34,9 @@
               "node_modules/angular-calendar/css/angular-calendar.css",
               "node_modules/highlight.js/styles/atom-one-dark.min.css"
             ],
-            "scripts": [],
+            "scripts": [
+              "node_modules/hammerjs/hammer.min.js"
+            ],
             "browser": "src/main.ts"
           },
           "configurations": {
