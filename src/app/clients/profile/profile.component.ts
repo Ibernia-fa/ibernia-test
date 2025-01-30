@@ -8,6 +8,7 @@ import { map, switchMap } from 'rxjs';
 import { CommonModule, DatePipe } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { AgeCalculatorPipe } from 'src/app/pipe/age-calculator.pipe';
+import { AddModelComponent } from "./add-model/add-model.component";
 
 @Component({
   selector: 'app-profile',
@@ -16,8 +17,9 @@ import { AgeCalculatorPipe } from 'src/app/pipe/age-calculator.pipe';
     TablerIconsModule,
     CommonModule,
     MatButtonModule,
-    AgeCalculatorPipe
-  ],
+    AgeCalculatorPipe,
+    AddModelComponent
+],
   providers: [
     ClientHttpService,
     RouterModule,

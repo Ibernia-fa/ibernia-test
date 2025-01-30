@@ -9,8 +9,9 @@ import { provideNativeDateAdapter } from '@angular/material/core';
 // import { Timeline } from 'vis-timeline';
 // import { DataSet } from 'vis-data';
 
-import { DataSet, Timeline } from 'vis-timeline/standalone';
+import { DataSet, Timeline, TimelineOptions } from 'vis-timeline/standalone';
 import { Moment } from 'moment';
+import { AddEventComponent } from '../timeline/add-event/add-event.component';
 
 
 @Component({
@@ -21,6 +22,7 @@ import { Moment } from 'moment';
     MatFormFieldModule,
     MatInputModule,
     MatDatepickerModule,
+    AddEventComponent
   ],
   providers: [provideNativeDateAdapter()],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -50,49 +52,57 @@ export class FinancialWorkflowDashboardComponent implements OnInit {
 
   ngOnInit() {
     const container = this.timelineContainer.nativeElement;
-
+    
     // Define timeline events
     const items = new DataSet([
-      { id: 1, content: 'Retirement', start: '2027-04-20', end: '2025-06-01', className: 'retirement' },
+      { id: 1, content: 'Retirement', start: '2027-04-20', end: '2027-06-01', className: 'retirement' },
       { id: 2, content: 'Inheritance', start: '2027-05-15', className: 'inheritance' },
       { id: 3, content: 'Birth', start: '2026-06-10', className: 'birth' },
-      { id: 4, content: 'Wedding', start: '2028-07-01', end: '2027-07-05', className: 'wedding' },
+      { id: 4, content: 'Wedding', start: '2028-07-01', end: '2029-07-05', className: 'wedding' },
       { id: 5, content: 'State Pension Age', start: '2035-01-01', className: 'state-pension' }
     ]);
     const birthYear=2000;
     // Define timeline options
-    const options = {
+    const options: TimelineOptions = {
       editable: {
         add: false, // Prevent adding new events directly
         updateTime: true, // Allow changing event time by dragging
         updateGroup: false, // Prevent moving events between groups
-        remove: false // Prevent deletion via UI
+        remove: true // Prevent deletion via UI
       },
       stack: true, // Prevent overlapping events
       zoomable: true, // Allow zooming
       horizontalScroll: true, // Enable scrolling
       orientation: 'bottom', // Place events at the top
       margin: { item: 10 }, // Adds spacing between events
-      start: '2026-06-10',
-      end: '2126-06-10',
+      min: '2000-01-01',
+      start: '2025-06-10',
+      end: '2030-06-10',
+      minHeight: '300px',
+      align: 'left',
       showCurrentTime: false, // Hide default current time marker
       // showCustomTime: true, // Allows custom markers
+      showMajorLabels:true,
+      timeAxis: {scale: 'year', step: 1},
       format: {
         minorLabels: function(date: any) {
           console.log(date);
-          return `${date.year() - birthYear} years`; // Calculate Age
+          return `${date.year() - birthYear} years <br/> ${date.year()}`; // Calculate Age
         },
         majorLabels: function(date: any) {
-          return `${date.year()}`; // Show actual years
+          return ``; // Show actual years
         }
       }
     };
 
     // Initialize timeline
-    new Timeline(container, items, options);
+    var timeline = new Timeline(container, items, options);
+    
+    const customDate = new Date('2026-06-10');
+    timeline.addCustomTime(customDate, 't1');
   }
-
-
+  
+  
   getTimelineData() {
     this.data = new DataSet();
     this.data.add({
