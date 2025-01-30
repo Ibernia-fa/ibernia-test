@@ -53,10 +53,10 @@ export class FinancialWorkflowDashboardComponent implements OnInit {
 
     // Define timeline events
     const items = new DataSet([
-      { id: 1, content: 'Retirement', start: '2025-04-20', end: '2025-06-01', className: 'retirement' },
-      { id: 2, content: 'Inheritance', start: '2025-05-15', className: 'inheritance' },
+      { id: 1, content: 'Retirement', start: '2027-04-20', end: '2025-06-01', className: 'retirement' },
+      { id: 2, content: 'Inheritance', start: '2027-05-15', className: 'inheritance' },
       { id: 3, content: 'Birth', start: '2026-06-10', className: 'birth' },
-      { id: 4, content: 'Wedding', start: '2027-07-01', end: '2027-07-05', className: 'wedding' },
+      { id: 4, content: 'Wedding', start: '2028-07-01', end: '2027-07-05', className: 'wedding' },
       { id: 5, content: 'State Pension Age', start: '2035-01-01', className: 'state-pension' }
     ]);
     const birthYear=2000;
@@ -73,8 +73,8 @@ export class FinancialWorkflowDashboardComponent implements OnInit {
       horizontalScroll: true, // Enable scrolling
       orientation: 'bottom', // Place events at the top
       margin: { item: 10 }, // Adds spacing between events
-      start: birthYear.toString(),
-      end: (birthYear + 100).toString(),
+      start: '2026-06-10',
+      end: '2126-06-10',
       showCurrentTime: false, // Hide default current time marker
       // showCustomTime: true, // Allows custom markers
       format: {
