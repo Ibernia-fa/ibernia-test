@@ -1,0 +1,491 @@
+<!-- <div class="m-t-20" style="max-width: 700px; margin: 0 auto; width: 100%">
+  <mat-card class="cardWithShadow">
+    <mat-card-content>
+
+    </mat-card-content>
+  </mat-card>
+</div> -->
+
+<!-- State Pension Event  -->
+<!-- <div class="m-t-20" style="max-width: 700px; margin: 0 auto; width: 100%">
+  <mat-card class="cardWithShadow">
+    <mat-card-content>
+
+    </mat-card-content>
+  </mat-card>
+</div> -->
+<!-- End State Pension Event  -->
+
+<!-- Custom Event  -->
+<!-- <div class="m-t-20" style="max-width: 700px; margin: 0 auto; width: 100%">
+  <mat-card class="cardWithShadow">
+    <mat-card-content>
+
+    </mat-card-content>
+  </mat-card>
+</div> -->
+<!-- End Custom Event  -->
+
+
+<div class="d-flex flex-column gap-32 p-8">
+  <!-- Modal Header  -->
+  <div
+    class="d-flex align-items-center justify-content-between gap-10 modal-header"
+  >
+    <h3>Inheritance / Wedding</h3>
+    <button (click)="closeDialog()" type="button">
+      <img
+        src="assets/images/svgs/close-line-cion.svg"
+        alt="close-line-cion"
+      />
+    </button>
+  </div>
+  <!-- End Modal Header  -->
+
+  <!-- Modal tabs  -->
+  <div class="d-flex flex-column gap-12 tab">
+    <span class="f-s-16 f-w-400">Type</span>
+    <div class="tabs">
+      <div class="row">
+        <div class="col-6">
+          <button class="button-icon w-100 active">
+            <span class="uppercase active">Income</span>
+          </button>
+        </div>
+        <div class="col-6">
+          <button class="button-icon w-100">
+            <span class="uppercase">Expense</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- End Modal tabs  -->
+
+  <!-- Modal Body  -->
+  <div class="d-flex flex-column gap-20">
+    <!-- Net Amount Field  -->
+    <div class="d-flex flex-column gap-12 net-fields">
+      <span class="f-s-16 f-w-400">Net amount</span>
+      <div class="net-field d-flex align-items-center">
+        <!-- Currency Selector  -->
+        <div class="left">
+          <mat-select placeholder="£" class="sortby-edit-profile">
+            @for (food of foods; track food) {
+            <mat-option [value]="food.value">{{
+              food.viewValue
+            }}</mat-option>
+            }
+          </mat-select>
+        </div>
+        <!-- End Currency Selector  -->
+        <!-- Price Field  -->
+        <div class="w-100 form-field">
+          <input matInput formControlName="name" placeholder="0" />
+        </div>
+        <!-- End Price Field  -->
+        <!-- End Type Field  -->
+        <div class="right">
+          <mat-select placeholder="Select" class="sortby-edit-profile">
+            <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
+            @for (food of foods; track food) {
+            <mat-option [value]="food.value">{{
+              food.viewValue
+            }}</mat-option>
+            }
+          </mat-select>
+        </div>
+        <!-- End Type Field  -->
+      </div>
+    </div>
+    <!-- End Net Amount Field  -->
+    <div class="w-100 form-field gap-12">
+      <div class="d-flex gap-8 align-items-center">
+        <mat-label class="f-s-16 f-w-400 d-block">Age and date</mat-label>
+        <img
+          src="assets/images/svgs/help-circle-icon.svg"
+          alt="help-circle-icon"
+        />
+      </div>
+      <div class="position-relative">
+        <input
+          matInput
+          [matDatepicker]="agepicker"
+          formControlName="age_date"
+        />
+        <div class="date-picker-position">
+          <mat-datepicker-toggle matIconSuffix [for]="agepicker">
+            <mat-icon matDatepickerToggleIcon>
+              <img
+                src="assets/images/svgs/datepicker-icon.svg"
+                alt="datepicker-icon"
+              />
+            </mat-icon>
+          </mat-datepicker-toggle>
+        </div>
+        <mat-datepicker #agepicker></mat-datepicker>
+      </div>
+    </div>
+  </div>
+  <!-- End Modal Body  -->
+  <!-- Modal Action Button  -->
+  <div class="row justify-content-between modal-action">
+    <div class="col-5">
+      <button (click)="closeDialog()" class="button-icon-outline w-100 d-block">
+        <span class="f-s-16">Cancel</span>
+      </button>
+    </div>
+    <div class="col-5">
+      <button class="button-icon w-100 d-block">
+        <span class="f-s-16">Start Modal</span>
+      </button>
+    </div>
+  </div>
+  <!-- End Modal Action Button  -->
+</div>
+
+<!-- State Pension Event -->
+
+<div class="d-flex flex-column gap-32 p-8">
+  <!-- Modal Header  -->
+  <div
+    class="d-flex align-items-center justify-content-between gap-10 modal-header"
+  >
+    <h3>State Pension</h3>
+    <button (click)="closeDialog()" type="button">
+      <img
+        src="assets/images/svgs/close-line-cion.svg"
+        alt="close-line-cion"
+      />
+    </button>
+  </div>
+  <!-- End Modal Header  -->
+
+  <!-- Modal Body  -->
+  <div class="d-flex flex-column gap-20">
+    <!-- Modal tabs  -->
+    <div class="d-flex flex-column gap-12 tab">
+      <span class="f-s-16 f-w-400">Type</span>
+      <div class="tabs">
+        <div class="row">
+          <div class="col-6">
+            <button class="button-icon w-100 active">
+              <span class="uppercase active">Income</span>
+            </button>
+          </div>
+          <div class="col-6">
+            <button class="button-icon w-100">
+              <span class="uppercase">Expense</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- End Modal tabs  -->
+
+    <!-- Net Amount Field  -->
+    <div class="d-flex flex-column gap-12 net-fields">
+      <span class="f-s-16 f-w-400">Net amount</span>
+      <div class="net-field d-flex align-items-center">
+        <!-- Currency Selector  -->
+        <div class="left">
+          <mat-select placeholder="£" class="sortby-edit-profile">
+            @for (food of foods; track food) {
+            <mat-option [value]="food.value">{{
+              food.viewValue
+            }}</mat-option>
+            }
+          </mat-select>
+        </div>
+        <!-- End Currency Selector  -->
+
+        <!-- Price Field  -->
+        <div class="w-100 form-field">
+          <input matInput formControlName="name" placeholder="0" />
+        </div>
+        <!-- End Price Field  -->
+
+        <!-- End Type Field  -->
+        <div class="right">
+          <mat-select placeholder="Select" class="sortby-edit-profile">
+            @for (food of foods; track food) {
+            <mat-option [value]="food.value">{{
+              food.viewValue
+            }}</mat-option>
+            }
+          </mat-select>
+        </div>
+        <!-- End Type Field  -->
+      </div>
+    </div>
+    <!-- End Net Amount Field  -->
+
+    <!-- Start End  -->
+    <div class="start-end">
+      <div
+        class="row justify-content-between align-items-end flex-nowrap"
+      >
+        <div class="col-6">
+          <div class="w-100 form-field gap-12">
+            <div class="d-flex gap-8 align-items-center">
+              <mat-label class="f-s-16 f-w-400 d-block"
+                >Start & end</mat-label
+              >
+              <img
+                src="assets/images/svgs/help-circle-icon.svg"
+                alt="help-circle-icon"
+              />
+            </div>
+            <div class="position-relative">
+              <div class="w-100 form-field">
+                <div class="select-option">
+                  <mat-select formControlName="currency" value="Select">
+                    <mat-option value="AED">AED</mat-option>
+                    <mat-option value="USD">USD</mat-option>
+                  </mat-select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="d-flex justify-content-end align-items-end">
+          <img
+            src="assets/images/svgs/chevron-right-date-icon.svg"
+            alt="chevron-right-date-icon"
+          />
+        </div>
+        <div class="col-6">
+          <div class="position-relative">
+            <div class="w-100 form-field">
+              <div class="select-option">
+                <mat-select formControlName="currency" value="Select">
+                  <mat-option value="AED">AED</mat-option>
+                  <mat-option value="USD">USD</mat-option>
+                </mat-select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Finish Start End  -->
+
+    <div class="w-100 form-field gap-12">
+      <div class="d-flex gap-8 align-items-center">
+        <mat-label class="f-s-16 f-w-400 d-block"
+          >Escalation rate</mat-label
+        >
+        <img
+          src="assets/images/svgs/help-circle-icon.svg"
+          alt="help-circle-icon"
+        />
+      </div>
+      <div class="position-relative">
+        <div class="w-100 form-field">
+          <div class="select-option">
+            <mat-select formControlName="currency" value="Select">
+              <mat-option value="AED">AED</mat-option>
+              <mat-option value="USD">USD</mat-option>
+            </mat-select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- End Modal Body  -->
+
+  <!-- Modal Action Button  -->
+  <div class="row justify-content-between modal-action">
+    <div class="col-5">
+      <button (click)="closeDialog()" class="button-icon-outline w-100 d-block">
+        <span class="f-s-16">Cancel</span>
+      </button>
+    </div>
+    <div class="col-5">
+      <button class="button-icon w-100 d-block">
+        <span class="f-s-16">Start Modal</span>
+      </button>
+    </div>
+  </div>
+  <!-- End Modal Action Button  -->
+</div>
+
+
+
+<!-- Custom Event -->
+
+
+<div class="d-flex flex-column gap-32 p-8">
+  <!-- Modal Header  -->
+  <div
+    class="d-flex align-items-center justify-content-between gap-10 modal-header"
+  >
+    <h3>Custom Event</h3>
+    <button (click)="closeDialog()" type="button">
+      <img
+        src="assets/images/svgs/close-line-cion.svg"
+        alt="close-line-cion"
+      />
+    </button>
+  </div>
+  <!-- End Modal Header  -->
+
+  <!-- Modal Body  -->
+  <div class="d-flex flex-column gap-20">
+    <!-- Name Field  -->
+    <div class="w-100 form-field gap-12">
+      <mat-label class="f-s-16 d-block" style="line-height: 18px"
+        >Name</mat-label
+      >
+      <input matInput formControlName="name" />
+    </div>
+    <!--End  Name Field  -->
+    <!-- Modal tabs  -->
+    <div class="d-flex flex-column gap-12 tab">
+      <span class="f-s-16 f-w-400">Type</span>
+      <div class="tabs">
+        <div class="row">
+          <div class="col-6">
+            <button class="button-icon w-100 active">
+              <span class="uppercase active">Income</span>
+            </button>
+          </div>
+          <div class="col-6">
+            <button class="button-icon w-100">
+              <span class="uppercase">Expense</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- End Modal tabs  -->
+
+    <!-- Net Amount Field  -->
+    <div class="d-flex flex-column gap-12 net-fields">
+      <span class="f-s-16 f-w-400">Net amount</span>
+      <div class="net-field d-flex align-items-center">
+        <!-- Currency Selector  -->
+        <div class="left">
+          <mat-select placeholder="£" class="sortby-edit-profile">
+            @for (food of foods; track food) {
+            <mat-option [value]="food.value">{{
+              food.viewValue
+            }}</mat-option>
+            }
+          </mat-select>
+        </div>
+        <!-- End Currency Selector  -->
+        <!-- Price Field  -->
+        <div class="w-100 form-field">
+          <input matInput formControlName="name" placeholder="0" />
+        </div>
+        <!-- End Price Field  -->
+        <!-- End Type Field  -->
+        <div class="right">
+          <mat-select placeholder="Select" class="sortby-edit-profile">
+            <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
+            @for (food of foods; track food) {
+            <mat-option [value]="food.value">{{
+              food.viewValue
+            }}</mat-option>
+            }
+          </mat-select>
+        </div>
+        <!-- End Type Field  -->
+      </div>
+    </div>
+    <!-- End Net Amount Field  -->
+
+    <!-- Start End  -->
+    <div class="start-end">
+      <div
+        class="row justify-content-between align-items-end flex-nowrap"
+      >
+        <div class="col-6">
+          <div class="w-100 form-field gap-12">
+            <div class="d-flex gap-8 align-items-center">
+              <mat-label class="f-s-16 f-w-400 d-block"
+                >Start & end</mat-label
+              >
+              <img
+                src="assets/images/svgs/help-circle-icon.svg"
+                alt="help-circle-icon"
+              />
+            </div>
+            <div class="position-relative">
+              <div class="w-100 form-field">
+                <div class="select-option">
+                  <mat-select formControlName="currency" value="Select">
+                    <mat-option value="AED">AED</mat-option>
+                    <mat-option value="USD">USD</mat-option>
+                  </mat-select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="d-flex justify-content-end align-items-end">
+          <img
+            src="assets/images/svgs/chevron-right-date-icon.svg"
+            alt="chevron-right-date-icon"
+          />
+        </div>
+        <div class="col-6">
+          <div class="position-relative">
+            <div class="w-100 form-field">
+              <div class="select-option">
+                <mat-select formControlName="currency" value="Select">
+                  <mat-option value="AED">AED</mat-option>
+                  <mat-option value="USD">USD</mat-option>
+                </mat-select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Finish Start End  -->
+
+    <div class="w-100 form-field gap-12">
+      <div class="d-flex gap-8 align-items-center">
+        <mat-label class="f-s-16 f-w-400 d-block"
+          >Escalation rate</mat-label
+        >
+        <img
+          src="assets/images/svgs/help-circle-icon.svg"
+          alt="help-circle-icon"
+        />
+      </div>
+      <div class="position-relative">
+        <div class="w-100 form-field">
+          <div class="select-option">
+            <mat-select formControlName="currency" value="Select">
+              <mat-option value="AED">AED</mat-option>
+              <mat-option value="USD">USD</mat-option>
+            </mat-select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- End Modal Body  -->
+
+  <!-- Modal Action Button  -->
+  <div class="row justify-content-between modal-action">
+    <div class="col-5">
+      <button (click)="closeDialog()" class="button-icon-outline w-100 d-block">
+        <span class="f-s-16">Cancel</span>
+      </button>
+    </div>
+    <div class="col-5">
+      <button class="button-icon w-100 d-block">
+        <span class="f-s-16">Start Modal</span>
+      </button>
+    </div>
+  </div>
+  <!-- End Modal Action Button  -->
+</div>
+
+
+
+

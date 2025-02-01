@@ -184,6 +184,16 @@ export class ClientListComponent implements OnInit, AfterViewInit {
     }
   }
 
+  clientExpandRowClicked(element: any, redirect: boolean = false) {
+    if(!element.partnerDetail?.name || redirect) {
+      this.router.navigate(['/clients/' + element.id + '/profile']);
+    }
+  }
+
+  partnerExpandRowClicked(element: any) {
+    this.router.navigate(['/clients/' + element.id + '/profile']);
+  }
+
   announceSortChange(sortState: Sort) {
     // This example uses English messages. If your application supports
     // multiple language, you would internationalize these strings.

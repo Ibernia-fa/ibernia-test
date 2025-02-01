@@ -14,7 +14,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { AgeCalculatorPipe } from 'src/app/pipe/age-calculator.pipe';
-import { AddModelComponent } from './add-model/add-model.component';
+import { MatDialog } from '@angular/material/dialog';
+import { AddModelDialogComponent } from './add-model-dialog/add-model-dialog.component';
 interface Food {
   value: string;
   viewValue: string;
@@ -28,7 +29,6 @@ interface Food {
     CommonModule,
     MatButtonModule,
     AgeCalculatorPipe,
-    AddModelComponent,
     MatMenuModule,
     MatIconModule,
     MatFormFieldModule,
@@ -44,6 +44,7 @@ export class ProfileComponent {
   clientId: string;
   client: Client;
   constructor(
+    private dialog: MatDialog,
     private clientHttpService: ClientHttpService,
     private activatedRoute: ActivatedRoute,
     private router: Router
@@ -66,6 +67,24 @@ export class ProfileComponent {
         })
       )
       .subscribe();
+  }
+
+  newModelClicked() {
+
+    const dialogRef = this.dialog.open(
+      AddModelDialogComponent,
+      {
+        width: '600px',
+        disableClose: true,
+        data: {
+          client: this.client
+        }
+      }
+    );
+
+    dialogRef.afterClosed().subscribe((result: any) => {
+      console.log('Dialog closed with result:', result);
+    });
   }
 
   foods: Food[] = [

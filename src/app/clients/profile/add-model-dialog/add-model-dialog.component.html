@@ -1,0 +1,54 @@
+<!-- <div class="m-t-20" style="max-width: 600px; margin: 0 auto; width: 100%">
+  <mat-card class="cardWithShadow">
+    <mat-card-content>
+    </mat-card-content>
+  </mat-card>
+</div> -->
+<!-- <mat-dialog-container> -->
+<div class="d-flex flex-column gap-32">
+    <!-- Modal Header  -->
+    <div class="d-flex align-items-center justify-content-between gap-10 modal-header">
+        <h3>New model</h3>
+        <button (click)="closeDialog()" type="button">
+            <img src="assets/images/svgs/close-line-cion.svg" alt="close-line-cion" />
+        </button>
+    </div>
+    <!-- End Modal Header  -->
+
+    <!-- Modal Body  -->
+    <!-- <mat-dialog-content> -->
+    <div class="d-flex flex-column gap-20">
+        <div class="w-100 form-field">
+            <mat-label class="f-s-14 f-w-600 d-block">Model Name</mat-label>
+            <input matInput formControlName="name" />
+            <!-- @if(clientForm.get('name')?.touched &&
+             clientForm.get('name')?.hasError('required')) { -->
+            <span class="field-error d-block">Name is required</span>
+            <!-- } -->
+        </div>
+        <div class="w-100 form-field">
+            <mat-label class="f-s-14 f-w-600 d-block">Description (Optional)</mat-label>
+            <textarea placeholder="Enter description"></textarea>
+        </div>
+    </div>
+    <!-- </mat-dialog-content> -->
+    <!-- End Modal Body  -->
+    <!-- Modal Action Button  -->
+    <!-- <mat-dialog-actions> -->
+    <div class="row justify-content-between modal-action">
+        <div class="col-5">
+            <button (click)="closeDialog()" class="button-icon-outline w-100 d-block">
+                <span class="f-s-16">Cancel</span>
+            </button>
+        </div>
+        <div class="col-5">
+            <button class="button-icon w-100 d-block">
+                <span class="f-s-16">Start Modal</span>
+            </button>
+        </div>
+    </div>
+    <!-- </mat-dialog-actions> -->
+    <!-- End Modal Action Button  -->
+</div>
+
+<!-- </mat-dialog-container> -->

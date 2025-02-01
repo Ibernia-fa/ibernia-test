@@ -13,7 +13,8 @@ import { MatIconModule } from '@angular/material/icon';
 
 import { DataSet, Timeline, TimelineOptions } from 'vis-timeline/standalone';
 import { Moment } from 'moment';
-import { AddEventComponent } from '../timeline/add-event/add-event.component';
+import { AddEventDialogComponent } from '../timeline/add-event-dialog/add-event-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-financial-workflow-dashboard',
@@ -23,7 +24,7 @@ import { AddEventComponent } from '../timeline/add-event/add-event.component';
     MatFormFieldModule,
     MatInputModule,
     MatDatepickerModule,
-    AddEventComponent,
+    AddEventDialogComponent,
     MatChipsModule,
     MatIconModule,
   ],
@@ -41,7 +42,7 @@ export class FinancialWorkflowDashboardComponent implements OnInit {
   @ViewChild('timelineContainer', { static: true })
   timelineContainer!: ElementRef;
 
-  constructor() {
+  constructor(private dialog: MatDialog) {
     this.getTimelineData();
     this.getTimelineGroups();
     this.getOptions();
@@ -111,7 +112,6 @@ export class FinancialWorkflowDashboardComponent implements OnInit {
       timeAxis: { scale: 'year', step: 1 },
       format: {
         minorLabels: function (date: any) {
-          console.log(date);
           return `${date.year() - birthYear} years <br/> ${date.year()}`; // Calculate Age
         },
         majorLabels: function (date: any) {
@@ -160,5 +160,19 @@ export class FinancialWorkflowDashboardComponent implements OnInit {
       showMajorLabels: false,
       orientation: 'top',
     };
+  }
+
+  newEventClicked() {
+    const dialogRef = this.dialog.open(AddEventDialogComponent, {
+      width: '600px',
+      disableClose: true,
+      data: {
+        client: {},
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((result: any) => {
+      console.log('Dialog closed with result:', result);
+    });
   }
 }

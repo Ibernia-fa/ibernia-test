@@ -454,6 +454,7 @@
             *matRowDef="let element; columns: columnsToDisplayWithExpand"
             class="example-element-row"
             [class.example-expanded-row]="expandedClientElement === element"
+            (click)="clientExpandRowClicked(element)"
           ></tr>
 
           <!-- Expanded Rows -->
@@ -465,6 +466,7 @@
             "
             class="example-detail-row"
             [hidden]="expandedClientElement !== element"
+            (click)="clientExpandRowClicked(element, true)"
           ></tr>
           <tr
             mat-row
@@ -477,6 +479,7 @@
               expandedPartnerElement !== element ||
               !expandedPartnerElement?.partnerDetail?.name
             "
+            (click)="partnerExpandRowClicked(element)"
           >
             <!-- && !expandedPartnerElement?.partnerDetail?.name -->
           </tr>
