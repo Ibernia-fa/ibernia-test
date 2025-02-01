@@ -116,3 +116,185 @@ html .customizerNav {
     border: 0 !important;
   }
 }
+
+// Vis Timeline Customization
+
+.vis-timeline {
+  border: none !important;
+  background: white !important;
+}
+
+.vis-item {
+  padding: 4px 10px;
+  color: #1c1c1c;
+}
+
+.vis-item.vis-box,
+.vis-item.vis-range {
+  border-radius: 9999px !important;
+}
+.vis-item.vis-line {
+  background-color: transparent;
+  border: none !important;
+}
+.vis-item.vis-dot {
+  display: none;
+}
+.vis-item .vis-item-content {
+  padding: 0 !important;
+  font-size: 14px;
+}
+
+.vis-custom-time {
+  background-color: #b0b0b0 !important;
+  width: 1px !important;
+}
+// .vis-time-axis .vis-grid.vis-minor {
+//   border-width: 2px;
+//   border-color: pink;
+// }
+.vis-time-axis .vis-grid.vis-minor {
+  border-color: #f7f7f7 !important;
+}
+
+// .vis-panel.vis-center {
+//   border: 1px #cfcfd7 !important;
+//   border-radius: 12px;
+// }
+// .vis-panel.vis-top {
+//   border-top: 1px solid #cfcfd7 !important;
+//   border-radius: 12px;
+// }
+// .vis-panel.vis-right {
+//   border-top: 1px solid #cfcfd7 !important;
+//   border-radius: 12px;
+// }
+// Tags
+
+.vis-item.retirement {
+  background-color: #fff9f7;
+  color: #1c1c1c;
+  border: 1px solid #ffede7 !important;
+}
+
+.vis-item.inheritance {
+  background-color: #f8fff2;
+  color: #1c1c1c;
+  border: 1px solid #e8f4e1 !important;
+}
+
+.vis-item.birth {
+  background-color: #fffbf5;
+  color: #1c1c1c;
+  border: 1px solid #fff3e0 !important;
+}
+.vis-item.birth.vis-line {
+  display: none !important;
+}
+
+.vis-item.wedding {
+  background-color: #f8f5ff;
+  border: 1px solid #eae0ff !important;
+  color: #1c1c1c;
+}
+
+.vis-item.state-pension {
+  background-color: #f9f9ff;
+  color: #1c1c1c;
+  border: 1px solid #ebecff !important;
+}
+
+.vis-item.vis-selected {
+  background-color: transparent !important;
+}
+.vis-item .vis-delete {
+  right: 0 !important;
+  padding: 0 !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  height: auto !important;
+}
+.vis-item .vis-delete:after {
+  color: #1c1c1c !important;
+  font-size: 18px !important;
+  font-weight: normal !important;
+}
+.vis-item .vis-delete:hover {
+  background: transparent !important;
+}
+
+// End Vis Timeline Customization
+
+// Card Styles
+.cardWithShadow {
+  border-radius: 12px !important;
+  border: 1px solid #e7e7eb !important;
+  box-shadow: none !important;
+  @media (max-width: 768px) {
+    border-radius: 8px;
+    .mat-mdc-card-content {
+      padding: 16px !important;
+    }
+  }
+}
+
+// Edit Profile Dropdown
+.dropdown-menus {
+  .mat-mdc-menu-item .mat-icon {
+    margin-right: 8px !important;
+  }
+  .mat-mdc-menu-content {
+    padding: 0 0 !important;
+    button {
+      min-height: auto !important;
+      padding: 12px 24px;
+      span {
+        font-size: 14px;
+        line-height: 20px;
+        color: #5e5e73;
+      }
+    }
+  }
+  // .mat-mdc-menu-panel {
+  // }
+  min-width: 140px !important;
+}
+
+.sortby-edit-profile {
+  width: auto !important;
+  min-width: 156px !important;
+  padding: 8px 16px !important;
+}
+
+// Modal Styles
+.modal-header {
+  h3 {
+    font-size: 24px;
+    line-height: 36px;
+    font-weight: 700;
+    color: #1c1c1c;
+  }
+  button {
+    padding: 0;
+    margin: 0;
+    border: none;
+    outline: none;
+    background-color: transparent;
+    cursor: pointer;
+  }
+}
+
+.modal-action {
+  &.row {
+    margin: 0 !important;
+    .col-5 {
+      padding: 0 !important;
+    }
+    .f-s-16 {
+      font-size: 16px !important;
+      line-height: 18px !important;
+    }
+  }
+}
+
+// End Modal Styles

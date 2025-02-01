@@ -1,7 +1,42 @@
-.color-primary {
-    color: var(--mat-sys-primary);
+.profile-main-wrapper {
+  padding: 0 12px;
+}
+.saving-title {
+  font-size: 24px;
+  line-height: 38px;
+  font-weight: 700;
+}
+.badge {
+  background-color: #71bc42;
+  border-radius: 999px;
+  padding: 6px 10px;
+  color: white;
+  font-size: 18px;
+  line-height: 18px;
+  font-weight: 500;
 }
 
-.m-l-60 {
-    margin-left: 77px;
+.simulation-wrapper {
+  border: 1px solid #e7e7eb;
+  border-radius: 10px;
+  padding: 24px 24px 24px 36px;
+  h3 {
+    font-size: 24px;
+    line-height: 36px;
+    font-weight: 700;
+    color: #1c1c1c;
+  }
+  p {
+    margin: 0;
+    max-width: 800px;
+    color: #48475d;
+    font-size: 16px;
+    line-height: 20px;
+  }
+  span {
+    display: inline-block;
+    font-size: 14px;
+    line-height: 20px;
+    color: #787889 !important;
+  }
 }

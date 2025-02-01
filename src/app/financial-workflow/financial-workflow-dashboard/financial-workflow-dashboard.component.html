@@ -109,31 +109,103 @@
   <!-- Event Section  -->
   <mat-card class="cardWithShadow">
     <mat-card-content>
-      <div
-        class="d-flex align-items-center justify-content-between flex-wrap gap-16 event-main-wrapper"
-      >
-        <div class="d-flex flex-column gap-6" style="flex-direction: column">
-          <h4 class="f-s-22 f-w-400">Events</h4>
-          <p class="m-0">
-            Drag new events onto the timeline, or drag to re-arrange existing
-            events. <br />
-            The start and end date of transactions such as incomes can be linked
-            to events.
-          </p>
+      <div class="d-flex flex-column gap-32">
+        <div
+          class="d-flex align-items-center justify-content-between flex-wrap gap-16 event-main-wrapper"
+        >
+          <div class="d-flex flex-column gap-6" style="flex-direction: column">
+            <h4 class="f-s-22 f-w-400">Events</h4>
+            <p class="m-0">
+              Drag new events onto the timeline, or drag to re-arrange existing
+              events. <br />
+              The start and end date of transactions such as incomes can be
+              linked to events.
+            </p>
+          </div>
+          <button type="button" class="button-icon">
+            <span>New Event</span>
+            <img src="assets/images/svgs/add-icon.svg" alt="add-icon" />
+          </button>
         </div>
-        <button type="button" class="button-icon">
-          <span>New Event</span>
-          <img src="assets/images/svgs/add-icon.svg" alt="add-icon" />
-        </button>
-
+        <!-- Tags Section  -->
+        <div class="chips-custom">
+          <mat-chip-set aria-label="Dog selection">
+            <mat-chip class="f-s-14" class="chip-item retirement-age">
+              <div class="d-flex gap-8 align-items-center m-r-16">
+                <img
+                  matChipAvatar
+                  src="/assets/images/svgs/retirement-icon.svg"
+                  alt="Photo of a Shiba Inu"
+                />
+                Retirement Age
+              </div>
+              <img src="/assets/images/svgs/close-line-icon.svg" alt="remove" />
+            </mat-chip>
+            <mat-chip class="f-s-14" class="chip-item inheritance">
+              <div class="d-flex gap-8 align-items-center m-r-16">
+                <img
+                  matChipAvatar
+                  src="/assets/images/svgs/inheritance-icon.svg"
+                  alt="inheritance"
+                />
+                Inheritance
+              </div>
+              <img src="/assets/images/svgs/close-line-icon.svg" alt="remove" />
+            </mat-chip>
+            <mat-chip class="f-s-14" class="chip-item birth">
+              <div class="d-flex gap-8 align-items-center m-r-16">
+                <img
+                  matChipAvatar
+                  src="/assets/images/svgs/cake-icon.svg"
+                  alt="birth"
+                />
+                Birth
+              </div>
+              <img src="/assets/images/svgs/close-line-icon.svg" alt="remove" />
+            </mat-chip>
+            <mat-chip class="f-s-14" class="chip-item wedding">
+              <div class="d-flex gap-8 align-items-center m-r-16">
+                <img
+                  matChipAvatar
+                  src="/assets/images/svgs/wedding-heart-icon.svg"
+                  alt="heart"
+                />
+                Wedding
+              </div>
+              <img src="/assets/images/svgs/close-line-icon.svg" alt="remove" />
+            </mat-chip>
+            <mat-chip class="f-s-14" class="chip-item mortality">
+              <div class="d-flex gap-8 align-items-center m-r-16">
+                <img
+                  matChipAvatar
+                  src="/assets/images/svgs/bed-icon.svg"
+                  alt="mortality"
+                />
+                Mortality
+              </div>
+              <img src="/assets/images/svgs/close-line-icon.svg" alt="remove" />
+            </mat-chip>
+            <mat-chip class="f-s-14" class="chip-item state-pension">
+              <div class="d-flex gap-8 align-items-center m-r-16">
+                <img
+                  matChipAvatar
+                  src="/assets/images/svgs/state-pension-profile-icon.svg"
+                  alt="state-pension"
+                />
+                State Pension
+              </div>
+              <img src="/assets/images/svgs/close-line-icon.svg" alt="remove" />
+            </mat-chip>
+          </mat-chip-set>
+        </div>
       </div>
+
+      <!-- Chart  -->
       <div #timelineContainer class="timeline"></div>
+      <!-- End Chart  -->
     </mat-card-content>
   </mat-card>
   <!-- Event Section  -->
 </div>
-
-
-
 
 <app-add-event></app-add-event>

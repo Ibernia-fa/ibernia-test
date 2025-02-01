@@ -190,12 +190,32 @@
                   </mat-icon>
                 </button>
               </div>
-              <mat-menu #menu="matMenu" class="cardWithShadow">
-                <button (click)="redirectToEdit(element.id)" mat-menu-item>
-                  <span class="m-t-15 m-r-10 cursor-pointer">Edit</span>
+              <mat-menu
+                #menu="matMenu"
+                xPosition="before"
+                class="dropdown-menus"
+              >
+                <button mat-menu-item (click)="redirectToEdit(element.id)">
+                  <mat-icon>
+                    <img
+                      src="assets/images/svgs/drop-down-edit-2-line.svg"
+                      alt="drop-down-copy-2-line"
+                      height="24"
+                      width="24"
+                    />
+                  </mat-icon>
+                  <span>Edit</span>
                 </button>
-                <button (click)="openDialog('Delete', element)" mat-menu-item>
-                  <span class="m-t-15 m-r-10 cursor-pointer"> Delete </span>
+                <button mat-menu-item (click)="openDialog('Delete', element)">
+                  <mat-icon>
+                    <img
+                      src="assets/images/svgs/drop-down-delete-2-line.svg"
+                      alt="drop-down-copy-2-line"
+                      height="24"
+                      width="24"
+                    />
+                  </mat-icon>
+                  <span>Delete</span>
                 </button>
               </mat-menu>
               <!-- <a [routerLink]="['./' + element.id + '/edit']" class="m-t-15 m-r-10 cursor-pointer"><i-tabler name="pencil-minus"

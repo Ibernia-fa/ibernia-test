@@ -7,8 +7,18 @@ import { Client } from '../client';
 import { map, switchMap } from 'rxjs';
 import { CommonModule, DatePipe } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
+import { FormsModule } from '@angular/forms';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { AgeCalculatorPipe } from 'src/app/pipe/age-calculator.pipe';
-import { AddModelComponent } from "./add-model/add-model.component";
+import { AddModelComponent } from './add-model/add-model.component';
+interface Food {
+  value: string;
+  viewValue: string;
+}
 
 @Component({
   selector: 'app-profile',
@@ -18,41 +28,49 @@ import { AddModelComponent } from "./add-model/add-model.component";
     CommonModule,
     MatButtonModule,
     AgeCalculatorPipe,
-    AddModelComponent
-],
-  providers: [
-    ClientHttpService,
-    RouterModule,
-    DatePipe,
-    AgeCalculatorPipe
+    AddModelComponent,
+    MatMenuModule,
+    MatIconModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatInputModule,
+    FormsModule,
   ],
+  providers: [ClientHttpService, RouterModule, DatePipe, AgeCalculatorPipe],
   templateUrl: './profile.component.html',
-  styleUrl: './profile.component.scss'
+  styleUrl: './profile.component.scss',
 })
 export class ProfileComponent {
-
   clientId: string;
   client: Client;
-  constructor(private clientHttpService: ClientHttpService,
+  constructor(
+    private clientHttpService: ClientHttpService,
     private activatedRoute: ActivatedRoute,
     private router: Router
   ) {
-    this.getClient()    
+    this.getClient();
   }
 
   onEditClicked() {
-    this.router.navigate(['/clients/' + this.clientId + '/edit'])
+    this.router.navigate(['/clients/' + this.clientId + '/edit']);
   }
   getClient() {
-      this.activatedRoute.params.pipe(
+    this.activatedRoute.params
+      .pipe(
         switchMap((params) => {
-          this.clientId = params['id']
+          this.clientId = params['id'];
           return this.clientHttpService.getClient(this.clientId);
         }),
         map((res) => {
           this.client = res;
         })
-      ).subscribe()
-    }
+      )
+      .subscribe();
+  }
 
+  foods: Food[] = [
+    { value: 'steak-0', viewValue: 'Steak' },
+    { value: 'pizza-1', viewValue: 'Pizza' },
+    { value: 'tacos-2', viewValue: 'Tacos' },
+  ];
 }
