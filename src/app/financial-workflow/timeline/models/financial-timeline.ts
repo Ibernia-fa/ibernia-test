@@ -1,0 +1,63 @@
+import {
+  ClientViewModel,
+  FinancialAdvisor,
+} from 'src/app/clients/models/client';
+
+export interface FinancialTimeline {
+  id: string;
+  forecastStartDate: Date;
+  forecastEndtDate: Date;
+  clientBirthDate: Date;
+  startAt: AgeYear;
+  client: ClientViewModel;
+  cashflow: CashflowViewModel;
+  financialAdvisor: FinancialAdvisor;
+  clientEvents: ClientEvent[];
+}
+
+export interface AgeYear {
+  age: number;
+  year: number;
+}
+
+export interface ClientEvent {
+  id: string;
+  name: string;
+  type: EventType;
+  iconUrl: string;
+  netAmount: NetAmount;
+  ageYear: AgeYear;
+  start: AgeYear;
+  end: AgeYear;
+  escalationRate: EscalationRate;
+  isPlaceHolder: boolean;
+  isOneOff: boolean;
+  isDefault: boolean;
+}
+
+export interface NetAmount {
+  currencySymbol: string;
+  amount: number;
+  cycle: Cycle;
+}
+
+export interface Cycle {
+  id: string;
+  description: string;
+}
+
+export interface EscalationRate {
+  id: string;
+  description: string;
+}
+
+export interface CashflowViewModel {
+    id: string,
+    name: string
+}
+
+export enum EventType
+{
+    Income = 1,
+    Expense = 2
+}

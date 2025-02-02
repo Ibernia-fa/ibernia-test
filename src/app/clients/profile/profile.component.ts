@@ -47,7 +47,7 @@ interface SortDescriptor {
     MatProgressSpinnerModule,
     RouterModule
   ],
-  providers: [ClientHttpService, RouterModule, DatePipe, AgeCalculatorPipe],
+  providers: [RouterModule, DatePipe, AgeCalculatorPipe],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss',
 })

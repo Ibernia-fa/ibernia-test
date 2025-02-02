@@ -89,7 +89,9 @@
         <div class="simulation-wrapper">
           <div class="d-flex flex-column gap-10">
             <div class="d-flex align-items-center justify-content-between">
-              <a [routerLink]="['/cashflows/' + cashflow.id + '/timeline']"><h3>{{cashflow.name}}</h3></a> 
+              <a [routerLink]="['/cashflows/' + cashflow.id + '/timeline']">
+                <h3>{{cashflow.name}}</h3>
+              </a>
               <button mat-icon-button [matMenuTriggerFor]="beforeMenu" aria-label="icon-button with a menu">
                 <mat-icon>
                   <img src="assets/images/svgs/drop-down-icon-v2.svg" alt="drop-down-icon-v2" />
@@ -130,12 +132,12 @@
         }
       </div>
     </mat-card-content>
-  }
+    }
     @else {
-      <div class="h-300">
-        <mat-spinner></mat-spinner>
-      </div>
-      }
+    <div class="h-300">
+      <mat-spinner></mat-spinner>
+    </div>
+    }
   </mat-card>
   <!-- End Client Cashflow  Section  -->
 </div>
