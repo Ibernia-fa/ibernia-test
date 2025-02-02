@@ -56,4 +56,8 @@ export class TimelineComponent {
           )
           .subscribe();
   }
+
+  updateTimelines(){
+    this.getTimeline();
+  }
 }

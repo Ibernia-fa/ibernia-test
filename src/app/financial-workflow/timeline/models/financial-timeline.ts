@@ -23,7 +23,7 @@ export interface AgeYear {
 export interface ClientEvent {
   id: string;
   name: string;
-  type: EventType;
+  type: EventIncomeType;
   iconUrl: string;
   netAmount: NetAmount;
   ageYear: AgeYear;
@@ -56,7 +56,7 @@ export interface CashflowViewModel {
     name: string
 }
 
-export enum EventType
+export enum EventIncomeType
 {
     Income = 1,
     Expense = 2

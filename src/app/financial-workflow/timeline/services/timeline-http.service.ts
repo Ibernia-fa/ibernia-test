@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { FinancialTimeline } from '../models/financial-timeline';
+import { ClientEvent, FinancialTimeline } from '../models/financial-timeline';
 
 @Injectable({
   providedIn: 'root'
@@ -12,5 +12,19 @@ export class TimelineHttpService {
 
   getTimelinebyCashflowId(cashflowId: string) {
     return this.httpClient.get<FinancialTimeline>(`/api/v1/cashflows/${cashflowId}/timelines`);
+  }
+
+  getSystemEvents() {
+    return this.httpClient.get<ClientEvent[]>('/api/v1/events/default')
+  }
+  
+  getCustomEvents() {
+    return this.httpClient.get<ClientEvent[]>('/api/v1/events/custom')
+  }
+
+  addEvent(clientEvent: ClientEvent, timelineId: string) {
+    return this.httpClient.post(`${this.TIMELINE_BASE_URL}s/${timelineId}/events`, clientEvent, {
+      responseType: "text"
+    })
   }
 }

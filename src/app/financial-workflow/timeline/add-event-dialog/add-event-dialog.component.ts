@@ -2,12 +2,28 @@ import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import {
+  MAT_DIALOG_DATA,
+  MatDialogModule,
+  MatDialogRef,
+} from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { Client } from 'src/app/clients/models/client';
+import { ClientEvent, EventIncomeType } from '../models/financial-timeline';
+import {
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import { Timeline } from 'vis-timeline';
+import { TimelineHttpService } from '../services/timeline-http.service';
+import { catchError, filter } from 'rxjs';
+import { MatButtonModule } from '@angular/material/button';
 interface Food {
   value: string;
   viewValue: string;
@@ -22,8 +38,10 @@ interface Food {
     MatInputModule,
     MatIconModule,
     MatInputModule,
+    MatButtonModule,
     MatSelectModule,
-    MatDatepickerModule
+    MatDatepickerModule,
+    ReactiveFormsModule,
   ],
   providers: [provideNativeDateAdapter()],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -31,14 +49,27 @@ interface Food {
   styleUrl: './add-event-dialog.component.scss',
 })
 export class AddEventDialogComponent {
-  
-  
-  
+  isIncomeEvent = true;
+
+  selectedEventType: string = EventType.CUSTOM;
+  eventType = EventType;
+  customEventsLibrary: ClientEvent[];
+  eventForm: FormGroup;
+  timelineId: string;
+
   constructor(
     private dialogRef: MatDialogRef<AddEventDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public clientData: Client
+    private fb: FormBuilder,
+    private timelineHttpService: TimelineHttpService,
+    @Inject(MAT_DIALOG_DATA) public data: any
   ) {
-    console.log(clientData)
+    console.log(data);
+    this.selectedEventType = data.eventType;
+    this.isIncomeEvent = data.isIncomeEvent;
+    this.customEventsLibrary = data.customEvents;
+    this.timelineId = data.timelineId;
+
+    this.initForm();
   }
 
   doAction(): void {
@@ -48,10 +79,143 @@ export class AddEventDialogComponent {
   closeDialog(): void {
     this.dialogRef.close();
   }
-  
+
+  onIncomeControlClicked(value: boolean) {
+    this.isIncomeEvent = value;
+  }
+
+  initForm() {
+    switch (this.selectedEventType) {
+      case EventType.INHERITANCE:
+        this.eventForm = this.fb.group({
+          type: ['Income', Validators.required],
+          currency: ['', Validators.required],
+          amount: ['', [Validators.required, Validators.min(0)]],
+          ageDate: ['', Validators.required],
+        });
+        break;
+
+      case EventType.STATE_PENSION:
+        this.eventForm = this.fb.group({
+          type: ['Income', Validators.required],
+          currency: ['', Validators.required],
+          amount: ['', [Validators.required, Validators.min(0)]],
+          start: ['', Validators.required],
+          end: ['', Validators.required],
+          escalationRate: ['', Validators.required],
+        });
+        break;
+
+      case EventType.CUSTOM:
+        this.eventForm = this.fb.group({
+          eventName: ['', Validators.required],
+          isIncomeEvent: [true, Validators.required],
+          currency: ['', Validators.required],
+          amount: ['', [Validators.required, Validators.min(0)]],
+          cycle: ['', [Validators.required]],
+          start: ['', Validators.required],
+          end: ['', Validators.required],
+          escalationRate: ['', Validators.required],
+        });
+        break;
+    }
+  }
+
+  onEventNameValueChange(event: any) {
+    if (event === 'Custom') {
+      this.eventForm.addControl(
+        'name',
+        new FormControl('', [Validators.required])
+      );
+      this.eventForm.updateValueAndValidity();
+    } else {
+      this.eventForm.removeControl('name');
+      this.eventForm.updateValueAndValidity();
+
+      const cusEvent = this.customEventsLibrary.find(
+        (customEvent) => customEvent.name === event
+      );
+      this.isIncomeEvent = cusEvent?.type === EventIncomeType.Income;
+    }
+  }
+  onSubmit() {
+    console.log(this.eventForm.value);
+    this.eventForm.markAllAsTouched();
+    if (this.eventForm.valid) {
+      const clientEvent: ClientEvent = {
+        id: '',
+        name:
+          this.eventForm.get('eventName')?.value !== 'Custom'
+            ? this.eventForm.get('eventName')?.value
+            : this.eventForm.get('name')?.value,
+        netAmount: {
+          cycle: {
+            id: '',
+            description: this.eventForm.get('cycle')?.value,
+          },
+          amount: this.eventForm.get('amount')?.value,
+          currencySymbol: this.eventForm.get('currency')?.value,
+        },
+        start: {
+          year: (this.eventForm.get('start')?.value as Date).getFullYear(),
+          age: (this.eventForm.get('start')?.value as Date).getFullYear(),
+        },
+        end: {
+          year: (this.eventForm.get('end')?.value as Date).getFullYear(),
+          age: (this.eventForm.get('end')?.value as Date).getFullYear(),
+        },
+        ageYear: {
+          year: (this.eventForm.get('start')?.value as Date).getFullYear(),
+          age: (this.eventForm.get('start')?.value as Date).getFullYear(),
+        },
+        escalationRate: {
+          id: '',
+          description: this.eventForm.get('escalationRate')?.value
+        },
+        type: this.isIncomeEvent
+          ? EventIncomeType.Income
+          : EventIncomeType.Expense,
+        iconUrl:
+          (this.eventForm.get('eventName')?.value !== 'Custom'
+            ? this.customEventsLibrary.find(
+                (customEvent) =>
+                  customEvent.name === this.eventForm.get('eventName')?.value
+              )?.iconUrl
+            : '') ?? '',
+        isDefault: false,
+        isOneOff: false,
+        isPlaceHolder: false,
+      };
+      this.timelineHttpService.addEvent(clientEvent, this.timelineId)
+      .pipe(
+        filter(res => !!res),
+        catchError(err => {
+          console.error(err);
+          throw err;
+        })
+      ).subscribe(res => {
+        this.dialogRef.close({
+          status: 'Success'
+        });
+      })
+      // this.dialogRef.close();
+    }
+  }
+
   foods: Food[] = [
     { value: '0', viewValue: '1' },
     { value: '1', viewValue: '2' },
     { value: '2', viewValue: '3' },
   ];
+
+  cycles: string[] = ['One-Off', 'Every Month', 'Every Year'];
+  currencySymbols: string[] = ['$', '£', '€'];
+
+  events: string[] = ['$', '£', '€'];
+}
+
+export class EventType {
+  public static readonly CUSTOM = 'Custom';
+  public static readonly STATE_PENSION = 'StatePension';
+  public static readonly INHERITANCE = 'Inheritance';
 }

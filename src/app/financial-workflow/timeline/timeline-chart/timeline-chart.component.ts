@@ -4,26 +4,31 @@ import {
   ChangeDetectorRef,
   Component,
   ElementRef,
+  EventEmitter,
   Input,
   OnChanges,
   OnInit,
+  Output,
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
-import { FinancialTimeline } from '../models/financial-timeline';
-import { DataSet, Timeline, TimelineOptions } from 'vis-timeline/standalone';
+import { ClientEvent, FinancialTimeline } from '../models/financial-timeline';
+import { DataSet, moment, Timeline, TimelineOptions } from 'vis-timeline/standalone';
 
 import { MatDialog } from '@angular/material/dialog';
 import { TimelineHttpService } from '../services/timeline-http.service';
-import { AddEventDialogComponent } from '../add-event-dialog/add-event-dialog.component';
+import { AddEventDialogComponent, EventType } from '../add-event-dialog/add-event-dialog.component';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { TablerIconsModule } from 'angular-tabler-icons';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { combineLatest, filter, tap } from 'rxjs';
+import { CommonModule } from '@angular/common';
+import { CdkDrag, CdkDropList } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-timeline-chart',
@@ -36,6 +41,9 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     MatDatepickerModule,
     MatIconModule,
     MatProgressSpinnerModule,
+    CommonModule,
+    CdkDrag,
+    CdkDropList
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './timeline-chart.component.html',
@@ -43,15 +51,19 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 })
 export class TimelineChartComponent implements OnInit {
   timeline: Timeline;
-  options: {};
-  data: any;
-  groups: any;
+  customEventsLibrary: ClientEvent[];
+  systemEventsLibrary: ClientEvent[];
 
   @Input() financialTimeline: FinancialTimeline;
+  @Output() updateTimelines: EventEmitter<boolean>;
   @ViewChild('timelineContainer', { static: true })
   timelineContainer!: ElementRef;
 
-  constructor(private dialog: MatDialog, private cdr: ChangeDetectorRef) {}
+  constructor(private dialog: MatDialog, private timelineHttpService: TimelineHttpService,
+    private cdr: ChangeDetectorRef
+  ) {
+    this.updateTimelines = new EventEmitter<boolean>();
+  }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['financialTimeline']) {
@@ -61,6 +73,31 @@ export class TimelineChartComponent implements OnInit {
 
   ngOnInit() {
     this.initTimelineContainer();
+    this.getTimelineEventsLibrary();
+  }
+
+  getTimelineEventsLibrary() {
+    combineLatest([this.timelineHttpService.getSystemEvents(), this.timelineHttpService.getCustomEvents()]).pipe(
+      filter(res => !!res),
+      tap((res) => {
+        this.systemEventsLibrary = res[0];
+        this.customEventsLibrary = res[1];
+        this.cdr.detectChanges();
+      })
+    ).subscribe()
+  }
+
+  onDrop(event: any) {
+    console.log("onDrop", event);
+  }
+
+  onDragStart(event: any, customEvent: any) {
+    console.log("onDragStart", event, customEvent);
+
+  }
+
+  onDragOver(event: any) {
+    console.log("onDragOver", event);
   }
 
   initTimelineContainer() {
@@ -104,25 +141,29 @@ export class TimelineChartComponent implements OnInit {
     // Initialize timeline
     this.timeline = new Timeline(this.timelineContainer.nativeElement, this.timelineData, this.timelineOptions);
 
-    this.timeline.addCustomTime(this.financialTimeline.startAt?.year, 't1');
+    if(this.financialTimeline.startAt) {
+      this.timeline.addCustomTime(this.financialTimeline.startAt?.year, 't1');
+    }
   }
 
   get timelineData(): DataSet<{
     id: string;
     content: string;
-    start: number;
-    end: number;
+    start: Date;
+    end: Date;
     className: string;
 }, "id"> {
-    const dataArray = this.financialTimeline.clientEvents.map((event) => {
+    const dataArray = this.financialTimeline.clientEvents.map((event, index) => {
+      console.log({index})
       return {
-        id: event.id,
+        id: event.id ?? (index+1).toString(),
         content: event.name,
-        start: event.start.year,
-        end: event.end.year,
+        start: new Date(event.start.year, 0),
+        end: new Date(event.end.year, 0),
         className: event.iconUrl
       }
     });
+    console.log({dataArray})
     return new DataSet(dataArray);
   }
   get timelineOptions(): TimelineOptions {
@@ -138,9 +179,9 @@ export class TimelineChartComponent implements OnInit {
       horizontalScroll: true, // Enable scrolling
       orientation: 'bottom', // Place events at the top
       margin: { item: 10 }, // Adds spacing between events
-      min: this.financialTimeline.forecastStartDate,
-      start: this.financialTimeline.forecastStartDate,
-      end: this.financialTimeline.forecastEndtDate,
+      min: new Date(moment(this.financialTimeline.forecastStartDate).year(), 0),
+      start: new Date(moment(this.financialTimeline.forecastStartDate).year(), 0),
+      end: moment(this.financialTimeline.forecastStartDate).add(3, 'years').toDate(),
       max: this.financialTimeline.forecastEndtDate,
       minHeight: '252px',
       align: 'left',
@@ -164,12 +205,17 @@ export class TimelineChartComponent implements OnInit {
       width: '600px',
       disableClose: true,
       data: {
-        client: {},
+        eventType: EventType.CUSTOM,
+        customEvents: this.customEventsLibrary,
+        timelineId: this.financialTimeline.id
       },
     });
 
     dialogRef.afterClosed().subscribe((result: any) => {
       console.log('Dialog closed with result:', result);
+      if(result.status = 'Success') {
+        this.updateTimelines.emit();
+      }
     });
   }
 }

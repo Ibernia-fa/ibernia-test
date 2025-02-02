@@ -17,8 +17,12 @@
                 </button>
             </div>
             <div class="chips-custom">
-                <mat-chip-set aria-label="Dog selection">
-                    <mat-chip class="f-s-14" class="chip-item retirement-age">
+                <mat-chip-set 
+                aria-label="Dog selection">
+                <!-- <mat-chip class="f-s-14" class="chip-item retirement-age">
+                    cdkDropList
+                    cdkDropListOrientation="horizontal"
+                    (cdkDropListDropped)="drop($event)" 
                         <div class="d-flex gap-8 align-items-center m-r-16">
                             <img matChipAvatar src="/assets/images/svgs/retirement-icon.svg"
                                 alt="Photo of a Shiba Inu" />
@@ -61,13 +65,29 @@
                             State Pension
                         </div>
                         <img src="/assets/images/svgs/close-line-icon.svg" alt="remove" />
-                    </mat-chip>
+                    </mat-chip> -->
+                    @if(systemEventsLibrary) {
+                        @for(event of systemEventsLibrary; track event) {
+                            <mat-chip 
+                            draggable="true" 
+                            (dragStart)="onDragStart($event, event)" class="f-s-14" class="chip-item" [class]="event.iconUrl">
+                                <div class="d-flex gap-8 align-items-center m-r-16">
+                                    <img matChipAvatar [src]="'/assets/images/svgs/' + event.iconUrl  + '.svg'"
+                                        [alt]="event.iconUrl" />
+                                    {{event.name}}
+                                </div>
+                                <img src="/assets/images/svgs/close-line-icon.svg" alt="remove" />
+                            </mat-chip>
+                        }
+                    }
                 </mat-chip-set>
             </div>
         </div>
 
         <!-- Chart  -->
-        <div #timelineContainer class="timeline"></div>
+        <div #timelineContainer class="timeline" 
+        (dragover)="onDragOver($event)" 
+        (drop)="onDrop($event)"></div>
         <!-- End Chart  -->
     </mat-card-content>
 </mat-card>
