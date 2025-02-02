@@ -1,0 +1,30 @@
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Cashflow } from '../models/cashflow';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class CashflowHttpService {
+
+  private readonly CASHFLOW_URL_PREFIX = '/api/v1/cashflows'
+  constructor(private httpClient: HttpClient) { }
+
+  createCashflow(cashflow: Cashflow) {
+    return this.httpClient.post<Cashflow>(this.CASHFLOW_URL_PREFIX, cashflow)
+  }
+  
+  updateCashflow(cashflow: Cashflow) {
+    return this.httpClient.put<Cashflow>(this.CASHFLOW_URL_PREFIX, cashflow)
+  }
+  
+  getByClientId(clientId: string) {
+    return this.httpClient.get<Array<Cashflow>>(`/api/v1/client/${clientId}/cashflows`);
+  }
+
+  deleteCashflow(cashflowId: string) {
+    return this.httpClient.delete(`${this.CASHFLOW_URL_PREFIX}/${cashflowId}`, {
+      responseType: "text"
+    });
+  }
+}

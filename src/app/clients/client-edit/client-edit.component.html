@@ -56,13 +56,25 @@
       <div class="row justify-content-between">
         <div class="col-6">
           <div class="w-100 form-field">
-            <mat-label class="f-s-14 f-w-600 d-block"
-              >Preferred Currency</mat-label
-            >
-            <input matInput placeholder="USD/AED" formControlName="currency" />
+            <mat-label class="f-s-14 f-w-600 d-block">Country</mat-label>
+
+            <input matInput formControlName="country" />
           </div>
         </div>
         <div class="col-6">
+          <div class="w-100 form-field">
+            <mat-label class="f-s-14 f-w-600 d-block">
+              Preferred Currency</mat-label
+            >
+            <div class="select-option">
+              <mat-select formControlName="currency" value="Select">
+                <mat-option value="AED">AED</mat-option>
+                <mat-option value="USD">USD</mat-option>
+              </mat-select>
+            </div>
+          </div>
+        </div>
+        <!-- <div class="col-6">
           <div class="w-100 form-field">
             <mat-label class="f-s-14 f-w-600 d-block">Gender</mat-label>
             <div class="select-option">
@@ -72,10 +84,7 @@
               </mat-select>
             </div>
           </div>
-          <!-- <mat-form-field appearance="outline" class="w-100">
-                                <input matInput placeholder="Male/Female" formControlName="gender" />
-                            </mat-form-field> -->
-        </div>
+        </div> -->
       </div>
       <div class="checkbox-align d-flex flex-column gap-1">
         <div class="row justify-content-between">
@@ -172,17 +181,25 @@
         <div class="row justify-content-between">
           <div class="col-6">
             <div class="w-100 form-field">
-              <mat-label class="f-s-14 f-w-600 d-block"
-                >Preferred Currency</mat-label
-              >
-              <input
-                matInput
-                placeholder="USD/AED"
-                formControlName="currency"
-              />
+              <mat-label class="f-s-14 f-w-600 d-block">Country</mat-label>
+  
+              <input matInput formControlName="country" />
             </div>
           </div>
           <div class="col-6">
+            <div class="w-100 form-field">
+              <mat-label class="f-s-14 f-w-600 d-block">
+                Preferred Currency</mat-label
+              >
+              <div class="select-option">
+                <mat-select formControlName="currency" value="Select">
+                  <mat-option value="AED">AED</mat-option>
+                  <mat-option value="USD">USD</mat-option>
+                </mat-select>
+              </div>
+            </div>
+          </div>
+          <!-- <div class="col-6">
             <div class="w-100 form-field">
               <mat-label class="f-s-14 f-w-600 d-block">Gender</mat-label>
               <div class="select-option">
@@ -192,11 +209,7 @@
                 </mat-select>
               </div>
             </div>
-
-            <!-- <mat-form-field appearance="outline" class="w-100">
-                                    <input matInput placeholder="Male/Female" formControlName="gender" />
-                                </mat-form-field> -->
-          </div>
+          </div> -->
         </div>
         <div class="row justify-content-between">
           <div class="col-6">

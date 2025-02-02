@@ -4,8 +4,10 @@ import {
   importProvidersFrom,
 } from '@angular/core';
 import {
+  HttpBackend,
   HttpClient,
   provideHttpClient,
+  withInterceptors,
   withInterceptorsFromDi,
 } from '@angular/common/http';
 import { routes } from './app.routes';
@@ -38,8 +40,10 @@ import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
 // code view
 import { provideHighlightOptions } from 'ngx-highlightjs';
 import 'highlight.js/styles/atom-one-dark.min.css';
+import { httpRequestInterceptor } from './core/http-request.interceptor';
 
-export function HttpLoaderFactory(http: HttpClient): any {
+export function HttpLoaderFactory(handler: HttpBackend): any {
+  const http = new HttpClient(handler);
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
 }
 
@@ -65,7 +69,8 @@ export const appConfig: ApplicationConfig = {
       }),
       withComponentInputBinding()
     ),
-    provideHttpClient(withInterceptorsFromDi()),
+    provideHttpClient(withInterceptorsFromDi(),
+    withInterceptors([httpRequestInterceptor])),
     provideClientHydration(),
     provideAnimationsAsync(),
     importProvidersFrom(
@@ -84,7 +89,7 @@ export const appConfig: ApplicationConfig = {
         loader: {
           provide: TranslateLoader,
           useFactory: HttpLoaderFactory,
-          deps: [HttpClient],
+          deps: [HttpBackend],
         },
       })
     ),

@@ -17,18 +17,18 @@
 
     <!-- Modal Body  -->
     <!-- <mat-dialog-content> -->
-    <div class="d-flex flex-column gap-20">
+    <div [formGroup]="form" class="d-flex flex-column gap-20">
         <div class="w-100 form-field">
             <mat-label class="f-s-14 f-w-600 d-block">Model Name</mat-label>
             <input matInput formControlName="name" />
-            <!-- @if(clientForm.get('name')?.touched &&
-             clientForm.get('name')?.hasError('required')) { -->
-            <span class="field-error d-block">Name is required</span>
-            <!-- } -->
+            @if(form.get('name')?.touched &&
+             form.get('name')?.hasError('required')) {
+                <span class="field-error d-block">Name is required</span>
+            }
         </div>
         <div class="w-100 form-field">
             <mat-label class="f-s-14 f-w-600 d-block">Description (Optional)</mat-label>
-            <textarea placeholder="Enter description"></textarea>
+            <textarea formControlName="description" placeholder="Enter description"></textarea>
         </div>
     </div>
     <!-- </mat-dialog-content> -->
@@ -42,8 +42,8 @@
             </button>
         </div>
         <div class="col-5">
-            <button class="button-icon w-100 d-block">
-                <span class="f-s-16">Start Modal</span>
+            <button [disabled]="form.invalid" (click)="onSubmit()" class="button-icon w-100 d-block">
+                <span class="f-s-16">Start Model</span>
             </button>
         </div>
     </div>

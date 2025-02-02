@@ -16,9 +16,9 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
 import { AppBreadcrumbComponent } from 'src/app/layouts/full/shared/breadcrumb/breadcrumb.component';
 import { FiveDayRangeSelectionStrategy } from 'src/app/pages/forms/form-elements';
-import { ClientHttpService } from '../client-http.service';
+import { ClientHttpService } from '../services/client-http.service';
 import { catchError, filter, map, switchMap } from 'rxjs';
-import { Client } from '../client';
+import { Client } from '../models/client';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -65,6 +65,7 @@ export class ClientEditComponent {
       name: ['', Validators.required],
       dob: ['', Validators.required],
       gender: [''],
+      country: [''],
       currency: [''],
       email: ['', [Validators.email]],
       phone: [''],
@@ -73,6 +74,7 @@ export class ClientEditComponent {
         name: [''],
         dob: [''],
         gender: [''],
+        country: [''],
         currency: [''],
         email: ['', [Validators.email]],
         phone: [''],
@@ -93,6 +95,7 @@ export class ClientEditComponent {
         this.clientForm.controls['dob'].patchValue(res.clientDetails.birthDate);
         this.clientForm.controls['email'].patchValue(res.clientDetails.email);
         this.clientForm.controls['gender'].patchValue(res.clientDetails.gender);
+        this.clientForm.controls['country'].patchValue(res.clientDetails.country);
         this.clientForm.controls['name'].patchValue(res.clientDetails.name);
         this.clientForm.controls['phone'].patchValue(res.clientDetails.phone);
         this.clientForm.controls['currency'].patchValue(res.clientDetails.preferredCurrency);
@@ -103,6 +106,7 @@ export class ClientEditComponent {
           partnerFormGroup.controls['dob'].patchValue(res.partnerDetail.birthDate);
           partnerFormGroup.controls['email'].patchValue(res.partnerDetail.email);
           partnerFormGroup.controls['gender'].patchValue(res.partnerDetail.gender);
+          partnerFormGroup.controls['country'].patchValue(res.partnerDetail.country);
           partnerFormGroup.controls['name'].patchValue(res.partnerDetail.name);
           partnerFormGroup.controls['phone'].patchValue(res.partnerDetail.phone);
           partnerFormGroup.controls['currency'].patchValue(res.partnerDetail.preferredCurrency);
@@ -139,6 +143,7 @@ export class ClientEditComponent {
           birthDate: this.clientForm.controls['dob'].value,
           email: this.clientForm.controls['email'].value,
           gender: this.clientForm.controls['gender'].value,
+          country: this.clientForm.controls['country'].value,
           name: this.clientForm.controls['name'].value,
           phone: this.clientForm.controls['phone'].value,
           preferredCurrency: this.clientForm.controls['currency'].value,
@@ -147,6 +152,7 @@ export class ClientEditComponent {
           birthDate: partnerGroup.controls['dob']?.value,
           email: partnerGroup.controls['email']?.value,
           gender: partnerGroup.controls['gender']?.value,
+          country: partnerGroup.controls['country']?.value,
           name: partnerGroup.controls['name']?.value,
           phone: partnerGroup.controls['phone']?.value,
           preferredCurrency:

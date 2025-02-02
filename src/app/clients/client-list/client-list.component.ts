@@ -41,9 +41,9 @@ import {
   transition,
   trigger,
 } from '@angular/animations';
-import { ClientHttpService } from '../client-http.service';
+import { ClientHttpService } from '../services/client-http.service';
 import { catchError, filter, map } from 'rxjs';
-import { Client } from '../client';
+import { Client } from '../models/client';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
 import { DialogComponent } from 'src/app/dialog/dialog.component';
 import { MatSort, MatSortModule, Sort } from '@angular/material/sort';
@@ -304,11 +304,6 @@ export class ClientListComponent implements OnInit, AfterViewInit {
       width: '460px',
     });
     dialogRef.afterClosed().subscribe((result) => {
-      // if (result.event === 'Add') {
-      //   this.addRowData(result.data);
-      // } else if (result.event === 'Update') {
-      //   this.updateRowData(result.data);
-      // } else
       if (result.event === 'Delete') {
         this.deleteRowData(result.data);
       }

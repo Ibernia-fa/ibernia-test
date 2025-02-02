@@ -7,7 +7,7 @@ export const FinancialWorkflowRoutes: Routes = [
     path: '',
     children: [
       {
-        path: '',
+        path: ':id/timeline',
         component: FinancialWorkflowDashboardComponent,
         // data: {
         //   title: 'Clients',
