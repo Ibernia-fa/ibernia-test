@@ -21,15 +21,14 @@ export interface AgeYear {
 }
 
 export interface ClientEvent {
-  id: string;
+  id: string | null;
   name: string;
   type: EventIncomeType;
   iconUrl: string;
   netAmount: NetAmount;
-  ageYear: AgeYear;
   start: AgeYear;
-  end: AgeYear;
-  escalationRate: EscalationRate;
+  end: AgeYear | null;
+  escalationRate: EscalationRate | null;
   isPlaceHolder: boolean;
   isOneOff: boolean;
   isDefault: boolean;

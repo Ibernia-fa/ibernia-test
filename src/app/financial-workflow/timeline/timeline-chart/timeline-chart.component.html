@@ -67,14 +67,16 @@
                         <img src="/assets/images/svgs/close-line-icon.svg" alt="remove" />
                     </mat-chip> -->
                     @if(systemEventsLibrary) {
-                        @for(event of systemEventsLibrary; track event) {
+                        @for(systemEvent of systemEventsLibrary; track systemEvent) {
                             <mat-chip 
                             draggable="true" 
-                            (dragStart)="onDragStart($event, event)" class="f-s-14" class="chip-item" [class]="event.iconUrl">
+                            (dragstart)="onDragStart($event, systemEvent)" class="f-s-14" class="chip-item" [class]="systemEvent.iconUrl">
                                 <div class="d-flex gap-8 align-items-center m-r-16">
-                                    <img matChipAvatar [src]="'/assets/images/svgs/' + event.iconUrl  + '.svg'"
-                                        [alt]="event.iconUrl" />
-                                    {{event.name}}
+                                    <img matChipAvatar 
+                                    src="/assets/images/svgs/retirement-icon.svg"
+                                    [alt]="systemEvent.iconUrl" />
+                                    <!-- [src]="'/assets/images/svgs/' + systemEvent.iconUrl  + '.svg'" -->
+                                    {{systemEvent.name}}
                                 </div>
                                 <img src="/assets/images/svgs/close-line-icon.svg" alt="remove" />
                             </mat-chip>

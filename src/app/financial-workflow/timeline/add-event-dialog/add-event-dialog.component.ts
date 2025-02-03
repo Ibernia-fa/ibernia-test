@@ -56,6 +56,9 @@ export class AddEventDialogComponent {
   customEventsLibrary: ClientEvent[];
   eventForm: FormGroup;
   timelineId: string;
+  systemEvent: ClientEvent | undefined | null;
+  dropTime: Date;
+
 
   constructor(
     private dialogRef: MatDialogRef<AddEventDialogComponent>,
@@ -68,6 +71,9 @@ export class AddEventDialogComponent {
     this.isIncomeEvent = data.isIncomeEvent;
     this.customEventsLibrary = data.customEvents;
     this.timelineId = data.timelineId;
+    this.systemEvent = data.systemEvent
+    this.dropTime = data.dropTime;
+
 
     this.initForm();
   }
@@ -88,19 +94,21 @@ export class AddEventDialogComponent {
     switch (this.selectedEventType) {
       case EventType.INHERITANCE:
         this.eventForm = this.fb.group({
-          type: ['Income', Validators.required],
+          isIncomeEvent: [false, Validators.required],
           currency: ['', Validators.required],
           amount: ['', [Validators.required, Validators.min(0)]],
-          ageDate: ['', Validators.required],
+          cycle: ['', [Validators.required]],
+          ageDate: [this.dropTime, Validators.required],
         });
         break;
 
       case EventType.STATE_PENSION:
         this.eventForm = this.fb.group({
-          type: ['Income', Validators.required],
+          isIncomeEvent: [true, Validators.required],
           currency: ['', Validators.required],
           amount: ['', [Validators.required, Validators.min(0)]],
-          start: ['', Validators.required],
+          cycle: ['', [Validators.required]],
+          start: [this.dropTime, Validators.required],
           end: ['', Validators.required],
           escalationRate: ['', Validators.required],
         });
@@ -138,12 +146,105 @@ export class AddEventDialogComponent {
       this.isIncomeEvent = cusEvent?.type === EventIncomeType.Income;
     }
   }
-  onSubmit() {
+
+  onPensionEventSubmit() {
+    this.eventForm.markAllAsTouched();
+    if (this.eventForm.valid && this.systemEvent) {
+      const clientEvent: ClientEvent = {
+        id: null,
+        name: this.systemEvent.name,
+        netAmount: {
+          cycle: {
+            id: '',
+            description: this.eventForm.get('cycle')?.value,
+          },
+          amount: this.eventForm.get('amount')?.value,
+          currencySymbol: this.eventForm.get('currency')?.value,
+        },
+        start: {
+          year: (this.eventForm.get('start')?.value as Date).getFullYear(),
+          age: (this.eventForm.get('start')?.value as Date).getFullYear(),
+        },
+        end: {
+          year: (this.eventForm.get('end')?.value as Date).getFullYear(),
+          age: (this.eventForm.get('end')?.value as Date).getFullYear(),
+        },
+        escalationRate: {
+          id: '',
+          description: this.eventForm.get('escalationRate')?.value
+        },
+        type: this.isIncomeEvent
+          ? EventIncomeType.Income
+          : EventIncomeType.Expense,
+        iconUrl: this.systemEvent.iconUrl,
+        isDefault: false,
+        isOneOff: this.systemEvent.isOneOff,
+        isPlaceHolder: this.systemEvent.isPlaceHolder,
+      };
+      this.timelineHttpService.addEvent(clientEvent, this.timelineId)
+      .pipe(
+        filter(res => !!res),
+        catchError(err => {
+          console.error(err);
+          throw err;
+        })
+      ).subscribe(res => {
+        this.dialogRef.close({
+          status: 'Success'
+        });
+      })
+      // this.dialogRef.close();
+    }
+  }
+  onInsuranceEventSubmit() {
+    this.eventForm.markAllAsTouched();
+    if (this.eventForm.valid && this.systemEvent) {
+      const clientEvent: ClientEvent = {
+        id: null,
+        name: this.systemEvent.name,
+        netAmount: {
+          cycle: {
+            id: '',
+            description: this.eventForm.get('cycle')?.value,
+          },
+          amount: this.eventForm.get('amount')?.value,
+          currencySymbol: this.eventForm.get('currency')?.value,
+        },
+        start: {
+          year: (this.eventForm.get('ageDate')?.value as Date).getFullYear(),
+          age: (this.eventForm.get('ageDate')?.value as Date).getFullYear(),
+        },
+        end: null,
+        escalationRate: null,
+        type: this.isIncomeEvent
+          ? EventIncomeType.Income
+          : EventIncomeType.Expense,
+        iconUrl: this.systemEvent.iconUrl,
+        isDefault: false,
+        isOneOff: this.systemEvent.isOneOff,
+        isPlaceHolder: this.systemEvent.isPlaceHolder,
+      };
+      this.timelineHttpService.addEvent(clientEvent, this.timelineId)
+      .pipe(
+        filter(res => !!res),
+        catchError(err => {
+          console.error(err);
+          throw err;
+        })
+      ).subscribe(res => {
+        this.dialogRef.close({
+          status: 'Success'
+        });
+      })
+      // this.dialogRef.close();
+    }
+  }
+  onCustomEventSubmit() {
     console.log(this.eventForm.value);
     this.eventForm.markAllAsTouched();
     if (this.eventForm.valid) {
       const clientEvent: ClientEvent = {
-        id: '',
+        id: null,
         name:
           this.eventForm.get('eventName')?.value !== 'Custom'
             ? this.eventForm.get('eventName')?.value
@@ -163,10 +264,6 @@ export class AddEventDialogComponent {
         end: {
           year: (this.eventForm.get('end')?.value as Date).getFullYear(),
           age: (this.eventForm.get('end')?.value as Date).getFullYear(),
-        },
-        ageYear: {
-          year: (this.eventForm.get('start')?.value as Date).getFullYear(),
-          age: (this.eventForm.get('start')?.value as Date).getFullYear(),
         },
         escalationRate: {
           id: '',
