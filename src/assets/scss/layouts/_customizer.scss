@@ -298,3 +298,9 @@ html .customizerNav {
 }
 
 // End Modal Styles
+
+// Modal Container
+
+.mat-mdc-dialog-container .mat-mdc-dialog-content {
+  padding: 0 !important;
+}
