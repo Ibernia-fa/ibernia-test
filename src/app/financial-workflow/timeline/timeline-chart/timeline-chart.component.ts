@@ -16,11 +16,19 @@ import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { ClientEvent, FinancialTimeline } from '../models/financial-timeline';
-import { DataSet, moment, Timeline, TimelineOptions } from 'vis-timeline/standalone';
+import {
+  DataSet,
+  moment,
+  Timeline,
+  TimelineOptions,
+} from 'vis-timeline/standalone';
 
 import { MatDialog } from '@angular/material/dialog';
 import { TimelineHttpService } from '../services/timeline-http.service';
-import { AddEventDialogComponent, EventType } from '../add-event-dialog/add-event-dialog.component';
+import {
+  AddEventDialogComponent,
+  EventType,
+} from '../add-event-dialog/add-event-dialog.component';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -43,7 +51,7 @@ import { CdkDrag, CdkDropList } from '@angular/cdk/drag-drop';
     MatProgressSpinnerModule,
     CommonModule,
     CdkDrag,
-    CdkDropList
+    CdkDropList,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './timeline-chart.component.html',
@@ -59,7 +67,9 @@ export class TimelineChartComponent implements OnInit {
   @ViewChild('timelineContainer', { static: true })
   timelineContainer!: ElementRef;
 
-  constructor(private dialog: MatDialog, private timelineHttpService: TimelineHttpService,
+  constructor(
+    private dialog: MatDialog,
+    private timelineHttpService: TimelineHttpService,
     private cdr: ChangeDetectorRef
   ) {
     this.updateTimelines = new EventEmitter<boolean>();
@@ -77,27 +87,83 @@ export class TimelineChartComponent implements OnInit {
   }
 
   getTimelineEventsLibrary() {
-    combineLatest([this.timelineHttpService.getSystemEvents(), this.timelineHttpService.getCustomEvents()]).pipe(
-      filter(res => !!res),
-      tap((res) => {
-        this.systemEventsLibrary = res[0];
-        this.customEventsLibrary = res[1];
-        this.cdr.detectChanges();
-      })
-    ).subscribe()
+    combineLatest([
+      this.timelineHttpService.getSystemEvents(),
+      this.timelineHttpService.getCustomEvents(),
+    ])
+      .pipe(
+        filter((res) => !!res),
+        tap((res) => {
+          this.systemEventsLibrary = res[0];
+          this.customEventsLibrary = res[1];
+          this.cdr.detectChanges();
+        })
+      )
+      .subscribe();
   }
 
   onDrop(event: any) {
-    console.log("onDrop", event);
+    console.log('onDrop', event);
   }
 
   onDragStart(event: any, customEvent: any) {
-    console.log("onDragStart", event, customEvent);
-
+    console.log('onDragStart', event, customEvent);
   }
 
   onDragOver(event: any) {
-    console.log("onDragOver", event);
+    console.log('onDragOver', event);
+  }
+
+  // Event Tag Content
+  getContent(title: string, img: string): HTMLElement {
+    // Create the outer container div
+    const retirementChip = document.createElement('div');
+    retirementChip.classList.add('timeline-chips', 'retirement-chip');
+
+    // Create the inner div with flex properties
+    const flexContainer = document.createElement('div');
+    flexContainer.classList.add(
+      'd-flex',
+      'align-items-center',
+      'justify-content-between'
+    );
+
+    // Create the left side (flex container with image and text)
+    const leftContainer = document.createElement('div');
+    leftContainer.classList.add(
+      'd-flex',
+      'gap-8',
+      'align-items-center',
+      'm-r-16'
+    );
+
+    // Create and append the image element for the icon
+    const retirementIcon = document.createElement('img');
+    retirementIcon.setAttribute('src', img);
+    retirementIcon.setAttribute('alt', 'icon');
+
+    // Create and append the span element with the text
+    const retirementText = document.createElement('span');
+    retirementText.textContent = title;
+
+    // Append the icon and text to the left container
+    leftContainer.appendChild(retirementIcon);
+    leftContainer.appendChild(retirementText);
+
+    // Create and append the close button image
+    const closeButton = document.createElement('img');
+    closeButton.setAttribute('src', '/assets/images/svgs/close-line-icon.svg');
+    closeButton.setAttribute('alt', 'remove');
+
+    // Append the left container and close button to the flex container
+    flexContainer.appendChild(leftContainer);
+    flexContainer.appendChild(closeButton);
+
+    // Append the flex container to the outer container
+    retirementChip.appendChild(flexContainer);
+
+    // Return the final HTML element (for appending to the DOM)
+    return retirementChip;
   }
 
   initTimelineContainer() {
@@ -105,65 +171,89 @@ export class TimelineChartComponent implements OnInit {
     // if(this.timelineContainer) {
     if (!this.timelineContainer?.nativeElement) return;
 
-
-    
     // Define timeline events
     const items2 = new DataSet([
       {
         id: 1,
-        content: 'Retirement',
+        content: this.getContent(
+          'Retirement Age',
+          '/assets/images/svgs/retirement-age-icon.svg'
+        ),
         start: '2027-04-20',
         end: '2027-06-01',
         className: 'retirement',
       },
       {
         id: 2,
-        content: 'Inheritance',
+        content: this.getContent(
+          'Inheritance',
+          '/assets/images/svgs/inheritance-icon.svg'
+        ),
         start: '2027-05-15',
         className: 'inheritance',
       },
-      { id: 3, content: 'Birth', start: '2026-06-10', className: 'birth' },
+      {
+        id: 3,
+        content: this.getContent('Birth', '/assets/images/svgs/birth-icon.svg'),
+        start: '2026-06-10',
+        className: 'birth',
+      },
       {
         id: 4,
-        content: 'Wedding',
+        content: this.getContent(
+          'Wedding',
+          '/assets/images/svgs/wedding-icon.svg'
+        ),
         start: '2028-07-01',
         end: '2029-07-05',
         className: 'wedding',
       },
       {
         id: 5,
-        content: 'State Pension Age',
+        content: this.getContent(
+          'State Pension Age',
+          '/assets/images/svgs/state-pension-icon.svg'
+        ),
         start: '2035-01-01',
         className: 'state-pension',
       },
     ]);
 
     // Initialize timeline
-    this.timeline = new Timeline(this.timelineContainer.nativeElement, this.timelineData, this.timelineOptions);
+    this.timeline = new Timeline(
+      this.timelineContainer.nativeElement,
+      this.timelineData,
+      this.timelineOptions
+    );
 
-    if(this.financialTimeline.startAt) {
+    if (this.financialTimeline.startAt) {
       this.timeline.addCustomTime(this.financialTimeline.startAt?.year, 't1');
     }
   }
 
-  get timelineData(): DataSet<{
-    id: string;
-    content: string;
-    start: Date;
-    end: Date;
-    className: string;
-}, "id"> {
-    const dataArray = this.financialTimeline.clientEvents.map((event, index) => {
-      console.log({index})
-      return {
-        id: event.id ?? (index+1).toString(),
-        content: event.name,
-        start: new Date(event.start.year, 0),
-        end: new Date(event.end.year, 0),
-        className: event.iconUrl
+  get timelineData(): DataSet<
+    {
+      id: string;
+      content: string;
+      start: Date;
+      end: Date;
+      className: string;
+    },
+    'id'
+  > {
+    const dataArray = this.financialTimeline.clientEvents.map(
+      (event, index) => {
+        console.log({ index });
+        return {
+          id: event.id ?? (index + 1).toString(),
+          content: event.name,
+          start: new Date(event.start.year, 0),
+          end: new Date(event.end.year, 0),
+          className: event.iconUrl,
+        };
       }
-    });
-    console.log({dataArray})
+    );
+    console.log({ dataArray });
     return new DataSet(dataArray);
   }
   get timelineOptions(): TimelineOptions {
@@ -180,8 +270,13 @@ export class TimelineChartComponent implements OnInit {
       orientation: 'bottom', // Place events at the top
       margin: { item: 10 }, // Adds spacing between events
       min: new Date(moment(this.financialTimeline.forecastStartDate).year(), 0),
-      start: new Date(moment(this.financialTimeline.forecastStartDate).year(), 0),
-      end: moment(this.financialTimeline.forecastStartDate).add(3, 'years').toDate(),
+      start: new Date(
+        moment(this.financialTimeline.forecastStartDate).year(),
+        0
+      ),
+      end: moment(this.financialTimeline.forecastStartDate)
+        .add(3, 'years')
+        .toDate(),
       max: this.financialTimeline.forecastEndtDate,
       minHeight: '252px',
       align: 'left',
@@ -202,18 +297,18 @@ export class TimelineChartComponent implements OnInit {
 
   newEventClicked() {
     const dialogRef = this.dialog.open(AddEventDialogComponent, {
-      width: '600px',
+      width: '700px',
       disableClose: true,
       data: {
         eventType: EventType.CUSTOM,
         customEvents: this.customEventsLibrary,
-        timelineId: this.financialTimeline.id
+        timelineId: this.financialTimeline.id,
       },
     });
 
     dialogRef.afterClosed().subscribe((result: any) => {
       console.log('Dialog closed with result:', result);
-      if(result.status = 'Success') {
+      if ((result.status = 'Success')) {
         this.updateTimelines.emit();
       }
     });

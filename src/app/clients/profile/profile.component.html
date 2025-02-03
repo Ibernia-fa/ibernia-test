@@ -3,11 +3,18 @@
   <mat-card class="cardWithShadow">
     <mat-card-content>
       <div class="profile-main-wrapper">
-        <div class="d-flex align-items-center justify-content-between w-100 gap-16 flex-wrap">
+        <div
+          class="d-flex align-items-center justify-content-between w-100 gap-16 flex-wrap"
+        >
           <div class="d-flex align-items-center gap-16">
             <!-- Icon  -->
-            <div class="icon-wrapper d-flex align-items-center justify-content-center">
-              <img src="assets/images/svgs/user-profile-header-icon.svg" alt="user-profile-header-icon" />
+            <div
+              class="icon-wrapper d-flex align-items-center justify-content-center"
+            >
+              <img
+                src="assets/images/svgs/user-profile-header-icon.svg"
+                alt="user-profile-header-icon"
+              />
             </div>
             <!-- End Icon  -->
             <!-- headings  -->
@@ -17,14 +24,22 @@
               </h4>
               <span class="sub-title">
                 {{ client.clientDetails.birthDate | date }} ({{
-                client.clientDetails.birthDate | ageCalculator
-                }})</span>
+                  client.clientDetails.birthDate | ageCalculator
+                }})</span
+              >
             </div>
             <!-- End headings  -->
           </div>
-          <button type="button" class="button-icon-outline" (click)="onEditClicked()">
+          <button
+            type="button"
+            class="button-icon-outline"
+            (click)="onEditClicked()"
+          >
             <span>Edit</span>
-            <img src="assets/images/svgs/edit-pen-icon-button.svg" alt="edit-pen-icon" />
+            <img
+              src="assets/images/svgs/edit-pen-icon-button.svg"
+              alt="edit-pen-icon"
+            />
           </button>
           <!-- <div class="d-flex align-items-center gap-12">
           <img
@@ -44,7 +59,10 @@
       <div class="profile-main-wrapper">
         <div class="d-flex flex-column gap-8">
           <div class="d-flex align-items-center gap-8">
-            <img src="assets/images/svgs/total-saving-wallet.svg" alt="total-saving-wallet" />
+            <img
+              src="assets/images/svgs/total-saving-wallet.svg"
+              alt="total-saving-wallet"
+            />
             <h3 class="card-title">Total savings</h3>
           </div>
           <div class="d-flex align-items-center gap-20">
@@ -63,7 +81,9 @@
     <mat-card-content>
       <div class="d-flex flex-column gap-32">
         <!-- Cash Flow Section  -->
-        <div class="d-flex align-items-center justify-content-between w-100 gap-16 flex-wrap">
+        <div
+          class="d-flex align-items-center justify-content-between w-100 gap-16 flex-wrap"
+        >
           <span class="f-s-20">Client’s cashflows:</span>
           <div class="d-flex align-items-center gap-32">
             <div class="d-flex align-items-center">
@@ -72,12 +92,16 @@
                 @for (sortDescriptor of sortDescriptors; track sortDescriptor) {
                 <mat-option [value]="sortDescriptor.value">{{
                   sortDescriptor.viewValue
-                  }}</mat-option>
+                }}</mat-option>
                 }
               </mat-select>
             </div>
 
-            <button (click)="newModelClicked()" type="button" class="button-icon">
+            <button
+              (click)="newModelClicked()"
+              type="button"
+              class="button-icon"
+            >
               <span>New Model</span>
               <img src="assets/images/svgs/add-icon.svg" alt="add-icon" />
             </button>
@@ -89,33 +113,62 @@
         <div class="simulation-wrapper">
           <div class="d-flex flex-column gap-10">
             <div class="d-flex align-items-center justify-content-between">
-              <a [routerLink]="['/cashflows/' + cashflow.id + '/timeline']">
-                <h3>{{cashflow.name}}</h3>
+              <a
+                [routerLink]="['/cashflows/' + cashflow.id + '/timeline']"
+                class="text-decoration-none"
+              >
+                <h3>{{ cashflow.name }}</h3>
               </a>
-              <button mat-icon-button [matMenuTriggerFor]="beforeMenu" aria-label="icon-button with a menu">
+              <button
+                mat-icon-button
+                [matMenuTriggerFor]="beforeMenu"
+                aria-label="icon-button with a menu"
+              >
                 <mat-icon>
-                  <img src="assets/images/svgs/drop-down-icon-v2.svg" alt="drop-down-icon-v2" />
+                  <img
+                    src="assets/images/svgs/drop-down-icon-v2.svg"
+                    alt="drop-down-icon-v2"
+                  />
                 </mat-icon>
               </button>
-              <mat-menu #beforeMenu="matMenu" xPosition="before" class="dropdown-menus">
+              <mat-menu
+                #beforeMenu="matMenu"
+                xPosition="before"
+                class="dropdown-menus"
+              >
                 <button (click)="onEditModelClicked(cashflow.id)" mat-menu-item>
                   <mat-icon>
-                    <img src="assets/images/svgs/drop-down-edit-2-line.svg" alt="drop-down-edit-2-line" height="24"
-                      width="24" />
+                    <img
+                      src="assets/images/svgs/drop-down-edit-2-line.svg"
+                      alt="drop-down-edit-2-line"
+                      height="24"
+                      width="24"
+                    />
                   </mat-icon>
                   <span>Edit</span>
                 </button>
                 <button (click)="onCopyModelClicked(cashflow)" mat-menu-item>
                   <mat-icon>
-                    <img src="assets/images/svgs/drop-down-copy-2-line.svg" alt="drop-down-copy-2-line" height="24"
-                      width="24" />
+                    <img
+                      src="assets/images/svgs/drop-down-copy-2-line.svg"
+                      alt="drop-down-copy-2-line"
+                      height="24"
+                      width="24"
+                    />
                   </mat-icon>
                   <span>Copy</span>
                 </button>
-                <button (click)="onDeleteModelClicked(cashflow.id)" mat-menu-item>
+                <button
+                  (click)="onDeleteModelClicked(cashflow.id)"
+                  mat-menu-item
+                >
                   <mat-icon>
-                    <img src="assets/images/svgs/drop-down-delete-2-line.svg" alt="drop-down-delete-2-line" height="24"
-                      width="24" />
+                    <img
+                      src="assets/images/svgs/drop-down-delete-2-line.svg"
+                      alt="drop-down-delete-2-line"
+                      height="24"
+                      width="24"
+                    />
                   </mat-icon>
                   <span>Delete</span>
                 </button>
@@ -124,7 +177,7 @@
             <div class="d-flex flex-column gap-10">
               <span>Updated: {{ cashflow.updatedAt | timeAgo }}</span>
               <p>
-                {{cashflow.description}}
+                {{ cashflow.description }}
               </p>
             </div>
           </div>
@@ -132,8 +185,7 @@
         }
       </div>
     </mat-card-content>
-    }
-    @else {
+    } @else {
     <div class="h-300">
       <mat-spinner></mat-spinner>
     </div>

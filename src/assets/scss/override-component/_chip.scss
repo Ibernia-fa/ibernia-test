@@ -29,27 +29,27 @@
     padding: 4px 10px;
     align-items: center;
     display: flex;
-    &.retirement-age {
+    &.retirement-age-icon {
       background-color: #fff9f7 !important;
       border: 1px solid #ffede7;
     }
-    &.inheritance {
+    &.inheritance-icon {
       background-color: #f8fff2 !important;
       border: 1px solid #e8f4e1;
     }
-    &.birth {
+    &.birth-icon {
       background-color: #fffbf5 !important;
       border: 1px solid #fff3e0;
     }
-    &.wedding {
+    &.wedding-icon {
       background-color: #f8f5ff !important;
       border: 1px solid #eae0ff;
     }
-    &.mortality {
+    &.mortality-icon {
       background-color: #f7f7f7 !important;
       border: 1px solid #f7f7f7;
     }
-    &.state-pension {
+    &.state-pension-icon {
       background-color: #f9f9ff !important;
       border: 1px solid #ebecff;
     }
@@ -69,6 +69,9 @@
   // .mdc-evolution-chip__action {
   //   gap: 8px;
   // }
+  .mdc-evolution-chip__icon--primary {
+    border-radius: 0 !important;
+  }
   .mat-mdc-chip-action-label {
     display: flex;
   }
