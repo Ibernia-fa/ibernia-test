@@ -27,4 +27,10 @@ export class TimelineHttpService {
       responseType: "text"
     })
   }
+
+  deleteEvent(timelineId: string, eventId: string) {
+    return this.httpClient.delete(`${this.TIMELINE_BASE_URL}s/${timelineId}/events/${eventId}`, {
+      responseType: 'text'
+    })
+  }
 }

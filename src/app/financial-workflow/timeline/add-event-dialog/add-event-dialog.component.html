@@ -107,20 +107,21 @@
         <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
       </div>
       <div class="position-relative">
-        <input matInput formControlName="ageDate" [matDatepicker]="inheritanceagepicker" />
-        <div class="date-picker-position">
-          <mat-datepicker-toggle matIconSuffix [for]="inheritanceagepicker">
-            <mat-icon matDatepickerToggleIcon>
-              <img src="assets/images/svgs/datepicker-icon.svg" alt="datepicker-icon" />
-            </mat-icon>
-          </mat-datepicker-toggle>
+        <div class="w-100 form-field">
+          <div class="select-option">
+            <mat-select value="Select" formControlName="ageDate" hideSingleSelectionIndicator>
+              <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
+              @for (year of years; track year) {
+              <mat-option [value]="year">{{ year }} ({{ year - clientBirthYear }})</mat-option>
+              }
+            </mat-select>
+          </div>
+          @if(eventForm.get('ageDate')?.touched &&
+          eventForm.get('ageDate')?.hasError('required')) {
+          <span class="field-error d-block">Age is required</span>
+          }
         </div>
-        <mat-datepicker #inheritanceagepicker></mat-datepicker>
       </div>
-      @if(eventForm.get('ageDate')?.touched &&
-      eventForm.get('ageDate')?.hasError('required')) {
-      <span class="field-error d-block">Date is required</span>
-      }
     </div>
   </div>
   <!-- End Modal Body  -->
@@ -228,17 +229,14 @@
           <!-- Start Date  -->
           <div class="col-6">
             <div class="w-100 form-field">
-              <div class="position-relative">
-                <input formControlName="start" matInput [matDatepicker]="pensionStartAgePicker" />
-                <div class="date-picker-position">
-                  <mat-datepicker-toggle matIconSuffix [for]="pensionStartAgePicker">
-                    <mat-icon matDatepickerToggleIcon>
-                      <img src="assets/images/svgs/datepicker-icon.svg" alt="datepicker-icon" />
-                    </mat-icon>
-                  </mat-datepicker-toggle>
+                <div class="select-option">
+                  <mat-select value="Select" formControlName="start" hideSingleSelectionIndicator>
+                    <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
+                    @for (year of years; track year) {
+                    <mat-option [value]="year">{{ year }} ({{ year - clientBirthYear }})</mat-option>
+                    }
+                  </mat-select>
                 </div>
-                <mat-datepicker #pensionStartAgePicker></mat-datepicker>
-              </div>
             </div>
             @if(eventForm.get('start')?.touched &&
             eventForm.get('start')?.hasError('required')) {
@@ -254,22 +252,19 @@
           <!-- End Date  -->
           <div class="col-6">
             <div class="w-100 form-field">
-              <div class="position-relative">
-                <input matInput formControlName="end" [matDatepicker]="pensionEndAgePicker" />
-                <div class="date-picker-position">
-                  <mat-datepicker-toggle matIconSuffix [for]="pensionEndAgePicker">
-                    <mat-icon matDatepickerToggleIcon>
-                      <img src="assets/images/svgs/datepicker-icon.svg" alt="datepicker-icon" />
-                    </mat-icon>
-                  </mat-datepicker-toggle>
-                </div>
-                <mat-datepicker #pensionEndAgePicker></mat-datepicker>
+              <div class="select-option">
+                <mat-select value="Select" formControlName="end" hideSingleSelectionIndicator>
+                  <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
+                  @for (event of eventsList; track event) {
+                  <mat-option [value]="event.year">{{ event.name }} ({{ event.age }})</mat-option>
+                  }
+                </mat-select>
               </div>
-            </div>
-            @if(eventForm.get('end')?.touched &&
-            eventForm.get('end')?.hasError('required')) {
-            <span class="field-error d-block">Date is required</span>
-            }
+              @if(eventForm.get('end')?.touched &&
+              eventForm.get('end')?.hasError('required')) {
+              <span class="field-error d-block">Date is required</span>
+              }
+          </div>
           </div>
 
         </div>
@@ -343,6 +338,12 @@
             <div class="w-100 form-field">
               <div class="select-option">
                 <mat-select (valueChange)="onEventNameValueChange($event)" formControlName="eventName" value="Select">
+                  <mat-select-trigger>
+                    <img [src]="'/assets/images/svgs/' + selectedEventIconUrl + '.svg'" [alt]="selectedEventIconUrl" />
+                    <span>
+                      {{ selectedEventName }}
+                    </span>
+                  </mat-select-trigger>
                   <!-- <mat-option value="2.5%">Increase at same rate as inflation (2.5%)</mat-option> -->
                   @for (event of customEventsLibrary; track event) {
                   <mat-option [value]="event.name">
@@ -459,16 +460,13 @@
               <!-- Start date  -->
               <div class="col-6">
                 <div class="w-100 form-field">
-                  <div class="position-relative">
-                    <input matInput [matDatepicker]="startPicker" formControlName="start" />
-                    <div class="date-picker-position">
-                      <mat-datepicker-toggle matIconSuffix [for]="startPicker">
-                        <mat-icon matDatepickerToggleIcon>
-                          <img src="assets/images/svgs/datepicker-icon.svg" alt="datepicker-icon" />
-                        </mat-icon>
-                      </mat-datepicker-toggle>
-                    </div>
-                    <mat-datepicker #startPicker></mat-datepicker>
+                  <div class="select-option">
+                    <mat-select value="Select" formControlName="start" hideSingleSelectionIndicator>
+                      <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
+                      @for (year of years; track year) {
+                      <mat-option [value]="year">{{ year }} ({{ year - clientBirthYear }})</mat-option>
+                      }
+                    </mat-select>
                   </div>
                   @if(eventForm.get('start')?.touched &&
                   eventForm.get('start')?.hasError('required')) {
@@ -483,16 +481,13 @@
               <!-- End date  -->
               <div class="col-6">
                 <div class="w-100 form-field">
-                  <div class="position-relative">
-                    <input matInput [matDatepicker]="endPicker" formControlName="end" />
-                    <div class="date-picker-position">
-                      <mat-datepicker-toggle matIconSuffix [for]="endPicker">
-                        <mat-icon matDatepickerToggleIcon>
-                          <img src="assets/images/svgs/datepicker-icon.svg" alt="datepicker-icon" />
-                        </mat-icon>
-                      </mat-datepicker-toggle>
-                    </div>
-                    <mat-datepicker #endPicker></mat-datepicker>
+                  <div class="select-option">
+                    <mat-select value="Select" formControlName="end" hideSingleSelectionIndicator>
+                      <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
+                      @for (event of eventsList; track event) {
+                      <mat-option [value]="event.year">{{ event.name }} ({{ event.age }})</mat-option>
+                      }
+                    </mat-select>
                   </div>
                   @if(eventForm.get('end')?.touched &&
                   eventForm.get('end')?.hasError('required')) {

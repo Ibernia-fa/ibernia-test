@@ -38,8 +38,9 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { TablerIconsModule } from 'angular-tabler-icons';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { combineLatest, filter, tap } from 'rxjs';
+import { catchError, combineLatest, filter, map, take, tap } from 'rxjs';
 import { CommonModule } from '@angular/common';
+import { group } from '@angular/animations';
 
 @Component({
   selector: 'app-timeline-chart',
@@ -118,7 +119,13 @@ export class TimelineChartComponent implements OnInit {
   onDrop(event: DragEvent) {
     event.preventDefault();
 
-    if (!this.draggedEvent || !this.timeline) return;
+    console.log(this.draggedEvent);
+    console.log(this.timeline);
+
+    if (!this.draggedEvent || !this.timeline) {
+      this.draggedEvent = null;
+      return;
+    }
 
     // Get the dropped position on the timeline
     const dropTime = this.timeline.getEventProperties(event).time;
@@ -137,16 +144,59 @@ export class TimelineChartComponent implements OnInit {
     // this.timeline.itemsData.add(newEvent);
 
     console.log(`Event "${this.draggedEvent.name}" dropped at:`, dropTime);
+    console.log(this.financialTimeline);
 
     if (
-      this.draggedEvent.isOneOff &&
-      this.financialTimeline.clientEvents.find(
+      this.draggedEvent.isOneOff && !this.draggedEvent.isPlaceHolder &&
+      (this.financialTimeline.clientEvents.length < 1 || this.financialTimeline.clientEvents.find(
         (event) => event.name === this.draggedEvent?.name
-      )
-    )
+      ))
+    ) {
+      this.draggedEvent = null;
       return;
+    }
 
-    if (this.draggedEvent.isPlaceHolder) return;
+    console.log(this.financialTimeline.clientEvents.find(
+      (event) => event.name === this.draggedEvent?.name
+    ))
+
+    if(this.draggedEvent.isPlaceHolder) {
+      if (this.financialTimeline.clientEvents.find(
+          (event) => event.name === this.draggedEvent?.name
+        )
+      ) {
+        this.draggedEvent = null;
+        return;
+      }
+      else {
+        const clientEvent: ClientEvent = this.draggedEvent;
+        // Object.assign<ClientEvent, ClientEvent>(clientEvent, this.draggedEvent);
+  
+        clientEvent.start = {
+          year: dropTime.getFullYear(),
+          age: dropTime.getFullYear() - this.clientBirthDate.getFullYear() 
+        }
+        this.timelineHttpService.addEvent(clientEvent, this.financialTimeline.id)
+        .pipe(
+          // filter(res => !!res),
+          take(1),
+          map((res) => {
+            this.financialTimeline.clientEvents.push(clientEvent);
+            this.draggedEvent = null;
+            this.timeline.setItems(this.timelineData)
+            this.cdr.detectChanges();
+            this.timeline.redraw();
+          }),
+          catchError(err => {
+            console.error(err);
+            this.draggedEvent = null;
+            throw err;
+          })
+        ).subscribe(res => {
+          this.draggedEvent = null;
+        })
+      }
+    }
 
     if (
       this.draggedEvent.name === 'Inheritance' ||
@@ -161,12 +211,14 @@ export class TimelineChartComponent implements OnInit {
           isIncomeEvent: this.draggedEvent.type === EventIncomeType.Income,
           systemEvent: this.draggedEvent,
           dropTime: new Date(dropTime.getFullYear(), 0),
+          clientBirthDate: this.clientBirthDate
         },
       });
 
       dialogRef.afterClosed().subscribe((result: any) => {
         console.log('Dialog closed with result:', result);
         if ((result.status = 'Success')) {
+          this.draggedEvent = null;
           this.updateTimelines.emit();
         }
       });
@@ -182,12 +234,21 @@ export class TimelineChartComponent implements OnInit {
           isIncomeEvent: this.draggedEvent.type === EventIncomeType.Income,
           systemEvent: this.draggedEvent,
           dropTime: new Date(dropTime.getFullYear(), 0),
+          clientBirthDate: this.clientBirthDate,
+          eventsList: this.financialTimeline.clientEvents.map(event => {
+            return {
+              name: event.name,
+              year: event.start.year,
+              age: event.start.year - this.clientBirthDate.getFullYear()
+            }
+          })
         },
       });
 
       dialogRef.afterClosed().subscribe((result: any) => {
         console.log('Dialog closed with result:', result);
         if ((result.status = 'Success')) {
+          this.draggedEvent = null;
           this.updateTimelines.emit();
         }
       });
@@ -218,9 +279,6 @@ export class TimelineChartComponent implements OnInit {
     }
   }
 
-  onEventMove(eventProperties: any) {
-    console.log({ eventProperties });
-  }
 
   get timelineData(): DataSet<
     {
@@ -236,10 +294,10 @@ export class TimelineChartComponent implements OnInit {
       (event, index) => {
         console.log({ index });
         return {
-          id: event.id ?? (index + 1).toString(),
+          id: event.id,
           content: this.getContent(event.name, event.iconUrl),
           start: new Date(event.start.year, 0),
-          end: event.end ? new Date(event.end.year, 0) : '',
+          end: event.end ? new Date(event.end.year, 0) : new Date(event.start.year + 1, 0),
           className: event.iconUrl,
         };
       }
@@ -248,7 +306,7 @@ export class TimelineChartComponent implements OnInit {
     return new DataSet(dataArray);
   }
   get timelineOptions(): TimelineOptions {
-    const clientBirthDateYear = moment(this.financialTimeline.forecastStartDate).year();
+    const clientBirthDateYear = moment(this.clientBirthDate).year();
     return {
       editable: {
         add: false, // Prevent adding new events directly
@@ -284,8 +342,27 @@ export class TimelineChartComponent implements OnInit {
           return ``; // Show actual years
         },
       },
+      onRemove: (item, callback) => {
+        console.log(item);
+        this.handleEventRemoval(item, callback);
+      }
     };
   }
+
+  handleEventRemoval(item: any, callback: (item: any) => void) {
+    console.log("❌ Attempting to remove event:", item);
+
+    this.timelineHttpService.deleteEvent(this.financialTimeline.id, item.id).pipe(
+      take(1),
+      map(res => {
+        this.financialTimeline.clientEvents.splice(this.financialTimeline.clientEvents.findIndex(event => event.id === item.id), 1);
+        this.timeline.setItems(this.timelineData);
+        this.timeline.redraw();
+        console.log(this.financialTimeline);
+        callback(item);
+      })
+    ).subscribe();
+}
 
   newEventClicked() {
     const dialogRef = this.dialog.open(AddEventDialogComponent, {
@@ -295,6 +372,14 @@ export class TimelineChartComponent implements OnInit {
         eventType: EventType.CUSTOM,
         customEvents: this.customEventsLibrary,
         timelineId: this.financialTimeline.id,
+        clientBirthDate: this.clientBirthDate,
+        eventsList: this.financialTimeline.clientEvents.map(event => {
+          return {
+            name: event.name,
+            year: event.start.year,
+            age: event.start.year - this.clientBirthDate.getFullYear()
+          }
+        })
       },
     });
 

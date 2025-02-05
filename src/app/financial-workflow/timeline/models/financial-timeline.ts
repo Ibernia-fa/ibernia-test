@@ -21,7 +21,7 @@ export interface AgeYear {
 }
 
 export interface ClientEvent {
-  id: string | null;
+  id: string;
   name: string;
   type: EventIncomeType;
   iconUrl: string;

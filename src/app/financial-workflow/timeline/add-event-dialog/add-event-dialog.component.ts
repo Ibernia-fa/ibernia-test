@@ -59,6 +59,11 @@ export class AddEventDialogComponent {
   systemEvent: ClientEvent | undefined | null;
   dropTime: Date;
   clientBirthDate: Date;
+  clientBirthYear: number;
+  years: number[] = []
+  eventsList: any;
+  selectedEventName: string;
+  selectedEventIconUrl: string;
 
 
   constructor(
@@ -74,8 +79,14 @@ export class AddEventDialogComponent {
     this.timelineId = data.timelineId;
     this.systemEvent = data.systemEvent
     this.dropTime = data.dropTime;
-    this.clientBirthDate = data.clientBirthDate
-
+    this.clientBirthDate = data.clientBirthDate;
+    this.clientBirthYear = this.clientBirthDate.getFullYear();
+    this.eventsList = data.eventsList
+    
+    for (let index = 0; index < 100; index++) {
+      const element = this.clientBirthYear+index;
+      this.years.push(element);
+    }
 
     this.initForm();
   }
@@ -100,7 +111,7 @@ export class AddEventDialogComponent {
           currency: ['', Validators.required],
           amount: ['', [Validators.required, Validators.min(0)]],
           cycle: [{value: this.systemEvent?.isOneOff ? 'One-Off' : '', disabled: true}, [Validators.required]],
-          ageDate: [this.dropTime, Validators.required],
+          ageDate: [this.dropTime.getFullYear(), Validators.required],
         });
         break;
 
@@ -110,8 +121,8 @@ export class AddEventDialogComponent {
           currency: ['', Validators.required],
           amount: ['', [Validators.required, Validators.min(0)]],
           cycle: [this.systemEvent?.isOneOff ? 'One-Off' : '', [Validators.required]],
-          start: [this.dropTime, Validators.required],
-          end: ['', Validators.required],
+          start: [this.dropTime.getFullYear(), Validators.required],
+          end: [0, Validators.required],
           escalationRate: ['', Validators.required],
         });
         break;
@@ -123,8 +134,8 @@ export class AddEventDialogComponent {
           currency: ['', Validators.required],
           amount: ['', [Validators.required, Validators.min(0)]],
           cycle: ['', [Validators.required]],
-          start: ['', Validators.required],
-          end: ['', Validators.required],
+          start: [0, Validators.required],
+          end: [0, Validators.required],
           escalationRate: ['', Validators.required],
         });
         break;
@@ -132,12 +143,14 @@ export class AddEventDialogComponent {
   }
 
   onEventNameValueChange(event: any) {
+    this.selectedEventName = event;
     if (event === 'Custom') {
       this.eventForm.addControl(
         'name',
         new FormControl('', [Validators.required])
       );
       this.eventForm.updateValueAndValidity();
+      this.selectedEventIconUrl = 'custom-icon'
     } else {
       this.eventForm.removeControl('name');
       this.eventForm.updateValueAndValidity();
@@ -145,6 +158,7 @@ export class AddEventDialogComponent {
       const cusEvent = this.customEventsLibrary.find(
         (customEvent) => customEvent.name === event
       );
+      this.selectedEventIconUrl = cusEvent?.iconUrl ?? '';
       this.isIncomeEvent = cusEvent?.type === EventIncomeType.Income;
     }
   }
@@ -164,12 +178,12 @@ export class AddEventDialogComponent {
           currencySymbol: this.eventForm.get('currency')?.value,
         },
         start: {
-          year: (this.eventForm.get('start')?.value as Date).getFullYear(),
-          age: (this.eventForm.get('start')?.value as Date).getFullYear(),
+          year: this.eventForm.get('start')?.value,
+          age: this.eventForm.get('start')?.value - this.clientBirthYear,
         },
         end: {
-          year: (this.eventForm.get('end')?.value as Date).getFullYear(),
-          age: (this.eventForm.get('end')?.value as Date).getFullYear(),
+          year: this.eventForm.get('end')?.value,
+          age: this.eventForm.get('end')?.value - this.clientBirthYear,
         },
         escalationRate: {
           id: '',
@@ -213,8 +227,8 @@ export class AddEventDialogComponent {
           currencySymbol: this.eventForm.get('currency')?.value,
         },
         start: {
-          year: (this.eventForm.get('ageDate')?.value as Date).getFullYear(),
-          age: (this.eventForm.get('ageDate')?.value as Date).getFullYear(),
+          year: this.eventForm.get('ageDate')?.value,
+          age: this.eventForm.get('ageDate')?.value - this.clientBirthYear,
         },
         end: null,
         escalationRate: null,
@@ -246,7 +260,7 @@ export class AddEventDialogComponent {
     this.eventForm.markAllAsTouched();
     if (this.eventForm.valid) {
       const clientEvent: ClientEvent = {
-        id: null,
+        id: "",
         name:
           this.eventForm.get('eventName')?.value !== 'Custom'
             ? this.eventForm.get('eventName')?.value
@@ -260,12 +274,12 @@ export class AddEventDialogComponent {
           currencySymbol: this.eventForm.get('currency')?.value,
         },
         start: {
-          year: (this.eventForm.get('start')?.value as Date).getFullYear(),
-          age: (this.eventForm.get('start')?.value as Date).getFullYear(),
+          year: this.eventForm.get('start')?.value,
+          age: this.eventForm.get('start')?.value - this.clientBirthYear,
         },
         end: {
-          year: (this.eventForm.get('end')?.value as Date).getFullYear(),
-          age: (this.eventForm.get('end')?.value as Date).getFullYear(),
+          year: this.eventForm.get('end')?.value,
+          age: this.eventForm.get('end')?.value - this.clientBirthYear,
         },
         escalationRate: {
           id: '',
@@ -280,7 +294,7 @@ export class AddEventDialogComponent {
                 (customEvent) =>
                   customEvent.name === this.eventForm.get('eventName')?.value
               )?.iconUrl
-            : '') ?? '',
+            : '') ?? 'custom-icon',
         isDefault: false,
         isOneOff: this.eventForm.get('cycle')?.value === 'One-Off',
         isPlaceHolder: false,
