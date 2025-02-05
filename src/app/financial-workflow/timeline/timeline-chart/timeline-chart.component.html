@@ -87,18 +87,18 @@
         <div #timelineContainer class="timeline" (dragover)="onDragOver($event)" (drop)="onDrop($event)">
             <div class="timeline-button d-flex flex-column gap-8">
                 <div>
-                    <button type="button">
+                    <button (click)="toggleMoveable()" type="button">
                         <img src="assets/images/svgs/move-icon.svg" alt="move-icon" />
                     </button>
                 </div>
                 <div>
 
-                    <button type="button">
+                    <button (click)="zoomIn()" type="button">
                         <img src="assets/images/svgs/zoom-in-icon.svg" alt="zoom-in-icon" />
                     </button>
                 </div>
                 <div>
-                    <button type="button">
+                    <button (click)="zoomOut()" type="button">
                         <img src="assets/images/svgs/zoom-out-icon.svg" alt="zoom-out-icon" />
                     </button>
 

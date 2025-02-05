@@ -315,8 +315,9 @@ export class TimelineChartComponent implements OnInit {
         remove: true, // Prevent deletion via UI
       },
       stack: true, // Prevent overlapping events
-      zoomable: true, // Allow zooming
-      horizontalScroll: true, // Enable scrolling
+      zoomable: false, // Allow zooming
+      moveable: this.moveable,
+      horizontalScroll: false, // Enable scrolling
       orientation: 'bottom', // Place events at the top
       margin: { item: 10 }, // Adds spacing between events
       min: new Date(moment(this.financialTimeline.forecastStartDate).year(), 0),
@@ -347,6 +348,29 @@ export class TimelineChartComponent implements OnInit {
         this.handleEventRemoval(item, callback);
       }
     };
+  }
+
+  currentZoomPercentage = 0.1;
+  moveable = false;
+  zoomIn() {
+    if(this.currentZoomPercentage <=0.95) {
+      console.log('zoomin', this.currentZoomPercentage)
+      this.currentZoomPercentage = this.currentZoomPercentage + 0.05
+      this.timeline.zoomIn(this.currentZoomPercentage)
+    }
+  }
+
+  zoomOut() {
+    if(this.currentZoomPercentage >=0.05) {
+      console.log('zoomout' , this.currentZoomPercentage)
+      this.currentZoomPercentage = this.currentZoomPercentage - 0.05
+      this.timeline.zoomOut(this.currentZoomPercentage)
+    }
+  }
+
+  toggleMoveable() {
+    this.moveable = !this.moveable;
+    this.timeline.setOptions(this.timelineOptions);
   }
 
   handleEventRemoval(item: any, callback: (item: any) => void) {
