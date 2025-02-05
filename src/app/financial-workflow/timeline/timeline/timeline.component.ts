@@ -12,6 +12,7 @@ import { map, switchMap } from 'rxjs';
 import { FinancialTimeline } from '../models/financial-timeline';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TimelineChartComponent } from '../timeline-chart/timeline-chart.component';
+import { NavItemService } from 'src/app/layouts/full/nav-item.service';
 
 @Component({
   selector: 'app-timeline',
@@ -38,7 +39,9 @@ export class TimelineComponent {
   constructor(
     private timelineHttpService: TimelineHttpService,
     private activatedRoute: ActivatedRoute,
+    private navItemService: NavItemService
   ) {
+    this.navItemService.currentRouteName = 'Goals & Events'
     this.getTimeline();
   }
 

@@ -59,8 +59,16 @@
         <div class="col-6">
           <div class="w-100 form-field">
             <mat-label class="f-s-14 f-w-600 d-block">Country</mat-label>
-
-            <input matInput formControlName="country" />
+            <div class="select-option">
+              <mat-select formControlName="country" value="Select">
+                @for(country of allCountries; track country) {
+                  @if(country.currencySymbol) {
+                    <mat-option [value]="country.countryName">{{country.countryName}}</mat-option>
+                  }
+                }
+              </mat-select>
+            </div>
+            <!-- <input matInput formControlName="country" /> -->
           </div>
         </div>
         <div class="col-6">
@@ -71,8 +79,11 @@
             <div class="select-option">
               <!-- <mat-form-field appearance="outline" class="w-100"> -->
               <mat-select formControlName="currency" value="Select">
-                <mat-option value="AED">AED</mat-option>
-                <mat-option value="USD">USD</mat-option>
+                @for(country of allCountries; track country) {
+                  @if(country.currencySymbol) {
+                    <mat-option [value]="country.currencySymbol">{{country.currencySymbol}}</mat-option>
+                  }
+                }
               </mat-select>
             </div>
             <!-- </mat-form-field> -->
@@ -174,7 +185,15 @@
             <div class="w-100 form-field">
               <mat-label class="f-s-14 f-w-600 d-block">Country</mat-label>
   
-              <input matInput formControlName="country" />
+              <div class="select-option">
+                <mat-select formControlName="country" value="Select">
+                  @for(country of allCountries; track country) {
+                    @if(country.currencySymbol) {
+                      <mat-option [value]="country.countryName">{{country.countryName}}</mat-option>
+                    }
+                  }
+                </mat-select>
+              </div>
             </div>
           </div>
           <div class="col-6">
@@ -184,8 +203,11 @@
               >
               <div class="select-option">
                 <mat-select formControlName="currency" value="Select">
-                  <mat-option value="AED">AED</mat-option>
-                  <mat-option value="USD">USD</mat-option>
+                  @for(country of allCountries; track country) {
+                    @if(country.currencySymbol) {
+                      <mat-option [value]="country.currencySymbol">{{country.currencySymbol}}</mat-option>
+                    }
+                  } 
                 </mat-select>
               </div>
             </div>

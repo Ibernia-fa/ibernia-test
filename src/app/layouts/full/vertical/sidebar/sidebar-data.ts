@@ -607,7 +607,7 @@ export const navItems: NavItem[] = [
     displayName: 'Goals & Events',
     // iconName: 'clock',
     iconName: '/assets/images/svgs/clock-icon.svg',
-    route: '/finances',
+    route: '/cashflows/*/timeline',
   },
   {
     displayName: 'Saving Pots',
