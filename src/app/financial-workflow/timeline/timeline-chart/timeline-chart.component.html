@@ -17,9 +17,8 @@
                 </button>
             </div>
             <div class="chips-custom">
-                <mat-chip-set 
-                aria-label="Dog selection">
-                <!-- <mat-chip class="f-s-14" class="chip-item retirement-age">
+                <mat-chip-set aria-label="Dog selection">
+                    <!-- <mat-chip class="f-s-14" class="chip-item retirement-age">
                     cdkDropList
                     cdkDropListOrientation="horizontal"
                     (cdkDropListDropped)="drop($event)" 
@@ -67,29 +66,45 @@
                         <img src="/assets/images/svgs/close-line-icon.svg" alt="remove" />
                     </mat-chip> -->
                     @if(systemEventsLibrary) {
-                        @for(systemEvent of systemEventsLibrary; track systemEvent) {
-                            <mat-chip 
-                            draggable="true" 
-                            (dragstart)="onDragStart($event, systemEvent)" class="f-s-14" class="chip-item" [class]="systemEvent.iconUrl">
-                                <div class="d-flex gap-8 align-items-center m-r-16">
-                                    <img matChipAvatar 
-                                    [src]="'/assets/images/svgs/' + systemEvent.iconUrl + '.svg'"
-                                    [alt]="systemEvent.iconUrl" />
-                                    <!-- [src]="'/assets/images/svgs/' + systemEvent.iconUrl  + '.svg'" -->
-                                    {{systemEvent.name}}
-                                </div>
-                                <img src="/assets/images/svgs/close-line-icon.svg" alt="remove" />
-                            </mat-chip>
-                        }
+                    @for(systemEvent of systemEventsLibrary; track systemEvent) {
+                    <mat-chip draggable="true" (dragstart)="onDragStart($event, systemEvent)" class="f-s-14"
+                        class="chip-item" [class]="systemEvent.iconUrl">
+                        <div class="d-flex gap-8 align-items-center m-r-16">
+                            <img matChipAvatar [src]="'/assets/images/svgs/' + systemEvent.iconUrl + '.svg'"
+                                [alt]="systemEvent.iconUrl" />
+                            <!-- [src]="'/assets/images/svgs/' + systemEvent.iconUrl  + '.svg'" -->
+                            {{systemEvent.name}}
+                        </div>
+                        <img src="/assets/images/svgs/close-line-icon.svg" alt="remove" />
+                    </mat-chip>
+                    }
                     }
                 </mat-chip-set>
             </div>
         </div>
 
         <!-- Chart  -->
-        <div #timelineContainer class="timeline" 
-        (dragover)="onDragOver($event)" 
-        (drop)="onDrop($event)"></div>
+        <div #timelineContainer class="timeline" (dragover)="onDragOver($event)" (drop)="onDrop($event)">
+            <div class="timeline-button d-flex flex-column gap-8">
+                <div>
+                    <button type="button">
+                        <img src="assets/images/svgs/move-icon.svg" alt="move-icon" />
+                    </button>
+                </div>
+                <div>
+
+                    <button type="button">
+                        <img src="assets/images/svgs/zoom-in-icon.svg" alt="zoom-in-icon" />
+                    </button>
+                </div>
+                <div>
+                    <button type="button">
+                        <img src="assets/images/svgs/zoom-out-icon.svg" alt="zoom-out-icon" />
+                    </button>
+
+                </div>
+            </div>
+        </div>
         <!-- End Chart  -->
     </mat-card-content>
 </mat-card>

@@ -151,19 +151,17 @@ html .customizerNav {
   line-height: 18px;
 
   div {
-    div {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      img {
-        height: 20px !important;
-        width: 20px !important;
-      }
-      span {
-        font-size: 14px;
-        line-height: 18px;
-        display: inline-block;
-      }
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    img {
+      height: 20px !important;
+      width: 20px !important;
+    }
+    span {
+      font-size: 14px;
+      line-height: 18px;
+      display: inline-block;
     }
   }
 }
@@ -199,6 +197,12 @@ html .customizerNav {
   background-color: #fff9f7;
   color: #1c1c1c;
   border: 1px solid #ffede7 !important;
+}
+.vis-item.mortality-icon,
+.vis-item.mortality-icon.vis-selected {
+  background-color: #f7f7f7;
+  color: #1c1c1c;
+  border: 1px solid #e7e7eb !important;
 }
 
 .vis-item.inheritance-icon,
@@ -267,10 +271,13 @@ html .customizerNav {
   color: #1c1c1c;
   border: 1px solid #dfe3ef !important;
 }
+.vis-item.custom-icon,
+.vis-item.custom-icon.vis-selected {
+  background-color: #f9f9ff;
+  color: #1c1c1c;
+  border: 1px solid #ebecff !important;
+}
 
-// .vis-item.vis-selected {
-//   background-color: transparent !important;
-// }
 .vis-item .vis-delete {
   right: 0 !important;
   padding: 0 !important;
@@ -286,7 +293,21 @@ html .customizerNav {
 .vis-item .vis-delete:hover {
   background: transparent !important;
 }
-
+.vis-item.birth-icon.vis-selected .vis-item-content,
+.vis-item.home-icon.vis-selected .vis-item-content,
+.vis-item.car-icon.vis-selected .vis-item-content,
+.vis-item.new-business-icon.vis-selected .vis-item-content,
+.vis-item.education-icon.vis-selected .vis-item-content,
+.vis-item.custom-icon.vis-selected .vis-item-content,
+.vis-item.travel-icon.vis-selected .vis-item-content,
+.vis-item.boat-icon.vis-selected .vis-item-content,
+.vis-item.retirement-icon.vis-selected .vis-item-content,
+.vis-item.wedding-icon.vis-selected .vis-item-content,
+.vis-item.mortality-icon.vis-selected .vis-item-content,
+.vis-item.state-pension-icon.vis-selected .vis-item-content,
+.vis-item.inheritance-icon.vis-selected .vis-item-content {
+  font-weight: 600 !important;
+}
 // End Vis Timeline Customization
 
 // Card Styles
