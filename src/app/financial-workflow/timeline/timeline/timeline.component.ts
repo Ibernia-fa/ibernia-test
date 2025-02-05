@@ -32,6 +32,7 @@ import { TimelineChartComponent } from '../timeline-chart/timeline-chart.compone
 export class TimelineComponent {
   cashflowId: string;
   financialTimeline: FinancialTimeline;
+  clientBirthDate: Date;
   isLoaderVisible: boolean;
 
   constructor(
@@ -52,6 +53,7 @@ export class TimelineComponent {
             map((res) => {
               this.isLoaderVisible = false;
               this.financialTimeline = res;
+              this.clientBirthDate = this.financialTimeline.clientBirthDate;
             })
           )
           .subscribe();

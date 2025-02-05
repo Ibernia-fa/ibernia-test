@@ -58,6 +58,7 @@ export class AddEventDialogComponent {
   timelineId: string;
   systemEvent: ClientEvent | undefined | null;
   dropTime: Date;
+  clientBirthDate: Date;
 
 
   constructor(
@@ -73,6 +74,7 @@ export class AddEventDialogComponent {
     this.timelineId = data.timelineId;
     this.systemEvent = data.systemEvent
     this.dropTime = data.dropTime;
+    this.clientBirthDate = data.clientBirthDate
 
 
     this.initForm();
@@ -97,7 +99,7 @@ export class AddEventDialogComponent {
           isIncomeEvent: [false, Validators.required],
           currency: ['', Validators.required],
           amount: ['', [Validators.required, Validators.min(0)]],
-          cycle: ['', [Validators.required]],
+          cycle: [this.systemEvent?.isOneOff ? 'One-Off' : '', [Validators.required]],
           ageDate: [this.dropTime, Validators.required],
         });
         break;
@@ -107,7 +109,7 @@ export class AddEventDialogComponent {
           isIncomeEvent: [true, Validators.required],
           currency: ['', Validators.required],
           amount: ['', [Validators.required, Validators.min(0)]],
-          cycle: ['', [Validators.required]],
+          cycle: [this.systemEvent?.isOneOff ? 'One-Off' : '', [Validators.required]],
           start: [this.dropTime, Validators.required],
           end: ['', Validators.required],
           escalationRate: ['', Validators.required],
@@ -151,7 +153,7 @@ export class AddEventDialogComponent {
     this.eventForm.markAllAsTouched();
     if (this.eventForm.valid && this.systemEvent) {
       const clientEvent: ClientEvent = {
-        id: null,
+        id: this.systemEvent.id,
         name: this.systemEvent.name,
         netAmount: {
           cycle: {
@@ -178,7 +180,7 @@ export class AddEventDialogComponent {
           : EventIncomeType.Expense,
         iconUrl: this.systemEvent.iconUrl,
         isDefault: false,
-        isOneOff: this.systemEvent.isOneOff,
+        isOneOff: this.eventForm.get('cycle')?.value === 'One-Off',
         isPlaceHolder: this.systemEvent.isPlaceHolder,
       };
       this.timelineHttpService.addEvent(clientEvent, this.timelineId)
@@ -200,7 +202,7 @@ export class AddEventDialogComponent {
     this.eventForm.markAllAsTouched();
     if (this.eventForm.valid && this.systemEvent) {
       const clientEvent: ClientEvent = {
-        id: null,
+        id: this.systemEvent.id,
         name: this.systemEvent.name,
         netAmount: {
           cycle: {
@@ -221,7 +223,7 @@ export class AddEventDialogComponent {
           : EventIncomeType.Expense,
         iconUrl: this.systemEvent.iconUrl,
         isDefault: false,
-        isOneOff: this.systemEvent.isOneOff,
+        isOneOff: this.eventForm.get('cycle')?.value === 'One-Off',
         isPlaceHolder: this.systemEvent.isPlaceHolder,
       };
       this.timelineHttpService.addEvent(clientEvent, this.timelineId)
@@ -280,7 +282,7 @@ export class AddEventDialogComponent {
               )?.iconUrl
             : '') ?? '',
         isDefault: false,
-        isOneOff: false,
+        isOneOff: this.eventForm.get('cycle')?.value === 'One-Off',
         isPlaceHolder: false,
       };
       this.timelineHttpService.addEvent(clientEvent, this.timelineId)

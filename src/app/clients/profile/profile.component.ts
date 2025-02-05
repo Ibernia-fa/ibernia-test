@@ -23,6 +23,7 @@ import { DialogComponent } from 'src/app/dialog/dialog.component';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
 import { EditModelDialogComponent } from './edit-model-dialog/edit-model-dialog.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { ClientService } from '../services/client.service';
 interface SortDescriptor {
   value: string;
   viewValue: string;
@@ -63,7 +64,8 @@ export class ProfileComponent {
     private activatedRoute: ActivatedRoute,
     private router: Router,
     private toastr: ToastrService,
-    private cashflowHttpService: CashflowHttpService
+    private cashflowHttpService: CashflowHttpService,
+    private clientService: ClientService
   ) {
     this.getClient();
   }
@@ -85,6 +87,7 @@ export class ProfileComponent {
         map((res) => {
           this.client = res[0];
           this.cashflows = res[1];
+          Object.assign(this.clientService.selectedClient, this.client);
           this.isLoaderVisible = false;
         })
       )

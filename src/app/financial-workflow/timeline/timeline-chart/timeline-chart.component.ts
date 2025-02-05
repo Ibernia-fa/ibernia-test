@@ -66,6 +66,7 @@ export class TimelineChartComponent implements OnInit {
   draggedEvent: ClientEvent | null;
 
   @Input() financialTimeline: FinancialTimeline;
+  @Input() clientBirthDate: Date;
   @Output() updateTimelines: EventEmitter<boolean>;
   @ViewChild('timelineContainer', { static: true })
   timelineContainer!: ElementRef;
@@ -355,6 +356,7 @@ export class TimelineChartComponent implements OnInit {
     return new DataSet(dataArray);
   }
   get timelineOptions(): TimelineOptions {
+    const clientBirthDateYear = moment(this.financialTimeline.forecastStartDate).year();
     return {
       editable: {
         add: false, // Prevent adding new events directly
@@ -384,7 +386,7 @@ export class TimelineChartComponent implements OnInit {
       timeAxis: { scale: 'year', step: 1 },
       format: {
         minorLabels: function (date: any) {
-          return `${date.year() - 2010} years <br/> ${date.year()}`; // Calculate Age
+          return `${date.year() - clientBirthDateYear} years <br/> ${date.year()}`; // Calculate Age
         },
         majorLabels: function (date: any) {
           return ``; // Show actual years
