@@ -238,7 +238,6 @@ export class TimelineChartComponent implements OnInit {
         return {
           id: event.id ?? (index + 1).toString(),
           content: this.getContent(event.name, event.iconUrl),
-          // content: this.getContentTwo(),
           start: new Date(event.start.year, 0),
           end: event.end ? new Date(event.end.year, 0) : '',
           className: event.iconUrl,
@@ -309,18 +308,6 @@ export class TimelineChartComponent implements OnInit {
 
   
   private getContent(title: string, img: string): string {
-    
-    const container = document.createElement('div');
- 
-    const icon = document.createElement('img');
-    icon.setAttribute('src', `/assets/images/svgs/${img}.svg`);
-    icon.setAttribute('alt', 'icon');
-
-    const text = document.createElement('span');
-    text.textContent = title;
-
-    container.appendChild(icon);
-    container.appendChild(text);
-    return container.getHTML();
+    return `<div><img src="/assets/images/svgs/${img}.svg"><span>${title}</span></div>`;
   }
 }
