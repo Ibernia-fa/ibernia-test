@@ -53,7 +53,8 @@ export class TimelineComponent {
             map((res) => {
               this.isLoaderVisible = false;
               this.financialTimeline = res;
-              this.clientBirthDate = this.financialTimeline.clientBirthDate;
+              // this.clientBirthDate = this.financialTimeline.clientBirthDate;
+              this.clientBirthDate = new Date();
             })
           )
           .subscribe();
