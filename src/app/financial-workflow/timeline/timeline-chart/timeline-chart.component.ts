@@ -203,122 +203,15 @@ export class TimelineChartComponent implements OnInit {
     event.preventDefault(); // Allows dropping
   }
 
-  // Event Tag Content
-  getContent(title: string, img: string): string {
-    // Create the outer container div
-    const retirementChip = document.createElement('div');
-    retirementChip.classList.add('timeline-chips', 'retirement-chip');
-
-    // Create the inner div with flex properties
-    const flexContainer = document.createElement('div');
-    flexContainer.classList.add(
-      'd-flex',
-      'align-items-center',
-      'justify-content-between'
-    );
-
-    // Create the left side (flex container with image and text)
-    const leftContainer = document.createElement('div');
-    leftContainer.classList.add(
-      'd-flex',
-      'gap-8',
-      'align-items-center',
-      'm-r-16'
-    );
-
-    // Create and append the image element for the icon
-    const retirementIcon = document.createElement('img');
-    retirementIcon.setAttribute('src', `/assets/images/svgs/${img}.svg`);
-    retirementIcon.setAttribute('alt', 'icon');
-
-    // Create and append the span element with the text
-    const retirementText = document.createElement('span');
-    retirementText.textContent = title;
-
-    // Append the icon and text to the left container
-    leftContainer.appendChild(retirementIcon);
-    leftContainer.appendChild(retirementText);
-
-    // Create and append the close button image
-    // const closeButton = document.createElement('img');
-    // closeButton.setAttribute('src', '/assets/images/svgs/close-line-icon.svg');
-    // closeButton.setAttribute('alt', 'remove');
-
-    // Append the left container and close button to the flex container
-    flexContainer.appendChild(leftContainer);
-    // flexContainer.appendChild(closeButton);
-
-    // Append the flex container to the outer container
-    retirementChip.appendChild(flexContainer);
-
-    // Return the final HTML element (for appending to the DOM)
-    return retirementChip.getHTML();
-  }
   initTimelineContainer() {
-    // this.changeDetectorRef.detectChanges();
-    // if(this.timelineContainer) {
     if (!this.timelineContainer?.nativeElement) return;
 
-    const items2 = new DataSet([
-      {
-        id: 1,
-        content: this.getContent(
-          'Retirement Age',
-          '/assets/images/svgs/retirement-age-icon.svg'
-        ),
-        start: '2027-04-20',
-        end: '2027-06-01',
-        className: 'retirement',
-      },
-      {
-        id: 2,
-        content: this.getContent(
-          'Inheritance',
-          '/assets/images/svgs/inheritance-icon.svg'
-        ),
-        start: '2027-05-15',
-        className: 'inheritance',
-      },
-      {
-        id: 3,
-        content: this.getContent('Birth', '/assets/images/svgs/birth-icon.svg'),
-        start: '2026-06-10',
-        className: 'birth',
-      },
-      {
-        id: 4,
-        content: this.getContent(
-          'Wedding',
-          '/assets/images/svgs/wedding-icon.svg'
-        ),
-        start: '2028-07-01',
-        end: '2029-07-05',
-        className: 'wedding',
-      },
-      {
-        id: 5,
-        content: this.getContent(
-          'State Pension Age',
-          '/assets/images/svgs/state-pension-icon.svg'
-        ),
-        start: '2035-01-01',
-        className: 'state-pension',
-      },
-    ]);
-    // Initialize timeline
     this.timeline = new Timeline(
       this.timelineContainer.nativeElement,
       this.timelineData,
       this.timelineOptions
     );
 
-    // this.timeline.on('dragover', (properties) => {
-    //   console.log('Change Event Triggered:', properties);
-    // });
-
-    // this.timeline.on('drop', (eventProperties) => {
-    //   this.onEventMove(eventProperties);
-    // });
 
     if (this.financialTimeline.startAt) {
       this.timeline.addCustomTime(this.financialTimeline.startAt?.year, 't1');
@@ -328,22 +221,6 @@ export class TimelineChartComponent implements OnInit {
   onEventMove(eventProperties: any) {
     console.log({ eventProperties });
   }
-
-  // getContentTwo() {
-  //   return `
-  //   <div class="timeline-chips retirement-chip" id="hello-world">
-  //   <div class="d-flex align-items-center justify-content-between">
-  //     <div class="d-flex gap-8 align-items-center m-r-16">
-  //       <img
-  //         src="/assets/images/svgs/retirement-age-icon.svg"
-  //         alt="Photo of a Shiba Inu"
-  //       />
-  //       <span>Retirement Age</span>
-  //     </div>
-  //     <img src="/assets/images/svgs/close-line-icon.svg" alt="remove" />
-  //   </div>
-  // </div>`;
-  // }
 
   get timelineData(): DataSet<
     {
@@ -376,7 +253,7 @@ export class TimelineChartComponent implements OnInit {
     return {
       editable: {
         add: false, // Prevent adding new events directly
-        updateTime: true, // Allow changing event time by dragging
+        updateTime: false, // Allow changing event time by dragging
         updateGroup: false, // Prevent moving events between groups
         remove: true, // Prevent deletion via UI
       },
@@ -428,5 +305,22 @@ export class TimelineChartComponent implements OnInit {
         this.updateTimelines.emit();
       }
     });
+  }
+
+  
+  private getContent(title: string, img: string): string {
+    
+    const container = document.createElement('div');
+ 
+    const icon = document.createElement('img');
+    icon.setAttribute('src', `/assets/images/svgs/${img}.svg`);
+    icon.setAttribute('alt', 'icon');
+
+    const text = document.createElement('span');
+    text.textContent = title;
+
+    container.appendChild(icon);
+    container.appendChild(text);
+    return container.getHTML();
   }
 }

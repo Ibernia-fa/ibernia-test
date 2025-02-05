@@ -99,7 +99,7 @@ export class AddEventDialogComponent {
           isIncomeEvent: [false, Validators.required],
           currency: ['', Validators.required],
           amount: ['', [Validators.required, Validators.min(0)]],
-          cycle: [this.systemEvent?.isOneOff ? 'One-Off' : '', [Validators.required]],
+          cycle: [{value: this.systemEvent?.isOneOff ? 'One-Off' : '', disabled: true}, [Validators.required]],
           ageDate: [this.dropTime, Validators.required],
         });
         break;

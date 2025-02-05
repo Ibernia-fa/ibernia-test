@@ -82,7 +82,7 @@
         <!-- End Price Field  -->
         <!-- End Type Field  -->
         <div class="right">
-          <mat-select value="Select" formControlName="cycle" class="sortby-edit-profile" hideSingleSelectionIndicator>
+          <mat-select value="Select" [disabled]="systemEvent?.isOneOff === true" formControlName="cycle" class="sortby-edit-profile" hideSingleSelectionIndicator>
             <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
             @for (cycle of cycles; track cycle) {
             <mat-option [value]="cycle">{{ cycle }}</mat-option>
@@ -197,7 +197,7 @@
         <!-- End Price Field  -->
         <!-- End Type Field  -->
         <div class="right">
-          <mat-select value="Select" formControlName="cycle" class="sortby-edit-profile" hideSingleSelectionIndicator>
+          <mat-select value="Select" [disabled]="systemEvent?.isOneOff === true" formControlName="cycle" class="sortby-edit-profile" hideSingleSelectionIndicator>
             <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
             @for (cycle of cycles; track cycle) {
             <mat-option [value]="cycle">{{ cycle }}</mat-option>
