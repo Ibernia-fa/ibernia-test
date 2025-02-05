@@ -82,7 +82,8 @@
         <!-- End Price Field  -->
         <!-- End Type Field  -->
         <div class="right">
-          <mat-select value="Select" [disabled]="systemEvent?.isOneOff === true" formControlName="cycle" class="sortby-edit-profile" hideSingleSelectionIndicator>
+          <mat-select value="Select" [disabled]="systemEvent?.isOneOff === true" formControlName="cycle"
+            class="sortby-edit-profile" hideSingleSelectionIndicator>
             <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
             @for (cycle of cycles; track cycle) {
             <mat-option [value]="cycle">{{ cycle }}</mat-option>
@@ -198,7 +199,8 @@
         <!-- End Price Field  -->
         <!-- End Type Field  -->
         <div class="right">
-          <mat-select value="Select" [disabled]="systemEvent?.isOneOff === true" formControlName="cycle" class="sortby-edit-profile" hideSingleSelectionIndicator>
+          <mat-select value="Select" [disabled]="systemEvent?.isOneOff === true" formControlName="cycle"
+            class="sortby-edit-profile" hideSingleSelectionIndicator>
             <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
             @for (cycle of cycles; track cycle) {
             <mat-option [value]="cycle">{{ cycle }}</mat-option>
@@ -229,14 +231,14 @@
           <!-- Start Date  -->
           <div class="col-6">
             <div class="w-100 form-field">
-                <div class="select-option">
-                  <mat-select value="Select" formControlName="start" hideSingleSelectionIndicator>
-                    <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
-                    @for (year of years; track year) {
-                    <mat-option [value]="year">{{ year }} ({{ year - clientBirthYear }})</mat-option>
-                    }
-                  </mat-select>
-                </div>
+              <div class="select-option">
+                <mat-select value="Select" formControlName="start" hideSingleSelectionIndicator>
+                  <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
+                  @for (year of years; track year) {
+                  <mat-option [value]="year">{{ year }} ({{ year - clientBirthYear }})</mat-option>
+                  }
+                </mat-select>
+              </div>
             </div>
             @if(eventForm.get('start')?.touched &&
             eventForm.get('start')?.hasError('required')) {
@@ -264,7 +266,7 @@
               eventForm.get('end')?.hasError('required')) {
               <span class="field-error d-block">Date is required</span>
               }
-          </div>
+            </div>
           </div>
 
         </div>
@@ -337,12 +339,16 @@
           <div class="position-relative">
             <div class="w-100 form-field">
               <div class="select-option">
-                <mat-select (valueChange)="onEventNameValueChange($event)" formControlName="eventName" value="Select">
+                <mat-select (valueChange)="onEventNameValueChange($event)" formControlName="eventName" value="Select"
+                  style="height: 24px">
                   <mat-select-trigger>
-                    <img [src]="'/assets/images/svgs/' + selectedEventIconUrl + '.svg'" [alt]="selectedEventIconUrl" />
-                    <span>
-                      {{ selectedEventName }}
-                    </span>
+                    <div class="d-flex align-items-center gap-8">
+                      <img [src]="'/assets/images/svgs/' + selectedEventIconUrl + '.svg'"
+                        [alt]="selectedEventIconUrl" />
+                      <span>
+                        {{ selectedEventName }}
+                      </span>
+                    </div>
                   </mat-select-trigger>
                   <!-- <mat-option value="2.5%">Increase at same rate as inflation (2.5%)</mat-option> -->
                   @for (event of customEventsLibrary; track event) {
