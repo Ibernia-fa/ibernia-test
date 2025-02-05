@@ -140,9 +140,32 @@ html .customizerNav {
 .vis-item.vis-dot {
   display: none;
 }
+.vis-item .vis-item-overflow {
+  min-height: 24px !important;
+  display: flex !important;
+  align-items: center !important;
+}
 .vis-item .vis-item-content {
   padding: 0 !important;
   font-size: 14px;
+  line-height: 18px;
+
+  div {
+    div {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      img {
+        height: 20px !important;
+        width: 20px !important;
+      }
+      span {
+        font-size: 14px;
+        line-height: 18px;
+        display: inline-block;
+      }
+    }
+  }
 }
 
 .vis-custom-time {
@@ -171,19 +194,22 @@ html .customizerNav {
 // }
 // Tags
 
-.vis-item.retirement-icon {
+.vis-item.retirement-age-icon,
+.vis-item.retirement-age-icon.vis-selected {
   background-color: #fff9f7;
   color: #1c1c1c;
   border: 1px solid #ffede7 !important;
 }
 
-.vis-item.inheritance-icon {
+.vis-item.inheritance-icon,
+.vis-item.inheritance.vis-selected {
   background-color: #f8fff2;
   color: #1c1c1c;
   border: 1px solid #e8f4e1 !important;
 }
 
-.vis-item.birth-icon {
+.vis-item.birth-icon,
+.vis-item.birth-icon.vis-selected {
   background-color: #fffbf5;
   color: #1c1c1c;
   border: 1px solid #fff3e0 !important;
@@ -192,21 +218,59 @@ html .customizerNav {
   display: none !important;
 }
 
-.vis-item.wedding-icon {
+.vis-item.wedding-icon,
+.vis-item.wedding-icon.vis-selected {
   background-color: #f8f5ff;
   border: 1px solid #eae0ff !important;
   color: #1c1c1c;
 }
 
-.vis-item.state-pension-icon {
+.vis-item.state-pension-icon,
+.vis-item.state-pension-icon.vis-selected {
   background-color: #f9f9ff;
   color: #1c1c1c;
   border: 1px solid #ebecff !important;
 }
-
-.vis-item.vis-selected {
-  background-color: transparent !important;
+.vis-item.education-icon,
+.vis-item.education-icon.vis-selected {
+  background-color: #eef4ff;
+  color: #1c1c1c;
+  border: 1px solid #dee7f6 !important;
 }
+.vis-item.car-icon,
+.vis-item.car-icon.vis-selected {
+  background-color: #fff4ed;
+  color: #1c1c1c;
+  border: 1px solid #eddace !important;
+}
+.vis-item.home-icon,
+.vis-item.home-icon.vis-selected {
+  background-color: #f0f9ff;
+  color: #1c1c1c;
+  border: 1px solid #e0ecf4 !important;
+}
+.vis-item.new-business-icon,
+.vis-item.new-business-icon.vis-selected {
+  background-color: #fef3f2;
+  color: #1c1c1c;
+  border: 1px solid #ffe8e5 !important;
+}
+.vis-item.boat-icon,
+.vis-item.boat-icon.vis-selected {
+  background-color: #ecfdf3;
+  color: #1c1c1c;
+  border: 1px solid #cbf1db !important;
+}
+.vis-item.travel-icon,
+.vis-item.travel-icon.vis-selected {
+  background-color: #f8f9fc;
+  color: #1c1c1c;
+  border: 1px solid #dfe3ef !important;
+}
+
+// .vis-item.vis-selected {
+//   background-color: transparent !important;
+// }
 .vis-item .vis-delete {
   right: 0 !important;
   padding: 0 !important;
@@ -302,5 +366,5 @@ html .customizerNav {
 // Modal Container
 
 .mat-mdc-dialog-container .mat-mdc-dialog-content {
-  padding: 0 !important;
+  padding: 0 4px 0 0 !important;
 }

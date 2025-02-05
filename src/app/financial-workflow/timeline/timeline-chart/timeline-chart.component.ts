@@ -40,7 +40,6 @@ import { TablerIconsModule } from 'angular-tabler-icons';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { combineLatest, filter, tap } from 'rxjs';
 import { CommonModule } from '@angular/common';
-import { I, P } from '@angular/cdk/keycodes';
 
 @Component({
   selector: 'app-timeline-chart',
@@ -241,13 +240,13 @@ export class TimelineChartComponent implements OnInit {
     leftContainer.appendChild(retirementText);
 
     // Create and append the close button image
-    const closeButton = document.createElement('img');
-    closeButton.setAttribute('src', '/assets/images/svgs/close-line-icon.svg');
-    closeButton.setAttribute('alt', 'remove');
+    // const closeButton = document.createElement('img');
+    // closeButton.setAttribute('src', '/assets/images/svgs/close-line-icon.svg');
+    // closeButton.setAttribute('alt', 'remove');
 
     // Append the left container and close button to the flex container
     flexContainer.appendChild(leftContainer);
-    flexContainer.appendChild(closeButton);
+    // flexContainer.appendChild(closeButton);
 
     // Append the flex container to the outer container
     retirementChip.appendChild(flexContainer);
@@ -330,14 +329,30 @@ export class TimelineChartComponent implements OnInit {
     console.log({ eventProperties });
   }
 
+  // getContentTwo() {
+  //   return `
+  //   <div class="timeline-chips retirement-chip" id="hello-world">
+  //   <div class="d-flex align-items-center justify-content-between">
+  //     <div class="d-flex gap-8 align-items-center m-r-16">
+  //       <img
+  //         src="/assets/images/svgs/retirement-age-icon.svg"
+  //         alt="Photo of a Shiba Inu"
+  //       />
+  //       <span>Retirement Age</span>
+  //     </div>
+  //     <img src="/assets/images/svgs/close-line-icon.svg" alt="remove" />
+  //   </div>
+  // </div>`;
+  // }
+
   get timelineData(): DataSet<
-  {
-    id: string;
-    content: string;
-    start: Date;
-    end: Date | string;
-    className: string;
-},
+    {
+      id: string;
+      content: string;
+      start: Date;
+      end: Date | string;
+      className: string;
+    },
     'id'
   > {
     const dataArray = this.financialTimeline.clientEvents.map(
@@ -346,6 +361,7 @@ export class TimelineChartComponent implements OnInit {
         return {
           id: event.id ?? (index + 1).toString(),
           content: this.getContent(event.name, event.iconUrl),
+          // content: this.getContentTwo(),
           start: new Date(event.start.year, 0),
           end: event.end ? new Date(event.end.year, 0) : '',
           className: event.iconUrl,
@@ -397,7 +413,7 @@ export class TimelineChartComponent implements OnInit {
 
   newEventClicked() {
     const dialogRef = this.dialog.open(AddEventDialogComponent, {
-      width: '700px',
+      width: '900px',
       disableClose: true,
       data: {
         eventType: EventType.CUSTOM,
