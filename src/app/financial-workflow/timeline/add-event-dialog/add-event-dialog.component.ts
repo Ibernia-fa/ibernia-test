@@ -24,6 +24,7 @@ import { Timeline } from 'vis-timeline';
 import { TimelineHttpService } from '../services/timeline-http.service';
 import { catchError, filter } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
+import moment from 'moment';
 interface Food {
   value: string;
   viewValue: string;
@@ -80,7 +81,7 @@ export class AddEventDialogComponent {
     this.systemEvent = data.systemEvent
     this.dropTime = data.dropTime;
     this.clientBirthDate = data.clientBirthDate;
-    this.clientBirthYear = this.clientBirthDate.getFullYear();
+    this.clientBirthYear = moment(this.clientBirthDate).year();
     this.eventsList = data.eventsList
     
     for (let index = 0; index < 100; index++) {
@@ -111,7 +112,7 @@ export class AddEventDialogComponent {
           currency: ['', Validators.required],
           amount: ['', [Validators.required, Validators.min(0)]],
           cycle: [{value: this.systemEvent?.isOneOff ? 'One-Off' : '', disabled: true}, [Validators.required]],
-          ageDate: [this.dropTime.getFullYear(), Validators.required],
+          ageDate: [moment(this.dropTime).year(), Validators.required],
         });
         break;
 
@@ -121,7 +122,7 @@ export class AddEventDialogComponent {
           currency: ['', Validators.required],
           amount: ['', [Validators.required, Validators.min(0)]],
           cycle: [this.systemEvent?.isOneOff ? 'One-Off' : '', [Validators.required]],
-          start: [this.dropTime.getFullYear(), Validators.required],
+          start: [moment(this.dropTime).year(), Validators.required],
           end: [0, Validators.required],
           escalationRate: ['', Validators.required],
         });
