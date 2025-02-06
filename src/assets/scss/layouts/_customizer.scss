@@ -177,19 +177,18 @@ html .customizerNav {
 .vis-time-axis .vis-grid.vis-minor {
   border-color: #f7f7f7 !important;
 }
-
-// .vis-panel.vis-center {
-//   border: 1px #cfcfd7 !important;
-//   border-radius: 12px;
-// }
-// .vis-panel.vis-top {
-//   border-top: 1px solid #cfcfd7 !important;
-//   border-radius: 12px;
-// }
-// .vis-panel.vis-right {
-//   border-top: 1px solid #cfcfd7 !important;
-//   border-radius: 12px;
-// }
+.vis-panel.vis-horizontal {
+  border: 1px solid #cfcfd7 !important;
+  border-radius: 12px !important;
+}
+.vis-panel.vis-vertical {
+  border-top: 1px solid #cfcfd7 !important;
+  border-radius: 12px !important;
+}
+.vis-panel.vis-center {
+  border-color: #cfcfd7;
+  border-radius: 12px !important;
+}
 // Tags
 
 .vis-item.retirement-age-icon,
@@ -307,6 +306,57 @@ html .customizerNav {
 .vis-item.state-pension-icon.vis-selected .vis-item-content,
 .vis-item.inheritance-icon.vis-selected .vis-item-content {
   font-weight: 600 !important;
+}
+
+// Lines Hieght Controls
+.vis-custom-time.t1 {
+  height: 77% !important;
+  top: 10px !important;
+}
+.vis-time-axis .vis-grid.vis-vertical {
+  height: 77% !important;
+  top: 10px;
+}
+
+// Style Date of Vis Timeline
+.vis-time-axis .vis-text.vis-minor {
+  opacity: 30%;
+  div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    p {
+      margin: 0px;
+      font-size: 10px;
+      line-height: 11.49px;
+      color: #48475d;
+    }
+    span {
+      display: inline-block;
+      font-size: 10px;
+      line-height: 11.49px;
+      color: #768396;
+    }
+  }
+}
+.vis-time-axis .vis-text.vis-current-year {
+  opacity: 100%;
+  div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    p {
+      margin: 0px;
+      font-size: 22px;
+      line-height: 25px;
+      color: #48475d;
+    }
+    span {
+      display: inline-block;
+      font-size: 10px;
+      line-height: 11.49px;
+    }
+  }
 }
 // End Vis Timeline Customization
 

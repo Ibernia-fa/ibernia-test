@@ -112,7 +112,7 @@ export class TimelineChartComponent implements OnInit {
       return;
     }
 
-    console.log("drag started");
+    console.log('drag started');
     this.draggedEvent = customEvent; // Store dragged event
     event.dataTransfer?.setData('text/plain', JSON.stringify(customEvent));
   }
@@ -148,54 +148,60 @@ export class TimelineChartComponent implements OnInit {
     console.log(this.financialTimeline);
 
     if (
-      this.draggedEvent.isOneOff && !this.draggedEvent.isPlaceHolder &&
-      (this.financialTimeline.clientEvents.length >= 1 || this.financialTimeline.clientEvents.find(
-        (event) => event.name === this.draggedEvent?.name
-      ))
+      this.draggedEvent.isOneOff &&
+      !this.draggedEvent.isPlaceHolder &&
+      (this.financialTimeline.clientEvents.length >= 1 ||
+        this.financialTimeline.clientEvents.find(
+          (event) => event.name === this.draggedEvent?.name
+        ))
     ) {
       this.draggedEvent = null;
       return;
     }
 
-    console.log(this.financialTimeline.clientEvents.find(
-      (event) => event.name === this.draggedEvent?.name
-    ))
+    console.log(
+      this.financialTimeline.clientEvents.find(
+        (event) => event.name === this.draggedEvent?.name
+      )
+    );
 
-    if(this.draggedEvent.isPlaceHolder) {
-      if (this.financialTimeline.clientEvents.find(
+    if (this.draggedEvent.isPlaceHolder) {
+      if (
+        this.financialTimeline.clientEvents.find(
           (event) => event.name === this.draggedEvent?.name
         )
       ) {
         this.draggedEvent = null;
         return;
-      }
-      else {
+      } else {
         const clientEvent: ClientEvent = this.draggedEvent;
         // Object.assign<ClientEvent, ClientEvent>(clientEvent, this.draggedEvent);
-  
+
         clientEvent.start = {
           year: moment(dropTime).year(),
-          age: moment(dropTime).year() - moment(this.clientBirthDate).year() 
-        }
-        this.timelineHttpService.addEvent(clientEvent, this.financialTimeline.id)
-        .pipe(
-          // filter(res => !!res),
-          take(1),
-          map((res) => {
-            this.financialTimeline.clientEvents.push(clientEvent);
+          age: moment(dropTime).year() - moment(this.clientBirthDate).year(),
+        };
+        this.timelineHttpService
+          .addEvent(clientEvent, this.financialTimeline.id)
+          .pipe(
+            // filter(res => !!res),
+            take(1),
+            map((res) => {
+              this.financialTimeline.clientEvents.push(clientEvent);
+              this.draggedEvent = null;
+              this.timeline.setItems(this.timelineData);
+              this.cdr.detectChanges();
+              this.timeline.redraw();
+            }),
+            catchError((err) => {
+              console.error(err);
+              this.draggedEvent = null;
+              throw err;
+            })
+          )
+          .subscribe((res) => {
             this.draggedEvent = null;
-            this.timeline.setItems(this.timelineData)
-            this.cdr.detectChanges();
-            this.timeline.redraw();
-          }),
-          catchError(err => {
-            console.error(err);
-            this.draggedEvent = null;
-            throw err;
-          })
-        ).subscribe(res => {
-          this.draggedEvent = null;
-        })
+          });
       }
     }
 
@@ -212,7 +218,7 @@ export class TimelineChartComponent implements OnInit {
           isIncomeEvent: this.draggedEvent.type === EventIncomeType.Income,
           systemEvent: this.draggedEvent,
           dropTime: new Date(moment(dropTime).year(), 0),
-          clientBirthDate: this.clientBirthDate
+          clientBirthDate: this.clientBirthDate,
         },
       });
 
@@ -236,13 +242,15 @@ export class TimelineChartComponent implements OnInit {
           systemEvent: this.draggedEvent,
           dropTime: new Date(moment(dropTime).year(), 0),
           clientBirthDate: this.clientBirthDate,
-          eventsList: this.financialTimeline.clientEvents.map(event => {
+          eventsList: this.financialTimeline.clientEvents.map((event) => {
             return {
               name: event.name,
               year: event.start.year,
-              age: event.start.year - moment(new Date(this.clientBirthDate)).year()
-            }
-          })
+              age:
+                event.start.year -
+                moment(new Date(this.clientBirthDate)).year(),
+            };
+          }),
         },
       });
 
@@ -262,7 +270,7 @@ export class TimelineChartComponent implements OnInit {
   }
 
   onDragOver(event: DragEvent) {
-    console.log("dragover")
+    console.log('dragover');
     event.preventDefault(); // Allows dropping
   }
 
@@ -275,13 +283,15 @@ export class TimelineChartComponent implements OnInit {
       this.timelineOptions
     );
 
-
     console.log(this.financialTimeline.startAt);
-    if (this.financialTimeline.startAt) {
-      this.timeline.addCustomTime(moment(this.financialTimeline.startAt.year).toDate(), 't1');
-    }
+    // if (this.financialTimeline.startAt) {
+    //   this.timeline.addCustomTime(
+    //     moment(this.financialTimeline.startAt.year).toDate(),
+    //     't1'
+    //   );
+    // }
+    this.timeline.addCustomTime(new Date(), 't1');
   }
-
 
   get timelineData(): DataSet<
     {
@@ -300,7 +310,9 @@ export class TimelineChartComponent implements OnInit {
           id: event.id,
           content: this.getContent(event.name, event.iconUrl),
           start: new Date(event.start.year, 0),
-          end: event.end ? new Date(event.end.year, 0) : new Date(event.start.year + 1, 0),
+          end: event.end
+            ? new Date(event.end.year, 0)
+            : new Date(event.start.year + 1, 0),
           className: event.iconUrl,
         };
       }
@@ -309,9 +321,9 @@ export class TimelineChartComponent implements OnInit {
     return new DataSet(dataArray);
   }
   get timelineOptions(): TimelineOptions {
-    console.log(this.clientBirthDate)
+    console.log(this.clientBirthDate);
     const clientBirthDateYear = moment(new Date(this.clientBirthDate)).year();
-    console.log({clientBirthDateYear})
+    console.log({ clientBirthDateYear });
     return {
       editable: {
         add: false, // Prevent adding new events directly
@@ -334,7 +346,7 @@ export class TimelineChartComponent implements OnInit {
         .add(100, 'years')
         .toDate(),
       max: this.financialTimeline.forecastEndtDate,
-      minHeight: '252px',
+      minHeight: '304px',
       align: 'left',
       showCurrentTime: false, // Hide default current time marker
       // showCustomTime: true, // Allows custom markers
@@ -342,7 +354,11 @@ export class TimelineChartComponent implements OnInit {
       timeAxis: { scale: 'year', step: 5 },
       format: {
         minorLabels: function (date: any) {
-          return `${date.year() - clientBirthDateYear} <br/> ${date.year()}`; // Calculate Age
+          return `
+          <div>
+            <p>${date.year() - clientBirthDateYear}</p>
+            <span>${date.year()}</span>
+          </div>`;
         },
         majorLabels: function (date: any) {
           return ``; // Show actual years
@@ -351,25 +367,25 @@ export class TimelineChartComponent implements OnInit {
       onRemove: (item, callback) => {
         console.log(item);
         this.handleEventRemoval(item, callback);
-      }
+      },
     };
   }
 
   currentZoomPercentage = 0.1;
   moveable = false;
   zoomIn() {
-    if(this.currentZoomPercentage <=0.95) {
-      console.log('zoomin', this.currentZoomPercentage)
-      this.currentZoomPercentage = this.currentZoomPercentage + 0.05
-      this.timeline.zoomIn(this.currentZoomPercentage)
+    if (this.currentZoomPercentage <= 0.95) {
+      console.log('zoomin', this.currentZoomPercentage);
+      this.currentZoomPercentage = this.currentZoomPercentage + 0.05;
+      this.timeline.zoomIn(this.currentZoomPercentage);
     }
   }
 
   zoomOut() {
-    if(this.currentZoomPercentage >=0.05) {
-      console.log('zoomout' , this.currentZoomPercentage)
-      this.currentZoomPercentage = this.currentZoomPercentage - 0.05
-      this.timeline.zoomOut(this.currentZoomPercentage)
+    if (this.currentZoomPercentage >= 0.05) {
+      console.log('zoomout', this.currentZoomPercentage);
+      this.currentZoomPercentage = this.currentZoomPercentage - 0.05;
+      this.timeline.zoomOut(this.currentZoomPercentage);
     }
   }
 
@@ -379,19 +395,27 @@ export class TimelineChartComponent implements OnInit {
   }
 
   handleEventRemoval(item: any, callback: (item: any) => void) {
-    console.log("❌ Attempting to remove event:", item);
+    console.log('❌ Attempting to remove event:', item);
 
-    this.timelineHttpService.deleteEvent(this.financialTimeline.id, item.id).pipe(
-      take(1),
-      map(res => {
-        this.financialTimeline.clientEvents.splice(this.financialTimeline.clientEvents.findIndex(event => event.id === item.id), 1);
-        this.timeline.setItems(this.timelineData);
-        this.timeline.redraw();
-        console.log(this.financialTimeline);
-        callback(item);
-      })
-    ).subscribe();
-}
+    this.timelineHttpService
+      .deleteEvent(this.financialTimeline.id, item.id)
+      .pipe(
+        take(1),
+        map((res) => {
+          this.financialTimeline.clientEvents.splice(
+            this.financialTimeline.clientEvents.findIndex(
+              (event) => event.id === item.id
+            ),
+            1
+          );
+          this.timeline.setItems(this.timelineData);
+          this.timeline.redraw();
+          console.log(this.financialTimeline);
+          callback(item);
+        })
+      )
+      .subscribe();
+  }
 
   newEventClicked() {
     const dialogRef = this.dialog.open(AddEventDialogComponent, {
@@ -402,13 +426,14 @@ export class TimelineChartComponent implements OnInit {
         customEvents: this.customEventsLibrary,
         timelineId: this.financialTimeline.id,
         clientBirthDate: this.clientBirthDate,
-        eventsList: this.financialTimeline.clientEvents.map(event => {
+        eventsList: this.financialTimeline.clientEvents.map((event) => {
           return {
             name: event.name,
             year: event.start.year,
-            age: event.start.year - moment(new Date(this.clientBirthDate)).year()
-          }
-        })
+            age:
+              event.start.year - moment(new Date(this.clientBirthDate)).year(),
+          };
+        }),
       },
     });
 
@@ -420,7 +445,6 @@ export class TimelineChartComponent implements OnInit {
     });
   }
 
-  
   private getContent(title: string, img: string): string {
     return `<div><img src="/assets/images/svgs/${img}.svg"><span>${title}</span></div>`;
   }
