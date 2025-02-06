@@ -22,6 +22,8 @@ FROM nginx:alpine as production-stage
 # Copy the built app to Nginx's HTML directory
 COPY --from=build-stage /app/dist/ibernia-app/browser /usr/share/nginx/html
 
+# Copy custom Nginx configuration
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 # Expose port 80
 EXPOSE 80
 
