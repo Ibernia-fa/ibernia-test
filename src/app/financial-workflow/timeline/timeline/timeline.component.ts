@@ -8,7 +8,7 @@ import { provideNativeDateAdapter } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
 import { TimelineHttpService } from '../services/timeline-http.service';
 import { ActivatedRoute } from '@angular/router';
-import { map, switchMap } from 'rxjs';
+import { map, switchMap, take, tap } from 'rxjs';
 import { FinancialTimeline } from '../models/financial-timeline';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TimelineChartComponent } from '../timeline-chart/timeline-chart.component';
@@ -64,6 +64,13 @@ export class TimelineComponent {
   }
 
   updateTimelines(){
-    this.getTimeline();
+    // this.getTimeline();
+    this.timelineHttpService.getTimelinebyCashflowId(this.cashflowId).pipe(
+      take(1),
+      tap((res) => {
+        this.financialTimeline = res;
+        this.clientBirthDate = this.financialTimeline.clientBirthDate;
+      })
+    ).subscribe();
   }
 }

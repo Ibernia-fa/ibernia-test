@@ -84,3 +84,16 @@
   }
 }
 // d-flex flex-column gap-8
+
+
+.vis-panel.vis-left {
+  position: relative;
+}
+
+.fixed-label {
+  position: absolute;
+  left: 0;
+  top: 10px;
+  background-color: white;
+  padding: 5px;
+}

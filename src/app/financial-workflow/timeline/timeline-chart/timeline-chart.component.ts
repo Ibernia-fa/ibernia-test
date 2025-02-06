@@ -59,7 +59,7 @@ import { group } from '@angular/animations';
   templateUrl: './timeline-chart.component.html',
   styleUrl: './timeline-chart.component.scss',
 })
-export class TimelineChartComponent implements OnInit {
+export class TimelineChartComponent implements OnInit, OnChanges {
   timeline: Timeline;
   customEventsLibrary: ClientEvent[];
   systemEventsLibrary: ClientEvent[];
@@ -81,7 +81,13 @@ export class TimelineChartComponent implements OnInit {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['financialTimeline']) {
-      this.timeline?.redraw();
+      if(this.timeline) {
+        this.timeline.setItems(this.timelineData);
+        this.timeline.removeCustomTime('t1');
+        if(this.financialTimeline.startAt && this.financialTimeline.clientEvents.length > 0)
+          this.timeline.addCustomTime(new Date(this.financialTimeline.startAt.year, 0), 't1');
+        this.timeline.redraw();
+      }
     }
   }
 
@@ -147,64 +153,117 @@ export class TimelineChartComponent implements OnInit {
     console.log(`Event "${this.draggedEvent.name}" dropped at:`, dropTime);
     console.log(this.financialTimeline);
 
-    if (
-      this.draggedEvent.isOneOff &&
-      !this.draggedEvent.isPlaceHolder &&
-      (this.financialTimeline.clientEvents.length >= 1 ||
-        this.financialTimeline.clientEvents.find(
-          (event) => event.name === this.draggedEvent?.name
-        ))
-    ) {
+    if(this.draggedEvent.isOneOff && this.financialTimeline.clientEvents.find(
+      (event) => event.name === this.draggedEvent?.name
+    )) {
       this.draggedEvent = null;
       return;
     }
 
-    console.log(
-      this.financialTimeline.clientEvents.find(
-        (event) => event.name === this.draggedEvent?.name
-      )
-    );
+    if(this.draggedEvent.isPlaceHolder) {
+      const clientEvent: ClientEvent = this.draggedEvent;
+      // Object.assign<ClientEvent, ClientEvent>(clientEvent, this.draggedEvent);
 
-    if (this.draggedEvent.isPlaceHolder) {
-      if (
-        this.financialTimeline.clientEvents.find(
-          (event) => event.name === this.draggedEvent?.name
-        )
-      ) {
-        this.draggedEvent = null;
-        return;
-      } else {
-        const clientEvent: ClientEvent = this.draggedEvent;
-        // Object.assign<ClientEvent, ClientEvent>(clientEvent, this.draggedEvent);
-
-        clientEvent.start = {
-          year: moment(dropTime).year(),
-          age: moment(dropTime).year() - moment(this.clientBirthDate).year(),
-        };
-        this.timelineHttpService
-          .addEvent(clientEvent, this.financialTimeline.id)
-          .pipe(
-            // filter(res => !!res),
-            take(1),
-            map((res) => {
-              this.financialTimeline.clientEvents.push(clientEvent);
-              this.draggedEvent = null;
-              this.timeline.setItems(this.timelineData);
-              this.cdr.detectChanges();
-              this.timeline.redraw();
-            }),
-            catchError((err) => {
-              console.error(err);
-              this.draggedEvent = null;
-              throw err;
-            })
-          )
-          .subscribe((res) => {
+      clientEvent.start = {
+        year: moment(dropTime).year(),
+        age: moment(dropTime).year() - moment(this.clientBirthDate).year(),
+      };
+      this.timelineHttpService
+        .addEvent(clientEvent, this.financialTimeline.id)
+        .pipe(
+          // filter(res => !!res),
+          take(1),
+          map((res) => {
+            if(this.financialTimeline.clientEvents.length < 1) {
+              this.financialTimeline.startAt = {
+                age: clientEvent.start.age,
+                year: clientEvent.start.year
+              }
+              this.timeline.addCustomTime(new Date(this.financialTimeline.startAt.year, 1), 't1');
+            }
+            this.financialTimeline.clientEvents.push(clientEvent);
             this.draggedEvent = null;
-          });
-      }
+            this.timeline.setItems(this.timelineData);
+            this.cdr.detectChanges();
+            this.timeline.redraw();
+          }),
+          catchError((err) => {
+            console.error(err);
+            this.draggedEvent = null;
+            throw err;
+          })
+        )
+        .subscribe((res) => {
+          this.draggedEvent = null;
+        });
     }
 
+    // if (
+    //   this.draggedEvent.isOneOff &&
+    //   !this.draggedEvent.isPlaceHolder &&
+    //   (this.financialTimeline.clientEvents.length >= 1 ||
+    //     this.financialTimeline.clientEvents.find(
+    //       (event) => event.name === this.draggedEvent?.name
+    //     ))
+    // ) {
+    //   console.log('First if: oneOff')
+    //   this.draggedEvent = null;
+    //   return;
+    // }
+
+    // console.log(
+    //   this.financialTimeline.clientEvents.find(
+    //     (event) => event.name === this.draggedEvent?.name
+    //   )
+    // );
+
+    // if (this.draggedEvent.isPlaceHolder) {
+    //   if (
+    //     this.financialTimeline.clientEvents.find(
+    //       (event) => event.name === this.draggedEvent?.name
+    //     )
+    //   ) {
+    //     this.draggedEvent = null;
+    //     return;
+    //   } else {
+    //     const clientEvent: ClientEvent = this.draggedEvent;
+    //     // Object.assign<ClientEvent, ClientEvent>(clientEvent, this.draggedEvent);
+
+    //     clientEvent.start = {
+    //       year: moment(dropTime).year(),
+    //       age: moment(dropTime).year() - moment(this.clientBirthDate).year(),
+    //     };
+    //     this.timelineHttpService
+    //       .addEvent(clientEvent, this.financialTimeline.id)
+    //       .pipe(
+    //         // filter(res => !!res),
+    //         take(1),
+    //         map((res) => {
+    //           if(this.financialTimeline.clientEvents.length < 1) {
+    //             this.financialTimeline.startAt = {
+    //               age: clientEvent.start.age,
+    //               year: clientEvent.start.year
+    //             }
+    //             this.timeline.addCustomTime(new Date(this.financialTimeline.startAt.year, 1), 't1');
+    //           }
+    //           this.financialTimeline.clientEvents.push(clientEvent);
+    //           this.draggedEvent = null;
+    //           this.timeline.setItems(this.timelineData);
+    //           this.cdr.detectChanges();
+    //           this.timeline.redraw();
+    //         }),
+    //         catchError((err) => {
+    //           console.error(err);
+    //           this.draggedEvent = null;
+    //           throw err;
+    //         })
+    //       )
+    //       .subscribe((res) => {
+    //         this.draggedEvent = null;
+    //       });
+    //   }
+    // }
+    // console.log('Before Popup:', this.draggedEvent)
     if (
       this.draggedEvent.name === 'Inheritance' ||
       this.draggedEvent.name === 'Wedding'
@@ -284,13 +343,13 @@ export class TimelineChartComponent implements OnInit {
     );
 
     console.log(this.financialTimeline.startAt);
-    // if (this.financialTimeline.startAt) {
+    if (this.financialTimeline.startAt && this.financialTimeline.clientEvents.length > 0)
+      this.timeline.addCustomTime(new Date(this.financialTimeline.startAt.year, 1), 't1');
     //   this.timeline.addCustomTime(
     //     moment(this.financialTimeline.startAt.year).toDate(),
     //     't1'
     //   );
     // }
-    this.timeline.addCustomTime(new Date(), 't1');
   }
 
   get timelineData(): DataSet<
@@ -331,17 +390,27 @@ export class TimelineChartComponent implements OnInit {
         updateGroup: false, // Prevent moving events between groups
         remove: true, // Prevent deletion via UI
       },
+      // snap: function (date, scale, step) {
+      //   var hour = 60 * 60 * 1000;
+      //   return Math.round(date / hour) * hour;
+      // },
       stack: true, // Prevent overlapping events
       zoomable: true, // Allow zooming
       moveable: true,
       horizontalScroll: false, // Enable scrolling
       orientation: 'bottom', // Place events at the top
       margin: { item: 10 }, // Adds spacing between events
-      min: new Date(moment(this.financialTimeline.forecastStartDate).year(), 0),
+      // min: new Date(moment(this.financialTimeline.forecastStartDate).year(), 0),
+      min: moment(this.financialTimeline.forecastStartDate)
+      .subtract(5, 'years')
+      .toDate(),
       start: new Date(
         moment(this.financialTimeline.forecastStartDate).year(),
         0
       ),
+      // start: moment(this.financialTimeline.forecastStartDate)
+      // .subtract(5, 'years')
+      // .toDate(),
       end: moment(this.financialTimeline.forecastStartDate)
         .add(100, 'years')
         .toDate(),
@@ -408,6 +477,9 @@ export class TimelineChartComponent implements OnInit {
             ),
             1
           );
+          if(this.financialTimeline.clientEvents.length < 1) {
+            this.timeline.removeCustomTime('t1')
+          }
           this.timeline.setItems(this.timelineData);
           this.timeline.redraw();
           console.log(this.financialTimeline);
