@@ -82,18 +82,22 @@
                 </mat-chip-set>
             </div>
         </div>
-        
+
         <div #timelineContainer class="timeline" (dragover)="onDragOver($event)" (drop)="onDrop($event)">
-        <!-- <div style="display: flex; height: 400px;"> -->
+            <div class="timeline-fields">
+                <p>Age</p>
+                <span>year</span>
+            </div>
+            <!-- <div style="display: flex; height: 400px;"> -->
             <!-- Left Column with Static Labels -->
             <!-- <div style="width: 100px; background: #f3f3f3; padding: 10px; text-align: right;">
               <div style="position: absolute; top: 50px;">Label 1</div>
               <div style="position: absolute; top: 150px;">Label 2</div>
               <div style="position: absolute; top: 250px;">Label 3</div>
             </div> -->
-            
+
             <!-- Timeline Container -->
-                <!-- <div class="timeline-button d-flex flex-column gap-8">
+            <!-- <div class="timeline-button d-flex flex-column gap-8">
                     <div>
                         <button (click)="toggleMoveable()" type="button">
                             <img src="assets/images/svgs/move-icon.svg" alt="move-icon" />
@@ -113,8 +117,8 @@
                     </div>
                 </div> -->
             <!-- </div> -->
-          </div>
-          
+        </div>
+
         <!-- Chart  -->
         <!-- End Chart  -->
     </mat-card-content>
