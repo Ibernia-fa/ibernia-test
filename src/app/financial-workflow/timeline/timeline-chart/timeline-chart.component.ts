@@ -278,6 +278,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
           systemEvent: this.draggedEvent,
           dropTime: new Date(moment(dropTime).year(), 0),
           clientBirthDate: this.clientBirthDate,
+          forecastStartDateYear: moment(this.financialTimeline.forecastStartDate).year()
         },
       });
 
@@ -301,6 +302,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
           systemEvent: this.draggedEvent,
           dropTime: new Date(moment(dropTime).year(), 0),
           clientBirthDate: this.clientBirthDate,
+          forecastStartDateYear: moment(this.financialTimeline.forecastStartDate).year(),
           eventsList: this.financialTimeline.clientEvents.map((event) => {
             return {
               name: event.name,
@@ -498,6 +500,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
         customEvents: this.customEventsLibrary,
         timelineId: this.financialTimeline.id,
         clientBirthDate: this.clientBirthDate,
+        forecastStartDateYear: moment(this.financialTimeline.forecastStartDate).year(),
         eventsList: this.financialTimeline.clientEvents.map((event) => {
           return {
             name: event.name,

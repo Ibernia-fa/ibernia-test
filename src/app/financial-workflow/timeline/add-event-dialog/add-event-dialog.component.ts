@@ -85,7 +85,7 @@ export class AddEventDialogComponent {
     this.eventsList = data.eventsList
     
     for (let index = 0; index < 100; index++) {
-      const element = this.clientBirthYear+index;
+      const element = data.forecastStartDateYear +index;
       this.years.push(element);
     }
 
