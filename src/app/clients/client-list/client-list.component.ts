@@ -133,6 +133,7 @@ export class ClientListComponent implements OnInit, AfterViewInit {
 
   expandedClientElement: Client | null = null;
   expandedPartnerElement: Client | null = null;
+  isLoaderVisible = false;
 
   @ViewChild(MatTable, { static: true }) table: MatTable<any> =
     Object.create(null);
@@ -259,9 +260,13 @@ export class ClientListComponent implements OnInit, AfterViewInit {
     });
   }
   getClients() {
+    this.isLoaderVisible = true;
     this.clientHttpService
       .getClients()
-      .pipe(filter((clients) => !!clients))
+      .pipe(filter((clients) => {
+        this.isLoaderVisible = false;
+        return !!clients
+      }))
       .subscribe((clients) => {
         console.log(clients);
         this.dataSource = new MatTableDataSource(clients);
