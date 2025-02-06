@@ -177,9 +177,9 @@
               *matHeaderCellDef
               class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-action"
             ></th>
-            <td mat-cell class="column-action" *matCellDef="let element">
+            <td  mat-cell class="column-action" *matCellDef="let element">
               <div class="d-flex align-items-center justify-content-center">
-                <button mat-icon-button [matMenuTriggerFor]="menu">
+                <button (click)="$event.stopPropagation(); $event.preventDefault()" mat-icon-button [matMenuTriggerFor]="menu">
                   <mat-icon>
                     <img
                       src="assets/images/svgs/dropdown-detail.svg"
