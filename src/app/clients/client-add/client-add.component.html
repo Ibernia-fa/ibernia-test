@@ -60,7 +60,7 @@
           <div class="w-100 form-field">
             <mat-label class="f-s-14 f-w-600 d-block">Country</mat-label>
             <div class="select-option">
-              <mat-select formControlName="country" value="Select">
+              <mat-select (valueChange)="clientCountryValueChange($event)" formControlName="country" value="Select">
                 @for(country of allCountries; track country) {
                   @if(country.currencySymbol) {
                     <mat-option [value]="country.countryName">{{country.countryName}}</mat-option>
@@ -111,11 +111,24 @@
           <div class="col-6">
             <div class="w-100 form-field">
               <mat-label class="f-s-14 f-w-600 d-block">Telephone</mat-label>
-              <input
+              <ngx-intl-tel-input
+                [cssClass]="'custom'"
+                [enableAutoCountrySelect]="false"
+                [enablePlaceholder]="true"
+                [searchCountryFlag]="true"
+                [selectFirstCountry]="false"
+                [selectedCountryISO]="selectedClientCountryISO"
+                [maxLength]="15"
+                [phoneValidation]="true"
+                name="phone"
+                formControlName="phone"
+                ></ngx-intl-tel-input>
+                <!-- [inputId]="my-input-id" -->
+              <!-- <input
                 matInput
                 placeholder="00000000000"
                 formControlName="phone"
-              />
+              /> -->
             </div>
           </div>
         </div>
@@ -186,7 +199,7 @@
               <mat-label class="f-s-14 f-w-600 d-block">Country</mat-label>
   
               <div class="select-option">
-                <mat-select formControlName="country" value="Select">
+                <mat-select (valueChange)="partnerCountryValueChange($event)"  formControlName="country" value="Select">
                   @for(country of allCountries; track country) {
                     @if(country.currencySymbol) {
                       <mat-option [value]="country.countryName">{{country.countryName}}</mat-option>
@@ -241,11 +254,23 @@
           <div class="col-6">
             <div class="w-100 form-field">
               <mat-label class="f-s-14 f-w-600 d-block">Telephone</mat-label>
-              <input
+              <ngx-intl-tel-input
+                [cssClass]="'custom'"
+                [enableAutoCountrySelect]="false"
+                [enablePlaceholder]="true"
+                [searchCountryFlag]="true"
+                [selectFirstCountry]="false"
+                [selectedCountryISO]="selectedPartnerCountryISO"
+                [maxLength]="15"
+                [phoneValidation]="true"
+                name="phone"
+                formControlName="phone"
+                ></ngx-intl-tel-input>
+              <!-- <input
                 matInput
                 placeholder="0000000000"
                 formControlName="phone"
-              />
+              /> -->
             </div>
           </div>
         </div>

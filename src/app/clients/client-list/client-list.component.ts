@@ -51,6 +51,7 @@ import { TimeAgoPipe } from 'src/app/pipe/time-ago.pipe';
 import { AgeCalculatorPipe } from 'src/app/pipe/age-calculator.pipe';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { allCountries } from '../models/country';
 
 @Component({
   selector: 'app-client-list',
@@ -138,7 +139,6 @@ export class ClientListComponent implements OnInit, AfterViewInit {
   @ViewChild(MatSort) sort: MatSort;
   searchText: any;
   clients: Array<Client>;
-
   // displayedColumns: string[] = [
   //   'client',
   //   'dob',
