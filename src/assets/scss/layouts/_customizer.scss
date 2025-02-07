@@ -121,7 +121,13 @@ html .customizerNav {
 
 .vis-timeline {
   border: none !important;
-  background: white !important;
+  // border-radius: 12px;
+  // border-top: 1px solid red !important;
+  // border-left: 1px solid red !important;
+  // border-right: 1px solid red !important;
+  // border-left: 1px solid red !important;
+  // background: white !important;
+  background: transparent !important;
 }
 
 .vis-item {
@@ -170,10 +176,10 @@ html .customizerNav {
   background-color: #b0b0b0 !important;
   width: 1px !important;
 }
-// .vis-time-axis .vis-grid.vis-minor {
-//   border-width: 2px;
-//   border-color: pink;
-// }
+.vis-time-axis .vis-grid.vis-minor {
+  border-width: 2px;
+  border-color: pink;
+}
 .vis-time-axis .vis-grid.vis-minor {
   border-color: #f7f7f7 !important;
 }
@@ -188,6 +194,7 @@ html .customizerNav {
 .vis-panel.vis-center {
   border-color: #cfcfd7;
   border-radius: 12px !important;
+  border: none !important;
 }
 // Tags
 
@@ -311,11 +318,11 @@ html .customizerNav {
 // Lines Hieght Controls
 .vis-custom-time.t1 {
   height: 77% !important;
-  top: 10px !important;
+  top: 8px !important;
 }
 .vis-time-axis .vis-grid.vis-vertical {
   height: 77% !important;
-  top: 10px;
+  top: 8px;
 }
 
 // Style Date of Vis Timeline
@@ -438,4 +445,12 @@ html .customizerNav {
 
 .mat-mdc-dialog-container .mat-mdc-dialog-content {
   padding: 0 4px 0 0 !important;
+}
+
+// Input Telephone Styles
+
+.tel-input-custom {
+  .iti {
+    width: 100%;
+  }
 }

@@ -1,15 +1,7 @@
 <mat-card class="edit-client-wrapper">
   <div class="edit-client-content-wrapper">
-    <app-breadcrumb
-      [showBackIcon]="true"
-      [routeForBack]="'/clients'"
-      title="Edit client"
-    ></app-breadcrumb>
-    <form
-      [formGroup]="clientForm"
-      (ngSubmit)="onSubmit()"
-      class="edit-client-form-wrapper"
-    >
+    <app-breadcrumb [showBackIcon]="true" [routeForBack]="'/clients'" title="Edit client"></app-breadcrumb>
+    <form [formGroup]="clientForm" (ngSubmit)="onSubmit()" class="edit-client-form-wrapper">
       <div class="row justify-content-between">
         <div class="col-6">
           <div class="w-100 form-field">
@@ -33,10 +25,7 @@
               <div class="date-picker-position">
                 <mat-datepicker-toggle matIconSuffix [for]="picker">
                   <mat-icon matDatepickerToggleIcon>
-                    <img
-                      src="assets/images/svgs/datepicker-icon.svg"
-                      alt="datepicker-icon"
-                    />
+                    <img src="assets/images/svgs/datepicker-icon.svg" alt="datepicker-icon" />
                   </mat-icon>
                 </mat-datepicker-toggle>
               </div>
@@ -61,9 +50,9 @@
             <div class="select-option">
               <mat-select (valueChange)="clientCountryValueChange($event)" formControlName="country" value="Select">
                 @for(country of allCountries; track country) {
-                  @if(country.currencySymbol) {
-                    <mat-option [value]="country.countryName">{{country.countryName}}</mat-option>
-                  }
+                @if(country.currencySymbol) {
+                <mat-option [value]="country.countryName">{{country.countryName}}</mat-option>
+                }
                 }
               </mat-select>
             </div>
@@ -72,15 +61,14 @@
         <div class="col-6">
           <div class="w-100 form-field">
             <mat-label class="f-s-14 f-w-600 d-block">
-              Preferred Currency</mat-label
-            >
+              Preferred Currency</mat-label>
             <div class="select-option">
               <mat-select formControlName="currency" value="Select">
                 @for(country of allCountries; track country) {
-                  @if(country.currencySymbol) {
-                    <mat-option [value]="country.currencySymbol">{{country.currencySymbol}}</mat-option>
-                  }
-                } 
+                @if(country.currencySymbol) {
+                <mat-option [value]="country.currencySymbol">{{country.currencySymbol}}</mat-option>
+                }
+                }
               </mat-select>
             </div>
           </div>
@@ -102,11 +90,7 @@
           <div class="col-6">
             <div class="w-100 form-field">
               <mat-label class="f-s-14 f-w-600 d-block">Email</mat-label>
-              <input
-                matInput
-                placeholder="email@somedomain.com"
-                formControlName="email"
-              />
+              <input matInput placeholder="email@somedomain.com" formControlName="email" />
               @if(clientForm.get('email')?.hasError('email')) {
               <mat-error>Invalid Email Address</mat-error>
               }
@@ -115,19 +99,10 @@
           <div class="col-6">
             <div class="w-100 form-field">
               <mat-label class="f-s-14 f-w-600 d-block">Telephone</mat-label>
-              <ngx-intl-tel-input
-                [cssClass]="'custom'"
-                [enableAutoCountrySelect]="false"
-                [enablePlaceholder]="true"
-                [searchCountryFlag]="true"
-                [selectFirstCountry]="false"
-                [enableAutoCountrySelect]="true"
-                [selectedCountryISO]="selectedPartnerCountryISO"
-                [maxLength]="15"
-                [phoneValidation]="true"
-                name="phone"
-                formControlName="phone"
-                ></ngx-intl-tel-input>
+              <ngx-intl-tel-input [cssClass]="'custom'" [enableAutoCountrySelect]="false" [enablePlaceholder]="true"
+                [searchCountryFlag]="true" [selectFirstCountry]="false" [enableAutoCountrySelect]="true"
+                [selectedCountryISO]="selectedPartnerCountryISO" [maxLength]="15" [phoneValidation]="true" name="phone"
+                formControlName="phone" class="tel-input-custom"></ngx-intl-tel-input>
               <!-- <input
                 matInput
                 placeholder="00000000000"
@@ -138,12 +113,8 @@
         </div>
         <div class="checkbox-box">
           <div>
-            <input
-              type="checkbox"
-              id="partner-section"
-              [checked]="showPartner"
-              (change)="togglePartnerSection(!showPartner)"
-            />
+            <input type="checkbox" id="partner-section" [checked]="showPartner"
+              (change)="togglePartnerSection(!showPartner)" />
           </div>
           <label for="partner-section">Add a partner or spouse</label>
         </div>
@@ -169,23 +140,14 @@
           </div>
           <div class="col-6">
             <div class="w-100 form-field">
-              <mat-label class="f-s-14 f-w-600 d-block"
-                >Date Of Birth</mat-label
-              >
+              <mat-label class="f-s-14 f-w-600 d-block">Date Of Birth</mat-label>
               <div class="position-relative">
-                <input
-                  matInput
-                  [matDatepicker]="partnerPicker"
-                  formControlName="dob"
-                />
+                <input matInput [matDatepicker]="partnerPicker" formControlName="dob" />
                 <!-- <mat-hint>MM/DD/YYYY</mat-hint> -->
                 <div class="date-picker-position">
                   <mat-datepicker-toggle matIconSuffix [for]="partnerPicker">
                     <mat-icon matDatepickerToggleIcon>
-                      <img
-                        src="assets/images/svgs/datepicker-icon.svg"
-                        alt="datepicker-icon"
-                      />
+                      <img src="assets/images/svgs/datepicker-icon.svg" alt="datepicker-icon" />
                     </mat-icon>
                   </mat-datepicker-toggle>
                 </div>
@@ -206,13 +168,13 @@
           <div class="col-6">
             <div class="w-100 form-field">
               <mat-label class="f-s-14 f-w-600 d-block">Country</mat-label>
-  
+
               <div class="select-option">
                 <mat-select (valueChange)="partnerCountryValueChange($event)" formControlName="country" value="Select">
                   @for(country of allCountries; track country) {
-                    @if(country.currencySymbol) {
-                      <mat-option [value]="country.countryName">{{country.countryName}}</mat-option>
-                    }
+                  @if(country.currencySymbol) {
+                  <mat-option [value]="country.countryName">{{country.countryName}}</mat-option>
+                  }
                   }
                 </mat-select>
               </div>
@@ -221,15 +183,14 @@
           <div class="col-6">
             <div class="w-100 form-field">
               <mat-label class="f-s-14 f-w-600 d-block">
-                Preferred Currency</mat-label
-              >
+                Preferred Currency</mat-label>
               <div class="select-option">
                 <mat-select formControlName="currency" value="Select">
                   @for(country of allCountries; track country) {
-                    @if(country.currencySymbol) {
-                      <mat-option [value]="country.currencySymbol">{{country.currencySymbol}}</mat-option>
-                    }
-                  } 
+                  @if(country.currencySymbol) {
+                  <mat-option [value]="country.currencySymbol">{{country.currencySymbol}}</mat-option>
+                  }
+                  }
                 </mat-select>
               </div>
             </div>
@@ -250,11 +211,7 @@
           <div class="col-6">
             <div class="w-100 form-field">
               <mat-label class="f-s-14 f-w-600 d-block">Email</mat-label>
-              <input
-                matInput
-                placeholder="email@somedomain.com"
-                formControlName="email"
-              />
+              <input matInput placeholder="email@somedomain.com" formControlName="email" />
               @if(clientForm.get('partner.email')?.hasError('email')) {
               <span class="field-error d-block">Invalid Email Address</span>
               }
@@ -263,19 +220,10 @@
           <div class="col-6">
             <div class="w-100 form-field">
               <mat-label class="f-s-14 f-w-600 d-block">Telephone</mat-label>
-              <ngx-intl-tel-input
-                [cssClass]="'custom'"
-                [enableAutoCountrySelect]="false"
-                [enablePlaceholder]="true"
-                [searchCountryFlag]="true"
-                [selectFirstCountry]="false"
-                [enableAutoCountrySelect]="true"
-                [selectedCountryISO]="selectedPartnerCountryISO"
-                [maxLength]="15"
-                [phoneValidation]="true"
-                name="phone"
-                formControlName="phone"
-                ></ngx-intl-tel-input>
+              <ngx-intl-tel-input [cssClass]="'custom'" [enableAutoCountrySelect]="false" [enablePlaceholder]="true"
+                [searchCountryFlag]="true" [selectFirstCountry]="false" [enableAutoCountrySelect]="true"
+                [selectedCountryISO]="selectedPartnerCountryISO" [maxLength]="15" [phoneValidation]="true" name="phone"
+                formControlName="phone" class="tel-input-custom"></ngx-intl-tel-input>
               <!-- <input
                 matInput
                 placeholder="0000000000"
@@ -294,12 +242,7 @@
       </div>
       <div class="row justify-content-end">
         <div class="col-sm-12">
-          <button
-            mat-flat-button
-            class="btn-submit"
-            type="submit"
-            [disabled]="clientForm.invalid"
-          >
+          <button mat-flat-button class="btn-submit" type="submit" [disabled]="clientForm.invalid">
             Save
           </button>
         </div>
