@@ -300,6 +300,7 @@ html .customizerNav {
   background: transparent !important;
 }
 .vis-item.birth-icon.vis-selected .vis-item-content,
+.vis-item.retirement-age-icon.vis-selected .vis-item-content,
 .vis-item.home-icon.vis-selected .vis-item-content,
 .vis-item.car-icon.vis-selected .vis-item-content,
 .vis-item.new-business-icon.vis-selected .vis-item-content,
@@ -452,5 +453,8 @@ html .customizerNav {
 .tel-input-custom {
   .iti {
     width: 100%;
+  }
+  .iti__country-list {
+    max-height: 300px;
   }
 }

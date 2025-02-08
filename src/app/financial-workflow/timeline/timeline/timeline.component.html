@@ -14,7 +14,7 @@
                             <!-- End Icon  -->
                             <!-- headings  -->
                             <div class="d-flex flex-column justify-content-between gap-4">
-                                <h4 class="page-title f-w-500">Timeline</h4>
+                                <h4 class="page-title f-w-500">Goals & Events</h4>
                                 <span class="sub-title">{{financialTimeline.client.name}}</span>
                             </div>
                             <!-- End headings  -->
@@ -76,11 +76,8 @@
         </mat-card-content>
     </mat-card>
 
-    <app-timeline-chart 
-    [financialTimeline]="financialTimeline"
-    [clientBirthDate]="clientBirthDate"
-    (updateTimelines)="updateTimelines()"
-    ></app-timeline-chart>
+    <app-timeline-chart [financialTimeline]="financialTimeline" [clientBirthDate]="clientBirthDate"
+        (updateTimelines)="updateTimelines()"></app-timeline-chart>
     <!-- Event Section  -->
 
     }

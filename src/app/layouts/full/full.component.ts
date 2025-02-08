@@ -1,12 +1,16 @@
 import { BreakpointObserver, MediaMatcher } from '@angular/cdk/layout';
 import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { MatSidenav, MatSidenavContent, MatSidenavModule } from '@angular/material/sidenav';
+import {
+  MatSidenav,
+  MatSidenavContent,
+  MatSidenavModule,
+} from '@angular/material/sidenav';
 import { CoreService } from 'src/app/services/core.service';
 import { AppSettings } from 'src/app/config';
 import { filter } from 'rxjs/operators';
 import { NavigationEnd, Router } from '@angular/router';
-import { navItems } from './vertical/sidebar/sidebar-data';
+import { navItems, navItemslower } from './vertical/sidebar/sidebar-data';
 import { NavService } from '../../services/nav.service';
 import { AppNavItemComponent } from './vertical/sidebar/nav-item/nav-item.component';
 import { RouterModule } from '@angular/router';
@@ -43,29 +47,30 @@ interface quicklinks {
 }
 
 @Component({
-    selector: 'app-full',
-    imports: [
-        RouterModule,
-        AppNavItemComponent,
-        CommonModule,
-        SidebarComponent,
-        NgScrollbarModule,
-        TablerIconsModule,
-        HeaderComponent,
-        AppHorizontalHeaderComponent,
-        AppHorizontalSidebarComponent,
-        CustomizerComponent,
-        MatSidenavModule,
-        MatExpansionModule,
-        MatDividerModule,
-        MatListModule
-    ],
-    templateUrl: './full.component.html',
-    styleUrls: [],
-    encapsulation: ViewEncapsulation.None
+  selector: 'app-full',
+  imports: [
+    RouterModule,
+    AppNavItemComponent,
+    CommonModule,
+    SidebarComponent,
+    NgScrollbarModule,
+    TablerIconsModule,
+    HeaderComponent,
+    AppHorizontalHeaderComponent,
+    AppHorizontalSidebarComponent,
+    CustomizerComponent,
+    MatSidenavModule,
+    MatExpansionModule,
+    MatDividerModule,
+    MatListModule,
+  ],
+  templateUrl: './full.component.html',
+  styleUrls: [],
+  encapsulation: ViewEncapsulation.None,
 })
 export class FullComponent implements OnInit {
   navItems = navItems;
+  navItemslower = navItemslower;
 
   @ViewChild('leftsidenav')
   public sidenav: MatSidenav;
@@ -219,9 +224,12 @@ export class FullComponent implements OnInit {
     this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe((e) => {
-        
         var currentRoute = e.urlAfterRedirects;
-        this.hideSidebar = this.options.sidebarHiddenOnRoutes.find(x => currentRoute.includes(x)) ? true : false;
+        this.hideSidebar = this.options.sidebarHiddenOnRoutes.find((x) =>
+          currentRoute.includes(x)
+        )
+          ? true
+          : false;
 
         this.content?.scrollTo({ top: 0 });
       });

@@ -215,10 +215,26 @@
   }
 }
 
-.sidebar-list {
+.cashflow-modal {
+  border: 1px solid #516ce8;
+  padding: 8px;
+  border-radius: 8px;
+  color: #516ce8;
+  height: 36px;
+  background-color: white;
+  text-decoration: none;
+  span {
+    font-size: 14px;
+    line-height: 20px;
+  }
+}
+// Upper side Menus
+.sidebar-list,
+.sidebar-list-noline {
+  // .custom-line-sidebar {
   &.mdc-list {
     // padding: 0 24px;
-    padding: 16px 16px 0 16px;
+    // padding: 16px 16px 0 16px;
     display: flex;
     flex-direction: column;
     gap: 16px;
@@ -331,10 +347,49 @@
       }
     }
   }
+  // }
 }
+// End upper side Menus
 
+// Lower Side Menu
+.sidebar-list {
+  &.mdc-list {
+    padding: 32px 16px 0 16px;
+  }
+}
+.sidebar-list-noline {
+  &.mdc-list {
+    padding: 16px 16px 0 16px;
+    .menu-list-item {
+      &::after {
+        display: none;
+      }
+      &.activeMenu {
+        background-color: transparent;
+        border-left: none;
+        .mdc-list-item__primary-text {
+          color: #787889 !important;
+        }
+        .mat-mdc-list-item-icon {
+          color: #787889 !important;
+        }
+      }
+    }
+  }
+}
+// End Lower Side Menu
 .flex-layout {
   display: flex;
   flex-direction: column;
   height: 100%;
+}
+.nav-caption-button {
+  padding: 16px 16px 0 16px;
+  .button-icon {
+    span {
+      font-weight: 600;
+      font-size: 16px;
+      line-height: 18px;
+    }
+  }
 }
