@@ -105,6 +105,15 @@ export class ClientEditComponent {
     this.selectedPartnerCountryISO = (selectedCountry?.countryCode.toLowerCase() ?? '') as CountryISO
   }
 
+  get isFormInvalid() {
+    const partnerGroup = this.clientForm.get('partner') as FormGroup;
+    if(this.showPartner) {
+      return this.clientForm.controls['name'].invalid || this.clientForm.controls['dob'].invalid || 
+      partnerGroup.controls['name'].invalid || partnerGroup.controls['dob'].invalid
+    }
+    return this.clientForm.controls['name'].invalid || this.clientForm.controls['dob'].invalid
+  }
+
 
   getClient() {
     this.activatedRoute.params.pipe(
@@ -156,6 +165,8 @@ export class ClientEditComponent {
   }
 
   onSubmit() {
+    this.clientForm.markAllAsTouched();
+    this.clientForm.markAsDirty();
     if (this.clientForm.valid) {
       const partnerGroup = this.clientForm.get('partner') as FormGroup;
       var client: Client = {

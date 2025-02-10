@@ -42,7 +42,7 @@ export class AddModelDialogComponent {
 
   initForm() {
     this.form = this.fb.group({
-      name: ['', Validators.required],
+      name: ['Cashflow Simulator', Validators.required],
       description: ['']
     });
   }

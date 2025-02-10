@@ -41,6 +41,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { catchError, combineLatest, filter, map, take, tap } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { group } from '@angular/animations';
+import { E } from '@angular/cdk/keycodes';
 
 @Component({
   selector: 'app-timeline-chart',
@@ -121,11 +122,19 @@ export class TimelineChartComponent implements OnInit, OnChanges {
     console.log('drag started');
     this.draggedEvent = customEvent; // Store dragged event
     event.dataTransfer?.setData('text/plain', JSON.stringify(customEvent));
+    this.timeline.addCustomTime(new Date(), 'dragOver');
+  }
+
+  onDragEnd(event: DragEvent) {
+    event.preventDefault();
+    console.log(event.dataTransfer?.dropEffect)
+    
+    this.timeline.removeCustomTime('dragOver');
   }
 
   onDrop(event: DragEvent) {
     event.preventDefault();
-
+    
     console.log(this.draggedEvent);
     console.log(this.timeline);
 
@@ -333,8 +342,31 @@ export class TimelineChartComponent implements OnInit, OnChanges {
   }
 
   onDragOver(event: DragEvent) {
-    console.log('dragover');
+    this.timeline.setCustomTime(this.timeline.getEventProperties(event).time, 'dragOver');
+    this.timeline.setCustomTimeTitle(moment(this.timeline.getEventProperties(event).time).year().toString(), 'dragOver');
     event.preventDefault(); // Allows dropping
+    // var isCustomTimeCreated = false;
+    // try {
+    //   console.log('dragover', (this.timeline.getEventProperties(event) as any).customTime);
+    //   console.log('dragover', !(this.timeline.getEventProperties(event) as any).customTime);
+    //   if(!(this.timeline.getEventProperties(event) as any).customTime) {
+    //     console.log()
+    //     isCustomTimeCreated = true;
+    //   }
+      
+    // } catch(err) {
+    //   console.log('called err', err);
+    //   // this.timeline.removeCustomTime('dragOver');
+    //   // this.timeline.addCustomTime(this.timeline.getEventProperties(event).time, 'dragOver');
+    //   // this.timeline.setCustomTimeTitle(moment(this.timeline.getEventProperties(event).time).year().toString(), 'dragOver');
+    // }
+    // finally {
+    //   console.log('called after');
+    //   if(isCustomTimeCreated) {
+    //     this.timeline.removeCustomTime('dragOver');
+    //   }
+    //   // this.timeline.redraw()
+    // }
   }
 
   initTimelineContainer() {

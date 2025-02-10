@@ -71,7 +71,17 @@ export class ProfileComponent {
   onEditClicked() {
     this.router.navigate(['/clients/' + this.clientId + '/edit']);
   }
-  
+
+  onSortByValueChange(event: any)
+  {
+    console.log({event})
+    if(event === 'asc') {
+      this.cashflows.sort((a, b) => new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime());
+    } else {
+      this.cashflows.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+    }
+  }
+
   getClient() {
     this.activatedRoute.params
       .pipe(

@@ -122,6 +122,17 @@ export class ClientAddComponent {
     }
   }
 
+
+  get isFormInvalid() {
+    const partnerGroup = this.clientForm.get('partner') as FormGroup;
+    if(this.showPartner) {
+      return this.clientForm.controls['name'].invalid || this.clientForm.controls['dob'].invalid || 
+      partnerGroup.controls['name'].invalid || partnerGroup.controls['dob'].invalid
+    }
+    return this.clientForm.controls['name'].invalid || this.clientForm.controls['dob'].invalid
+  }
+
+
   getClientFormInfo() {
     const partnerGroup = this.clientForm.get('partner') as FormGroup;
     return {
@@ -156,6 +167,8 @@ export class ClientAddComponent {
   }
 
   onAddNewClientClicked() {
+    this.clientForm.markAllAsTouched();
+    this.clientForm.markAsDirty();
     if (this.clientForm.valid) {
       var client: Client = this.getClientFormInfo();
       this.clientHttpService
@@ -193,6 +206,8 @@ export class ClientAddComponent {
   }
 
   onSubmit() {
+    this.clientForm.markAllAsTouched();
+    this.clientForm.markAsDirty();
     if (this.clientForm.valid) {
       var client: Client = this.getClientFormInfo();
       this.clientHttpService

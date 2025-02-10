@@ -199,7 +199,7 @@
         <!-- End Price Field  -->
         <!-- End Type Field  -->
         <div class="right">
-          <mat-select value="Select" [disabled]="systemEvent?.isOneOff === true" formControlName="cycle"
+          <mat-select (valueChange)="onCycleValueChange($event)" value="Select" [disabled]="systemEvent?.isOneOff === true" formControlName="cycle"
             class="sortby-edit-profile" hideSingleSelectionIndicator>
             <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
             @for (cycle of cycles; track cycle) {
@@ -224,12 +224,12 @@
     <div class="start-end">
       <div class="d-flex flex-column gap-12">
         <div class="d-flex gap-8 align-items-center">
-          <mat-label class="f-s-16 f-w-400 d-block">Start & end</mat-label>
+          <mat-label class="f-s-16 f-w-400 d-block">Start @if(eventForm.get('cycle')?.value !=='One-Off') {& end}</mat-label>
           <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
         </div>
         <div class="row justify-content-between align-items-start flex-nowrap">
           <!-- Start Date  -->
-          <div class="col-6">
+          <div [className]="eventForm.get('cycle')?.value !== 'One-Off' ? 'col-6' : 'w-100'">
             <div class="w-100 form-field">
               <div class="select-option">
                 <mat-select value="Select" formControlName="start" hideSingleSelectionIndicator>
@@ -247,27 +247,33 @@
           </div>
 
           <!-- Divider  -->
-          <div class="d-flex justify-content-center align-items-center">
-            <img src="assets/images/svgs/chevron-right-date-icon.svg" alt="chevron-right-date-icon" />
-          </div>
-
-          <!-- End Date  -->
-          <div class="col-6">
-            <div class="w-100 form-field">
-              <div class="select-option">
-                <mat-select value="Select" formControlName="end" hideSingleSelectionIndicator>
-                  <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
-                  @for (event of eventsList; track event) {
-                  <mat-option [value]="event.year">{{ event.name }} ({{ event.age }})</mat-option>
-                  }
-                </mat-select>
-              </div>
-              @if(eventForm.get('end')?.touched &&
-              eventForm.get('end')?.hasError('required')) {
-              <span class="field-error d-block">Date is required</span>
-              }
+          
+          @if(eventForm.get('cycle')?.value !== 'One-Off') {
+            <div class="d-flex justify-content-center align-items-center">
+              <img src="assets/images/svgs/chevron-right-date-icon.svg" alt="chevron-right-date-icon" />
             </div>
-          </div>
+            <!-- End Date  -->
+            <div class="col-6">
+              <div class="w-100 form-field">
+                <div class="select-option">
+                  <mat-select value="Select" formControlName="end" hideSingleSelectionIndicator>
+                    <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
+                    @for (event of eventsList; track event) {
+                    <mat-option [value]="event.year">{{ event.name }} ({{ event.age }})</mat-option>
+                    }
+                    <hr>
+                    @for (year of years; track year) {
+                      <mat-option [value]="year">{{ year }} ({{ year - clientBirthYear }})</mat-option>
+                      }
+                  </mat-select>
+                </div>
+                @if(eventForm.get('end')?.touched &&
+                eventForm.get('end')?.hasError('required')) {
+                <span class="field-error d-block">Date is required</span>
+                }
+              </div>
+            </div>
+          }
 
         </div>
       </div>
@@ -435,7 +441,7 @@
             <!-- End Price Field  -->
             <!-- End Type Field  -->
             <div class="right">
-              <mat-select value="Select" formControlName="cycle" class="sortby-edit-profile"
+              <mat-select (valueChange)="onCycleValueChange($event)" value="Select" formControlName="cycle" class="sortby-edit-profile"
                 hideSingleSelectionIndicator>
                 <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
                 @for (cycle of cycles; track cycle) {
@@ -460,12 +466,12 @@
         <div class="start-end">
           <div class="d-flex flex-column gap-12">
             <div class="d-flex gap-8 align-items-center">
-              <mat-label class="f-s-16 f-w-400 d-block">Start & end</mat-label>
+              <mat-label class="f-s-16 f-w-400 d-block">Start @if(eventForm.get('cycle')?.value !== 'One-Off') {& end}</mat-label>
               <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
             </div>
             <div class="row justify-content-between align-items-start flex-nowrap">
               <!-- Start date  -->
-              <div class="col-6">
+              <div [className]="eventForm.get('cycle')?.value !== 'One-Off' ? 'col-6' : 'w-100'">
                 <div class="w-100 form-field">
                   <div class="select-option">
                     <mat-select value="Select" formControlName="start" hideSingleSelectionIndicator>
@@ -481,27 +487,34 @@
                   }
                 </div>
               </div>
-              <!-- Divider  -->
-              <div class="d-flex justify-content-start align-items-start">
-                <img src="assets/images/svgs/chevron-right-date-icon.svg" alt="chevron-right-date-icon" />
-              </div>
-              <!-- End date  -->
-              <div class="col-6">
-                <div class="w-100 form-field">
-                  <div class="select-option">
-                    <mat-select value="Select" formControlName="end" hideSingleSelectionIndicator>
-                      <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
-                      @for (event of eventsList; track event) {
-                      <mat-option [value]="event.year">{{ event.name }} ({{ event.age }})</mat-option>
-                      }
-                    </mat-select>
-                  </div>
-                  @if(eventForm.get('end')?.touched &&
-                  eventForm.get('end')?.hasError('required')) {
-                  <span class="field-error d-block">End is required</span>
-                  }
+
+              @if(eventForm.get('cycle')?.value !== 'One-Off') {
+                <!-- Divider  -->
+                <div class="d-flex justify-content-start align-items-start">
+                  <img src="assets/images/svgs/chevron-right-date-icon.svg" alt="chevron-right-date-icon" />
                 </div>
-              </div>
+                <!-- End date  -->
+                <div class="col-6">
+                  <div class="w-100 form-field">
+                    <div class="select-option">
+                      <mat-select value="Select" formControlName="end" hideSingleSelectionIndicator>
+                        <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
+                        @for (event of eventsList; track event) {
+                        <mat-option [value]="event.year">{{ event.name }} ({{ event.age }})</mat-option>
+                        }
+                        <hr>
+                        @for (year of years; track year) {
+                          <mat-option [value]="year">{{ year }} ({{ year - clientBirthYear }})</mat-option>
+                          }
+                      </mat-select>
+                    </div>
+                    @if(eventForm.get('end')?.touched &&
+                    eventForm.get('end')?.hasError('required')) {
+                    <span class="field-error d-block">End is required</span>
+                    }
+                  </div>
+                </div>
+              }
             </div>
           </div>
         </div>

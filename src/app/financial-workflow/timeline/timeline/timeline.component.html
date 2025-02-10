@@ -34,7 +34,7 @@
                                 <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
                             </div>
                             <div class="position-relative">
-                                <input matInput [matDatepicker]="picker" formControlName="start_date"
+                                <!-- <input matInput [matDatepicker]="picker" formControlName="start_date"
                                     [value]="financialTimeline.forecastStartDate" />
                                 <div class="date-picker-position">
                                     <mat-datepicker-toggle matIconSuffix [for]="picker">
@@ -43,7 +43,15 @@
                                         </mat-icon>
                                     </mat-datepicker-toggle>
                                 </div>
-                                <mat-datepicker #picker></mat-datepicker>
+                                <mat-datepicker #picker></mat-datepicker> -->
+                                <div class="select-option">
+                                    <mat-select [value]="this.forecastStartYear" formControlName="start" hideSingleSelectionIndicator>
+                                      <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
+                                      @for (year of forecastStartYears; track year) {
+                                      <mat-option [value]="year">{{ year }} ({{ year - clientBirthYear }})</mat-option>
+                                      }
+                                    </mat-select>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -57,7 +65,7 @@
                                 <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
                             </div>
                             <div class="position-relative">
-                                <input matInput [matDatepicker]="pickerend" formControlName="end_date"
+                                <!-- <input matInput [matDatepicker]="pickerend" formControlName="end_date"
                                     [value]="financialTimeline.forecastEndtDate" />
                                 <div class="date-picker-position">
                                     <mat-datepicker-toggle matIconSuffix [for]="pickerend">
@@ -66,7 +74,15 @@
                                         </mat-icon>
                                     </mat-datepicker-toggle>
                                 </div>
-                                <mat-datepicker #pickerend></mat-datepicker>
+                                <mat-datepicker #pickerend></mat-datepicker> -->
+                                <div class="select-option">
+                                    <mat-select [value]="this.forecastEndYear" formControlName="start" hideSingleSelectionIndicator>
+                                      <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
+                                      @for (year of forecastStartYears; track year) {
+                                      <mat-option [value]="year">{{ year }} ({{ year - clientBirthYear }})</mat-option>
+                                      }
+                                    </mat-select>
+                                </div>
                             </div>
                         </div>
                     </div>

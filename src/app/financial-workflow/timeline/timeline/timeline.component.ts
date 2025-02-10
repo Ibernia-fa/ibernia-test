@@ -13,6 +13,8 @@ import { FinancialTimeline } from '../models/financial-timeline';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TimelineChartComponent } from '../timeline-chart/timeline-chart.component';
 import { NavItemService } from 'src/app/layouts/full/nav-item.service';
+import { MatSelectModule } from '@angular/material/select';
+import moment from 'moment';
 
 @Component({
   selector: 'app-timeline',
@@ -24,7 +26,8 @@ import { NavItemService } from 'src/app/layouts/full/nav-item.service';
     MatDatepickerModule,
     MatIconModule,
     MatProgressSpinnerModule,
-    TimelineChartComponent
+    TimelineChartComponent,
+    MatSelectModule
   ],
   providers: [provideNativeDateAdapter()],
   templateUrl: './timeline.component.html',
@@ -35,6 +38,10 @@ export class TimelineComponent {
   financialTimeline: FinancialTimeline;
   clientBirthDate: Date;
   isLoaderVisible: boolean;
+  forecastStartYears: number[] = [];
+  forecastStartYear: number;
+  forecastEndYear: number;
+  clientBirthYear: number;
 
   constructor(
     private timelineHttpService: TimelineHttpService,
@@ -57,6 +64,16 @@ export class TimelineComponent {
               this.isLoaderVisible = false;
               this.financialTimeline = res;
               this.clientBirthDate = this.financialTimeline.clientBirthDate;
+              this.clientBirthYear = moment(this.financialTimeline.clientBirthDate).year();
+              this.forecastStartYear = moment(this.financialTimeline.forecastStartDate).year();
+              this.forecastEndYear = moment(this.financialTimeline.forecastEndtDate).year();
+
+              var iterations = this.forecastEndYear - this.forecastStartYear;
+
+              for (let index = 0; index <= iterations; index++) {
+                const element = this.forecastStartYear + index;
+                this.forecastStartYears.push(element);
+              }
               // this.clientBirthDate = new Date();
             })
           )

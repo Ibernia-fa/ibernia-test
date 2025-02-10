@@ -145,6 +145,17 @@ export class AddEventDialogComponent {
     }
   }
 
+  onCycleValueChange(event: string) {
+    if(event === 'One-Off') {
+      this.eventForm.controls['end'].clearValidators();
+      this.eventForm.controls['end'].updateValueAndValidity();
+    }
+    else {
+      this.eventForm.controls['end'].addValidators(Validators.required);
+      this.eventForm.controls['end'].updateValueAndValidity();
+    }
+  }
+
   onEventNameValueChange(event: any) {
     this.selectedEventName = event;
     if (event === 'Custom') {
@@ -292,12 +303,12 @@ export class AddEventDialogComponent {
           ? EventIncomeType.Income
           : EventIncomeType.Expense,
         iconUrl:
-          (this.eventForm.get('eventName')?.value !== 'Custom'
+          this.eventForm.get('eventName')?.value !== 'Custom'
             ? this.customEventsLibrary.find(
                 (customEvent) =>
                   customEvent.name === this.eventForm.get('eventName')?.value
-              )?.iconUrl
-            : '') ?? 'custom-icon',
+              )?.iconUrl ?? ''
+            : 'custom-icon',
         isDefault: false,
         isOneOff: this.eventForm.get('cycle')?.value === 'One-Off',
         isPlaceHolder: false,

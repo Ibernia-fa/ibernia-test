@@ -67,7 +67,7 @@
                     </mat-chip> -->
                     @if(systemEventsLibrary) {
                     @for(systemEvent of systemEventsLibrary; track systemEvent) {
-                    <mat-chip draggable="true" (dragstart)="onDragStart($event, systemEvent)" class="f-s-14"
+                    <mat-chip draggable="true" (dragend)="onDragEnd($event)" (dragstart)="onDragStart($event, systemEvent)" class="f-s-14"
                         class="chip-item" [class]="systemEvent.iconUrl">
                         <div class="d-flex gap-8 align-items-center m-r-16">
                             <img matChipAvatar [src]="'/assets/images/svgs/' + systemEvent.iconUrl + '.svg'"
