@@ -99,9 +99,9 @@
           <div class="col-6">
             <div class="w-100 form-field">
               <mat-label class="f-s-14 f-w-600 d-block">Telephone</mat-label>
-              <ngx-intl-tel-input [cssClass]="'custom'" [enableAutoCountrySelect]="false" [enablePlaceholder]="true"
-                [searchCountryFlag]="true" [selectFirstCountry]="false" [enableAutoCountrySelect]="true"
-                [selectedCountryISO]="selectedPartnerCountryISO" [maxLength]="15" [phoneValidation]="true" name="phone"
+              <ngx-intl-tel-input [cssClass]="'custom'" [enableAutoCountrySelect]="false" [enablePlaceholder]="false"
+              [searchCountryFlag]="true" [selectFirstCountry]="false" [separateDialCode]="true" [selectedCountryISO]="selectedClientCountryISO"
+              [maxLength]="15" [phoneValidation]="false" name="phone"
                 formControlName="phone" class="tel-input-custom"></ngx-intl-tel-input>
               <!-- <input
                 matInput
@@ -220,9 +220,9 @@
           <div class="col-6">
             <div class="w-100 form-field">
               <mat-label class="f-s-14 f-w-600 d-block">Telephone</mat-label>
-              <ngx-intl-tel-input [cssClass]="'custom'" [enableAutoCountrySelect]="false" [enablePlaceholder]="true"
-                [searchCountryFlag]="true" [selectFirstCountry]="false" [enableAutoCountrySelect]="true"
-                [selectedCountryISO]="selectedPartnerCountryISO" [maxLength]="15" [phoneValidation]="true" name="phone"
+              <ngx-intl-tel-input [cssClass]="'custom'" [enableAutoCountrySelect]="false" [enablePlaceholder]="false"
+              [searchCountryFlag]="true" [selectFirstCountry]="false" [separateDialCode]="true" 
+              [selectedCountryISO]="selectedPartnerCountryISO" [maxLength]="15" [phoneValidation]="false" name="phone"
                 formControlName="phone" class="tel-input-custom"></ngx-intl-tel-input>
               <!-- <input
                 matInput

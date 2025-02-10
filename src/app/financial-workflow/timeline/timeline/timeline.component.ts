@@ -80,6 +80,10 @@ export class TimelineComponent {
           .subscribe();
   }
 
+  onUpdateClicked() {
+
+  }
+  
   updateTimelines(){
     // this.getTimeline();
     this.timelineHttpService.getTimelinebyCashflowId(this.cashflowId).pipe(

@@ -65,6 +65,8 @@ export class AddEventDialogComponent {
   eventsList: any;
   selectedEventName: string;
   selectedEventIconUrl: string;
+  isEditWorkflow: boolean = false;
+  patchEvent: ClientEvent | undefined | null;
 
 
   constructor(
@@ -83,6 +85,8 @@ export class AddEventDialogComponent {
     this.clientBirthDate = data.clientBirthDate;
     this.clientBirthYear = moment(this.clientBirthDate).year();
     this.eventsList = data.eventsList
+    this.isEditWorkflow = data.isEditWorkflow;
+    this.patchEvent= data.patchEvent
 
     var iterations = data.forecastEndDateYear - data.forecastStartDateYear
 
@@ -141,6 +145,59 @@ export class AddEventDialogComponent {
           end: [0, Validators.required],
           escalationRate: ['', Validators.required],
         });
+        break;
+    }
+
+    if(this.isEditWorkflow) {
+      this.patchForm();
+    }
+  }
+
+  patchForm() {
+    switch (this.selectedEventType) {
+      case EventType.INHERITANCE:
+          this.eventForm.controls['isIncomeEvent'].patchValue(this.patchEvent?.type === EventIncomeType.Income);
+          this.eventForm.controls['currency'].patchValue(this.patchEvent?.netAmount.currencySymbol);
+          this.eventForm.controls['amount'].patchValue(this.patchEvent?.netAmount.amount);
+          this.eventForm.controls['cycle'].patchValue(this.patchEvent?.netAmount.cycle.description);
+          this.eventForm.controls['ageDate'].patchValue(this.patchEvent?.start.year);
+        break;
+        
+        case EventType.STATE_PENSION:
+          this.eventForm.controls['isIncomeEvent'].patchValue(this.patchEvent?.type === EventIncomeType.Income);
+          this.eventForm.controls['currency'].patchValue(this.patchEvent?.netAmount.currencySymbol);
+          this.eventForm.controls['amount'].patchValue(this.patchEvent?.netAmount.amount);
+          this.eventForm.controls['cycle'].patchValue(this.patchEvent?.netAmount.cycle.description);
+          this.eventForm.controls['start'].patchValue(this.patchEvent?.start.year);
+          this.eventForm.controls['end'].patchValue(this.patchEvent?.end?.year);
+          this.eventForm.controls['escalationRate'].patchValue(this.patchEvent?.escalationRate?.description);
+        break;
+        
+        case EventType.CUSTOM:
+          if(this.customEventsLibrary.every(event => event.name !== this.patchEvent?.name))
+          {
+            console.log('in if')
+              this.eventForm.controls['eventName'].patchValue('Custom');
+              this.eventForm.addControl(
+                'name',
+                new FormControl(this.patchEvent?.name, [Validators.required])
+              );
+              this.eventForm.updateValueAndValidity();
+            this.selectedEventIconUrl = this.patchEvent?.iconUrl ?? "";
+            this.selectedEventName = 'Custom';
+          }
+          else {
+            this.eventForm.controls['eventName'].patchValue(this.patchEvent?.name);
+            this.selectedEventIconUrl = this.patchEvent?.iconUrl ?? "";
+            this.selectedEventName = this.patchEvent?.name ?? "";
+          }
+          this.eventForm.controls['isIncomeEvent'].patchValue(this.patchEvent?.type === EventIncomeType.Income);
+          this.eventForm.controls['currency'].patchValue(this.patchEvent?.netAmount.currencySymbol);
+          this.eventForm.controls['amount'].patchValue(this.patchEvent?.netAmount.amount);
+          this.eventForm.controls['cycle'].patchValue(this.patchEvent?.netAmount.cycle.description);
+          this.eventForm.controls['start'].patchValue(this.patchEvent?.start.year);
+          this.eventForm.controls['end'].patchValue(this.patchEvent?.end?.year);
+          this.eventForm.controls['escalationRate'].patchValue(this.patchEvent?.escalationRate?.description);
         break;
     }
   }
@@ -293,7 +350,7 @@ export class AddEventDialogComponent {
         },
         end: {
           year: this.eventForm.get('end')?.value,
-          age: this.eventForm.get('end')?.value - this.clientBirthYear,
+          age: (this.eventForm.get('end')?.value > this.clientBirthYear) ? this.eventForm.get('end')?.value - this.clientBirthYear : 0,
         },
         escalationRate: {
           id: '',
