@@ -84,6 +84,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
     if (changes['financialTimeline']) {
       if(this.timeline) {
         this.timeline.setItems(this.timelineData);
+        this.timeline.setOptions(this.timelineOptions);
         this.timeline.removeCustomTime('t1');
         if(this.financialTimeline.startAt && this.financialTimeline.clientEvents.length > 0)
           this.timeline.addCustomTime(new Date(this.financialTimeline.startAt.year, 0), 't1');

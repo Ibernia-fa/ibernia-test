@@ -45,7 +45,7 @@
                                 </div>
                                 <mat-datepicker #picker></mat-datepicker> -->
                                 <div class="select-option">
-                                    <mat-select [value]="this.forecastStartYear" formControlName="start" hideSingleSelectionIndicator>
+                                    <mat-select (valueChange)="onForecastStartChange($event)" [value]="this.forecastStartYear" formControlName="start" hideSingleSelectionIndicator>
                                       <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
                                       @for (year of forecastStartYears; track year) {
                                       <mat-option [value]="year">{{ year }} ({{ year - clientBirthYear }})</mat-option>
@@ -76,7 +76,7 @@
                                 </div>
                                 <mat-datepicker #pickerend></mat-datepicker> -->
                                 <div class="select-option">
-                                    <mat-select [value]="this.forecastEndYear" formControlName="start" hideSingleSelectionIndicator>
+                                    <mat-select (valueChange)="onForecastEndChange($event)" [value]="this.forecastEndYear" formControlName="start" hideSingleSelectionIndicator>
                                       <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
                                       @for (year of forecastStartYears; track year) {
                                       <mat-option [value]="year">{{ year }} ({{ year - clientBirthYear }})</mat-option>
@@ -100,7 +100,7 @@
     </mat-card>
 
     <app-timeline-chart [financialTimeline]="financialTimeline" [clientBirthDate]="clientBirthDate"
-        (updateTimelines)="updateTimelines()"></app-timeline-chart>
+        (updateTimelines)="updateTimelinesEmittedEvent()"></app-timeline-chart>
     <!-- Event Section  -->
 
     }

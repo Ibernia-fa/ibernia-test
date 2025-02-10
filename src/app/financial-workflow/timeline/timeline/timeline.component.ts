@@ -15,6 +15,8 @@ import { TimelineChartComponent } from '../timeline-chart/timeline-chart.compone
 import { NavItemService } from 'src/app/layouts/full/nav-item.service';
 import { MatSelectModule } from '@angular/material/select';
 import moment from 'moment';
+import { DialogComponent } from 'src/app/dialog/dialog.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-timeline',
@@ -27,11 +29,11 @@ import moment from 'moment';
     MatIconModule,
     MatProgressSpinnerModule,
     TimelineChartComponent,
-    MatSelectModule
+    MatSelectModule,
   ],
   providers: [provideNativeDateAdapter()],
   templateUrl: './timeline.component.html',
-  styleUrl: './timeline.component.scss'
+  styleUrl: './timeline.component.scss',
 })
 export class TimelineComponent {
   cashflowId: string;
@@ -46,52 +48,101 @@ export class TimelineComponent {
   constructor(
     private timelineHttpService: TimelineHttpService,
     private activatedRoute: ActivatedRoute,
+    private dialog: MatDialog,
     private navItemService: NavItemService
   ) {
-    this.navItemService.currentRouteName = 'Goals & Events'
+    this.navItemService.currentRouteName = 'Goals & Events';
     this.getTimeline();
   }
 
   getTimeline() {
     this.isLoaderVisible = true;
     this.activatedRoute.params
-          .pipe(
-            switchMap((params) => {
-              this.cashflowId = params['id']
-              return this.timelineHttpService.getTimelinebyCashflowId(this.cashflowId)
-            }),
-            map((res) => {
-              this.isLoaderVisible = false;
-              this.financialTimeline = res;
-              this.clientBirthDate = this.financialTimeline.clientBirthDate;
-              this.clientBirthYear = moment(this.financialTimeline.clientBirthDate).year();
-              this.forecastStartYear = moment(this.financialTimeline.forecastStartDate).year();
-              this.forecastEndYear = moment(this.financialTimeline.forecastEndtDate).year();
+      .pipe(
+        switchMap((params) => {
+          this.cashflowId = params['id'];
+          return this.timelineHttpService.getTimelinebyCashflowId(
+            this.cashflowId
+          );
+        }),
+        map((res) => {
+          this.isLoaderVisible = false;
+          this.financialTimeline = res;
+          this.clientBirthDate = this.financialTimeline.clientBirthDate;
+          this.clientBirthYear = moment(
+            this.financialTimeline.clientBirthDate
+          ).year();
+          this.forecastStartYear = moment(
+            this.financialTimeline.forecastStartDate
+          ).year();
+          this.forecastEndYear = moment(
+            this.financialTimeline.forecastEndtDate
+          ).year();
 
-              var iterations = this.forecastEndYear - this.forecastStartYear;
+          var iterations = this.forecastEndYear - this.forecastStartYear;
 
-              for (let index = 0; index <= iterations; index++) {
-                const element = this.forecastStartYear + index;
-                this.forecastStartYears.push(element);
-              }
-              // this.clientBirthDate = new Date();
-            })
-          )
-          .subscribe();
+          for (let index = 0; index <= iterations; index++) {
+            const element = this.forecastStartYear + index;
+            this.forecastStartYears.push(element);
+          }
+          // this.clientBirthDate = new Date();
+        })
+      )
+      .subscribe();
   }
 
   onUpdateClicked() {
-
+    this.financialTimeline.forecastStartDate = new Date(
+      this.forecastStartYear,
+      1
+    );
+    this.financialTimeline.forecastEndtDate = new Date(this.forecastEndYear, 1);
+    const dialogRef = this.dialog.open(DialogComponent, {
+      data: {
+        action: 'Delete',
+        text: 'Updating these dates will clear out the existing timeline events?',
+      },
+      width: '460px',
+    });
+    dialogRef.afterClosed().subscribe((result) => {
+      console.log(result);
+      if (result.event === 'Delete') {
+        this.updateTimeline();
+      }
+    });
   }
   
-  updateTimelines(){
+  updateTimeline() {
+    this.timelineHttpService
+      .updateTimeline(this.financialTimeline)
+      .pipe(
+        take(1),
+        tap((res) => {
+          this.updateTimelinesEmittedEvent();
+        })
+      )
+      .subscribe();
+  }
+
+  onForecastStartChange(event: any) {
+    this.forecastStartYear = event;
+  }
+
+  onForecastEndChange(event: any) {
+    this.forecastEndYear = event;
+  }
+
+  updateTimelinesEmittedEvent() {
     // this.getTimeline();
-    this.timelineHttpService.getTimelinebyCashflowId(this.cashflowId).pipe(
-      take(1),
-      tap((res) => {
-        this.financialTimeline = res;
-        this.clientBirthDate = this.financialTimeline.clientBirthDate;
-      })
-    ).subscribe();
+    this.timelineHttpService
+      .getTimelinebyCashflowId(this.cashflowId)
+      .pipe(
+        take(1),
+        tap((res) => {
+          this.financialTimeline = res;
+          this.clientBirthDate = this.financialTimeline.clientBirthDate;
+        })
+      )
+      .subscribe();
   }
 }

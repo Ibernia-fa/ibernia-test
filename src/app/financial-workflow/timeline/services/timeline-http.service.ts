@@ -7,7 +7,7 @@ import { ClientEvent, FinancialTimeline } from '../models/financial-timeline';
 })
 export class TimelineHttpService {
 
-  readonly TIMELINE_BASE_URL = '/api/v1/timeline';
+  readonly TIMELINE_BASE_URL = '/api/v1/timelines';
   constructor(private httpClient: HttpClient) { }
 
   getTimelinebyCashflowId(cashflowId: string) {
@@ -23,13 +23,19 @@ export class TimelineHttpService {
   }
 
   addEvent(clientEvent: ClientEvent, timelineId: string) {
-    return this.httpClient.post(`${this.TIMELINE_BASE_URL}s/${timelineId}/events`, clientEvent, {
+    return this.httpClient.post(`${this.TIMELINE_BASE_URL}/${timelineId}/events`, clientEvent, {
+      responseType: "text"
+    })
+  }
+
+  updateTimeline(financialTimeline: FinancialTimeline) {
+    return this.httpClient.put(`${this.TIMELINE_BASE_URL}`, financialTimeline, {
       responseType: "text"
     })
   }
 
   deleteEvent(timelineId: string, eventId: string) {
-    return this.httpClient.delete(`${this.TIMELINE_BASE_URL}s/${timelineId}/events/${eventId}`, {
+    return this.httpClient.delete(`${this.TIMELINE_BASE_URL}/${timelineId}/events/${eventId}`, {
       responseType: 'text'
     })
   }
