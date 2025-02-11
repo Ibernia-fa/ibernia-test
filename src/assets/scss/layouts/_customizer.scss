@@ -290,6 +290,7 @@ html .customizerNav {
   top: 50% !important;
   transform: translateY(-50%) !important;
   height: auto !important;
+  z-index: 999;
 }
 .vis-item .vis-delete:after {
   color: #1c1c1c !important;

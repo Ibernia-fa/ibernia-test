@@ -408,7 +408,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
           start: new Date(event.start.year, 0),
           end: event.end
             ? new Date(event.end.year, 0)
-            : new Date(event.start.year + 1, 0),
+            : "",
           className: event.iconUrl,
         };
       }
@@ -426,6 +426,11 @@ export class TimelineChartComponent implements OnInit, OnChanges {
         updateTime: true, // Allow changing event time by dragging
         updateGroup: false, // Prevent moving events between groups
         remove: true, // Prevent deletion via UI
+      },
+      snap: function (date: Date) {
+        const year = moment(date).year();
+        const snappedYear = Math.round(year / 5) * 5;
+        return new Date(snappedYear, 0, 1);
       },
       // snap: function (date, scale, step) {
       //   var hour = 60 * 60 * 1000;
@@ -605,6 +610,46 @@ export class TimelineChartComponent implements OnInit, OnChanges {
             callback(item);
           }
         });
+      } 
+      else {
+        const clientEvent: ClientEvent | undefined = this.financialTimeline.clientEvents.find(event => event.id === item.id);
+      // Object.assign<ClientEvent, ClientEvent>(clientEvent, this.draggedEvent);
+
+      if(clientEvent) {
+        clientEvent.start = {
+          year: moment(new Date(moment(item.start).year(), 1)).year(),
+          age: moment(new Date(moment(item.start).year(), 1)).year() - moment(this.clientBirthDate).year(),
+        };
+        this.timelineHttpService
+          .addEvent(clientEvent, this.financialTimeline.id)
+          .pipe(
+            // filter(res => !!res),
+            take(1),
+            map((res) => {
+              if(this.financialTimeline.clientEvents.length < 1) {
+                this.financialTimeline.startAt = {
+                  age: clientEvent.start.age,
+                  year: clientEvent.start.year
+                }
+                this.timeline.addCustomTime(new Date(this.financialTimeline.startAt.year, 1), 't1');
+              }
+              this.financialTimeline.clientEvents.push(clientEvent);
+              this.draggedEvent = null;
+              this.timeline.setItems(this.timelineData);
+              this.cdr.detectChanges();
+              this.timeline.redraw();
+            }),
+            catchError((err) => {
+              console.error(err);
+              this.draggedEvent = null;
+              throw err;
+            })
+          )
+          .subscribe((res) => {
+            callback(item)
+          });
+        }
+
       }
     }
   }
