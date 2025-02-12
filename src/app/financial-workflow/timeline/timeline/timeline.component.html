@@ -26,15 +26,16 @@
                     </div>
                 </div>
                 <!-- Date Fields  -->
-                <div class="row justify-content-between align-items-end flex-nowrap">
-                    <div class="col-6">
-                        <div class="w-100 form-field gap-12">
-                            <div class="d-flex gap-8 align-items-center">
-                                <mat-label class="f-s-16 f-w-400 d-block">Forecast start date:</mat-label>
-                                <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
-                            </div>
-                            <div class="position-relative">
-                                <!-- <input matInput [matDatepicker]="picker" formControlName="start_date"
+                <div>
+                    <div class="row justify-content-between align-items-end flex-nowrap">
+                        <div class="col-6">
+                            <div class="w-100 form-field gap-12">
+                                <div class="d-flex gap-8 align-items-center">
+                                    <mat-label class="f-s-16 f-w-400 d-block">Forecast start date:</mat-label>
+                                    <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
+                                </div>
+                                <div class="position-relative">
+                                    <!-- <input matInput [matDatepicker]="picker" formControlName="start_date"
                                     [value]="financialTimeline.forecastStartDate" />
                                 <div class="date-picker-position">
                                     <mat-datepicker-toggle matIconSuffix [for]="picker">
@@ -44,38 +45,43 @@
                                     </mat-datepicker-toggle>
                                 </div>
                                 <mat-datepicker #picker></mat-datepicker> -->
-                                <div class="select-option">
-                                    <mat-select [disabled]="!enableForecastEdit" (valueChange)="onForecastStartChange($event)" [value]="this.forecastStartYear" formControlName="start" hideSingleSelectionIndicator>
-                                      <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
-                                      @for (year of forecastStartYears; track year) {
-                                      <mat-option [value]="year">{{ year }} ({{ year - clientBirthYear }})</mat-option>
-                                      }
-                                    </mat-select>
+                                    <div class="select-option">
+                                        <mat-select [disabled]="!enableForecastEdit"
+                                            (valueChange)="onForecastStartChange($event)"
+                                            [value]="this.forecastStartYear" formControlName="start"
+                                            hideSingleSelectionIndicator>
+                                            <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
+                                            @for (year of forecastStartYears; track year) {
+                                            <mat-option [value]="year">{{ year }} ({{ year - clientBirthYear
+                                                }})</mat-option>
+                                            }
+                                        </mat-select>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="d-flex justify-content-end align-items-end">
-                        <img src="assets/images/svgs/chevron-right-date-icon.svg" alt="chevron-right-date-icon" />
-                    </div>
-                    <div class="col-6">
-                        <div class="w-100 form-field gap-12">
-                            <div class="d-flex gap-8 align-items-center justify-content-between">
-                                <div class="d-flex align-items-center">
-                                    <mat-label class="f-s-16 f-w-400 d-block">Forecast end date:</mat-label>
-                                    <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" class="m-l-2" />
+                        <div class="d-flex justify-content-end align-items-end">
+                            <img src="assets/images/svgs/chevron-right-date-icon.svg" alt="chevron-right-date-icon" />
+                        </div>
+                        <div class="col-6">
+                            <div class="w-100 form-field">
+                                <div class="d-flex gap-8 align-items-center justify-content-between">
+                                    <div class="d-flex align-items-center">
+                                        <mat-label class="f-s-16 f-w-400 d-block">Forecast end date:</mat-label>
+                                        <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon"
+                                            class="m-l-2" />
+                                    </div>
+                                    <div class="d-flex justify-content-end">
+                                        <button mat-icon-button (click)="enableForecastEdit=!enableForecastEdit">
+                                            <mat-icon>
+                                                <img src="assets/images/svgs/pen-icon.svg" alt="pen-icon" />
+                                            </mat-icon>
+                                        </button>
+                                    </div>
                                 </div>
-                                <div class="col-2 d-flex justify-content-end">
-                                    <button mat-icon-button (click)="enableForecastEdit=!enableForecastEdit">
-                                        <mat-icon>
-                                            <img src="assets/images/svgs/pen-icon.svg" alt="pen-icon" />
-                                        </mat-icon>
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            <div class="position-relative">
-                                <!-- <input matInput [matDatepicker]="pickerend" formControlName="end_date"
+
+                                <div class="position-relative">
+                                    <!-- <input matInput [matDatepicker]="pickerend" formControlName="end_date"
                                     [value]="financialTimeline.forecastEndtDate" />
                                 <div class="date-picker-position">
                                     <mat-datepicker-toggle matIconSuffix [for]="pickerend">
@@ -85,27 +91,31 @@
                                     </mat-datepicker-toggle>
                                 </div>
                                 <mat-datepicker #pickerend></mat-datepicker> -->
-                                <div class="select-option">
-                                    <mat-select [disabled]="!enableForecastEdit" (valueChange)="onForecastEndChange($event)" [value]="this.forecastEndYear" formControlName="start" hideSingleSelectionIndicator>
-                                      <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
-                                      @for (year of forecastStartYears; track year) {
-                                      <mat-option [value]="year">{{ year }} ({{ year - clientBirthYear }})</mat-option>
-                                      }
-                                    </mat-select>
+                                    <div class="select-option">
+                                        <mat-select [disabled]="!enableForecastEdit"
+                                            (valueChange)="onForecastEndChange($event)" [value]="this.forecastEndYear"
+                                            formControlName="start" hideSingleSelectionIndicator>
+                                            <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
+                                            @for (year of forecastStartYears; track year) {
+                                            <mat-option [value]="year">{{ year }} ({{ year - clientBirthYear
+                                                }})</mat-option>
+                                            }
+                                        </mat-select>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                @if(enableForecastEdit) {
-                    <div class="row justify-content-end align-items-end flex-nowrap">
+                    @if(enableForecastEdit) {
+                    <div class="d-flex justify-content-end align-items-end flex-nowrap m-t-16">
                         <div>
                             <button (click)="onUpdateClicked()" type="button" class="button-icon">
                                 <span>Update</span>
                             </button>
                         </div>
                     </div>
-                }
+                    }
+                </div>
                 <!-- End Date Fields  -->
             </div>
         </mat-card-content>
