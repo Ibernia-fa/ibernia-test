@@ -25,6 +25,7 @@ import { TimelineHttpService } from '../services/timeline-http.service';
 import { catchError, filter } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
 import moment from 'moment';
+import { allCountries } from 'src/app/clients/models/country';
 interface Food {
   value: string;
   viewValue: string;
@@ -67,6 +68,7 @@ export class AddEventDialogComponent {
   selectedEventIconUrl: string;
   isEditWorkflow: boolean = false;
   patchEvent: ClientEvent | undefined | null;
+  countries = allCountries;
 
 
   constructor(

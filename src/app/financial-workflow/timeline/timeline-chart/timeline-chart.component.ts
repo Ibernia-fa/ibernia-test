@@ -405,10 +405,10 @@ export class TimelineChartComponent implements OnInit, OnChanges {
         return {
           id: event.id,
           content: this.getContent(event.name, event.iconUrl),
-          start: new Date(event.start.year, 0),
+          start: new Date(event.start.year, 1),
           end: event.end
-            ? new Date(event.end.year, 0)
-            : "",
+            ? new Date(event.end.year, 1)
+            : new Date(event.start.year+10, 1),
           className: event.iconUrl,
         };
       }
@@ -427,11 +427,11 @@ export class TimelineChartComponent implements OnInit, OnChanges {
         updateGroup: false, // Prevent moving events between groups
         remove: true, // Prevent deletion via UI
       },
-      snap: function (date: Date) {
-        const year = moment(date).year();
-        const snappedYear = Math.round(year / 5) * 5;
-        return new Date(snappedYear, 0, 1);
-      },
+      // snap: function (date: Date) {
+      //   const year = moment(date).year();
+      //   const snappedYear = Math.round(year / 5) * 5;
+      //   return new Date(snappedYear, 0, 1);
+      // },
       // snap: function (date, scale, step) {
       //   var hour = 60 * 60 * 1000;
       //   return Math.round(date / hour) * hour;
@@ -448,7 +448,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
       .toDate(),
       start: new Date(
         moment(this.financialTimeline.forecastStartDate).year(),
-        0
+        1
       ),
       // start: moment(this.financialTimeline.forecastStartDate)
       // .subtract(5, 'years')
@@ -458,6 +458,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
         .toDate(),
       max: this.financialTimeline.forecastEndtDate,
       minHeight: '304px',
+      width: '100%',
       align: 'left',
       showCurrentTime: false, // Hide default current time marker
       // showCustomTime: true, // Allows custom markers
@@ -466,7 +467,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
       format: {
         minorLabels: function (date: any) {
           return `
-          <div>
+          <div id='selected'>
             <p>${date.year() - clientBirthDateYear}</p>
             <span>${date.year()}</span>
           </div>`;
@@ -513,6 +514,34 @@ export class TimelineChartComponent implements OnInit, OnChanges {
 
     var clientEvent = this.financialTimeline.clientEvents.find((event) => event.id === item.id);
     if(clientEvent) {
+      if(this.systemEventsLibrary.filter(event => event.isPlaceHolder).some(event => event.name === clientEvent?.name)) {
+        clientEvent.start = {
+          year: moment(new Date(moment(item.start).year(), 1)).year(),
+          age: moment(new Date(moment(item.start).year(), 1)).year() - moment(this.clientBirthDate).year(),
+        };
+        this.timelineHttpService
+          .addEvent(clientEvent, this.financialTimeline.id)
+          .pipe(
+            // filter(res => !!res),
+            take(1),
+            map((res) => {
+              // this.financialTimeline.clientEvents.push(clientEvent);
+              this.draggedEvent = null;
+              this.timeline.setItems(this.timelineData);
+              this.cdr.detectChanges();
+              this.timeline.redraw();
+            }),
+            catchError((err) => {
+              console.error(err);
+              this.draggedEvent = null;
+              throw err;
+            })
+          )
+          .subscribe((res) => {
+            callback(item)
+          });
+      }
+
       if (
         clientEvent.name === 'Inheritance' ||
         clientEvent.name === 'Wedding'
@@ -579,7 +608,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
         });
       }
 
-      if(this.systemEventsLibrary.filter(event => event.isPlaceHolder).every(event => event.name !== clientEvent?.name)) {
+      if(this.systemEventsLibrary.every(event => event.name !== clientEvent?.name)) {
         const dialogRef = this.dialog.open(AddEventDialogComponent, {
           width: '900px',
           disableClose: true,
@@ -616,38 +645,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
       // Object.assign<ClientEvent, ClientEvent>(clientEvent, this.draggedEvent);
 
       if(clientEvent) {
-        clientEvent.start = {
-          year: moment(new Date(moment(item.start).year(), 1)).year(),
-          age: moment(new Date(moment(item.start).year(), 1)).year() - moment(this.clientBirthDate).year(),
-        };
-        this.timelineHttpService
-          .addEvent(clientEvent, this.financialTimeline.id)
-          .pipe(
-            // filter(res => !!res),
-            take(1),
-            map((res) => {
-              if(this.financialTimeline.clientEvents.length < 1) {
-                this.financialTimeline.startAt = {
-                  age: clientEvent.start.age,
-                  year: clientEvent.start.year
-                }
-                this.timeline.addCustomTime(new Date(this.financialTimeline.startAt.year, 1), 't1');
-              }
-              this.financialTimeline.clientEvents.push(clientEvent);
-              this.draggedEvent = null;
-              this.timeline.setItems(this.timelineData);
-              this.cdr.detectChanges();
-              this.timeline.redraw();
-            }),
-            catchError((err) => {
-              console.error(err);
-              this.draggedEvent = null;
-              throw err;
-            })
-          )
-          .subscribe((res) => {
-            callback(item)
-          });
+        
         }
 
       }

@@ -31,7 +31,7 @@
 <div class="d-flex flex-column gap-32">
   <!-- Modal Header  -->
   <div class="d-flex align-items-center justify-content-between gap-10 modal-header">
-    <h3>Inheritance / Wedding</h3>
+    <h3>{{systemEvent?.name}}</h3>
     <button (click)="closeDialog()" type="button">
       <img src="assets/images/svgs/close-line-cion.svg" alt="close-line-cion" />
     </button>
@@ -67,10 +67,13 @@
         <!-- Currency Selector  -->
         <div class="left">
           <mat-select value="£" formControlName="currency" class="sortby-edit-profile" hideSingleSelectionIndicator>
-            @for (currencySymbol of currencySymbols; track currencySymbol) {
-            <mat-option [value]="currencySymbol">{{
-              currencySymbol
-              }}</mat-option>
+            @for (country of countries; track country) {
+              @if(country.currencySymbol) {
+                <mat-option [value]="country.currencySymbol">{{
+                  country.currencySymbol
+                  }}</mat-option>
+
+              }
             }
           </mat-select>
         </div>
@@ -184,10 +187,14 @@
         <!-- Currency Selector  -->
         <div class="left">
           <mat-select value="£" formControlName="currency" class="sortby-edit-profile" hideSingleSelectionIndicator>
-            @for (currencySymbol of currencySymbols; track currencySymbol) {
-            <mat-option [value]="currencySymbol">{{
-              currencySymbol
-              }}</mat-option>
+            
+            @for (country of countries; track country) {
+              @if(country.currencySymbol) {
+                <mat-option [value]="country.currencySymbol">{{
+                  country.currencySymbol
+                  }}</mat-option>
+
+              }
             }
           </mat-select>
         </div>
@@ -426,10 +433,13 @@
             <!-- Currency Selector  -->
             <div class="left">
               <mat-select value="£" formControlName="currency" class="sortby-edit-profile" hideSingleSelectionIndicator>
-                @for (currencySymbol of currencySymbols; track currencySymbol) {
-                <mat-option [value]="currencySymbol">{{
-                  currencySymbol
-                  }}</mat-option>
+                @for (country of countries; track country) {
+                  @if(country.currencySymbol) {
+                    <mat-option [value]="country.currencySymbol">{{
+                      country.currencySymbol
+                      }}</mat-option>
+
+                  }
                 }
               </mat-select>
             </div>

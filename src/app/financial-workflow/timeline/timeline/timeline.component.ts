@@ -17,6 +17,7 @@ import { MatSelectModule } from '@angular/material/select';
 import moment from 'moment';
 import { DialogComponent } from 'src/app/dialog/dialog.component';
 import { MatDialog } from '@angular/material/dialog';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-timeline',
@@ -27,6 +28,7 @@ import { MatDialog } from '@angular/material/dialog';
     MatInputModule,
     MatDatepickerModule,
     MatIconModule,
+    MatButtonModule,
     MatProgressSpinnerModule,
     TimelineChartComponent,
     MatSelectModule,
@@ -44,6 +46,7 @@ export class TimelineComponent {
   forecastStartYear: number;
   forecastEndYear: number;
   clientBirthYear: number;
+  enableForecastEdit=false;
 
   constructor(
     private timelineHttpService: TimelineHttpService,
@@ -99,14 +102,15 @@ export class TimelineComponent {
     this.financialTimeline.forecastEndtDate = new Date(this.forecastEndYear, 1);
     const dialogRef = this.dialog.open(DialogComponent, {
       data: {
-        action: 'Delete',
-        text: 'Updating these dates will clear out the existing timeline events?',
+        action: 'Update',
+        text: 'This action will affect the timeline events?',
       },
       width: '460px',
     });
     dialogRef.afterClosed().subscribe((result) => {
       console.log(result);
-      if (result.event === 'Delete') {
+      this.enableForecastEdit=false
+      if (result.event === 'Update') {
         this.updateTimeline();
       }
     });

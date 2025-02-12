@@ -167,7 +167,7 @@ export class ClientEditComponent {
   onSubmit() {
     this.clientForm.markAllAsTouched();
     this.clientForm.markAsDirty();
-    if (this.clientForm.valid) {
+    if (!this.isFormInvalid) {
       const partnerGroup = this.clientForm.get('partner') as FormGroup;
       var client: Client = {
         id: this.clientId,
@@ -177,7 +177,7 @@ export class ClientEditComponent {
           gender: this.clientForm.controls['gender'].value,
           country: this.clientForm.controls['country'].value,
           name: this.clientForm.controls['name'].value,
-          phone: this.clientForm.controls['phone'].value.e164Number,
+          phone: this.clientForm.controls['phone'].value?.e164Number,
           preferredCurrency: this.clientForm.controls['currency'].value,
         },
         partnerDetail: this.showPartner ? {
@@ -186,7 +186,7 @@ export class ClientEditComponent {
           gender: partnerGroup.controls['gender']?.value,
           country: partnerGroup.controls['country']?.value,
           name: partnerGroup.controls['name']?.value,
-          phone: partnerGroup.controls['phone']?.value.e164Number,
+          phone: partnerGroup.controls['phone']?.value?.e164Number,
           preferredCurrency:
             partnerGroup.controls['currency']?.value,
         } : null,

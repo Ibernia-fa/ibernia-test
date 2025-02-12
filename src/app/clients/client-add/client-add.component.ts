@@ -143,7 +143,7 @@ export class ClientAddComponent {
         gender: this.clientForm.controls['gender'].value,
         country: this.clientForm.controls['country'].value,
         name: this.clientForm.controls['name'].value,
-        phone: this.clientForm.controls['phone'].value.e164Number,
+        phone: this.clientForm.controls['phone'].value?.e164Number,
         preferredCurrency: this.clientForm.controls['currency'].value,
       },
       partnerDetail: this.showPartner
@@ -153,7 +153,7 @@ export class ClientAddComponent {
             gender: partnerGroup.controls['gender']?.value,
             country: partnerGroup.controls['country']?.value,
             name: partnerGroup.controls['name']?.value,
-            phone: partnerGroup.controls['phone']?.value.e164Number,
+            phone: partnerGroup.controls['phone']?.value?.e164Number,
             preferredCurrency: partnerGroup.controls['currency']?.value,
           }
         : null,
@@ -169,7 +169,7 @@ export class ClientAddComponent {
   onAddNewClientClicked() {
     this.clientForm.markAllAsTouched();
     this.clientForm.markAsDirty();
-    if (this.clientForm.valid) {
+    if (!this.isFormInvalid) {
       var client: Client = this.getClientFormInfo();
       this.clientHttpService
         .addClient(client)
@@ -208,7 +208,7 @@ export class ClientAddComponent {
   onSubmit() {
     this.clientForm.markAllAsTouched();
     this.clientForm.markAsDirty();
-    if (this.clientForm.valid) {
+    if (!this.isFormInvalid) {
       var client: Client = this.getClientFormInfo();
       this.clientHttpService
         .addClient(client)
