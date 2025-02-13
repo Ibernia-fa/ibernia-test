@@ -147,6 +147,9 @@ export class TimelineChartComponent implements OnInit, OnChanges {
     // Get the dropped position on the timeline
     const dropTime = this.timeline.getEventProperties(event).time;
 
+    if(moment(dropTime).year() < moment(this.financialTimeline.forecastStartDate).year() || moment(dropTime).year() > moment(this.financialTimeline.forecastEndtDate).year())
+      return;
+
     const newEvent = {
       id: this.draggedEvent.id, // Unique ID
       content: this.draggedEvent.name,
@@ -406,7 +409,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
           id: event.id,
           content: this.getContent(event.name, event.iconUrl),
           start: new Date(event.start.year, 1),
-          end: event.end
+          end: event.end && event.end.year > 0
             ? new Date(event.end.year, 1)
             : new Date(event.start.year+10, 1),
           className: event.iconUrl,
@@ -456,7 +459,9 @@ export class TimelineChartComponent implements OnInit, OnChanges {
       end: moment(this.financialTimeline.forecastStartDate)
         .add(100, 'years')
         .toDate(),
-      max: this.financialTimeline.forecastEndtDate,
+      max: moment(this.financialTimeline.forecastEndtDate)
+      .add(3, 'years')
+      .toDate(),
       minHeight: '304px',
       width: '100%',
       align: 'left',

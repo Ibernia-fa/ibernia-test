@@ -24,6 +24,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { allCountries } from '../models/country';
 import { CountryISO, NgxIntlTelInputModule } from 'ngx-intl-tel-input';
+import { countryDialCodes } from '../models/country-code';
 
 
 @Component({
@@ -60,6 +61,7 @@ export class ClientEditComponent {
   allCountries = allCountries;
   selectedClientCountryISO = CountryISO.UnitedStates;
   selectedPartnerCountryISO = CountryISO.UnitedStates;
+  allControlCountries= countryDialCodes
 
   constructor(
     private fb: FormBuilder,
@@ -114,7 +116,6 @@ export class ClientEditComponent {
     return this.clientForm.controls['name'].invalid || this.clientForm.controls['dob'].invalid
   }
 
-
   getClient() {
     this.activatedRoute.params.pipe(
       switchMap((params) => {
@@ -127,7 +128,10 @@ export class ClientEditComponent {
         this.clientForm.controls['gender'].patchValue(res.clientDetails.gender);
         this.clientForm.controls['country'].patchValue(res.clientDetails.country);
         this.clientForm.controls['name'].patchValue(res.clientDetails.name);
-        this.clientForm.controls['phone'].patchValue(res.clientDetails.phone);
+        const index = countryDialCodes.findIndex(x => res.clientDetails.phone.slice(1, res.clientDetails.phone.length).startsWith(x.DialCode));
+        this.clientForm.controls['phone'].patchValue(res.clientDetails.phone.slice(countryDialCodes[index].DialCode.length + 1));
+        this.selectedClientCountryISO = countryDialCodes[index].ISOCode as CountryISO;
+        
         this.clientForm.controls['currency'].patchValue(res.clientDetails.preferredCurrency);
         this.clientForm.controls['notes'].patchValue(res.notes);
         if(res.partnerDetail?.name) {
@@ -138,7 +142,9 @@ export class ClientEditComponent {
           partnerFormGroup.controls['gender'].patchValue(res.partnerDetail.gender);
           partnerFormGroup.controls['country'].patchValue(res.partnerDetail.country);
           partnerFormGroup.controls['name'].patchValue(res.partnerDetail.name);
-          partnerFormGroup.controls['phone'].patchValue(res.partnerDetail.phone);
+          const index = countryDialCodes.findIndex(x => res.partnerDetail?.phone.slice(1, res.partnerDetail.phone.length).startsWith(x.DialCode));
+          partnerFormGroup.controls['phone'].patchValue(res.partnerDetail.phone.slice(countryDialCodes[index].DialCode.length + 1));
+          this.selectedPartnerCountryISO = countryDialCodes[index].ISOCode as CountryISO;
           partnerFormGroup.controls['currency'].patchValue(res.partnerDetail.preferredCurrency);
         }
 
