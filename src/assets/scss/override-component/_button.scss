@@ -137,7 +137,8 @@ html {
 
 // New Styles
 // icon button Styles
-.button-icon {
+.button-icon,
+.button-icon-outline {
   background-color: #516ce8;
   padding: 12px 24px;
   border-radius: 4px;
@@ -148,6 +149,7 @@ html {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex: none;
   gap: 8px;
   cursor: pointer;
   font-family: "Ubuntu", serif;
@@ -161,15 +163,32 @@ html {
   border: none;
   outline: none;
 }
-.button-icon span {
+.button-icon span,
+.button-icon-outline span {
   font-size: 14px;
   line-height: 16px;
   font-weight: 700;
   color: white;
   display: block;
 }
-.button-icon:hover {
+.button-icon:hover,
+.button-icon-outline:hover {
   opacity: 0.9;
   transition: opacity 0.3s linear;
+}
+
+.button-icon-outline {
+  background-color: white;
+  border: 1px solid #516ce8;
+  transition: all 0.3s linear;
+}
+.button-icon-outline span {
+  color: #516ce8;
+  font-size: 16px;
+  line-height: 18px;
+}
+.button-icon-outline:hover {
+  background-color: #516de810;
+  transition: all 0.3s linear;
 }
 // End New Styles

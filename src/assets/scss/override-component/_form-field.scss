@@ -39,6 +39,7 @@ html {
   line-height: 16px;
 }
 .form-field input,
+.form-field textarea,
 .form-field .select-option {
   width: 100%;
   display: block;
@@ -73,5 +74,10 @@ html {
   top: 50%;
   right: 6px;
   transform: translateY(-50%);
+}
+.form-field textarea {
+  padding: 16px;
+  min-height: 100px;
+  resize: none;
 }
 // End Form Fields

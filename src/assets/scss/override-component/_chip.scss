@@ -6,3 +6,73 @@
     focus-state-layer-color: var(--mat-option-focus-state-layer-color),
   )
 );
+
+.chips-custom {
+  margin-bottom: 8px;
+  .mdc-evolution-chip {
+    margin: 0 !important;
+  }
+  // .mat-mdc-standard-chip {
+  //   height: auto !important;
+  // }
+  .mat-mdc-chip-set .mdc-evolution-chip-set__chips {
+    gap: 8px !important;
+    margin-left: 0 !important;
+  }
+  .mat-mdc-chip-focus-overlay {
+    display: none;
+  }
+  .mat-mdc-chip-ripple {
+    display: none !important;
+  }
+  .chip-item {
+    padding: 4px 10px;
+    align-items: center;
+    display: flex;
+    &.retirement-age-icon {
+      background-color: #fff9f7 !important;
+      border: 1px solid #ffede7;
+    }
+    &.inheritance-icon {
+      background-color: #f8fff2 !important;
+      border: 1px solid #e8f4e1;
+    }
+    &.birth-icon {
+      background-color: #fffbf5 !important;
+      border: 1px solid #fff3e0;
+    }
+    &.wedding-icon {
+      background-color: #f8f5ff !important;
+      border: 1px solid #eae0ff;
+    }
+    &.mortality-icon {
+      background-color: #f7f7f7 !important;
+      border: 1px solid #f7f7f7;
+    }
+    &.state-pension-icon {
+      background-color: #f9f9ff !important;
+      border: 1px solid #ebecff;
+    }
+    border-radius: 999px !important;
+    .mdc-evolution-chip__graphic {
+      height: auto !important;
+      width: auto !important;
+      padding: 0 !important;
+    }
+  }
+  .mdc-evolution-chip__action--primary::before {
+    display: none;
+  }
+  .mdc-evolution-chip__action--primary {
+    padding: 0 !important;
+  }
+  // .mdc-evolution-chip__action {
+  //   gap: 8px;
+  // }
+  .mdc-evolution-chip__icon--primary {
+    border-radius: 0 !important;
+  }
+  .mat-mdc-chip-action-label {
+    display: flex;
+  }
+}

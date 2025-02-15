@@ -41,9 +41,9 @@ import {
   transition,
   trigger,
 } from '@angular/animations';
-import { ClientHttpService } from '../client-http.service';
+import { ClientHttpService } from '../services/client-http.service';
 import { catchError, filter, map } from 'rxjs';
-import { Client } from '../client';
+import { Client } from '../models/client';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
 import { DialogComponent } from 'src/app/dialog/dialog.component';
 import { MatSort, MatSortModule, Sort } from '@angular/material/sort';
@@ -51,6 +51,7 @@ import { TimeAgoPipe } from 'src/app/pipe/time-ago.pipe';
 import { AgeCalculatorPipe } from 'src/app/pipe/age-calculator.pipe';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { allCountries } from '../models/country';
 
 @Component({
   selector: 'app-client-list',
@@ -132,13 +133,13 @@ export class ClientListComponent implements OnInit, AfterViewInit {
 
   expandedClientElement: Client | null = null;
   expandedPartnerElement: Client | null = null;
+  isLoaderVisible = false;
 
   @ViewChild(MatTable, { static: true }) table: MatTable<any> =
     Object.create(null);
   @ViewChild(MatSort) sort: MatSort;
   searchText: any;
   clients: Array<Client>;
-
   // displayedColumns: string[] = [
   //   'client',
   //   'dob',
@@ -182,6 +183,16 @@ export class ClientListComponent implements OnInit, AfterViewInit {
           : element;
       event?.stopPropagation();
     }
+  }
+
+  clientExpandRowClicked(element: any, redirect: boolean = false) {
+    if(!element.partnerDetail?.name || redirect) {
+      this.router.navigate(['/clients/' + element.id + '/profile']);
+    }
+  }
+
+  partnerExpandRowClicked(element: any) {
+    this.router.navigate(['/clients/' + element.id + '/profile']);
   }
 
   announceSortChange(sortState: Sort) {
@@ -249,9 +260,13 @@ export class ClientListComponent implements OnInit, AfterViewInit {
     });
   }
   getClients() {
+    this.isLoaderVisible = true;
     this.clientHttpService
       .getClients()
-      .pipe(filter((clients) => !!clients))
+      .pipe(filter((clients) => {
+        this.isLoaderVisible = false;
+        return !!clients
+      }))
       .subscribe((clients) => {
         console.log(clients);
         this.dataSource = new MatTableDataSource(clients);
@@ -294,11 +309,6 @@ export class ClientListComponent implements OnInit, AfterViewInit {
       width: '460px',
     });
     dialogRef.afterClosed().subscribe((result) => {
-      // if (result.event === 'Add') {
-      //   this.addRowData(result.data);
-      // } else if (result.event === 'Update') {
-      //   this.updateRowData(result.data);
-      // } else
       if (result.event === 'Delete') {
         this.deleteRowData(result.data);
       }

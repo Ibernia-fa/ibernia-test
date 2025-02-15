@@ -12,6 +12,7 @@ export interface Details {
     birthDate: Date,
     preferredCurrency: string,
     gender: string,
+    country: string,
     email: string,
     phone: string
 }
@@ -19,4 +20,9 @@ export interface Details {
 export interface FinancialAdvisor {
     advisorId: string,
     advisorName: string
+}
+
+export interface ClientViewModel {
+    id: string,
+    name: string
 }

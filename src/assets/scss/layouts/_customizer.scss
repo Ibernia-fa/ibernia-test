@@ -116,3 +116,352 @@ html .customizerNav {
     border: 0 !important;
   }
 }
+
+// Vis Timeline Customization
+
+.vis-timeline {
+  border: none !important;
+  // border-radius: 12px;
+  // border-top: 1px solid red !important;
+  // border-left: 1px solid red !important;
+  // border-right: 1px solid red !important;
+  // border-left: 1px solid red !important;
+  // background: white !important;
+  background: transparent !important;
+}
+
+.vis-item {
+  padding: 4px 10px;
+  color: #1c1c1c;
+}
+
+.vis-item.vis-box,
+.vis-item.vis-range {
+  border-radius: 9999px !important;
+}
+.vis-item.vis-line {
+  background-color: transparent;
+  border: none !important;
+}
+.vis-item.vis-dot {
+  display: none;
+}
+.vis-item .vis-item-overflow {
+  min-height: 24px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+.vis-item .vis-item-content {
+  padding: 0 !important;
+  font-size: 14px;
+  line-height: 18px;
+
+  div {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    img {
+      height: 20px !important;
+      width: 20px !important;
+    }
+    span {
+      font-size: 14px;
+      line-height: 18px;
+      display: inline-block;
+    }
+  }
+}
+
+.vis-custom-time {
+  background-color: #b0b0b0 !important;
+  width: 1px !important;
+}
+.vis-time-axis .vis-grid.vis-minor {
+  border-width: 2px;
+  border-color: pink;
+}
+.vis-time-axis .vis-grid.vis-minor {
+  border-color: #f7f7f7 !important;
+}
+.vis-panel.vis-horizontal {
+  border: 1px solid #cfcfd7 !important;
+  border-radius: 12px !important;
+}
+.vis-panel.vis-vertical {
+  border-top: 1px solid #cfcfd7 !important;
+  border-radius: 12px !important;
+}
+.vis-panel.vis-center {
+  border-color: #cfcfd7;
+  border-radius: 12px !important;
+  border: none !important;
+}
+// Tags
+
+.vis-item.retirement-age-icon,
+.vis-item.retirement-age-icon.vis-selected {
+  background-color: #fff9f7;
+  color: #1c1c1c;
+  border: 1px solid #ffede7 !important;
+}
+.vis-item.mortality-icon,
+.vis-item.mortality-icon.vis-selected {
+  background-color: #f7f7f7;
+  color: #1c1c1c;
+  border: 1px solid #e7e7eb !important;
+}
+
+.vis-item.inheritance-icon,
+.vis-item.inheritance-icon.vis-selected {
+  background-color: #f8fff2;
+  color: #1c1c1c;
+  border: 1px solid #e8f4e1 !important;
+}
+
+.vis-item.birth-icon,
+.vis-item.birth-icon.vis-selected {
+  background-color: #fffbf5;
+  color: #1c1c1c;
+  border: 1px solid #fff3e0 !important;
+}
+.vis-item.birth-icon.vis-line {
+  display: none !important;
+}
+
+.vis-item.wedding-icon,
+.vis-item.wedding-icon.vis-selected {
+  background-color: #f8f5ff;
+  border: 1px solid #eae0ff !important;
+  color: #1c1c1c;
+}
+
+.vis-item.state-pension-icon,
+.vis-item.state-pension-icon.vis-selected {
+  background-color: #f9f9ff;
+  color: #1c1c1c;
+  border: 1px solid #ebecff !important;
+}
+.vis-item.education-icon,
+.vis-item.education-icon.vis-selected {
+  background-color: #eef4ff;
+  color: #1c1c1c;
+  border: 1px solid #dee7f6 !important;
+}
+.vis-item.car-icon,
+.vis-item.car-icon.vis-selected {
+  background-color: #fff4ed;
+  color: #1c1c1c;
+  border: 1px solid #eddace !important;
+}
+.vis-item.home-icon,
+.vis-item.home-icon.vis-selected {
+  background-color: #f0f9ff;
+  color: #1c1c1c;
+  border: 1px solid #e0ecf4 !important;
+}
+.vis-item.new-business-icon,
+.vis-item.new-business-icon.vis-selected {
+  background-color: #fef3f2;
+  color: #1c1c1c;
+  border: 1px solid #ffe8e5 !important;
+}
+.vis-item.boat-icon,
+.vis-item.boat-icon.vis-selected {
+  background-color: #ecfdf3;
+  color: #1c1c1c;
+  border: 1px solid #cbf1db !important;
+}
+.vis-item.travel-icon,
+.vis-item.travel-icon.vis-selected {
+  background-color: #f8f9fc;
+  color: #1c1c1c;
+  border: 1px solid #dfe3ef !important;
+}
+.vis-item.custom-icon,
+.vis-item.custom-icon.vis-selected {
+  background-color: #f9f9ff;
+  color: #1c1c1c;
+  border: 1px solid #ebecff !important;
+}
+
+.vis-item .vis-delete {
+  right: 0 !important;
+  padding: 0 !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  height: auto !important;
+  z-index: 999;
+}
+.vis-item .vis-delete:after {
+  color: #1c1c1c !important;
+  font-size: 18px !important;
+  font-weight: normal !important;
+}
+.vis-item .vis-delete:hover {
+  background: transparent !important;
+}
+.vis-item.birth-icon.vis-selected .vis-item-content,
+.vis-item.retirement-age-icon.vis-selected .vis-item-content,
+.vis-item.home-icon.vis-selected .vis-item-content,
+.vis-item.car-icon.vis-selected .vis-item-content,
+.vis-item.new-business-icon.vis-selected .vis-item-content,
+.vis-item.education-icon.vis-selected .vis-item-content,
+.vis-item.custom-icon.vis-selected .vis-item-content,
+.vis-item.travel-icon.vis-selected .vis-item-content,
+.vis-item.boat-icon.vis-selected .vis-item-content,
+.vis-item.retirement-icon.vis-selected .vis-item-content,
+.vis-item.wedding-icon.vis-selected .vis-item-content,
+.vis-item.mortality-icon.vis-selected .vis-item-content,
+.vis-item.state-pension-icon.vis-selected .vis-item-content,
+.vis-item.inheritance-icon.vis-selected .vis-item-content {
+  font-weight: 600 !important;
+}
+
+// Lines Hieght Controls
+.vis-custom-time.t1 {
+  height: 77% !important;
+  top: 8px !important;
+}
+
+.vis-custom-time.dragOver {
+  height: 77% !important;
+  top: 8px !important;
+  background-color: #516ce8 !important;
+}
+.vis-time-axis .vis-grid.vis-vertical {
+  height: 77% !important;
+  top: 8px;
+}
+
+// Style Date of Vis Timeline
+.vis-time-axis .vis-text.vis-minor {
+  opacity: 30%;
+  div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    p {
+      margin: 0px;
+      font-size: 10px;
+      line-height: 11.49px;
+      color: #48475d;
+    }
+    span {
+      display: inline-block;
+      font-size: 10px;
+      line-height: 11.49px;
+      color: #768396;
+    }
+  }
+}
+.vis-time-axis .vis-text.vis-current-year {
+  opacity: 100%;
+  div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    p {
+      margin: 0px;
+      font-size: 22px;
+      line-height: 25px;
+      color: #48475d;
+    }
+    span {
+      display: inline-block;
+      font-size: 10px;
+      line-height: 11.49px;
+    }
+  }
+}
+// End Vis Timeline Customization
+
+// Card Styles
+.cardWithShadow {
+  border-radius: 12px !important;
+  border: 1px solid #e7e7eb !important;
+  box-shadow: none !important;
+  @media (max-width: 768px) {
+    border-radius: 8px;
+    .mat-mdc-card-content {
+      padding: 16px !important;
+    }
+  }
+}
+
+// Edit Profile Dropdown
+.dropdown-menus {
+  .mat-mdc-menu-item .mat-icon {
+    margin-right: 8px !important;
+  }
+  .mat-mdc-menu-content {
+    padding: 0 0 !important;
+    button {
+      min-height: auto !important;
+      padding: 12px 24px;
+      span {
+        font-size: 14px;
+        line-height: 20px;
+        color: #5e5e73;
+      }
+    }
+  }
+  // .mat-mdc-menu-panel {
+  // }
+  min-width: 140px !important;
+}
+
+.sortby-edit-profile {
+  width: auto !important;
+  min-width: 156px !important;
+  padding: 8px 16px !important;
+}
+
+// Modal Styles
+.modal-header {
+  h3 {
+    font-size: 24px;
+    line-height: 36px;
+    font-weight: 700;
+    color: #1c1c1c;
+  }
+  button {
+    padding: 0;
+    margin: 0;
+    border: none;
+    outline: none;
+    background-color: transparent;
+    cursor: pointer;
+  }
+}
+
+.modal-action {
+  &.row {
+    margin: 0 !important;
+    .col-5 {
+      padding: 0 !important;
+    }
+    .f-s-16 {
+      font-size: 16px !important;
+      line-height: 18px !important;
+    }
+  }
+}
+
+// End Modal Styles
+
+// Modal Container
+
+.mat-mdc-dialog-container .mat-mdc-dialog-content {
+  padding: 0 4px 0 0 !important;
+}
+
+// Input Telephone Styles
+
+.tel-input-custom {
+  .iti {
+    width: 100%;
+  }
+  .iti__country-list {
+    max-height: 300px;
+  }
+}

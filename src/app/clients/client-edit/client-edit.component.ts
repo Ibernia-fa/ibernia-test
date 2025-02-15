@@ -16,12 +16,16 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
 import { AppBreadcrumbComponent } from 'src/app/layouts/full/shared/breadcrumb/breadcrumb.component';
 import { FiveDayRangeSelectionStrategy } from 'src/app/pages/forms/form-elements';
-import { ClientHttpService } from '../client-http.service';
+import { ClientHttpService } from '../services/client-http.service';
 import { catchError, filter, map, switchMap } from 'rxjs';
-import { Client } from '../client';
+import { Client } from '../models/client';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
+import { allCountries } from '../models/country';
+import { CountryISO, NgxIntlTelInputModule } from 'ngx-intl-tel-input';
+import { countryDialCodes } from '../models/country-code';
+
 
 @Component({
   selector: 'app-client-edit',
@@ -36,6 +40,7 @@ import { MatButtonModule } from '@angular/material/button';
     MatSelectModule,
     MatButtonModule,
     MatCardModule,
+    NgxIntlTelInputModule
   ],
   providers: [
     ClientHttpService,
@@ -53,6 +58,10 @@ export class ClientEditComponent {
   clientForm: FormGroup;
   clientId: string;
   showPartner: boolean = false;
+  allCountries = allCountries;
+  selectedClientCountryISO = CountryISO.UnitedStates;
+  selectedPartnerCountryISO = CountryISO.UnitedStates;
+  allControlCountries= countryDialCodes
 
   constructor(
     private fb: FormBuilder,
@@ -65,6 +74,7 @@ export class ClientEditComponent {
       name: ['', Validators.required],
       dob: ['', Validators.required],
       gender: [''],
+      country: [''],
       currency: [''],
       email: ['', [Validators.email]],
       phone: [''],
@@ -73,6 +83,7 @@ export class ClientEditComponent {
         name: [''],
         dob: [''],
         gender: [''],
+        country: [''],
         currency: [''],
         email: ['', [Validators.email]],
         phone: [''],
@@ -81,6 +92,28 @@ export class ClientEditComponent {
 
     this.getClient();
     this.togglePartnerSection(false); // Ensure partner section validations are off initially
+  }
+
+  
+  clientCountryValueChange(event: any) {
+    const selectedCountry = allCountries.find(country => country.countryName === event);
+    this.clientForm.controls['currency'].patchValue(selectedCountry?.currencySymbol);
+    this.selectedClientCountryISO = (selectedCountry?.countryCode.toLowerCase() ?? '') as CountryISO
+  }
+  
+  partnerCountryValueChange(event: any) {
+    const selectedCountry = allCountries.find(country => country.countryName === event);
+    (this.clientForm.get('partner') as FormGroup).controls['currency'].patchValue(selectedCountry?.currencySymbol);
+    this.selectedPartnerCountryISO = (selectedCountry?.countryCode.toLowerCase() ?? '') as CountryISO
+  }
+
+  get isFormInvalid() {
+    const partnerGroup = this.clientForm.get('partner') as FormGroup;
+    if(this.showPartner) {
+      return this.clientForm.controls['name'].invalid || this.clientForm.controls['dob'].invalid || 
+      partnerGroup.controls['name'].invalid || partnerGroup.controls['dob'].invalid
+    }
+    return this.clientForm.controls['name'].invalid || this.clientForm.controls['dob'].invalid
   }
 
   getClient() {
@@ -93,8 +126,12 @@ export class ClientEditComponent {
         this.clientForm.controls['dob'].patchValue(res.clientDetails.birthDate);
         this.clientForm.controls['email'].patchValue(res.clientDetails.email);
         this.clientForm.controls['gender'].patchValue(res.clientDetails.gender);
+        this.clientForm.controls['country'].patchValue(res.clientDetails.country);
         this.clientForm.controls['name'].patchValue(res.clientDetails.name);
-        this.clientForm.controls['phone'].patchValue(res.clientDetails.phone);
+        const index = countryDialCodes.findIndex(x => res.clientDetails.phone.slice(1, res.clientDetails.phone.length).startsWith(x.DialCode));
+        this.clientForm.controls['phone'].patchValue(res.clientDetails.phone.slice(countryDialCodes[index].DialCode.length + 1));
+        this.selectedClientCountryISO = countryDialCodes[index].ISOCode as CountryISO;
+        
         this.clientForm.controls['currency'].patchValue(res.clientDetails.preferredCurrency);
         this.clientForm.controls['notes'].patchValue(res.notes);
         if(res.partnerDetail?.name) {
@@ -103,8 +140,11 @@ export class ClientEditComponent {
           partnerFormGroup.controls['dob'].patchValue(res.partnerDetail.birthDate);
           partnerFormGroup.controls['email'].patchValue(res.partnerDetail.email);
           partnerFormGroup.controls['gender'].patchValue(res.partnerDetail.gender);
+          partnerFormGroup.controls['country'].patchValue(res.partnerDetail.country);
           partnerFormGroup.controls['name'].patchValue(res.partnerDetail.name);
-          partnerFormGroup.controls['phone'].patchValue(res.partnerDetail.phone);
+          const index = countryDialCodes.findIndex(x => res.partnerDetail?.phone.slice(1, res.partnerDetail.phone.length).startsWith(x.DialCode));
+          partnerFormGroup.controls['phone'].patchValue(res.partnerDetail.phone.slice(countryDialCodes[index].DialCode.length + 1));
+          this.selectedPartnerCountryISO = countryDialCodes[index].ISOCode as CountryISO;
           partnerFormGroup.controls['currency'].patchValue(res.partnerDetail.preferredCurrency);
         }
 
@@ -131,7 +171,9 @@ export class ClientEditComponent {
   }
 
   onSubmit() {
-    if (this.clientForm.valid) {
+    this.clientForm.markAllAsTouched();
+    this.clientForm.markAsDirty();
+    if (!this.isFormInvalid) {
       const partnerGroup = this.clientForm.get('partner') as FormGroup;
       var client: Client = {
         id: this.clientId,
@@ -139,16 +181,18 @@ export class ClientEditComponent {
           birthDate: this.clientForm.controls['dob'].value,
           email: this.clientForm.controls['email'].value,
           gender: this.clientForm.controls['gender'].value,
+          country: this.clientForm.controls['country'].value,
           name: this.clientForm.controls['name'].value,
-          phone: this.clientForm.controls['phone'].value,
+          phone: this.clientForm.controls['phone'].value?.e164Number,
           preferredCurrency: this.clientForm.controls['currency'].value,
         },
         partnerDetail: this.showPartner ? {
           birthDate: partnerGroup.controls['dob']?.value,
           email: partnerGroup.controls['email']?.value,
           gender: partnerGroup.controls['gender']?.value,
+          country: partnerGroup.controls['country']?.value,
           name: partnerGroup.controls['name']?.value,
-          phone: partnerGroup.controls['phone']?.value,
+          phone: partnerGroup.controls['phone']?.value?.e164Number,
           preferredCurrency:
             partnerGroup.controls['currency']?.value,
         } : null,
@@ -180,4 +224,5 @@ export class ClientEditComponent {
       console.error('Form is invalid');
     }
   }
+
 }

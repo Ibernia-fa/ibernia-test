@@ -1,0 +1,573 @@
+<!-- <div class="m-t-20" style="max-width: 700px; margin: 0 auto; width: 100%">
+  <mat-card class="cardWithShadow">
+    <mat-card-content>
+
+    </mat-card-content>
+  </mat-card>
+</div> -->
+
+<!-- State Pension Event  -->
+<!-- <div class="m-t-20" style="max-width: 700px; margin: 0 auto; width: 100%">
+  <mat-card class="cardWithShadow">
+    <mat-card-content>
+
+    </mat-card-content>
+  </mat-card>
+</div> -->
+<!-- End State Pension Event  -->
+
+<!-- Custom Event  -->
+<!-- <div class="m-t-20" style="max-width: 700px; margin: 0 auto; width: 100%">
+  <mat-card class="cardWithShadow">
+    <mat-card-content>
+
+    </mat-card-content>
+  </mat-card>
+</div> -->
+<!-- End Custom Event  -->
+
+@if(selectedEventType === eventType.INHERITANCE){
+
+<div class="d-flex flex-column gap-32">
+  <!-- Modal Header  -->
+  <div class="d-flex align-items-center justify-content-between gap-10 modal-header">
+    <h3>{{systemEvent?.name}}</h3>
+    <button (click)="closeDialog()" type="button">
+      <img src="assets/images/svgs/close-line-cion.svg" alt="close-line-cion" />
+    </button>
+  </div>
+  <!-- End Modal Header  -->
+
+  <!-- Modal tabs  -->
+  <div class="d-flex flex-column gap-12 tab">
+    <span class="f-s-16 f-w-400">Type</span>
+    <div class="tabs">
+      <div class="row">
+        <div class="col-6">
+          <button class="button-icon w-100" [class]="{ active: isIncomeEvent }">
+            <span class="uppercase" [class]="{ active: isIncomeEvent }">Income</span>
+          </button>
+        </div>
+        <div class="col-6">
+          <button class="button-icon w-100" [class]="{ active: !isIncomeEvent }">
+            <span class="uppercase" [class]="{ active: !isIncomeEvent }">Expense</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- End Modal tabs  -->
+
+  <!-- Modal Body  -->
+  <div [formGroup]="eventForm" class="d-flex flex-column gap-20">
+    <!-- Net Amount Field  -->
+    <div class="d-flex flex-column gap-12 net-fields">
+      <span class="f-s-16 f-w-400">Net amount</span>
+      <div class="net-field d-flex align-items-center">
+        <!-- Currency Selector  -->
+        <div class="left">
+          <mat-select value="£" formControlName="currency" class="sortby-edit-profile" hideSingleSelectionIndicator>
+            @for (country of countries; track country) {
+              @if(country.currencySymbol) {
+                <mat-option [value]="country.currencySymbol">{{
+                  country.currencySymbol
+                  }}</mat-option>
+
+              }
+            }
+          </mat-select>
+        </div>
+        <!-- End Currency Selector  -->
+        <!-- Price Field  -->
+        <div class="w-100 form-field">
+          <input matInput type="number" formControlName="amount" placeholder="0" />
+        </div>
+        <!-- End Price Field  -->
+        <!-- End Type Field  -->
+        <div class="right">
+          <mat-select value="Select" [disabled]="systemEvent?.isOneOff === true" formControlName="cycle"
+            class="sortby-edit-profile" hideSingleSelectionIndicator>
+            <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
+            @for (cycle of cycles; track cycle) {
+            <mat-option [value]="cycle">{{ cycle }}</mat-option>
+            }
+          </mat-select>
+        </div>
+        <!-- End Type Field  -->
+      </div>
+      @if((eventForm.get('cycle')?.touched &&
+      eventForm.get('cycle')?.hasError('required')) ||
+      (eventForm.get('amount')?.touched &&
+      eventForm.get('amount')?.hasError('required')) ||
+      (eventForm.get('currency')?.touched &&
+      eventForm.get('currency')?.hasError('required'))) {
+      <span class="field-error d-block">Amount is required</span>
+      }
+    </div>
+    <!-- End Net Amount Field  -->
+    <div class="w-100 form-field gap-12">
+      <div class="d-flex gap-8 align-items-center">
+        <mat-label class="f-s-16 f-w-400 d-block">Age and date</mat-label>
+        <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
+      </div>
+      <div class="position-relative">
+        <div class="w-100 form-field">
+          <div class="select-option">
+            <mat-select value="Select" formControlName="ageDate" hideSingleSelectionIndicator>
+              <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
+              @for (year of years; track year) {
+              <mat-option [value]="year">{{ year }} ({{ year - clientBirthYear }})</mat-option>
+              }
+            </mat-select>
+          </div>
+          @if(eventForm.get('ageDate')?.touched &&
+          eventForm.get('ageDate')?.hasError('required')) {
+          <span class="field-error d-block">Age is required</span>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- End Modal Body  -->
+  <!-- Modal Action Button  -->
+  <div class="row justify-content-between modal-action">
+    <div class="col-5">
+      <button (click)="closeDialog()" class="button-icon-outline w-100 d-block">
+        <span class="f-s-16">Cancel</span>
+      </button>
+    </div>
+    <div class="col-5">
+      <button (click)="onInsuranceEventSubmit()" class="button-icon w-100 d-block">
+        <span class="f-s-16">Save</span>
+      </button>
+    </div>
+  </div>
+  <!-- End Modal Action Button  -->
+</div>
+}
+
+<!-- State Pension Event -->
+@if(selectedEventType === eventType.STATE_PENSION) {
+<div class="d-flex flex-column gap-32">
+  <!-- Modal Header  -->
+  <div class="d-flex align-items-center justify-content-between gap-10 modal-header">
+    <h3>State Pension</h3>
+    <button (click)="closeDialog()" type="button">
+      <img src="assets/images/svgs/close-line-cion.svg" alt="close-line-cion" />
+    </button>
+  </div>
+  <!-- End Modal Header  -->
+
+  <!-- Modal Body  -->
+  <div [formGroup]="eventForm" class="d-flex flex-column gap-20">
+    <!-- Modal tabs  -->
+    <div class="d-flex flex-column gap-12 tab">
+      <span class="f-s-16 f-w-400">Type</span>
+      <div class="tabs">
+        <div class="row">
+          <div class="col-6">
+            <button class="button-icon w-100" [class]="{ active: isIncomeEvent }">
+              <span class="uppercase" [class]="{ active: isIncomeEvent }">Income</span>
+            </button>
+          </div>
+          <div class="col-6">
+            <button class="button-icon w-100" [class]="{ active: !isIncomeEvent }">
+              <span class="uppercase" [class]="{ active: !isIncomeEvent }">Expense</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- End Modal tabs  -->
+
+    <!-- Net Amount Field  -->
+    <div class="d-flex flex-column gap-12 net-fields">
+      <span class="f-s-16 f-w-400">Net amount</span>
+      <div class="net-field d-flex align-items-center">
+        <!-- Currency Selector  -->
+        <div class="left">
+          <mat-select value="£" formControlName="currency" class="sortby-edit-profile" hideSingleSelectionIndicator>
+            
+            @for (country of countries; track country) {
+              @if(country.currencySymbol) {
+                <mat-option [value]="country.currencySymbol">{{
+                  country.currencySymbol
+                  }}</mat-option>
+
+              }
+            }
+          </mat-select>
+        </div>
+        <!-- End Currency Selector  -->
+        <!-- Price Field  -->
+        <div class="w-100 form-field">
+          <input matInput type="number" formControlName="amount" placeholder="0" />
+        </div>
+        <!-- End Price Field  -->
+        <!-- End Type Field  -->
+        <div class="right">
+          <mat-select (valueChange)="onCycleValueChange($event)" value="Select" [disabled]="systemEvent?.isOneOff === true" formControlName="cycle"
+            class="sortby-edit-profile" hideSingleSelectionIndicator>
+            <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
+            @for (cycle of cycles; track cycle) {
+            <mat-option [value]="cycle">{{ cycle }}</mat-option>
+            }
+          </mat-select>
+        </div>
+        <!-- End Type Field  -->
+      </div>
+      @if((eventForm.get('cycle')?.touched &&
+      eventForm.get('cycle')?.hasError('required')) ||
+      (eventForm.get('amount')?.touched &&
+      eventForm.get('amount')?.hasError('required')) ||
+      (eventForm.get('currency')?.touched &&
+      eventForm.get('currency')?.hasError('required'))) {
+      <span class="field-error d-block">Amount is required</span>
+      }
+    </div>
+    <!-- End Net Amount Field  -->
+
+    <!-- Start End  -->
+    <div class="start-end">
+      <div class="d-flex flex-column gap-12">
+        <div class="d-flex gap-8 align-items-center">
+          <mat-label class="f-s-16 f-w-400 d-block">Start @if(eventForm.get('cycle')?.value !=='One-Off') {& end}</mat-label>
+          <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
+        </div>
+        <div class="row justify-content-between align-items-start flex-nowrap">
+          <!-- Start Date  -->
+          <div [className]="eventForm.get('cycle')?.value !== 'One-Off' ? 'col-6' : 'w-100'">
+            <div class="w-100 form-field">
+              <div class="select-option">
+                <mat-select value="Select" formControlName="start" hideSingleSelectionIndicator>
+                  <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
+                  @for (year of years; track year) {
+                  <mat-option [value]="year">{{ year }} ({{ year - clientBirthYear }})</mat-option>
+                  }
+                </mat-select>
+              </div>
+            </div>
+            @if(eventForm.get('start')?.touched &&
+            eventForm.get('start')?.hasError('required')) {
+            <span class="field-error d-block">Date is required</span>
+            }
+          </div>
+
+          <!-- Divider  -->
+          
+          @if(eventForm.get('cycle')?.value !== 'One-Off') {
+            <div class="d-flex justify-content-center align-items-center">
+              <img src="assets/images/svgs/chevron-right-date-icon.svg" alt="chevron-right-date-icon" />
+            </div>
+            <!-- End Date  -->
+            <div class="col-6">
+              <div class="w-100 form-field">
+                <div class="select-option">
+                  <mat-select value="Select" formControlName="end" hideSingleSelectionIndicator>
+                    <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
+                    @for (event of eventsList; track event) {
+                    <mat-option [value]="event.year">{{ event.name }} ({{ event.age }})</mat-option>
+                    }
+                    <hr>
+                    @for (year of years; track year) {
+                      <mat-option [value]="year">{{ year }} ({{ year - clientBirthYear }})</mat-option>
+                      }
+                  </mat-select>
+                </div>
+                @if(eventForm.get('end')?.touched &&
+                eventForm.get('end')?.hasError('required')) {
+                <span class="field-error d-block">Date is required</span>
+                }
+              </div>
+            </div>
+          }
+
+        </div>
+      </div>
+    </div>
+    <!-- Finish Start End  -->
+
+    <div class="w-100 form-field gap-12">
+      <div class="d-flex gap-8 align-items-center">
+        <mat-label class="f-s-16 f-w-400 d-block">Escalation rate</mat-label>
+        <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
+      </div>
+      <div class="position-relative">
+        <div class="w-100 form-field">
+          <div class="select-option">
+            <mat-select formControlName="escalationRate" value="Select">
+              <mat-option value="2.5%">Increase at same rate as inflation (2.5%)</mat-option>
+              <mat-option value="0%">Don't increase with inflation</mat-option>
+            </mat-select>
+          </div>
+          @if(eventForm.get('escalationRate')?.touched &&
+          eventForm.get('escalationRate')?.hasError('required')) {
+          <span class="field-error d-block">Escalation Rate is required</span>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- End Modal Body  -->
+
+  <!-- Modal Action Button  -->
+  <div class="row justify-content-between modal-action">
+    <div class="col-5">
+      <button (click)="closeDialog()" class="button-icon-outline w-100 d-block">
+        <span class="f-s-16">Cancel</span>
+      </button>
+    </div>
+    <div class="col-5">
+      <button (click)="onPensionEventSubmit()" class="button-icon w-100 d-block">
+        <span class="f-s-16">Save</span>
+      </button>
+    </div>
+  </div>
+  <!-- End Modal Action Button  -->
+</div>
+}
+
+<!-- Custom Event -->
+
+@if(selectedEventType === eventType.CUSTOM) {
+<div class="w-100">
+  <div class="d-flex flex-column gap-32">
+    <!-- Modal Header  -->
+    <div class="d-flex align-items-center justify-content-between gap-10 modal-header">
+      <h3>Custom Event</h3>
+      <button (click)="closeDialog()" type="button">
+        <img src="assets/images/svgs/close-line-cion.svg" alt="close-line-cion" />
+      </button>
+    </div>
+    <!-- End Modal Header  -->
+
+    <!-- Modal Body  -->
+    <mat-dialog-content>
+      <div [formGroup]="eventForm" class="d-flex flex-column gap-20">
+        <!-- Name Field  -->
+        <div class="w-100 form-field gap-12">
+          <div class="d-flex gap-8 align-items-center">
+            <mat-label class="f-s-16 f-w-400 d-block">Event</mat-label>
+            <!-- <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" /> -->
+          </div>
+          <div class="position-relative">
+            <div class="w-100 form-field">
+              <div class="select-option">
+                <mat-select (valueChange)="onEventNameValueChange($event)" formControlName="eventName" value="Select"
+                  style="height: 24px">
+                  <mat-select-trigger>
+                    <div class="d-flex align-items-center gap-8">
+                      <img [src]="'/assets/images/svgs/' + selectedEventIconUrl + '.svg'"
+                        [alt]="selectedEventIconUrl" />
+                      <span>
+                        {{ selectedEventName }}
+                      </span>
+                    </div>
+                  </mat-select-trigger>
+                  <!-- <mat-option value="2.5%">Increase at same rate as inflation (2.5%)</mat-option> -->
+                  @for (event of customEventsLibrary; track event) {
+                  <mat-option [value]="event.name">
+                    <div class="d-flex align-items-center gap-8">
+                      <img [src]="'/assets/images/svgs/' + event.iconUrl + '.svg'" [alt]="event.iconUrl" />
+                      <span>
+                        {{ event.name }}
+                      </span>
+                    </div>
+                  </mat-option>
+                  }
+                  <mat-option value="Custom">
+                    <div class="d-flex align-items-center gap-8">
+                      <img src="/assets/images/svgs/state-pension-icon.svg" alt="custom-event" height="24" width="24" />
+                      <span>
+                        Custom
+                      </span>
+                    </div>
+                  </mat-option>
+                </mat-select>
+              </div>
+              @if(eventForm.get('eventName')?.touched &&
+              eventForm.get('eventName')?.hasError('required')) {
+              <span class="field-error d-block">Event is required</span>
+              }
+            </div>
+          </div>
+        </div>
+        @if(eventForm.get('eventName')?.value === 'Custom' &&
+        eventForm.get('name')) {
+        <div class="w-100 form-field gap-12">
+          <mat-label class="f-s-16 d-block" style="line-height: 18px">Name</mat-label>
+          <input matInput formControlName="name" />
+          @if(eventForm.get('name')?.touched &&
+          eventForm.get('name')?.hasError('required')) {
+          <span class="field-error d-block">Name is required</span>
+          }
+        </div>
+        }
+        <!--End  Name Field  -->
+        <!-- Modal tabs  -->
+        <div class="d-flex flex-column gap-12 tab">
+          <span class="f-s-16 f-w-400">Type</span>
+          <div class="tabs">
+            <div class="row">
+              <div class="col-6">
+                <button (click)="onIncomeControlClicked(true)" class="button-icon w-100"
+                  [class]="{ active: isIncomeEvent }">
+                  <span class="uppercase" [class]="{ active: isIncomeEvent }">Income</span>
+                </button>
+              </div>
+              <div class="col-6">
+                <button (click)="onIncomeControlClicked(false)" class="button-icon w-100"
+                  [class]="{ active: !isIncomeEvent }">
+                  <span class="uppercase" [class]="{ active: !isIncomeEvent }">Expense</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- End Modal tabs  -->
+
+        <!-- Net Amount Field  -->
+        <div class="d-flex flex-column gap-12 net-fields">
+          <span class="f-s-16 f-w-400">Net amount</span>
+          <div class="net-field d-flex align-items-center">
+            <!-- Currency Selector  -->
+            <div class="left">
+              <mat-select value="£" formControlName="currency" class="sortby-edit-profile" hideSingleSelectionIndicator>
+                @for (country of countries; track country) {
+                  @if(country.currencySymbol) {
+                    <mat-option [value]="country.currencySymbol">{{
+                      country.currencySymbol
+                      }}</mat-option>
+
+                  }
+                }
+              </mat-select>
+            </div>
+            <!-- End Currency Selector  -->
+            <!-- Price Field  -->
+            <div class="w-100 form-field">
+              <input matInput type="number" formControlName="amount" placeholder="0" />
+            </div>
+            <!-- End Price Field  -->
+            <!-- End Type Field  -->
+            <div class="right">
+              <mat-select (valueChange)="onCycleValueChange($event)" value="Select" formControlName="cycle" class="sortby-edit-profile"
+                hideSingleSelectionIndicator>
+                <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
+                @for (cycle of cycles; track cycle) {
+                <mat-option [value]="cycle">{{ cycle }}</mat-option>
+                }
+              </mat-select>
+            </div>
+            <!-- End Type Field  -->
+          </div>
+          @if((eventForm.get('cycle')?.touched &&
+          eventForm.get('cycle')?.hasError('required')) ||
+          (eventForm.get('amount')?.touched &&
+          eventForm.get('amount')?.hasError('required')) ||
+          (eventForm.get('currency')?.touched &&
+          eventForm.get('currency')?.hasError('required'))) {
+          <span class="field-error d-block">Amount is required</span>
+          }
+        </div>
+        <!-- End Net Amount Field  -->
+
+        <!-- Start End  -->
+        <div class="start-end">
+          <div class="d-flex flex-column gap-12">
+            <div class="d-flex gap-8 align-items-center">
+              <mat-label class="f-s-16 f-w-400 d-block">Start @if(eventForm.get('cycle')?.value !== 'One-Off') {& end}</mat-label>
+              <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
+            </div>
+            <div class="row justify-content-between align-items-start flex-nowrap">
+              <!-- Start date  -->
+              <div [className]="eventForm.get('cycle')?.value !== 'One-Off' ? 'col-6' : 'w-100'">
+                <div class="w-100 form-field">
+                  <div class="select-option">
+                    <mat-select value="Select" formControlName="start" hideSingleSelectionIndicator>
+                      <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
+                      @for (year of years; track year) {
+                      <mat-option [value]="year">{{ year }} ({{ year - clientBirthYear }})</mat-option>
+                      }
+                    </mat-select>
+                  </div>
+                  @if(eventForm.get('start')?.touched &&
+                  eventForm.get('start')?.hasError('required')) {
+                  <span class="field-error d-block">Start is required</span>
+                  }
+                </div>
+              </div>
+
+              @if(eventForm.get('cycle')?.value !== 'One-Off') {
+                <!-- Divider  -->
+                <div class="d-flex justify-content-start align-items-start">
+                  <img src="assets/images/svgs/chevron-right-date-icon.svg" alt="chevron-right-date-icon" />
+                </div>
+                <!-- End date  -->
+                <div class="col-6">
+                  <div class="w-100 form-field">
+                    <div class="select-option">
+                      <mat-select value="Select" formControlName="end" hideSingleSelectionIndicator>
+                        <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
+                        @for (event of eventsList; track event) {
+                        <mat-option [value]="event.year">{{ event.name }} ({{ event.age }})</mat-option>
+                        }
+                        <hr>
+                        @for (year of years; track year) {
+                          <mat-option [value]="year">{{ year }} ({{ year - clientBirthYear }})</mat-option>
+                          }
+                      </mat-select>
+                    </div>
+                    @if(eventForm.get('end')?.touched &&
+                    eventForm.get('end')?.hasError('required')) {
+                    <span class="field-error d-block">End is required</span>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+        <!-- Finish Start End  -->
+
+        <div class="w-100 form-field gap-12">
+          <div class="d-flex gap-8 align-items-center">
+            <mat-label class="f-s-16 f-w-400 d-block">Escalation rate</mat-label>
+            <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
+          </div>
+          <div class="position-relative">
+            <div class="w-100 form-field">
+              <div class="select-option">
+                <mat-select formControlName="escalationRate" value="Select">
+                  <mat-option value="2.5%">Increase at same rate as inflation (2.5%)</mat-option>
+                  <mat-option value="0%">Don't increase with inflation</mat-option>
+                </mat-select>
+              </div>
+              @if(eventForm.get('escalationRate')?.touched &&
+              eventForm.get('escalationRate')?.hasError('required')) {
+              <span class="field-error d-block">Escalation Rate is required</span>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-dialog-content>
+    <!-- End Modal Body  -->
+
+    <!-- Modal Action Button  -->
+    <div class="row justify-content-between modal-action">
+      <div class="col-5">
+        <button (click)="closeDialog()" class="button-icon-outline w-100 d-block">
+          <span class="f-s-16">Cancel</span>
+        </button>
+      </div>
+      <div class="col-5">
+        <button (click)="onCustomEventSubmit()" class="button-icon w-100 d-block">
+          <span class="f-s-16">Save</span>
+        </button>
+      </div>
+    </div>
+    <!-- End Modal Action Button  -->
+  </div>
+</div>
+}

@@ -8,7 +8,7 @@ import {
   EventEmitter,
 } from '@angular/core';
 import { NavItem } from './nav-item';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NavService } from '../../../../../services/nav.service';
 import {
   animate,
@@ -22,6 +22,7 @@ import { TablerIconsModule } from 'angular-tabler-icons';
 import { MaterialModule } from 'src/app/material.module';
 import { CommonModule } from '@angular/common';
 import { MatRippleModule } from '@angular/material/core';
+import { NavItemService } from '../../../nav-item.service';
 
 @Component({
   selector: 'app-nav-item',
@@ -56,7 +57,7 @@ export class AppNavItemComponent implements OnChanges {
   @Input() item: NavItem | any;
   @Input() depth: any;
 
-  constructor(public navService: NavService, public router: Router) {
+  constructor(public navService: NavService, public router: Router, public navItem: NavItemService) {
     if (this.depth === undefined) {
       this.depth = 0;
     }

@@ -599,6 +599,18 @@ import { NavItem } from './nav-item/nav-item';
 //     external: true,
 //   },
 // ];
+export const navItemslower: NavItem[] = [
+  {
+    displayName: 'Goals',
+    iconName: '/assets/images/svgs/goals-nav-icon.svg',
+    route: '#',
+  },
+  {
+    displayName: 'Emergencies',
+    iconName: '/assets/images/svgs/danger-square-icon.svg',
+    route: '#',
+  },
+];
 export const navItems: NavItem[] = [
   // {
   //   navCap: 'Home',
@@ -607,7 +619,7 @@ export const navItems: NavItem[] = [
     displayName: 'Goals & Events',
     // iconName: 'clock',
     iconName: '/assets/images/svgs/clock-icon.svg',
-    route: '/finances',
+    route: '/cashflows/*/timeline',
   },
   {
     displayName: 'Saving Pots',
@@ -628,18 +640,12 @@ export const navItems: NavItem[] = [
     route: '',
   },
   {
-    displayName: 'Cashflow Model',
+    displayName: 'Charges & Fees',
     // iconName: 'trending-up',
     iconName: '/assets/images/svgs/wallet-icon.svg',
     route: '',
   },
   {
-    navCap: 'PREMIUM',
-  },
-  {
-    displayName: 'Emergencies',
-    // iconName: 'info-square-rounded',
-    iconName: '/assets/images/svgs/danger-square-icon.svg',
-    route: '',
+    navCap: 'Cashflow Model',
   },
 ];

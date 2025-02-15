@@ -1,21 +1,14 @@
 <mat-card class="edit-client-wrapper">
   <div class="edit-client-content-wrapper">
-    <app-breadcrumb
-      [showBackIcon]="true"
-      [routeForBack]="'/clients'"
-      title="Edit client"
-    ></app-breadcrumb>
-    <form
-      [formGroup]="clientForm"
-      (ngSubmit)="onSubmit()"
-      class="edit-client-form-wrapper"
-    >
+    <app-breadcrumb [showBackIcon]="true" [routeForBack]="'/clients'" title="Edit client"></app-breadcrumb>
+    <form [formGroup]="clientForm" (ngSubmit)="onSubmit()" class="edit-client-form-wrapper">
       <div class="row justify-content-between">
         <div class="col-6">
           <div class="w-100 form-field">
             <mat-label class="f-s-14 f-w-600 d-block">Client Name</mat-label>
             <input matInput placeholder="John Deo" formControlName="name" />
-            @if(clientForm.get('name')?.touched && clientForm.get('name')?.hasError('required')) {
+            @if(clientForm.get('name')?.touched &&
+            clientForm.get('name')?.hasError('required')) {
             <mat-error>Name is required</mat-error>
             }
           </div>
@@ -32,73 +25,14 @@
               <div class="date-picker-position">
                 <mat-datepicker-toggle matIconSuffix [for]="picker">
                   <mat-icon matDatepickerToggleIcon>
-                    <svg
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M8 2V5"
-                        stroke="#1C1C1C"
-                        stroke-width="2"
-                        stroke-miterlimit="10"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      />
-                      <path
-                        d="M16 2V5"
-                        stroke="#1C1C1C"
-                        stroke-width="2"
-                        stroke-miterlimit="10"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      />
-                      <path
-                        d="M3.5 9.08997H20.5"
-                        stroke="#1C1C1C"
-                        stroke-width="2"
-                        stroke-miterlimit="10"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      />
-                      <path
-                        d="M21 8.5V17C21 20 19.5 22 16 22H8C4.5 22 3 20 3 17V8.5C3 5.5 4.5 3.5 8 3.5H16C19.5 3.5 21 5.5 21 8.5Z"
-                        stroke="#1C1C1C"
-                        stroke-width="2"
-                        stroke-miterlimit="10"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      />
-                      <path
-                        d="M11.9945 13.7H12.0035"
-                        stroke="#1C1C1C"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      />
-                      <path
-                        d="M8.29529 13.7H8.30427"
-                        stroke="#1C1C1C"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      />
-                      <path
-                        d="M8.29529 16.7H8.30427"
-                        stroke="#1C1C1C"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      />
-                    </svg>
+                    <img src="assets/images/svgs/datepicker-icon.svg" alt="datepicker-icon" />
                   </mat-icon>
                 </mat-datepicker-toggle>
               </div>
               <mat-datepicker #picker></mat-datepicker>
             </div>
-            @if(clientForm.get('dob')?.touched && clientForm.get('dob')?.hasError('required')) {
+            @if(clientForm.get('dob')?.touched &&
+            clientForm.get('dob')?.hasError('required')) {
             <mat-error>Date Of Birth is required</mat-error>
             }
             <!-- </mat-form-field> -->
@@ -111,13 +45,35 @@
       <div class="row justify-content-between">
         <div class="col-6">
           <div class="w-100 form-field">
-            <mat-label class="f-s-14 f-w-600 d-block"
-              >Preferred Currency</mat-label
-            >
-            <input matInput placeholder="USD/AED" formControlName="currency" />
+            <mat-label class="f-s-14 f-w-600 d-block">Country</mat-label>
+
+            <div class="select-option">
+              <mat-select (valueChange)="clientCountryValueChange($event)" formControlName="country" value="Select">
+                @for(country of allCountries; track country) {
+                @if(country.currencySymbol) {
+                <mat-option [value]="country.countryName">{{country.countryName}}</mat-option>
+                }
+                }
+              </mat-select>
+            </div>
           </div>
         </div>
         <div class="col-6">
+          <div class="w-100 form-field">
+            <mat-label class="f-s-14 f-w-600 d-block">
+              Preferred Currency</mat-label>
+            <div class="select-option">
+              <mat-select formControlName="currency" value="Select">
+                @for(country of allCountries; track country) {
+                @if(country.currencySymbol) {
+                <mat-option [value]="country.currencySymbol">{{country.currencySymbol}}</mat-option>
+                }
+                }
+              </mat-select>
+            </div>
+          </div>
+        </div>
+        <!-- <div class="col-6">
           <div class="w-100 form-field">
             <mat-label class="f-s-14 f-w-600 d-block">Gender</mat-label>
             <div class="select-option">
@@ -127,21 +83,14 @@
               </mat-select>
             </div>
           </div>
-          <!-- <mat-form-field appearance="outline" class="w-100">
-                                <input matInput placeholder="Male/Female" formControlName="gender" />
-                            </mat-form-field> -->
-        </div>
+        </div> -->
       </div>
       <div class="checkbox-align d-flex flex-column gap-1">
         <div class="row justify-content-between">
           <div class="col-6">
             <div class="w-100 form-field">
               <mat-label class="f-s-14 f-w-600 d-block">Email</mat-label>
-              <input
-                matInput
-                placeholder="email@somedomain.com"
-                formControlName="email"
-              />
+              <input matInput placeholder="email@somedomain.com" formControlName="email" />
               @if(clientForm.get('email')?.hasError('email')) {
               <mat-error>Invalid Email Address</mat-error>
               }
@@ -150,22 +99,22 @@
           <div class="col-6">
             <div class="w-100 form-field">
               <mat-label class="f-s-14 f-w-600 d-block">Telephone</mat-label>
-              <input
+              <ngx-intl-tel-input [cssClass]="'custom'" [enableAutoCountrySelect]="true" [enablePlaceholder]="false"
+              [searchCountryFlag]="true" [selectFirstCountry]="false" [separateDialCode]="true" [selectedCountryISO]="selectedClientCountryISO"
+              [maxLength]="15" [phoneValidation]="false" name="phone"
+                formControlName="phone" class="tel-input-custom"></ngx-intl-tel-input>
+              <!-- <input
                 matInput
                 placeholder="00000000000"
                 formControlName="phone"
-              />
+              /> -->
             </div>
           </div>
         </div>
         <div class="checkbox-box">
           <div>
-            <input
-              type="checkbox"
-              id="partner-section"
-              [checked]="showPartner"
-              (change)="togglePartnerSection(!showPartner)"
-            />
+            <input type="checkbox" id="partner-section" [checked]="showPartner"
+              (change)="togglePartnerSection(!showPartner)" />
           </div>
           <label for="partner-section">Add a partner or spouse</label>
         </div>
@@ -183,93 +132,29 @@
             <div class="w-100 form-field">
               <mat-label class="f-s-14 f-w-600 d-block">Partner Name</mat-label>
               <input matInput placeholder="John Deo" formControlName="name" />
-              @if(clientForm.get('partner.name')?.touched && clientForm.get('partner.name')?.hasError('required')) {
+              @if(clientForm.get('partner.name')?.touched &&
+              clientForm.get('partner.name')?.hasError('required')) {
               <span class="field-error d-block">Name is required</span>
               }
             </div>
           </div>
           <div class="col-6">
             <div class="w-100 form-field">
-              <mat-label class="f-s-14 f-w-600 d-block"
-                >Date Of Birth</mat-label
-              >
+              <mat-label class="f-s-14 f-w-600 d-block">Date Of Birth</mat-label>
               <div class="position-relative">
-                <input
-                  matInput
-                  [matDatepicker]="partnerPicker"
-                  formControlName="dob"
-                />
+                <input matInput [matDatepicker]="partnerPicker" formControlName="dob" />
                 <!-- <mat-hint>MM/DD/YYYY</mat-hint> -->
                 <div class="date-picker-position">
                   <mat-datepicker-toggle matIconSuffix [for]="partnerPicker">
                     <mat-icon matDatepickerToggleIcon>
-                      <svg
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M8 2V5"
-                          stroke="#1C1C1C"
-                          stroke-width="2"
-                          stroke-miterlimit="10"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        />
-                        <path
-                          d="M16 2V5"
-                          stroke="#1C1C1C"
-                          stroke-width="2"
-                          stroke-miterlimit="10"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        />
-                        <path
-                          d="M3.5 9.08997H20.5"
-                          stroke="#1C1C1C"
-                          stroke-width="2"
-                          stroke-miterlimit="10"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        />
-                        <path
-                          d="M21 8.5V17C21 20 19.5 22 16 22H8C4.5 22 3 20 3 17V8.5C3 5.5 4.5 3.5 8 3.5H16C19.5 3.5 21 5.5 21 8.5Z"
-                          stroke="#1C1C1C"
-                          stroke-width="2"
-                          stroke-miterlimit="10"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        />
-                        <path
-                          d="M11.9945 13.7H12.0035"
-                          stroke="#1C1C1C"
-                          stroke-width="2"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        />
-                        <path
-                          d="M8.29529 13.7H8.30427"
-                          stroke="#1C1C1C"
-                          stroke-width="2"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        />
-                        <path
-                          d="M8.29529 16.7H8.30427"
-                          stroke="#1C1C1C"
-                          stroke-width="2"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        />
-                      </svg>
+                      <img src="assets/images/svgs/datepicker-icon.svg" alt="datepicker-icon" />
                     </mat-icon>
                   </mat-datepicker-toggle>
                 </div>
                 <mat-datepicker #partnerPicker></mat-datepicker>
               </div>
-              @if(clientForm.get('partner.dob')?.touched && clientForm.get('partner.dob')?.hasError('required')) {
+              @if(clientForm.get('partner.dob')?.touched &&
+              clientForm.get('partner.dob')?.hasError('required')) {
               <span class="field-error d-block">Date Of Birth is required</span>
               }
 
@@ -282,17 +167,35 @@
         <div class="row justify-content-between">
           <div class="col-6">
             <div class="w-100 form-field">
-              <mat-label class="f-s-14 f-w-600 d-block"
-                >Preferred Currency</mat-label
-              >
-              <input
-                matInput
-                placeholder="USD/AED"
-                formControlName="currency"
-              />
+              <mat-label class="f-s-14 f-w-600 d-block">Country</mat-label>
+
+              <div class="select-option">
+                <mat-select (valueChange)="partnerCountryValueChange($event)" formControlName="country" value="Select">
+                  @for(country of allCountries; track country) {
+                  @if(country.currencySymbol) {
+                  <mat-option [value]="country.countryName">{{country.countryName}}</mat-option>
+                  }
+                  }
+                </mat-select>
+              </div>
             </div>
           </div>
           <div class="col-6">
+            <div class="w-100 form-field">
+              <mat-label class="f-s-14 f-w-600 d-block">
+                Preferred Currency</mat-label>
+              <div class="select-option">
+                <mat-select formControlName="currency" value="Select">
+                  @for(country of allCountries; track country) {
+                  @if(country.currencySymbol) {
+                  <mat-option [value]="country.currencySymbol">{{country.currencySymbol}}</mat-option>
+                  }
+                  }
+                </mat-select>
+              </div>
+            </div>
+          </div>
+          <!-- <div class="col-6">
             <div class="w-100 form-field">
               <mat-label class="f-s-14 f-w-600 d-block">Gender</mat-label>
               <div class="select-option">
@@ -302,21 +205,13 @@
                 </mat-select>
               </div>
             </div>
-
-            <!-- <mat-form-field appearance="outline" class="w-100">
-                                    <input matInput placeholder="Male/Female" formControlName="gender" />
-                                </mat-form-field> -->
-          </div>
+          </div> -->
         </div>
         <div class="row justify-content-between">
           <div class="col-6">
             <div class="w-100 form-field">
               <mat-label class="f-s-14 f-w-600 d-block">Email</mat-label>
-              <input
-                matInput
-                placeholder="email@somedomain.com"
-                formControlName="email"
-              />
+              <input matInput placeholder="email@somedomain.com" formControlName="email" />
               @if(clientForm.get('partner.email')?.hasError('email')) {
               <span class="field-error d-block">Invalid Email Address</span>
               }
@@ -325,11 +220,15 @@
           <div class="col-6">
             <div class="w-100 form-field">
               <mat-label class="f-s-14 f-w-600 d-block">Telephone</mat-label>
-              <input
+              <ngx-intl-tel-input [cssClass]="'custom'" [enableAutoCountrySelect]="true" [enablePlaceholder]="false"
+              [searchCountryFlag]="true" [selectFirstCountry]="false" [separateDialCode]="true" 
+              [selectedCountryISO]="selectedPartnerCountryISO" [maxLength]="15" [phoneValidation]="false" name="phone"
+                formControlName="phone" class="tel-input-custom"></ngx-intl-tel-input>
+              <!-- <input
                 matInput
                 placeholder="0000000000"
                 formControlName="phone"
-              />
+              /> -->
             </div>
           </div>
         </div>
@@ -343,12 +242,7 @@
       </div>
       <div class="row justify-content-end">
         <div class="col-sm-12">
-          <button
-            mat-flat-button
-            class="btn-submit"
-            type="submit"
-            [disabled]="clientForm.invalid"
-          >
+          <button mat-flat-button class="btn-submit" type="submit" [disabled]="isFormInvalid">
             Save
           </button>
         </div>

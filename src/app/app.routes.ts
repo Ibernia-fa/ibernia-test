@@ -19,7 +19,7 @@ export const routes: Routes = [
           import('./clients/clients.routes').then((m) => m.ClientsRoutes),
       },
       {
-        path: 'finances',
+        path: 'cashflows',
         loadChildren: () =>
           import('./financial-workflow/financial-workflow.routes').then((m) => m.FinancialWorkflowRoutes),
       },

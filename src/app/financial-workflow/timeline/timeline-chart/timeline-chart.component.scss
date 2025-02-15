@@ -1,0 +1,117 @@
+// Timeline Section Style
+.timeline-wrapper {
+  .card-main-wrapper {
+    span.f-s-16 {
+      line-height: 18px;
+      text-decoration: underline;
+    }
+  }
+  @media (max-width: 768px) {
+    .flex-nowrap {
+      flex-wrap: wrap !important;
+    }
+  }
+
+  // Date Field Styles
+  .row {
+    margin: 0 !important;
+  }
+  .col-sm-12,
+  .col-6,
+  .field-error {
+    padding: 0 !important;
+  }
+  .row .col-6 {
+    flex: 0 0 47% !important;
+    max-width: 47% !important;
+    @media (max-width: 768px) {
+      flex: 0 0 100% !important;
+      max-width: 100% !important;
+    }
+  }
+
+  // end Date Field Styles
+}
+
+//Event Section Styles
+
+.event-main-wrapper {
+  h4 {
+    font-size: 20px;
+    line-height: 22px;
+    color: #1c1c1c;
+  }
+  p {
+    color: #9495a2;
+    font-size: 14px;
+    line-height: 17px;
+    max-width: 540px;
+  }
+}
+
+.timeline {
+  width: 100%;
+  // border: 1px solid #cfcfd7;
+  // border-radius: 10px;
+  // padding: 10px 0;
+  background: white;
+  flex-direction: row;
+  position: relative;
+
+  .timeline-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 10;
+    button {
+      outline: none;
+      border: 1px solid #c2d1d9;
+      background-color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 4px;
+      padding: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      &:hover {
+        background-color: #fafafa;
+        transition: all 0.3s ease;
+      }
+    }
+  }
+
+  .timeline-fields {
+    position: absolute;
+    bottom: 10px;
+    left: 0px;
+    padding: 4px 16px 12px 16px;
+    z-index: 1;
+    background-color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    p,
+    span {
+      margin: 0;
+      font-size: 10px;
+      line-height: 12px;
+      color: #768396;
+    }
+  }
+}
+// d-flex flex-column gap-8
+
+.vis-panel.vis-left {
+  position: relative;
+}
+
+.fixed-label {
+  position: absolute;
+  left: 0;
+  top: 10px;
+  background-color: white;
+  padding: 5px;
+}

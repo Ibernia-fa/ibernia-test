@@ -1,0 +1,59 @@
+// Timeline Section Style
+.timeline-wrapper {
+    .card-main-wrapper {
+      span.f-s-16 {
+        line-height: 18px;
+        text-decoration: underline;
+      }
+    }
+    @media (max-width: 768px) {
+      .flex-nowrap {
+        flex-wrap: wrap !important;
+      }
+    }
+  
+    // Date Field Styles
+    .row {
+      margin: 0 !important;
+    }
+    .col-sm-12,
+    .col-6,
+    .field-error {
+      padding: 0 !important;
+    }
+    .row .col-6 {
+      flex: 0 0 47% !important;
+      max-width: 47% !important;
+      @media (max-width: 768px) {
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
+      }
+    }
+  
+    // end Date Field Styles
+  }
+  
+  //Event Section Styles
+  
+  .event-main-wrapper {
+    h4 {
+      font-size: 20px;
+      line-height: 22px;
+      color: #1c1c1c;
+    }
+    p {
+      color: #9495a2;
+      font-size: 14px;
+      line-height: 17px;
+      max-width: 540px;
+    }
+  }
+  
+  .timeline {
+    width: 100%;
+    border: 1px solid #cfcfd7;
+    border-radius: 10px;
+    padding: 10px 0;
+    background: white;
+  }
+  

@@ -25,7 +25,7 @@ import { CoreService } from 'src/app/services/core.service';
   // `,
   template: `
     <a href="/">
-      <img src="./assets/images/logos/Logo.svg" alt="logo" />
+      <img width="150px" src="./assets/images/logos/1.png" alt="logo" />
     </a>
   `,
 })
