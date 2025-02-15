@@ -625,7 +625,7 @@ export const navItems: NavItem[] = [
     displayName: 'Saving Pots',
     // iconName: 'folder',
     iconName: '/assets/images/svgs/file-icon.svg',
-    route: '',
+    route: '/cashflows/finances',
   },
   {
     displayName: 'Incomes & Expenses',
