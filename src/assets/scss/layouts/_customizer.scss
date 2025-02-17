@@ -465,3 +465,50 @@ html .customizerNav {
     max-height: 300px;
   }
 }
+
+// Range Input
+.slider-customizer {
+  .w-100 {
+    width: 100% !important;
+  }
+  .mat-mdc-slider {
+    height: 46px !important;
+  }
+  .mdc-slider__track {
+    height: 8px !important;
+  }
+  .mdc-slider__track--inactive {
+    height: 8px !important;
+    background-color: #e3e7fb !important;
+  }
+  .mdc-slider__track--active {
+    height: 8px !important;
+    top: calc(
+      (
+          var(--mdc-slider-inactive-track-height, 8px) -
+            var(--mdc-slider-active-track-height, 8px)
+        ) / 2
+    ) !important;
+  }
+  .mdc-slider__track--active_fill {
+    border-color: #516ce8 !important;
+    border-top-width: var(--mdc-slider-active-track-height, 8px) !important;
+  }
+  .mdc-slider__thumb {
+    height: 46px !important;
+  }
+  .mdc-slider__thumb-knob {
+    background-color: #ffffff !important;
+    border-color: #ffffff !important;
+    border: 1px solid #e3e7fb !important;
+    box-shadow: 0px 0.95px 1.4px 0px #00000003, 0px 2.63px 3.88px 0px #00000004,
+      0px 6.33px 9.35px 0px #00000005, 0px 21px 31px 0px #00000008;
+  }
+  .mat-ripple {
+    display: none !important;
+  }
+  .mat-focus-indicator {
+    display: none !important;
+  }
+}
+// End Range Input

@@ -1,0 +1,141 @@
+.stats-main-wrapper {
+  .saving-title {
+    font-size: 24px;
+    line-height: 36px;
+    font-weight: 700;
+  }
+  .badge {
+    border-radius: 999px;
+    padding: 6px 10px;
+    color: white;
+    font-size: 18px;
+    line-height: 18px;
+    font-weight: 500;
+    &.green {
+      background-color: #71bc42;
+    }
+    &.red {
+      background-color: #ff4444;
+    }
+  }
+}
+
+.cashflow-saving-wrapper {
+  .row {
+    padding: 0;
+    margin: 0;
+    .col-5,
+    .col-10,
+    .col-9,
+    .col-3,
+    .col-2 {
+      padding: 0;
+    }
+    // .col-2 {
+    //   background-color: #71bc421e;
+    // }
+    // .col-10 {
+    //   background-color: #bc42b23a;
+    // }
+    .col-5 {
+      // background-color: #ff330048;
+      max-width: 48% !important;
+      flex: 0 0 48% !important;
+    }
+    .divider {
+      // height: 100%;
+      width: 2px;
+      margin-left: 8px;
+      margin-right: 8px;
+      background-color: #e7e7eb;
+    }
+  }
+  .percentage-field {
+    flex-basis: 98px;
+  }
+  .slider-wrapper {
+    flex: 1;
+  }
+}
+
+.cashflow-drag-wrapper {
+  .sec-heading {
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 22.98px;
+    color: #1c1c1c;
+  }
+  .vote-btns {
+    button {
+      outline: none;
+      border: none;
+      background-color: transparent;
+      cursor: pointer;
+      transition: all 0.3s ease-in-out;
+      &:hover {
+        opacity: 50%;
+        transition: all 0.3s ease-in-out;
+      }
+      &:active {
+        opacity: 100%;
+        transition: all 0.3s ease-in-out;
+      }
+    }
+  }
+}
+
+// Dragable Cards
+.dragable-card {
+  overflow: hidden;
+  position: relative;
+  flex: 1;
+  padding: 24px 16px;
+  border-radius: 10px;
+  background-color: #f7fbff;
+  border: 1px solid #f7f7f7;
+  .stats-main-wrapper {
+    .saving-title {
+      font-family: "Inter";
+    }
+  }
+  .drag-btn {
+    height: 36px;
+    width: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
+    outline: none;
+    border: none;
+    cursor: grab;
+    img {
+      pointer-events: none;
+    }
+  }
+  // Lock Overlay
+  .lock-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background-color: #3a3a4740;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    p {
+      color: white;
+      font-family: "Inter";
+      font-size: 14px;
+      line-height: 20px;
+      font-weight: 600;
+      margin: 0;
+      padding: 0;
+    }
+    .help-lock-overlay {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+    }
+  }
+}
+// End Dragable Cards
