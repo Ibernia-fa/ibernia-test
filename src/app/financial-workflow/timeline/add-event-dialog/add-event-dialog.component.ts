@@ -69,6 +69,7 @@ export class AddEventDialogComponent {
   isEditWorkflow: boolean = false;
   patchEvent: ClientEvent | undefined | null;
   countries = allCountries;
+  clientPreferredCurrency: string;
 
 
   constructor(
@@ -89,6 +90,7 @@ export class AddEventDialogComponent {
     this.eventsList = data.eventsList
     this.isEditWorkflow = data.isEditWorkflow;
     this.patchEvent= data.patchEvent
+    this.clientPreferredCurrency= data.clientPreferredCurrency
 
     var iterations = data.forecastEndDateYear - data.forecastStartDateYear
 
@@ -117,7 +119,7 @@ export class AddEventDialogComponent {
       case EventType.INHERITANCE:
         this.eventForm = this.fb.group({
           isIncomeEvent: [false, Validators.required],
-          currency: ['', Validators.required],
+          currency: [this.clientPreferredCurrency, Validators.required],
           amount: ['', [Validators.required, Validators.min(0)]],
           cycle: [{value: this.systemEvent?.isOneOff ? 'One-Off' : '', disabled: true}, [Validators.required]],
           ageDate: [moment(this.dropTime).year(), Validators.required],
@@ -127,7 +129,7 @@ export class AddEventDialogComponent {
       case EventType.STATE_PENSION:
         this.eventForm = this.fb.group({
           isIncomeEvent: [true, Validators.required],
-          currency: ['', Validators.required],
+          currency: [this.clientPreferredCurrency, Validators.required],
           amount: ['', [Validators.required, Validators.min(0)]],
           cycle: [this.systemEvent?.isOneOff ? 'One-Off' : '', [Validators.required]],
           start: [moment(this.dropTime).year(), Validators.required],
@@ -140,7 +142,7 @@ export class AddEventDialogComponent {
         this.eventForm = this.fb.group({
           eventName: ['', Validators.required],
           isIncomeEvent: [true, Validators.required],
-          currency: ['', Validators.required],
+          currency: [this.clientPreferredCurrency, Validators.required],
           amount: ['', [Validators.required, Validators.min(0)]],
           cycle: ['', [Validators.required]],
           start: [0, Validators.required],

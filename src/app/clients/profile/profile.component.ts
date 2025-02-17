@@ -4,7 +4,7 @@ import { TablerIconsModule } from 'angular-tabler-icons';
 import { ClientHttpService } from '../services/client-http.service';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Client } from '../models/client';
-import { catchError, combineLatest, combineLatestWith, filter, forkJoin, map, of, switchMap, tap } from 'rxjs';
+import { catchError, combineLatest, combineLatestWith, distinctUntilChanged, filter, forkJoin, map, of, switchMap, tap } from 'rxjs';
 import { CommonModule, DatePipe } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -23,6 +23,10 @@ import { DialogComponent } from 'src/app/dialog/dialog.component';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
 import { EditModelDialogComponent } from './edit-model-dialog/edit-model-dialog.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { Store } from '@ngrx/store';
+import { selectedClient } from 'src/app/store/client/client.selectors';
+import * as ClientActions from 'src/app/store/client/client.actions';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 interface SortDescriptor {
   value: string;
   viewValue: string;
@@ -53,7 +57,7 @@ interface SortDescriptor {
 })
 export class ProfileComponent {
   clientId: string;
-  client: Client;
+  client: Client | null;
   cashflows: Array<Cashflow> = [];
   isLoaderVisible = true;
 
@@ -64,6 +68,7 @@ export class ProfileComponent {
     private router: Router,
     private toastr: ToastrService,
     private cashflowHttpService: CashflowHttpService,
+    private store: Store
   ) {
     this.getClient();
   }
@@ -87,14 +92,19 @@ export class ProfileComponent {
       .pipe(
         switchMap((params) => {
           this.clientId = params['id']
-          return forkJoin([
-            this.clientHttpService.getClient(this.clientId), 
-            this.cashflowHttpService.getByClientId(this.clientId)
-          ])
+          return this.cashflowHttpService.getByClientId(this.clientId)
         }),
-        map((res) => {
-          this.client = res[0];
-          this.cashflows = res[1];
+        combineLatestWith(this.store.select(selectedClient).pipe(takeUntilDestroyed())),
+        tap(([cashflows, client]) => {
+          console.log(client);
+          if(!client || client.id !== this.clientId) {
+            this.store.dispatch(ClientActions.loadClient({clientId: this.clientId}))
+          }
+        }),
+        filter(([cashflows, client]) => !!client && client.id === this.clientId),
+        map(([cashflows, client]) => {
+          this.client = client;
+          this.cashflows = cashflows;
           this.isLoaderVisible = false;
         })
       )

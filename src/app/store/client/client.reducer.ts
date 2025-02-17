@@ -13,5 +13,15 @@ const initialState: ClientState = {
 export const clientReducer = createReducer(
   initialState,
   on(ClientActions.selectClient, (state, { client }) => ({ ...state, selectedClient: client })),
+  on(ClientActions.loadClientSuccess, (state, { client }) => ({
+      ...state,
+      selectedClient: client,
+      loading: false
+    })),
+    on(ClientActions.loadClientFailure, (state, { error }) => ({
+      ...state,
+      loading: false,
+      error
+    })),
   on(ClientActions.clearClient, () => ({ selectedClient: null }))
 );

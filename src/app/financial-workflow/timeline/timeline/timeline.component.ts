@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { TablerIconsModule } from 'angular-tabler-icons';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -8,7 +8,7 @@ import { provideNativeDateAdapter } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
 import { TimelineHttpService } from '../services/timeline-http.service';
 import { ActivatedRoute } from '@angular/router';
-import { map, switchMap, take, tap } from 'rxjs';
+import { BehaviorSubject, combineLatestWith, concatMap, filter, map, Observable, switchMap, take, takeUntil, tap } from 'rxjs';
 import { FinancialTimeline } from '../models/financial-timeline';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TimelineChartComponent } from '../timeline-chart/timeline-chart.component';
@@ -18,6 +18,11 @@ import moment from 'moment';
 import { DialogComponent } from 'src/app/dialog/dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
+import { Store } from '@ngrx/store';
+import { selectedClient } from 'src/app/store/client/client.selectors';
+import * as ClientActions from 'src/app/store/client/client.actions';
+import { Client } from 'src/app/clients/models/client';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-timeline',
@@ -37,7 +42,7 @@ import { MatButtonModule } from '@angular/material/button';
   templateUrl: './timeline.component.html',
   styleUrl: './timeline.component.scss',
 })
-export class TimelineComponent {
+export class TimelineComponent implements OnDestroy {
   cashflowId: string;
   financialTimeline: FinancialTimeline;
   clientBirthDate: Date;
@@ -46,16 +51,24 @@ export class TimelineComponent {
   forecastStartYear: number;
   forecastEndYear: number;
   clientBirthYear: number;
+  client: Client;
   enableForecastEdit=false;
+  destroyed$: BehaviorSubject<boolean>;
 
   constructor(
     private timelineHttpService: TimelineHttpService,
     private activatedRoute: ActivatedRoute,
     private dialog: MatDialog,
-    private navItemService: NavItemService
+    private navItemService: NavItemService,
+    private store: Store
   ) {
+    this.destroyed$ = new BehaviorSubject<boolean>(false);
     this.navItemService.currentRouteName = 'Goals & Events';
     this.getTimeline();
+  }
+
+  ngOnDestroy(): void {
+    this.destroyed$.next(true);
   }
 
   getTimeline() {
@@ -68,27 +81,34 @@ export class TimelineComponent {
             this.cashflowId
           );
         }),
-        map((res) => {
-          this.isLoaderVisible = false;
-          this.financialTimeline = res;
-          this.clientBirthDate = this.financialTimeline.clientBirthDate;
-          this.clientBirthYear = moment(
-            this.financialTimeline.clientBirthDate
-          ).year();
-          this.forecastStartYear = moment(
-            this.financialTimeline.forecastStartDate
-          ).year();
-          this.forecastEndYear = moment(
-            this.financialTimeline.forecastEndtDate
-          ).year();
-
-          var iterations = this.forecastEndYear - this.forecastStartYear;
-
-          for (let index = 0; index <= iterations; index++) {
-            const element = this.forecastStartYear + index;
-            this.forecastStartYears.push(element);
+        combineLatestWith(this.store.select(selectedClient).pipe(takeUntilDestroyed())),
+        tap(([res, client]) => {
+          if(!client || client.id !== res.client.id) {
+            this.store.dispatch(ClientActions.loadClient({clientId: res.client.id}));
           }
-          // this.clientBirthDate = new Date();
+        }),
+        filter(([res, client]) => !!client && client.id === res.client.id),
+        map(([res, client]) => {
+          if(client) {
+            this.isLoaderVisible = false;
+            this.financialTimeline = res;
+            this.client = client;
+            this.clientBirthDate = client.clientDetails.birthDate;
+            this.clientBirthYear = moment(
+              client.clientDetails.birthDate
+            ).year();
+            this.forecastStartYear = moment(
+              this.financialTimeline.forecastStartDate
+            ).year();
+            this.forecastEndYear = moment(
+              this.financialTimeline.forecastEndtDate
+            ).year();
+  
+            this.forecastStartYears = Array.from(
+              { length: this.forecastEndYear - this.forecastStartYear + 1 },
+              (_, i) => this.forecastStartYear + i
+            );
+          }
         })
       )
       .subscribe();
@@ -137,14 +157,12 @@ export class TimelineComponent {
   }
 
   updateTimelinesEmittedEvent() {
-    // this.getTimeline();
     this.timelineHttpService
       .getTimelinebyCashflowId(this.cashflowId)
       .pipe(
         take(1),
         tap((res) => {
           this.financialTimeline = res;
-          this.clientBirthDate = this.financialTimeline.clientBirthDate;
         })
       )
       .subscribe();

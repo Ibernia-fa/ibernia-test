@@ -40,8 +40,7 @@ import { TablerIconsModule } from 'angular-tabler-icons';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { catchError, combineLatest, filter, map, take, tap } from 'rxjs';
 import { CommonModule } from '@angular/common';
-import { group } from '@angular/animations';
-import { E } from '@angular/cdk/keycodes';
+import { Client } from 'src/app/clients/models/client';
 
 @Component({
   selector: 'app-timeline-chart',
@@ -68,6 +67,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
 
   @Input() financialTimeline: FinancialTimeline;
   @Input() clientBirthDate: Date;
+  @Input() client: Client;
   @Output() updateTimelines: EventEmitter<boolean>;
   @ViewChild('timelineContainer', { static: true })
   timelineContainer!: ElementRef;
@@ -166,7 +166,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
     console.log(`Event "${this.draggedEvent.name}" dropped at:`, dropTime);
     console.log(this.financialTimeline);
 
-    if(this.draggedEvent.isOneOff && this.financialTimeline.clientEvents.find(
+    if(this.draggedEvent.isDefault && this.financialTimeline.clientEvents.find(
       (event) => event.name === this.draggedEvent?.name
     )) {
       this.draggedEvent = null;
@@ -291,6 +291,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
           systemEvent: this.draggedEvent,
           dropTime: new Date(moment(dropTime).year(), 0),
           clientBirthDate: this.clientBirthDate,
+          clientPreferredCurrency: this.client.clientDetails.preferredCurrency,
           forecastStartDateYear: moment(this.financialTimeline.forecastStartDate).year(),
           forecastEndDateYear: moment(this.financialTimeline.forecastEndtDate).year(),
         },
@@ -316,6 +317,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
           systemEvent: this.draggedEvent,
           dropTime: new Date(moment(dropTime).year(), 0),
           clientBirthDate: this.clientBirthDate,
+          clientPreferredCurrency: this.client.clientDetails.preferredCurrency,
           forecastStartDateYear: moment(this.financialTimeline.forecastStartDate).year(),
           forecastEndDateYear: moment(this.financialTimeline.forecastEndtDate).year(),
           eventsList: this.financialTimeline.clientEvents.map((event) => {
@@ -561,6 +563,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
             systemEvent: clientEvent,
             dropTime: new Date(moment(item.start).year(), 0),
             clientBirthDate: this.clientBirthDate,
+            clientPreferredCurrency: this.client.clientDetails.preferredCurrency,
             forecastStartDateYear: moment(this.financialTimeline.forecastStartDate).year(),
             forecastEndDateYear: moment(this.financialTimeline.forecastEndtDate).year(),
             isEditWorkflow: true,
@@ -588,6 +591,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
             systemEvent: clientEvent,
             dropTime: new Date(moment(item.start).year(), 0),
             clientBirthDate: this.clientBirthDate,
+            clientPreferredCurrency: this.client.clientDetails.preferredCurrency,
             forecastStartDateYear: moment(this.financialTimeline.forecastStartDate).year(),
             forecastEndDateYear: moment(this.financialTimeline.forecastEndtDate).year(),
             eventsList: this.financialTimeline.clientEvents.map((event) => {
@@ -622,6 +626,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
             customEvents: this.customEventsLibrary,
             timelineId: this.financialTimeline.id,
             clientBirthDate: this.clientBirthDate,
+            clientPreferredCurrency: this.client.clientDetails.preferredCurrency,
             forecastStartDateYear: moment(this.financialTimeline.forecastStartDate).year(),
             forecastEndDateYear: moment(this.financialTimeline.forecastEndtDate).year(),
             eventsList: this.financialTimeline.clientEvents.map((event) => {
@@ -692,6 +697,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
         customEvents: this.customEventsLibrary,
         timelineId: this.financialTimeline.id,
         clientBirthDate: this.clientBirthDate,
+        clientPreferredCurrency: this.client.clientDetails.preferredCurrency,
         forecastStartDateYear: moment(this.financialTimeline.forecastStartDate).year(),
         forecastEndDateYear: moment(this.financialTimeline.forecastEndtDate).year(),
         eventsList: this.financialTimeline.clientEvents.map((event) => {
