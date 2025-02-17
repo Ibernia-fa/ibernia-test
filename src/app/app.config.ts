@@ -1,7 +1,7 @@
 import {
   ApplicationConfig,
   provideZoneChangeDetection,
-  importProvidersFrom,
+  importProvidersFrom, isDevMode,
 } from '@angular/core';
 import {
   HttpBackend,
@@ -41,6 +41,13 @@ import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
 import { provideHighlightOptions } from 'ngx-highlightjs';
 import 'highlight.js/styles/atom-one-dark.min.css';
 import { httpRequestInterceptor } from './core/http-request.interceptor';
+import { provideStore } from '@ngrx/store';
+import { provideEffects } from '@ngrx/effects';
+import { FinancialAdvisorEffects } from './store/financial-advisor/financial-advisor.effects';
+import { provideStoreDevtools } from '@ngrx/store-devtools';
+import { ClientEffects } from './store/client/client.effects';
+import { CashflowEffects } from './store/cashflow/cashflow.effects';
+
 
 export function HttpLoaderFactory(handler: HttpBackend): any {
   const http = new HttpClient(handler);
@@ -53,45 +60,33 @@ export const appConfig: ApplicationConfig = {
     provideToastr(), // Toastr providers
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideHighlightOptions({
-      coreLibraryLoader: () => import('highlight.js/lib/core'),
-      lineNumbersLoader: () => import('ngx-highlightjs/line-numbers'), // Optional, add line numbers if needed
-      languages: {
-        typescript: () => import('highlight.js/lib/languages/typescript'),
-        css: () => import('highlight.js/lib/languages/css'),
-        xml: () => import('highlight.js/lib/languages/xml'),
-      },
+        coreLibraryLoader: () => import('highlight.js/lib/core'),
+        lineNumbersLoader: () => import('ngx-highlightjs/line-numbers'), // Optional, add line numbers if needed
+        languages: {
+            typescript: () => import('highlight.js/lib/languages/typescript'),
+            css: () => import('highlight.js/lib/languages/css'),
+            xml: () => import('highlight.js/lib/languages/xml'),
+        },
     }),
-    provideRouter(
-      routes,
-      withInMemoryScrolling({
+    provideRouter(routes, withInMemoryScrolling({
         scrollPositionRestoration: 'enabled',
         anchorScrolling: 'enabled',
-      }),
-      withComponentInputBinding()
-    ),
-    provideHttpClient(withInterceptorsFromDi(),
-    withInterceptors([httpRequestInterceptor])),
+    }), withComponentInputBinding()),
+    provideHttpClient(withInterceptorsFromDi(), withInterceptors([httpRequestInterceptor])),
     provideClientHydration(),
     provideAnimationsAsync(),
-    importProvidersFrom(
-      FormsModule,
-      ToastrModule.forRoot(),
-      ReactiveFormsModule,
-      MaterialModule,
-      NgxPermissionsModule.forRoot(),
-      TablerIconsModule.pick(TablerIcons),
-      NgScrollbarModule,
-      CalendarModule.forRoot({
+    importProvidersFrom(FormsModule, ToastrModule.forRoot(), ReactiveFormsModule, MaterialModule, NgxPermissionsModule.forRoot(), TablerIconsModule.pick(TablerIcons), NgScrollbarModule, CalendarModule.forRoot({
         provide: DateAdapter,
         useFactory: adapterFactory,
-      }),
-      TranslateModule.forRoot({
+    }), TranslateModule.forRoot({
         loader: {
-          provide: TranslateLoader,
-          useFactory: HttpLoaderFactory,
-          deps: [HttpBackend],
+            provide: TranslateLoader,
+            useFactory: HttpLoaderFactory,
+            deps: [HttpBackend],
         },
-      })
-    ),
-  ],
+    })),
+    provideStore(),
+    provideEffects(FinancialAdvisorEffects, ClientEffects, CashflowEffects),
+    provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() })
+],
 };

@@ -411,7 +411,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
           start: new Date(event.start.year, 1),
           end: event.end && event.end.year > 0
             ? new Date(event.end.year, 1)
-            : new Date(event.start.year+10, 1),
+            : new Date(event.start.year+14, 1),
           className: event.iconUrl,
         };
       }
@@ -440,7 +440,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
       //   return Math.round(date / hour) * hour;
       // },
       stack: true, // Prevent overlapping events
-      zoomable: true, // Allow zooming
+      zoomable: false, // Allow zooming
       moveable: true,
       horizontalScroll: false, // Enable scrolling
       orientation: 'bottom', // Place events at the top
