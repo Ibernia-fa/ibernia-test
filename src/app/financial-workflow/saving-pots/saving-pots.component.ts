@@ -16,7 +16,7 @@ export class SavingPotsComponent {
 
   newEventClicked() {
     const dialogRef = this.dialog.open(AddNewPotComponent, {
-      width: '600px',
+      width: '700px',
       disableClose: true,
       data: {},
     });

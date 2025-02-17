@@ -1,3 +1,231 @@
-<button (click)="closeDialog()" class="button-icon-outline w-100 d-block">
+<!-- <button (click)="closeDialog()" class="button-icon-outline w-100 d-block">
     <span class="f-s-16">Cancel</span>
-  </button>
+  </button> -->
+
+
+
+<!--  Add Cashflow-->
+
+<div class="w-100">
+  <div class="d-flex flex-column gap-32">
+    <!-- Modal Header  -->
+    <div class="d-flex align-items-center justify-content-between gap-10 modal-header">
+      <h3>Add a savings pot, investment or pension</h3>
+      <button (click)="closeDialog()" type="button">
+        <img src="assets/images/svgs/close-line-cion.svg" alt="close-line-cion" />
+      </button>
+    </div>
+    <!-- End Modal Header  -->
+
+    <!-- Modal Body  -->
+    <mat-dialog-content>
+      <div class="d-flex flex-column gap-16">
+        <!-- Name Field  -->
+        <div class="w-100 form-field gap-12">
+          <mat-label class="f-s-16 d-block" style="line-height: 18px">Name</mat-label>
+          <input matInput formControlName="name" />
+          <!-- Error  -->
+          <!-- <span class="field-error d-block">Name is required</span> -->
+          <!-- End Error  -->
+        </div>
+        <!--End  Name Field  -->
+
+        <!-- Starting pot value Field  -->
+        <div class="d-flex flex-column gap-12 net-fields">
+          <span class="f-s-16 f-w-400">Starting pot value</span>
+          <div class="net-field d-flex align-items-center">
+            <!-- Currency Selector  -->
+            <div class="left">
+              <mat-select value="£" formControlName="currency" class="sortby-edit-profile">
+                <mat-option value="country">$</mat-option>
+                <mat-option value="country">£</mat-option>
+              </mat-select>
+            </div>
+            <!-- End Currency Selector  -->
+            <!-- Price Field  -->
+            <div class="w-100 form-field">
+              <input matInput type="number" formControlName="amount" placeholder="0" />
+            </div>
+            <!-- End Price Field  -->
+          </div>
+          <!-- Error   -->
+          <!-- <span class="field-error d-block">Amount is required</span> -->
+          <!-- ENd Error   -->
+
+        </div>
+        <!-- End Starting pot value Field  -->
+
+        <!-- Slider Section  -->
+        <div class="d-flex flex-column gap-4">
+          <div class="d-flex gap-8 align-items-center">
+            <mat-label class="f-s-16 f-w-400 d-block">Return rate</mat-label>
+            <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
+          </div>
+          <div class="d-flex align-items-center gap-24">
+            <div class="slider-customizer slider-wrapper">
+              <mat-slider class="w-100">
+                <input value="30" matSliderThumb>
+              </mat-slider>
+            </div>
+            <div class="percentage-field">
+              <div class="w-100 form-field">
+                <input placeholder="No." value="8.5%" />
+              </div>
+            </div>
+          </div>
+          <span class="return-rate">Real return: -0.5% (net of 4% inflation)</span>
+        </div>
+        <!-- End Slider Section  -->
+
+        <!-- CheckBox  -->
+        <div class="checkbox-box">
+          <div>
+            <input type="checkbox" id="lock-pot" />
+          </div>
+          <label for="lock-pot">Lock this pot from automatically covering an income shortfall</label>
+        </div>
+        <!-- End CheckBox  -->
+
+        <!-- Savings pot is locked between  -->
+        <div class="start-end">
+          <div class="d-flex flex-column gap-12">
+            <div class="d-flex gap-8 align-items-center">
+              <mat-label class="f-s-16 f-w-400 d-block">Savings pot is locked between</mat-label>
+            </div>
+            <div class="row justify-content-between align-items-start flex-nowrap">
+              <!-- Start date  -->
+              <div class="col-6">
+                <div class="w-100 form-field">
+                  <div class="select-option">
+                    <mat-select value="Select" formControlName="start" hideSingleSelectionIndicator>
+                      <mat-option value="year">123</mat-option>
+                    </mat-select>
+                  </div>
+                  <!-- Error  -->
+                  <!-- <span class="field-error d-block">Start is required</span> -->
+                  <!-- End Error  -->
+                </div>
+              </div>
+
+              <!-- Divider  -->
+              <div class="d-flex justify-content-start align-items-start">
+                <img src="assets/images/svgs/chevron-right-date-icon.svg" alt="chevron-right-date-icon" />
+              </div>
+              <!-- End date  -->
+              <div class="col-6">
+                <div class="w-100 form-field">
+                  <div class="select-option">
+                    <mat-select value="Select" formControlName="end">
+                      <mat-option value="123">123</mat-option>
+                    </mat-select>
+                  </div>
+                  <!-- error  -->
+                  <!-- <span class="field-error d-block">End is required</span> -->
+                  <!-- End error  -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Finish Savings pot is locked between  -->
+
+        <!-- CheckBox  -->
+        <div class="checkbox-box">
+          <div>
+            <input type="checkbox" id="commissions" />
+          </div>
+          <label for="commissions">Add commissions</label>
+        </div>
+        <!-- End CheckBox  -->
+
+        <div class="d-flex flex-column gap-12">
+          <!-- Modal tabs  -->
+          <div class="d-flex flex-column gap-12 tab">
+            <span class="f-s-16 f-w-400">Commission type</span>
+            <div class="tabs">
+              <div class="row">
+                <div class="col-6">
+                  <button class="button-icon w-100 active">
+                    <span class="uppercase active">Amount</span>
+                  </button>
+                </div>
+                <div class="col-6">
+                  <button class="button-icon w-100">
+                    <span class="uppercase">Percentage</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- End Modal tabs  -->
+
+          <!-- Net Amount Field  -->
+          <div class="d-flex flex-column gap-4 net-fields">
+            <div class="net-field d-flex align-items-center">
+              <!-- Currency Selector  -->
+              <div class="left">
+                <mat-select class="sortby-edit-profile" hideSingleSelectionIndicator>
+                  <mat-option value="country">123</mat-option>
+                </mat-select>
+              </div>
+              <!-- End Currency Selector  -->
+              <!-- Price Field  -->
+              <div class="w-100 form-field">
+                <input matInput type="number" formControlName="amount" placeholder="0" />
+              </div>
+              <!-- End Price Field  -->
+              <!-- End Type Field  -->
+              <div class="right">
+                <mat-select value="Select" formControlName="cycle" class="sortby-edit-profile">
+                  <mat-option value="cycle">123</mat-option>
+                </mat-select>
+              </div>
+              <!-- End Type Field  -->
+            </div>
+            <!-- Error  -->
+            <!-- <span class="field-error d-block">Amount is required</span> -->
+            <!-- End Error  -->
+          </div>
+          <!-- End Net Amount Field  -->
+        </div>
+
+        <div class="w-100 form-field gap-12">
+          <div class="d-flex gap-8 align-items-center">
+            <mat-label class="f-s-16 f-w-400 d-block">Commission escalation rate</mat-label>
+            <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
+          </div>
+          <div class="position-relative">
+            <div class="w-100 form-field">
+              <div class="select-option">
+                <mat-select formControlName="escalationRate" value="Select">
+                  <mat-option value="2.5%">Increase at same rate as inflation (2.5%)</mat-option>
+                  <mat-option value="0%">Don't increase with inflation</mat-option>
+                </mat-select>
+              </div>
+              <!-- error  -->
+              <!-- <span class="field-error d-block">Escalation Rate is required</span> -->
+              <!-- End error  -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-dialog-content>
+    <!-- End Modal Body  -->
+
+    <!-- Modal Action Button  -->
+    <div class="row justify-content-between modal-action">
+      <div class="col-5">
+        <button (click)="closeDialog()" class="button-icon-outline w-100 d-block">
+          <span class="f-s-16">Cancel</span>
+        </button>
+      </div>
+      <div class="col-5">
+        <button type="button" class="button-icon w-100 d-block">
+          <span class="f-s-16">Save</span>
+        </button>
+      </div>
+    </div>
+    <!-- End Modal Action Button  -->
+  </div>
+</div>
+<!-- End Add Cashflow -->
