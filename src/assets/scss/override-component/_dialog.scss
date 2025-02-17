@@ -24,3 +24,7 @@
   box-shadow: none !important;
   padding: 32px !important;
 }
+.cdk-overlay-pane.mat-mdc-dialog-panel {
+  max-width: 100% !important;
+  min-width: auto !important;
+}
