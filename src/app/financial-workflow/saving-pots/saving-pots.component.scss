@@ -139,3 +139,101 @@
   }
 }
 // End Dragable Cards
+
+// Feeback Cards
+.feeback-container {
+  position: fixed;
+  z-index: 10;
+  bottom: 76px;
+  right: 32px;
+  .feedback-wrapper {
+    width: 340px;
+    padding: 12px;
+    background-color: white;
+    border: 1px solid #e7e7eb;
+    border-radius: 12px;
+    button {
+      outline: none;
+      border: none;
+      padding: 0;
+      background-color: transparent;
+      background: transparent;
+      cursor: pointer;
+    }
+    p {
+      margin: 0;
+      font-weight: 500;
+      font-size: 14px;
+      line-height: 20px;
+      max-width: 254px;
+      color: #1c1c1c;
+    }
+    .emoji-btn {
+      button {
+        background: transparent;
+        border: none;
+        outline: none;
+        padding: 0;
+        height: auto;
+      }
+    }
+    .feedback-nav-btns {
+      button {
+        outline: none;
+        border: none;
+        height: 3px;
+        width: 40px;
+        background-color: #d9d9d9;
+        border-radius: 20px;
+        cursor: pointer;
+        &.active {
+          background-color: #516ce8;
+        }
+      }
+    }
+    .form-label {
+      font-size: 14px;
+      line-height: 20px;
+      font-weight: 500;
+      color: #1c1c1c;
+    }
+    .feedback-form {
+      button {
+        background-color: #516ce8;
+        border-radius: 5px;
+        min-width: 96px;
+        padding: 7px;
+        font-size: 13px;
+        color: white;
+        line-height: 18px;
+        letter-spacing: 5%;
+        transition: all 0.3s ease-in-out;
+        &:hover {
+          opacity: 90%;
+          transition: all 0.3s ease-in-out;
+        }
+      }
+      textarea {
+        min-height: 61px;
+        border-radius: 5px;
+        border: 1px solid #e7e7eb;
+        outline: none;
+        padding: 8px;
+        resize: none;
+        font-family: "Ubuntu";
+        transition: all 0.3s ease-in-out;
+      }
+      textarea:focus {
+        transition: all 0.3s ease-in-out;
+        border: 1px solid #516ce8;
+      }
+      textarea::placeholder {
+        color: #e7e7eb;
+        font-size: 12px;
+        line-height: 20px;
+        font-family: "Ubuntu";
+      }
+    }
+  }
+}
+// End Feeback Cards

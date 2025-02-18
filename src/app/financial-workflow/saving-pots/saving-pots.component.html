@@ -1,321 +1,386 @@
-<div class="d-flex gap-24 flex-column">
-    <mat-card class="cardWithShadow">
-        <mat-card-content>
-            <div class="d-flex align-items-center justify-content-between w-100 gap-16 flex-wrap">
-                <div class="d-flex align-items-center gap-16">
-                    <!-- Icon  -->
-                    <div class="icon-wrapper d-flex align-items-center justify-content-center">
-                        <img src="assets/images/svgs/cashflow-filled-icon.svg" alt="cashflow-filled-icon" />
-                    </div>
-                    <!-- End Icon  -->
-                    <!-- headings  -->
-                    <div class="d-flex flex-column justify-content-between gap-4">
-                        <div class="d-flex align-items-center gap-4">
-                            <h4 class="page-title f-w-500">Savings pots, investments & pensions</h4>
-                            <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" class="m-t-4">
+<div class="position-relative">
+    <div class="d-flex gap-24 flex-column">
+        <mat-card class="cardWithShadow">
+            <mat-card-content>
+                <div class="d-flex align-items-center justify-content-between w-100 gap-16 flex-wrap">
+                    <div class="d-flex align-items-center gap-16">
+                        <!-- Icon  -->
+                        <div class="icon-wrapper d-flex align-items-center justify-content-center">
+                            <img src="assets/images/svgs/cashflow-filled-icon.svg" alt="cashflow-filled-icon" />
                         </div>
-                        <span class="sub-title">John Devidson</span>
+                        <!-- End Icon  -->
+                        <!-- headings  -->
+                        <div class="d-flex flex-column justify-content-between gap-4">
+                            <div class="d-flex align-items-center gap-4">
+                                <h4 class="page-title f-w-500">Savings pots, investments & pensions</h4>
+                                <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" class="m-t-4">
+                            </div>
+                            <span class="sub-title">John Devidson</span>
+                        </div>
+                        <!-- End headings  -->
                     </div>
-                    <!-- End headings  -->
+                    <div class="d-flex align-items-center gap-12">
+                        <img src="/assets/images/svgs/chart-histogram-two-icon.svg" alt="chart" />
+                        <span class="f-s-16">Cashflow Simulator #1</span>
+                    </div>
                 </div>
-                <div class="d-flex align-items-center gap-12">
-                    <img src="/assets/images/svgs/chart-histogram-two-icon.svg" alt="chart" />
-                    <span class="f-s-16">Cashflow Simulator #1</span>
-                </div>
-            </div>
-        </mat-card-content>
-    </mat-card>
+            </mat-card-content>
+        </mat-card>
 
-    <!-- Saving Section  -->
-    <mat-card class="cardWithShadow">
-        <mat-card-content>
-            <div class="cashflow-saving-wrapper">
-                <div class="row align-items-center flex-wrap">
-                    <!-- stats  -->
-                    <div class="col-10">
-                        <div class="row justify-content-between">
-                            <!-- Saving Section  -->
-                            <div class="col-5">
-                                <div class="stats-main-wrapper">
-                                    <div class="d-flex flex-column gap-8">
-                                        <div class="d-flex align-items-center gap-8">
-                                            <img src="assets/images/svgs/total-saving-wallet.svg"
-                                                alt="total-saving-wallet" />
-                                            <h3 class="card-title">Total savings at start</h3>
-                                        </div>
-                                        <div class="d-flex align-items-center gap-10">
-                                            <h3 class="saving-title">£1,281,000</h3>
-                                            <span class="badge green">+4%</span>
+        <!-- Saving Section  -->
+        <mat-card class="cardWithShadow">
+            <mat-card-content>
+                <div class="cashflow-saving-wrapper">
+                    <div class="row align-items-center flex-wrap">
+                        <!-- stats  -->
+                        <div class="col-10">
+                            <div class="row justify-content-between">
+                                <!-- Saving Section  -->
+                                <div class="col-5">
+                                    <div class="stats-main-wrapper">
+                                        <div class="d-flex flex-column gap-8">
+                                            <div class="d-flex align-items-center gap-8">
+                                                <img src="assets/images/svgs/total-saving-wallet.svg"
+                                                    alt="total-saving-wallet" />
+                                                <h3 class="card-title">Total savings at start</h3>
+                                            </div>
+                                            <div class="d-flex align-items-center gap-10">
+                                                <h3 class="saving-title">£1,281,000</h3>
+                                                <span class="badge green">+4%</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <!-- End Saving Section  -->
+                                <!-- End Saving Section  -->
 
-                            <!-- Divider  -->
-                            <div class="divider"></div>
-                            <!-- End Divider  -->
+                                <!-- Divider  -->
+                                <div class="divider"></div>
+                                <!-- End Divider  -->
 
-                            <!-- Slider Section  -->
-                            <div class="col-5">
-                                <div class="d-flex align-items-center gap-8">
+                                <!-- Slider Section  -->
+                                <div class="col-5">
                                     <div class="d-flex align-items-center gap-8">
-                                        <img src="assets/images/svgs/inflation-rate-icon.svg"
-                                            alt="total-saving-wallet" />
-                                        <h3 class="card-title">Inflation rate:</h3>
-                                    </div>
-                                    <div mat-raised-button matTooltipPosition="above"
-                                        matTooltip="The assumed rate inflation is expected to rise by, per year.
+                                        <div class="d-flex align-items-center gap-8">
+                                            <img src="assets/images/svgs/inflation-rate-icon.svg"
+                                                alt="total-saving-wallet" />
+                                            <h3 class="card-title">Inflation rate:</h3>
+                                        </div>
+                                        <div mat-raised-button matTooltipPosition="above"
+                                            matTooltip="The assumed rate inflation is expected to rise by, per year.
                                     This assumption affects the entire cashflow model, as future values are inflation adjusted into real terms.">
-                                        <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon">
+                                            <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon">
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="d-flex align-items-center gap-24">
-                                    <div class="slider-customizer slider-wrapper">
-                                        <mat-slider class="w-100">
-                                            <input value="30" matSliderThumb>
-                                        </mat-slider>
-                                    </div>
-                                    <div class="percentage-field">
-                                        <div class="w-100 form-field">
-                                            <input placeholder="No." value="8.5%" />
+                                    <div class="d-flex align-items-center gap-24">
+                                        <div class="slider-customizer slider-wrapper">
+                                            <mat-slider class="w-100">
+                                                <input value="30" matSliderThumb>
+                                            </mat-slider>
+                                        </div>
+                                        <div class="percentage-field">
+                                            <div class="w-100 form-field">
+                                                <input placeholder="No." value="8.5%" />
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
+                                <!-- End Slider Section  -->
                             </div>
-                            <!-- End Slider Section  -->
                         </div>
-                    </div>
-                    <!-- End stats  -->
+                        <!-- End stats  -->
 
-                    <!-- button  -->
-                    <div class="col-2">
-                        <div class="d-flex align-items-center justify-content-end">
-                            <button (click)="newEventClicked()" type="button" class="button-icon">
-                                <span>Add New</span>
-                                <img src="assets/images/svgs/add-icon.svg" alt="add-icon" />
-                            </button>
+                        <!-- button  -->
+                        <div class="col-2">
+                            <div class="d-flex align-items-center justify-content-end">
+                                <button (click)="newEventClicked()" type="button" class="button-icon">
+                                    <span>Add New</span>
+                                    <img src="assets/images/svgs/add-icon.svg" alt="add-icon" />
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                    <!-- button  -->
-                </div>
-            </div>
-        </mat-card-content>
-    </mat-card>
-    <!-- End Saving Section  -->
-
-    <!-- liquid savings, investments and pensions Section  -->
-    <mat-card class="cardWithShadow">
-        <mat-card-content>
-            <div class="cashflow-drag-wrapper">
-                <div class="d-flex flex-column gap-20">
-                    <h3 class="sec-heading">Other liquid savings, investments and pensions:</h3>
-                    <div class="flex-column d-flex gap-10">
-                        <!-- Card One -->
-                        <div class="d-flex justify-content-between align-items-center gap-12 dragable-card-wrapper">
-                            <!-- Card  -->
-                            <div class="dragable-card d-flex align-items-center justify-content-between">
-                                <!-- Content  -->
-                                <div class="d-flex align-items-center gap-8">
-                                    <button type="button" class="drag-btn">
-                                        <img src="/assets/images/svgs/drag-icon.svg" alt="drag-icon">
-                                    </button>
-                                    <!-- Status  -->
-                                    <div class="stats-main-wrapper">
-                                        <div class="d-flex flex-column gap-8">
-                                            <div class="d-flex align-items-center gap-8">
-                                                <img src="assets/images/svgs/cashflow-moneys-icon.svg"
-                                                    alt="cashflow-moneys-icon" />
-                                                <h3 class="card-title">Savings</h3>
-                                            </div>
-                                            <div class="d-flex align-items-center gap-10">
-                                                <h3 class="saving-title">£1,000</h3>
-                                                <span class="badge green">+1%</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- End Status  -->
-                                </div>
-                                <!-- End Content  -->
-                                <!--  Chart  -->
-                                <div class="card-chart">
-                                    <img src="assets/images/shapes/dummy-green-graph.png" alt="dummy-green-graph">
-                                </div>
-                                <!-- End Chart  -->
-                            </div>
-                            <!-- End Card  -->
-
-                            <!-- Up and Down Buttons   -->
-                            <div class="d-flex flex-column gap-10 vote-btns">
-                                <button type="button">
-                                    <img src="assets/images/svgs/vote-arrow-up.svg" alt="vote-arrow-up">
-                                </button>
-                                <button type="button">
-                                    <img src="assets/images/svgs/vote-arrow-down.svg" alt="vote-arrow-down">
-                                </button>
-                            </div>
-                            <!-- End Up and Down Buttons   -->
-                        </div>
-                        <!-- End Card One -->
-
-                        <!-- Card Two -->
-                        <div class="d-flex justify-content-between align-items-center gap-12 dragable-card-wrapper">
-                            <!-- Card  -->
-                            <div class="dragable-card d-flex align-items-center justify-content-between">
-                                <!-- Content  -->
-                                <div class="d-flex align-items-center gap-8">
-                                    <button type="button" class="drag-btn">
-                                        <img src="/assets/images/svgs/drag-icon.svg" alt="drag-icon">
-                                    </button>
-                                    <!-- Status  -->
-                                    <div class="stats-main-wrapper">
-                                        <div class="d-flex flex-column gap-8">
-                                            <div class="d-flex align-items-center gap-8">
-                                                <img src="assets/images/svgs/cashflow-investment-icon.svg"
-                                                    alt="cashflow-investment-icon" />
-                                                <h3 class="card-title">Investments</h3>
-                                            </div>
-                                            <div class="d-flex align-items-center gap-10">
-                                                <h3 class="saving-title">£50,000</h3>
-                                                <span class="badge green">+1%</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- End Status  -->
-                                </div>
-                                <!-- End Content  -->
-                                <!--  Chart  -->
-                                <div class="card-chart">
-                                    <img src="assets/images/shapes/dummy-green-graph.png" alt="dummy-green-graph">
-                                </div>
-                                <!-- End Chart  -->
-                            </div>
-                            <!-- End Card  -->
-
-                            <!-- Up and Down Buttons   -->
-                            <div class="d-flex flex-column gap-10 vote-btns">
-                                <button type="button">
-                                    <img src="assets/images/svgs/vote-arrow-up.svg" alt="vote-arrow-up">
-                                </button>
-                                <button type="button">
-                                    <img src="assets/images/svgs/vote-arrow-down.svg" alt="vote-arrow-down">
-                                </button>
-                            </div>
-                            <!-- End Up and Down Buttons   -->
-                        </div>
-                        <!-- End Card Two -->
-
-                        <!-- Card Three -->
-                        <div class="d-flex justify-content-between align-items-center gap-12 dragable-card-wrapper">
-                            <!-- Card  -->
-                            <div class="dragable-card d-flex align-items-center justify-content-between">
-                                <!-- Content  -->
-                                <div class="d-flex align-items-center gap-8">
-                                    <button type="button" class="drag-btn">
-                                        <img src="/assets/images/svgs/drag-icon.svg" alt="drag-icon">
-                                    </button>
-                                    <!-- Status  -->
-                                    <div class="stats-main-wrapper">
-                                        <div class="d-flex flex-column gap-8">
-                                            <div class="d-flex align-items-center gap-8">
-                                                <img src="assets/images/svgs/cashflow-pension-icon.svg"
-                                                    alt="cashflow-pension-icon" />
-                                                <h3 class="card-title">Pension</h3>
-                                            </div>
-                                            <div class="d-flex align-items-center gap-10">
-                                                <h3 class="saving-title">£250,000</h3>
-                                                <span class="badge red">-1%</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- End Status  -->
-                                </div>
-                                <!-- End Content  -->
-                                <!--  Chart  -->
-                                <div class="card-chart">
-                                    <img src="assets/images/shapes/dummy-red-graph.png" alt="dummy-red-graph">
-                                </div>
-                                <!-- End Chart  -->
-                            </div>
-                            <!-- End Card  -->
-
-                            <!-- Up and Down Buttons   -->
-                            <div class="d-flex flex-column gap-10 vote-btns">
-                                <button type="button">
-                                    <img src="assets/images/svgs/vote-arrow-up.svg" alt="vote-arrow-up">
-                                </button>
-                                <button type="button">
-                                    <img src="assets/images/svgs/vote-arrow-down.svg" alt="vote-arrow-down">
-                                </button>
-                            </div>
-                            <!-- End Up and Down Buttons   -->
-                        </div>
-                        <!-- End Card Three -->
-
-                        <!-- Card Four With Overlay -->
-                        <div class="d-flex justify-content-between align-items-center gap-12 dragable-card-wrapper">
-                            <!-- Card  -->
-                            <div class="dragable-card d-flex align-items-center justify-content-between">
-                                <!-- Content  -->
-                                <div class="d-flex align-items-center gap-8">
-                                    <button type="button" class="drag-btn">
-                                        <img src="/assets/images/svgs/drag-icon.svg" alt="drag-icon">
-                                    </button>
-                                    <!-- Status  -->
-                                    <div class="stats-main-wrapper">
-                                        <div class="d-flex flex-column gap-8">
-                                            <div class="d-flex align-items-center gap-8">
-                                                <img src="assets/images/svgs/cashflow-investment-icon.svg"
-                                                    alt="cashflow-investment-icon" />
-                                                <h3 class="card-title">Investments</h3>
-                                            </div>
-                                            <div class="d-flex align-items-center gap-10">
-                                                <h3 class="saving-title">£50,000</h3>
-                                                <span class="badge green">+1%</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- End Status  -->
-                                </div>
-                                <!-- End Content  -->
-                                <!--  Chart  -->
-                                <div class="card-chart">
-                                    <img src="assets/images/shapes/dummy-green-graph.png" alt="dummy-green-graph">
-                                </div>
-                                <!-- End Chart  -->
-
-                                <!-- Lock Overlay  -->
-                                <div class="lock-overlay">
-                                    <div
-                                        class="d-flex align-items-center justify-content-center flex-column gap-10 h-100">
-                                        <img src="assets/images/svgs/cashflow-lock-icon.svg" alt="cashflow-lock-icon">
-                                        <p>Locked until 75 y.o.</p>
-                                    </div>
-                                    <div class="help-lock-overlay">
-                                        <img src="assets/images/svgs/help-circle-lock-overlay.svg"
-                                            alt="help-circle-lock-overlay">
-                                    </div>
-                                </div>
-                                <!-- End Lock Overlay  -->
-                            </div>
-                            <!-- End Card  -->
-
-                            <!-- Up and Down Buttons   -->
-                            <div class="d-flex flex-column gap-10 vote-btns">
-                                <button type="button">
-                                    <img src="assets/images/svgs/vote-arrow-up.svg" alt="vote-arrow-up">
-                                </button>
-                                <button type="button">
-                                    <img src="assets/images/svgs/vote-arrow-down.svg" alt="vote-arrow-down">
-                                </button>
-                            </div>
-                            <!-- End Up and Down Buttons   -->
-                        </div>
-                        <!-- Card Four With Overlay -->
+                        <!-- button  -->
                     </div>
                 </div>
+            </mat-card-content>
+        </mat-card>
+        <!-- End Saving Section  -->
+
+        <!-- liquid savings, investments and pensions Section  -->
+        <mat-card class="cardWithShadow">
+            <mat-card-content>
+                <div class="cashflow-drag-wrapper">
+                    <div class="d-flex flex-column gap-20">
+                        <h3 class="sec-heading">Other liquid savings, investments and pensions:</h3>
+                        <div class="flex-column d-flex gap-10">
+                            <!-- Card One -->
+                            <div class="d-flex justify-content-between align-items-center gap-12 dragable-card-wrapper">
+                                <!-- Card  -->
+                                <div class="dragable-card d-flex align-items-center justify-content-between">
+                                    <!-- Content  -->
+                                    <div class="d-flex align-items-center gap-8">
+                                        <button type="button" class="drag-btn">
+                                            <img src="/assets/images/svgs/drag-icon.svg" alt="drag-icon">
+                                        </button>
+                                        <!-- Status  -->
+                                        <div class="stats-main-wrapper">
+                                            <div class="d-flex flex-column gap-8">
+                                                <div class="d-flex align-items-center gap-8">
+                                                    <img src="assets/images/svgs/cashflow-moneys-icon.svg"
+                                                        alt="cashflow-moneys-icon" />
+                                                    <h3 class="card-title">Savings</h3>
+                                                </div>
+                                                <div class="d-flex align-items-center gap-10">
+                                                    <h3 class="saving-title">£1,000</h3>
+                                                    <span class="badge green">+1%</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- End Status  -->
+                                    </div>
+                                    <!-- End Content  -->
+                                    <!--  Chart  -->
+                                    <div class="card-chart">
+                                        <img src="assets/images/shapes/dummy-green-graph.png" alt="dummy-green-graph">
+                                    </div>
+                                    <!-- End Chart  -->
+                                </div>
+                                <!-- End Card  -->
+
+                                <!-- Up and Down Buttons   -->
+                                <div class="d-flex flex-column gap-10 vote-btns">
+                                    <button type="button">
+                                        <img src="assets/images/svgs/vote-arrow-up.svg" alt="vote-arrow-up">
+                                    </button>
+                                    <button type="button">
+                                        <img src="assets/images/svgs/vote-arrow-down.svg" alt="vote-arrow-down">
+                                    </button>
+                                </div>
+                                <!-- End Up and Down Buttons   -->
+                            </div>
+                            <!-- End Card One -->
+
+                            <!-- Card Two -->
+                            <div class="d-flex justify-content-between align-items-center gap-12 dragable-card-wrapper">
+                                <!-- Card  -->
+                                <div class="dragable-card d-flex align-items-center justify-content-between">
+                                    <!-- Content  -->
+                                    <div class="d-flex align-items-center gap-8">
+                                        <button type="button" class="drag-btn">
+                                            <img src="/assets/images/svgs/drag-icon.svg" alt="drag-icon">
+                                        </button>
+                                        <!-- Status  -->
+                                        <div class="stats-main-wrapper">
+                                            <div class="d-flex flex-column gap-8">
+                                                <div class="d-flex align-items-center gap-8">
+                                                    <img src="assets/images/svgs/cashflow-investment-icon.svg"
+                                                        alt="cashflow-investment-icon" />
+                                                    <h3 class="card-title">Investments</h3>
+                                                </div>
+                                                <div class="d-flex align-items-center gap-10">
+                                                    <h3 class="saving-title">£50,000</h3>
+                                                    <span class="badge green">+1%</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- End Status  -->
+                                    </div>
+                                    <!-- End Content  -->
+                                    <!--  Chart  -->
+                                    <div class="card-chart">
+                                        <img src="assets/images/shapes/dummy-green-graph.png" alt="dummy-green-graph">
+                                    </div>
+                                    <!-- End Chart  -->
+                                </div>
+                                <!-- End Card  -->
+
+                                <!-- Up and Down Buttons   -->
+                                <div class="d-flex flex-column gap-10 vote-btns">
+                                    <button type="button">
+                                        <img src="assets/images/svgs/vote-arrow-up.svg" alt="vote-arrow-up">
+                                    </button>
+                                    <button type="button">
+                                        <img src="assets/images/svgs/vote-arrow-down.svg" alt="vote-arrow-down">
+                                    </button>
+                                </div>
+                                <!-- End Up and Down Buttons   -->
+                            </div>
+                            <!-- End Card Two -->
+
+                            <!-- Card Three -->
+                            <div class="d-flex justify-content-between align-items-center gap-12 dragable-card-wrapper">
+                                <!-- Card  -->
+                                <div class="dragable-card d-flex align-items-center justify-content-between">
+                                    <!-- Content  -->
+                                    <div class="d-flex align-items-center gap-8">
+                                        <button type="button" class="drag-btn">
+                                            <img src="/assets/images/svgs/drag-icon.svg" alt="drag-icon">
+                                        </button>
+                                        <!-- Status  -->
+                                        <div class="stats-main-wrapper">
+                                            <div class="d-flex flex-column gap-8">
+                                                <div class="d-flex align-items-center gap-8">
+                                                    <img src="assets/images/svgs/cashflow-pension-icon.svg"
+                                                        alt="cashflow-pension-icon" />
+                                                    <h3 class="card-title">Pension</h3>
+                                                </div>
+                                                <div class="d-flex align-items-center gap-10">
+                                                    <h3 class="saving-title">£250,000</h3>
+                                                    <span class="badge red">-1%</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- End Status  -->
+                                    </div>
+                                    <!-- End Content  -->
+                                    <!--  Chart  -->
+                                    <div class="card-chart">
+                                        <img src="assets/images/shapes/dummy-red-graph.png" alt="dummy-red-graph">
+                                    </div>
+                                    <!-- End Chart  -->
+                                </div>
+                                <!-- End Card  -->
+
+                                <!-- Up and Down Buttons   -->
+                                <div class="d-flex flex-column gap-10 vote-btns">
+                                    <button type="button">
+                                        <img src="assets/images/svgs/vote-arrow-up.svg" alt="vote-arrow-up">
+                                    </button>
+                                    <button type="button">
+                                        <img src="assets/images/svgs/vote-arrow-down.svg" alt="vote-arrow-down">
+                                    </button>
+                                </div>
+                                <!-- End Up and Down Buttons   -->
+                            </div>
+                            <!-- End Card Three -->
+
+                            <!-- Card Four With Overlay -->
+                            <div class="d-flex justify-content-between align-items-center gap-12 dragable-card-wrapper">
+                                <!-- Card  -->
+                                <div class="dragable-card d-flex align-items-center justify-content-between">
+                                    <!-- Content  -->
+                                    <div class="d-flex align-items-center gap-8">
+                                        <button type="button" class="drag-btn">
+                                            <img src="/assets/images/svgs/drag-icon.svg" alt="drag-icon">
+                                        </button>
+                                        <!-- Status  -->
+                                        <div class="stats-main-wrapper">
+                                            <div class="d-flex flex-column gap-8">
+                                                <div class="d-flex align-items-center gap-8">
+                                                    <img src="assets/images/svgs/cashflow-investment-icon.svg"
+                                                        alt="cashflow-investment-icon" />
+                                                    <h3 class="card-title">Investments</h3>
+                                                </div>
+                                                <div class="d-flex align-items-center gap-10">
+                                                    <h3 class="saving-title">£50,000</h3>
+                                                    <span class="badge green">+1%</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- End Status  -->
+                                    </div>
+                                    <!-- End Content  -->
+                                    <!--  Chart  -->
+                                    <div class="card-chart">
+                                        <img src="assets/images/shapes/dummy-green-graph.png" alt="dummy-green-graph">
+                                    </div>
+                                    <!-- End Chart  -->
+
+                                    <!-- Lock Overlay  -->
+                                    <div class="lock-overlay">
+                                        <div
+                                            class="d-flex align-items-center justify-content-center flex-column gap-10 h-100">
+                                            <img src="assets/images/svgs/cashflow-lock-icon.svg"
+                                                alt="cashflow-lock-icon">
+                                            <p>Locked until 75 y.o.</p>
+                                        </div>
+                                        <div class="help-lock-overlay">
+                                            <img src="assets/images/svgs/help-circle-lock-overlay.svg"
+                                                alt="help-circle-lock-overlay">
+                                        </div>
+                                    </div>
+                                    <!-- End Lock Overlay  -->
+                                </div>
+                                <!-- End Card  -->
+
+                                <!-- Up and Down Buttons   -->
+                                <div class="d-flex flex-column gap-10 vote-btns">
+                                    <button type="button">
+                                        <img src="assets/images/svgs/vote-arrow-up.svg" alt="vote-arrow-up">
+                                    </button>
+                                    <button type="button">
+                                        <img src="assets/images/svgs/vote-arrow-down.svg" alt="vote-arrow-down">
+                                    </button>
+                                </div>
+                                <!-- End Up and Down Buttons   -->
+                            </div>
+                            <!-- Card Four With Overlay -->
+                        </div>
+                    </div>
+                </div>
+            </mat-card-content>
+        </mat-card>
+        <!-- End liquid savings, investments and pensions Section  -->
+    </div>
+
+    <!-- Feedback Card  -->
+    <div class="feeback-container d-flex flex-column gap-16">
+        <!-- Feeback First Step -->
+        <div class="feedback-wrapper">
+            <div class="d-flex flex-column gap-20">
+                <div class="d-flex flex-column gap-10">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center gap-8 feedback-nav-btns">
+                            <button type="button" class="active"></button>
+                            <button type="button"></button>
+                        </div>
+                        <button type="button">
+                            <img src="assets/images/svgs/close-line-cion.svg" alt="close-line-cion">
+                        </button>
+                    </div>
+                    <p>How satisfied are you with your current financial planning?</p>
+                </div>
+                <div class="d-flex align-items-center gap-24 emoji-btn">
+                    <button type="button"><img src="assets/images/shapes/sad-feedback-icon.png"
+                            alt="sad-feedback-icon"></button>
+                    <button type="button"><img src="assets/images/shapes/sad-feedback-icon-v2.png"
+                            alt="sad-feedback-icon-v2"></button>
+                    <button type="button"><img src="assets/images/shapes/happy-feedback-icon.png"
+                            alt="happy-feedback-icon"></button>
+                </div>
             </div>
-        </mat-card-content>
-    </mat-card>
-    <!-- End liquid savings, investments and pensions Section  -->
+        </div>
+        <!-- End Feeback First Step  -->
+
+        <!-- Second Feeback Step -->
+        <div class="feedback-wrapper">
+            <div class="d-flex flex-column gap-20">
+                <div class="d-flex flex-column gap-10">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center gap-8 feedback-nav-btns">
+                            <button type="button"></button>
+                            <button type="button" class="active"></button>
+                        </div>
+                    </div>
+                    <p class="form-label">Anything that can be improved?</p>
+                </div>
+                <div class="d-flex flex-column gap-20 feedback-form">
+                    <textarea name="feedback" id="feedback" placeholder="Your feedback (Optional)"></textarea>
+                    <div>
+                        <button type="button">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End Second Feeback Step  -->
+
+        <!-- Feeback Third Step -->
+        <div class="feedback-wrapper">
+            <div class="d-flex align-items-center gap-10">
+                <img src="assets/images/shapes/feeback-sent-icon.png" alt="feeback-sent-icon">
+                <p>Thanks for the feedback!</p>
+            </div>
+        </div>
+        <!-- End Feeback Third Step  -->
+    </div>
+    <!-- End Feedback Card  -->
 </div>
