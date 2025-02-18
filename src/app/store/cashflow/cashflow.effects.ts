@@ -4,11 +4,12 @@ import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { catchError, map, mergeMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import * as CashflowActions from './cashflow.actions';
+import { CashflowHttpService } from 'src/app/clients/services/cashflow-http.service';
 
 @Injectable()
 export class CashflowEffects {
   constructor(private actions$: Actions, 
-    // private CashflowService: CashflowService
+    private CashflowService: CashflowHttpService
 ) {}
 
 //   loadCashflow$ = createEffect(() =>
