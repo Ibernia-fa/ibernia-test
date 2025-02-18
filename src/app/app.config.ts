@@ -47,6 +47,7 @@ import { FinancialAdvisorEffects } from './store/financial-advisor/financial-adv
 import { provideStoreDevtools } from '@ngrx/store-devtools';
 import { ClientEffects } from './store/client/client.effects';
 import { CashflowEffects } from './store/cashflow/cashflow.effects';
+import { clientReducer } from './store/client/client.reducer';
 
 
 export function HttpLoaderFactory(handler: HttpBackend): any {
@@ -85,7 +86,7 @@ export const appConfig: ApplicationConfig = {
             deps: [HttpBackend],
         },
     })),
-    provideStore(),
+    provideStore({client: clientReducer}),
     provideEffects(FinancialAdvisorEffects, ClientEffects, CashflowEffects),
     provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() })
 ],
