@@ -65,21 +65,21 @@
     line-height: 22.98px;
     color: #1c1c1c;
   }
-  .vote-btns {
-    button {
-      outline: none;
-      border: none;
-      background-color: transparent;
-      cursor: pointer;
+}
+.vote-btns {
+  button {
+    outline: none;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    &:hover {
+      opacity: 50%;
       transition: all 0.3s ease-in-out;
-      &:hover {
-        opacity: 50%;
-        transition: all 0.3s ease-in-out;
-      }
-      &:active {
-        opacity: 100%;
-        transition: all 0.3s ease-in-out;
-      }
+    }
+    &:active {
+      opacity: 100%;
+      transition: all 0.3s ease-in-out;
     }
   }
 }
@@ -241,3 +241,57 @@
   }
 }
 // End Feeback Cards
+
+.leaderboard {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.leaderboard-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #f9f9f9;
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease-out;
+}
+
+.item-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.item-name {
+  font-weight: bold;
+}
+
+.item-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.upvote-btn,
+.downvote-btn {
+  padding: 5px 10px;
+  border: none;
+  background-color: #007bff;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.upvote-btn:hover,
+.downvote-btn:hover {
+  background-color: #0056b3;
+}
+
+.downvote-btn {
+  background-color: #dc3545;
+}
+
+.downvote-btn:hover {
+  background-color: #c82333;
+}
