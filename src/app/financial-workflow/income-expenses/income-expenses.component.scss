@@ -38,9 +38,12 @@
 }
 .income-expense-tables {
   .row {
-    // margin: 0;
+    margin: 0;
+    gap: 12px;
     .col-6 {
-      padding: 8px;
+      padding: 0px;
+      flex: 0 0 49%;
+      max-width: 49%;
     }
   }
 }
