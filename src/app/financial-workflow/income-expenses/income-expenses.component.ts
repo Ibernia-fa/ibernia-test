@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { AddIncomeComponent } from './add-income/add-income.component';
+import { UpdateIncomeComponent } from './update-income/update-income.component';
 import { MatCardModule } from '@angular/material/card';
 import { AddExpenseComponent } from './add-expense/add-expense.component';
 import { MatTableModule } from '@angular/material/table';
@@ -94,6 +95,18 @@ export class IncomeExpensesComponent {
 
   newExpenseClicked() {
     const dialogRef = this.dialog.open(AddExpenseComponent, {
+      width: '700px',
+      disableClose: true,
+      data: {},
+    });
+
+    dialogRef.afterClosed().subscribe((result: any) => {
+      console.log('Dialog closed with result:', result);
+    });
+  }
+
+  updateIncomeClicked() {
+    const dialogRef = this.dialog.open(UpdateIncomeComponent, {
       width: '700px',
       disableClose: true,
       data: {},
