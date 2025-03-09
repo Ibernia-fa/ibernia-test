@@ -18,57 +18,7 @@ import { IncomeExpensesHttpService } from './services/income-expenses-http.servi
 import { SettingsHttpService } from '../settings/services/settings-http.service';
 import { FinancialViewModel, IncomeExpense } from './model/income-expense';
 import { Cycle, EscalationRate } from '../timeline/models/financial-timeline';
-
-export interface PeriodicElement {
-  name: string;
-  position: string;
-  symbol: string;
-}
-
-const ELEMENT_DATA: PeriodicElement[] = [
-  { position: 'Accountant Salary (MR)', name: '£4,000/month', symbol: 'H' },
-  {
-    position: 'Graphic Design Salary - Part Time (Mrs)',
-    name: '£4,000/month',
-    symbol: 'He',
-  },
-  { position: 'NHS DB Pension (MRS)', name: '£4,000/month', symbol: 'Li' },
-  {
-    position: 'Tax free cash from NHS (Mrs)',
-    name: '£4,000/month',
-    symbol: 'Be',
-  },
-  {
-    position: "New Example Client's State Pension",
-    name: '£4,000/month',
-    symbol: 'B',
-  },
-  {
-    position: "New Example Client's State Pension",
-    name: '£4,000/month',
-    symbol: 'C',
-  },
-  {
-    position: "New Example Client's State Pension",
-    name: '£4,000/month',
-    symbol: 'N',
-  },
-  {
-    position: "New Example Client's State Pension",
-    name: '£4,000/month',
-    symbol: 'O',
-  },
-  {
-    position: "New Example Client's State Pension",
-    name: '£4,000/month',
-    symbol: 'F',
-  },
-  {
-    position: "New Example Client's State Pension",
-    name: '£4,000/month',
-    symbol: 'Ne',
-  },
-];
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-income-expenses',
@@ -80,13 +30,13 @@ const ELEMENT_DATA: PeriodicElement[] = [
     MatIconModule,
     MatMenuModule,
     MatButtonModule,
+    MatProgressSpinnerModule
   ],
   templateUrl: './income-expenses.component.html',
   styleUrl: './income-expenses.component.scss',
 })
 export class IncomeExpensesComponent {
   displayedColumns: string[] = ['position', 'name', 'action'];
-  dataSource = ELEMENT_DATA;
   incomeDataSource: MatTableDataSource<FinancialViewModel> = new MatTableDataSource(
       new Array<FinancialViewModel>()
     );
@@ -98,6 +48,7 @@ export class IncomeExpensesComponent {
   incomeExpense: IncomeExpense;
   amountCycles: Cycle[];
   escalationRates: EscalationRate[];
+  isLoaderVisible = false
 
   constructor(
     private dialog: MatDialog,
@@ -110,6 +61,7 @@ export class IncomeExpensesComponent {
   }
 
   getData() {
+    this.isLoaderVisible = true
     this.activatedRoute.params
       .pipe(
         switchMap((params) =>
@@ -138,6 +90,7 @@ export class IncomeExpensesComponent {
 
           this.incomeDataSource = new MatTableDataSource(this.incomeExpense.incomes);
           this.expenseDataSource = new MatTableDataSource(this.incomeExpense.expenses);
+          this.isLoaderVisible = false;
         })
       )
       .subscribe();
@@ -147,11 +100,17 @@ export class IncomeExpensesComponent {
     const dialogRef = this.dialog.open(AddIncomeComponent, {
       width: '700px',
       disableClose: true,
-      data: {},
+      data: {
+        amountCycles: this.amountCycles,
+        escalataionRates: this.escalationRates,
+        clientBirthDate: this.selectedClient?.clientDetails.birthDate,
+        clientPreferredCurrency: this.selectedClient?.clientDetails.preferredCurrency,
+        cashflowId: this.selectedCashflow?.id
+      },
     });
 
     dialogRef.afterClosed().subscribe((result: any) => {
-      console.log('Dialog closed with result:', result);
+      this.updateIncomeExpenseByResponse(result.incomeExpense);
     });
   }
 
@@ -159,35 +118,123 @@ export class IncomeExpensesComponent {
     const dialogRef = this.dialog.open(AddExpenseComponent, {
       width: '700px',
       disableClose: true,
-      data: {},
+      data: {
+        amountCycles: this.amountCycles,
+        escalataionRates: this.escalationRates,
+        clientBirthDate: this.selectedClient?.clientDetails.birthDate,
+        clientPreferredCurrency: this.selectedClient?.clientDetails.preferredCurrency,
+        cashflowId: this.selectedCashflow?.id
+      },
     });
 
     dialogRef.afterClosed().subscribe((result: any) => {
       console.log('Dialog closed with result:', result);
+      this.updateIncomeExpenseByResponse(result.incomeExpense);
     });
   }
 
-  updateIncomeClicked() {
-    const dialogRef = this.dialog.open(UpdateIncomeComponent, {
+
+  updateIncomeClicked(item: FinancialViewModel) {
+    const dialogRef = this.dialog.open(AddIncomeComponent, {
       width: '700px',
       disableClose: true,
-      data: {},
+      data: {
+        amountCycles: this.amountCycles,
+        escalataionRates: this.escalationRates,
+        clientBirthDate: this.selectedClient?.clientDetails.birthDate,
+        clientPreferredCurrency: this.selectedClient?.clientDetails.preferredCurrency,
+        cashflowId: this.selectedCashflow?.id,
+        selectedIncome: item,
+        isEditWorkflow: true
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((result: any) => {
+      this.updateIncomeExpenseByResponse(result.incomeExpense);
+    });
+  }
+
+  updateExpenseClicked(item: FinancialViewModel) {
+    const dialogRef = this.dialog.open(AddExpenseComponent, {
+      width: '700px',
+      disableClose: true,
+      data: {
+        amountCycles: this.amountCycles,
+        escalataionRates: this.escalationRates,
+        clientBirthDate: this.selectedClient?.clientDetails.birthDate,
+        clientPreferredCurrency: this.selectedClient?.clientDetails.preferredCurrency,
+        cashflowId: this.selectedCashflow?.id,
+        selectedExpense: item,
+        isEditWorkflow: true
+      },
     });
 
     dialogRef.afterClosed().subscribe((result: any) => {
       console.log('Dialog closed with result:', result);
+      this.updateIncomeExpenseByResponse(result.incomeExpense);
+    });
+  }
+
+  // updateIncomeClicked() {
+  //   const dialogRef = this.dialog.open(UpdateIncomeComponent, {
+  //     width: '700px',
+  //     disableClose: true,
+  //     data: {},
+  //   });
+
+  //   dialogRef.afterClosed().subscribe((result: any) => {
+  //     console.log('Dialog closed with result:', result);
+  //   });
+  // }
+
+  // updateExpenseClicked() {
+  //   const dialogRef = this.dialog.open(UpdateIncomeComponent, {
+  //     width: '700px',
+  //     disableClose: true,
+  //     data: {},
+  //   });
+
+  //   dialogRef.afterClosed().subscribe((result: any) => {
+  //     console.log('Dialog closed with result:', result);
+  //   });
+  // }
+
+  deleteIncome(element: FinancialViewModel) {
+    this.incomeExpensesHttpService.deleteIncome(this.selectedCashflow.id, element)
+    .subscribe((res) => {
+      this.updateIncomeExpenseByResponse(res);
     });
   }
   
-  updateExpenseClicked() {
-    const dialogRef = this.dialog.open(UpdateIncomeComponent, {
-      width: '700px',
-      disableClose: true,
-      data: {},
+  deleteExpense(element: FinancialViewModel) {
+    this.incomeExpensesHttpService.deleteExpense(this.selectedCashflow.id, element)
+    .subscribe((res) => {
+      this.updateIncomeExpenseByResponse(res);
     });
+  }
 
-    dialogRef.afterClosed().subscribe((result: any) => {
-      console.log('Dialog closed with result:', result);
-    });
+  updateIncomeExpenseByResponse(res: IncomeExpense) {
+    this.incomeExpense = res;
+    this.incomeDataSource = new MatTableDataSource(this.incomeExpense.incomes);
+    this.expenseDataSource = new MatTableDataSource(this.incomeExpense.expenses);
+  }
+
+  private calculateSavingsRate()
+  {
+    var totalIncome = 0;
+    var totalExpense = 0;
+    this.incomeExpense.incomes.map(x => totalIncome = totalIncome + x.amount.amount);
+    this.incomeExpense.expenses.map(x => totalExpense = totalExpense + x.amount.amount);
+    this.incomeExpense.totalIncome = totalIncome;
+    this.incomeExpense.totalExpenses = totalExpense;
+    this.incomeExpense.total = totalIncome - totalExpense;
+
+    if (totalIncome === 0) {
+      return;
+    }
+        // return 0; // Avoid division by zero
+
+    var savings = this.incomeExpense.totalIncome - this.incomeExpense.totalExpenses;
+    return (savings / this.incomeExpense.totalIncome) * 100;
   }
 }

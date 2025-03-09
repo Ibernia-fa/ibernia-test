@@ -1,9 +1,12 @@
+<!-- <p>add-Expense works!</p>
+<button (click)="closeDialog()" type="button"></button> -->
+
 <!--  Add Expense-->
 <div class="w-100">
   <div class="d-flex flex-column gap-32">
     <!-- Modal Header  -->
     <div class="d-flex align-items-center justify-content-between gap-10 modal-header">
-      <h3>Add an expense</h3>
+      <h3>Add an Expense</h3>
       <button (click)="closeDialog()" type="button">
         <img src="assets/images/svgs/close-line-cion.svg" alt="close-line-cion" />
       </button>
@@ -12,11 +15,11 @@
 
     <!-- Modal Body  -->
     <mat-dialog-content>
-      <div class="d-flex flex-column gap-20">
+      <div [formGroup]="expenseForm" class="d-flex flex-column gap-20">
         <!-- Description Field  -->
         <div class="w-100 form-field gap-12">
           <mat-label class="f-s-16 d-block" style="line-height: 18px">Description</mat-label>
-          <input matInput formControlName="name" placeholder="e.g. State Pension" />
+          <input matInput formControlName="description" placeholder="e.g. State Pension" />
           <!-- Error  -->
           <!-- <span class="field-error d-block">Name is required</span> -->
           <!-- End Error  -->
@@ -30,8 +33,15 @@
             <div class="net-field d-flex align-items-center">
               <!-- Currency Selector  -->
               <div class="left">
-                <mat-select class="sortby-edit-profile" hideSingleSelectionIndicator>
-                  <mat-option value="country">123</mat-option>
+                <mat-select formControlName="currencySymbol" class="sortby-edit-profile" hideSingleSelectionIndicator>
+                  @for (country of countries; track country) {
+                    @if(country.currencySymbol) {
+                      <mat-option [value]="country.currencySymbol">{{
+                        country.currencySymbol
+                        }}</mat-option>
+  
+                    }
+                  }
                 </mat-select>
               </div>
               <!-- End Currency Selector  -->
@@ -43,7 +53,9 @@
               <!-- End Type Field  -->
               <div class="right">
                 <mat-select value="Select" formControlName="cycle" class="sortby-edit-profile">
-                  <mat-option value="cycle">123</mat-option>
+                  @for (cycle of cycles; track cycle) {
+                    <mat-option [value]="cycle.id">{{ cycle.description }}</mat-option>
+                  }
                 </mat-select>
               </div>
               <!-- End Type Field  -->
@@ -89,8 +101,8 @@
         </button>
       </div>
       <div class="col-5">
-        <button type="button" class="button-icon w-100 d-block">
-          <span class="f-s-16">Add expense</span>
+        <button (click)="addExpense()" type="button" class="button-icon w-100 d-block">
+          <span class="f-s-16"> {{isEditWorkflow ? 'Update' : 'Add'}} Expense</span>
         </button>
       </div>
     </div>

@@ -1,252 +1,259 @@
 <div class="d-flex gap-24 flex-column">
-    <mat-card class="cardWithShadow">
-        <mat-card-content>
-            <div class="d-flex align-items-center justify-content-between w-100 gap-16 flex-wrap">
-                <div class="d-flex align-items-center gap-16">
-                    <!-- Icon  -->
-                    <div class="icon-wrapper d-flex align-items-center justify-content-center">
-                        <img src="assets/images/svgs/income-expense-ticket-icon.svg" alt="income-expense-ticket-icon" />
+    @if(!isLoaderVisible) {
+        <mat-card class="cardWithShadow">
+            <mat-card-content>
+                <div class="d-flex align-items-center justify-content-between w-100 gap-16 flex-wrap">
+                    <div class="d-flex align-items-center gap-16">
+                        <!-- Icon  -->
+                        <div class="icon-wrapper d-flex align-items-center justify-content-center">
+                            <img src="assets/images/svgs/income-expense-ticket-icon.svg" alt="income-expense-ticket-icon" />
+                        </div>
+                        <!-- End Icon  -->
+                        <!-- headings  -->
+                        <div class="d-flex flex-column justify-content-between gap-4">
+                            <div class="d-flex align-items-center gap-4">
+                                <h4 class="page-title f-w-500">Incomes & expenses</h4>
+                                <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" class="m-t-4">
+                            </div>
+                            <span class="sub-title">{{selectedClient.clientDetails.name}}</span>
+                        </div>
+                        <!-- End headings  -->
                     </div>
-                    <!-- End Icon  -->
-                    <!-- headings  -->
-                    <div class="d-flex flex-column justify-content-between gap-4">
-                        <div class="d-flex align-items-center gap-4">
-                            <h4 class="page-title f-w-500">Incomes & expenses</h4>
-                            <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" class="m-t-4">
-                        </div>
-                        <span class="sub-title">{{selectedClient.clientDetails.name}}</span>
-                    </div>
-                    <!-- End headings  -->
-                </div>
-                <div class="d-flex align-items-center gap-12">
-                    <img src="/assets/images/svgs/chart-histogram-two-icon.svg" alt="chart" />
-                    <span class="f-s-16 underline">{{selectedCashflow.name}}</span>
-                </div>
-            </div>
-        </mat-card-content>
-    </mat-card>
-
-    <mat-card class="cardWithShadow">
-        <mat-card-content>
-            <div class="d-flex align-items-center gap-8 justify-content-between">
-                <div class="income-expense-wrapper">
-                    <div class="row justify-content-between">
-                        <div class="col-3">
-                            <div class="d-flex flex-column gap-8">
-                                <div class="d-flex align-items-center gap-8">
-                                    <img src="assets/images/svgs/income-money-receive.svg" alt="income-money-receive" />
-                                    <h3 class="card-title expense-income">Incomes</h3>
-                                </div>
-                                <h3 class="saving-title">+{{incomeExpense.totalIncome}}</h3>
-                            </div>
-                        </div>
-                        <!-- Divider  -->
-                        <div class="divider"></div>
-                        <!-- End Divider  -->
-                        <div class="col-3">
-                            <div class="d-flex flex-column gap-8">
-                                <div class="d-flex align-items-center gap-8">
-                                    <img src="assets/images/svgs/income-money-send.svg" alt="income-money-send" />
-                                    <h3 class="card-title expenses-deduct">Expenses</h3>
-                                </div>
-                                <h3 class="saving-title">-{{incomeExpense.totalExpenses}}</h3>
-                            </div>
-                        </div>
-                        <!-- Divider  -->
-                        <div class="divider"></div>
-                        <!-- End Divider  -->
-                        <div class="col-3">
-                            <div class="d-flex flex-column gap-8">
-                                <div class="d-flex align-items-center gap-8">
-                                    <img src="assets/images/svgs/income-dollar-icon.svg" alt="income-dollar-icon" />
-                                    <h3 class="card-title expenses-total">Total</h3>
-                                </div>
-                                <h3 class="saving-title">= {{incomeExpense.total}}</h3>
-                            </div>
-                        </div>
-                        <!-- Divider  -->
-                        <div class="divider"></div>
-                        <!-- End Divider  -->
-                        <div class="col-3">
-                            <div class="d-flex flex-column gap-8">
-                                <div class="d-flex align-items-center gap-8">
-                                    <img src="assets/images/svgs/income-discount.svg" alt="income-discount" />
-                                    <h3 class="card-title expense-income">Saving rate</h3>
-                                </div>
-                                <h3 class="saving-title expense-income">{{incomeExpense.savingRate}}%</h3>
-                            </div>
-                        </div>
+                    <div class="d-flex align-items-center gap-12">
+                        <img src="/assets/images/svgs/chart-histogram-two-icon.svg" alt="chart" />
+                        <span class="f-s-16 underline">{{selectedCashflow.name}}</span>
                     </div>
                 </div>
-                <!-- Emoji  -->
-                <img src="assets/images/shapes/happy-feedback-icon.png" alt="smile-emoji">
-                <!-- End Emoji  -->
-            </div>
-        </mat-card-content>
-    </mat-card>
+            </mat-card-content>
+        </mat-card>
 
-    <div class="income-expense-tables">
-        <div class="row justify-content-between">
-            <div class="col-6">
-                <!-- Left Table Income -->
-                <mat-card class="clientTableContainer">
-                    <div class="heading-btn-wrapper">
-                        <div class="d-flex flex-column gap-12">
-                            <h3>Incomes</h3>
-                            <button (click)="newIncomeClicked()" type="button" class="w-100 button-icon">
-                                <span>Add income</span>
-                            </button>
+        <mat-card class="cardWithShadow">
+            <mat-card-content>
+                <div class="d-flex align-items-center gap-8 justify-content-between">
+                    <div class="income-expense-wrapper">
+                        <div class="row justify-content-between">
+                            <div class="col-3">
+                                <div class="d-flex flex-column gap-8">
+                                    <div class="d-flex align-items-center gap-8">
+                                        <img src="assets/images/svgs/income-money-receive.svg" alt="income-money-receive" />
+                                        <h3 class="card-title expense-income">Incomes</h3>
+                                    </div>
+                                    <h3 class="saving-title">+{{incomeExpense.totalIncome}}</h3>
+                                </div>
+                            </div>
+                            <!-- Divider  -->
+                            <div class="divider"></div>
+                            <!-- End Divider  -->
+                            <div class="col-3">
+                                <div class="d-flex flex-column gap-8">
+                                    <div class="d-flex align-items-center gap-8">
+                                        <img src="assets/images/svgs/income-money-send.svg" alt="income-money-send" />
+                                        <h3 class="card-title expenses-deduct">Expenses</h3>
+                                    </div>
+                                    <h3 class="saving-title">-{{incomeExpense.totalExpenses}}</h3>
+                                </div>
+                            </div>
+                            <!-- Divider  -->
+                            <div class="divider"></div>
+                            <!-- End Divider  -->
+                            <div class="col-3">
+                                <div class="d-flex flex-column gap-8">
+                                    <div class="d-flex align-items-center gap-8">
+                                        <img src="assets/images/svgs/income-dollar-icon.svg" alt="income-dollar-icon" />
+                                        <h3 class="card-title expenses-total">Total</h3>
+                                    </div>
+                                    <h3 class="saving-title">= {{incomeExpense.total}}</h3>
+                                </div>
+                            </div>
+                            <!-- Divider  -->
+                            <div class="divider"></div>
+                            <!-- End Divider  -->
+                            <div class="col-3">
+                                <div class="d-flex flex-column gap-8">
+                                    <div class="d-flex align-items-center gap-8">
+                                        <img src="assets/images/svgs/income-discount.svg" alt="income-discount" />
+                                        <h3 class="card-title expense-income">Saving rate</h3>
+                                    </div>
+                                    <h3 class="saving-title expense-income">{{incomeExpense.savingRate}}%</h3>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <!-- Table Wrapper  -->
-                    <div class="table-main-wrapper">
-                        <div class="table-responsive-sm table-wrapper">
-                            <table mat-table [dataSource]="incomeDataSource" class="mat-elevation-z8">
+                    <!-- Emoji  -->
+                    <img src="assets/images/shapes/happy-feedback-icon.png" alt="smile-emoji">
+                    <!-- End Emoji  -->
+                </div>
+            </mat-card-content>
+        </mat-card>
 
-                                <!-- Position Column -->
-                                <ng-container matColumnDef="position">
-                                    <th mat-header-cell *matHeaderCellDef
-                                        class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-client">Description
-                                    </th>
-                                    <td mat-cell *matCellDef="let element" class="p-x-24 f-s-14 p-l-0 column-client">
-                                        {{element.description}} </td>
-                                </ng-container>
-
-                                <!-- Name Column -->
-                                <ng-container matColumnDef="name">
-                                    <th mat-header-cell *matHeaderCellDef
-                                        class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-net-amount">Net amount
-                                    </th>
-                                    <td mat-cell *matCellDef="let element"
-                                        class="p-x-24 f-s-14 p-l-0 column-net-amount">
-                                        {{element.amount.currencySymbol}} {{element.amount.amount}}</td>
-                                </ng-container>
-
-                                <!-- Symbol Column -->
-                                <ng-container matColumnDef="action">
-                                    <th mat-header-cell *matHeaderCellDef
-                                        class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-action"></th>
-                                    <td mat-cell class="column-action" *matCellDef="let element">
-                                        <div class="d-flex align-items-center justify-content-center">
-                                            <button (click)="$event.stopPropagation(); $event.preventDefault()"
-                                                mat-icon-button [matMenuTriggerFor]="menu">
-                                                <mat-icon>
-                                                    <img src="assets/images/svgs/dropdown-detail.svg"
-                                                        alt="dropdown-detail" />
-                                                </mat-icon>
-                                            </button>
-                                        </div>
-                                        <mat-menu #menu="matMenu" xPosition="before" class="dropdown-menus">
-                                            <button (click)="updateIncomeClicked()" mat-menu-item>
-                                                <mat-icon>
-                                                    <img src="assets/images/svgs/drop-down-edit-2-line.svg"
-                                                        alt="drop-down-copy-2-line" height="24" width="24" />
-                                                </mat-icon>
-                                                <span>Edit</span>
-                                            </button>
-                                            <button mat-menu-item>
-                                                <mat-icon>
-                                                    <img src="assets/images/svgs/drop-down-delete-2-line.svg"
-                                                        alt="drop-down-copy-2-line" height="24" width="24" />
-                                                </mat-icon>
-                                                <span>Delete</span>
-                                            </button>
-                                        </mat-menu>
-                                    </td>
-                                </ng-container>
-
-                                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-                            </table>
-
-
+        <div class="income-expense-tables">
+            <div class="row justify-content-between">
+                <div class="col-6">
+                    <!-- Left Table Income -->
+                    <mat-card class="clientTableContainer">
+                        <div class="heading-btn-wrapper">
+                            <div class="d-flex flex-column gap-12">
+                                <h3>Incomes</h3>
+                                <button (click)="newIncomeClicked()" type="button" class="w-100 button-icon">
+                                    <span>Add income</span>
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                    <!-- End Table Wrapper  -->
-                </mat-card>
-                <!-- End Left Table Income -->
-            </div>
-            <div class="col-6">
-                <!-- Right Table Income -->
-                <mat-card class="clientTableContainer">
-                    <div class="heading-btn-wrapper">
-                        <div class="d-flex flex-column gap-12">
-                            <h3>Expenses</h3>
-                            <button (click)="newExpenseClicked()" type="button" class="w-100 button-icon-outline">
-                                <span>Add expenses</span>
-                            </button>
+                        <!-- Table Wrapper  -->
+                        <div class="table-main-wrapper">
+                            <div class="table-responsive-sm table-wrapper">
+                                <table mat-table [dataSource]="incomeDataSource" class="mat-elevation-z8">
+
+                                    <!-- Position Column -->
+                                    <ng-container matColumnDef="position">
+                                        <th mat-header-cell *matHeaderCellDef
+                                            class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-client">Description
+                                        </th>
+                                        <td mat-cell *matCellDef="let element" class="p-x-24 f-s-14 p-l-0 column-client">
+                                            {{element.description}} </td>
+                                    </ng-container>
+
+                                    <!-- Name Column -->
+                                    <ng-container matColumnDef="name">
+                                        <th mat-header-cell *matHeaderCellDef
+                                            class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-net-amount">Net amount
+                                        </th>
+                                        <td mat-cell *matCellDef="let element"
+                                            class="p-x-24 f-s-14 p-l-0 column-net-amount">
+                                            {{element.amount.currencySymbol}} {{element.amount.amount}}/{{element.amount.cycle.description}}</td>
+                                    </ng-container>
+
+                                    <!-- Symbol Column -->
+                                    <ng-container matColumnDef="action">
+                                        <th mat-header-cell *matHeaderCellDef
+                                            class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-action"></th>
+                                        <td mat-cell class="column-action" *matCellDef="let element">
+                                            <div class="d-flex align-items-center justify-content-center">
+                                                <button (click)="$event.stopPropagation(); $event.preventDefault()"
+                                                    mat-icon-button [matMenuTriggerFor]="menu">
+                                                    <mat-icon>
+                                                        <img src="assets/images/svgs/dropdown-detail.svg"
+                                                            alt="dropdown-detail" />
+                                                    </mat-icon>
+                                                </button>
+                                            </div>
+                                            <mat-menu #menu="matMenu" xPosition="before" class="dropdown-menus">
+                                                <button (click)="updateIncomeClicked(element)" mat-menu-item>
+                                                    <mat-icon>
+                                                        <img src="assets/images/svgs/drop-down-edit-2-line.svg"
+                                                            alt="drop-down-copy-2-line" height="24" width="24" />
+                                                    </mat-icon>
+                                                    <span>Edit</span>
+                                                </button>
+                                                <button (click)="deleteIncome(element)" mat-menu-item>
+                                                    <mat-icon>
+                                                        <img src="assets/images/svgs/drop-down-delete-2-line.svg"
+                                                            alt="drop-down-copy-2-line" height="24" width="24" />
+                                                    </mat-icon>
+                                                    <span>Delete</span>
+                                                </button>
+                                            </mat-menu>
+                                        </td>
+                                    </ng-container>
+
+                                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                                    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                                </table>
+
+
+                            </div>
                         </div>
-                    </div>
-                    <!-- Table Wrapper  -->
-                    <div class="table-main-wrapper">
-                        <div class="table-responsive-sm table-wrapper">
-                            <table mat-table [dataSource]="expenseDataSource" class="mat-elevation-z8">
-
-                                <!-- Position Column -->
-                                <ng-container matColumnDef="position">
-                                    <th mat-header-cell *matHeaderCellDef
-                                        class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-client">Description
-                                    </th>
-                                    <td mat-cell *matCellDef="let element" class="p-x-24 f-s-14 p-l-0 column-client">
-                                        {{element.description}} </td>
-                                </ng-container>
-
-                                <!-- Name Column -->
-                                <ng-container matColumnDef="name">
-                                    <th mat-header-cell *matHeaderCellDef
-                                        class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-net-amount">Net amount
-                                    </th>
-                                    <td mat-cell *matCellDef="let element"
-                                        class="p-x-24 f-s-14 p-l-0 column-net-amount">
-                                        {{element.amount.currencySymbol}} {{element.amount.amount}} </td>
-                                </ng-container>
-
-                                <!-- Symbol Column -->
-                                <ng-container matColumnDef="action">
-                                    <th mat-header-cell *matHeaderCellDef
-                                        class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-action"></th>
-                                    <td mat-cell class="column-action" *matCellDef="let element">
-                                        <div class="d-flex align-items-center justify-content-center">
-                                            <button (click)="$event.stopPropagation(); $event.preventDefault()"
-                                                mat-icon-button [matMenuTriggerFor]="menu">
-                                                <mat-icon>
-                                                    <img src="assets/images/svgs/dropdown-detail.svg"
-                                                        alt="dropdown-detail" />
-                                                </mat-icon>
-                                            </button>
-                                        </div>
-                                        <mat-menu #menu="matMenu" xPosition="before" class="dropdown-menus">
-                                            <button (click)="updateExpenseClicked()" mat-menu-item>
-                                                <mat-icon>
-                                                    <img src="assets/images/svgs/drop-down-edit-2-line.svg"
-                                                        alt="drop-down-copy-2-line" height="24" width="24" />
-                                                </mat-icon>
-                                                <span>Edit</span>
-                                            </button>
-                                            <button mat-menu-item>
-                                                <mat-icon>
-                                                    <img src="assets/images/svgs/drop-down-delete-2-line.svg"
-                                                        alt="drop-down-copy-2-line" height="24" width="24" />
-                                                </mat-icon>
-                                                <span>Delete</span>
-                                            </button>
-                                        </mat-menu>
-                                    </td>
-                                </ng-container>
-
-                                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-                            </table>
-
-
+                        <!-- End Table Wrapper  -->
+                    </mat-card>
+                    <!-- End Left Table Income -->
+                </div>
+                <div class="col-6">
+                    <!-- Right Table Income -->
+                    <mat-card class="clientTableContainer">
+                        <div class="heading-btn-wrapper">
+                            <div class="d-flex flex-column gap-12">
+                                <h3>Expenses</h3>
+                                <button (click)="newExpenseClicked()" type="button" class="w-100 button-icon-outline">
+                                    <span>Add expenses</span>
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                    <!-- End Table Wrapper  -->
-                </mat-card>
-                <!-- End Right Table Income -->
+                        <!-- Table Wrapper  -->
+                        <div class="table-main-wrapper">
+                            <div class="table-responsive-sm table-wrapper">
+                                <table mat-table [dataSource]="expenseDataSource" class="mat-elevation-z8">
+
+                                    <!-- Position Column -->
+                                    <ng-container matColumnDef="position">
+                                        <th mat-header-cell *matHeaderCellDef
+                                            class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-client">Description
+                                        </th>
+                                        <td mat-cell *matCellDef="let element" class="p-x-24 f-s-14 p-l-0 column-client">
+                                            {{element.description}} </td>
+                                    </ng-container>
+
+                                    <!-- Name Column -->
+                                    <ng-container matColumnDef="name">
+                                        <th mat-header-cell *matHeaderCellDef
+                                            class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-net-amount">Net amount
+                                        </th>
+                                        <td mat-cell *matCellDef="let element"
+                                            class="p-x-24 f-s-14 p-l-0 column-net-amount">
+                                            {{element.amount.currencySymbol}} {{element.amount.amount}}/{{element.amount.cycle.description}} </td>
+                                    </ng-container>
+
+                                    <!-- Symbol Column -->
+                                    <ng-container matColumnDef="action">
+                                        <th mat-header-cell *matHeaderCellDef
+                                            class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-action"></th>
+                                        <td mat-cell class="column-action" *matCellDef="let element">
+                                            <div class="d-flex align-items-center justify-content-center">
+                                                <button (click)="$event.stopPropagation(); $event.preventDefault()"
+                                                    mat-icon-button [matMenuTriggerFor]="menu">
+                                                    <mat-icon>
+                                                        <img src="assets/images/svgs/dropdown-detail.svg"
+                                                            alt="dropdown-detail" />
+                                                    </mat-icon>
+                                                </button>
+                                            </div>
+                                            <mat-menu #menu="matMenu" xPosition="before" class="dropdown-menus">
+                                                <button (click)="updateExpenseClicked(element)" mat-menu-item>
+                                                    <mat-icon>
+                                                        <img src="assets/images/svgs/drop-down-edit-2-line.svg"
+                                                            alt="drop-down-copy-2-line" height="24" width="24" />
+                                                    </mat-icon>
+                                                    <span>Edit</span>
+                                                </button>
+                                                <button (click)="deleteExpense(element)" mat-menu-item>
+                                                    <mat-icon>
+                                                        <img src="assets/images/svgs/drop-down-delete-2-line.svg"
+                                                            alt="drop-down-copy-2-line" height="24" width="24" />
+                                                    </mat-icon>
+                                                    <span>Delete</span>
+                                                </button>
+                                            </mat-menu>
+                                        </td>
+                                    </ng-container>
+
+                                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                                    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                                </table>
+
+
+                            </div>
+                        </div>
+                        <!-- End Table Wrapper  -->
+                    </mat-card>
+                    <!-- End Right Table Income -->
+                </div>
             </div>
         </div>
-    </div>
+    }
+    @else {
+        <div class="h-300">
+            <mat-spinner></mat-spinner>
+        </div>
+    }
 </div>
 
 <!-- <button (click)="updateIncomeClicked()" type="button" class="button-icon">

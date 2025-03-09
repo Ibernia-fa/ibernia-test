@@ -16,7 +16,7 @@ export interface IncomeExpense {
 }
 
 export interface FinancialViewModel {
-    id: string;
+    id: string | null;
     description: string;
     amount: NetAmount;
     date: Date;
