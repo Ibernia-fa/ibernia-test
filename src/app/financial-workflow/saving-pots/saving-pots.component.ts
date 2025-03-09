@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { AddNewPotComponent } from './add-new-pot/add-new-pot.component';
 import { MatCardModule } from '@angular/material/card';
@@ -7,22 +7,39 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import {
   CdkDragDrop,
   moveItemInArray,
-  transferArrayItem,
   CdkDrag,
   CdkDropList,
   CdkDragHandle,
 } from '@angular/cdk/drag-drop';
 import {
   animate,
-  keyframes,
-  query,
-  stagger,
-  state,
   style,
   transition,
   trigger,
 } from '@angular/animations';
 import { CommonModule } from '@angular/common';
+import {
+  combineLatest,
+  switchMap,
+  tap,
+} from 'rxjs';
+import { SavingsPotsHttpService as SavingPotsHttpService } from './services/savings-pots-http.service';
+import { SavingPotsModel as SavingPots } from './models/saving-pots.model';
+import { Cashflow } from 'src/app/clients/models/cashflow';
+import { TimelineHttpService } from '../timeline/services/timeline-http.service';
+import { Client } from 'src/app/clients/models/client';
+import {
+  Cycle,
+  EscalationRate,
+  FinancialTimeline,
+} from '../timeline/models/financial-timeline';
+import { SettingsHttpService } from '../settings/services/settings-http.service';
+import moment from 'moment';
+import { ActivatedRoute } from '@angular/router';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { FormsModule } from '@angular/forms';
+import { FinancialWorkflowService } from '../services/financial-workflow.service';
+
 @Component({
   selector: 'app-saving-pots',
   imports: [
@@ -30,10 +47,12 @@ import { CommonModule } from '@angular/common';
     MatCardModule,
     MatSliderModule,
     MatTooltipModule,
+    MatProgressSpinnerModule,
     CdkDrag,
     CdkDragHandle,
     CdkDropList,
     CommonModule,
+    FormsModule
   ],
 
   templateUrl: './saving-pots.component.html',
@@ -71,11 +90,30 @@ import { CommonModule } from '@angular/common';
   //   ])
   // ]
 })
-export class SavingPotsComponent {
-  constructor(private dialog: MatDialog) {}
+export class SavingPotsComponent implements OnInit {
+  constructor(
+    private dialog: MatDialog,
+    private savingPotsHttpService: SavingPotsHttpService,
+    private timelineHttpService: TimelineHttpService,
+    private settingHttpService: SettingsHttpService,
+    private activatedRoute: ActivatedRoute,
+    private financialWorkflowService: FinancialWorkflowService
+  ) {
+    this.getData();
+  }
 
-  all = [1, 2, 3, 4, 5, 6, 7, 8, 9];
   transitionState = '';
+  selectedCashflow: Cashflow | null;
+  selectedClient: Client | null;
+  savingPots: SavingPots;
+  timeline: FinancialTimeline;
+  amountCycles: Array<Cycle>;
+  escalationRates: Array<EscalationRate>;
+  isLoaderVisible = false
+  showFeedbackPopup = false
+  selectedRating = '';
+  currentStep=1
+  feedbackDetail=''
 
   items = [
     { id: 1, name: 'Item 1', score: 5 },
@@ -84,7 +122,79 @@ export class SavingPotsComponent {
     { id: 4, name: 'Item 4', score: 2 },
   ];
 
-  ngOnInit(): void {}
+  getData() {
+    this.isLoaderVisible = true;
+    this.activatedRoute.params.pipe(
+      switchMap((params) =>
+        this.financialWorkflowService.loadClientCashflowMetadata(params),
+      ),
+      tap(([client, cashflow]) => {
+        this.selectedClient = client as Client;
+        console.log(cashflow);
+        this.selectedCashflow = cashflow as Cashflow;
+      }),
+      switchMap(([client, cashflow]) => {
+        return combineLatest([
+          this.savingPotsHttpService.getAllSavingsPots(
+            (cashflow as Cashflow).id
+          ),
+          this.timelineHttpService.getTimelinebyCashflowId(
+            (cashflow as Cashflow).id
+          ),
+          this.settingHttpService.getAmountCycles(),
+          this.settingHttpService.getEscalationRates(
+            (client as Client).financialAdvisor.advisorId
+          ),
+        ]);
+      }),
+      tap(([
+        savingPots,
+        timeline, amountCycles, escalationRates]) => {
+        console.log(timeline, amountCycles, escalationRates);
+        this.savingPots = savingPots;
+        this.timeline = timeline;
+        this.amountCycles = amountCycles;
+        this.escalationRates = escalationRates;
+        this.isLoaderVisible = false;
+      })
+    )
+    .subscribe();
+  }
+
+  ngOnInit(): void {
+    var showFeedbackPopup = localStorage.getItem('showFeedbackPopup');
+    if(showFeedbackPopup !== null) {
+      this.showFeedbackPopup =  showFeedbackPopup === 'true'
+    }
+    else {
+      this.showFeedbackPopup = true;
+    }
+  }
+
+  closeFeedbackPopupClicked() {
+    this.showFeedbackPopup = false;
+    localStorage.setItem('showFeedbackPopup', "false");
+  }
+
+  selectRating(value : any) {
+    this.selectedRating = value
+    this.currentStep = 2
+  }
+
+  feedbackSubmitBtnClicked() {
+    var feedback = {
+      rating: this.selectedRating,
+      feedbackDetail: this.feedbackDetail
+    }
+    localStorage.setItem('feedbackSubmission', JSON.stringify(feedback))
+    localStorage.setItem('showFeedbackPopup', 'false');
+
+    this.currentStep = 3;
+    setTimeout(() => {
+      this.showFeedbackPopup = false;
+    }, 5000)
+  }
+
 
   upvote(item: any): void {
     item.score++;
@@ -94,41 +204,24 @@ export class SavingPotsComponent {
     item.score--;
   }
 
-  // drop(event: CdkDragDrop<number[]>) {
-  //   console.log({event})
-  //   if (event.previousContainer === event.container) {
-  //     moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
-  //   } else {
-  //     transferArrayItem(
-  //       event.previousContainer.data,
-  //       event.container.data,
-  //       event.previousIndex,
-  //       event.currentIndex,
-  //     );
-  //   }
-  // }
 
-  drop(event: CdkDragDrop<any[]>) {
-    moveItemInArray(this.all, event.previousIndex, event.currentIndex);
+  drop(event: CdkDragDrop<any>) {
+    moveItemInArray(this.savingPots.clientSavings, event.previousIndex, event.currentIndex);
   }
 
-  // Move item up
   moveUp(index: number) {
     if (index > 0) {
-      moveItemInArray(this.all, index - 1, index);
+      moveItemInArray(this.savingPots.clientSavings, index - 1, index);
       this.transitionState = 'up';
-      this.all = [...this.all];
-      // [this.all[index], this.all[index - 1]] = [this.all[index - 1], this.all[index]];
+      this.savingPots.clientSavings = [...this.savingPots.clientSavings];
     }
   }
 
-  // Move item down
   moveDown(index: number) {
-    if (index < this.all.length - 1) {
-      moveItemInArray(this.all, index + 1, index);
+    if (index < this.savingPots.clientSavings.length - 1) {
+      moveItemInArray(this.savingPots.clientSavings, index + 1, index);
       this.transitionState = 'down';
-      this.all = [...this.all];
-      // [this.all[index], this.all[index + 1]] = [this.all[index + 1], this.all[index]];
+      this.savingPots.clientSavings = [...this.savingPots.clientSavings];
     }
   }
 
@@ -136,11 +229,21 @@ export class SavingPotsComponent {
     const dialogRef = this.dialog.open(AddNewPotComponent, {
       width: '700px',
       disableClose: true,
-      data: {},
+      data: {
+        amountCycles: this.amountCycles,
+        escalataionRates: this.escalationRates,
+        eventsList: this.timeline.clientEvents,
+        clientBirthDate: this.selectedClient?.clientDetails.birthDate,
+        clientPreferredCurrency: this.selectedClient?.clientDetails.preferredCurrency,
+        forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
+        forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
+        cashflowId: this.selectedCashflow?.id
+      },
     });
 
     dialogRef.afterClosed().subscribe((result: any) => {
       console.log('Dialog closed with result:', result);
+      this.savingPots.clientSavings.push(result.clientSaving);
     });
   }
 }

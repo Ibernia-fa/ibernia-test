@@ -3,4 +3,4 @@ import { CashflowState } from './cashflow.reducer';
 
 export const selectCashflowState = createFeatureSelector<CashflowState>('cashflow');
 
-export const selectCashflow = createSelector(selectCashflowState, (state) => state.selectedCashflow);
+export const selectedCashflow = createSelector(selectCashflowState, (state) => state.selectedCashflow);

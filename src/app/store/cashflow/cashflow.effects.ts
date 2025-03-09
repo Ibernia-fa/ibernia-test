@@ -9,18 +9,18 @@ import { CashflowHttpService } from 'src/app/clients/services/cashflow-http.serv
 @Injectable()
 export class CashflowEffects {
   constructor(private actions$: Actions, 
-    private CashflowService: CashflowHttpService
+    private cashflowHttpService: CashflowHttpService
 ) {}
 
-//   loadCashflow$ = createEffect(() =>
-//     this.actions$.pipe(
-//       ofType(CashflowActions.loadCashflow),
-//       mergeMap(() =>
-//         this.CashflowService.getAdvisor().pipe(
-//           map((advisor) => CashflowActions.loadCashflowSuccess({ advisor })),
-//           catchError((error) => of(CashflowActions.loadCashflowFailure({ error: error.message })))
-//         )
-//       )
-//     )
-//   );
+  loadCashflow$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(CashflowActions.loadCashflow),
+      mergeMap((props: { cashflowId: string }) =>
+        this.cashflowHttpService.getByCashflowId(props.cashflowId).pipe(
+          map((cashflow) => CashflowActions.loadCashflowSuccess({ cashflow })),
+          catchError((error) => of(CashflowActions.loadCashflowFailure({ error: error.message })))
+        )
+      )
+    )
+  );
 }

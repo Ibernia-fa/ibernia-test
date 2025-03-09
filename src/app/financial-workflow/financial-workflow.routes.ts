@@ -14,11 +14,11 @@ export const FinancialWorkflowRoutes: Routes = [
         component: TimelineComponent,
       },
       {
-        path: 'finances',
+        path: ':id/finances',
         component: SavingPotsComponent,
       },
       {
-        path: 'income',
+        path: ':id/income',
         component: IncomeExpensesComponent,
       },
       // {

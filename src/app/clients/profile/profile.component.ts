@@ -26,6 +26,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Store } from '@ngrx/store';
 import { selectedClient } from 'src/app/store/client/client.selectors';
 import * as ClientActions from 'src/app/store/client/client.actions';
+import * as CashflowActions from 'src/app/store/cashflow/cashflow.actions';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 interface SortDescriptor {
   value: string;
@@ -109,6 +110,13 @@ export class ProfileComponent {
         })
       )
       .subscribe();
+  }
+
+  loadCashflowToStore(cashflowId : any) {
+    var cashflow = this.cashflows.find(cashflow => cashflow.id === cashflowId)
+    console.log(cashflow);
+    if(cashflow)
+      this.store.dispatch(CashflowActions.selectCashflow({cashflow}));
   }
 
   getCashflows() {

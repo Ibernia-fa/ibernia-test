@@ -21,8 +21,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { Store } from '@ngrx/store';
 import { selectedClient } from 'src/app/store/client/client.selectors';
 import * as ClientActions from 'src/app/store/client/client.actions';
+import * as CashflowActions from 'src/app/store/cashflow/cashflow.actions';
 import { Client } from 'src/app/clients/models/client';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { selectedCashflow } from 'src/app/store/cashflow/cashflow.selectors';
 
 @Component({
   selector: 'app-timeline',
@@ -81,8 +83,11 @@ export class TimelineComponent implements OnDestroy {
             this.cashflowId
           );
         }),
-        combineLatestWith(this.store.select(selectedClient).pipe(takeUntilDestroyed())),
-        tap(([res, client]) => {
+        combineLatestWith(this.store.select(selectedClient).pipe(takeUntilDestroyed()), this.store.select(selectedCashflow).pipe(takeUntilDestroyed())),
+        tap(([res, client, cashflow]) => {
+          if(!cashflow) {
+            this.store.dispatch(CashflowActions.loadCashflow({cashflowId: this.cashflowId}));
+          }
           if(!client || client.id !== res.client.id) {
             this.store.dispatch(ClientActions.loadClient({clientId: res.client.id}));
           }

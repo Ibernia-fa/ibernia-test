@@ -619,19 +619,19 @@ export const navItems: NavItem[] = [
     displayName: 'Goals & Events',
     // iconName: 'clock',
     iconName: '/assets/images/svgs/clock-icon.svg',
-    route: '/cashflows/*/timeline',
+    route: '/cashflows/{cashflowId}/timeline',
   },
   {
     displayName: 'Saving Pots',
     // iconName: 'folder',
     iconName: '/assets/images/svgs/file-icon.svg',
-    route: '/cashflows/finances',
+    route: '/cashflows/{cashflowId}/finances',
   },
   {
     displayName: 'Incomes & Expenses',
     // iconName: 'wallet',
     iconName: '/assets/images/svgs/ticket-icon.svg',
-    route: '',
+    route: '/cashflows/{cashflowId}/income',
   },
   {
     displayName: 'Contributions & Withdrawals',

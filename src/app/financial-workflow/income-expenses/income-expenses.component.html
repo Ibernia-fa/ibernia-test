@@ -14,13 +14,13 @@
                             <h4 class="page-title f-w-500">Incomes & expenses</h4>
                             <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" class="m-t-4">
                         </div>
-                        <span class="sub-title">John Devidson</span>
+                        <span class="sub-title">{{selectedClient.clientDetails.name}}</span>
                     </div>
                     <!-- End headings  -->
                 </div>
                 <div class="d-flex align-items-center gap-12">
                     <img src="/assets/images/svgs/chart-histogram-two-icon.svg" alt="chart" />
-                    <span class="f-s-16 underline">Cashflow Simulator #1</span>
+                    <span class="f-s-16 underline">{{selectedCashflow.name}}</span>
                 </div>
             </div>
         </mat-card-content>
@@ -37,7 +37,7 @@
                                     <img src="assets/images/svgs/income-money-receive.svg" alt="income-money-receive" />
                                     <h3 class="card-title expense-income">Incomes</h3>
                                 </div>
-                                <h3 class="saving-title">+ $2750</h3>
+                                <h3 class="saving-title">+{{incomeExpense.totalIncome}}</h3>
                             </div>
                         </div>
                         <!-- Divider  -->
@@ -49,7 +49,7 @@
                                     <img src="assets/images/svgs/income-money-send.svg" alt="income-money-send" />
                                     <h3 class="card-title expenses-deduct">Expenses</h3>
                                 </div>
-                                <h3 class="saving-title">- $1850</h3>
+                                <h3 class="saving-title">-{{incomeExpense.totalExpenses}}</h3>
                             </div>
                         </div>
                         <!-- Divider  -->
@@ -61,7 +61,7 @@
                                     <img src="assets/images/svgs/income-dollar-icon.svg" alt="income-dollar-icon" />
                                     <h3 class="card-title expenses-total">Total</h3>
                                 </div>
-                                <h3 class="saving-title">= $900</h3>
+                                <h3 class="saving-title">= {{incomeExpense.total}}</h3>
                             </div>
                         </div>
                         <!-- Divider  -->
@@ -73,7 +73,7 @@
                                     <img src="assets/images/svgs/income-discount.svg" alt="income-discount" />
                                     <h3 class="card-title expense-income">Saving rate</h3>
                                 </div>
-                                <h3 class="saving-title expense-income">70%</h3>
+                                <h3 class="saving-title expense-income">{{incomeExpense.savingRate}}%</h3>
                             </div>
                         </div>
                     </div>
@@ -101,7 +101,7 @@
                     <!-- Table Wrapper  -->
                     <div class="table-main-wrapper">
                         <div class="table-responsive-sm table-wrapper">
-                            <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+                            <table mat-table [dataSource]="incomeDataSource" class="mat-elevation-z8">
 
                                 <!-- Position Column -->
                                 <ng-container matColumnDef="position">
@@ -109,7 +109,7 @@
                                         class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-client">Description
                                     </th>
                                     <td mat-cell *matCellDef="let element" class="p-x-24 f-s-14 p-l-0 column-client">
-                                        {{element.position}} </td>
+                                        {{element.description}} </td>
                                 </ng-container>
 
                                 <!-- Name Column -->
@@ -119,7 +119,7 @@
                                     </th>
                                     <td mat-cell *matCellDef="let element"
                                         class="p-x-24 f-s-14 p-l-0 column-net-amount">
-                                        {{element.name}} </td>
+                                        {{element.amount.currencySymbol}} {{element.amount.amount}}</td>
                                 </ng-container>
 
                                 <!-- Symbol Column -->
@@ -137,7 +137,7 @@
                                             </button>
                                         </div>
                                         <mat-menu #menu="matMenu" xPosition="before" class="dropdown-menus">
-                                            <button mat-menu-item>
+                                            <button (click)="updateIncomeClicked()" mat-menu-item>
                                                 <mat-icon>
                                                     <img src="assets/images/svgs/drop-down-edit-2-line.svg"
                                                         alt="drop-down-copy-2-line" height="24" width="24" />
@@ -180,7 +180,7 @@
                     <!-- Table Wrapper  -->
                     <div class="table-main-wrapper">
                         <div class="table-responsive-sm table-wrapper">
-                            <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+                            <table mat-table [dataSource]="expenseDataSource" class="mat-elevation-z8">
 
                                 <!-- Position Column -->
                                 <ng-container matColumnDef="position">
@@ -188,7 +188,7 @@
                                         class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-client">Description
                                     </th>
                                     <td mat-cell *matCellDef="let element" class="p-x-24 f-s-14 p-l-0 column-client">
-                                        {{element.position}} </td>
+                                        {{element.description}} </td>
                                 </ng-container>
 
                                 <!-- Name Column -->
@@ -198,7 +198,7 @@
                                     </th>
                                     <td mat-cell *matCellDef="let element"
                                         class="p-x-24 f-s-14 p-l-0 column-net-amount">
-                                        {{element.name}} </td>
+                                        {{element.amount.currencySymbol}} {{element.amount.amount}} </td>
                                 </ng-container>
 
                                 <!-- Symbol Column -->
@@ -216,7 +216,7 @@
                                             </button>
                                         </div>
                                         <mat-menu #menu="matMenu" xPosition="before" class="dropdown-menus">
-                                            <button mat-menu-item>
+                                            <button (click)="updateExpenseClicked()" mat-menu-item>
                                                 <mat-icon>
                                                     <img src="assets/images/svgs/drop-down-edit-2-line.svg"
                                                         alt="drop-down-copy-2-line" height="24" width="24" />
@@ -249,6 +249,6 @@
     </div>
 </div>
 
-<button (click)="updateIncomeClicked()" type="button" class="button-icon">
+<!-- <button (click)="updateIncomeClicked()" type="button" class="button-icon">
     <span>update income</span>
-</button>
+</button> -->
