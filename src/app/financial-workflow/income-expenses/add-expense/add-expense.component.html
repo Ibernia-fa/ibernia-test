@@ -6,7 +6,7 @@
   <div class="d-flex flex-column gap-32">
     <!-- Modal Header  -->
     <div class="d-flex align-items-center justify-content-between gap-10 modal-header">
-      <h3>Add an Expense</h3>
+      <h3>{{isEditWorkflow ? 'Update' : 'Add'}} an Expense</h3>
       <button (click)="closeDialog()" type="button">
         <img src="assets/images/svgs/close-line-cion.svg" alt="close-line-cion" />
       </button>
