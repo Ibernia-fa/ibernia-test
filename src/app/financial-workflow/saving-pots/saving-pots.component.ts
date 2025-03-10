@@ -39,6 +39,7 @@ import { ActivatedRoute } from '@angular/router';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { FormsModule } from '@angular/forms';
 import { FinancialWorkflowService } from '../services/financial-workflow.service';
+import { NavItemService } from 'src/app/layouts/full/nav-item.service';
 
 @Component({
   selector: 'app-saving-pots',
@@ -97,8 +98,10 @@ export class SavingPotsComponent implements OnInit {
     private timelineHttpService: TimelineHttpService,
     private settingHttpService: SettingsHttpService,
     private activatedRoute: ActivatedRoute,
-    private financialWorkflowService: FinancialWorkflowService
+    private financialWorkflowService: FinancialWorkflowService,
+    private navItemService: NavItemService
   ) {
+    this.navItemService.currentRouteName = 'Saving Pots';
     this.getData();
   }
 

@@ -19,6 +19,7 @@ import { SettingsHttpService } from '../settings/services/settings-http.service'
 import { FinancialViewModel, IncomeExpense } from './model/income-expense';
 import { Cycle, EscalationRate } from '../timeline/models/financial-timeline';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { NavItemService } from 'src/app/layouts/full/nav-item.service';
 
 @Component({
   selector: 'app-income-expenses',
@@ -55,8 +56,10 @@ export class IncomeExpensesComponent {
     private activatedRoute: ActivatedRoute,
     private financialWorkflowService: FinancialWorkflowService,
     private incomeExpensesHttpService: IncomeExpensesHttpService,
-    private settingHttpService: SettingsHttpService
+    private settingHttpService: SettingsHttpService,
+    private navItemService: NavItemService
   ) {
+    this.navItemService.currentRouteName = 'Incomes & Expenses';
     this.getData();
   }
 

@@ -71,16 +71,28 @@
                             <div class="col-3">
                                 <div class="d-flex flex-column gap-8">
                                     <div class="d-flex align-items-center gap-8">
-                                        <img src="assets/images/svgs/income-discount.svg" alt="income-discount" />
-                                        <h3 class="card-title expense-income">Saving rate</h3>
+                                        @if(incomeExpense.savingRate > 0) {
+                                            <img src="assets/images/svgs/income-discount.svg" alt="income-discount" />
+                                        }
+                                        @else {
+                                            <img class="red" src="assets/images/svgs/income-discount-red.svg" alt="income-discount" />
+                                        }
+                                        
+                                        <h3 [ngClass]="incomeExpense.savingRate > 0 ? 'card-title green' : 'card-title red'">Saving rate</h3>
                                     </div>
-                                    <h3 class="saving-title expense-income">{{incomeExpense.savingRate}}%</h3>
+                                    <h3 [ngClass]="incomeExpense.savingRate > 0 ? 'saving-title green' : 'saving-title red'">{{incomeExpense.savingRate}}%</h3>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <!-- Emoji  -->
-                    <img src="assets/images/shapes/happy-feedback-icon.png" alt="smile-emoji">
+                    @if(incomeExpense.savingRate > 0) {
+                         <img src="assets/images/shapes/happy-feedback-icon.png" alt="smile-emoji">
+                    }
+                    @else {
+                        <img src="assets/images/shapes/sad-feedback-icon.png" alt="smile-emoji">
+
+                     }
                     <!-- End Emoji  -->
                 </div>
             </mat-card-content>
