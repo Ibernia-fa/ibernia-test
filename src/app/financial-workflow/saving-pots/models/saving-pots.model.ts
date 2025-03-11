@@ -11,7 +11,7 @@ import {
 
 export interface SavingPotsModel {
   id: string;
-  totalSavingsAtStart: number;
+  totalSavings: number;
   clientSavings: ClientSaving[];
   client: ClientViewModel;
   cashflow: CashflowViewModel;
