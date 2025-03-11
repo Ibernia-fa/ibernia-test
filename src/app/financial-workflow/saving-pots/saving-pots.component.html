@@ -47,7 +47,7 @@
                                             </div>
                                             <div class="d-flex align-items-center gap-10">
                                                 <h3 class="saving-title">{{savingPots?.totalSavings ?? 0}}</h3>
-                                                <span class="badge green">+4%</span>
+                                                <span [ngClass]="savingPots.totalGwothRate >= 0 ? 'badge green' : 'badge red'">{{savingPots.totalGwothRate >= 0 ? '+' : '-'}}{{(savingPots?.totalGwothRate ?? 0) | number : '1.2-2'}}%</span>
                                             </div>
                                         </div>
                                     </div>
@@ -138,7 +138,7 @@
                                                 <div class="d-flex align-items-center gap-10">
                                                     <h3 class="saving-title">{{saving.startingPotValue.currencySymbol}}{{saving.startingPotValue.amount}}</h3>
                                                     <span [className]="saving.realReturn >= 0 ? 'badge green' : 'badge red'">
-                                                        @if(saving.realReturn >= 0){+}{{saving.realReturn}}%
+                                                        @if(saving.realReturn >= 0){+}{{saving.realReturn | number : '1.2-2'}}%
                                                     </span>
                                                 </div>
                                             </div>
@@ -148,7 +148,7 @@
                                     <!-- End Content  -->
                                     <!--  Chart  -->
                                     <div class="card-chart">
-                                        @if(saving.returnRate >= 0) {
+                                        @if(saving.isGrowing) {
                                             <img src="assets/images/shapes/dummy-green-graph.png" alt="dummy-green-graph">
                                         }
                                         @else {

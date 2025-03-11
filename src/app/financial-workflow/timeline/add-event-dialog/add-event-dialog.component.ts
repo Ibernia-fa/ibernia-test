@@ -58,6 +58,7 @@ export class AddEventDialogComponent {
   customEventsLibrary: ClientEvent[];
   eventForm: FormGroup;
   timelineId: string;
+  cashflowId: string;
   systemEvent: ClientEvent | undefined | null;
   dropTime: Date;
   clientBirthDate: Date;
@@ -83,6 +84,7 @@ export class AddEventDialogComponent {
     this.isIncomeEvent = data.isIncomeEvent;
     this.customEventsLibrary = data.customEvents;
     this.timelineId = data.timelineId;
+    this.cashflowId = data.cashflowId;
     this.systemEvent = data.systemEvent
     this.dropTime = data.dropTime;
     this.clientBirthDate = data.clientBirthDate;
@@ -272,7 +274,7 @@ export class AddEventDialogComponent {
         isOneOff: this.eventForm.get('cycle')?.value === 'One-Off',
         isPlaceHolder: this.systemEvent.isPlaceHolder,
       };
-      this.timelineHttpService.addEvent(clientEvent, this.timelineId)
+      this.timelineHttpService.addEvent(clientEvent, this.cashflowId)
       .pipe(
         filter(res => !!res),
         catchError(err => {
@@ -315,7 +317,7 @@ export class AddEventDialogComponent {
         isOneOff: this.eventForm.get('cycle')?.value === 'One-Off',
         isPlaceHolder: this.systemEvent.isPlaceHolder,
       };
-      this.timelineHttpService.addEvent(clientEvent, this.timelineId)
+      this.timelineHttpService.addEvent(clientEvent, this.cashflowId)
       .pipe(
         filter(res => !!res),
         catchError(err => {
@@ -374,7 +376,7 @@ export class AddEventDialogComponent {
         isOneOff: this.eventForm.get('cycle')?.value === 'One-Off',
         isPlaceHolder: false,
       };
-      this.timelineHttpService.addEvent(clientEvent, this.timelineId)
+      this.timelineHttpService.addEvent(clientEvent, this.cashflowId)
       .pipe(
         filter(res => !!res),
         catchError(err => {

@@ -246,7 +246,8 @@ export class SavingPotsComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result: any) => {
       console.log('Dialog closed with result:', result);
-      this.savingPots.clientSavings.push(result.clientSaving);
+      this.savingPots = result.savingPot
+      // this.savingPots.clientSavings.push(result.clientSaving);
     });
   }
 }

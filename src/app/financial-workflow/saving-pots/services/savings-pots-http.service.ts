@@ -17,8 +17,6 @@ export class SavingsPotsHttpService {
   }
 
   addNewSavingPot(cashflowId: string, clientSaving: ClientSaving) {
-    return this.httpClient.post(`/api/v1/cashflows/${cashflowId}/saving-pots`, clientSaving, {
-      responseType: "text"
-    });
+    return this.httpClient.post<SavingPotsModel>(`/api/v1/cashflows/${cashflowId}/saving-pots`, clientSaving);
   }
 }

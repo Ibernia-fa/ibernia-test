@@ -193,7 +193,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
         age: moment(dropTime).year() - moment(this.clientBirthDate).year(),
       };
       this.timelineHttpService
-        .addEvent(clientEvent, this.financialTimeline.id)
+        .addEvent(clientEvent, this.financialTimeline.cashflow.id)
         .pipe(
           // filter(res => !!res),
           take(1),
@@ -301,6 +301,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
         data: {
           eventType: EventType.INHERITANCE,
           timelineId: this.financialTimeline.id,
+          cashflowId: this.financialTimeline.cashflow.id,
           isIncomeEvent: this.draggedEvent.type === EventIncomeType.Income,
           systemEvent: this.draggedEvent,
           dropTime: new Date(moment(dropTime).year(), 0),
@@ -327,6 +328,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
         data: {
           eventType: EventType.STATE_PENSION,
           timelineId: this.financialTimeline.id,
+          cashflowId: this.financialTimeline.cashflow.id,
           isIncomeEvent: this.draggedEvent.type === EventIncomeType.Income,
           systemEvent: this.draggedEvent,
           dropTime: new Date(moment(dropTime).year(), 0),
@@ -561,7 +563,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
             moment(this.clientBirthDate).year(),
         };
         this.timelineHttpService
-          .addEvent(clientEvent, this.financialTimeline.id)
+          .addEvent(clientEvent, this.financialTimeline.cashflow.id)
           .pipe(
             // filter(res => !!res),
             take(1),
@@ -593,6 +595,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
           data: {
             eventType: EventType.INHERITANCE,
             timelineId: this.financialTimeline.id,
+            cashflowId: this.financialTimeline.cashflow.id,
             isIncomeEvent: clientEvent.type === EventIncomeType.Income,
             systemEvent: clientEvent,
             dropTime: new Date(moment(item.start).year(), 0),
@@ -621,6 +624,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
           data: {
             eventType: EventType.STATE_PENSION,
             timelineId: this.financialTimeline.id,
+            cashflowId: this.financialTimeline.cashflow.id,
             isIncomeEvent: clientEvent.type === EventIncomeType.Income,
             systemEvent: clientEvent,
             dropTime: new Date(moment(item.start).year(), 0),
@@ -663,6 +667,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
             eventType: EventType.CUSTOM,
             customEvents: this.customEventsLibrary,
             timelineId: this.financialTimeline.id,
+            cashflowId: this.financialTimeline.cashflow.id,
             clientBirthDate: this.clientBirthDate,
             clientPreferredCurrency: this.client.clientDetails.preferredCurrency,
             forecastStartDateYear: moment(this.financialTimeline.forecastStartDate).year(),
@@ -705,7 +710,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
     console.log('❌ Attempting to remove event:', item);
 
     this.timelineHttpService
-      .deleteEvent(this.financialTimeline.id, item.id)
+      .deleteEvent(this.financialTimeline.cashflow.id, item.id)
       .pipe(
         take(1),
         map((res) => {
@@ -735,6 +740,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
         eventType: EventType.CUSTOM,
         customEvents: this.customEventsLibrary,
         timelineId: this.financialTimeline.id,
+        cashflowId: this.financialTimeline.cashflow.id,
         clientBirthDate: this.clientBirthDate,
         clientPreferredCurrency: this.client.clientDetails.preferredCurrency,
         forecastStartDateYear: moment(this.financialTimeline.forecastStartDate).year(),

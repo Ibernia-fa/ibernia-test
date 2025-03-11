@@ -22,8 +22,8 @@ export class TimelineHttpService {
     return this.httpClient.get<ClientEvent[]>('/api/v1/events/custom')
   }
 
-  addEvent(clientEvent: ClientEvent, timelineId: string) {
-    return this.httpClient.post(`${this.TIMELINE_BASE_URL}/${timelineId}/events`, clientEvent, {
+  addEvent(clientEvent: ClientEvent, cashflowId: string) {
+    return this.httpClient.post(`/api/v1/cashflows/${cashflowId}/timelines/events`, clientEvent, {
       responseType: "text"
     })
   }
@@ -34,8 +34,8 @@ export class TimelineHttpService {
     })
   }
 
-  deleteEvent(timelineId: string, eventId: string) {
-    return this.httpClient.delete(`${this.TIMELINE_BASE_URL}/${timelineId}/events/${eventId}`, {
+  deleteEvent(cashflowId: string, eventId: string) {
+    return this.httpClient.delete(`/api/v1/cashflows/${cashflowId}/timelines/events/${eventId}`, {
       responseType: 'text'
     })
   }

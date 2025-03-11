@@ -12,6 +12,7 @@ import {
 export interface SavingPotsModel {
   id: string;
   totalSavings: number;
+  totalGwothRate: number;
   clientSavings: ClientSaving[];
   client: ClientViewModel;
   cashflow: CashflowViewModel;
@@ -30,6 +31,11 @@ export interface ClientSaving {
   type: SavingPotType;
   iconUrl: string;
   startingPotValue: NetAmount;
+  nominalValue: number;
+  realValue: number;
+  realGrowthRate: number;
+  inflationRate: number;
+  isGrowing: boolean;
   returnRate: number;
   realReturn: number;
   hasPotLocked: true;

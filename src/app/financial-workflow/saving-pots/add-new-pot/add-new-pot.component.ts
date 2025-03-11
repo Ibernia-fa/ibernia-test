@@ -230,6 +230,11 @@ export class AddNewPotComponent {
       var clientSaving: ClientSaving = {
         id: null,
         name: this.savingsForm.get('name')?.value,
+        isGrowing: false,
+        nominalValue: 0,
+        realValue: 0,
+        realGrowthRate: 0,
+        inflationRate: this.inflationRate,
         startingPotValue: {
           amount: this.savingsForm.get('amount')?.value,
           currencySymbol: this.savingsForm.get('currency')?.value,
@@ -304,7 +309,7 @@ export class AddNewPotComponent {
         .subscribe((res) => {
           this.dialogRef.close({
             status: 'Success',
-            clientSaving: clientSaving
+            savingPot: res
           });
         });
 
