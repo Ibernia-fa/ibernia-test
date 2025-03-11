@@ -80,7 +80,7 @@
                                         
                                         <h3 [ngClass]="incomeExpense.savingRate > 0 ? 'card-title green' : 'card-title red'">Saving rate</h3>
                                     </div>
-                                    <h3 [ngClass]="incomeExpense.savingRate > 0 ? 'saving-title green' : 'saving-title red'">{{incomeExpense.savingRate}}%</h3>
+                                    <h3 [ngClass]="incomeExpense.savingRate > 0 ? 'saving-title green' : 'saving-title red'">{{incomeExpense.savingRate | number : '1.2-2'}}%</h3>
                                 </div>
                             </div>
                         </div>
