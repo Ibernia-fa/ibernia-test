@@ -603,11 +603,13 @@ export const navItemslower: NavItem[] = [
   {
     displayName: 'Goals',
     iconName: '/assets/images/svgs/goals-nav-icon.svg',
+    iconOutline: '/assets/images/svgs/goals-nav-icon.svg',
     route: '#',
   },
   {
     displayName: 'Emergencies',
     iconName: '/assets/images/svgs/danger-square-icon.svg',
+    iconOutline: '/assets/images/svgs/danger-square-icon.svg',
     route: '#',
   },
 ];
@@ -618,31 +620,36 @@ export const navItems: NavItem[] = [
   {
     displayName: 'Goals & Events',
     // iconName: 'clock',
-    iconName: '/assets/images/svgs/clock-icon.svg',
+    iconName: '/assets/images/svgs/clock-icon-filled.svg',
+    iconOutline: '/assets/images/svgs/clock-icon.svg',
     route: '/cashflows/{cashflowId}/timeline',
   },
   {
     displayName: 'Saving Pots',
     // iconName: 'folder',
-    iconName: '/assets/images/svgs/file-icon.svg',
+    iconName: '/assets/images/svgs/file-icon-filled.svg',
+    iconOutline: '/assets/images/svgs/file-icon.svg',
     route: '/cashflows/{cashflowId}/finances',
   },
   {
     displayName: 'Incomes & Expenses',
     // iconName: 'wallet',
-    iconName: '/assets/images/svgs/ticket-icon.svg',
+    iconName: '/assets/images/svgs/ticket-icon-filled.svg',
+    iconOutline: '/assets/images/svgs/ticket-icon.svg',
     route: '/cashflows/{cashflowId}/income',
   },
   {
     displayName: 'Contributions & Withdrawals',
     // iconName: 'circle-percentage',
     iconName: '/assets/images/svgs/discount-icon.svg',
+    iconOutline: '/assets/images/svgs/discount-icon.svg',
     route: '',
   },
   {
     displayName: 'Charges & Fees',
     // iconName: 'trending-up',
     iconName: '/assets/images/svgs/wallet-icon.svg',
+    iconOutline: '/assets/images/svgs/wallet-icon.svg',
     route: '',
   },
   {
