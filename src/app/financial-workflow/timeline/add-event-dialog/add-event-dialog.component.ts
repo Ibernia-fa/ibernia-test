@@ -337,7 +337,7 @@ export class AddEventDialogComponent {
     this.eventForm.markAllAsTouched();
     if (this.eventForm.valid) {
       const clientEvent: ClientEvent = {
-        id: "",
+        id: this.isEditWorkflow ? this.patchEvent?.id ?? "" : "",
         name:
           this.eventForm.get('eventName')?.value !== 'Custom'
             ? this.eventForm.get('eventName')?.value

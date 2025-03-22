@@ -59,6 +59,7 @@ export class AddExpenseComponent {
   clientBirthYear: number;
   isEditWorkflow = false;
   selectedExpense: FinancialViewModel;
+  showStartEnd=false;
 
   constructor(
     private dialogRef: MatDialogRef<AddExpenseComponent>,
@@ -86,10 +87,12 @@ export class AddExpenseComponent {
       currencySymbol: [this.clientPreferredCurrency, [Validators.required]],
       amount: [0, [Validators.required, Validators.min(0)]],
       cycle: [this.cycles[0].id, Validators.required],
-      expensedate: ['', Validators.required],
+      start: ['', Validators.required],
+      end: [''],
     });
 
     if (this.isEditWorkflow) {
+      this.onCycleValueChange(this.selectedExpense.amount.cycle.id)
       this.expenseForm
         .get('description')
         ?.patchValue(this.selectedExpense.description);
@@ -103,14 +106,29 @@ export class AddExpenseComponent {
         .get('cycle')
         ?.patchValue(this.selectedExpense.amount.cycle.id);
       this.expenseForm
-        .get('expensedate')
-        ?.patchValue(this.selectedExpense.date);
+        .get('start')
+        ?.patchValue(moment(this.selectedExpense.date).year());
     }
   }
 
   closeDialog(): void {
     this.dialogRef.close();
   }
+
+  
+    onCycleValueChange(event: any) {
+      console.log({event})
+      this.showStartEnd = this.cycles.find(cycle => cycle.id === event)?.description !== 'One-off'
+      if(!this.showStartEnd) {
+        this.expenseForm.controls['end'].clearValidators();
+        this.expenseForm.controls['end'].updateValueAndValidity();
+      }
+      else {
+        this.expenseForm.controls['end'].addValidators(Validators.required);
+        this.expenseForm.controls['end'].updateValueAndValidity();
+      }
+    }
+  
 
   addExpense(): void {
     if (this.expenseForm.valid) {
@@ -129,7 +147,7 @@ export class AddExpenseComponent {
               )?.description ?? '',
           },
         },
-        date: this.expenseForm.get('expensedate')?.value,
+        date: new Date(this.expenseForm.get('start')?.value , 1, 1),
       };
 
       var action$ = this.incomeExpenseHttpService.addExpense(

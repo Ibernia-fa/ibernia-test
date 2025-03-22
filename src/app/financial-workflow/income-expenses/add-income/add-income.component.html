@@ -52,7 +52,7 @@
               <!-- End Price Field  -->
               <!-- End Type Field  -->
               <div class="right">
-                <mat-select value="Select" formControlName="cycle" class="sortby-edit-profile"
+                <mat-select (valueChange)="onCycleValueChange($event)" value="Select" formControlName="cycle" class="sortby-edit-profile"
                   hideSingleSelectionIndicator>
                   @for (cycle of cycles; track cycle) {
                   <mat-option [value]="cycle.id">{{ cycle.description }}</mat-option>
@@ -68,35 +68,78 @@
         </div>
         <!-- End Net Amount Field  -->
 
-        <div class="d-flex flex-column gap-8">
+        <!-- <div class="d-flex flex-column gap-8">
           <div class="w-100 form-field gap-12">
             <div class="d-flex gap-8 align-items-center">
               <mat-label class="f-s-16 f-w-400 d-block">Date</mat-label>
               <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
             </div>
-            <!-- <div class="position-relative">
-              <input matInput [matDatepicker]="picker" formControlName="expensedate" />
-              <div class="date-picker-position">
-                <mat-datepicker-toggle matIconSuffix [for]="picker">
-                  <mat-icon matDatepickerToggleIcon>
-                    <img src="assets/images/svgs/datepicker-icon.svg" alt="datepicker-icon" />
-                  </mat-icon>
-                </mat-datepicker-toggle>
-              </div>
-              <mat-datepicker #picker></mat-datepicker>
-            </div> -->
             <div class="select-option">
-              <mat-select value="Select" formControlName="expensedate" hideSingleSelectionIndicator>
+              <mat-select value="Select" formControlName="start" hideSingleSelectionIndicator>
                 @for (year of years; track year) {
                 <mat-option [value]="year">{{ year }} ({{ year - clientBirthYear }})</mat-option>
                 }
               </mat-select>
             </div>
           </div>
-          <!-- error  -->
-          <!-- <span class="field-error d-block">Escalation Rate is required</span> -->
-          <!-- End error  -->
+        </div> -->
+
+        <div class="start-end">
+          <div class="d-flex flex-column gap-12">
+            <div class="d-flex gap-8 align-items-center">
+              <mat-label class="f-s-16 f-w-400 d-block">Start @if(showStartEnd) {& end}</mat-label>
+              <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
+            </div>
+            <div class="row justify-content-between align-items-start flex-nowrap">
+              <!-- Start date  -->
+              <div [className]="showStartEnd ? 'col-6' : 'w-100'">
+                <div class="w-100 form-field">
+                  <div class="select-option">
+                    <mat-select value="Select" formControlName="start" hideSingleSelectionIndicator>
+                      <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
+                      @for (year of years; track year) {
+                      <mat-option [value]="year">{{ year }} ({{ year - clientBirthYear }})</mat-option>
+                      }
+                    </mat-select>
+                  </div>
+                  @if(incomeForm.get('start')?.touched &&
+                  incomeForm.get('start')?.hasError('required')) {
+                  <span class="field-error d-block">Start is required</span>
+                  }
+                </div>
+              </div>
+
+              @if(showStartEnd) {
+                <!-- Divider  -->
+                <div class="d-flex justify-content-start align-items-start">
+                  <img src="assets/images/svgs/chevron-right-date-icon.svg" alt="chevron-right-date-icon" />
+                </div>
+                <!-- End date  -->
+                <div class="col-6">
+                  <div class="w-100 form-field">
+                    <div class="select-option">
+                      <mat-select value="Select" formControlName="end" hideSingleSelectionIndicator>
+                        <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
+                        <!-- @for (event of eventsList; track event) {
+                        <mat-option [value]="event.year">{{ event.name }} ({{ event.age }})</mat-option>
+                        }
+                        <hr> -->
+                        @for (year of years; track year) {
+                          <mat-option [value]="year">{{ year }} ({{ year - clientBirthYear }})</mat-option>
+                          }
+                      </mat-select>
+                    </div>
+                    @if(incomeForm.get('end')?.touched &&
+                    incomeForm.get('end')?.hasError('required')) {
+                    <span class="field-error d-block">End is required</span>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
         </div>
+
       </div>
     </mat-dialog-content>
     <!-- End Modal Body  -->

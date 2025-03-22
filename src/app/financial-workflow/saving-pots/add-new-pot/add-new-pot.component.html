@@ -24,7 +24,7 @@
         <div class="w-100 form-field gap-12">
           <mat-label class="f-s-16 d-block" style="line-height: 18px">Name</mat-label>
           <div class="select-option">
-            <mat-select formControlName="name" value="Select" style="height: 24px">
+            <mat-select (valueChange)="onNameValueChange($event)" formControlName="name" value="Select" style="height: 24px">
               <!-- <mat-select-trigger>
                 <div class="d-flex align-items-center gap-8">
                   <img [src]="'/assets/images/svgs/' + selectedEventIconUrl + '.svg'"
@@ -72,6 +72,17 @@
           }
           <!-- End Error  -->
         </div>
+        @if(savingsForm.get('name')?.value === 'Custom' &&
+        savingsForm.get('customName')) {
+        <div class="w-100 form-field gap-12">
+          <mat-label class="f-s-16 d-block" style="line-height: 18px">Name</mat-label>
+          <input matInput formControlName="customName" />
+          @if(savingsForm.get('customName')?.touched &&
+          savingsForm.get('customName')?.hasError('required')) {
+          <span class="field-error d-block">Name is required</span>
+          }
+        </div>
+        }
         <!--End  Name Field  -->
 
         <!-- Starting pot value Field  -->

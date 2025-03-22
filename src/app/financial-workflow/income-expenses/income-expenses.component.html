@@ -67,7 +67,7 @@
                                     <h3 class="card-title expenses-total">Total</h3>
                                 </div>
                                 <h3 class="saving-title">=
-                                    {{selectedClient?.clientDetails?.preferredCurrency}}{{incomeExpense.total}}</h3>
+                                    {{incomeExpense.total < 0 ? '-' : ''}}{{selectedClient?.clientDetails?.preferredCurrency}}{{incomeExpense.total < 0 ? (incomeExpense.total)*(-1) : incomeExpense.total}}</h3>
                             </div>
                         </div>
                         <!-- Divider  -->
@@ -90,7 +90,7 @@
                                 </div>
                                 <h3
                                     [ngClass]="incomeExpense.savingRate > 0 ? 'saving-title green' : 'saving-title red'">
-                                    {{incomeExpense.savingRate | number : '1.2-2'}}%</h3>
+                                    {{incomeExpense.savingRate | number : '1.0-0'}}%</h3>
                             </div>
                         </div>
                     </div>

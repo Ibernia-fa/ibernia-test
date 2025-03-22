@@ -219,10 +219,6 @@ export class SavingPotsComponent implements OnInit {
     }
   }
 
-  floorValue(value: any): number {
-    return Math.floor(value);
-  }
-
   newEventClicked() {
     const dialogRef = this.dialog.open(AddNewPotComponent, {
       width: '700px',

@@ -59,6 +59,7 @@ export class AddIncomeComponent {
   clientBirthYear: number;
   isEditWorkflow = false;
   selectedIncome: FinancialViewModel;
+  showStartEnd = false;
 
   constructor(
     private dialogRef: MatDialogRef<AddIncomeComponent>,
@@ -86,10 +87,12 @@ export class AddIncomeComponent {
       currencySymbol: [this.clientPreferredCurrency, [Validators.required]],
       amount: [0, [Validators.required, Validators.min(0)]],
       cycle: ['', Validators.required],
-      expensedate: ['', Validators.required],
+      start: ['', Validators.required],
+      end: [''],
     });
 
     if (this.isEditWorkflow) {
+      this.onCycleValueChange(this.selectedIncome.amount.cycle.id)
       this.incomeForm
         .get('description')
         ?.patchValue(this.selectedIncome.description);
@@ -102,12 +105,26 @@ export class AddIncomeComponent {
       this.incomeForm
         .get('cycle')
         ?.patchValue(this.selectedIncome.amount.cycle.id);
-      this.incomeForm.get('expensedate')?.patchValue(this.selectedIncome.date);
+      this.incomeForm.get('start')?.patchValue(moment(this.selectedIncome.date).year());
+
     }
   }
 
   closeDialog(): void {
     this.dialogRef.close();
+  }
+
+  onCycleValueChange(event: any) {
+    console.log({event})
+    this.showStartEnd = this.cycles.find(cycle => cycle.id === event)?.description !== 'One-off'
+    if(!this.showStartEnd) {
+      this.incomeForm.controls['end'].clearValidators();
+      this.incomeForm.controls['end'].updateValueAndValidity();
+    }
+    else {
+      this.incomeForm.controls['end'].addValidators(Validators.required);
+      this.incomeForm.controls['end'].updateValueAndValidity();
+    }
   }
 
   addIncome(): void {
@@ -127,7 +144,7 @@ export class AddIncomeComponent {
               )?.description ?? '',
           },
         },
-        date: this.incomeForm.get('expensedate')?.value,
+        date: new Date(this.incomeForm.get('start')?.value , 1, 1)
       };
 
       var action$ = this.incomeExpenseHttpService.addIncome(

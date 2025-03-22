@@ -1,6 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import {
   FormBuilder,
+  FormControl,
   FormGroup,
   ReactiveFormsModule,
   Validators,
@@ -63,6 +64,8 @@ export class AddNewPotComponent {
   eventsList: any;
   cashflowId: string;
   formattedReturnRate: string = '';
+  selectedName: string = '';
+  selectedNameIconUrl: string = '';
   inflationRate = 2.5;
   savingPotValues = [
     {
@@ -109,15 +112,15 @@ export class AddNewPotComponent {
       returnRate: [3.5],
       // lockPot: [true],
       lockPot: [false],
-      start: ['', Validators.required],
-      end: ['', Validators.required],
+      start: [data.forecastStartDateYear, Validators.required],
+      end: [data.forecastEndDateYear-1, Validators.required],
       // commissions: [true],
       commissions: [false],
-      commissionCurrency: [this.clientPreferredCurrency, Validators.required],
+      commissionCurrency: [''],
       commissionType: ['amount'],
       commissionAmount: [0],
-      commissionCycle: [this.cycles[0].id, Validators.required],
-      escalationRate: [this.escalationRates[1].id, Validators.required],
+      commissionCycle: [''],
+      escalationRate: [''],
     });
 
     this.savingsForm.get('returnRate')?.valueChanges.subscribe((value) => {
@@ -130,6 +133,26 @@ export class AddNewPotComponent {
   }
   closeDialog(): void {
     this.dialogRef.close();
+  }
+
+  onNameValueChange(name: any) {
+    this.selectedName = name;
+    if (name === 'Custom') {
+      this.savingsForm.addControl(
+        'customName',
+        new FormControl('', [Validators.required])
+      );
+      this.savingsForm.updateValueAndValidity();
+      this.selectedNameIconUrl = 'custom-option-icon'
+    } else {
+      this.savingsForm.removeControl('customName');
+      this.savingsForm.updateValueAndValidity();
+
+      const cusEvent = this.savingPotValues.find(
+        (customEvent) => customEvent.name === name
+      );
+      this.selectedNameIconUrl = cusEvent?.iconUrl ?? '';
+    }
   }
 
   isLockPotChanged(event: any) {
@@ -156,6 +179,9 @@ export class AddNewPotComponent {
         .get('commissionCurrency')
         ?.setValidators(Validators.required);
       this.savingsForm
+        .get('commissionCurrency')
+        ?.setValue(this.clientPreferredCurrency);
+      this.savingsForm
         .get('commissionAmount')
         ?.setValidators(Validators.required);
       this.savingsForm
@@ -164,9 +190,15 @@ export class AddNewPotComponent {
       this.savingsForm
         .get('commissionCycle')
         ?.setValidators(Validators.required);
+        this.savingsForm
+        .get('commissionCycle')
+        ?.setValue(this.cycles[2].id);
       this.savingsForm
         .get('escalationRate')
         ?.setValidators(Validators.required);
+      this.savingsForm
+        .get('escalationRate')
+        ?.setValue(this.escalationRates[1].id);
 
       this.savingsForm.get('commissionCurrency')?.updateValueAndValidity();
       this.savingsForm.get('commissionAmount')?.updateValueAndValidity();
@@ -233,7 +265,9 @@ export class AddNewPotComponent {
     if (this.savingsForm.valid) {
       var clientSaving: ClientSaving = {
         id: null,
-        name: this.savingsForm.get('name')?.value,
+        name: this.savingsForm.get('name')?.value !== 'Custom'
+        ? this.savingsForm.get('name')?.value
+        : this.savingsForm.get('customName')?.value,
         isGrowing: false,
         nominalValue: 0,
         realValue: 0,
@@ -275,10 +309,11 @@ export class AddNewPotComponent {
         },
         hasCommission: this.savingsForm.get('commissions')?.value,
         hasPotLocked: this.savingsForm.get('lockPot')?.value,
-        iconUrl:
-          this.savingPotValues.find(
+        iconUrl: this.savingsForm.get('name')?.value !== 'Custom'
+          ? this.savingPotValues.find(
             (x) => this.savingsForm.get('name')?.value === x.name
-          )?.iconUrl ?? '',
+          )?.iconUrl ?? ''
+          : 'custom-option-icon',
         start: {
           age:
             this.savingsForm.get('start')?.value !== null &&
