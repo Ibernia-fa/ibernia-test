@@ -11,18 +11,9 @@ import {
   CdkDropList,
   CdkDragHandle,
 } from '@angular/cdk/drag-drop';
-import {
-  animate,
-  style,
-  transition,
-  trigger,
-} from '@angular/animations';
+import { animate, style, transition, trigger } from '@angular/animations';
 import { CommonModule } from '@angular/common';
-import {
-  combineLatest,
-  switchMap,
-  tap,
-} from 'rxjs';
+import { combineLatest, switchMap, tap } from 'rxjs';
 import { SavingsPotsHttpService as SavingPotsHttpService } from './services/savings-pots-http.service';
 import { SavingPotsModel as SavingPots } from './models/saving-pots.model';
 import { Cashflow } from 'src/app/clients/models/cashflow';
@@ -53,7 +44,7 @@ import { NavItemService } from 'src/app/layouts/full/nav-item.service';
     CdkDragHandle,
     CdkDropList,
     CommonModule,
-    FormsModule
+    FormsModule,
   ],
 
   templateUrl: './saving-pots.component.html',
@@ -112,11 +103,11 @@ export class SavingPotsComponent implements OnInit {
   timeline: FinancialTimeline;
   amountCycles: Array<Cycle>;
   escalationRates: Array<EscalationRate>;
-  isLoaderVisible = false
-  showFeedbackPopup = false
+  isLoaderVisible = false;
+  showFeedbackPopup = false;
   selectedRating = '';
-  currentStep=1
-  feedbackDetail=''
+  currentStep = 1;
+  feedbackDetail = '';
 
   items = [
     { id: 1, name: 'Item 1', score: 5 },
@@ -127,77 +118,74 @@ export class SavingPotsComponent implements OnInit {
 
   getData() {
     this.isLoaderVisible = true;
-    this.activatedRoute.params.pipe(
-      switchMap((params) =>
-        this.financialWorkflowService.loadClientCashflowMetadata(params),
-      ),
-      tap(([client, cashflow]) => {
-        this.selectedClient = client as Client;
-        console.log(cashflow);
-        this.selectedCashflow = cashflow as Cashflow;
-      }),
-      switchMap(([client, cashflow]) => {
-        return combineLatest([
-          this.savingPotsHttpService.getAllSavingsPots(
-            (cashflow as Cashflow).id
-          ),
-          this.timelineHttpService.getTimelinebyCashflowId(
-            (cashflow as Cashflow).id
-          ),
-          this.settingHttpService.getAmountCycles(),
-          this.settingHttpService.getEscalationRates(
-            (client as Client).financialAdvisor.advisorId
-          ),
-        ]);
-      }),
-      tap(([
-        savingPots,
-        timeline, amountCycles, escalationRates]) => {
-        console.log(timeline, amountCycles, escalationRates);
-        this.savingPots = savingPots;
-        this.timeline = timeline;
-        this.amountCycles = amountCycles;
-        this.escalationRates = escalationRates;
-        this.isLoaderVisible = false;
-      })
-    )
-    .subscribe();
+    this.activatedRoute.params
+      .pipe(
+        switchMap((params) =>
+          this.financialWorkflowService.loadClientCashflowMetadata(params)
+        ),
+        tap(([client, cashflow]) => {
+          this.selectedClient = client as Client;
+          console.log(cashflow);
+          this.selectedCashflow = cashflow as Cashflow;
+        }),
+        switchMap(([client, cashflow]) => {
+          return combineLatest([
+            this.savingPotsHttpService.getAllSavingsPots(
+              (cashflow as Cashflow).id
+            ),
+            this.timelineHttpService.getTimelinebyCashflowId(
+              (cashflow as Cashflow).id
+            ),
+            this.settingHttpService.getAmountCycles(),
+            this.settingHttpService.getEscalationRates(
+              (client as Client).financialAdvisor.advisorId
+            ),
+          ]);
+        }),
+        tap(([savingPots, timeline, amountCycles, escalationRates]) => {
+          console.log(timeline, amountCycles, escalationRates);
+          this.savingPots = savingPots;
+          this.timeline = timeline;
+          this.amountCycles = amountCycles;
+          this.escalationRates = escalationRates;
+          this.isLoaderVisible = false;
+        })
+      )
+      .subscribe();
   }
 
   ngOnInit(): void {
     var showFeedbackPopup = localStorage.getItem('showFeedbackPopup');
-    if(showFeedbackPopup !== null) {
-      this.showFeedbackPopup =  showFeedbackPopup === 'true'
-    }
-    else {
+    if (showFeedbackPopup !== null) {
+      this.showFeedbackPopup = showFeedbackPopup === 'true';
+    } else {
       this.showFeedbackPopup = true;
     }
   }
 
   closeFeedbackPopupClicked() {
     this.showFeedbackPopup = false;
-    localStorage.setItem('showFeedbackPopup', "false");
+    localStorage.setItem('showFeedbackPopup', 'false');
   }
 
-  selectRating(value : any) {
-    this.selectedRating = value
-    this.currentStep = 2
+  selectRating(value: any) {
+    this.selectedRating = value;
+    this.currentStep = 2;
   }
 
   feedbackSubmitBtnClicked() {
     var feedback = {
       rating: this.selectedRating,
-      feedbackDetail: this.feedbackDetail
-    }
-    localStorage.setItem('feedbackSubmission', JSON.stringify(feedback))
+      feedbackDetail: this.feedbackDetail,
+    };
+    localStorage.setItem('feedbackSubmission', JSON.stringify(feedback));
     localStorage.setItem('showFeedbackPopup', 'false');
 
     this.currentStep = 3;
     setTimeout(() => {
       this.showFeedbackPopup = false;
-    }, 5000)
+    }, 5000);
   }
-
 
   upvote(item: any): void {
     item.score++;
@@ -207,9 +195,12 @@ export class SavingPotsComponent implements OnInit {
     item.score--;
   }
 
-
   drop(event: CdkDragDrop<any>) {
-    moveItemInArray(this.savingPots.clientSavings, event.previousIndex, event.currentIndex);
+    moveItemInArray(
+      this.savingPots.clientSavings,
+      event.previousIndex,
+      event.currentIndex
+    );
   }
 
   moveUp(index: number) {
@@ -228,6 +219,10 @@ export class SavingPotsComponent implements OnInit {
     }
   }
 
+  floorValue(value: any): number {
+    return Math.floor(value);
+  }
+
   newEventClicked() {
     const dialogRef = this.dialog.open(AddNewPotComponent, {
       width: '700px',
@@ -237,16 +232,17 @@ export class SavingPotsComponent implements OnInit {
         escalataionRates: this.escalationRates,
         eventsList: this.timeline.clientEvents,
         clientBirthDate: this.selectedClient?.clientDetails.birthDate,
-        clientPreferredCurrency: this.selectedClient?.clientDetails.preferredCurrency,
+        clientPreferredCurrency:
+          this.selectedClient?.clientDetails.preferredCurrency,
         forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
         forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
-        cashflowId: this.selectedCashflow?.id
+        cashflowId: this.selectedCashflow?.id,
       },
     });
 
     dialogRef.afterClosed().subscribe((result: any) => {
       console.log('Dialog closed with result:', result);
-      this.savingPots = result.savingPot
+      this.savingPots = result.savingPot;
       // this.savingPots.clientSavings.push(result.clientSaving);
     });
   }

@@ -63,7 +63,7 @@ export class AddNewPotComponent {
   eventsList: any;
   cashflowId: string;
   formattedReturnRate: string = '';
-  inflationRate= 2.5;
+  inflationRate = 2.5;
   savingPotValues = [
     {
       name: 'Savings',
@@ -107,18 +107,20 @@ export class AddNewPotComponent {
       currency: [this.clientPreferredCurrency, Validators.required],
       amount: [0, [Validators.required, Validators.min(0)]],
       returnRate: [3.5],
-      lockPot: [true],
+      // lockPot: [true],
+      lockPot: [false],
       start: ['', Validators.required],
       end: ['', Validators.required],
-      commissions: [true],
+      // commissions: [true],
+      commissions: [false],
       commissionCurrency: [this.clientPreferredCurrency, Validators.required],
       commissionType: ['amount'],
       commissionAmount: [0],
-      commissionCycle: ['', Validators.required],
-      escalationRate: ['', Validators.required],
+      commissionCycle: [this.cycles[0].id, Validators.required],
+      escalationRate: [this.escalationRates[1].id, Validators.required],
     });
 
-    this.savingsForm.get('returnRate')?.valueChanges.subscribe(value => {
+    this.savingsForm.get('returnRate')?.valueChanges.subscribe((value) => {
       this.formattedReturnRate = this.formatWithPercentage(value);
     });
   }
@@ -195,7 +197,7 @@ export class AddNewPotComponent {
       this.savingsForm.get('escalationRate')?.updateValueAndValidity();
     }
   }
-  
+
   onSliderChange(value: any) {
     if (!isNaN(value)) {
       this.savingsForm.get('returnRate')?.setValue(value, { emitEvent: true });
@@ -205,7 +207,9 @@ export class AddNewPotComponent {
   onInputChange(event: any) {
     let value = event.target.value.replace('%', '').trim();
     if (!isNaN(value) && value !== '') {
-      this.savingsForm.get('returnRate')?.setValue(parseFloat(value), { emitEvent: true });
+      this.savingsForm
+        .get('returnRate')
+        ?.setValue(parseFloat(value), { emitEvent: true });
     }
   }
 
@@ -276,25 +280,36 @@ export class AddNewPotComponent {
             (x) => this.savingsForm.get('name')?.value === x.name
           )?.iconUrl ?? '',
         start: {
-          age: this.savingsForm.get('start')?.value !== null && this.savingsForm.get('start')?.value !== ''
-            ? this.savingsForm.get('start')?.value - this.clientBirthYear
-            : 0,
-          year: this.savingsForm.get('start')?.value !== null && this.savingsForm.get('start')?.value !== ''
-          ? this.savingsForm.get('start')?.value : 0,
+          age:
+            this.savingsForm.get('start')?.value !== null &&
+            this.savingsForm.get('start')?.value !== ''
+              ? this.savingsForm.get('start')?.value - this.clientBirthYear
+              : 0,
+          year:
+            this.savingsForm.get('start')?.value !== null &&
+            this.savingsForm.get('start')?.value !== ''
+              ? this.savingsForm.get('start')?.value
+              : 0,
         },
         end: {
-          age: this.savingsForm.get('end')?.value !== null && this.savingsForm.get('end')?.value !== ''
-            ? this.savingsForm.get('end')?.value - this.clientBirthYear
-            : 0,
-          year: this.savingsForm.get('end')?.value !== null && this.savingsForm.get('end')?.value !== ''
-          ? this.savingsForm.get('end')?.value : 0,
+          age:
+            this.savingsForm.get('end')?.value !== null &&
+            this.savingsForm.get('end')?.value !== ''
+              ? this.savingsForm.get('end')?.value - this.clientBirthYear
+              : 0,
+          year:
+            this.savingsForm.get('end')?.value !== null &&
+            this.savingsForm.get('end')?.value !== ''
+              ? this.savingsForm.get('end')?.value
+              : 0,
         },
         returnRate: this.savingsForm.get('returnRate')?.value,
         type:
           this.savingPotValues.find(
             (x) => this.savingsForm.get('name')?.value === x.name
           )?.type ?? SavingPotType.Cash,
-        realReturn: this.savingsForm.get('returnRate')?.value - this.inflationRate,
+        realReturn:
+          this.savingsForm.get('returnRate')?.value - this.inflationRate,
       };
 
       this.savingPotsHttpService
@@ -309,7 +324,7 @@ export class AddNewPotComponent {
         .subscribe((res) => {
           this.dialogRef.close({
             status: 'Success',
-            savingPot: res
+            savingPot: res,
           });
         });
 

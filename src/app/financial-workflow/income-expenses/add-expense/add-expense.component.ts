@@ -13,9 +13,17 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { provideNativeDateAdapter } from '@angular/material/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { allCountries } from 'src/app/clients/models/country';
-import { Cycle, EscalationRate } from '../../timeline/models/financial-timeline';
+import {
+  Cycle,
+  EscalationRate,
+} from '../../timeline/models/financial-timeline';
 import { IncomeExpensesHttpService } from '../services/income-expenses-http.service';
 import moment from 'moment';
 import { FinancialViewModel } from '../model/income-expense';
@@ -34,7 +42,7 @@ import { catchError, filter } from 'rxjs';
     MatSelectModule,
     MatDatepickerModule,
     MatSliderModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
   ],
   providers: [provideNativeDateAdapter()],
   templateUrl: './add-expense.component.html',
@@ -44,6 +52,7 @@ export class AddExpenseComponent {
   expenseForm: FormGroup;
   countries = allCountries;
   cycles: Cycle[];
+  years: number[] = [];
   escalationRates: EscalationRate[];
   cashflowId: string;
   clientPreferredCurrency: string;
@@ -57,29 +66,45 @@ export class AddExpenseComponent {
     private fb: FormBuilder,
     private incomeExpenseHttpService: IncomeExpensesHttpService
   ) {
-
     this.cycles = data.amountCycles;
     this.escalationRates = data.escalataionRates;
     this.clientBirthYear = moment(data.clientBirthDate).year();
     this.clientPreferredCurrency = data.clientPreferredCurrency;
     this.cashflowId = data.cashflowId;
     this.isEditWorkflow = data.isEditWorkflow;
-    this.selectedExpense = data.selectedExpense
+    this.selectedExpense = data.selectedExpense;
+
+    var iterations = data.forecastEndDateYear - data.forecastStartDateYear;
+
+    for (let index = 0; index < iterations; index++) {
+      const element = data.forecastStartDateYear + index;
+      this.years.push(element);
+    }
 
     this.expenseForm = this.fb.group({
       description: ['', Validators.required],
       currencySymbol: [this.clientPreferredCurrency, [Validators.required]],
       amount: [0, [Validators.required, Validators.min(0)]],
-      cycle: ['', Validators.required],
-      expensedate: ['', Validators.required]
+      cycle: [this.cycles[0].id, Validators.required],
+      expensedate: ['', Validators.required],
     });
 
-    if(this.isEditWorkflow) {
-      this.expenseForm.get('description')?.patchValue(this.selectedExpense.description)
-      this.expenseForm.get('currencySymbol')?.patchValue(this.selectedExpense.amount.currencySymbol)
-      this.expenseForm.get('amount')?.patchValue(this.selectedExpense.amount.amount)
-      this.expenseForm.get('cycle')?.patchValue(this.selectedExpense.amount.cycle.id)
-      this.expenseForm.get('expensedate')?.patchValue(this.selectedExpense.date)
+    if (this.isEditWorkflow) {
+      this.expenseForm
+        .get('description')
+        ?.patchValue(this.selectedExpense.description);
+      this.expenseForm
+        .get('currencySymbol')
+        ?.patchValue(this.selectedExpense.amount.currencySymbol);
+      this.expenseForm
+        .get('amount')
+        ?.patchValue(this.selectedExpense.amount.amount);
+      this.expenseForm
+        .get('cycle')
+        ?.patchValue(this.selectedExpense.amount.cycle.id);
+      this.expenseForm
+        .get('expensedate')
+        ?.patchValue(this.selectedExpense.date);
     }
   }
 
@@ -97,32 +122,41 @@ export class AddExpenseComponent {
           amount: this.expenseForm.get('amount')?.value,
           currencySymbol: this.expenseForm.get('currencySymbol')?.value,
           cycle: {
-            id: this.expenseForm.get('cycle')?.value ?? "",
-            description: this.cycles.find(x => x.id === this.expenseForm.get('cycle')?.value)?.description ?? "",
+            id: this.expenseForm.get('cycle')?.value ?? '',
+            description:
+              this.cycles.find(
+                (x) => x.id === this.expenseForm.get('cycle')?.value
+              )?.description ?? '',
           },
         },
-        date: this.expenseForm.get('expensedate')?.value
+        date: this.expenseForm.get('expensedate')?.value,
       };
 
-      var action$ = this.incomeExpenseHttpService.addExpense(this.cashflowId, expense);
-      
-      if(this.isEditWorkflow)
-        action$ = this.incomeExpenseHttpService.updateExpense(this.cashflowId, expense);
-        
+      var action$ = this.incomeExpenseHttpService.addExpense(
+        this.cashflowId,
+        expense
+      );
+
+      if (this.isEditWorkflow)
+        action$ = this.incomeExpenseHttpService.updateExpense(
+          this.cashflowId,
+          expense
+        );
+
       action$
-      .pipe(
-        filter((res) => !!res),
-        catchError((err) => {
-          console.error(err);
-          throw err;
-        })
-      )
-      .subscribe((res) => {
-        this.dialogRef.close({
-          status: 'Success',
-          incomeExpense: res
+        .pipe(
+          filter((res) => !!res),
+          catchError((err) => {
+            console.error(err);
+            throw err;
+          })
+        )
+        .subscribe((res) => {
+          this.dialogRef.close({
+            status: 'Success',
+            incomeExpense: res,
+          });
         });
-      });
       // Handle form submission logic
     } else {
       console.log('Form is invalid');

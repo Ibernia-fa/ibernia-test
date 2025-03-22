@@ -35,12 +35,12 @@
               <div class="left">
                 <mat-select formControlName="currencySymbol" class="sortby-edit-profile" hideSingleSelectionIndicator>
                   @for (country of countries; track country) {
-                    @if(country.currencySymbol) {
-                      <mat-option [value]="country.currencySymbol">{{
-                        country.currencySymbol
-                        }}</mat-option>
-  
-                    }
+                  @if(country.currencySymbol) {
+                  <mat-option [value]="country.currencySymbol">{{
+                    country.currencySymbol
+                    }}</mat-option>
+
+                  }
                   }
                 </mat-select>
               </div>
@@ -52,9 +52,10 @@
               <!-- End Price Field  -->
               <!-- End Type Field  -->
               <div class="right">
-                <mat-select value="Select" formControlName="cycle" class="sortby-edit-profile">
+                <mat-select value="Select" formControlName="cycle" class="sortby-edit-profile"
+                  hideSingleSelectionIndicator>
                   @for (cycle of cycles; track cycle) {
-                    <mat-option [value]="cycle.id">{{ cycle.description }}</mat-option>
+                  <mat-option [value]="cycle.id">{{ cycle.description }}</mat-option>
                   }
                 </mat-select>
               </div>
@@ -73,7 +74,7 @@
               <mat-label class="f-s-16 f-w-400 d-block">Date</mat-label>
               <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
             </div>
-            <div class="position-relative">
+            <!-- <div class="position-relative">
               <input matInput [matDatepicker]="picker" formControlName="expensedate" />
               <div class="date-picker-position">
                 <mat-datepicker-toggle matIconSuffix [for]="picker">
@@ -83,6 +84,13 @@
                 </mat-datepicker-toggle>
               </div>
               <mat-datepicker #picker></mat-datepicker>
+            </div> -->
+            <div class="select-option">
+              <mat-select value="Select" formControlName="expensedate" hideSingleSelectionIndicator>
+                @for (year of years; track year) {
+                <mat-option [value]="year">{{ year }} ({{ year - clientBirthYear }})</mat-option>
+                }
+              </mat-select>
             </div>
           </div>
           <!-- error  -->

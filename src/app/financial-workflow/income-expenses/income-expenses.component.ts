@@ -17,9 +17,15 @@ import { Cashflow } from 'src/app/clients/models/cashflow';
 import { IncomeExpensesHttpService } from './services/income-expenses-http.service';
 import { SettingsHttpService } from '../settings/services/settings-http.service';
 import { FinancialViewModel, IncomeExpense } from './model/income-expense';
-import { Cycle, EscalationRate } from '../timeline/models/financial-timeline';
+import {
+  Cycle,
+  EscalationRate,
+  FinancialTimeline,
+} from '../timeline/models/financial-timeline';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { NavItemService } from 'src/app/layouts/full/nav-item.service';
+import { TimelineHttpService } from '../timeline/services/timeline-http.service';
+import moment from 'moment';
 
 @Component({
   selector: 'app-income-expenses',
@@ -31,25 +37,24 @@ import { NavItemService } from 'src/app/layouts/full/nav-item.service';
     MatIconModule,
     MatMenuModule,
     MatButtonModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
   ],
   templateUrl: './income-expenses.component.html',
   styleUrl: './income-expenses.component.scss',
 })
 export class IncomeExpensesComponent {
   displayedColumns: string[] = ['position', 'name', 'action'];
-  incomeDataSource: MatTableDataSource<FinancialViewModel> = new MatTableDataSource(
-      new Array<FinancialViewModel>()
-    );
-  expenseDataSource: MatTableDataSource<FinancialViewModel> = new MatTableDataSource(
-    new Array<FinancialViewModel>()
-  );
+  incomeDataSource: MatTableDataSource<FinancialViewModel> =
+    new MatTableDataSource(new Array<FinancialViewModel>());
+  expenseDataSource: MatTableDataSource<FinancialViewModel> =
+    new MatTableDataSource(new Array<FinancialViewModel>());
   selectedClient: Client;
   selectedCashflow: Cashflow;
   incomeExpense: IncomeExpense;
   amountCycles: Cycle[];
   escalationRates: EscalationRate[];
-  isLoaderVisible = false
+  isLoaderVisible = false;
+  timeline: FinancialTimeline;
 
   constructor(
     private dialog: MatDialog,
@@ -57,6 +62,7 @@ export class IncomeExpensesComponent {
     private financialWorkflowService: FinancialWorkflowService,
     private incomeExpensesHttpService: IncomeExpensesHttpService,
     private settingHttpService: SettingsHttpService,
+    private timelineHttpService: TimelineHttpService,
     private navItemService: NavItemService
   ) {
     this.navItemService.currentRouteName = 'Incomes & Expenses';
@@ -64,7 +70,7 @@ export class IncomeExpensesComponent {
   }
 
   getData() {
-    this.isLoaderVisible = true
+    this.isLoaderVisible = true;
     this.activatedRoute.params
       .pipe(
         switchMap((params) =>
@@ -80,19 +86,27 @@ export class IncomeExpensesComponent {
             this.incomeExpensesHttpService.getAllIncomeExpenses(
               (cashflow as Cashflow).id
             ),
+            this.timelineHttpService.getTimelinebyCashflowId(
+              (cashflow as Cashflow).id
+            ),
             this.settingHttpService.getAmountCycles(),
             this.settingHttpService.getEscalationRates(
               (client as Client).financialAdvisor.advisorId
             ),
           ]);
         }),
-        tap(([incomeExpense, amountCycles, escalationRates]) => {
+        tap(([incomeExpense, timeline, amountCycles, escalationRates]) => {
           this.incomeExpense = incomeExpense;
           this.amountCycles = amountCycles;
           this.escalationRates = escalationRates;
+          this.timeline = timeline;
 
-          this.incomeDataSource = new MatTableDataSource(this.incomeExpense.incomes);
-          this.expenseDataSource = new MatTableDataSource(this.incomeExpense.expenses);
+          this.incomeDataSource = new MatTableDataSource(
+            this.incomeExpense.incomes
+          );
+          this.expenseDataSource = new MatTableDataSource(
+            this.incomeExpense.expenses
+          );
           this.isLoaderVisible = false;
         })
       )
@@ -107,8 +121,11 @@ export class IncomeExpensesComponent {
         amountCycles: this.amountCycles,
         escalataionRates: this.escalationRates,
         clientBirthDate: this.selectedClient?.clientDetails.birthDate,
-        clientPreferredCurrency: this.selectedClient?.clientDetails.preferredCurrency,
-        cashflowId: this.selectedCashflow?.id
+        clientPreferredCurrency:
+          this.selectedClient?.clientDetails.preferredCurrency,
+        cashflowId: this.selectedCashflow?.id,
+        forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
+        forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
       },
     });
 
@@ -125,8 +142,11 @@ export class IncomeExpensesComponent {
         amountCycles: this.amountCycles,
         escalataionRates: this.escalationRates,
         clientBirthDate: this.selectedClient?.clientDetails.birthDate,
-        clientPreferredCurrency: this.selectedClient?.clientDetails.preferredCurrency,
-        cashflowId: this.selectedCashflow?.id
+        clientPreferredCurrency:
+          this.selectedClient?.clientDetails.preferredCurrency,
+        cashflowId: this.selectedCashflow?.id,
+        forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
+        forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
       },
     });
 
@@ -136,7 +156,6 @@ export class IncomeExpensesComponent {
     });
   }
 
-
   updateIncomeClicked(item: FinancialViewModel) {
     const dialogRef = this.dialog.open(AddIncomeComponent, {
       width: '700px',
@@ -145,10 +164,13 @@ export class IncomeExpensesComponent {
         amountCycles: this.amountCycles,
         escalataionRates: this.escalationRates,
         clientBirthDate: this.selectedClient?.clientDetails.birthDate,
-        clientPreferredCurrency: this.selectedClient?.clientDetails.preferredCurrency,
+        clientPreferredCurrency:
+          this.selectedClient?.clientDetails.preferredCurrency,
         cashflowId: this.selectedCashflow?.id,
         selectedIncome: item,
-        isEditWorkflow: true
+        isEditWorkflow: true,
+        forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
+        forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
       },
     });
 
@@ -165,10 +187,13 @@ export class IncomeExpensesComponent {
         amountCycles: this.amountCycles,
         escalataionRates: this.escalationRates,
         clientBirthDate: this.selectedClient?.clientDetails.birthDate,
-        clientPreferredCurrency: this.selectedClient?.clientDetails.preferredCurrency,
+        clientPreferredCurrency:
+          this.selectedClient?.clientDetails.preferredCurrency,
         cashflowId: this.selectedCashflow?.id,
         selectedExpense: item,
-        isEditWorkflow: true
+        isEditWorkflow: true,
+        forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
+        forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
       },
     });
 
@@ -203,31 +228,38 @@ export class IncomeExpensesComponent {
   // }
 
   deleteIncome(element: FinancialViewModel) {
-    this.incomeExpensesHttpService.deleteIncome(this.selectedCashflow.id, element)
-    .subscribe((res) => {
-      this.updateIncomeExpenseByResponse(res);
-    });
+    this.incomeExpensesHttpService
+      .deleteIncome(this.selectedCashflow.id, element)
+      .subscribe((res) => {
+        this.updateIncomeExpenseByResponse(res);
+      });
   }
-  
+
   deleteExpense(element: FinancialViewModel) {
-    this.incomeExpensesHttpService.deleteExpense(this.selectedCashflow.id, element)
-    .subscribe((res) => {
-      this.updateIncomeExpenseByResponse(res);
-    });
+    this.incomeExpensesHttpService
+      .deleteExpense(this.selectedCashflow.id, element)
+      .subscribe((res) => {
+        this.updateIncomeExpenseByResponse(res);
+      });
   }
 
   updateIncomeExpenseByResponse(res: IncomeExpense) {
     this.incomeExpense = res;
     this.incomeDataSource = new MatTableDataSource(this.incomeExpense.incomes);
-    this.expenseDataSource = new MatTableDataSource(this.incomeExpense.expenses);
+    this.expenseDataSource = new MatTableDataSource(
+      this.incomeExpense.expenses
+    );
   }
 
-  private calculateSavingsRate()
-  {
+  private calculateSavingsRate() {
     var totalIncome = 0;
     var totalExpense = 0;
-    this.incomeExpense.incomes.map(x => totalIncome = totalIncome + x.amount.amount);
-    this.incomeExpense.expenses.map(x => totalExpense = totalExpense + x.amount.amount);
+    this.incomeExpense.incomes.map(
+      (x) => (totalIncome = totalIncome + x.amount.amount)
+    );
+    this.incomeExpense.expenses.map(
+      (x) => (totalExpense = totalExpense + x.amount.amount)
+    );
     this.incomeExpense.totalIncome = totalIncome;
     this.incomeExpense.totalExpenses = totalExpense;
     this.incomeExpense.total = totalIncome - totalExpense;
@@ -235,9 +267,10 @@ export class IncomeExpensesComponent {
     if (totalIncome === 0) {
       return;
     }
-        // return 0; // Avoid division by zero
+    // return 0; // Avoid division by zero
 
-    var savings = this.incomeExpense.totalIncome - this.incomeExpense.totalExpenses;
+    var savings =
+      this.incomeExpense.totalIncome - this.incomeExpense.totalExpenses;
     return (savings / this.incomeExpense.totalIncome) * 100;
   }
 }
