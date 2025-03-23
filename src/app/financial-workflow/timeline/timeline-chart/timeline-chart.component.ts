@@ -85,15 +85,15 @@ export class TimelineChartComponent implements OnInit, OnChanges {
       if (this.timeline) {
         this.timeline.setItems(this.timelineData);
         this.timeline.setOptions(this.timelineOptions);
-        this.timeline.removeCustomTime('t1');
-        if (
-          this.financialTimeline.startAt &&
-          this.financialTimeline.clientEvents.length > 0
-        )
-          this.timeline.addCustomTime(
-            new Date(this.financialTimeline.startAt.year, 0),
-            't1'
-          );
+        // this.timeline.removeCustomTime('t1');
+        // if (
+        //   this.financialTimeline.startAt &&
+        //   this.financialTimeline.clientEvents.length > 0
+        // )
+        //   this.timeline.addCustomTime(
+        //     new Date(this.financialTimeline.startAt.year, 0),
+        //     't1'
+        //   );
         this.timeline.redraw();
       }
     }
@@ -203,10 +203,10 @@ export class TimelineChartComponent implements OnInit, OnChanges {
                 age: clientEvent.start.age,
                 year: clientEvent.start.year,
               };
-              this.timeline.addCustomTime(
-                new Date(this.financialTimeline.startAt.year, 1),
-                't1'
-              );
+              // this.timeline.addCustomTime(
+              //   new Date(this.financialTimeline.startAt.year, 1),
+              //   't1'
+              // );
             }
             this.financialTimeline.clientEvents.push(clientEvent);
             this.draggedEvent = null;
@@ -407,19 +407,14 @@ export class TimelineChartComponent implements OnInit, OnChanges {
     );
 
     console.log(this.financialTimeline.startAt);
-    if (
-      this.financialTimeline.startAt &&
-      this.financialTimeline.clientEvents.length > 0
-    )
-      this.timeline.addCustomTime(
-        new Date(this.financialTimeline.startAt.year, 1),
-        't1'
-      );
+    // if (
+    //   this.financialTimeline.startAt &&
+    //   this.financialTimeline.clientEvents.length > 0
+    // )
     //   this.timeline.addCustomTime(
-    //     moment(this.financialTimeline.startAt.year).toDate(),
+    //     new Date(this.financialTimeline.startAt.year, 1),
     //     't1'
     //   );
-    // }
   }
 
   get timelineData(): DataSet<
@@ -720,9 +715,9 @@ export class TimelineChartComponent implements OnInit, OnChanges {
             ),
             1
           );
-          if (this.financialTimeline.clientEvents.length < 1) {
-            this.timeline.removeCustomTime('t1');
-          }
+          // if (this.financialTimeline.clientEvents.length < 1) {
+          //   this.timeline.removeCustomTime('t1');
+          // }
           this.timeline.setItems(this.timelineData);
           this.timeline.redraw();
           console.log(this.financialTimeline);
