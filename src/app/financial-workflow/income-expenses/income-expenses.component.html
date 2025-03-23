@@ -39,7 +39,7 @@
                                     <h3 class="card-title expense-income">Incomes</h3>
                                 </div>
                                 <h3 class="saving-title">
-                                    +{{selectedClient?.clientDetails?.preferredCurrency}}{{incomeExpense.totalIncome}}
+                                    +{{selectedClient?.clientDetails?.preferredCurrency}}{{incomeExpense?.totalIncome ?? 0}}
                                 </h3>
                             </div>
                         </div>
@@ -53,7 +53,7 @@
                                     <h3 class="card-title expenses-deduct">Expenses</h3>
                                 </div>
                                 <h3 class="saving-title">
-                                    -{{selectedClient?.clientDetails?.preferredCurrency}}{{incomeExpense.totalExpenses}}
+                                    -{{selectedClient?.clientDetails?.preferredCurrency}}{{incomeExpense?.totalExpenses ?? 0}}
                                 </h3>
                             </div>
                         </div>
@@ -67,7 +67,7 @@
                                     <h3 class="card-title expenses-total">Total</h3>
                                 </div>
                                 <h3 class="saving-title">=
-                                    {{incomeExpense.total < 0 ? '-' : ''}}{{selectedClient?.clientDetails?.preferredCurrency}}{{incomeExpense.total < 0 ? (incomeExpense.total)*(-1) : incomeExpense.total}}</h3>
+                                    {{(incomeExpense?.total ?? 0) < 0 ? '-' : ''}}{{selectedClient?.clientDetails?.preferredCurrency}}{{(incomeExpense?.total ?? 0) < 0 ? ((incomeExpense?.total ?? 0))*(-1) : (incomeExpense?.total ?? 0)}}</h3>
                             </div>
                         </div>
                         <!-- Divider  -->
@@ -76,7 +76,7 @@
                         <div class="col-3">
                             <div class="d-flex flex-column gap-8">
                                 <div class="d-flex align-items-center gap-8">
-                                    @if(incomeExpense.savingRate > 0) {
+                                    @if((incomeExpense?.savingRate ?? 0) > 0) {
                                     <img src="assets/images/svgs/income-discount.svg" alt="income-discount" />
                                     }
                                     @else {
@@ -85,18 +85,18 @@
                                     }
 
                                     <h3
-                                        [ngClass]="incomeExpense.savingRate > 0 ? 'card-title green' : 'card-title red'">
+                                        [ngClass]="(incomeExpense?.savingRate ?? 0) > 0 ? 'card-title green' : 'card-title red'">
                                         Saving rate</h3>
                                 </div>
                                 <h3
-                                    [ngClass]="incomeExpense.savingRate > 0 ? 'saving-title green' : 'saving-title red'">
-                                    {{incomeExpense.savingRate | number : '1.0-0'}}%</h3>
+                                    [ngClass]="(incomeExpense?.savingRate ?? 0) > 0 ? 'saving-title green' : 'saving-title red'">
+                                    {{(incomeExpense?.savingRate ?? 0) | number : '1.0-0'}}%</h3>
                             </div>
                         </div>
                     </div>
                 </div>
                 <!-- Emoji  -->
-                @if(incomeExpense.savingRate > 0) {
+                @if((incomeExpense?.savingRate ?? 0) > 0) {
                 <img src="assets/images/shapes/happy-feedback-icon.png" alt="smile-emoji">
                 }
                 @else {

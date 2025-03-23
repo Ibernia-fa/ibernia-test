@@ -167,18 +167,27 @@
                                     </div>
                                     <!-- End Chart  -->
                                     @if(saving.hasPotLocked) {
-                                    <div class="lock-overlay">
-                                        <div
-                                            class="d-flex align-items-center justify-content-center flex-column gap-10 h-100">
-                                            <img src="assets/images/svgs/cashflow-lock-icon.svg"
-                                                alt="cashflow-lock-icon">
-                                            <p>Locked until {{saving.end.age - saving.start.age}} y.o.</p>
+                                        <div class="lock-overlay">
+                                            <div
+                                                class="d-flex align-items-center justify-content-center flex-column gap-10 h-100">
+                                                <img src="assets/images/svgs/cashflow-lock-icon.svg"
+                                                    alt="cashflow-lock-icon">
+                                                <p>Locked until {{saving.end.age - saving.start.age}} y.o.</p>
+                                            </div>
+                                            <div class="help-lock-overlay">
+                                                <img src="assets/images/svgs/help-circle-lock-overlay.svg"
+                                                    alt="help-circle-lock-overlay">
+                                            </div>
                                         </div>
-                                        <div class="help-lock-overlay">
-                                            <img src="assets/images/svgs/help-circle-lock-overlay.svg"
-                                                alt="help-circle-lock-overlay">
+                                    }
+                                    @else {
+                                        <div class="edit-icon-overlay">
+                                            <button mat-icon-button (click)="updateEventClicked(saving)">
+                                                <mat-icon>
+                                                    <img src="assets/images/svgs/pen-icon.svg" alt="pen-icon" />
+                                                </mat-icon>
+                                            </button>
                                         </div>
-                                    </div>
                                     }
                                 </div>
                                 <!-- End Card  -->

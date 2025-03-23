@@ -105,7 +105,8 @@ export class AddIncomeComponent {
       this.incomeForm
         .get('cycle')
         ?.patchValue(this.selectedIncome.amount.cycle.id);
-      this.incomeForm.get('start')?.patchValue(moment(this.selectedIncome.date).year());
+      this.incomeForm.get('start')?.patchValue(this.selectedIncome.start.year);
+      this.incomeForm.get('end')?.patchValue(this.selectedIncome.end.year);
 
     }
   }
@@ -144,7 +145,30 @@ export class AddIncomeComponent {
               )?.description ?? '',
           },
         },
-        date: new Date(this.incomeForm.get('start')?.value , 1, 1)
+        start: {
+          age:
+            this.incomeForm.get('start')?.value !== null &&
+            this.incomeForm.get('start')?.value !== ''
+              ? this.incomeForm.get('start')?.value - this.clientBirthYear
+              : 0,
+          year:
+            this.incomeForm.get('start')?.value !== null &&
+            this.incomeForm.get('start')?.value !== ''
+              ? this.incomeForm.get('start')?.value
+              : 0,
+        },
+        end: {
+          age:
+            this.incomeForm.get('end')?.value !== null &&
+            this.incomeForm.get('end')?.value !== ''
+              ? this.incomeForm.get('end')?.value - this.clientBirthYear
+              : 0,
+          year:
+            this.incomeForm.get('end')?.value !== null &&
+            this.incomeForm.get('end')?.value !== ''
+              ? this.incomeForm.get('end')?.value
+              : 0,
+        },
       };
 
       var action$ = this.incomeExpenseHttpService.addIncome(

@@ -15,7 +15,7 @@ import { animate, style, transition, trigger } from '@angular/animations';
 import { CommonModule } from '@angular/common';
 import { combineLatest, switchMap, tap } from 'rxjs';
 import { SavingsPotsHttpService as SavingPotsHttpService } from './services/savings-pots-http.service';
-import { SavingPotsModel as SavingPots } from './models/saving-pots.model';
+import { ClientSaving, SavingPotsModel as SavingPots } from './models/saving-pots.model';
 import { Cashflow } from 'src/app/clients/models/cashflow';
 import { TimelineHttpService } from '../timeline/services/timeline-http.service';
 import { Client } from 'src/app/clients/models/client';
@@ -31,6 +31,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { FormsModule } from '@angular/forms';
 import { FinancialWorkflowService } from '../services/financial-workflow.service';
 import { NavItemService } from 'src/app/layouts/full/nav-item.service';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-saving-pots',
@@ -43,6 +45,8 @@ import { NavItemService } from 'src/app/layouts/full/nav-item.service';
     CdkDrag,
     CdkDragHandle,
     CdkDropList,
+    MatIconModule,
+    MatButtonModule,
     CommonModule,
     FormsModule,
   ],
@@ -219,6 +223,32 @@ export class SavingPotsComponent implements OnInit {
     }
   }
 
+  updateEventClicked(event: ClientSaving) {
+    const dialogRef = this.dialog.open(AddNewPotComponent, {
+      width: '700px',
+      disableClose: true,
+      data: {
+        amountCycles: this.amountCycles,
+        escalataionRates: this.escalationRates,
+        eventsList: this.timeline.clientEvents,
+        clientBirthDate: this.selectedClient?.clientDetails.birthDate,
+        clientPreferredCurrency:
+          this.selectedClient?.clientDetails.preferredCurrency,
+        forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
+        forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
+        cashflowId: this.selectedCashflow?.id,
+        isEditWorkflow: true,
+        event: event
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((result: any) => {
+      console.log('Dialog closed with result:', result);
+      this.savingPots = result.savingPot;
+      // this.savingPots.clientSavings.push(result.clientSaving);
+    });
+  }
+  
   newEventClicked() {
     const dialogRef = this.dialog.open(AddNewPotComponent, {
       width: '700px',
@@ -233,6 +263,7 @@ export class SavingPotsComponent implements OnInit {
         forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
         forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
         cashflowId: this.selectedCashflow?.id,
+        isEditWorkflow: false
       },
     });
 

@@ -64,6 +64,17 @@
   }
 }
 
+.input-container {
+  position: relative;
+  display: inline-block;
+  
+  .suffix {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}}
 .select-option {
   .mat-mdc-select {
     margin-top: 2px;

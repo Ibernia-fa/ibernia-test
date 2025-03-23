@@ -499,7 +499,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
       showCurrentTime: false, // Hide default current time marker
       // showCustomTime: true, // Allows custom markers
       showMajorLabels: true,
-      timeAxis: { scale: 'year', step: 5 },
+      timeAxis: { scale: 'year', step: 1 },
       format: {
         minorLabels: function (date: any) {
           return `

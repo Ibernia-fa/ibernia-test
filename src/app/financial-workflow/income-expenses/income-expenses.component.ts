@@ -102,10 +102,10 @@ export class IncomeExpensesComponent {
           this.timeline = timeline;
 
           this.incomeDataSource = new MatTableDataSource(
-            this.incomeExpense.incomes
+            this.incomeExpense?.incomes
           );
           this.expenseDataSource = new MatTableDataSource(
-            this.incomeExpense.expenses
+            this.incomeExpense?.expenses
           );
           this.isLoaderVisible = false;
         })

@@ -105,9 +105,8 @@ export class AddExpenseComponent {
       this.expenseForm
         .get('cycle')
         ?.patchValue(this.selectedExpense.amount.cycle.id);
-      this.expenseForm
-        .get('start')
-        ?.patchValue(moment(this.selectedExpense.date).year());
+      this.expenseForm.get('start')?.patchValue(this.selectedExpense.start.year);
+      this.expenseForm.get('end')?.patchValue(this.selectedExpense.end.year);
     }
   }
 
@@ -147,7 +146,30 @@ export class AddExpenseComponent {
               )?.description ?? '',
           },
         },
-        date: new Date(this.expenseForm.get('start')?.value , 1, 1),
+        start: {
+          age:
+            this.expenseForm.get('start')?.value !== null &&
+            this.expenseForm.get('start')?.value !== ''
+              ? this.expenseForm.get('start')?.value - this.clientBirthYear
+              : 0,
+          year:
+            this.expenseForm.get('start')?.value !== null &&
+            this.expenseForm.get('start')?.value !== ''
+              ? this.expenseForm.get('start')?.value
+              : 0,
+        },
+        end: {
+          age:
+            this.expenseForm.get('end')?.value !== null &&
+            this.expenseForm.get('end')?.value !== ''
+              ? this.expenseForm.get('end')?.value - this.clientBirthYear
+              : 0,
+          year:
+            this.expenseForm.get('end')?.value !== null &&
+            this.expenseForm.get('end')?.value !== ''
+              ? this.expenseForm.get('end')?.value
+              : 0,
+        },      
       };
 
       var action$ = this.incomeExpenseHttpService.addExpense(

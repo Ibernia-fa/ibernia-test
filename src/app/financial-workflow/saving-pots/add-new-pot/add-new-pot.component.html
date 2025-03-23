@@ -10,7 +10,7 @@
   <div class="d-flex flex-column gap-32">
     <!-- Modal Header  -->
     <div class="d-flex align-items-center justify-content-between gap-10 modal-header">
-      <h3>Add a savings pot, investment or pension</h3>
+      <h3>{{isEditWorkflow ? 'Update' : 'Add'}} a savings pot, investment or pension</h3>
       <button (click)="closeDialog()" type="button">
         <img src="assets/images/svgs/close-line-cion.svg" alt="close-line-cion" />
       </button>
@@ -131,14 +131,17 @@
           <div class="d-flex align-items-center gap-24">
             <div class="slider-customizer slider-wrapper">
               <mat-slider class="w-100" min="0" max="20" step="1">
-                <input matSliderThumb (valueChange)="onSliderChange($event)"
-                  [value]="savingsForm.get('returnRate')?.value">
+                <input matSliderThumb formControlName="returnRate" >
+                <!-- (valueChange)="onSliderChange($event)"
+                  [value]="savingsForm.get('returnRate')?.value"> -->
               </mat-slider>
             </div>
             <div class="percentage-field">
-              <div class="w-100 form-field">
-                <input placeholder="Return Rate" formControlName="returnRate" [value]="formattedReturnRate"
-                  (input)="onInputChange($event)" (blur)="onInputBlur($event)" />
+              <div class="w-100 form-field input-container">
+                <!-- <mat-form-field style="width: 110px" appearance="outline" class="w-100 form-field"> -->
+                  <input placeholder="Return Rate" matInput formControlName="returnRate" [value]="savingsForm.get('returnRate')?.value" />
+                  <span class="suffix">%</span>
+                <!-- </mat-form-field>  -->
               </div>
             </div>
           </div>
@@ -245,20 +248,26 @@
         @if(savingsForm.get('commissions')?.value) {
         <div class="d-flex flex-column gap-12">
           <!-- Modal tabs  -->
-          <div class="d-flex flex-column gap-12 tab">
+          <div class="d-flex flex-column gap-6 tab">
             <span class="f-s-16 f-w-400">Commission type</span>
             <div class="tabs">
               <div class="row">
-                <div class="col-6">
-                  <button (click)="onCommissionTypeControlClicked(true)" class="button-icon w-100"
-                    [class]="{ active: isAmountType }">
-                    <span class="uppercase" [class]="{ active: isAmountType }">Amount</span>
+                <div class="col-4">
+                  <button (click)="onCommissionTypeControlClicked('amount')" class="button-icon w-100"
+                    [class]="{ active: savingsForm.get('commissionType')?.value === 'amount' }">
+                    <span class="uppercase" [class]="{ active: savingsForm.get('commissionType')?.value === 'amount' }">Amount</span>
                   </button>
                 </div>
-                <div class="col-6">
-                  <button (click)="onCommissionTypeControlClicked(false)" class="button-icon w-100"
-                    [class]="{ active: !isAmountType }">
-                    <span class="uppercase" [class]="{ active: !isAmountType }">Percentage</span>
+                <div class="col-4">
+                  <button (click)="onCommissionTypeControlClicked('percentage')" class="button-icon w-100"
+                    [class]="{ active: savingsForm.get('commissionType')?.value === 'percentage' }">
+                    <span class="uppercase" [class]="{ active: savingsForm.get('commissionType')?.value === 'percentage' }">Percentage</span>
+                  </button>
+                </div>
+                <div class="col-4">
+                  <button (click)="onCommissionTypeControlClicked('both')" class="button-icon w-100"
+                    [class]="{ active: savingsForm.get('commissionType')?.value === 'both' }">
+                    <span class="uppercase" [class]="{ active: savingsForm.get('commissionType')?.value === 'both' }">Both</span>
                   </button>
                 </div>
               </div>
@@ -267,52 +276,119 @@
           <!-- End Modal tabs  -->
 
           <!-- Net Amount Field  -->
-          <div class="d-flex flex-column gap-4 net-fields">
-            <div class="net-field d-flex align-items-center">
-              <!-- Currency Selector  -->
-              <div class="left">
-                <mat-select value="£" formControlName="commissionCurrency" class="sortby-edit-profile"
-                  hideSingleSelectionIndicator>
-                  @for (country of countries; track country) {
-                  @if(country.currencySymbol) {
-                  <mat-option [value]="country.currencySymbol">{{
-                    country.currencySymbol
-                    }}</mat-option>
-
-                  }
-                  }
-                </mat-select>
+          @if(savingsForm.get('commissionType')?.value === 'amount' || savingsForm.get('commissionType')?.value === 'both') {
+            @if(savingsForm.get('commissionType')?.value === 'both') {
+              <div class="d-flex gap-8 align-items-center">
+                <mat-label class="f-s-16 f-w-400 d-block">Amount</mat-label>
+                <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
               </div>
-              <!-- End Currency Selector  -->
-              <!-- Price Field  -->
-              <div class="w-100 form-field">
-                <input matInput type="number" formControlName="commissionAmount" placeholder="0" />
-              </div>
-              <!-- End Price Field  -->
-              <!-- End Type Field  -->
-              <div class="right">
-                <mat-select value="Select" formControlName="commissionCycle" class="sortby-edit-profile"
-                  hideSingleSelectionIndicator>
-                  <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
-                  @for (cycle of cycles; track cycle) {
-                  <mat-option [value]="cycle.id">{{ cycle.description }}</mat-option>
-                  }
-                </mat-select>
-              </div>
-              <!-- End Type Field  -->
-            </div>
-            <!-- Error  -->
-            @if((savingsForm.get('commissionCycle')?.touched &&
-            savingsForm.get('commissionCycle')?.hasError('required')) ||
-            (savingsForm.get('commissionAmount')?.touched &&
-            savingsForm.get('commissionAmount')?.hasError('required')) ||
-            (savingsForm.get('commissionCurrency')?.touched &&
-            savingsForm.get('commissionCurrency')?.hasError('required'))) {
-            <span class="field-error d-block">Amount is required</span>
             }
-            <!-- <span class="field-error d-block">Amount is required</span> -->
-            <!-- End Error  -->
-          </div>
+            <div class="d-flex flex-column gap-4 net-fields">
+              <div class="net-field d-flex align-items-center">
+                <!-- Currency Selector  -->
+                <div class="left">
+                  <mat-select value="£" formControlName="commissionCurrency" class="sortby-edit-profile"
+                    hideSingleSelectionIndicator>
+                    @for (country of countries; track country) {
+                    @if(country.currencySymbol) {
+                    <mat-option [value]="country.currencySymbol">{{
+                      country.currencySymbol
+                      }}</mat-option>
+
+                    }
+                    }
+                  </mat-select>
+                </div>
+                <!-- End Currency Selector  -->
+                <!-- Price Field  -->
+                <div class="w-100 form-field">
+                  <input matInput type="number" formControlName="commissionAmount" placeholder="0" />
+                </div>
+                <!-- End Price Field  -->
+                <!-- End Type Field  -->
+                <div class="right">
+                  <mat-select value="Select" formControlName="commissionCycle" class="sortby-edit-profile"
+                    hideSingleSelectionIndicator>
+                    <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
+                    @for (cycle of cycles; track cycle) {
+                    <mat-option [value]="cycle.id">{{ cycle.description }}</mat-option>
+                    }
+                  </mat-select>
+                </div>
+                <!-- End Type Field  -->
+              </div>
+              <!-- Error  -->
+              @if((savingsForm.get('commissionCycle')?.touched &&
+              savingsForm.get('commissionCycle')?.hasError('required')) ||
+              (savingsForm.get('commissionAmount')?.touched &&
+              savingsForm.get('commissionAmount')?.hasError('required')) ||
+              (savingsForm.get('commissionCurrency')?.touched &&
+              savingsForm.get('commissionCurrency')?.hasError('required'))) {
+              <span class="field-error d-block">Amount is required</span>
+              }
+              <!-- <span class="field-error d-block">Amount is required</span> -->
+              <!-- End Error  -->
+            </div>
+          }
+          @if(savingsForm.get('commissionType')?.value === 'percentage' || savingsForm.get('commissionType')?.value === 'both') {
+            @if(savingsForm.get('commissionType')?.value === 'both') {
+              <div class="d-flex gap-8 align-items-center">
+                <mat-label class="f-s-16 f-w-400 d-block">Percentage</mat-label>
+                <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
+              </div>
+            }
+            <div class="d-flex flex-column gap-4 net-fields">
+              <div class="net-field d-flex align-items-center">
+                <!-- Currency Selector  -->
+                <div class="left">
+                  <mat-select value="£" formControlName="commissionPercentageCurrency" class="sortby-edit-profile"
+                    hideSingleSelectionIndicator>
+                    @for (country of countries; track country) {
+                    @if(country.currencySymbol) {
+                    <mat-option [value]="country.currencySymbol">{{
+                      country.currencySymbol
+                      }}</mat-option>
+  
+                    }
+                    }
+                  </mat-select>
+                </div>
+                <!-- End Currency Selector  -->
+                <!-- Price Field  -->
+                <div class="w-100 form-field input-container">
+                  <!-- <input matInput formControlName="commissionPercentage" [value]="formattedCommissionPercentage"
+                  placeholder="0" (input)="onInputChange($event, 'commissionPercentage')" (blur)="onInputBlur($event, 'commissionPercentage')" /> -->
+                  <!-- <mat-form-field class="w-100 form-field commision-percentage" appearance="outline"> -->
+                    <input matInput formControlName="commissionPercentage" />
+                    <span class="suffix">%</span>
+                  <!-- </mat-form-field>  -->
+                </div>
+                <!-- End Price Field  -->
+                <!-- End Type Field  -->
+                <div class="right">
+                  <mat-select value="Select" formControlName="commissionPercentageCycle" class="sortby-edit-profile"
+                    hideSingleSelectionIndicator>
+                    <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
+                    @for (cycle of cycles; track cycle) {
+                    <mat-option [value]="cycle.id">{{ cycle.description }}</mat-option>
+                    }
+                  </mat-select>
+                </div>
+                <!-- End Type Field  -->
+              </div>
+              <!-- Error  -->
+              @if((savingsForm.get('commissionPercentageCycle')?.touched &&
+              savingsForm.get('commissionPercentageCycle')?.hasError('required')) ||
+              (savingsForm.get('commissionPercentageCurrency')?.touched &&
+              savingsForm.get('commissionPercentageCurrency')?.hasError('required')) ||
+              (savingsForm.get('commissionPercentageCurrency')?.touched &&
+              savingsForm.get('commissionPercentageCurrency')?.hasError('required'))) {
+              <span class="field-error d-block">Amount is required</span>
+              }
+              <!-- <span class="field-error d-block">Amount is required</span> -->
+              <!-- End Error  -->
+            </div>
+          }
           <!-- End Net Amount Field  -->
         </div>
 
@@ -355,7 +431,7 @@
       </div>
       <div class="col-5">
         <button (click)="saveCashflow()" type="button" class="button-icon w-100 d-block">
-          <span class="f-s-16">Save</span>
+          <span class="f-s-16">{{isEditWorkflow ? 'Update' : 'Save'}}</span>
         </button>
       </div>
     </div>

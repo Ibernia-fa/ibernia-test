@@ -22,6 +22,7 @@ export interface SavingPotsModel {
 export interface Comission {
   type: ComissionType;
   amount: NetAmount;
+  percentage: NetAmount;
   escalationRate: EscalationRate;
 }
 
@@ -55,5 +56,6 @@ export enum SavingPotType
 export enum ComissionType
 {
     Amount = 1,
-    Percentage = 2
+    Percentage = 2,
+    Both = 3
 }

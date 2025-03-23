@@ -1,5 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import {
+  ControlEvent,
   FormBuilder,
   FormControl,
   FormGroup,
@@ -32,6 +33,7 @@ import {
   SavingPotType,
 } from '../models/saving-pots.model';
 import { catchError, filter } from 'rxjs';
+import { TablerIconsModule } from 'angular-tabler-icons';
 
 @Component({
   selector: 'app-add-new-pot',
@@ -48,6 +50,7 @@ import { catchError, filter } from 'rxjs';
     MatDatepickerModule,
     ReactiveFormsModule,
     MatSliderModule,
+    TablerIconsModule
   ],
   templateUrl: './add-new-pot.component.html',
   styleUrl: './add-new-pot.component.scss',
@@ -58,15 +61,19 @@ export class AddNewPotComponent {
   countries = allCountries;
   clientPreferredCurrency: string;
   clientBirthYear: number;
-  isAmountType: boolean = true;
+  // isAmountType: boolean = true;
   cycles: Cycle[];
   escalationRates: EscalationRate[];
   eventsList: any;
   cashflowId: string;
   formattedReturnRate: string = '';
+  formattedCommissionPercentage: string = '';
   selectedName: string = '';
   selectedNameIconUrl: string = '';
   inflationRate = 2.5;
+  isEditWorkflow = false;
+  selectedPot: ClientSaving;
+
   savingPotValues = [
     {
       name: 'Savings',
@@ -97,6 +104,8 @@ export class AddNewPotComponent {
     this.clientBirthYear = moment(data.clientBirthDate).year();
     this.clientPreferredCurrency = data.clientPreferredCurrency;
     this.cashflowId = data.cashflowId;
+    this.isEditWorkflow = data.isEditWorkflow;
+    this.selectedPot = data.event
 
     var iterations = data.forecastEndDateYear - data.forecastStartDateYear;
 
@@ -116,20 +125,70 @@ export class AddNewPotComponent {
       end: [data.forecastEndDateYear-1, Validators.required],
       // commissions: [true],
       commissions: [false],
-      commissionCurrency: [''],
       commissionType: ['amount'],
+      commissionCurrency: [''],
       commissionAmount: [0],
       commissionCycle: [''],
+      commissionPercentageCurrency: [''],
+      commissionPercentageCycle: [''],
+      commissionPercentage: [0],
       escalationRate: [''],
     });
 
     this.savingsForm.get('returnRate')?.valueChanges.subscribe((value) => {
       this.formattedReturnRate = this.formatWithPercentage(value);
     });
+
+    if(this.isEditWorkflow) {
+      this.patchFormValues();
+    }
+  }
+
+  patchFormValues() {
+    var savingPotValue = this.savingPotValues.find(x => x.name === this.selectedPot.name);
+    if(savingPotValue) {
+      this.savingsForm.get('name')?.patchValue(savingPotValue.name)
+    }
+    else {
+      this.savingsForm.get('name')?.patchValue('Custom');
+      this.onNameValueChange('Custom');
+      this.savingsForm.get('customName')?.patchValue(this.selectedPot.name);
+    }
+
+    this.savingsForm.get('currency')?.patchValue(this.selectedPot.startingPotValue.currencySymbol);
+    this.savingsForm.get('amount')?.patchValue(this.selectedPot.startingPotValue.amount);
+    this.savingsForm.get('returnRate')?.patchValue(this.selectedPot.returnRate);
+    this.savingsForm.get('lockPot')?.patchValue(this.selectedPot.hasPotLocked);
+    this.savingsForm.get('start')?.patchValue(this.selectedPot.start.year);
+    this.savingsForm.get('end')?.patchValue(this.selectedPot.end.year);
+    this.savingsForm.get('commissions')?.patchValue(this.selectedPot.hasCommission);
+    var selectedComissionType = 'amount';
+    if(this.selectedPot.comission.type === ComissionType.Amount) {
+      selectedComissionType = 'amount'
+    }
+    if(this.selectedPot.comission.type === ComissionType.Percentage) {
+      selectedComissionType = 'percentage'
+    }
+    if(this.selectedPot.comission.type === ComissionType.Both) {
+      selectedComissionType = 'both'
+    }
+    this.savingsForm.get('commissionType')?.patchValue(selectedComissionType);
+    if(this.selectedPot.comission.type === ComissionType.Percentage || this.selectedPot.comission.type === ComissionType.Both) {
+      this.savingsForm.get('commissionCurrency')?.patchValue(this.selectedPot.comission.amount.currencySymbol);
+      this.savingsForm.get('commissionAmount')?.patchValue(this.selectedPot.comission.amount.amount);
+      this.savingsForm.get('commissionCycle')?.patchValue(this.selectedPot.comission.amount.cycle.id);
+    }
+    if(this.selectedPot.comission.type === ComissionType.Percentage || this.selectedPot.comission.type === ComissionType.Both) {
+      this.savingsForm.get('commissionPercentageCurrency')?.patchValue(this.selectedPot.comission.percentage?.currencySymbol);
+      this.savingsForm.get('commissionPercentageCycle')?.patchValue(this.selectedPot.comission.percentage?.cycle.id);
+      this.savingsForm.get('commissionPercentage')?.patchValue(this.selectedPot.comission.percentage?.amount);
+    }
+    this.savingsForm.get('escalationRate')?.patchValue(this.selectedPot.comission.escalationRate.id);
+
   }
 
   ngOnInit() {
-    this.updateFormattedValue();
+    this.updateFormattedValue('returnRate');
   }
   closeDialog(): void {
     this.dialogRef.close();
@@ -173,6 +232,9 @@ export class AddNewPotComponent {
 
   isCommissionsChanged(event: any) {
     console.log(event);
+    this.savingsForm
+    .get('commissionType')
+    ?.setValue('amount');
 
     if (event) {
       this.savingsForm
@@ -236,24 +298,29 @@ export class AddNewPotComponent {
     }
   }
 
-  onInputChange(event: any) {
+  onInputChange(event: any, controlName: string) {
     let value = event.target.value.replace('%', '').trim();
     if (!isNaN(value) && value !== '') {
       this.savingsForm
-        .get('returnRate')
+        .get(controlName)
         ?.setValue(parseFloat(value), { emitEvent: true });
     }
   }
 
-  onInputBlur(event: any) {
-    let value = this.savingsForm.get('returnRate')?.value || 0;
-    this.savingsForm.get('returnRate')?.setValue(value, { emitEvent: true });
-    this.updateFormattedValue();
+  onInputBlur(event: any, controlName: string) {
+    let value = this.savingsForm.get(controlName)?.value || 0;
+    this.savingsForm.get(controlName)?.setValue(value, { emitEvent: true });
+    this.updateFormattedValue(controlName);
   }
 
-  updateFormattedValue() {
-    let value = this.savingsForm.get('returnRate')?.value || 0;
-    this.formattedReturnRate = this.formatWithPercentage(value);
+  updateFormattedValue(controlName: string) {
+    let value = this.savingsForm.get(controlName)?.value || 0;
+    if(controlName === 'returnRate') {
+      this.formattedReturnRate = this.formatWithPercentage(value);
+    }
+    if(controlName === 'commissionPercentage') {
+      this.formattedCommissionPercentage = this.formatWithPercentage(value);
+    }
   }
 
   formatWithPercentage(value: number | string): string {
@@ -264,7 +331,7 @@ export class AddNewPotComponent {
     console.log(this.savingsForm);
     if (this.savingsForm.valid) {
       var clientSaving: ClientSaving = {
-        id: null,
+        id: this.isEditWorkflow ? this.selectedPot.id : null,
         name: this.savingsForm.get('name')?.value !== 'Custom'
         ? this.savingsForm.get('name')?.value
         : this.savingsForm.get('customName')?.value,
@@ -289,7 +356,22 @@ export class AddNewPotComponent {
             cycle:
               this.savingsForm.get('commissionCycle')?.value !== null &&
               this.savingsForm.get('commissionCycle')?.value !== ''
-                ? this.savingsForm.get('commissionCycle')?.value
+                ? this.cycles.find(x => x.id === this.savingsForm.get('commissionCycle')?.value) ??
+                this.savingsForm.get('commissionCycle')?.value
+                : {
+                    id: '',
+                    description: '',
+                  },
+          },
+          percentage: {
+            amount: this.savingsForm.get('commissionPercentage')?.value ?? 0,
+            currencySymbol:
+              this.savingsForm.get('commissionPercentageCurrency')?.value ?? '',
+            cycle:
+              this.savingsForm.get('commissionPercentageCycle')?.value !== null &&
+              this.savingsForm.get('commissionPercentageCycle')?.value !== ''
+                ? this.cycles.find(x => x.id === this.savingsForm.get('commissionPercentageCycle')?.value) ??
+                this.savingsForm.get('commissionPercentageCycle')?.value
                 : {
                     id: '',
                     description: '',
@@ -298,14 +380,16 @@ export class AddNewPotComponent {
           escalationRate:
             this.savingsForm.get('escalationRate')?.value !== null &&
             this.savingsForm.get('escalationRate')?.value !== ''
-              ? this.savingsForm.get('escalationRate')?.value
+              ? this.escalationRates.find(x => x.id === this.savingsForm.get('escalationRate')?.value) ??
+              this.savingsForm.get('escalationRate')?.value
               : {
                   id: '',
                   description: '',
                 },
-          type: this.isAmountType
+          type: this.savingsForm.get('commissionType')?.value === 'amount'
             ? ComissionType.Amount
-            : ComissionType.Percentage,
+            : this.savingsForm.get('commissionType')?.value === 'percentage'
+            ? ComissionType.Percentage : ComissionType.Both,
         },
         hasCommission: this.savingsForm.get('commissions')?.value,
         hasPotLocked: this.savingsForm.get('lockPot')?.value,
@@ -347,8 +431,12 @@ export class AddNewPotComponent {
           this.savingsForm.get('returnRate')?.value - this.inflationRate,
       };
 
+      var function$ = !this.isEditWorkflow ? this.savingPotsHttpService
+      .addNewSavingPot(this.cashflowId, clientSaving) :
       this.savingPotsHttpService
-        .addNewSavingPot(this.cashflowId, clientSaving)
+        .updateSavingPot(this.cashflowId, clientSaving)
+
+      function$
         .pipe(
           filter((res) => !!res),
           catchError((err) => {
@@ -370,7 +458,165 @@ export class AddNewPotComponent {
     }
   }
 
-  onCommissionTypeControlClicked(isAmountType: boolean) {
-    this.isAmountType = isAmountType;
+  onCommissionTypeControlClicked(amountType: string) {
+    this.savingsForm.get('commissionType')?.setValue(amountType)
+
+    if(amountType === 'both') {
+      this.savingsForm
+        .get('commissionType')
+        ?.setValidators(Validators.required);
+      this.savingsForm
+        .get('commissionCurrency')
+        ?.setValidators(Validators.required);
+      this.savingsForm
+        .get('commissionCurrency')
+        ?.setValue(this.clientPreferredCurrency);
+      this.savingsForm
+        .get('commissionAmount')
+        ?.setValidators(Validators.required);
+      this.savingsForm
+        .get('commissionCycle')
+        ?.setValidators(Validators.required);
+        this.savingsForm
+        .get('commissionCycle')
+        ?.setValue(this.cycles[2].id);
+      this.savingsForm
+        .get('commissionPercentageCurrency')
+        ?.setValidators(Validators.required);
+      this.savingsForm
+        .get('commissionPercentageCurrency')
+        ?.setValue(this.clientPreferredCurrency);
+      this.savingsForm
+        .get('commissionPercentage')
+        ?.setValidators(Validators.required);
+      this.savingsForm
+        .get('commissionPercentageCycle')
+        ?.setValidators(Validators.required);
+        this.savingsForm
+        .get('commissionPercentageCycle')
+        ?.setValue(this.cycles[2].id);
+      this.savingsForm
+        .get('escalationRate')
+        ?.setValidators(Validators.required);
+      this.savingsForm
+        .get('escalationRate')
+        ?.setValue(this.escalationRates[1].id);
+
+      this.savingsForm.get('commissionCurrency')?.updateValueAndValidity();
+      this.savingsForm.get('commissionAmount')?.updateValueAndValidity();
+      this.savingsForm.get('commissionType')?.updateValueAndValidity();
+      this.savingsForm.get('commissionCycle')?.updateValueAndValidity();
+      this.savingsForm.get('commissionPercentageCurrency')?.updateValueAndValidity();
+      this.savingsForm.get('commissionPercentageCycle')?.updateValueAndValidity();
+      this.savingsForm.get('commissionPercentage')?.updateValueAndValidity();
+      this.savingsForm.get('escalationRate')?.updateValueAndValidity();
+      this.updateFormattedValue('commissionPercentage')
+
+    }
+
+    if(amountType === 'amount') {
+      this.savingsForm
+        .get('commissionType')
+        ?.setValidators(Validators.required);
+      this.savingsForm
+        .get('commissionCurrency')
+        ?.setValidators(Validators.required);
+      this.savingsForm
+        .get('commissionCurrency')
+        ?.setValue(this.clientPreferredCurrency);
+      this.savingsForm
+        .get('commissionAmount')
+        ?.setValidators(Validators.required);
+      this.savingsForm
+        .get('commissionCycle')
+        ?.setValidators(Validators.required);
+        this.savingsForm
+        .get('commissionCycle')
+        ?.setValue(this.cycles[2].id);
+      this.savingsForm
+        .get('commissionPercentageCurrency')
+        ?.removeValidators(Validators.required);
+      this.savingsForm
+        .get('commissionPercentageCurrency')
+        ?.setValue(this.clientPreferredCurrency);
+      this.savingsForm
+        .get('commissionPercentage')
+        ?.removeValidators(Validators.required);
+      this.savingsForm
+        .get('commissionPercentageCycle')
+        ?.removeValidators(Validators.required);
+        this.savingsForm
+        .get('commissionPercentageCycle')
+        ?.setValue(this.cycles[2].id);
+      this.savingsForm
+        .get('escalationRate')
+        ?.setValidators(Validators.required);
+      this.savingsForm
+        .get('escalationRate')
+        ?.setValue(this.escalationRates[1].id);
+
+      this.savingsForm.get('commissionCurrency')?.updateValueAndValidity();
+      this.savingsForm.get('commissionAmount')?.updateValueAndValidity();
+      this.savingsForm.get('commissionType')?.updateValueAndValidity();
+      this.savingsForm.get('commissionCycle')?.updateValueAndValidity();
+      this.savingsForm.get('commissionPercentageCurrency')?.updateValueAndValidity();
+      this.savingsForm.get('commissionPercentageCycle')?.updateValueAndValidity();
+      this.savingsForm.get('commissionPercentage')?.updateValueAndValidity();
+      this.savingsForm.get('escalationRate')?.updateValueAndValidity();
+    }
+
+
+    if(amountType === 'percentage') {
+      this.savingsForm
+        .get('commissionType')
+        ?.setValidators(Validators.required);
+      this.savingsForm
+        .get('commissionCurrency')
+        ?.removeValidators(Validators.required);
+      this.savingsForm
+        .get('commissionCurrency')
+        ?.setValue(this.clientPreferredCurrency);
+      this.savingsForm
+        .get('commissionAmount')
+        ?.removeValidators(Validators.required);
+      this.savingsForm
+        .get('commissionCycle')
+        ?.removeValidators(Validators.required);
+        this.savingsForm
+        .get('commissionCycle')
+        ?.setValue(this.cycles[2].id);
+      this.savingsForm
+        .get('commissionPercentageCurrency')
+        ?.setValidators(Validators.required);
+      this.savingsForm
+        .get('commissionPercentageCurrency')
+        ?.setValue(this.clientPreferredCurrency);
+      this.savingsForm
+        .get('commissionPercentage')
+        ?.setValidators(Validators.required);
+      this.savingsForm
+        .get('commissionPercentageCycle')
+        ?.setValidators(Validators.required);
+        this.savingsForm
+        .get('commissionPercentageCycle')
+        ?.setValue(this.cycles[2].id);
+      this.savingsForm
+        .get('escalationRate')
+        ?.setValidators(Validators.required);
+      this.savingsForm
+        .get('escalationRate')
+        ?.setValue(this.escalationRates[1].id);
+
+      this.savingsForm.get('commissionCurrency')?.updateValueAndValidity();
+      this.savingsForm.get('commissionAmount')?.updateValueAndValidity();
+      this.savingsForm.get('commissionType')?.updateValueAndValidity();
+      this.savingsForm.get('commissionCycle')?.updateValueAndValidity();
+      this.savingsForm.get('commissionPercentageCurrency')?.updateValueAndValidity();
+      this.savingsForm.get('commissionPercentageCycle')?.updateValueAndValidity();
+      this.savingsForm.get('commissionPercentage')?.updateValueAndValidity();
+      this.savingsForm.get('escalationRate')?.updateValueAndValidity();
+      this.updateFormattedValue('commissionPercentage')
+
+    }
   }
 }
