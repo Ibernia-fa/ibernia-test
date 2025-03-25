@@ -643,7 +643,7 @@ export const navItems: NavItem[] = [
     // iconName: 'circle-percentage',
     iconName: '/assets/images/svgs/discount-icon.svg',
     iconOutline: '/assets/images/svgs/discount-icon.svg',
-    route: '',
+    route: '/cashflows/{cashflowId}/withdrawal',
   },
   {
     displayName: 'Charges & Fees',
