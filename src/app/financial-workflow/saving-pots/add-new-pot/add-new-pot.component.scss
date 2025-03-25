@@ -1,0 +1,137 @@
+.tab {
+  span {
+    line-height: 18px;
+  }
+  .tabs {
+    border: 1px solid #516ce8;
+    border-radius: 4px;
+    padding: 2px;
+    button {
+      &.active {
+        background-color: #516ce8;
+      }
+      background-color: white;
+      text-align: center;
+      padding-top: 8px;
+      padding-bottom: 8px;
+      span {
+        &.active {
+          color: white;
+        }
+        font-weight: 500;
+        color: #516ce8;
+        text-transform: uppercase;
+      }
+    }
+    .row {
+      margin: 0 !important;
+      .col-6 {
+        padding: 0 !important;
+      }
+    }
+  }
+}
+
+.net-fields {
+  span {
+    line-height: 18px;
+  }
+  .net-field {
+    border: 1px solid #e7e7eb;
+    border-radius: 4px;
+    .form-field {
+      flex: 1;
+    }
+    .form-field input {
+      border-radius: 0 !important;
+      border-left: 1px solid #e7e7eb !important;
+      border-top: none !important;
+      border-bottom: none !important;
+      border-right: 1px solid #e7e7eb;
+    }
+    .left {
+      .sortby-edit-profile {
+        min-width: 105px !important;
+        height: 100%;
+      }
+    }
+    .right {
+      .sortby-edit-profile {
+        min-width: 150px !important;
+        height: 100%;
+      }
+    }
+  }
+}
+
+.input-container {
+  position: relative;
+  display: inline-block;
+  
+  .suffix {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}}
+.select-option {
+  .mat-mdc-select {
+    margin-top: 2px;
+  }
+}
+
+.start-end {
+  .row {
+    margin: 0 !important;
+    .col-6 {
+      padding: 0 !important;
+      max-width: 45% !important;
+      flex: 0 0 45% !important;
+    }
+  }
+}
+
+.percentage-field {
+  flex-basis: 98px;
+}
+.slider-wrapper {
+  flex: 1;
+}
+.return-rate {
+  color: #5e5e73;
+  font-size: 14px;
+  line-height: 16.09px;
+  display: inline-block;
+  margin-bottom: 12px;
+}
+.checkbox-box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 24px;
+    width: 24px;
+    input {
+      height: 18px;
+      width: 18px;
+      accent-color: #516ce8 !important;
+      border: 1px solid #d7dde2;
+      border-radius: 4px;
+      background-color: #516ce8;
+    }
+    input:checked,
+    input:hover {
+      background-color: #516ce8;
+    }
+  }
+  label {
+    color: #505d68;
+    font-size: 14px;
+    line-height: 24px;
+    font-weight: 400;
+  }
+}

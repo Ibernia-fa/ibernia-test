@@ -1,0 +1,303 @@
+.stats-main-wrapper {
+  .saving-title {
+    font-size: 24px;
+    line-height: 36px;
+    font-weight: 700;
+  }
+  .badge {
+    border-radius: 999px;
+    padding: 6px 10px;
+    color: white;
+    font-size: 18px;
+    line-height: 18px;
+    font-weight: 500;
+    &.green {
+      background-color: #71bc42;
+    }
+    &.red {
+      background-color: #ff4444;
+    }
+  }
+}
+
+.cashflow-saving-wrapper {
+  .row {
+    padding: 0;
+    margin: 0;
+    .col-5,
+    .col-10,
+    .col-9,
+    .col-3,
+    .col-2 {
+      padding: 0;
+    }
+    // .col-2 {
+    //   background-color: #71bc421e;
+    // }
+    // .col-10 {
+    //   background-color: #bc42b23a;
+    // }
+    .col-5 {
+      // background-color: #ff330048;
+      max-width: 48% !important;
+      flex: 0 0 48% !important;
+    }
+    .divider {
+      // height: 100%;
+      width: 2px;
+      margin-left: 8px;
+      margin-right: 8px;
+      background-color: #e7e7eb;
+    }
+  }
+  .percentage-field {
+    flex-basis: 98px;
+  }
+  .slider-wrapper {
+    flex: 1;
+  }
+}
+
+.cashflow-drag-wrapper {
+  .sec-heading {
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 22.98px;
+    color: #1c1c1c;
+  }
+}
+.vote-btns {
+  button {
+    outline: none;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    &:hover {
+      opacity: 50%;
+      transition: all 0.3s ease-in-out;
+    }
+    &:active {
+      opacity: 100%;
+      transition: all 0.3s ease-in-out;
+    }
+  }
+}
+
+// .dragable-card-wrapper {
+//   transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+
+// }
+// Dragable Cards
+.dragable-card {
+  overflow: hidden;
+  position: relative;
+  flex: 1;
+  padding: 24px 16px;
+  border-radius: 10px;
+  background-color: #f7fbff;
+  border: 1px solid #f7f7f7;
+  .stats-main-wrapper {
+    .saving-title {
+      font-family: "Inter";
+    }
+  }
+  .drag-btn {
+    height: 36px;
+    width: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
+    outline: none;
+    border: none;
+    cursor: grab;
+    img {
+      pointer-events: none;
+    }
+  }
+  // Lock Overlay
+  .lock-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background-color: #3a3a4740;
+    backdrop-filter: blur(1px);
+    -webkit-backdrop-filter: blur(1px);
+    p {
+      color: white;
+      font-family: "Inter";
+      font-size: 14px;
+      line-height: 20px;
+      font-weight: 600;
+      margin: 0;
+      padding: 0;
+    }
+    .help-lock-overlay {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+    }
+  }
+  .edit-icon-overlay {
+    position: absolute;
+    bottom: 0px;
+    right: 16px;
+  }
+}
+
+// End Dragable Cards
+
+// Feeback Cards
+.feeback-container {
+  position: fixed;
+  z-index: 10;
+  bottom: 76px;
+  right: 32px;
+  .feedback-wrapper {
+    width: 340px;
+    padding: 12px;
+    background-color: white;
+    border: 1px solid #e7e7eb;
+    border-radius: 12px;
+    button {
+      outline: none;
+      border: none;
+      padding: 0;
+      background-color: transparent;
+      background: transparent;
+      cursor: pointer;
+    }
+    p {
+      margin: 0;
+      font-weight: 500;
+      font-size: 14px;
+      line-height: 20px;
+      max-width: 254px;
+      color: #1c1c1c;
+    }
+    .emoji-btn {
+      button {
+        background: transparent;
+        border: none;
+        outline: none;
+        padding: 0;
+        height: auto;
+      }
+    }
+    .feedback-nav-btns {
+      button {
+        outline: none;
+        border: none;
+        height: 3px;
+        width: 40px;
+        background-color: #d9d9d9;
+        border-radius: 20px;
+        cursor: pointer;
+        &.active {
+          background-color: #516ce8;
+        }
+      }
+    }
+    .form-label {
+      font-size: 14px;
+      line-height: 20px;
+      font-weight: 500;
+      color: #1c1c1c;
+    }
+    .feedback-form {
+      button {
+        background-color: #516ce8;
+        border-radius: 5px;
+        min-width: 96px;
+        padding: 7px;
+        font-size: 13px;
+        color: white;
+        line-height: 18px;
+        letter-spacing: 5%;
+        transition: all 0.3s ease-in-out;
+        &:hover {
+          opacity: 90%;
+          transition: all 0.3s ease-in-out;
+        }
+      }
+      textarea {
+        min-height: 61px;
+        border-radius: 5px;
+        border: 1px solid #e7e7eb;
+        outline: none;
+        padding: 8px;
+        resize: none;
+        font-family: "Ubuntu";
+        transition: all 0.3s ease-in-out;
+      }
+      textarea:focus {
+        transition: all 0.3s ease-in-out;
+        border: 1px solid #516ce8;
+      }
+      textarea::placeholder {
+        color: #e7e7eb;
+        font-size: 12px;
+        line-height: 20px;
+        font-family: "Ubuntu";
+      }
+    }
+  }
+}
+// End Feeback Cards
+
+.leaderboard {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.leaderboard-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #f9f9f9;
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease-out;
+}
+
+.item-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.item-name {
+  font-weight: bold;
+}
+
+.item-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.upvote-btn,
+.downvote-btn {
+  padding: 5px 10px;
+  border: none;
+  background-color: #007bff;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.upvote-btn:hover,
+.downvote-btn:hover {
+  background-color: #0056b3;
+}
+
+.downvote-btn {
+  background-color: #dc3545;
+}
+
+.downvote-btn:hover {
+  background-color: #c82333;
+}

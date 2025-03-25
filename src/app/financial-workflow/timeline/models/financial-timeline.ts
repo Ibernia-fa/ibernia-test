@@ -1,3 +1,4 @@
+import { CashflowViewModel } from 'src/app/clients/models/cashflow';
 import {
   ClientViewModel,
   FinancialAdvisor,
@@ -48,11 +49,6 @@ export interface Cycle {
 export interface EscalationRate {
   id: string;
   description: string;
-}
-
-export interface CashflowViewModel {
-    id: string,
-    name: string
 }
 
 export enum EventIncomeType

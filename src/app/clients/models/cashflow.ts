@@ -10,3 +10,8 @@ export interface Cashflow {
     createdAt: Date,
     updatedAt: Date
 }
+
+export interface CashflowViewModel {
+    id: string,
+    name: string
+}

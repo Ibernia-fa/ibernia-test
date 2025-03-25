@@ -23,6 +23,10 @@ import { MaterialModule } from 'src/app/material.module';
 import { CommonModule } from '@angular/common';
 import { MatRippleModule } from '@angular/material/core';
 import { NavItemService } from '../../../nav-item.service';
+import { Store } from '@ngrx/store';
+import { selectedCashflow } from 'src/app/store/cashflow/cashflow.selectors';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { filter, tap } from 'rxjs';
 
 @Component({
   selector: 'app-nav-item',
@@ -53,14 +57,22 @@ export class AppNavItemComponent implements OnChanges {
   expanded: any = false;
   disabled: any = false;
   twoLines: any = false;
+  selectedCashflowId: string;
   @HostBinding('attr.aria-expanded') ariaExpanded = this.expanded;
   @Input() item: NavItem | any;
   @Input() depth: any;
 
-  constructor(public navService: NavService, public router: Router, public navItem: NavItemService) {
+  constructor(public navService: NavService, public router: Router, public navItem: NavItemService,
+    private store: Store
+  ) {
     if (this.depth === undefined) {
       this.depth = 0;
     }
+    this.store.select(selectedCashflow).pipe(
+      takeUntilDestroyed(),
+      filter(cashflow => !!cashflow),
+      tap((cashflow) => this.selectedCashflowId = cashflow.id)
+    ).subscribe();
   }
 
   ngOnChanges() {
@@ -73,7 +85,11 @@ export class AppNavItemComponent implements OnChanges {
 
   onItemSelected(item: NavItem) {
     if (!item.children || !item.children.length) {
-      this.router.navigate([item.route]);
+      var newRoute = item.route;
+      if(item?.route?.includes('{cashflowId}')) {
+        newRoute = item.route.replace('{cashflowId}', this.selectedCashflowId);
+      }
+      this.router.navigate([newRoute]);
     }
     if (item.children && item.children.length) {
       this.expanded = !this.expanded;

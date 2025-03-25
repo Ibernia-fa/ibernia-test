@@ -21,6 +21,10 @@ export class CashflowHttpService {
   getByClientId(clientId: string) {
     return this.httpClient.get<Array<Cashflow>>(`/api/v1/client/${clientId}/cashflows`);
   }
+  
+  getByCashflowId(cashflowId: string) {
+    return this.httpClient.get<Cashflow>(`${this.CASHFLOW_URL_PREFIX}/${cashflowId}`);
+  }
 
   deleteCashflow(cashflowId: string) {
     return this.httpClient.delete(`${this.CASHFLOW_URL_PREFIX}/${cashflowId}`, {

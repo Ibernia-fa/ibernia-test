@@ -58,6 +58,7 @@ export class AddEventDialogComponent {
   customEventsLibrary: ClientEvent[];
   eventForm: FormGroup;
   timelineId: string;
+  cashflowId: string;
   systemEvent: ClientEvent | undefined | null;
   dropTime: Date;
   clientBirthDate: Date;
@@ -69,6 +70,7 @@ export class AddEventDialogComponent {
   isEditWorkflow: boolean = false;
   patchEvent: ClientEvent | undefined | null;
   countries = allCountries;
+  clientPreferredCurrency: string;
 
 
   constructor(
@@ -82,6 +84,7 @@ export class AddEventDialogComponent {
     this.isIncomeEvent = data.isIncomeEvent;
     this.customEventsLibrary = data.customEvents;
     this.timelineId = data.timelineId;
+    this.cashflowId = data.cashflowId;
     this.systemEvent = data.systemEvent
     this.dropTime = data.dropTime;
     this.clientBirthDate = data.clientBirthDate;
@@ -89,6 +92,7 @@ export class AddEventDialogComponent {
     this.eventsList = data.eventsList
     this.isEditWorkflow = data.isEditWorkflow;
     this.patchEvent= data.patchEvent
+    this.clientPreferredCurrency= data.clientPreferredCurrency
 
     var iterations = data.forecastEndDateYear - data.forecastStartDateYear
 
@@ -117,7 +121,7 @@ export class AddEventDialogComponent {
       case EventType.INHERITANCE:
         this.eventForm = this.fb.group({
           isIncomeEvent: [false, Validators.required],
-          currency: ['', Validators.required],
+          currency: [this.clientPreferredCurrency, Validators.required],
           amount: ['', [Validators.required, Validators.min(0)]],
           cycle: [{value: this.systemEvent?.isOneOff ? 'One-Off' : '', disabled: true}, [Validators.required]],
           ageDate: [moment(this.dropTime).year(), Validators.required],
@@ -127,7 +131,7 @@ export class AddEventDialogComponent {
       case EventType.STATE_PENSION:
         this.eventForm = this.fb.group({
           isIncomeEvent: [true, Validators.required],
-          currency: ['', Validators.required],
+          currency: [this.clientPreferredCurrency, Validators.required],
           amount: ['', [Validators.required, Validators.min(0)]],
           cycle: [this.systemEvent?.isOneOff ? 'One-Off' : '', [Validators.required]],
           start: [moment(this.dropTime).year(), Validators.required],
@@ -140,7 +144,7 @@ export class AddEventDialogComponent {
         this.eventForm = this.fb.group({
           eventName: ['', Validators.required],
           isIncomeEvent: [true, Validators.required],
-          currency: ['', Validators.required],
+          currency: [this.clientPreferredCurrency, Validators.required],
           amount: ['', [Validators.required, Validators.min(0)]],
           cycle: ['', [Validators.required]],
           start: [0, Validators.required],
@@ -270,7 +274,7 @@ export class AddEventDialogComponent {
         isOneOff: this.eventForm.get('cycle')?.value === 'One-Off',
         isPlaceHolder: this.systemEvent.isPlaceHolder,
       };
-      this.timelineHttpService.addEvent(clientEvent, this.timelineId)
+      this.timelineHttpService.addEvent(clientEvent, this.cashflowId)
       .pipe(
         filter(res => !!res),
         catchError(err => {
@@ -313,7 +317,7 @@ export class AddEventDialogComponent {
         isOneOff: this.eventForm.get('cycle')?.value === 'One-Off',
         isPlaceHolder: this.systemEvent.isPlaceHolder,
       };
-      this.timelineHttpService.addEvent(clientEvent, this.timelineId)
+      this.timelineHttpService.addEvent(clientEvent, this.cashflowId)
       .pipe(
         filter(res => !!res),
         catchError(err => {
@@ -333,7 +337,7 @@ export class AddEventDialogComponent {
     this.eventForm.markAllAsTouched();
     if (this.eventForm.valid) {
       const clientEvent: ClientEvent = {
-        id: "",
+        id: this.isEditWorkflow ? this.patchEvent?.id ?? "" : "",
         name:
           this.eventForm.get('eventName')?.value !== 'Custom'
             ? this.eventForm.get('eventName')?.value
@@ -372,7 +376,7 @@ export class AddEventDialogComponent {
         isOneOff: this.eventForm.get('cycle')?.value === 'One-Off',
         isPlaceHolder: false,
       };
-      this.timelineHttpService.addEvent(clientEvent, this.timelineId)
+      this.timelineHttpService.addEvent(clientEvent, this.cashflowId)
       .pipe(
         filter(res => !!res),
         catchError(err => {

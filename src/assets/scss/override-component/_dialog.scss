@@ -24,3 +24,77 @@
   box-shadow: none !important;
   padding: 32px !important;
 }
+.cdk-overlay-pane.mat-mdc-dialog-panel {
+  max-width: 100% !important;
+  min-width: auto !important;
+}
+
+// Custom Dialog Field Style
+.net-fields {
+  span {
+    line-height: 18px;
+  }
+  .net-field {
+    border: 1px solid #e7e7eb;
+    border-radius: 4px;
+    .form-field {
+      flex: 1;
+    }
+    .form-field input {
+      border-radius: 0 !important;
+      border-left: 1px solid #e7e7eb !important;
+      border-top: none !important;
+      border-bottom: none !important;
+      border-right: 1px solid #e7e7eb;
+    }
+    .left {
+      .sortby-edit-profile {
+        min-width: 105px !important;
+        height: 100%;
+      }
+    }
+    .right {
+      .sortby-edit-profile {
+        min-width: 150px !important;
+        height: 100%;
+      }
+    }
+  }
+}
+// End Custom Dialog Field Style
+
+// Tabs Field
+
+.tab {
+  span {
+    line-height: 18px;
+  }
+  .tabs {
+    border: 1px solid #516ce8;
+    border-radius: 4px;
+    padding: 2px;
+    button {
+      &.active {
+        background-color: #516ce8;
+      }
+      background-color: white;
+      text-align: center;
+      padding-top: 8px;
+      padding-bottom: 8px;
+      span {
+        &.active {
+          color: white;
+        }
+        font-weight: 500;
+        color: #516ce8;
+        text-transform: uppercase;
+      }
+    }
+    .row {
+      margin: 0 !important;
+      .col-6 {
+        padding: 0 !important;
+      }
+    }
+  }
+}

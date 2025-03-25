@@ -4,7 +4,7 @@
   <span>{{ item.navCap }}</span>
 </a>
 } @if(!item.navCap && !item.external && !item.twoLines) {
-<a mat-list-item (click)="onItemSelected(item)" [ngClass]="{
+<a mat-list-item (click)="onItemSelected(item)" [disableRipple]="true" [ngClass]="{
     'mat-toolbar mat-primary activeMenu': item.route
       ? navItem.currentRouteName === item.displayName
       : false,
@@ -26,7 +26,12 @@
      
     "
   > -->
+  @if(navItem.currentRouteName === item.displayName) {
   <img style="flex: none" [src]="item.iconName" alt="item" />
+  }
+  @else {
+  <img style="flex: none" [src]="item.iconOutline" alt="item" />
+  }
   <!-- </div> -->
   <span class="hide-menu">{{ item.displayName | translate }}</span>
   <!-- <span class="connecting-line"></span> -->

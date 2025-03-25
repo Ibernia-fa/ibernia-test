@@ -114,6 +114,7 @@
           <div class="d-flex flex-column gap-10">
             <div class="d-flex align-items-center justify-content-between">
               <a
+              (click)="loadCashflowToStore(cashflow.id)"
                 [routerLink]="['/cashflows/' + cashflow.id + '/timeline']"
                 class="text-decoration-none"
               >

@@ -1,6 +1,8 @@
 import { Routes } from '@angular/router';
 import { FinancialWorkflowDashboardComponent } from './financial-workflow-dashboard/financial-workflow-dashboard.component';
 import { TimelineComponent } from './timeline/timeline/timeline.component';
+import { SavingPotsComponent } from './saving-pots/saving-pots.component';
+import { IncomeExpensesComponent } from './income-expenses/income-expenses.component';
 
 
 export const FinancialWorkflowRoutes: Routes = [
@@ -12,8 +14,12 @@ export const FinancialWorkflowRoutes: Routes = [
         component: TimelineComponent,
       },
       {
-        path: 'finances',
-        component: FinancialWorkflowDashboardComponent,
+        path: ':id/finances',
+        component: SavingPotsComponent,
+      },
+      {
+        path: ':id/income',
+        component: IncomeExpensesComponent,
       },
       // {
       //   path: 'add',
