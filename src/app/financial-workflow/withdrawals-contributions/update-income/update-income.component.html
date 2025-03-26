@@ -1,0 +1,161 @@
+<div class="w-100">
+  <div class="d-flex flex-column gap-32">
+    <!-- Modal Header  -->
+    <div class="d-flex align-items-center justify-content-between gap-10 modal-header">
+      <h3>Update Income</h3>
+      <button (click)="closeDialog()" type="button">
+        <img src="assets/images/svgs/close-line-cion.svg" alt="close-line-cion" />
+      </button>
+    </div>
+    <!-- End Modal Header  -->
+
+    <!-- Modal Body  -->
+    <mat-dialog-content>
+      <div class="d-flex flex-column gap-20">
+        <!-- Description Field  -->
+        <div class="w-100 form-field gap-12">
+          <mat-label class="f-s-16 d-block" style="line-height: 18px">Description</mat-label>
+          <input matInput formControlName="name" placeholder="e.g. State Pension" />
+          <!-- Error  -->
+          <!-- <span class="field-error d-block">Name is required</span> -->
+          <!-- End Error  -->
+        </div>
+        <!--End Description Field  -->
+
+        <!-- Modal tabs  -->
+        <div class="d-flex flex-column gap-12 tab">
+          <span class="f-s-16 f-w-400">Type</span>
+          <div class="tabs">
+            <div class="row">
+              <div class="col-6">
+                <button class="button-icon w-100 active ">
+                  <span class="uppercase active ">Income</span>
+                </button>
+              </div>
+              <div class="col-6">
+                <button class="button-icon w-100">
+                  <span class="uppercase">Expense</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- End Modal tabs  -->
+
+        <!-- Net Amount Field  -->
+        <div class="d-flex flex-column gap-12 net-fields">
+          <span class="f-s-16 f-w-400">Net amount</span>
+          <div class="net-field d-flex align-items-center">
+            <!-- Currency Selector  -->
+            <div class="left">
+              <mat-select value="£" formControlName="currency" class="sortby-edit-profile" hideSingleSelectionIndicator>
+                <mat-option value="$">$</mat-option>
+              </mat-select>
+            </div>
+            <!-- End Currency Selector  -->
+            <!-- Price Field  -->
+            <div class="w-100 form-field">
+              <input matInput type="number" formControlName="amount" placeholder="0" />
+            </div>
+            <!-- End Price Field  -->
+            <!-- End Type Field  -->
+            <div class="right">
+              <mat-select value="Select" formControlName="cycle" class="sortby-edit-profile"
+                hideSingleSelectionIndicator>
+                <mat-option value="cycle">123</mat-option>
+              </mat-select>
+            </div>
+            <!-- End Type Field  -->
+          </div>
+          <!-- Error  -->
+          <!-- <span class="field-error d-block">Amount is required</span> -->
+          <!-- Error  -->
+        </div>
+        <!-- End Net Amount Field  -->
+
+        <!-- Start End  -->
+        <div class="start-end">
+          <div class="d-flex flex-column gap-12">
+            <div class="d-flex gap-8 align-items-center">
+              <mat-label class="f-s-16 f-w-400 d-block">Start & End</mat-label>
+              <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
+            </div>
+            <div class="row justify-content-between align-items-start flex-nowrap">
+              <!-- Start date  -->
+              <div class="col-6">
+                <div class="w-100 form-field">
+                  <div class="select-option">
+                    <mat-select value="Select" formControlName="start" hideSingleSelectionIndicator>
+                      <mat-option value="123">123</mat-option>
+                      <mat-option value="456">456</mat-option>
+                    </mat-select>
+                  </div>
+                  <!-- Error  -->
+                  <!-- <span class="field-error d-block">Start is required</span> -->
+                  <!-- Error  -->
+                </div>
+              </div>
+
+
+              <!-- Divider  -->
+              <div class="d-flex justify-content-start align-items-start">
+                <img src="assets/images/svgs/chevron-right-date-icon.svg" alt="chevron-right-date-icon" />
+              </div>
+              <!-- End date  -->
+              <div class="col-6">
+                <div class="w-100 form-field">
+                  <div class="select-option">
+                    <mat-select value="Select" formControlName="end" hideSingleSelectionIndicator>
+                      <mat-option value="123">123</mat-option>
+                      <mat-option value="456">456</mat-option>
+                    </mat-select>
+                  </div>
+                  <!-- Error  -->
+                  <!-- <span class="field-error d-block">End is required</span> -->
+                  <!-- Error  -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Finish Start End  -->
+
+        <div class="w-100 form-field gap-12">
+          <div class="d-flex gap-8 align-items-center">
+            <mat-label class="f-s-16 f-w-400 d-block">Escalation rate</mat-label>
+            <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
+          </div>
+          <div class="position-relative">
+            <div class="w-100 form-field">
+              <div class="select-option">
+                <mat-select formControlName="escalationRate" value="Select">
+                  <mat-option value="2.5%">Increase at same rate as inflation (2.5%)</mat-option>
+                  <mat-option value="0%">Don't increase with inflation</mat-option>
+                </mat-select>
+              </div>
+              <!-- Error  -->
+              <!-- <span class="field-error d-block">Escalation Rate is required</span> -->
+              <!-- Error  -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-dialog-content>
+    <!-- End Modal Body  -->
+
+    <!-- Modal Action Button  -->
+    <div class="row justify-content-between modal-action">
+      <div class="col-5">
+        <button (click)="closeDialog()" class="button-icon-outline w-100 d-block">
+          <span class="f-s-16">Cancel</span>
+        </button>
+      </div>
+      <div class="col-5">
+        <button class="button-icon w-100 d-block">
+          <span class="f-s-16">Save</span>
+        </button>
+      </div>
+    </div>
+    <!-- End Modal Action Button  -->
+  </div>
+</div>

@@ -1,0 +1,16 @@
+.start-end {
+  .row {
+    margin: 0 !important;
+    .col-6 {
+      padding: 0 !important;
+      max-width: 45% !important;
+      flex: 0 0 45% !important;
+    }
+  }
+}
+
+.withdrawals-info-text {
+  color: #5e5e73;
+  font-size: 14px !important;
+  line-height: 100%;
+}

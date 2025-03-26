@@ -641,7 +641,7 @@ export const navItems: NavItem[] = [
   {
     displayName: 'Contributions & Withdrawals',
     // iconName: 'circle-percentage',
-    iconName: '/assets/images/svgs/discount-icon.svg',
+    iconName: '/assets/images/svgs/discount-icon-filled.svg',
     iconOutline: '/assets/images/svgs/discount-icon.svg',
     route: '/cashflows/{cashflowId}/withdrawal',
   },

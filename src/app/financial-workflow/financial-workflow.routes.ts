@@ -5,7 +5,6 @@ import { SavingPotsComponent } from './saving-pots/saving-pots.component';
 import { IncomeExpensesComponent } from './income-expenses/income-expenses.component';
 import { WithdrawalsContributionsComponent } from './withdrawals-contributions/withdrawals-contributions.component';
 
-
 export const FinancialWorkflowRoutes: Routes = [
   {
     path: '',
