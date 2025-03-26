@@ -65,7 +65,7 @@ export class WithdrawalsContributionsComponent {
     private timelineHttpService: TimelineHttpService,
     private navItemService: NavItemService
   ) {
-    this.navItemService.currentRouteName = 'Incomes & Expenses';
+    this.navItemService.currentRouteName = 'Contributions & Withdrawals';
     this.getData();
   }
 
