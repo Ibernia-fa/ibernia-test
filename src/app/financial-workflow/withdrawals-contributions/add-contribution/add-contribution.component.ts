@@ -25,8 +25,8 @@ import {
   EscalationRate,
 } from '../../timeline/models/financial-timeline';
 import moment from 'moment';
-import { FinancialViewModel } from '../model/income-expense';
-import { IncomeExpensesHttpService } from '../services/income-expenses-http.service';
+import { FundsViewModel } from '../model/withdrawals-contributions';
+import { WithdrawalsContributionsHttpService } from '../services/withdrawals-contributions-http.service';
 import { catchError, filter } from 'rxjs';
 
 @Component({
@@ -49,7 +49,7 @@ import { catchError, filter } from 'rxjs';
   styleUrl: './add-contribution.component.scss',
 })
 export class AddContributionComponent {
-  incomeForm: FormGroup;
+  contributionForm: FormGroup;
   countries = allCountries;
   cycles: Cycle[];
   years: number[] = [];
@@ -58,14 +58,14 @@ export class AddContributionComponent {
   clientPreferredCurrency: string;
   clientBirthYear: number;
   isEditWorkflow = false;
-  selectedIncome: FinancialViewModel;
+  selectedIncome: FundsViewModel;
   showStartEnd = false;
 
   constructor(
     private dialogRef: MatDialogRef<AddContributionComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private fb: FormBuilder,
-    private incomeExpenseHttpService: IncomeExpensesHttpService
+    private withdrawalsContributionsHttpService: WithdrawalsContributionsHttpService
   ) {
     this.cycles = data.amountCycles;
     this.escalationRates = data.escalataionRates;
@@ -82,7 +82,7 @@ export class AddContributionComponent {
       this.years.push(element);
     }
 
-    this.incomeForm = this.fb.group({
+    this.contributionForm = this.fb.group({
       description: ['', Validators.required],
       currencySymbol: [this.clientPreferredCurrency, [Validators.required]],
       amount: [0, [Validators.required, Validators.min(0)]],
@@ -93,20 +93,20 @@ export class AddContributionComponent {
 
     if (this.isEditWorkflow) {
       this.onCycleValueChange(this.selectedIncome.amount.cycle.id);
-      this.incomeForm
+      this.contributionForm
         .get('description')
         ?.patchValue(this.selectedIncome.description);
-      this.incomeForm
+      this.contributionForm
         .get('currencySymbol')
         ?.patchValue(this.selectedIncome.amount.currencySymbol);
-      this.incomeForm
+      this.contributionForm
         .get('amount')
         ?.patchValue(this.selectedIncome.amount.amount);
-      this.incomeForm
+      this.contributionForm
         .get('cycle')
         ?.patchValue(this.selectedIncome.amount.cycle.id);
-      this.incomeForm.get('start')?.patchValue(this.selectedIncome.start.year);
-      this.incomeForm.get('end')?.patchValue(this.selectedIncome.end.year);
+      this.contributionForm.get('start')?.patchValue(this.selectedIncome.start.year);
+      this.contributionForm.get('end')?.patchValue(this.selectedIncome.end.year);
     }
   }
 
@@ -120,66 +120,67 @@ export class AddContributionComponent {
       this.cycles.find((cycle) => cycle.id === event)?.description !==
       'One-off';
     if (!this.showStartEnd) {
-      this.incomeForm.controls['end'].clearValidators();
-      this.incomeForm.controls['end'].updateValueAndValidity();
+      this.contributionForm.controls['end'].clearValidators();
+      this.contributionForm.controls['end'].updateValueAndValidity();
     } else {
-      this.incomeForm.controls['end'].addValidators(Validators.required);
-      this.incomeForm.controls['end'].updateValueAndValidity();
+      this.contributionForm.controls['end'].addValidators(Validators.required);
+      this.contributionForm.controls['end'].updateValueAndValidity();
     }
   }
 
   addIncome(): void {
-    if (this.incomeForm.valid) {
-      console.log('Form Submitted', this.incomeForm.value);
-      var income: FinancialViewModel = {
+    if (this.contributionForm.valid) {
+      console.log('Form Submitted', this.contributionForm.value);
+      var contribution: FundsViewModel = {
         id: this.isEditWorkflow ? this.selectedIncome.id : null,
-        description: this.incomeForm.get('description')?.value,
+        associatedSavingPotId: '',
+        description: this.contributionForm.get('description')?.value,
         amount: {
-          amount: this.incomeForm.get('amount')?.value,
-          currencySymbol: this.incomeForm.get('currencySymbol')?.value,
+          amount: this.contributionForm.get('amount')?.value,
+          currencySymbol: this.contributionForm.get('currencySymbol')?.value,
           cycle: {
-            id: this.incomeForm.get('cycle')?.value ?? '',
+            id: this.contributionForm.get('cycle')?.value ?? '',
             description:
               this.cycles.find(
-                (x) => x.id === this.incomeForm.get('cycle')?.value
+                (x) => x.id === this.contributionForm.get('cycle')?.value
               )?.description ?? '',
           },
         },
         start: {
           age:
-            this.incomeForm.get('start')?.value !== null &&
-            this.incomeForm.get('start')?.value !== ''
-              ? this.incomeForm.get('start')?.value - this.clientBirthYear
+            this.contributionForm.get('start')?.value !== null &&
+            this.contributionForm.get('start')?.value !== ''
+              ? this.contributionForm.get('start')?.value - this.clientBirthYear
               : 0,
           year:
-            this.incomeForm.get('start')?.value !== null &&
-            this.incomeForm.get('start')?.value !== ''
-              ? this.incomeForm.get('start')?.value
+            this.contributionForm.get('start')?.value !== null &&
+            this.contributionForm.get('start')?.value !== ''
+              ? this.contributionForm.get('start')?.value
               : 0,
         },
         end: {
           age:
-            this.incomeForm.get('end')?.value !== null &&
-            this.incomeForm.get('end')?.value !== ''
-              ? this.incomeForm.get('end')?.value - this.clientBirthYear
+            this.contributionForm.get('end')?.value !== null &&
+            this.contributionForm.get('end')?.value !== ''
+              ? this.contributionForm.get('end')?.value - this.clientBirthYear
               : 0,
           year:
-            this.incomeForm.get('end')?.value !== null &&
-            this.incomeForm.get('end')?.value !== ''
-              ? this.incomeForm.get('end')?.value
+            this.contributionForm.get('end')?.value !== null &&
+            this.contributionForm.get('end')?.value !== ''
+              ? this.contributionForm.get('end')?.value
               : 0,
         },
       };
 
-      var action$ = this.incomeExpenseHttpService.addIncome(
+      var action$ = this.withdrawalsContributionsHttpService.addContributions(
         this.cashflowId,
-        income
+        contribution
       );
 
       if (this.isEditWorkflow)
-        action$ = this.incomeExpenseHttpService.updateIncome(
+        action$ = this.withdrawalsContributionsHttpService.updateContributions(
           this.cashflowId,
-          income
+          contribution
         );
 
       action$

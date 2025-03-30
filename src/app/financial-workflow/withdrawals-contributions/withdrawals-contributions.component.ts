@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { AddContributionComponent } from './add-contribution/add-contribution.component';
-import { UpdateIncomeComponent } from './update-income/update-income.component';
 import { MatCardModule } from '@angular/material/card';
 import { AddWithdrawalComponent } from './add-withdrawal/add-withdrawal.component';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -14,9 +13,9 @@ import { FinancialWorkflowService } from '../services/financial-workflow.service
 import { combineLatest, switchMap, tap } from 'rxjs';
 import { Client } from 'src/app/clients/models/client';
 import { Cashflow } from 'src/app/clients/models/cashflow';
-import { IncomeExpensesHttpService } from './services/income-expenses-http.service';
+import { WithdrawalsContributionsHttpService } from './services/withdrawals-contributions-http.service';
 import { SettingsHttpService } from '../settings/services/settings-http.service';
-import { FinancialViewModel, IncomeExpense } from './model/income-expense';
+import { FundsViewModel, WithdrawalsContributions } from './model/withdrawals-contributions';
 import {
   Cycle,
   EscalationRate,
@@ -26,6 +25,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { NavItemService } from 'src/app/layouts/full/nav-item.service';
 import { TimelineHttpService } from '../timeline/services/timeline-http.service';
 import moment from 'moment';
+import { SavingsPotsHttpService } from '../saving-pots/services/savings-pots-http.service';
+import { SavingPotsModel } from '../saving-pots/models/saving-pots.model';
 
 @Component({
   imports: [
@@ -44,23 +45,25 @@ import moment from 'moment';
 })
 export class WithdrawalsContributionsComponent {
   displayedColumns: string[] = ['position', 'name', 'action'];
-  incomeDataSource: MatTableDataSource<FinancialViewModel> =
-    new MatTableDataSource(new Array<FinancialViewModel>());
-  expenseDataSource: MatTableDataSource<FinancialViewModel> =
-    new MatTableDataSource(new Array<FinancialViewModel>());
+  contributionDataSource: MatTableDataSource<FundsViewModel> =
+    new MatTableDataSource(new Array<FundsViewModel>());
+  withdrawalDataSource: MatTableDataSource<FundsViewModel> =
+    new MatTableDataSource(new Array<FundsViewModel>());
   selectedClient: Client;
   selectedCashflow: Cashflow;
-  incomeExpense: IncomeExpense;
+  contributionWithdrawal: WithdrawalsContributions;
   amountCycles: Cycle[];
   escalationRates: EscalationRate[];
   isLoaderVisible = false;
   timeline: FinancialTimeline;
+  savingsPots: SavingPotsModel;
 
   constructor(
     private dialog: MatDialog,
     private activatedRoute: ActivatedRoute,
     private financialWorkflowService: FinancialWorkflowService,
-    private incomeExpensesHttpService: IncomeExpensesHttpService,
+    private savingsPotsHttpService: SavingsPotsHttpService,
+    private withdrawalsContributionsHttpService: WithdrawalsContributionsHttpService,
     private settingHttpService: SettingsHttpService,
     private timelineHttpService: TimelineHttpService,
     private navItemService: NavItemService
@@ -83,7 +86,7 @@ export class WithdrawalsContributionsComponent {
         }),
         switchMap(([client, cashflow]) => {
           return combineLatest([
-            this.incomeExpensesHttpService.getAllIncomeExpenses(
+            this.withdrawalsContributionsHttpService.getAllWithdrawalsContributions(
               (cashflow as Cashflow).id
             ),
             this.timelineHttpService.getTimelinebyCashflowId(
@@ -93,19 +96,23 @@ export class WithdrawalsContributionsComponent {
             this.settingHttpService.getEscalationRates(
               (client as Client).financialAdvisor.advisorId
             ),
+            this.savingsPotsHttpService.getAllSavingsPots(
+              (cashflow as Cashflow).id
+            )
           ]);
         }),
-        tap(([incomeExpense, timeline, amountCycles, escalationRates]) => {
-          this.incomeExpense = incomeExpense;
+        tap(([contributionWithdrawal, timeline, amountCycles, escalationRates, savingsPots]) => {
+          this.contributionWithdrawal = contributionWithdrawal;
           this.amountCycles = amountCycles;
           this.escalationRates = escalationRates;
           this.timeline = timeline;
+          this.savingsPots = savingsPots
 
-          this.incomeDataSource = new MatTableDataSource(
-            this.incomeExpense?.incomes
+          this.contributionDataSource = new MatTableDataSource(
+            this.contributionWithdrawal?.contributions
           );
-          this.expenseDataSource = new MatTableDataSource(
-            this.incomeExpense?.expenses
+          this.withdrawalDataSource = new MatTableDataSource(
+            this.contributionWithdrawal?.withdrawals
           );
           this.isLoaderVisible = false;
         })
@@ -113,7 +120,7 @@ export class WithdrawalsContributionsComponent {
       .subscribe();
   }
 
-  newIncomeClicked() {
+  newContributionClicked() {
     const dialogRef = this.dialog.open(AddContributionComponent, {
       width: '700px',
       disableClose: true,
@@ -130,11 +137,11 @@ export class WithdrawalsContributionsComponent {
     });
 
     dialogRef.afterClosed().subscribe((result: any) => {
-      this.updateIncomeExpenseByResponse(result.incomeExpense);
+      this.updateContributionWithdrawalByResponse(result.ContributionWithdrawal);
     });
   }
 
-  newExpenseClicked() {
+  newWithdrawalClicked() {
     const dialogRef = this.dialog.open(AddWithdrawalComponent, {
       width: '700px',
       disableClose: true,
@@ -152,11 +159,11 @@ export class WithdrawalsContributionsComponent {
 
     dialogRef.afterClosed().subscribe((result: any) => {
       console.log('Dialog closed with result:', result);
-      this.updateIncomeExpenseByResponse(result.incomeExpense);
+      this.updateContributionWithdrawalByResponse(result.ContributionWithdrawal);
     });
   }
 
-  updateIncomeClicked(item: FinancialViewModel) {
+  updateContributionClicked(item: FundsViewModel) {
     const dialogRef = this.dialog.open(AddContributionComponent, {
       width: '700px',
       disableClose: true,
@@ -167,7 +174,7 @@ export class WithdrawalsContributionsComponent {
         clientPreferredCurrency:
           this.selectedClient?.clientDetails.preferredCurrency,
         cashflowId: this.selectedCashflow?.id,
-        selectedIncome: item,
+        selectedContribution: item,
         isEditWorkflow: true,
         forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
         forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
@@ -175,11 +182,11 @@ export class WithdrawalsContributionsComponent {
     });
 
     dialogRef.afterClosed().subscribe((result: any) => {
-      this.updateIncomeExpenseByResponse(result.incomeExpense);
+      this.updateContributionWithdrawalByResponse(result.ContributionWithdrawal);
     });
   }
 
-  updateExpenseClicked(item: FinancialViewModel) {
+  updateWithdrawalClicked(item: FundsViewModel) {
     const dialogRef = this.dialog.open(AddWithdrawalComponent, {
       width: '700px',
       disableClose: true,
@@ -190,7 +197,7 @@ export class WithdrawalsContributionsComponent {
         clientPreferredCurrency:
           this.selectedClient?.clientDetails.preferredCurrency,
         cashflowId: this.selectedCashflow?.id,
-        selectedExpense: item,
+        selectedWithdrawal: item,
         isEditWorkflow: true,
         forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
         forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
@@ -199,12 +206,12 @@ export class WithdrawalsContributionsComponent {
 
     dialogRef.afterClosed().subscribe((result: any) => {
       console.log('Dialog closed with result:', result);
-      this.updateIncomeExpenseByResponse(result.incomeExpense);
+      this.updateContributionWithdrawalByResponse(result.ContributionWithdrawal);
     });
   }
 
-  // updateIncomeClicked() {
-  //   const dialogRef = this.dialog.open(UpdateIncomeComponent, {
+  // updateContributionClicked() {
+  //   const dialogRef = this.dialog.open(UpdateContributionComponent, {
   //     width: '700px',
   //     disableClose: true,
   //     data: {},
@@ -215,8 +222,8 @@ export class WithdrawalsContributionsComponent {
   //   });
   // }
 
-  // updateExpenseClicked() {
-  //   const dialogRef = this.dialog.open(UpdateIncomeComponent, {
+  // updateWithdrawalClicked() {
+  //   const dialogRef = this.dialog.open(UpdateContributionComponent, {
   //     width: '700px',
   //     disableClose: true,
   //     data: {},
@@ -227,50 +234,27 @@ export class WithdrawalsContributionsComponent {
   //   });
   // }
 
-  deleteIncome(element: FinancialViewModel) {
-    this.incomeExpensesHttpService
-      .deleteIncome(this.selectedCashflow.id, element)
+  deleteContribution(element: FundsViewModel) {
+    this.withdrawalsContributionsHttpService
+      .deleteContributions(this.selectedCashflow.id, element)
       .subscribe((res) => {
-        this.updateIncomeExpenseByResponse(res);
+        this.updateContributionWithdrawalByResponse(res);
       });
   }
 
-  deleteExpense(element: FinancialViewModel) {
-    this.incomeExpensesHttpService
-      .deleteExpense(this.selectedCashflow.id, element)
+  deleteWithdrawal(element: FundsViewModel) {
+    this.withdrawalsContributionsHttpService
+      .deleteWithdrawals(this.selectedCashflow.id, element)
       .subscribe((res) => {
-        this.updateIncomeExpenseByResponse(res);
+        this.updateContributionWithdrawalByResponse(res);
       });
   }
 
-  updateIncomeExpenseByResponse(res: IncomeExpense) {
-    this.incomeExpense = res;
-    this.incomeDataSource = new MatTableDataSource(this.incomeExpense.incomes);
-    this.expenseDataSource = new MatTableDataSource(
-      this.incomeExpense.expenses
+  updateContributionWithdrawalByResponse(res: WithdrawalsContributions) {
+    this.contributionWithdrawal = res;
+    this.contributionDataSource = new MatTableDataSource(this.contributionWithdrawal.contributions);
+    this.withdrawalDataSource = new MatTableDataSource(
+      this.contributionWithdrawal.withdrawals
     );
-  }
-
-  private calculateSavingsRate() {
-    var totalIncome = 0;
-    var totalExpense = 0;
-    this.incomeExpense.incomes.map(
-      (x) => (totalIncome = totalIncome + x.amount.amount)
-    );
-    this.incomeExpense.expenses.map(
-      (x) => (totalExpense = totalExpense + x.amount.amount)
-    );
-    this.incomeExpense.totalIncome = totalIncome;
-    this.incomeExpense.totalExpenses = totalExpense;
-    this.incomeExpense.total = totalIncome - totalExpense;
-
-    if (totalIncome === 0) {
-      return;
-    }
-    // return 0; // Avoid division by zero
-
-    var savings =
-      this.incomeExpense.totalIncome - this.incomeExpense.totalExpenses;
-    return (savings / this.incomeExpense.totalIncome) * 100;
   }
 }

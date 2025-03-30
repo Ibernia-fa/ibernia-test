@@ -24,9 +24,9 @@ import {
   Cycle,
   EscalationRate,
 } from '../../timeline/models/financial-timeline';
-import { IncomeExpensesHttpService } from '../services/income-expenses-http.service';
+import { WithdrawalsContributionsHttpService } from '../services/withdrawals-contributions-http.service';
 import moment from 'moment';
-import { FinancialViewModel } from '../model/income-expense';
+import { FundsViewModel } from '../model/withdrawals-contributions';
 import { catchError, filter } from 'rxjs';
 
 @Component({
@@ -49,7 +49,7 @@ import { catchError, filter } from 'rxjs';
   styleUrl: './add-withdrawal.component.scss',
 })
 export class AddWithdrawalComponent {
-  expenseForm: FormGroup;
+  withdrawalForm: FormGroup;
   countries = allCountries;
   cycles: Cycle[];
   years: number[] = [];
@@ -58,14 +58,14 @@ export class AddWithdrawalComponent {
   clientPreferredCurrency: string;
   clientBirthYear: number;
   isEditWorkflow = false;
-  selectedExpense: FinancialViewModel;
+  selectedExpense: FundsViewModel;
   showStartEnd = false;
 
   constructor(
     private dialogRef: MatDialogRef<AddWithdrawalComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private fb: FormBuilder,
-    private incomeExpenseHttpService: IncomeExpensesHttpService
+    private withdrawalsContributionsHttpService: WithdrawalsContributionsHttpService
   ) {
     this.cycles = data.amountCycles;
     this.escalationRates = data.escalataionRates;
@@ -82,7 +82,7 @@ export class AddWithdrawalComponent {
       this.years.push(element);
     }
 
-    this.expenseForm = this.fb.group({
+    this.withdrawalForm = this.fb.group({
       description: ['', Validators.required],
       currencySymbol: [this.clientPreferredCurrency, [Validators.required]],
       amount: [0, [Validators.required, Validators.min(0)]],
@@ -93,22 +93,22 @@ export class AddWithdrawalComponent {
 
     if (this.isEditWorkflow) {
       this.onCycleValueChange(this.selectedExpense.amount.cycle.id);
-      this.expenseForm
+      this.withdrawalForm
         .get('description')
         ?.patchValue(this.selectedExpense.description);
-      this.expenseForm
+      this.withdrawalForm
         .get('currencySymbol')
         ?.patchValue(this.selectedExpense.amount.currencySymbol);
-      this.expenseForm
+      this.withdrawalForm
         .get('amount')
         ?.patchValue(this.selectedExpense.amount.amount);
-      this.expenseForm
+      this.withdrawalForm
         .get('cycle')
         ?.patchValue(this.selectedExpense.amount.cycle.id);
-      this.expenseForm
+      this.withdrawalForm
         .get('start')
         ?.patchValue(this.selectedExpense.start.year);
-      this.expenseForm.get('end')?.patchValue(this.selectedExpense.end.year);
+      this.withdrawalForm.get('end')?.patchValue(this.selectedExpense.end.year);
     }
   }
 
@@ -122,66 +122,67 @@ export class AddWithdrawalComponent {
       this.cycles.find((cycle) => cycle.id === event)?.description !==
       'One-off';
     if (!this.showStartEnd) {
-      this.expenseForm.controls['end'].clearValidators();
-      this.expenseForm.controls['end'].updateValueAndValidity();
+      this.withdrawalForm.controls['end'].clearValidators();
+      this.withdrawalForm.controls['end'].updateValueAndValidity();
     } else {
-      this.expenseForm.controls['end'].addValidators(Validators.required);
-      this.expenseForm.controls['end'].updateValueAndValidity();
+      this.withdrawalForm.controls['end'].addValidators(Validators.required);
+      this.withdrawalForm.controls['end'].updateValueAndValidity();
     }
   }
 
   addExpense(): void {
-    if (this.expenseForm.valid) {
-      console.log('Form Submitted', this.expenseForm.value);
-      var expense: FinancialViewModel = {
+    if (this.withdrawalForm.valid) {
+      console.log('Form Submitted', this.withdrawalForm.value);
+      var withdrawal: FundsViewModel = {
         id: this.isEditWorkflow ? this.selectedExpense.id : null,
-        description: this.expenseForm.get('description')?.value,
+        associatedSavingPotId: '',
+        description: this.withdrawalForm.get('description')?.value,
         amount: {
-          amount: this.expenseForm.get('amount')?.value,
-          currencySymbol: this.expenseForm.get('currencySymbol')?.value,
+          amount: this.withdrawalForm.get('amount')?.value,
+          currencySymbol: this.withdrawalForm.get('currencySymbol')?.value,
           cycle: {
-            id: this.expenseForm.get('cycle')?.value ?? '',
+            id: this.withdrawalForm.get('cycle')?.value ?? '',
             description:
               this.cycles.find(
-                (x) => x.id === this.expenseForm.get('cycle')?.value
+                (x) => x.id === this.withdrawalForm.get('cycle')?.value
               )?.description ?? '',
           },
         },
         start: {
           age:
-            this.expenseForm.get('start')?.value !== null &&
-            this.expenseForm.get('start')?.value !== ''
-              ? this.expenseForm.get('start')?.value - this.clientBirthYear
+            this.withdrawalForm.get('start')?.value !== null &&
+            this.withdrawalForm.get('start')?.value !== ''
+              ? this.withdrawalForm.get('start')?.value - this.clientBirthYear
               : 0,
           year:
-            this.expenseForm.get('start')?.value !== null &&
-            this.expenseForm.get('start')?.value !== ''
-              ? this.expenseForm.get('start')?.value
+            this.withdrawalForm.get('start')?.value !== null &&
+            this.withdrawalForm.get('start')?.value !== ''
+              ? this.withdrawalForm.get('start')?.value
               : 0,
         },
         end: {
           age:
-            this.expenseForm.get('end')?.value !== null &&
-            this.expenseForm.get('end')?.value !== ''
-              ? this.expenseForm.get('end')?.value - this.clientBirthYear
+            this.withdrawalForm.get('end')?.value !== null &&
+            this.withdrawalForm.get('end')?.value !== ''
+              ? this.withdrawalForm.get('end')?.value - this.clientBirthYear
               : 0,
           year:
-            this.expenseForm.get('end')?.value !== null &&
-            this.expenseForm.get('end')?.value !== ''
-              ? this.expenseForm.get('end')?.value
+            this.withdrawalForm.get('end')?.value !== null &&
+            this.withdrawalForm.get('end')?.value !== ''
+              ? this.withdrawalForm.get('end')?.value
               : 0,
         },
       };
 
-      var action$ = this.incomeExpenseHttpService.addExpense(
+      var action$ = this.withdrawalsContributionsHttpService.addWithdrawals(
         this.cashflowId,
-        expense
+        withdrawal
       );
 
       if (this.isEditWorkflow)
-        action$ = this.incomeExpenseHttpService.updateExpense(
+        action$ = this.withdrawalsContributionsHttpService.updateWithdrawals(
           this.cashflowId,
-          expense
+          withdrawal
         );
 
       action$

@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { IncomeExpensesHttpService } from './income-expenses-http.service';
+import { WithdrawalsContributionsHttpService } from './withdrawals-contributions-http.service';
 
 describe('IncomeExpensesHttpService', () => {
-  let service: IncomeExpensesHttpService;
+  let service: WithdrawalsContributionsHttpService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(IncomeExpensesHttpService);
+    service = TestBed.inject(WithdrawalsContributionsHttpService);
   });
 
   it('should be created', () => {

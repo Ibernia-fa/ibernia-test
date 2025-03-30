@@ -15,7 +15,7 @@
 
     <!-- Modal Body  -->
     <mat-dialog-content>
-      <div [formGroup]="incomeForm" class="d-flex flex-column gap-20">
+      <div [formGroup]="contributionForm" class="d-flex flex-column gap-20">
         <!-- Description Field  -->
         <div class="w-100 form-field gap-12">
           <mat-label class="f-s-16 d-block" style="line-height: 18px">Description</mat-label>
@@ -102,8 +102,8 @@
                       }
                     </mat-select>
                   </div>
-                  @if(incomeForm.get('start')?.touched &&
-                  incomeForm.get('start')?.hasError('required')) {
+                  @if(contributionForm.get('start')?.touched &&
+                  contributionForm.get('start')?.hasError('required')) {
                   <span class="field-error d-block">Start is required</span>
                   }
                 </div>
@@ -129,8 +129,8 @@
                       }
                     </mat-select>
                   </div>
-                  @if(incomeForm.get('end')?.touched &&
-                  incomeForm.get('end')?.hasError('required')) {
+                  @if(contributionForm.get('end')?.touched &&
+                  contributionForm.get('end')?.hasError('required')) {
                   <span class="field-error d-block">End is required</span>
                   }
                 </div>

@@ -35,7 +35,7 @@
           <div class="heading-btn-wrapper">
             <div class="d-flex flex-column gap-12">
               <h3>Contributions</h3>
-              <button (click)="newIncomeClicked()" type="button" class="w-100 button-icon">
+              <button (click)="newContributionClicked()" type="button" class="w-100 button-icon">
                 <span>Add contribution</span>
               </button>
             </div>
@@ -43,7 +43,7 @@
           <!-- Table Wrapper  -->
           <div class="table-main-wrapper">
             <div class="table-responsive-sm table-wrapper">
-              <table mat-table [dataSource]="incomeDataSource" class="mat-elevation-z8">
+              <table mat-table [dataSource]="contributionDataSource" class="mat-elevation-z8">
 
                 <!-- Position Column -->
                 <ng-container matColumnDef="position">
@@ -78,14 +78,14 @@
                       </button>
                     </div>
                     <mat-menu #menu="matMenu" xPosition="before" class="dropdown-menus">
-                      <button (click)="updateIncomeClicked(element)" mat-menu-item>
+                      <button (click)="updateContributionClicked(element)" mat-menu-item>
                         <mat-icon>
                           <img src="assets/images/svgs/drop-down-edit-2-line.svg" alt="drop-down-copy-2-line"
                             height="24" width="24" />
                         </mat-icon>
                         <span>Edit</span>
                       </button>
-                      <button (click)="deleteIncome(element)" mat-menu-item>
+                      <button (click)="deleteContribution(element)" mat-menu-item>
                         <mat-icon>
                           <img src="assets/images/svgs/drop-down-delete-2-line.svg" alt="drop-down-copy-2-line"
                             height="24" width="24" />
@@ -113,7 +113,7 @@
           <div class="heading-btn-wrapper">
             <div class="d-flex flex-column gap-12">
               <h3>Withdrawals</h3>
-              <button (click)="newExpenseClicked()" type="button" class="w-100 button-icon-outline">
+              <button (click)="newWithdrawalClicked()" type="button" class="w-100 button-icon-outline">
                 <span>Add withdrawal</span>
               </button>
             </div>
@@ -121,7 +121,7 @@
           <!-- Table Wrapper  -->
           <div class="table-main-wrapper">
             <div class="table-responsive-sm table-wrapper">
-              <table mat-table [dataSource]="expenseDataSource" class="mat-elevation-z8">
+              <table mat-table [dataSource]="withdrawalDataSource" class="mat-elevation-z8">
 
                 <!-- Position Column -->
                 <ng-container matColumnDef="position">
@@ -156,14 +156,14 @@
                       </button>
                     </div>
                     <mat-menu #menu="matMenu" xPosition="before" class="dropdown-menus">
-                      <button (click)="updateExpenseClicked(element)" mat-menu-item>
+                      <button (click)="updateWithdrawalClicked(element)" mat-menu-item>
                         <mat-icon>
                           <img src="assets/images/svgs/drop-down-edit-2-line.svg" alt="drop-down-copy-2-line"
                             height="24" width="24" />
                         </mat-icon>
                         <span>Edit</span>
                       </button>
-                      <button (click)="deleteExpense(element)" mat-menu-item>
+                      <button (click)="deleteWithdrawal(element)" mat-menu-item>
                         <mat-icon>
                           <img src="assets/images/svgs/drop-down-delete-2-line.svg" alt="drop-down-copy-2-line"
                             height="24" width="24" />
