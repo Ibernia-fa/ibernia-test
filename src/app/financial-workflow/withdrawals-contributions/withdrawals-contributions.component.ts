@@ -133,6 +133,7 @@ export class WithdrawalsContributionsComponent {
         cashflowId: this.selectedCashflow?.id,
         forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
         forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
+        savingPots: this.savingsPots
       },
     });
 
@@ -179,6 +180,7 @@ export class WithdrawalsContributionsComponent {
         isEditWorkflow: true,
         forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
         forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
+        savingPots: this.savingsPots
       },
     });
 

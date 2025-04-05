@@ -28,6 +28,7 @@ import moment from 'moment';
 import { FundsViewModel } from '../model/withdrawals-contributions';
 import { WithdrawalsContributionsHttpService } from '../services/withdrawals-contributions-http.service';
 import { catchError, filter } from 'rxjs';
+import { SavingPotsModel } from '../../saving-pots/models/saving-pots.model';
 
 @Component({
   selector: 'app-add-contribution',
@@ -60,6 +61,7 @@ export class AddContributionComponent {
   isEditWorkflow = false;
   selectedContribution: FundsViewModel;
   showStartEnd = false;
+  savingPots: SavingPotsModel
 
   constructor(
     private dialogRef: MatDialogRef<AddContributionComponent>,
@@ -74,6 +76,7 @@ export class AddContributionComponent {
     this.cashflowId = data.cashflowId;
     this.isEditWorkflow = data.isEditWorkflow;
     this.selectedContribution = data.selectedContribution;
+    this.savingPots = data.savingPots
 
     var iterations = data.forecastEndDateYear - data.forecastStartDateYear;
 
@@ -89,6 +92,7 @@ export class AddContributionComponent {
       cycle: [this.cycles[1].id, Validators.required],
       start: ['', Validators.required],
       end: [''],
+      savingPot: ['']
     });
 
     if (this.isEditWorkflow) {
@@ -107,6 +111,7 @@ export class AddContributionComponent {
         ?.patchValue(this.selectedContribution.amount.cycle.id);
       this.contributionForm.get('start')?.patchValue(this.selectedContribution.start.year);
       this.contributionForm.get('end')?.patchValue(this.selectedContribution.end.year);
+      this.contributionForm.get('savingPot')?.patchValue(this.selectedContribution.associatedSavingPotId);
     }
   }
 
@@ -133,7 +138,7 @@ export class AddContributionComponent {
       console.log('Form Submitted', this.contributionForm.value);
       var contribution: FundsViewModel = {
         id: this.isEditWorkflow ? this.selectedContribution.id : null,
-        associatedSavingPotId: '',
+        associatedSavingPotId: this.contributionForm.get('savingPot')?.value ?? '',
         description: this.contributionForm.get('description')?.value,
         amount: {
           amount: this.contributionForm.get('amount')?.value,

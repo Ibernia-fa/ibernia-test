@@ -78,6 +78,7 @@ export class AddWithdrawalComponent {
     this.selectedWithdrawal = data.selectedWithdrawal;
     this.savingPots = data.savingPots
 
+    this.savingPots.clientSavings = this.savingPots.clientSavings.filter(saving => !saving.hasPotLocked)
     var iterations = data.forecastEndDateYear - data.forecastStartDateYear;
 
     for (let index = 0; index < iterations; index++) {
