@@ -58,7 +58,7 @@ export class AddContributionComponent {
   clientPreferredCurrency: string;
   clientBirthYear: number;
   isEditWorkflow = false;
-  selectedIncome: FundsViewModel;
+  selectedContribution: FundsViewModel;
   showStartEnd = false;
 
   constructor(
@@ -73,7 +73,7 @@ export class AddContributionComponent {
     this.clientPreferredCurrency = data.clientPreferredCurrency;
     this.cashflowId = data.cashflowId;
     this.isEditWorkflow = data.isEditWorkflow;
-    this.selectedIncome = data.selectedIncome;
+    this.selectedContribution = data.selectedContribution;
 
     var iterations = data.forecastEndDateYear - data.forecastStartDateYear;
 
@@ -86,27 +86,27 @@ export class AddContributionComponent {
       description: ['', Validators.required],
       currencySymbol: [this.clientPreferredCurrency, [Validators.required]],
       amount: [0, [Validators.required, Validators.min(0)]],
-      cycle: ['', Validators.required],
+      cycle: [this.cycles[1].id, Validators.required],
       start: ['', Validators.required],
       end: [''],
     });
 
     if (this.isEditWorkflow) {
-      this.onCycleValueChange(this.selectedIncome.amount.cycle.id);
+      this.onCycleValueChange(this.selectedContribution.amount.cycle.id);
       this.contributionForm
         .get('description')
-        ?.patchValue(this.selectedIncome.description);
+        ?.patchValue(this.selectedContribution.description);
       this.contributionForm
         .get('currencySymbol')
-        ?.patchValue(this.selectedIncome.amount.currencySymbol);
+        ?.patchValue(this.selectedContribution.amount.currencySymbol);
       this.contributionForm
         .get('amount')
-        ?.patchValue(this.selectedIncome.amount.amount);
+        ?.patchValue(this.selectedContribution.amount.amount);
       this.contributionForm
         .get('cycle')
-        ?.patchValue(this.selectedIncome.amount.cycle.id);
-      this.contributionForm.get('start')?.patchValue(this.selectedIncome.start.year);
-      this.contributionForm.get('end')?.patchValue(this.selectedIncome.end.year);
+        ?.patchValue(this.selectedContribution.amount.cycle.id);
+      this.contributionForm.get('start')?.patchValue(this.selectedContribution.start.year);
+      this.contributionForm.get('end')?.patchValue(this.selectedContribution.end.year);
     }
   }
 
@@ -132,7 +132,7 @@ export class AddContributionComponent {
     if (this.contributionForm.valid) {
       console.log('Form Submitted', this.contributionForm.value);
       var contribution: FundsViewModel = {
-        id: this.isEditWorkflow ? this.selectedIncome.id : null,
+        id: this.isEditWorkflow ? this.selectedContribution.id : null,
         associatedSavingPotId: '',
         description: this.contributionForm.get('description')?.value,
         amount: {
@@ -194,7 +194,7 @@ export class AddContributionComponent {
         .subscribe((res) => {
           this.dialogRef.close({
             status: 'Success',
-            incomeExpense: res,
+            contributionWithdrawal: res,
           });
         });
       // Handle form submission logic

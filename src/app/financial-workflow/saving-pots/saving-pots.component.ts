@@ -13,7 +13,7 @@ import {
 } from '@angular/cdk/drag-drop';
 import { animate, style, transition, trigger } from '@angular/animations';
 import { CommonModule } from '@angular/common';
-import { combineLatest, switchMap, tap } from 'rxjs';
+import { combineLatest, map, switchMap, tap } from 'rxjs';
 import { SavingsPotsHttpService as SavingPotsHttpService } from './services/savings-pots-http.service';
 import { ClientSaving, SavingPotsModel as SavingPots } from './models/saving-pots.model';
 import { Cashflow } from 'src/app/clients/models/cashflow';
@@ -247,6 +247,17 @@ export class SavingPotsComponent implements OnInit {
       this.savingPots = result.savingPot;
       // this.savingPots.clientSavings.push(result.clientSaving);
     });
+  }
+  
+  deleteEventClicked(event: ClientSaving) {
+    if(this.selectedCashflow) {
+      this.savingPotsHttpService.deleteSavingPot(this.selectedCashflow?.id, event).pipe(
+        map((res) => {
+          const index = this.savingPots.clientSavings.findIndex(x => x.id === event.id);
+          this.savingPots.clientSavings.splice(index, 1);
+        })
+      ).subscribe();
+    }
   }
   
   newEventClicked() {

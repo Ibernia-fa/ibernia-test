@@ -28,6 +28,7 @@ import { WithdrawalsContributionsHttpService } from '../services/withdrawals-con
 import moment from 'moment';
 import { FundsViewModel } from '../model/withdrawals-contributions';
 import { catchError, filter } from 'rxjs';
+import { SavingPotsModel } from '../../saving-pots/models/saving-pots.model';
 
 @Component({
   selector: 'app-add-withdrawal',
@@ -58,8 +59,9 @@ export class AddWithdrawalComponent {
   clientPreferredCurrency: string;
   clientBirthYear: number;
   isEditWorkflow = false;
-  selectedExpense: FundsViewModel;
+  selectedWithdrawal: FundsViewModel;
   showStartEnd = false;
+  savingPots: SavingPotsModel;
 
   constructor(
     private dialogRef: MatDialogRef<AddWithdrawalComponent>,
@@ -73,7 +75,8 @@ export class AddWithdrawalComponent {
     this.clientPreferredCurrency = data.clientPreferredCurrency;
     this.cashflowId = data.cashflowId;
     this.isEditWorkflow = data.isEditWorkflow;
-    this.selectedExpense = data.selectedExpense;
+    this.selectedWithdrawal = data.selectedWithdrawal;
+    this.savingPots = data.savingPots
 
     var iterations = data.forecastEndDateYear - data.forecastStartDateYear;
 
@@ -86,29 +89,31 @@ export class AddWithdrawalComponent {
       description: ['', Validators.required],
       currencySymbol: [this.clientPreferredCurrency, [Validators.required]],
       amount: [0, [Validators.required, Validators.min(0)]],
-      cycle: [this.cycles[0].id, Validators.required],
+      cycle: [this.cycles[1].id, Validators.required],
       start: ['', Validators.required],
       end: [''],
+      savingPot: ['']
     });
 
     if (this.isEditWorkflow) {
-      this.onCycleValueChange(this.selectedExpense.amount.cycle.id);
+      this.onCycleValueChange(this.selectedWithdrawal.amount.cycle.id);
       this.withdrawalForm
         .get('description')
-        ?.patchValue(this.selectedExpense.description);
+        ?.patchValue(this.selectedWithdrawal.description);
       this.withdrawalForm
         .get('currencySymbol')
-        ?.patchValue(this.selectedExpense.amount.currencySymbol);
+        ?.patchValue(this.selectedWithdrawal.amount.currencySymbol);
       this.withdrawalForm
         .get('amount')
-        ?.patchValue(this.selectedExpense.amount.amount);
+        ?.patchValue(this.selectedWithdrawal.amount.amount);
       this.withdrawalForm
         .get('cycle')
-        ?.patchValue(this.selectedExpense.amount.cycle.id);
+        ?.patchValue(this.selectedWithdrawal.amount.cycle.id);
       this.withdrawalForm
         .get('start')
-        ?.patchValue(this.selectedExpense.start.year);
-      this.withdrawalForm.get('end')?.patchValue(this.selectedExpense.end.year);
+        ?.patchValue(this.selectedWithdrawal.start.year);
+      this.withdrawalForm.get('end')?.patchValue(this.selectedWithdrawal.end.year);
+      this.withdrawalForm.get('savingPot')?.patchValue(this.selectedWithdrawal.associatedSavingPotId);
     }
   }
 
@@ -134,8 +139,8 @@ export class AddWithdrawalComponent {
     if (this.withdrawalForm.valid) {
       console.log('Form Submitted', this.withdrawalForm.value);
       var withdrawal: FundsViewModel = {
-        id: this.isEditWorkflow ? this.selectedExpense.id : null,
-        associatedSavingPotId: '',
+        id: this.isEditWorkflow ? this.selectedWithdrawal.id : null,
+        associatedSavingPotId: this.withdrawalForm.get('savingPot')?.value ?? '',
         description: this.withdrawalForm.get('description')?.value,
         amount: {
           amount: this.withdrawalForm.get('amount')?.value,
@@ -196,7 +201,7 @@ export class AddWithdrawalComponent {
         .subscribe((res) => {
           this.dialogRef.close({
             status: 'Success',
-            incomeExpense: res,
+            contributionWithdrawal: res,
           });
         });
       // Handle form submission logic

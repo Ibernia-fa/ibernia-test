@@ -86,7 +86,7 @@ export class AddExpenseComponent {
       description: ['', Validators.required],
       currencySymbol: [this.clientPreferredCurrency, [Validators.required]],
       amount: [0, [Validators.required, Validators.min(0)]],
-      cycle: [this.cycles[0].id, Validators.required],
+      cycle: [this.cycles[1].id, Validators.required],
       start: ['', Validators.required],
       end: [''],
     });

@@ -151,8 +151,10 @@
               <div class="w-100">
                 <div class="w-100 form-field">
                   <div class="select-option">
-                    <mat-select value="Select" hideSingleSelectionIndicator>
-                      <mat-option value="1">1</mat-option>
+                    <mat-select value="Select" formControlName="savingPot" hideSingleSelectionIndicator>
+                      @for (saving of savingPots.clientSavings; track saving) {
+                        <mat-option [value]="saving.id">{{ saving.name }}</mat-option>
+                        }
                     </mat-select>
                   </div>
                   <!-- Error  -->

@@ -137,7 +137,7 @@ export class WithdrawalsContributionsComponent {
     });
 
     dialogRef.afterClosed().subscribe((result: any) => {
-      this.updateContributionWithdrawalByResponse(result.ContributionWithdrawal);
+      this.updateContributionWithdrawalByResponse(result.contributionWithdrawal);
     });
   }
 
@@ -154,12 +154,13 @@ export class WithdrawalsContributionsComponent {
         cashflowId: this.selectedCashflow?.id,
         forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
         forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
+        savingPots: this.savingsPots
       },
     });
 
     dialogRef.afterClosed().subscribe((result: any) => {
       console.log('Dialog closed with result:', result);
-      this.updateContributionWithdrawalByResponse(result.ContributionWithdrawal);
+      this.updateContributionWithdrawalByResponse(result.contributionWithdrawal);
     });
   }
 
@@ -182,7 +183,7 @@ export class WithdrawalsContributionsComponent {
     });
 
     dialogRef.afterClosed().subscribe((result: any) => {
-      this.updateContributionWithdrawalByResponse(result.ContributionWithdrawal);
+      this.updateContributionWithdrawalByResponse(result.contributionWithdrawal);
     });
   }
 
@@ -201,12 +202,13 @@ export class WithdrawalsContributionsComponent {
         isEditWorkflow: true,
         forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
         forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
+        savingPots: this.savingsPots
       },
     });
 
     dialogRef.afterClosed().subscribe((result: any) => {
       console.log('Dialog closed with result:', result);
-      this.updateContributionWithdrawalByResponse(result.ContributionWithdrawal);
+      this.updateContributionWithdrawalByResponse(result.contributionWithdrawal);
     });
   }
 

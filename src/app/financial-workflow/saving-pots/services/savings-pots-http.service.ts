@@ -22,4 +22,10 @@ export class SavingsPotsHttpService {
   updateSavingPot(cashflowId: string, clientSaving: ClientSaving) {
     return this.httpClient.put<SavingPotsModel>(`/api/v1/cashflows/${cashflowId}/saving-pots`, clientSaving);
   }
+  deleteSavingPot(cashflowId: string, clientSaving: ClientSaving) {
+    return this.httpClient.delete(`/api/v1/cashflows/${cashflowId}/saving-pots`, {
+      body: clientSaving,
+      responseType: 'text'
+    });
+  }
 }

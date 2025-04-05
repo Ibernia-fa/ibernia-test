@@ -123,7 +123,8 @@
         <!-- End Starting pot value Field  -->
 
         <!-- Slider Section  -->
-        <div class="d-flex flex-column gap-4">
+        @if(savingsForm.get('name')?.value !== 'Cash') {
+          <div class="d-flex flex-column gap-4">
           <div class="d-flex gap-8 align-items-center">
             <mat-label class="f-s-16 f-w-400 d-block">Return rate</mat-label>
             <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
@@ -153,6 +154,7 @@
           <span class="field-error d-block">Return Rate is required</span>
           }
         </div>
+      }
         <!-- End Slider Section  -->
 
         <!-- CheckBox  -->
@@ -236,6 +238,7 @@
         <!-- Finish Savings pot is locked between  -->
 
         <!-- CheckBox  -->
+        @if(savingsForm.get('name')?.value !== 'Cash') {
         <div class="checkbox-box">
           <div>
             <input type="checkbox" id="commissions"
@@ -248,7 +251,7 @@
         @if(savingsForm.get('commissions')?.value) {
         <div class="d-flex flex-column gap-12">
           <!-- Modal tabs  -->
-          <div class="d-flex flex-column gap-6 tab">
+          <!-- <div class="d-flex flex-column gap-6 tab">
             <span class="f-s-16 f-w-400">Commission type</span>
             <div class="tabs">
               <div class="row">
@@ -272,8 +275,21 @@
                 </div>
               </div>
             </div>
-          </div>
+          </div> -->
           <!-- End Modal tabs  -->
+          <div class="position-relative">
+            <div class="w-100 form-field">
+              <div class="select-option">
+                <mat-select formControlName="commissionType" value="Select">
+                  <mat-option value="amount">Amount</mat-option>
+                  <mat-option value="percentage">Percentage</mat-option>
+                  <mat-option value="both">Both</mat-option>
+                </mat-select>
+              </div>
+              <!-- <span class="field-error d-block">Escalation Rate is required</span> -->
+              <!-- End error  -->
+            </div>
+          </div>
 
           <!-- Net Amount Field  -->
           @if(savingsForm.get('commissionType')?.value === 'amount' || savingsForm.get('commissionType')?.value === 'both') {
@@ -340,7 +356,7 @@
             <div class="d-flex flex-column gap-4 net-fields">
               <div class="net-field d-flex align-items-center">
                 <!-- Currency Selector  -->
-                <div class="left">
+                <!-- <div class="left">
                   <mat-select value="£" formControlName="commissionPercentageCurrency" class="sortby-edit-profile"
                     hideSingleSelectionIndicator>
                     @for (country of countries; track country) {
@@ -352,7 +368,7 @@
                     }
                     }
                   </mat-select>
-                </div>
+                </div> -->
                 <!-- End Currency Selector  -->
                 <!-- Price Field  -->
                 <div class="w-100 form-field input-container">
@@ -392,7 +408,8 @@
           <!-- End Net Amount Field  -->
         </div>
 
-        <div class="w-100 form-field gap-12">
+        @if(savingsForm.get('commissionType')?.value !== 'percentage'){
+          <div class="w-100 form-field gap-12">
           <div class="d-flex gap-8 align-items-center">
             <mat-label class="f-s-16 f-w-400 d-block">Commission escalation rate</mat-label>
             <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
@@ -416,8 +433,10 @@
             </div>
           </div>
         </div>
+      }
 
         }
+      }
       </div>
     </mat-dialog-content>
     <!-- End Modal Body  -->

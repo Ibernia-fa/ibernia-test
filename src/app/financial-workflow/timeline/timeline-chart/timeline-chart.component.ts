@@ -494,7 +494,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
       showCurrentTime: false, // Hide default current time marker
       // showCustomTime: true, // Allows custom markers
       showMajorLabels: true,
-      timeAxis: { scale: 'year', step: 5 },
+      timeAxis: { scale: 'year', step: 2 },
       format: {
         minorLabels: function (date: any) {
           return `
@@ -662,6 +662,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
             eventType: EventType.CUSTOM,
             customEvents: this.customEventsLibrary,
             timelineId: this.financialTimeline.id,
+            isIncomeEvent: true,
             cashflowId: this.financialTimeline.cashflow.id,
             clientBirthDate: this.clientBirthDate,
             clientPreferredCurrency: this.client.clientDetails.preferredCurrency,

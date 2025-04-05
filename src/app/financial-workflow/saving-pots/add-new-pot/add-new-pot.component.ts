@@ -73,10 +73,11 @@ export class AddNewPotComponent {
   inflationRate = 2.5;
   isEditWorkflow = false;
   selectedPot: ClientSaving;
+  savingPotType= SavingPotType
 
   savingPotValues = [
     {
-      name: 'Savings',
+      name: 'Cash',
       iconUrl: 'cashflow-moneys-icon',
       type: SavingPotType.Cash,
     },
@@ -173,7 +174,7 @@ export class AddNewPotComponent {
       selectedComissionType = 'both'
     }
     this.savingsForm.get('commissionType')?.patchValue(selectedComissionType);
-    if(this.selectedPot.comission.type === ComissionType.Percentage || this.selectedPot.comission.type === ComissionType.Both) {
+    if(this.selectedPot.comission.type === ComissionType.Amount || this.selectedPot.comission.type === ComissionType.Both) {
       this.savingsForm.get('commissionCurrency')?.patchValue(this.selectedPot.comission.amount.currencySymbol);
       this.savingsForm.get('commissionAmount')?.patchValue(this.selectedPot.comission.amount.amount);
       this.savingsForm.get('commissionCycle')?.patchValue(this.selectedPot.comission.amount.cycle.id);
@@ -339,7 +340,7 @@ export class AddNewPotComponent {
         nominalValue: 0,
         realValue: 0,
         realGrowthRate: 0,
-        inflationRate: this.inflationRate,
+        inflationRate: this.savingsForm.get('name')?.value !== 'Cash' ? this.inflationRate : 0,
         startingPotValue: {
           amount: this.savingsForm.get('amount')?.value,
           currencySymbol: this.savingsForm.get('currency')?.value,
@@ -422,13 +423,13 @@ export class AddNewPotComponent {
               ? this.savingsForm.get('end')?.value
               : 0,
         },
-        returnRate: this.savingsForm.get('returnRate')?.value,
+        returnRate: this.savingsForm.get('name')?.value !== 'Cash' ? this.savingsForm.get('returnRate')?.value : 0,
         type:
           this.savingPotValues.find(
             (x) => this.savingsForm.get('name')?.value === x.name
           )?.type ?? SavingPotType.Cash,
-        realReturn:
-          this.savingsForm.get('returnRate')?.value - this.inflationRate,
+        realReturn: this.savingsForm.get('name')?.value !== 'Cash' ?
+          this.savingsForm.get('returnRate')?.value - this.inflationRate : 0,
       };
 
       var function$ = !this.isEditWorkflow ? this.savingPotsHttpService
