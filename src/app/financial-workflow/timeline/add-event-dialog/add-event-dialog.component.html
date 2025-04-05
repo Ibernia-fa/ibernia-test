@@ -287,26 +287,28 @@
     </div>
     <!-- Finish Start End  -->
 
-    <div class="w-100 form-field gap-12">
-      <div class="d-flex gap-8 align-items-center">
-        <mat-label class="f-s-16 f-w-400 d-block">Escalation rate</mat-label>
-        <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
-      </div>
-      <div class="position-relative">
-        <div class="w-100 form-field">
-          <div class="select-option">
-            <mat-select formControlName="escalationRate" value="Select">
-              <mat-option value="2.5%">Increase at same rate as inflation (2.5%)</mat-option>
-              <mat-option value="0%">Don't increase with inflation</mat-option>
-            </mat-select>
+    @if(eventForm.get('cycle')?.value !== 'One-Off') {
+      <div class="w-100 form-field gap-12">
+        <div class="d-flex gap-8 align-items-center">
+          <mat-label class="f-s-16 f-w-400 d-block">Escalation rate</mat-label>
+          <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
+        </div>
+        <div class="position-relative">
+          <div class="w-100 form-field">
+            <div class="select-option">
+              <mat-select formControlName="escalationRate" value="Select">
+                <mat-option value="2.5%">Increase at same rate as inflation (2.5%)</mat-option>
+                <mat-option value="0%">Don't increase with inflation</mat-option>
+              </mat-select>
+            </div>
+            @if(eventForm.get('escalationRate')?.touched &&
+            eventForm.get('escalationRate')?.hasError('required')) {
+            <span class="field-error d-block">Escalation Rate is required</span>
+            }
           </div>
-          @if(eventForm.get('escalationRate')?.touched &&
-          eventForm.get('escalationRate')?.hasError('required')) {
-          <span class="field-error d-block">Escalation Rate is required</span>
-          }
         </div>
       </div>
-    </div>
+    }
   </div>
   <!-- End Modal Body  -->
 
@@ -529,27 +531,28 @@
           </div>
         </div>
         <!-- Finish Start End  -->
-
-        <div class="w-100 form-field gap-12">
-          <div class="d-flex gap-8 align-items-center">
-            <mat-label class="f-s-16 f-w-400 d-block">Escalation rate</mat-label>
-            <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
-          </div>
-          <div class="position-relative">
-            <div class="w-100 form-field">
-              <div class="select-option">
-                <mat-select formControlName="escalationRate" value="Select">
-                  <mat-option value="2.5%">Increase at same rate as inflation (2.5%)</mat-option>
-                  <mat-option value="0%">Don't increase with inflation</mat-option>
-                </mat-select>
+        @if(eventForm.get('cycle')?.value !== 'One-Off') {
+          <div class="w-100 form-field gap-12">
+            <div class="d-flex gap-8 align-items-center">
+              <mat-label class="f-s-16 f-w-400 d-block">Escalation rate</mat-label>
+              <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
+            </div>
+            <div class="position-relative">
+              <div class="w-100 form-field">
+                <div class="select-option">
+                  <mat-select formControlName="escalationRate" value="Select">
+                    <mat-option value="2.5%">Increase at same rate as inflation (2.5%)</mat-option>
+                    <mat-option value="0%">Don't increase with inflation</mat-option>
+                  </mat-select>
+                </div>
+                @if(eventForm.get('escalationRate')?.touched &&
+                eventForm.get('escalationRate')?.hasError('required')) {
+                <span class="field-error d-block">Escalation Rate is required</span>
+                }
               </div>
-              @if(eventForm.get('escalationRate')?.touched &&
-              eventForm.get('escalationRate')?.hasError('required')) {
-              <span class="field-error d-block">Escalation Rate is required</span>
-              }
             </div>
           </div>
-        </div>
+        }
       </div>
     </mat-dialog-content>
     <!-- End Modal Body  -->

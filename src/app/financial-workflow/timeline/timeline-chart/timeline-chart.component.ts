@@ -95,6 +95,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
         //     't1'
         //   );
         this.timeline.redraw();
+        
       }
     }
   }
@@ -406,6 +407,18 @@ export class TimelineChartComponent implements OnInit, OnChanges {
       this.timelineOptions
     );
 
+    this.timeline.on('doubleClick', (event) => {
+      event.event.preventDefault();
+      event.event.stopPropagation();
+      console.log({event});
+      if(event.event.type === 'dblclick') {
+        var clientEvent = this.financialTimeline.clientEvents.find(ce => ce.id === event.item);
+        if(clientEvent)
+          this.updateEventByDoubleClick(clientEvent);
+
+      }
+    })
+
     console.log(this.financialTimeline.startAt);
     // if (
     //   this.financialTimeline.startAt &&
@@ -494,7 +507,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
       showCurrentTime: false, // Hide default current time marker
       // showCustomTime: true, // Allows custom markers
       showMajorLabels: true,
-      timeAxis: { scale: 'year', step: 2 },
+      timeAxis: { scale: 'year' },
       format: {
         minorLabels: function (date: any) {
           return `
@@ -515,9 +528,24 @@ export class TimelineChartComponent implements OnInit, OnChanges {
         console.log(item);
         this.handleEventUpdate(item, callback);
       },
+      onMoving: (item, callback) => {
+        console.log(item);
+        this.handleEventMoving(item, callback)
+      }
     };
   }
 
+  handleEventMoving(item: any, callback: (item: any) => void) {
+    try {
+      this.timeline.getCustomTime('dragOver')
+      this.timeline.setCustomTime(item.start, 'dragOver');
+      callback(item)
+    }
+    catch(ex) {
+      this.timeline.addCustomTime(new Date(), 'dragOver');
+      callback(item);
+    }
+  }
   currentZoomPercentage = 0.1;
   moveable = false;
   zoomIn() {
@@ -542,6 +570,21 @@ export class TimelineChartComponent implements OnInit, OnChanges {
   }
 
   handleEventUpdate(item: any, callback: (item: any) => void) {
+    this.timeline.removeCustomTime('dragOver');
+
+    const dropTime = item.start;
+
+    if (
+      moment(dropTime).year() <
+        moment(this.financialTimeline.forecastStartDate).year() ||
+      moment(dropTime).year() >
+        moment(this.financialTimeline.forecastEndtDate).year()
+    )
+    {
+      this.timeline.setItems(this.timelineData);
+      return;
+    }
+
     var clientEvent = this.financialTimeline.clientEvents.find(
       (event) => event.id === item.id
     );
@@ -699,6 +742,116 @@ export class TimelineChartComponent implements OnInit, OnChanges {
         if (clientEvent) {
         }
       }
+    }
+  }
+
+  updateEventByDoubleClick(clientEvent: ClientEvent) {
+    if (
+      clientEvent.name === 'Inheritance' ||
+      clientEvent.name === 'Wedding'
+    ) {
+      const dialogRef = this.dialog.open(AddEventDialogComponent, {
+        width: '600px',
+        disableClose: true,
+        data: {
+          eventType: EventType.INHERITANCE,
+          timelineId: this.financialTimeline.id,
+          cashflowId: this.financialTimeline.cashflow.id,
+          isIncomeEvent: clientEvent.type === EventIncomeType.Income,
+          systemEvent: clientEvent,
+          dropTime: new Date(clientEvent.start.year, 0),
+          clientBirthDate: this.clientBirthDate,
+          clientPreferredCurrency: this.client.clientDetails.preferredCurrency,
+          forecastStartDateYear: moment(this.financialTimeline.forecastStartDate).year(),
+          forecastEndDateYear: moment(this.financialTimeline.forecastEndtDate).year(),
+          isEditWorkflow: true,
+          patchEvent: clientEvent,
+        },
+      });
+
+      dialogRef.afterClosed().subscribe((result: any) => {
+        console.log('Dialog closed with result:', result);
+        if ((result.status = 'Success')) {
+          this.updateTimelines.emit();
+        }
+      });
+    }
+
+    if (clientEvent.name === 'State Pension') {
+      const dialogRef = this.dialog.open(AddEventDialogComponent, {
+        width: '600px',
+        disableClose: true,
+        data: {
+          eventType: EventType.STATE_PENSION,
+          timelineId: this.financialTimeline.id,
+          cashflowId: this.financialTimeline.cashflow.id,
+          isIncomeEvent: clientEvent.type === EventIncomeType.Income,
+          systemEvent: clientEvent,
+          dropTime: new Date(clientEvent.start.year, 0),
+          clientBirthDate: this.clientBirthDate,
+          clientPreferredCurrency: this.client.clientDetails.preferredCurrency,
+          forecastStartDateYear: moment(this.financialTimeline.forecastStartDate).year(),
+          forecastEndDateYear: moment(this.financialTimeline.forecastEndtDate).year(),
+          eventsList: this.financialTimeline.clientEvents.map((event) => {
+            return {
+              name: event.name,
+              year: event.start.year,
+              age:
+                event.start.year -
+                moment(new Date(this.clientBirthDate)).year(),
+            };
+          }),
+          isEditWorkflow: true,
+          patchEvent: clientEvent,
+        },
+      });
+
+      dialogRef.afterClosed().subscribe((result: any) => {
+        console.log('Dialog closed with result:', result);
+        if ((result.status = 'Success')) {
+          this.updateTimelines.emit();
+        }
+      });
+    }
+
+    if (
+      this.systemEventsLibrary.every(
+        (event) => event.name !== clientEvent?.name
+      )
+    ) {
+      const dialogRef = this.dialog.open(AddEventDialogComponent, {
+        width: '900px',
+        disableClose: true,
+        data: {
+          eventType: EventType.CUSTOM,
+          customEvents: this.customEventsLibrary,
+          timelineId: this.financialTimeline.id,
+          isIncomeEvent: true,
+          cashflowId: this.financialTimeline.cashflow.id,
+          clientBirthDate: this.clientBirthDate,
+          clientPreferredCurrency: this.client.clientDetails.preferredCurrency,
+          forecastStartDateYear: moment(this.financialTimeline.forecastStartDate).year(),
+          forecastEndDateYear: moment(this.financialTimeline.forecastEndtDate).year(),
+          eventsList: this.financialTimeline.clientEvents.map((event) => {
+            return {
+              name: event.name,
+              year: event.start.year,
+              age:
+                event.start.year -
+                moment(new Date(this.clientBirthDate)).year(),
+            };
+          }),
+          isEditWorkflow: true,
+          patchEvent: clientEvent,
+        },
+      });
+
+      dialogRef.afterClosed().subscribe((result: any) => {
+        console.log('Dialog closed with result:', result);
+        if ((result.status = 'Success')) {
+          this.updateTimelines.emit();
+        }
+      });
     }
   }
 

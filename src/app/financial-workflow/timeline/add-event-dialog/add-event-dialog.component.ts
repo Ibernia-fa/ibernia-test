@@ -146,7 +146,7 @@ export class AddEventDialogComponent {
           isIncomeEvent: [true, Validators.required],
           currency: [this.clientPreferredCurrency, Validators.required],
           amount: ['', [Validators.required, Validators.min(0)]],
-          cycle: ['', [Validators.required]],
+          cycle: ['One-Off', [Validators.required]],
           start: [0, Validators.required],
           end: [0, Validators.required],
           escalationRate: ['', Validators.required],
@@ -212,10 +212,14 @@ export class AddEventDialogComponent {
     if(event === 'One-Off') {
       this.eventForm.controls['end'].clearValidators();
       this.eventForm.controls['end'].updateValueAndValidity();
+      this.eventForm.controls['escalationRate'].clearValidators();
+      this.eventForm.controls['escalationRate'].updateValueAndValidity();
     }
     else {
       this.eventForm.controls['end'].addValidators(Validators.required);
       this.eventForm.controls['end'].updateValueAndValidity();
+      this.eventForm.controls['escalationRate'].addValidators(Validators.required);
+      this.eventForm.controls['escalationRate'].updateValueAndValidity();
     }
   }
 
