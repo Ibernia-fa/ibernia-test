@@ -452,6 +452,10 @@ export class TimelineChartComponent implements OnInit, OnChanges {
               ? new Date(event.end.year, 1)
               : new Date(event.start.year + 14, 1),
           className: event.iconUrl,
+          editable: {
+            updateTime: !event.isOneOff,
+            remove: true,
+          }
         };
       }
     );
@@ -468,6 +472,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
         updateTime: true, // Allow changing event time by dragging
         updateGroup: false, // Prevent moving events between groups
         remove: true, // Prevent deletion via UI
+        overrideItems: false
       },
       // snap: function (date: Date) {
       //   const year = moment(date).year();

@@ -3,1743 +3,1743 @@ export const allCountries = [
     countryName: 'Aruba',
     countryCode: 'AW',
     phoneFormat: '',
-    currencySymbol: 'AWG',
     currencyName: '',
+    currencySymbol: 'AWG'
   },
   {
     countryName: 'Afghanistan',
     countryCode: 'AF',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'AFN'
   },
   {
     countryName: 'Angola',
     countryCode: 'AO',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'AOA'
   },
   {
     countryName: 'Anguilla',
     countryCode: 'AI',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'XCD'
   },
   {
-    countryName: '\u00c5land Islands',
+    countryName: 'Åland Islands',
     countryCode: 'AX',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'EUR'
   },
   {
     countryName: 'Albania',
     countryCode: 'AL',
     phoneFormat: '',
-    currencySymbol: 'ALL',
     currencyName: '',
+    currencySymbol: 'ALL'
   },
   {
     countryName: 'Andorra',
     countryCode: 'AD',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'EUR'
   },
   {
     countryName: 'United Arab Emirates',
     countryCode: 'AE',
     phoneFormat: '',
-    currencySymbol: 'AED',
     currencyName: 'Dirham',
+    currencySymbol: 'AED'
   },
   {
     countryName: 'Argentina',
     countryCode: 'AR',
     phoneFormat: '',
-    currencySymbol: 'ARS',
     currencyName: '',
+    currencySymbol: 'ARS'
   },
   {
     countryName: 'Armenia',
     countryCode: 'AM',
     phoneFormat: '',
-    currencySymbol: 'AMD',
     currencyName: '',
+    currencySymbol: 'AMD'
   },
   {
     countryName: 'American Samoa',
     countryCode: 'AS',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'USD'
   },
   {
     countryName: 'Antarctica',
     countryCode: 'AQ',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: '#N/A'
   },
   {
     countryName: 'French Southern Territories',
     countryCode: 'TF',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: '#N/A'
   },
   {
     countryName: 'Antigua and Barbuda',
     countryCode: 'AG',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'XCD'
   },
   {
     countryName: 'Australia',
     countryCode: 'AU',
     phoneFormat: '',
-    currencySymbol: 'AUD',
     currencyName: 'Dollar',
+    currencySymbol: 'AUD'
   },
   {
     countryName: 'Austria',
     countryCode: 'AT',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'EUR'
   },
   {
     countryName: 'Azerbaijan',
     countryCode: 'AZ',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'AZN'
   },
   {
     countryName: 'Burundi',
     countryCode: 'BI',
     phoneFormat: '',
-    currencySymbol: 'BIF',
     currencyName: '',
+    currencySymbol: 'BIF'
   },
   {
     countryName: 'Belgium',
     countryCode: 'BE',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'EUR'
   },
   {
     countryName: 'Benin',
     countryCode: 'BJ',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'XOF'
   },
   {
     countryName: 'Bonaire, Sint Eustatius and Saba',
     countryCode: 'BQ',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'USD'
   },
   {
     countryName: 'Burkina Faso',
     countryCode: 'BF',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'XOF'
   },
   {
     countryName: 'Bangladesh',
     countryCode: 'BD',
     phoneFormat: '',
-    currencySymbol: 'BDT',
     currencyName: '',
+    currencySymbol: 'BDT'
   },
   {
     countryName: 'Bulgaria',
     countryCode: 'BG',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'BGN'
   },
   {
     countryName: 'Bahrain',
     countryCode: 'BH',
     phoneFormat: '',
-    currencySymbol: 'BHD',
     currencyName: '',
+    currencySymbol: 'BHD'
   },
   {
     countryName: 'Bahamas',
     countryCode: 'BS',
     phoneFormat: '',
-    currencySymbol: 'BSD',
     currencyName: '',
+    currencySymbol: 'BSD'
   },
   {
     countryName: 'Bosnia and Herzegovina',
     countryCode: 'BA',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'BAM'
   },
   {
-    countryName: 'Saint Barth\u00e9lemy',
+    countryName: 'Saint Barthélemy',
     countryCode: 'BL',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: '#N/A'
   },
   {
     countryName: 'Belarus',
     countryCode: 'BY',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'BYN'
   },
   {
     countryName: 'Belize',
     countryCode: 'BZ',
     phoneFormat: '',
-    currencySymbol: 'BZD',
     currencyName: '',
+    currencySymbol: 'BZD'
   },
   {
     countryName: 'Bermuda',
     countryCode: 'BM',
     phoneFormat: '',
-    currencySymbol: 'BMD',
     currencyName: '',
+    currencySymbol: 'BMD'
   },
   {
     countryName: 'Bolivia, Plurinational State of',
     countryCode: 'BO',
     phoneFormat: '',
-    currencySymbol: 'BOB',
     currencyName: '',
+    currencySymbol: 'BOB'
   },
   {
     countryName: 'Brazil',
     countryCode: 'BR',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'BRL'
   },
   {
     countryName: 'Barbados',
     countryCode: 'BB',
     phoneFormat: '',
-    currencySymbol: 'BBD',
     currencyName: '',
+    currencySymbol: 'BBD'
   },
   {
     countryName: 'Brunei Darussalam',
     countryCode: 'BN',
     phoneFormat: '',
-    currencySymbol: 'BND',
     currencyName: '',
+    currencySymbol: 'BND'
   },
   {
     countryName: 'Bhutan',
     countryCode: 'BT',
     phoneFormat: '',
-    currencySymbol: 'BTN',
     currencyName: '',
+    currencySymbol: 'BTN'
   },
   {
     countryName: 'Bouvet Island',
     countryCode: 'BV',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: '#N/A'
   },
   {
     countryName: 'Botswana',
     countryCode: 'BW',
     phoneFormat: '',
-    currencySymbol: 'BWP',
     currencyName: '',
+    currencySymbol: 'BWP'
   },
   {
     countryName: 'Central African Republic',
     countryCode: 'CF',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'XAF'
   },
   {
     countryName: 'Canada',
     countryCode: 'CA',
     phoneFormat: '',
-    currencySymbol: 'CAD',
     currencyName: 'Dollar',
+    currencySymbol: 'CAD'
   },
   {
     countryName: 'Cocos (Keeling) Islands',
     countryCode: 'CC',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: '#N/A'
   },
   {
     countryName: 'Switzerland',
     countryCode: 'CH',
     phoneFormat: '',
-    currencySymbol: 'CHF',
     currencyName: '',
+    currencySymbol: 'CHF'
   },
   {
     countryName: 'Chile',
     countryCode: 'CL',
     phoneFormat: '',
-    currencySymbol: 'CLP',
     currencyName: '',
+    currencySymbol: 'CLP'
   },
   {
     countryName: 'China',
     countryCode: 'CN',
     phoneFormat: '',
-    currencySymbol: 'CNY',
     currencyName: '',
+    currencySymbol: 'CNY'
   },
   {
-    countryName: "C\u00f4te d'Ivoire",
+    countryName: 'Côte d"Ivoire',
     countryCode: 'CI',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'XOF'
   },
   {
     countryName: 'Cameroon',
     countryCode: 'CM',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'XAF'
   },
   {
     countryName: 'Congo, The Democratic Republic of the',
     countryCode: 'CD',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'CDF'
   },
   {
     countryName: 'Congo',
     countryCode: 'CG',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'XAF'
   },
   {
     countryName: 'Cook Islands',
     countryCode: 'CK',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'NZD'
   },
   {
     countryName: 'Colombia',
     countryCode: 'CO',
     phoneFormat: '',
-    currencySymbol: 'COP',
     currencyName: '',
+    currencySymbol: 'COP'
   },
   {
     countryName: 'Comoros',
     countryCode: 'KM',
     phoneFormat: '',
-    currencySymbol: 'KMF',
     currencyName: '',
+    currencySymbol: 'KMF'
   },
   {
     countryName: 'Cabo Verde',
     countryCode: 'CV',
     phoneFormat: '',
-    currencySymbol: 'CVE',
     currencyName: '',
+    currencySymbol: 'CVE'
   },
   {
     countryName: 'Costa Rica',
     countryCode: 'CR',
     phoneFormat: '',
-    currencySymbol: 'CRC',
     currencyName: '',
+    currencySymbol: 'CRC'
   },
   {
     countryName: 'Cuba',
     countryCode: 'CU',
     phoneFormat: '',
-    currencySymbol: 'CUP',
     currencyName: '',
+    currencySymbol: 'CUP'
   },
   {
-    countryName: 'Cura\u00e7ao',
+    countryName: 'Curaçao',
     countryCode: 'CW',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'ANG'
   },
   {
     countryName: 'Christmas Island',
     countryCode: 'CX',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: '#N/A'
   },
   {
     countryName: 'Cayman Islands',
     countryCode: 'KY',
     phoneFormat: '',
-    currencySymbol: 'KYD',
     currencyName: '',
+    currencySymbol: 'KYD'
   },
   {
     countryName: 'Cyprus',
     countryCode: 'CY',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'EUR'
   },
   {
     countryName: 'Czechia',
     countryCode: 'CZ',
     phoneFormat: '',
-    currencySymbol: 'CZK',
     currencyName: '',
+    currencySymbol: 'CZK'
   },
   {
     countryName: 'Germany',
     countryCode: 'DE',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'EUR'
   },
   {
     countryName: 'Djibouti',
     countryCode: 'DJ',
     phoneFormat: '',
-    currencySymbol: 'DJF',
     currencyName: '',
+    currencySymbol: 'DJF'
   },
   {
     countryName: 'Dominica',
     countryCode: 'DM',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'XCD'
   },
   {
     countryName: 'Denmark',
     countryCode: 'DK',
     phoneFormat: '',
-    currencySymbol: 'DKK',
     currencyName: '',
+    currencySymbol: 'DKK'
   },
   {
     countryName: 'Dominican Republic',
     countryCode: 'DO',
     phoneFormat: '',
-    currencySymbol: 'DOP',
     currencyName: '',
+    currencySymbol: 'DOP'
   },
   {
     countryName: 'Algeria',
     countryCode: 'DZ',
     phoneFormat: '',
-    currencySymbol: 'DZD',
     currencyName: '',
+    currencySymbol: 'DZD'
   },
   {
     countryName: 'Ecuador',
     countryCode: 'EC',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'USD'
   },
   {
     countryName: 'Egypt',
     countryCode: 'EG',
     phoneFormat: '',
-    currencySymbol: 'EGP',
     currencyName: '',
+    currencySymbol: 'EGP'
   },
   {
     countryName: 'Eritrea',
     countryCode: 'ER',
     phoneFormat: '',
-    currencySymbol: 'ERN',
     currencyName: '',
+    currencySymbol: 'ERN'
   },
   {
     countryName: 'Western Sahara',
     countryCode: 'EH',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: '#N/A'
   },
   {
     countryName: 'Spain',
     countryCode: 'ES',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'EUR'
   },
   {
     countryName: 'Estonia',
     countryCode: 'EE',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'EUR'
   },
   {
     countryName: 'Ethiopia',
     countryCode: 'ET',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'ETB'
   },
   {
     countryName: 'Finland',
     countryCode: 'FI',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'EUR'
   },
   {
     countryName: 'Fiji',
     countryCode: 'FJ',
     phoneFormat: '',
-    currencySymbol: 'FJD',
     currencyName: '',
+    currencySymbol: 'FJD'
   },
   {
     countryName: 'Falkland Islands (Malvinas)',
     countryCode: 'FK',
     phoneFormat: '',
-    currencySymbol: 'FKP',
     currencyName: '',
+    currencySymbol: 'FKP'
   },
   {
     countryName: 'France',
     countryCode: 'FR',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'EUR'
   },
   {
     countryName: 'Faroe Islands',
     countryCode: 'FO',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'DKK'
   },
   {
     countryName: 'Micronesia, Federated States of',
     countryCode: 'FM',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'USD'
   },
   {
     countryName: 'Gabon',
     countryCode: 'GA',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'XAF'
   },
   {
     countryName: 'United Kingdom',
     countryCode: 'GB',
     phoneFormat: '',
-    currencySymbol: 'GBP',
     currencyName: 'Pound Sterling',
+    currencySymbol: 'GBP'
   },
   {
     countryName: 'Georgia',
     countryCode: 'GE',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'GEL'
   },
   {
     countryName: 'Guernsey',
     countryCode: 'GG',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'GBP'
   },
   {
     countryName: 'Ghana',
     countryCode: 'GH',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'GHS'
   },
   {
     countryName: 'Gibraltar',
     countryCode: 'GI',
     phoneFormat: '',
-    currencySymbol: 'GIP',
     currencyName: '',
+    currencySymbol: 'GIP'
   },
   {
     countryName: 'Guinea',
     countryCode: 'GN',
     phoneFormat: '',
-    currencySymbol: 'GNF',
     currencyName: '',
+    currencySymbol: 'GNF'
   },
   {
     countryName: 'Guadeloupe',
     countryCode: 'GP',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'EUR'
   },
   {
     countryName: 'Gambia',
     countryCode: 'GM',
     phoneFormat: '',
-    currencySymbol: 'GMD',
     currencyName: '',
+    currencySymbol: 'GMD'
   },
   {
     countryName: 'Guinea-Bissau',
     countryCode: 'GW',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'XOF'
   },
   {
     countryName: 'Equatorial Guinea',
     countryCode: 'GQ',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'XAF'
   },
   {
     countryName: 'Greece',
     countryCode: 'GR',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'EUR'
   },
   {
     countryName: 'Grenada',
     countryCode: 'GD',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'XCD'
   },
   {
     countryName: 'Greenland',
     countryCode: 'GL',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'DKK'
   },
   {
     countryName: 'Guatemala',
     countryCode: 'GT',
     phoneFormat: '',
-    currencySymbol: 'GTQ',
     currencyName: '',
+    currencySymbol: 'GTQ'
   },
   {
     countryName: 'French Guiana',
     countryCode: 'GF',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'EUR'
   },
   {
     countryName: 'Guam',
     countryCode: 'GU',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'USD'
   },
   {
     countryName: 'Guyana',
     countryCode: 'GY',
     phoneFormat: '',
-    currencySymbol: 'GYD',
     currencyName: '',
+    currencySymbol: 'GYD'
   },
   {
     countryName: 'Hong Kong',
     countryCode: 'HK',
     phoneFormat: '',
-    currencySymbol: 'HKD',
     currencyName: '',
+    currencySymbol: 'HKD'
   },
   {
     countryName: 'Heard Island and McDonald Islands',
     countryCode: 'HM',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: '#N/A'
   },
   {
     countryName: 'Honduras',
     countryCode: 'HN',
     phoneFormat: '',
-    currencySymbol: 'HNL',
     currencyName: '',
+    currencySymbol: 'HNL'
   },
   {
     countryName: 'Croatia',
     countryCode: 'HR',
     phoneFormat: '',
-    currencySymbol: 'HRK',
     currencyName: '',
+    currencySymbol: 'EUR'
   },
   {
     countryName: 'Haiti',
     countryCode: 'HT',
     phoneFormat: '',
-    currencySymbol: 'HTG',
     currencyName: '',
+    currencySymbol: 'HTG'
   },
   {
     countryName: 'Hungary',
     countryCode: 'HU',
     phoneFormat: '',
-    currencySymbol: 'HUF',
     currencyName: '',
+    currencySymbol: 'HUF'
   },
   {
     countryName: 'Indonesia',
     countryCode: 'ID',
     phoneFormat: '',
-    currencySymbol: 'IDR',
     currencyName: '',
+    currencySymbol: 'IDR'
   },
   {
     countryName: 'Isle of Man',
     countryCode: 'IM',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'GBP'
   },
   {
     countryName: 'India',
     countryCode: 'IN',
     phoneFormat: '',
-    currencySymbol: 'INR',
     currencyName: 'Rupee',
+    currencySymbol: 'INR'
   },
   {
     countryName: 'British Indian Ocean Territory',
     countryCode: 'IO',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: '#N/A'
   },
   {
     countryName: 'Ireland',
     countryCode: 'IE',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'EUR'
   },
   {
     countryName: 'Iran, Islamic Republic of',
     countryCode: 'IR',
     phoneFormat: '',
-    currencySymbol: 'IRR',
     currencyName: '',
+    currencySymbol: 'IRR'
   },
   {
     countryName: 'Iraq',
     countryCode: 'IQ',
     phoneFormat: '',
-    currencySymbol: 'IQD',
     currencyName: '',
+    currencySymbol: 'IQD'
   },
   {
     countryName: 'Iceland',
     countryCode: 'IS',
     phoneFormat: '',
-    currencySymbol: 'ISK',
     currencyName: '',
+    currencySymbol: 'ISK'
   },
   {
     countryName: 'Israel',
     countryCode: 'IL',
     phoneFormat: '',
-    currencySymbol: 'ILS',
     currencyName: '',
+    currencySymbol: 'ILS'
   },
   {
     countryName: 'Italy',
     countryCode: 'IT',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'EUR'
   },
   {
     countryName: 'Jamaica',
     countryCode: 'JM',
     phoneFormat: '',
-    currencySymbol: 'JMD',
     currencyName: '',
+    currencySymbol: 'JMD'
   },
   {
     countryName: 'Jersey',
     countryCode: 'JE',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'GBP'
   },
   {
     countryName: 'Jordan',
     countryCode: 'JO',
     phoneFormat: '',
-    currencySymbol: 'JOD',
     currencyName: '',
+    currencySymbol: 'JOD'
   },
   {
     countryName: 'Japan',
     countryCode: 'JP',
     phoneFormat: '',
-    currencySymbol: 'JPY',
     currencyName: 'Yen',
+    currencySymbol: 'JPY'
   },
   {
     countryName: 'Kazakhstan',
     countryCode: 'KZ',
     phoneFormat: '',
-    currencySymbol: 'KZT',
     currencyName: '',
+    currencySymbol: 'KZT'
   },
   {
     countryName: 'Kenya',
     countryCode: 'KE',
     phoneFormat: '',
-    currencySymbol: 'KES',
     currencyName: '',
+    currencySymbol: 'KES'
   },
   {
     countryName: 'Kyrgyzstan',
     countryCode: 'KG',
     phoneFormat: '',
-    currencySymbol: 'KGS',
     currencyName: '',
+    currencySymbol: 'KGS'
   },
   {
     countryName: 'Cambodia',
     countryCode: 'KH',
     phoneFormat: '',
-    currencySymbol: 'KHR',
     currencyName: '',
+    currencySymbol: 'KHR'
   },
   {
     countryName: 'Kiribati',
     countryCode: 'KI',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'AUD'
   },
   {
     countryName: 'Saint Kitts and Nevis',
     countryCode: 'KN',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'XCD'
   },
   {
     countryName: 'Korea, Republic of',
     countryCode: 'KR',
     phoneFormat: '',
-    currencySymbol: 'KRW',
     currencyName: '',
+    currencySymbol: 'KRW'
   },
   {
     countryName: 'Kuwait',
     countryCode: 'KW',
     phoneFormat: '',
-    currencySymbol: 'KWD',
     currencyName: '',
+    currencySymbol: 'KWD'
   },
   {
-    countryName: "Lao People's Democratic Republic",
+    countryName: 'Lao People"s Democratic Republic',
     countryCode: 'LA',
     phoneFormat: '',
-    currencySymbol: 'LAK',
     currencyName: '',
+    currencySymbol: 'LAK'
   },
   {
     countryName: 'Lebanon',
     countryCode: 'LB',
     phoneFormat: '',
-    currencySymbol: 'LBP',
     currencyName: '',
+    currencySymbol: 'LBP'
   },
   {
     countryName: 'Liberia',
     countryCode: 'LR',
     phoneFormat: '',
-    currencySymbol: 'LRD',
     currencyName: '',
+    currencySymbol: 'LRD'
   },
   {
     countryName: 'Libya',
     countryCode: 'LY',
     phoneFormat: '',
-    currencySymbol: 'LYD',
     currencyName: '',
+    currencySymbol: 'LYD'
   },
   {
     countryName: 'Saint Lucia',
     countryCode: 'LC',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'XCD'
   },
   {
     countryName: 'Liechtenstein',
     countryCode: 'LI',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'CHF'
   },
   {
     countryName: 'Sri Lanka',
     countryCode: 'LK',
     phoneFormat: '',
-    currencySymbol: 'LKR',
     currencyName: '',
+    currencySymbol: 'LKR'
   },
   {
     countryName: 'Lesotho',
     countryCode: 'LS',
     phoneFormat: '',
-    currencySymbol: 'LSL',
     currencyName: '',
+    currencySymbol: 'LSL'
   },
   {
     countryName: 'Lithuania',
     countryCode: 'LT',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'EUR'
   },
   {
     countryName: 'Luxembourg',
     countryCode: 'LU',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'EUR'
   },
   {
     countryName: 'Latvia',
     countryCode: 'LV',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'EUR'
   },
   {
     countryName: 'Macao',
     countryCode: 'MO',
     phoneFormat: '',
-    currencySymbol: 'MOP',
     currencyName: '',
+    currencySymbol: 'MOP'
   },
   {
     countryName: 'Saint Martin (French part)',
     countryCode: 'MF',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'EUR'
   },
   {
     countryName: 'Morocco',
     countryCode: 'MA',
     phoneFormat: '',
-    currencySymbol: 'MAD',
     currencyName: '',
+    currencySymbol: 'MAD'
   },
   {
     countryName: 'Monaco',
     countryCode: 'MC',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'EUR'
   },
   {
     countryName: 'Moldova, Republic of',
     countryCode: 'MD',
     phoneFormat: '',
-    currencySymbol: 'MDL',
     currencyName: '',
+    currencySymbol: 'MDL'
   },
   {
     countryName: 'Madagascar',
     countryCode: 'MG',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'MGA'
   },
   {
     countryName: 'Maldives',
     countryCode: 'MV',
     phoneFormat: '',
-    currencySymbol: 'MVR',
     currencyName: '',
+    currencySymbol: 'MVR'
   },
   {
     countryName: 'Mexico',
     countryCode: 'MX',
     phoneFormat: '',
-    currencySymbol: 'MXN',
     currencyName: '',
+    currencySymbol: 'MXN'
   },
   {
     countryName: 'Marshall Islands',
     countryCode: 'MH',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'USD'
   },
   {
     countryName: 'North Macedonia',
     countryCode: 'MK',
     phoneFormat: '',
-    currencySymbol: 'MKD',
     currencyName: '',
+    currencySymbol: 'MKD'
   },
   {
     countryName: 'Mali',
     countryCode: 'ML',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'XOF'
   },
   {
     countryName: 'Malta',
     countryCode: 'MT',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'EUR'
   },
   {
     countryName: 'Myanmar',
     countryCode: 'MM',
     phoneFormat: '',
-    currencySymbol: 'MMK',
     currencyName: '',
+    currencySymbol: 'MMK'
   },
   {
     countryName: 'Montenegro',
     countryCode: 'ME',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'EUR'
   },
   {
     countryName: 'Mongolia',
     countryCode: 'MN',
     phoneFormat: '',
-    currencySymbol: 'MNT',
     currencyName: '',
+    currencySymbol: 'MNT'
   },
   {
     countryName: 'Northern Mariana Islands',
     countryCode: 'MP',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'USD'
   },
   {
     countryName: 'Mozambique',
     countryCode: 'MZ',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'MZN'
   },
   {
     countryName: 'Mauritania',
     countryCode: 'MR',
     phoneFormat: '',
-    currencySymbol: 'MRO',
     currencyName: '',
+    currencySymbol: 'MRU'
   },
   {
     countryName: 'Montserrat',
     countryCode: 'MS',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'XCD'
   },
   {
     countryName: 'Martinique',
     countryCode: 'MQ',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'EUR'
   },
   {
     countryName: 'Mauritius',
     countryCode: 'MU',
     phoneFormat: '',
-    currencySymbol: 'MUR',
     currencyName: '',
+    currencySymbol: 'MUR'
   },
   {
     countryName: 'Malawi',
     countryCode: 'MW',
     phoneFormat: '',
-    currencySymbol: 'MWK',
     currencyName: '',
+    currencySymbol: 'MWK'
   },
   {
     countryName: 'Malaysia',
     countryCode: 'MY',
     phoneFormat: '',
-    currencySymbol: 'MYR',
     currencyName: '',
+    currencySymbol: 'MYR'
   },
   {
     countryName: 'Mayotte',
     countryCode: 'YT',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'EUR'
   },
   {
     countryName: 'Namibia',
     countryCode: 'NA',
     phoneFormat: '',
-    currencySymbol: 'NAD',
     currencyName: '',
+    currencySymbol: 'NAD'
   },
   {
     countryName: 'New Caledonia',
     countryCode: 'NC',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'XPF'
   },
   {
     countryName: 'Niger',
     countryCode: 'NE',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'XOF'
   },
   {
     countryName: 'Norfolk Island',
     countryCode: 'NF',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'AUD'
   },
   {
     countryName: 'Nigeria',
     countryCode: 'NG',
     phoneFormat: '',
-    currencySymbol: 'NGN',
     currencyName: '',
+    currencySymbol: 'NGN'
   },
   {
     countryName: 'Nicaragua',
     countryCode: 'NI',
     phoneFormat: '',
-    currencySymbol: 'NIO',
     currencyName: '',
+    currencySymbol: 'NIO'
   },
   {
     countryName: 'Niue',
     countryCode: 'NU',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'NZD'
   },
   {
     countryName: 'Netherlands',
     countryCode: 'NL',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'EUR'
   },
   {
     countryName: 'Norway',
     countryCode: 'NO',
     phoneFormat: '',
-    currencySymbol: 'NOK',
     currencyName: '',
+    currencySymbol: 'NOK'
   },
   {
     countryName: 'Nepal',
     countryCode: 'NP',
     phoneFormat: '',
-    currencySymbol: 'NPR',
     currencyName: '',
+    currencySymbol: 'NPR'
   },
   {
     countryName: 'Nauru',
     countryCode: 'NR',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'AUD'
   },
   {
     countryName: 'New Zealand',
     countryCode: 'NZ',
     phoneFormat: '',
-    currencySymbol: 'NZD',
     currencyName: '',
+    currencySymbol: 'NZD'
   },
   {
     countryName: 'Oman',
     countryCode: 'OM',
     phoneFormat: '',
-    currencySymbol: 'OMR',
     currencyName: '',
+    currencySymbol: 'OMR'
   },
   {
     countryName: 'Pakistan',
     countryCode: 'PK',
     phoneFormat: '',
-    currencySymbol: 'PKR',
     currencyName: '',
+    currencySymbol: 'PKR'
   },
   {
     countryName: 'Panama',
     countryCode: 'PA',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'PAB'
   },
   {
     countryName: 'Pitcairn',
     countryCode: 'PN',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: '#N/A'
   },
   {
     countryName: 'Peru',
     countryCode: 'PE',
     phoneFormat: '',
-    currencySymbol: 'PEN',
     currencyName: '',
+    currencySymbol: 'PEN'
   },
   {
     countryName: 'Philippines',
     countryCode: 'PH',
     phoneFormat: '',
-    currencySymbol: 'PHP',
     currencyName: '',
+    currencySymbol: 'PHP'
   },
   {
     countryName: 'Palau',
     countryCode: 'PW',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'USD'
   },
   {
     countryName: 'Papua New Guinea',
     countryCode: 'PG',
     phoneFormat: '',
-    currencySymbol: 'PGK',
     currencyName: '',
+    currencySymbol: 'PGK'
   },
   {
     countryName: 'Poland',
     countryCode: 'PL',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'PLN'
   },
   {
     countryName: 'Puerto Rico',
     countryCode: 'PR',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'USD'
   },
   {
-    countryName: "Korea, Democratic People's Republic of",
+    countryName: 'Korea, Democratic People"s Republic of',
     countryCode: 'KP',
     phoneFormat: '',
-    currencySymbol: 'KPW',
     currencyName: '',
+    currencySymbol: 'KPW'
   },
   {
     countryName: 'Portugal',
     countryCode: 'PT',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'EUR'
   },
   {
     countryName: 'Paraguay',
     countryCode: 'PY',
     phoneFormat: '',
-    currencySymbol: 'PYG',
     currencyName: '',
+    currencySymbol: 'PYG'
   },
   {
     countryName: 'Palestine, State of',
     countryCode: 'PS',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: '#N/A'
   },
   {
     countryName: 'French Polynesia',
     countryCode: 'PF',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: '#N/A'
   },
   {
     countryName: 'Qatar',
     countryCode: 'QA',
     phoneFormat: '',
-    currencySymbol: 'QAR',
     currencyName: '',
+    currencySymbol: 'QAR'
   },
   {
-    countryName: 'R\u00e9union',
+    countryName: 'Réunion',
     countryCode: 'RE',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'EUR'
   },
   {
     countryName: 'Romania',
     countryCode: 'RO',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'RON'
   },
   {
     countryName: 'Russian Federation',
     countryCode: 'RU',
     phoneFormat: '',
-    currencySymbol: 'RUB',
     currencyName: '',
+    currencySymbol: 'RUB'
   },
   {
     countryName: 'Rwanda',
     countryCode: 'RW',
     phoneFormat: '',
-    currencySymbol: 'RWF',
     currencyName: '',
+    currencySymbol: 'RWF'
   },
   {
     countryName: 'Saudi Arabia',
     countryCode: 'SA',
     phoneFormat: '',
-    currencySymbol: 'SAR',
     currencyName: 'Riyal',
+    currencySymbol: 'SAR'
   },
   {
     countryName: 'Sudan',
     countryCode: 'SD',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'SDG'
   },
   {
     countryName: 'Senegal',
     countryCode: 'SN',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'XOF'
   },
   {
     countryName: 'Singapore',
     countryCode: 'SG',
     phoneFormat: '',
-    currencySymbol: 'SGD',
     currencyName: '',
+    currencySymbol: 'SGD'
   },
   {
     countryName: 'South Georgia and the South Sandwich Islands',
     countryCode: 'GS',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: '#N/A'
   },
   {
     countryName: 'Saint Helena, Ascension and Tristan da Cunha',
     countryCode: 'SH',
     phoneFormat: '',
-    currencySymbol: 'SHP',
     currencyName: '',
+    currencySymbol: 'SHP'
   },
   {
     countryName: 'Svalbard and Jan Mayen',
     countryCode: 'SJ',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: '#N/A'
   },
   {
     countryName: 'Solomon Islands',
     countryCode: 'SB',
     phoneFormat: '',
-    currencySymbol: 'SBD',
     currencyName: '',
+    currencySymbol: 'SBD'
   },
   {
     countryName: 'Sierra Leone',
     countryCode: 'SL',
     phoneFormat: '',
-    currencySymbol: 'SLL',
     currencyName: '',
+    currencySymbol: 'SLE'
   },
   {
     countryName: 'El Salvador',
     countryCode: 'SV',
     phoneFormat: '',
-    currencySymbol: 'SVC',
     currencyName: '',
+    currencySymbol: 'USD'
   },
   {
     countryName: 'San Marino',
     countryCode: 'SM',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'EUR'
   },
   {
     countryName: 'Somalia',
     countryCode: 'SO',
     phoneFormat: '',
-    currencySymbol: 'SOS',
     currencyName: '',
+    currencySymbol: 'SOS'
   },
   {
     countryName: 'Saint Pierre and Miquelon',
     countryCode: 'PM',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'EUR'
   },
   {
     countryName: 'Serbia',
     countryCode: 'RS',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'RSD'
   },
   {
     countryName: 'South Sudan',
     countryCode: 'SS',
     phoneFormat: '',
-    currencySymbol: 'SSP',
     currencyName: '',
+    currencySymbol: 'SSP'
   },
   {
     countryName: 'Sao Tome and Principe',
     countryCode: 'ST',
     phoneFormat: '',
-    currencySymbol: 'STD',
     currencyName: '',
+    currencySymbol: 'STN'
   },
   {
     countryName: 'Suriname',
     countryCode: 'SR',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'SRD'
   },
   {
     countryName: 'Slovakia',
     countryCode: 'SK',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'EUR'
   },
   {
     countryName: 'Slovenia',
     countryCode: 'SI',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'EUR'
   },
   {
     countryName: 'Sweden',
     countryCode: 'SE',
     phoneFormat: '',
-    currencySymbol: 'SEK',
     currencyName: '',
+    currencySymbol: 'SEK'
   },
   {
     countryName: 'Eswatini',
     countryCode: 'SZ',
     phoneFormat: '',
-    currencySymbol: 'SZL',
     currencyName: '',
+    currencySymbol: 'SZL'
   },
   {
     countryName: 'Sint Maarten (Dutch part)',
     countryCode: 'SX',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'ANG'
   },
   {
     countryName: 'Seychelles',
     countryCode: 'SC',
     phoneFormat: '',
-    currencySymbol: 'SCR',
     currencyName: '',
+    currencySymbol: 'SCR'
   },
   {
     countryName: 'Syrian Arab Republic',
     countryCode: 'SY',
     phoneFormat: '',
-    currencySymbol: 'SYP',
     currencyName: '',
+    currencySymbol: 'SYP'
   },
   {
     countryName: 'Turks and Caicos Islands',
     countryCode: 'TC',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'USD'
   },
   {
     countryName: 'Chad',
     countryCode: 'TD',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'XAF'
   },
   {
     countryName: 'Togo',
     countryCode: 'TG',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'XOF'
   },
   {
     countryName: 'Thailand',
     countryCode: 'TH',
     phoneFormat: '',
-    currencySymbol: 'THB',
     currencyName: '',
+    currencySymbol: 'THB'
   },
   {
     countryName: 'Tajikistan',
     countryCode: 'TJ',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'TJS'
   },
   {
     countryName: 'Tokelau',
     countryCode: 'TK',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'NZD'
   },
   {
     countryName: 'Turkmenistan',
     countryCode: 'TM',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'TMT'
   },
   {
     countryName: 'Timor-Leste',
     countryCode: 'TL',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'USD'
   },
   {
     countryName: 'Tonga',
     countryCode: 'TO',
     phoneFormat: '',
-    currencySymbol: 'TOP',
     currencyName: '',
+    currencySymbol: 'TOP'
   },
   {
     countryName: 'Trinidad and Tobago',
     countryCode: 'TT',
     phoneFormat: '',
-    currencySymbol: 'TTD',
     currencyName: '',
+    currencySymbol: 'TTD'
   },
   {
     countryName: 'Tunisia',
     countryCode: 'TN',
     phoneFormat: '',
-    currencySymbol: 'TND',
     currencyName: '',
+    currencySymbol: 'TND'
   },
   {
     countryName: 'Turkey',
     countryCode: 'TR',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'TRY'
   },
   {
     countryName: 'Tuvalu',
     countryCode: 'TV',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'AUD'
   },
   {
     countryName: 'Taiwan, Province of China',
     countryCode: 'TW',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'TWD'
   },
   {
     countryName: 'Tanzania, United Republic of',
     countryCode: 'TZ',
     phoneFormat: '',
-    currencySymbol: 'TZS',
     currencyName: '',
+    currencySymbol: 'TZS'
   },
   {
     countryName: 'Uganda',
     countryCode: 'UG',
     phoneFormat: '',
-    currencySymbol: 'UGX',
     currencyName: '',
+    currencySymbol: 'UGX'
   },
   {
     countryName: 'Ukraine',
     countryCode: 'UA',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'UAH'
   },
   {
     countryName: 'United States Minor Outlying Islands',
     countryCode: 'UM',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: '#N/A'
   },
   {
     countryName: 'Uruguay',
     countryCode: 'UY',
     phoneFormat: '',
-    currencySymbol: 'UYU',
     currencyName: '',
+    currencySymbol: 'UYU'
   },
   {
     countryName: 'United States',
     countryCode: 'US',
     phoneFormat: '',
-    currencySymbol: 'USD',
     currencyName: 'Dollar',
+    currencySymbol: 'USD'
   },
   {
     countryName: 'Uzbekistan',
     countryCode: 'UZ',
     phoneFormat: '',
-    currencySymbol: 'UZS',
     currencyName: '',
+    currencySymbol: 'UZS'
   },
   {
     countryName: 'Holy See (Vatican City State)',
     countryCode: 'VA',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'EUR'
   },
   {
     countryName: 'Saint Vincent and the Grenadines',
     countryCode: 'VC',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'XCD'
   },
   {
     countryName: 'Venezuela, Bolivarian Republic of',
     countryCode: 'VE',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'VES'
   },
   {
     countryName: 'Virgin Islands, British',
     countryCode: 'VG',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'USD'
   },
   {
     countryName: 'Virgin Islands, U.S.',
     countryCode: 'VI',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'USD'
   },
   {
     countryName: 'Viet Nam',
     countryCode: 'VN',
     phoneFormat: '',
-    currencySymbol: 'VND',
     currencyName: '',
+    currencySymbol: 'VND'
   },
   {
     countryName: 'Vanuatu',
     countryCode: 'VU',
     phoneFormat: '',
-    currencySymbol: 'VUV',
     currencyName: '',
+    currencySymbol: 'VUV'
   },
   {
     countryName: 'Wallis and Futuna',
     countryCode: 'WF',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'XPF'
   },
   {
     countryName: 'Samoa',
     countryCode: 'WS',
     phoneFormat: '',
-    currencySymbol: 'WST',
     currencyName: '',
+    currencySymbol: 'WST'
   },
   {
     countryName: 'Yemen',
     countryCode: 'YE',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'YER'
   },
   {
     countryName: 'South Africa',
     countryCode: 'ZA',
     phoneFormat: '',
-    currencySymbol: 'ZAR',
     currencyName: 'Rand',
+    currencySymbol: 'ZAR'
   },
   {
     countryName: 'Zambia',
     countryCode: 'ZM',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
+    currencySymbol: 'ZMW'
   },
   {
     countryName: 'Zimbabwe',
     countryCode: 'ZW',
     phoneFormat: '',
-    currencySymbol: '',
     currencyName: '',
-  },
+    currencySymbol: 'ZWL'
+  }
 ];

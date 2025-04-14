@@ -131,7 +131,7 @@ export class AddNewPotComponent {
       commissionAmount: [0],
       commissionCycle: [''],
       commissionPercentageCurrency: [''],
-      commissionPercentageCycle: [''],
+      commissionPercentageCycle: [this.cycles[2].id],
       commissionPercentage: [0],
       escalationRate: [''],
     });

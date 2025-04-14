@@ -181,10 +181,10 @@
                   <div class="select-option">
                     <mat-select value="Select" formControlName="start" hideSingleSelectionIndicator>
                       <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
-                      <!-- @for (event of eventsList; track event) {
-                      <mat-option [value]="event.start.year">{{ event.name }} ({{ event.start.age }})</mat-option>
+                      @for (event of eventsList; track event) {
+                        <mat-option [value]="event.start.year">{{ event.name }} ({{ event.start.age }})</mat-option>
                       }
-                      <hr> -->
+                      <hr>
                       @for (year of years; track year) {
                       <mat-option [value]="year">{{ year }} ({{ year - clientBirthYear }})</mat-option>
                       }
@@ -211,10 +211,10 @@
                   <div class="select-option">
                     <mat-select value="Select" formControlName="end" hideSingleSelectionIndicator>
                       <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
-                      <!-- @for (event of eventsList; track event) {
+                      @for (event of eventsList; track event) {
                       <mat-option [value]="event.start.year">{{ event.name }} ({{ event.start.age }})</mat-option>
                       }
-                      <hr> -->
+                      <hr>
                       @for (year of years; track year) {
                       <mat-option [value]="year">{{ year }} ({{ year - clientBirthYear }})</mat-option>
                       }
