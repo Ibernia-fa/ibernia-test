@@ -51,7 +51,8 @@
                                                     ?? 0}}</h3>
                                                 <span
                                                     [ngClass]="savingPots.totalGwothRate >= 0 ? 'badge green' : 'badge red'">{{savingPots.totalGwothRate
-                                                    >= 0 ? '+' : '-'}}{{(savingPots?.totalGwothRate | number : '1.0-0') ??
+                                                    >= 0 ? '+' : '-'}}{{(savingPots?.totalGwothRate | number : '1.0-0')
+                                                    ??
                                                     0}}%</span>
                                             </div>
                                         </div>
@@ -148,7 +149,8 @@
                                                         [className]="saving.realReturn >= 0 ? 'badge green' : 'badge red'">
                                                         <!-- @if(saving.realReturn >= 0){+}{{saving.realReturn | number :
                                                         '1.2-2'}}% -->
-                                                        @if(saving.realReturn >= 0){+}{{saving.realReturn | number : '1.0-0'}}%
+                                                        @if(saving.realReturn >= 0){+}{{saving.realReturn | number :
+                                                        '1.0-0'}}%
                                                     </span>
                                                 </div>
                                             </div>
@@ -167,35 +169,34 @@
                                     </div>
                                     <!-- End Chart  -->
                                     @if(saving.hasPotLocked) {
-                                        <div class="lock-overlay">
-                                            <div
-                                                class="d-flex align-items-center justify-content-center flex-column gap-10 h-100">
-                                                <img src="assets/images/svgs/cashflow-lock-icon.svg"
-                                                    alt="cashflow-lock-icon">
-                                                <p>Locked until {{saving.end.age - saving.start.age}} y.o.</p>
-                                            </div>
-                                            <div class="help-lock-overlay">
-                                                <img src="assets/images/svgs/help-circle-lock-overlay.svg"
-                                                    alt="help-circle-lock-overlay">
-                                            </div>
+                                    <div class="lock-overlay">
+                                        <div
+                                            class="d-flex align-items-center justify-content-center flex-column gap-10 h-100">
+                                            <img src="assets/images/svgs/cashflow-lock-icon.svg"
+                                                alt="cashflow-lock-icon">
+                                            <p>Locked until {{saving.end.age - saving.start.age}} y.o.</p>
                                         </div>
-                                    <!-- }
-                                    @else { -->
-                                        <div class="edit-icon-overlay">
-                                            <button mat-icon-button (click)="updateEventClicked(saving)">
-                                                <mat-icon>
-                                                    <img src="assets/images/svgs/pen-icon.svg" alt="pen-icon" />
-                                                </mat-icon>
-                                            </button>
-                                            <button mat-icon-button (click)="deleteEventClicked(saving)">
-                                                <mat-icon>
-                                                    <img src="assets/images/svgs/drop-down-delete-2-line.svg" alt="del-icon" />
-                                                </mat-icon>
-                                            </button>
+                                        <div class="help-lock-overlay">
+                                            <img src="assets/images/svgs/help-circle-lock-overlay.svg"
+                                                alt="help-circle-lock-overlay">
                                         </div>
-                                        <!-- <div class="edit-icon-overlay">
-                                        </div> -->
+                                    </div>
                                     }
+                                    <div class="edit-icon-overlay">
+                                        <button mat-icon-button (click)="updateEventClicked(saving)">
+                                            <mat-icon>
+                                                <img src="assets/images/svgs/pen-icon.svg" alt="pen-icon" />
+                                            </mat-icon>
+                                        </button>
+                                        <button mat-icon-button (click)="deleteEventClicked(saving)">
+                                            <mat-icon>
+                                                <img src="assets/images/svgs/drop-down-delete-2-line.svg"
+                                                    alt="del-icon" />
+                                            </mat-icon>
+                                        </button>
+                                    </div>
+                                    <!-- <div class="edit-icon-overlay">
+                                        </div> -->
                                 </div>
                                 <!-- End Card  -->
 
@@ -218,163 +219,6 @@
                             </div>
                             }
                             <!-- End Card One -->
-                            @if(false) {
-                            <!-- Card Two -->
-                            <div class="d-flex justify-content-between align-items-center gap-12 dragable-card-wrapper">
-                                <!-- Card  -->
-                                <div class="dragable-card d-flex align-items-center justify-content-between">
-                                    <!-- Content  -->
-                                    <div class="d-flex align-items-center gap-8">
-                                        <button type="button" class="drag-btn">
-                                            <img src="/assets/images/svgs/drag-icon.svg" alt="drag-icon">
-                                        </button>
-                                        <!-- Status  -->
-                                        <div class="stats-main-wrapper">
-                                            <div class="d-flex flex-column gap-8">
-                                                <div class="d-flex align-items-center gap-8">
-                                                    <img src="assets/images/svgs/cashflow-investment-icon.svg"
-                                                        alt="cashflow-investment-icon" />
-                                                    <h3 class="card-title">Investments</h3>
-                                                </div>
-                                                <div class="d-flex align-items-center gap-10">
-                                                    <h3 class="saving-title">£50,000</h3>
-                                                    <span class="badge green">+1%</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <!-- End Status  -->
-                                    </div>
-                                    <!-- End Content  -->
-                                    <!--  Chart  -->
-                                    <div class="card-chart">
-                                        <img src="assets/images/shapes/dummy-green-graph.png" alt="dummy-green-graph">
-                                    </div>
-                                    <!-- End Chart  -->
-                                </div>
-                                <!-- End Card  -->
-
-                                <!-- Up and Down Buttons   -->
-                                <div class="d-flex flex-column gap-10 vote-btns">
-                                    <button type="button">
-                                        <img src="assets/images/svgs/vote-arrow-up.svg" alt="vote-arrow-up">
-                                    </button>
-                                    <button type="button">
-                                        <img src="assets/images/svgs/vote-arrow-down.svg" alt="vote-arrow-down">
-                                    </button>
-                                </div>
-                                <!-- End Up and Down Buttons   -->
-                            </div>
-                            <!-- End Card Two -->
-
-                            <!-- Card Three -->
-                            <div class="d-flex justify-content-between align-items-center gap-12 dragable-card-wrapper">
-                                <!-- Card  -->
-                                <div class="dragable-card d-flex align-items-center justify-content-between">
-                                    <!-- Content  -->
-                                    <div class="d-flex align-items-center gap-8">
-                                        <button type="button" class="drag-btn">
-                                            <img src="/assets/images/svgs/drag-icon.svg" alt="drag-icon">
-                                        </button>
-                                        <!-- Status  -->
-                                        <div class="stats-main-wrapper">
-                                            <div class="d-flex flex-column gap-8">
-                                                <div class="d-flex align-items-center gap-8">
-                                                    <img src="assets/images/svgs/cashflow-pension-icon.svg"
-                                                        alt="cashflow-pension-icon" />
-                                                    <h3 class="card-title">Pension</h3>
-                                                </div>
-                                                <div class="d-flex align-items-center gap-10">
-                                                    <h3 class="saving-title">£250,000</h3>
-                                                    <span class="badge red">-1%</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <!-- End Status  -->
-                                    </div>
-                                    <!-- End Content  -->
-                                    <!--  Chart  -->
-                                    <div class="card-chart">
-                                        <img src="assets/images/shapes/dummy-red-graph.png" alt="dummy-red-graph">
-                                    </div>
-                                    <!-- End Chart  -->
-                                </div>
-                                <!-- End Card  -->
-
-                                <!-- Up and Down Buttons   -->
-                                <div class="d-flex flex-column gap-10 vote-btns">
-                                    <button type="button">
-                                        <img src="assets/images/svgs/vote-arrow-up.svg" alt="vote-arrow-up">
-                                    </button>
-                                    <button type="button">
-                                        <img src="assets/images/svgs/vote-arrow-down.svg" alt="vote-arrow-down">
-                                    </button>
-                                </div>
-                                <!-- End Up and Down Buttons   -->
-                            </div>
-                            <!-- End Card Three -->
-
-                            <!-- Card Four With Overlay -->
-                            <div class="d-flex justify-content-between align-items-center gap-12 dragable-card-wrapper">
-                                <!-- Card  -->
-                                <div class="dragable-card d-flex align-items-center justify-content-between">
-                                    <!-- Content  -->
-                                    <div class="d-flex align-items-center gap-8">
-                                        <button type="button" class="drag-btn">
-                                            <img src="/assets/images/svgs/drag-icon.svg" alt="drag-icon">
-                                        </button>
-                                        <!-- Status  -->
-                                        <div class="stats-main-wrapper">
-                                            <div class="d-flex flex-column gap-8">
-                                                <div class="d-flex align-items-center gap-8">
-                                                    <img src="assets/images/svgs/cashflow-investment-icon.svg"
-                                                        alt="cashflow-investment-icon" />
-                                                    <h3 class="card-title">Investments</h3>
-                                                </div>
-                                                <div class="d-flex align-items-center gap-10">
-                                                    <h3 class="saving-title">£50,000</h3>
-                                                    <span class="badge green">+1%</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <!-- End Status  -->
-                                    </div>
-                                    <!-- End Content  -->
-                                    <!--  Chart  -->
-                                    <div class="card-chart">
-                                        <img src="assets/images/shapes/dummy-green-graph.png" alt="dummy-green-graph">
-                                    </div>
-                                    <!-- End Chart  -->
-
-                                    <!-- Lock Overlay  -->
-                                    <div class="lock-overlay">
-                                        <div
-                                            class="d-flex align-items-center justify-content-center flex-column gap-10 h-100">
-                                            <img src="assets/images/svgs/cashflow-lock-icon.svg"
-                                                alt="cashflow-lock-icon">
-                                            <p>Locked until 75 y.o.</p>
-                                        </div>
-                                        <div class="help-lock-overlay">
-                                            <img src="assets/images/svgs/help-circle-lock-overlay.svg"
-                                                alt="help-circle-lock-overlay">
-                                        </div>
-                                    </div>
-                                    <!-- End Lock Overlay  -->
-                                </div>
-                                <!-- End Card  -->
-
-                                <!-- Up and Down Buttons   -->
-                                <div class="d-flex flex-column gap-10 vote-btns">
-                                    <button type="button">
-                                        <img src="assets/images/svgs/vote-arrow-up.svg" alt="vote-arrow-up">
-                                    </button>
-                                    <button type="button">
-                                        <img src="assets/images/svgs/vote-arrow-down.svg" alt="vote-arrow-down">
-                                    </button>
-                                </div>
-                                <!-- End Up and Down Buttons   -->
-                            </div>
-                            }
-                            <!-- Card Four With Overlay -->
                         </div>
                     </div>
                 </div>
@@ -452,26 +296,6 @@
         <!-- End Feeback Third Step  -->
     </div>
     <!-- End Feedback Card  -->
-    }
-
-
-    @if(false) {
-    <!-- Dummy Section  -->
-    <div class="leaderboard">
-        <div *ngFor="let item of items" class="leaderboard-item" [@moveItem]="item.score">
-            <div class="item-info">
-                <!-- <span class="item-name">{{ item.name }}</span> -->
-                <!-- <span class="item-score">{{ item.score }}</span> -->
-                <span class="item-score">Test 1</span>
-                <span class="item-score">123</span>
-            </div>
-            <div class="item-actions">
-                <button (click)="upvote(item)" class="upvote-btn">Upvote</button>
-                <button (click)="downvote(item)" class="downvote-btn">Downvote</button>
-            </div>
-        </div>
-    </div>
-    <!-- End  Dummy Section  -->
     }
     }
     @else {
