@@ -1,5 +1,5 @@
 @if(item.navCap){
-<a href="#" class="cashflow-modal d-flex align-items-center gap-8">
+<a (click)="onItemSelected(item)" class="cashflow-modal d-flex align-items-center gap-8">
   <img src="assets/images/svgs/cashflow-nav-icon.svg" alt="cash-flow">
   <span>{{ item.navCap }}</span>
 </a>
