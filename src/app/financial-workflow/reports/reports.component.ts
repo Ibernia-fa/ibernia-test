@@ -1,7 +1,14 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { BehaviorSubject, combineLatestWith, filter, map, switchMap, tap } from 'rxjs';
+import {
+  BehaviorSubject,
+  combineLatestWith,
+  filter,
+  map,
+  switchMap,
+  tap,
+} from 'rxjs';
 import { NavItemService } from 'src/app/layouts/full/nav-item.service';
 import { TimelineHttpService } from '../timeline/services/timeline-http.service';
 import { Client } from 'src/app/clients/models/client';
@@ -21,7 +28,89 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { Cashflow } from 'src/app/clients/models/cashflow';
-import { SavingsBarStackedChartComponent } from "./savings-bar-stacked-chart/savings-bar-stacked-chart.component";
+import { SavingsBarStackedChartComponent } from './savings-bar-stacked-chart/savings-bar-stacked-chart.component';
+import { MatTableModule } from '@angular/material/table';
+
+export interface PeriodicElement {
+  name: string;
+  position: string;
+  start_age: string | number;
+  end_age: string | number;
+  inflation_rate: string;
+}
+
+const ELEMENT_DATA: PeriodicElement[] = [
+  {
+    position: 'Accountant Salary (MR)',
+    name: '£4,000/month',
+    start_age: 58,
+    end_age: 58,
+    inflation_rate: 'Default (2.5%)',
+  },
+  {
+    position: 'Graphic Design Salary - Part Time (Mrs)',
+    name: '£4,000/month',
+    start_age: 58,
+    end_age: 58,
+    inflation_rate: 'Default (2.5%)',
+  },
+  {
+    position: 'NHS DB Pension (MRS)',
+    name: '£4,000/month',
+    start_age: 58,
+    end_age: 58,
+    inflation_rate: 'Default (2.5%)',
+  },
+  {
+    position: 'Tax free cash from NHS (Mrs)',
+    name: '£4,000/month',
+    start_age: 58,
+    end_age: 58,
+    inflation_rate: 'Default (2.5%)',
+  },
+  {
+    position: "New Example Client's State Pension",
+    name: '£4,000/month',
+    start_age: 58,
+    end_age: 58,
+    inflation_rate: 'Default (2.5%)',
+  },
+  {
+    position: "New Example Client's State Pension",
+    name: '£4,000/month',
+    start_age: 'Retirement (60)',
+    end_age: 58,
+    inflation_rate: 'Default (2.5%)',
+  },
+  {
+    position: "New Example Client's State Pension",
+    name: '£4,000/month',
+    start_age: 'Retirement - Mrs (60)',
+    end_age: 58,
+    inflation_rate: 'Default (2.5%)',
+  },
+  {
+    position: "New Example Client's State Pension",
+    name: '£4,000/month',
+    start_age: 67,
+    end_age: 58,
+    inflation_rate: 'Default (2.5%)',
+  },
+  {
+    position: "New Example Client's State Pension",
+    name: '£4,000/month',
+    start_age: 67,
+    end_age: 58,
+    inflation_rate: 'Default (2.5%)',
+  },
+  {
+    position: "New Example Client's State Pension",
+    name: '£4,000/month',
+    start_age: 67,
+    end_age: 58,
+    inflation_rate: 'Default (2.5%)',
+  },
+];
 
 @Component({
   selector: 'app-reports',
@@ -35,12 +124,22 @@ import { SavingsBarStackedChartComponent } from "./savings-bar-stacked-chart/sav
     MatButtonModule,
     MatProgressSpinnerModule,
     MatSelectModule,
-    SavingsBarStackedChartComponent
-],
+    SavingsBarStackedChartComponent,
+    MatTableModule,
+  ],
   templateUrl: './reports.component.html',
   styleUrl: './reports.component.scss',
 })
 export class ReportsComponent {
+  displayedColumns: string[] = [
+    'position',
+    'start_age',
+    'end_age',
+    'name',
+    'inflation_rate',
+  ];
+  dataSource = ELEMENT_DATA;
+
   cashflowId: string;
   cashflow: Cashflow | null;
   isLoaderVisible: boolean;
@@ -84,7 +183,10 @@ export class ReportsComponent {
             );
           }
         }),
-        filter(([res, client, cashflow]) => !!client && !!cashflow && client.id === res.client.id),
+        filter(
+          ([res, client, cashflow]) =>
+            !!client && !!cashflow && client.id === res.client.id
+        ),
         map(([res, client, cashflow]) => {
           if (client) {
             this.isLoaderVisible = false;
