@@ -68,6 +68,8 @@ export class TimelineChartComponent implements OnInit, OnChanges {
   @Input() financialTimeline: FinancialTimeline;
   @Input() clientBirthDate: Date;
   @Input() client: Client;
+  @Input() title: string = 'Events';
+  @Input() showOnReports: boolean = false;
   @Output() updateTimelines: EventEmitter<boolean>;
   @ViewChild('timelineContainer', { static: true })
   timelineContainer!: ElementRef;
@@ -469,9 +471,9 @@ export class TimelineChartComponent implements OnInit, OnChanges {
     return {
       editable: {
         add: false, // Prevent adding new events directly
-        updateTime: true, // Allow changing event time by dragging
+        updateTime:  !this.showOnReports, // Allow changing event time by dragging
         updateGroup: false, // Prevent moving events between groups
-        remove: true, // Prevent deletion via UI
+        remove: !this.showOnReports, // Prevent deletion via UI
         overrideItems: false
       },
       // snap: function (date: Date) {
@@ -485,7 +487,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
       // },
       stack: true, // Prevent overlapping events
       zoomable: false, // Allow zooming
-      moveable: true,
+      moveable: !this.showOnReports,
       horizontalScroll: false, // Enable scrolling
       orientation: 'bottom', // Place events at the top
       margin: { item: 10 }, // Adds spacing between events

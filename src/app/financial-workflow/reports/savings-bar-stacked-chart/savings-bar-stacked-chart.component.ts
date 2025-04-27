@@ -80,7 +80,7 @@ export class SavingsBarStackedChartComponent {
             { x: 2035, y: 400 },
             { x: 2036, y: 410 },
             { x: 2037, y: 420 },
-            { x: 2123, y: -420 } // Intentional value, use as required
+            // { x: 2123, y: -420 } // Intentional value, use as required
           ],
           color: '#FF5722' // Red for Crypto
         }

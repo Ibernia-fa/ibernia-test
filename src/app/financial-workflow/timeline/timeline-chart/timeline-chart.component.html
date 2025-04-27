@@ -3,18 +3,22 @@
         <div class="d-flex flex-column gap-32">
             <div class="d-flex align-items-center justify-content-between flex-wrap gap-16 event-main-wrapper">
                 <div class="d-flex flex-column gap-6" style="flex-direction: column">
-                    <h4 class="f-s-22 f-w-400">Events</h4>
-                    <p class="m-0">
-                        Drag new events onto the timeline, or drag to re-arrange existing
-                        events. <br />
-                        The start and end date of transactions such as incomes can be
-                        linked to events.
-                    </p>
+                    <h4 class="f-s-22 f-w-400">{{title}}</h4>
+                    @if(!showOnReports) {
+                        <p class="m-0">
+                            Drag new events onto the timeline, or drag to re-arrange existing
+                            events. <br />
+                            The start and end date of transactions such as incomes can be
+                            linked to events.
+                        </p>
+                    }
                 </div>
-                <button (click)="newEventClicked()" type="button" class="button-icon">
-                    <span>New Event</span>
-                    <img src="assets/images/svgs/add-icon.svg" alt="add-icon" />
-                </button>
+                @if(!showOnReports) {
+                    <button (click)="newEventClicked()" type="button" class="button-icon">
+                        <span>New Event</span>
+                        <img src="assets/images/svgs/add-icon.svg" alt="add-icon" />
+                    </button>
+                }
             </div>
             <div class="chips-custom">
                 <mat-chip-set aria-label="Dog selection">
@@ -65,19 +69,21 @@
                         </div>
                         <img src="/assets/images/svgs/close-line-icon.svg" alt="remove" />
                     </mat-chip> -->
-                    @if(systemEventsLibrary) {
-                    @for(systemEvent of systemEventsLibrary; track systemEvent) {
-                    <mat-chip draggable="true" (dragend)="onDragEnd($event)" (dragstart)="onDragStart($event, systemEvent)" class="f-s-14"
-                        class="chip-item" [class]="systemEvent.iconUrl">
-                        <div class="d-flex gap-8 align-items-center m-r-16">
-                            <img matChipAvatar [src]="'/assets/images/svgs/' + systemEvent.iconUrl + '.svg'"
-                                [alt]="systemEvent.iconUrl" />
-                            <!-- [src]="'/assets/images/svgs/' + systemEvent.iconUrl  + '.svg'" -->
-                            {{systemEvent.name}}
-                        </div>
-                        <img src="/assets/images/svgs/close-line-icon.svg" alt="remove" />
-                    </mat-chip>
-                    }
+                    @if(!showOnReports) {
+                        @if(systemEventsLibrary) {
+                        @for(systemEvent of systemEventsLibrary; track systemEvent) {
+                        <mat-chip draggable="true" (dragend)="onDragEnd($event)" (dragstart)="onDragStart($event, systemEvent)" class="f-s-14"
+                            class="chip-item" [class]="systemEvent.iconUrl">
+                            <div class="d-flex gap-8 align-items-center m-r-16">
+                                <img matChipAvatar [src]="'/assets/images/svgs/' + systemEvent.iconUrl + '.svg'"
+                                    [alt]="systemEvent.iconUrl" />
+                                <!-- [src]="'/assets/images/svgs/' + systemEvent.iconUrl  + '.svg'" -->
+                                {{systemEvent.name}}
+                            </div>
+                            <img src="/assets/images/svgs/close-line-icon.svg" alt="remove" />
+                        </mat-chip>
+                        }
+                        }
                     }
                 </mat-chip-set>
             </div>
