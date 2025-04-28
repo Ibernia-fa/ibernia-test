@@ -600,12 +600,12 @@ import { NavItem } from './nav-item/nav-item';
 //   },
 // ];
 export const navItemslower: NavItem[] = [
-  {
-    displayName: 'Goals',
-    iconName: '/assets/images/svgs/goals-nav-icon.svg',
-    iconOutline: '/assets/images/svgs/goals-nav-icon.svg',
-    route: '#',
-  },
+  // {
+  //   displayName: 'Goals',
+  //   iconName: '/assets/images/svgs/goals-nav-icon.svg',
+  //   iconOutline: '/assets/images/svgs/goals-nav-icon.svg',
+  //   route: '#',
+  // },
   {
     displayName: 'Emergencies',
     iconName: '/assets/images/svgs/danger-square-icon.svg',
@@ -645,13 +645,13 @@ export const navItems: NavItem[] = [
     iconOutline: '/assets/images/svgs/discount-icon.svg',
     route: '/cashflows/{cashflowId}/withdrawal',
   },
-  {
-    displayName: 'Charges & Fees',
-    // iconName: 'trending-up',
-    iconName: '/assets/images/svgs/wallet-icon.svg',
-    iconOutline: '/assets/images/svgs/wallet-icon.svg',
-    route: '',
-  },
+  // {
+  //   displayName: 'Charges & Fees',
+  //   // iconName: 'trending-up',
+  //   iconName: '/assets/images/svgs/wallet-icon.svg',
+  //   iconOutline: '/assets/images/svgs/wallet-icon.svg',
+  //   route: '',
+  // },
   {
     navCap: 'Cashflow Model',
     route: '/cashflows/{cashflowId}/reports'
