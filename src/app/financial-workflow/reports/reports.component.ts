@@ -40,6 +40,8 @@ import { IncomeExpensesHttpService } from '../income-expenses/services/income-ex
 import { FinancialViewModel, IncomeExpense } from '../income-expenses/model/income-expense';
 import { FundsViewModel, WithdrawalsContributions } from '../withdrawals-contributions/model/withdrawals-contributions';
 import { WithdrawalsContributionsHttpService } from '../withdrawals-contributions/services/withdrawals-contributions-http.service';
+import { ReportsHttpService } from './services/reports-http.service';
+import { ChartSeries } from './models/charts-series.model';
 
 export interface PeriodicElement {
   name: string;
@@ -172,9 +174,11 @@ export class ReportsComponent {
   withdrawalDataSource: MatTableDataSource<FundsViewModel> =
     new MatTableDataSource(new Array<FundsViewModel>());
   clientBirthDate: Date;
+  report: ChartSeries;
 
   constructor(
     private timelineHttpService: TimelineHttpService,
+    private reportsHttpService: ReportsHttpService,
     private savingPotsHttpService: SavingsPotsHttpService,
     private financialWorkflowService: FinancialWorkflowService,
     private incomeExpensesHttpService: IncomeExpensesHttpService,
@@ -184,10 +188,10 @@ export class ReportsComponent {
   ) {
     this.destroyed$ = new BehaviorSubject<boolean>(false);
     this.navItemService.currentRouteName = 'Goals & Events';
-    this.getTimeline();
+    this.getData();
   }
 
-  getTimeline() {
+  getData() {
     this.isLoaderVisible = true;
     this.activatedRoute.params
       .pipe(
@@ -213,9 +217,12 @@ export class ReportsComponent {
             this.withdrawalsContributionsHttpService.getAllWithdrawalsContributions(
               (cashflow as Cashflow).id
             ),
+            this.reportsHttpService.getReportbyCashflowId(
+              (cashflow as Cashflow).id
+            )
           ]);
         }),
-        tap(([savingPots, timeline, incomeExpense, contributionWithdrawal]) => {
+        tap(([savingPots, timeline, incomeExpense, contributionWithdrawal, report]) => {
           this.financialTimeline = timeline;
           this.clientBirthDate = this.client.clientDetails.birthDate;
           this.savingPots = savingPots;
@@ -235,6 +242,8 @@ export class ReportsComponent {
           this.withdrawalDataSource = new MatTableDataSource(
             this.contributionWithdrawal?.withdrawals
           );
+
+          this.report = report
           this.isLoaderVisible = false;
         })
       )

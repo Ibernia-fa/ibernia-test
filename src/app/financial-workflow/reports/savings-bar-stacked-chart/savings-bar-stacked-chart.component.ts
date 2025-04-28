@@ -1,7 +1,8 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, Input } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { TablerIconsModule } from 'angular-tabler-icons';
 import { ChartComponent, NgApexchartsModule } from 'ng-apexcharts';
+import { ChartSeries } from '../models/charts-series.model';
 
 @Component({
   selector: 'app-savings-bar-stacked-chart',
@@ -15,6 +16,7 @@ import { ChartComponent, NgApexchartsModule } from 'ng-apexcharts';
 })
 export class SavingsBarStackedChartComponent {
   @ViewChild("chart") chart: ChartComponent;
+  @Input() report: ChartSeries;
   public chartOptions: any;
 
   constructor() {
