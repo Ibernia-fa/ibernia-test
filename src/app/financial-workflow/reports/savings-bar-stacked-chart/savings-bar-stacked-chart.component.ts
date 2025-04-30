@@ -1,8 +1,10 @@
-import { Component, ViewChild, Input } from '@angular/core';
+import { Component, ViewChild, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { TablerIconsModule } from 'angular-tabler-icons';
 import { ChartComponent, NgApexchartsModule } from 'ng-apexcharts';
 import { ChartSeries } from '../models/charts-series.model';
+import { Client } from 'src/app/clients/models/client';
+import moment from 'moment';
 
 @Component({
   selector: 'app-savings-bar-stacked-chart',
@@ -14,78 +16,18 @@ import { ChartSeries } from '../models/charts-series.model';
   templateUrl: './savings-bar-stacked-chart.component.html',
   styleUrl: './savings-bar-stacked-chart.component.scss'
 })
-export class SavingsBarStackedChartComponent {
+export class SavingsBarStackedChartComponent implements OnChanges {
   @ViewChild("chart") chart: ChartComponent;
   @Input() report: ChartSeries;
+  @Input() forecastStartDate: Date;
+  @Input() forecastEndDate: Date;
+  @Input() client: Client;
+
   public chartOptions: any;
 
   constructor() {
     this.chartOptions = {
       series: [
-        {
-          name: 'Current account',
-          data: [
-            { x: 2023, y: -400 },
-            { x: 2024, y: -370 },
-            { x: 2025, y: -350 },
-            { x: 2026, y: -330 },
-            { x: 2027, y: 300 },
-            { x: 2028, y: 270 },
-            { x: 2029, y: 240 },
-            { x: 2030, y: 210 },
-            { x: 2031, y: 180 },
-            { x: 2032, y: 150 },
-            { x: 2033, y: 120 },
-            { x: 2034, y: 90 },
-            { x: 2035, y: 60 },
-            { x: 2036, y: 30 },
-            { x: 2037, y: 0 }
-          ],
-          color: '#4CAF50' // Green for Current account
-        },
-        {
-          name: 'Savings',
-          data: [
-            { x: 2023, y: 300 },
-            { x: 2024, y: 310 },
-            { x: 2025, y: 320 },
-            { x: 2026, y: 330 },
-            { x: 2027, y: 350 },
-            { x: 2028, y: -360 },
-            { x: 2029, y: -370 },
-            { x: 2030, y: -380 },
-            { x: 2031, y: -390 },
-            { x: 2032, y: -400 },
-            { x: 2033, y: 410 },
-            { x: 2034, y: 420 },
-            { x: 2035, y: 430 },
-            { x: 2036, y: 440 },
-            { x: 2037, y: 450 }
-          ],
-          color: '#8BC34A' // Light green for Savings
-        },
-        {
-          name: 'Crypto',
-          data: [
-            { x: 2023, y: 150 },
-            { x: 2024, y: 180 },
-            { x: 2025, y: 200 },
-            { x: 2026, y: 230 },
-            { x: 2027, y: 250 },
-            { x: 2028, y: 280 },
-            { x: 2029, y: 300 },
-            { x: 2030, y: 330 },
-            { x: 2031, y: 350 },
-            { x: 2032, y: 370 },
-            { x: 2033, y: 380 },
-            { x: 2034, y: 390 },
-            { x: 2035, y: 400 },
-            { x: 2036, y: 410 },
-            { x: 2037, y: 420 },
-            // { x: 2123, y: -420 } // Intentional value, use as required
-          ],
-          color: '#FF5722' // Red for Crypto
-        }
       ],
       chart: {
         type: "bar",
@@ -169,7 +111,46 @@ export class SavingsBarStackedChartComponent {
         opacity: 1,
       },
     }; 
-  }   
+  }  
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['forecastStartDate'] || changes['forecastEndDate']) {
+      this.chartOptions.xaxis = {
+        type: 'numeric', // Treat x-axis as numbers (years)
+        min: moment(this.forecastStartDate).year(), // Start from 2023
+        max: moment(this.forecastEndDate).year(), // End at 2133 for a 100-year range
+        stepSize: 5, // Each year is a distinct tick
+        tickAmount: Math.floor((moment(this.forecastEndDate).year() - moment(this.forecastStartDate).year()) / 5),
+        title: {
+          text: 'Year'
+        },
+        offsetX:-10,
+        style: {
+          cssClass: 'leftAlign'
+        },
+        labels: {
+          formatter: (value: any) => {
+            return [(Math.floor(value) - moment(this.client.clientDetails.birthDate).year()), Math.floor(value)]; // Ensure the year is displayed as an integer (remove fraction part)
+          }
+        }
+      }
+    }
+
+    if(changes['client']) {
+      this.chartOptions.yaxis={
+        title: {
+          text: this.client.clientDetails.preferredCurrency
+        },
+        labels: {
+          formatter: (value: any) => {
+            return `${this.client.clientDetails.preferredCurrency} ` + value;
+          }
+        }
+      }
+    }
+    
+  }
+
 }
 
 
