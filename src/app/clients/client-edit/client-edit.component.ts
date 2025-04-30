@@ -15,7 +15,6 @@ import { MatInputModule } from '@angular/material/input';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
 import { AppBreadcrumbComponent } from 'src/app/layouts/full/shared/breadcrumb/breadcrumb.component';
-import { FiveDayRangeSelectionStrategy } from 'src/app/pages/forms/form-elements';
 import { ClientHttpService } from '../services/client-http.service';
 import { catchError, filter, map, switchMap } from 'rxjs';
 import { Client } from '../models/client';
@@ -25,6 +24,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { allCountries } from '../models/country';
 import { CountryISO, NgxIntlTelInputModule } from 'ngx-intl-tel-input';
 import { countryDialCodes } from '../models/country-code';
+import { FiveDayRangeSelectionStrategy } from 'src/app/core/five-day-range-selection-strategy';
 
 
 @Component({

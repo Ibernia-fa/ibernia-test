@@ -2,7 +2,6 @@ import { DatePipe } from '@angular/common';
 import { Component, Inject, Optional } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Employee } from '../pages/apps/employee/employee';
 import { TablerIconsModule } from 'angular-tabler-icons';
 import { MatFormFieldModule } from '@angular/material/form-field';
 
@@ -29,7 +28,7 @@ export class DialogComponent {
     public datePipe: DatePipe,
     public dialogRef: MatDialogRef<DialogComponent>,
     // @Optional() is used to prevent error if no data is passed
-    @Optional() @Inject(MAT_DIALOG_DATA) public data: Employee
+    @Optional() @Inject(MAT_DIALOG_DATA) public data: any
   ) {
     this.local_data = { ...data };
     this.action = this.local_data.action;
