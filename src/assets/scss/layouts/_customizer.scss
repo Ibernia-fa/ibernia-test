@@ -354,25 +354,25 @@ html .customizerNav {
     }
   }
 }
-.vis-time-axis .vis-text.vis-current-year {
-  opacity: 100%;
-  div {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    p {
-      margin: 0px;
-      font-size: 22px;
-      line-height: 25px;
-      color: #48475d;
-    }
-    span {
-      display: inline-block;
-      font-size: 10px;
-      line-height: 11.49px;
-    }
-  }
-}
+// .vis-time-axis .vis-text.vis-current-year {
+//   opacity: 100%;
+//   div {
+//     display: flex;
+//     flex-direction: column;
+//     gap: 4px;
+//     p {
+//       margin: 0px;
+//       font-size: 22px;
+//       line-height: 25px;
+//       color: #48475d;
+//     }
+//     span {
+//       display: inline-block;
+//       font-size: 10px;
+//       line-height: 11.49px;
+//     }
+//   }
+// }
 // End Vis Timeline Customization
 
 // Card Styles

@@ -95,6 +95,8 @@ export class AddContributionComponent {
       savingPot: ['']
     });
 
+    this.onCycleValueChange(this.cycles[1].id);
+    
     if (this.isEditWorkflow) {
       this.onCycleValueChange(this.selectedContribution.amount.cycle.id);
       this.contributionForm

@@ -91,6 +91,8 @@ export class AddExpenseComponent {
       end: [''],
     });
 
+    this.onCycleValueChange(this.cycles[1].id);
+
     if (this.isEditWorkflow) {
       this.onCycleValueChange(this.selectedExpense.amount.cycle.id)
       this.expenseForm

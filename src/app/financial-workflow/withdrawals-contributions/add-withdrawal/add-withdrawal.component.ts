@@ -96,6 +96,8 @@ export class AddWithdrawalComponent {
       savingPot: ['']
     });
 
+    this.onCycleValueChange(this.cycles[1].id);
+    
     if (this.isEditWorkflow) {
       this.onCycleValueChange(this.selectedWithdrawal.amount.cycle.id);
       this.withdrawalForm

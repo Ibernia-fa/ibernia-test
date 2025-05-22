@@ -492,21 +492,21 @@ export class TimelineChartComponent implements OnInit, OnChanges {
       orientation: 'bottom', // Place events at the top
       margin: { item: 10 }, // Adds spacing between events
       // min: new Date(moment(this.financialTimeline.forecastStartDate).year(), 0),
-      min: moment(this.financialTimeline.forecastStartDate)
-        .subtract(5, 'years')
-        .toDate(),
+      min: moment(new Date(moment(this.financialTimeline.forecastStartDate).year(), 1))
+        .subtract(42, 'months')
+        .toDate(), // Set a minimum Date for the visible range. It will not be possible to move beyond this minimum.
       start: new Date(
         moment(this.financialTimeline.forecastStartDate).year(),
         1
-      ),
+      ), //The initial start date for the axis of the timeline. If not provided, the earliest date present in the events is taken as start date.
       // start: moment(this.financialTimeline.forecastStartDate)
       // .subtract(5, 'years')
       // .toDate(),
-      end: moment(this.financialTimeline.forecastStartDate)
+      end: moment(new Date(moment(this.financialTimeline.forecastEndtDate).year(), 1))
         .add(100, 'years')
         .toDate(),
-      max: moment(this.financialTimeline.forecastEndtDate)
-        .add(3, 'years')
+      max: moment(new Date(moment(this.financialTimeline.forecastEndtDate).year(), 1))
+        .add(2, 'years')
         .toDate(),
       minHeight: '304px',
       width: '100%',
@@ -514,7 +514,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
       showCurrentTime: false, // Hide default current time marker
       // showCustomTime: true, // Allows custom markers
       showMajorLabels: true,
-      timeAxis: { scale: 'year', step: 5 },
+      timeAxis: { scale: 'month', step: 24 },
       format: {
         minorLabels: function (date: any) {
           return `

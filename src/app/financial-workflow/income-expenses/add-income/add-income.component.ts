@@ -91,6 +91,8 @@ export class AddIncomeComponent {
       end: [''],
     });
 
+    this.onCycleValueChange(this.cycles[1].id);
+
     if (this.isEditWorkflow) {
       this.onCycleValueChange(this.selectedIncome.amount.cycle.id)
       this.incomeForm
