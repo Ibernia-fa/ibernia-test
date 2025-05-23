@@ -97,9 +97,9 @@ export class AddWithdrawalComponent {
     });
 
     this.onCycleValueChange(this.cycles[1].id);
-    
+
     if (this.isEditWorkflow) {
-      this.onCycleValueChange(this.selectedWithdrawal.amount.cycle.id);
+      this.onCycleValueChange(this.selectedWithdrawal.amount.cycle?.id);
       this.withdrawalForm
         .get('description')
         ?.patchValue(this.selectedWithdrawal.description);
@@ -111,7 +111,7 @@ export class AddWithdrawalComponent {
         ?.patchValue(this.selectedWithdrawal.amount.amount);
       this.withdrawalForm
         .get('cycle')
-        ?.patchValue(this.selectedWithdrawal.amount.cycle.id);
+        ?.patchValue(this.selectedWithdrawal.amount.cycle?.id);
       this.withdrawalForm
         .get('start')
         ?.patchValue(this.selectedWithdrawal.start.year);

@@ -663,6 +663,18 @@ export class TimelineChartComponent implements OnInit, OnChanges {
       }
 
       if (clientEvent.name === 'State Pension') {
+        clientEvent.start = {
+          year: moment(new Date(moment(item.start).year(), 1)).year(),
+          age:
+            moment(new Date(moment(item.start).year(), 1)).year() -
+            moment(this.clientBirthDate).year(),
+        }
+        clientEvent.end = {
+          year: moment(new Date(moment(item.end).year(), 1)).year(),
+          age:
+            moment(new Date(moment(item.end).year(), 1)).year() -
+            moment(this.clientBirthDate).year(),
+        }
         const dialogRef = this.dialog.open(AddEventDialogComponent, {
           width: '600px',
           disableClose: true,
@@ -705,6 +717,19 @@ export class TimelineChartComponent implements OnInit, OnChanges {
           (event) => event.name !== clientEvent?.name
         )
       ) {
+
+        clientEvent.start = {
+          year: moment(new Date(moment(item.start).year(), 1)).year(),
+          age:
+            moment(new Date(moment(item.start).year(), 1)).year() -
+            moment(this.clientBirthDate).year(),
+        }
+        clientEvent.end = {
+          year: moment(new Date(moment(item.end).year(), 1)).year(),
+          age:
+            moment(new Date(moment(item.end).year(), 1)).year() -
+            moment(this.clientBirthDate).year(),
+        }
         const dialogRef = this.dialog.open(AddEventDialogComponent, {
           width: '900px',
           disableClose: true,

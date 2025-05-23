@@ -138,6 +138,7 @@ export class AddEventDialogComponent {
           end: [0, Validators.required],
           escalationRate: ['', Validators.required],
         });
+        this.onCycleValueChange(this.systemEvent?.isOneOff ? 'One-Off' : '');
         break;
 
       case EventType.CUSTOM:
@@ -151,6 +152,7 @@ export class AddEventDialogComponent {
           end: [0, Validators.required],
           escalationRate: ['', Validators.required],
         });
+        this.onCycleValueChange('One-Off');
         break;
     }
 
@@ -165,7 +167,7 @@ export class AddEventDialogComponent {
           this.eventForm.controls['isIncomeEvent'].patchValue(this.patchEvent?.type === EventIncomeType.Income);
           this.eventForm.controls['currency'].patchValue(this.patchEvent?.netAmount.currencySymbol);
           this.eventForm.controls['amount'].patchValue(this.patchEvent?.netAmount.amount);
-          this.eventForm.controls['cycle'].patchValue(this.patchEvent?.netAmount.cycle.description);
+          this.eventForm.controls['cycle'].patchValue(this.patchEvent?.netAmount.cycle?.description);
           this.eventForm.controls['ageDate'].patchValue(this.patchEvent?.start.year);
         break;
         
@@ -173,7 +175,7 @@ export class AddEventDialogComponent {
           this.eventForm.controls['isIncomeEvent'].patchValue(this.patchEvent?.type === EventIncomeType.Income);
           this.eventForm.controls['currency'].patchValue(this.patchEvent?.netAmount.currencySymbol);
           this.eventForm.controls['amount'].patchValue(this.patchEvent?.netAmount.amount);
-          this.eventForm.controls['cycle'].patchValue(this.patchEvent?.netAmount.cycle.description);
+          this.eventForm.controls['cycle'].patchValue(this.patchEvent?.netAmount.cycle?.description);
           this.eventForm.controls['start'].patchValue(this.patchEvent?.start.year);
           this.eventForm.controls['end'].patchValue(this.patchEvent?.end?.year);
           this.eventForm.controls['escalationRate'].patchValue(this.patchEvent?.escalationRate?.description);
@@ -200,7 +202,7 @@ export class AddEventDialogComponent {
           this.eventForm.controls['isIncomeEvent'].patchValue(this.patchEvent?.type === EventIncomeType.Income);
           this.eventForm.controls['currency'].patchValue(this.patchEvent?.netAmount.currencySymbol);
           this.eventForm.controls['amount'].patchValue(this.patchEvent?.netAmount.amount);
-          this.eventForm.controls['cycle'].patchValue(this.patchEvent?.netAmount.cycle.description);
+          this.eventForm.controls['cycle'].patchValue(this.patchEvent?.netAmount.cycle?.description);
           this.eventForm.controls['start'].patchValue(this.patchEvent?.start.year);
           this.eventForm.controls['end'].patchValue(this.patchEvent?.end?.year);
           this.eventForm.controls['escalationRate'].patchValue(this.patchEvent?.escalationRate?.description);
@@ -393,6 +395,10 @@ export class AddEventDialogComponent {
         });
       })
       // this.dialogRef.close();
+    }
+
+    else {
+      console.log(this.eventForm);
     }
   }
 

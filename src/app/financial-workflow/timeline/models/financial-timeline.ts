@@ -38,7 +38,7 @@ export interface ClientEvent {
 export interface NetAmount {
   currencySymbol: string;
   amount: number;
-  cycle: Cycle;
+  cycle: Cycle | null;
 }
 
 export interface Cycle {

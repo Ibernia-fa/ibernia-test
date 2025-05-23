@@ -94,7 +94,7 @@ export class AddIncomeComponent {
     this.onCycleValueChange(this.cycles[1].id);
 
     if (this.isEditWorkflow) {
-      this.onCycleValueChange(this.selectedIncome.amount.cycle.id)
+      this.onCycleValueChange(this.selectedIncome.amount.cycle?.id)
       this.incomeForm
         .get('description')
         ?.patchValue(this.selectedIncome.description);
@@ -106,7 +106,7 @@ export class AddIncomeComponent {
         ?.patchValue(this.selectedIncome.amount.amount);
       this.incomeForm
         .get('cycle')
-        ?.patchValue(this.selectedIncome.amount.cycle.id);
+        ?.patchValue(this.selectedIncome.amount.cycle?.id);
       this.incomeForm.get('start')?.patchValue(this.selectedIncome.start.year);
       this.incomeForm.get('end')?.patchValue(this.selectedIncome.end.year);
 

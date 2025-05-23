@@ -177,11 +177,11 @@ export class AddNewPotComponent {
     if(this.selectedPot.comission.type === ComissionType.Amount || this.selectedPot.comission.type === ComissionType.Both) {
       this.savingsForm.get('commissionCurrency')?.patchValue(this.selectedPot.comission.amount.currencySymbol);
       this.savingsForm.get('commissionAmount')?.patchValue(this.selectedPot.comission.amount.amount);
-      this.savingsForm.get('commissionCycle')?.patchValue(this.selectedPot.comission.amount.cycle.id);
+      this.savingsForm.get('commissionCycle')?.patchValue(this.selectedPot.comission.amount.cycle?.id);
     }
     if(this.selectedPot.comission.type === ComissionType.Percentage || this.selectedPot.comission.type === ComissionType.Both) {
       this.savingsForm.get('commissionPercentageCurrency')?.patchValue(this.selectedPot.comission.percentage?.currencySymbol);
-      this.savingsForm.get('commissionPercentageCycle')?.patchValue(this.selectedPot.comission.percentage?.cycle.id);
+      this.savingsForm.get('commissionPercentageCycle')?.patchValue(this.selectedPot.comission.percentage?.cycle?.id);
       this.savingsForm.get('commissionPercentage')?.patchValue(this.selectedPot.comission.percentage?.amount);
     }
     this.savingsForm.get('escalationRate')?.patchValue(this.selectedPot.comission.escalationRate.id);
@@ -359,10 +359,7 @@ export class AddNewPotComponent {
               this.savingsForm.get('commissionCycle')?.value !== ''
                 ? this.cycles.find(x => x.id === this.savingsForm.get('commissionCycle')?.value) ??
                 this.savingsForm.get('commissionCycle')?.value
-                : {
-                    id: '',
-                    description: '',
-                  },
+                : null,
           },
           percentage: {
             amount: this.savingsForm.get('commissionPercentage')?.value ?? 0,

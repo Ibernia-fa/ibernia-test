@@ -94,7 +94,7 @@ export class AddExpenseComponent {
     this.onCycleValueChange(this.cycles[1].id);
 
     if (this.isEditWorkflow) {
-      this.onCycleValueChange(this.selectedExpense.amount.cycle.id)
+      this.onCycleValueChange(this.selectedExpense.amount.cycle?.id)
       this.expenseForm
         .get('description')
         ?.patchValue(this.selectedExpense.description);
@@ -106,7 +106,7 @@ export class AddExpenseComponent {
         ?.patchValue(this.selectedExpense.amount.amount);
       this.expenseForm
         .get('cycle')
-        ?.patchValue(this.selectedExpense.amount.cycle.id);
+        ?.patchValue(this.selectedExpense.amount.cycle?.id);
       this.expenseForm.get('start')?.patchValue(this.selectedExpense.start.year);
       this.expenseForm.get('end')?.patchValue(this.selectedExpense.end.year);
     }

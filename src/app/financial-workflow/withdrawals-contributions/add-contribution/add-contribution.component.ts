@@ -96,9 +96,9 @@ export class AddContributionComponent {
     });
 
     this.onCycleValueChange(this.cycles[1].id);
-    
+
     if (this.isEditWorkflow) {
-      this.onCycleValueChange(this.selectedContribution.amount.cycle.id);
+      this.onCycleValueChange(this.selectedContribution.amount.cycle?.id);
       this.contributionForm
         .get('description')
         ?.patchValue(this.selectedContribution.description);
@@ -110,7 +110,7 @@ export class AddContributionComponent {
         ?.patchValue(this.selectedContribution.amount.amount);
       this.contributionForm
         .get('cycle')
-        ?.patchValue(this.selectedContribution.amount.cycle.id);
+        ?.patchValue(this.selectedContribution.amount.cycle?.id);
       this.contributionForm.get('start')?.patchValue(this.selectedContribution.start.year);
       this.contributionForm.get('end')?.patchValue(this.selectedContribution.end.year);
       this.contributionForm.get('savingPot')?.patchValue(this.selectedContribution.associatedSavingPotId);
