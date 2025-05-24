@@ -92,6 +92,8 @@ export class AddNewPotComponent {
       type: SavingPotType.PensionFund,
     },
   ];
+  forecastEndDateYear: any;
+  forecastStartDateYear: any;
 
   constructor(
     private dialogRef: MatDialogRef<AddNewPotComponent>,
@@ -107,6 +109,8 @@ export class AddNewPotComponent {
     this.cashflowId = data.cashflowId;
     this.isEditWorkflow = data.isEditWorkflow;
     this.selectedPot = data.event
+    this.forecastStartDateYear = data.forecastStartDateYear;
+    this.forecastEndDateYear = data.forecastEndDateYear;
 
     var iterations = data.forecastEndDateYear - data.forecastStartDateYear;
 
@@ -223,11 +227,15 @@ export class AddNewPotComponent {
       this.savingsForm.get('start')?.updateValueAndValidity();
       this.savingsForm.get('end')?.setValidators(Validators.required);
       this.savingsForm.get('end')?.updateValueAndValidity();
+
+      this.savingsForm.get('end')?.patchValue(this.eventsList[0].start.year > 0 ? this.eventsList[0].start.year : this.forecastStartDateYear)
     } else {
       this.savingsForm.get('start')?.removeValidators(Validators.required);
       this.savingsForm.get('start')?.updateValueAndValidity();
       this.savingsForm.get('end')?.removeValidators(Validators.required);
       this.savingsForm.get('end')?.updateValueAndValidity();
+
+      this.savingsForm.get('end')?.patchValue(this.forecastEndDateYear-1)
     }
   }
 
