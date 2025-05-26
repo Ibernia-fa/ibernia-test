@@ -41,6 +41,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { catchError, combineLatest, filter, map, take, tap } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { Client } from 'src/app/clients/models/client';
+import { ToastrModule, ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-timeline-chart',
@@ -53,7 +54,11 @@ import { Client } from 'src/app/clients/models/client';
     MatDatepickerModule,
     MatIconModule,
     MatProgressSpinnerModule,
+    ToastrModule,
     CommonModule,
+  ],
+  providers: [
+    ToastrService
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './timeline-chart.component.html',
@@ -77,7 +82,8 @@ export class TimelineChartComponent implements OnInit, OnChanges {
   constructor(
     private dialog: MatDialog,
     private timelineHttpService: TimelineHttpService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private toastrService: ToastrService
   ) {
     this.updateTimelines = new EventEmitter<boolean>();
   }
@@ -431,7 +437,6 @@ export class TimelineChartComponent implements OnInit, OnChanges {
     //     't1'
     //   );
   }
-
   get timelineData(): DataSet<
     {
       id: string;
@@ -452,10 +457,11 @@ export class TimelineChartComponent implements OnInit, OnChanges {
           end:
             event.end && event.end.year > 0
               ? new Date(event.end.year, 1)
-              : new Date(event.start.year + 14, 1),
+              : new Date(event.start.year + Math.floor(0.6 * event.name.length + 5), 1),
+              // : new Date(event.start.year + Math.min(11, Math.floor(0.6 * event.name.length + 5)), 1),
           className: event.iconUrl,
           editable: {
-            updateTime: !event.isOneOff,
+            updateTime: true,
             remove: true,
           }
         };
@@ -532,10 +538,12 @@ export class TimelineChartComponent implements OnInit, OnChanges {
         this.handleEventRemoval(item, callback);
       },
       onMove: (item, callback) => {
+        console.log('onMove Called')
         console.log(item);
         this.handleEventUpdate(item, callback);
       },
       onMoving: (item, callback) => {
+        console.log('onMoving Called')
         console.log(item);
         this.handleEventMoving(item, callback)
       }
@@ -596,6 +604,18 @@ export class TimelineChartComponent implements OnInit, OnChanges {
       (event) => event.id === item.id
     );
     if (clientEvent) {
+
+      if( clientEvent.isOneOff &&
+        clientEvent.start.year ===  moment(new Date(moment(item.start).year(), 1)).year() &&
+        clientEvent.end?.year !==  moment(new Date(moment(item.end).year(), 1)).year()
+      ) {
+        this.toastrService.error("You cannot update the time by dragging the event from end");
+        this.timeline.setItems(this.timelineData);
+        this.cdr.detectChanges();
+        this.timeline.redraw();
+        return;
+      }
+
       if (
         this.systemEventsLibrary
           .filter((event) => event.isPlaceHolder)

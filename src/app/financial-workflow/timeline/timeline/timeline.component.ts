@@ -107,7 +107,7 @@ export class TimelineComponent implements OnDestroy {
             ).year();
             this.forecastEndYear = moment(
               this.financialTimeline.forecastEndtDate
-            ).year() - 1;
+            ).year();
   
             this.forecastStartYears = Array.from(
               { length: this.forecastEndYear - this.forecastStartYear + 1 },
