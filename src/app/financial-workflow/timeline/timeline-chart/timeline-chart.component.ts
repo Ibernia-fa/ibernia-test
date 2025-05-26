@@ -526,7 +526,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
         .add(100, 'years')
         .toDate(),
       max: moment(new Date(moment(this.financialTimeline.forecastEndtDate).year(), 1))
-        .add(2, 'years')
+        .add(30, 'months')
         .toDate(),
       minHeight: '304px',
       width: '100%',
