@@ -53,6 +53,7 @@ export class TimelineComponent implements OnDestroy {
   forecastStartYear: number;
   forecastEndYear: number;
   clientBirthYear: number;
+  clientAge: number;
   client: Client;
   enableForecastEdit=false;
   destroyed$: BehaviorSubject<boolean>;
@@ -99,12 +100,31 @@ export class TimelineComponent implements OnDestroy {
             this.financialTimeline = res;
             this.client = client;
             this.clientBirthDate = client.clientDetails.birthDate;
+
+            const birthDate = new Date(client.clientDetails.birthDate);
+            const today = new Date();
+
+            
+
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+            const dayDiff = today.getDate() - birthDate.getDate();
+
+            // Adjust age if birth month/day is in the future
+            if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+              age--;
+            }
+
+            this.clientAge = age
+
             this.clientBirthYear = moment(
               client.clientDetails.birthDate
             ).year();
+
             this.forecastStartYear = moment(
               this.financialTimeline.forecastStartDate
             ).year();
+            if(this.clientBirthYear - this.forecastStartYear > this.clientAge) this.clientBirthYear =  this.clientBirthYear-1
             this.forecastEndYear = moment(
               this.financialTimeline.forecastEndtDate
             ).year();

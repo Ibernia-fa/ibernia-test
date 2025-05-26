@@ -51,8 +51,8 @@
                                             [value]="this.forecastStartYear" formControlName="start"
                                             hideSingleSelectionIndicator>
                                             <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
-                                            @for (year of forecastStartYears; track year) {
-                                            <mat-option [value]="year">{{ year }} ({{ year - clientBirthYear
+                                            @for (year of forecastStartYears; let i = $index; track year) {
+                                            <mat-option [value]="year">{{ year }} ({{ clientAge + i
                                                 }})</mat-option>
                                             }
                                         </mat-select>
@@ -96,8 +96,8 @@
                                             (valueChange)="onForecastEndChange($event)" [value]="this.forecastEndYear"
                                             formControlName="start" hideSingleSelectionIndicator>
                                             <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
-                                            @for (year of forecastStartYears; track year) {
-                                            <mat-option [value]="year">{{ year }} ({{ year - clientBirthYear
+                                            @for (year of forecastStartYears; let i = $index; track year) {
+                                            <mat-option [value]="year">{{ year }} ({{ clientAge + i
                                                 }})</mat-option>
                                             }
                                         </mat-select>

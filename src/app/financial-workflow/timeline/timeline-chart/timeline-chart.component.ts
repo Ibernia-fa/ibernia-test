@@ -472,7 +472,21 @@ export class TimelineChartComponent implements OnInit, OnChanges {
   }
   get timelineOptions(): TimelineOptions {
     console.log(this.clientBirthDate);
-    const clientBirthDateYear = moment(new Date(this.clientBirthDate)).year();
+
+    const birthDate = new Date(this.clientBirthDate);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    const dayDiff = today.getDate() - birthDate.getDate();
+
+    // Adjust age if birth month/day is in the future
+    if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+      age--;
+    }
+    let clientBirthDateYear = moment(new Date(this.clientBirthDate)).year();
+
+    console.log(moment(this.financialTimeline.forecastStartDate).year() - clientBirthDateYear)
+    if(moment(this.financialTimeline.forecastStartDate).year() - clientBirthDateYear > age) clientBirthDateYear =  clientBirthDateYear+1
     console.log({ clientBirthDateYear });
     return {
       editable: {
