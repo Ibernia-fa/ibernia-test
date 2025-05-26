@@ -124,7 +124,8 @@ export class TimelineComponent implements OnDestroy {
             this.forecastStartYear = moment(
               this.financialTimeline.forecastStartDate
             ).year();
-            if(this.clientBirthYear - this.forecastStartYear > this.clientAge) this.clientBirthYear =  this.clientBirthYear-1
+            if(this.forecastStartYear - this.clientBirthYear > this.clientAge) this.clientBirthYear =  this.clientBirthYear+1
+            
             this.forecastEndYear = moment(
               this.financialTimeline.forecastEndtDate
             ).year();

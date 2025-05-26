@@ -26,6 +26,8 @@ import { catchError, filter } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
 import moment from 'moment';
 import { allCountries } from 'src/app/clients/models/country';
+import { AgeCalculatorPipe } from 'src/app/pipe/age-calculator.pipe';
+import { CommonModule } from '@angular/common';
 interface Food {
   value: string;
   viewValue: string;
@@ -43,9 +45,13 @@ interface Food {
     MatButtonModule,
     MatSelectModule,
     MatDatepickerModule,
+    AgeCalculatorPipe,
     ReactiveFormsModule,
+    CommonModule
   ],
-  providers: [provideNativeDateAdapter()],
+  providers: [provideNativeDateAdapter(), 
+    AgeCalculatorPipe,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './add-event-dialog.component.html',
   styleUrl: './add-event-dialog.component.scss',
@@ -63,6 +69,7 @@ export class AddEventDialogComponent {
   dropTime: Date;
   clientBirthDate: Date;
   clientBirthYear: number;
+  clientAge: number;
   years: number[] = []
   eventsList: any;
   selectedEventName: string;
@@ -89,12 +96,26 @@ export class AddEventDialogComponent {
     this.dropTime = data.dropTime;
     this.clientBirthDate = data.clientBirthDate;
     this.clientBirthYear = moment(this.clientBirthDate).year();
+    const birthDate = new Date(this.clientBirthDate);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    const dayDiff = today.getDate() - birthDate.getDate();
+
+    // Adjust age if birth month/day is in the future
+    if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+      age--;
+    }
+
+    this.clientAge = age
+    if(data.forecastStartDateYear - this.clientBirthYear > this.clientAge) this.clientBirthYear =  this.clientBirthYear+1
+
     this.eventsList = data.eventsList
     this.isEditWorkflow = data.isEditWorkflow;
     this.patchEvent= data.patchEvent
     this.clientPreferredCurrency= data.clientPreferredCurrency
 
-    var iterations = data.forecastEndDateYear - data.forecastStartDateYear
+    var iterations = data.forecastEndDateYear - data.forecastStartDateYear + 1
 
     for (let index = 0; index < iterations; index++) {
       const element = data.forecastStartDateYear + index;

@@ -61,6 +61,7 @@ export class AddNewPotComponent {
   countries = allCountries;
   clientPreferredCurrency: string;
   clientBirthYear: number;
+  clientAge: number;
   // isAmountType: boolean = true;
   cycles: Cycle[];
   escalationRates: EscalationRate[];
@@ -105,6 +106,21 @@ export class AddNewPotComponent {
     this.escalationRates = data.escalataionRates;
     this.eventsList = data.eventsList;
     this.clientBirthYear = moment(data.clientBirthDate).year();
+
+    const birthDate = new Date(data.clientBirthDate);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    const dayDiff = today.getDate() - birthDate.getDate();
+
+    // Adjust age if birth month/day is in the future
+    if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+      age--;
+    }
+
+    this.clientAge = age
+    if(data.forecastStartDateYear - this.clientBirthYear > this.clientAge) this.clientBirthYear =  this.clientBirthYear+1
+
     this.clientPreferredCurrency = data.clientPreferredCurrency;
     this.cashflowId = data.cashflowId;
     this.isEditWorkflow = data.isEditWorkflow;
@@ -112,7 +128,7 @@ export class AddNewPotComponent {
     this.forecastStartDateYear = data.forecastStartDateYear;
     this.forecastEndDateYear = data.forecastEndDateYear;
 
-    var iterations = data.forecastEndDateYear - data.forecastStartDateYear;
+    var iterations = data.forecastEndDateYear - data.forecastStartDateYear + 1;
 
     for (let index = 0; index < iterations; index++) {
       const element = data.forecastStartDateYear + index;

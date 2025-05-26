@@ -57,6 +57,7 @@ export class AddExpenseComponent {
   cashflowId: string;
   clientPreferredCurrency: string;
   clientBirthYear: number;
+  clientAge: number;
   isEditWorkflow = false;
   selectedExpense: FinancialViewModel;
   showStartEnd=false;
@@ -70,12 +71,26 @@ export class AddExpenseComponent {
     this.cycles = data.amountCycles;
     this.escalationRates = data.escalataionRates;
     this.clientBirthYear = moment(data.clientBirthDate).year();
+    const birthDate = new Date(data.clientBirthDate);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    const dayDiff = today.getDate() - birthDate.getDate();
+
+    // Adjust age if birth month/day is in the future
+    if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+      age--;
+    }
+
+    this.clientAge = age
+    if(data.forecastStartDateYear - this.clientBirthYear > this.clientAge) this.clientBirthYear =  this.clientBirthYear+1
+
     this.clientPreferredCurrency = data.clientPreferredCurrency;
     this.cashflowId = data.cashflowId;
     this.isEditWorkflow = data.isEditWorkflow;
     this.selectedExpense = data.selectedExpense;
 
-    var iterations = data.forecastEndDateYear - data.forecastStartDateYear;
+    var iterations = data.forecastEndDateYear - data.forecastStartDateYear + 1;
 
     for (let index = 0; index < iterations; index++) {
       const element = data.forecastStartDateYear + index;
