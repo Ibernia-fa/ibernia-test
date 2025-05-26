@@ -600,9 +600,9 @@ export class TimelineChartComponent implements OnInit, OnChanges {
       return;
     }
 
-    var clientEvent = this.financialTimeline.clientEvents.find(
+    var clientEvent = JSON.parse(JSON.stringify(this.financialTimeline.clientEvents.find(
       (event) => event.id === item.id
-    );
+    )));
     if (clientEvent) {
 
       if( clientEvent.isOneOff &&
@@ -654,6 +654,18 @@ export class TimelineChartComponent implements OnInit, OnChanges {
         clientEvent.name === 'Inheritance' ||
         clientEvent.name === 'Wedding'
       ) {
+        clientEvent.start = {
+          year: moment(new Date(moment(item.start).year(), 1)).year(),
+          age:
+            moment(new Date(moment(item.start).year(), 1)).year() -
+            moment(this.clientBirthDate).year(),
+        }
+        clientEvent.end = {
+          year: moment(new Date(moment(item.end).year(), 1)).year(),
+          age:
+            moment(new Date(moment(item.end).year(), 1)).year() -
+            moment(this.clientBirthDate).year(),
+        }
         const dialogRef = this.dialog.open(AddEventDialogComponent, {
           width: '600px',
           disableClose: true,
@@ -679,6 +691,9 @@ export class TimelineChartComponent implements OnInit, OnChanges {
             this.updateTimelines.emit();
             callback(item);
           }
+          this.timeline.setItems(this.timelineData);
+          this.cdr.detectChanges();
+          this.timeline.redraw();
         });
       }
 
@@ -729,6 +744,9 @@ export class TimelineChartComponent implements OnInit, OnChanges {
             this.updateTimelines.emit();
             callback(item);
           }
+          this.timeline.setItems(this.timelineData);
+          this.cdr.detectChanges();
+          this.timeline.redraw();
         });
       }
 
@@ -783,6 +801,9 @@ export class TimelineChartComponent implements OnInit, OnChanges {
             this.updateTimelines.emit();
             callback(item);
           }
+          this.timeline.setItems(this.timelineData);
+          this.cdr.detectChanges();
+          this.timeline.redraw();
         });
       } else {
         const clientEvent: ClientEvent | undefined =
