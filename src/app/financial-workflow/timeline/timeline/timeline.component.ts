@@ -25,6 +25,7 @@ import * as CashflowActions from 'src/app/store/cashflow/cashflow.actions';
 import { Client } from 'src/app/clients/models/client';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { selectedCashflow } from 'src/app/store/cashflow/cashflow.selectors';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-timeline',
@@ -39,6 +40,7 @@ import { selectedCashflow } from 'src/app/store/cashflow/cashflow.selectors';
     MatProgressSpinnerModule,
     TimelineChartComponent,
     MatSelectModule,
+    MatTooltipModule
   ],
   providers: [provideNativeDateAdapter()],
   templateUrl: './timeline.component.html',

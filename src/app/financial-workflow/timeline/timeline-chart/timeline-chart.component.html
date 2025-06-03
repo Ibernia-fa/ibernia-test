@@ -6,10 +6,8 @@
                     <h4 class="f-s-22 f-w-400">{{title}}</h4>
                     @if(!showOnReports) {
                         <p class="m-0">
-                            Drag new events onto the timeline, or drag to re-arrange existing
-                            events. <br />
-                            The start and end date of transactions such as incomes can be
-                            linked to events.
+                            Let us begin with what matter most: goals and life plans. <br />
+                            Drag new events onto the timeline, or move existing ones.
                         </p>
                     }
                 </div>
@@ -72,8 +70,8 @@
                     @if(!showOnReports) {
                         @if(systemEventsLibrary) {
                         @for(systemEvent of systemEventsLibrary; track systemEvent) {
-                        <mat-chip draggable="true" (dragend)="onDragEnd($event)" (dragstart)="onDragStart($event, systemEvent)" class="f-s-14"
-                            class="chip-item" [class]="systemEvent.iconUrl">
+                        <mat-chip draggable="true" (dragend)="onDragEnd($event)" (dragstart)="onDragStart($event, systemEvent)"
+                            class="f-s-14 chip-item" [class]="systemEvent.iconUrl">
                             <div class="d-flex gap-8 align-items-center m-r-16">
                                 <img matChipAvatar [src]="'/assets/images/svgs/' + systemEvent.iconUrl + '.svg'"
                                     [alt]="systemEvent.iconUrl" />

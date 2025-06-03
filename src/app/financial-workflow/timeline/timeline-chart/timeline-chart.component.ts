@@ -415,6 +415,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
       this.timelineOptions
     );
 
+
     this.timeline.on('doubleClick', (event) => {
       event.event.preventDefault();
       event.event.stopPropagation();
@@ -496,6 +497,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
         remove: !this.showOnReports, // Prevent deletion via UI
         overrideItems: false
       },
+      selectable: true,
       // snap: function (date: Date) {
       //   const year = moment(date).year();
       //   const snappedYear = Math.round(year / 5) * 5;
@@ -623,7 +625,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
         clientEvent.start.year ===  moment(new Date(moment(item.start).year(), 1)).year() &&
         clientEvent.end?.year !==  moment(new Date(moment(item.end).year(), 1)).year()
       ) {
-        this.toastrService.error("You cannot update the time by dragging the event from end");
+        this.toastrService.error("You cannot edit the duration of \"one off\" events");
         this.timeline.setItems(this.timelineData);
         this.cdr.detectChanges();
         this.timeline.redraw();

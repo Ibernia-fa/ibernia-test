@@ -169,7 +169,7 @@ export class AddEventDialogComponent {
           currency: [this.clientPreferredCurrency, Validators.required],
           amount: ['', [Validators.required, Validators.min(0)]],
           cycle: ['One-Off', [Validators.required]],
-          start: [0, Validators.required],
+          start: [null, Validators.required],
           end: [0, Validators.required],
           escalationRate: ['', Validators.required],
         });
