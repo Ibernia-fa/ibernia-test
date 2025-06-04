@@ -415,6 +415,11 @@ export class TimelineChartComponent implements OnInit, OnChanges {
       this.timelineOptions
     );
 
+this.timeline.on('mouseDown', (props) => {
+  if (props.item) {
+    this.timeline.setSelection(props.item);
+  }
+});
 
     this.timeline.on('doubleClick', (event) => {
       event.event.preventDefault();
@@ -562,7 +567,14 @@ export class TimelineChartComponent implements OnInit, OnChanges {
         console.log('onMoving Called')
         console.log(item);
         this.handleEventMoving(item, callback)
-      }
+      },
+        snap: (date: Date) => {
+    const year = date.getFullYear();
+    const midYear = new Date(year, 6, 1); // July 1st
+    const nextYearStart = new Date(year + 1, 0, 1);
+    const currentYearStart = new Date(year, 0, 1);
+    return date < midYear ? currentYearStart : nextYearStart;
+  }
     };
   }
 
@@ -1002,7 +1014,15 @@ export class TimelineChartComponent implements OnInit, OnChanges {
     });
   }
 
-  private getContent(title: string, img: string): string {
-    return `<div><img src="/assets/images/svgs/${img}.svg"><span>${title}</span></div>`;
-  }
+private getContent(title: string, img: string): string {
+  return `
+    <div class="timeline-event-chip with-padding">
+      <div class="event-left">
+        <img src="/assets/images/svgs/${img}.svg" class="icon" />
+        <span class="label">${title}</span>
+      </div>
+    </div>`;
+}
+
+
 }

@@ -5,17 +5,17 @@
                 <div class="d-flex flex-column gap-6" style="flex-direction: column">
                     <h4 class="f-s-22 f-w-400">{{title}}</h4>
                     @if(!showOnReports) {
-                        <p class="m-0">
-                            Let us begin with what matter most: goals and life plans. <br />
-                            Drag new events onto the timeline, or move existing ones.
-                        </p>
+                    <p class="m-0">
+                        Let us begin with what matter most: goals and life plans. <br />
+                        Drag new events onto the timeline, or move existing ones.
+                    </p>
                     }
                 </div>
                 @if(!showOnReports) {
-                    <button (click)="newEventClicked()" type="button" class="button-icon">
-                        <span>New Event</span>
-                        <img src="assets/images/svgs/add-icon.svg" alt="add-icon" />
-                    </button>
+                <button (click)="newEventClicked()" type="button" class="button-icon">
+                    <span>New Event</span>
+                    <img src="assets/images/svgs/add-icon.svg" alt="add-icon" />
+                </button>
                 }
             </div>
             <div class="chips-custom">
@@ -68,20 +68,34 @@
                         <img src="/assets/images/svgs/close-line-icon.svg" alt="remove" />
                     </mat-chip> -->
                     @if(!showOnReports) {
-                        @if(systemEventsLibrary) {
-                        @for(systemEvent of systemEventsLibrary; track systemEvent) {
-                        <mat-chip draggable="true" (dragend)="onDragEnd($event)" (dragstart)="onDragStart($event, systemEvent)"
+                    @if(systemEventsLibrary) {
+                    @for(systemEvent of systemEventsLibrary; track systemEvent) {
+                    <!-- <mat-chip draggable="true" (dragend)="onDragEnd($event)" (dragstart)="onDragStart($event, systemEvent)"
                             class="f-s-14 chip-item" [class]="systemEvent.iconUrl">
                             <div class="d-flex gap-8 align-items-center m-r-16">
                                 <img matChipAvatar [src]="'/assets/images/svgs/' + systemEvent.iconUrl + '.svg'"
                                     [alt]="systemEvent.iconUrl" />
-                                <!-- [src]="'/assets/images/svgs/' + systemEvent.iconUrl  + '.svg'" -->
-                                {{systemEvent.name}}
+                               {{systemEvent.name}}
                             </div>
                             <img src="/assets/images/svgs/close-line-icon.svg" alt="remove" />
-                        </mat-chip>
-                        }
-                        }
+                        </mat-chip> -->
+
+                    <mat-chip draggable="true" (dragend)="onDragEnd($event)"
+                        (dragstart)="onDragStart($event, systemEvent)" class="f-s-14 chip-item"
+                        [class]="systemEvent.iconUrl">
+                        <div class="chip-content">
+                            <div class="d-flex gap-8 align-items-center">
+                                <img matChipAvatar [src]="'/assets/images/svgs/' + systemEvent.iconUrl + '.svg'"
+                                    [alt]="systemEvent.iconUrl" />
+                                {{ systemEvent.name }}
+                            </div>
+
+                            <img src="/assets/images/svgs/close-line-icon.svg" alt="remove" class="chip-close-icon" />
+                        </div>
+                    </mat-chip>
+
+                    }
+                    }
                     }
                 </mat-chip-set>
             </div>
