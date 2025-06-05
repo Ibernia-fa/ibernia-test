@@ -372,39 +372,58 @@ export class TimelineChartComponent implements OnInit, OnChanges {
     this.draggedEvent = null;
   }
 
-  onDragOver(event: DragEvent) {
-    this.timeline.setCustomTime(
-      this.timeline.getEventProperties(event).time,
-      'dragOver'
-    );
-    this.timeline.setCustomTimeTitle(
-      moment(this.timeline.getEventProperties(event).time).year().toString(),
-      'dragOver'
-    );
-    event.preventDefault(); // Allows dropping
-    // var isCustomTimeCreated = false;
-    // try {
-    //   console.log('dragover', (this.timeline.getEventProperties(event) as any).customTime);
-    //   console.log('dragover', !(this.timeline.getEventProperties(event) as any).customTime);
-    //   if(!(this.timeline.getEventProperties(event) as any).customTime) {
-    //     console.log()
-    //     isCustomTimeCreated = true;
-    //   }
+  // onDragOver(event: DragEvent) {
+  //   this.timeline.setCustomTime(
+  //     this.timeline.getEventProperties(event).time,
+  //     'dragOver'
+  //   );
+  //   this.timeline.setCustomTimeTitle(
+  //     moment(this.timeline.getEventProperties(event).time).year().toString(),
+  //     'dragOver'
+  //   );
+  //   event.preventDefault(); // Allows dropping
+  //   // var isCustomTimeCreated = false;
+  //   // try {
+  //   //   console.log('dragover', (this.timeline.getEventProperties(event) as any).customTime);
+  //   //   console.log('dragover', !(this.timeline.getEventProperties(event) as any).customTime);
+  //   //   if(!(this.timeline.getEventProperties(event) as any).customTime) {
+  //   //     console.log()
+  //   //     isCustomTimeCreated = true;
+  //   //   }
 
-    // } catch(err) {
-    //   console.log('called err', err);
-    //   // this.timeline.removeCustomTime('dragOver');
-    //   // this.timeline.addCustomTime(this.timeline.getEventProperties(event).time, 'dragOver');
-    //   // this.timeline.setCustomTimeTitle(moment(this.timeline.getEventProperties(event).time).year().toString(), 'dragOver');
-    // }
-    // finally {
-    //   console.log('called after');
-    //   if(isCustomTimeCreated) {
-    //     this.timeline.removeCustomTime('dragOver');
-    //   }
-    //   // this.timeline.redraw()
-    // }
-  }
+  //   // } catch(err) {
+  //   //   console.log('called err', err);
+  //   //   // this.timeline.removeCustomTime('dragOver');
+  //   //   // this.timeline.addCustomTime(this.timeline.getEventProperties(event).time, 'dragOver');
+  //   //   // this.timeline.setCustomTimeTitle(moment(this.timeline.getEventProperties(event).time).year().toString(), 'dragOver');
+  //   // }
+  //   // finally {
+  //   //   console.log('called after');
+  //   //   if(isCustomTimeCreated) {
+  //   //     this.timeline.removeCustomTime('dragOver');
+  //   //   }
+  //   //   // this.timeline.redraw()
+  //   // }
+  // }
+
+  onDragOver(event: DragEvent) {
+  event.preventDefault();
+
+  if (!this.timeline) return;
+
+  const props = this.timeline.getEventProperties(event);
+  if (!props?.time) return;
+
+  const snappedTime = this.snapToNearestYear(props.time);
+  this.timeline.setCustomTime(snappedTime, 'dragOver');
+}
+
+
+private snapToNearestYear(date: Date): Date {
+  const year = date.getFullYear();
+  return new Date(year, 0, 1); // Always snap to Jan 1st of the year
+}
+
 
   initTimelineContainer() {
     if (!this.timelineContainer?.nativeElement) return;
@@ -460,11 +479,28 @@ this.timeline.on('mouseDown', (props) => {
           id: event.id,
           content: this.getContent(event.name, event.iconUrl),
           start: new Date(event.start.year, 1),
-          end:
-            event.end && event.end.year > 0
-              ? new Date(event.end.year, 1)
-              : new Date(event.start.year + Math.floor(0.45 * event.name.length + 5), 1),
-              // : new Date(event.start.year + Math.min(11, Math.floor(0.6 * event.name.length + 5)), 1),
+          end: (() => {
+              if (!event.end || !event.end.year || event.end.year === event.start.year) {
+                // One-off or no meaningful end date
+                return new Date(event.start.year + Math.floor(0.45 * event.name.length + 5), 1);
+              }
+
+              const startYear = event.start.year;
+              const endYear = event.end.year;
+
+              if ((endYear - startYear) <= 1) {
+                // Too short duration, make it visually wider
+                return new Date(startYear + Math.floor(0.45 * event.name.length + 7), 1);
+              }
+
+              return new Date(endYear, 1);
+            })(),
+
+          // end:
+          //   event.end && event.end.year > 0
+          //     ? new Date(event.end.year, 1)
+          //     : new Date(event.start.year + Math.floor(0.45 * event.name.length + 5), 1),
+          //     // : new Date(event.start.year + Math.min(11, Math.floor(0.6 * event.name.length + 5)), 1),
           className: event.iconUrl,
           editable: {
             updateTime: true,
