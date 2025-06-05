@@ -107,7 +107,7 @@
     <!-- End Net Amount Field  -->
     <div class="w-100 form-field gap-12">
       <div class="d-flex gap-8 align-items-center">
-        <mat-label class="f-s-16 f-w-400 d-block">Date and Age</mat-label>
+        <mat-label class="f-s-16 f-w-400 d-block">Date</mat-label>
         <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
       </div>
       <div class="position-relative">
@@ -231,7 +231,14 @@
     <div class="start-end">
       <div class="d-flex flex-column gap-12">
         <div class="d-flex gap-8 align-items-center">
+          @if(eventForm.get('cycle')?.value ==='One-Off')
+          {
+            <mat-label class="f-s-16 f-w-400 d-block">Date</mat-label>  
+          }
+          @else 
+          {
           <mat-label class="f-s-16 f-w-400 d-block">Start @if(eventForm.get('cycle')?.value !=='One-Off') {& end}</mat-label>
+          }
           <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
         </div>
         <div class="row justify-content-between align-items-start flex-nowrap">
@@ -298,7 +305,7 @@
             <div class="select-option">
               <mat-select formControlName="escalationRate" value="Select">
                 <mat-option value="2.5%">Increase at same rate as inflation (2.5%)</mat-option>
-                <mat-option value="0%">Don't increase with inflation</mat-option>
+                <mat-option value="0%">Doesn't increase with inflation</mat-option>
               </mat-select>
             </div>
             @if(eventForm.get('escalationRate')?.touched &&

@@ -484,13 +484,13 @@ this.timeline.on('mouseDown', (props) => {
                 // One-off or no meaningful end date
                 return new Date(event.start.year + Math.floor(0.45 * event.name.length + 5), 1);
               }
-
+              
               const startYear = event.start.year;
               const endYear = event.end.year;
 
-              if ((endYear - startYear) <= 1) {
+              if ((endYear - startYear) <= 10) {
                 // Too short duration, make it visually wider
-                return new Date(startYear + Math.floor(0.45 * event.name.length + 7), 1);
+                return new Date(startYear + Math.floor(0.45 * event.name.length + 5), 1);
               }
 
               return new Date(endYear, 1);
