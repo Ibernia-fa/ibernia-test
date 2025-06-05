@@ -330,7 +330,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
       });
     }
 
-    if (this.draggedEvent.name === 'State Pension') {
+    if (this.draggedEvent.name === 'State pension') {
       const dialogRef = this.dialog.open(AddEventDialogComponent, {
         width: '700px',
         disableClose: true,
@@ -463,7 +463,7 @@ this.timeline.on('mouseDown', (props) => {
           end:
             event.end && event.end.year > 0
               ? new Date(event.end.year, 1)
-              : new Date(event.start.year + Math.floor(0.6 * event.name.length + 5), 1),
+              : new Date(event.start.year + Math.floor(0.45 * event.name.length + 5), 1),
               // : new Date(event.start.year + Math.min(11, Math.floor(0.6 * event.name.length + 5)), 1),
           className: event.iconUrl,
           editable: {
@@ -725,7 +725,7 @@ this.timeline.on('mouseDown', (props) => {
         });
       }
 
-      if (clientEvent.name === 'State Pension') {
+      if (clientEvent.name === 'State pension') {
         clientEvent.start = {
           year: moment(new Date(moment(item.start).year(), 1)).year(),
           age:
@@ -878,7 +878,7 @@ this.timeline.on('mouseDown', (props) => {
       });
     }
 
-    if (clientEvent.name === 'State Pension') {
+    if (clientEvent.name === 'State pension') {
       const dialogRef = this.dialog.open(AddEventDialogComponent, {
         width: '600px',
         disableClose: true,
