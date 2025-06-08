@@ -256,7 +256,14 @@
             </div>
             @if(eventForm.get('start')?.touched &&
             eventForm.get('start')?.hasError('required')) {
-            <span class="field-error d-block">Date is required</span>
+              @if(eventForm.get('cycle')?.value ==='One-Off')
+              {
+                <span class="field-error d-block">Date is required</span>
+              }
+              @else 
+              {
+                <span class="field-error d-block">Start is required</span>
+              }
             }
           </div>
 
@@ -283,7 +290,14 @@
                 </div>
                 @if(eventForm.get('end')?.touched &&
                 eventForm.get('end')?.hasError('required')) {
-                <span class="field-error d-block">Date is required</span>
+                 @if(eventForm.get('cycle')?.value ==='One-Off')
+                 {
+                   <span class="field-error d-block">Date is required</span>
+                 }
+                 @else 
+                 {
+                   <span class="field-error d-block">Start is required</span>
+                 }
                 }
               </div>
             </div>
@@ -505,7 +519,14 @@
                   </div>
                   @if(eventForm.get('start')?.touched &&
                   eventForm.get('start')?.hasError('required')) {
-                  <span class="field-error d-block">Start is required</span>
+                   @if(eventForm.get('cycle')?.value ==='One-Off')
+                   {
+                     <span class="field-error d-block">Date is required</span>
+                   }
+                   @else 
+                   {
+                     <span class="field-error d-block">Start is required</span>
+                   }
                   }
                 </div>
               </div>

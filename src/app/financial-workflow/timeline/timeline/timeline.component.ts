@@ -26,6 +26,8 @@ import { Client } from 'src/app/clients/models/client';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { selectedCashflow } from 'src/app/store/cashflow/cashflow.selectors';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { Cashflow } from 'src/app/clients/models/cashflow';
+import { FinancialWorkflowService } from '../../services/financial-workflow.service';
 
 @Component({
   selector: 'app-timeline',
@@ -57,6 +59,7 @@ export class TimelineComponent implements OnDestroy {
   clientBirthYear: number;
   clientAge: number;
   client: Client;
+  selectedCashflow: Cashflow | null;
   enableForecastEdit=false;
   destroyed$: BehaviorSubject<boolean>;
 
@@ -94,6 +97,8 @@ export class TimelineComponent implements OnDestroy {
           if(!client || client.id !== res.client.id) {
             this.store.dispatch(ClientActions.loadClient({clientId: res.client.id}));
           }
+          this.selectedCashflow = cashflow as Cashflow;
+          this.client = client as Client;
         }),
         filter(([res, client]) => !!client && client.id === res.client.id),
         map(([res, client]) => {
