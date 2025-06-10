@@ -346,6 +346,36 @@
               <!-- End Error  -->
             </div>
           }
+
+          
+        @if(savingsForm.get('commissionType')?.value !== 'percentage'){
+          <div class="w-100 form-field gap-12">
+          <div class="d-flex gap-8 align-items-center">
+            <mat-label class="f-s-16 f-w-400 d-block">Commission escalation rate</mat-label>
+            <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
+          </div>
+          <div class="position-relative">
+            <div class="w-100 form-field">
+              <div class="select-option">
+                <mat-select formControlName="escalationRate" value="Select">
+                  @for (escalationRate of escalationRates; track escalationRate) {
+                  <mat-option [value]="escalationRate.id">{{ escalationRate.description }}</mat-option>
+                  }
+                </mat-select>
+              </div>
+              <!-- error  -->
+              @if(savingsForm.get('escalationRate')?.touched &&
+              savingsForm.get('escalationRate')?.hasError('required')) {
+              <span class="field-error d-block">Escalation Rate is required</span>
+              }
+              <!-- <span class="field-error d-block">Escalation Rate is required</span> -->
+              <!-- End error  -->
+            </div>
+          </div>
+        </div>
+      }
+
+      
           @if(savingsForm.get('commissionType')?.value === 'percentage' || savingsForm.get('commissionType')?.value === 'both') {
             @if(savingsForm.get('commissionType')?.value === 'both') {
               <div class="d-flex gap-8 align-items-center">
@@ -408,32 +438,6 @@
           <!-- End Net Amount Field  -->
         </div>
 
-        @if(savingsForm.get('commissionType')?.value !== 'percentage'){
-          <div class="w-100 form-field gap-12">
-          <div class="d-flex gap-8 align-items-center">
-            <mat-label class="f-s-16 f-w-400 d-block">Commission escalation rate</mat-label>
-            <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
-          </div>
-          <div class="position-relative">
-            <div class="w-100 form-field">
-              <div class="select-option">
-                <mat-select formControlName="escalationRate" value="Select">
-                  @for (escalationRate of escalationRates; track escalationRate) {
-                  <mat-option [value]="escalationRate.id">{{ escalationRate.description }}</mat-option>
-                  }
-                </mat-select>
-              </div>
-              <!-- error  -->
-              @if(savingsForm.get('escalationRate')?.touched &&
-              savingsForm.get('escalationRate')?.hasError('required')) {
-              <span class="field-error d-block">Escalation Rate is required</span>
-              }
-              <!-- <span class="field-error d-block">Escalation Rate is required</span> -->
-              <!-- End error  -->
-            </div>
-          </div>
-        </div>
-      }
 
         }
       }
