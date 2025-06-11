@@ -142,10 +142,13 @@ export class TimelineChartComponent implements OnInit, OnChanges {
   }
 
   onDragEnd(event: DragEvent) {
-    event.preventDefault();
-    console.log(event.dataTransfer?.dropEffect);
+  event.preventDefault();
 
-    this.timeline.removeCustomTime('dragOver');
+  // this.hoveredYear = null;
+
+  this.clearLabelHighlight();
+  this.timeline.removeCustomTime('dragOver');
+  this.timeline.redraw();
   }
 
   onDrop(event: DragEvent) {
@@ -416,6 +419,82 @@ export class TimelineChartComponent implements OnInit, OnChanges {
 
   const snappedTime = this.snapToNearestYear(props.time);
   this.timeline.setCustomTime(snappedTime, 'dragOver');
+
+  this.highlightHoveredYearLabel(snappedTime.getFullYear());
+}
+
+
+highlightHoveredYearLabel(snappedYear: number) {
+  const allMinorLabels = document.querySelectorAll('.vis-text.vis-minor');
+
+  // Clear previous highlights completely
+  allMinorLabels.forEach((label) => {
+    const pTag = label.querySelector('p') as HTMLElement;
+    const spanTag = label.querySelector('span') as HTMLElement;
+
+    if (pTag) {
+      pTag.style.color = '';
+      pTag.style.fontWeight = '';
+      pTag.style.fontSize = '';
+    }
+
+    if (spanTag) {
+      spanTag.style.color = '';
+      spanTag.style.fontWeight = '';
+    }
+
+    (label as HTMLElement).style.backgroundColor = '';
+    (label as HTMLElement).style.borderRadius = '';
+    (label as HTMLElement).style.border = '';
+  });
+
+  // Highlight the new one
+  allMinorLabels.forEach((label) => {
+    const pTag = label.querySelector('p');
+    const spanTag = label.querySelector('span');
+
+    if (spanTag?.textContent?.trim() === snappedYear.toString()) {
+      // if (pTag) {
+      //   pTag.style.color = 'blue';
+      //   pTag.style.fontWeight = 'bold';
+      //   pTag.style.fontSize = '14px';
+      // }
+
+      // if (spanTag) {
+      //   spanTag.style.color = 'blue';
+      //   spanTag.style.fontWeight = 'bold';
+      // }
+
+(label as HTMLElement).style.backgroundColor = '#66B2FF';
+(label as HTMLElement).style.border = '1px solid #004C99';
+
+    }
+  });
+}
+
+
+clearLabelHighlight() {
+  const minorLabels = document.querySelectorAll('.vis-text.vis-minor');
+  minorLabels.forEach((label) => {
+    const pTag = label.querySelector('p') as HTMLElement;
+    const spanTag = label.querySelector('span') as HTMLElement;
+
+    if (pTag) {
+      pTag.style.color = '';
+      pTag.style.fontWeight = '';
+      pTag.style.fontSize = '';
+    }
+
+    if (spanTag) {
+      spanTag.style.color = '';
+      spanTag.style.fontWeight = '';
+    }
+
+    (label as HTMLElement).style.backgroundColor = '';
+    (label as HTMLElement).style.borderRadius = '';
+    (label as HTMLElement).style.border = '';
+  
+  });
 }
 
 
@@ -618,6 +697,10 @@ this.timeline.on('mouseDown', (props) => {
     try {
       this.timeline.getCustomTime('dragOver')
       this.timeline.setCustomTime(item.start, 'dragOver');
+      const year = new Date(item.start).getFullYear();
+
+      this.highlightHoveredYearLabel(year);
+
       callback(item)
     }
     catch(ex) {
@@ -652,7 +735,7 @@ this.timeline.on('mouseDown', (props) => {
     this.timeline.removeCustomTime('dragOver');
 
     const dropTime = item.start;
-
+    this.clearLabelHighlight();
     if (
       moment(dropTime).year() <
         moment(this.financialTimeline.forecastStartDate).year() ||
