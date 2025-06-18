@@ -13,7 +13,7 @@
                         <!-- headings  -->
                         <div class="d-flex flex-column justify-content-between gap-4">
                             <div class="d-flex align-items-center gap-4">
-                                <h4 class="page-title f-w-500">Savings pots</h4>
+                                <h4 class="page-title f-w-500">Savings Pots</h4>
                                 <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" class="m-t-4"
                                  matTooltip="Enter all savings pots, pensions, and investment accounts held by your client in this section (excluding property).
 In the event of an income shortfall, these pots will be drawn down in the sequence displayed below.
@@ -51,7 +51,7 @@ You may rearrange the order by dragging and dropping the pots, or by using the u
                                             </div>
                                             <div class="d-flex align-items-center gap-10">
                                                 <h3 class="saving-title">
-                                                    {{selectedClient?.clientDetails?.preferredCurrency}}{{savingPots?.totalSavings
+                                                    {{selectedClient?.clientDetails?.preferredCurrency  | currencySymbol }}{{savingPots?.totalSavings
                                                     ?? 0}}</h3>
                                                 <span
                                                     [ngClass]="savingPots.totalGwothRate >= 0 ? 'badge green' : 'badge red'">{{savingPots.totalGwothRate
@@ -146,8 +146,9 @@ You may rearrange the order by dragging and dropping the pots, or by using the u
                                                     <h3 class="card-title">{{saving.name}}</h3>
                                                 </div>
                                                 <div class="d-flex align-items-center gap-10">
+                                                    
                                                     <h3 class="saving-title">
-                                                        {{saving.startingPotValue.currencySymbol}}{{saving.startingPotValue.amount}}
+                                                        {{saving.startingPotValue.currencySymbol  | currencySymbol }}{{saving.startingPotValue.amount}}
                                                     </h3>
                                                     <span
                                                         [className]="saving.realReturn >= 0 ? 'badge green' : 'badge red'">

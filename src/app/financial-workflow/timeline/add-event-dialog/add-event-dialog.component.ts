@@ -243,6 +243,11 @@ export class AddEventDialogComponent {
       this.eventForm.controls['end'].updateValueAndValidity();
       this.eventForm.controls['escalationRate'].addValidators(Validators.required);
       this.eventForm.controls['escalationRate'].updateValueAndValidity();
+
+          const currentValue = this.eventForm.get('escalationRate')?.value;
+    if (currentValue === null || currentValue === '' || currentValue === undefined) {
+      this.eventForm.get('escalationRate')?.setValue('2.5%');
+    }
     }
   }
 
