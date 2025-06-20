@@ -608,7 +608,21 @@ this.timeline.on('mouseDown', (props) => {
 
     console.log(moment(this.financialTimeline.forecastStartDate).year() - clientBirthDateYear)
     if(moment(this.financialTimeline.forecastStartDate).year() - clientBirthDateYear > age) clientBirthDateYear =  clientBirthDateYear+1
-    console.log({ clientBirthDateYear });
+ 
+    const birthYear = moment(this.clientBirthDate).year();
+    const forecastStartYear = moment(this.financialTimeline.forecastStartDate).year();
+
+    const timelineEndYear = birthYear + 100;
+    const visualBufferYears = (timelineEndYear % 2 === 0 ? 1 : 2) + 1;
+
+
+  // Adjust start year so that (startYear - birthYear) is even
+    let startYear = forecastStartYear;
+    if ((startYear - birthYear) % 2 !== 0) {
+      startYear += 1;
+    }
+
+
     return {
       editable: {
         add: false, // Prevent adding new events directly
@@ -634,22 +648,27 @@ this.timeline.on('mouseDown', (props) => {
       orientation: 'bottom', // Place events at the top
       margin: { item: 10 }, // Adds spacing between events
       // min: new Date(moment(this.financialTimeline.forecastStartDate).year(), 0),
-      min: moment(new Date(moment(this.financialTimeline.forecastStartDate).year(), 1))
-        .subtract(42, 'months')
-        .toDate(), // Set a minimum Date for the visible range. It will not be possible to move beyond this minimum.
-      start: new Date(
-        moment(this.financialTimeline.forecastStartDate).year(),
-        1
-      ), //The initial start date for the axis of the timeline. If not provided, the earliest date present in the events is taken as start date.
-      // start: moment(this.financialTimeline.forecastStartDate)
-      // .subtract(5, 'years')
-      // .toDate(),
-      end: moment(new Date(moment(this.financialTimeline.forecastEndtDate).year(), 1))
-        .add(100, 'years')
-        .toDate(),
-      max: moment(new Date(moment(this.financialTimeline.forecastEndtDate).year(), 1))
-        .add(30, 'months')
-        .toDate(),
+      // min: moment(new Date(moment(this.financialTimeline.forecastStartDate).year(), 1))
+      //   .subtract(42, 'months')
+      //   .toDate(), // Set a minimum Date for the visible range. It will not be possible to move beyond this minimum.
+      // start: new Date(
+      //   moment(this.financialTimeline.forecastStartDate).year(),
+      //   1
+      // ), //The initial start date for the axis of the timeline. If not provided, the earliest date present in the events is taken as start date.
+      // // start: moment(this.financialTimeline.forecastStartDate)
+      // // .subtract(5, 'years')
+      // // .toDate(),
+      // end: moment(new Date(moment(this.financialTimeline.forecastEndtDate).year(), 1))
+      //   .add(100, 'years')
+      //   .toDate(),
+      // max: moment(new Date(moment(this.financialTimeline.forecastEndtDate).year(), 1))
+      //   .add(30, 'months')
+      //   .toDate(),
+      start: new Date(startYear, 0, 1),
+      min: new Date(startYear - 4, 0, 1),
+      end: new Date(timelineEndYear + visualBufferYears, 0, 1),
+      max: new Date(timelineEndYear + visualBufferYears, 0, 1),
+
       minHeight: '304px',
       width: '100%',
       align: 'left',
@@ -658,13 +677,12 @@ this.timeline.on('mouseDown', (props) => {
       showMajorLabels: true,
       timeAxis: { scale: 'month', step: 24 },
       format: {
-        minorLabels: function (date: any) {
-          return `
-          <div id='selected'>
-            <p>${date.year() - clientBirthDateYear}</p>
-            <span>${date.year()}</span>
-          </div>`;
-        },
+      minorLabels: (date: any) => {
+        const age = date.year() - birthYear;
+        return age >= 0 && age <= 100
+          ? `<div id='selected'><p>${age}</p><span>${date.year()}</span></div>`
+          : '';
+      },
         majorLabels: function (date: any) {
           return ``; // Show actual years
         },
