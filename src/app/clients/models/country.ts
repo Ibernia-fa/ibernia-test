@@ -54,7 +54,7 @@ export const allCountries = [
     phoneFormat: '',
     currencyName: 'Dirham',
     currencySymbol: 'AED'
-  , symbol: 'د.إ'},
+  , symbol: 'Đ'},
   {
     countryName: 'Argentina',
     countryCode: 'AR',

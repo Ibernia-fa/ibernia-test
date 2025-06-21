@@ -25,6 +25,8 @@
     line-height: 30px;
     color: #1c1c1c;
     font-weight: 700;
+    font-family: "Inter" !important;
+    
   }
   .expense-income {
     color: #71bc42;
@@ -113,6 +115,7 @@ tr.example-detail-row {
   min-width: 110px;
   color: #3a3a47;
   padding: 10px 16px !important;
+    font-family: "Inter" !important;
   // @media (max-width: 768px) {
   //   min-width: 10px;
   // }

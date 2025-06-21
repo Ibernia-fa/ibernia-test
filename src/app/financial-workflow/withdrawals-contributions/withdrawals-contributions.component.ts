@@ -27,6 +27,7 @@ import { TimelineHttpService } from '../timeline/services/timeline-http.service'
 import moment from 'moment';
 import { SavingsPotsHttpService } from '../saving-pots/services/savings-pots-http.service';
 import { SavingPotsModel } from '../saving-pots/models/saving-pots.model';
+import { CurrencySymbolPipe } from 'src/app/pipe/currency-symbol.pipe';
 
 @Component({
   imports: [
@@ -38,6 +39,7 @@ import { SavingPotsModel } from '../saving-pots/models/saving-pots.model';
     MatMenuModule,
     MatButtonModule,
     MatProgressSpinnerModule,
+    CurrencySymbolPipe
   ],
   selector: 'app-withdrawals-contributions',
   templateUrl: './withdrawals-contributions.component.html',

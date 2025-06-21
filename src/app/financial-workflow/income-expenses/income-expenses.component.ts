@@ -27,6 +27,7 @@ import { NavItemService } from 'src/app/layouts/full/nav-item.service';
 import { TimelineHttpService } from '../timeline/services/timeline-http.service';
 import moment from 'moment';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { CurrencySymbolPipe } from 'src/app/pipe/currency-symbol.pipe';
 
 @Component({
   selector: 'app-income-expenses',
@@ -40,6 +41,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatButtonModule,
     MatProgressSpinnerModule,
         MatTooltipModule,
+        CurrencySymbolPipe
   ],
   templateUrl: './income-expenses.component.html',
   styleUrl: './income-expenses.component.scss',

@@ -101,43 +101,28 @@
             </div>
         </div>
 
-        <div #timelineContainer class="timeline" (dragover)="onDragOver($event)" (drop)="onDrop($event)">
+<div class="timeline-wrapper">
+  <div class="timeline-labels">
+    <p>Age</p>
+    <span>Year</span>
+  </div>
+
+  <div class="timeline-container" #timelineContainer
+       (dragover)="onDragOver($event)"
+       (drop)="onDrop($event)">
+  </div>
+</div>
+
+
+
+
+
+        <!-- <div #timelineContainer class="timeline" (dragover)="onDragOver($event)" (drop)="onDrop($event)">
             <div class="timeline-fields">
                 <p>Age</p>
                 <span>Year</span>
             </div>
-            <!-- <div style="display: flex; height: 400px;"> -->
-            <!-- Left Column with Static Labels -->
-            <!-- <div style="width: 100px; background: #f3f3f3; padding: 10px; text-align: right;">
-              <div style="position: absolute; top: 50px;">Label 1</div>
-              <div style="position: absolute; top: 150px;">Label 2</div>
-              <div style="position: absolute; top: 250px;">Label 3</div>
-            </div> -->
 
-            <!-- Timeline Container -->
-            <!-- <div class="timeline-button d-flex flex-column gap-8">
-                    <div>
-                        <button (click)="toggleMoveable()" type="button">
-                            <img src="assets/images/svgs/move-icon.svg" alt="move-icon" />
-                        </button>
-                    </div>
-                    <div>
-    
-                        <button (click)="zoomIn()" type="button">
-                            <img src="assets/images/svgs/zoom-in-icon.svg" alt="zoom-in-icon" />
-                        </button>
-                    </div>
-                    <div>
-                        <button (click)="zoomOut()" type="button">
-                            <img src="assets/images/svgs/zoom-out-icon.svg" alt="zoom-out-icon" />
-                        </button>
-    
-                    </div>
-                </div> -->
-            <!-- </div> -->
-        </div>
-
-        <!-- Chart  -->
-        <!-- End Chart  -->
+        </div> -->
     </mat-card-content>
 </mat-card>

@@ -42,7 +42,7 @@ You may link transactions to specific events, and adjust timing or frequency as 
                                     <h3 class="card-title expense-income">Incomes</h3>
                                 </div>
                                 <h3 class="saving-title">
-                                    +{{selectedClient?.clientDetails?.preferredCurrency}}{{incomeExpense?.totalIncome ?? 0}}
+                                    +{{selectedClient?.clientDetails?.preferredCurrency | currencySymbol}}{{incomeExpense?.totalIncome ?? 0}}
                                 </h3>
                             </div>
                         </div>
@@ -56,7 +56,7 @@ You may link transactions to specific events, and adjust timing or frequency as 
                                     <h3 class="card-title expenses-deduct">Expenses</h3>
                                 </div>
                                 <h3 class="saving-title">
-                                    -{{selectedClient?.clientDetails?.preferredCurrency}}{{incomeExpense?.totalExpenses ?? 0}}
+                                    -{{selectedClient?.clientDetails?.preferredCurrency | currencySymbol}}{{incomeExpense?.totalExpenses ?? 0}}
                                 </h3>
                             </div>
                         </div>
@@ -70,7 +70,7 @@ You may link transactions to specific events, and adjust timing or frequency as 
                                     <h3 class="card-title expenses-total">Total</h3>
                                 </div>
                                 <h3 class="saving-title">=
-                                    {{(incomeExpense?.total ?? 0) < 0 ? '-' : ''}}{{selectedClient?.clientDetails?.preferredCurrency}}{{(incomeExpense?.total ?? 0) < 0 ? ((incomeExpense?.total ?? 0))*(-1) : (incomeExpense?.total ?? 0)}}</h3>
+                                    {{(incomeExpense?.total ?? 0) < 0 ? '-' : ''}}{{selectedClient?.clientDetails?.preferredCurrency | currencySymbol}}{{(incomeExpense?.total ?? 0) < 0 ? ((incomeExpense?.total ?? 0))*(-1) : (incomeExpense?.total ?? 0)}}</h3>
                             </div>
                         </div>
                         <!-- Divider  -->
@@ -145,7 +145,7 @@ You may link transactions to specific events, and adjust timing or frequency as 
                                     </th>
                                     <td mat-cell *matCellDef="let element"
                                         class="p-x-24 f-s-14 p-l-0 column-net-amount">
-                                        {{element.amount.currencySymbol}}
+                                        {{element.amount.currencySymbol | currencySymbol}}
                                         {{element.amount.amount}}/{{element.amount.cycle.description}}</td>
                                 </ng-container>
 
@@ -225,7 +225,7 @@ You may link transactions to specific events, and adjust timing or frequency as 
                                     </th>
                                     <td mat-cell *matCellDef="let element"
                                         class="p-x-24 f-s-14 p-l-0 column-net-amount">
-                                        {{element.amount.currencySymbol}}
+                                        {{element.amount.currencySymbol | currencySymbol}}
                                         {{element.amount.amount}}/{{element.amount.cycle.description}} </td>
                                 </ng-container>
 
