@@ -420,14 +420,14 @@ export class TimelineChartComponent implements OnInit, OnChanges {
   const snappedTime = this.snapToNearestYear(props.time);
   this.timeline.setCustomTime(snappedTime, 'dragOver');
 
-  this.highlightHoveredYearLabel(snappedTime.getFullYear());
+  this.highlightHoveredYearLabel(snappedTime.getFullYear() % 100);
 }
 
 
 highlightHoveredYearLabel(snappedYear: number) {
   const allMinorLabels = document.querySelectorAll('.vis-text.vis-minor');
-
   // Clear previous highlights completely
+  console.log(snappedYear);
   allMinorLabels.forEach((label) => {
     const pTag = label.querySelector('p') as HTMLElement;
     const spanTag = label.querySelector('span') as HTMLElement;
@@ -466,6 +466,8 @@ highlightHoveredYearLabel(snappedYear: number) {
       // }
 
 (label as HTMLElement).style.backgroundColor = '#66B2FF';
+// (label as HTMLElement).style.fontWeight = 'bold';
+// (label as HTMLElement).style.fontSize = 'large';
 (label as HTMLElement).style.border = '1px solid #004C99';
 
     }
@@ -593,35 +595,40 @@ this.timeline.on('mouseDown', (props) => {
   }
   get timelineOptions(): TimelineOptions {
     console.log(this.clientBirthDate);
-
     const birthDate = new Date(this.clientBirthDate);
-    const today = new Date();
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDiff = today.getMonth() - birthDate.getMonth();
-    const dayDiff = today.getDate() - birthDate.getDate();
+    let age = this.calculateAge(birthDate);
 
-    // Adjust age if birth month/day is in the future
-    if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
-      age--;
-    }
-    let clientBirthDateYear = moment(new Date(this.clientBirthDate)).year();
+    console.log("age " + age);
+   
+    //console.log(moment(this.financialTimeline.forecastStartDate).year() - clientBirthDateYear)
 
-    console.log(moment(this.financialTimeline.forecastStartDate).year() - clientBirthDateYear)
-    if(moment(this.financialTimeline.forecastStartDate).year() - clientBirthDateYear > age) clientBirthDateYear =  clientBirthDateYear+1
+    //if(moment(this.financialTimeline.forecastStartDate).year() - clientBirthDateYear > age) clientBirthDateYear =  clientBirthDateYear+1
  
     const birthYear = moment(this.clientBirthDate).year();
+    console.log("birthYear " + birthYear);
+
     const forecastStartYear = moment(this.financialTimeline.forecastStartDate).year();
 
-    const timelineEndYear = birthYear + 100;
-    const visualBufferYears = (timelineEndYear % 2 === 0 ? 1 : 2) + 1;
 
+    const timelineEndYear = new Date(
+      new Date(this.financialTimeline.forecastStartDate).setFullYear(
+        new Date(this.financialTimeline.forecastStartDate).getFullYear() + (100 - age)
+      )
+    ).getFullYear();
 
+    console.log("resultDate " + timelineEndYear);
+
+    const visualBufferYears = (timelineEndYear % 2 === 0 ? 1 : 2);
+
+    console.log(visualBufferYears);
+    console.log(forecastStartYear);
   // Adjust start year so that (startYear - birthYear) is even
     let startYear = forecastStartYear;
-    if ((startYear - birthYear) % 2 !== 0) {
-      startYear += 1;
-    }
+    // if ((startYear - birthYear) % 2 !== 0) {
+    //   startYear += 1;
+    // }
 
+    console.log(startYear);
 
     return {
       editable: {
@@ -665,9 +672,9 @@ this.timeline.on('mouseDown', (props) => {
       //   .add(30, 'months')
       //   .toDate(),
       start: new Date(startYear, 0, 1),
-      min: new Date(startYear - 4, 0, 1),
-      end: new Date(timelineEndYear + visualBufferYears, 0, 1),
-      max: new Date(timelineEndYear + visualBufferYears, 0, 1),
+      //min: new Date(startYear, 0, 1),
+      end: new Date(timelineEndYear + 2, 0, 1),
+      //max: new Date(timelineEndYear + visualBufferYears, 0, 1),
 
       minHeight: '304px',
       width: '100%',
@@ -675,12 +682,13 @@ this.timeline.on('mouseDown', (props) => {
       showCurrentTime: false, // Hide default current time marker
       // showCustomTime: true, // Allows custom markers
       showMajorLabels: true,
-      timeAxis: { scale: 'month', step: 24 },
+      timeAxis: { scale: 'month', step: 12 },
       format: {
       minorLabels: (date: any) => {
-        const age = date.year() - birthYear;
+        const today = new Date(date); // assuming date is a JS Date or something convertible
+        const age = this.calculateAgeForTimeline(today, birthDate);
         return age >= 0 && age <= 100
-          ? `<div id='selected'><p>${age}</p><span>${date.year()}</span></div>`
+          ? `<div id='selected'><p>${age}</p><span>${date.year() % 100}</span></div>`
           : '';
       },
         majorLabels: function (date: any) {
@@ -1160,6 +1168,39 @@ private getContent(title: string, img: string): string {
       </div>
     </div>`;
 }
+
+private calculateAge(dateOfBirth: Date): number {
+  const today = new Date();
+  let age = today.getFullYear() - dateOfBirth.getFullYear();
+  const birthMonth = dateOfBirth.getMonth();
+  const birthDay = dateOfBirth.getDate();
+
+  // If birthday hasn't occurred yet this year, subtract one from age
+  const hasBirthdayPassedThisYear =
+    today.getMonth() > birthMonth ||
+    (today.getMonth() === birthMonth && today.getDate() >= birthDay);
+
+  if (!hasBirthdayPassedThisYear) {
+    age--;
+  }
+
+  return age;
+}
+
+private calculateAgeForTimeline = (date: Date, dateOfBirth: Date): number => {
+  let age = date.getFullYear() - dateOfBirth.getFullYear();
+
+  const hasBirthdayPassed =
+    date.getMonth() > dateOfBirth.getMonth() ||
+    (date.getMonth() === dateOfBirth.getMonth() && date.getDate() >= dateOfBirth.getDate());
+
+  if (!hasBirthdayPassed) {
+    age--;
+  }
+
+  return age;
+};
+
 
 
 }

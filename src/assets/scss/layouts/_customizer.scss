@@ -336,6 +336,7 @@ html .customizerNav {
 // Style Date of Vis Timeline
 .vis-time-axis .vis-text.vis-minor {
   opacity: 30%;
+  width: fit-content !important;
   div {
     display: flex;
     flex-direction: column;
