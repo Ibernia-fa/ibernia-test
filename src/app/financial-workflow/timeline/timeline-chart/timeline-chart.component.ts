@@ -725,7 +725,7 @@ this.timeline.on('mouseDown', (props) => {
       this.timeline.setCustomTime(item.start, 'dragOver');
       const year = new Date(item.start).getFullYear();
 
-      this.highlightHoveredYearLabel(year);
+      this.highlightHoveredYearLabel(year % 100);
 
       callback(item)
     }
