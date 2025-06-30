@@ -2,3 +2,9 @@
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+/* Global tooltip width & wrapping */
+.cdk-overlay-container .mat-mdc-tooltip-surface {
+  max-width: 400px !important;   /* was 200 px by default */
+  white-space: pre-line;         /* lets “\n” create new lines           */
+  font-size: 13px;               /* optional: match your UI font-size    */
+}
