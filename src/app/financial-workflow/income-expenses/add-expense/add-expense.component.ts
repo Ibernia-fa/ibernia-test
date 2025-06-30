@@ -61,6 +61,7 @@ export class AddExpenseComponent {
   isEditWorkflow = false;
   selectedExpense: FinancialViewModel;
   showStartEnd=false;
+  eventsList: any;
 
   constructor(
     private dialogRef: MatDialogRef<AddExpenseComponent>,
@@ -68,6 +69,7 @@ export class AddExpenseComponent {
     private fb: FormBuilder,
     private incomeExpenseHttpService: IncomeExpensesHttpService
   ) {
+    this.eventsList = data.eventsList;
     this.cycles = data.amountCycles;
     this.escalationRates = data.escalataionRates;
     this.clientBirthYear = moment(data.clientBirthDate).year();

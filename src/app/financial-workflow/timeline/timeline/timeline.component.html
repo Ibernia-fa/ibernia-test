@@ -78,7 +78,7 @@ You may add new events to the timeline or adjust existing ones by dragging them 
                                             class="m-l-2" />
                                     </div>
                                     <div class="d-flex justify-content-end">
-                                        <button mat-icon-button (click)="enableForecastEdit=!enableForecastEdit">
+                                        <button [disabled]="true" mat-icon-button (click)="enableForecastEdit=!enableForecastEdit">
                                             <mat-icon>
                                                 <img src="assets/images/svgs/pen-icon.svg" alt="pen-icon" />
                                             </mat-icon>

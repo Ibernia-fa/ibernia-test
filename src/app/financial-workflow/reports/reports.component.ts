@@ -42,6 +42,7 @@ import { FundsViewModel, WithdrawalsContributions } from '../withdrawals-contrib
 import { WithdrawalsContributionsHttpService } from '../withdrawals-contributions/services/withdrawals-contributions-http.service';
 import { ReportsHttpService } from './services/reports-http.service';
 import { ChartSeries } from './models/charts-series.model';
+import { CurrencySymbolPipe } from 'src/app/pipe/currency-symbol.pipe';
 
 export interface PeriodicElement {
   name: string;
@@ -140,6 +141,7 @@ const ELEMENT_DATA: PeriodicElement[] = [
     TimelineChartComponent,
     MatTableModule,
     CommonModule,
+    CurrencySymbolPipe
   ],
   templateUrl: './reports.component.html',
   styleUrl: './reports.component.scss',

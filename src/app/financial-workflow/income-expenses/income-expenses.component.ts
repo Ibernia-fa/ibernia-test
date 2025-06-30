@@ -123,6 +123,7 @@ export class IncomeExpensesComponent {
       disableClose: true,
       data: {
         amountCycles: this.amountCycles,
+        eventsList: this.timeline.clientEvents,
         escalataionRates: this.escalationRates,
         clientBirthDate: this.selectedClient?.clientDetails.birthDate,
         clientPreferredCurrency:
@@ -145,6 +146,7 @@ export class IncomeExpensesComponent {
       data: {
         amountCycles: this.amountCycles,
         escalataionRates: this.escalationRates,
+        eventsList: this.timeline.clientEvents,
         clientBirthDate: this.selectedClient?.clientDetails.birthDate,
         clientPreferredCurrency:
           this.selectedClient?.clientDetails.preferredCurrency,

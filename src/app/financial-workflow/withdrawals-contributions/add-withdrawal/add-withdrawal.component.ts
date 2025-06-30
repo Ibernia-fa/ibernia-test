@@ -63,6 +63,7 @@ export class AddWithdrawalComponent {
   selectedWithdrawal: FundsViewModel;
   showStartEnd = false;
   savingPots: SavingPotsModel;
+  eventsList: any;
 
   constructor(
     private dialogRef: MatDialogRef<AddWithdrawalComponent>,
@@ -70,6 +71,7 @@ export class AddWithdrawalComponent {
     private fb: FormBuilder,
     private withdrawalsContributionsHttpService: WithdrawalsContributionsHttpService
   ) {
+    this.eventsList = data.eventsList;
     this.cycles = data.amountCycles;
     this.escalationRates = data.escalataionRates;
     this.clientBirthYear = moment(data.clientBirthDate).year();

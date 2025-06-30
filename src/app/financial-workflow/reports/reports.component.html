@@ -98,7 +98,7 @@
                                         </div>
                                         <div class="d-flex align-items-center gap-10">
                                             <h3 class="saving-title">
-                                                {{client?.clientDetails?.preferredCurrency}}{{savingPots?.totalSavings
+                                                {{client?.clientDetails?.preferredCurrency | currencySymbol}}{{savingPots?.totalSavings
                                                     ?? 0}}</h3>
                                             <span
                                             [ngClass]="savingPots.totalGwothRate >= 0 ? 'badge green' : 'badge red'">{{savingPots.totalGwothRate
@@ -164,7 +164,7 @@
                                                         </div>
                                                         <div class="d-flex align-items-center gap-10">
                                                             <h3 class="saving-title">
-                                                                {{saving.startingPotValue.currencySymbol}}{{saving.startingPotValue.amount}}
+                                                                {{saving.startingPotValue.currencySymbol | currencySymbol}}{{saving.startingPotValue.amount}}
                                                             </h3>
                                                             <span
                                                                 [className]="saving.realReturn >= 0 ? 'badge green' : 'badge red'">
@@ -235,7 +235,7 @@
                                 <h3 class="card-title expense-income">Incomes</h3>
                             </div>
                             <h3 class="saving-title">
-                                +{{client?.clientDetails?.preferredCurrency}}{{incomeExpense?.totalIncome ?? 0}}
+                                +{{client?.clientDetails?.preferredCurrency | currencySymbol}}{{incomeExpense?.totalIncome ?? 0}}
                             </h3>
                         </div>
                     </div>
@@ -249,7 +249,7 @@
                                 <h3 class="card-title expenses-deduct">Expenses</h3>
                             </div>
                             <h3 class="saving-title">
-                                -{{client?.clientDetails?.preferredCurrency}}{{incomeExpense?.totalExpenses ?? 0}}
+                                -{{client?.clientDetails?.preferredCurrency | currencySymbol}}{{incomeExpense?.totalExpenses ?? 0}}
                             </h3>
                         </div>
                     </div>
@@ -263,7 +263,7 @@
                                 <h3 class="card-title expenses-total">Total</h3>
                             </div>
                             <h3 class="saving-title">=
-                                {{(incomeExpense?.total ?? 0) < 0 ? '-' : ''}}{{client?.clientDetails?.preferredCurrency}}{{(incomeExpense?.total ?? 0) < 0 ? ((incomeExpense?.total ?? 0))*(-1) : (incomeExpense?.total ?? 0)}}</h3>
+                                {{(incomeExpense?.total ?? 0) < 0 ? '-' : ''}}{{client?.clientDetails?.preferredCurrency | currencySymbol}}{{(incomeExpense?.total ?? 0) < 0 ? ((incomeExpense?.total ?? 0))*(-1) : (incomeExpense?.total ?? 0)}}</h3>
                         </div>
                     </div>
                     <!-- Divider  -->

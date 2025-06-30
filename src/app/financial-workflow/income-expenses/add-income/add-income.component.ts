@@ -49,6 +49,7 @@ import { catchError, filter } from 'rxjs';
   styleUrl: './add-income.component.scss',
 })
 export class AddIncomeComponent {
+  eventsList: any;
   incomeForm: FormGroup;
   countries = allCountries;
   cycles: Cycle[];
@@ -68,6 +69,7 @@ export class AddIncomeComponent {
     private fb: FormBuilder,
     private incomeExpenseHttpService: IncomeExpensesHttpService
   ) {
+    this.eventsList = data.eventsList;
     this.cycles = data.amountCycles;
     this.escalationRates = data.escalataionRates;
     this.clientBirthYear = moment(data.clientBirthDate).year();

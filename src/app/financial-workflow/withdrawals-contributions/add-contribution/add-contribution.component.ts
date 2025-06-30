@@ -63,6 +63,7 @@ export class AddContributionComponent {
   selectedContribution: FundsViewModel;
   showStartEnd = false;
   savingPots: SavingPotsModel
+  eventsList: any;
 
   constructor(
     private dialogRef: MatDialogRef<AddContributionComponent>,
@@ -70,6 +71,7 @@ export class AddContributionComponent {
     private fb: FormBuilder,
     private withdrawalsContributionsHttpService: WithdrawalsContributionsHttpService
   ) {
+    this.eventsList = data.eventsList;
     this.cycles = data.amountCycles;
     this.escalationRates = data.escalataionRates;
     this.clientBirthYear = moment(data.clientBirthDate).year();

@@ -127,6 +127,7 @@ export class WithdrawalsContributionsComponent {
       width: '700px',
       disableClose: true,
       data: {
+        eventsList: this.timeline.clientEvents,
         amountCycles: this.amountCycles,
         escalataionRates: this.escalationRates,
         clientBirthDate: this.selectedClient?.clientDetails.birthDate,
@@ -150,6 +151,7 @@ export class WithdrawalsContributionsComponent {
       disableClose: true,
       data: {
         amountCycles: this.amountCycles,
+        eventsList: this.timeline.clientEvents,
         escalataionRates: this.escalationRates,
         clientBirthDate: this.selectedClient?.clientDetails.birthDate,
         clientPreferredCurrency:
