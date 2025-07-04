@@ -114,6 +114,31 @@ export class SavingsBarStackedChartComponent implements OnChanges {
   }  
 
   ngOnChanges(changes: SimpleChanges): void {
+  if (changes['report'] && this.report?.series?.length) {
+    const seriesList = this.report.series;
+    const seriesColors = this.chartOptions.colors || [];
+
+    // Dynamically build fillColors array based on series names
+    const fillColors = seriesList.map((s, i) =>
+      s.name === 'Current Account (Negative)' ? 'transparent' :  s.color
+    );
+  console.log(fillColors);
+    this.chartOptions.legend = {
+      ...this.chartOptions.legend,
+      formatter: (seriesName: string, opts: any) =>
+        seriesName === 'Current Account (Negative)' ? '' : seriesName,
+      markers: {
+        fillColors: fillColors
+      },
+      onItemClick: {
+        toggleDataSeries: true
+      },
+      onItemHover: {
+        highlightDataSeries: true
+      }
+    };
+  }
+
     if (changes['forecastStartDate'] || changes['forecastEndDate']) {
       this.chartOptions.xaxis = {
         type: 'numeric', // Treat x-axis as numbers (years)
