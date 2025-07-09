@@ -249,7 +249,7 @@
                 <mat-select value="Select" formControlName="start" hideSingleSelectionIndicator>
                   <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
 
-                  
+
                   @for (year of years; let i = $index;  track year) {
                   <mat-option [value]="year">{{ year }} ({{ clientAge + i }})</mat-option>
                   }
@@ -575,7 +575,9 @@
                 <div class="select-option">
                   <mat-select formControlName="escalationRate" value="Select">
                     <mat-option value="2.5%">Increase at same rate as inflation (2.5%)</mat-option>
-                    <mat-option value="0%">Don't increase with inflation</mat-option>
+                    <mat-option value="0%">Doesn't increase with inflation</mat-option>
+                    <mat-option value="0%">"Increase at custom rate"</mat-option>
+
                   </mat-select>
                 </div>
                 @if(eventForm.get('escalationRate')?.touched &&

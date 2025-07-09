@@ -194,4 +194,25 @@
 .timeline-container {
   flex: 1;
 }
+.timeline-tooltip {
+  position: fixed;
+  background: rgba(0, 76, 153, 0.95);
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  pointer-events: none;
+  z-index: 9999;
+  white-space: nowrap;
+}
+#year-tooltip {
+  position: fixed;         // Important for screen-relative cursor
+  z-index: 9999;
+  background: rgba(0, 76, 153, 0.95);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  pointer-events: none;
+  font-size: 12px;
+}
 
