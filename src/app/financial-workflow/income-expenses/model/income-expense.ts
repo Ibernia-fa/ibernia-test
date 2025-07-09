@@ -1,6 +1,6 @@
 import { CashflowViewModel } from "src/app/clients/models/cashflow";
 import { ClientViewModel, FinancialAdvisor } from "src/app/clients/models/client";
-import { AgeYear, NetAmount } from "../../timeline/models/financial-timeline";
+import { AgeYear, EscalationRate, NetAmount } from "../../timeline/models/financial-timeline";
 
 export interface IncomeExpense {
   id: string;
@@ -21,4 +21,6 @@ export interface FinancialViewModel {
     amount: NetAmount;
     start: AgeYear;
     end: AgeYear;
+    escalationRate: EscalationRate | null;
+    
 }

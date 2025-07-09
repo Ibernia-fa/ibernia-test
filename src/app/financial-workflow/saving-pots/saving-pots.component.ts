@@ -147,12 +147,12 @@ export class SavingPotsComponent implements OnInit {
             ),
           ]);
         }),
-        tap(([savingPots, timeline, amountCycles, escalationRates]) => {
-          console.log(timeline, amountCycles, escalationRates);
+        tap(([savingPots, timeline, amountCycles, escalationRatesResponse]) => {
+          console.log(timeline, amountCycles, escalationRatesResponse);
           this.savingPots = savingPots;
           this.timeline = timeline;
           this.amountCycles = amountCycles;
-          this.escalationRates = escalationRates;
+          this.escalationRates = escalationRatesResponse.escalationRates;
           this.isLoaderVisible = false;
         })
       )

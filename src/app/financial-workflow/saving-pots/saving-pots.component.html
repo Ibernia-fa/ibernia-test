@@ -53,11 +53,11 @@ You may rearrange the order by dragging and dropping the pots, or by using the u
                                                 <h3 class="saving-title">
                                                     {{selectedClient?.clientDetails?.preferredCurrency  | currencySymbol }}{{savingPots?.totalSavings
                                                     ?? 0}}</h3>
-                                                <span
+                                                <!-- <span
                                                     [ngClass]="savingPots.totalGwothRate >= 0 ? 'badge green' : 'badge red'">{{savingPots.totalGwothRate
                                                     >= 0 ? '+' : '-'}}{{(savingPots?.totalGwothRate | number : '1.0-0')
                                                     ??
-                                                    0}}%</span>
+                                                    0}}%</span> -->
                                             </div>
                                         </div>
                                     </div>

@@ -106,6 +106,8 @@ export class AddExpenseComponent {
       cycle: [this.cycles[1].id, Validators.required],
       start: ['', Validators.required],
       end: [''],
+      escalationRate: ['', Validators.required],
+
     });
 
     this.onCycleValueChange(this.cycles[1].id);
@@ -188,7 +190,18 @@ export class AddExpenseComponent {
             this.expenseForm.get('end')?.value !== ''
               ? this.expenseForm.get('end')?.value
               : 0,
-        },      
+        },
+ escalationRate: this.expenseForm.get('escalationRate')?.value !== null &&
+                this.expenseForm.get('escalationRate')?.value !== ''
+  ? this.escalationRates.find(x => x.value === this.expenseForm.get('escalationRate')?.value) ??
+    {
+      description: this.expenseForm.get('escalationRate')?.value,
+      value: this.expenseForm.get('escalationRate')?.value
+    }
+  : {
+      description: '',
+      value: ''
+    }     
       };
 
       var action$ = this.incomeExpenseHttpService.addExpense(

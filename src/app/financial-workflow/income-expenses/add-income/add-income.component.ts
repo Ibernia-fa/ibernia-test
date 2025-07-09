@@ -72,6 +72,7 @@ export class AddIncomeComponent {
     this.eventsList = data.eventsList;
     this.cycles = data.amountCycles;
     this.escalationRates = data.escalataionRates;
+    console.log('rates', this.escalationRates);
     this.clientBirthYear = moment(data.clientBirthDate).year();
     const birthDate = new Date(data.clientBirthDate);
     const today = new Date();
@@ -106,6 +107,8 @@ export class AddIncomeComponent {
       cycle: [this.cycles[1].id, Validators.required],
       start: ['', Validators.required],
       end: [''],
+      escalationRate: ['', Validators.required],
+      
     });
 
     this.onCycleValueChange(this.cycles[1].id);
@@ -188,6 +191,17 @@ export class AddIncomeComponent {
               ? this.incomeForm.get('end')?.value
               : 0,
         },
+ escalationRate: this.incomeForm.get('escalationRate')?.value !== null &&
+                this.incomeForm.get('escalationRate')?.value !== ''
+  ? this.escalationRates.find(x => x.value === this.incomeForm.get('escalationRate')?.value) ??
+    {
+      description: this.incomeForm.get('escalationRate')?.value,
+      value: this.incomeForm.get('escalationRate')?.value
+    }
+  : {
+      description: '',
+      value: ''
+    }
       };
 
       var action$ = this.incomeExpenseHttpService.addIncome(

@@ -103,10 +103,10 @@ export class WithdrawalsContributionsComponent {
             )
           ]);
         }),
-        tap(([contributionWithdrawal, timeline, amountCycles, escalationRates, savingsPots]) => {
+        tap(([contributionWithdrawal, timeline, amountCycles, escalationRatesResponse, savingsPots]) => {
           this.contributionWithdrawal = contributionWithdrawal;
           this.amountCycles = amountCycles;
-          this.escalationRates = escalationRates;
+          this.escalationRates = escalationRatesResponse.escalationRates;
           this.timeline = timeline;
           this.savingsPots = savingsPots
 

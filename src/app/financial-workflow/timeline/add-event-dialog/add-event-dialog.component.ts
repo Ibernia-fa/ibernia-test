@@ -12,7 +12,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { Client } from 'src/app/clients/models/client';
-import { ClientEvent, EventIncomeType } from '../models/financial-timeline';
+import { ClientEvent, EscalationRate, EventIncomeType } from '../models/financial-timeline';
 import {
   FormBuilder,
   FormControl,
@@ -58,7 +58,7 @@ interface Food {
 })
 export class AddEventDialogComponent {
   isIncomeEvent = true;
-
+  escalationRates: EscalationRate[];
   selectedEventType: string = EventType.CUSTOM;
   eventType = EventType;
   customEventsLibrary: ClientEvent[];
@@ -89,6 +89,7 @@ export class AddEventDialogComponent {
     console.log(data);
     this.selectedEventType = data.eventType;
     this.isIncomeEvent = data.isIncomeEvent;
+    this.escalationRates = data.escalataionRates;
     this.customEventsLibrary = data.customEvents;
     this.timelineId = data.timelineId;
     this.cashflowId = data.cashflowId;
@@ -295,8 +296,9 @@ export class AddEventDialogComponent {
           age: this.eventForm.get('end')?.value - this.clientBirthYear,
         },
         escalationRate: {
-          id: '',
-          description: this.eventForm.get('escalationRate')?.value
+          // id: '',
+          description: this.eventForm.get('escalationRate')?.value,
+          value:this.eventForm.get('escalationRate')?.value
         },
         type: this.isIncomeEvent
           ? EventIncomeType.Income
@@ -391,8 +393,9 @@ export class AddEventDialogComponent {
           age: (this.eventForm.get('end')?.value > this.clientBirthYear) ? this.eventForm.get('end')?.value - this.clientBirthYear : 0,
         },
         escalationRate: {
-          id: '',
-          description: this.eventForm.get('escalationRate')?.value
+          // id: '',
+          description: this.eventForm.get('escalationRate')?.value,
+          value:this.eventForm.get('escalationRate')?.value
         },
         type: this.isIncomeEvent
           ? EventIncomeType.Income

@@ -43,6 +43,7 @@ import { catchError, combineLatest, filter, map, take, tap } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { Client } from 'src/app/clients/models/client';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
+import { SettingsHttpService } from '../../settings/services/settings-http.service';
 
 @Component({
   selector: 'app-timeline-chart',
@@ -83,14 +84,22 @@ export class TimelineChartComponent implements OnInit, OnChanges {
   private tooltipPollingInterval: any;
   private tooltipMouseX: number = 0;
   private tooltipMouseY: number = 0;
+  escalationRates: import("c:/Projects/Ibernia-portal/src/app/financial-workflow/timeline/models/financial-timeline").EscalationRate[];
 
   constructor(
     private dialog: MatDialog,
     private timelineHttpService: TimelineHttpService,
     private cdr: ChangeDetectorRef,
-    private toastrService: ToastrService
+    private toastrService: ToastrService,
+    private settingHttpService: SettingsHttpService
+    
   ) {
     this.updateTimelines = new EventEmitter<boolean>();
+        this.settingHttpService.getEscalationRates(
+             '678c93f32be72db4b9631be1'
+            ).subscribe((escalationRatesResponse) => {
+              this.escalationRates = escalationRatesResponse.escalationRates;
+            })
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -1162,6 +1171,7 @@ handleEventMoving(item: any, callback: (item: any) => void) {
       disableClose: true,
       data: {
         eventType: EventType.CUSTOM,
+        escalataionRates : this.escalationRates,
         customEvents: this.customEventsLibrary,
         timelineId: this.financialTimeline.id,
         cashflowId: this.financialTimeline.cashflow.id,

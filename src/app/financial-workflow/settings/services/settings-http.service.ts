@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Cycle, EscalationRate, NetAmount } from '../../timeline/models/financial-timeline';
+import { Cycle, EscalationRate, EscalationRateResponse, NetAmount } from '../../timeline/models/financial-timeline';
 
 @Injectable({
   providedIn: 'root'
@@ -15,6 +15,6 @@ export class SettingsHttpService {
   }
   
   public getEscalationRates(financialAdvisorId: string) {
-    return this.httpClient.get<Array<EscalationRate>>(`${this.SETTINGS_BASE_URL}${financialAdvisorId}/escalation-rates`);
+    return this.httpClient.get<EscalationRateResponse>(`${this.SETTINGS_BASE_URL}${financialAdvisorId}/escalation-rates`);
   }
 }

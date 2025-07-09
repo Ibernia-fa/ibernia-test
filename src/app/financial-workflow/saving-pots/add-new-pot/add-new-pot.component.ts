@@ -204,7 +204,7 @@ export class AddNewPotComponent {
       this.savingsForm.get('commissionPercentageCycle')?.patchValue(this.selectedPot.comission.percentage?.cycle?.id);
       this.savingsForm.get('commissionPercentage')?.patchValue(this.selectedPot.comission.percentage?.amount);
     }
-    this.savingsForm.get('escalationRate')?.patchValue(this.selectedPot.comission.escalationRate.id);
+    this.savingsForm.get('escalationRate')?.patchValue(this.selectedPot.comission.escalationRate.value);
 
   }
 
@@ -285,7 +285,7 @@ export class AddNewPotComponent {
         ?.setValidators(Validators.required);
       this.savingsForm
         .get('escalationRate')
-        ?.setValue(this.escalationRates[1].id);
+        ?.setValue(this.escalationRates[1].value);
 
       this.savingsForm.get('commissionCurrency')?.updateValueAndValidity();
       this.savingsForm.get('commissionAmount')?.updateValueAndValidity();
@@ -402,7 +402,7 @@ export class AddNewPotComponent {
           escalationRate:
             this.savingsForm.get('escalationRate')?.value !== null &&
             this.savingsForm.get('escalationRate')?.value !== ''
-              ? this.escalationRates.find(x => x.id === this.savingsForm.get('escalationRate')?.value) ??
+              ? this.escalationRates.find(x => x.value === this.savingsForm.get('escalationRate')?.value) ??
               this.savingsForm.get('escalationRate')?.value
               : {
                   id: '',
@@ -522,7 +522,7 @@ export class AddNewPotComponent {
         ?.setValidators(Validators.required);
       this.savingsForm
         .get('escalationRate')
-        ?.setValue(this.escalationRates[1].id);
+        ?.setValue(this.escalationRates[1].value);
 
       this.savingsForm.get('commissionCurrency')?.updateValueAndValidity();
       this.savingsForm.get('commissionAmount')?.updateValueAndValidity();
@@ -575,7 +575,7 @@ export class AddNewPotComponent {
         ?.setValidators(Validators.required);
       this.savingsForm
         .get('escalationRate')
-        ?.setValue(this.escalationRates[1].id);
+        ?.setValue(this.escalationRates[1].value);
 
       this.savingsForm.get('commissionCurrency')?.updateValueAndValidity();
       this.savingsForm.get('commissionAmount')?.updateValueAndValidity();
@@ -627,7 +627,7 @@ export class AddNewPotComponent {
         ?.setValidators(Validators.required);
       this.savingsForm
         .get('escalationRate')
-        ?.setValue(this.escalationRates[1].id);
+        ?.setValue(this.escalationRates[1].value);
 
       this.savingsForm.get('commissionCurrency')?.updateValueAndValidity();
       this.savingsForm.get('commissionAmount')?.updateValueAndValidity();

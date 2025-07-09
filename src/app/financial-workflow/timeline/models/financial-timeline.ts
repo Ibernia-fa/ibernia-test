@@ -47,8 +47,14 @@ export interface Cycle {
 }
 
 export interface EscalationRate {
-  id: string;
+  // id: string;
   description: string;
+  value: string;
+}
+
+export interface EscalationRateResponse{
+  escalationRates: Array<EscalationRate>,
+  id: string
 }
 
 export enum EventIncomeType
