@@ -18,6 +18,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import {
   ClientEvent,
+  EscalationRate,
   EventIncomeType,
   FinancialTimeline,
 } from '../models/financial-timeline';
@@ -84,7 +85,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
   private tooltipPollingInterval: any;
   private tooltipMouseX: number = 0;
   private tooltipMouseY: number = 0;
-  escalationRates: import("c:/Projects/Ibernia-portal/src/app/financial-workflow/timeline/models/financial-timeline").EscalationRate[];
+  escalationRates: EscalationRate[];
 
   constructor(
     private dialog: MatDialog,
