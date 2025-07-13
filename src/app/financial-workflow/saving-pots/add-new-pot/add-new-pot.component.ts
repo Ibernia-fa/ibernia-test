@@ -156,6 +156,8 @@ export class AddNewPotComponent {
       escalationRate: [''],
     });
 
+    this.savingsForm.get('currency')?.disable();
+
     this.savingsForm.get('returnRate')?.valueChanges.subscribe((value) => {
       this.formattedReturnRate = this.formatWithPercentage(value);
     });

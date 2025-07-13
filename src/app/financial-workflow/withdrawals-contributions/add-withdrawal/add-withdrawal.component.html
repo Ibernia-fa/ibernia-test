@@ -32,8 +32,8 @@
             <mat-label class="f-s-16 d-block" style="line-height: 18px">Net amount</mat-label>
             <div class="net-field d-flex align-items-center">
               <!-- Currency Selector  -->
-              <!-- <div class="left">
-                <mat-select formControlName="currencySymbol" class="sortby-edit-profile" hideSingleSelectionIndicator>
+              <div class="left">
+                <mat-select formControlName="currencySymbol" class="sortby-edit-profile" [disabled]="true" hideSingleSelectionIndicator>
                   @for (country of countries; track country) {
                   @if(country.currencySymbol) {
                   <mat-option [value]="country.currencySymbol">{{
@@ -43,7 +43,7 @@
                   }
                   }
                 </mat-select>
-              </div> -->
+              </div>
               <!-- End Currency Selector  -->
               <!-- Price Field  -->
               <div class="w-100 form-field">

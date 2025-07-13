@@ -109,6 +109,7 @@ export class AddExpenseComponent {
       escalationRate: ['', Validators.required],
 
     });
+    this.expenseForm.get('currencySymbol')?.disable();
 
     this.onCycleValueChange(this.cycles[1].id);
 

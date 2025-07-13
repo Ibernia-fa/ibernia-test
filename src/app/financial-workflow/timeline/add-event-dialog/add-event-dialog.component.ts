@@ -177,6 +177,7 @@ export class AddEventDialogComponent {
         this.onCycleValueChange('One-Off');
         break;
     }
+    this.eventForm.get('currency')?.disable();
 
     if(this.isEditWorkflow) {
       this.patchForm();

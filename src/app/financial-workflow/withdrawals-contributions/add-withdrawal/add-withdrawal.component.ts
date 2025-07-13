@@ -112,7 +112,7 @@ export class AddWithdrawalComponent {
       end: [''],
       savingPot: ['']
     });
-
+    this.withdrawalForm.get('currencySymbol')?.disable();
     this.onCycleValueChange(this.cycles[1].id);
 
     if (this.isEditWorkflow) {

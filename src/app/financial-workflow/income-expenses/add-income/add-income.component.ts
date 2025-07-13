@@ -110,6 +110,7 @@ export class AddIncomeComponent {
       escalationRate: ['', Validators.required],
       
     });
+    this.incomeForm.get('currencySymbol')?.disable();
 
     this.onCycleValueChange(this.cycles[1].id);
 

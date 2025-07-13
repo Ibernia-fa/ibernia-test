@@ -111,6 +111,7 @@ export class AddContributionComponent {
       end: [''],
       savingPot: ['']
     });
+    this.contributionForm.get('currencySymbol')?.disable();
 
     this.onCycleValueChange(this.cycles[1].id);
 
