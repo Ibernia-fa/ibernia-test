@@ -201,7 +201,7 @@ export class AddExpenseComponent {
     }
   : {
       description: '',
-      value: ''
+      value: 0
     }     
       };
 

@@ -201,7 +201,7 @@ export class AddIncomeComponent {
     }
   : {
       description: '',
-      value: ''
+      value: 0
     }
       };
 

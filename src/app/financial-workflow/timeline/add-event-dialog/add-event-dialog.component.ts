@@ -402,7 +402,7 @@ export class AddEventDialogComponent {
     }
     : {
       description: '',
-      value: ''
+      value: 0
     }, 
         type: this.isIncomeEvent
           ? EventIncomeType.Income
