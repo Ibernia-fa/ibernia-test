@@ -393,11 +393,17 @@ export class AddEventDialogComponent {
           year: this.eventForm.get('end')?.value,
           age: (this.eventForm.get('end')?.value > this.clientBirthYear) ? this.eventForm.get('end')?.value - this.clientBirthYear : 0,
         },
-        escalationRate: {
-          // id: '',
-          description: this.eventForm.get('escalationRate')?.value,
-          value:this.eventForm.get('escalationRate')?.value
-        },
+ escalationRate: this.eventForm.get('escalationRate')?.value !== null &&
+                this.eventForm.get('escalationRate')?.value !== ''
+  ? this.escalationRates.find(x => x.value === this.eventForm.get('escalationRate')?.value) ??
+    {
+      description: this.eventForm.get('escalationRate')?.value,
+      value: this.eventForm.get('escalationRate')?.value
+    }
+    : {
+      description: '',
+      value: ''
+    }, 
         type: this.isIncomeEvent
           ? EventIncomeType.Income
           : EventIncomeType.Expense,
