@@ -10,7 +10,7 @@ import {
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
+import { MatSelectChange, MatSelectModule } from '@angular/material/select';
 import { Client } from 'src/app/clients/models/client';
 import { ClientEvent, EscalationRate, EventIncomeType } from '../models/financial-timeline';
 import {
@@ -78,6 +78,7 @@ export class AddEventDialogComponent {
   patchEvent: ClientEvent | undefined | null;
   countries = allCountries;
   clientPreferredCurrency: string;
+  selectedEscalationDescription: string | null;
 
 
   constructor(
@@ -147,6 +148,8 @@ export class AddEventDialogComponent {
           amount: ['', [Validators.required, Validators.min(0)]],
           cycle: [{value: this.systemEvent?.isOneOff ? 'One-Off' : '', disabled: true}, [Validators.required]],
           ageDate: [moment(this.dropTime).year(), Validators.required],
+          customEscalationRate: [0]
+
         });
         break;
 
@@ -159,6 +162,8 @@ export class AddEventDialogComponent {
           start: [moment(this.dropTime).year(), Validators.required],
           end: [0, Validators.required],
           escalationRate: ['', Validators.required],
+          customEscalationRate: [0]
+
         });
         this.onCycleValueChange(this.systemEvent?.isOneOff ? 'One-Off' : '');
         break;
@@ -173,6 +178,8 @@ export class AddEventDialogComponent {
           start: [null, Validators.required],
           end: [0, Validators.required],
           escalationRate: ['', Validators.required],
+          customEscalationRate: [0]
+
         });
         this.onCycleValueChange('One-Off');
         break;
@@ -202,7 +209,9 @@ export class AddEventDialogComponent {
           this.eventForm.controls['start'].patchValue(this.patchEvent?.start.year);
           this.eventForm.controls['end'].patchValue(this.patchEvent?.end?.year);
           this.eventForm.controls['escalationRate'].patchValue(this.patchEvent?.escalationRate?.description);
-        break;
+        this.handleEscalationRatePatch(this.patchEvent?.escalationRate?.description, this.patchEvent?.escalationRate?.value);
+
+          break;
         
         case EventType.CUSTOM:
           if(this.customEventsLibrary.every(event => event.name !== this.patchEvent?.name))
@@ -229,9 +238,26 @@ export class AddEventDialogComponent {
           this.eventForm.controls['start'].patchValue(this.patchEvent?.start.year);
           this.eventForm.controls['end'].patchValue(this.patchEvent?.end?.year);
           this.eventForm.controls['escalationRate'].patchValue(this.patchEvent?.escalationRate?.description);
-        break;
+        this.handleEscalationRatePatch(this.patchEvent?.escalationRate?.description, this.patchEvent?.escalationRate?.value);
+
+          break;
     }
   }
+
+  private handleEscalationRatePatch(description: string| any, value: number| any) {
+  this.eventForm.controls['escalationRate'].patchValue(description);
+
+  if (description === 'Increase at custom rate') {
+    this.selectedEscalationDescription = description;
+    this.eventForm.controls['escalationRate'].patchValue(this.selectedEscalationDescription);
+
+    const customControl = this.eventForm.get('customEscalationRate');
+    customControl?.setValidators([Validators.required, Validators.min(0)]);
+    customControl?.setValue(value);
+    customControl?.updateValueAndValidity();
+  }
+}
+
 
   onCycleValueChange(event: string) {
     if(event === 'One-Off') {
@@ -277,6 +303,10 @@ export class AddEventDialogComponent {
   onPensionEventSubmit() {
     this.eventForm.markAllAsTouched();
     if (this.eventForm.valid && this.systemEvent) {
+      const isCustomEscalation = this.selectedEscalationDescription === 'Increase at custom rate';
+const selectedEscalationRateValue = isCustomEscalation
+  ? this.eventForm.get('customEscalationRate')?.value
+  : this.eventForm.get('escalationRate')?.value;
       const clientEvent: ClientEvent = {
         id: this.systemEvent.id,
         name: this.systemEvent.name,
@@ -296,11 +326,15 @@ export class AddEventDialogComponent {
           year: this.eventForm.get('end')?.value,
           age: this.eventForm.get('end')?.value - this.clientBirthYear,
         },
-        escalationRate: {
-          // id: '',
-          description: this.eventForm.get('escalationRate')?.value,
-          value:this.eventForm.get('escalationRate')?.value
-        },
+        escalationRate: selectedEscalationRateValue !== null && selectedEscalationRateValue !== ''
+          ? this.escalationRates.find(x => x.value === selectedEscalationRateValue) ?? {
+              value: selectedEscalationRateValue,
+              description: isCustomEscalation ? 'Increase at custom rate' : selectedEscalationRateValue
+            }
+          : {
+              value: 0,
+              description: ''
+            },
         type: this.isIncomeEvent
           ? EventIncomeType.Income
           : EventIncomeType.Expense,
@@ -371,6 +405,10 @@ export class AddEventDialogComponent {
     console.log(this.eventForm.value);
     this.eventForm.markAllAsTouched();
     if (this.eventForm.valid) {
+      const isCustomEscalation = this.selectedEscalationDescription === 'Increase at custom rate';
+const selectedEscalationRateValue = isCustomEscalation
+  ? this.eventForm.get('customEscalationRate')?.value
+  : this.eventForm.get('escalationRate')?.value;
       const clientEvent: ClientEvent = {
         id: this.isEditWorkflow ? this.patchEvent?.id ?? "" : "",
         name:
@@ -393,17 +431,15 @@ export class AddEventDialogComponent {
           year: this.eventForm.get('end')?.value,
           age: (this.eventForm.get('end')?.value > this.clientBirthYear) ? this.eventForm.get('end')?.value - this.clientBirthYear : 0,
         },
- escalationRate: this.eventForm.get('escalationRate')?.value !== null &&
-                this.eventForm.get('escalationRate')?.value !== ''
-  ? this.escalationRates.find(x => x.value === this.eventForm.get('escalationRate')?.value) ??
-    {
-      description: this.eventForm.get('escalationRate')?.value,
-      value: this.eventForm.get('escalationRate')?.value
+escalationRate: selectedEscalationRateValue !== null && selectedEscalationRateValue !== ''
+  ? this.escalationRates.find(x => x.value === selectedEscalationRateValue) ?? {
+      value: selectedEscalationRateValue,
+      description: isCustomEscalation ? 'Increase at custom rate' : selectedEscalationRateValue
     }
-    : {
-      description: '',
-      value: 0
-    }, 
+  : {
+      value: 0,
+      description: ''
+    },
         type: this.isIncomeEvent
           ? EventIncomeType.Income
           : EventIncomeType.Expense,
@@ -448,6 +484,43 @@ export class AddEventDialogComponent {
   currencySymbols: string[] = ['$', '£', '€'];
 
   events: string[] = ['$', '£', '€'];
+    
+    get isCustomEscalationSelected(): boolean {
+      const selectedValue = this.eventForm.get('escalationRate')?.value;
+    
+      // Find exact match by both value and description
+      return this.escalationRates.some(e =>
+        e.value === selectedValue && e.description === 'Increase at custom rate'
+      );
+    }
+    
+    
+    
+    onEscalationRateChange(event: MatSelectChange): void {
+      const selectedOption = event.source.selected;
+    
+      let description: string | null = null;
+    
+      if (Array.isArray(selectedOption)) {
+        description = selectedOption[0]?.viewValue ?? null;
+      } else {
+        description = selectedOption?.viewValue ?? null;
+      }
+    
+      this.selectedEscalationDescription = description;
+    
+      const customControl = this.eventForm.get('customEscalationRate');
+    
+      if (description === 'Increase at custom rate') {
+        customControl?.setValidators([Validators.required, Validators.min(0)]);
+      } else {
+        customControl?.clearValidators();
+        customControl?.setValue(null); // Optionally reset field
+      }
+    
+      customControl?.updateValueAndValidity();
+    }
+  
 }
 
 export class EventType {

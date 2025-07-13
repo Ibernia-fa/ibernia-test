@@ -318,18 +318,37 @@
         </div>
         <div class="position-relative">
           <div class="w-100 form-field">
-            <div class="select-option">
-              <mat-select formControlName="escalationRate" value="Select">
-                <mat-option value="2.5%">Increase at same rate as inflation (2.5%)</mat-option>
-                <mat-option value="0%">Doesn't increase with inflation</mat-option>
-              </mat-select>
-            </div>
+           <div class="select-option">
+                    <mat-select formControlName="escalationRate" value="Select" (selectionChange)="onEscalationRateChange($event)">
+                  @for (escalationRate of escalationRates; track escalationRate) {
+                  <mat-option [value]="escalationRate.value">{{ escalationRate.description }}</mat-option>
+                  }
+                </mat-select>
+                </div>
             @if(eventForm.get('escalationRate')?.touched &&
             eventForm.get('escalationRate')?.hasError('required')) {
             <span class="field-error d-block">Escalation Rate is required</span>
             }
           </div>
         </div>
+        @if(selectedEscalationDescription === 'Increase at custom rate') {
+          <div class="w-100 form-field gap-12">
+            <mat-label class="f-s-16 d-block">Custom Escalation Rate (%)</mat-label>
+            <div class="input-container position-relative">
+              <input
+                matInput
+                type="number"
+                formControlName="customEscalationRate"
+                placeholder="Enter custom rate"
+              />
+              <span class="suffix">%</span>
+            </div>
+            @if(eventForm.get('customEscalationRate')?.touched &&
+                eventForm.get('customEscalationRate')?.hasError('required')) {
+              <span class="field-error d-block">Custom escalation rate is required</span>
+            }
+          </div>
+        }
       </div>
     }
   </div>
@@ -573,7 +592,7 @@
             <div class="position-relative">
               <div class="w-100 form-field">
                 <div class="select-option">
-                    <mat-select formControlName="escalationRate" value="Select">
+                    <mat-select formControlName="escalationRate" value="Select" (selectionChange)="onEscalationRateChange($event)">
                   @for (escalationRate of escalationRates; track escalationRate) {
                   <mat-option [value]="escalationRate.value">{{ escalationRate.description }}</mat-option>
                   }
@@ -585,6 +604,24 @@
                 }
               </div>
             </div>
+                    @if(selectedEscalationDescription === 'Increase at custom rate') {
+          <div class="w-100 form-field gap-12">
+            <mat-label class="f-s-16 d-block">Custom Escalation Rate (%)</mat-label>
+            <div class="input-container position-relative">
+              <input
+                matInput
+                type="number"
+                formControlName="customEscalationRate"
+                placeholder="Enter custom rate"
+              />
+              <span class="suffix">%</span>
+            </div>
+            @if(eventForm.get('customEscalationRate')?.touched &&
+                eventForm.get('customEscalationRate')?.hasError('required')) {
+              <span class="field-error d-block">Custom escalation rate is required</span>
+            }
+          </div>
+        }
           </div>
         }
       </div>

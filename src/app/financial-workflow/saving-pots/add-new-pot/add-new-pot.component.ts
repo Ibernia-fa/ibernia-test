@@ -18,7 +18,7 @@ import {
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
+import { MatSelectChange, MatSelectModule } from '@angular/material/select';
 import { MatSliderModule } from '@angular/material/slider';
 import { allCountries } from 'src/app/clients/models/country';
 import {
@@ -75,7 +75,7 @@ export class AddNewPotComponent {
   isEditWorkflow = false;
   selectedPot: ClientSaving;
   savingPotType= SavingPotType
-
+  selectedEscalationDescription: string | null = null;
   savingPotValues = [
     {
       name: 'Cash',
@@ -154,6 +154,7 @@ export class AddNewPotComponent {
       commissionPercentageCycle: [this.cycles[2].id],
       commissionPercentage: [0],
       escalationRate: [''],
+      customEscalationRate: [0]
     });
 
     this.savingsForm.get('currency')?.disable();
@@ -206,7 +207,33 @@ export class AddNewPotComponent {
       this.savingsForm.get('commissionPercentageCycle')?.patchValue(this.selectedPot.comission.percentage?.cycle?.id);
       this.savingsForm.get('commissionPercentage')?.patchValue(this.selectedPot.comission.percentage?.amount);
     }
-    this.savingsForm.get('escalationRate')?.patchValue(this.selectedPot.comission.escalationRate.value);
+    //this.savingsForm.get('escalationRate')?.patchValue(this.selectedPot.comission.escalationRate.value);
+const matchedEscalation = this.escalationRates.find(
+  x =>
+    x.value === this.selectedPot.comission.escalationRate?.value &&
+    x.description === this.selectedPot.comission.escalationRate?.description
+);
+
+if (matchedEscalation) {
+  // Predefined escalation rate
+  this.savingsForm.get('escalationRate')?.patchValue(matchedEscalation.value);
+  this.selectedEscalationDescription = matchedEscalation.description;
+} else if (
+  this.selectedPot.comission.escalationRate &&
+  this.selectedPot.comission.escalationRate.description === 'Increase at custom rate'
+) {
+  // Custom escalation case
+  this.savingsForm.get('escalationRate')?.patchValue('custom');
+  this.savingsForm.get('customEscalationRate')?.patchValue(
+    this.selectedPot.comission.escalationRate.value
+  );
+  this.selectedEscalationDescription = 'Increase at custom rate';
+
+  // Set validators again
+  const customControl = this.savingsForm.get('customEscalationRate');
+  customControl?.setValidators([Validators.required, Validators.min(0)]);
+  customControl?.updateValueAndValidity();
+}
 
   }
 
@@ -325,6 +352,42 @@ export class AddNewPotComponent {
     }
   }
 
+get isCustomEscalationSelected(): boolean {
+  const selectedValue = this.savingsForm.get('escalationRate')?.value;
+
+  // Find exact match by both value and description
+  return this.escalationRates.some(e =>
+    e.value === selectedValue && e.description === 'Increase at custom rate'
+  );
+}
+
+
+
+onEscalationRateChange(event: MatSelectChange): void {
+  const selectedOption = event.source.selected;
+
+  let description: string | null = null;
+
+  if (Array.isArray(selectedOption)) {
+    description = selectedOption[0]?.viewValue ?? null;
+  } else {
+    description = selectedOption?.viewValue ?? null;
+  }
+
+  this.selectedEscalationDescription = description;
+
+  const customControl = this.savingsForm.get('customEscalationRate');
+
+  if (description === 'Increase at custom rate') {
+    customControl?.setValidators([Validators.required, Validators.min(0)]);
+  } else {
+    customControl?.clearValidators();
+    customControl?.setValue(null); // Optionally reset field
+  }
+
+  customControl?.updateValueAndValidity();
+}
+
   onInputChange(event: any, controlName: string) {
     let value = event.target.value.replace('%', '').trim();
     if (!isNaN(value) && value !== '') {
@@ -356,6 +419,11 @@ export class AddNewPotComponent {
 
   saveCashflow(): void {
     console.log(this.savingsForm);
+    const isCustomEscalation = this.selectedEscalationDescription === 'Increase at custom rate';
+    const selectedEscalationRateValue = isCustomEscalation
+      ? this.savingsForm.get('customEscalationRate')?.value
+      : this.savingsForm.get('escalationRate')?.value;
+
     if (this.savingsForm.valid) {
       var clientSaving: ClientSaving = {
         id: this.isEditWorkflow ? this.selectedPot.id : null,
@@ -401,15 +469,26 @@ export class AddNewPotComponent {
                     description: '',
                   },
           },
-          escalationRate:
-            this.savingsForm.get('escalationRate')?.value !== null &&
-            this.savingsForm.get('escalationRate')?.value !== ''
-              ? this.escalationRates.find(x => x.value === this.savingsForm.get('escalationRate')?.value) ??
-              this.savingsForm.get('escalationRate')?.value
-              : {
-                  id: '',
-                  description: '',
-                },
+          // escalationRate:
+          //   this.savingsForm.get('escalationRate')?.value !== null &&
+          //   this.savingsForm.get('escalationRate')?.value !== ''
+          //     ? this.escalationRates.find(x => x.value === this.savingsForm.get('escalationRate')?.value) ??
+          //     this.savingsForm.get('escalationRate')?.value
+          //     : {
+          //         id: '',
+          //         description: '',
+          //       },
+  escalationRate:
+  selectedEscalationRateValue !== null && selectedEscalationRateValue !== ''
+    ? this.escalationRates.find(x => x.value === selectedEscalationRateValue) ??
+      {
+        description: this.selectedEscalationDescription ?? selectedEscalationRateValue,
+        value: selectedEscalationRateValue
+      }
+    : {
+        description: '',
+        value: 0
+      },
           type: this.savingsForm.get('commissionType')?.value === 'amount'
             ? ComissionType.Amount
             : this.savingsForm.get('commissionType')?.value === 'percentage'
@@ -454,7 +533,7 @@ export class AddNewPotComponent {
         realReturn: this.savingsForm.get('name')?.value !== 'Cash' ?
           this.savingsForm.get('returnRate')?.value - this.inflationRate : 0,
       };
-
+      console.log(clientSaving);
       var function$ = !this.isEditWorkflow ? this.savingPotsHttpService
       .addNewSavingPot(this.cashflowId, clientSaving) :
       this.savingPotsHttpService

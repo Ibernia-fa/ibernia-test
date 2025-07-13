@@ -338,6 +338,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
         disableClose: true,
         data: {
           eventType: EventType.INHERITANCE,
+        escalataionRates : this.escalationRates,
           timelineId: this.financialTimeline.id,
           cashflowId: this.financialTimeline.cashflow.id,
           isIncomeEvent: this.draggedEvent.type === EventIncomeType.Income,
@@ -365,6 +366,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
         disableClose: true,
         data: {
           eventType: EventType.STATE_PENSION,
+          escalataionRates : this.escalationRates,
           timelineId: this.financialTimeline.id,
           cashflowId: this.financialTimeline.cashflow.id,
           isIncomeEvent: this.draggedEvent.type === EventIncomeType.Income,
@@ -883,6 +885,7 @@ handleEventMoving(item: any, callback: (item: any) => void) {
           disableClose: true,
           data: {
             eventType: EventType.INHERITANCE,
+            escalataionRates : this.escalationRates,
             timelineId: this.financialTimeline.id,
             cashflowId: this.financialTimeline.cashflow.id,
             isIncomeEvent: clientEvent.type === EventIncomeType.Income,
@@ -927,6 +930,7 @@ handleEventMoving(item: any, callback: (item: any) => void) {
           disableClose: true,
           data: {
             eventType: EventType.STATE_PENSION,
+            escalataionRates : this.escalationRates,
             timelineId: this.financialTimeline.id,
             cashflowId: this.financialTimeline.cashflow.id,
             isIncomeEvent: clientEvent.type === EventIncomeType.Income,
@@ -985,6 +989,7 @@ handleEventMoving(item: any, callback: (item: any) => void) {
           disableClose: true,
           data: {
             eventType: EventType.CUSTOM,
+            escalataionRates : this.escalationRates,
             customEvents: this.customEventsLibrary,
             timelineId: this.financialTimeline.id,
             isIncomeEvent: true,
@@ -1040,6 +1045,7 @@ handleEventMoving(item: any, callback: (item: any) => void) {
         disableClose: true,
         data: {
           eventType: EventType.INHERITANCE,
+          escalataionRates : this.escalationRates,
           timelineId: this.financialTimeline.id,
           cashflowId: this.financialTimeline.cashflow.id,
           isIncomeEvent: clientEvent.type === EventIncomeType.Income,
@@ -1069,6 +1075,7 @@ handleEventMoving(item: any, callback: (item: any) => void) {
         data: {
           eventType: EventType.STATE_PENSION,
           timelineId: this.financialTimeline.id,
+          escalataionRates : this.escalationRates,
           cashflowId: this.financialTimeline.cashflow.id,
           isIncomeEvent: clientEvent.type === EventIncomeType.Income,
           systemEvent: clientEvent,
@@ -1109,6 +1116,7 @@ handleEventMoving(item: any, callback: (item: any) => void) {
         disableClose: true,
         data: {
           eventType: EventType.CUSTOM,
+          escalataionRates : this.escalationRates,
           customEvents: this.customEventsLibrary,
           timelineId: this.financialTimeline.id,
           isIncomeEvent: true,

@@ -7,7 +7,7 @@ import {
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
+import { MatSelectChange, MatSelectModule } from '@angular/material/select';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -62,6 +62,7 @@ export class AddIncomeComponent {
   isEditWorkflow = false;
   selectedIncome: FinancialViewModel;
   showStartEnd = false;
+  selectedEscalationDescription: string | null;
 
   constructor(
     private dialogRef: MatDialogRef<AddIncomeComponent>,
@@ -108,6 +109,7 @@ export class AddIncomeComponent {
       start: ['', Validators.required],
       end: [''],
       escalationRate: ['', Validators.required],
+      customEscalationRate: [0]
       
     });
     this.incomeForm.get('currencySymbol')?.disable();
@@ -130,7 +132,28 @@ export class AddIncomeComponent {
         ?.patchValue(this.selectedIncome.amount.cycle?.id);
       this.incomeForm.get('start')?.patchValue(this.selectedIncome.start.year);
       this.incomeForm.get('end')?.patchValue(this.selectedIncome.end.year);
+      const matchedEscalation = this.escalationRates.find(
+  x => x.value === this.selectedIncome.escalationRate?.value
+);
 
+if (matchedEscalation) {
+  // Standard escalation rate selected
+  this.incomeForm.get('escalationRate')?.patchValue(matchedEscalation.value);
+  this.selectedEscalationDescription = matchedEscalation.description;
+} else if (
+  this.selectedIncome.escalationRate &&
+  this.selectedIncome.escalationRate.description === 'Increase at custom rate'
+) {
+  // Custom escalation
+  this.incomeForm.get('escalationRate')?.patchValue('custom');
+  this.incomeForm.get('customEscalationRate')?.patchValue(this.selectedIncome.escalationRate.value);
+  this.selectedEscalationDescription = 'Increase at custom rate';
+  
+  // Trigger validators for custom rate
+  const customControl = this.incomeForm.get('customEscalationRate');
+  customControl?.setValidators([Validators.required, Validators.min(0)]);
+  customControl?.updateValueAndValidity();
+}
     }
   }
 
@@ -154,6 +177,15 @@ export class AddIncomeComponent {
   addIncome(): void {
     if (this.incomeForm.valid) {
       console.log('Form Submitted', this.incomeForm.value);
+
+            const isCustomEscalation =
+        this.selectedEscalationDescription === 'Increase at custom rate';
+      const escalationRateValue = isCustomEscalation
+        ? this.incomeForm.get('customEscalationRate')?.value
+        : this.incomeForm.get('escalationRate')?.value;
+      const matchedRate = this.escalationRates.find(
+        (x) => x.value === escalationRateValue
+      );
       var income: FinancialViewModel = {
         id: this.isEditWorkflow ? this.selectedIncome.id : null,
         description: this.incomeForm.get('description')?.value,
@@ -192,17 +224,27 @@ export class AddIncomeComponent {
               ? this.incomeForm.get('end')?.value
               : 0,
         },
- escalationRate: this.incomeForm.get('escalationRate')?.value !== null &&
-                this.incomeForm.get('escalationRate')?.value !== ''
-  ? this.escalationRates.find(x => x.value === this.incomeForm.get('escalationRate')?.value) ??
-    {
-      description: this.incomeForm.get('escalationRate')?.value,
-      value: this.incomeForm.get('escalationRate')?.value
+//  escalationRate: this.incomeForm.get('escalationRate')?.value !== null &&
+//                 this.incomeForm.get('escalationRate')?.value !== ''
+//   ? this.escalationRates.find(x => x.value === this.incomeForm.get('escalationRate')?.value) ??
+//     {
+//       description: this.incomeForm.get('escalationRate')?.value,
+//       value: this.incomeForm.get('escalationRate')?.value
+//     }
+//   : {
+//       description: '',
+//       value: 0
+//     }
+
+escalationRate: escalationRateValue !== null && escalationRateValue !== ''
+  ? matchedRate ?? {
+      description: this.selectedEscalationDescription ?? '', // Use actual description
+      value: escalationRateValue
     }
   : {
       description: '',
       value: 0
-    }
+    }  
       };
 
       var action$ = this.incomeExpenseHttpService.addIncome(
@@ -235,4 +277,43 @@ export class AddIncomeComponent {
       console.log('Form is invalid');
     }
   }
+
+  
+    
+    get isCustomEscalationSelected(): boolean {
+      const selectedValue = this.incomeForm.get('escalationRate')?.value;
+    
+      // Find exact match by both value and description
+      return this.escalationRates.some(e =>
+        e.value === selectedValue && e.description === 'Increase at custom rate'
+      );
+    }
+    
+    
+    
+    onEscalationRateChange(event: MatSelectChange): void {
+      const selectedOption = event.source.selected;
+    
+      let description: string | null = null;
+    
+      if (Array.isArray(selectedOption)) {
+        description = selectedOption[0]?.viewValue ?? null;
+      } else {
+        description = selectedOption?.viewValue ?? null;
+      }
+    
+      this.selectedEscalationDescription = description;
+    
+      const customControl = this.incomeForm.get('customEscalationRate');
+    
+      if (description === 'Increase at custom rate') {
+        customControl?.setValidators([Validators.required, Validators.min(0)]);
+      } else {
+        customControl?.clearValidators();
+        customControl?.setValue(null); // Optionally reset field
+      }
+    
+      customControl?.updateValueAndValidity();
+    }
+  
 }

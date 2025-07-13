@@ -80,3 +80,20 @@
     }
   }
 }
+ .input-container {
+  position: relative;
+
+  .percent-input {
+    padding-right: 24px; // space for the suffix
+  }
+
+  .suffix {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #888;
+    font-size: 14px;
+    pointer-events: none;
+  }
+}
