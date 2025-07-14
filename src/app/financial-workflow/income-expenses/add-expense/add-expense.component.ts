@@ -144,7 +144,17 @@ if (matchedEscalation) {
   this.selectedExpense.escalationRate.description === 'Increase at custom rate'
 ) {
   // Custom escalation
-  this.expenseForm.get('escalationRate')?.patchValue('custom');
+    this.escalationRates = this.escalationRates.filter(
+    x => x.description !== 'Increase at custom rate'
+  );
+
+  // Then add the custom rate value to escalationRates
+  this.escalationRates.push({
+    description: 'Increase at custom rate',
+    value: this.selectedExpense.escalationRate.value
+  });
+
+  this.expenseForm.get('escalationRate')?.patchValue(this.selectedExpense.escalationRate.value);
   this.expenseForm.get('customEscalationRate')?.patchValue(this.selectedExpense.escalationRate.value);
   this.selectedEscalationDescription = 'Increase at custom rate';
   

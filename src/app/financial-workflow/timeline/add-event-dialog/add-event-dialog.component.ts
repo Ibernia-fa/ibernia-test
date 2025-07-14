@@ -245,15 +245,34 @@ export class AddEventDialogComponent {
   }
 
   private handleEscalationRatePatch(description: string| any, value: number| any) {
-  this.eventForm.controls['escalationRate'].patchValue(description);
+  // this.eventForm.controls['escalationRate'].patchValue(description);
 
   if (description === 'Increase at custom rate') {
-    this.selectedEscalationDescription = description;
-    this.eventForm.controls['escalationRate'].patchValue(this.selectedEscalationDescription);
+        this.escalationRates = this.escalationRates.filter(
+      (x) => x.description !== 'Increase at custom rate'
+    );
 
+    // Add the current custom rate to the dropdown
+    this.escalationRates.push({
+      description: 'Increase at custom rate',
+      value: value
+    });
+    this.eventForm.controls['escalationRate'].patchValue(value);
+    this.selectedEscalationDescription = 'Increase at custom rate';
+
+    // Configure the custom field
     const customControl = this.eventForm.get('customEscalationRate');
     customControl?.setValidators([Validators.required, Validators.min(0)]);
     customControl?.setValue(value);
+    customControl?.updateValueAndValidity();
+  }else {
+    // For standard rates, set by value and reset custom control
+    this.eventForm.controls['escalationRate'].patchValue(value);
+    this.selectedEscalationDescription = description;
+
+    const customControl = this.eventForm.get('customEscalationRate');
+    customControl?.clearValidators();
+    customControl?.setValue(null);
     customControl?.updateValueAndValidity();
   }
 }

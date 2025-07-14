@@ -223,7 +223,16 @@ if (matchedEscalation) {
   this.selectedPot.comission.escalationRate.description === 'Increase at custom rate'
 ) {
   // Custom escalation case
-  this.savingsForm.get('escalationRate')?.patchValue('custom');
+  this.escalationRates = this.escalationRates.filter(
+  x => x.description !== 'Increase at custom rate'
+);
+
+// Then add the custom rate value to escalationRates
+this.escalationRates.push({
+  description: 'Increase at custom rate',
+  value: this.selectedPot?.comission?.escalationRate?.value
+});
+  this.savingsForm.get('escalationRate')?.patchValue(this.selectedPot.comission.escalationRate.value);
   this.savingsForm.get('customEscalationRate')?.patchValue(
     this.selectedPot.comission.escalationRate.value
   );
