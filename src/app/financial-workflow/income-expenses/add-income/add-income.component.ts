@@ -173,7 +173,9 @@ this.escalationRates.push({
 
   onCycleValueChange(event: any) {
     console.log({event})
-    this.showStartEnd = this.cycles.find(cycle => cycle.id === event)?.description !== 'One-off'
+    // this.showStartEnd = this.cycles.find(cycle => cycle.id === event)?.description !== 'One-off'
+     const isOneOff = this.cycles.find(cycle => cycle.id === event)?.description === 'One-off';
+  this.showStartEnd = !isOneOff;
     if(!this.showStartEnd) {
       this.incomeForm.controls['end'].clearValidators();
       this.incomeForm.controls['end'].updateValueAndValidity();
@@ -182,9 +184,18 @@ this.escalationRates.push({
       this.incomeForm.controls['end'].addValidators(Validators.required);
       this.incomeForm.controls['end'].updateValueAndValidity();
     }
+      const escalationControl = this.incomeForm.get('escalationRate');
+  if (isOneOff) {
+    escalationControl?.clearValidators();
+  } else {
+    escalationControl?.setValidators(Validators.required);
+  }
+  escalationControl?.updateValueAndValidity();
   }
 
   addIncome(): void {
+      console.log('Form Submitted', this.incomeForm);
+
     if (this.incomeForm.valid) {
       console.log('Form Submitted', this.incomeForm.value);
 

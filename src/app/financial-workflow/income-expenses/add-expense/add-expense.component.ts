@@ -174,7 +174,9 @@ if (matchedEscalation) {
   
     onCycleValueChange(event: any) {
       console.log({event})
-      this.showStartEnd = this.cycles.find(cycle => cycle.id === event)?.description !== 'One-off'
+      // this.showStartEnd = this.cycles.find(cycle => cycle.id === event)?.description !== 'One-off'
+           const isOneOff = this.cycles.find(cycle => cycle.id === event)?.description === 'One-off';
+  this.showStartEnd = !isOneOff;
       if(!this.showStartEnd) {
         this.expenseForm.controls['end'].clearValidators();
         this.expenseForm.controls['end'].updateValueAndValidity();
@@ -183,6 +185,13 @@ if (matchedEscalation) {
         this.expenseForm.controls['end'].addValidators(Validators.required);
         this.expenseForm.controls['end'].updateValueAndValidity();
       }
+      const escalationControl = this.expenseForm.get('escalationRate');
+      if (isOneOff) {
+        escalationControl?.clearValidators();
+      } else {
+        escalationControl?.setValidators(Validators.required);
+      }
+      escalationControl?.updateValueAndValidity();
     }
   
 
