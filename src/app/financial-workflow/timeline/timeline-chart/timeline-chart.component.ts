@@ -497,15 +497,15 @@ highlightHoveredYearLabel(snappedYear: number) {
 
     if (spanTag?.textContent?.trim() === snappedYear.toString()) {
 
-      (label as HTMLElement).style.backgroundColor = '#66B2FF';
-      (label as HTMLElement).style.border = '1px solid #004C99';
+      //(label as HTMLElement).style.backgroundColor = '#66B2FF';
+      //(label as HTMLElement).style.border = '1px solid #004C99';
       (label as HTMLElement).style.borderRadius = '4px';
 
       // Enlarge the year label
       if (spanTag) {
         spanTag.style.fontSize = '16px'; // or 'larger' or '1.2em'
         spanTag.style.fontWeight = 'bold';
-        spanTag.style.color = '#004C99';
+        spanTag.style.color = '#000000';
       }
 
       // Optionally also emphasize the age
