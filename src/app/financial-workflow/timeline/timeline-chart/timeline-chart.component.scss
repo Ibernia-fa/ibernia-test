@@ -215,4 +215,20 @@
   pointer-events: none;
   font-size: 12px;
 }
+.vis-text.vis-minor.highlighted {
+  background-color: #66B2FF;
+  border-radius: 4px;
+}
+
+.vis-text.vis-minor.highlighted span {
+  font-size: 16px !important;
+  font-weight: bold;
+  color: #004C99;
+}
+
+.vis-text.vis-minor.highlighted p {
+  font-size: 14px !important;
+  font-weight: 500;
+  color: #333;
+}
 

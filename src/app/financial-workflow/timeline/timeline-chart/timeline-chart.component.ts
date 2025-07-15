@@ -136,10 +136,10 @@ export class TimelineChartComponent implements OnInit, OnChanges {
   }
 
   ngAfterViewInit() {
-    this.timelineContainer.nativeElement.addEventListener('mousemove', (e: MouseEvent) => {
-      this.tooltipMouseX = e.clientX;
-      this.tooltipMouseY = e.clientY;
-    });
+    // this.timelineContainer.nativeElement.addEventListener('mousemove', (e: MouseEvent) => {
+    //   this.tooltipMouseX = e.clientX;
+    //   this.tooltipMouseY = e.clientY;
+    // });
   }
 
   getTimelineEventsLibrary() {
@@ -178,12 +178,12 @@ export class TimelineChartComponent implements OnInit, OnChanges {
   this.clearLabelHighlight();
   this.timeline.removeCustomTime('dragOver');
   this.timeline.redraw();
-  this.stopTooltipPolling();
+  // this.stopTooltipPolling();
   }
 
   onDrop(event: DragEvent) {
 
-  this.stopTooltipPolling();
+  // this.stopTooltipPolling();
 
     event.preventDefault();
 
@@ -461,7 +461,7 @@ onDragOver(event: DragEvent) {
   const age = this.calculateAgeForTimeline(snappedTime, new Date(this.clientBirthDate));
 
   this.highlightHoveredYearLabel(snappedYear % 100);
-  this.showTooltip(event, `Year: ${snappedYear}, Age: ${age}`);
+  // this.showTooltip(event, `Year: ${snappedYear}, Age: ${age}`);
 }
 
 
@@ -496,13 +496,14 @@ highlightHoveredYearLabel(snappedYear: number) {
     const spanTag = label.querySelector('span') as HTMLElement;
 
     if (spanTag?.textContent?.trim() === snappedYear.toString()) {
-
-      //(label as HTMLElement).style.backgroundColor = '#66B2FF';
+      (label as HTMLElement).style.backgroundColor = '#66B2FF';
+       (label as HTMLElement).classList.add('highlighted');
       //(label as HTMLElement).style.border = '1px solid #004C99';
       (label as HTMLElement).style.borderRadius = '4px';
 
       // Enlarge the year label
       if (spanTag) {
+        console.log('span tag found');
         spanTag.style.fontSize = '16px'; // or 'larger' or '1.2em'
         spanTag.style.fontWeight = 'bold';
         spanTag.style.color = '#000000';
@@ -773,7 +774,7 @@ handleEventMoving(item: any, callback: (item: any) => void) {
     const age = this.calculateAgeForTimeline(snappedTime, new Date(this.clientBirthDate));
     this.highlightHoveredYearLabel(year % 100);
 
-    this.startTooltipPolling(`Year: ${year}, Age: ${age}`);
+    // this.startTooltipPolling(`Year: ${year}, Age: ${age}`);
     callback(item);
   } catch (ex) {
     this.timeline.addCustomTime(new Date(), 'dragOver');
@@ -808,7 +809,7 @@ handleEventMoving(item: any, callback: (item: any) => void) {
 
   handleEventUpdate(item: any, callback: (item: any) => void) {
     this.timeline.removeCustomTime('dragOver');
-    this.stopTooltipPolling();
+    // this.stopTooltipPolling();
 
     const dropTime = item.start;
     this.clearLabelHighlight();
@@ -1265,50 +1266,50 @@ private calculateAgeForTimeline = (date: Date, dateOfBirth: Date): number => {
   return age;
 };
 
-showTooltip(event: DragEvent | MouseEvent, text: string) {
-  const tooltip = document.getElementById('year-tooltip');
-  if (tooltip) {
-    tooltip.innerText = text;
-    tooltip.style.left = `${event.clientX + 12}px`;
-    tooltip.style.top = `${event.clientY + 12}px`;
-    tooltip.hidden = false;
-  }
-}
+// showTooltip(event: DragEvent | MouseEvent, text: string) {
+//   const tooltip = document.getElementById('year-tooltip');
+//   if (tooltip) {
+//     tooltip.innerText = text;
+//     tooltip.style.left = `${event.clientX + 12}px`;
+//     tooltip.style.top = `${event.clientY + 12}px`;
+//     tooltip.hidden = false;
+//   }
+// }
 
-hideTooltip() {
-  const tooltip = document.getElementById('year-tooltip');
-  if (tooltip) tooltip.hidden = true;
-}
+// hideTooltip() {
+//   const tooltip = document.getElementById('year-tooltip');
+//   if (tooltip) tooltip.hidden = true;
+// }
 
-private startTooltipPolling(text: string) {
-  this.stopTooltipPolling(); // Clear if already running
-  const tooltip = document.getElementById('year-tooltip');
-  if (!tooltip) return;
+// private startTooltipPolling(text: string) {
+//   this.stopTooltipPolling(); // Clear if already running
+//   const tooltip = document.getElementById('year-tooltip');
+//   if (!tooltip) return;
 
-  tooltip.hidden = false;
+//   tooltip.hidden = false;
 
-  this.tooltipPollingInterval = setInterval(() => {
-    tooltip.innerText = text;
+//   this.tooltipPollingInterval = setInterval(() => {
+//     tooltip.innerText = text;
 
-    const offsetX = 12;
-    const offsetY = 12;
+//     const offsetX = 12;
+//     const offsetY = 12;
 
-    // Use current mouse coordinates updated by document.mousemove
-    tooltip.style.left = `${this.tooltipMouseX + offsetX}px`;
-    tooltip.style.top = `${this.tooltipMouseY + offsetY}px`;
-  }, 33); // ~33 times/sec
-}
+//     // Use current mouse coordinates updated by document.mousemove
+//     tooltip.style.left = `${this.tooltipMouseX + offsetX}px`;
+//     tooltip.style.top = `${this.tooltipMouseY + offsetY}px`;
+//   }, 33); // ~33 times/sec
+// }
 
 
-private stopTooltipPolling() {
-  if (this.tooltipPollingInterval) {
-    clearInterval(this.tooltipPollingInterval);
-    this.tooltipPollingInterval = null;
-  }
+// private stopTooltipPolling() {
+//   if (this.tooltipPollingInterval) {
+//     clearInterval(this.tooltipPollingInterval);
+//     this.tooltipPollingInterval = null;
+//   }
 
-  const tooltip = document.getElementById('year-tooltip');
-  if (tooltip) tooltip.hidden = true;
-}
+//   const tooltip = document.getElementById('year-tooltip');
+//   if (tooltip) tooltip.hidden = true;
+// }
 
 
 }
