@@ -231,19 +231,19 @@
     <div class="start-end">
       <div class="d-flex flex-column gap-12">
         <div class="d-flex gap-8 align-items-center">
-          @if(eventForm.get('cycle')?.value ==='One-Off')
+          @if(eventForm.get('cycle')?.value ==='One-off')
           {
             <mat-label class="f-s-16 f-w-400 d-block">Date</mat-label>  
           }
           @else 
           {
-          <mat-label class="f-s-16 f-w-400 d-block">Start @if(eventForm.get('cycle')?.value !=='One-Off') {& end}</mat-label>
+          <mat-label class="f-s-16 f-w-400 d-block">Start @if(eventForm.get('cycle')?.value !=='One-off') {& end}</mat-label>
           }
           <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
         </div>
         <div class="row justify-content-between align-items-start flex-nowrap">
           <!-- Start Date  -->
-          <div [className]="eventForm.get('cycle')?.value !== 'One-Off' ? 'col-6' : 'w-100'">
+          <div [className]="eventForm.get('cycle')?.value !== 'One-off' ? 'col-6' : 'w-100'">
             <div class="w-100 form-field">
               <div class="select-option">
                 <mat-select value="Select" formControlName="start" hideSingleSelectionIndicator>
@@ -258,7 +258,7 @@
             </div>
             @if(eventForm.get('start')?.touched &&
             eventForm.get('start')?.hasError('required')) {
-              @if(eventForm.get('cycle')?.value ==='One-Off')
+              @if(eventForm.get('cycle')?.value ==='One-off')
               {
                 <span class="field-error d-block">Date is required</span>
               }
@@ -271,7 +271,7 @@
 
           <!-- Divider  -->
           
-          @if(eventForm.get('cycle')?.value !== 'One-Off') {
+          @if(eventForm.get('cycle')?.value !== 'One-off') {
             <div class="d-flex justify-content-center align-items-center">
               <img src="assets/images/svgs/chevron-right-date-icon.svg" alt="chevron-right-date-icon" />
             </div>
@@ -292,7 +292,7 @@
                 </div>
                 @if(eventForm.get('end')?.touched &&
                 eventForm.get('end')?.hasError('required')) {
-                 @if(eventForm.get('cycle')?.value ==='One-Off')
+                 @if(eventForm.get('cycle')?.value ==='One-off')
                  {
                    <span class="field-error d-block">Date is required</span>
                  }
@@ -310,7 +310,7 @@
     </div>
     <!-- Finish Start End  -->
 
-    @if(eventForm.get('cycle')?.value !== 'One-Off') {
+    @if(eventForm.get('cycle')?.value !== 'One-off') {
       <div class="w-100 form-field gap-12">
         <div class="d-flex gap-8 align-items-center">
           <mat-label class="f-s-16 f-w-400 d-block">Escalation rate</mat-label>
@@ -522,13 +522,13 @@
             <div class="d-flex gap-8 align-items-center">
 
             <mat-label class="f-s-16 f-w-400 d-block">
-              {{ eventForm.get('cycle')?.value === 'One-Off' ? 'Date' : 'Start & End' }}
+              {{ eventForm.get('cycle')?.value === 'One-off' ? 'Date' : 'Start & End' }}
             </mat-label>
               <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
             </div>
             <div class="row justify-content-between align-items-start flex-nowrap">
               <!-- Start date  -->
-              <div [className]="eventForm.get('cycle')?.value !== 'One-Off' ? 'col-6' : 'w-100'">
+              <div [className]="eventForm.get('cycle')?.value !== 'One-off' ? 'col-6' : 'w-100'">
                 <div class="w-100 form-field">
                   <div class="select-option">
                     <mat-select value="Select" formControlName="start" hideSingleSelectionIndicator>
@@ -540,7 +540,7 @@
                   </div>
                   @if(eventForm.get('start')?.touched &&
                   eventForm.get('start')?.hasError('required')) {
-                   @if(eventForm.get('cycle')?.value ==='One-Off')
+                   @if(eventForm.get('cycle')?.value ==='One-off')
                    {
                      <span class="field-error d-block">Date is required</span>
                    }
@@ -552,7 +552,7 @@
                 </div>
               </div>
 
-              @if(eventForm.get('cycle')?.value !== 'One-Off') {
+              @if(eventForm.get('cycle')?.value !== 'One-off') {
                 <!-- Divider  -->
                 <div class="d-flex justify-content-start align-items-start">
                   <img src="assets/images/svgs/chevron-right-date-icon.svg" alt="chevron-right-date-icon" />
@@ -583,7 +583,7 @@
           </div>
         </div>
         <!-- Finish Start End  -->
-        @if(eventForm.get('cycle')?.value !== 'One-Off') {
+        @if(eventForm.get('cycle')?.value !== 'One-off') {
           <div class="w-100 form-field gap-12">
             <div class="d-flex gap-8 align-items-center">
               <mat-label class="f-s-16 f-w-400 d-block">Escalation rate</mat-label>

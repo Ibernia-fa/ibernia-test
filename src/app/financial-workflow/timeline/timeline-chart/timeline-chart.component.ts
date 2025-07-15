@@ -18,6 +18,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import {
   ClientEvent,
+  Cycle,
   EscalationRate,
   EventIncomeType,
   FinancialTimeline,
@@ -86,6 +87,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
   private tooltipMouseX: number = 0;
   private tooltipMouseY: number = 0;
   escalationRates: EscalationRate[];
+  amountCycles: Cycle[];
 
   constructor(
     private dialog: MatDialog,
@@ -101,6 +103,11 @@ export class TimelineChartComponent implements OnInit, OnChanges {
             ).subscribe((escalationRatesResponse) => {
               this.escalationRates = escalationRatesResponse.escalationRates;
             })
+
+            this.settingHttpService.getAmountCycles().subscribe((cycles) => {
+              this.amountCycles = cycles;
+            });
+
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -337,6 +344,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
         width: '600px',
         disableClose: true,
         data: {
+        amountCycles: this.amountCycles,
           eventType: EventType.INHERITANCE,
         escalataionRates : this.escalationRates,
           timelineId: this.financialTimeline.id,
@@ -365,6 +373,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
         width: '700px',
         disableClose: true,
         data: {
+          amountCycles: this.amountCycles,
           eventType: EventType.STATE_PENSION,
           escalataionRates : this.escalationRates,
           timelineId: this.financialTimeline.id,
@@ -884,6 +893,7 @@ handleEventMoving(item: any, callback: (item: any) => void) {
           width: '600px',
           disableClose: true,
           data: {
+            amountCycles: this.amountCycles,
             eventType: EventType.INHERITANCE,
             escalataionRates : this.escalationRates,
             timelineId: this.financialTimeline.id,
@@ -929,6 +939,7 @@ handleEventMoving(item: any, callback: (item: any) => void) {
           width: '600px',
           disableClose: true,
           data: {
+            amountCycles: this.amountCycles,
             eventType: EventType.STATE_PENSION,
             escalataionRates : this.escalationRates,
             timelineId: this.financialTimeline.id,
@@ -989,6 +1000,7 @@ handleEventMoving(item: any, callback: (item: any) => void) {
           disableClose: true,
           data: {
             eventType: EventType.CUSTOM,
+            amountCycles: this.amountCycles,
             escalataionRates : this.escalationRates,
             customEvents: this.customEventsLibrary,
             timelineId: this.financialTimeline.id,
@@ -1045,6 +1057,7 @@ handleEventMoving(item: any, callback: (item: any) => void) {
         disableClose: true,
         data: {
           eventType: EventType.INHERITANCE,
+          amountCycles: this.amountCycles,
           escalataionRates : this.escalationRates,
           timelineId: this.financialTimeline.id,
           cashflowId: this.financialTimeline.cashflow.id,
@@ -1074,6 +1087,7 @@ handleEventMoving(item: any, callback: (item: any) => void) {
         disableClose: true,
         data: {
           eventType: EventType.STATE_PENSION,
+          amountCycles: this.amountCycles,
           timelineId: this.financialTimeline.id,
           escalataionRates : this.escalationRates,
           cashflowId: this.financialTimeline.cashflow.id,
@@ -1115,6 +1129,7 @@ handleEventMoving(item: any, callback: (item: any) => void) {
         width: '900px',
         disableClose: true,
         data: {
+        amountCycles: this.amountCycles,
           eventType: EventType.CUSTOM,
           escalataionRates : this.escalationRates,
           customEvents: this.customEventsLibrary,
@@ -1180,6 +1195,7 @@ handleEventMoving(item: any, callback: (item: any) => void) {
       disableClose: true,
       data: {
         eventType: EventType.CUSTOM,
+        amountCycles: this.amountCycles,
         escalataionRates : this.escalationRates,
         customEvents: this.customEventsLibrary,
         timelineId: this.financialTimeline.id,

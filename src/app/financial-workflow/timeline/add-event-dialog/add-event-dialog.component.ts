@@ -12,7 +12,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectChange, MatSelectModule } from '@angular/material/select';
 import { Client } from 'src/app/clients/models/client';
-import { ClientEvent, EscalationRate, EventIncomeType } from '../models/financial-timeline';
+import { ClientEvent, Cycle, EscalationRate, EventIncomeType } from '../models/financial-timeline';
 import {
   FormBuilder,
   FormControl,
@@ -79,6 +79,7 @@ export class AddEventDialogComponent {
   countries = allCountries;
   clientPreferredCurrency: string;
   selectedEscalationDescription: string | null;
+  amountCycles: Cycle[];
 
 
   constructor(
@@ -88,6 +89,7 @@ export class AddEventDialogComponent {
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
     console.log(data);
+    this.amountCycles = data.amountCycles;
     this.selectedEventType = data.eventType;
     this.isIncomeEvent = data.isIncomeEvent;
     this.escalationRates = data.escalataionRates;
@@ -146,7 +148,7 @@ export class AddEventDialogComponent {
           isIncomeEvent: [false, Validators.required],
           currency: [this.clientPreferredCurrency, Validators.required],
           amount: ['', [Validators.required, Validators.min(0)]],
-          cycle: [{value: this.systemEvent?.isOneOff ? 'One-Off' : '', disabled: true}, [Validators.required]],
+          cycle: [{value: this.systemEvent?.isOneOff ? 'One-off' : '', disabled: true}, [Validators.required]],
           ageDate: [moment(this.dropTime).year(), Validators.required],
           customEscalationRate: [0]
 
@@ -158,14 +160,14 @@ export class AddEventDialogComponent {
           isIncomeEvent: [true, Validators.required],
           currency: [this.clientPreferredCurrency, Validators.required],
           amount: ['', [Validators.required, Validators.min(0)]],
-          cycle: [this.systemEvent?.isOneOff ? 'One-Off' : '', [Validators.required]],
+          cycle: [this.systemEvent?.isOneOff ? 'One-off' : '', [Validators.required]],
           start: [moment(this.dropTime).year(), Validators.required],
           end: [0, Validators.required],
           escalationRate: ['', Validators.required],
           customEscalationRate: [0]
 
         });
-        this.onCycleValueChange(this.systemEvent?.isOneOff ? 'One-Off' : '');
+        this.onCycleValueChange(this.systemEvent?.isOneOff ? 'One-off' : '');
         break;
 
       case EventType.CUSTOM:
@@ -174,14 +176,14 @@ export class AddEventDialogComponent {
           isIncomeEvent: [true, Validators.required],
           currency: [this.clientPreferredCurrency, Validators.required],
           amount: ['', [Validators.required, Validators.min(0)]],
-          cycle: ['One-Off', [Validators.required]],
+          cycle: ['One-off', [Validators.required]],
           start: [null, Validators.required],
           end: [0, Validators.required],
           escalationRate: ['', Validators.required],
           customEscalationRate: [0]
 
         });
-        this.onCycleValueChange('One-Off');
+        this.onCycleValueChange('One-off');
         break;
     }
     this.eventForm.get('currency')?.disable();
@@ -279,7 +281,7 @@ export class AddEventDialogComponent {
 
 
   onCycleValueChange(event: string) {
-    if(event === 'One-Off') {
+    if(event === 'One-off') {
       this.eventForm.controls['end'].clearValidators();
       this.eventForm.controls['end'].updateValueAndValidity();
       this.eventForm.controls['escalationRate'].clearValidators();
@@ -331,7 +333,9 @@ const selectedEscalationRateValue = isCustomEscalation
         name: this.systemEvent.name,
         netAmount: {
           cycle: {
-            id: '',
+            id:  this.amountCycles.find(
+                (x) => x.description === this.eventForm.get('cycle')?.value
+              )?.id ?? '',
             description: this.eventForm.get('cycle')?.value,
           },
           amount: this.eventForm.get('amount')?.value,
@@ -359,7 +363,7 @@ const selectedEscalationRateValue = isCustomEscalation
           : EventIncomeType.Expense,
         iconUrl: this.systemEvent.iconUrl,
         isDefault: false,
-        isOneOff: this.eventForm.get('cycle')?.value === 'One-Off',
+        isOneOff: this.eventForm.get('cycle')?.value === 'One-off',
         isPlaceHolder: this.systemEvent.isPlaceHolder,
       };
       this.timelineHttpService.addEvent(clientEvent, this.cashflowId)
@@ -385,7 +389,9 @@ const selectedEscalationRateValue = isCustomEscalation
         name: this.systemEvent.name,
         netAmount: {
           cycle: {
-            id: '',
+          id:  this.amountCycles.find(
+                (x) => x.description === this.eventForm.get('cycle')?.value
+              )?.id ?? '',
             description: this.eventForm.get('cycle')?.value,
           },
           amount: this.eventForm.get('amount')?.value,
@@ -402,7 +408,7 @@ const selectedEscalationRateValue = isCustomEscalation
           : EventIncomeType.Expense,
         iconUrl: this.systemEvent.iconUrl,
         isDefault: false,
-        isOneOff: this.eventForm.get('cycle')?.value === 'One-Off',
+        isOneOff: this.eventForm.get('cycle')?.value === 'One-off',
         isPlaceHolder: this.systemEvent.isPlaceHolder,
       };
       this.timelineHttpService.addEvent(clientEvent, this.cashflowId)
@@ -436,7 +442,9 @@ const selectedEscalationRateValue = isCustomEscalation
             : this.eventForm.get('name')?.value,
         netAmount: {
           cycle: {
-            id: '',
+            id:  this.amountCycles.find(
+                (x) => x.description === this.eventForm.get('cycle')?.value
+              )?.id ?? '',
             description: this.eventForm.get('cycle')?.value,
           },
           amount: this.eventForm.get('amount')?.value,
@@ -470,7 +478,7 @@ escalationRate: selectedEscalationRateValue !== null && selectedEscalationRateVa
               )?.iconUrl ?? ''
             : 'custom-icon',
         isDefault: false,
-        isOneOff: this.eventForm.get('cycle')?.value === 'One-Off',
+        isOneOff: this.eventForm.get('cycle')?.value === 'One-off',
         isPlaceHolder: false,
       };
       this.timelineHttpService.addEvent(clientEvent, this.cashflowId)
@@ -499,7 +507,7 @@ escalationRate: selectedEscalationRateValue !== null && selectedEscalationRateVa
     { value: '2', viewValue: '3' },
   ];
 
-  cycles: string[] = ['One-Off', 'Every Month', 'Every Year'];
+  cycles: string[] = ['One-off', 'Every month', 'Every years'];
   currencySymbols: string[] = ['$', '£', '€'];
 
   events: string[] = ['$', '£', '€'];
