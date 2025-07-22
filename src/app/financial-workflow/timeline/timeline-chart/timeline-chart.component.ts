@@ -460,14 +460,13 @@ onDragOver(event: DragEvent) {
   const snappedYear = snappedTime.getFullYear();
   const age = this.calculateAgeForTimeline(snappedTime, new Date(this.clientBirthDate));
 
-  this.highlightHoveredYearLabel(snappedYear % 100);
+  this.highlightHoveredYearLabel(snappedYear);
   // this.showTooltip(event, `Year: ${snappedYear}, Age: ${age}`);
 }
 
-
-
 highlightHoveredYearLabel(snappedYear: number) {
   const allMinorLabels = document.querySelectorAll('.vis-text.vis-minor');
+
   // Clear previous highlights completely
   allMinorLabels.forEach((label) => {
     const pTag = label.querySelector('p') as HTMLElement;
@@ -482,12 +481,19 @@ highlightHoveredYearLabel(snappedYear: number) {
     if (spanTag) {
       spanTag.style.color = '';
       spanTag.style.fontWeight = '';
-      spanTag.style.fontSize = ''; // Clear any previous custom font size
+      spanTag.style.fontSize = '';
+      // Restore original short year text if we modified it
+      const originalShortYear = spanTag.getAttribute('data-short-year');
+      if (originalShortYear) {
+        spanTag.textContent = originalShortYear;
+        spanTag.removeAttribute('data-short-year');
+      }
     }
 
     (label as HTMLElement).style.backgroundColor = '';
     (label as HTMLElement).style.borderRadius = '';
     (label as HTMLElement).style.border = '';
+    (label as HTMLElement).classList.remove('highlighted');
   });
 
   // Highlight the matching year
@@ -495,21 +501,23 @@ highlightHoveredYearLabel(snappedYear: number) {
     const pTag = label.querySelector('p') as HTMLElement;
     const spanTag = label.querySelector('span') as HTMLElement;
 
-    if (spanTag?.textContent?.trim() === snappedYear.toString()) {
+    if (spanTag?.textContent?.trim() === snappedYear.toString().slice(-2)) {
       (label as HTMLElement).style.backgroundColor = '#66B2FF';
-       (label as HTMLElement).classList.add('highlighted');
-      //(label as HTMLElement).style.border = '1px solid #004C99';
       (label as HTMLElement).style.borderRadius = '4px';
+      (label as HTMLElement).classList.add('highlighted');
 
-      // Enlarge the year label
+      // Enlarge and update the year label
       if (spanTag) {
         console.log('span tag found');
-        spanTag.style.fontSize = '16px'; // or 'larger' or '1.2em'
+        spanTag.setAttribute('data-short-year', spanTag.textContent ?? ''); // Store original
+        console.log(snappedYear.toString());
+        spanTag.textContent = snappedYear.toString(); // Show full year
+        spanTag.style.fontSize = '16px';
         spanTag.style.fontWeight = 'bold';
         spanTag.style.color = '#000000';
       }
 
-      // Optionally also emphasize the age
+      // Emphasize the age
       if (pTag) {
         pTag.style.fontSize = '14px';
         pTag.style.fontWeight = '500';
@@ -518,6 +526,7 @@ highlightHoveredYearLabel(snappedYear: number) {
     }
   });
 }
+
 
 
 
@@ -772,7 +781,10 @@ handleEventMoving(item: any, callback: (item: any) => void) {
 
     const year = snappedTime.getFullYear();
     const age = this.calculateAgeForTimeline(snappedTime, new Date(this.clientBirthDate));
-    this.highlightHoveredYearLabel(year % 100);
+    // this.highlightHoveredYearLabel(year);
+requestAnimationFrame(() => {
+  this.highlightHoveredYearLabel(year);
+});
 
     // this.startTooltipPolling(`Year: ${year}, Age: ${age}`);
     callback(item);
