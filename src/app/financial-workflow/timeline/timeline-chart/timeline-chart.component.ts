@@ -490,9 +490,11 @@ highlightHoveredYearLabel(snappedYear: number) {
       }
     }
 
+    (label as HTMLElement).style.display  = '';
     (label as HTMLElement).style.backgroundColor = '';
-    (label as HTMLElement).style.borderRadius = '';
-    (label as HTMLElement).style.border = '';
+    (label as HTMLElement).style.opacity  = '';
+    (label as HTMLElement).style.zIndex  = '';
+    (label as HTMLElement).style.padding  = '';
     (label as HTMLElement).classList.remove('highlighted');
   });
 
@@ -502,8 +504,11 @@ highlightHoveredYearLabel(snappedYear: number) {
     const spanTag = label.querySelector('span') as HTMLElement;
 
     if (spanTag?.textContent?.trim() === snappedYear.toString().slice(-2)) {
-      (label as HTMLElement).style.backgroundColor = '#66B2FF';
-      (label as HTMLElement).style.borderRadius = '4px';
+      (label as HTMLElement).style.display  = 'inline-block';
+      (label as HTMLElement).style.backgroundColor = '#ffffffff';
+      (label as HTMLElement).style.opacity  = '1';
+      (label as HTMLElement).style.zIndex  = '9999';
+      (label as HTMLElement).style.padding  = '2px 6px';
       (label as HTMLElement).classList.add('highlighted');
 
       // Enlarge and update the year label
@@ -547,9 +552,11 @@ clearLabelHighlight() {
       spanTag.style.fontWeight = '';
     }
 
+    (label as HTMLElement).style.display  = '';
     (label as HTMLElement).style.backgroundColor = '';
-    (label as HTMLElement).style.borderRadius = '';
-    (label as HTMLElement).style.border = '';
+    (label as HTMLElement).style.opacity  = '';
+    (label as HTMLElement).style.zIndex  = '';
+    (label as HTMLElement).style.padding  = '';
   
   });
 }
@@ -727,9 +734,9 @@ this.timeline.on('mouseDown', (props) => {
       //   .add(30, 'months')
       //   .toDate(),
       start: new Date(startYear, 0, 1),
-      //min: new Date(startYear, 0, 1),
+      min: new Date(startYear, 0, 1),
       end: new Date(timelineEndYear + 2, 0, 1),
-      //max: new Date(timelineEndYear + visualBufferYears, 0, 1),
+      max: new Date(timelineEndYear + 2, 0, 1),
 
       minHeight: '304px',
       width: '100%',
