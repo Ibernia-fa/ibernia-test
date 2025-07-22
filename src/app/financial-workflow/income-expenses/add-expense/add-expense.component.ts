@@ -107,7 +107,7 @@ export class AddExpenseComponent {
       cycle: [this.cycles[1].id, Validators.required],
       start: ['', Validators.required],
       end: [''],
-      escalationRate: ['', Validators.required],
+      escalationRate: [this.escalationRates[0].value, Validators.required],
       customEscalationRate: [0]
 
     });

@@ -140,7 +140,7 @@
             <div class="percentage-field">
               <div class="w-100 form-field input-container">
                 <!-- <mat-form-field style="width: 110px" appearance="outline" class="w-100 form-field"> -->
-                  <input placeholder="Return Rate" matInput formControlName="returnRate" [value]="savingsForm.get('returnRate')?.value" />
+                  <input matInput formControlName="returnRate" [value]="savingsForm.get('returnRate')?.value" />
                   <span class="suffix">%</span>
                 <!-- </mat-form-field>  -->
               </div>
@@ -375,7 +375,7 @@
 
         @if(selectedEscalationDescription === 'Increase at custom rate') {
           <div class="w-100 form-field gap-12">
-            <mat-label class="f-s-16 d-block">Custom Escalation Rate (%)</mat-label>
+            <mat-label class="f-s-16 d-block">Custom Escalation Rate</mat-label>
             <div class="input-container position-relative">
               <input
                 matInput

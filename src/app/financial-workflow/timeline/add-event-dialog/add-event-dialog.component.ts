@@ -163,7 +163,7 @@ export class AddEventDialogComponent {
           cycle: [this.systemEvent?.isOneOff ? 'One-off' : '', [Validators.required]],
           start: [moment(this.dropTime).year(), Validators.required],
           end: [0, Validators.required],
-          escalationRate: ['', Validators.required],
+          escalationRate: [this.escalationRates[1].value, Validators.required],
           customEscalationRate: [0]
 
         });
@@ -179,7 +179,7 @@ export class AddEventDialogComponent {
           cycle: ['One-off', [Validators.required]],
           start: [null, Validators.required],
           end: [0, Validators.required],
-          escalationRate: ['', Validators.required],
+          escalationRate: [this.escalationRates[0].value, Validators.required],
           customEscalationRate: [0]
 
         });

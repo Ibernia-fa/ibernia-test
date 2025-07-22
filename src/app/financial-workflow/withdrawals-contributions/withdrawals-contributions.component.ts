@@ -28,6 +28,7 @@ import moment from 'moment';
 import { SavingsPotsHttpService } from '../saving-pots/services/savings-pots-http.service';
 import { SavingPotsModel } from '../saving-pots/models/saving-pots.model';
 import { CurrencySymbolPipe } from 'src/app/pipe/currency-symbol.pipe';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   imports: [
@@ -39,7 +40,9 @@ import { CurrencySymbolPipe } from 'src/app/pipe/currency-symbol.pipe';
     MatMenuModule,
     MatButtonModule,
     MatProgressSpinnerModule,
-    CurrencySymbolPipe
+    CurrencySymbolPipe,
+            MatTooltipModule,
+    
   ],
   selector: 'app-withdrawals-contributions',
   templateUrl: './withdrawals-contributions.component.html',
