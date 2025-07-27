@@ -98,7 +98,7 @@ export class SavingsBarStackedChartComponent implements OnChanges {
         },
         labels: {
           formatter: function(value: any) {
-            return 'AED ' + value;
+            return  value;
           }
         }
       },
@@ -168,7 +168,7 @@ export class SavingsBarStackedChartComponent implements OnChanges {
         },
         labels: {
           formatter: (value: any) => {
-            return `${this.client.clientDetails.preferredCurrency} ` + value;
+            return  value;
           }
         }
       }
