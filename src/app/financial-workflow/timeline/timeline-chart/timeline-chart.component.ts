@@ -878,6 +878,7 @@ requestAnimationFrame(() => {
             map((res) => {
               // this.financialTimeline.clientEvents.push(clientEvent);
               this.draggedEvent = null;
+              this.updateTimelines.emit();
               this.timeline.setItems(this.timelineData);
               this.cdr.detectChanges();
               this.timeline.redraw();
