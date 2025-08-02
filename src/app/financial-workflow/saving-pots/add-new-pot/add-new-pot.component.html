@@ -406,7 +406,7 @@
             <div class="d-flex flex-column gap-4 net-fields">
               <div class="net-field d-flex align-items-center">
                 <!-- Currency Selector  -->
-                <div class="left">
+                <!-- <div class="left">
                   <mat-select value="£" formControlName="commissionPercentageCurrency" class="sortby-edit-profile"
                     hideSingleSelectionIndicator>
                     @for (country of countries; track country) {
@@ -418,7 +418,7 @@
                     }
                     }
                   </mat-select>
-                </div>
+                </div> -->
                 <!-- End Currency Selector  -->
                 <!-- Price Field  -->
                 <div class="w-100 form-field input-container">
@@ -431,15 +431,14 @@
                 </div>
                 <!-- End Price Field  -->
                 <!-- End Type Field  -->
-                <div class="right">
+                <!-- <div class="right">
                   <mat-select value="Select" formControlName="commissionPercentageCycle" class="sortby-edit-profile"
                     hideSingleSelectionIndicator>
-                    <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
                     @for (cycle of cycles; track cycle) {
                     <mat-option [value]="cycle.id">{{ cycle.description }}</mat-option>
                     }
                   </mat-select>
-                </div>
+                </div> -->
                 <!-- End Type Field  -->
               </div>
               <!-- Error  -->

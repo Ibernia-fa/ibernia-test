@@ -149,7 +149,13 @@ export class SavingPotsComponent implements OnInit {
         }),
         tap(([savingPots, timeline, amountCycles, escalationRatesResponse]) => {
           console.log(timeline, amountCycles, escalationRatesResponse);
-          this.savingPots = savingPots;
+          // this.savingPots = savingPots;
+            this.savingPots = {
+            ...savingPots,
+            clientSavings: savingPots.clientSavings
+              .map((item, index) => ({ ...item, orderNumber: item.orderNumber ?? index }))
+              .sort((a, b) => a.orderNumber - b.orderNumber)
+          };
           this.timeline = timeline;
           this.amountCycles = amountCycles;
           this.escalationRates = escalationRatesResponse.escalationRates;
@@ -208,30 +214,94 @@ export class SavingPotsComponent implements OnInit {
     );
   }
 
-  moveUp(index: number) {
-    if (index > 0) {
-      moveItemInArray(this.savingPots.clientSavings, index - 1, index);
-      this.transitionState = 'up';
-      this.savingPots.clientSavings = [...this.savingPots.clientSavings];
-    }
-  }
+  // moveUp(index: number) {
+  //   if (index > 0) {
+  //     moveItemInArray(this.savingPots.clientSavings, index - 1, index);
+  //     this.transitionState = 'up';
+  //     this.savingPots.clientSavings = [...this.savingPots.clientSavings];
+  //   }
+  // }
 
-  moveDown(index: number) {
-    if (index < this.savingPots.clientSavings.length - 1) {
-      moveItemInArray(this.savingPots.clientSavings, index + 1, index);
-      this.transitionState = 'down';
-      this.savingPots.clientSavings = [...this.savingPots.clientSavings];
-    }
+  // moveDown(index: number) {
+  //   if (index < this.savingPots.clientSavings.length - 1) {
+  //     moveItemInArray(this.savingPots.clientSavings, index + 1, index);
+  //     this.transitionState = 'down';
+  //     this.savingPots.clientSavings = [...this.savingPots.clientSavings];
+  //   }
+  // }
+
+
+moveUp(index: number) {
+  if (index > 0) {
+    const currentItem = this.savingPots.clientSavings[index];
+    const previousItem = this.savingPots.clientSavings[index - 1];
+
+    // Swap order numbers
+    const tempOrder = currentItem.orderNumber;
+    currentItem.orderNumber = previousItem.orderNumber;
+    previousItem.orderNumber = tempOrder;
+
+    // Swap items in array
+    moveItemInArray(this.savingPots.clientSavings, index, index - 1);
+    this.savingPots.clientSavings = [...this.savingPots.clientSavings];
+
+    // Call API
+    this.updateOrderNumbers();
   }
+}
+
+moveDown(index: number) {
+  if (index < this.savingPots.clientSavings.length - 1) {
+    const currentItem = this.savingPots.clientSavings[index];
+    const nextItem = this.savingPots.clientSavings[index + 1];
+
+    // Swap order numbers
+    const tempOrder = currentItem.orderNumber;
+    currentItem.orderNumber = nextItem.orderNumber;
+    nextItem.orderNumber = tempOrder;
+
+    // Swap items in array
+    moveItemInArray(this.savingPots.clientSavings, index, index + 1);
+    this.savingPots.clientSavings = [...this.savingPots.clientSavings];
+
+    // Call API
+    this.updateOrderNumbers();
+  }
+}
+
+
+updateOrderNumbers() {
+  if (!this.selectedCashflow) return;
+
+  // Ensure all orderNumbers are unique and sorted by position
+  this.savingPots.clientSavings.forEach((item, index) => {
+    item.orderNumber = index;
+  });
+
+  this.savingPotsHttpService
+    .updateSavingsPots(this.selectedCashflow.id, this.savingPots.clientSavings)
+    .subscribe({
+      next: () => {
+        console.log('Updated orderNumbers successfully');
+      },
+      error: (err) => {
+        console.error('Failed to update orderNumbers', err);
+      }
+    });
+}
+
+
+
 
   updateEventClicked(event: ClientSaving) {
+    console.log(event)
     const dialogRef = this.dialog.open(AddNewPotComponent, {
       width: '700px',
       disableClose: true,
       data: {
         amountCycles: this.amountCycles,
         escalataionRates: this.escalationRates,
-        eventsList: this.timeline.clientEvents,
+        eventsList: this.timeline.clientEvents.sort((a, b) => a.start.age - b.start.age),
         clientBirthDate: this.selectedClient?.clientDetails.birthDate,
         clientPreferredCurrency:
           this.selectedClient?.clientDetails.preferredCurrency,
@@ -262,13 +332,14 @@ export class SavingPotsComponent implements OnInit {
   }
   
   newEventClicked() {
+    console.log(this.timeline.clientEvents)
     const dialogRef = this.dialog.open(AddNewPotComponent, {
       width: '700px',
       disableClose: true,
       data: {
         amountCycles: this.amountCycles,
         escalataionRates: this.escalationRates,
-        eventsList: this.timeline.clientEvents,
+        eventsList: this.timeline.clientEvents.sort((a, b) => a.start.age - b.start.age),
         clientBirthDate: this.selectedClient?.clientDetails.birthDate,
         clientPreferredCurrency:
           this.selectedClient?.clientDetails.preferredCurrency,

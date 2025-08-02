@@ -44,6 +44,7 @@ export interface ClientSaving {
   end: AgeYear;
   hasCommission: boolean;
   comission: Comission;
+  orderNumber: number;
 }
 
 export enum SavingPotType

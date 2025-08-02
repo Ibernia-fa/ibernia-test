@@ -307,6 +307,9 @@ this.escalationRates.push({
         .get('commissionCurrency')
         ?.setValue(this.clientPreferredCurrency);
       this.savingsForm
+        .get('commissionPercentageCurrency')
+        ?.setValue(this.clientPreferredCurrency);
+      this.savingsForm
         .get('commissionAmount')
         ?.setValidators(Validators.required);
       this.savingsForm
@@ -504,6 +507,7 @@ onEscalationRateChange(event: MatSelectChange): void {
             ? ComissionType.Percentage : ComissionType.Both,
         },
         hasCommission: this.savingsForm.get('commissions')?.value,
+        orderNumber: this.isEditWorkflow ? this.selectedPot.orderNumber : 0,
         hasPotLocked: this.savingsForm.get('lockPot')?.value,
         iconUrl: this.savingsForm.get('name')?.value !== 'Custom'
           ? this.savingPotValues.find(
@@ -580,9 +584,6 @@ onEscalationRateChange(event: MatSelectChange): void {
       this.savingsForm
         .get('commissionCurrency')
         ?.setValidators(Validators.required);
-      this.savingsForm
-        .get('commissionCurrency')
-        ?.setValue(this.clientPreferredCurrency);
       this.savingsForm
         .get('commissionAmount')
         ?.setValidators(Validators.required);
@@ -686,7 +687,7 @@ onEscalationRateChange(event: MatSelectChange): void {
         .get('commissionCurrency')
         ?.removeValidators(Validators.required);
       this.savingsForm
-        .get('commissionCurrency')
+        .get('commissionPercentageCurrency')
         ?.setValue(this.clientPreferredCurrency);
       this.savingsForm
         .get('commissionAmount')

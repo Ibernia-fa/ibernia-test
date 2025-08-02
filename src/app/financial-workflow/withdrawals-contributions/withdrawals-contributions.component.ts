@@ -130,7 +130,7 @@ export class WithdrawalsContributionsComponent {
       width: '700px',
       disableClose: true,
       data: {
-        eventsList: this.timeline.clientEvents,
+        eventsList: this.timeline.clientEvents.sort((a, b) => a.start.age - b.start.age),
         amountCycles: this.amountCycles,
         escalataionRates: this.escalationRates,
         clientBirthDate: this.selectedClient?.clientDetails.birthDate,
@@ -154,7 +154,7 @@ export class WithdrawalsContributionsComponent {
       disableClose: true,
       data: {
         amountCycles: this.amountCycles,
-        eventsList: this.timeline.clientEvents,
+        eventsList: this.timeline.clientEvents.sort((a, b) => a.start.age - b.start.age),
         escalataionRates: this.escalationRates,
         clientBirthDate: this.selectedClient?.clientDetails.birthDate,
         clientPreferredCurrency:
