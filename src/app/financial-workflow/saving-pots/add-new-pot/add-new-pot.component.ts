@@ -546,7 +546,7 @@ onEscalationRateChange(event: MatSelectChange): void {
       var function$ = !this.isEditWorkflow ? this.savingPotsHttpService
       .addNewSavingPot(this.cashflowId, clientSaving) :
       this.savingPotsHttpService
-        .updateSavingPot(this.cashflowId, clientSaving)
+        .addNewSavingPot(this.cashflowId, clientSaving)
 
       function$
         .pipe(
