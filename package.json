@@ -57,7 +57,9 @@
     "vis-timeline": "^7.7.3",
     "vis-util": "^5.0.7",
     "xss": "^1.0.15",
-    "zone.js": "~0.15.0"
+    "zone.js": "~0.15.0",
+    "angular-oauth2-oidc": "^17.0.2",
+    "oidc-client": "^1.11.5"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^19.0.5",

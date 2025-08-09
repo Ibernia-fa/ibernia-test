@@ -20,6 +20,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
+import { AuthService } from 'src/app/auth/services/auth.service';
 
 interface notifications {
   id: number;
@@ -111,11 +112,15 @@ export class HeaderComponent {
     private settings: CoreService,
     private vsidenav: CoreService,
     public dialog: MatDialog,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private Authservice: AuthService
   ) {
     translate.setDefaultLang('en');
   }
 
+      logout() {
+        this.Authservice.logout();
+    }
   options = this.settings.getOptions();
 
   openDialog() {
