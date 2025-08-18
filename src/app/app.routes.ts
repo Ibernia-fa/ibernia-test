@@ -26,7 +26,12 @@ export const routes: Routes = [
         loadChildren: () =>
           import('./financial-workflow/financial-workflow.routes').then((m) => m.FinancialWorkflowRoutes),
         canActivate:[AuthGuard]
-      }
+      },
+        {
+      path: 'settings',
+      loadChildren: () =>
+        import('./settings/settings.module').then(m => m.SettingsModule)
+    }
     ],
         canActivate:[AuthGuard]
   },
