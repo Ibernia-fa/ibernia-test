@@ -33,7 +33,7 @@ export const routes: Routes = [
         import('./settings/settings.module').then(m => m.SettingsModule)
     }
     ],
-        canActivate:[AuthGuard]
+        // canActivate:[AuthGuard]
   },
   {
     path: '',
