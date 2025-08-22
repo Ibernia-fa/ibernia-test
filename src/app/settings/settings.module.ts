@@ -7,7 +7,12 @@ import { PlanBillingComponent } from './plan-billing/plan-billing.component';
 import { SecurityComponent } from './security/security.component';
 import { NotificationsComponent } from './notifications/notifications.component';
 import { BrandingComponent } from './branding/branding.component';
-
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatIconModule } from '@angular/material/icon'; // ✅ This is required
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import {MatCheckboxModule} from '@angular/material/checkbox';
 
 @NgModule({
   declarations: [   
@@ -18,7 +23,7 @@ import { BrandingComponent } from './branding/branding.component';
     AccountPreferencesComponent,],
   imports: [
     CommonModule
-, FormsModule, ReactiveFormsModule, SettingsRoutingModule
+, FormsModule, ReactiveFormsModule,MatCardModule,MatCheckboxModule, SettingsRoutingModule,MatFormFieldModule,MatInputModule,MatButtonModule,MatIconModule
   ]
 })
 export class SettingsModule { }
