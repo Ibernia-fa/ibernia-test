@@ -31,9 +31,14 @@ export const routes: Routes = [
       path: 'settings',
       loadChildren: () =>
         import('./settings/settings.module').then(m => m.SettingsModule)
+    },
+            {
+      path: 'default-preferance',
+      loadChildren: () =>
+        import('./default-preferance/default-preferance.module').then(m => m.DefaultPreferanceModule)
     }
     ],
-        // canActivate:[AuthGuard]
+        canActivate:[AuthGuard]
   },
   {
     path: '',

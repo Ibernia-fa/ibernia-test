@@ -24,6 +24,7 @@ export const defaults: AppSettings = {
   language: 'en-us',
   navPos: 'side',
   sidebarHiddenOnRoutes: [
-    '/clients'
+    '/clients',
+    '/default-preferance'
   ]
 };

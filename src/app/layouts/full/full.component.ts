@@ -25,7 +25,8 @@ import { CustomizerComponent } from './shared/customizer/customizer.component';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatListModule } from '@angular/material/list';
-
+import { navItems as mainNavItems, navItemslower as mainLower } from './vertical/sidebar/sidebar-data';
+import { settingsNavItems, settingsLowerNavItems } from './vertical/sidebar/settings-nav-config';
 const MOBILE_VIEW = 'screen and (max-width: 768px)';
 const TABLET_VIEW = 'screen and (min-width: 769px) and (max-width: 1024px)';
 const MONITOR_VIEW = 'screen and (min-width: 1024px)';
@@ -71,7 +72,7 @@ interface quicklinks {
 export class FullComponent implements OnInit {
   navItems = navItems;
   navItemslower = navItemslower;
-
+  isSettings = false;
   @ViewChild('leftsidenav')
   public sidenav: MatSidenav;
   resView = false;
@@ -221,15 +222,40 @@ export class FullComponent implements OnInit {
     this.receiveOptions(this.options);
 
     // This is for scroll to top
+    // this.router.events
+    //   .pipe(filter((event) => event instanceof NavigationEnd))
+    //   .subscribe((e) => {
+    //     var currentRoute = e.urlAfterRedirects;
+    //     this.hideSidebar = this.options.sidebarHiddenOnRoutes.find((x) =>
+    //       currentRoute.includes(x)
+    //     )
+    //       ? true
+    //       : false;
+
+    //     this.content?.scrollTo({ top: 0 });
+    //   });
+
     this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
-      .subscribe((e) => {
-        var currentRoute = e.urlAfterRedirects;
-        this.hideSidebar = this.options.sidebarHiddenOnRoutes.find((x) =>
+      .subscribe((e: NavigationEnd) => {
+        const currentRoute = e.urlAfterRedirects;
+
+        // keep your existing hideSidebar logic
+        this.hideSidebar = this.options.sidebarHiddenOnRoutes.some((x) =>
           currentRoute.includes(x)
-        )
-          ? true
-          : false;
+        );
+
+        // NEW: detect settings
+        this.isSettings = currentRoute.startsWith('/settings');
+
+        // swap menu sources
+        if (this.isSettings) {
+          this.navItems = settingsNavItems;
+          this.navItemslower = settingsLowerNavItems ?? []; // or [] if you don’t have a lower list
+        } else {
+          this.navItems = mainNavItems;
+          this.navItemslower = mainLower;
+        }
 
         this.content?.scrollTo({ top: 0 });
       });

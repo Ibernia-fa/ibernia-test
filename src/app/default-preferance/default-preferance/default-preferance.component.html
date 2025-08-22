@@ -1,0 +1,94 @@
+<form class="" [formGroup]="form" (ngSubmit)="submit()">
+  <h1 class="f-s-30 f-w-500 m-0 m-b-30">Your account preferences</h1>
+
+  <div class="container">
+    <div class="row">
+      <div class="col-6">
+        <mat-label class="f-s-16 f-w-400 m-b-8 d-block">Default inflation rate</mat-label>
+        <mat-form-field appearance="outline" class="w-full w-100">
+          <input matInput type="number" formControlName="inflationRate" placeholder="Enter inflation rate" step="0.1">
+          <span matSuffix>%&nbsp;</span>
+          <mat-error *ngIf="f.inflationRate.hasError('required')">Required</mat-error>
+          <mat-error *ngIf="f.inflationRate.hasError('min') || f.inflationRate.hasError('max')">
+            Must be between 0 and 100
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="col-6">
+        <mat-label class="f-s-16 f-w-400 m-b-8 d-block">Default currency</mat-label>
+        <mat-form-field appearance="outline" class="w-full w-100">
+          <mat-select formControlName="currency" placeholder="Select currency">
+            <mat-option *ngFor="let c of currencies" [value]="c">{{ c }}</mat-option>
+          </mat-select>
+          <mat-error *ngIf="f.currency.invalid">Required</mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-6">
+        <mat-label class="f-s-16 f-w-400 m-b-8 d-block">Default net investment return</mat-label>
+        <mat-form-field appearance="outline" class="w-full w-100">
+          <input matInput type="number" formControlName="netInvestmentReturn" placeholder="Enter investment return" step="0.1">
+          <span matSuffix>%&nbsp;</span>
+          <mat-error *ngIf="f.netInvestmentReturn.hasError('required')">Required</mat-error>
+          <mat-error *ngIf="f.netInvestmentReturn.hasError('min') || f.netInvestmentReturn.hasError('max')">
+            Must be between -100 and 100
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="col-6">
+        <mat-label class="f-s-16 f-w-400 m-b-8 d-block">Default advisor commission type</mat-label>
+        <mat-form-field appearance="outline" class="w-full w-100">
+          <mat-select formControlName="advisorCommissionType" placeholder="Select commission type">
+            <mat-option value="none">None</mat-option>
+            <mat-option value="percentage">Percentage</mat-option>
+            <mat-option value="amount">Fixed amount</mat-option>
+          </mat-select>
+          <mat-error *ngIf="f.advisorCommissionType.invalid">Required</mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-6">
+        <mat-label class="f-s-16 f-w-400 m-b-8 d-block">Default commission percentage</mat-label>
+        <mat-form-field appearance="outline" class="w-full w-100">
+          <input matInput type="number" formControlName="commissionPercentage" placeholder="Enter commission percentage" step="0.1">
+          <span matSuffix>%&nbsp;</span>
+          <mat-error *ngIf="f.commissionPercentage.hasError('required')">Required for percentage type</mat-error>
+          <mat-error *ngIf="f.commissionPercentage.hasError('min') || f.commissionPercentage.hasError('max')">
+            Must be between 0 and 100
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="col-6">
+        <mat-label class="f-s-16 f-w-400 m-b-8 d-block">Default commission amount</mat-label>
+        <mat-form-field appearance="outline" class="w-full w-100">
+          <input matInput type="number" formControlName="commissionAmount" placeholder="Enter commission amount" step="0.01">
+          <mat-error *ngIf="f.commissionAmount.hasError('required')">Required for amount type</mat-error>
+          <mat-error *ngIf="f.commissionAmount.hasError('min')">Must be greater than 0</mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="d-flex justify-between align-items-center">
+      <section class="example-section">
+        <mat-checkbox formControlName="acknowledged" class="example-margin">
+          You can change these later at any time
+        </mat-checkbox>
+      </section>
+
+      <button mat-raised-button color="primary"
+              type="submit"
+              class="button-icon pull-right"
+              [disabled]="form.invalid || isSaving || form.pristine">
+        <!-- <mat-progress-spinner *ngIf="isSaving" diameter="18" mode="indeterminate"></mat-progress-spinner> -->
+        <span >Finish and go to your dashboard</span>
+      </button>
+    </div>
+  </div>
+</form>
