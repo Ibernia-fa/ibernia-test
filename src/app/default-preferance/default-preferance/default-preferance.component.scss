@@ -1,0 +1,42 @@
+.main-header-content{
+    .header-icon{
+        margin-right: 10px;
+    }
+    h2{
+        margin-bottom: 10px;
+    }
+}
+.logo-update-wrapper{
+    position: relative;
+    .delete-icon{
+        height: 28px;
+        width: 28px;
+        border: 1px solid #E7E7EB;
+        border-radius: 50%;
+        position: absolute;
+        right: -10px;
+        top: -10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        &:hover{
+            background-color:#E7E7EB ;
+        }
+    }
+}
+.upload-avatar-wrapper{
+    border: 2px dashed #d5d5d5 ;
+    padding: 15px;
+    border-radius: 4px;
+    width: 200px;
+    height: 171px;
+    font-size: 14px;
+    line-height: 16px;
+    &.upload-company-avatar{
+        width: 400px;
+    }
+    small{
+        color: #B7B6C2;
+    }
+}

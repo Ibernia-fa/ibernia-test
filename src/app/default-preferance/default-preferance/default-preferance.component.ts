@@ -5,7 +5,9 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { Subject, EMPTY } from 'rxjs';
 import { catchError, finalize, startWith, takeUntil } from 'rxjs/operators';
-import { DefaultPreferencesPayload, SettingsService, CommissionType } from '../services/default-preferance.http.service';
+import { SettingsService, ComissionType, UserProfileDto } from '../services/default-preferance.http.service';
+import { allCountries } from 'src/app/clients/models/country'; 
+import { AuthService } from 'src/app/auth/services/auth.service';
 
 @Component({
   selector: 'app-default-preferance',
@@ -18,93 +20,128 @@ export class DefaultPreferanceComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   isSaving = false;
   submitted = false;
+  countries = allCountries;
 
-  // Common currencies – extend if needed
-  currencies = ['USD', 'EUR', 'GBP', 'AED', 'SAR', 'PKR'];
+  // UI helpers
+  comissionTypes = [
+    { label: 'Amount', value: ComissionType.Amount },
+    { label: 'Percentage', value: ComissionType.Percentage },
+    { label: 'Both', value: ComissionType.Both },
+  ];
 
-  // Typed reactive form
+  // Form structure mirrors Swagger exactly
   form = this.fb.nonNullable.group({
-    inflationRate: [2.5 as number, [Validators.required, Validators.min(0), Validators.max(100)]],
-    currency: ['USD', [Validators.required]],
-    netInvestmentReturn: [2 as number, [Validators.required, Validators.min(-100), Validators.max(100)]],
-    advisorCommissionType: ['none' as CommissionType, [Validators.required]],
-    commissionPercentage: [null as number | null],
-    commissionAmount: [null as number | null],
-    acknowledged: [true as boolean],
+    userId: ['' as string],         
+    profilePhotoUrl: ['' as string],
+    fullName: ['' as string],
+    email: ['' as string],
+    preferences: this.fb.nonNullable.group({
+      inflationRate: [2.5 as number, [Validators.required, Validators.min(0), Validators.max(100)]],
+      investmentReturn: [5 as number, [Validators.required, Validators.min(-100), Validators.max(100)]],
+      comissionType: [ComissionType.Amount as ComissionType, [Validators.required]],
+      comissionPercentage: [1 as number | null],
+      comissionAmount: [null as number | null],
+      currency: ['USD', [Validators.required]],
+      country: ['' as string],
+    }),
   });
-
+  user: any;
+ComissionType = ComissionType;
   constructor(
     private fb: FormBuilder,
     private api: SettingsService,
     private snack: MatSnackBar,
-    private router: Router
+    private router: Router,
+    private Authservice: AuthService
   ) {}
 
   ngOnInit(): void {
-    // Dynamic validators based on commission type
-    this.form.controls.advisorCommissionType.valueChanges
-      .pipe(startWith(this.form.controls.advisorCommissionType.value), takeUntil(this.destroy$))
-      .subscribe((t) => this.applyCommissionValidation(t));
-
-    // (Optional) preload existing preferences
-    // this.api.getDefaultPreferences()
-    //   .pipe(takeUntil(this.destroy$))
-    //   .subscribe(v => this.form.patchValue(v));
+    this.user = this.Authservice.getUserProfile();
+    console.log(this.user);
+    this.form.controls.preferences.controls.comissionType.valueChanges
+      .pipe(
+        startWith(this.form.controls.preferences.controls.comissionType.value),
+        takeUntil(this.destroy$)
+      )
+      .subscribe((t) => this.applyComissionValidation(t));
   }
 
-  private applyCommissionValidation(t: CommissionType) {
-    const pct = this.form.controls.commissionPercentage;
-    const amt = this.form.controls.commissionAmount;
+  private applyComissionValidation(t: ComissionType) {
+    const prefs = this.form.controls.preferences;
+    const pct = prefs.controls.comissionPercentage;
+    const amt = prefs.controls.comissionAmount;
 
-    // Reset validators
     pct.clearValidators();
     amt.clearValidators();
-    pct.disable({ emitEvent: false });
-    amt.disable({ emitEvent: false });
 
-    if (t === 'percentage') {
-      pct.enable({ emitEvent: false });
-      pct.setValidators([Validators.required, Validators.min(0), Validators.max(100)]);
-      amt.setValue(null, { emitEvent: false });
-    } else if (t === 'amount') {
-      amt.enable({ emitEvent: false });
-      amt.setValidators([Validators.required, Validators.min(0.01)]);
+    // reset enable/disable
+    pct.enable({ emitEvent: false });
+    amt.enable({ emitEvent: false });
+
+    if (t === ComissionType.Amount) {
       pct.setValue(null, { emitEvent: false });
+      pct.disable({ emitEvent: false });
+      amt.setValidators([Validators.required, Validators.min(0.01)]);
+    } else if (t === ComissionType.Percentage) {
+      amt.setValue(null, { emitEvent: false });
+      amt.disable({ emitEvent: false });
+      pct.setValidators([Validators.required, Validators.min(0), Validators.max(100)]);
+    } else if (t === ComissionType.Both) {
+      pct.setValidators([Validators.required, Validators.min(0), Validators.max(100)]);
+      amt.setValidators([Validators.required, Validators.min(0.01)]);
     }
 
     pct.updateValueAndValidity({ emitEvent: false });
     amt.updateValueAndValidity({ emitEvent: false });
   }
 
-  get f() { return this.form.controls; }
+  get p() {
+    return this.form.controls.preferences.controls;
+  }
+
+    clientCountryValueChange(event: any) {
+      const selectedCountry = allCountries.find(country => country.countryName === event);
+      this.p['currency'].patchValue(selectedCountry?.currencySymbol || '');
+    }
 
   submit(): void {
     this.submitted = true;
-
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       this.snack.open('Please fix the highlighted fields.', 'Close', { duration: 3000 });
       return;
     }
 
-    const v = this.form.getRawValue();
-    const payload: DefaultPreferencesPayload = {
-      inflationRate: round2(v.inflationRate),
-      currency: v.currency,
-      netInvestmentReturn: round2(v.netInvestmentReturn),
-      advisorCommissionType: v.advisorCommissionType,
-      commissionPercentage: v.advisorCommissionType === 'percentage' ? round2(v.commissionPercentage!) : null,
-      commissionAmount: v.advisorCommissionType === 'amount' ? round2(v.commissionAmount!) : null,
-      acknowledged: v.acknowledged,
+    const raw = this.form.getRawValue();
+    const payload: UserProfileDto = {
+      userId: this.user?.sub,
+      profilePhotoUrl: blankToNull(raw.profilePhotoUrl),
+      fullName: this.user?.name,
+      email: this.user?.email,
+      preferences: {
+        inflationRate: round2(raw.preferences.inflationRate),
+        investmentReturn: round2(raw.preferences.investmentReturn),
+        comissionType: raw.preferences.comissionType,
+        comissionPercentage:
+          raw.preferences.comissionType === ComissionType.Amount
+            ? null
+            : roundOrNull(raw.preferences.comissionPercentage),
+        comissionAmount:
+          raw.preferences.comissionType === ComissionType.Percentage
+            ? null
+            : intOrNull(raw.preferences.comissionAmount),
+        currency: raw.preferences.currency,
+        country: blankToNull(raw.preferences.country),
+      },
     };
 
     this.isSaving = true;
     this.api
-      .saveDefaultPreferences(payload)
+      .postUserProfile(payload)
       .pipe(
         takeUntil(this.destroy$),
-        catchError(err => {
-          const msg = err?.error?.message ?? 'Failed to save preferences. Please try again.';
+        catchError((err) => {
+          const msg = err?.error?.message ?? 'Failed to save preferences.';
           this.snack.open(msg, 'Close', { duration: 4000 });
           return EMPTY;
         }),
@@ -112,8 +149,7 @@ export class DefaultPreferanceComponent implements OnInit, OnDestroy {
       )
       .subscribe(() => {
         this.snack.open('Preferences saved.', undefined, { duration: 2000 });
-        // Navigate if this is a one-time setup
-        this.router.navigate(['/dashboard']);
+        this.router.navigate(['/clients']); // or wherever you want
       });
   }
 
@@ -121,10 +157,25 @@ export class DefaultPreferanceComponent implements OnInit, OnDestroy {
     this.destroy$.next();
     this.destroy$.complete();
   }
+
+  get comTypeCtrl() {
+  return this.form.controls.preferences.controls.comissionType;
+}
 }
 
-// Helpers
-function round2(n: number | null | undefined): number {
-  if (n == null || Number.isNaN(+n)) return 0;
-  return Math.round(+n * 100) / 100;
+
+// helpers
+function round2(n: number): number {
+  return Math.round(n * 100) / 100;
+}
+function roundOrNull(n: number | null): number | null {
+  return n == null || Number.isNaN(+n) ? null : round2(+n);
+}
+function blankToNull(s?: string | null): string | null {
+  return s && s.trim().length ? s.trim() : null;
+}
+
+function intOrNull(n: number | null): number | null {
+  if (n == null || Number.isNaN(+n)) return null;
+  return Math.trunc(n); 
 }

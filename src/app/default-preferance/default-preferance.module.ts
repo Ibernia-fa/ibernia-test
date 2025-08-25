@@ -7,6 +7,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MaterialModule } from '../material.module';
 
 
 
@@ -20,6 +21,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     DefaultPreferanceRoutingModule,
     MatSelectModule,
     FormsModule,
+        MaterialModule,
+    
     ReactiveFormsModule
   ]
 })

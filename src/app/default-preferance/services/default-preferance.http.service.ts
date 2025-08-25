@@ -3,31 +3,33 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-export type CommissionType = 'none' | 'percentage' | 'amount';
+export enum ComissionType { Amount = 1, Percentage = 2, Both = 3 }
 
-export interface DefaultPreferencesPayload {
-  inflationRate: number;          // e.g., 2.5  (percent)
-  currency: string;               // e.g., 'USD'
-  netInvestmentReturn: number;    // e.g., 5 (percent, can be negative)
-  advisorCommissionType: CommissionType;
-  commissionPercentage?: number | null; // 0..100 when type=percentage
-  commissionAmount?: number | null;     // >0 when type=amount
-  acknowledged?: boolean;
+export interface PreferencesDto {
+  inflationRate: number;
+  investmentReturn: number;
+  comissionType: ComissionType;         // 1|2|3
+  comissionPercentage?: number | null;  // 0..100 when Percentage/Both
+  comissionAmount?: number | null;      // >0 when Amount/Both
+  currency: string;
+  country?: string | null;
+}
+
+export interface UserProfileDto {
+  userId?: string | null;
+  profilePhotoUrl?: string | null;
+  fullName?: string | null;
+  email?: string | null;
+  preferences: PreferencesDto;
 }
 
 @Injectable({ providedIn: 'root' })
 export class SettingsService {
-  // Change this to your real base API
-  private readonly baseUrl = '/api';
+  private readonly baseUrl = '/api/v1';
 
   constructor(private http: HttpClient) {}
-
-  saveDefaultPreferences(payload: DefaultPreferencesPayload): Observable<void> {
-    return this.http.post<void>(`${this.baseUrl}/user/preferences`, payload);
+  postUserProfile(payload: UserProfileDto): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/UserProfile`, payload);
   }
 
-  // Optional: preload existing values
-  getDefaultPreferences(): Observable<DefaultPreferencesPayload> {
-    return this.http.get<DefaultPreferencesPayload>(`${this.baseUrl}/user/preferences`);
-  }
 }
