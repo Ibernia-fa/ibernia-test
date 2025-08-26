@@ -15,7 +15,7 @@
        
         <mat-form-field appearance="outline" class="w-full w-100">
           <input matInput type="number" step="0.1" formControlName="inflationRate" placeholder="Enter inflation rate" />
-          <span matSuffix>%&nbsp;</span>
+          <!-- <span matSuffix>%&nbsp;</span> -->
           <mat-error *ngIf="p.inflationRate.hasError('required')">Required</mat-error>
           <mat-error *ngIf="p.inflationRate.hasError('min') || p.inflationRate.hasError('max')">0–100</mat-error>
         </mat-form-field>
@@ -48,7 +48,7 @@
         </mat-label>
       
         <mat-form-field appearance="outline" class="w-full w-100">
-          <mat-select formControlName="currency" class="sortby-edit-profile" hideSingleSelectionIndicator>
+          <mat-select formControlName="currency"  hideSingleSelectionIndicator>
             @for (country of countries; track country) {
               @if (country.currencySymbol) {
                 <mat-option [value]="country.currencySymbol">{{ country.currencySymbol }}</mat-option>
@@ -71,7 +71,7 @@
         <mat-form-field appearance="outline" class="w-full w-100">
           <input matInput type="number" step="0.1" formControlName="investmentReturn"
                  placeholder="Enter investment return" />
-          <span matSuffix>%&nbsp;</span>
+          <!-- <span matSuffix>%&nbsp;</span> -->
           <mat-error *ngIf="p.investmentReturn.hasError('required')">Required</mat-error>
           <mat-error *ngIf="p.investmentReturn.hasError('min') || p.investmentReturn.hasError('max')">-100–100</mat-error>
         </mat-form-field>
@@ -128,7 +128,7 @@
           <mat-label class="f-s-16 f-w-400 m-b-8 d-block">Default commission %</mat-label>
           <mat-form-field appearance="outline" class="w-full w-100">
             <input matInput type="number" step="0.1" formControlName="comissionPercentage"
-                   placeholder="Enter %" />
+                   placeholder="Enter" />
             <span matSuffix>%&nbsp;</span>
           </mat-form-field>
         </div>
