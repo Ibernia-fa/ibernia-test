@@ -1,7 +1,11 @@
+<mat-card class="add-client-wrapper">
+  <div class="add-client-content-wrapper">
+    
 <form [formGroup]="form" (ngSubmit)="submit()">
-  <h1 class="f-s-30 f-w-500 m-0 m-b-30">Your account preferences</h1>
 
+    <h1 class="f-s-30 f-w-500 m-0 m-b-30">Your account preferences</h1>
   <div class="container" formGroupName="preferences">
+    
     <!-- Row 1: Inflation + Country -->
     <div class="row">
       <div class="col-6">
@@ -167,3 +171,6 @@
 
 
 </form>
+  </div>
+</mat-card>
+
