@@ -14,10 +14,12 @@ import { MatSelectChange, MatSelectModule } from '@angular/material/select';
 import { Client } from 'src/app/clients/models/client';
 import { ClientEvent, Cycle, EscalationRate, EventIncomeType } from '../models/financial-timeline';
 import {
+  AbstractControl,
   FormBuilder,
   FormControl,
   FormGroup,
   ReactiveFormsModule,
+  ValidatorFn,
   Validators,
 } from '@angular/forms';
 import { Timeline } from 'vis-timeline';
@@ -187,7 +189,8 @@ export class AddEventDialogComponent {
         break;
     }
     this.eventForm.get('currency')?.disable();
-
+this.eventForm.setValidators(this.endOnOrAfterStartValidator());
+this.eventForm.updateValueAndValidity({ emitEvent: false });
     if(this.isEditWorkflow) {
       this.patchForm();
     }
@@ -298,6 +301,7 @@ export class AddEventDialogComponent {
       this.eventForm.get('escalationRate')?.setValue('2.5%');
     }
     }
+     this.eventForm.updateValueAndValidity({ onlySelf: false, emitEvent: false });
   }
 
   onEventNameValueChange(event: any) {
@@ -547,6 +551,36 @@ escalationRate: selectedEscalationRateValue !== null && selectedEscalationRateVa
     
       customControl?.updateValueAndValidity();
     }
+
+
+private endOnOrAfterStartValidator(): ValidatorFn {
+  return (group: AbstractControl) => {
+    const cycle = group.get('cycle')?.value as string | null;
+    const start = group.get('start')?.value as number | null;
+    const end   = group.get('end')?.value as number | null;
+    const endCtrl = group.get('end');
+
+    if (!endCtrl) return null;
+
+    const existing = endCtrl.errors ?? null;
+
+    // validate only when cycle is not One-off and both numbers are present
+    const shouldValidate =
+      !!cycle && cycle !== 'One-off' &&
+      start != null && end != null;
+
+    if (shouldValidate && end < start) {
+      endCtrl.setErrors({ ...(existing ?? {}), endBeforeStart: true });
+    } else if (existing && 'endBeforeStart' in existing) {
+      const { endBeforeStart, ...rest } = existing;
+      endCtrl.setErrors(Object.keys(rest).length ? rest : null);
+    }
+
+    return null;
+  };
+}
+
+
   
 }
 

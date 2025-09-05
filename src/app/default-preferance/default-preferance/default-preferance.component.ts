@@ -41,7 +41,7 @@ export class DefaultPreferanceComponent implements OnInit, OnDestroy {
       comissionType: [ComissionType.Amount as ComissionType, [Validators.required]],
       comissionPercentage: [1 as number | null],
       comissionAmount: [null as number | null],
-      currency: ['USD', [Validators.required]],
+      currency: ['EUR', [Validators.required]],
       country: ['' as string],
     }),
   });
@@ -57,7 +57,6 @@ ComissionType = ComissionType;
 
   ngOnInit(): void {
     this.user = this.Authservice.getUserProfile();
-    console.log(this.user);
     this.form.controls.preferences.controls.comissionType.valueChanges
       .pipe(
         startWith(this.form.controls.preferences.controls.comissionType.value),
@@ -85,6 +84,9 @@ ComissionType = ComissionType;
     } else if (t === ComissionType.Percentage) {
       amt.setValue(null, { emitEvent: false });
       amt.disable({ emitEvent: false });
+          if (!pct.value) {
+      pct.setValue(1, { emitEvent: false });
+    }
       pct.setValidators([Validators.required, Validators.min(0), Validators.max(100)]);
     } else if (t === ComissionType.Both) {
       pct.setValidators([Validators.required, Validators.min(0), Validators.max(100)]);

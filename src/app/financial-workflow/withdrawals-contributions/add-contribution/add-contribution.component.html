@@ -141,6 +141,10 @@
                   contributionForm.get('end')?.hasError('required')) {
                   <span class="field-error d-block">End is required</span>
                   }
+                  @if(contributionForm.get('end')?.touched &&
+                        contributionForm.get('end')?.hasError('endBeforeStart')) {
+                      <span class="field-error d-block">End year cannot be before start year</span>
+                    }
                 </div>
               </div>
               }
