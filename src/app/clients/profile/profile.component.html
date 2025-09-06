@@ -1,6 +1,6 @@
 @if(client) {
 <div class="d-flex flex-column gap-24">
-  <mat-card class="cardWithShadow">
+  <mat-card >
     <mat-card-content>
       <div class="profile-main-wrapper">
         <div
@@ -19,13 +19,13 @@
             <!-- End Icon  -->
             <!-- headings  -->
             <div class="d-flex flex-column justify-content-between gap-4">
-              <h4 class="page-title f-w-500">
+              <h4 class="page-title f-w-500 f-s-30">
                 {{ client.clientDetails.name }}'s Profile
               </h4>
               <span class="sub-title">
                 {{ client.clientDetails.birthDate | date }} ({{
                   client.clientDetails.birthDate | ageCalculator
-                }})</span
+                }}  years old) </span
               >
             </div>
             <!-- End headings  -->
@@ -54,7 +54,7 @@
   </mat-card>
 
   <!-- Saving Section  -->
-  <mat-card class="cardWithShadow">
+  <mat-card >
     <mat-card-content>
       <div class="profile-main-wrapper">
         <div class="d-flex flex-column gap-8">
@@ -76,7 +76,7 @@
   <!-- End Saving Section  -->
 
   <!-- Client Cashflow Section  -->
-  <mat-card class="cardWithShadow">
+  <mat-card >
     @if(!isLoaderVisible) {
     <mat-card-content>
       <div class="d-flex flex-column gap-32">

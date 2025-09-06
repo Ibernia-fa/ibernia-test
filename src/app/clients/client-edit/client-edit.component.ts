@@ -25,6 +25,7 @@ import { allCountries } from '../models/country';
 import { CountryISO, NgxIntlTelInputModule } from 'ngx-intl-tel-input';
 import { countryDialCodes } from '../models/country-code';
 import { FiveDayRangeSelectionStrategy } from 'src/app/core/five-day-range-selection-strategy';
+import {MatCheckboxModule} from '@angular/material/checkbox';
 
 
 @Component({
@@ -33,6 +34,7 @@ import { FiveDayRangeSelectionStrategy } from 'src/app/core/five-day-range-selec
     AppBreadcrumbComponent,
     MatFormFieldModule,
     MatInputModule,
+    MatCheckboxModule,
     MatDatepickerModule,
     ReactiveFormsModule,
     ToastrModule,

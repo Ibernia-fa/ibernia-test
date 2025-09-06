@@ -377,17 +377,7 @@ html .customizerNav {
 // End Vis Timeline Customization
 
 // Card Styles
-.cardWithShadow {
-  border-radius: 12px !important;
-  border: 1px solid #e7e7eb !important;
-  box-shadow: none !important;
-  @media (max-width: 768px) {
-    border-radius: 8px;
-    .mat-mdc-card-content {
-      padding: 16px !important;
-    }
-  }
-}
+
 
 // Edit Profile Dropdown
 .dropdown-menus {

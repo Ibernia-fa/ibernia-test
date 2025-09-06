@@ -77,7 +77,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
   @Input() financialTimeline: FinancialTimeline;
   @Input() clientBirthDate: Date;
   @Input() client: Client;
-  @Input() title: string = 'Events';
+  @Input() title: string = 'Timeline';
   @Input() showOnReports: boolean = false;
   @Output() updateTimelines: EventEmitter<boolean>;
   @ViewChild('timelineContainer', { static: true })

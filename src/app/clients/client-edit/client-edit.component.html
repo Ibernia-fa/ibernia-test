@@ -1,21 +1,28 @@
 <mat-card class="edit-client-wrapper">
-  <div class="edit-client-content-wrapper">
-    <app-breadcrumb [showBackIcon]="true" [routeForBack]="'/clients'" title="Edit client"></app-breadcrumb>
-    <form [formGroup]="clientForm" (ngSubmit)="onSubmit()" class="edit-client-form-wrapper">
+  <mat-card-content>
+ 
+    <app-breadcrumb [showBackIcon]="true" [routeForBack]="'/clients'" title="Edit a client"></app-breadcrumb>
+    <form [formGroup]="clientForm" (ngSubmit)="onSubmit()" class="client-form-wrapper">
       <div class="row justify-content-between">
-        <div class="col-6">
+        <div class="col-4 m-b-20">
           <div class="w-100 form-field">
-            <mat-label class="f-s-14 f-w-600 d-block">Client Name</mat-label>
-            <input matInput placeholder="John Deo" formControlName="name" />
+            <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">Client first name</mat-label>
+            <input matInput placeholder="John " formControlName="name" />
             @if(clientForm.get('name')?.touched &&
             clientForm.get('name')?.hasError('required')) {
             <mat-error>Name is required</mat-error>
             }
           </div>
         </div>
-        <div class="col-6">
+           <div class="col-4 m-b-20">
           <div class="w-100 form-field">
-            <mat-label class="f-s-14 f-w-600 d-block">Date Of Birth</mat-label>
+            <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">Client last name</mat-label>
+            <input matInput placeholder="Deo" formControlName="name" />
+          </div>
+        </div>
+        <div class="col-4 m-b-20">
+          <div class="w-100 form-field">
+            <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">Date Of birth</mat-label>
 
             <!-- <mat-form-field appearance="outline" class="w-100"> -->
             <!-- <mat-label>Choose a date</mat-label> -->
@@ -43,9 +50,9 @@
         </div>
       </div>
       <div class="row justify-content-between">
-        <div class="col-6">
+        <div class="col-6 m-b-20">
           <div class="w-100 form-field">
-            <mat-label class="f-s-14 f-w-600 d-block">Country</mat-label>
+            <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">Country</mat-label>
 
             <div class="select-option">
               <mat-select (valueChange)="clientCountryValueChange($event)" formControlName="country" value="Select">
@@ -58,10 +65,10 @@
             </div>
           </div>
         </div>
-        <div class="col-6">
+        <div class="col-6 m-b-20">
           <div class="w-100 form-field">
-            <mat-label class="f-s-14 f-w-600 d-block">
-              Preferred Currency</mat-label>
+            <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">
+              Preferred currency</mat-label>
             <div class="select-option">
               <mat-select formControlName="currency" value="Select">
                 @for(country of allCountries; track country) {
@@ -75,7 +82,7 @@
         </div>
         <!-- <div class="col-6">
           <div class="w-100 form-field">
-            <mat-label class="f-s-14 f-w-600 d-block">Gender</mat-label>
+            <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">Gender</mat-label>
             <div class="select-option">
               <mat-select formControlName="gender" value="Select">
                 <mat-option value="Male">Male</mat-option>
@@ -87,18 +94,18 @@
       </div>
       <div class="checkbox-align d-flex flex-column gap-1">
         <div class="row justify-content-between">
-          <div class="col-6">
+          <div class="col-6 m-b-20">
             <div class="w-100 form-field">
-              <mat-label class="f-s-14 f-w-600 d-block">Email</mat-label>
+              <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">Email</mat-label>
               <input matInput placeholder="email@somedomain.com" formControlName="email" />
               @if(clientForm.get('email')?.hasError('email')) {
               <mat-error>Invalid Email Address</mat-error>
               }
             </div>
           </div>
-          <div class="col-6">
+          <div class="col-6 m-b-20">
             <div class="w-100 form-field">
-              <mat-label class="f-s-14 f-w-600 d-block">Telephone</mat-label>
+              <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">Telephone</mat-label>
               <ngx-intl-tel-input [cssClass]="'custom'" [enableAutoCountrySelect]="true" [enablePlaceholder]="false"
               [searchCountryFlag]="true" [selectFirstCountry]="false" [separateDialCode]="true" [selectedCountryISO]="selectedClientCountryISO"
               [maxLength]="15" [phoneValidation]="false" name="phone"
@@ -111,13 +118,12 @@
             </div>
           </div>
         </div>
-        <div class="checkbox-box">
-          <div>
-            <input type="checkbox" id="partner-section" [checked]="showPartner"
-              (change)="togglePartnerSection(!showPartner)" />
-          </div>
-          <label for="partner-section">Add a partner or spouse</label>
-        </div>
+
+        <section class="example-section m-b-20">
+        <mat-checkbox class="example-margin" id="partner-section" [checked]="showPartner"
+              (change)="togglePartnerSection(!showPartner)">Add a partner or spouse</mat-checkbox>
+      </section>
+        
       </div>
       <!-- <mat-checkbox
         class="example-margin"
@@ -128,9 +134,9 @@
       @if(showPartner) {
       <ng-container formGroupName="partner">
         <div class="row justify-content-between">
-          <div class="col-6">
+          <div class="col-4 m-b-20">
             <div class="w-100 form-field">
-              <mat-label class="f-s-14 f-w-600 d-block">Partner Name</mat-label>
+              <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">Partner first name</mat-label>
               <input matInput placeholder="John Deo" formControlName="name" />
               @if(clientForm.get('partner.name')?.touched &&
               clientForm.get('partner.name')?.hasError('required')) {
@@ -138,9 +144,16 @@
               }
             </div>
           </div>
-          <div class="col-6">
+              <div class="col-4 m-b-20">
             <div class="w-100 form-field">
-              <mat-label class="f-s-14 f-w-600 d-block">Date Of Birth</mat-label>
+              <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">Partner last name</mat-label>
+              <input matInput placeholder=" Deo" formControlName="name" />
+     
+            </div>
+          </div>
+          <div class="col-4 m-b-20">
+            <div class="w-100 form-field">
+              <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">Date Of birth</mat-label>
               <div class="position-relative">
                 <input matInput [matDatepicker]="partnerPicker" formControlName="dob" />
                 <!-- <mat-hint>MM/DD/YYYY</mat-hint> -->
@@ -165,9 +178,9 @@
           </div>
         </div>
         <div class="row justify-content-between">
-          <div class="col-6">
+          <div class="col-6 m-b-20">
             <div class="w-100 form-field">
-              <mat-label class="f-s-14 f-w-600 d-block">Country</mat-label>
+              <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">Country</mat-label>
 
               <div class="select-option">
                 <mat-select (valueChange)="partnerCountryValueChange($event)" formControlName="country" value="Select">
@@ -180,10 +193,10 @@
               </div>
             </div>
           </div>
-          <div class="col-6">
+          <div class="col-6 m-b-20">
             <div class="w-100 form-field">
-              <mat-label class="f-s-14 f-w-600 d-block">
-                Preferred Currency</mat-label>
+              <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">
+                Preferred currency</mat-label>
               <div class="select-option">
                 <mat-select formControlName="currency" value="Select">
                   @for(country of allCountries; track country) {
@@ -197,7 +210,7 @@
           </div>
           <!-- <div class="col-6">
             <div class="w-100 form-field">
-              <mat-label class="f-s-14 f-w-600 d-block">Gender</mat-label>
+              <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">Gender</mat-label>
               <div class="select-option">
                 <mat-select formControlName="gender" value="Select">
                   <mat-option value="Male">Male</mat-option>
@@ -208,18 +221,18 @@
           </div> -->
         </div>
         <div class="row justify-content-between">
-          <div class="col-6">
+          <div class="col-6 m-b-20">
             <div class="w-100 form-field">
-              <mat-label class="f-s-14 f-w-600 d-block">Email</mat-label>
+              <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">Email</mat-label>
               <input matInput placeholder="email@somedomain.com" formControlName="email" />
               @if(clientForm.get('partner.email')?.hasError('email')) {
               <span class="field-error d-block">Invalid Email Address</span>
               }
             </div>
           </div>
-          <div class="col-6">
+          <div class="col-6 m-b-20">
             <div class="w-100 form-field">
-              <mat-label class="f-s-14 f-w-600 d-block">Telephone</mat-label>
+              <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">Telephone</mat-label>
               <ngx-intl-tel-input [cssClass]="'custom'" [enableAutoCountrySelect]="true" [enablePlaceholder]="false"
               [searchCountryFlag]="true" [selectFirstCountry]="false" [separateDialCode]="true" 
               [selectedCountryISO]="selectedPartnerCountryISO" [maxLength]="15" [phoneValidation]="false" name="phone"
@@ -235,18 +248,21 @@
       </ng-container>
       }
       <div class="row">
-        <div class="w-100 form-field">
-          <mat-label class="f-s-14 f-w-600 d-block">Notes</mat-label>
-          <input matInput formControlName="notes" />
+        <div class="col-12 m-b-20">
+          <div class=" form-field">
+          <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">Notes</mat-label>
+          <textarea matInput formControlName="notes"></textarea>
+          </div>
         </div>
       </div>
       <div class="row justify-content-end">
-        <div class="col-sm-12">
+        <div class="col-sm-12 text-right">
           <button mat-flat-button class="btn-submit" type="submit" [disabled]="isFormInvalid">
             Save
           </button>
         </div>
       </div>
     </form>
-  </div>
+  
+  </mat-card-content>
 </mat-card>

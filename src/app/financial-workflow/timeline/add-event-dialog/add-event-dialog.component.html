@@ -39,7 +39,7 @@
   <!-- End Modal Header  -->
 
   <!-- Modal tabs  -->
-  <div class="d-flex flex-column gap-12 tab">
+  <div class="d-flex flex-column gap-8 tab">
     <span class="f-s-16 f-w-400">Type</span>
     <div class="tabs">
       <div class="row">
@@ -61,7 +61,7 @@
   <!-- Modal Body  -->
   <div [formGroup]="eventForm" class="d-flex flex-column gap-20">
     <!-- Net Amount Field  -->
-    <div class="d-flex flex-column gap-12 net-fields">
+    <div class="d-flex flex-column gap-8 net-fields">
       <span class="f-s-16 f-w-400">Net amount</span>
       <div class="net-field d-flex align-items-center">
         <!-- Currency Selector  -->
@@ -105,10 +105,10 @@
       }
     </div>
     <!-- End Net Amount Field  -->
-    <div class="w-100 form-field gap-12">
-      <div class="d-flex gap-8 align-items-center">
+    <div class="w-100 form-field gap-8">
+      <div class="d-flex gap-4 align-items-center">
         <mat-label class="f-s-16 f-w-400 d-block">Date</mat-label>
-        <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
+        <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
       </div>
       <div class="position-relative">
         <div class="w-100 form-field">
@@ -161,7 +161,7 @@
   <!-- Modal Body  -->
   <div [formGroup]="eventForm" class="d-flex flex-column gap-20">
     <!-- Modal tabs  -->
-    <div class="d-flex flex-column gap-12 tab">
+    <div class="d-flex flex-column gap-8 tab">
       <span class="f-s-16 f-w-400">Type</span>
       <div class="tabs">
         <div class="row">
@@ -181,7 +181,7 @@
     <!-- End Modal tabs  -->
 
     <!-- Net Amount Field  -->
-    <div class="d-flex flex-column gap-12 net-fields">
+    <div class="d-flex flex-column gap-8 net-fields">
       <span class="f-s-16 f-w-400">Net amount</span>
       <div class="net-field d-flex align-items-center">
         <!-- Currency Selector  -->
@@ -229,8 +229,8 @@
 
     <!-- Start End  -->
     <div class="start-end">
-      <div class="d-flex flex-column gap-12">
-        <div class="d-flex gap-8 align-items-center">
+      <div class="d-flex flex-column gap-8">
+        <div class="d-flex gap-4 align-items-center">
           @if(eventForm.get('cycle')?.value ==='One-off')
           {
             <mat-label class="f-s-16 f-w-400 d-block">Date</mat-label>  
@@ -239,7 +239,7 @@
           {
           <mat-label class="f-s-16 f-w-400 d-block">Start @if(eventForm.get('cycle')?.value !=='One-off') {& end}</mat-label>
           }
-          <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
+          <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
         </div>
         <div class="row justify-content-between align-items-start flex-nowrap">
           <!-- Start Date  -->
@@ -311,10 +311,10 @@
     <!-- Finish Start End  -->
 
     @if(eventForm.get('cycle')?.value !== 'One-off') {
-      <div class="w-100 form-field gap-12">
-        <div class="d-flex gap-8 align-items-center">
+      <div class="w-100  gap-8">
+        <div class="d-flex gap-4 align-items-center">
           <mat-label class="f-s-16 f-w-400 d-block">Escalation rate</mat-label>
-          <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
+          <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
         </div>
         <div class="position-relative">
           <div class="w-100 form-field">
@@ -332,17 +332,21 @@
           </div>
         </div>
         @if(selectedEscalationDescription === 'Increase at custom rate') {
-          <div class="w-100 form-field gap-12">
+          <div class="w-100 d-flex flex-column   gap-8">
             <mat-label class="f-s-16 d-block">Custom Escalation Rate</mat-label>
-            <div class="input-container position-relative">
-              <input
+
+<mat-form-field  appearance="outline" class="w-full w-100 percentage-icon">
+  <span matSuffix>%&nbsp;</span> 
+     <input
                 matInput
                 type="number"
                 formControlName="customEscalationRate"
                 placeholder="Enter custom rate"
               />
-              <span class="suffix">%</span>
-            </div>
+           
+</mat-form-field>
+
+          
             @if(eventForm.get('customEscalationRate')?.touched &&
                 eventForm.get('customEscalationRate')?.hasError('required')) {
               <span class="field-error d-block">Custom escalation rate is required</span>
@@ -389,8 +393,8 @@
     <mat-dialog-content>
       <div [formGroup]="eventForm" class="d-flex flex-column gap-20">
         <!-- Name Field  -->
-        <div class="w-100 form-field gap-12">
-          <div class="d-flex gap-8 align-items-center">
+        <div class="w-100 form-field gap-8">
+          <div class="d-flex gap-4 align-items-center">
             <mat-label class="f-s-16 f-w-400 d-block">Event</mat-label>
             <!-- <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" /> -->
           </div>
@@ -438,7 +442,7 @@
         </div>
         @if(eventForm.get('eventName')?.value === 'Custom' &&
         eventForm.get('name')) {
-        <div class="w-100 form-field gap-12">
+        <div class="w-100 form-field gap-8">
           <mat-label class="f-s-16 d-block" style="line-height: 18px">Name</mat-label>
           <input matInput formControlName="name" />
           @if(eventForm.get('name')?.touched &&
@@ -449,7 +453,7 @@
         }
         <!--End  Name Field  -->
         <!-- Modal tabs  -->
-        <div class="d-flex flex-column gap-12 tab">
+        <div class="d-flex flex-column gap-8 tab">
           <span class="f-s-16 f-w-400">Type</span>
           <div class="tabs">
             <div class="row">
@@ -471,7 +475,7 @@
         <!-- End Modal tabs  -->
 
         <!-- Net Amount Field  -->
-        <div class="d-flex flex-column gap-12 net-fields">
+        <div class="d-flex flex-column gap-8 net-fields">
           <span class="f-s-16 f-w-400">Net amount</span>
           <div class="net-field d-flex align-items-center">
             <!-- Currency Selector  -->
@@ -518,13 +522,13 @@
 
         <!-- Start End  -->
         <div class="start-end">
-          <div class="d-flex flex-column gap-12">
-            <div class="d-flex gap-8 align-items-center">
+          <div class="d-flex flex-column gap-8">
+            <div class="d-flex gap-4 align-items-center">
 
             <mat-label class="f-s-16 f-w-400 d-block">
-              {{ eventForm.get('cycle')?.value === 'One-off' ? 'Date' : 'Start & End' }}
+              {{ eventForm.get('cycle')?.value === 'One-off' ? 'Date' : 'Start & end' }}
             </mat-label>
-              <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
+              <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
             </div>
             <div class="row justify-content-between align-items-start flex-nowrap">
               <!-- Start date  -->
@@ -584,10 +588,11 @@
         </div>
         <!-- Finish Start End  -->
         @if(eventForm.get('cycle')?.value !== 'One-off') {
-          <div class="w-100 form-field gap-12">
-            <div class="d-flex gap-8 align-items-center">
+          <div class="w-100 d-flex flex-column gap-20">
+            <div class="d-flex flex-column gap-8">
+            <div class="d-flex gap-4 align-items-center">
               <mat-label class="f-s-16 f-w-400 d-block">Escalation rate</mat-label>
-              <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
+              <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
             </div>
             <div class="position-relative">
               <div class="w-100 form-field">
@@ -604,18 +609,21 @@
                 }
               </div>
             </div>
-                    @if(selectedEscalationDescription === 'Increase at custom rate') {
-          <div class="w-100 form-field gap-12">
-            <mat-label class="f-s-16 d-block">Custom Escalation Rate</mat-label>
-            <div class="input-container position-relative">
-              <input
-                matInput
-                type="number"
-                formControlName="customEscalationRate"
-                placeholder="Enter custom rate"
-              />
-              <span class="suffix">%</span>
             </div>
+                    @if(selectedEscalationDescription === 'Increase at custom rate') {
+          <div class="w-100 d-flex flex-column    gap-8">
+            <mat-label class="f-s-16 d-block">Custom escalation rate</mat-label>
+            <mat-form-field  appearance="outline" class="w-full w-100 percentage-icon">
+              <span matSuffix>%&nbsp;</span> 
+                <input
+                              matInput
+                              type="number"
+                              formControlName="customEscalationRate"
+                              placeholder="Enter custom rate"
+                            />
+                            
+              </mat-form-field>
+            
             @if(eventForm.get('customEscalationRate')?.touched &&
                 eventForm.get('customEscalationRate')?.hasError('required')) {
               <span class="field-error d-block">Custom escalation rate is required</span>

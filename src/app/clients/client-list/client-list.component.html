@@ -34,9 +34,10 @@
   </mat-card-content>
 </mat-card> -->
 <section class="client-section">
-  <div class="client-search-wrapper">
+  <div class="client-search-wrapper m-b-30">
     <!-- <div class="row">
       <div class="col-10"> -->
+        <mat-card ><mat-card-content class=" d-flex justify-content-between">
     <div class="position-relative">
       <input
         type="text"
@@ -57,6 +58,7 @@
       <span>New Client</span>
       <img src="assets/images/svgs/add-icon.svg" alt="add-icon" />
     </button>
+    </mat-card-content></mat-card>
     <!-- </div> -->
     <!-- </div> -->
     <!-- </div> -->
@@ -86,7 +88,7 @@
     <!-- </div> -->
 
     @if(dataSource.data.length > 0 && !isLoaderVisible) {
-    <div class="table-main-wrapper">
+    <div class="table-main-wrapper p-t-30">
       <!-- <mat-card-content > -->
       <div class="table-responsive-sm table-wrapper">
         <table
@@ -102,14 +104,14 @@
               mat-header-cell
               *matHeaderCellDef
               mat-sort-header
-              class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-client"
+              class=" column-client"
             >
               Client
             </th>
             <td
               mat-cell
               *matCellDef="let element"
-              class="p-x-24 f-s-14 p-l-0 column-client"
+              class=" column-client"
             >
               {{ element.clientDetails.name }} @if(element.partnerDetail?.name)
               { & {{ element.partnerDetail?.name }} }
@@ -119,14 +121,14 @@
             <th
               mat-header-cell
               *matHeaderCellDef
-              class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-dob"
+              class=" column-dob"
             >
               Date(s) of birth
             </th>
             <td
               mat-cell
               *matCellDef="let element"
-              class="p-x-24 f-s-14 p-l-0 column-dob"
+              class="column-dob"
             >
               {{ element.clientDetails.birthDate | date }} ({{
                 element.clientDetails.birthDate | ageCalculator
@@ -149,24 +151,26 @@
             <td
               mat-cell
               *matCellDef="let element"
-              class="p-x-24 f-s-14 p-l-0 column-last_updated"
+              class="column-last_updated"
             >
               {{ element.lastUpdated | date }} <br />
+              <span style="color:#9495a2">
               {{ element.lastUpdated | timeAgo }}
+              </span>
             </td>
           </ng-container>
           <ng-container matColumnDef="notes">
             <th
               mat-header-cell
               *matHeaderCellDef
-              class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-notes"
+              class="column-notes"
             >
               Notes
             </th>
             <td
               mat-cell
               *matCellDef="let element"
-              class="p-x-24 f-s-14 p-l-0 column-notes"
+              class=" column-notes"
             >
               {{ element.notes }}
             </td>
@@ -175,7 +179,7 @@
             <th
               mat-header-cell
               *matHeaderCellDef
-              class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-action"
+              class="column-action"
             ></th>
             <td  mat-cell class="column-action" *matCellDef="let element">
               <div class="d-flex align-items-center justify-content-center">
@@ -184,6 +188,7 @@
                     <img
                       src="assets/images/svgs/dropdown-detail.svg"
                       alt="dropdown-detail"
+                      
                     />
 
                     <!-- <i-tabler name="dots-vertical" class="icon-20"></i-tabler> -->
@@ -261,11 +266,11 @@
             <th
               mat-header-cell
               *matHeaderCellDef
-              class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0"
+              class=""
             >
               Client
             </th>
-            <td mat-cell *matCellDef="let element" class="p-x-24 f-s-14 p-l-0">
+            <td mat-cell *matCellDef="let element" >
               {{ element.clientDetails.name }}
             </td>
           </ng-container>
@@ -273,11 +278,11 @@
             <th
               mat-header-cell
               *matHeaderCellDef
-              class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0"
+              class=""
             >
               Date(s) of birth
             </th>
-            <td mat-cell *matCellDef="let element" class="p-x-24 f-s-14 p-l-0">
+            <td mat-cell *matCellDef="let element" class="">
               {{ element.clientDetails.birthDate | date }} ({{
                 element.clientDetails.birthDate | ageCalculator
               }})
@@ -287,24 +292,26 @@
             <th
               mat-header-cell
               *matHeaderCellDef
-              class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0"
+              class=""
             >
               Last Updated
             </th>
-            <td mat-cell *matCellDef="let element" class="p-x-24 f-s-14 p-l-0">
+            <td mat-cell *matCellDef="let element" class="">
               {{ element.lastUpdated | date }} <br />
+              <span style="color:#9495a2">
               {{ element.lastUpdated | timeAgo }}
+              </span>
             </td>
           </ng-container>
           <ng-container matColumnDef="notes_client">
             <th
               mat-header-cell
               *matHeaderCellDef
-              class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0"
+              class=""
             >
               Last Updated
             </th>
-            <td mat-cell *matCellDef="let element" class="p-x-24 f-s-14 p-l-0">
+            <td mat-cell *matCellDef="let element" class="">
               <!-- {{ element.lastUpdated | date }} -->
             </td>
           </ng-container>
@@ -312,11 +319,11 @@
             <th
               mat-header-cell
               *matHeaderCellDef
-              class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0"
+              class=""
             >
               Last Updated
             </th>
-            <td mat-cell *matCellDef="let element" class="p-x-24 f-s-14 p-l-0">
+            <td mat-cell *matCellDef="let element" class="">
               <!-- {{ element.lastUpdated | date }} -->
             </td>
           </ng-container>
@@ -324,11 +331,11 @@
             <th
               mat-header-cell
               *matHeaderCellDef
-              class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0"
+              class=""
             >
               Client
             </th>
-            <td mat-cell *matCellDef="let element" class="p-x-24 f-s-14 p-l-0">
+            <td mat-cell *matCellDef="let element" class="">
               {{ element.partnerDetail?.name }}
             </td>
           </ng-container>
@@ -336,11 +343,11 @@
             <th
               mat-header-cell
               *matHeaderCellDef
-              class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0"
+              class=""
             >
               Date(s) of birth
             </th>
-            <td mat-cell *matCellDef="let element" class="p-x-24 f-s-14 p-l-0">
+            <td mat-cell *matCellDef="let element" class="">
               {{ element.partnerDetail?.birthDate | date }} ({{
                 element.partnerDetail?.birthDate | ageCalculator
               }})
@@ -354,20 +361,22 @@
             >
               Last Updated
             </th>
-            <td mat-cell *matCellDef="let element" class="p-x-24 f-s-14 p-l-0">
+            <td mat-cell *matCellDef="let element" class="">
               {{ element.lastUpdated | date }} <br />
+                  <span style="color:#9495a2">
               {{ element.lastUpdated | timeAgo }}
+              </span>
             </td>
           </ng-container>
           <ng-container matColumnDef="notes_partner">
             <th
               mat-header-cell
               *matHeaderCellDef
-              class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0"
+              class=""
             >
               Last Updated
             </th>
-            <td mat-cell *matCellDef="let element" class="p-x-24 f-s-14 p-l-0">
+            <td mat-cell *matCellDef="let element" class="">
               <!-- {{ element.lastUpdated | date }} -->
             </td>
           </ng-container>
@@ -375,11 +384,11 @@
             <th
               mat-header-cell
               *matHeaderCellDef
-              class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0"
+              class=""
             >
               Last Updated
             </th>
-            <td mat-cell *matCellDef="let element" class="p-x-24 f-s-14 p-l-0">
+            <td mat-cell *matCellDef="let element" class="">
               <!-- {{ element.lastUpdated | date }} -->
             </td>
           </ng-container>
@@ -487,22 +496,22 @@
           <!-- <tr mat-row *matRowDef="let element; columns: columnsToDisplayWithCheckbox" class="example-detail-row"
             [hidden]="expandedElement !== element && !element.partnerDetail?">
             <ng-container>
-              <td mat-cell *matCellDef="let element" class="p-x-24 f-s-14 p-l-0">
+              <td mat-cell *matCellDef="let element" class="">
                 {{element.partnerDetail?.name}} 
               </td>
             </ng-container>
             <ng-container>
-              <td mat-cell *matCellDef="let element" class="p-x-24 f-s-14 p-l-0">
+              <td mat-cell *matCellDef="let element" class="">
                 {{element.partnerDetail?.birthDate | date}}
               </td>
             </ng-container>
             <ng-container>
-              <td mat-cell *matCellDef="let element" class="p-x-24 f-s-14 p-l-0">
+              <td mat-cell *matCellDef="let element" class="">
                 {{ element.lastUpdated | date }}
               </td>
             </ng-container>
             <ng-container>
-              <td mat-cell *matCellDef="let element" class="p-x-24 f-s-14 p-l-0">
+              <td mat-cell *matCellDef="let element" class="">
                 {{ element.notes }}
               </td>
             </ng-container>

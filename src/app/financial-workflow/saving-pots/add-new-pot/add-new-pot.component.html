@@ -10,7 +10,7 @@
   <div class="d-flex flex-column gap-32">
     <!-- Modal Header  -->
     <div class="d-flex align-items-center justify-content-between gap-10 modal-header">
-      <h3>{{isEditWorkflow ? 'Update' : 'Add'}} a savings pot, investment or pension</h3>
+      <h3>{{isEditWorkflow ? 'Edit' : 'Add'}} a savings pot, investment or pension</h3>
       <button (click)="closeDialog()" type="button">
         <img src="assets/images/svgs/close-line-cion.svg" alt="close-line-cion" />
       </button>
@@ -19,7 +19,7 @@
 
     <!-- Modal Body  -->
     <mat-dialog-content>
-      <div class="d-flex flex-column gap-16" [formGroup]="savingsForm">
+      <div class="d-flex flex-column gap-20" [formGroup]="savingsForm">
         <!-- Name Field  -->
         <div class="w-100 form-field gap-12">
           <mat-label class="f-s-16 d-block" style="line-height: 18px">Type</mat-label>
@@ -127,7 +127,7 @@
           <div class="d-flex flex-column gap-4">
           <div class="d-flex gap-8 align-items-center">
             <mat-label class="f-s-16 f-w-400 d-block">Return rate</mat-label>
-            <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
+            <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
           </div>
           <div class="d-flex align-items-center gap-24">
             <div class="slider-customizer slider-wrapper">
@@ -138,10 +138,17 @@
               </mat-slider>
             </div>
             <div class="percentage-field">
-              <div class="w-100 form-field input-container">
+              <div class="w-100 form-field ">
                 <!-- <mat-form-field style="width: 110px" appearance="outline" class="w-100 form-field"> -->
-                  <input matInput formControlName="returnRate" [value]="savingsForm.get('returnRate')?.value" />
-                  <span class="suffix">%</span>
+                 
+
+                      <mat-form-field  appearance="outline" class="w-full w-100 percentage-icon">
+                          <span matSuffix>%&nbsp;</span> 
+                            <input
+                                          matInput class="p-0" formControlName="returnRate" [value]="savingsForm.get('returnRate')?.value"
+                                        />
+                                        
+                          </mat-form-field>
                 <!-- </mat-form-field>  -->
               </div>
             </div>
@@ -156,20 +163,18 @@
         </div>
       }
         <!-- End Slider Section  -->
-
+<div class="d-flex flex-column gap-0">
         <!-- CheckBox  -->
-        <div class="checkbox-box">
-          <div>
-            <input type="checkbox" id="lock-pot" (change)="isLockPotChanged(savingsForm.get('lockPot')?.value)"
-              formControlName="lockPot" />
-          </div>
-          <label for="lock-pot">Lock this pot from automatically covering an income shortfall</label>
-        </div>
-        <!-- End CheckBox  -->
+            <section class="example-section">
+        <mat-checkbox type="checkbox" id="lock-pot" (change)="isLockPotChanged(savingsForm.get('lockPot')?.value)"
+              formControlName="lockPot">Lock this pot from automatically covering an income shortfall</mat-checkbox>
+      </section>
 
+        <!-- End CheckBox  -->
+     
         <!-- Savings pot is locked between  -->
         @if(savingsForm.get('lockPot')?.value) {
-        <div class="start-end">
+        <div class="start-end m-t-15 m-b-15">
           <div class="d-flex flex-column gap-12">
             <div class="d-flex gap-8 align-items-center">
               <mat-label class="f-s-16 f-w-400 d-block">Savings pot is locked between</mat-label>
@@ -239,17 +244,15 @@
 
         <!-- CheckBox  -->
         @if(savingsForm.get('name')?.value !== 'Cash') {
-        <div class="checkbox-box">
-          <div>
-            <input type="checkbox" id="commissions"
-              (change)="isCommissionsChanged(savingsForm.get('commissions')?.value)" formControlName="commissions" />
-          </div>
-          <label for="commissions">Add commissions</label>
-        </div>
+    
+        <section class="example-section">
+        <mat-checkbox type="checkbox" id="commissions"
+              (change)="isCommissionsChanged(savingsForm.get('commissions')?.value)" formControlName="commissions">Add commissions</mat-checkbox>
+      </section>
         <!-- End CheckBox  -->
 
         @if(savingsForm.get('commissions')?.value) {
-        <div class="d-flex flex-column gap-12">
+        <div class="d-flex flex-column gap-12  m-t-15">
           <!-- Modal tabs  -->
           <!-- <div class="d-flex flex-column gap-6 tab">
             <span class="f-s-16 f-w-400">Commission type</span>
@@ -295,8 +298,8 @@
           @if(savingsForm.get('commissionType')?.value === 'amount' || savingsForm.get('commissionType')?.value === 'both') {
             @if(savingsForm.get('commissionType')?.value === 'both') {
               <div class="d-flex gap-8 align-items-center">
-                <mat-label class="f-s-16 f-w-400 d-block">Amount</mat-label>
-                <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
+                <mat-label class="f-s-16 f-w-400 d-block">Commission amount</mat-label>
+                <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
               </div>
             }
             <div class="d-flex flex-column gap-4 net-fields">
@@ -351,8 +354,8 @@
         @if(savingsForm.get('commissionType')?.value !== 'percentage'){
           <div class="w-100 form-field gap-12">
           <div class="d-flex gap-8 align-items-center">
-            <mat-label class="f-s-16 f-w-400 d-block">Commission escalation rate</mat-label>
-            <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
+            <mat-label class="f-s-16 f-w-400 d-block">Commission amount escalatation rate</mat-label>
+            <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
           </div>
           <div class="position-relative">
             <div class="w-100 form-field">
@@ -376,16 +379,25 @@
         @if(selectedEscalationDescription === 'Increase at custom rate') {
           <div class="w-100 form-field gap-12">
             <mat-label class="f-s-16 d-block">Custom escalation rate</mat-label>
-            <div class="input-container position-relative">
-              <input
-                matInput
+
+         <mat-form-field  appearance="outline" class="w-full w-100 percentage-icon">
+              <span matSuffix>%&nbsp;</span> 
+                <input
+                              matInput
+                              class="p-0"
                 type="number"
                 formControlName="customEscalationRate"
                 placeholder="Enter custom rate"
-                class="percent-input"
-              />
-              <span class="suffix">%</span>
-            </div>
+          
+                            />
+                            
+              </mat-form-field>
+
+
+
+
+
+            
             @if(savingsForm.get('customEscalationRate')?.touched &&
                 savingsForm.get('customEscalationRate')?.hasError('required')) {
               <span class="field-error d-block">Custom escalation rate is required</span>
@@ -399,8 +411,8 @@
           @if(savingsForm.get('commissionType')?.value === 'percentage' || savingsForm.get('commissionType')?.value === 'both') {
             @if(savingsForm.get('commissionType')?.value === 'both') {
               <div class="d-flex gap-8 align-items-center">
-                <mat-label class="f-s-16 f-w-400 d-block">Percentage</mat-label>
-                <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
+                <mat-label class="f-s-16 f-w-400 d-block">Commission percentage</mat-label>
+                <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
               </div>
             }
             <div class="d-flex flex-column gap-4 net-fields">
@@ -425,8 +437,14 @@
                   <!-- <input matInput formControlName="commissionPercentage" [value]="formattedCommissionPercentage"
                   placeholder="0" (input)="onInputChange($event, 'commissionPercentage')" (blur)="onInputBlur($event, 'commissionPercentage')" /> -->
                   <!-- <mat-form-field class="w-100 form-field commision-percentage" appearance="outline"> -->
-                    <input matInput formControlName="commissionPercentage" />
-                    <span class="suffix">%</span>
+                   
+                           <mat-form-field  appearance="outline" class="w-full w-100 percentage-icon">
+                          <span matSuffix>%&nbsp;</span> 
+                            <input
+                                          matInput formControlName="commissionPercentage"
+                                        />
+                                        
+                          </mat-form-field>
                   <!-- </mat-form-field>  -->
                 </div>
                 <!-- End Price Field  -->
@@ -460,6 +478,7 @@
 
         }
       }
+      </div>
       </div>
     </mat-dialog-content>
     <!-- End Modal Body  -->

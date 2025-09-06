@@ -27,7 +27,7 @@ import { AddModelDialogComponent } from '../profile/add-model-dialog/add-model-d
 import { allCountries } from '../models/country';
 import { CountryISO, NgxIntlTelInputModule } from 'ngx-intl-tel-input';
 import { FiveDayRangeSelectionStrategy } from 'src/app/core/five-day-range-selection-strategy';
-
+import {MatCheckboxModule} from '@angular/material/checkbox';
 
 
 @Component({
@@ -43,7 +43,8 @@ import { FiveDayRangeSelectionStrategy } from 'src/app/core/five-day-range-selec
     MatSelectModule,
     MatButtonModule,
     MatCardModule,
-    NgxIntlTelInputModule
+    NgxIntlTelInputModule,
+    MatCheckboxModule
   ],
   providers: [
     ClientHttpService,

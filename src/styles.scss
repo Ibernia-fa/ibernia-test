@@ -29,3 +29,96 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 .justify-between{
   justify-content: space-between;
 }
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+.mat-mdc-card{
+      border: 1px solid #e7e7eb !important;
+    border-radius: 12px !important;
+        box-shadow: none !important;
+}
+.client-form-wrapper{
+  padding: 0px 130px;
+}
+.mat-mdc-table{
+  tr{
+    th{
+      color: #3A3A47;
+      font-weight: 700;
+    }
+  }
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse; /* Ensures consistent spacing between cells */
+}
+.modal-header{
+  button{
+    border-radius: 4px;
+    padding: 0px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    &:hover{
+      background-color: #ffcece;
+    }
+  }
+}
+.mat-mdc-form-field{
+  .mat-mdc-text-field-wrapper{
+    .mat-mdc-form-field-infix{
+      height: 46px;
+      line-height: 34px;
+      }
+  }
+}
+.percentage-icon{
+  .mat-mdc-text-field-wrapper{
+    padding-left: 45px;
+  }
+  .mat-mdc-form-field-infix{
+    flex: inherit;
+    margin-right: 5px;
+    input{
+      padding: 0px !important;
+      min-height: inherit;
+    }
+    
+  }
+  .mat-mdc-form-field-icon-suffix {
+    padding: 0 0 0 4px;
+    background: gray;
+    height: 20px;
+    width: 20px;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    line-height: normal;
+    border-radius: 4px;
+    color: white;
+    font-size: 16px;
+      left: 16px;
+    top: 13px;
+}
+}
+.field-error,
+.mat-mdc-form-field-error {
+   padding-left: 0px !important;
+    color: red !important;
+}
+.mat-mdc-form-field-error-wrapper{
+  padding-left: 0px !important;
+}
+.mdc-text-field--outlined:not(.mdc-text-field--disabled).mdc-text-field--invalid .mat-mdc-notch-piece{
+  border-color: red !important;
+}

@@ -1,8 +1,5 @@
 /* General Table Styling */
-table {
-  width: 100%;
-  border-collapse: collapse; /* Ensures consistent spacing between cells */
-}
+
 
 /* Detail Row Styling */
 tr.example-detail-row {
@@ -29,17 +26,8 @@ tr.example-detail-row {
   background-color: #e8e8e8; /* Subtle active row effect */
 }
 
-/* Styling for Expanded Cells */
-.expanded-cell {
-  background-color: #f9f9f9;
-  font-size: 13px;
-  font-style: italic;
-  border: none; /* Removes cell borders for cleaner look */
-}
 
-.action-link {
-  display: flex;
-}
+
 
 .mat-mdc-header-row {
   background: rgba(247, 251, 255, 1) !important;
@@ -115,49 +103,12 @@ tr.example-detail-row {
 
 // New Styles
 
-.client-section {
-  display: flex;
-  flex-direction: column;
-  gap: 36px;
-}
-.table-main-wrapper {
-  padding-top: 24px;
-  @media (max-width: 768px) {
-    padding-top: 16px;
-  }
-}
-.clientTableContainer {
-  background: #ffffff;
-  border: 1px solid #e7e7eb;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: none;
-}
+
+
+
+
 .client-search-wrapper {
-  background: #ffffff;
-  border: 1px solid #e7e7eb;
-  border-radius: 12px;
-  padding: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  @media (max-width: 768px) {
-    flex-direction: column;
-    gap: 16px;
-    align-items: flex-start;
-    padding: 16px;
-    border-radius: 8px;
-  }
-}
-.client-search-wrapper .col-10,
-.client-search-wrapper .col-2 {
-  padding-left: 0 !important;
-  padding-right: 0 !important;
-}
-.client-search-wrapper .row {
-  margin: 0 !important;
-}
-.client-search-wrapper .position-relative {
+  .position-relative {
   width: 100%;
   max-width: 473px;
   background-color: #f7f7f7;
@@ -168,7 +119,7 @@ tr.example-detail-row {
     max-width: 100%;
   }
 }
-.client-search-wrapper input {
+input {
   display: block;
   border: 1px solid #e7e7eb;
   background: transparent;
@@ -181,17 +132,16 @@ tr.example-detail-row {
   font-family: "Ubuntu", serif;
   letter-spacing: "2%";
   transition: all 0.2s linear;
-}
-
-.client-search-wrapper input::placeholder {
+  &::placeholder {
   color: #b7b6c2;
 }
-.client-search-wrapper input:focus {
+&:focus {
   outline: none;
   border: 1px solid #516ce8;
   transition: border 0.2s linear;
 }
-.client-search-wrapper .search-icon {
+}
+.search-icon {
   top: 50%;
   right: 16px;
   transform: translateY(-50%);
@@ -201,6 +151,8 @@ tr.example-detail-row {
   width: 24px;
   pointer-events: none;
 }
+}
+
 
 // Table Heading
 .table-heading {

@@ -21,6 +21,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectChange, MatSelectModule } from '@angular/material/select';
 import { MatSliderModule } from '@angular/material/slider';
 import { allCountries } from 'src/app/clients/models/country';
+import {MatCheckboxModule} from '@angular/material/checkbox';
 import {
   Cycle,
   EscalationRate,
@@ -50,7 +51,8 @@ import { TablerIconsModule } from 'angular-tabler-icons';
     MatDatepickerModule,
     ReactiveFormsModule,
     MatSliderModule,
-    TablerIconsModule
+    TablerIconsModule,
+    MatCheckboxModule
   ],
   templateUrl: './add-new-pot.component.html',
   styleUrl: './add-new-pot.component.scss',
