@@ -142,6 +142,10 @@
                   withdrawalForm.get('end')?.hasError('required')) {
                   <span class="field-error d-block">End is required</span>
                   }
+                                    @if(withdrawalForm.get('end')?.touched &&
+                        withdrawalForm.get('end')?.hasError('endBeforeStart')) {
+                      <span class="field-error d-block">End year cannot be before start year</span>
+                    }
                 </div>
               </div>
               }

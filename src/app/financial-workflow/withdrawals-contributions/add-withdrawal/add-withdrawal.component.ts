@@ -14,9 +14,11 @@ import { MatCardModule } from '@angular/material/card';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import {
+  AbstractControl,
   FormBuilder,
   FormGroup,
   ReactiveFormsModule,
+  ValidatorFn,
   Validators,
 } from '@angular/forms';
 import { allCountries } from 'src/app/clients/models/country';
@@ -113,6 +115,8 @@ export class AddWithdrawalComponent {
       savingPot: ['']
     });
     this.withdrawalForm.get('currencySymbol')?.disable();
+    this.withdrawalForm.setValidators(this.endOnOrAfterStartValidator());
+    this.withdrawalForm.updateValueAndValidity({ emitEvent: false });
     this.onCycleValueChange(this.cycles[1].id);
 
     if (this.isEditWorkflow) {
@@ -229,4 +233,29 @@ export class AddWithdrawalComponent {
       console.log('Form is invalid');
     }
   }
+
+      private endOnOrAfterStartValidator(): ValidatorFn {
+      return (group: AbstractControl) => {
+        const start = group.get('start')?.value;
+        const end   = group.get('end')?.value;
+        const endCtrl = group.get('end');
+    
+        // Only validate when both are present (or when end is present)
+        if (endCtrl) {
+          const existing = endCtrl.errors ?? null;
+    
+          if (start != null && start !== '' && end != null && end !== '' && end < start) {
+            // attach/merge the error onto the END control
+            endCtrl.setErrors({ ...(existing ?? {}), endBeforeStart: true });
+          } else {
+            // remove just our error, keep any others
+            if (existing && 'endBeforeStart' in existing) {
+              const { endBeforeStart, ...rest } = existing;
+              endCtrl.setErrors(Object.keys(rest).length ? rest : null);
+            }
+          }
+        }
+        return null;
+      };
+    }
 }

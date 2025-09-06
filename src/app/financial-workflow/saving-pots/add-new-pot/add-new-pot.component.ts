@@ -35,6 +35,7 @@ import {
 } from '../models/saving-pots.model';
 import { catchError, filter } from 'rxjs';
 import { TablerIconsModule } from 'angular-tabler-icons';
+import { IntegerOnlyDirective } from 'src/app/directives/integerOnly.directive';
 
 @Component({
   selector: 'app-add-new-pot',
@@ -52,7 +53,8 @@ import { TablerIconsModule } from 'angular-tabler-icons';
     ReactiveFormsModule,
     MatSliderModule,
     TablerIconsModule,
-    MatCheckboxModule
+    MatCheckboxModule,
+    IntegerOnlyDirective
   ],
   templateUrl: './add-new-pot.component.html',
   styleUrl: './add-new-pot.component.scss',
@@ -734,4 +736,8 @@ onEscalationRateChange(event: MatSelectChange): void {
 
     }
   }
+
+  blockComma(e: KeyboardEvent) {
+  if (e.key === ',') e.preventDefault();
+}
 }

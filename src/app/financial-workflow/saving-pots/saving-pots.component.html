@@ -197,12 +197,15 @@ You may rearrange the order by dragging and dropping the pots, or by using the u
                                                 <img src="assets/images/svgs/pen-icon.svg" alt="pen-icon" />
                                             </mat-icon>
                                         </button>
-                                        <button mat-icon-button (click)="deleteEventClicked(saving)">
+                                        <ng-container *ngIf="saving.name != 'Cash'">
+                                                 <button mat-icon-button (click)="deleteEventClicked(saving)">
                                             <mat-icon>
                                                 <img src="assets/images/svgs/drop-down-delete-2-line.svg"
                                                     alt="del-icon" />
                                             </mat-icon>
                                         </button>
+                                        </ng-container>
+                                   
                                     </div>
                                     <!-- <div class="edit-icon-overlay">
                                         </div> -->
@@ -212,12 +215,13 @@ You may rearrange the order by dragging and dropping the pots, or by using the u
                                 <!-- Up and Down Buttons   -->
                                 @if(savingPots.clientSavings) {
                                 <div class="d-flex flex-column gap-10 vote-btns">
-                                    @if(i > 0) {
+                                    @if(i > 0 && !('cash' === (savingPots.clientSavings[i - 1]?.name || '').toLowerCase())) {
                                     <button (click)="moveUp(i)" type="button">
                                         <img src="assets/images/svgs/vote-arrow-up.svg" alt="vote-arrow-up">
                                     </button>
                                     }
-                                    @if(i < savingPots.clientSavings.length - 1) { <button (click)="moveDown(i)"
+                                        @if((saving.name || '').toLowerCase() !== 'cash' && i < savingPots.clientSavings.length - 1) {
+                                        <button (click)="moveDown(i)"
                                         type="button">
                                         <img src="assets/images/svgs/vote-arrow-down.svg" alt="vote-arrow-down">
                                         </button>

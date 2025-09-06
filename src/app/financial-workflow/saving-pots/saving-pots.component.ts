@@ -156,6 +156,7 @@ export class SavingPotsComponent implements OnInit {
               .map((item, index) => ({ ...item, orderNumber: item.orderNumber ?? index }))
               .sort((a, b) => a.orderNumber - b.orderNumber)
           };
+          this.ensureCashFirst();
           this.timeline = timeline;
           this.amountCycles = amountCycles;
           this.escalationRates = escalationRatesResponse.escalationRates;
@@ -316,6 +317,7 @@ updateOrderNumbers() {
     dialogRef.afterClosed().subscribe((result: any) => {
       console.log('Dialog closed with result:', result);
       this.savingPots = result.savingPot;
+      this.ensureCashFirst();
       // this.savingPots.clientSavings.push(result.clientSaving);
     });
   }
@@ -353,7 +355,26 @@ updateOrderNumbers() {
     dialogRef.afterClosed().subscribe((result: any) => {
       console.log('Dialog closed with result:', result);
       this.savingPots = result.savingPot;
+      this.ensureCashFirst();
       // this.savingPots.clientSavings.push(result.clientSaving);
     });
   }
+
+  // Add these helpers to the component
+private isCashName(n?: string): boolean {
+  return (n ?? '').trim().toLowerCase() === 'cash';
+}
+
+private ensureCashFirst(): void {
+  const list = this.savingPots?.clientSavings;
+  if (!list || !list.length) return;
+  const cashIdx = list.findIndex(x => this.isCashName(x?.name));
+  if (cashIdx > 0) {
+    const [cash] = list.splice(cashIdx, 1);
+    list.unshift(cash);
+    this.savingPots.clientSavings = [...list];
+    this.updateOrderNumbers(); // persist the invariant
+  }
+}
+
 }
