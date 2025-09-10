@@ -1,5 +1,5 @@
 // src/app/settings/default-preferance/default-preferance.component.ts
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Inject, OnDestroy, OnInit, Optional } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
@@ -8,6 +8,7 @@ import { catchError, finalize, startWith, takeUntil } from 'rxjs/operators';
 import { SettingsService, ComissionType, UserProfileDto } from '../services/default-preferance.http.service';
 import { allCountries } from 'src/app/clients/models/country'; 
 import { AuthService } from 'src/app/auth/services/auth.service';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-default-preferance',
@@ -52,7 +53,9 @@ ComissionType = ComissionType;
     private api: SettingsService,
     private snack: MatSnackBar,
     private router: Router,
-    private Authservice: AuthService
+    private Authservice: AuthService,
+    @Optional() private dialogRef?: MatDialogRef<DefaultPreferanceComponent>,
+    @Optional() @Inject(MAT_DIALOG_DATA) public data?: any
   ) {}
 
   ngOnInit(): void {
@@ -151,7 +154,12 @@ ComissionType = ComissionType;
       )
       .subscribe(() => {
         this.snack.open('Preferences saved.', undefined, { duration: 2000 });
-        this.router.navigate(['/clients']); // or wherever you want
+          if (this.dialogRef) {
+          this.dialogRef.close(true);
+          return;
+        }
+        // If routed page → navigate back to clients
+        this.router.navigate(['/clients']);
       });
   }
 

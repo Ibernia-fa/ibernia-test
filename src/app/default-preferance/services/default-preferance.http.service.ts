@@ -1,7 +1,7 @@
 // src/app/settings/settings.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpResponse } from '@angular/common/http';
+import { map, Observable } from 'rxjs';
 
 export enum ComissionType { Amount = 1, Percentage = 2, Both = 3 }
 
@@ -31,5 +31,25 @@ export class SettingsService {
   postUserProfile(payload: UserProfileDto): Observable<void> {
     return this.http.post<void>(`${this.baseUrl}/UserProfile`, payload);
   }
+  
+   getUserProfileResponse(userId: string): Observable<HttpResponse<any>> {
+    return this.http.get<any>(`${this.baseUrl}/UserProfile/${userId}`, {
+      observe: 'response',
+    });
+  }
+
+  uploadProfilePhoto(file: File) {
+  const form = new FormData();
+  form.append('file', file);
+  // Adjust URL and response handling to your API;
+  // assume API returns { url: 'https://...' }
+  return this.http.post<{ url: string }>(`${this.baseUrl}/UserProfile/UploadPhoto`, form)
+    .pipe(
+      // map to just the URL string
+      // If your API returns plain string, change accordingly
+      map(res => res.url)
+    );
+}
+
 
 }

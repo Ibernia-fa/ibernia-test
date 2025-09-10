@@ -64,7 +64,7 @@ export class AddModelDialogComponent {
         clientBirthDate: this.clientData.clientDetails.birthDate,
         client: {
           id: this.clientData.id,
-          name: this.clientData.clientDetails.name
+          name: this.clientData.clientDetails.firstName
         },
         financialAdvisor: this.clientData.financialAdvisor,
         createdAt: new Date(),

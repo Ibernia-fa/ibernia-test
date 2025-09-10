@@ -14,11 +14,13 @@ import { NavItem } from './nav-item/nav-item';
 import { settingsNavItems } from './settings-nav-config';
 import { navItems as mainNavItems } from './sidebar-data';
 import { AppNavItemComponent } from './nav-item/nav-item.component';
+import { CommonModule } from '@angular/common';
 @Component({
     selector: 'app-sidebar',
     imports: [
       TablerIconsModule,
       AppNavItemComponent,
+      CommonModule
     ],
     templateUrl: './sidebar.component.html'
 })

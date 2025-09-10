@@ -1,93 +1,189 @@
 <mat-card class="mat-mdc-card mdc-card cardWithShadow mb-20">
   <mat-card-content class="mat-mdc-card-content">
     <div class="d-flex align-items-center main-header-content">
-    <div class="header-icon">
-      <img src="../../../assets/images/shapes/small-icon-1.svg" alt="">
-    </div>
-    <div>
-   <h2 class="text-xl font-semibold flex items-center f-s-30">
-    Account Preferences
-  </h2>
-  <p class="text-sm text-gray-500 m-0">Update your company photo and details here</p>
-  </div>
-  </div>
-</mat-card-content>  
-</mat-card>
-<mat-card class="mat-mdc-card mdc-card cardWithShadow mb-20">
-    <mat-card-content class="mat-mdc-card-content">
-
-    <h3 class="text-md f-w-400 mb-1 f-s-20">Profile</h3>
-    <p class="text-sm text-gray-500 m-0 m-b-20 f-s-14">Update your profile</p>
-
-    <div class="d-flex">
-      <!-- Upload Avatar -->
-      <div class="upload-avatar-wrapper">
-        <label
-          for="upload-avatar"
-          class="flex items-center justify-center h-40 border border-dashed rounded-md cursor-pointer hover:border-primary transition"
-        >
-          <div class="text-center">
-             <img class="m-b-10" src="../../../assets/images/shapes/small-icon.svg" alt="">
-            <p class="text-sm text-gray-500 f-s-14 m-b-10 m-0">Click to upload avatar<br><span class=" underline">or drag and drop</span></p>
-            <small class="text-xs text-gray-400 f-s-12 m-0">SVG, PNG, JPG or GIF (max. 800×400px)</small>
-          </div>
-        </label>
-        <input id="upload-avatar" type="file" accept="image/*" hidden (change)="onFileSelected($event)">
+      <div class="header-icon">
+        <img src="../../../assets/images/shapes/small-icon-1.svg" alt="">
       </div>
-
-      <!-- Full Name and Email -->
-      <div class="upload-file-info">
-          <mat-label class="f-s-16 f-w-400 m-b-8 d-block">Full name</mat-label>
-
-        <mat-form-field appearance="outline" class="w-full w-100">
-          <input matInput placeholder="Enter Name">
-        </mat-form-field>
-          <mat-label class="f-s-16 f-w-400 m-b-8 d-block">Email address</mat-label>
-
-        <mat-form-field appearance="outline" class="w-full  w-100">
-          <input matInput type="email" placeholder="Enter Email">
-        </mat-form-field>
+      <div>
+        <h2 class="f-s-30 f-w-500 m-0">Account Preferences</h2>
+        <p class="text-sm text-gray-500 m-0">Update your profile and default settings</p>
       </div>
     </div>
- 
   </mat-card-content>
 </mat-card>
 
-<mat-card  class="mat-mdc-card mdc-card cardWithShadow mb-20">
-  <mat-card-content class="mat-mdc-card-content">
-     <div class="mt-6 p-4 border rounded-md">
-    <h3 class="text-md  f-s-20 f-w-400 m-b-20">Default Preferences</h3>
-    
-<div class="row">
-  <div class="col-12">
-        <mat-label class="f-s-16 f-w-400 m-b-8 d-block">Default client currency</mat-label>
-         <mat-form-field appearance="outline" class="w-full w-100">
-        <input matInput placeholder="€">
-      </mat-form-field>
-  </div>
-</div>
-<div class="row">
-  <div class="col-6">
-        <mat-label class="f-s-16 f-w-400 m-b-8 d-block">Default inflation rate</mat-label>
+<form [formGroup]="form" (ngSubmit)="submit()">
+  <mat-card class="cardWithShadow mb-20">
+    <mat-card-content>
+      <h3 class="f-s-20 f-w-400 m-b-20">Profile</h3>
 
-     <mat-form-field appearance="outline" class="w-full w-100">
-        <input matInput type="number" placeholder="2.5%">
-      </mat-form-field>
-  </div>
-  <div class="col-6">
-        <mat-label class="f-s-16 f-w-400 m-b-8 d-block">Default investment return</mat-label>
+      <div class="d-flex align-items-start gap-24">
+        <!-- Upload Avatar -->
+        <div class="upload-avatar-wrapper">
+          <label for="upload-avatar" class="cursor-pointer">
+            <div class="text-center">
+      <img *ngIf="profileImagePreview; else placeholder"
+     [src]="profileImagePreview"
+     alt="avatar"
+     class="rounded"
+     style="width:120px;height:120px;object-fit:cover;">
+              <ng-template #placeholder>
+                <img class="m-b-10" src="../../../assets/images/shapes/small-icon.svg" alt="">
+                <p class="text-sm text-gray-500 f-s-14 m-b-10 m-0">
+                  Click to upload avatar<br><span class="underline">or drag and drop</span>
+                </p>
+                <small class="text-xs text-gray-400 f-s-12 m-0">
+                  SVG, PNG, JPG or GIF (max. 800×400px)
+                </small>
+              </ng-template>
+            </div>
+          </label>
+          <input id="upload-avatar" type="file" accept="image/*" hidden (change)="onFileSelected($event)">
+        </div>
 
-      <mat-form-field appearance="outline" class="w-full w-100">
-        <input matInput type="number" placeholder="2%">
-      </mat-form-field>
-  </div>
-  </div>
-  
+        <!-- Name / Email -->
+        <div class="flex-1">
+          <mat-label class="f-s-16 f-w-400 m-b-8 d-block">Full name</mat-label>
+          <mat-form-field appearance="outline" class="w-100">
+            <input matInput formControlName="fullName" placeholder="Enter Name">
+          </mat-form-field>
 
-    <div class="mt-4 text-right ">
-      <button  class="button-icon pull-right"><span>Save</span></button>
-    </div>
-  </div>
-</mat-card-content>
+          <mat-label class="f-s-16 f-w-400 m-b-8 d-block">Email address</mat-label>
+          <mat-form-field appearance="outline" class="w-100">
+            <input matInput formControlName="email" type="email" placeholder="Enter Email">
+          </mat-form-field>
 
-</mat-card>
+          <!-- Hidden field holds uploaded URL -->
+          <input type="hidden" formControlName="profilePhotoUrl">
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="cardWithShadow mb-20">
+    <mat-card-content>
+      <h3 class="f-s-20 f-w-400 m-b-20">Default Preferences</h3>
+
+      <div class="container" formGroupName="preferences">
+        <div class="row">
+          <div class="col-6">
+            <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">
+              Default inflation rate
+              <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4" matTooltip="This rate will be applied to all future projections by default. You can override it for specific clients or scenarios.">
+            </mat-label>
+            <mat-form-field appearance="outline" class="w-100 percentage-icon">
+              <span matSuffix>%&nbsp;</span>
+              <input matInput type="number" step="0.1" formControlName="inflationRate" placeholder="2.5" />
+              <mat-error *ngIf="p.inflationRate.hasError('required')">Required</mat-error>
+              <mat-error *ngIf="p.inflationRate.hasError('min') || p.inflationRate.hasError('max')">0–100</mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="col-6">
+            <mat-label class="f-s-16 f-w-400 m-b-8 d-block">Country</mat-label>
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-select formControlName="country" placeholder="Select country" (valueChange)="clientCountryValueChange($event)">
+                @for (country of countries; track country) {
+                  @if (country.currencySymbol) {
+                    <mat-option [value]="country.countryName">{{ country.countryName }}</mat-option>
+                  }
+                }
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div class="col-6">
+            <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">
+              Default currency
+              <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4" matTooltip="Each client can also have their own default individual currency. You can set this when adding or editing a client.">
+            </mat-label>
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-select formControlName="currency" hideSingleSelectionIndicator>
+                @for (country of countries; track country) {
+                  @if (country.currencySymbol) {
+                    <mat-option [value]="country.currencySymbol">{{ country.currencySymbol }}</mat-option>
+                  }
+                }
+              </mat-select>
+              <mat-error *ngIf="p.currency.invalid">Required</mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="col-6">
+            <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">
+              Default net investment return
+              <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4" matTooltip="The annual net return (before advisor fees) assumed for investments in projection. You can change it per client or per saving pot.">
+            </mat-label>
+            <mat-form-field appearance="outline" class="w-100 percentage-icon">
+              <span matSuffix>%&nbsp;</span>
+              <input matInput type="number" step="0.1" formControlName="investmentReturn" placeholder="5" />
+              <mat-error *ngIf="p.investmentReturn.hasError('required')">Required</mat-error>
+              <mat-error *ngIf="p.investmentReturn.hasError('min') || p.investmentReturn.hasError('max')">-100–100</mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="col-6">
+            <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">
+              Default advisor commission type
+              <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4" matTooltip="Choose whether commissions are calculated as fixed amount, a percentage of investment, or both. This can be adjusted per client.">
+            </mat-label>
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-select formControlName="comissionType" placeholder="Select commission type">
+                <mat-option *ngFor="let t of comissionTypes" [value]="t.value">
+                  {{ t.label }}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="p.comissionType.invalid">Required</mat-error>
+            </mat-form-field>
+          </div>
+
+          @if (form.controls.preferences.controls.comissionType.value === ComissionType.Percentage) {
+            <div class="col-6">
+              <mat-label class="f-s-16 f-w-400 m-b-8 d-block">Default commission percentage</mat-label>
+              <mat-form-field appearance="outline" class="w-100 percentage-icon">
+                <span matSuffix>%&nbsp;</span>
+                <input matInput type="number" step="0.1" formControlName="comissionPercentage" placeholder="1" />
+                <mat-error *ngIf="p.comissionPercentage.hasError('required')">Required</mat-error>
+                <mat-error *ngIf="p.comissionPercentage.hasError('min') || p.comissionPercentage.hasError('max')">0–100</mat-error>
+              </mat-form-field>
+            </div>
+          }
+
+          @if (form.controls.preferences.controls.comissionType.value === ComissionType.Amount) {
+            <div class="col-6">
+              <mat-label class="f-s-16 f-w-400 m-b-8 d-block">Default commission amount</mat-label>
+              <mat-form-field appearance="outline" class="w-100">
+                <input matInput type="number" step="1" formControlName="comissionAmount" placeholder="Enter amount" />
+                <mat-error *ngIf="p.comissionAmount.hasError('required')">Required</mat-error>
+                <mat-error *ngIf="p.comissionAmount.hasError('min')">Must be &gt; 0</mat-error>
+              </mat-form-field>
+            </div>
+          }
+
+          @if (form.controls.preferences.controls.comissionType.value === ComissionType.Both) {
+            <div class="col-3">
+              <mat-label class="f-s-16 f-w-400 m-b-8 d-block">Default commission percentage</mat-label>
+              <mat-form-field appearance="outline" class="w-100 percentage-icon">
+                <input matInput type="number" step="0.1" formControlName="comissionPercentage" placeholder="1" />
+                <span matSuffix>%&nbsp;</span>
+              </mat-form-field>
+            </div>
+            <div class="col-3">
+              <mat-label class="f-s-16 f-w-400 m-b-8 d-block">Default commission amount</mat-label>
+              <mat-form-field appearance="outline" class="w-100">
+                <input matInput type="number" step="1" formControlName="comissionAmount" placeholder="Enter amount" />
+              </mat-form-field>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="mt-4 text-right">
+        <button type="submit" class="button-icon" [disabled]="form.invalid || isSaving">
+          <span *ngIf="!isSaving">Save</span>
+          <span *ngIf="isSaving">Saving…</span>
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</form>

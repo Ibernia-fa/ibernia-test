@@ -213,6 +213,57 @@
           </div>
         </div>
 
+                @if(showStartEnd) {
+          <div class="w-100 form-field gap-12">
+            <div class="d-flex gap-8 align-items-center">
+              <mat-label class="f-s-16 f-w-400 d-block">Escalation rate</mat-label>
+              <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
+            </div>
+            <div class="position-relative">
+              <div class="w-100 form-field">
+                <div class="select-option">
+                    <mat-select formControlName="escalationRate" value="Select" (selectionChange)="onEscalationRateChange($event)">
+                  @for (escalationRate of escalationRates; track escalationRate) {
+                  <mat-option [value]="escalationRate.value">{{ escalationRate.description }}</mat-option>
+                  }
+                </mat-select>
+                </div>
+                @if(contributionForm.get('escalationRate')?.touched &&
+                contributionForm.get('escalationRate')?.hasError('required')) {
+                <span class="field-error d-block">Escalation Rate is required</span>
+                }
+              </div>
+            </div>
+          @if(selectedEscalationDescription === 'Increase at custom rate') {
+          <div class="w-100 form-field gap-12">
+            <mat-label class="f-s-16 d-block">Custom escalation rate</mat-label>
+
+              <mat-form-field  appearance="outline" class="w-full w-100 percentage-icon">
+              <span matSuffix>%&nbsp;</span> 
+                <input
+                               matInput
+                type="number"
+                formControlName="customEscalationRate"
+                placeholder="Enter custom rate"
+          
+                            />
+                            
+              </mat-form-field>
+
+            
+            @if(contributionForm.get('customEscalationRate')?.touched &&
+                contributionForm.get('customEscalationRate')?.hasError('required')) {
+              <span class="field-error d-block">Custom escalation rate is required</span>
+            }
+          </div>
+        }
+          </div>
+        }
+
+
+              <!-- <mat-checkbox type="checkbox" id="commissions"
+              (change)="isCommissionsChanged(savingsForm.get('commissions')?.value)" formControlName="commissions">Add commissions</mat-checkbox>
+      </section> -->
       </div>
     </mat-dialog-content>
     <!-- End Modal Body  -->

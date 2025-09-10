@@ -81,11 +81,11 @@ export class AddNewPotComponent {
   savingPotType= SavingPotType
   selectedEscalationDescription: string | null = null;
   savingPotValues = [
-    {
-      name: 'Cash',
-      iconUrl: 'cashflow-moneys-icon',
-      type: SavingPotType.Cash,
-    },
+    // {
+    //   name: 'Cash',
+    //   iconUrl: 'cashflow-moneys-icon',
+    //   type: SavingPotType.Cash,
+    // },
     {
       name: 'Investment',
       iconUrl: 'cashflow-investment-icon',
@@ -371,11 +371,18 @@ this.escalationRates.push({
 get isCustomEscalationSelected(): boolean {
   const selectedValue = this.savingsForm.get('escalationRate')?.value;
 
+
   // Find exact match by both value and description
   return this.escalationRates.some(e =>
     e.value === selectedValue && e.description === 'Increase at custom rate'
   );
 }
+
+  get isOneOff(): boolean {
+    // const selectedValue = this.savingsForm.get('escalationRate')?.value;
+    return this.cycles.find(cycle => cycle.id === this.savingsForm.get('commissionCycle')?.value)?.description === 'One-off';
+  }
+
 
 
 
@@ -740,4 +747,6 @@ onEscalationRateChange(event: MatSelectChange): void {
   blockComma(e: KeyboardEvent) {
   if (e.key === ',') e.preventDefault();
 }
+
+
 }

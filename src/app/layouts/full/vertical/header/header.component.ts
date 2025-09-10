@@ -21,6 +21,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { AuthService } from 'src/app/auth/services/auth.service';
+import { SettingsService } from 'src/app/default-preferance/services/default-preferance.http.service';
 
 interface notifications {
   id: number;
@@ -113,7 +114,8 @@ export class HeaderComponent {
     private vsidenav: CoreService,
     public dialog: MatDialog,
     private translate: TranslateService,
-    private Authservice: AuthService
+    private Authservice: AuthService,
+    private settingsService: SettingsService,
   ) {
     translate.setDefaultLang('en');
   }

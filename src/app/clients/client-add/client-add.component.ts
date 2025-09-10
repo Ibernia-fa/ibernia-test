@@ -74,7 +74,8 @@ export class ClientAddComponent {
     private router: Router
   ) {
     this.clientForm = this.fb.group({
-      name: ['', Validators.required],
+      firstName: ['', Validators.required],
+      lastName: ['', Validators.required],
       dob: ['', Validators.required],
       gender: [''],
       country: [''],
@@ -83,7 +84,8 @@ export class ClientAddComponent {
       phone: [''],
       notes: [''],
       partner: this.fb.group({
-        name: [''],
+      firstName: ['', Validators.required],
+      lastName: ['', Validators.required],
         dob: [''],
         gender: [''],
         country: [''],
@@ -113,7 +115,9 @@ export class ClientAddComponent {
     const partnerGroup = this.clientForm.get('partner') as FormGroup;
 
     if (visible) {
-      partnerGroup.get('name')?.setValidators(Validators.required);
+      partnerGroup.get('lastName')?.setValidators(Validators.required);
+      partnerGroup.get('firstName')?.setValidators(Validators.required);
+
       partnerGroup.get('dob')?.setValidators(Validators.required);
     } else {
       partnerGroup.reset();
@@ -128,10 +132,10 @@ export class ClientAddComponent {
   get isFormInvalid() {
     const partnerGroup = this.clientForm.get('partner') as FormGroup;
     if(this.showPartner) {
-      return this.clientForm.controls['name'].invalid || this.clientForm.controls['dob'].invalid || 
-      partnerGroup.controls['name'].invalid || partnerGroup.controls['dob'].invalid
+      return this.clientForm.controls['firstName'].invalid  || this.clientForm.controls['lastName'].invalid || this.clientForm.controls['dob'].invalid || 
+      partnerGroup.controls['firstName'].invalid || partnerGroup.controls['lastName'].invalid || partnerGroup.controls['dob'].invalid
     }
-    return this.clientForm.controls['name'].invalid || this.clientForm.controls['dob'].invalid
+    return this.clientForm.controls['firstName'].invalid || this.clientForm.controls['lastName'].invalid || this.clientForm.controls['dob'].invalid
   }
 
 
@@ -144,7 +148,9 @@ export class ClientAddComponent {
         email: this.clientForm.controls['email'].value,
         gender: this.clientForm.controls['gender'].value,
         country: this.clientForm.controls['country'].value,
-        name: this.clientForm.controls['name'].value,
+        firstName: this.clientForm.controls['firstName'].value,
+        lastName: this.clientForm.controls['lastName'].value,
+
         phone: this.clientForm.controls['phone'].value?.e164Number,
         preferredCurrency: this.clientForm.controls['currency'].value,
       },
@@ -154,7 +160,8 @@ export class ClientAddComponent {
             email: partnerGroup.controls['email']?.value,
             gender: partnerGroup.controls['gender']?.value,
             country: partnerGroup.controls['country']?.value,
-            name: partnerGroup.controls['name']?.value,
+            firstName: partnerGroup.controls['firstName']?.value,
+            lastName: partnerGroup.controls['lastName']?.value,
             phone: partnerGroup.controls['phone']?.value?.e164Number,
             preferredCurrency: partnerGroup.controls['currency']?.value,
           }

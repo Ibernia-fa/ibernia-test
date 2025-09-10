@@ -8,7 +8,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MaterialModule } from '../material.module';
-
+import { MatDialogModule } from '@angular/material/dialog';
 
 
 @NgModule({
@@ -23,7 +23,9 @@ import { MaterialModule } from '../material.module';
     FormsModule,
         MaterialModule,
     
-    ReactiveFormsModule
-  ]
+    ReactiveFormsModule,
+    MatDialogModule
+  ],
+    exports: [DefaultPreferanceComponent] 
 })
 export class DefaultPreferanceModule { }

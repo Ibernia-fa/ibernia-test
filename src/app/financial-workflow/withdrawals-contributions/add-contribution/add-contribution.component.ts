@@ -7,7 +7,7 @@ import {
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
+import { MatSelectChange, MatSelectModule } from '@angular/material/select';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -66,6 +66,7 @@ export class AddContributionComponent {
   showStartEnd = false;
   savingPots: SavingPotsModel
   eventsList: any;
+  selectedEscalationDescription: string;
 
   constructor(
     private dialogRef: MatDialogRef<AddContributionComponent>,
@@ -111,7 +112,9 @@ export class AddContributionComponent {
       cycle: [this.cycles[1].id, Validators.required],
       start: ['', Validators.required],
       end: [''],
-      savingPot: ['']
+      savingPot: [''],
+      escalationRate: [this.escalationRates[0].value, Validators.required],
+      customEscalationRate: [0]
     });
     this.contributionForm.get('currencySymbol')?.disable();
     this.contributionForm.setValidators(this.endOnOrAfterStartValidator());
@@ -159,6 +162,14 @@ export class AddContributionComponent {
   addIncome(): void {
     if (this.contributionForm.valid) {
       console.log('Form Submitted', this.contributionForm.value);
+            const isCustomEscalation =
+        this.selectedEscalationDescription === 'Increase at custom rate';
+      const escalationRateValue = isCustomEscalation
+        ? this.contributionForm.get('customEscalationRate')?.value
+        : this.contributionForm.get('escalationRate')?.value;
+   const matchedRate = this.escalationRates.find(
+        (x) => x.value === escalationRateValue
+      );
       var contribution: FundsViewModel = {
         id: this.isEditWorkflow ? this.selectedContribution.id : null,
         associatedSavingPotId: this.contributionForm.get('savingPot')?.value ?? '',
@@ -197,7 +208,19 @@ export class AddContributionComponent {
             this.contributionForm.get('end')?.value !== ''
               ? this.contributionForm.get('end')?.value
               : 0,
+              
         },
+           escalationRate:  escalationRateValue !== null && escalationRateValue !== ''
+  ? matchedRate ?? {
+      description: this.selectedEscalationDescription ?? '', // Use actual description
+      value: escalationRateValue
+    }
+  : {
+      description: '',
+      value: 0
+    }      
+              
+        
       };
 
       var action$ = this.withdrawalsContributionsHttpService.addContributions(
@@ -255,4 +278,30 @@ export class AddContributionComponent {
       return null;
     };
   }
+
+
+    onEscalationRateChange(event: MatSelectChange): void {
+      const selectedOption = event.source.selected;
+    
+      let description: string | null = null;
+    
+      if (Array.isArray(selectedOption)) {
+        description = selectedOption[0]?.viewValue ?? null;
+      } else {
+        description = selectedOption?.viewValue ?? null;
+      }
+    
+      this.selectedEscalationDescription = description;
+    
+      const customControl = this.contributionForm.get('customEscalationRate');
+    
+      if (description === 'Increase at custom rate') {
+        customControl?.setValidators([Validators.required, Validators.min(0)]);
+      } else {
+        customControl?.clearValidators();
+        customControl?.setValue(null); // Optionally reset field
+      }
+    
+      customControl?.updateValueAndValidity();
+    }
 }

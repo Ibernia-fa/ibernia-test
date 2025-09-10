@@ -52,6 +52,10 @@ import { AgeCalculatorPipe } from 'src/app/pipe/age-calculator.pipe';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { allCountries } from '../models/country';
+import { DefaultPreferanceModule } from 'src/app/default-preferance/default-preferance.module';
+import { SettingsService } from 'src/app/default-preferance/services/default-preferance.http.service';
+import { DefaultPreferanceComponent } from 'src/app/default-preferance/default-preferance/default-preferance.component';
+import { AuthService } from 'src/app/auth/services/auth.service';
 
 @Component({
   selector: 'app-client-list',
@@ -75,6 +79,7 @@ import { allCountries } from '../models/country';
     AgeCalculatorPipe,
     MatMenuModule,
     MatProgressSpinnerModule,
+    DefaultPreferanceModule
   ],
   // imports: [
   //   MatCardModule,
@@ -159,18 +164,55 @@ export class ClientListComponent implements OnInit, AfterViewInit {
   // dataSource = new MatTableDataSource(employees);
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator =
     Object.create(null);
+  user: any;
 
   constructor(
     public dialog: MatDialog,
     public datePipe: DatePipe,
     private router: Router,
     private clientHttpService: ClientHttpService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private settingsService: SettingsService,
+        private Authservice: AuthService  
   ) {}
 
   ngOnInit() {
+    this.user = this.Authservice.getUserProfile();
+    console.log('user', this.user);
     this.getClients();
+    this.checkPrefsAndPrompt();  
   }
+
+
+private checkPrefsAndPrompt() {
+  this.settingsService.getUserProfileResponse(this.user?.sub).subscribe({
+    next: (res) => {
+      if (res.status === 204) {
+        // preferences missing → open dialog
+        const ref = this.dialog.open(DefaultPreferanceComponent, {
+          width: '1000px',
+          disableClose: true,
+          autoFocus: false,
+          data: { mode: 'onboarding' },
+        });
+
+        ref.afterClosed().subscribe((saved) => {
+          if (saved) {
+            this.toastr.success('Default preferences saved', 'Success!');
+          }
+        });
+      }
+      // if res.status === 200, do nothing
+    },
+    error: (err) => {
+      console.error('Error fetching user profile', err);
+      // optional: you could also open dialog on error if you want
+    },
+  });
+}
+
+
+
 
   rowExpandClicked(element: any, event?: any) {
     if (element.partnerDetail.name) {

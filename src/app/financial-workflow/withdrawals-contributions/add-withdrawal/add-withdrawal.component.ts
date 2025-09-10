@@ -7,7 +7,7 @@ import {
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
+import { MatSelectChange, MatSelectModule } from '@angular/material/select';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -66,6 +66,7 @@ export class AddWithdrawalComponent {
   showStartEnd = false;
   savingPots: SavingPotsModel;
   eventsList: any;
+  selectedEscalationDescription: string;
 
   constructor(
     private dialogRef: MatDialogRef<AddWithdrawalComponent>,
@@ -112,7 +113,9 @@ export class AddWithdrawalComponent {
       cycle: [this.cycles[1].id, Validators.required],
       start: ['', Validators.required],
       end: [''],
-      savingPot: ['']
+      savingPot: [''],
+      escalationRate: [this.escalationRates[0].value, Validators.required],
+      customEscalationRate: [0]
     });
     this.withdrawalForm.get('currencySymbol')?.disable();
     this.withdrawalForm.setValidators(this.endOnOrAfterStartValidator());
@@ -162,6 +165,14 @@ export class AddWithdrawalComponent {
   addExpense(): void {
     if (this.withdrawalForm.valid) {
       console.log('Form Submitted', this.withdrawalForm.value);
+                  const isCustomEscalation =
+        this.selectedEscalationDescription === 'Increase at custom rate';
+      const escalationRateValue = isCustomEscalation
+        ? this.withdrawalForm.get('customEscalationRate')?.value
+        : this.withdrawalForm.get('escalationRate')?.value;
+   const matchedRate = this.escalationRates.find(
+        (x) => x.value === escalationRateValue
+      );
       var withdrawal: FundsViewModel = {
         id: this.isEditWorkflow ? this.selectedWithdrawal.id : null,
         associatedSavingPotId: this.withdrawalForm.get('savingPot')?.value ?? '',
@@ -201,6 +212,16 @@ export class AddWithdrawalComponent {
               ? this.withdrawalForm.get('end')?.value
               : 0,
         },
+                   escalationRate:  escalationRateValue !== null && escalationRateValue !== ''
+  ? matchedRate ?? {
+      description: this.selectedEscalationDescription ?? '', // Use actual description
+      value: escalationRateValue
+    }
+  : {
+      description: '',
+      value: 0
+    }      
+      
       };
 
       var action$ = this.withdrawalsContributionsHttpService.addWithdrawals(
@@ -258,4 +279,29 @@ export class AddWithdrawalComponent {
         return null;
       };
     }
+
+        onEscalationRateChange(event: MatSelectChange): void {
+          const selectedOption = event.source.selected;
+        
+          let description: string | null = null;
+        
+          if (Array.isArray(selectedOption)) {
+            description = selectedOption[0]?.viewValue ?? null;
+          } else {
+            description = selectedOption?.viewValue ?? null;
+          }
+        
+          this.selectedEscalationDescription = description;
+        
+          const customControl = this.withdrawalForm.get('customEscalationRate');
+        
+          if (description === 'Increase at custom rate') {
+            customControl?.setValidators([Validators.required, Validators.min(0)]);
+          } else {
+            customControl?.clearValidators();
+            customControl?.setValue(null); // Optionally reset field
+          }
+        
+          customControl?.updateValueAndValidity();
+        }
 }

@@ -8,7 +8,8 @@ export interface Client {
 }
 
 export interface Details {
-    name: string,
+    firstName: string,
+    lastName: string,
     birthDate: Date,
     preferredCurrency: string,
     gender: string,

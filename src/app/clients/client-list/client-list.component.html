@@ -113,8 +113,8 @@
               *matCellDef="let element"
               class=" column-client"
             >
-              {{ element.clientDetails.name }} @if(element.partnerDetail?.name)
-              { & {{ element.partnerDetail?.name }} }
+              {{ element.clientDetails.firstName }} {{ element.clientDetails.lastName }} @if(element.partnerDetail?.firstName)
+              { & {{ element.partnerDetail?.firstName }} {{ element.partnerDetail?.lastName }} }
             </td>
           </ng-container>
           <ng-container matColumnDef="dob">
@@ -486,7 +486,7 @@
             class="example-detail-row"
             [hidden]="
               expandedPartnerElement !== element ||
-              !expandedPartnerElement?.partnerDetail?.name
+              !expandedPartnerElement?.partnerDetail?.firstName
             "
             (click)="partnerExpandRowClicked(element)"
           >

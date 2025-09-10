@@ -368,7 +368,7 @@
           }
 
           
-        @if(savingsForm.get('commissionType')?.value !== 'percentage'){
+        @if(savingsForm.get('commissionType')?.value !== 'percentage' && !isOneOff){
           <div class="w-100 form-field gap-12">
           <div class="d-flex gap-8 align-items-center">
             <mat-label class="f-s-16 f-w-400 d-block">Commission amount escalatation rate</mat-label>

@@ -21,6 +21,6 @@ export interface FinancialViewModel {
     amount: NetAmount;
     start: AgeYear;
     end: AgeYear;
-    escalationRate: EscalationRate | null;
+    escalationRate: EscalationRate | null; 
     
 }

@@ -6,18 +6,21 @@
         <div class="col-4 m-b-20">
           <div class="w-100 form-field">
             <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">Client first name</mat-label>
-            <input matInput formControlName="name" />
-            @if(clientForm.get('name')?.touched &&
-            clientForm.get('name')?.hasError('required')) {
-            <span class="field-error d-block">Name is required</span>
+            <input matInput formControlName="firstName" />
+            @if(clientForm.get('firstName')?.touched &&
+            clientForm.get('firstName')?.hasError('required')) {
+            <span class="field-error d-block">First Name is required</span>
             }
           </div>
         </div>
           <div class="col-4 m-b-20">
           <div class="w-100 form-field">
             <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">Client last name</mat-label>
-            <input matInput formControlName="name" />
-         
+            <input matInput formControlName="lastName" />
+                     @if(clientForm.get('firstName')?.touched &&
+            clientForm.get('firstName')?.hasError('required')) {
+            <span class="field-error d-block">First Name is required</span>
+            }
           </div>
         </div>
         <div class="col-4 m-b-20">
@@ -135,18 +138,21 @@
           <div class="col-4  m-b-20">
             <div class="w-100 form-field">
               <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">Partner first name</mat-label>
-              <input matInput formControlName="name" />
-              @if(clientForm.get('partner.name')?.touched &&
-              clientForm.get('partner.name')?.hasError('required')) {
-              <span class="field-error d-block">Name is required</span>
+              <input matInput formControlName="firstName" />
+              @if(clientForm.get('partner.firstName')?.touched &&
+              clientForm.get('partner.firstName')?.hasError('required')) {
+              <span class="field-error d-block">First Name is required</span>
               }
             </div>
           </div>
             <div class="col-4  m-b-20">
             <div class="w-100 form-field">
               <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">Partner last name</mat-label>
-              <input matInput formControlName="name" />
-         
+              <input matInput formControlName="lastName" />
+                @if(clientForm.get('partner.lastName')?.touched &&
+              clientForm.get('partner.lastName')?.hasError('required')) {
+              <span class="field-error d-block">Last Name is required</span>
+              }
             </div>
           </div>
           <div class="col-4  m-b-20">

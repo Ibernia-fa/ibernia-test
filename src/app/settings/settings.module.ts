@@ -13,6 +13,10 @@ import { MatIconModule } from '@angular/material/icon'; // ✅ This is required
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import {MatCheckboxModule} from '@angular/material/checkbox';
+import { MatOptionModule } from '@angular/material/core';
+import { MaterialModule } from '../material.module';
+
+
 
 @NgModule({
   declarations: [   
@@ -22,8 +26,9 @@ import {MatCheckboxModule} from '@angular/material/checkbox';
     BrandingComponent,
     AccountPreferencesComponent,],
   imports: [
-    CommonModule
-, FormsModule, ReactiveFormsModule,MatCardModule,MatCheckboxModule, SettingsRoutingModule,MatFormFieldModule,MatInputModule,MatButtonModule,MatIconModule
+    MaterialModule,
+    CommonModule, MatOptionModule,
+     FormsModule, ReactiveFormsModule,MatCardModule,MatCheckboxModule, SettingsRoutingModule,MatFormFieldModule,MatInputModule,MatButtonModule,MatIconModule
   ]
 })
 export class SettingsModule { }

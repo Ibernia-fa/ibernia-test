@@ -73,7 +73,8 @@ export class ClientEditComponent {
     private activatedRoute: ActivatedRoute
   ) {
     this.clientForm = this.fb.group({
-      name: ['', Validators.required],
+      firstName: ['', Validators.required],
+      lastName: ['', Validators.required],
       dob: ['', Validators.required],
       gender: [''],
       country: [''],
@@ -82,7 +83,8 @@ export class ClientEditComponent {
       phone: [''],
       notes: [''],
       partner: this.fb.group({
-        name: [''],
+      firstName: ['', Validators.required],
+      lastName: ['', Validators.required],
         dob: [''],
         gender: [''],
         country: [''],
@@ -112,10 +114,10 @@ export class ClientEditComponent {
   get isFormInvalid() {
     const partnerGroup = this.clientForm.get('partner') as FormGroup;
     if(this.showPartner) {
-      return this.clientForm.controls['name'].invalid || this.clientForm.controls['dob'].invalid || 
-      partnerGroup.controls['name'].invalid || partnerGroup.controls['dob'].invalid
+      return this.clientForm.controls['lastName'].invalid || this.clientForm.controls['firstName'].invalid || this.clientForm.controls['dob'].invalid || 
+      partnerGroup.controls['firstName'].invalid || partnerGroup.controls['lastName'].invalid || partnerGroup.controls['dob'].invalid
     }
-    return this.clientForm.controls['name'].invalid || this.clientForm.controls['dob'].invalid
+    return this.clientForm.controls['firstName'].invalid || this.clientForm.controls['lastName'].invalid || this.clientForm.controls['dob'].invalid
   }
 
   getClient() {
@@ -125,25 +127,30 @@ export class ClientEditComponent {
         return this.clientHttpService.getClient(this.clientId);
       }),
       map((res) => {
+        console.log('res', res);
         this.clientForm.controls['dob'].patchValue(res.clientDetails.birthDate);
         this.clientForm.controls['email'].patchValue(res.clientDetails.email);
         this.clientForm.controls['gender'].patchValue(res.clientDetails.gender);
         this.clientForm.controls['country'].patchValue(res.clientDetails.country);
-        this.clientForm.controls['name'].patchValue(res.clientDetails.name);
+        this.clientForm.controls['firstName'].patchValue(res.clientDetails.firstName);
+        this.clientForm.controls['lastName'].patchValue(res.clientDetails.lastName);
+
         const index = countryDialCodes.findIndex(x => res.clientDetails.phone.slice(1, res.clientDetails.phone.length).startsWith(x.DialCode));
         this.clientForm.controls['phone'].patchValue(res.clientDetails.phone.slice(countryDialCodes[index].DialCode.length + 1));
         this.selectedClientCountryISO = countryDialCodes[index].ISOCode as CountryISO;
         
         this.clientForm.controls['currency'].patchValue(res.clientDetails.preferredCurrency);
         this.clientForm.controls['notes'].patchValue(res.notes);
-        if(res.partnerDetail?.name) {
+        if(res.partnerDetail?.firstName) {
           this.togglePartnerSection(true);
           var partnerFormGroup = this.clientForm.get('partner') as FormGroup
           partnerFormGroup.controls['dob'].patchValue(res.partnerDetail.birthDate);
           partnerFormGroup.controls['email'].patchValue(res.partnerDetail.email);
           partnerFormGroup.controls['gender'].patchValue(res.partnerDetail.gender);
           partnerFormGroup.controls['country'].patchValue(res.partnerDetail.country);
-          partnerFormGroup.controls['name'].patchValue(res.partnerDetail.name);
+          partnerFormGroup.controls['firstName'].patchValue(res.partnerDetail.firstName);
+          partnerFormGroup.controls['lastName'].patchValue(res.partnerDetail.lastName);
+
           const index = countryDialCodes.findIndex(x => res.partnerDetail?.phone.slice(1, res.partnerDetail.phone.length).startsWith(x.DialCode));
           partnerFormGroup.controls['phone'].patchValue(res.partnerDetail.phone.slice(countryDialCodes[index].DialCode.length + 1));
           this.selectedPartnerCountryISO = countryDialCodes[index].ISOCode as CountryISO;
@@ -161,7 +168,9 @@ export class ClientEditComponent {
     const partnerGroup = this.clientForm.get('partner') as FormGroup;
 
     if (visible) {
-      partnerGroup.get('name')?.setValidators(Validators.required);
+      partnerGroup.get('firstName')?.setValidators(Validators.required);
+      partnerGroup.get('lastName')?.setValidators(Validators.required);
+
       partnerGroup.get('dob')?.setValidators(Validators.required);
     } else {
       partnerGroup.reset();
@@ -184,7 +193,9 @@ export class ClientEditComponent {
           email: this.clientForm.controls['email'].value,
           gender: this.clientForm.controls['gender'].value,
           country: this.clientForm.controls['country'].value,
-          name: this.clientForm.controls['name'].value,
+          firstName: this.clientForm.controls['firstName'].value,
+          lastName: this.clientForm.controls['lastName'].value,
+
           phone: this.clientForm.controls['phone'].value?.e164Number,
           preferredCurrency: this.clientForm.controls['currency'].value,
         },
@@ -193,7 +204,8 @@ export class ClientEditComponent {
           email: partnerGroup.controls['email']?.value,
           gender: partnerGroup.controls['gender']?.value,
           country: partnerGroup.controls['country']?.value,
-          name: partnerGroup.controls['name']?.value,
+          firstName: partnerGroup.controls['firstName']?.value,
+          lastName: partnerGroup.controls['lastName']?.value,
           phone: partnerGroup.controls['phone']?.value?.e164Number,
           preferredCurrency:
             partnerGroup.controls['currency']?.value,
