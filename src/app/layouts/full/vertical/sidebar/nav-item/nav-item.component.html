@@ -27,10 +27,10 @@
     "
   > -->
   @if(navItem.currentRouteName === item.displayName) {
-  <img style="flex: none" [src]="item.iconName" alt="item" />
+  <img style="flex: none; max-width: 18px;" [src]="item.iconName" alt="item" />
   }
   @else {
-  <img style="flex: none" [src]="item.iconOutline" alt="item" />
+  <img style="flex: none;max-width: 18px" [src]="item.iconOutline" alt="item" />
   }
   <!-- </div> -->
   <span class="hide-menu">{{ item.displayName | translate }}</span>

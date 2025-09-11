@@ -4,9 +4,9 @@
       <div class="header-icon">
         <img src="../../../assets/images/shapes/small-icon-1.svg" alt="">
       </div>
-      <div>
-        <h2 class="f-s-30 f-w-500 m-0">Account Preferences</h2>
-        <p class="text-sm text-gray-500 m-0">Update your profile and default settings</p>
+      <div class="d-flex flex-column justify-content-between gap-4">
+        <h4 class="page-title f-w-500">Account Preferences</h4>
+        <span class="sub-title">Update your profile and default settings</span>
       </div>
     </div>
   </mat-card-content>
@@ -15,8 +15,8 @@
 <form [formGroup]="form" (ngSubmit)="submit()">
   <mat-card class="cardWithShadow mb-20">
     <mat-card-content>
-      <h3 class="f-s-20 f-w-400 m-b-20">Profile</h3>
-
+      <h3 class="f-s-20 f-w-400 m-b-5">Profile</h3>
+      <p class="f-s-14 m-b-30 p-t-0 m-t-0">Update your profile</p>
       <div class="d-flex align-items-start gap-24">
         <!-- Upload Avatar -->
         <div class="upload-avatar-wrapper">
@@ -42,12 +42,22 @@
         </div>
 
         <!-- Name / Email -->
-        <div class="flex-1">
-          <mat-label class="f-s-16 f-w-400 m-b-8 d-block">Full name</mat-label>
+        <div class="row">
+          <div class="col-6">
+          <mat-label class="f-s-16 f-w-400 m-b-8 d-block">First name</mat-label>
           <mat-form-field appearance="outline" class="w-100">
             <input matInput formControlName="fullName" placeholder="Enter Name">
           </mat-form-field>
+          </div>
+          <div class="col-6">
+          <mat-label class="f-s-16 f-w-400 m-b-8 d-block">Last name</mat-label>
+          <mat-form-field appearance="outline" class="w-100">
+            <input matInput formControlName="fullName" placeholder="Enter Name">
+          </mat-form-field>
+          </div>
 
+
+          <div class="col-12">
           <mat-label class="f-s-16 f-w-400 m-b-8 d-block">Email address</mat-label>
           <mat-form-field appearance="outline" class="w-100">
             <input matInput formControlName="email" type="email" placeholder="Enter Email">
@@ -55,6 +65,7 @@
 
           <!-- Hidden field holds uploaded URL -->
           <input type="hidden" formControlName="profilePhotoUrl">
+          </div>
         </div>
       </div>
     </mat-card-content>
@@ -62,9 +73,9 @@
 
   <mat-card class="cardWithShadow mb-20">
     <mat-card-content>
-      <h3 class="f-s-20 f-w-400 m-b-20">Default Preferences</h3>
+      <h3 class="f-s-20 f-w-400 m-b-30">Default Preferences</h3>
 
-      <div class="container" formGroupName="preferences">
+      <div  formGroupName="preferences">
         <div class="row">
           <div class="col-6">
             <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">
@@ -178,7 +189,7 @@
         </div>
       </div>
 
-      <div class="mt-4 text-right">
+      <div class="mt-4 d-flex justify-content-end">
         <button type="submit" class="button-icon" [disabled]="form.invalid || isSaving">
           <span *ngIf="!isSaving">Save</span>
           <span *ngIf="isSaving">Saving…</span>
