@@ -1,6 +1,7 @@
 import { CashflowViewModel } from "src/app/clients/models/cashflow";
 import { ClientViewModel, FinancialAdvisor } from "src/app/clients/models/client";
 import { AgeYear, EscalationRate, NetAmount } from "../../timeline/models/financial-timeline";
+import { Comission } from "../../saving-pots/models/saving-pots.model";
 
 export interface WithdrawalsContributions {
   id: string;
@@ -19,5 +20,7 @@ export interface FundsViewModel {
     start: AgeYear;
     end: AgeYear;
     escalationRate: EscalationRate | null;
-    
+    contributionType:number;
+      hasCommission: boolean;
+      comission: Comission | any;
 }

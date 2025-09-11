@@ -25,12 +25,14 @@ import { allCountries } from 'src/app/clients/models/country';
 import {
   Cycle,
   EscalationRate,
+  NetAmount,
 } from '../../timeline/models/financial-timeline';
 import moment from 'moment';
 import { FundsViewModel } from '../model/withdrawals-contributions';
 import { WithdrawalsContributionsHttpService } from '../services/withdrawals-contributions-http.service';
 import { catchError, filter } from 'rxjs';
-import { SavingPotsModel } from '../../saving-pots/models/saving-pots.model';
+import { ComissionType, SavingPotsModel } from '../../saving-pots/models/saving-pots.model';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @Component({
   selector: 'app-add-contribution',
@@ -46,6 +48,8 @@ import { SavingPotsModel } from '../../saving-pots/models/saving-pots.model';
     MatDatepickerModule,
     MatSliderModule,
     ReactiveFormsModule,
+        MatCheckboxModule,
+    
   ],
   providers: [provideNativeDateAdapter()],
   templateUrl: './add-contribution.component.html',
@@ -114,7 +118,10 @@ export class AddContributionComponent {
       end: [''],
       savingPot: [''],
       escalationRate: [this.escalationRates[0].value, Validators.required],
-      customEscalationRate: [0]
+      customEscalationRate: [0],
+        contributionType: [1, Validators.required] ,
+          commissions: [false],
+  commissionPercentage: [0],
     });
     this.contributionForm.get('currencySymbol')?.disable();
     this.contributionForm.setValidators(this.endOnOrAfterStartValidator());
@@ -122,6 +129,14 @@ export class AddContributionComponent {
     this.onCycleValueChange(this.cycles[1].id);
 
     if (this.isEditWorkflow) {
+  this.contributionForm.get('commissions')?.patchValue(this.selectedContribution?.hasCommission ?? false);
+  const pct = this.selectedContribution?.comission?.percentage?.amount ?? 0;
+  this.contributionForm.get('commissionPercentage')?.patchValue(pct);
+  
+  this.contributionForm
+    .get('contributionType')
+    ?.patchValue(this.selectedContribution?.contributionType ?? 1);
+
       this.onCycleValueChange(this.selectedContribution.amount.cycle?.id);
       this.contributionForm
         .get('description')
@@ -138,12 +153,27 @@ export class AddContributionComponent {
       this.contributionForm.get('start')?.patchValue(this.selectedContribution.start.year);
       this.contributionForm.get('end')?.patchValue(this.selectedContribution.end.year);
       this.contributionForm.get('savingPot')?.patchValue(this.selectedContribution.associatedSavingPotId);
+          this.contributionForm.get('savingPot')?.patchValue(this.selectedContribution.associatedSavingPotId);
+            const hasComm = !!this.selectedContribution?.comission;
+      this.contributionForm.get('commissions')?.patchValue(hasComm);
+      const pct1 =
+        this.selectedContribution?.comission?.percentage?.amount ?? 0;
+      this.contributionForm.get('commissionPercentage')?.patchValue(pct1);
+      this.isCommissionsChanged(hasComm);
     }
   }
 
   closeDialog(): void {
     this.dialogRef.close();
   }
+
+  selectContributionType(type: 1 | 2): void {
+  this.contributionForm.patchValue({ contributionType: type });
+}
+
+isTypeSelected(type: 1 | 2): boolean {
+  return this.contributionForm.get('contributionType')?.value === type;
+}
 
   onCycleValueChange(event: any) {
     console.log({ event });
@@ -159,9 +189,33 @@ export class AddContributionComponent {
     }
   }
 
+isCommissionsChanged(enabled: boolean) {
+  if (enabled) {
+    this.contributionForm.get('commissionPercentage')?.setValidators([Validators.required, Validators.min(0)]);
+    if (
+      this.contributionForm.get('commissionPercentage')?.value === null ||
+      this.contributionForm.get('commissionPercentage')?.value === ''
+    ) {
+      this.contributionForm.get('commissionPercentage')?.setValue(0);
+    }
+  } else {
+    this.contributionForm.get('commissionPercentage')?.clearValidators();
+    this.contributionForm.get('commissionPercentage')?.setValue(0);
+  }
+  this.contributionForm.get('commissionPercentage')?.updateValueAndValidity();
+}
+
+
   addIncome(): void {
     if (this.contributionForm.valid) {
       console.log('Form Submitted', this.contributionForm.value);
+      const hasCommission = !!this.contributionForm.get('commissions')?.value;
+const commissionPct = Number(this.contributionForm.get('commissionPercentage')?.value ?? 0);
+
+// helper empty objects to satisfy NetAmount shape
+const emptyCycle = { id: '', description: '' };
+const emptyNetAmount: NetAmount = { amount: 0, currencySymbol: '', cycle: emptyCycle };
+// const neutralEscRate: EscalationRate = { description: '', value: 0 };
             const isCustomEscalation =
         this.selectedEscalationDescription === 'Increase at custom rate';
       const escalationRateValue = isCustomEscalation
@@ -218,8 +272,33 @@ export class AddContributionComponent {
   : {
       description: '',
       value: 0
-    }      
-              
+    },
+    contributionType: Number(this.contributionForm.get('contributionType')?.value),      
+            hasCommission: !!this.contributionForm.get('commissions')?.value,
+ comission: hasCommission
+    ? {
+        type: ComissionType.Percentage,
+        amount: emptyNetAmount, // not used in this component
+        percentage: {
+          amount: commissionPct,      // <-- the actual percentage value (e.g., 2.5)
+          currencySymbol: '',         // not applicable
+          cycle: emptyCycle           // not applicable
+        },
+        escalationRate: {
+        description: '',
+        value: 0
+      } // no commission-specific escalation in this component
+      }
+    : {
+        // send a valid “empty” commission object when disabled
+        type: ComissionType.Percentage, // or ComissionType.Amount — whichever your backend expects
+        amount: emptyNetAmount,
+        percentage: emptyNetAmount,
+        escalationRate: {
+        description: '',
+        value: 0
+      }
+      }
         
       };
 

@@ -30,7 +30,8 @@ import { WithdrawalsContributionsHttpService } from '../services/withdrawals-con
 import moment from 'moment';
 import { FundsViewModel } from '../model/withdrawals-contributions';
 import { catchError, filter } from 'rxjs';
-import { SavingPotsModel } from '../../saving-pots/models/saving-pots.model';
+import { ComissionType, SavingPotsModel } from '../../saving-pots/models/saving-pots.model';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @Component({
   selector: 'app-add-withdrawal',
@@ -46,6 +47,8 @@ import { SavingPotsModel } from '../../saving-pots/models/saving-pots.model';
     MatDatepickerModule,
     MatSliderModule,
     ReactiveFormsModule,
+        MatCheckboxModule,
+    
   ],
   providers: [provideNativeDateAdapter()],
   templateUrl: './add-withdrawal.component.html',
@@ -115,7 +118,9 @@ export class AddWithdrawalComponent {
       end: [''],
       savingPot: [''],
       escalationRate: [this.escalationRates[0].value, Validators.required],
-      customEscalationRate: [0]
+      customEscalationRate: [0],
+          commissions: [false],
+      commissionPercentage: [0],
     });
     this.withdrawalForm.get('currencySymbol')?.disable();
     this.withdrawalForm.setValidators(this.endOnOrAfterStartValidator());
@@ -140,8 +145,27 @@ export class AddWithdrawalComponent {
         .get('start')
         ?.patchValue(this.selectedWithdrawal.start.year);
       this.withdrawalForm.get('end')?.patchValue(this.selectedWithdrawal.end.year);
+      // console.log(this.sele)
       this.withdrawalForm.get('savingPot')?.patchValue(this.selectedWithdrawal.associatedSavingPotId);
+            const hasComm = !!this.selectedWithdrawal?.comission;
+      this.withdrawalForm.get('commissions')?.patchValue(hasComm);
+      const pct =
+        this.selectedWithdrawal?.comission?.percentage?.amount ?? 0;
+      this.withdrawalForm.get('commissionPercentage')?.patchValue(pct);
+      this.onCommissionsToggled(hasComm);
     }
+  }
+
+    onCommissionsToggled(enabled: boolean) {
+    const ctrl = this.withdrawalForm.get('commissionPercentage');
+    if (enabled) {
+      ctrl?.setValidators([Validators.required, Validators.min(0)]);
+      if (ctrl?.value === null || ctrl?.value === '') ctrl?.setValue(0);
+    } else {
+      ctrl?.clearValidators();
+      ctrl?.setValue(0);
+    }
+    ctrl?.updateValueAndValidity();
   }
 
   closeDialog(): void {
@@ -164,6 +188,19 @@ export class AddWithdrawalComponent {
 
   addExpense(): void {
     if (this.withdrawalForm.valid) {
+          const hasCommission = !!this.withdrawalForm.get('commissions')?.value;
+    const commissionPct = Number(
+      this.withdrawalForm.get('commissionPercentage')?.value ?? 0
+    );
+
+    const emptyCycle = { id: '', description: '' };
+    const emptyNetAmount = {
+      amount: 0,
+      currencySymbol: '',
+      cycle: emptyCycle,
+    };
+    const neutralCommissionEscRate: EscalationRate = { description: '', value: '0' };
+
       console.log('Form Submitted', this.withdrawalForm.value);
                   const isCustomEscalation =
         this.selectedEscalationDescription === 'Increase at custom rate';
@@ -220,8 +257,27 @@ export class AddWithdrawalComponent {
   : {
       description: '',
       value: 0
-    }      
-      
+    },
+    contributionType : 0,
+     hasCommission: hasCommission,
+     comission: hasCommission
+  ? {
+      type: ComissionType.Percentage,
+      amount: emptyNetAmount,
+      percentage: {
+        amount: commissionPct,
+        currencySymbol: '',
+        cycle: emptyCycle,
+      },
+      escalationRate: neutralCommissionEscRate,  // <-- use the string-valued esc rate
+    }
+  : {
+      type: ComissionType.Percentage, // or Amount if your API prefers for "none"
+      amount: emptyNetAmount,
+      percentage: emptyNetAmount,
+      escalationRate: neutralCommissionEscRate,  // <-- here too
+    },
+
       };
 
       var action$ = this.withdrawalsContributionsHttpService.addWithdrawals(
@@ -304,4 +360,6 @@ export class AddWithdrawalComponent {
         
           customControl?.updateValueAndValidity();
         }
+
+        
 }
