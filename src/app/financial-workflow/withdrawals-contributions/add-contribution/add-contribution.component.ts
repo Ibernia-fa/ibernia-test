@@ -149,7 +149,7 @@ export class AddContributionComponent {
 
     if (this.isEditWorkflow) {
       // hydrate commission
-      const hasCommInit = !!this.selectedContribution?.hasCommission;
+      const hasCommInit = !!this.selectedContribution;
       const pctInit = this.selectedContribution?.comission?.percentage?.amount ?? 0;
 
       // hydrate core fields
@@ -180,7 +180,11 @@ export class AddContributionComponent {
         // type External but saved pot is Cash -> clear
         this.contributionForm.get('savingPot')?.patchValue(null);
       }
-
+            const hasComm = !!this.selectedContribution?.comission;
+      this.contributionForm.get('commissions')?.patchValue(hasComm);
+      const pct =
+        this.selectedContribution?.comission?.percentage?.amount ?? 0;
+      this.contributionForm.get('commissionPercentage')?.patchValue(pct);
       this.isCommissionsChanged(hasCommInit);
       this.onCycleValueChange(this.selectedContribution.amount.cycle?.id);
     }

@@ -153,6 +153,7 @@ export class AddWithdrawalComponent {
         this.selectedWithdrawal?.comission?.percentage?.amount ?? 0;
       this.withdrawalForm.get('commissionPercentage')?.patchValue(pct);
       this.onCommissionsToggled(hasComm);
+      
     }
   }
 
