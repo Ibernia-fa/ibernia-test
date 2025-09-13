@@ -132,7 +132,7 @@
           <div class="d-flex align-items-center gap-24">
             <div class="slider-customizer slider-wrapper">
         <mat-slider class="w-100" [min]="0" [max]="10" [step]="0.5">
-  <input matSliderThumb formControlName="returnRate">
+  <input matSliderThumb formControlName="returnRate"   (valueChange)="onSliderChange($event)">
 </mat-slider>
 
             </div>
@@ -159,9 +159,13 @@
 
                       <mat-form-field  appearance="outline" class="w-full w-100 percentage-icon">
                           <span matSuffix>%&nbsp;</span> 
-                            <input
-                                          matInput class="p-0" formControlName="returnRate" [value]="savingsForm.get('returnRate')?.value"
-                                        />
+                       <input
+    matInput
+    type="number"
+    class="p-0"
+    formControlName="returnRate"
+    (input)="onReturnRateInput($event)"
+  />
                                         
                           </mat-form-field>
                 <!-- </mat-form-field>  -->

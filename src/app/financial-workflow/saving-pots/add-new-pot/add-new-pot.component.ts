@@ -374,11 +374,11 @@ this.escalationRates.push({
     }
   }
 
-  onSliderChange(value: any) {
-    if (!isNaN(value)) {
-      this.savingsForm.get('returnRate')?.setValue(value, { emitEvent: true });
-    }
-  }
+  // onSliderChange(value: any) {
+  //   if (!isNaN(value)) {
+  //     this.savingsForm.get('returnRate')?.setValue(value, { emitEvent: true });
+  //   }
+  // }
 
 get isCustomEscalationSelected(): boolean {
   const selectedValue = this.savingsForm.get('escalationRate')?.value;
@@ -785,4 +785,17 @@ onEscalationRateChange(event: MatSelectChange): void {
         return null;
       };
     }
+
+    onReturnRateInput(event: Event) {
+  // when typing, ensure the control holds a number (so slider updates smoothly)
+  const raw = (event.target as HTMLInputElement).value;
+  const num = Number(raw);
+  this.savingsForm.get('returnRate')?.setValue(isNaN(num) ? 0 : num, { emitEvent: true });
+}
+
+onSliderChange(val: number) {
+  // coerce to number and push into the form control
+  const num = Number(val);
+  this.savingsForm.get('returnRate')?.setValue(isNaN(num) ? 0 : num, { emitEvent: true });
+}
 }
