@@ -1,10 +1,12 @@
 import { Component, Inject } from '@angular/core';
 import {
+  AbstractControl,
   ControlEvent,
   FormBuilder,
   FormControl,
   FormGroup,
   ReactiveFormsModule,
+  ValidatorFn,
   Validators,
 } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -81,11 +83,11 @@ export class AddNewPotComponent {
   savingPotType= SavingPotType
   selectedEscalationDescription: string | null = null;
   savingPotValues = [
-    // {
-    //   name: 'Cash',
-    //   iconUrl: 'cashflow-moneys-icon',
-    //   type: SavingPotType.Cash,
-    // },
+    {
+      name: 'Cash',
+      iconUrl: 'cashflow-moneys-icon',
+      type: SavingPotType.Cash,
+    },
     {
       name: 'Investment',
       iconUrl: 'cashflow-investment-icon',
@@ -160,6 +162,8 @@ export class AddNewPotComponent {
       escalationRate: [''],
       customEscalationRate: [0]
     });
+
+  this.savingsForm.setValidators(this.endOnOrAfterStartValidator());
 
     this.savingsForm.get('currency')?.disable();
 
@@ -748,5 +752,28 @@ onEscalationRateChange(event: MatSelectChange): void {
   if (e.key === ',') e.preventDefault();
 }
 
-
+      private endOnOrAfterStartValidator(): ValidatorFn {
+      return (group: AbstractControl) => {
+        const start = group.get('start')?.value;
+        const end   = group.get('end')?.value;
+        const endCtrl = group.get('end');
+    
+        // Only validate when both are present (or when end is present)
+        if (endCtrl) {
+          const existing = endCtrl.errors ?? null;
+    
+          if (start != null && start !== '' && end != null && end !== '' && end < start) {
+            // attach/merge the error onto the END control
+            endCtrl.setErrors({ ...(existing ?? {}), endBeforeStart: true });
+          } else {
+            // remove just our error, keep any others
+            if (existing && 'endBeforeStart' in existing) {
+              const { endBeforeStart, ...rest } = existing;
+              endCtrl.setErrors(Object.keys(rest).length ? rest : null);
+            }
+          }
+        }
+        return null;
+      };
+    }
 }
