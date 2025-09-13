@@ -83,11 +83,11 @@ export class AddNewPotComponent {
   savingPotType= SavingPotType
   selectedEscalationDescription: string | null = null;
   savingPotValues = [
-    {
-      name: 'Cash',
-      iconUrl: 'cashflow-moneys-icon',
-      type: SavingPotType.Cash,
-    },
+    // {
+    //   name: 'Cash',
+    //   iconUrl: 'cashflow-moneys-icon',
+    //   type: SavingPotType.Cash,
+    // },
     {
       name: 'Investment',
       iconUrl: 'cashflow-investment-icon',
