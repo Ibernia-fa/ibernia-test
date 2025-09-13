@@ -166,6 +166,8 @@ export class AddNewPotComponent {
   this.savingsForm.setValidators(this.endOnOrAfterStartValidator());
 
     this.savingsForm.get('currency')?.disable();
+    this.savingsForm.get('commissionCurrency')?.disable();
+
 
     this.savingsForm.get('returnRate')?.valueChanges.subscribe((value) => {
       this.formattedReturnRate = this.formatWithPercentage(value);
@@ -251,6 +253,12 @@ this.escalationRates.push({
   customControl?.setValidators([Validators.required, Validators.min(0)]);
   customControl?.updateValueAndValidity();
 }
+
+    console.log(this.selectedPot);
+    if(this.selectedPot.name.toLowerCase() == 'cash'){
+      this.savingsForm.get('name')?.disable();
+      this.savingsForm.get('customName')?.disable();
+    }
 
   }
 
@@ -446,6 +454,7 @@ onEscalationRateChange(event: MatSelectChange): void {
 
   saveCashflow(): void {
     console.log(this.savingsForm);
+    this.savingsForm.markAllAsTouched();
     const isCustomEscalation = this.selectedEscalationDescription === 'Increase at custom rate';
     const selectedEscalationRateValue = isCustomEscalation
       ? this.savingsForm.get('customEscalationRate')?.value
