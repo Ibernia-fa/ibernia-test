@@ -101,6 +101,7 @@ export class AddNewPotComponent {
   ];
   forecastEndDateYear: any;
   forecastStartDateYear: any;
+  isCashPotEditMode: boolean;
 
   constructor(
     private dialogRef: MatDialogRef<AddNewPotComponent>,
@@ -174,92 +175,170 @@ export class AddNewPotComponent {
     });
 
     if(this.isEditWorkflow) {
+      this.isCashPotEditMode = (this.selectedPot?.name ?? '').trim().toLowerCase() === 'cash';
       this.patchFormValues();
+    if (this.isCashPotEditMode) {
+        // Freeze the Type as Cash and don’t emit changes
+        this.savingsForm.get('name')?.setValue('Cash', { emitEvent: false });
+        this.savingsForm.get('name')?.disable({ emitEvent: false });
+        this.selectedNameIconUrl = 'cashflow-moneys-icon';
+      }
     }
   }
 
+//   patchFormValues() {
+//     var savingPotValue = this.savingPotValues.find(x => x.name === this.selectedPot.name);
+//     if(savingPotValue) {
+//       this.savingsForm.get('name')?.patchValue(savingPotValue.name)
+//     }
+//     else {
+//       this.savingsForm.get('name')?.patchValue('Custom');
+//       this.onNameValueChange('Custom');
+//       this.savingsForm.get('customName')?.patchValue(this.selectedPot.name);
+//     }
+
+//     this.savingsForm.get('currency')?.patchValue(this.selectedPot.startingPotValue.currencySymbol);
+//     this.savingsForm.get('amount')?.patchValue(this.selectedPot.startingPotValue.amount);
+//     this.savingsForm.get('returnRate')?.patchValue(this.selectedPot.returnRate);
+//     this.savingsForm.get('lockPot')?.patchValue(this.selectedPot.hasPotLocked);
+//     this.savingsForm.get('start')?.patchValue(this.selectedPot.start.year);
+//     this.savingsForm.get('end')?.patchValue(this.selectedPot.end.year);
+//     this.savingsForm.get('commissions')?.patchValue(this.selectedPot.hasCommission);
+//     var selectedComissionType = 'amount';
+//     if(this.selectedPot.comission.type === ComissionType.Amount) {
+//       selectedComissionType = 'amount'
+//     }
+//     if(this.selectedPot.comission.type === ComissionType.Percentage) {
+//       selectedComissionType = 'percentage'
+//     }
+//     if(this.selectedPot.comission.type === ComissionType.Both) {
+//       selectedComissionType = 'both'
+//     }
+//     this.savingsForm.get('commissionType')?.patchValue(selectedComissionType);
+//     if(this.selectedPot.comission.type === ComissionType.Amount || this.selectedPot.comission.type === ComissionType.Both) {
+//       this.savingsForm.get('commissionCurrency')?.patchValue(this.selectedPot.comission.amount.currencySymbol);
+//       this.savingsForm.get('commissionAmount')?.patchValue(this.selectedPot.comission.amount.amount);
+//       this.savingsForm.get('commissionCycle')?.patchValue(this.selectedPot.comission.amount.cycle?.id);
+//     }
+//     if(this.selectedPot.comission.type === ComissionType.Percentage || this.selectedPot.comission.type === ComissionType.Both) {
+//       this.savingsForm.get('commissionPercentageCurrency')?.patchValue(this.selectedPot.comission.percentage?.currencySymbol);
+//       this.savingsForm.get('commissionPercentageCycle')?.patchValue(this.selectedPot.comission.percentage?.cycle?.id);
+//       this.savingsForm.get('commissionPercentage')?.patchValue(this.selectedPot.comission.percentage?.amount);
+//     }
+//     //this.savingsForm.get('escalationRate')?.patchValue(this.selectedPot.comission.escalationRate.value);
+// const matchedEscalation = this.escalationRates.find(
+//   x =>
+//     x.value === this.selectedPot.comission.escalationRate?.value &&
+//     x.description === this.selectedPot.comission.escalationRate?.description
+// );
+
+// if (matchedEscalation) {
+//   // Predefined escalation rate
+//   this.savingsForm.get('escalationRate')?.patchValue(matchedEscalation.value);
+//   this.selectedEscalationDescription = matchedEscalation.description;
+// } else if (
+//   this.selectedPot.comission.escalationRate &&
+//   this.selectedPot.comission.escalationRate.description === 'Increase at custom rate'
+// ) {
+//   // Custom escalation case
+//   this.escalationRates = this.escalationRates.filter(
+//   x => x.description !== 'Increase at custom rate'
+// );
+
+// // Then add the custom rate value to escalationRates
+// this.escalationRates.push({
+//   description: 'Increase at custom rate',
+//   value: this.selectedPot?.comission?.escalationRate?.value
+// });
+//   this.savingsForm.get('escalationRate')?.patchValue(this.selectedPot.comission.escalationRate.value);
+//   this.savingsForm.get('customEscalationRate')?.patchValue(
+//     this.selectedPot.comission.escalationRate.value
+//   );
+//   this.selectedEscalationDescription = 'Increase at custom rate';
+
+//   // Set validators again
+//   const customControl = this.savingsForm.get('customEscalationRate');
+//   customControl?.setValidators([Validators.required, Validators.min(0)]);
+//   customControl?.updateValueAndValidity();
+// }
+
+//     console.log(this.selectedPot);
+//     if(this.selectedPot.name.toLowerCase() == 'cash'){
+//       this.savingsForm.get('name')?.disable();
+//       this.savingsForm.get('customName')?.disable();
+//     }
+
+//   }
+
+
   patchFormValues() {
-    var savingPotValue = this.savingPotValues.find(x => x.name === this.selectedPot.name);
-    if(savingPotValue) {
-      this.savingsForm.get('name')?.patchValue(savingPotValue.name)
-    }
-    else {
-      this.savingsForm.get('name')?.patchValue('Custom');
-      this.onNameValueChange('Custom');
-      this.savingsForm.get('customName')?.patchValue(this.selectedPot.name);
-    }
-
-    this.savingsForm.get('currency')?.patchValue(this.selectedPot.startingPotValue.currencySymbol);
-    this.savingsForm.get('amount')?.patchValue(this.selectedPot.startingPotValue.amount);
-    this.savingsForm.get('returnRate')?.patchValue(this.selectedPot.returnRate);
-    this.savingsForm.get('lockPot')?.patchValue(this.selectedPot.hasPotLocked);
-    this.savingsForm.get('start')?.patchValue(this.selectedPot.start.year);
-    this.savingsForm.get('end')?.patchValue(this.selectedPot.end.year);
-    this.savingsForm.get('commissions')?.patchValue(this.selectedPot.hasCommission);
-    var selectedComissionType = 'amount';
-    if(this.selectedPot.comission.type === ComissionType.Amount) {
-      selectedComissionType = 'amount'
-    }
-    if(this.selectedPot.comission.type === ComissionType.Percentage) {
-      selectedComissionType = 'percentage'
-    }
-    if(this.selectedPot.comission.type === ComissionType.Both) {
-      selectedComissionType = 'both'
-    }
-    this.savingsForm.get('commissionType')?.patchValue(selectedComissionType);
-    if(this.selectedPot.comission.type === ComissionType.Amount || this.selectedPot.comission.type === ComissionType.Both) {
-      this.savingsForm.get('commissionCurrency')?.patchValue(this.selectedPot.comission.amount.currencySymbol);
-      this.savingsForm.get('commissionAmount')?.patchValue(this.selectedPot.comission.amount.amount);
-      this.savingsForm.get('commissionCycle')?.patchValue(this.selectedPot.comission.amount.cycle?.id);
-    }
-    if(this.selectedPot.comission.type === ComissionType.Percentage || this.selectedPot.comission.type === ComissionType.Both) {
-      this.savingsForm.get('commissionPercentageCurrency')?.patchValue(this.selectedPot.comission.percentage?.currencySymbol);
-      this.savingsForm.get('commissionPercentageCycle')?.patchValue(this.selectedPot.comission.percentage?.cycle?.id);
-      this.savingsForm.get('commissionPercentage')?.patchValue(this.selectedPot.comission.percentage?.amount);
-    }
-    //this.savingsForm.get('escalationRate')?.patchValue(this.selectedPot.comission.escalationRate.value);
-const matchedEscalation = this.escalationRates.find(
-  x =>
-    x.value === this.selectedPot.comission.escalationRate?.value &&
-    x.description === this.selectedPot.comission.escalationRate?.description
-);
-
-if (matchedEscalation) {
-  // Predefined escalation rate
-  this.savingsForm.get('escalationRate')?.patchValue(matchedEscalation.value);
-  this.selectedEscalationDescription = matchedEscalation.description;
-} else if (
-  this.selectedPot.comission.escalationRate &&
-  this.selectedPot.comission.escalationRate.description === 'Increase at custom rate'
-) {
-  // Custom escalation case
-  this.escalationRates = this.escalationRates.filter(
-  x => x.description !== 'Increase at custom rate'
-);
-
-// Then add the custom rate value to escalationRates
-this.escalationRates.push({
-  description: 'Increase at custom rate',
-  value: this.selectedPot?.comission?.escalationRate?.value
-});
-  this.savingsForm.get('escalationRate')?.patchValue(this.selectedPot.comission.escalationRate.value);
-  this.savingsForm.get('customEscalationRate')?.patchValue(
-    this.selectedPot.comission.escalationRate.value
-  );
-  this.selectedEscalationDescription = 'Increase at custom rate';
-
-  // Set validators again
-  const customControl = this.savingsForm.get('customEscalationRate');
-  customControl?.setValidators([Validators.required, Validators.min(0)]);
-  customControl?.updateValueAndValidity();
-}
-
-    console.log(this.selectedPot);
-    if(this.selectedPot.name.toLowerCase() == 'cash'){
-      this.savingsForm.get('name')?.disable();
-      this.savingsForm.get('customName')?.disable();
+    // --- Type (name) ---
+    if (this.isCashPotEditMode) {
+      // Keep it Cash, do not touch customName control
+      this.savingsForm.get('name')?.patchValue('Cash', { emitEvent: false });
+      this.selectedNameIconUrl = 'cashflow-moneys-icon';
+    } else {
+      const savingPotValue = this.savingPotValues.find(x => x.name === this.selectedPot.name);
+      if (savingPotValue) {
+        this.savingsForm.get('name')?.patchValue(savingPotValue.name, { emitEvent: false });
+      } else {
+        this.savingsForm.get('name')?.patchValue('Custom', { emitEvent: false });
+        this.onNameValueChange('Custom'); // will add customName control
+        this.savingsForm.get('customName')?.patchValue(this.selectedPot.name, { emitEvent: false });
+      }
     }
 
+    // --- The rest of fields (unchanged behavior) ---
+    this.savingsForm.get('currency')?.patchValue(this.selectedPot.startingPotValue.currencySymbol, { emitEvent: false });
+    this.savingsForm.get('amount')?.patchValue(this.selectedPot.startingPotValue.amount, { emitEvent: false });
+    this.savingsForm.get('returnRate')?.patchValue(this.selectedPot.returnRate, { emitEvent: false });
+    this.savingsForm.get('lockPot')?.patchValue(this.selectedPot.hasPotLocked, { emitEvent: false });
+    this.savingsForm.get('start')?.patchValue(this.selectedPot.start.year, { emitEvent: false });
+    this.savingsForm.get('end')?.patchValue(this.selectedPot.end.year, { emitEvent: false });
+    this.savingsForm.get('commissions')?.patchValue(this.selectedPot.hasCommission, { emitEvent: false });
+
+    let selectedComissionType = 'amount';
+    if (this.selectedPot.comission.type === ComissionType.Percentage) selectedComissionType = 'percentage';
+    if (this.selectedPot.comission.type === ComissionType.Both) selectedComissionType = 'both';
+    this.savingsForm.get('commissionType')?.patchValue(selectedComissionType, { emitEvent: false });
+
+    if (this.selectedPot.comission.type === ComissionType.Amount || this.selectedPot.comission.type === ComissionType.Both) {
+      this.savingsForm.get('commissionCurrency')?.patchValue(this.selectedPot.comission.amount.currencySymbol, { emitEvent: false });
+      this.savingsForm.get('commissionAmount')?.patchValue(this.selectedPot.comission.amount.amount, { emitEvent: false });
+      this.savingsForm.get('commissionCycle')?.patchValue(this.selectedPot.comission.amount.cycle?.id, { emitEvent: false });
+    }
+    if (this.selectedPot.comission.type === ComissionType.Percentage || this.selectedPot.comission.type === ComissionType.Both) {
+      this.savingsForm.get('commissionPercentageCurrency')?.patchValue(this.selectedPot.comission.percentage?.currencySymbol, { emitEvent: false });
+      this.savingsForm.get('commissionPercentageCycle')?.patchValue(this.selectedPot.comission.percentage?.cycle?.id, { emitEvent: false });
+      this.savingsForm.get('commissionPercentage')?.patchValue(this.selectedPot.comission.percentage?.amount, { emitEvent: false });
+    }
+
+    const matchedEscalation = this.escalationRates.find(
+      x =>
+        x.value === this.selectedPot.comission.escalationRate?.value &&
+        x.description === this.selectedPot.comission.escalationRate?.description
+    );
+
+    if (matchedEscalation) {
+      this.savingsForm.get('escalationRate')?.patchValue(matchedEscalation.value, { emitEvent: false });
+      this.selectedEscalationDescription = matchedEscalation.description;
+    } else if (
+      this.selectedPot.comission.escalationRate &&
+      this.selectedPot.comission.escalationRate.description === 'Increase at custom rate'
+    ) {
+      this.escalationRates = this.escalationRates.filter(x => x.description !== 'Increase at custom rate');
+      this.escalationRates.push({
+        description: 'Increase at custom rate',
+        value: this.selectedPot?.comission?.escalationRate?.value,
+      });
+      this.savingsForm.get('escalationRate')?.patchValue(this.selectedPot.comission.escalationRate.value, { emitEvent: false });
+      this.savingsForm.get('customEscalationRate')?.patchValue(this.selectedPot.comission.escalationRate.value, { emitEvent: false });
+      this.selectedEscalationDescription = 'Increase at custom rate';
+
+      const customControl = this.savingsForm.get('customEscalationRate');
+      customControl?.setValidators([Validators.required, Validators.min(0)]);
+      customControl?.updateValueAndValidity({ emitEvent: false });
+    }
   }
 
   ngOnInit() {

@@ -24,44 +24,41 @@
         <div class="w-100 form-field gap-12">
           <mat-label class="f-s-16 d-block" style="line-height: 18px">Type</mat-label>
           <div class="select-option">
-            <mat-select (valueChange)="onNameValueChange($event)" formControlName="name" value="Select" style="height: 24px">
-              <!-- <mat-select-trigger>
-                <div class="d-flex align-items-center gap-8">
-                  <img [src]="'/assets/images/svgs/' + selectedEventIconUrl + '.svg'"
-                    [alt]="selectedEventIconUrl" />
-                  <span>
-                    {{ selectedEventName }}
-                  </span>
-                </div>
-              </mat-select-trigger> -->
-              <!-- <mat-option value="2.5%">Increase at same rate as inflation (2.5%)</mat-option> -->
-              @for (event of savingPotValues; track event) {
-              <mat-option [value]="event.name">
-                <div class="d-flex align-items-center gap-8">
-                  <img [src]="'/assets/images/svgs/' + event.iconUrl + '.svg'" [alt]="event.iconUrl" />
-                  <span>
-                    {{ event.name }}
-                  </span>
-                </div>
-              </mat-option>
-              }
-              <mat-option value="Custom">
-                <div class="d-flex align-items-center gap-8">
-                  <img src="/assets/images/svgs/custom-option-icon.svg" alt="custom-event" height="24" width="24" />
-                  <span>
-                    Custom
-                  </span>
-                </div>
-              </mat-option>
-              <!-- <mat-option value="Custom">
-                <div class="d-flex align-items-center gap-8">
-                  <img src="/assets/images/svgs/state-pension-icon.svg" alt="custom-event" height="24" width="24" />
-                  <span>
-                    Custom
-                  </span>
-                </div>
-              </mat-option> -->
-            </mat-select>
+     <mat-select
+  formControlName="name"
+  placeholder="Select"
+  [disabled]="isCashPotEditMode"
+  (selectionChange)="onNameValueChange($event.value)"
+  style="height:24px"
+>
+  <!-- When editing a Cash pot, inject a single disabled 'Cash' option so the label shows -->
+  @if (isCashPotEditMode) {
+    <mat-option [value]="'Cash'" disabled>
+      <div class="d-flex align-items-center gap-8">
+        <img src="/assets/images/svgs/cashflow-moneys-icon.svg" alt="cashflow-moneys-icon" />
+        <span>Cash</span>
+      </div>
+    </mat-option>
+  }
+
+  <!-- Your normal options (no 'Cash' here, that’s fine) -->
+  @for (event of savingPotValues; track event) {
+    <mat-option [value]="event.name">
+      <div class="d-flex align-items-center gap-8">
+        <img [src]="'/assets/images/svgs/' + event.iconUrl + '.svg'" [alt]="event.iconUrl" />
+        <span>{{ event.name }}</span>
+      </div>
+    </mat-option>
+  }
+
+  <mat-option [value]="'Custom'">
+    <div class="d-flex align-items-center gap-8">
+      <img src="/assets/images/svgs/custom-option-icon.svg" alt="custom-event" height="24" width="24" />
+      <span>Custom</span>
+    </div>
+  </mat-option>
+</mat-select>
+
 
           </div>
           <!-- <input matInput formControlName="name" /> -->
