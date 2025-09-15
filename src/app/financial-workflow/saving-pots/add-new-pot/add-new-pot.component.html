@@ -18,7 +18,7 @@
     <!-- End Modal Header  -->
 
     <!-- Modal Body  -->
-    <mat-dialog-content>
+    <mat-dialog-content class="custom-body">
       <div class="d-flex flex-column gap-20" [formGroup]="savingsForm">
         <!-- Name Field  -->
         <div class="w-100 form-field gap-12">
@@ -85,9 +85,10 @@
         <!-- Starting pot value Field  -->
         <div class="d-flex flex-column gap-12">
           <span class="f-s-16 f-w-400">Starting pot value</span>
-          <div class="d-flex align-items-center">
+          <div class="d-flex align-items-center gap-12">
             <!-- Currency Selector  -->
-            <div class="left">
+            <div class="left form-field">
+              <div class="select-option">
               <mat-select value="£" formControlName="currency" class="sortby-edit-profile" hideSingleSelectionIndicator>
                 @for (country of countries; track country) {
                 @if(country.currencySymbol) {
@@ -98,6 +99,7 @@
                 }
                 }
               </mat-select>
+              </div>
             </div>
             <!-- End Currency Selector  -->
             <!-- Price Field  -->
@@ -325,9 +327,10 @@
               </div>
             }
             <div class="d-flex flex-column gap-4">
-              <div class="d-flex align-items-center">
+              <div class="d-flex align-items-center gap-12">
                 <!-- Currency Selector  -->
-                <div class="left">
+                 <div class="left form-field">
+              <div class="select-option">
                   <mat-select value="£" formControlName="commissionCurrency" class="sortby-edit-profile"
                     hideSingleSelectionIndicator>
                     @for (country of countries; track country) {
@@ -339,6 +342,7 @@
                     }
                     }
                   </mat-select>
+                  </div>
                 </div>
                 <!-- End Currency Selector  -->
                 <!-- Price Field  -->
@@ -347,7 +351,11 @@
                 </div>
                 <!-- End Price Field  -->
                 <!-- End Type Field  -->
-                <div class="right">
+                <div class="right form-field">
+
+
+                   
+              <div class="select-option">
                   <mat-select value="Select" formControlName="commissionCycle" class="sortby-edit-profile"
                     hideSingleSelectionIndicator>
                     <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
@@ -355,6 +363,7 @@
                     <mat-option [value]="cycle.id">{{ cycle.description }}</mat-option>
                     }
                   </mat-select>
+                </div>
                 </div>
                 <!-- End Type Field  -->
               </div>
