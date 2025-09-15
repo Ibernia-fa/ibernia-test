@@ -24,44 +24,41 @@
         <div class="w-100 form-field gap-12">
           <mat-label class="f-s-16 d-block" style="line-height: 18px">Type</mat-label>
           <div class="select-option">
-            <mat-select (valueChange)="onNameValueChange($event)" formControlName="name" value="Select" style="height: 24px">
-              <!-- <mat-select-trigger>
-                <div class="d-flex align-items-center gap-8">
-                  <img [src]="'/assets/images/svgs/' + selectedEventIconUrl + '.svg'"
-                    [alt]="selectedEventIconUrl" />
-                  <span>
-                    {{ selectedEventName }}
-                  </span>
-                </div>
-              </mat-select-trigger> -->
-              <!-- <mat-option value="2.5%">Increase at same rate as inflation (2.5%)</mat-option> -->
-              @for (event of savingPotValues; track event) {
-              <mat-option [value]="event.name">
-                <div class="d-flex align-items-center gap-8">
-                  <img [src]="'/assets/images/svgs/' + event.iconUrl + '.svg'" [alt]="event.iconUrl" />
-                  <span>
-                    {{ event.name }}
-                  </span>
-                </div>
-              </mat-option>
-              }
-              <mat-option value="Custom">
-                <div class="d-flex align-items-center gap-8">
-                  <img src="/assets/images/svgs/custom-option-icon.svg" alt="custom-event" height="24" width="24" />
-                  <span>
-                    Custom
-                  </span>
-                </div>
-              </mat-option>
-              <!-- <mat-option value="Custom">
-                <div class="d-flex align-items-center gap-8">
-                  <img src="/assets/images/svgs/state-pension-icon.svg" alt="custom-event" height="24" width="24" />
-                  <span>
-                    Custom
-                  </span>
-                </div>
-              </mat-option> -->
-            </mat-select>
+     <mat-select
+  formControlName="name"
+  placeholder="Select"
+  [disabled]="isCashPotEditMode"
+  (selectionChange)="onNameValueChange($event.value)"
+  style="height:24px"
+>
+  <!-- When editing a Cash pot, inject a single disabled 'Cash' option so the label shows -->
+  @if (isCashPotEditMode) {
+    <mat-option [value]="'Cash'" disabled>
+      <div class="d-flex align-items-center gap-8">
+        <img src="/assets/images/svgs/cashflow-moneys-icon.svg" alt="cashflow-moneys-icon" />
+        <span>Cash</span>
+      </div>
+    </mat-option>
+  }
+
+  <!-- Your normal options (no 'Cash' here, that’s fine) -->
+  @for (event of savingPotValues; track event) {
+    <mat-option [value]="event.name">
+      <div class="d-flex align-items-center gap-8">
+        <img [src]="'/assets/images/svgs/' + event.iconUrl + '.svg'" [alt]="event.iconUrl" />
+        <span>{{ event.name }}</span>
+      </div>
+    </mat-option>
+  }
+
+  <mat-option [value]="'Custom'">
+    <div class="d-flex align-items-center gap-8">
+      <img src="/assets/images/svgs/custom-option-icon.svg" alt="custom-event" height="24" width="24" />
+      <span>Custom</span>
+    </div>
+  </mat-option>
+</mat-select>
+
 
           </div>
           <!-- <input matInput formControlName="name" /> -->
@@ -132,7 +129,7 @@
           <div class="d-flex align-items-center gap-24">
             <div class="slider-customizer slider-wrapper">
         <mat-slider class="w-100" [min]="0" [max]="10" [step]="0.5">
-  <input matSliderThumb formControlName="returnRate">
+  <input matSliderThumb formControlName="returnRate"   (valueChange)="onSliderChange($event)">
 </mat-slider>
 
             </div>
@@ -159,9 +156,13 @@
 
                       <mat-form-field  appearance="outline" class="w-full w-100 percentage-icon">
                           <span matSuffix>%&nbsp;</span> 
-                            <input
-                                          matInput class="p-0" formControlName="returnRate" [value]="savingsForm.get('returnRate')?.value"
-                                        />
+                       <input
+    matInput
+    type="number"
+    class="p-0"
+    formControlName="returnRate"
+    (input)="onReturnRateInput($event)"
+  />
                                         
                           </mat-form-field>
                 <!-- </mat-form-field>  -->
@@ -248,6 +249,10 @@
                   savingsForm.get('end')?.hasError('required'))) {
                   <span class="field-error d-block">End is required</span>
                   }
+                                      @if(savingsForm.get('end')?.touched &&
+                        savingsForm.get('end')?.hasError('endBeforeStart')) {
+                      <span class="field-error d-block">End year cannot be before start year</span>
+                    }
                   <!-- <span class="field-error d-block">End is required</span> -->
                   <!-- End error  -->
                 </div>
