@@ -119,6 +119,35 @@ export class ClientAddComponent {
       partnerGroup.get('firstName')?.setValidators(Validators.required);
 
       partnerGroup.get('dob')?.setValidators(Validators.required);
+
+    const clientCountryName = this.clientForm.get('country')?.value as string | null;
+    const clientCurrency    = this.clientForm.get('currency')?.value as string | null;
+
+    if (clientCountryName) {
+      const selectedCountry = allCountries.find(c => c.countryName === clientCountryName);
+      if (selectedCountry) {
+        partnerGroup.patchValue(
+          {
+            country: selectedCountry.countryName,
+            // if client currency is set use it; otherwise use the country's default
+            currency: clientCurrency ?? selectedCountry.currencySymbol,
+          },
+          { emitEvent: false }
+        );
+
+        // keep partner phone dropdown in sync
+        this.selectedPartnerCountryISO = (selectedCountry.countryCode.toLowerCase() as CountryISO);
+      }
+    } else if (clientCurrency) {
+      // no country set on client, but currency is—still copy the currency
+      partnerGroup.patchValue({ currency: clientCurrency }, { emitEvent: false });
+    }
+
+    // reflect validators
+    Object.keys(partnerGroup.controls).forEach(key =>
+      partnerGroup.get(key)?.updateValueAndValidity({ emitEvent: false })
+    );
+
     } else {
       partnerGroup.reset();
       Object.keys(partnerGroup.controls).forEach((key) => {

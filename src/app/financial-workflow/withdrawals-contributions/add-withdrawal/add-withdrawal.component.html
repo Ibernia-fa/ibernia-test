@@ -126,38 +126,6 @@
             </div>
           </div>
         </div>
-
-        <!-- Commission (percentage-only) -->
-        <section class="example-section">
-          <mat-checkbox
-            type="checkbox"
-            id="commissions"
-            formControlName="commissions"
-            (change)="onCommissionsToggled(withdrawalForm.get('commissions')?.value)"
-          >
-            Add commission
-          </mat-checkbox>
-        </section>
-
-        @if(withdrawalForm.get('commissions')?.value) {
-          <div class="d-flex flex-column gap-12 m-t-15">
-            <div class="d-flex gap-8 align-items-center">
-              <mat-label class="f-s-16 f-w-400 d-block">Commission percentage</mat-label>
-              <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
-            </div>
-            <div class="w-100 form-field input-container">
-              <mat-form-field appearance="outline" class="w-full w-100 percentage-icon">
-                <span matSuffix>%&nbsp;</span>
-                <input matInput type="number" formControlName="commissionPercentage" />
-              </mat-form-field>
-              @if(withdrawalForm.get('commissionPercentage')?.touched &&
-                   withdrawalForm.get('commissionPercentage')?.hasError('required')) {
-                <span class="field-error d-block">Commission percentage is required</span>
-              }
-            </div>
-          </div>
-        }
-
         @if(showStartEnd) {
           <div class="w-100 form-field gap-12">
             <div class="d-flex gap-8 align-items-center">
@@ -195,6 +163,38 @@
             }
           </div>
         }
+        <!-- Commission (percentage-only) -->
+        <section class="example-section">
+          <mat-checkbox
+            type="checkbox"
+            id="commissions"
+            formControlName="commissions"
+            (change)="onCommissionsToggled(withdrawalForm.get('commissions')?.value)"
+          >
+            Add commission
+          </mat-checkbox>
+        </section>
+
+        @if(withdrawalForm.get('commissions')?.value) {
+          <div class="d-flex flex-column gap-12 m-t-15">
+            <div class="d-flex gap-8 align-items-center">
+              <mat-label class="f-s-16 f-w-400 d-block">Commission percentage</mat-label>
+              <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
+            </div>
+            <div class="w-100 form-field input-container">
+              <mat-form-field appearance="outline" class="w-full w-100 percentage-icon">
+                <span matSuffix>%&nbsp;</span>
+                <input matInput type="number" formControlName="commissionPercentage" />
+              </mat-form-field>
+              @if(withdrawalForm.get('commissionPercentage')?.touched &&
+                   withdrawalForm.get('commissionPercentage')?.hasError('required')) {
+                <span class="field-error d-block">Commission percentage is required</span>
+              }
+            </div>
+          </div>
+        }
+
+
       </div>
     </mat-dialog-content>
 

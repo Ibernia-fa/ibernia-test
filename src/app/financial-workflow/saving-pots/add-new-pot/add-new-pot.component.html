@@ -185,6 +185,7 @@
         <!-- End Slider Section  -->
 <div class="d-flex flex-column gap-0">
         <!-- CheckBox  -->
+         @if(savingsForm.get('name')?.value !== 'Cash') {
             <section class="example-section">
         <mat-checkbox type="checkbox" id="lock-pot" (change)="isLockPotChanged(savingsForm.get('lockPot')?.value)"
               formControlName="lockPot">Lock this pot from automatically covering an income shortfall</mat-checkbox>
@@ -265,7 +266,7 @@
 
         }
         <!-- Finish Savings pot is locked between  -->
-
+      }
         <!-- CheckBox  -->
         @if(savingsForm.get('name')?.value !== 'Cash') {
     
