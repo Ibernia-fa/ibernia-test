@@ -4,9 +4,14 @@ html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 /* Global tooltip width & wrapping */
 .cdk-overlay-container .mat-mdc-tooltip-surface {
-  max-width: 400px !important;   /* was 200 px by default */
-  white-space: pre-line;         /* lets “\n” create new lines           */
-  font-size: 13px;               /* optional: match your UI font-size    */
+    max-width: 400px !important;
+    white-space: pre-line;
+    font-size: 14px;
+    background: #fff;
+    color: #2a3547;
+    font-family: 'Ubuntu';
+    border: 1px solid #e7e7eb;
+    padding: 15px;
 }
 .mb-20{
   margin-bottom: 20px;
@@ -77,8 +82,8 @@ table {
 .mat-mdc-form-field{
   .mat-mdc-text-field-wrapper{
     .mat-mdc-form-field-infix{
-      height: 46px;
-      line-height: 34px;
+      height: 49px;
+      line-height: 37px;
       }
   }
 }
@@ -94,7 +99,7 @@ table {
     
   }
   .mat-mdc-form-field-icon-suffix {
-    padding: 0 0 0 4px;
+    padding: 0 0 0 3px;
     background: gray;
     height: 20px;
     width: 20px;
@@ -106,7 +111,7 @@ table {
     color: white;
     font-size: 16px;
       right: 16px;
-    top: 13px;
+    top: 15px;
 }
 }
 .field-error,
@@ -120,3 +125,32 @@ table {
 .mdc-text-field--outlined:not(.mdc-text-field--disabled).mdc-text-field--invalid .mat-mdc-notch-piece{
   border-color: red !important;
 }
+
+button {
+  span{
+    text-transform: lowercase;
+    &::first-letter {
+      text-transform: uppercase;
+    }
+  }
+}
+
+
+.modal-header{
+  h3{
+     text-transform: lowercase;
+    &::first-letter {
+      text-transform: uppercase;
+    }
+  }
+}
+
+.hide-arrow{
+  .mat-mdc-select-arrow-wrapper{
+    display: none;
+  }
+}
+.mat-internal-form-field>label{
+  margin-top: 3px;
+}
+

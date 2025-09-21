@@ -88,7 +88,7 @@
           <div class="d-flex align-items-center gap-12">
             <!-- Currency Selector  -->
             <div class="left form-field">
-              <div class="select-option">
+              <div class="select-option hide-arrow">
               <mat-select value="£" formControlName="currency" class="sortby-edit-profile" hideSingleSelectionIndicator>
                 @for (country of countries; track country) {
                 @if(country.currencySymbol) {
@@ -331,7 +331,7 @@
               <div class="d-flex align-items-center gap-12">
                 <!-- Currency Selector  -->
                  <div class="left form-field">
-              <div class="select-option">
+              <div class="select-option hide-arrow">
                   <mat-select value="£" formControlName="commissionCurrency" class="sortby-edit-profile"
                     hideSingleSelectionIndicator>
                     @for (country of countries; track country) {

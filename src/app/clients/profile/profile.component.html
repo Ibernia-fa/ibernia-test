@@ -87,7 +87,7 @@
           <span class="f-s-20">Client’s cashflows:</span>
           <div class="d-flex align-items-center gap-32">
             <div class="d-flex align-items-center">
-              <span class="f-s-14">Sort by:</span>
+              <span class="f-s-14">Sorting order:</span>
               <mat-select (valueChange)="onSortByValueChange($event)" placeholder="Select" class="sortby-edit-profile">
                 @for (sortDescriptor of sortDescriptors; track sortDescriptor) {
                 <mat-option [value]="sortDescriptor.value">{{

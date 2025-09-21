@@ -24,7 +24,7 @@
           <div class="d-flex flex-column gap-12">
             <mat-label class="f-s-16 d-block" style="line-height: 18px">Net amount</mat-label>
             <div class="net-field d-flex align-items-center">
-              <div class="left">
+              <div class="left  hide-arrow">
                 <mat-select formControlName="currencySymbol" class="sortby-edit-profile" [disabled]="true" hideSingleSelectionIndicator>
                   @for (country of countries; track country) {
                     @if(country.currencySymbol) {
@@ -126,7 +126,7 @@
             </div>
           </div>
         </div>
-        @if(showStartEnd) {
+          @if(showStartEnd) {
           <div class="w-100 form-field gap-12">
             <div class="d-flex gap-8 align-items-center">
               <mat-label class="f-s-16 f-w-400 d-block">Escalation rate</mat-label>
@@ -194,7 +194,7 @@
           </div>
         }
 
-
+      
       </div>
     </mat-dialog-content>
 

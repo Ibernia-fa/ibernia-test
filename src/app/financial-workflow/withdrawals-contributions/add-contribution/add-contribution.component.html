@@ -32,7 +32,7 @@
             <mat-label class="f-s-16 d-block" style="line-height: 18px">Net amount</mat-label>
             <div class="net-field d-flex align-items-center">
               <!-- Currency Selector  -->
-              <div class="left">
+              <div class="left hide-arrow">
                 <mat-select formControlName="currencySymbol" class="sortby-edit-profile" hideSingleSelectionIndicator>
                   @for (country of countries; track country) {
                   @if(country.currencySymbol) {
@@ -219,11 +219,11 @@
                 </div>
               </div>
             </div>
-            <div class="d-flex gap-8 align-items-center">
+            <!-- <div class="d-flex gap-8 align-items-center">
               <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
               <mat-label class="f-s-16 f-w-400 d-block withdrawals-info-text">To show contributions are added, you may
                 also need to add a corresponding income.</mat-label>
-            </div>
+            </div> -->
           </div>
         </div>
 

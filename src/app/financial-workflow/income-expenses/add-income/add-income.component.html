@@ -32,7 +32,7 @@
             <mat-label class="f-s-16 d-block" style="line-height: 18px">Net amount</mat-label>
             <div class="net-field d-flex align-items-center">
               <!-- Currency Selector  -->
-              <div class="left">
+              <div class="left hide-arrow">
                 <mat-select formControlName="currencySymbol" class="sortby-edit-profile" hideSingleSelectionIndicator>
                   @for (country of countries; track country) {
                   @if(country.currencySymbol) {

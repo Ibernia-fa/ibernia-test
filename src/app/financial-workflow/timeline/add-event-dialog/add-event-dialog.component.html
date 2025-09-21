@@ -65,7 +65,7 @@
       <span class="f-s-16 f-w-400">Net amount</span>
       <div class="net-field d-flex align-items-center">
         <!-- Currency Selector  -->
-        <div class="left">
+        <div class="left hide-arrow">
           <mat-select value="£" formControlName="currency" class="sortby-edit-profile" hideSingleSelectionIndicator>
             @for (country of countries; track country) {
               @if(country.currencySymbol) {
@@ -185,7 +185,7 @@
       <span class="f-s-16 f-w-400">Net amount</span>
       <div class="net-field d-flex align-items-center">
         <!-- Currency Selector  -->
-        <div class="left">
+        <div class="left hide-arrow">
           <mat-select value="£" formControlName="currency" class="sortby-edit-profile" hideSingleSelectionIndicator>
             
             @for (country of countries; track country) {
@@ -433,7 +433,7 @@
                   }
                   <mat-option value="Custom">
                     <div class="d-flex align-items-center gap-8">
-                      <img src="/assets/images/svgs/state-pension-icon.svg" alt="custom-event" height="24" width="24" />
+                      <img src="/assets/images/svgs/custom-icon.svg" alt="custom-event" height="24" width="24" />
                       <span>
                         Custom
                       </span>
@@ -487,7 +487,7 @@
           <span class="f-s-16 f-w-400">Net amount</span>
           <div class="net-field d-flex align-items-center">
             <!-- Currency Selector  -->
-            <div class="left">
+            <div class="left hide-arrow">
               <mat-select value="£" formControlName="currency" class="sortby-edit-profile" hideSingleSelectionIndicator>
                 @for (country of countries; track country) {
                   @if(country.currencySymbol) {

@@ -109,3 +109,66 @@ html .topbar {
   background: #e3e4e4;
 }
 // End New Styles
+.header-profile-button{
+  height: 65px;
+  display: flex;
+  align-items: center;
+    .sub-menu{
+       position: absolute;
+        top: 65px;
+        right: 20px;
+        background-color: #fff;
+        border: 1px solid #e7e7eb;
+        border-top: 0px;
+        min-width: 220px;
+        list-style: none;
+        padding: 0px;
+        margin: 0px;
+        padding: 0px;
+        border-radius: 0px 0px 4px 4px;
+        display: none;
+
+        flex-direction: column;
+        li{
+          padding: 8px 12px;
+          border-radius: 4px;
+          min-height: 38px;
+          display: flex;
+          align-items: center;
+           gap: 8px;
+          flex: none;
+          cursor: pointer;
+          font-family: "Ubuntu", serif;
+          transition: all 0.3s  linear;
+          width: 100%;
+          background: #fff;
+          color: #787889 ;
+          font-size: 14px;
+          font-weight: 400;
+          line-height: normal;
+          span{
+            width: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+          &:hover{
+            background-color: #f7f7f7;
+            color:#516ce8;
+            border-color: #516ce8;
+            svg{
+              *{
+                stroke: #516ce8;
+              }
+            }
+          }
+        }
+        
+    }
+    &:hover{
+      .sub-menu{
+       display: flex;
+
+      }
+    }
+}
