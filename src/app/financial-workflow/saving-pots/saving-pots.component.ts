@@ -295,6 +295,7 @@ updateOrderNumbers() {
 
 
   updateEventClicked(event: ClientSaving) {
+    console.log('Saving Pot Data Received')
     console.log(event)
     const dialogRef = this.dialog.open(AddNewPotComponent, {
       width: '700px',

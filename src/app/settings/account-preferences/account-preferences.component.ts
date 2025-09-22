@@ -43,7 +43,8 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
   form = this.fb.nonNullable.group({
     userId: ['' as string],
     profilePhotoUrl: ['' as string],  // stays whatever backend returned
-    fullName: ['' as string],
+    firstName: ['' as string],
+    lastName: ['' as string],
     email: ['' as string],
     preferences: this.fb.nonNullable.group({
       inflationRate: [2.5 as number, [Validators.required, Validators.min(0), Validators.max(100)]],
@@ -67,7 +68,8 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
     this.user = this.auth.getUserProfile();
     this.form.patchValue({
       userId: this.user?.sub ?? '',
-      fullName: this.user?.name ?? '',
+      firstName: this.user?.firstName ?? '',
+      lastName: this.user?.lastName ?? '',
       email: this.user?.email ?? '',
     });
 
@@ -106,7 +108,8 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
           this.form.patchValue({
             userId: p.userId ?? this.user?.sub ?? '',
             profilePhotoUrl: p.profilePhotoUrl ?? '',
-            fullName: p.fullName ?? this.user?.name ?? '',
+            firstName: p.firstName ?? this.user?.firstName ?? '',
+            lastName: p.lastName ?? this.user?.lastName ?? '',
             email: p.email ?? this.user?.email ?? '',
             preferences: {
               inflationRate: p.preferences?.inflationRate ?? this.form.value.preferences?.inflationRate,
@@ -201,7 +204,8 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
       userId: this.user?.sub,
       // keep existing backend URL; do not use preview blob URL
       profilePhotoUrl: blankToNull(raw.profilePhotoUrl),
-      fullName: raw.fullName?.trim() || this.user?.name,
+      firstName: raw.firstName?.trim() || this.user?.firstName,
+      lastName: raw.lastName?.trim() || this.user?.lastName,
       email: raw.email?.trim() || this.user?.email,
       preferences: {
         inflationRate: round2(raw.preferences.inflationRate),

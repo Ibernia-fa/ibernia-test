@@ -18,7 +18,8 @@ export interface PreferencesDto {
 export interface UserProfileDto {
   userId?: string | null;
   profilePhotoUrl?: string | null;
-  fullName?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
   email?: string | null;
   preferences: PreferencesDto;
 }

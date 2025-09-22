@@ -615,7 +615,7 @@ onEscalationRateChange(event: MatSelectChange): void {
         iconUrl: this.savingsForm.get('name')?.value !== 'Custom'
           ? this.savingPotValues.find(
             (x) => this.savingsForm.get('name')?.value === x.name
-          )?.iconUrl ?? ''
+          )?.iconUrl ?? 'cashflow-moneys-icon'
           : 'custom-option-icon',
         start: {
           age:

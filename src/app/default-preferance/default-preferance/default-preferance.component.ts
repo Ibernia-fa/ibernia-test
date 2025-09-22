@@ -34,7 +34,8 @@ export class DefaultPreferanceComponent implements OnInit, OnDestroy {
   form = this.fb.nonNullable.group({
     userId: ['' as string],         
     profilePhotoUrl: ['' as string],
-    fullName: ['' as string],
+    firstName: ['' as string],
+    lastName: ['' as string],
     email: ['' as string],
     preferences: this.fb.nonNullable.group({
       inflationRate: [2.5 as number, [Validators.required, Validators.min(0), Validators.max(100)]],
@@ -121,7 +122,8 @@ ComissionType = ComissionType;
     const payload: UserProfileDto = {
       userId: this.user?.sub,
       profilePhotoUrl: blankToNull(raw.profilePhotoUrl),
-      fullName: this.user?.name,
+      firstName: this.user?.family_name,
+      lastName: this.user?.given_name,
       email: this.user?.email,
       preferences: {
         inflationRate: round2(raw.preferences.inflationRate),
