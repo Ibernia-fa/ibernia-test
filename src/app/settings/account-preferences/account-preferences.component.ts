@@ -247,6 +247,13 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
     this.destroy$.next();
     this.destroy$.complete();
   }
+
+  clearImage(event: Event): void {
+  event.stopPropagation(); // Prevents opening file dialog when clicking the cross
+  this.profileImagePreview = null;
+  this.form.get('profilePhotoUrl')?.setValue('');
+}
+
 }
 
 /* helpers */

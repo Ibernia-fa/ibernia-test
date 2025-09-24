@@ -22,11 +22,29 @@
         <div class="upload-avatar-wrapper">
           <label for="upload-avatar" class="cursor-pointer">
             <div class="text-center">
-      <img *ngIf="profileImagePreview; else placeholder"
+      <!-- <img *ngIf="profileImagePreview; else placeholder"
      [src]="profileImagePreview"
      alt="avatar"
      class="rounded"
-     style="width:120px;height:120px;object-fit:cover;">
+     style="width:120px;height:120px;object-fit:cover;"> -->
+     <div *ngIf="profileImagePreview; else placeholder" class="image-preview-wrapper position-relative">
+  <img
+    [src]="profileImagePreview"
+    alt="avatar"
+    class="rounded"
+    style="width:120px;height:120px;object-fit:cover;"
+  />
+  <button
+    type="button"
+    class="delete-btn"
+    (click)="clearImage($event)"
+    mat-icon-button
+    aria-label="Remove image"
+  >
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+
               <ng-template #placeholder>
                 <img class="m-b-10" src="../../../assets/images/shapes/small-icon.svg" alt="">
                 <p class="text-sm text-gray-500 f-s-14 m-b-10 m-0">
