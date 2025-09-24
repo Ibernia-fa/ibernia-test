@@ -145,22 +145,22 @@ if (matchedEscalation) {
   this.selectedEscalationDescription = matchedEscalation.description;
 } else if (
   this.selectedIncome.escalationRate &&
-  this.selectedIncome.escalationRate.description === 'Increase at custom rate'
+  this.selectedIncome.escalationRate.description === 'Increases at custom rate'
 ) {
   // Custom escalation
 this.escalationRates = this.escalationRates.filter(
-  x => x.description !== 'Increase at custom rate'
+  x => x.description !== 'Increases at custom rate'
 );
 
 // Then add the custom rate value to escalationRates
 this.escalationRates.push({
-  description: 'Increase at custom rate',
+  description: 'Increases at custom rate',
   value: this.selectedIncome.escalationRate.value
 });
 
   this.incomeForm.get('escalationRate')?.patchValue(this.selectedIncome.escalationRate.value);
   this.incomeForm.get('customEscalationRate')?.patchValue(this.selectedIncome.escalationRate.value);
-  this.selectedEscalationDescription = 'Increase at custom rate';
+  this.selectedEscalationDescription = 'Increases at custom rate';
 
   // Trigger validators for custom rate
   const customControl = this.incomeForm.get('customEscalationRate');
@@ -203,7 +203,7 @@ this.escalationRates.push({
       console.log('Form Submitted', this.incomeForm.value);
 
             const isCustomEscalation =
-        this.selectedEscalationDescription === 'Increase at custom rate';
+        this.selectedEscalationDescription === 'Increases at custom rate';
       const escalationRateValue = isCustomEscalation
         ? this.incomeForm.get('customEscalationRate')?.value
         : this.incomeForm.get('escalationRate')?.value;
@@ -309,7 +309,7 @@ escalationRate: escalationRateValue !== null && escalationRateValue !== ''
     
       // Find exact match by both value and description
       return this.escalationRates.some(e =>
-        e.value === selectedValue && e.description === 'Increase at custom rate'
+        e.value === selectedValue && e.description === 'Increases at custom rate'
       );
     }
     
@@ -330,7 +330,7 @@ escalationRate: escalationRateValue !== null && escalationRateValue !== ''
     
       const customControl = this.incomeForm.get('customEscalationRate');
     
-      if (description === 'Increase at custom rate') {
+      if (description === 'Increases at custom rate') {
         customControl?.setValidators([Validators.required, Validators.min(0)]);
       } else {
         customControl?.clearValidators();

@@ -238,23 +238,23 @@ export class AddNewPotComponent {
 //   this.selectedEscalationDescription = matchedEscalation.description;
 // } else if (
 //   this.selectedPot.comission.escalationRate &&
-//   this.selectedPot.comission.escalationRate.description === 'Increase at custom rate'
+//   this.selectedPot.comission.escalationRate.description === 'Increases at custom rate'
 // ) {
 //   // Custom escalation case
 //   this.escalationRates = this.escalationRates.filter(
-//   x => x.description !== 'Increase at custom rate'
+//   x => x.description !== 'Increases at custom rate'
 // );
 
 // // Then add the custom rate value to escalationRates
 // this.escalationRates.push({
-//   description: 'Increase at custom rate',
+//   description: 'Increases at custom rate',
 //   value: this.selectedPot?.comission?.escalationRate?.value
 // });
 //   this.savingsForm.get('escalationRate')?.patchValue(this.selectedPot.comission.escalationRate.value);
 //   this.savingsForm.get('customEscalationRate')?.patchValue(
 //     this.selectedPot.comission.escalationRate.value
 //   );
-//   this.selectedEscalationDescription = 'Increase at custom rate';
+//   this.selectedEscalationDescription = 'Increases at custom rate';
 
 //   // Set validators again
 //   const customControl = this.savingsForm.get('customEscalationRate');
@@ -324,16 +324,16 @@ export class AddNewPotComponent {
       this.selectedEscalationDescription = matchedEscalation.description;
     } else if (
       this.selectedPot.comission.escalationRate &&
-      this.selectedPot.comission.escalationRate.description === 'Increase at custom rate'
+      this.selectedPot.comission.escalationRate.description === 'Increases at custom rate'
     ) {
-      this.escalationRates = this.escalationRates.filter(x => x.description !== 'Increase at custom rate');
+      this.escalationRates = this.escalationRates.filter(x => x.description !== 'Increases at custom rate');
       this.escalationRates.push({
-        description: 'Increase at custom rate',
+        description: 'Increases at custom rate',
         value: this.selectedPot?.comission?.escalationRate?.value,
       });
       this.savingsForm.get('escalationRate')?.patchValue(this.selectedPot.comission.escalationRate.value, { emitEvent: false });
       this.savingsForm.get('customEscalationRate')?.patchValue(this.selectedPot.comission.escalationRate.value, { emitEvent: false });
-      this.selectedEscalationDescription = 'Increase at custom rate';
+      this.selectedEscalationDescription = 'Increases at custom rate';
 
       const customControl = this.savingsForm.get('customEscalationRate');
       customControl?.setValidators([Validators.required, Validators.min(0)]);
@@ -465,7 +465,7 @@ get isCustomEscalationSelected(): boolean {
 
   // Find exact match by both value and description
   return this.escalationRates.some(e =>
-    e.value === selectedValue && e.description === 'Increase at custom rate'
+    e.value === selectedValue && e.description === 'Increases at custom rate'
   );
 }
 
@@ -492,7 +492,7 @@ onEscalationRateChange(event: MatSelectChange): void {
 
   const customControl = this.savingsForm.get('customEscalationRate');
 
-  if (description === 'Increase at custom rate') {
+  if (description === 'Increases at custom rate') {
     customControl?.setValidators([Validators.required, Validators.min(0)]);
   } else {
     customControl?.clearValidators();
@@ -534,7 +534,7 @@ onEscalationRateChange(event: MatSelectChange): void {
   saveCashflow(): void {
     console.log(this.savingsForm);
     this.savingsForm.markAllAsTouched();
-    const isCustomEscalation = this.selectedEscalationDescription === 'Increase at custom rate';
+    const isCustomEscalation = this.selectedEscalationDescription === 'Increases at custom rate';
     const selectedEscalationRateValue = isCustomEscalation
       ? this.savingsForm.get('customEscalationRate')?.value
       : this.savingsForm.get('escalationRate')?.value;

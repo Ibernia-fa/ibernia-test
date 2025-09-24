@@ -287,7 +287,7 @@ export class AddContributionComponent {
 
     // contribution escalation
     const isCustomEscalation =
-      this.selectedEscalationDescription === 'Increase at custom rate';
+      this.selectedEscalationDescription === 'Increases at custom rate';
     const escalationRateValue = isCustomEscalation
       ? this.contributionForm.get('customEscalationRate')?.value
       : this.contributionForm.get('escalationRate')?.value;
@@ -429,7 +429,7 @@ export class AddContributionComponent {
     this.selectedEscalationDescription = description;
 
     const customControl = this.contributionForm.get('customEscalationRate');
-    if (description === 'Increase at custom rate') {
+    if (description === 'Increases at custom rate') {
       customControl?.setValidators([Validators.required, Validators.min(0)]);
     } else {
       customControl?.clearValidators();

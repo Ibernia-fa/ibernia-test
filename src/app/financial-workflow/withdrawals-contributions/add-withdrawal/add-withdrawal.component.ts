@@ -204,7 +204,7 @@ export class AddWithdrawalComponent {
 
       console.log('Form Submitted', this.withdrawalForm.value);
                   const isCustomEscalation =
-        this.selectedEscalationDescription === 'Increase at custom rate';
+        this.selectedEscalationDescription === 'Increases at custom rate';
       const escalationRateValue = isCustomEscalation
         ? this.withdrawalForm.get('customEscalationRate')?.value
         : this.withdrawalForm.get('escalationRate')?.value;
@@ -352,7 +352,7 @@ export class AddWithdrawalComponent {
         
           const customControl = this.withdrawalForm.get('customEscalationRate');
         
-          if (description === 'Increase at custom rate') {
+          if (description === 'Increases at custom rate') {
             customControl?.setValidators([Validators.required, Validators.min(0)]);
           } else {
             customControl?.clearValidators();

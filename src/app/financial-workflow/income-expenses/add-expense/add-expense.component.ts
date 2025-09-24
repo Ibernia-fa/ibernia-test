@@ -145,22 +145,22 @@ if (matchedEscalation) {
   this.selectedEscalationDescription = matchedEscalation.description;
 } else if (
   this.selectedExpense.escalationRate &&
-  this.selectedExpense.escalationRate.description === 'Increase at custom rate'
+  this.selectedExpense.escalationRate.description === 'Increases at custom rate'
 ) {
   // Custom escalation
     this.escalationRates = this.escalationRates.filter(
-    x => x.description !== 'Increase at custom rate'
+    x => x.description !== 'Increases at custom rate'
   );
 
   // Then add the custom rate value to escalationRates
   this.escalationRates.push({
-    description: 'Increase at custom rate',
+    description: 'Increases at custom rate',
     value: this.selectedExpense.escalationRate.value
   });
 
   this.expenseForm.get('escalationRate')?.patchValue(this.selectedExpense.escalationRate.value);
   this.expenseForm.get('customEscalationRate')?.patchValue(this.selectedExpense.escalationRate.value);
-  this.selectedEscalationDescription = 'Increase at custom rate';
+  this.selectedEscalationDescription = 'Increases at custom rate';
   
   // Trigger validators for custom rate
   const customControl = this.expenseForm.get('customEscalationRate');
@@ -203,7 +203,7 @@ if (matchedEscalation) {
     if (this.expenseForm.valid) {
       console.log('Form Submitted', this.expenseForm.value);
       const isCustomEscalation =
-        this.selectedEscalationDescription === 'Increase at custom rate';
+        this.selectedEscalationDescription === 'Increases at custom rate';
       const escalationRateValue = isCustomEscalation
         ? this.expenseForm.get('customEscalationRate')?.value
         : this.expenseForm.get('escalationRate')?.value;
@@ -297,7 +297,7 @@ if (matchedEscalation) {
   
     // Find exact match by both value and description
     return this.escalationRates.some(e =>
-      e.value === selectedValue && e.description === 'Increase at custom rate'
+      e.value === selectedValue && e.description === 'Increases at custom rate'
     );
   }
   
@@ -318,7 +318,7 @@ if (matchedEscalation) {
   
     const customControl = this.expenseForm.get('customEscalationRate');
   
-    if (description === 'Increase at custom rate') {
+    if (description === 'Increases at custom rate') {
       customControl?.setValidators([Validators.required, Validators.min(0)]);
     } else {
       customControl?.clearValidators();

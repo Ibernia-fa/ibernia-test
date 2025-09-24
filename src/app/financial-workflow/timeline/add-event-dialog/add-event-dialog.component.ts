@@ -252,18 +252,18 @@ this.eventForm.updateValueAndValidity({ emitEvent: false });
   private handleEscalationRatePatch(description: string| any, value: number| any) {
   // this.eventForm.controls['escalationRate'].patchValue(description);
 
-  if (description === 'Increase at custom rate') {
+  if (description === 'Increases at custom rate') {
         this.escalationRates = this.escalationRates.filter(
-      (x) => x.description !== 'Increase at custom rate'
+      (x) => x.description !== 'Increases at custom rate'
     );
 
     // Add the current custom rate to the dropdown
     this.escalationRates.push({
-      description: 'Increase at custom rate',
+      description: 'Increases at custom rate',
       value: value
     });
     this.eventForm.controls['escalationRate'].patchValue(value);
-    this.selectedEscalationDescription = 'Increase at custom rate';
+    this.selectedEscalationDescription = 'Increases at custom rate';
 
     // Configure the custom field
     const customControl = this.eventForm.get('customEscalationRate');
@@ -328,7 +328,7 @@ this.eventForm.updateValueAndValidity({ emitEvent: false });
   onPensionEventSubmit() {
     this.eventForm.markAllAsTouched();
     if (this.eventForm.valid && this.systemEvent) {
-      const isCustomEscalation = this.selectedEscalationDescription === 'Increase at custom rate';
+      const isCustomEscalation = this.selectedEscalationDescription === 'Increases at custom rate';
 const selectedEscalationRateValue = isCustomEscalation
   ? this.eventForm.get('customEscalationRate')?.value
   : this.eventForm.get('escalationRate')?.value;
@@ -356,7 +356,7 @@ const selectedEscalationRateValue = isCustomEscalation
         escalationRate: selectedEscalationRateValue !== null && selectedEscalationRateValue !== ''
           ? this.escalationRates.find(x => x.value === selectedEscalationRateValue) ?? {
               value: selectedEscalationRateValue,
-              description: isCustomEscalation ? 'Increase at custom rate' : selectedEscalationRateValue
+              description: isCustomEscalation ? 'Increases at custom rate' : selectedEscalationRateValue
             }
           : {
               value: 0,
@@ -434,7 +434,7 @@ const selectedEscalationRateValue = isCustomEscalation
     console.log(this.eventForm.value);
     this.eventForm.markAllAsTouched();
     if (this.eventForm.valid) {
-      const isCustomEscalation = this.selectedEscalationDescription === 'Increase at custom rate';
+      const isCustomEscalation = this.selectedEscalationDescription === 'Increases at custom rate';
 const selectedEscalationRateValue = isCustomEscalation
   ? this.eventForm.get('customEscalationRate')?.value
   : this.eventForm.get('escalationRate')?.value;
@@ -465,7 +465,7 @@ const selectedEscalationRateValue = isCustomEscalation
 escalationRate: selectedEscalationRateValue !== null && selectedEscalationRateValue !== ''
   ? this.escalationRates.find(x => x.value === selectedEscalationRateValue) ?? {
       value: selectedEscalationRateValue,
-      description: isCustomEscalation ? 'Increase at custom rate' : selectedEscalationRateValue
+      description: isCustomEscalation ? 'Increases at custom rate' : selectedEscalationRateValue
     }
   : {
       value: 0,
@@ -521,7 +521,7 @@ escalationRate: selectedEscalationRateValue !== null && selectedEscalationRateVa
     
       // Find exact match by both value and description
       return this.escalationRates.some(e =>
-        e.value === selectedValue && e.description === 'Increase at custom rate'
+        e.value === selectedValue && e.description === 'Increases at custom rate'
       );
     }
     
@@ -542,7 +542,7 @@ escalationRate: selectedEscalationRateValue !== null && selectedEscalationRateVa
     
       const customControl = this.eventForm.get('customEscalationRate');
     
-      if (description === 'Increase at custom rate') {
+      if (description === 'Increases at custom rate') {
         customControl?.setValidators([Validators.required, Validators.min(0)]);
       } else {
         customControl?.clearValidators();
