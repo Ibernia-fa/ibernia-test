@@ -21,7 +21,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectChange, MatSelectModule } from '@angular/material/select';
-import { MatSliderModule } from '@angular/material/slider';
+import { MatSliderChange, MatSliderModule } from '@angular/material/slider';
 import { allCountries } from 'src/app/clients/models/country';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import {
@@ -872,9 +872,19 @@ onEscalationRateChange(event: MatSelectChange): void {
   this.savingsForm.get('returnRate')?.setValue(isNaN(num) ? 0 : num, { emitEvent: true });
 }
 
-onSliderChange(val: number) {
-  // coerce to number and push into the form control
-  const num = Number(val);
-  this.savingsForm.get('returnRate')?.setValue(isNaN(num) ? 0 : num, { emitEvent: true });
+// onSliderChange(val: number) {
+//   // coerce to number and push into the form control
+//   const num = Number(val);
+//   this.savingsForm.get('returnRate')?.setValue(isNaN(num) ? 0 : num, { emitEvent: true });
+// }
+
+onSliderInput(event: Event): void {
+  const inputElement = event.target as HTMLInputElement;
+  const value = Number(inputElement.value);
+
+  this.savingsForm.get('returnRate')?.setValue(isNaN(value) ? 0 : value, {
+    emitEvent: true,
+  });
 }
+
 }
