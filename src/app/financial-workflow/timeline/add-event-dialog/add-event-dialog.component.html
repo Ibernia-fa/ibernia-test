@@ -84,7 +84,7 @@
         </div>
         <!-- End Price Field  -->
         <!-- End Type Field  -->
-        <div class="right">
+        <div class="right hide-arrow">
           <mat-select value="Select" [disabled]="systemEvent?.isOneOff === true" formControlName="cycle"
             class="sortby-edit-profile" hideSingleSelectionIndicator>
             <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
@@ -506,7 +506,7 @@
             </div>
             <!-- End Price Field  -->
             <!-- End Type Field  -->
-            <div class="right hide-arrow">
+            <div class="right ">
               <mat-select (valueChange)="onCycleValueChange($event)" value="Select" formControlName="cycle" class="sortby-edit-profile"
                 hideSingleSelectionIndicator>
                 <!-- <mat-icon matPrefix>expand_more</mat-icon> -->

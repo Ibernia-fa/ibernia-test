@@ -20,7 +20,7 @@
       <div class="d-flex align-items-start gap-24">
         <!-- Upload Avatar -->
         <div class="upload-avatar-wrapper">
-          <span class="remove-pic"><img  src="../../../assets/images/shapes/delete.svg" alt=""></span>
+        
           <label for="upload-avatar" class="cursor-pointer">
             <div class="text-center">
       <!-- <img *ngIf="profileImagePreview; else placeholder"
@@ -35,15 +35,9 @@
     class="rounded"
     style="width:120px;height:120px;object-fit:cover;"
   />
-  <button
-    type="button"
-    class="delete-btn"
-    (click)="clearImage($event)"
-    mat-icon-button
-    aria-label="Remove image"
-  >
-    <mat-icon>close</mat-icon>
-  </button>
+
+    <span class="remove-pic" (click)="clearImage($event)"><img  src="../../../assets/images/shapes/delete.svg" alt=""></span>
+
 </div>
 
               <ng-template #placeholder>
@@ -91,7 +85,7 @@
 
   <mat-card class="cardWithShadow mb-20">
     <mat-card-content>
-      <h3 class="f-s-20 f-w-400 m-b-30">Default Preferences</h3>
+      <h3 class="f-s-20 f-w-400 m-b-30">Default preferences</h3>
 
       <div  formGroupName="preferences">
         <div class="row">
