@@ -10,7 +10,7 @@
   <div class="d-flex flex-column gap-32">
     <!-- Modal Header  -->
     <div class="d-flex align-items-center justify-content-between gap-10 modal-header">
-      <h3>{{isEditWorkflow ? 'Edit' : 'Add'}} a savings pot, investment or pension</h3>
+      <h3>{{isEditWorkflow ? 'Edit' : 'Add'}}  savings pot, investment or pension</h3>
       <button (click)="closeDialog()" type="button">
         <img src="assets/images/svgs/close-line-cion.svg" alt="close-line-cion" />
       </button>
@@ -23,7 +23,7 @@
         <!-- Name Field  -->
         <div class="w-100 form-field gap-12">
           <mat-label class="f-s-16 d-block" style="line-height: 18px">Type</mat-label>
-          <div class="select-option">
+          <div class="select-option hide-arrow">
      <mat-select
   formControlName="name"
   placeholder="Select"
@@ -146,7 +146,7 @@
             <div class="percentage-field">
               <div class="w-100 form-field ">
                 <!-- <mat-form-field  appearance="outline" class="w-full w-100 percentage-icon">
-                          <span matSuffix>%&nbsp;</span> 
+                          <span matSuffix>%</span> 
                           <input
                                 matInput
                                 formControlName="returnRate"
@@ -165,7 +165,7 @@
                  
 
                       <mat-form-field  appearance="outline" class="w-full w-100 percentage-icon">
-                          <span matSuffix>%&nbsp;</span> 
+                          <span matSuffix>%</span> 
                        <input
     matInput
     type="number"
@@ -421,7 +421,7 @@
             <mat-label class="f-s-16 d-block">Custom escalation rate</mat-label>
 
          <mat-form-field  appearance="outline" class="w-full w-100 percentage-icon">
-              <span matSuffix>%&nbsp;</span> 
+              <span matSuffix>%</span> 
                 <input
                               matInput
                               class="p-0"
@@ -479,7 +479,7 @@
                   <!-- <mat-form-field class="w-100 form-field commision-percentage" appearance="outline"> -->
                    
                            <mat-form-field  appearance="outline" class="w-full w-100 percentage-icon">
-                          <span matSuffix>%&nbsp;</span> 
+                          <span matSuffix>%</span> 
                             <input
                                           matInput formControlName="commissionPercentage"
                                         />

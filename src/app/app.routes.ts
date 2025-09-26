@@ -19,13 +19,13 @@ export const routes: Routes = [
         path: 'clients',
         loadChildren: () =>
           import('./clients/clients.routes').then((m) => m.ClientsRoutes),
-        canActivate: [AuthGuard]
+    //    canActivate: [AuthGuard]
       },
       {
         path: 'cashflows',
         loadChildren: () =>
           import('./financial-workflow/financial-workflow.routes').then((m) => m.FinancialWorkflowRoutes),
-        canActivate: [AuthGuard]
+       // canActivate: [AuthGuard]
       },
       {
         path: 'settings',
@@ -38,7 +38,7 @@ export const routes: Routes = [
           import('./default-preferance/default-preferance.module').then(m => m.DefaultPreferanceModule)
       }
     ],
-    canActivate: [AuthGuard]
+  //  canActivate: [AuthGuard]
   },
   {
     path: '',

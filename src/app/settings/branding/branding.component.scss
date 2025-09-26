@@ -8,6 +8,10 @@
 }
 .logo-update-wrapper{
     position: relative;
+    width: 200px;
+    img{
+        max-width: 100%;
+    }
     .delete-icon{
         height: 28px;
         width: 28px;
@@ -20,8 +24,10 @@
         align-items: center;
         justify-content: center;
         cursor: pointer;
+        background-color: #fff;
         &:hover{
-            background-color:#E7E7EB ;
+             background-color: #ffb4b4;
+        border-color: #ffb4b4;
         }
     }
 }

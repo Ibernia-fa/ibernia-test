@@ -45,12 +45,12 @@
       <div class="row">
         <div class="col-6">
           <button class="button-icon w-100" [class]="{ active: isIncomeEvent }">
-            <span class="uppercase" [class]="{ active: isIncomeEvent }">Income</span>
+            <span  [class]="{ active: isIncomeEvent }">Income</span>
           </button>
         </div>
         <div class="col-6">
           <button class="button-icon w-100" [class]="{ active: !isIncomeEvent }">
-            <span class="uppercase" [class]="{ active: !isIncomeEvent }">Expense</span>
+            <span  [class]="{ active: !isIncomeEvent }">Expense</span>
           </button>
         </div>
       </div>
@@ -167,12 +167,12 @@
         <div class="row">
           <div class="col-6">
             <button class="button-icon w-100" [class]="{ active: isIncomeEvent }">
-              <span class="uppercase" [class]="{ active: isIncomeEvent }">Income</span>
+              <span  [class]="{ active: isIncomeEvent }">Income</span>
             </button>
           </div>
           <div class="col-6">
             <button class="button-icon w-100" [class]="{ active: !isIncomeEvent }">
-              <span class="uppercase" [class]="{ active: !isIncomeEvent }">Expense</span>
+              <span  [class]="{ active: !isIncomeEvent }">Expense</span>
             </button>
           </div>
         </div>
@@ -344,7 +344,7 @@
             <mat-label class="f-s-16 d-block">Custom Escalation Rate</mat-label>
 
 <mat-form-field  appearance="outline" class="w-full w-100 percentage-icon">
-  <span matSuffix>%&nbsp;</span> 
+  <span matSuffix>%</span> 
      <input
                 matInput
                 type="number"
@@ -468,13 +468,13 @@
               <div class="col-6">
                 <button (click)="onIncomeControlClicked(true)" class="button-icon w-100"
                   [class]="{ active: isIncomeEvent }">
-                  <span class="uppercase" [class]="{ active: isIncomeEvent }">Income</span>
+                  <span  [class]="{ active: isIncomeEvent }">Income</span>
                 </button>
               </div>
               <div class="col-6">
                 <button (click)="onIncomeControlClicked(false)" class="button-icon w-100"
                   [class]="{ active: !isIncomeEvent }">
-                  <span class="uppercase" [class]="{ active: !isIncomeEvent }">Expense</span>
+                  <span  [class]="{ active: !isIncomeEvent }">Expense</span>
                 </button>
               </div>
             </div>
@@ -484,7 +484,7 @@
 
         <!-- Net Amount Field  -->
         <div class="d-flex flex-column gap-8 net-fields">
-          <span class="f-s-16 f-w-400">Net amount</span>
+          <span class="f-s-16 f-w-400">Net amount aa</span>
           <div class="net-field d-flex align-items-center">
             <!-- Currency Selector  -->
             <div class="left hide-arrow">
@@ -506,7 +506,7 @@
             </div>
             <!-- End Price Field  -->
             <!-- End Type Field  -->
-            <div class="right">
+            <div class="right hide-arrow">
               <mat-select (valueChange)="onCycleValueChange($event)" value="Select" formControlName="cycle" class="sortby-edit-profile"
                 hideSingleSelectionIndicator>
                 <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
@@ -626,7 +626,7 @@
           <div class="w-100 d-flex flex-column    gap-8">
             <mat-label class="f-s-16 d-block">Custom escalation rate</mat-label>
             <mat-form-field  appearance="outline" class="w-full w-100 percentage-icon">
-              <span matSuffix>%&nbsp;</span> 
+              <span matSuffix>%</span> 
                 <input
                               matInput
                               type="number"

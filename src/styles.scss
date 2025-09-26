@@ -1,7 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
 
 html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+body { margin: 0;  }
 /* Global tooltip width & wrapping */
 .cdk-overlay-container .mat-mdc-tooltip-surface {
     max-width: 400px !important;
@@ -99,19 +99,21 @@ table {
     
   }
   .mat-mdc-form-field-icon-suffix {
-    padding: 0 0 0 3px;
+     padding: 0 0 0 0px;
     background: gray;
     height: 20px;
-    width: 20px;
+    width: 21px;
     align-items: center;
     justify-content: center;
     position: absolute;
-    line-height: normal;
+    line-height: 11px;
     border-radius: 4px;
     color: white;
     font-size: 16px;
-      right: 16px;
+    right: 16px;
     top: 15px;
+    text-align: center;
+    display: flex;
 }
 }
 .field-error,
@@ -153,4 +155,33 @@ button {
 .mat-internal-form-field>label{
   margin-top: 3px;
 }
+.apexcharts-text,
+.apexcharts-legend-text,
+.apexcharts-text tspan{
+  font-size: 14px !important;
+  font-family: 'Ubuntu' !important;
+      font-weight: 600 !important;
+}
+.apexcharts-text tspan{
+font-weight: 400 !important;
+}
 
+
+/* Hide all minor labels first */
+.vis-panel .vis-time-axis .vis-text.vis-minor {
+  display: none;
+}
+
+/* Show every 5th minor label */
+.vis-panel .vis-time-axis .vis-text.vis-minor:nth-of-type(5n),
+.vis-panel .vis-time-axis .vis-text.vis-minor:first-of-type,
+.vis-panel .vis-time-axis .vis-text.vis-minor:last-of-type {
+  display: block;
+}
+
+/* Style age (<p>) and year (<span>) */
+.vis-panel .vis-time-axis .vis-text.vis-minor p,
+.vis-panel .vis-time-axis .vis-text.vis-minor span {
+  font-size: 14px;   /* adjust as you like */
+  font-weight: bold;
+}
