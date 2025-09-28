@@ -146,8 +146,13 @@ export class AddWithdrawalComponent {
         ?.patchValue(this.selectedWithdrawal.start.year);
       this.withdrawalForm.get('end')?.patchValue(this.selectedWithdrawal.end.year);
       // console.log(this.sele)
-      this.withdrawalForm.get('savingPot')?.patchValue(this.selectedWithdrawal.associatedSavingPotId);
-            const hasComm = !!this.selectedWithdrawal?.comission;
+      // this.withdrawalForm.get('savingPot')?.patchValue(this.selectedWithdrawal.associatedSavingPotId);
+ 
+ const savedId = this.selectedWithdrawal.associatedSavingPotId;
+const stillExists = this.savingPots.clientSavings.some(s => s.id === savedId);
+this.withdrawalForm.get('savingPot')?.patchValue(stillExists ? savedId : null);
+
+      const hasComm = !!this.selectedWithdrawal?.comission;
       this.withdrawalForm.get('commissions')?.patchValue(hasComm);
       const pct =
         this.selectedWithdrawal?.comission?.percentage?.amount ?? 0;
@@ -155,6 +160,11 @@ export class AddWithdrawalComponent {
       this.onCommissionsToggled(hasComm);
       
     }
+    // hide locked pots AND the "Cash" pot from the dropdown
+this.savingPots.clientSavings = (this.savingPots.clientSavings || [])
+  .filter(s => !s.hasPotLocked)
+  .filter(s => (s.name ?? '').toLowerCase() !== 'cash');
+
   }
 
     onCommissionsToggled(enabled: boolean) {
@@ -200,6 +210,11 @@ export class AddWithdrawalComponent {
       currencySymbol: '',
       cycle: emptyCycle,
     };
+
+    // ensure the selected pot is one of the allowed (non-Cash) options
+const selectedPotId = this.withdrawalForm.get('savingPot')?.value ?? '';
+const validPotId = this.savingPots.clientSavings.some(s => s.id === selectedPotId) ? selectedPotId : '';
+
     const neutralCommissionEscRate: EscalationRate = { description: '', value: '0' };
 
       console.log('Form Submitted', this.withdrawalForm.value);
@@ -213,7 +228,8 @@ export class AddWithdrawalComponent {
       );
       var withdrawal: FundsViewModel = {
         id: this.isEditWorkflow ? this.selectedWithdrawal.id : null,
-        associatedSavingPotId: this.withdrawalForm.get('savingPot')?.value ?? '',
+        // associatedSavingPotId: this.withdrawalForm.get('savingPot')?.value ?? '',
+          associatedSavingPotId: validPotId,
         description: this.withdrawalForm.get('description')?.value,
         amount: {
           amount: this.withdrawalForm.get('amount')?.value,
