@@ -114,6 +114,7 @@ ComissionType = ComissionType;
     this.submitted = true;
     if (this.form.invalid) {
       this.form.markAllAsTouched();
+      this.form.markAsDirty();
       this.snack.open('Please fix the highlighted fields.', 'Close', { duration: 3000 });
       return;
     }

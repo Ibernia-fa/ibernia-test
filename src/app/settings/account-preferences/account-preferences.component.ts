@@ -39,7 +39,7 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
   // local-only preview (no upload)
   profileImagePreview: string | null = null;
   private objectUrlToRevoke: string | null = null;
-
+// profileImagePreview: string | null = null;
   form = this.fb.nonNullable.group({
     userId: ['' as string],
     profilePhotoUrl: ['' as string],  // stays whatever backend returned
@@ -56,6 +56,7 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
       country: ['' as string],
     }),
   });
+  userprofile: UserProfileDto;
 
   constructor(
     private fb: FormBuilder,
@@ -104,6 +105,7 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
           return;
         }
         if (res.ok && res.body) {
+          this.userprofile = res.body;
           const p = res.body;
           this.form.patchValue({
             userId: p.userId ?? this.user?.sub ?? '',
@@ -123,9 +125,11 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
           });
 
           // show backend avatar if present (local preview only)
-          if (p.profilePhotoUrl) {
-            this.profileImagePreview = p.profilePhotoUrl;
-          }
+          // if (p.profilePhotoUrl) {
+          //   this.profileImagePreview = p.profilePhotoUrl;
+          // }
+
+          this.profileImagePreview = ensureDataUrl(p.profilePhotoUrl);
 
           // re-apply validators in case type changed
           this.applyComissionValidation(this.form.controls.preferences.controls.comissionType.value);
@@ -172,24 +176,47 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
   }
 
   // local preview only (no upload)
-  onFileSelected(evt: Event) {
-    const input = evt.target as HTMLInputElement;
-    const file = input?.files?.[0];
-    if (!file) return;
+  // onFileSelected(evt: Event) {
+  //   const input = evt.target as HTMLInputElement;
+  //   const file = input?.files?.[0];
+  //   if (!file) return;
 
-    // revoke previous preview URL (if any)
-    if (this.objectUrlToRevoke) {
-      URL.revokeObjectURL(this.objectUrlToRevoke);
-      this.objectUrlToRevoke = null;
-    }
+  //   // revoke previous preview URL (if any)
+  //   if (this.objectUrlToRevoke) {
+  //     URL.revokeObjectURL(this.objectUrlToRevoke);
+  //     this.objectUrlToRevoke = null;
+  //   }
 
-    const url = URL.createObjectURL(file);
-    this.profileImagePreview = url;
-    this.objectUrlToRevoke = url;
+  //   const url = URL.createObjectURL(file);
+  //   this.profileImagePreview = url;
+  //   this.objectUrlToRevoke = url;
 
-    // NOTE: we're NOT setting profilePhotoUrl here since there's no upload yet.
-    // The payload will keep whatever URL came from backend (if any).
+  //   // NOTE: we're NOT setting profilePhotoUrl here since there's no upload yet.
+  //   // The payload will keep whatever URL came from backend (if any).
+  // }
+
+  // local preview + store base64 in form control
+async onFileSelected(evt: Event) {
+  const input = evt.target as HTMLInputElement;
+  const file = input?.files?.[0];
+  if (!file) return;
+
+  try {
+    const dataUrl = await fileToDataUrl(file); // "data:image/png;base64,...."
+    // preview uses the same string
+    this.profileImagePreview = dataUrl;
+
+    // store in the form so it goes to backend
+    this.form.get('profilePhotoUrl')?.setValue(dataUrl);
+  } catch (e) {
+    console.error('Failed to read image', e);
+    this.snack.open('Could not read the selected image.', 'Close', { duration: 3000 });
+  } finally {
+    // allow selecting same file again later
+    input.value = '';
   }
+}
+
 
   submit() {
     this.submitted = true;
@@ -201,9 +228,11 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
 
     const raw = this.form.getRawValue();
     const payload: UserProfileDto = {
+      id: this.userprofile.id,
       userId: this.user?.sub,
       // keep existing backend URL; do not use preview blob URL
-      profilePhotoUrl: blankToNull(raw.profilePhotoUrl),
+      // profilePhotoUrl: blankToNull(raw.profilePhotoUrl),
+      profilePhotoUrl: raw.profilePhotoUrl, // <-- keep as-is (may be base64 or null)
       firstName: raw.firstName?.trim() || this.user?.firstName,
       lastName: raw.lastName?.trim() || this.user?.lastName,
       email: raw.email?.trim() || this.user?.email,
@@ -236,6 +265,7 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
         finalize(() => (this.isSaving = false))
       )
       .subscribe(() => {
+        this.isSaving = false;
         this.snack.open('Preferences saved.', undefined, { duration: 2000 });
       });
   }
@@ -269,4 +299,17 @@ function blankToNull(s?: string | null): string | null {
 function intOrNull(n: number | null): number | null {
   if (n == null || Number.isNaN(+n)) return null;
   return Math.trunc(n);
+}
+function ensureDataUrl(s?: string | null): string | null {
+  if (!s) return null;
+  // If it's already a data URL, keep it; otherwise assume JPEG and prefix.
+  return s.startsWith('data:') ? s : `data:image/jpeg;base64,${s}`;
+}
+function fileToDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error('File read error'));
+    reader.onload = () => resolve(reader.result as string);
+    reader.readAsDataURL(file);
+  });
 }

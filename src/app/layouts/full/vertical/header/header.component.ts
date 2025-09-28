@@ -21,8 +21,10 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { AuthService } from 'src/app/auth/services/auth.service';
-import { SettingsService } from 'src/app/default-preferance/services/default-preferance.http.service';
+import { SettingsService, UserProfileDto } from 'src/app/default-preferance/services/default-preferance.http.service';
 import { User } from 'oidc-client';
+import { HttpResponse } from '@angular/common/http';
+import { takeUntil, catchError, of, finalize, ObservableInput, Subject } from 'rxjs';
 
 interface notifications {
   id: number;
@@ -110,6 +112,11 @@ export class HeaderComponent {
 
   @Output() optionsChange = new EventEmitter<AppSettings>();
   user: any;
+  profileImagePreview: any;
+  userprofile: any;
+  isLoading: boolean;
+  // private destroy$ = new Subject<void>();
+
 
   constructor(
     private settings: CoreService,
@@ -118,11 +125,56 @@ export class HeaderComponent {
     private translate: TranslateService,
     private Authservice: AuthService,
     private settingsService: SettingsService,
+    
   ) {
     translate.setDefaultLang('en');
     this.user = this.Authservice.getUserProfile();
     console.log('user', this.user);
+    this.loadProfile();
+
   }
+
+// Prefer saved profile names; fallback to OIDC claims; otherwise blank
+get displayFirstName(): string {
+  return (this.userprofile?.firstName ?? '').trim() || (this.user?.given_name ?? '');
+}
+
+get displayLastName(): string {
+  return (this.userprofile?.lastName ?? '').trim() || (this.user?.family_name ?? '');
+}
+
+
+    private loadProfile() {
+      if (!this.user?.sub) return;
+      this.isLoading = true;
+  
+      this.settingsService.getUserProfileResponse(this.user.sub)
+        .pipe(
+          // takeUntil(this.destroy$),
+          catchError((err) => {
+            console.error('getUserProfile failed', err);
+            return of(new HttpResponse<UserProfileDto | null>({ status: 500 }));
+          }),
+          finalize(() => (this.isLoading = false))
+        )
+        .subscribe((res: HttpResponse<UserProfileDto | null>) => {
+          if (res.status === 204) {
+            // nothing saved yet; keep defaults
+            return;
+          }
+          if (res.ok && res.body) {
+            this.userprofile = res.body;
+            const p = res.body;
+  
+            // show backend avatar if present (local preview only)
+            if (p.profilePhotoUrl) {
+              this.profileImagePreview = p.profilePhotoUrl;
+            }
+  
+            // re-apply validators in case type changed
+          }
+        });
+    }
 
       logout() {
         this.Authservice.logout();

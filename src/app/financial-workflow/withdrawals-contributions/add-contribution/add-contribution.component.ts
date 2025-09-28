@@ -229,42 +229,42 @@ export class AddContributionComponent {
   }
 
   // 🔽 Core filtering logic
-  // private applySavingPotFilter(): void {
-  //   const type = Number(this.contributionForm.get('contributionType')?.value ?? 1);
-  //   const all = this.allClientSavings;
-
-  //   if (type === 1) {
-  //     // Cash: only show “Cash”, auto-select it
-  //     this.clientSavings = this.cashPot ? [this.cashPot] : [];
-  //     if (this.cashPot) {
-  //       this.contributionForm.get('savingPot')?.setValue(this.cashPot.id);
-  //     } else {
-  //       this.contributionForm.get('savingPot')?.setValue(null);
-  //     }
-  //   } else {
-  //     // External: hide “Cash”, leave current selection if valid
-  //     this.clientSavings = all.filter(
-  //       (s) => (s.name ?? '').toLowerCase() !== 'cash'
-  //     );
-  //     const currentId = this.contributionForm.get('savingPot')?.value;
-  //     if (this.cashPot && currentId === this.cashPot.id) {
-  //       // selected cash but now external -> clear
-  //       this.contributionForm.get('savingPot')?.setValue(null);
-  //     }
-  //   }
-  // }
-
   private applySavingPotFilter(): void {
-  // Show everything, no filtering based on type
-  const all = this.allClientSavings ?? [];
-  this.clientSavings = [...all];
+    const type = Number(this.contributionForm.get('contributionType')?.value ?? 1);
+    const all = this.allClientSavings;
 
-  // Keep current selection if it still exists; otherwise clear it
-  const currentId = this.contributionForm.get('savingPot')?.value;
-  if (currentId && !all.some(s => s.id === currentId)) {
-    this.contributionForm.get('savingPot')?.setValue(null);
+    if (type === 1) {
+      // Cash: only show “Cash”, auto-select it
+      this.clientSavings = this.cashPot ? [this.cashPot] : [];
+      if (this.cashPot) {
+        this.contributionForm.get('savingPot')?.setValue(this.cashPot.id);
+      } else {
+        this.contributionForm.get('savingPot')?.setValue(null);
+      }
+    } else {
+      // External: hide “Cash”, leave current selection if valid
+      this.clientSavings = all.filter(
+        (s) => (s.name ?? '').toLowerCase() !== 'cash'
+      );
+      const currentId = this.contributionForm.get('savingPot')?.value;
+      if (this.cashPot && currentId === this.cashPot.id) {
+        // selected cash but now external -> clear
+        this.contributionForm.get('savingPot')?.setValue(null);
+      }
+    }
   }
-}
+
+//   private applySavingPotFilter(): void {
+//   // Show everything, no filtering based on type
+//   const all = this.allClientSavings ?? [];
+//   this.clientSavings = [...all];
+
+//   // Keep current selection if it still exists; otherwise clear it
+//   const currentId = this.contributionForm.get('savingPot')?.value;
+//   if (currentId && !all.some(s => s.id === currentId)) {
+//     this.contributionForm.get('savingPot')?.setValue(null);
+//   }
+// }
 
   addIncome(): void {
     if (!this.contributionForm.valid) {

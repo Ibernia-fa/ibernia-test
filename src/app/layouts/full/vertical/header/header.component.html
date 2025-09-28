@@ -214,15 +214,18 @@
       >
         <!-- <button mat-icon-button> profile-dd -->
         <div class="position-relative">
-          <img
-            src="/assets/images/profile/user-1.jpg"
-            class="rounded-circle object-cover icon-35"
-            width="35"
-          />
+     <img
+  [src]="profileImagePreview || '/assets/images/profile/user-1.jpg'"
+  class="rounded-circle object-cover icon-35"
+  width="35"
+  alt="profile"
+/>
           <span class="pic-riple"></span>
         </div>
         <!-- </button> -->
-        <span class="f-w-500 f-s-16">{{user?.name}}</span>
+<span *ngIf="displayFirstName" class="f-w-500 f-s-16">{{ displayFirstName }}</span>
+<span *ngIf="displayLastName" class="f-w-500 f-s-16">{{ displayLastName }}</span>
+
       </div>
       <ul class="sub-menu">
         <li [routerLink]="'/settings'">

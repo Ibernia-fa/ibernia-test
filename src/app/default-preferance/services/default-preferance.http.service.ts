@@ -16,6 +16,7 @@ export interface PreferencesDto {
 }
 
 export interface UserProfileDto {
+  id?:string | null;
   userId?: string | null;
   profilePhotoUrl?: string | null;
   firstName?: string | null;
@@ -30,7 +31,7 @@ export class SettingsService {
 
   constructor(private http: HttpClient) {}
   postUserProfile(payload: UserProfileDto): Observable<void> {
-    return this.http.post<void>(`${this.baseUrl}/UserProfile`, payload);
+    return this.http.put<void>(`${this.baseUrl}/UserProfile`, payload);
   }
   
    getUserProfileResponse(userId: string): Observable<HttpResponse<any>> {
