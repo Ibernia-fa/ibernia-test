@@ -169,17 +169,37 @@ export class AddContributionComponent {
       this.applySavingPotFilter();
 
       // set saving pot if still valid under new filter; otherwise auto-fix
+      // const savedId = this.selectedContribution.associatedSavingPotId;
+      // const exists = this.clientSavings.some((s) => s.id === savedId);
+      // if (exists) {
+      //   this.contributionForm.get('savingPot')?.patchValue(savedId);
+      // } else if (this.contributionForm.get('contributionType')?.value === 1 && this.cashPot) {
+      //   // type Cash but saved pot not valid -> force Cash
+      //   this.contributionForm.get('savingPot')?.patchValue(this.cashPot.id);
+      // } else {
+      //   // type External but saved pot is Cash -> clear
+      //   this.contributionForm.get('savingPot')?.patchValue(null);
+      // }
+
       const savedId = this.selectedContribution.associatedSavingPotId;
-      const exists = this.clientSavings.some((s) => s.id === savedId);
-      if (exists) {
-        this.contributionForm.get('savingPot')?.patchValue(savedId);
-      } else if (this.contributionForm.get('contributionType')?.value === 1 && this.cashPot) {
-        // type Cash but saved pot not valid -> force Cash
-        this.contributionForm.get('savingPot')?.patchValue(this.cashPot.id);
-      } else {
-        // type External but saved pot is Cash -> clear
-        this.contributionForm.get('savingPot')?.patchValue(null);
-      }
+const type = Number(this.contributionForm.get('contributionType')?.value ?? 1);
+
+if (type === 1) {
+  // Cash mode: do NOT show Cash in list; preselect only if savedId is non-cash and present
+  if (savedId && savedId !== this.cashPot?.id && this.clientSavings.some(s => s.id === savedId)) {
+    this.contributionForm.get('savingPot')?.patchValue(savedId);
+  } else {
+    this.contributionForm.get('savingPot')?.patchValue(null);
+  }
+} else {
+  // External mode: show all, including Cash
+  if (savedId && this.clientSavings.some(s => s.id === savedId)) {
+    this.contributionForm.get('savingPot')?.patchValue(savedId);
+  } else {
+    this.contributionForm.get('savingPot')?.patchValue(null);
+  }
+}
+
             const hasComm = !!this.selectedContribution?.comission;
       this.contributionForm.get('commissions')?.patchValue(hasComm);
       const pct =
@@ -229,30 +249,57 @@ export class AddContributionComponent {
   }
 
   // 🔽 Core filtering logic
-  private applySavingPotFilter(): void {
-    const type = Number(this.contributionForm.get('contributionType')?.value ?? 1);
-    const all = this.allClientSavings;
+  // private applySavingPotFilter(): void {
+  //   const type = Number(this.contributionForm.get('contributionType')?.value ?? 1);
+  //   const all = this.allClientSavings;
 
-    if (type === 1) {
-      // Cash: only show “Cash”, auto-select it
-      this.clientSavings = this.cashPot ? [this.cashPot] : [];
-      if (this.cashPot) {
-        this.contributionForm.get('savingPot')?.setValue(this.cashPot.id);
-      } else {
-        this.contributionForm.get('savingPot')?.setValue(null);
-      }
-    } else {
-      // External: hide “Cash”, leave current selection if valid
-      this.clientSavings = all.filter(
-        (s) => (s.name ?? '').toLowerCase() !== 'cash'
-      );
-      const currentId = this.contributionForm.get('savingPot')?.value;
-      if (this.cashPot && currentId === this.cashPot.id) {
-        // selected cash but now external -> clear
-        this.contributionForm.get('savingPot')?.setValue(null);
-      }
+  //   if (type === 1) {
+  //     // Cash: only show “Cash”, auto-select it
+  //     this.clientSavings = this.cashPot ? [this.cashPot] : [];
+  //     if (this.cashPot) {
+  //       this.contributionForm.get('savingPot')?.setValue(this.cashPot.id);
+  //     } else {
+  //       this.contributionForm.get('savingPot')?.setValue(null);
+  //     }
+  //   } else {
+  //     // External: hide “Cash”, leave current selection if valid
+  //     this.clientSavings = all.filter(
+  //       (s) => (s.name ?? '').toLowerCase() !== 'cash'
+  //     );
+  //     const currentId = this.contributionForm.get('savingPot')?.value;
+  //     if (this.cashPot && currentId === this.cashPot.id) {
+  //       // selected cash but now external -> clear
+  //       this.contributionForm.get('savingPot')?.setValue(null);
+  //     }
+  //   }
+  // }
+
+private applySavingPotFilter(): void {
+  const type = Number(this.contributionForm.get('contributionType')?.value ?? 1);
+
+  if (type === 1) {
+    // Cash selected ➜ hide Cash from the dropdown
+    this.clientSavings = (this.allClientSavings ?? []).filter(
+      (s) => (s.name ?? '').toLowerCase() !== 'cash'
+    );
+
+    // if previously selected is Cash (or not in list), clear it
+    const currentId = this.contributionForm.get('savingPot')?.value;
+    if (!currentId || currentId === this.cashPot?.id || !this.clientSavings.some(s => s.id === currentId)) {
+      this.contributionForm.get('savingPot')?.setValue(null);
+    }
+  } else {
+    // External selected ➜ show ALL (including Cash)
+    this.clientSavings = (this.allClientSavings ?? []).slice();
+
+    // keep current selection if still valid; otherwise clear
+    const currentId = this.contributionForm.get('savingPot')?.value;
+    if (currentId && !this.clientSavings.some(s => s.id === currentId)) {
+      this.contributionForm.get('savingPot')?.setValue(null);
     }
   }
+}
+
 
 //   private applySavingPotFilter(): void {
 //   // Show everything, no filtering based on type
@@ -277,6 +324,16 @@ export class AddContributionComponent {
       this.contributionForm.get('commissionPercentage')?.value ?? 0
     );
 
+const selectedPotId: string | null = this.contributionForm.get('savingPot')?.value ?? null;
+const type = Number(this.contributionForm.get('contributionType')?.value ?? 1);
+
+
+const associatedSavingPotId =
+  type === 1
+    ? (selectedPotId || this.cashPot?.id || '')
+    : (selectedPotId || '');
+
+
     // helper NetAmount shells
     const emptyCycle = { id: '', description: '' };
     const emptyNetAmount: NetAmount = {
@@ -297,7 +354,8 @@ export class AddContributionComponent {
 
     const contribution: FundsViewModel = {
       id: this.isEditWorkflow ? this.selectedContribution.id : null,
-      associatedSavingPotId: this.contributionForm.get('savingPot')?.value ?? '',
+      // associatedSavingPotId: this.contributionForm.get('savingPot')?.value ?? '',
+      associatedSavingPotId: associatedSavingPotId,
       description: this.contributionForm.get('description')?.value,
       amount: {
         amount: this.contributionForm.get('amount')?.value,
