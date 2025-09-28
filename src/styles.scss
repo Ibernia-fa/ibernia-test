@@ -13,6 +13,13 @@ body { margin: 0;  }
     border: 1px solid #e7e7eb;
     padding: 15px;
 }
+.hint{
+     margin: 0px;
+    position: relative;
+    top: -13px;
+    font-size: 14px;
+    color: #979797;
+}
 .mb-20{
   margin-bottom: 20px;
 }
@@ -24,6 +31,9 @@ body { margin: 0;  }
 }
 .align-items-end{
   align-items: end;
+}
+.justify-space-between{
+  justify-content: space-between;
 }
 .pull-right{
   float: right;
@@ -154,6 +164,21 @@ button {
 }
 .mat-internal-form-field>label{
   margin-top: 3px;
+}
+
+.disabled-field {
+  .mat-mdc-input-element{
+    color:#b2b2b4 !important
+  }
+}
+
+.main-header-content {
+  .header-icon {
+    margin-right: 10px;
+}
+}
+.mdc-switch__track::after{
+  background-color: #516CE8;
 }
 .apexcharts-text,
 .apexcharts-legend-text,

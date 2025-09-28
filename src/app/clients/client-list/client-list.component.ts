@@ -190,7 +190,7 @@ private checkPrefsAndPrompt() {
       if (res.status === 204) {
         // preferences missing → open dialog
         const ref = this.dialog.open(DefaultPreferanceComponent, {
-          width: '1135px',
+          width: '1265px',
           disableClose: true,
           autoFocus: false,
           data: { mode: 'onboarding' },
