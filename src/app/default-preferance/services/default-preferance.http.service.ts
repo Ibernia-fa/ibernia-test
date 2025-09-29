@@ -31,9 +31,13 @@ export class SettingsService {
 
   constructor(private http: HttpClient) {}
   postUserProfile(payload: UserProfileDto): Observable<void> {
-    return this.http.put<void>(`${this.baseUrl}/UserProfile`, payload);
+    return this.http.post<void>(`${this.baseUrl}/UserProfile`, payload);
   }
   
+  updateUserProfile(payload: UserProfileDto): Observable<void> {
+    return this.http.put<void>(`${this.baseUrl}/UserProfile`, payload);
+  }
+
    getUserProfileResponse(userId: string): Observable<HttpResponse<any>> {
     return this.http.get<any>(`${this.baseUrl}/UserProfile/${userId}`, {
       observe: 'response',

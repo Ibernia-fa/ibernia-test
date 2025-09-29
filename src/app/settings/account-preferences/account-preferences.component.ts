@@ -254,7 +254,7 @@ async onFileSelected(evt: Event) {
     };
 
     this.isSaving = true;
-    this.api.postUserProfile(payload)
+    this.api.updateUserProfile(payload)
       .pipe(
         takeUntil(this.destroy$),
         catchError((err) => {
