@@ -123,8 +123,8 @@ ComissionType = ComissionType;
     const payload: UserProfileDto = {
       userId: this.user?.sub,
       profilePhotoUrl: blankToNull(raw.profilePhotoUrl),
-      firstName: this.user?.family_name,
-      lastName: this.user?.given_name,
+      firstName: this.user?.given_name,
+      lastName: this.user?.family_name,
       email: this.user?.email,
       preferences: {
         inflationRate: round2(raw.preferences.inflationRate),
