@@ -1,54 +1,80 @@
 <mat-card class="mat-mdc-card mdc-card cardWithShadow mb-20">
   <mat-card-content class="mat-mdc-card-content">
     <div class="d-flex align-items-center main-header-content">
-    <div class="header-icon">
-      <img src="../../../assets/images/shapes/small-icon-2.svg" alt="">
-    </div>
-    <div>
-   <h4 class="page-title f-w-500">
-   Branding
-  </h4>
-  <span class="sub-title"> Personalize Ibernia</span>
-  </div>
-  </div>
-</mat-card-content>  
-</mat-card>
-<mat-card class="mat-mdc-card mdc-card cardWithShadow mb-20">
-    <mat-card-content class="mat-mdc-card-content">
-
-    <h3 class="f-s-20 f-w-400 m-b-5">Company logo</h3>
-    <p class="f-s-14 m-b-30 p-t-0 m-t-0">Update your company logo and it will be displayed on the top left corner</p>
-
-    <div class="d-flex">
-      <!-- Upload Avatar -->
-       <mat-card class="mat-mdc-card mdc-card cardWithShadow m-r-30">
-        <div class="logo-update-wrapper">
-        <div class="p-2">
-             <img class="m-b-10" src="../../../assets/images/shapes/logo.png" alt="">
-        </div>
-        <span class="delete-icon"> <img  src="../../../assets/images/shapes/delete.svg" alt=""></span>
-        </div>
-       </mat-card>
-      <div class="upload-avatar-wrapper upload-company-avatar">
-        <label
-          for="upload-avatar"
-          class="flex items-center justify-center h-40 border border-dashed rounded-md cursor-pointer hover:border-primary transition"
-        >
-          <div class="text-center">
-             <img class="m-b-10" src="../../../assets/images/shapes/small-icon.svg" alt="">
-            <p class="text-sm text-gray-500 f-s-14 m-b-10 m-0">Click to upload avatar<br><span class=" underline">or drag and drop</span></p>
-            <small class="text-xs text-gray-400 f-s-12 m-0">SVG, PNG, JPG or GIF (max. 800×400px)</small>
-          </div>
-        </label>
-        <input id="upload-avatar" type="file" accept="image/*" hidden (change)="onFileSelected($event)">
+      <div class="header-icon">
+        <img src="../../../assets/images/shapes/small-icon-2.svg" alt="">
       </div>
-
-      
-    </div>
- <div class="mt-4 text-right ">
-      <button  class="button-icon pull-right"><span>Save</span></button>
+      <div>
+        <h4 class="page-title f-w-500">Branding</h4>
+        <span class="sub-title">Personalize Ibernia</span>
+      </div>
     </div>
   </mat-card-content>
 </mat-card>
 
+<mat-card class="mat-mdc-card mdc-card cardWithShadow mb-20">
+  <mat-card-content class="mat-mdc-card-content">
+    <h3 class="f-s-20 f-w-400 m-b-5">Company logo</h3>
+    <p class="f-s-14 m-b-30 p-t-0 m-t-0">Update your company logo and it will be displayed on the top left corner</p>
 
+    <div class="d-flex">
+      <!-- Left: live preview (or empty state) -->
+      <mat-card class="mat-mdc-card mdc-card cardWithShadow m-r-30">
+        <div class="logo-update-wrapper">
+          <div class="p-2" *ngIf="profileImage; else noLogo">
+            <img
+              [src]="profileImage"
+              alt="company logo preview"
+              style="width:120px;height:120px;object-fit:contain;border-radius:8px;"
+            />
+          </div>
+          <ng-template #noLogo>
+            <div class="p-2 d-flex align-items-center justify-content-center" style="width:120px;height:120px;">
+              <span class="text-muted f-s-12">No logo selected</span>
+            </div>
+          </ng-template>
+
+          <!-- Clear button (does NOT open file dialog) -->
+          <button
+            type="button"
+            class="delete-icon"
+            *ngIf="profileImage"
+            (click)="clearImage($event)"
+            aria-label="Remove logo"
+          >
+            <img src="../../../assets/images/shapes/delete.svg" alt="">
+          </button>
+        </div>
+      </mat-card>
+
+      <!-- Right: uploader (label triggers hidden input) -->
+      <div class="upload-avatar-wrapper upload-company-avatar">
+        <label for="company-logo-input" class="cursor-pointer">
+          <div class="text-center">
+            <img class="m-b-10" src="../../../assets/images/shapes/small-icon.svg" alt="">
+            <p class="text-sm text-gray-500 f-s-14 m-b-10 m-0">
+              Click to upload avatar<br><span class="underline">or drag and drop</span>
+            </p>
+            <small class="text-xs text-gray-400 f-s-12 m-0">
+              SVG, PNG, JPG or GIF (max. 800×400px)
+            </small>
+          </div>
+        </label>
+
+        <!-- keep this hidden; we reset its value after each use so the same file can be reselected -->
+        <input
+          #fileInput
+          id="company-logo-input"
+          type="file"
+          accept="image/*"
+          hidden
+          (change)="onFileSelected($event)"
+        />
+      </div>
+    </div>
+
+    <div class="mt-4 text-right">
+      <button class="button-icon pull-right" type="button"><span>Save</span></button>
+    </div>
+  </mat-card-content>
+</mat-card>
