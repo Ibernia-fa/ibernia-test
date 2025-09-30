@@ -51,7 +51,17 @@
               </ng-template>
             </div>
           </label>
-          <input id="upload-avatar" type="file" accept="image/*" hidden (change)="onFileSelected($event)">
+          <!-- <input id="upload-avatar" type="file" accept="image/*" hidden (change)="onFileSelected($event)"> -->
+        <input
+  id="upload-avatar"
+  #fileInput
+  type="file"
+  accept="image/*"
+  hidden
+  (change)="onFileSelected($event)"
+/>
+
+        
         </div>
 
         <!-- Name / Email -->

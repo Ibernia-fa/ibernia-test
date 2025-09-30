@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { HttpResponse } from '@angular/common/http';
@@ -39,6 +39,7 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
   // local-only preview (no upload)
   profileImagePreview: string | null = null;
   private objectUrlToRevoke: string | null = null;
+  @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 // profileImagePreview: string | null = null;
   form = this.fb.nonNullable.group({
     userId: ['' as string],
@@ -62,7 +63,8 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private api: SettingsService,
     private auth: AuthService,
-    private snack: MatSnackBar
+    private snack: MatSnackBar,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -196,26 +198,47 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
   // }
 
   // local preview + store base64 in form control
-async onFileSelected(evt: Event) {
-  const input = evt.target as HTMLInputElement;
-  const file = input?.files?.[0];
-  if (!file) return;
+// async onFileSelected(evt: Event) {
+//   const input = evt.target as HTMLInputElement;
+//   const file = input?.files?.[0];
+//   if (!file) return;
 
-  try {
-    const dataUrl = await fileToDataUrl(file); // "data:image/png;base64,...."
-    // preview uses the same string
-    this.profileImagePreview = dataUrl;
+//   try {
+//     const dataUrl = await fileToDataUrl(file); // "data:image/png;base64,...."
+//     // preview uses the same string
+//     this.profileImagePreview = dataUrl;
 
-    // store in the form so it goes to backend
-    this.form.get('profilePhotoUrl')?.setValue(dataUrl);
-  } catch (e) {
-    console.error('Failed to read image', e);
-    this.snack.open('Could not read the selected image.', 'Close', { duration: 3000 });
-  } finally {
-    // allow selecting same file again later
-    input.value = '';
+//     // store in the form so it goes to backend
+//     this.form.get('profilePhotoUrl')?.setValue(dataUrl);
+//   } catch (e) {
+//     console.error('Failed to read image', e);
+//     this.snack.open('Could not read the selected image.', 'Close', { duration: 3000 });
+//   } finally {
+//     // allow selecting same file again later
+//     input.value = '';
+//   }
+// }
+
+  async onFileSelected(evt: Event) {
+    const input = evt.target as HTMLInputElement;
+    const file = input?.files?.[0];
+    if (!file) return;
+
+    try {
+      const dataUrl = await fileToDataUrl(file); // data:image/...;base64,...
+      this.profileImagePreview = dataUrl;
+      this.form.get('profilePhotoUrl')?.setValue(dataUrl);
+      this.cdr.markForCheck();                // <-- ensure UI updates under OnPush
+    } catch (e) {
+      console.error('Failed to read image', e);
+      this.snack.open('Could not read the selected image.', 'Close', { duration: 3000 });
+    } finally {
+      // reset the native input so picking the *same file* again will fire (change)
+      if (this.fileInput?.nativeElement) {
+        this.fileInput.nativeElement.value = '';
+      }
+    }
   }
-}
 
 
   submit() {
@@ -278,11 +301,23 @@ async onFileSelected(evt: Event) {
     this.destroy$.complete();
   }
 
+//   clearImage(event: Event): void {
+//   event.stopPropagation(); // Prevents opening file dialog when clicking the cross
+//   this.profileImagePreview = null;
+//   this.form.get('profilePhotoUrl')?.setValue('');
+// }
+
   clearImage(event: Event): void {
-  event.stopPropagation(); // Prevents opening file dialog when clicking the cross
-  this.profileImagePreview = null;
-  this.form.get('profilePhotoUrl')?.setValue('');
-}
+    event.stopPropagation();
+    event.preventDefault();
+    this.profileImagePreview = null;
+    this.form.get('profilePhotoUrl')?.setValue('');
+    // also clear the native input here (important for the "2nd pick" case)
+    if (this.fileInput?.nativeElement) {
+      this.fileInput.nativeElement.value = '';
+    }
+    this.cdr.markForCheck();
+  }
 
 }
 
