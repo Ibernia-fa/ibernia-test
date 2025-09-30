@@ -290,6 +290,7 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
       .subscribe(() => {
         this.isSaving = false;
         this.snack.open('Preferences saved.', undefined, { duration: 2000 });
+         this.api.notifyProfileChanged();
       });
   }
 

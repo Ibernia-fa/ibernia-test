@@ -4,6 +4,7 @@ import {
   EventEmitter,
   Input,
   ViewEncapsulation,
+  OnDestroy,
 } from '@angular/core';
 import { CoreService } from 'src/app/services/core.service';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -69,7 +70,7 @@ interface quicklinks {
     templateUrl: './header.component.html',
     encapsulation: ViewEncapsulation.None
 })
-export class HeaderComponent {
+export class HeaderComponent implements OnDestroy {
   @Input() showToggle = true;
   @Input() hideSidebarToggle = false;
   @Input() toggleChecked = false;
@@ -116,7 +117,7 @@ export class HeaderComponent {
   userprofile: any;
   isLoading: boolean;
   // private destroy$ = new Subject<void>();
-
+private destroy$ = new Subject<void>();
 
   constructor(
     private settings: CoreService,
@@ -131,9 +132,16 @@ export class HeaderComponent {
     this.user = this.Authservice.getUserProfile();
     console.log('user', this.user);
     this.loadProfile();
-
+    this.settingsService.profileChanged$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => this.loadProfile());
   }
 
+
+    ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 // Prefer saved profile names; fallback to OIDC claims; otherwise blank
 get displayFirstName(): string {
   return (this.userprofile?.firstName ?? '').trim() || (this.user?.given_name ?? '');
