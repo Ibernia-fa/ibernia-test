@@ -19,7 +19,7 @@
         <!-- <mat-dialog-content> -->
         <div [formGroup]="form" class="d-flex flex-column gap-20">
             <div class="w-100 form-field">
-                <mat-label class="f-s-14 f-w-600 d-block">Model Name</mat-label>
+                <mat-label class="f-s-14 f-w-600 d-block">Model name</mat-label>
                 <input matInput formControlName="name" />
                 @if(form.get('name')?.touched &&
                  form.get('name')?.hasError('required')) {
@@ -27,7 +27,7 @@
                 }
             </div>
             <div class="w-100 form-field">
-                <mat-label class="f-s-14 f-w-600 d-block">Description (Optional)</mat-label>
+                <mat-label class="f-s-14 f-w-600 d-block">Description (optional)</mat-label>
                 <textarea formControlName="description" placeholder="Enter description"></textarea>
             </div>
         </div>
