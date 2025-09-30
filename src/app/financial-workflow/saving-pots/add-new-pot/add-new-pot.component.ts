@@ -38,10 +38,12 @@ import {
 import { catchError, filter } from 'rxjs';
 import { TablerIconsModule } from 'angular-tabler-icons';
 import { IntegerOnlyDirective } from 'src/app/directives/integerOnly.directive';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-add-new-pot',
   imports: [
+    CommonModule,
     MatCardModule,
     MatFormFieldModule,
     MatDialogModule,
@@ -291,7 +293,11 @@ export class AddNewPotComponent {
     // --- The rest of fields (unchanged behavior) ---
     this.savingsForm.get('currency')?.patchValue(this.selectedPot.startingPotValue.currencySymbol, { emitEvent: false });
     this.savingsForm.get('amount')?.patchValue(this.selectedPot.startingPotValue.amount, { emitEvent: false });
-    this.savingsForm.get('returnRate')?.patchValue(this.selectedPot.returnRate, { emitEvent: false });
+    // this.savingsForm.get('returnRate')?.patchValue(this.selectedPot.returnRate, { emitEvent: false });
+  this.savingsForm.get('returnRate')?.patchValue(
+  this.round2(this.selectedPot.returnRate),
+  { emitEvent: false }
+);
     this.savingsForm.get('lockPot')?.patchValue(this.selectedPot.hasPotLocked, { emitEvent: false });
     this.savingsForm.get('start')?.patchValue(this.selectedPot.start.year, { emitEvent: false });
     this.savingsForm.get('end')?.patchValue(this.selectedPot.end.year, { emitEvent: false });
@@ -538,7 +544,10 @@ onEscalationRateChange(event: MatSelectChange): void {
     const selectedEscalationRateValue = isCustomEscalation
       ? this.savingsForm.get('customEscalationRate')?.value
       : this.savingsForm.get('escalationRate')?.value;
-
+ const rr = this.round2(this.savingsForm.get('returnRate')?.value ?? 0);
+  const real = this.savingsForm.get('name')?.value !== 'Cash'
+    ? this.round2(rr - this.inflationRate)
+    : 0;
     if (this.savingsForm.valid) {
       var clientSaving: ClientSaving = {
         id: this.isEditWorkflow ? this.selectedPot.id : null,
@@ -641,13 +650,15 @@ onEscalationRateChange(event: MatSelectChange): void {
               ? this.savingsForm.get('end')?.value
               : 0,
         },
-        returnRate: this.savingsForm.get('name')?.value !== 'Cash' ? this.savingsForm.get('returnRate')?.value : 0,
+        // returnRate: this.savingsForm.get('name')?.value !== 'Cash' ? this.savingsForm.get('returnRate')?.value : 0,
+          returnRate: this.savingsForm.get('name')?.value !== 'Cash' ? rr : 0,
         type:
           this.savingPotValues.find(
             (x) => this.savingsForm.get('name')?.value === x.name
           )?.type ?? SavingPotType.Cash,
-        realReturn: this.savingsForm.get('name')?.value !== 'Cash' ?
-          this.savingsForm.get('returnRate')?.value - this.inflationRate : 0,
+        // realReturn: this.savingsForm.get('name')?.value !== 'Cash' ?
+        //   this.savingsForm.get('returnRate')?.value - this.inflationRate : 0,
+        realReturn: real,
       };
       console.log(clientSaving);
       var function$ = !this.isEditWorkflow ? this.savingPotsHttpService
@@ -869,7 +880,9 @@ onEscalationRateChange(event: MatSelectChange): void {
   // when typing, ensure the control holds a number (so slider updates smoothly)
   const raw = (event.target as HTMLInputElement).value;
   const num = Number(raw);
-  this.savingsForm.get('returnRate')?.setValue(isNaN(num) ? 0 : num, { emitEvent: true });
+  const val = isNaN(num) ? 0 : this.round2(num);
+  this.savingsForm.get('returnRate')?.setValue(val, { emitEvent: true });
+
 }
 
 // onSliderChange(val: number) {
@@ -882,9 +895,13 @@ onSliderInput(event: Event): void {
   const inputElement = event.target as HTMLInputElement;
   const value = Number(inputElement.value);
 
-  this.savingsForm.get('returnRate')?.setValue(isNaN(value) ? 0 : value, {
-    emitEvent: true,
-  });
+  const val = isNaN(value) ? 0 : this.round2(value);
+  this.savingsForm.get('returnRate')?.setValue(val, { emitEvent: true });
+}
+
+private round2(n: number): number {
+  return Math.round((n + Number.EPSILON) * 100) / 100;
 }
 
 }
+

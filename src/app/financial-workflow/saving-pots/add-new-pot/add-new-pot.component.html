@@ -181,8 +181,18 @@
               </div>
             </div>
           </div>
-          <span class="return-rate">Real return: {{savingsForm.get('returnRate')?.value - inflationRate}}% (net of
-            {{inflationRate}}% inflation)</span>
+          <!-- <span class="return-rate">Real return: {{savingsForm.get('returnRate')?.value - inflationRate}}% (net of
+            {{inflationRate}}% inflation)</span> -->
+
+            <span class="return-rate">
+  Real return:
+  {{
+    ((savingsForm.get('returnRate')?.value || 0) - inflationRate)
+      | number : '1.2-2'
+  }}%
+  (net of {{ inflationRate | number:'1.2-2' }}% inflation)
+</span>
+
           @if(
           (savingsForm.get('returnRate')?.touched &&
           savingsForm.get('returnRate')?.hasError('required'))) {
