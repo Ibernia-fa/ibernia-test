@@ -1,7 +1,7 @@
 // src/app/settings/settings.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
-import { map, Observable } from 'rxjs';
+import { map, Observable, Subject } from 'rxjs';
 
 export enum ComissionType { Amount = 1, Percentage = 2, Both = 3 }
 
@@ -28,7 +28,9 @@ export interface UserProfileDto {
 @Injectable({ providedIn: 'root' })
 export class SettingsService {
   private readonly baseUrl = '/api/v1';
-
+  private _profileChanged = new Subject<void>();
+  /** Header (and others) can subscribe to this */
+  readonly profileChanged$ = this._profileChanged.asObservable();
   constructor(private http: HttpClient) {}
   postUserProfile(payload: UserProfileDto): Observable<void> {
     return this.http.post<void>(`${this.baseUrl}/UserProfile`, payload);
@@ -57,5 +59,8 @@ export class SettingsService {
     );
 }
 
+  notifyProfileChanged(): void {
+    this._profileChanged.next();
+  }
 
 }
