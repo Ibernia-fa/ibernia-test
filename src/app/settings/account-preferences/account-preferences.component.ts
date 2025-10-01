@@ -12,6 +12,7 @@ import {
 } from '../../default-preferance/services/default-preferance.http.service';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { allCountries } from 'src/app/clients/models/country';
+import { NavItemService } from 'src/app/layouts/full/nav-item.service';
 
 @Component({
   selector: 'app-account-preferences',
@@ -64,8 +65,12 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
     private api: SettingsService,
     private auth: AuthService,
     private snack: MatSnackBar,
-    private cdr: ChangeDetectorRef
-  ) {}
+    private cdr: ChangeDetectorRef,
+    private navItemService: NavItemService
+  ) {
+    this.navItemService.currentRouteName = 'Account Preferences';
+
+  }
 
   ngOnInit(): void {
     this.user = this.auth.getUserProfile();

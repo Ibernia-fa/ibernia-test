@@ -1,4 +1,5 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
+import { NavItemService } from 'src/app/layouts/full/nav-item.service';
 
 @Component({
   selector: 'app-branding',
@@ -11,6 +12,12 @@ export class BrandingComponent {
 
   profileImage: string | null = null; // Data URL preview
 
+  constructor(
+        private navItemService: NavItemService
+  ){
+    this.navItemService.currentRouteName = 'Branding';
+    
+  }
   async onFileSelected(evt: Event) {
     const input = evt.target as HTMLInputElement;
     const file = input.files?.[0];
