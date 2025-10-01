@@ -139,7 +139,7 @@
           <mat-form-field appearance="outline" class="w-full w-100 percentage-icon">
             <span matSuffix>%</span>
             <input matInput type="number" step="0.1" formControlName="comissionPercentage"
-                   placeholder="1" />
+                   />
             
             <mat-error *ngIf="p.comissionPercentage.hasError('required')">Required</mat-error>
             <mat-error *ngIf="p.comissionPercentage.hasError('min') || p.comissionPercentage.hasError('max')">
@@ -168,7 +168,7 @@
           <mat-label class="f-s-16 f-w-400 m-b-8 d-block">Default commission percentage</mat-label>
           <mat-form-field appearance="outline" class="w-full w-100 percentage-icon">
             <input matInput type="number" step="0.1" formControlName="comissionPercentage"
-                   placeholder="1" />
+                    />
             <span matSuffix>%</span>
           </mat-form-field>
         </div>

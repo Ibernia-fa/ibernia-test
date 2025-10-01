@@ -216,16 +216,17 @@
         <div class="position-relative">
      <img
   [src]="profileImagePreview || '/assets/images/profile/user-1.jpg'"
-  class="rounded-circle object-cover icon-35"
+  class="rounded-circle object-cover icon-34"
   width="35"
   alt="profile"
 />
           <span class="pic-riple"></span>
         </div>
         <!-- </button> -->
-<span *ngIf="displayFirstName" class="f-w-500 f-s-16">{{ displayFirstName }}</span>
-<span *ngIf="displayLastName" class="f-w-500 f-s-16">{{ displayLastName }}</span>
-
+          <span class="name-wraper">
+<span  class="f-w-500 f-s-16">Muhammad{{displayFirstName}} </span>
+<span  class="f-w-500 f-s-16">Iqbal{{displayLastName}}</span>
+</span>
       </div>
       <ul class="sub-menu">
         <li [routerLink]="'/settings'">

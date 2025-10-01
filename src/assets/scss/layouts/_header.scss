@@ -95,11 +95,11 @@ html .topbar {
 }
 .header-profile-button .pic-riple {
   position: absolute;
-  top: -3px;
+  top: -1px;
   left: -3px;
   z-index: -1;
-  height: 41px;
-  width: 41px;
+  height: 40px;
+  width: 40px;
   background: transparent;
   border-radius: 9999px;
   transition: all 0.2s ease;
@@ -109,9 +109,17 @@ html .topbar {
 }
 // End New Styles
 .header-profile-button{
-  height: 65px;
-  display: flex;
-  align-items: center;
+    padding-top: 4px;
+    height: 65px;
+    display: flex;
+    align-items: center;
+    .name-wraper{
+      margin-top: -8px;
+      line-height: normal;
+    }
+    img{
+      margin-top: 2px;
+    }
     .sub-menu{
        position: absolute;
         top: 65px;
