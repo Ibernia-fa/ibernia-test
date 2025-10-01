@@ -80,7 +80,7 @@
           <mat-error *ngIf="p.investmentReturn.hasError('min') || p.investmentReturn.hasError('max')">-100–100</mat-error>
         </mat-form-field>
       </div>
-        <div class="col-6">
+        <div class="col-4">
         <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">Default advisor commission type
   <img src="assets/images/svgs/help-circle-icon.svg"
              alt="help-circle-icon "
@@ -116,25 +116,8 @@
                     </div>
                   </div>
       </div> -->
-
-<div class="col-6">
-  <div class="row">
-          <div class="col-2" style="padding-right: 0px;">
-  <mat-label class="f-s-16 f-w-400 m-b-8 d-block">Currency</mat-label>
-  <mat-form-field appearance="outline" class="w-full w-100 disabled-field">
-    <input
-      matInput
-      disabled
-      [value]="p.currency?.value || ''"
-      readonly
-      aria-readonly="true"
-      placeholder="—"
-    />
-  </mat-form-field>
-</div>
-      
       @if (comTypeCtrl.value === ComissionType.Percentage) {
-        <div class="col-10">
+        <div class="col-8">
           <mat-label class="f-s-16 f-w-400 m-b-8 d-block">Default commission percentage</mat-label>
           <mat-form-field appearance="outline" class="w-full w-100 percentage-icon">
             <span matSuffix>%</span>
@@ -149,10 +132,28 @@
         </div>
       }
 
+<div class="col-8">
+  <div class="row">
+
+      
+
 
 
 
       @if (comTypeCtrl.value === ComissionType.Amount) {
+                  <div class="col-2" style="padding-right: 0px;">
+  <mat-label class="f-s-16 f-w-400 m-b-8 d-block">Currency</mat-label>
+  <mat-form-field appearance="outline" class="w-full w-100 disabled-field">
+    <input
+      matInput
+      disabled
+      [value]="p.currency?.value || ''"
+      readonly
+      aria-readonly="true"
+      placeholder="—"
+    />
+  </mat-form-field>
+</div>
         <div class="col-10">
           <mat-label class="f-s-16 f-w-400 m-b-8 d-block">Default commission amount</mat-label>
           <mat-form-field appearance="outline" class="w-full w-100">
@@ -164,6 +165,27 @@
         </div>
       }
           @if (comTypeCtrl.value === ComissionType.Both) {
+
+                      <div class="col-2" style="padding-right: 0px;">
+  <mat-label class="f-s-16 f-w-400 m-b-8 d-block">Currency</mat-label>
+  <mat-form-field appearance="outline" class="w-full w-100 disabled-field">
+    <input
+      matInput
+      disabled
+      [value]="p.currency?.value || ''"
+      readonly
+      aria-readonly="true"
+      placeholder="—"
+    />
+  </mat-form-field>
+</div>
+ <div class="col-5">
+          <mat-label class="f-s-16 f-w-400 m-b-8 d-block">Default commission amount</mat-label>
+          <mat-form-field appearance="outline" class="w-full w-100">
+            <input matInput type="number" step="1" formControlName="comissionAmount"
+                   placeholder="Enter amount" />
+          </mat-form-field>
+        </div>
         <div class="col-5" style="padding-right: 0px;">
           <mat-label class="f-s-16 f-w-400 m-b-8 d-block">Default commission percentage</mat-label>
           <mat-form-field appearance="outline" class="w-full w-100 percentage-icon">
@@ -172,13 +194,8 @@
             <span matSuffix>%</span>
           </mat-form-field>
         </div>
-        <div class="col-5">
-          <mat-label class="f-s-16 f-w-400 m-b-8 d-block">Default commission amount</mat-label>
-          <mat-form-field appearance="outline" class="w-full w-100">
-            <input matInput type="number" step="1" formControlName="comissionAmount"
-                   placeholder="Enter amount" />
-          </mat-form-field>
-        </div>
+        
+       
       }
   </div>
 </div>

@@ -224,8 +224,8 @@
         </div>
         <!-- </button> -->
           <span class="name-wraper">
-<span  class="f-w-500 f-s-16">Muhammad{{displayFirstName}} </span>
-<span  class="f-w-500 f-s-16">Iqbal{{displayLastName}}</span>
+<span *ngIf="displayFirstName" class="f-w-500 f-s-16">{{displayFirstName}} </span>
+<span *ngIf="displayLastName" class="f-w-500 f-s-16">{{displayLastName}}</span>
 </span>
       </div>
       <ul class="sub-menu">
