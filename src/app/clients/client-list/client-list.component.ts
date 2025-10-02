@@ -198,7 +198,7 @@ private checkPrefsAndPrompt() {
 
         ref.afterClosed().subscribe((saved) => {
           if (saved) {
-            this.toastr.success('Default preferences saved', 'Success!');
+            // this.toastr.success('Default preferences saved', 'Success!');
           }
         });
       }
