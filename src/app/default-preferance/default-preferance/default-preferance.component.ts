@@ -44,7 +44,7 @@ export class DefaultPreferanceComponent implements OnInit, OnDestroy {
       comissionPercentage: [1 as number | null],
       comissionAmount: [null as number | null],
       currency: ['EUR', [Validators.required]],
-      country: ['' as string],
+      country: ['' as string, [Validators.required]],
     }),
   });
   user: any;
@@ -112,9 +112,9 @@ ComissionType = ComissionType;
 
   submit(): void {
     this.submitted = true;
+    this.form.markAllAsTouched();
+    // this.form.markAsDirty();
     if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      this.form.markAsDirty();
       this.snack.open('Please fix the highlighted fields.', 'Close', { duration: 3000 });
       return;
     }

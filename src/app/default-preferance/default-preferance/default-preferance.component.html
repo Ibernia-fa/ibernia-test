@@ -37,6 +37,7 @@
               }
             }
           </mat-select>
+                    <mat-error *ngIf="p.country.hasError('required')">Required</mat-error>
         </mat-form-field>
       </div> 
        <div class="col-6">
@@ -227,7 +228,7 @@
         </p>
     </section>
 
-    <button type="submit" class="button-icon pull-right" [disabled]="form.invalid || isSaving">
+    <button type="submit" class="button-icon pull-right" >
       <span *ngIf="!isSaving">Finish and go to your dashboard</span>
       <span *ngIf="isSaving">Saving…</span>
     </button>
