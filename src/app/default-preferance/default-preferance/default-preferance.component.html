@@ -8,24 +8,7 @@
     
     <!-- Row 1: Inflation + Country -->
     <div class="row">
-      <div class="col-6">
-        <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">Default inflation rate 
-
-             <img src="assets/images/svgs/help-circle-icon.svg"
-             alt="help-circle-icon"
-             width="18"
-             class="m-l-4 cursor-pointer"
-             matTooltip="This rate will be applied to all future projections by default. You can override it for specific clients or scenarios.">
-        </mat-label>
-       
-        <mat-form-field appearance="outline" class="w-full w-100 percentage-icon">
-          <span matSuffix>%</span> 
-          <input matInput type="number" step="0.1" formControlName="inflationRate"  />
-         
-          <mat-error *ngIf="p.inflationRate.hasError('required')">Required</mat-error>
-          <mat-error *ngIf="p.inflationRate.hasError('min') || p.inflationRate.hasError('max')">0–100</mat-error>
-        </mat-form-field>
-      </div>
+      
          <div class="col-6">
         <mat-label class="f-s-16 f-w-400 m-b-8 d-block">Country</mat-label>
         <mat-form-field appearance="outline" class="w-full w-100">
@@ -61,7 +44,24 @@
           <mat-error *ngIf="p.currency.invalid">Required</mat-error>
         </mat-form-field>
       </div>
-     
+     <div class="col-6">
+        <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">Default inflation rate 
+
+             <img src="assets/images/svgs/help-circle-icon.svg"
+             alt="help-circle-icon"
+             width="18"
+             class="m-l-4 cursor-pointer"
+             matTooltip="This rate will be applied to all future projections by default. You can override it for specific clients or scenarios.">
+        </mat-label>
+       
+        <mat-form-field appearance="outline" class="w-full w-100 percentage-icon">
+          <span matSuffix>%</span> 
+          <input matInput type="number" step="0.1" formControlName="inflationRate"  />
+         
+          <mat-error *ngIf="p.inflationRate.hasError('required')">Required</mat-error>
+          <mat-error *ngIf="p.inflationRate.hasError('min') || p.inflationRate.hasError('max')">0–100</mat-error>
+        </mat-form-field>
+      </div>
       <div class="col-6">
         <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">Default net investment return
 
