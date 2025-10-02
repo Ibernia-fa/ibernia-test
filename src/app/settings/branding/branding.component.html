@@ -73,8 +73,20 @@
       </div>
     </div>
 
-    <div class="mt-4 text-right">
+    <!-- <div class="mt-4 text-right">
       <button class="button-icon pull-right" type="button"><span>Save</span></button>
-    </div>
+    </div> -->
+
+    <!-- branding.component.html -->
+<div class="mt-4 text-right">
+  <button
+    class="button-icon pull-right"
+    type="button"
+    (click)="save()"
+    [disabled]="!profileImage || isSaving"
+  >
+    <span>{{ isSaving ? 'Saving…' : 'Save' }}</span>
+  </button>
+</div>
   </mat-card-content>
 </mat-card>
