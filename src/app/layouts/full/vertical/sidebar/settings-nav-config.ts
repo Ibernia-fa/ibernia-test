@@ -32,7 +32,7 @@ export const settingsNavItems: NavItem[] = [
 export const settingsLowerNavItems: NavItem[] = [
   {
     displayName: 'Branding',
-    iconName: '/assets/images/shapes/branding.svg',
+    iconName: '/assets/images/shapes/branding-active.svg',
     iconOutline: '/assets/images/shapes/branding.svg',
     route: '/settings/branding',
   },
