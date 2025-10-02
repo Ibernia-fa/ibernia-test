@@ -36,13 +36,18 @@
                 </p>
                 <span></span>
               </div>
-              <mat-nav-list class="sidebar-list-noline">
+              <!-- <mat-nav-list class="sidebar-list-noline">
                 @for(item of navItemslower; track item) {
-                <!-- <app-nav-item [item]="item" (notify)="sidenav.toggle()"> -->
                 <app-nav-item [item]="item">
                 </app-nav-item>
                 }
-              </mat-nav-list>
+              </mat-nav-list> -->
+              <mat-nav-list class="sidebar-list">
+  @for(item of navItemslower; track item) {
+    <app-nav-item [item]="item"></app-nav-item>
+  }
+</mat-nav-list>
+
          
             </ng-scrollbar>
           </div>
