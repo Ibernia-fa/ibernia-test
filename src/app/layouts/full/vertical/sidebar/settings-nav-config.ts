@@ -4,7 +4,7 @@ import { NavItem } from './nav-item/nav-item';
 export const settingsNavItems: NavItem[] = [
   {
     displayName: 'Account Preferences',
-    iconName: '/assets/images/shapes/account.svg',
+    iconName: '/assets/images/shapes/account-preference-active.svg',
     iconOutline: '/assets/images/shapes/account.svg',
     route: '/settings/account-preferences',
   },
