@@ -15,7 +15,8 @@ export interface Details {
     gender: string,
     country: string,
     email: string,
-    phone: string
+    phone: string,
+    inflationRate: number
 }
 
 export interface FinancialAdvisor {

@@ -32,7 +32,7 @@ You may add new events to the timeline or adjust existing ones by dragging them 
                     </div>
                 </div>
                 <!-- Date Fields  -->
-                <div>
+                <!-- <div>
                     <div class="row justify-content-between align-items-end flex-nowrap">
                         <div class="col-6">
                             <div class="w-100 form-field gap-12">
@@ -41,22 +41,11 @@ You may add new events to the timeline or adjust existing ones by dragging them 
                                     <img width="18"  src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
                                 </div>
                                 <div class="position-relative">
-                                    <!-- <input matInput [matDatepicker]="picker" formControlName="start_date"
-                                    [value]="financialTimeline.forecastStartDate" />
-                                <div class="date-picker-position">
-                                    <mat-datepicker-toggle matIconSuffix [for]="picker">
-                                        <mat-icon matDatepickerToggleIcon>
-                                            <img src="assets/images/svgs/pen-icon.svg" alt="pen-icon" />
-                                        </mat-icon>
-                                    </mat-datepicker-toggle>
-                                </div>
-                                <mat-datepicker #picker></mat-datepicker> -->
                                     <div class="select-option">
                                         <mat-select [disabled]="!enableForecastEdit"
                                             (valueChange)="onForecastStartChange($event)"
                                             [value]="this.forecastStartYear" formControlName="start"
                                             hideSingleSelectionIndicator>
-                                            <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
                                             @for (year of forecastStartYears; let i = $index; track year) {
                                             <mat-option [value]="year">{{ year }} ({{ clientAge + i
                                                 }})</mat-option>
@@ -77,31 +66,13 @@ You may add new events to the timeline or adjust existing ones by dragging them 
                                         <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon"
                                           />
                                     </div>
-                                    <!-- <div class="d-flex justify-content-end">
-                                        <button [disabled]="true" mat-icon-button (click)="enableForecastEdit=!enableForecastEdit">
-                                            <mat-icon>
-                                                <img src="assets/images/svgs/pen-icon.svg" alt="pen-icon" />
-                                            </mat-icon>
-                                        </button>
-                                    </div> -->
                                 </div>
 
                                 <div class="position-relative">
-                                    <!-- <input matInput [matDatepicker]="pickerend" formControlName="end_date"
-                                    [value]="financialTimeline.forecastEndtDate" />
-                                <div class="date-picker-position">
-                                    <mat-datepicker-toggle matIconSuffix [for]="pickerend">
-                                        <mat-icon matDatepickerToggleIcon>
-                                            <img src="assets/images/svgs/pen-icon.svg" alt="pen-icon" />
-                                        </mat-icon>
-                                    </mat-datepicker-toggle>
-                                </div>
-                                <mat-datepicker #pickerend></mat-datepicker> -->
                                     <div class="select-option">
                                         <mat-select [disabled]="!enableForecastEdit"
                                             (valueChange)="onForecastEndChange($event)" [value]="this.forecastEndYear"
                                             formControlName="start" hideSingleSelectionIndicator>
-                                            <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
                                             @for (year of forecastStartYears; let i = $index; track year) {
                                             <mat-option [value]="year">{{ year }} ({{ clientAge + i
                                                 }})</mat-option>
@@ -121,7 +92,7 @@ You may add new events to the timeline or adjust existing ones by dragging them 
                         </div>
                     </div>
                     }
-                </div>
+                </div> -->
                 <!-- End Date Fields  -->
             </div>
         </mat-card-content>

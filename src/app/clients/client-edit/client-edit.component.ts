@@ -80,6 +80,7 @@ export class ClientEditComponent {
       country: [''],
       currency: [''],
       email: ['', [Validators.email]],
+      inflationRate: [2.5, [Validators.required, Validators.min(0), Validators.max(100)]],
       phone: [''],
       notes: [''],
       partner: this.fb.group({
@@ -134,7 +135,9 @@ export class ClientEditComponent {
         this.clientForm.controls['country'].patchValue(res.clientDetails.country);
         this.clientForm.controls['firstName'].patchValue(res.clientDetails.firstName);
         this.clientForm.controls['lastName'].patchValue(res.clientDetails.lastName);
-
+          this.clientForm.controls['inflationRate'].patchValue(
+            res.clientDetails.inflationRate ?? 2.5
+          );
         const index = countryDialCodes.findIndex(x => res.clientDetails.phone.slice(1, res.clientDetails.phone.length).startsWith(x.DialCode));
         this.clientForm.controls['phone'].patchValue(res.clientDetails.phone.slice(countryDialCodes[index].DialCode.length + 1));
         this.selectedClientCountryISO = countryDialCodes[index].ISOCode as CountryISO;
@@ -198,6 +201,7 @@ export class ClientEditComponent {
 
           phone: this.clientForm.controls['phone'].value?.e164Number,
           preferredCurrency: this.clientForm.controls['currency'].value,
+          inflationRate: round2(this.clientForm.controls['inflationRate'].value),
         },
         partnerDetail: this.showPartner ? {
           birthDate: partnerGroup.controls['dob']?.value,
@@ -207,6 +211,7 @@ export class ClientEditComponent {
           firstName: partnerGroup.controls['firstName']?.value,
           lastName: partnerGroup.controls['lastName']?.value,
           phone: partnerGroup.controls['phone']?.value?.e164Number,
+          inflationRate:0,
           preferredCurrency:
             partnerGroup.controls['currency']?.value,
         } : null,
@@ -239,4 +244,9 @@ export class ClientEditComponent {
     }
   }
 
+}
+
+/** helpers */
+function round2(n: number): number {
+  return Math.round((+n) * 100) / 100;
 }

@@ -81,6 +81,7 @@ export class ClientAddComponent {
       country: [''],
       currency: [''],
       email: ['', [Validators.email]],
+      inflationRate: [2.5, [Validators.required, Validators.min(0), Validators.max(100)]],
       phone: [''],
       notes: [''],
       partner: this.fb.group({
@@ -182,6 +183,7 @@ export class ClientAddComponent {
 
         phone: this.clientForm.controls['phone'].value?.e164Number,
         preferredCurrency: this.clientForm.controls['currency'].value,
+         inflationRate: round2(this.clientForm.controls['inflationRate'].value),
       },
       partnerDetail: this.showPartner
         ? {
@@ -201,7 +203,7 @@ export class ClientAddComponent {
       },
       lastUpdated: new Date(),
       notes: this.clientForm.controls['notes'].value,
-    };
+    } as Client;
   }
 
   onAddNewClientClicked() {
@@ -270,4 +272,7 @@ export class ClientAddComponent {
       console.error('Form is invalid');
     }
   }
+}
+function round2(n: number): number {
+  return Math.round((+n) * 100) / 100;
 }
