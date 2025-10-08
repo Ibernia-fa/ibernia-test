@@ -10,8 +10,8 @@ export const settingsNavItems: NavItem[] = [
   },
     {
     displayName: 'Notifications',
-    iconName: '/assets/images/shapes/account-preference-active.svg',
-    iconOutline: '/assets/images/shapes/account.svg',
+    iconName: '/assets/images/shapes/Notification.svg',
+    iconOutline: '/assets/images/shapes/Notification.svg',
     route: '/settings/notifications',
   },
       {
