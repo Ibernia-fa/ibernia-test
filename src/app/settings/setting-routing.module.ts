@@ -6,6 +6,7 @@ import { NotificationsComponent } from './notifications/notifications.component'
 import { SecurityComponent } from './security/security.component';
 import { PlanBillingComponent } from './plan-billing/plan-billing.component';
 import { AccountPreferencesComponent } from './account-preferences/account-preferences.component';
+import { HelpAndContactComponent } from './help-and-contact/help-and-contact.component';
 
 
 const routes: Routes = [
@@ -15,6 +16,8 @@ const routes: Routes = [
   { path: 'security', component: SecurityComponent, data: { showSidebar: true } },
   { path: 'notifications', component: NotificationsComponent, data: { showSidebar: true } },
   { path: 'branding', component: BrandingComponent, data: { showSidebar: true } },
+  { path: 'help', component: HelpAndContactComponent, data: { showSidebar: true } },
+
 ];
 
 @NgModule({

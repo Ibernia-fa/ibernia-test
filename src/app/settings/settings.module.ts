@@ -15,6 +15,7 @@ import { MatCardModule } from '@angular/material/card';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import { MatOptionModule } from '@angular/material/core';
 import { MaterialModule } from '../material.module';
+import { HelpAndContactComponent } from './help-and-contact/help-and-contact.component';
 
 
 
@@ -24,7 +25,7 @@ import { MaterialModule } from '../material.module';
     SecurityComponent,
     NotificationsComponent,
     BrandingComponent,
-    AccountPreferencesComponent,],
+    AccountPreferencesComponent],
   imports: [
     MaterialModule,
     CommonModule, MatOptionModule,

@@ -8,6 +8,18 @@ export const settingsNavItems: NavItem[] = [
     iconOutline: '/assets/images/shapes/account.svg',
     route: '/settings/account-preferences',
   },
+    {
+    displayName: 'Notifications',
+    iconName: '/assets/images/shapes/account-preference-active.svg',
+    iconOutline: '/assets/images/shapes/account.svg',
+    route: '/settings/notifications',
+  },
+      {
+    displayName: 'Help & Contact',
+    iconName: '/assets/images/shapes/account-preference-active.svg',
+    iconOutline: '/assets/images/shapes/account.svg',
+    route: '/settings/help',
+  },
 //   {
 //     displayName: 'Plan & Billing',
 //     iconName: '/assets/images/svgs/wallet-icon-filled.svg',
