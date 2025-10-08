@@ -158,6 +158,9 @@
   line-height: 1.2;
   font-weight: 600;
 }
+::ng-deep .vis-item.vis-range{
+  width: auto !important;
+}
 ::ng-deep .vis-item .vis-delete {
   top: 55% !important;
   transform: translateY(-50%);
@@ -165,7 +168,7 @@
 ::ng-deep .vis-item .vis-item-content {
   display: flex;
   align-items: center;
-  padding-right: 32px !important;
+  padding-right: 20px !important;
 }
 .timeline-wrapper {
   display: flex;

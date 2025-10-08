@@ -19,18 +19,19 @@
 
     <div class="d-flex">
       <!-- Left: live preview (or empty state) -->
-      <mat-card class="mat-mdc-card mdc-card cardWithShadow m-r-30">
+      <mat-card class="mat-mdc-card mdc-card cardWithShadow m-r-30 bor-w-2">
         <div class="logo-update-wrapper">
           <div class="p-2" *ngIf="profileImage; else noLogo">
             <img
               [src]="profileImage"
               alt="company logo preview"
-              style="width:120px;height:120px;object-fit:contain;border-radius:8px;"
+              class="rounded"
+              style="width:120px;height:120px;object-fit:cover;"
             />
           </div>
           <ng-template #noLogo>
             <div class="p-2 d-flex align-items-center justify-content-center" style="width:120px;height:120px;">
-              <span class="text-muted f-s-12">No logo selected</span>
+              <span class="text-muted f-s-14">No logo selected</span>
             </div>
           </ng-template>
 
