@@ -67,3 +67,40 @@ position: absolute;
     border-radius: 4px !important ;
     border-color: #d5d5d5 !important
 }
+
+/* Shared uploader styles (use in both components) */
+.upload-avatar-wrapper {
+  display: inline-block;
+}
+
+.image-preview-wrapper {
+  position: relative;
+  width: 120px;
+  height: 120px;
+}
+
+.remove-pic {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 28px;
+  height: 28px;
+  border-radius: 9999px;
+  background: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,.15);
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .image-preview-wrapper {
+    width: 96px;
+    height: 96px;
+  }
+  .remove-pic {
+    width: 26px;
+    height: 26px;
+  }
+}
