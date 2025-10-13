@@ -27,6 +27,12 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
   countries = allCountries;
   ComissionType = ComissionType;
 
+  private apiCommissionSnapshot?: { 
+  comissionType: ComissionType | null;
+  comissionAmount: number | null;
+  comissionPercentage: number | null;
+};
+
   isLoading = false;
   isSaving = false;
   submitted = false;
@@ -131,6 +137,11 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
             },
           });
 
+          this.apiCommissionSnapshot = {
+  comissionType: p.preferences?.comissionType ?? null,
+  comissionAmount: p.preferences?.comissionAmount ?? null,
+  comissionPercentage: p.preferences?.comissionPercentage ?? null,
+};
           // show backend avatar if present (local preview only)
           // if (p.profilePhotoUrl) {
           //   this.profileImagePreview = p.profilePhotoUrl;
@@ -144,34 +155,80 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
       });
   }
 
+  // private applyComissionValidation(t: ComissionType) {
+  //   const prefs = this.form.controls.preferences;
+  //   const pct = prefs.controls.comissionPercentage;
+  //   const amt = prefs.controls.comissionAmount;
+
+  //   pct.clearValidators();
+  //   amt.clearValidators();
+
+  //   pct.enable({ emitEvent: false });
+  //   amt.enable({ emitEvent: false });
+
+  //   if (t === ComissionType.Amount) {
+  //     pct.setValue(null, { emitEvent: false });
+  //     pct.disable({ emitEvent: false });
+  //     amt.setValidators([Validators.required, Validators.min(0.01)]);
+  //   } else if (t === ComissionType.Percentage) {
+  //     amt.setValue(null, { emitEvent: false });
+  //     amt.disable({ emitEvent: false });
+  //     if (!pct.value) pct.setValue(1, { emitEvent: false });
+  //     pct.setValidators([Validators.required, Validators.min(0), Validators.max(100)]);
+  //   } else if (t === ComissionType.Both) {
+  //     pct.setValidators([Validators.required, Validators.min(0), Validators.max(100)]);
+  //     amt.setValidators([Validators.required, Validators.min(0.01)]);
+  //   }
+
+  //   pct.updateValueAndValidity({ emitEvent: false });
+  //   amt.updateValueAndValidity({ emitEvent: false });
+  // }
+
+
   private applyComissionValidation(t: ComissionType) {
-    const prefs = this.form.controls.preferences;
-    const pct = prefs.controls.comissionPercentage;
-    const amt = prefs.controls.comissionAmount;
+  const prefs = this.form.controls.preferences;
+  const pct = prefs.controls.comissionPercentage;
+  const amt = prefs.controls.comissionAmount;
 
-    pct.clearValidators();
-    amt.clearValidators();
+  // Reset validators only (don’t wipe values)
+  pct.clearValidators();
+  amt.clearValidators();
 
-    pct.enable({ emitEvent: false });
-    amt.enable({ emitEvent: false });
+  // Enable both first so we can set values safely, then disable the irrelevant one.
+  pct.enable({ emitEvent: false });
+  amt.enable({ emitEvent: false });
 
-    if (t === ComissionType.Amount) {
-      pct.setValue(null, { emitEvent: false });
-      pct.disable({ emitEvent: false });
-      amt.setValidators([Validators.required, Validators.min(0.01)]);
-    } else if (t === ComissionType.Percentage) {
-      amt.setValue(null, { emitEvent: false });
-      amt.disable({ emitEvent: false });
-      if (!pct.value) pct.setValue(1, { emitEvent: false });
-      pct.setValidators([Validators.required, Validators.min(0), Validators.max(100)]);
-    } else if (t === ComissionType.Both) {
-      pct.setValidators([Validators.required, Validators.min(0), Validators.max(100)]);
-      amt.setValidators([Validators.required, Validators.min(0.01)]);
+  const fromApiPct = this.apiCommissionSnapshot?.comissionPercentage ?? null;
+  const fromApiAmt = this.apiCommissionSnapshot?.comissionAmount ?? null;
+
+  if (t === ComissionType.Amount) {
+    // Validators
+    amt.setValidators([Validators.required, Validators.min(0.01)]);
+    // If amount is empty, seed from API or fallback default
+    if (amt.value == null) {
+      amt.setValue(fromApiAmt ?? 100, { emitEvent: false }); // <- choose your default
     }
+    // Disable the other without clearing its value
+    pct.disable({ emitEvent: false });
+  } else if (t === ComissionType.Percentage) {
+    pct.setValidators([Validators.required, Validators.min(0), Validators.max(100)]);
+    if (pct.value == null) {
+      pct.setValue(fromApiPct ?? 1, { emitEvent: false }); // <- default %
+    }
+    amt.disable({ emitEvent: false });
+  } else { // Both
+    pct.setValidators([Validators.required, Validators.min(0), Validators.max(100)]);
+    amt.setValidators([Validators.required, Validators.min(0.01)]);
 
-    pct.updateValueAndValidity({ emitEvent: false });
-    amt.updateValueAndValidity({ emitEvent: false });
+    if (pct.value == null) pct.setValue(fromApiPct ?? 1, { emitEvent: false });
+    if (amt.value == null) amt.setValue(fromApiAmt ?? 100, { emitEvent: false });
   }
+
+  pct.updateValueAndValidity({ emitEvent: false });
+  amt.updateValueAndValidity({ emitEvent: false });
+  this.cdr.markForCheck();
+}
+
 
   get p() {
     return this.form.controls.preferences.controls;
