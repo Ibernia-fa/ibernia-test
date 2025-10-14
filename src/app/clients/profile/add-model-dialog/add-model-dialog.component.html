@@ -23,7 +23,9 @@
             <input matInput formControlName="name" />
             @if(form.get('name')?.touched &&
              form.get('name')?.hasError('required')) {
-                <span class="field-error d-block">Name is required</span>
+                <!-- <span class="field-error d-block">Name is required</span> -->
+              <span class="field-error d-block">Required</span>
+
             }
         </div>
         <div class="w-100 form-field">

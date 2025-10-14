@@ -9,7 +9,9 @@
             <input matInput formControlName="firstName" />
             @if(clientForm.get('firstName')?.touched &&
             clientForm.get('firstName')?.hasError('required')) {
-            <span class="field-error d-block">First name is required</span>
+            <!-- <span class="field-error d-block">First name is required</span> -->
+            <span class="field-error d-block">Required</span>
+
             }
           </div>
         </div>
@@ -17,9 +19,11 @@
           <div class="w-100 form-field">
             <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">Client last name</mat-label>
             <input matInput formControlName="lastName" />
-            @if(clientForm.get('firstName')?.touched &&
-            clientForm.get('firstName')?.hasError('required')) {
-            <span class="field-error d-block">Last name is required</span>
+            @if(clientForm.get('lastName')?.touched &&
+            clientForm.get('lastName')?.hasError('required')) {
+            <!-- <span class="field-error d-block">Last name is required</span> -->
+            <span class="field-error d-block">Required</span>
+
             }
           </div>
         </div>
@@ -47,7 +51,9 @@
             @if(clientForm.get('dob')?.touched &&
             clientForm.get('dob')?.hasError('required')) {
             <!-- <mat-error>Date Of Birth is required</mat-error> -->
-            <span class="field-error d-block">Date of birth is required</span>
+            <!-- <span class="field-error d-block">Date of birth is required</span> -->
+            <span class="field-error d-block">Required</span>
+
             }
           </div>
           <!-- </mat-form-field> -->
@@ -163,7 +169,9 @@
               <input matInput formControlName="firstName" />
               @if(clientForm.get('partner.firstName')?.touched &&
               clientForm.get('partner.firstName')?.hasError('required')) {
-              <span class="field-error d-block">First Name is required</span>
+              <!-- <span class="field-error d-block">First Name is required</span> -->
+            <span class="field-error d-block">Required</span>
+
               }
             </div>
           </div>
@@ -173,7 +181,9 @@
               <input matInput formControlName="lastName" />
               @if(clientForm.get('partner.lastName')?.touched &&
               clientForm.get('partner.lastName')?.hasError('required')) {
-              <span class="field-error d-block">Last Name is required</span>
+              <!-- <span class="field-error d-block">Last Name is required</span> -->
+            <span class="field-error d-block">Required</span>
+
               }
             </div>
           </div>
@@ -195,7 +205,9 @@
               @if(clientForm.get('partner.dob')?.touched &&
               clientForm.get('partner.dob')?.hasError('required')) {
 
-              <span class="field-error d-block">Date of Birth is required</span>
+              <!-- <span class="field-error d-block">Date of Birth is required</span> -->
+            <span class="field-error d-block">Required</span>
+
               }
             </div>
           </div>

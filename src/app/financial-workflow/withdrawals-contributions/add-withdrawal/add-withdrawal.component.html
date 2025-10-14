@@ -72,7 +72,9 @@
                     </mat-select>
                   </div>
                   @if(withdrawalForm.get('start')?.touched && withdrawalForm.get('start')?.hasError('required')) {
-                    <span class="field-error d-block">Start is required</span>
+                    <!-- <span class="field-error d-block">Start is required</span> -->
+              <span class="field-error d-block">Required</span>
+
                   }
                 </div>
               </div>
@@ -95,7 +97,9 @@
                       </mat-select>
                     </div>
                     @if(withdrawalForm.get('end')?.touched && withdrawalForm.get('end')?.hasError('required')) {
-                      <span class="field-error d-block">End is required</span>
+                      <!-- <span class="field-error d-block">End is required</span> -->
+              <span class="field-error d-block">Required</span>
+
                     }
                     @if(withdrawalForm.get('end')?.touched && withdrawalForm.get('end')?.hasError('endBeforeStart')) {
                       <span class="field-error d-block">End year cannot be before start year</span>
@@ -146,7 +150,9 @@
                 </div>
                 @if(withdrawalForm.get('escalationRate')?.touched &&
                     withdrawalForm.get('escalationRate')?.hasError('required')) {
-                  <span class="field-error d-block">Escalation Rate is required</span>
+                  <!-- <span class="field-error d-block">Escalation Rate is required</span> -->
+              <span class="field-error d-block">Required</span>
+
                 }
               </div>
             </div>
@@ -160,7 +166,9 @@
                 </mat-form-field>
                 @if(withdrawalForm.get('customEscalationRate')?.touched &&
                     withdrawalForm.get('customEscalationRate')?.hasError('required')) {
-                  <span class="field-error d-block">Custom escalation rate is required</span>
+                  <!-- <span class="field-error d-block">Custom escalation rate is required</span> -->
+              <span class="field-error d-block">Required</span>
+
                 }
               </div>
             }
@@ -191,7 +199,9 @@
               </mat-form-field>
               @if(withdrawalForm.get('commissionPercentage')?.touched &&
                    withdrawalForm.get('commissionPercentage')?.hasError('required')) {
-                <span class="field-error d-block">Commission percentage is required</span>
+                <!-- <span class="field-error d-block">Commission percentage is required</span> -->
+              <span class="field-error d-block">Required</span>
+
               }
             </div>
           </div>

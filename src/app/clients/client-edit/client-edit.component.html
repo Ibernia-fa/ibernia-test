@@ -10,7 +10,8 @@
             <input matInput placeholder="John " formControlName="firstName" />
             @if(clientForm.get('firstName')?.touched &&
             clientForm.get('firstName')?.hasError('required')) {
-            <mat-error>First Name is required</mat-error>
+            <!-- <mat-error>First Name is required</mat-error> -->
+             <mat-error>Required</mat-error>
             }
           </div>
         </div>
@@ -20,7 +21,9 @@
             <input matInput placeholder="Deo" formControlName="lastName" />
                         @if(clientForm.get('lastName')?.touched &&
             clientForm.get('lastName')?.hasError('required')) {
-            <mat-error>Last Name is required</mat-error>
+            <!-- <mat-error>Last Name is required</mat-error> -->
+             <mat-error>Required</mat-error>
+
             }
           </div>
         </div>
@@ -44,7 +47,9 @@
             </div>
             @if(clientForm.get('dob')?.touched &&
             clientForm.get('dob')?.hasError('required')) {
-            <mat-error>Date of Birth is required</mat-error>
+            <!-- <mat-error>Date of Birth is required</mat-error> -->
+             <mat-error>Required</mat-error>
+
             }
             <!-- </mat-form-field> -->
             <!-- <mat-form-field appearance="outline" class="w-100">
@@ -151,7 +156,9 @@
               <input matInput placeholder="John Deo" formControlName="firstName" />
               @if(clientForm.get('partner.firstName')?.touched &&
               clientForm.get('partner.firstName')?.hasError('required')) {
-              <span class="field-error d-block">First Name is required</span>
+              <!-- <span class="field-error d-block">First Name is required</span> -->
+              <span class="field-error d-block">Required</span>
+
               }
             </div>
           </div>
@@ -161,7 +168,9 @@
               <input matInput placeholder=" Deo" formControlName="lastName" />
                    @if(clientForm.get('partner.lastName')?.touched &&
               clientForm.get('partner.lastName')?.hasError('required')) {
-              <span class="field-error d-block">Last Name is required</span>
+              <!-- <span class="field-error d-block">Last Name is required</span> -->
+              <span class="field-error d-block">Required</span>
+
               }
             </div>
           </div>

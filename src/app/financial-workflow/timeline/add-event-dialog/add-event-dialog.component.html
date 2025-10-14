@@ -101,7 +101,9 @@
       eventForm.get('amount')?.hasError('required')) ||
       (eventForm.get('currency')?.touched &&
       eventForm.get('currency')?.hasError('required'))) {
-      <span class="field-error d-block">Amount is required</span>
+      <!-- <span class="field-error d-block">Amount is required</span> -->
+              <span class="field-error d-block">Required</span>
+
       }
     </div>
     <!-- End Net Amount Field  -->
@@ -122,7 +124,9 @@
           </div>
           @if(eventForm.get('ageDate')?.touched &&
           eventForm.get('ageDate')?.hasError('required')) {
-          <span class="field-error d-block">Age is required</span>
+          <!-- <span class="field-error d-block">Age is required</span> -->
+              <span class="field-error d-block">Required</span>
+
           }
         </div>
       </div>
@@ -222,7 +226,9 @@
       eventForm.get('amount')?.hasError('required')) ||
       (eventForm.get('currency')?.touched &&
       eventForm.get('currency')?.hasError('required'))) {
-      <span class="field-error d-block">Amount is required</span>
+      <!-- <span class="field-error d-block">Amount is required</span> -->
+              <span class="field-error d-block">Required</span>
+
       }
     </div>
     <!-- End Net Amount Field  -->
@@ -260,11 +266,15 @@
             eventForm.get('start')?.hasError('required')) {
               @if(eventForm.get('cycle')?.value ==='One-off')
               {
-                <span class="field-error d-block">Date is required</span>
+                <!-- <span class="field-error d-block">Date is required</span> -->
+              <span class="field-error d-block">Required</span>
+
               }
               @else 
               {
-                <span class="field-error d-block">Start is required</span>
+                <!-- <span class="field-error d-block">Start is required</span> -->
+              <span class="field-error d-block">Required</span>
+
               }
             }
           </div>
@@ -294,16 +304,22 @@
                 eventForm.get('end')?.hasError('required')) {
                  @if(eventForm.get('cycle')?.value ==='One-off')
                  {
-                   <span class="field-error d-block">Date is required</span>
+                   <!-- <span class="field-error d-block">Date is required</span> -->
+              <span class="field-error d-block">Required</span>
+
                  }
                  @else 
                  {
-                   <span class="field-error d-block">Start is required</span>
+                   <!-- <span class="field-error d-block">Start is required</span> -->
+              <span class="field-error d-block">Required</span>
+
                  }
                 }
                       @if(eventForm.get('end')?.touched &&
                     eventForm.get('end')?.hasError('required')) {
-                    <span class="field-error d-block">End is required</span>
+                    <!-- <span class="field-error d-block">End is required</span> -->
+              <span class="field-error d-block">Required</span>
+
                     }
                                 @if(eventForm.get('end')?.touched &&
     eventForm.get('end')?.hasError('endBeforeStart')) {
@@ -357,7 +373,9 @@
           
             @if(eventForm.get('customEscalationRate')?.touched &&
                 eventForm.get('customEscalationRate')?.hasError('required')) {
-              <span class="field-error d-block">Custom escalation rate is required</span>
+              <!-- <span class="field-error d-block">Custom escalation rate is required</span> -->
+              <span class="field-error d-block">Required</span>
+
             }
           </div>
         }
@@ -443,7 +461,9 @@
               </div>
               @if(eventForm.get('eventName')?.touched &&
               eventForm.get('eventName')?.hasError('required')) {
-              <span class="field-error d-block">Event is required</span>
+              <!-- <span class="field-error d-block">Event is required</span> -->
+              <span class="field-error d-block">Required</span>
+
               }
             </div>
           </div>
@@ -455,7 +475,9 @@
           <input matInput formControlName="name" />
           @if(eventForm.get('name')?.touched &&
           eventForm.get('name')?.hasError('required')) {
-          <span class="field-error d-block">Name is required</span>
+          <!-- <span class="field-error d-block">Name is required</span> -->
+              <span class="field-error d-block">Required</span>
+
           }
         </div>
         }
@@ -523,7 +545,9 @@
           eventForm.get('amount')?.hasError('required')) ||
           (eventForm.get('currency')?.touched &&
           eventForm.get('currency')?.hasError('required'))) {
-          <span class="field-error d-block">Amount is required</span>
+          <!-- <span class="field-error d-block">Amount is required</span> -->
+              <span class="field-error d-block">Required</span>
+
           }
         </div>
         <!-- End Net Amount Field  -->
@@ -554,11 +578,15 @@
                   eventForm.get('start')?.hasError('required')) {
                    @if(eventForm.get('cycle')?.value ==='One-off')
                    {
-                     <span class="field-error d-block">Date is required</span>
+                     <!-- <span class="field-error d-block">Date is required</span> -->
+              <span class="field-error d-block">Required</span>
+
                    }
                    @else 
                    {
-                     <span class="field-error d-block">Start is required</span>
+                     <!-- <span class="field-error d-block">Start is required</span> -->
+              <span class="field-error d-block">Required</span>
+
                    }
                   }
                 </div>
@@ -586,7 +614,9 @@
                     </div>
                     @if(eventForm.get('end')?.touched &&
                     eventForm.get('end')?.hasError('required')) {
-                    <span class="field-error d-block">End is required</span>
+                    <!-- <span class="field-error d-block">End is required</span> -->
+              <span class="field-error d-block">Required</span>
+
                     }
                     @if(eventForm.get('end')?.touched &&
     eventForm.get('end')?.hasError('endBeforeStart')) {
@@ -617,7 +647,9 @@
                 </div>
                 @if(eventForm.get('escalationRate')?.touched &&
                 eventForm.get('escalationRate')?.hasError('required')) {
-                <span class="field-error d-block">Escalation Rate is required</span>
+                <!-- <span class="field-error d-block">Escalation Rate is required</span> -->
+              <span class="field-error d-block">Required</span>
+
                 }
               </div>
             </div>
@@ -638,7 +670,9 @@
             
             @if(eventForm.get('customEscalationRate')?.touched &&
                 eventForm.get('customEscalationRate')?.hasError('required')) {
-              <span class="field-error d-block">Custom escalation rate is required</span>
+              <!-- <span class="field-error d-block">Custom escalation rate is required</span> -->
+              <span class="field-error d-block">Required</span>
+
             }
           </div>
         }

@@ -112,7 +112,9 @@
                   </div>
                   @if(expenseForm.get('start')?.touched &&
                   expenseForm.get('start')?.hasError('required')) {
-                  <span class="field-error d-block">Start is required</span>
+                  <!-- <span class="field-error d-block">Start is required</span> -->
+              <span class="field-error d-block">Required</span>
+
                   }
                 </div>
               </div>
@@ -143,7 +145,9 @@
                     </div>
                     @if(expenseForm.get('end')?.touched &&
                     expenseForm.get('end')?.hasError('required')) {
-                    <span class="field-error d-block">End is required</span>
+                    <!-- <span class="field-error d-block">End is required</span> -->
+              <span class="field-error d-block">Required</span>
+
                     }
                     @if(expenseForm.get('end')?.touched &&
                         expenseForm.get('end')?.hasError('endBeforeStart')) {
@@ -173,7 +177,9 @@
                 </div>
                 @if(expenseForm.get('escalationRate')?.touched &&
                 expenseForm.get('escalationRate')?.hasError('required')) {
-                <span class="field-error d-block">Escalation Rate is required</span>
+                <!-- <span class="field-error d-block">Escalation Rate is required</span> -->
+              <span class="field-error d-block">Required</span>
+
                 }
               </div>
             </div>

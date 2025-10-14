@@ -65,7 +65,9 @@
           <!-- Error  -->
           @if(savingsForm.get('name')?.touched &&
           savingsForm.get('name')?.hasError('required')) {
-          <span class="field-error d-block">Name is required</span>
+          <!-- <span class="field-error d-block">Name is required</span> -->
+              <span class="field-error d-block">Required</span>
+
           }
           <!-- End Error  -->
         </div>
@@ -76,7 +78,9 @@
           <input matInput formControlName="customName" />
           @if(savingsForm.get('customName')?.touched &&
           savingsForm.get('customName')?.hasError('required')) {
-          <span class="field-error d-block">Name is required</span>
+          <!-- <span class="field-error d-block">Name is required</span> -->
+              <span class="field-error d-block">Required</span>
+
           }
         </div>
         }
@@ -114,7 +118,9 @@
           savingsForm.get('amount')?.hasError('required')) ||
           (savingsForm.get('currency')?.touched &&
           savingsForm.get('currency')?.hasError('required'))) {
-          <span class="field-error d-block">Amount is required</span>
+          <!-- <span class="field-error d-block">Amount is required</span> -->
+              <span class="field-error d-block">Required</span>
+
           }
           <!-- ENd Error   -->
 
@@ -196,7 +202,9 @@
           @if(
           (savingsForm.get('returnRate')?.touched &&
           savingsForm.get('returnRate')?.hasError('required'))) {
-          <span class="field-error d-block">Return Rate is required</span>
+          <!-- <span class="field-error d-block">Return Rate is required</span> -->
+              <span class="field-error d-block">Required</span>
+
           }
         </div>
       }
@@ -238,7 +246,9 @@
                   @if(
                   (savingsForm.get('start')?.touched &&
                   savingsForm.get('start')?.hasError('required'))) {
-                  <span class="field-error d-block">Start is required</span>
+                  <!-- <span class="field-error d-block">Start is required</span> -->
+              <span class="field-error d-block">Required</span>
+
                   }
                   <!-- <span class="field-error d-block">Start is required</span> -->
                   <!-- End Error  -->
@@ -268,7 +278,9 @@
                   @if(
                   (savingsForm.get('end')?.touched &&
                   savingsForm.get('end')?.hasError('required'))) {
-                  <span class="field-error d-block">End is required</span>
+                  <!-- <span class="field-error d-block">End is required</span> -->
+              <span class="field-error d-block">Required</span>
+
                   }
                                       @if(savingsForm.get('end')?.touched &&
                         savingsForm.get('end')?.hasError('endBeforeStart')) {
@@ -393,7 +405,10 @@
               savingsForm.get('commissionAmount')?.hasError('required')) ||
               (savingsForm.get('commissionCurrency')?.touched &&
               savingsForm.get('commissionCurrency')?.hasError('required'))) {
-              <span class="field-error d-block">Amount is required</span>
+              <!-- <span class="field-error d-block">Amount is required</span> -->
+
+              <span class="field-error d-block">Required</span>
+
               }
               <!-- <span class="field-error d-block">Amount is required</span> -->
               <!-- End Error  -->
@@ -419,7 +434,9 @@
               <!-- error  -->
               @if(savingsForm.get('escalationRate')?.touched &&
               savingsForm.get('escalationRate')?.hasError('required')) {
-              <span class="field-error d-block">Escalation Rate is required</span>
+              <!-- <span class="field-error d-block">Escalation Rate is required</span> -->
+              <span class="field-error d-block">Required</span>
+
               }
               <!-- <span class="field-error d-block">Escalation Rate is required</span> -->
               <!-- End error  -->
@@ -450,7 +467,9 @@
             
             @if(savingsForm.get('customEscalationRate')?.touched &&
                 savingsForm.get('customEscalationRate')?.hasError('required')) {
-              <span class="field-error d-block">Custom escalation rate is required</span>
+              <!-- <span class="field-error d-block">Custom escalation rate is required</span> -->
+              <span class="field-error d-block">Required</span>
+
             }
           </div>
         }
@@ -516,7 +535,9 @@
               savingsForm.get('commissionPercentageCurrency')?.hasError('required')) ||
               (savingsForm.get('commissionPercentageCurrency')?.touched &&
               savingsForm.get('commissionPercentageCurrency')?.hasError('required'))) {
-              <span class="field-error d-block">Amount is required</span>
+              <!-- <span class="field-error d-block">Amount is required</span> -->
+              <span class="field-error d-block">Required</span>
+
               }
               <!-- <span class="field-error d-block">Amount is required</span> -->
               <!-- End Error  -->
