@@ -214,3 +214,22 @@ font-weight: 400 !important;
   font-size: 14px;   /* adjust as you like */
   font-weight: bold;
 }
+.form-field .mat-mdc-input-element {
+  border: 1px solid rgba(0,0,0,0.23);
+  border-radius: 4px;
+  padding: 10px 12px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+/* turn it red when invalid */
+.form-field .mat-mdc-input-element.ng-invalid.ng-touched,
+.form-field .mat-mdc-input-element.ng-invalid.ng-dirty {
+  border-color: #d32f2f !important; /* override Material’s border: none */
+}
+
+/* optional focus ring */
+.form-field .mat-mdc-input-element:focus {
+  outline: 2px solid rgba(211,47,47,.2);
+  outline-offset: 1px;
+}

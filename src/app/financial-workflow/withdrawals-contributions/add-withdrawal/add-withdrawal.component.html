@@ -18,7 +18,10 @@
           <mat-label class="f-s-16 d-block" style="line-height: 18px">Description</mat-label>
           <input matInput formControlName="description" />
         </div>
-
+                @if(withdrawalForm.get('description')?.touched &&
+              withdrawalForm.get('description')?.hasError('required')) {
+              <span class="field-error d-block">Required</span>
+              }
         <!-- Net Amount Field  -->
         <div class="d-flex flex-column gap-4 net-fields">
           <div class="d-flex flex-column gap-12">

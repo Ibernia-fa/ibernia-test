@@ -24,6 +24,10 @@
           <!-- <span class="field-error d-block">Name is required</span> -->
           <!-- End Error  -->
         </div>
+                              @if(expenseForm.get('description')?.touched &&
+              expenseForm.get('description')?.hasError('required')) {
+              <span class="field-error d-block">Required</span>
+              }
         <!--End Description Field  -->
 
         <!-- Net Amount Field  -->

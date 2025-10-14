@@ -314,6 +314,8 @@ private applySavingPotFilter(): void {
 // }
 
   addIncome(): void {
+    this.contributionForm.markAllAsTouched();
+    this.contributionForm.markAsDirty();
     if (!this.contributionForm.valid) {
       console.log('Form is invalid');
       return;

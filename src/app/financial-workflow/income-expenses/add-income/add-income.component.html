@@ -21,9 +21,13 @@
           <mat-label class="f-s-16 d-block" style="line-height: 18px">Description</mat-label>
           <input matInput formControlName="description" placeholder="e.g. State Pension" />
           <!-- Error  -->
-          <!-- <span class="field-error d-block">Name is required</span> -->
+          <!-- <span class="field-error d-block">Required</span>S -->
           <!-- End Error  -->
         </div>
+                      @if(incomeForm.get('description')?.touched &&
+              incomeForm.get('description')?.hasError('required')) {
+              <span class="field-error d-block">Required</span>
+              }
         <!--End Description Field  -->
 
         <!-- Net Amount Field  -->

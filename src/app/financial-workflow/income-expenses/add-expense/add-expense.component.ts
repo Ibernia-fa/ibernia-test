@@ -200,6 +200,8 @@ if (matchedEscalation) {
   
 
   addExpense(): void {
+    this.expenseForm.markAllAsTouched();
+    this.expenseForm.markAsDirty();
     if (this.expenseForm.valid) {
       console.log('Form Submitted', this.expenseForm.value);
       const isCustomEscalation =

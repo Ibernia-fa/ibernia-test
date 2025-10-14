@@ -198,6 +198,8 @@ this.escalationRates.push({
 
   addIncome(): void {
       console.log('Form Submitted', this.incomeForm);
+      this.incomeForm.markAllAsTouched();
+      this.incomeForm.markAsDirty();
 
     if (this.incomeForm.valid) {
       console.log('Form Submitted', this.incomeForm.value);

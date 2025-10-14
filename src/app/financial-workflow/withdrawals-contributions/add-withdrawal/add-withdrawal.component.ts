@@ -198,6 +198,8 @@ this.savingPots.clientSavings = (this.savingPots.clientSavings || [])
   }
 
   addExpense(): void {
+    this.withdrawalForm.markAllAsTouched();
+    this.withdrawalForm.markAsDirty();
     if (this.withdrawalForm.valid) {
           const hasCommission = !!this.withdrawalForm.get('commissions')?.value;
     const commissionPct = Number(

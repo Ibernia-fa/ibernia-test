@@ -87,4 +87,31 @@
 .input-container input {
   padding-right: 30px; /* ensures space for the % */
 }
+/* base look */
+:host .select-option .mat-mdc-select-trigger {
+  border: 1px solid rgba(0,0,0,0.23);
+  border-radius: 4px;
+  padding: 8px 12px;
+  min-height: 40px;
+  box-sizing: border-box;
+  width: 100%;
+  display: flex;           /* keeps content vertically centered */
+  align-items: center;
+}
 
+/* make the whole select take full width */
+:host .select-option .mat-mdc-select {
+  width: 100%;
+}
+
+/* error: turn border red when invalid */
+:host .select-option .mat-mdc-select.ng-invalid.ng-touched .mat-mdc-select-trigger,
+:host .select-option .mat-mdc-select.ng-invalid.ng-dirty .mat-mdc-select-trigger {
+  border-color: #d32f2f !important;
+}
+
+/* optional: focus ring */
+:host .select-option .mat-mdc-select.cdk-focused .mat-mdc-select-trigger {
+  outline: 2px solid rgba(211,47,47,.2);
+  outline-offset: 1px;
+}
