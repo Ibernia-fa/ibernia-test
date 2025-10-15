@@ -230,7 +230,7 @@
         </button>
       </div>
       <div class="col-5">
-        <button (click)="addIncome()" type="button" class="button-icon w-100 d-block">
+        <button (click)="addIncome()" type="button" [disabled]="incomeForm.invalid" class="button-icon w-100 d-block">
           <span class="f-s-16">{{isEditWorkflow ? 'Update' : 'Add'}} income</span>
         </button>
       </div>

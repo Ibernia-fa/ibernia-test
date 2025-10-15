@@ -219,7 +219,7 @@
         </button>
       </div>
       <div class="col-5">
-        <button (click)="addExpense()" type="button" class="button-icon w-100 d-block">
+        <button (click)="addExpense()" type="button" [disabled]="withdrawalForm.invalid"  class="button-icon w-100 d-block">
           <span class="f-s-16">{{isEditWorkflow ? 'Update' : 'Add'}} Withdrawal</span>
         </button>
       </div>

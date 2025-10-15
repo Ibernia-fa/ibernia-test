@@ -690,7 +690,7 @@
         </button>
       </div>
       <div class="col-5">
-        <button (click)="onCustomEventSubmit()" class="button-icon w-100 d-block">
+        <button (click)="onCustomEventSubmit()" [disabled]="eventForm.invalid" class="button-icon w-100 d-block">
           <span class="f-s-16">Save</span>
         </button>
       </div>
