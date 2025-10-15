@@ -56,6 +56,7 @@ position: absolute;
     justify-content: center;
     &.upload-company-avatar{
         width: 400px;
+        margin: auto;
     }
     small{
         color: #B7B6C2;
@@ -69,29 +70,32 @@ position: absolute;
 }
 
 /* Shared uploader styles (use in both components) */
-.upload-avatar-wrapper {
-  display: inline-block;
-}
+
 
 .image-preview-wrapper {
-  position: relative;
+
   width: 120px;
   height: 120px;
 }
 
 .remove-pic {
-  position: absolute;
-  top: -6px;
-  right: -6px;
-  width: 28px;
-  height: 28px;
-  border-radius: 9999px;
-  background: #fff;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 8px rgba(0,0,0,.15);
-  cursor: pointer;
+    position: absolute;
+    right: -14px;
+    top: -16px;
+    border: 1px solid #ccc;
+    border-radius: 100px;
+    width: 28px;
+    height: 28px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    cursor: pointer;
+      &:hover{
+        background-color: #ffb4b4;
+        border-color: #ffb4b4;
+    }
 }
 
 @media (max-width: 768px) {

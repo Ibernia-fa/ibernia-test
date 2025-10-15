@@ -115,7 +115,7 @@ ComissionType = ComissionType;
     this.form.markAllAsTouched();
     // this.form.markAsDirty();
     if (this.form.invalid) {
-      this.snack.open('Please fix the highlighted fields.', 'Close', { duration: 3000 });
+      this.snack.open('Please fix the highlighted fields', 'Close', { duration: 3000 });
       return;
     }
 
@@ -149,14 +149,14 @@ ComissionType = ComissionType;
       .pipe(
         takeUntil(this.destroy$),
         catchError((err) => {
-          const msg = err?.error?.message ?? 'Failed to save preferences.';
+          const msg = err?.error?.message ?? 'Failed to save preferences';
           this.snack.open(msg, 'Close', { duration: 4000 });
           return EMPTY;
         }),
         finalize(() => (this.isSaving = false))
       )
       .subscribe(() => {
-        this.snack.open('Preferences saved.', undefined, { duration: 2000 });
+        this.snack.open('Preferences saved', undefined, { duration: 2000 });
           if (this.dialogRef) {
           this.dialogRef.close(true);
           return;

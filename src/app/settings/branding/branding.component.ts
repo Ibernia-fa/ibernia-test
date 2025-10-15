@@ -65,12 +65,12 @@ export class BrandingComponent implements OnInit {
 
   save() {
     if (!this.profileImage) {
-      this.snack.open('Please select a logo first.', 'Close', { duration: 2500 });
+      this.snack.open('Please select a logo first', 'Close', { duration: 2500 });
       return;
     }
     const userId = this.auth.getUserProfile()?.sub;
     if (!userId) {
-      this.snack.open('No user id found. Please sign in again.', 'Close', { duration: 3000 });
+      this.snack.open('No user id found. Please sign in again', 'Close', { duration: 3000 });
       return;
     }
 
@@ -79,12 +79,12 @@ export class BrandingComponent implements OnInit {
       .saveProfile({ userId, profilePhotoUrl: this.profileImage })
       .subscribe({
         next: () => {
-          this.snack.open('Logo saved.', undefined, { duration: 1800 });
+          this.snack.open('Logo saved', undefined, { duration: 1800 });
           this.isSaving = false;
         },
         error: (err) => {
           console.error(err);
-          this.snack.open('Failed to save logo.', 'Close', { duration: 3500 });
+          this.snack.open('Failed to save logo', 'Close', { duration: 3500 });
           this.isSaving = false;
         },
       });

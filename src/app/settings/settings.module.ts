@@ -25,7 +25,10 @@ import { HelpAndContactComponent } from './help-and-contact/help-and-contact.com
     SecurityComponent,
     NotificationsComponent,
     BrandingComponent,
+    HelpAndContactComponent,
     AccountPreferencesComponent],
+    
+    
   imports: [
     MaterialModule,
     CommonModule, MatOptionModule,

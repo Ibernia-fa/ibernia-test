@@ -293,7 +293,7 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
       this.cdr.markForCheck();                // <-- ensure UI updates under OnPush
     } catch (e) {
       console.error('Failed to read image', e);
-      this.snack.open('Could not read the selected image.', 'Close', { duration: 3000 });
+      this.snack.open('Could not read the selected image', 'Close', { duration: 3000 });
     } finally {
       // reset the native input so picking the *same file* again will fire (change)
       if (this.fileInput?.nativeElement) {
@@ -307,7 +307,7 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
     this.submitted = true;
     if (this.form.invalid) {
       this.form.markAllAsTouched();
-      this.snack.open('Please fix the highlighted fields.', 'Close', { duration: 3000 });
+      this.snack.open('Please fix the highlighted fields', 'Close', { duration: 3000 });
       return;
     }
 
@@ -351,7 +351,7 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
       )
       .subscribe(() => {
         this.isSaving = false;
-        this.snack.open('Preferences saved.', undefined, { duration: 2000 });
+        this.snack.open('Preferences saved', undefined, { duration: 2000 });
          this.api.notifyProfileChanged();
       });
   }

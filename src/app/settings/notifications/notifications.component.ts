@@ -15,5 +15,8 @@ export class NotificationsComponent {
     ) {
       this.navItemService.currentRouteName = 'Notifications';
     }
-
+  toggleStatus = true; // default ON
+  toggleStatus1 = true; // default ON
+  toggleStatus2 = true; // default ON
+  toggleStatus3 = true; // default ON
 }
