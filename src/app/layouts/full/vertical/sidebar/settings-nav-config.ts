@@ -10,14 +10,14 @@ export const settingsNavItems: NavItem[] = [
   },
     {
     displayName: 'Notifications',
-    iconName: '/assets/images/shapes/Notification.svg',
+    iconName: '/assets/images/shapes/Notification-active.svg',
     iconOutline: '/assets/images/shapes/Notification.svg',
     route: '/settings/notifications',
   },
       {
     displayName: 'Help & Contact',
-    iconName: '/assets/images/shapes/account-preference-active.svg',
-    iconOutline: '/assets/images/shapes/account.svg',
+    iconName: '/assets/images/shapes/help-active.svg',
+    iconOutline: '/assets/images/shapes/help.svg',
     route: '/settings/help',
   },
 //   {

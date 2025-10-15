@@ -235,3 +235,13 @@ font-weight: 400 !important;
   outline: 2px solid rgba(211,47,47,.2);
   outline-offset: 1px;
 }
+
+.mat-accordion{
+  .mat-expansion-panel {
+    margin-bottom: 10px;
+    border-radius: 12px !important;
+    box-shadow: none !important;
+    background-color: #fff;
+    border:1px solid #e7e7eb;
+  }
+}
