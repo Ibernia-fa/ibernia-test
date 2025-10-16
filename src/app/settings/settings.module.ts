@@ -15,6 +15,7 @@ import { MatCardModule } from '@angular/material/card';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import { MatOptionModule } from '@angular/material/core';
 import { MaterialModule } from '../material.module';
+import {MatExpansionModule} from '@angular/material/expansion';
 import { HelpAndContactComponent } from './help-and-contact/help-and-contact.component';
 
 
@@ -25,11 +26,16 @@ import { HelpAndContactComponent } from './help-and-contact/help-and-contact.com
     SecurityComponent,
     NotificationsComponent,
     BrandingComponent,
+    HelpAndContactComponent,
     AccountPreferencesComponent],
+    
+    
   imports: [
     MaterialModule,
     CommonModule, MatOptionModule,
-     FormsModule, ReactiveFormsModule,MatCardModule,MatCheckboxModule, SettingsRoutingModule,MatFormFieldModule,MatInputModule,MatButtonModule,MatIconModule
+     FormsModule, ReactiveFormsModule,MatCardModule,MatCheckboxModule, SettingsRoutingModule,MatFormFieldModule,MatInputModule,MatButtonModule,MatExpansionModule,MatIconModule
   ]
 })
-export class SettingsModule { }
+export class SettingsModule { 
+  
+}

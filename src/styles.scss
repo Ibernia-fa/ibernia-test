@@ -111,6 +111,7 @@ table {
   .mat-mdc-form-field-icon-suffix {
      padding: 0 0 0 1px;
     background: url(../src/assets/images/shapes/percentage.png) left top no-repeat;
+     background: url(../src/assets/images/shapes/percentage.SVG) left top no-repeat;
     height: 20px;
     width: 20px;
     align-items: center;
@@ -121,10 +122,11 @@ table {
     color: white;
     font-size: 16px;
     right: 16px;
-    top: 15px;
+    top: 50%;
     text-align: center;
     display: flex;
-    background-size: contain;
+    background-size: 20px 20px;
+    margin-top: -10px;
     span{
       display: none;
     }
@@ -232,4 +234,14 @@ font-weight: 400 !important;
 .form-field .mat-mdc-input-element:focus {
   outline: 2px solid rgba(211,47,47,.2);
   outline-offset: 1px;
+}
+
+.mat-accordion{
+  .mat-expansion-panel {
+    margin-bottom: 10px;
+    border-radius: 12px !important;
+    box-shadow: none !important;
+    background-color: #fff;
+    border:1px solid #e7e7eb;
+  }
 }

@@ -1,11 +1,6 @@
 // Timeline Section Style
 .timeline-wrapper {
-    .card-main-wrapper {
-      span.f-s-16 {
-        line-height: 18px;
-        text-decoration: underline;
-      }
-    }
+  
     @media (max-width: 768px) {
       .flex-nowrap {
         flex-wrap: wrap !important;

@@ -3,9 +3,10 @@
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 20 20" style="enable-background:new 0 0 20 20;" xml:space="preserve">
 <style type="text/css">
-	.st0{fill:none;stroke:#9495A2;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
+	.st0{fill:#516CE8;stroke:#516CE8;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
+	.st1{fill:none;stroke:#516CE8;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
 </style>
-<path class="st0" d="M10,15.4c5.2,0,7.6-0.7,7.9-3.4c0-2.7-1.7-2.5-1.7-5.8c0-2.6-2.4-5.5-6.2-5.5c-3.7,0-6.2,2.9-6.2,5.5
+<path class="st0" d="M10,15.4c5.2,0,7.6-0.7,7.8-3.3c0-2.7-1.7-2.5-1.7-5.8c0-2.6-2.4-5.5-6.2-5.5c-3.7,0-6.2,2.9-6.2,5.5
 	c0,3.3-1.7,3.1-1.7,5.8C2.4,14.7,4.8,15.4,10,15.4z"/>
-<path class="st0" d="M12.2,18.2c-1.3,1.4-3.2,1.4-4.5,0"/>
+<path class="st1" d="M12.3,18.1c-1.3,1.4-3.2,1.4-4.5,0"/>
 </svg>

@@ -16,8 +16,8 @@ export const settingsNavItems: NavItem[] = [
   },
       {
     displayName: 'Help & Contact',
-    iconName: '/assets/images/shapes/Help-active.svg',
-    iconOutline: '/assets/images/shapes/Help.svg',
+    iconName: '/assets/images/shapes/help-active.svg',
+    iconOutline: '/assets/images/shapes/help.svg',
     route: '/settings/help',
   },
 //   {
