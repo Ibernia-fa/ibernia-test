@@ -8,6 +8,12 @@ export const settingsNavItems: NavItem[] = [
     iconOutline: '/assets/images/shapes/account.svg',
     route: '/settings/account-preferences',
   },
+          {
+    displayName: 'Plan & Billing',
+    iconName: '/assets/images/shapes/help-active.svg',
+    iconOutline: '/assets/images/shapes/help.svg',
+    route: '/settings/plan-billing',
+  },
     {
     displayName: 'Notifications',
     iconName: '/assets/images/shapes/Notification-active.svg',
@@ -20,6 +26,7 @@ export const settingsNavItems: NavItem[] = [
     iconOutline: '/assets/images/shapes/help.svg',
     route: '/settings/help',
   },
+
 //   {
 //     displayName: 'Plan & Billing',
 //     iconName: '/assets/images/svgs/wallet-icon-filled.svg',
@@ -47,5 +54,11 @@ export const settingsLowerNavItems: NavItem[] = [
     iconName: '/assets/images/shapes/branding-active.svg',
     iconOutline: '/assets/images/shapes/branding.svg',
     route: '/settings/branding',
+  },
+    {
+    displayName: 'AI Reccomendations',
+    iconName: '/assets/images/shapes/branding-active.svg',
+    iconOutline: '/assets/images/shapes/branding.svg',
+    route: '/settings/ai-reccomendations',
   },
 ];
