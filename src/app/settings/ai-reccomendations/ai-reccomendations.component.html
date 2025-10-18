@@ -1,1 +1,42 @@
-<p>ai-reccomendations works!</p>
+<mat-card class="mat-mdc-card mdc-card cardWithShadow mb-20">
+  <mat-card-content class="mat-mdc-card-content">
+    <div class="d-flex align-items-center main-header-content">
+      <div class="header-icon">
+        <img width="56" src="../../../assets/images/shapes/small-icon-6.svg" alt="">
+      </div>
+      <div class="d-flex flex-column justify-content-between gap-4">
+        <h4 class="page-title f-w-500">AI Recommendations</h4>
+        <span class="sub-title">Fine-tune your AI assistant</span>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>
+<mat-card class="mat-mdc-card mdc-card cardWithShadow mb-20">
+  <mat-card-content class="mat-mdc-card-content">
+<div *ngIf="selectedPlan === 'enterprise'" class="enterprise-context-section">
+<h3 class="f-s-24 f-w-400 m-b-5">Only available to enterprise customers</h3>
+  <p class="description">
+    Configure tone, solution preferences, and risk limits; outputs will conform to your firm-wide policies.
+    Specify approved offerings and required compliance language here to ensure consistent, compliant recommendations for every client.
+    <br /><br />
+    <strong>Talk to an Ibernia AI expert</strong> to set this up effectively for your organization.
+  </p>
+
+  <mat-form-field appearance="outline" class="full-width textarea-wrapper w-100">
+    <textarea
+      matInput
+      placeholder="Your company context"
+      [(ngModel)]="companyContext"
+      maxlength="10000"
+      rows="3">
+    </textarea>
+    <mat-hint >{{ companyContext?.length || 0 }} / 10000</mat-hint>
+  </mat-form-field>
+<div class="d-flex justify-space-end">
+    <button  color="primary" class="button-icon"><span> Send</span></button>
+</div>
+
+  
+</div>
+</mat-card-content>
+</mat-card>

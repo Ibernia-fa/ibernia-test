@@ -17,7 +17,7 @@ import { MatOptionModule } from '@angular/material/core';
 import { MaterialModule } from '../material.module';
 import {MatExpansionModule} from '@angular/material/expansion';
 import { HelpAndContactComponent } from './help-and-contact/help-and-contact.component';
-
+import { AiReccomendationsComponent } from './ai-reccomendations/ai-reccomendations.component';
 
 
 @NgModule({
@@ -27,6 +27,7 @@ import { HelpAndContactComponent } from './help-and-contact/help-and-contact.com
     NotificationsComponent,
     BrandingComponent,
     HelpAndContactComponent,
+    AiReccomendationsComponent,
     AccountPreferencesComponent],
     
     

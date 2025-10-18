@@ -10,8 +10,8 @@ export const settingsNavItems: NavItem[] = [
   },
           {
     displayName: 'Plan & Billing',
-    iconName: '/assets/images/shapes/help-active.svg',
-    iconOutline: '/assets/images/shapes/help.svg',
+    iconName: '/assets/images/shapes/plan-billing-active.svg',
+    iconOutline: '/assets/images/shapes/plan-billing.svg',
     route: '/settings/plan-billing',
   },
     {
@@ -57,8 +57,8 @@ export const settingsLowerNavItems: NavItem[] = [
   },
     {
     displayName: 'AI Reccomendations',
-    iconName: '/assets/images/shapes/branding-active.svg',
-    iconOutline: '/assets/images/shapes/branding.svg',
+    iconName: '/assets/images/shapes/ai-rec-act.png',
+    iconOutline: '/assets/images/shapes/ai-rec.png',
     route: '/settings/ai-reccomendations',
   },
 ];

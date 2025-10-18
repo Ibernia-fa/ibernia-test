@@ -35,6 +35,9 @@ body { margin: 0;  }
 .justify-space-between{
   justify-content: space-between;
 }
+.justify-space-end{
+  justify-content: end;
+}
 .pull-right{
   float: right;
 }
@@ -95,6 +98,13 @@ table {
       height: 49px;
       line-height: 37px;
       }
+  }
+  &.textarea-wrapper{
+   .mat-mdc-text-field-wrapper{
+     .mat-mdc-form-field-infix{
+      height: auto;
+     }
+   }
   }
 }
 .percentage-icon{
@@ -242,4 +252,13 @@ font-weight: 400 !important;
     background-color: #fff;
     border:1px solid #e7e7eb;
   }
+}
+
+.mat-mdc-form-field-subscript-wrapper{
+  margin-top: 10px;
+  font-size: 14px;
+}
+.mat-mdc-form-field-hint-wrapper{
+  padding-left: 0px !important;
+
 }

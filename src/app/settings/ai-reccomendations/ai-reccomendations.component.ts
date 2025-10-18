@@ -13,4 +13,6 @@ export class AiReccomendationsComponent {
     ) {
       this.navItemService.currentRouteName = 'AI Reccomendations';
     }
+    selectedPlan: string = 'enterprise'; // or bind this from radio buttons
+companyContext: string = '';
 }
