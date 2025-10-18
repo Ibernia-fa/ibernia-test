@@ -7,6 +7,7 @@ import { SecurityComponent } from './security/security.component';
 import { PlanBillingComponent } from './plan-billing/plan-billing.component';
 import { AccountPreferencesComponent } from './account-preferences/account-preferences.component';
 import { HelpAndContactComponent } from './help-and-contact/help-and-contact.component';
+import { AiReccomendationsComponent } from './ai-reccomendations/ai-reccomendations.component';
 
 
 const routes: Routes = [
@@ -17,6 +18,8 @@ const routes: Routes = [
   { path: 'notifications', component: NotificationsComponent, data: { showSidebar: true } },
   { path: 'branding', component: BrandingComponent, data: { showSidebar: true } },
   { path: 'help', component: HelpAndContactComponent, data: { showSidebar: true } },
+  { path: 'ai-reccomendations', component: AiReccomendationsComponent, data: { showSidebar: true } },
+
 
 ];
 
