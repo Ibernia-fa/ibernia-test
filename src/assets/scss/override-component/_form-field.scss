@@ -40,9 +40,8 @@ html {
 }
 .form-field input,
 .form-field textarea,
-.form-field .select-option {
+.form-field .select-option .mat-mdc-select .mat-mdc-select-trigger {
   width: 100%;
-  display: block;
   background-color: #ffffff;
   border: 1px solid #e7e7eb;
   border-radius: 4px;
