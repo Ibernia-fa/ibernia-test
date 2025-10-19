@@ -1,5 +1,5 @@
 # Step 1: Use Node.js to build the Angular app
-FROM node:18 as build-stage
+FROM node:22.20.0 as build-stage
 
 # Set the working directory
 WORKDIR /app
@@ -14,7 +14,7 @@ RUN npm install --legacy-peer-deps
 COPY . .
 
 # Build the Angular app
-RUN npm run build --prod
+RUN npm run build --prod --verbose
 
 # Step 2: Use Nginx to serve the Angular app
 FROM nginx:alpine as production-stage
