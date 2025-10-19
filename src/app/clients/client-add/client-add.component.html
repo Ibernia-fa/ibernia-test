@@ -290,13 +290,15 @@
           </div>
         </div>
       </div>
-      <div class="row justify-content-end client-submit-btn">
-        <button mat-flat-button class="btn-submit m-r-5" (click)="onAddNewClientClicked()" [disabled]="isFormInvalid">
-          Add new client
+      <div class="row  client-submit-btn">
+        <div class="col-12 d-flex justify-content-end">
+        <button  class="button-icon   m-r-5" (click)="onAddNewClientClicked()" [disabled]="isFormInvalid">
+         <span>Add new client</span> 
         </button>
-        <button mat-flat-button class="btn-secondary" (click)="onSubmit()" [disabled]="isFormInvalid">
-          Add new client and start the model
+        <button  class="button-icon " (click)="onSubmit()" [disabled]="isFormInvalid">
+         <span>Add new client and start the model</span> 
         </button>
+        </div>
       </div>
     </form>
   </mat-card-content>

@@ -161,6 +161,14 @@ button {
       text-transform: uppercase;
     }
   }
+  &:disabled{
+    background: #e0e0e1;
+    span{
+ color: #969698;
+    }
+   
+    cursor: not-allowed;
+  }
 }
 
 
@@ -226,13 +234,13 @@ font-weight: 400 !important;
   font-size: 14px;   /* adjust as you like */
   font-weight: bold;
 }
-.form-field .mat-mdc-input-element {
-  border: 1px solid rgba(0,0,0,0.23);
-  border-radius: 4px;
-  padding: 10px 12px;
-  box-sizing: border-box;
-  width: 100%;
-}
+// .form-field .mat-mdc-input-element {
+//   border: 1px solid rgba(0,0,0,0.23);
+//   border-radius: 4px;
+//   padding: 10px 12px;
+//   box-sizing: border-box;
+//   width: 100%;
+// }
 
 /* turn it red when invalid */
 .net-fields .form-field .mat-mdc-input-element.ng-invalid.ng-touched,
@@ -254,10 +262,10 @@ font-weight: 400 !important;
   }
 }
 
-.mat-mdc-form-field-subscript-wrapper{
-  margin-top: 10px;
-  font-size: 14px;
-}
+// .mat-mdc-form-field-subscript-wrapper{
+//   margin-top: 10px;
+//   font-size: 14px;
+// }
 .mat-mdc-form-field-hint-wrapper{
   padding-left: 0px !important;
 

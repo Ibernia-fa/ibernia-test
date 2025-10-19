@@ -21,7 +21,7 @@
     <mat-dialog-content class="custom-body">
       <div class="d-flex flex-column gap-20" [formGroup]="savingsForm">
         <!-- Name Field  -->
-        <div class="w-100 form-field gap-12">
+        <div class="w-100 form-field gap-8">
           <mat-label class="f-s-16 d-block" style="line-height: 18px">Type</mat-label>
           <div class="select-option hide-arrow">
      <mat-select
@@ -29,7 +29,6 @@
   placeholder="Select"
   [disabled]="isCashPotEditMode"
   (selectionChange)="onNameValueChange($event.value)"
-  style="height:24px"
 >
   <!-- When editing a Cash pot, inject a single disabled 'Cash' option so the label shows -->
   @if (isCashPotEditMode) {
@@ -87,12 +86,11 @@
         <!--End  Name Field  -->
 
         <!-- Starting pot value Field  -->
-        <div class="d-flex flex-column gap-12">
+        <div class="d-flex flex-column gap-8  net-fields">
           <span class="f-s-16 f-w-400">Starting pot value</span>
-          <div class="d-flex align-items-center gap-12">
+          <div class="net-field d-flex align-items-center">
             <!-- Currency Selector  -->
-            <div class="left form-field">
-              <div class="select-option hide-arrow">
+              <div class="left hide-arrow">
               <mat-select value="£" formControlName="currency" class="sortby-edit-profile" hideSingleSelectionIndicator>
                 @for (country of countries; track country) {
                 @if(country.currencySymbol) {
@@ -104,11 +102,10 @@
                 }
               </mat-select>
               </div>
-            </div>
             <!-- End Currency Selector  -->
             <!-- Price Field  -->
             <div class="w-100 form-field">
-              <input matInput type="number" formControlName="amount" placeholder="0" />
+              <input matInput type="number" style="border-radius: 0px 4px 4px 0px;" formControlName="amount" placeholder="0" />
             </div>
             <!-- End Price Field  -->
           </div>
@@ -307,7 +304,7 @@
         <!-- End CheckBox  -->
 
         @if(savingsForm.get('commissions')?.value) {
-        <div class="d-flex flex-column gap-12  m-t-15">
+        <div class="d-flex flex-column gap-20  m-t-15">
           <!-- Modal tabs  -->
           <!-- <div class="d-flex flex-column gap-6 tab">
             <span class="f-s-16 f-w-400">Commission type</span>
@@ -357,11 +354,11 @@
                 <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
               </div>
             }
-            <div class="d-flex flex-column gap-4">
-              <div class="d-flex align-items-center gap-12">
+            <div class="d-flex flex-column gap-4 net-fields">
+              <div class="d-flex align-items-center net-field">
                 <!-- Currency Selector  -->
-                 <div class="left form-field">
-              <div class="select-option hide-arrow">
+                 <div class="left hide-arrow">
+            
                   <mat-select value="£" formControlName="commissionCurrency" class="sortby-edit-profile"
                     hideSingleSelectionIndicator>
                     @for (country of countries; track country) {
@@ -373,7 +370,7 @@
                     }
                     }
                   </mat-select>
-                  </div>
+                  
                 </div>
                 <!-- End Currency Selector  -->
                 <!-- Price Field  -->
@@ -382,11 +379,10 @@
                 </div>
                 <!-- End Price Field  -->
                 <!-- End Type Field  -->
-                <div class="right form-field">
+                <div class="right">
 
 
                    
-              <div class="select-option">
                   <mat-select value="Select" formControlName="commissionCycle" class="sortby-edit-profile"
                     hideSingleSelectionIndicator>
                     <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
@@ -394,7 +390,6 @@
                     <mat-option [value]="cycle.id">{{ cycle.description }}</mat-option>
                     }
                   </mat-select>
-                </div>
                 </div>
                 <!-- End Type Field  -->
               </div>

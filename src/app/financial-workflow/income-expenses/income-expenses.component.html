@@ -41,8 +41,7 @@ You may link transactions to specific events, and adjust timing or frequency as 
                                     <img src="assets/images/svgs/income-money-receive.svg" alt="income-money-receive" />
                                     <h3 class="card-title expense-income">Incomes</h3>
                                 </div>
-                                <h3 class="saving-title">
-                                    +{{selectedClient?.clientDetails?.preferredCurrency | currencySymbol}}{{incomeExpense?.totalIncome ?? 0}}
+                                <h3 class="saving-title">+{{selectedClient?.clientDetails?.preferredCurrency | currencySymbol}}{{incomeExpense?.totalIncome ?? 0}}
                                 </h3>
                             </div>
                         </div>
@@ -55,8 +54,7 @@ You may link transactions to specific events, and adjust timing or frequency as 
                                     <img src="assets/images/svgs/income-money-send.svg" alt="income-money-send" />
                                     <h3 class="card-title expenses-deduct">Expenses</h3>
                                 </div>
-                                <h3 class="saving-title">
-                                    -{{selectedClient?.clientDetails?.preferredCurrency | currencySymbol}}{{incomeExpense?.totalExpenses ?? 0}}
+                                <h3 class="saving-title">-{{selectedClient?.clientDetails?.preferredCurrency | currencySymbol}}{{incomeExpense?.totalExpenses ?? 0}}
                                 </h3>
                             </div>
                         </div>
@@ -92,8 +90,7 @@ You may link transactions to specific events, and adjust timing or frequency as 
                                         Saving rate</h3>
                                 </div>
                                 <h3
-                                    [ngClass]="(incomeExpense?.savingRate ?? 0) > 0 ? 'saving-title green' : 'saving-title red'">
-                                    {{(incomeExpense?.savingRate ?? 0) | number : '1.0-0'}}%</h3>
+                                    [ngClass]="(incomeExpense?.savingRate ?? 0) > 0 ? 'saving-title green' : 'saving-title red'">{{(incomeExpense?.savingRate ?? 0) | number : '1.0-0'}}%</h3>
                             </div>
                         </div>
                     </div>

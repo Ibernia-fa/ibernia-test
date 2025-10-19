@@ -17,22 +17,23 @@
     <mat-dialog-content>
       <div [formGroup]="expenseForm" class="d-flex flex-column gap-20">
         <!-- Description Field  -->
-        <div class="w-100 form-field gap-12">
+        <div class="w-100 form-field gap-8">
           <mat-label class="f-s-16 d-block" style="line-height: 18px">Description</mat-label>
           <input matInput formControlName="description" placeholder="e.g. State Pension" />
           <!-- Error  -->
           <!-- <span class="field-error d-block">Name is required</span> -->
           <!-- End Error  -->
-        </div>
-                              @if(expenseForm.get('description')?.touched &&
+               @if(expenseForm.get('description')?.touched &&
               expenseForm.get('description')?.hasError('required')) {
               <span class="field-error d-block">Required</span>
               }
+        </div>
+                          
         <!--End Description Field  -->
 
         <!-- Net Amount Field  -->
         <div class="d-flex flex-column gap-4 net-fields">
-          <div class="d-flex flex-column gap-12">
+          <div class="d-flex flex-column gap-8">
             <mat-label class="f-s-16 d-block" style="line-height: 18px">Net amount</mat-label>
             <div class="net-field d-flex align-items-center">
               <!-- Currency Selector  -->
@@ -161,13 +162,10 @@
         </div>
 
                 @if(showStartEnd) {
-          <div class="w-100 form-field gap-12">
-            <div class="d-flex gap-8 align-items-center">
-              <mat-label class="f-s-16 f-w-400 d-block">Escalation rate</mat-label>
-              <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
-            </div>
-            <div class="position-relative">
-              <div class="w-100 form-field">
+          <div class="w-100 form-field gap-20">
+            <div class="w-100 form-field gap-8 ">
+              <mat-label class="f-s-16 f-w-400 d-flex gap-8 align-items-center">Escalation rate <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" /></mat-label>
+               <div class="w-100 form-field">
                 <div class="select-option">
                     <mat-select formControlName="escalationRate" value="Select" (selectionChange)="onEscalationRateChange($event)">
                   @for (escalationRate of escalationRates; track escalationRate) {
@@ -183,8 +181,9 @@
                 }
               </div>
             </div>
+           
           @if(selectedEscalationDescription === 'Increases at custom rate') {
-          <div class="w-100 form-field gap-12">
+          <div class="w-100 form-field gap-8">
             <mat-label class="f-s-16 d-block">Custom escalation rate</mat-label>
 
               <mat-form-field  appearance="outline" class="w-full w-100 percentage-icon">
@@ -202,7 +201,7 @@
             
             @if(expenseForm.get('customEscalationRate')?.touched &&
                 expenseForm.get('customEscalationRate')?.hasError('required')) {
-              <span class="field-error d-block">Custom escalation rate is required</span>
+              <span class="field-error d-block">required</span>
             }
           </div>
         }

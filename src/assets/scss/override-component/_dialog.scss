@@ -35,28 +35,32 @@
     line-height: 18px;
   }
   .net-field {
-    border: 1px solid #e7e7eb;
-    border-radius: 4px;
     .form-field {
       flex: 1;
     }
     .form-field input {
-      border-radius: 0 !important;
-      border-left: 1px solid #e7e7eb !important;
-      border-top: none !important;
-      border-bottom: none !important;
-      border-right: 1px solid #e7e7eb;
+       border: 1px solid #e7e7eb;
+       border-radius: 0px;
     }
     .left {
       .sortby-edit-profile {
         min-width: 105px !important;
-        height: 100%;
+        border: 1px solid #e7e7eb;
+        border-right: none;
+        height: 46px;
+        line-height: 29px;
+        border-radius: 4px 0px 0px 4px;
       }
     }
     .right {
       .sortby-edit-profile {
         min-width: 150px !important;
-        height: 100%;
+        border-radius: 0px 4px 4px 0px;
+        
+         border: 1px solid #e7e7eb;
+          border-left: none;
+        height: 46px;
+        line-height: 29px;
       }
     }
   }

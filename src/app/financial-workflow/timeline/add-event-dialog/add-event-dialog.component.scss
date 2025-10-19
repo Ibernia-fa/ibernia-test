@@ -31,37 +31,7 @@
   }
 }
 
-.net-fields {
-  span {
-    line-height: 18px;
-  }
-  .net-field {
-    border: 1px solid #e7e7eb;
-    border-radius: 4px;
-    .form-field {
-      flex: 1;
-    }
-    .form-field input {
-      border-radius: 0 !important;
-      border-left: 1px solid #e7e7eb !important;
-      border-top: none !important;
-      border-bottom: none !important;
-      border-right: 1px solid #e7e7eb;
-    }
-    .left {
-      .sortby-edit-profile {
-        min-width: 105px !important;
-        height: 100%;
-      }
-    }
-    .right {
-      .sortby-edit-profile {
-        min-width: 150px !important;
-        height: 100%;
-      }
-    }
-  }
-}
+
 
 
 
