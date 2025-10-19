@@ -503,7 +503,7 @@ highlightHoveredYearLabel(snappedYear: number) {
     const pTag = label.querySelector('p') as HTMLElement;
     const spanTag = label.querySelector('span') as HTMLElement;
 
-    if (spanTag?.textContent?.trim() === snappedYear.toString().slice(-2)) {
+    if (spanTag?.textContent?.trim() === snappedYear.toString()) {
       (label as HTMLElement).style.display  = 'inline-block';
       (label as HTMLElement).style.backgroundColor = '#ffffffff';
       (label as HTMLElement).style.opacity  = '1';
@@ -750,7 +750,7 @@ this.timeline.on('mouseDown', (props) => {
         const today = new Date(date); // assuming date is a JS Date or something convertible
         const age = this.calculateAgeForTimeline(today, birthDate);
         return age >= 0 && age <= 100
-          ? `<div id='selected'><p>${age}</p><span>${date.year() % 100}</span></div>`
+          ? `<div id='selected'><p>${age}</p><span>${date.year()}</span></div>`
           : '';
       },
         majorLabels: function (date: any) {
