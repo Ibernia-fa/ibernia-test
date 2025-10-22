@@ -1,6 +1,6 @@
 <mat-card class="mat-mdc-card mdc-card cardWithShadow mb-20">
   <mat-card-content class="mat-mdc-card-content">
-    <div class="d-flex align-items-center main-header-content">
+    <div class="d-flex align-items-center main-header-content ">
       <div class="header-icon">
         <img width="56" src="../../../assets/images/shapes/small-icon-7.svg" alt="">
       </div>
@@ -14,14 +14,13 @@
 <mat-card class="mat-mdc-card mdc-card cardWithShadow mb-20">
   <mat-card-content class="mat-mdc-card-content">
 <div *ngIf="selectedPlan === 'enterprise'" class="enterprise-context-section">
-<h3 class="f-s-24 f-w-400 m-b-5">Only available to enterprise customers</h3>
-  <p class="description">
+<h3 class="f-s-20 f-w-400 m-b-8">Only available to enterprise customers</h3>
+  <p class="description f-s-14 m-t-0 m-b-20">
     Configure tone, solution preferences, and risk limits; outputs will conform to your firm-wide policies.
     Specify approved offerings and required compliance language here to ensure consistent, compliant recommendations for every client.
-    <br /><br />
-    <strong>Talk to an Ibernia AI expert</strong> to set this up effectively for your organization.
+   
   </p>
-
+  <div class="m-b-5"><strong>Talk to an Ibernia AI expert</strong> to set this up effectively for your organization.</div>
   <mat-form-field appearance="outline" class="full-width textarea-wrapper w-100">
     <textarea
       matInput
@@ -33,7 +32,7 @@
     <mat-hint >{{ companyContext?.length || 0 }} / 10000</mat-hint>
   </mat-form-field>
 <div class="d-flex justify-space-end">
-    <button  color="primary" class="button-icon"><span> Send</span></button>
+    <button  color="primary" class="button-icon"><span>Save</span></button>
 </div>
 
   

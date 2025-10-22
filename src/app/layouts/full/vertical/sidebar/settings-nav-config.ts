@@ -9,7 +9,7 @@ export const settingsNavItems: NavItem[] = [
     route: '/settings/account-preferences',
   },
           {
-    displayName: 'Plan & Billing',
+    displayName: 'Plans & Billing',
     iconName: '/assets/images/shapes/plan-billing-active.svg',
     iconOutline: '/assets/images/shapes/plan-billing.svg',
     route: '/settings/plan-billing',
