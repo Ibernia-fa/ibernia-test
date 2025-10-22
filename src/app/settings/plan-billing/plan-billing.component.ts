@@ -12,6 +12,6 @@ export class PlanBillingComponent {
   constructor(
       private navItemService: NavItemService,
     ) {
-      this.navItemService.currentRouteName = 'Plan & Billing';
+      this.navItemService.currentRouteName = 'Plans & Billing';
     }
 }
