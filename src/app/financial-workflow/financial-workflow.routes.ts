@@ -5,6 +5,7 @@ import { SavingPotsComponent } from './saving-pots/saving-pots.component';
 import { IncomeExpensesComponent } from './income-expenses/income-expenses.component';
 import { WithdrawalsContributionsComponent } from './withdrawals-contributions/withdrawals-contributions.component';
 import { ReportsComponent } from './reports/reports.component';
+import { EmergenciesComponent } from './emergencies/emergencies.component';
 
 export const FinancialWorkflowRoutes: Routes = [
   {
@@ -29,6 +30,10 @@ export const FinancialWorkflowRoutes: Routes = [
       {
         path: ':id/reports',
         component: ReportsComponent,
+      },
+      {
+        path: ':id/emergencies',
+        component: EmergenciesComponent,
       },
       // {
       //   path: 'add',
