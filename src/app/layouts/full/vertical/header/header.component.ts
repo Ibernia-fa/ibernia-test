@@ -1,11 +1,11 @@
-import {
+import { 
   Component,
   Output,
   EventEmitter,
   Input,
   ViewEncapsulation,
-  OnDestroy,
-} from '@angular/core';
+  OnInit,
+  OnDestroy } from '@angular/core';
 import { CoreService } from 'src/app/services/core.service';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { navItems } from '../sidebar/sidebar-data';
@@ -23,9 +23,9 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { SettingsService, UserProfileDto } from 'src/app/default-preferance/services/default-preferance.http.service';
-import { User } from 'oidc-client';
 import { HttpResponse } from '@angular/common/http';
-import { takeUntil, catchError, of, finalize, ObservableInput, Subject } from 'rxjs';
+import { takeUntil, catchError, of, finalize, Subject } from 'rxjs';
+import { OrganizationProfilesService } from 'src/app/settings/services/organization.profiles.service';
 
 interface notifications {
   id: number;
@@ -70,7 +70,7 @@ interface quicklinks {
     templateUrl: './header.component.html',
     encapsulation: ViewEncapsulation.None
 })
-export class HeaderComponent implements OnDestroy {
+export class HeaderComponent implements OnInit, OnDestroy {
   @Input() showToggle = true;
   @Input() hideSidebarToggle = false;
   @Input() toggleChecked = false;
@@ -112,13 +112,13 @@ export class HeaderComponent implements OnDestroy {
   ];
 
   @Output() optionsChange = new EventEmitter<AppSettings>();
+  private destroy$ = new Subject<void>();
   user: any;
   profileImagePreview: any;
   userprofile: any;
   isLoading: boolean;
-  // private destroy$ = new Subject<void>();
-private destroy$ = new Subject<void>();
-
+  brandingLogo: any;
+  
   constructor(
     private settings: CoreService,
     private vsidenav: CoreService,
@@ -126,7 +126,7 @@ private destroy$ = new Subject<void>();
     private translate: TranslateService,
     private Authservice: AuthService,
     private settingsService: SettingsService,
-    
+    private organizationProfiles: OrganizationProfilesService
   ) {
     translate.setDefaultLang('en');
     this.user = this.Authservice.getUserProfile();
@@ -137,6 +137,22 @@ private destroy$ = new Subject<void>();
       .subscribe(() => this.loadProfile());
   }
 
+    ngOnInit() {
+      // branding logo
+      this.organizationProfiles.getProfile(this.user.sub).subscribe({
+        next: (p) => {
+          this.brandingLogo = this.ensureDataUrl(p?.profilePhotoUrl ?? null);
+        },
+        error: (err) => {
+          console.error(err);
+        },
+      });
+    }
+
+    ensureDataUrl(s: string | null): string | null {
+      if (!s) return null;
+      return s.startsWith('data:') ? s : `data:image/jpeg;base64,${s}`;
+    }
 
     ngOnDestroy(): void {
     this.destroy$.next();
