@@ -117,6 +117,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   profileImagePreview: any;
   userprofile: any;
   isLoading: boolean;
+  isBrandLogoLoaded: boolean;
   brandingLogo: string | null = null;
   private sub!: Subscription;
 
@@ -144,9 +145,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
       this.organizationProfiles.getProfile(this.user.sub).subscribe({
         next: (p) => {
           this.brandingLogo = this.ensureDataUrl(p?.profilePhotoUrl ?? null);
+          this.isBrandLogoLoaded = true;
         },
         error: (err) => {
           console.error(err);
+          this.isBrandLogoLoaded = true;
         },
       });
 
