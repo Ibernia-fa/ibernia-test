@@ -1,35 +1,17 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CoreService } from 'src/app/services/core.service';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-branding',
   standalone: true,
   imports: [CommonModule],
-  // template: `
-  //   <a href="/" class="logodark">
-  //     <!-- src="./assets/images/logos/dark-logo.svg" -->
-  //     <img
-  //       src="./assets/images/logos/logo.png"
-  //       class="align-middle m-2"
-  //       alt="logo"
-  //     />
-  //   </a>
-
-  //   <a href="/" class="logolight">
-  //     <!-- src="./assets/images/logos/light-logo.svg" -->
-  //     <img
-  //       src="./assets/images/logos/logo.png"
-  //       class="align-middle m-2"
-  //       alt="logo"
-  //     />
-  //   </a>
-  // `,
   template: `
     <a href="/" class="branding-link">
       <ng-container *ngIf="profileImage; else defaultLogo">
         <img
-          [src]="profileImage"
+          [src]="sanitizedImage"
           alt="logo"
           class="brand-logo"
         />
@@ -75,8 +57,15 @@ import { CoreService } from 'src/app/services/core.service';
     }
   `]
 })
-export class BrandingComponent {
+export class BrandingComponent implements OnChanges {
   @Input() profileImage: string | null = null;
+  sanitizedImage: SafeUrl | null = null;
   options = this.settings.getOptions();
-  constructor(private settings: CoreService) {}
+  constructor(private settings: CoreService, private sanitizer: DomSanitizer) {}
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['profileImage'] && this.profileImage) {
+      this.sanitizedImage = this.sanitizer.bypassSecurityTrustUrl(this.profileImage);
+    }
+  }
 }

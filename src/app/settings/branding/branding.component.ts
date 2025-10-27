@@ -81,6 +81,8 @@ export class BrandingComponent implements OnInit {
         next: () => {
           this.snack.open('Logo saved', undefined, { duration: 1800 });
           this.isSaving = false;
+
+          this.orgProfiles.setBrandingLogo(this.profileImage!);
         },
         error: (err) => {
           console.error(err);

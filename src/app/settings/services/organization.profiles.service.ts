@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
-import { map, Observable } from 'rxjs';
+import { map, Observable, BehaviorSubject } from 'rxjs';
 
 export interface OrganizationProfileDto {
   id?: string | null;        // optional – keep null if you don't have one yet
@@ -11,6 +11,8 @@ export interface OrganizationProfileDto {
 @Injectable({ providedIn: 'root' })
 export class OrganizationProfilesService {
   private readonly baseUrl = '/api/v1';
+  private brandingLogoSource = new BehaviorSubject<string | null>(null);
+  public brandingLogo$ = this.brandingLogoSource.asObservable();
 
   constructor(private http: HttpClient) {}
 
@@ -31,5 +33,9 @@ export class OrganizationProfilesService {
           return res.body;
         })
       );
+  }
+
+  setBrandingLogo(newLogoUrl: string) {
+    this.brandingLogoSource.next(newLogoUrl); // + '?v=' + new Date().getTime() 
   }
 }

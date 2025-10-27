@@ -24,7 +24,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { SettingsService, UserProfileDto } from 'src/app/default-preferance/services/default-preferance.http.service';
 import { HttpResponse } from '@angular/common/http';
-import { takeUntil, catchError, of, finalize, Subject } from 'rxjs';
+import { takeUntil, catchError, of, finalize, Subject, Subscription } from 'rxjs';
 import { OrganizationProfilesService } from 'src/app/settings/services/organization.profiles.service';
 
 interface notifications {
@@ -117,8 +117,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
   profileImagePreview: any;
   userprofile: any;
   isLoading: boolean;
-  brandingLogo: any;
-  
+  brandingLogo: string | null = null;
+  private sub!: Subscription;
+
   constructor(
     private settings: CoreService,
     private vsidenav: CoreService,
@@ -130,8 +131,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
   ) {
     translate.setDefaultLang('en');
     this.user = this.Authservice.getUserProfile();
-    console.log('user', this.user);
+    
     this.loadProfile();
+    
     this.settingsService.profileChanged$
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => this.loadProfile());
@@ -147,6 +149,12 @@ export class HeaderComponent implements OnInit, OnDestroy {
           console.error(err);
         },
       });
+
+      this.sub = this.organizationProfiles.brandingLogo$.subscribe((url) => {
+      if (url) {
+        this.brandingLogo = url;
+      }
+    });
     }
 
     ensureDataUrl(s: string | null): string | null {
@@ -155,9 +163,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
+      this.destroy$.next();
+      this.destroy$.complete();
+      this.sub?.unsubscribe();
+    }
 // Prefer saved profile names; fallback to OIDC claims; otherwise blank
 get displayFirstName(): string {
   return (this.userprofile?.firstName ?? '').trim() || (this.user?.given_name ?? '');
