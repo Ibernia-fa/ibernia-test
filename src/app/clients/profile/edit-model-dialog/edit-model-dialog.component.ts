@@ -84,8 +84,12 @@ export class EditModelDialogComponent {
         .pipe(
           filter((res) => !!res),
           catchError((err) => {
+            if (err.error)
+              this.toaster.error(err.error);
+            else
+              this.toaster.error('An error occurred while updating model');
+
             console.error('An error occurred while updating cashflow', err);
-            this.toaster.error('An error occurred while updating model');
             throw err;
           })
         )

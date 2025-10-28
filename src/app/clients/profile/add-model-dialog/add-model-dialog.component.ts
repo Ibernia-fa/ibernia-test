@@ -73,8 +73,12 @@ export class AddModelDialogComponent {
       this.cashflowHttpService.createCashflow(cashflow).pipe(
         filter(res => !!res),
         catchError((err) => {
+          if (err.error)
+            this.toaster.error(err.error);
+          else
+            this.toaster.error('An error occurred while creating model');
+          
           console.error("An error occurred while creating cashflow", err);
-          this.toaster.error('An error occurred while creating model');
           throw err;
         })
       ).subscribe((res) => {
