@@ -134,7 +134,7 @@ export class AddWithdrawalComponent {
         ?.patchValue(this.selectedWithdrawal.description);
       this.withdrawalForm
         .get('currencySymbol')
-        ?.patchValue(this.selectedWithdrawal.amount.currencySymbol);
+        ?.patchValue(this.clientPreferredCurrency);
       this.withdrawalForm
         .get('amount')
         ?.patchValue(this.selectedWithdrawal.amount.amount);
