@@ -40,6 +40,7 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
       object-fit: contain;
       object-position: center;
       margin: 0;
+      margin-bottom: 10px;
       padding: 0;
       display: block;
     }
@@ -53,7 +54,7 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
       padding: 0;
       line-height: 1;
       position: relative;
-      bottom: 0;
+      bottom: 10px;
     }
   `]
 })
