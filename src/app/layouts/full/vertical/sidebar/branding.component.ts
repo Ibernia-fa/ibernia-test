@@ -15,7 +15,11 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
           alt="logo"
           class="brand-logo"
         />
-        <span class="powered-text">powered by Ibernia</span>
+        <img
+          src="./assets/images/logos/powered-by-logo.svg"
+          alt="Ibernia logo"
+          class="power-by-logo"
+        />
       </ng-container>
     </a>
 
@@ -29,7 +33,7 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
     styles: [`
     .branding-link {
       display: flex;
-      align-items: flex-end;
+      align-items: center;
       text-decoration: none;
       gap: 5px;
     }
@@ -40,21 +44,12 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
       object-fit: contain;
       object-position: center;
       margin: 0;
-      margin-bottom: 10px;
       padding: 0;
       display: block;
     }
-
-    .powered-text {
-      font-size: 0.7rem;
-      color: #a2a2a2;
-      white-space: nowrap;
-      text-decoration: none;
-      margin: 0;
-      padding: 0;
-      line-height: 1;
-      position: relative;
-      bottom: 10px;
+    .power-by-logo {
+      display: block;
+      width:120px;
     }
   `]
 })
