@@ -15,7 +15,7 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
           alt="logo"
           class="brand-logo"
         />
-        <span class="powered-text">Powered by Ibernia.</span>
+        <span class="powered-text">powered by Ibernia</span>
       </ng-container>
     </a>
 
