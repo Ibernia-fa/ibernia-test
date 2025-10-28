@@ -126,7 +126,7 @@ export class AddIncomeComponent {
         ?.patchValue(this.selectedIncome.description);
       this.incomeForm
         .get('currencySymbol')
-        ?.patchValue(this.selectedIncome.amount.currencySymbol);
+        ?.patchValue(this.clientPreferredCurrency);
       this.incomeForm
         .get('amount')
         ?.patchValue(this.selectedIncome.amount.amount);
