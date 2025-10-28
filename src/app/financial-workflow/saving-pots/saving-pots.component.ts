@@ -33,7 +33,8 @@ import { FinancialWorkflowService } from '../services/financial-workflow.service
 import { NavItemService } from 'src/app/layouts/full/nav-item.service';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { CurrencySymbolPipe } from 'src/app/pipe/currency-symbol.pipe' 
+import { CurrencySymbolPipe } from 'src/app/pipe/currency-symbol.pipe';
+import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 @Component({
   selector: 'app-saving-pots',
   imports: [
@@ -49,7 +50,8 @@ import { CurrencySymbolPipe } from 'src/app/pipe/currency-symbol.pipe'
     MatButtonModule,
     CommonModule,
     FormsModule,
-    CurrencySymbolPipe
+    CurrencySymbolPipe,
+    ThousandSeparatorPipe
   ],
 
   templateUrl: './saving-pots.component.html',

@@ -28,6 +28,7 @@ import { TimelineHttpService } from '../timeline/services/timeline-http.service'
 import moment from 'moment';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { CurrencySymbolPipe } from 'src/app/pipe/currency-symbol.pipe';
+import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 
 @Component({
   selector: 'app-income-expenses',
@@ -40,8 +41,9 @@ import { CurrencySymbolPipe } from 'src/app/pipe/currency-symbol.pipe';
     MatMenuModule,
     MatButtonModule,
     MatProgressSpinnerModule,
-        MatTooltipModule,
-        CurrencySymbolPipe
+    MatTooltipModule,
+    CurrencySymbolPipe,
+    ThousandSeparatorPipe
   ],
   templateUrl: './income-expenses.component.html',
   styleUrl: './income-expenses.component.scss',
