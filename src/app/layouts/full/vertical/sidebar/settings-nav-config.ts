@@ -13,18 +13,16 @@ export const settingsNavItems: NavItem[] = [
     iconName: '/assets/images/shapes/plan-billing-active.svg',
     iconOutline: '/assets/images/shapes/plan-billing.svg',
     route: '/settings/plan-billing',
-  },
-    {
-    displayName: 'Notifications',
-    iconName: '/assets/images/shapes/Notification-active.svg',
-    iconOutline: '/assets/images/shapes/Notification.svg',
-    route: '/settings/notifications',
-  },
-      {
+  },{
     displayName: 'Help & Contact',
     iconName: '/assets/images/shapes/help-active.svg',
     iconOutline: '/assets/images/shapes/help.svg',
     route: '/settings/help',
+  },{
+    displayName: 'Notifications',
+    iconName: '/assets/images/shapes/Notification-active.svg',
+    iconOutline: '/assets/images/shapes/Notification.svg',
+    route: '/settings/notifications',
   },
 
 //   {
@@ -50,15 +48,15 @@ export const settingsNavItems: NavItem[] = [
 
 export const settingsLowerNavItems: NavItem[] = [
   {
+    displayName: 'AI Recommendations',
+    iconName: '/assets/images/shapes/ai-rec-act.png',
+    iconOutline: '/assets/images/shapes/ai-rec.png',
+    route: '/settings/ai-reccomendations',
+  },  {
     displayName: 'Branding',
     iconName: '/assets/images/shapes/branding-active.svg',
     iconOutline: '/assets/images/shapes/branding.svg',
     route: '/settings/branding',
   },
-    {
-    displayName: 'AI Reccomendations',
-    iconName: '/assets/images/shapes/ai-rec-act.png',
-    iconOutline: '/assets/images/shapes/ai-rec.png',
-    route: '/settings/ai-reccomendations',
-  },
+
 ];
