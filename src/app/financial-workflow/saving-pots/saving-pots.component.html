@@ -148,7 +148,7 @@ You may rearrange the order by dragging and dropping the pots, or by using the u
                                                 <div class="d-flex align-items-center gap-10">
                                                     
                                                     <h3 class="saving-title">
-                                                        {{saving.startingPotValue.currencySymbol  | currencySymbol }}
+                                                         {{selectedClient?.clientDetails?.preferredCurrency  | currencySymbol }}
                                                         {{ saving.startingPotValue.amount | thousandSeparator}}
                                                     </h3>
                                                     <span

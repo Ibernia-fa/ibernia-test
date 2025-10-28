@@ -150,7 +150,7 @@ You may link transactions to specific events, and adjust timing or frequency as 
                                     </th>
                                     <td mat-cell *matCellDef="let element"
                                         class="p-x-24 f-s-14 p-l-0 column-net-amount">
-                                        {{element.amount.currencySymbol | currencySymbol}}{{element.amount.amount | thousandSeparator}}/{{element.amount.cycle.description}}
+                                        {{selectedClient?.clientDetails?.preferredCurrency | currencySymbol}}{{element.amount.amount | thousandSeparator}}/{{element.amount.cycle.description}}
                                     </td>
                                 </ng-container>
 
@@ -230,7 +230,7 @@ You may link transactions to specific events, and adjust timing or frequency as 
                                     </th>
                                     <td mat-cell *matCellDef="let element"
                                         class="p-x-24 f-s-14 p-l-0 column-net-amount">
-                                        {{element.amount.currencySymbol | currencySymbol}}{{element.amount.amount | thousandSeparator}}/{{element.amount.cycle.description}} </td>
+                                        {{selectedClient?.clientDetails?.preferredCurrency | currencySymbol}}{{element.amount.amount | thousandSeparator}}/{{element.amount.cycle.description}} </td>
                                 </ng-container>
 
                                 <!-- Symbol Column -->

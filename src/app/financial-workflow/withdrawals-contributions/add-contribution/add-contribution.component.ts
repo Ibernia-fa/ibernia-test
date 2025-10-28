@@ -156,7 +156,7 @@ export class AddContributionComponent {
       this.contributionForm.patchValue({
         contributionType: this.selectedContribution?.contributionType ?? 1,
         description: this.selectedContribution.description,
-        currencySymbol: this.selectedContribution.amount.currencySymbol,
+        currencySymbol: this.clientPreferredCurrency,
         amount: this.selectedContribution.amount.amount,
         cycle: this.selectedContribution.amount.cycle?.id,
         start: this.selectedContribution.start.year,

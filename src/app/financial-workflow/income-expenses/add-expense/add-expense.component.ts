@@ -126,7 +126,7 @@ export class AddExpenseComponent {
         ?.patchValue(this.selectedExpense.description);
       this.expenseForm
         .get('currencySymbol')
-        ?.patchValue(this.selectedExpense.amount.currencySymbol);
+        ?.patchValue(this.clientPreferredCurrency);
       this.expenseForm
         .get('amount')
         ?.patchValue(this.selectedExpense.amount.amount);
