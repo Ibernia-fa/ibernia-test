@@ -313,4 +313,8 @@ export class FullComponent implements OnInit {
     // Add the selected theme class
     this.htmlElement.classList.add(options.activeTheme);
   }
+
+  onUpgradeClick() {
+    this.router.navigate(['/settings/plan-billing']);
+  }
 }
