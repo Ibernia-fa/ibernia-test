@@ -39,7 +39,8 @@ import { catchError, filter } from 'rxjs';
 import { TablerIconsModule } from 'angular-tabler-icons';
 import { IntegerOnlyDirective } from 'src/app/directives/integerOnly.directive';
 import { CommonModule } from '@angular/common';
-
+import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
+import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
 @Component({
   selector: 'app-add-new-pot',
   imports: [
@@ -58,7 +59,8 @@ import { CommonModule } from '@angular/common';
     MatSliderModule,
     TablerIconsModule,
     MatCheckboxModule,
-    IntegerOnlyDirective
+    IntegerOnlyDirective,
+    ThousandSeparatorPipe
   ],
   templateUrl: './add-new-pot.component.html',
   styleUrl: './add-new-pot.component.scss',
@@ -277,9 +279,6 @@ export class AddNewPotComponent {
     // --- Type (name) ---
     if (this.isCashPotEditMode) {
       // Keep it Cash, do not touch customName control
-      this.savingsForm.get('name')?.patchValue('Cash', { emitEvent: false });
-      this.selectedNameIconUrl = 'cashflow-moneys-icon';
-    } else {
       const savingPotValue = this.savingPotValues.find(x => x.name === this.selectedPot.name);
       if (savingPotValue) {
         this.savingsForm.get('name')?.patchValue(savingPotValue.name, { emitEvent: false });
@@ -531,6 +530,14 @@ onEscalationRateChange(event: MatSelectChange): void {
     if(controlName === 'commissionPercentage') {
       this.formattedCommissionPercentage = this.formatWithPercentage(value);
     }
+  }
+
+  onAmountInput(rawValue: string) {
+    if (rawValue == null) rawValue = '';
+    const cleaned = rawValue.replace(/[^0-9.]/g, '');
+    const parsed = cleaned === '' ? 0 : parseFloat(cleaned);
+    const value = isNaN(parsed) ? 0 : parsed;
+    this.savingsForm.get('amount')?.setValue(value, { emitEvent: true });
   }
 
   formatWithPercentage(value: number | string): string {

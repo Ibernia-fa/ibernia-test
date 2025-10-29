@@ -38,7 +38,14 @@
                 </mat-select>
               </div>
               <div class="w-100 form-field">
-                <input matInput type="number" formControlName="amount" placeholder="0" />
+                <input
+                  matInput
+                  type="text"
+                  formControlName="amount"
+                  [value]="withdrawalForm.get('amount')?.value | thousandSeparator"
+                  (input)="onAmountInput($event.target.value)"
+                  placeholder="0"
+                />
               </div>
               <div class="right">
                 <mat-select (valueChange)="onCycleValueChange($event)" value="Select" formControlName="cycle" class="sortby-edit-profile" hideSingleSelectionIndicator>

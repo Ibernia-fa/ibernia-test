@@ -37,6 +37,8 @@ import {
   SavingPotsModel,
 } from '../../saving-pots/models/saving-pots.model';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
+import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
 
 @Component({
   selector: 'app-add-contribution',
@@ -53,6 +55,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
     MatSliderModule,
     ReactiveFormsModule,
     MatCheckboxModule,
+    ThousandSeparatorPipe,
   ],
   providers: [provideNativeDateAdapter()],
   templateUrl: './add-contribution.component.html',
@@ -246,6 +249,11 @@ if (type === 1) {
       ctrl?.setValue(0);
     }
     ctrl?.updateValueAndValidity();
+  }
+
+  onAmountInput(rawValue: string) {
+    const value = parseFormattedNumber(rawValue);
+    this.contributionForm.get('amount')?.setValue(value, { emitEvent: true });
   }
 
   // 🔽 Core filtering logic

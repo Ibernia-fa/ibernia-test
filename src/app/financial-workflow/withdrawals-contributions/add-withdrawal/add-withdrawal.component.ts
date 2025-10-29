@@ -32,6 +32,8 @@ import { FundsViewModel } from '../model/withdrawals-contributions';
 import { catchError, filter } from 'rxjs';
 import { ComissionType, SavingPotsModel } from '../../saving-pots/models/saving-pots.model';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
+import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
 
 @Component({
   selector: 'app-add-withdrawal',
@@ -47,7 +49,8 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
     MatDatepickerModule,
     MatSliderModule,
     ReactiveFormsModule,
-        MatCheckboxModule,
+    MatCheckboxModule,
+    ThousandSeparatorPipe,
     
   ],
   providers: [provideNativeDateAdapter()],
@@ -165,6 +168,11 @@ this.savingPots.clientSavings = (this.savingPots.clientSavings || [])
   .filter(s => !s.hasPotLocked)
   .filter(s => (s.name ?? '').toLowerCase() !== 'cash');
 
+  }
+
+  onAmountInput(rawValue: string) {
+    const value = parseFormattedNumber(rawValue);
+    this.withdrawalForm.get('amount')?.setValue(value, { emitEvent: true });
   }
 
     onCommissionsToggled(enabled: boolean) {

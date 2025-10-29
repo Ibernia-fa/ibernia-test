@@ -13,6 +13,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { provideNativeDateAdapter } from '@angular/material/core';
+  import { ThousandSeparatorModule } from 'src/app/pipe/thousand-separator.module';
 import {
   AbstractControl,
   FormBuilder,
@@ -45,12 +46,21 @@ import { catchError, filter } from 'rxjs';
     MatDatepickerModule,
     MatSliderModule,
     ReactiveFormsModule,
+     ThousandSeparatorModule,
   ],
   providers: [provideNativeDateAdapter()],
   templateUrl: './add-expense.component.html',
   styleUrl: './add-expense.component.scss',
 })
 export class AddExpenseComponent {
+  // ...existing code...
+  onAmountInput(rawValue: string) {
+    // Use shared utility to parse formatted number
+    // @ts-ignore
+    const { parseFormattedNumber } = require('src/app/shared/utils/number-utils');
+    const value = parseFormattedNumber(rawValue);
+    this.expenseForm.get('amount')?.setValue(value);
+  }
   expenseForm: FormGroup;
   countries = allCountries;
   cycles: Cycle[];

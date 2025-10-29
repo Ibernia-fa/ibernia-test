@@ -13,6 +13,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { provideNativeDateAdapter } from '@angular/material/core';
+import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
+import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
 
 @Component({
   selector: 'app-update-income',
@@ -27,6 +29,7 @@ import { provideNativeDateAdapter } from '@angular/material/core';
     MatSelectModule,
     MatDatepickerModule,
     MatSliderModule,
+    ThousandSeparatorPipe,
   ],
   providers: [provideNativeDateAdapter()],
   templateUrl: './update-income.component.html',
@@ -37,6 +40,13 @@ export class UpdateIncomeComponent {
     private dialogRef: MatDialogRef<UpdateIncomeComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {}
+
+  onAmountInput(rawValue: string) {
+    const value = parseFormattedNumber(rawValue);
+    try {
+      (this as any)['incomeForm']?.get('amount')?.setValue(value, { emitEvent: true });
+    } catch (e) {}
+  }
 
   closeDialog(): void {
     this.dialogRef.close();

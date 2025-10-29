@@ -22,6 +22,8 @@ import {
   Validators,
 } from '@angular/forms';
 import { allCountries } from 'src/app/clients/models/country';
+import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
+import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
 import {
   Cycle,
   EscalationRate,
@@ -45,6 +47,7 @@ import { catchError, filter } from 'rxjs';
     MatDatepickerModule,
     MatSliderModule,
     ReactiveFormsModule,
+    ThousandSeparatorPipe
   ],
   providers: [provideNativeDateAdapter()],
   templateUrl: './add-income.component.html',
@@ -168,6 +171,11 @@ this.escalationRates.push({
   customControl?.updateValueAndValidity();
 }
     }
+  }
+
+  onAmountInput(rawValue: string) {
+    const value = parseFormattedNumber(rawValue);
+    this.incomeForm.get('amount')?.setValue(value, { emitEvent: true });
   }
 
   closeDialog(): void {

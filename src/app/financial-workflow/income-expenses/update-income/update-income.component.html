@@ -55,7 +55,13 @@
             <!-- End Currency Selector  -->
             <!-- Price Field  -->
             <div class="w-100 form-field">
-              <input matInput type="number" formControlName="amount" placeholder="0" />
+              <input
+                matInput
+                type="text"
+                [value]="(data?.selectedIncome?.amount?.amount ?? 0) | thousandSeparator"
+                (input)="onAmountInput($event.target.value)"
+                placeholder="0"
+              />
             </div>
             <!-- End Price Field  -->
             <!-- End Type Field  -->
