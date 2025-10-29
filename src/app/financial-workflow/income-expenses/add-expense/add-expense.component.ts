@@ -13,7 +13,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { provideNativeDateAdapter } from '@angular/material/core';
-  import { ThousandSeparatorModule } from 'src/app/pipe/thousand-separator.module';
+  import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import {
   AbstractControl,
   FormBuilder,
@@ -46,7 +46,7 @@ import { catchError, filter } from 'rxjs';
     MatDatepickerModule,
     MatSliderModule,
     ReactiveFormsModule,
-     ThousandSeparatorModule,
+     ThousandSeparatorPipe,
   ],
   providers: [provideNativeDateAdapter()],
   templateUrl: './add-expense.component.html',
