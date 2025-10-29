@@ -610,7 +610,13 @@ export const navItemslower: NavItem[] = [
     displayName: 'Emergencies',
     iconName: '/assets/images/svgs/danger-square-icon.svg',
     iconOutline: '/assets/images/svgs/danger-square-icon.svg',
-    route: '#',
+    route: '/cashflows/{cashflowId}/emergencies',
+  },
+  {
+    displayName: 'AI Recommendations',
+    iconName: '/assets/images/svgs/goals-nav-icon.svg',
+    iconOutline: '/assets/images/svgs/goals-nav-icon.svg',
+    route: '/cashflows/{cashflowId}/ai-recommendations',
   },
 ];
 export const navItems: NavItem[] = [
@@ -655,5 +661,11 @@ export const navItems: NavItem[] = [
   {
     navCap: 'Cashflow Model',
     route: '/cashflows/{cashflowId}/reports'
+  },
+  {
+    displayName: 'Create Reports',
+    iconName: '/assets/images/svgs/file-nav-icon.svg',
+    iconOutline: '/assets/images/svgs/file-icon.svg',
+    route: '/cashflows/{cashflowId}/create-reports',
   },
 ];
