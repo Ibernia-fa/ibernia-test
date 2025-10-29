@@ -63,7 +63,7 @@ import { AuthService } from 'src/app/auth/services/auth.service';
     TablerIconsModule,
     MatNativeDateModule,
     NgScrollbarModule,
-    AppBreadcrumbComponent,
+    // AppBreadcrumbComponent,
     RouterModule,
     CommonModule,
 

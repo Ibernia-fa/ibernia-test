@@ -24,7 +24,7 @@ import { MatDialog } from '@angular/material/dialog';
     MatFormFieldModule,
     MatInputModule,
     MatDatepickerModule,
-    AddEventDialogComponent,
+    // AddEventDialogComponent,
     MatChipsModule,
     MatIconModule,
   ],

@@ -59,7 +59,7 @@ import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
     MatSliderModule,
     TablerIconsModule,
     MatCheckboxModule,
-    IntegerOnlyDirective,
+    // IntegerOnlyDirective,
     ThousandSeparatorPipe
   ],
   templateUrl: './add-new-pot.component.html',

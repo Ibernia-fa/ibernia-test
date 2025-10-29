@@ -47,7 +47,7 @@ interface Food {
     MatButtonModule,
     MatSelectModule,
     MatDatepickerModule,
-    AgeCalculatorPipe,
+    // AgeCalculatorPipe,
     ReactiveFormsModule,
     CommonModule
   ],
