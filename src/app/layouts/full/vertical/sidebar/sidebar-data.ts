@@ -614,8 +614,8 @@ export const navItemslower: NavItem[] = [
   },
   {
     displayName: 'AI Recommendations',
-    iconName: '/assets/images/svgs/goals-nav-icon.svg',
-    iconOutline: '/assets/images/svgs/goals-nav-icon.svg',
+    iconName: '/assets/images/shapes/ai-filled.svg',
+    iconOutline: '/assets/images/shapes/ai.svg',
     route: '/cashflows/{cashflowId}/ai-recommendations',
   },
 ];

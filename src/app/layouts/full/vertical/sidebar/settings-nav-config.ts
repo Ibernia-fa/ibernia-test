@@ -49,8 +49,8 @@ export const settingsNavItems: NavItem[] = [
 export const settingsLowerNavItems: NavItem[] = [
   {
     displayName: 'AI Recommendations',
-    iconName: '/assets/images/shapes/ai-rec-act.png',
-    iconOutline: '/assets/images/shapes/ai-rec.png',
+      iconName: '/assets/images/shapes/ai-filled.svg',
+    iconOutline: '/assets/images/shapes/ai.svg',
     route: '/settings/ai-reccomendations',
   },  {
     displayName: 'Branding',
