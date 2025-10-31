@@ -273,7 +273,7 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
 //     this.form.get('profilePhotoUrl')?.setValue(dataUrl);
 //   } catch (e) {
 //     console.error('Failed to read image', e);
-//     this.snack.open('Could not read the selected image.', 'Close', { duration: 3000 });
+//     this.toastr.error('Could not read the selected image.', 'Error!');
 //   } finally {
 //     // allow selecting same file again later
 //     input.value = '';

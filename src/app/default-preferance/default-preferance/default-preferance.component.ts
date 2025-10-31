@@ -1,9 +1,8 @@
-// src/app/settings/default-preferance/default-preferance.component.ts
 import { ChangeDetectionStrategy, Component, Inject, OnDestroy, OnInit, Optional } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { Subject, EMPTY } from 'rxjs';
+import { ToastrService } from 'ngx-toastr';
 import { catchError, finalize, startWith, takeUntil } from 'rxjs/operators';
 import { SettingsService, ComissionType, UserProfileDto } from '../services/default-preferance.http.service';
 import { allCountries } from 'src/app/clients/models/country'; 
@@ -52,7 +51,7 @@ ComissionType = ComissionType;
   constructor(
     private fb: FormBuilder,
     private api: SettingsService,
-    private snack: MatSnackBar,
+    private toastr: ToastrService,
     private router: Router,
     private Authservice: AuthService,
     @Optional() private dialogRef?: MatDialogRef<DefaultPreferanceComponent>,
@@ -115,7 +114,7 @@ ComissionType = ComissionType;
     this.form.markAllAsTouched();
     // this.form.markAsDirty();
     if (this.form.invalid) {
-      this.snack.open('Please complete the highlighted fields', 'Close', { duration: 3000 });
+      this.toastr.error('Please complete the highlighted fields.', 'Error!');
       return;
     }
 
@@ -150,13 +149,13 @@ ComissionType = ComissionType;
         takeUntil(this.destroy$),
         catchError((err) => {
           const msg = err?.error?.message ?? 'Failed to save preferences';
-          this.snack.open(msg, 'Close', { duration: 4000 });
+          this.toastr.error(msg, 'Error!');
           return EMPTY;
         }),
         finalize(() => (this.isSaving = false))
       )
       .subscribe(() => {
-        this.snack.open('Preferences saved', undefined, { duration: 2000 });
+        this.toastr.error('Preferences saved.', 'Error!');
           if (this.dialogRef) {
           this.dialogRef.close(true);
           return;

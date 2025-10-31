@@ -1,9 +1,8 @@
-// branding.component.ts
 import { Component, ElementRef, ViewChild, OnInit } from '@angular/core';
 import { NavItemService } from 'src/app/layouts/full/nav-item.service';
 import { OrganizationProfilesService } from '../services/organization.profiles.service';
 import { AuthService } from 'src/app/auth/services/auth.service';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-branding',
@@ -22,7 +21,7 @@ export class BrandingComponent implements OnInit {
     private navItemService: NavItemService,
     private orgProfiles: OrganizationProfilesService,
     private auth: AuthService,
-    private snack: MatSnackBar
+    private toastr: ToastrService
   ) {
     this.navItemService.currentRouteName = 'Branding';
   }
@@ -65,12 +64,12 @@ export class BrandingComponent implements OnInit {
 
   save() {
     if (!this.profileImage) {
-      this.snack.open('Please select a logo first', 'Close', { duration: 2500 });
+      this.toastr.error('Please select a logo first.', 'Error!');
       return;
     }
     const userId = this.auth.getUserProfile()?.sub;
     if (!userId) {
-      this.snack.open('No user id found. Please sign in again', 'Close', { duration: 3000 });
+      this.toastr.error('No user id found. Please sign in again.', 'Error!');
       return;
     }
 
@@ -79,14 +78,14 @@ export class BrandingComponent implements OnInit {
       .saveProfile({ userId, profilePhotoUrl: this.profileImage })
       .subscribe({
         next: () => {
-          this.snack.open('Logo saved', undefined, { duration: 1800 });
+          this.toastr.success('Logo saved.', 'Success!');
           this.isSaving = false;
 
           this.orgProfiles.setBrandingLogo(this.profileImage!);
         },
         error: (err) => {
           console.error(err);
-          this.snack.open('Failed to save logo', 'Close', { duration: 3500 });
+          this.toastr.error('Failed to save logo.', 'Error!');
           this.isSaving = false;
         },
       });
