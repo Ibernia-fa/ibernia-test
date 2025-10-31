@@ -86,20 +86,36 @@ export class AppNavItemComponent implements OnChanges {
   onItemSelected(item: NavItem) {
     if (!item.children || !item.children.length) {
       var newRoute = item.route;
-      if(item?.route?.includes('{cashflowId}')) {
+      
+      if (item?.route?.includes('{cashflowId}')) {
         newRoute = item.route.replace('{cashflowId}', this.selectedCashflowId);
       }
-      this.router.navigate([newRoute]);
+
+      if (newRoute?.startsWith('http://') 
+          || newRoute?.startsWith('https://')) {
+        const url = new URL(newRoute);
+      
+        if (url.hostname === window.location.hostname) {
+          this.router.navigateByUrl(url.pathname + url.search);
+        } else {
+          window.location.href = newRoute;
+        }
+      } else {
+        this.router.navigate([newRoute]);
+      }
     }
+
     if (item.children && item.children.length) {
       this.expanded = !this.expanded;
     }
+    
     //scroll
     window.scroll({
       top: 0,
       left: 0,
       behavior: 'smooth',
     });
+    
     if (!this.expanded) {
       if (window.innerWidth < 1024) {
         this.notify.emit();
