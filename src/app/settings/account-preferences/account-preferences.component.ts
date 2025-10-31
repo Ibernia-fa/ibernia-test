@@ -1,8 +1,8 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { HttpResponse } from '@angular/common/http';
 import { Subject, EMPTY, of } from 'rxjs';
+import { ToastrService } from 'ngx-toastr';
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
 
 import {
@@ -70,12 +70,11 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private api: SettingsService,
     private auth: AuthService,
-    private snack: MatSnackBar,
     private cdr: ChangeDetectorRef,
-    private navItemService: NavItemService
+    private navItemService: NavItemService,
+    private toastr: ToastrService
   ) {
-    this.navItemService.currentRouteName = 'Account Preferences';
-
+      this.navItemService.currentRouteName = 'Account Preferences';
   }
 
   ngOnInit(): void {
@@ -293,7 +292,7 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
       this.cdr.markForCheck();                // <-- ensure UI updates under OnPush
     } catch (e) {
       console.error('Failed to read image', e);
-      this.snack.open('Could not read the selected image', 'Close', { duration: 3000 });
+      this.toastr.error('Could not read the selected image.', 'Error!');
     } finally {
       // reset the native input so picking the *same file* again will fire (change)
       if (this.fileInput?.nativeElement) {
@@ -307,7 +306,7 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
     this.submitted = true;
     if (this.form.invalid) {
       this.form.markAllAsTouched();
-      this.snack.open('Please fix the highlighted fields', 'Close', { duration: 3000 });
+      this.toastr.error('Please fix the highlighted fields.', 'Error!');
       return;
     }
 
@@ -344,15 +343,15 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
         takeUntil(this.destroy$),
         catchError((err) => {
           const msg = err?.error?.message ?? 'Failed to save preferences.';
-          this.snack.open(msg, 'Close', { duration: 4000 });
+          this.toastr.error(msg, 'Error!');
           return EMPTY;
         }),
         finalize(() => (this.isSaving = false))
       )
       .subscribe(() => {
         this.isSaving = false;
-        this.snack.open('Preferences saved', undefined, { duration: 2000 });
-         this.api.notifyProfileChanged();
+        this.toastr.success('Preferences saved', 'Success!');
+        this.api.notifyProfileChanged();
       });
   }
 
