@@ -63,10 +63,10 @@ export class BrandingComponent implements OnInit {
   }
 
   save() {
-    if (!this.profileImage) {
-      this.toastr.error('Please select a logo first.', 'Error!');
-      return;
-    }
+    // if (!this.profileImage) {
+    //   this.toastr.error('Please select a logo first.', 'Error!');
+    //   return;
+    // }
     const userId = this.auth.getUserProfile()?.sub;
     if (!userId) {
       this.toastr.error('No user id found. Please sign in again.', 'Error!');
@@ -75,7 +75,7 @@ export class BrandingComponent implements OnInit {
 
     this.isSaving = true;
     this.orgProfiles
-      .saveProfile({ userId, profilePhotoUrl: this.profileImage })
+      .saveProfile({ userId, profilePhotoUrl: this.profileImage || "" })
       .subscribe({
         next: () => {
           this.toastr.success('Logo saved.', 'Success!');
