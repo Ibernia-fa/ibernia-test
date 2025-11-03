@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import {
   FormBuilder,
+  FormControl,
   FormGroup,
   ReactiveFormsModule,
   Validators,
@@ -28,6 +29,8 @@ import { allCountries } from '../models/country';
 import { CountryISO, NgxIntlTelInputModule } from 'ngx-intl-tel-input';
 import { FiveDayRangeSelectionStrategy } from 'src/app/core/five-day-range-selection-strategy';
 import {MatCheckboxModule} from '@angular/material/checkbox';
+import { SettingsService } from 'src/app/default-preferance/services/default-preferance.http.service';
+import { AuthService } from 'src/app/auth/services/auth.service';
 
 
 @Component({
@@ -71,7 +74,9 @@ export class ClientAddComponent {
     private clientHttpService: ClientHttpService,
     private toastr: ToastrService,
     private dialog: MatDialog,
-    private router: Router
+    private router: Router,
+      private settingsService: SettingsService,
+  private authService: AuthService  
   ) {
     this.clientForm = this.fb.group({
       firstName: ['', Validators.required],
@@ -98,6 +103,50 @@ export class ClientAddComponent {
 
     this.togglePartnerSection(false); // Ensure partner section validations are off initially
   }
+
+  ngOnInit() {
+  const user = this.authService.getUserProfile();
+  const userId = user?.sub;
+
+  if (!userId) return;
+
+  this.settingsService.getUserProfileResponse(userId).subscribe({
+    next: (res: any) => {
+      // Your API returns a plain object with a `preferences` bag
+      const p = res?.body?.preferences;
+      if (!p) return;
+
+      // --- COUNTRY ---
+      
+      if (!this.clientForm.get('country')?.value && p.country) {
+        this.clientForm.get('country')?.patchValue(p.country, { emitEvent: false });
+
+        // keep phone ISO in sync
+        const countryMatch = allCountries.find(c => c.countryName === p.country);
+        if (countryMatch?.countryCode) {
+          this.selectedClientCountryISO = (countryMatch.countryCode.toLowerCase() as any);
+        }
+
+        if (!this.clientForm.get('currency')?.value && countryMatch?.currencySymbol) {
+          this.clientForm.get('currency')?.patchValue(countryMatch.currencySymbol, { emitEvent: false });
+        }
+      }
+
+      if (!this.clientForm.get('currency')?.value && p.currency) {
+        const curMatch =
+          allCountries.find(c =>
+            (c as any).currencyCode?.toUpperCase?.() === String(p.currency).toUpperCase()
+          )
+          || allCountries.find(c => c.currencySymbol === p.currency);
+
+        const preferredSymbol = curMatch?.currencySymbol ?? p.currency;
+        this.clientForm.get('currency')?.patchValue(preferredSymbol, { emitEvent: false });
+      }
+    },
+    error: (e) => console.error('Failed to load user prefs', e),
+  });
+}
+
 
   clientCountryValueChange(event: any) {
     const selectedCountry = allCountries.find(country => country.countryName === event);

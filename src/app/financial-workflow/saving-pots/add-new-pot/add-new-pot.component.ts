@@ -41,6 +41,7 @@ import { IntegerOnlyDirective } from 'src/app/directives/integerOnly.directive';
 import { CommonModule } from '@angular/common';
 import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
+import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 @Component({
   selector: 'app-add-new-pot',
   imports: [
@@ -60,7 +61,8 @@ import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
     TablerIconsModule,
     MatCheckboxModule,
     // IntegerOnlyDirective,
-    ThousandSeparatorPipe
+    ThousandSeparatorPipe,
+    ThousandSeparatorInputDirective
   ],
   templateUrl: './add-new-pot.component.html',
   styleUrl: './add-new-pot.component.scss',
@@ -189,6 +191,23 @@ export class AddNewPotComponent {
       }
     }
   }
+
+
+  onAmountFocus(e: Event) {
+  // show raw (no commas) while typing
+  const c = this.savingsForm.get('amount')!;
+  (e.target as HTMLInputElement).value = (c.value ?? '').toString();
+}
+
+onAmountBlur(e: Event) {
+  // pretty-print with commas when leaving the field
+  const c = this.savingsForm.get('amount')!;
+  const num = Number(String(c.value).replace(/,/g, ''));
+  if (!isNaN(num)) {
+    c.setValue(num, { emitEvent: false }); // model stays numeric
+    (e.target as HTMLInputElement).value = num.toLocaleString('en-US');
+  }
+}
 
 //   patchFormValues() {
 //     var savingPotValue = this.savingPotValues.find(x => x.name === this.selectedPot.name);

@@ -111,6 +111,7 @@
                 style="border-radius: 0px 4px 4px 0px;"
                 formControlName="amount"
                 [value]="savingsForm.get('amount')?.value | thousandSeparator"
+                thousandSeparatorInput
                 (input)="onAmountInput($event.target.value)"
                 placeholder="0"
               />
