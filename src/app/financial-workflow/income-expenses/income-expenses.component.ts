@@ -125,59 +125,47 @@ export class IncomeExpensesComponent {
   }
 
   newIncomeClicked() {
-    if (this.incomeExpense.incomes.length > 0 || this.incomeExpense.expenses.length > 0)
-    {
-       const dialogRef = this.dialog.open(AddIncomeComponent, {
-        width: '700px',
-        disableClose: true,
-        data: {
-          amountCycles: this.amountCycles,
-          eventsList: this.timeline.clientEvents.sort((a, b) => a.start.age - b.start.age),
-          escalataionRates: this.escalationRates,
-          clientBirthDate: this.selectedClient?.clientDetails.birthDate,
-          clientPreferredCurrency: this.selectedClient?.clientDetails.preferredCurrency,
-          cashflowId: this.selectedCashflow?.id,
-          forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
-          forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
-        },
-      });
+    const dialogRef = this.dialog.open(AddIncomeComponent, {
+      width: '700px',
+      disableClose: true,
+      data: {
+        amountCycles: this.amountCycles,
+        eventsList: this.timeline.clientEvents.sort((a, b) => a.start.age - b.start.age),
+        escalataionRates: this.escalationRates,
+        clientBirthDate: this.selectedClient?.clientDetails.birthDate,
+        clientPreferredCurrency: this.selectedClient?.clientDetails.preferredCurrency,
+        cashflowId: this.selectedCashflow?.id,
+        forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
+        forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
+      },
+    });
 
-      dialogRef.afterClosed().subscribe((result: any) => {
-        this.updateIncomeExpenseByResponse(result.incomeExpense);
-      });
-    }
-    else {
-     this.toastr.error('Before adding this, please create a new saving pot', 'Error!', { timeOut: 5000 });
-    }
+    dialogRef.afterClosed().subscribe((result: any) => {
+      this.updateIncomeExpenseByResponse(result.incomeExpense);
+    });
   }
 
   newExpenseClicked() {
-    if (this.incomeExpense.incomes.length > 0 || this.incomeExpense.expenses.length > 0)
-    {
-      const dialogRef = this.dialog.open(AddExpenseComponent, {
-        width: '700px',
-        disableClose: true,
-        data: {
-          amountCycles: this.amountCycles,
-          escalataionRates: this.escalationRates,
-          eventsList: this.timeline.clientEvents.sort((a, b) => a.start.age - b.start.age),
-          clientBirthDate: this.selectedClient?.clientDetails.birthDate,
-          clientPreferredCurrency:
-            this.selectedClient?.clientDetails.preferredCurrency,
-          cashflowId: this.selectedCashflow?.id,
-          forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
-          forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
-        },
-      });
+    const dialogRef = this.dialog.open(AddExpenseComponent, {
+      width: '700px',
+      disableClose: true,
+      data: {
+        amountCycles: this.amountCycles,
+        escalataionRates: this.escalationRates,
+        eventsList: this.timeline.clientEvents.sort((a, b) => a.start.age - b.start.age),
+        clientBirthDate: this.selectedClient?.clientDetails.birthDate,
+        clientPreferredCurrency:
+          this.selectedClient?.clientDetails.preferredCurrency,
+        cashflowId: this.selectedCashflow?.id,
+        forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
+        forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
+      },
+    });
 
-      dialogRef.afterClosed().subscribe((result: any) => {
-        console.log('Dialog closed with result:', result);
-        this.updateIncomeExpenseByResponse(result.incomeExpense);
-      });
-    }
-    else {
-      this.toastr.error('Before adding this, please create a new saving pot', 'Error!', { timeOut: 5000 });
-    }
+    dialogRef.afterClosed().subscribe((result: any) => {
+      console.log('Dialog closed with result:', result);
+      this.updateIncomeExpenseByResponse(result.incomeExpense);
+    });
   }
 
   updateIncomeClicked(item: FinancialViewModel) {
