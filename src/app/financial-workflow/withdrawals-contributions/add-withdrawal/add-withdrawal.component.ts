@@ -34,6 +34,7 @@ import { ComissionType, SavingPotsModel } from '../../saving-pots/models/saving-
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
+import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 
 @Component({
   selector: 'app-add-withdrawal',
@@ -51,7 +52,7 @@ import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
     ReactiveFormsModule,
     MatCheckboxModule,
     ThousandSeparatorPipe,
-    
+    ThousandSeparatorInputDirective
   ],
   providers: [provideNativeDateAdapter()],
   templateUrl: './add-withdrawal.component.html',
