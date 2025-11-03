@@ -15,11 +15,6 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
           alt="logo"
           class="brand-logo"
         />
-        <img
-          src="./assets/images/logos/powered-by-logo.svg"
-          alt="Ibernia logo"
-          class="power-by-logo"
-        />
       </ng-container>
     </a>
 

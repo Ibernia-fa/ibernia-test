@@ -30,6 +30,7 @@ import { SavingPotsModel } from '../saving-pots/models/saving-pots.model';
 import { CurrencySymbolPipe } from 'src/app/pipe/currency-symbol.pipe';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
+import { ToastrModule, ToastrService } from 'ngx-toastr';
 
 @Component({
   imports: [
@@ -43,8 +44,10 @@ import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
     MatProgressSpinnerModule,
     CurrencySymbolPipe,
     MatTooltipModule,
-    ThousandSeparatorPipe
+    ThousandSeparatorPipe,
+    ToastrModule
   ],
+  providers: [ToastrService],
   selector: 'app-withdrawals-contributions',
   templateUrl: './withdrawals-contributions.component.html',
   styleUrl: './withdrawals-contributions.component.scss',
@@ -72,7 +75,8 @@ export class WithdrawalsContributionsComponent {
     private withdrawalsContributionsHttpService: WithdrawalsContributionsHttpService,
     private settingHttpService: SettingsHttpService,
     private timelineHttpService: TimelineHttpService,
-    private navItemService: NavItemService
+    private navItemService: NavItemService,
+    private toastr: ToastrService
   ) {
     this.navItemService.currentRouteName = 'Contributions & Withdrawals';
     this.getData();
@@ -127,50 +131,66 @@ export class WithdrawalsContributionsComponent {
   }
 
   newContributionClicked() {
-    const dialogRef = this.dialog.open(AddContributionComponent, {
-      width: '700px',
-      disableClose: true,
-      data: {
-        eventsList: this.timeline.clientEvents.sort((a, b) => a.start.age - b.start.age),
-        amountCycles: this.amountCycles,
-        escalataionRates: this.escalationRates,
-        clientBirthDate: this.selectedClient?.clientDetails.birthDate,
-        clientPreferredCurrency:
-          this.selectedClient?.clientDetails.preferredCurrency,
-        cashflowId: this.selectedCashflow?.id,
-        forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
-        forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
-        savingPots: this.savingsPots
-      },
-    });
+    if (this.savingsPots.clientSavings.length === 0 ||
+        (this.savingsPots.clientSavings.length === 1 && 
+          this.savingsPots.clientSavings[0].name.toLowerCase() === 'cash'))
+    {
+      this.toastr.error('Before adding this, please create a new saving pot', 'Error!', { timeOut: 5000 });
+    }    
+    else {
+      const dialogRef = this.dialog.open(AddContributionComponent, {
+        width: '700px',
+        disableClose: true,
+        data: {
+          eventsList: this.timeline.clientEvents.sort((a, b) => a.start.age - b.start.age),
+          amountCycles: this.amountCycles,
+          escalataionRates: this.escalationRates,
+          clientBirthDate: this.selectedClient?.clientDetails.birthDate,
+          clientPreferredCurrency:
+            this.selectedClient?.clientDetails.preferredCurrency,
+          cashflowId: this.selectedCashflow?.id,
+          forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
+          forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
+          savingPots: this.savingsPots
+        },
+      });
 
-    dialogRef.afterClosed().subscribe((result: any) => {
-      this.updateContributionWithdrawalByResponse(result.contributionWithdrawal);
-    });
+      dialogRef.afterClosed().subscribe((result: any) => {
+        this.updateContributionWithdrawalByResponse(result.contributionWithdrawal);
+      });
+    }
   }
 
   newWithdrawalClicked() {
-    const dialogRef = this.dialog.open(AddWithdrawalComponent, {
-      width: '700px',
-      disableClose: true,
-      data: {
-        amountCycles: this.amountCycles,
-        eventsList: this.timeline.clientEvents.sort((a, b) => a.start.age - b.start.age),
-        escalataionRates: this.escalationRates,
-        clientBirthDate: this.selectedClient?.clientDetails.birthDate,
-        clientPreferredCurrency:
-          this.selectedClient?.clientDetails.preferredCurrency,
-        cashflowId: this.selectedCashflow?.id,
-        forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
-        forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
-        savingPots: this.savingsPots
-      },
-    });
+    if (this.savingsPots.clientSavings.length === 0 ||
+        (this.savingsPots.clientSavings.length === 1 && 
+          this.savingsPots.clientSavings[0].name.toLowerCase() === 'cash'))
+    {
+      this.toastr.error('Before adding this, please create a new saving pot', 'Error!', { timeOut: 5000 });
+    }    
+    else {
+      const dialogRef = this.dialog.open(AddWithdrawalComponent, {
+        width: '700px',
+        disableClose: true,
+        data: {
+          amountCycles: this.amountCycles,
+          eventsList: this.timeline.clientEvents.sort((a, b) => a.start.age - b.start.age),
+          escalataionRates: this.escalationRates,
+          clientBirthDate: this.selectedClient?.clientDetails.birthDate,
+          clientPreferredCurrency:
+            this.selectedClient?.clientDetails.preferredCurrency,
+          cashflowId: this.selectedCashflow?.id,
+          forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
+          forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
+          savingPots: this.savingsPots
+        },
+      });
 
-    dialogRef.afterClosed().subscribe((result: any) => {
-      console.log('Dialog closed with result:', result);
-      this.updateContributionWithdrawalByResponse(result.contributionWithdrawal);
-    });
+      dialogRef.afterClosed().subscribe((result: any) => {
+        console.log('Dialog closed with result:', result);
+        this.updateContributionWithdrawalByResponse(result.contributionWithdrawal);
+      });
+    }
   }
 
   updateContributionClicked(item: FundsViewModel) {
