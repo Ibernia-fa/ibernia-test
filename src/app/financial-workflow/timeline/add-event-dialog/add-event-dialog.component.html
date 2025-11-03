@@ -110,6 +110,7 @@
     <div class="w-100 form-field gap-8">
       <div class="d-flex gap-4 align-items-center">
         <mat-label class="f-s-16 f-w-400 d-block">Date</mat-label>
+
         <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
       </div>
       <div class="position-relative">
@@ -420,9 +421,9 @@
       <div [formGroup]="eventForm" class="d-flex flex-column gap-20">
         <!-- Name Field  -->
         <div class="w-100 form-field gap-8">
-          <div class="d-flex gap-4 align-items-center">
+          <div class="d-flex align-items-center">
             <mat-label class="f-s-16 f-w-400 d-block">Event</mat-label>
-            <!-- <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" /> -->
+            <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4" matTooltip="Select the type of life event or goal you want to create (for example, “Home,” “New car,” or “Education”).">
           </div>
           <div class="position-relative">
             <div class="w-100 form-field">
@@ -484,7 +485,10 @@
         <!--End  Name Field  -->
         <!-- Modal tabs  -->
         <div class="d-flex flex-column gap-8 tab">
-          <span class="f-s-16 f-w-400">Type</span>
+          <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">Type
+            <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4" matTooltip="Choose whether this event represents an Income (money coming in) or an Expense (money going out).">
+
+        </mat-label>
           <div class="tabs">
             <div class="row">
               <div class="col-6">
@@ -506,7 +510,11 @@
 
         <!-- Net Amount Field  -->
         <div class="d-flex flex-column gap-8 net-fields">
-          <span class="f-s-16 f-w-400">Net amount</span>
+      <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">Net amount
+            <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4" matTooltip="Enter the amount linked to this event. Use the dropdown to define how often it occurs (e.g., every month, every year, or one-off).">
+
+        </mat-label>
+
           <div class="net-field d-flex align-items-center">
             <!-- Currency Selector  -->
             <div class="left hide-arrow">
@@ -560,7 +568,10 @@
             <mat-label class="f-s-16 f-w-400 d-block">
               {{ eventForm.get('cycle')?.value === 'One-off' ? 'Date' : 'Start & end' }}
             </mat-label>
-              <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
+         <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4" matTooltip="Define when this event starts and, if applicable, when it ends. Ibernia will include this period in the client’s cashflow projection.">
+
+
+
             </div>
             <div class="row justify-content-between align-items-start flex-nowrap">
               <!-- Start date  -->
@@ -634,7 +645,15 @@
             <div class="d-flex flex-column gap-8">
             <div class="d-flex gap-4 align-items-center">
               <mat-label class="f-s-16 f-w-400 d-block">Escalation rate</mat-label>
-              <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
+                      <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4" matTooltip="         Defines how this amount will evolve over time. You can choose to:
+Keep it fixed (the amount stays the same each year),
+Match inflation (it increases automatically based on the default inflation rate set in Preferences), or
+Apply a custom rate (you decide the exact yearly percentage change).
+This setting helps make projections more realistic by accounting for rising costs or expected income growth.">
+
+
+     
+
             </div>
             <div class="position-relative">
               <div class="w-100 form-field">
