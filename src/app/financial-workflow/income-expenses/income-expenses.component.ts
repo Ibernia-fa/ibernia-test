@@ -125,12 +125,9 @@ export class IncomeExpensesComponent {
   }
 
   newIncomeClicked() {
-    if (this.incomeExpense.incomes.length == 0 && this.incomeExpense.expenses.length == 0)
+    if (this.incomeExpense.incomes.length > 0 || this.incomeExpense.expenses.length > 0)
     {
-      this.toastr.error('Before adding this, please create a new saving pot', 'Error!', { timeOut: 5000 });
-    }
-    else {
-      const dialogRef = this.dialog.open(AddIncomeComponent, {
+       const dialogRef = this.dialog.open(AddIncomeComponent, {
         width: '700px',
         disableClose: true,
         data: {
@@ -149,14 +146,14 @@ export class IncomeExpensesComponent {
         this.updateIncomeExpenseByResponse(result.incomeExpense);
       });
     }
+    else {
+     this.toastr.error('Before adding this, please create a new saving pot', 'Error!', { timeOut: 5000 });
+    }
   }
 
   newExpenseClicked() {
-    if (this.incomeExpense.incomes.length == 0 && this.incomeExpense.expenses.length == 0)
+    if (this.incomeExpense.incomes.length > 0 || this.incomeExpense.expenses.length > 0)
     {
-      this.toastr.error('Before adding this, please create a new saving pot', 'Error!', { timeOut: 5000 });
-    }
-    else {
       const dialogRef = this.dialog.open(AddExpenseComponent, {
         width: '700px',
         disableClose: true,
@@ -177,6 +174,9 @@ export class IncomeExpensesComponent {
         console.log('Dialog closed with result:', result);
         this.updateIncomeExpenseByResponse(result.incomeExpense);
       });
+    }
+    else {
+      this.toastr.error('Before adding this, please create a new saving pot', 'Error!', { timeOut: 5000 });
     }
   }
 
