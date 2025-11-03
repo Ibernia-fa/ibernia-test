@@ -29,6 +29,7 @@ import moment from 'moment';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { CurrencySymbolPipe } from 'src/app/pipe/currency-symbol.pipe';
 import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
+import { ToastrModule, ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-income-expenses',
@@ -43,8 +44,10 @@ import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
     MatProgressSpinnerModule,
     MatTooltipModule,
     CurrencySymbolPipe,
-    ThousandSeparatorPipe
+    ThousandSeparatorPipe,
+    ToastrModule
   ],
+  providers: [ToastrService],
   templateUrl: './income-expenses.component.html',
   styleUrl: './income-expenses.component.scss',
 })
@@ -69,7 +72,8 @@ export class IncomeExpensesComponent {
     private incomeExpensesHttpService: IncomeExpensesHttpService,
     private settingHttpService: SettingsHttpService,
     private timelineHttpService: TimelineHttpService,
-    private navItemService: NavItemService
+    private navItemService: NavItemService,
+    private toastr: ToastrService
   ) {
     this.navItemService.currentRouteName = 'Incomes & Expenses';
     this.getData();
@@ -85,6 +89,7 @@ export class IncomeExpensesComponent {
         tap(([client, cashflow]) => {
           this.selectedClient = client as Client;
           console.log(cashflow);
+          console.log(client);
           this.selectedCashflow = cashflow as Cashflow;
         }),
         switchMap(([client, cashflow]) => {
@@ -120,48 +125,59 @@ export class IncomeExpensesComponent {
   }
 
   newIncomeClicked() {
-    const dialogRef = this.dialog.open(AddIncomeComponent, {
-      width: '700px',
-      disableClose: true,
-      data: {
-        amountCycles: this.amountCycles,
-        eventsList: this.timeline.clientEvents.sort((a, b) => a.start.age - b.start.age),
-        escalataionRates: this.escalationRates,
-        clientBirthDate: this.selectedClient?.clientDetails.birthDate,
-        clientPreferredCurrency:
-          this.selectedClient?.clientDetails.preferredCurrency,
-        cashflowId: this.selectedCashflow?.id,
-        forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
-        forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
-      },
-    });
+    if (this.incomeExpense.incomes.length == 0 && this.incomeExpense.expenses.length == 0)
+    {
+      this.toastr.error('Before adding this, please create a new saving pot', 'Error!', { timeOut: 5000 });
+    }
+    else {
+      const dialogRef = this.dialog.open(AddIncomeComponent, {
+        width: '700px',
+        disableClose: true,
+        data: {
+          amountCycles: this.amountCycles,
+          eventsList: this.timeline.clientEvents.sort((a, b) => a.start.age - b.start.age),
+          escalataionRates: this.escalationRates,
+          clientBirthDate: this.selectedClient?.clientDetails.birthDate,
+          clientPreferredCurrency: this.selectedClient?.clientDetails.preferredCurrency,
+          cashflowId: this.selectedCashflow?.id,
+          forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
+          forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
+        },
+      });
 
-    dialogRef.afterClosed().subscribe((result: any) => {
-      this.updateIncomeExpenseByResponse(result.incomeExpense);
-    });
+      dialogRef.afterClosed().subscribe((result: any) => {
+        this.updateIncomeExpenseByResponse(result.incomeExpense);
+      });
+    }
   }
 
   newExpenseClicked() {
-    const dialogRef = this.dialog.open(AddExpenseComponent, {
-      width: '700px',
-      disableClose: true,
-      data: {
-        amountCycles: this.amountCycles,
-        escalataionRates: this.escalationRates,
-        eventsList: this.timeline.clientEvents.sort((a, b) => a.start.age - b.start.age),
-        clientBirthDate: this.selectedClient?.clientDetails.birthDate,
-        clientPreferredCurrency:
-          this.selectedClient?.clientDetails.preferredCurrency,
-        cashflowId: this.selectedCashflow?.id,
-        forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
-        forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
-      },
-    });
+    if (this.incomeExpense.incomes.length == 0 && this.incomeExpense.expenses.length == 0)
+    {
+      this.toastr.error('Before adding this, please create a new saving pot', 'Error!', { timeOut: 5000 });
+    }
+    else {
+      const dialogRef = this.dialog.open(AddExpenseComponent, {
+        width: '700px',
+        disableClose: true,
+        data: {
+          amountCycles: this.amountCycles,
+          escalataionRates: this.escalationRates,
+          eventsList: this.timeline.clientEvents.sort((a, b) => a.start.age - b.start.age),
+          clientBirthDate: this.selectedClient?.clientDetails.birthDate,
+          clientPreferredCurrency:
+            this.selectedClient?.clientDetails.preferredCurrency,
+          cashflowId: this.selectedCashflow?.id,
+          forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
+          forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
+        },
+      });
 
-    dialogRef.afterClosed().subscribe((result: any) => {
-      console.log('Dialog closed with result:', result);
-      this.updateIncomeExpenseByResponse(result.incomeExpense);
-    });
+      dialogRef.afterClosed().subscribe((result: any) => {
+        console.log('Dialog closed with result:', result);
+        this.updateIncomeExpenseByResponse(result.incomeExpense);
+      });
+    }
   }
 
   updateIncomeClicked(item: FinancialViewModel) {
