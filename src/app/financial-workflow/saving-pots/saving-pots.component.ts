@@ -35,6 +35,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { CurrencySymbolPipe } from 'src/app/pipe/currency-symbol.pipe';
 import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
+import { AuthService } from 'src/app/auth/services/auth.service';
+import { SettingsService } from 'src/app/default-preferance/services/default-preferance.http.service';
 @Component({
   selector: 'app-saving-pots',
   imports: [
@@ -90,6 +92,8 @@ import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
   // ]
 })
 export class SavingPotsComponent implements OnInit {
+  user: any;
+  userRerturnRate: any;
   constructor(
     private dialog: MatDialog,
     private savingPotsHttpService: SavingPotsHttpService,
@@ -97,11 +101,20 @@ export class SavingPotsComponent implements OnInit {
     private settingHttpService: SettingsHttpService,
     private activatedRoute: ActivatedRoute,
     private financialWorkflowService: FinancialWorkflowService,
-    private navItemService: NavItemService
+    private navItemService: NavItemService,
+    private Authservice: AuthService,
+     private settingsService: SettingsService
   ) {
     this.navItemService.currentRouteName = 'Saving Pots';
+        this.user = this.Authservice.getUserProfile();
+  this.settingsService.getUserProfileResponse(this.user?.sub).subscribe({
+    next: (res: any) => {
+      console.log('data', res.body);
+       const p = res?.body?.preferences;
+      this.userRerturnRate = p.investmentReturn;
+    }});
     this.getData();
-  }
+}
 
   transitionState = '';
   selectedCashflow: Cashflow | null;
@@ -342,6 +355,7 @@ updateOrderNumbers() {
       width: '700px',
       disableClose: true,
       data: {
+        returnRate: this.userRerturnRate,
         amountCycles: this.amountCycles,
         escalataionRates: this.escalationRates,
         eventsList: this.timeline.clientEvents.sort((a, b) => a.start.age - b.start.age),
