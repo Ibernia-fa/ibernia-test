@@ -31,6 +31,8 @@ import moment from 'moment';
 import { allCountries } from 'src/app/clients/models/country';
 import { AgeCalculatorPipe } from 'src/app/pipe/age-calculator.pipe';
 import { CommonModule } from '@angular/common';
+import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
+import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 interface Food {
   value: string;
   viewValue: string;
@@ -51,7 +53,9 @@ interface Food {
     // AgeCalculatorPipe,
     ReactiveFormsModule,
     MatTooltipModule,
-    CommonModule
+    CommonModule,
+    ThousandSeparatorInputDirective,
+    ThousandSeparatorPipe
   ],
   providers: [provideNativeDateAdapter(), 
     AgeCalculatorPipe,
