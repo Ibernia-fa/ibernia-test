@@ -130,4 +130,11 @@ export class AppNavItemComponent implements OnChanges {
       }
     }
   }
+
+  onExternalLinkClick(url: string) {
+  if (!url) return;
+  // Ensure protocol is correct and open in new tab
+  const finalUrl = url.startsWith('http') ? url : `https://${url}`;
+  window.open(finalUrl, '_blank', 'noopener,noreferrer');
+}
 }
