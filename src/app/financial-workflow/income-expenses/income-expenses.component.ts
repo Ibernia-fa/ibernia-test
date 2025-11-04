@@ -29,6 +29,7 @@ import moment from 'moment';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { CurrencySymbolPipe } from 'src/app/pipe/currency-symbol.pipe';
 import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
+import { ToastrModule, ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-income-expenses',
@@ -43,8 +44,10 @@ import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
     MatProgressSpinnerModule,
     MatTooltipModule,
     CurrencySymbolPipe,
-    ThousandSeparatorPipe
+    ThousandSeparatorPipe,
+    ToastrModule
   ],
+  providers: [ToastrService],
   templateUrl: './income-expenses.component.html',
   styleUrl: './income-expenses.component.scss',
 })
@@ -69,7 +72,8 @@ export class IncomeExpensesComponent {
     private incomeExpensesHttpService: IncomeExpensesHttpService,
     private settingHttpService: SettingsHttpService,
     private timelineHttpService: TimelineHttpService,
-    private navItemService: NavItemService
+    private navItemService: NavItemService,
+    private toastr: ToastrService
   ) {
     this.navItemService.currentRouteName = 'Incomes & Expenses';
     this.getData();
@@ -85,6 +89,7 @@ export class IncomeExpensesComponent {
         tap(([client, cashflow]) => {
           this.selectedClient = client as Client;
           console.log(cashflow);
+          console.log(client);
           this.selectedCashflow = cashflow as Cashflow;
         }),
         switchMap(([client, cashflow]) => {
@@ -128,8 +133,7 @@ export class IncomeExpensesComponent {
         eventsList: this.timeline.clientEvents.sort((a, b) => a.start.age - b.start.age),
         escalataionRates: this.escalationRates,
         clientBirthDate: this.selectedClient?.clientDetails.birthDate,
-        clientPreferredCurrency:
-          this.selectedClient?.clientDetails.preferredCurrency,
+        clientPreferredCurrency: this.selectedClient?.clientDetails.preferredCurrency,
         cashflowId: this.selectedCashflow?.id,
         forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
         forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),

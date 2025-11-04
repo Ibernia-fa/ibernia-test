@@ -102,7 +102,9 @@
 
 
           <div class="col-6">
-            <mat-label class="f-s-16 f-w-400 m-b-8 d-block">Country</mat-label>
+            <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">Country 
+              <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4" matTooltip="Sets the main currency for all new client plans. All figures will be shown in this currency by default, but you can change it for individual clients later.">
+            </mat-label>
             <mat-form-field appearance="outline" class="w-100">
               <mat-select formControlName="country" placeholder="Select country" (valueChange)="clientCountryValueChange($event)">
                 @for (country of countries; track country) {
@@ -116,7 +118,7 @@
              <div class="col-6">
             <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">
               Default currency
-              <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4" matTooltip="Each client can also have their own default individual currency. You can set this when adding or editing a client.">
+              <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4" matTooltip="Sets the main currency for all new client plans. All figures will be shown in this currency by default, but you can change it for individual clients later.">
             </mat-label>
             <mat-form-field appearance="outline" class="w-100">
               <mat-select formControlName="currency" hideSingleSelectionIndicator>
@@ -136,7 +138,7 @@
           <div class="col-6">
             <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">
               Default inflation rate
-              <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4" matTooltip="This rate will be applied to all future projections by default. You can override it for specific clients or scenarios.">
+              <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4" matTooltip="Sets the default annual inflation rate used in projections. You can modify it in each client’s cashflow model to show how inflation impacts their future results.">
             </mat-label>
             <mat-form-field appearance="outline" class="w-100 percentage-icon">
               <span matSuffix>%</span>
@@ -153,7 +155,7 @@
           <div class="col-6">
             <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">
               Default net investment return
-              <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4" matTooltip="The annual net return (before advisor fees) assumed for investments in projection. You can change it per client or per saving pot.">
+              <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4" matTooltip="Defines the expected yearly return after taxes. Ibernia uses this to estimate how investments grow over time. You can adapt it for each Saving Pot or individual client.">
             </mat-label>
             <mat-form-field appearance="outline" class="w-100 percentage-icon">
               <span matSuffix>%</span>
@@ -166,7 +168,7 @@
           <div class="col-4">
             <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">
               Default advisor commission type
-              <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4" matTooltip="Choose whether commissions are calculated as fixed amount, a percentage of investment, or both. This can be adjusted per client.">
+              <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4" matTooltip="Defines how advisor commissions are calculated. You can set a fixed amount (e.g., €100 per year), a percentage of assets (e.g., 1% annually), or both. This acts as your default method and can be customized for each client.">
             </mat-label>
             <mat-form-field appearance="outline" class="w-100">
               <mat-select formControlName="comissionType" placeholder="Select commission type">
@@ -204,7 +206,9 @@
       </div> -->
      @if (form.controls.preferences.controls.comissionType.value === ComissionType.Percentage) {
             <div class="col-8">
-              <mat-label class="f-s-16 f-w-400 m-b-8 d-block">Default commission percentage</mat-label>
+              <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">Default commission percentage
+                <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4" matTooltip="Sets the default percentage commission for new plans (e.g., 1% annually on the value of invested savings). This applies to each Saving Pot by default, and you can adjust it for each client when needed.">
+              </mat-label>
               <mat-form-field appearance="outline" class="w-100 percentage-icon">
                 <span matSuffix>%</span>
                 <input matInput type="number" step="0.1" formControlName="comissionPercentage"  />
@@ -239,7 +243,9 @@
             </mat-form-field>
                 </div>
             <div class="col-10">
-              <mat-label class="f-s-16 f-w-400 m-b-8 d-block">Default commission amount</mat-label>
+              <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">Default commission amount
+                <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4" matTooltip="Sets the standard fixed commission value applied when creating new plans (e.g., €100 per year). This applies to each Saving Pot by default, but you can change it per client if needed.">
+              </mat-label>
               <mat-form-field appearance="outline" class="w-100">
                 <input matInput type="number" step="1" formControlName="comissionAmount" placeholder="Enter amount" />
                 <mat-error *ngIf="p.comissionAmount.hasError('required')">Required</mat-error>
@@ -263,7 +269,11 @@
             </mat-form-field>
                 </div>
               <div class="col-5">
-              <mat-label class="f-s-16 f-w-400 m-b-8 d-block">Default commission amount</mat-label>
+              <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">Default commission amount
+                <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4" matTooltip="Sets the standard fixed commission value applied when creating new plans (e.g., €100 per year). This applies to each Saving Pot by default, but you can change it per client if needed.">
+
+
+              </mat-label>
               <mat-form-field appearance="outline" class="w-100">
                 <input matInput type="number" step="1" formControlName="comissionAmount" placeholder="Enter amount" />
                 <mat-error *ngIf="p.comissionAmount.hasError('required')">Required</mat-error>
@@ -271,7 +281,11 @@
               </mat-form-field>
             </div>
             <div class="col-5">
-              <mat-label class="f-s-16 f-w-400 m-b-8 d-block">Default commission percentage</mat-label>
+              <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">Default commission percentage
+                <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4" matTooltip="Sets the default percentage commission for new plans (e.g., 1% annually on the value of invested savings). This applies to each Saving Pot by default, and you can adjust it for each client when needed.
+">
+
+              </mat-label>
               <mat-form-field appearance="outline" class="w-100 percentage-icon">
                 <input matInput type="number" step="0.1" formControlName="comissionPercentage" />
                 <mat-error *ngIf="p.comissionPercentage.hasError('required')">Required</mat-error>

@@ -10,6 +10,7 @@ import {
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import {MatTooltipModule} from '@angular/material/tooltip';
 import { MatSelectChange, MatSelectModule } from '@angular/material/select';
 import { Client } from 'src/app/clients/models/client';
 import { ClientEvent, Cycle, EscalationRate, EventIncomeType } from '../models/financial-timeline';
@@ -49,6 +50,7 @@ interface Food {
     MatDatepickerModule,
     // AgeCalculatorPipe,
     ReactiveFormsModule,
+    MatTooltipModule,
     CommonModule
   ],
   providers: [provideNativeDateAdapter(), 

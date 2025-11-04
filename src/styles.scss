@@ -270,3 +270,26 @@ font-weight: 400 !important;
   padding-left: 0px !important;
 
 }
+.btn-secondary{
+      background-color: #fff;
+      border: 1px solid #516ce8;
+      color: #516ce8;
+    padding: 12px 24px;
+    border-radius: 4px;
+    outline: none;
+    height: 100%;
+    min-height: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    gap: 8px;
+    cursor: pointer;
+    font-family: "Ubuntu", serif;
+    transition: all 0.3s linear;
+    &:hover{
+      background-color: #516ce8;
+      border: 1px solid #516ce8;
+      color: #fff;
+    }
+}
