@@ -128,7 +128,10 @@ export class AddEventDialogComponent {
     this.clientPreferredCurrency= data.clientPreferredCurrency
 
     var iterations = data.forecastEndDateYear - data.forecastStartDateYear + 1
-
+    // console.log('Forecast end year => ', data.forecastEndDateYear)
+    // console.log('Forecast start year => ', data.forecastStartDateYear)
+    
+    // console.log('Iterations => ', iterations)
     for (let index = 0; index < iterations; index++) {
       const element = data.forecastStartDateYear + index;
       this.years.push(element);
