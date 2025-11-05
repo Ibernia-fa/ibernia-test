@@ -46,7 +46,7 @@ You may add new events to the timeline or adjust existing ones by dragging them 
 
         <div class="text-center">
             <div>
-        <button class="button-icon"><span>Generate recommendations</span></button></div>
+        <button class="button-icon" (click)="onClickShow()"><span>Generate recommendations</span></button></div>
             <small>Today: 0/5 used</small>
         </div>
     </div>
@@ -73,7 +73,8 @@ You may add new events to the timeline or adjust existing ones by dragging them 
     </div>
     </mat-card-content>
 </mat-card>
-
+<!-- {{isReccShown}} -->
+<ng-container *ngIf="isReccShown">
 <mat-card class="mat-mdc-card mdc-card cardWithShadow">
   <mat-card-content class="mat-mdc-card-content">
      <div class="edit-rec-sugg">
@@ -109,5 +110,7 @@ You may add new events to the timeline or adjust existing ones by dragging them 
 </div>
     </mat-card-content>
 </mat-card>
+</ng-container>
+
 </div>
 

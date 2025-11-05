@@ -412,39 +412,6 @@ export class TimelineChartComponent implements OnInit, OnChanges {
     this.draggedEvent = null;
   }
 
-  // onDragOver(event: DragEvent) {
-  //   this.timeline.setCustomTime(
-  //     this.timeline.getEventProperties(event).time,
-  //     'dragOver'
-  //   );
-  //   this.timeline.setCustomTimeTitle(
-  //     moment(this.timeline.getEventProperties(event).time).year().toString(),
-  //     'dragOver'
-  //   );
-  //   event.preventDefault(); // Allows dropping
-  //   // var isCustomTimeCreated = false;
-  //   // try {
-  //   //   console.log('dragover', (this.timeline.getEventProperties(event) as any).customTime);
-  //   //   console.log('dragover', !(this.timeline.getEventProperties(event) as any).customTime);
-  //   //   if(!(this.timeline.getEventProperties(event) as any).customTime) {
-  //   //     console.log()
-  //   //     isCustomTimeCreated = true;
-  //   //   }
-
-  //   // } catch(err) {
-  //   //   console.log('called err', err);
-  //   //   // this.timeline.removeCustomTime('dragOver');
-  //   //   // this.timeline.addCustomTime(this.timeline.getEventProperties(event).time, 'dragOver');
-  //   //   // this.timeline.setCustomTimeTitle(moment(this.timeline.getEventProperties(event).time).year().toString(), 'dragOver');
-  //   // }
-  //   // finally {
-  //   //   console.log('called after');
-  //   //   if(isCustomTimeCreated) {
-  //   //     this.timeline.removeCustomTime('dragOver');
-  //   //   }
-  //   //   // this.timeline.redraw()
-  //   // }
-  // }
 
 onDragOver(event: DragEvent) {
   event.preventDefault();
@@ -826,247 +793,340 @@ requestAnimationFrame(() => {
     this.timeline.setOptions(this.timelineOptions);
   }
 
+  // handleEventUpdate(item: any, callback: (item: any) => void) {
+  //   this.timeline.removeCustomTime('dragOver');
+  //   // this.stopTooltipPolling();
+
+  //   const dropTime = item.start;
+  //   this.clearLabelHighlight();
+  //   if (
+  //     moment(dropTime).year() <
+  //       moment(this.financialTimeline.forecastStartDate).year() ||
+  //     moment(dropTime).year() >
+  //       moment(this.financialTimeline.forecastEndtDate).year()
+  //   )
+  //   {
+  //     this.timeline.setItems(this.timelineData);
+  //     return;
+  //   }
+
+  //   var clientEvent = JSON.parse(JSON.stringify(this.financialTimeline.clientEvents.find(
+  //     (event) => event.id === item.id
+  //   )));
+  //   if (clientEvent) {
+
+  //     if( clientEvent.isOneOff &&
+  //       clientEvent.start.year ===  moment(new Date(moment(item.start).year(), 1)).year() &&
+  //       clientEvent.end?.year !==  moment(new Date(moment(item.end).year(), 1)).year()
+  //     ) {
+  //       this.toastrService.error("You cannot edit the duration of \"one off\" events");
+  //       this.timeline.setItems(this.timelineData);
+  //       this.cdr.detectChanges();
+  //       this.timeline.redraw();
+  //       return;
+  //     }
+
+  //     if (
+  //       this.systemEventsLibrary
+  //         .filter((event) => event.isPlaceHolder)
+  //         .some((event) => event.name === clientEvent?.name)
+  //     ) {
+  //       clientEvent.start = {
+  //         year: moment(new Date(moment(item.start).year(), 1)).year(),
+  //         age:
+  //           moment(new Date(moment(item.start).year(), 1)).year() -
+  //           moment(this.clientBirthDate).year(),
+  //       };
+  //       this.timelineHttpService
+  //         .addEvent(clientEvent, this.financialTimeline.cashflow.id)
+  //         .pipe(
+  //           // filter(res => !!res),
+  //           take(1),
+  //           map((res) => {
+  //             // this.financialTimeline.clientEvents.push(clientEvent);
+  //             this.draggedEvent = null;
+  //             this.updateTimelines.emit();
+  //             this.timeline.setItems(this.timelineData);
+  //             this.cdr.detectChanges();
+  //             this.timeline.redraw();
+  //           }),
+  //           catchError((err) => {
+  //             console.error(err);
+  //             this.draggedEvent = null;
+  //             throw err;
+  //           })
+  //         )
+  //         .subscribe((res) => {
+  //           callback(item);
+  //         });
+  //     }
+
+  //     if (
+  //       clientEvent.name === 'Inheritance' ||
+  //       clientEvent.name === 'Wedding'
+  //     ) {
+  //       clientEvent.start = {
+  //         year: moment(new Date(moment(item.start).year(), 1)).year(),
+  //         age:
+  //           moment(new Date(moment(item.start).year(), 1)).year() -
+  //           moment(this.clientBirthDate).year(),
+  //       }
+  //       clientEvent.end = {
+  //         year: moment(new Date(moment(item.end).year(), 1)).year(),
+  //         age:
+  //           moment(new Date(moment(item.end).year(), 1)).year() -
+  //           moment(this.clientBirthDate).year(),
+  //       }
+  //       const dialogRef = this.dialog.open(AddEventDialogComponent, {
+  //         width: '600px',
+  //         disableClose: true,
+  //         data: {
+  //           amountCycles: this.amountCycles,
+  //           eventType: EventType.INHERITANCE,
+  //           escalataionRates : this.escalationRates,
+  //           timelineId: this.financialTimeline.id,
+  //           cashflowId: this.financialTimeline.cashflow.id,
+  //           isIncomeEvent: clientEvent.type === EventIncomeType.Income,
+  //           systemEvent: clientEvent,
+  //           dropTime: new Date(moment(item.start).year(), 0),
+  //           clientBirthDate: this.clientBirthDate,
+  //           clientPreferredCurrency: this.client.clientDetails.preferredCurrency,
+  //           forecastStartDateYear: moment(this.financialTimeline.forecastStartDate).year(),
+  //           forecastEndDateYear: moment(this.financialTimeline.forecastEndtDate).year(),
+  //           isEditWorkflow: true,
+  //           patchEvent: clientEvent,
+  //         },
+  //       });
+
+  //       dialogRef.afterClosed().subscribe((result: any) => {
+  //         console.log('Dialog closed with result:', result);
+  //         if ((result.status = 'Success')) {
+  //           this.updateTimelines.emit();
+  //           callback(item);
+  //         }
+  //         this.timeline.setItems(this.timelineData);
+  //         this.cdr.detectChanges();
+  //         this.timeline.redraw();
+  //       });
+  //     }
+
+  //     if (clientEvent.name === 'State pension') {
+  //       clientEvent.start = {
+  //         year: moment(new Date(moment(item.start).year(), 1)).year(),
+  //         age:
+  //           moment(new Date(moment(item.start).year(), 1)).year() -
+  //           moment(this.clientBirthDate).year(),
+  //       }
+  //       clientEvent.end = {
+  //         year: moment(new Date(moment(item.end).year(), 1)).year(),
+  //         age:
+  //           moment(new Date(moment(item.end).year(), 1)).year() -
+  //           moment(this.clientBirthDate).year(),
+  //       }
+  //       const dialogRef = this.dialog.open(AddEventDialogComponent, {
+  //         width: '600px',
+  //         disableClose: true,
+  //         data: {
+  //           amountCycles: this.amountCycles,
+  //           eventType: EventType.STATE_PENSION,
+  //           escalataionRates : this.escalationRates,
+  //           timelineId: this.financialTimeline.id,
+  //           cashflowId: this.financialTimeline.cashflow.id,
+  //           isIncomeEvent: clientEvent.type === EventIncomeType.Income,
+  //           systemEvent: clientEvent,
+  //           dropTime: new Date(moment(item.start).year(), 0),
+  //           clientBirthDate: this.clientBirthDate,
+  //           clientPreferredCurrency: this.client.clientDetails.preferredCurrency,
+  //           forecastStartDateYear: moment(this.financialTimeline.forecastStartDate).year(),
+  //           forecastEndDateYear: moment(this.financialTimeline.forecastEndtDate).year(),
+  //           eventsList: this.financialTimeline.clientEvents.map((event) => {
+  //             return {
+  //               name: event.name,
+  //               year: event.start.year,
+  //               age:
+  //                 event.start.year -
+  //                 moment(new Date(this.clientBirthDate)).year(),
+  //             };
+  //           }),
+  //           isEditWorkflow: true,
+  //           patchEvent: clientEvent,
+  //         },
+  //       });
+
+  //       dialogRef.afterClosed().subscribe((result: any) => {
+  //         console.log('Dialog closed with result:', result);
+  //         if ((result.status = 'Success')) {
+  //           this.updateTimelines.emit();
+  //           callback(item);
+  //         }
+  //         this.timeline.setItems(this.timelineData);
+  //         this.cdr.detectChanges();
+  //         this.timeline.redraw();
+  //       });
+  //     }
+
+  //     if (
+  //       this.systemEventsLibrary.every(
+  //         (event) => event.name !== clientEvent?.name
+  //       )
+  //     ) {
+
+  //       clientEvent.start = {
+  //         year: moment(new Date(moment(item.start).year(), 1)).year(),
+  //         age:
+  //           moment(new Date(moment(item.start).year(), 1)).year() -
+  //           moment(this.clientBirthDate).year(),
+  //       }
+  //       clientEvent.end = {
+  //         year: moment(new Date(moment(item.end).year(), 1)).year(),
+  //         age:
+  //           moment(new Date(moment(item.end).year(), 1)).year() -
+  //           moment(this.clientBirthDate).year(),
+  //       }
+  //       const dialogRef = this.dialog.open(AddEventDialogComponent, {
+  //         width: '900px',
+  //         disableClose: true,
+  //         data: {
+  //           eventType: EventType.CUSTOM,
+  //           amountCycles: this.amountCycles,
+  //           escalataionRates : this.escalationRates,
+  //           customEvents: this.customEventsLibrary,
+  //           timelineId: this.financialTimeline.id,
+  //           isIncomeEvent: true,
+  //           cashflowId: this.financialTimeline.cashflow.id,
+  //           clientBirthDate: this.clientBirthDate,
+  //           clientPreferredCurrency: this.client.clientDetails.preferredCurrency,
+  //           forecastStartDateYear: moment(this.financialTimeline.forecastStartDate).year(),
+  //           forecastEndDateYear: moment(this.financialTimeline.forecastEndtDate).year(),
+  //           eventsList: this.financialTimeline.clientEvents.map((event) => {
+  //             return {
+  //               name: event.name,
+  //               year: event.start.year,
+  //               age:
+  //                 event.start.year -
+  //                 moment(new Date(this.clientBirthDate)).year(),
+  //             };
+  //           }),
+  //           isEditWorkflow: true,
+  //           patchEvent: clientEvent,
+  //         },
+  //       });
+
+  //       dialogRef.afterClosed().subscribe((result: any) => {
+  //         console.log('Dialog closed with result:', result);
+  //         if ((result.status = 'Success')) {
+  //           this.updateTimelines.emit();
+  //           callback(item);
+  //         }
+  //         this.timeline.setItems(this.timelineData);
+  //         this.cdr.detectChanges();
+  //         this.timeline.redraw();
+  //       });
+  //     } else {
+  //       const clientEvent: ClientEvent | undefined =
+  //         this.financialTimeline.clientEvents.find(
+  //           (event) => event.id === item.id
+  //         );
+  //       // Object.assign<ClientEvent, ClientEvent>(clientEvent, this.draggedEvent);
+
+  //       if (clientEvent) {
+  //       }
+  //     }
+  //   }
+  // }
+
+
   handleEventUpdate(item: any, callback: (item: any) => void) {
-    this.timeline.removeCustomTime('dragOver');
-    // this.stopTooltipPolling();
+  // remove hover marker + clear highlight
+  this.timeline.removeCustomTime('dragOver');
+  this.clearLabelHighlight();
 
-    const dropTime = item.start;
-    this.clearLabelHighlight();
-    if (
-      moment(dropTime).year() <
-        moment(this.financialTimeline.forecastStartDate).year() ||
-      moment(dropTime).year() >
-        moment(this.financialTimeline.forecastEndtDate).year()
-    )
-    {
-      this.timeline.setItems(this.timelineData);
-      return;
-    }
+  const dropTime = item.start;
 
-    var clientEvent = JSON.parse(JSON.stringify(this.financialTimeline.clientEvents.find(
-      (event) => event.id === item.id
-    )));
-    if (clientEvent) {
+  // guard: outside forecast window → revert
+  if (
+    moment(dropTime).year() < moment(this.financialTimeline.forecastStartDate).year() ||
+    moment(dropTime).year() > moment(this.financialTimeline.forecastEndtDate).year()
+  ) {
+    this.timeline.setItems(this.timelineData);
+    this.cdr.detectChanges();
+    this.timeline.redraw();
+    return;
+  }
 
-      if( clientEvent.isOneOff &&
-        clientEvent.start.year ===  moment(new Date(moment(item.start).year(), 1)).year() &&
-        clientEvent.end?.year !==  moment(new Date(moment(item.end).year(), 1)).year()
-      ) {
-        this.toastrService.error("You cannot edit the duration of \"one off\" events");
+  // clone current event from the model
+  const existing = this.financialTimeline.clientEvents.find(ev => ev.id === item.id);
+  if (!existing) {
+    // nothing to update; just refresh UI
+    this.timeline.setItems(this.timelineData);
+    this.cdr.detectChanges();
+    this.timeline.redraw();
+    return;
+  }
+
+  // compute snapped years from vis item
+  const newStartYear = moment(new Date(moment(item.start).year(), 1)).year();
+  const newEndYear   = moment(new Date(moment(item.end).year(),   1)).year();
+
+  // one-off rule: allow moving the date (year), but DON'T allow changing duration
+  if (
+    existing.isOneOff &&
+    existing.start?.year === newStartYear &&
+    existing.end?.year !== newEndYear
+  ) {
+    this.toastrService.error('You cannot edit the duration of "one off" events');
+    this.timeline.setItems(this.timelineData);
+    this.cdr.detectChanges();
+    this.timeline.redraw();
+    return;
+  }
+
+  // build the payload to upsert
+  const updated = {
+    ...existing,
+    start: {
+      year: newStartYear,
+      age:  newStartYear - moment(this.clientBirthDate).year(),
+    },
+    // if event had no end, keep it undefined OR keep previous end if it existed and user didn't resize
+    end: (() => {
+      if (!existing.end || !existing.end.year) return existing.end; // one-off stays one-off
+      return {
+        year: newEndYear,
+        age:  newEndYear - moment(this.clientBirthDate).year(),
+      };
+    })(),
+  };
+
+  // persist WITHOUT opening any dialog (upsert pattern)
+  this.timelineHttpService
+    .addEvent(updated, this.financialTimeline.cashflow.id) // server treats as upsert by id
+    .pipe(take(1))
+    .subscribe({
+      next: () => {
+        // update local model
+        const idx = this.financialTimeline.clientEvents.findIndex(e => e.id === updated.id);
+        if (idx > -1) this.financialTimeline.clientEvents[idx] = updated;
+
+        // refresh UI
+        this.updateTimelines.emit(); // optional, if parent reloads timelines
         this.timeline.setItems(this.timelineData);
         this.cdr.detectChanges();
         this.timeline.redraw();
-        return;
-      }
 
-      if (
-        this.systemEventsLibrary
-          .filter((event) => event.isPlaceHolder)
-          .some((event) => event.name === clientEvent?.name)
-      ) {
-        clientEvent.start = {
-          year: moment(new Date(moment(item.start).year(), 1)).year(),
-          age:
-            moment(new Date(moment(item.start).year(), 1)).year() -
-            moment(this.clientBirthDate).year(),
-        };
-        this.timelineHttpService
-          .addEvent(clientEvent, this.financialTimeline.cashflow.id)
-          .pipe(
-            // filter(res => !!res),
-            take(1),
-            map((res) => {
-              // this.financialTimeline.clientEvents.push(clientEvent);
-              this.draggedEvent = null;
-              this.updateTimelines.emit();
-              this.timeline.setItems(this.timelineData);
-              this.cdr.detectChanges();
-              this.timeline.redraw();
-            }),
-            catchError((err) => {
-              console.error(err);
-              this.draggedEvent = null;
-              throw err;
-            })
-          )
-          .subscribe((res) => {
-            callback(item);
-          });
-      }
+        callback(item);
+      },
+      error: (err) => {
+        console.error(err);
+        this.toastrService.error('Failed to save event position');
+        // revert UI if save failed
+        this.timeline.setItems(this.timelineData);
+        this.cdr.detectChanges();
+        this.timeline.redraw();
+      },
+    });
+}
 
-      if (
-        clientEvent.name === 'Inheritance' ||
-        clientEvent.name === 'Wedding'
-      ) {
-        clientEvent.start = {
-          year: moment(new Date(moment(item.start).year(), 1)).year(),
-          age:
-            moment(new Date(moment(item.start).year(), 1)).year() -
-            moment(this.clientBirthDate).year(),
-        }
-        clientEvent.end = {
-          year: moment(new Date(moment(item.end).year(), 1)).year(),
-          age:
-            moment(new Date(moment(item.end).year(), 1)).year() -
-            moment(this.clientBirthDate).year(),
-        }
-        const dialogRef = this.dialog.open(AddEventDialogComponent, {
-          width: '600px',
-          disableClose: true,
-          data: {
-            amountCycles: this.amountCycles,
-            eventType: EventType.INHERITANCE,
-            escalataionRates : this.escalationRates,
-            timelineId: this.financialTimeline.id,
-            cashflowId: this.financialTimeline.cashflow.id,
-            isIncomeEvent: clientEvent.type === EventIncomeType.Income,
-            systemEvent: clientEvent,
-            dropTime: new Date(moment(item.start).year(), 0),
-            clientBirthDate: this.clientBirthDate,
-            clientPreferredCurrency: this.client.clientDetails.preferredCurrency,
-            forecastStartDateYear: moment(this.financialTimeline.forecastStartDate).year(),
-            forecastEndDateYear: moment(this.financialTimeline.forecastEndtDate).year(),
-            isEditWorkflow: true,
-            patchEvent: clientEvent,
-          },
-        });
-
-        dialogRef.afterClosed().subscribe((result: any) => {
-          console.log('Dialog closed with result:', result);
-          if ((result.status = 'Success')) {
-            this.updateTimelines.emit();
-            callback(item);
-          }
-          this.timeline.setItems(this.timelineData);
-          this.cdr.detectChanges();
-          this.timeline.redraw();
-        });
-      }
-
-      if (clientEvent.name === 'State pension') {
-        clientEvent.start = {
-          year: moment(new Date(moment(item.start).year(), 1)).year(),
-          age:
-            moment(new Date(moment(item.start).year(), 1)).year() -
-            moment(this.clientBirthDate).year(),
-        }
-        clientEvent.end = {
-          year: moment(new Date(moment(item.end).year(), 1)).year(),
-          age:
-            moment(new Date(moment(item.end).year(), 1)).year() -
-            moment(this.clientBirthDate).year(),
-        }
-        const dialogRef = this.dialog.open(AddEventDialogComponent, {
-          width: '600px',
-          disableClose: true,
-          data: {
-            amountCycles: this.amountCycles,
-            eventType: EventType.STATE_PENSION,
-            escalataionRates : this.escalationRates,
-            timelineId: this.financialTimeline.id,
-            cashflowId: this.financialTimeline.cashflow.id,
-            isIncomeEvent: clientEvent.type === EventIncomeType.Income,
-            systemEvent: clientEvent,
-            dropTime: new Date(moment(item.start).year(), 0),
-            clientBirthDate: this.clientBirthDate,
-            clientPreferredCurrency: this.client.clientDetails.preferredCurrency,
-            forecastStartDateYear: moment(this.financialTimeline.forecastStartDate).year(),
-            forecastEndDateYear: moment(this.financialTimeline.forecastEndtDate).year(),
-            eventsList: this.financialTimeline.clientEvents.map((event) => {
-              return {
-                name: event.name,
-                year: event.start.year,
-                age:
-                  event.start.year -
-                  moment(new Date(this.clientBirthDate)).year(),
-              };
-            }),
-            isEditWorkflow: true,
-            patchEvent: clientEvent,
-          },
-        });
-
-        dialogRef.afterClosed().subscribe((result: any) => {
-          console.log('Dialog closed with result:', result);
-          if ((result.status = 'Success')) {
-            this.updateTimelines.emit();
-            callback(item);
-          }
-          this.timeline.setItems(this.timelineData);
-          this.cdr.detectChanges();
-          this.timeline.redraw();
-        });
-      }
-
-      if (
-        this.systemEventsLibrary.every(
-          (event) => event.name !== clientEvent?.name
-        )
-      ) {
-
-        clientEvent.start = {
-          year: moment(new Date(moment(item.start).year(), 1)).year(),
-          age:
-            moment(new Date(moment(item.start).year(), 1)).year() -
-            moment(this.clientBirthDate).year(),
-        }
-        clientEvent.end = {
-          year: moment(new Date(moment(item.end).year(), 1)).year(),
-          age:
-            moment(new Date(moment(item.end).year(), 1)).year() -
-            moment(this.clientBirthDate).year(),
-        }
-        const dialogRef = this.dialog.open(AddEventDialogComponent, {
-          width: '900px',
-          disableClose: true,
-          data: {
-            eventType: EventType.CUSTOM,
-            amountCycles: this.amountCycles,
-            escalataionRates : this.escalationRates,
-            customEvents: this.customEventsLibrary,
-            timelineId: this.financialTimeline.id,
-            isIncomeEvent: true,
-            cashflowId: this.financialTimeline.cashflow.id,
-            clientBirthDate: this.clientBirthDate,
-            clientPreferredCurrency: this.client.clientDetails.preferredCurrency,
-            forecastStartDateYear: moment(this.financialTimeline.forecastStartDate).year(),
-            forecastEndDateYear: moment(this.financialTimeline.forecastEndtDate).year(),
-            eventsList: this.financialTimeline.clientEvents.map((event) => {
-              return {
-                name: event.name,
-                year: event.start.year,
-                age:
-                  event.start.year -
-                  moment(new Date(this.clientBirthDate)).year(),
-              };
-            }),
-            isEditWorkflow: true,
-            patchEvent: clientEvent,
-          },
-        });
-
-        dialogRef.afterClosed().subscribe((result: any) => {
-          console.log('Dialog closed with result:', result);
-          if ((result.status = 'Success')) {
-            this.updateTimelines.emit();
-            callback(item);
-          }
-          this.timeline.setItems(this.timelineData);
-          this.cdr.detectChanges();
-          this.timeline.redraw();
-        });
-      } else {
-        const clientEvent: ClientEvent | undefined =
-          this.financialTimeline.clientEvents.find(
-            (event) => event.id === item.id
-          );
-        // Object.assign<ClientEvent, ClientEvent>(clientEvent, this.draggedEvent);
-
-        if (clientEvent) {
-        }
-      }
-    }
-  }
 
   updateEventByDoubleClick(clientEvent: ClientEvent) {
     if (
