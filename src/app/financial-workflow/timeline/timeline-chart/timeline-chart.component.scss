@@ -179,6 +179,7 @@
 
 .timeline-labels {
   display: flex;
+  position: absolute;
   flex-direction: column;
   align-items: flex-end;
   justify-content: flex-end;
@@ -188,6 +189,7 @@
   color: #666;
   min-width: 40px;
   font-weight: 500;
+  left: 11px;
 
   p, span {
     margin: 0;
@@ -236,4 +238,3 @@
   font-weight: 500;
   color: #333;
 }
-

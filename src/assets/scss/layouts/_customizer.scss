@@ -503,3 +503,10 @@ html .customizerNav {
   }
 }
 // End Range Input
+.vis-panel.vis-center,
+.vis-timeline{
+  overflow: visible  !important;
+}
+.vis-panel.vis-bottom{
+  border:none !important
+}
