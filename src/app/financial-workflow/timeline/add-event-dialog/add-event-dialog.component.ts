@@ -31,6 +31,8 @@ import moment from 'moment';
 import { allCountries } from 'src/app/clients/models/country';
 import { AgeCalculatorPipe } from 'src/app/pipe/age-calculator.pipe';
 import { CommonModule } from '@angular/common';
+import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
+import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 interface Food {
   value: string;
   viewValue: string;
@@ -51,7 +53,9 @@ interface Food {
     // AgeCalculatorPipe,
     ReactiveFormsModule,
     MatTooltipModule,
-    CommonModule
+    CommonModule,
+    ThousandSeparatorInputDirective,
+    ThousandSeparatorPipe
   ],
   providers: [provideNativeDateAdapter(), 
     AgeCalculatorPipe,
@@ -124,7 +128,10 @@ export class AddEventDialogComponent {
     this.clientPreferredCurrency= data.clientPreferredCurrency
 
     var iterations = data.forecastEndDateYear - data.forecastStartDateYear + 1
-
+    // console.log('Forecast end year => ', data.forecastEndDateYear)
+    // console.log('Forecast start year => ', data.forecastStartDateYear)
+    
+    // console.log('Iterations => ', iterations)
     for (let index = 0; index < iterations; index++) {
       const element = data.forecastStartDateYear + index;
       this.years.push(element);

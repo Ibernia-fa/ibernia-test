@@ -108,6 +108,7 @@ export class AddNewPotComponent {
   forecastEndDateYear: any;
   forecastStartDateYear: any;
   isCashPotEditMode: boolean;
+  userReturnRate: any = 3.5;
 
   constructor(
     private dialogRef: MatDialogRef<AddNewPotComponent>,
@@ -119,7 +120,7 @@ export class AddNewPotComponent {
     this.escalationRates = data.escalataionRates;
     this.eventsList = data.eventsList;
     this.clientBirthYear = moment(data.clientBirthDate).year();
-
+    this.userReturnRate = data.returnRate;
     const birthDate = new Date(data.clientBirthDate);
     const today = new Date();
     let age = today.getFullYear() - birthDate.getFullYear();
@@ -152,7 +153,7 @@ export class AddNewPotComponent {
       name: ['', Validators.required],
       currency: [this.clientPreferredCurrency, Validators.required],
       amount: [0, [Validators.required, Validators.min(0)]],
-      returnRate: [3.5],
+      returnRate: [this.userReturnRate],
       // lockPot: [true],
       lockPot: [false],
       start: [data.forecastStartDateYear, Validators.required],

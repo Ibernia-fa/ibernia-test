@@ -31,6 +31,7 @@ import { IncomeExpensesHttpService } from '../services/income-expenses-http.serv
 import moment from 'moment';
 import { FinancialViewModel } from '../model/income-expense';
 import { catchError, filter } from 'rxjs';
+import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 
 @Component({
   selector: 'app-add-expense',
@@ -47,6 +48,8 @@ import { catchError, filter } from 'rxjs';
     MatSliderModule,
     ReactiveFormsModule,
      ThousandSeparatorPipe,
+    ThousandSeparatorInputDirective
+
   ],
   providers: [provideNativeDateAdapter()],
   templateUrl: './add-expense.component.html',

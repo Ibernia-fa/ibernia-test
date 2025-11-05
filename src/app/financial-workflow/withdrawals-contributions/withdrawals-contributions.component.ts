@@ -135,7 +135,7 @@ export class WithdrawalsContributionsComponent {
         (this.savingsPots.clientSavings.length === 1 && 
           this.savingsPots.clientSavings[0].name.toLowerCase() === 'cash'))
     {
-      this.toastr.error('Before adding this, please create a new saving pot', 'Error!', { timeOut: 5000 });
+      this.toastr.error('Before adding this, please create a new Saving Pot', 'Error!', { timeOut: 5000 });
     }    
     else {
       const dialogRef = this.dialog.open(AddContributionComponent, {
@@ -166,7 +166,7 @@ export class WithdrawalsContributionsComponent {
         (this.savingsPots.clientSavings.length === 1 && 
           this.savingsPots.clientSavings[0].name.toLowerCase() === 'cash'))
     {
-      this.toastr.error('Before adding this, please create a new saving pot', 'Error!', { timeOut: 5000 });
+      this.toastr.error('Before adding this, please create a new Saving Pot', 'Error!', { timeOut: 5000 });
     }    
     else {
       const dialogRef = this.dialog.open(AddWithdrawalComponent, {
