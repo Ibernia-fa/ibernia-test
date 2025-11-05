@@ -114,7 +114,7 @@ ComissionType = ComissionType;
     this.form.markAllAsTouched();
     // this.form.markAsDirty();
     if (this.form.invalid) {
-      this.toastr.error('Please complete the highlighted fields.', 'Error!');
+      this.toastr.error('Please complete the highlighted fields', 'Error!');
       return;
     }
 
@@ -155,7 +155,7 @@ ComissionType = ComissionType;
         finalize(() => (this.isSaving = false))
       )
       .subscribe(() => {
-        this.toastr.error('Preferences saved.', 'Error!');
+        this.toastr.error('Preferences saved', 'Error!');
           if (this.dialogRef) {
           this.dialogRef.close(true);
           return;

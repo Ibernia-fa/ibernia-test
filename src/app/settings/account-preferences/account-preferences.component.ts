@@ -292,7 +292,7 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
       this.cdr.markForCheck();                // <-- ensure UI updates under OnPush
     } catch (e) {
       console.error('Failed to read image', e);
-      this.toastr.error('Could not read the selected image.', 'Error!');
+      this.toastr.error('Could not read the selected image', 'Error!');
     } finally {
       // reset the native input so picking the *same file* again will fire (change)
       if (this.fileInput?.nativeElement) {
@@ -306,7 +306,7 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
     this.submitted = true;
     if (this.form.invalid) {
       this.form.markAllAsTouched();
-      this.toastr.error('Please fix the highlighted fields.', 'Error!');
+      this.toastr.error('Please fix the highlighted fields', 'Error!');
       return;
     }
 

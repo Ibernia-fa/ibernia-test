@@ -69,7 +69,7 @@ export class BrandingComponent implements OnInit {
     // }
     const userId = this.auth.getUserProfile()?.sub;
     if (!userId) {
-      this.toastr.error('No user id found. Please sign in again.', 'Error!');
+      this.toastr.error('No user id found. Please sign in again', 'Error!');
       return;
     }
 
@@ -85,7 +85,7 @@ export class BrandingComponent implements OnInit {
         },
         error: (err) => {
           console.error(err);
-          this.toastr.error('Failed to save logo.', 'Error!');
+          this.toastr.error('Failed to save logo', 'Error!');
           this.isSaving = false;
         },
       });

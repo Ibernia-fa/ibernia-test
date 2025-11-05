@@ -359,7 +359,7 @@
           @if(savingsForm.get('commissionType')?.value === 'amount' || savingsForm.get('commissionType')?.value === 'both') {
             @if(savingsForm.get('commissionType')?.value === 'both') {
               <div class="d-flex gap-8 align-items-center">
-                <mat-label class="f-s-16 f-w-400 d-block">Commission amount</mat-label>
+                <mat-label class="f-s-16 f-w-400 d-block">Commission amount ss</mat-label>
                 <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
               </div>
             }
@@ -422,6 +422,8 @@
           
         @if(savingsForm.get('commissionType')?.value !== 'percentage' && !isOneOff){
           <div class="w-100 form-field gap-12">
+            <div class="d-flex flex-column gap-8">
+            <div class="d-flex flex-column gap-8">
           <div class="d-flex gap-8 align-items-center">
             <mat-label class="f-s-16 f-w-400 d-block">Commission amount escalatation rate</mat-label>
             <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
@@ -446,7 +448,8 @@
               <!-- End error  -->
             </div>
           </div>
-
+          </div>
+          </div>
         @if(selectedEscalationDescription === 'Increases at custom rate') {
           <div class="w-100 form-field gap-12">
             <mat-label class="f-s-16 d-block">Custom escalation rate</mat-label>

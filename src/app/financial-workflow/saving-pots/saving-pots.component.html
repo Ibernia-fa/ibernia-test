@@ -51,8 +51,7 @@ You may rearrange the order by dragging and dropping the pots, or by using the u
                                             </div>
                                             <div class="d-flex align-items-center gap-10">
                                                 <h3 class="saving-title">
-                                                    {{selectedClient?.clientDetails?.preferredCurrency  | currencySymbol }}
-                                                    {{ (savingPots?.totalSavings ?? 0) | thousandSeparator}}</h3>
+                                                    {{selectedClient?.clientDetails?.preferredCurrency|currencySymbol}}{{(savingPots?.totalSavings ?? 0)|thousandSeparator}}</h3>
                                                 <!-- <span
                                                     [ngClass]="savingPots.totalGwothRate >= 0 ? 'badge green' : 'badge red'">{{savingPots.totalGwothRate
                                                     >= 0 ? '+' : '-'}}{{(savingPots?.totalGwothRate | number : '1.0-0')
@@ -148,8 +147,7 @@ You may rearrange the order by dragging and dropping the pots, or by using the u
                                                 <div class="d-flex align-items-center gap-10">
                                                     
                                                     <h3 class="saving-title">
-                                                         {{selectedClient?.clientDetails?.preferredCurrency  | currencySymbol }}
-                                                        {{ saving.startingPotValue.amount | thousandSeparator}}
+                                                         {{selectedClient?.clientDetails?.preferredCurrency|currencySymbol}}{{saving.startingPotValue.amount|thousandSeparator}}
                                                     </h3>
                                                     <span
                                                         [className]="saving.realReturn >= 0 ? 'badge green' : 'badge red'">

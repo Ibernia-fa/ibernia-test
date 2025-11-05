@@ -10,8 +10,8 @@ export const settingsNavItems: NavItem[] = [
   },
   {
     displayName: 'Security & Privacy',
-    iconName: '/assets/images/shapes/plan-billing-active.svg',
-    iconOutline: '/assets/images/shapes/plan-billing.svg',
+    iconName: '/assets/images/shapes/key-filled.svg',
+    iconOutline: '/assets/images/shapes/key.svg',
     route: 'https://identity.ibernia.it/Manage'
   },
   {
