@@ -28,6 +28,9 @@ import { selectedClient } from 'src/app/store/client/client.selectors';
 import * as ClientActions from 'src/app/store/client/client.actions';
 import * as CashflowActions from 'src/app/store/cashflow/cashflow.actions';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { SavingsPotsHttpService } from 'src/app/financial-workflow/saving-pots/services/savings-pots-http.service';
+import { CurrencySymbolPipe } from 'src/app/pipe/currency-symbol.pipe';
+
 interface SortDescriptor {
   value: string;
   viewValue: string;
@@ -50,7 +53,8 @@ interface SortDescriptor {
     TimeAgoPipe,
     ToastrModule,
     MatProgressSpinnerModule,
-    RouterModule
+    RouterModule,
+    CurrencySymbolPipe,
   ],
   providers: [RouterModule, DatePipe, AgeCalculatorPipe],
   templateUrl: './profile.component.html',
@@ -60,6 +64,8 @@ export class ProfileComponent {
   clientId: string;
   client: Client | null;
   cashflows: Array<Cashflow> = [];
+  preferredCurrency: string | undefined;
+  totalSavings: string = "0";
   isLoaderVisible = true;
 
   constructor(
@@ -69,6 +75,7 @@ export class ProfileComponent {
     private router: Router,
     private toastr: ToastrService,
     private cashflowHttpService: CashflowHttpService,
+    private savingsPotsHttpService: SavingsPotsHttpService,
     private store: Store
   ) {
     this.getClient();
@@ -107,6 +114,25 @@ export class ProfileComponent {
           console.log('clinet', this.client)
           this.client = client;
           this.cashflows = cashflows;
+
+          var lastUpdatedCashflowIndex = this.cashflows.length - 1;
+          var lastUpdatedCashflow = this.cashflows[lastUpdatedCashflowIndex];
+
+          this.savingsPotsHttpService
+            .getAllSavingsPots(lastUpdatedCashflow.id)
+            .subscribe({
+              next: (data) => {
+                this.preferredCurrency = this.client?.clientDetails.preferredCurrency;
+                const totalSavings = data.totalSavings?.toString();
+                this.totalSavings = (this.preferredCurrency == undefined || totalSavings == null)
+                ? "N/A"
+                : totalSavings;
+              },
+              error: (err) => {
+                console.error('Error fetching saving pots:', err);
+              },
+            });
+
           this.isLoaderVisible = false;
         })
       )
