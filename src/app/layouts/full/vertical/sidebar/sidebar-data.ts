@@ -662,10 +662,4 @@ export const navItems: NavItem[] = [
     navCap: 'Cashflow Model',
     route: '/cashflows/{cashflowId}/reports'
   },
-  {
-    displayName: 'Create Reports',
-    iconName: '/assets/images/svgs/file-nav-icon.svg',
-    iconOutline: '/assets/images/svgs/file-icon.svg',
-    route: '/cashflows/{cashflowId}/create-reports',
-  },
 ];
