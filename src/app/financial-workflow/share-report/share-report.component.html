@@ -1,0 +1,44 @@
+<div class="w-100">
+  <div class="d-flex flex-column gap-32">
+    <div class="d-flex align-items-center justify-content-between gap-10 modal-header">
+      <h3>Share with [Client Name]</h3>
+      <button (click)="closeDialog()" type="button">
+        <img src="assets/images/svgs/close-line-cion.svg" alt="close-line-cion" />
+      </button>
+    </div>
+
+    <mat-dialog-content class="custom-body">
+      <div class="d-flex flex-column gap-20" [formGroup]="reportForm">
+        <div class="w-100 form-field gap-8">
+          <p>Share this link to grant view-only access to this cashflow model (no editing rights).</p>
+          <p>This link will automatically expire in:</p>
+
+          <mat-label class="f-s-16 d-block" style="line-height: 18px">Expiry (days)</mat-label>
+          <div class="select-option hide-arrow">
+            <mat-select formControlName="expiry" [(value)]="selectedExpiry">
+              <mat-option *ngFor="let day of expiryOptions" [value]="day">{{day}} days</mat-option>
+            </mat-select>
+          </div>
+          
+          @if(reportForm.get('expiry')?.touched && reportForm.get('expiry')?.hasError('required')) {
+              <span class="field-error d-block">Expiry is required</span>
+          }
+        </div>
+      </div>
+    </mat-dialog-content>
+
+    <div class="row justify-content-between modal-action">
+      <div class="col-5">
+        <button (click)="closeDialog()" class="button-icon-outline w-100 d-block">
+          <span class="f-s-16">Cancel</span>
+        </button>
+      </div>
+      <div class="col-5">
+        <!-- <button mat-button (click)="copyLinkAndPassword()">Copy both</button> -->
+        <button (click)="shareReport()" type="button" [disabled]="reportForm.invalid" class="button-icon w-100 d-block">
+          <span class="f-s-16">Share</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

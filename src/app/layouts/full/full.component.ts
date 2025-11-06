@@ -27,6 +27,9 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatListModule } from '@angular/material/list';
 import { navItems as mainNavItems, navItemslower as mainLower } from './vertical/sidebar/sidebar-data';
 import { settingsNavItems, settingsLowerNavItems } from './vertical/sidebar/settings-nav-config';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { ShareReportComponent } from 'src/app/financial-workflow/share-report/share-report.component';
+
 const MOBILE_VIEW = 'screen and (max-width: 768px)';
 const TABLET_VIEW = 'screen and (min-width: 769px) and (max-width: 1024px)';
 const MONITOR_VIEW = 'screen and (min-width: 1024px)';
@@ -64,6 +67,7 @@ interface quicklinks {
     MatExpansionModule,
     MatDividerModule,
     MatListModule,
+    MatDialogModule
   ],
   templateUrl: './full.component.html',
   styleUrls: [],
@@ -85,6 +89,7 @@ export class FullComponent implements OnInit {
   private isCollapsedWidthFixed = false;
   private htmlElement!: HTMLHtmlElement;
   hideSidebar = false;
+  private clientName = "Shujaat Ali";
 
   get isOver(): boolean {
     return this.isMobileScreen;
@@ -202,7 +207,8 @@ export class FullComponent implements OnInit {
     private mediaMatcher: MediaMatcher,
     private router: Router,
     private breakpointObserver: BreakpointObserver,
-    private navService: NavService
+    private navService: NavService,
+    private dialog: MatDialog,
   ) {
     this.htmlElement = document.querySelector('html')!;
     this.layoutChangesSubscription = this.breakpointObserver
@@ -316,5 +322,27 @@ export class FullComponent implements OnInit {
 
   onUpgradeClick() {
     this.router.navigate(['/settings/plan-billing']);
+  }
+
+  openShareModal() {
+    const dialogRef = this.dialog.open(ShareReportComponent, {
+      width: '700px',
+      disableClose: true,
+      data: {
+        // amountCycles: this.amountCycles,
+        // escalataionRates: this.escalationRates,
+        // eventsList: this.timeline.clientEvents.sort((a, b) => a.start.age - b.start.age),
+        // clientBirthDate: this.selectedClient?.clientDetails.birthDate,
+        // clientPreferredCurrency:
+        //   this.selectedClient?.clientDetails.preferredCurrency,
+        // cashflowId: this.selectedCashflow?.id,
+        // forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
+        // forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((result: any) => {
+      console.log('Dialog closed with result:', result);
+    });
   }
 }
