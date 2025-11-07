@@ -94,6 +94,7 @@ import { SettingsService } from 'src/app/default-preferance/services/default-pre
 export class SavingPotsComponent implements OnInit {
   user: any;
   userRerturnRate: any;
+  loggedInUserPreferences: any;
   constructor(
     private dialog: MatDialog,
     private savingPotsHttpService: SavingPotsHttpService,
@@ -109,8 +110,9 @@ export class SavingPotsComponent implements OnInit {
         this.user = this.Authservice.getUserProfile();
   this.settingsService.getUserProfileResponse(this.user?.sub).subscribe({
     next: (res: any) => {
-      console.log('data', res.body);
+      // console.log('data', res.body);
        const p = res?.body?.preferences;
+       this.loggedInUserPreferences = p;
       this.userRerturnRate = p.investmentReturn;
     }});
     this.getData();
@@ -356,6 +358,7 @@ updateOrderNumbers() {
       disableClose: true,
       data: {
         returnRate: this.userRerturnRate,
+        loggedInUserPreferences : this.loggedInUserPreferences,
         amountCycles: this.amountCycles,
         escalataionRates: this.escalationRates,
         eventsList: this.timeline.clientEvents.sort((a, b) => a.start.age - b.start.age),
@@ -371,7 +374,7 @@ updateOrderNumbers() {
 
     dialogRef.afterClosed().subscribe((result: any) => {
       console.log('Dialog closed with result:', result);
-      this.savingPots = result.savingPot;
+      this.savingPots = result?.savingPot;
       this.ensureCashFirst();
       // this.savingPots.clientSavings.push(result.clientSaving);
     });

@@ -127,9 +127,9 @@ export class ClientAddComponent {
           this.selectedClientCountryISO = (countryMatch.countryCode.toLowerCase() as any);
         }
 
-        if (!this.clientForm.get('currency')?.value && countryMatch?.currencySymbol) {
-          this.clientForm.get('currency')?.patchValue(countryMatch.currencySymbol, { emitEvent: false });
-        }
+        // if (!this.clientForm.get('currency')?.value && countryMatch?.currencySymbol) {
+        //   this.clientForm.get('currency')?.patchValue(countryMatch.currencySymbol, { emitEvent: false });
+        // }
       }
 
       if (!this.clientForm.get('currency')?.value && p.currency) {
