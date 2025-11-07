@@ -183,12 +183,12 @@
   flex-direction: column;
   align-items: flex-end;
   justify-content: flex-end;
-  padding-bottom: 22px; // 👈 Tweak this to align with bottom scale
+  padding-bottom: 21px; // 👈 Tweak this to align with bottom scale
   margin-right: 8px;
-  font-size: 13px;
+  font-size: 14px;
   color: #666;
   min-width: 40px;
-  font-weight: 500;
+  font-weight: bold;
   left: 11px;
 
   p, span {

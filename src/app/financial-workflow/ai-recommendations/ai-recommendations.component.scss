@@ -21,4 +21,17 @@
     position: absolute;
     right: 20px;
     top: 10px;
+    button{
+    border: none;
+    background: none;
+    padding: 6px;
+    border-radius: 4px;
+    margin-right: 4px;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+        &:hover{
+            background-color: #f7f7f7;
+        }
+    }
 }
