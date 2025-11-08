@@ -307,6 +307,15 @@ onAmountBlur(e: Event) {
 
 
   patchFormValues() {
+    var savingPotValue = this.savingPotValues.find(x => x.name === this.selectedPot.name);
+        if(savingPotValue) {
+      this.savingsForm.get('name')?.patchValue(savingPotValue.name)
+    }
+    else {
+      this.savingsForm.get('name')?.patchValue('Custom');
+      this.onNameValueChange('Custom');
+      this.savingsForm.get('customName')?.patchValue(this.selectedPot.name);
+    }
     // --- Type (name) ---
     if (this.isCashPotEditMode) {
       // Keep it Cash, do not touch customName control
