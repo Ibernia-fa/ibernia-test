@@ -109,13 +109,21 @@ export class AddNewPotComponent {
   forecastStartDateYear: any;
   isCashPotEditMode: boolean;
   userReturnRate: any = 3.5;
-
+  loggedInUserPreferences: any;
+  comissionTypes = [
+    { label: 'Amount', value: ComissionType.Amount },
+    { label: 'Percentage', value: ComissionType.Percentage },
+    { label: 'Both', value: ComissionType.Both },
+  ];
+  loggedInUserComissionType: string | undefined;
   constructor(
     private dialogRef: MatDialogRef<AddNewPotComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private fb: FormBuilder,
     private savingPotsHttpService: SavingsPotsHttpService
   ) {
+    this.loggedInUserPreferences = data.loggedInUserPreferences;
+    console.log('loggedin user preferences', this.loggedInUserPreferences);
     this.cycles = data.amountCycles;
     this.escalationRates = data.escalataionRates;
     this.eventsList = data.eventsList;
@@ -126,7 +134,10 @@ export class AddNewPotComponent {
     let age = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
     const dayDiff = today.getDate() - birthDate.getDate();
-
+    console.log(this.comissionTypes);
+    console.log('', this.comissionTypes.find(x => x.value == this.loggedInUserPreferences?.comissionType)?.label);
+    this.loggedInUserComissionType = this.comissionTypes.find(x => x.value == this.loggedInUserPreferences?.comissionType)?.label.toLowerCase();
+    console.log('adfas', this.loggedInUserComissionType);
     // Adjust age if birth month/day is in the future
     if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
       age--;
@@ -160,13 +171,13 @@ export class AddNewPotComponent {
       end: [data.forecastEndDateYear-1, Validators.required],
       // commissions: [true],
       commissions: [false],
-      commissionType: ['amount'],
-      commissionCurrency: [''],
-      commissionAmount: [0],
+      commissionType: [this.loggedInUserComissionType || 'amount'],
+      commissionCurrency: [this.clientPreferredCurrency],
+      commissionAmount: [this.loggedInUserPreferences?.comissionAmount || 0],
       commissionCycle: [''],
       commissionPercentageCurrency: [''],
       commissionPercentageCycle: [this.cycles[2].id],
-      commissionPercentage: [0],
+      commissionPercentage: [this.loggedInUserPreferences?.comissionPercentage || 0],
       escalationRate: [''],
       customEscalationRate: [0]
     });
@@ -417,7 +428,7 @@ onAmountBlur(e: Event) {
     console.log(event);
     this.savingsForm
     .get('commissionType')
-    ?.setValue('amount');
+    ?.setValue(this.loggedInUserComissionType || 'amount');
 
     if (event) {
       this.savingsForm
@@ -454,6 +465,7 @@ onAmountBlur(e: Event) {
       this.savingsForm.get('commissionCycle')?.updateValueAndValidity();
       this.savingsForm.get('escalationRate')?.updateValueAndValidity();
     } else {
+      console.log('1');
       this.savingsForm
         .get('commissionCurrency')
         ?.removeValidators(Validators.required);

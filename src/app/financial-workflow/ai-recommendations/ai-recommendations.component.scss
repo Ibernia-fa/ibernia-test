@@ -1,7 +1,8 @@
 .ai-rec-sugg{
-    border-bottom: 1px solid #e7e7eb;
-    padding-bottom: 15px;
-    margin-bottom: 15px;
+    margin-top: 15px;
+    background: #f1faff;
+    padding: 15px;
+    border-radius: 4px;
     h3{
         font-size: 18px;
         font-weight: 500;
@@ -21,4 +22,17 @@
     position: absolute;
     right: 20px;
     top: 10px;
+    button{
+    border: none;
+    background: none;
+    padding: 6px;
+    border-radius: 4px;
+    margin-right: 4px;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+        &:hover{
+            background-color: #f7f7f7;
+        }
+    }
 }
