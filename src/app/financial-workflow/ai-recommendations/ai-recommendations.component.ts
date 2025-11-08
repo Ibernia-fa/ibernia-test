@@ -5,10 +5,11 @@ import { AiRecommendationsHttpService as AiRecommendationsHttpService } from './
 import { AiRecommendationsModel as AiRecommendationsModel } from './models/ai-recommendations.model';
 import { MatCardModule } from '@angular/material/card';
 import { CommonModule } from '@angular/common';
+import {MatTooltipModule} from '@angular/material/tooltip';
 
 @Component({
 
- imports: [CommonModule, MatCardModule], 
+ imports: [CommonModule, MatCardModule,MatTooltipModule], 
   selector: 'app-ai-recommendations',
   templateUrl: './ai-recommendations.component.html',
     standalone: true,  
