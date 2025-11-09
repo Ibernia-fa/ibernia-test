@@ -340,7 +340,7 @@ const selectedEscalationRateValue = isCustomEscalation
   ? this.eventForm.get('customEscalationRate')?.value
   : this.eventForm.get('escalationRate')?.value;
       const clientEvent: ClientEvent = {
-        id: this.systemEvent.id,
+         id: this.isEditWorkflow ? this.patchEvent?.id ?? "" : "",
         name: this.systemEvent.name,
         netAmount: {
           cycle: {
@@ -396,7 +396,7 @@ const selectedEscalationRateValue = isCustomEscalation
     this.eventForm.markAllAsTouched();
     if (this.eventForm.valid && this.systemEvent) {
       const clientEvent: ClientEvent = {
-        id: this.systemEvent.id,
+        id: this.isEditWorkflow ? this.patchEvent?.id ?? "" : "",
         name: this.systemEvent.name,
         netAmount: {
           cycle: {

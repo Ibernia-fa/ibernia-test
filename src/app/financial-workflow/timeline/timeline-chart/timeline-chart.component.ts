@@ -222,12 +222,12 @@ export class TimelineChartComponent implements OnInit, OnChanges {
     console.log(`Event "${this.draggedEvent.name}" dropped at:`, dropTime);
     console.log(this.financialTimeline);
 
-    if(this.draggedEvent.isDefault && this.financialTimeline.clientEvents.find(
-      (event) => event.name === this.draggedEvent?.name
-    )) {
-      this.draggedEvent = null;
-      return;
-    }
+    // if(this.draggedEvent.isDefault && this.financialTimeline.clientEvents.find(
+    //   (event) => event.name === this.draggedEvent?.name
+    // )) {
+    //   this.draggedEvent = null;
+    //   return;
+    // }
 
     if (this.draggedEvent.isPlaceHolder) {
       const clientEvent: ClientEvent = this.draggedEvent;
@@ -237,6 +237,9 @@ export class TimelineChartComponent implements OnInit, OnChanges {
         year: moment(dropTime).year(),
         age: moment(dropTime).year() - moment(this.clientBirthDate).year(),
       };
+      clientEvent.id = "";
+      console.log('client event', clientEvent);
+      console.log('1');
       this.timelineHttpService
         .addEvent(clientEvent, this.financialTimeline.cashflow.id)
         .pipe(
@@ -338,7 +341,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
     // console.log('Before Popup:', this.draggedEvent)
     if (
       this.draggedEvent.name === 'Inheritance' ||
-      this.draggedEvent.name === 'Wedding'
+      this.draggedEvent.name === 'Wedding'   
     ) {
       const dialogRef = this.dialog.open(AddEventDialogComponent, {
         width: '600px',
