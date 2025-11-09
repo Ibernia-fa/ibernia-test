@@ -1,0 +1,493 @@
+<div class="d-flex gap-24 flex-column">
+    @if(!isLoaderVisible && client && cashflow) {
+    <!-- Cashflow Model  -->
+    <mat-card class="cardWithShadow">
+        <mat-card-content>
+            <div class="d-flex flex-column gap-32 timeline-wrapper">
+                <div class="card-main-wrapper">
+                    <div class="d-flex align-items-center justify-content-between w-100 gap-16 flex-wrap">
+                        <div class="d-flex align-items-center gap-16">
+                            <div class="icon-wrapper d-flex align-items-center justify-content-center">
+                                <img width="24" src="assets/images/svgs/inheritance-icon.svg" alt="clock" />
+                            </div>
+                            <div class="d-flex flex-column justify-content-between gap-4">
+                                <h4 class="page-title f-w-500">Reports</h4>
+                                <span class="sub-title">{{client.clientDetails.firstName}} {{client.clientDetails.lastName}}</span>
+                            </div>
+                        </div>
+                        <div class="d-flex  gap-12 align-items-end">
+                            <img src="/assets/images/svgs/chart-histogram-two-icon.svg" alt="chart" />
+                            <span class="f-s-16 underline">{{cashflow.name}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </mat-card-content>
+    </mat-card>
+    
+    <mat-card class="cardWithShadow">
+        <mat-card-content>
+            <div class="d-flex flex-column gap-32">
+                <h3 class="f-w-400 sec-title">Cashflow model</h3>
+                <div class="cashflow-stats">
+                    <div class="cashflow-grid">
+                        <div class="stats-main-wrapper">
+                            <div class="d-flex flex-column gap-8">
+                                <h3 class="card-title">Savings at start (age 58):</h3>
+                                <h3 class="saving-title">£1,281,000</h3>
+                            </div>
+                        </div>
+                        <div class="divider"></div>
+                        <div class="stats-main-wrapper">
+                            <div class="d-flex flex-column gap-8">
+                                <h3 class="card-title">Savings at retirement (age 60):</h3>
+                                <h3 class="saving-title">£1,314,562</h3>
+                            </div>
+                        </div>
+                        <div class="divider"></div>
+                        <div class="stats-main-wrapper">
+                            <div class="d-flex flex-column gap-8">
+                                <h3 class="card-title">Savings at end (age 100):</h3>
+                                <h3 class="saving-title">£141,459</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <app-savings-bar-stacked-chart [report]="report" [client]="client"
+                [forecastStartDate]="financialTimeline.forecastStartDate" [forecastEndDate]="financialTimeline.forecastEndtDate"></app-savings-bar-stacked-chart>
+            </div>
+        </mat-card-content>
+    </mat-card>
+    <!-- End Cashflow Model  -->
+
+    <!-- Timeline  -->
+    <app-timeline-chart 
+        title="Timeline"
+        [showOnReports]="true"
+        [financialTimeline]="financialTimeline"
+        [clientBirthDate]="clientBirthDate"
+        [client]="client">
+    </app-timeline-chart>
+    <!-- End Timeline  -->
+
+    <!-- Saving Pot  -->
+    <mat-card class="cardWithShadow">
+        <mat-card-content>
+            <div class="d-flex flex-column gap-32">
+                <h3 class="f-w-400 sec-title">Savings pots, investments & pensions</h3>
+                @if(savingPots) {
+                <div class="saving-pot-stats-cashflow-model">
+                    <div class="cashflow-saving-wrapper">
+                        <div class="row justify-content-between flex-wrap">
+                            <div class="col-5">
+                                <div class="stats-main-wrapper">
+                                    <div class="d-flex flex-column gap-8">
+                                        <div class="d-flex align-items-center gap-8">
+                                            <img src="assets/images/svgs/total-saving-wallet.svg"
+                                                alt="total-saving-wallet" />
+                                            <h3 class="card-title">Total savings at start</h3>
+                                        </div>
+                                        <div class="d-flex align-items-center gap-10">
+                                            <h3 class="saving-title">
+                                                {{client?.clientDetails?.preferredCurrency | currencySymbol}}
+                                                {{ (savingPots?.totalSavings ?? 0) | thousandSeparator}}</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="divider"></div>
+                            
+                            <div class="col-5">
+                                <div class="stats-main-wrapper">
+                                    <div class="d-flex flex-column gap-8">
+                                        <div class="d-flex align-items-center gap-8">
+                                            <img src="assets/images/svgs/inflation-saving-pot-icon.svg"
+                                                alt="total-saving-wallet" />
+                                            <h3 class="card-title">Inflation rate:</h3>
+                                        </div>
+                                        <div class="d-flex align-items-center gap-10">
+                                            <h3 class="saving-title">8.5%</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="saving-pot-stats-cashflow-model">
+                    <div class="cashflow-drag-wrapper">
+                        <div class="d-flex flex-column gap-20">
+                            <h3 class="f-w-400 sec-title">Other liquid savings, investments and pensions:</h3>
+                            <div class="saving-pot-chart-cashflow-model gap-10">
+                                @for(saving of savingPots?.clientSavings; track saving; let i = $index) {
+                                    <div class="d-flex justify-content-between align-items-center gap-12 dragable-card-wrapper">
+                                        <div class="dragable-card d-flex align-items-center justify-content-between">
+                                            <div class="d-flex align-items-center gap-8">
+                                                <div class="stats-main-wrapper">
+                                                    <div class="d-flex flex-column gap-8">
+                                                        <div class="d-flex align-items-center gap-8">
+                                                            <img [src]="'assets/images/svgs/' + saving.iconUrl +'.svg'"
+                                                                alt="cashflow-moneys-icon" />
+                                                            <h3 class="card-title">{{saving.name}}</h3>
+                                                        </div>
+                                                        <div class="d-flex align-items-center gap-10">
+                                                            <h3 class="saving-title">
+                                                                {{saving.startingPotValue.currencySymbol | currencySymbol}}
+                                                                {{ (saving.startingPotValue.amount) | thousandSeparator}}
+                                                            </h3>
+                                                            <span
+                                                                [className]="saving.realReturn >= 0 ? 'badge green' : 'badge red'">
+                                                                @if(saving.realReturn >= 0){+}{{saving.realReturn | number :
+                                                                '1.0-0'}}%
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="card-chart">
+                                                @if(saving.isGrowing) {
+                                                <img src="assets/images/shapes/dummy-green-graph.png" alt="dummy-green-graph">
+                                                }
+                                                @else {
+                                                <img src="assets/images/shapes/dummy-red-graph.png" alt="dummy-red-graph">
+                                                }
+                                            </div>
+                                            @if(saving.hasPotLocked) {
+                                            <div class="lock-overlay">
+                                                <div
+                                                    class="d-flex align-items-center justify-content-center flex-column gap-10 h-100">
+                                                    <img src="assets/images/svgs/cashflow-lock-icon.svg"
+                                                        alt="cashflow-lock-icon">
+                                                    <p>Locked until {{saving.end.age - saving.start.age}} y.o.</p>
+                                                </div>
+                                                <div class="help-lock-overlay">
+                                                    <img src="assets/images/svgs/help-circle-lock-overlay.svg"
+                                                        alt="help-circle-lock-overlay">
+                                                </div>
+                                            </div>
+                                            }
+                                        </div>
+                                    </div>
+                                    }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                }
+            </div>
+        </mat-card-content>
+    </mat-card>
+    <!-- End Saving Pot  -->
+
+    <!-- Income and Expense  -->
+    <mat-card class="cardWithShadow">
+        <mat-card-content>
+            <div class="d-flex flex-column gap-32">
+                <h3 class="f-w-400 sec-title">Incomes & expenses</h3>
+
+                <div class="income-expense-wrapper income-expense-stats-cashflow-model">
+                    <div class="income-stats">
+                        <div class="d-flex flex-column gap-8">
+                            <div class="d-flex align-items-center gap-8">
+                                <img src="assets/images/svgs/income-money-receive.svg" alt="income-money-receive" />
+                                <h3 class="card-title expense-income">Incomes</h3>
+                            </div>
+                            <h3 class="saving-title">
+                                +{{client?.clientDetails?.preferredCurrency | currencySymbol}}
+                                {{ (incomeExpense?.totalIncome ?? 0) | thousandSeparator}}
+                            </h3>
+                        </div>
+                    </div>
+                    
+                    <div class="divider"></div>
+
+                    <div class="income-stats">
+                        <div class="d-flex flex-column gap-8">
+                            <div class="d-flex align-items-center gap-8">
+                                <img src="assets/images/svgs/income-money-send.svg" alt="income-money-send" />
+                                <h3 class="card-title expenses-deduct">Expenses</h3>
+                            </div>
+                            <h3 class="saving-title">
+                                -{{client?.clientDetails?.preferredCurrency | currencySymbol}}
+                                {{ (incomeExpense?.totalExpenses ?? 0) | thousandSeparator}}
+                            </h3>
+                        </div>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="income-stats">
+                        <div class="d-flex flex-column gap-8">
+                            <div class="d-flex align-items-center gap-8">
+                                <img src="assets/images/svgs/income-dollar-icon.svg" alt="income-dollar-icon" />
+                                <h3 class="card-title expenses-total">Total</h3>
+                            </div>
+                            <h3 class="saving-title">=
+                                {{(incomeExpense?.total ?? 0) < 0 ? '-' : ''}}
+                                {{client?.clientDetails?.preferredCurrency | currencySymbol}}
+                                {{
+                                    ((incomeExpense?.total ?? 0) < 0 
+                                        ? ((incomeExpense?.total ?? 0))*(-1) 
+                                        : (incomeExpense?.total ?? 0)
+                                    ) | thousandSeparator
+                                }}
+                            </h3>
+                        </div>
+                    </div>
+                    
+                    <div class="divider"></div>
+                    
+                    <div class="income-stats">
+                        <div class="d-flex flex-column gap-8">
+                            <div class="d-flex align-items-center gap-8">
+                                @if((incomeExpense?.savingRate ?? 0) > 0) {
+                                    <img src="assets/images/svgs/income-discount.svg" alt="income-discount" />
+                                    }
+                                    @else {
+                                    <img class="red" src="assets/images/svgs/income-discount-red.svg"
+                                        alt="income-discount" />
+                                    }
+
+                                    <h3 [ngClass]="(incomeExpense?.savingRate ?? 0) > 0 ? 'card-title green' : 'card-title red'">Saving rate</h3>
+                            </div>
+                            <h3
+                                [ngClass]="(incomeExpense?.savingRate ?? 0) > 0 ? 'saving-title green' : 'saving-title red'">
+                                {{(incomeExpense?.savingRate ?? 0) | number : '1.0-0'}}%</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="row income-expense-table-wrapper">
+                    <div class="col-6 table-main-wrapper">
+                        <h3 class="">Incomes</h3>
+                        <div class="table-responsive-sm table-wrapper">
+                            <table mat-table [dataSource]="incomeDataSource" class="mat-elevation-z8">
+                                <ng-container matColumnDef="position">
+                                    <th mat-header-cell *matHeaderCellDef
+                                        class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-client">Description
+                                    </th>
+                                    <td mat-cell *matCellDef="let element" class="p-x-24 f-s-14 p-l-0 column-client">
+                                        {{element.description}} </td>
+                                </ng-container>
+                                <ng-container matColumnDef="start_age">
+                                    <th mat-header-cell *matHeaderCellDef
+                                        class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-net-amount">Start
+                                        age
+                                    </th>
+                                    <td mat-cell *matCellDef="let element"
+                                        class="p-x-24 f-s-14 p-l-0 column-net-amount">
+                                        {{element.start.age}} </td>
+                                </ng-container>
+                                <ng-container matColumnDef="end_age">
+                                    <th mat-header-cell *matHeaderCellDef
+                                        class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-net-amount">End
+                                        age
+                                    </th>
+                                    <td mat-cell *matCellDef="let element"
+                                        class="p-x-24 f-s-14 p-l-0 column-net-amount">
+                                        {{element.end.age ?? '-'}} </td>
+                                </ng-container>
+                                <ng-container matColumnDef="name">
+                                    <th mat-header-cell *matHeaderCellDef
+                                        class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-net-amount">Net
+                                        amount
+                                    </th>
+                                    <td mat-cell *matCellDef="let element"
+                                        class="p-x-24 f-s-14 p-l-0 column-net-amount">
+                                        {{element.amount.currencySymbol}}
+                                        {{element.amount.amount | thousandSeparator}}/{{element.amount.cycle.description}}</td>
+                                </ng-container>
+                                <ng-container matColumnDef="inflation_rate">
+                                    <th mat-header-cell *matHeaderCellDef
+                                        class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-net-amount">
+                                        Inflation rate
+                                    </th>
+                                    <td mat-cell *matCellDef="let element"
+                                        class="p-x-24 f-s-14 p-l-0 column-net-amount">
+                                        {{element.inflation_rate ?? '-'}} </td>
+                                </ng-container>
+                                <tr mat-header-row *matHeaderRowDef="incomeExpenseDisplayedColumns"></tr>
+                                <tr mat-row *matRowDef="let row; columns: incomeExpenseDisplayedColumns;"></tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="col-6 table-main-wrapper">
+                        <h3 class="mb-16">Expenses</h3>
+                        <div class="table-responsive-sm table-wrapper">
+                            <table mat-table [dataSource]="expenseDataSource" class="mat-elevation-z8">
+                                <ng-container matColumnDef="position">
+                                    <th mat-header-cell *matHeaderCellDef
+                                        class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-client">Description
+                                    </th>
+                                    <td mat-cell *matCellDef="let element" class="p-x-24 f-s-14 p-l-0 column-client">
+                                        {{element.description}} </td>
+                                </ng-container>
+                                <ng-container matColumnDef="start_age">
+                                    <th mat-header-cell *matHeaderCellDef
+                                        class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-net-amount">Start
+                                        age
+                                    </th>
+                                    <td mat-cell *matCellDef="let element"
+                                        class="p-x-24 f-s-14 p-l-0 column-net-amount">
+                                        {{element.start.age}} </td>
+                                </ng-container>
+                                <ng-container matColumnDef="end_age">
+                                    <th mat-header-cell *matHeaderCellDef
+                                        class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-net-amount">End
+                                        age
+                                    </th>
+                                    <td mat-cell *matCellDef="let element"
+                                        class="p-x-24 f-s-14 p-l-0 column-net-amount">
+                                        {{element.end.age ?? '-'}} </td>
+                                </ng-container>
+                                <ng-container matColumnDef="name">
+                                    <th mat-header-cell *matHeaderCellDef
+                                        class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-net-amount">Net
+                                        amount
+                                    </th>
+                                    <td mat-cell *matCellDef="let element"
+                                        class="p-x-24 f-s-14 p-l-0 column-net-amount">
+                                        {{element.amount.currencySymbol}}
+                                        {{element.amount.amount | thousandSeparator}}/{{element.amount.cycle.description}}</td>
+                                </ng-container>
+                                <ng-container matColumnDef="inflation_rate">
+                                    <th mat-header-cell *matHeaderCellDef
+                                        class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-net-amount">
+                                        Inflation rate
+                                    </th>
+                                    <td mat-cell *matCellDef="let element"
+                                        class="p-x-24 f-s-14 p-l-0 column-net-amount">
+                                        {{element.inflation_rate ?? '-'}} 
+                                    </td>
+                                </ng-container>
+                                <tr mat-header-row *matHeaderRowDef="incomeExpenseDisplayedColumns"></tr>
+                                <tr mat-row *matRowDef="let row; columns: incomeExpenseDisplayedColumns;"></tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </mat-card-content>
+    </mat-card>
+    <!-- End Income and Expense  -->
+
+    <!-- Contributions and Withdrawals  -->
+    <mat-card class="cardWithShadow">
+        <mat-card-content>
+            <div class="d-flex flex-column gap-32">
+                <h3 class="f-w-400 sec-title">Contributions & withdrawals</h3>
+                <div class="row income-expense-table-wrapper">
+                    <div class="col-6 table-main-wrapper">
+                        <h3 class="">Contributions</h3>
+                        <div class="table-responsive-sm table-wrapper">
+                            <table mat-table [dataSource]="contributionDataSource" class="mat-elevation-z8">
+                                <ng-container matColumnDef="position">
+                                    <th mat-header-cell *matHeaderCellDef
+                                        class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-client">Description
+                                    </th>
+                                    <td mat-cell *matCellDef="let element" class="p-x-24 f-s-14 p-l-0 column-client">
+                                        {{element.description}} </td>
+                                </ng-container>
+                                <ng-container matColumnDef="start_age">
+                                    <th mat-header-cell *matHeaderCellDef
+                                        class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-net-amount">Start
+                                        age
+                                    </th>
+                                    <td mat-cell *matCellDef="let element"
+                                        class="p-x-24 f-s-14 p-l-0 column-net-amount">
+                                        {{element.start.age}} </td>
+                                </ng-container>
+                                <ng-container matColumnDef="end_age">
+                                    <th mat-header-cell *matHeaderCellDef
+                                        class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-net-amount">End
+                                        age
+                                    </th>
+                                    <td mat-cell *matCellDef="let element"
+                                        class="p-x-24 f-s-14 p-l-0 column-net-amount">
+                                        {{element.end.age ?? '-'}} </td>
+                                </ng-container>
+                                <ng-container matColumnDef="name">
+                                    <th mat-header-cell *matHeaderCellDef
+                                        class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-net-amount">Net
+                                        amount
+                                    </th>
+                                    <td mat-cell *matCellDef="let element" class="p-x-24 f-s-14 p-l-0 column-net-amount">
+                                        {{element.amount.currencySymbol}}
+                                        {{element.amount.amount | thousandSeparator}}/{{element.amount.cycle.description}}</td>
+                                </ng-container>
+                                <ng-container matColumnDef="inflation_rate">
+                                    <th mat-header-cell *matHeaderCellDef
+                                        class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-net-amount">
+                                        Inflation rate
+                                    </th>
+                                    <td mat-cell *matCellDef="let element"
+                                        class="p-x-24 f-s-14 p-l-0 column-net-amount">
+                                        {{element.inflation_rate ?? '-'}} </td>
+                                </ng-container>
+                                <tr mat-header-row *matHeaderRowDef="incomeExpenseDisplayedColumns"></tr>
+                                <tr mat-row *matRowDef="let row; columns: incomeExpenseDisplayedColumns;"></tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="col-6 table-main-wrapper">
+                        <h3 class="mb-16">Withdrawals</h3>
+                        <div class="table-responsive-sm table-wrapper">
+                            <table mat-table [dataSource]="withdrawalDataSource" class="mat-elevation-z8">
+                                <ng-container matColumnDef="position">
+                                    <th mat-header-cell *matHeaderCellDef
+                                        class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-client">Description
+                                    </th>
+                                    <td mat-cell *matCellDef="let element" class="p-x-24 f-s-14 p-l-0 column-client">
+                                        {{element.description}} </td>
+                                </ng-container>
+                                <ng-container matColumnDef="start_age">
+                                    <th mat-header-cell *matHeaderCellDef
+                                        class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-net-amount">Start
+                                        age
+                                    </th>
+                                    <td mat-cell *matCellDef="let element"
+                                        class="p-x-24 f-s-14 p-l-0 column-net-amount">
+                                        {{element.start.age}} </td>
+                                </ng-container>
+                                <ng-container matColumnDef="end_age">
+                                    <th mat-header-cell *matHeaderCellDef
+                                        class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-net-amount">End
+                                        age
+                                    </th>
+                                    <td mat-cell *matCellDef="let element"
+                                        class="p-x-24 f-s-14 p-l-0 column-net-amount">
+                                        {{element.end.age ?? '-'}} </td>
+                                </ng-container>
+                                <ng-container matColumnDef="name">
+                                    <th mat-header-cell *matHeaderCellDef
+                                        class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-net-amount">Net
+                                        amount
+                                    </th>
+                                    <td mat-cell *matCellDef="let element" class="p-x-24 f-s-14 p-l-0 column-net-amount">
+                                        {{element.amount.currencySymbol}}
+                                        {{element.amount.amount | thousandSeparator}}/{{element.amount.cycle.description}}</td>
+                                </ng-container>
+                                <ng-container matColumnDef="inflation_rate">
+                                    <th mat-header-cell *matHeaderCellDef
+                                        class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-net-amount">
+                                        Inflation rate
+                                    </th>
+                                    <td mat-cell *matCellDef="let element"
+                                        class="p-x-24 f-s-14 p-l-0 column-net-amount">
+                                        {{element.inflation_rate ?? '-'}} </td>
+                                </ng-container>
+                                <tr mat-header-row *matHeaderRowDef="incomeExpenseDisplayedColumns"></tr>
+                                <tr mat-row *matRowDef="let row; columns: incomeExpenseDisplayedColumns;"></tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </mat-card-content>
+    </mat-card>
+    <!-- End Contributions and Withdrawals  -->
+    }
+    @else {
+    <div class="h-300">
+        <mat-spinner></mat-spinner>
+    </div>
+    }
+</div>

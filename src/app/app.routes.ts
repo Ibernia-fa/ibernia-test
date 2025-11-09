@@ -43,6 +43,19 @@ export const routes: Routes = [
     path: '',
     component: BlankComponent,
     children: [
+      {
+        path: 'view/report/:token',
+        loadComponent: () =>
+          import('./client-reports/view-report.component').then(
+            (m) => m.ViewReportComponent
+          ),
+      },
+    ],
+  },
+  {
+    path: '',
+    component: BlankComponent,
+    children: [
     ],
   },
   {
