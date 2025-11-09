@@ -222,12 +222,12 @@ export class TimelineChartComponent implements OnInit, OnChanges {
     console.log(`Event "${this.draggedEvent.name}" dropped at:`, dropTime);
     console.log(this.financialTimeline);
 
-    // if(this.draggedEvent.isDefault && this.financialTimeline.clientEvents.find(
-    //   (event) => event.name === this.draggedEvent?.name
-    // )) {
-    //   this.draggedEvent = null;
-    //   return;
-    // }
+    if(this.draggedEvent?.name == 'Retirement age' && this.financialTimeline.clientEvents.find(
+      (event) => event.name === this.draggedEvent?.name
+    )) {
+      this.draggedEvent = null;
+      return;
+    }
 
     if (this.draggedEvent.isPlaceHolder) {
       const clientEvent: ClientEvent = this.draggedEvent;
@@ -256,6 +256,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
               //   't1'
               // );
             }
+            this.updateTimelines.emit(); // optional, if parent reloads timelines
             this.financialTimeline.clientEvents.push(clientEvent);
             this.draggedEvent = null;
             this.timeline.setItems(this.timelineData);
