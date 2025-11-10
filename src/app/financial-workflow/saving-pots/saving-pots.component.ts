@@ -374,8 +374,10 @@ updateOrderNumbers() {
 
     dialogRef.afterClosed().subscribe((result: any) => {
       console.log('Dialog closed with result:', result);
-      this.savingPots = result?.savingPot;
-      this.ensureCashFirst();
+      if(result?.savingPot) {
+        this.savingPots = result?.savingPot;
+        this.ensureCashFirst();
+      }
       // this.savingPots.clientSavings.push(result.clientSaving);
     });
   }
