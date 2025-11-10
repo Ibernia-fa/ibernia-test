@@ -201,6 +201,8 @@ get displayLastName(): string {
           if (res.ok && res.body) {
             this.userprofile = res.body;
             const p = res.body;
+            this.settingsService.setUserData(res.body);
+
   
             // show backend avatar if present (local preview only)
             if (p.profilePhotoUrl) {
