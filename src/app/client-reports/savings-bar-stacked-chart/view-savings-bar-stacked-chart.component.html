@@ -1,0 +1,9 @@
+<div id="chart">
+    @if(report?.series) {
+        <apx-chart [series]="report?.series ?? []" [chart]="chartOptions.chart" [xaxis]="chartOptions.xaxis"
+            [yaxis]="chartOptions.yaxis" [dataLabels]="chartOptions.dataLabels" [annotations]="chartOptions.annotations"
+            [tooltip]="chartOptions.tooltip" [fill]="chartOptions.fill" [legend]="chartOptions.legend"
+            [grid]="chartOptions.grid">
+        </apx-chart>
+    }
+</div>

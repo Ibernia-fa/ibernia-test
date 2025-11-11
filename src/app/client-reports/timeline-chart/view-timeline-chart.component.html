@@ -1,0 +1,25 @@
+<mat-card class="cardWithShadow">
+    <mat-card-content>
+        <div class="d-flex flex-column gap-32">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-16 event-main-wrapper">
+                <div class="d-flex flex-column gap-6" style="flex-direction: column">
+                    <h4 class="f-s-22 f-w-400">{{title}}</h4>
+                </div>
+            </div>
+            <div class="chips-custom">
+                <mat-chip-set aria-label="Dog selection">
+                </mat-chip-set>
+            </div>
+        </div>
+
+        <div class="timeline-wrapper">
+          <div class="timeline-labels">
+            <p>Age</p>
+            <span>Year</span>
+          </div>
+
+          <div class="timeline-container" #timelineContainer>
+          </div>
+        </div>
+    </mat-card-content>
+</mat-card>

@@ -1,3 +1,7 @@
+::ng-deep app-footer {
+  display: none !important;
+}
+
 .cashflow-stats,
 .saving-pot-stats-cashflow-model,
 .income-expense-stats-cashflow-model {
@@ -17,6 +21,10 @@
 .divider {
   width: 1.5px;
   background-color: #e7e7eb;
+}
+
+.p-20 {
+  padding: 20px !important;
 }
 
 .stats-main-wrapper {
@@ -52,19 +60,11 @@
     .col-2 {
       padding: 0;
     }
-    // .col-2 {
-    //   background-color: #71bc421e;
-    // }
-    // .col-10 {
-    //   background-color: #bc42b23a;
-    // }
     .col-5 {
-      // background-color: #ff330048;
       max-width: 48% !important;
       flex: 0 0 48% !important;
     }
     .divider {
-      // height: 100%;
       width: 2px;
       margin-left: 8px;
       margin-right: 8px;

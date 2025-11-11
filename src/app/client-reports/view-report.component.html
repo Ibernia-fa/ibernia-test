@@ -1,4 +1,4 @@
-<div class="d-flex gap-24 flex-column">
+<div class="d-flex gap-24 flex-column p-20">
     @if(!isLoaderVisible && client && cashflow) {
     <!-- Cashflow Model  -->
     <mat-card class="cardWithShadow">
@@ -53,21 +53,25 @@
                         </div>
                     </div>
                 </div>
-                <app-savings-bar-stacked-chart [report]="report" [client]="client"
-                [forecastStartDate]="financialTimeline.forecastStartDate" [forecastEndDate]="financialTimeline.forecastEndtDate"></app-savings-bar-stacked-chart>
+                <app-view-savings-bar-stacked-chart
+                    [report]="report"
+                    [client]="client"
+                    [forecastStartDate]="financialTimeline.forecastStartDate"
+                    [forecastEndDate]="financialTimeline.forecastEndtDate">
+                </app-view-savings-bar-stacked-chart>
             </div>
         </mat-card-content>
     </mat-card>
     <!-- End Cashflow Model  -->
 
     <!-- Timeline  -->
-    <app-timeline-chart 
+    <app-view-timeline-chart 
         title="Timeline"
         [showOnReports]="true"
         [financialTimeline]="financialTimeline"
         [clientBirthDate]="clientBirthDate"
         [client]="client">
-    </app-timeline-chart>
+    </app-view-timeline-chart>
     <!-- End Timeline  -->
 
     <!-- Saving Pot  -->

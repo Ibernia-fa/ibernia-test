@@ -21,8 +21,8 @@ import { ChartSeries } from '../financial-workflow/reports/models/charts-series.
 import { FinancialViewModel, IncomeExpense } from '../financial-workflow/income-expenses/model/income-expense';
 import { FinancialTimeline } from '../financial-workflow/timeline/models/financial-timeline';
 
-import { SavingsBarStackedChartComponent } from '../financial-workflow/reports/savings-bar-stacked-chart/savings-bar-stacked-chart.component';
-import { TimelineChartComponent } from '../financial-workflow/timeline/timeline-chart/timeline-chart.component';
+import { ViewSavingsBarStackedChartComponent } from './savings-bar-stacked-chart/view-savings-bar-stacked-chart.component';
+import { ViewTimelineChartComponent } from './timeline-chart/view-timeline-chart.component';
 
 import { ViewReportHttpService } from './services/view-report-http.service';
 
@@ -122,8 +122,8 @@ const ELEMENT_DATA: PeriodicElement[] = [
     MatButtonModule,
     MatProgressSpinnerModule,
     MatSelectModule,
-    SavingsBarStackedChartComponent,
-    TimelineChartComponent,
+    ViewSavingsBarStackedChartComponent,
+    ViewTimelineChartComponent,
     MatTableModule,
     CommonModule,
     CurrencySymbolPipe,
@@ -156,7 +156,6 @@ export class ViewReportComponent {
   contributionDataSource: MatTableDataSource<FundsViewModel> = new MatTableDataSource(new Array<FundsViewModel>());
   withdrawalDataSource: MatTableDataSource<FundsViewModel> = new MatTableDataSource(new Array<FundsViewModel>());
   report: ChartSeries;
-  financialSeries: any;
   
   constructor(
     private viewReportHttpService: ViewReportHttpService,
@@ -180,26 +179,19 @@ export class ViewReportComponent {
 
     this.viewReportHttpService.viewReport(token, password).subscribe({
       next: (financialSeries: any) => {
-        this.financialSeries = financialSeries;
-
         this.client = financialSeries.client as Client;
         this.cashflow = financialSeries.cashflow as Cashflow;
-        this.savingPots = financialSeries.savingPots;
-
         this.financialTimeline = financialSeries.timeline;
         this.savingPots = financialSeries.savingPots;
-        this.incomeExpense = financialSeries.incomeExpense;
-        this.contributionWithdrawal = financialSeries.contributionWithdrawal;
-          
+        this.incomeExpense = financialSeries.financialRecords;
+        this.contributionWithdrawal = financialSeries.fundTransactions;
+        this.report = financialSeries.financialProjection;
+
         this.incomeDataSource = new MatTableDataSource(this.incomeExpense?.incomes);
         this.expenseDataSource = new MatTableDataSource(this.incomeExpense?.expenses);
         this.contributionDataSource = new MatTableDataSource(this.contributionWithdrawal?.contributions);
         this.withdrawalDataSource = new MatTableDataSource(this.contributionWithdrawal?.withdrawals);
-
-        this.report = financialSeries.report;
-
-
-        console.log(this.financialSeries);
+        
         this.isLoaderVisible = false;
       },
       error: (err: any) => {
@@ -208,45 +200,4 @@ export class ViewReportComponent {
       },
     });
   }
-
-
-  // getData() {
-  //   this.isLoaderVisible = true;
-  //   this.activatedRoute.params
-  //     .pipe(
-  //       switchMap((params) =>
-  //         this.financialWorkflowService.loadClientCashflowMetadata(params)
-  //       ),
-  //       tap(([client, cashflow]) => {
-  //         this.client = client as Client;
-  //         console.log(cashflow);
-  //         this.cashflow = cashflow as Cashflow;
-  //       }),
-  //       switchMap(([client, cashflow]) => {
-  //         return combineLatest([
-  //           this.savingPotsHttpService.getAllSavingsPots((cashflow as Cashflow).id),
-  //           this.timelineHttpService.getTimelinebyCashflowId((cashflow as Cashflow).id),
-  //           this.incomeExpensesHttpService.getAllIncomeExpenses((cashflow as Cashflow).id),
-  //           this.withdrawalsContributionsHttpService.getAllWithdrawalsContributions((cashflow as Cashflow).id),
-  //           this.reportsHttpService.getReportbyCashflowId((cashflow as Cashflow).id)
-  //         ]);
-  //       }),
-  //       tap(([savingPots, timeline, incomeExpense, contributionWithdrawal, report]) => {
-  //         this.financialTimeline = timeline;
-  //         this.clientBirthDate = this.client.clientDetails.birthDate;
-  //         this.savingPots = savingPots;
-  //         this.incomeExpense = incomeExpense;
-  //         this.contributionWithdrawal = contributionWithdrawal;
-          
-  //         this.incomeDataSource = new MatTableDataSource(this.incomeExpense?.incomes);
-  //         this.expenseDataSource = new MatTableDataSource(this.incomeExpense?.expenses);
-  //         this.contributionDataSource = new MatTableDataSource(this.contributionWithdrawal?.contributions);
-  //         this.withdrawalDataSource = new MatTableDataSource(this.contributionWithdrawal?.withdrawals);
-
-  //         this.report = report
-  //         this.isLoaderVisible = false;
-  //       })
-  //     )
-  //     .subscribe();
-  // }
 }
