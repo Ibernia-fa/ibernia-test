@@ -117,11 +117,13 @@ export class ProfileComponent {
           this.client = client;
           this.cashflows = cashflows;
 
-          var lastUpdatedCashflowIndex = this.cashflows.length - 1;
-          var lastUpdatedCashflow = this.cashflows[lastUpdatedCashflowIndex];
+          const lastUpdatedCashflow = [...this.cashflows]
+            .sort(
+              (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+            )[0];
 
           this.savingsPotsHttpService
-            .getAllSavingsPots(lastUpdatedCashflow.id)
+            .getAllSavingsPots(lastUpdatedCashflow?.id)
             .subscribe({
               next: (data) => {
                 this.preferredCurrency = this.client?.clientDetails.preferredCurrency;
