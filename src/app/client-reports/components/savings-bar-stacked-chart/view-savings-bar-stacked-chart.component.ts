@@ -2,7 +2,7 @@ import { Component, ViewChild, Input, OnChanges, SimpleChanges } from '@angular/
 import { MatCardModule } from '@angular/material/card';
 import { TablerIconsModule } from 'angular-tabler-icons';
 import { ChartComponent, NgApexchartsModule } from 'ng-apexcharts';
-import { ChartSeries } from '../models/charts-series.model';
+import { ChartSeries } from '../../models/charts-series.model';
 import { Client } from 'src/app/clients/models/client';
 import moment from 'moment';
 

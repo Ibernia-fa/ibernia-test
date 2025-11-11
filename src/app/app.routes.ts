@@ -46,8 +46,8 @@ export const routes: Routes = [
       {
         path: 'view/report/:token',
         loadComponent: () =>
-          import('./client-reports/view-report.component').then(
-            (m) => m.ViewReportComponent
+          import('./client-reports/client-report.component').then(
+            (m) => m.ClientReportComponent
           ),
       },
     ],

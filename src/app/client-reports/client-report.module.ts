@@ -1,13 +1,13 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ViewReportRoutes } from './view-report.routes';
 import { RouterModule } from '@angular/router';
+import { ClientReportRoutes } from './client-report.routes';
 
 @NgModule({
   declarations: [],
   imports: [
-    RouterModule.forChild(ViewReportRoutes),
+    RouterModule.forChild(ClientReportRoutes),
     CommonModule
   ]
 })
-export class ViewReportModule { }
+export class ClientReportModule { }

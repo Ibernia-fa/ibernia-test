@@ -1,7 +1,6 @@
 <div class="d-flex gap-24 flex-column p-20">
-    @if(!isLoaderVisible && client && cashflow) {
-    <!-- Cashflow Model  -->
-    <mat-card class="cardWithShadow">
+        <!-- cashflow model  -->
+        <mat-card class="cardWithShadow">
         <mat-card-content>
             <div class="d-flex flex-column gap-32 timeline-wrapper">
                 <div class="card-main-wrapper">
@@ -23,9 +22,9 @@
                 </div>
             </div>
         </mat-card-content>
-    </mat-card>
-    
-    <mat-card class="cardWithShadow">
+        </mat-card>
+
+        <mat-card class="cardWithShadow">
         <mat-card-content>
             <div class="d-flex flex-column gap-32">
                 <h3 class="f-w-400 sec-title">Cashflow model</h3>
@@ -61,21 +60,21 @@
                 </app-view-savings-bar-stacked-chart>
             </div>
         </mat-card-content>
-    </mat-card>
-    <!-- End Cashflow Model  -->
+        </mat-card>
+        <!-- end cashflow model  -->
 
-    <!-- Timeline  -->
-    <app-view-timeline-chart 
-        title="Timeline"
-        [showOnReports]="true"
-        [financialTimeline]="financialTimeline"
-        [clientBirthDate]="clientBirthDate"
-        [client]="client">
-    </app-view-timeline-chart>
-    <!-- End Timeline  -->
+        <!-- timeline  -->
+        <app-view-timeline-chart 
+            title="Timeline"
+            [showOnReports]="true"
+            [financialTimeline]="financialTimeline"
+            clientBirthDate="clientBirthDate"
+            [client]="client">
+        </app-view-timeline-chart>
+        <!-- end timeline  -->
 
-    <!-- Saving Pot  -->
-    <mat-card class="cardWithShadow">
+        <!-- saving pot  -->
+        <mat-card class="cardWithShadow">
         <mat-card-content>
             <div class="d-flex flex-column gap-32">
                 <h3 class="f-w-400 sec-title">Savings pots, investments & pensions</h3>
@@ -181,11 +180,11 @@
                 }
             </div>
         </mat-card-content>
-    </mat-card>
-    <!-- End Saving Pot  -->
+        </mat-card>
+        <!-- end saving pot  -->
 
-    <!-- Income and Expense  -->
-    <mat-card class="cardWithShadow">
+        <!-- income and expense  -->
+        <mat-card class="cardWithShadow">
         <mat-card-content>
             <div class="d-flex flex-column gap-32">
                 <h3 class="f-w-400 sec-title">Incomes & expenses</h3>
@@ -370,11 +369,11 @@
                 </div>
             </div>
         </mat-card-content>
-    </mat-card>
-    <!-- End Income and Expense  -->
+        </mat-card>
+        <!-- end income and expense  -->
 
-    <!-- Contributions and Withdrawals  -->
-    <mat-card class="cardWithShadow">
+        <!-- contributions and withdrawals  -->
+        <mat-card class="cardWithShadow">
         <mat-card-content>
             <div class="d-flex flex-column gap-32">
                 <h3 class="f-w-400 sec-title">Contributions & withdrawals</h3>
@@ -486,12 +485,6 @@
                 </div>
             </div>
         </mat-card-content>
-    </mat-card>
-    <!-- End Contributions and Withdrawals  -->
-    }
-    @else {
-    <div class="h-300">
-        <mat-spinner></mat-spinner>
-    </div>
-    }
+        </mat-card>
+        <!-- end contributions and withdrawals  -->
 </div>

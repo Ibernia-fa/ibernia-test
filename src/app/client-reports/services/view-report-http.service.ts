@@ -12,8 +12,10 @@ export class ViewReportHttpService {
   constructor(private httpClient: HttpClient) { }
 
   viewReport(token: string, password: string) {
+    console.log(token, password);
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     const body = JSON.stringify(password);
+    
     return this.httpClient.post<FinancialSeriesModel>(
       `${this.REPORTS_BASE_URL}/view/report/${token}`,
       body,

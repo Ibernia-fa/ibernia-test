@@ -10,7 +10,7 @@ import { TablerIconsModule } from 'angular-tabler-icons';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { CommonModule } from '@angular/common';
 import { Client } from 'src/app/clients/models/client';
-import { FinancialTimeline } from '../../financial-workflow/timeline/models/financial-timeline';
+import { FinancialTimeline } from '../../../financial-workflow/timeline/models/financial-timeline';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
 
 @Component({

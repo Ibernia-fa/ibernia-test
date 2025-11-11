@@ -1,0 +1,123 @@
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ActivatedRoute } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { ToastrService } from 'ngx-toastr';
+import { ViewReportHttpService } from './services/view-report-http.service';
+import { ViewReportPasswordComponent } from './components/view-report-password/view-report-password.component';
+import { ViewReportComponent } from './components/view-report/view-report.component';
+
+@Component({
+  selector: 'app-client-report',
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    ViewReportPasswordComponent,
+    ViewReportComponent
+  ],
+  templateUrl: './client-report.component.html',
+  styleUrl: './client-report.component.scss',
+})
+
+export class ClientReportComponent {
+  financialSeries: any = null;
+  isAuthenticated = false;
+  isLoaderVisible: boolean;
+  token: string = '';
+  password: string = '';
+
+  private readonly AUTH_KEY_PREFIX = 'report_auth_';
+  private readonly EXPIRY_DURATION_MS = 60 * 60 * 1000; // 1 hour
+  
+  constructor(
+    private viewReportHttpService: ViewReportHttpService,
+    private activatedRoute: ActivatedRoute,
+    private toastr: ToastrService
+  ) { }
+
+  ngOnInit(): void {
+    this.activatedRoute.params.subscribe(params => {
+      this.token = params['token'];
+      
+      if (!this.token) {
+        this.toastr.error('Invalid or missing token in URL.', 'Error!');
+      }
+
+      this.checkExistingAuthentication();
+    });
+  }
+
+  private checkExistingAuthentication(): void {
+    const storedData = localStorage.getItem(this.AUTH_KEY_PREFIX + this.token);
+    if (!storedData) return;
+
+    try {
+      const { timestamp } = JSON.parse(storedData);
+      const now = Date.now();
+
+      if (now - timestamp < this.EXPIRY_DURATION_MS) {
+        this.isAuthenticated = true;
+        this.loadReport();
+      } else {
+        localStorage.removeItem(this.AUTH_KEY_PREFIX + this.token);
+      }
+    } catch {
+      localStorage.removeItem(this.AUTH_KEY_PREFIX + this.token);
+    }
+  }
+
+  private loadReport(): void {
+    this.isLoaderVisible = true;
+    this.viewReportHttpService.viewReport(this.token, this.password).subscribe({
+      next: (financialSeries: any) => {
+        this.financialSeries = financialSeries;
+        this.isLoaderVisible = false;
+      },
+      error: (err: any) => {
+        this.isLoaderVisible = false;
+        this.toastr.error('Unable to load report. Please try again later.', 'Error!');
+        localStorage.removeItem(this.AUTH_KEY_PREFIX + this.token);
+        this.isAuthenticated = false;
+      }
+    });
+  }
+
+  onSubmitPassword(password: string): void {
+   this.password = password;
+   this.isLoaderVisible = true;
+
+   if (!this.password) {
+     this.toastr.error('Please enter a password.', 'Error!');
+     this.isLoaderVisible = false;
+     return;
+   }
+
+   this.viewReportHttpService.viewReport(this.token, this.password).subscribe({
+     next: (financialSeries: any) => {
+       this.financialSeries = financialSeries;
+       this.isAuthenticated = true;
+       this.isLoaderVisible = false;
+
+       const authData = {
+          token: this.token,
+          timestamp: Date.now()
+        };
+        localStorage.setItem(this.AUTH_KEY_PREFIX + this.token, JSON.stringify(authData));
+     },
+     error: (err: any) => {
+      this.isLoaderVisible = false;
+
+      if (err.status === 401) {
+        this.toastr.error('Incorrect password. Please try again.', 'Error!');
+      } else if (err.status === 410) {
+        this.toastr.error('This link has expired. Please contact support.', 'Error!');
+      } else if (err.status === 400) {
+        this.toastr.error('Invalid or missing link.', 'Error!');
+      } else {
+        this.toastr.error('Unable to load report. Please try again later.', 'Error!');
+      }
+     },
+   });
+  }
+}
