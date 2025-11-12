@@ -30,6 +30,11 @@ import { settingsNavItems, settingsLowerNavItems } from './vertical/sidebar/sett
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ShareReportComponent } from 'src/app/financial-workflow/share-report/share-report.component';
 
+import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs';
+import { selectedClient } from 'src/app/store/client/client.selectors';
+import { Client } from 'src/app/clients/models/client';
+
 const MOBILE_VIEW = 'screen and (max-width: 768px)';
 const TABLET_VIEW = 'screen and (min-width: 769px) and (max-width: 1024px)';
 const MONITOR_VIEW = 'screen and (min-width: 1024px)';
@@ -89,7 +94,9 @@ export class FullComponent implements OnInit {
   private isCollapsedWidthFixed = false;
   private htmlElement!: HTMLHtmlElement;
   hideSidebar = false;
-  private clientName = "Shujaat Ali";
+
+  client$: Observable<Client | null>;
+  clientName = '';
 
   get isOver(): boolean {
     return this.isMobileScreen;
@@ -209,7 +216,10 @@ export class FullComponent implements OnInit {
     private breakpointObserver: BreakpointObserver,
     private navService: NavService,
     private dialog: MatDialog,
+    private store: Store
   ) {
+    this.client$ = this.store.select(selectedClient);
+
     this.htmlElement = document.querySelector('html')!;
     this.layoutChangesSubscription = this.breakpointObserver
       .observe([MOBILE_VIEW, TABLET_VIEW, MONITOR_VIEW, BELOWMONITOR])
@@ -267,7 +277,13 @@ export class FullComponent implements OnInit {
       });
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.client$.subscribe(client => {
+      if (client) {
+        this.clientName = client.clientDetails?.firstName + " " + client.clientDetails?.lastName;
+      }
+    });
+  }
 
   ngOnDestroy() {
     this.layoutChangesSubscription.unsubscribe();
@@ -329,16 +345,7 @@ export class FullComponent implements OnInit {
       width: '700px',
       disableClose: true,
       data: {
-        // amountCycles: this.amountCycles,
-        // escalataionRates: this.escalationRates,
-        // eventsList: this.timeline.clientEvents.sort((a, b) => a.start.age - b.start.age),
-        // clientBirthDate: this.selectedClient?.clientDetails.birthDate,
-        // clientPreferredCurrency:
-        //   this.selectedClient?.clientDetails.preferredCurrency,
-        // cashflowId: this.selectedCashflow?.id,
-        // forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
-        // forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
-      },
+      }
     });
 
     dialogRef.afterClosed().subscribe((result: any) => {

@@ -67,10 +67,6 @@ export class ShareReportComponent {
         tap(([client, cashflow]) => {
           this.client = client as Client;
           this.cashflow = cashflow as Cashflow;
-
-          console.log(this.client);
-          console.log(this.cashflow);
-
           this.clientName = this.client.clientDetails?.firstName + " " + this.client.clientDetails.lastName;
           this.clientEmail = this.client.clientDetails?.email;
           this.clientId = this.client.id;

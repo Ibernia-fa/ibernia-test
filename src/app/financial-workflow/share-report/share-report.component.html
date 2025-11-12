@@ -19,7 +19,7 @@
           </p>
           
           <mat-label class="f-s-16 d-block" style="line-height: 18px">Expiry period</mat-label>
-          <div class="select-option">
+          <div class="select-option" style="width: 50%;">
             <mat-select formControlName="expiry" [(value)]="selectedExpiry">
               <mat-option *ngFor="let day of expiryOptions" [value]="day">
                 {{ day }} days
