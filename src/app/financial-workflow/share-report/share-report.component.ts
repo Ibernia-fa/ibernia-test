@@ -55,7 +55,7 @@ export class ShareReportComponent {
         expiry: [this.selectedExpiry]
     });
 
-      this.getData();
+    this.getData();
   }
 
   getData() {
@@ -90,7 +90,7 @@ export class ShareReportComponent {
       clientId: this.clientId,
       cashflowId: this.cashflowId,
       expiryDays: this.reportForm.value.expiry,
-      requestBy: '68ffab8cb56a1334d8b24d8f' // todo get current user id
+      requestBy: this.client?.financialAdvisor?.advisorId ?? ''
     };
 
     this.isLoaderVisible = true;
