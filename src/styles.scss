@@ -288,6 +288,12 @@ font-weight: 400 !important;
     cursor: pointer;
     font-family: "Ubuntu", serif;
     transition: all 0.3s linear;
+    span{
+      font-size: 14px;
+    line-height: 16px;
+    font-weight: 700;
+    display: block;
+    }
     &:hover{
       background-color: #516ce8;
       border: 1px solid #516ce8;

@@ -40,7 +40,7 @@ You may add new events to the timeline or adjust existing ones by dragging them 
        
          <div class="text-center">
             <div>
-       <button class="btn-secondary">Client notes for context</button></div>
+       <button class="btn-secondary" style="min-width: 233px;"><span>Client notes</span></button></div>
             <small></small>
         </div>
 
@@ -55,9 +55,12 @@ You may add new events to the timeline or adjust existing ones by dragging them 
   </mat-card-content>
 </mat-card>
 
+<!-- {{isReccShown}} -->
+<ng-container *ngIf="isReccShown">
 <mat-card class="mat-mdc-card mdc-card cardWithShadow">
   <mat-card-content class="mat-mdc-card-content">
-    <div class="d-flex align-items-start mb-20 ">
+
+    <div class="d-flex align-items-start ai-rec-sugg ">
         <div  class="m-r-10">
 
         <img  src="assets/images/svgs/Info-icon.svg" alt="">
@@ -71,12 +74,7 @@ You may add new events to the timeline or adjust existing ones by dragging them 
 
     </div>
     </div>
-    </mat-card-content>
-</mat-card>
-<!-- {{isReccShown}} -->
-<ng-container *ngIf="isReccShown">
-<mat-card class="mat-mdc-card mdc-card cardWithShadow">
-  <mat-card-content class="mat-mdc-card-content">
+<div class="position-relative outer-recmendation">
      <div class="edit-rec-sugg">
         <button matTooltip="Edit"><img width="16" src="assets/images/svgs/edit-icon.svg" alt="clock" /></button>
         
@@ -110,7 +108,7 @@ You may add new events to the timeline or adjust existing ones by dragging them 
 
 
         </ul>
-</div>
+</div></div>
     </mat-card-content>
 </mat-card>
 </ng-container>
