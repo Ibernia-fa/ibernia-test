@@ -224,13 +224,35 @@ export class SavingPotsComponent implements OnInit {
     item.score--;
   }
 
+  // drop(event: CdkDragDrop<any>) {
+  //   moveItemInArray(
+  //     this.savingPots.clientSavings,
+  //     event.previousIndex,
+  //     event.currentIndex
+  //   );
+  // }
+
   drop(event: CdkDragDrop<any>) {
-    moveItemInArray(
-      this.savingPots.clientSavings,
-      event.previousIndex,
-      event.currentIndex
-    );
+  const list = this.savingPots?.clientSavings ?? [];
+  if (!list.length) return;
+
+  // Don’t let anything be dropped at index 0
+  if (event.currentIndex === 0) {
+    return;
   }
+
+  // Don’t let the first item (Cash) be moved at all (defense in depth)
+  if (event.previousIndex === 0) {
+    return;
+  }
+
+  moveItemInArray(list, event.previousIndex, event.currentIndex);
+  this.savingPots.clientSavings = [...list];
+
+  // Recompute order numbers and persist (you already have this)
+  this.updateOrderNumbers();
+}
+
 
   // moveUp(index: number) {
   //   if (index > 0) {
@@ -249,43 +271,82 @@ export class SavingPotsComponent implements OnInit {
   // }
 
 
+// moveUp(index: number) {
+//   if (index > 0) {
+//     const currentItem = this.savingPots.clientSavings[index];
+//     const previousItem = this.savingPots.clientSavings[index - 1];
+
+//     // Swap order numbers
+//     const tempOrder = currentItem.orderNumber;
+//     currentItem.orderNumber = previousItem.orderNumber;
+//     previousItem.orderNumber = tempOrder;
+
+//     // Swap items in array
+//     moveItemInArray(this.savingPots.clientSavings, index, index - 1);
+//     this.savingPots.clientSavings = [...this.savingPots.clientSavings];
+
+//     // Call API
+//     this.updateOrderNumbers();
+//   }
+// }
+
+// moveDown(index: number) {
+//   if (index < this.savingPots.clientSavings.length - 1) {
+//     const currentItem = this.savingPots.clientSavings[index];
+//     const nextItem = this.savingPots.clientSavings[index + 1];
+
+//     // Swap order numbers
+//     const tempOrder = currentItem.orderNumber;
+//     currentItem.orderNumber = nextItem.orderNumber;
+//     nextItem.orderNumber = tempOrder;
+
+//     // Swap items in array
+//     moveItemInArray(this.savingPots.clientSavings, index, index + 1);
+//     this.savingPots.clientSavings = [...this.savingPots.clientSavings];
+
+//     // Call API
+//     this.updateOrderNumbers();
+//   }
+// }
+
 moveUp(index: number) {
-  if (index > 0) {
-    const currentItem = this.savingPots.clientSavings[index];
-    const previousItem = this.savingPots.clientSavings[index - 1];
+  if (index <= 0) return;
 
-    // Swap order numbers
-    const tempOrder = currentItem.orderNumber;
-    currentItem.orderNumber = previousItem.orderNumber;
-    previousItem.orderNumber = tempOrder;
+  // If moving up would place the item into index 0, block it
+  if (index - 1 === 0) return;
 
-    // Swap items in array
-    moveItemInArray(this.savingPots.clientSavings, index, index - 1);
-    this.savingPots.clientSavings = [...this.savingPots.clientSavings];
+  // Also, if the row above is Cash, block the move
+  if (this.isCashName(this.savingPots.clientSavings[index - 1]?.name)) return;
 
-    // Call API
-    this.updateOrderNumbers();
-  }
+  const currentItem = this.savingPots.clientSavings[index];
+  const previousItem = this.savingPots.clientSavings[index - 1];
+
+  const tempOrder = currentItem.orderNumber;
+  currentItem.orderNumber = previousItem.orderNumber;
+  previousItem.orderNumber = tempOrder;
+
+  moveItemInArray(this.savingPots.clientSavings, index, index - 1);
+  this.savingPots.clientSavings = [...this.savingPots.clientSavings];
+  this.updateOrderNumbers();
 }
 
 moveDown(index: number) {
-  if (index < this.savingPots.clientSavings.length - 1) {
-    const currentItem = this.savingPots.clientSavings[index];
-    const nextItem = this.savingPots.clientSavings[index + 1];
+  if (index >= this.savingPots.clientSavings.length - 1) return;
 
-    // Swap order numbers
-    const tempOrder = currentItem.orderNumber;
-    currentItem.orderNumber = nextItem.orderNumber;
-    nextItem.orderNumber = tempOrder;
+  // Normal guard: the next item can be Cash (that’s fine),
+  // but moving down never touches index 0 anyway.
+  const currentItem = this.savingPots.clientSavings[index];
+  const nextItem = this.savingPots.clientSavings[index + 1];
 
-    // Swap items in array
-    moveItemInArray(this.savingPots.clientSavings, index, index + 1);
-    this.savingPots.clientSavings = [...this.savingPots.clientSavings];
+  const tempOrder = currentItem.orderNumber;
+  currentItem.orderNumber = nextItem.orderNumber;
+  nextItem.orderNumber = tempOrder;
 
-    // Call API
-    this.updateOrderNumbers();
-  }
+  moveItemInArray(this.savingPots.clientSavings, index, index + 1);
+  this.savingPots.clientSavings = [...this.savingPots.clientSavings];
+  this.updateOrderNumbers();
 }
+
 
 
 updateOrderNumbers() {

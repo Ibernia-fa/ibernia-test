@@ -124,6 +124,7 @@ export class AddNewPotComponent {
   ) {
     this.loggedInUserPreferences = data.loggedInUserPreferences;
     console.log('loggedin user preferences', this.loggedInUserPreferences);
+    this.inflationRate = this.loggedInUserPreferences.inflationRate;
     this.cycles = data.amountCycles;
     this.escalationRates = data.escalataionRates;
     this.eventsList = data.eventsList;
