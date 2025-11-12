@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ViewReportHttpService } from './services/view-report-http.service';
 import { ViewReportPasswordComponent } from './components/view-report-password/view-report-password.component';
 import { ViewReportComponent } from './components/view-report/view-report.component';
@@ -13,6 +14,7 @@ import { ViewReportComponent } from './components/view-report/view-report.compon
   imports: [
     CommonModule,
     FormsModule,
+    MatProgressSpinnerModule,
     ViewReportPasswordComponent,
     ViewReportComponent
   ],
@@ -46,6 +48,8 @@ export class ClientReportComponent {
 
       this.checkExistingAuthentication();
     });
+
+    sessionStorage.setItem('session_active', 'true');
   }
 
   private checkExistingAuthentication(): void {
@@ -53,10 +57,11 @@ export class ClientReportComponent {
     if (!storedData) return;
 
     try {
-      const { timestamp } = JSON.parse(storedData);
+      const { timestamp, password } = JSON.parse(storedData);
       const now = Date.now();
 
       if (now - timestamp < this.EXPIRY_DURATION_MS) {
+        this.password = password;
         this.isAuthenticated = true;
         this.loadReport();
       } else {
@@ -69,6 +74,12 @@ export class ClientReportComponent {
 
   private loadReport(): void {
     this.isLoaderVisible = true;
+
+    if (!this.token || !this.password) {
+      this.toastr.error('Missing token or password, cannot load report.', 'Error!');
+      return;
+    }
+
     this.viewReportHttpService.viewReport(this.token, this.password).subscribe({
       next: (financialSeries: any) => {
         this.financialSeries = financialSeries;
@@ -76,6 +87,7 @@ export class ClientReportComponent {
       },
       error: (err: any) => {
         this.isLoaderVisible = false;
+        console.log(err);
         this.toastr.error('Unable to load report. Please try again later.', 'Error!');
         localStorage.removeItem(this.AUTH_KEY_PREFIX + this.token);
         this.isAuthenticated = false;
@@ -84,40 +96,41 @@ export class ClientReportComponent {
   }
 
   onSubmitPassword(password: string): void {
-   this.password = password;
-   this.isLoaderVisible = true;
+    this.password = password.trim();
+    this.isLoaderVisible = true;
 
-   if (!this.password) {
-     this.toastr.error('Please enter a password.', 'Error!');
-     this.isLoaderVisible = false;
-     return;
-   }
+    if (!this.password) {
+      this.toastr.error('Please enter a password.', 'Error!');
+      this.isLoaderVisible = false;
+      return;
+    }
+   
+    this.viewReportHttpService.viewReport(this.token, this.password).subscribe({
+      next: (financialSeries: any) => {
+        this.financialSeries = financialSeries;
+        this.isAuthenticated = true;
+        this.isLoaderVisible = false;
 
-   this.viewReportHttpService.viewReport(this.token, this.password).subscribe({
-     next: (financialSeries: any) => {
-       this.financialSeries = financialSeries;
-       this.isAuthenticated = true;
+        const authData = {
+           token: this.token,
+           password: this.password,
+           timestamp: Date.now()
+         };
+         localStorage.setItem(this.AUTH_KEY_PREFIX + this.token, JSON.stringify(authData));
+      },
+      error: (err: any) => {
        this.isLoaderVisible = false;
 
-       const authData = {
-          token: this.token,
-          timestamp: Date.now()
-        };
-        localStorage.setItem(this.AUTH_KEY_PREFIX + this.token, JSON.stringify(authData));
-     },
-     error: (err: any) => {
-      this.isLoaderVisible = false;
-
-      if (err.status === 401) {
-        this.toastr.error('Incorrect password. Please try again.', 'Error!');
-      } else if (err.status === 410) {
-        this.toastr.error('This link has expired. Please contact support.', 'Error!');
-      } else if (err.status === 400) {
-        this.toastr.error('Invalid or missing link.', 'Error!');
-      } else {
-        this.toastr.error('Unable to load report. Please try again later.', 'Error!');
-      }
-     },
-   });
+       if (err.status === 401) {
+         this.toastr.error('Incorrect password. Please try again.', 'Error!');
+       } else if (err.status === 410) {
+         this.toastr.error('This link has expired. Please contact support.', 'Error!');
+       } else if (err.status === 400) {
+         this.toastr.error('Invalid or missing link.', 'Error!');
+       } else {
+         this.toastr.error('Unable to load report. Please try again later.', 'Error!');
+       }
+      },
+    });
   }
 }

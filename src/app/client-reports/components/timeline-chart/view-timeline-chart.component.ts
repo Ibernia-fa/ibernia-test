@@ -253,8 +253,8 @@ export class ViewTimelineChartComponent implements OnInit {
             })(),
           className: event.iconUrl,
           editable: {
-            updateTime: true,
-            remove: true,
+            updateTime: false,
+            remove: false,
           }
         };
       }
@@ -263,7 +263,6 @@ export class ViewTimelineChartComponent implements OnInit {
   }
 
   get timelineOptions(): TimelineOptions {
-    console.log(this.clientBirthDate);
     const birthDate = new Date(this.clientBirthDate);
     let age = this.calculateAge(birthDate);
     const birthYear = moment(this.clientBirthDate).year();

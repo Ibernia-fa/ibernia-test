@@ -2,6 +2,19 @@
   display: none !important;
 }
 
+.full-screen-loader {
+  position: fixed;   /* Overlay over entire screen */
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;     /* Full viewport height */
+  background: rgba(255, 255, 255, 0.8); /* Optional: semi-transparent background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;     /* On top of everything */
+}
+
 .cashflow-stats,
 .saving-pot-stats-cashflow-model,
 .income-expense-stats-cashflow-model {
