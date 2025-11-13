@@ -158,9 +158,9 @@
   line-height: 1.2;
   font-weight: 600;
 }
-// ::ng-deep .vis-item.vis-range{
-//   width: auto !important;
-// }
+ ::ng-deep .vis-item.vis-range{
+   width: auto !important;
+ }
 ::ng-deep .vis-item .vis-delete {
   top: 55% !important;
   transform: translateY(-50%);
@@ -195,6 +195,10 @@
     margin: 0;
     line-height: normal;
     margin-bottom: 1px;
+  }
+  span{
+    position: relative;
+    top: -1px;
   }
 }
 

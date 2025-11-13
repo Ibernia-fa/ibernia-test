@@ -8,7 +8,7 @@
 <div class="d-flex flex-column gap-32">
     <!-- Modal Header  -->
     <div class="d-flex align-items-center justify-content-between gap-10 modal-header">
-        <h3>New model</h3>
+        <h3>New plan</h3>
         <button (click)="closeDialog()" type="button">
             <img src="assets/images/svgs/close-line-cion.svg" alt="close-line-cion" />
         </button>
@@ -19,7 +19,7 @@
     <!-- <mat-dialog-content> -->
     <div [formGroup]="form" class="d-flex flex-column gap-20">
         <div class="w-100 form-field gap-8">
-            <mat-label class="f-s-16 d-block">Model name</mat-label>
+            <mat-label class="f-s-16 d-block">Plan name </mat-label>
             <input matInput formControlName="name" />
             @if(form.get('name')?.touched &&
              form.get('name')?.hasError('required')) {
@@ -45,7 +45,7 @@
         </div>
         <div class="col-5">
             <button [disabled]="form.invalid" (click)="onSubmit()" class="button-icon w-100 d-block">
-                <span class="f-s-16">Start Model</span>
+                <span class="f-s-16">Start </span>
             </button>
         </div>
     </div>
