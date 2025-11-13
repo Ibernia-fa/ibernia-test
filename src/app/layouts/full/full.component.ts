@@ -27,6 +27,14 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatListModule } from '@angular/material/list';
 import { navItems as mainNavItems, navItemslower as mainLower } from './vertical/sidebar/sidebar-data';
 import { settingsNavItems, settingsLowerNavItems } from './vertical/sidebar/settings-nav-config';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { ShareReportComponent } from 'src/app/financial-workflow/share-report/share-report.component';
+
+import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs';
+import { selectedClient } from 'src/app/store/client/client.selectors';
+import { Client } from 'src/app/clients/models/client';
+
 const MOBILE_VIEW = 'screen and (max-width: 768px)';
 const TABLET_VIEW = 'screen and (min-width: 769px) and (max-width: 1024px)';
 const MONITOR_VIEW = 'screen and (min-width: 1024px)';
@@ -64,6 +72,7 @@ interface quicklinks {
     MatExpansionModule,
     MatDividerModule,
     MatListModule,
+    MatDialogModule
   ],
   templateUrl: './full.component.html',
   styleUrls: [],
@@ -85,6 +94,9 @@ export class FullComponent implements OnInit {
   private isCollapsedWidthFixed = false;
   private htmlElement!: HTMLHtmlElement;
   hideSidebar = false;
+
+  client$: Observable<Client | null>;
+  clientName = '';
 
   get isOver(): boolean {
     return this.isMobileScreen;
@@ -202,8 +214,12 @@ export class FullComponent implements OnInit {
     private mediaMatcher: MediaMatcher,
     private router: Router,
     private breakpointObserver: BreakpointObserver,
-    private navService: NavService
+    private navService: NavService,
+    private dialog: MatDialog,
+    private store: Store
   ) {
+    this.client$ = this.store.select(selectedClient);
+
     this.htmlElement = document.querySelector('html')!;
     this.layoutChangesSubscription = this.breakpointObserver
       .observe([MOBILE_VIEW, TABLET_VIEW, MONITOR_VIEW, BELOWMONITOR])
@@ -261,7 +277,13 @@ export class FullComponent implements OnInit {
       });
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.client$.subscribe(client => {
+      if (client) {
+        this.clientName = client.clientDetails?.firstName + " " + client.clientDetails?.lastName;
+      }
+    });
+  }
 
   ngOnDestroy() {
     this.layoutChangesSubscription.unsubscribe();
@@ -316,5 +338,18 @@ export class FullComponent implements OnInit {
 
   onUpgradeClick() {
     this.router.navigate(['/settings/plan-billing']);
+  }
+
+  openShareModal() {
+    const dialogRef = this.dialog.open(ShareReportComponent, {
+      width: '700px',
+      disableClose: true,
+      data: {
+      }
+    });
+
+    dialogRef.afterClosed().subscribe((result: any) => {
+      console.log('Dialog closed with result:', result);
+    });
   }
 }
