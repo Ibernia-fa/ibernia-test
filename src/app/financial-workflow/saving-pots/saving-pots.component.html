@@ -137,7 +137,9 @@ You may rearrange the order by dragging and dropping the pots, or by using the u
                                         <button cdkDragHandle type="button" class="drag-btn">
                                             <img src="/assets/images/svgs/drag-icon.svg" alt="drag-icon">
                                         </button>
-                                    }
+                                    }@else {
+    <span class="drag-btn drag-spacer" aria-hidden="true"></span>
+  }
                                         <!-- @if((saving.name || '').toLowerCase() !== 'cash' && i < savingPots.clientSavings.length - 1) { -->
 
                                         <!-- Status  -->
