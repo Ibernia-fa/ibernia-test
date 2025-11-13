@@ -43,12 +43,20 @@
                 }
               </mat-nav-list> -->
               <mat-nav-list class="sidebar-list">
-  @for(item of navItemslower; track item) {
-    <app-nav-item [item]="item"></app-nav-item>
-  }
-</mat-nav-list>
+                @for(item of navItemslower; track item) {
+                  <app-nav-item [item]="item"></app-nav-item>
+                }
+              </mat-nav-list>
 
-         
+              <!-- share report -->
+              <div class="p-16 rounded d-flex flex-column gap-12">
+                <a (click)="openShareModal()" class="cashflow-modal d-flex align-items-center gap-8">
+                  <img src="assets/images/svgs/file-icon-filled.svg" alt="share report">
+                  <span>
+                    Share with {{ clientName }}
+                  </span>
+                </a>
+              </div> 
             </ng-scrollbar>
           </div>
           <div class="m-t-auto profile-bar" style="margin-bottom: 54px">

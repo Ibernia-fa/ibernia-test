@@ -13,7 +13,7 @@ import {
 } from '@angular/cdk/drag-drop';
 import { animate, style, transition, trigger } from '@angular/animations';
 import { CommonModule } from '@angular/common';
-import { combineLatest, map, switchMap, tap } from 'rxjs';
+import { combineLatest, filter, map, Observable, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { SavingsPotsHttpService as SavingPotsHttpService } from './services/savings-pots-http.service';
 import { ClientSaving, SavingPotsModel as SavingPots } from './models/saving-pots.model';
 import { Cashflow } from 'src/app/clients/models/cashflow';
@@ -37,6 +37,8 @@ import { CurrencySymbolPipe } from 'src/app/pipe/currency-symbol.pipe';
 import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { SettingsService } from 'src/app/default-preferance/services/default-preferance.http.service';
+import { Store } from '@ngrx/store';
+import { selectedClient } from 'src/app/store/client/client.selectors';
 @Component({
   selector: 'app-saving-pots',
   imports: [
@@ -95,6 +97,10 @@ export class SavingPotsComponent implements OnInit {
   user: any;
   userRerturnRate: any;
   loggedInUserPreferences: any;
+      private destroy$ = new Subject<void>();
+  client$: Observable<Client | null>;
+  clientData: any;
+
   constructor(
     private dialog: MatDialog,
     private savingPotsHttpService: SavingPotsHttpService,
@@ -104,17 +110,40 @@ export class SavingPotsComponent implements OnInit {
     private financialWorkflowService: FinancialWorkflowService,
     private navItemService: NavItemService,
     private Authservice: AuthService,
-     private settingsService: SettingsService
+     private settingsService: SettingsService,
+             private store: Store
   ) {
     this.navItemService.currentRouteName = 'Saving Pots';
         this.user = this.Authservice.getUserProfile();
-  this.settingsService.getUserProfileResponse(this.user?.sub).subscribe({
-    next: (res: any) => {
-      // console.log('data', res.body);
-       const p = res?.body?.preferences;
+  // this.settingsService.getUserProfileResponse(this.user?.sub).subscribe({
+  //   next: (res: any) => {
+  //     console.log('res =>', res);
+  //     // console.log('data', res.body);
+  //      const p = res?.body?.preferences;
+  //      this.loggedInUserPreferences = p;
+  //     this.userRerturnRate = p.investmentReturn;
+  //   }});
+      this.settingsService.userData$
+        .pipe(
+          filter((v): v is NonNullable<typeof v> => v != null), // skip initial null
+          takeUntil(this.destroy$)
+        )
+        .subscribe((data) => {
+      console.log('res 1=>', data);
+
+          // console.log('userData arrived', data);
+          // this.userData = data;
+                 const p = data.preferences;
        this.loggedInUserPreferences = p;
       this.userRerturnRate = p.investmentReturn;
-    }});
+        });
+                this.client$ = this.store.select(selectedClient);
+                    this.client$.subscribe(client => {
+              if (client) {
+                this.clientData = client.clientDetails;
+                console.log('client data', this.clientData);
+              }
+            });
     this.getData();
 }
 
@@ -379,6 +408,9 @@ updateOrderNumbers() {
       width: '700px',
       disableClose: true,
       data: {
+        returnRate: this.userRerturnRate,
+        inflationRate: this.clientData?.inflationRate,
+        loggedInUserPreferences : this.loggedInUserPreferences,
         amountCycles: this.amountCycles,
         escalataionRates: this.escalationRates,
         eventsList: this.timeline.clientEvents.sort((a, b) => a.start.age - b.start.age),
@@ -419,6 +451,7 @@ updateOrderNumbers() {
       disableClose: true,
       data: {
         returnRate: this.userRerturnRate,
+        inflationRate: this.clientData?.inflationRate,
         loggedInUserPreferences : this.loggedInUserPreferences,
         amountCycles: this.amountCycles,
         escalataionRates: this.escalationRates,

@@ -1,0 +1,18 @@
+<div class="d-flex gap-24 flex-column">
+    <!-- loader -->
+    <div class="full-screen-loader" *ngIf="isLoaderVisible">
+        <mat-spinner></mat-spinner>
+    </div>
+    
+    <!-- password section -->
+    <ng-container *ngIf="!isAuthenticated">
+        <app-view-report-password
+            (submitPassword)="onSubmitPassword($event)">
+        </app-view-report-password>
+    </ng-container>
+
+    <!-- report section  -->
+    <ng-container *ngIf="isAuthenticated && !isLoaderVisible && financialSeries">
+       <app-view-report [financialSeries]="financialSeries"></app-view-report>
+    </ng-container>
+</div>

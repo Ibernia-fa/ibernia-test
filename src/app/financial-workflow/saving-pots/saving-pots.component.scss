@@ -306,3 +306,16 @@
 .vote-btns{
   width: 27px;
 }
+.drag-btn,
+.drag-spacer {
+  width: 32px;           /* keep same footprint as the real button */
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.drag-spacer {
+  pointer-events: none;  /* cannot click/drag */
+  user-select: none;
+}
