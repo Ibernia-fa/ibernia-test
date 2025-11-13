@@ -138,26 +138,26 @@ export class ClientEditComponent {
           this.clientForm.controls['inflationRate'].patchValue(
             res.clientDetails.inflationRate ?? 2.5
           );
-        const index = countryDialCodes.findIndex(x => res.clientDetails.phone.slice(1, res.clientDetails.phone.length).startsWith(x.DialCode));
-        this.clientForm.controls['phone'].patchValue(res.clientDetails.phone.slice(countryDialCodes[index].DialCode.length + 1));
-        this.selectedClientCountryISO = countryDialCodes[index].ISOCode as CountryISO;
+        const index = countryDialCodes.findIndex(x => res.clientDetails?.phone?.slice(1, res.clientDetails.phone.length).startsWith(x.DialCode));
+        this.clientForm.controls['phone'].patchValue(res.clientDetails?.phone?.slice(countryDialCodes[index].DialCode.length + 1));
+        this.selectedClientCountryISO = countryDialCodes[index]?.ISOCode as CountryISO;
         
-        this.clientForm.controls['currency'].patchValue(res.clientDetails.preferredCurrency);
-        this.clientForm.controls['notes'].patchValue(res.notes);
+        this.clientForm.controls['currency'].patchValue(res.clientDetails?.preferredCurrency);
+        this.clientForm.controls['notes'].patchValue(res?.notes);
         if(res.partnerDetail?.firstName) {
           this.togglePartnerSection(true);
           var partnerFormGroup = this.clientForm.get('partner') as FormGroup
-          partnerFormGroup.controls['dob'].patchValue(res.partnerDetail.birthDate);
-          partnerFormGroup.controls['email'].patchValue(res.partnerDetail.email);
-          partnerFormGroup.controls['gender'].patchValue(res.partnerDetail.gender);
-          partnerFormGroup.controls['country'].patchValue(res.partnerDetail.country);
-          partnerFormGroup.controls['firstName'].patchValue(res.partnerDetail.firstName);
-          partnerFormGroup.controls['lastName'].patchValue(res.partnerDetail.lastName);
+          partnerFormGroup.controls['dob'].patchValue(res.partnerDetail?.birthDate);
+          partnerFormGroup.controls['email'].patchValue(res.partnerDetail?.email);
+          partnerFormGroup.controls['gender'].patchValue(res.partnerDetail?.gender);
+          partnerFormGroup.controls['country'].patchValue(res.partnerDetail?.country);
+          partnerFormGroup.controls['firstName'].patchValue(res.partnerDetail?.firstName);
+          partnerFormGroup.controls['lastName'].patchValue(res.partnerDetail?.lastName);
 
-          const index = countryDialCodes.findIndex(x => res.partnerDetail?.phone.slice(1, res.partnerDetail.phone.length).startsWith(x.DialCode));
-          partnerFormGroup.controls['phone'].patchValue(res.partnerDetail.phone.slice(countryDialCodes[index].DialCode.length + 1));
+          const index = countryDialCodes.findIndex(x => res.partnerDetail?.phone.slice(1, res.partnerDetail?.phone.length).startsWith(x.DialCode));
+          partnerFormGroup.controls['phone'].patchValue(res.partnerDetail?.phone.slice(countryDialCodes[index]?.DialCode?.length + 1));
           this.selectedPartnerCountryISO = countryDialCodes[index].ISOCode as CountryISO;
-          partnerFormGroup.controls['currency'].patchValue(res.partnerDetail.preferredCurrency);
+          partnerFormGroup.controls['currency'].patchValue(res.partnerDetail?.preferredCurrency);
         }
 
         this.clientForm.updateValueAndValidity();

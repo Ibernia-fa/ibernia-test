@@ -133,9 +133,13 @@ You may rearrange the order by dragging and dropping the pots, or by using the u
                                 <div class="dragable-card d-flex align-items-center justify-content-between">
                                     <!-- Content  -->
                                     <div class="d-flex align-items-center gap-8">
+                                        @if(i > 0 && !('cash' === (savingPots.clientSavings[i]?.name || '').toLowerCase())) {
                                         <button cdkDragHandle type="button" class="drag-btn">
                                             <img src="/assets/images/svgs/drag-icon.svg" alt="drag-icon">
                                         </button>
+                                    }
+                                        <!-- @if((saving.name || '').toLowerCase() !== 'cash' && i < savingPots.clientSavings.length - 1) { -->
+
                                         <!-- Status  -->
                                         <div class="stats-main-wrapper">
                                             <div class="d-flex flex-column gap-8">

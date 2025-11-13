@@ -86,6 +86,7 @@ export class AddEventDialogComponent {
   clientPreferredCurrency: string;
   selectedEscalationDescription: string | null;
   amountCycles: Cycle[];
+  saveClicked: boolean = false;
 
 
   constructor(
@@ -169,7 +170,7 @@ export class AddEventDialogComponent {
           isIncomeEvent: [true, Validators.required],
           currency: [this.clientPreferredCurrency, Validators.required],
           amount: ['', [Validators.required, Validators.min(0)]],
-          cycle: [this.systemEvent?.isOneOff ? 'One-off' : '', [Validators.required]],
+          cycle: ['Every month', [Validators.required]],
           start: [moment(this.dropTime).year(), Validators.required],
           end: [0, Validators.required],
           escalationRate: [this.escalationRates[1].value, Validators.required],
@@ -335,6 +336,7 @@ this.eventForm.updateValueAndValidity({ emitEvent: false });
   onPensionEventSubmit() {
     this.eventForm.markAllAsTouched();
     if (this.eventForm.valid && this.systemEvent) {
+      this.saveClicked = true;
       const isCustomEscalation = this.selectedEscalationDescription === 'Increases at custom rate';
 const selectedEscalationRateValue = isCustomEscalation
   ? this.eventForm.get('customEscalationRate')?.value
@@ -381,10 +383,12 @@ const selectedEscalationRateValue = isCustomEscalation
       .pipe(
         filter(res => !!res),
         catchError(err => {
+      this.saveClicked = false;
           console.error(err);
           throw err;
         })
       ).subscribe(res => {
+      this.saveClicked = false;
         this.dialogRef.close({
           status: 'Success'
         });
@@ -395,6 +399,7 @@ const selectedEscalationRateValue = isCustomEscalation
   onInsuranceEventSubmit() {
     this.eventForm.markAllAsTouched();
     if (this.eventForm.valid && this.systemEvent) {
+      this.saveClicked = true;
       const clientEvent: ClientEvent = {
         id: this.isEditWorkflow ? this.patchEvent?.id ?? "" : "",
         name: this.systemEvent.name,
@@ -426,10 +431,12 @@ const selectedEscalationRateValue = isCustomEscalation
       .pipe(
         filter(res => !!res),
         catchError(err => {
+      this.saveClicked = false;
           console.error(err);
           throw err;
         })
       ).subscribe(res => {
+      this.saveClicked = false;
         this.dialogRef.close({
           status: 'Success'
         });
@@ -441,6 +448,7 @@ const selectedEscalationRateValue = isCustomEscalation
     console.log(this.eventForm.value);
     this.eventForm.markAllAsTouched();
     if (this.eventForm.valid) {
+      this.saveClicked = true;
       const isCustomEscalation = this.selectedEscalationDescription === 'Increases at custom rate';
 const selectedEscalationRateValue = isCustomEscalation
   ? this.eventForm.get('customEscalationRate')?.value
@@ -496,10 +504,13 @@ escalationRate: selectedEscalationRateValue !== null && selectedEscalationRateVa
       .pipe(
         filter(res => !!res),
         catchError(err => {
+      this.saveClicked = false;
+
           console.error(err);
           throw err;
         })
       ).subscribe(res => {
+      this.saveClicked = false;
         this.dialogRef.close({
           status: 'Success'
         });
