@@ -13,7 +13,7 @@ import {
 } from '@angular/cdk/drag-drop';
 import { animate, style, transition, trigger } from '@angular/animations';
 import { CommonModule } from '@angular/common';
-import { combineLatest, map, switchMap, tap } from 'rxjs';
+import { combineLatest, filter, map, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { SavingsPotsHttpService as SavingPotsHttpService } from './services/savings-pots-http.service';
 import { ClientSaving, SavingPotsModel as SavingPots } from './models/saving-pots.model';
 import { Cashflow } from 'src/app/clients/models/cashflow';
@@ -95,6 +95,8 @@ export class SavingPotsComponent implements OnInit {
   user: any;
   userRerturnRate: any;
   loggedInUserPreferences: any;
+      private destroy$ = new Subject<void>();
+
   constructor(
     private dialog: MatDialog,
     private savingPotsHttpService: SavingPotsHttpService,
@@ -108,13 +110,28 @@ export class SavingPotsComponent implements OnInit {
   ) {
     this.navItemService.currentRouteName = 'Saving Pots';
         this.user = this.Authservice.getUserProfile();
-  this.settingsService.getUserProfileResponse(this.user?.sub).subscribe({
-    next: (res: any) => {
-      // console.log('data', res.body);
-       const p = res?.body?.preferences;
+  // this.settingsService.getUserProfileResponse(this.user?.sub).subscribe({
+  //   next: (res: any) => {
+  //     console.log('res =>', res);
+  //     // console.log('data', res.body);
+  //      const p = res?.body?.preferences;
+  //      this.loggedInUserPreferences = p;
+  //     this.userRerturnRate = p.investmentReturn;
+  //   }});
+      this.settingsService.userData$
+        .pipe(
+          filter((v): v is NonNullable<typeof v> => v != null), // skip initial null
+          takeUntil(this.destroy$)
+        )
+        .subscribe((data) => {
+      console.log('res 1=>', data);
+
+          // console.log('userData arrived', data);
+          // this.userData = data;
+                 const p = data.preferences;
        this.loggedInUserPreferences = p;
       this.userRerturnRate = p.investmentReturn;
-    }});
+        });
     this.getData();
 }
 
@@ -379,6 +396,8 @@ updateOrderNumbers() {
       width: '700px',
       disableClose: true,
       data: {
+        returnRate: this.userRerturnRate,
+        loggedInUserPreferences : this.loggedInUserPreferences,
         amountCycles: this.amountCycles,
         escalataionRates: this.escalationRates,
         eventsList: this.timeline.clientEvents.sort((a, b) => a.start.age - b.start.age),
