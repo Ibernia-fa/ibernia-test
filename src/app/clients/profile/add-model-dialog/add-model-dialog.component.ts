@@ -42,7 +42,7 @@ export class AddModelDialogComponent {
 
   initForm() {
     this.form = this.fb.group({
-      name: ['Cashflow Simulator', Validators.required],
+      name: ['Lifetime Plan', Validators.required],
       description: ['']
     });
   }
@@ -76,13 +76,13 @@ export class AddModelDialogComponent {
           if (err.error)
             this.toaster.error(err.error);
           else
-            this.toaster.error('An error occurred while creating model');
+            this.toaster.error('An error occurred while creating plan');
           
           console.error("An error occurred while creating cashflow", err);
           throw err;
         })
       ).subscribe((res) => {
-        this.toaster.success('Model Created Successfully');
+        this.toaster.success('Plan Created Successfully');
         this.dialogRef.close();
         this.router.navigate([`cashflows/${res.id}/timeline`]);
       });

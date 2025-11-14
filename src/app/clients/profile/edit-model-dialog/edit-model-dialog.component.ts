@@ -87,14 +87,14 @@ export class EditModelDialogComponent {
             if (err.error)
               this.toaster.error(err.error);
             else
-              this.toaster.error('An error occurred while updating model');
+              this.toaster.error('An error occurred while updating plan');
 
             console.error('An error occurred while updating cashflow', err);
             throw err;
           })
         )
         .subscribe((res) => {
-          this.toaster.success('Model Updated Successfully');
+          this.toaster.success('Plan Updated Successfully');
           this.dialogRef.close();
           // this.router.navigate([`cashflows/${res.id}/timeline`]);
         });

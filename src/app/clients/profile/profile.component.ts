@@ -208,16 +208,17 @@ export class ProfileComponent {
     //   updatedAt: new Date()
     // };
     this.isLoaderVisible = true;
-    cashflow.id = ''
+    cashflow.id = '';
+    cashflow.name = 'Copy of ' + cashflow.name;
     this.cashflowHttpService.createCashflow(cashflow).pipe(
       filter(res => !!res),
       catchError((err) => {
         console.error("An error occurred while cloning cashflow", err);
-        this.toastr.error('An error occurred while cloning model');
+        this.toastr.error('An error occurred while cloning plan');
         throw err;
       })
     ).subscribe((res) => {
-      this.toastr.success('Model Cloned Successfully');
+      this.toastr.success('Plan Cloned Successfully');
       this.getCashflows();
     });
   }
@@ -226,7 +227,7 @@ export class ProfileComponent {
     const dialogRef = this.dialog.open(DialogComponent, {
       data: {
         action: 'Delete',
-        text: 'Are you sure you want to delete this model?',
+        text: 'Are you sure you want to delete this plan?',
         cashflowId
       },
       width: '460px',
@@ -245,12 +246,12 @@ export class ProfileComponent {
           .deleteCashflow(cashflowId)
           .pipe(
             map((res) => {
-              this.toastr.success('Client deleted successfully', 'Success!');
+              this.toastr.success('Plan deleted successfully', 'Success!');
               this.getCashflows();
             }),
             catchError((err) => {
               console.error(err);
-              this.toastr.error('An error occured while saving client', 'Error!');
+              this.toastr.error('An error occured while deleting plan', 'Error!');
               throw err;
             })
           )
