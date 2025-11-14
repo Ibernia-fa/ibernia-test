@@ -99,7 +99,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
   ) {
     this.updateTimelines = new EventEmitter<boolean>();
         this.settingHttpService.getEscalationRates(
-             '678c93f32be72db4b9631be1'
+             this.client.id
             ).subscribe((escalationRatesResponse) => {
               this.escalationRates = escalationRatesResponse.escalationRates;
             })

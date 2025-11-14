@@ -189,7 +189,7 @@ export class SavingPotsComponent implements OnInit {
             ),
             this.settingHttpService.getAmountCycles(),
             this.settingHttpService.getEscalationRates(
-              (client as Client).financialAdvisor.advisorId
+              (client as Client).id
             ),
           ]);
         }),

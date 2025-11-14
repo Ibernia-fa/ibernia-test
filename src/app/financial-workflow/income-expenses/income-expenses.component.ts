@@ -102,7 +102,7 @@ export class IncomeExpensesComponent {
             ),
             this.settingHttpService.getAmountCycles(),
             this.settingHttpService.getEscalationRates(
-              (client as Client).financialAdvisor.advisorId
+              (client as Client).id
             ),
           ]);
         }),

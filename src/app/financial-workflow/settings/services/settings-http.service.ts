@@ -14,7 +14,7 @@ export class SettingsHttpService {
     return this.httpClient.get<Array<Cycle>>(`${this.SETTINGS_BASE_URL}amount-cycles`);
   }
   
-  public getEscalationRates(financialAdvisorId: string) {
-    return this.httpClient.get<EscalationRateResponse>(`${this.SETTINGS_BASE_URL}${financialAdvisorId}/escalation-rates`);
+  public getEscalationRates(clientId: string) {
+    return this.httpClient.get<EscalationRateResponse>(`${this.SETTINGS_BASE_URL}${clientId}/escalation-rates`);
   }
 }

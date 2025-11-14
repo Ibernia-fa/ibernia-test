@@ -104,7 +104,7 @@ export class WithdrawalsContributionsComponent {
             ),
             this.settingHttpService.getAmountCycles(),
             this.settingHttpService.getEscalationRates(
-              (client as Client).financialAdvisor.advisorId
+              (client as Client).id
             ),
             this.savingsPotsHttpService.getAllSavingsPots(
               (cashflow as Cashflow).id
