@@ -94,23 +94,14 @@ export class TimelineChartComponent implements OnInit, OnChanges {
     private timelineHttpService: TimelineHttpService,
     private cdr: ChangeDetectorRef,
     private toastrService: ToastrService,
-    private settingHttpService: SettingsHttpService
-    
-  ) {
+    private settingHttpService: SettingsHttpService 
+  ) { 
     this.updateTimelines = new EventEmitter<boolean>();
-        this.settingHttpService.getEscalationRates(
-             this.client.id
-            ).subscribe((escalationRatesResponse) => {
-              this.escalationRates = escalationRatesResponse.escalationRates;
-            })
-
-            this.settingHttpService.getAmountCycles().subscribe((cycles) => {
-              this.amountCycles = cycles;
-            });
-
   }
 
   ngOnChanges(changes: SimpleChanges) {
+    if (!this.client) return;
+
     if (changes['financialTimeline']) {
       if (this.timeline) {
         this.timeline.setItems(this.timelineData);
@@ -135,11 +126,27 @@ export class TimelineChartComponent implements OnInit, OnChanges {
     this.getTimelineEventsLibrary();
   }
 
+  
+
   ngAfterViewInit() {
     // this.timelineContainer.nativeElement.addEventListener('mousemove', (e: MouseEvent) => {
     //   this.tooltipMouseX = e.clientX;
     //   this.tooltipMouseY = e.clientY;
     // });
+    this.settingHttpService
+      .getEscalationRates(this.client.id)
+      .subscribe((escalationRatesResponse) => {
+        escalationRatesResponse = escalationRatesResponse ?? {escalationRates: []};
+        this.escalationRates = escalationRatesResponse.escalationRates;
+      }
+    );
+
+    this.settingHttpService
+      .getAmountCycles()
+      .subscribe((cycles) => {
+        this.amountCycles = cycles;
+      }
+    );
   }
 
   getTimelineEventsLibrary() {

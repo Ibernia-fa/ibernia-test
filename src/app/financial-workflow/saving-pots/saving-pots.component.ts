@@ -205,7 +205,7 @@ export class SavingPotsComponent implements OnInit {
           this.ensureCashFirst();
           this.timeline = timeline;
           this.amountCycles = amountCycles;
-          this.escalationRates = escalationRatesResponse.escalationRates;
+          this.escalationRates = escalationRatesResponse?.escalationRates;
           this.isLoaderVisible = false;
         })
       )

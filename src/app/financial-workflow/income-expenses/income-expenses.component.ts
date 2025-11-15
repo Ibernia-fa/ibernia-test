@@ -109,7 +109,7 @@ export class IncomeExpensesComponent {
         tap(([incomeExpense, timeline, amountCycles, escalationRatesResponse]) => {
           this.incomeExpense = incomeExpense;
           this.amountCycles = amountCycles;
-          this.escalationRates = escalationRatesResponse.escalationRates;
+          this.escalationRates = escalationRatesResponse?.escalationRates;
           this.timeline = timeline;
 
           this.incomeDataSource = new MatTableDataSource(

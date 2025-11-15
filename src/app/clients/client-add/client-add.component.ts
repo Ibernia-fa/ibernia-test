@@ -65,9 +65,9 @@ export class ClientAddComponent {
   clientForm: FormGroup;
   showPartner: boolean = false;
   allCountries = allCountries;
-  selectedClientCountryISO = CountryISO.UnitedStates
-  selectedPartnerCountryISO = CountryISO.UnitedStates
-
+  selectedClientCountryISO = CountryISO.UnitedStates;
+  selectedPartnerCountryISO = CountryISO.UnitedStates;
+  user: any;
 
   constructor(
     private fb: FormBuilder,
@@ -105,12 +105,11 @@ export class ClientAddComponent {
   }
 
   ngOnInit() {
-  const user = this.authService.getUserProfile();
-  const userId = user?.sub;
+    this.user = this.authService.getUserProfile();
 
-  if (!userId) return;
+    if (!this.user || !this.user?.sub) return;
 
-  this.settingsService.getUserProfileResponse(userId).subscribe({
+  this.settingsService.getUserProfileResponse(this.user.sub).subscribe({
     next: (res: any) => {
       // Your API returns a plain object with a `preferences` bag
       const p = res?.body?.preferences;
@@ -247,8 +246,8 @@ export class ClientAddComponent {
           }
         : null,
       financialAdvisor: {
-        advisorId: '678c93f32be72db4b9631be1',
-        advisorName: 'Matteo',
+        advisorId: this.user.sub,
+        advisorName: this.user.given_name,
       },
       lastUpdated: new Date(),
       notes: this.clientForm.controls['notes'].value,

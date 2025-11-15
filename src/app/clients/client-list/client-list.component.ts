@@ -179,7 +179,7 @@ export class ClientListComponent implements OnInit, AfterViewInit {
   ngOnInit() {
     this.user = this.Authservice.getUserProfile();
     console.log('user', this.user);
-    this.getClients();
+    this.getClients(this.user.sub);
     this.checkPrefsAndPrompt();  
   }
 
@@ -301,10 +301,10 @@ private checkPrefsAndPrompt() {
       return 0;
     });
   }
-  getClients() {
+  getClients(advisorId: string) {
     this.isLoaderVisible = true;
     this.clientHttpService
-      .getClients()
+      .getClients(advisorId)
       .pipe(filter((clients) => {
         this.isLoaderVisible = false;
         return !!clients
@@ -338,7 +338,7 @@ private checkPrefsAndPrompt() {
         )
         .subscribe();
     } else {
-      this.getClients();
+      this.getClients(this.user.sub);
     }
     // this.dataSource.filter = filterValue.trim().toLowerCase();
   }
@@ -406,7 +406,7 @@ private checkPrefsAndPrompt() {
       .pipe(
         map((res) => {
           this.toastr.success('Client deleted successfully', 'Success!');
-          this.getClients();
+          this.getClients(this.user.id);
         }),
         catchError((err) => {
           console.error(err);

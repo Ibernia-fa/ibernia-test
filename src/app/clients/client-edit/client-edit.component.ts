@@ -26,6 +26,7 @@ import { CountryISO, NgxIntlTelInputModule } from 'ngx-intl-tel-input';
 import { countryDialCodes } from '../models/country-code';
 import { FiveDayRangeSelectionStrategy } from 'src/app/core/five-day-range-selection-strategy';
 import {MatCheckboxModule} from '@angular/material/checkbox';
+import { AuthService } from 'src/app/auth/services/auth.service';
 
 
 @Component({
@@ -64,14 +65,20 @@ export class ClientEditComponent {
   selectedClientCountryISO = CountryISO.UnitedStates;
   selectedPartnerCountryISO = CountryISO.UnitedStates;
   allControlCountries= countryDialCodes
+  user: any;
 
   constructor(
     private fb: FormBuilder,
     private clientHttpService: ClientHttpService,
     private router: Router,
     private toastr: ToastrService,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private authService: AuthService
   ) {
+    this.user = this.authService.getUserProfile();
+
+    if (!this.user || !this.user?.sub) return;
+
     this.clientForm = this.fb.group({
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
@@ -99,7 +106,6 @@ export class ClientEditComponent {
     this.togglePartnerSection(false); // Ensure partner section validations are off initially
   }
 
-  
   clientCountryValueChange(event: any) {
     const selectedCountry = allCountries.find(country => country.countryName === event);
     this.clientForm.controls['currency'].patchValue(selectedCountry?.currencySymbol);
@@ -216,8 +222,8 @@ export class ClientEditComponent {
             partnerGroup.controls['currency']?.value,
         } : null,
         financialAdvisor: {
-          advisorId: '678c93f32be72db4b9631be1',
-          advisorName: 'Matteo',
+          advisorId: this.user.sub,
+          advisorName: this.user.given_name,
         },
         lastUpdated: new Date(),
         notes: this.clientForm.controls['notes'].value,

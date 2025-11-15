@@ -15,8 +15,8 @@ export class ClientHttpService {
   searchClients(query: string) {
     return this.httpClient.get<Array<Client>>(`${this.CLIENT_URL_PREFIX}/search?searchTerm=${query}`)
   }
-  getClients() {
-    return this.httpClient.get<Array<Client>>(`${this.CLIENT_URL_PREFIX}`)
+  getClients(advisorId: string) {
+    return this.httpClient.get<Array<Client>>(`${this.CLIENT_URL_PREFIX}/${advisorId}/all`)
   }
 
   getClient(id: string) {

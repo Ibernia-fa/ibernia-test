@@ -1,5 +1,5 @@
 <div class="d-flex gap-24 flex-column">
-    @if(!isLoaderVisible && financialTimeline) {
+    @if(!isLoaderVisible && financialTimeline && client) {
 
     <mat-card class="cardWithShadow">
         <mat-card-content>
@@ -99,8 +99,12 @@ Add new events to the timeline or move existing ones to adjust their timing.
         </mat-card-content>
     </mat-card>
 
-    <app-timeline-chart [financialTimeline]="financialTimeline" [clientBirthDate]="clientBirthDate" [client]="client"
-        (updateTimelines)="updateTimelinesEmittedEvent()"></app-timeline-chart>
+    <app-timeline-chart
+        [financialTimeline]="financialTimeline"
+        [clientBirthDate]="clientBirthDate"
+        [client]="client"
+        (updateTimelines)="updateTimelinesEmittedEvent()">
+    </app-timeline-chart>
     <!-- Event Section  -->
 
     }
