@@ -55,6 +55,7 @@
                 <input
                   matInput
                   type="text"
+                  formControlName="amount"
                   [value]="expenseForm.get('amount')?.value | thousandSeparator"
                   thousandSeparatorInput
                   (input)="onAmountInput($event.target.value)"
