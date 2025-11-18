@@ -5,6 +5,8 @@ import { EmergenciesHttpService as EmergenciesHttpService } from './services/eme
 import { EmergenciesModel as EmergenciesModel } from './models/emergencies.model';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatCardModule } from '@angular/material/card';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { AddEmergenciesComponent } from './add-emergencies/add-emergencies.component';
 @Component({
   selector: 'app-emergencies',
    imports: [
@@ -19,12 +21,26 @@ import { MatCardModule } from '@angular/material/card';
 export class EmergenciesComponent implements OnInit {
   constructor(
     private emergenciesHttpService: EmergenciesHttpService,
-    private navItemService: NavItemService
+    private navItemService: NavItemService,
+        private dialog: MatDialog,
+        
   ) {
     this.navItemService.currentRouteName = 'Emergencies';
   }
 
   ngOnInit(): void {
     
+  }
+
+  onAddClick(){
+        const dialogRef = this.dialog.open(AddEmergenciesComponent, {
+          width: '700px',
+          disableClose: true,
+          data: {
+          },
+        });
+    
+        dialogRef.afterClosed().subscribe((result: any) => {
+        });
   }
 }
