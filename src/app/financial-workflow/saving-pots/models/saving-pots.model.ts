@@ -51,7 +51,8 @@ export enum SavingPotType
 {
     Cash = 1,
     Investment = 2,
-    PensionFund = 3
+    PensionFund = 3,
+    Other = 4
 }
 
 export enum ComissionType
