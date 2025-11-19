@@ -1,56 +1,36 @@
-<!-- <p>add-income works!</p>
-<button (click)="closeDialog()" type="button"></button> -->
-
-<!--  Add Expense-->
 <div class="w-100">
   <div class="d-flex flex-column gap-32">
-    <!-- Modal Header  -->
     <div class="d-flex align-items-center justify-content-between gap-10 modal-header">
       <h3>{{isEditWorkflow ? 'Edit' : 'Add'}}  income</h3>
       <button (click)="closeDialog()" type="button">
         <img src="assets/images/svgs/close-line-cion.svg" alt="close-line-cion" />
       </button>
     </div>
-    <!-- End Modal Header  -->
 
-    <!-- Modal Body  -->
     <mat-dialog-content>
       <div [formGroup]="incomeForm" class="d-flex flex-column gap-20">
-        <!-- Description Field  -->
         <div class="w-100 form-field gap-8">
           <mat-label class="f-s-16 d-block" style="line-height: 18px">Description</mat-label>
           <input matInput formControlName="description" placeholder="e.g. Salary" />
-          <!-- Error  -->
-          <!-- <span class="field-error d-block">Required</span>S -->
-          <!-- End Error  -->
-                @if(incomeForm.get('description')?.touched &&
-              incomeForm.get('description')?.hasError('required')) {
-              <span class="field-error d-block">Required</span>
-              }
+          
+          @if(incomeForm.get('description')?.touched && incomeForm.get('description')?.hasError('required')) {
+          <span class="field-error d-block">Required</span>
+          }
         </div>
                  
-        <!--End Description Field  -->
-
-        <!-- Net Amount Field  -->
         <div class="d-flex flex-column gap-4 net-fields">
           <div class="d-flex flex-column gap-8">
             <mat-label class="f-s-16 d-block" style="line-height: 18px">Net amount</mat-label>
             <div class="net-field d-flex align-items-center">
-              <!-- Currency Selector  -->
               <div class="left hide-arrow">
                 <mat-select formControlName="currencySymbol" class="sortby-edit-profile" hideSingleSelectionIndicator>
                   @for (country of countries; track country) {
-                  @if(country.currencySymbol) {
-                  <mat-option [value]="country.currencySymbol">{{
-                    country.currencySymbol
-                    }}</mat-option>
-
-                  }
+                    @if(country.currencySymbol) {
+                      <mat-option [value]="country.currencySymbol">{{country.currencySymbol}}</mat-option>
+                    }
                   }
                 </mat-select>
               </div>
-              <!-- End Currency Selector  -->
-              <!-- Price Field  -->
               <div class="w-100 form-field">
                 <input
                   matInput
@@ -61,41 +41,21 @@
                   (input)="onAmountInput($event.target.value)"
                 />
               </div>
-              <!-- End Price Field  -->
-              <!-- End Type Field  -->
               <div class="right">
-                <mat-select (valueChange)="onCycleValueChange($event)" value="Select" formControlName="cycle" class="sortby-edit-profile"
+                <mat-select 
+                  (valueChange)="onCycleValueChange($event)" 
+                  formControlName="cycle" 
+                  class="sortby-edit-profile"
                   hideSingleSelectionIndicator>
-                  @for (cycle of cycles; let i = $index; track cycle) {
-                  <mat-option [value]="cycle.id">{{ cycle.description }}</mat-option>
-                  }
+                    @for (cycle of cycles; let i = $index; track cycle) {
+                      <mat-option [value]="cycle.id">{{ cycle.description }}</mat-option>
+                    }
                 </mat-select>
               </div>
-              <!-- End Type Field  -->
             </div>
           </div>
-          <!-- Error  -->
-          <!-- <span class="field-error d-block">Amount is required</span> -->
-          <!-- End Error  -->
         </div>
-        <!-- End Net Amount Field  -->
-
-        <!-- <div class="d-flex flex-column gap-8">
-          <div class="w-100 form-field gap-12">
-            <div class="d-flex gap-8 align-items-center">
-              <mat-label class="f-s-16 f-w-400 d-block">Date</mat-label>
-              <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
-            </div>
-            <div class="select-option">
-              <mat-select value="Select" formControlName="start" hideSingleSelectionIndicator>
-                @for (year of years; track year) {
-                <mat-option [value]="year">{{ year }} ({{ clientAge + i }})</mat-option>
-                }
-              </mat-select>
-            </div>
-          </div>
-        </div> -->
-
+        
         <div class="start-end">
           <div class="d-flex flex-column gap-8">
             <div class="d-flex gap-8 align-items-center">
@@ -103,132 +63,91 @@
               <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
             </div>
             <div class="row justify-content-between align-items-start flex-nowrap">
-              <!-- Start date  -->
               <div [className]="showStartEnd ? 'col-6' : 'w-100'">
                 <div class="w-100 form-field">
                   <div class="select-option">
                     <mat-select value="Select" formControlName="start" hideSingleSelectionIndicator>
-                      <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
-                               <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
                       @for (event of eventsList; track event) {
-                      <mat-option [value]="event.start.year">{{ event.name }} ({{ event.start.age }})</mat-option>
+                        <mat-option [value]="event.start.year">{{ event.name }} ({{ event.start.age }})</mat-option>
                       }
                       <hr>
-
                       @for (year of years;let i = $index; track year) {
-                      <mat-option [value]="year">{{ year }} ({{ clientAge + i }})</mat-option>
+                        <mat-option [value]="year">{{ year }} ({{ clientAge + i }})</mat-option>
                       }
                     </mat-select>
                   </div>
-                  @if(incomeForm.get('start')?.touched &&
-                  incomeForm.get('start')?.hasError('required')) {
-                  <!-- <span class="field-error d-block">Start is required</span> -->
-              <span class="field-error d-block">Required</span>
-
+                  @if(incomeForm.get('start')?.touched && incomeForm.get('start')?.hasError('required')) {
+                    <span class="field-error d-block">Required</span>
                   }
                 </div>
               </div>
 
               @if(showStartEnd) {
-                <!-- Divider  -->
                 <div class="d-flex justify-content-start align-items-start">
                   <img src="assets/images/svgs/chevron-right-date-icon.svg" alt="chevron-right-date-icon" />
                 </div>
-                <!-- End date  -->
                 <div class="col-6">
                   <div class="w-100 form-field">
                     <div class="select-option">
                       <mat-select value="Select" formControlName="end" hideSingleSelectionIndicator>
-                        <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
-                        <!-- @for (event of eventsList; track event) {
-                        <mat-option [value]="event.year">{{ event.name }} ({{ event.age }})</mat-option>
+                        @for (event of eventsList; track event) {
+                          <mat-option [value]="event.start.year">{{ event.name }} ({{ event.start.age }})</mat-option>
                         }
-                        <hr> -->
-                      @for (event of eventsList; track event) {
-                      <mat-option [value]="event.start.year">{{ event.name }} ({{ event.start.age }})</mat-option>
-                      }
-                      <hr>
+                        <hr>
                         @for (year of years; let i=$index; track year) {
                           <mat-option [value]="year">{{ year }} ({{ clientAge + i }})</mat-option>
-                          }
+                        }
                       </mat-select>
                     </div>
-                    @if(incomeForm.get('end')?.touched &&
-                    incomeForm.get('end')?.hasError('required')) {
-                    <!-- <span class="field-error d-block">End is required</span> -->
-              <span class="field-error d-block">Required</span>
-
+                    @if(incomeForm.get('end')?.touched && incomeForm.get('end')?.hasError('required')) {
+                      <span class="field-error d-block">Required</span>
                     }
-                    @if(incomeForm.get('end')?.touched &&
-                        incomeForm.get('end')?.hasError('endBeforeStart')) {
+                    @if(incomeForm.get('end')?.touched && incomeForm.get('end')?.hasError('endBeforeStart')) {
                       <span class="field-error d-block">End year cannot be before start year</span>
                     }
                   </div>
                 </div>
-
               }
             </div>
           </div>
         </div>
 
-
         @if(showStartEnd) {
           <div class="w-100 form-field gap-20">
             <div class="w-100 form-field gap-8 ">
-              <mat-label class="f-s-16 f-w-400 d-flex gap-8 align-items-center">Escalation rate <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" /></mat-label>
-               <div class="w-100 form-field">
+              <mat-label class="f-s-16 f-w-400 d-flex gap-8 align-items-center">Escalation rate 
+                <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
+              </mat-label>
+              <div class="w-100 form-field">
                 <div class="select-option">
-                    <mat-select formControlName="escalationRate" value="Select" (selectionChange)="onEscalationRateChange($event)">
-                  @for (escalationRate of escalationRates; track escalationRate) {
-                  <mat-option [value]="escalationRate.value">{{ escalationRate.description }}</mat-option>
-                  }
-                </mat-select>
+                  <mat-select formControlName="escalationRate" value="Select" (selectionChange)="onEscalationRateChange($event)">
+                    @for (escalationRate of escalationRates; track escalationRate) {
+                      <mat-option [value]="escalationRate.value">{{ escalationRate.description }}</mat-option>
+                    }
+                  </mat-select>
                 </div>
-                @if(incomeForm.get('escalationRate')?.touched &&
-                incomeForm.get('escalationRate')?.hasError('required')) {
-                <!-- <span class="field-error d-block">Escalation Rate is required</span> -->
-              <span class="field-error d-block">Required</span>
-
+                @if(incomeForm.get('escalationRate')?.touched && incomeForm.get('escalationRate')?.hasError('required')) {
+                  <span class="field-error d-block">Required</span>
                 }
               </div>
             </div>
-         
-                      @if(selectedEscalationDescription === 'Increases at custom rate') {
-          <div class="w-100 form-field gap-8">
-            <mat-label class="f-s-16 d-block">Custom escalation rate</mat-label>
-
-
-            
-         <mat-form-field  appearance="outline" class="w-full w-100 percentage-icon">
-              <span matSuffix>%</span> 
-                <input
-                              matInput
-                type="number"
-                formControlName="customEscalationRate"
-                placeholder="Enter custom rate"
-          
-                            />
-                            
-              </mat-form-field>
-
-
-             
-            @if(incomeForm.get('customEscalationRate')?.touched &&
-                incomeForm.get('customEscalationRate')?.hasError('required')) {
-              <!-- <span class="field-error d-block">Custom escalation rate is required</span> -->
-              <span class="field-error d-block">Required</span>
-
+            @if(selectedEscalationDescription === 'Increases at custom rate') {
+              <div class="w-100 form-field gap-8">
+                <mat-label class="f-s-16 d-block">Custom escalation rate</mat-label>            
+                <mat-form-field  appearance="outline" class="w-full w-100 percentage-icon">
+                  <span matSuffix>%</span> 
+                  <input matInput type="number" formControlName="customEscalationRate" placeholder="Enter custom rate" />
+                </mat-form-field>
+                @if(incomeForm.get('customEscalationRate')?.touched && incomeForm.get('customEscalationRate')?.hasError('required')) {
+                  <span class="field-error d-block">Required</span>
+                }
+              </div>
             }
           </div>
         }
-          </div>
-        }
-
       </div>
     </mat-dialog-content>
-    <!-- End Modal Body  -->
-
-    <!-- Modal Action Button  -->
+   
     <div class="row justify-content-between modal-action">
       <div class="col-5">
         <button (click)="closeDialog()" class="button-icon-outline w-100 d-block">
@@ -241,7 +160,5 @@
         </button>
       </div>
     </div>
-    <!-- End Modal Action Button  -->
   </div>
 </div>
-<!-- End Add Expense -->

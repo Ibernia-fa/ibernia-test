@@ -214,15 +214,11 @@ this.escalationRates.push({
 
     if (this.incomeForm.valid) {
       console.log('Form Submitted', this.incomeForm.value);
-
-            const isCustomEscalation =
-        this.selectedEscalationDescription === 'Increases at custom rate';
+      const isCustomEscalation = this.selectedEscalationDescription === 'Increases at custom rate';
       const escalationRateValue = isCustomEscalation
         ? this.incomeForm.get('customEscalationRate')?.value
         : this.incomeForm.get('escalationRate')?.value;
-      const matchedRate = this.escalationRates.find(
-        (x) => x.value === escalationRateValue
-      );
+      const matchedRate = this.escalationRates.find((x) => x.value === escalationRateValue);
       var income: FinancialViewModel = {
         id: this.isEditWorkflow ? this.selectedIncome.id : null,
         description: this.incomeForm.get('description')?.value,
@@ -325,8 +321,6 @@ escalationRate: escalationRateValue !== null && escalationRateValue !== ''
         e.value === selectedValue && e.description === 'Increases at custom rate'
       );
     }
-    
-    
     
     onEscalationRateChange(event: MatSelectChange): void {
       const selectedOption = event.source.selected;

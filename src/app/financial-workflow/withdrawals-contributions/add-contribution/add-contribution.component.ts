@@ -213,6 +213,31 @@ if (type === 1) {
       this.isCommissionsChanged(hasCommInit);
       this.onCycleValueChange(this.selectedContribution.amount.cycle?.id);
     }
+
+    const matchedEscalation = this.escalationRates.find(x => x.value === this.selectedContribution.escalationRate?.value);
+      
+      if (matchedEscalation) {
+        this.contributionForm.get('escalationRate')?.patchValue(matchedEscalation.value);
+        this.selectedEscalationDescription = matchedEscalation.description;
+      } else if (
+        this.selectedContribution.escalationRate &&
+        this.selectedContribution.escalationRate.description === 'Increases at custom rate'
+      ) {
+        this.escalationRates = this.escalationRates.filter(x => x.description !== 'Increases at custom rate')
+        this.escalationRates.push({ 
+          description: 'Increases at custom rate', 
+          value: this.selectedContribution.escalationRate.value
+        });
+
+        this.contributionForm.get('escalationRate')?.patchValue(this.selectedContribution.escalationRate.value);
+        this.contributionForm.get('customEscalationRate')?.patchValue(this.selectedContribution.escalationRate.value);
+        this.selectedEscalationDescription = 'Increases at custom rate';
+        
+        // Trigger validators for custom rate
+        const customControl = this.contributionForm.get('customEscalationRate');
+        customControl?.setValidators([Validators.required, Validators.min(0)]);
+        customControl?.updateValueAndValidity();
+      }
   }
 
   // === UI helpers ===
@@ -230,8 +255,9 @@ if (type === 1) {
   }
 
   onCycleValueChange(event: any) {
-    this.showStartEnd =
-      this.cycles.find((cycle) => cycle.id === event)?.description !== 'One-off';
+    const isOneOff = this.cycles.find(cycle => cycle.id === event)?.description === 'One-off';
+    this.showStartEnd = !isOneOff;
+
     if (!this.showStartEnd) {
       this.contributionForm.controls['end'].clearValidators();
       this.contributionForm.controls['end'].updateValueAndValidity();
@@ -239,6 +265,15 @@ if (type === 1) {
       this.contributionForm.controls['end'].addValidators(Validators.required);
       this.contributionForm.controls['end'].updateValueAndValidity();
     }
+
+    const escalationControl = this.contributionForm.get('escalationRate');
+
+    if (isOneOff) {
+      escalationControl?.clearValidators();
+    } else {
+      escalationControl?.setValidators(Validators.required);
+    }
+    escalationControl?.updateValueAndValidity();
   }
 
   isCommissionsChanged(enabled: boolean) {

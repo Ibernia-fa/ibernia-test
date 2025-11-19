@@ -148,7 +148,7 @@
               <mat-label class="f-s-16 f-w-400 d-flex gap-8 align-items-center">Escalation rate <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" /></mat-label>
                <div class="w-100 form-field">
                 <div class="select-option">
-                  <mat-select formControlName="escalationRate" value="Select" (selectionChange)="onEscalationRateChange($event)">
+                  <mat-select formControlName="escalationRate" (selectionChange)="onEscalationRateChange($event)">
                     @for (escalationRate of escalationRates; track escalationRate) {
                       <mat-option [value]="escalationRate.value">{{ escalationRate.description }}</mat-option>
                     }

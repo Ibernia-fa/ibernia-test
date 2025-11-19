@@ -149,12 +149,35 @@ export class AddWithdrawalComponent {
         .get('start')
         ?.patchValue(this.selectedWithdrawal.start.year);
       this.withdrawalForm.get('end')?.patchValue(this.selectedWithdrawal.end.year);
-      // console.log(this.sele)
-      // this.withdrawalForm.get('savingPot')?.patchValue(this.selectedWithdrawal.associatedSavingPotId);
- 
- const savedId = this.selectedWithdrawal.associatedSavingPotId;
-const stillExists = this.savingPots.clientSavings.some(s => s.id === savedId);
-this.withdrawalForm.get('savingPot')?.patchValue(stillExists ? savedId : null);
+
+      const matchedEscalation = this.escalationRates.find(x => x.value === this.selectedWithdrawal.escalationRate?.value);
+      
+      if (matchedEscalation) {
+        this.withdrawalForm.get('escalationRate')?.patchValue(matchedEscalation.value);
+        this.selectedEscalationDescription = matchedEscalation.description;
+      } else if (
+        this.selectedWithdrawal.escalationRate &&
+        this.selectedWithdrawal.escalationRate.description === 'Increases at custom rate'
+      ) {
+        this.escalationRates = this.escalationRates.filter(x => x.description !== 'Increases at custom rate')
+        this.escalationRates.push({ 
+          description: 'Increases at custom rate', 
+          value: this.selectedWithdrawal.escalationRate.value
+        });
+
+        this.withdrawalForm.get('escalationRate')?.patchValue(this.selectedWithdrawal.escalationRate.value);
+        this.withdrawalForm.get('customEscalationRate')?.patchValue(this.selectedWithdrawal.escalationRate.value);
+        this.selectedEscalationDescription = 'Increases at custom rate';
+        
+        // Trigger validators for custom rate
+        const customControl = this.withdrawalForm.get('customEscalationRate');
+        customControl?.setValidators([Validators.required, Validators.min(0)]);
+        customControl?.updateValueAndValidity();
+      }
+
+      const savedId = this.selectedWithdrawal.associatedSavingPotId;
+      const stillExists = this.savingPots.clientSavings.some(s => s.id === savedId);
+      this.withdrawalForm.get('savingPot')?.patchValue(stillExists ? savedId : null);
 
       const hasComm = !!this.selectedWithdrawal?.comission;
       this.withdrawalForm.get('commissions')?.patchValue(hasComm);
@@ -194,9 +217,9 @@ this.savingPots.clientSavings = (this.savingPots.clientSavings || [])
 
   onCycleValueChange(event: any) {
     console.log({ event });
-    this.showStartEnd =
-      this.cycles.find((cycle) => cycle.id === event)?.description !==
-      'One-off';
+    const isOneOff = this.cycles.find(cycle => cycle.id === event)?.description === 'One-off';
+    this.showStartEnd = !isOneOff;
+
     if (!this.showStartEnd) {
       this.withdrawalForm.controls['end'].clearValidators();
       this.withdrawalForm.controls['end'].updateValueAndValidity();
@@ -204,6 +227,15 @@ this.savingPots.clientSavings = (this.savingPots.clientSavings || [])
       this.withdrawalForm.controls['end'].addValidators(Validators.required);
       this.withdrawalForm.controls['end'].updateValueAndValidity();
     }
+
+    const escalationControl = this.withdrawalForm.get('escalationRate');
+
+    if (isOneOff) {
+      escalationControl?.clearValidators();
+    } else {
+      escalationControl?.setValidators(Validators.required);
+    }
+    escalationControl?.updateValueAndValidity();
   }
 
   addExpense(): void {
