@@ -72,15 +72,6 @@ export class ViewTimelineChartComponent implements OnInit {
     private settingHttpService: SettingsHttpService
   ) { 
     this.updateTimelines = new EventEmitter<boolean>();
-        this.settingHttpService.getEscalationRates(
-             this.client.id
-            ).subscribe((escalationRatesResponse) => {
-              this.escalationRates = escalationRatesResponse.escalationRates;
-            })
-
-            this.settingHttpService.getAmountCycles().subscribe((cycles) => {
-              this.amountCycles = cycles;
-            });
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -96,6 +87,23 @@ export class ViewTimelineChartComponent implements OnInit {
   ngOnInit() {
     this.initTimelineContainer();
     this.getTimelineEventsLibrary();
+  }
+
+   ngAfterViewInit() {
+    this.settingHttpService
+      .getEscalationRates(this.client.id)
+      .subscribe((escalationRatesResponse) => {
+        escalationRatesResponse = escalationRatesResponse ?? {escalationRates: []};
+        this.escalationRates = escalationRatesResponse.escalationRates;
+      }
+    );
+
+    this.settingHttpService
+      .getAmountCycles()
+      .subscribe((cycles) => {
+        this.amountCycles = cycles;
+      }
+    );
   }
 
   getTimelineEventsLibrary() {
