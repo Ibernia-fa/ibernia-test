@@ -87,7 +87,7 @@
             <label>Inflation rate:</label>
             <img src="../../../assets/images/svgs/help-circle-icon.svg" width="19" alt="">
         </div>
-            <div class="slider-customizer slider-wrapper">
+            <!-- <div class="slider-customizer slider-wrapper">
                <mat-slider class="w-100">
                   <input value="30"  matSliderThumb>
                </mat-slider>
@@ -96,9 +96,37 @@
                <div class="w-100 form-field">
                   <input style="width:65px ;" placeholder="No." value="8.5%" />
                </div>
-            </div>
+            </div> -->
+
+            <!-- Slider -->
+<mat-slider class="w-100" [min]="0" [max]="sliderMax" [step]="sliderStep">
+  <input
+    matSliderThumb
+    [(ngModel)]="inflationRate"
+    (ngModelChange)="onRateChange($event)"
+  />
+</mat-slider>
+
+<!-- Number input -->
+<div class="percentage-field">
+  <div class="w-100 form-field">
+    <mat-form-field appearance="outline" class="w-full w-100 percentage-icon">
+      <span matSuffix>%</span>
+      <input
+        matInput
+        type="number"
+        class="p-0"
+        [(ngModel)]="inflationRate"
+        [step]="sliderStep"
+        min="0"
+        (ngModelChange)="onRateChange($event)"
+      />
+    </mat-form-field>
+  </div>
+</div>
+
          </div>
-         <button class="button-icon"><span>Compare plans</span></button>
+         <button class="button-icon" (click)="onComparePlansClicked()"><span>Compare plans</span></button>
       </div>
    </mat-card-content>
 </mat-card> 
