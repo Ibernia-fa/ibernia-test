@@ -23,7 +23,7 @@
         <!-- Name Field  -->
         <div class="w-100 form-field gap-8">
           <mat-label class="f-s-16 d-block" style="line-height: 18px">Type</mat-label>
-          <div class="select-option hide-arrow">
+          <div class="select-option" [ngClass]="isCashPotEditMode ? 'hide-arrow' : ''">
      <mat-select
   formControlName="name"
   placeholder="Select"

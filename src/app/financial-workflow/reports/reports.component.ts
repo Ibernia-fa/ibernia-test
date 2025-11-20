@@ -202,7 +202,7 @@ cashflows: Cashflow[] = [];
       
   ) {
     this.destroyed$ = new BehaviorSubject<boolean>(false);
-    this.navItemService.currentRouteName = 'Cashflow Model';
+    this.navItemService.currentRouteName = 'Lifetime Plan';
     this.getData();
   }
 

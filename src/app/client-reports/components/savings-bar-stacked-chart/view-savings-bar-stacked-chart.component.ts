@@ -31,7 +31,7 @@ export class ViewSavingsBarStackedChartComponent implements OnChanges {
       ],
       chart: {
         type: "bar",
-        height: 350,
+        height: 450,
         stacked: true,
         toolbar: {
           show: false,

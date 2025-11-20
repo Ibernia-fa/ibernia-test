@@ -659,8 +659,8 @@ export const navItems: NavItem[] = [
   //   route: '',
   // },
   {
-    navCap: 'Cashflow Model',
-    displayName: 'Cashflow Model',
+    navCap: 'Lifetime Plan',
+    displayName: 'Lifetime Plan',
     route: '/cashflows/{cashflowId}/reports'
   },
 ];

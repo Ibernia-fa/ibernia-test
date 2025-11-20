@@ -158,12 +158,25 @@
   line-height: 1.2;
   font-weight: 600;
 }
- ::ng-deep .vis-item.vis-range{
-   width: auto !important;
- }
+//  ::ng-deep .vis-item.vis-range{
+//    width: auto !important;
+//  }
 ::ng-deep .vis-item .vis-delete {
-  top: 55% !important;
-  transform: translateY(-50%);
+top: -2% !important;
+    transform: translateY(-50%);
+    background: #fff;
+    border-radius: 100px;
+    border: 1px solid #ccc;
+    text-align: center;
+    line-height: 20px;
+    height: 20px !important;
+    width: 20px !important;
+    right: -1px !important;
+    background: #fff !important;
+    &:hover{
+    background: #fff !important;
+
+    }
 }
 ::ng-deep .vis-item .vis-item-content {
   display: flex;

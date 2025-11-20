@@ -238,10 +238,15 @@ button {
   justify-content: end !important;
 }
 .apexcharts-legend-series{
+  margin-right: 10px !important;
+  &:last-child{
+    margin-right: 0px !important;
+  }
   .apexcharts-legend-marker{
     height: 12px !important; 
     width: 12px !important;
     overflow: hidden;
+    margin-right: 5px;;
     svg{
       border-radius: 100px;
     }
