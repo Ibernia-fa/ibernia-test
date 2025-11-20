@@ -196,7 +196,7 @@ export class ReportsComponent {
     private navItemService: NavItemService
   ) {
     this.destroyed$ = new BehaviorSubject<boolean>(false);
-    this.navItemService.currentRouteName = 'Goals & Events';
+    this.navItemService.currentRouteName = 'Cashflow Model';
     this.getData();
   }
 
