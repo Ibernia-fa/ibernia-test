@@ -46,6 +46,8 @@ import { CurrencySymbolPipe } from 'src/app/pipe/currency-symbol.pipe';
 import { MatSliderModule } from '@angular/material/slider';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
+import { CashflowHttpService } from 'src/app/clients/services/cashflow-http.service';
+import { ToastrService } from 'ngx-toastr';
 
 
 export interface PeriodicElement {
@@ -184,6 +186,7 @@ export class ReportsComponent {
     new MatTableDataSource(new Array<FundsViewModel>());
   clientBirthDate: Date;
   report: ChartSeries;
+cashflows: Cashflow[] = [];
 
   constructor(
     private timelineHttpService: TimelineHttpService,
@@ -193,7 +196,10 @@ export class ReportsComponent {
     private incomeExpensesHttpService: IncomeExpensesHttpService,
     private withdrawalsContributionsHttpService: WithdrawalsContributionsHttpService,
     private activatedRoute: ActivatedRoute,
-    private navItemService: NavItemService
+    private navItemService: NavItemService,
+      private cashflowHttpService: CashflowHttpService,
+          private toaster: ToastrService,
+      
   ) {
     this.destroyed$ = new BehaviorSubject<boolean>(false);
     this.navItemService.currentRouteName = 'Cashflow Model';
@@ -213,6 +219,7 @@ export class ReportsComponent {
           this.cashflow = cashflow as Cashflow;
         }),
         switchMap(([client, cashflow]) => {
+        const clientId = (client as Client).id;
           return combineLatest([
             this.savingPotsHttpService.getAllSavingsPots(
               (cashflow as Cashflow).id
@@ -228,14 +235,16 @@ export class ReportsComponent {
             ),
             this.reportsHttpService.getReportbyCashflowId(
               (cashflow as Cashflow).id
-            )
+            ),
+              this.cashflowHttpService.getByClientId(clientId),
           ]);
         }),
-        tap(([savingPots, timeline, incomeExpense, contributionWithdrawal, report]) => {
+        tap(([savingPots, timeline, incomeExpense, contributionWithdrawal, report, cashflows]) => {
           this.financialTimeline = timeline;
           this.clientBirthDate = this.client.clientDetails.birthDate;
           this.savingPots = savingPots;
           this.incomeExpense = incomeExpense;
+           this.cashflows = cashflows as Cashflow[];
           this.contributionWithdrawal = contributionWithdrawal;
           
           this.incomeDataSource = new MatTableDataSource(
@@ -258,4 +267,18 @@ export class ReportsComponent {
       )
       .subscribe();
   }
+
+  onComparePlansClicked() {
+  if (!this.cashflows || this.cashflows.length < 2) {
+    this.toaster.info(
+      'You need at least two plans to compare. Please create another plan first.',
+      'Info'
+    );
+    return;
+  }
+
+  // Otherwise, proceed with your comparison logic
+  // e.g. this.router.navigate(['/compare', this.clientId]);
+}
+
 }
