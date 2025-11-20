@@ -660,6 +660,7 @@ export const navItems: NavItem[] = [
   // },
   {
     navCap: 'Cashflow Model',
+    displayName: 'Cashflow Model',
     route: '/cashflows/{cashflowId}/reports'
   },
 ];
