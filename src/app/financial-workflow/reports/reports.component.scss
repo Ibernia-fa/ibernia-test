@@ -26,7 +26,7 @@
 .stats-main-wrapper {
   .saving-title {
     font-size: 20px;
-    line-height: 36px;
+    line-height: 20px;
     font-weight: 700;
   }
   .badge {
@@ -326,8 +326,8 @@ tr.example-detail-row {
 
 // Cashflow Styles
 .cashflow-grid {
-  display: grid;
-  grid-template-columns: 1fr 1.5px 1fr 1.5px 1fr;
+  display: flex;
+  justify-content: space-between;
   gap: 24px;
 }
 // End Cashflow Styles
@@ -349,4 +349,10 @@ tr.example-detail-row {
   &:hover{
     background-color: #f7f7f7;
   }
+}
+.col-red{
+  color: #ff0000;
+}
+.col-green{
+  color: green;
 }

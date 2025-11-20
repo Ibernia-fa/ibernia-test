@@ -529,7 +529,7 @@ escalationRate: selectedEscalationRateValue !== null && selectedEscalationRateVa
     { value: '2', viewValue: '3' },
   ];
 
-  cycles: string[] = ['One-off', 'Every month', 'Every years'];
+  cycles: string[] = ['One-off', 'Every month', 'Every year'];
   currencySymbols: string[] = ['$', '£', '€'];
 
   events: string[] = ['$', '£', '€'];
