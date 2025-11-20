@@ -212,11 +212,45 @@ button {
   font-family: 'Ubuntu' !important;
       font-weight: 600 !important;
 }
-.apexcharts-text tspan{
-font-weight: 400 !important;
+.apexcharts-yaxis{
+  .apexcharts-yaxis-texts-g{
+
+    tspan{
+      font-weight: bold;
+      fill: #d7dbe0;
+    }
+  }
 }
 
+.apexcharts-xaxis{
+  .apexcharts-xaxis-texts-g{
+    text{
+          text-anchor: start;
+    }
+    tspan{
+      font-weight: bold;
+      fill: #d7dbe0;
+    }
+  }
+}
+.apexcharts-legend.apx-legend-position-bottom.apexcharts-align-center, 
+.apexcharts-legend.apx-legend-position-top.apexcharts-align-center{
+  justify-content: end !important;
+}
+.apexcharts-legend-series{
+  .apexcharts-legend-marker{
+    height: 12px !important; 
+    width: 12px !important;
+    overflow: hidden;
+    svg{
+      border-radius: 100px;
+    }
+  }
+}
+.apexcharts-legend-text {
 
+    color: #2a3547 !important;
+}
 /* Hide all minor labels first */
 .vis-panel .vis-time-axis .vis-text.vis-minor {
   display: none;

@@ -14,7 +14,7 @@
                             <!-- End Icon  -->
                             <!-- headings  -->
                             <div class="d-flex flex-column justify-content-between gap-4">
-                                <h4 class="page-title f-w-500">Reports</h4>
+                                <h4 class="page-title f-w-500">Lifetime Plan</h4>
                                 <span class="sub-title">{{client.clientDetails.firstName}} {{client.clientDetails.lastName}}</span>
                             </div>
                             <!-- End headings  -->
@@ -29,34 +29,48 @@
         </mat-card-content>
     </mat-card>
     
-    <mat-card class="cardWithShadow">
-        <mat-card-content>
-            <div class="d-flex flex-column gap-32">
-                <h3 class="f-w-400 sec-title">Cashflow model</h3>
-                <div class="cashflow-stats">
+
+ <div class="cashflow-stats">
                     <div class="cashflow-grid">
                         <div class="stats-main-wrapper">
-                            <div class="d-flex flex-column gap-8">
+                            <div class="d-flex align-items-center gap-8">
                                 <h3 class="card-title">Savings at start (age 58):</h3>
                                 <h3 class="saving-title">£1,281,000</h3>
                             </div>
                         </div>
                         <div class="divider"></div>
                         <div class="stats-main-wrapper">
-                            <div class="d-flex flex-column gap-8">
+                            <div class="d-flex align-items-center gap-8">
                                 <h3 class="card-title">Savings at retirement (age 60):</h3>
                                 <h3 class="saving-title">£1,314,562</h3>
                             </div>
                         </div>
                         <div class="divider"></div>
                         <div class="stats-main-wrapper">
-                            <div class="d-flex flex-column gap-8">
+                            <div class="d-flex align-items-center gap-8">
                                 <h3 class="card-title">Savings at end (age 100):</h3>
                                 <h3 class="saving-title">£141,459</h3>
                             </div>
                         </div>
                     </div>
                 </div>
+
+
+
+
+
+
+    <mat-card class="cardWithShadow">
+        <mat-card-content>
+
+
+<button matTooltip="Full screen"
+         class="button-full-screen"><img width="20" src="../../../assets/images/svgs/full-screen.svg" alt=""></button>
+
+
+            
+            <div class="d-flex flex-column gap-32">
+               
                 <app-savings-bar-stacked-chart [report]="report" [client]="client"
                 [forecastStartDate]="financialTimeline.forecastStartDate" [forecastEndDate]="financialTimeline.forecastEndtDate"></app-savings-bar-stacked-chart>
             </div>
@@ -84,7 +98,7 @@
                </div>
             </div>
          </div>
-         <button class="button-icon"><span>Compare models</span></button>
+         <button class="button-icon"><span>Compare plans</span></button>
       </div>
    </mat-card-content>
 </mat-card> 

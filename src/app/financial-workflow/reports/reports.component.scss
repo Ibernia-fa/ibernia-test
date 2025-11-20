@@ -4,6 +4,10 @@
   border: 1px solid #e7e7eb;
   border-radius: 12px;
   padding: 24px;
+  background-color: #fff;
+  .card-title{
+    font-size: 14px;
+  }
 }
 .sec-title {
   font-size: 20px;
@@ -21,7 +25,7 @@
 
 .stats-main-wrapper {
   .saving-title {
-    font-size: 24px;
+    font-size: 20px;
     line-height: 36px;
     font-weight: 700;
   }
@@ -185,7 +189,7 @@
     }
   }
   .saving-title {
-    font-size: 24px;
+    font-size: 20px;
     line-height: 30px;
     color: #1c1c1c;
     font-weight: 700;
@@ -330,4 +334,19 @@ tr.example-detail-row {
 
 .slider-wrapper{
     width: 250px;
+}
+.button-full-screen{
+     padding: 5px 8px;
+    border-radius: 4px;
+    border: none;
+    position: absolute;
+    display: flex;
+    cursor: pointer;
+    background: none;
+    left: 16px;
+    top: 20px;
+    z-index: 99;
+  &:hover{
+    background-color: #f7f7f7;
+  }
 }

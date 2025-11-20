@@ -7,11 +7,16 @@ import { MatSliderModule } from '@angular/material/slider';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { AddEmergenciesComponent } from './add-emergencies/add-emergencies.component';
+import {MatChipsModule} from '@angular/material/chips';
+import {MatIconModule} from '@angular/material/icon';
+
 @Component({
   selector: 'app-emergencies',
    imports: [
       MatSliderModule,
-  MatCardModule
+      MatIconModule,
+  MatCardModule,
+  MatChipsModule
     ],
 
   templateUrl: './emergencies.component.html',

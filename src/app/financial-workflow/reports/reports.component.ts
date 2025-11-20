@@ -44,7 +44,7 @@ import { ReportsHttpService } from './services/reports-http.service';
 import { ChartSeries } from './models/charts-series.model';
 import { CurrencySymbolPipe } from 'src/app/pipe/currency-symbol.pipe';
 import { MatSliderModule } from '@angular/material/slider';
-
+import {MatTooltipModule} from '@angular/material/tooltip';
 import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 
 
@@ -147,6 +147,7 @@ const ELEMENT_DATA: PeriodicElement[] = [
     MatTableModule,
     CommonModule,
     CurrencySymbolPipe,
+    MatTooltipModule,
     ThousandSeparatorPipe
   ],
   templateUrl: './reports.component.html',
