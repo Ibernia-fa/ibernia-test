@@ -44,10 +44,11 @@ import { ReportsHttpService } from './services/reports-http.service';
 import { ChartSeries } from './models/charts-series.model';
 import { CurrencySymbolPipe } from 'src/app/pipe/currency-symbol.pipe';
 import { MatSliderModule } from '@angular/material/slider';
-import {MatTooltipModule} from '@angular/material/tooltip';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { CashflowHttpService } from 'src/app/clients/services/cashflow-http.service';
 import { ToastrService } from 'ngx-toastr';
+import { FormBuilder } from '@angular/forms';
 
 
 export interface PeriodicElement {
@@ -174,19 +175,20 @@ export class ReportsComponent {
   savingPots: SavingPotsModel;
   incomeExpense: IncomeExpense;
   contributionWithdrawal: WithdrawalsContributions
-  
+
   incomeDataSource: MatTableDataSource<FinancialViewModel> =
     new MatTableDataSource(new Array<FinancialViewModel>());
   expenseDataSource: MatTableDataSource<FinancialViewModel> =
     new MatTableDataSource(new Array<FinancialViewModel>());
-  
+
   contributionDataSource: MatTableDataSource<FundsViewModel> =
     new MatTableDataSource(new Array<FundsViewModel>());
   withdrawalDataSource: MatTableDataSource<FundsViewModel> =
     new MatTableDataSource(new Array<FundsViewModel>());
   clientBirthDate: Date;
   report: ChartSeries;
-cashflows: Cashflow[] = [];
+  cashflows: Cashflow[] = [];
+  savingsForm: any;
 
   constructor(
     private timelineHttpService: TimelineHttpService,
@@ -197,13 +199,17 @@ cashflows: Cashflow[] = [];
     private withdrawalsContributionsHttpService: WithdrawalsContributionsHttpService,
     private activatedRoute: ActivatedRoute,
     private navItemService: NavItemService,
-      private cashflowHttpService: CashflowHttpService,
-          private toaster: ToastrService,
-      
+    private cashflowHttpService: CashflowHttpService,
+    private toaster: ToastrService,
+    private fb: FormBuilder,
+
   ) {
     this.destroyed$ = new BehaviorSubject<boolean>(false);
     this.navItemService.currentRouteName = 'Lifetime Plan';
     this.getData();
+    this.savingsForm = this.fb.group({
+      returnRate: [10]
+    });
   }
 
   getData() {
@@ -219,7 +225,7 @@ cashflows: Cashflow[] = [];
           this.cashflow = cashflow as Cashflow;
         }),
         switchMap(([client, cashflow]) => {
-        const clientId = (client as Client).id;
+          const clientId = (client as Client).id;
           return combineLatest([
             this.savingPotsHttpService.getAllSavingsPots(
               (cashflow as Cashflow).id
@@ -236,7 +242,7 @@ cashflows: Cashflow[] = [];
             this.reportsHttpService.getReportbyCashflowId(
               (cashflow as Cashflow).id
             ),
-              this.cashflowHttpService.getByClientId(clientId),
+            this.cashflowHttpService.getByClientId(clientId),
           ]);
         }),
         tap(([savingPots, timeline, incomeExpense, contributionWithdrawal, report, cashflows]) => {
@@ -244,16 +250,16 @@ cashflows: Cashflow[] = [];
           this.clientBirthDate = this.client.clientDetails.birthDate;
           this.savingPots = savingPots;
           this.incomeExpense = incomeExpense;
-           this.cashflows = cashflows as Cashflow[];
+          this.cashflows = cashflows as Cashflow[];
           this.contributionWithdrawal = contributionWithdrawal;
-          
+
           this.incomeDataSource = new MatTableDataSource(
             this.incomeExpense?.incomes
           );
           this.expenseDataSource = new MatTableDataSource(
             this.incomeExpense?.expenses
           );
-          
+
           this.contributionDataSource = new MatTableDataSource(
             this.contributionWithdrawal?.contributions
           );
@@ -269,16 +275,35 @@ cashflows: Cashflow[] = [];
   }
 
   onComparePlansClicked() {
-  if (!this.cashflows || this.cashflows.length < 2) {
-    this.toaster.info(
-      'You need at least two plans to compare. Please create another plan first.',
-      'Info'
-    );
-    return;
+    if (!this.cashflows || this.cashflows.length < 2) {
+      this.toaster.info(
+        'You need at least two plans to compare. Please create another plan first.',
+        'Info'
+      );
+      return;
+    }
   }
 
-  // Otherwise, proceed with your comparison logic
-  // e.g. this.router.navigate(['/compare', this.clientId]);
-}
+  onReturnRateInput(event: Event) {
+    // when typing, ensure the control holds a number (so slider updates smoothly)
+    const raw = (event.target as HTMLInputElement).value;
+    const num = Number(raw);
+    const val = isNaN(num) ? 0 : this.round2(num);
+    this.savingsForm.get('returnRate')?.setValue(val, { emitEvent: true });
+
+  }
+
+  onSliderInput(event: Event): void {
+    const inputElement = event.target as HTMLInputElement;
+    const value = Number(inputElement.value);
+
+    const val = isNaN(value) ? 0 : this.round2(value);
+    this.savingsForm.get('returnRate')?.setValue(val, { emitEvent: true });
+  }
+
+  private round2(n: number): number {
+    return Math.round((n + Number.EPSILON) * 100) / 100;
+  }
+
 
 }
