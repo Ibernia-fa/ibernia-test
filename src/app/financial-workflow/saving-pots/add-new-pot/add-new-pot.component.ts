@@ -607,6 +607,30 @@ onEscalationRateChange(event: MatSelectChange): void {
               ? this.savingsForm.get('start')?.value
               : 0,
         },
+        lockedFrom: {
+          age:
+            this.savingsForm.get('start')?.value !== null &&
+            this.savingsForm.get('start')?.value !== ''
+              ? this.savingsForm.get('start')?.value - this.clientBirthYear
+              : 0,
+          year:
+            this.savingsForm.get('start')?.value !== null &&
+            this.savingsForm.get('start')?.value !== ''
+              ? this.savingsForm.get('start')?.value
+              : 0,
+        },
+        lockedTill: {
+          age:
+            this.savingsForm.get('end')?.value !== null &&
+            this.savingsForm.get('end')?.value !== ''
+              ? this.savingsForm.get('end')?.value - this.clientBirthYear
+              : 0,
+          year:
+            this.savingsForm.get('end')?.value !== null &&
+            this.savingsForm.get('end')?.value !== ''
+              ? this.savingsForm.get('end')?.value
+              : 0,
+        },
         end: {
           age:
             this.savingsForm.get('end')?.value !== null &&

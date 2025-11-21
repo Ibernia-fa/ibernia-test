@@ -42,6 +42,8 @@ export interface ClientSaving {
   hasPotLocked: true;
   start: AgeYear;
   end: AgeYear;
+  lockedFrom: AgeYear;
+  lockedTill : AgeYear;
   hasCommission: boolean;
   comission: Comission;
   orderNumber: number;
