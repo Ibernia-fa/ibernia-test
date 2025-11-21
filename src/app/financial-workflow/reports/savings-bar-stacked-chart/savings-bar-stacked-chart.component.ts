@@ -25,13 +25,20 @@ export class SavingsBarStackedChartComponent implements OnChanges {
 
   public chartOptions: any;
 
+
+
+
+
+
+
   constructor() {
     this.chartOptions = {
+      
       series: [
       ],
       chart: {
         type: "bar",
-        height: 350,
+        height: 500,
         stacked: true,
         toolbar: {
           show: false,
@@ -64,7 +71,7 @@ export class SavingsBarStackedChartComponent implements OnChanges {
         show: true,
         xaxis: {
           lines: {
-              show: true
+              show: false
           }
         },   
         yaxis: {
@@ -80,7 +87,7 @@ export class SavingsBarStackedChartComponent implements OnChanges {
         stepSize: 5, // Each year is a distinct tick
         tickAmount: 19,
         title: {
-          text: 'Year'
+          text: 'Age'
         },
         offsetX:-10,
         style: {
@@ -147,7 +154,7 @@ export class SavingsBarStackedChartComponent implements OnChanges {
         stepSize: 5, // Each year is a distinct tick
         tickAmount: Math.floor((moment(this.forecastEndDate).year() - moment(this.forecastStartDate).year()) / 5),
         title: {
-          text: 'Year'
+          text: 'Age'
         },
         offsetX:-10,
         style: {
