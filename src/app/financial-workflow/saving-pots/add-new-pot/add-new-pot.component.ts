@@ -161,7 +161,6 @@ export class AddNewPotComponent {
       const element = data.forecastStartDateYear + index;
       this.years.push(element);
     }
-
     this.savingsForm = this.fb.group({
       name: ['', Validators.required],
       currency: [this.clientPreferredCurrency, Validators.required],
@@ -257,8 +256,8 @@ onAmountBlur(e: Event) {
   { emitEvent: false }
 );
     this.savingsForm.get('lockPot')?.patchValue(this.selectedPot.hasPotLocked, { emitEvent: false });
-    this.savingsForm.get('start')?.patchValue(this.selectedPot.start.year, { emitEvent: false });
-    this.savingsForm.get('end')?.patchValue(this.selectedPot.end.year, { emitEvent: false });
+    this.savingsForm.get('start')?.patchValue(this.selectedPot.lockedFrom?.year, { emitEvent: false });
+    this.savingsForm.get('end')?.patchValue(this.selectedPot.lockedTill?.year, { emitEvent: false });
     this.savingsForm.get('commissions')?.patchValue(this.selectedPot.hasCommission, { emitEvent: false });
 
     let selectedComissionType = 'amount';
@@ -516,6 +515,7 @@ onEscalationRateChange(event: MatSelectChange): void {
   const real = this.savingsForm.get('name')?.value !== 'Cash'
     ? this.round2(rr - this.inflationRate)
     : 0;
+    const isPotLocked = this.savingsForm.get('lockPot')?.value;
     if (this.savingsForm.valid) {
       var clientSaving: ClientSaving = {
         id: this.isEditWorkflow ? this.selectedPot.id : null,
@@ -597,50 +597,46 @@ onEscalationRateChange(event: MatSelectChange): void {
           : 'custom-option-icon',
         start: {
           age:
-            this.savingsForm.get('start')?.value !== null &&
-            this.savingsForm.get('start')?.value !== ''
-              ? this.savingsForm.get('start')?.value - this.clientBirthYear
+            this.forecastStartDateYear != null
+              ? this.forecastStartDateYear - this.clientBirthYear
               : 0,
           year:
-            this.savingsForm.get('start')?.value !== null &&
-            this.savingsForm.get('start')?.value !== ''
-              ? this.savingsForm.get('start')?.value
+            this.forecastStartDateYear != null
+              ? this.forecastStartDateYear
               : 0,
         },
         lockedFrom: {
           age:
-            this.savingsForm.get('start')?.value !== null &&
+            isPotLocked && this.savingsForm.get('start')?.value !== null &&
             this.savingsForm.get('start')?.value !== ''
               ? this.savingsForm.get('start')?.value - this.clientBirthYear
               : 0,
           year:
-            this.savingsForm.get('start')?.value !== null &&
+            isPotLocked &&  this.savingsForm.get('start')?.value !== null &&
             this.savingsForm.get('start')?.value !== ''
               ? this.savingsForm.get('start')?.value
               : 0,
         },
         lockedTill: {
           age:
-            this.savingsForm.get('end')?.value !== null &&
+             isPotLocked && this.savingsForm.get('end')?.value !== null &&
             this.savingsForm.get('end')?.value !== ''
               ? this.savingsForm.get('end')?.value - this.clientBirthYear
               : 0,
           year:
-            this.savingsForm.get('end')?.value !== null &&
+             isPotLocked && this.savingsForm.get('end')?.value !== null &&
             this.savingsForm.get('end')?.value !== ''
               ? this.savingsForm.get('end')?.value
               : 0,
         },
         end: {
           age:
-            this.savingsForm.get('end')?.value !== null &&
-            this.savingsForm.get('end')?.value !== ''
-              ? this.savingsForm.get('end')?.value - this.clientBirthYear
+            this.forecastEndDateYear != null
+              ? this.forecastEndDateYear - this.clientBirthYear
               : 0,
           year:
-            this.savingsForm.get('end')?.value !== null &&
-            this.savingsForm.get('end')?.value !== ''
-              ? this.savingsForm.get('end')?.value
+            this.forecastEndDateYear != null
+              ? this.forecastEndDateYear
               : 0,
         },
         // returnRate: this.savingsForm.get('name')?.value !== 'Cash' ? this.savingsForm.get('returnRate')?.value : 0,
