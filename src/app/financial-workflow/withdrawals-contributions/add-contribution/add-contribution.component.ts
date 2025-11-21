@@ -214,23 +214,23 @@ if (type === 1) {
       this.onCycleValueChange(this.selectedContribution.amount.cycle?.id);
     }
 
-    const matchedEscalation = this.escalationRates.find(x => x.value === this.selectedContribution.escalationRate?.value);
+    const matchedEscalation = this.escalationRates.find(x => x.value === this.selectedContribution?.escalationRate?.value);
       
       if (matchedEscalation) {
         this.contributionForm.get('escalationRate')?.patchValue(matchedEscalation.value);
         this.selectedEscalationDescription = matchedEscalation.description;
       } else if (
-        this.selectedContribution.escalationRate &&
-        this.selectedContribution.escalationRate.description === 'Increases at custom rate'
+        this.selectedContribution?.escalationRate &&
+        this.selectedContribution?.escalationRate.description === 'Increases at custom rate'
       ) {
         this.escalationRates = this.escalationRates.filter(x => x.description !== 'Increases at custom rate')
         this.escalationRates.push({ 
           description: 'Increases at custom rate', 
-          value: this.selectedContribution.escalationRate.value
+          value: this.selectedContribution?.escalationRate.value
         });
 
-        this.contributionForm.get('escalationRate')?.patchValue(this.selectedContribution.escalationRate.value);
-        this.contributionForm.get('customEscalationRate')?.patchValue(this.selectedContribution.escalationRate.value);
+        this.contributionForm.get('escalationRate')?.patchValue(this.selectedContribution?.escalationRate.value);
+        this.contributionForm.get('customEscalationRate')?.patchValue(this.selectedContribution?.escalationRate.value);
         this.selectedEscalationDescription = 'Increases at custom rate';
         
         // Trigger validators for custom rate

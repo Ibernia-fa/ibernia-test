@@ -150,7 +150,7 @@ export class AddWithdrawalComponent {
         ?.patchValue(this.selectedWithdrawal.start.year);
       this.withdrawalForm.get('end')?.patchValue(this.selectedWithdrawal.end.year);
 
-      const matchedEscalation = this.escalationRates.find(x => x.value === this.selectedWithdrawal.escalationRate?.value);
+      const matchedEscalation = this.escalationRates.find(x => x.value === this.selectedWithdrawal?.escalationRate?.value);
       
       if (matchedEscalation) {
         this.withdrawalForm.get('escalationRate')?.patchValue(matchedEscalation.value);
