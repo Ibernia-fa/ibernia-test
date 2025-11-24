@@ -85,7 +85,7 @@ export class ClientAddComponent {
       gender: [''],
       country: [''],
       currency: [''],
-      email: ['', [Validators.email]],
+      email: ['', [Validators.email, Validators.required]],
       inflationRate: [2.5, [Validators.required, Validators.min(0), Validators.max(100)]],
       phone: [''],
       notes: [''],
@@ -166,8 +166,8 @@ export class ClientAddComponent {
     if (visible) {
       partnerGroup.get('lastName')?.setValidators(Validators.required);
       partnerGroup.get('firstName')?.setValidators(Validators.required);
-
       partnerGroup.get('dob')?.setValidators(Validators.required);
+      partnerGroup.get('email')?.setValidators(Validators.required);
 
     const clientCountryName = this.clientForm.get('country')?.value as string | null;
     const clientCurrency    = this.clientForm.get('currency')?.value as string | null;
@@ -210,10 +210,19 @@ export class ClientAddComponent {
   get isFormInvalid() {
     const partnerGroup = this.clientForm.get('partner') as FormGroup;
     if(this.showPartner) {
-      return this.clientForm.controls['firstName'].invalid  || this.clientForm.controls['lastName'].invalid || this.clientForm.controls['dob'].invalid || 
-      partnerGroup.controls['firstName'].invalid || partnerGroup.controls['lastName'].invalid || partnerGroup.controls['dob'].invalid
+      return this.clientForm.controls['firstName'].invalid
+        || this.clientForm.controls['lastName'].invalid
+        || this.clientForm.controls['dob'].invalid
+        || this.clientForm.controls['email'].invalid
+        || partnerGroup.controls['firstName'].invalid
+        || partnerGroup.controls['lastName'].invalid
+        || partnerGroup.controls['dob'].invalid
+        || partnerGroup.controls['email'].invalid
     }
-    return this.clientForm.controls['firstName'].invalid || this.clientForm.controls['lastName'].invalid || this.clientForm.controls['dob'].invalid
+    return this.clientForm.controls['firstName'].invalid
+      || this.clientForm.controls['lastName'].invalid
+      || this.clientForm.controls['dob'].invalid
+      || this.clientForm.controls['email'].invalid
   }
 
 

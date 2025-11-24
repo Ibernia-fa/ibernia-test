@@ -67,7 +67,12 @@ export class ShareReportComponent {
         tap(([client, cashflow]) => {
           this.client = client as Client;
           this.cashflow = cashflow as Cashflow;
-          this.clientName = this.client.clientDetails?.firstName + " " + this.client.clientDetails.lastName;
+
+          const first = this.client.clientDetails?.firstName || '';
+          const last = this.client.clientDetails?.lastName || '';
+          this.clientName = `${first.charAt(0).toUpperCase()}${first.slice(1).toLowerCase()} ` +
+            `${last.charAt(0).toUpperCase()}${last.slice(1).toLowerCase()}`;
+          
           this.clientEmail = this.client.clientDetails?.email;
           this.clientId = this.client.id;
           this.cashflowId = this.cashflow.id;
@@ -99,7 +104,7 @@ export class ShareReportComponent {
       next: (response) => {
         this.isLoaderVisible = false;
         this.toastr.success(
-          `Link and password successfully sent to ${this.clientName || 'client'}.`
+          `Link and password successfully sent to ${this.clientName || 'client'}`
         );
         this.dialogRef.close(true);
       },

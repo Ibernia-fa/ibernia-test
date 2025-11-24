@@ -261,7 +261,10 @@
               <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">Email</mat-label>
               <input matInput placeholder="email@somedomain.com" formControlName="email" />
               @if(clientForm.get('partner.email')?.hasError('email')) {
-              <mat-error>Invalid Email Address</mat-error>
+                <mat-error>Invalid Email Address</mat-error>
+              }
+              @if(clientForm.get('partner.email')?.touched && clientForm.get('partner.email')?.hasError('required')) {
+                <span class="field-error d-block">Required</span>
               }
             </div>
           </div>
