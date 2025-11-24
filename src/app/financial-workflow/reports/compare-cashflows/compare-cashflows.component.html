@@ -1,5 +1,38 @@
-      <button (click)="closeDialog()" type="button">
+     <div class="d-flex flex-column gap-32">
+      <div class="d-flex align-items-center justify-content-between gap-10 modal-header">
+        <h3>Compare models</h3>
+        <button (click)="closeDialog()" type="button">
         <img src="assets/images/svgs/close-line-cion.svg" alt="close-line-cion" />
       </button>
+      </div>
 
-<p>compare-cashflows works!</p>
+      <div class="custom-body">
+        <p class="f-s-16 m-t-0">Select 2 models to compare</p>
+          <div class="d-flex align-items-center border-wraper">
+              <mat-checkbox>Cashflow Simulator #1</mat-checkbox>
+          </div>
+             <div class="d-flex align-items-center  border-wraper">
+              <mat-checkbox>Cashflow Simulator #2</mat-checkbox>
+          </div>
+ <div class="d-flex align-items-center  border-wraper">
+              <mat-checkbox>Cashflow Simulator #3</mat-checkbox>
+          </div>
+          
+   </div>
+
+       <div class="row justify-content-between modal-action">
+      <div class="col-5">
+        <button  class="button-icon-outline w-100 d-block">
+          <span class="f-s-16">Cancel</span>
+        </button>
+      </div>
+      <div class="col-5">
+        <button  type="button"  class="button-icon w-100 d-block">
+          <span class="f-s-16">Save</span>
+        </button>
+      </div>
+    </div>
+     </div>
+     
+     
+   
