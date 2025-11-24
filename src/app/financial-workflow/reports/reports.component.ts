@@ -7,7 +7,10 @@ import {
   combineLatestWith,
   filter,
   map,
+  Subject,
   switchMap,
+  take,
+  takeUntil,
   tap,
 } from 'rxjs';
 import { NavItemService } from 'src/app/layouts/full/nav-item.service';
@@ -48,9 +51,10 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { CashflowHttpService } from 'src/app/clients/services/cashflow-http.service';
 import { ToastrService } from 'ngx-toastr';
-import { FormBuilder } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { CompareCashflowsComponent } from './compare-cashflows/compare-cashflows.component';
+import { SettingsService } from 'src/app/default-preferance/services/default-preferance.http.service';
 
 
 export interface PeriodicElement {
@@ -153,7 +157,8 @@ const ELEMENT_DATA: PeriodicElement[] = [
     CommonModule,
     CurrencySymbolPipe,
     MatTooltipModule,
-    ThousandSeparatorPipe
+    ThousandSeparatorPipe,
+     ReactiveFormsModule  
   ],
   templateUrl: './reports.component.html',
   styleUrl: './reports.component.scss',
@@ -177,6 +182,12 @@ export class ReportsComponent {
   savingPots: SavingPotsModel;
   incomeExpense: IncomeExpense;
   contributionWithdrawal: WithdrawalsContributions
+// in ReportsComponent class
+
+compareCashflow: Cashflow | null = null;
+compareReport: ChartSeries | null = null;
+compareTimeline: FinancialTimeline | null = null;
+isCompareLoading = false;
 
   incomeDataSource: MatTableDataSource<FinancialViewModel> =
     new MatTableDataSource(new Array<FinancialViewModel>());
@@ -190,7 +201,9 @@ export class ReportsComponent {
   clientBirthDate: Date;
   report: ChartSeries;
   cashflows: Cashflow[] = [];
-  savingsForm: any;
+  savingsForm: FormGroup;
+  userRerturnRate: number;
+      private destroy$ = new Subject<void>();
 
   constructor(
     private timelineHttpService: TimelineHttpService,
@@ -204,15 +217,36 @@ export class ReportsComponent {
     private cashflowHttpService: CashflowHttpService,
     private toaster: ToastrService,
     private fb: FormBuilder,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+         private settingsService: SettingsService
 
   ) {
     this.destroyed$ = new BehaviorSubject<boolean>(false);
     this.navItemService.currentRouteName = 'Lifetime Plan';
-    this.getData();
-    this.savingsForm = this.fb.group({
-      returnRate: [10]
+  this.savingsForm = this.fb.group({
+    returnRate: [0]
+  });
+
+  this.settingsService.userData$
+    .pipe(
+      filter((v): v is NonNullable<typeof v> => v != null),
+      // we only need it once here
+      // (if you want to react to later changes too, remove take(1))
+      take(1)
+    )
+    .subscribe((data) => {
+      const p = data.preferences;
+      this.userRerturnRate = p.investmentReturn;
+
+      this.savingsForm
+        .get('returnRate')
+        ?.setValue(this.userRerturnRate, { emitEvent: false });
+
+      // now that the form has the correct default, load everything
+      this.getData();
     });
+
+
   }
 
   getData() {
@@ -229,6 +263,8 @@ export class ReportsComponent {
         }),
         switchMap(([client, cashflow]) => {
           const clientId = (client as Client).id;
+          const inflationRate =
+          this.savingsForm.get('returnRate')?.value;
           return combineLatest([
             this.savingPotsHttpService.getAllSavingsPots(
               (cashflow as Cashflow).id
@@ -243,7 +279,8 @@ export class ReportsComponent {
               (cashflow as Cashflow).id
             ),
             this.reportsHttpService.getReportbyCashflowId(
-              (cashflow as Cashflow).id
+              (cashflow as Cashflow).id,
+              inflationRate
             ),
             this.cashflowHttpService.getByClientId(clientId),
           ]);
@@ -277,58 +314,73 @@ export class ReportsComponent {
       .subscribe();
   }
 
-  onComparePlansClicked() {
-    if (!this.cashflows || this.cashflows.length < 2) {
-      this.toaster.info(
-        'You need at least two plans to compare. Please create another plan first.',
-        'Info'
-      );
-      return;
-    }
-    else{
-    const dialogRef = this.dialog.open(CompareCashflowsComponent, {
-      width: '700px',
-      disableClose: true,
-      // data: {
-      //   returnRate: this.userRerturnRate,
-      //   inflationRate: this.clientData?.inflationRate,
-      //   loggedInUserPreferences : this.loggedInUserPreferences,
-      //   amountCycles: this.amountCycles,
-      //   escalataionRates: this.escalationRates,
-      //   eventsList: this.timeline.clientEvents.sort((a, b) => a.start.age - b.start.age),
-      //   clientBirthDate: this.selectedClient?.clientDetails.birthDate,
-      //   clientPreferredCurrency:
-      //     this.selectedClient?.clientDetails.preferredCurrency,
-      //   forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
-      //   forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
-      //   cashflowId: this.selectedCashflow?.id,
-      //   isEditWorkflow: true,
-      //   event: event
-      // },
-    });
-
-    dialogRef.afterClosed().subscribe((result: any) => {
-      // console.log('Dialog closed with result:', result);
-      // this.savingPots = result.savingPot;
-      // this.ensureCashFirst();
-      // this.savingPots.clientSavings.push(result.clientSaving);
-    });
-    }
+onComparePlansClicked() {
+  if (!this.cashflows || this.cashflows.length < 2) {
+    this.toaster.info(
+      'You need at least two plans to compare. Please create another plan first.',
+      'Info'
+    );
+    return;
   }
 
-  onReturnRateInput(event: Event) {
-    // when typing, ensure the control holds a number (so slider updates smoothly)
+  const dialogRef = this.dialog.open(CompareCashflowsComponent, {
+    width: '700px',
+    disableClose: true,
+    data: {
+      cashflows: this.cashflows,
+      baseCashflowId: this.cashflow?.id,
+    },
+  });
+
+  dialogRef.afterClosed().subscribe((selectedOtherId?: string) => {
+    if (!selectedOtherId) {
+      return; // dialog cancelled
+    }
+
+    const selected = this.cashflows.find(c => c.id === selectedOtherId) || null;
+    if (!selected) {
+      this.toaster.error('Selected plan not found.', 'Error');
+      return;
+    }
+
+    this.isCompareLoading = true;
+    this.compareCashflow = null;
+    this.compareReport = null;
+    this.compareTimeline = null;
+
+    combineLatest([
+      this.reportsHttpService.getReportbyCashflowId(selectedOtherId),
+      this.timelineHttpService.getTimelinebyCashflowId(selectedOtherId),
+    ]).subscribe({
+      next: ([report, timeline]) => {
+        this.compareCashflow = selected;
+        this.compareReport = report;
+        this.compareTimeline = timeline;
+        this.isCompareLoading = false;
+      },
+      error: (err) => {
+        console.error('Failed to load comparison plan', err);
+        this.toaster.error(
+          'Failed to load comparison plan. Please try again.',
+          'Error'
+        );
+        this.isCompareLoading = false;
+      },
+    });
+  });
+}
+
+onReturnRateInput(event: Event) {
+    // when typing, ensure the control holds a clean number so slider updates
     const raw = (event.target as HTMLInputElement).value;
     const num = Number(raw);
     const val = isNaN(num) ? 0 : this.round2(num);
     this.savingsForm.get('returnRate')?.setValue(val, { emitEvent: true });
-
   }
 
   onSliderInput(event: Event): void {
     const inputElement = event.target as HTMLInputElement;
     const value = Number(inputElement.value);
-
     const val = isNaN(value) ? 0 : this.round2(value);
     this.savingsForm.get('returnRate')?.setValue(val, { emitEvent: true });
   }
@@ -336,6 +388,39 @@ export class ReportsComponent {
   private round2(n: number): number {
     return Math.round((n + Number.EPSILON) * 100) / 100;
   }
+
+
+onReturnRateCommitted(): void {
+  const control = this.savingsForm.get('returnRate');
+  if (!control) return;
+
+  const num = Number(control.value);
+  const val = isNaN(num) ? 0 : this.round2(num);
+
+  // Normalise the value (e.g. 3.333 → 3.33)
+  control.setValue(val, { emitEvent: false });
+
+  // Make sure we have a cashflow loaded
+  if (!this.cashflow) {
+    return;
+  }
+
+  const cashflowId = this.cashflow.id;
+  const returnRate = val;
+
+
+  this.reportsHttpService
+    .getReportbyCashflowId(cashflowId, returnRate)  // <- you’ll update this service
+    .pipe(
+      tap((report) => {
+        this.report = report;
+      }),
+      // Optional: handle errors gracefully
+      // catchError(err => { console.error(err); return of(null); })
+    )
+    .subscribe();
+}
+
 
 
 }
