@@ -49,6 +49,8 @@ import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { CashflowHttpService } from 'src/app/clients/services/cashflow-http.service';
 import { ToastrService } from 'ngx-toastr';
 import { FormBuilder } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
+import { CompareCashflowsComponent } from './compare-cashflows/compare-cashflows.component';
 
 
 export interface PeriodicElement {
@@ -202,6 +204,7 @@ export class ReportsComponent {
     private cashflowHttpService: CashflowHttpService,
     private toaster: ToastrService,
     private fb: FormBuilder,
+    private dialog: MatDialog
 
   ) {
     this.destroyed$ = new BehaviorSubject<boolean>(false);
@@ -281,6 +284,35 @@ export class ReportsComponent {
         'Info'
       );
       return;
+    }
+    else{
+    const dialogRef = this.dialog.open(CompareCashflowsComponent, {
+      width: '700px',
+      disableClose: true,
+      // data: {
+      //   returnRate: this.userRerturnRate,
+      //   inflationRate: this.clientData?.inflationRate,
+      //   loggedInUserPreferences : this.loggedInUserPreferences,
+      //   amountCycles: this.amountCycles,
+      //   escalataionRates: this.escalationRates,
+      //   eventsList: this.timeline.clientEvents.sort((a, b) => a.start.age - b.start.age),
+      //   clientBirthDate: this.selectedClient?.clientDetails.birthDate,
+      //   clientPreferredCurrency:
+      //     this.selectedClient?.clientDetails.preferredCurrency,
+      //   forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
+      //   forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
+      //   cashflowId: this.selectedCashflow?.id,
+      //   isEditWorkflow: true,
+      //   event: event
+      // },
+    });
+
+    dialogRef.afterClosed().subscribe((result: any) => {
+      // console.log('Dialog closed with result:', result);
+      // this.savingPots = result.savingPot;
+      // this.ensureCashFirst();
+      // this.savingPots.clientSavings.push(result.clientSaving);
+    });
     }
   }
 
