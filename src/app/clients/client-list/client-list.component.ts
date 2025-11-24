@@ -326,7 +326,7 @@ private checkPrefsAndPrompt() {
   applyFilter(filterValue: string): void {
     if (filterValue) {
       this.clientHttpService
-        .searchClients(filterValue)
+        .searchClients(this.user.sub, filterValue)
         .pipe(
           filter((clients) => !!clients),
           map((clients) => {
