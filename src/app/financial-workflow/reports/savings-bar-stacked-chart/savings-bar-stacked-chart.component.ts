@@ -50,6 +50,30 @@ export class SavingsBarStackedChartComponent implements OnChanges {
       dataLabels: {
         enabled: false
       },
+    //       tooltip: {
+    //   enabled: true,
+    //   shared: false, // or true if you want stacked values together
+    //   custom: (opts: any) => {
+    //     const { series, seriesIndex, dataPointIndex, w } = opts;
+
+    //     const value = series[seriesIndex][dataPointIndex];
+    //     const seriesName = w.globals.seriesNames[seriesIndex];
+    //     const xValue = w.globals.labels[dataPointIndex];
+
+    //     // build whatever HTML you want here
+    //     return `
+    //       <div class="savings-tooltip">
+    //         <div class="savings-tooltip__header">
+    //           Age: ${xValue}
+    //         </div>
+    //         <div class="savings-tooltip__body">
+    //           <div class="savings-tooltip__label">${seriesName}</div>
+    //           <div class="savings-tooltip__value">${value.toLocaleString()}</div>
+    //         </div>
+    //       </div>
+    //     `;
+    //   }
+    // },
       responsive: [
         {
           breakpoint: 480,
