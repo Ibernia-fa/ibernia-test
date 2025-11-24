@@ -1,4 +1,31 @@
 .apexcharts-text .apexcharts-xaxis-label {
     text-anchor: start !important;
   }
-  
+  /* styles.scss */
+
+.apexcharts-tooltip .savings-tooltip {
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.18);
+  font-size: 12px;
+}
+
+.apexcharts-tooltip .savings-tooltip__header {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.apexcharts-tooltip .savings-tooltip__body {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.apexcharts-tooltip .savings-tooltip__label {
+  font-weight: 500;
+}
+
+.apexcharts-tooltip .savings-tooltip__value {
+  font-weight: 700;
+}
