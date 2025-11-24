@@ -86,7 +86,7 @@ export class ClientEditComponent {
       gender: [''],
       country: [''],
       currency: [''],
-      email: ['', [Validators.email]],
+      email: ['', [Validators.email, Validators.required]],
       inflationRate: [2.5, [Validators.required, Validators.min(0), Validators.max(100)]],
       phone: [''],
       notes: [''],
@@ -121,10 +121,20 @@ export class ClientEditComponent {
   get isFormInvalid() {
     const partnerGroup = this.clientForm.get('partner') as FormGroup;
     if(this.showPartner) {
-      return this.clientForm.controls['lastName'].invalid || this.clientForm.controls['firstName'].invalid || this.clientForm.controls['dob'].invalid || 
-      partnerGroup.controls['firstName'].invalid || partnerGroup.controls['lastName'].invalid || partnerGroup.controls['dob'].invalid
+      return this.clientForm.controls['lastName'].invalid 
+        || this.clientForm.controls['firstName'].invalid 
+        || this.clientForm.controls['dob'].invalid
+        || this.clientForm.controls['email'].invalid
+        || partnerGroup.controls['firstName'].invalid
+        || partnerGroup.controls['lastName'].invalid
+        || partnerGroup.controls['dob'].invalid
+        || partnerGroup.controls['email'].invalid
     }
-    return this.clientForm.controls['firstName'].invalid || this.clientForm.controls['lastName'].invalid || this.clientForm.controls['dob'].invalid
+
+    return this.clientForm.controls['firstName'].invalid
+      || this.clientForm.controls['lastName'].invalid
+      || this.clientForm.controls['dob'].invalid
+      || this.clientForm.controls['email'].invalid
   }
 
   getClient() {
@@ -179,8 +189,8 @@ export class ClientEditComponent {
     if (visible) {
       partnerGroup.get('firstName')?.setValidators(Validators.required);
       partnerGroup.get('lastName')?.setValidators(Validators.required);
-
       partnerGroup.get('dob')?.setValidators(Validators.required);
+      partnerGroup.get('email')?.setValidators(Validators.required);
     } else {
       partnerGroup.reset();
       Object.keys(partnerGroup.controls).forEach((key) => {
