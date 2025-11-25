@@ -14,11 +14,11 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { CommonModule } from '@angular/common';
-import { Client } from 'src/app/clients/models/client';
+import { Client , Details} from 'src/app/clients/models/client';
 import { Store } from '@ngrx/store';
 import { selectedClient } from 'src/app/store/client/client.selectors';
 import { SettingsHttpService } from '../settings/services/settings-http.service';
-
+// import { Client } from '../../clients/models/client'
 @Component({
   selector: 'app-emergencies',
   imports: [
@@ -53,7 +53,7 @@ export class EmergenciesComponent {
   willStatuses: LookupItem[] = [];
   insuranceCostTemplate?: Money;
   client$: Observable<Client | null>;
-  clientData: import("c:/Projects/New folder/Ibernia-portal/src/app/clients/models/client").Details;
+  clientData: Details;
   amountCycles: any;
 
   constructor(

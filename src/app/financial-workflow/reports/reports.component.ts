@@ -16,7 +16,7 @@ import {
 } from 'rxjs';
 import { NavItemService } from 'src/app/layouts/full/nav-item.service';
 import { TimelineHttpService } from '../timeline/services/timeline-http.service';
-import { Client } from 'src/app/clients/models/client';
+import { Client, Details } from 'src/app/clients/models/client';
 import { FinancialTimeline } from '../timeline/models/financial-timeline';
 import { selectedClient } from 'src/app/store/client/client.selectors';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -206,7 +206,7 @@ isCompareLoading = false;
   userRerturnRate: number;
       private destroy$ = new Subject<void>();
   client$: Observable<Client | null>;
-  clientData: import("c:/Projects/New folder/Ibernia-portal/src/app/clients/models/client").Details;
+  clientData: Details;
 
   constructor(
     private timelineHttpService: TimelineHttpService,
