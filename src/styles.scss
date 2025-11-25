@@ -205,57 +205,57 @@ button {
 .mdc-switch__track::after{
   background-color: #516CE8;
 }
-.apexcharts-text,
-.apexcharts-legend-text,
-.apexcharts-text tspan{
-  font-size: 14px !important;
-  font-family: 'Ubuntu' !important;
-      font-weight: 600 !important;
-}
-.apexcharts-yaxis{
-  .apexcharts-yaxis-texts-g{
+// .apexcharts-text,
+// .apexcharts-legend-text,
+// .apexcharts-text tspan{
+//   font-size: 14px !important;
+//   font-family: 'Ubuntu' !important;
+//       font-weight: 600 !important;
+// }
+// .apexcharts-yaxis{
+//   .apexcharts-yaxis-texts-g{
 
-    tspan{
-      font-weight: bold;
-      fill: #d7dbe0;
-    }
-  }
-}
+//     tspan{
+//       font-weight: bold;
+//       fill: #d7dbe0;
+//     }
+//   }
+// }
 
-.apexcharts-xaxis{
-  .apexcharts-xaxis-texts-g{
-    text{
-          text-anchor: start;
-    }
-    tspan{
-      font-weight: bold;
-      fill: #d7dbe0;
-    }
-  }
-}
-.apexcharts-legend.apx-legend-position-bottom.apexcharts-align-center, 
-.apexcharts-legend.apx-legend-position-top.apexcharts-align-center{
-  justify-content: end !important;
-}
-.apexcharts-legend-series{
-  margin-right: 10px !important;
-  &:last-child{
-    margin-right: 0px !important;
-  }
-  .apexcharts-legend-marker{
-    height: 12px !important; 
-    width: 12px !important;
-    overflow: hidden;
-    margin-right: 5px;;
-    svg{
-      border-radius: 100px;
-    }
-  }
-}
-.apexcharts-legend-text {
+// .apexcharts-xaxis{
+//   .apexcharts-xaxis-texts-g{
+//     text{
+//           text-anchor: start;
+//     }
+//     tspan{
+//       font-weight: bold;
+//       fill: #d7dbe0;
+//     }
+//   }
+// }
+// .apexcharts-legend.apx-legend-position-bottom.apexcharts-align-center, 
+// .apexcharts-legend.apx-legend-position-top.apexcharts-align-center{
+//   justify-content: end !important;
+// }
+// .apexcharts-legend-series{
+//   margin-right: 10px !important;
+//   &:last-child{
+//     margin-right: 0px !important;
+//   }
+//   .apexcharts-legend-marker{
+//     height: 12px !important; 
+//     width: 12px !important;
+//     overflow: hidden;
+//     margin-right: 5px;;
+//     svg{
+//       border-radius: 100px;
+//     }
+//   }
+// }
+// .apexcharts-legend-text {
 
-    color: #2a3547 !important;
-}
+//     color: #2a3547 !important;
+// }
 /* Hide all minor labels first */
 .vis-panel .vis-time-axis .vis-text.vis-minor {
   display: none;
