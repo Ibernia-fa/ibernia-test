@@ -99,7 +99,7 @@ export class ViewSavingsBarStackedChartComponent implements OnChanges {
         },
         labels: {
           formatter: function(value: any) {
-            return  value;
+            return value?.toLocaleString();
           }
         }
       },
@@ -166,7 +166,7 @@ export class ViewSavingsBarStackedChartComponent implements OnChanges {
         },
         labels: {
           formatter: (value: any) => {
-            return  value;
+            return value?.toLocaleString();;
           }
         }
       }
