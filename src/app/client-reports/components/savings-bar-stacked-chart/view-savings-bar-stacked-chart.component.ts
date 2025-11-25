@@ -49,12 +49,15 @@ export class ViewSavingsBarStackedChartComponent implements OnChanges {
           options: {
             legend: {
               position: "bottom",
-              offsetX: -10,
+              offsetX: 0,
               offsetY: 0,
             },
           },
         },
       ],
+      tooltip:{
+        return:""
+      },
       plotOptions: {
         bar: {
           horizontal: false,
@@ -82,10 +85,8 @@ export class ViewSavingsBarStackedChartComponent implements OnChanges {
         title: {
           text: 'Year'
         },
-        offsetX:-10,
-        style: {
-          cssClass: 'leftAlign'
-        },
+        offsetX:0,
+     
         labels: {
           formatter: function(value: any) {
             return [(Math.floor(value)-1993), Math.floor(value)]; // Ensure the year is displayed as an integer (remove fraction part)
@@ -148,10 +149,8 @@ export class ViewSavingsBarStackedChartComponent implements OnChanges {
         title: {
           text: 'Year'
         },
-        offsetX:-10,
-        style: {
-          cssClass: 'leftAlign'
-        },
+        offsetX:0,
+      
         labels: {
           formatter: (value: any) => {
             return [(Math.floor(value) - moment(this.client.clientDetails.birthDate).year()), Math.floor(value)];
