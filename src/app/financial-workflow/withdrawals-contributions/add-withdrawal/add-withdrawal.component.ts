@@ -189,7 +189,7 @@ export class AddWithdrawalComponent {
     }
     // hide locked pots AND the "Cash" pot from the dropdown
 this.savingPots.clientSavings = (this.savingPots.clientSavings || [])
-  .filter(s => !s.hasPotLocked)
+  // .filter(s => !s.hasPotLocked)
   .filter(s => (s.name ?? '').toLowerCase() !== 'cash');
 
   }
