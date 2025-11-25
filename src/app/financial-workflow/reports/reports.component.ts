@@ -7,6 +7,7 @@ import {
   combineLatestWith,
   filter,
   map,
+  Observable,
   Subject,
   switchMap,
   take,
@@ -204,6 +205,8 @@ isCompareLoading = false;
   savingsForm: FormGroup;
   userRerturnRate: number;
       private destroy$ = new Subject<void>();
+  client$: Observable<Client | null>;
+  clientData: import("c:/Projects/New folder/Ibernia-portal/src/app/clients/models/client").Details;
 
   constructor(
     private timelineHttpService: TimelineHttpService,
@@ -218,7 +221,8 @@ isCompareLoading = false;
     private toaster: ToastrService,
     private fb: FormBuilder,
     private dialog: MatDialog,
-         private settingsService: SettingsService
+         private settingsService: SettingsService,
+         private store: Store
 
   ) {
     this.destroyed$ = new BehaviorSubject<boolean>(false);
@@ -227,24 +231,44 @@ isCompareLoading = false;
     returnRate: [0]
   });
 
-  this.settingsService.userData$
-    .pipe(
-      filter((v): v is NonNullable<typeof v> => v != null),
-      // we only need it once here
-      // (if you want to react to later changes too, remove take(1))
-      take(1)
-    )
-    .subscribe((data) => {
-      const p = data.preferences;
-      this.userRerturnRate = p.investmentReturn;
+  // this.settingsService.userData$
+  //   .pipe(
+  //     filter((v): v is NonNullable<typeof v> => v != null),
+  //     // we only need it once here
+  //     // (if you want to react to later changes too, remove take(1))
+  //     take(1)
+  //   )
+  //   .subscribe((data) => {
+  //     const p = data.preferences;
+  //     this.userRerturnRate = p.investmentReturn;
 
-      this.savingsForm
+  //     this.savingsForm
+  //       .get('returnRate')
+  //       ?.setValue(this.userRerturnRate, { emitEvent: false });
+
+  //     // now that the form has the correct default, load everything
+  //     this.getData();
+  //   });
+                    this.client$ = this.store.select(selectedClient);
+                    this.client$
+                    // .pipe(
+                    //   filter((v): v is NonNullable<typeof v> => v != null),
+                    //   // we only need it once here
+                    //   // (if you want to react to later changes too, remove take(1))
+                    //   take(1)
+                    // )
+                    .subscribe(client => {
+              if (client) {
+                // console.log('client data', client);
+                this.clientData = client.clientDetails;
+                 this.savingsForm
         .get('returnRate')
-        ?.setValue(this.userRerturnRate, { emitEvent: false });
-
-      // now that the form has the correct default, load everything
+        ?.setValue(this.clientData.inflationRate, { emitEvent: false });
+                
+              }
       this.getData();
-    });
+
+            });
 
 
   }
