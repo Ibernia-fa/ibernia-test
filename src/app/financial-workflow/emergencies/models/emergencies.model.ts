@@ -50,3 +50,11 @@ export interface EmergenciesResponse {
   emergencies: Emergency[];
   statsAndLookupData: StatsAndLookupData;
 }
+
+// Use the same shape as Emergency, but without the mandatory id.
+// Backend can generate id / timestamps.
+export type CreateEmergencyRequest = Omit<
+  Emergency,
+  'id' | 'createdAt' | 'updatedAt'
+>;
+

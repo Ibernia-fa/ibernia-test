@@ -2,7 +2,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { EmergenciesResponse, Emergency } from '../models/emergencies.model';
+import { CreateEmergencyRequest, EmergenciesResponse, Emergency } from '../models/emergencies.model';
 
 @Injectable({ providedIn: 'root' })
 export class EmergenciesHttpService {
@@ -15,12 +15,17 @@ export class EmergenciesHttpService {
     return this.http.get<EmergenciesResponse>(`${this.baseUrl}/${cashflowId}/all`);
   }
 
-    createEmergency(body: any) {
-    return this.http.post(`${this.baseUrl}/emergencies`, body);
-  }
+  //   createEmergency(body: any) {
+  //   return this.http.post(`${this.baseUrl}/emergencies`, body);
+  // }
 
   // POST /
-  addEmergency(payload: Emergency): Observable<Emergency> {
-    return this.http.post<Emergency>(this.baseUrl, payload);
+createEmergency(body: CreateEmergencyRequest) {
+  return this.http.post<Emergency>(this.baseUrl, body);
+}
+
+  updateEmergency(payload: CreateEmergencyRequest) {
+    return this.http.put<Emergency>(this.baseUrl, payload);
   }
+
 }

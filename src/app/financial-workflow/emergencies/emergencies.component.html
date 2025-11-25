@@ -1,6 +1,5 @@
-<div class="container my-4 protection-center">
+<!-- <div class="container my-4 protection-center">
 
-  <!-- Page title + Add new -->
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h2 class="fw-bold">Protection Center</h2>
 
@@ -9,7 +8,6 @@
     </button>
   </div>
 
-  <!-- Top summary cards -->
   <div class="row g-3 mb-4">
     <div class="col-md-4">
       <mat-card class="summary-card">
@@ -33,10 +31,8 @@
     </div>
   </div>
 
-  <!-- Main cards -->
   <div class="row g-4">
 
-    <!-- Health -->
     <div class="col-md-4">
       <mat-card class="item-card health-card">
         <div class="d-flex justify-content-between">
@@ -69,7 +65,6 @@
       </mat-card>
     </div>
 
-    <!-- Life -->
     <div class="col-md-4">
       <mat-card class="item-card danger-card">
         <div class="d-flex justify-content-between">
@@ -90,7 +85,6 @@
       </mat-card>
     </div>
 
-    <!-- Disability -->
     <div class="col-md-4">
       <mat-card class="item-card danger-card">
         <div class="d-flex justify-content-between">
@@ -111,7 +105,6 @@
       </mat-card>
     </div>
 
-    <!-- Will -->
     <div class="col-md-4">
       <mat-card class="item-card danger-card">
         <div class="d-flex justify-content-between">
@@ -130,7 +123,6 @@
       </mat-card>
     </div>
 
-    <!-- Home -->
     <div class="col-md-4">
       <mat-card class="item-card home-card">
         <div class="d-flex justify-content-between">
@@ -169,4 +161,142 @@
 
 </div>
 
-<button (click)="onAddClick()">Add</button>
+<button (click)="onAddClick()">Add</button> -->
+
+<div class="container my-4 protection-center">
+
+  <!-- Page title + Add new -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold">Protection Center</h2>
+
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="onAddClick()"
+    >
+      Add new
+    </button>
+  </div>
+
+  <!-- Top summary cards -->
+  <div class="row g-3 mb-4" *ngIf="stats as s">
+    <div class="col-md-4">
+      <mat-card class="summary-card">
+        <div class="label">Total coverage</div>
+        <div class="value">
+          {{ s.emergeinciesStats.totalCoverage | number:'1.0-0' }}
+        </div>
+      </mat-card>
+    </div>
+
+    <div class="col-md-4">
+      <mat-card class="summary-card">
+        <div class="label">Total annual cost</div>
+        <div class="value">
+          {{ s.emergeinciesStats.totalCost | number:'1.0-0' }}
+        </div>
+      </mat-card>
+    </div>
+
+    <div class="col-md-4">
+      <mat-card class="summary-card danger-outline">
+        <div class="label">Protection score</div>
+        <div class="value text-danger fw-bold">
+          {{ s.emergeinciesStats.protectionScore }}/100
+        </div>
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- Main cards -->
+  <div class="row g-4">
+
+    <div
+      class="col-md-4"
+      *ngFor="let e of emergencies; trackBy: trackById"
+    >
+      <mat-card class="item-card" [ngClass]="getCardCssClass(e)">
+        <!-- Header: icon + title + edit -->
+        <div class="d-flex justify-content-between">
+          <div class="d-flex gap-2 align-items-center">
+            <mat-icon [color]="e.type === 1 ? 'primary' : 'warn'">
+              {{ getIconName(e) }}
+            </mat-icon>
+            <span class="card-title">
+              {{ e.name || getTypeName(e.type) }}
+            </span>
+          </div>
+
+             <button mat-icon-button (click)="onEditClick(e)">
+        <mat-icon>edit</mat-icon>
+      </button>
+        </div>
+
+        <!-- Insurance-type emergency (type = 1) -->
+        <ng-container *ngIf="e.type === 1; else willTemplate">
+          <div class="mt-3 mb-2">
+            <div class="text-muted">Coverage</div>
+            <div class="fw-bold">
+              {{ e.coverage | number:'1.0-0' }}
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <div class="text-muted">Annual cost</div>
+            <div class="fw-bold">
+              {{ getInsuranceCostLabel(e) }}
+            </div>
+          </div>
+
+          <div class="text-muted mb-1">Adequacy</div>
+          <mat-chip-set>
+            
+            <mat-chip
+              *ngFor="let ca of coverageAdequacies"
+              appearance="outlined"
+              [color]="ca.id === e.coverageAdequacy ? 'primary' : undefined"
+              [selected]="ca.id === e.coverageAdequacy"
+            >
+              {{ ca.description }}
+            </mat-chip>
+          </mat-chip-set>
+        </ng-container>
+
+        <!-- Will-type emergency (type = 2) -->
+        <ng-template #willTemplate>
+          <div class="mt-3">
+            <div class="text-muted">Status</div>
+            <div
+              class="fw-bold"
+              [ngClass]="{
+                'text-danger': e.willStatus !== 1,
+                'text-success': e.willStatus === 1
+              }"
+            >
+              {{ getWillStatusLabel(e.willStatus) }}
+            </div>
+          </div>
+        </ng-template>
+
+      </mat-card>
+    </div>
+
+    <!-- If no emergencies -->
+    <div class="col-12" *ngIf="!isLoading && emergencies.length === 0">
+      <p class="text-muted text-center my-4">
+        No protection items added yet. Click <b>Add new</b> to get started.
+      </p>
+    </div>
+
+  </div>
+
+  <div class="text-center my-4" *ngIf="hasHiddenEmergencies">
+    <button mat-stroked-button color="primary">
+      Show hidden
+    </button>
+  </div>
+
+</div>
+
+<!-- Debug / dev button (you can remove this) -->
+<!-- <button (click)="onAddClick()">Add</button> -->

@@ -251,15 +251,8 @@ isCompareLoading = false;
   //   });
                     this.client$ = this.store.select(selectedClient);
                     this.client$
-                    // .pipe(
-                    //   filter((v): v is NonNullable<typeof v> => v != null),
-                    //   // we only need it once here
-                    //   // (if you want to react to later changes too, remove take(1))
-                    //   take(1)
-                    // )
                     .subscribe(client => {
               if (client) {
-                // console.log('client data', client);
                 this.clientData = client.clientDetails;
                  this.savingsForm
         .get('returnRate')
