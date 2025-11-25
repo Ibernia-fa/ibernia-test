@@ -115,24 +115,12 @@ export class SavingPotsComponent implements OnInit {
   ) {
     this.navItemService.currentRouteName = 'Saving Pots';
         this.user = this.Authservice.getUserProfile();
-  // this.settingsService.getUserProfileResponse(this.user?.sub).subscribe({
-  //   next: (res: any) => {
-  //     console.log('res =>', res);
-  //     // console.log('data', res.body);
-  //      const p = res?.body?.preferences;
-  //      this.loggedInUserPreferences = p;
-  //     this.userRerturnRate = p.investmentReturn;
-  //   }});
       this.settingsService.userData$
         .pipe(
           filter((v): v is NonNullable<typeof v> => v != null), // skip initial null
           takeUntil(this.destroy$)
         )
         .subscribe((data) => {
-      console.log('res 1=>', data);
-
-          // console.log('userData arrived', data);
-          // this.userData = data;
                  const p = data.preferences;
        this.loggedInUserPreferences = p;
       this.userRerturnRate = p.investmentReturn;
@@ -141,7 +129,6 @@ export class SavingPotsComponent implements OnInit {
                     this.client$.subscribe(client => {
               if (client) {
                 this.clientData = client.clientDetails;
-                console.log('client data', this.clientData);
               }
             });
     this.getData();
