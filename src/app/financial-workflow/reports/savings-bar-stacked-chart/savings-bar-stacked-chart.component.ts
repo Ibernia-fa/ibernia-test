@@ -64,10 +64,10 @@ export class SavingsBarStackedChartComponent implements OnChanges {
         return `
           <div class="savings-tooltip">
             <div class="savings-tooltip__header">
-              Age: ${xValue}
+              <div>Age:24 </div>  <div> Year: ${xValue}</div> 
             </div>
             <div class="savings-tooltip__body">
-              <div class="savings-tooltip__label">${seriesName}</div>
+              <div class="savings-tooltip__label">${seriesName}:</div>
               <div class="savings-tooltip__value">${value.toLocaleString()}</div>
             </div>
           </div>

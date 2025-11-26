@@ -98,7 +98,7 @@ export class EmergenciesComponent {
           this.emergenciesHttp.getAllByCashflowId(cashflowId).pipe(
             catchError((err: HttpErrorResponse) => {
               this.errorMessage =
-                err?.error?.message || 'Failed to load emergencies.';
+                err?.error?.message || 'Failed to load emergencies';
               this.toastr.error(this.errorMessage, 'Error');
               return of(null);
             })

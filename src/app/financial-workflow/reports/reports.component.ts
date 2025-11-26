@@ -334,7 +334,7 @@ isCompareLoading = false;
 onComparePlansClicked() {
   if (!this.cashflows || this.cashflows.length < 2) {
     this.toaster.info(
-      'You need at least two plans to compare. Please create another plan first.',
+      'You need at least two plans to compare. Please create another plan first',
       'Info'
     );
     return;

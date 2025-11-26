@@ -170,16 +170,65 @@
     <div class="d-flex align-items-center justify-content-between w-100 gap-16 flex-wrap">
       <div class="d-flex align-items-center gap-16">
       <div class="icon-wrapper d-flex align-items-center justify-content-center">
-        <img width="25"  src="../../../assets/images/svgs/inheritance-icon.svg" alt="">
+        <img width="25"  src="../../../assets/images/svgs/danger-square-icon-active.svg" alt="">
       </div>
       <div class="d-flex flex-column justify-content-between gap-4">
-        <h4 class="page-title f-w-500">Emergencies</h4>
-        <span class="sub-title">Find answers to common questions and reach our team</span>
+        <h4 class="page-title f-w-500">Risk & Insurance</h4>
+                        <span class="sub-title">Talha Basit</span>
+
       </div>
 </div>
 
 
-   <button
+ 
+    
+    </div>
+  </mat-card-content>
+</mat-card>
+
+    <mat-card class="cardWithShadow mb-20">
+        <mat-card-content>
+            <div class="d-flex align-items-center gap-8 justify-content-between">
+                <div class="income-expense-wrapper w-100">
+                    <div class="row justify-content-between" *ngIf="stats as s">
+                        <div class="col-2">
+                            <div class="d-flex flex-column gap-8">
+                                <div class="d-flex align-items-center gap-8">
+                                    <h3 class="card-title expense-income">Total coverage</h3>
+                                </div>
+                                <h3 class="saving-title">
+                                   <span>$</span>{{s.emergeinciesStats.totalCoverage | number:'1.0-0'}}
+                                </h3>
+                            </div>
+                        </div>
+                        <!-- Divider  -->
+                        <div class="divider"></div>
+                        <!-- End Divider  -->
+                        <div class="col-2">
+                            <div class="d-flex flex-column gap-8">
+                                <div class="d-flex align-items-center gap-8">
+                                    <h3 class="card-title expenses-deduct">Total annual cost</h3>
+                                </div>
+                                <h3 class="saving-title"> <span>$</span>{{s.emergeinciesStats.totalCost | number:'1.0-0'}}
+                                </h3>
+                            </div>
+                        </div>
+                        <!-- Divider  -->
+                        <div class="divider"></div>
+                        <!-- End Divider  -->
+                        <div class="col-2">
+                            <div class="d-flex flex-column gap-8">
+                                <div class="d-flex align-items-center gap-8">
+                                    <h3 class="card-title expenses-total">Protection score</h3>
+                                </div>
+                                <h3 class="saving-title saving-below-number"> {{s.emergeinciesStats.protectionScore}}/100</h3>
+                            </div>
+                        </div>
+
+                          <div class="divider"></div>
+
+<div class="col-2 align-items-center d-flex">
+                                          <button style="height: auto;"
               (click)="onAddClick()"
               type="button"
               class="button-icon"
@@ -187,10 +236,25 @@
               <span>Add new</span>
               <img src="assets/images/svgs/add-icon.svg" alt="add-icon" />
             </button>
-    
-    </div>
-  </mat-card-content>
-</mat-card>
+
+            </div>
+                    </div>
+                </div>
+           
+                <!-- End Emoji  -->
+            </div>
+        </mat-card-content>
+    </mat-card>
+
+
+
+
+
+
+
+
+
+
 
 
 <mat-card class="mat-mdc-card mdc-card cardWithShadow mb-20">
@@ -199,46 +263,18 @@
   
 
   <!-- Top summary cards -->
-  <div class="d-flex gap-10 flex-wrap m-b-10" *ngIf="stats as s">
-    <div class="card-em-outer">
-      <mat-card class="summary-card">
-        <div class="label">Total coverage</div>
-        <div class="value">
-          {{ s.emergeinciesStats.totalCoverage | number:'1.0-0' }}
-        </div>
-      </mat-card>
-    </div>
 
-    <div class="card-em-outer">
-      <mat-card class="summary-card">
-        <div class="label">Total annual cost</div>
-        <div class="value">
-          {{ s.emergeinciesStats.totalCost | number:'1.0-0' }}
-        </div>
-      </mat-card>
-    </div>
-
-    <div class="card-em-outer">
-      <mat-card class="summary-card danger-outline">
-        <div class="label">Protection score</div>
-        <div class="value text-danger fw-bold">
-          {{ s.emergeinciesStats.protectionScore }}/100
-        </div>
-      </mat-card>
-    </div>
-  </div>
 
   <!-- Main cards -->
   <div class="d-flex gap-10 flex-wrap">
 
     <div
-      class="card-em-outer "
-      *ngFor="let e of emergencies; trackBy: trackById"
+      class="card-em-outer " *ngFor="let e of emergencies; trackBy: trackById"
     >
       <mat-card class="summary-card item-card" [ngClass]="getCardCssClass(e)">
         <!-- Header: icon + title + edit -->
         <div class="d-flex justify-content-between m-b-5">
-          <div class="d-flex gap-5 align-items-center">
+          <div class="d-flex gap-10 align-items-center">
             <!-- <mat-icon [color]="e.type === 1 ? 'primary' : 'warn'">
               {{ getIconName(e) }}
             </mat-icon> -->
@@ -249,11 +285,20 @@
             </span>
           </div>
 
-             <button matTooltip="Edit" mat-icon-button (click)="onEditClick(e)">
+            <div class="d-flex align-items-center">
+                <button class="hide-button"  mat-icon-button >
                      
-<svg xmlns="http://www.w3.org/2000/svg" width="15"  viewBox="0 0 24 24" fill="none" stroke="#95a4bb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pencil w-4 h-4" aria-hidden="true" data-source-pos="181:20-181:50" data-source-name="Pencil"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"></path><path d="m15 5 4 4"></path></svg>
+                  Hide
+      </button>
+             <button (click)="onEditClick(e)">
+                     
+
+                    <svg width="14"  viewBox="0 0 18 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M2 16.89H3.41421L12.7279 7.57629L11.3137 6.16207L2 15.4758V16.89ZM18 17.89C18 18.4423 17.5523 18.89 17 18.89H1C0.447716 18.89 0 18.4423 0 17.89V14.8545C0 14.7219 0.0526781 14.5947 0.146446 14.501L13.435 1.21233C13.8256 0.821801 14.4587 0.821801 14.8492 1.21233L17.6777 4.04075C18.0682 4.43128 18.0682 5.06444 17.6777 5.45497L6.24264 16.89H17C17.5523 16.89 18 17.3377 18 17.89ZM12.7279 4.74786L14.1421 6.16207L15.5563 4.74786L14.1421 3.33365L12.7279 4.74786Z" fill="#90a1b9"/>
+                    </svg>
 
       </button>
+      </div>
         </div>
 
         <!-- Insurance-type emergency (type = 1) -->
@@ -261,14 +306,14 @@
           <div class="d-flex m-b-10">
           <div class="inner-information  w-50">
             <div class="label">Coverage</div>
-            <div class="fw-bold">
-              {{ e.coverage | number:'1.0-0' }}
+            <div class="f-w-500 f-s-14">
+             <span>$</span>{{e.coverage | number:'1.0-0'}}
             </div>
           </div>
 
           <div class="inner-information">
             <div class="label">Annual cost</div>
-            <div class="fw-bold">
+            <div class="f-w-500 f-s-14">
               {{ getInsuranceCostLabel(e) }}
             </div>
           </div></div>
@@ -289,15 +334,16 @@
         <!-- Will-type emergency (type = 2) -->
         <ng-template #willTemplate>
           <div class="inner-information">
-            <div >Status</div>
+            <div class="label">Status</div>
             <div
-              class="label"
+              class="f-w-500 f-s-14"
               [ngClass]="{
                 'text-danger': e.willStatus !== 1,
                 'text-success': e.willStatus === 1
               }"
             >
-              {{ getWillStatusLabel(e.willStatus) }}
+              <!-- {{ getWillStatusLabel(e.willStatus) }} -->
+                Not covered
             </div>
           </div>
         </ng-template>
@@ -314,9 +360,13 @@
 
   </div>
 
-  <div class="text-center my-4" *ngIf="hasHiddenEmergencies">
-    <button mat-stroked-button color="primary">
-      Show hidden
+
+
+  <div class="d-flex align-items-center m-t-10 justify-content-center">
+
+     <!-- *ngIf="hasHiddenEmergencies" -->
+    <button  class="btn-secondary" mat-stroked-button color="primary">
+     <span>Show hidden</span> 
     </button>
   </div>
     </mat-card-content>

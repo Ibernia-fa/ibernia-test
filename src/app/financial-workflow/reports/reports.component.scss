@@ -120,7 +120,7 @@
   border: 1px solid #f7f7f7;
   .stats-main-wrapper {
     .saving-title {
-      font-family: "Inter";
+       font-family: 'Ubuntu';
     }
   }
   .drag-btn {
@@ -149,10 +149,10 @@
     -webkit-backdrop-filter: blur(2px);
     p {
       color: white;
-      font-family: "Inter";
+       font-family: 'Ubuntu';
       font-size: 14px;
       line-height: 20px;
-      font-weight: 600;
+      font-weight: 500;
       margin: 0;
       padding: 0;
     }

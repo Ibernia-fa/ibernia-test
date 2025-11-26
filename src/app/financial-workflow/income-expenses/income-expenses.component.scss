@@ -14,7 +14,7 @@
     line-height: 19px;
     font-weight: 700;
     &.expenses-deduct {
-      color: #ff4444;
+      color: red;
     }
     &.expenses-total {
       color: #4043af;
@@ -25,17 +25,17 @@
     line-height: 30px;
     color: #1c1c1c;
     font-weight: 700;
-    font-family: "Inter" !important;
+     font-family: 'Ubuntu' !important;
     
   }
   .expense-income {
     color: #71bc42;
   }
   .green {
-    color: #71bc42;
+    color: green
   }
   .red {
-    color: #ff4444;
+    color: red;
   }
   .divider {
     width: 1.5px;
@@ -115,7 +115,7 @@ tr.example-detail-row {
   min-width: 110px;
   color: #3a3a47;
   padding: 10px 16px !important;
-    font-family: "Inter" !important;
+     font-family: 'Ubuntu' !important;
   // @media (max-width: 768px) {
   //   min-width: 10px;
   // }

@@ -608,7 +608,7 @@ export const navItemslower: NavItem[] = [
   // },
   {
     displayName: 'Emergencies',
-    iconName: '/assets/images/svgs/danger-square-icon.svg',
+    iconName: '/assets/images/svgs/danger-square-icon-active.svg',
     iconOutline: '/assets/images/svgs/danger-square-icon.svg',
     route: '/cashflows/{cashflowId}/emergencies',
   },

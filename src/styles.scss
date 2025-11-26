@@ -235,7 +235,8 @@ button {
 }
 .apexcharts-legend.apx-legend-position-bottom.apexcharts-align-center, 
 .apexcharts-legend.apx-legend-position-top.apexcharts-align-center{
-  justify-content: end !important;
+  // justify-content: end !important;
+      margin-left: -135px !important;
 }
 .apexcharts-legend-series{
   margin-right: 10px !important;
@@ -339,34 +340,52 @@ button {
       color: #fff;
     }
 }
+
+
+
+.mat-button-toggle-checked .mat-button-toggle-button:has(.mat-button-toggle-checkbox-wrapper){
+  padding-left: 0px !important;
+}
+
+
 .mat-button-toggle-group{
-  border: none;
+  border: none !important;
+  border-radius: 0px !important;
   .mat-button-toggle{
-    border: 1px solid #ccc;
+    border: 1px solid #e2e8f0;
     border-radius: 4px;
     margin-right: 10px;
     font-size: 14px;
     background-color: transparent;
+        height: 30px !important;
+    padding: 0px !important;
+    line-height: 27px;
+    color: #45556c;
+     .mat-button-toggle-label-content{
+      line-height: normal;
+      font-size: 12px;
+      font-weight: 500;
+     }
     &:first-child{
       &.mat-button-toggle-checked{
-        color: #b84c00;
-        border: 1px solid #b84c00;
+        color: #bb4d00;
+        border: 1px solid #bb4d00;
         background-color: transparent;
-      }
+        }
     }
     &:nth-child(2){
-      &.mat-button-toggle-checked{
-         color: #e4f4ec;
-        border: 1px solid #e4f4ec;
+         &.mat-button-toggle-checked{
+         color: #007a55;
+        border: 1px solid #a4f4cf !important;
         background-color: transparent;
-      }
+         }
     }
    &:nth-child(3){
-      &.mat-button-toggle-checked{
-        color: green;
-        border: 1px solid green;
+       &.mat-button-toggle-checked{
+        color: #006045;
+        border: 1px solid #006045 !important;
         background-color: transparent;
-      }
+       }
     }
   }
   .mat-button-toggle-checkbox-wrapper{
@@ -378,3 +397,37 @@ button {
     padding-left: 0px;
   }
 }
+.apexcharts-tooltip{
+  box-shadow: 0px !important;
+  border-radius: 4px !important;
+    box-shadow: none;
+    border: 1px solid #e7e7eb !important;
+}
+.savings-tooltip {
+  
+    background: rgba(255, 255, 255, .96);
+    min-width: 170px;
+        font-size: 14px !important;
+    font-family: "Ubuntu" !important;
+    .savings-tooltip__header {
+  font-weight: 500;
+   padding: 7px 10px;
+    background: #eceff1;
+    color: #595959;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    border-bottom: 1px solid #e7e7eb;
+}
+.savings-tooltip__body{
+  padding: 10px;
+  display: flex;
+  .savings-tooltip__label{
+    font-weight: 500;
+    margin-right: 10px;
+  }
+}
+
+}
+
+
