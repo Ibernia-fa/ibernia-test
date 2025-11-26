@@ -339,3 +339,42 @@ button {
       color: #fff;
     }
 }
+.mat-button-toggle-group{
+  border: none;
+  .mat-button-toggle{
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-right: 10px;
+    font-size: 14px;
+    background-color: transparent;
+    &:first-child{
+      &.mat-button-toggle-checked{
+        color: #b84c00;
+        border: 1px solid #b84c00;
+        background-color: transparent;
+      }
+    }
+    &:nth-child(2){
+      &.mat-button-toggle-checked{
+         color: #e4f4ec;
+        border: 1px solid #e4f4ec;
+        background-color: transparent;
+      }
+    }
+   &:nth-child(3){
+      &.mat-button-toggle-checked{
+        color: green;
+        border: 1px solid green;
+        background-color: transparent;
+      }
+    }
+  }
+  .mat-button-toggle-checkbox-wrapper{
+    display: none;
+    
+  }
+  
+  .mat-button-toggle-checked{
+    padding-left: 0px;
+  }
+}

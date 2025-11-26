@@ -18,6 +18,8 @@ import { Client , Details} from 'src/app/clients/models/client';
 import { Store } from '@ngrx/store';
 import { selectedClient } from 'src/app/store/client/client.selectors';
 import { SettingsHttpService } from '../settings/services/settings-http.service';
+import {MatTooltipModule} from '@angular/material/tooltip';
+import {MatButtonToggleModule} from '@angular/material/button-toggle';
 // import { Client } from '../../clients/models/client'
 @Component({
   selector: 'app-emergencies',
@@ -26,7 +28,9 @@ import { SettingsHttpService } from '../settings/services/settings-http.service'
     MatIconModule,
     MatCardModule,
     MatChipsModule,
-    CommonModule
+    CommonModule,
+    MatTooltipModule,
+    MatButtonToggleModule
   ],
 
   templateUrl: './emergencies.component.html',

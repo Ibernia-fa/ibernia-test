@@ -1,6 +1,52 @@
-.protection-center .summary-card {
-  padding: 20px;
-  border-radius: 12px;
+.protection-center {
+  .card-em-outer{
+   width: calc((100% - 20px) / 3);
+  }
+  .dot{
+    height: 8px;
+    width: 8px;
+    border-radius: 100px;
+    background-color: green;
+  }
+    .summary-card {
+      
+       .w-50{
+        width: 50%;
+       }
+    padding: 15px;
+    border-radius: 4px;
+        height:100%;
+        button{
+          border: none;
+          background: none;
+          color: #8d8d8d;
+          border-radius: 100px;
+          height: 35px;
+          width: 35px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+           mat-icon{
+            font-size: 20px;
+            margin-top: 2px;
+          }
+          &:hover{
+           background-color: #516ce8;
+          svg{
+            stroke: white !important;
+          }
+          }
+        }
+
+  .inner-information{
+    line-height: normal;
+    label{
+          font-size: 14px;
+          color: #747474;
+    }
+  }
+  }
 }
 
 .summary-card .label {
@@ -10,12 +56,14 @@
 
 .summary-card .value {
   font-size: 24px;
-  font-weight: bold;
+  font-weight: 500;
   margin-top: 4px;
 }
-
+.summary-card .value.text-danger{
+  color: #c70036;
+}
 .danger-outline {
-  border: 2px solid #f8d7da !important;
+  border: 1px solid #f8d7da !important;
   background: #fff5f5;
 }
 
@@ -25,7 +73,8 @@
 }
 
 .health-card {
-  background: #fff9e6;
+  background: #fcf8e8;
+  border: 1px solid #f4ebcf !important;
 }
 
 .home-card {
@@ -33,15 +82,17 @@
 }
 
 .danger-card {
-  background: #ffecec;
+  background: #fff1f2;
+  border: 1px solid #f7d4d4 !important;
 }
 
 .card-title {
   font-size: 18px;
-  font-weight: 600;
+  font-weight:500;
 }
 
 .hide-btn {
   font-size: 12px;
   padding: 0;
 }
+

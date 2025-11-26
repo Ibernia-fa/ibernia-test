@@ -96,7 +96,9 @@
               <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4"
                    matTooltip="This rate will be applied to this client's projections by default. You can override it later.">
             </mat-label>
-            <div class="position-relative">
+            <div class="position-relative percentage-icon">
+
+               <span  class="inner-p">%</span>
               <input matInput type="number" step="0.1" formControlName="inflationRate" placeholder="e.g. 2.5" />
               @if(clientForm.get('inflationRate')?.touched && clientForm.get('inflationRate')?.hasError('required')) {
                 <span class="field-error d-block">Required</span>
