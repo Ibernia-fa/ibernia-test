@@ -59,6 +59,7 @@ export class EmergenciesComponent {
   client$: Observable<Client | null>;
   clientData: Details;
   amountCycles: any;
+  showHidden: boolean;
 
   constructor(
     private route: ActivatedRoute,
@@ -73,7 +74,8 @@ export class EmergenciesComponent {
     this.load();
     this.navItemService.currentRouteName = 'Emergencies';
     this.settingHttpService.getAmountCycles().subscribe((cycles) => {
-      this.amountCycles = cycles;
+      this.amountCycles = cycles.filter(x => x.description != "One-off");
+      // this.amountCycles
     })
 
   }
@@ -203,7 +205,7 @@ export class EmergenciesComponent {
 
   getWillStatusLabel(id: number | null): string {
     if (id == null) return 'Not set';
-    return this.willStatuses.find(w => w.id === id)?.description ?? 'Unknown';
+    return this.policyStatuses.find(w => w.id === id)?.description ?? 'Unknown';
   }
 
   getInsuranceCostLabel(e: Emergency): string {
@@ -212,7 +214,7 @@ export class EmergenciesComponent {
     const symbol = cost.currencySymbol ?? '';
     const amount = cost.amount ?? 0;
     const cycleDesc = cost.cycle?.description || cost.cycle?.id || '';
-    return `${symbol}${amount} ${cycleDesc ? `(${cycleDesc})` : ''}`;
+    return `${symbol}${amount} `;
   }
 
   getIconName(e: Emergency): string {
@@ -228,8 +230,14 @@ export class EmergenciesComponent {
 
   getCardCssClass(e: Emergency): string {
     // Simple example: mark "not covered" / bad adequacy as danger
-    const isNotCovered = e.policyStatus === 2 || e.coverageAdequacy === 1;
-    return isNotCovered ? 'danger-card' : 'health-card';
+    const isNotCovered = e.policyStatus == 2;
+    return isNotCovered ? 'danger-card' : 'home-card';
+  }
+
+    getDotClass(e: Emergency): string {
+    // Simple example: mark "not covered" / bad adequacy as danger
+    const isNotCovered = e.policyStatus == 2;
+    return isNotCovered ? 'dot-red' : 'dot';
   }
 
   get hasHiddenEmergencies(): boolean {
@@ -263,6 +271,66 @@ export class EmergenciesComponent {
     });
   }
 
+onCoverageAdequacyChange(e: Emergency, newId: number): void {
+  if (newId === e.coverageAdequacy) {
+    return; // no change
+  }
+
+  const updated: Emergency = {
+    ...e,
+    coverageAdequacy: newId
+  };
+
+  this.emergenciesHttp.updateEmergency(updated).subscribe({
+    next: (res: Emergency) => {
+      // update local model so UI reflects the change
+      e.coverageAdequacy = res.coverageAdequacy;
+
+      // if your API returns updated stats as well, you could also refresh stats here
+      this.load(); // or patch stats from response if you get them
+    },
+    error: (err) => {
+      console.error(err);
+      this.toastr.error('Failed to update coverage adequacy', 'Error');
+    }
+  });
+}
+
+onHide(e: Emergency,) {
+   const updated: Emergency = {
+    ...e,
+    isHidden: true
+  };
+
+  this.emergenciesHttp.updateEmergency(updated).subscribe({
+    next: (res: Emergency) => {
+      // update local model so UI reflects the change
+      e.coverageAdequacy = res.coverageAdequacy;
+
+      // if your API returns updated stats as well, you could also refresh stats here
+      this.load(); // or patch stats from response if you get them
+    },
+    error: (err) => {
+      console.error(err);
+      this.toastr.error('Failed to update coverage adequacy', 'Error');
+    }
+  });
+}
+
+  // get hasHiddenEmergencies(): boolean {
+  //   return this.emergencies?.some(e => e.isHidden) ?? false;
+  // }
+
+  get filteredEmergencies(): Emergency[] {
+    if (this.showHidden) {
+      return this.emergencies;
+    }
+    return this.emergencies.filter(e => !e.isHidden);
+  }
+
+  toggleShowHidden(): void {
+    this.showHidden = !this.showHidden;
+  }
 
 }
 

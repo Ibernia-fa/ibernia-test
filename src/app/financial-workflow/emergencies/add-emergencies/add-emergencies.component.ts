@@ -102,14 +102,14 @@ this.currencySymbol =
     this.insuranceCycles = data.cycles ?? [];
     this.form = this.fb.group({
       name: ['', Validators.required],
-      policyStatus: [null, Validators.required],
+      policyStatus: [this.policyStatuses[1].id, Validators.required],
       currencySymbol: [this.currencySymbol, Validators.required],
       insuranceAmount: [
         this.insuranceCostTemplate?.amount ?? 0,
         [Validators.required, Validators.min(0)],
       ],
       insuranceCycleId: [
-        this.insuranceCycles[0].id,
+        this.insuranceCycles[1]?.id,
         Validators.required,
       ],
       coverageAdequacy: [null, Validators.required],
@@ -117,7 +117,13 @@ this.currencySymbol =
     });
 
     this.form.get('currencySymbol')?.disable();
+const policyCtrl = this.form.get('policyStatus');
+this.updateValidatorsForPolicyStatus(policyCtrl?.value ?? null);
 
+// 🔹 React to changes
+policyCtrl?.valueChanges.subscribe((status: number) => {
+  this.updateValidatorsForPolicyStatus(status);
+});
   if (this.data.mode === 'edit' && this.data.emergency) {
     this.patchForm(this.data.emergency);
   }
@@ -368,4 +374,44 @@ onSave(): void {
     if (name.includes('will')) return 'will-icon.svg';
     return 'default-emergency-icon.svg';
   }
+
+  private NOT_COVERED_STATUS_ID = 2; // id for "NotCovered"
+
+private updateValidatorsForPolicyStatus(status: number | null): void {
+  const insuranceAmountCtrl   = this.form.get('insuranceAmount');
+  const insuranceCycleIdCtrl  = this.form.get('insuranceCycleId');
+  const coverageAdequacyCtrl  = this.form.get('coverageAdequacy');
+  const coverageCtrl          = this.form.get('coverage');
+
+  if (!insuranceAmountCtrl || !insuranceCycleIdCtrl || !coverageAdequacyCtrl || !coverageCtrl) {
+    return;
+  }
+
+  const isNotCovered = status === this.NOT_COVERED_STATUS_ID;
+
+  if (isNotCovered) {
+    // 🔹 Remove validators when NotCovered (fields hidden)
+    insuranceAmountCtrl.clearValidators();
+    insuranceCycleIdCtrl.clearValidators();
+    coverageAdequacyCtrl.clearValidators();
+    coverageCtrl.clearValidators();
+
+    // Optional: also clear values
+    // insuranceAmountCtrl.setValue(null);
+    // coverageAdequacyCtrl.setValue(null);
+    // coverageCtrl.setValue(null);
+  } else {
+    // 🔹 Re-apply validators when status is Covered (or anything else)
+    insuranceAmountCtrl.setValidators([Validators.required, Validators.min(0)]);
+    insuranceCycleIdCtrl.setValidators([Validators.required]);
+    coverageAdequacyCtrl.setValidators([Validators.required]);
+    coverageCtrl.setValidators([Validators.required, Validators.min(0)]);
+  }
+
+  insuranceAmountCtrl.updateValueAndValidity({ emitEvent: false });
+  insuranceCycleIdCtrl.updateValueAndValidity({ emitEvent: false });
+  coverageAdequacyCtrl.updateValueAndValidity({ emitEvent: false });
+  coverageCtrl.updateValueAndValidity({ emitEvent: false });
+}
+
 }
