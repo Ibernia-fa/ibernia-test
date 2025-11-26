@@ -229,11 +229,11 @@
   </div>
 
   <!-- Main cards -->
-  <div class="d-flex gap-10 flex-wrap">
+  <div class="d-flex gap-10 flex-wrap" >
 
     <div
       class="card-em-outer "
-      *ngFor="let e of emergencies; trackBy: trackById"
+      *ngFor="let e of filteredEmergencies; trackBy: trackById"
     >
       <mat-card class="summary-card item-card" [ngClass]="getCardCssClass(e)">
         <!-- Header: icon + title + edit -->
@@ -242,12 +242,14 @@
             <!-- <mat-icon [color]="e.type === 1 ? 'primary' : 'warn'">
               {{ getIconName(e) }}
             </mat-icon> -->
-            <div class="dot"></div>
+            <div  [ngClass]="getDotClass(e)"></div>
               <img width="18" src="../../../assets/images/svgs/shield.svg" alt="">
             <span class="card-title">
               {{ e.name || getTypeName(e.type) }}
             </span>
           </div>
+
+<button mat-button color="primary" class="hide-btn" (click)="onHide(e)">Hide</button>
 
              <button matTooltip="Edit" mat-icon-button (click)="onEditClick(e)">
                      
@@ -257,7 +259,7 @@
         </div>
 
         <!-- Insurance-type emergency (type = 1) -->
-        <ng-container *ngIf="e.type === 1; else willTemplate">
+        <ng-container *ngIf="e.policyStatus === 1; else willTemplate">
           <div class="d-flex m-b-10">
           <div class="inner-information  w-50">
             <div class="label">Coverage</div>
@@ -276,11 +278,20 @@
           <div  class="label m-b-5">Adequacy</div>
    
         
-        <mat-button-toggle-group name="fontStyle" aria-label="Font Style">
-  <mat-button-toggle *ngFor="let ca of coverageAdequacies" [color]="ca.id === e.coverageAdequacy ? 'primary' : undefined"
-              [selected]="ca.id === e.coverageAdequacy"> {{ ca.description }}</mat-button-toggle>
-
+<mat-button-toggle-group
+  class="coverage-toggle-group"
+  [value]="e.coverageAdequacy"
+  (change)="onCoverageAdequacyChange(e, $event.value)"
+  aria-label="Coverage adequacy"
+>
+  <mat-button-toggle
+    *ngFor="let ca of coverageAdequacies"
+    [value]="ca.id"
+  >
+    {{ ca.description }}
+  </mat-button-toggle>
 </mat-button-toggle-group>
+
         
         
         </div>
@@ -297,7 +308,7 @@
                 'text-success': e.willStatus === 1
               }"
             >
-              {{ getWillStatusLabel(e.willStatus) }}
+              {{ getWillStatusLabel(e.policyStatus) }}
             </div>
           </div>
         </ng-template>
@@ -314,11 +325,16 @@
 
   </div>
 
-  <div class="text-center my-4" *ngIf="hasHiddenEmergencies">
-    <button mat-stroked-button color="primary">
-      Show hidden
-    </button>
-  </div>
+<div class="text-center my-4" *ngIf="hasHiddenEmergencies">
+  <button
+    mat-stroked-button
+    color="primary"
+    (click)="toggleShowHidden()"
+  >
+    {{ showHidden ? 'Hide hidden' : 'Show hidden' }}
+  </button>
+</div>
+
     </mat-card-content>
     </mat-card>
 
