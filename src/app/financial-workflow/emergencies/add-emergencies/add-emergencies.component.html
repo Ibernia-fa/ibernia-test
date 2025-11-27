@@ -108,9 +108,7 @@
              formControlName="insuranceAmount"
              placeholder="Amount"
            />
-           @if(form.get('insuranceAmount')?.touched && form.get('insuranceAmount')?.hasError('required')) {
-             <span class="field-error d-block">Required</span>
-           }
+        
          </div>
    
          <!-- RIGHT: cycle -->
@@ -129,6 +127,9 @@
          </div>
    
        </div>
+          @if(form.get('insuranceAmount')?.touched && form.get('insuranceAmount')?.hasError('required')) {
+             <span class="field-error d-block">Required</span>
+           }
      </div>
    </div>
    

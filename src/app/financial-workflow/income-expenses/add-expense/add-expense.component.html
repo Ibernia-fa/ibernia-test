@@ -10,7 +10,7 @@
       <div [formGroup]="expenseForm" class="d-flex flex-column gap-20">
         <div class="w-100 form-field gap-8">
           <mat-label class="f-s-16 d-block" style="line-height: 18px">Description</mat-label>
-          <input matInput formControlName="description" placeholder="e.g. State pension" />
+          <input matInput formControlName="description" placeholder="e.g. Bills" />
           
           @if(expenseForm.get('description')?.touched && expenseForm.get('description')?.hasError('required')) {
             <span class="field-error d-block">Required</span>
