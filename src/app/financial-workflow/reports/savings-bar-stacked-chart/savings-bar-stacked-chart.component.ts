@@ -59,12 +59,13 @@ export class SavingsBarStackedChartComponent implements OnChanges {
         const value = series[seriesIndex][dataPointIndex];
         const seriesName = w.globals.seriesNames[seriesIndex];
         const xValue = w.globals.labels[dataPointIndex];
-
+        // console.log('opts', opts, );
+        const age = [(Math.floor(xValue) - moment(this.client.clientDetails.birthDate).year())]
         // build whatever HTML you want here
         return `
           <div class="savings-tooltip">
             <div class="savings-tooltip__header">
-              <div>Age:24 </div>  <div> Year: ${xValue}</div> 
+              <div>Age: ${age} </div>  <div> Year: ${xValue}</div> 
             </div>
             <div class="savings-tooltip__body">
               <div class="savings-tooltip__label">${seriesName}:</div>
@@ -104,35 +105,35 @@ export class SavingsBarStackedChartComponent implements OnChanges {
             }
         }, 
       },
-      xaxis: {
-        type: 'numeric', // Treat x-axis as numbers (years)
-        min: 2023, // Start from 2023
-        max: 2123, // End at 2133 for a 100-year range
-        stepSize: 5, // Each year is a distinct tick
-        tickAmount: 19,
-        title: {
-          text: 'Age'
-        },
-        offsetX:-10,
-        style: {
-          cssClass: 'leftAlign'
-        },
-        labels: {
-          formatter: function(value: any) {
-            return [(Math.floor(value)-1993), Math.floor(value)]; // Ensure the year is displayed as an integer (remove fraction part)
-          }
-        }
-      },
-      yaxis: {
-        title: {
-          text: 'AED'
-        },
-        labels: {
-          formatter: function(value: any) {
-            return value?.toLocaleString();;
-          }
-        }
-      },
+      // xaxis: {
+      //   type: 'numeric', // Treat x-axis as numbers (years)
+      //   min: 2023, // Start from 2023
+      //   max: 2123, // End at 2133 for a 100-year range
+      //   stepSize: 5, // Each year is a distinct tick
+      //   tickAmount: 19,
+      //   title: {
+      //     text: 'Age'
+      //   },
+      //   offsetX:-10,
+      //   style: {
+      //     cssClass: 'leftAlign'
+      //   },
+      //   labels: {
+      //     formatter: function(value: any) {
+      //       return [(Math.floor(value)-1993), Math.floor(value)]; // Ensure the year is displayed as an integer (remove fraction part)
+      //     }
+      //   }
+      // },
+      // yaxis: {
+      //   title: {
+      //     text: 'AED'
+      //   },
+      //   labels: {
+      //     formatter: function(value: any) {
+      //       return value?.toLocaleString();;
+      //     }
+      //   }
+      // },
       legend: {
         position: "top",
         offsetX: 100,
@@ -172,23 +173,24 @@ export class SavingsBarStackedChartComponent implements OnChanges {
 
     if (changes['forecastStartDate'] || changes['forecastEndDate']) {
       this.chartOptions.xaxis = {
-        type: 'numeric', // Treat x-axis as numbers (years)
-        min: moment(this.forecastStartDate).year(), // Start from 2023
-        max: moment(this.forecastEndDate).year(), // End at 2133 for a 100-year range
+         type: 'category', // Treat x-axis as numbers (years)
+         categories: this.report.categories,
+        // min: moment(this.forecastStartDate).year(), // Start from 2023
+        // max: moment(this.forecastEndDate).year(), // End at 2133 for a 100-year range
         stepSize: 5, // Each year is a distinct tick
         tickAmount: Math.floor((moment(this.forecastEndDate).year() - moment(this.forecastStartDate).year()) / 5),
-        title: {
-          text: 'Age'
-        },
-        offsetX:-10,
+        // title: {
+        //   text: 'Age'
+        // },
+        // offsetX:-10,
         style: {
           cssClass: 'leftAlign'
         },
-        labels: {
-          formatter: (value: any) => {
-            return [(Math.floor(value) - moment(this.client.clientDetails.birthDate).year()), Math.floor(value)]; // Ensure the year is displayed as an integer (remove fraction part)
-          }
-        }
+        // labels: {
+        //   formatter: (value: any) => {
+        //     return [(Math.floor(value) - moment(this.client.clientDetails.birthDate).year()), Math.floor(value)]; // Ensure the year is displayed as an integer (remove fraction part)
+        //   }
+        // }
       }
     }
 
