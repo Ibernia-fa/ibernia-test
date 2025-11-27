@@ -34,7 +34,7 @@ export interface Emergency {
 }
 
 export interface StatsAndLookupData {
-  emergeinciesStats: {
+  emergenciesStats: {
     totalCoverage: number;
     totalCost: number;
     protectionScore: number;
