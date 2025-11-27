@@ -174,7 +174,9 @@
       </div>
       <div class="d-flex flex-column justify-content-between gap-4">
         <h4 class="page-title f-w-500">Risk & Insurance</h4>
-                        <span class="sub-title">Talha Basit</span>
+                        <span class="sub-title">{{clientData?.firstName}} {{clientData?.lastName}}</span> 
+                        <!-- <span class="sub-title">{{clientData?.lastName}}</span>  -->
+                        
 
       </div>
 </div>
@@ -197,7 +199,7 @@
                                     <h3 class="card-title expense-income">Total coverage</h3>
                                 </div>
                                 <h3 class="saving-title">
-                                   <span>$</span>{{s.emergeinciesStats.totalCoverage | number:'1.0-0'}}
+                                   <span>$</span>{{s.emergenciesStats?.totalCoverage | number:'1.0-0'}}
                                 </h3>
                             </div>
                         </div>
@@ -209,7 +211,7 @@
                                 <div class="d-flex align-items-center gap-8">
                                     <h3 class="card-title expenses-deduct">Total annual cost</h3>
                                 </div>
-                                <h3 class="saving-title"> <span>$</span>{{s.emergeinciesStats.totalCost | number:'1.0-0'}}
+                                <h3 class="saving-title"> <span>$</span>{{s.emergenciesStats?.totalCost | number:'1.0-0'}}
                                 </h3>
                             </div>
                         </div>
@@ -221,7 +223,7 @@
                                 <div class="d-flex align-items-center gap-8">
                                     <h3 class="card-title expenses-total">Protection score</h3>
                                 </div>
-                                <h3 class="saving-title saving-below-number"> {{s.emergeinciesStats.protectionScore}}/100</h3>
+                                <h3 class="saving-title saving-below-number"> {{s.emergenciesStats?.protectionScore}}/100</h3>
                             </div>
                         </div>
 
@@ -269,7 +271,7 @@
   <div class="d-flex gap-10 flex-wrap" >
 
     <div
-      class="card-em-outer " *ngFor="let e of emergencies; trackBy: trackById"
+      class="card-em-outer " *ngFor="let e of filteredEmergencies; trackBy: trackById"
     >
       <mat-card class="summary-card item-card" [ngClass]="getCardCssClass(e)">
         <!-- Header: icon + title + edit -->
@@ -286,7 +288,7 @@
           </div>
 
             <div class="d-flex align-items-center">
-                <button class="hide-button"  mat-icon-button >
+                <button class="hide-button"  mat-icon-button (click)="onHide(e)" >
                      
                   Hide
       </button>
@@ -374,8 +376,10 @@
   <div class="d-flex align-items-center m-t-10 justify-content-center">
 
      <!-- *ngIf="hasHiddenEmergencies" -->
-    <button  class="btn-secondary" mat-stroked-button color="primary">
-     <span>Show hidden</span> 
+    <button  class="btn-secondary" mat-stroked-button color="primary" (click)="toggleShowHidden()">
+     <span>
+    {{ showHidden ? 'Hide hidden' : 'Show hidden' }}
+    </span> 
     </button>
   </div>
     </mat-card-content>

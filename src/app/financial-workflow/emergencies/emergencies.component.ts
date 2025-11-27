@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { catchError, combineLatest, filter, map, Observable, of, switchMap, tap } from 'rxjs';
 import { NavItemService } from 'src/app/layouts/full/nav-item.service';
 import { EmergenciesHttpService as EmergenciesHttpService } from './services/emergencies-http.service';
@@ -20,6 +20,8 @@ import { selectedClient } from 'src/app/store/client/client.selectors';
 import { SettingsHttpService } from '../settings/services/settings-http.service';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
+import * as ClientActions from 'src/app/store/client/client.actions';
+
 // import { Client } from '../../clients/models/client'
 @Component({
   selector: 'app-emergencies',
@@ -39,7 +41,7 @@ import {MatButtonToggleModule} from '@angular/material/button-toggle';
 
 export class EmergenciesComponent {
   // Route params (use what your route provides; supports both styles)
-  clientId?: string;
+  clientId?: string = '';
   cashflowId!: string;
 
   // UI state
@@ -69,7 +71,7 @@ export class EmergenciesComponent {
     private navItemService: NavItemService,
     private store: Store,
     private settingHttpService: SettingsHttpService,
-
+    private cdr:ChangeDetectorRef
   ) {
     this.load();
     this.navItemService.currentRouteName = 'Emergencies';
@@ -121,6 +123,8 @@ export class EmergenciesComponent {
         tap(() => (this.isLoading = false))
       )
       .subscribe();
+
+
 
     this.client$ = this.store.select(selectedClient);
     this.client$
@@ -309,6 +313,7 @@ onHide(e: Emergency,) {
 
       // if your API returns updated stats as well, you could also refresh stats here
       this.load(); // or patch stats from response if you get them
+      this.cdr.detectChanges();
     },
     error: (err) => {
       console.error(err);
