@@ -13,13 +13,14 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { CommonModule } from '@angular/common';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Client, Details } from 'src/app/clients/models/client';
 import { Store } from '@ngrx/store';
 import { selectedClient } from 'src/app/store/client/client.selectors';
 import { SettingsHttpService } from '../settings/services/settings-http.service';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
-import * as ClientActions from 'src/app/store/client/client.actions';
+// import { CurrencySymbolPipe } from 'src/app/pipe/currency-symbol.pipe';
 
 @Component({
   selector: 'app-emergencies',
@@ -30,7 +31,9 @@ import * as ClientActions from 'src/app/store/client/client.actions';
     MatChipsModule,
     CommonModule,
     MatTooltipModule,
-    MatButtonToggleModule
+    MatButtonToggleModule,
+    // CurrencySymbolPipe,
+    MatProgressSpinnerModule
   ],
 
   templateUrl: './emergencies.component.html',
@@ -60,6 +63,9 @@ export class EmergenciesComponent {
   clientData: Details;
   amountCycles: any;
   showHidden: boolean;
+
+  isClientLoaded = false;
+  isEmergenciesLoaded = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -116,7 +122,11 @@ export class EmergenciesComponent {
           this.willStatuses = this.stats?.willStatuses ?? [];
           this.insuranceCostTemplate = this.stats?.insuranceCost ?? undefined;
         }),
-        tap(() => (this.isLoading = false))
+        tap(() =>  {
+          this.isLoading = false;
+          this.isEmergenciesLoaded = true;
+          this.checkFullyLoaded();
+        })
       )
       .subscribe();
 
@@ -125,10 +135,20 @@ export class EmergenciesComponent {
       .subscribe(client => {
         if (client) {
           this.clientData = client.clientDetails;
+          this.isClientLoaded = true;
+          this.checkFullyLoaded();
+          this.cdr.detectChanges();
 
           console.log('this client', this.clientData);
         }
       });
+  }
+
+  checkFullyLoaded() {
+    if (this.isClientLoaded && this.isEmergenciesLoaded) {
+      this.isLoading = false;
+      this.cdr.detectChanges();
+    }
   }
 
   trackById(_: number, e: Emergency) {
@@ -186,10 +206,13 @@ export class EmergenciesComponent {
 
   getInsuranceCostLabel(e: Emergency): string {
     const cost = e.insuranceCost;
+    
     if (!cost) return '-';
-    const symbol = cost.currencySymbol ?? '';
+    
+    const symbol = this.clientData?.preferredCurrency ?? '';
     const amount = cost.amount ?? 0;
     const cycleDesc = cost.cycle?.description || cost.cycle?.id || '';
+    
     return `${symbol}${amount} `;
   }
 
@@ -272,10 +295,10 @@ export class EmergenciesComponent {
     });
   }
 
-  onHide(e: Emergency,) {
+  showHideEmergency(e: Emergency,) {
     const updated: Emergency = {
       ...e,
-      isHidden: true
+      isHidden: !e.isHidden
     };
 
     this.emergenciesHttp.updateEmergency(updated).subscribe({
@@ -298,6 +321,7 @@ export class EmergenciesComponent {
     if (this.showHidden) {
       return this.emergencies;
     }
+
     return this.emergencies.filter(e => !e.isHidden);
   }
 

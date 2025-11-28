@@ -123,8 +123,6 @@ export class AddEmergenciesComponent {
     const existing = this.data.emergency;
     const nowIso = new Date().toISOString();
     const type = existing?.type ?? 1;
-
-    const willStatus = existing?.willStatus ?? 2;
     const isHidden = existing?.isHidden ?? false;
     const emergencyType = type == 2 ? "Will" : "Insurance";
 
@@ -144,7 +142,7 @@ export class AddEmergenciesComponent {
       insuranceCost,
       coverage: form.coverage,
       coverageAdequacy: form.coverageAdequacy,
-      willStatus: type === 2 ? willStatus : 1,
+      willStatus: type === 2 ? form.willStatus : 1,
       name: form.name,
       iconUrl: this.resolveIconUrl(type),
       isHidden,
@@ -161,13 +159,12 @@ export class AddEmergenciesComponent {
         insuranceCost,
         coverage: form.coverage,
         coverageAdequacy: form.coverageAdequacy,
-        willStatus: type === 2 ? willStatus : 1,
+        willStatus: type === 2 ? form.willStatus : 1,
         name: form.name,
         iconUrl: this.resolveIconUrl(type),
         isHidden,
         client: existing.client ?? this.data.client ?? { id: '', name: '' },
-        cashflow:
-          existing.cashflow ?? this.data.cashflow ?? { id: '', name: '' },
+        cashflow: existing.cashflow ?? this.data.cashflow ?? { id: '', name: '' },
         createdAt: existing.createdAt ?? nowIso,
         updatedAt: nowIso,
       };
