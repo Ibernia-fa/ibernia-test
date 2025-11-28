@@ -229,14 +229,37 @@ export class EmergenciesComponent {
 
   getCardCssClass(e: Emergency): string {
     // Simple example: mark "not covered" / bad adequacy as danger
-    const isNotCovered = e.policyStatus == 2;
-    return isNotCovered ? 'danger-card' : 'home-card';
+    if(e.type === 1)
+    {
+      const isNotCovered = e.policyStatus == 2;
+      return isNotCovered ? 'danger-card' : 'home-card';
+    }
+
+    if(e.type === 2)
+    {
+      const isNotDone = e.willStatus == 2;
+      return isNotDone ? 'danger-card' : 'home-card';
+    }
+
+    return 'danger-card';
   }
 
   getDotClass(e: Emergency): string {
     // Simple example: mark "not covered" / bad adequacy as danger
-    const isNotCovered = e.policyStatus == 2;
-    return isNotCovered ? 'dot-red' : 'dot';
+    
+    if(e.type === 1)
+    {
+      const isNotCovered = e.policyStatus == 2;
+      return isNotCovered ? 'dot-red' : 'dot';
+    }
+
+    if(e.type === 2)
+    {
+      const isNotDone = e.willStatus == 2;
+      return isNotDone ? 'dot-red' : 'dot';
+    }
+
+    return 'dot-red';
   }
 
   get hasHiddenEmergencies(): boolean {

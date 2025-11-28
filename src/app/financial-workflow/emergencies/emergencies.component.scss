@@ -1,68 +1,78 @@
 .protection-center {
-  .card-em-outer{
-   width: calc((100% - 20px) / 3);
-   min-height: 161px;
+  .card-em-outer {
+    width: calc((100% - 20px) / 3);
+    min-height: 161px;
   }
-  .dot{
+
+  .dot {
     height: 8px;
     width: 8px;
     border-radius: 100px;
     background-color: green;
-    &.red{
+
+    &.red {
       background-color: red;
     }
   }
-    .dot-red{
+
+  .dot-red {
     height: 8px;
     width: 8px;
     border-radius: 100px;
     background-color: red;
   }
-    .summary-card {
-      
-       .w-50{
-        width: 50%;
-       }
+
+  .summary-card {
+
+    .w-50 {
+      width: 50%;
+    }
+
     padding: 15px;
     border-radius: 4px;
-        height:100%;
-        button{
-          border: none;
-          background: none;
-          color: #8d8d8d;
-          border-radius: 100px;
-          height: 35px;
-          width: 35px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-           mat-icon{
-            font-size: 20px;
-            margin-top: 2px;
-          }
-          &:hover{
-           background-color: #e9edf1;
-        
-          }
-          &.hide-button{
-            border-radius: 4px;
-          border: 1px solid #e2e8f0;
-          padding: 6px 10px;
-          width: auto;
-          height: inherit;
-          font-size: 12px;
-          margin-right:5px;
-          }
-        }
+    height:100%;
 
-  .inner-information{
-    line-height: normal;
-    label{
-          font-size: 14px;
-          color: #747474;
+    button {
+      border: none;
+      background: none;
+      color: #8d8d8d;
+      border-radius: 100px;
+      height: 35px;
+      width: 35px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+
+      mat-icon {
+        font-size: 20px;
+        margin-top: 2px;
+      }
+
+      &:hover {
+        background-color: #e9edf1;
+
+      }
+
+      &.hide-button {
+        border-radius: 4px;
+        border: 1px solid #e2e8f0;
+        padding: 6px 10px;
+        width: auto;
+        height: inherit;
+        font-size: 12px;
+        margin-right: 5px;
+      }
     }
-  }
+
+    .inner-information {
+      line-height: normal;
+
+      label {
+        font-size: 14px;
+        color: #747474;
+      }
+    }
   }
 }
 
@@ -76,9 +86,11 @@
   font-weight: 500;
   margin-top: 4px;
 }
-.summary-card .value.text-danger{
+
+.summary-card .value.text-danger {
   color: #c70036;
 }
+
 .danger-outline {
   border: 1px solid #f8d7da !important;
   background: #fff5f5;
@@ -91,7 +103,7 @@
 
 .health-card {
   background: #fffbeb;
-  border: 1px solid #fee685!important;
+  border: 1px solid #fee685 !important;
 }
 
 .home-card {
@@ -102,18 +114,21 @@
   background: #fff1f2;
   border: 1px solid #ffccd3 !important;
 }
-.good-card-covered{
+
+.good-card-covered {
   background-color: #ecfdf5;
   border: 1px solid #a4f4cf !important;
 
 }
-.excellent-card-covered{
-      background-color: #b6f6d9;
-    border: 1px solid #59c996 !important;
+
+.excellent-card-covered {
+  background-color: #b6f6d9;
+  border: 1px solid #59c996 !important;
 }
+
 .card-title {
   font-size: 18px;
-  font-weight:500;
+  font-weight: 500;
 }
 
 .hide-btn {
@@ -121,25 +136,28 @@
   padding: 0;
 }
 
-.divider{
+.divider {
   width: 1.5px;
-    margin-left: 12px;
-    margin-right: 12px;
-    background-color: #e7e7eb;
+  margin-left: 12px;
+  margin-right: 12px;
+  background-color: #e7e7eb;
 }
-.saving-title{
+
+.saving-title {
   font-size: 24px;
-    line-height: 30px;
-    color: #1c1c1c;
-    font-weight: 700;
-    font-family: "Ubuntu" !important;
-    &.saving-below-number{
-      color: red;
-    }
+  line-height: 30px;
+  color: #1c1c1c;
+  font-weight: 700;
+  font-family: "Ubuntu" !important;
+
+  &.saving-below-number {
+    color: red;
+  }
 }
+
 .income-expense-wrapper {
-  
-    .card-title{
+
+  .card-title {
     font-size: 18px;
     line-height: 19px;
     font-weight: 700;
@@ -152,6 +170,5 @@
     // &.expenses-total{
     // color: #4043af;
     // }
-    }
+  }
 }
-

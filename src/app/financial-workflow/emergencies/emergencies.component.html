@@ -72,6 +72,7 @@
   <mat-card class="mat-mdc-card mdc-card cardWithShadow mb-20">
     <mat-card-content class="mat-mdc-card-content protection-center">
       <div class="d-flex gap-10 flex-wrap">
+        
         <div class="card-em-outer " *ngFor="let e of filteredEmergencies; trackBy: trackById">
           <mat-card class="summary-card item-card" [ngClass]="getCardCssClass(e)">
             <div class="d-flex justify-content-between m-b-5">
@@ -99,59 +100,53 @@
             </div>
 
             @if(e.type === 1){
-            <ng-container *ngIf="e.policyStatus === 1; else insuranceTemplate">
-              <div class="d-flex m-b-10">
-                <div class="inner-information  w-50">
-                  <div class="label">Coverage</div>
-                  <div class="f-w-500 f-s-14">
-                    <span>$</span>{{e.coverage | number:'1.0-0'}}
+              <ng-container *ngIf="e.policyStatus === 1; else insuranceTemplate">
+                <div class="d-flex m-b-10">
+                  <div class="inner-information w-50">
+                    <div class="label">Coverage</div>
+                    <div class="f-w-500 f-s-14">
+                      <span>$</span>{{e.coverage | number:'1.0-0'}}
+                    </div>
+                  </div>
+
+                  <div class="inner-information">
+                    <div class="label">Annual cost</div>
+                    <div class="f-w-500 f-s-14">
+                      {{ getInsuranceCostLabel(e) }}
+                    </div>
                   </div>
                 </div>
-
                 <div class="inner-information">
-                  <div class="label">Annual cost</div>
-                  <div class="f-w-500 f-s-14">
-                    {{ getInsuranceCostLabel(e) }}
+                  <div class="label m-b-5">Adequacy</div>
+                  <mat-button-toggle-group class="coverage-toggle-group" [value]="e.coverageAdequacy"
+                    (change)="onCoverageAdequacyChange(e, $event.value)" aria-label="Coverage adequacy">
+                    <mat-button-toggle *ngFor="let ca of coverageAdequacies" [value]="ca.id">
+                      {{ ca.description }}
+                    </mat-button-toggle>
+                  </mat-button-toggle-group>
+                </div>
+              </ng-container>
+
+              <!-- Will-type emergency (type = 2) -->
+              <ng-template #insuranceTemplate>
+                <div class="inner-information">
+                  <div class="label">Status</div>
+                  <div class="f-w-500 f-s-14"
+                    [ngClass]="{ 'text-danger': e.policyStatus !== 1, 'text-success': e.policyStatus === 1 }">
+                    Not covered
                   </div>
                 </div>
-              </div>
-              <div class="inner-information">
-                <div class="label m-b-5">Adequacy</div>
-                <mat-button-toggle-group class="coverage-toggle-group" [value]="e.coverageAdequacy"
-                  (change)="onCoverageAdequacyChange(e, $event.value)" aria-label="Coverage adequacy">
-                  <mat-button-toggle *ngFor="let ca of coverageAdequacies" [value]="ca.id">
-                    {{ ca.description }}
-                  </mat-button-toggle>
-                </mat-button-toggle-group>
-              </div>
-            </ng-container>
-
-            <!-- Will-type emergency (type = 2) -->
-            <ng-template #insuranceTemplate>
-              <div class="inner-information">
-                <div class="label">Status</div>
-                <div class="f-w-500 f-s-14"
-                  [ngClass]="{ 'text-danger': e.policyStatus !== 1, 'text-success': e.policyStatus === 1 }">
-                  Not covered
-                </div>
-              </div>
-            </ng-template>
+              </ng-template>
             }
 
             @if(e.type === 2){
-            <div class="inner-information">
-              <div class="label">Status</div>
-              <div class="f-w-500 f-s-14"
-                [ngClass]="{ 'text-danger': e.willStatus === 2, 'text-success': e.willStatus === 1 }">
-                @if(e.willStatus === 1)
-                {
-                Done
-                } @else {
-                {{willStatus}}
-                Not done
-                }
+              <div class="inner-information">
+                <div class="label">Status</div>
+                <div class="f-w-500 f-s-14"
+                  [ngClass]="{ 'text-danger': e.willStatus !== 1, 'text-success': e.willStatus === 1 }">
+                  {{e.willStatus === 1 ? 'Done' : 'Not done' }}
+                </div>
               </div>
-            </div>
             }
           </mat-card>
         </div>
