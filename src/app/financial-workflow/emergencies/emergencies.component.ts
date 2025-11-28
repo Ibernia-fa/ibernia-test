@@ -1,5 +1,5 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { catchError, combineLatest, filter, map, Observable, of, switchMap, tap } from 'rxjs';
+import { ChangeDetectorRef, Component } from '@angular/core';
+import { catchError, filter, map, Observable, of, switchMap, tap } from 'rxjs';
 import { NavItemService } from 'src/app/layouts/full/nav-item.service';
 import { EmergenciesHttpService as EmergenciesHttpService } from './services/emergencies-http.service';
 import { MatSliderModule } from '@angular/material/slider';
@@ -41,19 +41,12 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 })
 
 export class EmergenciesComponent {
-  // Route params (use what your route provides; supports both styles)
   clientId?: string = '';
   cashflowId!: string;
-
-  // UI state
   isLoading = false;
   errorMessage = '';
-
-  // Data
   emergencies: Emergency[] = [];
   stats?: StatsAndLookupData;
-
-  // Lookups (for add/edit popup later)
   emergencyTypes: LookupItem[] = [];
   policyStatuses: LookupItem[] = [];
   coverageAdequacies: LookupItem[] = [];
@@ -180,7 +173,7 @@ export class EmergenciesComponent {
       },
     }).afterClosed().subscribe(res => {
       if (res?.status === 'Success') {
-        this.load(); // re-fetch emergencies + stats
+        this.load();
       }
     });
   }
@@ -190,7 +183,9 @@ export class EmergenciesComponent {
   }
 
   getPolicyStatusLabel(statusId: number | null): string {
-    if (statusId == null) return '-';
+    if (statusId == null) 
+      return '-';
+    
     return this.policyStatuses.find(p => p.id === statusId)?.description ?? 'Unknown';
   }
 
@@ -201,6 +196,7 @@ export class EmergenciesComponent {
 
   getWillStatusLabel(id: number | null): string {
     if (id == null) return 'Not set';
+
     return this.policyStatuses.find(w => w.id === id)?.description ?? 'Unknown';
   }
 
@@ -217,7 +213,7 @@ export class EmergenciesComponent {
   }
 
   getIconName(e: Emergency): string {
-    // you can tweak this mapping
+    // TODO: update this when icons are available
     if (e.type === 1) {
       return 'health_and_safety'; // insurance
     }
@@ -258,10 +254,6 @@ export class EmergenciesComponent {
     }
 
     return 'dot-red';
-  }
-
-  get hasHiddenEmergencies(): boolean {
-    return this.emergencies?.some(e => e.isHidden) ?? false;
   }
 
   onEditClick(emergency: Emergency): void {
@@ -308,14 +300,6 @@ export class EmergenciesComponent {
       });
   }
 
-  get filteredEmergencies(): Emergency[] {
-    if (this.showHidden) {
-      return this.emergencies;
-    }
-
-    return this.emergencies.filter(e => !e.isHidden);
-  }
-
   toggleShowHidden(): void {
     this.showHidden = !this.showHidden;
   }
@@ -337,6 +321,18 @@ export class EmergenciesComponent {
         this.toastr.error('Failed to update coverage adequacy', 'Error');
       }
     });
+  }
+
+  get hasHiddenEmergencies(): boolean {
+    return this.emergencies?.some(e => e.isHidden) ?? false;
+  }
+
+  get filteredEmergencies(): Emergency[] {
+    if (this.showHidden) {
+      return this.emergencies;
+    }
+
+    return this.emergencies.filter(e => !e.isHidden);
   }
 }
 

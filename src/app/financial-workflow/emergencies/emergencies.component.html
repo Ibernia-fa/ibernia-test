@@ -119,6 +119,7 @@
                 </div>
                 <div class="inner-information">
                   <div class="label m-b-5">Adequacy</div>
+                  
                   <mat-button-toggle-group class="coverage-toggle-group" [value]="e.coverageAdequacy"
                     (change)="onCoverageAdequacyChange(e, $event.value)" aria-label="Coverage adequacy">
                     <mat-button-toggle *ngFor="let ca of coverageAdequacies" [value]="ca.id">
