@@ -1,15 +1,6 @@
 import { Component, Inject } from '@angular/core';
-import {
-  FormBuilder,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
-import {
-  MAT_DIALOG_DATA,
-  MatDialogModule,
-  MatDialogRef,
-} from '@angular/material/dialog';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { CommonModule } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -17,27 +8,9 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { ToastrService } from 'ngx-toastr';
-
-import {
-  Emergency,
-  CreateEmergencyRequest,
-  LookupItem,
-  Money,
-} from '../models/emergencies.model';
-
+import { Emergency, CreateEmergencyRequest, LookupItem, Money } from '../models/emergencies.model';
 import { EmergenciesHttpService } from '../services/emergencies-http.service';
 import { allCountries } from 'src/app/clients/models/country';
-
-// export interface AddEmergenciesDialogData {
-//   emergencyTypes: LookupItem[];        // from stats.emergencyTypes
-//   policyStatuses: LookupItem[];        // from stats.policyStatuses
-//   coverageAdequacies: LookupItem[];    // from stats.coverageAdequacies
-//   willStatuses: LookupItem[];          // from stats.willStatuses (not used yet in UI)
-//   insuranceCostTemplate?: Money;       // from stats.insuranceCost
-//   client?: { id: string; name: string };
-//   cashflow?: { id: string; name: string };
-//   defaultTypeId?: number;              // optional: Insurance = 1, Will = 2, etc.
-// }
 
 export interface AddEmergencyDialogData {
   mode: 'add' | 'edit';
@@ -49,8 +22,8 @@ export interface AddEmergencyDialogData {
   insuranceCostTemplate?: Money;
   client?: { id: string; name: string };
   cashflow?: { id: string; name: string };
-    clientPreferredCurrency?: string;
-  cycles?: { id: string; description: string }[]; 
+  clientPreferredCurrency?: string;
+  cycles?: { id: string; description: string }[];
 }
 
 @Component({
@@ -80,8 +53,8 @@ export class AddEmergenciesComponent {
   countries = allCountries;
 
   // used for display
-insuranceCycles: { id: string; description: string }[] = [];
-currencySymbol: string;
+  insuranceCycles: { id: string; description: string }[] = [];
+  currencySymbol: string;
 
   isSaving = false;
 
@@ -97,8 +70,8 @@ currencySymbol: string;
     this.coverageAdequacies = data.coverageAdequacies ?? [];
     this.willStatuses = data.willStatuses ?? [];
     this.insuranceCostTemplate = data.insuranceCostTemplate;
-this.currencySymbol =
-  data.clientPreferredCurrency ?? '';
+    this.currencySymbol =
+      data.clientPreferredCurrency ?? '';
     this.insuranceCycles = data.cycles ?? [];
     this.form = this.fb.group({
       name: ['', Validators.required],
@@ -117,16 +90,16 @@ this.currencySymbol =
     });
 
     this.form.get('currencySymbol')?.disable();
-const policyCtrl = this.form.get('policyStatus');
-this.updateValidatorsForPolicyStatus(policyCtrl?.value ?? null);
+    const policyCtrl = this.form.get('policyStatus');
+    this.updateValidatorsForPolicyStatus(policyCtrl?.value ?? null);
 
-// 🔹 React to changes
-policyCtrl?.valueChanges.subscribe((status: number) => {
-  this.updateValidatorsForPolicyStatus(status);
-});
-  if (this.data.mode === 'edit' && this.data.emergency) {
-    this.patchForm(this.data.emergency);
-  }
+    // react to changes
+    policyCtrl?.valueChanges.subscribe((status: number) => {
+      this.updateValidatorsForPolicyStatus(status);
+    });
+    if (this.data.mode === 'edit' && this.data.emergency) {
+      this.patchForm(this.data.emergency);
+    }
   }
 
   closeDialog(): void {
@@ -134,194 +107,43 @@ policyCtrl?.valueChanges.subscribe((status: number) => {
   }
 
   private patchForm(e: Emergency): void {
-  // this.form.patchValue({
-  //   type: e.type || 1,
-  //   policyStatus: e.policyStatus,
-  //   name: e.name,
-  //   insuranceAmount: e.insuranceCost?.amount ?? 0,
-  //   insuranceCycleId: e.insuranceCost?.cycle?.id ?? 'annual',
-  //   coverage: e.coverage ?? 0,
-  //   coverageAdequacy: e.coverageAdequacy ?? 1,
-  //   willStatus: e.willStatus ?? 1,
-  //   isHidden: e.isHidden ?? false,
-  // });
     this.form.patchValue({
-    name: e.name,
-    policyStatus: e.policyStatus,
-    insuranceAmount: e.insuranceCost?.amount ?? 0,
-    insuranceCycleId: e.insuranceCost?.cycle?.id ?? 'annual',
-    coverage: e.coverage ?? 0,
-    coverageAdequacy: e.coverageAdequacy ?? 1,
-    currencySymbol:e.insuranceCost.currencySymbol
-  });
-}
-
-
-//   save(): void {
-//     if (this.form.invalid) {
-//       this.form.markAllAsTouched();
-//       return;
-//     }
-
-//     const v = this.form.value;
-//     const now = new Date().toISOString();
-
-//     const selectedCycle =
-//       this.insuranceCycles.find(c => c.id === v.insuranceCycleId) ??
-//       this.insuranceCycles[0];
-
-//     // Choose a type; for now default to Insurance (1) unless caller passes something else
-//     const typeId = this.data.defaultTypeId ?? 1;
-//   const form = this.form.value; 
-//  const payload: CreateEmergencyRequest = {
-//   type: form.type,
-//   policyStatus: form.policyStatus,
-//   insuranceCost: {
-//     currencySymbol: '£',
-//     amount: form.insuranceAmount,
-//     cycle: {
-//       id: form.insuranceCycleId,
-//       description: form.insuranceCycleDescription,
-//     },
-//   },
-//   coverage: form.coverage,
-//   coverageAdequacy: form.coverageAdequacy,
-//   willStatus: form.type === 2 ? form.willStatus : 1,
-//   name: form.name,
-//   iconUrl: '',          // or some default
-//   isHidden: false,      // or from a checkbox later
-//   client: {
-//     id: this.data.client?.id ?? '', 
-//     name: this.data.client?.name ?? '',
-//   },
-//   cashflow: {
-//     id: this.data.cashflow?.id  ?? '',
-//     name: this.data.cashflow?.name ?? '',
-//   },
-// };
-
-
-//     this.isSaving = true;
-//     this.emergenciesHttp.createEmergency(payload).subscribe({
-//       next: (res) => {
-//         this.isSaving = false;
-//         this.toastr.success('Cover added successfully', 'Success');
-//         this.dialogRef.close({ status: 'Success', emergency: res });
-//       },
-//       error: (err) => {
-//         console.error(err);
-//         this.isSaving = false;
-//         this.toastr.error('Failed to add cover', 'Error');
-//       },
-//     });
-//   }
-
-// onSave(): void {
-//   if (this.form.invalid) {
-//     this.form.markAllAsTouched();
-//     return;
-//   }
-
-//   const form = this.form.value;
-//   const existing = this.data.emergency;
-
-//   const nowIso = new Date().toISOString();
-//   const payload: CreateEmergencyRequest = {
-//      id: existing?.id ?? '',
-//     type: form.type,
-//     policyStatus: form.policyStatus,
-//     insuranceCost: {
-//       currencySymbol: '£', // or from template / user preference
-//       amount: form.insuranceAmount,
-//       cycle: {
-//         id: form.insuranceCycleId,
-//         description: null,
-//       }
-//     },
-//     coverage: form.coverage,
-//     coverageAdequacy: form.coverageAdequacy,
-//     willStatus: form.type === 2 ? form.willStatus : 1,
-//     name: form.name,
-//     iconUrl: '',
-//     isHidden: form.isHidden ?? false,
-//     client: this.data.client ?? { id: '', name: '' },
-//     cashflow: this.data.cashflow ?? { id: '', name: '' },
-//   };
-
-//   if (this.data.mode === 'edit' && this.data.emergency) {
-//     // TODO: call update API
-//     // this.emergenciesHttp.updateEmergency(this.data.emergency.id, payload)...
-//         this.emergenciesHttp.updateEmergency(payload).subscribe({
-//       next: (res: Emergency) => {
-//         this.dialogRef.close({ status: 'Success', emergency: res });
-//       },
-//       error: (err) => {
-//         console.error(err);
-//         // optional: show toastr.error
-//       },
-//     });
-//   } else {
-//     // create
-//     this.emergenciesHttp.createEmergency(payload).subscribe({
-//       next: (res) => this.dialogRef.close({ status: 'Success', emergency: res }),
-//       error: (err) => console.error(err),
-//     });
-//   }
-// }
-
-
-onSave(): void {
-  if (this.form.invalid) {
-    this.form.markAllAsTouched();
-    return;
+      name: e.name,
+      policyStatus: e.policyStatus,
+      insuranceAmount: e.insuranceCost?.amount ?? 0,
+      insuranceCycleId: e.insuranceCost?.cycle?.id ?? 'annual',
+      coverage: e.coverage ?? 0,
+      coverageAdequacy: e.coverageAdequacy ?? 1,
+      currencySymbol: e.insuranceCost.currencySymbol
+    });
   }
 
-  const form = this.form.getRawValue(); 
-  const existing = this.data.emergency;
-  const nowIso = new Date().toISOString();
+  onSave(): void {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
 
-  // derive type / will / hidden from existing for now
-  const type = existing?.type ?? 1;              // 1 = Insurance default
-  const willStatus = existing?.willStatus ?? 1;  // default Done
-  const isHidden = existing?.isHidden ?? false;
+    const form = this.form.getRawValue();
+    const existing = this.data.emergency;
+    const nowIso = new Date().toISOString();
 
-  // const insuranceCost: Money = {
-  //   currencySymbol: this.currencySymbol,
-  //   amount: form.insuranceAmount,
-  //   cycle: {
-  //     id: form.insuranceCycleId,
-  //     description: null,
-  //   },
-  // };
+    // derive type / will / hidden from existing for now
+    const type = existing?.type ?? 1;              // 1 = Insurance default
+    const willStatus = existing?.willStatus ?? 1;  // default Done
+    const isHidden = existing?.isHidden ?? false;
 
-  const insuranceCost: Money = {
-  currencySymbol: form.currencySymbol,  // now comes from control
-  amount: form.insuranceAmount,
-  cycle: {
-    id: form.insuranceCycleId,
-    description: null,
-  },
-};
+    const insuranceCost: Money = {
+      currencySymbol: form.currencySymbol,  // now comes from control
+      amount: form.insuranceAmount,
+      cycle: {
+        id: form.insuranceCycleId,
+        description: null,
+      },
+    };
 
-  // 🔹 CREATE payload (no id, no createdAt/updatedAt)
-  const createPayload: CreateEmergencyRequest = {
-    type,
-    policyStatus: form.policyStatus,
-    insuranceCost,
-    coverage: form.coverage,
-    coverageAdequacy: form.coverageAdequacy,
-    willStatus: type === 2 ? willStatus : 1,
-    name: form.name,
-    iconUrl: this.resolveIconUrl(type),
-    isHidden,
-    client: this.data.client ?? { id: '', name: '' },
-    cashflow: this.data.cashflow ?? { id: '', name: '' },
-  };
-
-  if (this.data.mode === 'edit' && existing) {
-    // 🔹 UPDATE payload: full Emergency, includes id + timestamps
-    const updatePayload: Emergency = {
-      id: existing.id,
+    // CREATE payload (no id, no createdAt/updatedAt)
+    const createPayload: CreateEmergencyRequest = {
       type,
       policyStatus: form.policyStatus,
       insuranceCost,
@@ -331,39 +153,54 @@ onSave(): void {
       name: form.name,
       iconUrl: this.resolveIconUrl(type),
       isHidden,
-      client: existing.client ?? this.data.client ?? { id: '', name: '' },
-      cashflow:
-        existing.cashflow ?? this.data.cashflow ?? { id: '', name: '' },
-      createdAt: existing.createdAt ?? nowIso,
-      updatedAt: nowIso,
+      client: this.data.client ?? { id: '', name: '' },
+      cashflow: this.data.cashflow ?? { id: '', name: '' },
     };
 
-    this.emergenciesHttp.updateEmergency(updatePayload).subscribe({
-      next: (res: Emergency) => {
-        this.toastr.success('Cover updated successfully', 'Success');
-        this.dialogRef.close({ status: 'Success', emergency: res });
-      },
-      error: (err) => {
-        console.error(err);
-        this.toastr.error('Failed to update cover', 'Error');
-      },
-    });
-  } else {
-    // 🔹 CREATE
-    this.emergenciesHttp.createEmergency(createPayload).subscribe({
-      next: (res: Emergency) => {
-        this.toastr.success('Cover added successfully', 'Success');
-        this.dialogRef.close({ status: 'Success', emergency: res });
-      },
-      error: (err) => {
-        console.error(err);
-        this.toastr.error('Failed to add cover', 'Error');
-      },
-    });
+    if (this.data.mode === 'edit' && existing) {
+      // UPDATE payload: full Emergency, includes id + timestamps
+      const updatePayload: Emergency = {
+        id: existing.id,
+        type,
+        policyStatus: form.policyStatus,
+        insuranceCost,
+        coverage: form.coverage,
+        coverageAdequacy: form.coverageAdequacy,
+        willStatus: type === 2 ? willStatus : 1,
+        name: form.name,
+        iconUrl: this.resolveIconUrl(type),
+        isHidden,
+        client: existing.client ?? this.data.client ?? { id: '', name: '' },
+        cashflow:
+          existing.cashflow ?? this.data.cashflow ?? { id: '', name: '' },
+        createdAt: existing.createdAt ?? nowIso,
+        updatedAt: nowIso,
+      };
+
+      this.emergenciesHttp.updateEmergency(updatePayload).subscribe({
+        next: (res: Emergency) => {
+          this.toastr.success('Cover updated successfully', 'Success');
+          this.dialogRef.close({ status: 'Success', emergency: res });
+        },
+        error: (err) => {
+          console.error(err);
+          this.toastr.error('Failed to update cover', 'Error');
+        },
+      });
+    } else {
+      // CREATE
+      this.emergenciesHttp.createEmergency(createPayload).subscribe({
+        next: (res: Emergency) => {
+          this.toastr.success('Cover added successfully', 'Success');
+          this.dialogRef.close({ status: 'Success', emergency: res });
+        },
+        error: (err) => {
+          console.error(err);
+          this.toastr.error('Failed to add cover', 'Error');
+        },
+      });
+    }
   }
-}
-
-
 
   private resolveIconUrl(typeId: number): string {
     const t = this.emergencyTypes.find(e => e.id === typeId);
@@ -377,41 +214,36 @@ onSave(): void {
 
   private NOT_COVERED_STATUS_ID = 2; // id for "NotCovered"
 
-private updateValidatorsForPolicyStatus(status: number | null): void {
-  const insuranceAmountCtrl   = this.form.get('insuranceAmount');
-  const insuranceCycleIdCtrl  = this.form.get('insuranceCycleId');
-  const coverageAdequacyCtrl  = this.form.get('coverageAdequacy');
-  const coverageCtrl          = this.form.get('coverage');
+  private updateValidatorsForPolicyStatus(status: number | null): void {
+    const insuranceAmountCtrl = this.form.get('insuranceAmount');
+    const insuranceCycleIdCtrl = this.form.get('insuranceCycleId');
+    const coverageAdequacyCtrl = this.form.get('coverageAdequacy');
+    const coverageCtrl = this.form.get('coverage');
 
-  if (!insuranceAmountCtrl || !insuranceCycleIdCtrl || !coverageAdequacyCtrl || !coverageCtrl) {
-    return;
+    if (!insuranceAmountCtrl || !insuranceCycleIdCtrl || !coverageAdequacyCtrl || !coverageCtrl) {
+      return;
+    }
+
+    const isNotCovered = status === this.NOT_COVERED_STATUS_ID;
+
+    if (isNotCovered) {
+      // remove validators when NotCovered (fields hidden)
+      insuranceAmountCtrl.clearValidators();
+      insuranceCycleIdCtrl.clearValidators();
+      coverageAdequacyCtrl.clearValidators();
+      coverageCtrl.clearValidators();
+
+    } else {
+      // re-apply validators when status is Covered (or anything else)
+      insuranceAmountCtrl.setValidators([Validators.required, Validators.min(0)]);
+      insuranceCycleIdCtrl.setValidators([Validators.required]);
+      coverageAdequacyCtrl.setValidators([Validators.required]);
+      coverageCtrl.setValidators([Validators.required, Validators.min(0)]);
+    }
+
+    insuranceAmountCtrl.updateValueAndValidity({ emitEvent: false });
+    insuranceCycleIdCtrl.updateValueAndValidity({ emitEvent: false });
+    coverageAdequacyCtrl.updateValueAndValidity({ emitEvent: false });
+    coverageCtrl.updateValueAndValidity({ emitEvent: false });
   }
-
-  const isNotCovered = status === this.NOT_COVERED_STATUS_ID;
-
-  if (isNotCovered) {
-    // 🔹 Remove validators when NotCovered (fields hidden)
-    insuranceAmountCtrl.clearValidators();
-    insuranceCycleIdCtrl.clearValidators();
-    coverageAdequacyCtrl.clearValidators();
-    coverageCtrl.clearValidators();
-
-    // Optional: also clear values
-    // insuranceAmountCtrl.setValue(null);
-    // coverageAdequacyCtrl.setValue(null);
-    // coverageCtrl.setValue(null);
-  } else {
-    // 🔹 Re-apply validators when status is Covered (or anything else)
-    insuranceAmountCtrl.setValidators([Validators.required, Validators.min(0)]);
-    insuranceCycleIdCtrl.setValidators([Validators.required]);
-    coverageAdequacyCtrl.setValidators([Validators.required]);
-    coverageCtrl.setValidators([Validators.required, Validators.min(0)]);
-  }
-
-  insuranceAmountCtrl.updateValueAndValidity({ emitEvent: false });
-  insuranceCycleIdCtrl.updateValueAndValidity({ emitEvent: false });
-  coverageAdequacyCtrl.updateValueAndValidity({ emitEvent: false });
-  coverageCtrl.updateValueAndValidity({ emitEvent: false });
-}
-
 }

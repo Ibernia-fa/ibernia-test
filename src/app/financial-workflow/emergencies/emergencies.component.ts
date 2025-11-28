@@ -2,10 +2,9 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { catchError, combineLatest, filter, map, Observable, of, switchMap, tap } from 'rxjs';
 import { NavItemService } from 'src/app/layouts/full/nav-item.service';
 import { EmergenciesHttpService as EmergenciesHttpService } from './services/emergencies-http.service';
-// import { EmergenciesModel as EmergenciesModel } from './models/emergencies.model';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatCardModule } from '@angular/material/card';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { AddEmergenciesComponent } from './add-emergencies/add-emergencies.component';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
@@ -14,15 +13,14 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { CommonModule } from '@angular/common';
-import { Client , Details} from 'src/app/clients/models/client';
+import { Client, Details } from 'src/app/clients/models/client';
 import { Store } from '@ngrx/store';
 import { selectedClient } from 'src/app/store/client/client.selectors';
 import { SettingsHttpService } from '../settings/services/settings-http.service';
-import {MatTooltipModule} from '@angular/material/tooltip';
-import {MatButtonToggleModule} from '@angular/material/button-toggle';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import * as ClientActions from 'src/app/store/client/client.actions';
 
-// import { Client } from '../../clients/models/client'
 @Component({
   selector: 'app-emergencies',
   imports: [
@@ -71,15 +69,13 @@ export class EmergenciesComponent {
     private navItemService: NavItemService,
     private store: Store,
     private settingHttpService: SettingsHttpService,
-    private cdr:ChangeDetectorRef
+    private cdr: ChangeDetectorRef
   ) {
     this.load();
     this.navItemService.currentRouteName = 'Risk & Insurance';
     this.settingHttpService.getAmountCycles().subscribe((cycles) => {
       this.amountCycles = cycles.filter(x => x.description != "One-off");
-      // this.amountCycles
-    })
-
+    });
   }
 
   private load(): void {
@@ -124,44 +120,20 @@ export class EmergenciesComponent {
       )
       .subscribe();
 
-
-
     this.client$ = this.store.select(selectedClient);
     this.client$
       .subscribe(client => {
         if (client) {
           this.clientData = client.clientDetails;
+
           console.log('this client', this.clientData);
-
         }
-
       });
   }
 
   trackById(_: number, e: Emergency) {
     return e.id;
   }
-
-  //     onAddClick(){
-  //   this.dialog.open(AddEmergenciesComponent, {
-  //   width: '700px',
-  //   disableClose: true,
-  //   data: {
-  //     emergencyTypes: this.emergencyTypes,
-  //     policyStatuses: this.stats?.policyStatuses,
-  //     coverageAdequacies: this.coverageAdequacies,
-  //     willStatuses:  this.willStatuses,
-  //     // client: { id: client.id, name: client.clientDetails?.name },
-  //     // cashflow: { id: cashflow.id, name: cashflow.name }
-  //   }
-  // }).afterClosed().subscribe(res => {
-  //   if (res?.status === 'Success') {
-  //     // refresh list
-  //   }
-  // });
-
-  //   }
-
 
   onAddClick() {
     this.dialog.open(AddEmergenciesComponent, {
@@ -238,7 +210,7 @@ export class EmergenciesComponent {
     return isNotCovered ? 'danger-card' : 'home-card';
   }
 
-    getDotClass(e: Emergency): string {
+  getDotClass(e: Emergency): string {
     // Simple example: mark "not covered" / bad adequacy as danger
     const isNotCovered = e.policyStatus == 2;
     return isNotCovered ? 'dot-red' : 'dot';
@@ -262,7 +234,7 @@ export class EmergenciesComponent {
         insuranceCostTemplate: this.insuranceCostTemplate,
         client: emergency.client,      // may be empty for now but still fine
         cashflow: emergency.cashflow,  // has id at least
-                clientPreferredCurrency: this.clientData?.preferredCurrency,
+        clientPreferredCurrency: this.clientData?.preferredCurrency,
         cycles: this.amountCycles
       },
     });
@@ -275,56 +247,52 @@ export class EmergenciesComponent {
     });
   }
 
-onCoverageAdequacyChange(e: Emergency, newId: number): void {
-  if (newId === e.coverageAdequacy) {
-    return; // no change
+  onCoverageAdequacyChange(e: Emergency, newId: number): void {
+    if (newId === e.coverageAdequacy) {
+      return; // no change
+    }
+
+    const updated: Emergency = {
+      ...e,
+      coverageAdequacy: newId
+    };
+
+    this.emergenciesHttp.updateEmergency(updated).subscribe({
+      next: (res: Emergency) => {
+        // update local model so UI reflects the change
+        e.coverageAdequacy = res.coverageAdequacy;
+
+        // if your API returns updated stats as well, you could also refresh stats here
+        this.load(); // or patch stats from response if you get them
+      },
+      error: (err) => {
+        console.error(err);
+        this.toastr.error('Failed to update coverage adequacy', 'Error');
+      }
+    });
   }
 
-  const updated: Emergency = {
-    ...e,
-    coverageAdequacy: newId
-  };
+  onHide(e: Emergency,) {
+    const updated: Emergency = {
+      ...e,
+      isHidden: true
+    };
 
-  this.emergenciesHttp.updateEmergency(updated).subscribe({
-    next: (res: Emergency) => {
-      // update local model so UI reflects the change
-      e.coverageAdequacy = res.coverageAdequacy;
+    this.emergenciesHttp.updateEmergency(updated).subscribe({
+      next: (res: Emergency) => {
+        // update local model so UI reflects the change
+        e.coverageAdequacy = res.coverageAdequacy;
 
-      // if your API returns updated stats as well, you could also refresh stats here
-      this.load(); // or patch stats from response if you get them
-    },
-    error: (err) => {
-      console.error(err);
-      this.toastr.error('Failed to update coverage adequacy', 'Error');
-    }
-  });
-}
-
-onHide(e: Emergency,) {
-   const updated: Emergency = {
-    ...e,
-    isHidden: true
-  };
-
-  this.emergenciesHttp.updateEmergency(updated).subscribe({
-    next: (res: Emergency) => {
-      // update local model so UI reflects the change
-      e.coverageAdequacy = res.coverageAdequacy;
-
-      // if your API returns updated stats as well, you could also refresh stats here
-      this.load(); // or patch stats from response if you get them
-      this.cdr.detectChanges();
-    },
-    error: (err) => {
-      console.error(err);
-      this.toastr.error('Failed to update coverage adequacy', 'Error');
-    }
-  });
-}
-
-  // get hasHiddenEmergencies(): boolean {
-  //   return this.emergencies?.some(e => e.isHidden) ?? false;
-  // }
+        // if your API returns updated stats as well, you could also refresh stats here
+        this.load(); // or patch stats from response if you get them
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error(err);
+        this.toastr.error('Failed to update coverage adequacy', 'Error');
+      }
+    });
+  }
 
   get filteredEmergencies(): Emergency[] {
     if (this.showHidden) {
@@ -336,7 +304,6 @@ onHide(e: Emergency,) {
   toggleShowHidden(): void {
     this.showHidden = !this.showHidden;
   }
-
 }
 
 

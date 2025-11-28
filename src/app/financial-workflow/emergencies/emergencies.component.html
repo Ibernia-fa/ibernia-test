@@ -1,387 +1,153 @@
-<!-- <div class="container my-4 protection-center">
-
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="fw-bold">Protection Center</h2>
-
-    <button mat-raised-button color="primary">
-      Add new
-    </button>
-  </div>
-
-  <div class="row g-3 mb-4">
-    <div class="col-md-4">
-      <mat-card class="summary-card">
-        <div class="label">Total coverage</div>
-        <div class="value">$1,300,000</div>
-      </mat-card>
-    </div>
-
-    <div class="col-md-4">
-      <mat-card class="summary-card">
-        <div class="label">Total annual cost</div>
-        <div class="value">$2,750</div>
-      </mat-card>
-    </div>
-
-    <div class="col-md-4">
-      <mat-card class="summary-card danger-outline">
-        <div class="label">Protection score</div>
-        <div class="value text-danger fw-bold">27/100</div>
-      </mat-card>
-    </div>
-  </div>
-
-  <div class="row g-4">
-
-    <div class="col-md-4">
-      <mat-card class="item-card health-card">
-        <div class="d-flex justify-content-between">
-          <div class="d-flex gap-2 align-items-center">
-            <mat-icon color="primary">health_and_safety</mat-icon>
-            <span class="card-title">Health</span>
-          </div>
-
-          <button mat-icon-button>
-            <mat-icon>edit</mat-icon>
-          </button>
-        </div>
-
-        <div class="mt-3 mb-2">
-          <div class="text-muted">Coverage</div>
-          <div class="fw-bold">$100,000</div>
-        </div>
-
-        <div class="mb-3">
-          <div class="text-muted">Annual cost</div>
-          <div class="fw-bold">$2,400</div>
-        </div>
-
-        <div class="text-muted mb-1">Adequacy</div>
-        <mat-chip-set>
-          <mat-chip appearance="outlined" color="primary" selected>Basic</mat-chip>
-          <mat-chip appearance="outlined">Good</mat-chip>
-          <mat-chip appearance="outlined">Excellent</mat-chip>
-        </mat-chip-set>
-      </mat-card>
-    </div>
-
-    <div class="col-md-4">
-      <mat-card class="item-card danger-card">
-        <div class="d-flex justify-content-between">
-          <div class="d-flex gap-2 align-items-center">
-            <mat-icon color="warn">shield</mat-icon>
-            <span class="card-title">Life</span>
-          </div>
-
-          <button mat-icon-button>
-            <mat-icon>edit</mat-icon>
-          </button>
-        </div>
-
-        <div class="mt-3">
-          <div class="fw-bold text-danger">Not covered</div>
-          <div class="text-muted small">No active policy</div>
-        </div>
-      </mat-card>
-    </div>
-
-    <div class="col-md-4">
-      <mat-card class="item-card danger-card">
-        <div class="d-flex justify-content-between">
-          <div class="d-flex gap-2 align-items-center">
-            <mat-icon color="warn">monitor_heart</mat-icon>
-            <span class="card-title">Disability</span>
-          </div>
-
-          <button mat-icon-button>
-            <mat-icon>edit</mat-icon>
-          </button>
-        </div>
-
-        <div class="mt-3">
-          <div class="fw-bold text-danger">Not covered</div>
-          <div class="text-muted small">No active policy</div>
-        </div>
-      </mat-card>
-    </div>
-
-    <div class="col-md-4">
-      <mat-card class="item-card danger-card">
-        <div class="d-flex justify-content-between">
-          <div class="d-flex gap-2 align-items-center">
-            <mat-icon color="warn">description</mat-icon>
-            <span class="card-title">Will</span>
-          </div>
-
-          <button mat-button color="primary" class="hide-btn">Hide</button>
-        </div>
-
-        <div class="mt-3">
-          <div class="text-muted">Status</div>
-          <div class="fw-bold text-danger">Not done</div>
-        </div>
-      </mat-card>
-    </div>
-
-    <div class="col-md-4">
-      <mat-card class="item-card home-card">
-        <div class="d-flex justify-content-between">
-          <div class="d-flex gap-2 align-items-center">
-            <mat-icon color="primary">home</mat-icon>
-            <span class="card-title">Home</span>
-          </div>
-
-          <button mat-button color="primary" class="hide-btn">Hide</button>
-        </div>
-
-        <div class="mt-3 mb-2">
-          <div class="text-muted">Coverage</div>
-          <div class="fw-bold">$1,200,000</div>
-        </div>
-
-        <div class="mb-3">
-          <div class="text-muted">Annual cost</div>
-          <div class="fw-bold">$350</div>
-        </div>
-
-        <div class="text-muted mb-1">Adequacy</div>
-        <mat-chip-set>
-          <mat-chip appearance="outlined">Basic</mat-chip>
-          <mat-chip appearance="outlined">Good</mat-chip>
-          <mat-chip appearance="outlined" color="primary" selected>Excellent</mat-chip>
-        </mat-chip-set>
-      </mat-card>
-    </div>
-
-  </div>
-
-  <div class="text-center my-4">
-    <button mat-stroked-button color="primary">Show hidden</button>
-  </div>
-
-</div>
-
-<button (click)="onAddClick()">Add</button> -->
-
-
-
 <mat-card class="mat-mdc-card mdc-card cardWithShadow mb-20">
   <mat-card-content class="mat-mdc-card-content">
     <div class="d-flex align-items-center justify-content-between w-100 gap-16 flex-wrap">
       <div class="d-flex align-items-center gap-16">
-      <div class="icon-wrapper d-flex align-items-center justify-content-center">
-        <img width="25"  src="../../../assets/images/svgs/danger-square-icon-active.svg" alt="">
+        <div class="icon-wrapper d-flex align-items-center justify-content-center">
+          <img width="25" src="../../../assets/images/svgs/danger-square-icon-active.svg" alt="">
+        </div>
+        <div class="d-flex flex-column justify-content-between gap-4">
+          <h4 class="page-title f-w-500">Risk & Insurance</h4>
+          <span class="sub-title">{{clientData?.firstName}} {{clientData?.lastName}}</span>
+        </div>
       </div>
-      <div class="d-flex flex-column justify-content-between gap-4">
-        <h4 class="page-title f-w-500">Risk & Insurance</h4>
-                        <span class="sub-title">{{clientData?.firstName}} {{clientData?.lastName}}</span> 
-                        <!-- <span class="sub-title">{{clientData?.lastName}}</span>  -->
-                        
-
-      </div>
-</div>
-
-
- 
-    
     </div>
   </mat-card-content>
 </mat-card>
 
-    <mat-card class="cardWithShadow mb-20">
-        <mat-card-content>
-            <div class="d-flex align-items-center gap-8 justify-content-between">
-                <div class="income-expense-wrapper w-100">
-                    <div class="row justify-content-between" *ngIf="stats as s">
-                        <div class="col-2">
-                            <div class="d-flex flex-column gap-8">
-                                <div class="d-flex align-items-center gap-8">
-                                    <h3 class="card-title expense-income">Total coverage</h3>
-                                </div>
-                                <h3 class="saving-title">
-                                   <span>$</span>{{s.emergenciesStats?.totalCoverage | number:'1.0-0'}}
-                                </h3>
-                            </div>
-                        </div>
-                        <!-- Divider  -->
-                        <div class="divider"></div>
-                        <!-- End Divider  -->
-                        <div class="col-2">
-                            <div class="d-flex flex-column gap-8">
-                                <div class="d-flex align-items-center gap-8">
-                                    <h3 class="card-title expenses-deduct">Total annual cost</h3>
-                                </div>
-                                <h3 class="saving-title"> <span>$</span>{{s.emergenciesStats?.totalCost | number:'1.0-0'}}
-                                </h3>
-                            </div>
-                        </div>
-                        <!-- Divider  -->
-                        <div class="divider"></div>
-                        <!-- End Divider  -->
-                        <div class="col-2">
-                            <div class="d-flex flex-column gap-8">
-                                <div class="d-flex align-items-center gap-8">
-                                    <h3 class="card-title expenses-total">Protection score</h3>
-                                </div>
-                                <h3 class="saving-title saving-below-number"> {{s.emergenciesStats?.protectionScore}}/100</h3>
-                            </div>
-                        </div>
+<mat-card class="cardWithShadow mb-20">
+  <mat-card-content>
+    <div class="d-flex align-items-center gap-8 justify-content-between">
+      <div class="income-expense-wrapper w-100">
+        <div class="row justify-content-between" *ngIf="stats as s">
+          <div class="col-2">
+            <div class="d-flex flex-column gap-8">
+              <div class="d-flex align-items-center gap-8">
+                <h3 class="card-title expense-income">Total coverage</h3>
+              </div>
+              <h3 class="saving-title">
+                <span>$</span>{{s.emergenciesStats?.totalCoverage | number:'1.0-0'}}
+              </h3>
+            </div>
+          </div>
 
-                          <div class="divider"></div>
+          <div class="divider"></div>
 
-<div class="col-2 align-items-center d-flex">
-                                          <button style="height: auto;"
-              (click)="onAddClick()"
-              type="button"
-              class="button-icon"
-            >
+          <div class="col-2">
+            <div class="d-flex flex-column gap-8">
+              <div class="d-flex align-items-center gap-8">
+                <h3 class="card-title expenses-deduct">Total annual cost</h3>
+              </div>
+              <h3 class="saving-title"> <span>$</span>{{s.emergenciesStats?.totalCost | number:'1.0-0'}}
+              </h3>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="col-2">
+            <div class="d-flex flex-column gap-8">
+              <div class="d-flex align-items-center gap-8">
+                <h3 class="card-title expenses-total">Protection score</h3>
+              </div>
+              <h3 class="saving-title saving-below-number"> {{s.emergenciesStats?.protectionScore}}/100</h3>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="col-2 align-items-center d-flex">
+            <button style="height: auto;" (click)="onAddClick()" type="button" class="button-icon">
               <span>Add new</span>
               <img src="assets/images/svgs/add-icon.svg" alt="add-icon" />
             </button>
-
-            </div>
-                    </div>
-                </div>
-           
-                <!-- End Emoji  -->
-            </div>
-        </mat-card-content>
-    </mat-card>
-
-
-
-
-
-
-
-
-
-
-
+          </div>
+        </div>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>
 
 <mat-card class="mat-mdc-card mdc-card cardWithShadow mb-20">
   <mat-card-content class="mat-mdc-card-content protection-center">
- 
-  
-
-  <!-- Top summary cards -->
-
-
-  <!-- Main cards -->
-  <div class="d-flex gap-10 flex-wrap" >
-
-    <div
-      class="card-em-outer " *ngFor="let e of filteredEmergencies; trackBy: trackById"
-    >
-      <mat-card class="summary-card item-card" [ngClass]="getCardCssClass(e)">
-        <!-- Header: icon + title + edit -->
-        <div class="d-flex justify-content-between m-b-5">
-          <div class="d-flex gap-10 align-items-center">
-            <!-- <mat-icon [color]="e.type === 1 ? 'primary' : 'warn'">
-              {{ getIconName(e) }}
-            </mat-icon> -->
-            <div  [ngClass]="getDotClass(e)"></div>
+    <div class="d-flex gap-10 flex-wrap">
+      <div class="card-em-outer " *ngFor="let e of filteredEmergencies; trackBy: trackById">
+        <mat-card class="summary-card item-card" [ngClass]="getCardCssClass(e)">
+          <div class="d-flex justify-content-between m-b-5">
+            <div class="d-flex gap-10 align-items-center">
+              <div [ngClass]="getDotClass(e)"></div>
               <img width="18" src="../../../assets/images/svgs/shield.svg" alt="">
-            <span class="card-title">
-              {{ e.name || getTypeName(e.type) }}
-            </span>
-          </div>
+              <span class="card-title">
+                {{ e.name || getTypeName(e.type) }}
+              </span>
+            </div>
 
             <div class="d-flex align-items-center">
-                <button class="hide-button"  mat-icon-button (click)="onHide(e)" >
-                     
-                  Hide
-      </button>
-             <button (click)="onEditClick(e)">
-                     
-
-                    <svg width="14"  viewBox="0 0 18 19" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M2 16.89H3.41421L12.7279 7.57629L11.3137 6.16207L2 15.4758V16.89ZM18 17.89C18 18.4423 17.5523 18.89 17 18.89H1C0.447716 18.89 0 18.4423 0 17.89V14.8545C0 14.7219 0.0526781 14.5947 0.146446 14.501L13.435 1.21233C13.8256 0.821801 14.4587 0.821801 14.8492 1.21233L17.6777 4.04075C18.0682 4.43128 18.0682 5.06444 17.6777 5.45497L6.24264 16.89H17C17.5523 16.89 18 17.3377 18 17.89ZM12.7279 4.74786L14.1421 6.16207L15.5563 4.74786L14.1421 3.33365L12.7279 4.74786Z" fill="#90a1b9"/>
-                    </svg>
-
-      </button>
-      </div>
-        </div>
-
-        <!-- Insurance-type emergency (type = 1) -->
-        <ng-container *ngIf="e.policyStatus === 1; else willTemplate">
-          <div class="d-flex m-b-10">
-          <div class="inner-information  w-50">
-            <div class="label">Coverage</div>
-            <div class="f-w-500 f-s-14">
-             <span>$</span>{{e.coverage | number:'1.0-0'}}
+              <button class="hide-button" mat-icon-button (click)="onHide(e)">
+                Hide
+              </button>
+              <button (click)="onEditClick(e)">
+                <svg width="14" viewBox="0 0 18 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M2 16.89H3.41421L12.7279 7.57629L11.3137 6.16207L2 15.4758V16.89ZM18 17.89C18 18.4423 17.5523 18.89 17 18.89H1C0.447716 18.89 0 18.4423 0 17.89V14.8545C0 14.7219 0.0526781 14.5947 0.146446 14.501L13.435 1.21233C13.8256 0.821801 14.4587 0.821801 14.8492 1.21233L17.6777 4.04075C18.0682 4.43128 18.0682 5.06444 17.6777 5.45497L6.24264 16.89H17C17.5523 16.89 18 17.3377 18 17.89ZM12.7279 4.74786L14.1421 6.16207L15.5563 4.74786L14.1421 3.33365L12.7279 4.74786Z"
+                    fill="#90a1b9" />
+                </svg>
+              </button>
             </div>
           </div>
 
-          <div class="inner-information">
-            <div class="label">Annual cost</div>
-            <div class="f-w-500 f-s-14">
-              {{ getInsuranceCostLabel(e) }}
+          <ng-container *ngIf="e.policyStatus === 1; else willTemplate">
+            <div class="d-flex m-b-10">
+              <div class="inner-information  w-50">
+                <div class="label">Coverage</div>
+                <div class="f-w-500 f-s-14">
+                  <span>$</span>{{e.coverage | number:'1.0-0'}}
+                </div>
+              </div>
+
+              <div class="inner-information">
+                <div class="label">Annual cost</div>
+                <div class="f-w-500 f-s-14">
+                  {{ getInsuranceCostLabel(e) }}
+                </div>
+              </div>
             </div>
-          </div></div>
-<div class="inner-information">
-          <div  class="label m-b-5">Adequacy</div>
-   
-        
-<mat-button-toggle-group
-  class="coverage-toggle-group"
-  [value]="e.coverageAdequacy"
-  (change)="onCoverageAdequacyChange(e, $event.value)"
-  aria-label="Coverage adequacy"
->
-  <mat-button-toggle
-    *ngFor="let ca of coverageAdequacies"
-    [value]="ca.id"
-  >
-    {{ ca.description }}
-  </mat-button-toggle>
-</mat-button-toggle-group>
+            <div class="inner-information">
+              <div class="label m-b-5">Adequacy</div>
+              <mat-button-toggle-group class="coverage-toggle-group" [value]="e.coverageAdequacy"
+                (change)="onCoverageAdequacyChange(e, $event.value)" aria-label="Coverage adequacy">
+                <mat-button-toggle *ngFor="let ca of coverageAdequacies" [value]="ca.id">
+                  {{ ca.description }}
+                </mat-button-toggle>
+              </mat-button-toggle-group>
+            </div>
+          </ng-container>
 
-        
-        
-        </div>
-        </ng-container>
-
-        <!-- Will-type emergency (type = 2) -->
-        <ng-template #willTemplate>
-          <div class="inner-information">
-            <div class="label">Status</div>
-            <div
-              class="f-w-500 f-s-14"
-              [ngClass]="{
-                'text-danger': e.willStatus !== 1,
-                'text-success': e.willStatus === 1
-              }"
-            >
-              <!-- {{ getWillStatusLabel(e.willStatus) }} -->
+          <!-- Will-type emergency (type = 2) -->
+          <ng-template #willTemplate>
+            <div class="inner-information">
+              <div class="label">Status</div>
+              <div class="f-w-500 f-s-14"
+                [ngClass]="{ 'text-danger': e.willStatus !== 1, 'text-success': e.willStatus === 1 }">
                 Not covered
+              </div>
             </div>
-          </div>
-        </ng-template>
+          </ng-template>
+        </mat-card>
+      </div>
 
-      </mat-card>
+      <div class="col-12" *ngIf="!isLoading && emergencies.length === 0">
+        <p class="text-muted text-center my-4">
+          No protection items added yet. Click <b>Add new</b> to get started.
+        </p>
+      </div>
     </div>
 
-    <!-- If no emergencies -->
-    <div class="col-12" *ngIf="!isLoading && emergencies.length === 0">
-      <p class="text-muted text-center my-4">
-        No protection items added yet. Click <b>Add new</b> to get started.
-      </p>
+    <div class="d-flex align-items-center m-t-10 justify-content-center">
+      <button class="btn-secondary" mat-stroked-button color="primary" (click)="toggleShowHidden()">
+        <span>
+          {{ showHidden ? 'Hide hidden' : 'Show hidden' }}
+        </span>
+      </button>
     </div>
-
-  </div>
-
-
-
-  <div class="d-flex align-items-center m-t-10 justify-content-center">
-
-     <!-- *ngIf="hasHiddenEmergencies" -->
-    <button  class="btn-secondary" mat-stroked-button color="primary" (click)="toggleShowHidden()">
-     <span>
-    {{ showHidden ? 'Hide hidden' : 'Show hidden' }}
-    </span> 
-    </button>
-  </div>
-    </mat-card-content>
-    </mat-card>
-
+  </mat-card-content>
+</mat-card>

@@ -19,10 +19,6 @@ import { TimelineHttpService } from '../timeline/services/timeline-http.service'
 import { Client, Details } from 'src/app/clients/models/client';
 import { FinancialTimeline } from '../timeline/models/financial-timeline';
 import { selectedClient } from 'src/app/store/client/client.selectors';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { selectedCashflow } from 'src/app/store/cashflow/cashflow.selectors';
-import * as ClientActions from 'src/app/store/client/client.actions';
-import * as CashflowActions from 'src/app/store/cashflow/cashflow.actions';
 import { TablerIconsModule } from 'angular-tabler-icons';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -35,7 +31,6 @@ import { MatSelectModule } from '@angular/material/select';
 import { Cashflow } from 'src/app/clients/models/cashflow';
 import { SavingsBarStackedChartComponent } from './savings-bar-stacked-chart/savings-bar-stacked-chart.component';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { TimelineChartComponent } from '../timeline/timeline-chart/timeline-chart.component';
 import { FinancialWorkflowService } from '../services/financial-workflow.service';
 import { SavingsPotsHttpService } from '../saving-pots/services/savings-pots-http.service';
 import { SavingPotsModel } from '../saving-pots/models/saving-pots.model';
@@ -46,10 +41,8 @@ import { FundsViewModel, WithdrawalsContributions } from '../withdrawals-contrib
 import { WithdrawalsContributionsHttpService } from '../withdrawals-contributions/services/withdrawals-contributions-http.service';
 import { ReportsHttpService } from './services/reports-http.service';
 import { ChartSeries } from './models/charts-series.model';
-import { CurrencySymbolPipe } from 'src/app/pipe/currency-symbol.pipe';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { CashflowHttpService } from 'src/app/clients/services/cashflow-http.service';
 import { ToastrService } from 'ngx-toastr';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
@@ -153,12 +146,9 @@ const ELEMENT_DATA: PeriodicElement[] = [
     MatProgressSpinnerModule,
     MatSelectModule,
     SavingsBarStackedChartComponent,
-    TimelineChartComponent,
     MatTableModule,
     CommonModule,
-    CurrencySymbolPipe,
     MatTooltipModule,
-    ThousandSeparatorPipe,
      ReactiveFormsModule  
   ],
   templateUrl: './reports.component.html',
