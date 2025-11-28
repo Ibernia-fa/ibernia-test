@@ -132,6 +132,7 @@ export class SavingPotsComponent implements OnInit {
               }
             });
     this.getData();
+    
 }
 
   transitionState = '';
@@ -194,6 +195,10 @@ export class SavingPotsComponent implements OnInit {
           this.amountCycles = amountCycles;
           this.escalationRates = escalationRatesResponse?.escalationRates;
           this.isLoaderVisible = false;
+
+
+    console.log("kjdjai")
+    console.log(this.savingPots)
         })
       )
       .subscribe();
@@ -206,6 +211,7 @@ export class SavingPotsComponent implements OnInit {
     } else {
       this.showFeedbackPopup = true;
     }
+
   }
 
   closeFeedbackPopupClicked() {

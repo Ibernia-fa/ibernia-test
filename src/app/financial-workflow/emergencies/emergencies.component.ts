@@ -74,7 +74,7 @@ export class EmergenciesComponent {
     private cdr:ChangeDetectorRef
   ) {
     this.load();
-    this.navItemService.currentRouteName = 'Emergencies';
+    this.navItemService.currentRouteName = 'Risk & Insurance';
     this.settingHttpService.getAmountCycles().subscribe((cycles) => {
       this.amountCycles = cycles.filter(x => x.description != "One-off");
       // this.amountCycles
