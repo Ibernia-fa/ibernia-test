@@ -224,11 +224,11 @@ export class EmergenciesComponent {
     if (e.type === 2) {
       return 'description'; // will
     }
+
     return 'shield';
   }
 
   getCardCssClass(e: Emergency): string {
-    // Simple example: mark "not covered" / bad adequacy as danger
     if(e.type === 1)
     {
       const isNotCovered = e.policyStatus == 2;
@@ -245,8 +245,6 @@ export class EmergenciesComponent {
   }
 
   getDotClass(e: Emergency): string {
-    // Simple example: mark "not covered" / bad adequacy as danger
-    
     if(e.type === 1)
     {
       const isNotCovered = e.policyStatus == 2;
@@ -293,51 +291,21 @@ export class EmergenciesComponent {
     });
   }
 
-  onCoverageAdequacyChange(e: Emergency, newId: number): void {
-    if (newId === e.coverageAdequacy) {
-      return; // no change
-    }
+  showHideEmergency(e: Emergency) {
+    e.isHidden = !e.isHidden;
 
-    const updated: Emergency = {
-      ...e,
-      coverageAdequacy: newId
-    };
+    const updated: Emergency = { ...e };
 
     this.emergenciesHttp.updateEmergency(updated).subscribe({
-      next: (res: Emergency) => {
-        // update local model so UI reflects the change
-        e.coverageAdequacy = res.coverageAdequacy;
-
-        // if your API returns updated stats as well, you could also refresh stats here
-        this.load(); // or patch stats from response if you get them
-      },
-      error: (err) => {
-        console.error(err);
-        this.toastr.error('Failed to update coverage adequacy', 'Error');
-      }
-    });
-  }
-
-  showHideEmergency(e: Emergency,) {
-    const updated: Emergency = {
-      ...e,
-      isHidden: !e.isHidden
-    };
-
-    this.emergenciesHttp.updateEmergency(updated).subscribe({
-      next: (res: Emergency) => {
-        // update local model so UI reflects the change
-        e.coverageAdequacy = res.coverageAdequacy;
-
-        // if your API returns updated stats as well, you could also refresh stats here
-        this.load(); // or patch stats from response if you get them
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        console.error(err);
-        this.toastr.error('Failed to update coverage adequacy', 'Error');
-      }
-    });
+        next: (res: Emergency) => {
+           Object.assign(e, res);
+        },
+        error: (err) => {
+          console.error(err);
+          this.toastr.error('Failed to toggle hide and show', 'Error');
+          e.isHidden = !e.isHidden;
+        }
+      });
   }
 
   get filteredEmergencies(): Emergency[] {
@@ -350,6 +318,25 @@ export class EmergenciesComponent {
 
   toggleShowHidden(): void {
     this.showHidden = !this.showHidden;
+  }
+
+  onCoverageAdequacyChange(e: Emergency, newId: number): void {
+    if (newId === e.coverageAdequacy) {
+      return;
+    }
+
+    const updated: Emergency = { ...e, coverageAdequacy: newId };
+
+    this.emergenciesHttp.updateEmergency(updated).subscribe({
+      next: (res: Emergency) => {
+        e.coverageAdequacy = res.coverageAdequacy;
+        this.load();
+      },
+      error: (err) => {
+        console.error(err);
+        this.toastr.error('Failed to update coverage adequacy', 'Error');
+      }
+    });
   }
 }
 

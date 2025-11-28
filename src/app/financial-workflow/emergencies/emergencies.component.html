@@ -38,8 +38,7 @@
                 <div class="d-flex align-items-center gap-8">
                   <h3 class="card-title expenses-deduct">Total annual cost</h3>
                 </div>
-                <h3 class="saving-title"> <span>{{clientData?.preferredCurrency}}</span>{{s.emergenciesStats?.totalCost
-                  | number:'1.0-0'}}
+                <h3 class="saving-title"> <span>{{clientData?.preferredCurrency}}</span>{{s.emergenciesStats?.totalCost | number:'1.0-0'}}
                 </h3>
               </div>
             </div>
@@ -72,7 +71,7 @@
   <mat-card class="mat-mdc-card mdc-card cardWithShadow mb-20">
     <mat-card-content class="mat-mdc-card-content protection-center">
       <div class="d-flex gap-10 flex-wrap">
-        
+
         <div class="card-em-outer " *ngFor="let e of filteredEmergencies; trackBy: trackById">
           <mat-card class="summary-card item-card" [ngClass]="getCardCssClass(e)">
             <div class="d-flex justify-content-between m-b-5">
@@ -85,8 +84,8 @@
               </div>
 
               <div class="d-flex align-items-center">
-                <button *ngIf="hasHiddenEmergencies" class="hide-button" mat-icon-button (click)="showHideEmergency(e)">
-                  {{ showHidden ? 'Show' : 'Hide' }}
+                <button class="hide-button" mat-icon-button (click)="showHideEmergency(e)">
+                  {{ e.isHidden ? 'Show' : 'Hide' }}
                 </button>
 
                 <button (click)="onEditClick(e)">
@@ -99,7 +98,9 @@
               </div>
             </div>
 
+            <!-- Insurance -->
             @if(e.type === 1){
+              <!-- covered -->
               <ng-container *ngIf="e.policyStatus === 1; else insuranceTemplate">
                 <div class="d-flex m-b-10">
                   <div class="inner-information w-50">
@@ -127,7 +128,7 @@
                 </div>
               </ng-container>
 
-              <!-- Will-type emergency (type = 2) -->
+              <!-- not covered -->
               <ng-template #insuranceTemplate>
                 <div class="inner-information">
                   <div class="label">Status</div>
@@ -139,6 +140,7 @@
               </ng-template>
             }
 
+            <!-- Will -->
             @if(e.type === 2){
               <div class="inner-information">
                 <div class="label">Status</div>
