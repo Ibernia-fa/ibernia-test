@@ -43,19 +43,16 @@ export interface AddEmergencyDialogData {
   styleUrl: './add-emergencies.component.scss',
 })
 export class AddEmergenciesComponent {
+  private NOT_COVERED_STATUS_ID = 2;
   form: FormGroup;
-
   policyStatuses: LookupItem[] = [];
   coverageAdequacies: LookupItem[] = [];
   emergencyTypes: LookupItem[] = [];
   willStatuses: LookupItem[] = [];
   insuranceCostTemplate?: Money;
   countries = allCountries;
-
-  // used for display
   insuranceCycles: { id: string; description: string }[] = [];
   currencySymbol: string;
-
   isSaving = false;
 
   constructor(
@@ -70,33 +67,30 @@ export class AddEmergenciesComponent {
     this.coverageAdequacies = data.coverageAdequacies ?? [];
     this.willStatuses = data.willStatuses ?? [];
     this.insuranceCostTemplate = data.insuranceCostTemplate;
-    this.currencySymbol =
-      data.clientPreferredCurrency ?? '';
+    this.currencySymbol = data.clientPreferredCurrency ?? '';
     this.insuranceCycles = data.cycles ?? [];
+
     this.form = this.fb.group({
       name: ['', Validators.required],
       policyStatus: [this.policyStatuses[1].id, Validators.required],
       currencySymbol: [this.currencySymbol, Validators.required],
-      insuranceAmount: [
-        this.insuranceCostTemplate?.amount ?? 0,
-        [Validators.required, Validators.min(0)],
-      ],
-      insuranceCycleId: [
-        this.insuranceCycles[1]?.id,
-        Validators.required,
-      ],
+      insuranceAmount: [this.insuranceCostTemplate?.amount ?? 0, [Validators.required, Validators.min(0)]],
+      insuranceCycleId: [this.insuranceCycles[1]?.id, Validators.required],
       coverageAdequacy: [null, Validators.required],
       coverage: [0, [Validators.required, Validators.min(0)]],
+      willStatus: [null]
     });
 
     this.form.get('currencySymbol')?.disable();
-    const policyCtrl = this.form.get('policyStatus');
-    this.updateValidatorsForPolicyStatus(policyCtrl?.value ?? null);
+    this.updateValidatorsForFormByType();
 
-    // react to changes
-    policyCtrl?.valueChanges.subscribe((status: number) => {
-      this.updateValidatorsForPolicyStatus(status);
-    });
+    // subscribe policyStatus changes only if Insurance
+    if (!this.isWill) {
+      this.form.get('policyStatus')?.valueChanges.subscribe(status => {
+        this.updateValidatorsForPolicyStatus(status);
+      });
+    }
+
     if (this.data.mode === 'edit' && this.data.emergency) {
       this.patchForm(this.data.emergency);
     }
@@ -114,7 +108,8 @@ export class AddEmergenciesComponent {
       insuranceCycleId: e.insuranceCost?.cycle?.id ?? 'annual',
       coverage: e.coverage ?? 0,
       coverageAdequacy: e.coverageAdequacy ?? 1,
-      currencySymbol: e.insuranceCost.currencySymbol
+      currencySymbol: e.insuranceCost.currencySymbol,
+      willStatus: e.willStatus ?? null
     });
   }
 
@@ -127,14 +122,14 @@ export class AddEmergenciesComponent {
     const form = this.form.getRawValue();
     const existing = this.data.emergency;
     const nowIso = new Date().toISOString();
+    const type = existing?.type ?? 1;
 
-    // derive type / will / hidden from existing for now
-    const type = existing?.type ?? 1;              // 1 = Insurance default
-    const willStatus = existing?.willStatus ?? 1;  // default Done
+    const willStatus = existing?.willStatus ?? 2;
     const isHidden = existing?.isHidden ?? false;
+    const emergencyType = type == 2 ? "Will" : "Insurance";
 
     const insuranceCost: Money = {
-      currencySymbol: form.currencySymbol,  // now comes from control
+      currencySymbol: form.currencySymbol,
       amount: form.insuranceAmount,
       cycle: {
         id: form.insuranceCycleId,
@@ -142,7 +137,7 @@ export class AddEmergenciesComponent {
       },
     };
 
-    // CREATE payload (no id, no createdAt/updatedAt)
+    // CREATE payload
     const createPayload: CreateEmergencyRequest = {
       type,
       policyStatus: form.policyStatus,
@@ -157,8 +152,8 @@ export class AddEmergenciesComponent {
       cashflow: this.data.cashflow ?? { id: '', name: '' },
     };
 
+    // UPDATE payload
     if (this.data.mode === 'edit' && existing) {
-      // UPDATE payload: full Emergency, includes id + timestamps
       const updatePayload: Emergency = {
         id: existing.id,
         type,
@@ -179,7 +174,7 @@ export class AddEmergenciesComponent {
 
       this.emergenciesHttp.updateEmergency(updatePayload).subscribe({
         next: (res: Emergency) => {
-          this.toastr.success('Cover updated successfully', 'Success');
+          this.toastr.success(`${emergencyType} updated successfully`, 'Success');
           this.dialogRef.close({ status: 'Success', emergency: res });
         },
         error: (err) => {
@@ -191,7 +186,7 @@ export class AddEmergenciesComponent {
       // CREATE
       this.emergenciesHttp.createEmergency(createPayload).subscribe({
         next: (res: Emergency) => {
-          this.toastr.success('Cover added successfully', 'Success');
+          this.toastr.success(`${emergencyType} added successfully`, 'Success');
           this.dialogRef.close({ status: 'Success', emergency: res });
         },
         error: (err) => {
@@ -212,8 +207,6 @@ export class AddEmergenciesComponent {
     return 'default-emergency-icon.svg';
   }
 
-  private NOT_COVERED_STATUS_ID = 2; // id for "NotCovered"
-
   private updateValidatorsForPolicyStatus(status: number | null): void {
     const insuranceAmountCtrl = this.form.get('insuranceAmount');
     const insuranceCycleIdCtrl = this.form.get('insuranceCycleId');
@@ -226,13 +219,12 @@ export class AddEmergenciesComponent {
 
     const isNotCovered = status === this.NOT_COVERED_STATUS_ID;
 
-    if (isNotCovered) {
+    if (isNotCovered || this.isWill) {
       // remove validators when NotCovered (fields hidden)
       insuranceAmountCtrl.clearValidators();
       insuranceCycleIdCtrl.clearValidators();
       coverageAdequacyCtrl.clearValidators();
       coverageCtrl.clearValidators();
-
     } else {
       // re-apply validators when status is Covered (or anything else)
       insuranceAmountCtrl.setValidators([Validators.required, Validators.min(0)]);
@@ -245,5 +237,39 @@ export class AddEmergenciesComponent {
     insuranceCycleIdCtrl.updateValueAndValidity({ emitEvent: false });
     coverageAdequacyCtrl.updateValueAndValidity({ emitEvent: false });
     coverageCtrl.updateValueAndValidity({ emitEvent: false });
+  }
+
+  private updateValidatorsForFormByType(): void {
+    if (this.isWill) {
+      // Will: only name + willStatus required
+      this.form.get('name')?.setValidators([Validators.required]);
+      this.form.get('willStatus')?.setValidators([Validators.required]);
+
+      // clear insurance validators
+      ['policyStatus', 'insuranceAmount', 'insuranceCycleId', 'coverageAdequacy', 'coverage']
+        .forEach(f => this.form.get(f)?.clearValidators());
+
+    } else {
+      // insurance: restore insurance validators
+      this.form.get('name')?.setValidators([Validators.required]);
+      this.form.get('policyStatus')?.setValidators([Validators.required]);
+      this.updateValidatorsForPolicyStatus(this.form.get('policyStatus')?.value ?? null);
+
+      // clear Will validators
+      this.form.get('willStatus')?.clearValidators();
+    }
+
+    // update all controls
+    Object.keys(this.form.controls).forEach(key => {
+      this.form.get(key)?.updateValueAndValidity({ emitEvent: false });
+    });
+  }
+
+  get isWill(): boolean {
+    if (this.data.emergency) {
+      return this.data.emergency.type === 2;
+    }
+
+    return this.data.emergencyTypes?.length === 1 && this.data.emergencyTypes[0].id === 2;
   }
 }
