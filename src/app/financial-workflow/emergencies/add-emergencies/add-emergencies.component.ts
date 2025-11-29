@@ -107,7 +107,7 @@ export class AddEmergenciesComponent {
       insuranceAmount: e.insuranceCost?.amount ?? 0,
       insuranceCycleId: e.insuranceCost?.cycle?.id ?? 'annual',
       coverage: e.coverage ?? 0,
-      coverageAdequacy: e.coverageAdequacy ?? 1,
+      coverageAdequacy: e.coverageAdequacy ?? 2,
       currencySymbol: e.insuranceCost.currencySymbol,
       willStatus: e.willStatus ?? null
     });

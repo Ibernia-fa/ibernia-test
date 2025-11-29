@@ -101,8 +101,8 @@
         <mat-label class="f-s-16 f-w-400 d-flex align-items-center">
           Coverage
         </mat-label>
-        <mat-form-field appearance="outline" class="w-100 percentage-icon">
-          <span matSuffix>%</span>
+        <mat-form-field appearance="outline" class="w-100">
+          
           <input matInput type="number" formControlName="coverage" />
         </mat-form-field>
         @if(form.get('coverage')?.touched && form.get('coverage')?.hasError('required')) {
