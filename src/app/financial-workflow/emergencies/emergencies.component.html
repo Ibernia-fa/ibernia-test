@@ -26,7 +26,7 @@
                   <h3 class="card-title expense-income">Total coverage</h3>
                 </div>
                 <h3 class="saving-title">
-                  <span>{{clientData?.preferredCurrency}}</span>{{s.emergenciesStats?.totalCoverage | number:'1.0-0'}}
+                  <span>{{clientData?.preferredCurrency | currencySymbol}}</span>{{s.emergenciesStats?.totalCoverage | number:'1.0-0'}}
                 </h3>
               </div>
             </div>
@@ -38,7 +38,7 @@
                 <div class="d-flex align-items-center gap-8">
                   <h3 class="card-title expenses-deduct">Total annual cost</h3>
                 </div>
-                <h3 class="saving-title"> <span>{{clientData?.preferredCurrency}}</span>{{s.emergenciesStats?.totalCost | number:'1.0-0'}}
+                <h3 class="saving-title"> <span>{{clientData?.preferredCurrency | currencySymbol}}</span>{{s.emergenciesStats?.totalCost | number:'1.0-0'}}
                 </h3>
               </div>
             </div>
@@ -106,14 +106,14 @@
                   <div class="inner-information w-50">
                     <div class="label">Coverage</div>
                     <div class="f-w-500 f-s-14">
-                      <span>$</span>{{e.coverage | number:'1.0-0'}}
+                      <span>{{clientData?.preferredCurrency | currencySymbol}}</span>{{e.coverage | number:'1.0-0'}}
                     </div>
                   </div>
 
                   <div class="inner-information">
                     <div class="label">Annual cost</div>
                     <div class="f-w-500 f-s-14">
-                      {{ getInsuranceCostLabel(e) }}
+                      <span>{{clientData?.preferredCurrency | currencySymbol}}</span>{{ e.insuranceCost.amount | number:'1.0-0' }}
                     </div>
                   </div>
                 </div>

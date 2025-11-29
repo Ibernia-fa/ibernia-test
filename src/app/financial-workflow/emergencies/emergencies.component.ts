@@ -20,7 +20,7 @@ import { selectedClient } from 'src/app/store/client/client.selectors';
 import { SettingsHttpService } from '../settings/services/settings-http.service';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
-// import { CurrencySymbolPipe } from 'src/app/pipe/currency-symbol.pipe';
+import { CurrencySymbolPipe } from 'src/app/pipe/currency-symbol.pipe';
 
 @Component({
   selector: 'app-emergencies',
@@ -32,8 +32,8 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
     CommonModule,
     MatTooltipModule,
     MatButtonToggleModule,
-    // CurrencySymbolPipe,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    CurrencySymbolPipe
   ],
 
   templateUrl: './emergencies.component.html',
@@ -198,18 +198,6 @@ export class EmergenciesComponent {
     if (id == null) return 'Not set';
 
     return this.policyStatuses.find(w => w.id === id)?.description ?? 'Unknown';
-  }
-
-  getInsuranceCostLabel(e: Emergency): string {
-    const cost = e.insuranceCost;
-    
-    if (!cost) return '-';
-    
-    const symbol = this.clientData?.preferredCurrency ?? '';
-    const amount = cost.amount ?? 0;
-    const cycleDesc = cost.cycle?.description || cost.cycle?.id || '';
-    
-    return `${symbol}${amount} `;
   }
 
   getIconName(e: Emergency): string {
