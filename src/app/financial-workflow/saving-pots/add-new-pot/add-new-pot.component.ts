@@ -506,6 +506,8 @@ onEscalationRateChange(event: MatSelectChange): void {
 
   saveCashflow(): void {
     console.log(this.savingsForm);
+    // console.log(this.savingsForm.get('name')?.value == null , this.savingsForm.get('customName')?.value != null,
+    //     this.savingsForm.get('customName')?.value == 'Cash');
     this.savingsForm.markAllAsTouched();
     const isCustomEscalation = this.selectedEscalationDescription === 'Increases at custom rate';
     const selectedEscalationRateValue = isCustomEscalation
@@ -642,6 +644,8 @@ onEscalationRateChange(event: MatSelectChange): void {
         // returnRate: this.savingsForm.get('name')?.value !== 'Cash' ? this.savingsForm.get('returnRate')?.value : 0,
           returnRate: this.savingsForm.get('name')?.value !== 'Cash' ? rr : 0,
         type:
+        this.savingsForm.get('customName')?.value != null &&
+        this.savingsForm.get('customName')?.value == 'Cash' ? 1 : 
           this.savingPotValues.find(
             (x) => this.savingsForm.get('name')?.value === x.name
           )?.type ?? SavingPotType.Other,
