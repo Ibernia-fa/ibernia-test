@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
 import { catchError, filter, map, Observable, of, switchMap, tap } from 'rxjs';
 import { NavItemService } from 'src/app/layouts/full/nav-item.service';
 import { EmergenciesHttpService as EmergenciesHttpService } from './services/emergencies-http.service';
@@ -37,7 +37,8 @@ import { CurrencySymbolPipe } from 'src/app/pipe/currency-symbol.pipe';
   ],
 
   templateUrl: './emergencies.component.html',
-  styleUrl: './emergencies.component.scss'
+  styleUrl: './emergencies.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
 export class EmergenciesComponent {
@@ -200,17 +201,21 @@ export class EmergenciesComponent {
     return this.policyStatuses.find(w => w.id === id)?.description ?? 'Unknown';
   }
 
-  getIconName(e: Emergency): string {
-    // TODO: update this when icons are available
-    if (e.type === 1) {
-      return 'health_and_safety'; // insurance
-    }
-    if (e.type === 2) {
-      return 'description'; // will
-    }
+private readonly iconMap: Record<string, string> = {
+  home: 'home.svg',
+  disability: 'disability.svg',
+  health: 'health.svg',
+  will: 'will.svg',
+  life: 'shield.svg'
+};
 
-    return 'shield';
-  }
+private readonly defaultIcon = 'shield.svg';
+
+getIconName(e: Emergency): string {
+  const key = (e.name || '').toLowerCase();
+  return `assets/images/svgs/${this.iconMap[key] ?? this.defaultIcon}`;
+}
+
 
   getCardCssClass(e: Emergency): string {
     if(e.type === 1)
@@ -322,6 +327,8 @@ export class EmergenciesComponent {
 
     return this.emergencies.filter(e => !e.isHidden);
   }
+
+
 }
 
 

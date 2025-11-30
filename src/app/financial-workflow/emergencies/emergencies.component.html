@@ -77,7 +77,7 @@
             <div class="d-flex justify-content-between m-b-5">
               <div class="d-flex gap-10 align-items-center">
                 <div [ngClass]="getDotClass(e)"></div>
-                <img width="18" src="../../../assets/images/svgs/shield.svg" alt="">
+                <img width="18" [src]="getIconName(e)" alt="">
                 <span class="card-title">
                   {{ e.name || getTypeName(e.type) }}
                 </span>

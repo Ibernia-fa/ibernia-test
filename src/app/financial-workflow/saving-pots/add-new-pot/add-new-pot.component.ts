@@ -526,7 +526,7 @@ onEscalationRateChange(event: MatSelectChange): void {
         nominalValue: 0,
         realValue: 0,
         realGrowthRate: 0,
-        inflationRate: this.savingsForm.get('name')?.value !== 'Cash' ? this.inflationRate : 0,
+        inflationRate: this.inflationRate ??  0,
         startingPotValue: {
           amount: this.savingsForm.get('amount')?.value,
           currencySymbol: this.savingsForm.get('currency')?.value,
