@@ -90,9 +90,20 @@ export class AddEmergenciesComponent {
         this.updateValidatorsForPolicyStatus(status);
       });
     }
-
+    
     if (this.data.mode === 'edit' && this.data.emergency) {
       this.patchForm(this.data.emergency);
+    }
+    else {
+      setTimeout(() => this.setDefaultAdequacy());
+    }
+  }
+
+  setDefaultAdequacy() {
+    const good = this.coverageAdequacies.find(a => a.name === 'Good');
+    
+    if (good) {
+      this.form.patchValue({ coverageAdequacy: good.id });
     }
   }
 

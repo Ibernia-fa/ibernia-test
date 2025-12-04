@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/
 import { catchError, filter, map, Observable, of, switchMap, tap } from 'rxjs';
 import { NavItemService } from 'src/app/layouts/full/nav-item.service';
 import { EmergenciesHttpService as EmergenciesHttpService } from './services/emergencies-http.service';
+import { ClientHttpService as ClientHttpService } from 'src/app/clients/services/client-http.service';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialog } from '@angular/material/dialog';
@@ -63,6 +64,7 @@ export class EmergenciesComponent {
   constructor(
     private route: ActivatedRoute,
     private emergenciesHttp: EmergenciesHttpService,
+    private clientHttpService: ClientHttpService,
     private toastr: ToastrService,
     private dialog: MatDialog,
     private navItemService: NavItemService,
@@ -124,17 +126,38 @@ export class EmergenciesComponent {
       )
       .subscribe();
 
-    this.client$ = this.store.select(selectedClient);
-    this.client$
-      .subscribe(client => {
-        if (client) {
-          this.clientData = client.clientDetails;
-          this.isClientLoaded = true;
-          this.cdr.detectChanges();
-        }
+      // load client
+      this.client$ = this.store.select(selectedClient);
+      this.client$
+        .pipe(
+          switchMap(client => {
 
-        this.checkFullyLoaded();
-      });
+            // load client from store
+            if (client) {
+              this.clientData = client.clientDetails;
+              this.isClientLoaded = true;
+              this.checkFullyLoaded();
+              return of(client);
+            }
+
+            // if client is not in store load it from the api
+            return this.clientHttpService.getClientByCashflowId(this.cashflowId).pipe(
+              tap(apiClient => {
+                if (apiClient) {
+                  this.store.dispatch({
+                    type: '[Client API] Load Success',
+                    client: apiClient
+                  });
+                
+                  this.clientData = apiClient.clientDetails;
+                  this.isClientLoaded = true;
+                  this.checkFullyLoaded();
+                }
+              }),
+              catchError(() => of(null))
+            );
+          })
+        ).subscribe();
   }
 
   checkFullyLoaded() {
