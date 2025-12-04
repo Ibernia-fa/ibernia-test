@@ -211,7 +211,9 @@ export class IncomeExpensesComponent {
 
     dialogRef.afterClosed().subscribe((result: any) => {
       console.log('Dialog closed with result:', result);
-      this.updateIncomeExpenseByResponse(result.incomeExpense);
+      if(result) {
+        this.updateIncomeExpenseByResponse(result?.incomeExpense);
+      }
     });
   }
 
