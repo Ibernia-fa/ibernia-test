@@ -152,6 +152,13 @@ export class AddExpenseComponent {
   x => x.value === this.selectedExpense.escalationRate?.value
 );
 
+  const cycleId = this.selectedExpense.amount.cycle?.id;
+  const cycle = this.cycles.find(x => x.id === cycleId);
+
+  if (cycle?.description === 'One-off') {
+    this.expenseForm.get('cycle')?.disable();
+  }
+
 if (matchedEscalation) {
   // Standard escalation rate selected
   this.expenseForm.get('escalationRate')?.patchValue(matchedEscalation.value);
@@ -185,6 +192,7 @@ if (matchedEscalation) {
   }
 
   closeDialog(): void {
+    console.log(this.expenseForm);
     this.dialogRef.close();
   }
 

@@ -1167,7 +1167,7 @@ requestAnimationFrame(() => {
 
       dialogRef.afterClosed().subscribe((result: any) => {
         console.log('Dialog closed with result:', result);
-        if ((result.status = 'Success')) {
+        if (result && (result.status = 'Success')) {
           this.updateTimelines.emit();
         }
       });

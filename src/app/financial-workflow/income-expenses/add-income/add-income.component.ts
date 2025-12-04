@@ -145,6 +145,14 @@ export class AddIncomeComponent {
   x => x.value === this.selectedIncome.escalationRate?.value
 );
 
+
+  const cycleId = this.selectedIncome.amount.cycle?.id;
+  const cycle = this.cycles.find(x => x.id === cycleId);
+
+  if (cycle?.description === 'One-off') {
+    this.incomeForm.get('cycle')?.disable();
+  }
+
 if (matchedEscalation) {
   // Standard escalation rate selected
   this.incomeForm.get('escalationRate')?.patchValue(matchedEscalation.value);

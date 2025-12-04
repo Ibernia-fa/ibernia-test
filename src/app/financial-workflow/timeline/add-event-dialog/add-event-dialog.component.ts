@@ -255,6 +255,12 @@ this.eventForm.updateValueAndValidity({ emitEvent: false });
 
           break;
     }
+
+    const cycleDescription = this.patchEvent?.netAmount?.cycle?.description;
+
+if (cycleDescription === 'One-off') {
+  this.eventForm.get('cycle')?.disable();
+}
   }
 
   private handleEscalationRatePatch(description: string| any, value: number| any) {
