@@ -56,7 +56,6 @@ export class EmergenciesComponent {
   client$: Observable<Client | null>;
   clientData: Details;
   amountCycles: any;
-  showHidden: boolean;
 
   isClientLoaded = false;
   isEmergenciesLoaded = false;
@@ -85,13 +84,15 @@ export class EmergenciesComponent {
     this.route.paramMap
       .pipe(
         map(pm => {
-          // support either /clients/:clientId/cashflows/:cashflowId/emergencies
-          // or /cashflows/:id/emergencies
           const cf = pm.get('cashflowId') || pm.get('id');
           const cl = pm.get('clientId') || undefined;
-          if (!cf) throw new Error('cashflowId not found in route.');
+
+          if (!cf)
+            throw new Error('cashflowId not found in route.');
+          
           this.cashflowId = cf;
           this.clientId = cl;
+          
           return cf;
         }),
         switchMap(cashflowId =>
@@ -117,7 +118,6 @@ export class EmergenciesComponent {
           this.insuranceCostTemplate = this.stats?.insuranceCost ?? undefined;
         }),
         tap(() =>  {
-          this.isLoading = false;
           this.isEmergenciesLoaded = true;
           this.checkFullyLoaded();
         })
@@ -130,16 +130,15 @@ export class EmergenciesComponent {
         if (client) {
           this.clientData = client.clientDetails;
           this.isClientLoaded = true;
-          this.checkFullyLoaded();
           this.cdr.detectChanges();
-
-          console.log('this client', this.clientData);
         }
+
+        this.checkFullyLoaded();
       });
   }
 
   checkFullyLoaded() {
-    if (this.isClientLoaded && this.isEmergenciesLoaded) {
+    if (this.isEmergenciesLoaded) {
       this.isLoading = false;
       this.cdr.detectChanges();
     }
@@ -201,21 +200,20 @@ export class EmergenciesComponent {
     return this.policyStatuses.find(w => w.id === id)?.description ?? 'Unknown';
   }
 
-private readonly iconMap: Record<string, string> = {
-  home: 'home.svg',
-  disability: 'disability.svg',
-  health: 'health.svg',
-  will: 'will.svg',
-  life: 'shield.svg'
-};
+  private readonly iconMap: Record<string, string> = {
+    home: 'home.svg',
+    disability: 'disability.svg',
+    health: 'health.svg',
+    will: 'will.svg',
+    life: 'shield.svg'
+  };
 
-private readonly defaultIcon = 'shield.svg';
+  private readonly defaultIcon = 'shield.svg';
 
-getIconName(e: Emergency): string {
-  const key = (e.name || '').toLowerCase();
-  return `assets/images/svgs/${this.iconMap[key] ?? this.defaultIcon}`;
-}
-
+  getIconName(e: Emergency): string {
+    const key = (e.name || '').toLowerCase();
+    return `assets/images/svgs/${this.iconMap[key] ?? this.defaultIcon}`;
+  }
 
   getCardCssClass(e: Emergency): string {
     if(e.type === 1)
@@ -276,9 +274,8 @@ getIconName(e: Emergency): string {
     });
   }
 
-  showHideEmergency(e: Emergency) {
-    e.isHidden = !e.isHidden;
-
+  hideEmergency(e: Emergency) {
+    e.isHidden = true;
     const updated: Emergency = { ...e };
 
     this.emergenciesHttp.updateEmergency(updated).subscribe({
@@ -287,14 +284,40 @@ getIconName(e: Emergency): string {
         },
         error: (err) => {
           console.error(err);
-          this.toastr.error('Failed to toggle hide and show', 'Error');
+          this.toastr.error('Failed to hide emergency', 'Error');
           e.isHidden = !e.isHidden;
         }
       });
   }
 
-  toggleShowHidden(): void {
-    this.showHidden = !this.showHidden;
+  showHiddenEmergencies(): void {
+    const hiddenEmergencies = this.emergencies.filter(e => e.isHidden);
+    
+    if (hiddenEmergencies.length === 0) {
+      return;
+    }
+
+    hiddenEmergencies.forEach(e => e.isHidden = false);
+
+    hiddenEmergencies.forEach(e => {
+      const updated: Emergency = { ...e, isHidden: false };
+      this.emergenciesHttp.updateEmergency(updated).subscribe({
+        next: (res: Emergency) => {
+          Object.assign(e, res);
+        },
+        error: (err) => {
+          console.error(err);
+          this.toastr.error(
+            `Failed to update "${e.name}" to visible`,
+            'Error'
+          );
+          
+          e.isHidden = true;
+        }
+      });
+   });
+  
+   this.cdr.detectChanges();
   }
 
   onCoverageAdequacyChange(e: Emergency, newId: number): void {
@@ -321,14 +344,8 @@ getIconName(e: Emergency): string {
   }
 
   get filteredEmergencies(): Emergency[] {
-    if (this.showHidden) {
-      return this.emergencies;
-    }
-
     return this.emergencies.filter(e => !e.isHidden);
   }
-
-
 }
 
 
