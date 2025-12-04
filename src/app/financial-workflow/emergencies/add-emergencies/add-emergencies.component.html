@@ -40,7 +40,7 @@
         <div class="select-option">
           <mat-select formControlName="policyStatus" hideSingleSelectionIndicator placeholder="Select">
             @for (s of policyStatuses; track s) {
-              <mat-option [value]="s.id">{{ s.name }}</mat-option>
+              <mat-option [value]="s.id">{{ s.name == 'NotCovered' ? 'Not covered' : s.name }}</mat-option>
             }
           </mat-select>
         </div>
