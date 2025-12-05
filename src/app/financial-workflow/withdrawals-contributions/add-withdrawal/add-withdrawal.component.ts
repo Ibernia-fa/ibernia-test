@@ -1,9 +1,5 @@
 import { Component, Inject } from '@angular/core';
-import {
-  MAT_DIALOG_DATA,
-  MatDialogModule,
-  MatDialogRef,
-} from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -13,19 +9,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { provideNativeDateAdapter } from '@angular/material/core';
-import {
-  AbstractControl,
-  FormBuilder,
-  FormGroup,
-  ReactiveFormsModule,
-  ValidatorFn,
-  Validators,
-} from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 import { allCountries } from 'src/app/clients/models/country';
-import {
-  Cycle,
-  EscalationRate,
-} from '../../timeline/models/financial-timeline';
+import { Cycle, EscalationRate } from '../../timeline/models/financial-timeline';
 import { WithdrawalsContributionsHttpService } from '../services/withdrawals-contributions-http.service';
 import moment from 'moment';
 import { FundsViewModel } from '../model/withdrawals-contributions';
@@ -97,7 +83,7 @@ export class AddWithdrawalComponent {
     }
 
     this.clientAge = age
-    if(data.forecastStartDateYear - this.clientBirthYear > this.clientAge) this.clientBirthYear =  this.clientBirthYear+1
+    if (data.forecastStartDateYear - this.clientBirthYear > this.clientAge) this.clientBirthYear = this.clientBirthYear + 1
 
     this.clientPreferredCurrency = data.clientPreferredCurrency;
     this.cashflowId = data.cashflowId;
@@ -123,7 +109,7 @@ export class AddWithdrawalComponent {
       savingPot: [''],
       escalationRate: [this.escalationRates[0].value, Validators.required],
       customEscalationRate: [0],
-          commissions: [false],
+      commissions: [false],
       commissionPercentage: [0],
     });
     this.withdrawalForm.get('currencySymbol')?.disable();
@@ -151,7 +137,7 @@ export class AddWithdrawalComponent {
       this.withdrawalForm.get('end')?.patchValue(this.selectedWithdrawal.end.year);
 
       const matchedEscalation = this.escalationRates.find(x => x.value === this.selectedWithdrawal?.escalationRate?.value);
-      
+
       if (matchedEscalation) {
         this.withdrawalForm.get('escalationRate')?.patchValue(matchedEscalation.value);
         this.selectedEscalationDescription = matchedEscalation.description;
@@ -160,15 +146,15 @@ export class AddWithdrawalComponent {
         this.selectedWithdrawal.escalationRate.description === 'Increases at custom rate'
       ) {
         this.escalationRates = this.escalationRates.filter(x => x.description !== 'Increases at custom rate')
-        this.escalationRates.push({ 
-          description: 'Increases at custom rate', 
+        this.escalationRates.push({
+          description: 'Increases at custom rate',
           value: this.selectedWithdrawal.escalationRate.value
         });
 
         this.withdrawalForm.get('escalationRate')?.patchValue(this.selectedWithdrawal.escalationRate.value);
         this.withdrawalForm.get('customEscalationRate')?.patchValue(this.selectedWithdrawal.escalationRate.value);
         this.selectedEscalationDescription = 'Increases at custom rate';
-        
+
         // Trigger validators for custom rate
         const customControl = this.withdrawalForm.get('customEscalationRate');
         customControl?.setValidators([Validators.required, Validators.min(0)]);
@@ -178,37 +164,16 @@ export class AddWithdrawalComponent {
       const savedId = this.selectedWithdrawal.associatedSavingPotId;
       const stillExists = this.savingPots.clientSavings.some(s => s.id === savedId);
       this.withdrawalForm.get('savingPot')?.patchValue(stillExists ? savedId : null);
-
-      const hasComm = !!this.selectedWithdrawal?.comission;
-      this.withdrawalForm.get('commissions')?.patchValue(hasComm);
-      const pct =
-        this.selectedWithdrawal?.comission?.percentage?.amount ?? 0;
-      this.withdrawalForm.get('commissionPercentage')?.patchValue(pct);
-      this.onCommissionsToggled(hasComm);
-      
     }
-    // hide locked pots AND the "Cash" pot from the dropdown
-this.savingPots.clientSavings = (this.savingPots.clientSavings || [])
-  // .filter(s => !s.hasPotLocked)
-  .filter(s => (s.name ?? '').toLowerCase() !== 'cash');
 
+    // hide locked pots AND the "Cash" pot from the dropdown
+    this.savingPots.clientSavings = (this.savingPots.clientSavings || [])
+      .filter(s => (s.name ?? '').toLowerCase() !== 'cash');
   }
 
   onAmountInput(rawValue: string) {
     const value = parseFormattedNumber(rawValue);
     this.withdrawalForm.get('amount')?.setValue(value, { emitEvent: true });
-  }
-
-    onCommissionsToggled(enabled: boolean) {
-    const ctrl = this.withdrawalForm.get('commissionPercentage');
-    if (enabled) {
-      ctrl?.setValidators([Validators.required, Validators.min(0)]);
-      if (ctrl?.value === null || ctrl?.value === '') ctrl?.setValue(0);
-    } else {
-      ctrl?.clearValidators();
-      ctrl?.setValue(0);
-    }
-    ctrl?.updateValueAndValidity();
   }
 
   closeDialog(): void {
@@ -242,37 +207,37 @@ this.savingPots.clientSavings = (this.savingPots.clientSavings || [])
     this.withdrawalForm.markAllAsTouched();
     this.withdrawalForm.markAsDirty();
     if (this.withdrawalForm.valid) {
-          const hasCommission = !!this.withdrawalForm.get('commissions')?.value;
-    const commissionPct = Number(
-      this.withdrawalForm.get('commissionPercentage')?.value ?? 0
-    );
+      const hasCommission = false;
+      const commissionPct = Number(
+        this.withdrawalForm.get('commissionPercentage')?.value ?? 0
+      );
 
-    const emptyCycle = { id: '', description: '' };
-    const emptyNetAmount = {
-      amount: 0,
-      currencySymbol: '',
-      cycle: emptyCycle,
-    };
+      const emptyCycle = { id: '', description: '' };
+      const emptyNetAmount = {
+        amount: 0,
+        currencySymbol: '',
+        cycle: emptyCycle,
+      };
 
-    // ensure the selected pot is one of the allowed (non-Cash) options
-const selectedPotId = this.withdrawalForm.get('savingPot')?.value ?? '';
-const validPotId = this.savingPots.clientSavings.some(s => s.id === selectedPotId) ? selectedPotId : '';
+      // ensure the selected pot is one of the allowed (non-Cash) options
+      const selectedPotId = this.withdrawalForm.get('savingPot')?.value ?? '';
+      const validPotId = this.savingPots.clientSavings.some(s => s.id === selectedPotId) ? selectedPotId : '';
 
-    const neutralCommissionEscRate: EscalationRate = { description: '', value: '0' };
+      const neutralCommissionEscRate: EscalationRate = { description: '', value: '0' };
 
       console.log('Form Submitted', this.withdrawalForm.value);
-                  const isCustomEscalation =
+      const isCustomEscalation =
         this.selectedEscalationDescription === 'Increases at custom rate';
       const escalationRateValue = isCustomEscalation
         ? this.withdrawalForm.get('customEscalationRate')?.value
         : this.withdrawalForm.get('escalationRate')?.value;
-   const matchedRate = this.escalationRates.find(
+      const matchedRate = this.escalationRates.find(
         (x) => x.value === escalationRateValue
       );
       var withdrawal: FundsViewModel = {
         id: this.isEditWorkflow ? this.selectedWithdrawal.id : null,
         // associatedSavingPotId: this.withdrawalForm.get('savingPot')?.value ?? '',
-          associatedSavingPotId: validPotId,
+        associatedSavingPotId: validPotId,
         description: this.withdrawalForm.get('description')?.value,
         amount: {
           amount: this.withdrawalForm.get('amount')?.value,
@@ -288,55 +253,55 @@ const validPotId = this.savingPots.clientSavings.some(s => s.id === selectedPotI
         start: {
           age:
             this.withdrawalForm.get('start')?.value !== null &&
-            this.withdrawalForm.get('start')?.value !== ''
+              this.withdrawalForm.get('start')?.value !== ''
               ? this.withdrawalForm.get('start')?.value - this.clientBirthYear
               : 0,
           year:
             this.withdrawalForm.get('start')?.value !== null &&
-            this.withdrawalForm.get('start')?.value !== ''
+              this.withdrawalForm.get('start')?.value !== ''
               ? this.withdrawalForm.get('start')?.value
               : 0,
         },
         end: {
           age:
             this.withdrawalForm.get('end')?.value !== null &&
-            this.withdrawalForm.get('end')?.value !== ''
+              this.withdrawalForm.get('end')?.value !== ''
               ? this.withdrawalForm.get('end')?.value - this.clientBirthYear
               : 0,
           year:
             this.withdrawalForm.get('end')?.value !== null &&
-            this.withdrawalForm.get('end')?.value !== ''
+              this.withdrawalForm.get('end')?.value !== ''
               ? this.withdrawalForm.get('end')?.value
               : 0,
         },
-                   escalationRate:  escalationRateValue !== null && escalationRateValue !== ''
-  ? matchedRate ?? {
-      description: this.selectedEscalationDescription ?? '', // Use actual description
-      value: escalationRateValue
-    }
-  : {
-      description: '',
-      value: 0
-    },
-    contributionType : 0,
-     hasCommission: hasCommission,
-     comission: hasCommission
-  ? {
-      type: ComissionType.Percentage,
-      amount: emptyNetAmount,
-      percentage: {
-        amount: commissionPct,
-        currencySymbol: '',
-        cycle: emptyCycle,
-      },
-      escalationRate: neutralCommissionEscRate,  // <-- use the string-valued esc rate
-    }
-  : {
-      type: ComissionType.Percentage, // or Amount if your API prefers for "none"
-      amount: emptyNetAmount,
-      percentage: emptyNetAmount,
-      escalationRate: neutralCommissionEscRate,  // <-- here too
-    },
+        escalationRate: escalationRateValue !== null && escalationRateValue !== ''
+          ? matchedRate ?? {
+            description: this.selectedEscalationDescription ?? '', // Use actual description
+            value: escalationRateValue
+          }
+          : {
+            description: '',
+            value: 0
+          },
+        contributionType: 0,
+        hasCommission: hasCommission,
+        comission: hasCommission
+          ? {
+            type: ComissionType.Percentage,
+            amount: emptyNetAmount,
+            percentage: {
+              amount: commissionPct,
+              currencySymbol: '',
+              cycle: emptyCycle,
+            },
+            escalationRate: neutralCommissionEscRate,  // <-- use the string-valued esc rate
+          }
+          : {
+            type: ComissionType.Percentage, // or Amount if your API prefers for "none"
+            amount: emptyNetAmount,
+            percentage: emptyNetAmount,
+            escalationRate: neutralCommissionEscRate,  // <-- here too
+          },
 
       };
 
@@ -371,55 +336,53 @@ const validPotId = this.savingPots.clientSavings.some(s => s.id === selectedPotI
     }
   }
 
-      private endOnOrAfterStartValidator(): ValidatorFn {
-      return (group: AbstractControl) => {
-        const start = group.get('start')?.value;
-        const end   = group.get('end')?.value;
-        const endCtrl = group.get('end');
-    
-        // Only validate when both are present (or when end is present)
-        if (endCtrl) {
-          const existing = endCtrl.errors ?? null;
-    
-          if (start != null && start !== '' && end != null && end !== '' && end < start) {
-            // attach/merge the error onto the END control
-            endCtrl.setErrors({ ...(existing ?? {}), endBeforeStart: true });
-          } else {
-            // remove just our error, keep any others
-            if (existing && 'endBeforeStart' in existing) {
-              const { endBeforeStart, ...rest } = existing;
-              endCtrl.setErrors(Object.keys(rest).length ? rest : null);
-            }
+  private endOnOrAfterStartValidator(): ValidatorFn {
+    return (group: AbstractControl) => {
+      const start = group.get('start')?.value;
+      const end = group.get('end')?.value;
+      const endCtrl = group.get('end');
+
+      // Only validate when both are present (or when end is present)
+      if (endCtrl) {
+        const existing = endCtrl.errors ?? null;
+
+        if (start != null && start !== '' && end != null && end !== '' && end < start) {
+          // attach/merge the error onto the END control
+          endCtrl.setErrors({ ...(existing ?? {}), endBeforeStart: true });
+        } else {
+          // remove just our error, keep any others
+          if (existing && 'endBeforeStart' in existing) {
+            const { endBeforeStart, ...rest } = existing;
+            endCtrl.setErrors(Object.keys(rest).length ? rest : null);
           }
         }
-        return null;
-      };
+      }
+      return null;
+    };
+  }
+
+  onEscalationRateChange(event: MatSelectChange): void {
+    const selectedOption = event.source.selected;
+
+    let description: string | null = null;
+
+    if (Array.isArray(selectedOption)) {
+      description = selectedOption[0]?.viewValue ?? null;
+    } else {
+      description = selectedOption?.viewValue ?? null;
     }
 
-        onEscalationRateChange(event: MatSelectChange): void {
-          const selectedOption = event.source.selected;
-        
-          let description: string | null = null;
-        
-          if (Array.isArray(selectedOption)) {
-            description = selectedOption[0]?.viewValue ?? null;
-          } else {
-            description = selectedOption?.viewValue ?? null;
-          }
-        
-          this.selectedEscalationDescription = description;
-        
-          const customControl = this.withdrawalForm.get('customEscalationRate');
-        
-          if (description === 'Increases at custom rate') {
-            customControl?.setValidators([Validators.required, Validators.min(0)]);
-          } else {
-            customControl?.clearValidators();
-            customControl?.setValue(null); // Optionally reset field
-          }
-        
-          customControl?.updateValueAndValidity();
-        }
+    this.selectedEscalationDescription = description;
 
-        
+    const customControl = this.withdrawalForm.get('customEscalationRate');
+
+    if (description === 'Increases at custom rate') {
+      customControl?.setValidators([Validators.required, Validators.min(0)]);
+    } else {
+      customControl?.clearValidators();
+      customControl?.setValue(null); // Optionally reset field
+    }
+
+    customControl?.updateValueAndValidity();
+  }
 }
