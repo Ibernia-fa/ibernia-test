@@ -154,8 +154,8 @@ export class AddContributionComponent {
 
     if (this.isEditWorkflow) {
       // hydrate commission
-      const hasCommInit = !!this.selectedContribution;
       const pctInit = this.selectedContribution?.comission?.percentage?.amount ?? 0;
+      const hasCommInit = pctInit > 0;
 
       // hydrate core fields
       this.contributionForm.patchValue({
@@ -187,57 +187,56 @@ export class AddContributionComponent {
       // }
 
       const savedId = this.selectedContribution.associatedSavingPotId;
-const type = Number(this.contributionForm.get('contributionType')?.value ?? 1);
+      const type = Number(this.contributionForm.get('contributionType')?.value ?? 1);
 
-if (type === 1) {
-  // Cash mode: do NOT show Cash in list; preselect only if savedId is non-cash and present
-  if (savedId && savedId !== this.cashPot?.id && this.clientSavings.some(s => s.id === savedId)) {
-    this.contributionForm.get('savingPot')?.patchValue(savedId);
-  } else {
-    this.contributionForm.get('savingPot')?.patchValue(null);
-  }
-} else {
-  // External mode: show all, including Cash
-  if (savedId && this.clientSavings.some(s => s.id === savedId)) {
-    this.contributionForm.get('savingPot')?.patchValue(savedId);
-  } else {
-    this.contributionForm.get('savingPot')?.patchValue(null);
-  }
-}
+      if (type === 1) {
+        // Cash mode: do NOT show Cash in list; preselect only if savedId is non-cash and present
+        if (savedId && savedId !== this.cashPot?.id && this.clientSavings.some(s => s.id === savedId)) {
+          this.contributionForm.get('savingPot')?.patchValue(savedId);
+        } else {
+          this.contributionForm.get('savingPot')?.patchValue(null);
+        }
+      } else {
+        // External mode: show all, including Cash
+        if (savedId && this.clientSavings.some(s => s.id === savedId)) {
+          this.contributionForm.get('savingPot')?.patchValue(savedId);
+        } else {
+          this.contributionForm.get('savingPot')?.patchValue(null);
+        }
+      }
 
-            const hasComm = !!this.selectedContribution?.comission;
+      const pct = this.selectedContribution?.comission?.percentage?.amount ?? 0;
+      const hasComm = pct > 0;
       this.contributionForm.get('commissions')?.patchValue(hasComm);
-      const pct =
-        this.selectedContribution?.comission?.percentage?.amount ?? 0;
       this.contributionForm.get('commissionPercentage')?.patchValue(pct);
       this.isCommissionsChanged(hasCommInit);
       this.onCycleValueChange(this.selectedContribution.amount.cycle?.id);
     }
 
     const matchedEscalation = this.escalationRates.find(x => x.value === this.selectedContribution?.escalationRate?.value);
-      
-      if (matchedEscalation) {
-        this.contributionForm.get('escalationRate')?.patchValue(matchedEscalation.value);
-        this.selectedEscalationDescription = matchedEscalation.description;
-      } else if (
-        this.selectedContribution?.escalationRate &&
-        this.selectedContribution?.escalationRate.description === 'Increases at custom rate'
-      ) {
-        this.escalationRates = this.escalationRates.filter(x => x.description !== 'Increases at custom rate')
-        this.escalationRates.push({ 
-          description: 'Increases at custom rate', 
-          value: this.selectedContribution?.escalationRate.value
-        });
 
-        this.contributionForm.get('escalationRate')?.patchValue(this.selectedContribution?.escalationRate.value);
-        this.contributionForm.get('customEscalationRate')?.patchValue(this.selectedContribution?.escalationRate.value);
-        this.selectedEscalationDescription = 'Increases at custom rate';
-        
-        // Trigger validators for custom rate
-        const customControl = this.contributionForm.get('customEscalationRate');
-        customControl?.setValidators([Validators.required, Validators.min(0)]);
-        customControl?.updateValueAndValidity();
-      }
+    if (matchedEscalation) {
+      this.contributionForm.get('escalationRate')?.patchValue(matchedEscalation.value);
+      this.selectedEscalationDescription = matchedEscalation.description;
+    } else if (
+      this.selectedContribution?.escalationRate &&
+      this.selectedContribution?.escalationRate.description === 'Increases at custom rate'
+    ) {
+      this.escalationRates = this.escalationRates.filter(x => x.description !== 'Increases at custom rate')
+      this.escalationRates.push({
+        description: 'Increases at custom rate',
+        value: this.selectedContribution?.escalationRate.value
+      });
+
+      this.contributionForm.get('escalationRate')?.patchValue(this.selectedContribution?.escalationRate.value);
+      this.contributionForm.get('customEscalationRate')?.patchValue(this.selectedContribution?.escalationRate.value);
+      this.selectedEscalationDescription = 'Increases at custom rate';
+
+      // Trigger validators for custom rate
+      const customControl = this.contributionForm.get('customEscalationRate');
+      customControl?.setValidators([Validators.required, Validators.min(0)]);
+      customControl?.updateValueAndValidity();
+    }
   }
 
   // === UI helpers ===
@@ -319,44 +318,44 @@ if (type === 1) {
   //   }
   // }
 
-private applySavingPotFilter(): void {
-  const type = Number(this.contributionForm.get('contributionType')?.value ?? 1);
+  private applySavingPotFilter(): void {
+    const type = Number(this.contributionForm.get('contributionType')?.value ?? 1);
 
-  if (type === 1) {
-    // Cash selected ➜ hide Cash from the dropdown
-    this.clientSavings = (this.allClientSavings ?? []).filter(
-      (s) => (s.name ?? '').toLowerCase() !== 'cash'
-    );
+    if (type === 1) {
+      // Cash selected ➜ hide Cash from the dropdown
+      this.clientSavings = (this.allClientSavings ?? []).filter(
+        (s) => (s.name ?? '').toLowerCase() !== 'cash'
+      );
 
-    // if previously selected is Cash (or not in list), clear it
-    const currentId = this.contributionForm.get('savingPot')?.value;
-    if (!currentId || currentId === this.cashPot?.id || !this.clientSavings.some(s => s.id === currentId)) {
-      this.contributionForm.get('savingPot')?.setValue(null);
-    }
-  } else {
-    // External selected ➜ show ALL (including Cash)
-    this.clientSavings = (this.allClientSavings ?? []).slice();
+      // if previously selected is Cash (or not in list), clear it
+      const currentId = this.contributionForm.get('savingPot')?.value;
+      if (!currentId || currentId === this.cashPot?.id || !this.clientSavings.some(s => s.id === currentId)) {
+        this.contributionForm.get('savingPot')?.setValue(null);
+      }
+    } else {
+      // External selected ➜ show ALL (including Cash)
+      this.clientSavings = (this.allClientSavings ?? []).slice();
 
-    // keep current selection if still valid; otherwise clear
-    const currentId = this.contributionForm.get('savingPot')?.value;
-    if (currentId && !this.clientSavings.some(s => s.id === currentId)) {
-      this.contributionForm.get('savingPot')?.setValue(null);
+      // keep current selection if still valid; otherwise clear
+      const currentId = this.contributionForm.get('savingPot')?.value;
+      if (currentId && !this.clientSavings.some(s => s.id === currentId)) {
+        this.contributionForm.get('savingPot')?.setValue(null);
+      }
     }
   }
-}
 
 
-//   private applySavingPotFilter(): void {
-//   // Show everything, no filtering based on type
-//   const all = this.allClientSavings ?? [];
-//   this.clientSavings = [...all];
+  //   private applySavingPotFilter(): void {
+  //   // Show everything, no filtering based on type
+  //   const all = this.allClientSavings ?? [];
+  //   this.clientSavings = [...all];
 
-//   // Keep current selection if it still exists; otherwise clear it
-//   const currentId = this.contributionForm.get('savingPot')?.value;
-//   if (currentId && !all.some(s => s.id === currentId)) {
-//     this.contributionForm.get('savingPot')?.setValue(null);
-//   }
-// }
+  //   // Keep current selection if it still exists; otherwise clear it
+  //   const currentId = this.contributionForm.get('savingPot')?.value;
+  //   if (currentId && !all.some(s => s.id === currentId)) {
+  //     this.contributionForm.get('savingPot')?.setValue(null);
+  //   }
+  // }
 
   addIncome(): void {
     this.contributionForm.markAllAsTouched();
@@ -371,14 +370,14 @@ private applySavingPotFilter(): void {
       this.contributionForm.get('commissionPercentage')?.value ?? 0
     );
 
-const selectedPotId: string | null = this.contributionForm.get('savingPot')?.value ?? null;
-const type = Number(this.contributionForm.get('contributionType')?.value ?? 1);
+    const selectedPotId: string | null = this.contributionForm.get('savingPot')?.value ?? null;
+    const type = Number(this.contributionForm.get('contributionType')?.value ?? 1);
 
 
-const associatedSavingPotId =
-  type === 1
-    ? (selectedPotId || this.cashPot?.id || '')
-    : (selectedPotId || '');
+    const associatedSavingPotId =
+      type === 1
+        ? (selectedPotId || this.cashPot?.id || '')
+        : (selectedPotId || '');
 
 
     // helper NetAmount shells
@@ -418,33 +417,33 @@ const associatedSavingPotId =
       start: {
         age:
           this.contributionForm.get('start')?.value !== null &&
-          this.contributionForm.get('start')?.value !== ''
+            this.contributionForm.get('start')?.value !== ''
             ? this.contributionForm.get('start')?.value - this.clientBirthYear
             : 0,
         year:
           this.contributionForm.get('start')?.value !== null &&
-          this.contributionForm.get('start')?.value !== ''
+            this.contributionForm.get('start')?.value !== ''
             ? this.contributionForm.get('start')?.value
             : 0,
       },
       end: {
         age:
           this.contributionForm.get('end')?.value !== null &&
-          this.contributionForm.get('end')?.value !== ''
+            this.contributionForm.get('end')?.value !== ''
             ? this.contributionForm.get('end')?.value - this.clientBirthYear
             : 0,
         year:
           this.contributionForm.get('end')?.value !== null &&
-          this.contributionForm.get('end')?.value !== ''
+            this.contributionForm.get('end')?.value !== ''
             ? this.contributionForm.get('end')?.value
             : 0,
       },
       escalationRate:
         escalationRateValue !== null && escalationRateValue !== ''
           ? matchedRate ?? {
-              description: this.selectedEscalationDescription ?? '',
-              value: escalationRateValue,
-            }
+            description: this.selectedEscalationDescription ?? '',
+            value: escalationRateValue,
+          }
           : { description: '', value: 0 },
 
       contributionType: Number(this.contributionForm.get('contributionType')?.value),
@@ -453,23 +452,23 @@ const associatedSavingPotId =
       hasCommission: hasCommission,
       comission: hasCommission
         ? {
-            type: ComissionType.Percentage,
-            amount: emptyNetAmount, // not used here
-            percentage: {
-              amount: commissionPct, // e.g. 2.5
-              currencySymbol: '',
-              cycle: emptyCycle,
-            },
-            // IMPORTANT: value is a string per your Comission model typing
-            escalationRate: { description: '', value: '0' },
-          }
-        : {
-            // send empty-but-valid object when disabled
-            type: ComissionType.Percentage, // keep consistent with your API
-            amount: emptyNetAmount,
-            percentage: emptyNetAmount,
-            escalationRate: { description: '', value: '0' },
+          type: ComissionType.Percentage,
+          amount: emptyNetAmount, // not used here
+          percentage: {
+            amount: commissionPct, // e.g. 2.5
+            currencySymbol: '',
+            cycle: emptyCycle,
           },
+          // IMPORTANT: value is a string per your Comission model typing
+          escalationRate: { description: '', value: '0' },
+        }
+        : {
+          // send empty-but-valid object when disabled
+          type: ComissionType.Percentage, // keep consistent with your API
+          amount: emptyNetAmount,
+          percentage: emptyNetAmount,
+          escalationRate: { description: '', value: '0' },
+        },
     };
 
     let action$ = this.withdrawalsContributionsHttpService.addContributions(
