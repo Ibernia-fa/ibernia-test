@@ -41,8 +41,9 @@
         <mat-card-content style="padding-bottom: 10px !important;">
 
 
-            <button matTooltip="Full screen" class="button-full-screen"><img width="20"
-                    src="../../../assets/images/svgs/full-screen.svg" alt=""></button>
+                  <button matTooltip="Full screen" class="button-full-screen" (click)="enterFullscreen()">
+                <img width="20" src="../../../assets/images/svgs/full-screen.svg" alt="">
+            </button>
 
 
 
@@ -58,11 +59,9 @@
     <!-- Comparison chart card -->
 <mat-card class="cardWithShadow" *ngIf="compareReport && compareCashflow">
   <mat-card-content style="padding-bottom: 10px !important;">
-    <button
-      matTooltip="Full screen"
-      class="button-full-screen">
-      <img width="20" src="../../../assets/images/svgs/full-screen.svg" alt="">
-    </button>
+            <button matTooltip="Full screen" class="button-full-screen" (click)="enterFullscreen(true)">
+                <img width="20" src="../../../assets/images/svgs/full-screen.svg" alt="">
+            </button>
 
     <div class="d-flex flex-column gap-8 m-b-16">
       <div class="d-flex align-items-center justify-content-between w-100 gap-16 flex-wrap">

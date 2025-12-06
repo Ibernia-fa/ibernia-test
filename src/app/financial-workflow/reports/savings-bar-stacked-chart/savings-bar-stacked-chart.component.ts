@@ -25,7 +25,7 @@ export class SavingsBarStackedChartComponent implements OnChanges {
   @Input() client: Client;
   @Input() cashFlowName: string;
 
-
+isFullscreen: any;
   public chartOptions: any;
 
 

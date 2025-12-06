@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import {
@@ -49,6 +49,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { CompareCashflowsComponent } from './compare-cashflows/compare-cashflows.component';
 import { SettingsService } from 'src/app/default-preferance/services/default-preferance.http.service';
+import { FullscreenData, FullscreenService } from 'src/app/services/fullscreen.service';
 
 
 export interface PeriodicElement {
@@ -197,7 +198,8 @@ isCompareLoading = false;
       private destroy$ = new Subject<void>();
   client$: Observable<Client | null>;
   clientData: Details;
-
+  @ViewChild('mainChart') mainChart?: SavingsBarStackedChartComponent;
+  @ViewChild('compareChart') compareChart?: SavingsBarStackedChartComponent;
   constructor(
     private timelineHttpService: TimelineHttpService,
     private reportsHttpService: ReportsHttpService,
@@ -212,7 +214,9 @@ isCompareLoading = false;
     private fb: FormBuilder,
     private dialog: MatDialog,
          private settingsService: SettingsService,
-         private store: Store
+         private store: Store,
+             private fullscreenService: FullscreenService,
+    private elementRef: ElementRef
 
   ) {
     this.destroyed$ = new BehaviorSubject<boolean>(false);
@@ -255,6 +259,39 @@ isCompareLoading = false;
 
 
   }
+
+
+
+ngAfterViewInit(): void {
+    // Optional: Listen for fullscreen changes
+    this.fullscreenService.isFullscreen$.subscribe(isFullscreen => {
+      // You can handle any component-specific logic here
+    });
+  }
+
+  enterFullscreen(isComparison = false): void {
+    const chartData = {
+      report: isComparison ? this.compareReport : this.report,
+      client: this.client,
+      forecastStartDate: isComparison ? 
+        (this.compareTimeline?.forecastStartDate || this.financialTimeline.forecastStartDate) : 
+        this.financialTimeline.forecastStartDate,
+      forecastEndDate: isComparison ? 
+        (this.compareTimeline?.forecastEndtDate || this.financialTimeline.forecastEndtDate) : 
+        this.financialTimeline.forecastEndtDate,
+      cashFlowName: isComparison ? 
+        (this.compareTimeline?.cashflow?.name || this.financialTimeline?.cashflow?.name) : 
+        this.financialTimeline?.cashflow?.name,
+      isComparison: isComparison
+    };
+    
+    this.fullscreenService.enterFullscreen(chartData);
+  }
+
+  ngOnDestroy(): void {
+    this.fullscreenService.exitFullscreen();
+  }
+
 
   getData() {
     this.isLoaderVisible = true;
