@@ -5,6 +5,7 @@ import { ChartComponent, NgApexchartsModule } from 'ng-apexcharts';
 import { ChartSeries } from '../models/charts-series.model';
 import { Client } from 'src/app/clients/models/client';
 import moment from 'moment';
+import { Cashflow } from 'src/app/clients/models/cashflow';
 
 @Component({
   selector: 'app-savings-bar-stacked-chart',
@@ -22,6 +23,8 @@ export class SavingsBarStackedChartComponent implements OnChanges {
   @Input() forecastStartDate: Date;
   @Input() forecastEndDate: Date;
   @Input() client: Client;
+  @Input() cashFlowName: string;
+
 
   public chartOptions: any;
 

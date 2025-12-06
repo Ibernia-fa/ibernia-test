@@ -325,7 +325,7 @@ onComparePlansClicked() {
   if (!this.cashflows || this.cashflows.length < 2) {
     this.toaster.info(
       'You need at least two plans to compare. Please create another plan first',
-      'Info'
+      // 'Info'
     );
     return;
   }
@@ -428,6 +428,12 @@ onReturnRateCommitted(): void {
     .subscribe();
 }
 
+exitComparison() {
+  this.compareCashflow = null;
+  this.compareReport = null;
+  this.compareTimeline = null;
+  this.isCompareLoading = false;
+}
 
 
 }

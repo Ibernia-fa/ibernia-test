@@ -1,4 +1,5 @@
 <div id="chart">
+    {{cashFlowName}}
     @if(report?.series) {
         <apx-chart [series]="report?.series ?? []" [chart]="chartOptions.chart" [xaxis]="chartOptions.xaxis"
             [yaxis]="chartOptions.yaxis" [dataLabels]="chartOptions.dataLabels" [annotations]="chartOptions.annotations"
