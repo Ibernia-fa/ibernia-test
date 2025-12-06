@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
-import { catchError, filter, map, Observable, of, switchMap, tap } from 'rxjs';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { catchError, filter, map, Observable, of, switchMap, tap, forkJoin } from 'rxjs';
 import { NavItemService } from 'src/app/layouts/full/nav-item.service';
 import { EmergenciesHttpService as EmergenciesHttpService } from './services/emergencies-http.service';
+import { ClientHttpService as ClientHttpService } from 'src/app/clients/services/client-http.service';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialog } from '@angular/material/dialog';
@@ -41,7 +42,7 @@ import { CurrencySymbolPipe } from 'src/app/pipe/currency-symbol.pipe';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
-export class EmergenciesComponent {
+export class EmergenciesComponent implements OnInit {
   clientId?: string = '';
   cashflowId!: string;
   isLoading = false;
@@ -63,6 +64,7 @@ export class EmergenciesComponent {
   constructor(
     private route: ActivatedRoute,
     private emergenciesHttp: EmergenciesHttpService,
+    private clientHttpService: ClientHttpService,
     private toastr: ToastrService,
     private dialog: MatDialog,
     private navItemService: NavItemService,
@@ -70,8 +72,12 @@ export class EmergenciesComponent {
     private settingHttpService: SettingsHttpService,
     private cdr: ChangeDetectorRef
   ) {
-    this.load();
     this.navItemService.currentRouteName = 'Risk & Insurance';
+  }
+
+  ngOnInit(): void {
+    this.load();
+
     this.settingHttpService.getAmountCycles().subscribe((cycles) => {
       this.amountCycles = cycles.filter(x => x.description != "One-off");
     });
@@ -124,23 +130,44 @@ export class EmergenciesComponent {
       )
       .subscribe();
 
-    this.client$ = this.store.select(selectedClient);
-    this.client$
-      .subscribe(client => {
-        if (client) {
-          this.clientData = client.clientDetails;
-          this.isClientLoaded = true;
-          this.cdr.detectChanges();
-        }
+      // load client
+      this.client$ = this.store.select(selectedClient);
+      this.client$
+        .pipe(
+          switchMap(client => {
 
-        this.checkFullyLoaded();
-      });
+            // load client from store
+            if (client) {
+              this.clientData = client.clientDetails;
+              this.isClientLoaded = true;
+              this.checkFullyLoaded();
+              return of(client);
+            }
+
+            // if client is not in store load it from the api
+            return this.clientHttpService.getClientByCashflowId(this.cashflowId).pipe(
+              tap(apiClient => {
+                if (apiClient) {
+                  this.store.dispatch({
+                    type: '[Client API] Load Success',
+                    client: apiClient
+                  });
+                
+                  this.clientData = apiClient.clientDetails;
+                  this.isClientLoaded = true;
+                  this.checkFullyLoaded();
+                }
+              }),
+              catchError(() => of(null))
+            );
+          })
+        ).subscribe();
   }
 
   checkFullyLoaded() {
-    if (this.isEmergenciesLoaded) {
+    if (this.isEmergenciesLoaded && this.isClientLoaded) {
       this.isLoading = false;
-      this.cdr.detectChanges();
+      this.cdr.markForCheck();
     }
   }
 
@@ -281,6 +308,9 @@ export class EmergenciesComponent {
     this.emergenciesHttp.updateEmergency(updated).subscribe({
         next: (res: Emergency) => {
            Object.assign(e, res);
+
+           // Reload list so updated values show
+           this.load();
         },
         error: (err) => {
           console.error(err);
@@ -292,32 +322,27 @@ export class EmergenciesComponent {
 
   showHiddenEmergencies(): void {
     const hiddenEmergencies = this.emergencies.filter(e => e.isHidden);
-    
+
     if (hiddenEmergencies.length === 0) {
       return;
     }
 
-    hiddenEmergencies.forEach(e => e.isHidden = false);
-
-    hiddenEmergencies.forEach(e => {
+    // update all hidden emergencies in API first
+    const updates$ = hiddenEmergencies.map(e => {
       const updated: Emergency = { ...e, isHidden: false };
-      this.emergenciesHttp.updateEmergency(updated).subscribe({
-        next: (res: Emergency) => {
-          Object.assign(e, res);
-        },
-        error: (err) => {
-          console.error(err);
-          this.toastr.error(
-            `Failed to update "${e.name}" to visible`,
-            'Error'
-          );
-          
-          e.isHidden = true;
-        }
-      });
-   });
-  
-   this.cdr.detectChanges();
+      return this.emergenciesHttp.updateEmergency(updated);
+    });
+
+    // wait for all api calls to finish then reload once
+    forkJoin(updates$).subscribe({
+      next: () => {
+        this.load();
+      },
+      error: (err) => {
+        console.error(err);
+        this.toastr.error('Failed to show hidden emergencies', 'Error');
+      }
+    });
   }
 
   onCoverageAdequacyChange(e: Emergency, newId: number): void {

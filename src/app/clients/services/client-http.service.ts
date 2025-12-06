@@ -22,6 +22,10 @@ export class ClientHttpService {
   getClient(id: string) {
     return this.httpClient.get<Client>(`${this.CLIENT_URL_PREFIX}/${id}`)
   }
+  
+  getClientByCashflowId(id: string) {
+    return this.httpClient.get<Client>(`${this.CLIENT_URL_PREFIX}/cashflow/${id}`)
+  }
 
   addClient(client: Client) {
     return this.httpClient.post<Client>(`${this.CLIENT_URL_PREFIX}`, client)
