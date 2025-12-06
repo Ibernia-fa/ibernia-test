@@ -31,4 +31,8 @@ export class CashflowHttpService {
       responseType: "text"
     });
   }
+
+  copyCashflow(cashflow: Cashflow) {
+    return this.httpClient.post<Cashflow>(`${this.CASHFLOW_URL_PREFIX}/copy`, cashflow)
+  }
 }
