@@ -2,7 +2,7 @@
 <a (click)="onItemSelected(item)" class="cashflow-modal d-flex align-items-center gap-8"
 [ngClass]="navItem.currentRouteName === item.displayName ? 'activeMenu' : ''"
 >
-  <img src="assets/images/svgs/inheritance-icon.svg" alt="cash-flow">
+  <img style="width: 18px;" src="assets/images/svgs/inheritance-icon.svg" alt="cash-flow">
   <span>{{ item.navCap }}</span>
 </a>
 } @if(!item.navCap && !item.external && !item.twoLines) {
