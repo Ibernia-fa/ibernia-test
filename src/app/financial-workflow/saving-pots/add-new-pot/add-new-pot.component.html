@@ -454,7 +454,6 @@
         @if(selectedEscalationDescription === 'Increases at custom rate') {
           <div class="w-100 form-field gap-12">
             <mat-label class="f-s-16 d-block">Custom escalation rate</mat-label>
-
          <mat-form-field  appearance="outline" class="w-full w-100 percentage-icon">
               <span matSuffix>%</span> 
                 <input
@@ -467,12 +466,6 @@
                             />
                             
               </mat-form-field>
-
-
-
-
-
-            
             @if(savingsForm.get('customEscalationRate')?.touched &&
                 savingsForm.get('customEscalationRate')?.hasError('required')) {
               <!-- <span class="field-error d-block">Custom escalation rate is required</span> -->

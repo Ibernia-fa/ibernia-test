@@ -238,6 +238,9 @@
     font-size: 14px;
     line-height: 20px;
   }
+  &:hover{
+     background-color: #f7f7f7;
+  }
   &.activeMenu{
     background-color: #f7f7f7;
   }
@@ -362,6 +365,31 @@
       }
     }
   }
+  &.preimum-nav{
+    
+      .mat-mdc-list-item {
+        border: 1px solid #516ce8 !important;
+        padding: 8px;
+        border-radius: 8px;
+        color: #516ce8 ;
+        height: 36px;
+        background-color: white;
+        text-decoration: none;
+        cursor: pointer;
+        .mdc-list-item__content{
+          .mdc-list-item__primary-text{
+            color: #516ce8 ;
+          }
+        }
+        span {
+          font-size: 14px;
+          line-height: 20px;
+        }
+        &.activeMenu{
+          background-color: #f7f7f7;
+        }
+      }
+}
   // }
 }
 // End upper side Menus

@@ -10,13 +10,13 @@ export const navItemslower: NavItem[] = [
   {
     displayName: 'Risk & Insurance',
     iconName: '/assets/images/svgs/danger-square-icon-active.svg',
-    iconOutline: '/assets/images/svgs/danger-square-icon.svg',
+    iconOutline: '/assets/images/svgs/danger-square-icon-active.svg',
     route: '/cashflows/{cashflowId}/emergencies',
   },
   {
     displayName: 'AI Recommendations',
     iconName: '/assets/images/shapes/ai-filled.svg',
-    iconOutline: '/assets/images/shapes/ai.svg',
+    iconOutline: '/assets/images/shapes/ai-filled.svg',
     route: '/cashflows/{cashflowId}/ai-recommendations',
   },
 ];

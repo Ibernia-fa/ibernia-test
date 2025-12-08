@@ -342,7 +342,7 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
       .pipe(
         takeUntil(this.destroy$),
         catchError((err) => {
-          const msg = err?.error?.message ?? 'Failed to save preferences.';
+          const msg = err?.error?.message ?? 'Failed to save preferences';
           this.toastr.error(msg, 'Error!');
           return EMPTY;
         }),

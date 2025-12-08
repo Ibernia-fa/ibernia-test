@@ -87,7 +87,7 @@ export class ShareReportComponent {
 
   shareReport(): void {
     if (!this.reportForm.valid || !this.clientId || !this.cashflowId) {
-      this.toastr.error('Missing required data to share the report.', 'Error!');
+      this.toastr.error('Missing required data to share the report', 'Error!');
       return;
     }
 
@@ -111,7 +111,7 @@ export class ShareReportComponent {
       error: (error) => {
         this.isLoaderVisible = false;
         console.error('Error:', error);
-        this.toastr.error('Failed to share the report. Please try again.', 'Error!');
+        this.toastr.error('Failed to share the report. Please try again', 'Error!');
       },
     });
   }
