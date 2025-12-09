@@ -356,9 +356,11 @@
           </div>
 
           <!-- Net Amount Field  -->
-           <div class="d-flex flex-column gap-8">
+          
           @if(savingsForm.get('commissionType')?.value === 'amount' || savingsForm.get('commissionType')?.value === 'both') {
+             <div class="d-flex flex-column gap-8">
             @if(savingsForm.get('commissionType')?.value === 'both') {
+
               <div class="d-flex gap-8 align-items-center">
                 <mat-label class="f-s-16 f-w-400 d-block">Commission amount </mat-label>
                 <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
@@ -418,8 +420,9 @@
               <!-- <span class="field-error d-block">Amount is required</span> -->
               <!-- End Error  -->
             </div>
+            </div>
           }
-</div>
+
           
         @if(savingsForm.get('commissionType')?.value !== 'percentage' && !isOneOff){
           <div class="w-100 form-field gap-12">
@@ -477,8 +480,9 @@
         </div>
       }
 
-      <div class="d-flex flex-column gap-8">
+      
           @if(savingsForm.get('commissionType')?.value === 'percentage' || savingsForm.get('commissionType')?.value === 'both') {
+            <div class="d-flex flex-column gap-8">
             @if(savingsForm.get('commissionType')?.value === 'both') {
               <div class="d-flex gap-8 align-items-center">
                 <mat-label class="f-s-16 f-w-400 d-block">Commission percentage</mat-label>
@@ -543,8 +547,9 @@
               <!-- <span class="field-error d-block">Amount is required</span> -->
               <!-- End Error  -->
             </div>
+            </div>
           }
-          </div>
+          
           <!-- End Net Amount Field  -->
         </div>
 

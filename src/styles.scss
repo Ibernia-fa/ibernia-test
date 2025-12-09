@@ -275,6 +275,9 @@ button {
   font-size: 14px;   /* adjust as you like */
   font-weight: bold;
 }
+.vis-time-axis .vis-text.vis-minor div span{
+  line-height: 10px !important;
+}
 // .form-field .mat-mdc-input-element {
 //   border: 1px solid rgba(0,0,0,0.23);
 //   border-radius: 4px;
