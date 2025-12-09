@@ -64,9 +64,11 @@
                                 </div>
 
                                 <div [class.active]="section === 'lifetimePlan'">
-                                    <a mat-list-item (click)="setSection('lifetimePlan')" [disableRipple]="true" class="cashflow-modal d-flex align-items-center gap-8 activeMenu" style="height: 36px;">
-                                        <img style="flex: none; max-width: 18px;" src="/assets/images/svgs/inheritance-icon.svg" alt="Lifetime plan">
-                                        <span class="activeMenu" style="font-size: 14px; line-height: 20px;">Lifetime Plan</span>
+                                    <a mat-list-item (click)="setSection('lifetimePlan')" [disableRipple]="true" class="cashflow-modal d-flex align-items-center gap-8 activeMenu" style="height: 36px; padding-left: 8px;">
+                                        <img style="flex: none; max-width: 18px; vertical-align: text-bottom; margin: 0px 8px 0px 0px;"
+                                            src="/assets/images/svgs/inheritance-icon.svg"
+                                            alt="Lifetime plan">
+                                        <span class="activeMenu mdc-list-item__primary-text" style="font-size: 14px; line-height: 20px; color: #516ce8 !important; vertical-align: text-bottom;margin-top: 2px;">Lifetime Plan</span>
                                     </a>
                                 </div> 
                             </mat-nav-list>
