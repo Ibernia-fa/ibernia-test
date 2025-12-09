@@ -100,8 +100,6 @@ export class ViewReportComponent {
   contributionDataSource!: MatTableDataSource<any>;
   withdrawalDataSource!: MatTableDataSource<any>;
   section: string = 'goalsAndEvents';
-
-
   displayedColumns: string[] = ['position', 'name'];
   
   constructor() { }

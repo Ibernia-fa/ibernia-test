@@ -607,7 +607,9 @@
                             <mat-card-content>
                                 <div class="d-flex flex-column gap-32">
                                     <h3 class="f-w-400 sec-title">{{cashflow.name}}</h3>
-                                    <app-view-savings-bar-stacked-chart [report]="report" [client]="client"
+                                    <app-view-savings-bar-stacked-chart 
+                                        [report]="report"
+                                        [client]="client"
                                         [forecastStartDate]="financialTimeline.forecastStartDate"
                                         [forecastEndDate]="financialTimeline.forecastEndtDate">
                                     </app-view-savings-bar-stacked-chart>
