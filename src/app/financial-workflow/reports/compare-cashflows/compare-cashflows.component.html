@@ -41,7 +41,7 @@
     <div class="d-flex flex-column gap-32">
   <!-- Header -->
   <div class="d-flex align-items-center justify-content-between gap-10 modal-header">
-    <h3>Compare models</h3>
+    <h3>Compare plans</h3>
     <button (click)="closeDialog()" type="button">
       <img src="assets/images/svgs/close-line-cion.svg" alt="close-line-cion" />
     </button>
@@ -49,7 +49,7 @@
 
   <!-- Body -->
   <div class="custom-body">
-    <p class="f-s-16 m-t-0">Select 2 models to compare</p>
+    <p class="f-s-16 m-t-0">Select another plan to compare with</p>
 
     <!-- Fixed base model (current route cashflow) -->
     <p class="f-s-14 m-b-8"><strong>Base model (fixed)</strong></p>
@@ -93,7 +93,7 @@
         (click)="save()"
         [disabled]="!selectedOtherId"
       >
-        <span class="f-s-16">Save</span>
+        <span class="f-s-16">Compare</span>
       </button>
     </div>
   </div>

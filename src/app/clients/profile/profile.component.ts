@@ -193,24 +193,10 @@ export class ProfileComponent {
   }
   
   onCopyModelClicked(cashflow: Cashflow) {
-
-    // const cashflow: Cashflow = {
-    //   id: '',
-    //   description: this.form.get('description')?.value,
-    //   name: this.form.get('name')?.value,
-    //   clientBirthDate: this.clientData.clientDetails.birthDate,
-    //   client: {
-    //     id: this.clientData.id,
-    //     name: this.clientData.clientDetails.name
-    //   },
-    //   financialAdvisor: this.clientData.financialAdvisor,
-    //   createdAt: new Date(),
-    //   updatedAt: new Date()
-    // };
     this.isLoaderVisible = true;
-    cashflow.id = '';
     cashflow.name = 'Copy of ' + cashflow.name;
-    this.cashflowHttpService.createCashflow(cashflow).pipe(
+    
+    this.cashflowHttpService.copyCashflow(cashflow).pipe(
       filter(res => !!res),
       catchError((err) => {
         console.error("An error occurred while cloning cashflow", err);

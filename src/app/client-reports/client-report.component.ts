@@ -43,7 +43,7 @@ export class ClientReportComponent {
       this.token = params['token'];
       
       if (!this.token) {
-        this.toastr.error('Invalid or missing token in URL.', 'Error!');
+        this.toastr.error('Invalid or missing token in URL', 'Error!');
       }
 
       this.checkExistingAuthentication();
@@ -76,7 +76,7 @@ export class ClientReportComponent {
     this.isLoaderVisible = true;
 
     if (!this.token || !this.password) {
-      this.toastr.error('Missing token or password, cannot load report.', 'Error!');
+      this.toastr.error('Missing token or password, cannot load report', 'Error!');
       return;
     }
 
@@ -88,7 +88,7 @@ export class ClientReportComponent {
       error: (err: any) => {
         this.isLoaderVisible = false;
         console.log(err);
-        this.toastr.error('Unable to load report. Please try again later.', 'Error!');
+        this.toastr.error('Unable to load report. Please try again later', 'Error!');
         localStorage.removeItem(this.AUTH_KEY_PREFIX + this.token);
         this.isAuthenticated = false;
       }
@@ -100,7 +100,7 @@ export class ClientReportComponent {
     this.isLoaderVisible = true;
 
     if (!this.password) {
-      this.toastr.error('Please enter a password.', 'Error!');
+      this.toastr.error('Please enter a password', 'Error!');
       this.isLoaderVisible = false;
       return;
     }
@@ -122,13 +122,13 @@ export class ClientReportComponent {
        this.isLoaderVisible = false;
 
        if (err.status === 401) {
-         this.toastr.error('Incorrect password. Please try again.', 'Error!');
+         this.toastr.error('Incorrect password. Please try again', 'Error!');
        } else if (err.status === 410) {
-         this.toastr.error('This link has expired. Please contact support.', 'Error!');
+         this.toastr.error('This link has expired. Please contact support', 'Error!');
        } else if (err.status === 400) {
-         this.toastr.error('Invalid or missing link.', 'Error!');
+         this.toastr.error('Invalid or missing link', 'Error!');
        } else {
-         this.toastr.error('Unable to load report. Please try again later.', 'Error!');
+         this.toastr.error('Unable to load report. Please try again later', 'Error!');
        }
       },
     });

@@ -42,14 +42,14 @@
                 </app-nav-item>
                 }
               </mat-nav-list> -->
-              <mat-nav-list class="sidebar-list">
+              <mat-nav-list class="sidebar-list preimum-nav">
                 @for(item of navItemslower; track item) {
                   <app-nav-item [item]="item"></app-nav-item>
                 }
               </mat-nav-list>
 
               <!-- share report -->
-              <div class="p-16 rounded d-flex flex-column gap-12">
+              <div class="p-16 p-t-10 rounded d-flex flex-column gap-12">
                 <a (click)="openShareModal()" class="cashflow-modal d-flex align-items-center gap-8">
                   <img src="assets/images/svgs/file-icon-filled.svg" alt="share report">
                   <span>

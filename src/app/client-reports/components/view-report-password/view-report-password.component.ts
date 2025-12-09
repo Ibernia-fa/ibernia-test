@@ -33,7 +33,7 @@ export class ViewReportPasswordComponent {
 
   onSubmit() {
     if (!this.password.trim()) {
-      this.toastr.error('Please enter a password.', 'Error!');
+      this.toastr.error('Please enter a password', 'Error!');
       return;
     }
     

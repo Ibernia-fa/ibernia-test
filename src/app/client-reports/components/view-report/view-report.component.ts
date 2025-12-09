@@ -1,24 +1,59 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
+import { MatIconModule } from '@angular/material/icon';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatListModule } from '@angular/material/list';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatCardModule } from '@angular/material/card';
 import { ViewSavingsBarStackedChartComponent } from '../savings-bar-stacked-chart/view-savings-bar-stacked-chart.component';
 import { ViewTimelineChartComponent } from '../timeline-chart/view-timeline-chart.component';
 import { CurrencySymbolPipe } from 'src/app/pipe/currency-symbol.pipe';
 import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
-import { T } from '@angular/cdk/keycodes';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatRippleModule } from '@angular/material/core';
+import {
+  animate,
+  state,
+  style,
+  transition,
+  trigger,
+} from '@angular/animations';
+import { TablerIconsModule } from 'angular-tabler-icons';
+import { MaterialModule } from 'src/app/material.module';
 
 @Component({
   selector: 'app-view-report',
   standalone: true,
   imports: [
     CommonModule,
+    MatSidenav,
+    MatSidenavModule,
+    MatIconModule,
+    MatExpansionModule,
+    MatDividerModule,
+    MatListModule,
     MatTableModule,
     MatCardModule,
+    MatToolbarModule,
     ViewSavingsBarStackedChartComponent,
     ViewTimelineChartComponent,
     CurrencySymbolPipe,
-    ThousandSeparatorPipe
+    ThousandSeparatorPipe,
+    MatRippleModule,
+    TablerIconsModule,
+    MaterialModule,
+  ],
+   animations: [
+    trigger('indicatorRotate', [
+      state('collapsed', style({ transform: 'rotate(0deg)' })),
+      state('expanded', style({ transform: 'rotate(180deg)' })),
+      transition(
+        'expanded <=> collapsed',
+        animate('225ms cubic-bezier(0.4,0.0,0.2,1)')
+      ),
+    ]),
   ],
   templateUrl: './view-report.component.html',
   styleUrl: './view-report.component.scss',
@@ -26,7 +61,7 @@ import { T } from '@angular/cdk/keycodes';
 
 export class ViewReportComponent {
   @Input() financialSeries: any;
-
+  
   get clientBirthDate() {
     return this.financialSeries?.client.clientDetails.birthDate;
   }
@@ -64,6 +99,10 @@ export class ViewReportComponent {
   expenseDataSource!: MatTableDataSource<any>;
   contributionDataSource!: MatTableDataSource<any>;
   withdrawalDataSource!: MatTableDataSource<any>;
+  section: string = 'goalsAndEvents';
+
+
+  displayedColumns: string[] = ['position', 'name'];
   
   constructor() { }
 
@@ -74,5 +113,9 @@ export class ViewReportComponent {
       this.contributionDataSource = new MatTableDataSource(this.contributionWithdrawal?.contributions || []);
       this.withdrawalDataSource = new MatTableDataSource(this.contributionWithdrawal?.withdrawals || []);
     }
+  }
+
+  setSection(section: string) {
+    this.section = section;
   }
 }
