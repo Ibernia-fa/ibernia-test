@@ -42,7 +42,9 @@
                 </app-nav-item>
                 }
               </mat-nav-list> -->
-              <mat-nav-list class="sidebar-list preimum-nav">
+              <mat-nav-list class="sidebar-list {{!isSettings ? 'preimum-nav' : ''}}">
+
+              <!-- <mat-nav-list class="sidebar-list  preimum-nav"> -->
                 @for(item of navItemslower; track item) {
                   <app-nav-item [item]="item"></app-nav-item>
                 }
