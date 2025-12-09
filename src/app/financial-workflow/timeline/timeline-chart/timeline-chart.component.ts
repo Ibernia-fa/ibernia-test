@@ -41,7 +41,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { TablerIconsModule } from 'angular-tabler-icons';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { catchError, combineLatest, filter, map, take, tap } from 'rxjs';
+import { catchError, combineLatest, filter, fromEvent, map, Subscription, take, tap, throttleTime } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { Client } from 'src/app/clients/models/client';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
@@ -88,7 +88,8 @@ export class TimelineChartComponent implements OnInit, OnChanges {
   private tooltipMouseY: number = 0;
   escalationRates: EscalationRate[];
   amountCycles: Cycle[];
-
+  private timelineHoverSubscription: Subscription;
+  private isDragging = false; // Track drag state
   constructor(
     private dialog: MatDialog,
     private timelineHttpService: TimelineHttpService,
@@ -172,6 +173,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
     }
 
     console.log('drag started');
+     this.isDragging = true; 
     this.draggedEvent = customEvent; // Store dragged event
     event.dataTransfer?.setData('text/plain', JSON.stringify(customEvent));
     this.timeline.addCustomTime(new Date(), 'dragOver');
@@ -181,7 +183,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
   event.preventDefault();
 
   // this.hoveredYear = null;
-
+  this.isDragging = false;
   this.clearLabelHighlight();
   this.timeline.removeCustomTime('dragOver');
   this.timeline.redraw();
@@ -193,7 +195,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
   // this.stopTooltipPolling();
 
     event.preventDefault();
-
+    this.isDragging = false; 
     console.log(this.draggedEvent);
     console.log(this.timeline);
 
@@ -560,6 +562,8 @@ this.timeline.on('mouseDown', (props) => {
     this.timeline.setSelection(props.item);
   }
 });
+
+  this.initTimelineHover();
 
     this.timeline.on('doubleClick', (event) => {
       event.event.preventDefault();
@@ -1403,4 +1407,53 @@ private calculateAgeForTimeline = (date: Date, dateOfBirth: Date): number => {
 // }
 
 
+
+ // Add this method for timeline hover
+  initTimelineHover() {
+    if (!this.timelineContainer?.nativeElement || !this.timeline) return;
+
+    // Create observable for mousemove on timeline container
+    this.timelineHoverSubscription = fromEvent<MouseEvent>(
+      this.timelineContainer.nativeElement, 
+      'mousemove'
+    ).pipe(
+      throttleTime(50) // Throttle to avoid excessive updates
+    ).subscribe((event: MouseEvent) => {
+      // Only process if NOT dragging
+      if (this.isDragging || this.draggedEvent) return;
+      
+      this.handleTimelineHover(event);
+    });
+
+    // Also handle mouse leave to clear highlights
+    fromEvent(this.timelineContainer.nativeElement, 'mouseleave')
+      .subscribe(() => {
+        if (!this.isDragging && !this.draggedEvent) {
+          this.clearLabelHighlight();
+        }
+      });
+  }
+
+   private handleTimelineHover(event: MouseEvent) {
+    if (!this.timeline) return;
+
+    // Get the time at the mouse position
+    const props = this.timeline.getEventProperties(event);
+    if (!props?.time) return;
+
+    const hoverTime = props.time;
+    const snappedTime = this.snapToNearestYear(hoverTime);
+    const snappedYear = snappedTime.getFullYear();
+    
+    // Only highlight if within forecast range
+    if (
+      snappedYear >= moment(this.financialTimeline.forecastStartDate).year() &&
+      snappedYear <= moment(this.financialTimeline.forecastEndtDate).year()
+    ) {
+      const age = this.calculateAgeForTimeline(snappedTime, new Date(this.clientBirthDate));
+      this.highlightHoveredYearLabel(snappedYear);
+    } else {
+      this.clearLabelHighlight();
+    }
+  }
 }
