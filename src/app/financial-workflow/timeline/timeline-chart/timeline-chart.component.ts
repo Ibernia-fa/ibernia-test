@@ -587,56 +587,85 @@ this.timeline.on('mouseDown', (props) => {
     //     't1'
     //   );
   }
-  get timelineData(): DataSet<
-    {
-      id: string;
-      content: string;
-      start: Date;
-      end: Date | string;
-      className: string;
-    },
-    'id'
-  > {
-    const dataArray = this.financialTimeline.clientEvents.map(
-      (event, index) => {
-        console.log({ index });
-        return {
-          id: event.id,
-          content: this.getContent(event.name, event.iconUrl),
-          start: new Date(event.start.year, 1),
-          end: (() => {
-              if (!event.end || !event.end.year || event.end.year === event.start.year) {
-                // One-off or no meaningful end date
-                return new Date(event.start.year + Math.floor(0.5 * event.name.length + 5), 1);
-              }
-              
-              const startYear = event.start.year;
-              const endYear = event.end.year;
-
-              if ((endYear - startYear) <= 10) {
-                // Too short duration, make it visually wider
-                return new Date(startYear + Math.floor(0.5 * event.name.length + 5), 1);
-              }
-
-              return new Date(endYear, 1);
-            })(),
-
-          // end:
-          //   event.end && event.end.year > 0
-          //     ? new Date(event.end.year, 1)
-          //     : new Date(event.start.year + Math.floor(0.45 * event.name.length + 5), 1),
-          //     // : new Date(event.start.year + Math.min(11, Math.floor(0.6 * event.name.length + 5)), 1),
-          className: event.iconUrl,
-          editable: {
-            updateTime: true,
-            remove: true,
-          }
-        };
+get timelineData(): DataSet<
+  {
+    id: string;
+    content: string;
+    start: Date;
+    end: Date | string;
+    className: string;
+  },
+  'id'
+> {
+  const dataArray = this.financialTimeline.clientEvents.map(
+    (event, index) => {
+      const startYear = event.start.year;
+      
+      // Calculate the proportional width based on timeline length
+      const timelineStartYear = moment(this.financialTimeline.forecastStartDate).year();
+      const timelineEndYear = moment(this.financialTimeline.forecastEndtDate).year();
+      const timelineTotalYears = timelineEndYear - timelineStartYear;
+      
+      // Base width calculation from name (similar to original)
+      const baseWidthFromName = Math.floor(0.5 * event.name.length + 3); // Reduced from +5
+      
+      // Scale factor based on timeline length
+      let scaleFactor = 1.0;
+      if (timelineTotalYears < 30) {
+        scaleFactor = 0.5; // Half width for very short timelines
+      } else if (timelineTotalYears < 50) {
+        scaleFactor = 0.7; // Reduced width for short timelines
+      } else if (timelineTotalYears < 80) {
+        scaleFactor = 0.9; // Slightly reduced for medium timelines
       }
-    );
-    console.log({ dataArray });
-    return new DataSet(dataArray);
-  }
+      // For long timelines (>80 years), keep scaleFactor at 1.0
+      
+      let endDate: Date;
+      
+      if (!event.end || !event.end.year || event.end.year === startYear) {
+        // ONE-OFF EVENTS
+        const calculatedWidth = Math.max(
+          2, // Minimum width
+          Math.min(
+            10, // Maximum width
+            Math.ceil(baseWidthFromName * scaleFactor)
+          )
+        );
+        endDate = new Date(startYear + calculatedWidth, 1);
+      } else {
+        // EVENTS WITH DURATION
+        const endYear = event.end.year;
+        const actualDuration = endYear - startYear;
+        
+        // Only adjust very short duration events
+        if (actualDuration <= 2) {
+          const minWidthForVisibility = Math.max(
+            actualDuration,
+            Math.ceil(baseWidthFromName * 0.3 * scaleFactor) // Much smaller factor for duration events
+          );
+          endDate = new Date(startYear + minWidthForVisibility, 1);
+        } else {
+          // Normal duration - use actual
+          endDate = new Date(endYear, 1);
+        }
+      }
+      
+      return {
+        id: event.id,
+        content: this.getContent(event.name, event.iconUrl),
+        start: new Date(startYear, 1),
+        end: endDate,
+        className: event.iconUrl,
+        editable: {
+          updateTime: true,
+          remove: true,
+        }
+      };
+    }
+  );
+  
+  return new DataSet(dataArray);
+}
   get timelineOptions(): TimelineOptions {
     console.log(this.clientBirthDate);
     const birthDate = new Date(this.clientBirthDate);
