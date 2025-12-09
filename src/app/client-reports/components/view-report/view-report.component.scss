@@ -1,7 +1,3 @@
-// ::ng-deep app-footer {
-//   display: none !important;
-// }
-
 .cashflow-stats,
 .saving-pot-stats-cashflow-model,
 .income-expense-stats-cashflow-model {
@@ -161,24 +157,24 @@
 }
 // End Dragable Cards
 
-// income Expense New
-// .income-expense-table-wrapper {
-//   display: grid;
-//   grid-template-columns: 1fr 1fr;
-//   gap: 20px;
-// }
 
 .income-expense-wrapper {
-  display: grid;
-  grid-template-columns: 1fr 1.5px 1fr 1.5px 1fr 1.5px 1fr;
-  gap: 24px;
-
+  flex: 1;
+  .row {
+    margin: 0 !important;
+    .col-3 {
+      padding: 0;
+      // background-color: #ff00001c;
+      flex: 0 0 22.5%;
+      max-width: 22.5%;
+    }
+  }
   .card-title {
     font-size: 18px;
-    line-height: 20px;
+    line-height: 19px;
     font-weight: 700;
     &.expenses-deduct {
-      color: #ff4444;
+      color: red;
     }
     &.expenses-total {
       color: #4043af;
@@ -189,28 +185,38 @@
     line-height: 30px;
     color: #1c1c1c;
     font-weight: 700;
+     font-family: 'Ubuntu' !important;
+    
   }
   .expense-income {
     color: #71bc42;
   }
+  .green {
+    color: green
+  }
+  .red {
+    color: red;
+  }
   .divider {
     width: 1.5px;
+    margin-left: 12px;
+    margin-right: 12px;
     background-color: #e7e7eb;
   }
 }
-
-// Income Expense Table Styles
-// Table Style
-/* General Table Styling */
-.table-main-wrapper {
-  h3 {
-    font-size: 16px;
- 
-    margin-bottom: 16px;
-    font-weight: 600;
+.income-expense-tables {
+  .row {
+    margin: 0;
+    gap: 12px;
+    .col-6 {
+      padding: 0px;
+      flex: 0 0 49%;
+      max-width: 49%;
+    }
   }
 }
-
+// Table Style
+/* General Table Styling */
 table {
   width: 100%;
   border-collapse: collapse; /* Ensures consistent spacing between cells */
@@ -246,7 +252,6 @@ tr.example-detail-row {
 }
 .table-wrapper {
   overflow-x: auto;
-  border-radius: 12px;
 }
 
 .column-expand {
@@ -270,6 +275,7 @@ tr.example-detail-row {
   min-width: 110px;
   color: #3a3a47;
   padding: 10px 16px !important;
+     font-family: 'Ubuntu' !important;
   // @media (max-width: 768px) {
   //   min-width: 10px;
   // }
@@ -318,7 +324,6 @@ tr.example-detail-row {
   }
 }
 // End Table Heading
-// End Income Expense Table Styles
 
 // Cashflow Styles
 .cashflow-grid {
