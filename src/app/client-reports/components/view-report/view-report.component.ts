@@ -99,7 +99,7 @@ export class ViewReportComponent {
   expenseDataSource!: MatTableDataSource<any>;
   contributionDataSource!: MatTableDataSource<any>;
   withdrawalDataSource!: MatTableDataSource<any>;
-  section: string = 'goalsAndEvents';
+  section: string = 'lifetimePlan';
   displayedColumns: string[] = ['position', 'name'];
   
   constructor() { }
