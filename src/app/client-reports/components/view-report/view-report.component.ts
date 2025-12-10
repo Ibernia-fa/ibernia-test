@@ -86,6 +86,13 @@ export class ViewReportComponent {
   get report() {
     return this.financialSeries?.financialProjection;
   }
+  get clientName () {
+    return `${this.financialSeries?.client.clientDetails?.firstName} ${this.financialSeries?.client.clientDetails?.lastName}`;
+  }
+
+  get advisorName () {
+    return this.financialSeries?.client?.financialAdvisor?.advisorName;
+  }
 
   incomeExpenseDisplayedColumns: string[] = [
     'position',
