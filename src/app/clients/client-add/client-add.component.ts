@@ -221,7 +221,7 @@ export class ClientAddComponent {
     return {
       id: '',
       clientDetails: {
-        birthDate: new Date(this.clientForm.controls['dob'].value), 
+        birthDate: this.fixDate(this.clientForm.controls['dob'].value), 
         email: this.clientForm.controls['email'].value,
         gender: this.clientForm.controls['gender'].value,
         country: this.clientForm.controls['country'].value,
@@ -234,7 +234,7 @@ export class ClientAddComponent {
       },
       partnerDetail: this.showPartner
         ? {
-          birthDate: new Date(partnerGroup.controls['dob']?.value),
+          birthDate:this.fixDate(partnerGroup.controls['dob']?.value),
           email: partnerGroup.controls['email']?.value,
           gender: partnerGroup.controls['gender']?.value,
           country: partnerGroup.controls['country']?.value,
@@ -290,6 +290,13 @@ export class ClientAddComponent {
     dialog.afterClosed().subscribe((res: any) => {
       console.log('Dialog closed', res);
     });
+  }
+
+  fixDate(d: Date): Date {
+    if (!d) return d;
+    const newDate = new Date(d);
+    newDate.setHours(12, 0, 0, 0);
+    return newDate;
   }
 
   onSubmit() {
