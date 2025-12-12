@@ -433,73 +433,79 @@ button {
 
 }
 
+
+
+
+
 /* Global Fullscreen Styles */
 .global-fullscreen-overlay {
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  background: rgba(0, 0, 0, 0.98) !important;
-  z-index: 999999 !important; /* Very high z-index */
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  animation: fadeIn 0.3s ease !important;
-  margin: 0 !important;
-  padding: 0 !important;
+position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    background: #fff;
+    z-index: 999999 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    animation: fadeIn 0.3s 
+ease !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
 .global-fullscreen-content {
-  width: 98vw !important;
-  height: 98vh !important;
-  background: #1a1a1a !important;
-  border-radius: 12px !important;
-  display: flex !important;
-  flex-direction: column !important;
-  overflow: hidden !important;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8) !important;
-  margin: 0 !important;
-  padding: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    background: #1a1a1a !important;
+    border-radius: 0px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    /* box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8) !important; */
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
 .global-fullscreen-header {
-  padding: 20px 30px !important;
-  background: #252525 !important;
-  border-bottom: 1px solid #333 !important;
-  display: flex !important;
-  justify-content: space-between !important;
-  align-items: center !important;
-  flex-shrink: 0 !important;
-  margin: 0 !important;
-  z-index: 1000000 !important;
+    padding: 20px 30px !important;
+    background: #fff !important;
+    border-bottom: 1px solid #e4e4e4 !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    flex-shrink: 0 !important;
+    margin: 0 !important;
+    z-index: 1000000 !important;
   
   h4 {
-    color: white !important;
-    margin: 0 !important;
-    font-size: 1.5rem !important;
-    font-weight: 500 !important;
+        font-size: 24px;
+    line-height: 36px;
+    font-weight: 700;
+    color: #1c1c1c;
   }
 }
 
 .global-close-fullscreen-btn {
   background: transparent !important;
   border: none !important;
-  color: #999 !important;
+  color: #1c1c1c !important;
   cursor: pointer !important;
-  width: 40px !important;
-  height: 40px !important;
+  width: 23px !important;
+  height: 23px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  border-radius: 50% !important;
+  border-radius: 4px !important;
   transition: all 0.2s !important;
   padding: 0 !important;
   margin: 0 !important;
+
   
   &:hover {
-    color: white !important;
-    background: rgba(255, 255, 255, 0.1) !important;
+    color: #1c1c1c !important;
+    background: #ffcece !important;
   }
   
   &:focus {
@@ -508,12 +514,14 @@ button {
 }
 
 .global-fullscreen-chart-container {
-  flex: 1 !important;
-  padding: 20px !important;
-  overflow: hidden !important; /* Changed from auto to hidden */
-  margin: 0 !important;
-  position: relative !important;
-  background: #1a1a1a !important;
+flex: 1 !important;
+    padding: 20px !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    position: relative !important;
+    background: #fff !important;
+}
+
   
   /* Ensure chart takes full space */
   ::ng-deep app-savings-bar-stacked-chart {
@@ -536,7 +544,7 @@ button {
       max-height: none !important;
     }
   }
-}
+
 
 /* Hide everything except the overlay */
 .global-fullscreen-overlay ~ * {
@@ -566,7 +574,7 @@ body:has(.global-fullscreen-overlay) {
   font-family: 'Material Icons' !important;
   font-weight: normal !important;
   font-style: normal !important;
-  font-size: 24px !important;
+  font-size: 20px !important;
   line-height: 1 !important;
   letter-spacing: normal !important;
   text-transform: none !important;
