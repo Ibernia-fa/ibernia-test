@@ -13,8 +13,13 @@
 
 .apexcharts-tooltip .savings-tooltip__label {
   font-weight: 500;
+    display: inline-flex;
+  align-items: center;
 }
 
 .apexcharts-tooltip .savings-tooltip__value {
   font-weight: 700;
 }
+
+
+

@@ -235,7 +235,7 @@ export class EmergenciesComponent implements OnInit {
     life: 'shield.svg'
   };
 
-  private readonly defaultIcon = 'shield.svg';
+  private readonly defaultIcon = 'light.png';
 
   getIconName(e: Emergency): string {
     const key = (e.name || '').toLowerCase();

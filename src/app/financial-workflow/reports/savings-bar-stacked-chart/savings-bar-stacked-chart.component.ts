@@ -71,7 +71,7 @@ isFullscreen: any;
               <div>Age: ${age} </div>  <div> Year: ${xValue}</div> 
             </div>
             <div class="savings-tooltip__body">
-              <div class="savings-tooltip__label">${seriesName}:</div>
+              <div class="savings-tooltip__label"><span class="circle-wrapper circle-color"></span>${seriesName}:</div>
               <div class="savings-tooltip__value">${value.toLocaleString()}</div>
             </div>
           </div>
