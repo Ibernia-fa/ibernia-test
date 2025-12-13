@@ -587,6 +587,87 @@ this.timeline.on('mouseDown', (props) => {
     //     't1'
     //   );
   }
+// get timelineData(): DataSet<
+//   {
+//     id: string;
+//     content: string;
+//     start: Date;
+//     end: Date | string;
+//     className: string;
+//   },
+//   'id'
+// > {
+//   const dataArray = this.financialTimeline.clientEvents.map(
+//     (event, index) => {
+//       const startYear = event.start.year;
+      
+//       // Calculate the proportional width based on timeline length
+//       const timelineStartYear = moment(this.financialTimeline.forecastStartDate).year();
+//       const timelineEndYear = moment(this.financialTimeline.forecastEndtDate).year();
+//       const timelineTotalYears = timelineEndYear - timelineStartYear;
+      
+//       // Base width calculation from name (similar to original)
+//       const baseWidthFromName = Math.floor(0.5 * event.name.length + 3); // Reduced from +5
+      
+//       // Scale factor based on timeline length
+//       let scaleFactor = 1.0;
+//       if (timelineTotalYears < 30) {
+//         scaleFactor = 0.5; // Half width for very short timelines
+//       } else if (timelineTotalYears < 50) {
+//         scaleFactor = 0.7; // Reduced width for short timelines
+//       } else if (timelineTotalYears < 80) {
+//         scaleFactor = 0.9; // Slightly reduced for medium timelines
+//       }
+//       // For long timelines (>80 years), keep scaleFactor at 1.0
+      
+//       let endDate: Date;
+      
+//       if (!event.end || !event.end.year || event.end.year === startYear) {
+//         // ONE-OFF EVENTS
+//         const calculatedWidth = Math.max(
+//           2, // Minimum width
+//           Math.min(
+//             10, // Maximum width
+//             Math.ceil(baseWidthFromName * scaleFactor)
+//           )
+//         );
+//         endDate = new Date(startYear + calculatedWidth, 1);
+//       } else {
+//         // EVENTS WITH DURATION
+//         const endYear = event.end.year;
+//         const actualDuration = endYear - startYear;
+        
+//         // Only adjust very short duration events
+//         if (actualDuration <= 2) {
+//           const minWidthForVisibility = Math.max(
+//             actualDuration,
+//             Math.ceil(baseWidthFromName * 0.3 * scaleFactor) // Much smaller factor for duration events
+//           );
+//           endDate = new Date(startYear + minWidthForVisibility, 1);
+//         } else {
+//           // Normal duration - use actual
+//           endDate = new Date(endYear, 1);
+//         }
+//       }
+      
+//       return {
+//         id: event.id,
+//         content: this.getContent(event.name, event.iconUrl),
+//         start: new Date(startYear, 1),
+//         end: endDate,
+//         className: event.iconUrl,
+//         editable: {
+//           updateTime: true,
+//           remove: true,
+//         }
+//       };
+//     }
+//   );
+  
+//   return new DataSet(dataArray);
+// }
+
+
 get timelineData(): DataSet<
   {
     id: string;
@@ -601,66 +682,60 @@ get timelineData(): DataSet<
     (event, index) => {
       const startYear = event.start.year;
       
-      // Calculate the proportional width based on timeline length
-      const timelineStartYear = moment(this.financialTimeline.forecastStartDate).year();
-      const timelineEndYear = moment(this.financialTimeline.forecastEndtDate).year();
-      const timelineTotalYears = timelineEndYear - timelineStartYear;
-      
-      // Base width calculation from name (similar to original)
-      const baseWidthFromName = Math.floor(0.5 * event.name.length + 3); // Reduced from +5
-      
-      // Scale factor based on timeline length
-      let scaleFactor = 1.0;
-      if (timelineTotalYears < 30) {
-        scaleFactor = 0.5; // Half width for very short timelines
-      } else if (timelineTotalYears < 50) {
-        scaleFactor = 0.7; // Reduced width for short timelines
-      } else if (timelineTotalYears < 80) {
-        scaleFactor = 0.9; // Slightly reduced for medium timelines
-      }
-      // For long timelines (>80 years), keep scaleFactor at 1.0
-      
-      let endDate: Date;
-      
-      if (!event.end || !event.end.year || event.end.year === startYear) {
-        // ONE-OFF EVENTS
+      // For events with an end year (like State Pension that runs from 2040 to 2088)
+      if (event.end && event.end.year && event.end.year > startYear) {
+        // Events with duration - use their actual start and end years
+        return {
+          id: event.id,
+          content: this.getContent(event.name, event.iconUrl),
+          start: new Date(startYear, 12, 1), // Jan 1st of start year
+          end: new Date(event.end.year, 12, 1), // Jan 1st of end year
+          className: event.iconUrl,
+          editable: {
+            updateTime: true,
+            remove: true,
+          }
+        };
+      } else {
+        // ONE-OFF EVENTS (or events without end date)
+        // Calculate the proportional width based on timeline length
+        const timelineStartYear = moment(this.financialTimeline.forecastStartDate).year();
+        const timelineEndYear = moment(this.financialTimeline.forecastEndtDate).year();
+        const timelineTotalYears = timelineEndYear - timelineStartYear;
+        
+        // Base width calculation from name (similar to original)
+        const baseWidthFromName = Math.floor(0.5 * event.name.length + 3);
+        
+        // Scale factor based on timeline length
+        let scaleFactor = 1.0;
+        if (timelineTotalYears < 30) {
+          scaleFactor = 0.5;
+        } else if (timelineTotalYears < 50) {
+          scaleFactor = 0.7;
+        } else if (timelineTotalYears < 80) {
+          scaleFactor = 0.9;
+        }
+        
         const calculatedWidth = Math.max(
-          2, // Minimum width
+          1, // Minimum width (1 year)
           Math.min(
             10, // Maximum width
             Math.ceil(baseWidthFromName * scaleFactor)
           )
         );
-        endDate = new Date(startYear + calculatedWidth, 1);
-      } else {
-        // EVENTS WITH DURATION
-        const endYear = event.end.year;
-        const actualDuration = endYear - startYear;
         
-        // Only adjust very short duration events
-        if (actualDuration <= 2) {
-          const minWidthForVisibility = Math.max(
-            actualDuration,
-            Math.ceil(baseWidthFromName * 0.3 * scaleFactor) // Much smaller factor for duration events
-          );
-          endDate = new Date(startYear + minWidthForVisibility, 1);
-        } else {
-          // Normal duration - use actual
-          endDate = new Date(endYear, 1);
-        }
+        return {
+          id: event.id,
+          content: this.getContent(event.name, event.iconUrl),
+          start: new Date(startYear, 0, 1), // Jan 1st of start year
+          end: new Date(startYear + calculatedWidth, 0, 1), // End based on calculated width
+          className: event.iconUrl,
+          editable: {
+            updateTime: true,
+            remove: true,
+          }
+        };
       }
-      
-      return {
-        id: event.id,
-        content: this.getContent(event.name, event.iconUrl),
-        start: new Date(startYear, 1),
-        end: endDate,
-        className: event.iconUrl,
-        editable: {
-          updateTime: true,
-          remove: true,
-        }
-      };
     }
   );
   
