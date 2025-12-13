@@ -27,7 +27,7 @@
             <div class="col-2">
               <div class="d-flex flex-column gap-8">
                 <div class="d-flex align-items-center gap-8">
-                  <h3 class="card-title expense-income">Total coverage</h3>
+                  <h3 class="card-title expense-income">  <img src="/assets/images/svgs/shield.svg" alt="chart" />    Total coverage</h3>
                 </div>
                 <h3 class="saving-title">
                   <span>{{clientData?.preferredCurrency | currencySymbol}}</span>{{s.emergenciesStats?.totalCoverage | number:'1.0-0'}}
@@ -40,7 +40,7 @@
             <div class="col-2">
               <div class="d-flex flex-column gap-8">
                 <div class="d-flex align-items-center gap-8">
-                  <h3 class="card-title expenses-deduct">Total annual cost</h3>
+                  <h3 class="card-title expenses-deduct"><img src="/assets/images/svgs/will.svg" alt="chart" /> Total annual cost</h3>
                 </div>
                 <h3 class="saving-title"> <span>{{clientData?.preferredCurrency | currencySymbol}}</span>{{s.emergenciesStats?.totalCost | number:'1.0-0'}}
                 </h3>
@@ -52,7 +52,7 @@
             <div class="col-2">
               <div class="d-flex flex-column gap-8">
                 <div class="d-flex align-items-center gap-8">
-                  <h3 class="card-title expenses-total">Protection score</h3>
+                  <h3 class="card-title expenses-total"><img width="24" src="/assets/images/svgs/gauge.png" alt="chart" /> Protection score</h3>
                 </div>
                 <h3 class="saving-title saving-below-number"> {{s.emergenciesStats?.protectionScore}}/100</h3>
               </div>

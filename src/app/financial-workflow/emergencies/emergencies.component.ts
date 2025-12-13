@@ -232,7 +232,7 @@ export class EmergenciesComponent implements OnInit {
     disability: 'disability.svg',
     health: 'health.svg',
     will: 'will.svg',
-    life: 'shield.svg'
+    life: 'user.png'
   };
 
   private readonly defaultIcon = 'light.png';
