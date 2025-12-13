@@ -184,4 +184,8 @@ html .topbar {
     margin-left: 120px;
     font-weight: 500;
     cursor: pointer;
+    color: #787889;
+    &:hover{
+      text-decoration: underline;
+    }
 }

@@ -200,6 +200,13 @@ export class ClientEditComponent {
     }
   }
 
+  fixDate(d: Date): Date {
+    if (!d) return d;
+    const newDate = new Date(d);
+    newDate.setHours(12, 0, 0, 0);
+    return newDate;
+  }
+
   onSubmit() {
     this.clientForm.markAllAsTouched();
     this.clientForm.markAsDirty();
@@ -208,7 +215,7 @@ export class ClientEditComponent {
       var client: Client = {
         id: this.clientId,
         clientDetails: {
-          birthDate: this.clientForm.controls['dob'].value,
+          birthDate: this.fixDate(this.clientForm.controls['dob'].value),
           email: this.clientForm.controls['email'].value,
           gender: this.clientForm.controls['gender'].value,
           country: this.clientForm.controls['country'].value,
@@ -220,7 +227,7 @@ export class ClientEditComponent {
           inflationRate: round2(this.clientForm.controls['inflationRate'].value),
         },
         partnerDetail: this.showPartner ? {
-          birthDate: partnerGroup.controls['dob']?.value,
+          birthDate: this.fixDate(partnerGroup.controls['dob']?.value),
           email: partnerGroup.controls['email']?.value,
           gender: partnerGroup.controls['gender']?.value,
           country: partnerGroup.controls['country']?.value,

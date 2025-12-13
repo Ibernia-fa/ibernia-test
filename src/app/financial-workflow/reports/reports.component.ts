@@ -383,7 +383,7 @@ onComparePlansClicked() {
 
     const selected = this.cashflows.find(c => c.id === selectedOtherId) || null;
     if (!selected) {
-      this.toaster.error('Selected plan not found.', 'Error');
+      this.toaster.error('Selected plan not found', 'Error');
       return;
     }
 
@@ -405,7 +405,7 @@ onComparePlansClicked() {
       error: (err) => {
         console.error('Failed to load comparison plan', err);
         this.toaster.error(
-          'Failed to load comparison plan. Please try again.',
+          'Failed to load comparison plan. Please try again',
           'Error'
         );
         this.isCompareLoading = false;

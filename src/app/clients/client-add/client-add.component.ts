@@ -1,20 +1,10 @@
 import { Component } from '@angular/core';
-import {
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { provideNativeDateAdapter } from '@angular/material/core';
-import {
-  MAT_DATE_RANGE_SELECTION_STRATEGY,
-  MatDatepickerModule,
-} from '@angular/material/datepicker';
+import { MAT_DATE_RANGE_SELECTION_STRATEGY, MatDatepickerModule} from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { AppBreadcrumbComponent } from 'src/app/layouts/full/shared/breadcrumb/breadcrumb.component';
-// import { FiveDayRangeSelectionStrategy } from 'src/app/pages/forms/form-elements';
 import { ClientHttpService } from '../services/client-http.service';
 import { Client } from '../models/client';
 import { catchError, filter, map } from 'rxjs';
@@ -28,10 +18,9 @@ import { AddModelDialogComponent } from '../profile/add-model-dialog/add-model-d
 import { allCountries } from '../models/country';
 import { CountryISO, NgxIntlTelInputModule } from 'ngx-intl-tel-input';
 import { FiveDayRangeSelectionStrategy } from 'src/app/core/five-day-range-selection-strategy';
-import {MatCheckboxModule} from '@angular/material/checkbox';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { SettingsService } from 'src/app/default-preferance/services/default-preferance.http.service';
 import { AuthService } from 'src/app/auth/services/auth.service';
-
 
 @Component({
   selector: 'app-client-add',
@@ -75,8 +64,8 @@ export class ClientAddComponent {
     private toastr: ToastrService,
     private dialog: MatDialog,
     private router: Router,
-      private settingsService: SettingsService,
-  private authService: AuthService  
+    private settingsService: SettingsService,
+    private authService: AuthService
   ) {
     this.clientForm = this.fb.group({
       firstName: ['', Validators.required],
@@ -90,8 +79,8 @@ export class ClientAddComponent {
       phone: [''],
       notes: [''],
       partner: this.fb.group({
-      firstName: ['', Validators.required],
-      lastName: ['', Validators.required],
+        firstName: ['', Validators.required],
+        lastName: ['', Validators.required],
         dob: [''],
         gender: [''],
         country: [''],
@@ -109,50 +98,49 @@ export class ClientAddComponent {
 
     if (!this.user || !this.user?.sub) return;
 
-  this.settingsService.getUserProfileResponse(this.user.sub).subscribe({
-    next: (res: any) => {
-      // Your API returns a plain object with a `preferences` bag
-      const p = res?.body?.preferences;
-      if (!p) return;
+    this.settingsService.getUserProfileResponse(this.user.sub).subscribe({
+      next: (res: any) => {
+        // Your API returns a plain object with a `preferences` bag
+        const p = res?.body?.preferences;
+        if (!p) return;
 
-      // --- COUNTRY ---
-      
-      if (!this.clientForm.get('country')?.value && p.country) {
-        this.clientForm.get('country')?.patchValue(p.country, { emitEvent: false });
+        // --- COUNTRY ---
 
-        // keep phone ISO in sync
-        const countryMatch = allCountries.find(c => c.countryName === p.country);
-        if (countryMatch?.countryCode) {
-          this.selectedClientCountryISO = (countryMatch.countryCode.toLowerCase() as any);
+        if (!this.clientForm.get('country')?.value && p.country) {
+          this.clientForm.get('country')?.patchValue(p.country, { emitEvent: false });
+
+          // keep phone ISO in sync
+          const countryMatch = allCountries.find(c => c.countryName === p.country);
+          if (countryMatch?.countryCode) {
+            this.selectedClientCountryISO = (countryMatch.countryCode.toLowerCase() as any);
+          }
+
+          // if (!this.clientForm.get('currency')?.value && countryMatch?.currencySymbol) {
+          //   this.clientForm.get('currency')?.patchValue(countryMatch.currencySymbol, { emitEvent: false });
+          // }
         }
 
-        // if (!this.clientForm.get('currency')?.value && countryMatch?.currencySymbol) {
-        //   this.clientForm.get('currency')?.patchValue(countryMatch.currencySymbol, { emitEvent: false });
-        // }
-      }
+        if (!this.clientForm.get('currency')?.value && p.currency) {
+          const curMatch =
+            allCountries.find(c =>
+              (c as any).currencyCode?.toUpperCase?.() === String(p.currency).toUpperCase()
+            )
+            || allCountries.find(c => c.currencySymbol === p.currency);
 
-      if (!this.clientForm.get('currency')?.value && p.currency) {
-        const curMatch =
-          allCountries.find(c =>
-            (c as any).currencyCode?.toUpperCase?.() === String(p.currency).toUpperCase()
-          )
-          || allCountries.find(c => c.currencySymbol === p.currency);
-
-        const preferredSymbol = curMatch?.currencySymbol ?? p.currency;
-        this.clientForm.get('currency')?.patchValue(preferredSymbol, { emitEvent: false });
-      }
-    },
-    error: (e) => console.error('Failed to load user prefs', e),
-  });
-}
-
+          const preferredSymbol = curMatch?.currencySymbol ?? p.currency;
+          this.clientForm.get('currency')?.patchValue(preferredSymbol, { emitEvent: false });
+        }
+      },
+      error: (e) => console.error('Failed to load user prefs', e),
+    });
+  }
 
   clientCountryValueChange(event: any) {
     const selectedCountry = allCountries.find(country => country.countryName === event);
     this.clientForm.controls['currency'].patchValue(selectedCountry?.currencySymbol);
     this.selectedClientCountryISO = (selectedCountry?.countryCode.toLowerCase() ?? '') as CountryISO
   }
-  
+
   partnerCountryValueChange(event: any) {
     const selectedCountry = allCountries.find(country => country.countryName === event);
     (this.clientForm.get('partner') as FormGroup).controls['currency'].patchValue(selectedCountry?.currencySymbol);
@@ -169,33 +157,33 @@ export class ClientAddComponent {
       partnerGroup.get('dob')?.setValidators(Validators.required);
       partnerGroup.get('email')?.setValidators(Validators.required);
 
-    const clientCountryName = this.clientForm.get('country')?.value as string | null;
-    const clientCurrency    = this.clientForm.get('currency')?.value as string | null;
+      const clientCountryName = this.clientForm.get('country')?.value as string | null;
+      const clientCurrency = this.clientForm.get('currency')?.value as string | null;
 
-    if (clientCountryName) {
-      const selectedCountry = allCountries.find(c => c.countryName === clientCountryName);
-      if (selectedCountry) {
-        partnerGroup.patchValue(
-          {
-            country: selectedCountry.countryName,
-            // if client currency is set use it; otherwise use the country's default
-            currency: clientCurrency ?? selectedCountry.currencySymbol,
-          },
-          { emitEvent: false }
-        );
+      if (clientCountryName) {
+        const selectedCountry = allCountries.find(c => c.countryName === clientCountryName);
+        if (selectedCountry) {
+          partnerGroup.patchValue(
+            {
+              country: selectedCountry.countryName,
+              // if client currency is set use it; otherwise use the country's default
+              currency: clientCurrency ?? selectedCountry.currencySymbol,
+            },
+            { emitEvent: false }
+          );
 
-        // keep partner phone dropdown in sync
-        this.selectedPartnerCountryISO = (selectedCountry.countryCode.toLowerCase() as CountryISO);
+          // keep partner phone dropdown in sync
+          this.selectedPartnerCountryISO = (selectedCountry.countryCode.toLowerCase() as CountryISO);
+        }
+      } else if (clientCurrency) {
+        // no country set on client, but currency is—still copy the currency
+        partnerGroup.patchValue({ currency: clientCurrency }, { emitEvent: false });
       }
-    } else if (clientCurrency) {
-      // no country set on client, but currency is—still copy the currency
-      partnerGroup.patchValue({ currency: clientCurrency }, { emitEvent: false });
-    }
 
-    // reflect validators
-    Object.keys(partnerGroup.controls).forEach(key =>
-      partnerGroup.get(key)?.updateValueAndValidity({ emitEvent: false })
-    );
+      // reflect validators
+      Object.keys(partnerGroup.controls).forEach(key =>
+        partnerGroup.get(key)?.updateValueAndValidity({ emitEvent: false })
+      );
 
     } else {
       partnerGroup.reset();
@@ -206,10 +194,10 @@ export class ClientAddComponent {
     }
   }
 
-
   get isFormInvalid() {
     const partnerGroup = this.clientForm.get('partner') as FormGroup;
-    if(this.showPartner) {
+    
+    if (this.showPartner) {
       return this.clientForm.controls['firstName'].invalid
         || this.clientForm.controls['lastName'].invalid
         || this.clientForm.controls['dob'].invalid
@@ -219,6 +207,7 @@ export class ClientAddComponent {
         || partnerGroup.controls['dob'].invalid
         || partnerGroup.controls['email'].invalid
     }
+    
     return this.clientForm.controls['firstName'].invalid
       || this.clientForm.controls['lastName'].invalid
       || this.clientForm.controls['dob'].invalid
@@ -228,10 +217,11 @@ export class ClientAddComponent {
 
   getClientFormInfo() {
     const partnerGroup = this.clientForm.get('partner') as FormGroup;
+
     return {
       id: '',
       clientDetails: {
-        birthDate: this.clientForm.controls['dob'].value,
+        birthDate: this.fixDate(this.clientForm.controls['dob'].value), 
         email: this.clientForm.controls['email'].value,
         gender: this.clientForm.controls['gender'].value,
         country: this.clientForm.controls['country'].value,
@@ -240,19 +230,19 @@ export class ClientAddComponent {
 
         phone: this.clientForm.controls['phone'].value?.e164Number,
         preferredCurrency: this.clientForm.controls['currency'].value,
-         inflationRate: round2(this.clientForm.controls['inflationRate'].value),
+        inflationRate: round2(this.clientForm.controls['inflationRate'].value),
       },
       partnerDetail: this.showPartner
         ? {
-            birthDate: partnerGroup.controls['dob']?.value,
-            email: partnerGroup.controls['email']?.value,
-            gender: partnerGroup.controls['gender']?.value,
-            country: partnerGroup.controls['country']?.value,
-            firstName: partnerGroup.controls['firstName']?.value,
-            lastName: partnerGroup.controls['lastName']?.value,
-            phone: partnerGroup.controls['phone']?.value?.e164Number,
-            preferredCurrency: partnerGroup.controls['currency']?.value,
-          }
+          birthDate:this.fixDate(partnerGroup.controls['dob']?.value),
+          email: partnerGroup.controls['email']?.value,
+          gender: partnerGroup.controls['gender']?.value,
+          country: partnerGroup.controls['country']?.value,
+          firstName: partnerGroup.controls['firstName']?.value,
+          lastName: partnerGroup.controls['lastName']?.value,
+          phone: partnerGroup.controls['phone']?.value?.e164Number,
+          preferredCurrency: partnerGroup.controls['currency']?.value,
+        }
         : null,
       financialAdvisor: {
         advisorId: this.user.sub,
@@ -302,6 +292,13 @@ export class ClientAddComponent {
     });
   }
 
+  fixDate(d: Date): Date {
+    if (!d) return d;
+    const newDate = new Date(d);
+    newDate.setHours(12, 0, 0, 0);
+    return newDate;
+  }
+
   onSubmit() {
     this.clientForm.markAllAsTouched();
     this.clientForm.markAsDirty();
@@ -314,7 +311,6 @@ export class ClientAddComponent {
           map((res) => {
             this.toastr.success('Client created successfully', 'Success!');
             this.openNewModelDialog(res);
-            // this.router.navigate(['/finances']);
           }),
           catchError((err) => {
             console.error(err);
@@ -324,12 +320,12 @@ export class ClientAddComponent {
         )
         .subscribe();
       console.log('Form Data:', this.clientForm.value);
-      // Submit form data to the API or service
     } else {
       console.error('Form is invalid');
     }
   }
 }
+
 function round2(n: number): number {
   return Math.round((+n) * 100) / 100;
 }

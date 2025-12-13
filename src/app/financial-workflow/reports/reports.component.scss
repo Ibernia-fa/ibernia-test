@@ -357,3 +357,6 @@ tr.example-detail-row {
   color: green;
 }
 
+::ng-deep .infilation-check .mat-mdc-form-field-subscript-wrapper {
+  display: none !important;
+}
