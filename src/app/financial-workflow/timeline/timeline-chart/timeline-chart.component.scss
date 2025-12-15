@@ -255,3 +255,8 @@ top: -2% !important;
   font-weight: 500;
   color: #333;
 }
+::ng-deep .vis-custom-time.hoverLine,
+::ng-deep .vis-custom-time.dragOver {
+  pointer-events: none !important;
+  cursor: default !important;
+}

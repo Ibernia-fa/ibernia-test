@@ -82,6 +82,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
   @Output() updateTimelines: EventEmitter<boolean>;
   @ViewChild('timelineContainer', { static: true })
   timelineContainer!: ElementRef;
+  private hoverLineId = 'hoverLine';
 
   private tooltipPollingInterval: any;
   private tooltipMouseX: number = 0;
@@ -727,8 +728,8 @@ get timelineData(): DataSet<
         return {
           id: event.id,
           content: this.getContent(event.name, event.iconUrl),
-          start: new Date(startYear, 0, 1), // Jan 1st of start year
-          end: new Date(startYear + calculatedWidth, 0, 1), // End based on calculated width
+          start: new Date(startYear, 12, 1), // Jan 1st of start year
+          end: new Date(startYear + calculatedWidth, 12, 1), // End based on calculated width
           className: event.iconUrl,
           editable: {
             updateTime: true,
@@ -1513,51 +1514,106 @@ private calculateAgeForTimeline = (date: Date, dateOfBirth: Date): number => {
 
 
  // Add this method for timeline hover
-  initTimelineHover() {
+  // initTimelineHover() {
+  //   if (!this.timelineContainer?.nativeElement || !this.timeline) return;
+
+  //   // Create observable for mousemove on timeline container
+  //   this.timelineHoverSubscription = fromEvent<MouseEvent>(
+  //     this.timelineContainer.nativeElement, 
+  //     'mousemove'
+  //   ).pipe(
+  //     throttleTime(50) // Throttle to avoid excessive updates
+  //   ).subscribe((event: MouseEvent) => {
+  //     // Only process if NOT dragging
+  //     if (this.isDragging || this.draggedEvent) return;
+      
+  //     this.handleTimelineHover(event);
+  //   });
+
+  //   // Also handle mouse leave to clear highlights
+  //   fromEvent(this.timelineContainer.nativeElement, 'mouseleave')
+  //     .subscribe(() => {
+  //       if (!this.isDragging && !this.draggedEvent) {
+  //         this.clearLabelHighlight();
+  //       }
+  //     });
+  // }
+
+
+
+
+  //  private handleTimelineHover(event: MouseEvent) {
+  //   if (!this.timeline) return;
+
+  //   // Get the time at the mouse position
+  //   const props = this.timeline.getEventProperties(event);
+  //   if (!props?.time) return;
+
+  //   const hoverTime = props.time;
+  //   const snappedTime = this.snapToNearestYear(hoverTime);
+  //   const snappedYear = snappedTime.getFullYear();
+    
+  //   // Only highlight if within forecast range
+  //   if (
+  //     snappedYear >= moment(this.financialTimeline.forecastStartDate).year() &&
+  //     snappedYear <= moment(this.financialTimeline.forecastEndtDate).year()
+  //   ) {
+  //     const age = this.calculateAgeForTimeline(snappedTime, new Date(this.clientBirthDate));
+  //     this.highlightHoveredYearLabel(snappedYear);
+  //   } else {
+  //     this.clearLabelHighlight();
+  //   }
+  // }
+
+  /* ===========================================
+     3. HOVER LOGIC (UPDATED)
+     =========================================== */
+  private initTimelineHover(): void {
     if (!this.timelineContainer?.nativeElement || !this.timeline) return;
 
-    // Create observable for mousemove on timeline container
     this.timelineHoverSubscription = fromEvent<MouseEvent>(
-      this.timelineContainer.nativeElement, 
+      this.timelineContainer.nativeElement,
       'mousemove'
-    ).pipe(
-      throttleTime(50) // Throttle to avoid excessive updates
-    ).subscribe((event: MouseEvent) => {
-      // Only process if NOT dragging
-      if (this.isDragging || this.draggedEvent) return;
-      
-      this.handleTimelineHover(event);
-    });
+    )
+      .pipe(throttleTime(30))
+      .subscribe((event) => {
+        if (this.isDragging || this.draggedEvent) return;
+        this.handleTimelineHover(event);
+      });
 
-    // Also handle mouse leave to clear highlights
     fromEvent(this.timelineContainer.nativeElement, 'mouseleave')
       .subscribe(() => {
-        if (!this.isDragging && !this.draggedEvent) {
+        if (!this.isDragging) {
+          try { this.timeline.removeCustomTime(this.hoverLineId); } catch {}
           this.clearLabelHighlight();
         }
       });
   }
 
-   private handleTimelineHover(event: MouseEvent) {
+  private handleTimelineHover(event: MouseEvent): void {
     if (!this.timeline) return;
 
-    // Get the time at the mouse position
     const props = this.timeline.getEventProperties(event);
     if (!props?.time) return;
 
-    const hoverTime = props.time;
-    const snappedTime = this.snapToNearestYear(hoverTime);
-    const snappedYear = snappedTime.getFullYear();
-    
-    // Only highlight if within forecast range
-    if (
-      snappedYear >= moment(this.financialTimeline.forecastStartDate).year() &&
-      snappedYear <= moment(this.financialTimeline.forecastEndtDate).year()
-    ) {
-      const age = this.calculateAgeForTimeline(snappedTime, new Date(this.clientBirthDate));
-      this.highlightHoveredYearLabel(snappedYear);
+    const snappedTime = this.snapToNearestYear(props.time);
+    const year = snappedTime.getFullYear();
+
+    const startYear = moment(this.financialTimeline.forecastStartDate).year();
+    const endYear = moment(this.financialTimeline.forecastEndtDate).year();
+
+    if (year >= startYear && year <= endYear) {
+      try {
+        this.timeline.setCustomTime(snappedTime, this.hoverLineId);
+      } catch {
+        this.timeline.addCustomTime(snappedTime, this.hoverLineId);
+      }
+
+      this.highlightHoveredYearLabel(year);
     } else {
+      try { this.timeline.removeCustomTime(this.hoverLineId); } catch {}
       this.clearLabelHighlight();
     }
   }
+
 }
