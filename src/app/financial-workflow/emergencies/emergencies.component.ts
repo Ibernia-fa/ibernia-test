@@ -232,10 +232,10 @@ export class EmergenciesComponent implements OnInit {
     disability: 'disability.svg',
     health: 'health.svg',
     will: 'will.svg',
-    life: 'shield.svg'
+    life: 'user.png'
   };
 
-  private readonly defaultIcon = 'shield.svg';
+  private readonly defaultIcon = 'light.png';
 
   getIconName(e: Emergency): string {
     const key = (e.name || '').toLowerCase();

@@ -161,6 +161,10 @@
     font-size: 18px;
     line-height: 19px;
     font-weight: 700;
+    white-space: nowrap;
+        display: flex;
+    align-items: center;
+    gap: 5px;
     // &.expense-income{
     //       color: #71bc42;
     // }
