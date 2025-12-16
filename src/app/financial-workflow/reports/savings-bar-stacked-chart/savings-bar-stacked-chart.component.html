@@ -1,10 +1,8 @@
 <div id="chart">
-  <div class="text-right f-w-500">  {{cashFlowName}}</div>
-    @if(report?.series) {
-        <apx-chart [series]="report?.series ?? []" [chart]="chartOptions.chart" [xaxis]="chartOptions.xaxis"
-            [yaxis]="chartOptions.yaxis" [dataLabels]="chartOptions.dataLabels" [annotations]="chartOptions.annotations"
-            [tooltip]="chartOptions.tooltip" [fill]="chartOptions.fill" [legend]="chartOptions.legend"
-            [grid]="chartOptions.grid">
-        </apx-chart>
-    }
+    <div class="text-right f-w-500"> {{cashFlowName}}</div>
+    <apx-chart *ngIf="showChart && chartOptions.series?.length" #chart [series]="chartOptions.series ?? []"
+        [chart]="chartOptions.chart" [xaxis]="chartOptions.xaxis" [yaxis]="chartOptions.yaxis"
+        [dataLabels]="chartOptions.dataLabels" [annotations]="chartOptions.annotations" [tooltip]="chartOptions.tooltip"
+        [fill]="chartOptions.fill" [legend]="chartOptions.legend" [grid]="chartOptions.grid">
+    </apx-chart>
 </div>
