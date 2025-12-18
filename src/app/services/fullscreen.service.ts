@@ -103,38 +103,108 @@ export class FullscreenService {
     });
   }
 
-  private initializeChart(data: FullscreenData): void {
-    const chartContainer = document.getElementById('global-fullscreen-chart');
-    if (!chartContainer) return;
+//   private initializeChart(data: FullscreenData): void {
+//     const chartContainer = document.getElementById('global-fullscreen-chart');
+//     if (!chartContainer) return;
     
-    // Clear container
-    chartContainer.innerHTML = '';
+//     // Clear container
+//     chartContainer.innerHTML = '';
     
-    // Create component factory
-    const componentFactory = this.componentFactoryResolver.resolveComponentFactory(
-      SavingsBarStackedChartComponent
-    );
+//     // Create component factory
+//     const componentFactory = this.componentFactoryResolver.resolveComponentFactory(
+//       SavingsBarStackedChartComponent
+//     );
     
-    // Create component reference
-    this.chartComponentRef = componentFactory.create(this.injector);
+//     // Create component reference
+//     this.chartComponentRef = componentFactory.create(this.injector);
     
-    // Set component inputs
-    this.chartComponentRef.instance.report = data.report;
-    this.chartComponentRef.instance.client = data.client;
-    this.chartComponentRef.instance.forecastStartDate = data.forecastStartDate;
-    this.chartComponentRef.instance.forecastEndDate = data.forecastEndDate;
-    this.chartComponentRef.instance.cashFlowName = data.cashFlowName;
-    this.chartComponentRef.instance.isFullscreen = true;
+//     // Set component inputs
+//     this.chartComponentRef.instance.report = data.report;
+//     this.chartComponentRef.instance.client = data.client;
+//     this.chartComponentRef.instance.forecastStartDate = data.forecastStartDate;
+//     this.chartComponentRef.instance.forecastEndDate = data.forecastEndDate;
+//     this.chartComponentRef.instance.cashFlowName = data.cashFlowName;
+//     this.chartComponentRef.instance.isFullscreen = true;
     
-    // Attach to application
-    this.appRef.attachView(this.chartComponentRef.hostView);
+//     // Attach to application
+//     this.appRef.attachView(this.chartComponentRef.hostView);
     
-    // Append to DOM
-    chartContainer.appendChild(this.chartComponentRef.location.nativeElement);
+//     // Append to DOM
+//     chartContainer.appendChild(this.chartComponentRef.location.nativeElement);
     
-    // Trigger change detection
-    this.chartComponentRef.changeDetectorRef.detectChanges();
+//     // Trigger change detection
+//     this.chartComponentRef.changeDetectorRef.detectChanges();
+//   }
+
+private initializeChart(data: FullscreenData): void {
+  const chartContainer = document.getElementById('global-fullscreen-chart');
+  if (!chartContainer) return;
+  
+  // Clear container
+  chartContainer.innerHTML = '';
+  
+  // Create component factory
+  const componentFactory = this.componentFactoryResolver.resolveComponentFactory(
+    SavingsBarStackedChartComponent
+  );
+  
+  // Create component reference
+  this.chartComponentRef = componentFactory.create(this.injector);
+  
+  // Set component inputs
+  this.chartComponentRef.instance.report = data.report;
+  this.chartComponentRef.instance.client = data.client;
+  this.chartComponentRef.instance.forecastStartDate = data.forecastStartDate;
+  this.chartComponentRef.instance.forecastEndDate = data.forecastEndDate;
+  this.chartComponentRef.instance.cashFlowName = data.cashFlowName;
+  this.chartComponentRef.instance.isFullscreen = true;
+  
+  // Attach to application
+  this.appRef.attachView(this.chartComponentRef.hostView);
+  
+  // Append to DOM
+  chartContainer.appendChild(this.chartComponentRef.location.nativeElement);
+  
+  // MANUALLY TRIGGER ngOnChanges - THIS IS THE KEY FIX!
+  // This ensures chart options (including tooltip) are initialized
+  if (this.chartComponentRef.instance.ngOnChanges) {
+    this.chartComponentRef.instance.ngOnChanges({
+      report: {
+        currentValue: data.report,
+        previousValue: undefined,
+        firstChange: true,
+        isFirstChange: () => true
+      },
+      client: {
+        currentValue: data.client,
+        previousValue: undefined,
+        firstChange: true,
+        isFirstChange: () => true
+      },
+      forecastStartDate: {
+        currentValue: data.forecastStartDate,
+        previousValue: undefined,
+        firstChange: true,
+        isFirstChange: () => true
+      },
+      forecastEndDate: {
+        currentValue: data.forecastEndDate,
+        previousValue: undefined,
+        firstChange: true,
+        isFirstChange: () => true
+      },
+      cashFlowName: {
+        currentValue: data.cashFlowName,
+        previousValue: undefined,
+        firstChange: true,
+        isFirstChange: () => true
+      }
+    });
   }
+  
+  // Trigger change detection
+  this.chartComponentRef.changeDetectorRef.detectChanges();
+}
 
   private destroyChart(): void {
     if (this.chartComponentRef) {
