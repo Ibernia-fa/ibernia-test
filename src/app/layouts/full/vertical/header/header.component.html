@@ -4,7 +4,14 @@
   <!-- Desktop Menu -->
   <!-- <div class="branding"> -->
     <app-branding *ngIf="isBrandLogoLoaded" [profileImage]="brandingLogo"></app-branding>
-    <span class="bck-main">← Back to Shujaat’s page</span>
+  <ng-container *ngIf="isCashflowRoute && clientProfileLink && clientFirstName">
+    <a 
+      [routerLink]="clientProfileLink" 
+      class="bck-main d-flex align-items-center text-decoration-none"
+      matTooltip="Go back to client profile page">
+      ← Back to {{clientFirstName}}'s page
+    </a>
+  </ng-container>
     
   <!-- </div> -->
   <!-- @if (!hideSidebarToggle) {

@@ -11,7 +11,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { navItems } from '../sidebar/sidebar-data';
 import { TranslateService } from '@ngx-translate/core';
 import { TablerIconsModule } from 'angular-tabler-icons';
-import { RouterModule } from '@angular/router';
+import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgScrollbarModule } from 'ngx-scrollbar';
@@ -24,8 +24,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { SettingsService, UserProfileDto } from 'src/app/default-preferance/services/default-preferance.http.service';
 import { HttpResponse } from '@angular/common/http';
-import { takeUntil, catchError, of, finalize, Subject, Subscription } from 'rxjs';
+import { takeUntil, catchError, of, finalize, Subject, Subscription, filter } from 'rxjs';
 import { OrganizationProfilesService } from 'src/app/settings/services/organization.profiles.service';
+import { Store } from '@ngrx/store';
+import { Client } from 'src/app/clients/models/client';
+import { selectedClient } from 'src/app/store/client/client.selectors';
 
 interface notifications {
   id: number;
@@ -78,8 +81,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
   @Output() toggleMobileFilterNav = new EventEmitter<void>();
   @Output() toggleCollapsed = new EventEmitter<void>();
 
-  showFiller = false;
-
+  // showFiller = false;
+showFiller = false;
+  isCashflowRoute = false; // Add this flag
+  clientProfileLink = ''; // Add this for the link
   public selectedLanguage: any = {
     language: 'English',
     code: 'en',
@@ -120,7 +125,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
   isBrandLogoLoaded: boolean;
   brandingLogo: string | null = null;
   private sub!: Subscription;
-
+  currentClient: Client | null = null;
+  clientFirstName: string;
+  clientLastName: string;
   constructor(
     private settings: CoreService,
     private vsidenav: CoreService,
@@ -128,7 +135,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
     private translate: TranslateService,
     private Authservice: AuthService,
     private settingsService: SettingsService,
-    private organizationProfiles: OrganizationProfilesService
+    private organizationProfiles: OrganizationProfilesService,
+        private router: Router, // Add Router
+    private store: Store 
   ) {
     translate.setDefaultLang('en');
     this.user = this.Authservice.getUserProfile();
@@ -138,7 +147,58 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.settingsService.profileChanged$
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => this.loadProfile());
+
+    this.store.select(selectedClient)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(client => {
+        this.currentClient = client;
+              if (client?.clientDetails) {
+          this.clientFirstName = client.clientDetails.firstName || '';
+          this.clientLastName = client.clientDetails.lastName || '';
+        } else {
+          this.clientFirstName = '';
+          this.clientLastName = '';
+        }
+        // Rebuild link if client changes and we're on cashflow route
+        if (client && this.isCashflowRoute) {
+          this.buildClientProfileLink();
+        }
+      });
+
+
+          this.router.events
+      .pipe(
+        filter(event => event instanceof NavigationEnd),
+        takeUntil(this.destroy$)
+      )
+      .subscribe((event: NavigationEnd) => {
+        this.checkIfCashflowRoute();
+      });
   }
+
+    private buildClientProfileLink(): void {
+    if (this.currentClient?.id) {
+      this.clientProfileLink = `/clients/${this.currentClient.id}/profile`;
+    } else {
+      this.clientProfileLink = ''; // Clear link if no client
+    }
+  }
+
+
+  
+
+  private checkIfCashflowRoute(): void {
+    const currentUrl = this.router.url;
+    // Check if URL matches pattern: /cashflows/:cashflowId/...
+    this.isCashflowRoute = /^\/cashflows\/[^\/]+\/.+/.test(currentUrl);
+    
+    if (this.isCashflowRoute) {
+      // Get client from store to build the link
+      // Assuming you have access to the client store/state
+      this.buildClientProfileLink();
+    }
+  }
+
 
     ngOnInit() {
       // branding logo
@@ -170,6 +230,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
       this.destroy$.complete();
       this.sub?.unsubscribe();
     }
+
+    
 // Prefer saved profile names; fallback to OIDC claims; otherwise blank
 get displayFirstName(): string {
   return (this.userprofile?.firstName ?? '').trim() || (this.user?.given_name ?? '');
@@ -229,6 +291,17 @@ get displayLastName(): string {
 
   private emitOptions() {
     this.optionsChange.emit(this.options);
+  }
+
+    get clientFullName(): string {
+    if (this.clientFirstName && this.clientLastName) {
+      return `${this.clientFirstName} ${this.clientLastName}`;
+    } else if (this.clientFirstName) {
+      return this.clientFirstName;
+    } else if (this.clientLastName) {
+      return this.clientLastName;
+    }
+    return 'Client'; // Fallback text
   }
 
   setlightDark(theme: string) {
