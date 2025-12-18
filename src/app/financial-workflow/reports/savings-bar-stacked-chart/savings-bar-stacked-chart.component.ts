@@ -63,6 +63,8 @@ isFullscreen: any;
         const seriesName = w.globals.seriesNames[seriesIndex];
         const xValue = w.globals.labels[dataPointIndex];
         // console.log('opts', opts, );
+          const color = w.globals.colors[seriesIndex];
+
         const age = [(Math.floor(xValue) - moment(this.client.clientDetails.birthDate).year())]
         // build whatever HTML you want here
         return `
@@ -71,7 +73,8 @@ isFullscreen: any;
               <div>Age: ${age} </div>  <div> Year: ${xValue}</div> 
             </div>
             <div class="savings-tooltip__body">
-              <div class="savings-tooltip__label"><span class="circle-wrapper circle-color"></span>${seriesName}:</div>
+              <div class="savings-tooltip__label">
+                  <span class="circle-wrapper" style="background-color: ${color};"></span>${seriesName}:</div>
               <div class="savings-tooltip__value">${value.toLocaleString()}</div>
             </div>
           </div>
@@ -140,28 +143,29 @@ isFullscreen: any;
       legend: {
         position: "top",
         offsetX: 100,
-        fillColors: ['#4CAF50', '#8BC34A', '#FF5722', '#FF5700']
+        fillColors: ['#4CAF50', '#8BC34A', '#FF5722', '#FF5700'],
+        showForZeroSeries: false,
+
       },
       fill: {
         opacity: 1,
       },
     }; 
   }  
-
-  ngOnChanges(changes: SimpleChanges): void {
+ngOnChanges(changes: SimpleChanges): void {
   if (changes['report'] && this.report?.series?.length) {
     const seriesList = this.report.series;
     const seriesColors = this.chartOptions.colors || [];
 
     // Dynamically build fillColors array based on series names
-    const fillColors = seriesList.map((s, i) =>
+    const fillColors = seriesList.map((s, i) => 
       s.name === 'Current Account (Negative)' ? 'transparent' :  s.color
     );
-  console.log(fillColors);
+    console.log(fillColors);
     this.chartOptions.legend = {
       ...this.chartOptions.legend,
       formatter: (seriesName: string, opts: any) =>
-        seriesName === 'Current Account (Negative)' ? '' : seriesName,
+seriesName === 'Current Account (Negative)' ? '' : seriesName,
       markers: {
         fillColors: fillColors
       },
