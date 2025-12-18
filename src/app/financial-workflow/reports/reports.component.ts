@@ -358,61 +358,61 @@ ngAfterViewInit(): void {
       .subscribe();
   }
 
-onComparePlansClicked() {
-  if (!this.cashflows || this.cashflows.length < 2) {
-    this.toaster.info(
-      'You need at least two plans to compare. Please create another plan first',
-      // 'Info'
-    );
-    return;
-  }
+// onComparePlansClicked() {
+//   if (!this.cashflows || this.cashflows.length < 2) {
+//     this.toaster.info(
+//       'You need at least two plans to compare. Please create another plan first',
+//       // 'Info'
+//     );
+//     return;
+//   }
 
-  const dialogRef = this.dialog.open(CompareCashflowsComponent, {
-    width: '700px',
-    disableClose: true,
-    data: {
-      cashflows: this.cashflows,
-      baseCashflowId: this.cashflow?.id,
-    },
-  });
+//   const dialogRef = this.dialog.open(CompareCashflowsComponent, {
+//     width: '700px',
+//     disableClose: true,
+//     data: {
+//       cashflows: this.cashflows,
+//       baseCashflowId: this.cashflow?.id,
+//     },
+//   });
 
-  dialogRef.afterClosed().subscribe((selectedOtherId?: string) => {
-    if (!selectedOtherId) {
-      return; // dialog cancelled
-    }
+//   dialogRef.afterClosed().subscribe((selectedOtherId?: string) => {
+//     if (!selectedOtherId) {
+//       return; // dialog cancelled
+//     }
 
-    const selected = this.cashflows.find(c => c.id === selectedOtherId) || null;
-    if (!selected) {
-      this.toaster.error('Selected plan not found', 'Error');
-      return;
-    }
+//     const selected = this.cashflows.find(c => c.id === selectedOtherId) || null;
+//     if (!selected) {
+//       this.toaster.error('Selected plan not found', 'Error');
+//       return;
+//     }
 
-    this.isCompareLoading = true;
-    this.compareCashflow = null;
-    this.compareReport = null;
-    this.compareTimeline = null;
+//     this.isCompareLoading = true;
+//     this.compareCashflow = null;
+//     this.compareReport = null;
+//     this.compareTimeline = null;
 
-    combineLatest([
-      this.reportsHttpService.getReportbyCashflowId(selectedOtherId),
-      this.timelineHttpService.getTimelinebyCashflowId(selectedOtherId),
-    ]).subscribe({
-      next: ([report, timeline]) => {
-        this.compareCashflow = selected;
-        this.compareReport = report;
-        this.compareTimeline = timeline;
-        this.isCompareLoading = false;
-      },
-      error: (err) => {
-        console.error('Failed to load comparison plan', err);
-        this.toaster.error(
-          'Failed to load comparison plan. Please try again',
-          'Error'
-        );
-        this.isCompareLoading = false;
-      },
-    });
-  });
-}
+//     combineLatest([
+//       this.reportsHttpService.getReportbyCashflowId(selectedOtherId),
+//       this.timelineHttpService.getTimelinebyCashflowId(selectedOtherId),
+//     ]).subscribe({
+//       next: ([report, timeline]) => {
+//         this.compareCashflow = selected;
+//         this.compareReport = report;
+//         this.compareTimeline = timeline;
+//         this.isCompareLoading = false;
+//       },
+//       error: (err) => {
+//         console.error('Failed to load comparison plan', err);
+//         this.toaster.error(
+//           'Failed to load comparison plan. Please try again',
+//           'Error'
+//         );
+//         this.isCompareLoading = false;
+//       },
+//     });
+//   });
+// }
 
 onReturnRateInput(event: Event) {
     // when typing, ensure the control holds a clean number so slider updates
@@ -472,5 +472,78 @@ exitComparison() {
   this.isCompareLoading = false;
 }
 
+
+onComparePlansClicked() {
+  if (!this.cashflows || this.cashflows.length < 2) {
+    this.toaster.info(
+      'You need at least two plans to compare. Please create another plan first',
+      // 'Info'
+    );
+    return;
+  }
+
+  // If exactly 2 cashflows total, automatically compare with the other one
+  if (this.cashflows.length === 2 && this.cashflow) {
+    // Find the other cashflow (not the current one)
+    const otherCashflow = this.cashflows.find(c => c.id !== this.cashflow?.id);
+    
+    if (otherCashflow) {
+      this.loadComparisonPlan(otherCashflow.id, otherCashflow);
+      return; // Skip the dialog
+    }
+  }
+
+  // If more than 2 cashflows, show dialog to choose
+  const dialogRef = this.dialog.open(CompareCashflowsComponent, {
+    width: '700px',
+    disableClose: true,
+    data: {
+      cashflows: this.cashflows,
+      baseCashflowId: this.cashflow?.id,
+    },
+  });
+
+  dialogRef.afterClosed().subscribe((selectedOtherId?: string) => {
+    if (!selectedOtherId) {
+      return; // dialog cancelled
+    }
+
+    const selected = this.cashflows.find(c => c.id === selectedOtherId) || null;
+    if (!selected) {
+      this.toaster.error('Selected plan not found', 'Error');
+      return;
+    }
+
+    this.loadComparisonPlan(selectedOtherId, selected);
+  });
+}
+
+// Helper method to load comparison plan
+private loadComparisonPlan(cashflowId: string, cashflow: Cashflow): void {
+  this.isCompareLoading = true;
+  this.compareCashflow = null;
+  this.compareReport = null;
+  this.compareTimeline = null;
+
+  combineLatest([
+    this.reportsHttpService.getReportbyCashflowId(cashflowId),
+    this.timelineHttpService.getTimelinebyCashflowId(cashflowId),
+  ]).subscribe({
+    next: ([report, timeline]) => {
+      this.compareCashflow = cashflow;
+      this.compareReport = report;
+      this.compareTimeline = timeline;
+      this.isCompareLoading = false;
+    },
+    error: (err) => {
+      console.error('Failed to load comparison plan', err);
+      this.toaster.error(
+        'Failed to load comparison plan. Please try again',
+        'Error'
+      );
+      this.isCompareLoading = false;
+    },
+  });
+}
 
 }
