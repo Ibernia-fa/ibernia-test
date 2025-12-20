@@ -11,6 +11,7 @@ import { ToastrService } from 'ngx-toastr';
 import { Emergency, CreateEmergencyRequest, LookupItem, Money } from '../models/emergencies.model';
 import { EmergenciesHttpService } from '../services/emergencies-http.service';
 import { allCountries } from 'src/app/clients/models/country';
+import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 
 export interface AddEmergencyDialogData {
   mode: 'add' | 'edit';
@@ -38,6 +39,7 @@ export interface AddEmergencyDialogData {
     MatSelectModule,
     MatButtonModule,
     MatCheckboxModule,
+    ThousandSeparatorInputDirective
   ],
   templateUrl: './add-emergencies.component.html',
   styleUrl: './add-emergencies.component.scss',

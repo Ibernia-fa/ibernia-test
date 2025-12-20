@@ -65,7 +65,13 @@
             </div>
 
             <div class="w-100 form-field">
-              <input matInput type="number" formControlName="insuranceAmount" placeholder="Amount" />
+              <input 
+                matInput
+                type="text"
+                formControlName="insuranceAmount"
+                placeholder="Amount"
+                thousandSeparatorInput
+              />
             </div>
 
             <div class="right">
@@ -103,7 +109,13 @@
         </mat-label>
         <mat-form-field appearance="outline" class="w-100">
           
-          <input matInput type="number" formControlName="coverage" />
+          <input 
+            matInput 
+            type="text" 
+            formControlName="coverage"
+            placeholder="Coverage"
+            thousandSeparatorInput
+           />
         </mat-form-field>
         @if(form.get('coverage')?.touched && form.get('coverage')?.hasError('required')) {
           <span class="field-error d-block">Required</span>
