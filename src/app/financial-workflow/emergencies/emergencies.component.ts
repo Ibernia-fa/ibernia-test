@@ -36,7 +36,6 @@ import { CurrencySymbolPipe } from 'src/app/pipe/currency-symbol.pipe';
     MatProgressSpinnerModule,
     CurrencySymbolPipe
   ],
-
   templateUrl: './emergencies.component.html',
   styleUrl: './emergencies.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -57,9 +56,18 @@ export class EmergenciesComponent implements OnInit {
   client$: Observable<Client | null>;
   clientData: Details;
   amountCycles: any;
-
   isClientLoaded = false;
   isEmergenciesLoaded = false;
+
+  private readonly defaultIcon = 'shield.svg';
+  private readonly iconMap: Record<string, string> = {
+    home: 'home.svg',
+    disability: 'disability.svg',
+    health: 'health.svg',
+    will: 'will.svg',
+    life: 'user.png',
+    naturalHazards: 'naturalHazards.png',
+  };
 
   constructor(
     private route: ActivatedRoute,
@@ -205,6 +213,11 @@ export class EmergenciesComponent implements OnInit {
     });
   }
 
+  getCashflowName(): string {
+    const e = this.emergencies[0];
+    return e.cashflow?.name || '-';
+  }
+
   getTypeName(typeId: number): string {
     return this.emergencyTypes.find(t => t.id === typeId)?.name ?? 'Unknown';
   }
@@ -227,18 +240,13 @@ export class EmergenciesComponent implements OnInit {
     return this.policyStatuses.find(w => w.id === id)?.description ?? 'Unknown';
   }
 
-  private readonly iconMap: Record<string, string> = {
-    home: 'home.svg',
-    disability: 'disability.svg',
-    health: 'health.svg',
-    will: 'will.svg',
-    life: 'user.png'
-  };
-
-  private readonly defaultIcon = 'light.png';
-
   getIconName(e: Emergency): string {
     const key = (e.name || '').toLowerCase();
+
+    if (key === 'natural hazards') {
+      return `assets/images/svgs/${this.iconMap['naturalHazards']}`;
+    }
+
     return `assets/images/svgs/${this.iconMap[key] ?? this.defaultIcon}`;
   }
 
