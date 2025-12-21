@@ -251,12 +251,15 @@ export class EmergenciesComponent implements OnInit {
   }
 
   getCardCssClass(e: Emergency): string {
+    // non will
     if(e.type === 1)
     {
       const isNotCovered = e.policyStatus == 2;
-      return isNotCovered ? 'danger-card' : 'home-card';
+      return isNotCovered ? 'danger-card' 
+        : e.coverageAdequacy === 1 ? 'basic-card' : e.coverageAdequacy === 2 ? 'good-card' : 'excellent-card';
     }
 
+    // will
     if(e.type === 2)
     {
       const isNotDone = e.willStatus == 2;

@@ -112,17 +112,23 @@
 }
 
 .danger-card {
-  background: #fff1f2;
+  background: #fff1f2; 
   border: 1px solid #ffccd3 !important;
 }
 
-.good-card-covered {
+.basic-card {
+  background-color: #fffbeb;
+  border: 1px solid #a4f4cf !important;
+
+}
+
+.good-card {
   background-color: #ecfdf5;
   border: 1px solid #a4f4cf !important;
 
 }
 
-.excellent-card-covered {
+.excellent-card {
   background-color: #b6f6d9;
   border: 1px solid #59c996 !important;
 }
