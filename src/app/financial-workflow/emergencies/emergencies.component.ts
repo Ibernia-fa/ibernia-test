@@ -250,8 +250,17 @@ export class EmergenciesComponent implements OnInit {
     return `assets/images/svgs/${this.iconMap[key] ?? this.defaultIcon}`;
   }
 
+  getProtectionScoreCssClass(score: number | null): string {
+    if (score == null || score < 50) {
+      return 'basic';
+    } else if (score < 75) {
+      return 'good';
+    } else {
+      return 'excellent';
+    }
+  }
+
   getCardCssClass(e: Emergency): string {
-    // non will
     if(e.type === 1)
     {
       const isNotCovered = e.policyStatus == 2;
@@ -259,7 +268,6 @@ export class EmergenciesComponent implements OnInit {
         : e.coverageAdequacy === 1 ? 'basic-card' : e.coverageAdequacy === 2 ? 'good-card' : 'excellent-card';
     }
 
-    // will
     if(e.type === 2)
     {
       const isNotDone = e.willStatus == 2;
