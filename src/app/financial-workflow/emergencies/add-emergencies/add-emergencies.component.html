@@ -23,7 +23,7 @@
         <div class="select-option">
           <mat-select formControlName="willStatus" placeholder="Select">
             @for (ws of willStatuses; track ws) {
-              <mat-option [value]="ws.id">{{ ws.name }}</mat-option>
+              <mat-option [value]="ws.id">{{ ws.name == 'NotDone' ? 'Not done' : ws.name }}</mat-option>
             }
           </mat-select>
         </div>
