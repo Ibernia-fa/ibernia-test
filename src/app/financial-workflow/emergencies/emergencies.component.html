@@ -114,7 +114,7 @@
                   <div class="inner-information">
                     <div class="label">Annual cost</div>
                     <div class="f-w-500 f-s-14">
-                      <span>{{clientData?.preferredCurrency | currencySymbol}}</span>{{ e.insuranceCost.amount | number:'1.0-0' }}
+                      <span>{{clientData?.preferredCurrency | currencySymbol}}</span>{{ calculateAnnualCost(e) | number:'1.0-0' }}
                     </div>
                   </div>
                 </div>

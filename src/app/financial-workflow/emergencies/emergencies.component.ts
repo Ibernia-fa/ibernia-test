@@ -56,6 +56,7 @@ export class EmergenciesComponent implements OnInit {
   client$: Observable<Client | null>;
   clientData: Details;
   amountCycles: any;
+  monthlyCycleId = null
   isClientLoaded = false;
   isEmergenciesLoaded = false;
 
@@ -88,6 +89,7 @@ export class EmergenciesComponent implements OnInit {
 
     this.settingHttpService.getAmountCycles().subscribe((cycles) => {
       this.amountCycles = cycles.filter(x => x.description != "One-off");
+      this.monthlyCycleId = this.amountCycles.filter((x: any) => x.description === "Every month")[0]?.id;
     });
   }
 
@@ -381,6 +383,20 @@ export class EmergenciesComponent implements OnInit {
         this.toastr.error('Failed to update coverage adequacy', 'Error');
       }
     });
+  }
+
+  calculateAnnualCost(e: Emergency): number {
+    let annualCost = 0;
+    
+    if(e.insuranceCost?.amount  && e.insuranceCost?.amount > 0 
+      && this.monthlyCycleId && e.insuranceCost.cycle?.id === this.monthlyCycleId) {
+      annualCost = e.insuranceCost.amount * 12;
+    }
+    else {
+      annualCost = e.insuranceCost.amount;
+    }
+
+    return annualCost ?? 0;
   }
 
   get hasHiddenEmergencies(): boolean {
