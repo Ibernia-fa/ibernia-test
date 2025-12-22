@@ -254,11 +254,13 @@ export class EmergenciesComponent implements OnInit {
 
   getProtectionScoreCssClass(score: number | null): string {
     if (score == null || score < 50) {
-      return 'basic';
+      return 'ibernia-red';
     } else if (score < 75) {
-      return 'good';
+      return 'ibernia-orange';
+    } else if (score < 89) {
+      return 'ibernia-light-green';
     } else {
-      return 'excellent';
+      return 'ibernia-dark-green';
     }
   }
 
@@ -371,6 +373,10 @@ export class EmergenciesComponent implements OnInit {
       return;
     }
 
+    const previousValue = e.coverageAdequacy;
+    e.coverageAdequacy = newId;
+    this.cdr.markForCheck();
+
     const updated: Emergency = { ...e, coverageAdequacy: newId };
 
     this.emergenciesHttp.updateEmergency(updated).subscribe({
@@ -381,6 +387,9 @@ export class EmergenciesComponent implements OnInit {
       error: (err) => {
         console.error(err);
         this.toastr.error('Failed to update coverage adequacy', 'Error');
+
+        e.coverageAdequacy = previousValue;
+        this.cdr.markForCheck();
       }
     });
   }

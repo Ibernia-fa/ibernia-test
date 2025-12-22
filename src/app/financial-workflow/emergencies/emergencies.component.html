@@ -24,7 +24,7 @@
       <div class="d-flex align-items-center gap-8 justify-content-between">
         <div class="income-expense-wrapper w-100">
           <div class="row justify-content-between" *ngIf="stats as s">
-            <div class="col-2">
+            <div class="col-3">
               <div class="d-flex flex-column gap-8">
                 <div class="d-flex align-items-center gap-8">
                   <h3 class="card-title expense-income">  <img src="/assets/images/svgs/shield.svg" alt="chart" />    Total coverage</h3>
@@ -37,7 +37,7 @@
 
             <div class="divider"></div>
 
-            <div class="col-2" style="padding:0px">
+            <div class="col-3">
               <div class="d-flex flex-column gap-8">
                 <div class="d-flex align-items-center gap-8">
                   <h3 class="card-title expenses-deduct"><img src="/assets/images/svgs/will.svg" alt="chart" /> Total annual cost</h3>
@@ -49,7 +49,7 @@
 
             <div class="divider"></div>
 
-            <div class="col-2">
+            <div class="col-3">
               <div class="d-flex flex-column gap-8">
                 <div class="d-flex align-items-center gap-8">
                   <h3 class="card-title expenses-total"><img width="24" src="/assets/images/svgs/gauge.png" alt="chart" /> Protection score</h3>
@@ -61,7 +61,7 @@
             <div class="divider"></div>
 
             <div class="col-2 align-items-center d-flex">
-              <button style="height: auto;" (click)="onAddClick()" type="button" class="button-icon">
+              <button style="height: auto;" (click)="onAddClick()" type="button" class="button-icon" style="margin-left: 27px; height: 0%;">
                 <span>Add new</span>
                 <img src="assets/images/svgs/add-icon.svg" alt="add-icon" />
               </button>
@@ -90,11 +90,7 @@
               <div class="d-flex align-items-center">
                 <button class="hide-button" mat-icon-button (click)="hideEmergency(e)">Hide</button>
                 <button (click)="onEditClick(e)">
-                  <svg width="14" viewBox="0 0 18 19" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path
-                      d="M2 16.89H3.41421L12.7279 7.57629L11.3137 6.16207L2 15.4758V16.89ZM18 17.89C18 18.4423 17.5523 18.89 17 18.89H1C0.447716 18.89 0 18.4423 0 17.89V14.8545C0 14.7219 0.0526781 14.5947 0.146446 14.501L13.435 1.21233C13.8256 0.821801 14.4587 0.821801 14.8492 1.21233L17.6777 4.04075C18.0682 4.43128 18.0682 5.06444 17.6777 5.45497L6.24264 16.89H17C17.5523 16.89 18 17.3377 18 17.89ZM12.7279 4.74786L14.1421 6.16207L15.5563 4.74786L14.1421 3.33365L12.7279 4.74786Z"
-                      fill="#90a1b9" />
-                  </svg>
+                  <img src="assets/images/svgs/pen-icon.svg" alt="pen-icon" style="height: 18px;"/>
                 </button>
               </div>
             </div>
@@ -162,7 +158,7 @@
         </div>
       </div>
 
-      <div class="d-flex align-items-center m-t-10 justify-content-center">
+      <div class="d-flex align-items-center m-t-24 justify-content-center">
         <button *ngIf="hasHiddenEmergencies" class="btn-secondary" mat-stroked-button color="primary"
           (click)="showHiddenEmergencies()">
           <span>Show hidden</span>

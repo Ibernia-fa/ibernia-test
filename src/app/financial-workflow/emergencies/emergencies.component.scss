@@ -118,7 +118,7 @@
 
 .basic-card {
   background-color: #fffbeb;
-  border: 1px solid #a4f4cf !important;
+  border: 1px solid #fce584 !important;
 
 }
 
@@ -130,18 +130,6 @@
 .excellent-card {
   background-color: #b6f6d9;
   border: 1px solid #59c996 !important;
-}
-
-.basic {
-  color: #FF5722 !important;
-}
-
-.good {
-  color: #009E60 !important;
-}
-
-.excellent {
-  color: #00512C !important ;
 }
 
 .card-title {
@@ -193,4 +181,20 @@
     // color: #4043af;
     // }
   }
+}
+
+.ibernia-red {
+  color: #ff0000 !important;
+}
+
+.ibernia-orange {
+  color: #fce584 !important;
+}
+
+.ibernia-light-green {
+  color: #71bc42 !important ;
+}
+
+.ibernia-dark-green {
+  color: #00512C !important ;
 }
