@@ -92,7 +92,7 @@ export class AddEmergenciesComponent {
         this.updateValidatorsForPolicyStatus(status);
       });
     }
-    
+
     if (this.data.mode === 'edit' && this.data.emergency) {
       this.patchForm(this.data.emergency);
     }
@@ -103,7 +103,7 @@ export class AddEmergenciesComponent {
 
   setDefaultAdequacy() {
     const good = this.coverageAdequacies.find(a => a.name === 'Good');
-    
+
     if (good) {
       this.form.patchValue({ coverageAdequacy: good.id });
     }
@@ -281,5 +281,38 @@ export class AddEmergenciesComponent {
     }
 
     return this.data.emergencyTypes?.length === 1 && this.data.emergencyTypes[0].id === 2;
+  }
+
+  onDelete(): void {
+    if (this.isDeleteEnabled) {
+      const emergencyId = this.data?.emergency?.id;
+
+      if (emergencyId) {
+        this.emergenciesHttp.deleteEmergency(emergencyId).subscribe({
+          next: () => {
+            this.toastr.success(`Coverage deleted successfully`, 'Success');
+            this.dialogRef.close({ deleted: true });
+          },
+          error: (err) => {
+            console.error(err);
+            this.toastr.error('Failed to delete coverage', 'Error');
+          }
+        });
+      }
+      else {
+        console.log("failed to delete emergency, id: " + emergencyId);
+      }
+    }
+  }
+
+  get isDeleteEnabled(): boolean {
+    if (this.data.emergency?.name == "Home"
+      || this.data.emergency?.name == "Life"
+      || this.data.emergency?.name == "Health"
+      || this.data.emergency?.name == "Natural hazards"
+      || this.data.emergency?.name == "Will")
+      return false;
+    else
+      return true;
   }
 }

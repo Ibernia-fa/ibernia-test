@@ -317,7 +317,7 @@ export class EmergenciesComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe((res) => {
-      if (res?.status === 'Success') {
+      if (res?.status === 'Success' || res?.deleted) {
         // Reload list so updated values show
         this.load();
       }
