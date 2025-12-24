@@ -308,6 +308,7 @@ export class AddEmergenciesComponent {
   get isDeleteEnabled(): boolean {
     if (this.data.emergency?.name == "Home"
       || this.data.emergency?.name == "Life"
+      || this.data.emergency?.name == "Disability"
       || this.data.emergency?.name == "Health"
       || this.data.emergency?.name == "Natural hazards"
       || this.data.emergency?.name == "Will")

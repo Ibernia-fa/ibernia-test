@@ -275,7 +275,7 @@ export class EmergenciesComponent implements OnInit {
     if(e.type === 2)
     {
       const isNotDone = e.willStatus == 2;
-      return isNotDone ? 'danger-card' : 'home-card';
+      return isNotDone ? 'danger-card' : 'excellent-card';
     }
 
     return 'danger-card';
