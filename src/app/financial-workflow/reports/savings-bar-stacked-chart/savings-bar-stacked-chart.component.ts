@@ -2,10 +2,9 @@ import { Component, ViewChild, Input, OnChanges, SimpleChanges } from '@angular/
 import { MatCardModule } from '@angular/material/card';
 import { TablerIconsModule } from 'angular-tabler-icons';
 import { ChartComponent, NgApexchartsModule } from 'ng-apexcharts';
-import { ChartSeries } from '../models/charts-series.model';
+import { ChartSeries, TimelineEvent } from '../models/charts-series.model';
 import { Client } from 'src/app/clients/models/client';
 import moment from 'moment';
-import { Cashflow } from 'src/app/clients/models/cashflow';
 
 @Component({
   selector: 'app-savings-bar-stacked-chart',
@@ -24,21 +23,15 @@ export class SavingsBarStackedChartComponent implements OnChanges {
   @Input() forecastEndDate: Date;
   @Input() client: Client;
   @Input() cashFlowName: string;
+  isFullscreen: any;
 
-isFullscreen: any;
+  private readonly EVENT_DOT_SPACING = 20;
   public chartOptions: any;
-
-
-
-
-
-
+  events: TimelineEvent[] = [];
 
   constructor() {
     this.chartOptions = {
-      
-      series: [
-      ],
+      series: [],
       chart: {
         type: "bar",
         height: 500,
@@ -53,21 +46,21 @@ isFullscreen: any;
       dataLabels: {
         enabled: false
       },
-          tooltip: {
-      enabled: true,
-      shared: false, // or true if you want stacked values together
-      custom: (opts: any) => {
-        const { series, seriesIndex, dataPointIndex, w } = opts;
+      tooltip: {
+        enabled: true,
+        shared: false, // or true if you want stacked values together
+        custom: (opts: any) => {
+          const { series, seriesIndex, dataPointIndex, w } = opts;
 
-        const value = series[seriesIndex][dataPointIndex];
-        const seriesName = w.globals.seriesNames[seriesIndex];
-        const xValue = w.globals.labels[dataPointIndex];
-        // console.log('opts', opts, );
+          const value = series[seriesIndex][dataPointIndex];
+          const seriesName = w.globals.seriesNames[seriesIndex];
+          const xValue = w.globals.labels[dataPointIndex];
+          // console.log('opts', opts, );
           const color = w.globals.colors[seriesIndex];
 
-        const age = [(Math.floor(xValue) - moment(this.client.clientDetails.birthDate).year())]
-        // build whatever HTML you want here
-        return `
+          const age = [(Math.floor(xValue) - moment(this.client.clientDetails.birthDate).year())]
+          // build whatever HTML you want here
+          return `
           <div class="savings-tooltip">
             <div class="savings-tooltip__header">
               <div>Age: ${age} </div>  <div> Year: ${xValue}</div> 
@@ -79,8 +72,8 @@ isFullscreen: any;
             </div>
           </div>
         `;
-      }
-    },
+        }
+      },
       responsive: [
         {
           breakpoint: 480,
@@ -102,44 +95,15 @@ isFullscreen: any;
         show: true,
         xaxis: {
           lines: {
-              show: false
+            show: false
           }
-        },   
+        },
         yaxis: {
-            lines: {
-                show: true
-            }
-        }, 
+          lines: {
+            show: true
+          }
+        },
       },
-      // xaxis: {
-      //   type: 'numeric', // Treat x-axis as numbers (years)
-      //   min: 2023, // Start from 2023
-      //   max: 2123, // End at 2133 for a 100-year range
-      //   stepSize: 5, // Each year is a distinct tick
-      //   tickAmount: 19,
-      //   title: {
-      //     text: 'Age'
-      //   },
-      //   offsetX:-10,
-      //   style: {
-      //     cssClass: 'leftAlign'
-      //   },
-      //   labels: {
-      //     formatter: function(value: any) {
-      //       return [(Math.floor(value)-1993), Math.floor(value)]; // Ensure the year is displayed as an integer (remove fraction part)
-      //     }
-      //   }
-      // },
-      // yaxis: {
-      //   title: {
-      //     text: 'AED'
-      //   },
-      //   labels: {
-      //     formatter: function(value: any) {
-      //       return value?.toLocaleString();;
-      //     }
-      //   }
-      // },
       legend: {
         position: "top",
         offsetX: 100,
@@ -150,59 +114,57 @@ isFullscreen: any;
       fill: {
         opacity: 1,
       },
-    }; 
-  }  
-ngOnChanges(changes: SimpleChanges): void {
-  if (changes['report'] && this.report?.series?.length) {
-    const seriesList = this.report.series;
-    const seriesColors = this.chartOptions.colors || [];
-
-    // Dynamically build fillColors array based on series names
-    const fillColors = seriesList.map((s, i) => 
-      s.name === 'Current Account (Negative)' ? 'transparent' :  s.color
-    );
-    console.log(fillColors);
-    this.chartOptions.legend = {
-      ...this.chartOptions.legend,
-      formatter: (seriesName: string, opts: any) =>
-seriesName === 'Current Account (Negative)' ? '' : seriesName,
-      markers: {
-        fillColors: fillColors
-      },
-      onItemClick: {
-        toggleDataSeries: true
-      },
-      onItemHover: {
-        highlightDataSeries: true
-      }
+      annotations: { points: [] }
     };
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['report'] && this.report?.series?.length) {
+      const seriesList = this.report.series;
+      const seriesColors = this.chartOptions.colors || [];
+
+      // Dynamically build fillColors array based on series names
+      const fillColors = seriesList.map((s, i) =>
+        s.name === 'Current Account (Negative)' ? 'transparent' : s.color
+      );
+
+      this.chartOptions.legend = {
+        ...this.chartOptions.legend,
+        formatter: (seriesName: string) =>
+          seriesName === 'Current Account (Negative)' ? '' : seriesName,
+        markers: {
+          fillColors: fillColors
+        },
+        onItemClick: {
+          toggleDataSeries: true
+        },
+        onItemHover: {
+          highlightDataSeries: true
+        }
+      };
+
+      // goals and events dots
+      this.events = this.report.timelineEvents;
+      this.chartOptions.annotations = { points: this.buildEventAnnotations(this.events) };
+      setTimeout(() => this.attachHtmlTooltips(), 1000);
+    }
+
+    this.chartOptions.chart = { ...this.chartOptions.chart };
+
     if (changes['forecastStartDate'] || changes['forecastEndDate']) {
       this.chartOptions.xaxis = {
-         type: 'category', // Treat x-axis as numbers (years)
-         categories: this.report.categories,
-        // min: moment(this.forecastStartDate).year(), // Start from 2023
-        // max: moment(this.forecastEndDate).year(), // End at 2133 for a 100-year range
+        type: 'category', // Treat x-axis as numbers (years)
+        categories: this.report.categories,
         stepSize: 5, // Each year is a distinct tick
         tickAmount: Math.floor((moment(this.forecastEndDate).year() - moment(this.forecastStartDate).year()) / 5),
-        // title: {
-        //   text: 'Age'
-        // },
-        // offsetX:-10,
         style: {
           cssClass: 'leftAlign'
-        },
-        // labels: {
-        //   formatter: (value: any) => {
-        //     return [(Math.floor(value) - moment(this.client.clientDetails.birthDate).year()), Math.floor(value)]; // Ensure the year is displayed as an integer (remove fraction part)
-        //   }
-        // }
+        }
       }
     }
 
-    if(changes['client']) {
-      this.chartOptions.yaxis={
+    if (changes['client']) {
+      this.chartOptions.yaxis = {
         title: {
           text: this.client.clientDetails.preferredCurrency
         },
@@ -213,20 +175,91 @@ seriesName === 'Current Account (Negative)' ? '' : seriesName,
         }
       }
     }
-    
   }
 
+  buildEventAnnotations(events: TimelineEvent[]) {
+    const eventsByYear = new Map<string, TimelineEvent[]>();
+    const DOT_SPACING = 10;
+
+    events.forEach(event => {
+      const year = event.startYear.toString();
+      if (!eventsByYear.has(year)) eventsByYear.set(year, []);
+      eventsByYear.get(year)!.push(event);
+    });
+
+    const annotations: any[] = [];
+
+    eventsByYear.forEach((groupEvents, year) => {
+      groupEvents.forEach((event, index) => {
+        annotations.push({
+          x: year,
+          y: 0,
+          marker: {
+            size: 5,
+            fillColor: this.calculateDotColor(event.iconUrl),
+            strokeColor: '#fff',
+            strokeWidth: 2,
+            offsetY: -(index * DOT_SPACING),
+          },
+          label: { text: '' },
+          customTooltip: `
+            <div class="event-tooltip ${event.iconUrl}">
+              <img src="/assets/images/svgs/${event.iconUrl}.svg" alt="${event.iconUrl}" />
+              <span>${event.name}</span>
+            </div>`
+        });
+      });
+    });
+
+    return annotations;
+  }
+
+  private attachHtmlTooltips() {
+    document.querySelectorAll('.custom-html-tooltip').forEach(t => t.remove());
+
+    const markers = document.querySelectorAll<SVGElement>('.apexcharts-point-annotation-marker');
+
+    markers.forEach((marker, i) => {
+      const annotation = this.chartOptions.annotations.points[i];
+      if (!annotation?.customTooltip) return;
+
+      const tooltip = document.createElement('div');
+      tooltip.className = 'custom-html-tooltip';
+      tooltip.innerHTML = annotation.customTooltip;
+      tooltip.style.position = 'absolute';
+      tooltip.style.pointerEvents = 'none';
+      tooltip.style.display = 'none';
+      tooltip.style.whiteSpace = 'nowrap';
+      tooltip.style.zIndex = '9999';
+      document.body.appendChild(tooltip);
+
+      const rect = marker.getBoundingClientRect();
+
+      marker.addEventListener('mouseenter', () => {
+        tooltip.style.display = 'block';
+        tooltip.style.left = `${rect.x + window.scrollX - tooltip.offsetWidth / 2 + rect.width / 2}px`;
+        tooltip.style.top = `${rect.y + window.scrollY - tooltip.offsetHeight - 8}px`;
+      });
+
+      marker.addEventListener('mouseleave', () => tooltip.style.display = 'none');
+    });
+  }
+
+  private readonly ICON_COLORS: Record<string, string> = {
+    'birth-icon': '#feb63d',
+    'retirement-age-icon': '#ff8f6b',
+    'inheritance-icon': '#00d492',
+    'wedding-icon': '#7b3dfe',
+    'state-pension-icon': '#516ce8',
+    'home-icon': '#016aa2',
+    'travel-icon': '#363f72',
+    'car-icon': '#b93814',
+    'education-icon': '#3538cd',
+    'new-business-icon': '#b42318',
+    'boat-icon': '#047a48'
+  };
+
+  calculateDotColor(iconUrl: string): string {
+    return this.ICON_COLORS[iconUrl] ?? '#8388ff';
+  }
 }
-
-
-
-// export type ChartOptions = {
-//   series: ApexAxisChartSeries;
-//   chart: ApexChart;
-//   dataLabels: ApexDataLabels;
-//   plotOptions: ApexPlotOptions;
-//   responsive: ApexResponsive[];
-//   xaxis: ApexXAxis;
-//   legend: ApexLegend;
-//   fill: ApexFill;
-// };

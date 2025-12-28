@@ -1,9 +1,6 @@
 .apexcharts-text .apexcharts-xaxis-label {
-    text-anchor: start !important;
-  }
-  /* styles.scss */
-
-
+  text-anchor: start !important;
+}
 
 .apexcharts-tooltip .savings-tooltip__body {
   display: flex;
@@ -13,7 +10,7 @@
 
 .apexcharts-tooltip .savings-tooltip__label {
   font-weight: 500;
-    display: inline-flex;
+  display: inline-flex;
   align-items: center;
 }
 
@@ -21,5 +18,22 @@
   font-weight: 700;
 }
 
+.apexcharts-text .apexcharts-xaxis-label {
+  text-anchor: start !important;
+}
 
+.apexcharts-tooltip .savings-tooltip__body {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
 
+.apexcharts-tooltip .savings-tooltip__label {
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+}
+
+.apexcharts-tooltip .savings-tooltip__value {
+  font-weight: 700;
+}

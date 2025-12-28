@@ -1,19 +1,7 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
-import {
-  BehaviorSubject,
-  combineLatest,
-  combineLatestWith,
-  filter,
-  map,
-  Observable,
-  Subject,
-  switchMap,
-  take,
-  takeUntil,
-  tap,
-} from 'rxjs';
+import { BehaviorSubject, combineLatest, Observable, Subject, switchMap, tap } from 'rxjs';
 import { NavItemService } from 'src/app/layouts/full/nav-item.service';
 import { TimelineHttpService } from '../timeline/services/timeline-http.service';
 import { Client, Details } from 'src/app/clients/models/client';
@@ -150,7 +138,7 @@ const ELEMENT_DATA: PeriodicElement[] = [
     MatTableModule,
     CommonModule,
     MatTooltipModule,
-     ReactiveFormsModule  
+    ReactiveFormsModule
   ],
   templateUrl: './reports.component.html',
   styleUrl: './reports.component.scss',
@@ -174,32 +162,25 @@ export class ReportsComponent {
   savingPots: SavingPotsModel;
   incomeExpense: IncomeExpense;
   contributionWithdrawal: WithdrawalsContributions
-// in ReportsComponent class
-
-compareCashflow: Cashflow | null = null;
-compareReport: ChartSeries | null = null;
-compareTimeline: FinancialTimeline | null = null;
-isCompareLoading = false;
-
-  incomeDataSource: MatTableDataSource<FinancialViewModel> =
-    new MatTableDataSource(new Array<FinancialViewModel>());
-  expenseDataSource: MatTableDataSource<FinancialViewModel> =
-    new MatTableDataSource(new Array<FinancialViewModel>());
-
-  contributionDataSource: MatTableDataSource<FundsViewModel> =
-    new MatTableDataSource(new Array<FundsViewModel>());
-  withdrawalDataSource: MatTableDataSource<FundsViewModel> =
-    new MatTableDataSource(new Array<FundsViewModel>());
+  compareCashflow: Cashflow | null = null;
+  compareReport: ChartSeries | null = null;
+  compareTimeline: FinancialTimeline | null = null;
+  isCompareLoading = false;
+  incomeDataSource: MatTableDataSource<FinancialViewModel> = new MatTableDataSource(new Array<FinancialViewModel>());
+  expenseDataSource: MatTableDataSource<FinancialViewModel> = new MatTableDataSource(new Array<FinancialViewModel>());
+  contributionDataSource: MatTableDataSource<FundsViewModel> = new MatTableDataSource(new Array<FundsViewModel>());
+  withdrawalDataSource: MatTableDataSource<FundsViewModel> = new MatTableDataSource(new Array<FundsViewModel>());
   clientBirthDate: Date;
   report: ChartSeries;
   cashflows: Cashflow[] = [];
   savingsForm: FormGroup;
   userRerturnRate: number;
-      private destroy$ = new Subject<void>();
+  private destroy$ = new Subject<void>();
   client$: Observable<Client | null>;
   clientData: Details;
   @ViewChild('mainChart') mainChart?: SavingsBarStackedChartComponent;
   @ViewChild('compareChart') compareChart?: SavingsBarStackedChartComponent;
+
   constructor(
     private timelineHttpService: TimelineHttpService,
     private reportsHttpService: ReportsHttpService,
@@ -213,85 +194,56 @@ isCompareLoading = false;
     private toaster: ToastrService,
     private fb: FormBuilder,
     private dialog: MatDialog,
-         private settingsService: SettingsService,
-         private store: Store,
-             private fullscreenService: FullscreenService,
+    private settingsService: SettingsService,
+    private store: Store,
+    private fullscreenService: FullscreenService,
     private elementRef: ElementRef
-
   ) {
     this.destroyed$ = new BehaviorSubject<boolean>(false);
     this.navItemService.currentRouteName = 'Lifetime Plan';
-  this.savingsForm = this.fb.group({
-    returnRate: [0]
-  });
+    this.savingsForm = this.fb.group({ returnRate: [0] });
 
-  // this.settingsService.userData$
-  //   .pipe(
-  //     filter((v): v is NonNullable<typeof v> => v != null),
-  //     // we only need it once here
-  //     // (if you want to react to later changes too, remove take(1))
-  //     take(1)
-  //   )
-  //   .subscribe((data) => {
-  //     const p = data.preferences;
-  //     this.userRerturnRate = p.investmentReturn;
+    this.client$ = this.store.select(selectedClient);
+    this.client$
+      .subscribe(client => {
+        if (client) {
+          this.clientData = client.clientDetails;
+          this.savingsForm
+            .get('returnRate')
+            ?.setValue(this.clientData.inflationRate, { emitEvent: false });
+        }
 
-  //     this.savingsForm
-  //       .get('returnRate')
-  //       ?.setValue(this.userRerturnRate, { emitEvent: false });
-
-  //     // now that the form has the correct default, load everything
-  //     this.getData();
-  //   });
-                    this.client$ = this.store.select(selectedClient);
-                    this.client$
-                    .subscribe(client => {
-              if (client) {
-                this.clientData = client.clientDetails;
-                 this.savingsForm
-        .get('returnRate')
-        ?.setValue(this.clientData.inflationRate, { emitEvent: false });
-                
-              }
-      this.getData();
-
-            });
-
-
+        this.getData();
+      });
   }
 
-
-
-ngAfterViewInit(): void {
-    // Optional: Listen for fullscreen changes
-    this.fullscreenService.isFullscreen$.subscribe(isFullscreen => {
-      // You can handle any component-specific logic here
-    });
+  ngAfterViewInit(): void {
+    // Listen for fullscreen changes
+    this.fullscreenService.isFullscreen$.subscribe(isFullscreen => { });
   }
 
   enterFullscreen(isComparison = false): void {
     const chartData = {
       report: isComparison ? this.compareReport : this.report,
       client: this.client,
-      forecastStartDate: isComparison ? 
-        (this.compareTimeline?.forecastStartDate || this.financialTimeline.forecastStartDate) : 
+      forecastStartDate: isComparison ?
+        (this.compareTimeline?.forecastStartDate || this.financialTimeline.forecastStartDate) :
         this.financialTimeline.forecastStartDate,
-      forecastEndDate: isComparison ? 
-        (this.compareTimeline?.forecastEndtDate || this.financialTimeline.forecastEndtDate) : 
+      forecastEndDate: isComparison ?
+        (this.compareTimeline?.forecastEndtDate || this.financialTimeline.forecastEndtDate) :
         this.financialTimeline.forecastEndtDate,
-      cashFlowName: isComparison ? 
-        (this.compareTimeline?.cashflow?.name || this.financialTimeline?.cashflow?.name) : 
+      cashFlowName: isComparison ?
+        (this.compareTimeline?.cashflow?.name || this.financialTimeline?.cashflow?.name) :
         this.financialTimeline?.cashflow?.name,
       isComparison: isComparison
     };
-    
+
     this.fullscreenService.enterFullscreen(chartData);
   }
 
   ngOnDestroy(): void {
     this.fullscreenService.exitFullscreen();
   }
-
 
   getData() {
     this.isLoaderVisible = true;
@@ -308,7 +260,7 @@ ngAfterViewInit(): void {
         switchMap(([client, cashflow]) => {
           const clientId = (client as Client).id;
           const inflationRate =
-          this.savingsForm.get('returnRate')?.value;
+            this.savingsForm.get('returnRate')?.value;
           return combineLatest([
             this.savingPotsHttpService.getAllSavingsPots(
               (cashflow as Cashflow).id
@@ -358,63 +310,7 @@ ngAfterViewInit(): void {
       .subscribe();
   }
 
-// onComparePlansClicked() {
-//   if (!this.cashflows || this.cashflows.length < 2) {
-//     this.toaster.info(
-//       'You need at least two plans to compare. Please create another plan first',
-//       // 'Info'
-//     );
-//     return;
-//   }
-
-//   const dialogRef = this.dialog.open(CompareCashflowsComponent, {
-//     width: '700px',
-//     disableClose: true,
-//     data: {
-//       cashflows: this.cashflows,
-//       baseCashflowId: this.cashflow?.id,
-//     },
-//   });
-
-//   dialogRef.afterClosed().subscribe((selectedOtherId?: string) => {
-//     if (!selectedOtherId) {
-//       return; // dialog cancelled
-//     }
-
-//     const selected = this.cashflows.find(c => c.id === selectedOtherId) || null;
-//     if (!selected) {
-//       this.toaster.error('Selected plan not found', 'Error');
-//       return;
-//     }
-
-//     this.isCompareLoading = true;
-//     this.compareCashflow = null;
-//     this.compareReport = null;
-//     this.compareTimeline = null;
-
-//     combineLatest([
-//       this.reportsHttpService.getReportbyCashflowId(selectedOtherId),
-//       this.timelineHttpService.getTimelinebyCashflowId(selectedOtherId),
-//     ]).subscribe({
-//       next: ([report, timeline]) => {
-//         this.compareCashflow = selected;
-//         this.compareReport = report;
-//         this.compareTimeline = timeline;
-//         this.isCompareLoading = false;
-//       },
-//       error: (err) => {
-//         console.error('Failed to load comparison plan', err);
-//         this.toaster.error(
-//           'Failed to load comparison plan. Please try again',
-//           'Error'
-//         );
-//         this.isCompareLoading = false;
-//       },
-//     });
-//   });
-// }
-
-onReturnRateInput(event: Event) {
+  onReturnRateInput(event: Event) {
     // when typing, ensure the control holds a clean number so slider updates
     const raw = (event.target as HTMLInputElement).value;
     const num = Number(raw);
@@ -433,117 +329,111 @@ onReturnRateInput(event: Event) {
     return Math.round((n + Number.EPSILON) * 100) / 100;
   }
 
+  onReturnRateCommitted(): void {
+    const control = this.savingsForm.get('returnRate');
+    if (!control) return;
 
-onReturnRateCommitted(): void {
-  const control = this.savingsForm.get('returnRate');
-  if (!control) return;
+    const num = Number(control.value);
+    const val = isNaN(num) ? 0 : this.round2(num);
 
-  const num = Number(control.value);
-  const val = isNaN(num) ? 0 : this.round2(num);
+    // Normalise the value (e.g. 3.333 → 3.33)
+    control.setValue(val, { emitEvent: false });
 
-  // Normalise the value (e.g. 3.333 → 3.33)
-  control.setValue(val, { emitEvent: false });
-
-  // Make sure we have a cashflow loaded
-  if (!this.cashflow) {
-    return;
-  }
-
-  const cashflowId = this.cashflow.id;
-  const returnRate = val;
-
-
-  this.reportsHttpService
-    .getReportbyCashflowId(cashflowId, returnRate)  // <- you’ll update this service
-    .pipe(
-      tap((report) => {
-        this.report = report;
-      }),
-      // Optional: handle errors gracefully
-      // catchError(err => { console.error(err); return of(null); })
-    )
-    .subscribe();
-}
-
-exitComparison() {
-  this.compareCashflow = null;
-  this.compareReport = null;
-  this.compareTimeline = null;
-  this.isCompareLoading = false;
-}
-
-
-onComparePlansClicked() {
-  if (!this.cashflows || this.cashflows.length < 2) {
-    this.toaster.info(
-      'You need at least two plans to compare. Please create another plan first',
-      // 'Info'
-    );
-    return;
-  }
-
-  // If exactly 2 cashflows total, automatically compare with the other one
-  if (this.cashflows.length === 2 && this.cashflow) {
-    // Find the other cashflow (not the current one)
-    const otherCashflow = this.cashflows.find(c => c.id !== this.cashflow?.id);
-    
-    if (otherCashflow) {
-      this.loadComparisonPlan(otherCashflow.id, otherCashflow);
-      return; // Skip the dialog
-    }
-  }
-
-  // If more than 2 cashflows, show dialog to choose
-  const dialogRef = this.dialog.open(CompareCashflowsComponent, {
-    width: '700px',
-    disableClose: true,
-    data: {
-      cashflows: this.cashflows,
-      baseCashflowId: this.cashflow?.id,
-    },
-  });
-
-  dialogRef.afterClosed().subscribe((selectedOtherId?: string) => {
-    if (!selectedOtherId) {
-      return; // dialog cancelled
-    }
-
-    const selected = this.cashflows.find(c => c.id === selectedOtherId) || null;
-    if (!selected) {
-      this.toaster.error('Selected plan not found', 'Error');
+    // Make sure we have a cashflow loaded
+    if (!this.cashflow) {
       return;
     }
 
-    this.loadComparisonPlan(selectedOtherId, selected);
-  });
-}
+    const cashflowId = this.cashflow.id;
+    const returnRate = val;
 
-// Helper method to load comparison plan
-private loadComparisonPlan(cashflowId: string, cashflow: Cashflow): void {
-  this.isCompareLoading = true;
-  this.compareCashflow = null;
-  this.compareReport = null;
-  this.compareTimeline = null;
 
-  combineLatest([
-    this.reportsHttpService.getReportbyCashflowId(cashflowId),
-    this.timelineHttpService.getTimelinebyCashflowId(cashflowId),
-  ]).subscribe({
-    next: ([report, timeline]) => {
-      this.compareCashflow = cashflow;
-      this.compareReport = report;
-      this.compareTimeline = timeline;
-      this.isCompareLoading = false;
-    },
-    error: (err) => {
-      console.error('Failed to load comparison plan', err);
-      this.toaster.error(
-        'Failed to load comparison plan. Please try again',
-        'Error'
+    this.reportsHttpService
+      .getReportbyCashflowId(cashflowId, returnRate)
+      .pipe(
+        tap((report) => {
+          this.report = report;
+        })
+      )
+      .subscribe();
+  }
+
+  exitComparison() {
+    this.compareCashflow = null;
+    this.compareReport = null;
+    this.compareTimeline = null;
+    this.isCompareLoading = false;
+  }
+
+  onComparePlansClicked() {
+    if (!this.cashflows || this.cashflows.length < 2) {
+      this.toaster.info(
+        'You need at least two plans to compare. Please create another plan first'
       );
-      this.isCompareLoading = false;
-    },
-  });
-}
+      return;
+    }
 
+    // If exactly 2 cashflows total, automatically compare with the other one
+    if (this.cashflows.length === 2 && this.cashflow) {
+      // Find the other cashflow (not the current one)
+      const otherCashflow = this.cashflows.find(c => c.id !== this.cashflow?.id);
+
+      if (otherCashflow) {
+        this.loadComparisonPlan(otherCashflow.id, otherCashflow);
+        return; // Skip the dialog
+      }
+    }
+
+    // If more than 2 cashflows, show dialog to choose
+    const dialogRef = this.dialog.open(CompareCashflowsComponent, {
+      width: '700px',
+      disableClose: true,
+      data: {
+        cashflows: this.cashflows,
+        baseCashflowId: this.cashflow?.id,
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((selectedOtherId?: string) => {
+      if (!selectedOtherId) {
+        return; // dialog cancelled
+      }
+
+      const selected = this.cashflows.find(c => c.id === selectedOtherId) || null;
+      if (!selected) {
+        this.toaster.error('Selected plan not found', 'Error');
+        return;
+      }
+
+      this.loadComparisonPlan(selectedOtherId, selected);
+    });
+  }
+
+  // Helper method to load comparison plan
+  private loadComparisonPlan(cashflowId: string, cashflow: Cashflow): void {
+    this.isCompareLoading = true;
+    this.compareCashflow = null;
+    this.compareReport = null;
+    this.compareTimeline = null;
+
+    combineLatest([
+      this.reportsHttpService.getReportbyCashflowId(cashflowId),
+      this.timelineHttpService.getTimelinebyCashflowId(cashflowId),
+    ]).subscribe({
+      next: ([report, timeline]) => {
+        this.compareCashflow = cashflow;
+        this.compareReport = report;
+        this.compareTimeline = timeline;
+        this.isCompareLoading = false;
+      },
+      error: (err) => {
+        console.error('Failed to load comparison plan', err);
+        this.toaster.error(
+          'Failed to load comparison plan. Please try again',
+          'Error'
+        );
+        this.isCompareLoading = false;
+      },
+    });
+  }
 }
