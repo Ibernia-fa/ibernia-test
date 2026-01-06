@@ -74,6 +74,41 @@
         color: #747474;
       }
     }
+
+    .simulate-button-section {
+      margin-top: 33px; 
+    }
+
+    .simulate-button {
+      border-radius: 4px;
+      border: 1px solid #ffccd3 !important;
+      padding: 6px 10px;
+      font-size: 12px;
+      margin-right: 5px;
+      background: none;
+      color: #ff0000;
+      height: 35px;
+      width: auto;
+      height: inherit;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-family: "Ubuntu", serif;
+      line-height: normal;
+      font-size: 12px;
+      font-weight: 500;
+
+      mat-icon {
+        font-size: 20px;
+        margin-top: 2px;
+      }
+
+      &:hover {
+        background-color: #fff1f2;
+        cursor: pointer;
+      }
+    }
   }
 }
 
@@ -108,11 +143,11 @@
 }
 
 .will-done-text {
-  color:#006045;
+  color: #006045;
 }
 
 .danger-card {
-  background: #fff1f2; 
+  background: #fff1f2;
   border: 1px solid #ffccd3 !important;
 }
 
@@ -167,7 +202,7 @@
     line-height: 19px;
     font-weight: 700;
     white-space: nowrap;
-        display: flex;
+    display: flex;
     align-items: center;
     gap: 5px;
     // &.expense-income{
@@ -191,9 +226,9 @@
 }
 
 .ibernia-light-green {
-  color: #71bc42 !important ;
+  color: #71bc42 !important;
 }
 
 .ibernia-dark-green {
-  color: #00512C !important ;
+  color: #00512C !important;
 }

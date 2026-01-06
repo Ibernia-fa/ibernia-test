@@ -17,11 +17,7 @@ import { Cashflow } from 'src/app/clients/models/cashflow';
 import { IncomeExpensesHttpService } from './services/income-expenses-http.service';
 import { SettingsHttpService } from '../settings/services/settings-http.service';
 import { FinancialViewModel, IncomeExpense } from './model/income-expense';
-import {
-  Cycle,
-  EscalationRate,
-  FinancialTimeline,
-} from '../timeline/models/financial-timeline';
+import { Cycle, EscalationRate, FinancialTimeline } from '../timeline/models/financial-timeline';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { NavItemService } from 'src/app/layouts/full/nav-item.service';
 import { TimelineHttpService } from '../timeline/services/timeline-http.service';
@@ -132,6 +128,7 @@ export class IncomeExpensesComponent {
         amountCycles: this.amountCycles,
         eventsList: this.timeline.clientEvents.sort((a, b) => a.start.age - b.start.age),
         escalataionRates: this.escalationRates,
+        incomes: this.incomeExpense?.incomes,
         clientBirthDate: this.selectedClient?.clientDetails.birthDate,
         clientPreferredCurrency: this.selectedClient?.clientDetails.preferredCurrency,
         cashflowId: this.selectedCashflow?.id,
