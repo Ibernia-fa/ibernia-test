@@ -181,6 +181,7 @@ export class ReportsComponent {
   @ViewChild('mainChart') mainChart?: SavingsBarStackedChartComponent;
   @ViewChild('compareChart') compareChart?: SavingsBarStackedChartComponent;
   hasShortfall: boolean = false;
+  firstShortfallAge: number | null = null;
 
   constructor(
     private timelineHttpService: TimelineHttpService,
@@ -218,23 +219,21 @@ export class ReportsComponent {
     }
 
   getShortfallStatus(report: ChartSeries) {  
-    if (!report?.series?.length) {
-      this.hasShortfall = false;
-      return;
-    }
+   this.hasShortfall = false;
+  this.firstShortfallAge = null;
 
-    const hasShortfall = report?.series?.some(
-    s => s.name === 'Shortfall' && s.data?.some(d => d < 0)
-  );
+  const shortfallSeries = report?.series?.find(s => s.name === 'Shortfall');
+  if (!shortfallSeries) return;
 
-  if (!hasShortfall) {
-    console.log('No Shortfall in report data.');
-    this.hasShortfall = false;
-    return;
-  }
+  const index = shortfallSeries.data.findIndex(v => v < 0);
+  if (index < 0) return;
 
-  console.log('Shortfall found in report data.');
-    this.hasShortfall = true;
+  this.hasShortfall = true;
+
+  const year = Number(report.categories[index]);
+  const birthYear = new Date(this.client.clientDetails.birthDate).getFullYear();
+
+  this.firstShortfallAge = year - birthYear;
   }
 
   ngAfterViewInit(): void {
