@@ -180,6 +180,8 @@ export class ReportsComponent {
   clientData: Details;
   @ViewChild('mainChart') mainChart?: SavingsBarStackedChartComponent;
   @ViewChild('compareChart') compareChart?: SavingsBarStackedChartComponent;
+  hasShortfall: boolean = false;
+  firstShortfallAge: number | null = null;
 
   constructor(
     private timelineHttpService: TimelineHttpService,
@@ -212,9 +214,26 @@ export class ReportsComponent {
             .get('returnRate')
             ?.setValue(this.clientData.inflationRate, { emitEvent: false });
         }
-
         this.getData();
       });
+    }
+
+  getShortfallStatus(report: ChartSeries) {  
+   this.hasShortfall = false;
+  this.firstShortfallAge = null;
+
+  const shortfallSeries = report?.series?.find(s => s.name === 'Shortfall');
+  if (!shortfallSeries) return;
+
+  const index = shortfallSeries.data.findIndex(v => v < 0);
+  if (index < 0) return;
+
+  this.hasShortfall = true;
+
+  const year = Number(report.categories[index]);
+  const birthYear = new Date(this.client.clientDetails.birthDate).getFullYear();
+
+  this.firstShortfallAge = year - birthYear;
   }
 
   ngAfterViewInit(): void {
@@ -278,6 +297,7 @@ export class ReportsComponent {
               (cashflow as Cashflow).id,
               inflationRate
             ),
+           
             this.cashflowHttpService.getByClientId(clientId),
           ]);
         }),
@@ -304,6 +324,8 @@ export class ReportsComponent {
           );
 
           this.report = report
+          this.getShortfallStatus(report);
+          console.log('Report data loaded:', report);
           this.isLoaderVisible = false;
         })
       )
@@ -353,6 +375,8 @@ export class ReportsComponent {
       .pipe(
         tap((report) => {
           this.report = report;
+          this.getShortfallStatus(report);
+          console.log('Report data loaded:', report);
         })
       )
       .subscribe();

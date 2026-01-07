@@ -44,13 +44,44 @@
   </mat-card>
   <mat-card class="cardWithShadow ">
     <mat-card-content style="padding-bottom: 10px !important;">
+      <div class="icon-financial-label">
       <ng-container *ngIf="!compareReport || !compareCashflow">
         <button matTooltip="Full screen" class="button-full-screen" (click)="enterFullscreen()">
           <img width="16" src="../../../assets/images/svgs/full-screen.svg" alt="">
         </button>
       </ng-container>
 
-      <div class="d-flex flex-column gap-32">
+      <div class="shortfall" *ngIf="report">
+            <ng-container *ngIf="!hasShortfall; else lossTpl">
+              <div class="shortfall-status-profit">
+                <span class="icon-bg leaf-bg">
+                  <img
+                    src="../../../assets/images/svgs/leaf.svg"
+                    alt="leaf"
+                    class="icon-svg"
+                  />
+                </span>
+                <span class="status-text">Goals on track and funded</span>
+              </div>
+            </ng-container>
+            <ng-template #lossTpl>
+              <div class="shortfall-status-loss">
+                <span class="icon-bg flag-bg">
+                  <img
+                    src="../../../assets/images/svgs/triangle-flag.svg"
+                    alt="flag"
+                    class="icon-svg"
+                  />
+                </span>
+                <span class="status-text">
+                  Savings hit zero at {{ firstShortfallAge }}
+                </span>
+              </div>
+            </ng-template>
+      </div>
+      </div>
+
+      <div class="chart-component-wrapper">
 
         <app-savings-bar-stacked-chart [report]="report" [client]="client"
           [forecastStartDate]="financialTimeline.forecastStartDate"
