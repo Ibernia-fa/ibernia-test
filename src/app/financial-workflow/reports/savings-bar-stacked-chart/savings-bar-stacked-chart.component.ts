@@ -106,6 +106,7 @@ export class SavingsBarStackedChartComponent implements OnChanges {
       },
       legend: {
         position: "top",
+        horizontalAlign: "right",
         offsetX: 100,
         fillColors: ['#4CAF50', '#8BC34A', '#FF5722', '#FF5700'],
         showForZeroSeries: false,

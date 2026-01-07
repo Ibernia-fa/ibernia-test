@@ -180,6 +180,7 @@ export class ReportsComponent {
   clientData: Details;
   @ViewChild('mainChart') mainChart?: SavingsBarStackedChartComponent;
   @ViewChild('compareChart') compareChart?: SavingsBarStackedChartComponent;
+  hasShortfall: boolean = false;
 
   constructor(
     private timelineHttpService: TimelineHttpService,
@@ -212,9 +213,28 @@ export class ReportsComponent {
             .get('returnRate')
             ?.setValue(this.clientData.inflationRate, { emitEvent: false });
         }
-
         this.getData();
       });
+    }
+
+  getShortfallStatus(report: ChartSeries) {  
+    if (!report?.series?.length) {
+      this.hasShortfall = false;
+      return;
+    }
+
+    const hasShortfall = report?.series?.some(
+    s => s.name === 'Shortfall' && s.data?.some(d => d < 0)
+  );
+
+  if (!hasShortfall) {
+    console.log('No Shortfall in report data.');
+    this.hasShortfall = false;
+    return;
+  }
+
+  console.log('Shortfall found in report data.');
+    this.hasShortfall = true;
   }
 
   ngAfterViewInit(): void {
@@ -278,6 +298,7 @@ export class ReportsComponent {
               (cashflow as Cashflow).id,
               inflationRate
             ),
+           
             this.cashflowHttpService.getByClientId(clientId),
           ]);
         }),
@@ -304,6 +325,8 @@ export class ReportsComponent {
           );
 
           this.report = report
+          this.getShortfallStatus(report);
+          console.log('Report data loaded:', report);
           this.isLoaderVisible = false;
         })
       )
@@ -353,6 +376,8 @@ export class ReportsComponent {
       .pipe(
         tap((report) => {
           this.report = report;
+          this.getShortfallStatus(report);
+          console.log('Report data loaded:', report);
         })
       )
       .subscribe();
