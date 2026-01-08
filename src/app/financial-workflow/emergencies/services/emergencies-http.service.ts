@@ -29,8 +29,4 @@ export class EmergenciesHttpService {
   simulateEmergency(simulateEmergency: SimulateEmergencyModel) {
     return this.http.post<any>(`${this.baseUrl}/simulate`, simulateEmergency);
   }
-
-  getEmergencyExpense(emergencyId: string) {
-    return this.http.get<any>(`${this.baseUrl}/simulate/${emergencyId}`);
-  }
 }

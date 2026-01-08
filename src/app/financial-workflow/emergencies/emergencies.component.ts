@@ -32,6 +32,7 @@ import { TimelineHttpService } from '../timeline/services/timeline-http.service'
 import { IncomeExpensesHttpService } from '../income-expenses/services/income-expenses-http.service';
 import { DestroyRef, EnvironmentInjector, inject, runInInjectionContext } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { SimulateEmergencyModel } from './models/simulate-emergency.model';
 
 @Component({
   selector: 'app-emergencies',
@@ -473,6 +474,8 @@ export class EmergenciesComponent implements OnInit {
   }
 
   simulateEmergency(emergency: Emergency) {
+    const emergencyExpense = this.stats?.emergencyExpenses?.find(x => x.emergencyId == emergency.id) ?? null;
+     
     const dialogRef = this.dialog.open(SimulateEmergencyComponent, {
       width: '700px',
       disableClose: true,
@@ -482,6 +485,7 @@ export class EmergenciesComponent implements OnInit {
         clientPreferredCurrency: this.clientData?.preferredCurrency,
         clientBirthDate: this.clientData?.birthDate,
         emergency,
+        emergencyExpense,
         amountCycles: this.amountCyclesAll,
         escalationRates: this.escalationRates,
         eventsList: this.timeline.clientEvents.sort((a, b) => a.start.age - b.start.age),
@@ -491,6 +495,25 @@ export class EmergenciesComponent implements OnInit {
         forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
         forecastStartDateYear: moment(this.timeline.forecastStartDate).year()
       },
+    });
+
+    dialogRef.afterClosed()
+    .subscribe((updatedExpense: SimulateEmergencyModel | null) => {
+      if (!updatedExpense) return;
+
+      if (this.stats != null)
+      {
+        this.stats.emergencyExpenses??= [];
+
+        const index = 
+          this.stats?.emergencyExpenses.findIndex(x => x.emergencyId === updatedExpense.emergencyId) ?? -1;
+
+        if (index > -1) {
+          this.stats.emergencyExpenses[index] = updatedExpense;
+        } else {
+          this.stats?.emergencyExpenses.push(updatedExpense);
+        }
+      }
     });
   }
 }

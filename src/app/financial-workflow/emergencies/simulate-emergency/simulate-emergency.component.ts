@@ -1,4 +1,3 @@
-
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -73,6 +72,7 @@ export class SimulateEmergencyComponent {
   clientViewModel: ClientViewModel;
   cashflow: Cashflow;
   emergency: Emergency;
+  emergencyExpense: SimulateEmergencyModel | null;
   clientBirthDate: Date;
   forecastEndDate: Date;
   forecastStartDate: Date;
@@ -92,7 +92,8 @@ export class SimulateEmergencyComponent {
     timelineEvents: any[];
   } | null = null;
   existingEmergencyId: string | null = null;
-
+  isUpdateParentItem = false;
+  
   constructor(
     private dialogRef: MatDialogRef<SimulateEmergencyComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
@@ -115,6 +116,7 @@ export class SimulateEmergencyComponent {
     this.forecastEndDateYear = data.forecastEndDateYear;
     this.forecastStartDateYear = data.forecastStartDateYear;
     this.emergency = data.emergency;
+    this.emergencyExpense = data.emergencyExpense;
 
     this.clientBirthYear = moment(this.clientBirthDate).year();
     const birthDate = new Date(this.clientBirthDate);
@@ -174,13 +176,9 @@ export class SimulateEmergencyComponent {
         incomeControl?.updateValueAndValidity();
       });
 
-    if (this.emergency?.id) {
-      this.loadExistingEmergencyExpense(this.emergency.id);
+    if (this.emergencyExpense) {
+      this.populateForm(this.emergencyExpense);
     }
-  }
-
-  closeDialog(): void {
-    this.dialogRef.close();
   }
 
   onCycleValueChange(event: any) {
@@ -318,12 +316,28 @@ export class SimulateEmergencyComponent {
             this.activeTab = 'simulated';
             this.dialogRef.updateSize('92vw', '88vh');
             this.isSimulationCompleted = true;
+
+            this.emergencyExpense = simulateEmergency;
+            this.emergencyExpense.id = res.emergencyExpenseId;
+
+            console.log(this.emergencyExpense.id);
+
+            this.isUpdateParentItem = true;
           },
           error: (err: any) => {
             console.error(err);
             this.toastr.error('Failed to simulate cover', 'Error');
           }
         });
+    }
+  }
+
+  closeDialog(): void {
+    if (this.isUpdateParentItem) {
+      this.dialogRef.close(this.emergencyExpense);
+    }
+    else { 
+      this.dialogRef.close();
     }
   }
 
@@ -359,21 +373,6 @@ export class SimulateEmergencyComponent {
       }
       return null;
     };
-  }
-
-  private loadExistingEmergencyExpense(emergencyId: string): void {
-    this.emergenciesHttpService
-      .getEmergencyExpense(emergencyId)
-      .subscribe({
-        next: (expense) => {
-          if (!expense) return;
-
-          this.populateForm(expense);
-        },
-        error: () => {
-          // silently ignore – simulation can still be created
-        }
-      });
   }
 
   private populateForm(expense: any): void {

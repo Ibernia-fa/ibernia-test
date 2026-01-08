@@ -1,4 +1,5 @@
-// ---- Models (lightweight, aligned with your response) ----
+import { SimulateEmergencyModel } from "./simulate-emergency.model";
+
 export interface CycleRef {
   id: string | null;
   description: string | null;
@@ -18,12 +19,12 @@ export interface LookupItem {
 
 export interface Emergency {
   id: string;
-  type: number;                // 1 = Insurance, 2 = Will
-  policyStatus: number;        // e.g., 1 = Covered
+  type: number;
+  policyStatus: number;
   insuranceCost: Money;
   coverage: number;
-  coverageAdequacy: number;    // 1 Basic, 2 Good, 3 Excellent
-  willStatus: number;          // 1 Done, 2 NotDone
+  coverageAdequacy: number;
+  willStatus: number;
   name: string;
   iconUrl: string;
   isHidden: boolean;
@@ -44,6 +45,7 @@ export interface StatsAndLookupData {
   coverageAdequacies: LookupItem[];
   insuranceCost: Money;
   willStatuses: LookupItem[];
+  emergencyExpenses: SimulateEmergencyModel[];
 }
 
 export interface EmergenciesResponse {
@@ -53,8 +55,5 @@ export interface EmergenciesResponse {
 
 // Use the same shape as Emergency, but without the mandatory id.
 // Backend can generate id / timestamps.
-export type CreateEmergencyRequest = Omit<
-  Emergency,
-  'id' | 'createdAt' | 'updatedAt'
->;
+export type CreateEmergencyRequest = Omit<Emergency, 'id' | 'createdAt' | 'updatedAt'>;
 
