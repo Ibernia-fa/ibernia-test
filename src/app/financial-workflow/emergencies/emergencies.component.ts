@@ -477,8 +477,8 @@ export class EmergenciesComponent implements OnInit {
       width: '700px',
       disableClose: true,
       data: {
-        cashflowId: this.cashflowId,
         client: this.selectedClient,
+        cashflow: this.selectedCashflow,
         clientPreferredCurrency: this.clientData?.preferredCurrency,
         clientBirthDate: this.clientData?.birthDate,
         emergency,

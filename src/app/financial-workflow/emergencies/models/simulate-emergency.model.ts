@@ -1,3 +1,5 @@
+import { CashflowViewModel } from "src/app/clients/models/cashflow";
+import { ClientViewModel } from "src/app/clients/models/client";
 import { AgeYear, EscalationRate, NetAmount } from "../../timeline/models/financial-timeline";
 
 export interface SimulateEmergencyModel {
@@ -9,5 +11,7 @@ export interface SimulateEmergencyModel {
     escalationRate: EscalationRate | null; 
     stopIncome: boolean,
     stoppedIncomeId: string | null,
-    cashflowId: string
+    emergencyId: string,
+    client: ClientViewModel;
+    cashflow: CashflowViewModel;
 }

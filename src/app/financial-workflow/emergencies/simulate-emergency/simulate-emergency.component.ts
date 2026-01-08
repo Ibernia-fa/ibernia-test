@@ -15,8 +15,10 @@ import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 import moment from 'moment';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
+import { ToastrService } from 'ngx-toastr';
 import { allCountries } from 'src/app/clients/models/country';
-import { Client } from 'src/app/clients/models/client';
+import { Client, ClientViewModel } from 'src/app/clients/models/client';
+import { Cashflow } from 'src/app/clients/models/cashflow';
 import { Emergency } from '../models/emergencies.model';
 import { FinancialViewModel } from '../../income-expenses/model/income-expense';
 import { Cycle, EscalationRate, FinancialTimeline } from '../../timeline/models/financial-timeline';
@@ -67,15 +69,16 @@ export class SimulateEmergencyComponent {
   clientPreferredCurrency: string;
   eventsList: any;
   incomes: FinancialViewModel[];
-  cashflowId!: string;
   client: Client;
+  clientViewModel: ClientViewModel;
+  cashflow: Cashflow;
   emergency: Emergency;
   clientBirthDate: Date;
   forecastEndDate: Date;
   forecastStartDate: Date;
   forecastEndDateYear: number;
   forecastStartDateYear: number;
-  
+
   isSimulationCompleted = false;
   activeTab: 'baseline' | 'simulated' = 'simulated';
   baselineResult: {
@@ -88,21 +91,24 @@ export class SimulateEmergencyComponent {
     categories: string[];
     timelineEvents: any[];
   } | null = null;
+  existingEmergencyId: string | null = null;
 
   constructor(
     private dialogRef: MatDialogRef<SimulateEmergencyComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private fb: FormBuilder,
-    private emergenciesHttpService: EmergenciesHttpService
+    private emergenciesHttpService: EmergenciesHttpService,
+    private toastr: ToastrService
   ) {
     this.client = data.client;
+    this.cashflow = data.cashflow;
+    this.clientViewModel = data.cashflow.client;
     this.amountCycles = data.amountCycles;
     this.escalationRates = data.escalationRates;
     this.timeline = data.timeline;
     this.eventsList = data.eventsList;
     this.incomes = data.incomes;
     this.clientPreferredCurrency = data.clientPreferredCurrency;
-    this.cashflowId = data.cashflowId;
     this.clientBirthDate = data.clientBirthDate;
     this.forecastEndDate = data.forecastEndDate;
     this.forecastStartDate = data.forecastStartDate;
@@ -167,6 +173,10 @@ export class SimulateEmergencyComponent {
 
         incomeControl?.updateValueAndValidity();
       });
+
+    if (this.emergency?.id) {
+      this.loadExistingEmergencyExpense(this.emergency.id);
+    }
   }
 
   closeDialog(): void {
@@ -238,7 +248,7 @@ export class SimulateEmergencyComponent {
       const stoppedIncomeId = this.simulateEmergencyForm.get('stoppedIncomeId')?.value;
 
       var simulateEmergency: SimulateEmergencyModel = {
-        id: null,
+        id: this.existingEmergencyId,
         description: "",
         amount: {
           amount: this.simulateEmergencyForm.get('amount')?.value,
@@ -286,13 +296,15 @@ export class SimulateEmergencyComponent {
           },
         stopIncome: stopIncome,
         stoppedIncomeId: stopIncome ? stoppedIncomeId : null,
-        cashflowId: this.cashflowId
+        emergencyId: this.emergency.id,
+        client: this.clientViewModel,
+        cashflow: this.cashflow
       };
 
       this.emergenciesHttpService.simulateEmergency(simulateEmergency)
         .subscribe({
           next: (res: any) => {
-            if (!res || !res.baseline || !res.simulated || 
+            if (!res || !res.baseline || !res.simulated ||
               !res.baseline?.series || !res.baseline?.categories ||
               !res.simulated?.series || !res.simulated?.categories) {
               return;
@@ -303,16 +315,13 @@ export class SimulateEmergencyComponent {
             // simulated.timelineEvents = null;
             this.simulationResult = simulated;
 
-            // console.log(this.baselineResult);
-            // console.log(this.simulationResult);
-                
             this.activeTab = 'simulated';
             this.dialogRef.updateSize('92vw', '88vh');
             this.isSimulationCompleted = true;
           },
           error: (err: any) => {
             console.error(err);
-            // this.toastr.error('Failed to update cover', 'Error');
+            this.toastr.error('Failed to simulate cover', 'Error');
           }
         });
     }
@@ -350,5 +359,51 @@ export class SimulateEmergencyComponent {
       }
       return null;
     };
+  }
+
+  private loadExistingEmergencyExpense(emergencyId: string): void {
+    this.emergenciesHttpService
+      .getEmergencyExpense(emergencyId)
+      .subscribe({
+        next: (expense) => {
+          if (!expense) return;
+
+          this.populateForm(expense);
+        },
+        error: () => {
+          // silently ignore – simulation can still be created
+        }
+      });
+  }
+
+  private populateForm(expense: any): void {
+    this.existingEmergencyId = expense.id ?? null;
+    const cycleId = expense.amount?.cycle?.id ?? this.amountCycles[0].id;
+
+    this.simulateEmergencyForm.patchValue({
+      cycle: cycleId,
+      amount: expense.amount?.amount ?? 0,
+      start: expense.start?.year ?? null,
+      end: expense.end?.year ?? null,
+      escalationRate: expense.escalationRate?.value ?? this.escalationRates[0]?.value,
+      stopIncome: expense.stopIncome ?? false
+    });
+
+    this.selectedEscalationDescription = expense.escalationRate?.description ?? '';
+    if (expense.escalationRate?.description === 'Increases at custom rate') {
+      this.simulateEmergencyForm.patchValue({
+        customEscalationRate: expense.escalationRate.value
+      });
+    }
+
+    this.onCycleValueChange(cycleId);
+
+    if (expense.stopIncome) {
+      this.simulateEmergencyForm.patchValue({
+        stoppedIncomeId: expense.stoppedIncomeId ?? null
+      });
+    }
+
+    this.simulateEmergencyForm.updateValueAndValidity();
   }
 }
