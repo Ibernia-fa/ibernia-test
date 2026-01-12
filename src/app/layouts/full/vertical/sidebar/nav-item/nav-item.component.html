@@ -3,7 +3,8 @@
 [ngClass]="navItem.currentRouteName === item.displayName ? 'activeMenu' : ''"
 >
   <img style="width: 18px;" src="assets/images/svgs/inheritance-icon.svg" alt="cash-flow">
-  <span>{{ item.navCap }}</span>
+  <!-- <span>{{ item.navCap }}</span> -->
+  <span>{{ 'Lifetime Plan' | translate }}</span>
 </a>
 } @if(!item.navCap && !item.external && !item.twoLines) {
 <a mat-list-item (click)="onItemSelected(item)" [disableRipple]="true" [ngClass]="{

@@ -123,7 +123,7 @@
     "Boat": "Boat",
     "Custom": "Custom",
     "Type": "Type",
-    "Net Amount": "Net Amount",
+    "Net amount": "Net amount",
     "One-off": "One-off",
     "Every month": "Every month",
     "Every year": "Every year",
@@ -275,9 +275,15 @@
     "Sending...": "Sending...",
     "Income": "Income",
     "Expense": "Expense",
+    "Custom escalation rate": "Custom escalation rate",
+    "Enter custom rate": "Enter custom rate",
+    "State Pension": "State Pension",
 
     "ADD_EVENT": {
       "SELECT_EVENT_TYPE_TOOLTIP": "Select the type of life event or goal you want to create (for example, 'Home', 'New car' or 'Education').",
-      "EVENT_TYPE_TOOLTIP": "Choose whether this event represents an Income (money coming in) or an Expense (money going out)."
+      "EVENT_TYPE_TOOLTIP": "Choose whether this event represents an Income (money coming in) or an Expense (money going out).",
+      "ENTER_AMOUNT_TOOLTIP": "Enter the amount linked to this event. Use the dropdown to define how often it occurs (e.g., every month, every year, or one-off).",
+      "DEFINE_EVENT_PERIOD_TOOLTIP": "Define when this event starts and, if applicable, when it ends. Ibernia will include this period in the client’s cashflow projection.",
+      "AMOUNT_GROWTH_TOOLTIP": "Defines how this amount will evolve over time. You can choose to: Keep it fixed (the amount stays the same each year), Match inflation (it increases automatically based on the default inflation rate set in Preferences), or Apply a custom rate (you decide the exact yearly percentage change). This setting helps make projections more realistic by accounting for rising costs or expected income growth."
     }
 }

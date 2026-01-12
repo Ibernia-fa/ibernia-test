@@ -40,17 +40,17 @@
 
   <!-- Modal tabs  -->
   <div class="d-flex flex-column gap-8 tab">
-    <span class="f-s-16 f-w-400">Type</span>
+    <span class="f-s-16 f-w-400">{{ 'Type' | translate}}</span>
     <div class="tabs">
       <div class="row">
         <div class="col-6">
           <button class="button-icon w-100" [class]="{ active: isIncomeEvent }">
-            <span  [class]="{ active: isIncomeEvent }">Income</span>
+            <span  [class]="{ active: isIncomeEvent }">{{ 'Income' | translate }}</span>
           </button>
         </div>
         <div class="col-6">
           <button class="button-icon w-100" [class]="{ active: !isIncomeEvent }">
-            <span  [class]="{ active: !isIncomeEvent }">Expense</span>
+            <span  [class]="{ active: !isIncomeEvent }">{{ 'Expense' | translate }}</span>
           </button>
         </div>
       </div>
@@ -115,7 +115,7 @@
     <!-- End Net Amount Field  -->
     <div class="w-100 form-field gap-8">
       <div class="d-flex gap-4 align-items-center">
-        <mat-label class="f-s-16 f-w-400 d-block">Date</mat-label>
+        <mat-label class="f-s-16 f-w-400 d-block">{{ 'Date' | translate}}</mat-label>
 
         <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
       </div>
@@ -149,7 +149,7 @@
     </div>
     <div class="col-5">
       <button (click)="onInsuranceEventSubmit()" class="button-icon w-100 d-block">
-        <span class="f-s-16">Save</span>
+        <span class="f-s-16">{{ 'Save' | translate }}</span>
       </button>
     </div>
   </div>
@@ -162,7 +162,7 @@
 <div class="d-flex flex-column gap-32">
   <!-- Modal Header  -->
   <div class="d-flex align-items-center justify-content-between gap-10 modal-header">
-    <h3>State Pension</h3>
+    <h3>{{ 'State Pension' | translate}}</h3>
     <button (click)="closeDialog()" type="button">
       <img src="assets/images/svgs/close-line-cion.svg" alt="close-line-cion" />
     </button>
@@ -173,17 +173,17 @@
   <div [formGroup]="eventForm" class="d-flex flex-column gap-20">
     <!-- Modal tabs  -->
     <div class="d-flex flex-column gap-8 tab">
-      <span class="f-s-16 f-w-400">Type</span>
+      <span class="f-s-16 f-w-400">{{ 'Type' | translate}}</span>
       <div class="tabs">
         <div class="row">
           <div class="col-6">
             <button class="button-icon w-100" [class]="{ active: isIncomeEvent }">
-              <span  [class]="{ active: isIncomeEvent }">Income</span>
+              <span  [class]="{ active: isIncomeEvent }">{{ 'Income' | translate }}</span>
             </button>
           </div>
           <div class="col-6">
             <button class="button-icon w-100" [class]="{ active: !isIncomeEvent }">
-              <span  [class]="{ active: !isIncomeEvent }">Expense</span>
+              <span  [class]="{ active: !isIncomeEvent }">{{ 'Expense' | translate }}</span>
             </button>
           </div>
         </div>
@@ -193,7 +193,7 @@
 
     <!-- Net Amount Field  -->
     <div class="d-flex flex-column gap-8 net-fields">
-      <span class="f-s-16 f-w-400">>{{ 'Net amount' | translate }}<</span>
+      <span class="f-s-16 f-w-400">{{ 'Net amount' | translate }}</span>
       <div class="net-field d-flex align-items-center">
         <!-- Currency Selector  -->
         <div class="left hide-arrow">
@@ -254,7 +254,7 @@
         <div class="d-flex gap-4 align-items-center">
           @if(eventForm.get('cycle')?.value ==='One-off')
           {
-            <mat-label class="f-s-16 f-w-400 d-block">Date</mat-label>  
+            <mat-label class="f-s-16 f-w-400 d-block">{{ 'Date' | translate }}</mat-label>  
           }
           @else 
           {
@@ -525,7 +525,8 @@
         <!-- Net Amount Field  -->
         <div class="d-flex flex-column gap-8 net-fields">
       <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Net amount' | translate }}
-            <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4" matTooltip="Enter the amount linked to this event. Use the dropdown to define how often it occurs (e.g., every month, every year, or one-off).">
+            <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4" matTooltip="{{ 'ADD_EVENT.ENTER_AMOUNT_TOOLTIP' | translate }}
+">
         </mat-label>
 
           <div class="net-field d-flex align-items-center">
@@ -590,9 +591,10 @@
             <div class="d-flex gap-4 align-items-center">
 
             <mat-label class="f-s-16 f-w-400 d-block">
-              {{ eventForm.get('cycle')?.value === 'One-off' ? 'Date' : 'Start & end' }}
+              {{ (eventForm.get('cycle')?.value === 'One-off' ? 'Date' : 'Start & end') | translate  }}
             </mat-label>
-         <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4" matTooltip="Define when this event starts and, if applicable, when it ends. Ibernia will include this period in the client’s cashflow projection.">
+         <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4" matTooltip="{{ 'ADD_EVENT.DEFINE_EVENT_PERIOD_TOOLTIP' | translate }}
+">
 
 
 
@@ -668,16 +670,8 @@
           <div class="w-100 d-flex flex-column gap-20">
             <div class="d-flex flex-column gap-8">
             <div class="d-flex gap-4 align-items-center">
-              <mat-label class="f-s-16 f-w-400 d-block">Escalation rate</mat-label>
-                      <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4" matTooltip="         Defines how this amount will evolve over time. You can choose to:
-Keep it fixed (the amount stays the same each year),
-Match inflation (it increases automatically based on the default inflation rate set in Preferences), or
-Apply a custom rate (you decide the exact yearly percentage change).
-This setting helps make projections more realistic by accounting for rising costs or expected income growth.">
-
-
-     
-
+              <mat-label class="f-s-16 f-w-400 d-block">{{ 'Escalation rate' | translate}}</mat-label>
+                      <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4" matTooltip="         {{ 'ADD_EVENT.AMOUNT_GROWTH_TOOLTIP' | translate }}">
             </div>
             <div class="position-relative">
               <div class="w-100 form-field">
@@ -699,14 +693,14 @@ This setting helps make projections more realistic by accounting for rising cost
             </div>
                     @if(selectedEscalationDescription === 'Increases at custom rate') {
           <div class="w-100 d-flex flex-column    gap-8">
-            <mat-label class="f-s-16 d-block">Custom escalation rate</mat-label>
+            <mat-label class="f-s-16 d-block">{{ 'Custom escalation rate' | translate }}</mat-label>
             <mat-form-field  appearance="outline" class="w-full w-100 percentage-icon">
               <span matSuffix>%</span> 
                 <input
                               matInput
                               type="number"
                               formControlName="customEscalationRate"
-                              placeholder="Enter custom rate"
+                              placeholder="{{ 'Enter custom rate' | translate}}"
                             />
                             
               </mat-form-field>
@@ -734,7 +728,7 @@ This setting helps make projections more realistic by accounting for rising cost
       </div>
       <div class="col-5">
         <button (click)="onCustomEventSubmit()" [disabled]="eventForm.invalid" class="button-icon w-100 d-block">
-          <span class="f-s-16">Save</span>
+          <span class="f-s-16">{{ 'Save' | translate }}</span>
         </button>
       </div>
     </div>
