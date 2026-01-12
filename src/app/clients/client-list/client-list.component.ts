@@ -178,7 +178,6 @@ export class ClientListComponent implements OnInit, AfterViewInit {
 
   ngOnInit() {
     this.user = this.Authservice.getUserProfile();
-    console.log('user', this.user);
     this.getClients(this.user.sub);
     this.checkPrefsAndPrompt();  
   }
@@ -310,7 +309,6 @@ private checkPrefsAndPrompt() {
         return !!clients
       }))
       .subscribe((clients) => {
-        console.log(clients);
         this.dataSource = new MatTableDataSource(clients);
         this.clients = clients;
         this.dataSource.paginator = this.paginator;
@@ -406,7 +404,7 @@ private checkPrefsAndPrompt() {
       .pipe(
         map((res) => {
           this.toastr.success('Client deleted successfully', 'Success!');
-          this.getClients(this.user.id);
+          this.getClients(this.user.sub);
         }),
         catchError((err) => {
           console.error(err);
