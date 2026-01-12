@@ -8,7 +8,7 @@
 <div class="d-flex flex-column gap-32">
     <!-- Modal Header  -->
     <div class="d-flex align-items-center justify-content-between gap-10 modal-header">
-        <h3>New plan</h3>
+        <h3>{{ 'New plan' | translate }}</h3>
         <button (click)="closeDialog()" type="button">
             <img src="assets/images/svgs/close-line-cion.svg" alt="close-line-cion" />
         </button>
@@ -19,18 +19,18 @@
     <!-- <mat-dialog-content> -->
     <div [formGroup]="form" class="d-flex flex-column gap-20">
         <div class="w-100 form-field gap-8">
-            <mat-label class="f-s-16 d-block">Plan name </mat-label>
-            <input matInput formControlName="name" />
+            <mat-label class="f-s-16 d-block">{{ 'Plan name' | translate }}</mat-label>
+            <input matInput formControlName="name" placeholder="{{ 'Enter plan name' | translate}}" />
             @if(form.get('name')?.touched &&
              form.get('name')?.hasError('required')) {
                 <!-- <span class="field-error d-block">Name is required</span> -->
-              <span class="field-error d-block">Required</span>
+              <span class="field-error d-block">{{'Required' | translate}}</span>
 
             }
         </div>
         <div class="w-100 form-field gap-8">
-            <mat-label class="f-s-16 d-block">Description (optional)</mat-label>
-            <textarea formControlName="description" placeholder="Enter description"></textarea>
+            <mat-label class="f-s-16 d-block">{{ 'Description (optional)' | translate }}</mat-label>
+            <textarea formControlName="description" placeholder="{{ 'Enter description' | translate }}"></textarea>
         </div>
     </div>
     <!-- </mat-dialog-content> -->
@@ -40,12 +40,12 @@
     <div class="row justify-content-between modal-action">
         <div class="col-5">
             <button (click)="closeDialog()" class="button-icon-outline w-100 d-block">
-                <span class="f-s-16">Cancel</span>
+                <span class="f-s-16">{{ 'Cancel' | translate }}</span>
             </button>
         </div>
         <div class="col-5">
             <button [disabled]="form.invalid" (click)="onSubmit()" class="button-icon w-100 d-block">
-                <span class="f-s-16">Start </span>
+                <span class="f-s-16">{{ 'Start' | translate }}</span>
             </button>
         </div>
     </div>

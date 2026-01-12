@@ -13,20 +13,20 @@
     <!-- Modal Body  -->
     <mat-dialog-content>
       <div [formGroup]="withdrawalForm" class="d-flex flex-column gap-20">
-        <!-- Description Field  -->
+        <!-- >{{ 'Description' | translate }}< Field  -->
         <div class="w-100 form-field gap-8">
-          <mat-label class="f-s-16 d-block" style="line-height: 18px">Description</mat-label>
+          <mat-label class="f-s-16 d-block" style="line-height: 18px">>{{ 'Description' | translate }}<</mat-label>
           <input matInput formControlName="description" placeholder="e.g. Monthly living expenses" />
           @if(withdrawalForm.get('description')?.touched &&
           withdrawalForm.get('description')?.hasError('required')) {
-          <span class="field-error d-block">Required</span>
+          <span class="field-error d-block">{{'Required' | translate}}</span>
           }
         </div>
 
         <!-- Net Amount Field  -->
         <div class="d-flex flex-column gap-4 net-fields">
           <div class="d-flex flex-column gap-8">
-            <mat-label class="f-s-16 d-block" style="line-height: 18px">Net amount</mat-label>
+            <mat-label class="f-s-16 d-block" style="line-height: 18px">>{{ 'Net amount' | translate }}<</mat-label>
             <div class="net-field d-flex align-items-center">
               <div class="left  hide-arrow">
                 <mat-select formControlName="currencySymbol" class="sortby-edit-profile" [disabled]="true"
@@ -78,7 +78,7 @@
                   </div>
                   @if(withdrawalForm.get('start')?.touched && withdrawalForm.get('start')?.hasError('required')) {
                   <!-- <span class="field-error d-block">Start is required</span> -->
-                  <span class="field-error d-block">Required</span>
+                  <span class="field-error d-block">{{'Required' | translate}}</span>
 
                   }
                 </div>
@@ -103,7 +103,7 @@
                   </div>
                   @if(withdrawalForm.get('end')?.touched && withdrawalForm.get('end')?.hasError('required')) {
                   <!-- <span class="field-error d-block">End is required</span> -->
-                  <span class="field-error d-block">Required</span>
+                  <span class="field-error d-block">{{'Required' | translate}}</span>
 
                   }
                   @if(withdrawalForm.get('end')?.touched && withdrawalForm.get('end')?.hasError('endBeforeStart')) {
@@ -154,7 +154,7 @@
               @if(withdrawalForm.get('escalationRate')?.touched &&
               withdrawalForm.get('escalationRate')?.hasError('required')) {
               <!-- <span class="field-error d-block">Escalation Rate is required</span> -->
-              <span class="field-error d-block">Required</span>
+              <span class="field-error d-block">{{'Required' | translate}}</span>
 
               }
             </div>
@@ -171,7 +171,7 @@
             @if(withdrawalForm.get('customEscalationRate')?.touched &&
             withdrawalForm.get('customEscalationRate')?.hasError('required')) {
             <!-- <span class="field-error d-block">Custom escalation rate is required</span> -->
-            <span class="field-error d-block">Required</span>
+            <span class="field-error d-block">{{'Required' | translate}}</span>
 
             }
           </div>
@@ -185,7 +185,7 @@
     <div class="row justify-content-between modal-action">
       <div class="col-5">
         <button (click)="closeDialog()" class="button-icon-outline w-100 d-block">
-          <span class="f-s-16">Cancel</span>
+          <span class="f-s-16">{{ 'Cancel' | translate }}</span>
         </button>
       </div>
       <div class="col-5">

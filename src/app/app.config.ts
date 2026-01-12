@@ -76,11 +76,11 @@ export const appConfig: ApplicationConfig = {
     }), withComponentInputBinding()),
     provideHttpClient(withInterceptorsFromDi(), withInterceptors([httpRequestInterceptor])),
     provideClientHydration(),
-    provideAnimationsAsync(),
     importProvidersFrom(FormsModule, ToastrModule.forRoot(), ReactiveFormsModule, MaterialModule, NgxPermissionsModule.forRoot(), TablerIconsModule.pick(TablerIcons), NgScrollbarModule, CalendarModule.forRoot({
         provide: DateAdapter,
         useFactory: adapterFactory,
     }), TranslateModule.forRoot({
+      defaultLanguage: 'en',
         loader: {
             provide: TranslateLoader,
             useFactory: HttpLoaderFactory,

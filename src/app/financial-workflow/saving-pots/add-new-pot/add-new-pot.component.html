@@ -1,5 +1,5 @@
 <!-- <button (click)="closeDialog()" class="button-icon-outline w-100 d-block">
-    <span class="f-s-16">Cancel</span>
+    <span class="f-s-16">{{ 'Cancel' | translate }}</span>
   </button> -->
 
 
@@ -65,7 +65,7 @@
           @if(savingsForm.get('name')?.touched &&
           savingsForm.get('name')?.hasError('required')) {
           <!-- <span class="field-error d-block">Name is required</span> -->
-              <span class="field-error d-block">Required</span>
+              <span class="field-error d-block">{{'Required' | translate}}</span>
 
           }
           <!-- End Error  -->
@@ -78,7 +78,7 @@
           @if(savingsForm.get('customName')?.touched &&
           savingsForm.get('customName')?.hasError('required')) {
           <!-- <span class="field-error d-block">Name is required</span> -->
-              <span class="field-error d-block">Required</span>
+              <span class="field-error d-block">{{'Required' | translate}}</span>
 
           }
         </div>
@@ -125,7 +125,7 @@
           (savingsForm.get('currency')?.touched &&
           savingsForm.get('currency')?.hasError('required'))) {
           <!-- <span class="field-error d-block">Amount is required</span> -->
-              <span class="field-error d-block">Required</span>
+              <span class="field-error d-block">{{'Required' | translate}}</span>
 
           }
           <!-- ENd Error   -->
@@ -209,7 +209,7 @@
           (savingsForm.get('returnRate')?.touched &&
           savingsForm.get('returnRate')?.hasError('required'))) {
           <!-- <span class="field-error d-block">Return Rate is required</span> -->
-              <span class="field-error d-block">Required</span>
+              <span class="field-error d-block">{{'Required' | translate}}</span>
 
           }
         </div>
@@ -253,7 +253,7 @@
                   (savingsForm.get('start')?.touched &&
                   savingsForm.get('start')?.hasError('required'))) {
                   <!-- <span class="field-error d-block">Start is required</span> -->
-              <span class="field-error d-block">Required</span>
+              <span class="field-error d-block">{{'Required' | translate}}</span>
 
                   }
                   <!-- <span class="field-error d-block">Start is required</span> -->
@@ -285,7 +285,7 @@
                   (savingsForm.get('end')?.touched &&
                   savingsForm.get('end')?.hasError('required'))) {
                   <!-- <span class="field-error d-block">End is required</span> -->
-              <span class="field-error d-block">Required</span>
+              <span class="field-error d-block">{{'Required' | translate}}</span>
 
                   }
                                       @if(savingsForm.get('end')?.touched &&
@@ -414,7 +414,7 @@
               savingsForm.get('commissionCurrency')?.hasError('required'))) {
               <!-- <span class="field-error d-block">Amount is required</span> -->
 
-              <span class="field-error d-block">Required</span>
+              <span class="field-error d-block">{{'Required' | translate}}</span>
 
               }
               <!-- <span class="field-error d-block">Amount is required</span> -->
@@ -445,7 +445,7 @@
               @if(savingsForm.get('escalationRate')?.touched &&
               savingsForm.get('escalationRate')?.hasError('required')) {
               <!-- <span class="field-error d-block">Escalation Rate is required</span> -->
-              <span class="field-error d-block">Required</span>
+              <span class="field-error d-block">{{'Required' | translate}}</span>
 
               }
               <!-- <span class="field-error d-block">Escalation Rate is required</span> -->
@@ -472,7 +472,7 @@
             @if(savingsForm.get('customEscalationRate')?.touched &&
                 savingsForm.get('customEscalationRate')?.hasError('required')) {
               <!-- <span class="field-error d-block">Custom escalation rate is required</span> -->
-              <span class="field-error d-block">Required</span>
+              <span class="field-error d-block">{{'Required' | translate}}</span>
 
             }
           </div>
@@ -541,7 +541,7 @@
               (savingsForm.get('commissionPercentageCurrency')?.touched &&
               savingsForm.get('commissionPercentageCurrency')?.hasError('required'))) {
               <!-- <span class="field-error d-block">Amount is required</span> -->
-              <span class="field-error d-block">Required</span>
+              <span class="field-error d-block">{{'Required' | translate}}</span>
 
               }
               <!-- <span class="field-error d-block">Amount is required</span> -->
@@ -566,7 +566,7 @@
     <div class="row justify-content-between modal-action">
       <div class="col-5">
         <button (click)="closeDialog()" class="button-icon-outline w-100 d-block">
-          <span class="f-s-16">Cancel</span>
+          <span class="f-s-16">{{ 'Cancel' | translate }}</span>
         </button>
       </div>
       <div class="col-5">

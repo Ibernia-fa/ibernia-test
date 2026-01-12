@@ -12,7 +12,7 @@
       <input matInput formControlName="name" placeholder="e.g. Life Insurance" />
       
       @if(form.get('name')?.touched && form.get('name')?.hasError('required')) {
-        <span class="field-error d-block">Required</span>
+        <span class="field-error d-block">{{'Required' | translate}}</span>
       }
     </div>
 
@@ -28,7 +28,7 @@
           </mat-select>
         </div>
         @if(form.get('willStatus')?.touched && form.get('willStatus')?.hasError('required')) {
-          <span class="field-error">Required</span>
+          <span class="field-error">{{'Required' | translate}}</span>
         }
       </div>
     }
@@ -45,7 +45,7 @@
           </mat-select>
         </div>
         @if(form.get('policyStatus')?.touched && form.get('policyStatus')?.hasError('required')) {
-          <span class="field-error d-block">Required</span>
+          <span class="field-error d-block">{{'Required' | translate}}</span>
         }
       </div>
 
@@ -84,7 +84,7 @@
 
           </div>
           @if(form.get('insuranceAmount')?.touched && form.get('insuranceAmount')?.hasError('required')) {
-            <span class="field-error d-block">Required</span>
+            <span class="field-error d-block">{{'Required' | translate}}</span>
           }
         </div>
       </div>
@@ -99,7 +99,7 @@
           </mat-select>
         </div>
         @if(form.get('coverageAdequacy')?.touched && form.get('coverageAdequacy')?.hasError('required')) {
-          <span class="field-error d-block">Required</span>
+          <span class="field-error d-block">{{'Required' | translate}}</span>
         }
       </div>
 
@@ -118,7 +118,7 @@
            />
         </mat-form-field>
         @if(form.get('coverage')?.touched && form.get('coverage')?.hasError('required')) {
-          <span class="field-error d-block">Required</span>
+          <span class="field-error d-block">{{'Required' | translate}}</span>
         }
       </div>
       }
@@ -134,7 +134,7 @@
       } 
       @if(!isDeleteEnabled) {
         <button type="button" class="button-icon-outline w-100 d-block" (click)="closeDialog()">
-          <span class="f-s-16">Cancel</span>
+          <span class="f-s-16">{{ 'Cancel' | translate }}</span>
         </button>
       }
     </div>

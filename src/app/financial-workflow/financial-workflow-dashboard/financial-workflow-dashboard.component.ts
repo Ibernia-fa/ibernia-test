@@ -15,6 +15,7 @@ import { DataSet, Timeline, TimelineOptions } from 'vis-timeline/standalone';
 import { Moment } from 'moment';
 import { AddEventDialogComponent } from '../timeline/add-event-dialog/add-event-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-financial-workflow-dashboard',
@@ -27,6 +28,7 @@ import { MatDialog } from '@angular/material/dialog';
     // AddEventDialogComponent,
     MatChipsModule,
     MatIconModule,
+    TranslateModule
   ],
   providers: [provideNativeDateAdapter()],
   changeDetection: ChangeDetectionStrategy.OnPush,

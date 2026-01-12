@@ -46,6 +46,7 @@ import { CommonModule } from '@angular/common';
 import { Client } from 'src/app/clients/models/client';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
 import { SettingsHttpService } from '../../settings/services/settings-http.service';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-timeline-chart',
@@ -60,6 +61,7 @@ import { SettingsHttpService } from '../../settings/services/settings-http.servi
     MatProgressSpinnerModule,
     ToastrModule,
     CommonModule,
+    TranslateModule
   ],
   providers: [
     ToastrService

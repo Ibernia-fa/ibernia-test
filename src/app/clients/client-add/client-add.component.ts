@@ -21,6 +21,7 @@ import { FiveDayRangeSelectionStrategy } from 'src/app/core/five-day-range-selec
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { SettingsService } from 'src/app/default-preferance/services/default-preferance.http.service';
 import { AuthService } from 'src/app/auth/services/auth.service';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-client-add',
@@ -36,7 +37,8 @@ import { AuthService } from 'src/app/auth/services/auth.service';
     MatButtonModule,
     MatCardModule,
     NgxIntlTelInputModule,
-    MatCheckboxModule
+    MatCheckboxModule,
+    TranslateModule
   ],
   providers: [
     ClientHttpService,

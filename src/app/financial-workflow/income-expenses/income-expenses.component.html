@@ -12,13 +12,12 @@
                     <!-- headings  -->
                     <div class="d-flex flex-column justify-content-between gap-4">
                         <div class="d-flex align-items-center gap-4">
-                            <h4 class="page-title f-w-500">Incomes & Expenses</h4>
+                            <h4 class="page-title f-w-500">{{ 'Incomes & Expenses' | translate }}</h4>
                             <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" class="m-t-4"
-                                  matTooltip="Input all regular and one-off income sources and expenses relevant to your client.
-These entries will feed directly into the cashflow model, influencing the projected financial outcomes.
-You may link transactions to specific events, and adjust timing or frequency as needed.">
+                                matTooltip="{{ 'Input all regular and one-off income sources and expenses relevant to your client. These entries will feed directly into the cashflow model, influencing the projected financial outcomes. You may link transactions to specific events, and adjust timing or frequency as needed.' | translate }}">
                         </div>
-                        <span class="sub-title">{{selectedClient.clientDetails.firstName}} {{selectedClient.clientDetails.lastName}}</span>
+                        <span class="sub-title">{{selectedClient.clientDetails.firstName}}
+                            {{selectedClient.clientDetails.lastName}}</span>
                     </div>
                     <!-- End headings  -->
                 </div>
@@ -39,9 +38,11 @@ You may link transactions to specific events, and adjust timing or frequency as 
                             <div class="d-flex flex-column gap-8">
                                 <div class="d-flex align-items-center gap-8">
                                     <img src="assets/images/svgs/income-money-receive.svg" alt="income-money-receive" />
-                                    <h3 class="card-title expense-income">Incomes</h3>
+                                    <h3 class="card-title expense-income">{{ 'Incomes' | translate }}</h3>
                                 </div>
-                                <h3 class="saving-title">+{{selectedClient?.clientDetails?.preferredCurrency|currencySymbol}}{{(incomeExpense?.totalIncome ?? 0)|thousandSeparator}}
+                                <h3 class="saving-title">
+                                    +{{selectedClient?.clientDetails?.preferredCurrency|currencySymbol}}{{(incomeExpense?.totalIncome
+                                    ?? 0)|thousandSeparator}}
                                 </h3>
                             </div>
                         </div>
@@ -52,9 +53,11 @@ You may link transactions to specific events, and adjust timing or frequency as 
                             <div class="d-flex flex-column gap-8">
                                 <div class="d-flex align-items-center gap-8">
                                     <img src="assets/images/svgs/income-money-send.svg" alt="income-money-send" />
-                                    <h3 class="card-title expenses-deduct">Expenses</h3>
+                                    <h3 class="card-title expenses-deduct">{{ 'Expenses' | translate }}</h3>
                                 </div>
-                                <h3 class="saving-title">-{{selectedClient?.clientDetails?.preferredCurrency|currencySymbol}}{{(incomeExpense?.totalExpenses ?? 0)|thousandSeparator}}
+                                <h3 class="saving-title">
+                                    -{{selectedClient?.clientDetails?.preferredCurrency|currencySymbol}}{{(incomeExpense?.totalExpenses
+                                    ?? 0)|thousandSeparator}}
                                 </h3>
                             </div>
                         </div>
@@ -65,11 +68,12 @@ You may link transactions to specific events, and adjust timing or frequency as 
                             <div class="d-flex flex-column gap-8">
                                 <div class="d-flex align-items-center gap-8">
                                     <img src="assets/images/svgs/income-dollar-icon.svg" alt="income-dollar-icon" />
-                                    <h3 class="card-title expenses-total">Total</h3>
+                                    <h3 class="card-title expenses-total">{{ 'Total' | translate }}</h3>
                                 </div>
-                                <h3 class="saving-title">={{(incomeExpense?.total ?? 0) < 0 ? '-' : ''}}{{selectedClient?.clientDetails?.preferredCurrency|currencySymbol}}{{((incomeExpense?.total ?? 0) < 0 
-                                        ? ((incomeExpense?.total ?? 0))*(-1) 
-                                        : (incomeExpense?.total ?? 0))|thousandSeparator}}</h3>
+                                <h3 class="saving-title">={{(incomeExpense?.total ?? 0) < 0 ? '-' : ''
+                                        }}{{selectedClient?.clientDetails?.preferredCurrency|currencySymbol}}{{((incomeExpense?.total
+                                        ?? 0) < 0 ? ((incomeExpense?.total ?? 0))*(-1) : (incomeExpense?.total ??
+                                        0))|thousandSeparator}}</h3>
                             </div>
                         </div>
                         <!-- Divider  -->
@@ -88,10 +92,11 @@ You may link transactions to specific events, and adjust timing or frequency as 
 
                                     <h3
                                         [ngClass]="(incomeExpense?.savingRate ?? 0) > 0 ? 'card-title green' : 'card-title red'">
-                                        Saving rate</h3>
+                                        >{{ 'Saving rate' | translate }}<</h3>
                                 </div>
                                 <h3
-                                    [ngClass]="(incomeExpense?.savingRate ?? 0) > 0 ? 'saving-title green' : 'saving-title red'">{{(incomeExpense?.savingRate ?? 0)|number : '1.0-0'}}%</h3>
+                                    [ngClass]="(incomeExpense?.savingRate ?? 0) > 0 ? 'saving-title green' : 'saving-title red'">
+                                    {{(incomeExpense?.savingRate ?? 0)|number : '1.0-0'}}%</h3>
                             </div>
                         </div>
                     </div>
@@ -116,9 +121,9 @@ You may link transactions to specific events, and adjust timing or frequency as 
                 <mat-card class="clientTableContainer">
                     <div class="heading-btn-wrapper">
                         <div class="d-flex flex-column gap-12">
-                            <h3>Incomes</h3>
+                            <h3>{{ 'Incomes' | translate }}</h3>
                             <button (click)="newIncomeClicked()" type="button" class="w-100 button-icon">
-                                <span class="f-s-16">Add income</span>
+                                <span class="f-s-16">{{ 'Add income' | translate}}</span>
                             </button>
                         </div>
                     </div>
@@ -130,7 +135,7 @@ You may link transactions to specific events, and adjust timing or frequency as 
                                 <!-- Position Column -->
                                 <ng-container matColumnDef="position">
                                     <th mat-header-cell *matHeaderCellDef
-                                        class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-client">Description
+                                        class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-client">>{{ 'Description' | translate }}<
                                     </th>
                                     <td mat-cell *matCellDef="let element" class="p-x-24 f-s-14 p-l-0 column-client">
                                         {{element.description}} </td>
@@ -139,11 +144,13 @@ You may link transactions to specific events, and adjust timing or frequency as 
                                 <!-- Name Column -->
                                 <ng-container matColumnDef="name">
                                     <th mat-header-cell *matHeaderCellDef
-                                        class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-net-amount">Net amount
+                                        class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-net-amount">>{{ 'Net amount' | translate }}<
                                     </th>
                                     <td mat-cell *matCellDef="let element"
                                         class="p-x-24 f-s-14 p-l-0 column-net-amount">
-                                        {{selectedClient?.clientDetails?.preferredCurrency | currencySymbol}}{{element.amount.amount | thousandSeparator}}/{{element.amount.cycle.description}}
+                                        {{selectedClient?.clientDetails?.preferredCurrency |
+                                        currencySymbol}}{{element.amount.amount |
+                                        thousandSeparator}}/{{element.amount.cycle.description}}
                                     </td>
                                 </ng-container>
 
@@ -167,14 +174,14 @@ You may link transactions to specific events, and adjust timing or frequency as 
                                                     <img src="assets/images/svgs/drop-down-edit-2-line.svg"
                                                         alt="drop-down-copy-2-line" height="24" width="24" />
                                                 </mat-icon>
-                                                <span>Edit</span>
+                                                <span>{{ 'Edit' | translate }}</span>
                                             </button>
                                             <button (click)="deleteIncome(element)" mat-menu-item>
                                                 <mat-icon>
                                                     <img src="assets/images/svgs/drop-down-delete-2-line.svg"
                                                         alt="drop-down-copy-2-line" height="24" width="24" />
                                                 </mat-icon>
-                                                <span>Delete</span>
+                                                <span>{{ 'Delete' | translate }}</span>
                                             </button>
                                         </mat-menu>
                                     </td>
@@ -196,9 +203,9 @@ You may link transactions to specific events, and adjust timing or frequency as 
                 <mat-card class="clientTableContainer">
                     <div class="heading-btn-wrapper">
                         <div class="d-flex flex-column gap-12">
-                            <h3>Expenses</h3>
+                            <h3>{{ 'Expenses' | translate }}</h3>
                             <button (click)="newExpenseClicked()" type="button" class="w-100 button-icon-outline">
-                                <span>Add expense</span>
+                                <span>{{ 'Add expense' | translate }}</span>
                             </button>
                         </div>
                     </div>
@@ -210,7 +217,7 @@ You may link transactions to specific events, and adjust timing or frequency as 
                                 <!-- Position Column -->
                                 <ng-container matColumnDef="position">
                                     <th mat-header-cell *matHeaderCellDef
-                                        class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-client">Description
+                                        class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-client">>{{ 'Description' | translate }}<
                                     </th>
                                     <td mat-cell *matCellDef="let element" class="p-x-24 f-s-14 p-l-0 column-client">
                                         {{element.description}} </td>
@@ -219,11 +226,13 @@ You may link transactions to specific events, and adjust timing or frequency as 
                                 <!-- Name Column -->
                                 <ng-container matColumnDef="name">
                                     <th mat-header-cell *matHeaderCellDef
-                                        class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-net-amount">Net amount
+                                        class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-net-amount">>{{ 'Net amount' | translate }}<
                                     </th>
                                     <td mat-cell *matCellDef="let element"
                                         class="p-x-24 f-s-14 p-l-0 column-net-amount">
-                                        {{selectedClient?.clientDetails?.preferredCurrency | currencySymbol}}{{element.amount.amount | thousandSeparator}}/{{element.amount.cycle.description}} </td>
+                                        {{selectedClient?.clientDetails?.preferredCurrency |
+                                        currencySymbol}}{{element.amount.amount |
+                                        thousandSeparator}}/{{element.amount.cycle.description}} </td>
                                 </ng-container>
 
                                 <!-- Symbol Column -->
@@ -246,14 +255,14 @@ You may link transactions to specific events, and adjust timing or frequency as 
                                                     <img src="assets/images/svgs/drop-down-edit-2-line.svg"
                                                         alt="drop-down-copy-2-line" height="24" width="24" />
                                                 </mat-icon>
-                                                <span>Edit</span>
+                                                <span>{{ 'Edit' | translate }}</span>
                                             </button>
                                             <button (click)="deleteExpense(element)" mat-menu-item>
                                                 <mat-icon>
                                                     <img src="assets/images/svgs/drop-down-delete-2-line.svg"
                                                         alt="drop-down-copy-2-line" height="24" width="24" />
                                                 </mat-icon>
-                                                <span>Delete</span>
+                                                <span>{{ 'Delete' | translate }}</span>
                                             </button>
                                         </mat-menu>
                                     </td>

@@ -31,6 +31,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { SavingsPotsHttpService } from 'src/app/financial-workflow/saving-pots/services/savings-pots-http.service';
 import { CurrencySymbolPipe } from 'src/app/pipe/currency-symbol.pipe';
 import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
+import { TranslateModule } from '@ngx-translate/core';
 
 interface SortDescriptor {
   value: string;
@@ -57,6 +58,7 @@ interface SortDescriptor {
     RouterModule,
     CurrencySymbolPipe,
     ThousandSeparatorPipe,
+    TranslateModule
   ],
   providers: [RouterModule, DatePipe, AgeCalculatorPipe],
   templateUrl: './profile.component.html',

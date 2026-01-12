@@ -27,6 +27,7 @@ import { countryDialCodes } from '../models/country-code';
 import { FiveDayRangeSelectionStrategy } from 'src/app/core/five-day-range-selection-strategy';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import { AuthService } from 'src/app/auth/services/auth.service';
+import { TranslateModule } from '@ngx-translate/core';
 
 
 @Component({
@@ -43,7 +44,8 @@ import { AuthService } from 'src/app/auth/services/auth.service';
     MatSelectModule,
     MatButtonModule,
     MatCardModule,
-    NgxIntlTelInputModule
+    NgxIntlTelInputModule,
+    TranslateModule
   ],
   providers: [
     ClientHttpService,
