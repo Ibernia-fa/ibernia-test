@@ -42,6 +42,7 @@ import { CommonModule } from '@angular/common';
 import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
+import { TranslateModule } from '@ngx-translate/core';
 @Component({
   selector: 'app-add-new-pot',
   imports: [
@@ -62,7 +63,8 @@ import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-sep
     MatCheckboxModule,
     // IntegerOnlyDirective,
     ThousandSeparatorPipe,
-    ThousandSeparatorInputDirective
+    ThousandSeparatorInputDirective,
+    TranslateModule
   ],
   templateUrl: './add-new-pot.component.html',
   styleUrl: './add-new-pot.component.scss',

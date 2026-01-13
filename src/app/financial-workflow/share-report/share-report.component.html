@@ -1,7 +1,7 @@
 <div class="w-100">
   <div class="d-flex flex-column gap-32">
     <div class="d-flex align-items-center justify-content-between gap-10 modal-header">
-      <h3>Share with <span style="text-transform: capitalize;">{{clientName}}</span></h3>
+      <h3>{{ 'Share with' | translate }} <span style="text-transform: capitalize;">{{clientName}}</span></h3>
       <button (click)="closeDialog()" type="button">
         <img src="assets/images/svgs/close-line-cion.svg" alt="close-line-cion" />
       </button>
@@ -11,27 +11,27 @@
       <div class="d-flex flex-column gap-20" [formGroup]="reportForm">
         <div class="w-100 form-field gap-8">
           <p>
-            Send a secure, view-only version of this plan to your client at this address: <span style="color: #516ce8;">{{clientEmail}}</span>
+            {{ 'Send a secure, view-only version of this plan to your client at this address:' | translate}} <span style="color: #516ce8;">{{clientEmail}}</span>
             <br>
-            They’ll receive an email with a unique access link and password.
+            {{ 'They’ll receive an email with a unique access link and password.' | translate}}
             <br><br>
-            This link will automatically expire in:
+            {{ 'This link will automatically expire in:' | translate }}
           </p>
           
           <div class="select-option" style="width: 50%;">
             <mat-select formControlName="expiry" [(value)]="selectedExpiry">
               <mat-option *ngFor="let day of expiryOptions" [value]="day">
-                {{ day }} days
+                {{ day }} {{ 'days' | translate}}
               </mat-option>
             </mat-select>
           </div>
           
           <p>
-            Note: the AI Recommendations section will not be visible to your client.
+            {{ 'Note: the AI Recommendations section will not be visible to your client.' | translate }}
           </p>
           
           @if(reportForm.get('expiry')?.touched && reportForm.get('expiry')?.hasError('required')) {
-              <span class="field-error d-block">Expiry period is required</span>
+              <span class="field-error d-block">{{ 'Expiry period is required' | translate}}</span>
           }
         </div>
       </div>
@@ -40,13 +40,13 @@
     <div class="row justify-content-between modal-action">
       <div class="col-5">
         <button (click)="closeDialog()" class="button-icon-outline w-100 d-block">
-          <span class="f-s-16">Close</span>
+          <span class="f-s-16">{{ 'Close' | translate}}</span>
         </button>
       </div>
       <div class="col-5">
         <button (click)="shareReport()" type="button" [disabled]="reportForm.invalid || isLoaderVisible" class="button-icon w-100 d-block">
           <span class="f-s-16">
-            {{ isLoaderVisible ? 'Sending...' : 'Send' }}
+            {{ isLoaderVisible ? ('Sending...' | translate) : ('Send' | translate) }}
           </span>
         </button>
       </div>

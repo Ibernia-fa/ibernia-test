@@ -17,11 +17,7 @@ import { Cashflow } from 'src/app/clients/models/cashflow';
 import { IncomeExpensesHttpService } from './services/income-expenses-http.service';
 import { SettingsHttpService } from '../settings/services/settings-http.service';
 import { FinancialViewModel, IncomeExpense } from './model/income-expense';
-import {
-  Cycle,
-  EscalationRate,
-  FinancialTimeline,
-} from '../timeline/models/financial-timeline';
+import { Cycle, EscalationRate, FinancialTimeline } from '../timeline/models/financial-timeline';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { NavItemService } from 'src/app/layouts/full/nav-item.service';
 import { TimelineHttpService } from '../timeline/services/timeline-http.service';
@@ -30,6 +26,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { CurrencySymbolPipe } from 'src/app/pipe/currency-symbol.pipe';
 import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-income-expenses',
@@ -45,7 +42,8 @@ import { ToastrModule, ToastrService } from 'ngx-toastr';
     MatTooltipModule,
     CurrencySymbolPipe,
     ThousandSeparatorPipe,
-    ToastrModule
+    ToastrModule,
+    TranslateModule
   ],
   providers: [ToastrService],
   templateUrl: './income-expenses.component.html',
@@ -132,6 +130,7 @@ export class IncomeExpensesComponent {
         amountCycles: this.amountCycles,
         eventsList: this.timeline.clientEvents.sort((a, b) => a.start.age - b.start.age),
         escalataionRates: this.escalationRates,
+        incomes: this.incomeExpense?.incomes,
         clientBirthDate: this.selectedClient?.clientDetails.birthDate,
         clientPreferredCurrency: this.selectedClient?.clientDetails.preferredCurrency,
         cashflowId: this.selectedCashflow?.id,

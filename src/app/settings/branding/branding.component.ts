@@ -3,10 +3,13 @@ import { NavItemService } from 'src/app/layouts/full/nav-item.service';
 import { OrganizationProfilesService } from '../services/organization.profiles.service';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { ToastrService } from 'ngx-toastr';
+import { TranslateModule } from '@ngx-translate/core';
+import { MatCard, MatCardContent } from '@angular/material/card';
 
 @Component({
   selector: 'app-branding',
-  standalone: false,
+  standalone: true,
+  imports: [TranslateModule, MatCard, MatCardContent],
   templateUrl: './branding.component.html',
   styleUrls: ['./branding.component.scss'],
 })

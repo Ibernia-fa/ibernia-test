@@ -21,6 +21,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-add-withdrawal',
@@ -38,7 +39,8 @@ import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-sep
     ReactiveFormsModule,
     MatCheckboxModule,
     ThousandSeparatorPipe,
-    ThousandSeparatorInputDirective
+    ThousandSeparatorInputDirective,
+    TranslateModule
   ],
   providers: [provideNativeDateAdapter()],
   templateUrl: './add-withdrawal.component.html',

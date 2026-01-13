@@ -28,6 +28,7 @@ import { selectedCashflow } from 'src/app/store/cashflow/cashflow.selectors';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Cashflow } from 'src/app/clients/models/cashflow';
 import { FinancialWorkflowService } from '../../services/financial-workflow.service';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-timeline',
@@ -42,7 +43,8 @@ import { FinancialWorkflowService } from '../../services/financial-workflow.serv
     MatProgressSpinnerModule,
     TimelineChartComponent,
     MatSelectModule,
-    MatTooltipModule
+    MatTooltipModule,
+    TranslateModule
   ],
   providers: [provideNativeDateAdapter()],
   templateUrl: './timeline.component.html',

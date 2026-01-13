@@ -14,13 +14,13 @@
               <!-- End Icon  -->
               <!-- headings  -->
               <div class="d-flex flex-column justify-content-between gap-4">
-                <h4 class="page-title f-w-500">Lifetime Plan</h4>
+                <h4 class="page-title f-w-500">{{ 'Lifetime Plan' | translate }}</h4>
                 <span class="sub-title">{{client.clientDetails.firstName}}
                   {{client.clientDetails.lastName}}</span>
               </div>
               <!-- End headings  -->
             </div>
-            
+
             <div class="d-flex align-items-center gap-12">
               <!-- Cashflow name (visible when NOT in comparison mode) -->
               <ng-container *ngIf="!(compareReport || compareCashflow)">
@@ -33,7 +33,7 @@
               <!-- Exit Comparison button (visible when IN comparison mode) -->
               <ng-container *ngIf="compareReport || compareCashflow">
                 <button class="button-icon" (click)="exitComparison()">
-                  <span>Exit Comparison</span>
+                  <span>{{ 'Exit Comparison' | translate }}</span>
                 </button>
               </ng-container>
             </div>
@@ -44,13 +44,44 @@
   </mat-card>
   <mat-card class="cardWithShadow ">
     <mat-card-content style="padding-bottom: 10px !important;">
+      <div class="icon-financial-label">
       <ng-container *ngIf="!compareReport || !compareCashflow">
-        <button matTooltip="Full screen" class="button-full-screen" (click)="enterFullscreen()">
+        <button matTooltip="{{ 'Full screen' | translate}}" class="button-full-screen" (click)="enterFullscreen()">
           <img width="16" src="../../../assets/images/svgs/full-screen.svg" alt="">
         </button>
       </ng-container>
 
-      <div class="d-flex flex-column gap-32">
+      <div class="shortfall" *ngIf="report">
+            <ng-container *ngIf="!hasShortfall; else lossTpl">
+              <div class="shortfall-status-profit">
+                <span class="icon-bg leaf-bg">
+                  <img
+                    src="../../../assets/images/svgs/leaf.svg"
+                    alt="leaf"
+                    class="icon-svg"
+                  />
+                </span>
+                <span class="status-text">Goals on track and funded</span>
+              </div>
+            </ng-container>
+            <ng-template #lossTpl>
+              <div class="shortfall-status-loss">
+                <span class="icon-bg flag-bg">
+                  <img
+                    src="../../../assets/images/svgs/triangle-flag.svg"
+                    alt="flag"
+                    class="icon-svg"
+                  />
+                </span>
+                <span class="status-text">
+                  Savings hit zero at {{ firstShortfallAge }}
+                </span>
+              </div>
+            </ng-template>
+      </div>
+      </div>
+
+      <div class="chart-component-wrapper">
 
         <app-savings-bar-stacked-chart [report]="report" [client]="client"
           [forecastStartDate]="financialTimeline.forecastStartDate"
@@ -99,7 +130,7 @@
           <ng-container>
             <div class="d-flex align-items-center gap-8">
               <img src="../../../assets/images/svgs/graph-.svg" width="16" alt="">
-              <label>Inflation rate:</label>
+              <label>{{ 'Inflation rate' | translate}}:</label>
               <img src="../../../assets/images/svgs/help-circle-icon.svg" width="19" alt="">
             </div>
 
@@ -132,7 +163,7 @@
 
         <!-- RIGHT SIDE: Compare Button always fixed -->
         <button class="button-icon" (click)="onComparePlansClicked()">
-          <span>Compare plans</span>
+          <span>{{ 'Compare plans' | translate }}</span>
         </button>
 
       </div>

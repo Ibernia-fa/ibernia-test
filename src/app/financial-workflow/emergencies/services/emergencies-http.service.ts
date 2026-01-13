@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { CreateEmergencyRequest, EmergenciesResponse, Emergency } from '../models/emergencies.model';
+import { SimulateEmergencyModel } from '../models/simulate-emergency.model';
 
 @Injectable({ providedIn: 'root' })
 export class EmergenciesHttpService {
@@ -23,5 +24,9 @@ export class EmergenciesHttpService {
 
   deleteEmergency(id: string) {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  }
+
+  simulateEmergency(simulateEmergency: SimulateEmergencyModel) {
+    return this.http.post<any>(`${this.baseUrl}/simulate`, simulateEmergency);
   }
 }

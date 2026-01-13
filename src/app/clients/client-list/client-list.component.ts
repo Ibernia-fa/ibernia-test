@@ -56,6 +56,7 @@ import { DefaultPreferanceModule } from 'src/app/default-preferance/default-pref
 import { SettingsService } from 'src/app/default-preferance/services/default-preferance.http.service';
 import { DefaultPreferanceComponent } from 'src/app/default-preferance/default-preferance/default-preferance.component';
 import { AuthService } from 'src/app/auth/services/auth.service';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-client-list',
@@ -79,7 +80,8 @@ import { AuthService } from 'src/app/auth/services/auth.service';
     AgeCalculatorPipe,
     MatMenuModule,
     MatProgressSpinnerModule,
-    DefaultPreferanceModule
+    DefaultPreferanceModule,
+    TranslateModule
   ],
   // imports: [
   //   MatCardModule,
@@ -178,7 +180,6 @@ export class ClientListComponent implements OnInit, AfterViewInit {
 
   ngOnInit() {
     this.user = this.Authservice.getUserProfile();
-    console.log('user', this.user);
     this.getClients(this.user.sub);
     this.checkPrefsAndPrompt();  
   }
@@ -310,7 +311,6 @@ private checkPrefsAndPrompt() {
         return !!clients
       }))
       .subscribe((clients) => {
-        console.log(clients);
         this.dataSource = new MatTableDataSource(clients);
         this.clients = clients;
         this.dataSource.paginator = this.paginator;
@@ -406,7 +406,7 @@ private checkPrefsAndPrompt() {
       .pipe(
         map((res) => {
           this.toastr.success('Client deleted successfully', 'Success!');
-          this.getClients(this.user.id);
+          this.getClients(this.user.sub);
         }),
         catchError((err) => {
           console.error(err);

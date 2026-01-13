@@ -8,6 +8,7 @@ import { SettingsService, ComissionType, UserProfileDto } from '../services/defa
 import { allCountries } from 'src/app/clients/models/country'; 
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-default-preferance',
@@ -15,6 +16,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
   styleUrls: ['./default-preferance.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: false,
+  // imports: [TranslateModule]
 })
 export class DefaultPreferanceComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();

@@ -32,6 +32,7 @@ import moment from 'moment';
 import { FinancialViewModel } from '../model/income-expense';
 import { catchError, filter } from 'rxjs';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-add-expense',
@@ -48,8 +49,8 @@ import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-sep
     MatSliderModule,
     ReactiveFormsModule,
      ThousandSeparatorPipe,
-    ThousandSeparatorInputDirective
-
+    ThousandSeparatorInputDirective,
+TranslateModule
   ],
   providers: [provideNativeDateAdapter()],
   templateUrl: './add-expense.component.html',

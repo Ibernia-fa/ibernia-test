@@ -12,15 +12,15 @@
     <!-- Modal Body  -->
     <mat-dialog-content>
       <div class="d-flex flex-column gap-20">
-        <!-- Description Field  -->
+        <!-- >{{ 'Description' | translate }}< Field  -->
         <div class="w-100 form-field gap-12">
-          <mat-label class="f-s-16 d-block" style="line-height: 18px">Description</mat-label>
+          <mat-label class="f-s-16 d-block" style="line-height: 18px">>{{ 'Description' | translate }}<</mat-label>
           <input matInput formControlName="name" placeholder="e.g. State Pension" />
           <!-- Error  -->
           <!-- <span class="field-error d-block">Name is required</span> -->
           <!-- End Error  -->
         </div>
-        <!--End Description Field  -->
+        <!--End >{{ 'Description' | translate }}< Field  -->
 
         <!-- Modal tabs  -->
         <div class="d-flex flex-column gap-12 tab">
@@ -44,7 +44,7 @@
 
         <!-- Net Amount Field  -->
         <div class="d-flex flex-column gap-12 net-fields">
-          <span class="f-s-16 f-w-400">Net amount</span>
+          <span class="f-s-16 f-w-400">{{ 'Net amount' | translate }}</span>
           <div class="net-field d-flex align-items-center">
             <!-- Currency Selector  -->
             <div class="left">
@@ -155,7 +155,7 @@
     <div class="row justify-content-between modal-action">
       <div class="col-5">
         <button (click)="closeDialog()" class="button-icon-outline w-100 d-block">
-          <span class="f-s-16">Cancel</span>
+          <span class="f-s-16">{{ 'Cancel' | translate }}</span>
         </button>
       </div>
       <div class="col-5">

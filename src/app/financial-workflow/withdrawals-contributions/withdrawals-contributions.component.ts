@@ -31,6 +31,7 @@ import { CurrencySymbolPipe } from 'src/app/pipe/currency-symbol.pipe';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   imports: [
@@ -45,7 +46,8 @@ import { ToastrModule, ToastrService } from 'ngx-toastr';
     CurrencySymbolPipe,
     MatTooltipModule,
     ThousandSeparatorPipe,
-    ToastrModule
+    ToastrModule,
+    TranslateModule
   ],
   providers: [ToastrService],
   selector: 'app-withdrawals-contributions',

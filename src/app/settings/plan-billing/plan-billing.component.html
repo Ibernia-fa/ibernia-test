@@ -5,8 +5,8 @@
         <img width="56" src="../../../assets/images/shapes/small-icon-6.svg" alt="">
       </div>
       <div class="d-flex flex-column justify-content-between gap-4">
-        <h4 class="page-title f-w-500">Plans & Billing</h4>
-        <span class="sub-title">Choose the plan that suits you</span>
+        <h4 class="page-title f-w-500">{{ 'Plans & Billing' | translate }}</h4>
+        <span class="sub-title">{{ 'Choose the plan that suits you' | translate }}</span>
       </div>
     </div>
   </mat-card-content>
@@ -15,19 +15,19 @@
     <!-- Essential Plan -->
     <mat-card class="plan-card">
       <mat-card-content>
-     <h3 class="plan-header m-b-20">Essential</h3>
+     <h3 class="plan-header m-b-20">{{ 'Essential' | translate }}</h3>
       <p class="plan-description m-b-20 m-t-0">
-        The core planning tools: Cashflow Modeller, Client Onboarding & Data Capture Forms, Client Profile, and more
+        {{ 'The core planning tools: Cashflow Modeller, Client Onboarding & Data Capture Forms, Client Profile, and more' | translate }}
       </p>
       <p class="plan-price m-b-20 m-t-0">
-        <strong>€69 / month</strong> per advisor + VAT
+        <strong>{{ '€69 / month' | translate}}</strong> {{ 'per advisor + VAT' | translate }}
       </p>
       <div class="features-grid">
-        <div><img width="" src="../../../assets/images/shapes/tick.svg" width="14" alt=""> Cashflow Modeller</div>
-        <div><img width="" src="../../../assets/images/shapes/tick.svg" width="14" alt=""> Models Comparison</div>
-        <div><img width="" src="../../../assets/images/shapes/tick.svg" width="14" alt=""> Goal Planning</div>
+        <div><img width="" src="../../../assets/images/shapes/tick.svg" width="14" alt=""> {{ 'Cashflow Modeller' | translate}}</div>
+        <div><img width="" src="../../../assets/images/shapes/tick.svg" width="14" alt=""> {{ 'Models Comparison' | translate}}</div>
+        <div><img width="" src="../../../assets/images/shapes/tick.svg" width="14" alt=""> {{ 'Goal Planning' | translate}}</div>
         
-        <div><img width="" src="../../../assets/images/shapes/tick.svg" width="14" alt=""> Client Profile</div>
+        <div><img width="" src="../../../assets/images/shapes/tick.svg" width="14" alt=""> {{ 'Client Profile' | translate}}</div>
       </div>
       </mat-card-content>
     </mat-card>
@@ -36,20 +36,20 @@
     <mat-card class="plan-card">
         <mat-card-content>
      
-        <h3 class="plan-header m-b-20">Premium</h3>
+        <h3 class="plan-header m-b-20">{{ 'Premium' | translate }}</h3>
      
       <p class="plan-description m-b-20 m-t-0">
-        Everything in essential, plus our AI-powered recommendations and firm branding
+        {{ 'Everything in essential, plus our AI-powered recommendations and firm branding' | translate }}
       </p>
       <p class="plan-price m-b-20 m-t-0">
-        <strong>€99 / month</strong> per advisor + VAT
+        <strong>{{ '€99 / month' | translate}}</strong> {{ 'per advisor + VAT' | translate }}
       </p>
       <div class="features-grid">
-        <div><img width="" src="../../../assets/images/shapes/tick.svg" width="14" alt=""> Everything in Essential</div>
-        <div><img width="" src="../../../assets/images/shapes/tick.svg" width="14" alt=""> <strong>AI Recommendations</strong></div>
+        <div><img width="" src="../../../assets/images/shapes/tick.svg" width="14" alt=""> {{ 'Everything in Essential' | translate }}</div>
+        <div><img width="" src="../../../assets/images/shapes/tick.svg" width="14" alt=""> <strong>{{ 'AI Recommendations' | translate}}</strong></div>
        
-        <div><img width="" src="../../../assets/images/shapes/tick.svg" width="14" alt=""> <strong>Emergency Buffer & Insurance</strong></div>
-        <div><img width="" src="../../../assets/images/shapes/tick.svg" width="14" alt=""> <strong>Custom Branding</strong></div>
+        <div><img width="" src="../../../assets/images/shapes/tick.svg" width="14" alt=""> <strong>{{ 'Emergency Buffer & Insurance' | translate}}</strong></div>
+        <div><img width="" src="../../../assets/images/shapes/tick.svg" width="14" alt=""> <strong>{{ 'Custom Branding' | translate}}</strong></div>
       </div>
       </mat-card-content>
     </mat-card>
@@ -57,16 +57,16 @@
     <!-- Enterprise Plan -->
     <mat-card class="plan-card">
  <mat-card-content>
-        <h3 class="plan-header m-b-20">Enterprise</h3>
+        <h3 class="plan-header m-b-20">{{ 'Enterprise' | translate }}</h3>
       <p class="plan-description m-b-20 m-t-0">
-        For teams that need bespoke AI and data connectivity
+        {{ 'For teams that need bespoke AI and data connectivity' | translate }}
       </p>
-      <button   class="button-icon m-b-20"><span>Contact us</span></button>
+      <button   class="button-icon m-b-20"><span>{{ 'Contact us' | translate }}</span></button>
       <div class="features-grid">
-        <div><img width="" src="../../../assets/images/shapes/tick.svg" width="14" alt=""> Everything in Premium</div>
-        <div><img width="" src="../../../assets/images/shapes/tick.svg" width="14" alt=""> <strong>Custom AI Recommendations</strong></div>
-        <div><img width="" src="../../../assets/images/shapes/tick.svg" width="14" alt=""> <strong>Integrations with your Data Infrastructure</strong></div>
-        <div><img width="" src="../../../assets/images/shapes/tick.svg" width="14" alt=""> <strong>Priority Support & SLA</strong></div>
+        <div><img width="" src="../../../assets/images/shapes/tick.svg" width="14" alt=""> {{ 'Everything in Premium' | translate}}</div>
+        <div><img width="" src="../../../assets/images/shapes/tick.svg" width="14" alt=""> <strong>{{ 'Custom AI Recommendations' | translate}}</strong></div>
+        <div><img width="" src="../../../assets/images/shapes/tick.svg" width="14" alt=""> <strong>{{ 'Integrations with your Data Infrastructure' | translate}}</strong></div>
+        <div><img width="" src="../../../assets/images/shapes/tick.svg" width="14" alt=""> <strong>{{ 'Priority Support & SLA' | translate}}</strong></div>
       </div>
       </mat-card-content>
     </mat-card>
@@ -74,7 +74,7 @@
 
 
 <div class="d-flex justify-space-end">
-    <button  color="primary" class="button-icon"><span> Change plan</span></button>
+    <button  color="primary" class="button-icon"><span> {{ 'Change plan' | translate}}</span></button>
 </div>
 
 </div>

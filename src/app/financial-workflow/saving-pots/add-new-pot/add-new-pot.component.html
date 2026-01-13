@@ -1,5 +1,5 @@
 <!-- <button (click)="closeDialog()" class="button-icon-outline w-100 d-block">
-    <span class="f-s-16">Cancel</span>
+    <span class="f-s-16">{{ 'Cancel' | translate }}</span>
   </button> -->
 
 
@@ -22,7 +22,7 @@
       <div class="d-flex flex-column gap-20" [formGroup]="savingsForm">
         <!-- Name Field  -->
         <div class="w-100 form-field gap-8">
-          <mat-label class="f-s-16 d-block" style="line-height: 18px">Type</mat-label>
+          <mat-label class="f-s-16 d-block" style="line-height: 18px">{{ 'Type' | translate}}</mat-label>
           <div class="select-option" [ngClass]="isCashPotEditMode ? 'hide-arrow' : ''">
      <mat-select
   formControlName="name"
@@ -65,7 +65,7 @@
           @if(savingsForm.get('name')?.touched &&
           savingsForm.get('name')?.hasError('required')) {
           <!-- <span class="field-error d-block">Name is required</span> -->
-              <span class="field-error d-block">Required</span>
+              <span class="field-error d-block">{{'Required' | translate}}</span>
 
           }
           <!-- End Error  -->
@@ -78,7 +78,7 @@
           @if(savingsForm.get('customName')?.touched &&
           savingsForm.get('customName')?.hasError('required')) {
           <!-- <span class="field-error d-block">Name is required</span> -->
-              <span class="field-error d-block">Required</span>
+              <span class="field-error d-block">{{'Required' | translate}}</span>
 
           }
         </div>
@@ -87,7 +87,7 @@
 
         <!-- Starting pot value Field  -->
         <div class="d-flex flex-column gap-8  net-fields">
-          <span class="f-s-16 f-w-400">Starting pot value</span>
+          <span class="f-s-16 f-w-400">{{ 'Starting pot value' | translate }}</span>
           <div class="net-field d-flex align-items-center">
             <!-- Currency Selector  -->
               <div class="left hide-arrow">
@@ -125,7 +125,7 @@
           (savingsForm.get('currency')?.touched &&
           savingsForm.get('currency')?.hasError('required'))) {
           <!-- <span class="field-error d-block">Amount is required</span> -->
-              <span class="field-error d-block">Required</span>
+              <span class="field-error d-block">{{'Required' | translate}}</span>
 
           }
           <!-- ENd Error   -->
@@ -137,7 +137,7 @@
         @if(savingsForm.get('name')?.value !== 'Cash') {
           <div class="d-flex flex-column gap-4">
           <div class="d-flex gap-8 align-items-center">
-            <mat-label class="f-s-16 f-w-400 d-block">Return rate</mat-label>
+            <mat-label class="f-s-16 f-w-400 d-block">{{ 'Return rate' | translate}}</mat-label>
             <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
           </div>
           <div class="d-flex align-items-center gap-24">
@@ -209,7 +209,7 @@
           (savingsForm.get('returnRate')?.touched &&
           savingsForm.get('returnRate')?.hasError('required'))) {
           <!-- <span class="field-error d-block">Return Rate is required</span> -->
-              <span class="field-error d-block">Required</span>
+              <span class="field-error d-block">{{'Required' | translate}}</span>
 
           }
         </div>
@@ -220,7 +220,7 @@
          @if(savingsForm.get('name')?.value !== 'Cash') {
             <section class="example-section">
         <mat-checkbox type="checkbox" id="lock-pot" (change)="isLockPotChanged(savingsForm.get('lockPot')?.value)"
-              formControlName="lockPot">Lock this pot from automatically covering an income shortfall</mat-checkbox>
+              formControlName="lockPot">{{ 'Lock this pot from automatically covering an income shortfal' | translate}}</mat-checkbox>
       </section>
 
         <!-- End CheckBox  -->
@@ -230,7 +230,7 @@
         <div class="start-end m-t-15 m-b-15">
           <div class="d-flex flex-column gap-12">
             <div class="d-flex gap-8 align-items-center">
-              <mat-label class="f-s-16 f-w-400 d-block">Savings pot is locked between</mat-label>
+              <mat-label class="f-s-16 f-w-400 d-block">{{ 'Savings pot is locked between' | translate}}</mat-label>
             </div>
             <div class="row justify-content-between align-items-start flex-nowrap">
               <!-- Start date  -->
@@ -253,7 +253,7 @@
                   (savingsForm.get('start')?.touched &&
                   savingsForm.get('start')?.hasError('required'))) {
                   <!-- <span class="field-error d-block">Start is required</span> -->
-              <span class="field-error d-block">Required</span>
+              <span class="field-error d-block">{{'Required' | translate}}</span>
 
                   }
                   <!-- <span class="field-error d-block">Start is required</span> -->
@@ -285,12 +285,12 @@
                   (savingsForm.get('end')?.touched &&
                   savingsForm.get('end')?.hasError('required'))) {
                   <!-- <span class="field-error d-block">End is required</span> -->
-              <span class="field-error d-block">Required</span>
+              <span class="field-error d-block">{{'Required' | translate}}</span>
 
                   }
                                       @if(savingsForm.get('end')?.touched &&
                         savingsForm.get('end')?.hasError('endBeforeStart')) {
-                      <span class="field-error d-block">End year cannot be before start year</span>
+                      <span class="field-error d-block">{{ 'End year cannot be before start year' | translate}}</span>
                     }
                   <!-- <span class="field-error d-block">End is required</span> -->
                   <!-- End error  -->
@@ -308,7 +308,7 @@
     
         <section class="example-section">
         <mat-checkbox type="checkbox" id="commissions"
-              (change)="isCommissionsChanged(savingsForm.get('commissions')?.value)" formControlName="commissions">Add commissions</mat-checkbox>
+              (change)="isCommissionsChanged(savingsForm.get('commissions')?.value)" formControlName="commissions">{{ 'Add commissions' | translate}}</mat-checkbox>
       </section>
         <!-- End CheckBox  -->
 
@@ -345,9 +345,9 @@
             <div class="w-100 form-field">
               <div class="select-option">
                 <mat-select formControlName="commissionType" value="Select">
-                  <mat-option value="amount">Amount</mat-option>
-                  <mat-option value="percentage">Percentage</mat-option>
-                  <mat-option value="both">Both</mat-option>
+                  <mat-option value="amount">{{ 'Amount' | translate}}</mat-option>
+                  <mat-option value="percentage">{{ 'Percentage' | translate}}</mat-option>
+                  <mat-option value="both">{{ 'Both' | translate}}</mat-option>
                 </mat-select>
               </div>
               <!-- <span class="field-error d-block">Escalation Rate is required</span> -->
@@ -362,7 +362,7 @@
             @if(savingsForm.get('commissionType')?.value === 'both') {
 
               <div class="d-flex gap-8 align-items-center">
-                <mat-label class="f-s-16 f-w-400 d-block">Commission amount </mat-label>
+                <mat-label class="f-s-16 f-w-400 d-block">{{ 'Commission amount' | translate}} </mat-label>
                 <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
               </div>
             }
@@ -414,7 +414,7 @@
               savingsForm.get('commissionCurrency')?.hasError('required'))) {
               <!-- <span class="field-error d-block">Amount is required</span> -->
 
-              <span class="field-error d-block">Required</span>
+              <span class="field-error d-block">{{'Required' | translate}}</span>
 
               }
               <!-- <span class="field-error d-block">Amount is required</span> -->
@@ -429,7 +429,7 @@
             <div class="d-flex flex-column gap-8">
            
           <div class="d-flex gap-8 align-items-center">
-            <mat-label class="f-s-16 f-w-400 d-block">Commission amount escalatation rate</mat-label>
+            <mat-label class="f-s-16 f-w-400 d-block">{{ 'Commission amount escalatation rate' | translate}}</mat-label>
             <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
           </div>
           <div class="position-relative">
@@ -445,7 +445,7 @@
               @if(savingsForm.get('escalationRate')?.touched &&
               savingsForm.get('escalationRate')?.hasError('required')) {
               <!-- <span class="field-error d-block">Escalation Rate is required</span> -->
-              <span class="field-error d-block">Required</span>
+              <span class="field-error d-block">{{'Required' | translate}}</span>
 
               }
               <!-- <span class="field-error d-block">Escalation Rate is required</span> -->
@@ -456,7 +456,7 @@
           </div>
         @if(selectedEscalationDescription === 'Increases at custom rate') {
           <div class="w-100 form-field gap-12">
-            <mat-label class="f-s-16 d-block">Custom escalation rate</mat-label>
+            <mat-label class="f-s-16 d-block">{{ 'Custom escalation rate' | translate}}</mat-label>
          <mat-form-field  appearance="outline" class="w-full w-100 percentage-icon">
               <span matSuffix>%</span> 
                 <input
@@ -464,7 +464,7 @@
                               class="p-0"
                 type="number"
                 formControlName="customEscalationRate"
-                placeholder="Enter custom rate"
+                placeholder="{{ 'Enter custom rate' | translate}}"
           
                             />
                             
@@ -472,7 +472,7 @@
             @if(savingsForm.get('customEscalationRate')?.touched &&
                 savingsForm.get('customEscalationRate')?.hasError('required')) {
               <!-- <span class="field-error d-block">Custom escalation rate is required</span> -->
-              <span class="field-error d-block">Required</span>
+              <span class="field-error d-block">{{'Required' | translate}}</span>
 
             }
           </div>
@@ -485,7 +485,7 @@
             <div class="d-flex flex-column gap-8">
             @if(savingsForm.get('commissionType')?.value === 'both') {
               <div class="d-flex gap-8 align-items-center">
-                <mat-label class="f-s-16 f-w-400 d-block">Commission percentage</mat-label>
+                <mat-label class="f-s-16 f-w-400 d-block">{{'Commission percentage' | translate}}</mat-label>
                 <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
               </div>
             }
@@ -541,7 +541,7 @@
               (savingsForm.get('commissionPercentageCurrency')?.touched &&
               savingsForm.get('commissionPercentageCurrency')?.hasError('required'))) {
               <!-- <span class="field-error d-block">Amount is required</span> -->
-              <span class="field-error d-block">Required</span>
+              <span class="field-error d-block">{{'Required' | translate}}</span>
 
               }
               <!-- <span class="field-error d-block">Amount is required</span> -->
@@ -566,12 +566,12 @@
     <div class="row justify-content-between modal-action">
       <div class="col-5">
         <button (click)="closeDialog()" class="button-icon-outline w-100 d-block">
-          <span class="f-s-16">Cancel</span>
+          <span class="f-s-16">{{ 'Cancel' | translate }}</span>
         </button>
       </div>
       <div class="col-5">
         <button (click)="saveCashflow()" type="button" [disabled]="savingsForm.invalid" class="button-icon w-100 d-block">
-          <span class="f-s-16">{{isEditWorkflow ? 'Update' : 'Save'}}</span>
+          <span class="f-s-16">{{(isEditWorkflow ? 'Update' : 'Save') | translate}}</span>
         </button>
       </div>
     </div>

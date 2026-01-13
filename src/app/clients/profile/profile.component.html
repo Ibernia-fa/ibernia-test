@@ -20,7 +20,7 @@
             <!-- headings  -->
             <div class="d-flex flex-column justify-content-between gap-4">
               <h4 class="page-title f-w-500 f-s-30">
-                {{ client.clientDetails.firstName }} {{ client.clientDetails.lastName }}'s Profile
+                {{ client.clientDetails.firstName }} {{ client.clientDetails.lastName }}'s {{ 'Profile' | translate }}
               </h4>
               <span class="sub-title">
                 {{ client.clientDetails.birthDate | date }} ({{
@@ -35,7 +35,7 @@
             class="button-icon-outline"
             (click)="onEditClicked()"
           >
-            <span>Edit</span>
+            <span>{{ 'Edit' | translate }}</span>
             <img
               src="assets/images/svgs/edit-pen-icon-button.svg"
               alt="edit-pen-icon"
@@ -63,7 +63,7 @@
               src="assets/images/svgs/total-saving-wallet.svg"
               alt="total-saving-wallet"
             />
-            <h3 class="card-title">Total savings</h3>
+            <h3 class="card-title">{{ 'Total savings' | translate }}</h3>
           </div>
           <div class="d-flex align-items-center gap-20">
             <h3 class="saving-title">{{preferredCurrency | currencySymbol}}{{totalSavings | thousandSeparator}}</h3>
@@ -84,10 +84,10 @@
         <div
           class="d-flex align-items-center justify-content-between w-100 gap-16 flex-wrap"
         >
-          <span class="f-s-20">Client’s plans:</span>
+          <span class="f-s-20">{{ 'Client’s plans:' | translate }}</span>
           <div class="d-flex align-items-center gap-32">
             <div class="d-flex align-items-center">
-              <span class="f-s-14">Sorting order:</span>
+              <span class="f-s-14">{{ 'Sorting order:' | translate }}</span>
               <mat-select (valueChange)="onSortByValueChange($event)" placeholder="Select" class="sortby-edit-profile">
                 @for (sortDescriptor of sortDescriptors; track sortDescriptor) {
                 <mat-option [value]="sortDescriptor.value">{{
@@ -102,7 +102,7 @@
               type="button"
               class="button-icon"
             >
-              <span>New plan</span>
+              <span>{{ 'New plan' | translate }}</span>
               <img src="assets/images/svgs/add-icon.svg" alt="add-icon" />
             </button>
           </div>
@@ -146,7 +146,7 @@
                       width="24"
                     />
                   </mat-icon>
-                  <span>Edit</span>
+                  <span>{{ 'Edit' | translate }}</span>
                 </button>
                 <button (click)="onCopyModelClicked(cashflow)" mat-menu-item>
                   <mat-icon>
@@ -157,7 +157,7 @@
                       width="24"
                     />
                   </mat-icon>
-                  <span>Copy</span>
+                  <span>{{ 'Copy' | translate }}</span>
                 </button>
                 <button
                   (click)="onDeleteModelClicked(cashflow.id)"
@@ -171,12 +171,12 @@
                       width="24"
                     />
                   </mat-icon>
-                  <span>Delete</span>
+                  <span>{{ 'Delete' | translate }}</span>
                 </button>
               </mat-menu>
             </div>
             <div class="d-flex flex-column gap-10">
-              <span>Updated: {{ cashflow.updatedAt | timeAgo }}</span>
+              <span>{{ 'Updated:' | translate }} {{ cashflow.updatedAt | timeAgo }}</span>
               <p>
                 {{ cashflow.description }}
               </p>
