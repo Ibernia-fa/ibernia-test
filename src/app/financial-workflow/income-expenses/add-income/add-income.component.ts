@@ -33,6 +33,7 @@ import { FinancialViewModel } from '../model/income-expense';
 import { IncomeExpensesHttpService } from '../services/income-expenses-http.service';
 import { catchError, filter } from 'rxjs';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-add-income',
@@ -49,8 +50,8 @@ import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-sep
     MatSliderModule,
     ReactiveFormsModule,
     ThousandSeparatorPipe,
-    ThousandSeparatorInputDirective
-
+    ThousandSeparatorInputDirective,
+    TranslateModule
   ],
   providers: [provideNativeDateAdapter()],
   templateUrl: './add-income.component.html',

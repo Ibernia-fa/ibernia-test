@@ -12,15 +12,27 @@ import { AiReccomendationsComponent } from './ai-reccomendations/ai-reccomendati
 
 const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'account-preferences' },
-  { path: 'account-preferences', component: AccountPreferencesComponent, data: { showSidebar: true } },
-  { path: 'plan-billing', component: PlanBillingComponent, data: { showSidebar: true } },
-  { path: 'security', component: SecurityComponent, data: { showSidebar: true } },
-  { path: 'notifications', component: NotificationsComponent, data: { showSidebar: true } },
-  { path: 'branding', component: BrandingComponent, data: { showSidebar: true } },
-  { path: 'help', component: HelpAndContactComponent, data: { showSidebar: true } },
-  { path: 'ai-reccomendations', component: AiReccomendationsComponent, data: { showSidebar: true } },
-
-
+  { path: 'account-preferences',  loadComponent: () =>
+    import('./account-preferences/account-preferences.component')
+      .then(m => m.AccountPreferencesComponent), data: { showSidebar: true } },
+  { path: 'plan-billing', loadComponent: () =>
+    import('./plan-billing/plan-billing.component')
+      .then(m => m.PlanBillingComponent), data: { showSidebar: true } },
+  { path: 'security', loadComponent: () =>
+    import('./security/security.component')
+      .then(m => m.SecurityComponent), data: { showSidebar: true } },
+  { path: 'notifications', loadComponent: () =>
+    import('./notifications/notifications.component')
+      .then(m => m.NotificationsComponent), data: { showSidebar: true } },
+  { path: 'branding', loadComponent: () =>
+    import('./branding/branding.component')
+      .then(m => m.BrandingComponent), data: { showSidebar: true } },
+  { path: 'help', loadComponent: () =>
+    import('./help-and-contact/help-and-contact.component')
+      .then(m => m.HelpAndContactComponent), data: { showSidebar: true } },
+  { path: 'ai-reccomendations', loadComponent: () =>
+    import('./ai-reccomendations/ai-reccomendations.component')
+      .then(m => m.AiReccomendationsComponent), data: { showSidebar: true } },
 ];
 
 @NgModule({

@@ -32,6 +32,7 @@ import { allCountries } from 'src/app/clients/models/country';
 import { AgeCalculatorPipe } from 'src/app/pipe/age-calculator.pipe';
 import { CommonModule } from '@angular/common';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
+import { TranslateModule } from '@ngx-translate/core';
 interface Food {
   value: string;
   viewValue: string;
@@ -54,6 +55,7 @@ interface Food {
     MatTooltipModule,
     CommonModule,
     ThousandSeparatorInputDirective,
+    TranslateModule
   ],
   providers: [provideNativeDateAdapter(), 
     AgeCalculatorPipe,

@@ -56,6 +56,7 @@ import { DefaultPreferanceModule } from 'src/app/default-preferance/default-pref
 import { SettingsService } from 'src/app/default-preferance/services/default-preferance.http.service';
 import { DefaultPreferanceComponent } from 'src/app/default-preferance/default-preferance/default-preferance.component';
 import { AuthService } from 'src/app/auth/services/auth.service';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-client-list',
@@ -79,7 +80,8 @@ import { AuthService } from 'src/app/auth/services/auth.service';
     AgeCalculatorPipe,
     MatMenuModule,
     MatProgressSpinnerModule,
-    DefaultPreferanceModule
+    DefaultPreferanceModule,
+    TranslateModule
   ],
   // imports: [
   //   MatCardModule,

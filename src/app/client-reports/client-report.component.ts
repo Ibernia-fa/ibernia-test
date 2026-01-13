@@ -8,6 +8,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ViewReportHttpService } from './services/view-report-http.service';
 import { ViewReportPasswordComponent } from './components/view-report-password/view-report-password.component';
 import { ViewReportComponent } from './components/view-report/view-report.component';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-client-report',
@@ -18,7 +19,8 @@ import { ViewReportComponent } from './components/view-report/view-report.compon
     MatProgressSpinnerModule,
     ViewReportPasswordComponent,
     ViewReportComponent,
-    MatDialogModule
+    MatDialogModule,
+    TranslateModule
   ],
   templateUrl: './client-report.component.html',
   styleUrl: './client-report.component.scss',

@@ -1,11 +1,14 @@
 import { Component } from '@angular/core';
+import { MatCard, MatCardContent } from '@angular/material/card';
+import { TranslateModule } from '@ngx-translate/core';
 import { NavItemService } from 'src/app/layouts/full/nav-item.service';
 
 @Component({
   selector: 'app-ai-reccomendations',
-  standalone: false,
+  standalone: true,
   templateUrl: './ai-reccomendations.component.html',
-  styleUrl: './ai-reccomendations.component.scss'
+  styleUrl: './ai-reccomendations.component.scss',
+  imports: [MatCard, MatCardContent, TranslateModule]
 })
 export class AiReccomendationsComponent {
   constructor(

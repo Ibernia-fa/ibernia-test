@@ -31,6 +31,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Cashflow } from 'src/app/clients/models/cashflow';
+import { TranslateModule } from '@ngx-translate/core';
 
 interface CompareDialogData {
   cashflows: Cashflow[];
@@ -44,7 +45,8 @@ interface CompareDialogData {
     CommonModule,
     FormsModule,
     MatRadioModule,
-    MatButtonModule
+    MatButtonModule,
+    TranslateModule
   ],
   templateUrl: './compare-cashflows.component.html',
   styleUrl: './compare-cashflows.component.scss'

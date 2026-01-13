@@ -39,6 +39,7 @@ import { AuthService } from 'src/app/auth/services/auth.service';
 import { SettingsService } from 'src/app/default-preferance/services/default-preferance.http.service';
 import { Store } from '@ngrx/store';
 import { selectedClient } from 'src/app/store/client/client.selectors';
+import { TranslateModule } from '@ngx-translate/core';
 @Component({
   selector: 'app-saving-pots',
   imports: [
@@ -55,7 +56,8 @@ import { selectedClient } from 'src/app/store/client/client.selectors';
     CommonModule,
     FormsModule,
     CurrencySymbolPipe,
-    ThousandSeparatorPipe
+    ThousandSeparatorPipe,
+    TranslateModule
   ],
 
   templateUrl: './saving-pots.component.html',

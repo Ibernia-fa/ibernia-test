@@ -19,6 +19,7 @@ import { Cashflow } from '../../models/cashflow';
 import { catchError, filter } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-edit-model-dialog',
@@ -30,6 +31,7 @@ import { Router } from '@angular/router';
     MatIconModule,
     MatInputModule,
     ReactiveFormsModule,
+    TranslateModule
   ],
   templateUrl: './edit-model-dialog.component.html',
   styleUrl: './edit-model-dialog.component.scss',

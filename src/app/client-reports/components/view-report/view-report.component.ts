@@ -22,6 +22,7 @@ import {
 } from '@angular/animations';
 import { TablerIconsModule } from 'angular-tabler-icons';
 import { MaterialModule } from 'src/app/material.module';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-view-report',
@@ -44,6 +45,7 @@ import { MaterialModule } from 'src/app/material.module';
     MatRippleModule,
     TablerIconsModule,
     MaterialModule,
+    TranslateModule
   ],
    animations: [
     trigger('indicatorRotate', [
