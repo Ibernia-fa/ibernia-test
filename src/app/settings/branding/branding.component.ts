@@ -81,7 +81,7 @@ export class BrandingComponent implements OnInit {
       .saveProfile({ userId, profilePhotoUrl: this.profileImage || "" })
       .subscribe({
         next: () => {
-          this.toastr.success('Logo saved.', 'Success!');
+          this.toastr.success('Logo saved', 'Success!');
           this.isSaving = false;
 
           this.orgProfiles.setBrandingLogo(this.profileImage!);
