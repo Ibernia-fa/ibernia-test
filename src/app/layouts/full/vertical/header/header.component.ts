@@ -116,6 +116,9 @@ showFiller = false;
     },
   ];
 
+  currentLanguage: 'English' | 'Italian' = 'English';
+
+
   @Output() optionsChange = new EventEmitter<AppSettings>();
   private destroy$ = new Subject<void>();
   user: any;
