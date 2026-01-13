@@ -408,7 +408,7 @@ updateOrderNumbers() {
         loggedInUserPreferences : this.loggedInUserPreferences,
         amountCycles: this.amountCycles,
         escalataionRates: this.escalationRates,
-        eventsList: this.timeline.clientEvents.sort((a, b) => a.start.age - b.start.age),
+        eventsList: [...this.timeline.clientEvents].sort((a, b) => a.start.age - b.start.age),
         clientBirthDate: this.selectedClient?.clientDetails.birthDate,
         clientPreferredCurrency:
           this.selectedClient?.clientDetails.preferredCurrency,
@@ -422,7 +422,26 @@ updateOrderNumbers() {
 
     dialogRef.afterClosed().subscribe((result: any) => {
       console.log('Dialog closed with result:', result);
-      this.savingPots = result.savingPot;
+      // this.savingPots = result?.savingPot;
+      if (!result?.clientSaving) return;
+
+      const updatedSaving = result.clientSaving;
+
+      const list = [...this.savingPots.clientSavings];
+      const index = list.findIndex(x => x.id === updatedSaving.id);
+
+      if (index === -1) return;
+
+      list[index] = {
+        ...list[index],
+        ...updatedSaving
+      };
+
+      this.savingPots = {
+        ...this.savingPots,
+        // clientSavings: list
+        clientSavings: [...this.savingPots.clientSavings]
+      };
       this.ensureCashFirst();
       // this.savingPots.clientSavings.push(result.clientSaving);
     });
