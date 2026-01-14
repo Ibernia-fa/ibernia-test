@@ -234,10 +234,10 @@
       </div>
       <div class="row  client-submit-btn">
         <div class="col-12 d-flex justify-content-end">
-          <button class="button-icon   m-r-5" (click)="onAddNewClientClicked()" [disabled]="isFormInvalid">
-            <span>{{'Add new client' | translate}}</span>
+          <button class="button-icon m-r-5" [disabled]="isFormInvalid || isLoading" (click)="onAddNewClientClicked()">
+            <span>{{ 'Add new client' | translate }}</span>
           </button>
-          <button class="button-icon " (click)="onSubmit()" [disabled]="isFormInvalid">
+          <button class="button-icon " (click)="onSubmit()" [disabled]="isFormInvalid || isLoading">
             <span>{{'Add new client and start the plan' | translate}}</span>
           </button>
         </div>
