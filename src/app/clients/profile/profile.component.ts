@@ -206,7 +206,7 @@ export class ProfileComponent {
         throw err;
       })
     ).subscribe((res) => {
-      this.toastr.success('Plan Cloned Successfully');
+      this.toastr.success('Plan cloned successfully');
       this.getCashflows();
     });
   }
