@@ -30,6 +30,7 @@ import { Store } from '@ngrx/store';
 import { Client } from 'src/app/clients/models/client';
 import { selectedClient } from 'src/app/store/client/client.selectors';
 import { LanguageService } from 'src/app/core/language.service';
+import { LanguageLoaderService } from '../../language-loader.service';
 
 interface notifications {
   id: number;
@@ -123,7 +124,8 @@ showFiller = false;
 
   userId!: string;
   currentLanguage: LanguageCode = 'en';
-otherLanguage: LanguageCode = 'it';
+  otherLanguage: LanguageCode = 'it';
+  // isLanguageSwitching = false;
 
 
   @Output() optionsChange = new EventEmitter<AppSettings>();
@@ -149,6 +151,7 @@ otherLanguage: LanguageCode = 'it';
         private router: Router, // Add Router
     private store: Store ,
     private languageService: LanguageService,
+    private languageLoader: LanguageLoaderService
   ) {
     translate.setDefaultLang('en');
     this.user = this.Authservice.getUserProfile();
@@ -194,16 +197,20 @@ otherLanguage: LanguageCode = 'it';
   toggleLanguage(language: LanguageCode): void {
     if (!this.userId || language === this.currentLanguage) return;
 
+    this.languageLoader.show();
+
     this.settingsService
     .updateLanguage(this.userId, language)
     .subscribe({
       next: () => {
         this.currentLanguage = language;
         this.setOtherLanguage();
-
         this.languageService.use(language);
+
+        setTimeout(() => this.languageLoader.hide(), 300);
       },
       error: err => {
+        this.languageLoader.hide();
         console.error('Failed to update language', err);
       }
     });
