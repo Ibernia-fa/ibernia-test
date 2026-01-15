@@ -59,6 +59,7 @@ export class ClientAddComponent {
   selectedClientCountryISO = CountryISO.UnitedStates;
   selectedPartnerCountryISO = CountryISO.UnitedStates;
   user: any;
+  isLoading: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -256,8 +257,15 @@ export class ClientAddComponent {
   }
 
   onAddNewClientClicked() {
+    this.isLoading = true;
     this.clientForm.markAllAsTouched();
     this.clientForm.markAsDirty();
+
+    if (this.isFormInvalid) {
+      this.isLoading = false;
+      return;
+    } 
+
     if (!this.isFormInvalid) {
       var client: Client = this.getClientFormInfo();
       this.clientHttpService
@@ -267,10 +275,12 @@ export class ClientAddComponent {
           map((res) => {
             this.router.navigate(['/clients/' + res.id + '/profile']);
             this.toastr.success('Client created successfully', 'Success!');
+            this.isLoading = false;
           }),
           catchError((err) => {
             console.error(err);
             this.toastr.error('An error occured while saving client', 'Error!');
+            this.isLoading = false;
             throw err;
           })
         )
@@ -279,10 +289,11 @@ export class ClientAddComponent {
       // Submit form data to the API or service
     } else {
       console.error('Form is invalid');
+      this.isLoading = false;
     }
   }
 
-  openNewModelDialog(client: Client) {
+  openNewModelDialog(client: Client, id: string) {
     const dialog = this.dialog.open(AddModelDialogComponent, {
       width: '600px',
       disableClose: true,
@@ -290,7 +301,7 @@ export class ClientAddComponent {
     });
 
     dialog.afterClosed().subscribe((res: any) => {
-      console.log('Dialog closed', res);
+      this.router.navigate(['/clients/' + id + '/profile']);
     });
   }
 
@@ -302,8 +313,15 @@ export class ClientAddComponent {
   }
 
   onSubmit() {
+    this.isLoading = true;
     this.clientForm.markAllAsTouched();
     this.clientForm.markAsDirty();
+
+    if (this.isFormInvalid) {
+      this.isLoading = false;
+      return;
+    } 
+
     if (!this.isFormInvalid) {
       var client: Client = this.getClientFormInfo();
       this.clientHttpService
@@ -312,11 +330,13 @@ export class ClientAddComponent {
           filter((res) => !!res),
           map((res) => {
             this.toastr.success('Client created successfully', 'Success!');
-            this.openNewModelDialog(res);
+            this.openNewModelDialog(res, res.id);
+            this.isLoading = false;
           }),
           catchError((err) => {
             console.error(err);
             this.toastr.error('An error occured while saving client', 'Error!');
+            this.isLoading = false;
             throw err;
           })
         )
@@ -324,6 +344,7 @@ export class ClientAddComponent {
       console.log('Form Data:', this.clientForm.value);
     } else {
       console.error('Form is invalid');
+      this.isLoading = false;
     }
   }
 }
