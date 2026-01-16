@@ -15,7 +15,7 @@
       <div [formGroup]="withdrawalForm" class="d-flex flex-column gap-20">
         <!-- >{{ 'Description' | translate }}< Field  -->
         <div class="w-100 form-field gap-8">
-          <mat-label class="f-s-16 d-block" style="line-height: 18px">>{{ 'Description' | translate }}<</mat-label>
+          <mat-label class="f-s-16 d-block" style="line-height: 18px">{{ 'Description' | translate }}</mat-label>
           <input matInput formControlName="description" placeholder="e.g. Monthly living expenses" />
           @if(withdrawalForm.get('description')?.touched &&
           withdrawalForm.get('description')?.hasError('required')) {

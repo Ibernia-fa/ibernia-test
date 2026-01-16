@@ -130,7 +130,7 @@
                                 <!-- Card  -->
                                 <div class="dragable-card d-flex align-items-center justify-content-between">
                                     <!-- Content  -->
-                                    <div class="d-flex align-items-center gap-8">
+                                    <div (click)="updateEventClicked(saving)" class="d-flex align-items-center gap-8 cursor-pointer">
                                         @if(i > 0 && !('cash' === (savingPots.clientSavings[i]?.name ||
                                         '').toLowerCase())) {
                                         <button cdkDragHandle type="button" class="drag-btn">

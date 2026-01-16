@@ -10,7 +10,7 @@
     <mat-dialog-content>
       <div [formGroup]="incomeForm" class="d-flex flex-column gap-20">
         <div class="w-100 form-field gap-8">
-          <mat-label class="f-s-16 d-block" style="line-height: 18px">>{{ 'Description' | translate }}<</mat-label>
+          <mat-label class="f-s-16 d-block" style="line-height: 18px">{{ 'Description' | translate }}</mat-label>
           <input matInput formControlName="description" placeholder="e.g. Salary" />
           
           @if(incomeForm.get('description')?.touched && incomeForm.get('description')?.hasError('required')) {
