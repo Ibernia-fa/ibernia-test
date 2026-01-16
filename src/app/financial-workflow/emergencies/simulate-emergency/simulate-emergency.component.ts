@@ -320,7 +320,12 @@ export class SimulateEmergencyComponent {
               }
             ];
 
-            this.simulationResult = simulated;
+            // Show baseline first, then switch to simulated after 3 seconds (transition effect)
+            this.simulationResult = this.baselineResult;
+            setTimeout(() => {
+              this.simulationResult = simulated;
+            }, 3000);
+
             this.activeTab = 'simulated';
             this.dialogRef.updateSize('92vw', '88vh');
             this.emergencyExpense = simulateEmergency;
