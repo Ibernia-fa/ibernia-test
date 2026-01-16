@@ -310,18 +310,22 @@ export class SimulateEmergencyComponent {
 
             this.baselineResult = res.baseline;
             const simulated = res.simulated;
-            // simulated.timelineEvents = null;
-            this.simulationResult = simulated;
+            const iconUrlWithoutExtension = this.emergency.iconUrl?.replace(/\.[^/.]+$/, '');
 
+            simulated.timelineEvents = [
+              {
+                iconUrl: iconUrlWithoutExtension,
+                name: "Emergency - " + this.emergency.name,
+                startYear: this.emergencyExpense?.start?.year
+              }
+            ];
+
+            this.simulationResult = simulated;
             this.activeTab = 'simulated';
             this.dialogRef.updateSize('92vw', '88vh');
-            this.isSimulationCompleted = true;
-
             this.emergencyExpense = simulateEmergency;
             this.emergencyExpense.id = res.emergencyExpenseId;
-
-            console.log(this.emergencyExpense.id);
-
+            this.isSimulationCompleted = true;
             this.isUpdateParentItem = true;
           },
           error: (err: any) => {

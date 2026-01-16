@@ -192,20 +192,29 @@ export class SavingsBarStackedChartComponent implements OnChanges {
 
     eventsByYear.forEach((groupEvents, year) => {
       groupEvents.forEach((event, index) => {
+        const isEmergency = this.cashFlowName === "" ? true : false;
+        const tooltipClass = isEmergency ? 'emergency-icon' : event.iconUrl;
+        var iconExtension = ".svg";
+
+        // work around until get the svg icons for emergencies
+        if (isEmergency && (event.name == "Emergency - Natural hazards" || event.name == "Emergency - Life")) {
+          iconExtension = ".png";
+        }
+
         annotations.push({
           x: year,
           y: 0,
           marker: {
             size: 5,
-            fillColor: this.calculateDotColor(event.iconUrl),
+            fillColor: this.calculateDotColor(event.iconUrl, this.cashFlowName === "" ? true : false),
             strokeColor: '#fff',
             strokeWidth: 2,
             offsetY: -(index * DOT_SPACING),
           },
           label: { text: '' },
           customTooltip: `
-            <div class="event-tooltip ${event.iconUrl}">
-              <img src="/assets/images/svgs/${event.iconUrl}.svg" alt="${event.iconUrl}" />
+            <div class="event-tooltip ${tooltipClass}">
+              <img src="/assets/images/svgs/${event.iconUrl}${iconExtension}" alt="${event.iconUrl}" />
               <span>${event.name}</span>
             </div>`
         });
@@ -260,7 +269,7 @@ export class SavingsBarStackedChartComponent implements OnChanges {
     'boat-icon': '#047a48'
   };
 
-  calculateDotColor(iconUrl: string): string {
-    return this.ICON_COLORS[iconUrl] ?? '#8388ff';
+  calculateDotColor(iconUrl: string, isEmergency: boolean = false): string {
+    return isEmergency ? '#ea3323' : this.ICON_COLORS[iconUrl] ?? '#8388ff';
   }
 }
