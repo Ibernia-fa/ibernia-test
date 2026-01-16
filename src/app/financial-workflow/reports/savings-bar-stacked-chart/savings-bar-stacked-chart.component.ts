@@ -1,10 +1,11 @@
-import { Component, ViewChild, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, ViewChild, Input, OnChanges, SimpleChanges, ElementRef } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { TablerIconsModule } from 'angular-tabler-icons';
 import { ChartComponent, NgApexchartsModule } from 'ng-apexcharts';
 import { ChartSeries, TimelineEvent } from '../models/charts-series.model';
 import { Client } from 'src/app/clients/models/client';
 import moment from 'moment';
+import { set } from 'date-fns';
 
 @Component({
   selector: 'app-savings-bar-stacked-chart',
@@ -17,7 +18,8 @@ import moment from 'moment';
   styleUrl: './savings-bar-stacked-chart.component.scss'
 })
 export class SavingsBarStackedChartComponent implements OnChanges {
-  @ViewChild("chart") chart: ChartComponent;
+  // @ViewChild("chart") chart: ChartComponent;
+  @ViewChild("chart", { read: ElementRef }) chartElRef: ElementRef<HTMLDivElement>;
   @Input() report: ChartSeries;
   @Input() forecastStartDate: Date;
   @Input() forecastEndDate: Date;
@@ -46,6 +48,7 @@ export class SavingsBarStackedChartComponent implements OnChanges {
       dataLabels: {
         enabled: false
       },
+
       tooltip: {
         enabled: true,
         shared: false, // or true if you want stacked values together
@@ -55,11 +58,9 @@ export class SavingsBarStackedChartComponent implements OnChanges {
           const value = series[seriesIndex][dataPointIndex];
           const seriesName = w.globals.seriesNames[seriesIndex];
           const xValue = w.globals.labels[dataPointIndex];
-          // console.log('opts', opts, );
           const color = w.globals.colors[seriesIndex];
 
           const age = [(Math.floor(xValue) - moment(this.client.clientDetails.birthDate).year())]
-          // build whatever HTML you want here
           return `
           <div class="savings-tooltip">
             <div class="savings-tooltip__header">
@@ -146,8 +147,11 @@ export class SavingsBarStackedChartComponent implements OnChanges {
 
       // goals and events dots
       this.events = this.report.timelineEvents;
-      this.chartOptions.annotations = { points: this.buildEventAnnotations(this.events) };
-      setTimeout(() => this.attachHtmlTooltips(), 1000);
+      
+      if(this.events.length > 0) {
+        this.chartOptions.annotations = { points: this.buildEventAnnotations(this.events) };
+        setTimeout(() => this.attachHtmlTooltips(), 500);
+      }
     }
 
     this.chartOptions.chart = { ...this.chartOptions.chart };
@@ -176,7 +180,43 @@ export class SavingsBarStackedChartComponent implements OnChanges {
         }
       }
     }
+
+    
+    this.chartOptions.series = this.report.series;
+    // setTimeout(() => this.applyEmergencyIconAnnotation(), 1000);
   }
+
+// private applyEmergencyIconAnnotation() {
+//   if (!this.chartOptions.series) return;
+
+//   const emergencySeries = this.chartOptions.series.find((s:any) => s.id === 'emergency-expense');
+//   if (!emergencySeries) return;
+
+//   const points: any[] = emergencySeries.data.map((val: number, idx: number) => {
+//     if (val <= 0) return null;
+//     return {
+//       x: this.report.categories[idx], // category on x-axis
+//       y: val,                        // top of bar
+//       label: {
+//         text: '',
+//         style: {
+//           cssClass: 'emergency-annotation'
+//         }
+//       },
+//       marker: {
+//         size: 0 // hide default circle
+//       },
+//       customSVG: `
+//         <foreignObject x="-12" y="-28" width="24" height="24">
+//           <img src="/assets/images/svgs/emergency-orange.svg" width="24" height="24"/>
+//         </foreignObject>
+//       `
+//     };
+//   }).filter((p:any) => p != null);
+
+//   this.chartOptions.annotations = { points };
+// }
+
 
   buildEventAnnotations(events: TimelineEvent[]) {
     const eventsByYear = new Map<string, TimelineEvent[]>();
@@ -192,29 +232,21 @@ export class SavingsBarStackedChartComponent implements OnChanges {
 
     eventsByYear.forEach((groupEvents, year) => {
       groupEvents.forEach((event, index) => {
-        const isEmergency = this.cashFlowName === "" ? true : false;
-        const tooltipClass = isEmergency ? 'emergency-icon' : event.iconUrl;
-        var iconExtension = ".svg";
-
-        // work around until get the svg icons for emergencies
-        if (isEmergency && (event.name == "Emergency - Natural hazards" || event.name == "Emergency - Life")) {
-          iconExtension = ".png";
-        }
 
         annotations.push({
           x: year,
           y: 0,
           marker: {
             size: 5,
-            fillColor: this.calculateDotColor(event.iconUrl, this.cashFlowName === "" ? true : false),
+            fillColor: this.calculateDotColor(event.iconUrl),
             strokeColor: '#fff',
             strokeWidth: 2,
             offsetY: -(index * DOT_SPACING),
           },
           label: { text: '' },
           customTooltip: `
-            <div class="event-tooltip ${tooltipClass}">
-              <img src="/assets/images/svgs/${event.iconUrl}${iconExtension}" alt="${event.iconUrl}" />
+            <div class="event-tooltip ${event.iconUrl}">
+              <img src="/assets/images/svgs/${event.iconUrl}.svg" alt="${event.iconUrl}" />
               <span>${event.name}</span>
             </div>`
         });
@@ -269,7 +301,7 @@ export class SavingsBarStackedChartComponent implements OnChanges {
     'boat-icon': '#047a48'
   };
 
-  calculateDotColor(iconUrl: string, isEmergency: boolean = false): string {
-    return isEmergency ? '#ea3323' : this.ICON_COLORS[iconUrl] ?? '#8388ff';
+  calculateDotColor(iconUrl: string): string {
+    return this.ICON_COLORS[iconUrl] ?? '#8388ff';
   }
 }

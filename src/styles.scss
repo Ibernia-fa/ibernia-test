@@ -794,4 +794,9 @@ body:has(.global-fullscreen-overlay) {
   border: 1px solid #f9f9ff !important;
   color: #ff5621;
 }
+
+.emergency-icon-overlay {
+  z-index: 1000;
+  pointer-events: none;
+}
 // event styes for lifetime model - end

@@ -310,21 +310,33 @@ export class SimulateEmergencyComponent {
 
             this.baselineResult = res.baseline;
             const simulated = res.simulated;
-            const iconUrlWithoutExtension = this.emergency.iconUrl?.replace(/\.[^/.]+$/, '');
+            simulated.timelineEvents = [];
+            
+            // add emergency cancle
+            const emergencyAmount = this.simulateEmergencyForm.get('amount')?.value;
+            const emergencySeries = this.buildEmergencySeries(this.baselineResult, "2031", emergencyAmount);
 
-            simulated.timelineEvents = [
-              {
-                iconUrl: iconUrlWithoutExtension,
-                name: "Emergency - " + this.emergency.name,
-                startYear: this.emergencyExpense?.start?.year
-              }
+            if (!this.baselineResult || !this.baselineResult.series) return;
+            
+            this.baselineResult.series = [
+              ...this.baselineResult.series,
+              emergencySeries
             ];
 
-            // Show baseline first, then switch to simulated after 3 seconds (transition effect)
+            console.log('Baseline Series:', this.baselineResult.series);
+
+            simulated.series = [
+              ...simulated.series,
+              emergencySeries
+            ];
+
+            // show baseline first, then switch to simulated after 3 seconds (transition effect)
             this.simulationResult = this.baselineResult;
+
             setTimeout(() => {
               this.simulationResult = simulated;
-            }, 3000);
+              console.log('Simulated Series:', this.simulationResult);
+            }, 4000);
 
             this.activeTab = 'simulated';
             this.dialogRef.updateSize('92vw', '88vh');
@@ -413,5 +425,20 @@ export class SimulateEmergencyComponent {
     }
 
     this.simulateEmergencyForm.updateValueAndValidity();
+  }
+
+  private buildEmergencySeries(report: any, year: string, amount: number): any {
+    const emergencyData: number[] = report.categories.map((category: string) =>
+      category === year ? amount : 0
+    );
+
+    return {
+      id: 'emergency-expense',
+      name: 'Emergency Expense',
+      data: emergencyData,
+      color: '#fbd4d1',
+      group: 'apexcharts-axis-0',
+      order: report.series?.length ?? 0,
+    };
   }
 }
