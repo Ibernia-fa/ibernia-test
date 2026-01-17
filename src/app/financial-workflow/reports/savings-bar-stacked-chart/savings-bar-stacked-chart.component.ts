@@ -125,15 +125,24 @@ export class SavingsBarStackedChartComponent implements OnChanges {
       const seriesList = this.report.series;
       const seriesColors = this.chartOptions.colors || [];
 
-      // Dynamically build fillColors array based on series names
-      const fillColors = seriesList.map((s, i) =>
-        s.name === 'Current Account (Negative)' ? 'transparent' : s.color
-      );
+      // dynamically build fillColors array based on series names
+      const fillColors = seriesList.map((s, i) => {
+        if (s.name === 'Current Account (Negative)' || s.name === 'Emergency Expense') {
+          return 'transparent';
+        }
+        return s.color
+      });
 
+      // legends formatter to hide specific series names
       this.chartOptions.legend = {
         ...this.chartOptions.legend,
-        formatter: (seriesName: string) =>
-          seriesName === 'Current Account (Negative)' ? '' : seriesName,
+        
+        formatter: (seriesName: string) => {
+          if (seriesName === 'Current Account (Negative)' || seriesName === 'Emergency Expense') {
+            return '';
+          }
+          return seriesName;
+        },
         markers: {
           fillColors: fillColors
         },
@@ -147,8 +156,8 @@ export class SavingsBarStackedChartComponent implements OnChanges {
 
       // goals and events dots
       this.events = this.report.timelineEvents;
-      
-      if(this.events.length > 0) {
+
+      if (this.events.length > 0) {
         this.chartOptions.annotations = { points: this.buildEventAnnotations(this.events) };
         setTimeout(() => this.attachHtmlTooltips(), 500);
       }
@@ -181,41 +190,40 @@ export class SavingsBarStackedChartComponent implements OnChanges {
       }
     }
 
-    
     this.chartOptions.series = this.report.series;
     // setTimeout(() => this.applyEmergencyIconAnnotation(), 1000);
   }
 
-// private applyEmergencyIconAnnotation() {
-//   if (!this.chartOptions.series) return;
+  // private applyEmergencyIconAnnotation() {
+  //   if (!this.chartOptions.series) return;
 
-//   const emergencySeries = this.chartOptions.series.find((s:any) => s.id === 'emergency-expense');
-//   if (!emergencySeries) return;
+  //   const emergencySeries = this.chartOptions.series.find((s:any) => s.id === 'emergency-expense');
+  //   if (!emergencySeries) return;
 
-//   const points: any[] = emergencySeries.data.map((val: number, idx: number) => {
-//     if (val <= 0) return null;
-//     return {
-//       x: this.report.categories[idx], // category on x-axis
-//       y: val,                        // top of bar
-//       label: {
-//         text: '',
-//         style: {
-//           cssClass: 'emergency-annotation'
-//         }
-//       },
-//       marker: {
-//         size: 0 // hide default circle
-//       },
-//       customSVG: `
-//         <foreignObject x="-12" y="-28" width="24" height="24">
-//           <img src="/assets/images/svgs/emergency-orange.svg" width="24" height="24"/>
-//         </foreignObject>
-//       `
-//     };
-//   }).filter((p:any) => p != null);
+  //   const points: any[] = emergencySeries.data.map((val: number, idx: number) => {
+  //     if (val <= 0) return null;
+  //     return {
+  //       x: this.report.categories[idx], // category on x-axis
+  //       y: val,                        // top of bar
+  //       label: {
+  //         text: '',
+  //         style: {
+  //           cssClass: 'emergency-annotation'
+  //         }
+  //       },
+  //       marker: {
+  //         size: 0 // hide default circle
+  //       },
+  //       customSVG: `
+  //         <foreignObject x="-12" y="-28" width="24" height="24">
+  //           <img src="/assets/images/svgs/emergency-orange.svg" width="24" height="24"/>
+  //         </foreignObject>
+  //       `
+  //     };
+  //   }).filter((p:any) => p != null);
 
-//   this.chartOptions.annotations = { points };
-// }
+  //   this.chartOptions.annotations = { points };
+  // }
 
 
   buildEventAnnotations(events: TimelineEvent[]) {
