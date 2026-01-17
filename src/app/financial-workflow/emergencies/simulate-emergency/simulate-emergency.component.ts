@@ -314,7 +314,10 @@ export class SimulateEmergencyComponent {
             
             // add emergency cancle
             const emergencyAmount = this.simulateEmergencyForm.get('amount')?.value;
-            const emergencySeries = this.buildEmergencySeries(this.baselineResult, "2031", emergencyAmount);
+            const emergencySeries = this.buildEmergencySeries(
+              this.baselineResult,
+              this.simulateEmergencyForm.get('start')?.value?.toString() ?? '',
+              emergencyAmount);
 
             if (!this.baselineResult || !this.baselineResult.series) return;
             
@@ -322,8 +325,6 @@ export class SimulateEmergencyComponent {
               ...this.baselineResult.series,
               emergencySeries
             ];
-
-            console.log('Baseline Series:', this.baselineResult.series);
 
             simulated.series = [
               ...simulated.series,
@@ -335,8 +336,7 @@ export class SimulateEmergencyComponent {
 
             setTimeout(() => {
               this.simulationResult = simulated;
-              console.log('Simulated Series:', this.simulationResult);
-            }, 4000);
+            }, 3000);
 
             this.activeTab = 'simulated';
             this.dialogRef.updateSize('92vw', '88vh');
@@ -435,6 +435,7 @@ export class SimulateEmergencyComponent {
     return {
       id: 'emergency-expense',
       name: 'Emergency Expense',
+      stack: undefined,
       data: emergencyData,
       color: '#fbd4d1',
       group: 'apexcharts-axis-0',

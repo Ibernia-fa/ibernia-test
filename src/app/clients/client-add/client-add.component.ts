@@ -33,7 +33,6 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { SettingsService } from 'src/app/default-preferance/services/default-preferance.http.service';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { TranslateModule } from '@ngx-translate/core';
-import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-client-add',
@@ -50,8 +49,7 @@ import { NgIf } from '@angular/common';
     MatCardModule,
     NgxIntlTelInputModule,
     MatCheckboxModule,
-    TranslateModule,
-    NgIf,
+    TranslateModule
   ],
   providers: [
     ClientHttpService,
