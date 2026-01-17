@@ -28,6 +28,7 @@ import { FiveDayRangeSelectionStrategy } from 'src/app/core/five-day-range-selec
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { TranslateModule } from '@ngx-translate/core';
+import { Location } from '@angular/common';
 
 
 @Component({
@@ -75,7 +76,8 @@ export class ClientEditComponent {
     private router: Router,
     private toastr: ToastrService,
     private activatedRoute: ActivatedRoute,
-    private authService: AuthService
+    private authService: AuthService,
+    private location: Location
   ) {
     this.user = this.authService.getUserProfile();
 
@@ -252,7 +254,7 @@ export class ClientEditComponent {
         .pipe(
           filter((res) => !!res),
           map((res) => {
-            this.router.navigate(['/clients']);
+            this.location.back();
             this.toastr.success('Client updated successfully', 'Success!');
           }),
           catchError((err) => {
