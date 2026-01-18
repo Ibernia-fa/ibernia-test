@@ -23,7 +23,7 @@
                 </mat-select>
               </div>
               <div class="w-100 form-field">
-                <input matInput type="text" formControlName="amount"
+                <input matInput type="text" formControlName="amount" placeholder="0"
                   [value]="simulateEmergencyForm.get('amount')?.value | thousandSeparator" thousandSeparatorInput
                   (input)="onAmountInput($event.target.value)" />
               </div>

@@ -166,7 +166,7 @@ export class AddNewPotComponent {
     this.savingsForm = this.fb.group({
       name: ['', Validators.required],
       currency: [this.clientPreferredCurrency, Validators.required],
-      amount: [0, [Validators.required, Validators.min(0)]],
+      amount: ['', [Validators.required, Validators.min(0)]],
       returnRate: [this.userReturnRate],
       // lockPot: [true],
       lockPot: [false],
@@ -182,7 +182,7 @@ export class AddNewPotComponent {
       commissionPercentageCycle: [this.cycles[2].id],
       commissionPercentage: [this.loggedInUserPreferences?.comissionPercentage || 0],
       escalationRate: [''],
-      customEscalationRate: [0]
+      customEscalationRate: ['']
     });
 
   this.savingsForm.setValidators(this.endOnOrAfterStartValidator());

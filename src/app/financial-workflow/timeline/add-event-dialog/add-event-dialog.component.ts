@@ -176,7 +176,7 @@ export class AddEventDialogComponent {
           start: [moment(this.dropTime).year(), Validators.required],
           end: [0, Validators.required],
           escalationRate: [this.escalationRates[1].value, Validators.required],
-          customEscalationRate: [0]
+          customEscalationRate: ['']
 
         });
         this.onCycleValueChange(this.systemEvent?.isOneOff ? 'One-off' : '');

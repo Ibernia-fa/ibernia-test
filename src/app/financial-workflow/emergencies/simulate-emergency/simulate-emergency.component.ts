@@ -146,7 +146,7 @@ export class SimulateEmergencyComponent {
 
     this.simulateEmergencyForm = this.fb.group({
       currencySymbol: [this.clientPreferredCurrency, [Validators.required]],
-      amount: [0, [Validators.required, Validators.min(1)]],
+      amount: ['', [Validators.required, Validators.min(1)]],
       cycle: [this.amountCycles[0].id, Validators.required],
       start: ['', Validators.required],
       end: [''],
