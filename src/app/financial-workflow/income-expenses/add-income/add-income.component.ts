@@ -72,6 +72,7 @@ export class AddIncomeComponent {
   selectedIncome: FinancialViewModel;
   showStartEnd = false;
   selectedEscalationDescription: string | null;
+  currentYear: number = new Date().getFullYear();
 
   constructor(
     private dialogRef: MatDialogRef<AddIncomeComponent>,

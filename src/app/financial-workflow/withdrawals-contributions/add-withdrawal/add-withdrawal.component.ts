@@ -62,6 +62,7 @@ export class AddWithdrawalComponent {
   savingPots: SavingPotsModel;
   eventsList: any;
   selectedEscalationDescription: string;
+  currentYear: number = new Date().getFullYear();
 
   constructor(
     private dialogRef: MatDialogRef<AddWithdrawalComponent>,

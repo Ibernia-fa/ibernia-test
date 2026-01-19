@@ -110,6 +110,11 @@
                   <div class="select-option">
                     <mat-select value="Select" formControlName="start" hideSingleSelectionIndicator>
                       <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
+                       @if(eventsList.length > 0)
+                        {
+                          <mat-option [value]="currentYear">This year ({{ currentYear }})</mat-option>
+                          <hr>
+                        }
                       @for (event of eventsList; track event) {
                       <mat-option [value]="event.start.year">{{ event.name }} ({{ event.start.age }})</mat-option>
                       }
