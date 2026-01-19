@@ -20,3 +20,39 @@
     overflow: hidden;
     text-indent: -9999px;
 }
+
+.tab {
+  span {
+    line-height: 18px;
+  }
+  .tabs {
+    border: 1px solid #516ce8;
+    border-radius: 4px;
+    padding: 2px;
+    button {
+      &.active {
+        background-color: #516ce8;
+      }
+      background-color: white;
+      text-align: center;
+      padding-top: 8px;
+      padding-bottom: 8px;
+      span {
+        &.active {
+          color: white;
+        }
+        font-weight: 500;
+        color: #516ce8;
+      }
+    }
+    .row {
+      margin: 0 !important;
+      .col-6 {
+        padding: 0 !important;
+      }
+    }
+    .coverage-btn{
+      padding: 0;
+    }
+  }
+}
