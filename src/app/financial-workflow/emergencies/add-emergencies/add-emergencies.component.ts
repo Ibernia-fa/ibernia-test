@@ -103,6 +103,11 @@ export class AddEmergenciesComponent {
     }
   }
 
+  getCoverageClass(optionName: string, isActive: boolean) {
+    const name = optionName.toLowerCase();
+    return isActive ? `${name}-active` : name;
+  }
+
   setDefaultAdequacy() {
     const good = this.coverageAdequacies.find(a => a.name === 'Good');
 

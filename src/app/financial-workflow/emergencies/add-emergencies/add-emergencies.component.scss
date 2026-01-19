@@ -56,3 +56,68 @@
     }
   }
 }
+
+.coverageTabs {
+  border-radius: 4px;
+  padding: 2px;
+  span {
+    color: #45556c;
+  }
+  .row {
+    margin: 0 !important;
+    .col-6 {
+      padding: 0 !important;
+    }
+  }
+  .coverage-wrapper{
+    padding: 0;
+  }
+  .coverage-btn-colours {
+    text-align: center;
+    padding: 8px 0;
+    border-radius: 4px;
+    font-weight: 500;
+
+    &.basic {
+      background-color: transparent;
+      color: #45556c;
+      border: 1px solid #e2e8f0;
+    }
+    &.basic-active {
+      background-color: #fef3e4;
+      border: 1px solid #bb4d00;
+      span {
+        color: #bb4d00;
+      }
+    }
+
+    &.good {
+      background-color: transparent;
+      color: #45556c;
+      border: 1px solid #e2e8f0;
+    }
+    &.good-active {
+      background-color: #ecfdf5;
+      border: 1px solid #a4f4cf;
+      span {
+        color: #007a55;
+      }
+    }
+
+    &.excellent {
+      background-color: transparent;
+      color: #45556c;
+      border: 1px solid #e2e8f0;
+    }
+    &.excellent-active {
+      background-color: #b6f6d9;
+      border: 1px solid #006045;
+      span {
+        color: #006045;
+      }
+    }
+  }
+}
+
+
+

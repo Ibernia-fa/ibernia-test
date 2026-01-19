@@ -139,17 +139,18 @@
       <div class="w-100 form-field gap-8 tab">
   <mat-label class="f-s-16 d-block" style="line-height: 18px">Coverage adequacy</mat-label>
   
-  <div class="tabs">
+  <div class="coverageTabs">
     <div class="row">
       @for (a of coverageAdequacies; track a) {
-        <div class="col-4 coverage-btn">
+        <div class="col-4 coverage-wrapper">
           <button 
-            type="button" 
-            class="button-icon w-100"
-            [class.active]="form.get('coverageAdequacy')?.value === a.id"
-            (click)="form.get('coverageAdequacy')?.setValue(a.id)">
-            <span [class.active]="form.get('coverageAdequacy')?.value === a.id">{{ a.name }}</span>
-          </button>
+          type="button" 
+          class="button-icon coverage-btn-colours w-100"
+          [class.active]="form.get('coverageAdequacy')?.value === a.id"
+          [ngClass]="getCoverageClass(a.name, form.get('coverageAdequacy')?.value === a.id)"
+          (click)="form.get('coverageAdequacy')?.setValue(a.id)">
+          <span [class.active]="form.get('coverageAdequacy')?.value === a.id">{{ a.name }}</span>
+        </button>
         </div>
       }
     </div>
