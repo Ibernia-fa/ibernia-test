@@ -119,12 +119,12 @@ export class AddExpenseComponent {
     this.expenseForm = this.fb.group({
       description: ['', Validators.required],
       currencySymbol: [this.clientPreferredCurrency, [Validators.required]],
-      amount: [0, [Validators.required, Validators.min(0)]],
+      amount: ['', [Validators.required, Validators.min(0)]],
       cycle: [this.cycles[1].id, Validators.required],
       start: ['', Validators.required],
       end: [''],
       escalationRate: [this.escalationRates[0].value, Validators.required],
-      customEscalationRate: [0]
+      customEscalationRate: ['']
 
     });
     this.expenseForm.get('currencySymbol')?.disable();

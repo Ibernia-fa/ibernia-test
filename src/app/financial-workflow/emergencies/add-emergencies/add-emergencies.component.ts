@@ -76,10 +76,14 @@ export class AddEmergenciesComponent {
       name: ['', Validators.required],
       policyStatus: [this.policyStatuses[1].id, Validators.required],
       currencySymbol: [this.currencySymbol, Validators.required],
-      insuranceAmount: [this.insuranceCostTemplate?.amount ?? 0, [Validators.required, Validators.min(0)]],
+      insuranceAmount: [this.insuranceCostTemplate?.amount === 0
+    ? null
+    : this.insuranceCostTemplate?.amount ?? null, [Validators.required, Validators.min(0)]],
       insuranceCycleId: [this.insuranceCycles[1]?.id, Validators.required],
       coverageAdequacy: [null, Validators.required],
-      coverage: [0, [Validators.required, Validators.min(0)]],
+      coverage: [this.data.emergency?.coverage === 0
+      ? null
+      : this.data.emergency?.coverage ?? null, [Validators.required, Validators.min(0)]],
       willStatus: [null]
     });
 
@@ -117,9 +121,12 @@ export class AddEmergenciesComponent {
     this.form.patchValue({
       name: e.name,
       policyStatus: e.policyStatus,
-      insuranceAmount: e.insuranceCost?.amount ?? 0,
+      // insuranceAmount: e.insuranceCost?.amount ?? null,
+      insuranceAmount: e.insuranceCost?.amount === 0 ? null : e.insuranceCost?.amount,
       insuranceCycleId: e.insuranceCost?.cycle?.id ?? 'annual',
-      coverage: e.coverage ?? 0,
+      coverage: e.coverage === 0
+      ? null
+      : e.coverage,
       coverageAdequacy: e.coverageAdequacy ?? 2,
       currencySymbol: e.insuranceCost.currencySymbol,
       willStatus: e.willStatus ?? null
