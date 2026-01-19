@@ -86,6 +86,7 @@ export class AddContributionComponent {
   allClientSavings: ClientSaving[] = [];
   clientSavings: ClientSaving[] = [];  // <-- bound in template
   private cashPot?: ClientSaving;
+  currentYear: number = new Date().getFullYear();
 
   constructor(
     private dialogRef: MatDialogRef<AddContributionComponent>,

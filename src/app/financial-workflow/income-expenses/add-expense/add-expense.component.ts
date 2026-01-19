@@ -79,6 +79,7 @@ export class AddExpenseComponent {
   showStartEnd=false;
   eventsList: any;
   selectedEscalationDescription: string;
+  currentYear: number = new Date().getFullYear();
 
   constructor(
     private dialogRef: MatDialogRef<AddExpenseComponent>,

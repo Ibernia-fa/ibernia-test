@@ -119,6 +119,8 @@ export class AddNewPotComponent {
   ];
   loggedInUserComissionType: string | undefined;
   isAddComissionChecked: any;
+  currentYear: number = new Date().getFullYear();
+
   constructor(
     private dialogRef: MatDialogRef<AddNewPotComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,

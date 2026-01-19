@@ -89,6 +89,7 @@ export class AddEventDialogComponent {
   selectedEscalationDescription: string | null;
   amountCycles: Cycle[];
   saveClicked: boolean = false;
+  currentYear: number = new Date().getFullYear();
 
 
   constructor(

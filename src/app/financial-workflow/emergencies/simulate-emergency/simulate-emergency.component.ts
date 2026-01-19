@@ -93,6 +93,7 @@ export class SimulateEmergencyComponent {
   } | null = null;
   existingEmergencyId: string | null = null;
   isUpdateParentItem = false;
+  currentYear: number = new Date().getFullYear();
   
   constructor(
     private dialogRef: MatDialogRef<SimulateEmergencyComponent>,
