@@ -12,6 +12,7 @@ import { Emergency, CreateEmergencyRequest, LookupItem, Money } from '../models/
 import { EmergenciesHttpService } from '../services/emergencies-http.service';
 import { allCountries } from 'src/app/clients/models/country';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 
 export interface AddEmergencyDialogData {
   mode: 'add' | 'edit';
@@ -39,7 +40,8 @@ export interface AddEmergencyDialogData {
     MatSelectModule,
     MatButtonModule,
     MatCheckboxModule,
-    ThousandSeparatorInputDirective
+    ThousandSeparatorInputDirective,
+    MatButtonToggleModule 
   ],
   templateUrl: './add-emergencies.component.html',
   styleUrl: './add-emergencies.component.scss',
@@ -103,6 +105,11 @@ export class AddEmergenciesComponent {
     else {
       setTimeout(() => this.setDefaultAdequacy());
     }
+  }
+
+  getCoverageClass(optionName: string, isActive: boolean) {
+    const name = optionName.toLowerCase();
+    return isActive ? `${name}-active` : name;
   }
 
   setDefaultAdequacy() {
