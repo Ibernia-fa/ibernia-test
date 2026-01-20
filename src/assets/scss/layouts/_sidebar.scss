@@ -28,7 +28,7 @@
 
 .profile-bar {
   flex-shrink: 0; /* Prevent the profile bar from shrinking */
-  background-color: #141318;
+  background-color: #16151A;
   // border-top: 1px solid #ddd; /* Optional border to separate sections */
   padding: 16px !important; /* Adjust padding as needed */
   .flex-column {
@@ -236,6 +236,7 @@
   border-radius: 8px;
   color: #516ce8;
   height: 36px;
+  margin-top: 12px;
   // background-color: white;
   text-decoration: none;
   cursor: pointer;
@@ -328,7 +329,7 @@
       &:hover,
       &.activeMenu {
         // background-color: var(--mat-sys-primary);
-        // background-color: #f7f7f7;
+        background-color: #34313d;
         border-left: 2px solid #516ce8;
 
         .mdc-list-item__primary-text {
@@ -444,4 +445,27 @@
       line-height: 18px;
     }
   }
+}
+
+// .sidebar-list.mdc-list{
+//   .nav-items{
+//     display: flex;
+//     flex-direction: column;
+//   }
+// }
+
+.nav-divider {
+  position: relative;
+  display: inline-block;
+}
+
+.nav-divider:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 76%;
+  left: 7%;
+  transform: translateX(-50%);
+  width: 2px;
+  height: 31px;
+  background-color: #787889;
 }
