@@ -183,49 +183,6 @@
         <div class="row justify-content-between">
           <div class="col-6 m-b-20">
             <div class="w-100 form-field">
-              <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Country' | translate }}</mat-label>
-
-              <div class="select-option">
-                <mat-select (valueChange)="partnerCountryValueChange($event)" formControlName="country" value="Select">
-                  @for(country of allCountries; track country) {
-                  @if(country.currencySymbol) {
-                  <mat-option [value]="country.countryName">{{country.countryName}}</mat-option>
-                  }
-                  }
-                </mat-select>
-              </div>
-            </div>
-          </div>
-          <div class="col-6 m-b-20">
-            <div class="w-100 form-field">
-              <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">
-                {{ 'Preferred currency' | translate }}</mat-label>
-              <div class="select-option">
-                <mat-select formControlName="currency" value="Select">
-                  @for(country of allCountries; track country) {
-                  @if(country.currencySymbol) {
-                  <mat-option [value]="country.currencySymbol">{{country.currencySymbol}}</mat-option>
-                  }
-                  }
-                </mat-select>
-              </div>
-            </div>
-          </div>
-          <!-- <div class="col-6">
-            <div class="w-100 form-field">
-              <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">Gender</mat-label>
-              <div class="select-option">
-                <mat-select formControlName="gender" value="Select">
-                  <mat-option value="Male">Male</mat-option>
-                  <mat-option value="Female">Female</mat-option>
-                </mat-select>
-              </div>
-            </div>
-          </div> -->
-        </div>
-        <div class="row justify-content-between">
-          <div class="col-6 m-b-20">
-            <div class="w-100 form-field">
               <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Email' | translate }}</mat-label>
               <input matInput placeholder="email@somedomain.com" formControlName="email" />
               @if(clientForm.get('partner.email')?.hasError('email')) {
