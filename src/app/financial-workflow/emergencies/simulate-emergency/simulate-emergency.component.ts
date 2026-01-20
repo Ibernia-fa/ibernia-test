@@ -147,7 +147,7 @@ export class SimulateEmergencyComponent {
 
     this.simulateEmergencyForm = this.fb.group({
       currencySymbol: [this.clientPreferredCurrency, [Validators.required]],
-      amount: ['', [Validators.required, Validators.min(1)]],
+      amount: ['', [Validators.required]],
       cycle: [this.amountCycles[0].id, Validators.required],
       start: ['', Validators.required],
       end: [''],
@@ -158,24 +158,42 @@ export class SimulateEmergencyComponent {
     });
 
     this.simulateEmergencyForm.get('currencySymbol')?.disable();
-    this.simulateEmergencyForm.setValidators(this.endOnOrAfterStartValidator());
-    this.simulateEmergencyForm.updateValueAndValidity({ emitEvent: false });
+    const amountControl = this.simulateEmergencyForm.get('amount');
+    const incomeControl = this.simulateEmergencyForm.get('stoppedIncomeId');
+    const stopIncomeInitial = this.simulateEmergencyForm.get('stopIncome')?.value;
 
-    this.onCycleValueChange(this.amountCycles[0].id);
+    if (stopIncomeInitial) { // allow 0 or more
+      amountControl?.setValidators([Validators.required, Validators.min(0)]);
+      incomeControl?.setValidators([Validators.required]);
+    } else { // must be > 0
+      amountControl?.setValidators([Validators.required, Validators.min(1)]);
+      incomeControl?.clearValidators();
+      incomeControl?.setValue(null);
+    }
+
+    amountControl?.updateValueAndValidity();
+    incomeControl?.updateValueAndValidity();
 
     this.simulateEmergencyForm.get('stopIncome')?.valueChanges
       .subscribe((checked: boolean) => {
-        const incomeControl = this.simulateEmergencyForm.get('stoppedIncomeId');
+      if (checked) {
+        amountControl?.setValidators([Validators.required, Validators.min(0)]);
+        incomeControl?.setValidators([Validators.required]);
+        amountControl?.setValue(0, { emitEvent: false });
+      } else {
+        amountControl?.setValidators([Validators.required, Validators.min(1)]);
+        incomeControl?.clearValidators();
+        incomeControl?.setValue(null);
+        amountControl?.setValue(null, { emitEvent: false });
+      }
 
-        if (checked) {
-          incomeControl?.setValidators([Validators.required]);
-        } else {
-          incomeControl?.clearValidators();
-          incomeControl?.setValue(null);
-        }
+      amountControl?.updateValueAndValidity();
+      incomeControl?.updateValueAndValidity();
+    });
 
-        incomeControl?.updateValueAndValidity();
-      });
+    this.simulateEmergencyForm.setValidators(this.endOnOrAfterStartValidator());
+    this.simulateEmergencyForm.updateValueAndValidity({ emitEvent: false });
+    this.onCycleValueChange(this.amountCycles[0].id);
 
     if (this.emergencyExpense) {
       this.populateForm(this.emergencyExpense);
