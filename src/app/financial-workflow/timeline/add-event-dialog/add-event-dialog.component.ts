@@ -123,7 +123,8 @@ export class AddEventDialogComponent {
     this.clientAge = age
     if(data.forecastStartDateYear - this.clientBirthYear > this.clientAge) this.clientBirthYear =  this.clientBirthYear+1
 
-    this.eventsList = data.eventsList
+    this.eventsList = data.eventsList;
+    this.eventsList.sort((a: any, b: any) => a.age - b.age);
     this.isEditWorkflow = data.isEditWorkflow;
     this.patchEvent= data.patchEvent
     this.clientPreferredCurrency= data.clientPreferredCurrency
