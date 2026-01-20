@@ -26,7 +26,7 @@
             <ng-scrollbar class="position-relative" style="height: 100%">
               <mat-nav-list class="sidebar-list">
                 @for(item of navItems; track item) {
-                <app-nav-item [item]="item" (notify)="sidenav.toggle()">
+                <app-nav-item class="nav-divider" [item]="item" [isPremiumFeature]="false" (notify)="sidenav.toggle()">
                 </app-nav-item>
                 }
               </mat-nav-list>
@@ -53,7 +53,7 @@
               <!-- share report -->
               <div class="p-16 p-t-10 rounded d-flex flex-column gap-12">
                 <a (click)="openShareModal()" class="cashflow-modal d-flex align-items-center gap-8">
-                  <img src="assets/images/svgs/file-icon-filled.svg" alt="share report">
+                  <img src="assets/images/svgs/share-android-solid.svg" alt="share report">
                   <span>
                     {{ 'Share with' | translate }} <span style="text-transform: capitalize;">{{ clientName }}</span>
                   </span>
@@ -62,8 +62,10 @@
             </ng-scrollbar>
           </div>
           <div class="m-t-auto profile-bar" style="margin-bottom: 54px">
-            <div class="p-16 bg-light-secondary rounded d-flex flex-column gap-12">
-              <img src="/assets/images/svgs/heart-icon.svg" width="24" />
+            <div class="p-16 bg-light-secondary rounded d-flex flex-column gap-12 inner-profile-bar">
+              <div class="profile-bar-img">
+                <img src="/assets/images/svgs/heart-icon.svg" width="24" />
+              </div>
               <div class="content">
                 <div class="d-flex flex-column gap-2">
                   <h4 class="f-w-500">{{ 'Upgrade to Premium' | translate}}</h4>
