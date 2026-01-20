@@ -282,7 +282,7 @@ export class FullComponent implements OnInit {
   ngOnInit(): void {
     this.client$.subscribe(client => {
       if (client) {
-        this.clientName = client.clientDetails?.firstName + " " + client.clientDetails?.lastName;
+        this.clientName = client.clientDetails?.firstName;
       }
     });
   }
