@@ -44,6 +44,13 @@ export class SavingsBarStackedChartComponent implements OnChanges {
         zoom: {
           enabled: false,
         },
+        states: {
+          hover: {
+            filter: {
+              type: 'none'
+            }
+          }
+        }
       },
       dataLabels: {
         enabled: false
@@ -190,7 +197,23 @@ export class SavingsBarStackedChartComponent implements OnChanges {
       }
     }
 
-    this.chartOptions.series = this.report.series;
+    // final series assignment
+    this.chartOptions.series = this.report.series.map((s, idx) => ({
+      ...s,
+      tack: 'stack1',
+      order: s.name === 'Emergency Expense' ? this.report.series.length : idx,
+      fill: {
+        opacity: 1
+      },
+      states: {
+        hover: {
+          filter: {
+            type: 'lighten',
+            value: 0.15
+          }
+        }
+      }
+    }));
   }
 
   buildEventAnnotations(events: TimelineEvent[]) {

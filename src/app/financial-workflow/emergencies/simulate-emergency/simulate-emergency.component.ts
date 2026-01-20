@@ -176,20 +176,20 @@ export class SimulateEmergencyComponent {
 
     this.simulateEmergencyForm.get('stopIncome')?.valueChanges
       .subscribe((checked: boolean) => {
-      if (checked) {
-        amountControl?.setValidators([Validators.required, Validators.min(0)]);
-        incomeControl?.setValidators([Validators.required]);
-        amountControl?.setValue(0, { emitEvent: false });
-      } else {
-        amountControl?.setValidators([Validators.required, Validators.min(1)]);
-        incomeControl?.clearValidators();
-        incomeControl?.setValue(null);
-        amountControl?.setValue(null, { emitEvent: false });
-      }
+        if (checked) {
+          amountControl?.setValidators([Validators.required, Validators.min(0)]);
+          incomeControl?.setValidators([Validators.required]);
+          amountControl?.setValue(0, { emitEvent: false });
+        } else {
+          amountControl?.setValidators([Validators.required, Validators.min(1)]);
+          incomeControl?.clearValidators();
+          incomeControl?.setValue(null);
+          amountControl?.setValue(null, { emitEvent: false });
+        }
 
-      amountControl?.updateValueAndValidity();
-      incomeControl?.updateValueAndValidity();
-    });
+        amountControl?.updateValueAndValidity();
+        incomeControl?.updateValueAndValidity();
+      });
 
     this.simulateEmergencyForm.setValidators(this.endOnOrAfterStartValidator());
     this.simulateEmergencyForm.updateValueAndValidity({ emitEvent: false });
@@ -448,11 +448,20 @@ export class SimulateEmergencyComponent {
     return {
       id: 'emergency-expense',
       name: 'Emergency Expense',
-      stack: undefined,
       data: emergencyData,
-      color: '#fbd4d1',
-      group: 'apexcharts-axis-0',
+      color: '#fac2beff',
+      className: 'emergency-expense-series',
       order: report.series?.length ?? 0,
+      stack: 'stack1',
+      fill: { opacity: 1 },
+      states: {
+        hover: {
+          filter: {
+            type: 'lighten',
+            value: 0.03 
+          }
+        }
+      }
     };
   }
 }
