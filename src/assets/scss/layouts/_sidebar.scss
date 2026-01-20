@@ -23,11 +23,12 @@
   flex: 1; /* Allow this section to grow and take available space */
   overflow-y: auto; /* Enable vertical scrolling */
   overflow-x: hidden; /* Prevent horizontal scrolling */
+  background-color: oklch(20.8% 0.042 265.755);
 }
 
 .profile-bar {
   flex-shrink: 0; /* Prevent the profile bar from shrinking */
-  // background-color: #f5f5f5; /* Optional */
+  background-color: #16151A;
   // border-top: 1px solid #ddd; /* Optional border to separate sections */
   padding: 16px !important; /* Adjust padding as needed */
   .flex-column {
@@ -61,6 +62,7 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
+    // background-color: #141318;
   }
   button {
     padding: 12px 24px !important;
@@ -81,8 +83,11 @@
  
   }
   }
-
 }
+
+// .inner-profile-bar{
+//   background-color: #141318;
+// }
 
 .branding {
   padding: 20px;
@@ -231,19 +236,24 @@
   border-radius: 8px;
   color: #516ce8;
   height: 36px;
-  background-color: white;
+  margin-top: 12px;
+  // background-color: white;
   text-decoration: none;
   cursor: pointer;
   span {
     font-size: 14px;
     line-height: 20px;
   }
-  &:hover{
-     background-color: #f7f7f7;
+  img {
+    width: 20px;
+    height: 20px;
   }
-  &.activeMenu{
-    background-color: #f7f7f7;
-  }
+  // &:hover{
+  //    background-color: #f7f7f7;
+  // }
+  // &.activeMenu{
+  //   background-color: #f7f7f7;
+  // }
 }
 // Upper side Menus
 .sidebar-list,
@@ -319,7 +329,7 @@
       &:hover,
       &.activeMenu {
         // background-color: var(--mat-sys-primary);
-        background-color: #f7f7f7;
+        background-color: #34313d;
         border-left: 2px solid #516ce8;
 
         .mdc-list-item__primary-text {
@@ -373,7 +383,7 @@
         border-radius: 8px;
         color: #516ce8 ;
         height: 36px;
-        background-color: white;
+        // background-color: white;
         text-decoration: none;
         cursor: pointer;
         .mdc-list-item__content{
@@ -386,7 +396,7 @@
           line-height: 20px;
         }
         &.activeMenu{
-          background-color: #f7f7f7;
+          // background-color: #f7f7f7;
         }
       }
 }
@@ -435,4 +445,27 @@
       line-height: 18px;
     }
   }
+}
+
+// .sidebar-list.mdc-list{
+//   .nav-items{
+//     display: flex;
+//     flex-direction: column;
+//   }
+// }
+
+.nav-divider {
+  position: relative;
+  display: inline-block;
+}
+
+.nav-divider:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 76%;
+  left: 7%;
+  transform: translateX(-50%);
+  width: 2px;
+  height: 31px;
+  background-color: #787889;
 }
