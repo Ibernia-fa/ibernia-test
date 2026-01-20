@@ -321,6 +321,7 @@ export class SimulateEmergencyComponent {
               emergencyAmount);
 
             if (!this.baselineResult || !this.baselineResult.series) return;
+            this.simulationResult = simulated;
             
             this.baselineResult.series = [
               ...this.baselineResult.series,
@@ -331,13 +332,6 @@ export class SimulateEmergencyComponent {
               ...simulated.series,
               emergencySeries
             ];
-
-            // show baseline first, then switch to simulated after 3 seconds (transition effect)
-            this.simulationResult = this.baselineResult;
-
-            setTimeout(() => {
-              this.simulationResult = simulated;
-            }, 3000);
 
             this.activeTab = 'simulated';
             this.dialogRef.updateSize('92vw', '88vh');
