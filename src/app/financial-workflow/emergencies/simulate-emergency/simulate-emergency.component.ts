@@ -94,7 +94,7 @@ export class SimulateEmergencyComponent {
   existingEmergencyId: string | null = null;
   isUpdateParentItem = false;
   currentYear: number = new Date().getFullYear();
-  
+
   constructor(
     private dialogRef: MatDialogRef<SimulateEmergencyComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
@@ -179,12 +179,18 @@ export class SimulateEmergencyComponent {
         if (checked) {
           amountControl?.setValidators([Validators.required, Validators.min(0)]);
           incomeControl?.setValidators([Validators.required]);
-          amountControl?.setValue(0, { emitEvent: false });
+
+          if (!amountControl?.value) {
+            amountControl?.setValue(0, { emitEvent: false });
+          }
         } else {
           amountControl?.setValidators([Validators.required, Validators.min(1)]);
           incomeControl?.clearValidators();
           incomeControl?.setValue(null);
-          amountControl?.setValue(null, { emitEvent: false });
+
+          if (!amountControl?.value) {
+            amountControl?.setValue(null, { emitEvent: false });
+          }
         }
 
         amountControl?.updateValueAndValidity();
@@ -264,11 +270,22 @@ export class SimulateEmergencyComponent {
       const stopIncome = this.simulateEmergencyForm.get('stopIncome')?.value;
       const stoppedIncomeId = this.simulateEmergencyForm.get('stoppedIncomeId')?.value;
 
+      // convert amount back to number if it's still a formatted string
+      const rawAmountControl = this.simulateEmergencyForm.get('amount');
+      if (rawAmountControl) {
+        const { parseFormattedNumber } = require('src/app/shared/utils/number-utils');
+        const currentValue = rawAmountControl.value;
+        // only convert if it's a string with commas
+        rawAmountControl.setValue(parseFormattedNumber(currentValue), { emitEvent: false });
+      }
+      const rawAmount = this.simulateEmergencyForm.get('amount')?.value;
+
+
       var simulateEmergency: SimulateEmergencyModel = {
         id: this.existingEmergencyId,
         description: "",
         amount: {
-          amount: this.simulateEmergencyForm.get('amount')?.value,
+          amount: rawAmount,
           currencySymbol: this.simulateEmergencyForm.get('currencySymbol')?.value,
           cycle: {
             id: this.simulateEmergencyForm.get('cycle')?.value ?? '',
@@ -330,8 +347,7 @@ export class SimulateEmergencyComponent {
             this.baselineResult = res.baseline;
             const simulated = res.simulated;
             simulated.timelineEvents = [];
-            
-            // add emergency cancle
+
             const emergencyAmount = this.simulateEmergencyForm.get('amount')?.value;
             const emergencySeries = this.buildEmergencySeries(
               this.baselineResult,
@@ -340,7 +356,7 @@ export class SimulateEmergencyComponent {
 
             if (!this.baselineResult || !this.baselineResult.series) return;
             this.simulationResult = simulated;
-            
+
             this.baselineResult.series = [
               ...this.baselineResult.series,
               emergencySeries
@@ -370,7 +386,7 @@ export class SimulateEmergencyComponent {
     if (this.isUpdateParentItem) {
       this.dialogRef.close(this.emergencyExpense);
     }
-    else { 
+    else {
       this.dialogRef.close();
     }
   }
@@ -412,15 +428,16 @@ export class SimulateEmergencyComponent {
   private populateForm(expense: any): void {
     this.existingEmergencyId = expense.id ?? null;
     const cycleId = expense.amount?.cycle?.id ?? this.amountCycles[0].id;
+    const formattedAmount = this.formatWithThousandSeparator(expense.amount?.amount ?? 0);
 
     this.simulateEmergencyForm.patchValue({
       cycle: cycleId,
-      amount: expense.amount?.amount ?? 0,
+      amount: formattedAmount,
       start: expense.start?.year ?? null,
       end: expense.end?.year ?? null,
       escalationRate: expense.escalationRate?.value ?? this.escalationRates[0]?.value,
       stopIncome: expense.stopIncome ?? false
-    });
+    }, { emitEvent: false });
 
     this.selectedEscalationDescription = expense.escalationRate?.description ?? '';
     if (expense.escalationRate?.description === 'Increases at custom rate') {
@@ -434,10 +451,14 @@ export class SimulateEmergencyComponent {
     if (expense.stopIncome) {
       this.simulateEmergencyForm.patchValue({
         stoppedIncomeId: expense.stoppedIncomeId ?? null
-      });
+      }, { emitEvent: false });
     }
 
     this.simulateEmergencyForm.updateValueAndValidity();
+  }
+
+  private formatWithThousandSeparator(value: number): string {
+    return value.toLocaleString('en-US');
   }
 
   private buildEmergencySeries(report: any, year: string, amount: number): any {
@@ -458,7 +479,7 @@ export class SimulateEmergencyComponent {
         hover: {
           filter: {
             type: 'lighten',
-            value: 0.03 
+            value: 0.03
           }
         }
       }
