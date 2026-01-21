@@ -58,7 +58,7 @@ import { TranslateModule } from '@ngx-translate/core';
   styleUrl: './add-income.component.scss',
 })
 export class AddIncomeComponent {
-  eventsList: any;
+  eventsList: any[] = [];
   incomeForm: FormGroup;
   countries = allCountries;
   cycles: Cycle[];
