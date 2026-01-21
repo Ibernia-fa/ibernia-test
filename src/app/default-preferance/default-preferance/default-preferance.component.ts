@@ -157,7 +157,7 @@ ComissionType = ComissionType;
         finalize(() => (this.isSaving = false))
       )
       .subscribe(() => {
-        this.toastr.error('Preferences saved', 'Error!');
+        this.toastr.success('Preferences saved', 'Success!');
           if (this.dialogRef) {
           this.dialogRef.close(true);
           return;
