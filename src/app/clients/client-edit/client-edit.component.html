@@ -36,13 +36,13 @@
               <!-- [value]="clientDobDisplay" -->
               <input
                 matInput
-                #dobInput
-                formControlName="dob"
                 [matDatepicker]="picker"
+                formControlName="dob"
                 placeholder="DD/MM/YYYY"
                 inputmode="numeric"
                 autocomplete="bday"
                 (input)="onDobTyping(dobInput)"
+                #dobInput
                 />
               <div class="date-picker-position">
                 <mat-datepicker-toggle matIconSuffix [for]="picker">

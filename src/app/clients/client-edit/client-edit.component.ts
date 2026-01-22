@@ -7,7 +7,7 @@ import {
   ValidationErrors,
   Validators,
 } from '@angular/forms';
-import { provideNativeDateAdapter } from '@angular/material/core';
+import { MAT_DATE_FORMATS, MAT_DATE_LOCALE, provideNativeDateAdapter } from '@angular/material/core';
 import {
   MAT_DATE_RANGE_SELECTION_STRATEGY,
   MatDatepickerModule,
@@ -31,6 +31,15 @@ import {MatCheckboxModule} from '@angular/material/checkbox';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { TranslateModule } from '@ngx-translate/core';
 
+export const DMY_FORMATS = {
+  parse: { dateInput: 'DD/MM/YYYY' },
+  display: {
+    dateInput: 'DD/MM/YYYY',
+    monthYearLabel: 'MMM YYYY',
+    dateA11yLabel: 'DD/MM/YYYY',
+    monthYearA11yLabel: 'MMMM YYYY',
+  }
+};
 
 @Component({
   selector: 'app-client-edit',
@@ -53,10 +62,12 @@ import { TranslateModule } from '@ngx-translate/core';
     ClientHttpService,
     ToastrService,
     provideNativeDateAdapter(),
-    {
-      provide: MAT_DATE_RANGE_SELECTION_STRATEGY,
-      useClass: FiveDayRangeSelectionStrategy,
-    },
+    // {
+    //   provide: MAT_DATE_RANGE_SELECTION_STRATEGY,
+    //   useClass: FiveDayRangeSelectionStrategy,
+    // },
+  { provide: MAT_DATE_LOCALE, useValue: 'en-GB' },
+  { provide: MAT_DATE_FORMATS, useValue: DMY_FORMATS }
   ],
   templateUrl: './client-edit.component.html',
   styleUrl: './client-edit.component.scss',
@@ -738,40 +749,63 @@ export class ClientEditComponent {
     }
 
     onDobTyping(inputEl: HTMLInputElement): void {
-    // If datepicker just wrote a Date, don't interfere
-    const value = inputEl.value;
-    const cursorPos = inputEl.selectionStart || 0;
+    const raw = inputEl.value;
+    const cursor = inputEl.selectionStart ?? raw.length;
 
-    const digits = onlyDigits(value.replace(/\D/g, '').slice(0, 8));
+    const digitsBeforeCursor = raw
+    .slice(0, cursor)
+    .replace(/\D/g, '')
+    .length;
+
+    const digits = onlyDigits(raw);
     let formatted = formatDigitsToDMY(digits);
 
-    // Only update the input if formatting actually changes it
-    if (formatted !== value) {
-      const beforeCursor = value.substring(0, cursorPos);
-      const digitsBeforeCursor = onlyDigits(beforeCursor);
+    if (formatted === raw) return;
 
-      let newCursorPos = digitsBeforeCursor.length;
-      if (digitsBeforeCursor.length > 2) newCursorPos++;
-      if (digitsBeforeCursor.length > 4) newCursorPos++;
-      newCursorPos = Math.min(newCursorPos, formatted.length);
+    inputEl.value = formatted;
 
-      inputEl.value = formatted;
+    let newCursor = digitsBeforeCursor;
+    if (digitsBeforeCursor > 2) newCursor += 1;
+    if (digitsBeforeCursor > 4) newCursor += 1;
 
-      requestAnimationFrame(() => {
+    newCursor = Math.min(newCursor, formatted.length);
+
+    requestAnimationFrame(() => {
       if (document.activeElement === inputEl) {
-        inputEl.setSelectionRange(newCursorPos, newCursorPos);
+        inputEl.setSelectionRange(newCursor, newCursor);
       }
-    });
+  });
+  this.updateClientAgePreview(digits);
 
-    // const control = this.clientForm.get('dob');
-    // control?.setValue(formatted, { emitEvent: false });
-    this.updateClientAgePreview(digits);
+    // Only update the input if formatting actually changes it
+    // if (formatted !== value) {
+    //   const beforeCursor = value.substring(0, cursorPos);
+    //   const digitsBeforeCursor = onlyDigits(beforeCursor);
 
-      // const pos = inputEl.selectionStart ?? formatted.length;
-      // inputEl.value = formatted;
-      // inputEl.setSelectionRange(pos, pos);
-    }
+    //   let newCursorPos = digitsBeforeCursor.length;
+    //   if (digitsBeforeCursor.length > 2) newCursorPos++;
+    //   if (digitsBeforeCursor.length > 4) newCursorPos++;
+    //   newCursorPos = Math.min(newCursorPos, formatted.length);
+
+    //   inputEl.value = formatted;
+
+    //   requestAnimationFrame(() => {
+    //   if (document.activeElement === inputEl) {
+    //     inputEl.setSelectionRange(newCursorPos, newCursorPos);
+    //   }
+    // });
+
+    // // const control = this.clientForm.get('dob');
+    // // control?.setValue(formatted, { emitEvent: false });
+    // this.updateClientAgePreview(digits);
+
+    //   // const pos = inputEl.selectionStart ?? formatted.length;
+    //   // inputEl.value = formatted;
+    //   // inputEl.setSelectionRange(pos, pos);
+    // }
 }
+
+
 
   }
   
