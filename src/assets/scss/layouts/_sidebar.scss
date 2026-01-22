@@ -23,12 +23,12 @@
   flex: 1; /* Allow this section to grow and take available space */
   overflow-y: auto; /* Enable vertical scrolling */
   overflow-x: hidden; /* Prevent horizontal scrolling */
-  background-color: oklch(20.8% 0.042 265.755);
+  background-color: #16151C;
 }
 
 .profile-bar {
   flex-shrink: 0; /* Prevent the profile bar from shrinking */
-  background-color: #16151A;
+  // background-color: #16151A;
   // border-top: 1px solid #ddd; /* Optional border to separate sections */
   padding: 16px !important; /* Adjust padding as needed */
   .flex-column {
@@ -216,7 +216,7 @@
   align-items: center;
   gap: 8px;
   p {
-    color: #b7b6c2;
+    color: #787889;
     font-size: 12px;
     line-height: 14px;
     font-weight: 300 !important;
@@ -226,7 +226,7 @@
     height: 1px;
     flex: 1;
     display: block;
-    background-color: #e7e7eb;
+    background-color: #787889;
   }
 }
 
@@ -236,21 +236,20 @@
   border-radius: 8px;
   color: #516ce8;
   height: 36px;
-  margin-top: 12px;
-  // background-color: white;
   text-decoration: none;
+  background-color: #1c1e30;
   cursor: pointer;
   span {
     font-size: 14px;
     line-height: 20px;
   }
   img {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
   }
-  // &:hover{
-  //    background-color: #f7f7f7;
-  // }
+  &:hover{
+     background-color: #1c1d25;
+  }
   // &.activeMenu{
   //   background-color: #f7f7f7;
   // }
@@ -329,7 +328,9 @@
       &:hover,
       &.activeMenu {
         // background-color: var(--mat-sys-primary);
-        background-color: #34313d;
+        position: relative;
+        z-index: 1;
+        background-color: #1c1d25;
         border-left: 2px solid #516ce8;
 
         .mdc-list-item__primary-text {
@@ -396,7 +397,7 @@
           line-height: 20px;
         }
         &.activeMenu{
-          // background-color: #f7f7f7;
+          background-color: #1c1d25;
         }
       }
 }
@@ -457,15 +458,42 @@
 .nav-divider {
   position: relative;
   display: inline-block;
+  z-index: 0;
 }
 
 .nav-divider:not(:last-child)::after {
   content: "";
   position: absolute;
-  top: 76%;
+  top: 90%;
   left: 7%;
   transform: translateX(-50%);
   width: 2px;
-  height: 31px;
+  height: 18px;
   background-color: #787889;
+  z-index: 0;
 }
+
+.nav-item-row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+
+.menu-label {
+  font-size: 11px !important;
+  line-height: 14px !important;
+  background-color: #ff4344;
+  color: white;
+  border-radius: 15px;
+  padding: 1px 5px;
+}
+
+
+
