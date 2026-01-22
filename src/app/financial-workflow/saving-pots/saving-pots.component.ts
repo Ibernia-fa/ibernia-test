@@ -166,7 +166,6 @@ export class SavingPotsComponent implements OnInit {
         ),
         tap(([client, cashflow]) => {
           this.selectedClient = client as Client;
-          console.log(cashflow);
           this.selectedCashflow = cashflow as Cashflow;
         }),
         switchMap(([client, cashflow]) => {
@@ -184,7 +183,6 @@ export class SavingPotsComponent implements OnInit {
           ]);
         }),
         tap(([savingPots, timeline, amountCycles, escalationRatesResponse]) => {
-          console.log(timeline, amountCycles, escalationRatesResponse);
           // this.savingPots = savingPots;
             this.savingPots = {
             ...savingPots,
@@ -198,8 +196,6 @@ export class SavingPotsComponent implements OnInit {
           this.escalationRates = escalationRatesResponse?.escalationRates;
           this.isLoaderVisible = false;
 
-
-    console.log("kjdjai")
     console.log(this.savingPots)
         })
       )
@@ -459,7 +455,7 @@ updateOrderNumbers() {
   }
   
   newEventClicked() {
-    console.log(this.timeline.clientEvents)
+    console.log("newEventClicked() called")
     const dialogRef = this.dialog.open(AddNewPotComponent, {
       width: '700px',
       disableClose: true,
@@ -505,6 +501,12 @@ private ensureCashFirst(): void {
     this.savingPots.clientSavings = [...list];
     this.updateOrderNumbers(); // persist the invariant
   }
+}
+
+formatReturnRate(rate: number): string {
+  if (rate == null) return '0';
+  const rounded = Math.round(rate * 10) / 10;
+  return rounded % 1 === 0 ? rounded.toFixed(0) : rounded.toString();
 }
 
 }
