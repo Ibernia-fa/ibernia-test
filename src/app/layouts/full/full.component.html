@@ -43,15 +43,19 @@
                 }
               </mat-nav-list> -->
               <mat-nav-list class="sidebar-list {{!isSettings ? 'preimum-nav' : ''}}">
-
-              <!-- <mat-nav-list class="sidebar-list  preimum-nav"> -->
-                @for(item of navItemslower; track item) {
-                  <app-nav-item [item]="item"></app-nav-item>
+                @for (item of navItemslower; let i = $index; track item) {
+                  <app-nav-item 
+                    [item]="item"
+                    [showLabel]="i >= navItemslower.length - 3"
+                    label="BETA">
+                  </app-nav-item>
                 }
               </mat-nav-list>
 
               @if(!isSettings) {
                 <!-- share report -->
+
+              <!-- share report -->
               <div class="p-16 p-t-10 rounded d-flex flex-column gap-12">
                 <a (click)="openShareModal()" class="cashflow-modal d-flex align-items-center gap-8">
                   <img src="assets/images/svgs/share-android-solid.svg" alt="share report">

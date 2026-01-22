@@ -29,16 +29,32 @@
      
     "
   > -->
-  @if(navItem.currentRouteName === item.displayName) {
+  <!-- @if(navItem.currentRouteName === item.displayName) {
   <img style="flex: none; max-width: 18px;" class="connecting-line" [src]="item.iconName" alt="item" />
   
   }
   @else {
   <img style="flex: none;max-width: 18px;" class="connecting-line" [src]="item.iconOutline" alt="item" />
   
-  }
+  } -->
   <!-- </div> -->
-  <span class="hide-menu">{{ item.displayName | translate }}</span>
+  <!-- <span class="hide-menu">{{ item.displayName | translate }}</span> -->
+
+  <div class="nav-item-row">
+    <div class="nav-left">
+      <img
+      style="flex: none; max-width: 18px;"
+      [src]="item.currentRouteName === item.displayName ? item.iconName : item.iconOutline"
+      alt="item"
+    />
+      <span class="hide-menu">{{ item.displayName | translate }}</span>
+    </div>
+
+  @if(showLabel){
+    <span class="menu-label">{{ label }}</span>
+  }
+</div>
+
   @if(item.children && item.children.length) {
   <span class="arrow-icon" fxFlex>
     <span fxFlex></span>
