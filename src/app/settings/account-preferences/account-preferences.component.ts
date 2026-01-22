@@ -19,7 +19,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatSelect } from '@angular/material/select';
+import { MatSelect, MatSelectModule } from '@angular/material/select';
+import { NgFor, NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-account-preferences',
@@ -32,8 +33,12 @@ import { MatSelect } from '@angular/material/select';
   MatFormFieldModule,
   MatInputModule,
   MatSelect,
+  MatSelectModule,
   ReactiveFormsModule,
-  TranslateModule]
+  TranslateModule,
+  NgIf,
+  NgFor
+]
 })
 export class AccountPreferencesComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
