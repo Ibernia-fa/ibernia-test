@@ -39,8 +39,8 @@ export class DefaultPreferanceComponent implements OnInit, OnDestroy {
     lastName: ['' as string],
     email: ['' as string],
     preferences: this.fb.nonNullable.group({
-      // inflationRate: [2.5 as number, [Validators.required, Validators.min(0), Validators.max(100)]],
-      // investmentReturn: [5 as number, [Validators.required, Validators.min(-100), Validators.max(100)]],
+      inflationRate: [2.5 as number, [Validators.required, Validators.min(0), Validators.max(100)]],
+      investmentReturn: [5 as number, [Validators.required, Validators.min(-100), Validators.max(100)]],
       // comissionType: [ComissionType.Amount as ComissionType, [Validators.required]],
       // comissionPercentage: [1 as number | null],
       // comissionAmount: [null as number | null],
@@ -128,8 +128,8 @@ ComissionType = ComissionType;
       lastName: this.user?.family_name,
       email: this.user?.email,
       preferences: {
-        // inflationRate: round2(raw.preferences.inflationRate),
-        // investmentReturn: round2(raw.preferences.investmentReturn),
+        inflationRate: round2(raw.preferences.inflationRate),
+        investmentReturn: round2(raw.preferences.investmentReturn),
         // comissionType: raw.preferences.comissionType,
         // comissionPercentage:
         //   raw.preferences.comissionType === ComissionType.Amount
