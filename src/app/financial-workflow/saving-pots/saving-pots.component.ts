@@ -149,6 +149,8 @@ export class SavingPotsComponent implements OnInit {
   selectedRating = '';
   currentStep = 1;
   feedbackDetail = '';
+  total: number | null;
+  potAmounts: number[] | null; 
 
   items = [
     { id: 1, name: 'Item 1', score: 5 },
@@ -190,13 +192,15 @@ export class SavingPotsComponent implements OnInit {
               .map((item, index) => ({ ...item, orderNumber: item.orderNumber ?? index }))
               .sort((a, b) => a.orderNumber - b.orderNumber)
           };
+          this.total = this.savingPots?.totalSavings;
+          this.potAmounts = this.savingPots?.clientSavings?.map(
+            (pot) => pot.startingPotValue.amount ?? 0
+          );
           this.ensureCashFirst();
           this.timeline = timeline;
           this.amountCycles = amountCycles;
           this.escalationRates = escalationRatesResponse?.escalationRates;
           this.isLoaderVisible = false;
-
-    console.log(this.savingPots)
         })
       )
       .subscribe();
@@ -418,10 +422,19 @@ updateOrderNumbers() {
 
     dialogRef.afterClosed().subscribe((result: any) => {
       console.log('Dialog closed with result:', result);
-      // this.savingPots = result?.savingPot;
+      this.total = result.savingPot.totalSavings;
       if (!result?.clientSaving) return;
 
       const updatedSaving = result.clientSaving;
+
+      const updatedPotFromResponse = this.savingPots.clientSavings.findIndex(
+        (x) => x.id === updatedSaving.id
+      );
+
+      if (updatedPotFromResponse !== -1 && this.potAmounts) {
+        this.potAmounts[updatedPotFromResponse] = updatedSaving.startingPotValue.amount;
+        console.log('Updated potAmounts:', this.potAmounts);
+      }
 
       const list = [...this.savingPots.clientSavings];
       const index = list.findIndex(x => x.id === updatedSaving.id);
@@ -435,7 +448,7 @@ updateOrderNumbers() {
 
       this.savingPots = {
         ...this.savingPots,
-        // clientSavings: list
+        // clientSavings: result.savingPot.clientSavings
         clientSavings: [...this.savingPots.clientSavings]
       };
       this.ensureCashFirst();
