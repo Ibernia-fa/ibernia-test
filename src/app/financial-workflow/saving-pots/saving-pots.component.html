@@ -128,9 +128,9 @@
                             <div [cdkDragData]="saving" cdkDragLockAxis="y" cdkDrag cdkDragBoundary="#drag-boundary"
                                 class="d-flex justify-content-between align-items-center gap-12 dragable-card-wrapper">
                                 <!-- Card  -->
-                                <div class="dragable-card d-flex align-items-center justify-content-between">
+                                <div (click)="updateEventClicked(saving)" class="dragable-card d-flex align-items-center justify-content-between cursor-pointer">
                                     <!-- Content  -->
-                                    <div (click)="updateEventClicked(saving)" class="d-flex align-items-center gap-8 cursor-pointer">
+                                    <div class="d-flex align-items-center gap-8">
                                         @if(i > 0 && !('cash' === (savingPots.clientSavings[i]?.name ||
                                         '').toLowerCase())) {
                                         <button cdkDragHandle type="button" class="drag-btn">
@@ -155,11 +155,10 @@
                                                         {{selectedClient?.clientDetails?.preferredCurrency|currencySymbol}}{{saving.startingPotValue.amount|thousandSeparator}}
                                                     </h3>
                                                     <span
-                                                        [className]="saving.realReturn >= 0 ? 'badge green' : 'badge red'">
+                                                        [className]="saving.returnRate > 0 ? 'badge green' : 'badge red'">
                                                         <!-- @if(saving.realReturn >= 0){+}{{saving.realReturn | number :
                                                         '1.2-2'}}% -->
-                                                        @if(saving.realReturn >= 0){+}{{saving.realReturn | number :
-                                                        '1.0-0'}}%
+                                                        @if(saving.returnRate >= 0){+}{{formatReturnRate(saving.returnRate)}}%
                                                     </span>
                                                     <!-- <span>
                                                         NV: {{saving.nominalValue | thousandSeparator}}
@@ -198,13 +197,13 @@
                                     </div>
                                     }
                                     <div class="edit-icon-overlay">
-                                        <button mat-icon-button (click)="updateEventClicked(saving)">
+                                        <button mat-icon-button (click)="updateEventClicked(saving); $event.stopPropagation()">
                                             <mat-icon>
                                                 <img src="assets/images/svgs/drop-down-edit-2-line.svg" alt="pen-icon" />
                                             </mat-icon>
                                         </button>
                                         <ng-container *ngIf="saving.name != 'Cash'">
-                                            <button mat-icon-button (click)="deleteEventClicked(saving)">
+                                            <button mat-icon-button (click)="deleteEventClicked(saving); $event.stopPropagation()">
                                                 <mat-icon>
                                                     <img src="assets/images/svgs/drop-down-delete-2-line.svg"
                                                         alt="del-icon" />
@@ -246,78 +245,6 @@
         </mat-card>
         <!-- End liquid savings, investments and pensions Section  -->
     </div>
-
-    @if(showFeedbackPopup) {
-    <!-- Feedback Card  -->
-    <div class="feeback-container d-flex flex-column gap-16">
-        <!-- Feeback First Step -->
-        @if(currentStep === 1) {
-        <div class="feedback-wrapper">
-            <div class="d-flex flex-column gap-20">
-                <div class="d-flex flex-column gap-10">
-                    <div class="d-flex align-items-center justify-content-between">
-                        <div class="d-flex align-items-center gap-8 feedback-nav-btns">
-                            <button type="button" class="active"></button>
-                            <button type="button"></button>
-                        </div>
-                        <button type="button" (click)="closeFeedbackPopupClicked()">
-                            <img src="assets/images/svgs/close-line-cion.svg" alt="close-line-cion">
-                        </button>
-                    </div>
-                    <p>{{ 'How satisfied are you with your current financial planning?' | translate }}</p>
-                </div>
-                <div class="d-flex align-items-center gap-24 emoji-btn">
-                    <button (click)="selectRating('bad')" type="button"><img
-                            src="assets/images/shapes/sad-feedback-icon.png" alt="sad-feedback-icon"></button>
-                    <button (click)="selectRating('neutral')" type="button"><img
-                            src="assets/images/shapes/sad-feedback-icon-v2.png" alt="sad-feedback-icon-v2"></button>
-                    <button (click)="selectRating('good')" type="button"><img
-                            src="assets/images/shapes/happy-feedback-icon.png" alt="happy-feedback-icon"></button>
-                </div>
-            </div>
-        </div>
-        }
-        <!-- End Feeback First Step  -->
-
-        <!-- Second Feeback Step -->
-        @if(currentStep === 2) {
-        <div class="feedback-wrapper">
-            <div class="d-flex flex-column gap-20">
-                <div class="d-flex flex-column gap-10">
-                    <div class="d-flex align-items-center justify-content-between">
-                        <div class="d-flex align-items-center gap-8 feedback-nav-btns">
-                            <button type="button"></button>
-                            <button type="button" class="active"></button>
-                        </div>
-                    </div>
-                    <p class="form-label">{{ 'Anything that can be improved?' | translate }}</p>
-                </div>
-                <div class="d-flex flex-column gap-20 feedback-form">
-                    <textarea name="feedback" id="feedback" placeholder="{{ 'Your feedback (Optional)' | translate }}"
-                        [(ngModel)]="feedbackDetail"></textarea>
-                    <div>
-                        <button class="button-icon" (click)="feedbackSubmitBtnClicked()"
-                            type="button"><span>{{ 'Submit' | translate}}</span></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        }
-        <!-- End Second Feeback Step  -->
-
-        <!-- Feeback Third Step -->
-        @if(currentStep === 3) {
-        <div class="feedback-wrapper">
-            <div class="d-flex align-items-center gap-10">
-                <img src="assets/images/shapes/feeback-sent-icon.png" alt="feeback-sent-icon">
-                <p>{{ 'Thanks for the feedback!' | translate }}</p>
-            </div>
-        </div>
-        }
-        <!-- End Feeback Third Step  -->
-    </div>
-    <!-- End Feedback Card  -->
-    }
     }
     @else {
     <div class="h-300">

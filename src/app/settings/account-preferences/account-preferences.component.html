@@ -106,8 +106,8 @@
               <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4" matTooltip="Sets the main currency for all new client plans. All figures will be shown in this currency by default, but you can change it for individual clients later.">
             </mat-label>
             <mat-form-field appearance="outline" class="w-100">
-              <mat-select formControlName="country" placeholder="{{ 'Select country' | translate }}" (valueChange)="clientCountryValueChange($event)">
-                @for (country of countries; track country) {
+              <mat-select formControlName="country" placeholder="{{ 'Select country' | translate }}" (selectionChange)="clientCountryValueChange($event.value)">
+                @for (country of countries; track country.countryName) {
                   @if (country.currencySymbol) {
                     <mat-option [value]="country.countryName">{{ country.countryName }}</mat-option>
                   }
@@ -235,11 +235,11 @@
               <input
                 matInput
                 [value]="p.currency?.value || ''"
-                readonly
                 disabled
+                readonly
                 aria-readonly="true"
                 placeholder="—"
-              />
+                />
             </mat-form-field>
                 </div>
             <div class="col-10">
@@ -265,7 +265,7 @@
                 disabled
                 aria-readonly="true"
                 placeholder="—"
-              />
+                />
             </mat-form-field>
                 </div>
               <div class="col-5">
