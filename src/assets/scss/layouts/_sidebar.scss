@@ -237,7 +237,6 @@
   color: #516ce8;
   height: 36px;
   text-decoration: none;
-  background-color: #1c1e30;
   cursor: pointer;
   span {
     font-size: 14px;
@@ -250,9 +249,9 @@
   &:hover{
      background-color: #1c1d25;
   }
-  // &.activeMenu{
-  //   background-color: #f7f7f7;
-  // }
+  &.activeMenu{
+    background-color: #1c1e30;
+  }
 }
 // Upper side Menus
 .sidebar-list,
@@ -396,8 +395,14 @@
           font-size: 14px;
           line-height: 20px;
         }
-        &.activeMenu{
+        // &.activeMenu{
+        //   background-color: #1c1d25;
+        // }
+        &:hover{
           background-color: #1c1d25;
+        }
+        &.activeMenu{
+          background-color: #1c1e30;
         }
       }
 }

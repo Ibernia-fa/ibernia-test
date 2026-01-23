@@ -1,5 +1,6 @@
 @if(item.navCap){
 <a (click)="onItemSelected(item)" class="cashflow-modal d-flex align-items-center gap-8"
+style="margin-top: 11px;"
 [ngClass]="navItem.currentRouteName === item.displayName ? 'activeMenu' : ''"
 >
   <img style="width: 18px;" src="assets/images/svgs/inheritance-icon.svg" alt="cash-flow">

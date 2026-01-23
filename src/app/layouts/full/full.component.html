@@ -26,7 +26,7 @@
             <ng-scrollbar class="position-relative" style="height: 100%">
               <mat-nav-list class="sidebar-list">
                 @for(item of navItems; track item) {
-                <app-nav-item class="nav-divider" [item]="item" [isPremiumFeature]="false" (notify)="sidenav.toggle()">
+                <app-nav-item [class.nav-divider]="!isSettings" [item]="item" (notify)="sidenav.toggle()">
                 </app-nav-item>
                 }
               </mat-nav-list>
@@ -67,9 +67,11 @@
               }
             </ng-scrollbar>
           </div>
-          <!-- <div class="m-t-auto profile-bar" style="margin-bottom: 54px">
-            <div class="p-16 bg-light-secondary rounded d-flex flex-column gap-12">
-              <img src="/assets/images/svgs/heart-icon.svg" width="24" />
+          <div class="m-t-auto profile-bar" style="margin-bottom: 54px">
+            <div class="p-16 bg-light-secondary rounded d-flex flex-column gap-12 inner-profile-bar">
+              <div class="profile-bar-img">
+                <img src="/assets/images/svgs/heart-icon.svg" width="24" />
+              </div>
               <div class="content">
                 <div class="d-flex flex-column gap-2">
                   <h4 class="f-w-500">{{ 'Upgrade to Premium' | translate}}</h4>
@@ -78,7 +80,7 @@
                 <button mat-stroked-button class="w-100" (click)="onUpgradeClick()">{{ 'Upgrade' | translate}}</button>
               </div>
             </div>
-          </div> -->
+          </div>
         </div>
       </mat-sidenav>
       }
