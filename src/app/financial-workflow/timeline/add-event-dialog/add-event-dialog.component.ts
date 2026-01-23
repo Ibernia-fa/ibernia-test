@@ -98,6 +98,7 @@ export class AddEventDialogComponent {
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
     console.log(data);
+
     this.amountCycles = data.amountCycles;
     this.selectedEventType = data.eventType;
     this.isIncomeEvent = data.isIncomeEvent;
@@ -165,21 +166,6 @@ export class AddEventDialogComponent {
         });
         break;
 
-      case EventType.STATE_PENSION:
-        this.eventForm = this.fb.group({
-          isIncomeEvent: [true, Validators.required],
-          currency: [this.clientPreferredCurrency, Validators.required],
-          amount: ['', [Validators.required, Validators.min(0)]],
-          cycle: ['Every month', [Validators.required]],
-          start: [moment(this.dropTime).year(), Validators.required],
-          end: [0, Validators.required],
-          escalationRate: [this.escalationRates[1].value, Validators.required],
-          customEscalationRate: ['']
-
-        });
-        this.onCycleValueChange(this.systemEvent?.isOneOff ? 'One-off' : '');
-        break;
-
       case EventType.CUSTOM:
         this.eventForm = this.fb.group({
           eventName: ['', Validators.required],
@@ -214,21 +200,9 @@ export class AddEventDialogComponent {
         this.eventForm.controls['ageDate'].patchValue(this.patchEvent?.start.year);
         break;
 
-      case EventType.STATE_PENSION:
-        this.eventForm.controls['isIncomeEvent'].patchValue(this.patchEvent?.type === EventIncomeType.Income);
-        this.eventForm.controls['currency'].patchValue(this.patchEvent?.netAmount.currencySymbol);
-        this.eventForm.controls['amount'].patchValue(this.patchEvent?.netAmount.amount);
-        this.eventForm.controls['cycle'].patchValue(this.patchEvent?.netAmount.cycle?.description);
-        this.eventForm.controls['start'].patchValue(this.patchEvent?.start.year);
-        this.eventForm.controls['end'].patchValue(this.patchEvent?.end?.year);
-        this.eventForm.controls['escalationRate'].patchValue(this.patchEvent?.escalationRate?.description);
-        this.handleEscalationRatePatch(this.patchEvent?.escalationRate?.description, this.patchEvent?.escalationRate?.value);
-
-        break;
 
       case EventType.CUSTOM:
         if (this.customEventsLibrary?.every(event => event.name !== this.patchEvent?.name)) {
-alert(1);
           this.eventForm.controls['eventName'].patchValue('Custom');
           this.eventForm.addControl('name', new FormControl(this.patchEvent?.name, [Validators.required]));
           this.eventForm.updateValueAndValidity();
@@ -236,7 +210,6 @@ alert(1);
           this.selectedEventName = 'Custom';
         }
         else {
-          alert(2);
           this.eventForm.controls['eventName'].patchValue(this.patchEvent?.name);
           this.selectedEventIconUrl = this.patchEvent?.iconUrl ?? "";
           this.selectedEventName = this.patchEvent?.name ?? "";
@@ -291,7 +264,6 @@ alert(1);
     }
   }
 
-
   onCycleValueChange(event: string) {
     if (event === 'One-off') {
       this.eventForm.controls['end'].clearValidators();
@@ -334,68 +306,6 @@ alert(1);
     }
   }
 
-  onPensionEventSubmit() {
-    this.eventForm.markAllAsTouched();
-    if (this.eventForm.valid && this.systemEvent) {
-      this.saveClicked = true;
-      const isCustomEscalation = this.selectedEscalationDescription === 'Increases at custom rate';
-      const selectedEscalationRateValue = isCustomEscalation
-        ? this.eventForm.get('customEscalationRate')?.value
-        : this.eventForm.get('escalationRate')?.value;
-      const clientEvent: ClientEvent = {
-        id: this.isEditWorkflow ? this.patchEvent?.id ?? "" : "",
-        name: this.systemEvent.name,
-        netAmount: {
-          cycle: {
-            id: this.amountCycles.find(
-              (x) => x.description === this.eventForm.get('cycle')?.value
-            )?.id ?? '',
-            description: this.eventForm.get('cycle')?.value,
-          },
-          amount: this.eventForm.get('amount')?.value,
-          currencySymbol: this.eventForm.get('currency')?.value,
-        },
-        start: {
-          year: this.eventForm.get('start')?.value,
-          age: this.eventForm.get('start')?.value - this.clientBirthYear,
-        },
-        end: {
-          year: this.eventForm.get('end')?.value,
-          age: this.eventForm.get('end')?.value - this.clientBirthYear,
-        },
-        escalationRate: selectedEscalationRateValue !== null && selectedEscalationRateValue !== ''
-          ? this.escalationRates.find(x => x.value === selectedEscalationRateValue) ?? {
-            value: selectedEscalationRateValue,
-            description: isCustomEscalation ? 'Increases at custom rate' : selectedEscalationRateValue
-          }
-          : {
-            value: 0,
-            description: ''
-          },
-        type: this.isIncomeEvent
-          ? EventIncomeType.Income
-          : EventIncomeType.Expense,
-        iconUrl: this.systemEvent.iconUrl,
-        isDefault: false,
-        isOneOff: this.eventForm.get('cycle')?.value === 'One-off',
-        isPlaceHolder: this.systemEvent.isPlaceHolder,
-      };
-      this.timelineHttpService.addEvent(clientEvent, this.cashflowId)
-        .pipe(
-          filter(res => !!res),
-          catchError(err => {
-            this.saveClicked = false;
-            console.error(err);
-            throw err;
-          })
-        ).subscribe(res => {
-          this.saveClicked = false;
-          this.dialogRef.close({
-            status: 'Success'
-          });
-        })
-    }
-  }
   onInsuranceEventSubmit() {
     this.eventForm.markAllAsTouched();
     if (this.eventForm.valid && this.systemEvent) {
@@ -596,6 +506,5 @@ alert(1);
 
 export class EventType {
   public static readonly CUSTOM = 'Custom';
-  public static readonly STATE_PENSION = 'StatePension';
   public static readonly INHERITANCE = 'Inheritance';
 }

@@ -1,29 +1,41 @@
+.bold-icon {
+  height: 22px;
+  width: 22px;
+}
+
 .tab {
   span {
     line-height: 18px;
   }
+
   .tabs {
     border: 1px solid #516ce8;
     border-radius: 4px;
     padding: 2px;
+
     button {
       &.active {
         background-color: #516ce8;
       }
+
       background-color: white;
       text-align: center;
       padding-top: 8px;
       padding-bottom: 8px;
+
       span {
         &.active {
           color: white;
         }
+
         font-weight: 500;
         color: #516ce8;
       }
     }
+
     .row {
       margin: 0 !important;
+
       .col-6 {
         padding: 0 !important;
       }
@@ -31,13 +43,10 @@
   }
 }
 
-
-
-
-
 .start-end {
   .row {
     margin: 0 !important;
+
     .col-6 {
       padding: 0 !important;
       max-width: 45% !important;
@@ -45,23 +54,27 @@
     }
   }
 }
+
 .input-container {
   position: relative;
   width: 100%;
 }
 
 .input-container input {
-  padding-right: 30px; /* ensures space for the % */
+  padding-right: 30px;
+  /* ensures space for the % */
 }
+
 /* base look */
 :host .select-option .mat-mdc-select-trigger {
-  border: 1px solid rgba(0,0,0,0.23);
+  border: 1px solid rgba(0, 0, 0, 0.23);
   border-radius: 4px;
   padding: 8px 12px;
   min-height: 40px;
   box-sizing: border-box;
   width: 100%;
-  display: flex;           /* keeps content vertically centered */
+  display: flex;
+  /* keeps content vertically centered */
   align-items: center;
 }
 
@@ -78,6 +91,6 @@
 
 /* optional: focus ring */
 :host .select-option .mat-mdc-select.cdk-focused .mat-mdc-select-trigger {
-  outline: 2px solid rgba(211,47,47,.2);
+  outline: 2px solid rgba(211, 47, 47, .2);
   outline-offset: 1px;
 }

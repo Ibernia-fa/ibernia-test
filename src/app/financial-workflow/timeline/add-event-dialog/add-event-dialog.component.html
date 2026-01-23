@@ -2,7 +2,11 @@
 @if(selectedEventType === eventType.INHERITANCE){
 <div class="d-flex flex-column gap-32">
   <div class="d-flex align-items-center justify-content-between gap-10 modal-header">
-    <h3>{{systemEvent?.name}}</h3>
+    <div class="d-flex align-items-center gap-10">
+      <img matChipAvatar [src]="'/assets/images/svgs/' + systemEvent.iconUrl + '.svg'" [alt]="systemEvent.iconUrl" class="bold-icon" />
+      <h3>{{systemEvent?.name}}</h3>
+    </div>
+
     <button (click)="closeDialog()" type="button">
       <img src="assets/images/svgs/close-line-cion.svg" alt="close-line-cion" />
     </button>
@@ -114,264 +118,16 @@
 </div>
 }
 
-<!-- State Pension Event -->
-@if(selectedEventType === eventType.STATE_PENSION) {
-<div class="d-flex flex-column gap-32">
-  <!-- Modal Header  -->
-  <div class="d-flex align-items-center justify-content-between gap-10 modal-header">
-    <h3>{{ 'State Pension' | translate}}</h3>
-    <button (click)="closeDialog()" type="button">
-      <img src="assets/images/svgs/close-line-cion.svg" alt="close-line-cion" />
-    </button>
-  </div>
-  <!-- End Modal Header  -->
-
-  <!-- Modal Body  -->
-  <div [formGroup]="eventForm" class="d-flex flex-column gap-20">
-    <!-- Modal tabs  -->
-    <div class="d-flex flex-column gap-8 tab">
-      <span class="f-s-16 f-w-400">{{ 'Type' | translate}}</span>
-      <div class="tabs">
-        <div class="row">
-          <div class="col-6">
-            <button class="button-icon w-100" [class]="{ active: isIncomeEvent }">
-              <span [class]="{ active: isIncomeEvent }">{{ 'Income' | translate }}</span>
-            </button>
-          </div>
-          <div class="col-6">
-            <button class="button-icon w-100" [class]="{ active: !isIncomeEvent }">
-              <span [class]="{ active: !isIncomeEvent }">{{ 'Expense' | translate }}</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- End Modal tabs  -->
-
-    <!-- Net Amount Field  -->
-    <div class="d-flex flex-column gap-8 net-fields">
-      <span class="f-s-16 f-w-400">{{ 'Net amount' | translate }}</span>
-      <div class="net-field d-flex align-items-center">
-        <!-- Currency Selector  -->
-        <div class="left hide-arrow">
-          <mat-select value="£" formControlName="currency" class="sortby-edit-profile" hideSingleSelectionIndicator>
-
-            @for (country of countries; track country) {
-            @if(country.currencySymbol) {
-            <mat-option [value]="country.currencySymbol">{{
-              country.currencySymbol
-              }}</mat-option>
-
-            }
-            }
-          </mat-select>
-        </div>
-        <!-- End Currency Selector  -->
-        <!-- Price Field  -->
-
-        <div class="w-100 form-field">
-          <input matInput placeholder="0" type="text" inputmode="decimal" formControlName="amount"
-            thousandSeparatorInput />
-
-        </div>
-        <!-- End Price Field  -->
-        <!-- End Type Field  -->
-        <div class="right">
-          <mat-select (valueChange)="onCycleValueChange($event)" value="Select"
-            [disabled]="systemEvent?.isOneOff === true" formControlName="cycle" class="sortby-edit-profile"
-            hideSingleSelectionIndicator>
-            <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
-            @for (cycle of cycles; track cycle) {
-            <mat-option [value]="cycle">{{ cycle }}</mat-option>
-            }
-          </mat-select>
-        </div>
-        <!-- End Type Field  -->
-      </div>
-      @if((eventForm.get('cycle')?.touched &&
-      eventForm.get('cycle')?.hasError('required')) ||
-      (eventForm.get('amount')?.touched &&
-      eventForm.get('amount')?.hasError('required')) ||
-      (eventForm.get('currency')?.touched &&
-      eventForm.get('currency')?.hasError('required'))) {
-      <!-- <span class="field-error d-block">Amount is required</span> -->
-      <span class="field-error d-block">{{'Required' | translate}}</span>
-
-      }
-    </div>
-    <!-- End Net Amount Field  -->
-
-    <!-- Start End  -->
-    <div class="start-end">
-      <div class="d-flex flex-column gap-8">
-        <div class="d-flex gap-4 align-items-center">
-          @if(eventForm.get('cycle')?.value ==='One-off')
-          {
-          <mat-label class="f-s-16 f-w-400 d-block">{{ 'Date' | translate }}</mat-label>
-          }
-          @else
-          {
-          <mat-label class="f-s-16 f-w-400 d-block">Start @if(eventForm.get('cycle')?.value !=='One-off') {&
-            end}</mat-label>
-          }
-          <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
-        </div>
-        <div class="row justify-content-between align-items-start flex-nowrap">
-          <!-- Start Date  -->
-          <div [className]="eventForm.get('cycle')?.value !== 'One-off' ? 'col-6' : 'w-100'">
-            <div class="w-100 form-field">
-              <div class="select-option">
-                <mat-select value="Select" formControlName="start" hideSingleSelectionIndicator>
-                  <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
-
-
-                  @for (year of years; let i = $index; track year) {
-                  <mat-option [value]="year">{{ year }} ({{ clientAge + i }})</mat-option>
-                  }
-                </mat-select>
-              </div>
-            </div>
-            @if(eventForm.get('start')?.touched &&
-            eventForm.get('start')?.hasError('required')) {
-            @if(eventForm.get('cycle')?.value ==='One-off')
-            {
-            <!-- <span class="field-error d-block">Date is required</span> -->
-            <span class="field-error d-block">{{'Required' | translate}}</span>
-
-            }
-            @else
-            {
-            <!-- <span class="field-error d-block">Start is required</span> -->
-            <span class="field-error d-block">{{'Required' | translate}}</span>
-
-            }
-            }
-          </div>
-
-          <!-- Divider  -->
-
-          @if(eventForm.get('cycle')?.value !== 'One-off') {
-          <div class="d-flex justify-content-center align-items-center">
-            <img src="assets/images/svgs/chevron-right-date-icon.svg" alt="chevron-right-date-icon" />
-          </div>
-          <!-- End Date  -->
-          <div class="col-6">
-            <div class="w-100 form-field">
-              <div class="select-option">
-                <mat-select value="Select" formControlName="end" hideSingleSelectionIndicator>
-                  <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
-                  @for (event of eventsList; track event) {
-                  <mat-option [value]="event.year">{{ event.name }} ({{ event.age }})</mat-option>
-                  }
-                  <hr>
-                  @for (year of years; let i = $index; track year) {
-                  <mat-option [value]="year">{{ year }} ({{ clientAge + i }})</mat-option>
-                  }
-                </mat-select>
-              </div>
-              @if(eventForm.get('end')?.touched &&
-              eventForm.get('end')?.hasError('required')) {
-              @if(eventForm.get('cycle')?.value ==='One-off')
-              {
-              <!-- <span class="field-error d-block">Date is required</span> -->
-              <span class="field-error d-block">{{'Required' | translate}}</span>
-
-              }
-              @else
-              {
-              <!-- <span class="field-error d-block">Start is required</span> -->
-              <span class="field-error d-block">{{'Required' | translate}}</span>
-
-              }
-              }
-              @if(eventForm.get('end')?.touched &&
-              eventForm.get('end')?.hasError('required')) {
-              <!-- <span class="field-error d-block">End is required</span> -->
-              <span class="field-error d-block">{{'Required' | translate}}</span>
-
-              }
-              @if(eventForm.get('end')?.touched &&
-              eventForm.get('end')?.hasError('endBeforeStart')) {
-              <span class="field-error d-block">End year cannot be before start year</span>
-              }
-            </div>
-          </div>
-          }
-
-        </div>
-      </div>
-    </div>
-    <!-- Finish Start End  -->
-
-    @if(eventForm.get('cycle')?.value !== 'One-off') {
-    <div class="w-100  gap-8">
-      <div class="d-flex gap-4 align-items-center">
-        <mat-label class="f-s-16 f-w-400 d-block">Escalation rate</mat-label>
-        <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
-      </div>
-      <div class="position-relative">
-        <div class="w-100 form-field">
-          <div class="select-option">
-            <mat-select formControlName="escalationRate" value="Select"
-              (selectionChange)="onEscalationRateChange($event)">
-              @for (escalationRate of escalationRates; track escalationRate) {
-              <mat-option [value]="escalationRate.value">{{ escalationRate.description }}</mat-option>
-              }
-            </mat-select>
-          </div>
-          @if(eventForm.get('escalationRate')?.touched &&
-          eventForm.get('escalationRate')?.hasError('required')) {
-          <span class="field-error d-block">Escalation Rate is required</span>
-          }
-        </div>
-      </div>
-      @if(selectedEscalationDescription === 'Increases at custom rate') {
-      <div class="w-100 d-flex flex-column   gap-8">
-        <mat-label class="f-s-16 d-block">Custom Escalation Rate</mat-label>
-
-        <mat-form-field appearance="outline" class="w-full w-100 percentage-icon">
-          <span matSuffix>%</span>
-          <input matInput type="number" formControlName="customEscalationRate" placeholder="0" />
-
-        </mat-form-field>
-
-
-        @if(eventForm.get('customEscalationRate')?.touched &&
-        eventForm.get('customEscalationRate')?.hasError('required')) {
-        <!-- <span class="field-error d-block">Custom escalation rate is required</span> -->
-        <span class="field-error d-block">{{'Required' | translate}}</span>
-
-        }
-      </div>
-      }
-    </div>
-    }
-  </div>
-  <!-- End Modal Body  -->
-
-  <!-- Modal Action Button  -->
-  <div class="row justify-content-between modal-action">
-    <div class="col-5">
-      <button (click)="closeDialog()" class="button-icon-outline w-100 d-block">
-        <span class="f-s-16">{{ 'Cancel' | translate }}</span>
-      </button>
-    </div>
-    <div class="col-5">
-      <button (click)="onPensionEventSubmit()" class="button-icon w-100 d-block">
-        <span class="f-s-16">Save</span>
-      </button>
-    </div>
-  </div>
-  <!-- End Modal Action Button  -->
-</div>
-}
-
 <!-- Custom Event -->
 @if(selectedEventType === eventType.CUSTOM) {
 <div class="w-100">
   <div class="d-flex flex-column gap-32">
     <div class="d-flex align-items-center justify-content-between gap-10 modal-header">
-      <h3>{{ 'Custom event' | translate}}</h3>
+      <div class="d-flex align-items-center gap-10">
+        <img matChipAvatar src="/assets/images/svgs/custom-icon.svg" [alt]="custom-icon"
+          class="bold-icon" />
+        <h3>{{ 'Custom event' | translate}}</h3>
+      </div>
       <button (click)="closeDialog()" type="button">
         <img src="assets/images/svgs/close-line-cion.svg" alt="close-line-cion" />
       </button>
@@ -386,7 +142,7 @@
           <span class="field-error d-block">{{'Required' | translate}}</span>
           }
         </div>
-    
+
         <div class="d-flex flex-column gap-8 tab">
           <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Type' | translate}}
             <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4"
@@ -411,7 +167,8 @@
         </div>
         <div class="d-flex flex-column gap-8 net-fields">
           <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Net amount' | translate }}
-            <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4" matTooltip="{{ 'ADD_EVENT.ENTER_AMOUNT_TOOLTIP' | translate }}">
+            <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4"
+              matTooltip="{{ 'ADD_EVENT.ENTER_AMOUNT_TOOLTIP' | translate }}">
           </mat-label>
 
           <div class="net-field d-flex align-items-center">
@@ -455,7 +212,8 @@
               <mat-label class="f-s-16 f-w-400 d-block">
                 {{ (eventForm.get('cycle')?.value === 'One-off' ? 'Date' : 'Start & end') | translate }}
               </mat-label>
-              <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4" matTooltip="{{ 'ADD_EVENT.DEFINE_EVENT_PERIOD_TOOLTIP' | translate }}">
+              <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4"
+                matTooltip="{{ 'ADD_EVENT.DEFINE_EVENT_PERIOD_TOOLTIP' | translate }}">
             </div>
             <div class="row justify-content-between align-items-start flex-nowrap">
               <!-- Start date  -->

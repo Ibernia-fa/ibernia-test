@@ -310,44 +310,6 @@ export class TimelineChartComponent implements OnInit, OnChanges {
       });
     }
 
-    if (this.draggedEvent.name === 'State pension') {
-      const dialogRef = this.dialog.open(AddEventDialogComponent, {
-        width: '700px',
-        disableClose: true,
-        data: {
-          amountCycles: this.amountCycles,
-          eventType: EventType.STATE_PENSION,
-          escalataionRates: this.escalationRates,
-          timelineId: this.financialTimeline.id,
-          cashflowId: this.financialTimeline.cashflow.id,
-          isIncomeEvent: this.draggedEvent.type === EventIncomeType.Income,
-          systemEvent: this.draggedEvent,
-          dropTime: new Date(moment(dropTime).year(), 0),
-          clientBirthDate: this.clientBirthDate,
-          clientPreferredCurrency: this.client.clientDetails.preferredCurrency,
-          forecastStartDateYear: moment(this.financialTimeline.forecastStartDate).year(),
-          forecastEndDateYear: moment(this.financialTimeline.forecastEndtDate).year(),
-          eventsList: this.financialTimeline.clientEvents.map((event) => {
-            return {
-              name: event.name,
-              year: event.start.year,
-              age:
-                event.start.year -
-                moment(new Date(this.clientBirthDate)).year(),
-            };
-          }),
-        },
-      });
-
-      dialogRef.afterClosed().subscribe((result: any) => {
-
-        if ((result.status = 'Success')) {
-          this.draggedEvent = null;
-          this.updateTimelines.emit();
-        }
-      });
-    }
-
     this.draggedEvent = null;
   }
 
@@ -801,44 +763,6 @@ export class TimelineChartComponent implements OnInit, OnChanges {
       });
     }
 
-    if (clientEvent.name === 'State pension') {
-      const dialogRef = this.dialog.open(AddEventDialogComponent, {
-        width: '600px',
-        disableClose: true,
-        data: {
-          eventType: EventType.STATE_PENSION,
-          amountCycles: this.amountCycles,
-          timelineId: this.financialTimeline.id,
-          escalataionRates: this.escalationRates,
-          cashflowId: this.financialTimeline.cashflow.id,
-          isIncomeEvent: clientEvent.type === EventIncomeType.Income,
-          systemEvent: clientEvent,
-          dropTime: new Date(clientEvent.start.year, 0),
-          clientBirthDate: this.clientBirthDate,
-          clientPreferredCurrency: this.client.clientDetails.preferredCurrency,
-          forecastStartDateYear: moment(this.financialTimeline.forecastStartDate).year(),
-          forecastEndDateYear: moment(this.financialTimeline.forecastEndtDate).year(),
-          eventsList: this.financialTimeline.clientEvents.map((event) => {
-            return {
-              name: event.name,
-              year: event.start.year,
-              age:
-                event.start.year -
-                moment(new Date(this.clientBirthDate)).year(),
-            };
-          }),
-          isEditWorkflow: true,
-          patchEvent: clientEvent,
-        },
-      });
-
-      dialogRef.afterClosed().subscribe((result: any) => {
-        if ((result.status = 'Success')) {
-          this.updateTimelines.emit();
-        }
-      });
-    }
-
     if (this.systemEventsLibrary.every((event) => event.name !== clientEvent?.name) || 
       clientEvent.name === 'Home'||
       clientEvent.name === 'Travel'||
@@ -847,6 +771,9 @@ export class TimelineChartComponent implements OnInit, OnChanges {
       clientEvent.name === 'New business'||
       clientEvent.name === 'Boat'
     ) {
+      console.log("custom event");
+      console.log(this.customEventsLibrary);
+
       const dialogRef = this.dialog.open(AddEventDialogComponent, {
         width: '900px',
         disableClose: true,
