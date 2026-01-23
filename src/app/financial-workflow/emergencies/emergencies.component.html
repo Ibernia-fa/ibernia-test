@@ -139,7 +139,7 @@
                 <!-- if insurance and not covered show simulation button -->
                 <div class="inner-information">
                   <div class="simulate-button-section">
-                    <button class="simulate-button" mat-icon-button (click)="simulateEmergency(e)">Simulate</button>
+                    <button class="simulate-button" mat-icon-button (click)="simulateEmergency(e); $event.stopPropagation()">Simulate</button>
                   </div>
                 </div>
               </ng-template>
