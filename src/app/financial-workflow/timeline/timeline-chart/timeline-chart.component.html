@@ -3,7 +3,7 @@
         <div class="d-flex flex-column gap-32">
             <div class="d-flex align-items-center justify-content-between flex-wrap gap-16 event-main-wrapper">
                 <div class="d-flex flex-column gap-6" style="flex-direction: column">
-                    <h4 class="f-s-22 f-w-400">{{title}}  </h4>
+                    <h4 class="f-s-22 f-w-400">{{title}} </h4>
                     @if(!showOnReports) {
                     <p class="m-0">
                         {{ 'Let us begin with what matters most: goals and life plans.' | translate }} <br />
@@ -13,73 +13,15 @@
                 </div>
                 @if(!showOnReports) {
                 <button (click)="newEventClicked()" type="button" class="button-icon">
-                    <span>{{ 'New Event' | translate }}</span>
+                    <span>{{ 'Custom event' | translate }}</span>
                     <img src="assets/images/svgs/add-icon.svg" alt="add-icon" />
                 </button>
                 }
             </div>
             <div class="chips-custom">
                 <mat-chip-set aria-label="Dog selection">
-                    <!-- <mat-chip class="f-s-14" class="chip-item retirement-age">
-                    cdkDropList
-                    cdkDropListOrientation="horizontal"
-                    (cdkDropListDropped)="drop($event)" 
-                        <div class="d-flex gap-8 align-items-center m-r-16">
-                            <img matChipAvatar src="/assets/images/svgs/retirement-icon.svg"
-                                alt="Photo of a Shiba Inu" />
-                            Retirement Age
-                        </div>
-                        <img src="/assets/images/svgs/close-line-icon.svg" alt="remove" />
-                    </mat-chip>
-                    <mat-chip class="f-s-14" class="chip-item inheritance">
-                        <div class="d-flex gap-8 align-items-center m-r-16">
-                            <img matChipAvatar src="/assets/images/svgs/inheritance-icon.svg" alt="inheritance" />
-                            Inheritance
-                        </div>
-                        <img src="/assets/images/svgs/close-line-icon.svg" alt="remove" />
-                    </mat-chip>
-                    <mat-chip class="f-s-14" class="chip-item birth">
-                        <div class="d-flex gap-8 align-items-center m-r-16">
-                            <img matChipAvatar src="/assets/images/svgs/cake-icon.svg" alt="birth" />
-                            Birth
-                        </div>
-                        <img src="/assets/images/svgs/close-line-icon.svg" alt="remove" />
-                    </mat-chip>
-                    <mat-chip class="f-s-14" class="chip-item wedding">
-                        <div class="d-flex gap-8 align-items-center m-r-16">
-                            <img matChipAvatar src="/assets/images/svgs/wedding-heart-icon.svg" alt="heart" />
-                            Wedding
-                        </div>
-                        <img src="/assets/images/svgs/close-line-icon.svg" alt="remove" />
-                    </mat-chip>
-                    <mat-chip class="f-s-14" class="chip-item mortality">
-                        <div class="d-flex gap-8 align-items-center m-r-16">
-                            <img matChipAvatar src="/assets/images/svgs/bed-icon.svg" alt="mortality" />
-                            Mortality
-                        </div>
-                        <img src="/assets/images/svgs/close-line-icon.svg" alt="remove" />
-                    </mat-chip>
-                    <mat-chip class="f-s-14" class="chip-item state-pension">
-                        <div class="d-flex gap-8 align-items-center m-r-16">
-                            <img matChipAvatar src="/assets/images/svgs/state-pension-profile-icon.svg"
-                                alt="state-pension" />
-                            State Pension
-                        </div>
-                        <img src="/assets/images/svgs/close-line-icon.svg" alt="remove" />
-                    </mat-chip> -->
-                    @if(!showOnReports) {
-                    @if(systemEventsLibrary) {
+                    @if(!showOnReports && systemEventsLibrary) {
                     @for(systemEvent of systemEventsLibrary; track systemEvent) {
-                    <!-- <mat-chip draggable="true" (dragend)="onDragEnd($event)" (dragstart)="onDragStart($event, systemEvent)"
-                            class="f-s-14 chip-item" [class]="systemEvent.iconUrl">
-                            <div class="d-flex gap-8 align-items-center m-r-16">
-                                <img matChipAvatar [src]="'/assets/images/svgs/' + systemEvent.iconUrl + '.svg'"
-                                    [alt]="systemEvent.iconUrl" />
-                               {{systemEvent.name}}
-                            </div>
-                            <img src="/assets/images/svgs/close-line-icon.svg" alt="remove" />
-                        </mat-chip> -->
-
                     <mat-chip draggable="true" (dragend)="onDragEnd($event)"
                         (dragstart)="onDragStart($event, systemEvent)" class="f-s-14 chip-item"
                         [class]="systemEvent.iconUrl">
@@ -93,41 +35,19 @@
                             <img src="/assets/images/svgs/close-line-icon.svg" alt="remove" class="chip-close-icon" />
                         </div>
                     </mat-chip>
-
-                    }
                     }
                     }
                 </mat-chip-set>
             </div>
         </div>
 
-<div class="timeline-wrapper">
-  <div class="timeline-labels">
-    <p>{{ 'Age' | translate }}</p>
-    <span>{{ 'Year' | translate }}</span>
-  </div>
-<!-- <div id="year-tooltip" class="timeline-tooltip" hidden></div> -->
-  <!-- <div class="timeline-container" #timelineContainer
-       (dragover)="onDragOver($event)"
-       (drop)="onDrop($event)">
-  </div> -->
-
-  <div class="timeline-container" #timelineContainer
-     (dragover)="onDragOver($event)"
-     (drop)="onDrop($event)">
-</div>
-</div>
-
-
-
-
-
-        <!-- <div #timelineContainer class="timeline" (dragover)="onDragOver($event)" (drop)="onDrop($event)">
-            <div class="timeline-fields">
+        <div class="timeline-wrapper">
+            <div class="timeline-labels">
                 <p>{{ 'Age' | translate }}</p>
                 <span>{{ 'Year' | translate }}</span>
             </div>
-
-        </div> -->
+            <div class="timeline-container" #timelineContainer (dragover)="onDragOver($event)" (drop)="onDrop($event)">
+            </div>
+        </div>
     </mat-card-content>
 </mat-card>

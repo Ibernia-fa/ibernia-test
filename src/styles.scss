@@ -800,3 +800,15 @@ body:has(.global-fullscreen-overlay) {
   pointer-events: none;
 }
 // event styes for lifetime model - end
+
+.chips-custom .mdc-evolution-chip-set__chips {
+  display: flex !important;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.vis-item, 
+.vis-selected {
+    width: fit-content !important;
+}
