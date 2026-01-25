@@ -3,7 +3,14 @@
     <app-header [hideSidebarToggle]="hideSidebar" [showToggle]="!isOver" (toggleCollapsed)="toggleCollapsed()"
       (toggleMobileNav)="sidenav.toggle()" (toggleMobileFilterNav)="filterNavRight.toggle()"
       (optionsChange)="receiveOptions($event)"></app-header>
-    <mat-sidenav-container autosize autoFocus [ngClass]="{
+    <mat-sidenav-container autosize autoFocus
+      [ngStyle]="backgroundImage ? {
+        'background-image': 'url(' + backgroundImage + ')',
+        'background-size': 'cover',
+        'background-position': 'center',
+        'background-repeat': 'no-repeat'
+      } : null"
+      [ngClass]="{
         'sidebarNav-mini':
           options.sidenavCollapsed && options.navPos !== 'top' && !resView,
         'sidebarNav-horizontal': options.horizontal,

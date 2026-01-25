@@ -15,6 +15,7 @@ export class OrganizationProfilesService {
   private brandingLogoSource = new BehaviorSubject<string | null>(null);
   private backgroundImageSource = new BehaviorSubject<string | null>(null);
   public brandingLogo$ = this.brandingLogoSource.asObservable();
+  public backgroundImage$ = this.backgroundImageSource.asObservable();
 
   constructor(private http: HttpClient) {}
 
