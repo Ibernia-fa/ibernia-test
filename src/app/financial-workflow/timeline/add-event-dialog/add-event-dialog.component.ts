@@ -187,8 +187,6 @@ export class AddEventDialogComponent {
 
 
       case EventType.CUSTOM:
-        // this.eventForm.addControl('name', new FormControl(this.patchEvent?.name, [Validators.required]));
-        // this.eventForm.updateValueAndValidity();
         this.selectedEventIconUrl = this.patchEvent?.iconUrl ?? "";
         this.eventForm.controls['name'].patchValue(this.patchEvent?.name);
         this.eventForm.controls['isIncomeEvent'].patchValue(this.patchEvent?.type === EventIncomeType.Income);
@@ -281,8 +279,9 @@ export class AddEventDialogComponent {
     }
   }
 
-  onInsuranceEventSubmit() {
+  onSystemEventSubmit() {
     this.eventForm.markAllAsTouched();
+
     if (this.eventForm.valid && this.systemEvent) {
       this.saveClicked = true;
       const clientEvent: ClientEvent = {
@@ -312,6 +311,7 @@ export class AddEventDialogComponent {
         isOneOff: this.eventForm.get('cycle')?.value === 'One-off',
         isPlaceHolder: this.systemEvent.isPlaceHolder,
       };
+
       this.timelineHttpService.addEvent(clientEvent, this.cashflowId)
         .pipe(
           filter(res => !!res),

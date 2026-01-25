@@ -208,8 +208,6 @@ export class TimelineChartComponent implements OnInit, OnChanges {
     this.timeline.redraw();
   }
 
-
-
   onDrop(event: DragEvent) {
     event.preventDefault();
     this.isDragging = false;
@@ -294,6 +292,9 @@ export class TimelineChartComponent implements OnInit, OnChanges {
         .subscribe((res) => {
           this.draggedEvent = null;
         });
+
+        this.draggedEvent = null;
+        return;
     }
 
     const dialogRef = this.dialog.open(AddEventDialogComponent, {
