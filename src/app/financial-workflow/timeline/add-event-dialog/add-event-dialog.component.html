@@ -68,13 +68,15 @@
               placeholder="0" />
           </div>
           <div class="right ">
-            <mat-select 
+            <mat-select
               (valueChange)="onCycleValueChange($event)" 
-              value="Select" formControlName="cycle"
+              value="Select"
+              formControlName="cycle"
               class="sortby-edit-profile" 
-              [class.hide-arror]="isInheritanceOneOff"
+              [class.hide-arrow]="isInheritanceOneOff" 
               [disabled]="isInheritanceOneOff"
-              hideSingleSelectionIndicator>
+              hideSingleSelectionIndicator
+            >
               @for (cycle of cycles; track cycle) {
               <mat-option [value]="cycle">{{ cycle }}</mat-option>
               }
@@ -90,6 +92,32 @@
         <span class="field-error d-block">{{'Required' | translate}}</span>
         }
       </div>
+      @if(isInheritanceOneOff)
+      {
+      <div class="w-100 form-field gap-8">
+        <div class="d-flex gap-4 align-items-center">
+          <mat-label class="f-s-16 f-w-400 d-block">{{ 'Date' | translate}}</mat-label>
+
+          <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
+        </div>
+        <div class="position-relative">
+          <div class="w-100 form-field">
+            <div class="select-option">
+              <mat-select value="Select" formControlName="ageDate" hideSingleSelectionIndicator>
+                @for (year of years; let i = $index; track year) {
+                <mat-option [value]="year">{{ year }} ({{ clientAge + i }})</mat-option>
+                }
+              </mat-select>
+            </div>
+            @if(eventForm.get('ageDate')?.touched &&
+            eventForm.get('ageDate')?.hasError('required')) {
+            <span class="field-error d-block">{{'Required' | translate}}</span>
+            }
+          </div>
+        </div>
+      </div>
+      }
+      @else {
       <div class="start-end">
         <div class="d-flex flex-column gap-8">
           <div class="d-flex gap-4 align-items-center">
@@ -157,7 +185,7 @@
           </div>
         </div>
       </div>
-
+      }
       @if(eventForm.get('cycle')?.value !== 'One-off') {
       <div class="w-100 d-flex flex-column gap-20">
         <div class="d-flex flex-column gap-8">
@@ -296,7 +324,7 @@
               <input matInput type="text" inputmode="decimal" formControlName="amount" thousandSeparatorInput
                 placeholder="0" />
             </div>
-            <div class="right ">
+            <div class="right">
               <mat-select (valueChange)="onCycleValueChange($event)" value="Select" formControlName="cycle"
                 class="sortby-edit-profile" hideSingleSelectionIndicator>
                 @for (cycle of cycles; track cycle) {

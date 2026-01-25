@@ -82,9 +82,6 @@ export class AddEventDialogComponent {
     private timelineHttpService: TimelineHttpService,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
-    console.log("XXXXXX");
-    console.log(data);
-
     this.amountCycles = data.amountCycles;
     this.selectedEventType = data.eventType;
     this.isIncomeEvent = data.isIncomeEvent;
@@ -132,17 +129,16 @@ export class AddEventDialogComponent {
         this.data.patchEvent.name === "New business"
       ) {
         this.hideEventType = true;
+
+        // inheritance is default one-off. 
+        // diable cycle on one-off
+        // Date is Default at 65 years of age. If the user is older than 65, no default date.
+        if (this.data.patchEvent.name === "Inheritance") {
+          this.isInheritanceOneOff = true;
+        }
       }
       else {
         this.hideEventType = false;
-
-        // inheritance is default one-off. Date is Default at 65 years of age. If the user is older than 65, no default date.
-        if (this.data.patchEvent.name === "Inheritance")
-        {
-          // default one-off disabled
-          this.isInheritanceOneOff = true;
-          //only date visible with contition 65 years
-        }
       }
     }
 
@@ -164,11 +160,11 @@ export class AddEventDialogComponent {
   initForm() {
     let defaultCycle = 'One-off';
 
-    // make travel one off (there could be multiple travel events with rename functionality, consider while changing iconUrl until there is some proper solution to this)
-    if (this.selectedEventType == EventType.SYSTEM 
-      && (this.patchEvent?.name == "Travel" || 
-        this.patchEvent?.iconUrl == "travel-icon"))
-    {
+    // make travel one off (there could be multiple travel events with rename functionality,
+    //  consider while changing iconUrl until there is some proper solution to this)
+    if (this.selectedEventType == EventType.SYSTEM
+      && (this.patchEvent?.name == "Travel" ||
+        this.patchEvent?.iconUrl == "travel-icon")) {
       defaultCycle = 'Every year';
     }
 
@@ -203,6 +199,25 @@ export class AddEventDialogComponent {
         this.onCycleValueChange('One-off');
         break;
     }
+
+    if (this.isInheritanceOneOff) { // remove extra validation
+      this.eventForm.get('start')?.clearValidators();
+      this.eventForm.get('end')?.clearValidators();
+      this.eventForm.get('escalationRate')?.clearValidators();
+
+      this.eventForm.get('cycle')?.disable({ emitEvent: false });
+    } else { // add back validations
+      this.eventForm.get('start')?.setValidators(Validators.required);
+      this.eventForm.get('end')?.setValidators(Validators.required);
+      this.eventForm.get('escalationRate')?.setValidators(Validators.required);
+
+      this.eventForm.get('cycle')?.enable({ emitEvent: false });
+    }
+
+    this.eventForm.get('start')?.updateValueAndValidity({ emitEvent: false });
+    this.eventForm.get('end')?.updateValueAndValidity({ emitEvent: false });
+    this.eventForm.get('escalationRate')?.updateValueAndValidity({ emitEvent: false });
+
     this.eventForm.get('currency')?.disable();
     this.eventForm.setValidators(this.endOnOrAfterStartValidator());
     this.eventForm.updateValueAndValidity({ emitEvent: false });
@@ -326,11 +341,27 @@ export class AddEventDialogComponent {
     if (this.eventForm.valid && this.patchEvent) {
       this.saveClicked = true;
 
-      // should not be for inheritance
-      const isCustomEscalation = this.selectedEscalationDescription === 'Increases at custom rate';
-      const selectedEscalationRateValue = isCustomEscalation
-        ? this.eventForm.get('customEscalationRate')?.value
-        : this.eventForm.get('escalationRate')?.value;
+      // inheritance
+      let escalataionRatesToSubmit = null;
+
+      // non inheritance 
+      if (!this.isInheritanceOneOff) {
+        const isCustomEscalation = this.selectedEscalationDescription === 'Increases at custom rate';
+        const selectedEscalationRateValue = isCustomEscalation
+          ? this.eventForm.get('customEscalationRate')?.value
+          : this.eventForm.get('escalationRate')?.value;
+
+        escalataionRatesToSubmit =
+          selectedEscalationRateValue !== null && selectedEscalationRateValue !== ''
+            ? this.escalationRates.find(x => x.value === selectedEscalationRateValue) ?? {
+              value: selectedEscalationRateValue,
+              description: isCustomEscalation ? 'Increases at custom rate' : selectedEscalationRateValue
+            }
+            : {
+              value: 0,
+              description: ''
+            }
+      }
 
       const clientEvent: ClientEvent = {
         id: this.isEditWorkflow ? this.patchEvent?.id ?? "" : "",
@@ -347,25 +378,16 @@ export class AddEventDialogComponent {
         },
         start: {
           year: this.isInheritanceOneOff ? this.eventForm.get('ageDate')?.value  // for inheritance one-off event
-            : this.eventForm.get('start')?.value, 
-          age:  this.isInheritanceOneOff ? this.eventForm.get('ageDate')?.value - this.clientBirthYear // for inheritance one-off event
-            : this.eventForm.get('start')?.value - this.clientBirthYear, 
+            : this.eventForm.get('start')?.value,
+          age: this.isInheritanceOneOff ? this.eventForm.get('ageDate')?.value - this.clientBirthYear // for inheritance one-off event
+            : this.eventForm.get('start')?.value - this.clientBirthYear,
         },
         end: this.isInheritanceOneOff ? null // for inheritance one-off event
           : {
             year: this.eventForm.get('end')?.value,
             age: (this.eventForm.get('end')?.value > this.clientBirthYear) ? this.eventForm.get('end')?.value - this.clientBirthYear : 0,
           },
-        escalationRate: this.isInheritanceOneOff ? null : // for inheritance one-off event
-          selectedEscalationRateValue !== null && selectedEscalationRateValue !== ''
-            ? this.escalationRates.find(x => x.value === selectedEscalationRateValue) ?? {
-              value: selectedEscalationRateValue,
-              description: isCustomEscalation ? 'Increases at custom rate' : selectedEscalationRateValue
-            }
-            : {
-              value: 0,
-              description: ''
-            },
+        escalationRate: escalataionRatesToSubmit,
         type: this.isIncomeEvent ? EventIncomeType.Income : EventIncomeType.Expense,
         iconUrl: this.patchEvent.iconUrl,
         isDefault: false,

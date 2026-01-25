@@ -766,7 +766,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
     }
 
     const dialogRef = this.dialog.open(AddEventDialogComponent, {
-      width: '900px',
+      width: '700px',
       disableClose: true,
       data: {
         amountCycles: this.amountCycles,
