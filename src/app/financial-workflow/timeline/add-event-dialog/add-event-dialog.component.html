@@ -1,9 +1,10 @@
-<!-- Inheritance Event -->
-@if(selectedEventType === eventType.INHERITANCE){
+<!-- system events on top of timeline (dragdrop) -->
+@if(selectedEventType === eventType.SYSTEM){
 <div class="d-flex flex-column gap-32">
   <div class="d-flex align-items-center justify-content-between gap-10 modal-header">
     <div class="d-flex align-items-center gap-10">
-      <img matChipAvatar [src]="'/assets/images/svgs/' + systemEvent.iconUrl + '.svg'" [alt]="systemEvent.iconUrl" class="bold-icon" />
+      <img matChipAvatar [src]="'/assets/images/svgs/' + systemEvent.iconUrl + '.svg'" [alt]="systemEvent.iconUrl"
+        class="bold-icon" />
       <h3>{{systemEvent?.name}}</h3>
     </div>
 
@@ -118,15 +119,21 @@
 </div>
 }
 
-<!-- Custom Event -->
+<!-- custom event with add button -->
 @if(selectedEventType === eventType.CUSTOM) {
 <div class="w-100">
   <div class="d-flex flex-column gap-32">
     <div class="d-flex align-items-center justify-content-between gap-10 modal-header">
       <div class="d-flex align-items-center gap-10">
-        <img matChipAvatar src="/assets/images/svgs/custom-icon.svg" [alt]="custom-icon"
-          class="bold-icon" />
-        <h3>{{ 'Custom event' | translate}}</h3>
+        <img matChipAvatar src="/assets/images/svgs/custom-icon.svg" [alt]="custom-icon" class="bold-icon" />
+        <h3>
+          {{ isEditWorkflow ? eventForm.get('name')?.value : ('Custom event' | translate) }}
+
+          <ng-container *ngIf="isEditWorkflow">
+            <img src="assets/images/svgs/edit-icon.svg" alt="edit" class="cursor-pointer" width="16"
+              (click)="toggleNameEdit()" />
+          </ng-container>
+        </h3>
       </div>
       <button (click)="closeDialog()" type="button">
         <img src="assets/images/svgs/close-line-cion.svg" alt="close-line-cion" />
@@ -134,7 +141,7 @@
     </div>
     <mat-dialog-content>
       <div [formGroup]="eventForm" class="d-flex flex-column gap-20">
-        <div class="w-100 form-field gap-8">
+        <div class="w-100 form-field gap-8" *ngIf="!isEditWorkflow || showNameEdit">
           <mat-label class="f-s-16 d-block" style="line-height: 18px">Name</mat-label>
           <input matInput formControlName="name" />
           @if(eventForm.get('name')?.touched &&
@@ -216,7 +223,6 @@
                 matTooltip="{{ 'ADD_EVENT.DEFINE_EVENT_PERIOD_TOOLTIP' | translate }}">
             </div>
             <div class="row justify-content-between align-items-start flex-nowrap">
-              <!-- Start date  -->
               <div [className]="eventForm.get('cycle')?.value !== 'One-off' ? 'col-6' : 'w-100'">
                 <div class="w-100 form-field">
                   <div class="select-option">
@@ -241,11 +247,11 @@
               </div>
 
               @if(eventForm.get('cycle')?.value !== 'One-off') {
-              <!-- Divider  -->
+
               <div class="d-flex justify-content-start align-items-start">
                 <img src="assets/images/svgs/chevron-right-date-icon.svg" alt="chevron-right-date-icon" />
               </div>
-              <!-- End date  -->
+
               <div class="col-6">
                 <div class="w-100 form-field">
                   <div class="select-option">
@@ -273,14 +279,14 @@
             </div>
           </div>
         </div>
-        <!-- Finish Start End  -->
+
         @if(eventForm.get('cycle')?.value !== 'One-off') {
         <div class="w-100 d-flex flex-column gap-20">
           <div class="d-flex flex-column gap-8">
             <div class="d-flex gap-4 align-items-center">
               <mat-label class="f-s-16 f-w-400 d-block">{{ 'Escalation rate' | translate}}</mat-label>
               <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4"
-                matTooltip="         {{ 'ADD_EVENT.AMOUNT_GROWTH_TOOLTIP' | translate }}">
+                matTooltip="{{ 'ADD_EVENT.AMOUNT_GROWTH_TOOLTIP' | translate }}">
             </div>
             <div class="position-relative">
               <div class="w-100 form-field">
@@ -294,9 +300,7 @@
                 </div>
                 @if(eventForm.get('escalationRate')?.touched &&
                 eventForm.get('escalationRate')?.hasError('required')) {
-                <!-- <span class="field-error d-block">Escalation Rate is required</span> -->
                 <span class="field-error d-block">{{'Required' | translate}}</span>
-
                 }
               </div>
             </div>
@@ -313,7 +317,6 @@
 
             @if(eventForm.get('customEscalationRate')?.touched &&
             eventForm.get('customEscalationRate')?.hasError('required')) {
-            <!-- <span class="field-error d-block">Custom escalation rate is required</span> -->
             <span class="field-error d-block">{{'Required' | translate}}</span>
 
             }
@@ -323,9 +326,7 @@
         }
       </div>
     </mat-dialog-content>
-    <!-- End Modal Body  -->
 
-    <!-- Modal Action Button  -->
     <div class="row justify-content-between modal-action">
       <div class="col-5">
         <button (click)="closeDialog()" class="button-icon-outline w-100 d-block">
@@ -338,7 +339,6 @@
         </button>
       </div>
     </div>
-    <!-- End Modal Action Button  -->
   </div>
 </div>
 }

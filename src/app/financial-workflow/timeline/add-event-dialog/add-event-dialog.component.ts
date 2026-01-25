@@ -2,11 +2,7 @@ import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import {
-  MAT_DIALOG_DATA,
-  MatDialogModule,
-  MatDialogRef,
-} from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -14,15 +10,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSelectChange, MatSelectModule } from '@angular/material/select';
 import { Client } from 'src/app/clients/models/client';
 import { ClientEvent, Cycle, EscalationRate, EventIncomeType } from '../models/financial-timeline';
-import {
-  AbstractControl,
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  ReactiveFormsModule,
-  ValidatorFn,
-  Validators,
-} from '@angular/forms';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 import { Timeline } from 'vis-timeline';
 import { TimelineHttpService } from '../services/timeline-http.service';
 import { catchError, filter } from 'rxjs';
@@ -46,7 +34,6 @@ import { TranslateModule } from '@ngx-translate/core';
     MatButtonModule,
     MatSelectModule,
     MatDatepickerModule,
-    // AgeCalculatorPipe,
     ReactiveFormsModule,
     MatTooltipModule,
     CommonModule,
@@ -58,7 +45,7 @@ import { TranslateModule } from '@ngx-translate/core';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './add-event-dialog.component.html',
-  styleUrl: './add-event-dialog.component.scss',
+  styleUrl: './add-event-dialog.component.scss'
 })
 export class AddEventDialogComponent {
   isIncomeEvent = true;
@@ -86,6 +73,7 @@ export class AddEventDialogComponent {
   amountCycles: Cycle[];
   saveClicked: boolean = false;
   currentYear: number = new Date().getFullYear();
+  showNameEdit: boolean = false;
 
   constructor(
     private dialogRef: MatDialogRef<AddEventDialogComponent>,
@@ -150,7 +138,7 @@ export class AddEventDialogComponent {
 
   initForm() {
     switch (this.selectedEventType) {
-      case EventType.INHERITANCE:
+      case EventType.SYSTEM:
         this.eventForm = this.fb.group({
           isIncomeEvent: [false, Validators.required],
           currency: [this.clientPreferredCurrency, Validators.required],
@@ -164,7 +152,7 @@ export class AddEventDialogComponent {
 
       case EventType.CUSTOM:
         this.eventForm = this.fb.group({
-          eventName: ['', Validators.required],
+          name: ['', Validators.required],
           isIncomeEvent: [true, Validators.required],
           currency: [this.clientPreferredCurrency, Validators.required],
           amount: ['', [Validators.required, Validators.min(0)]],
@@ -181,6 +169,7 @@ export class AddEventDialogComponent {
     this.eventForm.get('currency')?.disable();
     this.eventForm.setValidators(this.endOnOrAfterStartValidator());
     this.eventForm.updateValueAndValidity({ emitEvent: false });
+    
     if (this.isEditWorkflow) {
       this.patchForm();
     }
@@ -188,7 +177,7 @@ export class AddEventDialogComponent {
 
   patchForm() {
     switch (this.selectedEventType) {
-      case EventType.INHERITANCE:
+      case EventType.SYSTEM:
         this.eventForm.controls['isIncomeEvent'].patchValue(this.patchEvent?.type === EventIncomeType.Income);
         this.eventForm.controls['currency'].patchValue(this.patchEvent?.netAmount.currencySymbol);
         this.eventForm.controls['amount'].patchValue(this.patchEvent?.netAmount.amount);
@@ -198,18 +187,10 @@ export class AddEventDialogComponent {
 
 
       case EventType.CUSTOM:
-        if (this.customEventsLibrary?.every(event => event.name !== this.patchEvent?.name)) {
-          this.eventForm.controls['eventName'].patchValue('Custom');
-          this.eventForm.addControl('name', new FormControl(this.patchEvent?.name, [Validators.required]));
-          this.eventForm.updateValueAndValidity();
-          this.selectedEventIconUrl = this.patchEvent?.iconUrl ?? "";
-          this.selectedEventName = 'Custom';
-        }
-        else {
-          this.eventForm.controls['eventName'].patchValue(this.patchEvent?.name);
-          this.selectedEventIconUrl = this.patchEvent?.iconUrl ?? "";
-          this.selectedEventName = this.patchEvent?.name ?? "";
-        }
+        // this.eventForm.addControl('name', new FormControl(this.patchEvent?.name, [Validators.required]));
+        // this.eventForm.updateValueAndValidity();
+        this.selectedEventIconUrl = this.patchEvent?.iconUrl ?? "";
+        this.eventForm.controls['name'].patchValue(this.patchEvent?.name);
         this.eventForm.controls['isIncomeEvent'].patchValue(this.patchEvent?.type === EventIncomeType.Income);
         this.eventForm.controls['currency'].patchValue(this.patchEvent?.netAmount.currencySymbol);
         this.eventForm.controls['amount'].patchValue(this.patchEvent?.netAmount.amount);
@@ -283,11 +264,9 @@ export class AddEventDialogComponent {
 
   onEventNameValueChange(event: any) {
     this.selectedEventName = event;
-    if (event === 'Custom') {
-      this.eventForm.addControl(
-        'name',
-        new FormControl('', [Validators.required])
-      );
+
+    if (event === EventType.CUSTOM) {
+      this.eventForm.addControl( 'name', new FormControl('', [Validators.required]));
       this.eventForm.updateValueAndValidity();
       this.selectedEventIconUrl = 'custom-icon'
     } else {
@@ -349,21 +328,21 @@ export class AddEventDialogComponent {
         })
     }
   }
+
   onCustomEventSubmit() {
-    console.log(this.eventForm.value);
     this.eventForm.markAllAsTouched();
+
     if (this.eventForm.valid) {
       this.saveClicked = true;
+
       const isCustomEscalation = this.selectedEscalationDescription === 'Increases at custom rate';
       const selectedEscalationRateValue = isCustomEscalation
         ? this.eventForm.get('customEscalationRate')?.value
         : this.eventForm.get('escalationRate')?.value;
+
       const clientEvent: ClientEvent = {
         id: this.isEditWorkflow ? this.patchEvent?.id ?? "" : "",
-        name:
-          this.eventForm.get('eventName')?.value !== 'Custom'
-            ? this.eventForm.get('eventName')?.value
-            : this.eventForm.get('name')?.value,
+        name: this.eventForm.get('name')?.value,
         netAmount: {
           cycle: {
             id: this.amountCycles.find(
@@ -394,13 +373,7 @@ export class AddEventDialogComponent {
         type: this.isIncomeEvent
           ? EventIncomeType.Income
           : EventIncomeType.Expense,
-        iconUrl:
-          this.eventForm.get('eventName')?.value !== 'Custom'
-            ? this.customEventsLibrary.find(
-              (customEvent) =>
-                customEvent.name === this.eventForm.get('eventName')?.value
-            )?.iconUrl ?? ''
-            : 'custom-icon',
+        iconUrl: 'custom-icon',
         isDefault: false,
         isOneOff: this.eventForm.get('cycle')?.value === 'One-off',
         isPlaceHolder: false,
@@ -491,9 +464,13 @@ export class AddEventDialogComponent {
       return null;
     };
   }
+
+   toggleNameEdit() {
+    this.showNameEdit = !this.showNameEdit;
+  }
 }
 
 export class EventType {
-  public static readonly CUSTOM = 'Custom';
-  public static readonly INHERITANCE = 'Inheritance';
+  public static readonly CUSTOM = 'Custom'; // custom event with add button
+  public static readonly SYSTEM = 'System'; // all events on top of timeline
 }

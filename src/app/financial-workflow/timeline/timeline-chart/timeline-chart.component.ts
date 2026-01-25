@@ -16,26 +16,11 @@ import {
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
-import {
-  ClientEvent,
-  Cycle,
-  EscalationRate,
-  EventIncomeType,
-  FinancialTimeline,
-} from '../models/financial-timeline';
-import {
-  DataSet,
-  moment,
-  Timeline,
-  TimelineOptions,
-} from 'vis-timeline/standalone';
-
+import { ClientEvent, Cycle, EscalationRate, EventIncomeType, FinancialTimeline } from '../models/financial-timeline';
+import { DataSet, moment, Timeline, TimelineOptions, } from 'vis-timeline/standalone';
 import { MatDialog } from '@angular/material/dialog';
 import { TimelineHttpService } from '../services/timeline-http.service';
-import {
-  AddEventDialogComponent,
-  EventType,
-} from '../add-event-dialog/add-event-dialog.component';
+import { AddEventDialogComponent, EventType } from '../add-event-dialog/add-event-dialog.component';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -69,7 +54,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './timeline-chart.component.html',
-  styleUrl: './timeline-chart.component.scss',
+  styleUrl: './timeline-chart.component.scss'
 })
 export class TimelineChartComponent implements OnInit, OnChanges {
   private readonly CHIP_ORDER = [
@@ -99,15 +84,16 @@ export class TimelineChartComponent implements OnInit, OnChanges {
   @Output() updateTimelines: EventEmitter<boolean>;
   @ViewChild('timelineContainer', { static: true })
   timelineContainer!: ElementRef;
-  private hoverLineId = 'hoverLine';
+  escalationRates: EscalationRate[];
+  amountCycles: Cycle[];
 
+  private hoverLineId = 'hoverLine';
   private tooltipPollingInterval: any;
   private tooltipMouseX: number = 0;
   private tooltipMouseY: number = 0;
-  escalationRates: EscalationRate[];
-  amountCycles: Cycle[];
   private timelineHoverSubscription: Subscription;
   private isDragging = false; // Track drag state
+
   constructor(
     private dialog: MatDialog,
     private timelineHttpService: TimelineHttpService,
@@ -161,7 +147,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
         filter((res) => !!res),
         tap((res) => {
 
-          // cash it
+          // cash all events
           this.cachedSystemEventsLibrary = [
             ...res[0],
             ...res[1],
@@ -204,7 +190,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
 
   onDragStart(event: DragEvent, customEvent: any) {
     if (!event.dataTransfer) {
-      console.error("🚨 dataTransfer is null, drag won't work!");
+      console.error("dataTransfer is null, drag won't work!");
       return;
     }
 
@@ -221,6 +207,8 @@ export class TimelineChartComponent implements OnInit, OnChanges {
     this.timeline.removeCustomTime('dragOver');
     this.timeline.redraw();
   }
+
+
 
   onDrop(event: DragEvent) {
     event.preventDefault();
@@ -308,44 +296,31 @@ export class TimelineChartComponent implements OnInit, OnChanges {
         });
     }
 
-    if (
-      this.draggedEvent.name === 'Inheritance' ||
-      this.draggedEvent.name === 'Wedding' ||
-      this.draggedEvent.name === 'Home' ||
-      this.draggedEvent.name === 'Travel' ||
-      this.draggedEvent.name === 'Car' ||
-      this.draggedEvent.name === 'Education' ||
-      this.draggedEvent.name === 'New business' ||
-      this.draggedEvent.name === 'Boat'
+    const dialogRef = this.dialog.open(AddEventDialogComponent, {
+      width: '600px',
+      disableClose: true,
+      data: {
+        amountCycles: this.amountCycles,
+        eventType: EventType.SYSTEM,
+        escalataionRates: this.escalationRates,
+        timelineId: this.financialTimeline.id,
+        cashflowId: this.financialTimeline.cashflow.id,
+        isIncomeEvent: this.draggedEvent.type === EventIncomeType.Income,
+        systemEvent: this.draggedEvent,
+        dropTime: new Date(moment(dropTime).year(), 0),
+        clientBirthDate: this.clientBirthDate,
+        clientPreferredCurrency: this.client.clientDetails.preferredCurrency,
+        forecastStartDateYear: moment(this.financialTimeline.forecastStartDate).year(),
+        forecastEndDateYear: moment(this.financialTimeline.forecastEndtDate).year(),
+      },
+    });
 
-    ) {
-      const dialogRef = this.dialog.open(AddEventDialogComponent, {
-        width: '600px',
-        disableClose: true,
-        data: {
-          amountCycles: this.amountCycles,
-          eventType: EventType.INHERITANCE,
-          escalataionRates: this.escalationRates,
-          timelineId: this.financialTimeline.id,
-          cashflowId: this.financialTimeline.cashflow.id,
-          isIncomeEvent: this.draggedEvent.type === EventIncomeType.Income,
-          systemEvent: this.draggedEvent,
-          dropTime: new Date(moment(dropTime).year(), 0),
-          clientBirthDate: this.clientBirthDate,
-          clientPreferredCurrency: this.client.clientDetails.preferredCurrency,
-          forecastStartDateYear: moment(this.financialTimeline.forecastStartDate).year(),
-          forecastEndDateYear: moment(this.financialTimeline.forecastEndtDate).year(),
-        },
-      });
-
-      dialogRef.afterClosed().subscribe((result: any) => {
-
-        if ((result.status = 'Success')) {
-          this.draggedEvent = null;
-          this.updateTimelines.emit();
-        }
-      });
-    }
+    dialogRef.afterClosed().subscribe((result: any) => {
+      if ((result.status = 'Success')) {
+        this.draggedEvent = null;
+        this.updateTimelines.emit();
+      }
+    });
 
     this.draggedEvent = null;
   }
@@ -677,13 +652,11 @@ export class TimelineChartComponent implements OnInit, OnChanges {
   }
 
   handleEventUpdate(item: any, callback: (item: any) => void) {
-    // remove hover marker + clear highlight
     this.timeline.removeCustomTime('dragOver');
     this.clearLabelHighlight();
 
     const dropTime = item.start;
 
-    // guard: outside forecast window → revert
     if (
       moment(dropTime).year() < moment(this.financialTimeline.forecastStartDate).year() ||
       moment(dropTime).year() > moment(this.financialTimeline.forecastEndtDate).year()
@@ -694,17 +667,14 @@ export class TimelineChartComponent implements OnInit, OnChanges {
       return;
     }
 
-    // clone current event from the model
     const existing = this.financialTimeline.clientEvents.find(ev => ev.id === item.id);
     if (!existing) {
-      // nothing to update; just refresh UI
       this.timeline.setItems(this.timelineData);
       this.cdr.detectChanges();
       this.timeline.redraw();
       return;
     }
 
-    // compute snapped years from vis item
     const newStartYear = moment(new Date(moment(item.start).year(), 1)).year();
     const newEndYear = moment(new Date(moment(item.end).year(), 1)).year();
 
@@ -768,39 +738,11 @@ export class TimelineChartComponent implements OnInit, OnChanges {
   }
 
   updateEventByDoubleClick(clientEvent: ClientEvent) {
+    let eventType = null;
+
     if (
       clientEvent.name === 'Inheritance' ||
-      clientEvent.name === 'Wedding'
-    ) {
-      const dialogRef = this.dialog.open(AddEventDialogComponent, {
-        width: '600px',
-        disableClose: true,
-        data: {
-          eventType: EventType.INHERITANCE,
-          amountCycles: this.amountCycles,
-          escalataionRates: this.escalationRates,
-          timelineId: this.financialTimeline.id,
-          cashflowId: this.financialTimeline.cashflow.id,
-          isIncomeEvent: clientEvent.type === EventIncomeType.Income,
-          systemEvent: clientEvent,
-          dropTime: new Date(clientEvent.start.year, 0),
-          clientBirthDate: this.clientBirthDate,
-          clientPreferredCurrency: this.client.clientDetails.preferredCurrency,
-          forecastStartDateYear: moment(this.financialTimeline.forecastStartDate).year(),
-          forecastEndDateYear: moment(this.financialTimeline.forecastEndtDate).year(),
-          isEditWorkflow: true,
-          patchEvent: clientEvent,
-        },
-      });
-
-      dialogRef.afterClosed().subscribe((result: any) => {
-        if (result && (result.status = 'Success')) {
-          this.updateTimelines.emit();
-        }
-      });
-    }
-
-    if (this.systemEventsLibrary.every((event) => event.name !== clientEvent?.name) ||
+      clientEvent.name === 'Wedding' ||
       clientEvent.name === 'Home' ||
       clientEvent.name === 'Travel' ||
       clientEvent.name === 'Car' ||
@@ -808,65 +750,46 @@ export class TimelineChartComponent implements OnInit, OnChanges {
       clientEvent.name === 'New business' ||
       clientEvent.name === 'Boat'
     ) {
-
-      const dialogRef = this.dialog.open(AddEventDialogComponent, {
-        width: '900px',
-        disableClose: true,
-        data: {
-          amountCycles: this.amountCycles,
-          eventType: EventType.CUSTOM,
-          escalataionRates: this.escalationRates,
-          customEvents: this.customEventsLibrary,
-          timelineId: this.financialTimeline.id,
-          isIncomeEvent: true,
-          cashflowId: this.financialTimeline.cashflow.id,
-          clientBirthDate: this.clientBirthDate,
-          clientPreferredCurrency: this.client.clientDetails.preferredCurrency,
-          forecastStartDateYear: moment(this.financialTimeline.forecastStartDate).year(),
-          forecastEndDateYear: moment(this.financialTimeline.forecastEndtDate).year(),
-          eventsList: this.financialTimeline.clientEvents.map((event) => {
-            return {
-              name: event.name,
-              year: event.start.year,
-              age:
-                event.start.year -
-                moment(new Date(this.clientBirthDate)).year(),
-            };
-          }),
-          isEditWorkflow: true,
-          patchEvent: clientEvent,
-        },
-      });
-
-      dialogRef.afterClosed().subscribe((result: any) => {
-        if ((result.status = 'Success')) {
-          this.updateTimelines.emit();
-        }
-      });
+      eventType = EventType.SYSTEM;
     }
-  }
+    else {
+      eventType = EventType.CUSTOM;
+    }
 
-  handleEventRemoval(item: any, callback: (item: any) => void) {
-    this.timelineHttpService
-      .deleteEvent(this.financialTimeline.cashflow.id, item.id)
-      .pipe(
-        take(1),
-        map((res) => {
-          this.financialTimeline.clientEvents.splice(
-            this.financialTimeline.clientEvents.findIndex(
-              (event) => event.id === item.id
-            ),
-            1
-          );
-          if (item.content?.includes('Retirement age')) {
-            this.addRetirementBackToChips();
-          }
-          this.timeline.setItems(this.timelineData);
-          this.timeline.redraw();
-          callback(item);
-        })
-      )
-      .subscribe();
+    const dialogRef = this.dialog.open(AddEventDialogComponent, {
+      width: '900px',
+      disableClose: true,
+      data: {
+        amountCycles: this.amountCycles,
+        eventType: eventType,
+        escalataionRates: this.escalationRates,
+        customEvents: this.customEventsLibrary,
+        timelineId: this.financialTimeline.id,
+        isIncomeEvent: true,
+        cashflowId: this.financialTimeline.cashflow.id,
+        clientBirthDate: this.clientBirthDate,
+        clientPreferredCurrency: this.client.clientDetails.preferredCurrency,
+        forecastStartDateYear: moment(this.financialTimeline.forecastStartDate).year(),
+        forecastEndDateYear: moment(this.financialTimeline.forecastEndtDate).year(),
+        eventsList: this.financialTimeline.clientEvents.map((event) => {
+          return {
+            name: event.name,
+            year: event.start.year,
+            age:
+              event.start.year -
+              moment(new Date(this.clientBirthDate)).year(),
+          };
+        }),
+        isEditWorkflow: true,
+        patchEvent: clientEvent,
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((result: any) => {
+      if (result && (result.status = 'Success')) {
+        this.updateTimelines.emit();
+      }
+    });
   }
 
   newEventClicked() {
@@ -900,6 +823,29 @@ export class TimelineChartComponent implements OnInit, OnChanges {
         this.updateTimelines.emit();
       }
     });
+  }
+
+  handleEventRemoval(item: any, callback: (item: any) => void) {
+    this.timelineHttpService
+      .deleteEvent(this.financialTimeline.cashflow.id, item.id)
+      .pipe(
+        take(1),
+        map((res) => {
+          this.financialTimeline.clientEvents.splice(
+            this.financialTimeline.clientEvents.findIndex(
+              (event) => event.id === item.id
+            ),
+            1
+          );
+          if (item.content?.includes('Retirement age')) {
+            this.addRetirementBackToChips();
+          }
+          this.timeline.setItems(this.timelineData);
+          this.timeline.redraw();
+          callback(item);
+        })
+      )
+      .subscribe();
   }
 
   private getContent(title: string, img: string): string {
