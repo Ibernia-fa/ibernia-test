@@ -46,7 +46,7 @@ import { CommonModule } from '@angular/common';
 import { Client } from 'src/app/clients/models/client';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
 import { SettingsHttpService } from '../../settings/services/settings-http.service';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-timeline-chart',
@@ -64,7 +64,8 @@ import { TranslateModule } from '@ngx-translate/core';
     TranslateModule
   ],
   providers: [
-    ToastrService
+    ToastrService,
+    TranslateService
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './timeline-chart.component.html',
@@ -87,6 +88,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
   timeline: Timeline;
   customEventsLibrary: ClientEvent[];
   systemEventsLibrary: ClientEvent[];
+  cachedSystemEventsLibrary: ClientEvent[];
   draggedEvent: ClientEvent | null;
 
   @Input() financialTimeline: FinancialTimeline;
@@ -111,7 +113,8 @@ export class TimelineChartComponent implements OnInit, OnChanges {
     private timelineHttpService: TimelineHttpService,
     private cdr: ChangeDetectorRef,
     private toastrService: ToastrService,
-    private settingHttpService: SettingsHttpService
+    private settingHttpService: SettingsHttpService,
+    private translate: TranslateService
   ) {
     this.updateTimelines = new EventEmitter<boolean>();
   }
@@ -157,14 +160,35 @@ export class TimelineChartComponent implements OnInit, OnChanges {
       .pipe(
         filter((res) => !!res),
         tap((res) => {
-          // this.systemEventsLibrary = res[0];
-          // this.customEventsLibrary = res[1];
+
+          // cash it
+          this.cachedSystemEventsLibrary = [
+            ...res[0],
+            ...res[1],
+          ]
+            .filter(event =>
+              event.name !== 'State pension'
+            )
+            .sort((a, b) => {
+              return (
+                this.CHIP_ORDER.indexOf(a.name) -
+                this.CHIP_ORDER.indexOf(b.name)
+              );
+            });
 
           this.systemEventsLibrary = [
             ...res[0],
             ...res[1],
           ]
-            .filter(event => event.name !== 'State pension')
+            .filter(event =>
+              event.name !== 'State pension' &&
+              !(
+                event.name === 'Retirement age' &&
+                this.financialTimeline?.clientEvents?.some(
+                  ce => ce.name === 'Retirement age'
+                )
+              )
+            )
             .sort((a, b) => {
               return (
                 this.CHIP_ORDER.indexOf(a.name) -
@@ -208,7 +232,24 @@ export class TimelineChartComponent implements OnInit, OnChanges {
     }
 
     // get the dropped position on the timeline
-    const dropTime = this.timeline.getEventProperties(event).time;
+    let dropTime = this.timeline.getEventProperties(event).time;
+
+    if (this.draggedEvent?.name === 'Retirement age') {
+
+      // drop only once
+      if (this.financialTimeline.clientEvents.find((event) => event.name === this.draggedEvent?.name)) {
+        this.draggedEvent = null;
+        return;
+      }
+
+      const retirementYear = this.getRetirementDropYear();
+      if (!retirementYear) {
+        this.draggedEvent = null;
+        return;
+      }
+
+      dropTime = new Date(retirementYear, 0, 1);
+    }
 
     if (
       moment(dropTime).year() <
@@ -225,13 +266,6 @@ export class TimelineChartComponent implements OnInit, OnChanges {
       end: new Date(moment(dropTime).year() + 1, 0),
       className: this.draggedEvent.iconUrl,
     };
-
-    if (this.draggedEvent?.name == 'Retirement age' && this.financialTimeline.clientEvents.find(
-      (event) => event.name === this.draggedEvent?.name
-    )) {
-      this.draggedEvent = null;
-      return;
-    }
 
     if (this.draggedEvent.isPlaceHolder) {
       const clientEvent: ClientEvent = this.draggedEvent;
@@ -255,6 +289,9 @@ export class TimelineChartComponent implements OnInit, OnChanges {
             }
             this.updateTimelines.emit();
             this.financialTimeline.clientEvents.push(clientEvent);
+            if (clientEvent.name === 'Retirement age') {
+              this.removeRetirementFromChips();
+            }
             this.draggedEvent = null;
             this.timeline.setItems(this.timelineData);
             this.cdr.detectChanges();
@@ -274,13 +311,13 @@ export class TimelineChartComponent implements OnInit, OnChanges {
     if (
       this.draggedEvent.name === 'Inheritance' ||
       this.draggedEvent.name === 'Wedding' ||
-      this.draggedEvent.name === 'Home'||
-      this.draggedEvent.name === 'Travel'||
-      this.draggedEvent.name === 'Car'||
-      this.draggedEvent.name === 'Education'||
-      this.draggedEvent.name === 'New business'||
+      this.draggedEvent.name === 'Home' ||
+      this.draggedEvent.name === 'Travel' ||
+      this.draggedEvent.name === 'Car' ||
+      this.draggedEvent.name === 'Education' ||
+      this.draggedEvent.name === 'New business' ||
       this.draggedEvent.name === 'Boat'
-       
+
     ) {
       const dialogRef = this.dialog.open(AddEventDialogComponent, {
         width: '600px',
@@ -763,16 +800,14 @@ export class TimelineChartComponent implements OnInit, OnChanges {
       });
     }
 
-    if (this.systemEventsLibrary.every((event) => event.name !== clientEvent?.name) || 
-      clientEvent.name === 'Home'||
-      clientEvent.name === 'Travel'||
-      clientEvent.name === 'Car'||
-      clientEvent.name === 'Education'||
-      clientEvent.name === 'New business'||
+    if (this.systemEventsLibrary.every((event) => event.name !== clientEvent?.name) ||
+      clientEvent.name === 'Home' ||
+      clientEvent.name === 'Travel' ||
+      clientEvent.name === 'Car' ||
+      clientEvent.name === 'Education' ||
+      clientEvent.name === 'New business' ||
       clientEvent.name === 'Boat'
     ) {
-      console.log("custom event");
-      console.log(this.customEventsLibrary);
 
       const dialogRef = this.dialog.open(AddEventDialogComponent, {
         width: '900px',
@@ -823,6 +858,9 @@ export class TimelineChartComponent implements OnInit, OnChanges {
             ),
             1
           );
+          if (item.content?.includes('Retirement age')) {
+            this.addRetirementBackToChips();
+          }
           this.timeline.setItems(this.timelineData);
           this.timeline.redraw();
           callback(item);
@@ -952,5 +990,53 @@ export class TimelineChartComponent implements OnInit, OnChanges {
       try { this.timeline.removeCustomTime(this.hoverLineId); } catch { }
       this.clearLabelHighlight();
     }
+  }
+
+  private getRetirementDropYear(): number | null {
+    const lang = this.translate.currentLang || this.translate.defaultLang;
+
+    const retirementAge =
+      lang === 'it' ? 67 :
+        lang === 'en' ? 64 :
+          null;
+
+    if (!retirementAge) return null;
+
+    const currentAge = this.calculateAge(new Date(this.clientBirthDate));
+    if (currentAge >= retirementAge) return null;
+
+    return moment(this.clientBirthDate).year() + retirementAge;
+  }
+
+  private removeRetirementFromChips(): void {
+    this.systemEventsLibrary = this.systemEventsLibrary.filter(
+      e => e.name !== 'Retirement age'
+    );
+    this.cdr.detectChanges();
+  }
+
+  private addRetirementBackToChips(): void {
+    const alreadyExists = this.systemEventsLibrary.some(
+      e => e.name === 'Retirement age'
+    );
+
+    if (alreadyExists) return;
+
+    const retirement = this.cachedSystemEventsLibrary.find(
+      e => e.name === 'Retirement age'
+    );
+
+    if (!retirement) return;
+
+    this.systemEventsLibrary = [
+      ...this.systemEventsLibrary,
+      retirement,
+    ].sort(
+      (a, b) =>
+        this.CHIP_ORDER.indexOf(a.name) -
+        this.CHIP_ORDER.indexOf(b.name)
+    );
+
+    this.cdr.detectChanges();
   }
 }

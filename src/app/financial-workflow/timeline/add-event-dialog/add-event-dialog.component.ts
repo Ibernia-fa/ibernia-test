@@ -33,10 +33,6 @@ import { AgeCalculatorPipe } from 'src/app/pipe/age-calculator.pipe';
 import { CommonModule } from '@angular/common';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 import { TranslateModule } from '@ngx-translate/core';
-interface Food {
-  value: string;
-  viewValue: string;
-}
 
 @Component({
   selector: 'app-add-event-dialog',
@@ -425,17 +421,10 @@ export class AddEventDialogComponent {
           });
         })
     }
-
     else {
       console.log(this.eventForm);
     }
   }
-
-  foods: Food[] = [
-    { value: '0', viewValue: '1' },
-    { value: '1', viewValue: '2' },
-    { value: '2', viewValue: '3' },
-  ];
 
   cycles: string[] = ['One-off', 'Every month', 'Every year'];
   currencySymbols: string[] = ['$', '£', '€'];
