@@ -422,35 +422,22 @@ updateOrderNumbers() {
 
     dialogRef.afterClosed().subscribe((result: any) => {
       console.log('Dialog closed with result:', result);
-      this.total = result.savingPot.totalSavings;
-      if (!result?.clientSaving) return;
-
-      const updatedSaving = result.clientSaving;
-
-      const updatedPotFromResponse = this.savingPots.clientSavings.findIndex(
-        (x) => x.id === updatedSaving.id
-      );
-
-      if (updatedPotFromResponse !== -1 && this.potAmounts) {
-        this.potAmounts[updatedPotFromResponse] = updatedSaving.startingPotValue.amount;
-        console.log('Updated potAmounts:', this.potAmounts);
-      }
-
-      const list = [...this.savingPots.clientSavings];
-      const index = list.findIndex(x => x.id === updatedSaving.id);
-
-      if (index === -1) return;
-
-      list[index] = {
-        ...list[index],
-        ...updatedSaving
-      };
+      if (!result?.savingPot) return;
 
       this.savingPots = {
-        ...this.savingPots,
-        // clientSavings: result.savingPot.clientSavings
-        clientSavings: [...this.savingPots.clientSavings]
+        ...result.savingPot,
+        clientSavings: (result.savingPot.clientSavings ?? [])
+          .map((item: ClientSaving, index: number) => ({
+            ...item,
+            orderNumber: item.orderNumber ?? index,
+          }))
+          .sort((a: ClientSaving, b: ClientSaving) => a.orderNumber - b.orderNumber),
       };
+
+      this.total = this.savingPots?.totalSavings ?? this.total ?? 0;
+      this.potAmounts = this.savingPots?.clientSavings?.map(
+        (pot) => pot.startingPotValue.amount ?? 0
+      );
       this.ensureCashFirst();
       // this.savingPots.clientSavings.push(result.clientSaving);
     });
@@ -459,9 +446,25 @@ updateOrderNumbers() {
   deleteEventClicked(event: ClientSaving) {
     if(this.selectedCashflow) {
       this.savingPotsHttpService.deleteSavingPot(this.selectedCashflow?.id, event).pipe(
-        map((res) => {
-          const index = this.savingPots.clientSavings.findIndex(x => x.id === event.id);
-          this.savingPots.clientSavings.splice(index, 1);
+        map(() => {
+          const list = [...(this.savingPots?.clientSavings ?? [])];
+          const index = list.findIndex(x => x.id === event.id);
+          if (index === -1) return;
+
+          list.splice(index, 1);
+
+          this.savingPots = {
+            ...this.savingPots,
+            clientSavings: [...list]
+          };
+
+          this.total = list.reduce(
+            (sum, pot) => sum + (pot?.startingPotValue?.amount ?? 0),
+            0
+          );
+          this.potAmounts = list.map(
+            (pot) => pot.startingPotValue.amount ?? 0
+          );
         })
       ).subscribe();
     }
@@ -492,7 +495,19 @@ updateOrderNumbers() {
     dialogRef.afterClosed().subscribe((result: any) => {
       console.log('Dialog closed with result:', result);
       if(result?.savingPot) {
-        this.savingPots = result?.savingPot;
+        this.savingPots = {
+          ...result.savingPot,
+          clientSavings: (result.savingPot.clientSavings ?? [])
+            .map((item: ClientSaving, index: number) => ({
+              ...item,
+              orderNumber: item.orderNumber ?? index,
+            }))
+            .sort((a: ClientSaving, b: ClientSaving) => a.orderNumber - b.orderNumber),
+        };
+        this.total = this.savingPots?.totalSavings ?? this.total ?? 0;
+        this.potAmounts = this.savingPots?.clientSavings?.map(
+          (pot) => pot.startingPotValue.amount ?? 0
+        );
         this.ensureCashFirst();
       }
       // this.savingPots.clientSavings.push(result.clientSaving);
