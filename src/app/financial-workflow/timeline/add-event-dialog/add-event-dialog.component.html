@@ -3,9 +3,9 @@
 <div class="d-flex flex-column gap-32">
   <div class="d-flex align-items-center justify-content-between gap-10 modal-header">
     <div class="d-flex align-items-center gap-10">
-      <img matChipAvatar [src]="'/assets/images/svgs/' + systemEvent.iconUrl + '.svg'" [alt]="systemEvent.iconUrl"
+      <img matChipAvatar [src]="'/assets/images/svgs/' + patchEvent.iconUrl + '.svg'" [alt]="patchEvent.iconUrl"
         class="bold-icon" />
-      <h3>{{systemEvent?.name}}</h3>
+      <h3>{{patchEvent?.name}}</h3>
     </div>
 
     <button (click)="closeDialog()" type="button">
@@ -30,41 +30,32 @@
     </div>
   </div>
   <div [formGroup]="eventForm" class="d-flex flex-column gap-20">
-    <!-- Net Amount Field  -->
     <div class="d-flex flex-column gap-8 net-fields">
       <span class="f-s-16 f-w-400">{{ 'Net amount' | translate }}</span>
       <div class="net-field d-flex align-items-center">
-        <!-- Currency Selector  -->
         <div class="left hide-arrow">
           <mat-select value="£" formControlName="currency" class="sortby-edit-profile" hideSingleSelectionIndicator>
             @for (country of countries; track country) {
             @if(country.currencySymbol) {
-            <mat-option [value]="country.currencySymbol">{{
-              country.currencySymbol
-              }}</mat-option>
-
+            <mat-option [value]="country.currencySymbol">{{ country.currencySymbol }}</mat-option>
             }
             }
           </mat-select>
         </div>
-        <!-- End Currency Selector  -->
-        <!-- Price Field  -->
+        
         <div class="w-100 form-field">
           <input matInput placeholder="0" type="text" inputmode="decimal" formControlName="amount"
             thousandSeparatorInput />
         </div>
-        <!-- End Price Field  -->
-        <!-- End Type Field  -->
+        
         <div class="right hide-arrow">
-          <mat-select value="Select" [disabled]="systemEvent?.isOneOff === true" formControlName="cycle"
+          <mat-select value="Select" [disabled]="patchEvent?.isOneOff === true" formControlName="cycle"
             class="sortby-edit-profile" hideSingleSelectionIndicator>
-            <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
             @for (cycle of cycles; track cycle) {
             <mat-option [value]="cycle">{{ cycle }}</mat-option>
             }
           </mat-select>
         </div>
-        <!-- End Type Field  -->
       </div>
       @if((eventForm.get('cycle')?.touched &&
       eventForm.get('cycle')?.hasError('required')) ||
@@ -72,12 +63,11 @@
       eventForm.get('amount')?.hasError('required')) ||
       (eventForm.get('currency')?.touched &&
       eventForm.get('currency')?.hasError('required'))) {
-      <!-- <span class="field-error d-block">Amount is required</span> -->
       <span class="field-error d-block">{{'Required' | translate}}</span>
 
       }
     </div>
-    <!-- End Net Amount Field  -->
+    
     <div class="w-100 form-field gap-8">
       <div class="d-flex gap-4 align-items-center">
         <mat-label class="f-s-16 f-w-400 d-block">{{ 'Date' | translate}}</mat-label>
@@ -88,7 +78,6 @@
         <div class="w-100 form-field">
           <div class="select-option">
             <mat-select value="Select" formControlName="ageDate" hideSingleSelectionIndicator>
-              <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
               @for (year of years; let i = $index; track year) {
               <mat-option [value]="year">{{ year }} ({{ clientAge + i }})</mat-option>
               }
@@ -96,9 +85,7 @@
           </div>
           @if(eventForm.get('ageDate')?.touched &&
           eventForm.get('ageDate')?.hasError('required')) {
-          <!-- <span class="field-error d-block">Age is required</span> -->
           <span class="field-error d-block">{{'Required' | translate}}</span>
-
           }
         </div>
       </div>

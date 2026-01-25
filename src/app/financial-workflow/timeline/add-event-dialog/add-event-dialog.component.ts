@@ -56,7 +56,6 @@ export class AddEventDialogComponent {
   eventForm: FormGroup;
   timelineId: string;
   cashflowId: string;
-  systemEvent: ClientEvent | undefined | null;
   dropTime: Date;
   clientBirthDate: Date;
   clientBirthYear: number;
@@ -81,8 +80,6 @@ export class AddEventDialogComponent {
     private timelineHttpService: TimelineHttpService,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
-    console.log(data);
-
     this.amountCycles = data.amountCycles;
     this.selectedEventType = data.eventType;
     this.isIncomeEvent = data.isIncomeEvent;
@@ -90,7 +87,6 @@ export class AddEventDialogComponent {
     this.customEventsLibrary = data.customEvents;
     this.timelineId = data.timelineId;
     this.cashflowId = data.cashflowId;
-    this.systemEvent = data.systemEvent
     this.dropTime = data.dropTime;
     this.clientBirthDate = data.clientBirthDate;
     this.clientBirthYear = moment(this.clientBirthDate).year();
@@ -143,10 +139,9 @@ export class AddEventDialogComponent {
           isIncomeEvent: [false, Validators.required],
           currency: [this.clientPreferredCurrency, Validators.required],
           amount: ['', [Validators.required, Validators.min(0)]],
-          cycle: [{ value: this.systemEvent?.isOneOff ? 'One-off' : '', disabled: true }, [Validators.required]],
+          cycle: [{ value: this.patchEvent?.isOneOff ? 'One-off' : '', disabled: true }, [Validators.required]],
           ageDate: [moment(this.dropTime).year(), Validators.required],
           customEscalationRate: [0]
-
         });
         break;
 
@@ -282,11 +277,11 @@ export class AddEventDialogComponent {
   onSystemEventSubmit() {
     this.eventForm.markAllAsTouched();
 
-    if (this.eventForm.valid && this.systemEvent) {
+    if (this.eventForm.valid && this.patchEvent) {
       this.saveClicked = true;
       const clientEvent: ClientEvent = {
         id: this.isEditWorkflow ? this.patchEvent?.id ?? "" : "",
-        name: this.systemEvent.name,
+        name: this.patchEvent.name,
         netAmount: {
           cycle: {
             id: this.amountCycles.find(
@@ -306,10 +301,10 @@ export class AddEventDialogComponent {
         type: this.isIncomeEvent
           ? EventIncomeType.Income
           : EventIncomeType.Expense,
-        iconUrl: this.systemEvent.iconUrl,
+        iconUrl: this.patchEvent.iconUrl,
         isDefault: false,
         isOneOff: this.eventForm.get('cycle')?.value === 'One-off',
-        isPlaceHolder: this.systemEvent.isPlaceHolder,
+        isPlaceHolder: this.patchEvent.isPlaceHolder,
       };
 
       this.timelineHttpService.addEvent(clientEvent, this.cashflowId)

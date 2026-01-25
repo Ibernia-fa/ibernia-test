@@ -307,7 +307,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
         timelineId: this.financialTimeline.id,
         cashflowId: this.financialTimeline.cashflow.id,
         isIncomeEvent: this.draggedEvent.type === EventIncomeType.Income,
-        systemEvent: this.draggedEvent,
+        patchEvent: this.draggedEvent,
         dropTime: new Date(moment(dropTime).year(), 0),
         clientBirthDate: this.clientBirthDate,
         clientPreferredCurrency: this.client.clientDetails.preferredCurrency,
@@ -776,9 +776,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
           return {
             name: event.name,
             year: event.start.year,
-            age:
-              event.start.year -
-              moment(new Date(this.clientBirthDate)).year(),
+            age: event.start.year - moment(new Date(this.clientBirthDate)).year(),
           };
         }),
         isEditWorkflow: true,
@@ -812,8 +810,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
           return {
             name: event.name,
             year: event.start.year,
-            age:
-              event.start.year - moment(new Date(this.clientBirthDate)).year(),
+            age: event.start.year - moment(new Date(this.clientBirthDate)).year()
           };
         }),
       },
