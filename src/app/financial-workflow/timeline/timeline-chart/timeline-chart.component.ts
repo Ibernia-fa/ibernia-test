@@ -298,21 +298,29 @@ export class TimelineChartComponent implements OnInit, OnChanges {
     }
 
     const dialogRef = this.dialog.open(AddEventDialogComponent, {
-      width: '600px',
+      width: '700px',
       disableClose: true,
       data: {
-        amountCycles: this.amountCycles,
         eventType: EventType.SYSTEM,
+        amountCycles: this.amountCycles,
+        customEvents: this.customEventsLibrary,
         escalataionRates: this.escalationRates,
         timelineId: this.financialTimeline.id,
         cashflowId: this.financialTimeline.cashflow.id,
-        isIncomeEvent: this.draggedEvent.type === EventIncomeType.Income,
-        patchEvent: this.draggedEvent,
-        dropTime: new Date(moment(dropTime).year(), 0),
         clientBirthDate: this.clientBirthDate,
         clientPreferredCurrency: this.client.clientDetails.preferredCurrency,
         forecastStartDateYear: moment(this.financialTimeline.forecastStartDate).year(),
         forecastEndDateYear: moment(this.financialTimeline.forecastEndtDate).year(),
+        isIncomeEvent: this.draggedEvent.type === EventIncomeType.Income,
+        patchEvent: this.draggedEvent,
+        dropTime: new Date(moment(dropTime).year(), 0),
+        eventsList: this.financialTimeline.clientEvents.map((event) => {
+          return {
+            name: event.name,
+            year: event.start.year,
+            age: event.start.year - moment(new Date(this.clientBirthDate)).year()
+          };
+        })
       },
     });
 

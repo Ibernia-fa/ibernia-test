@@ -73,6 +73,8 @@ export class AddEventDialogComponent {
   saveClicked: boolean = false;
   currentYear: number = new Date().getFullYear();
   showNameEdit: boolean = false;
+  hideEventType = false;
+  isInheritanceOneOff = false;
 
   constructor(
     private dialogRef: MatDialogRef<AddEventDialogComponent>,
@@ -80,6 +82,9 @@ export class AddEventDialogComponent {
     private timelineHttpService: TimelineHttpService,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
+    console.log("XXXXXX");
+    console.log(data);
+
     this.amountCycles = data.amountCycles;
     this.selectedEventType = data.eventType;
     this.isIncomeEvent = data.isIncomeEvent;
@@ -111,10 +116,34 @@ export class AddEventDialogComponent {
     this.clientPreferredCurrency = data.clientPreferredCurrency
 
     var iterations = data.forecastEndDateYear - data.forecastStartDateYear + 1
-    
+
     for (let index = 0; index < iterations; index++) {
       const element = data.forecastStartDateYear + index;
       this.years.push(element);
+    }
+
+    if (this.selectedEventType == EventType.SYSTEM) {
+      // not changeable event type (income/expense)
+      if (
+        this.data.patchEvent.name === "Inheritance" ||
+        this.data.patchEvent.name === "Wedding" ||
+        this.data.patchEvent.name === "Travel" ||
+        this.data.patchEvent.name === "Education" ||
+        this.data.patchEvent.name === "New business"
+      ) {
+        this.hideEventType = true;
+      }
+      else {
+        this.hideEventType = false;
+
+        // inheritance is default one-off. Date is Default at 65 years of age. If the user is older than 65, no default date.
+        if (this.data.patchEvent.name === "Inheritance")
+        {
+          // default one-off disabled
+          this.isInheritanceOneOff = true;
+          //only date visible with contition 65 years
+        }
+      }
     }
 
     this.initForm();
@@ -133,14 +162,27 @@ export class AddEventDialogComponent {
   }
 
   initForm() {
+    let defaultCycle = 'One-off';
+
+    // make travel one off (there could be multiple travel events with rename functionality, consider while changing iconUrl until there is some proper solution to this)
+    if (this.selectedEventType == EventType.SYSTEM 
+      && (this.patchEvent?.name == "Travel" || 
+        this.patchEvent?.iconUrl == "travel-icon"))
+    {
+      defaultCycle = 'Every year';
+    }
+
     switch (this.selectedEventType) {
       case EventType.SYSTEM:
         this.eventForm = this.fb.group({
           isIncomeEvent: [false, Validators.required],
           currency: [this.clientPreferredCurrency, Validators.required],
           amount: ['', [Validators.required, Validators.min(0)]],
-          cycle: [{ value: this.patchEvent?.isOneOff ? 'One-off' : '', disabled: true }, [Validators.required]],
+          cycle: [defaultCycle, [Validators.required]],
           ageDate: [moment(this.dropTime).year(), Validators.required],
+          start: [null, Validators.required],
+          end: [0, Validators.required],
+          escalationRate: [this.escalationRates[0].value, Validators.required],
           customEscalationRate: [0]
         });
         break;
@@ -164,7 +206,7 @@ export class AddEventDialogComponent {
     this.eventForm.get('currency')?.disable();
     this.eventForm.setValidators(this.endOnOrAfterStartValidator());
     this.eventForm.updateValueAndValidity({ emitEvent: false });
-    
+
     if (this.isEditWorkflow) {
       this.patchForm();
     }
@@ -178,6 +220,10 @@ export class AddEventDialogComponent {
         this.eventForm.controls['amount'].patchValue(this.patchEvent?.netAmount.amount);
         this.eventForm.controls['cycle'].patchValue(this.patchEvent?.netAmount.cycle?.description);
         this.eventForm.controls['ageDate'].patchValue(this.patchEvent?.start.year);
+        this.eventForm.controls['start'].patchValue(this.patchEvent?.start.year);
+        this.eventForm.controls['end'].patchValue(this.patchEvent?.end?.year);
+        this.eventForm.controls['escalationRate'].patchValue(this.patchEvent?.escalationRate?.description);
+        this.handleEscalationRatePatch(this.patchEvent?.escalationRate?.description, this.patchEvent?.escalationRate?.value);
         break;
 
 
@@ -259,7 +305,7 @@ export class AddEventDialogComponent {
     this.selectedEventName = event;
 
     if (event === EventType.CUSTOM) {
-      this.eventForm.addControl( 'name', new FormControl('', [Validators.required]));
+      this.eventForm.addControl('name', new FormControl('', [Validators.required]));
       this.eventForm.updateValueAndValidity();
       this.selectedEventIconUrl = 'custom-icon'
     } else {
@@ -279,6 +325,13 @@ export class AddEventDialogComponent {
 
     if (this.eventForm.valid && this.patchEvent) {
       this.saveClicked = true;
+
+      // should not be for inheritance
+      const isCustomEscalation = this.selectedEscalationDescription === 'Increases at custom rate';
+      const selectedEscalationRateValue = isCustomEscalation
+        ? this.eventForm.get('customEscalationRate')?.value
+        : this.eventForm.get('escalationRate')?.value;
+
       const clientEvent: ClientEvent = {
         id: this.isEditWorkflow ? this.patchEvent?.id ?? "" : "",
         name: this.patchEvent.name,
@@ -293,18 +346,31 @@ export class AddEventDialogComponent {
           currencySymbol: this.eventForm.get('currency')?.value,
         },
         start: {
-          year: this.eventForm.get('ageDate')?.value,
-          age: this.eventForm.get('ageDate')?.value - this.clientBirthYear,
+          year: this.isInheritanceOneOff ? this.eventForm.get('ageDate')?.value  // for inheritance one-off event
+            : this.eventForm.get('start')?.value, 
+          age:  this.isInheritanceOneOff ? this.eventForm.get('ageDate')?.value - this.clientBirthYear // for inheritance one-off event
+            : this.eventForm.get('start')?.value - this.clientBirthYear, 
         },
-        end: null,
-        escalationRate: null,
-        type: this.isIncomeEvent
-          ? EventIncomeType.Income
-          : EventIncomeType.Expense,
+        end: this.isInheritanceOneOff ? null // for inheritance one-off event
+          : {
+            year: this.eventForm.get('end')?.value,
+            age: (this.eventForm.get('end')?.value > this.clientBirthYear) ? this.eventForm.get('end')?.value - this.clientBirthYear : 0,
+          },
+        escalationRate: this.isInheritanceOneOff ? null : // for inheritance one-off event
+          selectedEscalationRateValue !== null && selectedEscalationRateValue !== ''
+            ? this.escalationRates.find(x => x.value === selectedEscalationRateValue) ?? {
+              value: selectedEscalationRateValue,
+              description: isCustomEscalation ? 'Increases at custom rate' : selectedEscalationRateValue
+            }
+            : {
+              value: 0,
+              description: ''
+            },
+        type: this.isIncomeEvent ? EventIncomeType.Income : EventIncomeType.Expense,
         iconUrl: this.patchEvent.iconUrl,
         isDefault: false,
         isOneOff: this.eventForm.get('cycle')?.value === 'One-off',
-        isPlaceHolder: this.patchEvent.isPlaceHolder,
+        isPlaceHolder: false,
       };
 
       this.timelineHttpService.addEvent(clientEvent, this.cashflowId)
@@ -373,6 +439,7 @@ export class AddEventDialogComponent {
         isOneOff: this.eventForm.get('cycle')?.value === 'One-off',
         isPlaceHolder: false,
       };
+
       this.timelineHttpService.addEvent(clientEvent, this.cashflowId)
         .pipe(
           filter(res => !!res),
@@ -460,7 +527,7 @@ export class AddEventDialogComponent {
     };
   }
 
-   toggleNameEdit() {
+  toggleNameEdit() {
     this.showNameEdit = !this.showNameEdit;
   }
 }
