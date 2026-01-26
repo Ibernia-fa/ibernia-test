@@ -6,8 +6,8 @@ import { BehaviorSubject, map, Observable, Subject } from 'rxjs';
 export enum ComissionType { Amount = 1, Percentage = 2, Both = 3 }
 
 export interface PreferencesDto {
-  // inflationRate: number;
-  // investmentReturn: number;
+  inflationRate: number;
+  investmentReturn: number;
   // comissionType: ComissionType;         // 1|2|3
   // comissionPercentage?: number | null;  // 0..100 when Percentage/Both
   // comissionAmount?: number | null;      // >0 when Amount/Both
