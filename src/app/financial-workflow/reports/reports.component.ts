@@ -254,7 +254,9 @@ export class ReportsComponent {
       cashFlowName: isComparison ?
         (this.compareTimeline?.cashflow?.name || this.financialTimeline?.cashflow?.name) :
         this.financialTimeline?.cashflow?.name,
-      isComparison: isComparison
+      isComparison: isComparison,
+      hasShortfall: this.hasShortfall,
+      firstShortfallAge: this.firstShortfallAge
     };
 
     this.fullscreenService.enterFullscreen(chartData);
