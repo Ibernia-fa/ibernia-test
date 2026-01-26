@@ -193,6 +193,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
               );
             });
 
+          this.autoAddRetirementIfMissing();
           this.cdr.detectChanges();
         })
       )
@@ -1004,4 +1005,60 @@ export class TimelineChartComponent implements OnInit, OnChanges {
 
     return `Birth ${birthEvents.length + 1}`;
   }
+
+  private autoAddRetirementIfMissing(): void {
+    if (!this.financialTimeline || !this.clientBirthDate) return;
+
+    const alreadyExists = this.financialTimeline.clientEvents
+      ?.some(e => e.name === 'Retirement age');
+
+    if (alreadyExists) return;
+
+    const retirementYear = this.getRetirementDropYear();
+    if (!retirementYear) return;
+
+    const retirementEvent: ClientEvent = {
+      id: '',
+      name: 'Retirement age',
+      type: EventIncomeType.Income,
+      iconUrl: 'retirement-age-icon',
+      netAmount: {
+        currencySymbol: this.client.clientDetails.preferredCurrency,
+        amount: 0,
+        cycle: null
+      },
+      start: {
+        age: retirementYear - moment(this.clientBirthDate).year(),
+        year: retirementYear
+      },
+      end: null,
+      escalationRate: null,
+      isPlaceHolder: true,
+      isOneOff: true,
+      isDefault: true
+    };
+
+    this.timelineHttpService
+      .addEvent(retirementEvent, this.financialTimeline.cashflow.id)
+      .pipe(take(1))
+      .subscribe({
+        next: () => {
+          this.financialTimeline.clientEvents.push(retirementEvent);
+
+          // remove from chips (same as drag-drop behaviour)
+          this.removeRetirementFromChips();
+
+          // refresh timeline
+          this.timeline.setItems(this.timelineData);
+          this.cdr.detectChanges();
+          this.timeline.redraw();
+
+          this.updateTimelines.emit();
+        },
+        error: (err) => {
+          console.error('Failed to auto-add retirement event', err);
+        }
+      });
+  }
+
 }
