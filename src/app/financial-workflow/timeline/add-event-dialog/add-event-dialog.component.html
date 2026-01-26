@@ -5,7 +5,13 @@
     <div class="d-flex align-items-center gap-10">
       <img matChipAvatar [src]="'/assets/images/svgs/' + patchEvent.iconUrl + '.svg'" [alt]="patchEvent.iconUrl"
         class="bold-icon" />
-      <h3>{{patchEvent?.name}}</h3>
+      <h3>
+        {{ isEditWorkflow ? eventForm.get('name')?.value : patchEvent?.name }}
+        <ng-container *ngIf="isEditWorkflow && isAllowRename">
+          <img src="assets/images/svgs/drop-down-edit-2-line.svg" alt="edit" class="cursor-pointer edit-name-icon"
+            (click)="toggleNameEdit()" />
+        </ng-container>
+      </h3>
     </div>
     <button (click)="closeDialog()" type="button">
       <img src="assets/images/svgs/close-line-cion.svg" alt="close-line-cion" />
@@ -14,7 +20,7 @@
 
   <mat-dialog-content>
     <div [formGroup]="eventForm" class="d-flex flex-column gap-20">
-      <div class="w-100 form-field gap-8" *ngIf="!isEditWorkflow && showNameEdit">
+      <div class="w-100 form-field gap-8" *ngIf="isEditWorkflow && showNameEdit">
         <mat-label class="f-s-16 d-block" style="line-height: 18px">Name</mat-label>
         <input matInput formControlName="name" />
         @if(eventForm.get('name')?.touched &&
@@ -68,15 +74,9 @@
               placeholder="0" />
           </div>
           <div class="right ">
-            <mat-select
-              (valueChange)="onCycleValueChange($event)" 
-              value="Select"
-              formControlName="cycle"
-              class="sortby-edit-profile" 
-              [class.hide-arrow]="isInheritanceOneOff" 
-              [disabled]="isInheritanceOneOff"
-              hideSingleSelectionIndicator
-            >
+            <mat-select (valueChange)="onCycleValueChange($event)" value="Select" formControlName="cycle"
+              class="sortby-edit-profile" [class.hide-arrow]="isInheritanceOneOff" [disabled]="isInheritanceOneOff"
+              hideSingleSelectionIndicator>
               @for (cycle of cycles; track cycle) {
               <mat-option [value]="cycle">{{ cycle }}</mat-option>
               }
@@ -232,7 +232,6 @@
       }
     </div>
   </mat-dialog-content>
-
 
   <div class="row justify-content-between modal-action">
     <div class="col-5">

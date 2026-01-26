@@ -70,6 +70,17 @@ export class TimelineChartComponent implements OnInit, OnChanges {
     'Inheritance',
   ];
 
+  private readonly DIALOG_SYSTEM_EVENTS = [
+    'Inheritance',
+    'Wedding',
+    'Home',
+    'Travel',
+    'Car',
+    'Education',
+    'New business',
+    'Boat',
+  ];
+
   timeline: Timeline;
   customEventsLibrary: ClientEvent[];
   systemEventsLibrary: ClientEvent[];
@@ -754,23 +765,9 @@ export class TimelineChartComponent implements OnInit, OnChanges {
   }
 
   updateEventByDoubleClick(clientEvent: ClientEvent) {
-    let eventType = null;
-
-    if (
-      clientEvent.name === 'Inheritance' ||
-      clientEvent.name === 'Wedding' ||
-      clientEvent.name === 'Home' ||
-      clientEvent.name === 'Travel' ||
-      clientEvent.name === 'Car' ||
-      clientEvent.name === 'Education' ||
-      clientEvent.name === 'New business' ||
-      clientEvent.name === 'Boat'
-    ) {
-      eventType = EventType.SYSTEM;
-    }
-    else {
-      eventType = EventType.CUSTOM;
-    }
+    const eventType = this.DIALOG_SYSTEM_EVENTS.some(baseName => clientEvent.name.startsWith(baseName))
+      ? EventType.SYSTEM
+      : EventType.CUSTOM;
 
     const dialogRef = this.dialog.open(AddEventDialogComponent, {
       width: '700px',

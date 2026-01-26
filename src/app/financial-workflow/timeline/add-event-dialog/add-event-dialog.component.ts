@@ -48,6 +48,17 @@ import { TranslateModule } from '@ngx-translate/core';
   styleUrl: './add-event-dialog.component.scss'
 })
 export class AddEventDialogComponent {
+  private readonly AUTO_RENAME_EVENTS = [
+    'Wedding',
+    'Home',
+    'Travel',
+    'Car',
+    'Education',
+    'New business',
+    'Boat',
+    'Inheritance'
+  ];
+
   isIncomeEvent = true;
   escalationRates: EscalationRate[];
   selectedEventType: string = EventType.CUSTOM;
@@ -73,6 +84,7 @@ export class AddEventDialogComponent {
   saveClicked: boolean = false;
   currentYear: number = new Date().getFullYear();
   showNameEdit: boolean = false;
+  isAllowRename: boolean = false;
   hideEventType = false;
   isInheritanceOneOff = false;
 
@@ -120,6 +132,13 @@ export class AddEventDialogComponent {
     }
 
     if (this.selectedEventType == EventType.SYSTEM) {
+      // not allow edit base name
+      if (this.isEditWorkflow && !this.AUTO_RENAME_EVENTS.includes(this.data.patchEvent.name)) {
+        this.isAllowRename = true;
+
+        alert();
+      }
+
       // not changeable event type (income/expense)
       if (
         this.data.patchEvent.name === "Inheritance" ||
@@ -171,6 +190,7 @@ export class AddEventDialogComponent {
     switch (this.selectedEventType) {
       case EventType.SYSTEM:
         this.eventForm = this.fb.group({
+          name: [this.patchEvent?.name],
           isIncomeEvent: [false, Validators.required],
           currency: [this.clientPreferredCurrency, Validators.required],
           amount: ['', [Validators.required, Validators.min(0)]],
@@ -363,9 +383,22 @@ export class AddEventDialogComponent {
             }
       }
 
+      let finalName = this.patchEvent.name;
+
+      // auto rename
+      if (!this.isEditWorkflow && this.AUTO_RENAME_EVENTS.includes(finalName)) {
+        finalName = this.getNextEventName(finalName);
+      }
+
+      if (this.eventForm.get('name')?.value !== this.patchEvent?.name 
+        && this.eventForm.get('name')?.value !== finalName)
+      {
+        finalName = this.eventForm.get('name')?.value;
+      }
+
       const clientEvent: ClientEvent = {
         id: this.isEditWorkflow ? this.patchEvent?.id ?? "" : "",
-        name: this.patchEvent.name,
+        name: finalName, //this.patchEvent.name,
         netAmount: {
           cycle: {
             id: this.amountCycles.find(
@@ -551,6 +584,19 @@ export class AddEventDialogComponent {
 
   toggleNameEdit() {
     this.showNameEdit = !this.showNameEdit;
+  }
+
+  private getNextEventName(baseName: string): string {
+    const existing = this.eventsList
+      ?.filter((e: any) =>
+        e.name === baseName || e.name.startsWith(`${baseName} `)
+      ) ?? [];
+
+    if (existing.length === 0) {
+      return baseName;
+    }
+
+    return `${baseName} ${existing.length + 1}`;
   }
 }
 
