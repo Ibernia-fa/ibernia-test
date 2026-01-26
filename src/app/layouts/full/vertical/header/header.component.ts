@@ -9,7 +9,7 @@ import {
 import { CoreService } from 'src/app/services/core.service';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { navItems } from '../sidebar/sidebar-data';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { TablerIconsModule } from 'angular-tabler-icons';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -29,6 +29,8 @@ import { OrganizationProfilesService } from 'src/app/settings/services/organizat
 import { Store } from '@ngrx/store';
 import { Client } from 'src/app/clients/models/client';
 import { selectedClient } from 'src/app/store/client/client.selectors';
+import { LanguageService } from 'src/app/core/language.service';
+import { LanguageLoaderService } from '../../language-loader.service';
 
 interface notifications {
   id: number;
@@ -59,8 +61,11 @@ interface quicklinks {
   link: string;
 }
 
+type LanguageCode = 'en' | 'it';
+
 @Component({
     selector: 'app-header',
+    // standalone: true,
     imports: [
         RouterModule,
         CommonModule,
@@ -68,7 +73,8 @@ interface quicklinks {
         BrandingComponent,
         TablerIconsModule,
         MatToolbarModule,
-        MatButtonModule
+        MatButtonModule,
+        TranslateModule
     ],
     templateUrl: './header.component.html',
     encapsulation: ViewEncapsulation.None
@@ -116,6 +122,12 @@ showFiller = false;
     },
   ];
 
+  userId!: string;
+  currentLanguage: LanguageCode = 'en';
+  otherLanguage: LanguageCode = 'it';
+  // isLanguageSwitching = false;
+
+
   @Output() optionsChange = new EventEmitter<AppSettings>();
   private destroy$ = new Subject<void>();
   user: any;
@@ -137,7 +149,9 @@ showFiller = false;
     private settingsService: SettingsService,
     private organizationProfiles: OrganizationProfilesService,
         private router: Router, // Add Router
-    private store: Store 
+    private store: Store ,
+    private languageService: LanguageService,
+    private languageLoader: LanguageLoaderService
   ) {
     translate.setDefaultLang('en');
     this.user = this.Authservice.getUserProfile();
@@ -175,6 +189,33 @@ showFiller = false;
         this.checkIfCashflowRoute();
       });
   }
+
+  private setOtherLanguage(): void {
+    this.otherLanguage = this.currentLanguage === 'en' ? 'it' : 'en';
+  }
+
+  toggleLanguage(language: LanguageCode): void {
+    if (!this.userId || language === this.currentLanguage) return;
+
+    this.languageLoader.show();
+
+    this.settingsService
+    .updateLanguage(this.userId, language)
+    .subscribe({
+      next: () => {
+        this.currentLanguage = language;
+        this.setOtherLanguage();
+        this.languageService.use(language);
+
+        setTimeout(() => this.languageLoader.hide(), 300);
+      },
+      error: err => {
+        this.languageLoader.hide();
+        console.error('Failed to update language', err);
+      }
+    });
+  }
+
 
     private buildClientProfileLink(): void {
     if (this.currentClient?.id) {
@@ -263,6 +304,12 @@ get displayLastName(): string {
           if (res.ok && res.body) {
             this.userprofile = res.body;
             const p = res.body;
+            if (!p?.userId) return;
+            this.userId = p.userId;
+            const language = p.preferences?.language;
+            this.currentLanguage = language === 'it' ? 'it' : 'en';
+            this.setOtherLanguage();
+            this.languageService.setFromApi(p.preferences?.language as LanguageCode);
             this.settingsService.setUserData(res.body);
 
   

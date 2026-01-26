@@ -40,6 +40,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-add-contribution',
@@ -57,7 +58,8 @@ import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-sep
     ReactiveFormsModule,
     MatCheckboxModule,
     ThousandSeparatorPipe,
-    ThousandSeparatorInputDirective
+    ThousandSeparatorInputDirective,
+    TranslateModule
   ],
   providers: [provideNativeDateAdapter()],
   templateUrl: './add-contribution.component.html',
@@ -84,6 +86,7 @@ export class AddContributionComponent {
   allClientSavings: ClientSaving[] = [];
   clientSavings: ClientSaving[] = [];  // <-- bound in template
   private cashPot?: ClientSaving;
+  currentYear: number = new Date().getFullYear();
 
   constructor(
     private dialogRef: MatDialogRef<AddContributionComponent>,
@@ -130,18 +133,18 @@ export class AddContributionComponent {
     this.contributionForm = this.fb.group({
       description: ['', Validators.required],
       currencySymbol: [this.clientPreferredCurrency, [Validators.required]],
-      amount: [0, [Validators.required, Validators.min(0)]],
+      amount: ['', [Validators.required, Validators.min(0)]],
       cycle: [this.cycles[1].id, Validators.required],
       start: ['', Validators.required],
       end: [''],
       savingPot: [''],
       escalationRate: [this.escalationRates[0].value, Validators.required],
-      customEscalationRate: [0],
+      customEscalationRate: [''],
       contributionType: [1, Validators.required], // 1 = Cash, 2 = External
 
       // commission (percentage-only)
       commissions: [false],
-      commissionPercentage: [0],
+      commissionPercentage: [''],
     });
 
     this.contributionForm.get('currencySymbol')?.disable();
@@ -205,10 +208,11 @@ export class AddContributionComponent {
         }
       }
 
-      const pct = this.selectedContribution?.comission?.percentage?.amount ?? 0;
+      // const pct = this.selectedContribution?.comission?.percentage?.amount ?? 0;
+      const pct = this.selectedContribution?.comission?.percentage?.amount ?? null;
       const hasComm = pct > 0;
       this.contributionForm.get('commissions')?.patchValue(hasComm);
-      this.contributionForm.get('commissionPercentage')?.patchValue(pct);
+      this.contributionForm.get('commissionPercentage')?.patchValue(pct === 0 ? null : pct);
       this.isCommissionsChanged(hasCommInit);
       this.onCycleValueChange(this.selectedContribution.amount.cycle?.id);
     }
@@ -279,10 +283,12 @@ export class AddContributionComponent {
     const ctrl = this.contributionForm.get('commissionPercentage');
     if (enabled) {
       ctrl?.setValidators([Validators.required, Validators.min(0)]);
-      if (ctrl?.value === null || ctrl?.value === '') ctrl?.setValue(0);
+      // if (ctrl?.value === null || ctrl?.value === '') ctrl?.setValue(0);
+      if (ctrl?.value === 0) ctrl?.setValue(null);
     } else {
       ctrl?.clearValidators();
-      ctrl?.setValue(0);
+      // ctrl?.setValue(0);
+      ctrl?.setValue(null);
     }
     ctrl?.updateValueAndValidity();
   }

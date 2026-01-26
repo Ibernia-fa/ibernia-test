@@ -38,6 +38,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { CompareCashflowsComponent } from './compare-cashflows/compare-cashflows.component';
 import { SettingsService } from 'src/app/default-preferance/services/default-preferance.http.service';
 import { FullscreenData, FullscreenService } from 'src/app/services/fullscreen.service';
+import { TranslateModule } from '@ngx-translate/core';
 
 
 export interface PeriodicElement {
@@ -138,7 +139,8 @@ const ELEMENT_DATA: PeriodicElement[] = [
     MatTableModule,
     CommonModule,
     MatTooltipModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    TranslateModule
   ],
   templateUrl: './reports.component.html',
   styleUrl: './reports.component.scss',

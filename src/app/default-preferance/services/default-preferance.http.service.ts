@@ -13,6 +13,7 @@ export interface PreferencesDto {
   comissionAmount?: number | null;      // >0 when Amount/Both
   currency: string;
   country?: string | null;
+  language?: string;
 }
 
 export interface UserProfileDto {
@@ -46,6 +47,18 @@ export class SettingsService {
     return this.http.get<any>(`${this.baseUrl}/UserProfile/${userId}`, {
       observe: 'response',
     });
+  }
+
+  updateLanguage(userId: string, language: string): Observable<any> {
+    return this.http.patch<any>(
+      `${this.baseUrl}/UserProfile/${userId}/language`,
+      JSON.stringify(language),
+    {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }
+    );
   }
 
   uploadProfilePhoto(file: File) {

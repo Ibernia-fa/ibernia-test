@@ -4,10 +4,11 @@ import { Router } from '@angular/router';
 import { Subject, EMPTY } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { catchError, finalize, startWith, takeUntil } from 'rxjs/operators';
-import { SettingsService, ComissionType, UserProfileDto } from '../services/default-preferance.http.service';
+import { OnlyPreferanceService, ComissionType, UserProfileDto } from '../services/only-preferance.http.service';
 import { allCountries } from 'src/app/clients/models/country'; 
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-default-preferance',
@@ -15,6 +16,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
   styleUrls: ['./default-preferance.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: false,
+  // imports: [TranslateModule]
 })
 export class DefaultPreferanceComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
@@ -39,9 +41,9 @@ export class DefaultPreferanceComponent implements OnInit, OnDestroy {
     preferences: this.fb.nonNullable.group({
       inflationRate: [2.5 as number, [Validators.required, Validators.min(0), Validators.max(100)]],
       investmentReturn: [5 as number, [Validators.required, Validators.min(-100), Validators.max(100)]],
-      comissionType: [ComissionType.Amount as ComissionType, [Validators.required]],
-      comissionPercentage: [1 as number | null],
-      comissionAmount: [null as number | null],
+      // comissionType: [ComissionType.Amount as ComissionType, [Validators.required]],
+      // comissionPercentage: [1 as number | null],
+      // comissionAmount: [null as number | null],
       currency: ['EUR', [Validators.required]],
       country: ['' as string, [Validators.required]],
     }),
@@ -50,7 +52,7 @@ export class DefaultPreferanceComponent implements OnInit, OnDestroy {
 ComissionType = ComissionType;
   constructor(
     private fb: FormBuilder,
-    private api: SettingsService,
+    private api: OnlyPreferanceService,
     private toastr: ToastrService,
     private router: Router,
     private Authservice: AuthService,
@@ -60,45 +62,45 @@ ComissionType = ComissionType;
 
   ngOnInit(): void {
     this.user = this.Authservice.getUserProfile();
-    this.form.controls.preferences.controls.comissionType.valueChanges
-      .pipe(
-        startWith(this.form.controls.preferences.controls.comissionType.value),
-        takeUntil(this.destroy$)
-      )
-      .subscribe((t) => this.applyComissionValidation(t));
+    // this.form.controls.preferences.controls.comissionType.valueChanges
+    //   .pipe(
+    //     startWith(this.form.controls.preferences.controls.comissionType.value),
+    //     takeUntil(this.destroy$)
+    //   )
+    //   .subscribe((t) => this.applyComissionValidation(t));
   }
 
-  private applyComissionValidation(t: ComissionType) {
-    const prefs = this.form.controls.preferences;
-    const pct = prefs.controls.comissionPercentage;
-    const amt = prefs.controls.comissionAmount;
+  // private applyComissionValidation(t: ComissionType) {
+  //   const prefs = this.form.controls.preferences;
+  //   const pct = prefs.controls.comissionPercentage;
+  //   const amt = prefs.controls.comissionAmount;
 
-    pct.clearValidators();
-    amt.clearValidators();
+  //   pct.clearValidators();
+  //   amt.clearValidators();
 
-    // reset enable/disable
-    pct.enable({ emitEvent: false });
-    amt.enable({ emitEvent: false });
+  //   // reset enable/disable
+  //   pct.enable({ emitEvent: false });
+  //   amt.enable({ emitEvent: false });
 
-    if (t === ComissionType.Amount) {
-      pct.setValue(null, { emitEvent: false });
-      pct.disable({ emitEvent: false });
-      amt.setValidators([Validators.required, Validators.min(0.01)]);
-    } else if (t === ComissionType.Percentage) {
-      amt.setValue(null, { emitEvent: false });
-      amt.disable({ emitEvent: false });
-          if (!pct.value) {
-      pct.setValue(1, { emitEvent: false });
-    }
-      pct.setValidators([Validators.required, Validators.min(0), Validators.max(100)]);
-    } else if (t === ComissionType.Both) {
-      pct.setValidators([Validators.required, Validators.min(0), Validators.max(100)]);
-      amt.setValidators([Validators.required, Validators.min(0.01)]);
-    }
+  //   if (t === ComissionType.Amount) {
+  //     pct.setValue(null, { emitEvent: false });
+  //     pct.disable({ emitEvent: false });
+  //     amt.setValidators([Validators.required, Validators.min(0.01)]);
+  //   } else if (t === ComissionType.Percentage) {
+  //     amt.setValue(null, { emitEvent: false });
+  //     amt.disable({ emitEvent: false });
+  //         if (!pct.value) {
+  //     pct.setValue(1, { emitEvent: false });
+  //   }
+  //     pct.setValidators([Validators.required, Validators.min(0), Validators.max(100)]);
+  //   } else if (t === ComissionType.Both) {
+  //     pct.setValidators([Validators.required, Validators.min(0), Validators.max(100)]);
+  //     amt.setValidators([Validators.required, Validators.min(0.01)]);
+  //   }
 
-    pct.updateValueAndValidity({ emitEvent: false });
-    amt.updateValueAndValidity({ emitEvent: false });
-  }
+  //   pct.updateValueAndValidity({ emitEvent: false });
+  //   amt.updateValueAndValidity({ emitEvent: false });
+  // }
 
   get p() {
     return this.form.controls.preferences.controls;
@@ -128,15 +130,15 @@ ComissionType = ComissionType;
       preferences: {
         inflationRate: round2(raw.preferences.inflationRate),
         investmentReturn: round2(raw.preferences.investmentReturn),
-        comissionType: raw.preferences.comissionType,
-        comissionPercentage:
-          raw.preferences.comissionType === ComissionType.Amount
-            ? null
-            : roundOrNull(raw.preferences.comissionPercentage),
-        comissionAmount:
-          raw.preferences.comissionType === ComissionType.Percentage
-            ? null
-            : intOrNull(raw.preferences.comissionAmount),
+        // comissionType: raw.preferences.comissionType,
+        // comissionPercentage:
+        //   raw.preferences.comissionType === ComissionType.Amount
+        //     ? null
+        //     : roundOrNull(raw.preferences.comissionPercentage),
+        // comissionAmount:
+        //   raw.preferences.comissionType === ComissionType.Percentage
+        //     ? null
+        //     : intOrNull(raw.preferences.comissionAmount),
         currency: raw.preferences.currency,
         country: blankToNull(raw.preferences.country),
       },
@@ -155,7 +157,7 @@ ComissionType = ComissionType;
         finalize(() => (this.isSaving = false))
       )
       .subscribe(() => {
-        this.toastr.error('Preferences saved', 'Error!');
+        this.toastr.success('Preferences saved', 'Success!');
           if (this.dialogRef) {
           this.dialogRef.close(true);
           return;
@@ -170,9 +172,9 @@ ComissionType = ComissionType;
     this.destroy$.complete();
   }
 
-  get comTypeCtrl() {
-  return this.form.controls.preferences.controls.comissionType;
-}
+//   get comTypeCtrl() {
+//   return this.form.controls.preferences.controls.comissionType;
+// }
 }
 
 

@@ -13,14 +13,12 @@
                         <!-- headings  -->
                         <div class="d-flex flex-column justify-content-between gap-4">
                             <div class="d-flex align-items-center gap-4">
-                                <h4 class="page-title f-w-500">Saving Pots</h4>
+                                <h4 class="page-title f-w-500">{{ 'Saving Pots' | translate }}</h4>
                                 <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" class="m-t-4"
-                                 matTooltip="Enter all savings pots, pensions, and investment accounts held by your client in this section (excluding property).
-In the event of an income shortfall, these pots will be drawn down in the sequence displayed below.
-You may rearrange the order by dragging and dropping the pots, or by using the up/down arrows.
-">
+                                    matTooltip="{{ 'Enter all savings pots, pensions, and investment accounts held by your client in this section (excluding property). In the event of an income shortfall, these pots will be drawn down in the sequence displayed below. You may rearrange the order by dragging and dropping the pots, or by using the up/down arrows.' | translate }}">
                             </div>
-                            <span class="sub-title">{{selectedClient?.clientDetails?.firstName}} {{selectedClient?.clientDetails?.lastName}}</span>
+                            <span class="sub-title">{{selectedClient?.clientDetails?.firstName}}
+                                {{selectedClient?.clientDetails?.lastName}}</span>
                         </div>
                         <!-- End headings  -->
                     </div>
@@ -47,11 +45,12 @@ You may rearrange the order by dragging and dropping the pots, or by using the u
                                             <div class="d-flex align-items-center gap-8">
                                                 <img src="assets/images/svgs/total-saving-wallet.svg"
                                                     alt="total-saving-wallet" />
-                                                <h3 class="card-title">Total savings at start</h3>
+                                                <h3 class="card-title">{{ 'Total savings at start' | translate }}</h3>
                                             </div>
                                             <div class="d-flex align-items-center gap-10">
                                                 <h3 class="saving-title">
-                                                    {{selectedClient?.clientDetails?.preferredCurrency|currencySymbol}}{{(savingPots?.totalSavings ?? 0)|thousandSeparator}}</h3>
+                                                    {{selectedClient?.clientDetails?.preferredCurrency|currencySymbol}}{{(savingPots?.totalSavings
+                                                    ?? 0)|thousandSeparator}}</h3>
                                                 <!-- <span
                                                     [ngClass]="savingPots.totalGwothRate >= 0 ? 'badge green' : 'badge red'">{{savingPots.totalGwothRate
                                                     >= 0 ? '+' : '-'}}{{(savingPots?.totalGwothRate | number : '1.0-0')
@@ -74,11 +73,10 @@ You may rearrange the order by dragging and dropping the pots, or by using the u
                                         <div class="d-flex align-items-center gap-8">
                                             <img src="assets/images/svgs/inflation-rate-icon.svg"
                                                 alt="total-saving-wallet" />
-                                            <h3 class="card-title">Inflation rate:</h3>
+                                            <h3 class="card-title">{{ 'Inflation rate' | translate }}:</h3>
                                         </div>
                                         <div mat-raised-button matTooltipPosition="above"
-                                            matTooltip="The assumed rate inflation is expected to rise by, per year.
-                                    This assumption affects the entire cashflow model, as future values are inflation adjusted into real terms.">
+                                            matTooltip="{{ 'The assumed rate inflation is expected to rise by, per year. This assumption affects the entire cashflow model, as future values are inflation adjusted into real terms.' | translate }}">
                                             <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon">
                                         </div>
                                     </div>
@@ -105,7 +103,7 @@ You may rearrange the order by dragging and dropping the pots, or by using the u
                         <div class="col-2">
                             <div class="d-flex align-items-center justify-content-end">
                                 <button (click)="newEventClicked()" type="button" class="button-icon">
-                                    <span>Add New</span>
+                                    <span>{{ 'Add New' | translate}}</span>
                                     <img src="assets/images/svgs/add-icon.svg" alt="add-icon" />
                                 </button>
                             </div>
@@ -122,7 +120,7 @@ You may rearrange the order by dragging and dropping the pots, or by using the u
             <mat-card-content>
                 <div class="cashflow-drag-wrapper">
                     <div class="d-flex flex-column gap-20">
-                        <h3 class="sec-heading">Other liquid savings, investments and pensions:</h3>
+                        <h3 class="sec-heading">{{ 'Other liquid savings, investments and pensions:' | translate }}</h3>
                         <div cdkDropList [cdkDropListData]="savingPots?.clientSavings"
                             (cdkDropListDropped)="drop($event)" class="flex-column d-flex gap-10" id="drag-boundary">
                             <!-- Card One -->
@@ -130,16 +128,17 @@ You may rearrange the order by dragging and dropping the pots, or by using the u
                             <div [cdkDragData]="saving" cdkDragLockAxis="y" cdkDrag cdkDragBoundary="#drag-boundary"
                                 class="d-flex justify-content-between align-items-center gap-12 dragable-card-wrapper">
                                 <!-- Card  -->
-                                <div class="dragable-card d-flex align-items-center justify-content-between">
+                                <div (click)="updateEventClicked(saving)" class="dragable-card d-flex align-items-center justify-content-between cursor-pointer">
                                     <!-- Content  -->
                                     <div class="d-flex align-items-center gap-8">
-                                        @if(i > 0 && !('cash' === (savingPots.clientSavings[i]?.name || '').toLowerCase())) {
+                                        @if(i > 0 && !('cash' === (savingPots.clientSavings[i]?.name ||
+                                        '').toLowerCase())) {
                                         <button cdkDragHandle type="button" class="drag-btn">
                                             <img src="/assets/images/svgs/drag-icon.svg" alt="drag-icon">
                                         </button>
-                                    }@else {
-    <span class="drag-btn drag-spacer" aria-hidden="true"></span>
-  }
+                                        }@else {
+                                        <span class="drag-btn drag-spacer" aria-hidden="true"></span>
+                                        }
                                         <!-- @if((saving.name || '').toLowerCase() !== 'cash' && i < savingPots.clientSavings.length - 1) { -->
 
                                         <!-- Status  -->
@@ -151,15 +150,15 @@ You may rearrange the order by dragging and dropping the pots, or by using the u
                                                     <h3 class="card-title">{{saving.name}}</h3>
                                                 </div>
                                                 <div class="d-flex align-items-center gap-10">
-                                                    
+
                                                     <h3 class="saving-title">
-                                                         {{selectedClient?.clientDetails?.preferredCurrency|currencySymbol}}{{saving.startingPotValue.amount|thousandSeparator}}
+                                                        {{selectedClient?.clientDetails?.preferredCurrency|currencySymbol}}{{saving.startingPotValue.amount|thousandSeparator}}
                                                     </h3>
                                                     <span
-                                                        [className]="saving.realReturn >= 0 ? 'badge green' : 'badge red'">
+                                                        [className]="saving.returnRate > 0 ? 'badge green' : 'badge red'">
                                                         <!-- @if(saving.realReturn >= 0){+}{{saving.realReturn | number :
                                                         '1.2-2'}}% -->
-                                                        @if(saving.realReturn >= 0){+}{{saving.realReturn | number : '1.0-0'}}%
+                                                        @if(saving.returnRate >= 0){+}{{formatReturnRate(saving.returnRate)}}%
                                                     </span>
                                                     <!-- <span>
                                                         NV: {{saving.nominalValue | thousandSeparator}}
@@ -187,8 +186,9 @@ You may rearrange the order by dragging and dropping the pots, or by using the u
                                             class="d-flex align-items-center justify-content-center flex-column gap-10 h-100">
                                             <img src="assets/images/svgs/cashflow-lock-icon.svg"
                                                 alt="cashflow-lock-icon">
-                                                
-                                            <h4 style="color: white;">Locked from {{saving.lockedFrom.year}} to {{saving.lockedTill.year}}</h4>
+
+                                            <h4 style="color: white;">{{ 'Locked from' | translate }} {{saving.lockedFrom.year}} to
+                                                {{saving.lockedTill.year}}</h4>
                                         </div>
                                         <div class="help-lock-overlay">
                                             <img src="assets/images/svgs/help-circle-lock-overlay.svg"
@@ -197,20 +197,20 @@ You may rearrange the order by dragging and dropping the pots, or by using the u
                                     </div>
                                     }
                                     <div class="edit-icon-overlay">
-                                        <button mat-icon-button (click)="updateEventClicked(saving)">
+                                        <button mat-icon-button (click)="updateEventClicked(saving); $event.stopPropagation()">
                                             <mat-icon>
-                                                <img src="assets/images/svgs/pen-icon.svg" alt="pen-icon" />
+                                                <img src="assets/images/svgs/drop-down-edit-2-line.svg" alt="pen-icon" />
                                             </mat-icon>
                                         </button>
                                         <ng-container *ngIf="saving.name != 'Cash'">
-                                                 <button mat-icon-button (click)="deleteEventClicked(saving)">
-                                            <mat-icon>
-                                                <img src="assets/images/svgs/drop-down-delete-2-line.svg"
-                                                    alt="del-icon" />
-                                            </mat-icon>
-                                        </button>
+                                            <button mat-icon-button (click)="deleteEventClicked(saving); $event.stopPropagation()">
+                                                <mat-icon>
+                                                    <img src="assets/images/svgs/drop-down-delete-2-line.svg"
+                                                        alt="del-icon" />
+                                                </mat-icon>
+                                            </button>
                                         </ng-container>
-                                   
+
                                     </div>
                                     <!-- <div class="edit-icon-overlay">
                                         </div> -->
@@ -220,13 +220,14 @@ You may rearrange the order by dragging and dropping the pots, or by using the u
                                 <!-- Up and Down Buttons   -->
                                 @if(savingPots.clientSavings) {
                                 <div class="d-flex flex-column gap-10 vote-btns">
-                                    @if(i > 0 && !('cash' === (savingPots.clientSavings[i - 1]?.name || '').toLowerCase())) {
+                                    @if(i > 0 && !('cash' === (savingPots.clientSavings[i - 1]?.name ||
+                                    '').toLowerCase())) {
                                     <button (click)="moveUp(i)" type="button">
                                         <img src="assets/images/svgs/vote-arrow-up.svg" alt="vote-arrow-up">
                                     </button>
                                     }
-                                        @if((saving.name || '').toLowerCase() !== 'cash' && i < savingPots.clientSavings.length - 1) {
-                                        <button (click)="moveDown(i)"
+                                    @if((saving.name || '').toLowerCase() !== 'cash' && i <
+                                        savingPots.clientSavings.length - 1) { <button (click)="moveDown(i)"
                                         type="button">
                                         <img src="assets/images/svgs/vote-arrow-down.svg" alt="vote-arrow-down">
                                         </button>
@@ -244,77 +245,6 @@ You may rearrange the order by dragging and dropping the pots, or by using the u
         </mat-card>
         <!-- End liquid savings, investments and pensions Section  -->
     </div>
-
-    @if(showFeedbackPopup) {
-    <!-- Feedback Card  -->
-    <div class="feeback-container d-flex flex-column gap-16">
-        <!-- Feeback First Step -->
-        @if(currentStep === 1) {
-        <div class="feedback-wrapper">
-            <div class="d-flex flex-column gap-20">
-                <div class="d-flex flex-column gap-10">
-                    <div class="d-flex align-items-center justify-content-between">
-                        <div class="d-flex align-items-center gap-8 feedback-nav-btns">
-                            <button type="button" class="active"></button>
-                            <button type="button"></button>
-                        </div>
-                        <button type="button" (click)="closeFeedbackPopupClicked()">
-                            <img src="assets/images/svgs/close-line-cion.svg" alt="close-line-cion">
-                        </button>
-                    </div>
-                    <p>How satisfied are you with your current financial planning?</p>
-                </div>
-                <div class="d-flex align-items-center gap-24 emoji-btn">
-                    <button (click)="selectRating('bad')" type="button"><img
-                            src="assets/images/shapes/sad-feedback-icon.png" alt="sad-feedback-icon"></button>
-                    <button (click)="selectRating('neutral')" type="button"><img
-                            src="assets/images/shapes/sad-feedback-icon-v2.png" alt="sad-feedback-icon-v2"></button>
-                    <button (click)="selectRating('good')" type="button"><img
-                            src="assets/images/shapes/happy-feedback-icon.png" alt="happy-feedback-icon"></button>
-                </div>
-            </div>
-        </div>
-        }
-        <!-- End Feeback First Step  -->
-
-        <!-- Second Feeback Step -->
-        @if(currentStep === 2) {
-        <div class="feedback-wrapper">
-            <div class="d-flex flex-column gap-20">
-                <div class="d-flex flex-column gap-10">
-                    <div class="d-flex align-items-center justify-content-between">
-                        <div class="d-flex align-items-center gap-8 feedback-nav-btns">
-                            <button type="button"></button>
-                            <button type="button" class="active"></button>
-                        </div>
-                    </div>
-                    <p class="form-label">Anything that can be improved?</p>
-                </div>
-                <div class="d-flex flex-column gap-20 feedback-form">
-                    <textarea name="feedback" id="feedback" placeholder="Your feedback (Optional)"
-                        [(ngModel)]="feedbackDetail"></textarea>
-                    <div>
-                        <button class="button-icon" (click)="feedbackSubmitBtnClicked()" type="button"><span>Submit</span></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        }
-        <!-- End Second Feeback Step  -->
-
-        <!-- Feeback Third Step -->
-        @if(currentStep === 3) {
-        <div class="feedback-wrapper">
-            <div class="d-flex align-items-center gap-10">
-                <img src="assets/images/shapes/feeback-sent-icon.png" alt="feeback-sent-icon">
-                <p>Thanks for the feedback!</p>
-            </div>
-        </div>
-        }
-        <!-- End Feeback Third Step  -->
-    </div>
-    <!-- End Feedback Card  -->
-    }
     }
     @else {
     <div class="h-300">

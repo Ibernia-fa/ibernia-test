@@ -61,6 +61,9 @@ export class AppNavItemComponent implements OnChanges {
   @HostBinding('attr.aria-expanded') ariaExpanded = this.expanded;
   @Input() item: NavItem | any;
   @Input() depth: any;
+  @Input() showLabel: boolean = false;
+  @Input() label: string = '';
+
 
   constructor(public navService: NavService, public router: Router, public navItem: NavItemService,
     private store: Store

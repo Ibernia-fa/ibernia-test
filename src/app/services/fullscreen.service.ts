@@ -71,7 +71,7 @@ export class FullscreenService {
     
     const title = this.renderer.createElement('h4');
     this.renderer.setProperty(title, 'textContent', 
-      `Lifetime Plan - ${this.fullscreenDataSubject.value?.isComparison ? 'Comparison' : 'Main View'}`);
+      `Lifetime Plan${this.fullscreenDataSubject.value?.isComparison ? 'Comparison' : ''}`);
     
     const closeButton = this.renderer.createElement('button');
     this.renderer.addClass(closeButton, 'global-close-fullscreen-btn');

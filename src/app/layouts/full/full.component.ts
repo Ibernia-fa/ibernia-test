@@ -34,6 +34,7 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { selectedClient } from 'src/app/store/client/client.selectors';
 import { Client } from 'src/app/clients/models/client';
+import { TranslateModule } from '@ngx-translate/core';
 
 const MOBILE_VIEW = 'screen and (max-width: 768px)';
 const TABLET_VIEW = 'screen and (min-width: 769px) and (max-width: 1024px)';
@@ -72,7 +73,8 @@ interface quicklinks {
     MatExpansionModule,
     MatDividerModule,
     MatListModule,
-    MatDialogModule
+    MatDialogModule,
+    TranslateModule
   ],
   templateUrl: './full.component.html',
   styleUrls: [],
@@ -280,7 +282,7 @@ export class FullComponent implements OnInit {
   ngOnInit(): void {
     this.client$.subscribe(client => {
       if (client) {
-        this.clientName = client.clientDetails?.firstName + " " + client.clientDetails?.lastName;
+        this.clientName = client.clientDetails?.firstName;
       }
     });
   }

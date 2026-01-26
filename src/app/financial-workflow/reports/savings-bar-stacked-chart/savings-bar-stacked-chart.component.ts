@@ -1,10 +1,11 @@
-import { Component, ViewChild, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, ViewChild, Input, OnChanges, SimpleChanges, ElementRef } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { TablerIconsModule } from 'angular-tabler-icons';
 import { ChartComponent, NgApexchartsModule } from 'ng-apexcharts';
 import { ChartSeries, TimelineEvent } from '../models/charts-series.model';
 import { Client } from 'src/app/clients/models/client';
 import moment from 'moment';
+import { set } from 'date-fns';
 
 @Component({
   selector: 'app-savings-bar-stacked-chart',
@@ -17,7 +18,8 @@ import moment from 'moment';
   styleUrl: './savings-bar-stacked-chart.component.scss'
 })
 export class SavingsBarStackedChartComponent implements OnChanges {
-  @ViewChild("chart") chart: ChartComponent;
+  // @ViewChild("chart") chart: ChartComponent;
+  @ViewChild("chart", { read: ElementRef }) chartElRef: ElementRef<HTMLDivElement>;
   @Input() report: ChartSeries;
   @Input() forecastStartDate: Date;
   @Input() forecastEndDate: Date;
@@ -42,10 +44,18 @@ export class SavingsBarStackedChartComponent implements OnChanges {
         zoom: {
           enabled: false,
         },
+        states: {
+          hover: {
+            filter: {
+              type: 'none'
+            }
+          }
+        }
       },
       dataLabels: {
         enabled: false
       },
+
       tooltip: {
         enabled: true,
         shared: false, // or true if you want stacked values together
@@ -55,11 +65,9 @@ export class SavingsBarStackedChartComponent implements OnChanges {
           const value = series[seriesIndex][dataPointIndex];
           const seriesName = w.globals.seriesNames[seriesIndex];
           const xValue = w.globals.labels[dataPointIndex];
-          // console.log('opts', opts, );
           const color = w.globals.colors[seriesIndex];
 
           const age = [(Math.floor(xValue) - moment(this.client.clientDetails.birthDate).year())]
-          // build whatever HTML you want here
           return `
           <div class="savings-tooltip">
             <div class="savings-tooltip__header">
@@ -124,15 +132,24 @@ export class SavingsBarStackedChartComponent implements OnChanges {
       const seriesList = this.report.series;
       const seriesColors = this.chartOptions.colors || [];
 
-      // Dynamically build fillColors array based on series names
-      const fillColors = seriesList.map((s, i) =>
-        s.name === 'Current Account (Negative)' ? 'transparent' : s.color
-      );
+      // dynamically build fillColors array based on series names
+      const fillColors = seriesList.map((s, i) => {
+        if (s.name === 'Current Account (Negative)' || s.name === 'Emergency Expense') {
+          return 'transparent';
+        }
+        return s.color
+      });
 
+      // legends formatter to hide specific series names
       this.chartOptions.legend = {
         ...this.chartOptions.legend,
-        formatter: (seriesName: string) =>
-          seriesName === 'Current Account (Negative)' ? '' : seriesName,
+
+        formatter: (seriesName: string) => {
+          if (seriesName === 'Current Account (Negative)' || seriesName === 'Emergency Expense') {
+            return '';
+          }
+          return seriesName;
+        },
         markers: {
           fillColors: fillColors
         },
@@ -146,8 +163,11 @@ export class SavingsBarStackedChartComponent implements OnChanges {
 
       // goals and events dots
       this.events = this.report.timelineEvents;
-      this.chartOptions.annotations = { points: this.buildEventAnnotations(this.events) };
-      setTimeout(() => this.attachHtmlTooltips(), 1000);
+
+      if (this.events.length > 0) {
+        this.chartOptions.annotations = { points: this.buildEventAnnotations(this.events) };
+        setTimeout(() => this.attachHtmlTooltips(), 500);
+      }
     }
 
     this.chartOptions.chart = { ...this.chartOptions.chart };
@@ -176,6 +196,24 @@ export class SavingsBarStackedChartComponent implements OnChanges {
         }
       }
     }
+
+    // final series assignment
+    this.chartOptions.series = this.report.series.map((s, idx) => ({
+      ...s,
+      tack: 'stack1',
+      order: s.name === 'Emergency Expense' ? this.report.series.length : idx,
+      fill: {
+        opacity: 1
+      },
+      states: {
+        hover: {
+          filter: {
+            type: 'lighten',
+            value: 0.15
+          }
+        }
+      }
+    }));
   }
 
   buildEventAnnotations(events: TimelineEvent[]) {
@@ -192,6 +230,7 @@ export class SavingsBarStackedChartComponent implements OnChanges {
 
     eventsByYear.forEach((groupEvents, year) => {
       groupEvents.forEach((event, index) => {
+
         annotations.push({
           x: year,
           y: 0,

@@ -11,8 +11,8 @@
         <img width="56" src="../../../assets/images/shapes/small-icon-7.svg" alt="">
       </div> -->
       <div class="d-flex flex-column justify-content-between gap-4">
-        <h4 class="page-title f-w-500">AI Recommendations</h4>
-        <span class="sub-title">Fine-tune your AI assistant</span>
+        <h4 class="page-title f-w-500">{{ 'AI Recommendations' | translate }}</h4>
+        <span class="sub-title">{{ 'Fine-tune your AI assistant' | translate }}</span>
       </div>
     </div>
   </mat-card-content>
@@ -24,11 +24,11 @@
 <div *ngIf="selectedPlan === 'enterprise'" class="enterprise-context-section">
 
   <p class="description f-s-14 m-t-0 m-b-10">
-    Customize how your AI gives advice, from tone and risk levels to approved products and compliance rules, so every client recommendation aligns with your firm’s policies.
+    {{ 'Customize how your AI gives advice, from tone and risk levels to approved products and compliance rules, so every client recommendation aligns with your firm’s policies.' | translate }}
     
    
   </p>
-  <div class="m-b-5 f-s-14"><strong>Talk to an Ibernia AI expert</strong> to set this up effectively for your organization.</div>
+  <div class="m-b-5 f-s-14"><strong>{{ 'Talk to an Ibernia AI expert' | translate }}</strong> {{ 'to set this up effectively for your organization.' | translate }}</div>
   <mat-form-field appearance="outline" class="full-width textarea-wrapper w-100">
     <textarea
       matInput
@@ -40,7 +40,7 @@
     <mat-hint >{{ companyContext?.length || 0 }} / 10000</mat-hint>
   </mat-form-field>
 <div class="d-flex justify-space-end">
-    <button  color="primary" class="button-icon"><span>Save</span></button>
+    <button  color="primary" class="button-icon"><span>{{ 'Save' | translate }}</span></button>
 </div>
 
   

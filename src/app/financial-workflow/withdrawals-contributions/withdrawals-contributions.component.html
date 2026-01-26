@@ -12,16 +12,14 @@
           <!-- headings  -->
           <div class="d-flex flex-column justify-content-between gap-4">
             <div class="d-flex align-items-center gap-4">
-              <h4 class="page-title f-w-500">Contributions & Withdrawals</h4>
+              <h4 class="page-title f-w-500">{{ 'Contributions & Withdrawals' | translate }}</h4>
               <!-- <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" class="m-t-4">
                 -->
 
-                       <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" class="m-t-4"
-                                  matTooltip="Add all expected contributions to and withdrawals from your client’s savings pots throughout the forecast period.
-Contributions will transfer funds from the client’s Current account to a selected Savings Pot.
-Withdrawals will move funds from a Savings Pot back to the Current account to cover shortfalls.">
+              <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" class="m-t-4" matTooltip="{{ 'Add all expected contributions to and withdrawals from your client’s savings pots throughout the forecast period. Contributions will transfer funds from the client’s Current account to a selected Savings Pot. Withdrawals will move funds from a Savings Pot back to the Current account to cover shortfalls.' | translate }}" />
             </div>
-            <span class="sub-title">{{selectedClient.clientDetails.firstName}} {{selectedClient.clientDetails.lastName}}</span>
+            <span class="sub-title">{{selectedClient.clientDetails.firstName}}
+              {{selectedClient.clientDetails.lastName}}</span>
           </div>
           <!-- End headings  -->
         </div>
@@ -40,9 +38,9 @@ Withdrawals will move funds from a Savings Pot back to the Current account to co
         <mat-card class="clientTableContainer">
           <div class="heading-btn-wrapper">
             <div class="d-flex flex-column gap-12">
-              <h3>Contributions</h3>
+              <h3>{{ 'Contributions' | translate }}</h3>
               <button (click)="newContributionClicked()" type="button" class="w-100 button-icon">
-                <span class="f-s-16">Add contribution</span>
+                <span class="f-s-16">{{ 'Add contribution' | translate }}</span>
               </button>
             </div>
           </div>
@@ -54,7 +52,7 @@ Withdrawals will move funds from a Savings Pot back to the Current account to co
                 <!-- Position Column -->
                 <ng-container matColumnDef="position">
                   <th mat-header-cell *matHeaderCellDef
-                    class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-client">Description
+                    class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-client">{{ 'Description' | translate }}
                   </th>
                   <td mat-cell *matCellDef="let element" class="p-x-24 f-s-14 p-l-0 column-client">
                     {{element.description}} </td>
@@ -63,10 +61,11 @@ Withdrawals will move funds from a Savings Pot back to the Current account to co
                 <!-- Name Column -->
                 <ng-container matColumnDef="name">
                   <th mat-header-cell *matHeaderCellDef
-                    class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-net-amount">Net amount
+                    class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-net-amount">{{ 'Net amount' | translate }}
                   </th>
                   <td mat-cell *matCellDef="let element" class="p-x-24 f-s-14 p-l-0 column-net-amount">
-                    {{selectedClient?.clientDetails?.preferredCurrency | currencySymbol}}{{element.amount.amount | thousandSeparator}}/{{element.amount.cycle.description}}</td>
+                    {{selectedClient?.clientDetails?.preferredCurrency | currencySymbol}}{{element.amount.amount |
+                    thousandSeparator}}/{{element.amount.cycle.description}}</td>
                 </ng-container>
 
                 <!-- Symbol Column -->
@@ -88,21 +87,21 @@ Withdrawals will move funds from a Savings Pot back to the Current account to co
                           <img src="assets/images/svgs/drop-down-edit-2-line.svg" alt="drop-down-copy-2-line"
                             height="24" width="24" />
                         </mat-icon>
-                        <span>Edit</span>
+                        <span>{{ 'Edit' | translate }}</span>
                       </button>
                       <button (click)="deleteContribution(element)" mat-menu-item>
                         <mat-icon>
                           <img src="assets/images/svgs/drop-down-delete-2-line.svg" alt="drop-down-copy-2-line"
                             height="24" width="24" />
                         </mat-icon>
-                        <span>Delete</span>
+                        <span>{{ 'Delete' | translate }}</span>
                       </button>
                     </mat-menu>
                   </td>
                 </ng-container>
 
                 <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="updateContributionClicked(row)" class="cursor-pointer"></tr>
               </table>
 
 
@@ -117,9 +116,9 @@ Withdrawals will move funds from a Savings Pot back to the Current account to co
         <mat-card class="clientTableContainer">
           <div class="heading-btn-wrapper">
             <div class="d-flex flex-column gap-12">
-              <h3>Withdrawals</h3>
+              <h3>{{ 'Withdrawals' | translate }}</h3>
               <button (click)="newWithdrawalClicked()" type="button" class="w-100 button-icon-outline">
-                <span>Add withdrawal</span>
+                <span>{{ 'Add withdrawal' | translate }}</span>
               </button>
             </div>
           </div>
@@ -131,7 +130,7 @@ Withdrawals will move funds from a Savings Pot back to the Current account to co
                 <!-- Position Column -->
                 <ng-container matColumnDef="position">
                   <th mat-header-cell *matHeaderCellDef
-                    class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-client">Description
+                    class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-client">{{ 'Description' | translate }}
                   </th>
                   <td mat-cell *matCellDef="let element" class="p-x-24 f-s-14 p-l-0 column-client">
                     {{element.description}} </td>
@@ -140,10 +139,11 @@ Withdrawals will move funds from a Savings Pot back to the Current account to co
                 <!-- Name Column -->
                 <ng-container matColumnDef="name">
                   <th mat-header-cell *matHeaderCellDef
-                    class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-net-amount">Net amount
+                    class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-net-amount">{{ 'Net amount' | translate }}
                   </th>
                   <td mat-cell *matCellDef="let element" class="p-x-24 f-s-14 p-l-0 column-net-amount">
-                    {{selectedClient?.clientDetails?.preferredCurrency | currencySymbol}}{{element.amount.amount | thousandSeparator}}/{{element.amount.cycle.description}} </td>
+                    {{selectedClient?.clientDetails?.preferredCurrency | currencySymbol}}{{element.amount.amount |
+                    thousandSeparator}}/{{element.amount.cycle.description}} </td>
                 </ng-container>
 
                 <!-- Symbol Column -->
@@ -165,21 +165,21 @@ Withdrawals will move funds from a Savings Pot back to the Current account to co
                           <img src="assets/images/svgs/drop-down-edit-2-line.svg" alt="drop-down-copy-2-line"
                             height="24" width="24" />
                         </mat-icon>
-                        <span>Edit</span>
+                        <span>{{ 'Edit' | translate }}</span>
                       </button>
                       <button (click)="deleteWithdrawal(element)" mat-menu-item>
                         <mat-icon>
                           <img src="assets/images/svgs/drop-down-delete-2-line.svg" alt="drop-down-copy-2-line"
                             height="24" width="24" />
                         </mat-icon>
-                        <span>Delete</span>
+                        <span>{{ 'Delete' | translate }}</span>
                       </button>
                     </mat-menu>
                   </td>
                 </ng-container>
 
                 <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="updateWithdrawalClicked(row)" class="cursor-pointer"></tr>
               </table>
 
 

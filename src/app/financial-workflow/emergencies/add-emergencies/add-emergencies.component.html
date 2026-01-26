@@ -12,7 +12,7 @@
       <input matInput formControlName="name" placeholder="e.g. Life Insurance" />
       
       @if(form.get('name')?.touched && form.get('name')?.hasError('required')) {
-        <span class="field-error d-block">Required</span>
+        <span class="field-error d-block">{{'Required' | translate}}</span>
       }
     </div>
 
@@ -28,14 +28,14 @@
           </mat-select>
         </div>
         @if(form.get('willStatus')?.touched && form.get('willStatus')?.hasError('required')) {
-          <span class="field-error">Required</span>
+          <span class="field-error">{{'Required' | translate}}</span>
         }
       </div>
     }
 
     <!-- Insurance fields (type 1) -->
     @if(!isWill) {
-      <div class="w-100 form-field gap-8">
+      <!-- <div class="w-100 form-field gap-8">
         <mat-label class="f-s-16 d-block" style="line-height: 18px">Status</mat-label>
         <div class="select-option">
           <mat-select formControlName="policyStatus" hideSingleSelectionIndicator placeholder="Select">
@@ -45,9 +45,42 @@
           </mat-select>
         </div>
         @if(form.get('policyStatus')?.touched && form.get('policyStatus')?.hasError('required')) {
-          <span class="field-error d-block">Required</span>
+          <span class="field-error d-block">{{'Required' | translate}}</span>
+        }
+      </div> -->
+
+      <!-- New Start -->
+       @if(!isWill) {
+  <div class="w-100 form-field gap-8 tab">
+    <span class="f-s-16 d-block" style="line-height: 18px">Status</span>
+
+    <div class="tabs">
+      <div class="row">
+        @for (s of policyStatuses; track s; let i = $index) {
+          <div class="col-6">
+            <button
+              type="button"
+              class="button-icon w-100"
+              (click)="form.get('policyStatus')?.setValue(s.id)"
+              [class.active]="form.get('policyStatus')?.value === s.id"
+            >
+              <span
+                [class.active]="form.get('policyStatus')?.value === s.id"
+              >
+                {{ s.name === 'NotCovered' ? 'Not covered' : s.name }}
+              </span>
+            </button>
+          </div>
         }
       </div>
+    </div>
+
+    @if(form.get('policyStatus')?.touched && form.get('policyStatus')?.hasError('required')) {
+      <span class="field-error d-block">Required</span>
+    }
+  </div>
+}
+      <!-- New End -->
 
       @if(form.get('policyStatus')?.value != 2){
       <div class="d-flex flex-column gap-4 net-fields">
@@ -69,10 +102,10 @@
                 matInput
                 type="text"
                 formControlName="insuranceAmount"
-                placeholder="Amount"
+                placeholder="0"
                 thousandSeparatorInput
-              />
-            </div>
+                />
+              </div>
 
             <div class="right">
               <mat-select formControlName="insuranceCycleId" class="sortby-edit-profile" hideSingleSelectionIndicator>
@@ -84,12 +117,12 @@
 
           </div>
           @if(form.get('insuranceAmount')?.touched && form.get('insuranceAmount')?.hasError('required')) {
-            <span class="field-error d-block">Required</span>
+            <span class="field-error d-block">{{'Required' | translate}}</span>
           }
         </div>
       </div>
 
-      <div class="w-100 form-field gap-8">
+      <!-- <div class="w-100 form-field gap-8">
         <mat-label class="f-s-16 d-block" style="line-height: 18px">Coverage adequacy</mat-label>
         <div class="select-option">
           <mat-select formControlName="coverageAdequacy" hideSingleSelectionIndicator placeholder="Select">
@@ -99,9 +132,35 @@
           </mat-select>
         </div>
         @if(form.get('coverageAdequacy')?.touched && form.get('coverageAdequacy')?.hasError('required')) {
-          <span class="field-error d-block">Required</span>
+          <span class="field-error d-block">{{'Required' | translate}}</span>
         }
-      </div>
+      </div> -->
+
+      <div class="w-100 form-field gap-8 tab">
+  <mat-label class="f-s-16 d-block" style="line-height: 18px">Coverage adequacy</mat-label>
+  
+  <div class="coverageTabs">
+    <div class="row">
+      @for (a of coverageAdequacies; track a) {
+        <div class="col-4 coverage-wrapper">
+          <button 
+          type="button" 
+          class="button-icon coverage-btn-colours w-100"
+          [class.active]="form.get('coverageAdequacy')?.value === a.id"
+          [ngClass]="getCoverageClass(a.name, form.get('coverageAdequacy')?.value === a.id)"
+          (click)="form.get('coverageAdequacy')?.setValue(a.id)">
+          <span [class.active]="form.get('coverageAdequacy')?.value === a.id">{{ a.name }}</span>
+        </button>
+        </div>
+      }
+    </div>
+  </div>
+
+  @if(form.get('coverageAdequacy')?.touched && form.get('coverageAdequacy')?.hasError('required')) {
+    <span class="field-error d-block">{{'Required' | translate}}</span>
+  }
+</div>
+
 
       <div class="w-100 d-flex flex-column gap-8">
         <mat-label class="f-s-16 f-w-400 d-flex align-items-center">
@@ -113,12 +172,12 @@
             matInput 
             type="text" 
             formControlName="coverage"
-            placeholder="Coverage"
+            placeholder="0"
             thousandSeparatorInput
            />
         </mat-form-field>
         @if(form.get('coverage')?.touched && form.get('coverage')?.hasError('required')) {
-          <span class="field-error d-block">Required</span>
+          <span class="field-error d-block">{{'Required' | translate}}</span>
         }
       </div>
       }
@@ -134,7 +193,7 @@
       } 
       @if(!isDeleteEnabled) {
         <button type="button" class="button-icon-outline w-100 d-block" (click)="closeDialog()">
-          <span class="f-s-16">Cancel</span>
+          <span class="f-s-16">{{ 'Cancel' | translate }}</span>
         </button>
       }
     </div>

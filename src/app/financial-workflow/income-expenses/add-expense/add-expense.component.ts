@@ -32,6 +32,7 @@ import moment from 'moment';
 import { FinancialViewModel } from '../model/income-expense';
 import { catchError, filter } from 'rxjs';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-add-expense',
@@ -48,8 +49,8 @@ import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-sep
     MatSliderModule,
     ReactiveFormsModule,
      ThousandSeparatorPipe,
-    ThousandSeparatorInputDirective
-
+    ThousandSeparatorInputDirective,
+TranslateModule
   ],
   providers: [provideNativeDateAdapter()],
   templateUrl: './add-expense.component.html',
@@ -78,6 +79,7 @@ export class AddExpenseComponent {
   showStartEnd=false;
   eventsList: any;
   selectedEscalationDescription: string;
+  currentYear: number = new Date().getFullYear();
 
   constructor(
     private dialogRef: MatDialogRef<AddExpenseComponent>,
@@ -118,12 +120,12 @@ export class AddExpenseComponent {
     this.expenseForm = this.fb.group({
       description: ['', Validators.required],
       currencySymbol: [this.clientPreferredCurrency, [Validators.required]],
-      amount: [0, [Validators.required, Validators.min(0)]],
+      amount: ['', [Validators.required, Validators.min(0)]],
       cycle: [this.cycles[1].id, Validators.required],
       start: ['', Validators.required],
       end: [''],
       escalationRate: [this.escalationRates[0].value, Validators.required],
-      customEscalationRate: [0]
+      customEscalationRate: ['']
 
     });
     this.expenseForm.get('currencySymbol')?.disable();

@@ -42,6 +42,7 @@ import { CommonModule } from '@angular/common';
 import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
+import { TranslateModule } from '@ngx-translate/core';
 @Component({
   selector: 'app-add-new-pot',
   imports: [
@@ -62,7 +63,8 @@ import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-sep
     MatCheckboxModule,
     // IntegerOnlyDirective,
     ThousandSeparatorPipe,
-    ThousandSeparatorInputDirective
+    ThousandSeparatorInputDirective,
+    TranslateModule
   ],
   templateUrl: './add-new-pot.component.html',
   styleUrl: './add-new-pot.component.scss',
@@ -117,6 +119,8 @@ export class AddNewPotComponent {
   ];
   loggedInUserComissionType: string | undefined;
   isAddComissionChecked: any;
+  currentYear: number = new Date().getFullYear();
+
   constructor(
     private dialogRef: MatDialogRef<AddNewPotComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
@@ -164,7 +168,7 @@ export class AddNewPotComponent {
     this.savingsForm = this.fb.group({
       name: ['', Validators.required],
       currency: [this.clientPreferredCurrency, Validators.required],
-      amount: [0, [Validators.required, Validators.min(0)]],
+      amount: ['', [Validators.required, Validators.min(0)]],
       returnRate: [this.userReturnRate],
       // lockPot: [true],
       lockPot: [false],
@@ -180,7 +184,7 @@ export class AddNewPotComponent {
       commissionPercentageCycle: [this.cycles[2].id],
       commissionPercentage: [this.loggedInUserPreferences?.comissionPercentage || 0],
       escalationRate: [''],
-      customEscalationRate: [0]
+      customEscalationRate: ['']
     });
 
   this.savingsForm.setValidators(this.endOnOrAfterStartValidator());

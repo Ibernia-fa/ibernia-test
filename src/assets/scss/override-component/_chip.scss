@@ -28,6 +28,7 @@
     padding: 4px 10px;
     align-items: center;
     display: flex;
+    width: fit-content;
     &.retirement-age-icon {
       background-color: #fff9f7 !important;
       border: 1px solid #ffede7;
@@ -52,6 +53,44 @@
       background-color: #f9f9ff !important;
       border: 1px solid #ebecff;
     }
+
+    &.state-pension-icon {
+      background-color: #f9f9ff !important;
+      border: 1px solid #ebecff;
+    }
+    &.state-pension-icon {
+      background-color: #f9f9ff !important;
+      border: 1px solid #ebecff;
+    }
+    &.state-pension-icon {
+      background-color: #f9f9ff !important;
+      border: 1px solid #ebecff;
+    }
+    &.home-icon {
+      background-color: #f0f9ff;
+      border: 1px solid #e0ecf4 !important;
+    }
+    &.travel-icon {
+      background-color: #f8f9fc;
+      border: 1px solid #dfe3ef !important;
+    }
+    &.car-icon {
+      background-color: #fff4ed;
+      border: 1px solid #eddace !important;
+    }
+    &.education-icon {
+      background-color: #eef4ff;
+      border: 1px solid #dee7f6 !important;
+    }
+    &.new-business-icon {
+      background-color: #fef3f2;
+      border: 1px solid #ffe8e5 !important;
+    }
+    &.boat-icon {
+      background-color: #ecfdf3;
+      border: 1px solid #cbf1db !important;
+    }
+
     border-radius: 999px !important;
     .mdc-evolution-chip__graphic {
       height: auto !important;

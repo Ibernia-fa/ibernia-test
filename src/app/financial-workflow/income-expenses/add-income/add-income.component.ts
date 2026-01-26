@@ -33,6 +33,7 @@ import { FinancialViewModel } from '../model/income-expense';
 import { IncomeExpensesHttpService } from '../services/income-expenses-http.service';
 import { catchError, filter } from 'rxjs';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-add-income',
@@ -49,15 +50,15 @@ import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-sep
     MatSliderModule,
     ReactiveFormsModule,
     ThousandSeparatorPipe,
-    ThousandSeparatorInputDirective
-
+    ThousandSeparatorInputDirective,
+    TranslateModule
   ],
   providers: [provideNativeDateAdapter()],
   templateUrl: './add-income.component.html',
   styleUrl: './add-income.component.scss',
 })
 export class AddIncomeComponent {
-  eventsList: any;
+  eventsList: any[] = [];
   incomeForm: FormGroup;
   countries = allCountries;
   cycles: Cycle[];
@@ -71,6 +72,7 @@ export class AddIncomeComponent {
   selectedIncome: FinancialViewModel;
   showStartEnd = false;
   selectedEscalationDescription: string | null;
+  currentYear: number = new Date().getFullYear();
 
   constructor(
     private dialogRef: MatDialogRef<AddIncomeComponent>,
@@ -112,12 +114,12 @@ export class AddIncomeComponent {
     this.incomeForm = this.fb.group({
       description: ['', Validators.required],
       currencySymbol: [this.clientPreferredCurrency, [Validators.required]],
-      amount: [0, [Validators.required, Validators.min(0)]],
+      amount: ['', [Validators.required, Validators.min(0)]],
       cycle: [this.cycles[1].id, Validators.required],
       start: ['', Validators.required],
       end: [''],
       escalationRate: [this.escalationRates[0].value, Validators.required],
-      customEscalationRate: [0]
+      customEscalationRate: ['']
       
     });
     this.incomeForm.get('currencySymbol')?.disable();

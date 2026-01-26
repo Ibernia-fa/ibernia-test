@@ -9,6 +9,33 @@ body {
   margin: 0;
 }
 
+.language-loader {
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.95);
+  z-index: 99999;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.spinner {
+  width: 70px;
+  height: 70px;
+  border: 6px solid #ddd;
+  border-top: 6px solid #1976d2;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+
 /* Global tooltip width & wrapping */
 .cdk-overlay-container .mat-mdc-tooltip-surface {
   max-width: 400px !important;
@@ -830,3 +857,27 @@ body:has(.global-fullscreen-overlay) {
   color: #1c1c1c;
 }
 // event styes for lifetime model - end
+
+.event-tooltip.emergency-icon {
+  background-color: #fef3f1;
+  border: 1px solid #f9f9ff !important;
+  color: #ff5621;
+}
+
+.emergency-icon-overlay {
+  z-index: 1000;
+  pointer-events: none;
+}
+// event styes for lifetime model - end
+
+.chips-custom .mdc-evolution-chip-set__chips {
+  display: flex !important;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.vis-item, 
+.vis-selected {
+    width: fit-content !important;
+}

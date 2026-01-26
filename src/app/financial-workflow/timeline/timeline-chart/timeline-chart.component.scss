@@ -6,6 +6,7 @@
       text-decoration: underline;
     }
   }
+
   @media (max-width: 768px) {
     .flex-nowrap {
       flex-wrap: wrap !important;
@@ -16,14 +17,17 @@
   .row {
     margin: 0 !important;
   }
+
   .col-sm-12,
   .col-6,
   .field-error {
     padding: 0 !important;
   }
+
   .row .col-6 {
     flex: 0 0 47% !important;
     max-width: 47% !important;
+
     @media (max-width: 768px) {
       flex: 0 0 100% !important;
       max-width: 100% !important;
@@ -41,6 +45,7 @@
     line-height: 22px;
     color: #1c1c1c;
   }
+
   p {
     color: #9495a2;
     font-size: 14px;
@@ -63,6 +68,7 @@
     top: 10px;
     right: 10px;
     z-index: 10;
+
     button {
       outline: none;
       border: 1px solid #c2d1d9;
@@ -76,6 +82,7 @@
       padding: 8px;
       cursor: pointer;
       transition: all 0.3s ease;
+
       &:hover {
         background-color: #fafafa;
         transition: all 0.3s ease;
@@ -93,6 +100,7 @@
     display: flex;
     flex-direction: column;
     gap: 4px;
+
     p,
     span {
       margin: 0;
@@ -102,6 +110,7 @@
     }
   }
 }
+
 // d-flex flex-column gap-8
 
 .vis-panel.vis-left {
@@ -115,20 +124,24 @@
   background-color: white;
   padding: 5px;
 }
+
 .chip-content {
   display: flex;
   justify-content: space-between;
   align-items: center;
   width: 100%;
 }
+
 .chip-close-icon {
   width: 16px;
   height: 16px;
   margin-left: 8px;
   position: relative;
-  top: 2px; /* 👈 Moves the icon down slightly */
+  top: 2px;
+  /* 👈 Moves the icon down slightly */
   cursor: pointer;
 }
+
 .timeline-event-chip {
   display: flex;
   align-items: center;
@@ -158,31 +171,35 @@
   line-height: 1.2;
   font-weight: 600;
 }
+
 //  ::ng-deep .vis-item.vis-range{
 //    width: auto !important;
 //  }
 ::ng-deep .vis-item .vis-delete {
-top: -2% !important;
-    transform: translateY(-50%);
-    background: #fff;
-    border-radius: 100px;
-    border: 1px solid #ccc;
-    text-align: center;
-    line-height: 20px;
-    height: 20px !important;
-    width: 20px !important;
-    right: -1px !important;
-    background: #fff !important;
-    &:hover{
+  top: -2% !important;
+  transform: translateY(-50%);
+  background: #fff;
+  border-radius: 100px;
+  border: 1px solid #ccc;
+  text-align: center;
+  line-height: 20px;
+  height: 20px !important;
+  width: 20px !important;
+  right: -1px !important;
+  background: #fff !important;
+
+  &:hover {
     background: #fff !important;
 
-    }
+  }
 }
+
 ::ng-deep .vis-item .vis-item-content {
   display: flex;
   align-items: center;
   padding-right: 20px !important;
 }
+
 .timeline-wrapper {
   display: flex;
   flex-direction: row;
@@ -204,12 +221,14 @@ top: -2% !important;
   font-weight: bold;
   left: 11px;
 
-  p, span {
+  p,
+  span {
     margin: 0;
     line-height: normal;
     margin-bottom: 1px;
   }
-  span{
+
+  span {
     position: relative;
     top: -1px;
   }
@@ -218,6 +237,7 @@ top: -2% !important;
 .timeline-container {
   flex: 1;
 }
+
 .timeline-tooltip {
   position: fixed;
   background: rgba(0, 76, 153, 0.95);
@@ -229,8 +249,9 @@ top: -2% !important;
   z-index: 9999;
   white-space: nowrap;
 }
+
 #year-tooltip {
-  position: fixed;         // Important for screen-relative cursor
+  position: fixed; // Important for screen-relative cursor
   z-index: 9999;
   background: rgba(0, 76, 153, 0.95);
   color: white;
@@ -239,6 +260,7 @@ top: -2% !important;
   pointer-events: none;
   font-size: 12px;
 }
+
 .vis-text.vis-minor.highlighted {
   background-color: #66B2FF;
   border-radius: 4px;
@@ -255,8 +277,17 @@ top: -2% !important;
   font-weight: 500;
   color: #333;
 }
+
 ::ng-deep .vis-custom-time.hoverLine,
 ::ng-deep .vis-custom-time.dragOver {
   pointer-events: none !important;
   cursor: default !important;
+}
+
+.chips-custom {
+  display: flex;
+  justify-content: center;
+  margin: 0px auto;
+  margin-bottom: 10px !important;
+  width: 57%;
 }

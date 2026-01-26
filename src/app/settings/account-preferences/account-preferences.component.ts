@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
-import { FormBuilder, Validators } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HttpResponse } from '@angular/common/http';
 import { Subject, EMPTY, of } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
@@ -13,13 +13,32 @@ import {
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { allCountries } from 'src/app/clients/models/country';
 import { NavItemService } from 'src/app/layouts/full/nav-item.service';
+import { TranslateModule } from '@ngx-translate/core';
+import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelect, MatSelectModule } from '@angular/material/select';
+import { NgFor, NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-account-preferences',
   templateUrl: './account-preferences.component.html',
   styleUrls: ['./account-preferences.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: false,
+  standalone: true,
+  imports: [MatCardModule, MatButtonModule,
+  MatIconModule,
+  MatFormFieldModule,
+  MatInputModule,
+  MatSelect,
+  MatSelectModule,
+  ReactiveFormsModule,
+  TranslateModule,
+  NgIf,
+  NgFor
+]
 })
 export class AccountPreferencesComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();

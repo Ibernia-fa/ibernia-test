@@ -14,6 +14,18 @@ export const navItemslower: NavItem[] = [
     route: '/cashflows/{cashflowId}/emergencies',
   },
   {
+    displayName: 'Wealth & Inheritance',
+    iconName: '/assets/images/svgs/money-square.svg',
+    iconOutline: '/assets/images/svgs/money-square.svg',
+    // route: '/cashflows/{cashflowId}/emergencies',
+  },
+  {
+    displayName: 'Knowledge Hub',
+    iconName: '/assets/images/svgs/book-solid.svg',
+    iconOutline: '/assets/images/svgs/book-solid.svg',
+    // route: '/cashflows/{cashflowId}/emergencies',
+  },
+  {
     displayName: 'AI Recommendations',
     iconName: '/assets/images/shapes/ai-filled.svg',
     iconOutline: '/assets/images/shapes/ai-filled.svg',

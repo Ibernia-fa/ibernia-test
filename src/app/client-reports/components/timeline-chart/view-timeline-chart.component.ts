@@ -24,6 +24,7 @@ import { ToastrModule, ToastrService } from 'ngx-toastr';
 import { SettingsHttpService } from '../../../financial-workflow/settings/services/settings-http.service';
 import { TimelineHttpService } from '../../../financial-workflow/timeline/services/timeline-http.service';
 import { catchError, combineLatest, filter, map, take, tap } from 'rxjs';
+import { TranslateModule } from '@ngx-translate/core';
  
 @Component({
   selector: 'app-view-timeline-chart',
@@ -38,6 +39,7 @@ import { catchError, combineLatest, filter, map, take, tap } from 'rxjs';
     MatProgressSpinnerModule,
     ToastrModule,
     CommonModule,
+    TranslateModule
   ],
   providers: [
     ToastrService

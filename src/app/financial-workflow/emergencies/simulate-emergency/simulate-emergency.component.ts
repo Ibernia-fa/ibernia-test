@@ -1,0 +1,488 @@
+import { Component, Inject } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectChange, MatSelectModule } from '@angular/material/select';
+import { MatSliderModule } from '@angular/material/slider';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { provideNativeDateAdapter } from '@angular/material/core';
+import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
+import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
+import moment from 'moment';
+import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
+import { ToastrService } from 'ngx-toastr';
+import { allCountries } from 'src/app/clients/models/country';
+import { Client, ClientViewModel } from 'src/app/clients/models/client';
+import { Cashflow } from 'src/app/clients/models/cashflow';
+import { Emergency } from '../models/emergencies.model';
+import { FinancialViewModel } from '../../income-expenses/model/income-expense';
+import { Cycle, EscalationRate, FinancialTimeline } from '../../timeline/models/financial-timeline';
+import { SimulateEmergencyModel } from '../models/simulate-emergency.model';
+import { EmergenciesHttpService } from '../services/emergencies-http.service';
+import { SavingsBarStackedChartComponent } from '../../reports/savings-bar-stacked-chart/savings-bar-stacked-chart.component';
+
+@Component({
+  selector: 'simulate-emergency',
+  imports: [
+    MatCardModule,
+    MatFormFieldModule,
+    MatDialogModule,
+    MatInputModule,
+    MatIconModule,
+    MatInputModule,
+    MatButtonModule,
+    MatSelectModule,
+    MatDatepickerModule,
+    MatCheckboxModule,
+    MatSliderModule,
+    ReactiveFormsModule,
+    ThousandSeparatorPipe,
+    ThousandSeparatorInputDirective,
+    SavingsBarStackedChartComponent
+  ],
+  providers: [provideNativeDateAdapter()],
+  templateUrl: './simulate-emergency.component.html',
+  styleUrl: './simulate-emergency.component.scss',
+})
+export class SimulateEmergencyComponent {
+  onAmountInput(rawValue: string) {
+    const { parseFormattedNumber } = require('src/app/shared/utils/number-utils');
+    const value = parseFormattedNumber(rawValue);
+    this.simulateEmergencyForm.get('amount')?.setValue(value);
+  }
+
+  simulateEmergencyForm: FormGroup;
+  countries = allCountries;
+  clientBirthYear: number;
+  clientAge: number;
+  years: number[] = [];
+  showStartEnd = false;
+  amountCycles: Cycle[];
+  escalationRates: EscalationRate[];
+  selectedEscalationDescription: string;
+  timeline: FinancialTimeline;
+  clientPreferredCurrency: string;
+  eventsList: any;
+  incomes: FinancialViewModel[];
+  client: Client;
+  clientViewModel: ClientViewModel;
+  cashflow: Cashflow;
+  emergency: Emergency;
+  emergencyExpense: SimulateEmergencyModel | null;
+  clientBirthDate: Date;
+  forecastEndDate: Date;
+  forecastStartDate: Date;
+  forecastEndDateYear: number;
+  forecastStartDateYear: number;
+
+  isSimulationCompleted = false;
+  activeTab: 'baseline' | 'simulated' = 'simulated';
+  baselineResult: {
+    series: any[];
+    categories: string[];
+    timelineEvents: any[];
+  } | null = null;
+  simulationResult: {
+    series: any[];
+    categories: string[];
+    timelineEvents: any[];
+  } | null = null;
+  existingEmergencyId: string | null = null;
+  isUpdateParentItem = false;
+  currentYear: number = new Date().getFullYear();
+
+  constructor(
+    private dialogRef: MatDialogRef<SimulateEmergencyComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: any,
+    private fb: FormBuilder,
+    private emergenciesHttpService: EmergenciesHttpService,
+    private toastr: ToastrService
+  ) {
+    this.client = data.client;
+    this.cashflow = data.cashflow;
+    this.clientViewModel = data.cashflow.client;
+    this.amountCycles = data.amountCycles;
+    this.escalationRates = data.escalationRates;
+    this.timeline = data.timeline;
+    this.eventsList = data.eventsList;
+    this.incomes = data.incomes;
+    this.clientPreferredCurrency = data.clientPreferredCurrency;
+    this.clientBirthDate = data.clientBirthDate;
+    this.forecastEndDate = data.forecastEndDate;
+    this.forecastStartDate = data.forecastStartDate;
+    this.forecastEndDateYear = data.forecastEndDateYear;
+    this.forecastStartDateYear = data.forecastStartDateYear;
+    this.emergency = data.emergency;
+    this.emergencyExpense = data.emergencyExpense;
+
+    this.clientBirthYear = moment(this.clientBirthDate).year();
+    const birthDate = new Date(this.clientBirthDate);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    const dayDiff = today.getDate() - birthDate.getDate();
+
+    // adjust age if birth month/day is in the future
+    if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+      age--;
+    }
+
+    this.clientAge = age;
+
+    if (this.forecastStartDateYear - this.clientBirthYear > this.clientAge)
+      this.clientBirthYear = this.clientBirthYear + 1
+
+    var iterations = this.forecastEndDateYear - this.forecastStartDateYear + 1;
+
+    for (let index = 0; index < iterations; index++) {
+      const element = this.forecastStartDateYear + index;
+      this.years.push(element);
+    }
+
+    this.showStartEnd = false;
+
+    this.simulateEmergencyForm = this.fb.group({
+      currencySymbol: [this.clientPreferredCurrency, [Validators.required]],
+      amount: ['', [Validators.required]],
+      cycle: [this.amountCycles[0].id, Validators.required],
+      start: ['', Validators.required],
+      end: [''],
+      escalationRate: [this.escalationRates[0]?.value, Validators.required],
+      customEscalationRate: [0],
+      stopIncome: [false],
+      stoppedIncomeId: [null]
+    });
+
+    this.simulateEmergencyForm.get('currencySymbol')?.disable();
+    const amountControl = this.simulateEmergencyForm.get('amount');
+    const incomeControl = this.simulateEmergencyForm.get('stoppedIncomeId');
+    const stopIncomeInitial = this.simulateEmergencyForm.get('stopIncome')?.value;
+
+    if (stopIncomeInitial) { // allow 0 or more
+      amountControl?.setValidators([Validators.required, Validators.min(0)]);
+      incomeControl?.setValidators([Validators.required]);
+    } else { // must be > 0
+      amountControl?.setValidators([Validators.required, Validators.min(1)]);
+      incomeControl?.clearValidators();
+      incomeControl?.setValue(null);
+    }
+
+    amountControl?.updateValueAndValidity();
+    incomeControl?.updateValueAndValidity();
+
+    this.simulateEmergencyForm.get('stopIncome')?.valueChanges
+      .subscribe((checked: boolean) => {
+        if (checked) {
+          amountControl?.setValidators([Validators.required, Validators.min(0)]);
+          incomeControl?.setValidators([Validators.required]);
+
+          if (!amountControl?.value) {
+            amountControl?.setValue(0, { emitEvent: false });
+          }
+        } else {
+          amountControl?.setValidators([Validators.required, Validators.min(1)]);
+          incomeControl?.clearValidators();
+          incomeControl?.setValue(null);
+
+          if (!amountControl?.value) {
+            amountControl?.setValue(null, { emitEvent: false });
+          }
+        }
+
+        amountControl?.updateValueAndValidity();
+        incomeControl?.updateValueAndValidity();
+      });
+
+    this.simulateEmergencyForm.setValidators(this.endOnOrAfterStartValidator());
+    this.simulateEmergencyForm.updateValueAndValidity({ emitEvent: false });
+    this.onCycleValueChange(this.amountCycles[0].id);
+
+    if (this.emergencyExpense) {
+      this.populateForm(this.emergencyExpense);
+    }
+  }
+
+  onCycleValueChange(event: any) {
+    const selectedCycle = this.amountCycles.find(cycle => cycle.id === event);
+    const isOneOff = selectedCycle?.description === 'One-off';
+
+    this.showStartEnd = !isOneOff;
+
+    const startControl = this.simulateEmergencyForm.get('start');
+    const endControl = this.simulateEmergencyForm.get('end');
+    const escalationControl = this.simulateEmergencyForm.get('escalationRate');
+
+    if (isOneOff) {
+      const defaultYear = new Date().getFullYear() + 5;
+
+      startControl?.setValue(defaultYear);
+      endControl?.setValue(null);
+
+      endControl?.clearValidators();
+      escalationControl?.clearValidators();
+    } else {
+      endControl?.setValidators(Validators.required);
+      escalationControl?.setValidators(Validators.required);
+    }
+
+    endControl?.updateValueAndValidity();
+    escalationControl?.updateValueAndValidity();
+  }
+
+  onEscalationRateChange(event: MatSelectChange): void {
+    const selectedOption = event.source.selected;
+
+    let description: string | null = null;
+
+    if (Array.isArray(selectedOption)) {
+      description = selectedOption[0]?.viewValue ?? null;
+    } else {
+      description = selectedOption?.viewValue ?? null;
+    }
+
+    this.selectedEscalationDescription = description;
+    const customControl = this.simulateEmergencyForm.get('customEscalationRate');
+
+    if (description === 'Increases at custom rate') {
+      customControl?.setValidators([Validators.required, Validators.min(0)]);
+    } else {
+      customControl?.clearValidators();
+      customControl?.setValue(null);
+    }
+
+    customControl?.updateValueAndValidity();
+  }
+
+  simulateEmergency(): void {
+    this.simulateEmergencyForm.markAllAsTouched();
+    this.simulateEmergencyForm.markAsDirty();
+
+    if (this.simulateEmergencyForm.valid) {
+      const isCustomEscalation = this.selectedEscalationDescription === 'Increases at custom rate';
+      const escalationRateValue = isCustomEscalation
+        ? this.simulateEmergencyForm.get('customEscalationRate')?.value
+        : this.simulateEmergencyForm.get('escalationRate')?.value;
+      const matchedRate = this.escalationRates.find((x) => x.value === escalationRateValue);
+      const stopIncome = this.simulateEmergencyForm.get('stopIncome')?.value;
+      const stoppedIncomeId = this.simulateEmergencyForm.get('stoppedIncomeId')?.value;
+
+      // convert amount back to number if it's still a formatted string
+      const rawAmountControl = this.simulateEmergencyForm.get('amount');
+      if (rawAmountControl) {
+        const { parseFormattedNumber } = require('src/app/shared/utils/number-utils');
+        const currentValue = rawAmountControl.value;
+        // only convert if it's a string with commas
+        rawAmountControl.setValue(parseFormattedNumber(currentValue), { emitEvent: false });
+      }
+      const rawAmount = this.simulateEmergencyForm.get('amount')?.value;
+
+
+      var simulateEmergency: SimulateEmergencyModel = {
+        id: this.existingEmergencyId,
+        description: "",
+        amount: {
+          amount: rawAmount,
+          currencySymbol: this.simulateEmergencyForm.get('currencySymbol')?.value,
+          cycle: {
+            id: this.simulateEmergencyForm.get('cycle')?.value ?? '',
+            description:
+              this.amountCycles.find(
+                (x) => x.id === this.simulateEmergencyForm.get('cycle')?.value
+              )?.description ?? '',
+          },
+        },
+        start: {
+          age:
+            this.simulateEmergencyForm.get('start')?.value !== null &&
+              this.simulateEmergencyForm.get('start')?.value !== ''
+              ? this.simulateEmergencyForm.get('start')?.value - this.clientBirthYear
+              : 0,
+          year:
+            this.simulateEmergencyForm.get('start')?.value !== null &&
+              this.simulateEmergencyForm.get('start')?.value !== ''
+              ? this.simulateEmergencyForm.get('start')?.value
+              : 0,
+        },
+        end: {
+          age:
+            this.simulateEmergencyForm.get('end')?.value !== null &&
+              this.simulateEmergencyForm.get('end')?.value !== ''
+              ? this.simulateEmergencyForm.get('end')?.value - this.clientBirthYear
+              : 0,
+          year:
+            this.simulateEmergencyForm.get('end')?.value !== null &&
+              this.simulateEmergencyForm.get('end')?.value !== ''
+              ? this.simulateEmergencyForm.get('end')?.value
+              : 0,
+        },
+        escalationRate: escalationRateValue !== null && escalationRateValue !== ''
+          ? matchedRate ?? {
+            description: this.selectedEscalationDescription ?? '', // Use actual description
+            value: escalationRateValue
+          }
+          : {
+            description: '',
+            value: 0
+          },
+        stopIncome: stopIncome,
+        stoppedIncomeId: stopIncome ? stoppedIncomeId : null,
+        emergencyId: this.emergency.id,
+        client: this.clientViewModel,
+        cashflow: this.cashflow
+      };
+
+      this.emergenciesHttpService.simulateEmergency(simulateEmergency)
+        .subscribe({
+          next: (res: any) => {
+            if (!res || !res.baseline || !res.simulated ||
+              !res.baseline?.series || !res.baseline?.categories ||
+              !res.simulated?.series || !res.simulated?.categories) {
+              return;
+            }
+
+            this.baselineResult = res.baseline;
+            const simulated = res.simulated;
+            simulated.timelineEvents = [];
+
+            const emergencyAmount = this.simulateEmergencyForm.get('amount')?.value;
+            const emergencySeries = this.buildEmergencySeries(
+              this.baselineResult,
+              this.simulateEmergencyForm.get('start')?.value?.toString() ?? '',
+              emergencyAmount);
+
+            if (!this.baselineResult || !this.baselineResult.series) return;
+            this.simulationResult = simulated;
+
+            this.baselineResult.series = [
+              ...this.baselineResult.series,
+              emergencySeries
+            ];
+
+            simulated.series = [
+              ...simulated.series,
+              emergencySeries
+            ];
+
+            this.activeTab = 'simulated';
+            this.dialogRef.updateSize('92vw', '88vh');
+            this.emergencyExpense = simulateEmergency;
+            this.emergencyExpense.id = res.emergencyExpenseId;
+            this.isSimulationCompleted = true;
+            this.isUpdateParentItem = true;
+          },
+          error: (err: any) => {
+            console.error(err);
+            this.toastr.error('Failed to simulate cover', 'Error');
+          }
+        });
+    }
+  }
+
+  closeDialog(): void {
+    if (this.isUpdateParentItem) {
+      this.dialogRef.close(this.emergencyExpense);
+    }
+    else {
+      this.dialogRef.close();
+    }
+  }
+
+  get isCustomEscalationSelected(): boolean {
+    const selectedValue = this.simulateEmergencyForm.get('escalationRate')?.value;
+
+    // find exact match by both value and description
+    return this.escalationRates.some(e =>
+      e.value === selectedValue && e.description === 'Increases at custom rate'
+    );
+  }
+
+  private endOnOrAfterStartValidator(): ValidatorFn {
+    return (group: AbstractControl) => {
+      const start = group.get('start')?.value;
+      const end = group.get('end')?.value;
+      const endCtrl = group.get('end');
+
+      // Only validate when both are present (or when end is present)
+      if (endCtrl) {
+        const existing = endCtrl.errors ?? null;
+
+        if (start != null && start !== '' && end != null && end !== '' && end < start) {
+          // attach/merge the error onto the END control
+          endCtrl.setErrors({ ...(existing ?? {}), endBeforeStart: true });
+        } else {
+          // remove just our error, keep any others
+          if (existing && 'endBeforeStart' in existing) {
+            const { endBeforeStart, ...rest } = existing;
+            endCtrl.setErrors(Object.keys(rest).length ? rest : null);
+          }
+        }
+      }
+      return null;
+    };
+  }
+
+  private populateForm(expense: any): void {
+    this.existingEmergencyId = expense.id ?? null;
+    const cycleId = expense.amount?.cycle?.id ?? this.amountCycles[0].id;
+    const formattedAmount = this.formatWithThousandSeparator(expense.amount?.amount ?? 0);
+
+    this.simulateEmergencyForm.patchValue({
+      cycle: cycleId,
+      amount: formattedAmount,
+      start: expense.start?.year ?? null,
+      end: expense.end?.year ?? null,
+      escalationRate: expense.escalationRate?.value ?? this.escalationRates[0]?.value,
+      stopIncome: expense.stopIncome ?? false
+    }, { emitEvent: false });
+
+    this.selectedEscalationDescription = expense.escalationRate?.description ?? '';
+    if (expense.escalationRate?.description === 'Increases at custom rate') {
+      this.simulateEmergencyForm.patchValue({
+        customEscalationRate: expense.escalationRate.value
+      });
+    }
+
+    this.onCycleValueChange(cycleId);
+
+    if (expense.stopIncome) {
+      this.simulateEmergencyForm.patchValue({
+        stoppedIncomeId: expense.stoppedIncomeId ?? null
+      }, { emitEvent: false });
+    }
+
+    this.simulateEmergencyForm.updateValueAndValidity();
+  }
+
+  private formatWithThousandSeparator(value: number): string {
+    return value.toLocaleString('en-US');
+  }
+
+  private buildEmergencySeries(report: any, year: string, amount: number): any {
+    const emergencyData: number[] = report.categories.map((category: string) =>
+      category === year ? amount : 0
+    );
+
+    return {
+      id: 'emergency-expense',
+      name: 'Emergency Expense',
+      data: emergencyData,
+      color: '#fac2beff',
+      className: 'emergency-expense-series',
+      order: report.series?.length ?? 0,
+      stack: 'stack1',
+      fill: { opacity: 1 },
+      states: {
+        hover: {
+          filter: {
+            type: 'lighten',
+            value: 0.03
+          }
+        }
+      }
+    };
+  }
+}

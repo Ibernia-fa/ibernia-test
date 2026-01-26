@@ -22,13 +22,14 @@ import { AiReccomendationsComponent } from './ai-reccomendations/ai-reccomendati
 
 @NgModule({
   declarations: [   
-    PlanBillingComponent,
-    SecurityComponent,
-    NotificationsComponent,
-    BrandingComponent,
-    HelpAndContactComponent,
-    AiReccomendationsComponent,
-    AccountPreferencesComponent],
+    // PlanBillingComponent,
+    // SecurityComponent,
+    // NotificationsComponent,
+    // BrandingComponent,
+    // HelpAndContactComponent,
+    // AiReccomendationsComponent,
+    // AccountPreferencesComponent
+  ],
     
     
   imports: [

@@ -22,55 +22,54 @@
                                     <a mat-list-item (click)="setSection('goalsAndEvents')" [disableRipple]="true"
                                         class="mat-toolbar mat-primary menu-list-item"
                                         [ngClass]="{ 'activeMenu': section === 'goalsAndEvents' }">
-                                        <img style="flex: none; max-width: 18px;"
-                                            [src]="section === 'goalsAndEvents'
+                                        <img style="flex: none; max-width: 18px;" [src]="section === 'goalsAndEvents'
                                                 ? '/assets/images/svgs/clock-icon-filled.svg' 
                                                 : '/assets/images/svgs/clock-icon.svg'" alt="item" />
-                                        <span class="hide-menu">Goals & Events</span>
+                                        <span class="hide-menu">{{ 'Goals & Events' | translate }}</span>
                                     </a>
                                 </div>
                                 <div class="nav-item" [class.active]="section === 'savingPots'">
                                     <a mat-list-item (click)="setSection('savingPots')" [disableRipple]="true"
                                         class="mat-toolbar mat-primary menu-list-item"
                                         [ngClass]="{ 'activeMenu': section === 'savingPots' }">
-                                        <img style="flex: none; max-width: 18px;"
-                                           [src]="section === 'savingPots'
+                                        <img style="flex: none; max-width: 18px;" [src]="section === 'savingPots'
                                                 ? '/assets/images/svgs/file-icon-filled.svg'
                                                 : '/assets/images/svgs/file-icon.svg'" alt="item" />
-                                        <span class="hide-menu">Saving Pots</span>
+                                        <span class="hide-menu">{{ 'Saving Pots' | translate }}</span>
                                     </a>
                                 </div>
                                 <div class="nav-item" [class.active]="section === 'incomesAndExpenses'">
                                     <a mat-list-item (click)="setSection('incomesAndExpenses')" [disableRipple]="true"
                                         class="mat-toolbar mat-primary menu-list-item"
                                         [ngClass]="{ 'activeMenu': section === 'incomesAndExpenses' }">
-                                        <img style="flex: none; max-width: 18px;"
-                                            [src]="section === 'incomesAndExpenses'
+                                        <img style="flex: none; max-width: 18px;" [src]="section === 'incomesAndExpenses'
                                                 ? '/assets/images/svgs/ticket-icon-filled.svg'
                                                 : '/assets/images/svgs/ticket-icon.svg'" alt="item" />
-                                        <span class="hide-menu">Incomes & Expenses</span>
+                                        <span class="hide-menu">{{ 'Incomes & Expenses' | translate }}</span>
                                     </a>
                                 </div>
                                 <div class="nav-item" [class.active]="section === 'contributionsAndWithdrawals'">
                                     <a mat-list-item (click)="setSection('contributionsAndWithdrawals')"
                                         [disableRipple]="true" class="mat-toolbar mat-primary menu-list-item"
                                         [ngClass]="{ 'activeMenu': section === 'contributionsAndWithdrawals' }">
-                                        <img style="flex: none; max-width: 18px;" 
-                                            [src]="section === 'contributionsAndWithdrawals'
+                                        <img style="flex: none; max-width: 18px;" [src]="section === 'contributionsAndWithdrawals'
                                                 ? '/assets/images/svgs/discount-icon-filled.svg'
                                                 : '/assets/images/svgs/discount-icon.svg'" alt="item" />
-                                        <span class="hide-menu">Contributions & Withdrawals</span>
+                                        <span class="hide-menu">{{ 'Contributions & Withdrawals' | translate }}</span>
                                     </a>
                                 </div>
 
                                 <div [class.active]="section === 'lifetimePlan'">
-                                    <a mat-list-item (click)="setSection('lifetimePlan')" [disableRipple]="true" class="cashflow-modal d-flex align-items-center gap-8 activeMenu" style="height: 36px; padding-left: 8px;">
+                                    <a mat-list-item (click)="setSection('lifetimePlan')" [disableRipple]="true"
+                                        class="cashflow-modal d-flex align-items-center gap-8 activeMenu"
+                                        style="height: 36px; padding-left: 8px;">
                                         <img style="flex: none; max-width: 18px; vertical-align: text-bottom; margin: 0px 8px 0px 0px;"
-                                            src="/assets/images/svgs/inheritance-icon.svg"
-                                            alt="Lifetime plan">
-                                        <span class="activeMenu mdc-list-item__primary-text" style="font-size: 14px; line-height: 20px; color: #516ce8 !important; vertical-align: text-bottom;margin-top: 2px;">Lifetime Plan</span>
+                                            src="/assets/images/svgs/inheritance-icon.svg" alt="Lifetime plan">
+                                        <span class="activeMenu mdc-list-item__primary-text"
+                                            style="font-size: 14px; line-height: 20px; color: #516ce8 !important; vertical-align: text-bottom;margin-top: 2px;">{{
+                                            'Lifetime Plan' | translate }}</span>
                                     </a>
-                                </div> 
+                                </div>
                             </mat-nav-list>
                         </div>
                     </div>
@@ -95,7 +94,8 @@
                                                         alt="clock" />
                                                 </div>
                                                 <div class="d-flex flex-column justify-content-between gap-4">
-                                                    <h4 class="page-title f-w-500">Goals & Events</h4>
+                                                    <h4 class="page-title f-w-500">{{ 'Goals & Events' | translate }}
+                                                    </h4>
                                                     <span class="sub-title">{{client.clientDetails.firstName}}
                                                         {{client.clientDetails.lastName}}</span>
                                                 </div>
@@ -132,7 +132,7 @@
                                                         alt="clock" />
                                                 </div>
                                                 <div class="d-flex flex-column justify-content-between gap-4">
-                                                    <h4 class="page-title f-w-500">Saving Pots</h4>
+                                                    <h4 class="page-title f-w-500">{{ 'Saving Pots' | translate }}</h4>
                                                     <span class="sub-title">{{client.clientDetails.firstName}}
                                                         {{client.clientDetails.lastName}}</span>
                                                 </div>
@@ -157,11 +157,13 @@
                                                 <div class="d-flex align-items-center gap-8">
                                                     <img src="assets/images/svgs/total-saving-wallet.svg"
                                                         alt="total-saving-wallet" />
-                                                    <h3 class="card-title">Total savings at start</h3>
+                                                    <h3 class="card-title">{{ 'Total savings at start' | translate }}
+                                                    </h3>
                                                 </div>
                                                 <div class="d-flex align-items-center gap-10">
                                                     <h3 class="saving-title">
-                                                        {{client?.clientDetails?.preferredCurrency | currencySymbol}}{{ (savingPots?.totalSavings ?? 0) |
+                                                        {{client?.clientDetails?.preferredCurrency | currencySymbol}}{{
+                                                        (savingPots?.totalSavings ?? 0) |
                                                         thousandSeparator}}
                                                     </h3>
                                                 </div>
@@ -177,8 +179,7 @@
                                 @if(savingPots) {
                                 <div class="cashflow-drag-wrapper">
                                     <div class="d-flex flex-column gap-20">
-                                        <h3 class="f-w-400 sec-title">Other liquid savings, investments and
-                                            pensions:
+                                        <h3 class="f-w-400 sec-title">{{ 'Other liquid savings, investments and pensions:' | translate }}
                                         </h3>
                                         @for(saving of savingPots?.clientSavings; track saving; let i =
                                         $index) {
@@ -197,11 +198,14 @@
                                                             </div>
                                                             <div class="d-flex align-items-center gap-10">
                                                                 <h3 class="saving-title">
-                                                                    {{saving.startingPotValue.currencySymbol | currencySymbol}}{{ (saving.startingPotValue.amount) | thousandSeparator}}
+                                                                    {{saving.startingPotValue.currencySymbol |
+                                                                    currencySymbol}}{{ (saving.startingPotValue.amount)
+                                                                    | thousandSeparator}}
                                                                 </h3>
                                                                 <span
                                                                     [className]="saving.realReturn >= 0 ? 'badge green' : 'badge red'">
-                                                                    @if(saving.realReturn >= 0){+}{{saving.realReturn | number : '1.0-0'}}%
+                                                                    @if(saving.realReturn >= 0){+}{{saving.realReturn |
+                                                                    number : '1.0-0'}}%
                                                                 </span>
                                                             </div>
                                                         </div>
@@ -223,9 +227,9 @@
                                                         class="d-flex align-items-center justify-content-center flex-column gap-10 h-100">
                                                         <img src="assets/images/svgs/cashflow-lock-icon.svg"
                                                             alt="cashflow-lock-icon">
-                                                        <h4 style="color: white;">Locked from
+                                                        <h4 style="color: white;">>{{ 'Locked from' | translate }}<
                                                             {{saving.lockedFrom.year}}
-                                                            to
+                                                            {{ 'to' | translate }}
                                                             {{saving.lockedTill.year}}</h4>
                                                     </div>
                                                     <div class="help-lock-overlay">
@@ -261,7 +265,8 @@
                                                         alt="clock" />
                                                 </div>
                                                 <div class="d-flex flex-column justify-content-between gap-4">
-                                                    <h4 class="page-title f-w-500">Incomes & Expenses</h4>
+                                                    <h4 class="page-title f-w-500">{{ 'Incomes & Expenses' | translate
+                                                        }}</h4>
                                                     <span class="sub-title">{{client.clientDetails.firstName}}
                                                         {{client.clientDetails.lastName}}</span>
                                                 </div>
@@ -285,10 +290,13 @@
                                             <div class="col-3">
                                                 <div class="d-flex flex-column gap-8">
                                                     <div class="d-flex align-items-center gap-8">
-                                                        <img src="assets/images/svgs/income-money-receive.svg" alt="income-money-receive" />
-                                                        <h3 class="card-title expense-income">Incomes</h3>
+                                                        <img src="assets/images/svgs/income-money-receive.svg"
+                                                            alt="income-money-receive" />
+                                                        <h3 class="card-title expense-income">{{ 'Incomes' | translate }}</h3>
                                                     </div>
-                                                    <h3 class="saving-title">+{{client?.clientDetails?.preferredCurrency | currencySymbol}}{{(incomeExpense?.totalIncome ?? 0) | thousandSeparator}}
+                                                    <h3 class="saving-title">+{{client?.clientDetails?.preferredCurrency
+                                                        | currencySymbol}}{{(incomeExpense?.totalIncome ?? 0) |
+                                                        thousandSeparator}}
                                                     </h3>
                                                 </div>
                                             </div>
@@ -298,10 +306,13 @@
                                             <div class="col-3">
                                                 <div class="d-flex flex-column gap-8">
                                                     <div class="d-flex align-items-center gap-8">
-                                                        <img src="assets/images/svgs/income-money-send.svg" alt="income-money-send" />
-                                                        <h3 class="card-title expenses-deduct">Expenses</h3>
+                                                        <img src="assets/images/svgs/income-money-send.svg"
+                                                            alt="income-money-send" />
+                                                        <h3 class="card-title expenses-deduct">{{ 'Expenses' | translate }}</h3>
                                                     </div>
-                                                    <h3 class="saving-title">-{{client?.clientDetails?.preferredCurrency|currencySymbol}}{{(incomeExpense?.totalExpenses ?? 0)|thousandSeparator}}
+                                                    <h3 class="saving-title">
+                                                        -{{client?.clientDetails?.preferredCurrency|currencySymbol}}{{(incomeExpense?.totalExpenses
+                                                        ?? 0)|thousandSeparator}}
                                                     </h3>
                                                 </div>
                                             </div>
@@ -311,12 +322,15 @@
                                             <div class="col-3">
                                                 <div class="d-flex flex-column gap-8">
                                                     <div class="d-flex align-items-center gap-8">
-                                                        <img src="assets/images/svgs/income-dollar-icon.svg" alt="income-dollar-icon" />
-                                                        <h3 class="card-title expenses-total">Total</h3>
+                                                        <img src="assets/images/svgs/income-dollar-icon.svg"
+                                                            alt="income-dollar-icon" />
+                                                        <h3 class="card-title expenses-total">{{ 'Total' | translate }}</h3>
                                                     </div>
-                                                    <h3 class="saving-title">={{(incomeExpense?.total ?? 0) < 0 ? '-' : ''}}{{client?.clientDetails?.preferredCurrency|currencySymbol}}{{((incomeExpense?.total ?? 0) < 0 
-                                                            ? ((incomeExpense?.total ?? 0))*(-1) 
-                                                            : (incomeExpense?.total ?? 0))|thousandSeparator}}</h3>
+                                                    <h3 class="saving-title">={{(incomeExpense?.total ?? 0) < 0 ? '-'
+                                                            : ''
+                                                            }}{{client?.clientDetails?.preferredCurrency|currencySymbol}}{{((incomeExpense?.total
+                                                            ?? 0) < 0 ? ((incomeExpense?.total ?? 0))*(-1) :
+                                                            (incomeExpense?.total ?? 0))|thousandSeparator}}</h3>
                                                 </div>
                                             </div>
                                             <!-- Divider  -->
@@ -326,19 +340,22 @@
                                                 <div class="d-flex flex-column gap-8">
                                                     <div class="d-flex align-items-center gap-8">
                                                         @if((incomeExpense?.savingRate ?? 0) > 0) {
-                                                        <img src="assets/images/svgs/income-discount.svg" alt="income-discount" />
-                                                        }
-                                                        @else {
-                                                        <img class="red" src="assets/images/svgs/income-discount-red.svg"
+                                                        <img src="assets/images/svgs/income-discount.svg"
                                                             alt="income-discount" />
                                                         }
-                                                    
+                                                        @else {
+                                                        <img class="red"
+                                                            src="assets/images/svgs/income-discount-red.svg"
+                                                            alt="income-discount" />
+                                                        }
+
                                                         <h3
                                                             [ngClass]="(incomeExpense?.savingRate ?? 0) > 0 ? 'card-title green' : 'card-title red'">
-                                                            Saving rate</h3>
+                                                            >{{ 'Saving rate' | translate }}<</h3>
                                                     </div>
                                                     <h3
-                                                        [ngClass]="(incomeExpense?.savingRate ?? 0) > 0 ? 'saving-title green' : 'saving-title red'">{{(incomeExpense?.savingRate ?? 0)|number : '1.0-0'}}%</h3>
+                                                        [ngClass]="(incomeExpense?.savingRate ?? 0) > 0 ? 'saving-title green' : 'saving-title red'">
+                                                        {{(incomeExpense?.savingRate ?? 0)|number : '1.0-0'}}%</h3>
                                                 </div>
                                             </div>
                                         </div>
@@ -349,7 +366,7 @@
                                     }
                                     @else {
                                     <img src="assets/images/shapes/sad-feedback-icon.png" alt="smile-emoji">
-                                    
+
                                     }
                                     <!-- End Emoji  -->
                                 </div>
@@ -362,7 +379,7 @@
                                     <mat-card class="clientTableContainer">
                                         <div class="heading-btn-wrapper">
                                             <div class="d-flex flex-column gap-12">
-                                                <h3>Incomes</h3>
+                                                <h3>{{ 'Incomes' | translate }}</h3>
                                             </div>
                                         </div>
                                         <div class="table-main-wrapper">
@@ -372,7 +389,7 @@
                                                     <ng-container matColumnDef="position">
                                                         <th mat-header-cell *matHeaderCellDef
                                                             class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-client">
-                                                            Description
+                                                            >{{ 'Description' | translate }}<
                                                         </th>
                                                         <td mat-cell *matCellDef="let element"
                                                             class="p-x-24 f-s-14 p-l-0 column-client">
@@ -381,7 +398,7 @@
                                                     <ng-container matColumnDef="name">
                                                         <th mat-header-cell *matHeaderCellDef
                                                             class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-net-amount">
-                                                            Net amount
+                                                            {{ 'Net amount' | translate }}
                                                         </th>
                                                         <td mat-cell *matCellDef="let element"
                                                             class="p-x-24 f-s-14 p-l-0 column-net-amount">
@@ -402,7 +419,7 @@
                                     <mat-card class="clientTableContainer">
                                         <div class="heading-btn-wrapper">
                                             <div class="d-flex flex-column gap-12">
-                                                <h3>Expenses</h3>
+                                                <h3>{{ 'Expenses' | translate }}</h3>
                                             </div>
                                         </div>
                                         <div class="table-main-wrapper">
@@ -412,7 +429,7 @@
                                                     <ng-container matColumnDef="position">
                                                         <th mat-header-cell *matHeaderCellDef
                                                             class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-client">
-                                                            Description
+                                                            >{{ 'Description' | translate }}<
                                                         </th>
                                                         <td mat-cell *matCellDef="let element"
                                                             class="p-x-24 f-s-14 p-l-0 column-client">
@@ -422,7 +439,7 @@
                                                     <ng-container matColumnDef="name">
                                                         <th mat-header-cell *matHeaderCellDef
                                                             class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-net-amount">
-                                                            Net amount
+                                                            {{ 'Net amount' | translate }}
                                                         </th>
                                                         <td mat-cell *matCellDef="let element"
                                                             class="p-x-24 f-s-14 p-l-0 column-net-amount">
@@ -459,7 +476,7 @@
                                                         alt="clock" />
                                                 </div>
                                                 <div class="d-flex flex-column justify-content-between gap-4">
-                                                    <h4 class="page-title f-w-500">Contributions & Withdrawals</h4>
+                                                    <h4 class="page-title f-w-500">{{ 'Contributions & Withdrawals' | translate }}</h4>
                                                     <span class="sub-title">{{client.clientDetails.firstName}}
                                                         {{client.clientDetails.lastName}}</span>
                                                 </div>
@@ -481,7 +498,7 @@
                                     <mat-card class="clientTableContainer">
                                         <div class="heading-btn-wrapper">
                                             <div class="d-flex flex-column gap-12">
-                                                <h3>Contributions</h3>
+                                                <h3>>{{ 'Contributions' | translate }}<</h3>
                                             </div>
                                         </div>
                                         <div class="table-main-wrapper">
@@ -491,7 +508,7 @@
                                                     <ng-container matColumnDef="position">
                                                         <th mat-header-cell *matHeaderCellDef
                                                             class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-client">
-                                                            Description
+                                                            >{{ 'Description' | translate }}<
                                                         </th>
                                                         <td mat-cell *matCellDef="let element"
                                                             class="p-x-24 f-s-14 p-l-0 column-client">
@@ -500,7 +517,7 @@
                                                     <ng-container matColumnDef="name">
                                                         <th mat-header-cell *matHeaderCellDef
                                                             class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-net-amount">
-                                                            Net amount
+                                                            {{ 'Net amount' | translate }}
                                                         </th>
                                                         <td mat-cell *matCellDef="let element"
                                                             class="p-x-24 f-s-14 p-l-0 column-net-amount">
@@ -520,7 +537,7 @@
                                     <mat-card class="clientTableContainer">
                                         <div class="heading-btn-wrapper">
                                             <div class="d-flex flex-column gap-12">
-                                                <h3>Withdrawals</h3>
+                                                <h3>>{{ 'Withdrawals' | translate }}<</h3>
                                             </div>
                                         </div>
                                         <div class="table-main-wrapper">
@@ -530,7 +547,7 @@
                                                     <ng-container matColumnDef="position">
                                                         <th mat-header-cell *matHeaderCellDef
                                                             class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-client">
-                                                            Description
+                                                            >{{ 'Description' | translate }}<
                                                         </th>
                                                         <td mat-cell *matCellDef="let element"
                                                             class="p-x-24 f-s-14 p-l-0 column-client">
@@ -539,7 +556,7 @@
                                                     <ng-container matColumnDef="name">
                                                         <th mat-header-cell *matHeaderCellDef
                                                             class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-net-amount">
-                                                            Net amount
+                                                            {{ 'Net amount' | translate }}
                                                         </th>
                                                         <td mat-cell *matCellDef="let element"
                                                             class="p-x-24 f-s-14 p-l-0 column-net-amount">
@@ -575,7 +592,8 @@
                                                         alt="clock" />
                                                 </div>
                                                 <div class="d-flex flex-column justify-content-between gap-4">
-                                                    <h4 class="page-title f-w-500">Lifetime Plan</h4>
+                                                    <h4 class="page-title f-w-500">{{ 'Lifetime Plan' | translate }}
+                                                    </h4>
                                                     <span class="sub-title">{{client.clientDetails.firstName}}
                                                         {{client.clientDetails.lastName}}</span>
                                                 </div>
@@ -589,9 +607,7 @@
                         <mat-card class="cardWithShadow">
                             <mat-card-content>
                                 <div class="d-flex flex-column gap-32">
-                                    <app-view-savings-bar-stacked-chart 
-                                        [report]="report"
-                                        [client]="client"
+                                    <app-view-savings-bar-stacked-chart [report]="report" [client]="client"
                                         [forecastStartDate]="financialTimeline.forecastStartDate"
                                         [forecastEndDate]="financialTimeline.forecastEndtDate"
                                         [cashFlowName]="cashflow?.name">

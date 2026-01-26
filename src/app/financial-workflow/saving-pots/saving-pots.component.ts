@@ -39,6 +39,7 @@ import { AuthService } from 'src/app/auth/services/auth.service';
 import { SettingsService } from 'src/app/default-preferance/services/default-preferance.http.service';
 import { Store } from '@ngrx/store';
 import { selectedClient } from 'src/app/store/client/client.selectors';
+import { TranslateModule } from '@ngx-translate/core';
 @Component({
   selector: 'app-saving-pots',
   imports: [
@@ -55,7 +56,8 @@ import { selectedClient } from 'src/app/store/client/client.selectors';
     CommonModule,
     FormsModule,
     CurrencySymbolPipe,
-    ThousandSeparatorPipe
+    ThousandSeparatorPipe,
+    TranslateModule
   ],
 
   templateUrl: './saving-pots.component.html',
@@ -164,7 +166,6 @@ export class SavingPotsComponent implements OnInit {
         ),
         tap(([client, cashflow]) => {
           this.selectedClient = client as Client;
-          console.log(cashflow);
           this.selectedCashflow = cashflow as Cashflow;
         }),
         switchMap(([client, cashflow]) => {
@@ -182,7 +183,6 @@ export class SavingPotsComponent implements OnInit {
           ]);
         }),
         tap(([savingPots, timeline, amountCycles, escalationRatesResponse]) => {
-          console.log(timeline, amountCycles, escalationRatesResponse);
           // this.savingPots = savingPots;
             this.savingPots = {
             ...savingPots,
@@ -196,8 +196,6 @@ export class SavingPotsComponent implements OnInit {
           this.escalationRates = escalationRatesResponse?.escalationRates;
           this.isLoaderVisible = false;
 
-
-    console.log("kjdjai")
     console.log(this.savingPots)
         })
       )
@@ -406,7 +404,7 @@ updateOrderNumbers() {
         loggedInUserPreferences : this.loggedInUserPreferences,
         amountCycles: this.amountCycles,
         escalataionRates: this.escalationRates,
-        eventsList: this.timeline.clientEvents.sort((a, b) => a.start.age - b.start.age),
+        eventsList: [...this.timeline.clientEvents].sort((a, b) => a.start.age - b.start.age),
         clientBirthDate: this.selectedClient?.clientDetails.birthDate,
         clientPreferredCurrency:
           this.selectedClient?.clientDetails.preferredCurrency,
@@ -420,7 +418,26 @@ updateOrderNumbers() {
 
     dialogRef.afterClosed().subscribe((result: any) => {
       console.log('Dialog closed with result:', result);
-      this.savingPots = result.savingPot;
+      // this.savingPots = result?.savingPot;
+      if (!result?.clientSaving) return;
+
+      const updatedSaving = result.clientSaving;
+
+      const list = [...this.savingPots.clientSavings];
+      const index = list.findIndex(x => x.id === updatedSaving.id);
+
+      if (index === -1) return;
+
+      list[index] = {
+        ...list[index],
+        ...updatedSaving
+      };
+
+      this.savingPots = {
+        ...this.savingPots,
+        // clientSavings: list
+        clientSavings: [...this.savingPots.clientSavings]
+      };
       this.ensureCashFirst();
       // this.savingPots.clientSavings.push(result.clientSaving);
     });
@@ -438,7 +455,7 @@ updateOrderNumbers() {
   }
   
   newEventClicked() {
-    console.log(this.timeline.clientEvents)
+    console.log("newEventClicked() called")
     const dialogRef = this.dialog.open(AddNewPotComponent, {
       width: '700px',
       disableClose: true,
@@ -484,6 +501,12 @@ private ensureCashFirst(): void {
     this.savingPots.clientSavings = [...list];
     this.updateOrderNumbers(); // persist the invariant
   }
+}
+
+formatReturnRate(rate: number): string {
+  if (rate == null) return '0';
+  const rounded = Math.round(rate * 10) / 10;
+  return rounded % 1 === 0 ? rounded.toFixed(0) : rounded.toString();
 }
 
 }

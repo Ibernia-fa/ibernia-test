@@ -11,6 +11,7 @@ import { Cashflow } from '../../models/cashflow';
 import { catchError, filter } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-add-model-dialog',
@@ -21,7 +22,8 @@ import { Router } from '@angular/router';
     MatInputModule,
     MatIconModule,
     MatInputModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    TranslateModule
   ],  templateUrl: './add-model-dialog.component.html',
   styleUrl: './add-model-dialog.component.scss'
 })
@@ -42,7 +44,8 @@ export class AddModelDialogComponent {
 
   initForm() {
     this.form = this.fb.group({
-      name: ['Lifetime Plan', Validators.required],
+      // name: ['Lifetime Plan', Validators.required],
+      name: ['', Validators.required],
       description: ['']
     });
   }

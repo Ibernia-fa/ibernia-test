@@ -13,6 +13,7 @@ import { Client } from 'src/app/clients/models/client';
 import { Cashflow } from 'src/app/clients/models/cashflow';
 import { FinancialWorkflowService } from '../services/financial-workflow.service';
 import { ShareReportHttpService, ClientReportRequest } from './services/share-report.service';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-share-report',
@@ -23,7 +24,8 @@ import { ShareReportHttpService, ClientReportRequest } from './services/share-re
     MatSelectModule,
     MatIconModule,
     MatButtonModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    TranslateModule
   ],
   templateUrl: './share-report.component.html',
   styleUrl: './share-report.component.scss',

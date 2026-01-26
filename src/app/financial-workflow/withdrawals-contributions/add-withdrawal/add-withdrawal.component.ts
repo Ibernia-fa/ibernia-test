@@ -21,6 +21,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-add-withdrawal',
@@ -38,7 +39,8 @@ import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-sep
     ReactiveFormsModule,
     MatCheckboxModule,
     ThousandSeparatorPipe,
-    ThousandSeparatorInputDirective
+    ThousandSeparatorInputDirective,
+    TranslateModule
   ],
   providers: [provideNativeDateAdapter()],
   templateUrl: './add-withdrawal.component.html',
@@ -60,6 +62,7 @@ export class AddWithdrawalComponent {
   savingPots: SavingPotsModel;
   eventsList: any;
   selectedEscalationDescription: string;
+  currentYear: number = new Date().getFullYear();
 
   constructor(
     private dialogRef: MatDialogRef<AddWithdrawalComponent>,
@@ -102,13 +105,13 @@ export class AddWithdrawalComponent {
     this.withdrawalForm = this.fb.group({
       description: ['', Validators.required],
       currencySymbol: [this.clientPreferredCurrency, [Validators.required]],
-      amount: [0, [Validators.required, Validators.min(0)]],
+      amount: ['', [Validators.required, Validators.min(0)]],
       cycle: [this.cycles[1].id, Validators.required],
       start: ['', Validators.required],
       end: [''],
       savingPot: [''],
       escalationRate: [this.escalationRates[0].value, Validators.required],
-      customEscalationRate: [0],
+      customEscalationRate: [''],
       commissions: [false],
       commissionPercentage: [0],
     });
