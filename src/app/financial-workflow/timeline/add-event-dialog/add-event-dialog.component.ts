@@ -135,8 +135,6 @@ export class AddEventDialogComponent {
       // not allow edit base name
       if (this.isEditWorkflow && !this.AUTO_RENAME_EVENTS.includes(this.data.patchEvent.name)) {
         this.isAllowRename = true;
-
-        alert();
       }
 
       // not changeable event type (income/expense)
