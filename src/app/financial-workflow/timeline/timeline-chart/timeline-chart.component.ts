@@ -778,7 +778,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
         escalataionRates: this.escalationRates,
         customEvents: this.customEventsLibrary,
         timelineId: this.financialTimeline.id,
-        isIncomeEvent: true,
+        isIncomeEvent: clientEvent.type === EventIncomeType.Income,
         cashflowId: this.financialTimeline.cashflow.id,
         clientBirthDate: this.clientBirthDate,
         clientPreferredCurrency: this.client.clientDetails.preferredCurrency,
