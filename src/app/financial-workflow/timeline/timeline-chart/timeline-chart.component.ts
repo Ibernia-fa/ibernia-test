@@ -254,12 +254,19 @@ export class TimelineChartComponent implements OnInit, OnChanges {
     };
 
     if (this.draggedEvent.isPlaceHolder) {
-      const clientEvent: ClientEvent = this.draggedEvent;
+      const clientEvent: ClientEvent = {
+        ...this.draggedEvent
+      };
+
+      if (clientEvent.name === 'Birth') {
+        clientEvent.name = this.getNextBirthName();
+      }
 
       clientEvent.start = {
         year: moment(dropTime).year(),
         age: moment(dropTime).year() - moment(this.clientBirthDate).year(),
       };
+
       clientEvent.id = "";
 
       this.timelineHttpService
@@ -293,8 +300,8 @@ export class TimelineChartComponent implements OnInit, OnChanges {
           this.draggedEvent = null;
         });
 
-        this.draggedEvent = null;
-        return;
+      this.draggedEvent = null;
+      return;
     }
 
     const dialogRef = this.dialog.open(AddEventDialogComponent, {
@@ -466,9 +473,9 @@ export class TimelineChartComponent implements OnInit, OnChanges {
       event.event.stopPropagation();
       if (event.event.type === 'dblclick') {
         var clientEvent = this.financialTimeline.clientEvents.find(ce => ce.id === event.item);
-        if (clientEvent)
-          this.updateEventByDoubleClick(clientEvent);
 
+        if (clientEvent && !clientEvent.isPlaceHolder)
+          this.updateEventByDoubleClick(clientEvent);
       }
     });
   }
@@ -990,5 +997,14 @@ export class TimelineChartComponent implements OnInit, OnChanges {
     );
 
     this.cdr.detectChanges();
+  }
+
+  private getNextBirthName(): string {
+    const birthEvents = this.financialTimeline.clientEvents
+      .filter(e => e.name.startsWith('Birth'));
+
+    if (birthEvents.length === 0) return 'Birth';
+
+    return `Birth ${birthEvents.length + 1}`;
   }
 }
