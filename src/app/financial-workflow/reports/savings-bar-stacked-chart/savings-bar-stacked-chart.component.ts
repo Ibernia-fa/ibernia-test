@@ -128,8 +128,26 @@ export class SavingsBarStackedChartComponent implements OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['report'] && this.report?.series?.length) {
-      const seriesList = this.report.series;
+    if (!this.report?.series?.length) {
+      if (changes['client'] && this.client) {
+        this.chartOptions.yaxis = {
+          title: {
+            text: this.client.clientDetails.preferredCurrency
+          },
+          labels: {
+            formatter: (value: any) => {
+              return value?.toLocaleString();
+            }
+          }
+        };
+      }
+      return;
+    }
+
+    const report = this.report;
+
+    if (changes['report']) {
+      const seriesList = report.series;
       const seriesColors = this.chartOptions.colors || [];
 
       // dynamically build fillColors array based on series names
@@ -162,7 +180,7 @@ export class SavingsBarStackedChartComponent implements OnChanges {
       };
 
       // goals and events dots
-      this.events = this.report.timelineEvents;
+      this.events = report.timelineEvents ?? [];
 
       if (this.events.length > 0) {
         this.chartOptions.annotations = { points: this.buildEventAnnotations(this.events) };
@@ -172,10 +190,14 @@ export class SavingsBarStackedChartComponent implements OnChanges {
 
     this.chartOptions.chart = { ...this.chartOptions.chart };
 
-    if (changes['forecastStartDate'] || changes['forecastEndDate']) {
+    if (
+      (changes['forecastStartDate'] || changes['forecastEndDate']) &&
+      this.forecastStartDate &&
+      this.forecastEndDate
+    ) {
       this.chartOptions.xaxis = {
         type: 'category', // Treat x-axis as numbers (years)
-        categories: this.report.categories,
+        categories: report.categories ?? [],
         stepSize: 5, // Each year is a distinct tick
         tickAmount: Math.floor((moment(this.forecastEndDate).year() - moment(this.forecastStartDate).year()) / 5),
         style: {
@@ -198,10 +220,10 @@ export class SavingsBarStackedChartComponent implements OnChanges {
     }
 
     // final series assignment
-    this.chartOptions.series = this.report.series.map((s, idx) => ({
+    this.chartOptions.series = report.series.map((s, idx) => ({
       ...s,
       tack: 'stack1',
-      order: s.name === 'Emergency Expense' ? this.report.series.length : idx,
+      order: s.name === 'Emergency Expense' ? report.series.length : idx,
       fill: {
         opacity: 1
       },
