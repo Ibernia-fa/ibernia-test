@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, ElementRef, Inject, ViewChild } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -47,6 +47,7 @@ import { TranslateModule } from '@ngx-translate/core';
   styleUrl: './add-withdrawal.component.scss',
 })
 export class AddWithdrawalComponent {
+  @ViewChild('amountInput') amountInput?: ElementRef<HTMLInputElement>;
   withdrawalForm: FormGroup;
   countries = allCountries;
   cycles: Cycle[];
@@ -131,6 +132,14 @@ export class AddWithdrawalComponent {
       this.withdrawalForm
         .get('amount')
         ?.patchValue(this.selectedWithdrawal.amount.amount);
+      // Ensure the patched amount displays with thousand separators immediately
+      setTimeout(() => {
+        const el = this.amountInput?.nativeElement;
+        const amount = this.withdrawalForm.get('amount')?.value;
+        if (!el || amount === null || amount === undefined || amount === '') return;
+        el.value = Number(amount).toLocaleString('en-US');
+        el.dispatchEvent(new Event('blur'));
+      });
       this.withdrawalForm
         .get('cycle')
         ?.patchValue(this.selectedWithdrawal.amount.cycle?.id);

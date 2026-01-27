@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, ElementRef, Inject, ViewChild } from '@angular/core';
 import {
   MAT_DIALOG_DATA,
   MatDialogModule,
@@ -57,6 +57,7 @@ TranslateModule
   styleUrl: './add-expense.component.scss',
 })
 export class AddExpenseComponent {
+  @ViewChild('amountInput') amountInput?: ElementRef<HTMLInputElement>;
   // ...existing code...
   onAmountInput(rawValue: string) {
     // Use shared utility to parse formatted number
@@ -145,6 +146,14 @@ export class AddExpenseComponent {
       this.expenseForm
         .get('amount')
         ?.patchValue(this.selectedExpense.amount.amount);
+      // Ensure the patched amount displays with thousand separators immediately
+      setTimeout(() => {
+        const el = this.amountInput?.nativeElement;
+        const amount = this.expenseForm.get('amount')?.value;
+        if (!el || amount === null || amount === undefined || amount === '') return;
+        el.value = Number(amount).toLocaleString('en-US');
+        el.dispatchEvent(new Event('blur'));
+      });
       this.expenseForm
         .get('cycle')
         ?.patchValue(this.selectedExpense.amount.cycle?.id);

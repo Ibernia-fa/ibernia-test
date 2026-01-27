@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, ElementRef, Inject, ViewChild } from '@angular/core';
 import {
   MAT_DIALOG_DATA,
   MatDialogModule,
@@ -58,6 +58,7 @@ import { TranslateModule } from '@ngx-translate/core';
   styleUrl: './add-income.component.scss',
 })
 export class AddIncomeComponent {
+  @ViewChild('amountInput') amountInput?: ElementRef<HTMLInputElement>;
   eventsList: any[] = [];
   incomeForm: FormGroup;
   countries = allCountries;
@@ -138,6 +139,14 @@ export class AddIncomeComponent {
       this.incomeForm
         .get('amount')
         ?.patchValue(this.selectedIncome.amount.amount);
+      // Ensure the patched amount displays with thousand separators immediately
+      setTimeout(() => {
+        const el = this.amountInput?.nativeElement;
+        const amount = this.incomeForm.get('amount')?.value;
+        if (!el || amount === null || amount === undefined || amount === '') return;
+        el.value = Number(amount).toLocaleString('en-US');
+        el.dispatchEvent(new Event('blur'));
+      });
       this.incomeForm
         .get('cycle')
         ?.patchValue(this.selectedIncome.amount.cycle?.id);
