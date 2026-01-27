@@ -8,7 +8,12 @@ import {
   ValidationErrors,
   Validators,
 } from '@angular/forms';
-import { provideNativeDateAdapter } from '@angular/material/core';
+import {
+  DateAdapter,
+  MAT_DATE_FORMATS,
+  MAT_DATE_LOCALE,
+  NativeDateAdapter,
+} from '@angular/material/core';
 import {
   MAT_DATE_RANGE_SELECTION_STRATEGY,
   MatDatepickerModule,
@@ -33,6 +38,35 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { SettingsService } from 'src/app/default-preferance/services/default-preferance.http.service';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { TranslateModule } from '@ngx-translate/core';
+import { MY_DATE_FORMATS } from 'src/app/shared/utils/custom-date-formatter';
+
+class DmyDateAdapter extends NativeDateAdapter {
+  override parse(value: any): Date | null {
+    if (value instanceof Date) {
+      return value;
+    }
+
+    if (typeof value === 'string') {
+      const digits = value.replace(/\D/g, '').slice(0, 8);
+      if (digits.length === 8) {
+        const day = Number(digits.slice(0, 2));
+        const month = Number(digits.slice(2, 4));
+        const year = Number(digits.slice(4, 8));
+        const date = new Date(year, month - 1, day);
+        if (
+          date.getFullYear() === year &&
+          date.getMonth() === month - 1 &&
+          date.getDate() === day
+        ) {
+          return date;
+        }
+        return null;
+      }
+    }
+
+    return super.parse(value);
+  }
+}
 
 @Component({
   selector: 'app-client-add',
@@ -54,7 +88,9 @@ import { TranslateModule } from '@ngx-translate/core';
   providers: [
     ClientHttpService,
     ToastrService,
-    provideNativeDateAdapter(),
+    { provide: DateAdapter, useClass: DmyDateAdapter },
+    { provide: MAT_DATE_LOCALE, useValue: 'en-GB' },
+    { provide: MAT_DATE_FORMATS, useValue: MY_DATE_FORMATS },
     {
       provide: MAT_DATE_RANGE_SELECTION_STRATEGY,
       useClass: FiveDayRangeSelectionStrategy,
