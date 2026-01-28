@@ -42,7 +42,7 @@ import { CommonModule } from '@angular/common';
 import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 @Component({
   selector: 'app-add-new-pot',
   imports: [
@@ -127,7 +127,8 @@ export class AddNewPotComponent {
     private dialogRef: MatDialogRef<AddNewPotComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private fb: FormBuilder,
-    private savingPotsHttpService: SavingsPotsHttpService
+    private savingPotsHttpService: SavingsPotsHttpService,
+    private translate: TranslateService
   ) {
     this.loggedInUserPreferences = data.loggedInUserPreferences;
     console.log('loggedin user preferences', this.loggedInUserPreferences);
@@ -226,11 +227,12 @@ export class AddNewPotComponent {
 
 onAmountBlur(e: Event) {
   const c = this.savingsForm.get('amount')!;
-  const num = Number(String(c.value).replace(/,/g, ''));
-  if (!isNaN(num)) {
-    c.setValue(num, { emitEvent: false }); // model stays numeric
-    (e.target as HTMLInputElement).value = num.toLocaleString('en-US');
-  }
+  const rawValue = (e.target as HTMLInputElement).value;
+  const num = parseFormattedNumber(rawValue);
+  c.setValue(num, { emitEvent: false }); // model stays numeric
+
+  const locale = this.translate.currentLang === 'it' ? 'it-IT' : 'en-US';
+  (e.target as HTMLInputElement).value = num.toLocaleString(locale);
 }
 
 
@@ -513,10 +515,7 @@ onEscalationRateChange(event: MatSelectChange): void {
   }
 
   onAmountInput(rawValue: string) {
-    if (rawValue == null) rawValue = '';
-    const cleaned = rawValue.replace(/[^0-9.]/g, '');
-    const parsed = cleaned === '' ? 0 : parseFloat(cleaned);
-    const value = isNaN(parsed) ? 0 : parsed;
+    const value = parseFormattedNumber(rawValue ?? '');
     this.savingsForm.get('amount')?.setValue(value, { emitEvent: true });
     this.amount = value;
   }
