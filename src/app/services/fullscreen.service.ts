@@ -10,7 +10,7 @@ export interface FullscreenData {
   forecastStartDate: Date;
   forecastEndDate: Date;
   cashFlowName: string;
-  isComparison?: boolean;
+  // isComparison?: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
