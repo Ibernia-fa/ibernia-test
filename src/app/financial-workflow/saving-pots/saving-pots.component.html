@@ -49,7 +49,7 @@
                                             </div>
                                             <div class="d-flex align-items-center gap-10">
                                                 <h3 class="saving-title">
-                                                    {{selectedClient?.clientDetails?.preferredCurrency|currencySymbol}}{{(savingPots?.totalSavings
+                                                    {{selectedClient?.clientDetails?.preferredCurrency|currencySymbol}}{{(total
                                                     ?? 0)|thousandSeparator}}</h3>
                                                 <!-- <span
                                                     [ngClass]="savingPots.totalGwothRate >= 0 ? 'badge green' : 'badge red'">{{savingPots.totalGwothRate
@@ -155,11 +155,10 @@
                                                         {{selectedClient?.clientDetails?.preferredCurrency|currencySymbol}}{{saving.startingPotValue.amount|thousandSeparator}}
                                                     </h3>
                                                     <span
-                                                        [className]="saving.realReturn >= 0 ? 'badge green' : 'badge red'">
+                                                        [className]="saving.returnRate > 0 ? 'badge green' : 'badge red'">
                                                         <!-- @if(saving.realReturn >= 0){+}{{saving.realReturn | number :
                                                         '1.2-2'}}% -->
-                                                        @if(saving.realReturn >= 0){+}{{saving.realReturn | number :
-                                                        '1.0-0'}}%
+                                                        @if(saving.returnRate >= 0){+}{{formatReturnRate(saving.returnRate)}}%
                                                     </span>
                                                     <!-- <span>
                                                         NV: {{saving.nominalValue | thousandSeparator}}

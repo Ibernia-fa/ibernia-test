@@ -10,7 +10,9 @@ export interface FullscreenData {
   forecastStartDate: Date;
   forecastEndDate: Date;
   cashFlowName: string;
-  // isComparison?: boolean;
+  isComparison?: boolean;
+  hasShortfall: boolean;
+  firstShortfallAge: number | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -38,7 +40,7 @@ export class FullscreenService {
     this.isFullscreenSubject.next(true);
     this.fullscreenDataSubject.next(data);
     
-    this.createOverlay();
+    this.createOverlay(data);
     document.body.style.overflow = 'hidden';
     
     // Initialize chart immediately after creating overlay
@@ -54,7 +56,7 @@ export class FullscreenService {
     document.body.style.overflow = '';
   }
 
-  private createOverlay(): void {
+  private createOverlay(data: FullscreenData): void {
     // Create overlay element
     this.overlayElement = this.renderer.createElement('div');
     this.renderer.addClass(this.overlayElement, 'global-fullscreen-overlay');
@@ -82,13 +84,72 @@ export class FullscreenService {
     this.renderer.appendChild(closeButton, closeIcon);
     this.renderer.appendChild(headerDiv, title);
     this.renderer.appendChild(headerDiv, closeButton);
+
+    const statusRow = this.renderer.createElement('div');
+    this.renderer.addClass(statusRow, 'global-fullscreen-status-row');
+
+    const statusWrapper = this.renderer.createElement('div');
+    this.renderer.addClass(statusWrapper, 'global-fullscreen-shortfall');
+    this.renderer.addClass(statusWrapper, 'shortfall');
+
+  if (!data.hasShortfall) {
+    const statusDiv = this.renderer.createElement('div');
+    this.renderer.addClass(statusDiv, 'shortfall-status-profit');
+
+    const iconSpan = this.renderer.createElement('span');
+    this.renderer.addClass(iconSpan, 'icon-bg');
+    this.renderer.addClass(iconSpan, 'leaf-bg');
+
+    const img = this.renderer.createElement('img');
+    this.renderer.setAttribute(img, 'src', '../../../assets/images/svgs/leaf.svg');
+    this.renderer.setAttribute(img, 'alt', 'leaf');
+    this.renderer.addClass(img, 'icon-svg');
+    this.renderer.appendChild(iconSpan, img);
+
+    const textSpan = this.renderer.createElement('span');
+    this.renderer.addClass(textSpan, 'status-text');
+    this.renderer.setProperty(textSpan, 'textContent', 'Goals on track and funded');
+
+    this.renderer.appendChild(statusDiv, iconSpan);
+    this.renderer.appendChild(statusDiv, textSpan);
+    this.renderer.appendChild(statusWrapper, statusDiv);
+  } else {
+    const statusDiv = this.renderer.createElement('div');
+    this.renderer.addClass(statusDiv, 'shortfall-status-loss');
+
+    const iconSpan = this.renderer.createElement('span');
+    this.renderer.addClass(iconSpan, 'icon-bg');
+    this.renderer.addClass(iconSpan, 'flag-bg');
+
+    const img = this.renderer.createElement('img');
+    this.renderer.setAttribute(img, 'src', '../../../assets/images/svgs/triangle-flag.svg');
+    this.renderer.setAttribute(img, 'alt', 'flag');
+    this.renderer.addClass(img, 'icon-svg');
+    this.renderer.appendChild(iconSpan, img);
+
+    const textSpan = this.renderer.createElement('span');
+    this.renderer.addClass(textSpan, 'status-text');
+    this.renderer.setProperty(
+      textSpan,
+      'textContent',
+      `Savings hit zero at ${data.firstShortfallAge}`
+    );
+
+    this.renderer.appendChild(statusDiv, iconSpan);
+    this.renderer.appendChild(statusDiv, textSpan);
+    this.renderer.appendChild(statusWrapper, statusDiv);
+  }
+
+  this.renderer.appendChild(statusRow, statusWrapper);
+
+  this.renderer.appendChild(contentDiv, headerDiv);
+  this.renderer.appendChild(contentDiv, statusRow);
     
     // Create chart container
     const chartContainer = this.renderer.createElement('div');
     this.renderer.addClass(chartContainer, 'global-fullscreen-chart-container');
     this.renderer.setProperty(chartContainer, 'id', 'global-fullscreen-chart');
     
-    this.renderer.appendChild(contentDiv, headerDiv);
     this.renderer.appendChild(contentDiv, chartContainer);
     this.renderer.appendChild(this.overlayElement, contentDiv);
     

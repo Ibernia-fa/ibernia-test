@@ -254,7 +254,9 @@ export class ReportsComponent {
         (this.compareTimeline?.forecastEndtDate || this.financialTimeline.forecastEndtDate) :
         this.financialTimeline.forecastEndtDate,
       cashFlowName: this.cashflow?.name || 'Error',
-      isComparison: isComparison
+      isComparison: isComparison,
+      hasShortfall: this.hasShortfall,
+      firstShortfallAge: this.firstShortfallAge
     };
 
     this.fullscreenService.enterFullscreen(chartData);
@@ -424,7 +426,7 @@ export class ReportsComponent {
 
       const selected = this.cashflows.find(c => c.id === selectedOtherId) || null;
       if (!selected) {
-        this.toaster.error('Selected plan not found', 'Error');
+        // this.toaster.error('Selected plan not found', 'Error');
         return;
       }
 

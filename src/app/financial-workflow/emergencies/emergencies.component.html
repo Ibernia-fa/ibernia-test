@@ -77,7 +77,7 @@
       <div class="d-flex gap-10 flex-wrap">
 
         <div class="card-em-outer" *ngFor="let e of filteredEmergencies; trackBy: trackById">
-          <mat-card class="summary-card item-card" [ngClass]="getCardCssClass(e)">
+          <mat-card class="summary-card item-card cursor-pointer" (click)="onEditClick(e)" [ngClass]="getCardCssClass(e)">
             <div class="d-flex justify-content-between m-b-5">
               <div class="d-flex gap-10 align-items-center">
                 <div [ngClass]="getDotClass(e)"></div>
@@ -89,7 +89,7 @@
 
               <div class="d-flex align-items-center">
                 <button class="hide-button" mat-icon-button (click)="hideEmergency(e)">Hide</button>
-                <button (click)="onEditClick(e)">
+                <button (click)="onEditClick(e); $event.stopPropagation()">
                   <img src="assets/images/svgs/pen-icon.svg" alt="pen-icon" style="height: 18px;"/>
                 </button>
               </div>
@@ -139,7 +139,7 @@
                 <!-- if insurance and not covered show simulation button -->
                 <div class="inner-information">
                   <div class="simulate-button-section">
-                    <button class="simulate-button" mat-icon-button (click)="simulateEmergency(e)">Simulate</button>
+                    <button class="simulate-button" mat-icon-button (click)="simulateEmergency(e); $event.stopPropagation()">Simulate</button>
                   </div>
                 </div>
               </ng-template>

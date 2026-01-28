@@ -74,7 +74,7 @@
                   />
                 </span>
                 <span class="status-text">
-                  Savings hit zero at {{ firstShortfallAge }}
+                  Savings hit zero at {{ firstShortfallAge }} y.o.
                 </span>
               </div>
             </ng-template>
@@ -101,17 +101,47 @@
         </button>
       </ng-container>
 
-      <div class="d-flex flex-column gap-8 m-b-16">
+      <!-- <div class="d-flex flex-column gap-8 m-b-16">
         <div class="d-flex align-items-center justify-content-between w-100 gap-16 flex-wrap"></div>
-      </div>
+      </div> -->
 
-      <div class="d-flex flex-column gap-32">
-        <app-savings-bar-stacked-chart [report]="compareReport" [client]="client"
-          [forecastStartDate]="compareTimeline?.forecastStartDate || financialTimeline.forecastStartDate"
-          [forecastEndDate]="compareTimeline?.forecastEndtDate || financialTimeline.forecastEndtDate"
-          [cashFlowName]="compareReport && compareCashflow ? compareTimeline?.cashflow?.name : ''">
-        </app-savings-bar-stacked-chart>
+      <div class="d-flex flex-column">
+        <div class="shortfall" *ngIf="report">
+            <ng-container *ngIf="!hasShortfall; else lossTpl">
+              <div class="shortfall-status-profit">
+                <span class="icon-bg leaf-bg">
+                  <img
+                    src="../../../assets/images/svgs/leaf.svg"
+                    alt="leaf"
+                    class="icon-svg"
+                  />
+                </span>
+                <span class="status-text">Goals on track and funded</span>
+              </div>
+            </ng-container>
+            <ng-template #lossTpl>
+              <div class="shortfall-status-loss">
+                <span class="icon-bg flag-bg">
+                  <img
+                    src="../../../assets/images/svgs/triangle-flag.svg"
+                    alt="flag"
+                    class="icon-svg"
+                  />
+                </span>
+                <span class="status-text">
+                  Savings hit zero at {{ firstShortfallAge }}
+                </span>
+              </div>
+            </ng-template>
       </div>
+      <div class="chart-component-wrapper">
+        <app-savings-bar-stacked-chart [report]="compareReport" [client]="client"
+        [forecastStartDate]="compareTimeline?.forecastStartDate || financialTimeline.forecastStartDate"
+        [forecastEndDate]="compareTimeline?.forecastEndtDate || financialTimeline.forecastEndtDate"
+        [cashFlowName]="compareReport && compareCashflow ? compareTimeline?.cashflow?.name : ''">
+      </app-savings-bar-stacked-chart>
+    </div>
+    </div>
     </mat-card-content>
   </mat-card>
 

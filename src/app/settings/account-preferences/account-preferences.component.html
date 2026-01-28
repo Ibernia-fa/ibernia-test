@@ -106,8 +106,8 @@
               <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4" matTooltip="Sets the main currency for all new client plans. All figures will be shown in this currency by default, but you can change it for individual clients later.">
             </mat-label>
             <mat-form-field appearance="outline" class="w-100">
-              <mat-select formControlName="country" placeholder="{{ 'Select country' | translate }}" (valueChange)="clientCountryValueChange($event)">
-                @for (country of countries; track country) {
+              <mat-select formControlName="country" placeholder="{{ 'Select country' | translate }}" (selectionChange)="clientCountryValueChange($event.value)">
+                @for (country of countries; track country.countryName) {
                   @if (country.currencySymbol) {
                     <mat-option [value]="country.countryName">{{ country.countryName }}</mat-option>
                   }
@@ -235,11 +235,11 @@
               <input
                 matInput
                 [value]="p.currency?.value || ''"
-                readonly
                 disabled
+                readonly
                 aria-readonly="true"
                 placeholder="—"
-              />
+                />
             </mat-form-field>
                 </div>
             <div class="col-10">
@@ -247,7 +247,16 @@
                 <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4" matTooltip="Sets the standard fixed commission value applied when creating new plans (e.g., €100 per year). This applies to each Saving Pot by default, but you can change it per client if needed.">
               </mat-label>
               <mat-form-field appearance="outline" class="w-100">
-                <input matInput type="number" step="1" formControlName="comissionAmount" placeholder="{{'Enter amount' | translate}}" />
+                <input
+                  matInput
+                  type="text"
+                  formControlName="comissionAmount"
+                  #commissionAmountInput
+                  thousandSeparatorInput
+                  (input)="onCommissionAmountInput($event.target.value)"
+                  (focus)="formatCommissionAmountOnFocus($event)"
+                  placeholder="{{'Enter amount' | translate}}"
+                />
                 <mat-error *ngIf="p.comissionAmount.hasError('required')">{{'Required' | translate}}</mat-error>
                 <mat-error *ngIf="p.comissionAmount.hasError('min')">{{ 'Must be' | translate }} &gt; 0</mat-error>
               </mat-form-field>
@@ -265,7 +274,7 @@
                 disabled
                 aria-readonly="true"
                 placeholder="—"
-              />
+                />
             </mat-form-field>
                 </div>
               <div class="col-5">
@@ -275,7 +284,16 @@
 
               </mat-label>
               <mat-form-field appearance="outline" class="w-100">
-                <input matInput type="number" step="1" formControlName="comissionAmount" placeholder="Enter amount" />
+                <input
+                  matInput
+                  type="text"
+                  formControlName="comissionAmount"
+                  #commissionAmountInput
+                  thousandSeparatorInput
+                  (input)="onCommissionAmountInput($event.target.value)"
+                  (focus)="formatCommissionAmountOnFocus($event)"
+                  placeholder="Enter amount"
+                />
                 <mat-error *ngIf="p.comissionAmount.hasError('required')">{{'Required' | translate}}</mat-error>
                 <mat-error *ngIf="p.comissionAmount.hasError('min')">{{ 'Must be' | translate }} &gt; 0</mat-error>
               </mat-form-field>

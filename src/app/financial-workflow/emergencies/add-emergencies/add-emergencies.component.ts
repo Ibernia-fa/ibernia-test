@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, ElementRef, Inject, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { CommonModule } from '@angular/common';
@@ -47,6 +47,8 @@ export interface AddEmergencyDialogData {
   styleUrl: './add-emergencies.component.scss',
 })
 export class AddEmergenciesComponent {
+  @ViewChild('insuranceAmountInput') insuranceAmountInput?: ElementRef<HTMLInputElement>;
+  @ViewChild('coverageInput') coverageInput?: ElementRef<HTMLInputElement>;
   private NOT_COVERED_STATUS_ID = 2;
   form: FormGroup;
   policyStatuses: LookupItem[] = [];
@@ -137,6 +139,24 @@ export class AddEmergenciesComponent {
       coverageAdequacy: e.coverageAdequacy ?? 2,
       currencySymbol: e.insuranceCost.currencySymbol,
       willStatus: e.willStatus ?? null
+    });
+
+    // Ensure patched amounts display with thousand separators immediately
+    setTimeout(() => {
+      const insuranceAmount = this.form.get('insuranceAmount')?.value;
+      const coverage = this.form.get('coverage')?.value;
+
+      const insuranceEl = this.insuranceAmountInput?.nativeElement;
+      if (insuranceEl && insuranceAmount !== null && insuranceAmount !== undefined && insuranceAmount !== '') {
+        insuranceEl.value = Number(insuranceAmount).toLocaleString('en-US');
+        insuranceEl.dispatchEvent(new Event('blur'));
+      }
+
+      const coverageEl = this.coverageInput?.nativeElement;
+      if (coverageEl && coverage !== null && coverage !== undefined && coverage !== '') {
+        coverageEl.value = Number(coverage).toLocaleString('en-US');
+        coverageEl.dispatchEvent(new Event('blur'));
+      }
     });
   }
 

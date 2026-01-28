@@ -149,6 +149,8 @@ export class SavingPotsComponent implements OnInit {
   selectedRating = '';
   currentStep = 1;
   feedbackDetail = '';
+  total: number | null;
+  potAmounts: number[] | null; 
 
   items = [
     { id: 1, name: 'Item 1', score: 5 },
@@ -166,7 +168,6 @@ export class SavingPotsComponent implements OnInit {
         ),
         tap(([client, cashflow]) => {
           this.selectedClient = client as Client;
-          console.log(cashflow);
           this.selectedCashflow = cashflow as Cashflow;
         }),
         switchMap(([client, cashflow]) => {
@@ -184,7 +185,6 @@ export class SavingPotsComponent implements OnInit {
           ]);
         }),
         tap(([savingPots, timeline, amountCycles, escalationRatesResponse]) => {
-          console.log(timeline, amountCycles, escalationRatesResponse);
           // this.savingPots = savingPots;
             this.savingPots = {
             ...savingPots,
@@ -192,15 +192,15 @@ export class SavingPotsComponent implements OnInit {
               .map((item, index) => ({ ...item, orderNumber: item.orderNumber ?? index }))
               .sort((a, b) => a.orderNumber - b.orderNumber)
           };
+          this.total = this.savingPots?.totalSavings;
+          this.potAmounts = this.savingPots?.clientSavings?.map(
+            (pot) => pot.startingPotValue.amount ?? 0
+          );
           this.ensureCashFirst();
           this.timeline = timeline;
           this.amountCycles = amountCycles;
           this.escalationRates = escalationRatesResponse?.escalationRates;
           this.isLoaderVisible = false;
-
-
-    console.log("kjdjai")
-    console.log(this.savingPots)
         })
       )
       .subscribe();
@@ -422,26 +422,22 @@ updateOrderNumbers() {
 
     dialogRef.afterClosed().subscribe((result: any) => {
       console.log('Dialog closed with result:', result);
-      // this.savingPots = result?.savingPot;
-      if (!result?.clientSaving) return;
-
-      const updatedSaving = result.clientSaving;
-
-      const list = [...this.savingPots.clientSavings];
-      const index = list.findIndex(x => x.id === updatedSaving.id);
-
-      if (index === -1) return;
-
-      list[index] = {
-        ...list[index],
-        ...updatedSaving
-      };
+      if (!result?.savingPot) return;
 
       this.savingPots = {
-        ...this.savingPots,
-        // clientSavings: list
-        clientSavings: [...this.savingPots.clientSavings]
+        ...result.savingPot,
+        clientSavings: (result.savingPot.clientSavings ?? [])
+          .map((item: ClientSaving, index: number) => ({
+            ...item,
+            orderNumber: item.orderNumber ?? index,
+          }))
+          .sort((a: ClientSaving, b: ClientSaving) => a.orderNumber - b.orderNumber),
       };
+
+      this.total = this.savingPots?.totalSavings ?? this.total ?? 0;
+      this.potAmounts = this.savingPots?.clientSavings?.map(
+        (pot) => pot.startingPotValue.amount ?? 0
+      );
       this.ensureCashFirst();
       // this.savingPots.clientSavings.push(result.clientSaving);
     });
@@ -450,16 +446,32 @@ updateOrderNumbers() {
   deleteEventClicked(event: ClientSaving) {
     if(this.selectedCashflow) {
       this.savingPotsHttpService.deleteSavingPot(this.selectedCashflow?.id, event).pipe(
-        map((res) => {
-          const index = this.savingPots.clientSavings.findIndex(x => x.id === event.id);
-          this.savingPots.clientSavings.splice(index, 1);
+        map(() => {
+          const list = [...(this.savingPots?.clientSavings ?? [])];
+          const index = list.findIndex(x => x.id === event.id);
+          if (index === -1) return;
+
+          list.splice(index, 1);
+
+          this.savingPots = {
+            ...this.savingPots,
+            clientSavings: [...list]
+          };
+
+          this.total = list.reduce(
+            (sum, pot) => sum + (pot?.startingPotValue?.amount ?? 0),
+            0
+          );
+          this.potAmounts = list.map(
+            (pot) => pot.startingPotValue.amount ?? 0
+          );
         })
       ).subscribe();
     }
   }
   
   newEventClicked() {
-    console.log(this.timeline.clientEvents)
+    console.log("newEventClicked() called")
     const dialogRef = this.dialog.open(AddNewPotComponent, {
       width: '700px',
       disableClose: true,
@@ -483,7 +495,19 @@ updateOrderNumbers() {
     dialogRef.afterClosed().subscribe((result: any) => {
       console.log('Dialog closed with result:', result);
       if(result?.savingPot) {
-        this.savingPots = result?.savingPot;
+        this.savingPots = {
+          ...result.savingPot,
+          clientSavings: (result.savingPot.clientSavings ?? [])
+            .map((item: ClientSaving, index: number) => ({
+              ...item,
+              orderNumber: item.orderNumber ?? index,
+            }))
+            .sort((a: ClientSaving, b: ClientSaving) => a.orderNumber - b.orderNumber),
+        };
+        this.total = this.savingPots?.totalSavings ?? this.total ?? 0;
+        this.potAmounts = this.savingPots?.clientSavings?.map(
+          (pot) => pot.startingPotValue.amount ?? 0
+        );
         this.ensureCashFirst();
       }
       // this.savingPots.clientSavings.push(result.clientSaving);
@@ -505,6 +529,12 @@ private ensureCashFirst(): void {
     this.savingPots.clientSavings = [...list];
     this.updateOrderNumbers(); // persist the invariant
   }
+}
+
+formatReturnRate(rate: number): string {
+  if (rate == null) return '0';
+  const rounded = Math.round(rate * 10) / 10;
+  return rounded % 1 === 0 ? rounded.toFixed(0) : rounded.toString();
 }
 
 }

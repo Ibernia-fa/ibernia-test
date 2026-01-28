@@ -562,7 +562,7 @@ button {
 .global-fullscreen-content {
   width: 100vw !important;
   height: 100vh !important;
-  background: #1a1a1a !important;
+  // background: #1a1a1a !important;
   border-radius: 0px !important;
   display: flex !important;
   flex-direction: column !important;
@@ -589,6 +589,74 @@ button {
     font-weight: 700;
     color: #1c1c1c;
   }
+}
+
+.global-fullscreen-status-row {
+  padding: 20px 0px 0px 30px !important;
+  background: #fff !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  flex-shrink: 0 !important;
+  margin: 0 !important;
+  z-index: 1;
+  width: fit-content;
+}
+
+.global-fullscreen-shortfall {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  font-size: 14px !important;
+  width: fit-content !important;
+}
+
+.global-fullscreen-content .shortfall-status-profit {
+  display: flex !important;
+  align-items: center !important;
+  padding: 4px 8px !important;
+  padding-right: 12px !important;
+  gap: 6px !important;
+  background-color: #ecfdf5 !important;
+  border-radius: 16px !important;
+  border: 1px solid #59c996 !important;
+}
+
+.global-fullscreen-content .shortfall-status-loss {
+  display: flex !important;
+  align-items: center !important;
+  padding: 4px 8px !important;
+  padding-right: 12px !important;
+  gap: 6px !important;
+  background-color: #fff1f2 !important;
+  border-radius: 16px !important;
+  border: 1px solid #ff4444 !important;
+}
+
+.global-fullscreen-content .icon-bg {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 24px !important;
+  height: 24px !important;
+  border-radius: 50% !important;
+  box-sizing: content-box !important;
+}
+
+.global-fullscreen-content .leaf-bg {
+  background-color: #59c996 !important;
+}
+
+.global-fullscreen-content .flag-bg {
+  background-color: #ff4444 !important;
+}
+
+.global-fullscreen-content .icon-svg {
+  width: 16px !important;
+  height: 16px !important;
+  display: block !important;
+  filter: brightness(0) invert(1) !important;
+  background: transparent !important;
 }
 
 .global-close-fullscreen-btn {
@@ -621,7 +689,7 @@ button {
   flex: 1 !important;
   padding: 20px !important;
   overflow: hidden !important;
-  margin: 0 !important;
+  margin-top: -53px;
   position: relative !important;
   background: #fff !important;
 }
@@ -788,6 +856,7 @@ body:has(.global-fullscreen-overlay) {
   border: 1px solid #ebecff !important;
   color: #1c1c1c;
 }
+// event styes for lifetime model - end
 
 .event-tooltip.emergency-icon {
   background-color: #fef3f1;
@@ -800,3 +869,14 @@ body:has(.global-fullscreen-overlay) {
   pointer-events: none;
 }
 // event styes for lifetime model - end
+
+.chips-custom .mdc-evolution-chip-set__chips {
+  display: flex !important;
+  flex-wrap: wrap;
+  margin-left: 0px !important;
+}
+
+.vis-item, 
+.vis-selected {
+    width: fit-content !important;
+}
