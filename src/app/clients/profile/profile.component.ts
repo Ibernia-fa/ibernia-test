@@ -67,6 +67,7 @@ interface SortDescriptor {
 export class ProfileComponent {
   clientId: string;
   client: Client | null;
+  birthDate: Date | undefined;
   cashflows: Array<Cashflow> = [];
   preferredCurrency: string | undefined;
   totalSavings: string = "0";
@@ -82,6 +83,10 @@ export class ProfileComponent {
     private savingsPotsHttpService: SavingsPotsHttpService,
     private store: Store
   ) {
+    this.getClient();
+  }
+
+  ngOnInit() {
     this.getClient();
   }
 
@@ -118,6 +123,7 @@ export class ProfileComponent {
           console.log('clinet', this.client)
           this.client = client;
           this.cashflows = cashflows;
+          this.birthDate = client?.clientDetails.birthDate;
 
           const lastUpdatedCashflow = [...this.cashflows]
             .sort(
