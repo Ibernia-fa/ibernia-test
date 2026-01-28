@@ -18,15 +18,36 @@
 
     <!-- Will status (only type 2) -->
     @if(isWill) {
-      <div class="w-100 form-field gap-8">
+      <div class="w-100 form-field gap-8 tab">
         <mat-label class="f-s-16 d-block" style="line-height: 18px">Will Status</mat-label>
-        <div class="select-option">
+        <!-- <div class="select-option">
           <mat-select formControlName="willStatus" placeholder="Select">
             @for (ws of willStatuses; track ws) {
               <mat-option [value]="ws.id">{{ ws.name == 'NotDone' ? 'Not done' : ws.name }}</mat-option>
             }
           </mat-select>
-        </div>
+        </div> -->
+
+        <div class="tabs">
+      <div class="row">
+        @for (ws of willStatuses; track ws; let i = $index) {
+          <div class="col-6">
+            <button
+              type="button"
+              class="button-icon w-100"
+              (click)="form.get('willStatus')?.setValue(ws.id)"
+              [class.active]="form.get('willStatus')?.value === ws.id"
+            >
+              <span
+                [class.active]="form.get('willStatus')?.value === ws.id"
+              >
+                {{ ws.name == 'NotDone' ? 'Not done' : ws.name }}
+              </span>
+            </button>
+          </div>
+        }
+      </div>
+    </div>
         @if(form.get('willStatus')?.touched && form.get('willStatus')?.hasError('required')) {
           <span class="field-error">{{'Required' | translate}}</span>
         }
@@ -163,24 +184,39 @@
 </div>
 
 
-      <div class="w-100 d-flex flex-column gap-8">
+      <div class="d-flex flex-column gap-4 net-fields">
+
+      <div class="d-flex flex-column gap-8">
         <mat-label class="f-s-16 f-w-400 d-flex align-items-center">
           Coverage
         </mat-label>
-        <mat-form-field appearance="outline" class="w-100">
-          
-          <input 
-            matInput 
-            type="text" 
-            formControlName="coverage"
-            #coverageInput
-            placeholder="0"
-            thousandSeparatorInput
-           />
-        </mat-form-field>
+        <div class="net-field d-flex align-items-center">
+          <div class="left hide-arrow">
+              <mat-select formControlName="currencySymbol" class="sortby-edit-profile" hideSingleSelectionIndicator disabled>
+                @for (country of countries; track country) {
+                  @if(country.currencySymbol) {
+                    <mat-option [value]="country.currencySymbol">{{country.currencySymbol}}</mat-option>
+                  }
+                }
+              </mat-select>
+            </div>
+
+            <div class="w-100 form-field">
+              <input 
+                matInput 
+                type="text" 
+                formControlName="coverage"
+                #coverageInput
+                placeholder="0"
+                thousandSeparatorInput
+              />
+            </div>
+        </div>
         @if(form.get('coverage')?.touched && form.get('coverage')?.hasError('required')) {
           <span class="field-error d-block">{{'Required' | translate}}</span>
         }
+      </div>
+
       </div>
       }
     }
