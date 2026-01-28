@@ -36,6 +36,8 @@ import {MatCheckboxModule} from '@angular/material/checkbox';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { TranslateModule } from '@ngx-translate/core';
 import { Location } from '@angular/common';
+import { Store } from '@ngrx/store';
+import * as ClientActions from 'src/app/store/client/client.actions';
 
 export const DMY_FORMATS = {
   parse: { dateInput: 'DD/MM/YYYY' },
@@ -130,7 +132,8 @@ export class ClientEditComponent {
     private toastr: ToastrService,
     private activatedRoute: ActivatedRoute,
     private authService: AuthService,
-    private location: Location
+    private location: Location,
+    private store: Store
   ) {
     this.user = this.authService.getUserProfile();
 
@@ -369,7 +372,8 @@ export class ClientEditComponent {
         .updateClient(client)
         .pipe(
           filter((res) => !!res),
-          map((res) => {
+          map(() => {
+            this.store.dispatch(ClientActions.selectClient({ client }));
             this.location.back();
             this.toastr.success('Client updated successfully', 'Success!');
           }),

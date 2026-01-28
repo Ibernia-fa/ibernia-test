@@ -23,8 +23,8 @@
                 {{ client.clientDetails.firstName }} {{ client.clientDetails.lastName }}'s {{ 'Profile' | translate }}
               </h4>
               <span class="sub-title">
-                {{ client.clientDetails.birthDate | date }} ({{
-                  client.clientDetails.birthDate | ageCalculator
+                {{ birthDate | date }} ({{
+                  birthDate | ageCalculator
                 }}  years old) </span
               >
             </div>
