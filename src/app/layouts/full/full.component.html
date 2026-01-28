@@ -4,8 +4,8 @@
       (toggleMobileNav)="sidenav.toggle()" (toggleMobileFilterNav)="filterNavRight.toggle()"
       (optionsChange)="receiveOptions($event)"></app-header>
     <mat-sidenav-container autosize autoFocus
-      [ngStyle]="backgroundImage ? {
-        'background-image': 'url(' + backgroundImage + ')',
+      [ngStyle]="backgroundImageReady ? {
+        'background-image': 'url(' + (backgroundImage || defaultBackgroundImage) + ')',
         'background-size': 'cover',
         'background-position': 'center',
         'background-repeat': 'no-repeat'

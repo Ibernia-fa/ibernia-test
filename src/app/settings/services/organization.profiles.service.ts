@@ -38,11 +38,11 @@ export class OrganizationProfilesService {
       );
   }
 
-  setBrandingLogo(newLogoUrl: string) {
-    this.brandingLogoSource.next(newLogoUrl); // + '?v=' + new Date().getTime() 
+  setBrandingLogo(newLogoUrl: string | null) {
+    this.brandingLogoSource.next(newLogoUrl); // + '?v=' + new Date().getTime()
   }
 
-  setBackgroundImage(newBackgroundImageUrl: string) {
+  setBackgroundImage(newBackgroundImageUrl: string | null) {
     this.backgroundImageSource.next(newBackgroundImageUrl);
   }
 }
