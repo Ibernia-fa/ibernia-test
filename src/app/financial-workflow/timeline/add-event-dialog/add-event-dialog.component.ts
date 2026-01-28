@@ -13,7 +13,7 @@ import { ClientEvent, Cycle, EscalationRate, EventIncomeType } from '../models/f
 import { AbstractControl, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 import { Timeline } from 'vis-timeline';
 import { TimelineHttpService } from '../services/timeline-http.service';
-import { forkJoin, catchError, filter } from 'rxjs';
+import { catchError, filter } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
 import moment from 'moment';
 import { allCountries } from 'src/app/clients/models/country';
@@ -21,6 +21,7 @@ import { AgeCalculatorPipe } from 'src/app/pipe/age-calculator.pipe';
 import { CommonModule } from '@angular/common';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 import { TranslateModule } from '@ngx-translate/core';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @Component({
   selector: 'app-add-event-dialog',
@@ -38,7 +39,8 @@ import { TranslateModule } from '@ngx-translate/core';
     MatTooltipModule,
     CommonModule,
     ThousandSeparatorInputDirective,
-    TranslateModule
+    TranslateModule,
+    MatCheckboxModule
   ],
   providers: [provideNativeDateAdapter(),
     AgeCalculatorPipe,
@@ -244,6 +246,8 @@ export class AddEventDialogComponent {
           amount: [null],
           downPayment: [0],
           monthlyPayment: [0, Validators.min(0)],
+          monthlyStart: [moment(this.dropTime).year()],
+          monthlyEnd: [null],
           start: [moment(this.dropTime).year(), Validators.required],
           end: [null],
           hasResale: [false],
@@ -263,10 +267,6 @@ export class AddEventDialogComponent {
           .valueChanges
           .subscribe(type => this.applyFinancingValidators(type));
 
-        this.eventForm.get('hasResale')!
-          .valueChanges
-          .subscribe(() => this.setDefaultResaleValues());
-
         // React to payment type changes (important!)
         this.eventForm.get('paymentType')!
           .valueChanges
@@ -280,28 +280,21 @@ export class AddEventDialogComponent {
           const resaleDate = this.eventForm.get('resaleDate');
           const resalePrice = this.eventForm.get('resalePrice');
 
+          resaleDate?.clearValidators();
+          resalePrice?.clearValidators();
+
           if (checked) {
             resaleDate?.setValidators(Validators.required);
             resalePrice?.setValidators([Validators.required, Validators.min(0)]);
+            this.setDefaultResaleValues();
           } else {
-            resaleDate?.clearValidators();
-            resalePrice?.clearValidators();
+            resaleDate?.setValue(null, { emitEvent: false });
+            resalePrice?.setValue(0, { emitEvent: false });
           }
 
           resaleDate?.updateValueAndValidity({ emitEvent: false });
           resalePrice?.updateValueAndValidity({ emitEvent: false });
         });
-
-        this.eventForm.get('end')!
-          .valueChanges
-          .subscribe(() => {
-            if (
-              this.eventForm.get('hasResale')?.value &&
-              this.eventForm.get('paymentType')?.value === 'Financing'
-            ) {
-              this.setDefaultResaleValues();
-            }
-          });
 
         break;
 
@@ -532,6 +525,8 @@ export class AddEventDialogComponent {
         isDefault: false,
         isOneOff: this.eventForm.get('cycle')?.value === 'One-off',
         isPlaceHolder: false,
+        isCash: false,
+        isFinance: false
       };
 
       this.timelineHttpService.addEvent(clientEvent, this.cashflowId)
@@ -599,6 +594,8 @@ export class AddEventDialogComponent {
         isDefault: false,
         isOneOff: this.eventForm.get('cycle')?.value === 'One-off',
         isPlaceHolder: false,
+        isCash: false,
+        isFinance: false
       };
 
       this.timelineHttpService.addEvent(clientEvent, this.cashflowId)
@@ -706,38 +703,6 @@ export class AddEventDialogComponent {
   }
 
   // event with financing option (Home, Car, Boat)
-
-  private applyFinancingValidators(paymentType: 'Cash' | 'Financing') {
-    const amount = this.eventForm.get('amount');
-    const monthlyPayment = this.eventForm.get('monthlyPayment');
-    const end = this.eventForm.get('end');
-
-    // Reset everything first
-    amount?.clearValidators();
-    monthlyPayment?.clearValidators();
-    end?.clearValidators();
-
-    amount?.setErrors(null);
-    monthlyPayment?.setErrors(null);
-    end?.setErrors(null);
-
-    if (paymentType === 'Cash') {
-      amount?.setValidators([Validators.required, Validators.min(0)]);
-      this.eventForm.patchValue({ cycle: 'One-off' }, { emitEvent: false });
-    }
-
-    if (paymentType === 'Financing') {
-      amount?.setValidators([Validators.required, Validators.min(0)]);
-      monthlyPayment?.setValidators([Validators.required, Validators.min(0)]);
-      end?.setValidators([Validators.required]);
-      this.eventForm.patchValue({ cycle: 'Every month' }, { emitEvent: false });
-    }
-
-    amount?.updateValueAndValidity({ emitEvent: false });
-    monthlyPayment?.updateValueAndValidity({ emitEvent: false });
-    end?.updateValueAndValidity({ emitEvent: false });
-  }
-
   onFinancingEventSubmit() {
     this.eventForm.markAllAsTouched();
 
@@ -765,8 +730,8 @@ export class AddEventDialogComponent {
 
       events.push(this.buildMonthlyExpense(
         this.eventForm.get('monthlyPayment')?.value,
-        this.eventForm.get('start')?.value,
-        this.eventForm.get('end')?.value
+        this.eventForm.get('monthlyStart')?.value,
+        this.eventForm.get('monthlyEnd')?.value
       ));
     }
 
@@ -783,31 +748,95 @@ export class AddEventDialogComponent {
       return;
     }
 
-    const requests$ = events.map(event =>
-      this.timelineHttpService.addEvent(event, this.cashflowId).pipe(
-        filter(res => !!res)
-      )
-    );
+    // Event
+    this.timelineHttpService.addFinancingEvents(events, this.cashflowId)
+        .pipe(
+          filter(res => !!res),
+          catchError(err => {
+            this.saveClicked = false;
 
-    forkJoin(requests$)
-    .pipe(
-      catchError(err => {
-        this.saveClicked = false;
-        console.error(err);
-        throw err;
-      })
-    )
-    .subscribe(() => {
-      this.saveClicked = false;
-      this.dialogRef.close({
-        status: 'Success'
-      });
-    });
+            console.error(err);
+            throw err;
+          })
+        ).subscribe(res => {
+          this.saveClicked = false;
+          this.dialogRef.close({
+            status: 'Success'
+          });
+        })
 
   }
 
   onCashControlClicked(value: boolean) {
     this.isCashEvent = value;
+    const paymentType: 'Cash' | 'Financing' = value ? 'Cash' : 'Financing';
+    this.eventForm.get('paymentType')?.setValue(paymentType);
+    this.applyFinancingValidators(paymentType);
+  }
+
+  hasResaleChanged(event: any) {
+    console.log(event);
+
+    // if (event) {
+    //   this.savingsForm.get('start')?.setValidators(Validators.required);
+    //   this.savingsForm.get('start')?.updateValueAndValidity();
+    //   this.savingsForm.get('end')?.setValidators(Validators.required);
+    //   this.savingsForm.get('end')?.updateValueAndValidity();
+
+    //   this.savingsForm.get('end')?.patchValue(this.eventsList[0].start.year > 0 ? this.eventsList[0].start.year : this.forecastStartDateYear)
+    // } else {
+    //   this.savingsForm.get('start')?.removeValidators(Validators.required);
+    //   this.savingsForm.get('start')?.updateValueAndValidity();
+    //   this.savingsForm.get('end')?.removeValidators(Validators.required);
+    //   this.savingsForm.get('end')?.updateValueAndValidity();
+
+    //   this.savingsForm.get('end')?.patchValue(this.forecastEndDateYear-1)
+    // }
+  }
+
+  private applyFinancingValidators(paymentType: 'Cash' | 'Financing') {
+    const amount = this.eventForm.get('amount');
+    const downPayment = this.eventForm.get('downPayment');
+    const monthlyPayment = this.eventForm.get('monthlyPayment');
+    const monthlyStart = this.eventForm.get('monthlyStart');
+    const monthlyEnd = this.eventForm.get('monthlyEnd');
+
+    // Reset everything first
+    amount?.clearValidators();
+    downPayment?.clearValidators();
+    monthlyPayment?.clearValidators();
+    monthlyStart?.clearValidators();
+    monthlyEnd?.clearValidators();
+
+    amount?.setErrors(null);
+    downPayment?.setErrors(null);
+    monthlyPayment?.setErrors(null);
+    monthlyStart?.setErrors(null);
+    monthlyEnd?.setErrors(null);
+
+    if (paymentType === 'Cash') {
+      amount?.setValidators([Validators.required, Validators.min(0)]);
+      this.eventForm.patchValue({ cycle: 'One-off', downPayment: 0, monthlyPayment: 0, monthlyEnd: null }, { emitEvent: false });
+    }
+
+    if (paymentType === 'Financing') {
+      amount?.setValidators([Validators.required, Validators.min(0)]);
+      monthlyPayment?.setValidators([Validators.required, Validators.min(0)]);
+      monthlyStart?.setValidators(Validators.required);
+      monthlyEnd?.setValidators(Validators.required);
+
+      if (!monthlyStart?.value) {
+        monthlyStart?.setValue(this.eventForm.get('start')?.value, { emitEvent: false });
+
+        this.eventForm.patchValue({ cycle: 'Every month' }, { emitEvent: false });
+      }
+    }
+
+    amount?.updateValueAndValidity({ emitEvent: false });
+    downPayment?.updateValueAndValidity({ emitEvent: false });
+    monthlyPayment?.updateValueAndValidity({ emitEvent: false });
+    monthlyStart?.updateValueAndValidity({ emitEvent: false });
+    monthlyEnd?.updateValueAndValidity({ emitEvent: false });
   }
 
   private createBaseEvent(
@@ -846,7 +875,9 @@ export class AddEventDialogComponent {
       iconUrl: this.patchEvent?.iconUrl ?? '',
       isDefault: false,
       isOneOff: cycle === 'One-off',
-      isPlaceHolder: false
+      isPlaceHolder: false,
+      isCash: this.isCashEvent,
+      isFinance: !this.isCashEvent
     };
   }
 

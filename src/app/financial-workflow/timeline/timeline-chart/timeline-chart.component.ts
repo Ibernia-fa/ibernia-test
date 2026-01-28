@@ -324,7 +324,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
       : EventType.FINANCING;
 
     const dialogRef = this.dialog.open(AddEventDialogComponent, {
-      width: '700px',
+      width: '900px',
       disableClose: true,
       data: {
         eventType: dropEventType,
@@ -847,26 +847,58 @@ export class TimelineChartComponent implements OnInit, OnChanges {
   }
 
   handleEventRemoval(item: any, callback: (item: any) => void) {
-    this.timelineHttpService
-      .deleteEvent(this.financialTimeline.cashflow.id, item.id)
-      .pipe(
-        take(1),
-        map((res) => {
-          this.financialTimeline.clientEvents.splice(
-            this.financialTimeline.clientEvents.findIndex(
-              (event) => event.id === item.id
-            ),
-            1
-          );
-          if (item.content?.includes('Retirement age')) {
-            this.addRetirementBackToChips();
-          }
-          this.timeline.setItems(this.timelineData);
-          this.timeline.redraw();
-          callback(item);
-        })
-      )
-      .subscribe();
+    let isDeleteFinanceEvent = false;
+
+    if (item.content?.includes('Home') 
+      || item.content?.includes('Car')
+    || item.content?.includes('Boat')) {
+      isDeleteFinanceEvent = true;
+    }
+    
+    if (isDeleteFinanceEvent) {
+      this.timelineHttpService
+        .deleteFinancingEvent(this.financialTimeline.cashflow.id, item.id)
+        .pipe(
+          take(1),
+          map((res) => {
+            this.financialTimeline.clientEvents.splice(
+              this.financialTimeline.clientEvents.findIndex(
+                (event) => event.id === item.id
+              ),
+              1
+            );
+            if (item.content?.includes('Retirement age')) {
+              this.addRetirementBackToChips();
+            }
+            this.timeline.setItems(this.timelineData);
+            this.timeline.redraw();
+            callback(item);
+          })
+        )
+        .subscribe();
+    }
+    else {
+      this.timelineHttpService
+        .deleteEvent(this.financialTimeline.cashflow.id, item.id)
+        .pipe(
+          take(1),
+          map((res) => {
+            this.financialTimeline.clientEvents.splice(
+              this.financialTimeline.clientEvents.findIndex(
+                (event) => event.id === item.id
+              ),
+              1
+            );
+            if (item.content?.includes('Retirement age')) {
+              this.addRetirementBackToChips();
+            }
+            this.timeline.setItems(this.timelineData);
+            this.timeline.redraw();
+            callback(item);
+          })
+        )
+        .subscribe();
+    }
   }
 
   private getContent(title: string, img: string): string {
@@ -1045,7 +1077,9 @@ export class TimelineChartComponent implements OnInit, OnChanges {
       escalationRate: null,
       isPlaceHolder: true,
       isOneOff: true,
-      isDefault: true
+      isDefault: true,
+      isCash: false,
+      isFinance: false
     };
 
     this.timelineHttpService
