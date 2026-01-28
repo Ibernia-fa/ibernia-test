@@ -73,12 +73,15 @@ export class TimelineChartComponent implements OnInit, OnChanges {
   private readonly DIALOG_SYSTEM_EVENTS = [
     'Inheritance',
     'Wedding',
-    'Home',
     'Travel',
-    'Car',
     'Education',
-    'New business',
-    'Boat',
+    'New business'
+  ];
+
+  private readonly DIALOG_FINANCING_EVENTS = [
+    'Home',
+    'Car',
+    'Boat'
   ];
 
   timeline: Timeline;
@@ -316,11 +319,15 @@ export class TimelineChartComponent implements OnInit, OnChanges {
       return;
     }
 
+    const dropEventType = this.DIALOG_SYSTEM_EVENTS.some(baseName => this.draggedEvent?.name.startsWith(baseName))
+      ? EventType.SYSTEM
+      : EventType.FINANCING;
+
     const dialogRef = this.dialog.open(AddEventDialogComponent, {
       width: '700px',
       disableClose: true,
       data: {
-        eventType: EventType.SYSTEM,
+        eventType: dropEventType,
         amountCycles: this.amountCycles,
         customEvents: this.customEventsLibrary,
         escalataionRates: this.escalationRates,
@@ -331,6 +338,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
         forecastStartDateYear: moment(this.financialTimeline.forecastStartDate).year(),
         forecastEndDateYear: moment(this.financialTimeline.forecastEndtDate).year(),
         isIncomeEvent: this.draggedEvent.type === EventIncomeType.Income,
+        isCashEvent: dropEventType === EventType.FINANCING ? true : false,
         patchEvent: this.draggedEvent,
         dropTime: new Date(moment(dropTime).year(), 0),
         eventsList: this.financialTimeline.clientEvents.map((event) => {
@@ -768,7 +776,9 @@ export class TimelineChartComponent implements OnInit, OnChanges {
   updateEventByDoubleClick(clientEvent: ClientEvent) {
     const eventType = this.DIALOG_SYSTEM_EVENTS.some(baseName => clientEvent.name.startsWith(baseName))
       ? EventType.SYSTEM
-      : EventType.CUSTOM;
+      : this.DIALOG_FINANCING_EVENTS.some(baseName => clientEvent.name.startsWith(baseName))
+        ? EventType.FINANCING
+        : EventType.CUSTOM;
 
     const dialogRef = this.dialog.open(AddEventDialogComponent, {
       width: '700px',
@@ -1060,5 +1070,4 @@ export class TimelineChartComponent implements OnInit, OnChanges {
         }
       });
   }
-
 }
