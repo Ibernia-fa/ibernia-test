@@ -1,4 +1,7 @@
-
+<div class="language-loader" *ngIf="isSaving">
+  <div class="spinner"></div>
+  <h2>{{ 'Saving branding...' | translate }}</h2>
+</div>
 
 <mat-card class="mat-mdc-card mdc-card cardWithShadow mb-20">
   <mat-card-content class="mat-mdc-card-content">
@@ -123,6 +126,7 @@
         class="button-icon pull-right"
         type="button"
         (click)="save()"
+        [disabled]="!hasChanges || isLoading || isSaving"
       >
         <span>{{ isSaving ? ('Saving…' | translate) : ('Save' | translate) }}</span>
       </button>

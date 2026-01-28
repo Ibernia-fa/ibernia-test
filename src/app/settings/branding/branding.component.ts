@@ -19,6 +19,9 @@ export class BrandingComponent implements OnInit {
 
   profileImage: string | null = null;   // Data URL preview
   backgroundImage: string | null = null;   // Data URL preview
+  private initialProfileImage: string | null = null;
+  private initialBackgroundImage: string | null = null;
+  hasChanges = false;
   isSaving = false;
   isLoading = false;
 
@@ -42,6 +45,9 @@ export class BrandingComponent implements OnInit {
         console.log(p);
         this.profileImage = ensureDataUrl(p?.profilePhotoUrl ?? null);
         this.backgroundImage = ensureDataUrl(p?.backgroundPhotoUrl ?? null);
+        this.initialProfileImage = this.profileImage;
+        this.initialBackgroundImage = this.backgroundImage;
+        this.hasChanges = false;
         this.isLoading = false;
       },
       error: (err) => {
@@ -64,6 +70,7 @@ export class BrandingComponent implements OnInit {
       } else if (imageType === 'background') {
         this.backgroundImage = dataUrl;
       }
+      this.updateHasChanges();
     } finally {
       input.value = '';
     }
@@ -77,6 +84,7 @@ export class BrandingComponent implements OnInit {
     } else if (type === 'background') {
       this.backgroundImage = null;
     }
+    this.updateHasChanges();
   }
 
   save() {
@@ -91,10 +99,13 @@ export class BrandingComponent implements OnInit {
       .saveProfile({ userId, profilePhotoUrl: this.profileImage || "", backgroundPhotoUrl: this.backgroundImage || "" })
       .subscribe({
         next: () => {
-          this.orgProfiles.setBrandingLogo(this.profileImage!);
-          this.orgProfiles.setBackgroundImage(this.backgroundImage!);
+          this.orgProfiles.setBrandingLogo(this.profileImage || null);
+          this.orgProfiles.setBackgroundImage(this.backgroundImage || null);
 
           this.toastr.success('Image saved', 'Success!');
+          this.initialProfileImage = this.profileImage;
+          this.initialBackgroundImage = this.backgroundImage;
+          this.hasChanges = false;
           this.isSaving = false;
         },
         error: (err) => {
@@ -112,6 +123,12 @@ export class BrandingComponent implements OnInit {
       reader.onload = () => resolve(reader.result as string);
       reader.readAsDataURL(file);
     });
+  }
+
+  private updateHasChanges() {
+    this.hasChanges =
+      this.profileImage !== this.initialProfileImage ||
+      this.backgroundImage !== this.initialBackgroundImage;
   }
 }
 
