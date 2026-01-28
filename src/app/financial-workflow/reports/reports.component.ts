@@ -429,7 +429,7 @@ export class ReportsComponent {
 
       const selected = this.cashflows.find(c => c.id === selectedOtherId) || null;
       if (!selected) {
-        this.toaster.error('Selected plan not found', 'Error');
+        // this.toaster.error('Selected plan not found', 'Error');
         return;
       }
 
