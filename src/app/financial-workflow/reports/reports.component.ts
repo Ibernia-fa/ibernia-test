@@ -253,10 +253,10 @@ export class ReportsComponent {
       forecastEndDate: isComparison ?
         (this.compareTimeline?.forecastEndtDate || this.financialTimeline.forecastEndtDate) :
         this.financialTimeline.forecastEndtDate,
-      cashFlowName: isComparison ?
-        (this.compareTimeline?.cashflow?.name || this.financialTimeline?.cashflow?.name) :
-        this.financialTimeline?.cashflow?.name,
-      isComparison: isComparison
+      cashFlowName: this.cashflow?.name || 'Error',
+      isComparison: isComparison,
+      hasShortfall: this.hasShortfall,
+      firstShortfallAge: this.firstShortfallAge
     };
 
     this.fullscreenService.enterFullscreen(chartData);
@@ -275,7 +275,6 @@ export class ReportsComponent {
         ),
         tap(([client, cashflow]) => {
           this.client = client as Client;
-          console.log(cashflow);
           this.cashflow = cashflow as Cashflow;
         }),
         switchMap(([client, cashflow]) => {
@@ -427,7 +426,7 @@ export class ReportsComponent {
 
       const selected = this.cashflows.find(c => c.id === selectedOtherId) || null;
       if (!selected) {
-        this.toaster.error('Selected plan not found', 'Error');
+        // this.toaster.error('Selected plan not found', 'Error');
         return;
       }
 

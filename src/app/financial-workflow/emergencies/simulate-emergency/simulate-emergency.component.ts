@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, ElementRef, Inject, ViewChild } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -49,6 +49,7 @@ import { SavingsBarStackedChartComponent } from '../../reports/savings-bar-stack
   styleUrl: './simulate-emergency.component.scss',
 })
 export class SimulateEmergencyComponent {
+  @ViewChild('amountInput') amountInput?: ElementRef<HTMLInputElement>;
   onAmountInput(rawValue: string) {
     const { parseFormattedNumber } = require('src/app/shared/utils/number-utils');
     const value = parseFormattedNumber(rawValue);
@@ -428,11 +429,11 @@ export class SimulateEmergencyComponent {
   private populateForm(expense: any): void {
     this.existingEmergencyId = expense.id ?? null;
     const cycleId = expense.amount?.cycle?.id ?? this.amountCycles[0].id;
-    const formattedAmount = this.formatWithThousandSeparator(expense.amount?.amount ?? 0);
+    const amount = expense.amount?.amount ?? 0;
 
     this.simulateEmergencyForm.patchValue({
       cycle: cycleId,
-      amount: formattedAmount,
+      amount,
       start: expense.start?.year ?? null,
       end: expense.end?.year ?? null,
       escalationRate: expense.escalationRate?.value ?? this.escalationRates[0]?.value,
@@ -455,10 +456,15 @@ export class SimulateEmergencyComponent {
     }
 
     this.simulateEmergencyForm.updateValueAndValidity();
-  }
 
-  private formatWithThousandSeparator(value: number): string {
-    return value.toLocaleString('en-US');
+    // Ensure patched amount displays with thousand separators immediately
+    setTimeout(() => {
+      const el = this.amountInput?.nativeElement;
+      const value = this.simulateEmergencyForm.get('amount')?.value;
+      if (!el || value === null || value === undefined || value === '') return;
+      el.value = Number(value).toLocaleString('en-US');
+      el.dispatchEvent(new Event('blur'));
+    });
   }
 
   private buildEmergencySeries(report: any, year: string, amount: number): any {

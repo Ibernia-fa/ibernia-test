@@ -3,7 +3,14 @@
     <app-header [hideSidebarToggle]="hideSidebar" [showToggle]="!isOver" (toggleCollapsed)="toggleCollapsed()"
       (toggleMobileNav)="sidenav.toggle()" (toggleMobileFilterNav)="filterNavRight.toggle()"
       (optionsChange)="receiveOptions($event)"></app-header>
-    <mat-sidenav-container autosize autoFocus [ngClass]="{
+    <mat-sidenav-container autosize autoFocus
+      [ngStyle]="backgroundImageReady ? {
+        'background-image': 'url(' + (backgroundImage || defaultBackgroundImage) + ')',
+        'background-size': 'cover',
+        'background-position': 'center',
+        'background-repeat': 'no-repeat'
+      } : null"
+      [ngClass]="{
         'sidebarNav-mini':
           options.sidenavCollapsed && options.navPos !== 'top' && !resView,
         'sidebarNav-horizontal': options.horizontal,
@@ -26,7 +33,7 @@
             <ng-scrollbar class="position-relative" style="height: 100%">
               <mat-nav-list class="sidebar-list">
                 @for(item of navItems; track item) {
-                <app-nav-item class="nav-divider" [item]="item" [isPremiumFeature]="false" (notify)="sidenav.toggle()">
+                <app-nav-item [class.nav-divider]="!isSettings" [item]="item" (notify)="sidenav.toggle()">
                 </app-nav-item>
                 }
               </mat-nav-list>
@@ -43,12 +50,17 @@
                 }
               </mat-nav-list> -->
               <mat-nav-list class="sidebar-list {{!isSettings ? 'preimum-nav' : ''}}">
-
-              <!-- <mat-nav-list class="sidebar-list  preimum-nav"> -->
-                @for(item of navItemslower; track item) {
-                  <app-nav-item [item]="item"></app-nav-item>
+                @for (item of navItemslower; let i = $index; track item) {
+                  <app-nav-item 
+                    [item]="item"
+                    [showLabel]="i >= navItemslower.length - 3"
+                    label="BETA">
+                  </app-nav-item>
                 }
               </mat-nav-list>
+
+              @if(!isSettings) {
+                <!-- share report -->
 
               <!-- share report -->
               <div class="p-16 p-t-10 rounded d-flex flex-column gap-12">
@@ -59,6 +71,7 @@
                   </span>
                 </a>
               </div> 
+              }
             </ng-scrollbar>
           </div>
         </div>

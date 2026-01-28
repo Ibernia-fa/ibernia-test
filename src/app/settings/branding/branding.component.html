@@ -1,4 +1,7 @@
-
+<div class="language-loader" *ngIf="isSaving">
+  <div class="spinner"></div>
+  <h2>{{ 'Saving branding...' | translate }}</h2>
+</div>
 
 <mat-card class="mat-mdc-card mdc-card cardWithShadow mb-20">
   <mat-card-content class="mat-mdc-card-content">
@@ -40,7 +43,7 @@
               class="rounded"
               style="width:120px;height:120px;object-fit:cover;"
             />
-            <span class="remove-pic" (click)="clearImage($event)">
+            <span class="remove-pic" (click)="clearImage($event, 'profile')">
               <img src="../../../assets/images/shapes/delete.svg" alt="delete">
             </span>
           </div>
@@ -65,7 +68,56 @@
         type="file"
         accept="image/*"
         hidden
-        (change)="onFileSelected($event)"
+        (change)="onFileSelected($event, 'profile')"
+      />
+    </div>
+  </mat-card-content>
+</mat-card>
+
+<mat-card class="mat-mdc-card mdc-card cardWithShadow mb-20">
+  <mat-card-content class="mat-mdc-card-content">
+    <h3 class="f-s-20 f-w-400 m-b-5">{{ 'Custom background' | translate }}</h3>
+    <p class="f-s-14 m-b-20 p-t-0 m-t-0">
+      {{ 'Upload your custom background to personalize the client experience and keep your brand consistent across every screen.' | translate }}
+    </p>
+
+    <div class="upload-background-wrapper upload-background position-relative m-b-20">
+      <label for="background-input" class="cursor-pointer">
+        <div class="text-center">
+          <!-- WHEN an image is present, show preview with delete (same as Profile) -->
+          <div *ngIf="backgroundImage; else placeholder" class="image-preview-wrapper ">
+            <img
+              [src]="backgroundImage"
+              alt="background preview"
+              class="rounded"
+              style="width:120px;height:120px;object-fit:cover;"
+            />
+            <span class="remove-pic" (click)="clearImage($event, 'background')">
+              <img src="../../../assets/images/shapes/delete.svg" alt="delete">
+            </span>
+          </div>
+
+          <!-- ELSE show the selection UI -->
+          <ng-template>
+            <img class="m-b-10" src="../../../assets/images/shapes/small-icon.svg" alt="">
+            <p class="text-sm text-gray-500 f-s-14 m-b-10 m-0">
+              {{ 'Click to upload background image' | translate }}<br><span class="underline">{{ 'or drag and drop' | translate }}</span>
+            </p>
+            <small class="text-xs text-gray-400 f-s-12 m-0">
+              SVG, PNG, JPG or GIF (max. 800×400px)
+            </small>
+          </ng-template>
+        </div>
+      </label>
+
+      <!-- Hidden input; reset value after each use so same file can be reselected -->
+      <input
+        #fileInput
+        id="background-input"
+        type="file"
+        accept="image/*"
+        hidden
+        (change)="onFileSelected($event, 'background')"
       />
     </div>
 
@@ -74,6 +126,7 @@
         class="button-icon pull-right"
         type="button"
         (click)="save()"
+        [disabled]="!hasChanges || isLoading || isSaving"
       >
         <span>{{ isSaving ? ('Saving…' | translate) : ('Save' | translate) }}</span>
       </button>

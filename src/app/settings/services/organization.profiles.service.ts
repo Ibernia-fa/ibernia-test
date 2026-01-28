@@ -6,13 +6,16 @@ export interface OrganizationProfileDto {
   id?: string | null;        // optional – keep null if you don't have one yet
   userId: string;            // logged-in user id
   profilePhotoUrl: string;   // data URL (base64) or URL string
+  backgroundPhotoUrl: string;
 }
 
 @Injectable({ providedIn: 'root' })
 export class OrganizationProfilesService {
   private readonly baseUrl = '/api/v1';
   private brandingLogoSource = new BehaviorSubject<string | null>(null);
+  private backgroundImageSource = new BehaviorSubject<string | null>(null);
   public brandingLogo$ = this.brandingLogoSource.asObservable();
+  public backgroundImage$ = this.backgroundImageSource.asObservable();
 
   constructor(private http: HttpClient) {}
 
@@ -35,7 +38,11 @@ export class OrganizationProfilesService {
       );
   }
 
-  setBrandingLogo(newLogoUrl: string) {
-    this.brandingLogoSource.next(newLogoUrl); // + '?v=' + new Date().getTime() 
+  setBrandingLogo(newLogoUrl: string | null) {
+    this.brandingLogoSource.next(newLogoUrl); // + '?v=' + new Date().getTime()
+  }
+
+  setBackgroundImage(newBackgroundImageUrl: string | null) {
+    this.backgroundImageSource.next(newBackgroundImageUrl);
   }
 }

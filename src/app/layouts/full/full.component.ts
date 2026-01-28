@@ -1,6 +1,6 @@
 import { BreakpointObserver, MediaMatcher } from '@angular/cdk/layout';
-import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { Component, OnInit, ViewChild, ViewEncapsulation, OnDestroy } from '@angular/core';
+import { Subscription, Subject, takeUntil } from 'rxjs';
 import {
   MatSidenav,
   MatSidenavContent,
@@ -35,6 +35,8 @@ import { Observable } from 'rxjs';
 import { selectedClient } from 'src/app/store/client/client.selectors';
 import { Client } from 'src/app/clients/models/client';
 import { TranslateModule } from '@ngx-translate/core';
+import { OrganizationProfilesService } from 'src/app/settings/services/organization.profiles.service';
+import { AuthService } from 'src/app/auth/services/auth.service';
 
 const MOBILE_VIEW = 'screen and (max-width: 768px)';
 const TABLET_VIEW = 'screen and (min-width: 769px) and (max-width: 1024px)';
@@ -80,7 +82,7 @@ interface quicklinks {
   styleUrls: [],
   encapsulation: ViewEncapsulation.None,
 })
-export class FullComponent implements OnInit {
+export class FullComponent implements OnInit, OnDestroy {
   navItems = navItems;
   navItemslower = navItemslower;
   isSettings = false;
@@ -96,6 +98,10 @@ export class FullComponent implements OnInit {
   private isCollapsedWidthFixed = false;
   private htmlElement!: HTMLHtmlElement;
   hideSidebar = false;
+  backgroundImage: string | null = null;
+  backgroundImageReady = false;
+  readonly defaultBackgroundImage = 'assets/images/backgrounds/default-bg.jpg';
+  private destroy$ = new Subject<void>();
 
   client$: Observable<Client | null>;
   clientName = '';
@@ -218,7 +224,9 @@ export class FullComponent implements OnInit {
     private breakpointObserver: BreakpointObserver,
     private navService: NavService,
     private dialog: MatDialog,
-    private store: Store
+    private store: Store,
+    private organizationProfiles: OrganizationProfilesService,
+    private Authservice: AuthService
   ) {
     this.client$ = this.store.select(selectedClient);
 
@@ -285,9 +293,12 @@ export class FullComponent implements OnInit {
         this.clientName = client.clientDetails?.firstName;
       }
     });
+    this.loadBackgroundImage();
   }
 
   ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
     this.layoutChangesSubscription.unsubscribe();
   }
 
@@ -353,5 +364,35 @@ export class FullComponent implements OnInit {
     dialogRef.afterClosed().subscribe((result: any) => {
       console.log('Dialog closed with result:', result);
     });
+  }
+
+  private loadBackgroundImage(): void {
+    const userId = this.Authservice.getUserProfile()?.sub;
+    if (!userId) return;
+
+    this.organizationProfiles.getProfile(userId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (p) => {
+          this.backgroundImage = this.ensureDataUrl(p?.backgroundPhotoUrl ?? null);
+          this.backgroundImageReady = true;
+        },
+        error: (err) => {
+          console.error(err);
+          this.backgroundImageReady = true;
+        },
+      });
+
+    this.organizationProfiles.backgroundImage$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((url) => {
+        this.backgroundImage = this.ensureDataUrl(url);
+        this.backgroundImageReady = true;
+      });
+  }
+
+  private ensureDataUrl(s: string | null): string | null {
+    if (!s) return null;
+    return s.startsWith('data:') ? s : `data:image/jpeg;base64,${s}`;
   }
 }

@@ -7,12 +7,9 @@
                 <div class="card-main-wrapper">
                     <div class="d-flex align-items-center justify-content-between w-100 gap-16 flex-wrap">
                         <div class="d-flex align-items-center gap-16">
-                            <!-- Icon  -->
                             <div class="icon-wrapper d-flex align-items-center justify-content-center">
                                 <img width="24" src="assets/images/svgs/clock-icon-filled.svg" alt="clock" />
                             </div>
-                            <!-- End Icon  -->
-                            <!-- headings  -->
                             <div class="d-flex flex-column justify-content-between gap-4">
                                 <div class="d-flex align-items-center">
                                     <h4 class="page-title f-w-500 m-r-4 f-s-30">{{ 'Goals & Events' | translate }}</h4>
@@ -22,7 +19,6 @@
                                 <span class="sub-title">{{client.clientDetails.firstName}}
                                     {{client.clientDetails.lastName}}</span>
                             </div>
-                            <!-- End headings  -->
                         </div>
                         <div class="d-flex  gap-12 align-items-end">
                             <img src="/assets/images/svgs/chart-histogram-two-icon.svg" alt="chart" />
@@ -30,69 +26,6 @@
                         </div>
                     </div>
                 </div>
-                <!-- Date Fields  -->
-                <!-- <div>
-                    <div class="row justify-content-between align-items-end flex-nowrap">
-                        <div class="col-6">
-                            <div class="w-100 form-field gap-12">
-                                <div class="d-flex align-items-center">
-                                    <mat-label class="f-s-16 f-w-400 d-block m-r-4">Forecast start date:</mat-label>
-                                    <img width="18"  src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
-                                </div>
-                                <div class="position-relative">
-                                    <div class="select-option">
-                                        <mat-select [disabled]="!enableForecastEdit"
-                                            (valueChange)="onForecastStartChange($event)"
-                                            [value]="this.forecastStartYear" formControlName="start"
-                                            hideSingleSelectionIndicator>
-                                            @for (year of forecastStartYears; let i = $index; track year) {
-                                            <mat-option [value]="year">{{ year }} ({{ clientAge + i
-                                                }})</mat-option>
-                                            }
-                                        </mat-select>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="d-flex justify-content-end align-items-end">
-                            <img src="assets/images/svgs/chevron-right-date-icon.svg" alt="chevron-right-date-icon" />
-                        </div>
-                        <div class="col-6">
-                            <div class="w-100 form-field">
-                                <div class="d-flex gap-8 align-items-center justify-content-between">
-                                    <div class="d-flex align-items-center">
-                                        <mat-label class="f-s-16 f-w-400 d-block m-r-4">Forecast end date:</mat-label>
-                                        <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon"
-                                          />
-                                    </div>
-                                </div>
-
-                                <div class="position-relative">
-                                    <div class="select-option">
-                                        <mat-select [disabled]="!enableForecastEdit"
-                                            (valueChange)="onForecastEndChange($event)" [value]="this.forecastEndYear"
-                                            formControlName="start" hideSingleSelectionIndicator>
-                                            @for (year of forecastStartYears; let i = $index; track year) {
-                                            <mat-option [value]="year">{{ year }} ({{ clientAge + i
-                                                }})</mat-option>
-                                            }
-                                        </mat-select>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    @if(enableForecastEdit) {
-                    <div class="d-flex justify-content-end align-items-end flex-nowrap m-t-16">
-                        <div>
-                            <button (click)="onUpdateClicked()" type="button" class="button-icon">
-                                <span>Update</span>
-                            </button>
-                        </div>
-                    </div>
-                    }
-                </div> -->
-                <!-- End Date Fields  -->
             </div>
         </mat-card-content>
     </mat-card>
@@ -100,7 +33,6 @@
     <app-timeline-chart [financialTimeline]="financialTimeline" [clientBirthDate]="clientBirthDate" [client]="client"
         (updateTimelines)="updateTimelinesEmittedEvent()">
     </app-timeline-chart>
-    <!-- Event Section  -->
 
     }
     @else {
@@ -108,8 +40,4 @@
         <mat-spinner></mat-spinner>
     </div>
     }
-
-    <!-- Event Section  -->
 </div>
-
-<!-- <app-add-event></app-add-event> -->

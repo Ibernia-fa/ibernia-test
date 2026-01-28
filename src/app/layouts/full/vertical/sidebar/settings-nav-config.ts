@@ -10,8 +10,8 @@ export const settingsNavItems: NavItem[] = [
   },
   {
     displayName: 'Security & Privacy',
-    iconName: '/assets/images/shapes/key-filled.sv',
-    iconOutline: '/assets/images/shapes/key.svg',
+    iconName: '/assets/images/svgs/shield-check.svg',
+    iconOutline: '/assets/images/svgs/shield-check.svg',
     route: 'https://identity.ibernia.it/Manage/ChangePassword',
     external: true,
   },
