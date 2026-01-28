@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, Inject, ViewChild } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -48,6 +48,7 @@ import { TranslateModule } from '@ngx-translate/core';
   styleUrl: './add-event-dialog.component.scss'
 })
 export class AddEventDialogComponent {
+  @ViewChild('amountInput') amountInput?: ElementRef<HTMLInputElement>;
   private readonly AUTO_RENAME_EVENTS = [
     'Wedding',
     'Home',
@@ -280,6 +281,15 @@ export class AddEventDialogComponent {
     if (cycleDescription === 'One-off') {
       this.eventForm.get('cycle')?.disable();
     }
+
+    // Ensure the patched amount displays with thousand separators immediately
+    setTimeout(() => {
+      const el = this.amountInput?.nativeElement;
+      const amount = this.eventForm.get('amount')?.value;
+      if (!el || amount === null || amount === undefined || amount === '') return;
+      el.value = Number(amount).toLocaleString('en-US');
+      el.dispatchEvent(new Event('blur'));
+    });
   }
 
   private handleEscalationRatePatch(description: string | any, value: number | any) {

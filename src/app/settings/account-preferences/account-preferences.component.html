@@ -247,7 +247,16 @@
                 <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4" matTooltip="Sets the standard fixed commission value applied when creating new plans (e.g., €100 per year). This applies to each Saving Pot by default, but you can change it per client if needed.">
               </mat-label>
               <mat-form-field appearance="outline" class="w-100">
-                <input matInput type="number" step="1" formControlName="comissionAmount" placeholder="{{'Enter amount' | translate}}" />
+                <input
+                  matInput
+                  type="text"
+                  formControlName="comissionAmount"
+                  #commissionAmountInput
+                  thousandSeparatorInput
+                  (input)="onCommissionAmountInput($event.target.value)"
+                  (focus)="formatCommissionAmountOnFocus($event)"
+                  placeholder="{{'Enter amount' | translate}}"
+                />
                 <mat-error *ngIf="p.comissionAmount.hasError('required')">{{'Required' | translate}}</mat-error>
                 <mat-error *ngIf="p.comissionAmount.hasError('min')">{{ 'Must be' | translate }} &gt; 0</mat-error>
               </mat-form-field>
@@ -275,7 +284,16 @@
 
               </mat-label>
               <mat-form-field appearance="outline" class="w-100">
-                <input matInput type="number" step="1" formControlName="comissionAmount" placeholder="Enter amount" />
+                <input
+                  matInput
+                  type="text"
+                  formControlName="comissionAmount"
+                  #commissionAmountInput
+                  thousandSeparatorInput
+                  (input)="onCommissionAmountInput($event.target.value)"
+                  (focus)="formatCommissionAmountOnFocus($event)"
+                  placeholder="Enter amount"
+                />
                 <mat-error *ngIf="p.comissionAmount.hasError('required')">{{'Required' | translate}}</mat-error>
                 <mat-error *ngIf="p.comissionAmount.hasError('min')">{{ 'Must be' | translate }} &gt; 0</mat-error>
               </mat-form-field>

@@ -21,6 +21,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelect, MatSelectModule } from '@angular/material/select';
 import { NgFor, NgIf } from '@angular/common';
+import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
+import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
 
 @Component({
   selector: 'app-account-preferences',
@@ -37,7 +39,8 @@ import { NgFor, NgIf } from '@angular/common';
   ReactiveFormsModule,
   TranslateModule,
   NgIf,
-  NgFor
+  NgFor,
+  ThousandSeparatorInputDirective
 ]
 })
 export class AccountPreferencesComponent implements OnInit, OnDestroy {
@@ -66,6 +69,7 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
   profileImagePreview: string | null = null;
   private objectUrlToRevoke: string | null = null;
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
+  @ViewChild('commissionAmountInput') commissionAmountInput?: ElementRef<HTMLInputElement>;
 // profileImagePreview: string | null = null;
   form = this.fb.nonNullable.group({
     userId: ['' as string],
@@ -169,6 +173,15 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
 
           // re-apply validators in case type changed
           this.applyComissionValidation(this.form.controls.preferences.controls.comissionType.value);
+
+          // Ensure commission amount displays with thousand separators immediately
+          setTimeout(() => {
+            const el = this.commissionAmountInput?.nativeElement;
+            const amount = this.form.controls.preferences.controls.comissionAmount.value;
+            if (!el || amount === null || amount === undefined) return;
+            el.value = Number(amount).toLocaleString('en-US');
+            el.dispatchEvent(new Event('blur'));
+          });
         }
       });
   }
@@ -398,6 +411,25 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
       this.fileInput.nativeElement.value = '';
     }
     this.cdr.markForCheck();
+  }
+
+  onCommissionAmountInput(rawValue: string) {
+    const value = parseFormattedNumber(rawValue);
+    this.form.controls.preferences.controls.comissionAmount.setValue(value, { emitEvent: false });
+    const el = this.commissionAmountInput?.nativeElement;
+    if (!el) return;
+    if (value === null || value === undefined || Number.isNaN(value)) {
+      el.value = '';
+      return;
+    }
+    el.value = Number(value).toLocaleString('en-US');
+  }
+
+  formatCommissionAmountOnFocus(event: Event) {
+    const input = event.target as HTMLInputElement | null;
+    const amount = this.form.controls.preferences.controls.comissionAmount.value;
+    if (!input || amount === null || amount === undefined) return;
+    input.value = Number(amount).toLocaleString('en-US');
   }
 
 }

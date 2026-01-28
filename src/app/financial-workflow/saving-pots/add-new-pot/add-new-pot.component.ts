@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, ElementRef, Inject, ViewChild } from '@angular/core';
 import {
   AbstractControl,
   ControlEvent,
@@ -70,6 +70,7 @@ import { TranslateModule } from '@ngx-translate/core';
   styleUrl: './add-new-pot.component.scss',
 })
 export class AddNewPotComponent {
+  @ViewChild('amountInput') amountInput?: ElementRef<HTMLInputElement>;
   savingsForm: FormGroup;
   years: number[] = [];
   countries = allCountries;
@@ -120,6 +121,7 @@ export class AddNewPotComponent {
   loggedInUserComissionType: string | undefined;
   isAddComissionChecked: any;
   currentYear: number = new Date().getFullYear();
+  amount: number | null;
 
   constructor(
     private dialogRef: MatDialogRef<AddNewPotComponent>,
@@ -197,6 +199,12 @@ export class AddNewPotComponent {
       this.formattedReturnRate = this.formatWithPercentage(value);
     });
 
+    // Keep the local amount property in sync with the form control
+    const amountControl = this.savingsForm.get('amount');
+    this.amount = (amountControl?.value ?? null) as number | null;
+    amountControl?.valueChanges.subscribe((value) => {
+      this.amount = (value ?? null) as number | null;
+    });
     if(this.isEditWorkflow) {
       this.isCashPotEditMode = (this.selectedPot?.name ?? '').trim().toLowerCase() === 'cash';
       this.patchFormValues();
@@ -254,11 +262,19 @@ onAmountBlur(e: Event) {
     // --- The rest of fields (unchanged behavior) ---
     this.savingsForm.get('currency')?.patchValue(this.selectedPot.startingPotValue.currencySymbol, { emitEvent: false });
     this.savingsForm.get('amount')?.patchValue(this.selectedPot.startingPotValue.amount, { emitEvent: false });
+    this.amount = (this.savingsForm.get('amount')?.value ?? null) as number | null;
+    // Ensure thousandSeparatorInput formats the patched value (it formats on blur)
+    setTimeout(() => {
+      const el = this.amountInput?.nativeElement;
+      if (!el || this.amount === null || this.amount === undefined) return;
+      el.value = this.amount.toLocaleString('en-US');
+      el.dispatchEvent(new Event('blur'));
+    });
     // this.savingsForm.get('returnRate')?.patchValue(this.selectedPot.returnRate, { emitEvent: false });
-  this.savingsForm.get('returnRate')?.patchValue(
-  this.round2(this.selectedPot.returnRate),
-  { emitEvent: false }
-);
+    this.savingsForm.get('returnRate')?.patchValue(
+      this.round2(this.selectedPot.returnRate),
+      { emitEvent: false }
+    );
     this.savingsForm.get('lockPot')?.patchValue(this.selectedPot.hasPotLocked, { emitEvent: false });
     this.savingsForm.get('start')?.patchValue(this.selectedPot.lockedFrom?.year, { emitEvent: false });
     this.savingsForm.get('end')?.patchValue(this.selectedPot.lockedTill?.year, { emitEvent: false });
@@ -502,8 +518,8 @@ onEscalationRateChange(event: MatSelectChange): void {
     const parsed = cleaned === '' ? 0 : parseFloat(cleaned);
     const value = isNaN(parsed) ? 0 : parsed;
     this.savingsForm.get('amount')?.setValue(value, { emitEvent: true });
+    this.amount = value;
   }
-
   formatWithPercentage(value: number | string): string {
     return value !== null && value !== '' ? `${value}%` : '0%';
   }
