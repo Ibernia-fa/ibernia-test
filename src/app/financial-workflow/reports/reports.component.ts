@@ -253,9 +253,7 @@ export class ReportsComponent {
       forecastEndDate: isComparison ?
         (this.compareTimeline?.forecastEndtDate || this.financialTimeline.forecastEndtDate) :
         this.financialTimeline.forecastEndtDate,
-      cashFlowName: isComparison ?
-        (this.compareTimeline?.cashflow?.name || this.financialTimeline?.cashflow?.name) :
-        this.financialTimeline?.cashflow?.name,
+      cashFlowName: this.cashflow?.name || 'Error',
       isComparison: isComparison,
       hasShortfall: this.hasShortfall,
       firstShortfallAge: this.firstShortfallAge
@@ -277,7 +275,6 @@ export class ReportsComponent {
         ),
         tap(([client, cashflow]) => {
           this.client = client as Client;
-          console.log(cashflow);
           this.cashflow = cashflow as Cashflow;
         }),
         switchMap(([client, cashflow]) => {
