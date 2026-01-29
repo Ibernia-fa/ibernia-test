@@ -338,7 +338,13 @@ export class AddEventDialogComponent {
     this.eventForm.updateValueAndValidity({ emitEvent: false });
 
     if (this.isEditWorkflow) {
-      this.patchForm();
+      if (this.selectedEventType === EventType.FINANCING)
+      {
+        this.patchFinancingForm();
+      }
+      else {
+        this.patchForm();
+      }
     }
   }
 
@@ -355,7 +361,6 @@ export class AddEventDialogComponent {
         this.eventForm.controls['escalationRate'].patchValue(this.patchEvent?.escalationRate?.description);
         this.handleEscalationRatePatch(this.patchEvent?.escalationRate?.description, this.patchEvent?.escalationRate?.value);
         break;
-
 
       case EventType.CUSTOM:
         this.selectedEventIconUrl = this.patchEvent?.iconUrl ?? "";
@@ -750,20 +755,20 @@ export class AddEventDialogComponent {
 
     // Event
     this.timelineHttpService.addFinancingEvents(events, this.cashflowId)
-        .pipe(
-          filter(res => !!res),
-          catchError(err => {
-            this.saveClicked = false;
-
-            console.error(err);
-            throw err;
-          })
-        ).subscribe(res => {
+      .pipe(
+        filter(res => !!res),
+        catchError(err => {
           this.saveClicked = false;
-          this.dialogRef.close({
-            status: 'Success'
-          });
+
+          console.error(err);
+          throw err;
         })
+      ).subscribe(res => {
+        this.saveClicked = false;
+        this.dialogRef.close({
+          status: 'Success'
+        });
+      })
 
   }
 
@@ -954,6 +959,38 @@ export class AddEventDialogComponent {
       resaleDate: resaleYear,
       resalePrice: 0
     }, { emitEvent: false });
+  }
+
+  private patchFinancingForm() {
+    const entries = this.patchEvent//?.entries ?? [];
+    // if (!entries.length) return;
+
+    const purchase = this.patchEvent; //entries.find(e => e.entryType === 'PURCHASE');
+    const monthly = this.patchEvent; //entries.find(e => e.entryType === 'MONTHLY_PAYMENT');
+    const resale = this.patchEvent; //entries.find(e => e.entryType === 'RESALE');
+
+    const paymentType = monthly ? 'Financing' : 'Cash';
+
+    this.eventForm.patchValue({
+      name: this.patchEvent?.name,
+
+      paymentType,
+      amount: purchase?.netAmount.amount ?? 0,
+      start: purchase?.start.year ?? null,
+
+      monthlyPayment: monthly?.netAmount.amount ?? 0,
+      monthlyStart: monthly?.start.year ?? null,
+      monthlyEnd: monthly?.end ?? null,
+
+      hasResale: !!resale,
+      resaleDate: resale?.start.year ?? null,
+      resalePrice: resale?.netAmount.amount ?? 0,
+
+      cycle: paymentType === 'Cash' ? 'One-off' : 'Every month'
+    }, { emitEvent: false });
+
+    this.isCashEvent = paymentType === 'Cash';
+    this.applyFinancingValidators(paymentType);
   }
 }
 
