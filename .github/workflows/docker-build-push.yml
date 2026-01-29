@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - iteration-4
-      - main
   workflow_dispatch:
 
 permissions:
