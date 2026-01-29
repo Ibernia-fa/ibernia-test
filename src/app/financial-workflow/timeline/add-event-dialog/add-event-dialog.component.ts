@@ -53,13 +53,13 @@ export class AddEventDialogComponent {
   @ViewChild('amountInput') amountInput?: ElementRef<HTMLInputElement>;
   private readonly AUTO_RENAME_EVENTS = [
     'Wedding',
-    'Home',
     'Travel',
-    'Car',
     'Education',
     'New business',
-    'Boat',
-    'Inheritance'
+    'Inheritance',
+    'Home',
+    'Car',
+    'Boat'
   ];
 
   private readonly FINANCING_EVENTS = [
@@ -153,7 +153,7 @@ export class AddEventDialogComponent {
       this.years.push(element);
     }
 
-    if (this.selectedEventType == EventType.SYSTEM) {
+    if (this.selectedEventType == EventType.SYSTEM || this.selectedEventType == EventType.FINANCING) {
       // not allow edit base name
       if (this.isEditWorkflow && !this.AUTO_RENAME_EVENTS.includes(this.data.patchEvent.name)) {
         this.isAllowRename = true;
@@ -339,8 +339,7 @@ export class AddEventDialogComponent {
     this.eventForm.updateValueAndValidity({ emitEvent: false });
 
     if (this.isEditWorkflow) {
-      if (this.selectedEventType === EventType.FINANCING)
-      {
+      if (this.selectedEventType === EventType.FINANCING) {
         this.patchFinancingForm();
       }
       else {
@@ -470,8 +469,7 @@ export class AddEventDialogComponent {
 
     if (
       this.eventForm.valid &&
-      (this.selectedEventType === EventType.SYSTEM ||
-        this.selectedEventType === EventType.FINANCING) &&
+      this.selectedEventType === EventType.SYSTEM &&
       this.patchEvent
     ) {
       this.saveClicked = true;
@@ -512,7 +510,7 @@ export class AddEventDialogComponent {
 
       const clientEvent: ClientEvent = {
         id: this.isEditWorkflow ? this.patchEvent?.id ?? "" : "",
-        name: finalName, //this.patchEvent.name,
+        name: finalName,
         netAmount: {
           cycle: {
             id: this.amountCycles.find(
@@ -541,7 +539,8 @@ export class AddEventDialogComponent {
         isOneOff: this.eventForm.get('cycle')?.value === 'One-off',
         isPlaceHolder: false,
         isCash: false,
-        isFinance: false
+        isFinance: false,
+        isParent: false
       };
 
       this.timelineHttpService.addEvent(clientEvent, this.cashflowId)
@@ -610,7 +609,8 @@ export class AddEventDialogComponent {
         isOneOff: this.eventForm.get('cycle')?.value === 'One-off',
         isPlaceHolder: false,
         isCash: false,
-        isFinance: false
+        isFinance: false,
+        isParent: false
       };
 
       this.timelineHttpService.addEvent(clientEvent, this.cashflowId)
@@ -724,25 +724,17 @@ export class AddEventDialogComponent {
     if (!this.eventForm.valid) return;
 
     this.saveClicked = true;
-
     const paymentType = this.eventForm.get('paymentType')?.value;
     const events: ClientEvent[] = [];
 
-    // cash purchase
-    if (paymentType === 'Cash') {
-      events.push(this.buildOneOffExpense(
-        this.eventForm.get('amount')?.value,
-        this.eventForm.get('start')?.value
-      ));
-    }
+    // cash purchase or down payment for the financing purchase
+    events.push(this.buildOneOffExpense(
+      this.eventForm.get('amount')?.value,
+      this.eventForm.get('start')?.value
+    ));
 
     // financing
     if (paymentType === 'Financing') {
-      events.push(this.buildOneOffExpense(
-        this.eventForm.get('amount')?.value,
-        this.eventForm.get('start')?.value
-      ));
-
       events.push(this.buildMonthlyExpense(
         this.eventForm.get('monthlyPayment')?.value,
         this.eventForm.get('monthlyStart')?.value,
@@ -778,8 +770,7 @@ export class AddEventDialogComponent {
         this.dialogRef.close({
           status: 'Success'
         });
-      })
-
+      });
   }
 
   onCashControlClicked(value: boolean) {
@@ -859,7 +850,8 @@ export class AddEventDialogComponent {
     amount: number,
     year: number,
     cycle: 'One-off' | 'Every month',
-    type: EventIncomeType
+    type: EventIncomeType,
+    isParent: boolean,
   ): ClientEvent {
     return {
       id: '',
@@ -892,17 +884,31 @@ export class AddEventDialogComponent {
       isOneOff: cycle === 'One-off',
       isPlaceHolder: false,
       isCash: this.isCashEvent,
-      isFinance: !this.isCashEvent
+      isFinance: !this.isCashEvent,
+      isParent
     };
   }
 
   private buildOneOffExpense(amount: number, year: number): ClientEvent {
+    let finalName = this.patchEvent?.name ?? 'Asset purchase';
+
+    // auto rename
+    if (!this.isEditWorkflow && this.AUTO_RENAME_EVENTS.includes(finalName)) {
+      finalName = this.getNextEventName(finalName);
+    }
+
+    if (this.eventForm.get('name')?.value !== this.patchEvent?.name
+      && this.eventForm.get('name')?.value !== finalName) {
+      finalName = this.eventForm.get('name')?.value;
+    }
+
     return this.createBaseEvent(
-      this.patchEvent?.name ?? 'Asset purchase',
+      finalName,
       amount,
       year,
       'One-off',
-      EventIncomeType.Expense
+      EventIncomeType.Expense,
+      true
     );
   }
 
@@ -911,12 +917,25 @@ export class AddEventDialogComponent {
     startYear: number,
     endYear: number
   ): ClientEvent {
+    let finalName = this.patchEvent?.name ?? 'Asset';
+
+    // auto rename
+    if (!this.isEditWorkflow && this.AUTO_RENAME_EVENTS.includes(finalName)) {
+      finalName = this.getNextEventName(finalName);
+    }
+
+    if (this.eventForm.get('name')?.value !== this.patchEvent?.name
+      && this.eventForm.get('name')?.value !== finalName) {
+      finalName = this.eventForm.get('name')?.value;
+    }
+
     const event = this.createBaseEvent(
-      `${this.patchEvent?.name ?? 'Asset'} – Monthly payment`,
+      `${finalName} – Monthly payment`,
       amount,
       startYear,
       'Every month',
-      EventIncomeType.Expense
+      EventIncomeType.Expense,
+      false
     );
 
     event.end = {
@@ -928,12 +947,25 @@ export class AddEventDialogComponent {
   }
 
   private buildOneOffIncome(amount: number, year: number): ClientEvent {
+    let finalName = this.patchEvent?.name ?? 'Asset';
+
+    // auto rename
+    if (!this.isEditWorkflow && this.AUTO_RENAME_EVENTS.includes(finalName)) {
+      finalName = this.getNextEventName(finalName);
+    }
+
+    if (this.eventForm.get('name')?.value !== this.patchEvent?.name
+      && this.eventForm.get('name')?.value !== finalName) {
+      finalName = this.eventForm.get('name')?.value;
+    }
+
     return this.createBaseEvent(
-      `${this.patchEvent?.name ?? 'Asset'} – Resale`,
+      `${finalName} – Resale`,
       amount,
       year,
       'One-off',
-      EventIncomeType.Income
+      EventIncomeType.Income,
+      false
     );
   }
 

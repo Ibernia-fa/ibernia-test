@@ -1079,7 +1079,8 @@ export class TimelineChartComponent implements OnInit, OnChanges {
       isOneOff: true,
       isDefault: true,
       isCash: false,
-      isFinance: false
+      isFinance: false,
+      isParent: false
     };
 
     this.timelineHttpService

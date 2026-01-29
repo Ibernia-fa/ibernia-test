@@ -257,6 +257,10 @@
         class="bold-icon" />
       <h3>
         {{ isEditWorkflow ? eventForm.get('name')?.value : patchEvent?.name }}
+        <ng-container *ngIf="isEditWorkflow && isAllowRename">
+          <img src="assets/images/svgs/drop-down-edit-2-line.svg" alt="edit" class="cursor-pointer edit-name-icon"
+            (click)="toggleNameEdit()" />
+        </ng-container>
       </h3>
     </div>
     <button (click)="closeDialog()" type="button">
@@ -266,6 +270,15 @@
 
   <mat-dialog-content>
     <div [formGroup]="eventForm" class="d-flex flex-column gap-20">
+      
+      <div class="w-100 form-field gap-8" *ngIf="isEditWorkflow && showNameEdit">
+        <mat-label class="f-s-16 d-block" style="line-height: 18px">Name</mat-label>
+        <input matInput formControlName="name" />
+        @if(eventForm.get('name')?.touched &&
+        eventForm.get('name')?.hasError('required')) {
+        <span class="field-error d-block">{{'Required' | translate}}</span>
+        }
+      </div>
 
       <!-- cash vs financing selector -->
       <div class="d-flex flex-column gap-8 tab">
