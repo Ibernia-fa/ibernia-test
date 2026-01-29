@@ -28,6 +28,12 @@ export class TimelineHttpService {
     })
   }
 
+  addFinancingEvents(clientEvents: ClientEvent[], cashflowId: string) {
+    return this.httpClient.post(`/api/v1/cashflows/${cashflowId}/timelines/events/financing`, clientEvents, {
+      responseType: "text"
+    })
+  }
+
   updateTimeline(financialTimeline: FinancialTimeline) {
     return this.httpClient.put(`${this.TIMELINE_BASE_URL}`, financialTimeline, {
       responseType: "text"
@@ -36,6 +42,12 @@ export class TimelineHttpService {
 
   deleteEvent(cashflowId: string, eventId: string) {
     return this.httpClient.delete(`/api/v1/cashflows/${cashflowId}/timelines/events/${eventId}`, {
+      responseType: 'text'
+    })
+  }
+
+  deleteFinancingEvent(cashflowId: string, eventId: string) {
+    return this.httpClient.delete(`/api/v1/cashflows/${cashflowId}/timelines/events/financing/${eventId}`, {
       responseType: 'text'
     })
   }
