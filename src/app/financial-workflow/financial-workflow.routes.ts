@@ -7,6 +7,7 @@ import { WithdrawalsContributionsComponent } from './withdrawals-contributions/w
 import { ReportsComponent } from './reports/reports.component';
 import { EmergenciesComponent } from './emergencies/emergencies.component';
 import { AiRecommendationsComponent } from './ai-recommendations/ai-recommendations.component';
+import { CashflowResolver } from './resolvers/cashflow.resolver';
 
 export const FinancialWorkflowRoutes: Routes = [
   {
@@ -15,30 +16,37 @@ export const FinancialWorkflowRoutes: Routes = [
       {
         path: ':id/timeline',
         component: TimelineComponent,
+        resolve: { cashflow: CashflowResolver },
       },
       {
         path: ':id/finances',
         component: SavingPotsComponent,
+        resolve: { cashflow: CashflowResolver },
       },
       {
         path: ':id/income',
         component: IncomeExpensesComponent,
+        resolve: { cashflow: CashflowResolver },
       },
       {
         path: ':id/withdrawal',
         component: WithdrawalsContributionsComponent,
+        resolve: { cashflow: CashflowResolver },
       },
       {
         path: ':id/reports',
         component: ReportsComponent,
+        resolve: { cashflow: CashflowResolver },
       },
       {
         path: ':id/emergencies',
         component: EmergenciesComponent,
+        resolve: { cashflow: CashflowResolver },
       },
       {
         path: ':id/ai-recommendations',
         component: AiRecommendationsComponent,
+        resolve: { cashflow: CashflowResolver },
       },
       // {
       //   path: 'add',
