@@ -799,22 +799,23 @@ export class ClientEditComponent {
     const digits = onlyDigits(raw);
     let formatted = formatDigitsToDMY(digits);
 
-    if (formatted === raw) return;
+    if (formatted !== raw) {
+      inputEl.value = formatted;
 
-    inputEl.value = formatted;
+      let newCursor = digitsBeforeCursor;
+      if (digitsBeforeCursor > 2) newCursor += 1;
+      if (digitsBeforeCursor > 4) newCursor += 1;
 
-    let newCursor = digitsBeforeCursor;
-    if (digitsBeforeCursor > 2) newCursor += 1;
-    if (digitsBeforeCursor > 4) newCursor += 1;
+      newCursor = Math.min(newCursor, formatted.length);
 
-    newCursor = Math.min(newCursor, formatted.length);
+      requestAnimationFrame(() => {
+        if (document.activeElement === inputEl) {
+          inputEl.setSelectionRange(newCursor, newCursor);
+        }
+      });
+    }
 
-    requestAnimationFrame(() => {
-      if (document.activeElement === inputEl) {
-        inputEl.setSelectionRange(newCursor, newCursor);
-      }
-  });
-  this.updateClientAgePreview(digits);
+    this.updateClientAgePreview(digits);
 
     // Only update the input if formatting actually changes it
     // if (formatted !== value) {

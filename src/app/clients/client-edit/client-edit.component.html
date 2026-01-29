@@ -42,6 +42,7 @@
                 inputmode="numeric"
                 autocomplete="bday"
                 (input)="onDobTyping(dobInput)"
+                (dateChange)="onCalendarChange($event.value)"
                 #dobInput
                 />
               <div class="date-picker-position">
@@ -54,10 +55,7 @@
                   </mat-icon>
                 </mat-datepicker-toggle>
               </div>
-              <mat-datepicker
-                #picker
-                (dateChange)="onCalendarChange($event.value)"
-              ></mat-datepicker>
+              <mat-datepicker #picker></mat-datepicker>
             </div>
             <div class="d-flex flex-column gap-1 m-t-4">
               <span class="f-s-12 text-muted"
