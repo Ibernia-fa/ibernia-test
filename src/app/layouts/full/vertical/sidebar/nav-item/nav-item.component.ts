@@ -89,8 +89,8 @@ export class AppNavItemComponent implements OnChanges {
   onItemSelected(item: NavItem) {
     if (!item.children || !item.children.length) {
       var newRoute = item.route;
-      
-      if (item?.route?.includes('{cashflowId}')) {
+
+      if (item?.route?.includes('{cashflowId}') && this.selectedCashflowId) {
         newRoute = item.route.replace('{cashflowId}', this.selectedCashflowId);
       }
 
