@@ -1,5 +1,4 @@
 name: Build, Push & Deploy (Docker Hub)
-
 on:
   push:
     branches:
@@ -24,18 +23,39 @@ jobs:
         id: vars
         shell: bash
         run: |
-          ENVIRONMENT="dev"
-          TAG_NUM=$((GITHUB_RUN_NUMBER))
-          TAG="${ENVIRONMENT}-frontend${TAG_NUM}"
+          if [[ "${GITHUB_REF_NAME}" == "main" ]]; then
+            ENVIRONMENT="prod"
+          else
+            ENVIRONMENT="dev"
+          fi
+
+          # Auto version: MAJOR.MINOR.PATCH (PATCH from run number)
+          MAJOR="${{ vars.VERSION_MAJOR }}"
+          MINOR="${{ vars.VERSION_MINOR }}"
+          PATCH="${GITHUB_RUN_NUMBER}"
+
+          if [[ -z "$MAJOR" || -z "$MINOR" ]]; then
+            echo "ERROR: VERSION_MAJOR / VERSION_MINOR variables are not set"
+            exit 1
+          fi
+
+          VERSION="${MAJOR}.${MINOR}.${PATCH}"
+
+          VERSION_TAG="${ENVIRONMENT}-${VERSION}"
+          SHA_TAG="sha-${GITHUB_SHA}"
+          LATEST_TAG="${ENVIRONMENT}-latest"
 
           # Docker requires lowercase repo names
           REPO_LOWER=$(echo "${{ github.event.repository.name }}" | tr '[:upper:]' '[:lower:]')
 
           IMAGE="${{ secrets.DOCKERHUB_USERNAME }}/${REPO_LOWER}"
 
-          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          echo "env=${ENVIRONMENT}" >> "$GITHUB_OUTPUT"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
           echo "image=${IMAGE}" >> "$GITHUB_OUTPUT"
-          echo "full_image=${IMAGE}:${TAG}" >> "$GITHUB_OUTPUT"
+          echo "version_tag=${VERSION_TAG}" >> "$GITHUB_OUTPUT"
+          echo "sha_tag=${SHA_TAG}" >> "$GITHUB_OUTPUT"
+          echo "latest_tag=${LATEST_TAG}" >> "$GITHUB_OUTPUT"
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -51,7 +71,9 @@ jobs:
           platforms: linux/amd64
           push: true
           tags: |
-            ${{ steps.vars.outputs.full_image }}
+            ${{ steps.vars.outputs.image }}:${{ steps.vars.outputs.version_tag }}
+            ${{ steps.vars.outputs.image }}:${{ steps.vars.outputs.sha_tag }}
+            ${{ steps.vars.outputs.image }}:${{ steps.vars.outputs.latest_tag }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -64,7 +86,7 @@ jobs:
           port: ${{ secrets.SERVER_PORT || 22 }}
           script: |
             set -e
-            IMAGE="${{ steps.vars.outputs.full_image }}"
+            IMAGE="${{ steps.vars.outputs.image }}:${{ steps.vars.outputs.version_tag }}"
             NAME="ibernia-app"
 
             docker pull "$IMAGE"
@@ -72,3 +94,4 @@ jobs:
             docker rm "$NAME" || true
             docker run -d -p 8082:80 --name "$NAME" "$IMAGE"
             docker image prune -f
+            echo "$IMAGE" > DEPLOYED_VERSION.txt
