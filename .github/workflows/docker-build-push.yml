@@ -2,7 +2,7 @@ name: Build, Push & Deploy (Docker Hub)
 on:
   push:
     branches:
-      - iteration-4
+      - feature/iteration-4
   workflow_dispatch:
 
 permissions:
