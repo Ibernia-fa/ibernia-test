@@ -99,6 +99,8 @@ export class FullComponent implements OnInit, OnDestroy {
   private htmlElement!: HTMLHtmlElement;
   hideSidebar = false;
   backgroundImage: string | null = null;
+  backgroundImageReady = false;
+  readonly defaultBackgroundImage = 'assets/images/backgrounds/default-bg.jpg';
   private destroy$ = new Subject<void>();
 
   client$: Observable<Client | null>;
@@ -373,18 +375,19 @@ export class FullComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (p) => {
           this.backgroundImage = this.ensureDataUrl(p?.backgroundPhotoUrl ?? null);
+          this.backgroundImageReady = true;
         },
         error: (err) => {
           console.error(err);
+          this.backgroundImageReady = true;
         },
       });
 
     this.organizationProfiles.backgroundImage$
       .pipe(takeUntil(this.destroy$))
       .subscribe((url) => {
-        if (url) {
-          this.backgroundImage = url;
-        }
+        this.backgroundImage = this.ensureDataUrl(url);
+        this.backgroundImageReady = true;
       });
   }
 

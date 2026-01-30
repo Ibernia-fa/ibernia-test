@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, ElementRef, Inject, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { CommonModule } from '@angular/common';
@@ -47,6 +47,8 @@ export interface AddEmergencyDialogData {
   styleUrl: './add-emergencies.component.scss',
 })
 export class AddEmergenciesComponent {
+  @ViewChild('insuranceAmountInput') insuranceAmountInput?: ElementRef<HTMLInputElement>;
+  @ViewChild('coverageInput') coverageInput?: ElementRef<HTMLInputElement>;
   private NOT_COVERED_STATUS_ID = 2;
   form: FormGroup;
   policyStatuses: LookupItem[] = [];
@@ -138,6 +140,24 @@ export class AddEmergenciesComponent {
       currencySymbol: e.insuranceCost.currencySymbol,
       willStatus: e.willStatus ?? null
     });
+
+    // Ensure patched amounts display with thousand separators immediately
+    setTimeout(() => {
+      const insuranceAmount = this.form.get('insuranceAmount')?.value;
+      const coverage = this.form.get('coverage')?.value;
+
+      const insuranceEl = this.insuranceAmountInput?.nativeElement;
+      if (insuranceEl && insuranceAmount !== null && insuranceAmount !== undefined && insuranceAmount !== '') {
+        insuranceEl.value = Number(insuranceAmount).toLocaleString('en-US');
+        insuranceEl.dispatchEvent(new Event('blur'));
+      }
+
+      const coverageEl = this.coverageInput?.nativeElement;
+      if (coverageEl && coverage !== null && coverage !== undefined && coverage !== '') {
+        coverageEl.value = Number(coverage).toLocaleString('en-US');
+        coverageEl.dispatchEvent(new Event('blur'));
+      }
+    });
   }
 
   onSave(): void {
@@ -152,23 +172,30 @@ export class AddEmergenciesComponent {
     const type = existing?.type ?? 1;
     const isHidden = existing?.isHidden ?? false;
     const emergencyType = type == 2 ? "Will" : "Insurance";
+    const isWill = type === 2;
+    const fallbackCoverageAdequacy =
+      this.coverageAdequacies.find(a => a.name === 'Good')?.id ?? 1;
+    const policyStatus = isWill ? this.NOT_COVERED_STATUS_ID : form.policyStatus;
+    const insuranceAmount = isWill ? 0 : form.insuranceAmount;
+    const insuranceCycleId = isWill
+      ? (this.insuranceCycles[0]?.id ?? form.insuranceCycleId ?? null)
+      : form.insuranceCycleId;
+    const coverageAdequacy = isWill ? fallbackCoverageAdequacy : form.coverageAdequacy;
+    const coverage = isWill ? 0 : form.coverage;
 
     const insuranceCost: Money = {
       currencySymbol: form.currencySymbol,
-      amount: form.insuranceAmount,
-      cycle: {
-        id: form.insuranceCycleId,
-        description: null,
-      },
+      amount: insuranceAmount,
+      cycle: insuranceCycleId ? { id: insuranceCycleId, description: null } : null,
     };
 
     // CREATE payload
     const createPayload: CreateEmergencyRequest = {
       type,
-      policyStatus: form.policyStatus,
+      policyStatus,
       insuranceCost,
-      coverage: form.coverage,
-      coverageAdequacy: form.coverageAdequacy,
+      coverage,
+      coverageAdequacy,
       willStatus: type === 2 ? form.willStatus : 1,
       name: form.name,
       iconUrl: this.resolveIconUrl(type),
@@ -182,10 +209,10 @@ export class AddEmergenciesComponent {
       const updatePayload: Emergency = {
         id: existing.id,
         type,
-        policyStatus: form.policyStatus,
+        policyStatus,
         insuranceCost,
-        coverage: form.coverage,
-        coverageAdequacy: form.coverageAdequacy,
+        coverage,
+        coverageAdequacy,
         willStatus: type === 2 ? form.willStatus : 1,
         name: form.name,
         iconUrl: this.resolveIconUrl(type),
@@ -198,6 +225,7 @@ export class AddEmergenciesComponent {
 
       this.emergenciesHttp.updateEmergency(updatePayload).subscribe({
         next: (res: Emergency) => {
+          console.log("Data received for update: ", res);
           this.toastr.success(`${emergencyType} updated successfully`, 'Success');
           this.dialogRef.close({ status: 'Success', emergency: res });
         },
@@ -210,6 +238,7 @@ export class AddEmergenciesComponent {
       // CREATE
       this.emergenciesHttp.createEmergency(createPayload).subscribe({
         next: (res: Emergency) => {
+          console.log("Data received for create: ", res);
           this.toastr.success(`${emergencyType} added successfully`, 'Success');
           this.dialogRef.close({ status: 'Success', emergency: res });
         },

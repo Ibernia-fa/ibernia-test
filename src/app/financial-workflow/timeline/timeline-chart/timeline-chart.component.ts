@@ -73,12 +73,15 @@ export class TimelineChartComponent implements OnInit, OnChanges {
   private readonly DIALOG_SYSTEM_EVENTS = [
     'Inheritance',
     'Wedding',
-    'Home',
     'Travel',
-    'Car',
     'Education',
-    'New business',
-    'Boat',
+    'New business'
+  ];
+
+  private readonly DIALOG_FINANCING_EVENTS = [
+    'Home',
+    'Car',
+    'Boat'
   ];
 
   timeline: Timeline;
@@ -193,6 +196,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
               );
             });
 
+          this.autoAddRetirementIfMissing();
           this.cdr.detectChanges();
         })
       )
@@ -315,11 +319,15 @@ export class TimelineChartComponent implements OnInit, OnChanges {
       return;
     }
 
+    const dropEventType = this.DIALOG_SYSTEM_EVENTS.some(baseName => this.draggedEvent?.name.startsWith(baseName))
+      ? EventType.SYSTEM
+      : EventType.FINANCING;
+
     const dialogRef = this.dialog.open(AddEventDialogComponent, {
-      width: '700px',
+      width: '900px',
       disableClose: true,
       data: {
-        eventType: EventType.SYSTEM,
+        eventType: dropEventType,
         amountCycles: this.amountCycles,
         customEvents: this.customEventsLibrary,
         escalataionRates: this.escalationRates,
@@ -330,6 +338,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
         forecastStartDateYear: moment(this.financialTimeline.forecastStartDate).year(),
         forecastEndDateYear: moment(this.financialTimeline.forecastEndtDate).year(),
         isIncomeEvent: this.draggedEvent.type === EventIncomeType.Income,
+        isCashEvent: dropEventType === EventType.FINANCING ? true : false,
         patchEvent: this.draggedEvent,
         dropTime: new Date(moment(dropTime).year(), 0),
         eventsList: this.financialTimeline.clientEvents.map((event) => {
@@ -767,7 +776,9 @@ export class TimelineChartComponent implements OnInit, OnChanges {
   updateEventByDoubleClick(clientEvent: ClientEvent) {
     const eventType = this.DIALOG_SYSTEM_EVENTS.some(baseName => clientEvent.name.startsWith(baseName))
       ? EventType.SYSTEM
-      : EventType.CUSTOM;
+      : this.DIALOG_FINANCING_EVENTS.some(baseName => clientEvent.name.startsWith(baseName))
+        ? EventType.FINANCING
+        : EventType.CUSTOM;
 
     const dialogRef = this.dialog.open(AddEventDialogComponent, {
       width: '700px',
@@ -836,26 +847,58 @@ export class TimelineChartComponent implements OnInit, OnChanges {
   }
 
   handleEventRemoval(item: any, callback: (item: any) => void) {
-    this.timelineHttpService
-      .deleteEvent(this.financialTimeline.cashflow.id, item.id)
-      .pipe(
-        take(1),
-        map((res) => {
-          this.financialTimeline.clientEvents.splice(
-            this.financialTimeline.clientEvents.findIndex(
-              (event) => event.id === item.id
-            ),
-            1
-          );
-          if (item.content?.includes('Retirement age')) {
-            this.addRetirementBackToChips();
-          }
-          this.timeline.setItems(this.timelineData);
-          this.timeline.redraw();
-          callback(item);
-        })
-      )
-      .subscribe();
+    let isDeleteFinanceEvent = false;
+
+    if (item.content?.includes('Home') 
+      || item.content?.includes('Car')
+    || item.content?.includes('Boat')) {
+      isDeleteFinanceEvent = true;
+    }
+    
+    if (isDeleteFinanceEvent) {
+      this.timelineHttpService
+        .deleteFinancingEvent(this.financialTimeline.cashflow.id, item.id)
+        .pipe(
+          take(1),
+          map((res) => {
+            this.financialTimeline.clientEvents.splice(
+              this.financialTimeline.clientEvents.findIndex(
+                (event) => event.id === item.id
+              ),
+              1
+            );
+            if (item.content?.includes('Retirement age')) {
+              this.addRetirementBackToChips();
+            }
+            this.timeline.setItems(this.timelineData);
+            this.timeline.redraw();
+            callback(item);
+          })
+        )
+        .subscribe();
+    }
+    else {
+      this.timelineHttpService
+        .deleteEvent(this.financialTimeline.cashflow.id, item.id)
+        .pipe(
+          take(1),
+          map((res) => {
+            this.financialTimeline.clientEvents.splice(
+              this.financialTimeline.clientEvents.findIndex(
+                (event) => event.id === item.id
+              ),
+              1
+            );
+            if (item.content?.includes('Retirement age')) {
+              this.addRetirementBackToChips();
+            }
+            this.timeline.setItems(this.timelineData);
+            this.timeline.redraw();
+            callback(item);
+          })
+        )
+        .subscribe();
+    }
   }
 
   private getContent(title: string, img: string): string {
@@ -1003,5 +1046,63 @@ export class TimelineChartComponent implements OnInit, OnChanges {
     if (birthEvents.length === 0) return 'Birth';
 
     return `Birth ${birthEvents.length + 1}`;
+  }
+
+  private autoAddRetirementIfMissing(): void {
+    if (!this.financialTimeline || !this.clientBirthDate) return;
+
+    const alreadyExists = this.financialTimeline.clientEvents
+      ?.some(e => e.name === 'Retirement age');
+
+    if (alreadyExists) return;
+
+    const retirementYear = this.getRetirementDropYear();
+    if (!retirementYear) return;
+
+    const retirementEvent: ClientEvent = {
+      id: '',
+      name: 'Retirement age',
+      type: EventIncomeType.Income,
+      iconUrl: 'retirement-age-icon',
+      netAmount: {
+        currencySymbol: this.client.clientDetails.preferredCurrency,
+        amount: 0,
+        cycle: null
+      },
+      start: {
+        age: retirementYear - moment(this.clientBirthDate).year(),
+        year: retirementYear
+      },
+      end: null,
+      escalationRate: null,
+      isPlaceHolder: true,
+      isOneOff: true,
+      isDefault: true,
+      isCash: false,
+      isFinance: false,
+      isParent: false
+    };
+
+    this.timelineHttpService
+      .addEvent(retirementEvent, this.financialTimeline.cashflow.id)
+      .pipe(take(1))
+      .subscribe({
+        next: () => {
+          this.financialTimeline.clientEvents.push(retirementEvent);
+
+          // remove from chips (same as drag-drop behaviour)
+          this.removeRetirementFromChips();
+
+          // refresh timeline
+          this.timeline.setItems(this.timelineData);
+          this.cdr.detectChanges();
+          this.timeline.redraw();
+
+          this.updateTimelines.emit();
+        },
+        error: (err) => {
+          console.error('Failed to auto-add retirement event', err);
+        }
+      });
   }
 }

@@ -1,4 +1,8 @@
 /* General Table Styling */
+table {
+  width: 100%;
+  border-collapse: collapse; /* Ensures consistent spacing between cells */
+}
 
 
 /* Detail Row Styling */
@@ -94,6 +98,15 @@ tr.example-detail-row {
 
 .mat-mdc-row:hover {
   background-color: #e0e0e0; /* Optional: Highlight row on hover */
+}
+
+// Table Container
+.clientTableContainer {
+  background: #ffffff;
+  border: 1px solid #e7e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: none;
 }
 
 // #pad-0 {

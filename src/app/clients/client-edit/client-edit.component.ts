@@ -7,7 +7,12 @@ import {
   ValidationErrors,
   Validators,
 } from '@angular/forms';
-import { MAT_DATE_FORMATS, MAT_DATE_LOCALE, provideNativeDateAdapter } from '@angular/material/core';
+import {
+  DateAdapter,
+  MAT_DATE_FORMATS,
+  MAT_DATE_LOCALE,
+  NativeDateAdapter,
+} from '@angular/material/core';
 import {
   MAT_DATE_RANGE_SELECTION_STRATEGY,
   MatDatepickerModule,
@@ -31,6 +36,8 @@ import {MatCheckboxModule} from '@angular/material/checkbox';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { TranslateModule } from '@ngx-translate/core';
 import { Location } from '@angular/common';
+import { Store } from '@ngrx/store';
+import * as ClientActions from 'src/app/store/client/client.actions';
 
 export const DMY_FORMATS = {
   parse: { dateInput: 'DD/MM/YYYY' },
@@ -41,6 +48,34 @@ export const DMY_FORMATS = {
     monthYearA11yLabel: 'MMMM YYYY',
   }
 };
+
+class DmyDateAdapter extends NativeDateAdapter {
+  override parse(value: any): Date | null {
+    if (value instanceof Date) {
+      return value;
+    }
+
+    if (typeof value === 'string') {
+      const digits = value.replace(/\D/g, '').slice(0, 8);
+      if (digits.length === 8) {
+        const day = Number(digits.slice(0, 2));
+        const month = Number(digits.slice(2, 4));
+        const year = Number(digits.slice(4, 8));
+        const date = new Date(year, month - 1, day);
+        if (
+          date.getFullYear() === year &&
+          date.getMonth() === month - 1 &&
+          date.getDate() === day
+        ) {
+          return date;
+        }
+        return null;
+      }
+    }
+
+    return super.parse(value);
+  }
+}
 
 @Component({
   selector: 'app-client-edit',
@@ -62,7 +97,7 @@ export const DMY_FORMATS = {
   providers: [
     ClientHttpService,
     ToastrService,
-    provideNativeDateAdapter(),
+    { provide: DateAdapter, useClass: DmyDateAdapter },
     // {
     //   provide: MAT_DATE_RANGE_SELECTION_STRATEGY,
     //   useClass: FiveDayRangeSelectionStrategy,
@@ -97,7 +132,8 @@ export class ClientEditComponent {
     private toastr: ToastrService,
     private activatedRoute: ActivatedRoute,
     private authService: AuthService,
-    private location: Location
+    private location: Location,
+    private store: Store
   ) {
     this.user = this.authService.getUserProfile();
 
@@ -336,7 +372,8 @@ export class ClientEditComponent {
         .updateClient(client)
         .pipe(
           filter((res) => !!res),
-          map((res) => {
+          map(() => {
+            this.store.dispatch(ClientActions.selectClient({ client }));
             this.location.back();
             this.toastr.success('Client updated successfully', 'Success!');
           }),
@@ -762,22 +799,23 @@ export class ClientEditComponent {
     const digits = onlyDigits(raw);
     let formatted = formatDigitsToDMY(digits);
 
-    if (formatted === raw) return;
+    if (formatted !== raw) {
+      inputEl.value = formatted;
 
-    inputEl.value = formatted;
+      let newCursor = digitsBeforeCursor;
+      if (digitsBeforeCursor > 2) newCursor += 1;
+      if (digitsBeforeCursor > 4) newCursor += 1;
 
-    let newCursor = digitsBeforeCursor;
-    if (digitsBeforeCursor > 2) newCursor += 1;
-    if (digitsBeforeCursor > 4) newCursor += 1;
+      newCursor = Math.min(newCursor, formatted.length);
 
-    newCursor = Math.min(newCursor, formatted.length);
+      requestAnimationFrame(() => {
+        if (document.activeElement === inputEl) {
+          inputEl.setSelectionRange(newCursor, newCursor);
+        }
+      });
+    }
 
-    requestAnimationFrame(() => {
-      if (document.activeElement === inputEl) {
-        inputEl.setSelectionRange(newCursor, newCursor);
-      }
-  });
-  this.updateClientAgePreview(digits);
+    this.updateClientAgePreview(digits);
 
     // Only update the input if formatting actually changes it
     // if (formatted !== value) {

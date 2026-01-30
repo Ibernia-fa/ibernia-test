@@ -33,6 +33,9 @@ export interface ClientEvent {
   isPlaceHolder: boolean;
   isOneOff: boolean;
   isDefault: boolean;
+  isCash: boolean | false;
+  isFinance: boolean | false;
+  isParent: boolean | false;
 }
 
 export interface NetAmount {
