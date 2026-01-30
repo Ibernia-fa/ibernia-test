@@ -123,6 +123,7 @@ export class ProfileComponent {
           console.log('clinet', this.client)
           this.client = client;
           this.cashflows = cashflows;
+          this.birthDate = this.client?.clientDetails.birthDate;
           this.refreshTotalSavings();
 
           this.isLoaderVisible = false;
