@@ -97,7 +97,6 @@ export class AddEventDialogComponent {
   hideEventType = false;
   isInheritanceOneOff = false;
   isCashEvent = false;
-  isOneOffFinancing = true;
   financialRecords: FinancialRecordLineItem[] = [];
 
   constructor(
@@ -190,6 +189,7 @@ export class AddEventDialogComponent {
       this.eventForm.get('end')?.clearValidators();
       this.eventForm.get('end')?.updateValueAndValidity({ emitEvent: false });
       this.eventForm.get('cycle')?.setValue('One-off', { emitEvent: false });
+      this.eventForm.get('cycle')?.disable();
     }
   }
 

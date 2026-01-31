@@ -270,7 +270,7 @@
 
   <mat-dialog-content>
     <div [formGroup]="eventForm" class="d-flex flex-column gap-20">
-      
+
       <div class="w-100 form-field gap-8" *ngIf="isEditWorkflow && showNameEdit">
         <mat-label class="f-s-16 d-block" style="line-height: 18px">Name</mat-label>
         <input matInput formControlName="name" />
@@ -334,10 +334,9 @@
             <input matInput type="text" inputmode="decimal" formControlName="amount" thousandSeparatorInput
               placeholder="0" />
           </div>
-          <div class="right">
+          <div class="right hide-arrow">
             <mat-select (valueChange)="onCycleValueChange($event)" value="Select" formControlName="cycle"
-              class="sortby-edit-profile" [class.hide-arrow]="isOneOffFinancing" [disabled]="isOneOffFinancing"
-              hideSingleSelectionIndicator>
+              class="sortby-edit-profile" hideSingleSelectionIndicator>
               @for (cycle of cycles; track cycle) {
               <mat-option [value]="cycle">{{ cycle }}</mat-option>
               }
@@ -370,14 +369,7 @@
             </div>
             @if(eventForm.get('start')?.touched &&
             eventForm.get('start')?.hasError('required')) {
-            @if(eventForm.get('cycle')?.value ==='One-off')
-            {
             <span class="field-error d-block">{{'Required' | translate}}</span>
-            }
-            @else
-            {
-            <span class="field-error d-block">{{'Required' | translate}}</span>
-            }
             }
           </div>
         </div>
@@ -391,8 +383,22 @@
           <mat-label class="f-s-16 f-w-400 d-block">{{ 'Monthly payment' | translate }}</mat-label>
           <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
         </div>
-        <div class="w-100 form-field">
-          <input matInput formControlName="monthlyPayment" thousandSeparatorInput placeholder="0" />
+        <div class="net-field d-flex align-items-center">
+          <div class="left hide-arrow">
+            <mat-select value="£" formControlName="currency" class="sortby-edit-profile" hideSingleSelectionIndicator>
+              @for (country of countries; track country) {
+              @if(country.currencySymbol) {
+              <mat-option [value]="country.currencySymbol">{{
+                country.currencySymbol
+                }}</mat-option>
+              }
+              }
+            </mat-select>
+          </div>
+          <div class="w-100 form-field">
+            <input matInput type="text" inputmode="decimal" formControlName="monthlyPayment" thousandSeparatorInput
+              placeholder="0" />
+          </div>
         </div>
       </div>
 
@@ -454,13 +460,10 @@
       <!-- resale checkbox -->
       <div class="d-flex align-items-center gap-8">
         <section class="example-section">
-          <mat-checkbox 
-            type="checkbox"
-            (change)="hasResaleChanged($event.checked)"
-            formControlName="hasResale">
+          <mat-checkbox type="checkbox" (change)="hasResaleChanged($event.checked)" formControlName="hasResale">
             {{ 'I plan to sell this asset' | translate}}
           </mat-checkbox>
-      </section>
+        </section>
       </div>
 
       @if(eventForm.get('hasResale')?.value) {
@@ -469,15 +472,14 @@
           <div class="col-6">
             <div class="d-flex gap-4 align-items-center m-b-10">
               <mat-label class="f-s-16 f-w-400 d-block">{{ 'Resale date' | translate }}</mat-label>
-              <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4" 
+              <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4"
                 matTooltip="{{ 'ADD_EVENT.DEFINE_EVENT_PERIOD_TOOLTIP' | translate }}">
             </div>
             <div class="row justify-content-between align-items-start flex-nowrap">
               <div class="col-12">
                 <div class="w-100 form-field">
                   <div class="select-option">
-                    <mat-select formControlName="resaleDate"
-                      hideSingleSelectionIndicator>
+                    <mat-select formControlName="resaleDate" hideSingleSelectionIndicator>
                       @for (year of years; let i = $index; track year) {
                       <mat-option [value]="year">
                         {{ year }} ({{ clientAge + i }})
@@ -494,15 +496,24 @@
           </div>
 
           <div class="col-6">
-            <div class="d-flex gap-4 align-items-center m-b-10">
-              <mat-label class="f-s-16 f-w-400 d-block">
-                {{ 'Resale price' | translate }}
-              </mat-label>
-              <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4"
-                matTooltip="{{ 'ADD_EVENT.DEFINE_EVENT_PERIOD_TOOLTIP' | translate }}">
-            </div>
-            <div class="row justify-content-between align-items-start flex-nowrap">
-              <div class="col-12">
+            <div class="d-flex flex-column gap-8 net-fields">
+              <div class="d-flex gap-4 align-items-center">
+                <mat-label class="f-s-16 f-w-400 d-block">{{ 'Resale pricet' | translate }}</mat-label>
+                <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
+              </div>
+              <div class="net-field d-flex align-items-center">
+                <div class="left hide-arrow">
+                  <mat-select value="£" formControlName="currency" class="sortby-edit-profile"
+                    hideSingleSelectionIndicator>
+                    @for (country of countries; track country) {
+                    @if(country.currencySymbol) {
+                    <mat-option [value]="country.currencySymbol">{{
+                      country.currencySymbol
+                      }}</mat-option>
+                    }
+                    }
+                  </mat-select>
+                </div>
                 <div class="w-100 form-field">
                   <input matInput type="text" inputmode="decimal" formControlName="resalePrice" thousandSeparatorInput
                     placeholder="0" />
