@@ -290,15 +290,14 @@
         <div class="tabs">
           <div class="row">
             <div class="col-6">
-              <button (click)="onCashControlClicked(true)" class="button-icon w-100" [class]="{ active: isCashEvent }">
-                <span [class]="{ active: isCashEvent }">{{ 'Cash' | translate }}</span>
+              <button (click)="onCashControlClicked(true)" class="button-icon w-100" [class.active]="isCashEvent">
+                <span [class.active]="isCashEvent">{{ 'Cash' | translate }}</span>
               </button>
             </div>
 
             <div class="col-6">
-              <button (click)="onCashControlClicked(false)" class="button-icon w-100"
-                [class]="{ active: !isCashEvent }">
-                <span [class]="{ active: !isCashEvent }">{{ 'Financing' | translate }}</span>
+              <button (click)="onCashControlClicked(false)" class="button-icon w-100" [class.active]="!isCashEvent">
+                <span [class.active]="!isCashEvent">{{ 'Financing' | translate }}</span>
               </button>
             </div>
           </div>

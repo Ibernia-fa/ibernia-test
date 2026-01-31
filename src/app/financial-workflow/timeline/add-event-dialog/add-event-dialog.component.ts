@@ -9,7 +9,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSelectChange, MatSelectModule } from '@angular/material/select';
 import { Client } from 'src/app/clients/models/client';
-import { ClientEvent, Cycle, EscalationRate, EventIncomeType } from '../models/financial-timeline';
+import { ClientEvent, Cycle, EscalationRate, EventIncomeType, FinancialRecordLineItem } from '../models/financial-timeline';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 import { Timeline } from 'vis-timeline';
 import { TimelineHttpService } from '../services/timeline-http.service';
@@ -96,9 +96,9 @@ export class AddEventDialogComponent {
   isAllowRename: boolean = false;
   hideEventType = false;
   isInheritanceOneOff = false;
-
   isCashEvent = false;
   isOneOffFinancing = true;
+  financialRecords: FinancialRecordLineItem[] = [];
 
   constructor(
     private dialogRef: MatDialogRef<AddEventDialogComponent>,
@@ -185,17 +185,11 @@ export class AddEventDialogComponent {
 
     if (this.selectedEventType === EventType.FINANCING) {
       this.isIncomeEvent = false; // financing is always expense
-      this.isCashEvent = this.data.isCashEvent;
+      this.isCashEvent = this.isEditWorkflow ? this.patchEvent?.isCash ?? true : this.data.isCashEvent;
       this.eventForm.get('escalationRate')?.disable();
-
-      if (this.isCashEvent || this.eventForm.get('paymentType')?.value === 'Cash') {
-        this.eventForm.get('end')?.clearValidators();
-        this.eventForm.get('end')?.updateValueAndValidity({ emitEvent: false });
-        this.eventForm.get('cycle')?.setValue('One-off', { emitEvent: false });
-      } else {
-        this.eventForm.get('end')?.setValidators(Validators.required);
-        this.eventForm.get('end')?.updateValueAndValidity({ emitEvent: false });
-      }
+      this.eventForm.get('end')?.clearValidators();
+      this.eventForm.get('end')?.updateValueAndValidity({ emitEvent: false });
+      this.eventForm.get('cycle')?.setValue('One-off', { emitEvent: false });
     }
   }
 
@@ -239,6 +233,7 @@ export class AddEventDialogComponent {
         break;
 
       case EventType.FINANCING:
+        this.isCashEvent = true;
         this.eventForm = this.fb.group({
           name: [this.patchEvent?.name],
           isIncomeEvent: [false],
@@ -268,34 +263,7 @@ export class AddEventDialogComponent {
           .valueChanges
           .subscribe(type => this.applyFinancingValidators(type));
 
-        // React to payment type changes (important!)
-        this.eventForm.get('paymentType')!
-          .valueChanges
-          .subscribe(() => {
-            if (this.eventForm.get('hasResale')?.value) {
-              this.setDefaultResaleValues();
-            }
-          });
-
-        this.eventForm.get('hasResale')!.valueChanges.subscribe(checked => {
-          const resaleDate = this.eventForm.get('resaleDate');
-          const resalePrice = this.eventForm.get('resalePrice');
-
-          resaleDate?.clearValidators();
-          resalePrice?.clearValidators();
-
-          if (checked) {
-            resaleDate?.setValidators(Validators.required);
-            resalePrice?.setValidators([Validators.required, Validators.min(0)]);
-            this.setDefaultResaleValues();
-          } else {
-            resaleDate?.setValue(null, { emitEvent: false });
-            resalePrice?.setValue(0, { emitEvent: false });
-          }
-
-          resaleDate?.updateValueAndValidity({ emitEvent: false });
-          resalePrice?.updateValueAndValidity({ emitEvent: false });
-        });
+        this.setupFinancingSubscriptions();
 
         break;
 
@@ -326,7 +294,6 @@ export class AddEventDialogComponent {
       this.eventForm.get('start')?.setValidators(Validators.required);
       this.eventForm.get('end')?.setValidators(Validators.required);
       this.eventForm.get('escalationRate')?.setValidators(Validators.required);
-
       this.eventForm.get('cycle')?.enable({ emitEvent: false });
     }
 
@@ -755,7 +722,7 @@ export class AddEventDialogComponent {
       return;
     }
 
-    // Event
+
     this.timelineHttpService.addFinancingEvents(events, this.cashflowId)
       .pipe(
         filter(res => !!res),
@@ -781,23 +748,8 @@ export class AddEventDialogComponent {
   }
 
   hasResaleChanged(event: any) {
-    console.log(event);
-
-    // if (event) {
-    //   this.savingsForm.get('start')?.setValidators(Validators.required);
-    //   this.savingsForm.get('start')?.updateValueAndValidity();
-    //   this.savingsForm.get('end')?.setValidators(Validators.required);
-    //   this.savingsForm.get('end')?.updateValueAndValidity();
-
-    //   this.savingsForm.get('end')?.patchValue(this.eventsList[0].start.year > 0 ? this.eventsList[0].start.year : this.forecastStartDateYear)
-    // } else {
-    //   this.savingsForm.get('start')?.removeValidators(Validators.required);
-    //   this.savingsForm.get('start')?.updateValueAndValidity();
-    //   this.savingsForm.get('end')?.removeValidators(Validators.required);
-    //   this.savingsForm.get('end')?.updateValueAndValidity();
-
-    //   this.savingsForm.get('end')?.patchValue(this.forecastEndDateYear-1)
-    // }
+    // enable disable validation
+    this.setupResaleValidation();
   }
 
   private applyFinancingValidators(paymentType: 'Cash' | 'Financing') {
@@ -826,14 +778,13 @@ export class AddEventDialogComponent {
     }
 
     if (paymentType === 'Financing') {
-      amount?.setValidators([Validators.required, Validators.min(0)]);
-      monthlyPayment?.setValidators([Validators.required, Validators.min(0)]);
+      amount?.setValidators([Validators.required, Validators.min(1)]);
+      monthlyPayment?.setValidators([Validators.required, Validators.min(1)]);
       monthlyStart?.setValidators(Validators.required);
       monthlyEnd?.setValidators(Validators.required);
 
       if (!monthlyStart?.value) {
         monthlyStart?.setValue(this.eventForm.get('start')?.value, { emitEvent: false });
-
         this.eventForm.patchValue({ cycle: 'Every month' }, { emitEvent: false });
       }
     }
@@ -846,6 +797,7 @@ export class AddEventDialogComponent {
   }
 
   private createBaseEvent(
+    id: string,
     name: string,
     amount: number,
     year: number,
@@ -854,7 +806,7 @@ export class AddEventDialogComponent {
     isParent: boolean,
   ): ClientEvent {
     return {
-      id: '',
+      id,
       name,
       netAmount: {
         cycle: {
@@ -889,6 +841,7 @@ export class AddEventDialogComponent {
     };
   }
 
+  // parent or main event
   private buildOneOffExpense(amount: number, year: number): ClientEvent {
     let finalName = this.patchEvent?.name ?? 'Asset purchase';
 
@@ -902,13 +855,16 @@ export class AddEventDialogComponent {
       finalName = this.eventForm.get('name')?.value;
     }
 
+    const id = this.isEditWorkflow ? this.patchEvent?.id ?? "" : "";
+
     return this.createBaseEvent(
+      id,
       finalName,
       amount,
       year,
       'One-off',
       EventIncomeType.Expense,
-      true
+      true,
     );
   }
 
@@ -929,7 +885,11 @@ export class AddEventDialogComponent {
       finalName = this.eventForm.get('name')?.value;
     }
 
+    const monthly = this.financialRecords?.find(x => x.description?.includes("Monthly payment"));
+    const id = this.isEditWorkflow ? monthly?.id ?? "" : "";
+
     const event = this.createBaseEvent(
+      id,
       `${finalName} – Monthly payment`,
       amount,
       startYear,
@@ -959,7 +919,11 @@ export class AddEventDialogComponent {
       finalName = this.eventForm.get('name')?.value;
     }
 
+    const resale = this.financialRecords?.find(x => x.description?.includes("Resale"));
+    const id = this.isEditWorkflow ? resale?.id ?? "" : "";
+
     return this.createBaseEvent(
+      id,
       `${finalName} – Resale`,
       amount,
       year,
@@ -1004,35 +968,65 @@ export class AddEventDialogComponent {
   }
 
   private patchFinancingForm() {
-    const entries = this.patchEvent//?.entries ?? [];
-    // if (!entries.length) return;
+    if (this.isEditWorkflow)
+      this.financialRecords = this.data.financialRecords;
 
-    const purchase = this.patchEvent; //entries.find(e => e.entryType === 'PURCHASE');
-    const monthly = this.patchEvent; //entries.find(e => e.entryType === 'MONTHLY_PAYMENT');
-    const resale = this.patchEvent; //entries.find(e => e.entryType === 'RESALE');
-
-    const paymentType = monthly ? 'Financing' : 'Cash';
+    this.isCashEvent = this.patchEvent?.isCash ?? true;
+    const paymentType: 'Cash' | 'Financing' = this.isCashEvent ? 'Cash' : 'Financing';
+    const monthly = this.financialRecords?.find(x => x.description?.includes("– Monthly payment"));
+    const resale = this.financialRecords?.find(x => x.description?.includes("– Resale"));
 
     this.eventForm.patchValue({
       name: this.patchEvent?.name,
+      paymentType: paymentType,
+      amount: this.patchEvent?.netAmount?.amount ?? 0,
+      start: this.patchEvent?.start?.year ?? null,
 
-      paymentType,
-      amount: purchase?.netAmount.amount ?? 0,
-      start: purchase?.start.year ?? null,
-
-      monthlyPayment: monthly?.netAmount.amount ?? 0,
-      monthlyStart: monthly?.start.year ?? null,
-      monthlyEnd: monthly?.end ?? null,
+      monthlyPayment: monthly?.amount?.amount ?? 0,
+      monthlyStart: monthly?.start?.year ?? null,
+      monthlyEnd: monthly?.end?.year ?? null,
 
       hasResale: !!resale,
-      resaleDate: resale?.start.year ?? null,
-      resalePrice: resale?.netAmount.amount ?? 0,
+      resaleDate: resale?.start?.year ?? null,
+      resalePrice: resale?.amount?.amount ?? 0,
 
-      cycle: paymentType === 'Cash' ? 'One-off' : 'Every month'
-    }, { emitEvent: false });
+      cycle: 'One-off',
+    }, { emitEvent: true });
 
-    this.isCashEvent = paymentType === 'Cash';
     this.applyFinancingValidators(paymentType);
+  }
+
+  private setupFinancingSubscriptions() {
+    this.eventForm.get('paymentType')!.valueChanges.subscribe(type => {
+      this.applyFinancingValidators(type);
+      if (this.eventForm.get('hasResale')?.value) {
+        this.setDefaultResaleValues();
+      }
+    });
+
+    this.setupResaleValidation();
+  }
+
+  private setupResaleValidation() {
+    this.eventForm.get('hasResale')!.valueChanges.subscribe(checked => {
+      const resaleDate = this.eventForm.get('resaleDate');
+      const resalePrice = this.eventForm.get('resalePrice');
+
+      resaleDate?.clearValidators();
+      resalePrice?.clearValidators();
+
+      if (checked) {
+        resaleDate?.setValidators(Validators.required);
+        resalePrice?.setValidators([Validators.required, Validators.min(0)]);
+        this.setDefaultResaleValues();
+      } else {
+        resaleDate?.setValue(null, { emitEvent: false });
+        resalePrice?.setValue(0, { emitEvent: false });
+      }
+
+      resaleDate?.updateValueAndValidity({ emitEvent: false });
+      resalePrice?.updateValueAndValidity({ emitEvent: false });
+    });
   }
 }
 

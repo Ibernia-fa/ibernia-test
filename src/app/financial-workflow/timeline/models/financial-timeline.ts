@@ -50,7 +50,6 @@ export interface Cycle {
 }
 
 export interface EscalationRate {
-  // id: string;
   description: string;
   value: string;
 }
@@ -64,4 +63,22 @@ export enum EventIncomeType
 {
     Income = 1,
     Expense = 2
+}
+
+export interface TimelineResponse {
+  timeline: FinancialTimeline;
+  financialRecords: FinancialRecordLineItem[];
+}
+
+export interface FinancialRecordLineItem {
+  id: string;
+  description: string;
+  amount: NetAmount;
+  start: AgeYear;
+  end: AgeYear | null;
+  escalationRate: EscalationRate | null;
+  isParent: boolean | false;
+  parentId: string;
+  isCash: boolean | false;
+  isFinance: boolean | false;
 }

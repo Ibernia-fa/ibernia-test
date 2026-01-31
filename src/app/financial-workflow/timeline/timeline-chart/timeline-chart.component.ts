@@ -16,7 +16,7 @@ import {
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
-import { ClientEvent, Cycle, EscalationRate, EventIncomeType, FinancialTimeline } from '../models/financial-timeline';
+import { ClientEvent, Cycle, EscalationRate, EventIncomeType, FinancialTimeline, FinancialRecordLineItem } from '../models/financial-timeline';
 import { DataSet, moment, Timeline, TimelineOptions, } from 'vis-timeline/standalone';
 import { MatDialog } from '@angular/material/dialog';
 import { TimelineHttpService } from '../services/timeline-http.service';
@@ -91,6 +91,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
   draggedEvent: ClientEvent | null;
 
   @Input() financialTimeline: FinancialTimeline;
+  @Input() financialRecords: FinancialRecordLineItem[] | [];
   @Input() clientBirthDate: Date;
   @Input() client: Client;
   @Input() title: string = 'Timeline';
@@ -196,7 +197,6 @@ export class TimelineChartComponent implements OnInit, OnChanges {
               );
             });
 
-          this.autoAddRetirementIfMissing();
           this.cdr.detectChanges();
         })
       )
@@ -774,6 +774,9 @@ export class TimelineChartComponent implements OnInit, OnChanges {
   }
 
   updateEventByDoubleClick(clientEvent: ClientEvent) {
+    const linkedIncomesAndExpenses = 
+      this.financialRecords.filter(e => e.parentId === clientEvent.id);
+
     const eventType = this.DIALOG_SYSTEM_EVENTS.some(baseName => clientEvent.name.startsWith(baseName))
       ? EventType.SYSTEM
       : this.DIALOG_FINANCING_EVENTS.some(baseName => clientEvent.name.startsWith(baseName))
@@ -804,6 +807,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
         }),
         isEditWorkflow: true,
         patchEvent: clientEvent,
+        financialRecords: linkedIncomesAndExpenses
       },
     });
 
@@ -1046,63 +1050,5 @@ export class TimelineChartComponent implements OnInit, OnChanges {
     if (birthEvents.length === 0) return 'Birth';
 
     return `Birth ${birthEvents.length + 1}`;
-  }
-
-  private autoAddRetirementIfMissing(): void {
-    if (!this.financialTimeline || !this.clientBirthDate) return;
-
-    const alreadyExists = this.financialTimeline.clientEvents
-      ?.some(e => e.name === 'Retirement age');
-
-    if (alreadyExists) return;
-
-    const retirementYear = this.getRetirementDropYear();
-    if (!retirementYear) return;
-
-    const retirementEvent: ClientEvent = {
-      id: '',
-      name: 'Retirement age',
-      type: EventIncomeType.Income,
-      iconUrl: 'retirement-age-icon',
-      netAmount: {
-        currencySymbol: this.client.clientDetails.preferredCurrency,
-        amount: 0,
-        cycle: null
-      },
-      start: {
-        age: retirementYear - moment(this.clientBirthDate).year(),
-        year: retirementYear
-      },
-      end: null,
-      escalationRate: null,
-      isPlaceHolder: true,
-      isOneOff: true,
-      isDefault: true,
-      isCash: false,
-      isFinance: false,
-      isParent: false
-    };
-
-    this.timelineHttpService
-      .addEvent(retirementEvent, this.financialTimeline.cashflow.id)
-      .pipe(take(1))
-      .subscribe({
-        next: () => {
-          this.financialTimeline.clientEvents.push(retirementEvent);
-
-          // remove from chips (same as drag-drop behaviour)
-          this.removeRetirementFromChips();
-
-          // refresh timeline
-          this.timeline.setItems(this.timelineData);
-          this.cdr.detectChanges();
-          this.timeline.redraw();
-
-          this.updateTimelines.emit();
-        },
-        error: (err) => {
-          console.error('Failed to auto-add retirement event', err);
-        }
-      });
   }
 }

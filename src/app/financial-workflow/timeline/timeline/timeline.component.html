@@ -30,7 +30,11 @@
         </mat-card-content>
     </mat-card>
 
-    <app-timeline-chart [financialTimeline]="financialTimeline" [clientBirthDate]="clientBirthDate" [client]="client"
+    <app-timeline-chart 
+        [financialTimeline]="financialTimeline" 
+        [financialRecords]="financialRecords"
+        [clientBirthDate]="clientBirthDate"
+        [client]="client"
         (updateTimelines)="updateTimelinesEmittedEvent()">
     </app-timeline-chart>
 
