@@ -51,6 +51,8 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 })
 export class AddEventDialogComponent {
   @ViewChild('amountInput') amountInput?: ElementRef<HTMLInputElement>;
+  @ViewChild('monthlyPayment') monthlyPayment?: ElementRef<HTMLInputElement>;
+  @ViewChild('resalePrice') resalePrice?: ElementRef<HTMLInputElement>;
   private readonly AUTO_RENAME_EVENTS = [
     'Wedding',
     'Travel',
@@ -1021,6 +1023,33 @@ export class AddEventDialogComponent {
     }, { emitEvent: true });
 
     this.applyFinancingValidators(paymentType);
+
+    setTimeout(() => {
+      // Net amount / Downpayment 
+      const el = this.amountInput?.nativeElement;
+      const amount = this.eventForm.get('amount')?.value;
+      if (!el || amount === null || amount === undefined || amount === '') return;
+      el.value = Number(amount).toLocaleString('en-US');
+      el.dispatchEvent(new Event('blur'));
+    });
+
+    setTimeout(() => {
+      // Monthly payment
+      const elMonthlyPayment = this.monthlyPayment?.nativeElement;
+      const monthlyPayment = this.eventForm.get('monthlyPayment')?.value;
+      if (!elMonthlyPayment || monthlyPayment === null || monthlyPayment === undefined || monthlyPayment === '') return;
+      elMonthlyPayment.value = Number(monthlyPayment).toLocaleString('en-US');
+      elMonthlyPayment.dispatchEvent(new Event('blur'));
+    });
+
+    setTimeout(() => {
+      // Resale prive
+      const elResalePrice = this.resalePrice?.nativeElement;
+      const resalePrice = this.eventForm.get('resalePrice')?.value;
+      if (!elResalePrice || resalePrice === null || resalePrice === undefined || resalePrice === '') return;
+      elResalePrice.value = Number(resalePrice).toLocaleString('en-US');
+      elResalePrice.dispatchEvent(new Event('blur'));
+    });
   }
 
   private setupFinancingSubscriptions() {
