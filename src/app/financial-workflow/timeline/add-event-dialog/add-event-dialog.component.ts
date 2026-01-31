@@ -667,6 +667,30 @@ export class AddEventDialogComponent {
     };
   }
 
+  private endOnOrAfterStartMonthlyValidator(): ValidatorFn {
+    return (group: AbstractControl) => {
+      const start = group.get('monthlyStart')?.value as number | null;
+      const end = group.get('monthlyEnd')?.value as number | null;
+      const endCtrl = group.get('monthlyEnd');
+
+      if (!endCtrl) return null;
+
+      const existing = endCtrl.errors ?? null;
+
+      // validate only when cycle is not One-off and both numbers are present
+      const shouldValidate = start != null && end != null;
+
+      if (shouldValidate && end < start) {
+        endCtrl.setErrors({ ...(existing ?? {}), endBeforeStart: true });
+      } else if (existing && 'endBeforeStart' in existing) {
+        const { endBeforeStart, ...rest } = existing;
+        endCtrl.setErrors(Object.keys(rest).length ? rest : null);
+      }
+
+      return null;
+    };
+  }
+
   toggleNameEdit() {
     this.showNameEdit = !this.showNameEdit;
   }
@@ -787,6 +811,9 @@ export class AddEventDialogComponent {
         monthlyStart?.setValue(this.eventForm.get('start')?.value, { emitEvent: false });
         this.eventForm.patchValue({ cycle: 'Every month' }, { emitEvent: false });
       }
+
+      this.eventForm.setValidators(this.endOnOrAfterStartMonthlyValidator());
+      this.eventForm.updateValueAndValidity({ emitEvent: false });
     }
 
     amount?.updateValueAndValidity({ emitEvent: false });
