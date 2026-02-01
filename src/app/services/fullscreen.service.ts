@@ -132,7 +132,7 @@ export class FullscreenService {
     this.renderer.setProperty(
       textSpan,
       'textContent',
-      `Savings hit zero at ${data.firstShortfallAge}`
+      `Savings hit zero at ${data.firstShortfallAge} y.o.`
     );
 
     this.renderer.appendChild(statusDiv, iconSpan);
