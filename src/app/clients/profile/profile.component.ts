@@ -115,7 +115,6 @@ export class ProfileComponent {
         }),
         filter(([cashflows, client]) => !!client && client.id === this.clientId),
         map(([cashflows, client]) => {
-          console.log('clinet', this.client)
           this.client = client;
           this.cashflows = cashflows;
 
