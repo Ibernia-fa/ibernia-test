@@ -6,8 +6,8 @@
       <img matChipAvatar [src]="'/assets/images/svgs/' + patchEvent.iconUrl + '.svg'" [alt]="patchEvent.iconUrl"
         class="bold-icon" />
       <h3>
-        {{ isEditWorkflow ? eventForm.get('name')?.value : patchEvent?.name }}
-        <ng-container *ngIf="isEditWorkflow && isAllowRename">
+        {{ eventForm.get('name')?.value }}
+        <ng-container *ngIf="isAllowRename">
           <img src="assets/images/svgs/drop-down-edit-2-line.svg" alt="edit" class="cursor-pointer edit-name-icon"
             (click)="toggleNameEdit()" />
         </ng-container>
@@ -20,7 +20,7 @@
 
   <mat-dialog-content>
     <div [formGroup]="eventForm" class="d-flex flex-column gap-20">
-      <div class="w-100 form-field gap-8" *ngIf="isEditWorkflow && showNameEdit">
+      <div class="w-100 form-field gap-8" *ngIf="showNameEdit">
         <mat-label class="f-s-16 d-block" style="line-height: 18px">Name</mat-label>
         <input matInput formControlName="name" />
         @if(eventForm.get('name')?.touched &&
@@ -256,8 +256,8 @@
       <img matChipAvatar [src]="'/assets/images/svgs/' + patchEvent.iconUrl + '.svg'" [alt]="patchEvent.iconUrl"
         class="bold-icon" />
       <h3>
-        {{ isEditWorkflow ? eventForm.get('name')?.value : patchEvent?.name }}
-        <ng-container *ngIf="isEditWorkflow && isAllowRename">
+        {{ eventForm.get('name')?.value }}
+        <ng-container *ngIf="isAllowRename">
           <img src="assets/images/svgs/drop-down-edit-2-line.svg" alt="edit" class="cursor-pointer edit-name-icon"
             (click)="toggleNameEdit()" />
         </ng-container>
@@ -271,7 +271,7 @@
   <mat-dialog-content>
     <div [formGroup]="eventForm" class="d-flex flex-column gap-20">
 
-      <div class="w-100 form-field gap-8" *ngIf="isEditWorkflow && showNameEdit">
+      <div class="w-100 form-field gap-8" *ngIf="showNameEdit">
         <mat-label class="f-s-16 d-block" style="line-height: 18px">Name</mat-label>
         <input matInput formControlName="name" />
         @if(eventForm.get('name')?.touched &&

@@ -154,10 +154,26 @@ export class AddEventDialogComponent {
       this.years.push(element);
     }
 
-    if (this.selectedEventType == EventType.SYSTEM || this.selectedEventType == EventType.FINANCING) {
-      // not allow edit base name
-      if (this.isEditWorkflow && !this.AUTO_RENAME_EVENTS.includes(this.data.patchEvent.name)) {
-        this.isAllowRename = true;
+    if (this.selectedEventType == EventType.SYSTEM
+      || this.selectedEventType == EventType.FINANCING) {
+
+      // add new case
+      if (!this.isEditWorkflow) {
+        const existingEvent = this.data.eventsList
+          ?.filter((e: any) =>
+            e.name === this.data.patchEvent.name || e.name.startsWith(`${this.data.patchEvent.name} `)
+          ) ?? [];
+
+        const isAutoRenameRequired = existingEvent.length > 0;
+
+        if (!this.AUTO_RENAME_EVENTS.includes(this.data.patchEvent.name) || isAutoRenameRequired) {
+          this.isAllowRename = true;
+        }
+      }
+      else { // update case
+        if (!this.AUTO_RENAME_EVENTS.includes(this.data.patchEvent.name)) {
+          this.isAllowRename = true;
+        }
       }
 
       // not changeable event type (income/expense)
@@ -192,6 +208,11 @@ export class AddEventDialogComponent {
       this.eventForm.get('end')?.updateValueAndValidity({ emitEvent: false });
       this.eventForm.get('cycle')?.setValue('One-off', { emitEvent: false });
       this.eventForm.get('cycle')?.disable();
+    }
+
+    if (!this.isEditWorkflow) {
+      const updatedName = this.getNextEventName(this.eventForm.get('name')?.value);
+      this.eventForm.get('name')?.setValue(updatedName, { emitEvent: false });
     }
   }
 
@@ -698,7 +719,7 @@ export class AddEventDialogComponent {
   }
 
   private getNextEventName(baseName: string): string {
-    const existing = this.eventsList
+    const existing = this.data.eventsList
       ?.filter((e: any) =>
         e.name === baseName || e.name.startsWith(`${baseName} `)
       ) ?? [];
