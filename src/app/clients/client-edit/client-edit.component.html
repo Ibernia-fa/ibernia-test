@@ -176,7 +176,17 @@
             <div class="w-100 form-field">
               <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Date of birth' | translate }}</mat-label>
               <div class="position-relative">
-                <input matInput [matDatepicker]="partnerPicker" formControlName="dob" />
+                <input
+                  matInput
+                  [matDatepicker]="partnerPicker"
+                  formControlName="dob"
+                  placeholder="DD/MM/YYYY"
+                  inputmode="numeric"
+                  autocomplete="bday"
+                  (input)="onPartnerDobTyping(dobPartnerInput)"
+                  (dateChange)="onPartnerCalendarChange($event.value)"
+                  #dobPartnerInput
+                />
                 <!-- <mat-hint>MM/DD/YYYY</mat-hint> -->
                 <div class="date-picker-position">
                   <mat-datepicker-toggle matIconSuffix [for]="partnerPicker">
@@ -187,14 +197,22 @@
                 </div>
                 <mat-datepicker #partnerPicker></mat-datepicker>
               </div>
+              <div class="d-flex flex-column gap-1 m-t-4">
+              <span class="f-s-12 text-muted"
+                ></span
+              >
+              @if(partnerAge !== null) {
+              <span class="f-s-12 f-w-500">Age: {{ partnerAge }}</span>
+              }
+            </div>
               @if(clientForm.get('partner.dob')?.touched &&
               clientForm.get('partner.dob')?.hasError('required')) {
-              <span class="field-error d-block">{{'Date of Birth is required' | translate}}</span>
+              <span class="field-error d-block">{{
+                "Required" | translate
+              }}</span>
+              } @if(clientForm.get('partner.dob')?.touched && partnerDobError) {
+              <span class="field-error d-block">{{ partnerDobError | translate }}</span>
               }
-
-              <!-- <mat-form-field appearance="outline" class="w-100">
-                                        <input matInput placeholder="ACME Inc." />
-                                    </mat-form-field> -->
             </div>
           </div>
         </div>

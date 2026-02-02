@@ -44,42 +44,46 @@
   </mat-card>
   <mat-card class="cardWithShadow ">
     <mat-card-content style="padding-bottom: 10px !important;">
-      <div class="icon-financial-label">
-      <ng-container *ngIf="!compareReport || !compareCashflow">
-        <button matTooltip="{{ 'Full screen' | translate}}" class="button-full-screen" (click)="enterFullscreen()">
-          <img width="16" src="../../../assets/images/svgs/full-screen.svg" alt="">
-        </button>
-      </ng-container>
+      <!-- <div class="icon-financial-label"> -->
+        <ng-container *ngIf="!compareReport || !compareCashflow">
+          <button matTooltip="{{ 'Full screen' | translate}}" class="button-full-screen" (click)="enterFullscreen()">
+            <img width="16" src="../../../assets/images/svgs/full-screen.svg" alt="">
+          </button>
+        </ng-container>
 
-      <div class="shortfall" *ngIf="report">
-            <ng-container *ngIf="!hasShortfall; else lossTpl">
-              <div class="shortfall-status-profit">
-                <span class="icon-bg leaf-bg">
-                  <img
-                    src="../../../assets/images/svgs/leaf.svg"
-                    alt="leaf"
-                    class="icon-svg"
-                  />
-                </span>
-                <span class="status-text">Goals on track and funded</span>
-              </div>
-            </ng-container>
-            <ng-template #lossTpl>
-              <div class="shortfall-status-loss">
-                <span class="icon-bg flag-bg">
-                  <img
-                    src="../../../assets/images/svgs/triangle-flag.svg"
-                    alt="flag"
-                    class="icon-svg"
-                  />
-                </span>
-                <span class="status-text">
-                  Savings hit zero at {{ firstShortfallAge }} y.o.
-                </span>
-              </div>
-            </ng-template>
+        <ng-container *ngIf="compareCashflow">
+          <p class="compare-chart-name">{{cashflow?.name}}</p>
+        </ng-container>
+
+        <div class="shortfall" *ngIf="report">
+          <ng-container *ngIf="!hasShortfall; else lossTpl">
+            <div class="shortfall-status-profit">
+              <span class="icon-bg leaf-bg">
+                <img
+                  src="../../../assets/images/svgs/leaf.svg"
+                  alt="leaf"
+                  class="icon-svg"
+                />
+              </span>
+              <span class="status-text">Goals on track and funded</span>
+            </div>
+          </ng-container>
+          <ng-template #lossTpl>
+            <div class="shortfall-status-loss">
+              <span class="icon-bg flag-bg">
+                <img
+                  src="../../../assets/images/svgs/triangle-flag.svg"
+                  alt="flag"
+                  class="icon-svg"
+                />
+              </span>
+              <span class="status-text">
+                Savings hit zero at {{ firstShortfallAge }} y.o.
+              </span>
+            </div>
+          </ng-template>
       </div>
-      </div>
+    <!-- </div> -->
 
       <div class="chart-component-wrapper">
 
@@ -101,9 +105,9 @@
         </button>
       </ng-container>
 
-      <!-- <div class="d-flex flex-column gap-8 m-b-16">
-        <div class="d-flex align-items-center justify-content-between w-100 gap-16 flex-wrap"></div>
-      </div> -->
+      <ng-container *ngIf="compareCashflow">
+        <p class="compare-chart-name">{{compareTimeline?.cashflow?.name}}</p>
+      </ng-container>
 
       <div class="d-flex flex-column">
         <div class="shortfall" *ngIf="report">
@@ -129,7 +133,7 @@
                   />
                 </span>
                 <span class="status-text">
-                  Savings hit zero at {{ firstShortfallAge }}
+                  Savings hit zero at {{ firstShortfallAge }} y.o.
                 </span>
               </div>
             </ng-template>
