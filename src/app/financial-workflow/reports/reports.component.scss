@@ -376,6 +376,15 @@ tr.example-detail-row {
   font-size: 14px;
 }
 
+.shortfall-compare {
+  display: flex;
+  align-items: center;
+  gap: 6;
+  margin-left: 150px;
+  width: fit-content;
+  font-size: 14px;
+}
+
 .shortfall-status-profit {
   display: flex;
   align-items: center;
@@ -462,4 +471,11 @@ tr.example-detail-row {
   flex-direction: column;
   gap: 32px;
   margin-top: -32px;
+}
+
+.compare-chart-name {
+  margin: 0;
+  margin-bottom: 15px;
+  font-size: 20px;
+  font-weight: 600;
 }
