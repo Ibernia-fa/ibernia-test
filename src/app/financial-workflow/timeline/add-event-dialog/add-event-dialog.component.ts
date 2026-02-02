@@ -974,15 +974,14 @@ export class AddEventDialogComponent {
 
     const paymentType = this.eventForm.get('paymentType')?.value;
     const startYear = this.eventForm.get('start')?.value;
-    const endYear = this.eventForm.get('end')?.value;
+    const endYearMonthlyPayment = this.eventForm.get('monthlyEnd')?.value;
     const eventName = this.patchEvent?.name;
 
     let resaleYear: number | null = null;
 
     if (paymentType === 'Financing') {
-      resaleYear = endYear ?? null;
+      resaleYear = endYearMonthlyPayment ?? null;
     } else {
-      // Cash logic
       if (eventName === 'Car') {
         resaleYear = startYear + 5;
       } else if (eventName === 'Home' || eventName === 'Boat') {
@@ -1043,7 +1042,7 @@ export class AddEventDialogComponent {
     });
 
     setTimeout(() => {
-      // Resale prive
+      // Resale price
       const elResalePrice = this.resalePrice?.nativeElement;
       const resalePrice = this.eventForm.get('resalePrice')?.value;
       if (!elResalePrice || resalePrice === null || resalePrice === undefined || resalePrice === '') return;
