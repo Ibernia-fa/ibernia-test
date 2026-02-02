@@ -512,8 +512,8 @@ export class TimelineChartComponent implements OnInit, OnChanges {
           return {
             id: event.id,
             content: this.getContent(event.name, event.iconUrl),
-            start: new Date(startYear, 12, 1), // Jan 1st of start year
-            end: new Date(event.end.year, 12, 1), // Jan 1st of end year
+            start: new Date(startYear, 0, 1), // Jan 1st of start year
+            end: new Date(event.end.year, 0, 1), // Jan 1st of end year
             className: event.iconUrl,
             editable: {
               updateTime: true,
@@ -551,8 +551,8 @@ export class TimelineChartComponent implements OnInit, OnChanges {
           return {
             id: event.id,
             content: this.getContent(event.name, event.iconUrl),
-            start: new Date(startYear, 12, 1), // Jan 1st of start year
-            end: new Date(startYear + calculatedWidth, 12, 1), // End based on calculated width
+            start: new Date(startYear, 0, 1), // Jan 1st of start year
+            end: new Date(startYear + calculatedWidth, 0, 1), // End based on calculated width
             className: event.iconUrl,
             editable: {
               updateTime: true,

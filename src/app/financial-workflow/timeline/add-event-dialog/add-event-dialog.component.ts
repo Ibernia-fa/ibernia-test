@@ -248,7 +248,7 @@ export class AddEventDialogComponent {
           amount: ['', [Validators.required, Validators.min(0)]],
           cycle: [defaultCycle, [Validators.required]],
           ageDate: [moment(this.dropTime).year(), Validators.required],
-          start: [null, Validators.required],
+          start: [moment(this.dropTime).year(), Validators.required],
           end: [0, Validators.required],
           escalationRate: [this.escalationRates[0].value, Validators.required],
           customEscalationRate: [0]
