@@ -178,18 +178,18 @@ export class AddEventDialogComponent {
 
       // not changeable event type (income/expense)
       if (
-        this.data.patchEvent.name === "Inheritance" ||
-        this.data.patchEvent.name === "Wedding" ||
-        this.data.patchEvent.name === "Travel" ||
-        this.data.patchEvent.name === "Education" ||
-        this.data.patchEvent.name === "New business"
+        this.data.patchEvent.name.startsWith("Inheritance") ||
+        this.data.patchEvent.name.startsWith("Wedding") ||
+        this.data.patchEvent.name.startsWith("Travel") ||
+        this.data.patchEvent.name.startsWith("Education") ||
+        this.data.patchEvent.name.startsWith("New business")
       ) {
         this.hideEventType = true;
 
         // inheritance is default one-off. 
         // diable cycle on one-off
         // Date is Default at 65 years of age. If the user is older than 65, no default date.
-        if (this.data.patchEvent.name === "Inheritance") {
+        if (this.data.patchEvent.name.startsWith("Inheritance")) {
           this.isInheritanceOneOff = true;
         }
       }
@@ -234,7 +234,7 @@ export class AddEventDialogComponent {
     // make travel one off (there could be multiple travel events with rename functionality,
     //  consider while changing iconUrl until there is some proper solution to this)
     if (this.selectedEventType == EventType.SYSTEM
-      && (this.patchEvent?.name == "Travel" ||
+      && (this.patchEvent?.name.startsWith("Travel") ||
         this.patchEvent?.iconUrl == "travel-icon")) {
       defaultCycle = 'Every year';
     }

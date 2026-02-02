@@ -260,14 +260,6 @@ export class TimelineChartComponent implements OnInit, OnChanges {
     )
       return;
 
-    const newEvent = {
-      id: this.draggedEvent.id,
-      content: this.draggedEvent.name,
-      start: new Date(moment(dropTime).year(), 0),
-      end: new Date(moment(dropTime).year() + 1, 0),
-      className: this.draggedEvent.iconUrl,
-    };
-
     if (this.draggedEvent.isPlaceHolder) {
       const clientEvent: ClientEvent = {
         ...this.draggedEvent
