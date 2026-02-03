@@ -8,10 +8,15 @@ import { Client } from '../../models/client';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CashflowHttpService } from '../../services/cashflow-http.service';
 import { Cashflow } from '../../models/cashflow';
-import { catchError, filter } from 'rxjs';
+import { catchError, combineLatestWith, filter, map, switchMap, tap } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
+import { Store } from '@ngrx/store';
+import { selectedClient } from 'src/app/store/client/client.selectors';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import * as ClientActions from 'src/app/store/client/client.actions';
+import { ClientHttpService } from '../../services/client-http.service';
 
 @Component({
   selector: 'app-add-model-dialog',
@@ -30,6 +35,8 @@ import { TranslateModule } from '@ngx-translate/core';
 export class AddModelDialogComponent {
 
   form: FormGroup;
+  birthDate!: Date;
+  minAge!: number;
 
   constructor(
     private dialogRef: MatDialogRef<AddModelDialogComponent>,
@@ -37,8 +44,10 @@ export class AddModelDialogComponent {
     private fb: FormBuilder,
     private cashflowHttpService: CashflowHttpService,
     private toaster: ToastrService,
-    private router: Router
+    private router: Router,
   ) {
+    this.birthDate = new Date(this.clientData?.clientDetails?.birthDate);
+    this.minAge = this.calculateAge(this.birthDate);
     this.initForm();
   }
 
@@ -46,6 +55,10 @@ export class AddModelDialogComponent {
     this.form = this.fb.group({
       // name: ['Lifetime Plan', Validators.required],
       name: ['', Validators.required],
+      planDuration: [
+        null,
+        [Validators.required, Validators.min(this.minAge), Validators.max(100)]
+      ],
       description: ['']
     });
   }
@@ -64,7 +77,8 @@ export class AddModelDialogComponent {
         id: '',
         description: this.form.get('description')?.value,
         name: this.form.get('name')?.value,
-        clientBirthDate: this.clientData.clientDetails.birthDate,
+        planDuration: this.form.get('planDuration')?.value,
+        clientBirthDate: this.birthDate,
         client: {
           id: this.clientData.id,
           name: this.clientData.clientDetails.firstName
@@ -85,10 +99,22 @@ export class AddModelDialogComponent {
           throw err;
         })
       ).subscribe((res) => {
+        console.log("Cashflow created successfully", res);
         this.toaster.success('Plan Created Successfully');
         this.dialogRef.close();
         this.router.navigate([`cashflows/${res.id}/timeline`]);
       });
     }
+  }
+
+  private calculateAge(birthDate: Date): number {
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
   }
 }

@@ -1,4 +1,4 @@
-import { Component, inject, Inject, Optional } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import {
   MAT_DIALOG_DATA,
@@ -16,10 +16,11 @@ import {
 } from '@angular/forms';
 import { CashflowHttpService } from '../../services/cashflow-http.service';
 import { Cashflow } from '../../models/cashflow';
-import { catchError, filter } from 'rxjs';
+import { catchError, filter, map, switchMap } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
+import { Client } from '../../models/client';
 
 @Component({
   selector: 'app-edit-model-dialog',
@@ -38,21 +39,33 @@ import { TranslateModule } from '@ngx-translate/core';
 })
 export class EditModelDialogComponent {
   form: FormGroup;
+  birthDate!: Date;
+  minAge!: number;
 
   constructor(
     private dialogRef: MatDialogRef<EditModelDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public cashflow: Cashflow,
+    @Inject(MAT_DIALOG_DATA) public clientData: Client,
     private fb: FormBuilder,
     private cashflowHttpService: CashflowHttpService,
     private toaster: ToastrService,
-    private router: Router
+    private router: Router,
+    private activatedRoute: ActivatedRoute
   ) {
+    const birthDateValue =
+      this.cashflow?.clientBirthDate ?? this.clientData?.clientDetails?.birthDate;
+    this.birthDate = birthDateValue ? new Date(birthDateValue) : new Date();
+    this.minAge = this.calculateAge(this.birthDate);
     this.initForm();
   }
 
   initForm() {
     this.form = this.fb.group({
       name: [this.cashflow.name, Validators.required],
+      planDuration: [
+        this.cashflow.planDuration,
+        [Validators.required, Validators.min(this.minAge), Validators.max(100)]
+      ],
       description: [this.cashflow.description],
     });
     this.form.updateValueAndValidity();
@@ -72,6 +85,7 @@ export class EditModelDialogComponent {
         id: this.cashflow.id,
         description: this.form.get('description')?.value,
         name: this.form.get('name')?.value,
+        planDuration: this.form.get('planDuration')?.value,
         clientBirthDate: this.cashflow.clientBirthDate,
         client: {
           id: this.cashflow.client.id,
@@ -96,10 +110,25 @@ export class EditModelDialogComponent {
           })
         )
         .subscribe((res) => {
+          console.log(res);
           this.toaster.success('Plan Updated Successfully');
           this.dialogRef.close();
           // this.router.navigate([`cashflows/${res.id}/timeline`]);
         });
     }
+  }
+
+  private calculateAge(birthDate: Date): number {
+    if (Number.isNaN(birthDate.getTime())) {
+      return 0;
+    }
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
   }
 }
