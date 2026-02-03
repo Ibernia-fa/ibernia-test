@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { AddIncomeComponent } from './add-income/add-income.component';
-import { UpdateIncomeComponent } from './update-income/update-income.component';
 import { MatCardModule } from '@angular/material/card';
 import { AddExpenseComponent } from './add-expense/add-expense.component';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -216,30 +215,6 @@ export class IncomeExpensesComponent {
     });
   }
 
-  // updateIncomeClicked() {
-  //   const dialogRef = this.dialog.open(UpdateIncomeComponent, {
-  //     width: '700px',
-  //     disableClose: true,
-  //     data: {},
-  //   });
-
-  //   dialogRef.afterClosed().subscribe((result: any) => {
-  //     console.log('Dialog closed with result:', result);
-  //   });
-  // }
-
-  // updateExpenseClicked() {
-  //   const dialogRef = this.dialog.open(UpdateIncomeComponent, {
-  //     width: '700px',
-  //     disableClose: true,
-  //     data: {},
-  //   });
-
-  //   dialogRef.afterClosed().subscribe((result: any) => {
-  //     console.log('Dialog closed with result:', result);
-  //   });
-  // }
-
   deleteIncome(element: FinancialViewModel) {
     this.incomeExpensesHttpService
       .deleteIncome(this.selectedCashflow.id, element)
@@ -262,28 +237,5 @@ export class IncomeExpensesComponent {
     this.expenseDataSource = new MatTableDataSource(
       this.incomeExpense.expenses
     );
-  }
-
-  private calculateSavingsRate() {
-    var totalIncome = 0;
-    var totalExpense = 0;
-    this.incomeExpense.incomes.map(
-      (x) => (totalIncome = totalIncome + x.amount.amount)
-    );
-    this.incomeExpense.expenses.map(
-      (x) => (totalExpense = totalExpense + x.amount.amount)
-    );
-    this.incomeExpense.totalIncome = totalIncome;
-    this.incomeExpense.totalExpenses = totalExpense;
-    this.incomeExpense.total = totalIncome - totalExpense;
-
-    if (totalIncome === 0) {
-      return;
-    }
-    // return 0; // Avoid division by zero
-
-    var savings =
-      this.incomeExpense.totalIncome - this.incomeExpense.totalExpenses;
-    return (savings / this.incomeExpense.totalIncome) * 100;
   }
 }
