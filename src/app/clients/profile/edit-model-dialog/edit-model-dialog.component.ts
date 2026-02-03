@@ -39,13 +39,6 @@ import { Client } from '../../models/client';
 })
 export class EditModelDialogComponent {
   form: FormGroup;
-  clientId: string;
-  clientAge?: number;
-  minPlanDuration?: number;
-  maxPlanDuration = 100;
-  projectionEndAge?: number;
-  projectionEndYear?: number;
-  private clientBirthDate?: Date;
   birthDate!: Date;
   minAge!: number;
 
@@ -59,14 +52,10 @@ export class EditModelDialogComponent {
     private router: Router,
     private activatedRoute: ActivatedRoute
   ) {
-    console.log('cashflow data', this.cashflow);
-    const birthDate =
-      this.clientData?.clientDetails?.birthDate ?? this.cashflow?.clientBirthDate;
-      console.log('birthDate', birthDate);
-    if (birthDate) {
-      this.birthDate = new Date(birthDate);
-      this.minAge = this.calculateAge(this.birthDate);
-    }
+    const birthDateValue =
+      this.cashflow?.clientBirthDate ?? this.clientData?.clientDetails?.birthDate;
+    this.birthDate = birthDateValue ? new Date(birthDateValue) : new Date();
+    this.minAge = this.calculateAge(this.birthDate);
     this.initForm();
   }
 
@@ -130,6 +119,9 @@ export class EditModelDialogComponent {
   }
 
   private calculateAge(birthDate: Date): number {
+    if (Number.isNaN(birthDate.getTime())) {
+      return 0;
+    }
     const today = new Date();
     let age = today.getFullYear() - birthDate.getFullYear();
     const m = today.getMonth() - birthDate.getMonth();

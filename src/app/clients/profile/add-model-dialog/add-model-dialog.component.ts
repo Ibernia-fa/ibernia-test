@@ -37,7 +37,6 @@ export class AddModelDialogComponent {
   form: FormGroup;
   birthDate!: Date;
   minAge!: number;
-  clientId: string;
 
   constructor(
     private dialogRef: MatDialogRef<AddModelDialogComponent>,
@@ -79,7 +78,7 @@ export class AddModelDialogComponent {
         description: this.form.get('description')?.value,
         name: this.form.get('name')?.value,
         planDuration: this.form.get('planDuration')?.value,
-        clientBirthDate: this.clientData.clientDetails.birthDate,
+        clientBirthDate: this.birthDate,
         client: {
           id: this.clientData.id,
           name: this.clientData.clientDetails.firstName
@@ -100,6 +99,7 @@ export class AddModelDialogComponent {
           throw err;
         })
       ).subscribe((res) => {
+        console.log("Cashflow created successfully", res);
         this.toaster.success('Plan Created Successfully');
         this.dialogRef.close();
         this.router.navigate([`cashflows/${res.id}/timeline`]);
