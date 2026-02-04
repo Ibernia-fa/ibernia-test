@@ -572,11 +572,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
     const birthYear = moment(this.clientBirthDate).year();
     const forecastStartYear = moment(this.financialTimeline.forecastStartDate).year();
 
-    const timelineEndYear = new Date(
-      new Date(this.financialTimeline.forecastStartDate).setFullYear(
-        new Date(this.financialTimeline.forecastStartDate).getFullYear() + (100 - age)
-      )
-    ).getFullYear();
+    const timelineEndYear = moment(this.financialTimeline.forecastEndtDate).year();
 
     const visualBufferYears = (timelineEndYear % 2 === 0 ? 1 : 2);
 
@@ -613,8 +609,9 @@ export class TimelineChartComponent implements OnInit, OnChanges {
         minorLabels: (date: any) => {
           const today = new Date(date); // assuming date is a JS Date or something convertible
           const age = this.calculateAgeForTimeline(today, birthDate);
-          return age >= 0 && age <= 100
-            ? `<div id='selected'><p>${age}</p><span>${date.year()}</span></div>`
+          const year = date.year();
+          return year >= forecastStartYear && year <= timelineEndYear
+            ? `<div id='selected'><p>${age}</p><span>${year}</span></div>`
             : '';
         },
         majorLabels: function (date: any) {
