@@ -46,13 +46,13 @@
                 }
                  @if(form.get('planDuration')?.hasError('min')) {
                     <span class="field-error d-block">
-                        Plan duration cannot be less than your current age ({{ minAge }})
+                        Plan end age must be greater than the current age
                     </span>
                 }
 
                 @if(form.get('planDuration')?.hasError('max')) {
                 <span class="field-error d-block">
-                    Plan duration cannot be greater than 100
+                    Plan end age cannot exceed 100
                 </span>
                 }
             </div>
