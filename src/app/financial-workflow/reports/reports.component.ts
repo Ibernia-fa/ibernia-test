@@ -251,7 +251,9 @@ export class ReportsComponent {
       forecastEndDate: isComparison ?
         (this.compareTimeline?.forecastEndtDate || this.financialTimeline.forecastEndtDate) :
         this.financialTimeline.forecastEndtDate,
-      cashFlowName: this.cashflow?.name || 'Error',
+      cashFlowName: isComparison ?
+        (this.compareCashflow?.name || this.compareTimeline?.cashflow?.name || this.financialTimeline?.cashflow?.name) :
+        (this.cashflow?.name || this.financialTimeline?.cashflow?.name),
       isComparison: isComparison,
       hasShortfall: this.hasShortfall,
       firstShortfallAge: this.firstShortfallAge
