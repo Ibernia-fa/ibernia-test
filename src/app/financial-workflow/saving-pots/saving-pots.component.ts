@@ -13,7 +13,7 @@ import {
 } from '@angular/cdk/drag-drop';
 import { animate, style, transition, trigger } from '@angular/animations';
 import { CommonModule } from '@angular/common';
-import { combineLatest, filter, map, Observable, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import { combineLatest, filter, map, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { SavingsPotsHttpService as SavingPotsHttpService } from './services/savings-pots-http.service';
 import { ClientSaving, SavingPotsModel as SavingPots } from './models/saving-pots.model';
 import { Cashflow } from 'src/app/clients/models/cashflow';
@@ -37,8 +37,6 @@ import { CurrencySymbolPipe } from 'src/app/pipe/currency-symbol.pipe';
 import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { SettingsService } from 'src/app/default-preferance/services/default-preferance.http.service';
-import { Store } from '@ngrx/store';
-import { selectedClient } from 'src/app/store/client/client.selectors';
 import { TranslateModule } from '@ngx-translate/core';
 @Component({
   selector: 'app-saving-pots',
@@ -100,8 +98,6 @@ export class SavingPotsComponent implements OnInit {
   userRerturnRate: any;
   loggedInUserPreferences: any;
       private destroy$ = new Subject<void>();
-  client$: Observable<Client | null>;
-  clientData: any;
 
   constructor(
     private dialog: MatDialog,
@@ -112,8 +108,7 @@ export class SavingPotsComponent implements OnInit {
     private financialWorkflowService: FinancialWorkflowService,
     private navItemService: NavItemService,
     private Authservice: AuthService,
-     private settingsService: SettingsService,
-             private store: Store
+     private settingsService: SettingsService
   ) {
     this.navItemService.currentRouteName = 'Saving Pots';
         this.user = this.Authservice.getUserProfile();
@@ -127,12 +122,6 @@ export class SavingPotsComponent implements OnInit {
        this.loggedInUserPreferences = p;
       this.userRerturnRate = p.investmentReturn;
         });
-                this.client$ = this.store.select(selectedClient);
-                    this.client$.subscribe(client => {
-              if (client) {
-                this.clientData = client.clientDetails;
-              }
-            });
     this.getData();
     
 }
@@ -404,7 +393,7 @@ updateOrderNumbers() {
       disableClose: true,
       data: {
         returnRate: this.userRerturnRate,
-        inflationRate: this.clientData?.inflationRate,
+        inflationRate: this.selectedCashflow?.inflationRate ?? this.selectedClient?.clientDetails?.inflationRate ?? 0,
         loggedInUserPreferences : this.loggedInUserPreferences,
         amountCycles: this.amountCycles,
         escalataionRates: this.escalationRates,
@@ -477,7 +466,7 @@ updateOrderNumbers() {
       disableClose: true,
       data: {
         returnRate: this.userRerturnRate,
-        inflationRate: this.clientData?.inflationRate,
+        inflationRate: this.selectedCashflow?.inflationRate ?? this.selectedClient?.clientDetails?.inflationRate ?? 0,
         loggedInUserPreferences : this.loggedInUserPreferences,
         amountCycles: this.amountCycles,
         escalataionRates: this.escalationRates,

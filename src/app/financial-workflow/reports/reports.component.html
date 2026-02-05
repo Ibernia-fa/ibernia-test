@@ -25,8 +25,9 @@
               <!-- Cashflow name (visible when NOT in comparison mode) -->
               <ng-container *ngIf="!(compareReport || compareCashflow)">
                 <div class="d-flex align-items-center gap-8">
-                  <img src="/assets/images/svgs/chart-histogram-two-icon.svg" alt="chart" width="16" />
-                  <span class="f-s-16 underline">{{cashflow?.name}}</span>
+                  <button class="button-icon" (click)="onComparePlansClicked()">
+                    <span>{{ 'Compare plans' | translate }}</span>
+                  </button>
                 </div>
               </ng-container>
 
@@ -153,56 +154,7 @@
   <div class="h-300 d-flex align-items-center justify-content-center" *ngIf="isCompareLoading">
     <mat-spinner></mat-spinner>
   </div>
-  <mat-card class="cardWithShadow" *ngIf="!compareReport || !compareCashflow; else placeholder">
-    <mat-card-content>
-      <div class="d-flex justify-content-between align-items-center">
-
-        <!-- LEFT SIDE: Show slider or a placeholder -->
-        <div class="d-flex align-items-center gap-24" style="min-height: 48px;">
-
-          <!-- When NOT comparing → show slider -->
-          <ng-container>
-            <div class="d-flex align-items-center gap-8">
-              <img src="../../../assets/images/svgs/graph-.svg" width="16" alt="">
-              <label>{{ 'Inflation rate' | translate}}:</label>
-              <img src="../../../assets/images/svgs/help-circle-icon.svg" width="19" alt="">
-            </div>
-
-            <div class="d-flex align-items-center gap-24" [formGroup]="savingsForm">
-              <div class="slider-customizer slider-wrapper">
-                <mat-slider class="w-100" [min]="0" [max]="10" [step]="0.5">
-                  <input matSliderThumb formControlName="returnRate" (input)="onSliderInput($event)"
-                    (change)="onReturnRateCommitted()" />
-                </mat-slider>
-              </div>
-
-              <div class="percentage-field" style="width: 100px;">
-                <div class="w-100 form-field infilation-check">
-                  <mat-form-field appearance="outline" class="w-full w-100 percentage-icon">
-                    <span matSuffix>%</span>
-                    <input matInput type="number" class="p-0" formControlName="returnRate"
-                      (input)="onReturnRateInput($event)" (change)="onReturnRateCommitted()" />
-                  </mat-form-field>
-                </div>
-              </div>
-            </div>
-          </ng-container>
-
-          <!-- PLACEHOLDER BLOCK when slider is hidden -->
-          <ng-template #placeholder>
-            <div style="height: 48px; width: 400px;"></div>
-          </ng-template>
-
-        </div>
-
-        <!-- RIGHT SIDE: Compare Button always fixed -->
-        <button class="button-icon" (click)="onComparePlansClicked()">
-          <span>{{ 'Compare plans' | translate }}</span>
-        </button>
-
-      </div>
-    </mat-card-content>
-  </mat-card>
+  
   }
   @else {
   <div class="h-300">

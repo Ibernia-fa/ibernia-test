@@ -1,0 +1,11 @@
+.slider-wrapper {
+    flex: 1;
+}
+
+.percentage-field {
+    flex-basis: 98px;
+}
+
+::ng-deep .infilation-check .mat-mdc-form-field-subscript-wrapper {
+  display: none !important;
+}

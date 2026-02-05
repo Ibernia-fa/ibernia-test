@@ -177,6 +177,7 @@ export class ReportsComponent {
   cashflows: Cashflow[] = [];
   savingsForm: FormGroup;
   userRerturnRate: number;
+  private lastCashflowId: string | null = null;
   private destroy$ = new Subject<void>();
   client$: Observable<Client | null>;
   clientData: Details;
@@ -212,9 +213,6 @@ export class ReportsComponent {
       .subscribe(client => {
         if (client) {
           this.clientData = client.clientDetails;
-          this.savingsForm
-            .get('returnRate')
-            ?.setValue(this.clientData.inflationRate, { emitEvent: false });
         }
         this.getData();
       });
@@ -353,6 +351,7 @@ export class ReportsComponent {
       tap(([client, cashflow]) => {
         this.client = client as Client;
         this.cashflow = cashflow as Cashflow;
+        this.applyCashflowInflation(this.cashflow);
       }),
       switchMap(([client, cashflow]) => {
         const clientId = (client as Client).id;
@@ -439,6 +438,28 @@ private toIsoString(value: Date | string): string {
     return '';
   }
   return date.toISOString();
+}
+
+private applyCashflowInflation(cashflow: Cashflow | null): void {
+  const control = this.savingsForm.get('returnRate');
+  if (!control) return;
+
+  const rate =
+    cashflow?.inflationRate ?? this.clientData?.inflationRate;
+  const num = Number(rate);
+  if (!Number.isFinite(num)) {
+    return;
+  }
+
+  const currentId = cashflow?.id ?? null;
+  const cashflowChanged = currentId !== this.lastCashflowId;
+  if (currentId) {
+    this.lastCashflowId = currentId;
+  }
+
+  if (!control.dirty || cashflowChanged) {
+    control.setValue(this.round2(num), { emitEvent: false });
+  }
 }
 
   onReturnRateInput(event: Event) {
@@ -569,7 +590,8 @@ private toIsoString(value: Date | string): string {
     this.compareReport = null;
     this.compareTimeline = null;
 
-    const inflationRate = this.savingsForm.get('returnRate')?.value;
+    const inflationRate =
+      cashflow?.inflationRate ?? this.savingsForm.get('returnRate')?.value;
 
     this.timelineHttpService
       .getTimelinebyCashflowId(cashflowId)
