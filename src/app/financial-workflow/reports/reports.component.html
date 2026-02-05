@@ -90,7 +90,7 @@
         <app-savings-bar-stacked-chart [report]="report" [client]="client"
           [forecastStartDate]="financialTimeline.forecastStartDate"
           [forecastEndDate]="financialTimeline.forecastEndtDate"
-          [cashFlowName]="compareReport && compareCashflow ? financialTimeline?.cashflow?.name : ''">
+          [cashFlowName]="cashflow?.name">
         </app-savings-bar-stacked-chart>
       </div>
     </mat-card-content>
@@ -106,7 +106,7 @@
       </ng-container>
 
       <ng-container *ngIf="compareCashflow">
-        <p class="compare-chart-name">{{compareTimeline?.cashflow?.name}}</p>
+        <p class="compare-chart-name">{{compareCashflow?.name}}</p>
       </ng-container>
 
       <div class="d-flex flex-column">
@@ -142,7 +142,7 @@
         <app-savings-bar-stacked-chart [report]="compareReport" [client]="client"
         [forecastStartDate]="compareTimeline?.forecastStartDate || financialTimeline.forecastStartDate"
         [forecastEndDate]="compareTimeline?.forecastEndtDate || financialTimeline.forecastEndtDate"
-        [cashFlowName]="compareReport && compareCashflow ? compareTimeline?.cashflow?.name : ''">
+        [cashFlowName]="compareCashflow?.name">
       </app-savings-bar-stacked-chart>
     </div>
     </div>
