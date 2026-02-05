@@ -49,7 +49,18 @@ export class SavingsBarStackedChartComponent implements OnChanges {
             filter: {
               type: 'none'
             }
+          },
+          active: {
+            filter: {
+              type: 'none'
+            }
           }
+        },
+        events: {
+          dataPointSelection: () => undefined
+        },
+        selection: {
+          enabled: false
         }
       },
       dataLabels: {
@@ -84,29 +95,38 @@ export class SavingsBarStackedChartComponent implements OnChanges {
       // },
       tooltip: {
   enabled: true,
-  shared: false,
+  shared: true,
+  intersect: false,
   custom: (opts: any) => {
-    const { series, seriesIndex, dataPointIndex, w } = opts;
+    const { series, dataPointIndex, w } = opts;
 
-    const value = series[seriesIndex][dataPointIndex];
-    const seriesName = w.globals.seriesNames[seriesIndex];
-    const xValue = w.globals.labels[dataPointIndex]; // should be year string like "2026"
-    const color = w.globals.colors[seriesIndex];
-
+    const xValue = w.globals.labels[dataPointIndex];
     const year = Number(xValue);
     const birthYear = moment(this.client.clientDetails.birthDate).year();
     const age = Number.isFinite(year) ? year - birthYear : '';
+
+    const bodyRows = w.globals.seriesNames
+      .map((seriesName: string, i: number) => {
+        const value = series[i]?.[dataPointIndex];
+        if (value === undefined) return '';
+        const color = w.globals.colors[i];
+        const displayValue = typeof value === 'number' ? value.toLocaleString() : String(value ?? '');
+        return `
+        <div class="savings-tooltip__body">
+          <div class="savings-tooltip__label">
+            <span class="circle-wrapper" style="background-color: ${color};"></span>${seriesName}:</div>
+          <div class="savings-tooltip__value">${displayValue}</div>
+        </div>`;
+      })
+      .filter(Boolean)
+      .join('');
 
     return `
       <div class="savings-tooltip">
         <div class="savings-tooltip__header">
           <div>Age: ${age} </div>  <div> Year: ${xValue}</div> 
         </div>
-        <div class="savings-tooltip__body">
-          <div class="savings-tooltip__label">
-              <span class="circle-wrapper" style="background-color: ${color};"></span>${seriesName}:</div>
-          <div class="savings-tooltip__value">${value.toLocaleString()}</div>
-        </div>
+        ${bodyRows}
       </div>
     `;
   }
@@ -119,6 +139,9 @@ export class SavingsBarStackedChartComponent implements OnChanges {
               position: "bottom",
               offsetX: -10,
               offsetY: 0,
+              onItemClick: {
+                toggleDataSeries: false
+              }
             },
           },
         },
@@ -126,6 +149,13 @@ export class SavingsBarStackedChartComponent implements OnChanges {
       plotOptions: {
         bar: {
           horizontal: false,
+          states: {
+            active: {
+              filter: {
+                type: 'none'
+              }
+            }
+          }
         },
       },
       grid: {
@@ -151,6 +181,14 @@ export class SavingsBarStackedChartComponent implements OnChanges {
       },
       fill: {
         opacity: 1,
+      },
+      states: {
+        normal: { filter: { type: 'none', value: 0 } },
+        hover: { filter: { type: 'none' } },
+        active: {
+          allowMultipleDataPointsSelection: false,
+          filter: { type: 'none' },
+        },
       },
       annotations: { points: [] }
     };
@@ -257,12 +295,21 @@ export class SavingsBarStackedChartComponent implements OnChanges {
         ? Math.max(1, Math.floor((lastYear! - firstYear!) / 5))
         : 1;
 
+    const birthYear = this.client?.clientDetails?.birthDate
+      ? moment(this.client.clientDetails.birthDate).year()
+      : null;
+
     this.chartOptions.xaxis = {
       type: 'category',
-      categories, // use backend years directly
+      categories, // keep years for data mapping; display as age via formatter
       tickAmount,
       labels: {
         style: { cssClass: 'leftAlign' },
+        formatter: (value: string) => {
+          if (birthYear == null) return value;
+          const year = Number(value);
+          return Number.isFinite(year) ? String(year - birthYear) : value;
+        },
       },
     };
   }
@@ -277,6 +324,21 @@ export class SavingsBarStackedChartComponent implements OnChanges {
             return value?.toLocaleString();
           }
         }
+      };
+      const birthYear = this.client?.clientDetails?.birthDate
+        ? moment(this.client.clientDetails.birthDate).year()
+        : null;
+      if (this.chartOptions.xaxis?.labels && birthYear != null) {
+        this.chartOptions.xaxis = {
+          ...this.chartOptions.xaxis,
+          labels: {
+            ...this.chartOptions.xaxis.labels,
+            formatter: (value: string) => {
+              const year = Number(value);
+              return Number.isFinite(year) ? String(year - birthYear) : value;
+            },
+          },
+        };
       }
     }
 
@@ -293,6 +355,11 @@ export class SavingsBarStackedChartComponent implements OnChanges {
           filter: {
             type: 'lighten',
             value: 0.15
+          }
+        },
+        active: {
+          filter: {
+            type: 'none'
           }
         }
       }
