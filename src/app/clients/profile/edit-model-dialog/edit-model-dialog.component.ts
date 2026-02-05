@@ -16,13 +16,14 @@ import {
 } from '@angular/forms';
 import { CashflowHttpService } from '../../services/cashflow-http.service';
 import { Cashflow } from '../../models/cashflow';
-import { EMPTY, catchError, filter, switchMap, take } from 'rxjs';
+import { EMPTY, catchError, filter, map, switchMap, take } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { Client } from '../../models/client';
 import { ReportsHttpService } from 'src/app/financial-workflow/reports/services/reports-http.service';
 import { TimelineHttpService } from 'src/app/financial-workflow/timeline/services/timeline-http.service';
+import { MaterialModule } from "src/app/material.module";
 
 @Component({
   selector: 'app-edit-model-dialog',
@@ -34,8 +35,9 @@ import { TimelineHttpService } from 'src/app/financial-workflow/timeline/service
     MatIconModule,
     MatInputModule,
     ReactiveFormsModule,
-    TranslateModule
-  ],
+    TranslateModule,
+    MaterialModule
+],
   templateUrl: './edit-model-dialog.component.html',
   styleUrl: './edit-model-dialog.component.scss',
 })
@@ -43,6 +45,7 @@ export class EditModelDialogComponent {
   form: FormGroup;
   birthDate!: Date;
   minAge!: number;
+  isLoading: boolean = false;
 
   constructor(
     private dialogRef: MatDialogRef<EditModelDialogComponent>,
@@ -70,6 +73,10 @@ export class EditModelDialogComponent {
         this.cashflow.planDuration,
         [Validators.required, Validators.min(this.minAge), Validators.max(100)]
       ],
+      inflationRate: [
+        this.cashflow.inflationRate,
+        [Validators.required, Validators.min(0), Validators.max(10)]
+      ],
       description: [this.cashflow.description],
     });
     this.form.updateValueAndValidity();
@@ -84,14 +91,20 @@ export class EditModelDialogComponent {
   }
 
   onSubmit() {
+    if (this.form.invalid) {
+      this.isLoading = false;
+      return;
+    }
+
     if (this.form.valid) {
+      this.isLoading = true;
       const planDuration = Number(this.form.get('planDuration')?.value);
-      console.log(planDuration);
       const cashflow: Cashflow = {
         id: this.cashflow.id,
         description: this.form.get('description')?.value,
         name: this.form.get('name')?.value,
         planDuration: planDuration,
+        inflationRate: this.form.get('inflationRate')?.value,
         clientBirthDate: this.cashflow.clientBirthDate,
         client: {
           id: this.cashflow.client.id,
@@ -105,17 +118,22 @@ export class EditModelDialogComponent {
         .updateCashflow(cashflow)
         .pipe(
           filter((res) => !!res),
+          map((res) => {
+            this.isLoading = false;
+            return res;
+          }),
           catchError((err) => {
             if (err.error)
               this.toaster.error(err.error);
             else
               this.toaster.error('An error occurred while updating plan');
-
+            this.isLoading = false;
             console.error('An error occurred while updating cashflow', err);
             throw err;
           })
         )
         .subscribe((res) => {
+          this.isLoading = false;
           console.log(res);
           this.toaster.success('Plan Updated Successfully');
           this.refreshReportForecastEndDate(res);
@@ -195,6 +213,24 @@ export class EditModelDialogComponent {
       return '';
     }
     return date.toISOString();
+  }
+
+  onInflationSliderInput(event: Event): void {
+    const inputElement = event.target as HTMLInputElement;
+    const value = Number(inputElement.value);
+    const val = isNaN(value) ? 0 : this.round1(value);
+    this.form.get('inflationRate')?.setValue(val, { emitEvent: true });
+  }
+
+  onInflationInput(event: Event): void {
+    const raw = (event.target as HTMLInputElement).value;
+    const num = Number(raw);
+    const val = isNaN(num) ? 0 : this.round1(num);
+    this.form.get('inflationRate')?.setValue(val, { emitEvent: true });
+  }
+
+  private round1(n: number): number {
+    return Math.round((n + Number.EPSILON) * 10) / 10;
   }
 
   private calculateAge(birthDate: Date): number {

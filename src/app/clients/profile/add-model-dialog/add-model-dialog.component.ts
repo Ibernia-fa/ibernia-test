@@ -17,6 +17,7 @@ import { selectedClient } from 'src/app/store/client/client.selectors';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import * as ClientActions from 'src/app/store/client/client.actions';
 import { ClientHttpService } from '../../services/client-http.service';
+import { MaterialModule } from "src/app/material.module";
 
 @Component({
   selector: 'app-add-model-dialog',
@@ -28,8 +29,9 @@ import { ClientHttpService } from '../../services/client-http.service';
     MatIconModule,
     MatInputModule,
     ReactiveFormsModule,
-    TranslateModule
-  ],  templateUrl: './add-model-dialog.component.html',
+    TranslateModule,
+    MaterialModule
+],  templateUrl: './add-model-dialog.component.html',
   styleUrl: './add-model-dialog.component.scss'
 })
 export class AddModelDialogComponent {
@@ -37,6 +39,7 @@ export class AddModelDialogComponent {
   form: FormGroup;
   birthDate!: Date;
   minAge!: number;
+  isLoading: boolean = false;
 
   constructor(
     private dialogRef: MatDialogRef<AddModelDialogComponent>,
@@ -53,11 +56,14 @@ export class AddModelDialogComponent {
 
   initForm() {
     this.form = this.fb.group({
-      // name: ['Lifetime Plan', Validators.required],
       name: ['', Validators.required],
       planDuration: [
         null,
         [Validators.required, Validators.min(this.minAge), Validators.max(100)]
+      ],
+      inflationRate: [
+        2.5,
+        [Validators.required, Validators.min(0), Validators.max(10)]
       ],
       description: ['']
     });
@@ -72,12 +78,19 @@ export class AddModelDialogComponent {
   }
 
   onSubmit() {
+    if (this.form.invalid) {
+      this.isLoading = false;
+      return;
+    }
+
     if(this.form.valid) {
+      this.isLoading = true;
       const cashflow: Cashflow = {
         id: '',
         description: this.form.get('description')?.value,
         name: this.form.get('name')?.value,
         planDuration: this.form.get('planDuration')?.value,
+        inflationRate: this.form.get('inflationRate')?.value,
         clientBirthDate: this.birthDate,
         client: {
           id: this.clientData.id,
@@ -89,22 +102,42 @@ export class AddModelDialogComponent {
       };
       this.cashflowHttpService.createCashflow(cashflow).pipe(
         filter(res => !!res),
+        map((res) => {
+          this.isLoading = false;
+          console.log(res);
+          return res;
+        }),
         catchError((err) => {
           if (err.error)
             this.toaster.error(err.error);
           else
             this.toaster.error('An error occurred while creating plan');
-          
+          this.isLoading = false;
           console.error("An error occurred while creating cashflow", err);
           throw err;
         })
       ).subscribe((res) => {
+        this.isLoading = false;
         console.log("Cashflow created successfully", res);
         this.toaster.success('Plan Created Successfully');
         this.dialogRef.close();
         this.router.navigate([`cashflows/${res.id}/timeline`]);
       });
     }
+  }
+
+  onInflationSliderInput(event: Event): void {
+    const inputElement = event.target as HTMLInputElement;
+    const value = Number(inputElement.value);
+    const val = isNaN(value) ? 0 : this.round1(value);
+    this.form.get('inflationRate')?.setValue(val, { emitEvent: true });
+  }
+
+  onInflationInput(event: Event): void {
+    const raw = (event.target as HTMLInputElement).value;
+    const num = Number(raw);
+    const val = isNaN(num) ? 0 : this.round1(num);
+    this.form.get('inflationRate')?.setValue(val, { emitEvent: true });
   }
 
   private calculateAge(birthDate: Date): number {
@@ -116,5 +149,9 @@ export class AddModelDialogComponent {
       age--;
     }
     return age;
+  }
+
+  private round1(n: number): number {
+    return Math.round((n + Number.EPSILON) * 10) / 10;
   }
 }

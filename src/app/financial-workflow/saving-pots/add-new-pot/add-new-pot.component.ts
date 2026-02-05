@@ -86,7 +86,7 @@ export class AddNewPotComponent {
   formattedCommissionPercentage: string = '';
   selectedName: string = '';
   selectedNameIconUrl: string = '';
-  inflationRate = 2.5;
+  inflationRate = 0;
   isEditWorkflow = false;
   selectedPot: ClientSaving;
   savingPotType= SavingPotType
@@ -132,7 +132,8 @@ export class AddNewPotComponent {
   ) {
     this.loggedInUserPreferences = data.loggedInUserPreferences;
     console.log('loggedin user preferences', this.loggedInUserPreferences);
-    this.inflationRate = data.inflationRate;
+    const infl = Number(data.inflationRate);
+    this.inflationRate = Number.isFinite(infl) ? infl : 0;
     this.cycles = data.amountCycles;
     this.escalationRates = data.escalataionRates;
     this.eventsList = data.eventsList;
