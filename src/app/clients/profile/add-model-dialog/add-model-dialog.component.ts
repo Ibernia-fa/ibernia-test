@@ -58,12 +58,12 @@ export class AddModelDialogComponent {
     this.form = this.fb.group({
       name: ['', Validators.required],
       planDuration: [
-        null,
+        90,
         [Validators.required, Validators.min(this.minAge), Validators.max(100)]
       ],
       inflationRate: [
         2.5,
-        [Validators.required, Validators.min(0), Validators.max(10)]
+        [Validators.required, Validators.min(0), Validators.max(1000)]
       ],
       description: ['']
     });
