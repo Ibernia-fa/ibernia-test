@@ -56,32 +56,61 @@ export class SavingsBarStackedChartComponent implements OnChanges {
         enabled: false
       },
 
+      // tooltip: {
+      //   enabled: true,
+      //   shared: false, // or true if you want stacked values together
+      //   custom: (opts: any) => {
+      //     const { series, seriesIndex, dataPointIndex, w } = opts;
+
+      //     const value = series[seriesIndex][dataPointIndex];
+      //     const seriesName = w.globals.seriesNames[seriesIndex];
+      //     const xValue = w.globals.labels[dataPointIndex];
+      //     const color = w.globals.colors[seriesIndex];
+
+      //     const age = [(Math.floor(xValue) - moment(this.client.clientDetails.birthDate).year())]
+      //     return `
+      //     <div class="savings-tooltip">
+      //       <div class="savings-tooltip__header">
+      //         <div>Age: ${age} </div>  <div> Year: ${xValue}</div> 
+      //       </div>
+      //       <div class="savings-tooltip__body">
+      //         <div class="savings-tooltip__label">
+      //             <span class="circle-wrapper" style="background-color: ${color};"></span>${seriesName}:</div>
+      //         <div class="savings-tooltip__value">${value.toLocaleString()}</div>
+      //       </div>
+      //     </div>
+      //   `;
+      //   }
+      // },
       tooltip: {
-        enabled: true,
-        shared: false, // or true if you want stacked values together
-        custom: (opts: any) => {
-          const { series, seriesIndex, dataPointIndex, w } = opts;
+  enabled: true,
+  shared: false,
+  custom: (opts: any) => {
+    const { series, seriesIndex, dataPointIndex, w } = opts;
 
-          const value = series[seriesIndex][dataPointIndex];
-          const seriesName = w.globals.seriesNames[seriesIndex];
-          const xValue = w.globals.labels[dataPointIndex];
-          const color = w.globals.colors[seriesIndex];
+    const value = series[seriesIndex][dataPointIndex];
+    const seriesName = w.globals.seriesNames[seriesIndex];
+    const xValue = w.globals.labels[dataPointIndex]; // should be year string like "2026"
+    const color = w.globals.colors[seriesIndex];
 
-          const age = [(Math.floor(xValue) - moment(this.client.clientDetails.birthDate).year())]
-          return `
-          <div class="savings-tooltip">
-            <div class="savings-tooltip__header">
-              <div>Age: ${age} </div>  <div> Year: ${xValue}</div> 
-            </div>
-            <div class="savings-tooltip__body">
-              <div class="savings-tooltip__label">
-                  <span class="circle-wrapper" style="background-color: ${color};"></span>${seriesName}:</div>
-              <div class="savings-tooltip__value">${value.toLocaleString()}</div>
-            </div>
-          </div>
-        `;
-        }
-      },
+    const year = Number(xValue);
+    const birthYear = moment(this.client.clientDetails.birthDate).year();
+    const age = Number.isFinite(year) ? year - birthYear : '';
+
+    return `
+      <div class="savings-tooltip">
+        <div class="savings-tooltip__header">
+          <div>Age: ${age} </div>  <div> Year: ${xValue}</div> 
+        </div>
+        <div class="savings-tooltip__body">
+          <div class="savings-tooltip__label">
+              <span class="circle-wrapper" style="background-color: ${color};"></span>${seriesName}:</div>
+          <div class="savings-tooltip__value">${value.toLocaleString()}</div>
+        </div>
+      </div>
+    `;
+  }
+},
       responsive: [
         {
           breakpoint: 480,
@@ -128,8 +157,27 @@ export class SavingsBarStackedChartComponent implements OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['report'] && this.report?.series?.length) {
-      const seriesList = this.report.series;
+    if (!this.report?.series?.length) {
+      if (changes['client'] && this.client) {
+        this.chartOptions.yaxis = {
+          title: {
+            text: this.client.clientDetails.preferredCurrency
+          },
+          labels: {
+            // formatter: (value: any) => {
+            //   return value?.toLocaleString();
+            // }
+            formatter: (value: any) => value?.toLocaleString(),
+          },
+        };
+      }
+      return;
+    }
+
+    const report = this.report;
+
+    if (changes['report']) {
+      const seriesList = report.series;
       const seriesColors = this.chartOptions.colors || [];
 
       // dynamically build fillColors array based on series names
@@ -162,7 +210,7 @@ export class SavingsBarStackedChartComponent implements OnChanges {
       };
 
       // goals and events dots
-      this.events = this.report.timelineEvents;
+      this.events = report.timelineEvents ?? [];
 
       if (this.events.length > 0) {
         this.chartOptions.annotations = { points: this.buildEventAnnotations(this.events) };
@@ -172,17 +220,52 @@ export class SavingsBarStackedChartComponent implements OnChanges {
 
     this.chartOptions.chart = { ...this.chartOptions.chart };
 
-    if (changes['forecastStartDate'] || changes['forecastEndDate']) {
-      this.chartOptions.xaxis = {
-        type: 'category', // Treat x-axis as numbers (years)
-        categories: this.report.categories,
-        stepSize: 5, // Each year is a distinct tick
-        tickAmount: Math.floor((moment(this.forecastEndDate).year() - moment(this.forecastStartDate).year()) / 5),
-        style: {
-          cssClass: 'leftAlign'
-        }
-      }
+    // if (
+    //   (changes['forecastStartDate'] || changes['forecastEndDate']) &&
+    //   this.forecastStartDate &&
+    //   this.forecastEndDate
+    // ) {
+    //   this.chartOptions.xaxis = {
+    //     type: 'category', // Treat x-axis as numbers (years)
+    //     categories: report.categories ?? [],
+    //     stepSize: 5, // Each year is a distinct tick
+    //     tickAmount: Math.floor((moment(this.forecastEndDate).year() - moment(this.forecastStartDate).year()) / 5),
+    //     style: {
+    //       cssClass: 'leftAlign'
+    //     }
+    //   }
+    // }
+
+    if (changes['report'] || changes['forecastStartDate'] || changes['forecastEndDate']) {
+    const categories = report.categories ?? [];
+
+    let firstYear = categories.length ? Number(categories[0]) : undefined;
+    let lastYear = categories.length ? Number(categories[categories.length - 1]) : undefined;
+
+    // Fallback to forecast dates only if categories are missing
+    if (!Number.isFinite(firstYear) && this.forecastStartDate) {
+      firstYear = moment(this.forecastStartDate).year();
     }
+    if (!Number.isFinite(lastYear) && this.forecastEndDate) {
+      lastYear = moment(this.forecastEndDate).year();
+    }
+
+    const tickAmount =
+      Number.isFinite(firstYear) &&
+      Number.isFinite(lastYear) &&
+      lastYear! > firstYear!
+        ? Math.max(1, Math.floor((lastYear! - firstYear!) / 5))
+        : 1;
+
+    this.chartOptions.xaxis = {
+      type: 'category',
+      categories, // use backend years directly
+      tickAmount,
+      labels: {
+        style: { cssClass: 'leftAlign' },
+      },
+    };
+  }
 
     if (changes['client']) {
       this.chartOptions.yaxis = {
@@ -198,10 +281,10 @@ export class SavingsBarStackedChartComponent implements OnChanges {
     }
 
     // final series assignment
-    this.chartOptions.series = this.report.series.map((s, idx) => ({
+    this.chartOptions.series = report.series.map((s, idx) => ({
       ...s,
       tack: 'stack1',
-      order: s.name === 'Emergency Expense' ? this.report.series.length : idx,
+      order: s.name === 'Emergency Expense' ? report.series.length : idx,
       fill: {
         opacity: 1
       },

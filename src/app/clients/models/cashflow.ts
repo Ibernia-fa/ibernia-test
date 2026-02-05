@@ -3,6 +3,8 @@ import { ClientViewModel, FinancialAdvisor } from "./client"
 export interface Cashflow {
     id: string,
     name: string,
+    planDuration: number,
+    inflationRate: number,
     description: string,
     clientBirthDate: Date,
     client: ClientViewModel,

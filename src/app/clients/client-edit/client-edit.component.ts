@@ -7,7 +7,12 @@ import {
   ValidationErrors,
   Validators,
 } from '@angular/forms';
-import { MAT_DATE_FORMATS, MAT_DATE_LOCALE, provideNativeDateAdapter } from '@angular/material/core';
+import {
+  DateAdapter,
+  MAT_DATE_FORMATS,
+  MAT_DATE_LOCALE,
+  NativeDateAdapter,
+} from '@angular/material/core';
 import {
   MAT_DATE_RANGE_SELECTION_STRATEGY,
   MatDatepickerModule,
@@ -31,6 +36,8 @@ import {MatCheckboxModule} from '@angular/material/checkbox';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { TranslateModule } from '@ngx-translate/core';
 import { Location } from '@angular/common';
+import { Store } from '@ngrx/store';
+import * as ClientActions from 'src/app/store/client/client.actions';
 
 export const DMY_FORMATS = {
   parse: { dateInput: 'DD/MM/YYYY' },
@@ -41,6 +48,34 @@ export const DMY_FORMATS = {
     monthYearA11yLabel: 'MMMM YYYY',
   }
 };
+
+class DmyDateAdapter extends NativeDateAdapter {
+  override parse(value: any): Date | null {
+    if (value instanceof Date) {
+      return value;
+    }
+
+    if (typeof value === 'string') {
+      const digits = value.replace(/\D/g, '').slice(0, 8);
+      if (digits.length === 8) {
+        const day = Number(digits.slice(0, 2));
+        const month = Number(digits.slice(2, 4));
+        const year = Number(digits.slice(4, 8));
+        const date = new Date(year, month - 1, day);
+        if (
+          date.getFullYear() === year &&
+          date.getMonth() === month - 1 &&
+          date.getDate() === day
+        ) {
+          return date;
+        }
+        return null;
+      }
+    }
+
+    return super.parse(value);
+  }
+}
 
 @Component({
   selector: 'app-client-edit',
@@ -62,7 +97,7 @@ export const DMY_FORMATS = {
   providers: [
     ClientHttpService,
     ToastrService,
-    provideNativeDateAdapter(),
+    { provide: DateAdapter, useClass: DmyDateAdapter },
     // {
     //   provide: MAT_DATE_RANGE_SELECTION_STRATEGY,
     //   useClass: FiveDayRangeSelectionStrategy,
@@ -97,7 +132,8 @@ export class ClientEditComponent {
     private toastr: ToastrService,
     private activatedRoute: ActivatedRoute,
     private authService: AuthService,
-    private location: Location
+    private location: Location,
+    private store: Store
   ) {
     this.user = this.authService.getUserProfile();
 
@@ -114,15 +150,17 @@ export class ClientEditComponent {
       inflationRate: [2.5, [Validators.required, Validators.min(0), Validators.max(100)]],
       phone: [''],
       notes: [''],
+
+      // Partner Info
       partner: this.fb.group({
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
-        dob: ['', dobValidator],
-        gender: [''],
-        country: [''],
-        currency: [''],
-        email: ['', [Validators.email]],
-        phone: [''],
+      dob: ['', [Validators.required, dobValidator]],
+      gender: [''],
+      country: [''],
+      currency: [''],
+      email: ['', [Validators.email, Validators.required]],
+      phone: [''],
       }),
     });
 
@@ -145,8 +183,8 @@ export class ClientEditComponent {
   get isFormInvalid() {
     const partnerGroup = this.clientForm.get('partner') as FormGroup;
     if(this.showPartner) {
-      return this.clientForm.controls['lastName'].invalid 
-        || this.clientForm.controls['firstName'].invalid 
+      return this.clientForm.controls['firstName'].invalid 
+        || this.clientForm.controls['lastName'].invalid 
         || this.clientForm.controls['dob'].invalid
         || this.clientForm.controls['email'].invalid
         || partnerGroup.controls['firstName'].invalid
@@ -181,21 +219,23 @@ export class ClientEditComponent {
         //   console.log('Client name changed:', value);
         // });
 
-        this.clientForm.controls['dob'].patchValue(res.clientDetails.birthDate);
-        this.clientForm.controls['email'].patchValue(res.clientDetails.email);
-        this.clientForm.controls['gender'].patchValue(res.clientDetails.gender);
-        this.clientForm.controls['country'].patchValue(res.clientDetails.country);
         this.clientForm.controls['firstName'].patchValue(res.clientDetails.firstName);
         this.clientForm.controls['lastName'].patchValue(res.clientDetails.lastName);
-          this.clientForm.controls['inflationRate'].patchValue(
-            res.clientDetails.inflationRate ?? 2.5
-          );
+        this.clientForm.controls['dob'].patchValue(res.clientDetails.birthDate);
+        this.clientForm.controls['gender'].patchValue(res.clientDetails.gender);
+        this.clientForm.controls['country'].patchValue(res.clientDetails.country);
+        this.clientForm.controls['currency'].patchValue(res.clientDetails?.preferredCurrency);
+        this.clientForm.controls['email'].patchValue(res.clientDetails.email);
+        this.clientForm.controls['inflationRate'].patchValue(
+          res.clientDetails.inflationRate ?? 2.5
+        );
+        
         const index = countryDialCodes.findIndex(x => res.clientDetails?.phone?.slice(1, res.clientDetails.phone.length).startsWith(x.DialCode));
         this.clientForm.controls['phone'].patchValue(res.clientDetails?.phone?.slice(countryDialCodes[index].DialCode.length + 1));
         this.selectedClientCountryISO = countryDialCodes[index]?.ISOCode as CountryISO;
         
-        this.clientForm.controls['currency'].patchValue(res.clientDetails?.preferredCurrency);
         this.clientForm.controls['notes'].patchValue(res?.notes);
+
         if(res.partnerDetail?.firstName) {
           this.togglePartnerSection(true);
           var partnerFormGroup = this.clientForm.get('partner') as FormGroup
@@ -205,11 +245,12 @@ export class ClientEditComponent {
           this.partnerDobDisplay = normalizeToDMY(partnerBirthDate);
           this.partnerAge = calculateAge(partnerBirthDate);
 
+          partnerFormGroup.controls['firstName'].patchValue(res.partnerDetail?.firstName);
+          partnerFormGroup.controls['lastName'].patchValue(res.partnerDetail?.lastName);
+          // partnerFormGroup.controls['dob'].patchValue(res.partnerDetail?.birthDate);
           partnerFormGroup.controls['email'].patchValue(res.partnerDetail?.email);
           partnerFormGroup.controls['gender'].patchValue(res.partnerDetail?.gender);
           partnerFormGroup.controls['country'].patchValue(res.partnerDetail?.country);
-          partnerFormGroup.controls['firstName'].patchValue(res.partnerDetail?.firstName);
-          partnerFormGroup.controls['lastName'].patchValue(res.partnerDetail?.lastName);
 
           const index = countryDialCodes.findIndex(x => res.partnerDetail?.phone.slice(1, res.partnerDetail?.phone.length).startsWith(x.DialCode));
           partnerFormGroup.controls['phone'].patchValue(res.partnerDetail?.phone.slice(countryDialCodes[index]?.DialCode?.length + 1));
@@ -218,34 +259,6 @@ export class ClientEditComponent {
         }
 
         this.clientForm.updateValueAndValidity();
-
-        // const _dob = this.clientForm.get('dob')!;
-        //   _dob
-        //   .valueChanges
-        //   .subscribe(value => {
-        //     console.log('Client name changed:', value);
-        //     _dob.setValue("10/01/2000", { emitEvent: false });
-        // });
-
-      //   setTimeout(() => {
-      //   const clientInput = document.querySelector('input[matDatepicker="picker"]') as HTMLInputElement;
-      //   if (clientInput) {
-      //     clientInput.value = this.clientDobDisplay;
-      //   }
-        
-      //   if (this.showPartner) {
-      //     const allInputs = document.querySelectorAll('input[matDatepicker]');
-      //     const partnerInput = Array.from(allInputs).find((el: any) => 
-      //       el.closest('[formGroupName="partner"]')
-      //     ) as HTMLInputElement;
-      //     if (partnerInput) {
-      //       partnerInput.value = this.partnerDobDisplay;
-      //     }
-      //   }
-      // }, 0);
-
-
-        
       })
     ).subscribe()
   }
@@ -260,26 +273,25 @@ export class ClientEditComponent {
       partnerGroup.get('dob')?.setValidators(Validators.required);
       partnerGroup.get('email')?.setValidators(Validators.required);
 
-      const partnerDob = partnerGroup.get('dob')?.value;
-    if (partnerDob instanceof Date) {
-      this.partnerDobDisplay = normalizeToDMY(partnerDob);
-      this.partnerAge = calculateAge(partnerDob);
+      // const partnerDob = partnerGroup.get('dob')?.value;
+    // if (partnerDob instanceof Date) {
+    //   this.partnerDobDisplay = normalizeToDMY(partnerDob);
+    //   this.partnerAge = calculateAge(partnerDob);
       
-      setTimeout(() => {
-        const allInputs = document.querySelectorAll('input[matDatepicker]');
-        const partnerInput = Array.from(allInputs).find((el: any) => 
-          el.closest('[formGroupName="partner"]')
-        ) as HTMLInputElement;
-        if (partnerInput) {
-          partnerInput.value = this.partnerDobDisplay;
-        }
-      }, 0);
-    }
-
+    //   setTimeout(() => {
+    //     const allInputs = document.querySelectorAll('input[matDatepicker]');
+    //     const partnerInput = Array.from(allInputs).find((el: any) => 
+    //       el.closest('[formGroupName="partnerPicker"]')
+    //     ) as HTMLInputElement;
+    //     if (partnerInput) {
+    //       partnerInput.value = this.partnerDobDisplay;
+    //     }
+    //   }, 0);
+    // }
     } else {
       partnerGroup.reset();
-      this.partnerDobDisplay = '';
-      this.partnerAge = null;
+      // this.partnerDobDisplay = '';
+      // this.partnerAge = null;
       Object.keys(partnerGroup.controls).forEach((key) => {
         partnerGroup.get(key)?.clearValidators();
         partnerGroup.get(key)?.updateValueAndValidity();
@@ -302,24 +314,23 @@ export class ClientEditComponent {
       var client: Client = {
         id: this.clientId,
         clientDetails: {
-          birthDate: this.fixDate(this.clientForm.controls['dob'].value),
-          email: this.clientForm.controls['email'].value,
-          gender: this.clientForm.controls['gender'].value,
-          country: this.clientForm.controls['country'].value,
           firstName: this.clientForm.controls['firstName'].value,
           lastName: this.clientForm.controls['lastName'].value,
-
-          phone: this.clientForm.controls['phone'].value?.e164Number,
+          birthDate: this.fixDate(this.clientForm.controls['dob'].value),
+          country: this.clientForm.controls['country'].value,
           preferredCurrency: this.clientForm.controls['currency'].value,
+          email: this.clientForm.controls['email'].value,
+          gender: this.clientForm.controls['gender'].value,
+          phone: this.clientForm.controls['phone'].value?.e164Number,
           inflationRate: round2(this.clientForm.controls['inflationRate'].value),
         },
         partnerDetail: this.showPartner ? {
+          firstName: partnerGroup.controls['firstName']?.value,
+          lastName: partnerGroup.controls['lastName']?.value,
           birthDate: this.fixDate(partnerGroup.controls['dob']?.value),
           email: partnerGroup.controls['email']?.value,
           gender: partnerGroup.controls['gender']?.value,
           country: partnerGroup.controls['country']?.value,
-          firstName: partnerGroup.controls['firstName']?.value,
-          lastName: partnerGroup.controls['lastName']?.value,
           phone: partnerGroup.controls['phone']?.value?.e164Number,
           inflationRate:0,
           preferredCurrency:
@@ -336,7 +347,8 @@ export class ClientEditComponent {
         .updateClient(client)
         .pipe(
           filter((res) => !!res),
-          map((res) => {
+          map(() => {
+            this.store.dispatch(ClientActions.selectClient({ client }));
             this.location.back();
             this.toastr.success('Client updated successfully', 'Success!');
           }),
@@ -726,21 +738,19 @@ export class ClientEditComponent {
       }
       const formatted = normalizeToDMY(value);
       this.partnerAge = calculateAge(value);
+      this.partnerDobDisplay = formatted;
       const partnerGroup = this.clientForm.get('partner') as FormGroup;
-      partnerGroup.get('dob')?.setValue(formatted, { emitEvent: false });
-      setTimeout(() => {
-        const allInputs = document.querySelectorAll(
-          'input[formControlName="dob"]'
-        );
+      partnerGroup.get('dob')?.setValue(value, { emitEvent: false });
+
+      requestAnimationFrame(() => {
+        const allInputs = document.querySelectorAll('input[matDatepicker]');
         const partnerInput = Array.from(allInputs).find((el: any) => {
-          const formGroup = el.closest('[formGroupName="partner"]');
-          return formGroup !== null;
+          return el.getAttribute('matDatepicker') === 'partnerPicker';
         }) as HTMLInputElement;
         if (partnerInput) {
           partnerInput.value = formatted;
         }
-        partnerGroup.get('dob')?.setValue(value, { emitEvent: false });
-      }, 0);
+      });
     }
   
     parseDobToDate(value: string): Date | null {
@@ -762,54 +772,56 @@ export class ClientEditComponent {
     const digits = onlyDigits(raw);
     let formatted = formatDigitsToDMY(digits);
 
-    if (formatted === raw) return;
+    if (formatted !== raw) {
+      inputEl.value = formatted;
 
-    inputEl.value = formatted;
+      let newCursor = digitsBeforeCursor;
+      if (digitsBeforeCursor > 2) newCursor += 1;
+      if (digitsBeforeCursor > 4) newCursor += 1;
 
-    let newCursor = digitsBeforeCursor;
-    if (digitsBeforeCursor > 2) newCursor += 1;
-    if (digitsBeforeCursor > 4) newCursor += 1;
+      newCursor = Math.min(newCursor, formatted.length);
 
-    newCursor = Math.min(newCursor, formatted.length);
+      requestAnimationFrame(() => {
+        if (document.activeElement === inputEl) {
+          inputEl.setSelectionRange(newCursor, newCursor);
+        }
+      });
+    }
 
-    requestAnimationFrame(() => {
-      if (document.activeElement === inputEl) {
-        inputEl.setSelectionRange(newCursor, newCursor);
-      }
-  });
-  this.updateClientAgePreview(digits);
-
-    // Only update the input if formatting actually changes it
-    // if (formatted !== value) {
-    //   const beforeCursor = value.substring(0, cursorPos);
-    //   const digitsBeforeCursor = onlyDigits(beforeCursor);
-
-    //   let newCursorPos = digitsBeforeCursor.length;
-    //   if (digitsBeforeCursor.length > 2) newCursorPos++;
-    //   if (digitsBeforeCursor.length > 4) newCursorPos++;
-    //   newCursorPos = Math.min(newCursorPos, formatted.length);
-
-    //   inputEl.value = formatted;
-
-    //   requestAnimationFrame(() => {
-    //   if (document.activeElement === inputEl) {
-    //     inputEl.setSelectionRange(newCursorPos, newCursorPos);
-    //   }
-    // });
-
-    // // const control = this.clientForm.get('dob');
-    // // control?.setValue(formatted, { emitEvent: false });
-    // this.updateClientAgePreview(digits);
-
-    //   // const pos = inputEl.selectionStart ?? formatted.length;
-    //   // inputEl.value = formatted;
-    //   // inputEl.setSelectionRange(pos, pos);
-    // }
-}
-
-
-
+    this.updateClientAgePreview(digits);
   }
+
+  onPartnerDobTyping(inputEl: HTMLInputElement): void {
+    const raw = inputEl.value;
+    const cursor = inputEl.selectionStart ?? raw.length;
+
+    const digitsBeforeCursor = raw
+    .slice(0, cursor)
+    .replace(/\D/g, '')
+    .length;
+
+    const digits = onlyDigits(raw);
+    let formatted = formatDigitsToDMY(digits);
+
+    if (formatted !== raw) {
+      inputEl.value = formatted;
+
+      let newCursor = digitsBeforeCursor;
+      if (digitsBeforeCursor > 2) newCursor += 1;
+      if (digitsBeforeCursor > 4) newCursor += 1;
+
+      newCursor = Math.min(newCursor, formatted.length);
+
+      requestAnimationFrame(() => {
+        if (document.activeElement === inputEl) {
+          inputEl.setSelectionRange(newCursor, newCursor);
+        }
+      });
+    }
+
+    this.updatePartnerAgePreview(digits);
+  }
+}
   
   const MAX_AGE = 120;
   

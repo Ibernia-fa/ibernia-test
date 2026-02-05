@@ -1,6 +1,11 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ChartSeries } from '../models/charts-series.model';
+
+export interface ReportForecastPayload {
+  ForecastStartDate: string;
+  ForecastEndDate: string;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -28,6 +33,21 @@ getReportbyCashflowId(
 
   // IMPORTANT: no `params` object here
   return this.httpClient.get<ChartSeries>(url);
+}
+
+getReportbyCashflowIdWithForecastDates(
+  cashflowId: string,
+  payload: ReportForecastPayload,
+  inflationRate?: number
+) {
+  let url = `${this.REPORTS_BASE_URL}/${cashflowId}`;
+
+  if (inflationRate !== undefined && inflationRate !== null) {
+    const encoded = encodeURIComponent(inflationRate.toString());
+    url = `${url}?inflationRate=${encoded}`;
+  }
+
+  return this.httpClient.post<ChartSeries>(url, payload);
 }
 
 }

@@ -28,6 +28,74 @@
 
             }
         </div>
+
+        <div class="w-100 form-field gap-8">
+                <mat-label class="f-s-16 d-block">{{ 'Projection ends at age' | translate }}</mat-label>
+                <input
+                    matInput
+                    type="number"
+                    formControlName="planDuration"
+                    [min]="minAge"
+                    max="100"
+                />
+                @if(form.get('planDuration')?.touched &&
+                 form.get('planDuration')?.hasError('required')) {
+              <span class="field-error d-block">{{'Required' | translate}}</span>
+
+                }
+                 @if(form.get('planDuration')?.hasError('min')) {
+                    <span class="field-error d-block">
+                        Plan end age must be greater than the current age
+                    </span>
+                }
+
+                @if(form.get('planDuration')?.hasError('max')) {
+                <span class="field-error d-block">
+                    Plan end age cannot exceed 100
+                </span>
+                }
+            </div>
+
+            <div class="w-100 form-field gap-8">
+                <div class="d-flex align-items-center gap-8">
+                    <label>{{ 'Inflation' | translate}}</label>
+                </div>
+
+                <div class="d-flex align-items-center gap-24">
+                    <div class="slider-customizer slider-wrapper">
+                        <mat-slider class="w-100" [min]="0" [max]="10" [step]="0.5">
+                            <input 
+                            matSliderThumb 
+                            formControlName="inflationRate"
+                            (input)="onInflationSliderInput($event)"
+                             />
+                        </mat-slider>
+                    </div>
+
+                    <div class="percentage-field" style="width: 100px;">
+                        <div class="w-100 form-field infilation-check">
+                            <mat-form-field appearance="outline" class="w-full w-100 percentage-icon">
+                                <span matSuffix>%</span>
+                                <input
+                                    matInput
+                                    type="number"
+                                    class="p-0"
+                                    formControlName="inflationRate"
+                                    min="0"
+                                    max="1000"
+                                    (input)="onInflationInput($event)"
+                                />
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+
+                @if(form.get('inflationRate')?.touched &&
+                 form.get('inflationRate')?.hasError('required')) {
+              <span class="field-error d-block">{{'Required' | translate}}</span>
+                }
+            </div>
+
         <div class="w-100 form-field gap-8">
             <mat-label class="f-s-16 d-block">{{ 'Description (optional)' | translate }}</mat-label>
             <textarea formControlName="description" placeholder="{{ 'Enter description' | translate }}"></textarea>
@@ -44,7 +112,7 @@
             </button>
         </div>
         <div class="col-5">
-            <button [disabled]="form.invalid" (click)="onSubmit()" class="button-icon w-100 d-block">
+            <button [disabled]="form.invalid || isLoading" (click)="onSubmit()" class="button-icon w-100 d-block">
                 <span class="f-s-16">{{ 'Start' | translate }}</span>
             </button>
         </div>

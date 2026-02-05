@@ -23,8 +23,8 @@
                 {{ client.clientDetails.firstName }} {{ client.clientDetails.lastName }}'s {{ 'Profile' | translate }}
               </h4>
               <span class="sub-title">
-                {{ client.clientDetails.birthDate | date }} ({{
-                  client.clientDetails.birthDate | ageCalculator
+                {{ birthDate | date }} ({{
+                  birthDate | ageCalculator
                 }}  years old) </span
               >
             </div>
@@ -53,6 +53,7 @@
     </mat-card-content>
   </mat-card>
 
+  @if(cashflows.length > 0) {
   <!-- Saving Section  -->
   <mat-card >
     <mat-card-content>
@@ -193,6 +194,28 @@
     }
   </mat-card>
   <!-- End Client Cashflow  Section  -->
+  } @else {
+    <mat-card>
+      <mat-card-content>
+        <div class="profile-main-wrapper">
+          <div class="d-flex align-items-center justify-content-between w-100 gap-16 flex-wrap">
+            <div class="d-flex flex-column gap-6">
+              <h3 class="card-title">{{ 'No plans yet' | translate }}</h3>
+              <p class="f-s-14">{{ 'Create a plan to start tracking this client’s savings and insights.' | translate }}</p>
+            </div>
+            <button
+              (click)="newModelClicked()"
+              type="button"
+              class="button-icon"
+            >
+              <span>{{ 'Create plan' | translate }}</span>
+              <img src="assets/images/svgs/add-icon.svg" alt="add-icon" />
+            </button>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  }
 </div>
 }
 

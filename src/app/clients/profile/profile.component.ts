@@ -67,6 +67,7 @@ interface SortDescriptor {
 export class ProfileComponent {
   clientId: string;
   client: Client | null;
+  birthDate: Date | undefined;
   cashflows: Array<Cashflow> = [];
   preferredCurrency: string | undefined;
   totalSavings: string = "0";
@@ -82,6 +83,10 @@ export class ProfileComponent {
     private savingsPotsHttpService: SavingsPotsHttpService,
     private store: Store
   ) {
+    this.getClient();
+  }
+
+  ngOnInit() {
     this.getClient();
   }
 
@@ -117,26 +122,8 @@ export class ProfileComponent {
         map(([cashflows, client]) => {
           this.client = client;
           this.cashflows = cashflows;
-
-          const lastUpdatedCashflow = [...this.cashflows]
-            .sort(
-              (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-            )[0];
-
-          this.savingsPotsHttpService
-            .getAllSavingsPots(lastUpdatedCashflow?.id)
-            .subscribe({
-              next: (data) => {
-                this.preferredCurrency = this.client?.clientDetails.preferredCurrency;
-                const totalSavings = data.totalSavings?.toString();
-                this.totalSavings = (this.preferredCurrency == undefined || totalSavings == null)
-                ? "N/A"
-                : totalSavings;
-              },
-              error: (err) => {
-                console.error('Error fetching saving pots:', err);
-              },
-            });
+          this.birthDate = this.client?.clientDetails.birthDate;
+          this.refreshTotalSavings();
 
           this.isLoaderVisible = false;
         })
@@ -156,6 +143,7 @@ export class ProfileComponent {
     this.cashflowHttpService.getByClientId(this.clientId).pipe(
       tap((cashflows: Cashflow[]) => {
         this.cashflows = cashflows;
+        this.refreshTotalSavings();
         this.isLoaderVisible = false;
       })
     ).subscribe();
@@ -243,6 +231,34 @@ export class ProfileComponent {
             })
           )
           .subscribe();
+  }
+
+  private refreshTotalSavings() {
+    this.preferredCurrency = this.client?.clientDetails.preferredCurrency;
+
+    if (!this.cashflows.length) {
+      this.totalSavings = this.preferredCurrency == undefined ? "N/A" : "0";
+      return;
+    }
+
+    const lastUpdatedCashflow = [...this.cashflows]
+      .sort(
+        (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+      )[0];
+
+    this.savingsPotsHttpService
+      .getAllSavingsPots(lastUpdatedCashflow?.id)
+      .subscribe({
+        next: (data) => {
+          const totalSavings = data.totalSavings?.toString();
+          this.totalSavings = (this.preferredCurrency == undefined || totalSavings == null)
+          ? "N/A"
+          : totalSavings;
+        },
+        error: (err) => {
+          console.error('Error fetching saving pots:', err);
+        },
+      });
   }
 
   sortDescriptors: SortDescriptor[] = [

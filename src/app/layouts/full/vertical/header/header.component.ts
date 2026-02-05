@@ -255,9 +255,7 @@ showFiller = false;
       });
 
       this.sub = this.organizationProfiles.brandingLogo$.subscribe((url) => {
-      if (url) {
-        this.brandingLogo = url;
-      }
+      this.brandingLogo = this.ensureDataUrl(url);
     });
     }
 

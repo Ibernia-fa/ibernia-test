@@ -3,7 +3,14 @@
     <app-header [hideSidebarToggle]="hideSidebar" [showToggle]="!isOver" (toggleCollapsed)="toggleCollapsed()"
       (toggleMobileNav)="sidenav.toggle()" (toggleMobileFilterNav)="filterNavRight.toggle()"
       (optionsChange)="receiveOptions($event)"></app-header>
-    <mat-sidenav-container autosize autoFocus [ngClass]="{
+    <mat-sidenav-container autosize autoFocus
+      [ngStyle]="backgroundImageReady ? {
+        'background-image': 'url(' + (backgroundImage || defaultBackgroundImage) + ')',
+        'background-size': 'cover',
+        'background-position': 'center',
+        'background-repeat': 'no-repeat'
+      } : null"
+      [ngClass]="{
         'sidebarNav-mini':
           options.sidenavCollapsed && options.navPos !== 'top' && !resView,
         'sidebarNav-horizontal': options.horizontal,
@@ -66,20 +73,6 @@
               </div> 
               }
             </ng-scrollbar>
-          </div>
-          <div class="m-t-auto profile-bar" style="margin-bottom: 54px">
-            <div class="p-16 bg-light-secondary rounded d-flex flex-column gap-12 inner-profile-bar">
-              <div class="profile-bar-img">
-                <img src="/assets/images/svgs/heart-icon.svg" width="24" />
-              </div>
-              <div class="content">
-                <div class="d-flex flex-column gap-2">
-                  <h4 class="f-w-500">{{ 'Upgrade to Premium' | translate}}</h4>
-                  <span class="f-s-12">{{ '12 days of trial period left' | translate}}</span>
-                </div>
-                <button mat-stroked-button class="w-100" (click)="onUpgradeClick()">{{ 'Upgrade' | translate}}</button>
-              </div>
-            </div>
           </div>
         </div>
       </mat-sidenav>

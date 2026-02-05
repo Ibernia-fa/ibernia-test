@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { ClientEvent, FinancialTimeline } from '../models/financial-timeline';
+import { ClientEvent, FinancialTimeline, TimelineResponse } from '../models/financial-timeline';
 
 @Injectable({
   providedIn: 'root'
@@ -12,6 +12,10 @@ export class TimelineHttpService {
 
   getTimelinebyCashflowId(cashflowId: string) {
     return this.httpClient.get<FinancialTimeline>(`/api/v1/cashflows/${cashflowId}/timelines`);
+  }
+
+  getTimelineWithLinkedFinancialRecordsByCashflowId(cashflowId: string) {
+    return this.httpClient.get<TimelineResponse>(`/api/v1/cashflows/${cashflowId}/timelines/financing`);
   }
 
   getSystemEvents() {
@@ -28,6 +32,12 @@ export class TimelineHttpService {
     })
   }
 
+  addFinancingEvents(clientEvents: ClientEvent[], cashflowId: string) {
+    return this.httpClient.post(`/api/v1/cashflows/${cashflowId}/timelines/events/financing`, clientEvents, {
+      responseType: "text"
+    })
+  }
+
   updateTimeline(financialTimeline: FinancialTimeline) {
     return this.httpClient.put(`${this.TIMELINE_BASE_URL}`, financialTimeline, {
       responseType: "text"
@@ -36,6 +46,12 @@ export class TimelineHttpService {
 
   deleteEvent(cashflowId: string, eventId: string) {
     return this.httpClient.delete(`/api/v1/cashflows/${cashflowId}/timelines/events/${eventId}`, {
+      responseType: 'text'
+    })
+  }
+
+  deleteFinancingEvent(cashflowId: string, eventId: string) {
+    return this.httpClient.delete(`/api/v1/cashflows/${cashflowId}/timelines/events/financing/${eventId}`, {
       responseType: 'text'
     })
   }

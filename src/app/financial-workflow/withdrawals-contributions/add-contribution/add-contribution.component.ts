@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, ElementRef, Inject, ViewChild } from '@angular/core';
 import {
   MAT_DIALOG_DATA,
   MatDialogModule,
@@ -66,6 +66,7 @@ import { TranslateModule } from '@ngx-translate/core';
   styleUrl: './add-contribution.component.scss',
 })
 export class AddContributionComponent {
+  @ViewChild('amountInput') amountInput?: ElementRef<HTMLInputElement>;
   contributionForm: FormGroup;
   countries = allCountries;
   cycles: Cycle[];
@@ -171,6 +172,15 @@ export class AddContributionComponent {
         end: this.selectedContribution.end.year,
         commissions: hasCommInit,
         commissionPercentage: pctInit,
+      });
+
+      // Ensure the patched amount displays with thousand separators immediately
+      setTimeout(() => {
+        const el = this.amountInput?.nativeElement;
+        const amount = this.contributionForm.get('amount')?.value;
+        if (!el || amount === null || amount === undefined || amount === '') return;
+        el.value = Number(amount).toLocaleString('en-US');
+        el.dispatchEvent(new Event('blur'));
       });
 
       // re-run filter for the (possibly) different type from edit

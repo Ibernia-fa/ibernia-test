@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, ElementRef, Inject, ViewChild } from '@angular/core';
 import {
   AbstractControl,
   ControlEvent,
@@ -42,7 +42,7 @@ import { CommonModule } from '@angular/common';
 import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 @Component({
   selector: 'app-add-new-pot',
   imports: [
@@ -70,6 +70,7 @@ import { TranslateModule } from '@ngx-translate/core';
   styleUrl: './add-new-pot.component.scss',
 })
 export class AddNewPotComponent {
+  @ViewChild('amountInput') amountInput?: ElementRef<HTMLInputElement>;
   savingsForm: FormGroup;
   years: number[] = [];
   countries = allCountries;
@@ -85,7 +86,7 @@ export class AddNewPotComponent {
   formattedCommissionPercentage: string = '';
   selectedName: string = '';
   selectedNameIconUrl: string = '';
-  inflationRate = 2.5;
+  inflationRate = 0;
   isEditWorkflow = false;
   selectedPot: ClientSaving;
   savingPotType= SavingPotType
@@ -120,16 +121,19 @@ export class AddNewPotComponent {
   loggedInUserComissionType: string | undefined;
   isAddComissionChecked: any;
   currentYear: number = new Date().getFullYear();
+  amount: number | null;
 
   constructor(
     private dialogRef: MatDialogRef<AddNewPotComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private fb: FormBuilder,
-    private savingPotsHttpService: SavingsPotsHttpService
+    private savingPotsHttpService: SavingsPotsHttpService,
+    private translate: TranslateService
   ) {
     this.loggedInUserPreferences = data.loggedInUserPreferences;
     console.log('loggedin user preferences', this.loggedInUserPreferences);
-    this.inflationRate = data.inflationRate;
+    const infl = Number(data.inflationRate);
+    this.inflationRate = Number.isFinite(infl) ? infl : 0;
     this.cycles = data.amountCycles;
     this.escalationRates = data.escalataionRates;
     this.eventsList = data.eventsList;
@@ -197,6 +201,12 @@ export class AddNewPotComponent {
       this.formattedReturnRate = this.formatWithPercentage(value);
     });
 
+    // Keep the local amount property in sync with the form control
+    const amountControl = this.savingsForm.get('amount');
+    this.amount = (amountControl?.value ?? null) as number | null;
+    amountControl?.valueChanges.subscribe((value) => {
+      this.amount = (value ?? null) as number | null;
+    });
     if(this.isEditWorkflow) {
       this.isCashPotEditMode = (this.selectedPot?.name ?? '').trim().toLowerCase() === 'cash';
       this.patchFormValues();
@@ -218,11 +228,12 @@ export class AddNewPotComponent {
 
 onAmountBlur(e: Event) {
   const c = this.savingsForm.get('amount')!;
-  const num = Number(String(c.value).replace(/,/g, ''));
-  if (!isNaN(num)) {
-    c.setValue(num, { emitEvent: false }); // model stays numeric
-    (e.target as HTMLInputElement).value = num.toLocaleString('en-US');
-  }
+  const rawValue = (e.target as HTMLInputElement).value;
+  const num = parseFormattedNumber(rawValue);
+  c.setValue(num, { emitEvent: false }); // model stays numeric
+
+  const locale = this.translate.currentLang === 'it' ? 'it-IT' : 'en-US';
+  (e.target as HTMLInputElement).value = num.toLocaleString(locale);
 }
 
 
@@ -254,11 +265,19 @@ onAmountBlur(e: Event) {
     // --- The rest of fields (unchanged behavior) ---
     this.savingsForm.get('currency')?.patchValue(this.selectedPot.startingPotValue.currencySymbol, { emitEvent: false });
     this.savingsForm.get('amount')?.patchValue(this.selectedPot.startingPotValue.amount, { emitEvent: false });
+    this.amount = (this.savingsForm.get('amount')?.value ?? null) as number | null;
+    // Ensure thousandSeparatorInput formats the patched value (it formats on blur)
+    setTimeout(() => {
+      const el = this.amountInput?.nativeElement;
+      if (!el || this.amount === null || this.amount === undefined) return;
+      el.value = this.amount.toLocaleString('en-US');
+      el.dispatchEvent(new Event('blur'));
+    });
     // this.savingsForm.get('returnRate')?.patchValue(this.selectedPot.returnRate, { emitEvent: false });
-  this.savingsForm.get('returnRate')?.patchValue(
-  this.round2(this.selectedPot.returnRate),
-  { emitEvent: false }
-);
+    this.savingsForm.get('returnRate')?.patchValue(
+      this.round2(this.selectedPot.returnRate),
+      { emitEvent: false }
+    );
     this.savingsForm.get('lockPot')?.patchValue(this.selectedPot.hasPotLocked, { emitEvent: false });
     this.savingsForm.get('start')?.patchValue(this.selectedPot.lockedFrom?.year, { emitEvent: false });
     this.savingsForm.get('end')?.patchValue(this.selectedPot.lockedTill?.year, { emitEvent: false });
@@ -497,13 +516,10 @@ onEscalationRateChange(event: MatSelectChange): void {
   }
 
   onAmountInput(rawValue: string) {
-    if (rawValue == null) rawValue = '';
-    const cleaned = rawValue.replace(/[^0-9.]/g, '');
-    const parsed = cleaned === '' ? 0 : parseFloat(cleaned);
-    const value = isNaN(parsed) ? 0 : parsed;
+    const value = parseFormattedNumber(rawValue ?? '');
     this.savingsForm.get('amount')?.setValue(value, { emitEvent: true });
+    this.amount = value;
   }
-
   formatWithPercentage(value: number | string): string {
     return value !== null && value !== '' ? `${value}%` : '0%';
   }

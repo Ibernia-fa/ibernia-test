@@ -38,8 +38,9 @@ export class AppBreadcrumbComponent {
       .pipe(mergeMap((route) => route.data))
       // tslint:disable-next-line - Disables all
       .subscribe((event) => {
-        // tslint:disable-next-line - Disables all
-        this.titleService.setTitle(event['title'] + ' Ibernia');
+        // tslint:disable-next-line - Disables all event['title'] + ' Ibernia'
+        const title = event['title'] ? `${event['title']} ibernia` : 'ibernia';
+        this.titleService.setTitle(title);
         this.pageInfo = event;
       });
   }

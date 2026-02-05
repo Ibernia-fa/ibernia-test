@@ -873,8 +873,7 @@ body:has(.global-fullscreen-overlay) {
 .chips-custom .mdc-evolution-chip-set__chips {
   display: flex !important;
   flex-wrap: wrap;
-  justify-content: center;
-  gap: 8px;
+  margin-left: 0px !important;
 }
 
 .vis-item, 

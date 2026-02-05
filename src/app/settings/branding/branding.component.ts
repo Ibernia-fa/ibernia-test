@@ -5,11 +5,12 @@ import { AuthService } from 'src/app/auth/services/auth.service';
 import { ToastrService } from 'ngx-toastr';
 import { TranslateModule } from '@ngx-translate/core';
 import { MatCard, MatCardContent } from '@angular/material/card';
+import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-branding',
   standalone: true,
-  imports: [TranslateModule, MatCard, MatCardContent],
+  imports: [TranslateModule, MatCard, MatCardContent, NgIf],
   templateUrl: './branding.component.html',
   styleUrls: ['./branding.component.scss'],
 })
@@ -17,6 +18,10 @@ export class BrandingComponent implements OnInit {
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
   profileImage: string | null = null;   // Data URL preview
+  backgroundImage: string | null = null;   // Data URL preview
+  private initialProfileImage: string | null = null;
+  private initialBackgroundImage: string | null = null;
+  hasChanges = false;
   isSaving = false;
   isLoading = false;
 
@@ -37,7 +42,12 @@ export class BrandingComponent implements OnInit {
     this.isLoading = true;
     this.orgProfiles.getProfile(userId).subscribe({
       next: (p) => {
+        console.log(p);
         this.profileImage = ensureDataUrl(p?.profilePhotoUrl ?? null);
+        this.backgroundImage = ensureDataUrl(p?.backgroundPhotoUrl ?? null);
+        this.initialProfileImage = this.profileImage;
+        this.initialBackgroundImage = this.backgroundImage;
+        this.hasChanges = false;
         this.isLoading = false;
       },
       error: (err) => {
@@ -47,29 +57,37 @@ export class BrandingComponent implements OnInit {
     });
   }
 
-  async onFileSelected(evt: Event) {
+  async onFileSelected(evt: Event, imageType: 'profile' | 'background') {
     const input = evt.target as HTMLInputElement;
     const file = input.files?.[0];
     if (!file) return;
 
     try {
-      this.profileImage = await this.fileToDataUrl(file);
+      const dataUrl = await this.fileToDataUrl(file);
+    
+      if (imageType === 'profile') {
+        this.profileImage = dataUrl;
+      } else if (imageType === 'background') {
+        this.backgroundImage = dataUrl;
+      }
+      this.updateHasChanges();
     } finally {
       input.value = '';
     }
   }
 
-  clearImage(e: Event) {
+  clearImage(e: Event, type: 'profile' | 'background') {
     e.stopPropagation();
     e.preventDefault();
-    this.profileImage = null;
+    if (type === 'profile') {
+      this.profileImage = null;
+    } else if (type === 'background') {
+      this.backgroundImage = null;
+    }
+    this.updateHasChanges();
   }
 
   save() {
-    // if (!this.profileImage) {
-    //   this.toastr.error('Please select a logo first.', 'Error!');
-    //   return;
-    // }
     const userId = this.auth.getUserProfile()?.sub;
     if (!userId) {
       this.toastr.error('No user id found. Please sign in again', 'Error!');
@@ -78,17 +96,21 @@ export class BrandingComponent implements OnInit {
 
     this.isSaving = true;
     this.orgProfiles
-      .saveProfile({ userId, profilePhotoUrl: this.profileImage || "" })
+      .saveProfile({ userId, profilePhotoUrl: this.profileImage || "", backgroundPhotoUrl: this.backgroundImage || "" })
       .subscribe({
         next: () => {
-          this.toastr.success('Logo saved', 'Success!');
-          this.isSaving = false;
+          this.orgProfiles.setBrandingLogo(this.profileImage || null);
+          this.orgProfiles.setBackgroundImage(this.backgroundImage || null);
 
-          this.orgProfiles.setBrandingLogo(this.profileImage!);
+          this.toastr.success('Image saved', 'Success!');
+          this.initialProfileImage = this.profileImage;
+          this.initialBackgroundImage = this.backgroundImage;
+          this.hasChanges = false;
+          this.isSaving = false;
         },
         error: (err) => {
           console.error(err);
-          this.toastr.error('Failed to save logo', 'Error!');
+          this.toastr.error('Failed to save image', 'Error!');
           this.isSaving = false;
         },
       });
@@ -101,6 +123,12 @@ export class BrandingComponent implements OnInit {
       reader.onload = () => resolve(reader.result as string);
       reader.readAsDataURL(file);
     });
+  }
+
+  private updateHasChanges() {
+    this.hasChanges =
+      this.profileImage !== this.initialProfileImage ||
+      this.backgroundImage !== this.initialBackgroundImage;
   }
 }
 
