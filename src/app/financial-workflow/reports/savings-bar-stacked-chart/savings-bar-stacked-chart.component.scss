@@ -6,6 +6,10 @@
   display: flex;
   justify-content: space-between;
   gap: 8px;
+
+  &:not(:last-child) {
+    margin-bottom: 4px;
+  }
 }
 
 .apexcharts-tooltip .savings-tooltip__label {
@@ -26,6 +30,10 @@
   display: flex;
   justify-content: space-between;
   gap: 8px;
+
+  &:not(:last-child) {
+    margin-bottom: 4px;
+  }
 }
 
 .apexcharts-tooltip .savings-tooltip__label {
