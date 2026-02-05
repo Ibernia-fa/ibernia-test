@@ -401,7 +401,7 @@ export class ClientAddComponent {
     });
 
     dialog.afterClosed().subscribe((res: any) => {
-      this.router.navigate(['/clients/' + id + '/profile']);
+      this.router.navigate([`cashflows/${res.id}/timeline`]);
     });
   }
 
