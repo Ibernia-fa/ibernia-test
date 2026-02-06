@@ -12,31 +12,7 @@
   }
 }
 
-.apexcharts-tooltip .savings-tooltip__label {
-  font-weight: 500;
-  display: inline-flex;
-  align-items: center;
-}
-
-.apexcharts-tooltip .savings-tooltip__value {
-  font-weight: 700;
-}
-
-.apexcharts-text .apexcharts-xaxis-label {
-  text-anchor: start !important;
-}
-
-.apexcharts-tooltip .savings-tooltip__body {
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
-
-  &:not(:last-child) {
-    margin-bottom: 4px;
-  }
-}
-
-.apexcharts-tooltip .savings-tooltip__label {
+.apexcharts-tooltip .savings-tooltip__label {  
   font-weight: 500;
   display: inline-flex;
   align-items: center;

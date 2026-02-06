@@ -574,10 +574,10 @@ export class TimelineChartComponent implements OnInit, OnChanges {
 
     const timelineEndYear = moment(this.financialTimeline.forecastEndtDate).year();
 
-    const visualBufferYears = (timelineEndYear % 2 === 0 ? 1 : 2);
-
     // Adjust start year so that (startYear - birthYear) is even
     let startYear = forecastStartYear;
+
+    const timelineEndDate = new Date(timelineEndYear + 1, 0, 1);
 
     return {
       editable: {
@@ -597,8 +597,8 @@ export class TimelineChartComponent implements OnInit, OnChanges {
       margin: { item: 10 }, // Adds spacing between events
       start: new Date(startYear, 0, 1),
       min: new Date(startYear, 0, 1),
-      end: new Date(timelineEndYear + 2, 0, 1),
-      max: new Date(timelineEndYear + 2, 0, 1),
+      end: timelineEndDate,
+      max: timelineEndDate,
       minHeight: '304px',
       width: '100%',
       align: 'left',
