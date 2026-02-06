@@ -108,9 +108,11 @@ export class SavingsBarStackedChartComponent implements OnChanges {
     const bodyRows = w.globals.seriesNames
       .map((seriesName: string, i: number) => {
         const value = series[i]?.[dataPointIndex];
-        if (value === undefined) return '';
+        if (value === undefined || (typeof value === 'number' && value === 0)) return '';
         const color = w.globals.colors[i];
-        const displayValue = typeof value === 'number' ? value.toLocaleString() : String(value ?? '');
+        const displayValue = typeof value === 'number'
+          ? this.formatCurrency(value)
+          : String(value ?? '');
         return `
         <div class="savings-tooltip__body">
           <div class="savings-tooltip__label">
@@ -198,14 +200,9 @@ export class SavingsBarStackedChartComponent implements OnChanges {
     if (!this.report?.series?.length) {
       if (changes['client'] && this.client) {
         this.chartOptions.yaxis = {
-          title: {
-            text: this.client.clientDetails.preferredCurrency
-          },
+          title: { text: '' },
           labels: {
-            // formatter: (value: any) => {
-            //   return value?.toLocaleString();
-            // }
-            formatter: (value: any) => value?.toLocaleString(),
+            formatter: (value: any) => value != null ? Number(value).toLocaleString() : '',
           },
         };
       }
@@ -316,13 +313,9 @@ export class SavingsBarStackedChartComponent implements OnChanges {
 
     if (changes['client']) {
       this.chartOptions.yaxis = {
-        title: {
-          text: this.client.clientDetails.preferredCurrency
-        },
+        title: { text: '' },
         labels: {
-          formatter: (value: any) => {
-            return value?.toLocaleString();
-          }
+          formatter: (value: any) => value != null ? Number(value).toLocaleString() : '',
         }
       };
       const birthYear = this.client?.clientDetails?.birthDate
@@ -451,5 +444,25 @@ export class SavingsBarStackedChartComponent implements OnChanges {
 
   calculateDotColor(iconUrl: string): string {
     return this.ICON_COLORS[iconUrl] ?? '#8388ff';
+  }
+
+  formatCurrency(value: number): string {
+    if (typeof value !== 'number' || !Number.isFinite(value)) {
+      return value != null ? String(value) : '';
+    }
+    const code = this.client?.clientDetails?.preferredCurrency;
+    if (!code || code.length !== 3) {
+      return value.toLocaleString();
+    }
+    try {
+      return new Intl.NumberFormat(undefined, {
+        style: 'currency',
+        currency: code,
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }).format(value);
+    } catch {
+      return value.toLocaleString();
+    }
   }
 }
