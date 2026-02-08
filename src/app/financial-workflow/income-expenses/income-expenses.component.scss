@@ -1,7 +1,9 @@
 .income-expense-wrapper {
   flex: 1;
+
   .row {
     margin: 0 !important;
+
     .col-3 {
       padding: 0;
       // background-color: #ff00001c;
@@ -9,34 +11,46 @@
       max-width: 22.5%;
     }
   }
+
   .card-title {
     font-size: 18px;
     line-height: 19px;
     font-weight: 700;
+
     &.expenses-deduct {
       color: red;
     }
+
     &.expenses-total {
       color: #4043af;
     }
   }
+
   .saving-title {
     font-size: 24px;
     line-height: 30px;
     color: #1c1c1c;
     font-weight: 700;
-     font-family: 'Ubuntu' !important;
-    
+    font-family: 'Ubuntu' !important;
+
   }
-  .expense-income {
+
+  .expense-income-green {
     color: #71bc42;
   }
+
+  .expense-income-red {
+    color: #fe4344;
+  }
+
   .green {
     color: green
   }
+
   .red {
     color: red;
   }
+
   .divider {
     width: 1.5px;
     margin-left: 12px;
@@ -44,10 +58,12 @@
     background-color: #e7e7eb;
   }
 }
+
 .income-expense-tables {
   .row {
     margin: 0;
-    gap: 12px;
+    gap: 10px;
+
     .col-6 {
       padding: 0px;
       flex: 0 0 49%;
@@ -55,11 +71,13 @@
     }
   }
 }
+
 // Table Style
 /* General Table Styling */
 table {
   width: 100%;
-  border-collapse: collapse; /* Ensures consistent spacing between cells */
+  border-collapse: collapse;
+  /* Ensures consistent spacing between cells */
 }
 
 /* Detail Row Styling */
@@ -68,28 +86,35 @@ tr.example-detail-row {
 }
 
 .example-detail-row td {
-  padding: 8px !important; /* Matches padding of the regular rows for consistency */
+  padding: 8px !important;
+  /* Matches padding of the regular rows for consistency */
   font-size: 14px;
-  color: #333; /* Text color */
-  border: none; /* Matches table border styling */
+  color: #333;
+  /* Text color */
+  border: none;
+  /* Matches table border styling */
 }
 
 /* Styling Regular Rows */
 .example-element-row td {
-  border-bottom: 0; /* Removes bottom border when expanded */
+  border-bottom: 0;
+  /* Removes bottom border when expanded */
 }
 
 .example-element-row:not(.example-expanded-row):hover {
-  background-color: #f1f1f1; /* Subtle hover effect */
+  background-color: #f1f1f1;
+  /* Subtle hover effect */
 }
 
 .example-element-row:not(.example-expanded-row):active {
-  background-color: #e8e8e8; /* Subtle active row effect */
+  background-color: #e8e8e8;
+  /* Subtle active row effect */
 }
 
 .mat-mdc-header-row {
   background: #f7fbff !important;
 }
+
 .table-wrapper {
   overflow-x: auto;
 }
@@ -103,6 +128,7 @@ tr.example-detail-row {
   &.mdc-data-table__cell {
     color: #1c1c1c !important;
   }
+
   min-width: 295px;
   color: #3a3a47;
   padding: 10px 16px !important;
@@ -112,10 +138,11 @@ tr.example-detail-row {
   &.mdc-data-table__cell {
     color: #48475d !important;
   }
+
   min-width: 110px;
   color: #3a3a47;
   padding: 10px 16px !important;
-     font-family: 'Ubuntu' !important;
+  font-family: 'Ubuntu' !important;
   // @media (max-width: 768px) {
   //   min-width: 10px;
   // }
@@ -134,12 +161,15 @@ tr.example-detail-row {
 .mat-mdc-row:nth-child(odd) {
   background-color: transparent;
 }
+
 .mat-mdc-header-cell {
   border-bottom-color: #e7e7eb !important;
 }
+
 .mat-mdc-cell {
   border-bottom-color: #f7f7f7 !important;
 }
+
 .mat-mdc-row {
   transition: background-color 0.3s ease;
 }
@@ -156,11 +186,103 @@ tr.example-detail-row {
 // Table Heading
 .heading-btn-wrapper {
   padding: 16px 12px;
+
   h3 {
     color: #1c1c1c;
-    font-size: 24px;
-    line-height: 36px;
-    font-weight: 700;
+    font-size: 22px;
+    line-height: 28px;
+    font-weight: 500;
   }
 }
+
 // End Table Heading
+
+.header-boarder-bottom {
+  border-bottom: solid 2px #f7f7f7;
+}
+
+.income-expense-tile-header {
+  h3 {
+    font-size: 16px;
+    line-height: 16px;
+    font-weight: 700;
+    display: block;
+  }
+}
+
+.paragraph-text {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.dragable-card {
+  overflow: hidden;
+  position: relative;
+  flex: 1;
+  padding: 24px 16px;
+  border-radius: 10px;
+  background-color: #f7fbff;
+  border: 1px solid #f7f7f7;
+  .stats-main-wrapper {
+    .saving-title {
+       font-family: 'Ubuntu';
+    }
+  }
+  .drag-btn {
+    height: 36px;
+    width: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
+    outline: none;
+    border: none;
+    cursor: grab;
+    img {
+      pointer-events: none;
+    }
+  }
+  // Lock Overlay
+  .lock-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background-color: #3a3a4740;
+    backdrop-filter: blur(1px);
+    -webkit-backdrop-filter: blur(1px);
+    p {
+      color: white;
+       font-family: 'Ubuntu';
+      font-size: 14px;
+      line-height: 20px;
+      font-weight: 500;
+      margin: 0;
+      padding: 0;
+    }
+    .help-lock-overlay {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+    }
+  }
+  .edit-icon-overlay {
+    position: absolute;
+    bottom: 0px;
+    right: 16px;
+  }
+}
+
+
+.card-title-margin {
+  margin-top: -18px;
+}
+
+.menu-top-margin {
+  margin-top: -46px;
+}
+
+.mat-mdc-icon-button img {
+  height: 18px !important;
+}

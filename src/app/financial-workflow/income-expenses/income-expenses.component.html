@@ -27,177 +27,204 @@
 
     <div class="income-expense-tables">
         <div class="row justify-content-between">
-            <div class="col-6">
-                <!-- left column -->
-                <mat-card class="income-expense-wrapper m-b-10">
-                    <div class="heading-btn-wrapper">
-                        <div class="d-flex gap-12">
-                            <h3>{{ 'Incomes' | translate }}</h3>
-
-                            <h3 class="expense-income">{{(incomeExpense?.total ?? 0) < 0 ? '-' : ''
-                                    }}{{selectedClient?.clientDetails?.preferredCurrency|currencySymbol}}{{((incomeExpense?.total
-                                    ?? 0) < 0 ? ((incomeExpense?.total ?? 0))*(-1) : (incomeExpense?.total ?? 0)) |
-                                    thousandSeparator}} </h3>
+            <mat-card class="cardWithShadow w-100">
+                <div class="row" style="padding: 16px;">
+                    <div class="col-6">
+                        <!-- left column -->
+                        <mat-card class="income-expense-wrapper m-b-10">
+                            <div class="heading-btn-wrapper">
+                                <div class="d-flex align-items-center justify-content-between w-100 gap-16 flex-wrap">
+                                    <div class="d-flex gap-12 align-items-end">
+                                        <h3>{{ 'Incomes' | translate }}</h3>
+                                        <h3 class="expense-income-green">
+                                            +{{currency|currencySymbol}}{{incomeExpense.totalIncome|thousandSeparator}}
+                                        </h3>
+                                    </div>
 
                                     <div class="d-flex gap-12 align-items-end">
-                                        <button (click)="newIncomeClicked()" type="button" class="button-icon right"
-                                            style="float: right;">
+                                        <button (click)="newIncomeClicked()" type="button" class="button-icon">
                                             <span class="f-s-16">{{ 'Add income' | translate}}</span>
                                         </button>
                                     </div>
-                        </div>
-                    </div>
-                </mat-card>
-
-                <mat-card class="income-expense-wrapper m-b-10">
-                    <div class="heading-btn-wrapper">
-                        <div class="d-flex gap-12">
-                            <h3>{{ 'Salary' | translate }}</h3>
-
-                            <div class="menu">
-                                <div class="d-flex align-items-center justify-content-center">
-                                    <button (click)="$event.stopPropagation(); $event.preventDefault()" mat-icon-button
-                                        [matMenuTriggerFor]="menu">
-                                        <mat-icon>
-                                            <img src="assets/images/svgs/dropdown-detail.svg" alt="dropdown-detail" />
-                                        </mat-icon>
-                                    </button>
                                 </div>
-                                <mat-menu #menu="matMenu" xPosition="before" class="dropdown-menus">
-                                    <button (click)="updateIncomeClicked(element)" mat-menu-item>
-                                        <mat-icon>
-                                            <img src="assets/images/svgs/drop-down-edit-2-line.svg"
-                                                alt="drop-down-copy-2-line" height="24" width="24" />
-                                        </mat-icon>
-                                        <span>{{ 'Edit' | translate }}</span>
-                                    </button>
-                                    <button (click)="deleteIncome(element)" mat-menu-item>
-                                        <mat-icon>
-                                            <img src="assets/images/svgs/drop-down-delete-2-line.svg"
-                                                alt="drop-down-copy-2-line" height="24" width="24" />
-                                        </mat-icon>
-                                        <span>{{ 'Delete' | translate }}</span>
-                                    </button>
-                                </mat-menu>
                             </div>
-                        </div>
-                    </div>
-                </mat-card>
+                        </mat-card>
+                        @for(income of defaultIncomes; track income; let i = $index) {
+                        <mat-card-content class="m-b-10" style="padding: 0px;">
+                            <div class="cashflow-drag-wrapper">
+                                <div class="d-flex flex-column gap-20">
+                                    <div class="flex-column d-flex gap-10" id="drag-boundary">
+                                        <div
+                                            class="d-flex justify-content-between align-items-center gap-12 dragable-card-wrapper">
+                                            <div
+                                                class="dragable-card d-flex align-items-center justify-content-between cursor-pointer">
+                                                <div class="d-flex align-items-center gap-8">
+                                                    <div class="stats-main-wrapper">
+                                                        <div class="d-flex flex-column gap-8">
+                                                            <div class="d-flex align-items-center gap-8">
+                                                                @if(income.amount.amount == 0)
+                                                                {
+                                                                <img height="32px;" [src]="'/assets/images/svgs/' + income.icon + '-gray.svg'"
+                                                                    alt="income-icon" />
+                                                                }
+                                                                @else {
+                                                                <img height="32px;" [src]="'/assets/images/svgs/' + income.icon + '-green.svg'"
+                                                                    alt="income-icon" />
+                                                                }
+                                                                <h3 class="card-title card-title-margin">{{income.description}}</h3>
+                                                            </div>
+                                                            <div class="d-flex align-items-center gap-10">
+                                                                <h3 class="saving-title">
+                                                                    @if(income.amount.amount == 0)
+                                                                    {
+                                                                    <span class="paragraph-text">{{'Set amount' |
+                                                                        translate}}</span>
+                                                                    }
+                                                                    @else {
+                                                                    <h3 class="card-title">+{{income.amount.currencySymbol|currencySymbol}}{{income.amount.amount|thousandSeparator}}
+                                                                        <span
+                                                                            class="paragraph-text">/{{getCycle(income.amount.cycle?.description)}}</span>
+                                                                    </h3>
+                                                                    }
+                                                                </h3>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
 
-                <mat-card class="income-expense-wrapper m-b-10">
-                    <div class="heading-btn-wrapper">
-                        <div class="d-flex gap-12">
-                            <h3>{{ 'State pension' | translate }}</h3>
-
-                            <div class="menu">
-                                <div class="d-flex align-items-center justify-content-center">
-                                    <button (click)="$event.stopPropagation(); $event.preventDefault()" mat-icon-button
-                                        [matMenuTriggerFor]="menu">
-                                        <mat-icon>
-                                            <img src="assets/images/svgs/dropdown-detail.svg" alt="dropdown-detail" />
-                                        </mat-icon>
-                                    </button>
-                                </div>
-                                <mat-menu #menu="matMenu" xPosition="before" class="dropdown-menus">
-                                    <button (click)="updateIncomeClicked(element)" mat-menu-item>
-                                        <mat-icon>
-                                            <img src="assets/images/svgs/drop-down-edit-2-line.svg"
-                                                alt="drop-down-copy-2-line" height="24" width="24" />
-                                        </mat-icon>
-                                        <span>{{ 'Edit' | translate }}</span>
-                                    </button>
-                                    <button (click)="deleteIncome(element)" mat-menu-item>
-                                        <mat-icon>
-                                            <img src="assets/images/svgs/drop-down-delete-2-line.svg"
-                                                alt="drop-down-copy-2-line" height="24" width="24" />
-                                        </mat-icon>
-                                        <span>{{ 'Delete' | translate }}</span>
-                                    </button>
-                                </mat-menu>
-                            </div>
-                        </div>
-                    </div>
-                </mat-card>
-
-                <!-- <mat-card class="clientTableContainer">
-                    <div class="table-main-wrapper">
-                        <div class="table-responsive-sm table-wrapper">
-                            <table mat-table [dataSource]="incomeDataSource" class="mat-elevation-z8">
-                                <ng-container matColumnDef="position">
-                                    <th mat-header-cell *matHeaderCellDef
-                                        class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-client">{{
-                                        'Description' | translate }}
-                                    </th>
-                                    <td mat-cell *matCellDef="let element" class="p-x-24 f-s-14 p-l-0 column-client">
-                                        {{element.description}} </td>
-                                </ng-container>
-                                <ng-container matColumnDef="name">
-                                    <th mat-header-cell *matHeaderCellDef
-                                        class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-net-amount">{{ 'Net
-                                        amount' | translate }}
-                                    </th>
-                                    <td mat-cell *matCellDef="let element"
-                                        class="p-x-24 f-s-14 p-l-0 column-net-amount">
-                                        {{selectedClient?.clientDetails?.preferredCurrency |
-                                        currencySymbol}}{{element.amount.amount |
-                                        thousandSeparator}}/{{element.amount.cycle.description}}
-                                    </td>
-                                </ng-container>
-
-                                <ng-container matColumnDef="action">
-                                    <th mat-header-cell *matHeaderCellDef
-                                        class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-action"></th>
-                                    <td mat-cell class="column-action" *matCellDef="let element">
-                                        <div class="d-flex align-items-center justify-content-center">
-                                            <button (click)="$event.stopPropagation(); $event.preventDefault()"
-                                                mat-icon-button [matMenuTriggerFor]="menu">
-                                                <mat-icon>
-                                                    <img src="assets/images/svgs/dropdown-detail.svg"
-                                                        alt="dropdown-detail" />
-                                                </mat-icon>
-                                            </button>
+                                                <div class="menu menu-top-margin">
+                                                    <div class="d-flex align-items-center justify-content-center">
+                                                        <button
+                                                            (click)="$event.stopPropagation(); $event.preventDefault()"
+                                                            mat-icon-button [matMenuTriggerFor]="menu">
+                                                            <mat-icon>
+                                                                <img src="assets/images/svgs/dropdown-detail.svg"
+                                                                    alt="dropdown-detail" />
+                                                            </mat-icon>
+                                                        </button>
+                                                    </div>
+                                                    <mat-menu #menu="matMenu" xPosition="before" class="dropdown-menus">
+                                                        <button (click)="updateIncomeClicked(income)" mat-menu-item>
+                                                            <mat-icon>
+                                                                <img src="assets/images/svgs/drop-down-edit-2-line.svg"
+                                                                    alt="drop-down-copy-2-line" height="24"
+                                                                    width="24" />
+                                                            </mat-icon>
+                                                            <span>{{ 'Edit' | translate }}</span>
+                                                        </button>
+                                                        <button (click)="deleteIncome(income)" mat-menu-item>
+                                                            <mat-icon>
+                                                                <img src="assets/images/svgs/drop-down-delete-2-line.svg"
+                                                                    alt="drop-down-copy-2-line" height="24"
+                                                                    width="24" />
+                                                            </mat-icon>
+                                                            <span>{{ 'Delete' | translate }}</span>
+                                                        </button>
+                                                    </mat-menu>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <mat-menu #menu="matMenu" xPosition="before" class="dropdown-menus">
-                                            <button (click)="updateIncomeClicked(element)" mat-menu-item>
-                                                <mat-icon>
-                                                    <img src="assets/images/svgs/drop-down-edit-2-line.svg"
-                                                        alt="drop-down-copy-2-line" height="24" width="24" />
-                                                </mat-icon>
-                                                <span>{{ 'Edit' | translate }}</span>
-                                            </button>
-                                            <button (click)="deleteIncome(element)" mat-menu-item>
-                                                <mat-icon>
-                                                    <img src="assets/images/svgs/drop-down-delete-2-line.svg"
-                                                        alt="drop-down-copy-2-line" height="24" width="24" />
-                                                </mat-icon>
-                                                <span>{{ 'Delete' | translate }}</span>
-                                            </button>
-                                        </mat-menu>
-                                    </td>
-                                </ng-container>
+                                    </div>
+                                </div>
+                            </div>
+                        </mat-card-content>
+                        }
 
-                                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                                <tr mat-row *matRowDef="let row; columns: displayedColumns;"
-                                    (click)="updateIncomeClicked(row)" class="cursor-pointer"></tr>
-                            </table>
+                        <div class="row">
+                            @for(income of incomes; track income; let i = $index) {
+                            <div class="col-6">
+                                <mat-card-content class="m-b-10" style="padding: 0px;">
+                                    <div class="cashflow-drag-wrapper">
+                                        <div class="d-flex flex-column gap-20">
+                                            <div class="flex-column d-flex gap-10" id="drag-boundary">
+                                                <div
+                                                    class="d-flex justify-content-between align-items-center gap-12 dragable-card-wrapper">
+                                                    <div
+                                                        class="dragable-card d-flex align-items-center justify-content-between cursor-pointer">
+                                                        <div class="d-flex align-items-center gap-8">
+                                                            <div class="stats-main-wrapper">
+                                                                <div class="d-flex flex-column gap-8">
+                                                                    <div class="d-flex align-items-center gap-8">
+                                                                        @if(income.amount.amount == 0)
+                                                                        {
+                                                                        <img height="32px;" [src]="'/assets/images/svgs/' + income.icon + '-gray.svg'"
+                                                                            alt="income-icon" />
+                                                                        }
+                                                                        @else {
+                                                                        <img height="32px;" [src]="'/assets/images/svgs/' + income.icon + '-green.svg'"
+                                                                            alt="income-icon" />
+                                                                        }
+                                                                        <h3 class="card-title card-title-margin">{{income.description}}
+                                                                        </h3>
+                                                                    </div>
+                                                                    <div class="d-flex align-items-center gap-10">
+                                                                            <h3 class="card-title">+{{income.amount.currencySymbol|currencySymbol}}{{income.amount.amount|thousandSeparator}}
+                                                                                <span
+                                                                                    class="paragraph-text">/{{getCycle(income.amount.cycle?.description)}}</span>
+                                                                            </h3>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
 
-
+                                                        @if(isEditableIncome(income.description)) {
+                                                        <div class="menu menu-top-margin">
+                                                            <div
+                                                                class="d-flex align-items-center justify-content-center">
+                                                                <button
+                                                                    (click)="$event.stopPropagation(); $event.preventDefault()"
+                                                                    mat-icon-button [matMenuTriggerFor]="menu">
+                                                                    <mat-icon>
+                                                                        <img src="assets/images/svgs/dropdown-detail.svg"
+                                                                            alt="dropdown-detail" />
+                                                                    </mat-icon>
+                                                                </button>
+                                                            </div>
+                                                            <mat-menu #menu="matMenu" xPosition="before"
+                                                                class="dropdown-menus">
+                                                                <button (click)="updateIncomeClicked(income)"
+                                                                    mat-menu-item>
+                                                                    <mat-icon>
+                                                                        <img src="assets/images/svgs/drop-down-edit-2-line.svg"
+                                                                            alt="drop-down-copy-2-line" height="24"
+                                                                            width="24" />
+                                                                    </mat-icon>
+                                                                    <span>{{ 'Edit' | translate }}</span>
+                                                                </button>
+                                                                <button (click)="deleteIncome(income)" mat-menu-item>
+                                                                    <mat-icon>
+                                                                        <img src="assets/images/svgs/drop-down-delete-2-line.svg"
+                                                                            alt="drop-down-copy-2-line" height="24"
+                                                                            width="24" />
+                                                                    </mat-icon>
+                                                                    <span>{{ 'Delete' | translate }}</span>
+                                                                </button>
+                                                            </mat-menu>
+                                                        </div>
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </mat-card-content>
+                            </div>
+                            }
                         </div>
+                        <!-- end left column -->
                     </div>
-                </mat-card> -->
-                <!-- end left column -->
-            </div>
-            <div class="col-6">
-                <!-- right column -->
-                <mat-card class="income-expense-wrapper">
-                    <div class="heading-btn-wrapper">
-                        <div class="d-flex gap-12">
-                            <h3>{{ 'Expenses' | translate }}</h3>
 
-                            <h3 class="expense-income">{{(incomeExpense?.total ?? 0) < 0 ? '-' : ''
-                                    }}{{selectedClient?.clientDetails?.preferredCurrency|currencySymbol}}{{((incomeExpense?.total
-                                    ?? 0) < 0 ? ((incomeExpense?.total ?? 0))*(-1) : (incomeExpense?.total ?? 0)) |
-                                    thousandSeparator}} </h3>
+                    <div class="col-6">
+                        <!-- right column -->
+                        <mat-card class="income-expense-wrapper m-b-10">
+                            <div class="heading-btn-wrapper">
+                                <div class="d-flex align-items-center justify-content-between w-100 gap-16 flex-wrap">
+                                    <div class="d-flex gap-12 align-items-end">
+                                        <h3>{{ 'Expenses' | translate }}</h3>
+                                        <h3 class="expense-income-red">
+                                            -{{currency|currencySymbol}}{{incomeExpense.totalExpenses|thousandSeparator}}
+                                        </h3>
+                                    </div>
 
                                     <div class="d-flex gap-12 align-items-end">
                                         <button (click)="newExpenseClicked()" type="button"
@@ -205,77 +232,180 @@
                                             <span>{{ 'Add expense' | translate }}</span>
                                         </button>
                                     </div>
-                        </div>
-                    </div>
-                </mat-card>
+                                </div>
+                            </div>
+                        </mat-card>
 
-                <mat-card class="clientTableContainer">
-                    <div class="table-main-wrapper">
-                        <div class="table-responsive-sm table-wrapper">
-                            <table mat-table [dataSource]="expenseDataSource" class="mat-elevation-z8">
-                                <ng-container matColumnDef="position">
-                                    <th mat-header-cell *matHeaderCellDef
-                                        class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-client">{{
-                                        'Description' | translate }}
-                                    </th>
-                                    <td mat-cell *matCellDef="let element" class="p-x-24 f-s-14 p-l-0 column-client">
-                                        {{element.description}} </td>
-                                </ng-container>
+                        @for(expense of defautExpenses; track expense; let i = $index) {
+                        <mat-card-content class="m-b-10" style="padding: 0px;">
+                            <div class="cashflow-drag-wrapper">
+                                <div class="d-flex flex-column gap-20">
+                                    <div class="flex-column d-flex gap-10" id="drag-boundary">
+                                        <div
+                                            class="d-flex justify-content-between align-items-center gap-12 dragable-card-wrapper">
+                                            <div
+                                                class="dragable-card d-flex align-items-center justify-content-between cursor-pointer">
+                                                <div class="d-flex align-items-center gap-8">
+                                                    <div class="stats-main-wrapper">
+                                                        <div class="d-flex flex-column gap-8">
+                                                            <div class="d-flex align-items-center gap-8">
+                                                                @if(expense.amount.amount == 0)
+                                                                {
+                                                                <img height="32px;" [src]="'/assets/images/svgs/' + expense.icon + '-gray.svg'"
+                                                                    alt="income-icon" />
+                                                                }
+                                                                @else {
+                                                                <img height="32px;" [src]="'/assets/images/svgs/' + expense.icon + '-red.svg'"
+                                                                    alt="income-icon" />
+                                                                }
+                                                                <h3 class="card-title card-title-margin">{{expense.description}}</h3>
+                                                            </div>
+                                                            <div class="d-flex align-items-center gap-10">
+                                                                <h3 class="saving-title">
+                                                                    @if(expense.amount.amount == 0)
+                                                                    {
+                                                                    <span class="paragraph-text">{{'Set amount' |
+                                                                        translate}}</span>
+                                                                    }
+                                                                    @else {
+                                                                    <h3 class="card-title">-{{expense.amount.currencySymbol|currencySymbol}}{{expense.amount.amount|thousandSeparator}}
+                                                                        <span
+                                                                            class="paragraph-text">/{{getCycle(expense.amount.cycle?.description)}}</span>
+                                                                    </h3>
+                                                                    }
+                                                                </h3>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
 
-                                <ng-container matColumnDef="name">
-                                    <th mat-header-cell *matHeaderCellDef
-                                        class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-net-amount">{{ 'Net
-                                        amount' | translate }}
-                                    </th>
-                                    <td mat-cell *matCellDef="let element"
-                                        class="p-x-24 f-s-14 p-l-0 column-net-amount">
-                                        {{selectedClient?.clientDetails?.preferredCurrency |
-                                        currencySymbol}}{{element.amount.amount |
-                                        thousandSeparator}}/{{element.amount.cycle.description}} </td>
-                                </ng-container>
-
-                                <ng-container matColumnDef="action">
-                                    <th mat-header-cell *matHeaderCellDef
-                                        class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-action"></th>
-                                    <td mat-cell class="column-action" *matCellDef="let element">
-                                        <div class="d-flex align-items-center justify-content-center">
-                                            <button (click)="$event.stopPropagation(); $event.preventDefault()"
-                                                mat-icon-button [matMenuTriggerFor]="menu">
-                                                <mat-icon>
-                                                    <img src="assets/images/svgs/dropdown-detail.svg"
-                                                        alt="dropdown-detail" />
-                                                </mat-icon>
-                                            </button>
+                                                <div class="menu menu-top-margin">
+                                                    <div class="d-flex align-items-center justify-content-center">
+                                                        <button
+                                                            (click)="$event.stopPropagation(); $event.preventDefault()"
+                                                            mat-icon-button [matMenuTriggerFor]="menu">
+                                                            <mat-icon>
+                                                                <img src="assets/images/svgs/dropdown-detail.svg"
+                                                                    alt="dropdown-detail" />
+                                                            </mat-icon>
+                                                        </button>
+                                                    </div>
+                                                    <mat-menu #menu="matMenu" xPosition="before" class="dropdown-menus">
+                                                        <button (click)="updateExpenseClicked(expense)" mat-menu-item>
+                                                            <mat-icon>
+                                                                <img src="assets/images/svgs/drop-down-edit-2-line.svg"
+                                                                    alt="drop-down-copy-2-line" height="24"
+                                                                    width="24" />
+                                                            </mat-icon>
+                                                            <span>{{ 'Edit' | translate }}</span>
+                                                        </button>
+                                                        <button (click)="deleteExpense(expense)" mat-menu-item>
+                                                            <mat-icon>
+                                                                <img src="assets/images/svgs/drop-down-delete-2-line.svg"
+                                                                    alt="drop-down-copy-2-line" height="24"
+                                                                    width="24" />
+                                                            </mat-icon>
+                                                            <span>{{ 'Delete' | translate }}</span>
+                                                        </button>
+                                                    </mat-menu>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <mat-menu #menu="matMenu" xPosition="before" class="dropdown-menus">
-                                            <button (click)="updateExpenseClicked(element)" mat-menu-item>
-                                                <mat-icon>
-                                                    <img src="assets/images/svgs/drop-down-edit-2-line.svg"
-                                                        alt="drop-down-copy-2-line" height="24" width="24" />
-                                                </mat-icon>
-                                                <span>{{ 'Edit' | translate }}</span>
-                                            </button>
-                                            <button (click)="deleteExpense(element)" mat-menu-item>
-                                                <mat-icon>
-                                                    <img src="assets/images/svgs/drop-down-delete-2-line.svg"
-                                                        alt="drop-down-copy-2-line" height="24" width="24" />
-                                                </mat-icon>
-                                                <span>{{ 'Delete' | translate }}</span>
-                                            </button>
-                                        </mat-menu>
-                                    </td>
-                                </ng-container>
-                                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                                <tr mat-row *matRowDef="let row; columns: displayedColumns;"
-                                    (click)="updateExpenseClicked(row)" class="cursor-pointer"></tr>
-                            </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </mat-card-content>
+                        }
+
+                        <div class="row">
+                            @for(expense of expenses; track expense; let i = $index) {
+                            <div class="col-6">
+                                <mat-card-content class="m-b-10" style="padding: 0px;">
+                                    <div class="cashflow-drag-wrapper">
+                                        <div class="d-flex flex-column gap-20">
+                                            <div class="flex-column d-flex gap-10" id="drag-boundary">
+                                                <div
+                                                    class="d-flex justify-content-between align-items-center gap-12 dragable-card-wrapper">
+                                                    <div
+                                                        class="dragable-card d-flex align-items-center justify-content-between cursor-pointer">
+                                                        <div class="d-flex align-items-center gap-8">
+                                                            <div class="stats-main-wrapper">
+                                                                <div class="d-flex flex-column gap-8">
+                                                                    <div class="d-flex align-items-center gap-8">
+                                                                        @if(expense.amount.amount == 0)
+                                                                        {
+                                                                        <img height="32px;" [src]="'/assets/images/svgs/' + expense.icon + '-gray.svg'"
+                                                                            alt="income-icon" />
+                                                                        }
+                                                                        @else {
+                                                                        <img height="32px;" [src]="'/assets/images/svgs/' + expense.icon + '-red.svg'"
+                                                                            alt="income-icon" />
+                                                                        }
+
+                                                                        <h3 class="card-title card-title-margin">{{expense.description}}
+                                                                        </h3>
+                                                                    </div>
+                                                                    <div class="d-flex align-items-center gap-10">
+                                                                            <h3 class="card-title">-{{expense.amount.currencySymbol|currencySymbol}}{{expense.amount.amount|thousandSeparator}}
+                                                                                <span
+                                                                                    class="paragraph-text">/{{getCycle(expense.amount.cycle?.description)}}</span>
+                                                                            </h3>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        @if(isEditableExpense(expense.description)) {
+                                                        <div class="menu menu-top-margin">
+                                                            <div
+                                                                class="d-flex align-items-center justify-content-center">
+                                                                <button
+                                                                    (click)="$event.stopPropagation(); $event.preventDefault()"
+                                                                    mat-icon-button [matMenuTriggerFor]="menu">
+                                                                    <mat-icon>
+                                                                        <img src="assets/images/svgs/dropdown-detail.svg"
+                                                                            alt="dropdown-detail" />
+                                                                    </mat-icon>
+                                                                </button>
+                                                            </div>
+                                                            <mat-menu #menu="matMenu" xPosition="before"
+                                                                class="dropdown-menus">
+                                                                <button (click)="updateExpenseClicked(expense)"
+                                                                    mat-menu-item>
+                                                                    <mat-icon>
+                                                                        <img src="assets/images/svgs/drop-down-edit-2-line.svg"
+                                                                            alt="drop-down-copy-2-line" height="24"
+                                                                            width="24" />
+                                                                    </mat-icon>
+                                                                    <span>{{ 'Edit' | translate }}</span>
+                                                                </button>
+                                                                <button (click)="deleteExpense(expense)" mat-menu-item>
+                                                                    <mat-icon>
+                                                                        <img src="assets/images/svgs/drop-down-delete-2-line.svg"
+                                                                            alt="drop-down-copy-2-line" height="24"
+                                                                            width="24" />
+                                                                    </mat-icon>
+                                                                    <span>{{ 'Delete' | translate }}</span>
+                                                                </button>
+                                                            </mat-menu>
+                                                        </div>
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </mat-card-content>
+                            </div>
+                            }
                         </div>
+                        <!-- right column -->
                     </div>
-                </mat-card>
-                <!-- right column -->
-            </div>
+                </div>
+            </mat-card>
         </div>
     </div>
+
     }
     @else {
     <div class="h-300">

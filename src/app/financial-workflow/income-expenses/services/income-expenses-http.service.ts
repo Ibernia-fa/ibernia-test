@@ -12,7 +12,7 @@ export class IncomeExpensesHttpService {
   constructor(private httpClient: HttpClient) { }
 
   getAllIncomeExpenses(cashflowId: string) {
-    return this.httpClient.get<IncomeExpense>(`${this.INCOME_EXPENSE_URL_PREFIX}/${cashflowId}/financial`);
+    return this.httpClient.get<IncomeExpense>(`${this.INCOME_EXPENSE_URL_PREFIX}/${cashflowId}/income-expense/financial`);
   }
 
   addIncome(cashflowId: string, income: FinancialViewModel) {
