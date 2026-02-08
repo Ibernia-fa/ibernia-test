@@ -22,5 +22,7 @@ export interface FinancialViewModel {
     start: AgeYear;
     end: AgeYear;
     escalationRate: EscalationRate | null; 
-    
+    isDefault: boolean | false;
+    isIncomeExpenseSource: boolean | false;
+    icon: string;
 }

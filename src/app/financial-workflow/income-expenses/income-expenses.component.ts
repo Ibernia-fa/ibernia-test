@@ -2,10 +2,8 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { AddIncomeComponent } from './add-income/add-income.component';
-import { UpdateIncomeComponent } from './update-income/update-income.component';
 import { MatCardModule } from '@angular/material/card';
 import { AddExpenseComponent } from './add-expense/add-expense.component';
-import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
@@ -24,9 +22,9 @@ import { TimelineHttpService } from '../timeline/services/timeline-http.service'
 import moment from 'moment';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { CurrencySymbolPipe } from 'src/app/pipe/currency-symbol.pipe';
-import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
 import { TranslateModule } from '@ngx-translate/core';
+import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 
 @Component({
   selector: 'app-income-expenses',
@@ -34,7 +32,6 @@ import { TranslateModule } from '@ngx-translate/core';
     MatDialogModule,
     CommonModule,
     MatCardModule,
-    MatTableModule,
     MatIconModule,
     MatMenuModule,
     MatButtonModule,
@@ -50,11 +47,6 @@ import { TranslateModule } from '@ngx-translate/core';
   styleUrl: './income-expenses.component.scss',
 })
 export class IncomeExpensesComponent {
-  displayedColumns: string[] = ['position', 'name', 'action'];
-  incomeDataSource: MatTableDataSource<FinancialViewModel> =
-    new MatTableDataSource(new Array<FinancialViewModel>());
-  expenseDataSource: MatTableDataSource<FinancialViewModel> =
-    new MatTableDataSource(new Array<FinancialViewModel>());
   selectedClient: Client;
   selectedCashflow: Cashflow;
   incomeExpense: IncomeExpense;
@@ -62,7 +54,16 @@ export class IncomeExpensesComponent {
   escalationRates: EscalationRate[];
   isLoaderVisible = false;
   timeline: FinancialTimeline;
-
+  currency: string;
+  // default
+  defaultIncomes: FinancialViewModel[];
+  defautExpenses: FinancialViewModel[];
+  // non default
+  incomes: FinancialViewModel[];
+  expenses: FinancialViewModel[];
+  incomeType: string[] = [];
+  expenseType: string[] = [];
+  
   constructor(
     private dialog: MatDialog,
     private activatedRoute: ActivatedRoute,
@@ -86,8 +87,6 @@ export class IncomeExpensesComponent {
         ),
         tap(([client, cashflow]) => {
           this.selectedClient = client as Client;
-          console.log(cashflow);
-          console.log(client);
           this.selectedCashflow = cashflow as Cashflow;
         }),
         switchMap(([client, cashflow]) => {
@@ -110,12 +109,11 @@ export class IncomeExpensesComponent {
           this.escalationRates = escalationRatesResponse?.escalationRates;
           this.timeline = timeline;
 
-          this.incomeDataSource = new MatTableDataSource(
-            this.incomeExpense?.incomes
-          );
-          this.expenseDataSource = new MatTableDataSource(
-            this.incomeExpense?.expenses
-          );
+          this.defaultIncomes = this.incomeExpense.incomes.filter(i => i.isDefault == true);
+          this.defautExpenses = this.incomeExpense.expenses.filter(i => i.isDefault == true);
+          this.incomes = this.incomeExpense.incomes.filter(i => i.isDefault == false);
+          this.expenses = this.incomeExpense.expenses.filter(i => i.isDefault == false);
+          this.currency = this.selectedClient.clientDetails?.preferredCurrency ?? "USD";
           this.isLoaderVisible = false;
         })
       )
@@ -123,6 +121,8 @@ export class IncomeExpensesComponent {
   }
 
   newIncomeClicked() {
+    this.setIncomeType();
+
     const dialogRef = this.dialog.open(AddIncomeComponent, {
       width: '700px',
       disableClose: true,
@@ -136,15 +136,18 @@ export class IncomeExpensesComponent {
         cashflowId: this.selectedCashflow?.id,
         forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
         forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
+        incomeType: this.incomeType
       },
     });
 
     dialogRef.afterClosed().subscribe((result: any) => {
-      this.updateIncomeExpenseByResponse(result.incomeExpense);
+      this.updateIncomeExpenseByResponse(result?.incomeExpense);
     });
   }
 
   newExpenseClicked() {
+    this.setExpenseType();
+
     const dialogRef = this.dialog.open(AddExpenseComponent, {
       width: '700px',
       disableClose: true,
@@ -158,16 +161,17 @@ export class IncomeExpensesComponent {
         cashflowId: this.selectedCashflow?.id,
         forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
         forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
+        expenseType: this.expenseType
       },
     });
 
     dialogRef.afterClosed().subscribe((result: any) => {
-      console.log('Dialog closed with result:', result);
-      this.updateIncomeExpenseByResponse(result.incomeExpense);
+      this.updateIncomeExpenseByResponse(result?.incomeExpense);
     });
   }
 
   updateIncomeClicked(item: FinancialViewModel) {
+    this.setIncomeType();
     const dialogRef = this.dialog.open(AddIncomeComponent, {
       width: '700px',
       disableClose: true,
@@ -175,22 +179,24 @@ export class IncomeExpensesComponent {
         amountCycles: this.amountCycles,
         escalataionRates: this.escalationRates,
         clientBirthDate: this.selectedClient?.clientDetails.birthDate,
-        clientPreferredCurrency:
-          this.selectedClient?.clientDetails.preferredCurrency,
+        clientPreferredCurrency: this.selectedClient?.clientDetails.preferredCurrency,
         cashflowId: this.selectedCashflow?.id,
         selectedIncome: item,
         isEditWorkflow: true,
         forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
         forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
+        incomeType: this.incomeType
       },
     });
 
     dialogRef.afterClosed().subscribe((result: any) => {
-      this.updateIncomeExpenseByResponse(result.incomeExpense);
+      this.updateIncomeExpenseByResponse(result?.incomeExpense);
     });
   }
 
   updateExpenseClicked(item: FinancialViewModel) {
+    this.setExpenseType();
+
     const dialogRef = this.dialog.open(AddExpenseComponent, {
       width: '700px',
       disableClose: true,
@@ -205,40 +211,48 @@ export class IncomeExpensesComponent {
         isEditWorkflow: true,
         forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
         forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
+        expenseType: this.expenseType
       },
     });
 
     dialogRef.afterClosed().subscribe((result: any) => {
-      console.log('Dialog closed with result:', result);
-      if(result) {
+      if (result) {
         this.updateIncomeExpenseByResponse(result?.incomeExpense);
       }
     });
   }
 
-  // updateIncomeClicked() {
-  //   const dialogRef = this.dialog.open(UpdateIncomeComponent, {
-  //     width: '700px',
-  //     disableClose: true,
-  //     data: {},
-  //   });
+  setIncomeType() {
+    this.incomeType = [];
 
-  //   dialogRef.afterClosed().subscribe((result: any) => {
-  //     console.log('Dialog closed with result:', result);
-  //   });
-  // }
+    if (!this.defaultIncomes.find(x => x.description == "Salary")) {
+      this.incomeType.push("Salary");
+    }
+    if (!this.defaultIncomes.find(x => x.description == "State pension")) {
+      this.incomeType.push("State pension");
+    }
+    if (!this.incomes.find(x => x.description == "Rental income")) {
+      this.incomeType.push("Rental income");
+    }
+    
+    this.incomeType.push("Custom");
+  }
 
-  // updateExpenseClicked() {
-  //   const dialogRef = this.dialog.open(UpdateIncomeComponent, {
-  //     width: '700px',
-  //     disableClose: true,
-  //     data: {},
-  //   });
+  setExpenseType() {
+    this.expenseType = [];
 
-  //   dialogRef.afterClosed().subscribe((result: any) => {
-  //     console.log('Dialog closed with result:', result);
-  //   });
-  // }
+    if (!this.defautExpenses.find(x => x.description == "Living costs")) {
+      this.expenseType.push("Living costs");
+    }
+    if (!this.defautExpenses.find(x => x.description == "Housing")) {
+      this.expenseType.push("Housing");
+    }
+    if (!this.incomes.find(x => x.description == "Debt repayment")) {
+      this.expenseType.push("Debt repayment");
+    }
+    
+    this.expenseType.push("Custom");
+  }
 
   deleteIncome(element: FinancialViewModel) {
     this.incomeExpensesHttpService
@@ -256,34 +270,59 @@ export class IncomeExpensesComponent {
       });
   }
 
-  updateIncomeExpenseByResponse(res: IncomeExpense) {
-    this.incomeExpense = res;
-    this.incomeDataSource = new MatTableDataSource(this.incomeExpense.incomes);
-    this.expenseDataSource = new MatTableDataSource(
-      this.incomeExpense.expenses
-    );
+  updateIncomeExpenseByResponse(res: IncomeExpense | null) {
+    // if (res) {
+    //   this.incomeExpense = res;
+    //   this.defaultIncomes = this.incomeExpense.incomes.filter(i => i.isDefault == true && i.isIncomeExpenseSource == true);
+    //   this.defautExpenses = this.incomeExpense.expenses.filter(i => i.isDefault == true && i.isIncomeExpenseSource == true);
+    //   this.incomes = this.incomeExpense.incomes.filter(i => i.isDefault == false && i.isIncomeExpenseSource == true);
+    //   this.expenses = this.incomeExpense.expenses.filter(i => i.isDefault == false && i.isIncomeExpenseSource == true);
+    // }
+
+    this.activatedRoute.params
+      .pipe(
+        switchMap(() => {
+          return combineLatest([
+            this.incomeExpensesHttpService.getAllIncomeExpenses(this.selectedCashflow.id),
+            this.timelineHttpService.getTimelinebyCashflowId(this.selectedCashflow.id)
+          ]);
+        }),
+        tap(([incomeExpense, timeline]) => {
+          this.incomeExpense = incomeExpense;
+          this.timeline = timeline;
+
+          this.defaultIncomes = this.incomeExpense.incomes.filter(i => i.isDefault == true);
+          this.defautExpenses = this.incomeExpense.expenses.filter(i => i.isDefault == true);
+          this.incomes = this.incomeExpense.incomes.filter(i => i.isDefault == false);
+          this.expenses = this.incomeExpense.expenses.filter(i => i.isDefault == false);
+        })
+      )
+      .subscribe();
   }
 
-  private calculateSavingsRate() {
-    var totalIncome = 0;
-    var totalExpense = 0;
-    this.incomeExpense.incomes.map(
-      (x) => (totalIncome = totalIncome + x.amount.amount)
-    );
-    this.incomeExpense.expenses.map(
-      (x) => (totalExpense = totalExpense + x.amount.amount)
-    );
-    this.incomeExpense.totalIncome = totalIncome;
-    this.incomeExpense.totalExpenses = totalExpense;
-    this.incomeExpense.total = totalIncome - totalExpense;
+  trackByIndex(index: number) {
+    return index;
+  }
 
-    if (totalIncome === 0) {
-      return;
+  getCycle(cycle: string) {
+    switch (cycle) {
+      case "One-off": return "One-off"
+      case "Every year": return "year";
+      default: return "month";
     }
-    // return 0; // Avoid division by zero
+  }
 
-    var savings =
-      this.incomeExpense.totalIncome - this.incomeExpense.totalExpenses;
-    return (savings / this.incomeExpense.totalIncome) * 100;
+  isEditableIncome(name: string): boolean {
+    if (name == "Pension Fund")
+      return false;
+    
+    return true;
+  }
+
+  isEditableExpense(name: string): boolean {
+    if (name == "Insurance")
+      return false;
+    
+    return true;
   }
 }
