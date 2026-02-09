@@ -189,3 +189,43 @@ html .topbar {
       text-decoration: underline;
     }
 }
+
+// Header breadcrumb (Home icon > Client name > Plan name)
+// Fixed at 120px from left (sidebar width) so it does not move when logo width changes
+.header-breadcrumb {
+  position: absolute;
+  left: 295px;
+  top: 50%;
+  transform: translateY(-50%);
+  margin: 0;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 400;
+  color: #787889;
+
+  .breadcrumb-home-icon {
+    width: 20px;
+    height: 20px;
+    color: #787889;
+    &:hover {
+      color: #4043AF;
+    }
+  }
+
+  .breadcrumb-link {
+    color: #787889;
+    &:hover {
+      color: #4043AF;
+    }
+  }
+
+  .breadcrumb-chevron {
+    color: #4043AF;
+    user-select: none;
+    margin: 0 2px;
+  }
+
+  .breadcrumb-current {
+    color: #1c1c1c;
+  }
+}

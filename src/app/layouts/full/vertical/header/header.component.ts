@@ -21,6 +21,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { SettingsService, UserProfileDto } from 'src/app/default-preferance/services/default-preferance.http.service';
 import { HttpResponse } from '@angular/common/http';
@@ -29,6 +30,7 @@ import { OrganizationProfilesService } from 'src/app/settings/services/organizat
 import { Store } from '@ngrx/store';
 import { Client } from 'src/app/clients/models/client';
 import { selectedClient } from 'src/app/store/client/client.selectors';
+import { selectedCashflow } from 'src/app/store/cashflow/cashflow.selectors';
 import { LanguageService } from 'src/app/core/language.service';
 import { LanguageLoaderService } from '../../language-loader.service';
 
@@ -74,6 +76,7 @@ type LanguageCode = 'en' | 'it';
         TablerIconsModule,
         MatToolbarModule,
         MatButtonModule,
+        MatTooltipModule,
         TranslateModule
     ],
     templateUrl: './header.component.html',
@@ -90,7 +93,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
   // showFiller = false;
 showFiller = false;
   isCashflowRoute = false; // Add this flag
+  isSettingsRoute = false;
+  settingsPageName = ''; // Current settings section for breadcrumb
   clientProfileLink = ''; // Add this for the link
+  planName = ''; // Current cashflow/plan name for breadcrumb
   public selectedLanguage: any = {
     language: 'English',
     code: 'en',
@@ -179,6 +185,12 @@ showFiller = false;
         }
       });
 
+    this.store.select(selectedCashflow)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(cashflow => {
+        this.planName = cashflow?.name ?? '';
+      });
+
 
           this.router.events
       .pipe(
@@ -232,12 +244,32 @@ showFiller = false;
     const currentUrl = this.router.url;
     // Check if URL matches pattern: /cashflows/:cashflowId/...
     this.isCashflowRoute = /^\/cashflows\/[^\/]+\/.+/.test(currentUrl);
-    
+    // Check if on settings section
+    this.isSettingsRoute = /^\/settings(\/|$)/.test(currentUrl);
+    if (this.isSettingsRoute) {
+      this.settingsPageName = this.getSettingsPageName(currentUrl);
+    } else {
+      this.settingsPageName = '';
+    }
     if (this.isCashflowRoute) {
-      // Get client from store to build the link
-      // Assuming you have access to the client store/state
       this.buildClientProfileLink();
     }
+  }
+
+  private static readonly SETTINGS_PAGE_LABELS: Record<string, string> = {
+    'account-preferences': 'Account preferences',
+    'plan-billing': 'Plan & billing',
+    'security': 'Security',
+    'notifications': 'Notifications',
+    'branding': 'Branding',
+    'help': 'Help',
+    'ai-reccomendations': 'AI recommendations',
+  };
+
+  private getSettingsPageName(url: string): string {
+    const match = url.match(/\/settings\/([^\/\?]+)/);
+    const segment = match ? match[1] : '';
+    return HeaderComponent.SETTINGS_PAGE_LABELS[segment] || segment.replace(/-/g, ' ') || 'Settings';
   }
 
 
