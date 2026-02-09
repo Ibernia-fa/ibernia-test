@@ -68,6 +68,12 @@ export class WithdrawalsContributionsComponent {
   isLoaderVisible = false;
   timeline: FinancialTimeline;
   savingsPots: SavingPotsModel;
+  contributionSummary = {
+    total: 0,
+    savingRate: 0,
+    totalContributions: 0,
+    totalWithdrawals: 0,
+  };
 
   constructor(
     private dialog: MatDialog,
@@ -126,6 +132,7 @@ export class WithdrawalsContributionsComponent {
           this.withdrawalDataSource = new MatTableDataSource(
             this.contributionWithdrawal?.withdrawals
           );
+          this.updateContributionSummary();
           this.isLoaderVisible = false;
         })
       )
@@ -153,7 +160,8 @@ export class WithdrawalsContributionsComponent {
           cashflowId: this.selectedCashflow?.id,
           forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
           forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
-          savingPots: this.savingsPots
+          savingPots: this.savingsPots,
+          existingContributions: this.contributionWithdrawal?.contributions ?? []
         },
       });
 
@@ -184,7 +192,8 @@ export class WithdrawalsContributionsComponent {
           cashflowId: this.selectedCashflow?.id,
           forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
           forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
-          savingPots: this.savingsPots
+          savingPots: this.savingsPots,
+          existingWithdrawals: this.contributionWithdrawal?.withdrawals ?? []
         },
       });
 
@@ -210,7 +219,8 @@ export class WithdrawalsContributionsComponent {
         isEditWorkflow: true,
         forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
         forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
-        savingPots: this.savingsPots
+        savingPots: this.savingsPots,
+        existingContributions: this.contributionWithdrawal?.contributions ?? []
       },
     });
 
@@ -234,7 +244,8 @@ export class WithdrawalsContributionsComponent {
         isEditWorkflow: true,
         forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
         forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
-        savingPots: this.savingsPots
+        savingPots: this.savingsPots,
+        existingWithdrawals: this.contributionWithdrawal?.withdrawals ?? []
       },
     });
 
@@ -290,5 +301,31 @@ export class WithdrawalsContributionsComponent {
     this.withdrawalDataSource = new MatTableDataSource(
       this.contributionWithdrawal.withdrawals
     );
+    this.updateContributionSummary();
+  }
+
+  private updateContributionSummary(): void {
+    const contributions = this.contributionWithdrawal?.contributions ?? [];
+    const withdrawals = this.contributionWithdrawal?.withdrawals ?? [];
+
+    const totalContributions = contributions.reduce(
+      (sum, item) => sum + Number(item?.amount?.amount ?? 0),
+      0
+    );
+    const totalWithdrawals = withdrawals.reduce(
+      (sum, item) => sum + Number(item?.amount?.amount ?? 0),
+      0
+    );
+
+    const total = totalContributions - totalWithdrawals;
+    const savingRate =
+      totalContributions === 0 ? 0 : (total / totalContributions) * 100;
+
+    this.contributionSummary = {
+      total,
+      savingRate,
+      totalContributions,
+      totalWithdrawals,
+    };
   }
 }

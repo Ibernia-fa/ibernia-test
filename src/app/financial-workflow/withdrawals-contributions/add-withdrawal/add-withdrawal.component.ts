@@ -16,7 +16,7 @@ import { WithdrawalsContributionsHttpService } from '../services/withdrawals-con
 import moment from 'moment';
 import { FundsViewModel } from '../model/withdrawals-contributions';
 import { catchError, filter } from 'rxjs';
-import { ComissionType, SavingPotsModel } from '../../saving-pots/models/saving-pots.model';
+import { ClientSaving, ComissionType, SavingPotsModel } from '../../saving-pots/models/saving-pots.model';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
@@ -63,6 +63,8 @@ export class AddWithdrawalComponent {
   savingPots: SavingPotsModel;
   eventsList: any;
   selectedEscalationDescription: string;
+  existingWithdrawals: FundsViewModel[] = [];
+  private lastAutoDescription: string | null = null;
   currentYear: number = new Date().getFullYear();
 
   constructor(
@@ -71,7 +73,7 @@ export class AddWithdrawalComponent {
     private fb: FormBuilder,
     private withdrawalsContributionsHttpService: WithdrawalsContributionsHttpService
   ) {
-    this.eventsList = data.eventsList;
+    this.eventsList = data.eventsList ?? [];
     this.cycles = data.amountCycles;
     this.escalationRates = data.escalataionRates;
     this.clientBirthYear = moment(data.clientBirthDate).year();
@@ -93,9 +95,15 @@ export class AddWithdrawalComponent {
     this.cashflowId = data.cashflowId;
     this.isEditWorkflow = data.isEditWorkflow;
     this.selectedWithdrawal = data.selectedWithdrawal;
-    this.savingPots = data.savingPots
+    this.savingPots = data.savingPots;
+    this.existingWithdrawals = data.existingWithdrawals ?? [];
 
-    this.savingPots.clientSavings = this.savingPots.clientSavings.filter(saving => !saving.hasPotLocked)
+    const availableSavings = (this.savingPots?.clientSavings ?? []).filter(
+      (saving) =>
+        !saving.hasPotLocked &&
+        (saving.name ?? '').toLowerCase() !== 'cash'
+    );
+    this.savingPots.clientSavings = availableSavings;
     var iterations = data.forecastEndDateYear - data.forecastStartDateYear + 1;
 
     for (let index = 0; index < iterations; index++) {
@@ -106,7 +114,7 @@ export class AddWithdrawalComponent {
     this.withdrawalForm = this.fb.group({
       description: ['', Validators.required],
       currencySymbol: [this.clientPreferredCurrency, [Validators.required]],
-      amount: ['', [Validators.required, Validators.min(0)]],
+      amount: [0, [Validators.required, Validators.min(0)]],
       cycle: [this.cycles[1].id, Validators.required],
       start: ['', Validators.required],
       end: [''],
@@ -120,6 +128,8 @@ export class AddWithdrawalComponent {
     this.withdrawalForm.setValidators(this.endOnOrAfterStartValidator());
     this.withdrawalForm.updateValueAndValidity({ emitEvent: false });
     this.onCycleValueChange(this.cycles[1].id);
+
+    this.initializeDefaultSelections();
 
     if (this.isEditWorkflow) {
       this.onCycleValueChange(this.selectedWithdrawal.amount.cycle?.id);
@@ -178,9 +188,7 @@ export class AddWithdrawalComponent {
       this.withdrawalForm.get('savingPot')?.patchValue(stillExists ? savedId : null);
     }
 
-    // hide locked pots AND the "Cash" pot from the dropdown
-    this.savingPots.clientSavings = (this.savingPots.clientSavings || [])
-      .filter(s => (s.name ?? '').toLowerCase() !== 'cash');
+    this.initializeSavingPotDescriptionAutoFill();
   }
 
   onAmountInput(rawValue: string) {
@@ -396,5 +404,136 @@ export class AddWithdrawalComponent {
     }
 
     customControl?.updateValueAndValidity();
+  }
+
+  private initializeDefaultSelections(): void {
+    if (this.isEditWorkflow) return;
+    this.setDefaultStartEndDates();
+    this.setDefaultSavingPot();
+  }
+
+  private setDefaultStartEndDates(): void {
+    const lastYear = this.years[this.years.length - 1];
+    const endControl = this.withdrawalForm.get('end');
+    if (endControl && lastYear !== null && lastYear !== undefined && lastYear.toString() !== '') {
+      if (endControl.value === null || endControl.value === undefined || endControl.value === '') {
+        endControl.setValue(lastYear);
+      }
+    }
+
+    const retirementEvent = this.getRetirementEvent();
+    if (!retirementEvent) return;
+
+    const startControl = this.withdrawalForm.get('start');
+    const retirementYear = retirementEvent?.start?.year;
+    if (startControl && retirementYear !== null && retirementYear !== undefined && retirementYear !== '') {
+      if (startControl.value === null || startControl.value === undefined || startControl.value === '') {
+        startControl.setValue(retirementYear);
+      }
+    }
+  }
+
+  private getRetirementEvent(): any | null {
+    const events = this.eventsList ?? [];
+    return events.find(
+      (event: any) =>
+        (event?.name ?? '').toString().toLowerCase() === 'retirement age'
+    ) ?? null;
+  }
+
+  private setDefaultSavingPot(): void {
+    const savingPotControl = this.withdrawalForm.get('savingPot');
+    if (!savingPotControl || savingPotControl.value) return;
+
+    const availablePots = this.savingPots?.clientSavings ?? [];
+    if (!availablePots.length) return;
+
+    let candidates = availablePots;
+    if (availablePots.length > 1) {
+      const usedPotIds = this.getExistingWithdrawalPotIds();
+      if (usedPotIds.length > 0) {
+        const unused = availablePots.filter(
+          (pot) => pot.id && !usedPotIds.includes(pot.id)
+        );
+        if (unused.length > 0) {
+          candidates = unused;
+        }
+      }
+    }
+
+    const defaultPot =
+      candidates.length === 1 ? candidates[0] : this.getLargestPot(candidates);
+
+    if (defaultPot?.id) {
+      savingPotControl.setValue(defaultPot.id);
+    }
+  }
+
+  private getExistingWithdrawalPotIds(): string[] {
+    return (this.existingWithdrawals ?? [])
+      .map((withdrawal) => withdrawal?.associatedSavingPotId)
+      .filter((id): id is string => !!id);
+  }
+
+  private getLargestPot(pots: ClientSaving[]): ClientSaving | null {
+    if (!pots.length) return null;
+    return pots.reduce((largest, pot) => {
+      const potAmount = Number(pot.startingPotValue?.amount ?? 0);
+      const largestAmount = Number(largest.startingPotValue?.amount ?? 0);
+      return potAmount > largestAmount ? pot : largest;
+    });
+  }
+
+  private initializeSavingPotDescriptionAutoFill(): void {
+    const descriptionControl = this.withdrawalForm.get('description');
+    const savingPotControl = this.withdrawalForm.get('savingPot');
+
+    if (!descriptionControl || !savingPotControl) return;
+
+    descriptionControl.valueChanges.subscribe((value) => {
+      if (this.lastAutoDescription && value !== this.lastAutoDescription) {
+        this.lastAutoDescription = null;
+      }
+    });
+
+    savingPotControl.valueChanges.subscribe((savingPotId) => {
+      this.applyDefaultDescriptionFromSavingPot(savingPotId);
+    });
+
+    this.applyDefaultDescriptionFromSavingPot(savingPotControl.value ?? null);
+  }
+
+  private applyDefaultDescriptionFromSavingPot(savingPotId: string | null): void {
+    if (!savingPotId) return;
+
+    const savingPot = (this.savingPots?.clientSavings ?? []).find(
+      (pot) => pot.id === savingPotId
+    );
+    if (!savingPot) return;
+
+    const descriptionControl = this.withdrawalForm.get('description');
+    if (!descriptionControl) return;
+
+    const currentValue = (descriptionControl.value ?? '').toString();
+    const nextDescription = this.buildDefaultDescription(savingPot.name);
+
+    if (currentValue === nextDescription) {
+      this.lastAutoDescription = nextDescription;
+      return;
+    }
+
+    const shouldReplace =
+      currentValue.trim() === '' ||
+      (this.lastAutoDescription && currentValue === this.lastAutoDescription);
+
+    if (!shouldReplace) return;
+
+    descriptionControl.setValue(nextDescription, { emitEvent: false });
+    this.lastAutoDescription = nextDescription;
+  }
+
+  private buildDefaultDescription(potName: string | null | undefined): string {
+    const name = (potName ?? '').toString().trim();
+    return name ? `Withdrawal from ${name}` : 'Withdrawal from';
   }
 }
