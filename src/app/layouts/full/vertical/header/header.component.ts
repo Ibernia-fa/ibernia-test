@@ -244,13 +244,6 @@ showFiller = false;
     const currentUrl = this.router.url;
     // Check if URL matches pattern: /cashflows/:cashflowId/...
     this.isCashflowRoute = /^\/cashflows\/[^\/]+\/.+/.test(currentUrl);
-    // Check if on settings section
-    this.isSettingsRoute = /^\/settings(\/|$)/.test(currentUrl);
-    if (this.isSettingsRoute) {
-      this.settingsPageName = this.getSettingsPageName(currentUrl);
-    } else {
-      this.settingsPageName = '';
-    }
     if (this.isCashflowRoute) {
       this.buildClientProfileLink();
     }

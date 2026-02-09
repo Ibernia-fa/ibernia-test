@@ -17,19 +17,6 @@
       <span class="breadcrumb-current f-w-600">{{ planName || 'Plan' }}</span>
     </nav>
   </ng-container>
-  <ng-container *ngIf="isSettingsRoute">
-    <nav class="header-breadcrumb d-flex align-items-center" aria-label="Breadcrumb">
-      <a [routerLink]="['/clients']" class="breadcrumb-link d-flex align-items-center text-decoration-none" matTooltip="Home">
-        <i-tabler name="home" class="breadcrumb-home-icon"></i-tabler>
-      </a>
-      <span class="breadcrumb-chevron" aria-hidden="true">&gt;</span>
-      <a [routerLink]="['/settings']" class="breadcrumb-link d-flex align-items-center text-decoration-none" matTooltip="Settings">
-        Settings
-      </a>
-      <span class="breadcrumb-chevron" aria-hidden="true">&gt;</span>
-      <span class="breadcrumb-current f-w-600">{{ settingsPageName }}</span>
-    </nav>
-  </ng-container>
     
   <!-- </div> -->
   <!-- @if (!hideSidebarToggle) {
