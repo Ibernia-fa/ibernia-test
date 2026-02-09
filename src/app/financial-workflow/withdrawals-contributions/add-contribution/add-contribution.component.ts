@@ -82,6 +82,8 @@ export class AddContributionComponent {
   savingPots: SavingPotsModel;
   eventsList: any;
   selectedEscalationDescription: string;
+  existingContributions: FundsViewModel[] = [];
+  private lastAutoDescription: string | null = null;
 
   // 🔽 New helpers for filtering
   allClientSavings: ClientSaving[] = [];
@@ -95,7 +97,7 @@ export class AddContributionComponent {
     private fb: FormBuilder,
     private withdrawalsContributionsHttpService: WithdrawalsContributionsHttpService
   ) {
-    this.eventsList = data.eventsList;
+    this.eventsList = data.eventsList ?? [];
     this.cycles = data.amountCycles;
     this.escalationRates = data.escalataionRates;
     this.clientBirthYear = moment(data.clientBirthDate).year();
@@ -117,6 +119,7 @@ export class AddContributionComponent {
     this.isEditWorkflow = data.isEditWorkflow;
     this.selectedContribution = data.selectedContribution;
     this.savingPots = data.savingPots;
+    this.existingContributions = data.existingContributions ?? [];
 
     // keep originals and find Cash pot
     this.allClientSavings = (this.savingPots?.clientSavings ?? []).slice();
@@ -134,7 +137,7 @@ export class AddContributionComponent {
     this.contributionForm = this.fb.group({
       description: ['', Validators.required],
       currencySymbol: [this.clientPreferredCurrency, [Validators.required]],
-      amount: ['', [Validators.required, Validators.min(0)]],
+      amount: [0, [Validators.required, Validators.min(0)]],
       cycle: [this.cycles[1].id, Validators.required],
       start: ['', Validators.required],
       end: [''],
@@ -155,6 +158,8 @@ export class AddContributionComponent {
 
     // initial filter based on default contributionType (1)
     this.applySavingPotFilter();
+
+    this.initializeDefaultSelections();
 
     if (this.isEditWorkflow) {
       // hydrate commission
@@ -251,6 +256,8 @@ export class AddContributionComponent {
       customControl?.setValidators([Validators.required, Validators.min(0)]);
       customControl?.updateValueAndValidity();
     }
+
+    this.initializeSavingPotDescriptionAutoFill();
   }
 
   // === UI helpers ===
@@ -556,5 +563,141 @@ export class AddContributionComponent {
       customControl?.setValue(null);
     }
     customControl?.updateValueAndValidity();
+  }
+
+  private initializeDefaultSelections(): void {
+    if (this.isEditWorkflow) return;
+    this.setDefaultStartEndDates();
+    this.setDefaultSavingPot();
+  }
+
+  private setDefaultStartEndDates(): void {
+    const startControl = this.contributionForm.get('start');
+    if (startControl && (startControl.value === null || startControl.value === undefined || startControl.value === '')) {
+      startControl.setValue(this.currentYear);
+    }
+
+    const endControl = this.contributionForm.get('end');
+    const retirementEvent = this.getRetirementEvent();
+    if (!endControl || !retirementEvent) return;
+
+    const retirementYear = retirementEvent?.start?.year;
+    if (retirementYear === null || retirementYear === undefined || retirementYear === '') return;
+    if (endControl.value === null || endControl.value === undefined || endControl.value === '') {
+      endControl.setValue(retirementYear);
+    }
+  }
+
+  private getRetirementEvent(): any | null {
+    const events = this.eventsList ?? [];
+    return events.find(
+      (event: any) =>
+        (event?.name ?? '').toString().toLowerCase() === 'retirement age'
+    ) ?? null;
+  }
+
+  private setDefaultSavingPot(): void {
+    const savingPotControl = this.contributionForm.get('savingPot');
+    if (!savingPotControl || savingPotControl.value) return;
+
+    const nonCashSavings = this.getNonCashSavings();
+    if (!nonCashSavings.length) return;
+
+    let candidates = nonCashSavings;
+    if (nonCashSavings.length > 1) {
+      const usedPotIds = this.getExistingContributionPotIds();
+      if (usedPotIds.length > 0) {
+        const unused = nonCashSavings.filter(
+          (pot) => pot.id && !usedPotIds.includes(pot.id)
+        );
+        if (unused.length > 0) {
+          candidates = unused;
+        }
+      }
+    }
+
+    const defaultPot = this.getLargestPot(candidates);
+    if (!defaultPot) return;
+
+    if (this.clientSavings?.length && !this.clientSavings.some((pot) => pot.id === defaultPot.id)) {
+      return;
+    }
+
+    savingPotControl.setValue(defaultPot.id);
+  }
+
+  private getNonCashSavings(): ClientSaving[] {
+    return (this.allClientSavings ?? []).filter(
+      (pot) => (pot.name ?? '').toLowerCase() !== 'cash'
+    );
+  }
+
+  private getExistingContributionPotIds(): string[] {
+    return (this.existingContributions ?? [])
+      .map((contribution) => contribution?.associatedSavingPotId)
+      .filter((id): id is string => !!id);
+  }
+
+  private getLargestPot(pots: ClientSaving[]): ClientSaving | null {
+    if (!pots.length) return null;
+    return pots.reduce((largest, pot) => {
+      const potAmount = Number(pot.startingPotValue?.amount ?? 0);
+      const largestAmount = Number(largest.startingPotValue?.amount ?? 0);
+      return potAmount > largestAmount ? pot : largest;
+    });
+  }
+
+  private initializeSavingPotDescriptionAutoFill(): void {
+    const descriptionControl = this.contributionForm.get('description');
+    const savingPotControl = this.contributionForm.get('savingPot');
+
+    if (!descriptionControl || !savingPotControl) return;
+
+    descriptionControl.valueChanges.subscribe((value) => {
+      if (this.lastAutoDescription && value !== this.lastAutoDescription) {
+        this.lastAutoDescription = null;
+      }
+    });
+
+    savingPotControl.valueChanges.subscribe((savingPotId) => {
+      this.applyDefaultDescriptionFromSavingPot(savingPotId);
+    });
+
+    this.applyDefaultDescriptionFromSavingPot(savingPotControl.value ?? null);
+  }
+
+  private applyDefaultDescriptionFromSavingPot(savingPotId: string | null): void {
+    if (!savingPotId) return;
+
+    const savingPot = (this.allClientSavings ?? []).find(
+      (pot) => pot.id === savingPotId
+    );
+
+    if (!savingPot) return;
+
+    const descriptionControl = this.contributionForm.get('description');
+    if (!descriptionControl) return;
+
+    const currentValue = (descriptionControl.value ?? '').toString();
+    const nextDescription = this.buildDefaultDescription(savingPot.name);
+
+    if (currentValue === nextDescription) {
+      this.lastAutoDescription = nextDescription;
+      return;
+    }
+
+    const shouldReplace =
+      currentValue.trim() === '' ||
+      (this.lastAutoDescription && currentValue === this.lastAutoDescription);
+
+    if (!shouldReplace) return;
+
+    descriptionControl.setValue(nextDescription, { emitEvent: false });
+    this.lastAutoDescription = nextDescription;
+  }
+
+  private buildDefaultDescription(potName: string | null | undefined): string {
+    const name = (potName ?? '').toString().trim();
+    return name ? `Contribution to ${name}` : 'Contribution to';
   }
 }

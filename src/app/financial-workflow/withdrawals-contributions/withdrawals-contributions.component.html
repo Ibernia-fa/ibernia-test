@@ -31,6 +31,61 @@
     </mat-card-content>
   </mat-card>
 
+  <mat-card class="cardWithShadow">
+        <mat-card-content>
+            <div class="d-flex align-items-center gap-8 justify-content-between">
+                <div class="income-expense-wrapper">
+                    <div class="row justify-content-between">
+                        <div class="col-3">
+                            <div class="d-flex flex-column gap-8">
+                                <div class="d-flex align-items-center gap-8">
+                                    <img src="assets/images/svgs/income-dollar-icon.svg" alt="income-dollar-icon" />
+                                    <h3 class="card-title expenses-total">{{ 'Total' | translate }}</h3>
+                                </div>
+                                <h3 class="saving-title">={{(contributionSummary?.total ?? 0) < 0 ? '-' : ''
+                                        }}{{selectedClient?.clientDetails?.preferredCurrency|currencySymbol}}{{((contributionSummary?.total
+                                        ?? 0) < 0 ? ((contributionSummary?.total ?? 0))*(-1) : (contributionSummary?.total ??
+                                        0))|thousandSeparator}}</h3>
+                            </div>
+                        </div>
+                        <!-- Divider  -->
+                        <div class="divider"></div>
+                        <!-- End Divider  -->
+                        <div class="col-3">
+                            <div class="d-flex flex-column gap-8">
+                                <div class="d-flex align-items-center gap-8">
+                                    @if((contributionSummary?.savingRate ?? 0) > 0) {
+                                    <img src="assets/images/svgs/income-discount.svg" alt="income-discount" />
+                                    }
+                                    @else {
+                                    <img class="red" src="assets/images/svgs/income-discount-red.svg"
+                                        alt="income-discount" />
+                                    }
+
+                                    <h3
+                                        [ngClass]="(contributionSummary?.savingRate ?? 0) > 0 ? 'card-title green' : 'card-title red'">
+                                        {{ 'Saving rate' | translate }}</h3>
+                                </div>
+                                <h3
+                                    [ngClass]="(contributionSummary?.savingRate ?? 0) > 0 ? 'saving-title green' : 'saving-title red'">
+                                    {{(contributionSummary?.savingRate ?? 0)|number : '1.0-0'}}%</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Emoji  -->
+                @if((contributionSummary?.savingRate ?? 0) > 0) {
+                <img src="assets/images/shapes/happy-feedback-icon.png" alt="smile-emoji">
+                }
+                @else {
+                <img src="assets/images/shapes/sad-feedback-icon.png" alt="smile-emoji">
+
+                }
+                <!-- End Emoji  -->
+            </div>
+        </mat-card-content>
+    </mat-card>
+
   <div class="income-expense-tables">
     <div class="row justify-content-between">
       <div class="col-6">
