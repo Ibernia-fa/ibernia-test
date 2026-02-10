@@ -18,7 +18,7 @@
     </button>
   </div>
 
-  <mat-dialog-content>
+  <mat-dialog-content class="event-dialog-content">
     <div [formGroup]="eventForm" class="d-flex flex-column gap-20">
       <div class="w-100 form-field gap-8" *ngIf="showNameEdit">
         <mat-label class="f-s-16 d-block" style="line-height: 18px">Name</mat-label>
@@ -188,46 +188,46 @@
       }
       @if(eventForm.get('cycle')?.value !== 'One-off') {
       <div class="w-100 d-flex flex-column gap-20">
-        <div class="d-flex flex-column gap-8">
-          <div class="d-flex gap-4 align-items-center">
-            <mat-label class="f-s-16 f-w-400 d-block">{{ 'Escalation rate' | translate}}</mat-label>
-            <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4"
-              matTooltip="{{ 'ADD_EVENT.AMOUNT_GROWTH_TOOLTIP' | translate }}">
-          </div>
-          <div class="position-relative">
-            <div class="w-100 form-field">
-              <div class="select-option">
-                <mat-select formControlName="escalationRate" value="Select"
-                  (selectionChange)="onEscalationRateChange($event)">
-                  @for (escalationRate of escalationRates; track escalationRate) {
-                  <mat-option [value]="escalationRate.value">{{ escalationRate.description }}</mat-option>
-                  }
-                </mat-select>
+        <div class="escalation-inline">
+          <div class="d-flex flex-column gap-8 escalation-field"
+            [class.escalation-full]="selectedEscalationDescription !== 'Increases at custom rate'">
+            <div class="d-flex gap-4 align-items-center">
+              <mat-label class="f-s-16 f-w-400 d-block">{{ 'Escalation rate' | translate}}</mat-label>
+              <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4"
+                matTooltip="{{ 'ADD_EVENT.AMOUNT_GROWTH_TOOLTIP' | translate }}">
+            </div>
+            <div class="position-relative">
+              <div class="w-100 form-field">
+                <div class="select-option">
+                  <mat-select formControlName="escalationRate" value="Select"
+                    (selectionChange)="onEscalationRateChange($event)">
+                    @for (escalationRate of escalationRates; track escalationRate) {
+                    <mat-option [value]="escalationRate.value">{{ escalationRate.description }}</mat-option>
+                    }
+                  </mat-select>
+                </div>
+                @if(eventForm.get('escalationRate')?.touched &&
+                eventForm.get('escalationRate')?.hasError('required')) {
+                <span class="field-error d-block">{{'Required' | translate}}</span>
+                }
               </div>
-              @if(eventForm.get('escalationRate')?.touched &&
-              eventForm.get('escalationRate')?.hasError('required')) {
-              <span class="field-error d-block">{{'Required' | translate}}</span>
-              }
             </div>
           </div>
-        </div>
-        @if(selectedEscalationDescription === 'Increases at custom rate') {
-        <div class="w-100 d-flex flex-column    gap-8">
-          <mat-label class="f-s-16 d-block">{{ 'Custom escalation rate' | translate }}</mat-label>
-          <mat-form-field appearance="outline" class="w-full w-100 percentage-icon">
-            <span matSuffix>%</span>
-            <input matInput type="number" formControlName="customEscalationRate"
-              placeholder="{{ 'Enter custom rate' | translate}}" />
-
-          </mat-form-field>
-
-          @if(eventForm.get('customEscalationRate')?.touched &&
-          eventForm.get('customEscalationRate')?.hasError('required')) {
-          <span class="field-error d-block">{{'Required' | translate}}</span>
-
+          @if(selectedEscalationDescription === 'Increases at custom rate') {
+          <div class="d-flex flex-column gap-8 escalation-field escalation-custom">
+            <mat-label class="f-s-16 d-block">{{ 'Custom escalation rate' | translate }}</mat-label>
+            <div class="w-100 form-field custom-rate-input">
+              <input matInput type="number" formControlName="customEscalationRate"
+                placeholder="0" />
+              <span class="custom-rate-suffix">%</span>
+            </div>
+            @if(eventForm.get('customEscalationRate')?.touched &&
+            eventForm.get('customEscalationRate')?.hasError('required')) {
+            <span class="field-error d-block">{{'Required' | translate}}</span>
+            }
+          </div>
           }
         </div>
-        }
       </div>
       }
     </div>
@@ -268,7 +268,7 @@
     </button>
   </div>
 
-  <mat-dialog-content>
+  <mat-dialog-content class="event-dialog-content">
     <div [formGroup]="eventForm" class="d-flex flex-column gap-20">
 
       <div class="w-100 form-field gap-8" *ngIf="showNameEdit">
@@ -562,7 +562,7 @@
       </button>
     </div>
 
-    <mat-dialog-content>
+    <mat-dialog-content class="event-dialog-content">
       <div [formGroup]="eventForm" class="d-flex flex-column gap-20">
         <div class="w-100 form-field gap-8" *ngIf="!isEditWorkflow || showNameEdit">
           <mat-label class="f-s-16 d-block" style="line-height: 18px">Name</mat-label>
@@ -707,46 +707,46 @@
 
         @if(eventForm.get('cycle')?.value !== 'One-off') {
         <div class="w-100 d-flex flex-column gap-20">
-          <div class="d-flex flex-column gap-8">
-            <div class="d-flex gap-4 align-items-center">
-              <mat-label class="f-s-16 f-w-400 d-block">{{ 'Escalation rate' | translate}}</mat-label>
-              <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4"
-                matTooltip="{{ 'ADD_EVENT.AMOUNT_GROWTH_TOOLTIP' | translate }}">
-            </div>
-            <div class="position-relative">
-              <div class="w-100 form-field">
-                <div class="select-option">
-                  <mat-select formControlName="escalationRate" value="Select"
-                    (selectionChange)="onEscalationRateChange($event)">
-                    @for (escalationRate of escalationRates; track escalationRate) {
-                    <mat-option [value]="escalationRate.value">{{ escalationRate.description }}</mat-option>
-                    }
-                  </mat-select>
+          <div class="escalation-inline">
+            <div class="d-flex flex-column gap-8 escalation-field"
+              [class.escalation-full]="selectedEscalationDescription !== 'Increases at custom rate'">
+              <div class="d-flex gap-4 align-items-center">
+                <mat-label class="f-s-16 f-w-400 d-block">{{ 'Escalation rate' | translate}}</mat-label>
+                <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4"
+                  matTooltip="{{ 'ADD_EVENT.AMOUNT_GROWTH_TOOLTIP' | translate }}">
+              </div>
+              <div class="position-relative">
+                <div class="w-100 form-field">
+                  <div class="select-option">
+                    <mat-select formControlName="escalationRate" value="Select"
+                      (selectionChange)="onEscalationRateChange($event)">
+                      @for (escalationRate of escalationRates; track escalationRate) {
+                      <mat-option [value]="escalationRate.value">{{ escalationRate.description }}</mat-option>
+                      }
+                    </mat-select>
+                  </div>
+                  @if(eventForm.get('escalationRate')?.touched &&
+                  eventForm.get('escalationRate')?.hasError('required')) {
+                  <span class="field-error d-block">{{'Required' | translate}}</span>
+                  }
                 </div>
-                @if(eventForm.get('escalationRate')?.touched &&
-                eventForm.get('escalationRate')?.hasError('required')) {
-                <span class="field-error d-block">{{'Required' | translate}}</span>
-                }
               </div>
             </div>
-          </div>
-          @if(selectedEscalationDescription === 'Increases at custom rate') {
-          <div class="w-100 d-flex flex-column    gap-8">
-            <mat-label class="f-s-16 d-block">{{ 'Custom escalation rate' | translate }}</mat-label>
-            <mat-form-field appearance="outline" class="w-full w-100 percentage-icon">
-              <span matSuffix>%</span>
-              <input matInput type="number" formControlName="customEscalationRate"
-                placeholder="{{ 'Enter custom rate' | translate}}" />
-
-            </mat-form-field>
-
-            @if(eventForm.get('customEscalationRate')?.touched &&
-            eventForm.get('customEscalationRate')?.hasError('required')) {
-            <span class="field-error d-block">{{'Required' | translate}}</span>
-
+            @if(selectedEscalationDescription === 'Increases at custom rate') {
+            <div class="d-flex flex-column gap-8 escalation-field escalation-custom">
+              <mat-label class="f-s-16 d-block">{{ 'Custom escalation rate' | translate }}</mat-label>
+              <div class="w-100 form-field custom-rate-input">
+                <input matInput type="number" formControlName="customEscalationRate"
+                  placeholder="0" />
+                <span class="custom-rate-suffix">%</span>
+              </div>
+              @if(eventForm.get('customEscalationRate')?.touched &&
+              eventForm.get('customEscalationRate')?.hasError('required')) {
+              <span class="field-error d-block">{{'Required' | translate}}</span>
+              }
+            </div>
             }
           </div>
-          }
         </div>
         }
       </div>
