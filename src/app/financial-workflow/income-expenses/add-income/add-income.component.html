@@ -144,39 +144,42 @@
         </div>
 
         @if(showStartEnd) {
-        <div class="w-100 form-field gap-20">
-          <div class="w-100 form-field gap-8 ">
-            <mat-label class="f-s-16 f-w-400 d-flex gap-8 align-items-center">Escalation rate
-              <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
-            </mat-label>
-            <div class="w-100 form-field">
-              <div class="select-option">
-                <mat-select formControlName="escalationRate" value="Select"
-                  (selectionChange)="onEscalationRateChange($event)">
-                  @for (escalationRate of escalationRates; track escalationRate) {
-                  <mat-option [value]="escalationRate.value">{{ escalationRate.description }}</mat-option>
-                  }
-                </mat-select>
+        <div class="w-100 d-flex flex-column gap-20">
+          <div class="escalation-inline">
+            <div class="d-flex flex-column gap-8 escalation-field"
+              [class.escalation-full]="selectedEscalationDescription !== 'Increases at custom rate'">
+              <mat-label class="f-s-16 f-w-400 d-flex gap-8 align-items-center">Escalation rate
+                <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
+              </mat-label>
+              <div class="w-100 form-field">
+                <div class="select-option">
+                  <mat-select formControlName="escalationRate" value="Select"
+                    (selectionChange)="onEscalationRateChange($event)">
+                    @for (escalationRate of escalationRates; track escalationRate) {
+                    <mat-option [value]="escalationRate.value">{{ escalationRate.description }}</mat-option>
+                    }
+                  </mat-select>
+                </div>
+                @if(incomeForm.get('escalationRate')?.touched && incomeForm.get('escalationRate')?.hasError('required'))
+                {
+                <span class="field-error d-block">{{'Required' | translate}}</span>
+                }
               </div>
-              @if(incomeForm.get('escalationRate')?.touched && incomeForm.get('escalationRate')?.hasError('required'))
-              {
+            </div>
+            @if(selectedEscalationDescription === 'Increases at custom rate') {
+            <div class="d-flex flex-column gap-8 escalation-field escalation-custom">
+              <mat-label class="f-s-16 d-block">Custom escalation rate</mat-label>
+              <div class="w-100 form-field custom-rate-input">
+                <input matInput type="number" formControlName="customEscalationRate" placeholder="0" />
+                <span class="custom-rate-suffix">%</span>
+              </div>
+              @if(incomeForm.get('customEscalationRate')?.touched &&
+              incomeForm.get('customEscalationRate')?.hasError('required')) {
               <span class="field-error d-block">{{'Required' | translate}}</span>
               }
             </div>
-          </div>
-          @if(selectedEscalationDescription === 'Increases at custom rate') {
-          <div class="w-100 form-field gap-8">
-            <mat-label class="f-s-16 d-block">Custom escalation rate</mat-label>
-            <mat-form-field appearance="outline" class="w-full w-100 percentage-icon">
-              <span matSuffix>%</span>
-              <input matInput type="number" formControlName="customEscalationRate" placeholder="0" />
-            </mat-form-field>
-            @if(incomeForm.get('customEscalationRate')?.touched &&
-            incomeForm.get('customEscalationRate')?.hasError('required')) {
-            <span class="field-error d-block">{{'Required' | translate}}</span>
             }
           </div>
-          }
         </div>
         }
       </div>

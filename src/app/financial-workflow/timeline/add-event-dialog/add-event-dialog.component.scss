@@ -102,3 +102,50 @@
   margin-top: -2px;
 }
 
+.escalation-inline {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.escalation-field {
+  flex: 1 1 260px;
+  min-width: 0;
+}
+
+.escalation-custom {
+  flex: 1 1 170px;
+}
+.custom-rate-input {
+  position: relative;
+
+  input {
+    padding-right: 32px;
+  }
+
+  .custom-rate-suffix {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: #b7b6c2;
+    font-size: 14px;
+    line-height: 16px;
+  }
+}
+
+.escalation-full {
+  flex: 1 1 100%;
+}
+
+.event-dialog-content {
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
