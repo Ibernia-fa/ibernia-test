@@ -19,6 +19,7 @@ import { FinancialViewModel } from '../model/income-expense';
 import { catchError, filter } from 'rxjs';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 import { TranslateModule } from '@ngx-translate/core';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-add-expense',
@@ -34,6 +35,7 @@ import { TranslateModule } from '@ngx-translate/core';
     MatDatepickerModule,
     MatSliderModule,
     ReactiveFormsModule,
+    CommonModule,
     ThousandSeparatorPipe,
     ThousandSeparatorInputDirective,
     TranslateModule
@@ -70,6 +72,8 @@ export class AddExpenseComponent {
   expenseTypes: string[] = [];
   isDefaultExpense: boolean = false;
   expenseIcon: string;
+  customDescriptionAutoRenamed: string;
+  showNameEdit: boolean = false;
 
   constructor(
     private dialogRef: MatDialogRef<AddExpenseComponent>,
@@ -101,7 +105,7 @@ export class AddExpenseComponent {
     this.selectedExpense = data.selectedExpense;
     this.isNameEditable = this.selectedExpense?.description != "Living costs"
       && this.selectedExpense?.description != "Housing"
-      && this.selectedExpense?.description != "Debt repayment"; 
+      && this.selectedExpense?.description != "Debt repayment";
 
     var iterations = data.forecastEndDateYear - data.forecastStartDateYear + 1;
 
@@ -111,8 +115,8 @@ export class AddExpenseComponent {
     }
 
     this.expenseForm = this.fb.group({
+      description: [this.selectedExpense?.description, Validators.required],
       expenseType: [this.expenseTypes[0], Validators.required],
-      description: ['', Validators.required],
       currencySymbol: [this.clientPreferredCurrency, [Validators.required]],
       amount: ['', [Validators.required, Validators.min(0)]],
       cycle: [this.cycles[1].id, Validators.required],
@@ -127,17 +131,17 @@ export class AddExpenseComponent {
     console.log(this.expenseForm);
     this.onCycleValueChange(this.cycles[1].id);
 
+    if (!this.isEditWorkflow) {
+      this.customDescriptionAutoRenamed = this.autoRenameCustom();
+    }
+
     if (this.isEditWorkflow) {
       this.onCycleValueChange(this.selectedExpense.amount.cycle?.id)
-      this.expenseForm
-        .get('description')
-        ?.patchValue(this.selectedExpense.description);
-      this.expenseForm
-        .get('currencySymbol')
-        ?.patchValue(this.clientPreferredCurrency);
-      this.expenseForm
-        .get('amount')
-        ?.patchValue(this.selectedExpense.amount.amount);
+      this.expenseForm.get('description')?.patchValue(this.selectedExpense.description);
+      this.expenseForm.get('currencySymbol')?.patchValue(this.clientPreferredCurrency);
+      this.expenseForm.get('amount')?.patchValue(this.selectedExpense.amount.amount);
+
+      // thousand comma seperator
       setTimeout(() => {
         const el = this.amountInput?.nativeElement;
         const amount = this.expenseForm.get('amount')?.value;
@@ -145,14 +149,11 @@ export class AddExpenseComponent {
         el.value = Number(amount).toLocaleString('en-US');
         el.dispatchEvent(new Event('blur'));
       });
-      this.expenseForm
-        .get('cycle')
-        ?.patchValue(this.selectedExpense.amount.cycle?.id);
+
+      this.expenseForm.get('cycle')?.patchValue(this.selectedExpense.amount.cycle?.id);
       this.expenseForm.get('start')?.patchValue(this.selectedExpense.start?.year);
       this.expenseForm.get('end')?.patchValue(this.selectedExpense.end?.year);
-      const matchedEscalation = this.escalationRates.find(
-        x => x.value === this.selectedExpense.escalationRate?.value
-      );
+      const matchedEscalation = this.escalationRates.find(x => x.value === this.selectedExpense.escalationRate?.value);
 
       const cycleId = this.selectedExpense.amount.cycle?.id;
       const cycle = this.cycles.find(x => x.id === cycleId);
@@ -187,10 +188,43 @@ export class AddExpenseComponent {
       }
     }
 
-    this.onExpenseTypeChange(this.selectedExpense?.description ?? this.expenseTypes[0]);
+    if (this.isEditWorkflow
+      && this.selectedExpense?.description != null
+      && (this.selectedExpense.description == "Living costs"
+        || this.selectedExpense.description == "Housing"
+        || this.selectedExpense.description == "Debt repayment"
+      )) {
+      this.onExpenseTypeChange(this.selectedExpense.description);
+    }
+    else {
+      this.onExpenseTypeChange(this.expenseTypes[0]);
+    }
+
     this.setIsDefaultExpense();
     this.setExpenseIcon();
   }
+
+  autoRenameCustom(): string {
+    let baseName = this.expenseForm.get('expenseType')?.value;
+
+    if (baseName == undefined || this.expenseForm.get('expenseType')?.value == "Custom")
+      baseName = "Custom expense";
+
+    if (baseName !== "Custom expense")
+      return baseName;
+
+    const existing = this.data.expenses
+      ?.filter((e: any) =>
+        e.isDefault == false && e.description != "Debt repayment" && e.description != "Insurance"
+      ) ?? [];
+
+    if (existing.length === 0 && baseName !== "Custom expense") {
+      return baseName;
+    }
+
+    return `${baseName} #${existing.length + 1}`;
+  }
+
 
   closeDialog(): void {
     this.dialogRef.close();
@@ -373,10 +407,10 @@ export class AddExpenseComponent {
   }
 
   get expenseTitle(): string {
-    const value = String(this.expenseForm.get('description')?.value || '').trim();
-    const title = value || 'Expense';
+    const operation = this.isEditWorkflow ? "Edit - " : "Add - ";
+    const title = this.selectedExpense?.description ?? this.customDescriptionAutoRenamed ?? "Expense";
+    return operation + (title[0].toUpperCase() + title.slice(1));
 
-    return title[0].toUpperCase() + title.slice(1);
   }
 
   setExpenseIcon(): void {
@@ -423,40 +457,54 @@ export class AddExpenseComponent {
       isDefault?: boolean;
       requireDescription?: boolean;
     }> = {
+      'Custom': {
+        icon: 'custom-expense',
+        editableName: true
+      },
       'Living costs': {
         icon: 'living-costs',
         description: 'Living costs',
         isDefault: true,
-        requireDescription: true
+        requireDescription: true,
+        editableName: false
       },
       'Housing': {
         icon: 'housing',
         description: 'Housing',
         isDefault: true,
-        requireDescription: true
+        requireDescription: true,
+        editableName: false
       },
       'Debt repayment': {
         icon: 'debt-repayment',
         description: 'Debt repayment',
-        requireDescription: true
-      },
-      'Custom': {
-        icon: 'custom-expense',
-        editableName: true
+        requireDescription: true,
+        editableName: false
       }
     };
 
-    const config = expenseConfig[value];
+    const isCustom = this.selectedExpense != null
+      && this.selectedExpense.description != "Living costs"
+      && this.selectedExpense.description != "Housing"
+      && this.selectedExpense.description != "Debt repayment";
+
+    const config = isCustom ? expenseConfig["Custom"] : expenseConfig[value];
     if (!config || !descriptionCtrl) return;
 
     this.expenseIcon = config.icon;
     this.isNameEditable = !!config.editableName;
     this.isDefaultExpense = !!config.isDefault;
 
-    if (config.description !== undefined) {
-      descriptionCtrl.setValue(config.description, { emitEvent: true });
-    } else {
-      descriptionCtrl.setValue('', { emitEvent: true });
+    if (this.isEditWorkflow) {
+      if (this.selectedExpense?.description != undefined) {
+        descriptionCtrl.setValue(this.selectedExpense?.description, { emitEvent: true });
+      }
+      else {
+        descriptionCtrl.setValue(value, { emitEvent: true });
+      }
+    }
+    else {
+      descriptionCtrl.setValue(this.customDescriptionAutoRenamed, { emitEvent: true });
     }
 
     if (config.requireDescription) {
@@ -466,5 +514,9 @@ export class AddExpenseComponent {
     }
 
     descriptionCtrl.updateValueAndValidity();
+  }
+
+  toggleNameEdit() {
+    this.showNameEdit = !this.showNameEdit;
   }
 }

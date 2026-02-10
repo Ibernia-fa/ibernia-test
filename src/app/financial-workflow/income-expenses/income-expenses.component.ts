@@ -109,10 +109,15 @@ export class IncomeExpensesComponent {
           this.escalationRates = escalationRatesResponse?.escalationRates;
           this.timeline = timeline;
 
-          this.defaultIncomes = this.incomeExpense.incomes.filter(i => i.isDefault == true);
-          this.defautExpenses = this.incomeExpense.expenses.filter(i => i.isDefault == true);
-          this.incomes = this.incomeExpense.incomes.filter(i => i.isDefault == false);
-          this.expenses = this.incomeExpense.expenses.filter(i => i.isDefault == false);
+          this.defaultIncomes = this.incomeExpense.incomes.filter(i => i.isDefault == true && i.isIncomeExpenseSource == true);
+          this.defautExpenses = this.incomeExpense.expenses.filter(i => i.isDefault == true && i.isIncomeExpenseSource == true);
+          this.incomes = this.incomeExpense.incomes
+            .filter(i => (i.isDefault == false && i.isIncomeExpenseSource == true) 
+              || i.description == "Pension Fund");
+          this.expenses = this.incomeExpense.expenses
+            .filter(i => (i.isDefault == false && i.isIncomeExpenseSource == true)
+              || i.description == "Insurance");
+
           this.currency = this.selectedClient.clientDetails?.preferredCurrency ?? "USD";
           this.isLoaderVisible = false;
         })
@@ -247,7 +252,7 @@ export class IncomeExpensesComponent {
     if (!this.defautExpenses.find(x => x.description == "Housing")) {
       this.expenseType.push("Housing");
     }
-    if (!this.incomes.find(x => x.description == "Debt repayment")) {
+    if (!this.expenses.find(x => x.description == "Debt repayment")) {
       this.expenseType.push("Debt repayment");
     }
     
@@ -271,14 +276,6 @@ export class IncomeExpensesComponent {
   }
 
   updateIncomeExpenseByResponse(res: IncomeExpense | null) {
-    // if (res) {
-    //   this.incomeExpense = res;
-    //   this.defaultIncomes = this.incomeExpense.incomes.filter(i => i.isDefault == true && i.isIncomeExpenseSource == true);
-    //   this.defautExpenses = this.incomeExpense.expenses.filter(i => i.isDefault == true && i.isIncomeExpenseSource == true);
-    //   this.incomes = this.incomeExpense.incomes.filter(i => i.isDefault == false && i.isIncomeExpenseSource == true);
-    //   this.expenses = this.incomeExpense.expenses.filter(i => i.isDefault == false && i.isIncomeExpenseSource == true);
-    // }
-
     this.activatedRoute.params
       .pipe(
         switchMap(() => {
@@ -291,10 +288,14 @@ export class IncomeExpensesComponent {
           this.incomeExpense = incomeExpense;
           this.timeline = timeline;
 
-          this.defaultIncomes = this.incomeExpense.incomes.filter(i => i.isDefault == true);
-          this.defautExpenses = this.incomeExpense.expenses.filter(i => i.isDefault == true);
-          this.incomes = this.incomeExpense.incomes.filter(i => i.isDefault == false);
-          this.expenses = this.incomeExpense.expenses.filter(i => i.isDefault == false);
+          this.defaultIncomes = this.incomeExpense.incomes.filter(i => i.isDefault == true && i.isIncomeExpenseSource == true);
+          this.defautExpenses = this.incomeExpense.expenses.filter(i => i.isDefault == true && i.isIncomeExpenseSource == true);
+          this.incomes = this.incomeExpense.incomes
+            .filter(i => (i.isDefault == false && i.isIncomeExpenseSource == true)
+              || i.description == "Pension Fund");
+          this.expenses = this.incomeExpense.expenses
+            .filter(i => (i.isDefault == false && i.isIncomeExpenseSource == true)
+              || i.description == "Insurance");
         })
       )
       .subscribe();

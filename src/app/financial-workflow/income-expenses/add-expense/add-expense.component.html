@@ -1,7 +1,13 @@
 <div class="w-100">
   <div class="d-flex flex-column gap-32">
     <div class="d-flex align-items-center justify-content-between gap-10 modal-header">
-      <h3>{{expenseTitle}}</h3>
+      <div class="d-flex align-items-center gap-10">
+        <h3 style="text-transform: none;">{{expenseTitle}}</h3>
+        <ng-container *ngIf="isNameEditable">
+          <img src="assets/images/svgs/drop-down-edit-2-line.svg" alt="edit" class="cursor-pointer edit-name-icon"
+            (click)="toggleNameEdit()" />
+        </ng-container>
+      </div>
       <button (click)="closeDialog()" type="button">
         <img src="assets/images/svgs/close-line-cion.svg" alt="close-line-cion" />
       </button>
@@ -35,7 +41,7 @@
           </div>
         }
 
-        @if(isNameEditable) {
+        @if(isNameEditable && showNameEdit) {
         <div class="w-100 form-field gap-8">
           <mat-label class="f-s-16 d-block" style="line-height: 18px">{{ 'Name' | translate }}</mat-label>
           <input matInput formControlName="description" placeholder="e.g. Bills" />
