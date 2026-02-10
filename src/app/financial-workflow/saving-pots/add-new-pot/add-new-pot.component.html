@@ -10,7 +10,24 @@
   <div class="d-flex flex-column gap-32">
     <!-- Modal Header  -->
     <div class="d-flex align-items-center justify-content-between gap-10 modal-header">
-      <h3>{{isEditWorkflow ? 'Edit' : 'Add'}}  saving pot, investment or pension</h3>
+      @if (isEditWorkflow) {
+        <div class="d-flex align-items-center gap-10">
+          <h3>
+            {{ displayPotName }}
+            @if (canEditName) {
+              <img
+                src="assets/images/svgs/drop-down-edit-2-line.svg"
+                alt="edit"
+                class="cursor-pointer edit-name-icon"
+                (click)="toggleNameEdit()"
+              />
+            }
+          </h3>
+        </div>
+      }
+      @else {
+        <h3>{{isEditWorkflow ? 'Edit' : 'Add'}}  saving pot, investment or pension</h3>
+      }
       <button (click)="closeDialog()" type="button">
         <img src="assets/images/svgs/close-line-cion.svg" alt="close-line-cion" />
       </button>
@@ -70,8 +87,11 @@
           }
           <!-- End Error  -->
         </div>
-        @if(savingsForm.get('name')?.value === 'Custom' &&
-        savingsForm.get('customName')) {
+        @if(
+          savingsForm.get('name')?.value === 'Custom' &&
+          savingsForm.get('customName') &&
+          (!isEditWorkflow || showNameEdit)
+        ) {
         <div class="w-100 form-field gap-12">
           <mat-label class="f-s-16 d-block" style="line-height: 18px">Name</mat-label>
           <input matInput formControlName="customName" />

@@ -60,6 +60,7 @@ export class AddEmergenciesComponent {
   insuranceCycles: { id: string; description: string }[] = [];
   currencySymbol: string;
   isSaving = false;
+  showNameEdit = false;
 
   constructor(
     private dialogRef: MatDialogRef<AddEmergenciesComponent>,
@@ -124,6 +125,18 @@ export class AddEmergenciesComponent {
 
   closeDialog(): void {
     this.dialogRef.close();
+  }
+
+  get displayEmergencyName(): string {
+    return (this.form?.get('name')?.value ?? '').toString();
+  }
+
+  get canEditName(): boolean {
+    return this.data.mode === 'edit';
+  }
+
+  toggleNameEdit(): void {
+    this.showNameEdit = !this.showNameEdit;
   }
 
   private patchForm(e: Emergency): void {
