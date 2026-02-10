@@ -63,7 +63,7 @@ export class IncomeExpensesComponent {
   expenses: FinancialViewModel[];
   incomeType: string[] = [];
   expenseType: string[] = [];
-  
+
   constructor(
     private dialog: MatDialog,
     private activatedRoute: ActivatedRoute,
@@ -112,7 +112,7 @@ export class IncomeExpensesComponent {
           this.defaultIncomes = this.incomeExpense.incomes.filter(i => i.isDefault == true && i.isIncomeExpenseSource == true);
           this.defautExpenses = this.incomeExpense.expenses.filter(i => i.isDefault == true && i.isIncomeExpenseSource == true);
           this.incomes = this.incomeExpense.incomes
-            .filter(i => (i.isDefault == false && i.isIncomeExpenseSource == true) 
+            .filter(i => (i.isDefault == false && i.isIncomeExpenseSource == true)
               || i.description == "Pension Fund");
           this.expenses = this.incomeExpense.expenses
             .filter(i => (i.isDefault == false && i.isIncomeExpenseSource == true)
@@ -160,6 +160,7 @@ export class IncomeExpensesComponent {
         amountCycles: this.amountCycles,
         escalataionRates: this.escalationRates,
         eventsList: this.timeline.clientEvents.sort((a, b) => a.start.age - b.start.age),
+        expenses: this.incomeExpense?.expenses,
         clientBirthDate: this.selectedClient?.clientDetails.birthDate,
         clientPreferredCurrency:
           this.selectedClient?.clientDetails.preferredCurrency,
@@ -239,7 +240,7 @@ export class IncomeExpensesComponent {
     if (!this.incomes.find(x => x.description == "Rental income")) {
       this.incomeType.push("Rental income");
     }
-    
+
     this.incomeType.push("Custom");
   }
 
@@ -255,7 +256,7 @@ export class IncomeExpensesComponent {
     if (!this.expenses.find(x => x.description == "Debt repayment")) {
       this.expenseType.push("Debt repayment");
     }
-    
+
     this.expenseType.push("Custom");
   }
 
@@ -301,8 +302,12 @@ export class IncomeExpensesComponent {
       .subscribe();
   }
 
-  trackByIndex(index: number) {
-    return index;
+  trackByIncomeId(index: number, item: FinancialViewModel): string | number {
+    return item.id ?? item.description;
+  }
+
+  trackByExpenseId(index: number, item: FinancialViewModel): string | number {
+    return item.id ?? item.description;
   }
 
   getCycle(cycle: string) {
@@ -316,14 +321,14 @@ export class IncomeExpensesComponent {
   isEditableIncome(name: string): boolean {
     if (name == "Pension Fund")
       return false;
-    
+
     return true;
   }
 
   isEditableExpense(name: string): boolean {
     if (name == "Insurance")
       return false;
-    
+
     return true;
   }
 }

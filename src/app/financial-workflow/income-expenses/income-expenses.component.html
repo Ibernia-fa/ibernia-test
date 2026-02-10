@@ -43,7 +43,7 @@
                                 </div>
                             </div>
                         </mat-card>
-                        @for(income of defaultIncomes; track income; let i = $index) {
+                        @for(income of defaultIncomes; track trackByIncomeId; let i = $index) {
                         <mat-card-content class="m-b-10" style="padding: 0px;">
                             <div class="cashflow-drag-wrapper">
                                 <div class="d-flex flex-column gap-20">
@@ -125,7 +125,7 @@
                         }
 
                         <div class="row">
-                            @for(income of incomes; track income; let i = $index) {
+                            @for(income of incomes; track trackByIncomeId; let i = $index) {
                             <div class="col-6">
                                 <mat-card-content class="m-b-10" style="padding: 0px;">
                                     <div class="cashflow-drag-wrapper">
@@ -230,7 +230,7 @@
                             </div>
                         </mat-card>
 
-                        @for(expense of defautExpenses; track expense; let i = $index) {
+                        @for(expense of defautExpenses; track trackByExpenseId; let i = $index) {
                         <mat-card-content class="m-b-10" style="padding: 0px;">
                             <div class="cashflow-drag-wrapper">
                                 <div class="d-flex flex-column gap-20">
@@ -312,7 +312,7 @@
                         }
 
                         <div class="row">
-                            @for(expense of expenses; track expense; let i = $index) {
+                            @for(expense of expenses; track trackByExpenseId; let i = $index) {
                             <div class="col-6">
                                 <mat-card-content class="m-b-10" style="padding: 0px;">
                                     <div class="cashflow-drag-wrapper">
