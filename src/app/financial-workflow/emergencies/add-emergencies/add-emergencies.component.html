@@ -24,7 +24,7 @@
   </div>
 
   <mat-dialog-content class="d-flex flex-column gap-20">
-    @if (data.mode !== 'edit' || showNameEdit) {
+    @if (showNameInput) {
       <div class="w-100 form-field gap-8">
         <mat-label class="f-s-16 d-block" style="line-height: 18px">Name</mat-label>
         <input matInput formControlName="name" placeholder="e.g. Life Insurance" />

@@ -17,6 +17,7 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 export interface AddEmergencyDialogData {
   mode: 'add' | 'edit';
   emergency?: Emergency;
+  isDefaultEmergency?: boolean;
   emergencyTypes: LookupItem[];
   policyStatuses: LookupItem[];
   coverageAdequacies: LookupItem[];
@@ -50,6 +51,14 @@ export class AddEmergenciesComponent {
   @ViewChild('insuranceAmountInput') insuranceAmountInput?: ElementRef<HTMLInputElement>;
   @ViewChild('coverageInput') coverageInput?: ElementRef<HTMLInputElement>;
   private NOT_COVERED_STATUS_ID = 2;
+  private readonly DEFAULT_EMERGENCY_NAMES = new Set([
+    'Home',
+    'Life',
+    'Disability',
+    'Health',
+    'Natural hazards',
+    'Will'
+  ]);
   form: FormGroup;
   policyStatuses: LookupItem[] = [];
   coverageAdequacies: LookupItem[] = [];
@@ -61,6 +70,7 @@ export class AddEmergenciesComponent {
   currencySymbol: string;
   isSaving = false;
   showNameEdit = false;
+  isDefaultEmergency: boolean | undefined;
 
   constructor(
     private dialogRef: MatDialogRef<AddEmergenciesComponent>,
@@ -76,6 +86,10 @@ export class AddEmergenciesComponent {
     this.insuranceCostTemplate = data.insuranceCostTemplate;
     this.currencySymbol = data.clientPreferredCurrency ?? '';
     this.insuranceCycles = data.cycles ?? [];
+    const hasExplicitDefaultFlag = typeof data.isDefaultEmergency === 'boolean';
+    this.isDefaultEmergency = hasExplicitDefaultFlag
+      ? data.isDefaultEmergency
+      : (!!data.emergency && this.DEFAULT_EMERGENCY_NAMES.has(data.emergency.name));
 
     this.form = this.fb.group({
       name: ['', Validators.required],
@@ -132,11 +146,16 @@ export class AddEmergenciesComponent {
   }
 
   get canEditName(): boolean {
-    return this.data.mode === 'edit';
+    return this.data.mode === 'edit' && !this.isDefaultEmergency;
   }
 
   toggleNameEdit(): void {
     this.showNameEdit = !this.showNameEdit;
+  }
+
+  get showNameInput(): boolean {
+    if (this.data.mode !== 'edit') return true;
+    return this.isDefaultEmergency || this.showNameEdit;
   }
 
   private patchForm(e: Emergency): void {
@@ -362,14 +381,6 @@ export class AddEmergenciesComponent {
   }
 
   get isDeleteEnabled(): boolean {
-    if (this.data.emergency?.name == "Home"
-      || this.data.emergency?.name == "Life"
-      || this.data.emergency?.name == "Disability"
-      || this.data.emergency?.name == "Health"
-      || this.data.emergency?.name == "Natural hazards"
-      || this.data.emergency?.name == "Will")
-      return false;
-    else
-      return true;
+    return !this.isDefaultEmergency;
   }
 }
