@@ -205,15 +205,20 @@ export class AddEmergenciesComponent {
     const isHidden = existing?.isHidden ?? false;
     const emergencyType = type == 2 ? "Will" : "Insurance";
     const isWill = type === 2;
+    const isUncovered = form.policyStatus === this.NOT_COVERED_STATUS_ID;
     const fallbackCoverageAdequacy =
       this.coverageAdequacies.find(a => a.name === 'Good')?.id ?? 1;
     const policyStatus = isWill ? this.NOT_COVERED_STATUS_ID : form.policyStatus;
-    const insuranceAmount = isWill ? 0 : form.insuranceAmount;
-    const insuranceCycleId = isWill
+    const insuranceAmount = isWill || isUncovered
+      ? 0
+      : (form.insuranceAmount ?? 0);
+    const insuranceCycleId = isWill || isUncovered
       ? (this.insuranceCycles[0]?.id ?? form.insuranceCycleId ?? null)
-      : form.insuranceCycleId;
-    const coverageAdequacy = isWill ? fallbackCoverageAdequacy : form.coverageAdequacy;
-    const coverage = isWill ? 0 : form.coverage;
+      : (form.insuranceCycleId ?? this.insuranceCycles[0]?.id ?? null);
+    const coverageAdequacy = isWill || isUncovered
+      ? fallbackCoverageAdequacy
+      : (form.coverageAdequacy ?? fallbackCoverageAdequacy);
+    const coverage = isWill || isUncovered ? 0 : (form.coverage ?? 0);
 
     const insuranceCost: Money = {
       currencySymbol: form.currencySymbol,
