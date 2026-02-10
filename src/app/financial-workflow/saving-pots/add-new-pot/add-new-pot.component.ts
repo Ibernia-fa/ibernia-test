@@ -122,6 +122,9 @@ export class AddNewPotComponent {
   isAddComissionChecked: any;
   currentYear: number = new Date().getFullYear();
   amount: number | null;
+  renamedCustomName: string = ''; // Track the renamed custom name
+  editDialogTitle: string = ''; // Dynamic dialog title
+  isRenamingEntry: boolean = false; // Track if renaming
 
   constructor(
     private dialogRef: MatDialogRef<AddNewPotComponent>,
@@ -171,6 +174,7 @@ export class AddNewPotComponent {
     }
     this.savingsForm = this.fb.group({
       name: ['', Validators.required],
+      customName: [''], // Custom pot name field
       currency: [this.clientPreferredCurrency, Validators.required],
       amount: ['', [Validators.required, Validators.min(0)]],
       returnRate: [this.userReturnRate],
@@ -188,7 +192,12 @@ export class AddNewPotComponent {
       commissionPercentageCycle: [this.cycles[2].id],
       commissionPercentage: [this.loggedInUserPreferences?.comissionPercentage || 0],
       escalationRate: [''],
-      customEscalationRate: ['']
+      customEscalationRate: [''],
+      // Pension Fund specific fields
+      contributionAmount: [''],
+      contributionFrequency: [1], // Default to Monthly
+      contributionStartDate: [data.forecastStartDateYear], // Default to this year
+      contributionEndDate: [''] // Will be set to required only for Pension Fund
     });
 
   this.savingsForm.setValidators(this.endOnOrAfterStartValidator());
@@ -209,8 +218,9 @@ export class AddNewPotComponent {
     });
     if(this.isEditWorkflow) {
       this.isCashPotEditMode = (this.selectedPot?.name ?? '').trim().toLowerCase() === 'cash';
-      this.patchFormValues();
-    if (this.isCashPotEditMode) {
+      this.patchFormValues();      // Set the dialog title with actual pot name
+      this.editDialogTitle = `Edit ${this.selectedPot.name}`;
+      this.renamedCustomName = this.selectedPot.name;    if (this.isCashPotEditMode) {
         // Freeze the Type as Cash and don’t emit changes
         this.savingsForm.get('name')?.setValue('Cash', { emitEvent: false });
         this.savingsForm.get('name')?.disable({ emitEvent: false });
@@ -334,6 +344,17 @@ onAmountBlur(e: Event) {
     this.dialogRef.close();
   }
 
+  toggleRenameEntry(): void {
+    this.isRenamingEntry = !this.isRenamingEntry;
+  }
+
+  saveRenamedEntry(): void {
+    const currentValue = this.savingsForm.get('customName')?.value || this.savingsForm.get('name')?.value;
+    this.renamedCustomName = currentValue;
+    this.editDialogTitle = `Edit ${this.renamedCustomName}`;
+    this.isRenamingEntry = false;
+  }
+
   onNameValueChange(name: any) {
     this.selectedName = name;
     if (name === 'Custom') {
@@ -342,10 +363,12 @@ onAmountBlur(e: Event) {
         new FormControl('', [Validators.required])
       );
       this.savingsForm.updateValueAndValidity();
+      this.renamedCustomName = ''; // Reset on new custom selection
       this.selectedNameIconUrl = 'custom-option-icon'
     } else {
       this.savingsForm.removeControl('customName');
       this.savingsForm.updateValueAndValidity();
+      this.renamedCustomName = ''; // Reset when switching away
 
       const cusEvent = this.savingPotValues.find(
         (customEvent) => customEvent.name === name
@@ -539,11 +562,26 @@ onEscalationRateChange(event: MatSelectChange): void {
     : 0;
     const isPotLocked = this.savingsForm.get('lockPot')?.value;
     if (this.savingsForm.valid) {
+      // Before building clientSaving, ensure renamed custom name is in the form control
+      if (this.renamedCustomName && this.savingsForm.get('customName')) {
+        this.savingsForm.get('customName')?.setValue(this.renamedCustomName, { emitEvent: false });
+      }
+      
+      // Get the custom name - use renamed value if available, otherwise form control or selectedPot
+      let customName = '';
+      if (this.renamedCustomName) {
+        customName = this.renamedCustomName;
+      } else if (this.savingsForm.get('customName')) {
+        customName = this.savingsForm.get('customName')?.value || '';
+      } else if (this.isEditWorkflow && this.selectedPot && !this.savingPotValues.find(x => x.name === this.selectedPot.name)) {
+        customName = this.selectedPot.name;
+      }
+
       var clientSaving: ClientSaving = {
         id: this.isEditWorkflow ? this.selectedPot.id : null,
         name: this.savingsForm.get('name')?.value !== 'Custom'
         ? this.savingsForm.get('name')?.value
-        : this.savingsForm.get('customName')?.value,
+        : customName,
         isGrowing: false,
         nominalValue: 0,
         realValue: 0,
@@ -674,10 +712,10 @@ onEscalationRateChange(event: MatSelectChange): void {
         realReturn: real,
       };
       console.log(clientSaving);
-      var function$ = !this.isEditWorkflow ? this.savingPotsHttpService
-      .addNewSavingPot(this.cashflowId, clientSaving) :
-      this.savingPotsHttpService
-        .addNewSavingPot(this.cashflowId, clientSaving)
+      // Use POST for create, PUT for edit
+      var function$ = !this.isEditWorkflow ? 
+        this.savingPotsHttpService.addNewSavingPot(this.cashflowId, clientSaving) :
+        this.savingPotsHttpService.updateSavingPot(this.cashflowId, clientSaving);
 
       function$
         .pipe(
