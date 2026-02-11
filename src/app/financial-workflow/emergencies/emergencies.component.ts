@@ -84,6 +84,15 @@ export class EmergenciesComponent implements OnInit {
   incomeExpense: IncomeExpense;
   private coverageAdequacyUpdates$ = new Subject<{ emergency: Emergency; newId: number; previousValue: number }>();
   private refreshEmergencies$ = new Subject<void>();
+  private readonly defaultEmergencyNames = new Set([
+    'Home',
+    'Life',
+    'Disability',
+    'Health',
+    'Natural hazards',
+    'Will'
+  ]);
+  private defaultEmergencyIds = new Set<string>();
 
   private readonly defaultIcon = 'shield.svg';
   private readonly iconMap: Record<string, string> = {
@@ -385,12 +394,16 @@ export class EmergenciesComponent implements OnInit {
   }
 
   onEditClick(emergency: Emergency): void {
+    const isDefaultEmergency =
+      this.defaultEmergencyIds.has(emergency.id) ||
+      this.defaultEmergencyNames.has(emergency.name);
     const dialogRef = this.dialog.open(AddEmergenciesComponent, {
       width: '700px',
       disableClose: true,
       data: {
         mode: 'edit',
         emergency,
+        isDefaultEmergency,
         emergencyTypes: this.emergencyTypes,
         policyStatuses: this.policyStatuses,
         coverageAdequacies: this.coverageAdequacies,
@@ -468,16 +481,17 @@ export class EmergenciesComponent implements OnInit {
 
   calculateAnnualCost(e: Emergency): number {
     let annualCost = 0;
+    if (!e.insuranceCost) return 0;
 
-    if (e.insuranceCost?.amount && e.insuranceCost?.amount > 0
+    if (e.insuranceCost.amount > 0
       && this.monthlyCycleId && e.insuranceCost.cycle?.id === this.monthlyCycleId) {
       annualCost = e.insuranceCost.amount * 12;
     }
     else {
-      annualCost = e.insuranceCost.amount;
+      annualCost = e.insuranceCost.amount ?? 0;
     }
 
-    return annualCost ?? 0;
+    return annualCost;
   }
 
   get hasHiddenEmergencies(): boolean {
@@ -560,6 +574,14 @@ export class EmergenciesComponent implements OnInit {
         } else {
           this.stats?.emergencyExpenses.push(updatedExpense);
         }
+      }
+    });
+  }
+
+  private markDefaultEmergencyIds(emergencies: Emergency[]): void {
+    emergencies.forEach(e => {
+      if (this.defaultEmergencyNames.has(e.name)) {
+        this.defaultEmergencyIds.add(e.id);
       }
     });
   }

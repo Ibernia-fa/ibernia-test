@@ -1,9 +1,5 @@
 import { Component, ElementRef, Inject, ViewChild } from '@angular/core';
-import {
-  MAT_DIALOG_DATA,
-  MatDialogModule,
-  MatDialogRef,
-} from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -13,27 +9,18 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { provideNativeDateAdapter } from '@angular/material/core';
-import {
-  AbstractControl,
-  FormBuilder,
-  FormGroup,
-  ReactiveFormsModule,
-  ValidatorFn,
-  Validators,
-} from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 import { allCountries } from 'src/app/clients/models/country';
 import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
-import {
-  Cycle,
-  EscalationRate,
-} from '../../timeline/models/financial-timeline';
+import { Cycle, EscalationRate } from '../../timeline/models/financial-timeline';
 import moment from 'moment';
 import { FinancialViewModel } from '../model/income-expense';
 import { IncomeExpensesHttpService } from '../services/income-expenses-http.service';
 import { catchError, filter } from 'rxjs';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 import { TranslateModule } from '@ngx-translate/core';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-add-income',
@@ -49,6 +36,7 @@ import { TranslateModule } from '@ngx-translate/core';
     MatDatepickerModule,
     MatSliderModule,
     ReactiveFormsModule,
+    CommonModule,
     ThousandSeparatorPipe,
     ThousandSeparatorInputDirective,
     TranslateModule
@@ -78,6 +66,8 @@ export class AddIncomeComponent {
   incomeTypes: string[] = [];
   isDefaultIncome: boolean = false;
   incomeIcon: string;
+  customDescriptionAutoRenamed: string;
+  showNameEdit: boolean = false;
 
   constructor(
     private dialogRef: MatDialogRef<AddIncomeComponent>,
@@ -107,6 +97,7 @@ export class AddIncomeComponent {
     this.cashflowId = data.cashflowId;
     this.isEditWorkflow = data.isEditWorkflow;
     this.selectedIncome = data.selectedIncome;
+
     this.isNameEditable = this.selectedIncome?.description != "Salary"
       && this.selectedIncome?.description != "State pension"
       && this.selectedIncome?.description != "Rental income";
@@ -119,8 +110,8 @@ export class AddIncomeComponent {
     }
 
     this.incomeForm = this.fb.group({
+      description: [this.selectedIncome?.description, Validators.required],
       incomeType: [this.incomeTypes[0], Validators.required],
-      description: ['', Validators.required],
       currencySymbol: [this.clientPreferredCurrency, [Validators.required]],
       amount: ['', [Validators.required, Validators.min(0)]],
       cycle: [this.cycles[1].id, Validators.required],
@@ -134,18 +125,17 @@ export class AddIncomeComponent {
     this.incomeForm.updateValueAndValidity({ emitEvent: false });
     this.onCycleValueChange(this.cycles[1].id);
 
+    if (!this.isEditWorkflow) {
+      this.customDescriptionAutoRenamed = this.autoRenameCustom();
+    }
+
     if (this.isEditWorkflow) {
       this.onCycleValueChange(this.selectedIncome.amount.cycle?.id)
-      this.incomeForm
-        .get('description')
-        ?.patchValue(this.selectedIncome.description);
-      this.incomeForm
-        .get('currencySymbol')
-        ?.patchValue(this.clientPreferredCurrency);
-      this.incomeForm
-        .get('amount')
-        ?.patchValue(this.selectedIncome.amount.amount);
-      // Ensure the patched amount displays with thousand separators immediately
+      this.incomeForm.get('description')?.patchValue(this.selectedIncome.description);
+      this.incomeForm.get('currencySymbol')?.patchValue(this.clientPreferredCurrency);
+      this.incomeForm.get('amount')?.patchValue(this.selectedIncome.amount.amount);
+
+      // thousand comma seperator
       setTimeout(() => {
         const el = this.amountInput?.nativeElement;
         const amount = this.incomeForm.get('amount')?.value;
@@ -153,15 +143,12 @@ export class AddIncomeComponent {
         el.value = Number(amount).toLocaleString('en-US');
         el.dispatchEvent(new Event('blur'));
       });
-      this.incomeForm
-        .get('cycle')
-        ?.patchValue(this.selectedIncome.amount.cycle?.id);
+
+      this.incomeForm.get('cycle')?.patchValue(this.selectedIncome.amount.cycle?.id);
       this.incomeForm.get('start')?.patchValue(this.selectedIncome.start?.year);
       this.incomeForm.get('end')?.patchValue(this.selectedIncome.end?.year);
-      const matchedEscalation = this.escalationRates.find(
-        x => x.value === this.selectedIncome.escalationRate?.value
-      );
 
+      const matchedEscalation = this.escalationRates.find(x => x.value === this.selectedIncome.escalationRate?.value);
       const cycleId = this.selectedIncome.amount.cycle?.id;
       const cycle = this.cycles.find(x => x.id === cycleId);
 
@@ -199,9 +186,41 @@ export class AddIncomeComponent {
       }
     }
 
-    this.onIncomeTypeChange(this.incomeTypes[0]);
+    if (this.isEditWorkflow
+      && this.selectedIncome?.description != null
+      && (this.selectedIncome.description == "Salary"
+        || this.selectedIncome.description == "State pension"
+        || this.selectedIncome.description == "Rental income"
+      )) {
+      this.onIncomeTypeChange(this.selectedIncome.description);
+    }
+    else {
+      this.onIncomeTypeChange(this.incomeTypes[0]);
+    }
+
     this.setIsDefaultIncome();
     this.setIncomeIcon();
+  }
+
+  autoRenameCustom(): string {
+    let baseName = this.incomeForm.get('incomeType')?.value;
+
+    if (baseName == undefined || this.incomeForm.get('incomeType')?.value == "Custom")
+      baseName = "Custom income";
+
+    if (baseName !== "Custom income")
+      return baseName;
+
+    const existing = this.data.incomes
+      ?.filter((e: any) =>
+        e.isDefault == false && e.description != "Rental income" && e.description != "Pension Fund"
+      ) ?? [];
+
+    if (existing.length === 0 && baseName !== "Custom income") {
+      return baseName;
+    }
+
+    return `${baseName} #${existing.length + 1}`;
   }
 
   onAmountInput(rawValue: string) {
@@ -283,7 +302,7 @@ export class AddIncomeComponent {
         },
         escalationRate: escalationRateValue !== null && escalationRateValue !== ''
           ? matchedRate ?? {
-            description: this.selectedEscalationDescription ?? '', // Use actual description
+            description: this.selectedEscalationDescription ?? '',
             value: escalationRateValue
           }
           : {
@@ -358,7 +377,6 @@ export class AddIncomeComponent {
     customControl?.updateValueAndValidity();
   }
 
-
   private endOnOrAfterStartValidator(): ValidatorFn {
     return (group: AbstractControl) => {
       const start = group.get('start')?.value;
@@ -385,10 +403,9 @@ export class AddIncomeComponent {
   }
 
   get incomeTitle(): string {
-    const value = String(this.incomeForm.get('description')?.value || '').trim();
-    const title = value || 'Income';
-
-    return title[0].toUpperCase() + title.slice(1);
+    const operation = this.isEditWorkflow ? "Edit - " : "Add - ";
+    const title = this.selectedIncome?.description ?? this.customDescriptionAutoRenamed ?? "Income";
+    return operation + (title[0].toUpperCase() + title.slice(1));
   }
 
   setIncomeIcon(): void {
@@ -439,36 +456,50 @@ export class AddIncomeComponent {
         icon: 'custom-income',
         editableName: true
       },
-      'Rental income': {
-        icon: 'rental-income',
-        description: 'Rental income',
-        requireDescription: true
-      },
       'Salary': {
         icon: 'salary',
         description: 'Salary',
         isDefault: true,
-        requireDescription: true
+        requireDescription: true,
+        editableName: false
       },
       'State pension': {
         icon: 'state-pension',
         description: 'State pension',
         isDefault: true,
-        requireDescription: true
+        requireDescription: true,
+        editableName: false
+      },
+      'Rental income': {
+        icon: 'rental-income',
+        description: 'Rental income',
+        requireDescription: true,
+        editableName: false
       }
     };
 
-    const config = incomeConfig[value];
+    const isCustom = this.selectedIncome != null
+      && this.selectedIncome.description != "Salary"
+      && this.selectedIncome.description != "State pension"
+      && this.selectedIncome.description != "Rental income";
+
+    const config = isCustom ? incomeConfig["Custom"] : incomeConfig[value];
     if (!config || !descriptionCtrl) return;
 
     this.incomeIcon = config.icon;
     this.isNameEditable = !!config.editableName;
     this.isDefaultIncome = !!config.isDefault;
 
-    if (config.description !== undefined) {
-      descriptionCtrl.setValue(config.description, { emitEvent: true });
-    } else {
-      descriptionCtrl.setValue('', { emitEvent: true });
+    if (this.isEditWorkflow) {
+      if (this.selectedIncome?.description != undefined) {
+        descriptionCtrl.setValue(this.selectedIncome?.description, { emitEvent: true });
+      }
+      else {
+        descriptionCtrl.setValue(value, { emitEvent: true });
+      }
+    }
+    else {
+      descriptionCtrl.setValue(this.customDescriptionAutoRenamed, { emitEvent: true });
     }
 
     if (config.requireDescription) {
@@ -478,5 +509,9 @@ export class AddIncomeComponent {
     }
 
     descriptionCtrl.updateValueAndValidity();
+  }
+
+  toggleNameEdit() {
+    this.showNameEdit = !this.showNameEdit;
   }
 }

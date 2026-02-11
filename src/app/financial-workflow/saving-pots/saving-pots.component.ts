@@ -405,7 +405,8 @@ updateOrderNumbers() {
         forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
         cashflowId: this.selectedCashflow?.id,
         isEditWorkflow: true,
-        event: event
+        event: event,
+        existingSavingPots: this.savingPots?.clientSavings || []  // Pass existing pots
       },
     });
 
@@ -477,7 +478,8 @@ updateOrderNumbers() {
         forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
         forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
         cashflowId: this.selectedCashflow?.id,
-        isEditWorkflow: false
+        isEditWorkflow: false,
+        existingSavingPots: this.savingPots?.clientSavings || []  // Pass existing pots for smart defaults
       },
     });
 

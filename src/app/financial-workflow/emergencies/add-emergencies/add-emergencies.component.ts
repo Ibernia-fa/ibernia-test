@@ -17,6 +17,7 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 export interface AddEmergencyDialogData {
   mode: 'add' | 'edit';
   emergency?: Emergency;
+  isDefaultEmergency?: boolean;
   emergencyTypes: LookupItem[];
   policyStatuses: LookupItem[];
   coverageAdequacies: LookupItem[];
@@ -50,6 +51,14 @@ export class AddEmergenciesComponent {
   @ViewChild('insuranceAmountInput') insuranceAmountInput?: ElementRef<HTMLInputElement>;
   @ViewChild('coverageInput') coverageInput?: ElementRef<HTMLInputElement>;
   private NOT_COVERED_STATUS_ID = 2;
+  private readonly DEFAULT_EMERGENCY_NAMES = new Set([
+    'Home',
+    'Life',
+    'Disability',
+    'Health',
+    'Natural hazards',
+    'Will'
+  ]);
   form: FormGroup;
   policyStatuses: LookupItem[] = [];
   coverageAdequacies: LookupItem[] = [];
@@ -60,6 +69,8 @@ export class AddEmergenciesComponent {
   insuranceCycles: { id: string; description: string }[] = [];
   currencySymbol: string;
   isSaving = false;
+  showNameEdit = false;
+  isDefaultEmergency: boolean | undefined;
 
   constructor(
     private dialogRef: MatDialogRef<AddEmergenciesComponent>,
@@ -75,6 +86,10 @@ export class AddEmergenciesComponent {
     this.insuranceCostTemplate = data.insuranceCostTemplate;
     this.currencySymbol = data.clientPreferredCurrency ?? '';
     this.insuranceCycles = data.cycles ?? [];
+    const hasExplicitDefaultFlag = typeof data.isDefaultEmergency === 'boolean';
+    this.isDefaultEmergency = hasExplicitDefaultFlag
+      ? data.isDefaultEmergency
+      : (!!data.emergency && this.DEFAULT_EMERGENCY_NAMES.has(data.emergency.name));
 
     this.form = this.fb.group({
       name: ['', Validators.required],
@@ -82,7 +97,7 @@ export class AddEmergenciesComponent {
       currencySymbol: [this.currencySymbol, Validators.required],
       insuranceAmount: [this.insuranceCostTemplate?.amount === 0
     ? null
-    : this.insuranceCostTemplate?.amount ?? null, [Validators.required, Validators.min(0)]],
+    : this.insuranceCostTemplate?.amount ?? null, [Validators.min(0)]],
       insuranceCycleId: [this.insuranceCycles[1]?.id, Validators.required],
       coverageAdequacy: [null, Validators.required],
       coverage: [this.data.emergency?.coverage === 0
@@ -126,6 +141,23 @@ export class AddEmergenciesComponent {
     this.dialogRef.close();
   }
 
+  get displayEmergencyName(): string {
+    return (this.form?.get('name')?.value ?? '').toString();
+  }
+
+  get canEditName(): boolean {
+    return this.data.mode === 'edit' && !this.isDefaultEmergency;
+  }
+
+  toggleNameEdit(): void {
+    this.showNameEdit = !this.showNameEdit;
+  }
+
+  get showNameInput(): boolean {
+    if (this.data.mode !== 'edit') return true;
+    return this.isDefaultEmergency || this.showNameEdit;
+  }
+
   private patchForm(e: Emergency): void {
     this.form.patchValue({
       name: e.name,
@@ -137,7 +169,7 @@ export class AddEmergenciesComponent {
       ? null
       : e.coverage,
       coverageAdequacy: e.coverageAdequacy ?? 2,
-      currencySymbol: e.insuranceCost.currencySymbol,
+      currencySymbol: e.insuranceCost?.currencySymbol ?? this.currencySymbol,
       willStatus: e.willStatus ?? null
     });
 
@@ -173,27 +205,38 @@ export class AddEmergenciesComponent {
     const isHidden = existing?.isHidden ?? false;
     const emergencyType = type == 2 ? "Will" : "Insurance";
     const isWill = type === 2;
+    const isUncovered = form.policyStatus === this.NOT_COVERED_STATUS_ID;
     const fallbackCoverageAdequacy =
       this.coverageAdequacies.find(a => a.name === 'Good')?.id ?? 1;
     const policyStatus = isWill ? this.NOT_COVERED_STATUS_ID : form.policyStatus;
-    const insuranceAmount = isWill ? 0 : form.insuranceAmount;
-    const insuranceCycleId = isWill
+    const insuranceAmount = isWill || isUncovered
+      ? 0
+      : (form.insuranceAmount ?? 0);
+    const insuranceCycleId = isWill || isUncovered
       ? (this.insuranceCycles[0]?.id ?? form.insuranceCycleId ?? null)
-      : form.insuranceCycleId;
-    const coverageAdequacy = isWill ? fallbackCoverageAdequacy : form.coverageAdequacy;
-    const coverage = isWill ? 0 : form.coverage;
+      : (form.insuranceCycleId ?? this.insuranceCycles[0]?.id ?? null);
+    const coverageAdequacy = isWill || isUncovered
+      ? fallbackCoverageAdequacy
+      : (form.coverageAdequacy ?? fallbackCoverageAdequacy);
+    const coverage = isWill || isUncovered ? 0 : (form.coverage ?? 0);
 
-    const insuranceCost: Money = {
-      currencySymbol: form.currencySymbol,
-      amount: insuranceAmount,
-      cycle: insuranceCycleId ? { id: insuranceCycleId, description: null } : null,
-    };
+    // Insurance cost is optional; send null when empty so API accepts it
+    const insuranceCost: Money | null =
+      isWill
+        ? null
+        : (insuranceAmount != null && insuranceAmount !== '' && Number(insuranceAmount) >= 0
+          ? {
+              currencySymbol: form.currencySymbol,
+              amount: Number(insuranceAmount),
+              cycle: insuranceCycleId ? { id: insuranceCycleId, description: null } : null,
+            }
+          : null);
 
     // CREATE payload
     const createPayload: CreateEmergencyRequest = {
       type,
       policyStatus,
-      insuranceCost,
+      insuranceCost: insuranceCost,
       coverage,
       coverageAdequacy,
       willStatus: type === 2 ? form.willStatus : 1,
@@ -274,19 +317,19 @@ export class AddEmergenciesComponent {
 
     if (isNotCovered || this.isWill) {
       // remove validators when NotCovered (fields hidden)
-      insuranceAmountCtrl.clearValidators();
+      // insuranceAmountCtrl.clearValidators();
       insuranceCycleIdCtrl.clearValidators();
       coverageAdequacyCtrl.clearValidators();
       coverageCtrl.clearValidators();
     } else {
       // re-apply validators when status is Covered (or anything else)
-      insuranceAmountCtrl.setValidators([Validators.required, Validators.min(0)]);
+      // insuranceAmountCtrl.setValidators([Validators.required, Validators.min(0)]);
       insuranceCycleIdCtrl.setValidators([Validators.required]);
       coverageAdequacyCtrl.setValidators([Validators.required]);
       coverageCtrl.setValidators([Validators.required, Validators.min(0)]);
     }
 
-    insuranceAmountCtrl.updateValueAndValidity({ emitEvent: false });
+    // insuranceAmountCtrl.updateValueAndValidity({ emitEvent: false });
     insuranceCycleIdCtrl.updateValueAndValidity({ emitEvent: false });
     coverageAdequacyCtrl.updateValueAndValidity({ emitEvent: false });
     coverageCtrl.updateValueAndValidity({ emitEvent: false });
@@ -349,14 +392,6 @@ export class AddEmergenciesComponent {
   }
 
   get isDeleteEnabled(): boolean {
-    if (this.data.emergency?.name == "Home"
-      || this.data.emergency?.name == "Life"
-      || this.data.emergency?.name == "Disability"
-      || this.data.emergency?.name == "Health"
-      || this.data.emergency?.name == "Natural hazards"
-      || this.data.emergency?.name == "Will")
-      return false;
-    else
-      return true;
+    return !this.isDefaultEmergency;
   }
 }
