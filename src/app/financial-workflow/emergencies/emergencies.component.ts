@@ -421,16 +421,17 @@ export class EmergenciesComponent implements OnInit {
 
   calculateAnnualCost(e: Emergency): number {
     let annualCost = 0;
+    if (!e.insuranceCost) return 0;
 
-    if (e.insuranceCost?.amount && e.insuranceCost?.amount > 0
+    if (e.insuranceCost.amount > 0
       && this.monthlyCycleId && e.insuranceCost.cycle?.id === this.monthlyCycleId) {
       annualCost = e.insuranceCost.amount * 12;
     }
     else {
-      annualCost = e.insuranceCost.amount;
+      annualCost = e.insuranceCost.amount ?? 0;
     }
 
-    return annualCost ?? 0;
+    return annualCost;
   }
 
   get hasHiddenEmergencies(): boolean {

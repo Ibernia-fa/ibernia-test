@@ -607,9 +607,9 @@ export class TimelineChartComponent implements OnInit, OnChanges {
       timeAxis: { scale: 'month', step: 12 },
       format: {
         minorLabels: (date: any) => {
-          const today = new Date(date); // assuming date is a JS Date or something convertible
-          const age = this.calculateAgeForTimeline(today, birthDate);
           const year = date.year();
+
+          const age = year - birthYear;
           return year >= forecastStartYear && year <= timelineEndYear
             ? `<div id='selected'><p>${age}</p><span>${year}</span></div>`
             : '';
