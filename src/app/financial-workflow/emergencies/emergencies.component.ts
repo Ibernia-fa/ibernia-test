@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { catchError, filter, map, Observable, of, combineLatest, switchMap, tap, forkJoin } from 'rxjs';
+import { catchError, filter, map, Observable, of, combineLatest, switchMap, tap, forkJoin, Subject, EMPTY, groupBy, mergeMap } from 'rxjs';
 import { NavItemService } from 'src/app/layouts/full/nav-item.service';
 import { EmergenciesHttpService as EmergenciesHttpService } from './services/emergencies-http.service';
 import { ClientHttpService as ClientHttpService } from 'src/app/clients/services/client-http.service';
@@ -82,6 +82,8 @@ export class EmergenciesComponent implements OnInit {
   selectedClient: Client;
   selectedCashflow: Cashflow;
   incomeExpense: IncomeExpense;
+  private coverageAdequacyUpdates$ = new Subject<{ emergency: Emergency; newId: number; previousValue: number }>();
+  private refreshEmergencies$ = new Subject<void>();
 
   private readonly defaultIcon = 'shield.svg';
   private readonly iconMap: Record<string, string> = {
@@ -112,6 +114,8 @@ export class EmergenciesComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.bindRefreshEmergencies();
+    this.bindCoverageAdequacyUpdates();
     this.load();
 
     this.settingHttpService.getAmountCycles().subscribe((cycles) => {
@@ -121,6 +125,63 @@ export class EmergenciesComponent implements OnInit {
 
     // preloaded data for simulation
     this.getSimulateData();
+  }
+
+  private bindRefreshEmergencies(): void {
+    this.refreshEmergencies$
+      .pipe(
+        switchMap(() => {
+          this.errorMessage = '';
+
+          if (!this.cashflowId) {
+            return of(null);
+          }
+
+          return this.emergenciesHttp.getAllByCashflowId(this.cashflowId).pipe(
+            catchError((err: HttpErrorResponse) => {
+              this.errorMessage =
+                err?.error?.message || 'Failed to load emergencies';
+              this.toastr.error(this.errorMessage, 'Error');
+              return of(null);
+            })
+          );
+        }),
+        filter((res): res is EmergenciesResponse => !!res),
+        tap((res) => this.applyEmergenciesResponse(res)),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe();
+  }
+
+  private bindCoverageAdequacyUpdates(): void {
+    this.coverageAdequacyUpdates$
+      .pipe(
+        groupBy((update) => update.emergency.id),
+        mergeMap((group$) =>
+          group$.pipe(
+            switchMap((update) => {
+              const updated: Emergency = { ...update.emergency, coverageAdequacy: update.newId };
+
+              return this.emergenciesHttp.updateEmergency(updated).pipe(
+                tap((res: Emergency) => {
+                  update.emergency.coverageAdequacy = res.coverageAdequacy;
+                  this.cdr.markForCheck();
+                }),
+                tap(() => this.refreshEmergencies$.next()),
+                catchError((err) => {
+                  console.error(err);
+                  this.toastr.error('Failed to update coverage adequacy', 'Error');
+                  update.emergency.coverageAdequacy = update.previousValue;
+                  this.cdr.markForCheck();
+                  return EMPTY;
+                })
+              );
+            })
+          )
+        ),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe();
   }
 
   private load(): void {
@@ -152,21 +213,7 @@ export class EmergenciesComponent implements OnInit {
           )
         ),
         filter((res): res is EmergenciesResponse => !!res),
-        tap(res => {
-          this.emergencies = res.emergencies ?? [];
-          this.stats = res.statsAndLookupData;
-
-          // expose lookups for popup usage
-          this.emergencyTypes = this.stats?.emergencyTypes ?? [];
-          this.policyStatuses = this.stats?.policyStatuses ?? [];
-          this.coverageAdequacies = this.stats?.coverageAdequacies ?? [];
-          this.willStatuses = this.stats?.willStatuses ?? [];
-          this.insuranceCostTemplate = this.stats?.insuranceCost ?? undefined;
-        }),
-        tap(() => {
-          this.isEmergenciesLoaded = true;
-          this.checkFullyLoaded();
-        })
+        tap((res) => this.applyEmergenciesResponse(res))
       )
       .subscribe();
 
@@ -201,6 +248,21 @@ export class EmergenciesComponent implements OnInit {
           );
         })
       ).subscribe();
+  }
+
+  private applyEmergenciesResponse(res: EmergenciesResponse): void {
+    this.emergencies = res.emergencies ?? [];
+    this.stats = res.statsAndLookupData;
+
+    // expose lookups for popup usage
+    this.emergencyTypes = this.stats?.emergencyTypes ?? [];
+    this.policyStatuses = this.stats?.policyStatuses ?? [];
+    this.coverageAdequacies = this.stats?.coverageAdequacies ?? [];
+    this.willStatuses = this.stats?.willStatuses ?? [];
+    this.insuranceCostTemplate = this.stats?.insuranceCost ?? undefined;
+
+    this.isEmergenciesLoaded = true;
+    this.checkFullyLoaded();
   }
 
   checkFullyLoaded() {
@@ -401,22 +463,7 @@ export class EmergenciesComponent implements OnInit {
     const previousValue = e.coverageAdequacy;
     e.coverageAdequacy = newId;
     this.cdr.markForCheck();
-
-    const updated: Emergency = { ...e, coverageAdequacy: newId };
-
-    this.emergenciesHttp.updateEmergency(updated).subscribe({
-      next: (res: Emergency) => {
-        e.coverageAdequacy = res.coverageAdequacy;
-        this.load();
-      },
-      error: (err) => {
-        console.error(err);
-        this.toastr.error('Failed to update coverage adequacy', 'Error');
-
-        e.coverageAdequacy = previousValue;
-        this.cdr.markForCheck();
-      }
-    });
+    this.coverageAdequacyUpdates$.next({ emergency: e, newId, previousValue });
   }
 
   calculateAnnualCost(e: Emergency): number {
