@@ -109,8 +109,21 @@ export class IncomeExpensesComponent {
           this.escalationRates = escalationRatesResponse?.escalationRates;
           this.timeline = timeline;
 
-          this.defaultIncomes = this.incomeExpense.incomes.filter(i => i.isDefault == true && i.isIncomeExpenseSource == true);
-          this.defautExpenses = this.incomeExpense.expenses.filter(i => i.isDefault == true && i.isIncomeExpenseSource == true);
+          this.defaultIncomes = this.incomeExpense.incomes
+            .filter(i => i.isDefault == true && i.isIncomeExpenseSource == true)
+            .sort((a, b) => {
+              if (a.description === 'Salary') return -1;
+              if (b.description === 'Salary') return 1;
+              return 0;
+            });
+          this.defautExpenses = this.incomeExpense.expenses
+            .filter(i => i.isDefault == true && i.isIncomeExpenseSource == true)
+            .sort((a, b) => {
+              if (a.description === 'Living costs') return -1;
+              if (b.description === 'Housing') return 1;
+              return 0;
+            });
+
           this.incomes = this.incomeExpense.incomes
             .filter(i => (i.isDefault == false && i.isIncomeExpenseSource == true)
               || i.description == "Pension Fund");
@@ -177,9 +190,9 @@ export class IncomeExpensesComponent {
   }
 
   updateIncomeClicked(item: FinancialViewModel) {
-    if(item.description == "Pension Fund")
+    if (item.description == "Pension Fund")
       return;
-    
+
     this.setIncomeType();
     const dialogRef = this.dialog.open(AddIncomeComponent, {
       width: '700px',
@@ -204,7 +217,7 @@ export class IncomeExpensesComponent {
   }
 
   updateExpenseClicked(item: FinancialViewModel) {
-    if(item.description == "Insurance")
+    if (item.description == "Insurance")
       return;
 
     this.setExpenseType();
@@ -216,8 +229,7 @@ export class IncomeExpensesComponent {
         amountCycles: this.amountCycles,
         escalataionRates: this.escalationRates,
         clientBirthDate: this.selectedClient?.clientDetails.birthDate,
-        clientPreferredCurrency:
-          this.selectedClient?.clientDetails.preferredCurrency,
+        clientPreferredCurrency: this.selectedClient?.clientDetails.preferredCurrency,
         cashflowId: this.selectedCashflow?.id,
         selectedExpense: item,
         isEditWorkflow: true,
@@ -295,8 +307,21 @@ export class IncomeExpensesComponent {
           this.incomeExpense = incomeExpense;
           this.timeline = timeline;
 
-          this.defaultIncomes = this.incomeExpense.incomes.filter(i => i.isDefault == true && i.isIncomeExpenseSource == true);
-          this.defautExpenses = this.incomeExpense.expenses.filter(i => i.isDefault == true && i.isIncomeExpenseSource == true);
+          this.defaultIncomes = this.incomeExpense.incomes
+            .filter(i => i.isDefault == true && i.isIncomeExpenseSource == true)
+            .sort((a, b) => {
+              if (a.description === 'Salary') return -1;
+              if (b.description === 'Salary') return 1;
+              return 0;
+            });
+          this.defautExpenses = this.incomeExpense.expenses
+            .filter(i => i.isDefault == true && i.isIncomeExpenseSource == true)
+            .sort((a, b) => {
+              if (a.description === 'Living costs') return -1;
+              if (b.description === 'Housing') return 1;
+              return 0;
+            });
+
           this.incomes = this.incomeExpense.incomes
             .filter(i => (i.isDefault == false && i.isIncomeExpenseSource == true)
               || i.description == "Pension Fund");
