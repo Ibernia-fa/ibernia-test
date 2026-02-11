@@ -332,356 +332,207 @@
         }
         <!-- End Pension Fund Specific Fields -->
 
-<div class="d-flex flex-column gap-0">
-        <!-- CheckBox  -->
-         @if(savingsForm.get('name')?.value !== 'Cash') {
-            <section class="example-section">
-        <mat-checkbox type="checkbox" id="lock-pot" (change)="isLockPotChanged(savingsForm.get('lockPot')?.value)"
-              [disabled]="savingsForm.get('name')?.value === 'Pension Fund'"
-              formControlName="lockPot">{{ 'Lock this pot from automatically covering an income shortfall' | translate}}</mat-checkbox>
-      </section>
-
-        <!-- End CheckBox  -->
-     
-        <!-- Savings pot is locked between (NOT shown for Pension Fund) -->
-        @if(savingsForm.get('lockPot')?.value && savingsForm.get('name')?.value !== 'Pension Fund') {
-        <div class="start-end m-t-15 m-b-15">
-          <div class="d-flex flex-column gap-12">
-            <div class="d-flex gap-8 align-items-center">
-              <mat-label class="f-s-16 f-w-400 d-block">{{ 'Savings pot is locked between' | translate}}</mat-label>
-            </div>
-            <div class="row justify-content-between align-items-start flex-nowrap">
-              <!-- Start date  -->
-              <div class="col-6">
-                <div class="w-100 form-field">
-                  <div class="select-option">
-                    <mat-select value="Select" formControlName="start" hideSingleSelectionIndicator>
-                      <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
-                      @if(eventsList.length > 0)
-                        {
-                          <mat-option [value]="currentYear">This year ({{ currentYear }})</mat-option>
-                          <hr>
-                        }
-
-                      @for (event of eventsList; track event) {
-                        <mat-option [value]="event.start.year">{{ event.name }} ({{ event.start.age }})</mat-option>
-                      }
-                      <hr>
-                      @for (year of years; let i = $index; track year) {
-                      <mat-option [value]="year">{{ year }} ({{ clientAge + i }})</mat-option>
-                      }
-                    </mat-select>
-                  </div>
-                  <!-- Error  -->
-                  @if(
-                  (savingsForm.get('start')?.touched &&
-                  savingsForm.get('start')?.hasError('required'))) {
-                  <!-- <span class="field-error d-block">Start is required</span> -->
-              <span class="field-error d-block">{{'Required' | translate}}</span>
-
-                  }
-                  <!-- <span class="field-error d-block">Start is required</span> -->
-                  <!-- End Error  -->
-                </div>
-              </div>
-
-              <!-- Divider  -->
-              <div class="d-flex justify-content-start align-items-start">
-                <img src="assets/images/svgs/chevron-right-date-icon.svg" alt="chevron-right-date-icon" />
-              </div>
-              <!-- End date  -->
-              <div class="col-6">
-                <div class="w-100 form-field">
-                  <div class="select-option">
-                    <mat-select value="Select" formControlName="end" hideSingleSelectionIndicator>
-                      <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
-                      @for (event of eventsList; track event) {
-                      <mat-option [value]="event.start.year">{{ event.name }} ({{ event.start.age }})</mat-option>
-                      }
-                      <hr>
-                      @for (year of years; let i = $index; track year) {
-                      <mat-option [value]="year">{{ year }} ({{ clientAge + i }})</mat-option>
-                      }
-                    </mat-select>
-                  </div>
-                  <!-- error  -->
-                  @if(
-                  (savingsForm.get('end')?.touched &&
-                  savingsForm.get('end')?.hasError('required'))) {
-                  <!-- <span class="field-error d-block">End is required</span> -->
-              <span class="field-error d-block">{{'Required' | translate}}</span>
-
-                  }
-                                      @if(savingsForm.get('end')?.touched &&
-                        savingsForm.get('end')?.hasError('endBeforeStart')) {
-                      <span class="field-error d-block">{{ 'End year cannot be before start year' | translate}}</span>
-                    }
-                  <!-- <span class="field-error d-block">End is required</span> -->
-                  <!-- End error  -->
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        }
-        <!-- Finish Savings pot is locked between  -->
-      }
-        <!-- CheckBox  -->
+        <!-- Lock Pot and Commissions Section -->
         @if(savingsForm.get('name')?.value !== 'Cash') {
-    
-        <section class="example-section">
-        <mat-checkbox type="checkbox" id="commissions"
-              (change)="isCommissionsChanged(savingsForm.get('commissions')?.value)" formControlName="commissions">{{ 'Add commissions' | translate}}</mat-checkbox>
-      </section>
-        <!-- End CheckBox  -->
+          <!-- Lock Pot Checkbox -->
+          <section class="example-section">
+            <mat-checkbox type="checkbox" id="lock-pot" 
+              (change)="isLockPotChanged(savingsForm.get('lockPot')?.value)"
+              [disabled]="savingsForm.get('name')?.value === 'Pension Fund'"
+              formControlName="lockPot">
+              {{ 'Lock this pot from automatically covering an income shortfall' | translate}}
+            </mat-checkbox>
+          </section>
 
-        @if(savingsForm.get('commissions')?.value) {
-        <div class="d-flex flex-column gap-20  m-t-15">
-          <!-- Modal tabs  -->
-          <!-- <div class="d-flex flex-column gap-6 tab">
-            <span class="f-s-16 f-w-400">Commission type</span>
-            <div class="tabs">
-              <div class="row">
-                <div class="col-4">
-                  <button (click)="onCommissionTypeControlClicked('amount')" class="button-icon w-100"
-                    [class]="{ active: savingsForm.get('commissionType')?.value === 'amount' }">
-                    <span class="uppercase" [class]="{ active: savingsForm.get('commissionType')?.value === 'amount' }">Amount</span>
-                  </button>
+          <!-- Lock Pot Date Range -->
+          @if(savingsForm.get('lockPot')?.value && savingsForm.get('name')?.value !== 'Pension Fund') {
+            <div class="start-end m-t-15 m-b-15">
+              <div class="d-flex flex-column gap-12">
+                <div class="d-flex gap-8 align-items-center">
+                  <mat-label class="f-s-16 f-w-400 d-block">{{ 'Savings pot is locked between' | translate}}</mat-label>
                 </div>
-                <div class="col-4">
-                  <button (click)="onCommissionTypeControlClicked('percentage')" class="button-icon w-100"
-                    [class]="{ active: savingsForm.get('commissionType')?.value === 'percentage' }">
-                    <span class="uppercase" [class]="{ active: savingsForm.get('commissionType')?.value === 'percentage' }">Percentage</span>
-                  </button>
-                </div>
-                <div class="col-4">
-                  <button (click)="onCommissionTypeControlClicked('both')" class="button-icon w-100"
-                    [class]="{ active: savingsForm.get('commissionType')?.value === 'both' }">
-                    <span class="uppercase" [class]="{ active: savingsForm.get('commissionType')?.value === 'both' }">Both</span>
-                  </button>
+                <div class="row justify-content-between align-items-start flex-nowrap">
+                  <div class="col-6">
+                    <div class="w-100 form-field">
+                      <div class="select-option">
+                        <mat-select value="Select" formControlName="start" hideSingleSelectionIndicator>
+                          @if(eventsList.length > 0) {
+                            <mat-option [value]="currentYear">This year ({{ currentYear }})</mat-option>
+                            <hr>
+                          }
+                          @for (event of eventsList; track event) {
+                            <mat-option [value]="event.start.year">{{ event.name }} ({{ event.start.age }})</mat-option>
+                          }
+                          <hr>
+                          @for (year of years; let i = $index; track year) {
+                            <mat-option [value]="year">{{ year }} ({{ clientAge + i }})</mat-option>
+                          }
+                        </mat-select>
+                      </div>
+                      @if(savingsForm.get('start')?.touched && savingsForm.get('start')?.hasError('required')) {
+                        <span class="field-error d-block">{{'Required' | translate}}</span>
+                      }
+                    </div>
+                  </div>
+                  <div class="d-flex justify-content-start align-items-start">
+                    <img src="assets/images/svgs/chevron-right-date-icon.svg" alt="chevron-right-date-icon" />
+                  </div>
+                  <div class="col-6">
+                    <div class="w-100 form-field">
+                      <div class="select-option">
+                        <mat-select value="Select" formControlName="end" hideSingleSelectionIndicator>
+                          @for (event of eventsList; track event) {
+                            <mat-option [value]="event.start.year">{{ event.name }} ({{ event.start.age }})</mat-option>
+                          }
+                          <hr>
+                          @for (year of years; let i = $index; track year) {
+                            <mat-option [value]="year">{{ year }} ({{ clientAge + i }})</mat-option>
+                          }
+                        </mat-select>
+                      </div>
+                      @if(savingsForm.get('end')?.touched && savingsForm.get('end')?.hasError('required')) {
+                        <span class="field-error d-block">{{'Required' | translate}}</span>
+                      }
+                      @if(savingsForm.get('end')?.touched && savingsForm.get('end')?.hasError('endBeforeStart')) {
+                        <span class="field-error d-block">{{ 'End year cannot be before start year' | translate}}</span>
+                      }
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div> -->
-          <!-- End Modal tabs  -->
-          <div class="position-relative">
-            <div class="w-100 form-field">
-              <div class="select-option">
-                <mat-select formControlName="commissionType" value="Select">
-                  <mat-option value="amount">{{ 'Amount' | translate}}</mat-option>
-                  <mat-option value="percentage">{{ 'Percentage' | translate}}</mat-option>
-                  <mat-option value="both">{{ 'Both' | translate}}</mat-option>
-                </mat-select>
-              </div>
-              <!-- <span class="field-error d-block">Escalation Rate is required</span> -->
-              <!-- End error  -->
-            </div>
-          </div>
+          }
 
-          <!-- Net Amount Field  -->
-          
-          @if(savingsForm.get('commissionType')?.value === 'amount' || savingsForm.get('commissionType')?.value === 'both') {
-             <div class="d-flex flex-column gap-8">
-            @if(savingsForm.get('commissionType')?.value === 'both') {
+          <!-- Commissions Checkbox -->
+          <section class="example-section">
+            <mat-checkbox type="checkbox" id="commissions"
+              (change)="isCommissionsChanged(savingsForm.get('commissions')?.value)" 
+              formControlName="commissions">
+              {{ 'Add commissions' | translate}}
+            </mat-checkbox>
+          </section>
 
-              <div class="d-flex gap-8 align-items-center">
-                <mat-label class="f-s-16 f-w-400 d-block">{{ 'Commission amount' | translate}} </mat-label>
-                <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
-              </div>
-            }
-            <div class="d-flex flex-column gap-4 net-fields">
-              <div class="d-flex align-items-center net-field">
-                <!-- Currency Selector  -->
-                 <div class="left hide-arrow">
-        {{country}}
-                  <mat-select value="£" formControlName="commissionCurrency" class="sortby-edit-profile"
-                    hideSingleSelectionIndicator>
-                    @for (country of countries; track country) {
-                    @if(country.currencySymbol) {
-                    <mat-option [value]="country.currencySymbol">{{
-                      country.currencySymbol
-                      }}</mat-option>
-
-                    }
-                    }
-                  </mat-select>
-                  
-                </div>
-                <!-- End Currency Selector  -->
-                <!-- Price Field  -->
+          <!-- Commissions Section -->
+          @if(savingsForm.get('commissions')?.value) {
+            <div class="d-flex flex-column gap-20 m-t-15">
+              <div class="position-relative">
                 <div class="w-100 form-field">
-                  <input matInput type="number" formControlName="commissionAmount" placeholder="0" />
+                  <div class="select-option">
+                    <mat-select formControlName="commissionType" value="Select">
+                      <mat-option value="amount">{{ 'Amount' | translate}}</mat-option>
+                      <mat-option value="percentage">{{ 'Percentage' | translate}}</mat-option>
+                      <mat-option value="both">{{ 'Both' | translate}}</mat-option>
+                    </mat-select>
+                  </div>
                 </div>
-                <!-- End Price Field  -->
-                <!-- End Type Field  -->
-                <div class="right">
-
-
-                   
-                  <mat-select value="Select" formControlName="commissionCycle" class="sortby-edit-profile"
-                    hideSingleSelectionIndicator>
-                    <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
-                    @for (cycle of cycles; track cycle) {
-                    <mat-option [value]="cycle.id">{{ cycle.description }}</mat-option>
-                    }
-                  </mat-select>
-                </div>
-                <!-- End Type Field  -->
               </div>
-              <!-- Error  -->
-              @if((savingsForm.get('commissionCycle')?.touched &&
-              savingsForm.get('commissionCycle')?.hasError('required')) ||
-              (savingsForm.get('commissionAmount')?.touched &&
-              savingsForm.get('commissionAmount')?.hasError('required')) ||
-              (savingsForm.get('commissionCurrency')?.touched &&
-              savingsForm.get('commissionCurrency')?.hasError('required'))) {
-              <!-- <span class="field-error d-block">Amount is required</span> -->
 
-              <span class="field-error d-block">{{'Required' | translate}}</span>
-
-              }
-              <!-- <span class="field-error d-block">Amount is required</span> -->
-              <!-- End Error  -->
-            </div>
-            </div>
-          }
-
-          
-        @if(savingsForm.get('commissionType')?.value !== 'percentage' && !isOneOff){
-          <div class="w-100 form-field gap-12">
-            <div class="d-flex flex-column gap-8">
-           
-          <div class="d-flex gap-8 align-items-center">
-            <mat-label class="f-s-16 f-w-400 d-block">{{ 'Commission amount escalatation rate' | translate}}</mat-label>
-            <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
-          </div>
-          <div class="position-relative">
-            <div class="w-100 form-field">
-              <div class="select-option">
-                <mat-select formControlName="escalationRate" value="Select"  (selectionChange)="onEscalationRateChange($event)">
-                  @for (escalationRate of escalationRates; track escalationRate) {
-                  <mat-option [value]="escalationRate.value">{{ escalationRate.description }}</mat-option>
+              <!-- Commission Amount -->
+              @if(savingsForm.get('commissionType')?.value === 'amount' || savingsForm.get('commissionType')?.value === 'both') {
+                <div class="d-flex flex-column gap-8">
+                  @if(savingsForm.get('commissionType')?.value === 'both') {
+                    <div class="d-flex gap-8 align-items-center">
+                      <mat-label class="f-s-16 f-w-400 d-block">{{ 'Commission amount' | translate}}</mat-label>
+                      <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
+                    </div>
                   }
-                </mat-select>
-              </div>
-              <!-- error  -->
-              @if(savingsForm.get('escalationRate')?.touched &&
-              savingsForm.get('escalationRate')?.hasError('required')) {
-              <!-- <span class="field-error d-block">Escalation Rate is required</span> -->
-              <span class="field-error d-block">{{'Required' | translate}}</span>
-
-              }
-              <!-- <span class="field-error d-block">Escalation Rate is required</span> -->
-              <!-- End error  -->
-            </div>
-          </div>
-       
-          </div>
-        @if(selectedEscalationDescription === 'Increases at custom rate') {
-          <div class="w-100 form-field gap-12">
-            <mat-label class="f-s-16 d-block">{{ 'Custom escalation rate' | translate}}</mat-label>
-         <mat-form-field  appearance="outline" class="w-full w-100 percentage-icon">
-              <span matSuffix>%</span> 
-                <input
-                              matInput
-                              class="p-0"
-                type="number"
-                formControlName="customEscalationRate"
-                placeholder="0"
-                />
-                <!-- placeholder="{{ 'Enter custom rate' | translate}}" -->
-                            
-              </mat-form-field>
-            @if(savingsForm.get('customEscalationRate')?.touched &&
-                savingsForm.get('customEscalationRate')?.hasError('required')) {
-              <!-- <span class="field-error d-block">Custom escalation rate is required</span> -->
-              <span class="field-error d-block">{{'Required' | translate}}</span>
-
-            }
-          </div>
-        }
-        </div>
-      }
-
-      
-          @if(savingsForm.get('commissionType')?.value === 'percentage' || savingsForm.get('commissionType')?.value === 'both') {
-            <div class="d-flex flex-column gap-8">
-            @if(savingsForm.get('commissionType')?.value === 'both') {
-              <div class="d-flex gap-8 align-items-center">
-                <mat-label class="f-s-16 f-w-400 d-block">{{'Commission percentage' | translate}}</mat-label>
-                <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
-              </div>
-            }
-            <div class="d-flex flex-column gap-4">
-              <div class="d-flex align-items-center">
-                <!-- Currency Selector  -->
-                <!-- <div class="left">
-                  <mat-select value="£" formControlName="commissionPercentageCurrency" class="sortby-edit-profile"
-                    hideSingleSelectionIndicator>
-                    @for (country of countries; track country) {
-                    @if(country.currencySymbol) {
-                    <mat-option [value]="country.currencySymbol">{{
-                      country.currencySymbol
-                      }}</mat-option>
-  
+                  <div class="d-flex flex-column gap-4 net-fields">
+                    <div class="d-flex align-items-center net-field">
+                      <div class="left hide-arrow">
+                        <mat-select value="£" formControlName="commissionCurrency" class="sortby-edit-profile" hideSingleSelectionIndicator>
+                          @for (country of countries; track country) {
+                            @if(country.currencySymbol) {
+                              <mat-option [value]="country.currencySymbol">{{ country.currencySymbol }}</mat-option>
+                            }
+                          }
+                        </mat-select>
+                      </div>
+                      <div class="w-100 form-field">
+                        <input matInput type="number" formControlName="commissionAmount" placeholder="0" />
+                      </div>
+                      <div class="right">
+                        <mat-select value="Select" formControlName="commissionCycle" class="sortby-edit-profile" hideSingleSelectionIndicator>
+                          @for (cycle of cycles; track cycle) {
+                            <mat-option [value]="cycle.id">{{ cycle.description }}</mat-option>
+                          }
+                        </mat-select>
+                      </div>
+                    </div>
+                    @if((savingsForm.get('commissionCycle')?.touched && savingsForm.get('commissionCycle')?.hasError('required')) ||
+                        (savingsForm.get('commissionAmount')?.touched && savingsForm.get('commissionAmount')?.hasError('required')) ||
+                        (savingsForm.get('commissionCurrency')?.touched && savingsForm.get('commissionCurrency')?.hasError('required'))) {
+                      <span class="field-error d-block">{{'Required' | translate}}</span>
                     }
-                    }
-                  </mat-select>
-                </div> -->
-                <!-- End Currency Selector  -->
-                <!-- Price Field  -->
-                <div class="w-100 form-field input-container">
-                  <!-- <input matInput formControlName="commissionPercentage" [value]="formattedCommissionPercentage"
-                  placeholder="0" (input)="onInputChange($event, 'commissionPercentage')" (blur)="onInputBlur($event, 'commissionPercentage')" /> -->
-                  <!-- <mat-form-field class="w-100 form-field commision-percentage" appearance="outline"> -->
-                   
-                           <mat-form-field  appearance="outline" class="w-full w-100 percentage-icon">
-                          <span matSuffix>%</span> 
-                            <input
-                                          matInput formControlName="commissionPercentage"
-                                        />
-                                        
-                          </mat-form-field>
-                  <!-- </mat-form-field>  -->
+                  </div>
                 </div>
-                <!-- End Price Field  -->
-                <!-- End Type Field  -->
-                <!-- <div class="right">
-                  <mat-select value="Select" formControlName="commissionPercentageCycle" class="sortby-edit-profile"
-                    hideSingleSelectionIndicator>
-                    @for (cycle of cycles; track cycle) {
-                    <mat-option [value]="cycle.id">{{ cycle.description }}</mat-option>
-                    }
-                  </mat-select>
-                </div> -->
-                <!-- End Type Field  -->
-              </div>
-              <!-- Error  -->
-              @if((savingsForm.get('commissionPercentageCycle')?.touched &&
-              savingsForm.get('commissionPercentageCycle')?.hasError('required')) ||
-              (savingsForm.get('commissionPercentageCurrency')?.touched &&
-              savingsForm.get('commissionPercentageCurrency')?.hasError('required')) ||
-              (savingsForm.get('commissionPercentageCurrency')?.touched &&
-              savingsForm.get('commissionPercentageCurrency')?.hasError('required'))) {
-              <!-- <span class="field-error d-block">Amount is required</span> -->
-              <span class="field-error d-block">{{'Required' | translate}}</span>
-
               }
-              <!-- <span class="field-error d-block">Amount is required</span> -->
-              <!-- End Error  -->
-            </div>
+
+              <!-- Commission Escalation -->
+              @if(savingsForm.get('commissionType')?.value !== 'percentage' && !isOneOff) {
+                <div class="w-100 form-field gap-12">
+                  <div class="d-flex gap-8 align-items-center">
+                    <mat-label class="f-s-16 f-w-400 d-block">{{ 'Commission amount escalation rate' | translate}}</mat-label>
+                    <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
+                  </div>
+                  <div class="position-relative">
+                    <div class="w-100 form-field">
+                      <div class="select-option">
+                        <mat-select formControlName="escalationRate" value="Select" (selectionChange)="onEscalationRateChange($event)">
+                          @for (escalationRate of escalationRates; track escalationRate) {
+                            <mat-option [value]="escalationRate.value">{{ escalationRate.description }}</mat-option>
+                          }
+                        </mat-select>
+                      </div>
+                      @if(savingsForm.get('escalationRate')?.touched && savingsForm.get('escalationRate')?.hasError('required')) {
+                        <span class="field-error d-block">{{'Required' | translate}}</span>
+                      }
+                    </div>
+                  </div>
+
+                  <!-- Custom Escalation Rate -->
+                  @if(selectedEscalationDescription === 'Increases at custom rate') {
+                    <div class="w-100 form-field gap-12">
+                      <mat-label class="f-s-16 d-block">{{ 'Custom escalation rate' | translate}}</mat-label>
+                      <mat-form-field appearance="outline" class="w-full w-100 percentage-icon">
+                        <span matSuffix>%</span>
+                        <input matInput type="number" class="p-0" formControlName="customEscalationRate" placeholder="0" />
+                      </mat-form-field>
+                      @if(savingsForm.get('customEscalationRate')?.touched && savingsForm.get('customEscalationRate')?.hasError('required')) {
+                        <span class="field-error d-block">{{'Required' | translate}}</span>
+                      }
+                    </div>
+                  }
+                </div>
+              }
+
+              <!-- Commission Percentage -->
+              @if(savingsForm.get('commissionType')?.value === 'percentage' || savingsForm.get('commissionType')?.value === 'both') {
+                <div class="d-flex flex-column gap-8">
+                  @if(savingsForm.get('commissionType')?.value === 'both') {
+                    <div class="d-flex gap-8 align-items-center">
+                      <mat-label class="f-s-16 f-w-400 d-block">{{'Commission percentage' | translate}}</mat-label>
+                      <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
+                    </div>
+                  }
+                  <div class="d-flex flex-column gap-4">
+                    <div class="d-flex align-items-center">
+                      <div class="w-100 form-field input-container">
+                        <mat-form-field appearance="outline" class="w-full w-100 percentage-icon">
+                          <span matSuffix>%</span>
+                          <input matInput formControlName="commissionPercentage" />
+                        </mat-form-field>
+                      </div>
+                    </div>
+                    @if((savingsForm.get('commissionPercentageCycle')?.touched && savingsForm.get('commissionPercentageCycle')?.hasError('required')) ||
+                        (savingsForm.get('commissionPercentageCurrency')?.touched && savingsForm.get('commissionPercentageCurrency')?.hasError('required'))) {
+                      <span class="field-error d-block">{{'Required' | translate}}</span>
+                    }
+                  </div>
+                </div>
+              }
             </div>
           }
-          
-          <!-- End Net Amount Field  -->
-        </div>
-
-
         }
-      }
-      
-      </div>
       </div>
     </mat-dialog-content>
     <!-- End Modal Body  -->
