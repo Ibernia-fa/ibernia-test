@@ -1,20 +1,39 @@
 <form class="d-flex flex-column gap-32" [formGroup]="form" (ngSubmit)="onSave()">
   <div class="d-flex align-items-center justify-content-between gap-10 modal-header">
-    <h3>{{ data.mode === 'edit' ? 'Edit cover' : 'Add cover' }}</h3>
+    @if (data.mode === 'edit') {
+      <div class="d-flex align-items-center gap-10">
+        <h3>
+          {{ displayEmergencyName }}
+          @if (canEditName) {
+            <img
+              src="assets/images/svgs/drop-down-edit-2-line.svg"
+              alt="edit"
+              class="cursor-pointer edit-name-icon"
+              (click)="toggleNameEdit()"
+            />
+          }
+        </h3>
+      </div>
+    }
+    @else {
+      <h3>{{ data.mode === 'edit' ? 'Edit cover' : 'Add cover' }}</h3>
+    }
     <button (click)="closeDialog()" type="button">
       <img src="assets/images/svgs/close-line-cion.svg" alt="close-line-cion" />
     </button>
   </div>
 
   <mat-dialog-content class="d-flex flex-column gap-20">
-    <div class="w-100 form-field gap-8">
-      <mat-label class="f-s-16 d-block" style="line-height: 18px">Name</mat-label>
-      <input matInput formControlName="name" placeholder="e.g. Life Insurance" />
-      
-      @if(form.get('name')?.touched && form.get('name')?.hasError('required')) {
-        <span class="field-error d-block">{{'Required' | translate}}</span>
-      }
-    </div>
+    @if (showNameInput) {
+      <div class="w-100 form-field gap-8">
+        <mat-label class="f-s-16 d-block" style="line-height: 18px">Name</mat-label>
+        <input matInput formControlName="name" placeholder="e.g. Life Insurance" />
+
+        @if(form.get('name')?.touched && form.get('name')?.hasError('required')) {
+          <span class="field-error d-block">{{'Required' | translate}}</span>
+        }
+      </div>
+    }
 
     <!-- Will status (only type 2) -->
     @if(isWill) {

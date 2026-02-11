@@ -87,10 +87,7 @@ export class AddNewPotComponent {
   selectedPot: ClientSaving;
   savingPotType= SavingPotType
   selectedEscalationDescription: string | null = null;
-  editDialogTitle: string = '';
-  isRenamingEntry: boolean = false;
-  renamedCustomName: string = '';
-  existingSavingPots: any[] = [];
+  showNameEdit: boolean = false;
   savingPotValues = [
     {
       name: 'Investment',
@@ -408,6 +405,26 @@ onAmountBlur(e: Event) {
   
   closeDialog(): void {
     this.dialogRef.close();
+  }
+
+  get displayPotName(): string {
+    if (!this.savingsForm) return '';
+    const name = (this.savingsForm.get('name')?.value ?? '').toString();
+
+    if (name === 'Custom') {
+      const customName = (this.savingsForm.get('customName')?.value ?? '').toString().trim();
+      return customName || this.selectedPot?.name || 'Custom';
+    }
+
+    return name || this.selectedPot?.name || '';
+  }
+
+  get canEditName(): boolean {
+    return this.isEditWorkflow && this.savingsForm?.get('name')?.value === 'Custom';
+  }
+
+  toggleNameEdit(): void {
+    this.showNameEdit = !this.showNameEdit;
   }
 
   onNameValueChange(name: any) {

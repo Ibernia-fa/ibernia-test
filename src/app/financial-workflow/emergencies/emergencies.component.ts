@@ -82,6 +82,15 @@ export class EmergenciesComponent implements OnInit {
   selectedClient: Client;
   selectedCashflow: Cashflow;
   incomeExpense: IncomeExpense;
+  private readonly defaultEmergencyNames = new Set([
+    'Home',
+    'Life',
+    'Disability',
+    'Health',
+    'Natural hazards',
+    'Will'
+  ]);
+  private defaultEmergencyIds = new Set<string>();
 
   private readonly defaultIcon = 'shield.svg';
   private readonly iconMap: Record<string, string> = {
@@ -155,6 +164,7 @@ export class EmergenciesComponent implements OnInit {
         tap(res => {
           this.emergencies = res.emergencies ?? [];
           this.stats = res.statsAndLookupData;
+          this.markDefaultEmergencyIds(this.emergencies);
 
           // expose lookups for popup usage
           this.emergencyTypes = this.stats?.emergencyTypes ?? [];
@@ -323,12 +333,16 @@ export class EmergenciesComponent implements OnInit {
   }
 
   onEditClick(emergency: Emergency): void {
+    const isDefaultEmergency =
+      this.defaultEmergencyIds.has(emergency.id) ||
+      this.defaultEmergencyNames.has(emergency.name);
     const dialogRef = this.dialog.open(AddEmergenciesComponent, {
       width: '700px',
       disableClose: true,
       data: {
         mode: 'edit',
         emergency,
+        isDefaultEmergency,
         emergencyTypes: this.emergencyTypes,
         policyStatuses: this.policyStatuses,
         coverageAdequacies: this.coverageAdequacies,
@@ -513,6 +527,14 @@ export class EmergenciesComponent implements OnInit {
         } else {
           this.stats?.emergencyExpenses.push(updatedExpense);
         }
+      }
+    });
+  }
+
+  private markDefaultEmergencyIds(emergencies: Emergency[]): void {
+    emergencies.forEach(e => {
+      if (this.defaultEmergencyNames.has(e.name)) {
+        this.defaultEmergencyIds.add(e.id);
       }
     });
   }
