@@ -31,7 +31,7 @@
                                     <div class="d-flex gap-12 align-items-end">
                                         <h3>{{ 'Incomes' | translate }}</h3>
                                         <h3 class="expense-income-green">
-                                            +{{currency|currencySymbol}}{{incomeExpense.totalIncome|thousandSeparator}}
+                                            +{{currency|currencySymbol}}{{incomeExpense.totalYearlyIncome|thousandSeparator}}
                                         </h3>
                                     </div>
 
@@ -220,7 +220,7 @@
                                     <div class="d-flex gap-12 align-items-end">
                                         <h3>{{ 'Expenses' | translate }}</h3>
                                         <h3 class="expense-income-red">
-                                            -{{currency|currencySymbol}}{{incomeExpense.totalExpenses|thousandSeparator}}
+                                            -{{currency|currencySymbol}}{{incomeExpense.totalYearlyExpense|thousandSeparator}}
                                         </h3>
                                     </div>
 
