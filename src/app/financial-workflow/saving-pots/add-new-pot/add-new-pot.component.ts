@@ -87,6 +87,10 @@ export class AddNewPotComponent {
   selectedPot: ClientSaving;
   savingPotType= SavingPotType
   selectedEscalationDescription: string | null = null;
+  editDialogTitle: string = '';
+  isRenamingEntry: boolean = false;
+  renamedCustomName: string = '';
+  existingSavingPots: any[] = [];
   showNameEdit: boolean = false;
   savingPotValues = [
     {
