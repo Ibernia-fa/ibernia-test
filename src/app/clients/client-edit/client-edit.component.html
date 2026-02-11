@@ -1,7 +1,7 @@
 <mat-card class="edit-client-wrapper">
   <mat-card-content>
  
-    <app-breadcrumb [showBackIcon]="true" [routeForBack]="'/clients'" title="{{ 'Edit  client' | translate }}"></app-breadcrumb>
+    <app-breadcrumb [showBackIcon]="true" [routeForBack]="'/clients/' + clientId + '/profile'" title="{{ 'Edit  client' | translate }}"></app-breadcrumb>
     <form [formGroup]="clientForm" (ngSubmit)="onSubmit()" class="client-form-wrapper">
       <div class="row justify-content-between">
         <div class="col-4 m-b-20">
