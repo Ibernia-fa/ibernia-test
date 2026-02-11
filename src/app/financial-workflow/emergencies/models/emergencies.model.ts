@@ -21,7 +21,7 @@ export interface Emergency {
   id: string;
   type: number;
   policyStatus: number;
-  insuranceCost: Money;
+  insuranceCost?: Money | null;
   coverage: number;
   coverageAdequacy: number;
   willStatus: number;
@@ -54,6 +54,5 @@ export interface EmergenciesResponse {
 }
 
 // Use the same shape as Emergency, but without the mandatory id.
-// Backend can generate id / timestamps.
 export type CreateEmergencyRequest = Omit<Emergency, 'id' | 'createdAt' | 'updatedAt'>;
 
