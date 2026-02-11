@@ -1,7 +1,6 @@
 import { Component, ElementRef, Inject, ViewChild } from '@angular/core';
 import {
   AbstractControl,
-  ControlEvent,
   FormBuilder,
   FormControl,
   FormGroup,
@@ -20,8 +19,8 @@ import {
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatSelectChange, MatSelectModule } from '@angular/material/select';
-import { MatSliderChange, MatSliderModule } from '@angular/material/slider';
+import { MatSelectModule, MatSelectChange } from '@angular/material/select';
+import { MatSliderModule } from '@angular/material/slider';
 import { allCountries } from 'src/app/clients/models/country';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import {
@@ -37,7 +36,6 @@ import {
 } from '../models/saving-pots.model';
 import { catchError, filter } from 'rxjs';
 import { TablerIconsModule } from 'angular-tabler-icons';
-import { IntegerOnlyDirective } from 'src/app/directives/integerOnly.directive';
 import { CommonModule } from '@angular/common';
 import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
@@ -53,31 +51,29 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
     MatInputModule,
     MatSelectModule,
     MatIconModule,
-    MatInputModule,
     MatButtonModule,
-    MatSelectModule,
     MatDatepickerModule,
     ReactiveFormsModule,
     MatSliderModule,
     TablerIconsModule,
     MatCheckboxModule,
-    // IntegerOnlyDirective,
     ThousandSeparatorPipe,
     ThousandSeparatorInputDirective,
-    TranslateModule
+    TranslateModule,
   ],
   templateUrl: './add-new-pot.component.html',
   styleUrl: './add-new-pot.component.scss',
 })
 export class AddNewPotComponent {
   @ViewChild('amountInput') amountInput?: ElementRef<HTMLInputElement>;
+  @ViewChild('renameInputRef') renameInputRef?: ElementRef<HTMLInputElement>;
   savingsForm: FormGroup;
   years: number[] = [];
   countries = allCountries;
   clientPreferredCurrency: string;
   clientBirthYear: number;
   clientAge: number;
-  // isAmountType: boolean = true;
+  retirementAge: number = 65;
   cycles: Cycle[];
   escalationRates: EscalationRate[];
   eventsList: any;
@@ -91,12 +87,11 @@ export class AddNewPotComponent {
   selectedPot: ClientSaving;
   savingPotType= SavingPotType
   selectedEscalationDescription: string | null = null;
+  editDialogTitle: string = '';
+  isRenamingEntry: boolean = false;
+  renamedCustomName: string = '';
+  existingSavingPots: any[] = [];
   savingPotValues = [
-    // {
-    //   name: 'Cash',
-    //   iconUrl: 'cashflow-moneys-icon',
-    //   type: SavingPotType.Cash,
-    // },
     {
       name: 'Investment',
       iconUrl: 'cashflow-investment-icon',
@@ -122,9 +117,6 @@ export class AddNewPotComponent {
   isAddComissionChecked: any;
   currentYear: number = new Date().getFullYear();
   amount: number | null;
-  renamedCustomName: string = ''; // Track the renamed custom name
-  editDialogTitle: string = ''; // Dynamic dialog title
-  isRenamingEntry: boolean = false; // Track if renaming
 
   constructor(
     private dialogRef: MatDialogRef<AddNewPotComponent>,
@@ -134,12 +126,12 @@ export class AddNewPotComponent {
     private translate: TranslateService
   ) {
     this.loggedInUserPreferences = data.loggedInUserPreferences;
-    console.log('loggedin user preferences', this.loggedInUserPreferences);
     const infl = Number(data.inflationRate);
     this.inflationRate = Number.isFinite(infl) ? infl : 0;
     this.cycles = data.amountCycles;
     this.escalationRates = data.escalataionRates;
     this.eventsList = data.eventsList;
+    this.existingSavingPots = data.existingSavingPots || [];  // Get existing pots for smart defaults
     this.clientBirthYear = moment(data.clientBirthDate).year();
     this.userReturnRate = data.returnRate;
     const birthDate = new Date(data.clientBirthDate);
@@ -147,10 +139,7 @@ export class AddNewPotComponent {
     let age = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
     const dayDiff = today.getDate() - birthDate.getDate();
-    console.log(this.comissionTypes);
-    console.log('', this.comissionTypes.find(x => x.value == this.loggedInUserPreferences?.comissionType)?.label);
     this.loggedInUserComissionType = this.comissionTypes.find(x => x.value == this.loggedInUserPreferences?.comissionType)?.label.toLowerCase();
-    console.log('adfas', this.loggedInUserComissionType);
     // Adjust age if birth month/day is in the future
     if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
       age--;
@@ -159,6 +148,15 @@ export class AddNewPotComponent {
     this.clientAge = age
     if(data.forecastStartDateYear - this.clientBirthYear > this.clientAge) this.clientBirthYear =  this.clientBirthYear+1
 
+    // Extract retirement age from events if available
+    const retirementEvent = this.eventsList?.find((e: any) => 
+      e.name?.toLowerCase().includes('retirement') || 
+      e.name?.toLowerCase().includes('pensione')
+    );
+    if (retirementEvent) {
+      this.retirementAge = retirementEvent.start.age + this.clientBirthYear;
+    }
+
     this.clientPreferredCurrency = data.clientPreferredCurrency;
     this.cashflowId = data.cashflowId;
     this.isEditWorkflow = data.isEditWorkflow;
@@ -166,20 +164,35 @@ export class AddNewPotComponent {
     this.forecastStartDateYear = data.forecastStartDateYear;
     this.forecastEndDateYear = data.forecastEndDateYear;
 
+    // Set edit dialog title if in edit mode
+    if (this.isEditWorkflow && this.selectedPot) {
+      this.editDialogTitle = `Edit ${this.selectedPot.name}`;
+    }
+
     var iterations = data.forecastEndDateYear - data.forecastStartDateYear + 1;
 
     for (let index = 0; index < iterations; index++) {
       const element = data.forecastStartDateYear + index;
       this.years.push(element);
     }
+
+    // Determine default type based on smart logic (Cases 1-4)
+    let defaultType = 'Investment';  // Default fallback
+    if (!this.isEditWorkflow) {
+      defaultType = this.getSmartDefaultType();
+    } else {
+      // In edit mode, use the current pot's type
+      defaultType = this.selectedPot?.name || 'Investment';
+    }
+
     this.savingsForm = this.fb.group({
-      name: ['', Validators.required],
-      customName: [''], // Custom pot name field
+      name: [defaultType, Validators.required],
       currency: [this.clientPreferredCurrency, Validators.required],
       amount: ['', [Validators.required, Validators.min(0)]],
+      customName: [''],  // For Custom pots
       returnRate: [this.userReturnRate],
       // lockPot: [true],
-      lockPot: [false],
+      lockPot: [defaultType === 'Pension Fund'],  // Auto-check for Pension Fund
       start: [data.forecastStartDateYear],
       end: [data.forecastEndDateYear-1],
       // commissions: [true],
@@ -194,10 +207,10 @@ export class AddNewPotComponent {
       escalationRate: [''],
       customEscalationRate: [''],
       // Pension Fund specific fields
-      contributionAmount: [''],
-      contributionFrequency: [1], // Default to Monthly
-      contributionStartDate: [data.forecastStartDateYear], // Default to this year
-      contributionEndDate: [''] // Will be set to required only for Pension Fund
+      contributionAmount: ['', [Validators.min(0)]],
+      contributionFrequency: [1],  // Monthly (1) by default
+      contributionStartDate: [data.forecastStartDateYear],  // This year
+      contributionEndDate: [this.retirementAge]  // Retirement year
     });
 
   this.savingsForm.setValidators(this.endOnOrAfterStartValidator());
@@ -218,9 +231,8 @@ export class AddNewPotComponent {
     });
     if(this.isEditWorkflow) {
       this.isCashPotEditMode = (this.selectedPot?.name ?? '').trim().toLowerCase() === 'cash';
-      this.patchFormValues();      // Set the dialog title with actual pot name
-      this.editDialogTitle = `Edit ${this.selectedPot.name}`;
-      this.renamedCustomName = this.selectedPot.name;    if (this.isCashPotEditMode) {
+      this.patchFormValues();
+    if (this.isCashPotEditMode) {
         // Freeze the Type as Cash and don’t emit changes
         this.savingsForm.get('name')?.setValue('Cash', { emitEvent: false });
         this.savingsForm.get('name')?.disable({ emitEvent: false });
@@ -248,7 +260,6 @@ onAmountBlur(e: Event) {
 
 
   patchFormValues() {
-    console.log('selected pot' , this.selectedPot);
     this.isAddComissionChecked = this.selectedPot?.hasCommission;
     var savingPotValue = this.savingPotValues.find(x => x.name === this.selectedPot.name);
         if(savingPotValue) {
@@ -291,6 +302,15 @@ onAmountBlur(e: Event) {
     this.savingsForm.get('lockPot')?.patchValue(this.selectedPot.hasPotLocked, { emitEvent: false });
     this.savingsForm.get('start')?.patchValue(this.selectedPot.lockedFrom?.year, { emitEvent: false });
     this.savingsForm.get('end')?.patchValue(this.selectedPot.lockedTill?.year, { emitEvent: false });
+    
+    // Patch Pension Fund specific fields if applicable
+    if (this.selectedPot.name === 'Pension Fund') {
+      this.savingsForm.get('contributionAmount')?.patchValue(this.selectedPot.contributionAmount, { emitEvent: false });
+      this.savingsForm.get('contributionFrequency')?.patchValue(this.selectedPot.contributionFrequency, { emitEvent: false });
+      this.savingsForm.get('contributionStartDate')?.patchValue(this.selectedPot.contributionStartDate?.year, { emitEvent: false });
+      this.savingsForm.get('contributionEndDate')?.patchValue(this.selectedPot.contributionEndDate?.year, { emitEvent: false });
+    }
+    
     this.savingsForm.get('commissions')?.patchValue(this.selectedPot.hasCommission, { emitEvent: false });
 
     let selectedComissionType = 'amount';
@@ -340,35 +360,70 @@ onAmountBlur(e: Event) {
   ngOnInit() {
     this.updateFormattedValue('returnRate');
   }
+
+  /**
+   * Implements smart default pot type selection based on existing pots
+   * Case 1: Existing pot: Cash → New pot default: Investment
+   * Case 2: Existing pot: Cash, Investment → New pot default: Pension Fund
+   * Case 3: Existing pot: Cash, Pension Fund → New pot default: Investment
+   * Case 4: Existing pot: Cash, Investment, Pension Fund or more → New pot default: Custom
+   */
+  getSmartDefaultType(): string {
+    if (!this.existingSavingPots || this.existingSavingPots.length === 0) {
+      return 'Investment';  // Default if no existing pots
+    }
+
+    // Get unique pot types from existing pots
+    const existingTypes = new Set(
+      this.existingSavingPots.map((pot: any) => pot.name)
+    );
+
+    const hasCash = existingTypes.has('Cash');
+    const hasInvestment = existingTypes.has('Investment');
+    const hasPension = existingTypes.has('Pension Fund');
+
+    // Case 4: Multiple types already exist
+    if (existingTypes.size >= 3) {
+      return 'Custom';
+    }
+
+    // Case 1: Only Cash exists
+    if (existingTypes.size === 1 && hasCash) {
+      return 'Investment';
+    }
+
+    // Case 2: Cash and Investment exist
+    if (existingTypes.size === 2 && hasCash && hasInvestment) {
+      return 'Pension Fund';
+    }
+
+    // Case 3: Cash and Pension Fund exist
+    if (existingTypes.size === 2 && hasCash && hasPension) {
+      return 'Investment';
+    }
+
+    // Default fallback
+    return 'Investment';
+  }
+  
   closeDialog(): void {
     this.dialogRef.close();
   }
 
-  toggleRenameEntry(): void {
-    this.isRenamingEntry = !this.isRenamingEntry;
-  }
-
-  saveRenamedEntry(): void {
-    const currentValue = this.savingsForm.get('customName')?.value || this.savingsForm.get('name')?.value;
-    this.renamedCustomName = currentValue;
-    this.editDialogTitle = `Edit ${this.renamedCustomName}`;
-    this.isRenamingEntry = false;
-  }
-
   onNameValueChange(name: any) {
     this.selectedName = name;
+    this.renamedCustomName = '';  // Reset renamed value when type changes
+    this.isRenamingEntry = false;  // Reset rename mode
     if (name === 'Custom') {
       this.savingsForm.addControl(
         'customName',
         new FormControl('', [Validators.required])
       );
       this.savingsForm.updateValueAndValidity();
-      this.renamedCustomName = ''; // Reset on new custom selection
       this.selectedNameIconUrl = 'custom-option-icon'
     } else {
       this.savingsForm.removeControl('customName');
       this.savingsForm.updateValueAndValidity();
-      this.renamedCustomName = ''; // Reset when switching away
 
       const cusEvent = this.savingPotValues.find(
         (customEvent) => customEvent.name === name
@@ -377,9 +432,34 @@ onAmountBlur(e: Event) {
     }
   }
 
-  isLockPotChanged(event: any) {
-    console.log(event);
+  toggleRenameEntry(): void {
+    this.isRenamingEntry = !this.isRenamingEntry;
+    if (this.isRenamingEntry) {
+      // Initialize with current custom name
+      this.renamedCustomName = this.savingsForm.get('customName')?.value || '';
+      // Auto-focus and select text for rename input
+      setTimeout(() => {
+        if (this.renameInputRef) {
+          this.renameInputRef.nativeElement.focus();
+          this.renameInputRef.nativeElement.select();
+        }
+      }, 0);
+    }
+  }
 
+  saveRenamedEntry(): void {
+    const currentValue = this.savingsForm.get('customName')?.value?.trim();
+    if (currentValue) {
+      this.renamedCustomName = currentValue;
+      this.isRenamingEntry = false;
+      // Update the dialog title if it's in edit mode
+      if (this.isEditWorkflow) {
+        this.editDialogTitle = `Edit ${currentValue}`;
+      }
+    }
+  }
+
+  isLockPotChanged(event: any) {
     if (event) {
       this.savingsForm.get('start')?.setValidators(Validators.required);
       this.savingsForm.get('start')?.updateValueAndValidity();
@@ -398,7 +478,6 @@ onAmountBlur(e: Event) {
   }
 
   isCommissionsChanged(event: any) {
-    console.log(event);
     this.isAddComissionChecked = event;
     this.savingsForm
     .get('commissionType')
@@ -439,7 +518,6 @@ onAmountBlur(e: Event) {
       this.savingsForm.get('commissionCycle')?.updateValueAndValidity();
       this.savingsForm.get('escalationRate')?.updateValueAndValidity();
     } else {
-      console.log('1');
       this.savingsForm
         .get('commissionCurrency')
         ?.removeValidators(Validators.required);
@@ -548,9 +626,6 @@ onEscalationRateChange(event: MatSelectChange): void {
   }
 
   saveCashflow(): void {
-    console.log(this.savingsForm);
-    // console.log(this.savingsForm.get('name')?.value == null , this.savingsForm.get('customName')?.value != null,
-    //     this.savingsForm.get('customName')?.value == 'Cash');
     this.savingsForm.markAllAsTouched();
     const isCustomEscalation = this.selectedEscalationDescription === 'Increases at custom rate';
     const selectedEscalationRateValue = isCustomEscalation
@@ -562,26 +637,11 @@ onEscalationRateChange(event: MatSelectChange): void {
     : 0;
     const isPotLocked = this.savingsForm.get('lockPot')?.value;
     if (this.savingsForm.valid) {
-      // Before building clientSaving, ensure renamed custom name is in the form control
-      if (this.renamedCustomName && this.savingsForm.get('customName')) {
-        this.savingsForm.get('customName')?.setValue(this.renamedCustomName, { emitEvent: false });
-      }
-      
-      // Get the custom name - use renamed value if available, otherwise form control or selectedPot
-      let customName = '';
-      if (this.renamedCustomName) {
-        customName = this.renamedCustomName;
-      } else if (this.savingsForm.get('customName')) {
-        customName = this.savingsForm.get('customName')?.value || '';
-      } else if (this.isEditWorkflow && this.selectedPot && !this.savingPotValues.find(x => x.name === this.selectedPot.name)) {
-        customName = this.selectedPot.name;
-      }
-
       var clientSaving: ClientSaving = {
         id: this.isEditWorkflow ? this.selectedPot.id : null,
         name: this.savingsForm.get('name')?.value !== 'Custom'
         ? this.savingsForm.get('name')?.value
-        : customName,
+        : this.savingsForm.get('customName')?.value,
         isGrowing: false,
         nominalValue: 0,
         realValue: 0,
@@ -710,12 +770,33 @@ onEscalationRateChange(event: MatSelectChange): void {
         // realReturn: this.savingsForm.get('name')?.value !== 'Cash' ?
         //   this.savingsForm.get('returnRate')?.value - this.inflationRate : 0,
         realReturn: real,
+        // Pension Fund specific fields
+        contributionAmount: this.savingsForm.get('name')?.value === 'Pension Fund' 
+          ? this.savingsForm.get('contributionAmount')?.value 
+          : null,
+        contributionFrequency: this.savingsForm.get('name')?.value === 'Pension Fund'
+          ? this.savingsForm.get('contributionFrequency')?.value
+          : null,
+        contributionStartDate: this.savingsForm.get('name')?.value === 'Pension Fund'
+          ? {
+              year: this.savingsForm.get('contributionStartDate')?.value,
+              age: (this.savingsForm.get('contributionStartDate')?.value || 0) - this.clientBirthYear
+            }
+          : null,
+        contributionEndDate: this.savingsForm.get('name')?.value === 'Pension Fund'
+          ? {
+              year: this.savingsForm.get('contributionEndDate')?.value,
+              age: (this.savingsForm.get('contributionEndDate')?.value || 0) - this.clientBirthYear
+            }
+          : null,
+        retirementAge: this.savingsForm.get('name')?.value === 'Pension Fund'
+          ? this.retirementAge
+          : null
       };
-      console.log(clientSaving);
-      // Use POST for create, PUT for edit
-      var function$ = !this.isEditWorkflow ? 
-        this.savingPotsHttpService.addNewSavingPot(this.cashflowId, clientSaving) :
-        this.savingPotsHttpService.updateSavingPot(this.cashflowId, clientSaving);
+      const function$ = !this.isEditWorkflow ? this.savingPotsHttpService
+      .addNewSavingPot(this.cashflowId, clientSaving) :
+      this.savingPotsHttpService
+        .addNewSavingPot(this.cashflowId, clientSaving)
 
       function$
         .pipe(
@@ -731,11 +812,6 @@ onEscalationRateChange(event: MatSelectChange): void {
             savingPot: res,
           });
         });
-
-      console.log('Form Submitted', this.savingsForm.value);
-      // Handle form submission logic
-    } else {
-      console.log('Form is invalid');
     }
   }
 

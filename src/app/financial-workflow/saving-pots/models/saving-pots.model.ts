@@ -47,6 +47,12 @@ export interface ClientSaving {
   hasCommission: boolean;
   comission: Comission;
   orderNumber: number;
+  customName?: string | null;
+  contributionAmount?: number | null;
+  contributionFrequency?: number | null;
+  contributionStartDate?: AgeYear | null;
+  contributionEndDate?: AgeYear | null;
+  retirementAge?: number | null;
 }
 
 export enum SavingPotType
