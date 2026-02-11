@@ -251,7 +251,7 @@ export class AddEventDialogComponent {
           start: [moment(this.dropTime).year(), Validators.required],
           end: [0, Validators.required],
           escalationRate: [this.escalationRates[0].value, Validators.required],
-          customEscalationRate: [0]
+          customEscalationRate: ['']
         });
         break;
 
@@ -274,7 +274,7 @@ export class AddEventDialogComponent {
           resalePrice: [0],
           cycle: ['One-off'],
           escalationRate: [0],
-          customEscalationRate: [0]
+          customEscalationRate: ['']
         });
 
         this.hideEventType = true;
@@ -300,7 +300,7 @@ export class AddEventDialogComponent {
           start: [null, Validators.required],
           end: [0, Validators.required],
           escalationRate: [this.escalationRates[0].value, Validators.required],
-          customEscalationRate: [0]
+          customEscalationRate: ['']
 
         });
         this.onCycleValueChange('One-off');
