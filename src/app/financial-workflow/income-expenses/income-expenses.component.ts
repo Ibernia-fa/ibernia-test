@@ -177,6 +177,9 @@ export class IncomeExpensesComponent {
   }
 
   updateIncomeClicked(item: FinancialViewModel) {
+    if(item.description == "Pension Fund")
+      return;
+    
     this.setIncomeType();
     const dialogRef = this.dialog.open(AddIncomeComponent, {
       width: '700px',
@@ -201,6 +204,9 @@ export class IncomeExpensesComponent {
   }
 
   updateExpenseClicked(item: FinancialViewModel) {
+    if(item.description == "Insurance")
+      return;
+
     this.setExpenseType();
 
     const dialogRef = this.dialog.open(AddExpenseComponent, {

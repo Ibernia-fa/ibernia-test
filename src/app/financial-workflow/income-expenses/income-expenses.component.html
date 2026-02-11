@@ -51,7 +51,9 @@
                                         <div
                                             class="d-flex justify-content-between align-items-center gap-12 dragable-card-wrapper">
                                             <div
-                                                class="dragable-card d-flex align-items-center justify-content-between cursor-pointer">
+                                                class="dragable-card d-flex align-items-center justify-content-between cursor-pointer"
+                                                (click)="updateIncomeClicked(income)"
+                                            >
                                                 <div class="d-flex align-items-center gap-8">
                                                     <div class="stats-main-wrapper">
                                                         <div class="d-flex flex-column gap-8">
@@ -134,7 +136,9 @@
                                                 <div
                                                     class="d-flex justify-content-between align-items-center gap-12 dragable-card-wrapper">
                                                     <div
-                                                        class="dragable-card d-flex align-items-center justify-content-between cursor-pointer">
+                                                        class="dragable-card d-flex align-items-center justify-content-between cursor-pointer"
+                                                        (click)="updateIncomeClicked(income)"
+                                                    >
                                                         <div class="d-flex align-items-center gap-8">
                                                             <div class="stats-main-wrapper">
                                                                 <div class="d-flex flex-column gap-8">
@@ -236,7 +240,9 @@
                                 <div class="d-flex flex-column gap-20">
                                     <div class="flex-column d-flex gap-10" id="drag-boundary">
                                         <div
-                                            class="d-flex justify-content-between align-items-center gap-12 dragable-card-wrapper">
+                                            class="d-flex justify-content-between align-items-center gap-12 dragable-card-wrapper"
+                                            (click)="updateExpenseClicked(expense)"
+                                        >
                                             <div
                                                 class="dragable-card d-flex align-items-center justify-content-between cursor-pointer">
                                                 <div class="d-flex align-items-center gap-8">
@@ -321,7 +327,9 @@
                                                 <div
                                                     class="d-flex justify-content-between align-items-center gap-12 dragable-card-wrapper">
                                                     <div
-                                                        class="dragable-card d-flex align-items-center justify-content-between cursor-pointer">
+                                                        class="dragable-card d-flex align-items-center justify-content-between cursor-pointer"
+                                                        (click)="updateExpenseClicked(expense)"    
+                                                    >
                                                         <div class="d-flex align-items-center gap-8">
                                                             <div class="stats-main-wrapper">
                                                                 <div class="d-flex flex-column gap-8">
