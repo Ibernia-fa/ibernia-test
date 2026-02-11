@@ -314,10 +314,11 @@ export class ViewTimelineChartComponent implements OnInit {
       timeAxis: { scale: 'month', step: 12 },
       format: {
       minorLabels: (date: any) => {
-        const today = new Date(date);
-        const age = this.calculateAgeForTimeline(today, birthDate);
-        return age >= 0 && age <= 100
-          ? `<div id='selected'><p>${age}</p><span>${date.year()}</span></div>`
+        const year = date.year();
+        // Use age-for-year so start year shows 30 and end year shows 60
+        const age = year - birthYear;
+        return year >= forecastStartYear && year <= timelineEndYear
+          ? `<div id='selected'><p>${age}</p><span>${year}</span></div>`
           : '';
       },
       majorLabels: function (date: any) {

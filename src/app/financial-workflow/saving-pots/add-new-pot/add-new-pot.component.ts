@@ -195,7 +195,7 @@ export class AddNewPotComponent {
       // lockPot: [true],
       lockPot: [defaultType === 'Pension Fund'],  // Auto-check for Pension Fund
       start: [data.forecastStartDateYear],
-      end: [data.forecastEndDateYear-1],
+      end: [data.forecastEndDateYear],
       // commissions: [true],
       commissions: [false],
       commissionType: [this.loggedInUserComissionType || 'amount'],
@@ -494,7 +494,7 @@ onAmountBlur(e: Event) {
       this.savingsForm.get('end')?.removeValidators(Validators.required);
       this.savingsForm.get('end')?.updateValueAndValidity();
 
-      this.savingsForm.get('end')?.patchValue(this.forecastEndDateYear-1)
+      this.savingsForm.get('end')?.patchValue(this.forecastEndDateYear)
     }
   }
 
