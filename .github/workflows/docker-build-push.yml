@@ -86,6 +86,7 @@ jobs:
           port: ${{ secrets.SERVER_PORT || 22 }}
           script: |
             set -euo pipefail
+            ENV="${{ steps.vars.outputs.env }}"
             IMAGE="${{ steps.vars.outputs.image }}:${{ steps.vars.outputs.version_tag }}"
             if [ "$ENV" = "prod" ]; then
               NAME="ibernia-app"
