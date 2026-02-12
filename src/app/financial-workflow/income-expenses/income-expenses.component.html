@@ -121,7 +121,7 @@
                                                     </mat-menu>
                                                     <div class="tile-bonus" *ngIf="income.description === 'Salary'">
                                                         <h3 class="saving-title">
-                                                            @if(income.bonus?.amount?.amount ?? 0 == 0)
+                                                            @if(income.bonus?.amount?.amount == 0)
                                                             {
                                                             <span class="paragraph-text">{{'Set bonus' | translate}}</span>
                                                             }
