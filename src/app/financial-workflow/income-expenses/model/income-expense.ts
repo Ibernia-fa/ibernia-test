@@ -25,4 +25,11 @@ export interface FinancialViewModel {
     isDefault: boolean | false;
     isIncomeExpenseSource: boolean | false;
     icon: string;
+    bonus?: Bonus | null;
+}
+
+export interface Bonus {
+  enabled: boolean;
+  amount: NetAmount;
+  bonusDate: AgeYear | null;
 }
