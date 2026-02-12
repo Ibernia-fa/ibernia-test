@@ -3,12 +3,13 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subject, EMPTY } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
-import { catchError, finalize, startWith, takeUntil } from 'rxjs/operators';
+import { catchError, finalize, startWith, switchMap, takeUntil } from 'rxjs/operators';
 import { OnlyPreferanceService, ComissionType, UserProfileDto } from '../services/only-preferance.http.service';
 import { allCountries } from 'src/app/clients/models/country'; 
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { TranslateModule } from '@ngx-translate/core';
+import { LanguageCode, LanguageService } from 'src/app/core/language.service';
 
 @Component({
   selector: 'app-default-preferance',
@@ -23,6 +24,11 @@ export class DefaultPreferanceComponent implements OnInit, OnDestroy {
   isSaving = false;
   submitted = false;
   countries = allCountries;
+  currentLanguage: LanguageCode = 'en';
+  readonly languages: { label: string; value: LanguageCode }[] = [
+    { label: 'English', value: 'en' },
+    { label: 'Italian', value: 'it' },
+  ];
 
   // UI helpers
   comissionTypes = [
@@ -46,6 +52,7 @@ export class DefaultPreferanceComponent implements OnInit, OnDestroy {
       // comissionAmount: [null as number | null],
       currency: ['EUR', [Validators.required]],
       country: ['' as string, [Validators.required]],
+      language: ['en' as LanguageCode, [Validators.required]],
     }),
   });
   user: any;
@@ -56,12 +63,15 @@ ComissionType = ComissionType;
     private toastr: ToastrService,
     private router: Router,
     private Authservice: AuthService,
+    private languageService: LanguageService,
     @Optional() private dialogRef?: MatDialogRef<DefaultPreferanceComponent>,
     @Optional() @Inject(MAT_DIALOG_DATA) public data?: any
   ) {}
 
   ngOnInit(): void {
     this.user = this.Authservice.getUserProfile();
+    this.currentLanguage = this.form.controls.preferences.controls.language.value === 'it' ? 'it' : 'en';
+    this.p.language.setValue(this.currentLanguage);
     // this.form.controls.preferences.controls.comissionType.valueChanges
     //   .pipe(
     //     startWith(this.form.controls.preferences.controls.comissionType.value),
@@ -106,6 +116,11 @@ ComissionType = ComissionType;
     return this.form.controls.preferences.controls;
   }
 
+  onLanguageChange(language: LanguageCode): void {
+    this.currentLanguage = language === 'it' ? 'it' : 'en';
+    this.p.language.setValue(this.currentLanguage);
+  }
+
     clientCountryValueChange(event: any) {
       const selectedCountry = allCountries.find(country => country.countryName === event);
       this.p['currency'].patchValue(selectedCountry?.currencySymbol || '');
@@ -141,6 +156,7 @@ ComissionType = ComissionType;
         //     : intOrNull(raw.preferences.comissionAmount),
         currency: raw.preferences.currency,
         country: blankToNull(raw.preferences.country),
+        language: raw.preferences.language,
       },
     };
 
@@ -148,6 +164,8 @@ ComissionType = ComissionType;
     this.api
       .postUserProfile(payload)
       .pipe(
+        switchMap(() => this.api.updateLanguage(this.user?.sub, raw.preferences.language)),
+        switchMap(() => this.api.getUserProfileResponse(this.user?.sub)),
         takeUntil(this.destroy$),
         catchError((err) => {
           const msg = err?.error?.message ?? 'Failed to save preferences';
@@ -156,7 +174,12 @@ ComissionType = ComissionType;
         }),
         finalize(() => (this.isSaving = false))
       )
-      .subscribe(() => {
+      .subscribe((res) => {
+        this.languageService.use(raw.preferences.language);
+        if (res?.ok && res.body) {
+          this.api.setUserData(res.body);
+        }
+        this.api.notifyProfileChanged();
         this.toastr.success('Preferences saved', 'Success!');
           if (this.dialogRef) {
           this.dialogRef.close(true);
