@@ -171,7 +171,7 @@
               <mat-label class="f-s-16 d-block">Custom escalation rate</mat-label>
               <div class="w-100 form-field custom-rate-input">
                 <input matInput type="number" formControlName="customEscalationRate" placeholder="0" />
-                <span class="custom-rate-suffix">%</span>
+                <img class="custom-rate-suffix" src="assets/images/shapes/percentage.svg" alt="percentage" />
               </div>
               @if(incomeForm.get('customEscalationRate')?.touched &&
               incomeForm.get('customEscalationRate')?.hasError('required')) {
