@@ -71,27 +71,26 @@
             }
             <!-- End Error  -->
           </div>
-
-          @if (
-            savingsForm.get('name')?.value === 'Custom' &&
-            savingsForm.get('customName') &&
-            (!isEditWorkflow || showNameEdit)
-          ) {
-            <div class="w-100 form-field gap-12">
-              <mat-label class="f-s-16 d-block" style="line-height: 18px">Name</mat-label>
-              @if (savingsForm.get('customName')) {
-                <input matInput formControlName="customName" />
-              } @else {
-                <input matInput placeholder="Enter name" />
-              }
-              @if (
-                savingsForm.get('customName')?.touched &&
-                savingsForm.get('customName')?.hasError('required')
-              ) {
-                <span class="field-error d-block">{{ 'Required' | translate }}</span>
-              }
-            </div>
-          }
+        }
+        @if (
+          savingsForm.get('name')?.value === 'Custom' &&
+          savingsForm.get('customName') &&
+          (!isEditWorkflow || showNameEdit)
+        ) {
+          <div class="w-100 form-field gap-12">
+            <mat-label class="f-s-16 d-block" style="line-height: 18px">Name</mat-label>
+            @if (savingsForm.get('customName')) {
+              <input matInput formControlName="customName" />
+            } @else {
+              <input matInput placeholder="Enter name" />
+            }
+            @if (
+              savingsForm.get('customName')?.touched &&
+              savingsForm.get('customName')?.hasError('required')
+            ) {
+              <span class="field-error d-block">{{ 'Required' | translate }}</span>
+            }
+          </div>
         }
         <!--End  Name Field  -->
 
