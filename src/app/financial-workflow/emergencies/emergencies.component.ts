@@ -176,7 +176,6 @@ export class EmergenciesComponent implements OnInit {
                   update.emergency.coverageAdequacy = res.coverageAdequacy;
                   this.cdr.markForCheck();
                 }),
-                tap(() => this.refreshEmergencies$.next()),
                 catchError((err) => {
                   console.error(err);
                   this.toastr.error('Failed to update coverage adequacy', 'Error');
@@ -350,6 +349,24 @@ export class EmergenciesComponent implements OnInit {
     }
 
     return `assets/images/svgs/${this.iconMap[key] ?? this.defaultIcon}`;
+  }
+
+  /** Computes protection score from current emergencies (mirrors backend logic) for instant updates when adequacy changes. */
+  get computedProtectionScore(): number | null {
+    const visible = this.emergencies?.filter(e => !e.isHidden) ?? [];
+    if (visible.length === 0) return null;
+
+    const scores = visible.map(e => {
+      if (e.type === 2) return e.willStatus === 1 ? 100 : 0;
+      if (e.policyStatus === 2) return 0;
+      switch (e.coverageAdequacy) {
+        case 1: return 100 / 3;
+        case 2: return 200 / 3;
+        case 3: return 100;
+        default: return 0;
+      }
+    });
+    return Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
   }
 
   getProtectionScoreCssClass(score: number | null): string {
