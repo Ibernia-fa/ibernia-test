@@ -74,6 +74,7 @@ export class AddExpenseComponent {
   expenseIcon: string;
   customDescriptionAutoRenamed: string;
   showNameEdit: boolean = false;
+  forecastEndYear: number;
 
   constructor(
     private dialogRef: MatDialogRef<AddExpenseComponent>,
@@ -113,6 +114,8 @@ export class AddExpenseComponent {
       const element = data.forecastStartDateYear + index;
       this.years.push(element);
     }
+
+    this.forecastEndYear = this.data.forecastEndDateYear;
 
     this.expenseForm = this.fb.group({
       description: [this.selectedExpense?.description, Validators.required],
@@ -447,6 +450,8 @@ export class AddExpenseComponent {
   onExpenseTypeChange(value: string): void {
     const descriptionCtrl = this.expenseForm.get('description');
 
+    if (!descriptionCtrl) return;
+
     this.isNameEditable = false;
     this.isDefaultExpense = false;
 
@@ -495,6 +500,11 @@ export class AddExpenseComponent {
     this.isNameEditable = !!config.editableName;
     this.isDefaultExpense = !!config.isDefault;
 
+    // apply default start and end dates
+    if (!this.isEditWorkflow) {
+      this.applyDefaultStartEnd(value);
+    }
+
     if (this.isEditWorkflow) {
       if (this.selectedExpense?.description != undefined) {
         descriptionCtrl.setValue(this.selectedExpense?.description, { emitEvent: true });
@@ -518,5 +528,28 @@ export class AddExpenseComponent {
 
   toggleNameEdit() {
     this.showNameEdit = !this.showNameEdit;
+  }
+
+  private applyDefaultStartEnd(expenseType: string): void {
+    const startCtrl = this.expenseForm.get('start');
+    const endCtrl = this.expenseForm.get('end');
+
+    if (!startCtrl || !endCtrl) return;
+
+    switch (expenseType) {
+      case 'Living costs':
+      case 'Housing':
+        startCtrl.setValue(this.currentYear);
+        endCtrl.setValue(this.forecastEndYear);
+        break;
+
+      default:
+        startCtrl.reset();
+        endCtrl.reset();
+        break;
+    }
+
+    startCtrl.updateValueAndValidity();
+    endCtrl.updateValueAndValidity();
   }
 }

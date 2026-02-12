@@ -544,7 +544,7 @@ onAmountBlur(e: Event) {
       this.savingsForm.get('end')?.removeValidators(Validators.required);
       this.savingsForm.get('end')?.updateValueAndValidity();
 
-      this.savingsForm.get('end')?.patchValue(this.forecastEndDateYear-1)
+      this.savingsForm.get('end')?.patchValue(this.forecastEndDateYear)
     }
   }
 
