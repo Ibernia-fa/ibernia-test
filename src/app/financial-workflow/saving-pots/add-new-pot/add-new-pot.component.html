@@ -138,6 +138,9 @@
           ) {
             <span class="field-error d-block">{{ 'Required' | translate }}</span>
           }
+          @if (savingsForm.get('amount')?.touched && savingsForm.get('amount')?.hasError('minPositiveValue')) {
+            <span class="field-error d-block">{{ 'Must be greater than 0' | translate }}</span>
+          }
           <!-- ENd Error   -->
         </div>
         <!-- End Starting pot value Field  -->
@@ -205,7 +208,7 @@
             <!-- Contribution Amount Field - Matched to "Net amount" layout -->
             <div class="d-flex flex-column gap-4 net-fields">
               <div class="d-flex flex-column gap-8">
-                <mat-label class="f-s-16 d-block" style="line-height: 18px">{{ 'Net amount' | translate }}</mat-label>
+                <mat-label class="f-s-16 d-block" style="line-height: 18px">{{ 'Contribution net amount' | translate }}</mat-label>
 
                 <div class="net-field d-flex align-items-center">
                   <!-- Currency Selector  -->
@@ -241,6 +244,14 @@
                   <!-- End Frequency Field  -->
                 </div>
               </div>
+              <!-- Error message for contribution amount -->
+              @if (
+                savingsForm.get('contributionAmount')?.touched &&
+                (savingsForm.get('contributionAmount')?.hasError('required') ||
+                savingsForm.get('contributionAmount')?.hasError('minPositiveValue'))
+              ) {
+                <span class="field-error d-block">{{ 'Required - must be greater than 0' | translate }}</span>
+              }
             </div>
 
             <!-- Start & End Date -->
@@ -295,6 +306,13 @@
                     </div>
                   </div>
                 </div>
+                <!-- Error messages for dates -->
+                @if (savingsForm.get('contributionStartDate')?.touched && savingsForm.get('contributionStartDate')?.hasError('required')) {
+                  <span class="field-error d-block">{{ 'Start date is required' | translate }}</span>
+                }
+                @if (savingsForm.get('contributionEndDate')?.touched && savingsForm.get('contributionEndDate')?.hasError('required')) {
+                  <span class="field-error d-block">{{ 'End date is required' | translate }}</span>
+                }
               </div>
             </div>
           </div>
