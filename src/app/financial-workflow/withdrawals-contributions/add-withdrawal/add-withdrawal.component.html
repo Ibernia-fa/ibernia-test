@@ -3,7 +3,14 @@
   <div class="d-flex flex-column gap-32">
     <!-- Modal Header  -->
     <div class="d-flex align-items-center justify-content-between gap-10 modal-header">
-      <h3>{{isEditWorkflow ? 'Edit' : 'Add'}} Withdrawal</h3>
+      <div class="d-flex align-items-center gap-8">
+        <h3>{{ dialogTitle }}</h3>
+        @if (isEditWorkflow && !showDescriptionField) {
+        <button type="button" (click)="showDescriptionEditor()">
+          <mat-icon>edit</mat-icon>
+        </button>
+        }
+      </div>
       <button (click)="closeDialog()" type="button">
         <img src="assets/images/svgs/close-line-cion.svg" alt="close-line-cion" />
       </button>
@@ -35,6 +42,7 @@
           </div>
         </div>
 
+        @if (!isEditWorkflow || showDescriptionField) {
         <div class="w-100 form-field gap-8">
           <mat-label class="f-s-16 d-block" style="line-height: 18px">{{ 'Description' | translate }}</mat-label>
           <input matInput formControlName="description" placeholder="e.g. Monthly living expenses" />
@@ -43,6 +51,7 @@
           <span class="field-error d-block">{{'Required' | translate}}</span>
           }
         </div>
+        }
 
         <!-- Net Amount Field  -->
         <div class="d-flex flex-column gap-4 net-fields">

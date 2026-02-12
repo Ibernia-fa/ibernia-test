@@ -189,26 +189,26 @@ export class AddNewPotComponent {
     this.savingsForm = this.fb.group({
       name: [defaultType, Validators.required],
       currency: [this.clientPreferredCurrency, Validators.required],
-      amount: ['', [Validators.required, Validators.min(0)]],
+      amount: ['', [Validators.required, this.minPositiveValue()]],
       customName: [''],  // For Custom pots
       returnRate: [this.userReturnRate],
       // lockPot: [true],
       lockPot: [defaultType === 'Pension Fund'],  // Auto-check for Pension Fund
-      start: [data.forecastStartDateYear],
-      end: [data.forecastEndDateYear],
-      // commissions: [true],
-      commissions: [false],
+      start: [data.forecastStartDateYear, Validators.required],
+      end: [data.forecastEndDateYear-1, Validators.required],
+      // For Pension Fund, auto-check commissions if defaults exist
+      commissions: [defaultType === 'Pension Fund' && (this.loggedInUserPreferences?.comissionAmount || this.loggedInUserPreferences?.comissionPercentage)],
       commissionType: [this.loggedInUserComissionType || 'amount'],
       commissionCurrency: [this.clientPreferredCurrency],
       commissionAmount: [this.loggedInUserPreferences?.comissionAmount || 0],
-      commissionCycle: [''],
-      commissionPercentageCurrency: [''],
-      commissionPercentageCycle: [this.cycles[2].id],
+      commissionCycle: [this.loggedInUserPreferences?.comissionCycle || this.cycles[2]?.id],
+      commissionPercentageCurrency: [this.clientPreferredCurrency],
+      commissionPercentageCycle: [this.loggedInUserPreferences?.comissionPercentageCycle || this.cycles[2]?.id],
       commissionPercentage: [this.loggedInUserPreferences?.comissionPercentage || 0],
       escalationRate: [''],
       customEscalationRate: [''],
       // Pension Fund specific fields
-      contributionAmount: ['', [Validators.min(0)]],
+      contributionAmount: [''],
       contributionFrequency: [1],  // Monthly (1) by default
       contributionStartDate: [data.forecastStartDateYear],  // This year
       contributionEndDate: [this.retirementAge]  // Retirement year
@@ -230,6 +230,10 @@ export class AddNewPotComponent {
     amountControl?.valueChanges.subscribe((value) => {
       this.amount = (value ?? null) as number | null;
     });
+    
+    // Set up initial validators for Pension Fund fields if default type is Pension Fund
+    this.updatePensionFundValidators(defaultType);
+    
     if(this.isEditWorkflow) {
       this.isCashPotEditMode = (this.selectedPot?.name ?? '').trim().toLowerCase() === 'cash';
       this.patchFormValues();
@@ -242,6 +246,18 @@ export class AddNewPotComponent {
     }
   }
 
+
+  // Custom validator to ensure value is greater than 0
+  minPositiveValue(): ValidatorFn {
+    return (control: AbstractControl) => {
+      const value = control.value;
+      if (value === null || value === '' || value === undefined) {
+        return null; // Let Validators.required handle empty values
+      }
+      const numValue = typeof value === 'string' ? parseFloat(value) : value;
+      return numValue > 0 ? null : { minPositiveValue: { value: control.value } };
+    };
+  }
 
   onAmountFocus(e: Event) {
   // show raw (no commas) while typing
@@ -435,6 +451,7 @@ onAmountBlur(e: Event) {
     this.selectedName = name;
     this.renamedCustomName = '';  // Reset renamed value when type changes
     this.isRenamingEntry = false;  // Reset rename mode
+    
     if (name === 'Custom') {
       this.savingsForm.addControl(
         'customName',
@@ -451,6 +468,39 @@ onAmountBlur(e: Event) {
       );
       this.selectedNameIconUrl = cusEvent?.iconUrl ?? '';
     }
+    
+    // Update Pension Fund field validators based on type
+    this.updatePensionFundValidators(name);
+  }
+  
+  // Update validators for Pension Fund specific fields
+  private updatePensionFundValidators(potType: string): void {
+    const contributionAmountControl = this.savingsForm.get('contributionAmount');
+    const contributionStartControl = this.savingsForm.get('contributionStartDate');
+    const contributionEndControl = this.savingsForm.get('contributionEndDate');
+    const commissionsControl = this.savingsForm.get('commissions');
+    
+    if (potType === 'Pension Fund') {
+      // Make Pension Fund fields required
+      contributionAmountControl?.setValidators([Validators.required, this.minPositiveValue()]);
+      contributionStartControl?.setValidators([Validators.required]);
+      contributionEndControl?.setValidators([Validators.required]);
+      
+      // Auto-check commissions checkbox and populate fields if defaults exist
+      if (this.loggedInUserPreferences?.comissionAmount || this.loggedInUserPreferences?.comissionPercentage) {
+        commissionsControl?.setValue(true, { emitEvent: false });
+        this.isAddComissionChecked = true;
+      }
+    } else {
+      // Clear validators for non-Pension Fund types
+      contributionAmountControl?.setValidators([]);
+      contributionStartControl?.setValidators([]);
+      contributionEndControl?.setValidators([]);
+    }
+    
+    contributionAmountControl?.updateValueAndValidity();
+    contributionStartControl?.updateValueAndValidity();
+    contributionEndControl?.updateValueAndValidity();
   }
 
   toggleRenameEntry(): void {

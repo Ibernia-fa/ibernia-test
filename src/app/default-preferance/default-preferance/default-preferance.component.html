@@ -31,7 +31,7 @@
                     <mat-error *ngIf="p.country.hasError('required')">{{'Required' | translate}}</mat-error>
         </mat-form-field>
       </div> 
-       <div class="col-6">
+      <div class="col-6">
         <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">Default currency
          <img src="assets/images/svgs/help-circle-icon.svg"
              alt="help-circle-icon"
@@ -54,7 +54,25 @@
         </mat-form-field>
       </div>
 
-           <div class="col-6">
+      <div class="col-6">
+        <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">Language
+          <img src="assets/images/svgs/help-circle-icon.svg"
+               alt="help-circle-icon"
+               width="18"
+               class="m-l-4 cursor-pointer"
+               matTooltip="Sets your app language. You can switch anytime from the header.">
+        </mat-label>
+        <mat-form-field appearance="outline" class="w-full w-100">
+          <mat-select formControlName="language" (selectionChange)="onLanguageChange($event.value)">
+            @for (lang of languages; track lang.value) {
+              <mat-option [value]="lang.value">{{ lang.label }}</mat-option>
+            }
+          </mat-select>
+          <mat-error *ngIf="p.language.invalid">{{'Required' | translate}}</mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="col-6">
         <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">Default inflation rate 
 
              <img src="assets/images/svgs/help-circle-icon.svg"

@@ -49,7 +49,7 @@
                 <div class="d-flex align-items-center gap-8">
                   <h3 class="card-title expenses-total"><img width="24" src="/assets/images/svgs/gauge.png" alt="chart" /> Protection score</h3>
                 </div>
-                <h3 class="saving-title" [ngClass]="getProtectionScoreCssClass(s.emergenciesStats?.protectionScore)"> {{s.emergenciesStats?.protectionScore}}/100</h3>
+                <h3 class="saving-title" [ngClass]="getProtectionScoreCssClass(computedProtectionScore ?? s.emergenciesStats?.protectionScore)"> {{computedProtectionScore ?? s.emergenciesStats?.protectionScore}}/100</h3>
               </div>
             </div>
 
