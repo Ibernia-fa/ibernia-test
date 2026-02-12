@@ -85,13 +85,32 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: ${{ secrets.SERVER_PORT || 22 }}
           script: |
-            set -e
+            set -euo pipefail
             IMAGE="${{ steps.vars.outputs.image }}:${{ steps.vars.outputs.version_tag }}"
-            NAME="ibernia-app"
+            if [ "$ENV" = "prod" ]; then
+              NAME="ibernia-app"
+              PORT="8082"
+              DEPLOY_DIR="/opt/ibernia/prod"
+            else
+              NAME="ibernia-app-dev"
+              PORT="8085"
+              DEPLOY_DIR="/opt/ibernia/dev"
+            fi
+
+            echo "Deploying ENV=$ENV NAME=$NAME PORT=$PORT IMAGE=$IMAGE"
+
+            sudo mkdir -p "$DEPLOY_DIR"
 
             docker pull "$IMAGE"
             docker stop "$NAME" || true
             docker rm "$NAME" || true
-            docker run -d -p 8082:80 --name "$NAME" "$IMAGE"
+
+            docker run -d \
+              --restart unless-stopped \
+              -p "${PORT}:80" \
+              --name "$NAME" \
+              "$IMAGE"
+
+            echo "$IMAGE" | sudo tee "${DEPLOY_DIR}/DEPLOYED_VERSION.txt" >/dev/null
+
             docker image prune -f
-            echo "$IMAGE" > DEPLOYED_VERSION.txt
