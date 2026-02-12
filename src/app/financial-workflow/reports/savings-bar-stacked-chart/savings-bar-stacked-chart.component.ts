@@ -31,6 +31,10 @@ export class SavingsBarStackedChartComponent implements OnChanges {
   public chartOptions: any;
   events: TimelineEvent[] = [];
 
+  private getCurrencyAxisTitle(): string {
+    return this.client?.clientDetails?.preferredCurrency ?? '';
+  }
+
   constructor() {
     this.chartOptions = {
       series: [],
@@ -66,33 +70,6 @@ export class SavingsBarStackedChartComponent implements OnChanges {
       dataLabels: {
         enabled: false
       },
-
-      // tooltip: {
-      //   enabled: true,
-      //   shared: false, // or true if you want stacked values together
-      //   custom: (opts: any) => {
-      //     const { series, seriesIndex, dataPointIndex, w } = opts;
-
-      //     const value = series[seriesIndex][dataPointIndex];
-      //     const seriesName = w.globals.seriesNames[seriesIndex];
-      //     const xValue = w.globals.labels[dataPointIndex];
-      //     const color = w.globals.colors[seriesIndex];
-
-      //     const age = [(Math.floor(xValue) - moment(this.client.clientDetails.birthDate).year())]
-      //     return `
-      //     <div class="savings-tooltip">
-      //       <div class="savings-tooltip__header">
-      //         <div>Age: ${age} </div>  <div> Year: ${xValue}</div> 
-      //       </div>
-      //       <div class="savings-tooltip__body">
-      //         <div class="savings-tooltip__label">
-      //             <span class="circle-wrapper" style="background-color: ${color};"></span>${seriesName}:</div>
-      //         <div class="savings-tooltip__value">${value.toLocaleString()}</div>
-      //       </div>
-      //     </div>
-      //   `;
-      //   }
-      // },
       tooltip: {
   enabled: true,
   shared: true,
@@ -200,7 +177,10 @@ export class SavingsBarStackedChartComponent implements OnChanges {
     if (!this.report?.series?.length) {
       if (changes['client'] && this.client) {
         this.chartOptions.yaxis = {
-          title: { text: '' },
+          title: {
+            text: this.getCurrencyAxisTitle(),
+            style: { fontWeight: 500 }
+          },
           labels: {
             formatter: (value: any) => value != null ? Number(value).toLocaleString() : '',
           },
@@ -300,6 +280,13 @@ export class SavingsBarStackedChartComponent implements OnChanges {
       type: 'category',
       categories, // keep years for data mapping; display as age via formatter
       tickAmount,
+      title: {
+        text: 'Age',
+        offsetY: 0,
+        style: {
+          fontWeight: 500
+        }
+      },
       labels: {
         style: { cssClass: 'leftAlign' },
         formatter: (value: string) => {
@@ -313,7 +300,10 @@ export class SavingsBarStackedChartComponent implements OnChanges {
 
     if (changes['client']) {
       this.chartOptions.yaxis = {
-        title: { text: '' },
+        title: {
+          text: this.getCurrencyAxisTitle(),
+          style: { fontWeight: 500 }
+        },
         labels: {
           formatter: (value: any) => value != null ? Number(value).toLocaleString() : '',
         }
