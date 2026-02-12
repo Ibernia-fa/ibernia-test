@@ -351,7 +351,6 @@ export class EmergenciesComponent implements OnInit {
     return `assets/images/svgs/${this.iconMap[key] ?? this.defaultIcon}`;
   }
 
-  /** Computes protection score from current emergencies (mirrors backend logic) for instant updates when adequacy changes. */
   get computedProtectionScore(): number | null {
     const visible = this.emergencies?.filter(e => !e.isHidden) ?? [];
     if (visible.length === 0) return null;
