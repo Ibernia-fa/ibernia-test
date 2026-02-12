@@ -49,6 +49,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 })
 export class AddIncomeComponent {
   @ViewChild('amountInput') amountInput?: ElementRef<HTMLInputElement>;
+  @ViewChild('bonusAmountInput') bonusAmountInput?: ElementRef<HTMLInputElement>;
   eventsList: any[] = [];
   incomeForm: FormGroup;
   countries = allCountries;
@@ -155,6 +156,12 @@ export class AddIncomeComponent {
         if (!el || amount === null || amount === undefined || amount === '') return;
         el.value = Number(amount).toLocaleString('en-US');
         el.dispatchEvent(new Event('blur'));
+
+        const elBonusAmountInput = this.bonusAmountInput?.nativeElement;
+        const bonusAmount = this.incomeForm.get('bonusAmount')?.value;
+        if (!elBonusAmountInput || bonusAmount === null || bonusAmount === undefined || bonusAmount === '') return;
+        elBonusAmountInput.value = Number(amount).toLocaleString('en-US');
+        elBonusAmountInput.dispatchEvent(new Event('blur'));
       });
 
       this.incomeForm.get('cycle')?.patchValue(this.selectedIncome.amount.cycle?.id);
@@ -228,7 +235,7 @@ export class AddIncomeComponent {
       this.onIncomeTypeChange(this.incomeTypes[0]);
     }
 
-    if (this.selectedIncome.description == "Salary" && this.selectedIncome?.bonus?.enabled) {
+    if (this.selectedIncome.description == "Salary") {
       this.incomeForm.get('addBonus')?.valueChanges.subscribe(enabled => {
         const bonusAmount = this.incomeForm.get('bonusAmount');
         const bonusCycle = this.incomeForm.get('bonusCycle');
@@ -275,14 +282,13 @@ export class AddIncomeComponent {
         bonusDateCtrl?.updateValueAndValidity();
       });
 
-
       const bonus = this.selectedIncome.bonus;
 
       this.incomeForm.patchValue({
-        addBonus: true,
-        bonusAmount: bonus.amount?.amount ?? 0,
-        bonusCycle: bonus.amount?.cycle?.id ?? this.getYearlyCycleId(),
-        bonusDate: bonus.bonusDate?.year ?? null
+        addBonus: this.selectedIncome?.bonus?.enabled ?? false,
+        bonusAmount: bonus?.amount?.amount ?? 0,
+        bonusCycle: bonus?.amount?.cycle?.id ?? this.getYearlyCycleId(),
+        bonusDate: bonus?.bonusDate?.year ?? null
       }, { emitEvent: false });
 
       this.incomeForm.get('bonusAmount')?.enable();
