@@ -90,6 +90,7 @@ export class AddContributionComponent {
   clientSavings: ClientSaving[] = [];  // <-- bound in template
   private cashPot?: ClientSaving;
   currentYear: number = new Date().getFullYear();
+  showDescriptionField = false;
 
   constructor(
     private dialogRef: MatDialogRef<AddContributionComponent>,
@@ -260,9 +261,22 @@ export class AddContributionComponent {
     this.initializeSavingPotDescriptionAutoFill();
   }
 
+  get dialogTitle(): string {
+    if (!this.isEditWorkflow) {
+      return 'Add Contribution';
+    }
+
+    const description = (this.contributionForm?.get('description')?.value ?? '').toString().trim();
+    return description || 'Edit Contribution';
+  }
+
   // === UI helpers ===
   closeDialog(): void {
     this.dialogRef.close();
+  }
+
+  showDescriptionEditor(): void {
+    this.showDescriptionField = true;
   }
 
   selectContributionType(type: 1 | 2): void {
