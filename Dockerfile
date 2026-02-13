@@ -17,6 +17,13 @@ RUN npm install --legacy-peer-deps
 # Copy the Angular project files
 COPY . .
 
+# Require and show build configuration (fail if not set - avoids accidental production build)
+RUN if [ -z "$NG_BUILD_CONFIGURATION" ]; then \
+      echo "ERROR: NG_BUILD_CONFIGURATION build-arg is required (production or development)"; \
+      exit 1; \
+    fi && \
+    echo "Building Angular with configuration: $NG_BUILD_CONFIGURATION"
+
 # Build the Angular app with the chosen environment
 RUN npm run build -- --configuration=${NG_BUILD_CONFIGURATION} --verbose
 
