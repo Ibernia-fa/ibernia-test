@@ -112,8 +112,7 @@ export class IncomeExpensesComponent {
           this.defaultIncomes = this.incomeExpense.incomes.filter(i => i.isDefault == true && i.isIncomeExpenseSource == true);
           this.defautExpenses = this.incomeExpense.expenses.filter(i => i.isDefault == true && i.isIncomeExpenseSource == true);
           this.incomes = this.incomeExpense.incomes
-            .filter(i => (i.isDefault == false && i.isIncomeExpenseSource == true)
-              || i.description == "Pension Fund");
+            .filter(i => i.isDefault == false && i.isIncomeExpenseSource == true);
           this.expenses = this.incomeExpense.expenses
             .filter(i => (i.isDefault == false && i.isIncomeExpenseSource == true)
               || i.description == "Insurance");
@@ -292,8 +291,7 @@ export class IncomeExpensesComponent {
           this.defaultIncomes = this.incomeExpense.incomes.filter(i => i.isDefault == true && i.isIncomeExpenseSource == true);
           this.defautExpenses = this.incomeExpense.expenses.filter(i => i.isDefault == true && i.isIncomeExpenseSource == true);
           this.incomes = this.incomeExpense.incomes
-            .filter(i => (i.isDefault == false && i.isIncomeExpenseSource == true)
-              || i.description == "Pension Fund");
+            .filter(i => i.isDefault == false && i.isIncomeExpenseSource == true);
           this.expenses = this.incomeExpense.expenses
             .filter(i => (i.isDefault == false && i.isIncomeExpenseSource == true)
               || i.description == "Insurance");
