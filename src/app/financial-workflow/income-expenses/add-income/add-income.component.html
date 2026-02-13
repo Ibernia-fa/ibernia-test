@@ -83,6 +83,75 @@
           </div>
         </div>
 
+        <!-- Bonus -->
+        @if(incomeForm.get('description')?.value === 'Salary') {
+        <div class="d-flex flex-column gap-4 net-fields">
+          <div class="d-flex flex-column gap-8">
+            <mat-checkbox formControlName="addBonus">
+              {{ 'Add bonus' | translate }}
+            </mat-checkbox>
+          </div>
+        </div>
+
+        <div class="d-flex flex-column gap-4 net-fields" *ngIf="incomeForm.get('addBonus')?.value">
+          <div class="d-flex flex-column gap-8">
+            <mat-label class="f-s-16 d-block" style="line-height: 18px">{{ 'Bonus amount' | translate }}</mat-label>
+            <div class="net-field d-flex align-items-center">
+              <div class="left hide-arrow">
+                <mat-select formControlName="currencySymbol" class="sortby-edit-profile" hideSingleSelectionIndicator>
+                  @for (country of countries; track country) {
+                  @if(country.currencySymbol) {
+                  <mat-option [value]="country.currencySymbol">{{country.currencySymbol}}</mat-option>
+                  }
+                  }
+                </mat-select>
+              </div>
+              <div class="w-100 form-field">
+                <input matInput type="text" formControlName="bonusAmount" #bonusAmountInput
+                  [value]="incomeForm.get('bonusAmount')?.value | thousandSeparator" thousandSeparatorInput
+                  (input)="onBonusAmountInput($event.target.value)" placeholder="0" />
+              </div>
+              <div class="right">
+                <mat-select formControlName="bonusCycle" class="sortby-edit-profile" hideSingleSelectionIndicator>
+                  @for (cycle of cycles; let i = $index; track cycle) {
+                  <mat-option [value]="cycle.id">{{ cycle.description }}</mat-option>
+                  }
+                </mat-select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        @if (isBonusOneOff)
+        {
+        <div class="d-flex flex-column gap-4 net-fields">
+          <div class="d-flex flex-column gap-8">
+            <div class="d-flex gap-8 align-items-center">
+              <mat-label class="f-s-16 f-w-400 d-block">Bonus date</mat-label>
+              <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
+            </div>
+
+            <div class="justify-content-between align-items-start flex-nowrap">
+              <div class="w-100">
+                <div class="w-100 form-field">
+                  <div class="select-option">
+                    <mat-select value="Select" formControlName="bonusDate" hideSingleSelectionIndicator>
+                      @for (year of years;let i = $index; track year) {
+                      <mat-option [value]="year">{{ year }} ({{ clientAge + i }})</mat-option>
+                      }
+                    </mat-select>
+                  </div>
+                  @if(incomeForm.get('bonusDate')?.touched && incomeForm.get('bonusDate')?.hasError('required')) {
+                  <span class="field-error d-block">{{'Required' | translate}}</span>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        }
+        }
+
         <div class="start-end">
           <div class="d-flex flex-column gap-8">
             <div class="d-flex gap-8 align-items-center">
@@ -171,7 +240,7 @@
               <mat-label class="f-s-16 d-block">Custom escalation rate</mat-label>
               <div class="w-100 form-field custom-rate-input">
                 <input matInput type="number" formControlName="customEscalationRate" placeholder="0" />
-                <span class="custom-rate-suffix">%</span>
+                <img class="custom-rate-suffix" src="assets/images/shapes/percentage.svg" alt="percentage" />
               </div>
               @if(incomeForm.get('customEscalationRate')?.touched &&
               incomeForm.get('customEscalationRate')?.hasError('required')) {

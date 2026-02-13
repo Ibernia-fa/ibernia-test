@@ -21,6 +21,7 @@ import { catchError, filter } from 'rxjs';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 import { TranslateModule } from '@ngx-translate/core';
 import { CommonModule } from '@angular/common';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @Component({
   selector: 'app-add-income',
@@ -35,6 +36,7 @@ import { CommonModule } from '@angular/common';
     MatSelectModule,
     MatDatepickerModule,
     MatSliderModule,
+    MatCheckboxModule,
     ReactiveFormsModule,
     CommonModule,
     ThousandSeparatorPipe,
@@ -47,6 +49,7 @@ import { CommonModule } from '@angular/common';
 })
 export class AddIncomeComponent {
   @ViewChild('amountInput') amountInput?: ElementRef<HTMLInputElement>;
+  @ViewChild('bonusAmountInput') bonusAmountInput?: ElementRef<HTMLInputElement>;
   eventsList: any[] = [];
   incomeForm: FormGroup;
   countries = allCountries;
@@ -125,7 +128,11 @@ export class AddIncomeComponent {
       start: ['', Validators.required],
       end: [''],
       escalationRate: [this.escalationRates[0].value, Validators.required],
-      customEscalationRate: ['']
+      customEscalationRate: [''],
+      addBonus: [this.selectedIncome?.bonus?.enabled ?? false],
+      bonusAmount: [{ value: this.selectedIncome?.bonus?.amount?.amount ?? 0, disabled: true }],
+      bonusCycle: [this.selectedIncome?.bonus?.amount?.cycle?.id ?? this.getYearlyCycleId()],
+      bonusDate: [this.selectedIncome?.bonus?.bonusDate?.year ?? null]
     });
     this.incomeForm.get('currencySymbol')?.disable();
     this.incomeForm.setValidators(this.endOnOrAfterStartValidator());
@@ -149,6 +156,12 @@ export class AddIncomeComponent {
         if (!el || amount === null || amount === undefined || amount === '') return;
         el.value = Number(amount).toLocaleString('en-US');
         el.dispatchEvent(new Event('blur'));
+
+        const elBonusAmountInput = this.bonusAmountInput?.nativeElement;
+        const bonusAmount = this.incomeForm.get('bonusAmount')?.value;
+        if (!elBonusAmountInput || bonusAmount === null || bonusAmount === undefined || bonusAmount === '') return;
+        elBonusAmountInput.value = Number(amount).toLocaleString('en-US');
+        elBonusAmountInput.dispatchEvent(new Event('blur'));
       });
 
       this.incomeForm.get('cycle')?.patchValue(this.selectedIncome.amount.cycle?.id);
@@ -191,6 +204,23 @@ export class AddIncomeComponent {
         customControl?.setValidators([Validators.required, Validators.min(0)]);
         customControl?.updateValueAndValidity();
       }
+
+      if (this.selectedIncome?.description === 'Salary' && this.selectedIncome?.bonus) {
+        const bonus = this.selectedIncome.bonus;
+        const amount = bonus.amount;
+        const cycle = amount?.cycle;
+
+        this.incomeForm.patchValue({
+          addBonus: bonus.enabled,
+          bonusAmount: amount?.amount ?? 0,
+          bonusCycle: cycle?.id ?? null,
+          bonusDate: bonus.bonusDate?.year ?? null
+        });
+
+        if (this.selectedIncome.bonus.enabled) {
+          this.incomeForm.get('bonusAmount')?.enable();
+        }
+      }
     }
 
     if (this.isEditWorkflow
@@ -203,6 +233,65 @@ export class AddIncomeComponent {
     }
     else {
       this.onIncomeTypeChange(this.incomeTypes[0]);
+    }
+
+    if (this.selectedIncome?.description == "Salary") {
+      this.incomeForm.get('addBonus')?.valueChanges.subscribe(enabled => {
+        const bonusAmount = this.incomeForm.get('bonusAmount');
+        const bonusCycle = this.incomeForm.get('bonusCycle');
+        const bonusDate = this.incomeForm.get('bonusDate');
+
+        if (enabled) {
+          bonusAmount?.enable();
+          bonusAmount?.setValidators([Validators.required, Validators.min(0)]);
+          bonusCycle?.setValidators([Validators.required]);
+        } else {
+          bonusAmount?.reset(0);
+          bonusAmount?.disable();
+          bonusAmount?.clearValidators();
+
+          bonusCycle?.setValue(this.getYearlyCycleId());
+          bonusCycle?.clearValidators();
+
+          bonusDate?.reset(null);
+          bonusDate?.clearValidators();
+        }
+
+        bonusAmount?.updateValueAndValidity();
+        bonusCycle?.updateValueAndValidity();
+        bonusDate?.updateValueAndValidity();
+      });
+
+      this.incomeForm.get('bonusCycle')?.valueChanges.subscribe(cycleId => {
+        const cycle = this.cycles.find(c => c.id === cycleId);
+        const bonusDateCtrl = this.incomeForm.get('bonusDate');
+
+        if (cycle?.description === 'One-off') {
+          bonusDateCtrl?.setValidators([Validators.required]);
+
+          const existingYear = this.selectedIncome?.bonus?.bonusDate?.year;
+
+          if (existingYear) {
+            bonusDateCtrl?.setValue(existingYear, { emitEvent: false });
+          }
+        } else {
+          bonusDateCtrl?.clearValidators();
+          bonusDateCtrl?.setValue(null, { emitEvent: false });
+        }
+
+        bonusDateCtrl?.updateValueAndValidity();
+      });
+
+      const bonus = this.selectedIncome?.bonus;
+
+      this.incomeForm.patchValue({
+        addBonus: this.selectedIncome?.bonus?.enabled ?? false,
+        bonusAmount: bonus?.amount?.amount ?? 0,
+        bonusCycle: bonus?.amount?.cycle?.id ?? this.getYearlyCycleId(),
+        bonusDate: bonus?.bonusDate?.year ?? null
+      }, { emitEvent: false });
+
+      this.incomeForm.get('bonusAmount')?.enable();
     }
 
     this.setIsDefaultIncome();
@@ -264,6 +353,8 @@ export class AddIncomeComponent {
     this.incomeForm.markAsDirty();
 
     if (this.incomeForm.valid) {
+      const isSalary = this.incomeForm.get('description')?.value === 'Salary';
+
       const isCustomEscalation = this.selectedEscalationDescription === 'Increases at custom rate';
       const escalationRateValue = isCustomEscalation
         ? this.incomeForm.get('customEscalationRate')?.value
@@ -318,7 +409,35 @@ export class AddIncomeComponent {
           },
         isDefault: this.isDefaultIncome,
         isIncomeExpenseSource: this.selectedIncome?.isIncomeExpenseSource ?? true,
-        icon: this.incomeIcon
+        icon: this.incomeIcon,
+        bonus: isSalary
+          ? {
+            enabled: this.incomeForm.get('addBonus')?.value,
+            amount: {
+              amount: this.incomeForm.get('bonusAmount')?.value ?? 0,
+              currencySymbol: this.clientPreferredCurrency,
+              cycle: {
+                id: this.incomeForm.get('bonusCycle')?.value,
+                description:
+                  this.cycles.find(x => x.id === this.incomeForm.get('bonusCycle')?.value)?.description ?? ''
+              }
+            },
+            bonusDate:
+              this.cycles.find(x => x.id === this.incomeForm.get('bonusCycle')?.value)?.description === 'One-off'
+                ? {
+                  age: this.incomeForm.get('bonusDate')?.value !== null &&
+                    this.incomeForm.get('bonusDate')?.value !== ''
+                    ? this.incomeForm.get('bonusDate')?.value - this.clientBirthYear
+                    : 0,
+                  year:
+                    this.incomeForm.get('bonusDate')?.value !== null &&
+                      this.incomeForm.get('bonusDate')?.value !== ''
+                      ? this.incomeForm.get('bonusDate')?.value
+                      : 0
+                }
+                : null
+          }
+          : null
       };
 
       var action$ = this.incomeExpenseHttpService.addIncome(
@@ -553,6 +672,24 @@ export class AddIncomeComponent {
 
     startCtrl.updateValueAndValidity();
     endCtrl.updateValueAndValidity();
+  }
+
+  private getYearlyCycleId(): string {
+    return this.cycles.find(c => c.description === 'Every year')?.id ?? '';
+  }
+
+  onBonusAmountInput(rawValue: string) {
+    const value = parseFormattedNumber(rawValue);
+    this.incomeForm.get('bonusAmount')?.setValue(value, { emitEvent: true });
+  }
+
+  get isBonusOneOff(): boolean {
+    const bonusCycleId = this.incomeForm.get('bonusCycle')?.value;
+    if (!bonusCycleId) return false;
+
+    return this.cycles?.some(
+      c => c.id === bonusCycleId && c.description === 'One-off'
+    );
   }
 
 }
