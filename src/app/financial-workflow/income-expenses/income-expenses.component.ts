@@ -63,6 +63,12 @@ export class IncomeExpensesComponent {
   expenses: FinancialViewModel[];
   incomeType: string[] = [];
   expenseType: string[] = [];
+  currentYearIncomeSummary = {
+    totalIncome: 0,
+    totalExpenses: 0,
+    total: 0,
+    savingRate: 0,
+  };
 
   constructor(
     private dialog: MatDialog,
@@ -107,30 +113,7 @@ export class IncomeExpensesComponent {
           this.incomeExpense = incomeExpense;
           this.amountCycles = amountCycles;
           this.escalationRates = escalationRatesResponse?.escalationRates;
-          this.timeline = timeline;
-
-          this.defaultIncomes = this.incomeExpense.incomes
-            .filter(i => i.isDefault == true && i.isIncomeExpenseSource == true)
-            .sort((a, b) => {
-              if (a.description === 'Salary') return -1;
-              if (b.description === 'Salary') return 1;
-              return 0;
-            });
-          this.defautExpenses = this.incomeExpense.expenses
-            .filter(i => i.isDefault == true && i.isIncomeExpenseSource == true)
-            .sort((a, b) => {
-              if (a.description === 'Living costs') return -1;
-              if (b.description === 'Housing') return 1;
-              return 0;
-            });
-
-          this.incomes = this.incomeExpense.incomes
-            .filter(i => (i.isDefault == false && i.isIncomeExpenseSource == true)
-              || i.description == "Pension Fund");
-          this.expenses = this.incomeExpense.expenses
-            .filter(i => (i.isDefault == false && i.isIncomeExpenseSource == true)
-              || i.description == "Insurance");
-
+          this.applyIncomeExpenseData(incomeExpense, timeline);
           this.currency = this.selectedClient.clientDetails?.preferredCurrency ?? "USD";
           this.isLoaderVisible = false;
         })
@@ -304,33 +287,108 @@ export class IncomeExpensesComponent {
           ]);
         }),
         tap(([incomeExpense, timeline]) => {
-          this.incomeExpense = incomeExpense;
-          this.timeline = timeline;
-
-          this.defaultIncomes = this.incomeExpense.incomes
-            .filter(i => i.isDefault == true && i.isIncomeExpenseSource == true)
-            .sort((a, b) => {
-              if (a.description === 'Salary') return -1;
-              if (b.description === 'Salary') return 1;
-              return 0;
-            });
-          this.defautExpenses = this.incomeExpense.expenses
-            .filter(i => i.isDefault == true && i.isIncomeExpenseSource == true)
-            .sort((a, b) => {
-              if (a.description === 'Living costs') return -1;
-              if (b.description === 'Housing') return 1;
-              return 0;
-            });
-
-          this.incomes = this.incomeExpense.incomes
-            .filter(i => (i.isDefault == false && i.isIncomeExpenseSource == true)
-              || i.description == "Pension Fund");
-          this.expenses = this.incomeExpense.expenses
-            .filter(i => (i.isDefault == false && i.isIncomeExpenseSource == true)
-              || i.description == "Insurance");
+          this.applyIncomeExpenseData(incomeExpense, timeline);
         })
       )
       .subscribe();
+  }
+
+  private applyIncomeExpenseData(incomeExpense: IncomeExpense, timeline: FinancialTimeline): void {
+    this.incomeExpense = incomeExpense;
+    this.timeline = timeline;
+
+    this.defaultIncomes = this.incomeExpense.incomes
+      .filter(i => i.isDefault == true && i.isIncomeExpenseSource == true)
+      .sort((a, b) => {
+        if (a.description === 'Salary') return -1;
+        if (b.description === 'Salary') return 1;
+        return 0;
+      });
+    this.defautExpenses = this.incomeExpense.expenses
+      .filter(i => i.isDefault == true && i.isIncomeExpenseSource == true)
+      .sort((a, b) => {
+        if (a.description === 'Living costs') return -1;
+        if (b.description === 'Housing') return 1;
+        return 0;
+      });
+
+    this.incomes = this.incomeExpense.incomes
+      .filter(i => (i.isDefault == false && i.isIncomeExpenseSource == true)
+        || i.description == "Pension Fund");
+    this.expenses = this.incomeExpense.expenses
+      .filter(i => (i.isDefault == false && i.isIncomeExpenseSource == true)
+        || i.description == "Insurance");
+
+    this.updateCurrentYearIncomeSummary();
+  }
+
+  private updateCurrentYearIncomeSummary(): void {
+    const currentYear = new Date().getFullYear();
+
+    const activeIncomes = (this.incomeExpense?.incomes ?? [])
+      .filter((item) => this.isIncludedIncome(item))
+      .filter((item) => this.isHappeningInYear(item, currentYear));
+
+    const activeExpenses = (this.incomeExpense?.expenses ?? [])
+      .filter((item) => this.isIncludedExpense(item))
+      .filter((item) => this.isHappeningInYear(item, currentYear));
+
+    const totalIncome = activeIncomes.reduce(
+      (sum, item) => sum + this.getYearAmount(item),
+      0
+    );
+    const totalExpenses = activeExpenses.reduce(
+      (sum, item) => sum + this.getYearAmount(item),
+      0
+    );
+
+    const total = totalIncome - totalExpenses;
+    const savingRate = totalIncome === 0 ? 0 : total / totalIncome;
+
+    this.currentYearIncomeSummary = {
+      totalIncome,
+      totalExpenses,
+      total,
+      savingRate,
+    };
+
+    this.incomeExpense.totalIncome = totalIncome;
+    this.incomeExpense.totalExpenses = totalExpenses;
+    this.incomeExpense.total = total;
+    this.incomeExpense.savingRate = savingRate;
+  }
+
+  private isIncludedIncome(item: FinancialViewModel): boolean {
+    return item?.isIncomeExpenseSource === true || item?.description === 'Pension Fund';
+  }
+
+  private isIncludedExpense(item: FinancialViewModel): boolean {
+    return item?.isIncomeExpenseSource === true || item?.description === 'Insurance';
+  }
+
+  private isHappeningInYear(item: FinancialViewModel, year: number): boolean {
+    const startYear = Number(item?.start?.year ?? 0);
+    const endYearRaw = Number(item?.end?.year ?? 0);
+    const hasEnd = endYearRaw > 0;
+    const cycleDescription = (item?.amount?.cycle?.description ?? '').toString().toLowerCase();
+    const isOneOff = cycleDescription === 'one-off';
+
+    if (!startYear) return false;
+    if (isOneOff) {
+      return startYear === year;
+    }
+
+    if (year < startYear) return false;
+    if (hasEnd && year > endYearRaw) return false;
+    return true;
+  }
+
+  private getYearAmount(item: FinancialViewModel): number {
+    const baseAmount = Number(item?.amount?.amount ?? 0);
+    const cycleDescription = (item?.amount?.cycle?.description ?? '').toString().toLowerCase();
+
+    if (cycleDescription.includes('month')) return baseAmount * 12;
+    return baseAmount;
   }
 
   trackByIncomeId(index: number, item: FinancialViewModel): string | number {
