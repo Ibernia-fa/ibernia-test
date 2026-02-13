@@ -97,7 +97,7 @@ export class AddEmergenciesComponent {
       currencySymbol: [this.currencySymbol, Validators.required],
       insuranceAmount: [this.insuranceCostTemplate?.amount === 0
     ? null
-    : this.insuranceCostTemplate?.amount ?? null, [Validators.required, Validators.min(0)]],
+    : this.insuranceCostTemplate?.amount ?? null, [Validators.min(0)]],
       insuranceCycleId: [this.insuranceCycles[1]?.id, Validators.required],
       coverageAdequacy: [null, Validators.required],
       coverage: [this.data.emergency?.coverage === 0
@@ -169,7 +169,7 @@ export class AddEmergenciesComponent {
       ? null
       : e.coverage,
       coverageAdequacy: e.coverageAdequacy ?? 2,
-      currencySymbol: e.insuranceCost.currencySymbol,
+      currencySymbol: e.insuranceCost?.currencySymbol ?? this.currencySymbol,
       willStatus: e.willStatus ?? null
     });
 
@@ -220,17 +220,23 @@ export class AddEmergenciesComponent {
       : (form.coverageAdequacy ?? fallbackCoverageAdequacy);
     const coverage = isWill || isUncovered ? 0 : (form.coverage ?? 0);
 
-    const insuranceCost: Money = {
-      currencySymbol: form.currencySymbol,
-      amount: insuranceAmount,
-      cycle: insuranceCycleId ? { id: insuranceCycleId, description: null } : null,
-    };
+    // Insurance cost is optional; send null when empty so API accepts it
+    const insuranceCost: Money | null =
+      isWill
+        ? null
+        : (insuranceAmount != null && insuranceAmount !== '' && Number(insuranceAmount) >= 0
+          ? {
+              currencySymbol: form.currencySymbol,
+              amount: Number(insuranceAmount),
+              cycle: insuranceCycleId ? { id: insuranceCycleId, description: null } : null,
+            }
+          : null);
 
     // CREATE payload
     const createPayload: CreateEmergencyRequest = {
       type,
       policyStatus,
-      insuranceCost,
+      insuranceCost: insuranceCost,
       coverage,
       coverageAdequacy,
       willStatus: type === 2 ? form.willStatus : 1,
@@ -311,19 +317,19 @@ export class AddEmergenciesComponent {
 
     if (isNotCovered || this.isWill) {
       // remove validators when NotCovered (fields hidden)
-      insuranceAmountCtrl.clearValidators();
+      // insuranceAmountCtrl.clearValidators();
       insuranceCycleIdCtrl.clearValidators();
       coverageAdequacyCtrl.clearValidators();
       coverageCtrl.clearValidators();
     } else {
       // re-apply validators when status is Covered (or anything else)
-      insuranceAmountCtrl.setValidators([Validators.required, Validators.min(0)]);
+      // insuranceAmountCtrl.setValidators([Validators.required, Validators.min(0)]);
       insuranceCycleIdCtrl.setValidators([Validators.required]);
       coverageAdequacyCtrl.setValidators([Validators.required]);
       coverageCtrl.setValidators([Validators.required, Validators.min(0)]);
     }
 
-    insuranceAmountCtrl.updateValueAndValidity({ emitEvent: false });
+    // insuranceAmountCtrl.updateValueAndValidity({ emitEvent: false });
     insuranceCycleIdCtrl.updateValueAndValidity({ emitEvent: false });
     coverageAdequacyCtrl.updateValueAndValidity({ emitEvent: false });
     coverageCtrl.updateValueAndValidity({ emitEvent: false });

@@ -68,6 +68,9 @@ export class AddIncomeComponent {
   incomeIcon: string;
   customDescriptionAutoRenamed: string;
   showNameEdit: boolean = false;
+  retirementAge: number;
+  retirementYear: number;
+  forecastEndYear: number;
 
   constructor(
     private dialogRef: MatDialogRef<AddIncomeComponent>,
@@ -108,6 +111,10 @@ export class AddIncomeComponent {
       const element = data.forecastStartDateYear + index;
       this.years.push(element);
     }
+
+    this.retirementAge = this.data.language === 'en' ? 64 : 67;
+    this.retirementYear = this.clientBirthYear + this.retirementAge;
+    this.forecastEndYear = this.data.forecastEndDateYear;
 
     this.incomeForm = this.fb.group({
       description: [this.selectedIncome?.description, Validators.required],
@@ -441,6 +448,7 @@ export class AddIncomeComponent {
 
   onIncomeTypeChange(value: string): void {
     const descriptionCtrl = this.incomeForm.get('description');
+    if (!descriptionCtrl) return;
 
     this.isNameEditable = false;
     this.isDefaultIncome = false;
@@ -490,6 +498,11 @@ export class AddIncomeComponent {
     this.isNameEditable = !!config.editableName;
     this.isDefaultIncome = !!config.isDefault;
 
+    // apply default start and end dates
+    if (!this.isEditWorkflow) {
+      this.applyDefaultStartEnd(value);
+    }
+
     if (this.isEditWorkflow) {
       if (this.selectedIncome?.description != undefined) {
         descriptionCtrl.setValue(this.selectedIncome?.description, { emitEvent: true });
@@ -514,4 +527,32 @@ export class AddIncomeComponent {
   toggleNameEdit() {
     this.showNameEdit = !this.showNameEdit;
   }
+
+  private applyDefaultStartEnd(incomeType: string): void {
+    const startCtrl = this.incomeForm.get('start');
+    const endCtrl = this.incomeForm.get('end');
+
+    if (!startCtrl || !endCtrl) return;
+
+    switch (incomeType) {
+      case 'Salary':
+        startCtrl.setValue(this.currentYear);
+        endCtrl.setValue(this.retirementYear);
+        break;
+
+      case 'State pension':
+        startCtrl.setValue(this.retirementYear);
+        endCtrl.setValue(this.forecastEndYear ?? this.retirementYear);
+        break;
+
+      default:
+        startCtrl.reset();
+        endCtrl.reset();
+        break;
+    }
+
+    startCtrl.updateValueAndValidity();
+    endCtrl.updateValueAndValidity();
+  }
+
 }
