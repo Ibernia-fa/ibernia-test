@@ -235,7 +235,7 @@ export class AddIncomeComponent {
       this.onIncomeTypeChange(this.incomeTypes[0]);
     }
 
-    if (this.selectedIncome.description == "Salary") {
+    if (this.selectedIncome?.description == "Salary") {
       this.incomeForm.get('addBonus')?.valueChanges.subscribe(enabled => {
         const bonusAmount = this.incomeForm.get('bonusAmount');
         const bonusCycle = this.incomeForm.get('bonusCycle');
@@ -282,7 +282,7 @@ export class AddIncomeComponent {
         bonusDateCtrl?.updateValueAndValidity();
       });
 
-      const bonus = this.selectedIncome.bonus;
+      const bonus = this.selectedIncome?.bonus;
 
       this.incomeForm.patchValue({
         addBonus: this.selectedIncome?.bonus?.enabled ?? false,
