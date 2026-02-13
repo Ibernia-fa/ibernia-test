@@ -1,6 +1,10 @@
 # Step 1: Use Node.js to build the Angular app
 FROM node:22.20.0 as build-stage
 
+# Build configuration: "production" (api.ibernia.it) or "development" (api-dev.ibernia.it)
+# Must be passed by CI or at build time: docker build --build-arg NG_BUILD_CONFIGURATION=development
+ARG NG_BUILD_CONFIGURATION
+
 # Set the working directory
 WORKDIR /app
 
@@ -13,8 +17,8 @@ RUN npm install --legacy-peer-deps
 # Copy the Angular project files
 COPY . .
 
-# Build the Angular app
-RUN npm run build --prod --verbose
+# Build the Angular app with the chosen environment
+RUN npm run build -- --configuration=${NG_BUILD_CONFIGURATION} --verbose
 
 # Step 2: Use Nginx to serve the Angular app
 FROM nginx:alpine as production-stage

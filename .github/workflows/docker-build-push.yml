@@ -50,6 +50,13 @@ jobs:
 
           IMAGE="${{ secrets.DOCKERHUB_USERNAME }}/${REPO_LOWER}"
 
+          # Angular build configuration: prod -> production (api.ibernia.it), dev -> development (api-dev.ibernia.it)
+          NG_CONFIG="production"
+          if [[ "$ENVIRONMENT" == "dev" ]]; then
+            NG_CONFIG="development"
+          fi
+          echo "ng_config=${NG_CONFIG}" >> "$GITHUB_OUTPUT"
+
           echo "env=${ENVIRONMENT}" >> "$GITHUB_OUTPUT"
           echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
           echo "image=${IMAGE}" >> "$GITHUB_OUTPUT"
@@ -70,6 +77,8 @@ jobs:
           file: ./Dockerfile
           platforms: linux/amd64
           push: true
+          build-args: |
+            NG_BUILD_CONFIGURATION=${{ steps.vars.outputs.ng_config }}
           tags: |
             ${{ steps.vars.outputs.image }}:${{ steps.vars.outputs.version_tag }}
             ${{ steps.vars.outputs.image }}:${{ steps.vars.outputs.sha_tag }}
@@ -92,10 +101,12 @@ jobs:
               NAME="ibernia-app"
               PORT="8082"
               DEPLOY_DIR="/opt/ibernia/prod"
+              ASPNETCORE_ENVIRONMENT="Production"
             else
               NAME="ibernia-app-dev"
               PORT="8085"
               DEPLOY_DIR="/opt/ibernia/dev"
+              ASPNETCORE_ENVIRONMENT="Development"
             fi
 
             echo "Deploying ENV=$ENV NAME=$NAME PORT=$PORT IMAGE=$IMAGE"
@@ -109,6 +120,7 @@ jobs:
             docker run -d \
               --restart unless-stopped \
               -p "${PORT}:80" \
+              -e ASPNETCORE_ENVIRONMENT="$ASPNETCORE_ENVIRONMENT" \
               --name "$NAME" \
               "$IMAGE"
 
