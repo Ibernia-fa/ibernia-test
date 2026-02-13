@@ -73,7 +73,8 @@ export class AddNewPotComponent {
   clientPreferredCurrency: string;
   clientBirthYear: number;
   clientAge: number;
-  retirementAge: number = 65;
+  retirementAge: number = 65;  // The year when retiring
+  retirementAgeValue: number = 65;  // The age at retirement
   cycles: Cycle[];
   escalationRates: EscalationRate[];
   eventsList: any;
@@ -155,7 +156,8 @@ export class AddNewPotComponent {
       e.name?.toLowerCase().includes('pensione')
     );
     if (retirementEvent) {
-      this.retirementAge = retirementEvent.start.age + this.clientBirthYear;
+      this.retirementAgeValue = retirementEvent.start.age;  // Store the age (e.g., 64)
+      this.retirementAge = retirementEvent.start.age + this.clientBirthYear;  // Store the year
     }
 
     this.clientPreferredCurrency = data.clientPreferredCurrency;
@@ -164,6 +166,11 @@ export class AddNewPotComponent {
     this.selectedPot = data.event
     this.forecastStartDateYear = data.forecastStartDateYear;
     this.forecastEndDateYear = data.forecastEndDateYear;
+
+    // Determine if this is a Cash pot edit mode EARLY (before form creation)
+    if (this.isEditWorkflow) {
+      this.isCashPotEditMode = (this.selectedPot?.name ?? '').trim().toLowerCase() === 'cash';
+    }
 
     // Set edit dialog title if in edit mode
     if (this.isEditWorkflow && this.selectedPot) {
@@ -196,8 +203,8 @@ export class AddNewPotComponent {
       lockPot: [defaultType === 'Pension Fund'],  // Auto-check for Pension Fund
       start: [data.forecastStartDateYear, Validators.required],
       end: [data.forecastEndDateYear-1, Validators.required],
-      // For Pension Fund, auto-check commissions if defaults exist
-      commissions: [defaultType === 'Pension Fund' && (this.loggedInUserPreferences?.comissionAmount || this.loggedInUserPreferences?.comissionPercentage)],
+      // Commissions always start unchecked - user must manually enable
+      commissions: [false],
       commissionType: [this.loggedInUserComissionType || 'amount'],
       commissionCurrency: [this.clientPreferredCurrency],
       commissionAmount: [this.loggedInUserPreferences?.comissionAmount || 0],
@@ -235,9 +242,8 @@ export class AddNewPotComponent {
     this.updatePensionFundValidators(defaultType);
     
     if(this.isEditWorkflow) {
-      this.isCashPotEditMode = (this.selectedPot?.name ?? '').trim().toLowerCase() === 'cash';
       this.patchFormValues();
-    if (this.isCashPotEditMode) {
+      if (this.isCashPotEditMode) {
         // Freeze the Type as Cash and don’t emit changes
         this.savingsForm.get('name')?.setValue('Cash', { emitEvent: false });
         this.savingsForm.get('name')?.disable({ emitEvent: false });
@@ -247,7 +253,7 @@ export class AddNewPotComponent {
   }
 
 
-  // Custom validator to ensure value is greater than 0
+  // Custom validator to ensure value is greater than 0 (or >= 0 for Cash edit mode)
   minPositiveValue(): ValidatorFn {
     return (control: AbstractControl) => {
       const value = control.value;
@@ -255,7 +261,15 @@ export class AddNewPotComponent {
         return null; // Let Validators.required handle empty values
       }
       const numValue = typeof value === 'string' ? parseFloat(value) : value;
-      return numValue > 0 ? null : { minPositiveValue: { value: control.value } };
+      
+      // Allow 0 for Cash pots in edit mode, otherwise require > 0
+      if (this.isCashPotEditMode) {
+        // For Cash edit mode, allow 0 or positive
+        return numValue >= 0 ? null : { minPositiveValue: { value: control.value } };
+      } else {
+        // For all other cases, require > 0
+        return numValue > 0 ? null : { minPositiveValue: { value: control.value } };
+      }
     };
   }
 
@@ -303,6 +317,7 @@ onAmountBlur(e: Event) {
     // --- The rest of fields (unchanged behavior) ---
     this.savingsForm.get('currency')?.patchValue(this.selectedPot.startingPotValue.currencySymbol, { emitEvent: false });
     this.savingsForm.get('amount')?.patchValue(this.selectedPot.startingPotValue.amount, { emitEvent: false });
+    this.savingsForm.get('amount')?.updateValueAndValidity(); // Force re-validation after patching
     this.amount = (this.savingsForm.get('amount')?.value ?? null) as number | null;
     // Ensure thousandSeparatorInput formats the patched value (it formats on blur)
     setTimeout(() => {
@@ -317,8 +332,8 @@ onAmountBlur(e: Event) {
       { emitEvent: false }
     );
     this.savingsForm.get('lockPot')?.patchValue(this.selectedPot.hasPotLocked, { emitEvent: false });
-    this.savingsForm.get('start')?.patchValue(this.selectedPot.lockedFrom?.year, { emitEvent: false });
-    this.savingsForm.get('end')?.patchValue(this.selectedPot.lockedTill?.year, { emitEvent: false });
+    this.savingsForm.get('start')?.patchValue(this.selectedPot.lockedFrom?.year ?? this.forecastStartDateYear, { emitEvent: false });
+    this.savingsForm.get('end')?.patchValue(this.selectedPot.lockedTill?.year ?? (this.forecastEndDateYear - 1), { emitEvent: false });
     
     // Patch Pension Fund specific fields if applicable
     if (this.selectedPot.name === 'Pension Fund') {
@@ -372,6 +387,9 @@ onAmountBlur(e: Event) {
       customControl?.setValidators([Validators.required, Validators.min(0)]);
       customControl?.updateValueAndValidity({ emitEvent: false });
     }
+
+    // Force form to recalculate validity after all patches are applied
+    this.savingsForm.updateValueAndValidity();
   }
 
   ngOnInit() {
@@ -486,11 +504,7 @@ onAmountBlur(e: Event) {
       contributionStartControl?.setValidators([Validators.required]);
       contributionEndControl?.setValidators([Validators.required]);
       
-      // Auto-check commissions checkbox and populate fields if defaults exist
-      if (this.loggedInUserPreferences?.comissionAmount || this.loggedInUserPreferences?.comissionPercentage) {
-        commissionsControl?.setValue(true, { emitEvent: false });
-        this.isAddComissionChecked = true;
-      }
+      // Do NOT auto-check commissions - user must manually enable it
     } else {
       // Clear validators for non-Pension Fund types
       contributionAmountControl?.setValidators([]);
@@ -582,6 +596,20 @@ onAmountBlur(e: Event) {
       this.savingsForm
         .get('escalationRate')
         ?.setValue(this.escalationRates[1].value);
+
+      // Populate commission values from Default Preferences
+      if (this.loggedInUserPreferences?.comissionAmount) {
+        this.savingsForm.get('commissionAmount')?.setValue(this.loggedInUserPreferences.comissionAmount);
+      }
+      if (this.loggedInUserPreferences?.comissionPercentage) {
+        this.savingsForm.get('commissionPercentage')?.setValue(this.loggedInUserPreferences.comissionPercentage);
+      }
+      if (this.loggedInUserPreferences?.comissionCycle) {
+        this.savingsForm.get('commissionCycle')?.setValue(this.loggedInUserPreferences.comissionCycle);
+      }
+      if (this.loggedInUserPreferences?.comissionPercentageCycle) {
+        this.savingsForm.get('commissionPercentageCycle')?.setValue(this.loggedInUserPreferences.comissionPercentageCycle);
+      }
 
       this.savingsForm.get('commissionCurrency')?.updateValueAndValidity();
       this.savingsForm.get('commissionAmount')?.updateValueAndValidity();

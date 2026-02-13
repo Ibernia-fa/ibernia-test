@@ -276,7 +276,11 @@
                           }
                           <hr>
                           @for (year of years; let i = $index; track year) {
-                            <mat-option [value]="year">{{ year }} ({{ clientAge + i }})</mat-option>
+                            @if (year === retirementAge) {
+                              <mat-option [value]="year">{{ 'Retirement age' | translate }} ({{ retirementAgeValue }})</mat-option>
+                            } @else {
+                              <mat-option [value]="year">{{ year }} ({{ clientAge + i }})</mat-option>
+                            }
                           }
                         </mat-select>
                       </div>
@@ -298,7 +302,11 @@
                           }
                           <hr>
                           @for (year of years; let i = $index; track year) {
-                            <mat-option [value]="year">{{ year }} ({{ clientAge + i }})</mat-option>
+                            @if (year === retirementAge) {
+                              <mat-option [value]="year">{{ 'Retirement age' | translate }} ({{ retirementAgeValue }})</mat-option>
+                            } @else {
+                              <mat-option [value]="year">{{ year }} ({{ clientAge + i }})</mat-option>
+                            }
                           }
                         </mat-select>
                       </div>
