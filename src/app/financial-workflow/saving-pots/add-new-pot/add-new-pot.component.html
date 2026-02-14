@@ -22,7 +22,7 @@
         </div>
       }
       @else {
-        <h3>{{ isEditWorkflow ? 'Edit' : 'Add new pot for testing' }} saving pot, investment or pension</h3>
+        <h3>{{ isEditWorkflow ? 'Edit' : 'Add' }} saving pot, investment or pension</h3>
       }
       <button (click)="closeDialog()" type="button">
         <img src="assets/images/svgs/close-line-cion.svg" alt="close-line-cion" />
@@ -597,7 +597,8 @@
       </div>
       <div class="col-5">
         <button (click)="saveCashflow()" type="button" [disabled]="savingsForm.invalid" class="button-icon w-100 d-block">
-          <span class="f-s-16">{{ (isEditWorkflow ? 'Update' : 'Save') | translate }}</span>
+          <!-- <span class="f-s-16">{{ (isEditWorkflow ? 'Save' : 'Save') | translate }}</span> -->
+           <span class="f-s-16">Save</span>
         </button>
       </div>
     </div>
