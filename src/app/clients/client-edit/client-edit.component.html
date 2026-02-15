@@ -1,28 +1,31 @@
 <mat-card class="edit-client-wrapper">
   <mat-card-content>
- 
-    <app-breadcrumb [showBackIcon]="true" [routeForBack]="'/clients/' + clientId + '/profile'" title="{{ 'Edit  client' | translate }}"></app-breadcrumb>
+
+    <app-breadcrumb [showBackIcon]="true" [routeForBack]="backRoute"
+      title="{{ 'Edit  client' | translate }}"></app-breadcrumb>
     <form [formGroup]="clientForm" (ngSubmit)="onSubmit()" class="client-form-wrapper">
       <div class="row justify-content-between">
         <div class="col-4 m-b-20">
           <div class="w-100 form-field">
-            <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{'Client first name' | translate}}</mat-label>
+            <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{'Client first name' |
+              translate}}</mat-label>
             <input matInput placeholder="John " formControlName="firstName" />
             @if(clientForm.get('firstName')?.touched &&
             clientForm.get('firstName')?.hasError('required')) {
             <!-- <mat-error>First Name is required</mat-error> -->
-             <mat-error>{{'Required' | translate}}</mat-error>
+            <mat-error>{{'Required' | translate}}</mat-error>
             }
           </div>
         </div>
-           <div class="col-4 m-b-20">
+        <div class="col-4 m-b-20">
           <div class="w-100 form-field">
-            <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{'Client last name' | translate}}</mat-label>
+            <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{'Client last name' |
+              translate}}</mat-label>
             <input matInput placeholder="Deo" formControlName="lastName" />
-                        @if(clientForm.get('lastName')?.touched &&
+            @if(clientForm.get('lastName')?.touched &&
             clientForm.get('lastName')?.hasError('required')) {
             <!-- <mat-error>Last Name is required</mat-error> -->
-             <mat-error>{{'Required' | translate}}</mat-error>
+            <mat-error>{{'Required' | translate}}</mat-error>
 
             }
           </div>
@@ -31,36 +34,23 @@
           <div class="w-100 form-field">
             <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{
               "Date of birth" | translate
-            }}</mat-label>
+              }}</mat-label>
             <div class="position-relative">
               <!-- [value]="clientDobDisplay" -->
-              <input
-                matInput
-                [matDatepicker]="picker"
-                formControlName="dob"
-                placeholder="DD/MM/YYYY"
-                inputmode="numeric"
-                autocomplete="bday"
-                (input)="onDobTyping(dobInput)"
-                (dateChange)="onCalendarChange($event.value)"
-                #dobInput
-                />
+              <input matInput [matDatepicker]="picker" formControlName="dob" placeholder="DD/MM/YYYY"
+                inputmode="numeric" autocomplete="bday" (input)="onDobTyping(dobInput)"
+                (dateChange)="onCalendarChange($event.value)" #dobInput />
               <div class="date-picker-position">
                 <mat-datepicker-toggle matIconSuffix [for]="picker">
                   <mat-icon matDatepickerToggleIcon>
-                    <img
-                      src="assets/images/svgs/datepicker-icon.svg"
-                      alt="datepicker-icon"
-                    />
+                    <img src="assets/images/svgs/datepicker-icon.svg" alt="datepicker-icon" />
                   </mat-icon>
                 </mat-datepicker-toggle>
               </div>
               <mat-datepicker #picker></mat-datepicker>
             </div>
             <div class="d-flex flex-column gap-1 m-t-4">
-              <span class="f-s-12 text-muted"
-                ></span
-              >
+              <span class="f-s-12 text-muted"></span>
               @if(age !== null) {
               <span class="f-s-12 f-w-500">Age: {{ age }}</span>
               }
@@ -69,7 +59,7 @@
             clientForm.get('dob')?.hasError('required')) {
             <span class="field-error d-block">{{
               "Required" | translate
-            }}</span>
+              }}</span>
             } @if(clientForm.get('dob')?.touched && dobError) {
             <span class="field-error d-block">{{ dobError | translate }}</span>
             }
@@ -115,10 +105,10 @@
               <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Email' | translate }}</mat-label>
               <input matInput placeholder="email@somedomain.com" formControlName="email" />
               @if(clientForm.get('email')?.hasError('email')) {
-                <mat-error>{{'Invalid Email Address' | translate}}</mat-error>
+              <mat-error>{{'Invalid Email Address' | translate}}</mat-error>
               }
               @if(clientForm.get('email')?.touched && clientForm.get('email')?.hasError('required')) {
-                <mat-error>{{'Required' | translate}}</mat-error>
+              <mat-error>{{'Required' | translate}}</mat-error>
               }
             </div>
           </div>
@@ -134,10 +124,10 @@
         </div>
 
         <section class="example-section m-b-20">
-        <mat-checkbox class="example-margin" id="partner-section" [checked]="showPartner"
-              (change)="togglePartnerSection(!showPartner)">{{ 'Add a partner or spouse' | translate }}</mat-checkbox>
-      </section>
-        
+          <mat-checkbox class="example-margin" id="partner-section" [checked]="showPartner"
+            (change)="togglePartnerSection(!showPartner)">{{ 'Add a partner or spouse' | translate }}</mat-checkbox>
+        </section>
+
       </div>
       <!-- <mat-checkbox
         class="example-margin"
@@ -150,7 +140,8 @@
         <div class="row justify-content-between">
           <div class="col-4 m-b-20">
             <div class="w-100 form-field">
-              <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Partner first name' | translate }}</mat-label>
+              <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Partner first name' | translate
+                }}</mat-label>
               <input matInput placeholder="John Deo" formControlName="firstName" />
               @if(clientForm.get('partner.firstName')?.touched &&
               clientForm.get('partner.firstName')?.hasError('required')) {
@@ -160,11 +151,12 @@
               }
             </div>
           </div>
-              <div class="col-4 m-b-20">
+          <div class="col-4 m-b-20">
             <div class="w-100 form-field">
-              <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Partner last name' | translate }}</mat-label>
+              <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Partner last name' | translate
+                }}</mat-label>
               <input matInput placeholder=" Deo" formControlName="lastName" />
-                   @if(clientForm.get('partner.lastName')?.touched &&
+              @if(clientForm.get('partner.lastName')?.touched &&
               clientForm.get('partner.lastName')?.hasError('required')) {
               <!-- <span class="field-error d-block">Last Name is required</span> -->
               <span class="field-error d-block">{{'Required' | translate}}</span>
@@ -174,19 +166,12 @@
           </div>
           <div class="col-4 m-b-20">
             <div class="w-100 form-field">
-              <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Date of birth' | translate }}</mat-label>
+              <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Date of birth' | translate
+                }}</mat-label>
               <div class="position-relative">
-                <input
-                  matInput
-                  [matDatepicker]="partnerPicker"
-                  formControlName="dob"
-                  placeholder="DD/MM/YYYY"
-                  inputmode="numeric"
-                  autocomplete="bday"
-                  (input)="onPartnerDobTyping(dobPartnerInput)"
-                  (dateChange)="onPartnerCalendarChange($event.value)"
-                  #dobPartnerInput
-                />
+                <input matInput [matDatepicker]="partnerPicker" formControlName="dob" placeholder="DD/MM/YYYY"
+                  inputmode="numeric" autocomplete="bday" (input)="onPartnerDobTyping(dobPartnerInput)"
+                  (dateChange)="onPartnerCalendarChange($event.value)" #dobPartnerInput />
                 <!-- <mat-hint>MM/DD/YYYY</mat-hint> -->
                 <div class="date-picker-position">
                   <mat-datepicker-toggle matIconSuffix [for]="partnerPicker">
@@ -198,18 +183,16 @@
                 <mat-datepicker #partnerPicker></mat-datepicker>
               </div>
               <div class="d-flex flex-column gap-1 m-t-4">
-              <span class="f-s-12 text-muted"
-                ></span
-              >
-              @if(partnerAge !== null) {
-              <span class="f-s-12 f-w-500">Age: {{ partnerAge }}</span>
-              }
-            </div>
+                <span class="f-s-12 text-muted"></span>
+                @if(partnerAge !== null) {
+                <span class="f-s-12 f-w-500">Age: {{ partnerAge }}</span>
+                }
+              </div>
               @if(clientForm.get('partner.dob')?.touched &&
               clientForm.get('partner.dob')?.hasError('required')) {
               <span class="field-error d-block">{{
                 "Required" | translate
-              }}</span>
+                }}</span>
               } @if(clientForm.get('partner.dob')?.touched && partnerDobError) {
               <span class="field-error d-block">{{ partnerDobError | translate }}</span>
               }
@@ -241,19 +224,19 @@
       <div class="row">
         <div class="col-12 m-b-20">
           <div class=" form-field">
-          <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Notes' | translate }}</mat-label>
-          <textarea matInput formControlName="notes"></textarea>
+            <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Notes' | translate }}</mat-label>
+            <textarea matInput formControlName="notes"></textarea>
           </div>
         </div>
       </div>
       <div class="row ">
         <div class="col-sm-12 d-flex justify-content-end">
-          <button  class="button-icon" type="submit" [disabled]="isFormInvalid">
-           <span>{{ 'Save' | translate }}</span> 
+          <button class="button-icon" type="submit" [disabled]="isFormInvalid">
+            <span>{{ 'Save' | translate }}</span>
           </button>
         </div>
       </div>
     </form>
-  
+
   </mat-card-content>
 </mat-card>
