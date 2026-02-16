@@ -1,6 +1,7 @@
 export interface ChartSeries {
     series: Array<Series>;
     categories: Array<string>;
+    timelineEvents?: Array<TimelineEvent>;
 }   
 
 export interface Series {
@@ -14,4 +15,10 @@ export interface Series {
 export interface LegendData {
     x: number;
     y: number;
+}
+
+export interface TimelineEvent {
+    name: string;
+    startYear: number;
+    iconUrl: string;
 }

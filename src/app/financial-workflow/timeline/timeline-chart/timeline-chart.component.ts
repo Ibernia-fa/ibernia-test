@@ -568,8 +568,8 @@ export class TimelineChartComponent implements OnInit, OnChanges {
 
   get timelineOptions(): TimelineOptions {
     const birthDate = new Date(this.clientBirthDate);
-    let age = this.calculateAge(birthDate);
     const birthYear = moment(this.clientBirthDate).year();
+    const forecastStartDate = new Date(this.financialTimeline.forecastStartDate);
     const forecastStartYear = moment(this.financialTimeline.forecastStartDate).year();
 
     const timelineEndYear = moment(this.financialTimeline.forecastEndtDate).year();
@@ -608,8 +608,13 @@ export class TimelineChartComponent implements OnInit, OnChanges {
       format: {
         minorLabels: (date: any) => {
           const year = date.year();
-
-          const age = year - birthYear;
+          const age = this.getTimelineLabelAge(
+            year,
+            forecastStartYear,
+            forecastStartDate,
+            birthDate,
+            birthYear
+          );
           return year >= forecastStartYear && year <= timelineEndYear
             ? `<div id='selected'><p>${age}</p><span>${year}</span></div>`
             : '';
@@ -635,6 +640,21 @@ export class TimelineChartComponent implements OnInit, OnChanges {
         return date < midYear ? currentYearStart : nextYearStart;
       }
     };
+  }
+
+  private getTimelineLabelAge(
+    year: number,
+    forecastStartYear: number,
+    forecastStartDate: Date,
+    birthDate: Date,
+    birthYear: number
+  ): number {
+    // First label should reflect the actual current age at forecast start.
+    if (year === forecastStartYear) {
+      return this.calculateAgeForTimeline(forecastStartDate, birthDate);
+    }
+
+    return year - birthYear;
   }
 
   handleEventMoving(item: any, callback: (item: any) => void) {

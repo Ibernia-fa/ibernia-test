@@ -414,6 +414,7 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
 
     const chartHost = this.chartElRef?.nativeElement;
     if (!chartHost) return;
+    const tooltipHost = this.getTooltipHost();
 
     const markers = chartHost.querySelectorAll<SVGElement>('.apexcharts-point-annotation-marker');
 
@@ -424,20 +425,20 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
       const tooltip = document.createElement('div');
       tooltip.className = 'custom-html-tooltip';
       tooltip.innerHTML = annotation.customTooltip;
-      tooltip.style.position = 'absolute';
+      tooltip.style.position = 'fixed';
       tooltip.style.pointerEvents = 'none';
       tooltip.style.display = 'none';
       tooltip.style.whiteSpace = 'nowrap';
       tooltip.style.zIndex = '9999';
-      document.body.appendChild(tooltip);
+      tooltipHost.appendChild(tooltip);
       this.tooltipElements.push(tooltip);
 
       const onMouseEnter = () => {
         const rect = marker.getBoundingClientRect();
         chartHost.classList.add('event-tooltip-active');
         tooltip.style.display = 'block';
-        tooltip.style.left = `${rect.x + window.scrollX - tooltip.offsetWidth / 2 + rect.width / 2}px`;
-        tooltip.style.top = `${rect.y + window.scrollY - tooltip.offsetHeight - 8}px`;
+        tooltip.style.left = `${rect.left - tooltip.offsetWidth / 2 + rect.width / 2}px`;
+        tooltip.style.top = `${rect.top - tooltip.offsetHeight - 8}px`;
       };
 
       const onMouseLeave = () => {
@@ -449,6 +450,11 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
       marker.addEventListener('mouseleave', onMouseLeave);
       this.markerListeners.push({ marker, onMouseEnter, onMouseLeave });
     });
+  }
+
+  private getTooltipHost(): HTMLElement {
+    const fullscreenOverlay = document.querySelector<HTMLElement>('.global-fullscreen-overlay');
+    return fullscreenOverlay ?? document.body;
   }
 
   private cleanupHtmlTooltips(): void {
