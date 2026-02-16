@@ -2,3 +2,27 @@
     text-anchor: start !important;
   }
   
+.apexcharts-tooltip .savings-tooltip__body {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+
+  &:not(:last-child) {
+    margin-bottom: 4px;
+  }
+}
+
+.apexcharts-tooltip .savings-tooltip__label {  
+  font-weight: 500;
+}
+
+.apexcharts-tooltip .savings-tooltip__value {
+  font-weight: 700;
+}
+
+:host ::ng-deep #chart.event-tooltip-active .apexcharts-tooltip {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+  

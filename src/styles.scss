@@ -498,7 +498,6 @@ button {
 }
 
 .savings-tooltip {
-
   background: rgba(255, 255, 255, .96);
   min-width: 170px;
   font-size: 14px !important;
@@ -772,7 +771,6 @@ body:has(.global-fullscreen-overlay) {
 .event-tooltip {
   display: flex;
   align-items: center;
-  margin-bottom: 50px;
   gap: 8px;
   padding: 10px 14px;
   border-radius: 99px;

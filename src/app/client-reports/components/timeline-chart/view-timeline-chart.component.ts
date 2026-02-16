@@ -274,17 +274,11 @@ export class ViewTimelineChartComponent implements OnInit {
 
   get timelineOptions(): TimelineOptions {
     const birthDate = new Date(this.clientBirthDate);
-    let age = this.calculateAge(birthDate);
     const birthYear = moment(this.clientBirthDate).year();
+    const forecastStartDate = new Date(this.financialTimeline.forecastStartDate);
     const forecastStartYear = moment(this.financialTimeline.forecastStartDate).year();
 
-    const timelineEndYear = new Date(
-      new Date(this.financialTimeline.forecastStartDate).setFullYear(
-        new Date(this.financialTimeline.forecastStartDate).getFullYear() + (100 - age)
-      )
-    ).getFullYear();
-
-    const visualBufferYears = (timelineEndYear % 2 === 0 ? 1 : 2);
+    const timelineEndYear = moment(this.financialTimeline.forecastEndtDate).year();
     let startYear = forecastStartYear;
 
     return {
@@ -315,8 +309,13 @@ export class ViewTimelineChartComponent implements OnInit {
       format: {
       minorLabels: (date: any) => {
         const year = date.year();
-        // Use age-for-year so start year shows 30 and end year shows 60
-        const age = year - birthYear;
+        const age = this.getTimelineLabelAge(
+          year,
+          forecastStartYear,
+          forecastStartDate,
+          birthDate,
+          birthYear
+        );
         return year >= forecastStartYear && year <= timelineEndYear
           ? `<div id='selected'><p>${age}</p><span>${year}</span></div>`
           : '';
@@ -333,6 +332,21 @@ export class ViewTimelineChartComponent implements OnInit {
         return date < midYear ? currentYearStart : nextYearStart;
       }
     };
+  }
+
+  private getTimelineLabelAge(
+    year: number,
+    forecastStartYear: number,
+    forecastStartDate: Date,
+    birthDate: Date,
+    birthYear: number
+  ): number {
+    // First label should reflect the actual current age at forecast start.
+    if (year === forecastStartYear) {
+      return this.calculateAgeForTimeline(forecastStartDate, birthDate);
+    }
+
+    return year - birthYear;
   }
 
   currentZoomPercentage = 0.1;
