@@ -278,6 +278,11 @@
     "Custom escalation rate": "Custom escalation rate",
     "Enter custom rate": "Enter custom rate",
     "State Pension": "State Pension",
+    "Questionnaire": "Questionnaire",
+    "Copy questionnaire link": "Copy questionnaire link",
+    "Select the questions you want to share with": "Select the questions you want to share with",
+    "You can reorder the questions or deselect any that are not relevant.": "You can reorder the questions or deselect any that are not relevant.",
+    "The client will only see the questions you select.": "The client will only see the questions you select.",
 
     "ADD_EVENT": {
       "SELECT_EVENT_TYPE_TOOLTIP": "Select the type of life event or goal you want to create (for example, 'Home', 'New car' or 'Education').",
