@@ -399,7 +399,7 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
     });
 
     dialogRef.afterClosed().subscribe((result: any) => {
-      if ((result.status = 'Success')) {
+      if (result?.status === 'Success') {
         this.draggedEvent = null;
         this.updateTimelines.emit();
       }
@@ -841,7 +841,7 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   updateEventByDoubleClick(clientEvent: ClientEvent) {
-    const linkedIncomesAndExpenses = 
+    const linkedIncomesAndExpenses =
       this.financialRecords.filter(e => e.parentId === clientEvent.id);
 
     const eventType = this.DIALOG_SYSTEM_EVENTS.some(baseName => clientEvent.name.startsWith(baseName))
@@ -920,12 +920,12 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
   handleEventRemoval(item: any, callback: (item: any) => void) {
     let isDeleteFinanceEvent = false;
 
-    if (item.content?.includes('Home') 
+    if (item.content?.includes('Home')
       || item.content?.includes('Car')
-    || item.content?.includes('Boat')) {
+      || item.content?.includes('Boat')) {
       isDeleteFinanceEvent = true;
     }
-    
+
     if (isDeleteFinanceEvent) {
       this.timelineHttpService
         .deleteFinancingEvent(this.financialTimeline.cashflow.id, item.id)
