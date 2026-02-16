@@ -253,7 +253,7 @@ export class AddNewPotComponent {
   }
 
 
-  // Custom validator to ensure value is greater than 0 (or >= 0 for Cash edit mode)
+  // Custom validator to ensure value is 0 or greater
   minPositiveValue(): ValidatorFn {
     return (control: AbstractControl) => {
       const value = control.value;
@@ -262,14 +262,8 @@ export class AddNewPotComponent {
       }
       const numValue = typeof value === 'string' ? parseFloat(value) : value;
       
-      // Allow 0 for Cash pots in edit mode, otherwise require > 0
-      if (this.isCashPotEditMode) {
-        // For Cash edit mode, allow 0 or positive
-        return numValue >= 0 ? null : { minPositiveValue: { value: control.value } };
-      } else {
-        // For all other cases, require > 0
-        return numValue > 0 ? null : { minPositiveValue: { value: control.value } };
-      }
+      // Allow 0 or positive for all saving pots
+      return numValue >= 0 ? null : { minPositiveValue: { value: control.value } };
     };
   }
 
@@ -487,6 +481,11 @@ onAmountBlur(e: Event) {
       this.selectedNameIconUrl = cusEvent?.iconUrl ?? '';
     }
     
+    // Auto-tick and disable lockPot for Pension Fund
+    if (name === 'Pension Fund') {
+      this.savingsForm.get('lockPot')?.setValue(true);
+    }
+
     // Update Pension Fund field validators based on type
     this.updatePensionFundValidators(name);
   }

@@ -138,7 +138,7 @@
             <span class="field-error d-block">{{ 'Required' | translate }}</span>
           }
           @if (savingsForm.get('amount')?.touched && savingsForm.get('amount')?.hasError('minPositiveValue')) {
-            <span class="field-error d-block">{{ 'Must be greater than 0' | translate }}</span>
+            <span class="field-error d-block">{{ 'Must be 0 or greater' | translate }}</span>
           }
           <!-- ENd Error   -->
         </div>
@@ -334,7 +334,6 @@
               type="checkbox"
               id="lock-pot"
               (change)="isLockPotChanged(savingsForm.get('lockPot')?.value)"
-              [disabled]="savingsForm.get('name')?.value === 'Pension Fund'"
               formControlName="lockPot"
             >
               {{ 'Lock this pot from automatically covering an income shortfall' | translate }}
