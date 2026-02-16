@@ -113,7 +113,7 @@
                       }
                       <hr>
                       @for (year of years; let i=$index; track year) {
-                        <mat-option [value]="year">{{ year }} ({{ clientAge + i }})</mat-option>
+                        <mat-option [value]="year">{{ year }} ({{ getAgeForYear(year) }})</mat-option>
                       }
                     </mat-select>
                   </div>
@@ -137,7 +137,7 @@
                         }
                         <hr>
                         @for (year of years; let i=$index; track year) {
-                          <mat-option [value]="year">{{ year }} ({{ clientAge + i }})</mat-option>
+                          <mat-option [value]="year">{{ year }} ({{ getAgeForYear(year) }})</mat-option>
                         }
                       </mat-select>
                     </div>
@@ -201,7 +201,8 @@
         </button>
       </div>
       <div class="col-5">
-        <button (click)="addExpense()" type="button" [disabled]="expenseForm.invalid" class="button-icon w-100 d-block">
+        <button (click)="addExpense()" type="button"
+          [disabled]="expenseForm.invalid || (isEditWorkflow && !hasFormChanges())" class="button-icon w-100 d-block">
           <!-- <span class="f-s-16"> {{isEditWorkflow ? 'Save' : 'Add'}} Expense</span> -->
           <span class="f-s-16">Save</span>
         </button>

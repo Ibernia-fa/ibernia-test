@@ -74,6 +74,7 @@ export class AddIncomeComponent {
   retirementAge: number;
   retirementYear: number;
   forecastEndYear: number;
+  private initialFormSnapshot = '';
 
   constructor(
     private dialogRef: MatDialogRef<AddIncomeComponent>,
@@ -96,8 +97,7 @@ export class AddIncomeComponent {
       age--;
     }
 
-    this.clientAge = age
-    if (data.forecastStartDateYear - this.clientBirthYear > this.clientAge) this.clientBirthYear = this.clientBirthYear + 1
+    this.clientAge = age;
 
     this.clientPreferredCurrency = data.clientPreferredCurrency;
     this.cashflowId = data.cashflowId;
@@ -116,7 +116,7 @@ export class AddIncomeComponent {
     }
 
     this.retirementAge = this.data.language === 'en' ? 64 : 67;
-    this.retirementYear = this.clientBirthYear + this.retirementAge;
+    this.retirementYear = this.getRetirementEventYear() ?? (this.clientBirthYear + this.retirementAge);
     this.forecastEndYear = this.data.forecastEndDateYear;
 
     this.incomeForm = this.fb.group({
@@ -160,7 +160,7 @@ export class AddIncomeComponent {
         const elBonusAmountInput = this.bonusAmountInput?.nativeElement;
         const bonusAmount = this.incomeForm.get('bonusAmount')?.value;
         if (!elBonusAmountInput || bonusAmount === null || bonusAmount === undefined || bonusAmount === '') return;
-        elBonusAmountInput.value = Number(amount).toLocaleString('en-US');
+        elBonusAmountInput.value = Number(bonusAmount).toLocaleString('en-US');
         elBonusAmountInput.dispatchEvent(new Event('blur'));
       });
 
@@ -235,67 +235,11 @@ export class AddIncomeComponent {
       this.onIncomeTypeChange(this.incomeTypes[0]);
     }
 
-    if (this.selectedIncome?.description == "Salary") {
-      this.incomeForm.get('addBonus')?.valueChanges.subscribe(enabled => {
-        const bonusAmount = this.incomeForm.get('bonusAmount');
-        const bonusCycle = this.incomeForm.get('bonusCycle');
-        const bonusDate = this.incomeForm.get('bonusDate');
-
-        if (enabled) {
-          bonusAmount?.enable();
-          bonusAmount?.setValidators([Validators.required, Validators.min(0)]);
-          bonusCycle?.setValidators([Validators.required]);
-        } else {
-          bonusAmount?.reset(0);
-          bonusAmount?.disable();
-          bonusAmount?.clearValidators();
-
-          bonusCycle?.setValue(this.getYearlyCycleId());
-          bonusCycle?.clearValidators();
-
-          bonusDate?.reset(null);
-          bonusDate?.clearValidators();
-        }
-
-        bonusAmount?.updateValueAndValidity();
-        bonusCycle?.updateValueAndValidity();
-        bonusDate?.updateValueAndValidity();
-      });
-
-      this.incomeForm.get('bonusCycle')?.valueChanges.subscribe(cycleId => {
-        const cycle = this.cycles.find(c => c.id === cycleId);
-        const bonusDateCtrl = this.incomeForm.get('bonusDate');
-
-        if (cycle?.description === 'One-off') {
-          bonusDateCtrl?.setValidators([Validators.required]);
-
-          const existingYear = this.selectedIncome?.bonus?.bonusDate?.year;
-
-          if (existingYear) {
-            bonusDateCtrl?.setValue(existingYear, { emitEvent: false });
-          }
-        } else {
-          bonusDateCtrl?.clearValidators();
-          bonusDateCtrl?.setValue(null, { emitEvent: false });
-        }
-
-        bonusDateCtrl?.updateValueAndValidity();
-      });
-
-      const bonus = this.selectedIncome?.bonus;
-
-      this.incomeForm.patchValue({
-        addBonus: this.selectedIncome?.bonus?.enabled ?? false,
-        bonusAmount: bonus?.amount?.amount ?? 0,
-        bonusCycle: bonus?.amount?.cycle?.id ?? this.getYearlyCycleId(),
-        bonusDate: bonus?.bonusDate?.year ?? null
-      }, { emitEvent: false });
-
-      this.incomeForm.get('bonusAmount')?.enable();
-    }
+    this.setupBonusControlHandlers();
 
     this.setIsDefaultIncome();
     this.setIncomeIcon();
+    this.captureInitialFormState();
   }
 
   autoRenameCustom(): string {
@@ -529,9 +473,8 @@ export class AddIncomeComponent {
   }
 
   get incomeTitle(): string {
-    const operation = this.isEditWorkflow ? "Edit - " : "Add - ";
     const title = this.selectedIncome?.description ?? this.customDescriptionAutoRenamed ?? "Income";
-    return operation + (title[0].toUpperCase() + title.slice(1));
+    return this.isEditWorkflow ? title : `Add - ${title}`;
   }
 
   setIncomeIcon(): void {
@@ -617,8 +560,8 @@ export class AddIncomeComponent {
     this.isNameEditable = !!config.editableName;
     this.isDefaultIncome = !!config.isDefault;
 
-    // apply default start and end dates
-    if (!this.isEditWorkflow) {
+    // Salary and State pension are linked to retirement age in both add and edit workflows.
+    if (!this.isEditWorkflow || value === 'Salary' || value === 'State pension') {
       this.applyDefaultStartEnd(value);
     }
 
@@ -631,7 +574,10 @@ export class AddIncomeComponent {
       }
     }
     else {
-      descriptionCtrl.setValue(this.customDescriptionAutoRenamed, { emitEvent: true });
+      const nextDescription = value === 'Custom'
+        ? this.customDescriptionAutoRenamed
+        : (config.description ?? value);
+      descriptionCtrl.setValue(nextDescription, { emitEvent: true });
     }
 
     if (config.requireDescription) {
@@ -655,18 +601,24 @@ export class AddIncomeComponent {
 
     switch (incomeType) {
       case 'Salary':
-        startCtrl.setValue(this.currentYear);
+        if (!this.isEditWorkflow) {
+          startCtrl.setValue(this.currentYear);
+        }
         endCtrl.setValue(this.retirementYear);
         break;
 
       case 'State pension':
         startCtrl.setValue(this.retirementYear);
-        endCtrl.setValue(this.forecastEndYear ?? this.retirementYear);
+        if (!this.isEditWorkflow) {
+          endCtrl.setValue(this.forecastEndYear ?? this.retirementYear);
+        }
         break;
 
       default:
-        startCtrl.reset();
-        endCtrl.reset();
+        if (!this.isEditWorkflow) {
+          startCtrl.reset();
+          endCtrl.reset();
+        }
         break;
     }
 
@@ -690,6 +642,115 @@ export class AddIncomeComponent {
     return this.cycles?.some(
       c => c.id === bonusCycleId && c.description === 'One-off'
     );
+  }
+
+  getAgeForYear(year: number): number {
+    return Number(year) - this.clientBirthYear;
+  }
+
+  hasFormChanges(): boolean {
+    return JSON.stringify(this.incomeForm.getRawValue()) !== this.initialFormSnapshot;
+  }
+
+  private captureInitialFormState(): void {
+    this.initialFormSnapshot = JSON.stringify(this.incomeForm.getRawValue());
+    this.incomeForm.markAsPristine();
+  }
+
+  private getRetirementEventYear(): number | null {
+    const retirementEvent = (this.eventsList ?? []).find(
+      (event: any) =>
+        (event?.name ?? '').toString().toLowerCase() === 'retirement age'
+    );
+
+    const retirementYear = Number(retirementEvent?.start?.year);
+    return Number.isFinite(retirementYear) && retirementYear > 0 ? retirementYear : null;
+  }
+
+  private setupBonusControlHandlers(): void {
+    this.incomeForm.get('addBonus')?.valueChanges.subscribe(() => {
+      this.syncBonusControlsState();
+    });
+
+    this.incomeForm.get('bonusCycle')?.valueChanges.subscribe(() => {
+      this.syncBonusDateState();
+    });
+
+    this.incomeForm.get('description')?.valueChanges.subscribe(() => {
+      this.syncBonusControlsState();
+    });
+
+    this.syncBonusControlsState();
+  }
+
+  private syncBonusControlsState(): void {
+    const isSalary = this.incomeForm.get('description')?.value === 'Salary';
+    const isBonusEnabled = !!this.incomeForm.get('addBonus')?.value;
+    const bonusAmount = this.incomeForm.get('bonusAmount');
+    const bonusCycle = this.incomeForm.get('bonusCycle');
+    const bonusDate = this.incomeForm.get('bonusDate');
+
+    if (!isSalary) {
+      this.incomeForm.get('addBonus')?.setValue(false, { emitEvent: false });
+      bonusAmount?.setValue(0, { emitEvent: false });
+      bonusAmount?.disable({ emitEvent: false });
+      bonusAmount?.clearValidators();
+
+      bonusCycle?.setValue(this.getYearlyCycleId(), { emitEvent: false });
+      bonusCycle?.clearValidators();
+
+      bonusDate?.setValue(null, { emitEvent: false });
+      bonusDate?.clearValidators();
+      bonusDate?.updateValueAndValidity({ emitEvent: false });
+      bonusAmount?.updateValueAndValidity({ emitEvent: false });
+      bonusCycle?.updateValueAndValidity({ emitEvent: false });
+      return;
+    }
+
+    if (isBonusEnabled) {
+      bonusAmount?.enable({ emitEvent: false });
+      bonusAmount?.setValidators([Validators.required, Validators.min(0)]);
+      bonusCycle?.setValidators([Validators.required]);
+    } else {
+      bonusAmount?.setValue(0, { emitEvent: false });
+      bonusAmount?.disable({ emitEvent: false });
+      bonusAmount?.clearValidators();
+
+      bonusCycle?.setValue(this.getYearlyCycleId(), { emitEvent: false });
+      bonusCycle?.clearValidators();
+
+      bonusDate?.setValue(null, { emitEvent: false });
+      bonusDate?.clearValidators();
+    }
+
+    this.syncBonusDateState();
+    bonusAmount?.updateValueAndValidity({ emitEvent: false });
+    bonusCycle?.updateValueAndValidity({ emitEvent: false });
+    bonusDate?.updateValueAndValidity({ emitEvent: false });
+  }
+
+  private syncBonusDateState(): void {
+    const isSalary = this.incomeForm.get('description')?.value === 'Salary';
+    const isBonusEnabled = !!this.incomeForm.get('addBonus')?.value;
+    const bonusDateCtrl = this.incomeForm.get('bonusDate');
+    const cycleId = this.incomeForm.get('bonusCycle')?.value;
+    const cycle = this.cycles.find(c => c.id === cycleId);
+
+    if (isSalary && isBonusEnabled && cycle?.description === 'One-off') {
+      bonusDateCtrl?.setValidators([Validators.required]);
+
+      if (!bonusDateCtrl?.value) {
+        const existingYear = this.selectedIncome?.bonus?.bonusDate?.year;
+        if (existingYear) {
+          bonusDateCtrl?.setValue(existingYear, { emitEvent: false });
+        }
+      }
+    } else {
+      bonusDateCtrl?.clearValidators();
+      bonusDateCtrl?.setValue(null, { emitEvent: false });
+    }
+
+    bonusDateCtrl?.updateValueAndValidity({ emitEvent: false });
   }
 
 }

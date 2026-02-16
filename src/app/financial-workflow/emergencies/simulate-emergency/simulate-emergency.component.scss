@@ -54,3 +54,19 @@
 .highlight-text {
   color: #ff9902 !important;
 }
+
+:host ::ng-deep .graph-dialog-content.mat-mdc-dialog-content {
+  max-height: none;
+  overflow: hidden;
+  padding-right: 0;
+}
+
+:host ::ng-deep .graph-dialog-content #chart {
+  width: 100%;
+  overflow: hidden;
+}
+
+:host ::ng-deep .graph-dialog-content .apexcharts-canvas,
+:host ::ng-deep .graph-dialog-content .apexcharts-svg {
+  max-width: 100% !important;
+}

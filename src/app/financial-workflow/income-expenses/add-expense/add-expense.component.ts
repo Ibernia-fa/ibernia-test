@@ -75,6 +75,7 @@ export class AddExpenseComponent {
   customDescriptionAutoRenamed: string;
   showNameEdit: boolean = false;
   forecastEndYear: number;
+  private initialFormSnapshot = '';
 
   constructor(
     private dialogRef: MatDialogRef<AddExpenseComponent>,
@@ -97,8 +98,7 @@ export class AddExpenseComponent {
       age--;
     }
 
-    this.clientAge = age
-    if (data.forecastStartDateYear - this.clientBirthYear > this.clientAge) this.clientBirthYear = this.clientBirthYear + 1
+    this.clientAge = age;
 
     this.clientPreferredCurrency = data.clientPreferredCurrency;
     this.cashflowId = data.cashflowId;
@@ -205,6 +205,7 @@ export class AddExpenseComponent {
 
     this.setIsDefaultExpense();
     this.setExpenseIcon();
+    this.captureInitialFormState();
   }
 
   autoRenameCustom(): string {
@@ -410,9 +411,8 @@ export class AddExpenseComponent {
   }
 
   get expenseTitle(): string {
-    const operation = this.isEditWorkflow ? "Edit - " : "Add - ";
     const title = this.selectedExpense?.description ?? this.customDescriptionAutoRenamed ?? "Expense";
-    return operation + (title[0].toUpperCase() + title.slice(1));
+    return this.isEditWorkflow ? title : `Add - ${title}`;
 
   }
 
@@ -551,5 +551,18 @@ export class AddExpenseComponent {
 
     startCtrl.updateValueAndValidity();
     endCtrl.updateValueAndValidity();
+  }
+
+  getAgeForYear(year: number): number {
+    return Number(year) - this.clientBirthYear;
+  }
+
+  hasFormChanges(): boolean {
+    return JSON.stringify(this.expenseForm.getRawValue()) !== this.initialFormSnapshot;
+  }
+
+  private captureInitialFormState(): void {
+    this.initialFormSnapshot = JSON.stringify(this.expenseForm.getRawValue());
+    this.expenseForm.markAsPristine();
   }
 }

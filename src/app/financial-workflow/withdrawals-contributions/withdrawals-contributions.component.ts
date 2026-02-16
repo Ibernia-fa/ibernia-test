@@ -32,6 +32,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
 import { TranslateModule } from '@ngx-translate/core';
+import { IncomeExpensesHttpService } from '../income-expenses/services/income-expenses-http.service';
+import { FinancialViewModel, IncomeExpense } from '../income-expenses/model/income-expense';
 
 @Component({
   imports: [
@@ -68,6 +70,7 @@ export class WithdrawalsContributionsComponent {
   isLoaderVisible = false;
   timeline: FinancialTimeline;
   savingsPots: SavingPotsModel;
+  incomeExpense: IncomeExpense;
   contributionSummary = {
     total: 0,
     savingRate: 0,
@@ -82,6 +85,7 @@ export class WithdrawalsContributionsComponent {
     private financialWorkflowService: FinancialWorkflowService,
     private savingsPotsHttpService: SavingsPotsHttpService,
     private withdrawalsContributionsHttpService: WithdrawalsContributionsHttpService,
+    private incomeExpensesHttpService: IncomeExpensesHttpService,
     private settingHttpService: SettingsHttpService,
     private timelineHttpService: TimelineHttpService,
     private navItemService: NavItemService,
@@ -117,15 +121,19 @@ export class WithdrawalsContributionsComponent {
             ),
             this.savingsPotsHttpService.getAllSavingsPots(
               (cashflow as Cashflow).id
-            )
+            ),
+            this.incomeExpensesHttpService.getAllIncomeExpenses(
+              (cashflow as Cashflow).id
+            ),
           ]);
         }),
-        tap(([contributionWithdrawal, timeline, amountCycles, escalationRatesResponse, savingsPots]) => {
+        tap(([contributionWithdrawal, timeline, amountCycles, escalationRatesResponse, savingsPots, incomeExpense]) => {
           this.contributionWithdrawal = contributionWithdrawal;
           this.amountCycles = amountCycles;
           this.escalationRates = escalationRatesResponse?.escalationRates;
           this.timeline = timeline;
           this.savingsPots = savingsPots;
+          this.incomeExpense = incomeExpense;
           this.rebuildSavingPotNameMap();
 
           this.contributionDataSource = new MatTableDataSource(
@@ -349,27 +357,67 @@ export class WithdrawalsContributionsComponent {
   }
 
   private updateContributionSummary(): void {
-    const contributions = this.contributionWithdrawal?.contributions ?? [];
-    const withdrawals = this.contributionWithdrawal?.withdrawals ?? [];
+    const currentYear = new Date().getFullYear();
 
-    const totalContributions = contributions.reduce(
-      (sum, item) => sum + Number(item?.amount?.amount ?? 0),
+    const activeIncomes = (this.incomeExpense?.incomes ?? [])
+      .filter((item) => this.isIncludedIncome(item))
+      .filter((item) => this.isHappeningInYear(item, currentYear));
+
+    const activeExpenses = (this.incomeExpense?.expenses ?? [])
+      .filter((item) => this.isIncludedExpense(item))
+      .filter((item) => this.isHappeningInYear(item, currentYear));
+
+    const totalIncome = activeIncomes.reduce(
+      (sum, item) => sum + this.getYearAmount(item),
       0
     );
-    const totalWithdrawals = withdrawals.reduce(
-      (sum, item) => sum + Number(item?.amount?.amount ?? 0),
+    const totalExpenses = activeExpenses.reduce(
+      (sum, item) => sum + this.getYearAmount(item),
       0
     );
 
-    const total = totalContributions - totalWithdrawals;
+    const total = totalIncome - totalExpenses;
     const savingRate =
-      totalContributions === 0 ? 0 : (total / totalContributions) * 100;
+      totalIncome === 0 ? 0 : (total / totalIncome) * 100;
 
     this.contributionSummary = {
       total,
       savingRate,
-      totalContributions,
-      totalWithdrawals,
+      totalContributions: totalIncome,
+      totalWithdrawals: totalExpenses,
     };
+  }
+
+  private isIncludedIncome(item: FinancialViewModel): boolean {
+    return item?.isIncomeExpenseSource === true || item?.description === 'Pension Fund';
+  }
+
+  private isIncludedExpense(item: FinancialViewModel): boolean {
+    return item?.isIncomeExpenseSource === true || item?.description === 'Insurance';
+  }
+
+  private isHappeningInYear(item: FinancialViewModel, year: number): boolean {
+    const startYear = Number(item?.start?.year ?? 0);
+    const endYearRaw = Number(item?.end?.year ?? 0);
+    const hasEnd = endYearRaw > 0;
+    const cycleDescription = (item?.amount?.cycle?.description ?? '').toString().toLowerCase();
+    const isOneOff = cycleDescription === 'one-off';
+
+    if (!startYear) return false;
+    if (isOneOff) {
+      return startYear === year;
+    }
+
+    if (year < startYear) return false;
+    if (hasEnd && year > endYearRaw) return false;
+    return true;
+  }
+
+  private getYearAmount(item: FinancialViewModel): number {
+    const baseAmount = Number(item?.amount?.amount ?? 0);
+    const cycleDescription = (item?.amount?.cycle?.description ?? '').toString().toLowerCase();
+
+    if (cycleDescription.includes('month')) return baseAmount * 12;
+    return baseAmount;
   }
 }
