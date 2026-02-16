@@ -419,18 +419,42 @@
 
           <!-- Commissions Section -->
           @if (savingsForm.get('commissions')?.value) {
-            <div class="d-flex flex-column gap-20 m-t-15">
-              <div class="position-relative">
-                <div class="w-100 form-field">
-                  <div class="select-option">
-                    <mat-select formControlName="commissionType" value="Select">
-                      <mat-option value="amount">{{ 'Amount' | translate }}</mat-option>
-                      <mat-option value="percentage">{{ 'Percentage' | translate }}</mat-option>
-                      <mat-option value="both">{{ 'Both' | translate }}</mat-option>
-                    </mat-select>
+            <div class="d-flex flex-column gap-20">
+              <mat-label class="f-s-16 d-block" style="line-height: 14px">{{ 'Commission type' | translate }}</mat-label>
+              @if (savingsForm.get('commissionType')?.value === 'percentage') {
+                <!-- Inline layout for Percentage only: dropdown + number field side by side -->
+                <div class="d-flex align-items-center gap-16 commission-percentage-inline">
+                  <div class="position-relative flex-grow-1">
+                    <div class="w-100 form-field">
+                      <div class="select-option">
+                        <mat-select formControlName="commissionType" value="Select">
+                          <mat-option value="amount">{{ 'Amount' | translate }}</mat-option>
+                          <mat-option value="percentage">{{ 'Percentage' | translate }}</mat-option>
+                          <mat-option value="both">{{ 'Both' | translate }}</mat-option>
+                        </mat-select>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flex-grow-1">
+                    <div class="w-100 form-field custom-rate-input">
+                      <input matInput type="number" formControlName="commissionPercentage" placeholder="0" />
+                      <img class="custom-rate-suffix" src="assets/images/shapes/percentage.svg" alt="percentage" />
+                    </div>
                   </div>
                 </div>
-              </div>
+              } @else {
+                <div class="position-relative">
+                  <div class="w-100 form-field">
+                    <div class="select-option">
+                      <mat-select formControlName="commissionType" value="Select">
+                        <mat-option value="amount">{{ 'Amount' | translate }}</mat-option>
+                        <mat-option value="percentage">{{ 'Percentage' | translate }}</mat-option>
+                        <mat-option value="both">{{ 'Both' | translate }}</mat-option>
+                      </mat-select>
+                    </div>
+                  </div>
+                </div>
+              }
 
               <!-- Commission Amount -->
               @if (
@@ -530,18 +554,13 @@
                 </div>
               }
 
-              <!-- Commission Percentage -->
-              @if (
-                savingsForm.get('commissionType')?.value === 'percentage' ||
-                savingsForm.get('commissionType')?.value === 'both'
-              ) {
+
+              @if (savingsForm.get('commissionType')?.value === 'both') {
                 <div class="d-flex flex-column gap-8">
-                  @if (savingsForm.get('commissionType')?.value === 'both') {
-                    <div class="d-flex gap-8 align-items-center">
-                      <mat-label class="f-s-16 f-w-400 d-block">{{ 'Commission percentage' | translate }}</mat-label>
-                      <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
-                    </div>
-                  }
+                  <div class="d-flex gap-8 align-items-center">
+                    <mat-label class="f-s-16 f-w-400 d-block">{{ 'Commission percentage' | translate }}</mat-label>
+                    <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
+                  </div>
 
                   <div class="d-flex flex-column gap-4">
                     <div class="d-flex align-items-center">
@@ -565,7 +584,6 @@
             </div>
           }
         }
-        <!-- ✅ IMPORTANT: close the name !== 'Cash' block ABOVE, then close the formGroup wrapper BELOW -->
       </div>
     </mat-dialog-content>
     <!-- End Modal Body  -->
@@ -579,7 +597,8 @@
       </div>
       <div class="col-5">
         <button (click)="saveCashflow()" type="button" [disabled]="savingsForm.invalid" class="button-icon w-100 d-block">
-          <span class="f-s-16">{{ (isEditWorkflow ? 'Update' : 'Save') | translate }}</span>
+          <!-- <span class="f-s-16">{{ (isEditWorkflow ? 'Save' : 'Save') | translate }}</span> -->
+           <span class="f-s-16">Save</span>
         </button>
       </div>
     </div>

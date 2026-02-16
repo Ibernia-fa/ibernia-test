@@ -1,4 +1,4 @@
-import { Component, ViewChild, Input, OnChanges, SimpleChanges, ElementRef } from '@angular/core';
+import { Component, ViewChild, Input, OnChanges, OnDestroy, SimpleChanges, ElementRef } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { TablerIconsModule } from 'angular-tabler-icons';
 import { ChartComponent, NgApexchartsModule } from 'ng-apexcharts';
@@ -17,7 +17,7 @@ import { set } from 'date-fns';
   templateUrl: './savings-bar-stacked-chart.component.html',
   styleUrl: './savings-bar-stacked-chart.component.scss'
 })
-export class SavingsBarStackedChartComponent implements OnChanges {
+export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
   // @ViewChild("chart") chart: ChartComponent;
   @ViewChild("chart", { read: ElementRef }) chartElRef: ElementRef<HTMLDivElement>;
   @Input() report: ChartSeries;
@@ -25,11 +25,18 @@ export class SavingsBarStackedChartComponent implements OnChanges {
   @Input() forecastEndDate: Date;
   @Input() client: Client;
   @Input() cashFlowName: string;
+  @Input() chartHeight: number = 500;
   isFullscreen: any;
 
   private readonly EVENT_DOT_SPACING = 20;
   public chartOptions: any;
   events: TimelineEvent[] = [];
+  private tooltipElements: HTMLElement[] = [];
+  private markerListeners: Array<{
+    marker: SVGElement;
+    onMouseEnter: () => void;
+    onMouseLeave: () => void;
+  }> = [];
 
   private getCurrencyAxisTitle(): string {
     return this.client?.clientDetails?.preferredCurrency ?? '';
@@ -79,8 +86,8 @@ export class SavingsBarStackedChartComponent implements OnChanges {
 
     const xValue = w.globals.labels[dataPointIndex];
     const year = Number(xValue);
-    const birthYear = moment(this.client.clientDetails.birthDate).year();
-    const age = Number.isFinite(year) ? year - birthYear : '';
+    const firstYear = Number(w.globals.labels?.[0]);
+    const age = this.getDisplayAgeForYear(year, firstYear);
 
     const bodyRows = w.globals.seriesNames
       .map((seriesName: string, i: number) => {
@@ -153,7 +160,7 @@ export class SavingsBarStackedChartComponent implements OnChanges {
       legend: {
         position: "top",
         horizontalAlign: "right",
-        offsetX: 100,
+        offsetX: 0,
         fillColors: ['#4CAF50', '#8BC34A', '#FF5722', '#FF5700'],
         showForZeroSeries: false,
 
@@ -174,6 +181,17 @@ export class SavingsBarStackedChartComponent implements OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    const parsedHeight = Number(this.chartHeight);
+    const effectiveHeight =
+      Number.isFinite(parsedHeight) && parsedHeight > 0
+        ? parsedHeight
+        : 500;
+
+    this.chartOptions.chart = {
+      ...this.chartOptions.chart,
+      height: effectiveHeight
+    };
+
     if (!this.report?.series?.length) {
       if (changes['client'] && this.client) {
         this.chartOptions.yaxis = {
@@ -272,9 +290,7 @@ export class SavingsBarStackedChartComponent implements OnChanges {
         ? Math.max(1, Math.floor((lastYear! - firstYear!) / 5))
         : 1;
 
-    const birthYear = this.client?.clientDetails?.birthDate
-      ? moment(this.client.clientDetails.birthDate).year()
-      : null;
+    const firstCategoryYear = Number.isFinite(firstYear) ? Number(firstYear) : null;
 
     this.chartOptions.xaxis = {
       type: 'category',
@@ -290,9 +306,9 @@ export class SavingsBarStackedChartComponent implements OnChanges {
       labels: {
         style: { cssClass: 'leftAlign' },
         formatter: (value: string) => {
-          if (birthYear == null) return value;
           const year = Number(value);
-          return Number.isFinite(year) ? String(year - birthYear) : value;
+          const age = this.getDisplayAgeForYear(year, firstCategoryYear);
+          return age === '' ? value : String(age);
         },
       },
     };
@@ -312,13 +328,15 @@ export class SavingsBarStackedChartComponent implements OnChanges {
         ? moment(this.client.clientDetails.birthDate).year()
         : null;
       if (this.chartOptions.xaxis?.labels && birthYear != null) {
+        const firstCategoryYear = Number(this.chartOptions.xaxis?.categories?.[0]);
         this.chartOptions.xaxis = {
           ...this.chartOptions.xaxis,
           labels: {
             ...this.chartOptions.xaxis.labels,
             formatter: (value: string) => {
               const year = Number(value);
-              return Number.isFinite(year) ? String(year - birthYear) : value;
+              const age = this.getDisplayAgeForYear(year, Number.isFinite(firstCategoryYear) ? firstCategoryYear : null);
+              return age === '' ? value : String(age);
             },
           },
         };
@@ -347,6 +365,10 @@ export class SavingsBarStackedChartComponent implements OnChanges {
         }
       }
     }));
+  }
+
+  ngOnDestroy(): void {
+    this.cleanupHtmlTooltips();
   }
 
   buildEventAnnotations(events: TimelineEvent[]) {
@@ -388,9 +410,12 @@ export class SavingsBarStackedChartComponent implements OnChanges {
   }
 
   private attachHtmlTooltips() {
-    document.querySelectorAll('.custom-html-tooltip').forEach(t => t.remove());
+    this.cleanupHtmlTooltips();
 
-    const markers = document.querySelectorAll<SVGElement>('.apexcharts-point-annotation-marker');
+    const chartHost = this.chartElRef?.nativeElement;
+    if (!chartHost) return;
+
+    const markers = chartHost.querySelectorAll<SVGElement>('.apexcharts-point-annotation-marker');
 
     markers.forEach((marker, i) => {
       const annotation = this.chartOptions.annotations.points[i];
@@ -405,17 +430,38 @@ export class SavingsBarStackedChartComponent implements OnChanges {
       tooltip.style.whiteSpace = 'nowrap';
       tooltip.style.zIndex = '9999';
       document.body.appendChild(tooltip);
+      this.tooltipElements.push(tooltip);
 
-      const rect = marker.getBoundingClientRect();
-
-      marker.addEventListener('mouseenter', () => {
+      const onMouseEnter = () => {
+        const rect = marker.getBoundingClientRect();
+        chartHost.classList.add('event-tooltip-active');
         tooltip.style.display = 'block';
         tooltip.style.left = `${rect.x + window.scrollX - tooltip.offsetWidth / 2 + rect.width / 2}px`;
         tooltip.style.top = `${rect.y + window.scrollY - tooltip.offsetHeight - 8}px`;
-      });
+      };
 
-      marker.addEventListener('mouseleave', () => tooltip.style.display = 'none');
+      const onMouseLeave = () => {
+        chartHost.classList.remove('event-tooltip-active');
+        tooltip.style.display = 'none';
+      };
+
+      marker.addEventListener('mouseenter', onMouseEnter);
+      marker.addEventListener('mouseleave', onMouseLeave);
+      this.markerListeners.push({ marker, onMouseEnter, onMouseLeave });
     });
+  }
+
+  private cleanupHtmlTooltips(): void {
+    this.chartElRef?.nativeElement?.classList.remove('event-tooltip-active');
+
+    this.markerListeners.forEach(({ marker, onMouseEnter, onMouseLeave }) => {
+      marker.removeEventListener('mouseenter', onMouseEnter);
+      marker.removeEventListener('mouseleave', onMouseLeave);
+    });
+    this.markerListeners = [];
+
+    this.tooltipElements.forEach((tooltip) => tooltip.remove());
+    this.tooltipElements = [];
   }
 
   private readonly ICON_COLORS: Record<string, string> = {
@@ -454,5 +500,50 @@ export class SavingsBarStackedChartComponent implements OnChanges {
     } catch {
       return value.toLocaleString();
     }
+  }
+
+  private getDisplayAgeForYear(year: number, firstCategoryYear: number | null): number | '' {
+    const birthDate = this.getClientBirthDate();
+    if (!birthDate || !Number.isFinite(year)) {
+      return '';
+    }
+
+    const birthYear = birthDate.getFullYear();
+    let age = year - birthYear;
+
+    // Use actual forecast start date for the first plotted year.
+    // This prevents +1 when the client's birthday hasn't happened yet.
+    if (
+      firstCategoryYear != null &&
+      year === firstCategoryYear &&
+      this.forecastStartDate
+    ) {
+      age = this.calculateAgeAtDate(this.forecastStartDate, birthDate);
+    }
+
+    return age;
+  }
+
+  private calculateAgeAtDate(referenceDate: Date, birthDate: Date): number {
+    const date = new Date(referenceDate);
+    let age = date.getFullYear() - birthDate.getFullYear();
+    const hasBirthdayPassed =
+      date.getMonth() > birthDate.getMonth() ||
+      (date.getMonth() === birthDate.getMonth() &&
+        date.getDate() >= birthDate.getDate());
+
+    if (!hasBirthdayPassed) {
+      age--;
+    }
+
+    return age;
+  }
+
+  private getClientBirthDate(): Date | null {
+    const raw = this.client?.clientDetails?.birthDate;
+    if (!raw) return null;
+
+    const parsed = new Date(raw);
+    return Number.isNaN(parsed.getTime()) ? null : parsed;
   }
 }

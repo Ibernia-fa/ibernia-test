@@ -95,7 +95,7 @@
 
         <div class="d-flex flex-column gap-4 net-fields" *ngIf="incomeForm.get('addBonus')?.value">
           <div class="d-flex flex-column gap-8">
-            <mat-label class="f-s-16 d-block" style="line-height: 18px">{{ 'Bonus amount' | translate }}</mat-label>
+            <mat-label class="f-s-16 d-block" style="line-height: 18px">{{ 'Bonus net amount' | translate }}</mat-label>
             <div class="net-field d-flex align-items-center">
               <div class="left hide-arrow">
                 <mat-select formControlName="currencySymbol" class="sortby-edit-profile" hideSingleSelectionIndicator>
@@ -137,7 +137,7 @@
                   <div class="select-option">
                     <mat-select value="Select" formControlName="bonusDate" hideSingleSelectionIndicator>
                       @for (year of years;let i = $index; track year) {
-                      <mat-option [value]="year">{{ year }} ({{ clientAge + i }})</mat-option>
+                      <mat-option [value]="year">{{ year }} ({{ getAgeForYear(year) }})</mat-option>
                       }
                     </mat-select>
                   </div>
@@ -172,7 +172,7 @@
                       }
                       <hr>
                       @for (year of years;let i = $index; track year) {
-                      <mat-option [value]="year">{{ year }} ({{ clientAge + i }})</mat-option>
+                      <mat-option [value]="year">{{ year }} ({{ getAgeForYear(year) }})</mat-option>
                       }
                     </mat-select>
                   </div>
@@ -195,7 +195,7 @@
                       }
                       <hr>
                       @for (year of years; let i=$index; track year) {
-                      <mat-option [value]="year">{{ year }} ({{ clientAge + i }})</mat-option>
+                      <mat-option [value]="year">{{ year }} ({{ getAgeForYear(year) }})</mat-option>
                       }
                     </mat-select>
                   </div>
@@ -261,8 +261,10 @@
         </button>
       </div>
       <div class="col-5">
-        <button (click)="addIncome()" type="button" [disabled]="incomeForm.invalid" class="button-icon w-100 d-block">
-          <span class="f-s-16">{{isEditWorkflow ? 'Update' : 'Add'}} income</span>
+        <button (click)="addIncome()" type="button"
+          [disabled]="incomeForm.invalid || (isEditWorkflow && !hasFormChanges())" class="button-icon w-100 d-block">
+          <!-- <span class="f-s-16">{{isEditWorkflow ? 'Save' : 'Add'}} income</span> -->
+          <span class="f-s-16">Save</span>
         </button>
       </div>
     </div>

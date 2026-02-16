@@ -32,7 +32,7 @@ import { allCountries } from '../models/country';
 import { CountryISO, NgxIntlTelInputModule } from 'ngx-intl-tel-input';
 import { countryDialCodes } from '../models/country-code';
 import { FiveDayRangeSelectionStrategy } from 'src/app/core/five-day-range-selection-strategy';
-import {MatCheckboxModule} from '@angular/material/checkbox';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { TranslateModule } from '@ngx-translate/core';
 import { Location } from '@angular/common';
@@ -102,8 +102,8 @@ class DmyDateAdapter extends NativeDateAdapter {
     //   provide: MAT_DATE_RANGE_SELECTION_STRATEGY,
     //   useClass: FiveDayRangeSelectionStrategy,
     // },
-  { provide: MAT_DATE_LOCALE, useValue: 'en-GB' },
-  { provide: MAT_DATE_FORMATS, useValue: DMY_FORMATS }
+    { provide: MAT_DATE_LOCALE, useValue: 'en-GB' },
+    { provide: MAT_DATE_FORMATS, useValue: DMY_FORMATS }
   ],
   templateUrl: './client-edit.component.html',
   styleUrl: './client-edit.component.scss',
@@ -115,7 +115,7 @@ export class ClientEditComponent {
   allCountries = allCountries;
   selectedClientCountryISO = CountryISO.UnitedStates;
   selectedPartnerCountryISO = CountryISO.UnitedStates;
-  allControlCountries= countryDialCodes
+  allControlCountries = countryDialCodes
   user: any;
   age: number | null = null;
   partnerAge: number | null = null;
@@ -124,6 +124,7 @@ export class ClientEditComponent {
   private isPastingPartner: boolean = false;
   clientDobDisplay: string = '';
   partnerDobDisplay: string = '';
+  backRoute: string = '/clients';
 
   constructor(
     private fb: FormBuilder,
@@ -153,18 +154,25 @@ export class ClientEditComponent {
 
       // Partner Info
       partner: this.fb.group({
-      firstName: ['', Validators.required],
-      lastName: ['', Validators.required],
-      dob: ['', [Validators.required, dobValidator]],
-      gender: [''],
-      country: [''],
-      currency: [''],
-      email: ['', [Validators.email, Validators.required]],
-      phone: [''],
+        firstName: ['', Validators.required],
+        lastName: ['', Validators.required],
+        dob: ['', [Validators.required, dobValidator]],
+        gender: [''],
+        country: [''],
+        currency: [''],
+        email: ['', [Validators.email, Validators.required]],
+        phone: [''],
       }),
     });
 
-    this.getClient();
+    this.activatedRoute.params.subscribe(params => {
+      this.clientId = params['id'];
+      if (this.clientId) {
+        this.backRoute = `/clients/${this.clientId}/profile`;
+      }
+      this.getClient();
+    });
+
     this.togglePartnerSection(false); // Ensure partner section validations are off initially
   }
 
@@ -173,7 +181,7 @@ export class ClientEditComponent {
     this.clientForm.controls['currency'].patchValue(selectedCountry?.currencySymbol);
     this.selectedClientCountryISO = (selectedCountry?.countryCode.toLowerCase() ?? '') as CountryISO
   }
-  
+
   partnerCountryValueChange(event: any) {
     const selectedCountry = allCountries.find(country => country.countryName === event);
     (this.clientForm.get('partner') as FormGroup).controls['currency'].patchValue(selectedCountry?.currencySymbol);
@@ -182,9 +190,9 @@ export class ClientEditComponent {
 
   get isFormInvalid() {
     const partnerGroup = this.clientForm.get('partner') as FormGroup;
-    if(this.showPartner) {
-      return this.clientForm.controls['firstName'].invalid 
-        || this.clientForm.controls['lastName'].invalid 
+    if (this.showPartner) {
+      return this.clientForm.controls['firstName'].invalid
+        || this.clientForm.controls['lastName'].invalid
         || this.clientForm.controls['dob'].invalid
         || this.clientForm.controls['email'].invalid
         || partnerGroup.controls['firstName'].invalid
@@ -207,7 +215,7 @@ export class ClientEditComponent {
       }),
       map((res) => {
         console.log('res', res);
-        
+
         const clientBirthDate = new Date(res.clientDetails.birthDate);
         this.clientForm.controls['dob'].patchValue(clientBirthDate);
         this.clientDobDisplay = normalizeToDMY(clientBirthDate);
@@ -229,17 +237,17 @@ export class ClientEditComponent {
         this.clientForm.controls['inflationRate'].patchValue(
           res.clientDetails.inflationRate ?? 2.5
         );
-        
+
         const index = countryDialCodes.findIndex(x => res.clientDetails?.phone?.slice(1, res.clientDetails.phone.length).startsWith(x.DialCode));
         this.clientForm.controls['phone'].patchValue(res.clientDetails?.phone?.slice(countryDialCodes[index].DialCode.length + 1));
         this.selectedClientCountryISO = countryDialCodes[index]?.ISOCode as CountryISO;
-        
+
         this.clientForm.controls['notes'].patchValue(res?.notes);
 
-        if(res.partnerDetail?.firstName) {
+        if (res.partnerDetail?.firstName) {
           this.togglePartnerSection(true);
           var partnerFormGroup = this.clientForm.get('partner') as FormGroup
-          
+
           const partnerBirthDate = new Date(res.partnerDetail.birthDate);
           partnerFormGroup.controls['dob'].patchValue(partnerBirthDate);
           this.partnerDobDisplay = normalizeToDMY(partnerBirthDate);
@@ -274,20 +282,20 @@ export class ClientEditComponent {
       partnerGroup.get('email')?.setValidators(Validators.required);
 
       // const partnerDob = partnerGroup.get('dob')?.value;
-    // if (partnerDob instanceof Date) {
-    //   this.partnerDobDisplay = normalizeToDMY(partnerDob);
-    //   this.partnerAge = calculateAge(partnerDob);
-      
-    //   setTimeout(() => {
-    //     const allInputs = document.querySelectorAll('input[matDatepicker]');
-    //     const partnerInput = Array.from(allInputs).find((el: any) => 
-    //       el.closest('[formGroupName="partnerPicker"]')
-    //     ) as HTMLInputElement;
-    //     if (partnerInput) {
-    //       partnerInput.value = this.partnerDobDisplay;
-    //     }
-    //   }, 0);
-    // }
+      // if (partnerDob instanceof Date) {
+      //   this.partnerDobDisplay = normalizeToDMY(partnerDob);
+      //   this.partnerAge = calculateAge(partnerDob);
+
+      //   setTimeout(() => {
+      //     const allInputs = document.querySelectorAll('input[matDatepicker]');
+      //     const partnerInput = Array.from(allInputs).find((el: any) => 
+      //       el.closest('[formGroupName="partnerPicker"]')
+      //     ) as HTMLInputElement;
+      //     if (partnerInput) {
+      //       partnerInput.value = this.partnerDobDisplay;
+      //     }
+      //   }, 0);
+      // }
     } else {
       partnerGroup.reset();
       // this.partnerDobDisplay = '';
@@ -332,7 +340,7 @@ export class ClientEditComponent {
           gender: partnerGroup.controls['gender']?.value,
           country: partnerGroup.controls['country']?.value,
           phone: partnerGroup.controls['phone']?.value?.e164Number,
-          inflationRate:0,
+          inflationRate: 0,
           preferredCurrency:
             partnerGroup.controls['currency']?.value,
         } : null,
@@ -367,8 +375,8 @@ export class ClientEditComponent {
   }
 
   // ---------- Typing & auto-format (Client) ----------
-    onDobInput(event: any) {
-       if (this.isPastingClient) {
+  onDobInput(event: any) {
+    if (this.isPastingClient) {
       return;
     }
 
@@ -408,366 +416,366 @@ export class ClientEditComponent {
     const control = this.clientForm.get('dob');
     control?.setValue(formatted, { emitEvent: false });
     this.updateClientAgePreview(digits);
+  }
+
+  // ---------- Paste handler (Client) ----------
+  onDobPaste(event: ClipboardEvent) {
+    this.isPastingClient = true;
+    event.preventDefault();
+    event.stopPropagation();
+    const input = event.target as HTMLInputElement;
+    const pastedText = (
+      event.clipboardData || (window as any).clipboardData
+    ).getData('text');
+
+    // Extract digits from pasted text
+    const digits = onlyDigits(pastedText);
+    const formatted = formatDigitsToDMY(digits);
+
+    // Set the formatted value directly
+    input.value = formatted;
+    this.clientDobDisplay = formatted;
+
+    // Update form control
+    const control = this.clientForm.get('dob');
+    control?.setValue(formatted, { emitEvent: false });
+    this.updateClientAgePreview(digits);
+
+    // Set cursor to end
+    requestAnimationFrame(() => {
+      input.setSelectionRange(formatted.length, formatted.length);
+      this.isPastingClient = false;
+    });
+  }
+
+  // ---------- Typing & auto-format (Partner) ----------
+  onPartnerDobInput(event: any) {
+    // Skip if we're handling a paste event
+    if (this.isPastingPartner) {
+      console.log('[onPartnerDobInput] Skipping - paste in progress');
+      return;
     }
-  
-    // ---------- Paste handler (Client) ----------
-    onDobPaste(event: ClipboardEvent) {
-      this.isPastingClient = true;
-      event.preventDefault();
-      event.stopPropagation();
-      const input = event.target as HTMLInputElement;
-      const pastedText = (
-        event.clipboardData || (window as any).clipboardData
-      ).getData('text');
-  
-      // Extract digits from pasted text
-      const digits = onlyDigits(pastedText);
-      const formatted = formatDigitsToDMY(digits);
-  
-      // Set the formatted value directly
-      input.value = formatted;
-      this.clientDobDisplay = formatted;
-  
-      // Update form control
-      const control = this.clientForm.get('dob');
-      control?.setValue(formatted, { emitEvent: false });
-      this.updateClientAgePreview(digits);
-  
-      // Set cursor to end
-      requestAnimationFrame(() => {
-        input.setSelectionRange(formatted.length, formatted.length);
-        this.isPastingClient = false;
-      });
+    console.log('[onPartnerDobInput] Event triggered');
+    const input = event.target as HTMLInputElement;
+    const partnerGroup = this.clientForm.get('partner') as FormGroup;
+    const control = partnerGroup.get('dob');
+    let value: string = input.value || '';
+    const cursorPos = input.selectionStart || 0;
+    console.log(
+      '[onPartnerDobInput] Initial input.value:',
+      value,
+      'cursorPos:',
+      cursorPos
+    );
+
+    // If form control has a Date object, convert it to string format first
+    if (control?.value instanceof Date) {
+      value = normalizeToDMY(control.value);
+      console.log('[onPartnerDobInput] Converted Date to string:', value);
     }
-  
-    // ---------- Typing & auto-format (Partner) ----------
-    onPartnerDobInput(event: any) {
-      // Skip if we're handling a paste event
-      if (this.isPastingPartner) {
-        console.log('[onPartnerDobInput] Skipping - paste in progress');
-        return;
-      }
-      console.log('[onPartnerDobInput] Event triggered');
-      const input = event.target as HTMLInputElement;
-      const partnerGroup = this.clientForm.get('partner') as FormGroup;
-      const control = partnerGroup.get('dob');
-      let value: string = input.value || '';
-      const cursorPos = input.selectionStart || 0;
+
+    // Remove all non-digits
+    const digits = onlyDigits(value);
+    console.log('[onPartnerDobInput] Extracted digits:', digits);
+    const formatted = formatDigitsToDMY(digits);
+    console.log('[onPartnerDobInput] Formatted value:', formatted);
+
+    // Only update if the formatted value is different
+    if (input.value !== formatted) {
       console.log(
-        '[onPartnerDobInput] Initial input.value:',
-        value,
-        'cursorPos:',
-        cursorPos
+        '[onPartnerDobInput] Value changed, updating from:',
+        input.value,
+        'to:',
+        formatted
       );
-  
-      // If form control has a Date object, convert it to string format first
-      if (control?.value instanceof Date) {
-        value = normalizeToDMY(control.value);
-        console.log('[onPartnerDobInput] Converted Date to string:', value);
-      }
-  
-      // Remove all non-digits
-      const digits = onlyDigits(value);
-      console.log('[onPartnerDobInput] Extracted digits:', digits);
-      const formatted = formatDigitsToDMY(digits);
-      console.log('[onPartnerDobInput] Formatted value:', formatted);
-  
-      // Only update if the formatted value is different
+
+      // Calculate new cursor position based on digits before cursor
+      const beforeCursor = value.substring(0, cursorPos);
+      const digitsBeforeCursor = onlyDigits(beforeCursor);
+      let newCursorPos = digitsBeforeCursor.length;
+      if (digitsBeforeCursor.length > 2) newCursorPos++;
+      if (digitsBeforeCursor.length > 4) newCursorPos++;
+      newCursorPos = Math.min(newCursorPos, formatted.length);
+
+      console.log('[onPartnerDobInput] Setting input.value to:', formatted);
+      input.value = formatted;
+      console.log(
+        '[onPartnerDobInput] input.value after setting:',
+        input.value
+      );
+
+      // Restore cursor position
+      setTimeout(() => {
+        console.log(
+          '[onPartnerDobInput] Setting cursor position to:',
+          newCursorPos
+        );
+        if (document.activeElement === input) {
+          input.setSelectionRange(newCursorPos, newCursorPos);
+          console.log(
+            '[onPartnerDobInput] Cursor position set, input.value:',
+            input.value
+          );
+        }
+      }, 0);
+    } else {
+      console.log('[onPartnerDobInput] Value unchanged, no update needed');
+    }
+
+    // Update FormControl with formatted string (not Date object)
+    control?.setValue(formatted, { emitEvent: false });
+    this.updatePartnerAgePreview(digits);
+  }
+
+  // ---------- Paste handler (Partner) ----------
+  onPartnerDobPaste(event: ClipboardEvent) {
+    console.log('[onPartnerDobPaste] Paste event triggered');
+    this.isPastingPartner = true;
+    event.preventDefault();
+    event.stopPropagation();
+    const input = event.target as HTMLInputElement;
+    const pastedText = (
+      event.clipboardData || (window as any).clipboardData
+    ).getData('text');
+    console.log('[onPartnerDobPaste] Pasted text:', pastedText);
+
+    // Extract digits from pasted text
+    const digits = onlyDigits(pastedText);
+    console.log('[onPartnerDobPaste] Extracted digits:', digits);
+    const formatted = formatDigitsToDMY(digits);
+    console.log('[onPartnerDobPaste] Formatted value:', formatted);
+
+    // Update form control FIRST with formatted string
+    const partnerGroup = this.clientForm.get('partner') as FormGroup;
+    const control = partnerGroup.get('dob');
+    console.log(
+      '[onPartnerDobPaste] FormControl value before:',
+      control?.value
+    );
+    control?.setValue(formatted, { emitEvent: false });
+    console.log(
+      '[onPartnerDobPaste] FormControl value after setValue:',
+      control?.value
+    );
+
+    console.log('[onPartnerDobPaste] Setting input.value to:', formatted);
+    input.value = formatted;
+    console.log('[onPartnerDobPaste] input.value after setting:', input.value);
+
+    this.updatePartnerAgePreview(digits);
+    console.log('[onPartnerDobPaste] Age preview updated:', this.partnerAge);
+
+    setTimeout(() => {
+      console.log('[onPartnerDobPaste] Timeout 1 - input.value:', input.value);
       if (input.value !== formatted) {
         console.log(
-          '[onPartnerDobInput] Value changed, updating from:',
-          input.value,
-          'to:',
+          '[onPartnerDobPaste] Value was changed, resetting to:',
           formatted
         );
-  
-        // Calculate new cursor position based on digits before cursor
-        const beforeCursor = value.substring(0, cursorPos);
-        const digitsBeforeCursor = onlyDigits(beforeCursor);
-        let newCursorPos = digitsBeforeCursor.length;
-        if (digitsBeforeCursor.length > 2) newCursorPos++;
-        if (digitsBeforeCursor.length > 4) newCursorPos++;
-        newCursorPos = Math.min(newCursorPos, formatted.length);
-  
-        console.log('[onPartnerDobInput] Setting input.value to:', formatted);
         input.value = formatted;
-        console.log(
-          '[onPartnerDobInput] input.value after setting:',
-          input.value
-        );
-  
-        // Restore cursor position
-        setTimeout(() => {
-          console.log(
-            '[onPartnerDobInput] Setting cursor position to:',
-            newCursorPos
-          );
-          if (document.activeElement === input) {
-            input.setSelectionRange(newCursorPos, newCursorPos);
-            console.log(
-              '[onPartnerDobInput] Cursor position set, input.value:',
-              input.value
-            );
-          }
-        }, 0);
-      } else {
-        console.log('[onPartnerDobInput] Value unchanged, no update needed');
+        control?.setValue(formatted, { emitEvent: false });
       }
-  
-      // Update FormControl with formatted string (not Date object)
-      control?.setValue(formatted, { emitEvent: false });
-      this.updatePartnerAgePreview(digits);
-    }
-  
-    // ---------- Paste handler (Partner) ----------
-    onPartnerDobPaste(event: ClipboardEvent) {
-      console.log('[onPartnerDobPaste] Paste event triggered');
-      this.isPastingPartner = true;
-      event.preventDefault();
-      event.stopPropagation();
-      const input = event.target as HTMLInputElement;
-      const pastedText = (
-        event.clipboardData || (window as any).clipboardData
-      ).getData('text');
-      console.log('[onPartnerDobPaste] Pasted text:', pastedText);
-  
-      // Extract digits from pasted text
-      const digits = onlyDigits(pastedText);
-      console.log('[onPartnerDobPaste] Extracted digits:', digits);
-      const formatted = formatDigitsToDMY(digits);
-      console.log('[onPartnerDobPaste] Formatted value:', formatted);
-  
-      // Update form control FIRST with formatted string
-      const partnerGroup = this.clientForm.get('partner') as FormGroup;
-      const control = partnerGroup.get('dob');
+      input.setSelectionRange(formatted.length, formatted.length);
       console.log(
-        '[onPartnerDobPaste] FormControl value before:',
-        control?.value
+        '[onPartnerDobPaste] Timeout 1 - Final input.value:',
+        input.value
       );
-      control?.setValue(formatted, { emitEvent: false });
-      console.log(
-        '[onPartnerDobPaste] FormControl value after setValue:',
-        control?.value
-      );
-  
-      console.log('[onPartnerDobPaste] Setting input.value to:', formatted);
-      input.value = formatted;
-      console.log('[onPartnerDobPaste] input.value after setting:', input.value);
-  
-      this.updatePartnerAgePreview(digits);
-      console.log('[onPartnerDobPaste] Age preview updated:', this.partnerAge);
-  
-      setTimeout(() => {
-        console.log('[onPartnerDobPaste] Timeout 1 - input.value:', input.value);
-        if (input.value !== formatted) {
-          console.log(
-            '[onPartnerDobPaste] Value was changed, resetting to:',
-            formatted
-          );
-          input.value = formatted;
-          control?.setValue(formatted, { emitEvent: false });
-        }
-        input.setSelectionRange(formatted.length, formatted.length);
-        console.log(
-          '[onPartnerDobPaste] Timeout 1 - Final input.value:',
-          input.value
-        );
-      }, 0);
-  
-      setTimeout(() => {
-        console.log(
-          '[onPartnerDobPaste] Timeout 2 - Final check input.value:',
-          input.value
-        );
-        this.isPastingPartner = false;
-      }, 100);
-    }
-  
-    onDobBlur() {
-      const control = this.clientForm.get('dob');
-      const value = control?.value;
-      if (!value) {
-        return;
-      }
-  
-      if (value instanceof Date) {
-        const normalized = normalizeToDMY(value);
-        setTimeout(() => {
-          const input = document.querySelector(
-            'input[formControlName="dob"]'
-          ) as HTMLInputElement;
-          if (input) {
-            input.value = normalized;
-          }
-        }, 0);
-        this.age = calculateAge(value);
-        control?.updateValueAndValidity({ emitEvent: false });
-        return;
-      }
-  
-      const digits = onlyDigits(value);
-      const parsed = parseDMYFromDigits(digits);
-  
-      if (parsed.ok) {
-        control?.setValue(parsed.date, { emitEvent: false });
-        setTimeout(() => {
-          const input = document.querySelector(
-            'input[formControlName="dob"]'
-          ) as HTMLInputElement;
-          if (input) {
-            input.value = parsed.normalized;
-          }
-        }, 0);
-        this.age = parsed.age;
-      } else {
-        control?.setValue(formatDigitsToDMY(digits), { emitEvent: false });
-        this.age = null;
-      }
-  
-      control?.markAsTouched();
-      control?.updateValueAndValidity({ emitEvent: false });
-    }
-  
-    onPartnerDobBlur() {
-      const partnerGroup = this.clientForm.get('partner') as FormGroup;
-      const control = partnerGroup.get('dob');
-      const value = control?.value;
-      if (!value) {
-        return;
-      }
-  
-      if (value instanceof Date) {
-        const normalized = normalizeToDMY(value);
-        setTimeout(() => {
-          const allInputs = document.querySelectorAll(
-            'input[formControlName="dob"]'
-          );
-          const partnerInput = Array.from(allInputs).find((el: any) => {
-            const formGroup = el.closest('[formGroupName="partner"]');
-            return formGroup !== null;
-          }) as HTMLInputElement;
-          if (partnerInput) {
-            partnerInput.value = normalized;
-          }
-        }, 0);
-        this.partnerAge = calculateAge(value);
-        control?.updateValueAndValidity({ emitEvent: false });
-        return;
-      }
-  
-      const digits = onlyDigits(value);
-      const parsed = parseDMYFromDigits(digits);
-  
-      if (parsed.ok) {
-        control?.setValue(parsed.date, { emitEvent: false });
-        setTimeout(() => {
-          const allInputs = document.querySelectorAll(
-            'input[formControlName="dob"]'
-          );
-          const partnerInput = Array.from(allInputs).find((el: any) => {
-            const formGroup = el.closest('[formGroupName="partner"]');
-            return formGroup !== null;
-          }) as HTMLInputElement;
-          if (partnerInput) {
-            partnerInput.value = parsed.normalized;
-          }
-        }, 0);
-        this.partnerAge = parsed.age;
-      } else {
-        control?.setValue(formatDigitsToDMY(digits), { emitEvent: false });
-        this.partnerAge = null;
-      }
-  
-      control?.markAsTouched();
-      control?.updateValueAndValidity({ emitEvent: false });
-    }
-  
-    private updateClientAgePreview(digits: string) {
-      const parsed = parseDMYFromDigits(digits);
-      this.age = parsed.ok ? parsed.age : null;
-    }
-  
-    private updatePartnerAgePreview(digits: string) {
-      const parsed = parseDMYFromDigits(digits);
-      this.partnerAge = parsed.ok ? parsed.age : null;
-    }
-  
-    get dobError(): string | null {
-      const control = this.clientForm.get('dob');
-      const err = control?.errors?.['dob'];
-      return typeof err === 'string' ? err : null;
-    }
-  
-    get partnerDobError(): string | null {
-      const partnerGroup = this.clientForm.get('partner') as FormGroup;
-      const control = partnerGroup.get('dob');
-      const err = control?.errors?.['dob'];
-      return typeof err === 'string' ? err : null;
-    }
-  
-    onCalendarChange(value: Date | null) {
-      if (!value) {
-        this.age = null;
-        this.clientDobDisplay = '';
-        this.clientForm.get('dob')?.setValue(null, { emitEvent: false });
-        return;
-      }
-      const formatted = normalizeToDMY(value);
-      this.age = calculateAge(value);
-      this.clientDobDisplay = formatted;
-  
-      this.clientForm.get('dob')?.setValue(value, { emitEvent: false });
-  
-      requestAnimationFrame(() => {
-        const allInputs = document.querySelectorAll('input[matDatepicker]');
-        const clientInput = Array.from(allInputs).find((el: any) => {
-          return el.getAttribute('matDatepicker') === 'picker';
-        }) as HTMLInputElement;
-        if (clientInput) {
-          clientInput.value = formatted;
-        }
-      });
-    }
-  
-    onPartnerCalendarChange(value: Date | null) {
-      if (!value) {
-        this.partnerAge = null;
-        const partnerGroup = this.clientForm.get('partner') as FormGroup;
-        partnerGroup.get('dob')?.setValue(null, { emitEvent: false });
-        return;
-      }
-      const formatted = normalizeToDMY(value);
-      this.partnerAge = calculateAge(value);
-      this.partnerDobDisplay = formatted;
-      const partnerGroup = this.clientForm.get('partner') as FormGroup;
-      partnerGroup.get('dob')?.setValue(value, { emitEvent: false });
+    }, 0);
 
-      requestAnimationFrame(() => {
-        const allInputs = document.querySelectorAll('input[matDatepicker]');
+    setTimeout(() => {
+      console.log(
+        '[onPartnerDobPaste] Timeout 2 - Final check input.value:',
+        input.value
+      );
+      this.isPastingPartner = false;
+    }, 100);
+  }
+
+  onDobBlur() {
+    const control = this.clientForm.get('dob');
+    const value = control?.value;
+    if (!value) {
+      return;
+    }
+
+    if (value instanceof Date) {
+      const normalized = normalizeToDMY(value);
+      setTimeout(() => {
+        const input = document.querySelector(
+          'input[formControlName="dob"]'
+        ) as HTMLInputElement;
+        if (input) {
+          input.value = normalized;
+        }
+      }, 0);
+      this.age = calculateAge(value);
+      control?.updateValueAndValidity({ emitEvent: false });
+      return;
+    }
+
+    const digits = onlyDigits(value);
+    const parsed = parseDMYFromDigits(digits);
+
+    if (parsed.ok) {
+      control?.setValue(parsed.date, { emitEvent: false });
+      setTimeout(() => {
+        const input = document.querySelector(
+          'input[formControlName="dob"]'
+        ) as HTMLInputElement;
+        if (input) {
+          input.value = parsed.normalized;
+        }
+      }, 0);
+      this.age = parsed.age;
+    } else {
+      control?.setValue(formatDigitsToDMY(digits), { emitEvent: false });
+      this.age = null;
+    }
+
+    control?.markAsTouched();
+    control?.updateValueAndValidity({ emitEvent: false });
+  }
+
+  onPartnerDobBlur() {
+    const partnerGroup = this.clientForm.get('partner') as FormGroup;
+    const control = partnerGroup.get('dob');
+    const value = control?.value;
+    if (!value) {
+      return;
+    }
+
+    if (value instanceof Date) {
+      const normalized = normalizeToDMY(value);
+      setTimeout(() => {
+        const allInputs = document.querySelectorAll(
+          'input[formControlName="dob"]'
+        );
         const partnerInput = Array.from(allInputs).find((el: any) => {
-          return el.getAttribute('matDatepicker') === 'partnerPicker';
+          const formGroup = el.closest('[formGroupName="partner"]');
+          return formGroup !== null;
         }) as HTMLInputElement;
         if (partnerInput) {
-          partnerInput.value = formatted;
+          partnerInput.value = normalized;
         }
-      });
-    }
-  
-    parseDobToDate(value: string): Date | null {
-      if (!value) return null;
-      const digits = onlyDigits(value);
-      const parsed = parseDMYFromDigits(digits);
-      return parsed.ok ? parsed.date : null;
+      }, 0);
+      this.partnerAge = calculateAge(value);
+      control?.updateValueAndValidity({ emitEvent: false });
+      return;
     }
 
-    onDobTyping(inputEl: HTMLInputElement): void {
+    const digits = onlyDigits(value);
+    const parsed = parseDMYFromDigits(digits);
+
+    if (parsed.ok) {
+      control?.setValue(parsed.date, { emitEvent: false });
+      setTimeout(() => {
+        const allInputs = document.querySelectorAll(
+          'input[formControlName="dob"]'
+        );
+        const partnerInput = Array.from(allInputs).find((el: any) => {
+          const formGroup = el.closest('[formGroupName="partner"]');
+          return formGroup !== null;
+        }) as HTMLInputElement;
+        if (partnerInput) {
+          partnerInput.value = parsed.normalized;
+        }
+      }, 0);
+      this.partnerAge = parsed.age;
+    } else {
+      control?.setValue(formatDigitsToDMY(digits), { emitEvent: false });
+      this.partnerAge = null;
+    }
+
+    control?.markAsTouched();
+    control?.updateValueAndValidity({ emitEvent: false });
+  }
+
+  private updateClientAgePreview(digits: string) {
+    const parsed = parseDMYFromDigits(digits);
+    this.age = parsed.ok ? parsed.age : null;
+  }
+
+  private updatePartnerAgePreview(digits: string) {
+    const parsed = parseDMYFromDigits(digits);
+    this.partnerAge = parsed.ok ? parsed.age : null;
+  }
+
+  get dobError(): string | null {
+    const control = this.clientForm.get('dob');
+    const err = control?.errors?.['dob'];
+    return typeof err === 'string' ? err : null;
+  }
+
+  get partnerDobError(): string | null {
+    const partnerGroup = this.clientForm.get('partner') as FormGroup;
+    const control = partnerGroup.get('dob');
+    const err = control?.errors?.['dob'];
+    return typeof err === 'string' ? err : null;
+  }
+
+  onCalendarChange(value: Date | null) {
+    if (!value) {
+      this.age = null;
+      this.clientDobDisplay = '';
+      this.clientForm.get('dob')?.setValue(null, { emitEvent: false });
+      return;
+    }
+    const formatted = normalizeToDMY(value);
+    this.age = calculateAge(value);
+    this.clientDobDisplay = formatted;
+
+    this.clientForm.get('dob')?.setValue(value, { emitEvent: false });
+
+    requestAnimationFrame(() => {
+      const allInputs = document.querySelectorAll('input[matDatepicker]');
+      const clientInput = Array.from(allInputs).find((el: any) => {
+        return el.getAttribute('matDatepicker') === 'picker';
+      }) as HTMLInputElement;
+      if (clientInput) {
+        clientInput.value = formatted;
+      }
+    });
+  }
+
+  onPartnerCalendarChange(value: Date | null) {
+    if (!value) {
+      this.partnerAge = null;
+      const partnerGroup = this.clientForm.get('partner') as FormGroup;
+      partnerGroup.get('dob')?.setValue(null, { emitEvent: false });
+      return;
+    }
+    const formatted = normalizeToDMY(value);
+    this.partnerAge = calculateAge(value);
+    this.partnerDobDisplay = formatted;
+    const partnerGroup = this.clientForm.get('partner') as FormGroup;
+    partnerGroup.get('dob')?.setValue(value, { emitEvent: false });
+
+    requestAnimationFrame(() => {
+      const allInputs = document.querySelectorAll('input[matDatepicker]');
+      const partnerInput = Array.from(allInputs).find((el: any) => {
+        return el.getAttribute('matDatepicker') === 'partnerPicker';
+      }) as HTMLInputElement;
+      if (partnerInput) {
+        partnerInput.value = formatted;
+      }
+    });
+  }
+
+  parseDobToDate(value: string): Date | null {
+    if (!value) return null;
+    const digits = onlyDigits(value);
+    const parsed = parseDMYFromDigits(digits);
+    return parsed.ok ? parsed.date : null;
+  }
+
+  onDobTyping(inputEl: HTMLInputElement): void {
     const raw = inputEl.value;
     const cursor = inputEl.selectionStart ?? raw.length;
 
     const digitsBeforeCursor = raw
-    .slice(0, cursor)
-    .replace(/\D/g, '')
-    .length;
+      .slice(0, cursor)
+      .replace(/\D/g, '')
+      .length;
 
     const digits = onlyDigits(raw);
     let formatted = formatDigitsToDMY(digits);
@@ -796,9 +804,9 @@ export class ClientEditComponent {
     const cursor = inputEl.selectionStart ?? raw.length;
 
     const digitsBeforeCursor = raw
-    .slice(0, cursor)
-    .replace(/\D/g, '')
-    .length;
+      .slice(0, cursor)
+      .replace(/\D/g, '')
+      .length;
 
     const digits = onlyDigits(raw);
     let formatted = formatDigitsToDMY(digits);
@@ -822,107 +830,107 @@ export class ClientEditComponent {
     this.updatePartnerAgePreview(digits);
   }
 }
-  
-  const MAX_AGE = 120;
-  
-  function onlyDigits(s: string | Date | null | undefined): string {
-    if (!s) return '';
-    if (s instanceof Date) {
-      const dd = pad2(s.getDate());
-      const mm = pad2(s.getMonth() + 1);
-      const yyyy = s.getFullYear();
-      return `${dd}${mm}${yyyy}`;
-    }
-    return String(s).replace(/\D/g, '').slice(0, 8);
+
+const MAX_AGE = 120;
+
+function onlyDigits(s: string | Date | null | undefined): string {
+  if (!s) return '';
+  if (s instanceof Date) {
+    const dd = pad2(s.getDate());
+    const mm = pad2(s.getMonth() + 1);
+    const yyyy = s.getFullYear();
+    return `${dd}${mm}${yyyy}`;
   }
-  
-  function formatDigitsToDMY(digits: string): string {
-    const d = digits.slice(0, 2);
-    const m = digits.slice(2, 4);
-    const y = digits.slice(4, 8);
-    return [d, m, y].filter(Boolean).join('/');
+  return String(s).replace(/\D/g, '').slice(0, 8);
+}
+
+function formatDigitsToDMY(digits: string): string {
+  const d = digits.slice(0, 2);
+  const m = digits.slice(2, 4);
+  const y = digits.slice(4, 8);
+  return [d, m, y].filter(Boolean).join('/');
+}
+
+function pad2(n: number): string {
+  return String(n).padStart(2, '0');
+}
+
+function normalizeToDMY(date: Date): string {
+  return `${pad2(date.getDate())}/${pad2(
+    date.getMonth() + 1
+  )}/${date.getFullYear()}`;
+}
+
+function parseDMYFromDigits(
+  digits: string
+):
+  | { ok: true; date: Date; age: number; normalized: string }
+  | { ok: false; error: string } {
+  if (digits.length !== 8)
+    return { ok: false, error: 'Please enter 8 digits (DDMMYYYY)' };
+
+  const dd = Number(digits.slice(0, 2));
+  const mm = Number(digits.slice(2, 4));
+  const yyyy = Number(digits.slice(4, 8));
+
+  if (mm < 1 || mm > 12) return { ok: false, error: 'Month must be 01–12' };
+  if (dd < 1 || dd > 31) return { ok: false, error: 'Day must be 01–31' };
+  if (yyyy < 1800 || yyyy > 9999)
+    return { ok: false, error: 'Year looks invalid' };
+
+  const date = new Date(yyyy, mm - 1, dd);
+  const isReal =
+    date.getFullYear() === yyyy &&
+    date.getMonth() === mm - 1 &&
+    date.getDate() === dd;
+
+  if (!isReal) return { ok: false, error: "That date doesn't exist" };
+
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  if (date > today)
+    return { ok: false, error: 'Date cannot be in the future' };
+
+  let age = today.getFullYear() - yyyy;
+  const hadBirthdayThisYear =
+    today.getMonth() > mm - 1 ||
+    (today.getMonth() === mm - 1 && today.getDate() >= dd);
+  if (!hadBirthdayThisYear) age -= 1;
+
+  if (age < 0) return { ok: false, error: 'Date cannot be in the future' };
+  if (age > MAX_AGE) return { ok: false, error: `Age must be ≤ ${MAX_AGE}` };
+
+  return { ok: true, date, age, normalized: normalizeToDMY(date) };
+}
+
+function calculateAge(date: Date): number {
+  const today = new Date();
+  let age = today.getFullYear() - date.getFullYear();
+  const hadBirthdayThisYear =
+    today.getMonth() > date.getMonth() ||
+    (today.getMonth() === date.getMonth() && today.getDate() >= date.getDate());
+  if (!hadBirthdayThisYear) age -= 1;
+  return age;
+}
+
+function dobValidator(
+  ctrl: FormControl<string | Date | null>
+): ValidationErrors | null {
+  const raw = ctrl.value;
+
+  if (raw instanceof Date) {
+    const age = calculateAge(raw);
+    if (age < 0) return { dob: 'Date cannot be in the future' };
+    if (age > MAX_AGE) return { dob: `Age must be ≤ ${MAX_AGE}` };
+    return null;
   }
-  
-  function pad2(n: number): string {
-    return String(n).padStart(2, '0');
-  }
-  
-  function normalizeToDMY(date: Date): string {
-    return `${pad2(date.getDate())}/${pad2(
-      date.getMonth() + 1
-    )}/${date.getFullYear()}`;
-  }
-  
-  function parseDMYFromDigits(
-    digits: string
-  ):
-    | { ok: true; date: Date; age: number; normalized: string }
-    | { ok: false; error: string } {
-    if (digits.length !== 8)
-      return { ok: false, error: 'Please enter 8 digits (DDMMYYYY)' };
-  
-    const dd = Number(digits.slice(0, 2));
-    const mm = Number(digits.slice(2, 4));
-    const yyyy = Number(digits.slice(4, 8));
-  
-    if (mm < 1 || mm > 12) return { ok: false, error: 'Month must be 01–12' };
-    if (dd < 1 || dd > 31) return { ok: false, error: 'Day must be 01–31' };
-    if (yyyy < 1800 || yyyy > 9999)
-      return { ok: false, error: 'Year looks invalid' };
-  
-    const date = new Date(yyyy, mm - 1, dd);
-    const isReal =
-      date.getFullYear() === yyyy &&
-      date.getMonth() === mm - 1 &&
-      date.getDate() === dd;
-  
-    if (!isReal) return { ok: false, error: "That date doesn't exist" };
-  
-    const now = new Date();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    if (date > today)
-      return { ok: false, error: 'Date cannot be in the future' };
-  
-    let age = today.getFullYear() - yyyy;
-    const hadBirthdayThisYear =
-      today.getMonth() > mm - 1 ||
-      (today.getMonth() === mm - 1 && today.getDate() >= dd);
-    if (!hadBirthdayThisYear) age -= 1;
-  
-    if (age < 0) return { ok: false, error: 'Date cannot be in the future' };
-    if (age > MAX_AGE) return { ok: false, error: `Age must be ≤ ${MAX_AGE}` };
-  
-    return { ok: true, date, age, normalized: normalizeToDMY(date) };
-  }
-  
-  function calculateAge(date: Date): number {
-    const today = new Date();
-    let age = today.getFullYear() - date.getFullYear();
-    const hadBirthdayThisYear =
-      today.getMonth() > date.getMonth() ||
-      (today.getMonth() === date.getMonth() && today.getDate() >= date.getDate());
-    if (!hadBirthdayThisYear) age -= 1;
-    return age;
-  }
-  
-  function dobValidator(
-    ctrl: FormControl<string | Date | null>
-  ): ValidationErrors | null {
-    const raw = ctrl.value;
-  
-    if (raw instanceof Date) {
-      const age = calculateAge(raw);
-      if (age < 0) return { dob: 'Date cannot be in the future' };
-      if (age > MAX_AGE) return { dob: `Age must be ≤ ${MAX_AGE}` };
-      return null;
-    }
-  
-    if (!raw) return null;
-  
-    const digits = onlyDigits(raw);
-    if (!digits) return null;
-    const parsed = parseDMYFromDigits(digits);
-    return parsed.ok ? null : { dob: parsed.error }; 
+
+  if (!raw) return null;
+
+  const digits = onlyDigits(raw);
+  if (!digits) return null;
+  const parsed = parseDMYFromDigits(digits);
+  return parsed.ok ? null : { dob: parsed.error };
 }
 
 

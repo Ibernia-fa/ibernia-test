@@ -21,3 +21,9 @@
 .apexcharts-tooltip .savings-tooltip__value {
   font-weight: 700;
 }
+
+:host ::ng-deep #chart.event-tooltip-active .apexcharts-tooltip {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
