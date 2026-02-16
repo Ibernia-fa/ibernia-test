@@ -298,12 +298,11 @@ export class AddEventDialogComponent {
           amount: ['', [Validators.required, Validators.min(0)]],
           cycle: ['One-off', [Validators.required]],
           start: [null, Validators.required],
-          end: [0, Validators.required],
-          escalationRate: [this.escalationRates[0].value, Validators.required],
+          end: [0],
+          escalationRate: [this.escalationRates[0].value],
           customEscalationRate: ['']
 
         });
-        this.onCycleValueChange('One-off');
         break;
     }
 
@@ -315,9 +314,17 @@ export class AddEventDialogComponent {
       this.eventForm.get('cycle')?.disable({ emitEvent: false });
     } else { // add back validations
       this.eventForm.get('start')?.setValidators(Validators.required);
-      this.eventForm.get('end')?.setValidators(Validators.required);
-      this.eventForm.get('escalationRate')?.setValidators(Validators.required);
       this.eventForm.get('cycle')?.enable({ emitEvent: false });
+
+      // Only require end and escalationRate for recurrent (non-one-off) events
+      const currentCycle = this.eventForm.get('cycle')?.value;
+      if (currentCycle && currentCycle !== 'One-off') {
+        this.eventForm.get('end')?.setValidators(Validators.required);
+        this.eventForm.get('escalationRate')?.setValidators(Validators.required);
+      } else {
+        this.eventForm.get('end')?.clearValidators();
+        this.eventForm.get('escalationRate')?.clearValidators();
+      }
     }
 
     this.eventForm.get('start')?.updateValueAndValidity({ emitEvent: false });
@@ -334,6 +341,11 @@ export class AddEventDialogComponent {
       }
       else {
         this.patchForm();
+        // Re-apply validators based on the patched cycle value
+        const patchedCycle = this.eventForm.get('cycle')?.value;
+        if (patchedCycle) {
+          this.onCycleValueChange(patchedCycle);
+        }
       }
     }
   }
@@ -420,11 +432,13 @@ export class AddEventDialogComponent {
       this.eventForm.controls['end'].updateValueAndValidity();
       this.eventForm.controls['escalationRate'].clearValidators();
       this.eventForm.controls['escalationRate'].updateValueAndValidity();
+      this.eventForm.controls['customEscalationRate'].clearValidators();
+      this.eventForm.controls['customEscalationRate'].updateValueAndValidity();
     }
     else {
-      this.eventForm.controls['end'].addValidators(Validators.required);
+      this.eventForm.controls['end'].setValidators(Validators.required);
       this.eventForm.controls['end'].updateValueAndValidity();
-      this.eventForm.controls['escalationRate'].addValidators(Validators.required);
+      this.eventForm.controls['escalationRate'].setValidators(Validators.required);
       this.eventForm.controls['escalationRate'].updateValueAndValidity();
 
       const currentValue = this.eventForm.get('escalationRate')?.value;
@@ -432,7 +446,7 @@ export class AddEventDialogComponent {
         this.eventForm.get('escalationRate')?.setValue('2.5%');
       }
     }
-    this.eventForm.updateValueAndValidity({ onlySelf: false, emitEvent: false });
+    this.eventForm.updateValueAndValidity();
   }
 
   onEventNameValueChange(event: any) {

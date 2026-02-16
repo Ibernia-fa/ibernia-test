@@ -283,3 +283,9 @@
   pointer-events: none !important;
   cursor: default !important;
 }
+
+// Disable vis-item pointer events during external chip drag
+// so that drops land on the timeline background, not on existing items
+::ng-deep .external-dragging .vis-item {
+  pointer-events: none !important;
+}

@@ -357,15 +357,11 @@ export class WithdrawalsContributionsComponent {
   }
 
   private updateContributionSummary(): void {
-    const currentYear = new Date().getFullYear();
-
     const activeIncomes = (this.incomeExpense?.incomes ?? [])
-      .filter((item) => this.isIncludedIncome(item))
-      .filter((item) => this.isHappeningInYear(item, currentYear));
+      .filter((item) => this.isIncludedIncome(item));
 
     const activeExpenses = (this.incomeExpense?.expenses ?? [])
-      .filter((item) => this.isIncludedExpense(item))
-      .filter((item) => this.isHappeningInYear(item, currentYear));
+      .filter((item) => this.isIncludedExpense(item));
 
     const totalIncome = activeIncomes.reduce(
       (sum, item) => sum + this.getYearAmount(item),
@@ -403,7 +399,8 @@ export class WithdrawalsContributionsComponent {
     const cycleDescription = (item?.amount?.cycle?.description ?? '').toString().toLowerCase();
     const isOneOff = cycleDescription === 'one-off';
 
-    if (!startYear) return false;
+    // If no start year is set, treat the item as currently active
+    if (!startYear) return !isOneOff;
     if (isOneOff) {
       return startYear === year;
     }

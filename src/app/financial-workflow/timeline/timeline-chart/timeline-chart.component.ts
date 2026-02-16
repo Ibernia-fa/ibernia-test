@@ -8,6 +8,7 @@ import {
   Input,
   OnChanges,
   OnInit,
+  OnDestroy,
   Output,
   SimpleChanges,
   ViewChild,
@@ -56,7 +57,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
   templateUrl: './timeline-chart.component.html',
   styleUrl: './timeline-chart.component.scss'
 })
-export class TimelineChartComponent implements OnInit, OnChanges {
+export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
   private readonly CHIP_ORDER = [
     'Retirement age',
     'Birth',
@@ -108,6 +109,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
   private tooltipMouseY: number = 0;
   private timelineHoverSubscription: Subscription;
   private isDragging = false; // Track drag state
+  private boundDocumentDrop: ((e: DragEvent) => void) | null = null;
 
   constructor(
     private dialog: MatDialog,
@@ -135,6 +137,10 @@ export class TimelineChartComponent implements OnInit, OnChanges {
   ngOnInit() {
     this.initTimelineContainer();
     this.getTimelineEventsLibrary();
+  }
+
+  ngOnDestroy() {
+    this.removeDocumentDropListener();
   }
 
   ngAfterViewInit() {
@@ -213,19 +219,53 @@ export class TimelineChartComponent implements OnInit, OnChanges {
     this.draggedEvent = customEvent;
     event.dataTransfer?.setData('text/plain', JSON.stringify(customEvent));
     this.timeline.addCustomTime(new Date(), 'dragOver');
+    this.timelineContainer.nativeElement.classList.add('external-dragging');
+
+    // Add a document-level drop listener to capture drops even when they land
+    // on vis-timeline's internal item elements that intercept the event
+    this.boundDocumentDrop = (e: DragEvent) => this.onDocumentDrop(e);
+    document.addEventListener('drop', this.boundDocumentDrop, true); // capture phase
   }
 
   onDragEnd(event: DragEvent) {
     event.preventDefault();
     this.isDragging = false;
     this.clearLabelHighlight();
+    this.timelineContainer.nativeElement.classList.remove('external-dragging');
+    this.removeDocumentDropListener();
     this.timeline.removeCustomTime('dragOver');
     this.timeline.redraw();
+  }
+
+  private removeDocumentDropListener() {
+    if (this.boundDocumentDrop) {
+      document.removeEventListener('drop', this.boundDocumentDrop, true);
+      this.boundDocumentDrop = null;
+    }
+  }
+
+  private onDocumentDrop(event: DragEvent) {
+    // Only handle if we're in an external drag and the drop is inside the timeline container
+    if (!this.isDragging || !this.draggedEvent) return;
+
+    const rect = this.timelineContainer.nativeElement.getBoundingClientRect();
+    if (
+      event.clientX >= rect.left &&
+      event.clientX <= rect.right &&
+      event.clientY >= rect.top &&
+      event.clientY <= rect.bottom
+    ) {
+      event.preventDefault();
+      event.stopPropagation();
+      this.onDrop(event);
+    }
   }
 
   onDrop(event: DragEvent) {
     event.preventDefault();
     this.isDragging = false;
+    this.timelineContainer.nativeElement.classList.remove('external-dragging');
+    this.removeDocumentDropListener();
 
     if (!this.draggedEvent || !this.timeline) {
       this.draggedEvent = null;
@@ -233,7 +273,22 @@ export class TimelineChartComponent implements OnInit, OnChanges {
     }
 
     // get the dropped position on the timeline
-    let dropTime = this.timeline.getEventProperties(event).time;
+    const props = this.timeline.getEventProperties(event);
+    let dropTime = props.time;
+
+    // If dropped on an existing item, time may be null — fall back to snapped position
+    if (!dropTime && props.snappedTime) {
+      dropTime = props.snappedTime;
+    }
+    if (!dropTime) {
+      // Last resort: calculate from the mouse X position on the timeline
+      const rect = this.timelineContainer.nativeElement.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const timelineRange = this.timeline.getWindow();
+      const ratio = x / rect.width;
+      const ms = timelineRange.start.valueOf() + ratio * (timelineRange.end.valueOf() - timelineRange.start.valueOf());
+      dropTime = this.snapToNearestYear(new Date(ms));
+    }
 
     if (this.draggedEvent?.name === 'Retirement age') {
 
@@ -505,15 +560,18 @@ export class TimelineChartComponent implements OnInit, OnChanges {
     const dataArray = this.financialTimeline.clientEvents.map(
       (event, index) => {
         const startYear = event.start.year;
+        const hasRealEnd = event.end && event.end.year && event.end.year > startYear;
+        const isOneOff = event.isOneOff;
+        const forecastEndYear = moment(this.financialTimeline.forecastEndtDate).year();
 
-        // For events with an end year (like State Pension that runs from 2040 to 2088)
-        if (event.end && event.end.year && event.end.year > startYear) {
-          // Events with duration - use their actual start and end years
+        // Non-one-off events: show actual duration
+        if (!isOneOff) {
+          const endYear = hasRealEnd ? event.end!.year : forecastEndYear;
           return {
             id: event.id,
             content: this.getContent(event.name, event.iconUrl),
-            start: new Date(startYear, 0, 1), // Jan 1st of start year
-            end: new Date(event.end.year, 0, 1), // Jan 1st of end year
+            start: new Date(startYear, 0, 1),
+            end: new Date(endYear, 0, 1),
             className: event.iconUrl,
             editable: {
               updateTime: true,
@@ -521,7 +579,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
             }
           };
         } else {
-          // ONE-OFF EVENTS (or events without end date)
+          // ONE-OFF EVENTS (or events without a valid end date)
           // Calculate the proportional width based on timeline length
           const timelineStartYear = moment(this.financialTimeline.forecastStartDate).year();
           const timelineEndYear = moment(this.financialTimeline.forecastEndtDate).year();
@@ -551,8 +609,8 @@ export class TimelineChartComponent implements OnInit, OnChanges {
           return {
             id: event.id,
             content: this.getContent(event.name, event.iconUrl),
-            start: new Date(startYear, 0, 1), // Jan 1st of start year
-            end: new Date(startYear + calculatedWidth, 0, 1), // End based on calculated width
+            start: new Date(startYear, 0, 1),
+            end: new Date(startYear + calculatedWidth, 0, 1),
             className: event.iconUrl,
             editable: {
               updateTime: true,
