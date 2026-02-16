@@ -79,7 +79,7 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
     email: ['' as string],
     preferences: this.fb.nonNullable.group({
       inflationRate: [2.5 as number, [Validators.required, Validators.min(0), Validators.max(100)]],
-      investmentReturn: [5 as number, [Validators.required, Validators.min(-100), Validators.max(100)]],
+      investmentReturn: [6 as number, [Validators.required, Validators.min(-100), Validators.max(100)]],
       pensionFundReturn: [4 as number, [Validators.required, Validators.min(-100), Validators.max(100)]],
       comissionType: [ComissionType.Amount as ComissionType, [Validators.required]],
       comissionPercentage: [1 as number | null],
@@ -151,7 +151,7 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
             email: p.email ?? this.user?.email ?? '',
             preferences: {
               inflationRate: p.preferences?.inflationRate ?? this.form.value.preferences?.inflationRate ?? 2.5,
-              investmentReturn: p.preferences?.investmentReturn ?? this.form.value.preferences?.investmentReturn ?? 5,
+              investmentReturn: p.preferences?.investmentReturn ?? this.form.value.preferences?.investmentReturn ?? 6,
               pensionFundReturn: p.preferences?.pensionFundReturn ?? this.form.value.preferences?.pensionFundReturn ?? 4,
               comissionType: (p.preferences?.comissionType as ComissionType) ?? this.form.value.preferences?.comissionType,
               comissionPercentage: p.preferences?.comissionPercentage ?? this.form.value.preferences?.comissionPercentage ?? null,
