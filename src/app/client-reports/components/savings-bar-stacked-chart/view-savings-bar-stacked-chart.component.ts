@@ -55,7 +55,9 @@ export class ViewSavingsBarStackedChartComponent implements OnChanges {
           const value = series[seriesIndex][dataPointIndex];
           const seriesName = w.globals.seriesNames[seriesIndex];
           const xValue = w.globals.labels[dataPointIndex];
-          const age = [(Math.floor(xValue) - moment(this.client.clientDetails.birthDate).year())]
+          const year = Number(xValue);
+          const firstYear = Number(w.globals.labels?.[0]);
+          const age = this.getDisplayAgeForYear(year, Number.isFinite(firstYear) ? firstYear : null);
           return `
           <div class="savings-tooltip">
             <div class="savings-tooltip__header">
@@ -137,14 +139,26 @@ export class ViewSavingsBarStackedChartComponent implements OnChanges {
     }
 
     if (changes['forecastStartDate'] || changes['forecastEndDate']) {
+      const categories = this.report?.categories ?? [];
+      const firstCategoryYear = Number(categories[0]);
       this.chartOptions.xaxis = {
         type: 'category', // treat x-axis as numbers (years)
-        categories: this.report.categories,
+        categories,
         stepSize: 5, // each year is a distinct tick
         tickAmount: Math.floor((moment(this.forecastEndDate).year() - moment(this.forecastStartDate).year()) / 5),
         style: {
           cssClass: 'leftAlign'
         },
+        labels: {
+          formatter: (value: string) => {
+            const year = Number(value);
+            const age = this.getDisplayAgeForYear(
+              year,
+              Number.isFinite(firstCategoryYear) ? firstCategoryYear : null
+            );
+            return age === '' ? value : String(age);
+          }
+        }
       }
     }
 
@@ -160,5 +174,51 @@ export class ViewSavingsBarStackedChartComponent implements OnChanges {
         }
       }
     }
+  }
+
+  private getDisplayAgeForYear(year: number, firstCategoryYear: number | null): number | '' {
+    if (!Number.isFinite(year)) {
+      return '';
+    }
+
+    // If report already sends age values instead of calendar years, keep them as-is.
+    if (year < 1000) {
+      return year;
+    }
+
+    const birthDate = this.getClientBirthDate();
+    if (!birthDate) {
+      return '';
+    }
+
+    let age = year - birthDate.getFullYear();
+
+    if (firstCategoryYear != null && year === firstCategoryYear && this.forecastStartDate) {
+      age = this.calculateAgeAtDate(this.forecastStartDate, birthDate);
+    }
+
+    return age;
+  }
+
+  private calculateAgeAtDate(referenceDate: Date, birthDate: Date): number {
+    const date = new Date(referenceDate);
+    let age = date.getFullYear() - birthDate.getFullYear();
+    const hasBirthdayPassed =
+      date.getMonth() > birthDate.getMonth() ||
+      (date.getMonth() === birthDate.getMonth() && date.getDate() >= birthDate.getDate());
+
+    if (!hasBirthdayPassed) {
+      age--;
+    }
+
+    return age;
+  }
+
+  private getClientBirthDate(): Date | null {
+    const raw = this.client?.clientDetails?.birthDate;
+    if (!raw) return null;
+
+    const parsed = new Date(raw);
+    return Number.isNaN(parsed.getTime()) ? null : parsed;
   }
 }

@@ -29,7 +29,7 @@
                             <div class="heading-btn-wrapper">
                                 <div class="d-flex align-items-center justify-content-between w-100 gap-16 flex-wrap">
                                     <div class="d-flex gap-12 align-items-end">
-                                        <h3>{{ 'Pension fund income' | translate }}</h3>
+                                        <h3>{{ 'Incomes' | translate }}</h3>
                                         <h3 class="expense-income-green">
                                             +{{currency|currencySymbol}}{{currentYearIncomeSummary.totalIncome|thousandSeparator}}
                                         </h3>
@@ -119,18 +119,12 @@
                                                             <span>{{ 'Delete' | translate }}</span>
                                                         </button>
                                                     </mat-menu>
-                                                    <div class="tile-bonus" *ngIf="income.description === 'Salary'">
+                                                    <div class="tile-bonus" *ngIf="income.description === 'Salary' && hasBonusAmount(income)">
                                                         <h3 class="saving-title">
-                                                            @if(income.bonus == null || income.bonus.amount == null || income.bonus?.amount?.amount == 0)
-                                                            {
-                                                            <span class="paragraph-text">{{'Set bonus' | translate}}</span>
-                                                            }
-                                                            @else {
                                                             <h3 class="card-title">
                                                                 <span class="span-header">Bonus:</span> +{{income.bonus.amount.currencySymbol|currencySymbol}}{{income.bonus.amount.amount|thousandSeparator}}
                                                                 <span class="paragraph-text">/{{getCycle(income.bonus.amount.cycle?.description)}}</span>
                                                             </h3>
-                                                            }
                                                         </h3>
                                                     </div>
                                                 </div>
