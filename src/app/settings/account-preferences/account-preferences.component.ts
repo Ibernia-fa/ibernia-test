@@ -31,17 +31,17 @@ import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
   imports: [MatCardModule, MatButtonModule,
-  MatIconModule,
-  MatFormFieldModule,
-  MatInputModule,
-  MatSelect,
-  MatSelectModule,
-  ReactiveFormsModule,
-  TranslateModule,
-  NgIf,
-  NgFor,
-  ThousandSeparatorInputDirective
-]
+    MatIconModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelect,
+    MatSelectModule,
+    ReactiveFormsModule,
+    TranslateModule,
+    NgIf,
+    NgFor,
+    ThousandSeparatorInputDirective
+  ]
 })
 export class AccountPreferencesComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
@@ -49,11 +49,11 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
   countries = allCountries;
   ComissionType = ComissionType;
 
-  private apiCommissionSnapshot?: { 
-  comissionType: ComissionType | null;
-  comissionAmount: number | null;
-  comissionPercentage: number | null;
-};
+  private apiCommissionSnapshot?: {
+    comissionType: ComissionType | null;
+    comissionAmount: number | null;
+    comissionPercentage: number | null;
+  };
 
   isLoading = false;
   isSaving = false;
@@ -70,7 +70,7 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
   private objectUrlToRevoke: string | null = null;
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
   @ViewChild('commissionAmountInput') commissionAmountInput?: ElementRef<HTMLInputElement>;
-// profileImagePreview: string | null = null;
+  // profileImagePreview: string | null = null;
   form = this.fb.nonNullable.group({
     userId: ['' as string],
     profilePhotoUrl: ['' as string],  // stays whatever backend returned
@@ -80,6 +80,7 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
     preferences: this.fb.nonNullable.group({
       inflationRate: [2.5 as number, [Validators.required, Validators.min(0), Validators.max(100)]],
       investmentReturn: [5 as number, [Validators.required, Validators.min(-100), Validators.max(100)]],
+      pensionFundReturn: [4 as number, [Validators.required, Validators.min(-100), Validators.max(100)]],
       comissionType: [ComissionType.Amount as ComissionType, [Validators.required]],
       comissionPercentage: [1 as number | null],
       comissionAmount: [null as number | null],
@@ -97,7 +98,7 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
     private navItemService: NavItemService,
     private toastr: ToastrService
   ) {
-      this.navItemService.currentRouteName = 'Account Preferences';
+    this.navItemService.currentRouteName = 'Account Preferences';
   }
 
   ngOnInit(): void {
@@ -149,8 +150,9 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
             lastName: p.lastName ?? this.user?.lastName ?? '',
             email: p.email ?? this.user?.email ?? '',
             preferences: {
-              inflationRate: p.preferences?.inflationRate ?? this.form.value.preferences?.inflationRate,
-              investmentReturn: p.preferences?.investmentReturn ?? this.form.value.preferences?.investmentReturn,
+              inflationRate: p.preferences?.inflationRate ?? this.form.value.preferences?.inflationRate ?? 2.5,
+              investmentReturn: p.preferences?.investmentReturn ?? this.form.value.preferences?.investmentReturn ?? 5,
+              pensionFundReturn: p.preferences?.pensionFundReturn ?? this.form.value.preferences?.pensionFundReturn ?? 4,
               comissionType: (p.preferences?.comissionType as ComissionType) ?? this.form.value.preferences?.comissionType,
               comissionPercentage: p.preferences?.comissionPercentage ?? this.form.value.preferences?.comissionPercentage ?? null,
               comissionAmount: p.preferences?.comissionAmount ?? this.form.value.preferences?.comissionAmount ?? null,
@@ -160,10 +162,10 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
           });
 
           this.apiCommissionSnapshot = {
-  comissionType: p.preferences?.comissionType ?? null,
-  comissionAmount: p.preferences?.comissionAmount ?? null,
-  comissionPercentage: p.preferences?.comissionPercentage ?? null,
-};
+            comissionType: p.preferences?.comissionType ?? null,
+            comissionAmount: p.preferences?.comissionAmount ?? null,
+            comissionPercentage: p.preferences?.comissionPercentage ?? null,
+          };
           // show backend avatar if present (local preview only)
           // if (p.profilePhotoUrl) {
           //   this.profileImagePreview = p.profilePhotoUrl;
@@ -217,48 +219,48 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
 
 
   private applyComissionValidation(t: ComissionType) {
-  const prefs = this.form.controls.preferences;
-  const pct = prefs.controls.comissionPercentage;
-  const amt = prefs.controls.comissionAmount;
+    const prefs = this.form.controls.preferences;
+    const pct = prefs.controls.comissionPercentage;
+    const amt = prefs.controls.comissionAmount;
 
-  // Reset validators only (don’t wipe values)
-  pct.clearValidators();
-  amt.clearValidators();
+    // Reset validators only (don’t wipe values)
+    pct.clearValidators();
+    amt.clearValidators();
 
-  // Enable both first so we can set values safely, then disable the irrelevant one.
-  pct.enable({ emitEvent: false });
-  amt.enable({ emitEvent: false });
+    // Enable both first so we can set values safely, then disable the irrelevant one.
+    pct.enable({ emitEvent: false });
+    amt.enable({ emitEvent: false });
 
-  const fromApiPct = this.apiCommissionSnapshot?.comissionPercentage ?? null;
-  const fromApiAmt = this.apiCommissionSnapshot?.comissionAmount ?? null;
+    const fromApiPct = this.apiCommissionSnapshot?.comissionPercentage ?? null;
+    const fromApiAmt = this.apiCommissionSnapshot?.comissionAmount ?? null;
 
-  if (t === ComissionType.Amount) {
-    // Validators
-    amt.setValidators([Validators.required, Validators.min(0.01)]);
-    // If amount is empty, seed from API or fallback default
-    if (amt.value == null) {
-      amt.setValue(fromApiAmt ?? 100, { emitEvent: false }); // <- choose your default
+    if (t === ComissionType.Amount) {
+      // Validators
+      amt.setValidators([Validators.required, Validators.min(0.01)]);
+      // If amount is empty, seed from API or fallback default
+      if (amt.value == null) {
+        amt.setValue(fromApiAmt ?? 100, { emitEvent: false }); // <- choose your default
+      }
+      // Disable the other without clearing its value
+      pct.disable({ emitEvent: false });
+    } else if (t === ComissionType.Percentage) {
+      pct.setValidators([Validators.required, Validators.min(0), Validators.max(100)]);
+      if (pct.value == null) {
+        pct.setValue(fromApiPct ?? 1, { emitEvent: false }); // <- default %
+      }
+      amt.disable({ emitEvent: false });
+    } else { // Both
+      pct.setValidators([Validators.required, Validators.min(0), Validators.max(100)]);
+      amt.setValidators([Validators.required, Validators.min(0.01)]);
+
+      if (pct.value == null) pct.setValue(fromApiPct ?? 1, { emitEvent: false });
+      if (amt.value == null) amt.setValue(fromApiAmt ?? 100, { emitEvent: false });
     }
-    // Disable the other without clearing its value
-    pct.disable({ emitEvent: false });
-  } else if (t === ComissionType.Percentage) {
-    pct.setValidators([Validators.required, Validators.min(0), Validators.max(100)]);
-    if (pct.value == null) {
-      pct.setValue(fromApiPct ?? 1, { emitEvent: false }); // <- default %
-    }
-    amt.disable({ emitEvent: false });
-  } else { // Both
-    pct.setValidators([Validators.required, Validators.min(0), Validators.max(100)]);
-    amt.setValidators([Validators.required, Validators.min(0.01)]);
 
-    if (pct.value == null) pct.setValue(fromApiPct ?? 1, { emitEvent: false });
-    if (amt.value == null) amt.setValue(fromApiAmt ?? 100, { emitEvent: false });
+    pct.updateValueAndValidity({ emitEvent: false });
+    amt.updateValueAndValidity({ emitEvent: false });
+    this.cdr.markForCheck();
   }
-
-  pct.updateValueAndValidity({ emitEvent: false });
-  amt.updateValueAndValidity({ emitEvent: false });
-  this.cdr.markForCheck();
-}
 
 
   get p() {
@@ -291,26 +293,26 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
   // }
 
   // local preview + store base64 in form control
-// async onFileSelected(evt: Event) {
-//   const input = evt.target as HTMLInputElement;
-//   const file = input?.files?.[0];
-//   if (!file) return;
+  // async onFileSelected(evt: Event) {
+  //   const input = evt.target as HTMLInputElement;
+  //   const file = input?.files?.[0];
+  //   if (!file) return;
 
-//   try {
-//     const dataUrl = await fileToDataUrl(file); // "data:image/png;base64,...."
-//     // preview uses the same string
-//     this.profileImagePreview = dataUrl;
+  //   try {
+  //     const dataUrl = await fileToDataUrl(file); // "data:image/png;base64,...."
+  //     // preview uses the same string
+  //     this.profileImagePreview = dataUrl;
 
-//     // store in the form so it goes to backend
-//     this.form.get('profilePhotoUrl')?.setValue(dataUrl);
-//   } catch (e) {
-//     console.error('Failed to read image', e);
-//     this.toastr.error('Could not read the selected image.', 'Error!');
-//   } finally {
-//     // allow selecting same file again later
-//     input.value = '';
-//   }
-// }
+  //     // store in the form so it goes to backend
+  //     this.form.get('profilePhotoUrl')?.setValue(dataUrl);
+  //   } catch (e) {
+  //     console.error('Failed to read image', e);
+  //     this.toastr.error('Could not read the selected image.', 'Error!');
+  //   } finally {
+  //     // allow selecting same file again later
+  //     input.value = '';
+  //   }
+  // }
 
   async onFileSelected(evt: Event) {
     const input = evt.target as HTMLInputElement;
@@ -355,6 +357,7 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
       preferences: {
         inflationRate: round2(raw.preferences.inflationRate),
         investmentReturn: round2(raw.preferences.investmentReturn),
+        pensionFundReturn: round2(raw.preferences.pensionFundReturn),
         comissionType: raw.preferences.comissionType,
         comissionPercentage:
           raw.preferences.comissionType === ComissionType.Amount
@@ -395,11 +398,11 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-//   clearImage(event: Event): void {
-//   event.stopPropagation(); // Prevents opening file dialog when clicking the cross
-//   this.profileImagePreview = null;
-//   this.form.get('profilePhotoUrl')?.setValue('');
-// }
+  //   clearImage(event: Event): void {
+  //   event.stopPropagation(); // Prevents opening file dialog when clicking the cross
+  //   this.profileImagePreview = null;
+  //   this.form.get('profilePhotoUrl')?.setValue('');
+  // }
 
   clearImage(event: Event): void {
     event.stopPropagation();

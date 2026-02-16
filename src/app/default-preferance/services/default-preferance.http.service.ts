@@ -8,6 +8,7 @@ export enum ComissionType { Amount = 1, Percentage = 2, Both = 3 }
 export interface PreferencesDto {
   inflationRate: number;
   investmentReturn: number;
+  pensionFundReturn: number;
   comissionType: ComissionType;         // 1|2|3
   comissionPercentage?: number | null;  // 0..100 when Percentage/Both
   comissionAmount?: number | null;      // >0 when Amount/Both
@@ -38,12 +39,12 @@ export class SettingsService {
   postUserProfile(payload: UserProfileDto): Observable<void> {
     return this.http.post<void>(`${this.baseUrl}/UserProfile`, payload);
   }
-  
+
   updateUserProfile(payload: UserProfileDto): Observable<void> {
     return this.http.put<void>(`${this.baseUrl}/UserProfile`, payload);
   }
 
-   getUserProfileResponse(userId: string): Observable<HttpResponse<any>> {
+  getUserProfileResponse(userId: string): Observable<HttpResponse<any>> {
     return this.http.get<any>(`${this.baseUrl}/UserProfile/${userId}`, {
       observe: 'response',
     });
@@ -53,32 +54,32 @@ export class SettingsService {
     return this.http.patch<any>(
       `${this.baseUrl}/UserProfile/${userId}/language`,
       JSON.stringify(language),
-    {
-      headers: {
-        'Content-Type': 'application/json'
+      {
+        headers: {
+          'Content-Type': 'application/json'
+        }
       }
-    }
     );
   }
 
   uploadProfilePhoto(file: File) {
-  const form = new FormData();
-  form.append('file', file);
-  // Adjust URL and response handling to your API;
-  // assume API returns { url: 'https://...' }
-  return this.http.post<{ url: string }>(`${this.baseUrl}/UserProfile/UploadPhoto`, form)
-    .pipe(
-      // map to just the URL string
-      // If your API returns plain string, change accordingly
-      map(res => res.url)
-    );
-}
+    const form = new FormData();
+    form.append('file', file);
+    // Adjust URL and response handling to your API;
+    // assume API returns { url: 'https://...' }
+    return this.http.post<{ url: string }>(`${this.baseUrl}/UserProfile/UploadPhoto`, form)
+      .pipe(
+        // map to just the URL string
+        // If your API returns plain string, change accordingly
+        map(res => res.url)
+      );
+  }
 
   notifyProfileChanged(): void {
     this._profileChanged.next();
   }
 
-  
+
   setUserData(value: UserProfileDto | null) {
     this._userData.next(value);
   }
