@@ -1,5 +1,6 @@
 // src/app/layouts/full/sidebar/settings-nav.config.ts
 import { NavItem } from './nav-item/nav-item';
+import { environment } from 'src/environments/environment';
 
 export const settingsNavItems: NavItem[] = [
   {
@@ -12,7 +13,7 @@ export const settingsNavItems: NavItem[] = [
     displayName: 'Security & Privacy',
     iconName: '/assets/images/svgs/shield-check.svg',
     iconOutline: '/assets/images/svgs/shield-check.svg',
-    route: 'https://identity.ibernia.it/Manage/ChangePassword',
+    route: `${environment.authority}/Manage/ChangePassword`,
     external: true,
   },
   {

@@ -2,7 +2,7 @@ import { AuthConfig } from 'angular-oauth2-oidc';
 import { environment } from '../environments/environment';
 
 export const authConfig: AuthConfig = {
-  issuer: 'https://identity.ibernia.it',
+  issuer: environment.authority,
   redirectUri: window.location.origin + '/signin-oidc',
   clientId: environment.authClientId,
   responseType: 'code',
@@ -10,5 +10,3 @@ export const authConfig: AuthConfig = {
   showDebugInformation: true,
   requireHttps: false,
 };
-//console.log(authConfig.clientId);
-debugger;
