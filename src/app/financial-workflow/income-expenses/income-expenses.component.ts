@@ -173,7 +173,7 @@ export class IncomeExpensesComponent {
   }
 
   updateIncomeClicked(item: FinancialViewModel) {
-    if (item.description == "Pension Fund")
+    if (item.description?.toLowerCase() === 'pension fund')
       return;
 
     this.setIncomeType();
@@ -354,7 +354,7 @@ export class IncomeExpensesComponent {
   }
 
   private isIncludedIncome(item: FinancialViewModel): boolean {
-    return item?.isIncomeExpenseSource === true || item?.description === 'Pension Fund';
+    return item?.isIncomeExpenseSource === true || item?.description?.toLowerCase() === 'pension fund';
   }
 
   private isIncludedExpense(item: FinancialViewModel): boolean {
@@ -404,7 +404,7 @@ export class IncomeExpensesComponent {
   }
 
   isEditableIncome(name: string): boolean {
-    if (name == "Pension Fund")
+    if (name?.toLowerCase() === 'pension fund')
       return false;
 
     return true;
