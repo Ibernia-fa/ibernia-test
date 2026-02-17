@@ -108,7 +108,7 @@
                  placeholder="" />
            
           <mat-error *ngIf="p.investmentReturn.hasError('required')">{{'Required' | translate}}</mat-error>
-          <mat-error *ngIf="p.investmentReturn.hasError('min') || p.investmentReturn.hasError('max')">-100–100</mat-error>
+          <mat-error *ngIf="p.investmentReturn.hasError('min') || p.investmentReturn.hasError('max')">0–100</mat-error>
         </mat-form-field>
       </div>
 
@@ -128,7 +128,7 @@
                  placeholder="" />
            
           <mat-error *ngIf="p.pensionFundReturn.hasError('required')">{{'Required' | translate}}</mat-error>
-          <mat-error *ngIf="p.pensionFundReturn.hasError('min') || p.pensionFundReturn.hasError('max')">-100–100</mat-error>
+          <mat-error *ngIf="p.pensionFundReturn.hasError('min') || p.pensionFundReturn.hasError('max')">0–100</mat-error>
         </mat-form-field>
       </div>
 

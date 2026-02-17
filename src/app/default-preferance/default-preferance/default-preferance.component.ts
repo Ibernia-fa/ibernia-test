@@ -46,8 +46,8 @@ export class DefaultPreferanceComponent implements OnInit, OnDestroy {
     email: ['' as string],
     preferences: this.fb.nonNullable.group({
       inflationRate: [2.5 as number, [Validators.required, Validators.min(0), Validators.max(100)]],
-      investmentReturn: [6 as number, [Validators.required, Validators.min(-100), Validators.max(100)]],
-      pensionFundReturn: [4 as number, [Validators.required, Validators.min(-100), Validators.max(100)]],
+      investmentReturn: [6 as number, [Validators.required, Validators.min(0), Validators.max(100)]],
+      pensionFundReturn: [4 as number, [Validators.required, Validators.min(0), Validators.max(100)]],
       // comissionType: [ComissionType.Amount as ComissionType, [Validators.required]],
       // comissionPercentage: [1 as number | null],
       // comissionAmount: [null as number | null],
