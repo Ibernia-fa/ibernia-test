@@ -222,6 +222,41 @@
               </button>
             </div>
           </div>
+          @if (questionnaireResponses) {
+            <div class="questionnaire-submitted-info mt-16">
+              <span class="f-s-14">{{ 'Submitted on' | translate }} {{ questionnaireResponses.submittedAt | date:'mediumDate' }}</span>
+            </div>
+          }
+        </div>
+      </mat-card-content>
+    </mat-card>
+  }
+
+  @if (questionnaireResponses) {
+    <mat-card class="questionnaire-responses-card">
+      <mat-card-content>
+        <div class="profile-main-wrapper">
+          <div class="d-flex flex-column gap-16">
+            <div class="d-flex align-items-center justify-content-between">
+              <h3 class="card-title">{{ 'Questionnaire responses' | translate }}</h3>
+              <span class="f-s-14 submitted-date">{{ 'Submitted on' | translate }} {{ questionnaireResponses.submittedAt | date:'mediumDate' }}</span>
+            </div>
+            <div class="responses-container">
+              @for (item of questionnaireResponses.responses; track item.questionId) {
+                <div class="response-item">
+                  <h4 class="response-question">{{ item.questionText }}</h4>
+                  <div class="response-value-chips">
+                    @for (chip of getResponseChips(item); track chip) {
+                      <span class="chip">{{ chip }}</span>
+                    }
+                    @if (getResponseChips(item).length === 0) {
+                      <span>{{ formatResponseValue(item) }}</span>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
         </div>
       </mat-card-content>
     </mat-card>

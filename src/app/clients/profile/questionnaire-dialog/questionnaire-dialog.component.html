@@ -10,6 +10,11 @@
 
   <!-- Modal Body (scrollable) -->
   <mat-dialog-content class="questionnaire-dialog-content">
+  @if (isLoaderVisible) {
+    <div class="d-flex justify-content-center p-32">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+  } @else {
   <div class="d-flex flex-column gap-20">
     <p class="f-s-14 questionnaire-body">
       {{ 'Select the questions you want to share with' | translate }}
@@ -46,6 +51,7 @@
       }
     </div>
   </div>
+  }
   </mat-dialog-content>
   <!-- End Modal Body -->
 
@@ -57,8 +63,12 @@
       </button>
     </div>
     <div class="col-5">
-      <button (click)="onCopyLink()" type="button" class="button-icon w-100 d-block">
-        <span class="f-s-16">{{ 'Copy questionnaire link' | translate }}</span>
+      <button (click)="onCopyLink()" type="button" class="button-icon w-100 d-block" [disabled]="isCopying || isLoaderVisible">
+        @if (isCopying) {
+          <mat-spinner diameter="20"></mat-spinner>
+        } @else {
+          <span class="f-s-16">{{ 'Copy questionnaire link' | translate }}</span>
+        }
       </button>
     </div>
   </div>

@@ -1,0 +1,134 @@
+<div class="questionnaire-page">
+  @if (isLoaderVisible) {
+    <div class="full-screen-loader">
+      <mat-spinner></mat-spinner>
+    </div>
+  } @else if (errorMessage) {
+    <div class="error-state">
+      <h2>{{ 'This link is no longer available' | translate }}</h2>
+      <p>{{ errorMessage }}</p>
+    </div>
+  } @else if (submitted) {
+    <div class="thank-you-state">
+      <h2>{{ 'Thank you!' | translate }}</h2>
+      <p>{{ 'Your responses have been shared with' | translate }} {{ advisorName }}.</p>
+    </div>
+  } @else {
+    <div class="questionnaire-form">
+      <h1 class="page-title">{{ 'Questionnaire' | translate }}</h1>
+      <p class="page-subtitle">{{ 'Shared by' | translate }} {{ advisorName }}</p>
+
+      <div class="questions-list">
+        @for (q of questions; track q.id) {
+          <mat-card class="question-card">
+            <mat-card-content>
+              <h3 class="question-text">{{ q.text }}</h3>
+              @if (q.type === 'ImportantPeople') {
+                <div class="important-people">
+                    @for (person of importantPeople; track $index) {
+                      <div class="person-row">
+                        <input
+                          type="text"
+                          [(ngModel)]="person.name"
+                          [ngModelOptions]="{standalone: true}"
+                          placeholder="{{ 'Name' | translate }}"
+                          class="person-name"
+                        />
+                        <mat-form-field appearance="outline" class="person-relationship">
+                          <mat-label>{{ 'Relationship' | translate }}</mat-label>
+                          <mat-select [(ngModel)]="person.relationship" [ngModelOptions]="{standalone: true}">
+                            @for (opt of q.options; track opt) {
+                              <mat-option [value]="opt">{{ opt }}</mat-option>
+                            }
+                          </mat-select>
+                        </mat-form-field>
+                        @if (importantPeople.length > 1) {
+                          <button type="button" class="btn-remove" (click)="removeImportantPerson($index)">×</button>
+                        }
+                      </div>
+                    }
+                    <button type="button" class="btn-add" (click)="addImportantPerson()">
+                      + {{ 'Add another' | translate }}
+                    </button>
+                  </div>
+              } @else if (q.type === 'Goals') {
+                  <div class="options-list">
+                    @for (opt of q.options; track opt) {
+                      <label class="option-checkbox">
+                        <input
+                          type="checkbox"
+                          [checked]="isGoalSelected(q.id, opt)"
+                          (change)="toggleGoal(q.id, opt)"
+                        />
+                        <span>{{ opt }}</span>
+                      </label>
+                    }
+                    @if (q.options?.includes('Other')) {
+                      <mat-form-field appearance="outline" class="others-field">
+                        <mat-label>{{ 'Others (please specify)' | translate }}</mat-label>
+                        <input matInput [(ngModel)]="othersByQuestion['goals_' + q.id]" [ngModelOptions]="{standalone: true}" />
+                      </mat-form-field>
+                    }
+                  </div>
+              } @else if (q.type === 'InvestableAssets' || q.type === 'InvestmentApproach') {
+                <div class="radio-list">
+                    @for (opt of q.options; track opt) {
+                      <label class="option-radio">
+                        <input
+                          type="radio"
+                          [name]="'q_' + q.id"
+                          [value]="opt"
+                          [checked]="getSingleSelect(q.id) === opt"
+                          (change)="setSingleSelect(q.id, opt)"
+                        />
+                        <span>{{ opt }}</span>
+                      </label>
+                    }
+                  </div>
+              } @else if (q.type === 'AreasOfWorry') {
+                <div class="options-list">
+                    @for (opt of q.options; track opt) {
+                      <label class="option-checkbox">
+                        <input
+                          type="checkbox"
+                          [checked]="isWorrySelected(q.id, opt)"
+                          (change)="toggleWorry(q.id, opt)"
+                        />
+                        <span>{{ opt }}</span>
+                      </label>
+                    }
+                    @if (q.options?.includes('Other')) {
+                      <mat-form-field appearance="outline" class="others-field">
+                        <mat-label>{{ 'Others (please specify)' | translate }}</mat-label>
+                        <input matInput [(ngModel)]="othersByQuestion['worry_' + q.id]" [ngModelOptions]="{standalone: true}" />
+                      </mat-form-field>
+                    }
+                  </div>
+              } @else if (q.type === 'FinancialPlanningImprovement') {
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>{{ 'Your response' | translate }}</mat-label>
+                  <textarea matInput [(ngModel)]="financialPlanningByQuestion[q.id]" [ngModelOptions]="{standalone: true}" rows="4"></textarea>
+                </mat-form-field>
+              }
+            </mat-card-content>
+          </mat-card>
+        }
+      </div>
+
+      <div class="submit-section">
+        <button
+          type="button"
+          class="button-icon submit-btn"
+          (click)="onSubmit()"
+          [disabled]="isSubmitting"
+        >
+          @if (isSubmitting) {
+            <mat-spinner diameter="24"></mat-spinner>
+          } @else {
+            <span>{{ 'Share with' | translate }} {{ advisorName }}</span>
+          }
+        </button>
+      </div>
+    </div>
+  }
+</div>

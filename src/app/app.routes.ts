@@ -50,6 +50,13 @@ export const routes: Routes = [
             (m) => m.ClientReportComponent
           ),
       },
+      {
+        path: 'questionnaire/:token',
+        loadComponent: () =>
+          import('./questionnaire/client-questionnaire.component').then(
+            (m) => m.ClientQuestionnaireComponent
+          ),
+      },
     ],
   },
   {
