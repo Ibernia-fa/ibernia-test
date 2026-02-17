@@ -385,7 +385,7 @@ export class WithdrawalsContributionsComponent {
   }
 
   private isIncludedIncome(item: FinancialViewModel): boolean {
-    return item?.isIncomeExpenseSource === true || item?.description === 'Pension Fund';
+    return item?.isIncomeExpenseSource === true || item?.description?.toLowerCase() === 'pension fund';
   }
 
   private isIncludedExpense(item: FinancialViewModel): boolean {

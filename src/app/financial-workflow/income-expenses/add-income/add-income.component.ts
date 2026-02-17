@@ -253,7 +253,7 @@ export class AddIncomeComponent {
 
     const existing = this.data.incomes
       ?.filter((e: any) =>
-        e.isDefault == false && e.description != "Rental income" && e.description != "Pension Fund"
+        e.isDefault == false && e.description != "Rental income" && e.description?.toLowerCase() !== 'pension fund'
       ) ?? [];
 
     if (existing.length === 0 && baseName !== "Custom income") {

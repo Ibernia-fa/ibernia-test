@@ -100,7 +100,7 @@ export class AddNewPotComponent {
       type: SavingPotType.Investment,
     },
     {
-      name: 'Pension Fund',
+      name: 'Pension fund',
       iconUrl: 'cashflow-pension-icon',
       type: SavingPotType.PensionFund,
     },
@@ -196,11 +196,11 @@ export class AddNewPotComponent {
     this.savingsForm = this.fb.group({
       name: [defaultType, Validators.required],
       currency: [this.clientPreferredCurrency, Validators.required],
-      amount: ['', [Validators.required, this.minPositiveValue()]],
+      amount: [0, [Validators.required, this.minPositiveValue()]],
       customName: [''],  // For Custom pots
       returnRate: [this.userReturnRate],
       // lockPot: [true],
-      lockPot: [defaultType === 'Pension Fund'],  // Auto-check for Pension Fund
+      lockPot: [defaultType === 'Pension fund'],  // Auto-check for Pension fund only
       start: [data.forecastStartDateYear, Validators.required],
       end: [data.forecastEndDateYear-1, Validators.required],
       // Commissions always start unchecked - user must manually enable
@@ -214,8 +214,8 @@ export class AddNewPotComponent {
       commissionPercentage: [this.loggedInUserPreferences?.comissionPercentage || 0],
       escalationRate: [''],
       customEscalationRate: [''],
-      // Pension Fund specific fields
-      contributionAmount: [''],
+      // Pension fund specific fields
+      contributionAmount: [0],
       contributionFrequency: [1],  // Monthly (1) by default
       contributionStartDate: [data.forecastStartDateYear],  // This year
       contributionEndDate: [this.retirementAge]  // Retirement year
@@ -238,7 +238,7 @@ export class AddNewPotComponent {
       this.amount = (value ?? null) as number | null;
     });
     
-    // Set up initial validators for Pension Fund fields if default type is Pension Fund
+    // Set up initial validators for Pension fund fields if default type is Pension fund
     this.updatePensionFundValidators(defaultType);
     
     if(this.isEditWorkflow) {
@@ -329,8 +329,8 @@ onAmountBlur(e: Event) {
     this.savingsForm.get('start')?.patchValue(this.selectedPot.lockedFrom?.year ?? this.forecastStartDateYear, { emitEvent: false });
     this.savingsForm.get('end')?.patchValue(this.selectedPot.lockedTill?.year ?? (this.forecastEndDateYear - 1), { emitEvent: false });
     
-    // Patch Pension Fund specific fields if applicable
-    if (this.selectedPot.name === 'Pension Fund') {
+    // Patch Pension fund specific fields if applicable
+    if (this.selectedPot.name === 'Pension fund') {
       this.savingsForm.get('contributionAmount')?.patchValue(this.selectedPot.contributionAmount, { emitEvent: false });
       this.savingsForm.get('contributionFrequency')?.patchValue(this.selectedPot.contributionFrequency, { emitEvent: false });
       this.savingsForm.get('contributionStartDate')?.patchValue(this.selectedPot.contributionStartDate?.year, { emitEvent: false });
@@ -393,9 +393,9 @@ onAmountBlur(e: Event) {
   /**
    * Implements smart default pot type selection based on existing pots
    * Case 1: Existing pot: Cash → New pot default: Investment
-   * Case 2: Existing pot: Cash, Investment → New pot default: Pension Fund
-   * Case 3: Existing pot: Cash, Pension Fund → New pot default: Investment
-   * Case 4: Existing pot: Cash, Investment, Pension Fund or more → New pot default: Custom
+   * Case 2: Existing pot: Cash, Investment → New pot default: Pension fund
+   * Case 3: Existing pot: Cash, Pension fund → New pot default: Investment
+   * Case 4: Existing pot: Cash, Investment, Pension fund or more → New pot default: Custom
    */
   getSmartDefaultType(): string {
     if (!this.existingSavingPots || this.existingSavingPots.length === 0) {
@@ -409,7 +409,7 @@ onAmountBlur(e: Event) {
 
     const hasCash = existingTypes.has('Cash');
     const hasInvestment = existingTypes.has('Investment');
-    const hasPension = existingTypes.has('Pension Fund');
+    const hasPension = existingTypes.has('Pension fund');
 
     // Case 4: Multiple types already exist
     if (existingTypes.size >= 3) {
@@ -423,10 +423,10 @@ onAmountBlur(e: Event) {
 
     // Case 2: Cash and Investment exist
     if (existingTypes.size === 2 && hasCash && hasInvestment) {
-      return 'Pension Fund';
+      return 'Pension fund';
     }
 
-    // Case 3: Cash and Pension Fund exist
+    // Case 3: Cash and Pension fund exist
     if (existingTypes.size === 2 && hasCash && hasPension) {
       return 'Investment';
     }
@@ -481,31 +481,33 @@ onAmountBlur(e: Event) {
       this.selectedNameIconUrl = cusEvent?.iconUrl ?? '';
     }
     
-    // Auto-tick and disable lockPot for Pension Fund
-    if (name === 'Pension Fund') {
+    // Auto-tick lockPot for Pension fund, untick for other types
+    if (name === 'Pension fund') {
       this.savingsForm.get('lockPot')?.setValue(true);
+    } else {
+      this.savingsForm.get('lockPot')?.setValue(false);
     }
 
-    // Update Pension Fund field validators based on type
+    // Update Pension fund field validators based on type
     this.updatePensionFundValidators(name);
   }
   
-  // Update validators for Pension Fund specific fields
+  // Update validators for Pension fund specific fields
   private updatePensionFundValidators(potType: string): void {
     const contributionAmountControl = this.savingsForm.get('contributionAmount');
     const contributionStartControl = this.savingsForm.get('contributionStartDate');
     const contributionEndControl = this.savingsForm.get('contributionEndDate');
     const commissionsControl = this.savingsForm.get('commissions');
     
-    if (potType === 'Pension Fund') {
-      // Make Pension Fund fields required
+    if (potType === 'Pension fund') {
+      // Make Pension fund fields required
       contributionAmountControl?.setValidators([Validators.required, this.minPositiveValue()]);
       contributionStartControl?.setValidators([Validators.required]);
       contributionEndControl?.setValidators([Validators.required]);
       
       // Do NOT auto-check commissions - user must manually enable it
     } else {
-      // Clear validators for non-Pension Fund types
+      // Clear validators for non-Pension fund types
       contributionAmountControl?.setValidators([]);
       contributionStartControl?.setValidators([]);
       contributionEndControl?.setValidators([]);
@@ -868,26 +870,26 @@ onEscalationRateChange(event: MatSelectChange): void {
         // realReturn: this.savingsForm.get('name')?.value !== 'Cash' ?
         //   this.savingsForm.get('returnRate')?.value - this.inflationRate : 0,
         realReturn: real,
-        // Pension Fund specific fields
-        contributionAmount: this.savingsForm.get('name')?.value === 'Pension Fund' 
+        // Pension fund specific fields
+        contributionAmount: this.savingsForm.get('name')?.value === 'Pension fund' 
           ? this.savingsForm.get('contributionAmount')?.value 
           : null,
-        contributionFrequency: this.savingsForm.get('name')?.value === 'Pension Fund'
+        contributionFrequency: this.savingsForm.get('name')?.value === 'Pension fund'
           ? this.savingsForm.get('contributionFrequency')?.value
           : null,
-        contributionStartDate: this.savingsForm.get('name')?.value === 'Pension Fund'
+        contributionStartDate: this.savingsForm.get('name')?.value === 'Pension fund'
           ? {
               year: this.savingsForm.get('contributionStartDate')?.value,
               age: (this.savingsForm.get('contributionStartDate')?.value || 0) - this.clientBirthYear
             }
           : null,
-        contributionEndDate: this.savingsForm.get('name')?.value === 'Pension Fund'
+        contributionEndDate: this.savingsForm.get('name')?.value === 'Pension fund'
           ? {
               year: this.savingsForm.get('contributionEndDate')?.value,
               age: (this.savingsForm.get('contributionEndDate')?.value || 0) - this.clientBirthYear
             }
           : null,
-        retirementAge: this.savingsForm.get('name')?.value === 'Pension Fund'
+        retirementAge: this.savingsForm.get('name')?.value === 'Pension fund'
           ? this.retirementAge
           : null
       };

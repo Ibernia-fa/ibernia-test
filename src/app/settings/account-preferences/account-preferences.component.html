@@ -20,15 +20,15 @@
       <div class="d-flex align-items-start gap-24">
         <!-- Upload Avatar -->
         <div class="upload-avatar-wrapper">
-        
+
           <label for="upload-avatar" class="cursor-pointer">
             <div class="text-center">
-      <!-- <img *ngIf="profileImagePreview; else placeholder"
+              <!-- <img *ngIf="profileImagePreview; else placeholder"
      [src]="profileImagePreview"
      alt="avatar"
      class="rounded"
      style="width:120px;height:120px;object-fit:cover;"> -->
-     <div *ngIf="profileImagePreview; else placeholder" class="image-preview-wrapper position-relative">
+              <div *ngIf="profileImagePreview; else placeholder" class="image-preview-wrapper position-relative">
   <img
     [src]="profileImagePreview"
     alt="avatar"
@@ -38,7 +38,7 @@
 
     <span class="remove-pic" (click)="clearImage($event)"><img  src="../../../assets/images/shapes/delete.svg" alt=""></span>
 
-</div>
+              </div>
 
               <ng-template #placeholder>
                 <img class="m-b-10" src="../../../assets/images/shapes/small-icon.svg" alt="">
@@ -61,32 +61,32 @@
   (change)="onFileSelected($event)"
 />
 
-        
+
         </div>
 
         <!-- Name / Email -->
         <div class="row">
           <div class="col-6">
-          <mat-label class="f-s-16 f-w-400 m-b-8 d-block">{{ 'First name' | translate }}</mat-label>
-          <mat-form-field appearance="outline" class="w-100">
-            <input matInput formControlName="firstName" placeholder="{{ 'First name' | translate }}">
-          </mat-form-field>
+            <mat-label class="f-s-16 f-w-400 m-b-8 d-block">{{ 'First name' | translate }}</mat-label>
+            <mat-form-field appearance="outline" class="w-100">
+              <input matInput formControlName="firstName" placeholder="{{ 'First name' | translate }}">
+            </mat-form-field>
           </div>
           <div class="col-6">
-          <mat-label class="f-s-16 f-w-400 m-b-8 d-block">{{ 'Last name' | translate }}</mat-label>
-          <mat-form-field appearance="outline" class="w-100">
-            <input matInput formControlName="lastName" placeholder="{{ 'Last name' | translate }}">
-          </mat-form-field>
+            <mat-label class="f-s-16 f-w-400 m-b-8 d-block">{{ 'Last name' | translate }}</mat-label>
+            <mat-form-field appearance="outline" class="w-100">
+              <input matInput formControlName="lastName" placeholder="{{ 'Last name' | translate }}">
+            </mat-form-field>
           </div>
-          
-          <div class="col-12">
-          <mat-label class="f-s-16 f-w-400 m-b-8 d-block">{{ 'Email address' | translate }}</mat-label>
-          <mat-form-field appearance="outline" class="w-100 disabled-field">
-            <input matInput formControlName="email" type="email" placeholder="{{ 'Email address' | translate }}" readonly>
-          </mat-form-field>
 
-          <!-- Hidden field holds uploaded URL -->
-          <input type="hidden" formControlName="profilePhotoUrl">
+          <div class="col-12">
+            <mat-label class="f-s-16 f-w-400 m-b-8 d-block">{{ 'Email address' | translate }}</mat-label>
+            <mat-form-field appearance="outline" class="w-100 disabled-field">
+            <input matInput formControlName="email" type="email" placeholder="{{ 'Email address' | translate }}" readonly>
+            </mat-form-field>
+
+            <!-- Hidden field holds uploaded URL -->
+            <input type="hidden" formControlName="profilePhotoUrl">
           </div>
         </div>
       </div>
@@ -102,30 +102,30 @@
 
 
           <div class="col-6">
-            <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Country' | translate }} 
+            <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Country' | translate }}
               <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4" matTooltip="Sets the main currency for all new client plans. All figures will be shown in this currency by default, but you can change it for individual clients later.">
             </mat-label>
             <mat-form-field appearance="outline" class="w-100">
               <mat-select formControlName="country" placeholder="{{ 'Select country' | translate }}" (selectionChange)="clientCountryValueChange($event.value)">
                 @for (country of countries; track country.countryName) {
-                  @if (country.currencySymbol) {
-                    <mat-option [value]="country.countryName">{{ country.countryName }}</mat-option>
-                  }
+                @if (country.currencySymbol) {
+                <mat-option [value]="country.countryName">{{ country.countryName }}</mat-option>
+                }
                 }
               </mat-select>
             </mat-form-field>
           </div>
-             <div class="col-6">
+          <div class="col-6">
             <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">
-              {{ 'Default currency' | translate }}
+              {{ 'Currency' | translate }}
               <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4" matTooltip="Sets the main currency for all new client plans. All figures will be shown in this currency by default, but you can change it for individual clients later.">
             </mat-label>
             <mat-form-field appearance="outline" class="w-100">
               <mat-select formControlName="currency" hideSingleSelectionIndicator>
                 @for (country of countries; track country) {
-                  @if (country.currencySymbol) {
-                    <mat-option [value]="country.currencySymbol">{{ country.currencySymbol }}</mat-option>
-                  }
+                @if (country.currencySymbol) {
+                <mat-option [value]="country.currencySymbol">{{ country.currencySymbol }}</mat-option>
+                }
                 }
               </mat-select>
               <mat-error *ngIf="p.currency.invalid">{{'Required' | translate}}</mat-error>
@@ -135,9 +135,9 @@
 
 
 
-          <div class="col-6">
+          <div class="col-4">
             <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">
-              {{ 'Default inflation rate' | translate }}
+              {{ 'Inflation rate' | translate }}
               <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4" matTooltip="Sets the default annual inflation rate used in projections. You can modify it in each client’s cashflow model to show how inflation impacts their future results.">
             </mat-label>
             <mat-form-field appearance="outline" class="w-100 percentage-icon">
@@ -148,13 +148,13 @@
             </mat-form-field>
           </div>
 
-        
 
-       
 
-          <div class="col-6">
+
+
+          <div class="col-4">
             <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">
-              {{ 'Default net investment return' | translate }}
+              {{ 'Investment net return' | translate }}
               <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4" matTooltip="Defines the expected yearly return after taxes. Ibernia uses this to estimate how investments grow over time. You can adapt it for each Saving Pot or individual client.">
             </mat-label>
             <mat-form-field appearance="outline" class="w-100 percentage-icon">
@@ -167,7 +167,20 @@
 
           <div class="col-4">
             <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">
-              {{ 'Default advisor commission type' | translate }}
+              {{ 'Pension fund net return' | translate }}
+              <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4" matTooltip="Sets the default return rate for pension funds.">
+            </mat-label>
+            <mat-form-field appearance="outline" class="w-100 percentage-icon">
+              <span matSuffix>%</span>
+              <input matInput type="number" step="0.1" formControlName="pensionFundReturn" />
+              <mat-error *ngIf="p.pensionFundReturn.hasError('required')">{{'Required' | translate}}</mat-error>
+              <mat-error *ngIf="p.pensionFundReturn.hasError('min') || p.pensionFundReturn.hasError('max')">-100–100</mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="col-4">
+            <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">
+              {{ 'Advisor commission type' | translate }}
               <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4" matTooltip="Defines how advisor commissions are calculated. You can set a fixed amount (e.g., €100 per year), a percentage of assets (e.g., 1% annually), or both. This acts as your default method and can be customized for each client.">
             </mat-label>
             <mat-form-field appearance="outline" class="w-100">
@@ -181,12 +194,12 @@
           </div>
 
 
-        
-          
-   
 
 
-    <!-- <div class="col-2">
+
+
+
+          <!-- <div class="col-2">
           <div class="left ">
             <mat-label class="f-s-16 f-w-400 m-b-8 d-block">Currency</mat-label>
                     <div class="select-option hide-arrow">
@@ -204,34 +217,34 @@
                     </div>
                   </div>
       </div> -->
-     @if (form.controls.preferences.controls.comissionType.value === ComissionType.Percentage) {
-            <div class="col-8">
-              <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Default commission percentage' | translate }}
-                <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4" matTooltip="Sets the default percentage commission for new plans (e.g., 1% annually on the value of invested savings). This applies to each Saving Pot by default, and you can adjust it for each client when needed.">
-              </mat-label>
-              <mat-form-field appearance="outline" class="w-100 percentage-icon">
-                <span matSuffix>%</span>
+          @if (form.controls.preferences.controls.comissionType.value === ComissionType.Percentage) {
+          <div class="col-8">
+            <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Commission percentage' | translate }}
+              <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4" matTooltip="Sets the default percentage commission for new plans (e.g., 1% annually on the value of invested savings). This applies to each Saving Pot by default, and you can adjust it for each client when needed.">
+            </mat-label>
+            <mat-form-field appearance="outline" class="w-100 percentage-icon">
+              <span matSuffix>%</span>
                 <input matInput type="number" step="0.1" formControlName="comissionPercentage"  />
-                <mat-error *ngIf="p.comissionPercentage.hasError('required')">{{'Required' | translate}}</mat-error>
+              <mat-error *ngIf="p.comissionPercentage.hasError('required')">{{'Required' | translate}}</mat-error>
                 <mat-error *ngIf="p.comissionPercentage.hasError('min') || p.comissionPercentage.hasError('max')">0–100</mat-error>
-              </mat-form-field>
-            </div>
+            </mat-form-field>
+          </div>
           }
 
 
-      <div class="col-8">
-        <div class="row">
-        
-
-
-     
+          <div class="col-8">
+            <div class="row">
 
 
 
-          @if (form.controls.preferences.controls.comissionType.value === ComissionType.Amount) {
-          <div class="col-2">
-            <mat-label class="f-s-16 f-w-400 m-b-8 d-block">{{ 'Currency' | translate }}</mat-label>
-            <mat-form-field appearance="outline" class="w-full w-100 disabled-field">
+
+
+
+
+              @if (form.controls.preferences.controls.comissionType.value === ComissionType.Amount) {
+              <div class="col-2">
+                <mat-label class="f-s-16 f-w-400 m-b-8 d-block">{{ 'Currency' | translate }}</mat-label>
+                <mat-form-field appearance="outline" class="w-full w-100 disabled-field">
               <input
                 matInput
                 [value]="p.currency?.value || ''"
@@ -240,13 +253,13 @@
                 aria-readonly="true"
                 placeholder="—"
                 />
-            </mat-form-field>
-                </div>
-            <div class="col-10">
-              <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Default commission amount' | translate }}
+                </mat-form-field>
+              </div>
+              <div class="col-10">
+              <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Commission amount' | translate }}
                 <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4" matTooltip="Sets the standard fixed commission value applied when creating new plans (e.g., €100 per year). This applies to each Saving Pot by default, but you can change it per client if needed.">
-              </mat-label>
-              <mat-form-field appearance="outline" class="w-100">
+                </mat-label>
+                <mat-form-field appearance="outline" class="w-100">
                 <input
                   matInput
                   type="text"
@@ -257,16 +270,16 @@
                   (focus)="formatCommissionAmountOnFocus($event)"
                   placeholder="{{'Enter amount' | translate}}"
                 />
-                <mat-error *ngIf="p.comissionAmount.hasError('required')">{{'Required' | translate}}</mat-error>
-                <mat-error *ngIf="p.comissionAmount.hasError('min')">{{ 'Must be' | translate }} &gt; 0</mat-error>
-              </mat-form-field>
-            </div>
-          }
+                  <mat-error *ngIf="p.comissionAmount.hasError('required')">{{'Required' | translate}}</mat-error>
+                  <mat-error *ngIf="p.comissionAmount.hasError('min')">{{ 'Must be' | translate }} &gt; 0</mat-error>
+                </mat-form-field>
+              </div>
+              }
 
-          @if (form.controls.preferences.controls.comissionType.value === ComissionType.Both) {
-                  <div class="col-2">
-            <mat-label class="f-s-16 f-w-400 m-b-8 d-block">{{ 'Currency' | translate }}</mat-label>
-            <mat-form-field appearance="outline" class="w-full w-100 disabled-field">
+              @if (form.controls.preferences.controls.comissionType.value === ComissionType.Both) {
+              <div class="col-2">
+                <mat-label class="f-s-16 f-w-400 m-b-8 d-block">{{ 'Currency' | translate }}</mat-label>
+                <mat-form-field appearance="outline" class="w-full w-100 disabled-field">
               <input
                 matInput
                 [value]="p.currency?.value || ''"
@@ -275,15 +288,15 @@
                 aria-readonly="true"
                 placeholder="—"
                 />
-            </mat-form-field>
-                </div>
+                </mat-form-field>
+              </div>
               <div class="col-5">
-              <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Default commission amount' | translate }}
-                <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4" matTooltip="Sets the standard fixed commission value applied when creating new plans (e.g., €100 per year). This applies to each Saving Pot by default, but you can change it per client if needed.">
+                <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Commission amount' | translate }}
+                  <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4" matTooltip="Sets the standard fixed commission value applied when creating new plans (e.g., €100 per year). This applies to each Saving Pot by default, but you can change it per client if needed.">
 
 
-              </mat-label>
-              <mat-form-field appearance="outline" class="w-100">
+                </mat-label>
+                <mat-form-field appearance="outline" class="w-100">
                 <input
                   matInput
                   type="text"
@@ -294,27 +307,27 @@
                   (focus)="formatCommissionAmountOnFocus($event)"
                   placeholder="Enter amount"
                 />
-                <mat-error *ngIf="p.comissionAmount.hasError('required')">{{'Required' | translate}}</mat-error>
-                <mat-error *ngIf="p.comissionAmount.hasError('min')">{{ 'Must be' | translate }} &gt; 0</mat-error>
-              </mat-form-field>
-            </div>
-            <div class="col-5">
-              <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Default commission percentage' | translate }}
-                <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4" matTooltip="Sets the default percentage commission for new plans (e.g., 1% annually on the value of invested savings). This applies to each Saving Pot by default, and you can adjust it for each client when needed.
+                  <mat-error *ngIf="p.comissionAmount.hasError('required')">{{'Required' | translate}}</mat-error>
+                  <mat-error *ngIf="p.comissionAmount.hasError('min')">{{ 'Must be' | translate }} &gt; 0</mat-error>
+                </mat-form-field>
+              </div>
+              <div class="col-5">
+                <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Commission percentage' | translate }}
+                  <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4" matTooltip="Sets the default percentage commission for new plans (e.g., 1% annually on the value of invested savings). This applies to each Saving Pot by default, and you can adjust it for each client when needed.
 ">
 
-              </mat-label>
-              <mat-form-field appearance="outline" class="w-100 percentage-icon">
-                <input matInput type="number" step="0.1" formControlName="comissionPercentage" />
-                <mat-error *ngIf="p.comissionPercentage.hasError('required')">{{'Required' | translate}}</mat-error>
+                </mat-label>
+                <mat-form-field appearance="outline" class="w-100 percentage-icon">
+                  <input matInput type="number" step="0.1" formControlName="comissionPercentage" />
+                  <mat-error *ngIf="p.comissionPercentage.hasError('required')">{{'Required' | translate}}</mat-error>
                 <mat-error *ngIf="p.comissionPercentage.hasError('min') || p.comissionPercentage.hasError('max')">0–100</mat-error>
-                <span matSuffix>%</span>
-              </mat-form-field>
+                  <span matSuffix>%</span>
+                </mat-form-field>
+              </div>
+
+              }
             </div>
-          
-          }
-        </div>
-      </div>
+          </div>
 
         </div>
       </div>
