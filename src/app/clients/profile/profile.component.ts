@@ -22,6 +22,7 @@ import { TimeAgoPipe } from 'src/app/pipe/time-ago.pipe';
 import { DialogComponent } from 'src/app/dialog/dialog.component';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
 import { EditModelDialogComponent } from './edit-model-dialog/edit-model-dialog.component';
+import { QuestionnaireDialogComponent } from './questionnaire-dialog/questionnaire-dialog.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Store } from '@ngrx/store';
 import { selectedClient } from 'src/app/store/client/client.selectors';
@@ -92,6 +93,14 @@ export class ProfileComponent {
 
   onEditClicked() {
     this.router.navigate(['/clients/' + this.clientId + '/edit']);
+  }
+
+  onQuestionnaireClicked() {
+    this.dialog.open(QuestionnaireDialogComponent, {
+      width: '720px',
+      disableClose: true,
+      data: { client: this.client },
+    });
   }
 
   onSortByValueChange(event: any)

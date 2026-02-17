@@ -1,0 +1,66 @@
+<div class="d-flex flex-column questionnaire-dialog">
+  <!-- Modal Header -->
+  <div class="d-flex align-items-center justify-content-between gap-10 modal-header">
+    <h3>{{ 'Questionnaire' | translate }}</h3>
+    <button (click)="closeDialog()" type="button">
+      <img src="assets/images/svgs/close-line-cion.svg" alt="close" />
+    </button>
+  </div>
+  <!-- End Modal Header -->
+
+  <!-- Modal Body (scrollable) -->
+  <mat-dialog-content class="questionnaire-dialog-content">
+  <div class="d-flex flex-column gap-20">
+    <p class="f-s-14 questionnaire-body">
+      {{ 'Select the questions you want to share with' | translate }}
+      {{ clientName }}.
+      {{ 'You can reorder the questions or deselect any that are not relevant.' | translate }}
+      {{ 'The client will only see the questions you select.' | translate }}
+    </p>
+
+    <div
+      cdkDropList
+      [cdkDropListData]="questions"
+      (cdkDropListDropped)="drop($event)"
+      class="d-flex flex-column gap-10 questionnaire-list"
+    >
+      @for (question of questions; track question.id) {
+        <div
+          [cdkDragData]="question"
+          cdkDrag
+          cdkDragLockAxis="y"
+          class="questionnaire-item d-flex align-items-center gap-12"
+          [class.deselected]="!question.selected"
+        >
+          <button cdkDragHandle type="button" class="drag-btn" aria-label="Reorder">
+            <img src="assets/images/svgs/drag-icon.svg" alt="drag" />
+          </button>
+          <mat-checkbox
+            [checked]="question.selected"
+            (change)="toggleQuestion(question)"
+            class="question-checkbox"
+          >
+          </mat-checkbox>
+          <span class="question-text f-s-16">{{ question.text }}</span>
+        </div>
+      }
+    </div>
+  </div>
+  </mat-dialog-content>
+  <!-- End Modal Body -->
+
+  <!-- Modal Action Buttons -->
+  <div class="row justify-content-between modal-action">
+    <div class="col-5">
+      <button (click)="closeDialog()" class="button-icon-outline w-100 d-block">
+        <span class="f-s-16">{{ 'Close' | translate }}</span>
+      </button>
+    </div>
+    <div class="col-5">
+      <button (click)="onCopyLink()" type="button" class="button-icon w-100 d-block">
+        <span class="f-s-16">{{ 'Copy questionnaire link' | translate }}</span>
+      </button>
+    </div>
+  </div>
+  <!-- End Modal Action Buttons -->
+</div>
