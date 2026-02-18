@@ -25,7 +25,7 @@ RUN if [ -z "$NG_BUILD_CONFIGURATION" ]; then \
     echo "Building Angular with configuration: $NG_BUILD_CONFIGURATION"
 
 # Build the Angular app with the chosen environment
-RUN npm run build -- --configuration=${NG_BUILD_CONFIGURATION} --verbose
+RUN NODE_OPTIONS=--max-old-space-size=4096 npm run build -- --configuration=${NG_BUILD_CONFIGURATION} --verbose
 
 # Ensure lazy-loaded chunks exist (fails build if missing, e.g. wrong output path)
 RUN test -n "$(ls /app/dist/ibernia-app/browser/financial-workflow.routes-*.js 2>/dev/null)" || \
