@@ -85,6 +85,13 @@
                 }
               ],
               "outputHashing": "all"
+            },
+            "local": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true,
+              "outputHashing": "none"
             }
           },
           "defaultConfiguration": "production"
@@ -100,6 +107,9 @@
             },
             "development": {
               "buildTarget": "Modernize:build:development"
+            },
+            "local": {
+              "buildTarget": "Modernize:build:local"
             }
           },
           "defaultConfiguration": "development"
