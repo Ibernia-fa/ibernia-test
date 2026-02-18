@@ -383,8 +383,19 @@ export class IncomeExpensesComponent {
     const baseAmount = Number(item?.amount?.amount ?? 0);
     const cycleDescription = (item?.amount?.cycle?.description ?? '').toString().toLowerCase();
 
-    if (cycleDescription.includes('month')) return baseAmount * 12;
-    return baseAmount;
+    let yearlyAmount = cycleDescription.includes('month') ? baseAmount * 12 : baseAmount;
+
+    if (item?.bonus?.enabled && Number(item?.bonus?.amount?.amount ?? 0) > 0) {
+      const bonusAmount = Number(item.bonus.amount.amount);
+      const bonusCycleDesc = (item.bonus.amount.cycle?.description ?? '').toLowerCase();
+      if (bonusCycleDesc.includes('month')) {
+        yearlyAmount += bonusAmount * 12;
+      } else {
+        yearlyAmount += bonusAmount;
+      }
+    }
+
+    return yearlyAmount;
   }
 
   trackByIncomeId(index: number, item: FinancialViewModel): string | number {

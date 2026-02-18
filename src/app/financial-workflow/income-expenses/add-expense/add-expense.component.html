@@ -3,7 +3,7 @@
     <div class="d-flex align-items-center justify-content-between gap-10 modal-header">
       <div class="d-flex align-items-center gap-10">
         <h3 style="text-transform: none;">{{expenseTitle}}</h3>
-        <ng-container *ngIf="isNameEditable">
+        <ng-container *ngIf="isEditWorkflow && isNameEditable">
           <img src="assets/images/svgs/drop-down-edit-2-line.svg" alt="edit" class="cursor-pointer edit-name-icon"
             (click)="toggleNameEdit()" />
         </ng-container>
@@ -90,6 +90,9 @@
                 </mat-select>
               </div>
             </div>
+            @if(expenseForm.get('amount')?.touched && (expenseForm.get('amount')?.hasError('required') || expenseForm.get('amount')?.hasError('greaterThanZero'))) {
+            <span class="field-error d-block">{{'Amount must be greater than 0' | translate}}</span>
+            }
           </div>
         </div>
         
