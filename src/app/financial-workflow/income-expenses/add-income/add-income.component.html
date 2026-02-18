@@ -3,7 +3,7 @@
     <div class="d-flex align-items-center justify-content-between gap-10 modal-header">
       <div class="d-flex align-items-center gap-10">
         <h3 style="text-transform: none;">{{incomeTitle}}</h3>
-        <ng-container *ngIf="isNameEditable">
+        <ng-container *ngIf="isEditWorkflow && isNameEditable">
           <img src="assets/images/svgs/drop-down-edit-2-line.svg" alt="edit" class="cursor-pointer edit-name-icon"
             (click)="toggleNameEdit()" />
         </ng-container>
@@ -80,6 +80,9 @@
                 </mat-select>
               </div>
             </div>
+            @if(incomeForm.get('amount')?.touched && (incomeForm.get('amount')?.hasError('required') || incomeForm.get('amount')?.hasError('greaterThanZero'))) {
+            <span class="field-error d-block">{{'Amount must be greater than 0' | translate}}</span>
+            }
           </div>
         </div>
 
@@ -119,6 +122,9 @@
                 </mat-select>
               </div>
             </div>
+            @if(incomeForm.get('bonusAmount')?.touched && (incomeForm.get('bonusAmount')?.hasError('required') || incomeForm.get('bonusAmount')?.hasError('greaterThanZero'))) {
+            <span class="field-error d-block">{{'Amount must be greater than 0' | translate}}</span>
+            }
           </div>
         </div>
 
@@ -195,7 +201,11 @@
                       }
                       <hr>
                       @for (year of years; let i=$index; track year) {
+                      @if (year === retirementYear) {
+                      <mat-option [value]="year">{{ 'Retirement age' | translate }} ({{ getAgeForYear(year) }})</mat-option>
+                      } @else {
                       <mat-option [value]="year">{{ year }} ({{ getAgeForYear(year) }})</mat-option>
+                      }
                       }
                     </mat-select>
                   </div>
