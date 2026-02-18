@@ -173,7 +173,7 @@ export class IncomeExpensesComponent {
   }
 
   updateIncomeClicked(item: FinancialViewModel) {
-    if (item.description == "Pension Fund")
+    if (item.description?.toLowerCase() === 'pension fund')
       return;
 
     this.setIncomeType();
@@ -322,15 +322,11 @@ export class IncomeExpensesComponent {
   }
 
   private updateCurrentYearIncomeSummary(): void {
-    const currentYear = new Date().getFullYear();
-
     const activeIncomes = (this.incomeExpense?.incomes ?? [])
-      .filter((item) => this.isIncludedIncome(item))
-      .filter((item) => this.isHappeningInYear(item, currentYear));
+      .filter((item) => this.isIncludedIncome(item));
 
     const activeExpenses = (this.incomeExpense?.expenses ?? [])
-      .filter((item) => this.isIncludedExpense(item))
-      .filter((item) => this.isHappeningInYear(item, currentYear));
+      .filter((item) => this.isIncludedExpense(item));
 
     const totalIncome = activeIncomes.reduce(
       (sum, item) => sum + this.getYearAmount(item),
@@ -358,7 +354,7 @@ export class IncomeExpensesComponent {
   }
 
   private isIncludedIncome(item: FinancialViewModel): boolean {
-    return item?.isIncomeExpenseSource === true || item?.description === 'Pension Fund';
+    return item?.isIncomeExpenseSource === true || item?.description?.toLowerCase() === 'pension fund';
   }
 
   private isIncludedExpense(item: FinancialViewModel): boolean {
@@ -372,7 +368,8 @@ export class IncomeExpensesComponent {
     const cycleDescription = (item?.amount?.cycle?.description ?? '').toString().toLowerCase();
     const isOneOff = cycleDescription === 'one-off';
 
-    if (!startYear) return false;
+    // If no start year is set, treat the item as currently active
+    if (!startYear) return !isOneOff;
     if (isOneOff) {
       return startYear === year;
     }
@@ -407,7 +404,7 @@ export class IncomeExpensesComponent {
   }
 
   isEditableIncome(name: string): boolean {
-    if (name == "Pension Fund")
+    if (name?.toLowerCase() === 'pension fund')
       return false;
 
     return true;

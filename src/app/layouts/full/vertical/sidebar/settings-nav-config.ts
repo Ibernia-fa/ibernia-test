@@ -66,5 +66,11 @@ export const settingsLowerNavItems: NavItem[] = [
     iconOutline: '/assets/images/shapes/branding.svg',
     route: '/settings/branding',
   },
-
+  {
+    displayName: 'Identity Admin',
+    iconName: '/assets/images/shapes/branding.svg',
+    iconOutline: '/assets/images/shapes/branding.svg',
+    route: environment.adminUrl,
+    external: true,
+  },
 ];

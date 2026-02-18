@@ -8,6 +8,7 @@ import {
   Input,
   OnChanges,
   OnInit,
+  OnDestroy,
   Output,
   SimpleChanges,
   ViewChild,
@@ -56,7 +57,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
   templateUrl: './timeline-chart.component.html',
   styleUrl: './timeline-chart.component.scss'
 })
-export class TimelineChartComponent implements OnInit, OnChanges {
+export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
   private readonly CHIP_ORDER = [
     'Retirement age',
     'Birth',
@@ -108,6 +109,8 @@ export class TimelineChartComponent implements OnInit, OnChanges {
   private tooltipMouseY: number = 0;
   private timelineHoverSubscription: Subscription;
   private isDragging = false; // Track drag state
+  private boundDocumentDrop: ((e: DragEvent) => void) | null = null;
+  private lastValidDragTime: Date | null = null; // Store last valid drag position from onDragOver
 
   constructor(
     private dialog: MatDialog,
@@ -124,6 +127,9 @@ export class TimelineChartComponent implements OnInit, OnChanges {
     if (!this.client) return;
 
     if (changes['financialTimeline']) {
+      console.log('=== ngOnChanges financialTimeline triggered ===');
+      console.log('Previous:', changes['financialTimeline'].previousValue?.clientEvents?.find((e: any) => e.name === 'Retirement age')?.start);
+      console.log('Current:', changes['financialTimeline'].currentValue?.clientEvents?.find((e: any) => e.name === 'Retirement age')?.start);
       if (this.timeline) {
         this.timeline.setItems(this.timelineData);
         this.timeline.setOptions(this.timelineOptions);
@@ -135,6 +141,10 @@ export class TimelineChartComponent implements OnInit, OnChanges {
   ngOnInit() {
     this.initTimelineContainer();
     this.getTimelineEventsLibrary();
+  }
+
+  ngOnDestroy() {
+    this.removeDocumentDropListener();
   }
 
   ngAfterViewInit() {
@@ -213,19 +223,54 @@ export class TimelineChartComponent implements OnInit, OnChanges {
     this.draggedEvent = customEvent;
     event.dataTransfer?.setData('text/plain', JSON.stringify(customEvent));
     this.timeline.addCustomTime(new Date(), 'dragOver');
+    this.timelineContainer.nativeElement.classList.add('external-dragging');
+
+    // Add a document-level drop listener to capture drops even when they land
+    // on vis-timeline's internal item elements that intercept the event
+    this.boundDocumentDrop = (e: DragEvent) => this.onDocumentDrop(e);
+    document.addEventListener('drop', this.boundDocumentDrop, true); // capture phase
   }
 
   onDragEnd(event: DragEvent) {
     event.preventDefault();
     this.isDragging = false;
     this.clearLabelHighlight();
+    this.timelineContainer.nativeElement.classList.remove('external-dragging');
+    this.removeDocumentDropListener();
+    this.lastValidDragTime = null; // Clear stored drag position
     this.timeline.removeCustomTime('dragOver');
     this.timeline.redraw();
+  }
+
+  private removeDocumentDropListener() {
+    if (this.boundDocumentDrop) {
+      document.removeEventListener('drop', this.boundDocumentDrop, true);
+      this.boundDocumentDrop = null;
+    }
+  }
+
+  private onDocumentDrop(event: DragEvent) {
+    // Only handle if we're in an external drag and the drop is inside the timeline container
+    if (!this.isDragging || !this.draggedEvent) return;
+
+    const rect = this.timelineContainer.nativeElement.getBoundingClientRect();
+    if (
+      event.clientX >= rect.left &&
+      event.clientX <= rect.right &&
+      event.clientY >= rect.top &&
+      event.clientY <= rect.bottom
+    ) {
+      event.preventDefault();
+      event.stopPropagation();
+      this.onDrop(event);
+    }
   }
 
   onDrop(event: DragEvent) {
     event.preventDefault();
     this.isDragging = false;
+    this.timelineContainer.nativeElement.classList.remove('external-dragging');
+    this.removeDocumentDropListener();
 
     if (!this.draggedEvent || !this.timeline) {
       this.draggedEvent = null;
@@ -233,7 +278,34 @@ export class TimelineChartComponent implements OnInit, OnChanges {
     }
 
     // get the dropped position on the timeline
-    let dropTime = this.timeline.getEventProperties(event).time;
+    const props = this.timeline.getEventProperties(event);
+    let dropTime = props.time;
+
+    // If dropped on an existing item, time may be null — fall back to snapped position
+    if (!dropTime && props.snappedTime) {
+      dropTime = props.snappedTime;
+    }
+    if (!dropTime) {
+      // Try to calculate from the mouse X position on the timeline
+      const rect = this.timelineContainer.nativeElement.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const timelineRange = this.timeline.getWindow();
+      const ratio = x / rect.width;
+      
+      // Only use calculated position if the ratio is valid (mouse is within timeline bounds)
+      if (ratio >= 0 && ratio <= 1 && event.clientX > 0) {
+        const ms = timelineRange.start.valueOf() + ratio * (timelineRange.end.valueOf() - timelineRange.start.valueOf());
+        dropTime = this.snapToNearestYear(new Date(ms));
+      }
+    }
+    
+    // Final fallback: use the last valid position from onDragOver
+    if (!dropTime && this.lastValidDragTime) {
+      dropTime = this.lastValidDragTime;
+    }
+    
+    // Clear the stored drag time
+    this.lastValidDragTime = null;
 
     if (this.draggedEvent?.name === 'Retirement age') {
 
@@ -244,21 +316,25 @@ export class TimelineChartComponent implements OnInit, OnChanges {
       }
 
       const retirementYear = this.getRetirementDropYear();
-      if (!retirementYear) {
-        this.draggedEvent = null;
-        return;
+      // If client is already past default retirement age, use the drop location they chose
+      // Otherwise, snap to the calculated retirement year
+      if (retirementYear) {
+        dropTime = new Date(retirementYear, 0, 1);
       }
-
-      dropTime = new Date(retirementYear, 0, 1);
+      // If retirementYear is null (client already past default retirement age),
+      // keep the dropTime from where they actually dropped it
     }
 
-    if (
+    // Validate dropTime exists and is within bounds
+    if (!dropTime || 
       moment(dropTime).year() <
       moment(this.financialTimeline.forecastStartDate).year() ||
       moment(dropTime).year() >
       moment(this.financialTimeline.forecastEndtDate).year()
-    )
+    ) {
+      this.draggedEvent = null;
       return;
+    }
 
     if (this.draggedEvent.isPlaceHolder) {
       const clientEvent: ClientEvent = {
@@ -344,7 +420,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
     });
 
     dialogRef.afterClosed().subscribe((result: any) => {
-      if ((result.status = 'Success')) {
+      if (result?.status === 'Success') {
         this.draggedEvent = null;
         this.updateTimelines.emit();
       }
@@ -362,6 +438,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
     if (!props?.time) return;
 
     const snappedTime = this.snapToNearestYear(props.time);
+    this.lastValidDragTime = snappedTime; // Store the last valid snapped position
     this.timeline.setCustomTime(snappedTime, 'dragOver');
 
     const snappedYear = snappedTime.getFullYear();
@@ -505,15 +582,21 @@ export class TimelineChartComponent implements OnInit, OnChanges {
     const dataArray = this.financialTimeline.clientEvents.map(
       (event, index) => {
         const startYear = event.start.year;
+        const hasRealEnd = event.end && event.end.year && event.end.year > startYear;
+        const isOneOff = event.isOneOff;
+        const forecastEndYear = moment(this.financialTimeline.forecastEndtDate).year();
 
-        // For events with an end year (like State Pension that runs from 2040 to 2088)
-        if (event.end && event.end.year && event.end.year > startYear) {
-          // Events with duration - use their actual start and end years
+        // Generate stable ID for events with null IDs (like default Retirement age)
+        const eventId = event.id || `placeholder-${event.name}-${index}`;
+
+        // Non-one-off events: show actual duration
+        if (!isOneOff) {
+          const endYear = hasRealEnd ? event.end!.year : forecastEndYear;
           return {
-            id: event.id,
+            id: eventId,
             content: this.getContent(event.name, event.iconUrl),
-            start: new Date(startYear, 0, 1), // Jan 1st of start year
-            end: new Date(event.end.year, 0, 1), // Jan 1st of end year
+            start: new Date(startYear, 0, 1),
+            end: new Date(endYear, 0, 1),
             className: event.iconUrl,
             editable: {
               updateTime: true,
@@ -521,7 +604,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
             }
           };
         } else {
-          // ONE-OFF EVENTS (or events without end date)
+          // ONE-OFF EVENTS (or events without a valid end date)
           // Calculate the proportional width based on timeline length
           const timelineStartYear = moment(this.financialTimeline.forecastStartDate).year();
           const timelineEndYear = moment(this.financialTimeline.forecastEndtDate).year();
@@ -549,10 +632,10 @@ export class TimelineChartComponent implements OnInit, OnChanges {
           );
 
           return {
-            id: event.id,
+            id: eventId,
             content: this.getContent(event.name, event.iconUrl),
-            start: new Date(startYear, 0, 1), // Jan 1st of start year
-            end: new Date(startYear + calculatedWidth, 0, 1), // End based on calculated width
+            start: new Date(startYear, 0, 1),
+            end: new Date(startYear + calculatedWidth, 0, 1),
             className: event.iconUrl,
             editable: {
               updateTime: true,
@@ -627,6 +710,7 @@ export class TimelineChartComponent implements OnInit, OnChanges {
         this.handleEventRemoval(item, callback);
       },
       onMove: (item, callback) => {
+        console.log('=== onMove triggered ===', item);
         this.handleEventUpdate(item, callback);
       },
       onMoving: (item, callback) => {
@@ -697,42 +781,54 @@ export class TimelineChartComponent implements OnInit, OnChanges {
   }
 
   handleEventUpdate(item: any, callback: (item: any) => void) {
+    console.log('handleEventUpdate called with item:', item);
+    console.log('Item ID:', item.id);
+    console.log('All clientEvents IDs:', JSON.stringify(this.financialTimeline.clientEvents.map(e => ({ id: e.id, name: e.name }))));
     this.timeline.removeCustomTime('dragOver');
     this.clearLabelHighlight();
 
     const dropTime = item.start;
+    console.log('dropTime:', dropTime, 'year:', moment(dropTime).year());
 
     if (
       moment(dropTime).year() < moment(this.financialTimeline.forecastStartDate).year() ||
       moment(dropTime).year() > moment(this.financialTimeline.forecastEndtDate).year()
     ) {
-      this.timeline.setItems(this.timelineData);
-      this.cdr.detectChanges();
-      this.timeline.redraw();
+      console.log('Out of forecast range, canceling');
+      callback(null); // cancel the move in vis-timeline
       return;
     }
 
-    const existing = this.financialTimeline.clientEvents.find(ev => ev.id === item.id);
+    // Find event by ID, or by placeholder ID pattern (for events with null IDs like Retirement age)
+    let existing = this.financialTimeline.clientEvents.find(ev => ev.id === item.id);
+    
+    // If not found by ID, try to match by placeholder pattern
+    if (!existing && item.id && item.id.startsWith('placeholder-')) {
+      const parts = item.id.split('-');
+      const eventName = parts.slice(1, -1).join('-'); // Extract name from placeholder-Name-index
+      existing = this.financialTimeline.clientEvents.find(ev => ev.name === eventName && !ev.id);
+    }
+    
+    console.log('existing event:', existing);
     if (!existing) {
-      this.timeline.setItems(this.timelineData);
-      this.cdr.detectChanges();
-      this.timeline.redraw();
+      console.log('No existing event found, canceling');
+      callback(null); // cancel the move in vis-timeline
       return;
     }
 
     const newStartYear = moment(new Date(moment(item.start).year(), 1)).year();
     const newEndYear = moment(new Date(moment(item.end).year(), 1)).year();
+    console.log('newStartYear:', newStartYear, 'existing.start.year:', existing.start?.year);
 
     // one-off rule: allow moving the date (year), but DON'T allow changing duration
+    // For one-off events, only block if the START didn't change but we're here (would be resize attempt)
     if (
       existing.isOneOff &&
-      existing.start?.year === newStartYear &&
-      existing.end?.year !== newEndYear
+      existing.start?.year === newStartYear
     ) {
-      this.toastrService.error('You cannot edit the duration of "one off" events');
-      this.timeline.setItems(this.timelineData);
-      this.cdr.detectChanges();
-      this.timeline.redraw();
+      console.log('One-off event with same year, canceling (resize attempt)');
+      // Start didn't change - this is either no real move or a resize attempt, cancel it
+      callback(null);
       return;
     }
 
@@ -754,36 +850,33 @@ export class TimelineChartComponent implements OnInit, OnChanges {
     };
 
     // persist WITHOUT opening any dialog (upsert pattern)
+    console.log('Sending update to server:', updated);
     this.timelineHttpService
       .addEvent(updated, this.financialTimeline.cashflow.id) // server treats as upsert by id
       .pipe(take(1))
       .subscribe({
         next: () => {
-          // update local model
-          const idx = this.financialTimeline.clientEvents.findIndex(e => e.id === updated.id);
+          console.log('Server update successful');
+          // update local model FIRST - find by reference to existing object
+          const idx = this.financialTimeline.clientEvents.indexOf(existing);
+          console.log('Updating local model at index:', idx);
           if (idx > -1) this.financialTimeline.clientEvents[idx] = updated;
 
-          // refresh UI
-          this.updateTimelines.emit(); // optional, if parent reloads timelines
-          this.timeline.setItems(this.timelineData);
-          this.cdr.detectChanges();
-          this.timeline.redraw();
-
+          // confirm the move to vis-timeline - let it handle the visual update
+          console.log('Calling callback(item) to confirm move');
           callback(item);
         },
         error: (err) => {
-          console.error(err);
+          console.error('Server update failed:', err);
           this.toastrService.error('Failed to save event position');
-          // revert UI if save failed
-          this.timeline.setItems(this.timelineData);
-          this.cdr.detectChanges();
-          this.timeline.redraw();
+          // cancel the move in vis-timeline to revert UI
+          callback(null);
         },
       });
   }
 
   updateEventByDoubleClick(clientEvent: ClientEvent) {
-    const linkedIncomesAndExpenses = 
+    const linkedIncomesAndExpenses =
       this.financialRecords.filter(e => e.parentId === clientEvent.id);
 
     const eventType = this.DIALOG_SYSTEM_EVENTS.some(baseName => clientEvent.name.startsWith(baseName))
@@ -862,12 +955,12 @@ export class TimelineChartComponent implements OnInit, OnChanges {
   handleEventRemoval(item: any, callback: (item: any) => void) {
     let isDeleteFinanceEvent = false;
 
-    if (item.content?.includes('Home') 
+    if (item.content?.includes('Home')
       || item.content?.includes('Car')
-    || item.content?.includes('Boat')) {
+      || item.content?.includes('Boat')) {
       isDeleteFinanceEvent = true;
     }
-    
+
     if (isDeleteFinanceEvent) {
       this.timelineHttpService
         .deleteFinancingEvent(this.financialTimeline.cashflow.id, item.id)
@@ -1004,6 +1097,11 @@ export class TimelineChartComponent implements OnInit, OnChanges {
     }
   }
 
+  /**
+   * Returns the year when the client reaches the default retirement age.
+   * Returns null if client is already past the default retirement age,
+   * allowing the user to place the retirement event at their chosen location.
+   */
   private getRetirementDropYear(): number | null {
     const lang = this.translate.currentLang || this.translate.defaultLang;
 
@@ -1015,6 +1113,8 @@ export class TimelineChartComponent implements OnInit, OnChanges {
     if (!retirementAge) return null;
 
     const currentAge = this.calculateAge(new Date(this.clientBirthDate));
+    // If client is already past default retirement age, return null
+    // to allow them to place the event at their chosen drop location
     if (currentAge >= retirementAge) return null;
 
     return moment(this.clientBirthDate).year() + retirementAge;

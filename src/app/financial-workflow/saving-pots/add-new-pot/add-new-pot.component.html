@@ -124,7 +124,6 @@
                 thousandSeparatorInput
                 (input)="onAmountInput($event.target.value)"
                 (blur)="onAmountBlur($event)"
-                placeholder="0"
               />
             </div>
             <!-- End Price Field  -->
@@ -138,16 +137,16 @@
             <span class="field-error d-block">{{ 'Required' | translate }}</span>
           }
           @if (savingsForm.get('amount')?.touched && savingsForm.get('amount')?.hasError('minPositiveValue')) {
-            <span class="field-error d-block">{{ 'Must be greater than 0' | translate }}</span>
+            <span class="field-error d-block">{{ 'Must be 0 or greater' | translate }}</span>
           }
           <!-- ENd Error   -->
         </div>
         <!-- End Starting pot value Field  -->
 
-        <!-- Slider Section - Return Rate (NOT for Cash or Pension Fund) -->
+        <!-- Slider Section - Return Rate (NOT for Cash or Pension fund) -->
         @if (
           savingsForm.get('name')?.value !== 'Cash' &&
-          savingsForm.get('name')?.value !== 'Pension Fund'
+          savingsForm.get('name')?.value !== 'Pension fund'
         ) {
           <div class="d-flex flex-column gap-4">
             <div class="d-flex gap-8 align-items-center">
@@ -201,8 +200,8 @@
         }
         <!-- End Slider Section  -->
 
-        <!-- Pension Fund Specific Fields -->
-        @if (savingsForm.get('name')?.value === 'Pension Fund') {
+        <!-- Pension fund specific fields -->
+        @if (savingsForm.get('name')?.value === 'Pension fund') {
           <div class="d-flex flex-column gap-20">
             <!-- Contribution Amount Field - Matched to "Net amount" layout -->
             <div class="d-flex flex-column gap-4 net-fields">
@@ -228,7 +227,6 @@
                       matInput
                       type="number"
                       formControlName="contributionAmount"
-                      placeholder="0"
                     />
                   </div>
                   <!-- End Amount Field  -->
@@ -324,7 +322,7 @@
             </div>
           </div>
         }
-        <!-- End Pension Fund Specific Fields -->
+        <!-- End Pension fund specific fields -->
 
         <!-- Lock Pot and Commissions Section -->
         @if (savingsForm.get('name')?.value !== 'Cash') {
@@ -334,7 +332,6 @@
               type="checkbox"
               id="lock-pot"
               (change)="isLockPotChanged(savingsForm.get('lockPot')?.value)"
-              [disabled]="savingsForm.get('name')?.value === 'Pension Fund'"
               formControlName="lockPot"
             >
               {{ 'Lock this pot from automatically covering an income shortfall' | translate }}
@@ -342,7 +339,7 @@
           </section>
 
           <!-- Lock Pot Date Range -->
-          @if (savingsForm.get('lockPot')?.value && savingsForm.get('name')?.value !== 'Pension Fund') {
+          @if (savingsForm.get('lockPot')?.value && savingsForm.get('name')?.value !== 'Pension fund') {
             <div class="start-end m-t-15 m-b-15">
               <div class="d-flex flex-column gap-12">
                 <div class="d-flex gap-8 align-items-center">

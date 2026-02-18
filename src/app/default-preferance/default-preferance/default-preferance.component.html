@@ -32,7 +32,7 @@
         </mat-form-field>
       </div> 
       <div class="col-6">
-        <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">Default currency
+        <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">Currency
          <img src="assets/images/svgs/help-circle-icon.svg"
              alt="help-circle-icon"
               width="18"
@@ -73,7 +73,7 @@
       </div>
 
       <div class="col-6">
-        <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">Default inflation rate 
+        <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">Inflation rate 
 
              <img src="assets/images/svgs/help-circle-icon.svg"
              alt="help-circle-icon"
@@ -92,7 +92,7 @@
         </mat-form-field>
       </div>
       <div class="col-6">
-        <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">Default net investment return
+        <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">Net investment return
 
                <img src="assets/images/svgs/help-circle-icon.svg"
              alt="help-circle-icon "
@@ -108,7 +108,27 @@
                  placeholder="" />
            
           <mat-error *ngIf="p.investmentReturn.hasError('required')">{{'Required' | translate}}</mat-error>
-          <mat-error *ngIf="p.investmentReturn.hasError('min') || p.investmentReturn.hasError('max')">-100–100</mat-error>
+          <mat-error *ngIf="p.investmentReturn.hasError('min') || p.investmentReturn.hasError('max')">0–100</mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="col-6">
+        <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">Pension fund net return
+
+               <img src="assets/images/svgs/help-circle-icon.svg"
+             alt="help-circle-icon "
+             class="m-l-4 cursor-pointer"
+              width="18"
+             matTooltip="Sets the default return rate for pension funds. You can modify it for each Saving Pot or individual client.">
+        </mat-label>
+     
+        <mat-form-field appearance="outline" class="w-full w-100 percentage-icon">
+          <span matSuffix>%</span> 
+          <input matInput type="number" step="0.1" formControlName="pensionFundReturn"
+                 placeholder="" />
+           
+          <mat-error *ngIf="p.pensionFundReturn.hasError('required')">{{'Required' | translate}}</mat-error>
+          <mat-error *ngIf="p.pensionFundReturn.hasError('min') || p.pensionFundReturn.hasError('max')">0–100</mat-error>
         </mat-form-field>
       </div>
 
