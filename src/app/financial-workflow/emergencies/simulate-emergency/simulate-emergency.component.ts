@@ -137,7 +137,8 @@ export class SimulateEmergencyComponent {
     if (this.forecastStartDateYear - this.clientBirthYear > this.clientAge)
       this.clientBirthYear = this.clientBirthYear + 1
 
-    var iterations = this.forecastEndDateYear - this.forecastStartDateYear + 1;
+    const endYear = data.forecastEndDateYear + 1;
+    const iterations = endYear - data.forecastStartDateYear + 1;
 
     for (let index = 0; index < iterations; index++) {
       const element = this.forecastStartDateYear + index;

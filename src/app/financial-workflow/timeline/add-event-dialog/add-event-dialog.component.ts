@@ -147,7 +147,9 @@ export class AddEventDialogComponent {
     this.patchEvent = data.patchEvent
     this.clientPreferredCurrency = data.clientPreferredCurrency
 
-    var iterations = data.forecastEndDateYear - data.forecastStartDateYear + 1
+
+    const endYear = data.forecastEndDateYear + 1;
+    var iterations = endYear - data.forecastStartDateYear + 1
 
     for (let index = 0; index < iterations; index++) {
       const element = data.forecastStartDateYear + index;

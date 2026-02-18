@@ -98,6 +98,7 @@ export class AddIncomeComponent {
     }
 
     this.clientAge = age;
+    if (data.forecastStartDateYear - this.clientBirthYear > this.clientAge) this.clientBirthYear = this.clientBirthYear + 1
 
     this.clientPreferredCurrency = data.clientPreferredCurrency;
     this.cashflowId = data.cashflowId;
@@ -108,7 +109,8 @@ export class AddIncomeComponent {
       && this.selectedIncome?.description != "State pension"
       && this.selectedIncome?.description != "Rental income";
 
-    var iterations = data.forecastEndDateYear - data.forecastStartDateYear + 1;
+    const endYear = data.forecastEndDateYear + 1;
+    const iterations = endYear - data.forecastStartDateYear + 1;
 
     for (let index = 0; index < iterations; index++) {
       const element = data.forecastStartDateYear + index;
