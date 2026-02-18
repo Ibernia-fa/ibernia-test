@@ -279,11 +279,15 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
 
     // get the dropped position on the timeline
     const props = this.timeline.getEventProperties(event);
-    let dropTime = props.time;
+    let dropTime: Date | null = null;
 
+    // Get raw time from props and snap it
+    if (props.time) {
+      dropTime = this.snapToNearestYear(props.time);
+    }
     // If dropped on an existing item, time may be null — fall back to snapped position
     if (!dropTime && props.snappedTime) {
-      dropTime = props.snappedTime;
+      dropTime = this.snapToNearestYear(props.snappedTime);
     }
     if (!dropTime) {
       // Try to calculate from the mouse X position on the timeline
@@ -537,7 +541,8 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
 
   private snapToNearestYear(date: Date): Date {
     const year = date.getFullYear();
-    return new Date(year, 0, 1);
+    const midYear = new Date(year, 6, 1); // July 1st as midpoint
+    return date < midYear ? new Date(year, 0, 1) : new Date(year + 1, 0, 1);
   }
 
   initTimelineContainer() {
@@ -576,6 +581,7 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
       start: Date;
       end: Date | string;
       className: string;
+      type?: string;
     },
     'id'
   > {
@@ -589,14 +595,14 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
         // Generate stable ID for events with null IDs (like default Retirement age)
         const eventId = event.id || `placeholder-${event.name}-${index}`;
 
-        // Non-one-off events: show actual duration
-        if (!isOneOff) {
-          const endYear = hasRealEnd ? event.end!.year : forecastEndYear;
+        // Non-one-off events with actual end date: show real duration
+        if (!isOneOff && hasRealEnd) {
           return {
             id: eventId,
             content: this.getContent(event.name, event.iconUrl),
             start: new Date(startYear, 0, 1),
-            end: new Date(endYear, 0, 1),
+            end: new Date(event.end!.year, 0, 1),
+            type: 'range',
             className: event.iconUrl,
             editable: {
               updateTime: true,
@@ -604,7 +610,7 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
             }
           };
         } else {
-          // ONE-OFF EVENTS (or events without a valid end date)
+          // ONE-OFF EVENTS or events without a valid end date
           // Calculate the proportional width based on timeline length
           const timelineStartYear = moment(this.financialTimeline.forecastStartDate).year();
           const timelineEndYear = moment(this.financialTimeline.forecastEndtDate).year();
@@ -743,7 +749,8 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
 
   handleEventMoving(item: any, callback: (item: any) => void) {
     try {
-      const snappedTime = new Date(item.start);
+      // Always snap to ensure consistent year during drag
+      const snappedTime = this.snapToNearestYear(new Date(item.start));
       this.timeline.setCustomTime(snappedTime, 'dragOver');
 
       const year = snappedTime.getFullYear();
@@ -787,7 +794,11 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
     this.timeline.removeCustomTime('dragOver');
     this.clearLabelHighlight();
 
-    const dropTime = item.start;
+    // Always snap the time to ensure consistent year placement
+    const snappedStart = this.snapToNearestYear(new Date(item.start));
+    const snappedEnd = item.end ? this.snapToNearestYear(new Date(item.end)) : null;
+    
+    const dropTime = snappedStart;
     console.log('dropTime:', dropTime, 'year:', moment(dropTime).year());
 
     if (
@@ -816,8 +827,8 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
       return;
     }
 
-    const newStartYear = moment(new Date(moment(item.start).year(), 1)).year();
-    const newEndYear = moment(new Date(moment(item.end).year(), 1)).year();
+    const newStartYear = snappedStart.getFullYear();
+    const newEndYear = snappedEnd ? snappedEnd.getFullYear() : moment(new Date(moment(item.end).year(), 1)).year();
     console.log('newStartYear:', newStartYear, 'existing.start.year:', existing.start?.year);
 
     // one-off rule: allow moving the date (year), but DON'T allow changing duration

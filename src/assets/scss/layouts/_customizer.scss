@@ -323,7 +323,8 @@ html .customizerNav {
   top: 8px !important;
 }
 
-.vis-custom-time.dragOver {
+.vis-custom-time.dragOver,
+.vis-custom-time.hoverLine {
   height: 77% !important;
   top: 8px !important;
   background-color: #516ce8 !important;
@@ -331,6 +332,10 @@ html .customizerNav {
 .vis-time-axis .vis-grid.vis-vertical {
   height: 77% !important;
   top: 8px;
+}
+
+.vis-time-axis .vis-grid.vis-vertical:last-of-type {
+  display: none !important;
 }
 
 // Style Date of Vis Timeline

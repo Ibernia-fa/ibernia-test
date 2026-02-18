@@ -158,9 +158,7 @@
   line-height: 1.2;
   font-weight: 600;
 }
-::ng-deep .vis-item.vis-range{
-  width: fit-content !important;
-}
+
 ::ng-deep .vis-item .vis-delete {
   top: 55% !important;
   transform: translateY(-50%);
@@ -183,18 +181,23 @@
   flex-direction: column;
   align-items: flex-end;
   justify-content: flex-end;
-  padding-bottom: 21px; // 👈 Tweak this to align with bottom scale
+  padding-bottom: 11px !important;
   margin-right: 8px;
-  font-size: 14px;
+  font-size: 18px;
   color: #666;
   min-width: 40px;
   font-weight: bold;
   left: 11px;
+  gap: 4px;
 
-  p, span {
+  p {
     margin: 0;
-    line-height: normal;
-    margin-bottom: 1px;
+    line-height: 1;
+  }
+
+  span {
+    margin: 0;
+    line-height: 1;
   }
 }
 
@@ -228,13 +231,13 @@
 }
 
 .vis-text.vis-minor.highlighted span {
-  font-size: 16px !important;
+  font-size: 21px !important;
   font-weight: bold;
   color: #004C99;
 }
 
 .vis-text.vis-minor.highlighted p {
-  font-size: 14px !important;
+  font-size: 21px !important;
   font-weight: 500;
   color: #333;
 }
