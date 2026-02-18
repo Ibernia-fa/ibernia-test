@@ -76,3 +76,21 @@
   background: #333;
   color: #fff;
 }
+
+// Skeleton loading styles
+.timeline-skeleton {
+  .skeleton-chart {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    gap: 16px;
+    
+    .loading-text {
+      color: #9495a2;
+      font-size: 14px;
+      margin: 0;
+    }
+  }
+}

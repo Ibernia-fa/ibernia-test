@@ -1,5 +1,5 @@
-<div class="d-flex gap-24 flex-column">
-  @if(!isLoaderVisible && client && cashflow) {
+﻿<div class="d-flex gap-24 flex-column">
+  @if(!isLoaderVisible && client && cashflow && report && financialTimeline) {
 
   <mat-card class="cardWithShadow">
     <mat-card-content>
@@ -43,7 +43,6 @@
   </mat-card>
   <mat-card class="cardWithShadow ">
     <mat-card-content style="padding-bottom: 10px !important;">
-      <!-- <div class="icon-financial-label"> -->
         <ng-container *ngIf="!compareReport || !compareCashflow">
           <button matTooltip="{{ 'Full screen' | translate}}" class="button-full-screen" (click)="enterFullscreen()">
             <img width="16" src="../../../assets/images/svgs/full-screen.svg" alt="">
@@ -82,7 +81,6 @@
             </div>
           </ng-template>
       </div>
-    <!-- </div> -->
 
       <div class="chart-component-wrapper">
 
