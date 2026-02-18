@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { AiRecommendationsModel } from '../models/ai-recommendations.model';
-import { T } from '@angular/cdk/keycodes';
+import { Observable } from 'rxjs';
+import { PlanAnalysisResponse } from '../models/ai-recommendations.model';
 
 @Injectable({
   providedIn: 'root'
@@ -9,5 +9,7 @@ import { T } from '@angular/cdk/keycodes';
 export class AiRecommendationsHttpService {
   constructor(private httpClient: HttpClient) { }
 
+  analyzePlan(cashflowId: string): Observable<PlanAnalysisResponse> {
+    return this.httpClient.get<PlanAnalysisResponse>(`/api/v1/agentic/plan?cashflowId=${cashflowId}`);
+  }
 }
-
