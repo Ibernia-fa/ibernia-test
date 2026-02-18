@@ -1,112 +1,128 @@
 <div class="d-flex gap-24 flex-column">
-        <mat-card class="cardWithShadow">
-        <mat-card-content>
-            <div class="d-flex flex-column gap-32 timeline-wrapper">
-                <div class="card-main-wrapper">
-                    <div class="d-flex align-items-center justify-content-between w-100 gap-16 flex-wrap">
-                        <div class="d-flex align-items-center gap-16">
-                            <!-- Icon  -->
-                            <div class="icon-wrapper d-flex align-items-center justify-content-center">
-                                <img width="24" src="assets/images/shapes/ai-filled.svg" alt="clock" />
-                            </div>
-                            <!-- End Icon  -->
-                            <!-- headings  -->
-                            <div class="d-flex flex-column justify-content-between gap-4">
-                                <div class="d-flex align-items-center">
-                                <h4 class="page-title f-w-500 m-r-4 f-s-30">AI Recommendations</h4>
-                            <img width="22" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" class="m-t-4"
-                                 matTooltip="Use this section to enter your client's key life events and financial goals.
-These events will shape the cashflow forecast and can be linked to specific transactions such as incomes or expenses.
-You may add new events to the timeline or adjust existing ones by dragging them to the appropriate position.">
-                            </div>
-                            </div>
-                            <!-- End headings  -->
-                        </div>
-                    </div>
+  <!-- Header card -->
+  <mat-card class="cardWithShadow">
+    <mat-card-content>
+      <div class="d-flex flex-column gap-32 timeline-wrapper">
+        <div class="card-main-wrapper">
+          <div class="d-flex align-items-center justify-content-between w-100 gap-16 flex-wrap">
+            <div class="d-flex align-items-center gap-16">
+              <div class="icon-wrapper d-flex align-items-center justify-content-center">
+                <img width="24" src="assets/images/shapes/ai-filled.svg" alt="ai" />
+              </div>
+              <div class="d-flex flex-column justify-content-between gap-4">
+                <div class="d-flex align-items-center">
+                  <h4 class="page-title f-w-500 m-r-4 f-s-30">AI Recommendations</h4>
+                  <img width="22" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" class="m-t-4"
+                    matTooltip="AI-powered analysis of your client's cashflow plan. Generates strengths, weaknesses, and actionable suggestions based on the full financial picture." />
                 </div>
-
+              </div>
             </div>
-        </mat-card-content>
-    </mat-card>
-
-    <mat-card class="mat-mdc-card mdc-card cardWithShadow">
-  <mat-card-content class="mat-mdc-card-content">
-    <div class="d-flex justify-content-between">
-       
-         <div class="text-center">
-            <div>
-       <button class="btn-secondary" style="min-width: 233px;"><span>Client notes</span></button></div>
-            <small></small>
+          </div>
         </div>
-
-        <div class="text-center">
-            <div>
-        <button class="button-icon" (click)="onClickShow()"><span>Generate recommendations</span></button></div>
-            <small>Today: 0/5 used</small>
-        </div>
-    </div>
-
-
-  </mat-card-content>
-</mat-card>
-
-<!-- {{isReccShown}} -->
-<ng-container *ngIf="isReccShown">
-<mat-card class="mat-mdc-card mdc-card cardWithShadow">
-  <mat-card-content class="mat-mdc-card-content">
-
-    <div class="d-flex align-items-start ai-rec-sugg ">
-        <div  class="m-r-10">
-
-        <img  src="assets/images/svgs/Info-icon.svg" alt="">
-
-        </div>
-        <div>
-    Recommendations are produced by AI and can be   <strong>incomplete</strong>  or  <strong>incorrect</strong>. <br>
-    They do not constitute financial advice and must be reviewed and approved by a licensed financial advisor before any action.
-    <br>
-    For more info, please consult our <a href=""><em>Terms & Conditions</em></a>    
-
-    </div>
-    </div>
-<div class="position-relative outer-recmendation">
-     <div class="edit-rec-sugg">
-        <button matTooltip="Edit"><img width="16" src="assets/images/svgs/edit-icon.svg" alt="clock" /></button>
-        
-        <button matTooltip="Copy"><img width="16" src="assets/images/svgs/copy-icon.svg" alt="clock" /></button>
-                                        
-
-    </div> 
-    <div class="ai-rec-sugg">
-       <h3>Increase monthly savings rate from 22% to at least 30% of net income.</h3> 
-        <ul>
-            <li><strong>Why:</strong> OECD (2024) and Fidelity (2023) data show households maintaining a 30%+ savings rate during working years are twice as likely to meet retirement targets.</li> 
-       <li><strong>Impact:</strong> Improves retirement fund sustainability by ~7 years.</li> 
-        </ul>
-</div>
-    <div class="ai-rec-sugg">
-       <h3>Reallocate idle cash exceeding 6 months of expenses into diversified investment pots.</h3> 
-        <ul>
-
-
-            <li><strong>Why:</strong> Cash beyond emergency reserves typically loses 2–3% per year in real terms due to inflation (IMF, 2024).</li> 
-       <li><strong>Impact:</strong> Higher long-term returns; preserves purchasing power of reserves.</li> 
-        </ul>
-</div>
-
-    <div class="ai-rec-sugg">
-       <h3>Maintain a cash balance covering 3-6 months of your current monthly expenses</h3> 
-        <ul>
-            <li><strong>Why:</strong> Based on current inflows and pot growth rates, maintaining the planned retirement age may deplete assets by age 82.</li> 
-       <li><strong>Impact:</strong> Extends financial independence horizon by ~5 years.</li> 
-       
-
-
-        </ul>
-</div></div>
+      </div>
     </mat-card-content>
-</mat-card>
-</ng-container>
+  </mat-card>
+
+  <!-- Action card -->
+  <mat-card class="mat-mdc-card mdc-card cardWithShadow">
+    <mat-card-content class="mat-mdc-card-content">
+      <div class="d-flex justify-content-between">
+        <div class="text-center">
+          <div>
+            <button class="btn-secondary" style="min-width: 233px;"><span>Client notes</span></button>
+          </div>
+          <small></small>
+        </div>
+        <div class="text-center">
+          <div>
+            <button class="button-icon" (click)="onClickShow()" [disabled]="isLoading">
+              <span>{{ isLoading ? 'Generating...' : 'Generate recommendations' }}</span>
+            </button>
+          </div>
+          <small>Today: 0/5 used</small>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Loading state -->
+  <ng-container *ngIf="isLoading">
+    <mat-card class="mat-mdc-card mdc-card cardWithShadow">
+      <mat-card-content class="mat-mdc-card-content d-flex justify-content-center align-items-center" style="min-height: 120px;">
+        <mat-spinner diameter="40"></mat-spinner>
+        <span class="m-l-16">Analysing your cashflow plan with AI...</span>
+      </mat-card-content>
+    </mat-card>
+  </ng-container>
+
+  <!-- Error state -->
+  <ng-container *ngIf="errorMessage">
+    <mat-card class="mat-mdc-card mdc-card cardWithShadow">
+      <mat-card-content class="mat-mdc-card-content">
+        <div class="d-flex align-items-center gap-12">
+          <img src="assets/images/svgs/Info-icon.svg" alt="error" width="20" />
+          <span class="text-error">{{ errorMessage }}</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </ng-container>
+
+  <!-- Results card -->
+  <ng-container *ngIf="isReccShown && analysis">
+    <mat-card class="mat-mdc-card mdc-card cardWithShadow">
+      <mat-card-content class="mat-mdc-card-content">
+
+        <!-- Disclaimer -->
+        <div class="d-flex align-items-start ai-rec-sugg">
+          <div class="m-r-10">
+            <img src="assets/images/svgs/Info-icon.svg" alt="info" />
+          </div>
+          <div>
+            Recommendations are produced by AI and can be <strong>incomplete</strong> or <strong>incorrect</strong>.<br />
+            They do not constitute financial advice and must be reviewed and approved by a licensed financial advisor before any action.<br />
+            For more info, please consult our <a href=""><em>Terms & Conditions</em></a>
+          </div>
+        </div>
+
+        <div class="position-relative outer-recmendation">
+          <div class="edit-rec-sugg">
+            <button matTooltip="Edit"><img width="16" src="assets/images/svgs/edit-icon.svg" alt="edit" /></button>
+            <button matTooltip="Copy"><img width="16" src="assets/images/svgs/copy-icon.svg" alt="copy" /></button>
+          </div>
+
+          <!-- Strengths -->
+          <ng-container *ngIf="analysis.strengths?.length">
+            <div class="ai-rec-sugg">
+              <h3 class="m-b-8">Strengths</h3>
+              <ul>
+                <li *ngFor="let item of analysis.strengths">{{ item }}</li>
+              </ul>
+            </div>
+          </ng-container>
+
+          <!-- Weaknesses -->
+          <ng-container *ngIf="analysis.weaknesses?.length">
+            <div class="ai-rec-sugg">
+              <h3 class="m-b-8">Weaknesses</h3>
+              <ul>
+                <li *ngFor="let item of analysis.weaknesses">{{ item }}</li>
+              </ul>
+            </div>
+          </ng-container>
+
+          <!-- Suggestions -->
+          <ng-container *ngIf="analysis.suggestions?.length">
+            <div class="ai-rec-sugg">
+              <h3 class="m-b-8">Suggestions</h3>
+              <ul>
+                <li *ngFor="let item of analysis.suggestions">{{ item }}</li>
+              </ul>
+            </div>
+          </ng-container>
+
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </ng-container>
 
 </div>
-

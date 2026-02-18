@@ -1,3 +1,5 @@
-export interface AiRecommendationsModel {
-  id: string;
+export interface PlanAnalysisResponse {
+  strengths: string[];
+  weaknesses: string[];
+  suggestions: string[];
 }
