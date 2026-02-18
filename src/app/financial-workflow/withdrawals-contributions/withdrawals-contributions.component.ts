@@ -357,18 +357,22 @@ export class WithdrawalsContributionsComponent {
   }
 
   private updateContributionSummary(): void {
+    const currentYear = this.timeline
+      ? moment(this.timeline.forecastStartDate).year()
+      : new Date().getFullYear();
+
     const activeIncomes = (this.incomeExpense?.incomes ?? [])
-      .filter((item) => this.isIncludedIncome(item));
+      .filter((item) => this.isIncludedIncome(item) && this.isHappeningInYear(item, currentYear));
 
     const activeExpenses = (this.incomeExpense?.expenses ?? [])
-      .filter((item) => this.isIncludedExpense(item));
+      .filter((item) => this.isIncludedExpense(item) && this.isHappeningInYear(item, currentYear));
 
     const totalIncome = activeIncomes.reduce(
-      (sum, item) => sum + this.getYearAmount(item),
+      (sum, item) => sum + this.getYearAmount(item, currentYear),
       0
     );
     const totalExpenses = activeExpenses.reduce(
-      (sum, item) => sum + this.getYearAmount(item),
+      (sum, item) => sum + this.getYearAmount(item, currentYear),
       0
     );
 
@@ -410,11 +414,31 @@ export class WithdrawalsContributionsComponent {
     return true;
   }
 
-  private getYearAmount(item: FinancialViewModel): number {
+  private getYearAmount(item: FinancialViewModel, year: number): number {
     const baseAmount = Number(item?.amount?.amount ?? 0);
     const cycleDescription = (item?.amount?.cycle?.description ?? '').toString().toLowerCase();
 
-    if (cycleDescription.includes('month')) return baseAmount * 12;
-    return baseAmount;
+    let yearlyAmount = cycleDescription.includes('month') ? baseAmount * 12 : baseAmount;
+
+    if (item?.bonus?.enabled && Number(item?.bonus?.amount?.amount ?? 0) > 0) {
+      const bonusCycleDesc = (item.bonus.amount.cycle?.description ?? '').toLowerCase();
+      const isBonusOneOff = bonusCycleDesc === 'one-off';
+
+      if (isBonusOneOff) {
+        const bonusYear = Number(item.bonus.bonusDate?.year ?? 0);
+        if (bonusYear === year) {
+          yearlyAmount += Number(item.bonus.amount.amount ?? 0);
+        }
+      } else {
+        const bonusAmount = Number(item.bonus.amount.amount ?? 0);
+        if (bonusCycleDesc.includes('month')) {
+          yearlyAmount += bonusAmount * 12;
+        } else {
+          yearlyAmount += bonusAmount;
+        }
+      }
+    }
+
+    return yearlyAmount;
   }
 }
