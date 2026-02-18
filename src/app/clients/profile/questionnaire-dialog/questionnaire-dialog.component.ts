@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { Client } from '../../models/client';
 import {
@@ -11,8 +11,10 @@ import {
 import { CommonModule } from '@angular/common';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatButtonModule } from '@angular/material/button';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ToastrService } from 'ngx-toastr';
 import { TranslateModule } from '@ngx-translate/core';
+import { QuestionnaireHttpService } from '../../services/questionnaire-http.service';
 
 export interface QuestionnaireItem {
   id: string;
@@ -28,6 +30,7 @@ export interface QuestionnaireItem {
     CommonModule,
     MatCheckboxModule,
     MatButtonModule,
+    MatProgressSpinnerModule,
     CdkDrag,
     CdkDragHandle,
     CdkDropList,
@@ -36,33 +39,16 @@ export interface QuestionnaireItem {
   templateUrl: './questionnaire-dialog.component.html',
   styleUrl: './questionnaire-dialog.component.scss',
 })
-export class QuestionnaireDialogComponent {
-  questions: QuestionnaireItem[] = [
-    { id: '1', text: 'The important people in your life', selected: true },
-    { id: '2', text: 'Your short and long term goals', selected: true },
-    {
-      id: '3',
-      text: 'Which range best describes your investable assets today?',
-      selected: true,
-    },
-    {
-      id: '4',
-      text: 'How would you define your investment approach?',
-      selected: true,
-    },
-    { id: '5', text: 'Which areas worry you most today?', selected: true },
-    {
-      id: '6',
-      text: 'What would you improve in your current financial planning?',
-      selected: true,
-    },
-  ];
-
+export class QuestionnaireDialogComponent implements OnInit {
+  questions: QuestionnaireItem[] = [];
   clientName: string;
+  isLoaderVisible = false;
+  isCopying = false;
 
   constructor(
     private dialogRef: MatDialogRef<QuestionnaireDialogComponent>,
     private toastr: ToastrService,
+    private questionnaireHttpService: QuestionnaireHttpService,
     @Inject(MAT_DIALOG_DATA) public data: { client: Client }
   ) {
     this.clientName =
@@ -71,13 +57,66 @@ export class QuestionnaireDialogComponent {
         : 'Client';
   }
 
+  ngOnInit(): void {
+    this.loadQuestions();
+  }
+
+  loadQuestions(): void {
+    this.isLoaderVisible = true;
+    this.questionnaireHttpService.getQuestions().subscribe({
+      next: (questions) => {
+        this.questions = questions.map((q) => ({ id: q.id, text: q.text, selected: true }));
+        this.isLoaderVisible = false;
+      },
+      error: (err) => {
+        this.isLoaderVisible = false;
+        this.toastr.error('Failed to load questions. Please try again.');
+        console.error(err);
+      },
+    });
+  }
+
   closeDialog(): void {
     this.dialogRef.close();
   }
 
   onCopyLink(): void {
-    this.toastr.success('Link copied!');
-    this.dialogRef.close();
+    const selectedIds = this.questions.filter((q) => q.selected).map((q) => q.id);
+    if (selectedIds.length === 0) {
+      this.toastr.warning('Please select at least one question.');
+      return;
+    }
+
+    const advisorId = this.data?.client?.financialAdvisor?.advisorId ?? '';
+    if (!advisorId) {
+      this.toastr.error('Unable to identify advisor.');
+      return;
+    }
+
+    this.isCopying = true;
+    this.questionnaireHttpService
+      .createLink({
+        clientId: this.data.client.id,
+        advisorId,
+        questionIds: selectedIds,
+      })
+      .subscribe({
+        next: (response) => {
+          navigator.clipboard.writeText(response.shareableUrl).then(() => {
+            this.toastr.success('Link copied!');
+            this.dialogRef.close();
+          }).catch(() => {
+            this.toastr.info('Link created. Share this URL: ' + response.shareableUrl);
+            this.dialogRef.close();
+          });
+          this.isCopying = false;
+        },
+        error: (err) => {
+          this.isCopying = false;
+          this.toastr.error('Failed to create link. Please try again.');
+          console.error(err);
+        },
+      });
   }
 
   toggleQuestion(item: QuestionnaireItem): void {

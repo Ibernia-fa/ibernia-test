@@ -128,8 +128,9 @@ export class AddContributionComponent {
       (s) => (s.name ?? '').toLowerCase() === 'cash'
     );
 
-    // timeline years
-    const iterations = data.forecastEndDateYear - data.forecastStartDateYear + 1;
+    const endYear = data.forecastEndDateYear + 1;
+    const iterations = endYear - data.forecastStartDateYear + 1;
+    
     for (let i = 0; i < iterations; i++) {
       this.years.push(data.forecastStartDateYear + i);
     }

@@ -24,6 +24,7 @@ import { ToastrModule, ToastrService } from 'ngx-toastr';
 import { EditModelDialogComponent } from './edit-model-dialog/edit-model-dialog.component';
 import { QuestionnaireDialogComponent } from './questionnaire-dialog/questionnaire-dialog.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { QuestionnaireHttpService, GetClientQuestionnaireResponse } from '../services/questionnaire-http.service';
 import { Store } from '@ngrx/store';
 import { selectedClient } from 'src/app/store/client/client.selectors';
 import * as ClientActions from 'src/app/store/client/client.actions';
@@ -73,6 +74,7 @@ export class ProfileComponent {
   preferredCurrency: string | undefined;
   totalSavings: string = "0";
   isLoaderVisible = true;
+  questionnaireResponses: GetClientQuestionnaireResponse | null = null;
 
   constructor(
     private dialog: MatDialog,
@@ -82,6 +84,7 @@ export class ProfileComponent {
     private toastr: ToastrService,
     private cashflowHttpService: CashflowHttpService,
     private savingsPotsHttpService: SavingsPotsHttpService,
+    private questionnaireHttpService: QuestionnaireHttpService,
     private store: Store
   ) {
     this.getClient();
@@ -96,11 +99,53 @@ export class ProfileComponent {
   }
 
   onQuestionnaireClicked() {
-    this.dialog.open(QuestionnaireDialogComponent, {
+    const dialogRef = this.dialog.open(QuestionnaireDialogComponent, {
       width: '720px',
       disableClose: true,
       data: { client: this.client },
     });
+    dialogRef.afterClosed().subscribe(() => {
+      this.loadQuestionnaireResponses();
+    });
+  }
+
+  loadQuestionnaireResponses() {
+    if (!this.clientId) return;
+    this.questionnaireHttpService.getClientResponses(this.clientId).subscribe({
+      next: (data) => {
+        this.questionnaireResponses = data;
+        console.log(this.questionnaireResponses);
+      },
+      error: () => {
+        this.questionnaireResponses = null;
+      },
+    });
+  }
+
+  formatResponseValue(item: { type: string; value: unknown }): string {
+    const v = item.value;
+    if (v == null) return '-';
+    if (typeof v === 'string') return v;
+    if (Array.isArray(v)) {
+      return v.map((x) => (typeof x === 'object' && x && 'name' in x && 'relationship' in x
+        ? `${(x as { name: string }).name} (${(x as { relationship: string }).relationship})`
+        : String(x))).join(', ');
+    }
+    if (typeof v === 'object') {
+      const obj = v as Record<string, unknown>;
+      const selected = obj['selected'] as string[] | undefined;
+      const others = obj['others'] as string | undefined;
+      const parts = selected ? [...selected] : [];
+      if (others) parts.push(`Other: ${others}`);
+      return parts.join(', ') || '-';
+    }
+    return String(v);
+  }
+
+  getResponseChips(item: { type: string; value: unknown }): string[] {
+    const formatted = this.formatResponseValue(item);
+    if (!formatted || formatted === '-') return [];
+    return formatted.split(', ').filter(Boolean);
   }
 
   onSortByValueChange(event: any)
@@ -133,6 +178,7 @@ export class ProfileComponent {
           this.cashflows = cashflows;
           this.birthDate = this.client?.clientDetails.birthDate;
           this.refreshTotalSavings();
+          this.loadQuestionnaireResponses();
 
           this.isLoaderVisible = false;
         })

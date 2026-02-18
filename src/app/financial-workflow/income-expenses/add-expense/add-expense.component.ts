@@ -99,6 +99,8 @@ export class AddExpenseComponent {
     }
 
     this.clientAge = age;
+    if (data.forecastStartDateYear - this.clientBirthYear > this.clientAge) this.clientBirthYear = this.clientBirthYear + 1
+
 
     this.clientPreferredCurrency = data.clientPreferredCurrency;
     this.cashflowId = data.cashflowId;
@@ -108,7 +110,8 @@ export class AddExpenseComponent {
       && this.selectedExpense?.description != "Housing"
       && this.selectedExpense?.description != "Debt repayment";
 
-    var iterations = data.forecastEndDateYear - data.forecastStartDateYear + 1;
+    const endYear = data.forecastEndDateYear + 1;
+    const iterations = endYear - data.forecastStartDateYear + 1;
 
     for (let index = 0; index < iterations; index++) {
       const element = data.forecastStartDateYear + index;
@@ -121,7 +124,7 @@ export class AddExpenseComponent {
       description: [this.selectedExpense?.description, Validators.required],
       expenseType: [this.expenseTypes[0], Validators.required],
       currencySymbol: [this.clientPreferredCurrency, [Validators.required]],
-      amount: ['', [Validators.required, Validators.min(0)]],
+      amount: ['', [Validators.required, this.greaterThanZero()]],
       cycle: [this.cycles[1].id, Validators.required],
       start: ['', Validators.required],
       end: [''],
@@ -142,9 +145,10 @@ export class AddExpenseComponent {
       this.onCycleValueChange(this.selectedExpense.amount.cycle?.id)
       this.expenseForm.get('description')?.patchValue(this.selectedExpense.description);
       this.expenseForm.get('currencySymbol')?.patchValue(this.clientPreferredCurrency);
-      this.expenseForm.get('amount')?.patchValue(this.selectedExpense.amount.amount);
+      const amountVal = this.selectedExpense.amount.amount;
+      this.expenseForm.get('amount')?.patchValue(amountVal === 0 || amountVal === null || amountVal === undefined ? '' : amountVal);
 
-      // thousand comma seperator
+      // thousand comma seperator (skip when amount is 0 to avoid showing error by default)
       setTimeout(() => {
         const el = this.amountInput?.nativeElement;
         const amount = this.expenseForm.get('amount')?.value;
@@ -198,6 +202,10 @@ export class AddExpenseComponent {
         || this.selectedExpense.description == "Debt repayment"
       )) {
       this.onExpenseTypeChange(this.selectedExpense.description);
+    }
+    else if (this.isEditWorkflow && this.selectedExpense != null) {
+      this.expenseForm.get('expenseType')?.patchValue('Custom');
+      this.onExpenseTypeChange('Custom');
     }
     else {
       this.onExpenseTypeChange(this.expenseTypes[0]);
@@ -388,6 +396,14 @@ export class AddExpenseComponent {
     customControl?.updateValueAndValidity();
   }
 
+  private greaterThanZero(): ValidatorFn {
+    return (control: AbstractControl) => {
+      const value = Number(control.value);
+      if (control.value === '' || control.value === null || control.value === undefined) return null;
+      return value > 0 ? null : { greaterThanZero: true };
+    };
+  }
+
   private endOnOrAfterStartValidator(): ValidatorFn {
     return (group: AbstractControl) => {
       const start = group.get('start')?.value;
@@ -411,9 +427,8 @@ export class AddExpenseComponent {
   }
 
   get expenseTitle(): string {
-    const title = this.selectedExpense?.description ?? this.customDescriptionAutoRenamed ?? "Expense";
-    return this.isEditWorkflow ? title : `Add - ${title}`;
-
+    if (!this.isEditWorkflow) return 'Add expense';
+    return this.selectedExpense?.description ?? this.customDescriptionAutoRenamed ?? 'Expense';
   }
 
   setExpenseIcon(): void {
@@ -499,6 +514,12 @@ export class AddExpenseComponent {
     this.expenseIcon = config.icon;
     this.isNameEditable = !!config.editableName;
     this.isDefaultExpense = !!config.isDefault;
+
+    if (!this.isEditWorkflow && this.isNameEditable) {
+      this.showNameEdit = true;
+    } else if (!this.isNameEditable) {
+      this.showNameEdit = false;
+    }
 
     // apply default start and end dates
     if (!this.isEditWorkflow) {

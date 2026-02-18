@@ -98,6 +98,7 @@ export class AddIncomeComponent {
     }
 
     this.clientAge = age;
+    if (data.forecastStartDateYear - this.clientBirthYear > this.clientAge) this.clientBirthYear = this.clientBirthYear + 1
 
     this.clientPreferredCurrency = data.clientPreferredCurrency;
     this.cashflowId = data.cashflowId;
@@ -108,7 +109,8 @@ export class AddIncomeComponent {
       && this.selectedIncome?.description != "State pension"
       && this.selectedIncome?.description != "Rental income";
 
-    var iterations = data.forecastEndDateYear - data.forecastStartDateYear + 1;
+    const endYear = data.forecastEndDateYear + 1;
+    const iterations = endYear - data.forecastStartDateYear + 1;
 
     for (let index = 0; index < iterations; index++) {
       const element = data.forecastStartDateYear + index;
@@ -123,7 +125,7 @@ export class AddIncomeComponent {
       description: [this.selectedIncome?.description, Validators.required],
       incomeType: [this.incomeTypes[0], Validators.required],
       currencySymbol: [this.clientPreferredCurrency, [Validators.required]],
-      amount: ['', [Validators.required, Validators.min(0)]],
+      amount: ['', [Validators.required, this.greaterThanZero()]],
       cycle: [this.cycles[1].id, Validators.required],
       start: ['', Validators.required],
       end: [''],
@@ -147,9 +149,10 @@ export class AddIncomeComponent {
       this.onCycleValueChange(this.selectedIncome.amount.cycle?.id)
       this.incomeForm.get('description')?.patchValue(this.selectedIncome.description);
       this.incomeForm.get('currencySymbol')?.patchValue(this.clientPreferredCurrency);
-      this.incomeForm.get('amount')?.patchValue(this.selectedIncome.amount.amount);
+      const amountVal = this.selectedIncome.amount.amount;
+      this.incomeForm.get('amount')?.patchValue(amountVal === 0 || amountVal === null || amountVal === undefined ? '' : amountVal);
 
-      // thousand comma seperator
+      // thousand comma seperator (skip when amount is 0 to avoid showing error by default)
       setTimeout(() => {
         const el = this.amountInput?.nativeElement;
         const amount = this.incomeForm.get('amount')?.value;
@@ -159,7 +162,7 @@ export class AddIncomeComponent {
 
         const elBonusAmountInput = this.bonusAmountInput?.nativeElement;
         const bonusAmount = this.incomeForm.get('bonusAmount')?.value;
-        if (!elBonusAmountInput || bonusAmount === null || bonusAmount === undefined || bonusAmount === '') return;
+        if (!elBonusAmountInput || bonusAmount === null || bonusAmount === undefined || bonusAmount === '' || Number(bonusAmount) === 0) return;
         elBonusAmountInput.value = Number(bonusAmount).toLocaleString('en-US');
         elBonusAmountInput.dispatchEvent(new Event('blur'));
       });
@@ -209,10 +212,11 @@ export class AddIncomeComponent {
         const bonus = this.selectedIncome.bonus;
         const amount = bonus.amount;
         const cycle = amount?.cycle;
+        const bonusAmt = amount?.amount ?? 0;
 
         this.incomeForm.patchValue({
           addBonus: bonus.enabled,
-          bonusAmount: amount?.amount ?? 0,
+          bonusAmount: bonusAmt === 0 ? '' : bonusAmt,
           bonusCycle: cycle?.id ?? null,
           bonusDate: bonus.bonusDate?.year ?? null
         });
@@ -230,6 +234,10 @@ export class AddIncomeComponent {
         || this.selectedIncome.description == "Rental income"
       )) {
       this.onIncomeTypeChange(this.selectedIncome.description);
+    }
+    else if (this.isEditWorkflow && this.selectedIncome != null) {
+      this.incomeForm.get('incomeType')?.patchValue('Custom');
+      this.onIncomeTypeChange('Custom');
     }
     else {
       this.onIncomeTypeChange(this.incomeTypes[0]);
@@ -473,8 +481,8 @@ export class AddIncomeComponent {
   }
 
   get incomeTitle(): string {
-    const title = this.selectedIncome?.description ?? this.customDescriptionAutoRenamed ?? "Income";
-    return this.isEditWorkflow ? title : `Add - ${title}`;
+    if (!this.isEditWorkflow) return 'Add income';
+    return this.selectedIncome?.description ?? this.customDescriptionAutoRenamed ?? 'Income';
   }
 
   setIncomeIcon(): void {
@@ -559,6 +567,12 @@ export class AddIncomeComponent {
     this.incomeIcon = config.icon;
     this.isNameEditable = !!config.editableName;
     this.isDefaultIncome = !!config.isDefault;
+
+    if (!this.isEditWorkflow && this.isNameEditable) {
+      this.showNameEdit = true;
+    } else if (!this.isNameEditable) {
+      this.showNameEdit = false;
+    }
 
     // Salary and State pension are linked to retirement age in both add and edit workflows.
     if (!this.isEditWorkflow || value === 'Salary' || value === 'State pension') {
@@ -709,7 +723,7 @@ export class AddIncomeComponent {
 
     if (isBonusEnabled) {
       bonusAmount?.enable({ emitEvent: false });
-      bonusAmount?.setValidators([Validators.required, Validators.min(0)]);
+      bonusAmount?.setValidators([Validators.required, this.greaterThanZero()]);
       bonusCycle?.setValidators([Validators.required]);
     } else {
       bonusAmount?.setValue(0, { emitEvent: false });
@@ -727,6 +741,14 @@ export class AddIncomeComponent {
     bonusAmount?.updateValueAndValidity({ emitEvent: false });
     bonusCycle?.updateValueAndValidity({ emitEvent: false });
     bonusDate?.updateValueAndValidity({ emitEvent: false });
+  }
+
+  private greaterThanZero(): ValidatorFn {
+    return (control: AbstractControl) => {
+      const value = Number(control.value);
+      if (control.value === '' || control.value === null || control.value === undefined) return null;
+      return value > 0 ? null : { greaterThanZero: true };
+    };
   }
 
   private syncBonusDateState(): void {
