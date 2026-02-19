@@ -187,19 +187,47 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
               );
             });
 
+          // Show 'Retirement age' in chips if:
+          // 1. It's not on the timeline at all, OR
+          // 2. It IS on the timeline but falls outside the visible forecast range
+          //    (so it's invisible on the chart and the user should be able to re-drag it)
+          const forecastStartYear = this.financialTimeline?.forecastStartDate
+            ? moment(this.financialTimeline.forecastStartDate).year()
+            : null;
+          const forecastEndYear = this.financialTimeline?.forecastEndtDate
+            ? moment(this.financialTimeline.forecastEndtDate).year()
+            : null;
+
           this.systemEventsLibrary = [
             ...res[0],
             ...res[1],
           ]
-            .filter(event =>
-              event.name !== 'State pension' &&
-              !(
-                event.name === 'Retirement age' &&
-                this.financialTimeline?.clientEvents?.some(
-                  ce => ce.name === 'Retirement age'
-                )
-              )
-            )
+            .filter(event => {
+              if (event.name === 'State pension') return false;
+              if (event.name !== 'Retirement age') return true;
+
+              // For 'Retirement age':
+              const retirementOnTimeline = this.financialTimeline?.clientEvents?.find(
+                ce => ce.name === 'Retirement age'
+              );
+
+              // Not on timeline at all → show chip
+              if (!retirementOnTimeline) return true;
+
+              // On timeline but outside visible forecast range → show chip
+              const retYear = retirementOnTimeline.start?.year;
+              if (
+                retYear != null &&
+                forecastStartYear != null &&
+                forecastEndYear != null &&
+                (retYear < forecastStartYear || retYear > forecastEndYear)
+              ) {
+                return true;
+              }
+
+              // Already visible on timeline → hide chip
+              return false;
+            })
             .sort((a, b) => {
               return (
                 this.CHIP_ORDER.indexOf(a.name) -
@@ -278,52 +306,70 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     // get the dropped position on the timeline
-    const props = this.timeline.getEventProperties(event);
-    let dropTime: Date | null = null;
+    // Prefer lastValidDragTime (continuously tracked during onDragOver) as the
+    // most reliable source. getEventProperties can return stale/wrong values
+    // when the drop lands on internal vis-timeline item elements.
+    let dropTime: Date | null = this.lastValidDragTime ?? null;
 
-    // Get raw time from props and snap it
-    if (props.time) {
-      dropTime = this.snapToNearestYear(props.time);
-    }
-    // If dropped on an existing item, time may be null — fall back to snapped position
-    if (!dropTime && props.snappedTime) {
-      dropTime = this.snapToNearestYear(props.snappedTime);
-    }
     if (!dropTime) {
-      // Try to calculate from the mouse X position on the timeline
+      const props = this.timeline.getEventProperties(event);
+
+      if (props.time) {
+        dropTime = this.snapToNearestYear(props.time);
+      }
+      if (!dropTime && props.snappedTime) {
+        dropTime = this.snapToNearestYear(props.snappedTime);
+      }
+    }
+
+    if (!dropTime) {
+      // Last resort: calculate from the mouse X position on the timeline
       const rect = this.timelineContainer.nativeElement.getBoundingClientRect();
       const x = event.clientX - rect.left;
       const timelineRange = this.timeline.getWindow();
       const ratio = x / rect.width;
-      
-      // Only use calculated position if the ratio is valid (mouse is within timeline bounds)
+
       if (ratio >= 0 && ratio <= 1 && event.clientX > 0) {
         const ms = timelineRange.start.valueOf() + ratio * (timelineRange.end.valueOf() - timelineRange.start.valueOf());
         dropTime = this.snapToNearestYear(new Date(ms));
       }
     }
     
-    // Final fallback: use the last valid position from onDragOver
-    if (!dropTime && this.lastValidDragTime) {
-      dropTime = this.lastValidDragTime;
-    }
-    
     // Clear the stored drag time
     this.lastValidDragTime = null;
 
     if (this.draggedEvent?.name === 'Retirement age') {
+      const existingRetirement = this.financialTimeline.clientEvents.find(
+        (event) => event.name === this.draggedEvent?.name
+      );
 
-      // drop only once
-      if (this.financialTimeline.clientEvents.find((event) => event.name === this.draggedEvent?.name)) {
-        this.draggedEvent = null;
-        return;
+      if (existingRetirement) {
+        // If retirement already exists AND is within the visible forecast range, block duplicate drop
+        const forecastStart = moment(this.financialTimeline.forecastStartDate).year();
+        const forecastEnd = moment(this.financialTimeline.forecastEndtDate).year();
+        const retYear = existingRetirement.start?.year;
+
+        if (retYear != null && retYear >= forecastStart && retYear <= forecastEnd) {
+          this.draggedEvent = null;
+          return;
+        }
+
+        // Existing retirement is outside forecast range — remove it so user can re-place it
+        const idx = this.financialTimeline.clientEvents.indexOf(existingRetirement);
+        if (idx > -1) {
+          this.financialTimeline.clientEvents.splice(idx, 1);
+        }
       }
 
       const retirementYear = this.getRetirementDropYear();
       // If client is already past default retirement age, use the drop location they chose
-      // Otherwise, snap to the calculated retirement year
+      // Otherwise, snap to the calculated retirement year — but only if it's within the forecast
       if (retirementYear) {
-        dropTime = new Date(retirementYear, 0, 1);
+        const forecastEnd = moment(this.financialTimeline.forecastEndtDate).year();
+        if (retirementYear <= forecastEnd) {
+          dropTime = new Date(retirementYear, 0, 1);
+        }
+        // If default retirement year is outside forecast, keep the user's chosen dropTime
       }
       // If retirementYear is null (client already past default retirement age),
       // keep the dropTime from where they actually dropped it
@@ -438,17 +484,34 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
 
     if (!this.timeline) return;
 
+    let snappedTime: Date | null = null;
+
     const props = this.timeline.getEventProperties(event);
-    if (!props?.time) return;
+    if (props?.time) {
+      snappedTime = this.snapToNearestYear(props.time);
+    }
 
-    const snappedTime = this.snapToNearestYear(props.time);
-    this.lastValidDragTime = snappedTime; // Store the last valid snapped position
-    this.timeline.setCustomTime(snappedTime, 'dragOver');
+    // Fallback: calculate from mouse X if getEventProperties failed
+    if (!snappedTime) {
+      const rect = this.timelineContainer.nativeElement.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const timelineRange = this.timeline.getWindow();
+      const ratio = x / rect.width;
+      if (ratio >= 0 && ratio <= 1 && event.clientX > 0) {
+        const ms = timelineRange.start.valueOf() + ratio * (timelineRange.end.valueOf() - timelineRange.start.valueOf());
+        snappedTime = this.snapToNearestYear(new Date(ms));
+      }
+    }
 
-    const snappedYear = snappedTime.getFullYear();
-    const age = this.calculateAgeForTimeline(snappedTime, new Date(this.clientBirthDate));
+    if (!snappedTime) return;
 
-    this.highlightHoveredYearLabel(snappedYear);
+    this.lastValidDragTime = snappedTime;
+
+    try {
+      this.timeline.setCustomTime(snappedTime, 'dragOver');
+    } catch { /* custom time may not exist yet */ }
+
+    this.highlightHoveredYearLabel(snappedTime.getFullYear());
   }
 
   highlightHoveredYearLabel(snappedYear: number) {

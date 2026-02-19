@@ -37,6 +37,8 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
     onMouseEnter: () => void;
     onMouseLeave: () => void;
   }> = [];
+  private emergencyIconEl: HTMLElement | null = null;
+  private shortfallDataPointIndex: number = -1;
 
   private getCurrencyAxisTitle(): string {
     return this.client?.clientDetails?.preferredCurrency ?? '';
@@ -245,10 +247,21 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
       // goals and events dots
       this.events = report.timelineEvents ?? [];
 
-      if (this.events.length > 0) {
-        this.chartOptions.annotations = { points: this.buildEventAnnotations(this.events) };
-        setTimeout(() => this.attachHtmlTooltips(), 500);
-      }
+      // Build annotations: event dots + emergency year highlight
+      const eventAnnotations = this.events.length > 0
+        ? this.buildEventAnnotations(this.events)
+        : [];
+      const emergencyXAxis = this.buildEmergencyAnnotation(report);
+
+      this.chartOptions.annotations = {
+        points: eventAnnotations,
+        xaxis: emergencyXAxis
+      };
+
+      setTimeout(() => {
+        if (this.events.length > 0) this.attachHtmlTooltips();
+        this.attachEmergencyIcon();
+      }, 500);
     }
 
     this.chartOptions.chart = { ...this.chartOptions.chart };
@@ -369,6 +382,10 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
 
   ngOnDestroy(): void {
     this.cleanupHtmlTooltips();
+    if (this.emergencyIconEl) {
+      this.emergencyIconEl.remove();
+      this.emergencyIconEl = null;
+    }
   }
 
   buildEventAnnotations(events: TimelineEvent[]) {
@@ -407,6 +424,100 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
     });
 
     return annotations;
+  }
+
+  /**
+   * Builds an xaxis annotation (red band) for the first year where the shortfall begins.
+   * Also stores the data-point index so the ⚠ icon can be placed via DOM.
+   */
+  private buildEmergencyAnnotation(report: ChartSeries): any[] {
+    this.shortfallDataPointIndex = -1;
+    const shortfallSeries = report?.series?.find(s => s.name === 'Shortfall');
+    if (!shortfallSeries) return [];
+
+    const index = shortfallSeries.data.findIndex(v => v < 0);
+    if (index < 0) return [];
+
+    const year = report.categories[index];
+    if (!year) return [];
+
+    this.shortfallDataPointIndex = index;
+
+    return [{
+      x: year,
+      x2: year,
+      fillColor: '#FF4560',
+      opacity: 0.15,
+      label: { text: '' }
+    }];
+  }
+
+  /**
+   * Places a ⚠ icon above the top of the stacked bar at the shortfall year.
+   * Uses an absolutely-positioned HTML element over the chart to avoid SVG clip-path issues.
+   */
+  private attachEmergencyIcon(): void {
+    // Clean up previous icon
+    if (this.emergencyIconEl) {
+      this.emergencyIconEl.remove();
+      this.emergencyIconEl = null;
+    }
+    if (this.shortfallDataPointIndex < 0) return;
+
+    const chartHost = this.chartElRef?.nativeElement;
+    if (!chartHost) return;
+
+    // Find all bar series groups
+    const allSeries = chartHost.querySelectorAll('.apexcharts-bar-series .apexcharts-series');
+    if (!allSeries.length) return;
+
+    // Find the topmost bar segment at the shortfall index using screen coordinates
+    let minTop = Infinity;
+    let barCenterX = 0;
+    let found = false;
+
+    allSeries.forEach(seriesGroup => {
+      const bars = seriesGroup.querySelectorAll<SVGPathElement>('path.apexcharts-bar-area');
+      const bar = bars[this.shortfallDataPointIndex];
+      if (!bar) return;
+
+      const rect = bar.getBoundingClientRect();
+      if (rect.height === 0 && rect.width === 0) return;
+
+      if (rect.top < minTop) {
+        minTop = rect.top;
+        barCenterX = rect.left + rect.width / 2;
+        found = true;
+      }
+    });
+
+    if (!found) return;
+
+    // Get chart host position for relative placement
+    const hostRect = chartHost.getBoundingClientRect();
+
+    // Create an absolutely positioned HTML element
+    const icon = document.createElement('div');
+    icon.textContent = '⚠';
+    icon.style.position = 'absolute';
+    icon.style.color = '#FF4560';
+    icon.style.fontSize = '18px';
+    icon.style.fontWeight = '700';
+    icon.style.pointerEvents = 'none';
+    icon.style.zIndex = '10';
+    icon.style.lineHeight = '1';
+    icon.style.transform = 'translateX(-50%)';
+    icon.style.left = `${barCenterX - hostRect.left}px`;
+    icon.style.top = `${minTop - hostRect.top - 22}px`;
+
+    // Make sure chart host is positioned for absolute children
+    const hostPosition = getComputedStyle(chartHost).position;
+    if (hostPosition === 'static') {
+      chartHost.style.position = 'relative';
+    }
+
+    chartHost.appendChild(icon);
+    this.emergencyIconEl = icon;
   }
 
   private attachHtmlTooltips() {
@@ -514,20 +625,20 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
       return '';
     }
 
-    const birthYear = birthDate.getFullYear();
-    let age = year - birthYear;
-
-    // Use actual forecast start date for the first plotted year.
-    // This prevents +1 when the client's birthday hasn't happened yet.
+    // Derive every age from the precise base age at the first plotted year
+    // so the sequence always increments by exactly 1 per year (no gaps).
     if (
       firstCategoryYear != null &&
-      year === firstCategoryYear &&
+      Number.isFinite(firstCategoryYear) &&
       this.forecastStartDate
     ) {
-      age = this.calculateAgeAtDate(this.forecastStartDate, birthDate);
+      const baseAge = this.calculateAgeAtDate(this.forecastStartDate, birthDate);
+      return baseAge + (year - firstCategoryYear);
     }
 
-    return age;
+    // Fallback when there is no first category year or forecast start date
+    const birthYear = birthDate.getFullYear();
+    return year - birthYear;
   }
 
   private calculateAgeAtDate(referenceDate: Date, birthDate: Date): number {
