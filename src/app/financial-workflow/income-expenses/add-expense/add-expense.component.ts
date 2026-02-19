@@ -16,7 +16,7 @@ import { Cycle, EscalationRate } from '../../timeline/models/financial-timeline'
 import { IncomeExpensesHttpService } from '../services/income-expenses-http.service';
 import moment from 'moment';
 import { FinancialViewModel } from '../model/income-expense';
-import { catchError, filter } from 'rxjs';
+import { catchError, filter, finalize } from 'rxjs';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 import { TranslateModule } from '@ngx-translate/core';
 import { CommonModule } from '@angular/common';
@@ -49,6 +49,10 @@ export class AddExpenseComponent {
 
   onAmountInput(rawValue: string) {
     const { parseFormattedNumber } = require('src/app/shared/utils/number-utils');
+    if (!rawValue || rawValue.trim() === '') {
+      this.expenseForm.get('amount')?.setValue('');
+      return;
+    }
     const value = parseFormattedNumber(rawValue);
     this.expenseForm.get('amount')?.setValue(value);
   }
@@ -75,6 +79,7 @@ export class AddExpenseComponent {
   customDescriptionAutoRenamed: string;
   showNameEdit: boolean = false;
   forecastEndYear: number;
+  isSaving = false;
   private initialFormSnapshot = '';
 
   constructor(
@@ -118,7 +123,7 @@ export class AddExpenseComponent {
       this.years.push(element);
     }
 
-    this.forecastEndYear = this.data.forecastEndDateYear;
+    this.forecastEndYear = this.years[this.years.length - 1];
 
     this.expenseForm = this.fb.group({
       description: [this.selectedExpense?.description, Validators.required],
@@ -268,10 +273,12 @@ export class AddExpenseComponent {
   }
 
   addExpense(): void {
+    if (this.isSaving) return;
     this.expenseForm.markAllAsTouched();
     this.expenseForm.markAsDirty();
 
     if (this.expenseForm.valid) {
+      this.isSaving = true;
       const isCustomEscalation = this.selectedEscalationDescription === 'Increases at custom rate';
       const escalationRateValue = isCustomEscalation
         ? this.expenseForm.get('customEscalationRate')?.value
@@ -349,6 +356,9 @@ export class AddExpenseComponent {
           catchError((err) => {
             console.error(err);
             throw err;
+          }),
+          finalize(() => {
+            this.isSaving = false;
           })
         )
         .subscribe((res) => {
@@ -521,8 +531,7 @@ export class AddExpenseComponent {
       this.showNameEdit = false;
     }
 
-    // apply default start and end dates
-    if (!this.isEditWorkflow) {
+    if (!this.isEditWorkflow || value === 'Living costs' || value === 'Housing') {
       this.applyDefaultStartEnd(value);
     }
 
@@ -535,10 +544,13 @@ export class AddExpenseComponent {
       }
     }
     else {
-      descriptionCtrl.setValue(this.customDescriptionAutoRenamed, { emitEvent: true });
+      const nextDescription = value === 'Custom'
+        ? ''
+        : (config.description ?? value);
+      descriptionCtrl.setValue(nextDescription, { emitEvent: true });
     }
 
-    if (config.requireDescription) {
+    if (config.requireDescription || value === 'Custom') {
       descriptionCtrl.setValidators([Validators.required]);
     } else {
       descriptionCtrl.clearValidators();
