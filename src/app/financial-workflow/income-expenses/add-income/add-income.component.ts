@@ -17,7 +17,7 @@ import { Cycle, EscalationRate } from '../../timeline/models/financial-timeline'
 import moment from 'moment';
 import { FinancialViewModel } from '../model/income-expense';
 import { IncomeExpensesHttpService } from '../services/income-expenses-http.service';
-import { catchError, filter } from 'rxjs';
+import { catchError, filter, finalize } from 'rxjs';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 import { TranslateModule } from '@ngx-translate/core';
 import { CommonModule } from '@angular/common';
@@ -74,6 +74,7 @@ export class AddIncomeComponent {
   retirementAge: number;
   retirementYear: number;
   forecastEndYear: number;
+  isSaving = false;
   private initialFormSnapshot = '';
 
   constructor(
@@ -119,7 +120,7 @@ export class AddIncomeComponent {
 
     this.retirementAge = this.data.language === 'en' ? 64 : 67;
     this.retirementYear = this.getRetirementEventYear() ?? (this.clientBirthYear + this.retirementAge);
-    this.forecastEndYear = this.data.forecastEndDateYear;
+    this.forecastEndYear = this.years[this.years.length - 1];
 
     this.incomeForm = this.fb.group({
       description: [this.selectedIncome?.description, Validators.required],
@@ -272,6 +273,10 @@ export class AddIncomeComponent {
   }
 
   onAmountInput(rawValue: string) {
+    if (!rawValue || rawValue.trim() === '') {
+      this.incomeForm.get('amount')?.setValue('', { emitEvent: true });
+      return;
+    }
     const value = parseFormattedNumber(rawValue);
     this.incomeForm.get('amount')?.setValue(value, { emitEvent: true });
   }
@@ -301,10 +306,12 @@ export class AddIncomeComponent {
   }
 
   addIncome(): void {
+    if (this.isSaving) return;
     this.incomeForm.markAllAsTouched();
     this.incomeForm.markAsDirty();
 
     if (this.incomeForm.valid) {
+      this.isSaving = true;
       const isSalary = this.incomeForm.get('description')?.value === 'Salary';
 
       const isCustomEscalation = this.selectedEscalationDescription === 'Increases at custom rate';
@@ -409,6 +416,9 @@ export class AddIncomeComponent {
           catchError((err) => {
             console.error(err);
             throw err;
+          }),
+          finalize(() => {
+            this.isSaving = false;
           })
         )
         .subscribe((res) => {
@@ -574,7 +584,6 @@ export class AddIncomeComponent {
       this.showNameEdit = false;
     }
 
-    // Salary and State pension are linked to retirement age in both add and edit workflows.
     if (!this.isEditWorkflow || value === 'Salary' || value === 'State pension') {
       this.applyDefaultStartEnd(value);
     }
@@ -589,12 +598,12 @@ export class AddIncomeComponent {
     }
     else {
       const nextDescription = value === 'Custom'
-        ? this.customDescriptionAutoRenamed
+        ? ''
         : (config.description ?? value);
       descriptionCtrl.setValue(nextDescription, { emitEvent: true });
     }
 
-    if (config.requireDescription) {
+    if (config.requireDescription || value === 'Custom') {
       descriptionCtrl.setValidators([Validators.required]);
     } else {
       descriptionCtrl.clearValidators();
@@ -623,9 +632,7 @@ export class AddIncomeComponent {
 
       case 'State pension':
         startCtrl.setValue(this.retirementYear);
-        if (!this.isEditWorkflow) {
-          endCtrl.setValue(this.forecastEndYear ?? this.retirementYear);
-        }
+        endCtrl.setValue(this.forecastEndYear ?? this.retirementYear);
         break;
 
       default:
@@ -645,6 +652,10 @@ export class AddIncomeComponent {
   }
 
   onBonusAmountInput(rawValue: string) {
+    if (!rawValue || rawValue.trim() === '') {
+      this.incomeForm.get('bonusAmount')?.setValue('', { emitEvent: true });
+      return;
+    }
     const value = parseFormattedNumber(rawValue);
     this.incomeForm.get('bonusAmount')?.setValue(value, { emitEvent: true });
   }

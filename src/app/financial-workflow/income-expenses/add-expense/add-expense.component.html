@@ -205,9 +205,12 @@
       </div>
       <div class="col-5">
         <button (click)="addExpense()" type="button"
-          [disabled]="expenseForm.invalid || (isEditWorkflow && !hasFormChanges())" class="button-icon w-100 d-block">
-          <!-- <span class="f-s-16"> {{isEditWorkflow ? 'Save' : 'Add'}} Expense</span> -->
+          [disabled]="isSaving || expenseForm.invalid || (isEditWorkflow && !hasFormChanges())" class="button-icon w-100 d-block">
+          @if (isSaving) {
+          <span class="f-s-16">Saving...</span>
+          } @else {
           <span class="f-s-16">Save</span>
+          }
         </button>
       </div>
     </div>
