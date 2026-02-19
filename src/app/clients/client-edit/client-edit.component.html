@@ -39,8 +39,9 @@
               <!-- [value]="clientDobDisplay" -->
               <input matInput [matDatepicker]="picker" formControlName="dob" placeholder="DD/MM/YYYY"
                 inputmode="numeric" autocomplete="bday" (input)="onDobTyping(dobInput)"
-                (dateChange)="onCalendarChange($event.value)" #dobInput />
-              <div class="date-picker-position">
+                (dateChange)="onCalendarChange($event.value)" #dobInput
+                [readonly]="clientForm.get('dob')?.disabled" />
+              <div class="date-picker-position" *ngIf="!clientForm.get('dob')?.disabled">
                 <mat-datepicker-toggle matIconSuffix [for]="picker">
                   <mat-icon matDatepickerToggleIcon>
                     <img src="assets/images/svgs/datepicker-icon.svg" alt="datepicker-icon" />
@@ -171,9 +172,10 @@
               <div class="position-relative">
                 <input matInput [matDatepicker]="partnerPicker" formControlName="dob" placeholder="DD/MM/YYYY"
                   inputmode="numeric" autocomplete="bday" (input)="onPartnerDobTyping(dobPartnerInput)"
-                  (dateChange)="onPartnerCalendarChange($event.value)" #dobPartnerInput />
+                  (dateChange)="onPartnerCalendarChange($event.value)" #dobPartnerInput
+                  [readonly]="clientForm.get('partner.dob')?.disabled" />
                 <!-- <mat-hint>MM/DD/YYYY</mat-hint> -->
-                <div class="date-picker-position">
+                <div class="date-picker-position" *ngIf="!clientForm.get('partner.dob')?.disabled">
                   <mat-datepicker-toggle matIconSuffix [for]="partnerPicker">
                     <mat-icon matDatepickerToggleIcon>
                       <img src="assets/images/svgs/datepicker-icon.svg" alt="datepicker-icon" />

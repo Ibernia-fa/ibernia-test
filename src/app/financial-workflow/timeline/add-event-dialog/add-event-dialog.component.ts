@@ -838,6 +838,7 @@ export class AddEventDialogComponent {
     if (paymentType === 'Cash') {
       amount?.setValidators([Validators.required, Validators.min(0)]);
       this.eventForm.patchValue({ cycle: 'One-off', downPayment: 0, monthlyPayment: 0, monthlyEnd: null }, { emitEvent: false });
+      this.eventForm.get('cycle')?.disable();
     }
 
     if (paymentType === 'Financing') {
@@ -848,8 +849,11 @@ export class AddEventDialogComponent {
 
       if (!monthlyStart?.value) {
         monthlyStart?.setValue(this.eventForm.get('start')?.value, { emitEvent: false });
-        this.eventForm.patchValue({ cycle: 'Every month' }, { emitEvent: false });
       }
+
+      // Downpayment is always one-off and non-editable
+      this.eventForm.patchValue({ cycle: 'One-off' }, { emitEvent: false });
+      this.eventForm.get('cycle')?.disable();
 
       this.eventForm.setValidators(this.endOnOrAfterStartMonthlyValidator());
       this.eventForm.updateValueAndValidity({ emitEvent: false });
@@ -1009,6 +1013,10 @@ export class AddEventDialogComponent {
       return;
     }
 
+    // Preserve user-entered resale data — only set defaults for empty fields
+    const currentResaleDate = this.eventForm.get('resaleDate')?.value;
+    const currentResalePrice = this.eventForm.get('resalePrice')?.value;
+
     const paymentType = this.eventForm.get('paymentType')?.value;
     const startYear = this.eventForm.get('start')?.value;
     const endYearMonthlyPayment = this.eventForm.get('monthlyEnd')?.value;
@@ -1027,8 +1035,8 @@ export class AddEventDialogComponent {
     }
 
     this.eventForm.patchValue({
-      resaleDate: resaleYear,
-      resalePrice: 0
+      resaleDate: currentResaleDate ?? resaleYear,
+      resalePrice: (currentResalePrice != null && currentResalePrice > 0) ? currentResalePrice : 0
     }, { emitEvent: false });
   }
 
