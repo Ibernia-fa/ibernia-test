@@ -72,6 +72,7 @@ export class AddIncomeComponent {
   customDescriptionAutoRenamed: string;
   showNameEdit: boolean = false;
   retirementAge: number;
+  retirementEventYear: number | null = null;
   retirementYear: number;
   forecastEndYear: number;
   isSaving = false;
@@ -119,7 +120,8 @@ export class AddIncomeComponent {
     }
 
     this.retirementAge = this.data.language === 'en' ? 64 : 67;
-    this.retirementYear = this.getRetirementEventYear() ?? (this.clientBirthYear + this.retirementAge);
+    this.retirementEventYear = this.getRetirementEventYear();
+    this.retirementYear = this.retirementEventYear ?? (this.clientBirthYear + this.retirementAge);
     this.forecastEndYear = this.years[this.years.length - 1];
 
     this.incomeForm = this.fb.group({
@@ -631,7 +633,11 @@ export class AddIncomeComponent {
         break;
 
       case 'State pension':
-        startCtrl.setValue(this.retirementYear);
+        if (this.retirementEventYear != null) {
+          startCtrl.setValue(this.retirementEventYear);
+        } else {
+          startCtrl.reset();
+        }
         endCtrl.setValue(this.forecastEndYear ?? this.retirementYear);
         break;
 

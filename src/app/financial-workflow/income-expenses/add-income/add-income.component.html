@@ -201,11 +201,7 @@
                       }
                       <hr>
                       @for (year of years; let i=$index; track year) {
-                      @if (year === retirementYear) {
-                      <mat-option [value]="year">{{ 'Retirement age' | translate }} ({{ getAgeForYear(year) }})</mat-option>
-                      } @else {
                       <mat-option [value]="year">{{ year }} ({{ getAgeForYear(year) }})</mat-option>
-                      }
                       }
                     </mat-select>
                   </div>
