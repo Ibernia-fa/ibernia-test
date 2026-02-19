@@ -12,8 +12,8 @@
               <div class="d-flex flex-column justify-content-between gap-4">
                 <div class="d-flex align-items-center">
                   <h4 class="page-title f-w-500 m-r-4 f-s-30">AI Recommendations</h4>
-                  <img width="22" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" class="m-t-4"
-                    matTooltip="AI-powered analysis of your client's cashflow plan. Generates strengths, weaknesses, and actionable suggestions based on the full financial picture." />
+                  <img width="22" src="assets/images/svgs/help-circle-icon.svg" alt="help" class="m-t-4"
+                    matTooltip="AI-powered analysis of your client's cashflow plan. Generates actionable recommendations based on the full financial picture." />
                 </div>
               </div>
             </div>
@@ -73,7 +73,7 @@
       <mat-card-content class="mat-mdc-card-content">
 
         <!-- Disclaimer -->
-        <div class="d-flex align-items-start ai-rec-sugg">
+        <div class="d-flex align-items-start ai-rec-sugg m-b-16">
           <div class="m-r-10">
             <img src="assets/images/svgs/Info-icon.svg" alt="info" />
           </div>
@@ -90,35 +90,14 @@
             <button matTooltip="Copy"><img width="16" src="assets/images/svgs/copy-icon.svg" alt="copy" /></button>
           </div>
 
-          <!-- Strengths -->
-          <ng-container *ngIf="analysis.strengths?.length">
-            <div class="ai-rec-sugg">
-              <h3 class="m-b-8">Strengths</h3>
-              <ul>
-                <li *ngFor="let item of analysis.strengths">{{ item }}</li>
-              </ul>
-            </div>
-          </ng-container>
-
-          <!-- Weaknesses -->
-          <ng-container *ngIf="analysis.weaknesses?.length">
-            <div class="ai-rec-sugg">
-              <h3 class="m-b-8">Weaknesses</h3>
-              <ul>
-                <li *ngFor="let item of analysis.weaknesses">{{ item }}</li>
-              </ul>
-            </div>
-          </ng-container>
-
-          <!-- Suggestions -->
-          <ng-container *ngIf="analysis.suggestions?.length">
-            <div class="ai-rec-sugg">
-              <h3 class="m-b-8">Suggestions</h3>
-              <ul>
-                <li *ngFor="let item of analysis.suggestions">{{ item }}</li>
-              </ul>
-            </div>
-          </ng-container>
+          <!-- Recommendations -->
+          <div *ngFor="let rec of analysis.recommendations; let i = index" class="ai-rec-sugg">
+            <h3>{{ i + 1 }}. {{ rec.action }}</h3>
+            <ul>
+              <li><strong>Why:</strong> {{ rec.why }}</li>
+              <li><strong>Impact:</strong> {{ rec.impact }}</li>
+            </ul>
+          </div>
 
         </div>
       </mat-card-content>

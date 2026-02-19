@@ -1,5 +1,9 @@
+export interface RecommendationItem {
+  action: string;
+  why: string;
+  impact: string;
+}
+
 export interface PlanAnalysisResponse {
-  strengths: string[];
-  weaknesses: string[];
-  suggestions: string[];
+  recommendations: RecommendationItem[];
 }
