@@ -154,6 +154,9 @@
   font-weight: 500;
   width: max-content;
   min-width: 120px;
+  max-width: 100%;
+  overflow: visible;
+  position: relative;
 }
 
 .timeline-event-chip .event-left {
@@ -170,6 +173,9 @@
 .timeline-event-chip .label {
   line-height: 1.2;
   font-weight: 600;
+  white-space: nowrap;
+  overflow: visible;
+  text-overflow: clip;
 }
 
 //  ::ng-deep .vis-item.vis-range{
@@ -198,6 +204,11 @@
   display: flex;
   align-items: center;
   padding-right: 20px !important;
+  overflow: visible;
+}
+
+::ng-deep .vis-item {
+  overflow: visible !important;
 }
 
 .timeline-wrapper {

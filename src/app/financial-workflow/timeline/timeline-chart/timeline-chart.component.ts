@@ -127,14 +127,13 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
     if (!this.client) return;
 
     if (changes['financialTimeline']) {
-      console.log('=== ngOnChanges financialTimeline triggered ===');
-      console.log('Previous:', changes['financialTimeline'].previousValue?.clientEvents?.find((e: any) => e.name === 'Retirement age')?.start);
-      console.log('Current:', changes['financialTimeline'].currentValue?.clientEvents?.find((e: any) => e.name === 'Retirement age')?.start);
       if (this.timeline) {
         this.timeline.setItems(this.timelineData);
         this.timeline.setOptions(this.timelineOptions);
         this.timeline.redraw();
       }
+      // Re-sync retirement chip visibility based on updated clientEvents
+      this.syncRetirementChipVisibility();
     }
   }
 
@@ -660,11 +659,13 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
 
         // Non-one-off events with actual end date: show real duration
         if (!isOneOff && hasRealEnd) {
+          // Ensure end doesn't exceed timeline boundary (timeline max is forecastEndYear + 1)
+          const clampedEndYear = Math.min(event.end!.year, forecastEndYear + 1);
           return {
             id: eventId,
             content: this.getContent(event.name, event.iconUrl),
             start: new Date(startYear, 0, 1),
-            end: new Date(event.end!.year, 0, 1),
+            end: new Date(clampedEndYear, 0, 1),
             type: 'range',
             className: event.iconUrl,
             editable: {
@@ -679,32 +680,45 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
           const timelineEndYear = moment(this.financialTimeline.forecastEndtDate).year();
           const timelineTotalYears = timelineEndYear - timelineStartYear;
 
-          // Base width calculation from name (similar to original)
-          const baseWidthFromName = Math.floor(0.5 * event.name.length + 3);
+          let calculatedWidth: number;
 
-          // Scale factor based on timeline length
-          let scaleFactor = 1.0;
-          if (timelineTotalYears < 30) {
-            scaleFactor = 0.5;
-          } else if (timelineTotalYears < 50) {
-            scaleFactor = 0.7;
-          } else if (timelineTotalYears < 80) {
-            scaleFactor = 0.9;
+          if (event.name === 'Retirement age') {
+            // Retirement age: adaptive width based on timeline length
+            // Ensures text fits while not dominating short timelines
+            if (timelineTotalYears < 15) {
+              calculatedWidth = 3; // Very short timeline: compact bar
+            } else if (timelineTotalYears < 30) {
+              calculatedWidth = 4; // Short timeline: slightly wider
+            } else if (timelineTotalYears < 50) {
+              calculatedWidth = 5; // Medium timeline
+            } else {
+              calculatedWidth = 6; // Long timeline: full width
+            }
+          } else {
+            // Other events: standard scaling
+            const baseWidth = 6;
+            let scaleFactor = 1.0;
+            if (timelineTotalYears < 30) {
+              scaleFactor = 0.5;
+            } else if (timelineTotalYears < 50) {
+              scaleFactor = 0.65;
+            } else if (timelineTotalYears < 80) {
+              scaleFactor = 0.8;
+            }
+            calculatedWidth = Math.max(2, Math.ceil(baseWidth * scaleFactor));
           }
 
-          const calculatedWidth = Math.max(
-            1, // Minimum width (1 year)
-            Math.min(
-              10, // Maximum width
-              Math.ceil(baseWidthFromName * scaleFactor)
-            )
-          );
+          // Ensure bar doesn't exceed forecast boundary
+          // Calculate max years available from start position to forecast end
+          const maxAvailableWidth = Math.max(1, forecastEndYear - startYear);
+          const finalWidth = Math.min(calculatedWidth, maxAvailableWidth);
+          const endYear = startYear + finalWidth;
 
           return {
             id: eventId,
             content: this.getContent(event.name, event.iconUrl),
             start: new Date(startYear, 0, 1),
-            end: new Date(startYear + calculatedWidth, 0, 1),
+            end: new Date(endYear, 0, 1),
             className: event.iconUrl,
             editable: {
               updateTime: true,
@@ -1035,49 +1049,27 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
       isDeleteFinanceEvent = true;
     }
 
+    const onSuccess = () => {
+      // Let the parent refresh handle state updates via ngOnChanges
+      this.updateTimelines.emit();
+      callback(item);
+    };
+
+    const onError = (err: any) => {
+      console.error('Failed to delete event:', err);
+      // On error, user can try again - don't modify local state
+    };
+
     if (isDeleteFinanceEvent) {
       this.timelineHttpService
         .deleteFinancingEvent(this.financialTimeline.cashflow.id, item.id)
-        .pipe(
-          take(1),
-          map((res) => {
-            this.financialTimeline.clientEvents.splice(
-              this.financialTimeline.clientEvents.findIndex(
-                (event) => event.id === item.id
-              ),
-              1
-            );
-            if (item.content?.includes('Retirement age')) {
-              this.addRetirementBackToChips();
-            }
-            this.timeline.setItems(this.timelineData);
-            this.timeline.redraw();
-            callback(item);
-          })
-        )
-        .subscribe();
-    }
-    else {
+        .pipe(take(1))
+        .subscribe({ next: onSuccess, error: onError });
+    } else {
       this.timelineHttpService
         .deleteEvent(this.financialTimeline.cashflow.id, item.id)
-        .pipe(
-          take(1),
-          map((res) => {
-            this.financialTimeline.clientEvents.splice(
-              this.financialTimeline.clientEvents.findIndex(
-                (event) => event.id === item.id
-              ),
-              1
-            );
-            if (item.content?.includes('Retirement age')) {
-              this.addRetirementBackToChips();
-            }
-            this.timeline.setItems(this.timelineData);
-            this.timeline.redraw();
-            callback(item);
-          })
-        )
-        .subscribe();
+        .pipe(take(1))
+        .subscribe({ next: onSuccess, error: onError });
     }
   }
 
@@ -1192,6 +1184,37 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
     if (currentAge >= retirementAge) return null;
 
     return moment(this.clientBirthDate).year() + retirementAge;
+  }
+
+  /**
+   * Re-evaluates whether the Retirement age chip should be shown or hidden
+   * based on the current clientEvents in financialTimeline.
+   */
+  private syncRetirementChipVisibility(): void {
+    if (!this.systemEventsLibrary || !this.cachedSystemEventsLibrary) return;
+
+    const retirementOnTimeline = this.financialTimeline?.clientEvents?.find(
+      ce => ce.name === 'Retirement age'
+    );
+
+    const forecastStartYear = this.financialTimeline?.forecastStartDate
+      ? moment(this.financialTimeline.forecastStartDate).year() : null;
+    const forecastEndYear = this.financialTimeline?.forecastEndtDate
+      ? moment(this.financialTimeline.forecastEndtDate).year() : null;
+
+    const shouldShowChip =
+      !retirementOnTimeline ||
+      (retirementOnTimeline.start?.year != null &&
+        forecastStartYear != null &&
+        forecastEndYear != null &&
+        (retirementOnTimeline.start.year < forecastStartYear ||
+          retirementOnTimeline.start.year > forecastEndYear));
+
+    if (shouldShowChip) {
+      this.addRetirementBackToChips();
+    } else {
+      this.removeRetirementFromChips();
+    }
   }
 
   private removeRetirementFromChips(): void {
