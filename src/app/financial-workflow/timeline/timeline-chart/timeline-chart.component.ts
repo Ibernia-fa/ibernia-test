@@ -651,29 +651,59 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
       end: Date | string;
       className: string;
       type?: string;
+      title?: string;
     },
     'id'
   > {
+    const timelineStartYear = moment(this.financialTimeline.forecastStartDate).year();
+    const timelineEndYear = moment(this.financialTimeline.forecastEndtDate).year();
+    const timelineTotalYears = timelineEndYear - timelineStartYear;
+
     const dataArray = this.financialTimeline.clientEvents.map(
       (event, index) => {
         const startYear = event.start.year;
         const hasRealEnd = event.end && event.end.year && event.end.year > startYear;
         const isOneOff = event.isOneOff;
-        const forecastEndYear = moment(this.financialTimeline.forecastEndtDate).year();
+        const forecastEndYear = timelineEndYear;
 
-        // Generate stable ID for events with null IDs (like default Retirement age)
         const eventId = event.id || `placeholder-${event.name}-${index}`;
 
-        // Non-one-off events with actual end date: show real duration
+        let minContainerWidth: number;
+        if (event.name === 'Retirement age') {
+          if (timelineTotalYears < 15) {
+            minContainerWidth = 3;
+          } else if (timelineTotalYears < 30) {
+            minContainerWidth = 4;
+          } else if (timelineTotalYears < 50) {
+            minContainerWidth = 5;
+          } else {
+            minContainerWidth = 6;
+          }
+        } else {
+          const baseWidth = 6;
+          let scaleFactor = 1.0;
+          if (timelineTotalYears < 30) {
+            scaleFactor = 0.5;
+          } else if (timelineTotalYears < 50) {
+            scaleFactor = 0.65;
+          } else if (timelineTotalYears < 80) {
+            scaleFactor = 0.8;
+          }
+          minContainerWidth = Math.max(2, Math.ceil(baseWidth * scaleFactor));
+        }
+
+        const maxAvailableWidth = Math.max(1, forecastEndYear - startYear);
+
         if (!isOneOff && hasRealEnd) {
-          // Ensure end doesn't exceed timeline boundary (timeline max is forecastEndYear + 1)
-          const clampedEndYear = Math.min(event.end!.year, forecastEndYear + 1);
+          const realDuration = Math.min(event.end!.year, forecastEndYear + 1) - startYear;
+          const visualWidth = Math.min(Math.max(realDuration, minContainerWidth), maxAvailableWidth);
           return {
             id: eventId,
             content: this.getContent(event.name, event.iconUrl),
             start: new Date(startYear, 0, 1),
-            end: new Date(clampedEndYear, 0, 1),
+            end: new Date(startYear + visualWidth, 0, 1),
             type: 'range',
+            title: event.name,
             className: event.iconUrl,
             editable: {
               updateTime: true,
@@ -681,51 +711,13 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
             }
           };
         } else {
-          // ONE-OFF EVENTS or events without a valid end date
-          // Calculate the proportional width based on timeline length
-          const timelineStartYear = moment(this.financialTimeline.forecastStartDate).year();
-          const timelineEndYear = moment(this.financialTimeline.forecastEndtDate).year();
-          const timelineTotalYears = timelineEndYear - timelineStartYear;
-
-          let calculatedWidth: number;
-
-          if (event.name === 'Retirement age') {
-            // Retirement age: adaptive width based on timeline length
-            // Ensures text fits while not dominating short timelines
-            if (timelineTotalYears < 15) {
-              calculatedWidth = 3; // Very short timeline: compact bar
-            } else if (timelineTotalYears < 30) {
-              calculatedWidth = 4; // Short timeline: slightly wider
-            } else if (timelineTotalYears < 50) {
-              calculatedWidth = 5; // Medium timeline
-            } else {
-              calculatedWidth = 6; // Long timeline: full width
-            }
-          } else {
-            // Other events: standard scaling
-            const baseWidth = 6;
-            let scaleFactor = 1.0;
-            if (timelineTotalYears < 30) {
-              scaleFactor = 0.5;
-            } else if (timelineTotalYears < 50) {
-              scaleFactor = 0.65;
-            } else if (timelineTotalYears < 80) {
-              scaleFactor = 0.8;
-            }
-            calculatedWidth = Math.max(2, Math.ceil(baseWidth * scaleFactor));
-          }
-
-          // Ensure bar doesn't exceed forecast boundary
-          // Calculate max years available from start position to forecast end
-          const maxAvailableWidth = Math.max(1, forecastEndYear - startYear);
-          const finalWidth = Math.min(calculatedWidth, maxAvailableWidth);
-          const endYear = startYear + finalWidth;
-
+          const finalWidth = Math.min(minContainerWidth, maxAvailableWidth);
           return {
             id: eventId,
             content: this.getContent(event.name, event.iconUrl),
             start: new Date(startYear, 0, 1),
-            end: new Date(endYear, 0, 1),
+            end: new Date(startYear + finalWidth, 0, 1),
+            title: event.name,
             className: event.iconUrl,
             editable: {
               updateTime: true,
@@ -1051,7 +1043,7 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
 
   private getContent(title: string, img: string): string {
     return `
-    <div class="timeline-event-chip with-padding">
+    <div class="timeline-event-chip with-padding" title="${title}">
       <div class="event-left">
         <img src="/assets/images/svgs/${img}.svg" class="icon" />
         <span class="label">${title}</span>
