@@ -1,4 +1,4 @@
-import { Component, ElementRef, Inject, ViewChild } from '@angular/core';
+import { Component, ElementRef, Inject, OnDestroy, ViewChild } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -48,7 +48,7 @@ import { SavingsBarStackedChartComponent } from '../../reports/savings-bar-stack
   templateUrl: './simulate-emergency.component.html',
   styleUrl: './simulate-emergency.component.scss',
 })
-export class SimulateEmergencyComponent {
+export class SimulateEmergencyComponent implements OnDestroy {
   @ViewChild('amountInput') amountInput?: ElementRef<HTMLInputElement>;
   onAmountInput(rawValue: string) {
     const { parseFormattedNumber } = require('src/app/shared/utils/number-utils');
@@ -96,6 +96,13 @@ export class SimulateEmergencyComponent {
   existingEmergencyId: string | null = null;
   isUpdateParentItem = false;
   currentYear: number = new Date().getFullYear();
+  displayedReport: {
+    series: any[];
+    categories: string[];
+    timelineEvents: any[];
+  } | null = null;
+  isAutoPlaying = false;
+  private autoPlayTimer: any = null;
 
   constructor(
     private dialogRef: MatDialogRef<SimulateEmergencyComponent>,
@@ -361,30 +368,37 @@ export class SimulateEmergencyComponent {
             simulated.timelineEvents = [];
 
             const emergencyAmount = this.simulateEmergencyForm.get('amount')?.value;
+            const selectedYear = this.simulateEmergencyForm.get('start')?.value;
             const emergencySeries = this.buildEmergencySeries(
-              this.baselineResult,
-              this.simulateEmergencyForm.get('start')?.value?.toString() ?? '',
+              simulated,
+              selectedYear?.toString() ?? '',
               emergencyAmount);
 
             if (!this.baselineResult || !this.baselineResult.series) return;
             this.simulationResult = simulated;
-
-            this.baselineResult.series = [
-              ...this.baselineResult.series,
-              emergencySeries
-            ];
 
             simulated.series = [
               ...simulated.series,
               emergencySeries
             ];
 
-            this.activeTab = 'simulated';
+            this.alignSeriesStructure();
+
+            this.activeTab = 'baseline';
+            this.displayedReport = this.baselineResult;
             this.dialogRef.updateSize('92vw', '88vh');
             this.emergencyExpense = simulateEmergency;
             this.emergencyExpense.id = res.emergencyExpenseId;
             this.isSimulationCompleted = true;
             this.isUpdateParentItem = true;
+
+            this.isAutoPlaying = true;
+            this.autoPlayTimer = setTimeout(() => {
+              this.activeTab = 'simulated';
+              this.displayedReport = this.simulationResult;
+              this.isAutoPlaying = false;
+              this.autoPlayTimer = null;
+            }, 2500);
           },
           error: (err: any) => {
             this.isSimulating = false;
@@ -396,12 +410,70 @@ export class SimulateEmergencyComponent {
   }
 
   closeDialog(): void {
+    this.cancelAutoPlay();
     if (this.isUpdateParentItem) {
       this.dialogRef.close(this.emergencyExpense);
     }
     else {
       this.dialogRef.close();
     }
+  }
+
+  ngOnDestroy(): void {
+    this.cancelAutoPlay();
+  }
+
+  switchToTab(tab: 'baseline' | 'simulated'): void {
+    this.cancelAutoPlay();
+    this.activeTab = tab;
+    this.displayedReport = tab === 'baseline' ? this.baselineResult : this.simulationResult;
+  }
+
+  replayAnimation(): void {
+    if (!this.baselineResult || !this.simulationResult) return;
+    this.cancelAutoPlay();
+    this.activeTab = 'baseline';
+    this.displayedReport = this.baselineResult;
+    this.isAutoPlaying = true;
+    this.autoPlayTimer = setTimeout(() => {
+      this.activeTab = 'simulated';
+      this.displayedReport = this.simulationResult;
+      this.isAutoPlaying = false;
+      this.autoPlayTimer = null;
+    }, 2500);
+  }
+
+  private cancelAutoPlay(): void {
+    if (this.autoPlayTimer) {
+      clearTimeout(this.autoPlayTimer);
+      this.autoPlayTimer = null;
+    }
+    this.isAutoPlaying = false;
+  }
+
+  private alignSeriesStructure(): void {
+    if (!this.baselineResult || !this.simulationResult) return;
+    const baseline = this.baselineResult;
+    const simulated = this.simulationResult;
+
+    const allNames: string[] = [];
+    [...simulated.series, ...baseline.series].forEach((s: any) => {
+      if (!allNames.includes(s.name)) allNames.push(s.name);
+    });
+
+    const categoryCount = baseline.categories.length;
+    allNames.forEach(name => {
+      if (!baseline.series.find((s: any) => s.name === name)) {
+        const ref = simulated.series.find((s: any) => s.name === name);
+        if (ref) {
+          baseline.series.push({ ...ref, data: new Array(categoryCount).fill(0) });
+        }
+      }
+    });
+
+    const sortFn = (a: any, b: any) => allNames.indexOf(a.name) - allNames.indexOf(b.name);
+    baseline.series.sort(sortFn);
+    simulated.series.sort(sortFn);
   }
 
   get isCustomEscalationSelected(): boolean {
