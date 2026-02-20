@@ -32,6 +32,7 @@ import { SavingsPotsHttpService } from '../services/savings-pots-http.service';
 import {
   ClientSaving,
   ComissionType,
+  SavingPotOwnership,
   SavingPotType,
 } from '../models/saving-pots.model';
 import { catchError, filter } from 'rxjs';
@@ -93,6 +94,10 @@ export class AddNewPotComponent {
   renamedCustomName: string = '';
   existingSavingPots: any[] = [];
   showNameEdit: boolean = false;
+  hasPartner: boolean = false;
+  clientFirstName: string = '';
+  partnerFirstName: string = '';
+  SavingPotOwnership = SavingPotOwnership;
   savingPotValues = [
     {
       name: 'Investment',
@@ -134,6 +139,9 @@ export class AddNewPotComponent {
     this.escalationRates = data.escalataionRates;
     this.eventsList = data.eventsList;
     this.existingSavingPots = data.existingSavingPots || [];  // Get existing pots for smart defaults
+    this.hasPartner = data.hasPartner ?? false;
+    this.clientFirstName = data.clientFirstName ?? '';
+    this.partnerFirstName = data.partnerFirstName ?? '';
     this.clientBirthYear = moment(data.clientBirthDate).year();
     this.userReturnRate = data.returnRate;
     const birthDate = new Date(data.clientBirthDate);
@@ -219,7 +227,8 @@ export class AddNewPotComponent {
       contributionAmount: [0],
       contributionFrequency: [1],  // Monthly (1) by default
       contributionStartDate: [data.forecastStartDateYear],  // This year
-      contributionEndDate: [this.retirementAge]  // Retirement year
+      contributionEndDate: [this.retirementAge],  // Retirement year
+      ownership: [SavingPotOwnership.Joint]
     });
 
   this.savingsForm.setValidators(this.endOnOrAfterStartValidator());
@@ -338,6 +347,7 @@ onAmountBlur(e: Event) {
       this.savingsForm.get('contributionEndDate')?.patchValue(this.selectedPot.contributionEndDate?.year, { emitEvent: false });
     }
     
+    this.savingsForm.get('ownership')?.patchValue(this.selectedPot.ownership ?? SavingPotOwnership.Joint, { emitEvent: false });
     this.savingsForm.get('commissions')?.patchValue(this.selectedPot.hasCommission, { emitEvent: false });
 
     let selectedComissionType = 'amount';
@@ -892,7 +902,8 @@ onEscalationRateChange(event: MatSelectChange): void {
           : null,
         retirementAge: this.savingsForm.get('name')?.value === 'Pension fund'
           ? this.retirementAge
-          : null
+          : null,
+        ownership: this.savingsForm.get('ownership')?.value ?? SavingPotOwnership.Joint
       };
       const function$ = !this.isEditWorkflow ? this.savingPotsHttpService
       .addNewSavingPot(this.cashflowId, clientSaving) :

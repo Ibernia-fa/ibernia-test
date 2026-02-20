@@ -36,6 +36,7 @@ export interface ClientEvent {
   isCash: boolean | false;
   isFinance: boolean | false;
   isParent: boolean | false;
+  isPartnerEvent?: boolean;
 }
 
 export interface NetAmount {

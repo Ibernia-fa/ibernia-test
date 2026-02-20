@@ -53,6 +53,7 @@ export interface ClientSaving {
   contributionStartDate?: AgeYear | null;
   contributionEndDate?: AgeYear | null;
   retirementAge?: number | null;
+  ownership?: SavingPotOwnership;
 }
 
 export enum SavingPotType
@@ -61,6 +62,13 @@ export enum SavingPotType
     Investment = 2,
     PensionFund = 3,
     Other = 4
+}
+
+export enum SavingPotOwnership
+{
+    Joint = 0,
+    Person1 = 1,
+    Person2 = 2
 }
 
 export enum ComissionType
