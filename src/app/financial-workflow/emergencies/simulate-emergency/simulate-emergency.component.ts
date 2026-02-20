@@ -80,6 +80,7 @@ export class SimulateEmergencyComponent {
   forecastEndDateYear: number;
   forecastStartDateYear: number;
 
+  isSimulating = false;
   isSimulationCompleted = false;
   activeTab: 'baseline' | 'simulated' = 'simulated';
   baselineResult: {
@@ -154,7 +155,7 @@ export class SimulateEmergencyComponent {
       start: ['', Validators.required],
       end: [''],
       escalationRate: [this.escalationRates[0]?.value, Validators.required],
-      customEscalationRate: [0],
+      customEscalationRate: [''],
       stopIncome: [false],
       stoppedIncomeId: [null]
     });
@@ -268,7 +269,17 @@ export class SimulateEmergencyComponent {
       const escalationRateValue = isCustomEscalation
         ? this.simulateEmergencyForm.get('customEscalationRate')?.value
         : this.simulateEmergencyForm.get('escalationRate')?.value;
-      const matchedRate = this.escalationRates.find((x) => x.value === escalationRateValue);
+      const selectedEscalationRateValue = this.simulateEmergencyForm.get('escalationRate')?.value;
+      const matchedRate = this.escalationRates.find((x) => x.value === selectedEscalationRateValue);
+      const escalationRateModel = isCustomEscalation
+        ? {
+          description: 'Increases at custom rate',
+          value: escalationRateValue
+        }
+        : (matchedRate ?? {
+          description: this.selectedEscalationDescription ?? '',
+          value: selectedEscalationRateValue
+        });
       const stopIncome = this.simulateEmergencyForm.get('stopIncome')?.value;
       const stoppedIncomeId = this.simulateEmergencyForm.get('stoppedIncomeId')?.value;
 
@@ -322,10 +333,7 @@ export class SimulateEmergencyComponent {
               : 0,
         },
         escalationRate: escalationRateValue !== null && escalationRateValue !== ''
-          ? matchedRate ?? {
-            description: this.selectedEscalationDescription ?? '', // Use actual description
-            value: escalationRateValue
-          }
+          ? escalationRateModel
           : {
             description: '',
             value: 0
@@ -337,9 +345,11 @@ export class SimulateEmergencyComponent {
         cashflow: this.cashflow
       };
 
+      this.isSimulating = true;
       this.emergenciesHttpService.simulateEmergency(simulateEmergency)
         .subscribe({
           next: (res: any) => {
+            this.isSimulating = false;
             if (!res || !res.baseline || !res.simulated ||
               !res.baseline?.series || !res.baseline?.categories ||
               !res.simulated?.series || !res.simulated?.categories) {
@@ -377,6 +387,7 @@ export class SimulateEmergencyComponent {
             this.isUpdateParentItem = true;
           },
           error: (err: any) => {
+            this.isSimulating = false;
             console.error(err);
             this.toastr.error('Failed to simulate cover', 'Error');
           }
@@ -432,20 +443,46 @@ export class SimulateEmergencyComponent {
     const cycleId = expense.amount?.cycle?.id ?? this.amountCycles[0].id;
     const amount = expense.amount?.amount ?? 0;
 
-    this.simulateEmergencyForm.patchValue({
-      cycle: cycleId,
-      amount,
-      start: expense.start?.year ?? null,
-      end: expense.end?.year ?? null,
-      escalationRate: expense.escalationRate?.value ?? this.escalationRates[0]?.value,
-      stopIncome: expense.stopIncome ?? false
-    }, { emitEvent: false });
+    const matchedEscalation = this.escalationRates.find(x => x.value === expense.escalationRate?.value);
 
-    this.selectedEscalationDescription = expense.escalationRate?.description ?? '';
-    if (expense.escalationRate?.description === 'Increases at custom rate') {
-      this.simulateEmergencyForm.patchValue({
-        customEscalationRate: expense.escalationRate.value
+    if (
+      expense.escalationRate &&
+      expense.escalationRate.description === 'Increases at custom rate'
+    ) {
+      this.escalationRates = this.escalationRates.filter(
+        x => x.description !== 'Increases at custom rate'
+      );
+      this.escalationRates.push({
+        description: 'Increases at custom rate',
+        value: expense.escalationRate.value
       });
+
+      this.simulateEmergencyForm.patchValue({
+        cycle: cycleId,
+        amount,
+        start: expense.start?.year ?? null,
+        end: expense.end?.year ?? null,
+        escalationRate: expense.escalationRate.value,
+        customEscalationRate: expense.escalationRate.value,
+        stopIncome: expense.stopIncome ?? false
+      }, { emitEvent: false });
+
+      this.selectedEscalationDescription = 'Increases at custom rate';
+
+      const customControl = this.simulateEmergencyForm.get('customEscalationRate');
+      customControl?.setValidators([Validators.required, Validators.min(0)]);
+      customControl?.updateValueAndValidity();
+    } else {
+      this.simulateEmergencyForm.patchValue({
+        cycle: cycleId,
+        amount,
+        start: expense.start?.year ?? null,
+        end: expense.end?.year ?? null,
+        escalationRate: matchedEscalation?.value ?? this.escalationRates[0]?.value,
+        stopIncome: expense.stopIncome ?? false
+      }, { emitEvent: false });
+
+      this.selectedEscalationDescription = matchedEscalation?.description ?? '';
     }
 
     this.onCycleValueChange(cycleId);
