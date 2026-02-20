@@ -26,6 +26,7 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
   @Input() client: Client;
   @Input() cashFlowName: string;
   @Input() chartHeight: number = 500;
+  @Input() emergencyIconUrl?: string;
   isFullscreen: any;
 
   private readonly EVENT_DOT_SPACING = 20;
@@ -38,7 +39,10 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
     onMouseLeave: () => void;
   }> = [];
   private emergencyIconEl: HTMLElement | null = null;
+  private emergencyExpenseIconEl: HTMLElement | null = null;
+  private emergencyExpenseLineEl: HTMLElement | null = null;
   private shortfallDataPointIndex: number = -1;
+  private emergencyExpenseDataPointIndex: number = -1;
 
   private getCurrencyAxisTitle(): string {
     return this.client?.clientDetails?.preferredCurrency ?? '';
@@ -252,15 +256,17 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
         ? this.buildEventAnnotations(this.events)
         : [];
       const emergencyXAxis = this.buildEmergencyAnnotation(report);
+      const emergencyExpenseXAxis = this.buildEmergencyExpenseAnnotation(report);
 
       this.chartOptions.annotations = {
         points: eventAnnotations,
-        xaxis: emergencyXAxis
+        xaxis: [...emergencyXAxis, ...emergencyExpenseXAxis]
       };
 
       setTimeout(() => {
         if (this.events.length > 0) this.attachHtmlTooltips();
         this.attachEmergencyIcon();
+        this.attachEmergencyExpenseIcon();
       }, 500);
     }
 
@@ -386,6 +392,14 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
       this.emergencyIconEl.remove();
       this.emergencyIconEl = null;
     }
+    if (this.emergencyExpenseIconEl) {
+      this.emergencyExpenseIconEl.remove();
+      this.emergencyExpenseIconEl = null;
+    }
+    if (this.emergencyExpenseLineEl) {
+      this.emergencyExpenseLineEl.remove();
+      this.emergencyExpenseLineEl = null;
+    }
   }
 
   buildEventAnnotations(events: TimelineEvent[]) {
@@ -450,6 +464,137 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
       opacity: 0.15,
       label: { text: '' }
     }];
+  }
+
+  /**
+   * Builds an xaxis annotation (amber band) for the year where the Emergency Expense falls.
+   * Also stores the data-point index so a 💸 icon can be placed via DOM.
+   */
+  private buildEmergencyExpenseAnnotation(report: ChartSeries): any[] {
+    this.emergencyExpenseDataPointIndex = -1;
+    const emergencySeries = report?.series?.find(s => s.name === 'Emergency Expense');
+    if (!emergencySeries) return [];
+
+    const index = emergencySeries.data.findIndex(v => v > 0);
+    if (index < 0) return [];
+
+    const year = report.categories[index];
+    if (!year) return [];
+
+    this.emergencyExpenseDataPointIndex = index;
+
+    return [{
+      x: year,
+      x2: year,
+      fillColor: '#FF4560',
+      opacity: 0.2,
+      label: { text: '' }
+    }];
+  }
+
+  /**
+   * Places the emergency icon above the chart column for the Emergency Expense year.
+   * Uses x-center from a visible bar at that column, and y from the chart inner plot area top
+   * so the icon is always visible regardless of how small the emergency expense bar is.
+   */
+  private attachEmergencyExpenseIcon(): void {
+    if (this.emergencyExpenseIconEl) {
+      this.emergencyExpenseIconEl.remove();
+      this.emergencyExpenseIconEl = null;
+    }
+    if (this.emergencyExpenseLineEl) {
+      this.emergencyExpenseLineEl.remove();
+      this.emergencyExpenseLineEl = null;
+    }
+    if (this.emergencyExpenseDataPointIndex < 0) return;
+
+    const chartHost = this.chartElRef?.nativeElement;
+    if (!chartHost) return;
+
+    const allSeries = chartHost.querySelectorAll('.apexcharts-bar-series .apexcharts-series');
+    if (!allSeries.length) return;
+
+    // Get x-center and width from any visible bar at the emergency column
+    let barCenterX = 0;
+    let barWidth = 30;
+    let found = false;
+
+    allSeries.forEach(seriesGroup => {
+      if (found) return;
+      const bars = seriesGroup.querySelectorAll<SVGPathElement>('path.apexcharts-bar-area');
+      const bar = bars[this.emergencyExpenseDataPointIndex];
+      if (!bar) return;
+
+      const rect = bar.getBoundingClientRect();
+      if (rect.width === 0) return;
+
+      barCenterX = rect.left + rect.width / 2;
+      barWidth = rect.width;
+      found = true;
+    });
+
+    if (!found) return;
+
+    const hostRect = chartHost.getBoundingClientRect();
+
+    // Use the inner plot area top for y-anchor so icon is always visible
+    const innerPlot = chartHost.querySelector<SVGElement>('.apexcharts-inner.apexcharts-graphical');
+    const plotTop = innerPlot
+      ? innerPlot.getBoundingClientRect().top - hostRect.top
+      : 10;
+
+    const icon = document.createElement('div');
+    icon.textContent = '⚠';
+    icon.style.position = 'absolute';
+    icon.style.pointerEvents = 'none';
+    icon.style.zIndex = '11';
+    icon.style.lineHeight = '1';
+    icon.style.fontSize = '18px';
+    icon.style.color = '#FF4560';
+    icon.style.transform = 'translateX(-50%)';
+    icon.style.left = `${barCenterX - hostRect.left}px`;
+
+    const hostPosition = getComputedStyle(chartHost).position;
+    if (hostPosition === 'static') {
+      chartHost.style.position = 'relative';
+    }
+
+    const iconTop = Math.max(4, plotTop - 4);
+    icon.style.top = `${iconTop}px`;
+
+    // Find the top of the topmost bar segment at the emergency column
+    let barTopY: number | null = null;
+    allSeries.forEach(seriesGroup => {
+      const bars = seriesGroup.querySelectorAll<SVGPathElement>('path.apexcharts-bar-area');
+      const bar = bars[this.emergencyExpenseDataPointIndex];
+      if (!bar) return;
+      const rect = bar.getBoundingClientRect();
+      if (rect.width === 0) return; // skip hidden/unrendered bars
+      const relTop = rect.top - hostRect.top;
+      if (barTopY === null || relTop < barTopY) {
+        barTopY = relTop;
+      }
+    });
+
+    // Draw vertical red connector line from icon top to bar top
+    const lineEndY = barTopY ?? plotTop + 20; // fallback to just below plot top
+    if (lineEndY > iconTop + 2) {
+      const line = document.createElement('div');
+      line.style.position = 'absolute';
+      line.style.pointerEvents = 'none';
+      line.style.zIndex = '10';
+      line.style.width = `${barWidth}px`;
+      line.style.backgroundColor = '#FF4560';
+      line.style.opacity = '0.25';
+      line.style.left = `${barCenterX - hostRect.left - barWidth / 2}px`;
+      line.style.top = `${iconTop + 18}px`; // start just below the icon character
+      line.style.height = `${lineEndY - (iconTop + 18)}px`;
+      chartHost.appendChild(line);
+      this.emergencyExpenseLineEl = line;
+    }
+
+    chartHost.appendChild(icon);
+    this.emergencyExpenseIconEl = icon;
   }
 
   /**

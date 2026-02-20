@@ -361,19 +361,16 @@ export class SimulateEmergencyComponent {
             simulated.timelineEvents = [];
 
             const emergencyAmount = this.simulateEmergencyForm.get('amount')?.value;
+            const selectedYear = this.simulateEmergencyForm.get('start')?.value;
             const emergencySeries = this.buildEmergencySeries(
-              this.baselineResult,
-              this.simulateEmergencyForm.get('start')?.value?.toString() ?? '',
+              simulated,
+              selectedYear?.toString() ?? '',
               emergencyAmount);
 
             if (!this.baselineResult || !this.baselineResult.series) return;
             this.simulationResult = simulated;
 
-            this.baselineResult.series = [
-              ...this.baselineResult.series,
-              emergencySeries
-            ];
-
+            // emergencySeries only added to the "After" (simulated) chart, not Before (baseline)
             simulated.series = [
               ...simulated.series,
               emergencySeries
