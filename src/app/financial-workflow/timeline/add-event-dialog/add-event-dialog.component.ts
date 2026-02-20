@@ -445,7 +445,7 @@ export class AddEventDialogComponent {
 
       const currentValue = this.eventForm.get('escalationRate')?.value;
       if (currentValue === null || currentValue === '' || currentValue === undefined) {
-        this.eventForm.get('escalationRate')?.setValue('2.5%');
+        this.eventForm.get('escalationRate')?.setValue(this.escalationRates[0]?.value);
       }
     }
     this.eventForm.updateValueAndValidity();

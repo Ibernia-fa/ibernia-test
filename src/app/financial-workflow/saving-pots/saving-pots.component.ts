@@ -38,6 +38,7 @@ import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { SettingsService } from 'src/app/default-preferance/services/default-preferance.http.service';
 import { TranslateModule } from '@ngx-translate/core';
+import { patchInflationRateDescription } from 'src/app/shared/utils/escalation-rate-utils';
 @Component({
   selector: 'app-saving-pots',
   imports: [
@@ -189,7 +190,10 @@ export class SavingPotsComponent implements OnInit {
           this.ensureCashFirst();
           this.timeline = timeline;
           this.amountCycles = amountCycles;
-          this.escalationRates = escalationRatesResponse?.escalationRates;
+          this.escalationRates = patchInflationRateDescription(
+            escalationRatesResponse?.escalationRates ?? [],
+            this.selectedCashflow?.inflationRate ?? 0
+          );
           this.isLoaderVisible = false;
         })
       )

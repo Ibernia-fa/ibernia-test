@@ -366,11 +366,15 @@ onAmountBlur(e: Event) {
       this.savingsForm.get('commissionPercentage')?.patchValue(this.selectedPot.comission.percentage?.amount, { emitEvent: false });
     }
 
-    const matchedEscalation = this.escalationRates.find(
-      x =>
-        x.value === this.selectedPot.comission.escalationRate?.value &&
-        x.description === this.selectedPot.comission.escalationRate?.description
-    );
+    const matchedEscalation =
+      this.escalationRates.find(
+        x =>
+          x.value === this.selectedPot.comission.escalationRate?.value &&
+          x.description === this.selectedPot.comission.escalationRate?.description
+      ) ??
+      this.escalationRates.find(
+        x => x.value === this.selectedPot.comission.escalationRate?.value
+      );
 
     if (matchedEscalation) {
       this.savingsForm.get('escalationRate')?.patchValue(matchedEscalation.value, { emitEvent: false });

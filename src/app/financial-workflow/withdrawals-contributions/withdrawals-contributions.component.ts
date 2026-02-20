@@ -34,6 +34,7 @@ import { ToastrModule, ToastrService } from 'ngx-toastr';
 import { TranslateModule } from '@ngx-translate/core';
 import { IncomeExpensesHttpService } from '../income-expenses/services/income-expenses-http.service';
 import { FinancialViewModel, IncomeExpense } from '../income-expenses/model/income-expense';
+import { patchInflationRateDescription } from 'src/app/shared/utils/escalation-rate-utils';
 
 @Component({
   imports: [
@@ -130,7 +131,10 @@ export class WithdrawalsContributionsComponent {
         tap(([contributionWithdrawal, timeline, amountCycles, escalationRatesResponse, savingsPots, incomeExpense]) => {
           this.contributionWithdrawal = contributionWithdrawal;
           this.amountCycles = amountCycles;
-          this.escalationRates = escalationRatesResponse?.escalationRates;
+          this.escalationRates = patchInflationRateDescription(
+            escalationRatesResponse?.escalationRates ?? [],
+            this.selectedCashflow?.inflationRate ?? 0
+          );
           this.timeline = timeline;
           this.savingsPots = savingsPots;
           this.incomeExpense = incomeExpense;
