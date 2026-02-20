@@ -213,34 +213,30 @@
 
     <mat-dialog-content class="graph-dialog-content">
       <div class="graph-tabs d-flex gap-12 mb-20">
-        <button class="tab-btn" [class.active]="activeTab === 'baseline'" (click)="activeTab = 'baseline'">
+        <button class="tab-btn" [class.active]="activeTab === 'baseline'" (click)="switchToTab('baseline')">
           Before
+          @if(isAutoPlaying && activeTab === 'baseline') {
+          <span class="auto-play-bar"></span>
+          }
         </button>
 
-        <button class="tab-btn" [class.active]="activeTab === 'simulated'" (click)="activeTab = 'simulated'">
+        <button class="tab-btn" [class.active]="activeTab === 'simulated'" (click)="switchToTab('simulated')">
           After
+        </button>
+
+        <button class="replay-btn" (click)="replayAnimation()" title="Replay animation">
+          Replay ↻
         </button>
       </div>
 
-      @if(activeTab === 'baseline') {
+      @if(displayedReport) {
       <app-savings-bar-stacked-chart 
-        [report]="baselineResult" 
-        [client]="client" 
-        [forecastStartDate]="forecastStartDate"
-        [forecastEndDate]="forecastEndDate"
-        [chartHeight]="420"
-        cashFlowName="">
-      </app-savings-bar-stacked-chart>
-      }
-
-      @if(activeTab === 'simulated') {
-      <app-savings-bar-stacked-chart 
-        [report]="simulationResult"
+        [report]="displayedReport"
         [client]="client"
         [forecastStartDate]="forecastStartDate"
         [forecastEndDate]="forecastEndDate"
         [chartHeight]="420"
-        [emergencyIconUrl]="emergency?.iconUrl"
+        [emergencyIconUrl]="activeTab === 'simulated' ? emergency?.iconUrl : undefined"
         cashFlowName="">
       </app-savings-bar-stacked-chart>
       }

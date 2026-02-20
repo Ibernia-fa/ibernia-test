@@ -55,6 +55,18 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
         type: "bar",
         height: 500,
         stacked: true,
+        animations: {
+          enabled: true,
+          easing: 'easeinout',
+          speed: 800,
+          animateGradually: {
+            enabled: false
+          },
+          dynamicAnimation: {
+            enabled: true,
+            speed: 1000
+          }
+        },
         toolbar: {
           show: false,
         },
@@ -216,6 +228,8 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
     const report = this.report;
 
     if (changes['report']) {
+      this.cleanupHtmlTooltips();
+
       const seriesList = report.series;
       const seriesColors = this.chartOptions.colors || [];
 

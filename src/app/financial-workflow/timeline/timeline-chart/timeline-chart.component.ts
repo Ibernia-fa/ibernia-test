@@ -27,7 +27,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { TablerIconsModule } from 'angular-tabler-icons';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { catchError, combineLatest, filter, fromEvent, map, Subscription, take, tap, throttleTime } from 'rxjs';
+import { combineLatest, filter, fromEvent, Subscription, take, tap, throttleTime } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { Client } from 'src/app/clients/models/client';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
@@ -309,37 +309,22 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
       return;
     }
 
-    // get the dropped position on the timeline
-    // Prefer lastValidDragTime (continuously tracked during onDragOver) as the
-    // most reliable source. getEventProperties can return stale/wrong values
-    // when the drop lands on internal vis-timeline item elements.
-    let dropTime: Date | null = this.lastValidDragTime ?? null;
+    let dropTime: Date | null = this.getTimeFromMouseX(event.clientX);
 
     if (!dropTime) {
       const props = this.timeline.getEventProperties(event);
-
-      if (props.time) {
+      if (props?.time) {
         dropTime = this.snapToNearestYear(props.time);
       }
-      if (!dropTime && props.snappedTime) {
+      if (!dropTime && props?.snappedTime) {
         dropTime = this.snapToNearestYear(props.snappedTime);
       }
     }
 
     if (!dropTime) {
-      // Last resort: calculate from the mouse X position on the timeline
-      const rect = this.timelineContainer.nativeElement.getBoundingClientRect();
-      const x = event.clientX - rect.left;
-      const timelineRange = this.timeline.getWindow();
-      const ratio = x / rect.width;
-
-      if (ratio >= 0 && ratio <= 1 && event.clientX > 0) {
-        const ms = timelineRange.start.valueOf() + ratio * (timelineRange.end.valueOf() - timelineRange.start.valueOf());
-        dropTime = this.snapToNearestYear(new Date(ms));
-      }
+      dropTime = this.lastValidDragTime ?? null;
     }
-    
-    // Clear the stored drag time
+
     this.lastValidDragTime = null;
 
     if (this.draggedEvent?.name === 'Retirement age') {
@@ -406,38 +391,43 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
 
       clientEvent.id = "";
 
+      if (this.financialTimeline.clientEvents.length < 1) {
+        this.financialTimeline.startAt = {
+          age: clientEvent.start.age,
+          year: clientEvent.start.year,
+        };
+      }
+
+      this.financialTimeline.clientEvents.push(clientEvent);
+      if (clientEvent.name === 'Retirement age') {
+        this.removeRetirementFromChips();
+      }
+      this.timeline.setItems(this.timelineData);
+      this.cdr.detectChanges();
+      this.timeline.redraw();
+      this.draggedEvent = null;
+
       this.timelineHttpService
         .addEvent(clientEvent, this.financialTimeline.cashflow.id)
-        .pipe(
-          take(1),
-          map((res) => {
-            if (this.financialTimeline.clientEvents.length < 1) {
-              this.financialTimeline.startAt = {
-                age: clientEvent.start.age,
-                year: clientEvent.start.year,
-              };
-            }
+        .pipe(take(1))
+        .subscribe({
+          next: () => {
             this.updateTimelines.emit();
-            this.financialTimeline.clientEvents.push(clientEvent);
+          },
+          error: (err) => {
+            console.error(err);
+            const idx = this.financialTimeline.clientEvents.indexOf(clientEvent);
+            if (idx > -1) this.financialTimeline.clientEvents.splice(idx, 1);
             if (clientEvent.name === 'Retirement age') {
-              this.removeRetirementFromChips();
+              this.addRetirementBackToChips();
             }
-            this.draggedEvent = null;
             this.timeline.setItems(this.timelineData);
             this.cdr.detectChanges();
             this.timeline.redraw();
-          }),
-          catchError((err) => {
-            console.error(err);
-            this.draggedEvent = null;
-            throw err;
-          })
-        )
-        .subscribe((res) => {
-          this.draggedEvent = null;
+            this.toastrService.error('Failed to add event');
+          }
         });
 
-      this.draggedEvent = null;
       return;
     }
 
@@ -488,22 +478,12 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
 
     if (!this.timeline) return;
 
-    let snappedTime: Date | null = null;
+    let snappedTime: Date | null = this.getTimeFromMouseX(event.clientX);
 
-    const props = this.timeline.getEventProperties(event);
-    if (props?.time) {
-      snappedTime = this.snapToNearestYear(props.time);
-    }
-
-    // Fallback: calculate from mouse X if getEventProperties failed
     if (!snappedTime) {
-      const rect = this.timelineContainer.nativeElement.getBoundingClientRect();
-      const x = event.clientX - rect.left;
-      const timelineRange = this.timeline.getWindow();
-      const ratio = x / rect.width;
-      if (ratio >= 0 && ratio <= 1 && event.clientX > 0) {
-        const ms = timelineRange.start.valueOf() + ratio * (timelineRange.end.valueOf() - timelineRange.start.valueOf());
-        snappedTime = this.snapToNearestYear(new Date(ms));
+      const props = this.timeline.getEventProperties(event);
+      if (props?.time) {
+        snappedTime = this.snapToNearestYear(props.time);
       }
     }
 
@@ -604,6 +584,28 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
       (label as HTMLElement).style.padding = '';
 
     });
+  }
+
+  private getTimeFromMouseX(clientX: number): Date | null {
+    if (clientX <= 0) return null;
+
+    const centerPanel = this.timelineContainer.nativeElement.querySelector(
+      '.vis-panel.vis-center'
+    );
+    if (!centerPanel) return null;
+
+    const panelRect = centerPanel.getBoundingClientRect();
+    if (panelRect.width <= 0) return null;
+
+    const x = clientX - panelRect.left;
+    const ratio = x / panelRect.width;
+    if (ratio < 0 || ratio > 1) return null;
+
+    const timelineRange = this.timeline.getWindow();
+    const ms =
+      timelineRange.start.valueOf() +
+      ratio * (timelineRange.end.valueOf() - timelineRange.start.valueOf());
+    return this.snapToNearestYear(new Date(ms));
   }
 
   private snapToNearestYear(date: Date): Date {
@@ -798,7 +800,6 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
         this.handleEventRemoval(item, callback);
       },
       onMove: (item, callback) => {
-        console.log('=== onMove triggered ===', item);
         this.handleEventUpdate(item, callback);
       },
       onMoving: (item, callback) => {
@@ -819,33 +820,25 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
     forecastStartYear: number,
     forecastStartDate: Date,
     birthDate: Date,
-    birthYear: number
+    _birthYear: number
   ): number {
-    // First label should reflect the actual current age at forecast start.
-    if (year === forecastStartYear) {
-      return this.calculateAgeForTimeline(forecastStartDate, birthDate);
-    }
-
-    return year - birthYear;
+    const baseAge = this.calculateAgeForTimeline(forecastStartDate, birthDate);
+    return baseAge + (year - forecastStartYear);
   }
 
   handleEventMoving(item: any, callback: (item: any) => void) {
+    const snappedTime = this.snapToNearestYear(new Date(item.start));
     try {
-      // Always snap to ensure consistent year during drag
-      const snappedTime = this.snapToNearestYear(new Date(item.start));
       this.timeline.setCustomTime(snappedTime, 'dragOver');
-
-      const year = snappedTime.getFullYear();
-      const age = this.calculateAgeForTimeline(snappedTime, new Date(this.clientBirthDate));
-      requestAnimationFrame(() => {
-        this.highlightHoveredYearLabel(year);
-      });
-
-      callback(item);
-    } catch (ex) {
-      this.timeline.addCustomTime(new Date(), 'dragOver');
-      callback(item);
+    } catch {
+      this.timeline.addCustomTime(snappedTime, 'dragOver');
     }
+
+    requestAnimationFrame(() => {
+      this.highlightHoveredYearLabel(snappedTime.getFullYear());
+    });
+
+    callback(item);
   }
 
   currentZoomPercentage = 0.1;
@@ -870,71 +863,53 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   handleEventUpdate(item: any, callback: (item: any) => void) {
-    console.log('handleEventUpdate called with item:', item);
-    console.log('Item ID:', item.id);
-    console.log('All clientEvents IDs:', JSON.stringify(this.financialTimeline.clientEvents.map(e => ({ id: e.id, name: e.name }))));
-    this.timeline.removeCustomTime('dragOver');
+    try { this.timeline.removeCustomTime('dragOver'); } catch { }
     this.clearLabelHighlight();
 
-    // Always snap the time to ensure consistent year placement
     const snappedStart = this.snapToNearestYear(new Date(item.start));
     const snappedEnd = item.end ? this.snapToNearestYear(new Date(item.end)) : null;
-    
     const dropTime = snappedStart;
-    console.log('dropTime:', dropTime, 'year:', moment(dropTime).year());
 
     if (
       moment(dropTime).year() < moment(this.financialTimeline.forecastStartDate).year() ||
       moment(dropTime).year() > moment(this.financialTimeline.forecastEndtDate).year()
     ) {
-      console.log('Out of forecast range, canceling');
-      callback(null); // cancel the move in vis-timeline
+      callback(null);
       return;
     }
 
-    // Find event by ID, or by placeholder ID pattern (for events with null IDs like Retirement age)
     let existing = this.financialTimeline.clientEvents.find(ev => ev.id === item.id);
-    
-    // If not found by ID, try to match by placeholder pattern
+
     if (!existing && item.id && item.id.startsWith('placeholder-')) {
       const parts = item.id.split('-');
-      const eventName = parts.slice(1, -1).join('-'); // Extract name from placeholder-Name-index
+      const eventName = parts.slice(1, -1).join('-');
       existing = this.financialTimeline.clientEvents.find(ev => ev.name === eventName && !ev.id);
     }
-    
-    console.log('existing event:', existing);
+
     if (!existing) {
-      console.log('No existing event found, canceling');
-      callback(null); // cancel the move in vis-timeline
+      callback(null);
       return;
     }
 
     const newStartYear = snappedStart.getFullYear();
     const newEndYear = snappedEnd ? snappedEnd.getFullYear() : moment(new Date(moment(item.end).year(), 1)).year();
-    console.log('newStartYear:', newStartYear, 'existing.start.year:', existing.start?.year);
 
-    // one-off rule: allow moving the date (year), but DON'T allow changing duration
-    // For one-off events, only block if the START didn't change but we're here (would be resize attempt)
     if (
       existing.isOneOff &&
       existing.start?.year === newStartYear
     ) {
-      console.log('One-off event with same year, canceling (resize attempt)');
-      // Start didn't change - this is either no real move or a resize attempt, cancel it
       callback(null);
       return;
     }
 
-    // build the payload to upsert
     const updated = {
       ...existing,
       start: {
         year: newStartYear,
         age: newStartYear - moment(this.clientBirthDate).year(),
       },
-      // if event had no end, keep it undefined OR keep previous end if it existed and user didn't resize
       end: (() => {
-        if (!existing.end || !existing.end.year) return existing.end; // one-off stays one-off
+        if (!existing.end || !existing.end.year) return existing.end;
         return {
           year: newEndYear,
           age: newEndYear - moment(this.clientBirthDate).year(),
@@ -942,28 +917,24 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
       })(),
     };
 
-    // persist WITHOUT opening any dialog (upsert pattern)
-    console.log('Sending update to server:', updated);
+    const idx = this.financialTimeline.clientEvents.indexOf(existing);
+    if (idx > -1) this.financialTimeline.clientEvents[idx] = updated;
+    callback(item);
+
     this.timelineHttpService
-      .addEvent(updated, this.financialTimeline.cashflow.id) // server treats as upsert by id
+      .addEvent(updated, this.financialTimeline.cashflow.id)
       .pipe(take(1))
       .subscribe({
         next: () => {
-          console.log('Server update successful');
-          // update local model FIRST - find by reference to existing object
-          const idx = this.financialTimeline.clientEvents.indexOf(existing);
-          console.log('Updating local model at index:', idx);
-          if (idx > -1) this.financialTimeline.clientEvents[idx] = updated;
-
-          // confirm the move to vis-timeline - let it handle the visual update
-          console.log('Calling callback(item) to confirm move');
-          callback(item);
+          this.updateTimelines.emit();
         },
         error: (err) => {
-          console.error('Server update failed:', err);
+          console.error('Failed to save event position:', err);
           this.toastrService.error('Failed to save event position');
-          // cancel the move in vis-timeline to revert UI
-          callback(null);
+          if (idx > -1) this.financialTimeline.clientEvents[idx] = existing;
+          this.timeline.setItems(this.timelineData);
+          this.cdr.detectChanges();
+          this.timeline.redraw();
         },
       });
   }
