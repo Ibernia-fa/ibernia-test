@@ -15,7 +15,7 @@ import { animate, style, transition, trigger } from '@angular/animations';
 import { CommonModule } from '@angular/common';
 import { combineLatest, filter, map, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { SavingsPotsHttpService as SavingPotsHttpService } from './services/savings-pots-http.service';
-import { ClientSaving, SavingPotsModel as SavingPots } from './models/saving-pots.model';
+import { ClientSaving, SavingPotsModel as SavingPots, SavingPotOwnership } from './models/saving-pots.model';
 import { Cashflow } from 'src/app/clients/models/cashflow';
 import { TimelineHttpService } from '../timeline/services/timeline-http.service';
 import { Client } from 'src/app/clients/models/client';
@@ -126,6 +126,7 @@ export class SavingPotsComponent implements OnInit {
     
 }
 
+  SavingPotOwnership = SavingPotOwnership;
   transitionState = '';
   selectedCashflow: Cashflow | null;
   selectedClient: Client | null;
@@ -406,7 +407,10 @@ updateOrderNumbers() {
         cashflowId: this.selectedCashflow?.id,
         isEditWorkflow: true,
         event: event,
-        existingSavingPots: this.savingPots?.clientSavings || []  // Pass existing pots
+        existingSavingPots: this.savingPots?.clientSavings || [],
+        hasPartner: !!this.selectedClient?.partnerDetail,
+        clientFirstName: this.selectedClient?.clientDetails?.firstName ?? '',
+        partnerFirstName: this.selectedClient?.partnerDetail?.firstName ?? ''
       },
     });
 
@@ -479,7 +483,10 @@ updateOrderNumbers() {
         forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
         cashflowId: this.selectedCashflow?.id,
         isEditWorkflow: false,
-        existingSavingPots: this.savingPots?.clientSavings || []  // Pass existing pots for smart defaults
+        existingSavingPots: this.savingPots?.clientSavings || [],
+        hasPartner: !!this.selectedClient?.partnerDetail,
+        clientFirstName: this.selectedClient?.clientDetails?.firstName ?? '',
+        partnerFirstName: this.selectedClient?.partnerDetail?.firstName ?? ''
       },
     });
 
@@ -526,6 +533,17 @@ formatReturnRate(rate: number): string {
   if (rate == null) return '0';
   const rounded = Math.round(rate * 10) / 10;
   return rounded % 1 === 0 ? rounded.toFixed(0) : rounded.toString();
+}
+
+getOwnershipLabel(saving: ClientSaving): string {
+  switch (saving.ownership) {
+    case SavingPotOwnership.Person1:
+      return this.selectedClient?.clientDetails?.firstName ?? 'Person 1';
+    case SavingPotOwnership.Person2:
+      return this.selectedClient?.partnerDetail?.firstName ?? 'Person 2';
+    default:
+      return 'Joint';
+  }
 }
 
 }
