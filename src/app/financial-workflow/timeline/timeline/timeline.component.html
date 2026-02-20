@@ -1,4 +1,4 @@
-﻿<div class="d-flex gap-24 flex-column">
+<div class="d-flex gap-24 flex-column">
     <mat-card class="cardWithShadow">
         <mat-card-content>
             <div class="d-flex flex-column gap-32 timeline-wrapper">
@@ -23,11 +23,12 @@
     </mat-card>
 
     @if(!isLoaderVisible && financialTimeline && client) {
-    <app-timeline-chart 
-        [financialTimeline]="financialTimeline" 
+    <app-timeline-chart
+        [financialTimeline]="financialTimeline"
         [financialRecords]="financialRecords"
         [clientBirthDate]="clientBirthDate"
         [client]="client"
+        [cashflowInflationRate]="selectedCashflow?.inflationRate ?? 0"
         (updateTimelines)="updateTimelinesEmittedEvent()">
     </app-timeline-chart>
     } @else {

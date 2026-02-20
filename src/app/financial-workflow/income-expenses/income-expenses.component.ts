@@ -25,6 +25,7 @@ import { CurrencySymbolPipe } from 'src/app/pipe/currency-symbol.pipe';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
 import { TranslateModule } from '@ngx-translate/core';
 import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
+import { patchInflationRateDescription } from 'src/app/shared/utils/escalation-rate-utils';
 
 @Component({
   selector: 'app-income-expenses',
@@ -111,7 +112,10 @@ export class IncomeExpensesComponent {
         }),
         tap(([incomeExpense, timeline, amountCycles, escalationRatesResponse]) => {
           this.amountCycles = amountCycles;
-          this.escalationRates = escalationRatesResponse?.escalationRates;
+          this.escalationRates = patchInflationRateDescription(
+            escalationRatesResponse?.escalationRates ?? [],
+            this.selectedCashflow?.inflationRate ?? 0
+          );
           this.applyIncomeExpenseData(incomeExpense, timeline);
 
           this.currency = this.selectedClient.clientDetails?.preferredCurrency ?? "USD";

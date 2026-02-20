@@ -33,6 +33,7 @@ import { IncomeExpensesHttpService } from '../income-expenses/services/income-ex
 import { DestroyRef, EnvironmentInjector, inject, runInInjectionContext } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { SimulateEmergencyModel } from './models/simulate-emergency.model';
+import { patchInflationRateDescription } from 'src/app/shared/utils/escalation-rate-utils';
 
 @Component({
   selector: 'app-emergencies',
@@ -542,7 +543,10 @@ export class EmergenciesComponent implements OnInit {
         tap(([incomeExpense, timeline, amountCycles, escalationRatesResponse]) => {
           this.incomeExpense = incomeExpense;
           this.amountCyclesAll = amountCycles;
-          this.escalationRates = escalationRatesResponse?.escalationRates;
+          this.escalationRates = patchInflationRateDescription(
+            escalationRatesResponse?.escalationRates ?? [],
+            this.selectedCashflow?.inflationRate ?? 0
+          );
           this.timeline = timeline;
           this.eventsList = this.timeline?.clientEvents.sort((a, b) => a.start.age - b.start.age);
         })

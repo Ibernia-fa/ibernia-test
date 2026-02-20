@@ -40,10 +40,16 @@ import { TranslateModule } from '@ngx-translate/core';
   styleUrl: './update-income.component.scss',
 })
 export class UpdateIncomeComponent {
+  inflationRateLabel: string;
+
   constructor(
     private dialogRef: MatDialogRef<UpdateIncomeComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
-  ) {}
+  ) {
+    const rate = Number(data?.inflationRate ?? 0);
+    const formatted = Number.isInteger(rate) ? `${rate}.0` : `${rate}`;
+    this.inflationRateLabel = `Increases at same rate as inflation (${formatted}%)`;
+  }
 
   onAmountInput(rawValue: string) {
     const value = parseFormattedNumber(rawValue);

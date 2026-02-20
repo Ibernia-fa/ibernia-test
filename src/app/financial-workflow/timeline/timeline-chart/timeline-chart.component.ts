@@ -33,6 +33,7 @@ import { Client } from 'src/app/clients/models/client';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
 import { SettingsHttpService } from '../../settings/services/settings-http.service';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { patchInflationRateDescription } from 'src/app/shared/utils/escalation-rate-utils';
 
 @Component({
   selector: 'app-timeline-chart',
@@ -97,6 +98,7 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
   @Input() client: Client;
   @Input() title: string = 'Timeline';
   @Input() showOnReports: boolean = false;
+  @Input() cashflowInflationRate: number = 0;
   @Output() updateTimelines: EventEmitter<boolean>;
   @ViewChild('timelineContainer', { static: true })
   timelineContainer!: ElementRef;
@@ -152,7 +154,10 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
       .getEscalationRates(this.client.id)
       .subscribe((escalationRatesResponse) => {
         escalationRatesResponse = escalationRatesResponse ?? { escalationRates: [] };
-        this.escalationRates = escalationRatesResponse.escalationRates;
+        this.escalationRates = patchInflationRateDescription(
+          escalationRatesResponse.escalationRates,
+          this.cashflowInflationRate
+        );
       }
       );
 
