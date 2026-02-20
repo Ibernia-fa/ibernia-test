@@ -18,13 +18,15 @@ export interface PreferencesDto {
 }
 
 export interface UserProfileDto {
-  id?:string | null;
+  id?: string | null;
   userId?: string | null;
   profilePhotoUrl?: string | null;
   firstName?: string | null;
   lastName?: string | null;
   email?: string | null;
   preferences: PreferencesDto;
+  /** Advisor/company guidelines for AI recommendations (risk tolerance, tone, compliance). */
+  advisorGuidelines?: string | null;
 }
 
 @Injectable({ providedIn: 'root' })

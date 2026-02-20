@@ -6,4 +6,5 @@ export interface RecommendationItem {
 
 export interface PlanAnalysisResponse {
   recommendations: RecommendationItem[];
+  providerName?: string;
 }

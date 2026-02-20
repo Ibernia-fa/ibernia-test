@@ -33,5 +33,31 @@
     <!-- report section  -->
     <ng-container *ngIf="isAuthenticated && !isLoaderVisible && financialSeries">
         <app-view-report [financialSeries]="financialSeries"></app-view-report>
+
+        <!-- Ask about your plan (consumer AI) -->
+        <mat-card class="cardWithShadow m-t-24">
+            <mat-card-content>
+                <h3 class="f-w-500 m-b-16">Ask about your plan</h3>
+                <p class="text-muted m-b-16">Ask a short question about your plan. This is for explanation only and is not financial advice. For advice, contact your advisor.</p>
+                <div class="d-flex flex-column gap-12">
+                    <textarea
+                        [(ngModel)]="consumerQuestion"
+                        placeholder="e.g. What does my saving rate mean?"
+                        rows="2"
+                        class="form-control"></textarea>
+                    <button type="button" class="button-icon align-self-start" (click)="onConsumerAsk()" [disabled]="consumerAskLoading || !consumerQuestion?.trim()">
+                        {{ consumerAskLoading ? 'Asking...' : 'Ask' }}
+                    </button>
+                    <ng-container *ngIf="consumerAnswer !== null">
+                        <div class="p-12 rounded bg-light">
+                            <strong>Answer:</strong> {{ consumerAnswer }}
+                        </div>
+                    </ng-container>
+                    <ng-container *ngIf="consumerError">
+                        <span class="text-error">{{ consumerError }}</span>
+                    </ng-container>
+                </div>
+            </mat-card-content>
+        </mat-card>
     </ng-container>
 </div>
