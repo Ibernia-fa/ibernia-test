@@ -536,7 +536,8 @@ formatReturnRate(rate: number): string {
 }
 
 getOwnershipLabel(saving: ClientSaving): string {
-  switch (saving.ownership) {
+  const ownership = saving.ownership ?? SavingPotOwnership.Joint;
+  switch (ownership) {
     case SavingPotOwnership.Person1:
       return this.selectedClient?.clientDetails?.firstName ?? 'Person 1';
     case SavingPotOwnership.Person2:
