@@ -28,6 +28,43 @@
   }
 }
 
+.escalation-inline {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.escalation-field {
+  flex: 1 1 260px;
+  min-width: 0;
+}
+
+.escalation-custom {
+  flex: 1 1 170px;
+}
+
+.escalation-full {
+  flex: 1 1 100%;
+}
+
+.custom-rate-input {
+  position: relative;
+
+  input {
+    padding-right: 32px;
+  }
+
+  .custom-rate-suffix {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    width: 18px;
+    height: 18px;
+  }
+}
+
 .graph-tabs {
   border-bottom: 1px solid #e5e7eb;
 }
