@@ -14,14 +14,20 @@ export class AuthService {
 
   public loginChanged = this._loginChangedSubject.asObservable();
 
+  /** Base URL for redirects; when set (e.g. dev/prod), ensures logout returns to same environment. Identity client must have this exact URI in Post Logout Redirect URIs. */
+  private get redirectBaseUrl(): string {
+    const envUrl = (environment as { appUrl?: string }).appUrl;
+    return (envUrl && envUrl.trim()) ? envUrl.trim().replace(/\/$/, '') : window.location.origin;
+  }
+
   private get idpSettings(): UserManagerSettings {
     return {
       authority: environment.authority,
       client_id: environment.authClientId,
-      redirect_uri: window.location.origin + '/signin-oidc',
+      redirect_uri: this.redirectBaseUrl + '/signin-oidc',
       scope: 'openid email profile roles ibernia_api',
       response_type: "code",
-      post_logout_redirect_uri: window.location.origin + '/signout-callback-oidc'
+      post_logout_redirect_uri: this.redirectBaseUrl + '/signout-callback-oidc'
     }
   }
 
@@ -55,7 +61,7 @@ export class AuthService {
   }
 
   public logout = () => {
-    const postLogoutRedirectUri = window.location.origin + '/signout-callback-oidc';
+    const postLogoutRedirectUri = this.redirectBaseUrl + '/signout-callback-oidc';
     this._userManager.getUser().then(user => {
       const args: { post_logout_redirect_uri: string; id_token_hint?: string } = { post_logout_redirect_uri: postLogoutRedirectUri };
       if (user?.id_token) args.id_token_hint = user.id_token;

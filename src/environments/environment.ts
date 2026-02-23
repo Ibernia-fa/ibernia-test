@@ -4,4 +4,5 @@ export const environment = {
   authority: 'https://identity.ibernia.it',
   adminUrl: 'https://dev-admin.ibernia.it',
   authClientId: 'b2323429-bc5e-42f1-ac7c-9ece5dd49110',
+  appUrl: '', // empty = use window.location.origin (e.g. localhost)
 };
