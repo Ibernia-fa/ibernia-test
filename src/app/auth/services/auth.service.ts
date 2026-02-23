@@ -67,6 +67,19 @@ export class AuthService {
     return this._user ? this._user.profile : null;
   }
 
+  /** Returns the current access token for API requests. Resolves with null if not authenticated. */
+  public getAccessToken = (): Promise<string | null> => {
+    return this._userManager.getUser()
+      .then(user => {
+        if (user && !user.expired && user.access_token) {
+          this._user = user;
+          return user.access_token;
+        }
+        return null;
+      })
+      .catch(() => null);
+  }
+
   private checkUser = (user: User | any): boolean => {
     return !!user && !user.expired;
   }

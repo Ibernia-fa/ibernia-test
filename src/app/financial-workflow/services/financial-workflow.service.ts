@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Store } from '@ngrx/store';
 import { combineLatest, filter, tap } from 'rxjs';
 import { selectedCashflow } from 'src/app/store/cashflow/cashflow.selectors';
@@ -15,13 +14,9 @@ export class FinancialWorkflowService {
 
   constructor(private store: Store) { }
 
-  loadClientCashflowMetadata(params: any) { 
-    var selectedClient$ = this.store
-      .select(selectedClient)
-      .pipe(takeUntilDestroyed());
-    var selectedCashflow$ = this.store
-      .select(selectedCashflow)
-      .pipe(takeUntilDestroyed());
+  loadClientCashflowMetadata(params: any) {
+    const selectedClient$ = this.store.select(selectedClient);
+    const selectedCashflow$ = this.store.select(selectedCashflow);
     return combineLatest([selectedClient$, selectedCashflow$])
       .pipe(
         tap(([client, cashflow]) => {
