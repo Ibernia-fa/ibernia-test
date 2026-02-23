@@ -4,6 +4,20 @@ import { UserManager, User, UserManagerSettings } from 'oidc-client';
 import { Subject } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
+/** Authority from current host so dev.ibernia.it always uses dev-identity (avoids prod Identity redirecting to ibernia.it after logout). */
+function getAuthorityFromHost(): string {
+  if (typeof window === 'undefined' || !window.location?.hostname) return environment.authority;
+  const h = window.location.hostname.toLowerCase();
+  if (h === 'localhost' || h === '127.0.0.1' || h.includes('dev.')) return 'https://dev-identity.ibernia.it';
+  return 'https://identity.ibernia.it';
+}
+
+/** Redirect base from current origin so logout always returns to the site the user is on. */
+function getRedirectBaseFromHost(): string {
+  if (typeof window !== 'undefined' && window.location?.origin) return window.location.origin;
+  return (environment as { appUrl?: string }).appUrl?.trim()?.replace(/\/$/, '') || '';
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -14,18 +28,13 @@ export class AuthService {
 
   public loginChanged = this._loginChangedSubject.asObservable();
 
-  /** Base URL for redirects. Always use current origin so logout returns to the site the user is on (avoids wrong env when dev build uses production config). */
   private get redirectBaseUrl(): string {
-    if (typeof window !== 'undefined' && window.location?.origin) {
-      return window.location.origin;
-    }
-    const envUrl = (environment as { appUrl?: string }).appUrl;
-    return (envUrl && envUrl.trim()) ? envUrl.trim().replace(/\/$/, '') : '';
+    return getRedirectBaseFromHost();
   }
 
   private get idpSettings(): UserManagerSettings {
     return {
-      authority: environment.authority,
+      authority: getAuthorityFromHost(),
       client_id: environment.authClientId,
       redirect_uri: this.redirectBaseUrl + '/signin-oidc',
       scope: 'openid email profile roles ibernia_api',
