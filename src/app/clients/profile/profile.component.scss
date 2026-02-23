@@ -104,3 +104,58 @@
   color: #787889;
   font-weight: 400;
 }
+
+.questionnaire-date-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+
+  .date-bold {
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    color: #1c1c1c !important;
+    line-height: 1.4 !important;
+  }
+
+  svg {
+    flex-shrink: 0;
+  }
+}
+
+.btn-close-responses {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid #e7e7eb;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  padding: 0;
+  flex-shrink: 0;
+
+  &:hover {
+    background: #f5f5f5;
+    border-color: #ccc;
+  }
+}
+
+.btn-sm {
+  padding: 6px 14px !important;
+  font-size: 13px !important;
+
+  span {
+    font-size: 13px;
+  }
+
+  img {
+    width: 14px;
+    height: 14px;
+  }
+}

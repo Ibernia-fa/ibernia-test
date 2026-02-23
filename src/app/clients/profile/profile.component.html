@@ -204,14 +204,25 @@
               <p class="f-s-14">{{ 'Invite the client to complete the questionnaire or directly start a plan' | translate }}</p>
             </div>
             <div class="d-flex align-items-center gap-20">
-              <button
-              type="button"
-              class="button-icon-outline"
-              (click)="onQuestionnaireClicked()"
-              >
-                <span>{{ 'Questionnaire' | translate }}</span>
-                <img class="questionnaire-icon" src="assets/images/svgs/add-icon-blue.svg" alt="add-icon" />
-              </button>
+              <div class="d-flex flex-column align-items-center gap-6">
+                <button
+                type="button"
+                class="button-icon-outline"
+                (click)="onQuestionnaireClicked()"
+                >
+                  <span>{{ 'Questionnaire' | translate }}</span>
+                  <img class="questionnaire-icon" src="assets/images/svgs/add-icon-blue.svg" alt="add-icon" />
+                </button>
+                @if (questionnaireResponses && !showResponsesCard) {
+                  <div class="questionnaire-date-badge">
+                    <svg width="16" height="16" viewBox="0 0 48 48" fill="none">
+                      <circle cx="24" cy="24" r="24" fill="#22c55e"/>
+                      <path d="M15 25l6 6 12-12" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span class="date-bold">{{ questionnaireResponses.submittedAt | date:'mediumDate' }}</span>
+                  </div>
+                }
+              </div>
               <button
                 (click)="newModelClicked()"
                 type="button"
@@ -222,24 +233,44 @@
               </button>
             </div>
           </div>
-          @if (questionnaireResponses) {
-            <div class="questionnaire-submitted-info mt-16">
-              <span class="f-s-14">{{ 'Submitted on' | translate }} {{ questionnaireResponses.submittedAt | date:'mediumDate' }}</span>
-            </div>
-          }
         </div>
       </mat-card-content>
     </mat-card>
   }
 
-  @if (questionnaireResponses) {
+  @if (questionnaireResponses && showResponsesCard) {
     <mat-card class="questionnaire-responses-card">
       <mat-card-content>
         <div class="profile-main-wrapper">
           <div class="d-flex flex-column gap-16">
             <div class="d-flex align-items-center justify-content-between">
               <h3 class="card-title">{{ 'Questionnaire responses' | translate }}</h3>
-              <span class="f-s-14 submitted-date">{{ 'Submitted on' | translate }} {{ questionnaireResponses.submittedAt | date:'mediumDate' }}</span>
+              <div class="d-flex align-items-center gap-12">
+                <button
+                  type="button"
+                  class="button-icon-outline btn-sm"
+                  (click)="onQuestionnaireClicked()"
+                >
+                  <span>{{ 'New' | translate }}</span>
+                  <img class="questionnaire-icon" src="assets/images/svgs/add-icon-blue.svg" alt="add-icon" />
+                </button>
+                <div class="questionnaire-date-badge">
+                  <svg width="16" height="16" viewBox="0 0 48 48" fill="none">
+                    <circle cx="24" cy="24" r="24" fill="#22c55e"/>
+                    <path d="M15 25l6 6 12-12" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <span class="date-bold">Completed on {{ questionnaireResponses.submittedAt | date:'mediumDate' }}</span>
+                </div>
+                <button
+                  type="button"
+                  class="btn-close-responses"
+                  (click)="dismissResponses()"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#787889" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                  </svg>
+                </button>
+              </div>
             </div>
             <div class="responses-container">
               @for (item of questionnaireResponses.responses; track item.questionId) {
@@ -247,7 +278,7 @@
                   <h4 class="response-question">{{ item.questionText }}</h4>
                   <div class="response-value-chips">
                     @for (chip of getResponseChips(item); track chip) {
-                      <span class="chip">{{ chip }}</span>
+                      <span class="chip">{{ item.type === 'InvestableAssets' ? formatAssetChip(chip) : chip }}</span>
                     }
                     @if (getResponseChips(item).length === 0) {
                       <span>{{ formatResponseValue(item) }}</span>
