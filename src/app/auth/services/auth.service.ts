@@ -55,7 +55,14 @@ export class AuthService {
   }
 
   public logout = () => {
-    this._userManager.signoutRedirect();
+    const postLogoutRedirectUri = window.location.origin + '/signout-callback-oidc';
+    this._userManager.getUser().then(user => {
+      const args: { post_logout_redirect_uri: string; id_token_hint?: string } = { post_logout_redirect_uri: postLogoutRedirectUri };
+      if (user?.id_token) args.id_token_hint = user.id_token;
+      this._userManager.signoutRedirect(args);
+    }).catch(() => {
+      this._userManager.signoutRedirect({ post_logout_redirect_uri: postLogoutRedirectUri });
+    });
   }
 
   public finishLogout = () => {
