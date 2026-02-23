@@ -4,20 +4,6 @@ import { UserManager, User, UserManagerSettings } from 'oidc-client';
 import { Subject } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
-/** Authority from current host so dev.ibernia.it always uses dev-identity (avoids prod Identity redirecting to ibernia.it after logout). */
-function getAuthorityFromHost(): string {
-  if (typeof window === 'undefined' || !window.location?.hostname) return environment.authority;
-  const h = window.location.hostname.toLowerCase();
-  if (h === 'localhost' || h === '127.0.0.1' || h.includes('dev.')) return 'https://dev-identity.ibernia.it';
-  return 'https://identity.ibernia.it';
-}
-
-/** Redirect base from current origin so logout always returns to the site the user is on. */
-function getRedirectBaseFromHost(): string {
-  if (typeof window !== 'undefined' && window.location?.origin) return window.location.origin;
-  return (environment as { appUrl?: string }).appUrl?.trim()?.replace(/\/$/, '') || '';
-}
-
 @Injectable({
   providedIn: 'root'
 })
@@ -28,23 +14,30 @@ export class AuthService {
 
   public loginChanged = this._loginChangedSubject.asObservable();
 
-  private get redirectBaseUrl(): string {
-    return getRedirectBaseFromHost();
-  }
-
   private get idpSettings(): UserManagerSettings {
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    const redirectUri = origin + '/signin-oidc';
+    const postLogoutUri = origin + '/signout-callback-oidc';
     return {
-      authority: getAuthorityFromHost(),
+      authority: environment.authority,
       client_id: environment.authClientId,
-      redirect_uri: this.redirectBaseUrl + '/signin-oidc',
+      redirect_uri: redirectUri,
       scope: 'openid email profile roles ibernia_api',
       response_type: "code",
-      post_logout_redirect_uri: this.redirectBaseUrl + '/signout-callback-oidc'
+      post_logout_redirect_uri: postLogoutUri
     }
   }
 
   constructor() {
     this._userManager = new UserManager(this.idpSettings);
+    const s = this.idpSettings;
+    console.info('[Auth] Init:', {
+      authority: s.authority,
+      redirect_uri: s.redirect_uri,
+      post_logout_redirect_uri: s.post_logout_redirect_uri,
+      window_origin: typeof window !== 'undefined' ? window.location.origin : 'n/a',
+      window_hostname: typeof window !== 'undefined' ? window.location.hostname : 'n/a'
+    });
   }
 
   public login = () => {
@@ -73,7 +66,13 @@ export class AuthService {
   }
 
   public logout = () => {
-    const postLogoutRedirectUri = this.redirectBaseUrl + '/signout-callback-oidc';
+    const postLogoutRedirectUri = window.location.origin + '/signout-callback-oidc';
+    console.info('[Auth] Logout:', {
+      post_logout_redirect_uri: postLogoutRedirectUri,
+      window_origin: window.location.origin,
+      authority: this.idpSettings.authority,
+      end_session_url: `${this.idpSettings.authority?.replace(/\/$/, '')}/connect/endsession`
+    });
     this._userManager.getUser().then(user => {
       const args: { post_logout_redirect_uri: string; id_token_hint?: string } = { post_logout_redirect_uri: postLogoutRedirectUri };
       if (user?.id_token) args.id_token_hint = user.id_token;
