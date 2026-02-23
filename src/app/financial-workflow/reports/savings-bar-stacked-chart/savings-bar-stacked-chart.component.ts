@@ -64,21 +64,14 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
           },
           dynamicAnimation: {
             enabled: true,
-            speed: 1000
-          }
+            speed: 400,
+          },
         },
         toolbar: {
           show: false,
         },
         zoom: {
           enabled: false,
-        },
-        animations: {
-          enabled: true,
-          dynamicAnimation: {
-            enabled: true,
-            speed: 400,
-          },
         },
         states: {
           hover: {
