@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -17,6 +17,7 @@ import {
   QuestionModel,
   QuestionnaireResponseItem,
 } from '../clients/services/questionnaire-http.service';
+import { allCountries } from '../clients/models/country';
 
 @Component({
   selector: 'app-client-questionnaire',
@@ -40,18 +41,32 @@ import {
 export class ClientQuestionnaireComponent implements OnInit {
   token = '';
   clientName = '';
+  advisorId = '';
   advisorName = '';
+  advisorPhoto = '';
+  currencySymbol = '';
   questions: QuestionModel[] = [];
-  isLoaderVisible = true;
+  showIntro = true;
+  introFadingOut = false;
   isSubmitting = false;
   submitted = false;
+  showBubbles = false;
   errorMessage = '';
+  bubbleCount = Array.from({ length: 30 });
+
+  private dataReady = false;
+  private minTimeElapsed = false;
 
   responses: Record<string, unknown> = {};
 
   importantPeople: { name: string; relationship: string }[] = [{ name: '', relationship: '' }];
   othersByQuestion: Record<string, string> = {};
   financialPlanningByQuestion: Record<string, string> = {};
+
+  currentIndex = 0;
+  progressPercent = 0;
+
+  @ViewChild('snapContainer') snapContainer!: ElementRef<HTMLDivElement>;
 
   constructor(
     private route: ActivatedRoute,
@@ -60,13 +75,19 @@ export class ClientQuestionnaireComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    setTimeout(() => {
+      this.minTimeElapsed = true;
+      this.dismissIntroIfReady();
+    }, 2000);
+
     this.route.params.subscribe((params) => {
       this.token = params['token'];
       if (this.token) {
         this.loadQuestionnaire();
       } else {
         this.errorMessage = 'Invalid or missing link';
-        this.isLoaderVisible = false;
+        this.dataReady = true;
+        this.dismissIntroIfReady();
       }
     });
   }
@@ -75,16 +96,27 @@ export class ClientQuestionnaireComponent implements OnInit {
     this.questionnaireHttpService.getByToken(this.token).subscribe({
       next: (data) => {
         this.clientName = data.clientName;
+        this.advisorId = data.advisorId;
         this.advisorName = data.advisorName;
+        this.advisorPhoto = data?.profilePhotoUrl || '';
+        this.currencySymbol = this.resolveCurrencySymbol(data?.currency);
         this.questions = data.questions;
         this.initResponses();
-        this.isLoaderVisible = false;
+        this.dataReady = true;
+        this.dismissIntroIfReady();
       },
       error: (err) => {
-        this.isLoaderVisible = false;
         this.errorMessage = err.status === 410 || err.error ? (err.error || 'This link has expired or is no longer valid') : 'Unable to load questionnaire';
+        this.dataReady = true;
+        this.dismissIntroIfReady();
       },
     });
+  }
+
+  private dismissIntroIfReady(): void {
+    if (!this.dataReady || !this.minTimeElapsed) return;
+    this.introFadingOut = true;
+    setTimeout(() => { this.showIntro = false; }, 500);
   }
 
   initResponses(): void {
@@ -93,6 +125,48 @@ export class ClientQuestionnaireComponent implements OnInit {
     this.financialPlanningByQuestion = {};
     this.responses = {};
   }
+
+  /* ─── Scroll tracking & progress ─── */
+
+  onScroll(): void {
+    const el = this.snapContainer?.nativeElement;
+    if (!el) return;
+
+    const sectionHeight = el.clientHeight;
+    const maxScroll = el.scrollHeight - sectionHeight;
+
+    if (maxScroll > 0) {
+      this.currentIndex = Math.round(el.scrollTop / sectionHeight);
+      this.progressPercent = (el.scrollTop / maxScroll) * 100;
+    }
+  }
+
+  scrollToSection(index: number): void {
+    const el = this.snapContainer?.nativeElement;
+    if (!el) return;
+
+    const totalSections = this.questions.length + 5 + (this.submitted ? 1 : 0);
+    const clamped = Math.max(0, Math.min(index, totalSections - 1));
+    el.scrollTo({ top: el.clientHeight * clamped, behavior: 'smooth' });
+  }
+
+  @HostListener('window:keydown', ['$event'])
+  onKeydown(event: KeyboardEvent): void {
+    if (this.submitted || this.showIntro || this.errorMessage) return;
+
+    const tag = (event.target as HTMLElement)?.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      this.scrollToSection(this.currentIndex + 1);
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      this.scrollToSection(this.currentIndex - 1);
+    }
+  }
+
+  /* ─── ImportantPeople helpers ─── */
 
   addImportantPerson(): void {
     this.importantPeople.push({ name: '', relationship: '' });
@@ -107,6 +181,8 @@ export class ClientQuestionnaireComponent implements OnInit {
   getImportantPeopleValue(): { name: string; relationship: string }[] {
     return this.importantPeople.filter((p) => p.name?.trim());
   }
+
+  /* ─── Goals helpers ─── */
 
   toggleGoal(questionId: string, option: string): void {
     const key = `goals_${questionId}`;
@@ -124,6 +200,8 @@ export class ClientQuestionnaireComponent implements OnInit {
     return arr.includes(option);
   }
 
+  /* ─── AreasOfWorry helpers ─── */
+
   toggleWorry(questionId: string, option: string): void {
     const key = `worry_${questionId}`;
     let arr = (this.responses[key] as string[]) || [];
@@ -140,6 +218,21 @@ export class ClientQuestionnaireComponent implements OnInit {
     return arr.includes(option);
   }
 
+  /* ─── Currency helpers ─── */
+
+  private resolveCurrencySymbol(code?: string): string {
+    if (!code) return '';
+    const country = allCountries.find(c => c.currencySymbol === code);
+    return country?.symbol || code;
+  }
+
+  formatAssetOption(option: string): string {
+    if (!this.currencySymbol) return option;
+    return option.replace(/(\d[\d,]*(\.\d+)?)/g, `${this.currencySymbol}$1`);
+  }
+
+  /* ─── Single-select helpers ─── */
+
   setSingleSelect(questionId: string, value: string): void {
     this.responses[questionId] = value;
   }
@@ -147,6 +240,8 @@ export class ClientQuestionnaireComponent implements OnInit {
   getSingleSelect(questionId: string): string {
     return (this.responses[questionId] as string) || '';
   }
+
+  /* ─── Submit ─── */
 
   buildSubmitPayload(): QuestionnaireResponseItem[] {
     const items: QuestionnaireResponseItem[] = [];
@@ -205,13 +300,24 @@ export class ClientQuestionnaireComponent implements OnInit {
 
     this.questionnaireHttpService.submit(this.token, payload).subscribe({
       next: () => {
-        this.submitted = true;
         this.isSubmitting = false;
-        this.toastr.success('Thank you! Your responses have been shared with your advisor.');
+        this.submitted = true;
+        this.showBubbles = true;
+
+        setTimeout(() => {
+          const el = this.snapContainer?.nativeElement;
+          if (el) {
+            el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
+          }
+          this.progressPercent = 100;
+        }, 50);
+
+        setTimeout(() => { this.showBubbles = false; }, 3000);
       },
       error: (err) => {
         this.isSubmitting = false;
-        this.toastr.error(err.error || 'Failed to submit. Please try again.');
+        const msg = typeof err.error === 'string' ? err.error : 'Failed to submit. Please try again.';
+        this.toastr.error(msg);
       },
     });
   }

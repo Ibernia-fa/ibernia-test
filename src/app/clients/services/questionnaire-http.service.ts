@@ -23,7 +23,10 @@ export interface CreateQuestionnaireLinkResponse {
 
 export interface GetQuestionnaireByTokenResponse {
   clientName: string;
+  advisorId: string;
   advisorName: string;
+  profilePhotoUrl?: string;
+  currency?: string;
   questions: QuestionModel[];
 }
 
@@ -40,7 +43,10 @@ export interface SubmitQuestionnaireRequest {
 
 export interface GetClientQuestionnaireResponse {
   clientId: string;
+  advisorId: string;
   advisorName: string;
+  profilePhotoUrl?: string;
+  currency?: string;
   submittedAt: string;
   responses: QuestionnaireResponseItem[];
 }

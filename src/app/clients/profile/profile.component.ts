@@ -25,6 +25,7 @@ import { EditModelDialogComponent } from './edit-model-dialog/edit-model-dialog.
 import { QuestionnaireDialogComponent } from './questionnaire-dialog/questionnaire-dialog.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { QuestionnaireHttpService, GetClientQuestionnaireResponse } from '../services/questionnaire-http.service';
+import { allCountries } from '../models/country';
 import { Store } from '@ngrx/store';
 import { selectedClient } from 'src/app/store/client/client.selectors';
 import * as ClientActions from 'src/app/store/client/client.actions';
@@ -75,6 +76,8 @@ export class ProfileComponent {
   totalSavings: string = "0";
   isLoaderVisible = true;
   questionnaireResponses: GetClientQuestionnaireResponse | null = null;
+  showResponsesCard = true;
+  responseCurrencySymbol = '';
 
   constructor(
     private dialog: MatDialog,
@@ -114,12 +117,28 @@ export class ProfileComponent {
     this.questionnaireHttpService.getClientResponses(this.clientId).subscribe({
       next: (data) => {
         this.questionnaireResponses = data;
-        console.log(this.questionnaireResponses);
+        this.showResponsesCard = true;
+        this.responseCurrencySymbol = this.resolveCurrencySymbol(data?.currency);
       },
       error: () => {
         this.questionnaireResponses = null;
       },
     });
+  }
+
+  dismissResponses() {
+    this.showResponsesCard = false;
+  }
+
+  private resolveCurrencySymbol(code?: string): string {
+    if (!code) return '';
+    const country = allCountries.find(c => c.currencySymbol === code);
+    return country?.symbol || code;
+  }
+
+  formatAssetChip(chip: string): string {
+    if (!this.responseCurrencySymbol) return chip;
+    return chip.replace(/(\d[\d,]*(\.\d+)?)/g, `${this.responseCurrencySymbol}$1`);
   }
 
   formatResponseValue(item: { type: string; value: unknown }): string {
