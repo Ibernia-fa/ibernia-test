@@ -1,3 +1,41 @@
 .chat-messages {
   background: var(--mat-sidenav-container-background-color, #fafafa);
 }
+
+.message-text {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.message-list {
+  margin: 0 0 0 1rem;
+  padding-left: 1rem;
+  line-height: 1.5;
+  li {
+    margin-bottom: 0.25rem;
+  }
+}
+
+.message-table-wrapper {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+.message-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  th,
+  td {
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+  }
+  th {
+    background: rgba(0, 0, 0, 0.04);
+    font-weight: 600;
+  }
+  tr:nth-child(even) {
+    background: rgba(0, 0, 0, 0.02);
+  }
+}

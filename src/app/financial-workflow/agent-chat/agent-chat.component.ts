@@ -31,6 +31,16 @@ import {
   templateUrl: './agent-chat.component.html',
   styleUrl: './agent-chat.component.scss'
 })
+export type MessageDisplayType = 'text' | 'list' | 'table';
+
+export interface MessageDisplay {
+  type: MessageDisplayType;
+  text?: string;
+  list?: unknown[];
+  tableHeaders?: string[];
+  tableRows?: unknown[][];
+}
+
 export class AgentChatComponent implements OnInit, OnDestroy {
   cashflowId: string;
   conversationId: string | null = null;
@@ -121,6 +131,68 @@ export class AgentChatComponent implements OnInit, OnDestroy {
         this.sending = false;
       }
     });
+  }
+
+  /**
+   * Interprets assistant message content: if JSON, returns list/table/text structure; otherwise plain text.
+   */
+  getMessageDisplay(content: string): MessageDisplay {
+    if (!content?.trim()) return { type: 'text', text: '' };
+    const trimmed = content.trim();
+
+    // Try parse as JSON
+    if ((trimmed.startsWith('[') || trimmed.startsWith('{')) && trimmed.endsWith(']') || trimmed.endsWith('}')) {
+      try {
+        const parsed = JSON.parse(trimmed) as unknown;
+        if (Array.isArray(parsed)) {
+          if (parsed.length === 0) return { type: 'list', list: [] };
+          const first = parsed[0];
+          if (typeof first === 'object' && first !== null && !Array.isArray(first)) {
+            const keys = Object.keys(first as Record<string, unknown>);
+            const allSameKeys = parsed.every(
+              (item) => typeof item === 'object' && item !== null && Object.keys(item as object).join(',') === keys.join(',')
+            );
+            if (allSameKeys && keys.length > 0) {
+              const tableRows = (parsed as Record<string, unknown>[]).map((row) =>
+                keys.map((k) => row[k] != null ? String(row[k]) : '')
+              );
+              return { type: 'table', tableHeaders: keys, tableRows };
+            }
+          }
+          return { type: 'list', list: parsed };
+        }
+        if (typeof parsed === 'object' && parsed !== null) {
+          const obj = parsed as Record<string, unknown>;
+          const arrKey = Object.keys(obj).find((k) => Array.isArray(obj[k]));
+          if (arrKey && Array.isArray(obj[arrKey]) && (obj[arrKey] as unknown[]).length > 0) {
+            const arr = obj[arrKey] as unknown[];
+            const first = arr[0];
+            if (typeof first === 'object' && first !== null && !Array.isArray(first)) {
+              const keys = Object.keys(first as Record<string, unknown>);
+              const tableRows = (arr as Record<string, unknown>[]).map((row) =>
+                keys.map((k) => row[k] != null ? String(row[k]) : '')
+              );
+              return { type: 'table', tableHeaders: keys, tableRows };
+            }
+            return { type: 'list', list: arr };
+          }
+        }
+      } catch {
+        // Not valid JSON, fall through to text
+      }
+    }
+
+    return { type: 'text', text: content };
+  }
+
+  formatListItem(item: unknown): string {
+    if (item == null) return '';
+    if (typeof item === 'object' && !Array.isArray(item)) {
+      return Object.entries(item as Record<string, unknown>)
+        .map(([k, v]) => `${k}: ${v ?? ''}`)
+        .join(' · ');
+    }
+    return String(item);
   }
 
   ngOnDestroy(): void {
