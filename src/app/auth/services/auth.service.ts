@@ -14,10 +14,13 @@ export class AuthService {
 
   public loginChanged = this._loginChangedSubject.asObservable();
 
-  /** Base URL for redirects; when set (e.g. dev/prod), ensures logout returns to same environment. Identity client must have this exact URI in Post Logout Redirect URIs. */
+  /** Base URL for redirects. Always use current origin so logout returns to the site the user is on (avoids wrong env when dev build uses production config). */
   private get redirectBaseUrl(): string {
+    if (typeof window !== 'undefined' && window.location?.origin) {
+      return window.location.origin;
+    }
     const envUrl = (environment as { appUrl?: string }).appUrl;
-    return (envUrl && envUrl.trim()) ? envUrl.trim().replace(/\/$/, '') : window.location.origin;
+    return (envUrl && envUrl.trim()) ? envUrl.trim().replace(/\/$/, '') : '';
   }
 
   private get idpSettings(): UserManagerSettings {
