@@ -6,7 +6,7 @@ export const authConfig: AuthConfig = {
   redirectUri: window.location.origin + '/signin-oidc',
   clientId: environment.authClientId,
   responseType: 'code',
-  scope: 'openid email profile roles',
+  scope: 'openid email profile roles ibernia_api',
   showDebugInformation: true,
   requireHttps: false,
 };
