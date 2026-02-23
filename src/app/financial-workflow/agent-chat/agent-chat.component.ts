@@ -168,10 +168,15 @@ export class AgentChatComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Interprets assistant message content: if JSON, returns list/table/sections/text structure; otherwise plain text.
+   * Interprets assistant message content. Prefer chat-style text; only treat as structured (list/table/sections) when content clearly looks like JSON.
    */
   getMessageDisplay(content: string): MessageDisplay {
     if (!content?.trim()) return { type: 'text', text: '' };
+
+    const trimmed = content.trim();
+    // Prefer prose: if response doesn't look like JSON (starts with { or [ or has ```json), show as text
+    const looksLikeJson = /^\s*(\{|\[)|```json/.test(trimmed);
+    if (!looksLikeJson) return { type: 'text', text: content };
 
     const jsonStr = this.extractJson(content);
     if (jsonStr) {
