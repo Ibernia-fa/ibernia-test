@@ -61,6 +61,28 @@
                         </tbody>
                       </table>
                     </div>
+                    <div *ngIf="disp.type === 'sections'" class="message-sections">
+                      <div *ngFor="let section of disp.sections" class="message-section">
+                        <div class="message-section-title">{{ section.title }}</div>
+                        <ul *ngIf="section.list && !section.tableHeaders" class="message-list">
+                          <li *ngFor="let item of section.list">{{ formatListItem(item) }}</li>
+                        </ul>
+                        <div *ngIf="section.tableHeaders" class="message-table-wrapper">
+                          <table class="message-table">
+                            <thead>
+                              <tr>
+                                <th *ngFor="let h of section.tableHeaders">{{ h }}</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr *ngFor="let row of section.tableRows">
+                                <td *ngFor="let cell of row">{{ cell }}</td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
                   </ng-container>
                 </ng-container>
               </div>

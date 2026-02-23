@@ -16,6 +16,19 @@
   }
 }
 
+.message-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.message-section-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 0.25rem;
+  color: rgba(0, 0, 0, 0.75);
+}
+
 .message-table-wrapper {
   overflow-x: auto;
   max-width: 100%;

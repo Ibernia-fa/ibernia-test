@@ -16,6 +16,24 @@ import {
   ConversationWithMessages
 } from './agent-chat-http.service';
 
+export type MessageDisplayType = 'text' | 'list' | 'table' | 'sections';
+
+export interface MessageDisplaySection {
+  title: string;
+  tableHeaders?: string[];
+  tableRows?: unknown[][];
+  list?: unknown[];
+}
+
+export interface MessageDisplay {
+  type: MessageDisplayType;
+  text?: string;
+  list?: unknown[];
+  tableHeaders?: string[];
+  tableRows?: unknown[][];
+  sections?: MessageDisplaySection[];
+}
+
 @Component({
   standalone: true,
   imports: [
@@ -31,16 +49,6 @@ import {
   templateUrl: './agent-chat.component.html',
   styleUrl: './agent-chat.component.scss'
 })
-export type MessageDisplayType = 'text' | 'list' | 'table';
-
-export interface MessageDisplay {
-  type: MessageDisplayType;
-  text?: string;
-  list?: unknown[];
-  tableHeaders?: string[];
-  tableRows?: unknown[][];
-}
-
 export class AgentChatComponent implements OnInit, OnDestroy {
   cashflowId: string;
   conversationId: string | null = null;
@@ -134,16 +142,42 @@ export class AgentChatComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Interprets assistant message content: if JSON, returns list/table/text structure; otherwise plain text.
+   * Extracts JSON from content: strips markdown code blocks (```json ... ```) and/or finds outermost [...] or {...}.
+   */
+  private extractJson(content: string): string | null {
+    let s = content.trim();
+    // Strip markdown code block
+    const codeBlockMatch = s.match(/```(?:json)?\s*([\s\S]*?)```/);
+    if (codeBlockMatch) s = codeBlockMatch[1].trim();
+    // Find outermost array or object
+    const arrayStart = s.indexOf('[');
+    const objectStart = s.indexOf('{');
+    let start = -1;
+    let endChar = '';
+    if (arrayStart >= 0 && (objectStart < 0 || arrayStart < objectStart)) {
+      start = arrayStart;
+      endChar = ']';
+    } else if (objectStart >= 0) {
+      start = objectStart;
+      endChar = '}';
+    }
+    if (start < 0 || !endChar) return null;
+    const end = s.lastIndexOf(endChar);
+    if (end <= start) return null;
+    return s.slice(start, end + 1);
+  }
+
+  /**
+   * Interprets assistant message content: if JSON, returns list/table/sections/text structure; otherwise plain text.
    */
   getMessageDisplay(content: string): MessageDisplay {
     if (!content?.trim()) return { type: 'text', text: '' };
-    const trimmed = content.trim();
 
-    // Try parse as JSON
-    if ((trimmed.startsWith('[') || trimmed.startsWith('{')) && trimmed.endsWith(']') || trimmed.endsWith('}')) {
+    const jsonStr = this.extractJson(content);
+    if (jsonStr) {
       try {
-        const parsed = JSON.parse(trimmed) as unknown;
+        const parsed = JSON.parse(jsonStr) as unknown;
+
         if (Array.isArray(parsed)) {
           if (parsed.length === 0) return { type: 'list', list: [] };
           const first = parsed[0];
@@ -161,24 +195,36 @@ export class AgentChatComponent implements OnInit, OnDestroy {
           }
           return { type: 'list', list: parsed };
         }
+
         if (typeof parsed === 'object' && parsed !== null) {
           const obj = parsed as Record<string, unknown>;
-          const arrKey = Object.keys(obj).find((k) => Array.isArray(obj[k]));
-          if (arrKey && Array.isArray(obj[arrKey]) && (obj[arrKey] as unknown[]).length > 0) {
-            const arr = obj[arrKey] as unknown[];
-            const first = arr[0];
-            if (typeof first === 'object' && first !== null && !Array.isArray(first)) {
-              const keys = Object.keys(first as Record<string, unknown>);
-              const tableRows = (arr as Record<string, unknown>[]).map((row) =>
-                keys.map((k) => row[k] != null ? String(row[k]) : '')
-              );
-              return { type: 'table', tableHeaders: keys, tableRows };
-            }
-            return { type: 'list', list: arr };
+          const arrayKeys = Object.keys(obj).filter((k) => Array.isArray(obj[k]));
+          // Multiple arrays (e.g. income + expenses) -> sections
+          if (arrayKeys.length > 0) {
+            const sections: MessageDisplaySection[] = arrayKeys.map((key) => {
+              const arr = obj[key] as unknown[];
+              const title = key.replace(/([A-Z])/g, ' $1').replace(/^./, (c) => c.toUpperCase()).trim();
+              if (arr.length === 0) return { title, list: [] };
+              const first = arr[0];
+              if (typeof first === 'object' && first !== null && !Array.isArray(first)) {
+                const keys = Object.keys(first as Record<string, unknown>);
+                const allSame = arr.every(
+                  (item) => typeof item === 'object' && item !== null && Object.keys(item as object).join(',') === keys.join(',')
+                );
+                if (allSame && keys.length > 0) {
+                  const tableRows = (arr as Record<string, unknown>[]).map((row) =>
+                    keys.map((k) => row[k] != null ? String(row[k]) : '')
+                  );
+                  return { title, tableHeaders: keys, tableRows };
+                }
+              }
+              return { title, list: arr };
+            });
+            return { type: 'sections', sections };
           }
         }
       } catch {
-        // Not valid JSON, fall through to text
+        // Fall through to text
       }
     }
 
