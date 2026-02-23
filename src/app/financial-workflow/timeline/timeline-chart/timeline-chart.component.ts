@@ -309,7 +309,14 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
       return;
     }
 
-    let dropTime: Date | null = this.getTimeFromMouseX(event.clientX);
+    // Prefer lastValidDragTime: it was continuously updated during dragover and
+    // is exactly what the visual indicator showed the user — use it first.
+    let dropTime: Date | null = this.lastValidDragTime;
+    this.lastValidDragTime = null;
+
+    if (!dropTime) {
+      dropTime = this.getTimeFromMouseX(event.clientX);
+    }
 
     if (!dropTime) {
       const props = this.timeline.getEventProperties(event);
@@ -320,12 +327,6 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
         dropTime = this.snapToNearestYear(props.snappedTime);
       }
     }
-
-    if (!dropTime) {
-      dropTime = this.lastValidDragTime ?? null;
-    }
-
-    this.lastValidDragTime = null;
 
     if (this.draggedEvent?.name === 'Retirement age') {
       const existingRetirement = this.financialTimeline.clientEvents.find(
@@ -609,9 +610,10 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   private snapToNearestYear(date: Date): Date {
-    const year = date.getFullYear();
-    const midYear = new Date(year, 6, 1); // July 1st as midpoint
-    return date < midYear ? new Date(year, 0, 1) : new Date(year + 1, 0, 1);
+    // Always snap to the START of the year the cursor is currently in.
+    // Using floor (not nearest-boundary) ensures the item lands at the year
+    // visually shown under the cursor, not the next one when past the midpoint.
+    return new Date(date.getFullYear(), 0, 1);
   }
 
   initTimelineContainer() {
@@ -712,13 +714,17 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
           };
         } else {
           const finalWidth = Math.min(minContainerWidth, maxAvailableWidth);
+          // Center the item on startYear: shift left by half the width so the
+          // vertical drop-line passes through the middle of the box.
+          const halfWidth = Math.floor(finalWidth / 2);
           return {
             id: eventId,
             content: this.getContent(event.name, event.iconUrl),
-            start: new Date(startYear, 0, 1),
-            end: new Date(startYear + finalWidth, 0, 1),
+            start: new Date(startYear - halfWidth, 0, 1),
+            end: new Date(startYear + (finalWidth - halfWidth), 0, 1),
             title: event.name,
             className: event.iconUrl,
+            centerYearOffset: halfWidth, // used by handleEventUpdate / handleEventMoving
             editable: {
               updateTime: true,
               remove: true,
@@ -798,11 +804,8 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
         this.handleEventMoving(item, callback)
       },
       snap: (date: Date) => {
-        const year = date.getFullYear();
-        const midYear = new Date(year, 6, 1); // July 1st
-        const nextYearStart = new Date(year + 1, 0, 1);
-        const currentYearStart = new Date(year, 0, 1);
-        return date < midYear ? currentYearStart : nextYearStart;
+        // Floor snap: always land at the start of the year the item is dragged into.
+        return new Date(date.getFullYear(), 0, 1);
       }
     };
   }
@@ -820,14 +823,18 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
 
   handleEventMoving(item: any, callback: (item: any) => void) {
     const snappedTime = this.snapToNearestYear(new Date(item.start));
+    // For centered items, item.start is the left edge (centerYear - halfWidth).
+    // Add the offset back so the indicator and highlight show the true center year.
+    const offset: number = item.centerYearOffset ?? 0;
+    const centerTime = new Date(snappedTime.getFullYear() + offset, 0, 1);
     try {
-      this.timeline.setCustomTime(snappedTime, 'dragOver');
+      this.timeline.setCustomTime(centerTime, 'dragOver');
     } catch {
-      this.timeline.addCustomTime(snappedTime, 'dragOver');
+      this.timeline.addCustomTime(centerTime, 'dragOver');
     }
 
     requestAnimationFrame(() => {
-      this.highlightHoveredYearLabel(snappedTime.getFullYear());
+      this.highlightHoveredYearLabel(centerTime.getFullYear());
     });
 
     callback(item);
@@ -860,11 +867,16 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
 
     const snappedStart = this.snapToNearestYear(new Date(item.start));
     const snappedEnd = item.end ? this.snapToNearestYear(new Date(item.end)) : null;
-    const dropTime = snappedStart;
+
+    // For centered items the stored start is (centerYear - halfWidth); add the
+    // offset back to recover the true center year before any comparisons.
+    const offset: number = item.centerYearOffset ?? 0;
+    const newStartYear = snappedStart.getFullYear() + offset;
+    const newEndYear = snappedEnd ? snappedEnd.getFullYear() : moment(new Date(moment(item.end).year(), 1)).year();
 
     if (
-      moment(dropTime).year() < moment(this.financialTimeline.forecastStartDate).year() ||
-      moment(dropTime).year() > moment(this.financialTimeline.forecastEndtDate).year()
+      newStartYear < moment(this.financialTimeline.forecastStartDate).year() ||
+      newStartYear > moment(this.financialTimeline.forecastEndtDate).year()
     ) {
       callback(null);
       return;
@@ -882,9 +894,6 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
       callback(null);
       return;
     }
-
-    const newStartYear = snappedStart.getFullYear();
-    const newEndYear = snappedEnd ? snappedEnd.getFullYear() : moment(new Date(moment(item.end).year(), 1)).year();
 
     if (
       existing.isOneOff &&
