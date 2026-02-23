@@ -53,6 +53,8 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
   financialTimeline: FinancialTimeline | null = null;
   savingPots: SavingPotsModel | null = null;
   report: ChartSeries | null = null;
+  /** Stable forecast end date for the chart; updated only when report is set to avoid redraw loops. */
+  scenarioForecastEndDate: Date | null = null;
   isLoaderVisible = false;
   scenarioForm: FormGroup;
   nonCashPots: ClientSaving[] = [];
@@ -115,6 +117,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
       .subscribe((report) => {
         if (report) {
           this.report = report;
+          this.scenarioForecastEndDate = this.getScenarioForecastEndDate();
           this.getShortfallStatus(report);
         }
       });
@@ -208,6 +211,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
     this.loadScenarioReport().pipe(takeUntil(this.destroy$)).subscribe((report) => {
       if (report) {
         this.report = report;
+        this.scenarioForecastEndDate = this.getScenarioForecastEndDate();
         this.getShortfallStatus(report);
       }
     });
