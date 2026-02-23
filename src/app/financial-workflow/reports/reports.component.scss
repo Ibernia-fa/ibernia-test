@@ -479,3 +479,15 @@ tr.example-detail-row {
   font-size: 20px;
   font-weight: 600;
 }
+
+.scenario-lab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  color: inherit;
+  .scenario-lab-icon-white {
+    display: block;
+    filter: brightness(0) invert(1);
+  }
+}
