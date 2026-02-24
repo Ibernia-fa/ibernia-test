@@ -10,8 +10,12 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSliderModule } from '@angular/material/slider';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatIconModule } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
 import { TranslateModule } from '@ngx-translate/core';
+import { TablerIconsModule } from 'angular-tabler-icons';
 
 import { FinancialWorkflowService } from '../../services/financial-workflow.service';
 import { TimelineHttpService } from '../../timeline/services/timeline-http.service';
@@ -21,12 +25,18 @@ import { CashflowHttpService } from 'src/app/clients/services/cashflow-http.serv
 import { NavItemService } from 'src/app/layouts/full/nav-item.service';
 import { Client } from 'src/app/clients/models/client';
 import { Cashflow } from 'src/app/clients/models/cashflow';
-import { FinancialTimeline } from '../../timeline/models/financial-timeline';
+import { FinancialTimeline, EventIncomeType } from '../../timeline/models/financial-timeline';
 import { SavingPotsModel, ClientSaving, SavingPotType } from '../../saving-pots/models/saving-pots.model';
 import { ChartSeries } from '../models/charts-series.model';
 import { SavingsBarStackedChartComponent } from '../savings-bar-stacked-chart/savings-bar-stacked-chart.component';
 import { ToastrService } from 'ngx-toastr';
 import { ScenarioNameDialogComponent } from './scenario-name-dialog/scenario-name-dialog.component';
+
+export interface ScenarioChangeItem {
+  id: string;
+  label: string;
+  type: 'income' | 'expense' | 'goal' | 'contribution' | 'withdrawal' | string;
+}
 
 @Component({
   selector: 'app-scenario-lab',
@@ -40,8 +50,12 @@ import { ScenarioNameDialogComponent } from './scenario-name-dialog/scenario-nam
     MatSelectModule,
     MatButtonModule,
     MatProgressSpinnerModule,
+    MatSliderModule,
+    MatMenuModule,
+    MatIconModule,
     SavingsBarStackedChartComponent,
     TranslateModule,
+    TablerIconsModule,
   ],
   templateUrl: './scenario-lab.component.html',
   styleUrl: './scenario-lab.component.scss',
@@ -60,6 +74,19 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
   nonCashPots: ClientSaving[] = [];
   hasShortfall = false;
   firstShortfallAge: number | null = null;
+
+  /** Items available to add as "Other changes" chips */
+  availableChangeItems: ScenarioChangeItem[] = [];
+  /** Currently selected other-change chips */
+  otherChanges: ScenarioChangeItem[] = [];
+
+  /** The unmodified baseline plan report (stored once on first load) */
+  baselineReport: ChartSeries | null = null;
+  /** The report currently shown in the chart — either baseline or scenario */
+  displayedReport: ChartSeries | null = null;
+  /** Controls which tab is active in the chart card */
+  activeTab: 'before' | 'after' = 'after';
+
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -106,6 +133,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
           this.savingPots = savingPots;
           this.buildNonCashPots();
           this.initFormFromPlan();
+          this.populateAvailableChanges();
         }),
         switchMap(() => this.loadScenarioReport()),
         catchError((err) => {
@@ -117,6 +145,12 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
       .subscribe((report) => {
         if (report) {
           this.report = report;
+          // Store as baseline (only on initial load)
+          if (!this.baselineReport) {
+            this.baselineReport = report;
+          }
+          this.displayedReport = report;
+          this.activeTab = 'after';
           this.scenarioForecastEndDate = this.getScenarioForecastEndDate();
           this.getShortfallStatus(report);
         }
@@ -211,8 +245,48 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
     this.loadScenarioReport().pipe(takeUntil(this.destroy$)).subscribe((report) => {
       if (report) {
         this.report = report;
+        this.alignSeriesStructure();
+        this.activeTab = 'after';
+        this.displayedReport = report;
         this.scenarioForecastEndDate = this.getScenarioForecastEndDate();
         this.getShortfallStatus(report);
+      }
+    });
+  }
+
+  /** Switch between the original plan (Before) and the current scenario (After). */
+  switchTab(tab: 'before' | 'after'): void {
+    this.activeTab = tab;
+    this.displayedReport = tab === 'before' ? this.baselineReport : this.report;
+    if (tab === 'after' && this.report) this.getShortfallStatus(this.report);
+    if (tab === 'before' && this.baselineReport) this.getShortfallStatus(this.baselineReport);
+  }
+
+  /**
+   * Aligns the series structure between baselineReport and the current scenario report
+   * so ApexCharts can morph smoothly (same number of series in both).
+   */
+  private alignSeriesStructure(): void {
+    if (!this.baselineReport || !this.report) return;
+    const baseline = this.baselineReport;
+    const scenario = this.report;
+
+    const allNames: string[] = [];
+    [...scenario.series, ...baseline.series].forEach((s: any) => {
+      if (!allNames.includes(s.name)) allNames.push(s.name);
+    });
+
+    const baselineCategoryCount = baseline.categories.length;
+    const scenarioCategoryCount = scenario.categories.length;
+
+    allNames.forEach(name => {
+      if (!baseline.series.find((s: any) => s.name === name)) {
+        const ref = scenario.series.find((s: any) => s.name === name);
+        if (ref) baseline.series.push({ ...ref, data: new Array(baselineCategoryCount).fill(0) });
+      }
+      if (!scenario.series.find((s: any) => s.name === name)) {
+        const ref = baseline.series.find((s: any) => s.name === name);
+        if (ref) scenario.series.push({ ...ref, data: new Array(scenarioCategoryCount).fill(0) });
       }
     });
   }
@@ -240,6 +314,81 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
   onBack(): void {
     this.router.navigate(['/cashflows', this.cashflowId, 'reports']);
   }
+
+  /** Explicitly simulate the scenario (also auto-runs on form change via debounce) */
+  onSimulate(): void {
+    if (this.financialTimeline && this.client) this.applyScenario();
+  }
+
+  // ── Retirement age stepper ───────────────────────────────────────────────
+
+  getRetirementAge(): number {
+    return Number(this.scenarioForm.get('retirementAge')?.value) || 65;
+  }
+
+  decrementAge(): void {
+    const current = this.getRetirementAge();
+    if (current > 18) {
+      this.scenarioForm.patchValue({ retirementAge: current - 1 });
+    }
+  }
+
+  incrementAge(): void {
+    const current = this.getRetirementAge();
+    if (current < 100) {
+      this.scenarioForm.patchValue({ retirementAge: current + 1 });
+    }
+  }
+
+  // ── Other changes ────────────────────────────────────────────────────────
+
+  private populateAvailableChanges(): void {
+    if (!this.financialTimeline?.clientEvents) {
+      this.availableChangeItems = [];
+      return;
+    }
+    const seen = new Set<string>();
+    this.availableChangeItems = this.financialTimeline.clientEvents
+      .filter((e) => !e.isPlaceHolder && e.name)
+      .filter((e) => {
+        if (seen.has(e.id)) return false;
+        seen.add(e.id);
+        return true;
+      })
+      .map((e) => ({
+        id: e.id,
+        label: e.name,
+        type: e.type === EventIncomeType.Income ? 'income' : 'expense',
+      }));
+  }
+
+  addOtherChange(item: ScenarioChangeItem): void {
+    if (this.otherChanges.some((c) => c.id === item.id)) return;
+    this.otherChanges = [...this.otherChanges, item];
+  }
+
+  removeOtherChange(item: ScenarioChangeItem): void {
+    this.otherChanges = this.otherChanges.filter((c) => c.id !== item.id);
+  }
+
+  /** Sync the standalone number input (not using formControlName) back to the form control */
+  onNumericInputChange(field: string, event: Event): void {
+    const val = parseFloat((event.target as HTMLInputElement).value);
+    if (!isNaN(val)) {
+      this.scenarioForm.patchValue({ [field]: val });
+    }
+  }
+
+  /** Returns a tabler icon name for a saving pot type */
+  getPotIcon(type: SavingPotType): string {
+    switch (type) {
+      case SavingPotType.Investment:  return 'chart-line';
+      case SavingPotType.PensionFund: return 'building-bank';
+      default:                        return 'wallet';
+    }
+  }
+
+  // ────────────────────────────────────────────────────────────────────────
 
   onCreatePlanFromScenario(): void {
     if (!this.cashflow || !this.client) return;

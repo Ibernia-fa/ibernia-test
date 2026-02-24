@@ -1,28 +1,312 @@
-.scenario-form {
-  .field-inflation,
-  .field-retirement,
-  .field-pot,
-  .field-return {
-    min-width: 120px;
+// ── Before/After tabs (matches simulate-emergency style exactly) ────────────
+.graph-tabs {
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 16px;
+}
+
+.tab-btn {
+  position: relative;
+  font-family: "Ubuntu", sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  background: none;
+  border: none;
+  padding: 8px 16px;
+  cursor: pointer;
+  color: #6b7280;
+  border-bottom: 2px solid transparent;
+  transition: color 0.2s ease, border-bottom-color 0.2s ease;
+  margin-bottom: -1px; // overlap the container border
+
+  &.active {
+    color: #111827;
+    border-bottom-color: #516ce8;
+    font-weight: 600 !important;
+  }
+
+  &:hover:not(.active) {
+    color: #374151;
   }
 }
 
-.scenario-lab-icon {
-  filter: brightness(0) invert(1);
-}
+// ── Shared spacing helpers ────────────────────────────────────────────────
+.text-muted { opacity: 0.7; }
+.m-0 { margin: 0; }
 
 .cardWithShadow {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
 }
 
-.mb-16 {
-  margin-bottom: 16px;
+// ── Assumptions card ─────────────────────────────────────────────────────
+.assumptions-card {
+  mat-card-content {
+    padding: 20px 24px 24px;
+  }
 }
 
-.mt-16 {
-  margin-top: 16px;
+// Header row: title left, buttons right
+.assumptions-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 24px;
 }
 
-.text-muted {
-  opacity: 0.8;
+// ── Action buttons ────────────────────────────────────────────────────────
+.scenario-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
 }
+
+// Simulate button: inline SVG icon sits flush left
+.simulate-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  padding: 0 20px !important;
+  height: 38px;
+
+  // Override MDC label wrapper so icon + text stay on same line
+  ::ng-deep .mdc-button__label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+}
+
+.create-plan-btn {
+  height: 38px;
+  font-size: 13px;
+}
+
+// ── Sliders row ───────────────────────────────────────────────────────────
+.assumptions-sliders-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 32px 40px;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+// Each labelled assumption block
+.assumption-block {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 240px;
+  flex: 1 1 240px;
+  max-width: 380px;
+}
+
+.assumption-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.65);
+  white-space: nowrap;
+}
+
+// Slider + value-input on the same row
+.slider-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  .slider-flex {
+    flex: 1 1 0;
+  }
+}
+
+// Numeric input + % badge box
+.value-input-box {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid rgba(0, 0, 0, 0.23);
+  border-radius: 6px;
+  overflow: hidden;
+  height: 34px;
+  min-width: 68px;
+  flex-shrink: 0;
+
+  .value-input {
+    width: 40px;
+    border: none;
+    outline: none;
+    padding: 0 4px;
+    font-size: 13px;
+    text-align: center;
+    background: transparent;
+    -moz-appearance: textfield;
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button { -webkit-appearance: none; }
+  }
+
+  .pct-badge {
+    background: rgba(0, 0, 0, 0.05);
+    padding: 0 8px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    border-left: 1px solid rgba(0, 0, 0, 0.1);
+    color: rgba(0, 0, 0, 0.55);
+    flex-shrink: 0;
+  }
+}
+
+// Return-rate label + inline mat-select
+.return-rate-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+
+  .pot-selector {
+    font-size: 13px;
+    font-weight: 600;
+
+    .mat-mdc-select-trigger {
+      font-size: 13px;
+    }
+  }
+
+  .pot-type-icon {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+  }
+}
+
+.pot-option {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+// ── Bottom row: retirement + other changes ────────────────────────────────
+.assumptions-bottom-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 24px 40px;
+  padding-top: 4px;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+// Retirement age: label + stepper inline
+.retirement-block {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-shrink: 0;
+}
+
+// ── Retirement age stepper ────────────────────────────────────────────────
+.age-stepper {
+  display: flex;
+  align-items: center;
+  border: 1px solid rgba(0, 0, 0, 0.23);
+  border-radius: 8px;
+  overflow: hidden;
+  height: 34px;
+
+  .stepper-btn {
+    width: 32px;
+    height: 34px;
+    border: none;
+    background: transparent;
+    font-size: 18px;
+    font-weight: 300;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(0, 0, 0, 0.7);
+    flex-shrink: 0;
+
+    &:hover { background: rgba(0, 0, 0, 0.05); }
+    &:active { background: rgba(0, 0, 0, 0.1); }
+  }
+
+  .age-value {
+    min-width: 36px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    border-left: 1px solid rgba(0, 0, 0, 0.12);
+    border-right: 1px solid rgba(0, 0, 0, 0.12);
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+  }
+}
+
+// ── Other changes ─────────────────────────────────────────────────────────
+.other-changes-block {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  flex: 1 1 auto;
+
+  .assumption-label {
+    flex-shrink: 0;
+  }
+
+  .chips-area {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+}
+
+.change-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px 3px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  background: rgba(0, 0, 0, 0.04);
+  font-size: 13px;
+
+  .chip-remove-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0 1px;
+    font-size: 15px;
+    line-height: 1;
+    color: rgba(0, 0, 0, 0.45);
+    display: flex;
+    align-items: center;
+    margin-left: 2px;
+
+    &:hover { color: rgba(0, 0, 0, 0.8); }
+  }
+}
+
+.add-change-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 0, 0, 0.22);
+  background: transparent;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: background 0.15s;
+  white-space: nowrap;
+
+  &:hover { background: rgba(0, 0, 0, 0.04); }
+}
+
