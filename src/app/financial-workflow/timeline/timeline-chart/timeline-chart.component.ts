@@ -191,55 +191,21 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
               );
             });
 
-          // Show 'Retirement age' in chips if:
-          // 1. It's not on the timeline at all, OR
-          // 2. It IS on the timeline but falls outside the visible forecast range
-          //    (so it's invisible on the chart and the user should be able to re-drag it)
-          const forecastStartYear = this.financialTimeline?.forecastStartDate
-            ? moment(this.financialTimeline.forecastStartDate).year()
-            : null;
-          const forecastEndYear = this.financialTimeline?.forecastEndtDate
-            ? moment(this.financialTimeline.forecastEndtDate).year()
-            : null;
-
+          // Build full chip list (all events except State pension).
+          // syncRetirementChipVisibility() below is the single source of truth
+          // for whether Retirement age chip is visible — do not duplicate that logic here.
           this.systemEventsLibrary = [
             ...res[0],
             ...res[1],
           ]
-            .filter(event => {
-              if (event.name === 'State pension') return false;
-              if (event.name !== 'Retirement age') return true;
-
-              // For 'Retirement age':
-              const retirementOnTimeline = this.financialTimeline?.clientEvents?.find(
-                ce => ce.name === 'Retirement age'
-              );
-
-              // Not on timeline at all → show chip
-              if (!retirementOnTimeline) return true;
-
-              // On timeline but outside visible forecast range → show chip
-              const retYear = retirementOnTimeline.start?.year;
-              if (
-                retYear != null &&
-                forecastStartYear != null &&
-                forecastEndYear != null &&
-                (retYear < forecastStartYear || retYear > forecastEndYear)
-              ) {
-                return true;
-              }
-
-              // Already visible on timeline → hide chip
-              return false;
-            })
-            .sort((a, b) => {
-              return (
-                this.CHIP_ORDER.indexOf(a.name) -
-                this.CHIP_ORDER.indexOf(b.name)
-              );
-            });
+            .filter(event => event.name !== 'State pension')
+            .sort((a, b) =>
+              this.CHIP_ORDER.indexOf(a.name) - this.CHIP_ORDER.indexOf(b.name)
+            );
 
           this.cdr.detectChanges();
+          // Single source of truth: hide/show Retirement age chip based on timeline state
+          this.syncRetirementChipVisibility();
         })
       )
       .subscribe();
@@ -1031,8 +997,9 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   private getContent(title: string, img: string): string {
+    const extraClass = title === 'Retirement age' ? ' retirement-age-chip' : '';
     return `
-    <div class="timeline-event-chip with-padding" title="${title}">
+    <div class="timeline-event-chip with-padding${extraClass}" title="${title}">
       <div class="event-left">
         <img src="/assets/images/svgs/${img}.svg" class="icon" />
         <span class="label">${title}</span>

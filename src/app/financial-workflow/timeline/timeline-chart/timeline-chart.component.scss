@@ -158,6 +158,16 @@
   box-sizing: border-box;
 }
 
+::ng-deep .timeline-event-chip.retirement-age-chip {
+  padding: 1px 24px 1px 8px;
+  font-size: 12px;
+}
+
+::ng-deep .timeline-event-chip.retirement-age-chip .icon {
+  width: 16px;
+  height: 16px;
+}
+
 .timeline-event-chip .event-left {
   display: flex;
   align-items: center;
