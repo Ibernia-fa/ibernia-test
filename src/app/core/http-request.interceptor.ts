@@ -1,21 +1,29 @@
 import {
   HttpEvent,
-  HttpEventType,
   HttpHandlerFn,
   HttpRequest,
 } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { from, Observable, switchMap } from 'rxjs';
 import { environment } from 'src/environments/environment';
+import { AuthService } from '../auth/services/auth.service';
+import { inject } from '@angular/core';
 
 export function httpRequestInterceptor(
   req: HttpRequest<unknown>,
   next: HttpHandlerFn
 ): Observable<HttpEvent<unknown>> {
-  console.log(req);
+  const auth = inject(AuthService);
+  const apiUrl = environment.apiUrl + req.urlWithParams;
 
-  const newReq = req.clone({
-    url: environment.apiUrl + req.urlWithParams
-  })
-
-  return next(newReq);
+  return from(auth.getAccessToken()).pipe(
+    switchMap((token) => {
+      const newReq = token
+        ? req.clone({
+            url: apiUrl,
+            setHeaders: { Authorization: `Bearer ${token}` },
+          })
+        : req.clone({ url: apiUrl });
+      return next(newReq);
+    })
+  );
 }

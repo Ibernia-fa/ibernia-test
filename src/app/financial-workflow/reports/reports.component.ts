@@ -39,6 +39,7 @@ import { CompareCashflowsComponent } from './compare-cashflows/compare-cashflows
 import { SettingsService } from 'src/app/default-preferance/services/default-preferance.http.service';
 import { FullscreenData, FullscreenService } from 'src/app/services/fullscreen.service';
 import { TranslateModule } from '@ngx-translate/core';
+import { RouterLink } from '@angular/router';
 
 
 export interface PeriodicElement {
@@ -140,7 +141,8 @@ const ELEMENT_DATA: PeriodicElement[] = [
     CommonModule,
     MatTooltipModule,
     ReactiveFormsModule,
-    TranslateModule
+    TranslateModule,
+    RouterLink
   ],
   templateUrl: './reports.component.html',
   styleUrl: './reports.component.scss',

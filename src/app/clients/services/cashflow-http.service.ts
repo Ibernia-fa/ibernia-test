@@ -35,4 +35,17 @@ export class CashflowHttpService {
   copyCashflow(cashflow: Cashflow) {
     return this.httpClient.post<Cashflow>(`${this.CASHFLOW_URL_PREFIX}/copy`, cashflow)
   }
+
+  createFromScenario(request: CreateFromScenarioRequest) {
+    return this.httpClient.post<Cashflow>(`${this.CASHFLOW_URL_PREFIX}/create-from-scenario`, request);
+  }
+}
+
+export interface CreateFromScenarioRequest {
+  SourceCashflowId: string;
+  NewPlanName: string;
+  InflationRate?: number;
+  PlanUntilDate?: string;
+  SavingPotId?: string | null;
+  ReturnRateOverride?: number | null;
 }

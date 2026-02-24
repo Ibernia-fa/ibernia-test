@@ -70,6 +70,7 @@
 }
 
 .tab-btn {
+  position: relative;
   font-size: 14px !important;
   font-family: "Ubuntu" !important;
   font-weight: 500 !important;
@@ -80,12 +81,45 @@
   cursor: pointer;
   color: #6b7280;
   border-bottom: 2px solid transparent;
+  transition: color 0.3s ease, border-bottom-color 0.3s ease;
 }
 
 .tab-btn.active {
   color: #111827;
   border-bottom-color: #516ce8;
   font-weight: 500;
+}
+
+.auto-play-bar {
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  height: 2px;
+  background-color: #516ce8;
+  animation: autoPlayFill 2.5s linear forwards;
+}
+
+@keyframes autoPlayFill {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+.replay-btn {
+  background: none;
+  border: none;
+  color: #516ce8;
+  cursor: pointer;
+  font-size: 13px;
+  font-family: "Ubuntu";
+  padding: 4px 8px;
+  margin-left: auto;
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+
+  &:hover {
+    opacity: 1;
+    text-decoration: underline;
+  }
 }
 
 .highlight-text {

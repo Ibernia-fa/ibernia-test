@@ -26,20 +26,25 @@
   <!-- Action card -->
   <mat-card class="mat-mdc-card mdc-card cardWithShadow">
     <mat-card-content class="mat-mdc-card-content">
-      <div class="d-flex justify-content-between">
-        <div class="text-center">
-          <div>
-            <button class="btn-secondary" style="min-width: 233px;"><span>Client notes</span></button>
-          </div>
-          <small></small>
+      <div class="d-flex flex-column gap-16">
+        <div class="d-flex flex-wrap gap-16 align-items-start">
+          <mat-form-field appearance="outline" class="flex-grow-1" style="min-width: 200px;">
+            <mat-label>Client notes (included in AI context)</mat-label>
+            <textarea matInput [(ngModel)]="clientNotes" rows="2" placeholder="Optional notes about this client..."></textarea>
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="flex-grow-1" style="min-width: 200px;">
+            <mat-label>Advisor/company guidelines</mat-label>
+            <textarea matInput [(ngModel)]="advisorGuidelines" rows="2" placeholder="Risk tolerance, tone, compliance..."></textarea>
+          </mat-form-field>
         </div>
-        <div class="text-center">
-          <div>
-            <button class="button-icon" (click)="onClickShow()" [disabled]="isLoading">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-16">
+          <span class="text-muted">These are passed to the AI to tailor recommendations.</span>
+          <div class="d-flex align-items-center gap-8">
+            <small class="text-muted">Today: {{ usageUsed }}/{{ usageLimit }} used</small>
+            <button class="button-icon" (click)="onClickShow()" [disabled]="isLoading || usageUsed >= usageLimit">
               <span>{{ isLoading ? 'Generating...' : 'Generate recommendations' }}</span>
             </button>
           </div>
-          <small>Today: 0/5 used</small>
         </div>
       </div>
     </mat-card-content>
@@ -88,6 +93,11 @@
           <div class="edit-rec-sugg">
             <button matTooltip="Edit"><img width="16" src="assets/images/svgs/edit-icon.svg" alt="edit" /></button>
             <button matTooltip="Copy"><img width="16" src="assets/images/svgs/copy-icon.svg" alt="copy" /></button>
+            <ng-container *ngIf="analysis?.providerName">
+              <span class="m-l-8 text-muted" style="font-size: 12px;">{{ analysis.providerName }}</span>
+              <button matTooltip="Good response" (click)="onFeedback(1)" type="button" class="m-l-4 p-0 border-0 bg-transparent">👍</button>
+              <button matTooltip="Poor response" (click)="onFeedback(0)" type="button" class="m-l-2 p-0 border-0 bg-transparent">👎</button>
+            </ng-container>
           </div>
 
           <!-- Recommendations -->

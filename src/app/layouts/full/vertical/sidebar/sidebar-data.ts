@@ -31,6 +31,12 @@ export const navItemslower: NavItem[] = [
     iconOutline: '/assets/images/shapes/ai-filled.svg',
     route: '/cashflows/{cashflowId}/ai-recommendations',
   },
+  {
+    displayName: 'AI Chat',
+    iconName: '/assets/images/shapes/ai-filled.svg',
+    iconOutline: '/assets/images/shapes/ai-filled.svg',
+    route: '/cashflows/{cashflowId}/agent-chat',
+  },
 ];
 export const navItems: NavItem[] = [
   // {

@@ -7,6 +7,14 @@ export interface ReportForecastPayload {
   ForecastEndDate: string;
 }
 
+export interface ReportScenarioPayload {
+  ForecastStartDate: string;
+  ForecastEndDate: string;
+  InflationRate: number;
+  SavingPotId?: string | null;
+  ReturnRateOverride?: number | null;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -47,6 +55,11 @@ getReportbyCashflowIdWithForecastDates(
     url = `${url}?inflationRate=${encoded}`;
   }
 
+  return this.httpClient.post<ChartSeries>(url, payload);
+}
+
+getReportScenario(cashflowId: string, payload: ReportScenarioPayload) {
+  const url = `${this.REPORTS_BASE_URL}/${cashflowId}/scenario`;
   return this.httpClient.post<ChartSeries>(url, payload);
 }
 

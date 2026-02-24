@@ -1,0 +1,28 @@
+.scenario-form {
+  .field-inflation,
+  .field-retirement,
+  .field-pot,
+  .field-return {
+    min-width: 120px;
+  }
+}
+
+.scenario-lab-icon {
+  filter: brightness(0) invert(1);
+}
+
+.cardWithShadow {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+.mb-16 {
+  margin-bottom: 16px;
+}
+
+.mt-16 {
+  margin-top: 16px;
+}
+
+.text-muted {
+  opacity: 0.8;
+}

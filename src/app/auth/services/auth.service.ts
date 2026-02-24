@@ -19,7 +19,7 @@ export class AuthService {
       authority: environment.authority,
       client_id: environment.authClientId,
       redirect_uri: window.location.origin + '/signin-oidc',
-      scope: 'openid email profile roles',
+      scope: 'openid email profile roles ibernia_api',
       response_type: "code",
       post_logout_redirect_uri: window.location.origin + '/signout-callback-oidc'
     }
@@ -55,7 +55,14 @@ export class AuthService {
   }
 
   public logout = () => {
-    this._userManager.signoutRedirect();
+    const postLogoutRedirectUri = window.location.origin + '/signout-callback-oidc';
+    this._userManager.getUser().then(user => {
+      const args: { post_logout_redirect_uri: string; id_token_hint?: string } = { post_logout_redirect_uri: postLogoutRedirectUri };
+      if (user?.id_token) args.id_token_hint = user.id_token;
+      this._userManager.signoutRedirect(args);
+    }).catch(() => {
+      this._userManager.signoutRedirect({ post_logout_redirect_uri: postLogoutRedirectUri });
+    });
   }
 
   public finishLogout = () => {
@@ -65,6 +72,19 @@ export class AuthService {
 
   public getUserProfile = (): User | any => {
     return this._user ? this._user.profile : null;
+  }
+
+  /** Returns the current access token for API requests. Resolves with null if not authenticated. */
+  public getAccessToken = (): Promise<string | null> => {
+    return this._userManager.getUser()
+      .then(user => {
+        if (user && !user.expired && user.access_token) {
+          this._user = user;
+          return user.access_token;
+        }
+        return null;
+      })
+      .catch(() => null);
   }
 
   private checkUser = (user: User | any): boolean => {

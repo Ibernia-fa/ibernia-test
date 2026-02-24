@@ -4,6 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatCardModule } from '@angular/material/card';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ViewReportHttpService } from './services/view-report-http.service';
 import { ViewReportPasswordComponent } from './components/view-report-password/view-report-password.component';
@@ -17,6 +18,7 @@ import { TranslateModule } from '@ngx-translate/core';
     CommonModule,
     FormsModule,
     MatProgressSpinnerModule,
+    MatCardModule,
     ViewReportPasswordComponent,
     ViewReportComponent,
     MatDialogModule,
@@ -36,6 +38,11 @@ export class ClientReportComponent {
   password: string = '';
   lifetimePlanName: string;
   advisorName: string;
+
+  consumerQuestion = '';
+  consumerAnswer: string | null = null;
+  consumerError: string | null = null;
+  consumerAskLoading = false;
 
   private readonly AUTH_KEY_PREFIX = 'report_auth_';
   private readonly EXPIRY_DURATION_MS = 60 * 60 * 1000; // 1 hour
@@ -157,5 +164,27 @@ export class ClientReportComponent {
   onContinue(): void {
     this.isAuthenticated = true;
     this.isLoaderVisible = false;
+  }
+
+  onConsumerAsk(): void {
+    const msg = this.consumerQuestion?.trim();
+    if (!msg || !this.token || !this.password) return;
+    this.consumerAskLoading = true;
+    this.consumerError = null;
+    this.consumerAnswer = null;
+    this.viewReportHttpService.consumerAsk(this.token, this.password, msg).subscribe({
+      next: (res) => {
+        this.consumerAskLoading = false;
+        if (res.success && res.answer != null) {
+          this.consumerAnswer = res.answer;
+        } else {
+          this.consumerError = res.message ?? 'Unable to get an answer.';
+        }
+      },
+      error: (err) => {
+        this.consumerAskLoading = false;
+        this.consumerError = err?.error?.message ?? 'Something went wrong. Try again.';
+      }
+    });
   }
 }

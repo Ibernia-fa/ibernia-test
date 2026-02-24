@@ -5,8 +5,10 @@ import { SavingPotsComponent } from './saving-pots/saving-pots.component';
 import { IncomeExpensesComponent } from './income-expenses/income-expenses.component';
 import { WithdrawalsContributionsComponent } from './withdrawals-contributions/withdrawals-contributions.component';
 import { ReportsComponent } from './reports/reports.component';
+import { ScenarioLabComponent } from './reports/scenario-lab/scenario-lab.component';
 import { EmergenciesComponent } from './emergencies/emergencies.component';
 import { AiRecommendationsComponent } from './ai-recommendations/ai-recommendations.component';
+import { AgentChatComponent } from './agent-chat/agent-chat.component';
 import { CashflowResolver } from './resolvers/cashflow.resolver';
 
 export const FinancialWorkflowRoutes: Routes = [
@@ -39,6 +41,11 @@ export const FinancialWorkflowRoutes: Routes = [
         resolve: { cashflow: CashflowResolver },
       },
       {
+        path: ':id/scenario-lab',
+        component: ScenarioLabComponent,
+        resolve: { cashflow: CashflowResolver },
+      },
+      {
         path: ':id/emergencies',
         component: EmergenciesComponent,
         resolve: { cashflow: CashflowResolver },
@@ -46,6 +53,11 @@ export const FinancialWorkflowRoutes: Routes = [
       {
         path: ':id/ai-recommendations',
         component: AiRecommendationsComponent,
+        resolve: { cashflow: CashflowResolver },
+      },
+      {
+        path: ':id/agent-chat',
+        component: AgentChatComponent,
         resolve: { cashflow: CashflowResolver },
       },
       // {

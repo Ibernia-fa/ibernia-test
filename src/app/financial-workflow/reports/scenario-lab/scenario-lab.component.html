@@ -1,0 +1,101 @@
+<div class="d-flex gap-24 flex-column">
+  @if (!isLoaderVisible && client && cashflow && financialTimeline) {
+    <mat-card class="cardWithShadow">
+      <mat-card-content>
+        <div class="d-flex flex-column gap-32 timeline-wrapper">
+          <div class="card-main-wrapper">
+            <div class="d-flex align-items-center justify-content-between w-100 gap-16 flex-wrap">
+              <div class="d-flex align-items-center gap-16">
+                <div class="icon-wrapper d-flex align-items-center justify-content-center">
+                  <img width="24" src="assets/images/svgs/scenario-lab-icon.svg" alt="Scenario Lab" class="scenario-lab-icon" />
+                </div>
+                <div class="d-flex flex-column justify-content-between gap-4">
+                  <h4 class="page-title f-w-500">{{ 'Scenario Lab' | translate }}</h4>
+                  <p class="mat-body-2 text-muted">{{ 'Change assumptions and see how the plan evolves.' | translate }}</p>
+                </div>
+              </div>
+              <div class="d-flex align-items-center gap-12">
+                <button mat-stroked-button (click)="onBack()">
+                  {{ 'Back to Lifetime Plan' | translate }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="cardWithShadow">
+      <mat-card-content>
+        <h5 class="f-w-500 mb-16">{{ 'Assumptions' | translate }}</h5>
+        <form [formGroup]="scenarioForm" class="scenario-form d-flex flex-wrap gap-24 align-items-end">
+          <mat-form-field appearance="outline" class="field-inflation">
+            <mat-label>{{ 'Inflation (%)' | translate }}</mat-label>
+            <input matInput type="number" formControlName="inflationRate" step="0.1" min="0" />
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="field-retirement">
+            <mat-label>{{ 'Retirement age' | translate }}</mat-label>
+            <input matInput type="number" formControlName="retirementAge" min="18" max="100" />
+          </mat-form-field>
+          @if (nonCashPots.length) {
+            <mat-form-field appearance="outline" class="field-pot">
+              <mat-label>{{ 'Saving pot (return rate)' | translate }}</mat-label>
+              <mat-select formControlName="selectedPotId">
+                @for (pot of nonCashPots; track pot.id) {
+                  <mat-option [value]="pot.id">{{ pot.name }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="field-return">
+              <mat-label>{{ 'Return rate (%)' | translate }}</mat-label>
+              <input matInput type="number" formControlName="returnRateOverride" step="0.1" />
+            </mat-form-field>
+          }
+        </form>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="cardWithShadow">
+      <mat-card-content style="padding-bottom: 10px !important;">
+        <div class="shortfall" *ngIf="report">
+          <ng-container *ngIf="!hasShortfall; else lossTpl">
+            <div class="shortfall-status-profit">
+              <span class="icon-bg leaf-bg">
+                <img src="../../../assets/images/svgs/leaf.svg" alt="leaf" class="icon-svg" />
+              </span>
+              <span class="status-text">{{ 'Goals on track and funded' | translate }}</span>
+            </div>
+          </ng-container>
+          <ng-template #lossTpl>
+            <div class="shortfall-status-loss">
+              <span class="icon-bg flag-bg">
+                <img src="../../../assets/images/svgs/triangle-flag.svg" alt="flag" class="icon-svg" />
+              </span>
+              <span class="status-text">
+                {{ 'Savings hit zero at' | translate }} {{ firstShortfallAge }} y.o.
+              </span>
+            </div>
+          </ng-template>
+        </div>
+        <div class="chart-component-wrapper" *ngIf="report && client && financialTimeline">
+          <app-savings-bar-stacked-chart
+            [report]="report"
+            [client]="client"
+            [forecastStartDate]="financialTimeline.forecastStartDate"
+            [forecastEndDate]="scenarioForecastEndDate"
+            [cashFlowName]="cashflow?.name ?? ''">
+          </app-savings-bar-stacked-chart>
+        </div>
+        <div class="d-flex justify-content-end mt-16">
+          <button mat-flat-button color="primary" (click)="onCreatePlanFromScenario()">
+            {{ 'Create plan from scenario' | translate }}
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  } @else {
+    <div class="h-300 d-flex align-items-center justify-content-center">
+      <mat-spinner></mat-spinner>
+    </div>
+  }
+</div>

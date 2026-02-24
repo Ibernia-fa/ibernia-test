@@ -1,4 +1,4 @@
-﻿<div class="d-flex gap-24 flex-column">
+<div class="d-flex gap-24 flex-column">
   @if(!isLoaderVisible && client && cashflow && report && financialTimeline) {
 
   <mat-card class="cardWithShadow">
@@ -23,6 +23,10 @@
               <!-- Cashflow name (visible when NOT in comparison mode) -->
               <ng-container *ngIf="!(compareReport || compareCashflow)">
                 <div class="d-flex align-items-center gap-8">
+                  <a [routerLink]="['/cashflows', cashflow?.id, 'scenario-lab']" class="button-icon scenario-lab-btn">
+                    <img width="20" height="20" src="assets/images/svgs/scenario-lab-icon.svg" alt="Scenario Lab" class="scenario-lab-icon-white" />
+                    <span>{{ 'Scenario Lab' | translate }}</span>
+                  </a>
                   <button class="button-icon" (click)="onComparePlansClicked()">
                     <span>{{ 'Compare plans' | translate }}</span>
                   </button>
