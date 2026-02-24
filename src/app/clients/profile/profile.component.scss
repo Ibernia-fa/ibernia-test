@@ -1,6 +1,13 @@
 .profile-main-wrapper {
   padding: 0 12px;
 }
+
+.page-loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+}
 .saving-title {
   font-size: 24px;
   line-height: 38px;
