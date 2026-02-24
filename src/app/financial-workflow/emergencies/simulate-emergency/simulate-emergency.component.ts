@@ -101,8 +101,7 @@ export class SimulateEmergencyComponent implements OnDestroy {
     categories: string[];
     timelineEvents: any[];
   } | null = null;
-  isAutoPlaying = false;
-  private autoPlayTimer: any = null;
+
 
   constructor(
     private dialogRef: MatDialogRef<SimulateEmergencyComponent>,
@@ -392,13 +391,8 @@ export class SimulateEmergencyComponent implements OnDestroy {
             this.isSimulationCompleted = true;
             this.isUpdateParentItem = true;
 
-            this.isAutoPlaying = true;
-            this.autoPlayTimer = setTimeout(() => {
-              this.activeTab = 'simulated';
-              this.displayedReport = this.simulationResult;
-              this.isAutoPlaying = false;
-              this.autoPlayTimer = null;
-            }, 2500);
+            this.activeTab = 'simulated';
+            this.displayedReport = this.simulationResult;
           },
           error: (err: any) => {
             this.isSimulating = false;
@@ -410,7 +404,6 @@ export class SimulateEmergencyComponent implements OnDestroy {
   }
 
   closeDialog(): void {
-    this.cancelAutoPlay();
     if (this.isUpdateParentItem) {
       this.dialogRef.close(this.emergencyExpense);
     }
@@ -420,35 +413,11 @@ export class SimulateEmergencyComponent implements OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.cancelAutoPlay();
   }
 
   switchToTab(tab: 'baseline' | 'simulated'): void {
-    this.cancelAutoPlay();
     this.activeTab = tab;
     this.displayedReport = tab === 'baseline' ? this.baselineResult : this.simulationResult;
-  }
-
-  replayAnimation(): void {
-    if (!this.baselineResult || !this.simulationResult) return;
-    this.cancelAutoPlay();
-    this.activeTab = 'baseline';
-    this.displayedReport = this.baselineResult;
-    this.isAutoPlaying = true;
-    this.autoPlayTimer = setTimeout(() => {
-      this.activeTab = 'simulated';
-      this.displayedReport = this.simulationResult;
-      this.isAutoPlaying = false;
-      this.autoPlayTimer = null;
-    }, 2500);
-  }
-
-  private cancelAutoPlay(): void {
-    if (this.autoPlayTimer) {
-      clearTimeout(this.autoPlayTimer);
-      this.autoPlayTimer = null;
-    }
-    this.isAutoPlaying = false;
   }
 
   private alignSeriesStructure(): void {
