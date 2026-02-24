@@ -1,6 +1,13 @@
 .profile-main-wrapper {
   padding: 0 12px;
 }
+
+.page-loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+}
 .saving-title {
   font-size: 24px;
   line-height: 38px;
@@ -126,23 +133,25 @@
   }
 }
 
-.btn-close-responses {
-  display: flex;
+.btn-hide-responses {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  padding: 6px 16px;
   border: 1px solid #e7e7eb;
   border-radius: 8px;
   background: #fff;
   cursor: pointer;
   transition: all 0.15s ease;
-  padding: 0;
-  flex-shrink: 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: #787889;
+  white-space: nowrap;
 
   &:hover {
     background: #f5f5f5;
     border-color: #ccc;
+    color: #48475d;
   }
 }
 

@@ -49,9 +49,9 @@
       <div class="snap-section">
         <div class="section-inner narrative-section">
           <h3 class="narrative-heading">{{ 'A few words about me' | translate }}</h3>
-          <p class="narrative-body">
-            {{ 'I live in Dubai with my wife Luisa.' | translate }}<br/><br/>
-            {{ "When I'm not working, I run and train for marathons and Ironman, and I'm learning guitar." | translate }}<br/><br/>
+          <p class="narrative-body about-me-text">
+            {{ 'I live in Dubai with my wife Luisa.' | translate }}<br/>
+            {{ "When I'm not working, I run and train for marathons and Ironman, and I'm learning guitar." | translate }}<br/>
             {{ "I've been a consultant for 14 years, and I'm a Bologna F.C. fan." | translate }}
           </p>
         </div>
@@ -61,7 +61,7 @@
       <div class="snap-section">
         <div class="section-inner narrative-section">
           <p class="narrative-body narrative-highlight">
-            {{ "Alright, let's talk about what really matters: you. Your goals, your family, your dreams." | translate }}
+            {{ "Alright, let's talk about what really matters:" | translate }} <strong>{{ 'you.' | translate }}</strong> {{ 'Your goals, your family, your dreams.' | translate }}
           </p>
         </div>
       </div>
@@ -70,10 +70,10 @@
       <div class="snap-section">
         <div class="section-inner narrative-section no-scroll">
           <p class="narrative-body">
-            {{ "The next pages are your reflection space. You don't need to take notes, though you're welcome to if it helps you think." | translate }}<br/><br/>
+            {{ 'The next pages are your' | translate }} <strong>{{ 'reflection space.' | translate }}</strong> {{ "You don't need to take notes, though you're welcome to if it helps you think." | translate }}<br/><br/>
             {{ 'This is just a chance to think ahead before our chat.' | translate }}
           </p>
-          <p class="narrative-ready">{{ 'Ready?' | translate }}</p>
+          <p class="narrative-ready"><strong>{{ 'Ready?' | translate }}</strong></p>
         </div>
       </div>
 
@@ -109,7 +109,7 @@
                       </div>
                     }
                     <button type="button" class="btn-add" (click)="addImportantPerson()">
-                      + {{ 'Add another' | translate }}
+                      <span>+</span> <span>{{ 'Add another' | translate }}</span>
                     </button>
                   </div>
                 } @else if (q.type === 'Goals') {
@@ -121,12 +121,12 @@
                           [checked]="isGoalSelected(q.id, opt)"
                           (change)="toggleGoal(q.id, opt)"
                         />
-                        <span>{{ opt }}</span>
+                        <span>@if (opt === 'Other') { ... }{{ opt }}</span>
                       </label>
                     }
                   </div>
-                  @if (q.options?.includes('Other')) {
-                    <mat-form-field appearance="outline" class="others-field">
+                  @if (isGoalSelected(q.id, 'Other')) {
+                    <mat-form-field appearance="outline" class="others-field white-field">
                       <mat-label>{{ 'Others (please specify)' | translate }}</mat-label>
                       <input matInput [(ngModel)]="othersByQuestion['goals_' + q.id]" [ngModelOptions]="{standalone: true}" />
                     </mat-form-field>
@@ -170,20 +170,20 @@
                           [checked]="isWorrySelected(q.id, opt)"
                           (change)="toggleWorry(q.id, opt)"
                         />
-                        <span>{{ opt }}</span>
+                        <span>@if (opt === 'Other') { ... }{{ opt }}</span>
                       </label>
                     }
                   </div>
-                  @if (q.options?.includes('Other')) {
-                    <mat-form-field appearance="outline" class="others-field">
+                  @if (isWorrySelected(q.id, 'Other')) {
+                    <mat-form-field appearance="outline" class="others-field white-field">
                       <mat-label>{{ 'Others (please specify)' | translate }}</mat-label>
                       <input matInput [(ngModel)]="othersByQuestion['worry_' + q.id]" [ngModelOptions]="{standalone: true}" />
                     </mat-form-field>
                   }
                 } @else if (q.type === 'FinancialPlanningImprovement') {
-                  <mat-form-field appearance="outline" class="full-width">
+                  <mat-form-field appearance="outline" class="full-width white-field">
                     <mat-label>{{ 'Your response' | translate }}</mat-label>
-                    <textarea matInput [(ngModel)]="financialPlanningByQuestion[q.id]" [ngModelOptions]="{standalone: true}" rows="4"></textarea>
+                    <textarea matInput [(ngModel)]="financialPlanningByQuestion[q.id]" [ngModelOptions]="{standalone: true}" rows="6"></textarea>
                   </mat-form-field>
                 }
               </mat-card-content>
