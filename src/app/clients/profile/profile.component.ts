@@ -76,7 +76,7 @@ export class ProfileComponent {
   totalSavings: string = "0";
   isLoaderVisible = true;
   questionnaireResponses: GetClientQuestionnaireResponse | null = null;
-  showResponsesCard = true;
+  showResponsesCard = false;
   responseCurrencySymbol = '';
 
   constructor(
@@ -102,6 +102,12 @@ export class ProfileComponent {
   }
 
   onQuestionnaireClicked() {
+    if (this.questionnaireResponses && !this.showResponsesCard) {
+      this.showResponsesCard = true;
+      localStorage.removeItem(`questionnaire_hidden_${this.clientId}`);
+      return;
+    }
+
     const dialogRef = this.dialog.open(QuestionnaireDialogComponent, {
       width: '720px',
       disableClose: true,
@@ -117,7 +123,8 @@ export class ProfileComponent {
     this.questionnaireHttpService.getClientResponses(this.clientId).subscribe({
       next: (data) => {
         this.questionnaireResponses = data;
-        this.showResponsesCard = true;
+        const dismissed = localStorage.getItem(`questionnaire_hidden_${this.clientId}`);
+        this.showResponsesCard = !dismissed;
         this.responseCurrencySymbol = this.resolveCurrencySymbol(data?.currency);
       },
       error: () => {
@@ -128,6 +135,7 @@ export class ProfileComponent {
 
   dismissResponses() {
     this.showResponsesCard = false;
+    localStorage.setItem(`questionnaire_hidden_${this.clientId}`, 'true');
   }
 
   private resolveCurrencySymbol(code?: string): string {
