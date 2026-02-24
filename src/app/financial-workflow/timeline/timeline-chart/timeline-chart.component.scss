@@ -153,7 +153,7 @@
   font-weight: 500;
   width: 100%;
   min-width: 0;
-  overflow: hidden;
+  overflow: visible;
   position: relative;
   box-sizing: border-box;
 }
@@ -163,7 +163,7 @@
   align-items: center;
   gap: 6px;
   min-width: 0;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .timeline-event-chip .icon {
@@ -176,8 +176,7 @@
   line-height: 1.2;
   font-weight: 600;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow: visible;
   min-width: 0;
 }
 
@@ -201,6 +200,10 @@
     background: #fff !important;
 
   }
+}
+
+::ng-deep .vis-item .vis-item-overflow {
+  overflow: visible !important;
 }
 
 ::ng-deep .vis-item .vis-item-content {

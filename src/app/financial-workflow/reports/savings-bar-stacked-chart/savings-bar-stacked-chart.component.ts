@@ -39,8 +39,12 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
     onMouseLeave: () => void;
   }> = [];
   private emergencyIconEl: HTMLElement | null = null;
+  private emergencyIconLineEl: HTMLElement | null = null;
+  private emergencyIconBandEl: HTMLElement | null = null;
   private emergencyExpenseIconEl: HTMLElement | null = null;
   private emergencyExpenseLineEl: HTMLElement | null = null;
+  private emergencyExpenseBandEl: HTMLElement | null = null;
+  private eventLabelElements: HTMLElement[] = [];
   private shortfallDataPointIndex: number = -1;
   private emergencyExpenseDataPointIndex: number = -1;
 
@@ -56,16 +60,7 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
         height: 500,
         stacked: true,
         animations: {
-          enabled: true,
-          easing: 'easeinout',
-          speed: 800,
-          animateGradually: {
-            enabled: false
-          },
-          dynamicAnimation: {
-            enabled: true,
-            speed: 400,
-          },
+          enabled: false,
         },
         toolbar: {
           show: false,
@@ -229,6 +224,8 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
 
     if (changes['report']) {
       this.cleanupHtmlTooltips();
+      this.cleanupEmergencyElements();
+      this.cleanupEventLabels();
 
       const seriesList = report.series;
       const seriesColors = this.chartOptions.colors || [];
@@ -279,9 +276,8 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
 
       setTimeout(() => {
         if (this.events.length > 0) this.attachHtmlTooltips();
-        this.attachEmergencyIcon();
         this.attachEmergencyExpenseIcon();
-      }, 500);
+      }, 50);
     }
 
     this.chartOptions.chart = { ...this.chartOptions.chart };
@@ -402,18 +398,23 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
 
   ngOnDestroy(): void {
     this.cleanupHtmlTooltips();
-    if (this.emergencyIconEl) {
-      this.emergencyIconEl.remove();
-      this.emergencyIconEl = null;
+    this.cleanupEmergencyElements();
+    this.cleanupEventLabels();
+  }
+
+  private cleanupEmergencyElements(): void {
+    for (const key of [
+      'emergencyIconEl', 'emergencyIconLineEl', 'emergencyIconBandEl',
+      'emergencyExpenseIconEl', 'emergencyExpenseLineEl', 'emergencyExpenseBandEl'
+    ] as const) {
+      const el = this[key] as HTMLElement | null;
+      if (el) { el.remove(); (this as any)[key] = null; }
     }
-    if (this.emergencyExpenseIconEl) {
-      this.emergencyExpenseIconEl.remove();
-      this.emergencyExpenseIconEl = null;
-    }
-    if (this.emergencyExpenseLineEl) {
-      this.emergencyExpenseLineEl.remove();
-      this.emergencyExpenseLineEl = null;
-    }
+  }
+
+  private cleanupEventLabels(): void {
+    this.eventLabelElements.forEach(el => el.remove());
+    this.eventLabelElements = [];
   }
 
   buildEventAnnotations(events: TimelineEvent[]) {
@@ -430,7 +431,7 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
 
     eventsByYear.forEach((groupEvents, year) => {
       groupEvents.forEach((event, index) => {
-
+        // Only show markers; labels will be rendered as HTML overlays
         annotations.push({
           x: year,
           y: 0,
@@ -455,228 +456,246 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
   }
 
   /**
-   * Builds an xaxis annotation (red band) for the first year where the shortfall begins.
-   * Also stores the data-point index so the ⚠ icon can be placed via DOM.
+   * Attach HTML label overlays for timeline events.
+   * These are rendered outside the SVG to prevent clipping.
+   */
+  private attachEventLabels(): void {
+    this.cleanupEventLabels();
+
+    const chartHost = this.chartElRef?.nativeElement;
+    if (!chartHost) return;
+
+    const hostRect = chartHost.getBoundingClientRect();
+
+    // Get plot area bounds
+    const gridEl = chartHost.querySelector<SVGElement>('.apexcharts-grid');
+    const gridRect = gridEl?.getBoundingClientRect();
+    const plotTop = gridRect ? gridRect.top : 10;
+    const plotBottom = gridRect ? gridRect.bottom : window.innerHeight - 10;
+
+    const eventsByYear = new Map<string, TimelineEvent[]>();
+    this.events.forEach(event => {
+      const year = event.startYear.toString();
+      if (!eventsByYear.has(year)) eventsByYear.set(year, []);
+      eventsByYear.get(year)!.push(event);
+    });
+
+    const labelHost = this.getTooltipHost();
+
+    eventsByYear.forEach((groupEvents, year) => {
+      groupEvents.forEach((event, index) => {
+        // Find marker position for this event
+        const markers = chartHost.querySelectorAll<SVGElement>('.apexcharts-point-annotation-marker');
+        let markerCenterX = 0;
+        let markerCenterY = 0;
+        let found = false;
+
+        // Match marker by checking if it's at this year with this event name in tooltip
+        markers.forEach((marker) => {
+          if (found) return;
+          const annotationIdx = Array.from(markers).indexOf(marker);
+          if (this.chartOptions.annotations?.points[annotationIdx]?.customTooltip?.includes(event.name)) {
+            const rect = marker.getBoundingClientRect();
+            markerCenterX = rect.left + rect.width / 2;
+            markerCenterY = rect.top + rect.height / 2;
+            found = true;
+          }
+        });
+
+        if (!found) return;
+
+        // Create label element with FIXED positioning (not clipped by chart overflow)
+        const label = document.createElement('div');
+        label.textContent = event.name;
+        label.className = 'event-label';
+        label.style.position = 'fixed';
+        label.style.pointerEvents = 'none';
+        label.style.zIndex = '99999';
+        label.style.fontSize = '12px';
+        label.style.fontWeight = '500';
+        label.style.color = '#333';
+        label.style.backgroundColor = 'white';
+        label.style.border = '1px solid #ddd';
+        label.style.borderRadius = '4px';
+        label.style.padding = '4px 8px';
+        label.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
+        label.style.whiteSpace = 'nowrap';
+        label.style.transform = 'translateX(-50%)';
+
+        labelHost.appendChild(label);
+
+        // Get label dimensions after it's rendered
+        setTimeout(() => {
+          const labelRect = label.getBoundingClientRect();
+          const labelHeight = labelRect.height;
+          
+          // Try to position above the marker
+          let labelTop = Math.max(5, markerCenterY - 45 - index * 25);
+          
+          // If it goes off the top of the viewport, position it below instead
+          if (labelTop < 5) {
+            labelTop = plotBottom + 10 + index * 25;
+          }
+          
+          label.style.left = `${markerCenterX}px`;
+          label.style.top = `${labelTop}px`;
+        }, 0);
+
+        this.eventLabelElements.push(label);
+      });
+    });
+  }
+
+  /**
+   * Locates the first year where shortfall begins and stores the data-point index.
+   * The visual band is drawn as an HTML overlay in attachEmergencyIcon().
    */
   private buildEmergencyAnnotation(report: ChartSeries): any[] {
     this.shortfallDataPointIndex = -1;
     const shortfallSeries = report?.series?.find(s => s.name === 'Shortfall');
     if (!shortfallSeries) return [];
 
-    const index = shortfallSeries.data.findIndex(v => v < 0);
+    const index = shortfallSeries.data.findIndex((v: number) => v < 0);
     if (index < 0) return [];
 
-    const year = report.categories[index];
-    if (!year) return [];
-
     this.shortfallDataPointIndex = index;
-
-    return [{
-      x: year,
-      x2: year,
-      fillColor: '#FF4560',
-      opacity: 0.15,
-      label: { text: '' }
-    }];
+    return [];
   }
 
   /**
-   * Builds an xaxis annotation (amber band) for the year where the Emergency Expense falls.
-   * Also stores the data-point index so a 💸 icon can be placed via DOM.
+   * Locates the year where the Emergency Expense falls and stores the data-point index.
+   * The visual band is drawn as an HTML overlay in attachEmergencyExpenseIcon().
    */
   private buildEmergencyExpenseAnnotation(report: ChartSeries): any[] {
     this.emergencyExpenseDataPointIndex = -1;
     const emergencySeries = report?.series?.find(s => s.name === 'Emergency Expense');
     if (!emergencySeries) return [];
 
-    const index = emergencySeries.data.findIndex(v => v > 0);
+    const index = emergencySeries.data.findIndex((v: number) => v > 0);
     if (index < 0) return [];
 
-    const year = report.categories[index];
-    if (!year) return [];
-
     this.emergencyExpenseDataPointIndex = index;
-
-    return [{
-      x: year,
-      x2: year,
-      fillColor: '#FF4560',
-      opacity: 0.2,
-      label: { text: '' }
-    }];
+    return [];
   }
 
   /**
-   * Places the emergency icon above the chart column for the Emergency Expense year.
-   * Uses x-center from a visible bar at that column, and y from the chart inner plot area top
-   * so the icon is always visible regardless of how small the emergency expense bar is.
+   * Places the emergency icon at the top of the plot area for the Emergency Expense year,
+   * draws a full-height background band, and a vertical connector line from icon to bar top.
    */
   private attachEmergencyExpenseIcon(): void {
-    if (this.emergencyExpenseIconEl) {
-      this.emergencyExpenseIconEl.remove();
-      this.emergencyExpenseIconEl = null;
-    }
-    if (this.emergencyExpenseLineEl) {
-      this.emergencyExpenseLineEl.remove();
-      this.emergencyExpenseLineEl = null;
-    }
+    if (this.emergencyExpenseIconEl) { this.emergencyExpenseIconEl.remove(); this.emergencyExpenseIconEl = null; }
+    if (this.emergencyExpenseLineEl) { this.emergencyExpenseLineEl.remove(); this.emergencyExpenseLineEl = null; }
+    if (this.emergencyExpenseBandEl) { this.emergencyExpenseBandEl.remove(); this.emergencyExpenseBandEl = null; }
     if (this.emergencyExpenseDataPointIndex < 0) return;
 
+    this.attachColumnOverlay(
+      this.emergencyExpenseDataPointIndex,
+      (icon, line, band) => {
+        this.emergencyExpenseIconEl = icon;
+        this.emergencyExpenseLineEl = line;
+        this.emergencyExpenseBandEl = band;
+      }
+    );
+  }
+
+  /**
+   * Places the shortfall ⚠ icon at the top of the plot area, draws a full-height
+   * background band, and a vertical connector line from icon to the bar top.
+   */
+  private attachEmergencyIcon(): void {
+    if (this.emergencyIconEl) { this.emergencyIconEl.remove(); this.emergencyIconEl = null; }
+    if (this.emergencyIconLineEl) { this.emergencyIconLineEl.remove(); this.emergencyIconLineEl = null; }
+    if (this.emergencyIconBandEl) { this.emergencyIconBandEl.remove(); this.emergencyIconBandEl = null; }
+    if (this.shortfallDataPointIndex < 0) return;
+
+    this.attachColumnOverlay(
+      this.shortfallDataPointIndex,
+      (icon, line, band) => {
+        this.emergencyIconEl = icon;
+        this.emergencyIconLineEl = line;
+        this.emergencyIconBandEl = band;
+      }
+    );
+  }
+
+  /**
+   * Shared logic for rendering an emergency column overlay:
+   * - full-height pink background band
+   * - ⚠ icon pinned to the top of the plot area
+   * - vertical connector line from icon bottom to the topmost bar segment
+   */
+  private attachColumnOverlay(
+    dataPointIndex: number,
+    assign: (icon: HTMLElement, line: HTMLElement | null, band: HTMLElement | null) => void
+  ): void {
     const chartHost = this.chartElRef?.nativeElement;
     if (!chartHost) return;
 
     const allSeries = chartHost.querySelectorAll('.apexcharts-bar-series .apexcharts-series');
     if (!allSeries.length) return;
 
-    // Get x-center and width from any visible bar at the emergency column
+    // Locate bar center-X and width at the target column
     let barCenterX = 0;
     let barWidth = 30;
-    let found = false;
+    let foundBar = false;
 
-    allSeries.forEach(seriesGroup => {
-      if (found) return;
+    allSeries.forEach((seriesGroup: Element) => {
+      if (foundBar) return;
       const bars = seriesGroup.querySelectorAll<SVGPathElement>('path.apexcharts-bar-area');
-      const bar = bars[this.emergencyExpenseDataPointIndex];
+      const bar = bars[dataPointIndex];
       if (!bar) return;
-
       const rect = bar.getBoundingClientRect();
       if (rect.width === 0) return;
-
       barCenterX = rect.left + rect.width / 2;
       barWidth = rect.width;
-      found = true;
+      foundBar = true;
     });
 
-    if (!found) return;
+    if (!foundBar) return;
 
     const hostRect = chartHost.getBoundingClientRect();
 
-    // Use the inner plot area top for y-anchor so icon is always visible
-    const innerPlot = chartHost.querySelector<SVGElement>('.apexcharts-inner.apexcharts-graphical');
-    const plotTop = innerPlot
-      ? innerPlot.getBoundingClientRect().top - hostRect.top
-      : 10;
+    // Ensure host is a positioning context
+    if (getComputedStyle(chartHost).position === 'static') {
+      chartHost.style.position = 'relative';
+    }
 
+    // Use the grid rect for exact plot-area bounds (excludes axis labels)
+    const gridEl = chartHost.querySelector<SVGElement>('.apexcharts-grid');
+    const gridRect = gridEl?.getBoundingClientRect();
+    const plotTop = gridRect ? gridRect.top - hostRect.top : 10;
+    const plotBottom = gridRect ? gridRect.bottom - hostRect.top : hostRect.height - 10;
+
+    // ── full-height band (stays within the grid area) ────────────────────
+    const band = document.createElement('div');
+    band.style.position = 'absolute';
+    band.style.pointerEvents = 'none';
+    band.style.zIndex = '8';
+    band.style.backgroundColor = '#FF4560';
+    band.style.opacity = '0.12';
+    band.style.width = `${barWidth}px`;
+    band.style.left = `${barCenterX - hostRect.left - barWidth / 2}px`;
+    band.style.top = `${plotTop}px`;
+    band.style.height = `${plotBottom - plotTop}px`;
+    chartHost.appendChild(band);
+
+    // ── icon sits fully ABOVE the band top edge ─────────────────────────
+    const iconSize = 18; // px — matches font-size
+    const iconTop = Math.max(2, plotTop - iconSize - 2);
     const icon = document.createElement('div');
     icon.textContent = '⚠';
     icon.style.position = 'absolute';
     icon.style.pointerEvents = 'none';
     icon.style.zIndex = '11';
     icon.style.lineHeight = '1';
-    icon.style.fontSize = '18px';
+    icon.style.fontSize = `${iconSize}px`;
     icon.style.color = '#FF4560';
     icon.style.transform = 'translateX(-50%)';
     icon.style.left = `${barCenterX - hostRect.left}px`;
-
-    const hostPosition = getComputedStyle(chartHost).position;
-    if (hostPosition === 'static') {
-      chartHost.style.position = 'relative';
-    }
-
-    const iconTop = Math.max(4, plotTop - 4);
     icon.style.top = `${iconTop}px`;
-
-    // Find the top of the topmost bar segment at the emergency column
-    let barTopY: number | null = null;
-    allSeries.forEach(seriesGroup => {
-      const bars = seriesGroup.querySelectorAll<SVGPathElement>('path.apexcharts-bar-area');
-      const bar = bars[this.emergencyExpenseDataPointIndex];
-      if (!bar) return;
-      const rect = bar.getBoundingClientRect();
-      if (rect.width === 0) return; // skip hidden/unrendered bars
-      const relTop = rect.top - hostRect.top;
-      if (barTopY === null || relTop < barTopY) {
-        barTopY = relTop;
-      }
-    });
-
-    // Draw vertical red connector line from icon top to bar top
-    const lineEndY = barTopY ?? plotTop + 20; // fallback to just below plot top
-    if (lineEndY > iconTop + 2) {
-      const line = document.createElement('div');
-      line.style.position = 'absolute';
-      line.style.pointerEvents = 'none';
-      line.style.zIndex = '10';
-      line.style.width = `${barWidth}px`;
-      line.style.backgroundColor = '#FF4560';
-      line.style.opacity = '0.25';
-      line.style.left = `${barCenterX - hostRect.left - barWidth / 2}px`;
-      line.style.top = `${iconTop + 18}px`; // start just below the icon character
-      line.style.height = `${lineEndY - (iconTop + 18)}px`;
-      chartHost.appendChild(line);
-      this.emergencyExpenseLineEl = line;
-    }
-
     chartHost.appendChild(icon);
-    this.emergencyExpenseIconEl = icon;
-  }
 
-  /**
-   * Places a ⚠ icon above the top of the stacked bar at the shortfall year.
-   * Uses an absolutely-positioned HTML element over the chart to avoid SVG clip-path issues.
-   */
-  private attachEmergencyIcon(): void {
-    // Clean up previous icon
-    if (this.emergencyIconEl) {
-      this.emergencyIconEl.remove();
-      this.emergencyIconEl = null;
-    }
-    if (this.shortfallDataPointIndex < 0) return;
-
-    const chartHost = this.chartElRef?.nativeElement;
-    if (!chartHost) return;
-
-    // Find all bar series groups
-    const allSeries = chartHost.querySelectorAll('.apexcharts-bar-series .apexcharts-series');
-    if (!allSeries.length) return;
-
-    // Find the topmost bar segment at the shortfall index using screen coordinates
-    let minTop = Infinity;
-    let barCenterX = 0;
-    let found = false;
-
-    allSeries.forEach(seriesGroup => {
-      const bars = seriesGroup.querySelectorAll<SVGPathElement>('path.apexcharts-bar-area');
-      const bar = bars[this.shortfallDataPointIndex];
-      if (!bar) return;
-
-      const rect = bar.getBoundingClientRect();
-      if (rect.height === 0 && rect.width === 0) return;
-
-      if (rect.top < minTop) {
-        minTop = rect.top;
-        barCenterX = rect.left + rect.width / 2;
-        found = true;
-      }
-    });
-
-    if (!found) return;
-
-    // Get chart host position for relative placement
-    const hostRect = chartHost.getBoundingClientRect();
-
-    // Create an absolutely positioned HTML element
-    const icon = document.createElement('div');
-    icon.textContent = '⚠';
-    icon.style.position = 'absolute';
-    icon.style.color = '#FF4560';
-    icon.style.fontSize = '18px';
-    icon.style.fontWeight = '700';
-    icon.style.pointerEvents = 'none';
-    icon.style.zIndex = '10';
-    icon.style.lineHeight = '1';
-    icon.style.transform = 'translateX(-50%)';
-    icon.style.left = `${barCenterX - hostRect.left}px`;
-    icon.style.top = `${minTop - hostRect.top - 22}px`;
-
-    // Make sure chart host is positioned for absolute children
-    const hostPosition = getComputedStyle(chartHost).position;
-    if (hostPosition === 'static') {
-      chartHost.style.position = 'relative';
-    }
-
-    chartHost.appendChild(icon);
-    this.emergencyIconEl = icon;
+    assign(icon, null, band);
   }
 
   private attachHtmlTooltips() {
@@ -723,6 +742,10 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
   }
 
   private getTooltipHost(): HTMLElement {
+    // Look for dialog container first (highest priority)
+    const dialogContainer = document.querySelector<HTMLElement>('.cdk-overlay-container');
+    if (dialogContainer) return dialogContainer;
+
     const fullscreenOverlay = document.querySelector<HTMLElement>('.global-fullscreen-overlay');
     return fullscreenOverlay ?? document.body;
   }

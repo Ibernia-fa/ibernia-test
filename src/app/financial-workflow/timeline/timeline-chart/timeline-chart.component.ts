@@ -659,6 +659,11 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
     const timelineEndYear = moment(this.financialTimeline.forecastEndtDate).year();
     const timelineTotalYears = timelineEndYear - timelineStartYear;
 
+    // Pixel width of the timeline container (used to compute years-per-pixel)
+    const containerPxWidth = this.timelineContainer?.nativeElement?.clientWidth || 1200;
+    // Approximate pixel width per year in the timeline
+    const pxPerYear = containerPxWidth / timelineTotalYears;
+
     const dataArray = this.financialTimeline.clientEvents.map(
       (event, index) => {
         const startYear = event.start.year;
@@ -668,29 +673,13 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
 
         const eventId = event.id || `placeholder-${event.name}-${index}`;
 
-        let minContainerWidth: number;
-        if (event.name === 'Retirement age') {
-          if (timelineTotalYears < 15) {
-            minContainerWidth = 3;
-          } else if (timelineTotalYears < 30) {
-            minContainerWidth = 4;
-          } else if (timelineTotalYears < 50) {
-            minContainerWidth = 5;
-          } else {
-            minContainerWidth = 6;
-          }
-        } else {
-          const baseWidth = 6;
-          let scaleFactor = 1.0;
-          if (timelineTotalYears < 30) {
-            scaleFactor = 0.5;
-          } else if (timelineTotalYears < 50) {
-            scaleFactor = 0.65;
-          } else if (timelineTotalYears < 80) {
-            scaleFactor = 0.8;
-          }
-          minContainerWidth = Math.max(2, Math.ceil(baseWidth * scaleFactor));
-        }
+        // Estimate the pixel width needed to display icon + event name + padding
+        // Icon ~20px, padding ~24px, text ~9px per character (bold 14px font)
+        const estimatedTextPx = 20 + 28 + event.name.length * 9;
+        // Minimum years to fit the text (always at least 1)
+        const minYearsForText = Math.max(1, Math.ceil(estimatedTextPx / pxPerYear));
+
+        let minContainerWidth = minYearsForText;
 
         const maxAvailableWidth = Math.max(1, forecastEndYear - startYear);
 
