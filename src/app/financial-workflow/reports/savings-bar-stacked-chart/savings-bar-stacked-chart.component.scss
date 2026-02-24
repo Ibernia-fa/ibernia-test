@@ -27,3 +27,66 @@
   opacity: 0 !important;
   pointer-events: none !important;
 }
+
+/* Event labels - HTML overlays above chart */
+.event-label {
+  display: inline-block;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #333;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  white-space: nowrap;
+  z-index: 99999;
+  overflow: visible !important;
+}
+
+/* Event tooltip styling - ensure minimum width for full text display */
+.custom-html-tooltip {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 8px 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  min-width: 140px;
+  text-align: center;
+  font-size: 12px;
+  white-space: nowrap;
+  z-index: 9999;
+
+  &.birth-icon,
+  &.retirement-age-icon,
+  &.inheritance-icon,
+  &.wedding-icon,
+  &.state-pension-icon,
+  &.home-icon,
+  &.travel-icon,
+  &.car-icon,
+  &.education-icon,
+  &.new-business-icon,
+  &.boat-icon {
+    img {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+
+    span {
+      display: inline-block;
+      vertical-align: middle;
+    }
+  }
+}
+
+/* Disable all ApexCharts bar grow/transition animations */
+:host ::ng-deep .apexcharts-bar-area,
+:host ::ng-deep .apexcharts-series path {
+  animation: none !important;
+  transition: none !important;
+}
+
