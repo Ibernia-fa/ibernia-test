@@ -262,10 +262,8 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
       // goals and events dots
       this.events = report.timelineEvents ?? [];
 
-      // Build annotations: event dots + emergency year highlight
-      const eventAnnotations = this.events.length > 0
-        ? this.buildEventAnnotations(this.events)
-        : [];
+      // Build annotations: emergency year highlight only (event dots removed)
+      const eventAnnotations: any[] = [];
       const emergencyXAxis = this.buildEmergencyAnnotation(report);
       const emergencyExpenseXAxis = this.buildEmergencyExpenseAnnotation(report);
 
@@ -375,6 +373,7 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
     // final series assignment
     this.chartOptions.series = report.series.map((s, idx) => ({
       ...s,
+      color: (s.name === 'Current Account (Negative)' || s.name === 'Emergency Expense') ? 'transparent' : s.color,
       tack: 'stack1',
       order: s.name === 'Emergency Expense' ? report.series.length : idx,
       fill: {
@@ -683,13 +682,11 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
     const iconSize = 18; // px — matches font-size
     const iconTop = Math.max(2, plotTop - iconSize - 2);
     const icon = document.createElement('div');
-    icon.textContent = '⚠';
+    icon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FF4560" width="${iconSize}" height="${iconSize}"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>`;
     icon.style.position = 'absolute';
     icon.style.pointerEvents = 'none';
     icon.style.zIndex = '11';
     icon.style.lineHeight = '1';
-    icon.style.fontSize = `${iconSize}px`;
-    icon.style.color = '#FF4560';
     icon.style.transform = 'translateX(-50%)';
     icon.style.left = `${barCenterX - hostRect.left}px`;
     icon.style.top = `${iconTop}px`;
