@@ -75,6 +75,7 @@ export class ProfileComponent {
   preferredCurrency: string | undefined;
   totalSavings: string = "0";
   isLoaderVisible = true;
+  isPageLoading = true;
   questionnaireResponses: GetClientQuestionnaireResponse | null = null;
   showResponsesCard = false;
   responseCurrencySymbol = '';
@@ -94,7 +95,6 @@ export class ProfileComponent {
   }
 
   ngOnInit() {
-    this.getClient();
   }
 
   onEditClicked() {
@@ -194,20 +194,32 @@ export class ProfileComponent {
         }),
         combineLatestWith(this.store.select(selectedClient).pipe(takeUntilDestroyed())),
         tap(([cashflows, client]) => {
-          console.log(client);
           if(!client || client.id !== this.clientId) {
             this.store.dispatch(ClientActions.loadClient({clientId: this.clientId}))
           }
         }),
         filter(([cashflows, client]) => !!client && client.id === this.clientId),
-        map(([cashflows, client]) => {
+        switchMap(([cashflows, client]) => {
           this.client = client;
-          this.cashflows = cashflows;
+          this.cashflows = cashflows || [];
           this.birthDate = this.client?.clientDetails.birthDate;
           this.refreshTotalSavings();
-          this.loadQuestionnaireResponses();
-
           this.isLoaderVisible = false;
+
+          return this.questionnaireHttpService.getClientResponses(this.clientId).pipe(
+            catchError(() => of(null))
+          );
+        }),
+        tap((questionnaireData) => {
+          if (questionnaireData) {
+            this.questionnaireResponses = questionnaireData;
+            const dismissed = localStorage.getItem(`questionnaire_hidden_${this.clientId}`);
+            this.showResponsesCard = !dismissed;
+            this.responseCurrencySymbol = this.resolveCurrencySymbol(questionnaireData?.currency);
+          } else {
+            this.questionnaireResponses = null;
+          }
+          this.isPageLoading = false;
         })
       )
       .subscribe();
