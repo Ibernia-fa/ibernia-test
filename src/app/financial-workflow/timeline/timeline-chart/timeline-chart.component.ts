@@ -191,55 +191,21 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
               );
             });
 
-          // Show 'Retirement age' in chips if:
-          // 1. It's not on the timeline at all, OR
-          // 2. It IS on the timeline but falls outside the visible forecast range
-          //    (so it's invisible on the chart and the user should be able to re-drag it)
-          const forecastStartYear = this.financialTimeline?.forecastStartDate
-            ? moment(this.financialTimeline.forecastStartDate).year()
-            : null;
-          const forecastEndYear = this.financialTimeline?.forecastEndtDate
-            ? moment(this.financialTimeline.forecastEndtDate).year()
-            : null;
-
+          // Build full chip list (all events except State pension).
+          // syncRetirementChipVisibility() below is the single source of truth
+          // for whether Retirement age chip is visible — do not duplicate that logic here.
           this.systemEventsLibrary = [
             ...res[0],
             ...res[1],
           ]
-            .filter(event => {
-              if (event.name === 'State pension') return false;
-              if (event.name !== 'Retirement age') return true;
-
-              // For 'Retirement age':
-              const retirementOnTimeline = this.financialTimeline?.clientEvents?.find(
-                ce => ce.name === 'Retirement age'
-              );
-
-              // Not on timeline at all → show chip
-              if (!retirementOnTimeline) return true;
-
-              // On timeline but outside visible forecast range → show chip
-              const retYear = retirementOnTimeline.start?.year;
-              if (
-                retYear != null &&
-                forecastStartYear != null &&
-                forecastEndYear != null &&
-                (retYear < forecastStartYear || retYear > forecastEndYear)
-              ) {
-                return true;
-              }
-
-              // Already visible on timeline → hide chip
-              return false;
-            })
-            .sort((a, b) => {
-              return (
-                this.CHIP_ORDER.indexOf(a.name) -
-                this.CHIP_ORDER.indexOf(b.name)
-              );
-            });
+            .filter(event => event.name !== 'State pension')
+            .sort((a, b) =>
+              this.CHIP_ORDER.indexOf(a.name) - this.CHIP_ORDER.indexOf(b.name)
+            );
 
           this.cdr.detectChanges();
+          // Single source of truth: hide/show Retirement age chip based on timeline state
+          this.syncRetirementChipVisibility();
         })
       )
       .subscribe();
@@ -659,6 +625,11 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
     const timelineEndYear = moment(this.financialTimeline.forecastEndtDate).year();
     const timelineTotalYears = timelineEndYear - timelineStartYear;
 
+    // Pixel width of the timeline container (used to compute years-per-pixel)
+    const containerPxWidth = this.timelineContainer?.nativeElement?.clientWidth || 1200;
+    // Approximate pixel width per year in the timeline
+    const pxPerYear = containerPxWidth / timelineTotalYears;
+
     const dataArray = this.financialTimeline.clientEvents.map(
       (event, index) => {
         const startYear = event.start.year;
@@ -668,29 +639,13 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
 
         const eventId = event.id || `placeholder-${event.name}-${index}`;
 
-        let minContainerWidth: number;
-        if (event.name === 'Retirement age') {
-          if (timelineTotalYears < 15) {
-            minContainerWidth = 3;
-          } else if (timelineTotalYears < 30) {
-            minContainerWidth = 4;
-          } else if (timelineTotalYears < 50) {
-            minContainerWidth = 5;
-          } else {
-            minContainerWidth = 6;
-          }
-        } else {
-          const baseWidth = 6;
-          let scaleFactor = 1.0;
-          if (timelineTotalYears < 30) {
-            scaleFactor = 0.5;
-          } else if (timelineTotalYears < 50) {
-            scaleFactor = 0.65;
-          } else if (timelineTotalYears < 80) {
-            scaleFactor = 0.8;
-          }
-          minContainerWidth = Math.max(2, Math.ceil(baseWidth * scaleFactor));
-        }
+        // Estimate the pixel width needed to display icon + event name + padding
+        // Icon ~20px, padding ~24px, text ~9px per character (bold 14px font)
+        const estimatedTextPx = 20 + 28 + event.name.length * 9;
+        // Minimum years to fit the text (always at least 1)
+        const minYearsForText = Math.max(1, Math.ceil(estimatedTextPx / pxPerYear));
+
+        let minContainerWidth = minYearsForText;
 
         const maxAvailableWidth = Math.max(1, forecastEndYear - startYear);
 
@@ -1042,8 +997,9 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   private getContent(title: string, img: string): string {
+    const extraClass = title === 'Retirement age' ? ' retirement-age-chip' : '';
     return `
-    <div class="timeline-event-chip with-padding" title="${title}">
+    <div class="timeline-event-chip with-padding${extraClass}" title="${title}">
       <div class="event-left">
         <img src="/assets/images/svgs/${img}.svg" class="icon" />
         <span class="label">${title}</span>
