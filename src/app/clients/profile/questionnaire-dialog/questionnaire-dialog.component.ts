@@ -19,6 +19,7 @@ import { QuestionnaireHttpService } from '../../services/questionnaire-http.serv
 export interface QuestionnaireItem {
   id: string;
   text: string;
+  subtitle: string;
   selected: boolean;
 }
 
@@ -65,7 +66,7 @@ export class QuestionnaireDialogComponent implements OnInit {
     this.isLoaderVisible = true;
     this.questionnaireHttpService.getQuestions().subscribe({
       next: (questions) => {
-        this.questions = questions.map((q) => ({ id: q.id, text: q.text, selected: true }));
+        this.questions = questions.map((q) => ({ id: q.id, text: q.text, subtitle: q.subtitle, selected: true }));
         this.isLoaderVisible = false;
       },
       error: (err) => {
