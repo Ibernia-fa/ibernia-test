@@ -24,6 +24,7 @@ export interface UserProfileDto {
   firstName?: string | null;
   lastName?: string | null;
   email?: string | null;
+  bio?: string | null;
   preferences: PreferencesDto;
   /** Advisor/company guidelines for AI recommendations (risk tolerance, tone, compliance). */
   advisorGuidelines?: string | null;

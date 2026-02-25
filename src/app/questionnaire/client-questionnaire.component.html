@@ -13,7 +13,7 @@
     <div class="intro-overlay"></div>
     <div class="center-state intro-state" [class.fade-out]="introFadingOut">
       <h2 class="intro-title">{{ 'Your journey to financial peace of mind starts here.' | translate }}</h2>
-      <p class="intro-subtitle">{{ 'This will take a while.' | translate }}</p>
+      <p class="intro-subtitle">{{ 'This will take about 2 minutes.' | translate }}</p>
     </div>
   } @else if (errorMessage) {
     <div class="center-state">
@@ -31,13 +31,11 @@
       <!-- Welcome section -->
       <div class="snap-section">
         <div class="section-inner welcome-section">
-          <div class="advisor-avatar">
-            @if (advisorPhoto) {
+          @if (advisorPhoto) {
+            <div class="advisor-avatar">
               <img [src]="advisorPhoto" [alt]="advisorName" />
-            } @else {
-              <div class="avatar-placeholder">{{ advisorName.charAt(0) }}</div>
-            }
-          </div>
+            </div>
+          }
           <p class="welcome-text">
             {{ 'Hello' | translate }} {{ clientName }},<br/>
             {{ "I'm" | translate }} {{ advisorName }}. {{ 'Looking forward to meeting you.' | translate }}
@@ -45,17 +43,15 @@
         </div>
       </div>
 
-      <!-- About me section -->
-      <div class="snap-section">
-        <div class="section-inner narrative-section">
-          <h3 class="narrative-heading">{{ 'A few words about me' | translate }}</h3>
-          <p class="narrative-body about-me-text">
-            {{ 'I live in Dubai with my wife Luisa.' | translate }}<br/>
-            {{ "When I'm not working, I run and train for marathons and Ironman, and I'm learning guitar." | translate }}<br/>
-            {{ "I've been a consultant for 14 years, and I'm a Bologna F.C. fan." | translate }}
-          </p>
+      <!-- About me section (only shown when advisor has a bio) -->
+      @if (advisorBio) {
+        <div class="snap-section">
+          <div class="section-inner narrative-section">
+            <h3 class="narrative-heading">{{ 'A few words about me' | translate }}</h3>
+            <p class="narrative-body about-me-text">{{ advisorBio }}</p>
+          </div>
         </div>
-      </div>
+      }
 
       <!-- Transition section -->
       <div class="snap-section">
@@ -115,7 +111,7 @@
                       </div>
                     }
                     <button type="button" class="btn-add" (click)="addImportantPerson()">
-                      <span class="add-icon">+</span> <span>{{ 'Add another' | translate }}</span>
+                      <span class="add-icon">+</span> <span>{{ 'Add person' | translate }}</span>
                     </button>
                   </div>
                 } @else if (q.type === 'Goals') {
@@ -249,19 +245,16 @@
             </div>
 
             <div class="success-badge">
-              <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-                <circle cx="24" cy="24" r="24" fill="#22c55e"/>
-                <path d="M15 25l6 6 12-12" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+              <svg width="56" height="56" viewBox="0 0 48 48" fill="none">
+                <circle cx="24" cy="24" r="22" stroke="#22c55e" stroke-width="3" fill="none"/>
+                <path d="M15 25l6 6 12-12" stroke="#22c55e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
               </svg>
+              <h2 class="success-percent">100% {{ 'completed' | translate }}</h2>
             </div>
-            <h2 class="success-percent">100% {{ 'completed' | translate }}</h2>
             <p class="success-title">{{ 'Great work!' | translate }}</p>
             <p class="success-body">{{ "Together, we'll use these insights to build a plan around you." | translate }}</p>
             <div class="success-privacy">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                <path d="M12 2L4 5.5V11c0 5.25 3.4 10.15 8 11.5 4.6-1.35 8-6.25 8-11.5V5.5L12 2z" fill="#6076f6"/>
-                <path d="M10 12l2 2 4-4" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
+              <img src="/assets/images/questionnaire/privacy.svg" alt="share" class="privacy-icon" />
               <span>{{ 'Your answers are private and shared only with your advisor' | translate }}</span>
             </div>
           </div>

@@ -88,7 +88,15 @@
             <!-- Hidden field holds uploaded URL -->
             <input type="hidden" formControlName="profilePhotoUrl">
           </div>
+
         </div>
+      </div>
+
+      <div class="bio-field-wrapper m-t-16">
+        <mat-label class="f-s-16 f-w-400 m-b-8 d-block">{{ 'Bio' | translate }}</mat-label>
+        <mat-form-field appearance="outline" class="w-100">
+          <textarea matInput formControlName="bio" placeholder="{{ 'Tell us a bit about yourself' | translate }}" cdkTextareaAutosize cdkAutosizeMinRows="5" cdkAutosizeMaxRows="10"></textarea>
+        </mat-form-field>
       </div>
     </mat-card-content>
   </mat-card>

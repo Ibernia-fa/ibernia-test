@@ -2,6 +2,12 @@
   padding: 0 12px;
 }
 
+.total-savings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .page-loader {
   display: flex;
   align-items: center;

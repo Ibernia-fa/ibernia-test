@@ -45,6 +45,7 @@ export class ClientQuestionnaireComponent implements OnInit {
   advisorName = '';
   advisorFirstName = '';
   advisorPhoto = '';
+  advisorBio = '';
   currencySymbol = '';
   questions: QuestionModel[] = [];
   showIntro = true;
@@ -79,7 +80,7 @@ export class ClientQuestionnaireComponent implements OnInit {
     setTimeout(() => {
       this.minTimeElapsed = true;
       this.dismissIntroIfReady();
-    }, 2000);
+    }, 5000);
 
     this.route.params.subscribe((params) => {
       this.token = params['token'];
@@ -101,6 +102,7 @@ export class ClientQuestionnaireComponent implements OnInit {
         this.advisorName = data.advisorName;
         this.advisorFirstName = data.advisorName?.split(' ')[0] || data.advisorName;
         this.advisorPhoto = data?.profilePhotoUrl || '';
+        this.advisorBio = data?.bio || '';
         this.currencySymbol = this.resolveCurrencySymbol(data?.currency);
         this.questions = data.questions;
         this.initResponses();
@@ -147,7 +149,8 @@ export class ClientQuestionnaireComponent implements OnInit {
     const el = this.snapContainer?.nativeElement;
     if (!el) return;
 
-    const totalSections = this.questions.length + 5 + (this.submitted ? 1 : 0);
+    const staticSections = this.advisorBio ? 5 : 4;
+    const totalSections = this.questions.length + staticSections + (this.submitted ? 1 : 0);
     const clamped = Math.max(0, Math.min(index, totalSections - 1));
     el.scrollTo({ top: el.clientHeight * clamped, behavior: 'smooth' });
   }
@@ -184,13 +187,19 @@ export class ClientQuestionnaireComponent implements OnInit {
 
   /* ─── Goals helpers ─── */
 
+  private readonly exclusiveOptions = ['Other', 'None of the above'];
+
   toggleGoal(questionId: string, option: string): void {
     const key = `goals_${questionId}`;
     let arr = (this.responses[key] as string[]) || [];
+    const isExclusive = this.exclusiveOptions.includes(option);
+
     if (arr.includes(option)) {
       arr = arr.filter((o) => o !== option);
+    } else if (isExclusive) {
+      arr = [option];
     } else {
-      arr = [...arr, option];
+      arr = [...arr.filter((o) => !this.exclusiveOptions.includes(o)), option];
     }
     this.responses[key] = arr;
   }
@@ -205,10 +214,14 @@ export class ClientQuestionnaireComponent implements OnInit {
   toggleWorry(questionId: string, option: string): void {
     const key = `worry_${questionId}`;
     let arr = (this.responses[key] as string[]) || [];
+    const isExclusive = this.exclusiveOptions.includes(option);
+
     if (arr.includes(option)) {
       arr = arr.filter((o) => o !== option);
+    } else if (isExclusive) {
+      arr = [option];
     } else {
-      arr = [...arr, option];
+      arr = [...arr.filter((o) => !this.exclusiveOptions.includes(o)), option];
     }
     this.responses[key] = arr;
   }
