@@ -40,8 +40,121 @@
 // ── Assumptions card ─────────────────────────────────────────────────────
 .assumptions-card {
   mat-card-content {
-    padding: 20px 24px 24px;
+    padding: 18px 20px 20px;
   }
+}
+
+// New assumptions layout to match screenshot: title pill + 2x2 panels + right actions
+.assumptions-shell {
+  background: #f3f4f7;
+  border-radius: 12px;
+  padding: 14px;
+}
+
+.assumptions-title {
+  display: inline-flex;
+  align-items: center;
+  background: #eceef3;
+  border-radius: 8px;
+  padding: 8px 14px;
+  margin-bottom: 14px;
+}
+
+.assumptions-body {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+.assumptions-form {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 18px;
+}
+
+.assumption-panel {
+  background: #f6f7f9;
+  border: 1px solid #ececf0;
+  border-radius: 10px;
+  padding: 14px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  min-height: 94px;
+
+  &.span-2 {
+    grid-column: 1 / -1;
+  }
+}
+
+.top-rate-panel {
+  display: grid;
+  grid-template-rows: auto auto;
+  align-content: start;
+}
+
+.inflation-header,
+.return-rate-header {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+
+.inflation-header {
+  padding-right: 6px;
+}
+
+.assumption-panel--compact {
+  justify-content: center;
+}
+
+.panel-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+}
+
+.assumptions-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  flex-shrink: 0;
+  margin-top: 80px;
+}
+
+.assumptions-actions .simulate-btn,
+.assumptions-actions .create-plan-btn {
+  width: 250px;
+  height: 42px;
+  border-radius: 6px;
+  justify-content: flex-start;
+  padding: 0 16px !important;
+}
+
+.assumptions-actions .simulate-btn {
+  gap: 10px !important;
+
+  ::ng-deep .mdc-button__label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+}
+
+.play-badge {
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.26);
+  flex-shrink: 0;
 }
 
 // Header row: title left, buttons right
@@ -105,9 +218,9 @@
 }
 
 .assumption-label {
-  font-size: 13px;
-  font-weight: 500;
-  color: rgba(0, 0, 0, 0.65);
+  font-size: 15px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.62);
   white-space: nowrap;
 }
 
@@ -129,12 +242,12 @@
   border: 1px solid rgba(0, 0, 0, 0.23);
   border-radius: 6px;
   overflow: hidden;
-  height: 34px;
+  height: 38px;
   min-width: 68px;
   flex-shrink: 0;
 
   .value-input {
-    width: 40px;
+    width: 42px;
     border: none;
     outline: none;
     padding: 0 4px;
@@ -162,15 +275,23 @@
 .return-rate-header {
   display: flex;
   align-items: center;
-  gap: 6px;
-  flex-wrap: wrap;
+  gap: 10px;
+  flex-wrap: nowrap;
+  min-width: 0;
 
   .pot-selector {
     font-size: 13px;
     font-weight: 600;
+    width: 170px;
+    max-width: 170px;
+    padding: 6px 10px;
+    border: 1px solid #d8dbe3;
+    border-radius: 4px;
+    background: #fff;
 
     .mat-mdc-select-trigger {
       font-size: 13px;
+      min-height: 16px;
     }
   }
 
@@ -293,20 +414,36 @@
   }
 }
 
+.chips-area {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+  flex: 1 1 auto;
+}
+
 .add-change-btn {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 3px 14px;
-  border-radius: 999px;
-  border: 1px solid rgba(0, 0, 0, 0.22);
-  background: transparent;
+  gap: 8px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid #516ce8;
+  background: #fff;
   cursor: pointer;
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
+  color: #516ce8;
+  height: 34px;
   transition: background 0.15s;
   white-space: nowrap;
 
-  &:hover { background: rgba(0, 0, 0, 0.04); }
+  &:hover { background: rgba(81, 108, 232, 0.08); }
+
+  .add-plus {
+    font-size: 17px;
+    line-height: 1;
+  }
 }
 

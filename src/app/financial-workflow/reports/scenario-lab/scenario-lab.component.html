@@ -59,9 +59,10 @@
           <app-savings-bar-stacked-chart
             [report]="displayedReport"
             [client]="client"
-            [forecastStartDate]="financialTimeline.forecastStartDate"
-            [forecastEndDate]="$any(activeTab === 'before' ? financialTimeline.forecastEndtDate : scenarioForecastEndDate)"
+            [forecastStartDate]="$any(baselineForecastStartDate || financialTimeline.forecastStartDate)"
+            [forecastEndDate]="$any(activeTab === 'before' ? (baselineForecastEndDate || financialTimeline.forecastEndtDate) : scenarioForecastEndDate)"
             [cashFlowName]="cashflow.name"
+            [emergencyIconUrl]="'none'"
             [animateUpdates]="true">
           </app-savings-bar-stacked-chart>
         </div>
@@ -71,117 +72,124 @@
     <!-- ── Scenario assumptions card (below chart) ── -->
     <mat-card class="cardWithShadow assumptions-card">
       <mat-card-content>
-        <div class="assumptions-header">
-          <h5 class="f-w-500 m-0">{{ 'Scenario assumptions' | translate }}</h5>
-          <div class="scenario-actions">
-            <button mat-flat-button color="primary" class="simulate-btn" (click)="onSimulate()">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0"><path d="M8 5v14l11-7z"/></svg>
-              {{ 'Simulate scenario' | translate }}
-            </button>
-            <button mat-stroked-button class="create-plan-btn" (click)="onCreatePlanFromScenario()">
-              {{ 'Create plan from scenario' | translate }}
-            </button>
+        <div class="assumptions-shell">
+          <div class="assumptions-title">
+            <h5 class="f-w-500 m-0">{{ 'Scenario assumptions' | translate }}</h5>
           </div>
-        </div>
 
-        <form [formGroup]="scenarioForm">
-          <!-- Row 1: Inflation + Return rate sliders -->
-          <div class="assumptions-sliders-row">
-
-            <!-- Inflation rate -->
-            <div class="assumption-block">
-              <span class="assumption-label">{{ 'Inflation rate' | translate }}</span>
-              <div class="slider-row">
-                <mat-slider class="slider-flex" [min]="0" [max]="20" [step]="0.1">
-                  <input matSliderThumb formControlName="inflationRate" />
-                </mat-slider>
-                <div class="value-input-box">
-                  <input
-                    type="number"
-                    class="value-input"
-                    [value]="scenarioForm.get('inflationRate')?.value"
-                    (change)="onNumericInputChange('inflationRate', $event)"
-                    min="0" max="20" step="0.1" />
-                  <span class="pct-badge">%</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Return rate (only when non-cash pots exist) -->
-            @if (nonCashPots.length) {
-              <div class="assumption-block">
-                <div class="return-rate-header">
-                  <span class="assumption-label">{{ 'Return rate:' | translate }}</span>
-                  <mat-select formControlName="selectedPotId" class="pot-selector" panelClass="pot-select-panel">
-                    @for (pot of nonCashPots; track pot.id) {
-                      <mat-option [value]="pot.id">
-                        <span class="pot-option">
-                          <i-tabler [name]="getPotIcon(pot.type)" class="pot-type-icon"></i-tabler>
-                          {{ pot.name }}
-                        </span>
-                      </mat-option>
-                    }
-                  </mat-select>
+          <div class="assumptions-body">
+            <form [formGroup]="scenarioForm" class="assumptions-form">
+              <!-- Inflation -->
+              <div class="assumption-panel top-rate-panel inflation-panel" [class.span-2]="!nonCashPots.length">
+                <div class="inflation-header">
+                  <span class="assumption-label">{{ 'Inflation rate' | translate }}</span>
                 </div>
                 <div class="slider-row">
-                  <mat-slider class="slider-flex" [min]="0" [max]="30" [step]="0.1">
-                    <input matSliderThumb formControlName="returnRateOverride" />
+                  <mat-slider class="slider-flex" [min]="0" [max]="20" [step]="0.1">
+                    <input matSliderThumb formControlName="inflationRate" />
                   </mat-slider>
                   <div class="value-input-box">
                     <input
                       type="number"
                       class="value-input"
-                      [value]="scenarioForm.get('returnRateOverride')?.value"
-                      (change)="onNumericInputChange('returnRateOverride', $event)"
-                      min="0" max="30" step="0.1" />
+                      [value]="scenarioForm.get('inflationRate')?.value"
+                      (change)="onNumericInputChange('inflationRate', $event)"
+                      min="0" max="20" step="0.1" />
                     <span class="pct-badge">%</span>
                   </div>
                 </div>
               </div>
-            }
-          </div>
 
-          <!-- Row 2: Retirement age + Other changes -->
-          <div class="assumptions-bottom-row">
-
-            <!-- Retirement age stepper -->
-            <div class="retirement-block">
-              <span class="assumption-label">{{ 'Retirement age' | translate }}</span>
-              <div class="age-stepper">
-                <button type="button" class="stepper-btn" (click)="decrementAge()">−</button>
-                <span class="age-value">{{ getRetirementAge() }}</span>
-                <button type="button" class="stepper-btn" (click)="incrementAge()">+</button>
-              </div>
-            </div>
-
-            <!-- Other changes -->
-            <div class="other-changes-block">
-              <span class="assumption-label">{{ 'Other changes:' | translate }}</span>
-              <div class="chips-area">
-                @for (change of otherChanges; track change.id) {
-                  <div class="change-chip">
-                    <span>{{ change.label }}</span>
-                    <button type="button" class="chip-remove-btn" (click)="removeOtherChange(change)">×</button>
+              <!-- Return rate (only when non-cash pots exist) -->
+              @if (nonCashPots.length) {
+                <div class="assumption-panel top-rate-panel return-rate-panel">
+                  <div class="return-rate-header">
+                    <span class="assumption-label">{{ 'Return rate:' | translate }}</span>
+                    <mat-select formControlName="selectedPotId" class="pot-selector" panelClass="pot-select-panel">
+                      @for (pot of nonCashPots; track pot.id) {
+                        <mat-option [value]="pot.id">
+                          <span class="pot-option">
+                            <i-tabler [name]="getPotIcon(pot.type)" class="pot-type-icon"></i-tabler>
+                            {{ pot.name }}
+                          </span>
+                        </mat-option>
+                      }
+                    </mat-select>
                   </div>
-                }
-                <button type="button" class="add-change-btn" [matMenuTriggerFor]="addChangeMenu">
-                  {{ 'Add' | translate }} +
-                </button>
-              </div>
-              <mat-menu #addChangeMenu="matMenu">
-                @for (item of availableChangeItems; track item.id) {
-                  <button mat-menu-item (click)="addOtherChange(item)">
-                    {{ item.label }}
-                  </button>
-                }
-                @if (!availableChangeItems.length) {
-                  <button mat-menu-item disabled>{{ 'No items available' | translate }}</button>
-                }
-              </mat-menu>
-            </div>
+                  <div class="slider-row">
+                    <mat-slider class="slider-flex" [min]="0" [max]="30" [step]="0.1">
+                      <input matSliderThumb formControlName="returnRateOverride" />
+                    </mat-slider>
+                    <div class="value-input-box">
+                      <input
+                        type="number"
+                        class="value-input"
+                        [value]="scenarioForm.get('returnRateOverride')?.value"
+                        (change)="onNumericInputChange('returnRateOverride', $event)"
+                        min="0" max="30" step="0.1" />
+                      <span class="pct-badge">%</span>
+                    </div>
+                  </div>
+                </div>
+              }
 
+              <!-- Retirement age -->
+              <div class="assumption-panel assumption-panel--compact">
+                <div class="panel-row">
+                  <span class="assumption-label">{{ 'Retirement age' | translate }}</span>
+                  <div class="age-stepper">
+                    <button type="button" class="stepper-btn" (click)="decrementAge()">−</button>
+                    <span class="age-value">{{ getRetirementAge() }}</span>
+                    <button type="button" class="stepper-btn" (click)="incrementAge()">+</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Other changes -->
+              <div class="assumption-panel assumption-panel--compact">
+                <div class="panel-row">
+                  <span class="assumption-label">{{ 'Other changes:' | translate }}</span>
+                  <div class="chips-area">
+                    @for (change of otherChanges; track change.id) {
+                      <div class="change-chip">
+                        <span>{{ change.label }}</span>
+                        <button type="button" class="chip-remove-btn" (click)="removeOtherChange(change)">×</button>
+                      </div>
+                    }
+
+                    <button
+                      type="button"
+                      class="add-change-btn"
+                      [matMenuTriggerFor]="otherChangesMenu">
+                      {{ 'Add' | translate }}
+                      <span class="add-plus" aria-hidden="true">+</span>
+                    </button>
+
+                    <mat-menu #otherChangesMenu="matMenu">
+                      @for (item of availableChangeItems; track item.id) {
+                        <button mat-menu-item (click)="addOtherChange(item)" [disabled]="isOtherChangeSelected(item)">
+                          {{ item.label }}
+                        </button>
+                      }
+                    </mat-menu>
+                  </div>
+                </div>
+              </div>
+            </form>
+
+            <div class="assumptions-actions">
+              <button mat-flat-button color="primary" class="simulate-btn" (click)="onSimulate()">
+                <span class="play-badge" aria-hidden="true">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                </span>
+                {{ 'Simulate scenario' | translate }}
+              </button>
+              <button mat-stroked-button class="create-plan-btn" (click)="onCreatePlanFromScenario()">
+                {{ 'Create plan from scenario' | translate }}
+              </button>
+            </div>
           </div>
-        </form>
+        </div>
       </mat-card-content>
     </mat-card>
 

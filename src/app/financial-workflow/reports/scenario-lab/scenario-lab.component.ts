@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject, combineLatest, of } from 'rxjs';
-import { switchMap, tap, takeUntil, catchError, debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { switchMap, tap, takeUntil, catchError } from 'rxjs/operators';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
@@ -25,7 +25,7 @@ import { CashflowHttpService } from 'src/app/clients/services/cashflow-http.serv
 import { NavItemService } from 'src/app/layouts/full/nav-item.service';
 import { Client } from 'src/app/clients/models/client';
 import { Cashflow } from 'src/app/clients/models/cashflow';
-import { FinancialTimeline, EventIncomeType } from '../../timeline/models/financial-timeline';
+import { FinancialTimeline } from '../../timeline/models/financial-timeline';
 import { SavingPotsModel, ClientSaving, SavingPotType } from '../../saving-pots/models/saving-pots.model';
 import { ChartSeries } from '../models/charts-series.model';
 import { SavingsBarStackedChartComponent } from '../savings-bar-stacked-chart/savings-bar-stacked-chart.component';
@@ -37,6 +37,14 @@ export interface ScenarioChangeItem {
   label: string;
   type: 'income' | 'expense' | 'goal' | 'contribution' | 'withdrawal' | string;
 }
+
+const SCENARIO_CHANGE_CATEGORIES: ScenarioChangeItem[] = [
+  { id: 'goal', label: 'Goals', type: 'goal' },
+  { id: 'income', label: 'Incomes', type: 'income' },
+  { id: 'expense', label: 'Expenses', type: 'expense' },
+  { id: 'contribution', label: 'Contributions', type: 'contribution' },
+  { id: 'withdrawal', label: 'Withdrawals', type: 'withdrawal' },
+];
 
 @Component({
   selector: 'app-scenario-lab',
@@ -69,6 +77,9 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
   report: ChartSeries | null = null;
   /** Stable forecast end date for the chart; updated only when report is set to avoid redraw loops. */
   scenarioForecastEndDate: Date | null = null;
+  /** Stable baseline forecast dates (avoid passing changing refs to chart). */
+  baselineForecastStartDate: Date | null = null;
+  baselineForecastEndDate: Date | null = null;
   isLoaderVisible = false;
   scenarioForm: FormGroup;
   nonCashPots: ClientSaving[] = [];
@@ -131,6 +142,12 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
         tap(([timeline, savingPots]) => {
           this.financialTimeline = timeline;
           this.savingPots = savingPots;
+          this.baselineForecastStartDate = timeline?.forecastStartDate
+            ? new Date(timeline.forecastStartDate)
+            : null;
+          this.baselineForecastEndDate = timeline?.forecastEndtDate
+            ? new Date(timeline.forecastEndtDate)
+            : null;
           this.buildNonCashPots();
           this.initFormFromPlan();
           this.populateAvailableChanges();
@@ -151,20 +168,11 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
           }
           this.displayedReport = report;
           this.activeTab = 'after';
-          this.scenarioForecastEndDate = this.getScenarioForecastEndDate();
+          this.updateScenarioForecastEndDateIfNeeded();
           this.getShortfallStatus(report);
         }
       });
 
-    this.scenarioForm.valueChanges
-      .pipe(
-        takeUntil(this.destroy$),
-        debounceTime(400),
-        distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b)),
-      )
-      .subscribe(() => {
-        if (this.financialTimeline && this.client) this.applyScenario();
-      });
   }
 
   private buildNonCashPots(): void {
@@ -248,7 +256,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
         this.alignSeriesStructure();
         this.activeTab = 'after';
         this.displayedReport = report;
-        this.scenarioForecastEndDate = this.getScenarioForecastEndDate();
+        this.updateScenarioForecastEndDateIfNeeded();
         this.getShortfallStatus(report);
       }
     });
@@ -311,11 +319,18 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
     return new Date(birthYear + retirementAge, 11, 31);
   }
 
+  private updateScenarioForecastEndDateIfNeeded(): void {
+    const next = this.getScenarioForecastEndDate();
+    if (!this.scenarioForecastEndDate || this.scenarioForecastEndDate.getTime() !== next.getTime()) {
+      this.scenarioForecastEndDate = next;
+    }
+  }
+
   onBack(): void {
     this.router.navigate(['/cashflows', this.cashflowId, 'reports']);
   }
 
-  /** Explicitly simulate the scenario (also auto-runs on form change via debounce) */
+  /** Explicitly simulate the scenario (only runs on button click). */
   onSimulate(): void {
     if (this.financialTimeline && this.client) this.applyScenario();
   }
@@ -343,28 +358,16 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
   // ── Other changes ────────────────────────────────────────────────────────
 
   private populateAvailableChanges(): void {
-    if (!this.financialTimeline?.clientEvents) {
-      this.availableChangeItems = [];
-      return;
-    }
-    const seen = new Set<string>();
-    this.availableChangeItems = this.financialTimeline.clientEvents
-      .filter((e) => !e.isPlaceHolder && e.name)
-      .filter((e) => {
-        if (seen.has(e.id)) return false;
-        seen.add(e.id);
-        return true;
-      })
-      .map((e) => ({
-        id: e.id,
-        label: e.name,
-        type: e.type === EventIncomeType.Income ? 'income' : 'expense',
-      }));
+    this.availableChangeItems = [...SCENARIO_CHANGE_CATEGORIES];
   }
 
   addOtherChange(item: ScenarioChangeItem): void {
     if (this.otherChanges.some((c) => c.id === item.id)) return;
     this.otherChanges = [...this.otherChanges, item];
+  }
+
+  isOtherChangeSelected(item: ScenarioChangeItem): boolean {
+    return this.otherChanges.some((c) => c.id === item.id);
   }
 
   removeOtherChange(item: ScenarioChangeItem): void {
