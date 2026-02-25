@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject, combineLatest, of } from 'rxjs';
-import { switchMap, tap, takeUntil, catchError, debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { switchMap, tap, takeUntil, catchError } from 'rxjs/operators';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
@@ -10,8 +10,12 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSliderModule } from '@angular/material/slider';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatIconModule } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
 import { TranslateModule } from '@ngx-translate/core';
+import { TablerIconsModule } from 'angular-tabler-icons';
 
 import { FinancialWorkflowService } from '../../services/financial-workflow.service';
 import { TimelineHttpService } from '../../timeline/services/timeline-http.service';
@@ -28,6 +32,20 @@ import { SavingsBarStackedChartComponent } from '../savings-bar-stacked-chart/sa
 import { ToastrService } from 'ngx-toastr';
 import { ScenarioNameDialogComponent } from './scenario-name-dialog/scenario-name-dialog.component';
 
+export interface ScenarioChangeItem {
+  id: string;
+  label: string;
+  type: 'income' | 'expense' | 'goal' | 'contribution' | 'withdrawal' | string;
+}
+
+const SCENARIO_CHANGE_CATEGORIES: ScenarioChangeItem[] = [
+  { id: 'goal', label: 'Goals', type: 'goal' },
+  { id: 'income', label: 'Incomes', type: 'income' },
+  { id: 'expense', label: 'Expenses', type: 'expense' },
+  { id: 'contribution', label: 'Contributions', type: 'contribution' },
+  { id: 'withdrawal', label: 'Withdrawals', type: 'withdrawal' },
+];
+
 @Component({
   selector: 'app-scenario-lab',
   standalone: true,
@@ -40,8 +58,12 @@ import { ScenarioNameDialogComponent } from './scenario-name-dialog/scenario-nam
     MatSelectModule,
     MatButtonModule,
     MatProgressSpinnerModule,
+    MatSliderModule,
+    MatMenuModule,
+    MatIconModule,
     SavingsBarStackedChartComponent,
     TranslateModule,
+    TablerIconsModule,
   ],
   templateUrl: './scenario-lab.component.html',
   styleUrl: './scenario-lab.component.scss',
@@ -55,11 +77,27 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
   report: ChartSeries | null = null;
   /** Stable forecast end date for the chart; updated only when report is set to avoid redraw loops. */
   scenarioForecastEndDate: Date | null = null;
+  /** Stable baseline forecast dates (avoid passing changing refs to chart). */
+  baselineForecastStartDate: Date | null = null;
+  baselineForecastEndDate: Date | null = null;
   isLoaderVisible = false;
   scenarioForm: FormGroup;
   nonCashPots: ClientSaving[] = [];
   hasShortfall = false;
   firstShortfallAge: number | null = null;
+
+  /** Items available to add as "Other changes" chips */
+  availableChangeItems: ScenarioChangeItem[] = [];
+  /** Currently selected other-change chips */
+  otherChanges: ScenarioChangeItem[] = [];
+
+  /** The unmodified baseline plan report (stored once on first load) */
+  baselineReport: ChartSeries | null = null;
+  /** The report currently shown in the chart — either baseline or scenario */
+  displayedReport: ChartSeries | null = null;
+  /** Controls which tab is active in the chart card */
+  activeTab: 'before' | 'after' = 'after';
+
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -104,8 +142,15 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
         tap(([timeline, savingPots]) => {
           this.financialTimeline = timeline;
           this.savingPots = savingPots;
+          this.baselineForecastStartDate = timeline?.forecastStartDate
+            ? new Date(timeline.forecastStartDate)
+            : null;
+          this.baselineForecastEndDate = timeline?.forecastEndtDate
+            ? new Date(timeline.forecastEndtDate)
+            : null;
           this.buildNonCashPots();
           this.initFormFromPlan();
+          this.populateAvailableChanges();
         }),
         switchMap(() => this.loadScenarioReport()),
         catchError((err) => {
@@ -117,20 +162,17 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
       .subscribe((report) => {
         if (report) {
           this.report = report;
-          this.scenarioForecastEndDate = this.getScenarioForecastEndDate();
+          // Store as baseline (only on initial load)
+          if (!this.baselineReport) {
+            this.baselineReport = report;
+          }
+          this.displayedReport = report;
+          this.activeTab = 'after';
+          this.updateScenarioForecastEndDateIfNeeded();
           this.getShortfallStatus(report);
         }
       });
 
-    this.scenarioForm.valueChanges
-      .pipe(
-        takeUntil(this.destroy$),
-        debounceTime(400),
-        distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b)),
-      )
-      .subscribe(() => {
-        if (this.financialTimeline && this.client) this.applyScenario();
-      });
   }
 
   private buildNonCashPots(): void {
@@ -211,8 +253,48 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
     this.loadScenarioReport().pipe(takeUntil(this.destroy$)).subscribe((report) => {
       if (report) {
         this.report = report;
-        this.scenarioForecastEndDate = this.getScenarioForecastEndDate();
+        this.alignSeriesStructure();
+        this.activeTab = 'after';
+        this.displayedReport = report;
+        this.updateScenarioForecastEndDateIfNeeded();
         this.getShortfallStatus(report);
+      }
+    });
+  }
+
+  /** Switch between the original plan (Before) and the current scenario (After). */
+  switchTab(tab: 'before' | 'after'): void {
+    this.activeTab = tab;
+    this.displayedReport = tab === 'before' ? this.baselineReport : this.report;
+    if (tab === 'after' && this.report) this.getShortfallStatus(this.report);
+    if (tab === 'before' && this.baselineReport) this.getShortfallStatus(this.baselineReport);
+  }
+
+  /**
+   * Aligns the series structure between baselineReport and the current scenario report
+   * so ApexCharts can morph smoothly (same number of series in both).
+   */
+  private alignSeriesStructure(): void {
+    if (!this.baselineReport || !this.report) return;
+    const baseline = this.baselineReport;
+    const scenario = this.report;
+
+    const allNames: string[] = [];
+    [...scenario.series, ...baseline.series].forEach((s: any) => {
+      if (!allNames.includes(s.name)) allNames.push(s.name);
+    });
+
+    const baselineCategoryCount = baseline.categories.length;
+    const scenarioCategoryCount = scenario.categories.length;
+
+    allNames.forEach(name => {
+      if (!baseline.series.find((s: any) => s.name === name)) {
+        const ref = scenario.series.find((s: any) => s.name === name);
+        if (ref) baseline.series.push({ ...ref, data: new Array(baselineCategoryCount).fill(0) });
+      }
+      if (!scenario.series.find((s: any) => s.name === name)) {
+        const ref = baseline.series.find((s: any) => s.name === name);
+        if (ref) scenario.series.push({ ...ref, data: new Array(scenarioCategoryCount).fill(0) });
       }
     });
   }
@@ -237,9 +319,79 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
     return new Date(birthYear + retirementAge, 11, 31);
   }
 
+  private updateScenarioForecastEndDateIfNeeded(): void {
+    const next = this.getScenarioForecastEndDate();
+    if (!this.scenarioForecastEndDate || this.scenarioForecastEndDate.getTime() !== next.getTime()) {
+      this.scenarioForecastEndDate = next;
+    }
+  }
+
   onBack(): void {
     this.router.navigate(['/cashflows', this.cashflowId, 'reports']);
   }
+
+  /** Explicitly simulate the scenario (only runs on button click). */
+  onSimulate(): void {
+    if (this.financialTimeline && this.client) this.applyScenario();
+  }
+
+  // ── Retirement age stepper ───────────────────────────────────────────────
+
+  getRetirementAge(): number {
+    return Number(this.scenarioForm.get('retirementAge')?.value) || 65;
+  }
+
+  decrementAge(): void {
+    const current = this.getRetirementAge();
+    if (current > 18) {
+      this.scenarioForm.patchValue({ retirementAge: current - 1 });
+    }
+  }
+
+  incrementAge(): void {
+    const current = this.getRetirementAge();
+    if (current < 100) {
+      this.scenarioForm.patchValue({ retirementAge: current + 1 });
+    }
+  }
+
+  // ── Other changes ────────────────────────────────────────────────────────
+
+  private populateAvailableChanges(): void {
+    this.availableChangeItems = [...SCENARIO_CHANGE_CATEGORIES];
+  }
+
+  addOtherChange(item: ScenarioChangeItem): void {
+    if (this.otherChanges.some((c) => c.id === item.id)) return;
+    this.otherChanges = [...this.otherChanges, item];
+  }
+
+  isOtherChangeSelected(item: ScenarioChangeItem): boolean {
+    return this.otherChanges.some((c) => c.id === item.id);
+  }
+
+  removeOtherChange(item: ScenarioChangeItem): void {
+    this.otherChanges = this.otherChanges.filter((c) => c.id !== item.id);
+  }
+
+  /** Sync the standalone number input (not using formControlName) back to the form control */
+  onNumericInputChange(field: string, event: Event): void {
+    const val = parseFloat((event.target as HTMLInputElement).value);
+    if (!isNaN(val)) {
+      this.scenarioForm.patchValue({ [field]: val });
+    }
+  }
+
+  /** Returns a tabler icon name for a saving pot type */
+  getPotIcon(type: SavingPotType): string {
+    switch (type) {
+      case SavingPotType.Investment:  return 'chart-line';
+      case SavingPotType.PensionFund: return 'building-bank';
+      default:                        return 'wallet';
+    }
+  }
+
+  // ────────────────────────────────────────────────────────────────────────
 
   onCreatePlanFromScenario(): void {
     if (!this.cashflow || !this.client) return;

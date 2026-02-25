@@ -176,11 +176,22 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
         filter((res) => !!res),
         tap((res) => {
 
-          // cash all events
-          this.cachedSystemEventsLibrary = [
+          // Merge system + custom events, deduplicate by name to prevent chips like
+          // 'Retirement age' appearing twice if returned by both endpoints.
+          const dedupeByName = (events: any[]) => {
+            const seen = new Set<string>();
+            return events.filter(e => {
+              if (seen.has(e.name)) return false;
+              seen.add(e.name);
+              return true;
+            });
+          };
+
+          // cache all events
+          this.cachedSystemEventsLibrary = dedupeByName([
             ...res[0],
             ...res[1],
-          ]
+          ])
             .filter(event =>
               event.name !== 'State pension'
             )
@@ -194,10 +205,10 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
           // Build full chip list (all events except State pension).
           // syncRetirementChipVisibility() below is the single source of truth
           // for whether Retirement age chip is visible — do not duplicate that logic here.
-          this.systemEventsLibrary = [
+          this.systemEventsLibrary = dedupeByName([
             ...res[0],
             ...res[1],
-          ]
+          ])
             .filter(event => event.name !== 'State pension')
             .sort((a, b) =>
               this.CHIP_ORDER.indexOf(a.name) - this.CHIP_ORDER.indexOf(b.name)
