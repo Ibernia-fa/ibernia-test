@@ -83,6 +83,9 @@
             <mat-card class="question-card">
               <mat-card-content>
                 <h3 class="question-text">{{ q.text }}</h3>
+                @if (q.subtitle) {
+                  <p class="question-subtitle">{{ q.subtitle }}</p>
+                }
 
                 @if (q.type === 'ImportantPeople') {
                   <div class="important-people">
@@ -95,96 +98,115 @@
                           placeholder="{{ 'Name' | translate }}"
                           class="person-name"
                         />
-                        <mat-form-field appearance="outline" class="person-relationship">
-                          <mat-label>{{ 'Relationship' | translate }}</mat-label>
-                          <mat-select [(ngModel)]="person.relationship" [ngModelOptions]="{standalone: true}">
-                            @for (opt of q.options; track opt) {
-                              <mat-option [value]="opt">{{ opt }}</mat-option>
+                        <div class="person-relationship-row">
+                          <mat-select
+                            [(ngModel)]="person.relationship"
+                            [ngModelOptions]="{standalone: true}"
+                            class="person-relationship-select"
+                            panelClass="questionnaire-select-panel"
+                            placeholder="{{ 'Relationship' | translate }}"
+                          >
+                            @for (opt of q.options; track opt.value) {
+                              <mat-option [value]="opt.value">{{ opt.value }}</mat-option>
                             }
                           </mat-select>
-                        </mat-form-field>
-                        @if (importantPeople.length > 1) {
                           <button type="button" class="btn-remove" (click)="removeImportantPerson($index)">×</button>
-                        }
+                        </div>
                       </div>
                     }
                     <button type="button" class="btn-add" (click)="addImportantPerson()">
-                      <span>+</span> <span>{{ 'Add another' | translate }}</span>
+                      <span class="add-icon">+</span> <span>{{ 'Add another' | translate }}</span>
                     </button>
                   </div>
                 } @else if (q.type === 'Goals') {
                   <div class="chip-list">
-                    @for (opt of q.options; track opt) {
-                      <label class="option-chip">
+                    @for (opt of q.options; track opt.value) {
+                      <label class="option-chip" [class.has-icon]="opt.iconUrl">
                         <input
                           type="checkbox"
-                          [checked]="isGoalSelected(q.id, opt)"
-                          (change)="toggleGoal(q.id, opt)"
+                          [checked]="isGoalSelected(q.id, opt.value)"
+                          (change)="toggleGoal(q.id, opt.value)"
                         />
-                        <span>@if (opt === 'Other') { ... }{{ opt }}</span>
+                        <span>
+                          @if (opt.iconUrl) {
+                            <img [src]="'/assets/images/questionnaire/' + opt.iconUrl + '.svg'" [alt]="opt.value" class="option-icon" />
+                          }
+                          {{ opt.value }}
+                        </span>
                       </label>
                     }
                   </div>
                   @if (isGoalSelected(q.id, 'Other')) {
-                    <mat-form-field appearance="outline" class="others-field white-field">
-                      <mat-label>{{ 'Others (please specify)' | translate }}</mat-label>
-                      <input matInput [(ngModel)]="othersByQuestion['goals_' + q.id]" [ngModelOptions]="{standalone: true}" />
-                    </mat-form-field>
+                    <textarea
+                      class="others-textarea"
+                      [(ngModel)]="othersByQuestion['goals_' + q.id]"
+                      [ngModelOptions]="{standalone: true}"
+                      placeholder="{{ 'Type your goals here' | translate }}"
+                    ></textarea>
                   }
                 } @else if (q.type === 'InvestableAssets') {
                   <div class="radio-list">
-                    @for (opt of q.options; track opt) {
+                    @for (opt of q.options; track opt.value) {
                       <label class="option-radio">
                         <input
                           type="radio"
                           [name]="'q_' + q.id"
-                          [value]="opt"
-                          [checked]="getSingleSelect(q.id) === opt"
-                          (change)="setSingleSelect(q.id, opt)"
+                          [value]="opt.value"
+                          [checked]="getSingleSelect(q.id) === opt.value"
+                          (change)="setSingleSelect(q.id, opt.value)"
                         />
-                        <span>{{ formatAssetOption(opt) }}</span>
+                        <span>{{ formatAssetOption(opt.value) }}</span>
                       </label>
                     }
                   </div>
                 } @else if (q.type === 'InvestmentApproach') {
                   <div class="radio-list">
-                    @for (opt of q.options; track opt) {
+                    @for (opt of q.options; track opt.value) {
                       <label class="option-radio">
                         <input
                           type="radio"
                           [name]="'q_' + q.id"
-                          [value]="opt"
-                          [checked]="getSingleSelect(q.id) === opt"
-                          (change)="setSingleSelect(q.id, opt)"
+                          [value]="opt.value"
+                          [checked]="getSingleSelect(q.id) === opt.value"
+                          (change)="setSingleSelect(q.id, opt.value)"
                         />
-                        <span>{{ opt }}</span>
+                        <span>{{ opt.value }}</span>
                       </label>
                     }
                   </div>
                 } @else if (q.type === 'AreasOfWorry') {
                   <div class="chip-list">
-                    @for (opt of q.options; track opt) {
-                      <label class="option-chip">
+                    @for (opt of q.options; track opt.value) {
+                      <label class="option-chip" [class.has-icon]="opt.iconUrl">
                         <input
                           type="checkbox"
-                          [checked]="isWorrySelected(q.id, opt)"
-                          (change)="toggleWorry(q.id, opt)"
+                          [checked]="isWorrySelected(q.id, opt.value)"
+                          (change)="toggleWorry(q.id, opt.value)"
                         />
-                        <span>@if (opt === 'Other') { ... }{{ opt }}</span>
+                        <span>
+                          @if (opt.iconUrl) {
+                            <img [src]="'/assets/images/questionnaire/' + opt.iconUrl + '.svg'" [alt]="opt.value" class="option-icon" />
+                          }
+                          {{ opt.value }}
+                        </span>
                       </label>
                     }
                   </div>
                   @if (isWorrySelected(q.id, 'Other')) {
-                    <mat-form-field appearance="outline" class="others-field white-field">
-                      <mat-label>{{ 'Others (please specify)' | translate }}</mat-label>
-                      <input matInput [(ngModel)]="othersByQuestion['worry_' + q.id]" [ngModelOptions]="{standalone: true}" />
-                    </mat-form-field>
+                    <textarea
+                      class="others-textarea"
+                      [(ngModel)]="othersByQuestion['worry_' + q.id]"
+                      [ngModelOptions]="{standalone: true}"
+                      placeholder="{{ 'Others (please specify)' | translate }}"
+                    ></textarea>
                   }
                 } @else if (q.type === 'FinancialPlanningImprovement') {
-                  <mat-form-field appearance="outline" class="full-width white-field">
-                    <mat-label>{{ 'Your response' | translate }}</mat-label>
-                    <textarea matInput [(ngModel)]="financialPlanningByQuestion[q.id]" [ngModelOptions]="{standalone: true}" rows="6"></textarea>
-                  </mat-form-field>
+                  <textarea
+                    class="financial-textarea"
+                    [(ngModel)]="financialPlanningByQuestion[q.id]"
+                    [ngModelOptions]="{standalone: true}"
+                    placeholder="{{ 'Share your thoughts...' | translate }}"
+                  ></textarea>
                 }
               </mat-card-content>
             </mat-card>
@@ -207,7 +229,8 @@
               @if (isSubmitting) {
                 <mat-spinner diameter="24"></mat-spinner>
               } @else {
-                <span>{{ 'Share With' | translate }} {{ advisorName }}</span>
+                <img src="/assets/images/questionnaire/share.svg" alt="share" class="share-icon" />
+                <span>{{ 'Share with' | translate }} {{ advisorFirstName }}</span>
               }
             </button>
           </div>

@@ -1,12 +1,18 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
+export interface QuestionOptionDto {
+  value: string;
+  iconUrl: string;
+}
+
 export interface QuestionModel {
   id: string;
   text: string;
+  subtitle: string;
   type: string;
   order: number;
-  options: string[];
+  options: QuestionOptionDto[];
 }
 
 export interface CreateQuestionnaireLinkRequest {

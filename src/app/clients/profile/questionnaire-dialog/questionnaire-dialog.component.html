@@ -46,7 +46,12 @@
             class="question-checkbox"
           >
           </mat-checkbox>
-          <span class="question-text f-s-16">{{ question.text }}</span>
+          <div class="question-text-wrapper">
+            <span class="question-text f-s-16">{{ question.text }}</span>
+            <!-- @if (question.subtitle) {
+              <span class="question-subtitle f-s-12">{{ question.subtitle }}</span>
+            } -->
+          </div>
         </div>
       }
     </div>

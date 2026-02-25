@@ -43,6 +43,7 @@ export class ClientQuestionnaireComponent implements OnInit {
   clientName = '';
   advisorId = '';
   advisorName = '';
+  advisorFirstName = '';
   advisorPhoto = '';
   currencySymbol = '';
   questions: QuestionModel[] = [];
@@ -98,6 +99,7 @@ export class ClientQuestionnaireComponent implements OnInit {
         this.clientName = data.clientName;
         this.advisorId = data.advisorId;
         this.advisorName = data.advisorName;
+        this.advisorFirstName = data.advisorName?.split(' ')[0] || data.advisorName;
         this.advisorPhoto = data?.profilePhotoUrl || '';
         this.currencySymbol = this.resolveCurrencySymbol(data?.currency);
         this.questions = data.questions;
@@ -173,9 +175,7 @@ export class ClientQuestionnaireComponent implements OnInit {
   }
 
   removeImportantPerson(index: number): void {
-    if (this.importantPeople.length > 1) {
-      this.importantPeople.splice(index, 1);
-    }
+    this.importantPeople.splice(index, 1);
   }
 
   getImportantPeopleValue(): { name: string; relationship: string }[] {
@@ -228,7 +228,7 @@ export class ClientQuestionnaireComponent implements OnInit {
 
   formatAssetOption(option: string): string {
     if (!this.currencySymbol) return option;
-    return option.replace(/(\d[\d,]*(\.\d+)?)/g, `${this.currencySymbol}$1`);
+    return option.replace(/\d[\d,]*(\.\d+)?/g, (match) => `${this.currencySymbol}${match}`);
   }
 
   /* ─── Single-select helpers ─── */
