@@ -27,6 +27,8 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
   @Input() cashFlowName: string;
   @Input() chartHeight: number = 500;
   @Input() emergencyIconUrl?: string;
+  /** When true, enables smooth bar morphing animation on data updates (dynamicAnimation). */
+  @Input() animateUpdates: boolean = false;
   isFullscreen: any;
 
   private readonly EVENT_DOT_SPACING = 20;
@@ -47,6 +49,10 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
   private eventLabelElements: HTMLElement[] = [];
   private shortfallDataPointIndex: number = -1;
   private emergencyExpenseDataPointIndex: number = -1;
+  /** Tracks whether the chart has been rendered at least once (used to skip full re-inits on subsequent series updates). */
+  private chartInitialized = false;
+  /** Last categories string used to detect genuine axis changes vs. same-length updates. */
+  private previousCategoriesKey = '';
 
   private getCurrencyAxisTitle(): string {
     return this.client?.clientDetails?.preferredCurrency ?? '';
@@ -60,7 +66,14 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
         height: 500,
         stacked: true,
         animations: {
+          // Keep disabled by default to preserve existing report-page behavior.
+          // Scenario Lab passes `animateUpdates=true`, which turns this on in ngOnChanges.
           enabled: false,
+          dynamicAnimation: {
+            enabled: true,
+            speed: 450,
+          },
+          animateGradually: { enabled: false },
         },
         toolbar: {
           show: false,
@@ -106,7 +119,9 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
       .map((seriesName: string, i: number) => {
         const value = series[i]?.[dataPointIndex];
         if (value === undefined || (typeof value === 'number' && value === 0)) return '';
-        const color = w.globals.colors[i];
+        // Use the original series color (before transparent override) so tooltip dots are always visible
+        const originalSeries = this.report?.series?.find(s => s.name === seriesName);
+        const color = (originalSeries?.color && originalSeries.color !== 'transparent') ? originalSeries.color : w.globals.colors[i];
         const displayValue = typeof value === 'number'
           ? this.formatCurrency(value)
           : String(value ?? '');
@@ -194,16 +209,34 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    const hideEmergencyOverlays = this.emergencyIconUrl === 'none';
+
     const parsedHeight = Number(this.chartHeight);
     const effectiveHeight =
       Number.isFinite(parsedHeight) && parsedHeight > 0
         ? parsedHeight
         : 500;
 
-    this.chartOptions.chart = {
-      ...this.chartOptions.chart,
-      height: effectiveHeight
-    };
+    // Only update chart options (triggers full re-render) when chartHeight itself changed.
+    // Doing this unconditionally was causing a full re-render on every series update.
+    if (changes['chartHeight']) {
+      this.chartOptions.chart = {
+        ...this.chartOptions.chart,
+        height: effectiveHeight
+      };
+    }
+
+    // Enable smooth morphing only for contexts that explicitly ask for it.
+    // This is a one-time (or rare) update and should not run on every report change.
+    if (changes['animateUpdates']) {
+      this.chartOptions.chart = {
+        ...this.chartOptions.chart,
+        animations: {
+          ...this.chartOptions.chart.animations,
+          enabled: !!this.animateUpdates,
+        }
+      };
+    }
 
     if (!this.report?.series?.length) {
       if (changes['client'] && this.client) {
@@ -227,60 +260,76 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
       this.cleanupEmergencyElements();
       this.cleanupEventLabels();
 
-      const seriesList = report.series;
-      const seriesColors = this.chartOptions.colors || [];
-
-      // dynamically build fillColors array based on series names
-      const fillColors = seriesList.map((s, i) => {
-        if (s.name === 'Current Account (Negative)' || s.name === 'Emergency Expense') {
-          return 'transparent';
-        }
-        return s.color
-      });
-
-      // legends formatter to hide specific series names
-      this.chartOptions.legend = {
-        ...this.chartOptions.legend,
-
-        formatter: (seriesName: string) => {
-          if (seriesName === 'Current Account (Negative)' || seriesName === 'Emergency Expense') {
-            return '';
-          }
-          return seriesName;
-        },
-        markers: {
-          fillColors: fillColors
-        },
-        onItemClick: {
-          toggleDataSeries: true
-        },
-        onItemHover: {
-          highlightDataSeries: true
-        }
-      };
-
       // goals and events dots
       this.events = report.timelineEvents ?? [];
 
-      // Build annotations: event dots + emergency year highlight
-      const eventAnnotations = this.events.length > 0
-        ? this.buildEventAnnotations(this.events)
-        : [];
-      const emergencyXAxis = this.buildEmergencyAnnotation(report);
-      const emergencyExpenseXAxis = this.buildEmergencyExpenseAnnotation(report);
+      // Always compute shortfall/emergency indices (needed for overlay rendering)
+      const emergencyXAxis = hideEmergencyOverlays ? [] : this.buildEmergencyAnnotation(report);
+      const emergencyExpenseXAxis = hideEmergencyOverlays ? [] : this.buildEmergencyExpenseAnnotation(report);
 
-      this.chartOptions.annotations = {
-        points: eventAnnotations,
-        xaxis: [...emergencyXAxis, ...emergencyExpenseXAxis]
-      };
+      // Only rebuild legend and annotations when NOT in animated-update mode (or on first render).
+      // Re-assigning these inputs triggers ng-apexcharts updateOptions → full re-render.
+      if (!this.animateUpdates || !this.chartInitialized) {
+        const seriesList = report.series;
+
+        // dynamically build fillColors array based on series names
+        const fillColors = seriesList.map((s, i) => {
+          if (s.name === 'Current Account (Negative)' || s.name === 'Emergency Expense') {
+            return 'transparent';
+          }
+          return s.color
+        });
+
+        // legends formatter to hide specific series names
+        this.chartOptions.legend = {
+          ...this.chartOptions.legend,
+
+          formatter: (seriesName: string) => {
+            if (seriesName === 'Current Account (Negative)' || seriesName === 'Emergency Expense') {
+              return '';
+            }
+            return seriesName;
+          },
+          markers: {
+            fillColors: fillColors
+          },
+          onItemClick: {
+            toggleDataSeries: true
+          },
+          onItemHover: {
+            highlightDataSeries: true
+          }
+        };
+
+        this.chartOptions.annotations = {
+          points: [],
+          xaxis: [...emergencyXAxis, ...emergencyExpenseXAxis]
+        };
+      }
 
       setTimeout(() => {
         if (this.events.length > 0) this.attachHtmlTooltips();
-        this.attachEmergencyExpenseIcon();
+        if (hideEmergencyOverlays) {
+          this.cleanupEmergencyElements();
+        } else {
+          this.attachEmergencyExpenseIcon();
+          // Show the shortfall icon only when there is no emergency-expense column.
+          // If an emergency expense exists it already marks the relevant date; showing
+          // a second shortfall icon on a different column would be confusing.
+          if (this.emergencyExpenseDataPointIndex < 0) {
+            this.attachEmergencyIcon();
+          } else {
+            // Clean up any stale shortfall overlay from a previous render
+            if (this.emergencyIconEl) { this.emergencyIconEl.remove(); this.emergencyIconEl = null; }
+            if (this.emergencyIconLineEl) { this.emergencyIconLineEl.remove(); this.emergencyIconLineEl = null; }
+            if (this.emergencyIconBandEl) { this.emergencyIconBandEl.remove(); this.emergencyIconBandEl = null; }
+          }
+        }
       }, 50);
     }
 
-    this.chartOptions.chart = { ...this.chartOptions.chart };
+    // NOTE: animations.dynamicAnimation is configured in the constructor and stays stable.
+    // Do NOT reassign chartOptions.chart here — that triggers a full re-render via updateOptions.
 
     // if (
     //   (changes['forecastStartDate'] || changes['forecastEndDate']) &&
@@ -298,7 +347,14 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
     //   }
     // }
 
-    if (changes['report'] || changes['forecastStartDate'] || changes['forecastEndDate']) {
+    // Rebuild xaxis only when: first init, OR categories actually changed, OR NOT in animateUpdates mode.
+    // Skipping this when animateUpdates + same categories avoids triggering updateOptions (full re-render).
+    const currentCategoriesKey = (report.categories ?? []).join(',');
+    const categoriesChanged = currentCategoriesKey !== this.previousCategoriesKey;
+    this.previousCategoriesKey = currentCategoriesKey;
+    this.chartInitialized = true;
+
+    if (!this.animateUpdates || categoriesChanged || changes['forecastStartDate'] || changes['forecastEndDate']) {
     const categories = report.categories ?? [];
 
     let firstYear = categories.length ? Number(categories[0]) : undefined;
@@ -375,6 +431,7 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
     // final series assignment
     this.chartOptions.series = report.series.map((s, idx) => ({
       ...s,
+      color: (s.name === 'Current Account (Negative)' || s.name === 'Emergency Expense') ? 'transparent' : s.color,
       tack: 'stack1',
       order: s.name === 'Emergency Expense' ? report.series.length : idx,
       fill: {
@@ -683,13 +740,11 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
     const iconSize = 18; // px — matches font-size
     const iconTop = Math.max(2, plotTop - iconSize - 2);
     const icon = document.createElement('div');
-    icon.textContent = '⚠';
+    icon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FF4560" width="${iconSize}" height="${iconSize}"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>`;
     icon.style.position = 'absolute';
     icon.style.pointerEvents = 'none';
     icon.style.zIndex = '11';
     icon.style.lineHeight = '1';
-    icon.style.fontSize = `${iconSize}px`;
-    icon.style.color = '#FF4560';
     icon.style.transform = 'translateX(-50%)';
     icon.style.left = `${barCenterX - hostRect.left}px`;
     icon.style.top = `${iconTop}px`;

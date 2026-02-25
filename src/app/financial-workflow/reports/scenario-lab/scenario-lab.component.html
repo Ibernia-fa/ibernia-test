@@ -1,63 +1,41 @@
 <div class="d-flex gap-24 flex-column">
   @if (!isLoaderVisible && client && cashflow && financialTimeline) {
+
+    <!-- ── Header card ── -->
     <mat-card class="cardWithShadow">
       <mat-card-content>
-        <div class="d-flex flex-column gap-32 timeline-wrapper">
-          <div class="card-main-wrapper">
-            <div class="d-flex align-items-center justify-content-between w-100 gap-16 flex-wrap">
-              <div class="d-flex align-items-center gap-16">
-                <div class="icon-wrapper d-flex align-items-center justify-content-center">
-                  <img width="24" src="assets/images/svgs/scenario-lab-icon.svg" alt="Scenario Lab" class="scenario-lab-icon" />
-                </div>
-                <div class="d-flex flex-column justify-content-between gap-4">
-                  <h4 class="page-title f-w-500">{{ 'Scenario Lab' | translate }}</h4>
-                  <p class="mat-body-2 text-muted">{{ 'Change assumptions and see how the plan evolves.' | translate }}</p>
-                </div>
-              </div>
-              <div class="d-flex align-items-center gap-12">
-                <button mat-stroked-button (click)="onBack()">
-                  {{ 'Back to Lifetime Plan' | translate }}
-                </button>
-              </div>
+        <div class="d-flex align-items-center justify-content-between w-100 gap-16 flex-wrap">
+          <div class="d-flex align-items-center gap-16">
+            <div class="icon-wrapper d-flex align-items-center justify-content-center">
+              <img width="24" src="assets/images/svgs/scenario-lab-icon.svg" alt="Scenario Lab" class="scenario-lab-page-icon" />
+            </div>
+            <div class="d-flex flex-column justify-content-between gap-4">
+              <h4 class="page-title f-w-500">{{ 'Scenario Lab' | translate }}</h4>
+              <p class="mat-body-2 text-muted">{{ 'Change assumptions and see how the plan evolves.' | translate }}</p>
             </div>
           </div>
+          <button mat-stroked-button (click)="onBack()">
+            {{ 'Back to Lifetime Plan' | translate }}
+          </button>
         </div>
       </mat-card-content>
     </mat-card>
 
-    <mat-card class="cardWithShadow">
-      <mat-card-content>
-        <h5 class="f-w-500 mb-16">{{ 'Assumptions' | translate }}</h5>
-        <form [formGroup]="scenarioForm" class="scenario-form d-flex flex-wrap gap-24 align-items-end">
-          <mat-form-field appearance="outline" class="field-inflation">
-            <mat-label>{{ 'Inflation (%)' | translate }}</mat-label>
-            <input matInput type="number" formControlName="inflationRate" step="0.1" min="0" />
-          </mat-form-field>
-          <mat-form-field appearance="outline" class="field-retirement">
-            <mat-label>{{ 'Retirement age' | translate }}</mat-label>
-            <input matInput type="number" formControlName="retirementAge" min="18" max="100" />
-          </mat-form-field>
-          @if (nonCashPots.length) {
-            <mat-form-field appearance="outline" class="field-pot">
-              <mat-label>{{ 'Saving pot (return rate)' | translate }}</mat-label>
-              <mat-select formControlName="selectedPotId">
-                @for (pot of nonCashPots; track pot.id) {
-                  <mat-option [value]="pot.id">{{ pot.name }}</mat-option>
-                }
-              </mat-select>
-            </mat-form-field>
-            <mat-form-field appearance="outline" class="field-return">
-              <mat-label>{{ 'Return rate (%)' | translate }}</mat-label>
-              <input matInput type="number" formControlName="returnRateOverride" step="0.1" />
-            </mat-form-field>
-          }
-        </form>
-      </mat-card-content>
-    </mat-card>
-
+    <!-- ── Chart card ── -->
     <mat-card class="cardWithShadow">
       <mat-card-content style="padding-bottom: 10px !important;">
-        <div class="shortfall" *ngIf="report">
+
+        <!-- Before / After tabs -->
+        <div class="graph-tabs d-flex gap-12">
+          <button class="tab-btn" [class.active]="activeTab === 'before'" (click)="switchTab('before')">
+            {{ 'Before' | translate }}
+          </button>
+          <button class="tab-btn" [class.active]="activeTab === 'after'" (click)="switchTab('after')">
+            {{ 'After' | translate }}
+          </button>
+        </div>
+
+        <div class="shortfall" *ngIf="displayedReport">
           <ng-container *ngIf="!hasShortfall; else lossTpl">
             <div class="shortfall-status-profit">
               <span class="icon-bg leaf-bg">
@@ -77,22 +55,144 @@
             </div>
           </ng-template>
         </div>
-        <div class="chart-component-wrapper" *ngIf="report && client && financialTimeline">
+        <div class="chart-component-wrapper" *ngIf="displayedReport && client && financialTimeline">
           <app-savings-bar-stacked-chart
-            [report]="report"
+            [report]="displayedReport"
             [client]="client"
-            [forecastStartDate]="financialTimeline.forecastStartDate"
-            [forecastEndDate]="scenarioForecastEndDate"
-            [cashFlowName]="cashflow?.name ?? ''">
+            [forecastStartDate]="$any(baselineForecastStartDate || financialTimeline.forecastStartDate)"
+            [forecastEndDate]="$any(activeTab === 'before' ? (baselineForecastEndDate || financialTimeline.forecastEndtDate) : scenarioForecastEndDate)"
+            [cashFlowName]="cashflow.name"
+            [emergencyIconUrl]="'none'"
+            [animateUpdates]="true">
           </app-savings-bar-stacked-chart>
-        </div>
-        <div class="d-flex justify-content-end mt-16">
-          <button mat-flat-button color="primary" (click)="onCreatePlanFromScenario()">
-            {{ 'Create plan from scenario' | translate }}
-          </button>
         </div>
       </mat-card-content>
     </mat-card>
+
+    <!-- ── Scenario assumptions card (below chart) ── -->
+    <mat-card class="cardWithShadow assumptions-card">
+      <mat-card-content>
+        <div class="assumptions-shell">
+          <div class="assumptions-title">
+            <h5 class="f-w-500 m-0">{{ 'Scenario assumptions' | translate }}</h5>
+          </div>
+
+          <div class="assumptions-body">
+            <form [formGroup]="scenarioForm" class="assumptions-form">
+              <!-- Inflation -->
+              <div class="assumption-panel top-rate-panel inflation-panel" [class.span-2]="!nonCashPots.length">
+                <div class="inflation-header">
+                  <span class="assumption-label">{{ 'Inflation rate' | translate }}</span>
+                </div>
+                <div class="slider-row">
+                  <mat-slider class="slider-flex" [min]="0" [max]="20" [step]="0.1">
+                    <input matSliderThumb formControlName="inflationRate" />
+                  </mat-slider>
+                  <div class="value-input-box">
+                    <input
+                      type="number"
+                      class="value-input"
+                      [value]="scenarioForm.get('inflationRate')?.value"
+                      (change)="onNumericInputChange('inflationRate', $event)"
+                      min="0" max="20" step="0.1" />
+                    <span class="pct-badge">%</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Return rate (only when non-cash pots exist) -->
+              @if (nonCashPots.length) {
+                <div class="assumption-panel top-rate-panel return-rate-panel">
+                  <div class="return-rate-header">
+                    <span class="assumption-label">{{ 'Return rate:' | translate }}</span>
+                    <mat-select formControlName="selectedPotId" class="pot-selector" panelClass="pot-select-panel">
+                      @for (pot of nonCashPots; track pot.id) {
+                        <mat-option [value]="pot.id">
+                          <span class="pot-option">
+                            <i-tabler [name]="getPotIcon(pot.type)" class="pot-type-icon"></i-tabler>
+                            {{ pot.name }}
+                          </span>
+                        </mat-option>
+                      }
+                    </mat-select>
+                  </div>
+                  <div class="slider-row">
+                    <mat-slider class="slider-flex" [min]="0" [max]="30" [step]="0.1">
+                      <input matSliderThumb formControlName="returnRateOverride" />
+                    </mat-slider>
+                    <div class="value-input-box">
+                      <input
+                        type="number"
+                        class="value-input"
+                        [value]="scenarioForm.get('returnRateOverride')?.value"
+                        (change)="onNumericInputChange('returnRateOverride', $event)"
+                        min="0" max="30" step="0.1" />
+                      <span class="pct-badge">%</span>
+                    </div>
+                  </div>
+                </div>
+              }
+
+              <!-- Retirement age -->
+              <div class="assumption-panel assumption-panel--compact">
+                <div class="panel-row">
+                  <span class="assumption-label">{{ 'Retirement age' | translate }}</span>
+                  <div class="age-stepper">
+                    <button type="button" class="stepper-btn" (click)="decrementAge()">−</button>
+                    <span class="age-value">{{ getRetirementAge() }}</span>
+                    <button type="button" class="stepper-btn" (click)="incrementAge()">+</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Other changes -->
+              <div class="assumption-panel assumption-panel--compact">
+                <div class="panel-row">
+                  <span class="assumption-label">{{ 'Other changes:' | translate }}</span>
+                  <div class="chips-area">
+                    @for (change of otherChanges; track change.id) {
+                      <div class="change-chip">
+                        <span>{{ change.label }}</span>
+                        <button type="button" class="chip-remove-btn" (click)="removeOtherChange(change)">×</button>
+                      </div>
+                    }
+
+                    <button
+                      type="button"
+                      class="add-change-btn"
+                      [matMenuTriggerFor]="otherChangesMenu">
+                      {{ 'Add' | translate }}
+                      <span class="add-plus" aria-hidden="true">+</span>
+                    </button>
+
+                    <mat-menu #otherChangesMenu="matMenu">
+                      @for (item of availableChangeItems; track item.id) {
+                        <button mat-menu-item (click)="addOtherChange(item)" [disabled]="isOtherChangeSelected(item)">
+                          {{ item.label }}
+                        </button>
+                      }
+                    </mat-menu>
+                  </div>
+                </div>
+              </div>
+            </form>
+
+            <div class="assumptions-actions">
+              <button mat-flat-button color="primary" class="simulate-btn" (click)="onSimulate()">
+                <span class="play-badge" aria-hidden="true">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                </span>
+                {{ 'Simulate scenario' | translate }}
+              </button>
+              <button mat-stroked-button class="create-plan-btn" (click)="onCreatePlanFromScenario()">
+                {{ 'Create plan from scenario' | translate }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
   } @else {
     <div class="h-300 d-flex align-items-center justify-content-center">
       <mat-spinner></mat-spinner>

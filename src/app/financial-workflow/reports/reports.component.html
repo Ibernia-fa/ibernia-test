@@ -21,24 +21,35 @@
 
             <div class="d-flex align-items-center gap-12">
               <!-- Cashflow name (visible when NOT in comparison mode) -->
-              <ng-container *ngIf="!(compareReport || compareCashflow)">
-                <div class="d-flex align-items-center gap-8">
-                  <a [routerLink]="['/cashflows', cashflow?.id, 'scenario-lab']" class="button-icon scenario-lab-btn">
-                    <img width="20" height="20" src="assets/images/svgs/scenario-lab-icon.svg" alt="Scenario Lab" class="scenario-lab-icon-white" />
-                    <span>{{ 'Scenario Lab' | translate }}</span>
-                  </a>
+              <div class="d-flex align-items-center gap-8">
+                <a [routerLink]="['/cashflows', cashflow?.id, 'scenario-lab']" class="button-icon scenario-lab-btn">
+                  <svg class="scenario-lab-icon" width="20" height="20" viewBox="0 0 100 110" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+                    <mask id="scenarioLabIconCutout">
+                      <rect width="100" height="110" fill="white" />
+                      <circle cx="58" cy="76" r="5.5" fill="black" />
+                    </mask>
+                    <g mask="url(#scenarioLabIconCutout)" fill="white">
+                      <circle cx="50" cy="8" r="8" />
+                      <rect x="22" y="18" width="56" height="11" rx="5.5" />
+                      <rect x="38" y="29" width="24" height="18" />
+                      <path d="M38 47 L9 88 Q5 98 16 100 H84 Q95 98 91 88 L62 47 Z" />
+                    </g>
+                  </svg>
+                  <span>{{ 'Scenario Lab' | translate }}</span>
+                </a>
+
+                <ng-container *ngIf="!(compareReport || compareCashflow)">
                   <button class="button-icon" (click)="onComparePlansClicked()">
                     <span>{{ 'Compare plans' | translate }}</span>
                   </button>
-                </div>
-              </ng-container>
+                </ng-container>
 
-              <!-- Exit Comparison button (visible when IN comparison mode) -->
-              <ng-container *ngIf="compareReport || compareCashflow">
-                <button class="button-icon" (click)="exitComparison()">
-                  <span>{{ 'Exit Comparison' | translate }}</span>
-                </button>
-              </ng-container>
+                <ng-container *ngIf="compareReport || compareCashflow">
+                  <button class="button-icon" (click)="exitComparison()">
+                    <span>{{ 'Exit Comparison' | translate }}</span>
+                  </button>
+                </ng-container>
+              </div>
             </div>
           </div>
         </div>
@@ -91,7 +102,8 @@
         <app-savings-bar-stacked-chart [report]="report" [client]="client"
           [forecastStartDate]="financialTimeline.forecastStartDate"
           [forecastEndDate]="financialTimeline.forecastEndtDate"
-          [cashFlowName]="cashflow?.name">
+          [cashFlowName]="cashflow?.name"
+          [emergencyIconUrl]="'none'">
         </app-savings-bar-stacked-chart>
       </div>
     </mat-card-content>
@@ -143,7 +155,8 @@
         <app-savings-bar-stacked-chart [report]="compareReport" [client]="client"
         [forecastStartDate]="compareTimeline?.forecastStartDate || financialTimeline.forecastStartDate"
         [forecastEndDate]="compareTimeline?.forecastEndtDate || financialTimeline.forecastEndtDate"
-        [cashFlowName]="compareCashflow?.name">
+        [cashFlowName]="compareCashflow?.name"
+        [emergencyIconUrl]="'none'">
       </app-savings-bar-stacked-chart>
     </div>
     </div>

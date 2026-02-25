@@ -176,11 +176,22 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
         filter((res) => !!res),
         tap((res) => {
 
-          // cash all events
-          this.cachedSystemEventsLibrary = [
+          // Merge system + custom events, deduplicate by name to prevent chips like
+          // 'Retirement age' appearing twice if returned by both endpoints.
+          const dedupeByName = (events: any[]) => {
+            const seen = new Set<string>();
+            return events.filter(e => {
+              if (seen.has(e.name)) return false;
+              seen.add(e.name);
+              return true;
+            });
+          };
+
+          // cache all events
+          this.cachedSystemEventsLibrary = dedupeByName([
             ...res[0],
             ...res[1],
-          ]
+          ])
             .filter(event =>
               event.name !== 'State pension'
             )
@@ -194,10 +205,10 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
           // Build full chip list (all events except State pension).
           // syncRetirementChipVisibility() below is the single source of truth
           // for whether Retirement age chip is visible — do not duplicate that logic here.
-          this.systemEventsLibrary = [
+          this.systemEventsLibrary = dedupeByName([
             ...res[0],
             ...res[1],
-          ]
+          ])
             .filter(event => event.name !== 'State pension')
             .sort((a, b) =>
               this.CHIP_ORDER.indexOf(a.name) - this.CHIP_ORDER.indexOf(b.name)
@@ -299,21 +310,9 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
       );
 
       if (existingRetirement) {
-        // If retirement already exists AND is within the visible forecast range, block duplicate drop
-        const forecastStart = moment(this.financialTimeline.forecastStartDate).year();
-        const forecastEnd = moment(this.financialTimeline.forecastEndtDate).year();
-        const retYear = existingRetirement.start?.year;
-
-        if (retYear != null && retYear >= forecastStart && retYear <= forecastEnd) {
-          this.draggedEvent = null;
-          return;
-        }
-
-        // Existing retirement is outside forecast range — remove it so user can re-place it
-        const idx = this.financialTimeline.clientEvents.indexOf(existingRetirement);
-        if (idx > -1) {
-          this.financialTimeline.clientEvents.splice(idx, 1);
-        }
+        // Retirement age cannot be placed twice — always block
+        this.draggedEvent = null;
+        return;
       }
 
       const retirementYear = this.getRetirementDropYear();
@@ -331,11 +330,9 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     // Validate dropTime exists and is within bounds
-    if (!dropTime || 
-      moment(dropTime).year() <
-      moment(this.financialTimeline.forecastStartDate).year() ||
-      moment(dropTime).year() >
-      moment(this.financialTimeline.forecastEndtDate).year()
+    if (!dropTime ||
+      moment(dropTime).year() < moment(this.financialTimeline.forecastStartDate).year() ||
+      moment(dropTime).year() > this.effectiveForecastEndYear
     ) {
       this.draggedEvent = null;
       return;
@@ -580,6 +577,16 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
     return date < midYear ? new Date(year, 0, 1) : new Date(year + 1, 0, 1);
   }
 
+  /**
+   * The effective forecast end year, capped at client age 90.
+   * Used everywhere to enforce the 90-year timeline limit.
+   */
+  private get effectiveForecastEndYear(): number {
+    const forecastEnd = moment(this.financialTimeline.forecastEndtDate).year();
+    const birthYear = moment(this.clientBirthDate).year();
+    return Math.min(forecastEnd, birthYear + 90);
+  }
+
   initTimelineContainer() {
     if (!this.timelineContainer?.nativeElement) return;
 
@@ -622,7 +629,7 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
     'id'
   > {
     const timelineStartYear = moment(this.financialTimeline.forecastStartDate).year();
-    const timelineEndYear = moment(this.financialTimeline.forecastEndtDate).year();
+    const timelineEndYear = this.effectiveForecastEndYear;
     const timelineTotalYears = timelineEndYear - timelineStartYear;
 
     // Pixel width of the timeline container (used to compute years-per-pixel)
@@ -667,11 +674,13 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
           };
         } else {
           const finalWidth = Math.min(minContainerWidth, maxAvailableWidth);
+          // Centre the item on the drop year so the vertical line bisects the box
+          const halfWidth = Math.round(finalWidth / 2);
           return {
             id: eventId,
             content: this.getContent(event.name, event.iconUrl),
-            start: new Date(startYear, 0, 1),
-            end: new Date(startYear + finalWidth, 0, 1),
+            start: new Date(startYear - halfWidth, 0, 1),
+            end: new Date(startYear - halfWidth + finalWidth, 0, 1),
             title: event.name,
             className: event.iconUrl,
             editable: {
@@ -692,7 +701,7 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
     const forecastStartDate = new Date(this.financialTimeline.forecastStartDate);
     const forecastStartYear = moment(this.financialTimeline.forecastStartDate).year();
 
-    const timelineEndYear = moment(this.financialTimeline.forecastEndtDate).year();
+    const timelineEndYear = this.effectiveForecastEndYear;
 
     // Adjust start year so that (startYear - birthYear) is even
     let startYear = forecastStartYear;
@@ -774,7 +783,13 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   handleEventMoving(item: any, callback: (item: any) => void) {
-    const snappedTime = this.snapToNearestYear(new Date(item.start));
+    // For visually-centred one-off items item.start is the left edge, not the actual year.
+    // Use the midpoint of start+end so the blue line tracks the centre of the box.
+    const startMs = new Date(item.start).getTime();
+    const endMs = item.end ? new Date(item.end).getTime() : startMs;
+    const midpoint = new Date((startMs + endMs) / 2);
+    const snappedTime = this.snapToNearestYear(midpoint);
+
     try {
       this.timeline.setCustomTime(snappedTime, 'dragOver');
     } catch {
@@ -813,17 +828,7 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
     try { this.timeline.removeCustomTime('dragOver'); } catch { }
     this.clearLabelHighlight();
 
-    const snappedStart = this.snapToNearestYear(new Date(item.start));
     const snappedEnd = item.end ? this.snapToNearestYear(new Date(item.end)) : null;
-    const dropTime = snappedStart;
-
-    if (
-      moment(dropTime).year() < moment(this.financialTimeline.forecastStartDate).year() ||
-      moment(dropTime).year() > moment(this.financialTimeline.forecastEndtDate).year()
-    ) {
-      callback(null);
-      return;
-    }
 
     let existing = this.financialTimeline.clientEvents.find(ev => ev.id === item.id);
 
@@ -838,7 +843,26 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
       return;
     }
 
-    const newStartYear = snappedStart.getFullYear();
+    // For visually-centred one-off items the item's start is offset by –halfWidth.
+    // Reconstruct the actual year from the midpoint of start+end instead.
+    const isVisualCentered = !existing.end?.year || existing.end.year <= existing.start.year || existing.isOneOff;
+    let newStartYear: number;
+    if (isVisualCentered) {
+      const startMs = new Date(item.start).getTime();
+      const endMs = item.end ? new Date(item.end).getTime() : startMs;
+      newStartYear = this.snapToNearestYear(new Date((startMs + endMs) / 2)).getFullYear();
+    } else {
+      newStartYear = this.snapToNearestYear(new Date(item.start)).getFullYear();
+    }
+
+    if (
+      newStartYear < moment(this.financialTimeline.forecastStartDate).year() ||
+      newStartYear > this.effectiveForecastEndYear
+    ) {
+      callback(null);
+      return;
+    }
+
     const newEndYear = snappedEnd ? snappedEnd.getFullYear() : moment(new Date(moment(item.end).year(), 1)).year();
 
     if (
@@ -1071,7 +1095,7 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
     const year = snappedTime.getFullYear();
 
     const startYear = moment(this.financialTimeline.forecastStartDate).year();
-    const endYear = moment(this.financialTimeline.forecastEndtDate).year();
+    const endYear = this.effectiveForecastEndYear;
 
     if (year >= startYear && year <= endYear) {
       try {
@@ -1121,18 +1145,8 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
       ce => ce.name === 'Retirement age'
     );
 
-    const forecastStartYear = this.financialTimeline?.forecastStartDate
-      ? moment(this.financialTimeline.forecastStartDate).year() : null;
-    const forecastEndYear = this.financialTimeline?.forecastEndtDate
-      ? moment(this.financialTimeline.forecastEndtDate).year() : null;
-
-    const shouldShowChip =
-      !retirementOnTimeline ||
-      (retirementOnTimeline.start?.year != null &&
-        forecastStartYear != null &&
-        forecastEndYear != null &&
-        (retirementOnTimeline.start.year < forecastStartYear ||
-          retirementOnTimeline.start.year > forecastEndYear));
+    // Chip is shown only when retirement is NOT on the timeline
+    const shouldShowChip = !retirementOnTimeline;
 
     if (shouldShowChip) {
       this.addRetirementBackToChips();
