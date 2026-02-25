@@ -146,7 +146,7 @@ export class ProfileComponent {
 
   formatAssetChip(chip: string): string {
     if (!this.responseCurrencySymbol) return chip;
-    return chip.replace(/(\d[\d,]*(\.\d+)?)/g, `${this.responseCurrencySymbol}$1`);
+    return chip.replace(/\d[\d,]*(\.\d+)?/g, (match) => `${this.responseCurrencySymbol}${match}`);
   }
 
   formatResponseValue(item: { type: string; value: unknown }): string {

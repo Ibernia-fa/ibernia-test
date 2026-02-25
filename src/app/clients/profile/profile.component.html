@@ -55,7 +55,7 @@
     <!-- Saving Section  -->
     <mat-card >
       <mat-card-content>
-        <div class="profile-main-wrapper">
+        <div class="profile-main-wrapper total-savings-header">
           <div class="d-flex flex-column gap-8">
             <div class="d-flex align-items-center gap-8">
               <img
@@ -67,6 +67,27 @@
             <div class="d-flex align-items-center gap-20">
               <h3 class="saving-title">{{preferredCurrency | currencySymbol}}{{totalSavings | thousandSeparator}}</h3>
             </div>
+          </div>
+          <div class="d-flex flex-column align-items-center gap-6">
+            <button
+            type="button"
+            class="button-icon-outline"
+            (click)="onQuestionnaireClicked()"
+            >
+              <span>{{ 'Questionnaire' | translate }}</span>
+              @if (!questionnaireResponses || showResponsesCard) {
+                <img class="questionnaire-icon" src="assets/images/svgs/add-icon-blue.svg" alt="add-icon" />
+              }
+            </button>
+            @if (questionnaireResponses && !showResponsesCard) {
+              <div class="questionnaire-date-badge">
+                <svg width="16" height="16" viewBox="0 0 48 48" fill="none">
+                  <circle cx="24" cy="24" r="24" fill="#22c55e"/>
+                  <path d="M15 25l6 6 12-12" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span class="date-bold">{{ questionnaireResponses.submittedAt | date:'mediumDate' }}</span>
+              </div>
+            }
           </div>
         </div>
       </mat-card-content>

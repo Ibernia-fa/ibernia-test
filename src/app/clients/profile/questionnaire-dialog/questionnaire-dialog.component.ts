@@ -15,6 +15,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ToastrService } from 'ngx-toastr';
 import { TranslateModule } from '@ngx-translate/core';
 import { QuestionnaireHttpService } from '../../services/questionnaire-http.service';
+import { SettingsService } from 'src/app/default-preferance/services/default-preferance.http.service';
 
 export interface QuestionnaireItem {
   id: string;
@@ -50,6 +51,7 @@ export class QuestionnaireDialogComponent implements OnInit {
     private dialogRef: MatDialogRef<QuestionnaireDialogComponent>,
     private toastr: ToastrService,
     private questionnaireHttpService: QuestionnaireHttpService,
+    private settingsService: SettingsService,
     @Inject(MAT_DIALOG_DATA) public data: { client: Client }
   ) {
     this.clientName =
@@ -94,6 +96,8 @@ export class QuestionnaireDialogComponent implements OnInit {
       return;
     }
 
+    this.showProfileWarnings();
+
     this.isCopying = true;
     this.questionnaireHttpService
       .createLink({
@@ -118,6 +122,18 @@ export class QuestionnaireDialogComponent implements OnInit {
           console.error(err);
         },
       });
+  }
+
+  private showProfileWarnings(): void {
+    const profile = this.settingsService.currentUserData;
+    if (!profile) return;
+
+    if (!profile.bio?.trim()) {
+      this.toastr.warning('Head to your account preference to add a bio.');
+    }
+    if (!profile.profilePhotoUrl?.trim()) {
+      this.toastr.warning('Head to your account preference to add a profile image.');
+    }
   }
 
   toggleQuestion(item: QuestionnaireItem): void {

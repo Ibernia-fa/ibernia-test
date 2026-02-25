@@ -21,6 +21,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelect, MatSelectModule } from '@angular/material/select';
 import { NgFor, NgIf } from '@angular/common';
+import { TextFieldModule } from '@angular/cdk/text-field';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
 
@@ -40,6 +41,7 @@ import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
     TranslateModule,
     NgIf,
     NgFor,
+    TextFieldModule,
     ThousandSeparatorInputDirective
   ]
 })
@@ -77,6 +79,7 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
     firstName: ['' as string],
     lastName: ['' as string],
     email: ['' as string],
+    bio: ['' as string],
     preferences: this.fb.nonNullable.group({
       inflationRate: [2.5 as number, [Validators.required, Validators.min(0), Validators.max(100)]],
       investmentReturn: [6 as number, [Validators.required, Validators.min(0), Validators.max(100)]],
@@ -149,6 +152,7 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
             firstName: p.firstName ?? this.user?.firstName ?? '',
             lastName: p.lastName ?? this.user?.lastName ?? '',
             email: p.email ?? this.user?.email ?? '',
+            bio: p.bio ?? '',
             preferences: {
               inflationRate: p.preferences?.inflationRate ?? this.form.value.preferences?.inflationRate ?? 2.5,
               investmentReturn: p.preferences?.investmentReturn ?? this.form.value.preferences?.investmentReturn ?? 6,
@@ -354,6 +358,7 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
       firstName: raw.firstName?.trim() || this.user?.firstName,
       lastName: raw.lastName?.trim() || this.user?.lastName,
       email: raw.email?.trim() || this.user?.email,
+      bio: blankToNull(raw.bio),
       preferences: {
         inflationRate: round2(raw.preferences.inflationRate),
         investmentReturn: round2(raw.preferences.investmentReturn),

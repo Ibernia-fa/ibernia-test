@@ -32,6 +32,7 @@ export interface GetQuestionnaireByTokenResponse {
   advisorId: string;
   advisorName: string;
   profilePhotoUrl?: string;
+  bio?: string;
   currency?: string;
   questions: QuestionModel[];
 }
