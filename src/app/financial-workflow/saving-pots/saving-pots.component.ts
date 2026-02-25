@@ -524,13 +524,11 @@ private isCashName(n?: string): boolean {
 private ensureCashFirst(): void {
   const list = this.savingPots?.clientSavings;
   if (!list || !list.length) return;
-  const cashIdx = list.findIndex(x => this.isCashName(x?.name));
-  if (cashIdx > 0) {
-    const [cash] = list.splice(cashIdx, 1);
-    list.unshift(cash);
-    this.savingPots.clientSavings = [...list];
-    this.updateOrderNumbers(); // persist the invariant
-  }
+  const cashPots = list.filter(x => this.isCashName(x?.name));
+  const rest = list.filter(x => !this.isCashName(x?.name));
+  if (cashPots.length === 0 || rest.length === 0) return;
+  this.savingPots!.clientSavings = [...cashPots, ...rest];
+  this.updateOrderNumbers(); // persist the invariant
 }
 
 formatReturnRate(rate: number): string {

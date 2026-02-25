@@ -97,6 +97,26 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
   @Input() clientBirthDate: Date;
   @Input() client: Client;
   @Input() title: string = 'Timeline';
+
+  /** True when client has a partner (for dual age axis). */
+  get hasPartner(): boolean {
+    return !!(this.client?.partnerDetail?.birthDate);
+  }
+  /** Main client initial for axis label (e.g. "Age M"). */
+  get mainClientInitial(): string {
+    const name = this.client?.clientDetails?.firstName ?? '';
+    return name.trim().length ? name.trim().charAt(0).toUpperCase() : '?';
+  }
+  /** Partner initial for axis label (e.g. "Age L"). */
+  get partnerInitial(): string {
+    const name = this.client?.partnerDetail?.firstName ?? '';
+    return name.trim().length ? name.trim().charAt(0).toUpperCase() : '?';
+  }
+  /** Partner birth date for age calculation; null if no partner. */
+  get partnerBirthDate(): Date | null {
+    const d = this.client?.partnerDetail?.birthDate;
+    return d ? new Date(d) : null;
+  }
   @Input() showOnReports: boolean = false;
   @Input() cashflowInflationRate: number = 0;
   @Output() updateTimelines: EventEmitter<boolean>;
@@ -202,17 +222,23 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
               );
             });
 
-          // Build full chip list (all events except State pension).
-          // syncRetirementChipVisibility() below is the single source of truth
-          // for whether Retirement age chip is visible — do not duplicate that logic here.
-          this.systemEventsLibrary = dedupeByName([
+          // Hide 'Retirement age' chip if any retirement event is already on the timeline
+          this.systemEventsLibrary = [
             ...res[0],
             ...res[1],
-          ])
-            .filter(event => event.name !== 'State pension')
-            .sort((a, b) =>
-              this.CHIP_ORDER.indexOf(a.name) - this.CHIP_ORDER.indexOf(b.name)
-            );
+          ]
+            .filter(event => {
+              if (event.name === 'State pension') return false;
+              if (event.name === 'Retirement age' &&
+                this.financialTimeline?.clientEvents?.some(ce => ce.name === 'Retirement age')) return false;
+              return true;
+            })
+            .sort((a, b) => {
+              return (
+                this.CHIP_ORDER.indexOf(a.name) -
+                this.CHIP_ORDER.indexOf(b.name)
+              );
+            });
 
           this.cdr.detectChanges();
           // Single source of truth: hide/show Retirement age chip based on timeline state
@@ -737,16 +763,26 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
       format: {
         minorLabels: (date: any) => {
           const year = date.year();
-          const age = this.getTimelineLabelAge(
+          if (year < forecastStartYear || year > timelineEndYear) return '';
+          const ageM = this.getTimelineLabelAge(
             year,
             forecastStartYear,
             forecastStartDate,
             birthDate,
             birthYear
           );
-          return year >= forecastStartYear && year <= timelineEndYear
-            ? `<div id='selected'><p>${age}</p><span>${year}</span></div>`
-            : '';
+          if (this.hasPartner && this.partnerBirthDate) {
+            const partnerBirthYear = moment(this.partnerBirthDate).year();
+            const ageL = this.getTimelineLabelAge(
+              year,
+              forecastStartYear,
+              forecastStartDate,
+              this.partnerBirthDate,
+              partnerBirthYear
+            );
+            return `<div id='selected'><p>${ageM}</p><p>${ageL}</p><span>${year}</span></div>`;
+          }
+          return `<div id='selected'><p>${ageM}</p><span>${year}</span></div>`;
         },
         majorLabels: function (date: any) {
           return ``; // Show actual years
@@ -1135,23 +1171,20 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   /**
-   * Re-evaluates whether the Retirement age chip should be shown or hidden
-   * based on the current clientEvents in financialTimeline.
+   * Re-evaluates whether the Retirement age chip should be shown or hidden:
+   * hide chip if any retirement event is already on the timeline.
    */
   private syncRetirementChipVisibility(): void {
     if (!this.systemEventsLibrary || !this.cachedSystemEventsLibrary) return;
 
-    const retirementOnTimeline = this.financialTimeline?.clientEvents?.find(
+    const hasRetirementOnTimeline = this.financialTimeline?.clientEvents?.some(
       ce => ce.name === 'Retirement age'
     );
 
-    // Chip is shown only when retirement is NOT on the timeline
-    const shouldShowChip = !retirementOnTimeline;
-
-    if (shouldShowChip) {
-      this.addRetirementBackToChips();
-    } else {
+    if (hasRetirementOnTimeline) {
       this.removeRetirementFromChips();
+    } else {
+      this.addRetirementBackToChips();
     }
   }
 

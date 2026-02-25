@@ -20,6 +20,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule, MatSelectChange } from '@angular/material/select';
+import { MatRadioModule } from '@angular/material/radio';
 import { MatSliderModule } from '@angular/material/slider';
 import { allCountries } from 'src/app/clients/models/country';
 import {MatCheckboxModule} from '@angular/material/checkbox';
@@ -51,6 +52,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
     MatDialogModule,
     MatInputModule,
     MatSelectModule,
+    MatRadioModule,
     MatIconModule,
     MatButtonModule,
     MatDatepickerModule,
@@ -99,6 +101,11 @@ export class AddNewPotComponent {
   partnerFirstName: string = '';
   SavingPotOwnership = SavingPotOwnership;
   savingPotValues = [
+    {
+      name: 'Cash',
+      iconUrl: 'cashflow-moneys-icon',
+      type: SavingPotType.Cash,
+    },
     {
       name: 'Investment',
       iconUrl: 'cashflow-investment-icon',
@@ -472,6 +479,19 @@ onAmountBlur(e: Event) {
 
   toggleNameEdit(): void {
     this.showNameEdit = !this.showNameEdit;
+  }
+
+  /** Number of existing pots with name "Cash". */
+  get cashPotCount(): number {
+    return (this.existingSavingPots || []).filter(
+      (p: { name?: string }) => (p?.name ?? '').trim().toLowerCase() === 'cash'
+    ).length;
+  }
+
+  /** Allowed to add a Cash pot: no partner => at most 1; has partner => up to 3. */
+  get canAddCashPot(): boolean {
+    if (!this.hasPartner) return this.cashPotCount === 0;
+    return this.cashPotCount < 3;
   }
 
   onNameValueChange(name: any) {
@@ -877,11 +897,12 @@ onEscalationRateChange(event: MatSelectChange): void {
         // returnRate: this.savingsForm.get('name')?.value !== 'Cash' ? this.savingsForm.get('returnRate')?.value : 0,
           returnRate: this.savingsForm.get('name')?.value !== 'Cash' ? rr : 0,
         type:
-        this.savingsForm.get('customName')?.value != null &&
-        this.savingsForm.get('customName')?.value == 'Cash' ? 1 : 
-          this.savingPotValues.find(
-            (x) => this.savingsForm.get('name')?.value === x.name
-          )?.type ?? SavingPotType.Other,
+        this.savingsForm.get('name')?.value === 'Cash' ||
+        this.savingsForm.get('customName')?.value === 'Cash'
+          ? SavingPotType.Cash
+          : this.savingPotValues.find(
+              (x) => this.savingsForm.get('name')?.value === x.name
+            )?.type ?? SavingPotType.Other,
         // realReturn: this.savingsForm.get('name')?.value !== 'Cash' ?
         //   this.savingsForm.get('returnRate')?.value - this.inflationRate : 0,
         realReturn: real,
@@ -907,7 +928,7 @@ onEscalationRateChange(event: MatSelectChange): void {
         retirementAge: this.savingsForm.get('name')?.value === 'Pension fund'
           ? this.retirementAge
           : null,
-        ownership: this.savingsForm.get('ownership')?.value ?? SavingPotOwnership.Joint
+        ownership: this.hasPartner ? (this.savingsForm.get('ownership')?.value ?? SavingPotOwnership.Joint) : SavingPotOwnership.Person1
       };
       const function$ = !this.isEditWorkflow ? this.savingPotsHttpService
       .addNewSavingPot(this.cashflowId, clientSaving) :

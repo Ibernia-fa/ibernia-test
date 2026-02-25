@@ -45,7 +45,7 @@
               >
                 <!-- Your normal options -->
                 @for (event of savingPotValues; track event) {
-                  <mat-option [value]="event.name">
+                  <mat-option [value]="event.name" [disabled]="event.name === 'Cash' && !canAddCashPot">
                     <div class="d-flex align-items-center gap-8">
                       <img [src]="'/assets/images/svgs/' + event.iconUrl + '.svg'" [alt]="event.iconUrl" />
                       <span>{{ event.name }}</span>
@@ -94,24 +94,18 @@
         }
         <!--End  Name Field  -->
 
+        @if (hasPartner) {
         <!-- Ownership Field -->
         <div class="w-100 form-field gap-8">
           <mat-label class="f-s-16 d-block" style="line-height: 18px">{{ 'Ownership' | translate }}</mat-label>
-          <div class="select-option">
-            <mat-select formControlName="ownership">
-              <mat-option [value]="SavingPotOwnership.Joint">{{ 'Joint' | translate }}</mat-option>
-              <mat-option [value]="SavingPotOwnership.Person1">
-                {{ clientFirstName || ('Person 1' | translate) }}
-              </mat-option>
-              @if (hasPartner) {
-                <mat-option [value]="SavingPotOwnership.Person2">
-                  {{ partnerFirstName || ('Person 2' | translate) }}
-                </mat-option>
-              }
-            </mat-select>
-          </div>
+          <mat-radio-group formControlName="ownership" class="d-flex flex-column gap-8">
+            <mat-radio-button [value]="SavingPotOwnership.Joint">{{ 'Ownership' | translate }}: {{ 'Joint' | translate }}</mat-radio-button>
+            <mat-radio-button [value]="SavingPotOwnership.Person1">{{ 'Ownership' | translate }}: {{ clientFirstName || ('Person 1' | translate) }}</mat-radio-button>
+            <mat-radio-button [value]="SavingPotOwnership.Person2">{{ 'Ownership' | translate }}: {{ partnerFirstName || ('Person 2' | translate) }}</mat-radio-button>
+          </mat-radio-group>
         </div>
         <!-- End Ownership Field -->
+        }
 
         <!-- Starting pot value Field  -->
         <div class="d-flex flex-column gap-8 net-fields">

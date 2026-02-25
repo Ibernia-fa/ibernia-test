@@ -41,8 +41,14 @@
 
         <div class="timeline-wrapper">
             <div class="timeline-labels">
-                <p>{{ 'Age' | translate }}</p>
-                <span>{{ 'Year' | translate }}</span>
+                @if (hasPartner) {
+                    <p>{{ 'Age' | translate }} {{ mainClientInitial }}</p>
+                    <p>{{ 'Age' | translate }} {{ partnerInitial }}</p>
+                    <span>{{ 'Year' | translate }}</span>
+                } @else {
+                    <p>{{ 'Age' | translate }}</p>
+                    <span>{{ 'Year' | translate }}</span>
+                }
             </div>
             <div class="timeline-container" #timelineContainer (dragover)="onDragOver($event)" (drop)="onDrop($event)">
             </div>
