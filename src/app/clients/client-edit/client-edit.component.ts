@@ -221,8 +221,7 @@ export class ClientEditComponent {
         this.clientDobDisplay = normalizeToDMY(clientBirthDate);
         this.age = calculateAge(clientBirthDate);
 
-        // Lock DOB after creation to prevent forecast range issues
-        this.clientForm.controls['dob'].disable();
+        
 
         //  this.clientForm.get('dob')!
         // .valueChanges
@@ -256,8 +255,7 @@ export class ClientEditComponent {
           this.partnerDobDisplay = normalizeToDMY(partnerBirthDate);
           this.partnerAge = calculateAge(partnerBirthDate);
 
-          // Lock partner DOB after creation to prevent forecast range issues
-          partnerFormGroup.controls['dob'].disable();
+          
 
           partnerFormGroup.controls['firstName'].patchValue(res.partnerDetail?.firstName);
           partnerFormGroup.controls['lastName'].patchValue(res.partnerDetail?.lastName);
