@@ -40,8 +40,8 @@
         </div>
 
         <div class="timeline-wrapper">
-            <div class="timeline-labels">
-                @if (hasPartner) {
+            <div class="timeline-labels" [class.dual-axis]="showDualAxis">
+                @if (showDualAxis) {
                     <p>{{ 'Age' | translate }} {{ mainClientInitial }}</p>
                     <p>{{ 'Age' | translate }} {{ partnerInitial }}</p>
                     <span>{{ 'Year' | translate }}</span>

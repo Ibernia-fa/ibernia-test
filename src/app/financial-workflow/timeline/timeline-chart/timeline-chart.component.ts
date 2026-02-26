@@ -98,9 +98,14 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
   @Input() client: Client;
   @Input() title: string = 'Timeline';
 
-  /** True when client has a partner (for dual age axis). */
+  /** True when client has a partner. */
   get hasPartner(): boolean {
     return !!(this.client?.partnerDetail?.birthDate);
+  }
+
+  get showDualAxis(): boolean {
+    if (!this.hasPartner) return false;
+    return this.financialTimeline?.clientEvents?.some(ce => ce.isPartnerEvent) ?? false;
   }
   /** Main client initial for axis label (e.g. "Age M"). */
   get mainClientInitial(): string {
@@ -230,7 +235,7 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
             .filter(event => {
               if (event.name === 'State pension') return false;
               if (event.name === 'Retirement age' &&
-                this.financialTimeline?.clientEvents?.some(ce => ce.name === 'Retirement age')) return false;
+                this.financialTimeline?.clientEvents?.some(ce => ce.name.toLowerCase().startsWith('retirement age'))) return false;
               return true;
             })
             .sort((a, b) => {
@@ -629,6 +634,7 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
     });
 
     this.initTimelineHover();
+    this.stripTimelineTooltips();
 
     this.timeline.on('doubleClick', (event) => {
       event.event.preventDefault();
@@ -650,7 +656,6 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
       end: Date | string;
       className: string;
       type?: string;
-      title?: string;
     },
     'id'
   > {
@@ -691,7 +696,6 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
             start: new Date(startYear, 0, 1),
             end: new Date(startYear + visualWidth, 0, 1),
             type: 'range',
-            title: event.name,
             className: event.iconUrl,
             editable: {
               updateTime: true,
@@ -707,7 +711,6 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
             content: this.getContent(event.name, event.iconUrl),
             start: new Date(startYear - halfWidth, 0, 1),
             end: new Date(startYear - halfWidth + finalWidth, 0, 1),
-            title: event.name,
             className: event.iconUrl,
             editable: {
               updateTime: true,
@@ -771,7 +774,7 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
             birthDate,
             birthYear
           );
-          if (this.hasPartner && this.partnerBirthDate) {
+          if (this.showDualAxis && this.partnerBirthDate) {
             const partnerBirthYear = moment(this.partnerBirthDate).year();
             const ageL = this.getTimelineLabelAge(
               year,
@@ -814,8 +817,7 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
     birthDate: Date,
     _birthYear: number
   ): number {
-    const baseAge = this.calculateAgeForTimeline(forecastStartDate, birthDate);
-    return baseAge + (year - forecastStartYear);
+    return year - new Date(birthDate).getFullYear();
   }
 
   handleEventMoving(item: any, callback: (item: any) => void) {
@@ -1099,6 +1101,22 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
     return age;
   };
 
+  private stripTimelineTooltips(): void {
+    if (!this.timelineContainer?.nativeElement) return;
+    const container = this.timelineContainer.nativeElement as HTMLElement;
+
+    const strip = () => {
+      container.querySelectorAll('.vis-delete[title], .vis-item[title]').forEach(el => {
+        el.removeAttribute('title');
+      });
+    };
+
+    strip();
+
+    const observer = new MutationObserver(() => strip());
+    observer.observe(container, { childList: true, subtree: true, attributes: true, attributeFilter: ['title'] });
+  }
+
   private initTimelineHover(): void {
     if (!this.timelineContainer?.nativeElement || !this.timeline) return;
 
@@ -1178,7 +1196,7 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
     if (!this.systemEventsLibrary || !this.cachedSystemEventsLibrary) return;
 
     const hasRetirementOnTimeline = this.financialTimeline?.clientEvents?.some(
-      ce => ce.name === 'Retirement age'
+      ce => ce.name.toLowerCase().startsWith('retirement age')
     );
 
     if (hasRetirementOnTimeline) {

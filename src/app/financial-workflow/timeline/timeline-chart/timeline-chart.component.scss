@@ -244,7 +244,8 @@
 .timeline-wrapper {
   display: flex;
   flex-direction: row;
-  align-items: flex-end; // 👈 Important: aligns to bottom
+  align-items: flex-end;
+  position: relative;
   width: 100%;
 }
 
@@ -254,13 +255,11 @@
   flex-direction: column;
   align-items: flex-end;
   justify-content: flex-end;
-  padding-bottom: 12px;
-  margin-right: 8px;
+  bottom: 12px;
   font-size: 18px;
   color: #666;
   min-width: 40px;
-  font-weight: bold;
-  left: 11px;
+  font-weight: 600;
   gap: 4px;
 
   p {
@@ -271,6 +270,10 @@
   span {
     margin: 0;
     line-height: 1;
+  }
+
+  &.dual-axis {
+    bottom: -10px;
   }
 }
 
