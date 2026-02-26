@@ -145,14 +145,33 @@ export class ClientQuestionnaireComponent implements OnInit {
     }
   }
 
+  private isScrolling = false;
+
   scrollToSection(index: number): void {
     const el = this.snapContainer?.nativeElement;
-    if (!el) return;
+    if (!el || this.isScrolling) return;
 
     const staticSections = this.advisorBio ? 5 : 4;
     const totalSections = this.questions.length + staticSections + (this.submitted ? 1 : 0);
     const clamped = Math.max(0, Math.min(index, totalSections - 1));
-    el.scrollTo({ top: el.clientHeight * clamped, behavior: 'smooth' });
+    const targetTop = el.clientHeight * clamped;
+
+    this.isScrolling = true;
+    el.style.scrollSnapType = 'none';
+
+    requestAnimationFrame(() => {
+      el.scrollTo({ top: targetTop, behavior: 'smooth' });
+
+      const checkDone = () => {
+        if (Math.abs(el.scrollTop - targetTop) < 2) {
+          el.style.scrollSnapType = '';
+          this.isScrolling = false;
+        } else {
+          requestAnimationFrame(checkDone);
+        }
+      };
+      requestAnimationFrame(checkDone);
+    });
   }
 
   @HostListener('window:keydown', ['$event'])
@@ -187,7 +206,7 @@ export class ClientQuestionnaireComponent implements OnInit {
 
   /* ─── Goals helpers ─── */
 
-  private readonly exclusiveOptions = ['Other', 'None of the above'];
+  private readonly exclusiveOptions = ['None of the above'];
 
   toggleGoal(questionId: string, option: string): void {
     const key = `goals_${questionId}`;
