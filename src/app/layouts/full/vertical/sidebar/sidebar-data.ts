@@ -15,9 +15,9 @@ export const navItemslower: NavItem[] = [
   },
   {
     displayName: 'Wealth & Inheritance',
-    iconName: '/assets/images/svgs/money-square.svg',
-    iconOutline: '/assets/images/svgs/money-square.svg',
-    // route: '/cashflows/{cashflowId}/emergencies',
+    iconName: '/assets/images/svgs/money-square-blue.svg',
+    iconOutline: '/assets/images/svgs/money-square-blue.svg',
+    route: '/cashflows/{cashflowId}/wealth',
   },
   {
     displayName: 'Knowledge Hub',
