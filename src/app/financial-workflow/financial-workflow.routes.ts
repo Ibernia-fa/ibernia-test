@@ -7,6 +7,7 @@ import { WithdrawalsContributionsComponent } from './withdrawals-contributions/w
 import { ReportsComponent } from './reports/reports.component';
 import { ScenarioLabComponent } from './reports/scenario-lab/scenario-lab.component';
 import { EmergenciesComponent } from './emergencies/emergencies.component';
+import { WealthComponent } from './wealth/wealth.component';
 import { AiRecommendationsComponent } from './ai-recommendations/ai-recommendations.component';
 import { AgentChatComponent } from './agent-chat/agent-chat.component';
 import { CashflowResolver } from './resolvers/cashflow.resolver';
@@ -48,6 +49,11 @@ export const FinancialWorkflowRoutes: Routes = [
       {
         path: ':id/emergencies',
         component: EmergenciesComponent,
+        resolve: { cashflow: CashflowResolver },
+      },
+      {
+        path: ':id/wealth',
+        component: WealthComponent,
         resolve: { cashflow: CashflowResolver },
       },
       {

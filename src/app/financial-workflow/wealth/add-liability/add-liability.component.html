@@ -1,0 +1,48 @@
+<form class="d-flex flex-column gap-32" [formGroup]="form" (ngSubmit)="onSave()">
+  <div class="d-flex align-items-center justify-content-between gap-10 modal-header">
+    <h3>{{ isEditMode ? 'Edit liability' : 'Add liability' }}</h3>
+    <button (click)="onCancel()" type="button" class="close-btn">
+      <img src="assets/images/svgs/close-line-cion.svg" alt="close" />
+    </button>
+  </div>
+
+  <mat-dialog-content class="d-flex flex-column gap-20">
+    <div class="w-100 form-field gap-8">
+      <mat-label class="f-s-16 d-block" style="line-height: 18px">Type</mat-label>
+      <div class="select-option">
+        <mat-select formControlName="type" placeholder="Select type">
+          <mat-option *ngFor="let t of liabilityTypes" [value]="t">
+            {{ t }}
+          </mat-option>
+        </mat-select>
+      </div>
+      <span *ngIf="form.get('type')?.touched && form.get('type')?.hasError('required')" class="field-error d-block">Required</span>
+    </div>
+
+    <div class="w-100 form-field gap-8">
+      <mat-label class="f-s-16 d-block" style="line-height: 18px">Description</mat-label>
+      <input matInput formControlName="description" placeholder="e.g. Home mortgage" />
+      <span *ngIf="form.get('description')?.touched && form.get('description')?.hasError('required')" class="field-error d-block">Required</span>
+    </div>
+
+    <div class="w-100 form-field gap-8">
+      <mat-label class="f-s-16 d-block" style="line-height: 18px">Outstanding amount</mat-label>
+      <input matInput type="number" formControlName="outstanding" placeholder="0" />
+      <span *ngIf="form.get('outstanding')?.touched && form.get('outstanding')?.hasError('required')" class="field-error d-block">Required</span>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="d-flex justify-content-between align-items-center">
+    <div>
+      <button *ngIf="isEditMode" type="button" mat-button color="warn" (click)="onDelete()" [disabled]="isSaving">
+        Delete
+      </button>
+    </div>
+    <div class="d-flex gap-10">
+      <button type="button" mat-button (click)="onCancel()">Cancel</button>
+      <button type="submit" mat-flat-button color="primary" [disabled]="form.invalid || isSaving">
+        {{ isEditMode ? 'Update' : 'Save' }}
+      </button>
+    </div>
+  </mat-dialog-actions>
+</form>
