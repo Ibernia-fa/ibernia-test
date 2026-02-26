@@ -586,7 +586,7 @@ export class AddIncomeComponent {
       this.showNameEdit = false;
     }
 
-    if (!this.isEditWorkflow || value === 'Salary' || value === 'State pension') {
+    if (!this.isEditWorkflow) {
       this.applyDefaultStartEnd(value);
     }
 
