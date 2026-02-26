@@ -2,11 +2,14 @@ import { Component, Inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { CommonModule } from '@angular/common';
-import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { MatButtonModule } from '@angular/material/button';
 import { ToastrService } from 'ngx-toastr';
+
+import { allCountries } from 'src/app/clients/models/country';
+import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
+import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
+import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
 
 import { WealthHttpService } from '../services/wealth-http.service';
 import {
@@ -31,10 +34,10 @@ export interface AddAssetDialogData {
     CommonModule,
     ReactiveFormsModule,
     MatDialogModule,
-    MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
-    MatButtonModule
+    ThousandSeparatorPipe,
+    ThousandSeparatorInputDirective
   ],
   templateUrl: './add-asset.component.html',
   styleUrl: './add-asset.component.scss',
@@ -43,6 +46,7 @@ export class AddAssetComponent {
   form: FormGroup;
   isEditMode: boolean;
   isSaving = false;
+  countries = allCountries;
 
   categories = [
     { value: AssetCategory.RealEstate, label: ASSET_CATEGORY_LABELS[AssetCategory.RealEstate] },
@@ -76,7 +80,8 @@ export class AddAssetComponent {
       category: [categoryValue, Validators.required],
       description: [this.isEditMode ? data.asset!.description : '', Validators.required],
       value: [this.isEditMode ? data.asset!.value : null, [Validators.required, Validators.min(0)]],
-      liquidity: [liquidityValue, Validators.required]
+      liquidity: [liquidityValue, Validators.required],
+      currencySymbol: [data.clientPreferredCurrency || 'EUR']
     });
   }
 
@@ -85,6 +90,15 @@ export class AddAssetComponent {
     if (cat === AssetCategory.RealEstate || cat === AssetCategory.PersonalProperty) {
       this.form.patchValue({ liquidity: LiquidityLevel.Illiquid });
     }
+  }
+
+  onAmountInput(rawValue: string): void {
+    if (!rawValue || rawValue.trim() === '') {
+      this.form.get('value')?.setValue('', { emitEvent: true });
+      return;
+    }
+    const value = parseFormattedNumber(rawValue);
+    this.form.get('value')?.setValue(value, { emitEvent: true });
   }
 
   onSave(): void {

@@ -93,12 +93,12 @@ export enum LiquidityLevel {
 }
 
 export const ASSET_CATEGORY_LABELS: Record<number, string> = {
-  [AssetCategory.RealEstate]: 'Real estate',
-  [AssetCategory.PersonalProperty]: 'Personal property'
+  [AssetCategory.RealEstate]: 'Real Estate',
+  [AssetCategory.PersonalProperty]: 'Personal Property'
 };
 
 export const LIQUIDITY_LABELS: Record<number, string> = {
   [LiquidityLevel.Liquid]: 'Liquid',
-  [LiquidityLevel.Partial]: 'Partial',
+  [LiquidityLevel.Partial]: 'Partial liquid',
   [LiquidityLevel.Illiquid]: 'Illiquid'
 };

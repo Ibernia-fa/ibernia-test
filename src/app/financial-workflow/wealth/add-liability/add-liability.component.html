@@ -1,48 +1,90 @@
-<form class="d-flex flex-column gap-32" [formGroup]="form" (ngSubmit)="onSave()">
-  <div class="d-flex align-items-center justify-content-between gap-10 modal-header">
-    <h3>{{ isEditMode ? 'Edit liability' : 'Add liability' }}</h3>
-    <button (click)="onCancel()" type="button" class="close-btn">
-      <img src="assets/images/svgs/close-line-cion.svg" alt="close" />
-    </button>
-  </div>
+<div class="w-100">
+  <div class="d-flex flex-column gap-32">
+    <div class="d-flex align-items-center justify-content-between gap-10 modal-header">
+      <h3>{{ isEditMode ? 'Edit Liability' : 'Add Liability' }}</h3>
+      <button (click)="onCancel()" type="button">
+        <img src="assets/images/svgs/close-line-cion.svg" alt="close" />
+      </button>
+    </div>
 
-  <mat-dialog-content class="d-flex flex-column gap-20">
-    <div class="w-100 form-field gap-8">
-      <mat-label class="f-s-16 d-block" style="line-height: 18px">Type</mat-label>
-      <div class="select-option">
-        <mat-select formControlName="type" placeholder="Select type">
-          <mat-option *ngFor="let t of liabilityTypes" [value]="t">
-            {{ t }}
-          </mat-option>
-        </mat-select>
+    <mat-dialog-content>
+      <div [formGroup]="form" class="d-flex flex-column gap-20">
+
+        <div class="w-100 form-field gap-8">
+          <mat-label class="f-s-16 d-block" style="line-height: 18px">Type</mat-label>
+          <div class="select-option">
+            <mat-select formControlName="type" placeholder="Select type" hideSingleSelectionIndicator>
+              @for (t of liabilityTypes; track t) {
+                <mat-option [value]="t">{{ t }}</mat-option>
+              }
+            </mat-select>
+          </div>
+          @if(form.get('type')?.touched && form.get('type')?.hasError('required')) {
+            <span class="field-error d-block">Required</span>
+          }
+        </div>
+
+        <div class="w-100 form-field gap-8">
+          <mat-label class="f-s-16 d-block" style="line-height: 18px">Description</mat-label>
+          <input matInput formControlName="description" placeholder="e.g. Home mortgage" />
+          @if(form.get('description')?.touched && form.get('description')?.hasError('required')) {
+            <span class="field-error d-block">Required</span>
+          }
+        </div>
+
+        <div class="d-flex flex-column gap-4 net-fields">
+          <div class="d-flex flex-column gap-8">
+            <mat-label class="f-s-16 d-block" style="line-height: 18px">Outstanding amount</mat-label>
+            <div class="net-field d-flex align-items-center">
+              <div class="left hide-arrow">
+                <mat-select formControlName="currencySymbol" class="sortby-edit-profile"
+                  hideSingleSelectionIndicator disabled>
+                  @for (country of countries; track country) {
+                    @if(country.currencySymbol) {
+                      <mat-option [value]="country.currencySymbol">{{country.currencySymbol}}</mat-option>
+                    }
+                  }
+                </mat-select>
+              </div>
+              <div class="w-100 form-field">
+                <input matInput type="text" formControlName="outstanding"
+                  [value]="form.get('outstanding')?.value | thousandSeparator"
+                  thousandSeparatorInput
+                  (input)="onAmountInput($event.target.value)"
+                  placeholder="0" />
+              </div>
+            </div>
+            @if(form.get('outstanding')?.touched && form.get('outstanding')?.hasError('required')) {
+              <span class="field-error d-block">Required</span>
+            }
+          </div>
+        </div>
+
       </div>
-      <span *ngIf="form.get('type')?.touched && form.get('type')?.hasError('required')" class="field-error d-block">Required</span>
-    </div>
+    </mat-dialog-content>
 
-    <div class="w-100 form-field gap-8">
-      <mat-label class="f-s-16 d-block" style="line-height: 18px">Description</mat-label>
-      <input matInput formControlName="description" placeholder="e.g. Home mortgage" />
-      <span *ngIf="form.get('description')?.touched && form.get('description')?.hasError('required')" class="field-error d-block">Required</span>
+    <div class="row justify-content-between modal-action">
+      <div class="col-5">
+        @if(isEditMode) {
+          <button type="button" class="button-icon-outline w-100 d-block" (click)="onDelete()" [disabled]="isSaving">
+            <span class="f-s-16">Delete</span>
+          </button>
+        } @else {
+          <button type="button" class="button-icon-outline w-100 d-block" (click)="onCancel()">
+            <span class="f-s-16">Cancel</span>
+          </button>
+        }
+      </div>
+      <div class="col-5">
+        <button type="button" class="button-icon w-100 d-block" (click)="onSave()"
+          [disabled]="form.invalid || isSaving">
+          @if(isSaving) {
+            <span class="f-s-16">Saving...</span>
+          } @else {
+            <span class="f-s-16">Save</span>
+          }
+        </button>
+      </div>
     </div>
-
-    <div class="w-100 form-field gap-8">
-      <mat-label class="f-s-16 d-block" style="line-height: 18px">Outstanding amount</mat-label>
-      <input matInput type="number" formControlName="outstanding" placeholder="0" />
-      <span *ngIf="form.get('outstanding')?.touched && form.get('outstanding')?.hasError('required')" class="field-error d-block">Required</span>
-    </div>
-  </mat-dialog-content>
-
-  <mat-dialog-actions class="d-flex justify-content-between align-items-center">
-    <div>
-      <button *ngIf="isEditMode" type="button" mat-button color="warn" (click)="onDelete()" [disabled]="isSaving">
-        Delete
-      </button>
-    </div>
-    <div class="d-flex gap-10">
-      <button type="button" mat-button (click)="onCancel()">Cancel</button>
-      <button type="submit" mat-flat-button color="primary" [disabled]="form.invalid || isSaving">
-        {{ isEditMode ? 'Update' : 'Save' }}
-      </button>
-    </div>
-  </mat-dialog-actions>
-</form>
+  </div>
+</div>

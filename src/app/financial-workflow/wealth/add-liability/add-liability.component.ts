@@ -2,11 +2,14 @@ import { Component, Inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { CommonModule } from '@angular/common';
-import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { MatButtonModule } from '@angular/material/button';
 import { ToastrService } from 'ngx-toastr';
+
+import { allCountries } from 'src/app/clients/models/country';
+import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
+import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
+import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
 
 import { WealthHttpService } from '../services/wealth-http.service';
 import { WealthLiabilityModel } from '../models/wealth.model';
@@ -25,10 +28,10 @@ export interface AddLiabilityDialogData {
     CommonModule,
     ReactiveFormsModule,
     MatDialogModule,
-    MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
-    MatButtonModule
+    ThousandSeparatorPipe,
+    ThousandSeparatorInputDirective
   ],
   templateUrl: './add-liability.component.html',
   styleUrl: './add-liability.component.scss',
@@ -37,12 +40,13 @@ export class AddLiabilityComponent {
   form: FormGroup;
   isEditMode: boolean;
   isSaving = false;
+  countries = allCountries;
 
   liabilityTypes = [
     'Mortgage',
     'Loan',
-    'Credit card',
-    'Student loan',
+    'Credit Card',
+    'Student Loan',
     'Other'
   ];
 
@@ -58,8 +62,18 @@ export class AddLiabilityComponent {
     this.form = this.fb.group({
       type: [this.isEditMode ? data.liability!.type : '', Validators.required],
       description: [this.isEditMode ? data.liability!.description : '', Validators.required],
-      outstanding: [this.isEditMode ? data.liability!.outstanding : null, [Validators.required, Validators.min(0)]]
+      outstanding: [this.isEditMode ? data.liability!.outstanding : null, [Validators.required, Validators.min(0)]],
+      currencySymbol: [data.clientPreferredCurrency || 'EUR']
     });
+  }
+
+  onAmountInput(rawValue: string): void {
+    if (!rawValue || rawValue.trim() === '') {
+      this.form.get('outstanding')?.setValue('', { emitEvent: true });
+      return;
+    }
+    const value = parseFormattedNumber(rawValue);
+    this.form.get('outstanding')?.setValue(value, { emitEvent: true });
   }
 
   onSave(): void {
