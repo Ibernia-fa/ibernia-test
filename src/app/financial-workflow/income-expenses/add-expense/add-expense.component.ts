@@ -531,7 +531,7 @@ export class AddExpenseComponent {
       this.showNameEdit = false;
     }
 
-    if (!this.isEditWorkflow || value === 'Living costs' || value === 'Housing') {
+    if (!this.isEditWorkflow) {
       this.applyDefaultStartEnd(value);
     }
 

@@ -29,6 +29,7 @@ export class ThousandSeparatorInputDirective implements OnInit {
       this.setSeparators();
       this.formatView();
     });
+    setTimeout(() => this.formatView());
   }
 
   private setSeparators() {
