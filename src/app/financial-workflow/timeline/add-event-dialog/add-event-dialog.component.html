@@ -304,6 +304,23 @@
         </div>
       </div>
 
+      @if(isHomeEvent && !isCashEvent) {
+      <div class="d-flex flex-column gap-8">
+        <button (click)="toggleMortgageCalculator()" type="button" class="mortgage-toggle-btn">
+          <img src="assets/images/svgs/cashflow-moneys-icon.svg" alt="calculator" width="16" />
+          <span>{{ showMortgageCalculator ? ('Hide mortgage calculator' | translate) : ('Use mortgage calculator' | translate) }}</span>
+        </button>
+
+        @if(showMortgageCalculator) {
+        <app-mortgage-calculator
+          [clientCountryCode]="clientCountryCode"
+          [currencySymbol]="clientPreferredCurrency"
+          (calculated)="onMortgageApplied($event)">
+        </app-mortgage-calculator>
+        }
+      </div>
+      }
+
       <div class="d-flex flex-column gap-8 net-fields">
         @if(isCashEvent) {
         <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Net amount' | translate }}

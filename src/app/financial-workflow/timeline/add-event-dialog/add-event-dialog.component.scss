@@ -148,3 +148,23 @@
   }
 }
 
+.mortgage-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: 1px dashed #516ce8;
+  border-radius: 6px;
+  padding: 8px 14px;
+  color: #516ce8;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  width: fit-content;
+
+  &:hover {
+    background: #f0f2ff;
+  }
+}
+

@@ -441,6 +441,7 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
         cashflowId: this.financialTimeline.cashflow.id,
         clientBirthDate: this.clientBirthDate,
         clientPreferredCurrency: this.client.clientDetails.preferredCurrency,
+        clientCountryCode: this.client.clientDetails.country,
         forecastStartDateYear: moment(this.financialTimeline.forecastStartDate).year(),
         forecastEndDateYear: moment(this.financialTimeline.forecastEndtDate).year(),
         isIncomeEvent: this.draggedEvent.type === EventIncomeType.Income,
@@ -971,6 +972,7 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
         cashflowId: this.financialTimeline.cashflow.id,
         clientBirthDate: this.clientBirthDate,
         clientPreferredCurrency: this.client.clientDetails.preferredCurrency,
+        clientCountryCode: this.client.clientDetails.country,
         forecastStartDateYear: moment(this.financialTimeline.forecastStartDate).year(),
         forecastEndDateYear: moment(this.financialTimeline.forecastEndtDate).year(),
         eventsList: this.financialTimeline.clientEvents.map((event) => {
@@ -1006,6 +1008,7 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
         cashflowId: this.financialTimeline.cashflow.id,
         clientBirthDate: this.clientBirthDate,
         clientPreferredCurrency: this.client.clientDetails.preferredCurrency,
+        clientCountryCode: this.client.clientDetails.country,
         forecastStartDateYear: moment(this.financialTimeline.forecastStartDate).year(),
         forecastEndDateYear: moment(this.financialTimeline.forecastEndtDate).year(),
         eventsList: this.financialTimeline.clientEvents.map((event) => {

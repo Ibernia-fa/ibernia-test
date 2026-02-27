@@ -22,6 +22,8 @@ import { CommonModule } from '@angular/common';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 import { TranslateModule } from '@ngx-translate/core';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MortgageCalculatorComponent } from '../mortgage-calculator/mortgage-calculator.component';
+import { MortgageOutput } from '../mortgage-calculator/mortgage-calculator.component';
 
 @Component({
   selector: 'app-add-event-dialog',
@@ -40,7 +42,8 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
     CommonModule,
     ThousandSeparatorInputDirective,
     TranslateModule,
-    MatCheckboxModule
+    MatCheckboxModule,
+    MortgageCalculatorComponent
   ],
   providers: [provideNativeDateAdapter(),
     AgeCalculatorPipe,
@@ -100,6 +103,12 @@ export class AddEventDialogComponent {
   isInheritanceOneOff = false;
   isCashEvent = false;
   financialRecords: FinancialRecordLineItem[] = [];
+  clientCountryCode: string = '';
+  showMortgageCalculator = false;
+
+  get isHomeEvent(): boolean {
+    return this.patchEvent?.name?.startsWith('Home') ?? false;
+  }
 
   constructor(
     private dialogRef: MatDialogRef<AddEventDialogComponent>,
@@ -109,6 +118,7 @@ export class AddEventDialogComponent {
   ) {
     this.amountCycles = data.amountCycles;
     this.selectedEventType = data.eventType;
+    this.clientCountryCode = this.resolveCountryCode(data.clientCountryCode ?? '');
 
     // Force Financing category based on event name
     if (
@@ -734,6 +744,15 @@ export class AddEventDialogComponent {
     this.showNameEdit = !this.showNameEdit;
   }
 
+  private resolveCountryCode(countryNameOrCode: string): string {
+    if (!countryNameOrCode) return '';
+    if (countryNameOrCode.length === 2) return countryNameOrCode.toUpperCase();
+    const match = allCountries.find(
+      c => c.countryName.toLowerCase() === countryNameOrCode.toLowerCase()
+    );
+    return match?.countryCode ?? '';
+  }
+
   private getNextEventName(baseName: string): string {
     const existing = this.data.eventsList
       ?.filter((e: any) =>
@@ -811,8 +830,48 @@ export class AddEventDialogComponent {
   }
 
   hasResaleChanged(event: any) {
-    // enable disable validation
     this.setupResaleValidation();
+  }
+
+  toggleMortgageCalculator(): void {
+    this.showMortgageCalculator = !this.showMortgageCalculator;
+  }
+
+  onMortgageApplied(output: MortgageOutput): void {
+    this.isCashEvent = false;
+    this.eventForm.get('paymentType')?.setValue('Financing', { emitEvent: true });
+
+    this.eventForm.patchValue({
+      amount: output.downPaymentAmount,
+      monthlyPayment: output.monthlyEMI,
+    }, { emitEvent: false });
+
+    const startYear = this.eventForm.get('start')?.value ?? this.eventForm.get('monthlyStart')?.value;
+    if (startYear) {
+      const endYear = startYear + output.loanTermYears;
+      this.eventForm.patchValue({
+        monthlyStart: startYear,
+        monthlyEnd: endYear,
+      }, { emitEvent: false });
+    }
+
+    this.applyFinancingValidators('Financing');
+
+    setTimeout(() => {
+      const el = this.amountInput?.nativeElement;
+      if (el) {
+        el.value = Number(output.downPaymentAmount).toLocaleString('en-US');
+        el.dispatchEvent(new Event('blur'));
+      }
+
+      const elMonthly = this.monthlyPayment?.nativeElement;
+      if (elMonthly) {
+        elMonthly.value = Number(output.monthlyEMI).toLocaleString('en-US');
+        elMonthly.dispatchEvent(new Event('blur'));
+      }
+    });
+
+    this.showMortgageCalculator = false;
   }
 
   private applyFinancingValidators(paymentType: 'Cash' | 'Financing') {

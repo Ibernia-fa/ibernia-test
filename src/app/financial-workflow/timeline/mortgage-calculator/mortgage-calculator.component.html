@@ -1,0 +1,140 @@
+<div class="mortgage-calculator">
+  <div class="calculator-header d-flex align-items-center justify-content-between">
+    <div class="d-flex align-items-center gap-8">
+      <img src="assets/images/svgs/cashflow-moneys-icon.svg" alt="calculator" width="20" />
+      <h4 class="f-w-500 f-s-16">{{ 'Mortgage Calculator' | translate }}</h4>
+      <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="16"
+        matTooltip="{{ config?.notes || ('Calculate your monthly mortgage payment based on property price, down payment, interest rate and loan term.' | translate) }}" />
+    </div>
+    @if(config?.countryName) {
+    <span class="calc-country-badge">{{ config.countryName }}</span>
+    }
+  </div>
+
+  <div [formGroup]="mortgageForm" class="calculator-body d-flex flex-column gap-16">
+
+    @if(hasResidencyTiers) {
+    <div class="d-flex flex-column gap-6">
+      <mat-label class="calc-label">{{ 'Residency status' | translate }}</mat-label>
+      <div class="select-option">
+        <mat-select formControlName="residencyType" hideSingleSelectionIndicator>
+          @for (tier of residencyTiers; track tier.value) {
+          <mat-option [value]="tier.value">{{ tier.label | translate }}</mat-option>
+          }
+        </mat-select>
+      </div>
+    </div>
+    }
+
+    @if(hasRateTypes) {
+    <div class="d-flex flex-column gap-6">
+      <mat-label class="calc-label">{{ 'Rate type' | translate }}</mat-label>
+      <div class="select-option">
+        <mat-select formControlName="rateType" hideSingleSelectionIndicator>
+          @for (rt of rateTypes; track rt.value) {
+          <mat-option [value]="rt.value">{{ rt.label | translate }}</mat-option>
+          }
+        </mat-select>
+      </div>
+    </div>
+    }
+
+    <div class="d-flex flex-column gap-6">
+      <mat-label class="calc-label">{{ 'Property price' | translate }}</mat-label>
+      <div class="calc-input-row">
+        <span class="calc-currency">{{ currencySymbol }}</span>
+        <input matInput type="text" inputmode="decimal" formControlName="propertyPrice"
+          thousandSeparatorInput placeholder="0" class="calc-input" />
+      </div>
+      @if(mortgageForm.get('propertyPrice')?.touched && mortgageForm.get('propertyPrice')?.hasError('required')) {
+      <span class="field-error d-block">{{ 'Required' | translate }}</span>
+      }
+      @if(highValueWarning) {
+      <span class="calc-warning d-block">{{ highValueWarning }}</span>
+      }
+    </div>
+
+    <div class="row calc-row">
+      <div class="col-6">
+        <div class="d-flex flex-column gap-6">
+          <mat-label class="calc-label">
+            {{ 'Down payment' | translate }}
+            <span class="calc-hint">(min {{ effectiveMinDownPayment }}%)</span>
+          </mat-label>
+          <div class="calc-input-row">
+            <input matInput type="number" formControlName="downPaymentPercent"
+              placeholder="20" class="calc-input" />
+            <span class="calc-suffix">%</span>
+          </div>
+          @if(mortgageForm.get('downPaymentPercent')?.touched && mortgageForm.get('downPaymentPercent')?.hasError('min')) {
+          <span class="field-error d-block">Min {{ effectiveMinDownPayment }}%</span>
+          }
+        </div>
+      </div>
+      <div class="col-6">
+        <div class="d-flex flex-column gap-6">
+          <mat-label class="calc-label">{{ 'Interest rate' | translate }} (% p.a.)</mat-label>
+          <div class="calc-input-row">
+            <input matInput type="number" step="0.01" formControlName="interestRate"
+              placeholder="5.0" class="calc-input" />
+            <span class="calc-suffix">%</span>
+          </div>
+          @if(mortgageForm.get('interestRate')?.touched && mortgageForm.get('interestRate')?.hasError('required')) {
+          <span class="field-error d-block">{{ 'Required' | translate }}</span>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="d-flex flex-column gap-6">
+      <mat-label class="calc-label">{{ 'Loan term' | translate }}</mat-label>
+      <div class="select-option">
+        <mat-select formControlName="loanTermYears" hideSingleSelectionIndicator>
+          @for (term of loanTermOptions; track term) {
+          <mat-option [value]="term">{{ term }} {{ 'years' | translate }}</mat-option>
+          }
+        </mat-select>
+      </div>
+    </div>
+
+    <div class="calc-disclaimer">
+      {{ 'Rates and limits shown are indicative defaults. Verify with your bank for exact terms.' | translate }}
+    </div>
+
+    <button (click)="onCalculate()" class="calc-btn calc-btn-secondary" type="button">
+      <span>{{ 'Calculate' | translate }}</span>
+    </button>
+
+    @if(result) {
+    <div class="calc-results">
+      <div class="calc-result-grid">
+        <div class="calc-result-item highlight">
+          <span class="calc-result-label">{{ 'Monthly EMI' | translate }}</span>
+          <span class="calc-result-value primary">{{ currencySymbol }}{{ result.monthlyEMI | thousandSeparator }}</span>
+        </div>
+        <div class="calc-result-item">
+          <span class="calc-result-label">{{ 'Down payment' | translate }}</span>
+          <span class="calc-result-value">{{ currencySymbol }}{{ result.downPaymentAmount | thousandSeparator }}</span>
+        </div>
+        <div class="calc-result-item">
+          <span class="calc-result-label">{{ 'Loan amount' | translate }}</span>
+          <span class="calc-result-value">{{ currencySymbol }}{{ result.loanAmount | thousandSeparator }}</span>
+        </div>
+        <div class="calc-result-item">
+          <span class="calc-result-label">{{ 'Total interest' | translate }}</span>
+          <span class="calc-result-value">{{ currencySymbol }}{{ result.totalInterest | thousandSeparator }}</span>
+        </div>
+        <div class="calc-result-item">
+          <span class="calc-result-label">{{ 'Total payable' | translate }}</span>
+          <span class="calc-result-value">{{ currencySymbol }}{{ result.totalPayable | thousandSeparator }}</span>
+        </div>
+      </div>
+
+      <button (click)="onApply()" class="calc-btn calc-btn-primary" type="button">
+        <span>{{ 'Apply to financing' | translate }}</span>
+      </button>
+    </div>
+    }
+
+  </div>
+</div>
