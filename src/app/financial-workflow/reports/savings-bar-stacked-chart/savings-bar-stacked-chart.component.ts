@@ -302,13 +302,15 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
         };
 
         this.chartOptions.annotations = {
-          points: [],
+          points: this.buildEventAnnotations(this.events),
           xaxis: [...emergencyXAxis, ...emergencyExpenseXAxis]
         };
       }
 
       setTimeout(() => {
-        if (this.events.length > 0) this.attachHtmlTooltips();
+        if (this.events.length > 0) {
+          this.attachHtmlTooltips();
+        }
         if (hideEmergencyOverlays) {
           this.cleanupEmergencyElements();
         } else {
