@@ -295,23 +295,25 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
   }
 
   private subscribeToEditTracking(): void {
-    this.scenarioForm.get('inflationRate')?.valueChanges
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(val => {
-        this.inflationEdited = Number(val) !== this.baselineInflationRate;
-      });
+    setTimeout(() => {
+      this.scenarioForm.get('inflationRate')?.valueChanges
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(val => {
+          this.inflationEdited = Number(val) !== this.baselineInflationRate;
+        });
 
-    this.scenarioForm.get('retirementAge')?.valueChanges
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(val => {
-        this.retirementAgeEdited = Number(val) !== this.baselineRetirementAge;
-      });
+      this.scenarioForm.get('retirementAge')?.valueChanges
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(val => {
+          this.retirementAgeEdited = Number(val) !== this.baselineRetirementAge;
+        });
 
-    this.scenarioForm.get('partnerRetirementAge')?.valueChanges
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(val => {
-        this.partnerRetirementAgeEdited = Number(val) !== this.baselinePartnerRetirementAge;
-      });
+      this.scenarioForm.get('partnerRetirementAge')?.valueChanges
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(val => {
+          this.partnerRetirementAgeEdited = Number(val) !== this.baselinePartnerRetirementAge;
+        });
+    });
   }
 
   private getMaxForecastEndDate(): Date {

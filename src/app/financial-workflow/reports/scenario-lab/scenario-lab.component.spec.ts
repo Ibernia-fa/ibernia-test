@@ -772,41 +772,47 @@ describe('ScenarioLabComponent', () => {
   // ── "Before:" label edited flags ─────────────────────────────────────
 
   describe('edited flags for Before labels', () => {
-    beforeEach(() => {
-      fixture.detectChanges();
-    });
-
     it('should start with inflationEdited=false', () => {
+      fixture.detectChanges();
       expect(component.inflationEdited).toBeFalse();
     });
 
-    it('should set inflationEdited=true when inflation value changes', () => {
+    it('should set inflationEdited=true when inflation value changes', fakeAsync(() => {
+      fixture.detectChanges();
+      tick();
       component.scenarioForm.patchValue({ inflationRate: 5 });
       expect(component.inflationEdited).toBeTrue();
-    });
+    }));
 
-    it('should set inflationEdited=false when value returns to baseline', () => {
+    it('should set inflationEdited=false when value returns to baseline', fakeAsync(() => {
+      fixture.detectChanges();
+      tick();
       component.scenarioForm.patchValue({ inflationRate: 5 });
       expect(component.inflationEdited).toBeTrue();
       component.scenarioForm.patchValue({ inflationRate: component.baselineInflationRate });
       expect(component.inflationEdited).toBeFalse();
-    });
+    }));
 
     it('should start with retirementAgeEdited=false', () => {
+      fixture.detectChanges();
       expect(component.retirementAgeEdited).toBeFalse();
     });
 
-    it('should set retirementAgeEdited=true when retirement age value changes', () => {
+    it('should set retirementAgeEdited=true when retirement age value changes', fakeAsync(() => {
+      fixture.detectChanges();
+      tick();
       component.scenarioForm.patchValue({ retirementAge: 70 });
       expect(component.retirementAgeEdited).toBeTrue();
-    });
+    }));
 
-    it('should set retirementAgeEdited=false when value returns to baseline', () => {
+    it('should set retirementAgeEdited=false when value returns to baseline', fakeAsync(() => {
+      fixture.detectChanges();
+      tick();
       component.scenarioForm.patchValue({ retirementAge: 70 });
       expect(component.retirementAgeEdited).toBeTrue();
       component.scenarioForm.patchValue({ retirementAge: component.baselineRetirementAge });
       expect(component.retirementAgeEdited).toBeFalse();
-    });
+    }));
   });
 
   describe('partner edited flag', () => {
@@ -823,17 +829,19 @@ describe('ScenarioLabComponent', () => {
     beforeEach(() => {
       mockFinancialWorkflowService.loadClientCashflowMetadata.and.returnValue(of([partnerClient, cashflow]));
       mockTimelineHttpService.getTimelinebyCashflowId.and.returnValue(of(partnerTimeline));
-      fixture.detectChanges();
     });
 
     it('should start with partnerRetirementAgeEdited=false', () => {
+      fixture.detectChanges();
       expect(component.partnerRetirementAgeEdited).toBeFalse();
     });
 
-    it('should set partnerRetirementAgeEdited=true when partner retirement age changes', () => {
+    it('should set partnerRetirementAgeEdited=true when partner retirement age changes', fakeAsync(() => {
+      fixture.detectChanges();
+      tick();
       component.scenarioForm.patchValue({ partnerRetirementAge: 70 });
       expect(component.partnerRetirementAgeEdited).toBeTrue();
-    });
+    }));
   });
 
   // ── buildScenarioPayload with partner max ─────────────────────────────
