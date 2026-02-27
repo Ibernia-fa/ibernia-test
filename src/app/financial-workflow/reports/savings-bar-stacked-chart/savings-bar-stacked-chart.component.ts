@@ -307,6 +307,19 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
         };
       }
 
+      // For animated updates (after first render): the series reassignment triggers
+      // updateSeries which destroys SVG annotation markers. Rebuild annotations
+      // after the 450ms dynamicAnimation completes so ApexCharts recreates them.
+      const pendingAnnotations = {
+        points: this.buildEventAnnotations(this.events),
+        xaxis: [...emergencyXAxis, ...emergencyExpenseXAxis]
+      };
+      if (this.animateUpdates && this.chartInitialized) {
+        setTimeout(() => {
+          this.chartOptions.annotations = pendingAnnotations;
+        }, 500);
+      }
+
       setTimeout(() => {
         if (this.events.length > 0) {
           this.attachHtmlTooltips();
@@ -327,7 +340,7 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
             if (this.emergencyIconBandEl) { this.emergencyIconBandEl.remove(); this.emergencyIconBandEl = null; }
           }
         }
-      }, 600);
+      }, 800);
     }
 
     // NOTE: animations.dynamicAnimation is configured in the constructor and stays stable.
