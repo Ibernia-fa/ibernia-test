@@ -28,6 +28,7 @@
         [financialRecords]="financialRecords"
         [clientBirthDate]="clientBirthDate"
         [client]="client"
+        [planDuration]="selectedCashflow?.planDuration"
         [cashflowInflationRate]="selectedCashflow?.inflationRate ?? 0"
         (updateTimelines)="updateTimelinesEmittedEvent()">
     </app-timeline-chart>
