@@ -183,6 +183,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
       )
       .subscribe((report) => {
         if (report) {
+          this.injectTimelineEvents(report);
           this.report = report;
           if (!this.baselineReport) {
             this.baselineReport = report;
@@ -208,6 +209,28 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
     );
 
     this.expenseItems = this.incomeExpenseData?.expenses ?? [];
+  }
+
+  private buildIncomeTypes(): string[] {
+    const defaultIncomes = (this.incomeExpenseData?.incomes ?? []).filter(i => i.isDefault);
+    const allIncomes = this.incomeExpenseData?.incomes ?? [];
+    const types: string[] = [];
+    if (!defaultIncomes.find(x => x.description === 'Salary')) types.push('Salary');
+    if (!defaultIncomes.find(x => x.description === 'State pension')) types.push('State pension');
+    if (!allIncomes.find(x => x.description === 'Rental income')) types.push('Rental income');
+    types.push('Custom');
+    return types;
+  }
+
+  private buildExpenseTypes(): string[] {
+    const defaultExpenses = (this.incomeExpenseData?.expenses ?? []).filter(e => e.isDefault);
+    const allExpenses = this.incomeExpenseData?.expenses ?? [];
+    const types: string[] = [];
+    if (!defaultExpenses.find(x => x.description === 'Living costs')) types.push('Living costs');
+    if (!defaultExpenses.find(x => x.description === 'Housing')) types.push('Housing');
+    if (!allExpenses.find(x => x.description === 'Debt repayment')) types.push('Debt repayment');
+    types.push('Custom');
+    return types;
   }
 
   private initFormFromPlan(): void {
@@ -266,6 +289,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
   private applyScenario(): void {
     this.loadScenarioReport().pipe(takeUntil(this.destroy$)).subscribe((report) => {
       if (report) {
+        this.injectTimelineEvents(report);
         this.report = report;
         this.alignSeriesStructure();
         this.activeTab = 'after';
@@ -333,6 +357,14 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
     if (!this.scenarioForecastEndDate || this.scenarioForecastEndDate.getTime() !== next.getTime()) {
       this.scenarioForecastEndDate = next;
     }
+  }
+
+  private injectTimelineEvents(report: ChartSeries): void {
+    if (report.timelineEvents?.length) return;
+    const events = this.financialTimeline?.clientEvents ?? [];
+    report.timelineEvents = events
+      .filter(e => !e.isPlaceHolder)
+      .map(e => ({ name: e.name, startYear: e.start.year, iconUrl: e.iconUrl }));
   }
 
   onBack(): void {
@@ -448,6 +480,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
       data: {
         amountCycles: this.amountCycles,
         escalataionRates: this.escalationRates,
+        eventsList: [...this.financialTimeline.clientEvents].sort((a, b) => a.start.age - b.start.age),
         clientBirthDate: this.client.clientDetails.birthDate,
         clientPreferredCurrency: this.client.clientDetails.preferredCurrency,
         cashflowId: this.cashflowId,
@@ -455,7 +488,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
         isEditWorkflow: true,
         forecastEndDateYear: moment(this.financialTimeline.forecastEndtDate).year(),
         forecastStartDateYear: moment(this.financialTimeline.forecastStartDate).year(),
-        incomeType: [],
+        incomeType: this.buildIncomeTypes(),
       },
     });
 
@@ -478,6 +511,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
       data: {
         amountCycles: this.amountCycles,
         escalataionRates: this.escalationRates,
+        eventsList: [...this.financialTimeline.clientEvents].sort((a, b) => a.start.age - b.start.age),
         clientBirthDate: this.client.clientDetails.birthDate,
         clientPreferredCurrency: this.client.clientDetails.preferredCurrency,
         cashflowId: this.cashflowId,
@@ -485,7 +519,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
         isEditWorkflow: true,
         forecastEndDateYear: moment(this.financialTimeline.forecastEndtDate).year(),
         forecastStartDateYear: moment(this.financialTimeline.forecastStartDate).year(),
-        expenseType: [],
+        expenseType: this.buildExpenseTypes(),
       },
     });
 

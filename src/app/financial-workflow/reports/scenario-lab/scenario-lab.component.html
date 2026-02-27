@@ -149,7 +149,7 @@
                   @for (income of incomeItems; track income.id) {
                     <mat-option [value]="income">
                       <span class="category-option">
-                        <img [src]="'assets/images/svgs/' + (income.icon || 'custom-icon') + '.svg'" [alt]="income.description" width="18" class="category-option-icon" />
+                        <img [src]="'assets/images/svgs/' + (income.icon || 'custom-icon') + '-gray.svg'" [alt]="income.description" width="18" class="category-option-icon" />
                         {{ income.description }}
                       </span>
                     </mat-option>
@@ -167,7 +167,7 @@
                   @for (expense of expenseItems; track expense.id) {
                     <mat-option [value]="expense">
                       <span class="category-option">
-                        <img [src]="'assets/images/svgs/' + (expense.icon || 'custom-icon') + '.svg'" [alt]="expense.description" width="18" class="category-option-icon" />
+                        <img [src]="'assets/images/svgs/' + (expense.icon || 'custom-icon') + '-gray.svg'" [alt]="expense.description" width="18" class="category-option-icon" />
                         {{ expense.description }}
                       </span>
                     </mat-option>

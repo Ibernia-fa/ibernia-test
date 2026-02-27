@@ -711,4 +711,112 @@ describe('ScenarioLabComponent', () => {
       expect(baselineShortfall!.data).toEqual([0, 0]);
     });
   });
+
+  // ── buildIncomeTypes / buildExpenseTypes ─────────────────────────────────
+
+  describe('buildIncomeTypes', () => {
+    beforeEach(() => {
+      fixture.detectChanges();
+    });
+
+    it('should always include Custom', () => {
+      const types = component['buildIncomeTypes']();
+      expect(types).toContain('Custom');
+    });
+
+    it('should include Salary when no default Salary income exists', () => {
+      component.incomeExpenseData = makeIncomeExpense({
+        incomes: [
+          { id: 'inc-1', description: 'Rental income', isDefault: false, icon: 'rental-income', amount: { currencySymbol: '€', amount: 0, cycle: null }, start: { age: 0, year: 0 }, end: { age: 0, year: 0 }, escalationRate: null, isIncomeExpenseSource: true },
+        ],
+      }) as any;
+      const types = component['buildIncomeTypes']();
+      expect(types).toContain('Salary');
+      expect(types).toContain('State pension');
+    });
+  });
+
+  describe('buildExpenseTypes', () => {
+    beforeEach(() => {
+      fixture.detectChanges();
+    });
+
+    it('should always include Custom', () => {
+      const types = component['buildExpenseTypes']();
+      expect(types).toContain('Custom');
+    });
+  });
+
+  // ── incomeType / expenseType passed to dialogs ──────────────────────────
+
+  describe('dialog data for income/expense editors', () => {
+    let dialogAfterClosed$: Subject<any>;
+
+    beforeEach(() => {
+      fixture.detectChanges();
+      dialogAfterClosed$ = new Subject();
+      mockDialog.open.and.returnValue({ afterClosed: () => dialogAfterClosed$.asObservable() } as MatDialogRef<any>);
+    });
+
+    it('should pass non-empty incomeType array to AddIncomeComponent', () => {
+      const income = component.incomeItems[0];
+      component.onIncomeSelected(income);
+      const dialogData = mockDialog.open.calls.mostRecent().args[1]?.data as any;
+      expect(dialogData.incomeType.length).toBeGreaterThan(0);
+      expect(dialogData.incomeType).toContain('Custom');
+    });
+
+    it('should pass eventsList to AddIncomeComponent', () => {
+      const income = component.incomeItems[0];
+      component.onIncomeSelected(income);
+      const dialogData = mockDialog.open.calls.mostRecent().args[1]?.data as any;
+      expect(dialogData.eventsList).toBeDefined();
+      expect(Array.isArray(dialogData.eventsList)).toBeTrue();
+    });
+
+    it('should pass non-empty expenseType array to AddExpenseComponent', () => {
+      const expense = component.expenseItems[0];
+      component.onExpenseSelected(expense);
+      const dialogData = mockDialog.open.calls.mostRecent().args[1]?.data as any;
+      expect(dialogData.expenseType.length).toBeGreaterThan(0);
+      expect(dialogData.expenseType).toContain('Custom');
+    });
+
+    it('should pass eventsList to AddExpenseComponent', () => {
+      const expense = component.expenseItems[0];
+      component.onExpenseSelected(expense);
+      const dialogData = mockDialog.open.calls.mostRecent().args[1]?.data as any;
+      expect(dialogData.eventsList).toBeDefined();
+      expect(Array.isArray(dialogData.eventsList)).toBeTrue();
+    });
+  });
+
+  // ── injectTimelineEvents ────────────────────────────────────────────────
+
+  describe('injectTimelineEvents', () => {
+    beforeEach(() => {
+      fixture.detectChanges();
+    });
+
+    it('should inject events from financialTimeline when report has none', () => {
+      const emptyReport = makeReport({ timelineEvents: [] });
+      component['injectTimelineEvents'](emptyReport);
+      expect(emptyReport.timelineEvents.length).toBe(1);
+      expect(emptyReport.timelineEvents[0].name).toBe('Home');
+    });
+
+    it('should not overwrite existing timelineEvents', () => {
+      const existingEvents = [{ name: 'Existing', startYear: 2030, iconUrl: 'icon' }];
+      const reportWithEvents = makeReport({ timelineEvents: existingEvents });
+      component['injectTimelineEvents'](reportWithEvents);
+      expect(reportWithEvents.timelineEvents).toBe(existingEvents);
+    });
+
+    it('should exclude placeholder events', () => {
+      const emptyReport = makeReport({ timelineEvents: [] });
+      component['injectTimelineEvents'](emptyReport);
+      const names = emptyReport.timelineEvents.map((e: any) => e.name);
+      expect(names).not.toContain('Retirement');
+    });
+  });
 });
