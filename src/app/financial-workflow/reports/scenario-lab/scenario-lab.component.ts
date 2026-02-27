@@ -75,6 +75,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
   baselineReport: ChartSeries | null = null;
   displayedReport: ChartSeries | null = null;
   activeTab: 'before' | 'after' = 'after';
+  hasSimulated = false;
 
   baselineInflationRate = 2.5;
   baselineRetirementAge = 65;
@@ -350,6 +351,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
         this.injectTimelineEvents(report);
         this.report = report;
         this.alignSeriesStructure();
+        this.hasSimulated = true;
         this.activeTab = 'after';
         this.displayedReport = report;
         this.updateScenarioForecastEndDateIfNeeded();

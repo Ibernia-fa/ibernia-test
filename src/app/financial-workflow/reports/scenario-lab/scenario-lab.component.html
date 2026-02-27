@@ -25,15 +25,17 @@
     <mat-card class="cardWithShadow">
       <mat-card-content style="padding-bottom: 10px !important;">
 
-        <!-- Before / After tabs -->
-        <div class="graph-tabs d-flex gap-12">
-          <button class="tab-btn" [class.active]="activeTab === 'before'" (click)="switchTab('before')">
-            {{ 'Before' | translate }}
-          </button>
-          <button class="tab-btn" [class.active]="activeTab === 'after'" (click)="switchTab('after')">
-            {{ 'After' | translate }}
-          </button>
-        </div>
+        <!-- Before / After tabs (only visible after first simulation) -->
+        @if (hasSimulated) {
+          <div class="graph-tabs d-flex gap-12">
+            <button class="tab-btn" [class.active]="activeTab === 'before'" (click)="switchTab('before')">
+              {{ 'Before' | translate }}
+            </button>
+            <button class="tab-btn" [class.active]="activeTab === 'after'" (click)="switchTab('after')">
+              {{ 'After' | translate }}
+            </button>
+          </div>
+        }
 
         <div class="chart-component-wrapper" *ngIf="displayedReport && client && financialTimeline">
           <app-savings-bar-stacked-chart

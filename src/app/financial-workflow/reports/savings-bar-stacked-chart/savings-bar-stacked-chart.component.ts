@@ -53,6 +53,12 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
   private chartInitialized = false;
   /** Last categories string used to detect genuine axis changes vs. same-length updates. */
   private previousCategoriesKey = '';
+  /** Annotation data decoupled from chartOptions to avoid triggering ng-apexcharts change detection. */
+  private currentAnnotationPoints: any[] = [];
+  /** Cached flag for use inside ApexCharts event callbacks. */
+  private _hideEmergencyOverlays = false;
+  /** Debounce handle for postRenderSetup. */
+  private _postRenderTimer: any = null;
 
   private getCurrencyAxisTitle(): string {
     return this.client?.clientDetails?.preferredCurrency ?? '';
@@ -94,7 +100,9 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
           }
         },
         events: {
-          dataPointSelection: () => undefined
+          dataPointSelection: () => undefined,
+          mounted: (chartContext: any) => this.postRenderSetup(chartContext),
+          updated: (chartContext: any) => this.postRenderSetup(chartContext),
         },
         selection: {
           enabled: false
@@ -210,6 +218,7 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
 
   ngOnChanges(changes: SimpleChanges): void {
     const hideEmergencyOverlays = this.emergencyIconUrl === 'none';
+    this._hideEmergencyOverlays = hideEmergencyOverlays;
 
     const parsedHeight = Number(this.chartHeight);
     const effectiveHeight =
@@ -301,46 +310,36 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
           }
         };
 
+        const points = this.buildEventAnnotations(this.events);
+        this.currentAnnotationPoints = points;
         this.chartOptions.annotations = {
-          points: this.buildEventAnnotations(this.events),
+          points,
           xaxis: [...emergencyXAxis, ...emergencyExpenseXAxis]
         };
       }
 
-      // For animated updates (after first render): the series reassignment triggers
-      // updateSeries which destroys SVG annotation markers. Rebuild annotations
-      // after the 450ms dynamicAnimation completes so ApexCharts recreates them.
-      const pendingAnnotations = {
-        points: this.buildEventAnnotations(this.events),
-        xaxis: [...emergencyXAxis, ...emergencyExpenseXAxis]
-      };
-      if (this.animateUpdates && this.chartInitialized) {
+      // For animated updates, postRenderSetup() (called by ApexCharts mounted/updated
+      // events) handles annotation rebuild and tooltip attachment reliably.
+      // Only use the setTimeout path for non-animated contexts (normal report pages).
+      if (!this.animateUpdates) {
         setTimeout(() => {
-          this.chartOptions.annotations = pendingAnnotations;
-        }, 500);
-      }
-
-      setTimeout(() => {
-        if (this.events.length > 0) {
-          this.attachHtmlTooltips();
-        }
-        if (hideEmergencyOverlays) {
-          this.cleanupEmergencyElements();
-        } else {
-          this.attachEmergencyExpenseIcon();
-          // Show the shortfall icon only when there is no emergency-expense column.
-          // If an emergency expense exists it already marks the relevant date; showing
-          // a second shortfall icon on a different column would be confusing.
-          if (this.emergencyExpenseDataPointIndex < 0) {
-            this.attachEmergencyIcon();
-          } else {
-            // Clean up any stale shortfall overlay from a previous render
-            if (this.emergencyIconEl) { this.emergencyIconEl.remove(); this.emergencyIconEl = null; }
-            if (this.emergencyIconLineEl) { this.emergencyIconLineEl.remove(); this.emergencyIconLineEl = null; }
-            if (this.emergencyIconBandEl) { this.emergencyIconBandEl.remove(); this.emergencyIconBandEl = null; }
+          if (this.events.length > 0) {
+            this.attachHtmlTooltips();
           }
-        }
-      }, 800);
+          if (hideEmergencyOverlays) {
+            this.cleanupEmergencyElements();
+          } else {
+            this.attachEmergencyExpenseIcon();
+            if (this.emergencyExpenseDataPointIndex < 0) {
+              this.attachEmergencyIcon();
+            } else {
+              if (this.emergencyIconEl) { this.emergencyIconEl.remove(); this.emergencyIconEl = null; }
+              if (this.emergencyIconLineEl) { this.emergencyIconLineEl.remove(); this.emergencyIconLineEl = null; }
+              if (this.emergencyIconBandEl) { this.emergencyIconBandEl.remove(); this.emergencyIconBandEl = null; }
+            }
+          }
+        }, 600);
+      }
     }
 
     // NOTE: animations.dynamicAnimation is configured in the constructor and stays stable.
@@ -566,7 +565,7 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
         markers.forEach((marker) => {
           if (found) return;
           const annotationIdx = Array.from(markers).indexOf(marker);
-          if (this.chartOptions.annotations?.points[annotationIdx]?.customTooltip?.includes(event.name)) {
+          if (this.currentAnnotationPoints[annotationIdx]?.customTooltip?.includes(event.name)) {
             const rect = marker.getBoundingClientRect();
             markerCenterX = rect.left + rect.width / 2;
             markerCenterY = rect.top + rect.height / 2;
@@ -768,6 +767,54 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
     assign(icon, null, band);
   }
 
+  /**
+   * Called by ApexCharts `mounted` (after initial render / full rebuild) and
+   * `updated` (after updateSeries animation completes). Only active when
+   * animateUpdates=true (Scenario Lab). Rebuilds annotation markers that
+   * updateSeries destroys and reattaches tooltip listeners.
+   */
+  private postRenderSetup(chartContext: any): void {
+    if (!this.animateUpdates) return;
+
+    clearTimeout(this._postRenderTimer);
+    this._postRenderTimer = setTimeout(() => {
+      const chartHost = this.chartElRef?.nativeElement;
+      if (!chartHost) return;
+
+      const markers = chartHost.querySelectorAll<SVGElement>('.apexcharts-point-annotation-marker');
+
+      if ((!markers || markers.length === 0) && this.events.length > 0) {
+        const points = this.buildEventAnnotations(this.events);
+        this.currentAnnotationPoints = points;
+        points.forEach(a => chartContext.addPointAnnotation(a, false));
+
+        if (!this._hideEmergencyOverlays) {
+          const emergencyXAxis = this.buildEmergencyAnnotation(this.report);
+          const emergencyExpenseXAxis = this.buildEmergencyExpenseAnnotation(this.report);
+          [...emergencyXAxis, ...emergencyExpenseXAxis].forEach(a => chartContext.addXaxisAnnotation(a, false));
+        }
+      }
+
+      this.cleanupHtmlTooltips();
+      if (this.events.length > 0) {
+        this.attachHtmlTooltips();
+      }
+
+      if (this._hideEmergencyOverlays) {
+        this.cleanupEmergencyElements();
+      } else {
+        this.attachEmergencyExpenseIcon();
+        if (this.emergencyExpenseDataPointIndex < 0) {
+          this.attachEmergencyIcon();
+        } else {
+          if (this.emergencyIconEl) { this.emergencyIconEl.remove(); this.emergencyIconEl = null; }
+          if (this.emergencyIconLineEl) { this.emergencyIconLineEl.remove(); this.emergencyIconLineEl = null; }
+          if (this.emergencyIconBandEl) { this.emergencyIconBandEl.remove(); this.emergencyIconBandEl = null; }
+        }
+      }
+    }, 50);
+  }
+
   private attachHtmlTooltips() {
     this.cleanupHtmlTooltips();
 
@@ -778,7 +825,7 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
     const markers = chartHost.querySelectorAll<SVGElement>('.apexcharts-point-annotation-marker');
 
     markers.forEach((marker, i) => {
-      const annotation = this.chartOptions.annotations.points[i];
+      const annotation = this.currentAnnotationPoints[i];
       if (!annotation?.customTooltip) return;
 
       const tooltip = document.createElement('div');
