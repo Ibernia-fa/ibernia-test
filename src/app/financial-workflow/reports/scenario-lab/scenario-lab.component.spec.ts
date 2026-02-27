@@ -48,6 +48,27 @@ function makeCashflow(overrides: any = {}) {
   };
 }
 
+function makeEvent(overrides: any = {}) {
+  return {
+    id: 'e-default',
+    name: 'Event',
+    type: EventIncomeType.Income,
+    iconUrl: 'custom-icon',
+    start: { age: 30, year: 2020 },
+    end: null,
+    isPlaceHolder: false,
+    isOneOff: false,
+    isDefault: false,
+    isCash: false,
+    isFinance: false,
+    isParent: false,
+    isPartnerEvent: false,
+    netAmount: { currencySymbol: '€', amount: 0, cycle: null },
+    escalationRate: null,
+    ...overrides,
+  };
+}
+
 function makeTimeline(overrides: any = {}) {
   return {
     id: 'tl-1',
@@ -55,8 +76,9 @@ function makeTimeline(overrides: any = {}) {
     forecastEndtDate: new Date(2055, 11, 31),
     clientBirthDate: new Date(1990, 0, 1),
     clientEvents: [
-      { id: 'e1', name: 'Home', type: EventIncomeType.Expense, iconUrl: 'home-icon', start: { age: 40, year: 2030 }, end: null, isPlaceHolder: false, isOneOff: true, isDefault: false, isCash: false, isFinance: true, isParent: false, netAmount: { currencySymbol: '€', amount: 0, cycle: null }, escalationRate: null },
-      { id: 'e2', name: 'Retirement', type: EventIncomeType.Income, iconUrl: 'custom-icon', start: { age: 65, year: 2055 }, end: null, isPlaceHolder: true, isOneOff: false, isDefault: false, isCash: false, isFinance: false, isParent: false, netAmount: { currencySymbol: '€', amount: 0, cycle: null }, escalationRate: null },
+      makeEvent({ id: 'e1', name: 'Home', type: EventIncomeType.Expense, iconUrl: 'home-icon', start: { age: 40, year: 2030 }, isOneOff: true, isFinance: true }),
+      makeEvent({ id: 'e2', name: 'Retirement', iconUrl: 'custom-icon', start: { age: 65, year: 2055 }, isPlaceHolder: true }),
+      makeEvent({ id: 'e3', name: 'Retirement age', start: { age: 65, year: 2055 } }),
     ],
     cashflow: { id: 'cf-1' },
     ...overrides,
@@ -249,7 +271,7 @@ describe('ScenarioLabComponent', () => {
     });
 
     it('should populate goalItems excluding placeholder events', () => {
-      expect(component.goalItems.length).toBe(1);
+      expect(component.goalItems.length).toBe(2);
       expect(component.goalItems[0].name).toBe('Home');
     });
 
@@ -281,9 +303,12 @@ describe('ScenarioLabComponent', () => {
       expect(component.baselineInflationRate).toBe(3);
     });
 
-    it('should compute baselineRetirementAge from forecast end year minus birth year', () => {
-      // forecastEndtDate = 2055, birthYear = 1990 → 65
+    it('should derive baselineRetirementAge from retirement event on timeline', () => {
       expect(component.baselineRetirementAge).toBe(65);
+    });
+
+    it('should set hasRetirementAge to true when retirement age event exists', () => {
+      expect(component.hasRetirementAge).toBeTrue();
     });
 
     it('should patch the form with baseline values', () => {
@@ -299,6 +324,10 @@ describe('ScenarioLabComponent', () => {
 
     it('should set maxRetirementAge to 100', () => {
       expect(component.maxRetirementAge).toBe(100);
+    });
+
+    it('should set clientFirstName from client details', () => {
+      expect(component.clientFirstName).toBe('John');
     });
   });
 
@@ -670,6 +699,183 @@ describe('ScenarioLabComponent', () => {
     });
   });
 
+  // ── hasRetirementAge = false when no retirement event ──────────────────
+
+  describe('retirement age missing', () => {
+    it('should set hasRetirementAge=false when no retirement event in timeline', () => {
+      const noRetTimeline = makeTimeline({
+        clientEvents: [
+          makeEvent({ id: 'e1', name: 'Home', type: EventIncomeType.Expense, start: { age: 40, year: 2030 }, isFinance: true }),
+        ],
+      });
+      mockTimelineHttpService.getTimelinebyCashflowId.and.returnValue(of(noRetTimeline));
+      fixture.detectChanges();
+      expect(component.hasRetirementAge).toBeFalse();
+    });
+
+    it('should not patch retirementAge form control when no retirement event', () => {
+      const noRetTimeline = makeTimeline({
+        clientEvents: [
+          makeEvent({ id: 'e1', name: 'Home', type: EventIncomeType.Expense, start: { age: 40, year: 2030 }, isFinance: true }),
+        ],
+      });
+      mockTimelineHttpService.getTimelinebyCashflowId.and.returnValue(of(noRetTimeline));
+      fixture.detectChanges();
+      expect(component.scenarioForm.get('retirementAge')?.value).toBe(65);
+    });
+  });
+
+  // ── Partner retirement age support ────────────────────────────────────
+
+  describe('partner retirement age', () => {
+    const partnerClient = makeClient({
+      partnerDetail: { firstName: 'Jane', birthDate: '1992-06-15', preferredCurrency: 'EUR', country: 'IE' },
+    });
+    const partnerTimeline = makeTimeline({
+      clientEvents: [
+        makeEvent({ id: 'e1', name: 'Home', type: EventIncomeType.Expense, start: { age: 40, year: 2030 }, isFinance: true }),
+        makeEvent({ id: 'e3', name: 'Retirement age', start: { age: 65, year: 2055 } }),
+        makeEvent({ id: 'e4', name: 'Retirement age', start: { age: 63, year: 2055 }, isPartnerEvent: true }),
+      ],
+    });
+
+    beforeEach(() => {
+      mockFinancialWorkflowService.loadClientCashflowMetadata.and.returnValue(of([partnerClient, cashflow]));
+      mockTimelineHttpService.getTimelinebyCashflowId.and.returnValue(of(partnerTimeline));
+      fixture.detectChanges();
+    });
+
+    it('should set hasPartnerRetirementAge=true', () => {
+      expect(component.hasPartnerRetirementAge).toBeTrue();
+    });
+
+    it('should derive baselinePartnerRetirementAge from partner event', () => {
+      expect(component.baselinePartnerRetirementAge).toBe(63);
+    });
+
+    it('should add partnerRetirementAge form control', () => {
+      expect(component.scenarioForm.get('partnerRetirementAge')).toBeTruthy();
+      expect(component.scenarioForm.get('partnerRetirementAge')?.value).toBe(63);
+    });
+
+    it('should set partnerFirstName', () => {
+      expect(component.partnerFirstName).toBe('Jane');
+    });
+
+    it('should compute minPartnerRetirementAge from partner current age', () => {
+      const currentYear = new Date().getFullYear();
+      const expectedMin = Math.max(18, currentYear - 1992);
+      expect(component.minPartnerRetirementAge).toBe(expectedMin);
+    });
+  });
+
+  // ── "Before:" label edited flags ─────────────────────────────────────
+
+  describe('edited flags for Before labels', () => {
+    beforeEach(() => {
+      fixture.detectChanges();
+    });
+
+    it('should start with inflationEdited=false', () => {
+      expect(component.inflationEdited).toBeFalse();
+    });
+
+    it('should set inflationEdited=true when inflation value changes', () => {
+      component.scenarioForm.patchValue({ inflationRate: 5 });
+      expect(component.inflationEdited).toBeTrue();
+    });
+
+    it('should set inflationEdited=false when value returns to baseline', () => {
+      component.scenarioForm.patchValue({ inflationRate: 5 });
+      expect(component.inflationEdited).toBeTrue();
+      component.scenarioForm.patchValue({ inflationRate: component.baselineInflationRate });
+      expect(component.inflationEdited).toBeFalse();
+    });
+
+    it('should start with retirementAgeEdited=false', () => {
+      expect(component.retirementAgeEdited).toBeFalse();
+    });
+
+    it('should set retirementAgeEdited=true when retirement age value changes', () => {
+      component.scenarioForm.patchValue({ retirementAge: 70 });
+      expect(component.retirementAgeEdited).toBeTrue();
+    });
+
+    it('should set retirementAgeEdited=false when value returns to baseline', () => {
+      component.scenarioForm.patchValue({ retirementAge: 70 });
+      expect(component.retirementAgeEdited).toBeTrue();
+      component.scenarioForm.patchValue({ retirementAge: component.baselineRetirementAge });
+      expect(component.retirementAgeEdited).toBeFalse();
+    });
+  });
+
+  describe('partner edited flag', () => {
+    const partnerClient = makeClient({
+      partnerDetail: { firstName: 'Jane', birthDate: '1992-06-15', preferredCurrency: 'EUR', country: 'IE' },
+    });
+    const partnerTimeline = makeTimeline({
+      clientEvents: [
+        makeEvent({ id: 'e3', name: 'Retirement age', start: { age: 65, year: 2055 } }),
+        makeEvent({ id: 'e4', name: 'Retirement age', start: { age: 63, year: 2055 }, isPartnerEvent: true }),
+      ],
+    });
+
+    beforeEach(() => {
+      mockFinancialWorkflowService.loadClientCashflowMetadata.and.returnValue(of([partnerClient, cashflow]));
+      mockTimelineHttpService.getTimelinebyCashflowId.and.returnValue(of(partnerTimeline));
+      fixture.detectChanges();
+    });
+
+    it('should start with partnerRetirementAgeEdited=false', () => {
+      expect(component.partnerRetirementAgeEdited).toBeFalse();
+    });
+
+    it('should set partnerRetirementAgeEdited=true when partner retirement age changes', () => {
+      component.scenarioForm.patchValue({ partnerRetirementAge: 70 });
+      expect(component.partnerRetirementAgeEdited).toBeTrue();
+    });
+  });
+
+  // ── buildScenarioPayload with partner max ─────────────────────────────
+
+  describe('buildScenarioPayload with partner retirement age', () => {
+    const partnerClient = makeClient({
+      partnerDetail: { firstName: 'Jane', birthDate: '1992-06-15', preferredCurrency: 'EUR', country: 'IE' },
+    });
+    const partnerTimeline = makeTimeline({
+      clientEvents: [
+        makeEvent({ id: 'e3', name: 'Retirement age', start: { age: 65, year: 2055 } }),
+        makeEvent({ id: 'e4', name: 'Retirement age', start: { age: 63, year: 2055 }, isPartnerEvent: true }),
+      ],
+    });
+
+    beforeEach(() => {
+      mockFinancialWorkflowService.loadClientCashflowMetadata.and.returnValue(of([partnerClient, cashflow]));
+      mockTimelineHttpService.getTimelinebyCashflowId.and.returnValue(of(partnerTimeline));
+      fixture.detectChanges();
+    });
+
+    it('should use max of main and partner retirement ages for ForecastEndDate', () => {
+      component.scenarioForm.patchValue({ retirementAge: 65, partnerRetirementAge: 70 });
+      component.onSimulate();
+
+      const args = mockReportsHttpService.getReportScenario.calls.mostRecent().args;
+      const endDate = new Date(args[1].ForecastEndDate);
+      // main: 1990 + 65 = 2055, partner: 1992 + 70 = 2062 → max = 2062
+      expect(endDate.getFullYear()).toBe(2062);
+    });
+
+    it('should use main retirement age when it produces a later end year', () => {
+      component.scenarioForm.patchValue({ retirementAge: 80, partnerRetirementAge: 63 });
+      component.onSimulate();
+
+      const args = mockReportsHttpService.getReportScenario.calls.mostRecent().args;
+      const endDate = new Date(args[1].ForecastEndDate);
+      // main: 1990 + 80 = 2070, partner: 1992 + 63 = 2055 → max = 2070
+      expect(endDate.getFullYear()).toBe(2070);
+    });
+  });
+
   // ── ngOnDestroy ─────────────────────────────────────────────────────────
 
   describe('ngOnDestroy', () => {
@@ -801,7 +1007,7 @@ describe('ScenarioLabComponent', () => {
     it('should inject events from financialTimeline when report has none', () => {
       const emptyReport = makeReport({ timelineEvents: [] });
       component['injectTimelineEvents'](emptyReport);
-      expect(emptyReport.timelineEvents.length).toBe(1);
+      expect(emptyReport.timelineEvents.length).toBe(2);
       expect(emptyReport.timelineEvents[0].name).toBe('Home');
     });
 

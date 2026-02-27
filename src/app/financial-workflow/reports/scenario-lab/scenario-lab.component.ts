@@ -81,6 +81,18 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
   minRetirementAge = 18;
   maxRetirementAge = 100;
 
+  hasRetirementAge = false;
+  hasPartnerRetirementAge = false;
+  clientFirstName = '';
+  partnerFirstName = '';
+  baselinePartnerRetirementAge = 65;
+  minPartnerRetirementAge = 18;
+  maxPartnerRetirementAge = 100;
+
+  inflationEdited = false;
+  retirementAgeEdited = false;
+  partnerRetirementAgeEdited = false;
+
   goalItems: ClientEvent[] = [];
   savingPotItems: ClientSaving[] = [];
   incomeItems: FinancialViewModel[] = [];
@@ -235,34 +247,93 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
 
   private initFormFromPlan(): void {
     if (!this.client || !this.financialTimeline || !this.cashflow) return;
-    const birthYear = new Date(this.client.clientDetails.birthDate).getFullYear();
     const currentYear = new Date().getFullYear();
-    const endYear = this.financialTimeline.forecastEndtDate
-      ? new Date(this.financialTimeline.forecastEndtDate).getFullYear()
-      : birthYear + 65;
-    const retirementAge = endYear - birthYear;
+    const birthYear = new Date(this.client.clientDetails.birthDate).getFullYear();
     const inflation = this.cashflow.inflationRate ?? this.client.clientDetails?.inflationRate ?? 2.5;
 
     this.baselineInflationRate = Number(inflation) || 2.5;
-    this.baselineRetirementAge = retirementAge || 65;
+    this.clientFirstName = this.client.clientDetails?.firstName ?? '';
+    this.partnerFirstName = this.client.partnerDetail?.firstName ?? '';
 
-    this.minRetirementAge = Math.max(18, currentYear - birthYear);
-    this.maxRetirementAge = 100;
+    const events = this.financialTimeline.clientEvents ?? [];
+    const mainRetirementEvent = events.find(
+      e => e.name.toLowerCase() === 'retirement age' && !e.isPartnerEvent
+    );
+
+    this.hasRetirementAge = !!mainRetirementEvent;
+    if (mainRetirementEvent) {
+      this.baselineRetirementAge = mainRetirementEvent.start.year - birthYear;
+      this.minRetirementAge = Math.max(18, currentYear - birthYear);
+      this.maxRetirementAge = 100;
+    }
+
+    const partnerRetirementEvent = events.find(
+      e => e.name.toLowerCase().startsWith('retirement age') && !!e.isPartnerEvent
+    );
+
+    this.hasPartnerRetirementAge = !!partnerRetirementEvent && !!this.client.partnerDetail;
+    if (this.hasPartnerRetirementAge && this.client.partnerDetail) {
+      const partnerBirthYear = new Date(this.client.partnerDetail.birthDate).getFullYear();
+      this.baselinePartnerRetirementAge = partnerRetirementEvent!.start.year - partnerBirthYear;
+      this.minPartnerRetirementAge = Math.max(18, currentYear - partnerBirthYear);
+      this.maxPartnerRetirementAge = 100;
+      this.scenarioForm.addControl(
+        'partnerRetirementAge',
+        this.fb.control(this.baselinePartnerRetirementAge)
+      );
+    }
 
     this.scenarioForm.patchValue(
       {
         inflationRate: this.baselineInflationRate,
-        retirementAge: this.baselineRetirementAge,
+        ...(this.hasRetirementAge ? { retirementAge: this.baselineRetirementAge } : {}),
       },
       { emitEvent: false }
     );
+
+    this.subscribeToEditTracking();
+  }
+
+  private subscribeToEditTracking(): void {
+    this.scenarioForm.get('inflationRate')?.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(val => {
+        this.inflationEdited = Number(val) !== this.baselineInflationRate;
+      });
+
+    this.scenarioForm.get('retirementAge')?.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(val => {
+        this.retirementAgeEdited = Number(val) !== this.baselineRetirementAge;
+      });
+
+    this.scenarioForm.get('partnerRetirementAge')?.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(val => {
+        this.partnerRetirementAgeEdited = Number(val) !== this.baselinePartnerRetirementAge;
+      });
+  }
+
+  private getMaxForecastEndDate(): Date {
+    if (!this.client) return new Date();
+    const birthYear = new Date(this.client.clientDetails.birthDate).getFullYear();
+    const mainAge = this.hasRetirementAge
+      ? (Number(this.scenarioForm.get('retirementAge')?.value) || this.baselineRetirementAge)
+      : this.baselineRetirementAge;
+    let endYear = birthYear + mainAge;
+
+    if (this.hasPartnerRetirementAge && this.client.partnerDetail) {
+      const partnerBirthYear = new Date(this.client.partnerDetail.birthDate).getFullYear();
+      const partnerAge = Number(this.scenarioForm.get('partnerRetirementAge')?.value) || this.baselinePartnerRetirementAge;
+      endYear = Math.max(endYear, partnerBirthYear + partnerAge);
+    }
+
+    return new Date(endYear, 11, 31);
   }
 
   private buildScenarioPayload(): ReportScenarioPayload | null {
     if (!this.financialTimeline || !this.client) return null;
-    const birthYear = new Date(this.client.clientDetails.birthDate).getFullYear();
-    const retirementAge = Number(this.scenarioForm.get('retirementAge')?.value) || 65;
-    const forecastEndDate = new Date(birthYear + retirementAge, 11, 31);
+    const forecastEndDate = this.getMaxForecastEndDate();
     const forecastStart = this.financialTimeline.forecastStartDate
       ? new Date(this.financialTimeline.forecastStartDate)
       : new Date();
@@ -346,10 +417,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
   }
 
   getScenarioForecastEndDate(): Date {
-    if (!this.client) return new Date();
-    const birthYear = new Date(this.client.clientDetails.birthDate).getFullYear();
-    const retirementAge = Number(this.scenarioForm.get('retirementAge')?.value) || 65;
-    return new Date(birthYear + retirementAge, 11, 31);
+    return this.getMaxForecastEndDate();
   }
 
   private updateScenarioForecastEndDateIfNeeded(): void {

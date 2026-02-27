@@ -85,6 +85,17 @@
   min-height: 94px;
 }
 
+.bottom-assumptions-row {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 18px;
+
+  > .assumption-panel {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+}
+
 .top-rate-panel {
   display: grid;
   grid-template-rows: auto auto auto;

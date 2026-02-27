@@ -60,53 +60,7 @@
           <div class="assumptions-body">
             <form [formGroup]="scenarioForm" class="assumptions-form">
 
-              <!-- Row 1 Left: Inflation rate -->
-              <div class="assumption-panel top-rate-panel">
-                <div class="inflation-header">
-                  <span class="assumption-label">{{ 'Inflation rate' | translate }}</span>
-                </div>
-                <div class="slider-row">
-                  <mat-slider class="slider-flex" [min]="0" [max]="10" [step]="0.1">
-                    <input matSliderThumb formControlName="inflationRate" />
-                  </mat-slider>
-                  <div class="value-input-box">
-                    <input
-                      type="number"
-                      class="value-input"
-                      [value]="scenarioForm.get('inflationRate')?.value"
-                      (change)="onNumericInputChange('inflationRate', $event)"
-                      min="0" max="10" step="0.1" />
-                    <span class="pct-badge">%</span>
-                  </div>
-                </div>
-                <span class="before-label">{{ 'Before' | translate }}: {{ baselineInflationRate }}%</span>
-              </div>
-
-              <!-- Row 1 Right: Retirement age -->
-              <div class="assumption-panel top-rate-panel">
-                <div class="inflation-header">
-                  <span class="assumption-label">{{ 'Retirement age' | translate }}</span>
-                </div>
-                <div class="slider-row">
-                  <mat-slider class="slider-flex" [min]="minRetirementAge" [max]="maxRetirementAge" [step]="1">
-                    <input matSliderThumb formControlName="retirementAge" />
-                  </mat-slider>
-                  <div class="value-input-box">
-                    <input
-                      type="number"
-                      class="value-input"
-                      [value]="scenarioForm.get('retirementAge')?.value"
-                      (change)="onNumericInputChange('retirementAge', $event)"
-                      [min]="minRetirementAge" [max]="maxRetirementAge" step="1" />
-                    <span class="pct-badge age-badge">
-                      <img src="assets/images/svgs/scenario-lab-icon.svg" alt="age" width="14" />
-                    </span>
-                  </div>
-                </div>
-                <span class="before-label">{{ 'Before' | translate }}: {{ baselineRetirementAge }}</span>
-              </div>
-
-              <!-- Row 2 Left: Goals -->
+              <!-- Row 1 Left: Goals -->
               <div class="assumption-panel category-panel">
                 <span class="assumption-label">{{ 'Goals' | translate }}</span>
                 <mat-select class="category-dropdown" [placeholder]="'Select' | translate" (selectionChange)="onGoalSelected($event.value)">
@@ -124,7 +78,7 @@
                 }
               </div>
 
-              <!-- Row 2 Right: Saving pots -->
+              <!-- Row 1 Right: Saving pots -->
               <div class="assumption-panel category-panel">
                 <span class="assumption-label">{{ 'Saving pots' | translate }}</span>
                 <mat-select class="category-dropdown" [placeholder]="'Select' | translate" (selectionChange)="onSavingPotSelected($event.value)">
@@ -142,7 +96,7 @@
                 }
               </div>
 
-              <!-- Row 3 Left: Incomes -->
+              <!-- Row 2 Left: Incomes -->
               <div class="assumption-panel category-panel">
                 <span class="assumption-label">{{ 'Incomes' | translate }}</span>
                 <mat-select class="category-dropdown" [placeholder]="'Select' | translate" (selectionChange)="onIncomeSelected($event.value)">
@@ -160,7 +114,7 @@
                 }
               </div>
 
-              <!-- Row 3 Right: Expenses -->
+              <!-- Row 2 Right: Expenses -->
               <div class="assumption-panel category-panel">
                 <span class="assumption-label">{{ 'Expenses' | translate }}</span>
                 <mat-select class="category-dropdown" [placeholder]="'Select' | translate" (selectionChange)="onExpenseSelected($event.value)">
@@ -176,6 +130,96 @@
                 @if (editedExpenses.length) {
                   <span class="edited-label">{{ 'Edited' | translate }}: {{ editedExpenses.join(', ') }}</span>
                 }
+              </div>
+
+              <!-- Bottom row: Inflation rate + Retirement age card(s) -->
+              <div class="bottom-assumptions-row">
+
+                <!-- Inflation rate -->
+                <div class="assumption-panel top-rate-panel">
+                  <div class="inflation-header">
+                    <span class="assumption-label">{{ 'Inflation rate' | translate }}</span>
+                  </div>
+                  <div class="slider-row">
+                    <mat-slider class="slider-flex" [min]="0" [max]="10" [step]="0.1">
+                      <input matSliderThumb formControlName="inflationRate" />
+                    </mat-slider>
+                    <div class="value-input-box">
+                      <input
+                        type="number"
+                        class="value-input"
+                        [value]="scenarioForm.get('inflationRate')?.value"
+                        (change)="onNumericInputChange('inflationRate', $event)"
+                        min="0" max="10" step="0.1" />
+                      <span class="pct-badge">%</span>
+                    </div>
+                  </div>
+                  @if (inflationEdited) {
+                    <span class="before-label">{{ 'Before' | translate }}: {{ baselineInflationRate }}%</span>
+                  }
+                </div>
+
+                <!-- Retirement age (main client) -->
+                @if (hasRetirementAge) {
+                  <div class="assumption-panel top-rate-panel">
+                    <div class="inflation-header">
+                      <span class="assumption-label">
+                        {{ 'Retirement age' | translate }}
+                        @if (hasPartnerRetirementAge) {
+                          {{ clientFirstName }}
+                        }
+                      </span>
+                    </div>
+                    <div class="slider-row">
+                      <mat-slider class="slider-flex" [min]="minRetirementAge" [max]="maxRetirementAge" [step]="1">
+                        <input matSliderThumb formControlName="retirementAge" />
+                      </mat-slider>
+                      <div class="value-input-box">
+                        <input
+                          type="number"
+                          class="value-input"
+                          [value]="scenarioForm.get('retirementAge')?.value"
+                          (change)="onNumericInputChange('retirementAge', $event)"
+                          [min]="minRetirementAge" [max]="maxRetirementAge" step="1" />
+                        <span class="pct-badge age-badge">
+                          <img src="assets/images/svgs/scenario-lab-icon.svg" alt="age" width="14" />
+                        </span>
+                      </div>
+                    </div>
+                    @if (retirementAgeEdited) {
+                      <span class="before-label">{{ 'Before' | translate }}: {{ baselineRetirementAge }}</span>
+                    }
+                  </div>
+                }
+
+                <!-- Retirement age (partner) -->
+                @if (hasPartnerRetirementAge) {
+                  <div class="assumption-panel top-rate-panel">
+                    <div class="inflation-header">
+                      <span class="assumption-label">{{ 'Retirement age' | translate }} {{ partnerFirstName }}</span>
+                    </div>
+                    <div class="slider-row">
+                      <mat-slider class="slider-flex" [min]="minPartnerRetirementAge" [max]="maxPartnerRetirementAge" [step]="1">
+                        <input matSliderThumb formControlName="partnerRetirementAge" />
+                      </mat-slider>
+                      <div class="value-input-box">
+                        <input
+                          type="number"
+                          class="value-input"
+                          [value]="scenarioForm.get('partnerRetirementAge')?.value"
+                          (change)="onNumericInputChange('partnerRetirementAge', $event)"
+                          [min]="minPartnerRetirementAge" [max]="maxPartnerRetirementAge" step="1" />
+                        <span class="pct-badge age-badge">
+                          <img src="assets/images/svgs/scenario-lab-icon.svg" alt="age" width="14" />
+                        </span>
+                      </div>
+                    </div>
+                    @if (partnerRetirementAgeEdited) {
+                      <span class="before-label">{{ 'Before' | translate }}: {{ baselinePartnerRetirementAge }}</span>
+                    }
+                  </div>
+                }
+
               </div>
 
             </form>
