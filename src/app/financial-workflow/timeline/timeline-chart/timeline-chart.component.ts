@@ -32,7 +32,7 @@ import { CommonModule } from '@angular/common';
 import { Client } from 'src/app/clients/models/client';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
 import { SettingsHttpService } from '../../settings/services/settings-http.service';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateModule } from '@ngx-translate/core';
 import { patchInflationRateDescription } from 'src/app/shared/utils/escalation-rate-utils';
 
 @Component({
@@ -51,8 +51,7 @@ import { patchInflationRateDescription } from 'src/app/shared/utils/escalation-r
     TranslateModule
   ],
   providers: [
-    ToastrService,
-    TranslateService
+    ToastrService
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './timeline-chart.component.html',
@@ -96,6 +95,7 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
   @Input() financialRecords: FinancialRecordLineItem[] | [];
   @Input() clientBirthDate: Date;
   @Input() client: Client;
+  @Input() planDuration?: number;
   @Input() title: string = 'Timeline';
 
   /** True when client has a partner. */
@@ -105,7 +105,9 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
 
   get showDualAxis(): boolean {
     if (!this.hasPartner) return false;
-    return this.financialTimeline?.clientEvents?.some(ce => ce.isPartnerEvent) ?? false;
+    return this.financialTimeline?.clientEvents?.some(
+      ce => ce.isPartnerEvent && this.isEventInVisibleRange(ce)
+    ) ?? false;
   }
   /** Main client initial for axis label (e.g. "Age M"). */
   get mainClientInitial(): string {
@@ -138,14 +140,14 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
   private isDragging = false; // Track drag state
   private boundDocumentDrop: ((e: DragEvent) => void) | null = null;
   private lastValidDragTime: Date | null = null; // Store last valid drag position from onDragOver
+  private lastRetirementDependencyKey: string | null = null;
 
   constructor(
     private dialog: MatDialog,
     private timelineHttpService: TimelineHttpService,
     private cdr: ChangeDetectorRef,
     private toastrService: ToastrService,
-    private settingHttpService: SettingsHttpService,
-    private translate: TranslateService
+    private settingHttpService: SettingsHttpService
   ) {
     this.updateTimelines = new EventEmitter<boolean>();
   }
@@ -153,7 +155,11 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
   ngOnChanges(changes: SimpleChanges) {
     if (!this.client) return;
 
-    if (changes['financialTimeline']) {
+    if (this.haveRetirementDependenciesChanged()) {
+      this.recalculateRetirementEventPositions();
+    }
+
+    if (changes['financialTimeline'] || changes['client'] || changes['clientBirthDate'] || changes['planDuration']) {
       if (this.timeline) {
         this.timeline.setItems(this.timelineData);
         this.timeline.setOptions(this.timelineOptions);
@@ -165,6 +171,8 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   ngOnInit() {
+    this.lastRetirementDependencyKey = this.getRetirementDependencyKey();
+    this.recalculateRetirementEventPositions();
     this.initTimelineContainer();
     this.getTimelineEventsLibrary();
   }
@@ -227,15 +235,14 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
               );
             });
 
-          // Hide 'Retirement age' chip if any retirement event is already on the timeline
+          // Hide/show Retirement age chip based on client age vs default retirement age.
           this.systemEventsLibrary = [
             ...res[0],
             ...res[1],
           ]
             .filter(event => {
               if (event.name === 'State pension') return false;
-              if (event.name === 'Retirement age' &&
-                this.financialTimeline?.clientEvents?.some(ce => ce.name.toLowerCase().startsWith('retirement age'))) return false;
+              if (event.name === 'Retirement age' && this.shouldHideRetirementChip()) return false;
               return true;
             })
             .sort((a, b) => {
@@ -337,7 +344,7 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
 
     if (this.draggedEvent?.name === 'Retirement age') {
       const existingRetirement = this.financialTimeline.clientEvents.find(
-        (event) => event.name === this.draggedEvent?.name
+        (event) => event.name.toLowerCase().startsWith('retirement age') && !event.isPartnerEvent
       );
 
       if (existingRetirement) {
@@ -346,18 +353,8 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
         return;
       }
 
-      const retirementYear = this.getRetirementDropYear();
-      // If client is already past default retirement age, use the drop location they chose
-      // Otherwise, snap to the calculated retirement year — but only if it's within the forecast
-      if (retirementYear) {
-        const forecastEnd = moment(this.financialTimeline.forecastEndtDate).year();
-        if (retirementYear <= forecastEnd) {
-          dropTime = new Date(retirementYear, 0, 1);
-        }
-        // If default retirement year is outside forecast, keep the user's chosen dropTime
-      }
-      // If retirementYear is null (client already past default retirement age),
-      // keep the dropTime from where they actually dropped it
+      // Keep user-chosen drop position during normal interaction.
+      // Retirement position is recalculated only when dependent data changes.
     }
 
     // Validate dropTime exists and is within bounds
@@ -609,13 +606,18 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   /**
-   * The effective forecast end year, capped at client age 90.
-   * Used everywhere to enforce the 90-year timeline limit.
+   * The effective forecast end year from the plan projection.
    */
   private get effectiveForecastEndYear(): number {
-    const forecastEnd = moment(this.financialTimeline.forecastEndtDate).year();
-    const birthYear = moment(this.clientBirthDate).year();
-    return Math.min(forecastEnd, birthYear + 90);
+    const forecastStartDate = new Date(this.financialTimeline.forecastStartDate);
+    const forecastStartYear = moment(forecastStartDate).year();
+    const birthDate = new Date(this.clientBirthDate);
+    const startAge = this.calculateAgeForTimeline(forecastStartDate, birthDate);
+    const planEndYear = Number.isFinite(this.planDuration as number)
+      ? forecastStartYear + (Number(this.planDuration) - startAge)
+      : null;
+    const forecastEndYear = moment(this.financialTimeline.forecastEndtDate).year();
+    return Math.max(forecastStartYear, planEndYear ?? forecastEndYear);
   }
 
   initTimelineContainer() {
@@ -668,8 +670,14 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
     // Approximate pixel width per year in the timeline
     const pxPerYear = containerPxWidth / timelineTotalYears;
 
-    const dataArray = this.financialTimeline.clientEvents.map(
-      (event, index) => {
+    const dataArray = this.financialTimeline.clientEvents
+      .filter(event => {
+        const inVisibleRange = event.start.year >= timelineStartYear && event.start.year <= timelineEndYear;
+        if (!inVisibleRange) return false;
+
+        return true;
+      })
+      .map((event, index) => {
         const startYear = event.start.year;
         const hasRealEnd = event.end && event.end.year && event.end.year > startYear;
         const isOneOff = event.isOneOff;
@@ -704,13 +712,17 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
           };
         } else {
           const finalWidth = Math.min(minContainerWidth, maxAvailableWidth);
-          // Centre the item on the drop year so the vertical line bisects the box
+          // Centre the item on the drop year so the vertical line bisects the box.
+          // Clamp to timeline bounds so labels at the edges do not overflow outside the chart.
           const halfWidth = Math.round(finalWidth / 2);
+          const centeredStartYear = startYear - halfWidth;
+          const clampedStartYear = Math.max(timelineStartYear, centeredStartYear);
+          const clampedEndYear = Math.min(forecastEndYear + 1, clampedStartYear + finalWidth);
           return {
             id: eventId,
             content: this.getContent(event.name, event.iconUrl),
-            start: new Date(startYear - halfWidth, 0, 1),
-            end: new Date(startYear - halfWidth + finalWidth, 0, 1),
+            start: new Date(clampedStartYear, 0, 1),
+            end: new Date(clampedEndYear, 0, 1),
             className: event.iconUrl,
             editable: {
               updateTime: true,
@@ -817,7 +829,8 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
     birthDate: Date,
     _birthYear: number
   ): number {
-    return year - new Date(birthDate).getFullYear();
+    const baseAge = this.calculateAgeForTimeline(forecastStartDate, birthDate);
+    return baseAge + (year - forecastStartYear);
   }
 
   handleEventMoving(item: any, callback: (item: any) => void) {
@@ -1101,6 +1114,68 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
     return age;
   };
 
+  private isEventInVisibleRange(event: any): boolean {
+    const startYear = event?.start?.year;
+    if (!startYear) return false;
+    const timelineStart = moment(this.financialTimeline.forecastStartDate).year();
+    const timelineEnd = this.effectiveForecastEndYear;
+    return startYear >= timelineStart && startYear <= timelineEnd;
+  }
+
+  private isRetirementEvent(event: any): boolean {
+    return !!event?.name?.toLowerCase?.().startsWith('retirement age');
+  }
+
+  private getRetirementYearForBirthDate(birthDate: Date | null): number | null {
+    if (!birthDate) return null;
+    return moment(birthDate).year() + this.getDefaultRetirementAge();
+  }
+
+  private getRetirementDependencyKey(): string {
+    const clientBirth = this.clientBirthDate ? new Date(this.clientBirthDate).toISOString() : '';
+    const partnerBirth = this.partnerBirthDate ? new Date(this.partnerBirthDate).toISOString() : '';
+    const country = (this.client?.clientDetails?.country ?? '').trim().toLowerCase();
+    return `${clientBirth}|${partnerBirth}|${country}`;
+  }
+
+  private haveRetirementDependenciesChanged(): boolean {
+    const current = this.getRetirementDependencyKey();
+    if (this.lastRetirementDependencyKey === null) {
+      this.lastRetirementDependencyKey = current;
+      return false;
+    }
+    const changed = this.lastRetirementDependencyKey !== current;
+    this.lastRetirementDependencyKey = current;
+    return changed;
+  }
+
+  private recalculateRetirementEventPositions(): void {
+    if (!this.financialTimeline?.clientEvents?.length) return;
+
+    const primaryYear = this.getRetirementYearForBirthDate(new Date(this.clientBirthDate));
+    const partnerYear = this.getRetirementYearForBirthDate(this.partnerBirthDate);
+
+    this.financialTimeline.clientEvents = this.financialTimeline.clientEvents.map(event => {
+      if (!this.isRetirementEvent(event)) return event;
+
+      const targetYear = event.isPartnerEvent ? partnerYear : primaryYear;
+      if (!targetYear) return event;
+
+      const birthYear = event.isPartnerEvent && this.partnerBirthDate
+        ? moment(this.partnerBirthDate).year()
+        : moment(this.clientBirthDate).year();
+
+      return {
+        ...event,
+        start: {
+          ...event.start,
+          year: targetYear,
+          age: targetYear - birthYear
+        }
+      };
+    });
+  }
+
   private stripTimelineTooltips(): void {
     if (!this.timelineContainer?.nativeElement) return;
     const container = this.timelineContainer.nativeElement as HTMLElement;
@@ -1166,44 +1241,37 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   /**
-   * Returns the year when the client reaches the default retirement age.
-   * Returns null if client is already past the default retirement age,
-   * allowing the user to place the retirement event at their chosen location.
-   */
-  private getRetirementDropYear(): number | null {
-    const lang = this.translate.currentLang || this.translate.defaultLang;
-
-    const retirementAge =
-      lang === 'it' ? 67 :
-        lang === 'en' ? 64 :
-          null;
-
-    if (!retirementAge) return null;
-
-    const currentAge = this.calculateAge(new Date(this.clientBirthDate));
-    // If client is already past default retirement age, return null
-    // to allow them to place the event at their chosen drop location
-    if (currentAge >= retirementAge) return null;
-
-    return moment(this.clientBirthDate).year() + retirementAge;
-  }
-
-  /**
    * Re-evaluates whether the Retirement age chip should be shown or hidden:
-   * hide chip if any retirement event is already on the timeline.
+   * hide when client is below retirement age, show when at/past retirement age.
    */
   private syncRetirementChipVisibility(): void {
     if (!this.systemEventsLibrary || !this.cachedSystemEventsLibrary) return;
 
-    const hasRetirementOnTimeline = this.financialTimeline?.clientEvents?.some(
-      ce => ce.name.toLowerCase().startsWith('retirement age')
-    );
-
-    if (hasRetirementOnTimeline) {
+    if (this.shouldHideRetirementChip()) {
       this.removeRetirementFromChips();
     } else {
       this.addRetirementBackToChips();
     }
+  }
+
+  private shouldHideRetirementChip(): boolean {
+    // If already at/past retirement age, keep chip visible (event is not shown on timeline).
+    if (this.isClientAtOrPastRetirementAge()) return false;
+
+    // Otherwise, hide chip only when a retirement event is currently visible on timeline.
+    return this.financialTimeline?.clientEvents?.some(
+      ce => this.isRetirementEvent(ce) && !ce.isPartnerEvent && this.isEventInVisibleRange(ce)
+    ) ?? false;
+  }
+
+  private getDefaultRetirementAge(): number {
+    const country = (this.client?.clientDetails?.country ?? '').trim().toLowerCase();
+    return country === 'italy' || country === 'it' ? 67 : 64;
+  }
+
+  private isClientAtOrPastRetirementAge(): boolean {
+    const currentAge = this.calculateAge(new Date(this.clientBirthDate));
+    return currentAge >= this.getDefaultRetirementAge();
   }
 
   private removeRetirementFromChips(): void {
