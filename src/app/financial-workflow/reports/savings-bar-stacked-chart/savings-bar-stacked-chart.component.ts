@@ -267,8 +267,8 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
       const emergencyXAxis = hideEmergencyOverlays ? [] : this.buildEmergencyAnnotation(report);
       const emergencyExpenseXAxis = hideEmergencyOverlays ? [] : this.buildEmergencyExpenseAnnotation(report);
 
-      // Only rebuild legend when NOT in animated-update mode (or on first render).
-      // Re-assigning legend triggers ng-apexcharts updateOptions → full re-render.
+      // Only rebuild legend and annotations when NOT in animated-update mode (or on first render).
+      // Re-assigning these inputs triggers ng-apexcharts updateOptions → full re-render.
       if (!this.animateUpdates || !this.chartInitialized) {
         const seriesList = report.series;
 
@@ -300,12 +300,12 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
             highlightDataSeries: true
           }
         };
-      }
 
-      this.chartOptions.annotations = {
-        points: this.buildEventAnnotations(this.events),
-        xaxis: [...emergencyXAxis, ...emergencyExpenseXAxis]
-      };
+        this.chartOptions.annotations = {
+          points: this.buildEventAnnotations(this.events),
+          xaxis: [...emergencyXAxis, ...emergencyExpenseXAxis]
+        };
+      }
 
       setTimeout(() => {
         if (this.events.length > 0) {
@@ -327,7 +327,7 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
             if (this.emergencyIconBandEl) { this.emergencyIconBandEl.remove(); this.emergencyIconBandEl = null; }
           }
         }
-      }, 50);
+      }, 600);
     }
 
     // NOTE: animations.dynamicAnimation is configured in the constructor and stays stable.

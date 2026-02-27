@@ -89,9 +89,17 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
   minPartnerRetirementAge = 18;
   maxPartnerRetirementAge = 100;
 
-  inflationEdited = false;
-  retirementAgeEdited = false;
-  partnerRetirementAgeEdited = false;
+  get inflationEdited(): boolean {
+    return this.scenarioForm.get('inflationRate')?.value !== this.baselineInflationRate;
+  }
+
+  get retirementAgeEdited(): boolean {
+    return this.scenarioForm.get('retirementAge')?.value !== this.baselineRetirementAge;
+  }
+
+  get partnerRetirementAgeEdited(): boolean {
+    return this.scenarioForm.get('partnerRetirementAge')?.value !== this.baselinePartnerRetirementAge;
+  }
 
   goalItems: ClientEvent[] = [];
   savingPotItems: ClientSaving[] = [];
@@ -291,29 +299,6 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
       { emitEvent: false }
     );
 
-    this.subscribeToEditTracking();
-  }
-
-  private subscribeToEditTracking(): void {
-    setTimeout(() => {
-      this.scenarioForm.get('inflationRate')?.valueChanges
-        .pipe(takeUntil(this.destroy$))
-        .subscribe(val => {
-          this.inflationEdited = Number(val) !== this.baselineInflationRate;
-        });
-
-      this.scenarioForm.get('retirementAge')?.valueChanges
-        .pipe(takeUntil(this.destroy$))
-        .subscribe(val => {
-          this.retirementAgeEdited = Number(val) !== this.baselineRetirementAge;
-        });
-
-      this.scenarioForm.get('partnerRetirementAge')?.valueChanges
-        .pipe(takeUntil(this.destroy$))
-        .subscribe(val => {
-          this.partnerRetirementAgeEdited = Number(val) !== this.baselinePartnerRetirementAge;
-        });
-    });
   }
 
   private getMaxForecastEndDate(): Date {
