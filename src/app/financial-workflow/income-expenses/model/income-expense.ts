@@ -26,6 +26,8 @@ export interface FinancialViewModel {
     isIncomeExpenseSource: boolean | false;
     icon: string;
     bonus?: Bonus | null;
+    startEventId?: string | null;
+    endEventId?: string | null;
 }
 
 export interface Bonus {

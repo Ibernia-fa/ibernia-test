@@ -22,6 +22,7 @@ import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 import { TranslateModule } from '@ngx-translate/core';
+import { extractEventId, resolveYear } from 'src/app/shared/utils/event-date-utils';
 
 @Component({
   selector: 'app-add-withdrawal',
@@ -156,10 +157,16 @@ export class AddWithdrawalComponent {
       this.withdrawalForm
         .get('cycle')
         ?.patchValue(this.selectedWithdrawal.amount.cycle?.id);
-      this.withdrawalForm
-        .get('start')
-        ?.patchValue(this.selectedWithdrawal.start.year);
-      this.withdrawalForm.get('end')?.patchValue(this.selectedWithdrawal.end.year);
+      if (this.selectedWithdrawal.startEventId) {
+        this.withdrawalForm.get('start')?.patchValue('event:' + this.selectedWithdrawal.startEventId);
+      } else {
+        this.withdrawalForm.get('start')?.patchValue(this.selectedWithdrawal.start.year);
+      }
+      if (this.selectedWithdrawal.endEventId) {
+        this.withdrawalForm.get('end')?.patchValue('event:' + this.selectedWithdrawal.endEventId);
+      } else {
+        this.withdrawalForm.get('end')?.patchValue(this.selectedWithdrawal.end.year);
+      }
 
       const matchedEscalation = this.escalationRates.find(x => x.value === this.selectedWithdrawal?.escalationRate?.value);
 
@@ -270,9 +277,15 @@ export class AddWithdrawalComponent {
       const matchedRate = this.escalationRates.find(
         (x) => x.value === escalationRateValue
       );
+      const startVal = this.withdrawalForm.get('start')?.value;
+      const endVal = this.withdrawalForm.get('end')?.value;
+      const startYear = resolveYear(startVal, this.eventsList);
+      const endYear = resolveYear(endVal, this.eventsList);
+      const startEventId = extractEventId(startVal);
+      const endEventId = extractEventId(endVal);
+
       var withdrawal: FundsViewModel = {
         id: this.isEditWorkflow ? this.selectedWithdrawal.id : null,
-        // associatedSavingPotId: this.withdrawalForm.get('savingPot')?.value ?? '',
         associatedSavingPotId: validPotId,
         description: this.withdrawalForm.get('description')?.value,
         amount: {
@@ -287,29 +300,15 @@ export class AddWithdrawalComponent {
           },
         },
         start: {
-          age:
-            this.withdrawalForm.get('start')?.value !== null &&
-              this.withdrawalForm.get('start')?.value !== ''
-              ? this.withdrawalForm.get('start')?.value - this.clientBirthYear
-              : 0,
-          year:
-            this.withdrawalForm.get('start')?.value !== null &&
-              this.withdrawalForm.get('start')?.value !== ''
-              ? this.withdrawalForm.get('start')?.value
-              : 0,
+          age: startYear ? startYear - this.clientBirthYear : 0,
+          year: startYear || 0,
         },
         end: {
-          age:
-            this.withdrawalForm.get('end')?.value !== null &&
-              this.withdrawalForm.get('end')?.value !== ''
-              ? this.withdrawalForm.get('end')?.value - this.clientBirthYear
-              : 0,
-          year:
-            this.withdrawalForm.get('end')?.value !== null &&
-              this.withdrawalForm.get('end')?.value !== ''
-              ? this.withdrawalForm.get('end')?.value
-              : 0,
+          age: endYear ? endYear - this.clientBirthYear : 0,
+          year: endYear || 0,
         },
+        startEventId,
+        endEventId,
         escalationRate: escalationRateValue !== null && escalationRateValue !== ''
           ? matchedRate ?? {
             description: this.selectedEscalationDescription ?? '', // Use actual description
@@ -374,15 +373,16 @@ export class AddWithdrawalComponent {
 
   private endOnOrAfterStartValidator(): ValidatorFn {
     return (group: AbstractControl) => {
-      const start = group.get('start')?.value;
-      const end = group.get('end')?.value;
+      const startRaw = group.get('start')?.value;
+      const endRaw = group.get('end')?.value;
+      const start = resolveYear(startRaw, this.eventsList);
+      const end = resolveYear(endRaw, this.eventsList);
       const endCtrl = group.get('end');
 
-      // Only validate when both are present (or when end is present)
       if (endCtrl) {
         const existing = endCtrl.errors ?? null;
 
-        if (start != null && start !== '' && end != null && end !== '' && end < start) {
+        if (start > 0 && end > 0 && end < start) {
           // attach/merge the error onto the END control
           endCtrl.setErrors({ ...(existing ?? {}), endBeforeStart: true });
         } else {

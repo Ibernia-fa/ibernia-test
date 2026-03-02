@@ -41,6 +41,7 @@ import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 import { TranslateModule } from '@ngx-translate/core';
+import { extractEventId, resolveYear } from 'src/app/shared/utils/event-date-utils';
 
 @Component({
   selector: 'app-add-contribution',
@@ -175,8 +176,12 @@ export class AddContributionComponent {
         currencySymbol: this.clientPreferredCurrency,
         amount: this.selectedContribution.amount.amount,
         cycle: this.selectedContribution.amount.cycle?.id,
-        start: this.selectedContribution.start.year,
-        end: this.selectedContribution.end.year,
+        start: this.selectedContribution.startEventId
+          ? 'event:' + this.selectedContribution.startEventId
+          : this.selectedContribution.start.year,
+        end: this.selectedContribution.endEventId
+          ? 'event:' + this.selectedContribution.endEventId
+          : this.selectedContribution.end.year,
         commissions: hasCommInit,
         commissionPercentage: pctInit,
       });
@@ -436,9 +441,15 @@ export class AddContributionComponent {
       (x) => x.value === escalationRateValue
     );
 
+    const startVal = this.contributionForm.get('start')?.value;
+    const endVal = this.contributionForm.get('end')?.value;
+    const startYear = resolveYear(startVal, this.eventsList);
+    const endYear = resolveYear(endVal, this.eventsList);
+    const startEventId = extractEventId(startVal);
+    const endEventId = extractEventId(endVal);
+
     const contribution: FundsViewModel = {
       id: this.isEditWorkflow ? this.selectedContribution.id : null,
-      // associatedSavingPotId: this.contributionForm.get('savingPot')?.value ?? '',
       associatedSavingPotId: associatedSavingPotId,
       description: this.contributionForm.get('description')?.value,
       amount: {
@@ -453,29 +464,15 @@ export class AddContributionComponent {
         },
       },
       start: {
-        age:
-          this.contributionForm.get('start')?.value !== null &&
-            this.contributionForm.get('start')?.value !== ''
-            ? this.contributionForm.get('start')?.value - this.clientBirthYear
-            : 0,
-        year:
-          this.contributionForm.get('start')?.value !== null &&
-            this.contributionForm.get('start')?.value !== ''
-            ? this.contributionForm.get('start')?.value
-            : 0,
+        age: startYear ? startYear - this.clientBirthYear : 0,
+        year: startYear || 0,
       },
       end: {
-        age:
-          this.contributionForm.get('end')?.value !== null &&
-            this.contributionForm.get('end')?.value !== ''
-            ? this.contributionForm.get('end')?.value - this.clientBirthYear
-            : 0,
-        year:
-          this.contributionForm.get('end')?.value !== null &&
-            this.contributionForm.get('end')?.value !== ''
-            ? this.contributionForm.get('end')?.value
-            : 0,
+        age: endYear ? endYear - this.clientBirthYear : 0,
+        year: endYear || 0,
       },
+      startEventId,
+      endEventId,
       escalationRate:
         escalationRateValue !== null && escalationRateValue !== ''
           ? matchedRate ?? {
@@ -540,12 +537,14 @@ export class AddContributionComponent {
 
   private endOnOrAfterStartValidator(): ValidatorFn {
     return (group: AbstractControl) => {
-      const start = group.get('start')?.value;
-      const end = group.get('end')?.value;
+      const startRaw = group.get('start')?.value;
+      const endRaw = group.get('end')?.value;
+      const start = resolveYear(startRaw, this.eventsList);
+      const end = resolveYear(endRaw, this.eventsList);
       const endCtrl = group.get('end');
       if (endCtrl) {
         const existing = endCtrl.errors ?? null;
-        if (start != null && start !== '' && end != null && end !== '' && end < start) {
+        if (start > 0 && end > 0 && end < start) {
           endCtrl.setErrors({ ...(existing ?? {}), endBeforeStart: true });
         } else {
           if (existing && 'endBeforeStart' in existing) {

@@ -16,6 +16,7 @@ import { Cycle, EscalationRate } from '../../timeline/models/financial-timeline'
 import { IncomeExpensesHttpService } from '../services/income-expenses-http.service';
 import moment from 'moment';
 import { FinancialViewModel } from '../model/income-expense';
+import { extractEventId, resolveYear } from 'src/app/shared/utils/event-date-utils';
 import { catchError, filter, finalize } from 'rxjs';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 import { TranslateModule } from '@ngx-translate/core';
@@ -163,8 +164,16 @@ export class AddExpenseComponent {
       });
 
       this.expenseForm.get('cycle')?.patchValue(this.selectedExpense.amount.cycle?.id);
-      this.expenseForm.get('start')?.patchValue(this.selectedExpense.start?.year);
-      this.expenseForm.get('end')?.patchValue(this.selectedExpense.end?.year);
+      if (this.selectedExpense.startEventId) {
+        this.expenseForm.get('start')?.patchValue('event:' + this.selectedExpense.startEventId);
+      } else {
+        this.expenseForm.get('start')?.patchValue(this.selectedExpense.start?.year);
+      }
+      if (this.selectedExpense.endEventId) {
+        this.expenseForm.get('end')?.patchValue('event:' + this.selectedExpense.endEventId);
+      } else {
+        this.expenseForm.get('end')?.patchValue(this.selectedExpense.end?.year);
+      }
       const matchedEscalation = this.escalationRates.find(x => x.value === this.selectedExpense.escalationRate?.value);
 
       const cycleId = this.selectedExpense.amount.cycle?.id;
@@ -287,6 +296,13 @@ export class AddExpenseComponent {
         (x) => x.value === escalationRateValue
       );
 
+      const startVal = this.expenseForm.get('start')?.value;
+      const endVal = this.expenseForm.get('end')?.value;
+      const startYear = resolveYear(startVal, this.eventsList);
+      const endYear = resolveYear(endVal, this.eventsList);
+      const startEventId = extractEventId(startVal);
+      const endEventId = extractEventId(endVal);
+
       var expense: FinancialViewModel = {
         id: this.isEditWorkflow ? this.selectedExpense.id : null,
         description: this.expenseForm.get('description')?.value,
@@ -302,29 +318,15 @@ export class AddExpenseComponent {
           },
         },
         start: {
-          age:
-            this.expenseForm.get('start')?.value !== null &&
-              this.expenseForm.get('start')?.value !== ''
-              ? this.expenseForm.get('start')?.value - this.clientBirthYear
-              : 0,
-          year:
-            this.expenseForm.get('start')?.value !== null &&
-              this.expenseForm.get('start')?.value !== ''
-              ? this.expenseForm.get('start')?.value
-              : 0,
+          age: startYear ? startYear - this.clientBirthYear : 0,
+          year: startYear || 0,
         },
         end: {
-          age:
-            this.expenseForm.get('end')?.value !== null &&
-              this.expenseForm.get('end')?.value !== ''
-              ? this.expenseForm.get('end')?.value - this.clientBirthYear
-              : 0,
-          year:
-            this.expenseForm.get('end')?.value !== null &&
-              this.expenseForm.get('end')?.value !== ''
-              ? this.expenseForm.get('end')?.value
-              : 0,
+          age: endYear ? endYear - this.clientBirthYear : 0,
+          year: endYear || 0,
         },
+        startEventId,
+        endEventId,
         escalationRate: escalationRateValue !== null && escalationRateValue !== ''
           ? matchedRate ?? {
             description: this.selectedEscalationDescription ?? '', // Use actual description
@@ -416,14 +418,16 @@ export class AddExpenseComponent {
 
   private endOnOrAfterStartValidator(): ValidatorFn {
     return (group: AbstractControl) => {
-      const start = group.get('start')?.value;
-      const end = group.get('end')?.value;
+      const startRaw = group.get('start')?.value;
+      const endRaw = group.get('end')?.value;
+      const start = resolveYear(startRaw, this.eventsList);
+      const end = resolveYear(endRaw, this.eventsList);
       const endCtrl = group.get('end');
 
       if (endCtrl) {
         const existing = endCtrl.errors ?? null;
 
-        if (start != null && start !== '' && end != null && end !== '' && end < start) {
+        if (start > 0 && end > 0 && end < start) {
           endCtrl.setErrors({ ...(existing ?? {}), endBeforeStart: true });
         } else {
           if (existing && 'endBeforeStart' in existing) {

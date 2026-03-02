@@ -102,7 +102,7 @@
                           <mat-option [value]="currentYear">This year ({{ currentYear }})</mat-option>
                         }
                       @for (event of eventsList; track event) {
-                      <mat-option [value]="event.start.year">{{ event.name }} ({{ event.start.age }})</mat-option>
+                      <mat-option [value]="'event:' + event.id">{{ event.name }} ({{ event.start.age }})</mat-option>
                       }
                       <hr>
                       @for (year of years; let i = $index; track year) {
@@ -131,7 +131,7 @@
                           <mat-option [value]="currentYear">This year ({{ currentYear }})</mat-option>
                         }
                       @for (event of eventsList; track event) {
-                      <mat-option [value]="event.start.year">{{ event.name }} ({{ event.start.age }})</mat-option>
+                      <mat-option [value]="'event:' + event.id">{{ event.name }} ({{ event.start.age }})</mat-option>
                       }
                       <hr>
                       @for (year of years; let i = $index; track year) {

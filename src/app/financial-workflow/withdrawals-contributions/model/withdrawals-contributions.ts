@@ -23,4 +23,6 @@ export interface FundsViewModel {
     contributionType:number;
       hasCommission: boolean;
       comission: Comission | any;
+    startEventId?: string | null;
+    endEventId?: string | null;
 }
