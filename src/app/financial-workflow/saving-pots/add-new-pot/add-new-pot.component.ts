@@ -1006,7 +1006,7 @@ onEscalationRateChange(event: MatSelectChange): void {
         retirementAge: this.savingsForm.get('name')?.value === 'Pension fund'
           ? this.retirementAge
           : null,
-        ownership: this.hasPartner ? (this.savingsForm.get('ownership')?.value ?? SavingPotOwnership.Joint) : SavingPotOwnership.Person1
+        ownership: this.hasPartner ? (this.savingsForm.get('ownership')?.value ?? SavingPotOwnership.Joint) : SavingPotOwnership.Joint
       };
       const function$ = !this.isEditWorkflow ? this.savingPotsHttpService
       .addNewSavingPot(this.cashflowId, clientSaving) :

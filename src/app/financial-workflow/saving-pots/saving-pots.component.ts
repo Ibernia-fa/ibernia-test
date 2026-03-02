@@ -131,6 +131,10 @@ export class SavingPotsComponent implements OnInit {
   transitionState = '';
   selectedCashflow: Cashflow | null;
   selectedClient: Client | null;
+
+  get hasPartner(): boolean {
+    return !!this.selectedClient?.partnerDetail;
+  }
   savingPots: SavingPots;
   timeline: FinancialTimeline;
   amountCycles: Array<Cycle>;
