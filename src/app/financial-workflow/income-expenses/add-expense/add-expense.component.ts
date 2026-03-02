@@ -115,15 +115,15 @@ export class AddExpenseComponent {
       && this.selectedExpense?.description != "Housing"
       && this.selectedExpense?.description != "Debt repayment";
 
-    const endYear = data.forecastEndDateYear + 1;
-    const iterations = endYear - data.forecastStartDateYear + 1;
+    const planEndYear = this.resolvePlanEndYear(data);
+    const iterations = planEndYear - data.forecastStartDateYear + 1;
 
     for (let index = 0; index < iterations; index++) {
       const element = data.forecastStartDateYear + index;
       this.years.push(element);
     }
 
-    this.forecastEndYear = this.years[this.years.length - 1];
+    this.forecastEndYear = planEndYear;
 
     this.expenseForm = this.fb.group({
       description: [this.selectedExpense?.description, Validators.required],
@@ -588,6 +588,18 @@ export class AddExpenseComponent {
 
   getAgeForYear(year: number): number {
     return Number(year) - this.clientBirthYear;
+  }
+
+  private resolvePlanEndYear(data: any): number {
+    const planEndYear = Number(data?.planEndYear);
+    if (Number.isFinite(planEndYear) && planEndYear > 0) {
+      return planEndYear;
+    }
+    const fallback = Number(data?.forecastEndDateYear);
+    if (Number.isFinite(fallback) && fallback > 0) {
+      return fallback;
+    }
+    return new Date().getFullYear();
   }
 
   hasFormChanges(): boolean {

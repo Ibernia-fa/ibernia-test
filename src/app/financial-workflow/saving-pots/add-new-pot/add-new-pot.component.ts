@@ -131,6 +131,11 @@ export class AddNewPotComponent {
   isAddComissionChecked: any;
   currentYear: number = new Date().getFullYear();
   amount: number | null;
+  private readonly allOwnershipOptions: SavingPotOwnership[] = [
+    SavingPotOwnership.Joint,
+    SavingPotOwnership.Person1,
+    SavingPotOwnership.Person2
+  ];
 
   constructor(
     private dialogRef: MatDialogRef<AddNewPotComponent>,
@@ -267,6 +272,8 @@ export class AddNewPotComponent {
         this.selectedNameIconUrl = 'cashflow-moneys-icon';
       }
     }
+
+    this.syncOwnershipForSelectedType();
   }
 
 
@@ -490,8 +497,68 @@ onAmountBlur(e: Event) {
 
   /** Allowed to add a Cash pot: no partner => at most 1; has partner => up to 3. */
   get canAddCashPot(): boolean {
-    if (!this.hasPartner) return this.cashPotCount === 0;
-    return this.cashPotCount < 3;
+    return this.availableCashOwnerships.length > 0;
+  }
+
+  get isCashTypeSelected(): boolean {
+    return (this.savingsForm?.get('name')?.value ?? '').toString().trim().toLowerCase() === 'cash';
+  }
+
+  get showCashOwnershipFilter(): boolean {
+    return this.hasPartner && this.isCashTypeSelected;
+  }
+
+  get availableCashOwnerships(): SavingPotOwnership[] {
+    const baseOptions = this.hasPartner
+      ? this.allOwnershipOptions
+      : [SavingPotOwnership.Person1];
+
+    const used = this.getUsedCashOwnerships();
+    return baseOptions.filter((ownership) => !used.has(ownership));
+  }
+
+  isOwnershipAvailableForCash(ownership: SavingPotOwnership): boolean {
+    return this.availableCashOwnerships.includes(ownership);
+  }
+
+  private getUsedCashOwnerships(): Set<SavingPotOwnership> {
+    const isEditingCash = this.isEditWorkflow && this.isCashPotEditMode;
+    const currentId = isEditingCash ? this.selectedPot?.id : null;
+    const used = new Set<SavingPotOwnership>();
+
+    (this.existingSavingPots || []).forEach((pot: any) => {
+      const isCash = (pot?.name ?? '').toString().trim().toLowerCase() === 'cash';
+      if (!isCash) return;
+      if (currentId && pot?.id === currentId) return;
+
+      used.add((pot?.ownership ?? SavingPotOwnership.Joint) as SavingPotOwnership);
+    });
+
+    return used;
+  }
+
+  private syncOwnershipForSelectedType(): void {
+    const ownershipControl = this.savingsForm.get('ownership');
+    if (!ownershipControl) return;
+
+    if (!this.isCashTypeSelected) {
+      // For non-cash pots keep current behavior/default.
+      return;
+    }
+
+    const current = ownershipControl.value as SavingPotOwnership;
+    if (this.isOwnershipAvailableForCash(current)) {
+      ownershipControl.setErrors(null);
+      return;
+    }
+
+    const fallback = this.availableCashOwnerships[0];
+    if (fallback != null) {
+      ownershipControl.patchValue(fallback, { emitEvent: false });
+      ownershipControl.setErrors(null);
+    } else {
+      ownershipControl.setErrors({ duplicateCashOwnership: true });
+    }
   }
 
   onNameValueChange(name: any) {
@@ -525,6 +592,7 @@ onAmountBlur(e: Event) {
 
     // Update Pension fund field validators based on type
     this.updatePensionFundValidators(name);
+    this.syncOwnershipForSelectedType();
   }
   
   // Update validators for Pension fund specific fields
@@ -771,6 +839,16 @@ onEscalationRateChange(event: MatSelectChange): void {
     ? this.round2(rr - this.inflationRate)
     : 0;
     const isPotLocked = this.savingsForm.get('lockPot')?.value;
+    if (this.isCashTypeSelected) {
+      const selectedOwnership =
+        (this.savingsForm.get('ownership')?.value ?? SavingPotOwnership.Joint) as SavingPotOwnership;
+      if (!this.isOwnershipAvailableForCash(selectedOwnership)) {
+        this.savingsForm.get('ownership')?.setErrors({ duplicateCashOwnership: true });
+        this.savingsForm.markAllAsTouched();
+        return;
+      }
+    }
+
     if (this.savingsForm.valid) {
       var clientSaving: ClientSaving = {
         id: this.isEditWorkflow ? this.selectedPot.id : null,

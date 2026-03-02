@@ -161,6 +161,9 @@
 ::ng-deep .timeline-event-chip.retirement-age-chip {
   padding: 1px 24px 1px 8px;
   font-size: 12px;
+  width: 230.358px;
+  min-width: 230.358px;
+  max-width: 230.358px;
 }
 
 ::ng-deep .timeline-event-chip.retirement-age-chip .icon {
@@ -225,6 +228,10 @@
 
 ::ng-deep .vis-item {
   overflow: visible !important;
+}
+
+::ng-deep .vis-item.vis-range.retirement-age-icon {
+  width: 230.358px !important;
 }
 
 ::ng-deep .vis-tooltip {

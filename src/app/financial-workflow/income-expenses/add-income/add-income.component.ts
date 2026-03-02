@@ -111,8 +111,8 @@ export class AddIncomeComponent {
       && this.selectedIncome?.description != "State pension"
       && this.selectedIncome?.description != "Rental income";
 
-    const endYear = data.forecastEndDateYear + 1;
-    const iterations = endYear - data.forecastStartDateYear + 1;
+    const planEndYear = this.resolvePlanEndYear(data);
+    const iterations = planEndYear - data.forecastStartDateYear + 1;
 
     for (let index = 0; index < iterations; index++) {
       const element = data.forecastStartDateYear + index;
@@ -122,7 +122,7 @@ export class AddIncomeComponent {
     this.retirementAge = this.data.language === 'en' ? 64 : 67;
     this.retirementEventYear = this.getRetirementEventYear();
     this.retirementYear = this.retirementEventYear ?? (this.clientBirthYear + this.retirementAge);
-    this.forecastEndYear = this.years[this.years.length - 1];
+    this.forecastEndYear = planEndYear;
 
     this.incomeForm = this.fb.group({
       description: [this.selectedIncome?.description, Validators.required],
@@ -633,12 +633,8 @@ export class AddIncomeComponent {
         break;
 
       case 'State pension':
-        if (this.retirementEventYear != null) {
-          startCtrl.setValue(this.retirementEventYear);
-        } else {
-          startCtrl.reset();
-        }
-        endCtrl.setValue(this.forecastEndYear ?? this.retirementYear);
+        startCtrl.setValue(this.retirementYear);
+        endCtrl.setValue(this.forecastEndYear);
         break;
 
       default:
@@ -655,6 +651,18 @@ export class AddIncomeComponent {
 
   private getYearlyCycleId(): string {
     return this.cycles.find(c => c.description === 'Every year')?.id ?? '';
+  }
+
+  private resolvePlanEndYear(data: any): number {
+    const planEndYear = Number(data?.planEndYear);
+    if (Number.isFinite(planEndYear) && planEndYear > 0) {
+      return planEndYear;
+    }
+    const fallback = Number(data?.forecastEndDateYear);
+    if (Number.isFinite(fallback) && fallback > 0) {
+      return fallback;
+    }
+    return new Date().getFullYear();
   }
 
   onBonusAmountInput(rawValue: string) {

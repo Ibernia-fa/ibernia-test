@@ -125,6 +125,7 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
 
     const bodyRows = w.globals.seriesNames
       .map((seriesName: string, i: number) => {
+        if (seriesName === 'Emergency Expense') return '';
         const value = series[i]?.[dataPointIndex];
         if (value === undefined || (typeof value === 'number' && value === 0)) return '';
         // Use the original series color (before transparent override) so tooltip dots are always visible
