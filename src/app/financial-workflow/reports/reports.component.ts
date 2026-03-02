@@ -408,6 +408,32 @@ export class ReportsComponent {
     });
 }
 
+  private getEffectiveReportEndDate(timeline: FinancialTimeline): Date | null {
+    if (!timeline?.forecastStartDate || !this.client?.clientDetails?.birthDate || !this.cashflow) {
+      return timeline?.forecastEndtDate ? new Date(timeline.forecastEndtDate) : null;
+    }
+    const forecastStartDate = new Date(timeline.forecastStartDate);
+    const forecastStartYear = forecastStartDate.getFullYear();
+    const birthDate = new Date(this.client.clientDetails.birthDate);
+    const planDuration = Number(this.cashflow.planDuration);
+    if (!Number.isFinite(planDuration) || planDuration <= 0) {
+      return timeline.forecastEndtDate ? new Date(timeline.forecastEndtDate) : null;
+    }
+    const startAge = this.calculateAgeAtDate(forecastStartDate, birthDate);
+    const planEndYear = forecastStartYear + (planDuration - startAge) + 1;
+    const effectiveYear = Math.max(forecastStartYear, planEndYear);
+    return new Date(effectiveYear, 11, 31);
+  }
+
+  private calculateAgeAtDate(date: Date, dateOfBirth: Date): number {
+    let age = date.getFullYear() - dateOfBirth.getFullYear();
+    const hasBirthdayPassed =
+      date.getMonth() > dateOfBirth.getMonth() ||
+      (date.getMonth() === dateOfBirth.getMonth() && date.getDate() >= dateOfBirth.getDate());
+    if (!hasBirthdayPassed) age--;
+    return age;
+  }
+
   private loadReportWithTimeline(
   cashflowId: string,
   timeline: any,
@@ -417,9 +443,10 @@ export class ReportsComponent {
     return;
   }
 
+  const effectiveEndDate = this.getEffectiveReportEndDate(timeline);
   const payload = {
     ForecastStartDate: this.toIsoString(timeline.forecastStartDate),
-    ForecastEndDate: this.toIsoString(timeline.forecastEndtDate),
+    ForecastEndDate: this.toIsoString(effectiveEndDate ?? timeline.forecastEndtDate),
   };
 
   this.reportsHttpService
@@ -428,7 +455,6 @@ export class ReportsComponent {
       next: (report) => {
         this.report = report;
         this.getShortfallStatus(report);
-        console.log('Report (with forecast dates) loaded:', report);
       },
       error: (err) => {
         console.error('Failed to load report with forecast dates', err);
