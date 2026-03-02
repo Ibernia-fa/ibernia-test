@@ -420,7 +420,7 @@ export class ReportsComponent {
       return timeline.forecastEndtDate ? new Date(timeline.forecastEndtDate) : null;
     }
     const startAge = this.calculateAgeAtDate(forecastStartDate, birthDate);
-    const planEndYear = forecastStartYear + (planDuration - startAge) + 1;
+    const planEndYear = forecastStartYear + (planDuration - startAge);
     const effectiveYear = Math.max(forecastStartYear, planEndYear);
     return new Date(effectiveYear, 11, 31);
   }
