@@ -9,6 +9,59 @@
   text-align: right;
 }
 
+:host ::ng-deep .sidebarNav {
+  background-color: #16151C !important;
+  border-right: 1px solid #16151C !important;
+
+  .mat-drawer-inner-container {
+    background-color: #16151C;
+  }
+
+  .sidebar-list {
+    padding: 16px 15px 0 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    .menu-list-item {
+      height: 36px;
+      padding: 8px !important;
+      border-radius: 4px;
+      border-left: 2px solid transparent;
+      background-color: transparent !important;
+
+      .mdc-list-item__primary-text,
+      .hide-menu {
+        color: #787889;
+        font-size: 14px;
+      }
+
+      .mdc-list-item__start {
+        margin-right: 8px;
+        margin-left: 0 !important;
+      }
+
+      &:hover,
+      &.activeMenu {
+        background-color: #1c1d25 !important;
+        border-left: 2px solid #516ce8;
+
+        .mdc-list-item__primary-text,
+        .hide-menu {
+          color: #516ce8 !important;
+        }
+      }
+    }
+  }
+}
+
+.divider {
+  width: 1.5px;
+  margin-left: 12px;
+  margin-right: 12px;
+  background-color: #e7e7eb;
+}
+
 .cashflow-stats,
 .saving-pot-stats-cashflow-model,
 .income-expense-stats-cashflow-model {
@@ -393,3 +446,124 @@ tr.example-detail-row {
 }
 
 // End Cashflow Styles
+
+// Risk & Insurance styles
+.emergency-stats-wrapper {
+  .row {
+    margin: 0 !important;
+
+    .col-3 {
+      padding: 0;
+      flex: 0 0 30%;
+      max-width: 30%;
+    }
+  }
+
+  .divider {
+    width: 1.5px;
+    margin-left: 12px;
+    margin-right: 12px;
+    background-color: #e7e7eb;
+    align-self: stretch;
+  }
+
+  .em-card-title {
+    font-size: 18px;
+    line-height: 19px;
+    font-weight: 700;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+}
+
+.protection-center {
+  .card-em-outer {
+    width: calc((100% - 20px) / 3);
+    min-height: 161px;
+  }
+
+  .dot {
+    height: 8px;
+    width: 8px;
+    border-radius: 100px;
+    background-color: green;
+  }
+
+  .dot-red {
+    height: 8px;
+    width: 8px;
+    border-radius: 100px;
+    background-color: red;
+  }
+
+  .summary-card {
+    .w-50 {
+      width: 50%;
+    }
+
+    padding: 15px;
+    border-radius: 4px;
+    height: 100%;
+
+    .inner-information {
+      line-height: normal;
+
+      .label {
+        font-size: 14px;
+        color: #555;
+      }
+    }
+  }
+}
+
+.em-card-title {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.item-card {
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.danger-card {
+  background: #fff1f2;
+  border: 1px solid #ffccd3 !important;
+}
+
+.basic-card {
+  background-color: #fef3e4;
+  border: 1px solid #f6ce98 !important;
+}
+
+.good-card {
+  background-color: #ecfdf5;
+  border: 1px solid #a4f4cf !important;
+}
+
+.excellent-card {
+  background-color: #b6f6d9;
+  border: 1px solid #59c996 !important;
+}
+
+.will-done-text {
+  color: #006045;
+}
+
+.ibernia-red {
+  color: #ff0000 !important;
+}
+
+.ibernia-orange {
+  color: #ff9902 !important;
+}
+
+.ibernia-light-green {
+  color: #71bc42 !important;
+}
+
+.ibernia-dark-green {
+  color: #00512C !important;
+}
