@@ -107,9 +107,8 @@ export class AddEventDialogComponent {
   showMortgageCalculator = false;
   lastCalculatorState: MortgageCalculatorState | null = null;
 
-  get isFinancingEvent(): boolean {
-    const name = this.patchEvent?.name ?? '';
-    return this.FINANCING_EVENTS.some(e => name.startsWith(e));
+  get isHomeEvent(): boolean {
+    return this.patchEvent?.name?.startsWith('Home') ?? false;
   }
 
   constructor(

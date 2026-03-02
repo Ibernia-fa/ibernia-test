@@ -167,6 +167,7 @@
   cursor: pointer;
   border: none;
   transition: background-color 0.2s;
+  text-transform: none;
 
   &.calc-btn-secondary {
     background: #fff;
@@ -188,9 +189,6 @@
     }
   }
 
-  &.calc-btn-sentence-case {
-    text-transform: none;
-  }
 }
 
 .calc-results {
