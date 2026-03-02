@@ -181,7 +181,7 @@ export function calculateMortgage(
     loanAmount: Math.round(loanAmount),
     interestRate: annualInterestRate,
     loanTermYears,
-    monthlyEMI: Math.round(monthlyEMI * 100) / 100,
+    monthlyEMI: Math.round(monthlyEMI),
     totalInterest: Math.round(totalInterest),
     totalPayable: Math.round(totalPayable),
   };

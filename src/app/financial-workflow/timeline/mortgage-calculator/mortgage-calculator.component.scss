@@ -14,16 +14,6 @@
   }
 }
 
-.calc-country-badge {
-  font-size: 11px;
-  font-weight: 600;
-  color: #516ce8;
-  background: #eef0ff;
-  padding: 3px 10px;
-  border-radius: 12px;
-  white-space: nowrap;
-}
-
 .calculator-body {
   .calc-label {
     font-size: 13px;
@@ -69,6 +59,7 @@
     font-size: 14px;
     height: 100%;
     background: transparent;
+    min-width: 0;
 
     &::-webkit-inner-spin-button,
     &::-webkit-outer-spin-button {
@@ -86,6 +77,50 @@
     display: flex;
     align-items: center;
     height: 100%;
+  }
+}
+
+.down-payment-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 8px;
+  border-left: 1px solid rgba(0, 0, 0, 0.12);
+  height: 100%;
+  background: #fafafa;
+  flex-shrink: 0;
+
+  .dp-radio {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #666;
+    white-space: nowrap;
+    user-select: none;
+
+    .dp-radio-circle {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 2px solid #bbb;
+      box-sizing: border-box;
+      transition: border-color 0.15s, background 0.15s;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    &.active {
+      color: #516ce8;
+      font-weight: 500;
+
+      .dp-radio-circle {
+        border-color: #516ce8;
+        background: #516ce8;
+        box-shadow: inset 0 0 0 2px #fff;
+      }
+    }
   }
 }
 

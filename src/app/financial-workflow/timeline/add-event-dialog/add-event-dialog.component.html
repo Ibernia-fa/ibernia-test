@@ -308,13 +308,14 @@
       <div class="d-flex flex-column gap-8">
         <button (click)="toggleMortgageCalculator()" type="button" class="mortgage-toggle-btn">
           <img src="assets/images/svgs/cashflow-moneys-icon.svg" alt="calculator" width="16" />
-          <span>{{ showMortgageCalculator ? ('Hide mortgage calculator' | translate) : ('Use mortgage calculator' | translate) }}</span>
+          <span>{{ showMortgageCalculator ? ('Hide mortgage or loan calculator' | translate) : ('Use mortgage or loan calculator' | translate) }}</span>
         </button>
 
         @if(showMortgageCalculator) {
         <app-mortgage-calculator
           [clientCountryCode]="clientCountryCode"
           [currencySymbol]="clientPreferredCurrency"
+          [initialState]="lastCalculatorState"
           (calculated)="onMortgageApplied($event)">
         </app-mortgage-calculator>
         }

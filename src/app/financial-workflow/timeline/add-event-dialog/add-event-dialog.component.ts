@@ -22,7 +22,7 @@ import { CommonModule } from '@angular/common';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 import { TranslateModule } from '@ngx-translate/core';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MortgageCalculatorComponent } from '../mortgage-calculator/mortgage-calculator.component';
+import { MortgageCalculatorComponent, MortgageCalculatorState } from '../mortgage-calculator/mortgage-calculator.component';
 import { MortgageOutput } from '../mortgage-calculator/mortgage-calculator.component';
 
 @Component({
@@ -56,6 +56,7 @@ export class AddEventDialogComponent {
   @ViewChild('amountInput') amountInput?: ElementRef<HTMLInputElement>;
   @ViewChild('monthlyPayment') monthlyPayment?: ElementRef<HTMLInputElement>;
   @ViewChild('resalePrice') resalePrice?: ElementRef<HTMLInputElement>;
+  @ViewChild(MortgageCalculatorComponent) mortgageCalcRef?: MortgageCalculatorComponent;
   private readonly AUTO_RENAME_EVENTS = [
     'Wedding',
     'Travel',
@@ -105,6 +106,7 @@ export class AddEventDialogComponent {
   financialRecords: FinancialRecordLineItem[] = [];
   clientCountryCode: string = '';
   showMortgageCalculator = false;
+  lastCalculatorState: MortgageCalculatorState | null = null;
 
   get isHomeEvent(): boolean {
     return this.patchEvent?.name?.startsWith('Home') ?? false;
@@ -834,6 +836,9 @@ export class AddEventDialogComponent {
   }
 
   toggleMortgageCalculator(): void {
+    if (this.showMortgageCalculator && this.mortgageCalcRef) {
+      this.lastCalculatorState = this.mortgageCalcRef.getState();
+    }
     this.showMortgageCalculator = !this.showMortgageCalculator;
   }
 
@@ -846,14 +851,14 @@ export class AddEventDialogComponent {
       monthlyPayment: output.monthlyEMI,
     }, { emitEvent: false });
 
-    const startYear = this.eventForm.get('start')?.value ?? this.eventForm.get('monthlyStart')?.value;
-    if (startYear) {
-      const endYear = startYear + output.loanTermYears;
-      this.eventForm.patchValue({
-        monthlyStart: startYear,
-        monthlyEnd: endYear,
-      }, { emitEvent: false });
-    }
+    const startYear = this.eventForm.get('start')?.value
+      ?? this.eventForm.get('monthlyStart')?.value
+      ?? this.data.forecastStartDateYear;
+    const endYear = startYear + output.loanTermYears;
+    this.eventForm.patchValue({
+      monthlyStart: startYear,
+      monthlyEnd: endYear,
+    }, { emitEvent: false });
 
     this.applyFinancingValidators('Financing');
 

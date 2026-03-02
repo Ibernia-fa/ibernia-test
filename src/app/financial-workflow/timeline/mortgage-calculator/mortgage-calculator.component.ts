@@ -35,6 +35,16 @@ export interface MortgageOutput {
   loanAmount: number;
 }
 
+export interface MortgageCalculatorState {
+  propertyPrice: number | null;
+  downPaymentValue: number | null;
+  downPaymentMode: 'currency' | 'percent';
+  interestRate: number | null;
+  loanTermYears: number | null;
+  residencyType: string | null;
+  rateType: string | null;
+}
+
 @Component({
   selector: 'app-mortgage-calculator',
   imports: [
@@ -55,6 +65,7 @@ export interface MortgageOutput {
 export class MortgageCalculatorComponent implements OnInit, OnChanges {
   @Input() clientCountryCode: string = '';
   @Input() currencySymbol: string = '';
+  @Input() initialState: MortgageCalculatorState | null = null;
   @Output() calculated = new EventEmitter<MortgageOutput>();
 
   mortgageForm: FormGroup;
@@ -62,6 +73,7 @@ export class MortgageCalculatorComponent implements OnInit, OnChanges {
   result: MortgageCalculation | null = null;
   loanTermOptions: number[] = [];
   highValueWarning: string | null = null;
+  downPaymentMode: 'currency' | 'percent' = 'percent';
 
   get hasResidencyTiers(): boolean {
     return !!this.config?.residencyTiers?.length;
@@ -129,6 +141,36 @@ export class MortgageCalculatorComponent implements OnInit, OnChanges {
     }
   }
 
+  getState(): MortgageCalculatorState {
+    return {
+      propertyPrice: this.mortgageForm.get('propertyPrice')?.value,
+      downPaymentValue: this.mortgageForm.get('downPaymentValue')?.value,
+      downPaymentMode: this.downPaymentMode,
+      interestRate: this.mortgageForm.get('interestRate')?.value,
+      loanTermYears: this.mortgageForm.get('loanTermYears')?.value,
+      residencyType: this.mortgageForm.get('residencyType')?.value,
+      rateType: this.mortgageForm.get('rateType')?.value,
+    };
+  }
+
+  toggleDownPaymentMode(mode: 'currency' | 'percent'): void {
+    if (mode === this.downPaymentMode) return;
+
+    const currentValue = this.mortgageForm.get('downPaymentValue')?.value ?? 0;
+    const propertyPrice = this.mortgageForm.get('propertyPrice')?.value ?? 0;
+
+    let converted = 0;
+    if (this.downPaymentMode === 'percent' && mode === 'currency') {
+      converted = propertyPrice > 0 ? Math.round(propertyPrice * (currentValue / 100)) : 0;
+    } else if (this.downPaymentMode === 'currency' && mode === 'percent') {
+      converted = propertyPrice > 0 ? Math.round((currentValue / propertyPrice) * 10000) / 100 : 0;
+    }
+
+    this.downPaymentMode = mode;
+    this.mortgageForm.patchValue({ downPaymentValue: converted }, { emitEvent: false });
+    this.updateDownPaymentValidators();
+  }
+
   private buildLoanTermOptions(): void {
     this.loanTermOptions = [];
     for (let y = 5; y <= this.config.maxLoanTermYears; y += 5) {
@@ -140,21 +182,26 @@ export class MortgageCalculatorComponent implements OnInit, OnChanges {
   }
 
   private initForm(): void {
-    const defaultDown = this.config.minDownPaymentPercent;
-    const defaultRate = this.config.defaultInterestRate;
-    const defaultTerm = this.config.defaultLoanTermYears;
+    const state = this.initialState;
+    const defaultDown = state?.downPaymentValue ?? this.config.minDownPaymentPercent;
+    const defaultRate = state?.interestRate ?? this.config.defaultInterestRate;
+    const defaultTerm = state?.loanTermYears ?? this.config.defaultLoanTermYears;
+
+    this.downPaymentMode = state?.downPaymentMode ?? 'percent';
 
     this.mortgageForm = this.fb.group({
-      propertyPrice: [null, [Validators.required, Validators.min(1)]],
-      downPaymentPercent: [defaultDown, [Validators.required, Validators.min(0), Validators.max(100)]],
+      propertyPrice: [state?.propertyPrice ?? null, [Validators.required, Validators.min(1)]],
+      downPaymentValue: [defaultDown, [Validators.required, Validators.min(0)]],
       interestRate: [defaultRate, [Validators.required, Validators.min(0)]],
       loanTermYears: [defaultTerm, [Validators.required]],
-      residencyType: [this.config.residencyTiers?.[0]?.value ?? null],
-      rateType: [this.config.rateTypes?.[0]?.value ?? null],
+      residencyType: [state?.residencyType ?? this.config.residencyTiers?.[0]?.value ?? null],
+      rateType: [state?.rateType ?? this.config.rateTypes?.[0]?.value ?? null],
     });
 
     this.result = null;
     this.highValueWarning = null;
+
+    this.updateDownPaymentValidators();
 
     this.mortgageForm.get('residencyType')?.valueChanges.subscribe(() => {
       this.syncTierDefaults();
@@ -169,7 +216,23 @@ export class MortgageCalculatorComponent implements OnInit, OnChanges {
 
     this.mortgageForm.get('propertyPrice')?.valueChanges.subscribe(() => {
       this.syncTierDefaults();
+      this.updateDownPaymentValidators();
     });
+  }
+
+  private updateDownPaymentValidators(): void {
+    const ctrl = this.mortgageForm.get('downPaymentValue');
+    if (!ctrl) return;
+
+    if (this.downPaymentMode === 'percent') {
+      const minPct = this.effectiveMinDownPayment;
+      ctrl.setValidators([Validators.required, Validators.min(minPct), Validators.max(100)]);
+    } else {
+      const propertyPrice = this.mortgageForm.get('propertyPrice')?.value ?? 0;
+      const maxVal = propertyPrice > 0 ? propertyPrice : Number.MAX_SAFE_INTEGER;
+      ctrl.setValidators([Validators.required, Validators.min(0), Validators.max(maxVal)]);
+    }
+    ctrl.updateValueAndValidity({ emitEvent: false });
   }
 
   /**
@@ -180,19 +243,17 @@ export class MortgageCalculatorComponent implements OnInit, OnChanges {
     const tier = this.selectedTier;
     if (!tier) {
       this.highValueWarning = null;
+      this.updateDownPaymentValidators();
       return;
     }
 
     const minDown = this.effectiveMinDownPayment;
-    const currentDown = this.mortgageForm.get('downPaymentPercent')?.value;
 
-    this.mortgageForm.get('downPaymentPercent')?.setValidators([
-      Validators.required, Validators.min(minDown), Validators.max(100),
-    ]);
-    this.mortgageForm.get('downPaymentPercent')?.updateValueAndValidity({ emitEvent: false });
-
-    if (currentDown < minDown) {
-      this.mortgageForm.patchValue({ downPaymentPercent: minDown }, { emitEvent: false });
+    if (this.downPaymentMode === 'percent') {
+      const currentDown = this.mortgageForm.get('downPaymentValue')?.value;
+      if (currentDown < minDown) {
+        this.mortgageForm.patchValue({ downPaymentValue: minDown }, { emitEvent: false });
+      }
     }
 
     this.mortgageForm.patchValue({ interestRate: tier.defaultInterestRate }, { emitEvent: false });
@@ -203,6 +264,17 @@ export class MortgageCalculatorComponent implements OnInit, OnChanges {
     } else {
       this.highValueWarning = null;
     }
+
+    this.updateDownPaymentValidators();
+  }
+
+  private resolveDownPaymentPercent(): number {
+    const value = this.mortgageForm.get('downPaymentValue')?.value ?? 0;
+    if (this.downPaymentMode === 'percent') return value;
+
+    const propertyPrice = this.mortgageForm.get('propertyPrice')?.value ?? 0;
+    if (propertyPrice <= 0) return 0;
+    return (value / propertyPrice) * 100;
   }
 
   onCalculate(): void {
@@ -210,7 +282,8 @@ export class MortgageCalculatorComponent implements OnInit, OnChanges {
     this.mortgageForm.markAllAsTouched();
     if (!this.mortgageForm.valid) return;
 
-    const { propertyPrice, downPaymentPercent, interestRate, loanTermYears } = this.mortgageForm.value;
+    const { propertyPrice, interestRate, loanTermYears } = this.mortgageForm.value;
+    const downPaymentPercent = this.resolveDownPaymentPercent();
     this.result = calculateMortgage(propertyPrice, downPaymentPercent, interestRate, loanTermYears);
   }
 
