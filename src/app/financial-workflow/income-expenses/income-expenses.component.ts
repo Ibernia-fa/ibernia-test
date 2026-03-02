@@ -188,6 +188,7 @@ export class IncomeExpensesComponent {
       disableClose: true,
       data: {
         amountCycles: this.amountCycles,
+        eventsList: this.timeline.clientEvents.sort((a, b) => a.start.age - b.start.age),
         escalataionRates: this.escalationRates,
         clientBirthDate: this.selectedClient?.clientDetails.birthDate,
         clientPreferredCurrency: this.selectedClient?.clientDetails.preferredCurrency,
@@ -217,6 +218,7 @@ export class IncomeExpensesComponent {
       disableClose: true,
       data: {
         amountCycles: this.amountCycles,
+        eventsList: this.timeline.clientEvents.sort((a, b) => a.start.age - b.start.age),
         escalataionRates: this.escalationRates,
         clientBirthDate: this.selectedClient?.clientDetails.birthDate,
         clientPreferredCurrency: this.selectedClient?.clientDetails.preferredCurrency,
