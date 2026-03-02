@@ -79,5 +79,12 @@ describe('event-date-utils', () => {
       expect(resolveYear('event:evt-1', [])).toBe(0);
       expect(resolveYear(2030, [])).toBe(2030);
     });
+
+    it('handles null or undefined events list without throwing', () => {
+      expect(resolveYear('event:evt-1', null as any)).toBe(0);
+      expect(resolveYear('event:evt-1', undefined as any)).toBe(0);
+      expect(resolveYear(2030, null as any)).toBe(2030);
+      expect(resolveYear(2030, undefined as any)).toBe(2030);
+    });
   });
 });

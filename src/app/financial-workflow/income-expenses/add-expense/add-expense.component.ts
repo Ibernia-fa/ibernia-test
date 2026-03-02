@@ -90,7 +90,7 @@ export class AddExpenseComponent {
     private incomeExpenseHttpService: IncomeExpensesHttpService
   ) {
     this.expenseTypes = data.expenseType;
-    this.eventsList = data.eventsList;
+    this.eventsList = data.eventsList ?? [];
     this.cycles = data.amountCycles;
     this.escalationRates = data.escalataionRates;
     this.clientBirthYear = moment(data.clientBirthDate).year();
