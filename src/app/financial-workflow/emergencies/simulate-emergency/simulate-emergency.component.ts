@@ -129,12 +129,11 @@ export class SimulateEmergencyComponent implements OnDestroy {
 
     this.clientBirthYear = moment(this.clientBirthDate).year();
     const birthDate = new Date(this.clientBirthDate);
-    const today = new Date();
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDiff = today.getMonth() - birthDate.getMonth();
-    const dayDiff = today.getDate() - birthDate.getDate();
+    const forecastStart = new Date(this.forecastStartDateYear, 0, 1);
+    let age = forecastStart.getFullYear() - birthDate.getFullYear();
+    const monthDiff = forecastStart.getMonth() - birthDate.getMonth();
+    const dayDiff = forecastStart.getDate() - birthDate.getDate();
 
-    // adjust age if birth month/day is in the future
     if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
       age--;
     }

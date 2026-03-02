@@ -104,12 +104,11 @@ export class AddContributionComponent {
     this.escalationRates = data.escalataionRates;
     this.clientBirthYear = moment(data.clientBirthDate).year();
 
-    // age
     const birthDate = new Date(data.clientBirthDate);
-    const today = new Date();
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDiff = today.getMonth() - birthDate.getMonth();
-    const dayDiff = today.getDate() - birthDate.getDate();
+    const forecastStart = new Date(data.forecastStartDateYear, 0, 1);
+    let age = forecastStart.getFullYear() - birthDate.getFullYear();
+    const monthDiff = forecastStart.getMonth() - birthDate.getMonth();
+    const dayDiff = forecastStart.getDate() - birthDate.getDate();
     if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) age--;
     this.clientAge = age;
     if (data.forecastStartDateYear - this.clientBirthYear > this.clientAge) {
@@ -722,5 +721,9 @@ export class AddContributionComponent {
   private buildDefaultDescription(potName: string | null | undefined): string {
     const name = (potName ?? '').toString().trim();
     return name ? `Contribution to ${name}` : 'Contribution to';
+  }
+
+  getAgeForYear(year: number): number {
+    return Number(year) - this.clientBirthYear;
   }
 }

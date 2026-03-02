@@ -129,18 +129,6 @@ export class TimelineComponent implements OnDestroy {
             this.clientBirthDate = client.clientDetails.birthDate;
 
             const birthDate = new Date(client.clientDetails.birthDate);
-            const today = new Date();
-
-            let age = today.getFullYear() - birthDate.getFullYear();
-            const monthDiff = today.getMonth() - birthDate.getMonth();
-            const dayDiff = today.getDate() - birthDate.getDate();
-
-            // Adjust age if birth month/day is in the future
-            if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
-              age--;
-            }
-
-            this.clientAge = age
 
             this.clientBirthYear = moment(
               client.clientDetails.birthDate
@@ -149,6 +137,17 @@ export class TimelineComponent implements OnDestroy {
             this.forecastStartYear = moment(
               this.financialTimeline.forecastStartDate
             ).year();
+
+            const forecastStart = new Date(this.forecastStartYear, 0, 1);
+            let age = forecastStart.getFullYear() - birthDate.getFullYear();
+            const monthDiff = forecastStart.getMonth() - birthDate.getMonth();
+            const dayDiff = forecastStart.getDate() - birthDate.getDate();
+
+            if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+              age--;
+            }
+
+            this.clientAge = age;
             if (this.forecastStartYear - this.clientBirthYear > this.clientAge) this.clientBirthYear = this.clientBirthYear + 1
 
             this.forecastEndYear = moment(
