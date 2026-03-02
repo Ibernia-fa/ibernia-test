@@ -167,7 +167,10 @@
   cursor: pointer;
   border: none;
   transition: background-color 0.2s;
-  text-transform: none;
+
+  span {
+    text-transform: none !important;
+  }
 
   &.calc-btn-secondary {
     background: #fff;
