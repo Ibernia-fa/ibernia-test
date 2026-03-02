@@ -4,6 +4,8 @@ export interface FinancialSeriesModel {
   timeline?: Timeline;
   financialRecords?: FinancialRecords;
   fundTransactions?: FundTransactions;
+  emergencies?: ClientEmergency[];
+  emergenciesLookupData?: EmergenciesLookupData;
 }
 
 export interface FinancialProjection {
@@ -119,4 +121,35 @@ export interface FinancialRecords {
 
 export interface FundTransactions {
   id: string;
+}
+
+export interface ClientEmergency {
+  id: string;
+  type: number;
+  policyStatus: number;
+  insuranceCost?: {
+    currencySymbol: string | null;
+    amount: number;
+    cycle: { id: string | null; description: string | null } | null;
+  } | null;
+  coverage: number;
+  coverageAdequacy: number;
+  willStatus: number;
+  name: string;
+  iconUrl: string;
+  isHidden: boolean;
+  client: { id: string; name: string };
+  cashflow: { id: string; name: string };
+}
+
+export interface EmergenciesLookupData {
+  emergenciesStats: {
+    totalCoverage: number;
+    totalCost: number;
+    protectionScore: number;
+  };
+  emergencyTypes: { id: number; name: string; description: string }[];
+  policyStatuses: { id: number; name: string; description: string }[];
+  coverageAdequacies: { id: number; name: string; description: string }[];
+  willStatuses: { id: number; name: string; description: string }[];
 }

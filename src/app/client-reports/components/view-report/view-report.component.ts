@@ -23,6 +23,7 @@ import {
 import { TablerIconsModule } from 'angular-tabler-icons';
 import { MaterialModule } from 'src/app/material.module';
 import { TranslateModule } from '@ngx-translate/core';
+import { ClientEmergency, EmergenciesLookupData } from '../../models/financial-series.model';
 
 @Component({
   selector: 'app-view-report',
@@ -96,6 +97,32 @@ export class ViewReportComponent {
     return this.financialSeries?.client?.financialAdvisor?.advisorName;
   }
 
+  get emergencies(): ClientEmergency[] {
+    return this.financialSeries?.emergencies ?? [];
+  }
+
+  get filteredEmergencies(): ClientEmergency[] {
+    return this.emergencies.filter(e => !e.isHidden);
+  }
+
+  get emergenciesLookupData(): EmergenciesLookupData | null {
+    return this.financialSeries?.emergenciesLookupData ?? null;
+  }
+
+  get emergencyStats() {
+    return this.emergenciesLookupData?.emergenciesStats;
+  }
+
+  private readonly defaultIcon = 'shield.svg';
+  private readonly iconMap: Record<string, string> = {
+    home: 'home.svg',
+    disability: 'disability.svg',
+    health: 'health.svg',
+    will: 'will.svg',
+    life: 'user.png',
+    naturalHazards: 'naturalHazards.png',
+  };
+
   incomeExpenseDisplayedColumns: string[] = [
     'position',
     'start_age',
@@ -124,5 +151,55 @@ export class ViewReportComponent {
 
   setSection(section: string) {
     this.section = section;
+  }
+
+  getEmergencyIcon(e: ClientEmergency): string {
+    const key = (e.name || '').toLowerCase();
+    if (key === 'natural hazards') {
+      return `assets/images/svgs/${this.iconMap['naturalHazards']}`;
+    }
+    return `assets/images/svgs/${this.iconMap[key] ?? this.defaultIcon}`;
+  }
+
+  getEmergencyTypeName(typeId: number): string {
+    return this.emergenciesLookupData?.emergencyTypes?.find(t => t.id === typeId)?.name ?? 'Unknown';
+  }
+
+  getCardCssClass(e: ClientEmergency): string {
+    if (e.type === 1) {
+      if (e.policyStatus === 2) return 'danger-card';
+      return e.coverageAdequacy === 1 ? 'basic-card' : e.coverageAdequacy === 2 ? 'good-card' : 'excellent-card';
+    }
+    if (e.type === 2) {
+      return e.willStatus === 2 ? 'danger-card' : 'excellent-card';
+    }
+    return 'danger-card';
+  }
+
+  getDotClass(e: ClientEmergency): string {
+    if (e.type === 1) return e.policyStatus === 2 ? 'dot-red' : 'dot';
+    if (e.type === 2) return e.willStatus === 2 ? 'dot-red' : 'dot';
+    return 'dot-red';
+  }
+
+  getProtectionScoreCssClass(score: number | null | undefined): string {
+    if (score == null || score < 50) return 'ibernia-red';
+    if (score < 75) return 'ibernia-orange';
+    if (score < 89) return 'ibernia-light-green';
+    return 'ibernia-dark-green';
+  }
+
+  getCoverageAdequacyLabel(id: number | null): string {
+    if (id == null) return '-';
+    return this.emergenciesLookupData?.coverageAdequacies?.find(c => c.id === id)?.description ?? 'Unknown';
+  }
+
+  calculateAnnualCost(e: ClientEmergency): number {
+    if (!e.insuranceCost) return 0;
+    const cycleDesc = e.insuranceCost.cycle?.description?.toLowerCase() ?? '';
+    if (e.insuranceCost.amount > 0 && cycleDesc.includes('month')) {
+      return e.insuranceCost.amount * 12;
+    }
+    return e.insuranceCost.amount ?? 0;
   }
 }

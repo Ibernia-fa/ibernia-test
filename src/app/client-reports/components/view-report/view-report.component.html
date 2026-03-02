@@ -18,7 +18,8 @@
                         <div class="flex-layout">
                             <mat-nav-list role="navigation"
                                 class="mat-mdc-nav-list mat-mdc-list-base mdc-list sidebar-list" aria-disabled="false">
-                                <div class="nav-item" [class.active]="section === 'goalsAndEvents'">
+                                <!-- Hidden menus: Goals & Events -->
+                                <div class="nav-item" [class.active]="section === 'goalsAndEvents'" style="display: none;">
                                     <a mat-list-item (click)="setSection('goalsAndEvents')" [disableRipple]="true"
                                         class="mat-toolbar mat-primary menu-list-item"
                                         [ngClass]="{ 'activeMenu': section === 'goalsAndEvents' }">
@@ -28,7 +29,8 @@
                                         <span class="hide-menu">{{ 'Goals & Events' | translate }}</span>
                                     </a>
                                 </div>
-                                <div class="nav-item" [class.active]="section === 'savingPots'">
+                                <!-- Hidden menus: Saving Pots -->
+                                <div class="nav-item" [class.active]="section === 'savingPots'" style="display: none;">
                                     <a mat-list-item (click)="setSection('savingPots')" [disableRipple]="true"
                                         class="mat-toolbar mat-primary menu-list-item"
                                         [ngClass]="{ 'activeMenu': section === 'savingPots' }">
@@ -38,7 +40,8 @@
                                         <span class="hide-menu">{{ 'Saving Pots' | translate }}</span>
                                     </a>
                                 </div>
-                                <div class="nav-item" [class.active]="section === 'incomesAndExpenses'">
+                                <!-- Hidden menus: Incomes & Expenses -->
+                                <div class="nav-item" [class.active]="section === 'incomesAndExpenses'" style="display: none;">
                                     <a mat-list-item (click)="setSection('incomesAndExpenses')" [disableRipple]="true"
                                         class="mat-toolbar mat-primary menu-list-item"
                                         [ngClass]="{ 'activeMenu': section === 'incomesAndExpenses' }">
@@ -48,7 +51,8 @@
                                         <span class="hide-menu">{{ 'Incomes & Expenses' | translate }}</span>
                                     </a>
                                 </div>
-                                <div class="nav-item" [class.active]="section === 'contributionsAndWithdrawals'">
+                                <!-- Hidden menus: Contributions & Withdrawals -->
+                                <div class="nav-item" [class.active]="section === 'contributionsAndWithdrawals'" style="display: none;">
                                     <a mat-list-item (click)="setSection('contributionsAndWithdrawals')"
                                         [disableRipple]="true" class="mat-toolbar mat-primary menu-list-item"
                                         [ngClass]="{ 'activeMenu': section === 'contributionsAndWithdrawals' }">
@@ -61,13 +65,21 @@
 
                                 <div [class.active]="section === 'lifetimePlan'">
                                     <a mat-list-item (click)="setSection('lifetimePlan')" [disableRipple]="true"
-                                        class="cashflow-modal d-flex align-items-center gap-8 activeMenu"
-                                        style="height: 36px; padding-left: 8px;">
-                                        <img style="flex: none; max-width: 18px; vertical-align: text-bottom; margin: 0px 8px 0px 0px;"
+                                        class="mat-toolbar mat-primary menu-list-item"
+                                        [ngClass]="{ 'activeMenu': section === 'lifetimePlan' }">
+                                        <img style="flex: none; max-width: 18px;"
                                             src="/assets/images/svgs/inheritance-icon.svg" alt="Lifetime plan">
-                                        <span class="activeMenu mdc-list-item__primary-text"
-                                            style="font-size: 14px; line-height: 20px; color: #516ce8 !important; vertical-align: text-bottom;margin-top: 2px;">{{
-                                            'Lifetime Plan' | translate }}</span>
+                                        <span class="hide-menu">{{ 'Lifetime Plan' | translate }}</span>
+                                    </a>
+                                </div>
+
+                                <div [class.active]="section === 'riskInsurance'">
+                                    <a mat-list-item (click)="setSection('riskInsurance')" [disableRipple]="true"
+                                        class="mat-toolbar mat-primary menu-list-item"
+                                        [ngClass]="{ 'activeMenu': section === 'riskInsurance' }">
+                                        <img style="flex: none; max-width: 18px;"
+                                            src="/assets/images/svgs/danger-square-icon-active.svg" alt="Risk & Insurance">
+                                        <span class="hide-menu">{{ 'Risk & Insurance' | translate }}</span>
                                     </a>
                                 </div>
                             </mat-nav-list>
@@ -594,8 +606,6 @@
                                                 <div class="d-flex flex-column justify-content-between gap-4">
                                                     <h4 class="page-title f-w-500">{{ 'Lifetime Plan' | translate }}
                                                     </h4>
-                                                    <span class="sub-title">{{client.clientDetails.firstName}}
-                                                        {{client.clientDetails.lastName}}</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -617,6 +627,150 @@
                         </mat-card>
                     </div>
                     <!-- end lifetime plan end  -->
+
+                    <!-- risk & insurance -->
+                    <div *ngIf="section === 'riskInsurance'" class="d-flex gap-24 flex-column">
+                        <mat-card class="cardWithShadow">
+                            <mat-card-content>
+                                <div class="d-flex flex-column gap-32 timeline-wrapper">
+                                    <div class="card-main-wrapper">
+                                        <div class="d-flex align-items-center justify-content-between w-100 gap-16 flex-wrap">
+                                            <div class="d-flex align-items-center gap-16">
+                                                <div class="icon-wrapper d-flex align-items-center justify-content-center">
+                                                    <img width="24" src="assets/images/svgs/danger-square-icon-active.svg" alt="risk" />
+                                                </div>
+                                                <div class="d-flex flex-column justify-content-between gap-4">
+                                                    <h4 class="page-title f-w-500">{{ 'Risk & Insurance' | translate }}</h4>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </mat-card-content>
+                        </mat-card>
+
+                        <!-- analytics stats -->
+                        <mat-card class="cardWithShadow" *ngIf="emergencyStats as s">
+                            <mat-card-content style="padding: 28px 24px !important;">
+                                <div class="d-flex align-items-center gap-8 justify-content-between">
+                                    <div class="emergency-stats-wrapper w-100">
+                                        <div class="row justify-content-between">
+                                            <div class="col-3">
+                                                <div class="d-flex flex-column gap-8">
+                                                    <div class="d-flex align-items-center gap-8">
+                                                        <h3 class="em-card-title">
+                                                            <img src="/assets/images/svgs/shield.svg" alt="chart" />
+                                                            {{ 'Total coverage' | translate }}
+                                                        </h3>
+                                                    </div>
+                                                    <h3 class="saving-title">
+                                                        <span>{{client?.clientDetails?.preferredCurrency | currencySymbol}}</span>{{s.totalCoverage | number:'1.0-0'}}
+                                                    </h3>
+                                                </div>
+                                            </div>
+
+                                            <div class="divider"></div>
+
+                                            <div class="col-3">
+                                                <div class="d-flex flex-column gap-8">
+                                                    <div class="d-flex align-items-center gap-8">
+                                                        <h3 class="em-card-title">
+                                                            <img src="/assets/images/svgs/will.svg" alt="chart" />
+                                                            {{ 'Total annual cost' | translate }}
+                                                        </h3>
+                                                    </div>
+                                                    <h3 class="saving-title">
+                                                        <span>{{client?.clientDetails?.preferredCurrency | currencySymbol}}</span>{{s.totalCost | number:'1.0-0'}}
+                                                    </h3>
+                                                </div>
+                                            </div>
+
+                                            <div class="divider"></div>
+
+                                            <div class="col-3">
+                                                <div class="d-flex flex-column gap-8">
+                                                    <div class="d-flex align-items-center gap-8">
+                                                        <h3 class="em-card-title">
+                                                            <img width="24" src="/assets/images/svgs/gauge.png" alt="chart" />
+                                                            {{ 'Protection score' | translate }}
+                                                        </h3>
+                                                    </div>
+                                                    <h3 class="saving-title" [ngClass]="getProtectionScoreCssClass(s.protectionScore)">
+                                                        {{s.protectionScore}}/100
+                                                    </h3>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </mat-card-content>
+                        </mat-card>
+
+                        <!-- emergency cards (read-only) -->
+                        <mat-card class="cardWithShadow">
+                            <mat-card-content class="protection-center">
+                                <div class="d-flex gap-10 flex-wrap">
+                                    <div class="card-em-outer" *ngFor="let e of filteredEmergencies">
+                                        <mat-card class="summary-card item-card" [ngClass]="getCardCssClass(e)">
+                                            <div class="d-flex justify-content-between m-b-5">
+                                                <div class="d-flex gap-10 align-items-center">
+                                                    <div [ngClass]="getDotClass(e)"></div>
+                                                    <img width="18" [src]="getEmergencyIcon(e)" alt="">
+                                                    <span class="em-card-title">{{ e.name || getEmergencyTypeName(e.type) }}</span>
+                                                </div>
+                                            </div>
+
+                                            <!-- Insurance type -->
+                                            <ng-container *ngIf="e.type === 1">
+                                                <ng-container *ngIf="e.policyStatus === 1; else notCoveredTpl">
+                                                    <div class="d-flex m-b-10">
+                                                        <div class="inner-information w-50">
+                                                            <div class="label">{{ 'Coverage' | translate }}</div>
+                                                            <div class="f-w-500 f-s-14">
+                                                                <span>{{client?.clientDetails?.preferredCurrency | currencySymbol}}</span>{{e.coverage | number:'1.0-0'}}
+                                                            </div>
+                                                        </div>
+                                                        <div class="inner-information">
+                                                            <div class="label">{{ 'Annual cost' | translate }}</div>
+                                                            <div class="f-w-500 f-s-14">
+                                                                <span>{{client?.clientDetails?.preferredCurrency | currencySymbol}}</span>{{ calculateAnnualCost(e) | number:'1.0-0' }}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="inner-information">
+                                                        <div class="label m-b-5">{{ 'Adequacy' | translate }}</div>
+                                                        <div class="f-w-500 f-s-14">{{ getCoverageAdequacyLabel(e.coverageAdequacy) }}</div>
+                                                    </div>
+                                                </ng-container>
+                                                <ng-template #notCoveredTpl>
+                                                    <div class="inner-information">
+                                                        <div class="label">{{ 'Status' | translate }}</div>
+                                                        <div class="f-w-500 f-s-14 text-danger">{{ 'Not covered' | translate }}</div>
+                                                    </div>
+                                                </ng-template>
+                                            </ng-container>
+
+                                            <!-- Will type -->
+                                            <ng-container *ngIf="e.type === 2">
+                                                <div class="inner-information">
+                                                    <div class="label">{{ 'Status' | translate }}</div>
+                                                    <div class="f-w-500 f-s-14"
+                                                        [ngClass]="{ 'text-danger': e.willStatus !== 1, 'will-done-text': e.willStatus === 1 }">
+                                                        {{e.willStatus === 1 ? 'Done' : 'Not done'}}
+                                                    </div>
+                                                </div>
+                                            </ng-container>
+                                        </mat-card>
+                                    </div>
+
+                                    <div class="col-12" *ngIf="filteredEmergencies.length === 0">
+                                        <p class="text-muted text-center my-4">{{ 'No protection items available.' | translate }}</p>
+                                    </div>
+                                </div>
+                            </mat-card-content>
+                        </mat-card>
+                    </div>
+                    <!-- end risk & insurance  -->
                 </main>
             </div>
         </mat-sidenav-container>
