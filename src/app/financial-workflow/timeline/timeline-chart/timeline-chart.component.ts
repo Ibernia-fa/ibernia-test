@@ -701,7 +701,7 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
           const visualWidth = Math.min(Math.max(realDuration, minContainerWidth), maxAvailableWidth);
           return {
             id: eventId,
-            content: this.getContent(event.name, event.iconUrl),
+            content: this.getContent(event),
             start: new Date(startYear, 0, 1),
             end: new Date(startYear + visualWidth, 0, 1),
             type: 'range',
@@ -721,7 +721,7 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
           const clampedEndYear = Math.min(forecastEndYear + 1, clampedStartYear + finalWidth);
           return {
             id: eventId,
-            content: this.getContent(event.name, event.iconUrl),
+            content: this.getContent(event),
             start: new Date(clampedStartYear, 0, 1),
             end: new Date(clampedEndYear, 0, 1),
             className: event.iconUrl,
@@ -1074,8 +1074,10 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
     }
   }
 
-  private getContent(title: string, img: string): string {
-    const extraClass = title === 'Retirement age' ? ' retirement-age-chip' : '';
+  private getContent(event: ClientEvent): string {
+    const title = this.getEventTitleForDisplay(event);
+    const img = event.iconUrl;
+    const extraClass = event.name === 'Retirement age' ? ' retirement-age-chip' : '';
     return `
     <div class="timeline-event-chip with-padding${extraClass}" title="${title}">
       <div class="event-left">
@@ -1083,6 +1085,19 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
         <span class="label">${title}</span>
       </div>
     </div>`;
+  }
+
+  private getEventTitleForDisplay(event: ClientEvent): string {
+    const rawTitle = (event?.name ?? '').trim();
+    if (rawTitle.toLowerCase() !== 'retirement age') {
+      return rawTitle;
+    }
+
+    const personName = event.isPartnerEvent
+      ? this.client?.partnerDetail?.firstName?.trim()
+      : this.client?.clientDetails?.firstName?.trim();
+
+    return personName ? `${rawTitle} ${personName}` : rawTitle;
   }
 
   private calculateAge(dateOfBirth: Date): number {

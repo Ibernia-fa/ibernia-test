@@ -99,10 +99,19 @@
         <div class="w-100 form-field gap-8">
           <mat-label class="f-s-16 d-block" style="line-height: 18px">{{ 'Ownership' | translate }}</mat-label>
           <mat-radio-group formControlName="ownership" class="d-flex flex-column gap-8">
-            <mat-radio-button [value]="SavingPotOwnership.Joint">{{ 'Ownership' | translate }}: {{ 'Joint' | translate }}</mat-radio-button>
-            <mat-radio-button [value]="SavingPotOwnership.Person1">{{ 'Ownership' | translate }}: {{ clientFirstName || ('Person 1' | translate) }}</mat-radio-button>
-            <mat-radio-button [value]="SavingPotOwnership.Person2">{{ 'Ownership' | translate }}: {{ partnerFirstName || ('Person 2' | translate) }}</mat-radio-button>
+            @if (!showCashOwnershipFilter || isOwnershipAvailableForCash(SavingPotOwnership.Joint)) {
+              <mat-radio-button [value]="SavingPotOwnership.Joint">{{ 'Joint' | translate }}</mat-radio-button>
+            }
+            @if (!showCashOwnershipFilter || isOwnershipAvailableForCash(SavingPotOwnership.Person1)) {
+              <mat-radio-button [value]="SavingPotOwnership.Person1">{{ clientFirstName || ('Person 1' | translate) }}</mat-radio-button>
+            }
+            @if (!showCashOwnershipFilter || isOwnershipAvailableForCash(SavingPotOwnership.Person2)) {
+              <mat-radio-button [value]="SavingPotOwnership.Person2">{{ partnerFirstName || ('Person 2' | translate) }}</mat-radio-button>
+            }
           </mat-radio-group>
+          @if (savingsForm.get('ownership')?.hasError('duplicateCashOwnership')) {
+            <span class="field-error d-block">A Cash pot already exists for this ownership</span>
+          }
         </div>
         <!-- End Ownership Field -->
         }

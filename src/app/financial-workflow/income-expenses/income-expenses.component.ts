@@ -141,6 +141,7 @@ export class IncomeExpensesComponent {
         cashflowId: this.selectedCashflow?.id,
         forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
         forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
+        planEndYear: this.getPlanEndYear(),
         incomeType: this.incomeType
       },
     });
@@ -167,6 +168,7 @@ export class IncomeExpensesComponent {
         cashflowId: this.selectedCashflow?.id,
         forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
         forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
+        planEndYear: this.getPlanEndYear(),
         expenseType: this.expenseType
       },
     });
@@ -194,6 +196,7 @@ export class IncomeExpensesComponent {
         isEditWorkflow: true,
         forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
         forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
+        planEndYear: this.getPlanEndYear(),
         incomeType: this.incomeType
       },
     });
@@ -222,6 +225,7 @@ export class IncomeExpensesComponent {
         isEditWorkflow: true,
         forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
         forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
+        planEndYear: this.getPlanEndYear(),
         expenseType: this.expenseType
       },
     });
@@ -326,25 +330,8 @@ export class IncomeExpensesComponent {
   }
 
   private updateCurrentYearIncomeSummary(): void {
-    const currentYear = this.timeline
-      ? moment(this.timeline.forecastStartDate).year()
-      : new Date().getFullYear();
-
-    const activeIncomes = (this.incomeExpense?.incomes ?? [])
-      .filter((item) => this.isIncludedIncome(item) && this.isHappeningInYear(item, currentYear));
-
-    const activeExpenses = (this.incomeExpense?.expenses ?? [])
-      .filter((item) => this.isIncludedExpense(item) && this.isHappeningInYear(item, currentYear));
-
-    const totalIncome = activeIncomes.reduce(
-      (sum, item) => sum + this.getYearAmount(item, currentYear),
-      0
-    );
-    const totalExpenses = activeExpenses.reduce(
-      (sum, item) => sum + this.getYearAmount(item, currentYear),
-      0
-    );
-
+    const totalIncome = this.incomeExpense?.totalIncome ?? 0;
+    const totalExpenses = this.incomeExpense?.totalExpenses ?? 0;
     const total = totalIncome - totalExpenses;
     const savingRate = totalIncome === 0 ? 0 : total / totalIncome;
 
@@ -354,65 +341,6 @@ export class IncomeExpensesComponent {
       total,
       savingRate,
     };
-
-    this.incomeExpense.totalIncome = totalIncome;
-    this.incomeExpense.totalExpenses = totalExpenses;
-    this.incomeExpense.total = total;
-    this.incomeExpense.savingRate = savingRate;
-  }
-
-  private isIncludedIncome(item: FinancialViewModel): boolean {
-    return item?.isIncomeExpenseSource === true || item?.description?.toLowerCase() === 'pension fund';
-  }
-
-  private isIncludedExpense(item: FinancialViewModel): boolean {
-    return item?.isIncomeExpenseSource === true || item?.description === 'Insurance';
-  }
-
-  private isHappeningInYear(item: FinancialViewModel, year: number): boolean {
-    const startYear = Number(item?.start?.year ?? 0);
-    const endYearRaw = Number(item?.end?.year ?? 0);
-    const hasEnd = endYearRaw > 0;
-    const cycleDescription = (item?.amount?.cycle?.description ?? '').toString().toLowerCase();
-    const isOneOff = cycleDescription === 'one-off';
-
-    // If no start year is set, treat the item as currently active
-    if (!startYear) return !isOneOff;
-    if (isOneOff) {
-      return startYear === year;
-    }
-
-    if (year < startYear) return false;
-    if (hasEnd && year > endYearRaw) return false;
-    return true;
-  }
-
-  private getYearAmount(item: FinancialViewModel, year: number): number {
-    const baseAmount = Number(item?.amount?.amount ?? 0);
-    const cycleDescription = (item?.amount?.cycle?.description ?? '').toString().toLowerCase();
-
-    let yearlyAmount = cycleDescription.includes('month') ? baseAmount * 12 : baseAmount;
-
-    if (item?.bonus?.enabled && Number(item?.bonus?.amount?.amount ?? 0) > 0) {
-      const bonusCycleDesc = (item.bonus.amount.cycle?.description ?? '').toLowerCase();
-      const isBonusOneOff = bonusCycleDesc === 'one-off';
-
-      if (isBonusOneOff) {
-        const bonusYear = Number(item.bonus.bonusDate?.year ?? 0);
-        if (bonusYear === year) {
-          yearlyAmount += Number(item.bonus.amount.amount ?? 0);
-        }
-      } else {
-        const bonusAmount = Number(item.bonus.amount.amount ?? 0);
-        if (bonusCycleDesc.includes('month')) {
-          yearlyAmount += bonusAmount * 12;
-        } else {
-          yearlyAmount += bonusAmount;
-        }
-      }
-    }
-
-    return yearlyAmount;
   }
 
   trackByIncomeId(index: number, item: FinancialViewModel): string | number {
@@ -447,5 +375,28 @@ export class IncomeExpensesComponent {
 
   hasBonusAmount(item: FinancialViewModel): boolean {
     return Number(item?.bonus?.amount?.amount ?? 0) > 0;
+  }
+
+  private getPlanEndYear(): number {
+    const planDuration = Number(this.selectedCashflow?.planDuration);
+    if (Number.isFinite(planDuration) && planDuration > 0 && this.timeline?.forecastStartDate && this.selectedClient?.clientDetails?.birthDate) {
+      const forecastStartDate = new Date(this.timeline.forecastStartDate);
+      const forecastStartYear = forecastStartDate.getFullYear();
+      const birthDate = new Date(this.selectedClient.clientDetails.birthDate);
+      const startAge = this.calculateClientAge(forecastStartDate, birthDate);
+      return forecastStartYear + (planDuration - startAge);
+    }
+    return moment(this.timeline?.forecastEndtDate).year();
+  }
+
+  private calculateClientAge(atDate: Date, birthDate: Date): number {
+    let age = atDate.getFullYear() - birthDate.getFullYear();
+    const hasBirthdayPassed =
+      atDate.getMonth() > birthDate.getMonth() ||
+      (atDate.getMonth() === birthDate.getMonth() && atDate.getDate() >= birthDate.getDate());
+    if (!hasBirthdayPassed) {
+      age--;
+    }
+    return age;
   }
 }

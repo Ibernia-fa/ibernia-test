@@ -144,7 +144,7 @@ export class AddEmergenciesComponent {
   }
 
   get canEditName(): boolean {
-    return this.data.mode === 'edit' && !this.isDefaultEmergency;
+    return this.data.mode === 'edit';
   }
 
   toggleNameEdit(): void {
@@ -153,7 +153,7 @@ export class AddEmergenciesComponent {
 
   get showNameInput(): boolean {
     if (this.data.mode !== 'edit') return true;
-    return this.isDefaultEmergency || this.showNameEdit;
+    return this.showNameEdit;
   }
 
   private patchForm(e: Emergency): void {
