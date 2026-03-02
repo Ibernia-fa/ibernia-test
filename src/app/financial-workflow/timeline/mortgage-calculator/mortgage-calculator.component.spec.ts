@@ -271,6 +271,21 @@ describe('MortgageCalculatorComponent', () => {
       expect(component.mortgageForm.get('loanTermYears')?.value).toBe(20);
       expect(component.downPaymentMode).toBe('percent');
     });
+
+    it('should emit stateChanged when form values change', () => {
+      initWith('');
+      spyOn(component.stateChanged, 'emit');
+      component.mortgageForm.patchValue({ propertyPrice: 999_000 });
+      expect(component.stateChanged.emit).toHaveBeenCalled();
+    });
+
+    it('should emit stateChanged when down payment mode toggles', () => {
+      initWith('');
+      component.mortgageForm.patchValue({ propertyPrice: 500_000, downPaymentValue: 20 });
+      spyOn(component.stateChanged, 'emit');
+      component.toggleDownPaymentMode('currency');
+      expect(component.stateChanged.emit).toHaveBeenCalled();
+    });
   });
 
   describe('UAE tier logic', () => {
@@ -286,6 +301,15 @@ describe('MortgageCalculatorComponent', () => {
 
       expect(component.highValueWarning).toBeTruthy();
       expect(component.highValueWarning).toContain('5,000,000');
+    });
+
+    it('should set high-value warning via onPropertyPriceInput', (done) => {
+      component.mortgageForm.patchValue({ propertyPrice: 6_000_000 }, { emitEvent: false });
+      component.onPropertyPriceInput();
+      setTimeout(() => {
+        expect(component.highValueWarning).toBeTruthy();
+        done();
+      }, 10);
     });
 
     it('should clear high-value warning for property below threshold', () => {

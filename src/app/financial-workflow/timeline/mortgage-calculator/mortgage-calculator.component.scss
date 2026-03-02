@@ -140,20 +140,22 @@
   }
 }
 
-:host .select-option .mat-mdc-select-trigger {
-  border: 1px solid rgba(0, 0, 0, 0.23);
-  border-radius: 4px;
-  padding: 8px 12px;
-  min-height: 40px;
-  box-sizing: border-box;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  background: #fff;
-}
+.select-option {
+  ::ng-deep .mat-mdc-select-trigger {
+    border: 1px solid rgba(0, 0, 0, 0.23);
+    border-radius: 4px;
+    padding: 8px 12px;
+    min-height: 40px;
+    box-sizing: border-box;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    background: #fff;
+  }
 
-:host .select-option .mat-mdc-select {
-  width: 100%;
+  ::ng-deep .mat-mdc-select {
+    width: 100%;
+  }
 }
 
 .calc-btn {
@@ -184,6 +186,10 @@
     &:hover {
       background: #3f57c9;
     }
+  }
+
+  &.calc-btn-sentence-case {
+    text-transform: none;
   }
 }
 

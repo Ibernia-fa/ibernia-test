@@ -56,7 +56,6 @@ export class AddEventDialogComponent {
   @ViewChild('amountInput') amountInput?: ElementRef<HTMLInputElement>;
   @ViewChild('monthlyPayment') monthlyPayment?: ElementRef<HTMLInputElement>;
   @ViewChild('resalePrice') resalePrice?: ElementRef<HTMLInputElement>;
-  @ViewChild(MortgageCalculatorComponent) mortgageCalcRef?: MortgageCalculatorComponent;
   private readonly AUTO_RENAME_EVENTS = [
     'Wedding',
     'Travel',
@@ -108,8 +107,9 @@ export class AddEventDialogComponent {
   showMortgageCalculator = false;
   lastCalculatorState: MortgageCalculatorState | null = null;
 
-  get isHomeEvent(): boolean {
-    return this.patchEvent?.name?.startsWith('Home') ?? false;
+  get isFinancingEvent(): boolean {
+    const name = this.patchEvent?.name ?? '';
+    return this.FINANCING_EVENTS.some(e => name.startsWith(e));
   }
 
   constructor(
@@ -836,10 +836,11 @@ export class AddEventDialogComponent {
   }
 
   toggleMortgageCalculator(): void {
-    if (this.showMortgageCalculator && this.mortgageCalcRef) {
-      this.lastCalculatorState = this.mortgageCalcRef.getState();
-    }
     this.showMortgageCalculator = !this.showMortgageCalculator;
+  }
+
+  onCalculatorStateChanged(state: MortgageCalculatorState): void {
+    this.lastCalculatorState = state;
   }
 
   onMortgageApplied(output: MortgageOutput): void {

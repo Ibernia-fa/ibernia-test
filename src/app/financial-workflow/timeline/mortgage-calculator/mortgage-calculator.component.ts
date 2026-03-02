@@ -67,6 +67,7 @@ export class MortgageCalculatorComponent implements OnInit, OnChanges {
   @Input() currencySymbol: string = '';
   @Input() initialState: MortgageCalculatorState | null = null;
   @Output() calculated = new EventEmitter<MortgageOutput>();
+  @Output() stateChanged = new EventEmitter<MortgageCalculatorState>();
 
   mortgageForm: FormGroup;
   config: MortgageCountryConfig;
@@ -169,6 +170,7 @@ export class MortgageCalculatorComponent implements OnInit, OnChanges {
     this.downPaymentMode = mode;
     this.mortgageForm.patchValue({ downPaymentValue: converted }, { emitEvent: false });
     this.updateDownPaymentValidators();
+    this.stateChanged.emit(this.getState());
   }
 
   private buildLoanTermOptions(): void {
@@ -214,9 +216,16 @@ export class MortgageCalculatorComponent implements OnInit, OnChanges {
       }
     });
 
-    this.mortgageForm.get('propertyPrice')?.valueChanges.subscribe(() => {
+    this.mortgageForm.valueChanges.subscribe(() => {
+      this.stateChanged.emit(this.getState());
+    });
+  }
+
+  onPropertyPriceInput(): void {
+    setTimeout(() => {
       this.syncTierDefaults();
       this.updateDownPaymentValidators();
+      this.stateChanged.emit(this.getState());
     });
   }
 

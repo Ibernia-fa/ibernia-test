@@ -42,7 +42,8 @@
           <div class="calc-input-row">
             <span class="calc-currency">{{ currencySymbol }}</span>
             <input matInput type="text" inputmode="decimal" formControlName="propertyPrice"
-              thousandSeparatorInput placeholder="0" class="calc-input" />
+              thousandSeparatorInput placeholder="0" class="calc-input"
+              (input)="onPropertyPriceInput()" />
           </div>
           @if(mortgageForm.get('propertyPrice')?.touched && mortgageForm.get('propertyPrice')?.hasError('required')) {
           <span class="field-error d-block">{{ 'Required' | translate }}</span>
@@ -163,7 +164,7 @@
         </div>
       </div>
 
-      <button (click)="onApply()" class="calc-btn calc-btn-primary" type="button">
+      <button (click)="onApply()" class="calc-btn calc-btn-primary calc-btn-sentence-case" type="button">
         <span>{{ 'Apply' | translate }}</span>
       </button>
     </div>
