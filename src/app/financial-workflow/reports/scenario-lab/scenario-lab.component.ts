@@ -266,7 +266,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
 
     const events = this.financialTimeline.clientEvents ?? [];
     const mainRetirementEvent = events.find(
-      e => e.name.toLowerCase() === 'retirement age' && !e.isPartnerEvent
+      e => e.name.trim().toLowerCase().startsWith('retirement age') && !e.isPartnerEvent
     );
 
     this.hasRetirementAge = !!mainRetirementEvent;
@@ -277,7 +277,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
     }
 
     const partnerRetirementEvent = events.find(
-      e => e.name.toLowerCase().startsWith('retirement age') && !!e.isPartnerEvent
+      e => e.name.trim().toLowerCase().startsWith('retirement age') && !!e.isPartnerEvent
     );
 
     this.hasPartnerRetirementAge = !!partnerRetirementEvent && !!this.client.partnerDetail;
