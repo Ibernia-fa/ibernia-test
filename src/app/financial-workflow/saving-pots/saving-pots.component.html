@@ -199,14 +199,14 @@
                                                 <img src="assets/images/svgs/drop-down-edit-2-line.svg" alt="pen-icon" />
                                             </mat-icon>
                                         </button>
-                                        <ng-container *ngIf="saving.name != 'Cash'">
+                                        @if (canDeleteSaving(saving)) {
                                             <button mat-icon-button (click)="deleteEventClicked(saving); $event.stopPropagation()">
                                                 <mat-icon>
                                                     <img src="assets/images/svgs/drop-down-delete-2-line.svg"
                                                         alt="del-icon" />
                                                 </mat-icon>
                                             </button>
-                                        </ng-container>
+                                        }
 
                                     </div>
                                     <!-- <div class="edit-icon-overlay">

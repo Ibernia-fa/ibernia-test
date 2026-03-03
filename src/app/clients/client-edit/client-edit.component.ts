@@ -276,6 +276,15 @@ export class ClientEditComponent {
   }
 
   togglePartnerSection(visible: boolean) {
+    if (!visible && this.showPartner) {
+      const confirmed = window.confirm(
+        'Removing a partner will affect any Joint or Partner-owned saving pots. ' +
+        'You will need to manually delete those pots afterwards.\n\n' +
+        'Do you want to continue?'
+      );
+      if (!confirmed) return;
+    }
+
     this.showPartner = visible;
     const partnerGroup = this.clientForm.get('partner') as FormGroup;
 

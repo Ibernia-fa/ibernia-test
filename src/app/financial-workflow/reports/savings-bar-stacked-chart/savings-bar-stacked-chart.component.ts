@@ -319,28 +319,9 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
         };
       }
 
-      // For animated updates, postRenderSetup() (called by ApexCharts mounted/updated
-      // events) handles annotation rebuild and tooltip attachment reliably.
-      // Only use the setTimeout path for non-animated contexts (normal report pages).
-      if (!this.animateUpdates) {
-        setTimeout(() => {
-          if (this.events.length > 0) {
-            this.attachHtmlTooltips();
-          }
-          if (hideEmergencyOverlays) {
-            this.cleanupEmergencyElements();
-          } else {
-            this.attachEmergencyExpenseIcon();
-            if (this.emergencyExpenseDataPointIndex < 0) {
-              this.attachEmergencyIcon();
-            } else {
-              if (this.emergencyIconEl) { this.emergencyIconEl.remove(); this.emergencyIconEl = null; }
-              if (this.emergencyIconLineEl) { this.emergencyIconLineEl.remove(); this.emergencyIconLineEl = null; }
-              if (this.emergencyIconBandEl) { this.emergencyIconBandEl.remove(); this.emergencyIconBandEl = null; }
-            }
-          }
-        }, 600);
-      }
+      // Tooltip attachment and emergency overlays are now handled reliably by
+      // postRenderSetup() which is triggered by ApexCharts mounted/updated events,
+      // avoiding race conditions with arbitrary setTimeout delays.
     }
 
     // NOTE: animations.dynamicAnimation is configured in the constructor and stays stable.
@@ -469,6 +450,8 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    clearTimeout(this._postRenderTimer);
+    clearTimeout(this._tooltipRetryTimer);
     this.cleanupHtmlTooltips();
     this.cleanupEmergencyElements();
     this.cleanupEventLabels();
@@ -775,24 +758,26 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
    * updateSeries destroys and reattaches tooltip listeners.
    */
   private postRenderSetup(chartContext: any): void {
-    if (!this.animateUpdates) return;
-
     clearTimeout(this._postRenderTimer);
     this._postRenderTimer = setTimeout(() => {
       const chartHost = this.chartElRef?.nativeElement;
       if (!chartHost) return;
 
-      const markers = chartHost.querySelectorAll<SVGElement>('.apexcharts-point-annotation-marker');
+      // For animated updates (Scenario Lab), updateSeries destroys annotation markers.
+      // Re-add them via the chart API when missing.
+      if (this.animateUpdates) {
+        const markers = chartHost.querySelectorAll<SVGElement>('.apexcharts-point-annotation-marker');
 
-      if ((!markers || markers.length === 0) && this.events.length > 0) {
-        const points = this.buildEventAnnotations(this.events);
-        this.currentAnnotationPoints = points;
-        points.forEach(a => chartContext.addPointAnnotation(a, false));
+        if ((!markers || markers.length === 0) && this.events.length > 0) {
+          const points = this.buildEventAnnotations(this.events);
+          this.currentAnnotationPoints = points;
+          points.forEach(a => chartContext.addPointAnnotation(a, false));
 
-        if (!this._hideEmergencyOverlays) {
-          const emergencyXAxis = this.buildEmergencyAnnotation(this.report);
-          const emergencyExpenseXAxis = this.buildEmergencyExpenseAnnotation(this.report);
-          [...emergencyXAxis, ...emergencyExpenseXAxis].forEach(a => chartContext.addXaxisAnnotation(a, false));
+          if (!this._hideEmergencyOverlays) {
+            const emergencyXAxis = this.buildEmergencyAnnotation(this.report);
+            const emergencyExpenseXAxis = this.buildEmergencyExpenseAnnotation(this.report);
+            [...emergencyXAxis, ...emergencyExpenseXAxis].forEach(a => chartContext.addXaxisAnnotation(a, false));
+          }
         }
       }
 
@@ -816,14 +801,28 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
     }, 50);
   }
 
-  private attachHtmlTooltips() {
+  private _tooltipRetryTimer: any = null;
+
+  private attachHtmlTooltips(retryCount = 0) {
+    clearTimeout(this._tooltipRetryTimer);
     this.cleanupHtmlTooltips();
 
     const chartHost = this.chartElRef?.nativeElement;
     if (!chartHost) return;
-    const tooltipHost = this.getTooltipHost();
 
     const markers = chartHost.querySelectorAll<SVGElement>('.apexcharts-point-annotation-marker');
+
+    // SVG annotation markers may not exist yet if the chart is still rendering.
+    // Retry with progressive back-off to avoid the intermittent hover failure.
+    if (markers.length === 0 && this.events.length > 0 && retryCount < 6) {
+      this._tooltipRetryTimer = setTimeout(
+        () => this.attachHtmlTooltips(retryCount + 1),
+        150 * (retryCount + 1)
+      );
+      return;
+    }
+
+    const tooltipHost = this.getTooltipHost();
 
     markers.forEach((marker, i) => {
       const annotation = this.currentAnnotationPoints[i];
@@ -860,15 +859,19 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
   }
 
   private getTooltipHost(): HTMLElement {
-    // Look for dialog container first (highest priority)
+    // Fullscreen overlay hides all other body children (including .cdk-overlay-container)
+    // via CSS, so it must be checked first to keep tooltips visible.
+    const fullscreenOverlay = document.querySelector<HTMLElement>('.global-fullscreen-overlay');
+    if (fullscreenOverlay) return fullscreenOverlay;
+
     const dialogContainer = document.querySelector<HTMLElement>('.cdk-overlay-container');
     if (dialogContainer) return dialogContainer;
 
-    const fullscreenOverlay = document.querySelector<HTMLElement>('.global-fullscreen-overlay');
-    return fullscreenOverlay ?? document.body;
+    return document.body;
   }
 
   private cleanupHtmlTooltips(): void {
+    clearTimeout(this._tooltipRetryTimer);
     this.chartElRef?.nativeElement?.classList.remove('event-tooltip-active');
 
     this.markerListeners.forEach(({ marker, onMouseEnter, onMouseLeave }) => {
