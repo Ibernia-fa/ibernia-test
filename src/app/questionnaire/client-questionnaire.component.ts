@@ -37,6 +37,10 @@ import { allCountries } from '../clients/models/country';
   ],
   templateUrl: './client-questionnaire.component.html',
   styleUrl: './client-questionnaire.component.scss',
+  host: {
+    class: 'questionnaire-route-host',
+    style: 'display: block; min-height: 100vh; min-height: 100dvh;',
+  },
 })
 export class ClientQuestionnaireComponent implements OnInit {
   token = '';

@@ -17,7 +17,8 @@ export class BlankComponent {
   options = this.settings.getOptions();
 
   constructor(private settings: CoreService) {
-    this.htmlElement = document.querySelector('html')!;
+    const el = document.querySelector('html');
+    this.htmlElement = el ?? (document.documentElement as HTMLHtmlElement);
     // Initialize project theme with options
     this.receiveOptions(this.options);
   }
@@ -28,6 +29,7 @@ export class BlankComponent {
   }
 
   toggleDarkTheme(options: AppSettings) {
+    if (!this.htmlElement) return;
     if (options.theme === 'dark') {
       this.htmlElement.classList.add('dark-theme');
       this.htmlElement.classList.remove('light-theme');
@@ -38,6 +40,7 @@ export class BlankComponent {
   }
 
   toggleColorsTheme(options: AppSettings) {
+    if (!this.htmlElement) return;
     // Remove any existing theme class dynamically
     this.htmlElement.classList.forEach((className) => {
       if (className.endsWith('_theme')) {

@@ -6,6 +6,10 @@ import { ClientQuestionnaireComponent } from './questionnaire/client-questionnai
 
 export const routes: Routes = [
   {
+    path: 'questionnaire/:token',
+    component: ClientQuestionnaireComponent,
+  },
+  {
     path: '',
     component: FullComponent,
     children: [
@@ -50,10 +54,6 @@ export const routes: Routes = [
           import('./client-reports/client-report.component').then(
             (m) => m.ClientReportComponent
           ),
-      },
-      {
-        path: 'questionnaire/:token',
-        component: ClientQuestionnaireComponent,
       },
     ],
   },
