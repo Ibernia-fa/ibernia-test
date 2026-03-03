@@ -120,7 +120,8 @@ export class AddIncomeComponent {
       this.years.push(element);
     }
 
-    this.retirementAge = this.data.language === 'en' ? 64 : 67;
+    const country = (this.data.clientCountryCode ?? '').toUpperCase();
+    this.retirementAge = (country === 'IT' || country === 'ITALY') ? 67 : 64;
     this.retirementEventYear = this.getRetirementEventYear();
     this.retirementYear = this.retirementEventYear ?? (this.clientBirthYear + this.retirementAge);
     this.forecastEndYear = planEndYear;
