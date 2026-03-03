@@ -168,6 +168,22 @@ export class ClientListComponent implements OnInit, AfterViewInit {
     Object.create(null);
   user: any;
 
+  /** Advisor name from API profile (set when getUserProfileResponse returns). Used so title stays correct when OIDC is slow or missing given_name. */
+  advisorNameFromApi: string | null = null;
+
+  /** Display name for the advisor in the page title. Uses API profile first, then OIDC claims; reads auth on each access so it updates when user loads late (same browser, intermittent missing name). */
+  get advisorDisplayName(): string {
+    const fromApi = (this.advisorNameFromApi ?? '').trim();
+    if (fromApi) return fromApi;
+    const u = this.Authservice.getUserProfile();
+    if (!u) return 'My';
+    const name =
+      (u.given_name && String(u.given_name).trim()) ||
+      (u.name && String(u.name).trim()) ||
+      (u.preferred_username && String(u.preferred_username).trim());
+    return name || 'My';
+  }
+
   constructor(
     public dialog: MatDialog,
     public datePipe: DatePipe,
@@ -203,7 +219,9 @@ private checkPrefsAndPrompt() {
           }
         });
       }
-      // if res.status === 200, do nothing
+      if (res.ok && res.body?.firstName != null) {
+        this.advisorNameFromApi = (res.body.firstName ?? '').trim() || null;
+      }
     },
     error: (err) => {
       console.error('Error fetching user profile', err);
