@@ -139,7 +139,9 @@ export class AddEventDialogComponent {
     this.clientBirthDate = data.clientBirthDate;
     this.clientBirthYear = moment(this.clientBirthDate).year();
     const birthDate = new Date(this.clientBirthDate);
-    const forecastStart = new Date(data.forecastStartDateYear, 0, 1);
+    const forecastStart = data.forecastStartDate
+      ? new Date(data.forecastStartDate)
+      : new Date(data.forecastStartDateYear, 0, 1);
     let age = forecastStart.getFullYear() - birthDate.getFullYear();
     const monthDiff = forecastStart.getMonth() - birthDate.getMonth();
     const dayDiff = forecastStart.getDate() - birthDate.getDate();
@@ -148,7 +150,7 @@ export class AddEventDialogComponent {
       age--;
     }
 
-    this.clientAge = age
+    this.clientAge = age;
     if (data.forecastStartDateYear - this.clientBirthYear > this.clientAge) this.clientBirthYear = this.clientBirthYear + 1
 
     this.eventsList = data.eventsList;
