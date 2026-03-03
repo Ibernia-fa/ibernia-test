@@ -372,22 +372,64 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
     const baseline = this.baselineReport;
     const scenario = this.report;
 
+    // Unify categories so both reports share the same x-axis.
+    // This prevents ng-apexcharts from destroying/recreating the chart
+    // (it can use updateSeries for smooth bar morphing instead).
+    const allCategoriesSet = new Set<string>([
+      ...baseline.categories.map(String),
+      ...scenario.categories.map(String),
+    ]);
+    const unifiedCategories = Array.from(allCategoriesSet)
+      .sort((a, b) => Number(a) - Number(b));
+
+    const padSeries = (report: ChartSeries, oldCategories: string[]) => {
+      const oldCatSet = new Set(oldCategories.map(String));
+      const insertionMap: number[] = unifiedCategories.map(c =>
+        oldCategories.indexOf(c)
+      );
+      report.series.forEach((s: any) => {
+        const newData = insertionMap.map(idx => idx >= 0 ? s.data[idx] : 0);
+        s.data = newData;
+      });
+      report.categories = [...unifiedCategories];
+    };
+
+    const baselineOldCats = baseline.categories.map(String);
+    const scenarioOldCats = scenario.categories.map(String);
+    if (baselineOldCats.join(',') !== unifiedCategories.join(',')) {
+      padSeries(baseline, baselineOldCats);
+    }
+    if (scenarioOldCats.join(',') !== unifiedCategories.join(',')) {
+      padSeries(scenario, scenarioOldCats);
+    }
+
+    // Use the max end date from the unified categories to prevent
+    // forecastEndDate input changes from triggering an xaxis rebuild.
+    const maxYear = Number(unifiedCategories[unifiedCategories.length - 1]);
+    if (Number.isFinite(maxYear)) {
+      const alignedEndDate = new Date(maxYear, 11, 31);
+      this.scenarioForecastEndDate = alignedEndDate;
+      if (!this.baselineForecastEndDate ||
+          this.baselineForecastEndDate.getFullYear() < maxYear) {
+        this.baselineForecastEndDate = alignedEndDate;
+      }
+    }
+
+    // Unify series names so both reports have the same stacked structure.
     const allNames: string[] = [];
     [...scenario.series, ...baseline.series].forEach((s: any) => {
       if (!allNames.includes(s.name)) allNames.push(s.name);
     });
 
-    const baselineCategoryCount = baseline.categories.length;
-    const scenarioCategoryCount = scenario.categories.length;
-
+    const categoryCount = unifiedCategories.length;
     allNames.forEach(name => {
       if (!baseline.series.find((s: any) => s.name === name)) {
         const ref = scenario.series.find((s: any) => s.name === name);
-        if (ref) baseline.series.push({ ...ref, data: new Array(baselineCategoryCount).fill(0) });
+        if (ref) baseline.series.push({ ...ref, data: new Array(categoryCount).fill(0) });
       }
       if (!scenario.series.find((s: any) => s.name === name)) {
         const ref = baseline.series.find((s: any) => s.name === name);
-        if (ref) scenario.series.push({ ...ref, data: new Array(scenarioCategoryCount).fill(0) });
+        if (ref) scenario.series.push({ ...ref, data: new Array(categoryCount).fill(0) });
       }
     });
   }

@@ -363,13 +363,15 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
     // }
 
     // Rebuild xaxis only when: first init, OR categories actually changed, OR NOT in animateUpdates mode.
-    // Skipping this when animateUpdates + same categories avoids triggering updateOptions (full re-render).
+    // When animateUpdates=true, forecastDate changes alone don't trigger xaxis rebuild because
+    // the Scenario Lab aligns categories between baseline/scenario, making categories the
+    // authoritative source. This keeps ng-apexcharts on the updateSeries path (smooth animation).
     const currentCategoriesKey = (report.categories ?? []).join(',');
     const categoriesChanged = currentCategoriesKey !== this.previousCategoriesKey;
     this.previousCategoriesKey = currentCategoriesKey;
     this.chartInitialized = true;
 
-    if (!this.animateUpdates || categoriesChanged || changes['forecastStartDate'] || changes['forecastEndDate']) {
+    if (!this.animateUpdates || categoriesChanged) {
     const categories = report.categories ?? [];
 
     let firstYear = categories.length ? Number(categories[0]) : undefined;

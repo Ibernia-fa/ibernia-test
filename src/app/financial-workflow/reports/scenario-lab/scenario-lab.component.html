@@ -25,17 +25,15 @@
     <mat-card class="cardWithShadow">
       <mat-card-content style="padding-bottom: 10px !important;">
 
-        <!-- Before / After tabs (only visible after first simulation) -->
-        @if (hasSimulated) {
-          <div class="graph-tabs d-flex gap-12">
-            <button class="tab-btn" [class.active]="activeTab === 'before'" (click)="switchTab('before')">
-              {{ 'Before' | translate }}
-            </button>
-            <button class="tab-btn" [class.active]="activeTab === 'after'" (click)="switchTab('after')">
-              {{ 'After' | translate }}
-            </button>
-          </div>
-        }
+        <!-- Before / After tabs (space reserved; visible after first simulation) -->
+        <div class="graph-tabs d-flex gap-12" [class.tabs-hidden]="!hasSimulated">
+          <button class="tab-btn" [class.active]="activeTab === 'before'" (click)="switchTab('before')">
+            {{ 'Before' | translate }}
+          </button>
+          <button class="tab-btn" [class.active]="activeTab === 'after'" (click)="switchTab('after')">
+            {{ 'After' | translate }}
+          </button>
+        </div>
 
         <div class="chart-component-wrapper" *ngIf="displayedReport && client && financialTimeline">
           <app-savings-bar-stacked-chart
@@ -143,7 +141,7 @@
                     <span class="assumption-label">{{ 'Inflation rate' | translate }}</span>
                   </div>
                   <div class="slider-row">
-                    <mat-slider class="slider-flex" [min]="0" [max]="10" [step]="0.1">
+                    <mat-slider class="slider-flex" [min]="0" [max]="10" [step]="0.5">
                       <input matSliderThumb formControlName="inflationRate" />
                     </mat-slider>
                     <div class="value-input-box">
@@ -152,7 +150,7 @@
                         class="value-input"
                         [value]="scenarioForm.get('inflationRate')?.value"
                         (change)="onNumericInputChange('inflationRate', $event)"
-                        min="0" max="10" step="0.1" />
+                        min="0" max="10" step="0.5" />
                       <span class="pct-badge">%</span>
                     </div>
                   </div>

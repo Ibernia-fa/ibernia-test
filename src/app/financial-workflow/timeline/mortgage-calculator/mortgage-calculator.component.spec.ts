@@ -108,8 +108,14 @@ describe('MortgageCalculatorComponent', () => {
         expect(component.mortgageForm.get('downPaymentValue')?.hasError('max')).toBeTrue();
       });
 
-      it('should reject values below effective minimum', () => {
+      it('should accept any non-negative percent value', () => {
         component.mortgageForm.patchValue({ downPaymentValue: 5 });
+        component.mortgageForm.get('downPaymentValue')?.updateValueAndValidity();
+        expect(component.mortgageForm.get('downPaymentValue')?.valid).toBeTrue();
+      });
+
+      it('should reject negative percent values', () => {
+        component.mortgageForm.patchValue({ downPaymentValue: -1 });
         component.mortgageForm.get('downPaymentValue')?.updateValueAndValidity();
         expect(component.mortgageForm.get('downPaymentValue')?.hasError('min')).toBeTrue();
       });

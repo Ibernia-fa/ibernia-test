@@ -234,8 +234,7 @@ export class MortgageCalculatorComponent implements OnInit, OnChanges {
     if (!ctrl) return;
 
     if (this.downPaymentMode === 'percent') {
-      const minPct = this.effectiveMinDownPayment;
-      ctrl.setValidators([Validators.required, Validators.min(minPct), Validators.max(100)]);
+      ctrl.setValidators([Validators.required, Validators.min(0), Validators.max(100)]);
     } else {
       const propertyPrice = this.mortgageForm.get('propertyPrice')?.value ?? 0;
       const maxVal = propertyPrice > 0 ? propertyPrice : Number.MAX_SAFE_INTEGER;
@@ -256,20 +255,11 @@ export class MortgageCalculatorComponent implements OnInit, OnChanges {
       return;
     }
 
-    const minDown = this.effectiveMinDownPayment;
-
-    if (this.downPaymentMode === 'percent') {
-      const currentDown = this.mortgageForm.get('downPaymentValue')?.value;
-      if (currentDown < minDown) {
-        this.mortgageForm.patchValue({ downPaymentValue: minDown }, { emitEvent: false });
-      }
-    }
-
     this.mortgageForm.patchValue({ interestRate: tier.defaultInterestRate }, { emitEvent: false });
 
     if (this.isHighValueProperty && tier.highValueMinDownPaymentPercent != null) {
       const threshold = this.config.propertyValueThreshold!;
-      this.highValueWarning = `Property exceeds ${threshold.toLocaleString('en-US')} — higher down payment required (min ${minDown}%).`;
+      this.highValueWarning = `Property exceeds ${threshold.toLocaleString('en-US')}.`;
     } else {
       this.highValueWarning = null;
     }

@@ -55,12 +55,7 @@
       </div>
       <div class="col-6">
         <div class="d-flex flex-column gap-6">
-          <mat-label class="calc-label">
-            {{ 'Down payment' | translate }}
-            @if(downPaymentMode === 'percent') {
-            <span class="calc-hint">(min {{ effectiveMinDownPayment }}%)</span>
-            }
-          </mat-label>
+          <mat-label class="calc-label">{{ 'Down payment' | translate }}</mat-label>
           <div class="calc-input-row">
             @if(downPaymentMode === 'currency') {
             <span class="calc-currency">{{ currencySymbol }}</span>
@@ -81,13 +76,7 @@
             </div>
           </div>
           @if(mortgageForm.get('downPaymentValue')?.touched && mortgageForm.get('downPaymentValue')?.hasError('min')) {
-          <span class="field-error d-block">
-            @if(downPaymentMode === 'percent') {
-            Min {{ effectiveMinDownPayment }}%
-            } @else {
-            {{ 'Min 0' | translate }}
-            }
-          </span>
+          <span class="field-error d-block">{{ 'Value must be 0 or greater' | translate }}</span>
           }
           @if(mortgageForm.get('downPaymentValue')?.touched && mortgageForm.get('downPaymentValue')?.hasError('max')) {
           <span class="field-error d-block">
