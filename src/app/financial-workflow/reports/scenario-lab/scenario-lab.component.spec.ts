@@ -911,10 +911,17 @@ describe('ScenarioLabComponent', () => {
       mockReportsHttpService.getReportScenario.and.returnValue(of(scenarioWithExtra));
       component.onSimulate();
 
-      // baseline should now have a Shortfall series filled with zeros
+      // Categories are unified to the superset ['2026','2027','2028']
+      expect(component.baselineReport!.categories).toEqual(['2026', '2027', '2028']);
+
+      // baseline Savings series is padded with 0 for the extra year
+      const baselineSavings = component.baselineReport!.series.find(s => s.name === 'Savings');
+      expect(baselineSavings!.data).toEqual([1, 2, 0]);
+
+      // baseline should now have a Shortfall series filled with zeros (3 categories)
       const baselineShortfall = component.baselineReport!.series.find(s => s.name === 'Shortfall');
       expect(baselineShortfall).toBeTruthy();
-      expect(baselineShortfall!.data).toEqual([0, 0]);
+      expect(baselineShortfall!.data).toEqual([0, 0, 0]);
     });
   });
 
