@@ -33,6 +33,8 @@ export class ViewSavingsBarStackedChartComponent implements OnChanges, OnDestroy
     onMouseEnter: () => void;
     onMouseLeave: () => void;
   }> = [];
+  private _postRenderTimer: any = null;
+  private _tooltipRetryTimer: any = null;
 
   constructor() {
     this.chartOptions = {
@@ -56,6 +58,10 @@ export class ViewSavingsBarStackedChartComponent implements OnChanges, OnDestroy
           active: {
             filter: { type: 'none' }
           }
+        },
+        events: {
+          mounted: () => this.postRenderSetup(),
+          updated: () => this.postRenderSetup(),
         }
       },
       dataLabels: {
@@ -155,11 +161,11 @@ export class ViewSavingsBarStackedChartComponent implements OnChanges, OnDestroy
       this.chartOptions.annotations = { points: this.buildEventAnnotations(this.events) };
       this.chartOptions.series = this.report.series.map((s) => ({ ...s, tack: 'stack1' }));
 
-      if (this.events.length > 0) {
-        setTimeout(() => this.attachHtmlTooltips(), 500);
-      } else {
+      if (this.events.length === 0) {
         this.cleanupHtmlTooltips();
       }
+      // Tooltip attachment is handled by postRenderSetup() via ApexCharts
+      // mounted/updated events, avoiding race conditions with the DOM.
     } else if (changes['report']) {
       this.chartOptions.annotations = { points: [] };
       this.cleanupHtmlTooltips();
@@ -204,7 +210,19 @@ export class ViewSavingsBarStackedChartComponent implements OnChanges, OnDestroy
   }
 
   ngOnDestroy(): void {
+    clearTimeout(this._postRenderTimer);
+    clearTimeout(this._tooltipRetryTimer);
     this.cleanupHtmlTooltips();
+  }
+
+  private postRenderSetup(): void {
+    clearTimeout(this._postRenderTimer);
+    this._postRenderTimer = setTimeout(() => {
+      this.cleanupHtmlTooltips();
+      if (this.events.length > 0) {
+        this.attachHtmlTooltips();
+      }
+    }, 50);
   }
 
   private buildEventAnnotations(events: TimelineEvent[]) {
@@ -244,14 +262,24 @@ export class ViewSavingsBarStackedChartComponent implements OnChanges, OnDestroy
     return annotations;
   }
 
-  private attachHtmlTooltips() {
+  private attachHtmlTooltips(retryCount = 0) {
+    clearTimeout(this._tooltipRetryTimer);
     this.cleanupHtmlTooltips();
 
     const chartHost = this.chartElRef?.nativeElement;
     if (!chartHost) return;
-    const tooltipHost = this.getTooltipHost();
 
     const markers = chartHost.querySelectorAll<SVGElement>('.apexcharts-point-annotation-marker');
+
+    if (markers.length === 0 && this.events.length > 0 && retryCount < 6) {
+      this._tooltipRetryTimer = setTimeout(
+        () => this.attachHtmlTooltips(retryCount + 1),
+        150 * (retryCount + 1)
+      );
+      return;
+    }
+
+    const tooltipHost = this.getTooltipHost();
 
     markers.forEach((marker, i) => {
       const annotation = this.chartOptions.annotations.points[i];
@@ -288,6 +316,7 @@ export class ViewSavingsBarStackedChartComponent implements OnChanges, OnDestroy
   }
 
   private cleanupHtmlTooltips(): void {
+    clearTimeout(this._tooltipRetryTimer);
     this.chartElRef?.nativeElement?.classList.remove('event-tooltip-active');
 
     this.markerListeners.forEach(({ marker, onMouseEnter, onMouseLeave }) => {

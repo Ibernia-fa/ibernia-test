@@ -276,7 +276,17 @@ export class AddNewPotComponent {
   }
 
 
-  // Custom validator to ensure value is 0 or greater
+  private noCashNameValidator(): ValidatorFn {
+    return (control: AbstractControl) => {
+      const val = (control.value ?? '').toString().trim().toLowerCase();
+      if (val !== 'cash') return null;
+      if (!this.hasPartner || !this.canAddCashPot) {
+        return { cashNameNotAllowed: true };
+      }
+      return null;
+    };
+  }
+
   minPositiveValue(): ValidatorFn {
     return (control: AbstractControl) => {
       const value = control.value;
@@ -494,8 +504,13 @@ onAmountBlur(e: Event) {
     ).length;
   }
 
-  /** Allowed to add a Cash pot: no partner => at most 1; has partner => up to 3. */
   get canAddCashPot(): boolean {
+    if (!this.hasPartner) {
+      const hasCash = (this.existingSavingPots || []).some(
+        (pot: any) => (pot?.name ?? '').toString().trim().toLowerCase() === 'cash'
+      );
+      return !hasCash;
+    }
     return this.availableCashOwnerships.length > 0;
   }
 
@@ -510,7 +525,7 @@ onAmountBlur(e: Event) {
   get availableCashOwnerships(): SavingPotOwnership[] {
     const baseOptions = this.hasPartner
       ? this.allOwnershipOptions
-      : [SavingPotOwnership.Person1];
+      : [SavingPotOwnership.Joint];
 
     const used = this.getUsedCashOwnerships();
     return baseOptions.filter((ownership) => !used.has(ownership));
@@ -566,9 +581,9 @@ onAmountBlur(e: Event) {
     this.isRenamingEntry = false;  // Reset rename mode
     
     if (name === 'Custom') {
-      this.savingsForm.addControl(
+      this.savingsForm.setControl(
         'customName',
-        new FormControl('', [Validators.required])
+        new FormControl('', [Validators.required, this.noCashNameValidator()])
       );
       this.savingsForm.updateValueAndValidity();
       this.selectedNameIconUrl = 'custom-option-icon'

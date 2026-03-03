@@ -45,12 +45,14 @@
               >
                 <!-- Your normal options -->
                 @for (event of savingPotValues; track event) {
-                  <mat-option [value]="event.name" [disabled]="event.name === 'Cash' && !canAddCashPot">
-                    <div class="d-flex align-items-center gap-8">
-                      <img [src]="'/assets/images/svgs/' + event.iconUrl + '.svg'" [alt]="event.iconUrl" />
-                      <span>{{ event.name }}</span>
-                    </div>
-                  </mat-option>
+                  @if (event.name !== 'Cash' || hasPartner) {
+                    <mat-option [value]="event.name" [disabled]="event.name === 'Cash' && !canAddCashPot">
+                      <div class="d-flex align-items-center gap-8">
+                        <img [src]="'/assets/images/svgs/' + event.iconUrl + '.svg'" [alt]="event.iconUrl" />
+                        <span>{{ event.name }}</span>
+                      </div>
+                    </mat-option>
+                  }
                 }
 
                 <mat-option [value]="'Custom'">
@@ -89,6 +91,9 @@
               savingsForm.get('customName')?.hasError('required')
             ) {
               <span class="field-error d-block">{{ 'Required' | translate }}</span>
+            }
+            @if (savingsForm.get('customName')?.hasError('cashNameNotAllowed')) {
+              <span class="field-error d-block">A Cash pot already exists</span>
             }
           </div>
         }
