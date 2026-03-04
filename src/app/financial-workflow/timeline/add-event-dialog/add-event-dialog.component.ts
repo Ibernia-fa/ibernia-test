@@ -61,7 +61,6 @@ export class AddEventDialogComponent {
     'Travel',
     'Education',
     'New business',
-    'Inheritance',
     'Home',
     'Car',
     'Boat'

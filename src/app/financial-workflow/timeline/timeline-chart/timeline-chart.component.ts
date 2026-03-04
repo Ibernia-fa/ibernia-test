@@ -68,11 +68,9 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
     'Education',
     'New business',
     'Boat',
-    'Inheritance',
   ];
 
   private readonly DIALOG_SYSTEM_EVENTS = [
-    'Inheritance',
     'Wedding',
     'Travel',
     'Education',
@@ -242,6 +240,7 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
             .filter(event => {
               if (event.name === 'State pension') return false;
               if (event.name === 'Retirement age' && this.shouldHideRetirementChip()) return false;
+              if (event.name === 'Inheritance') return false;
               return true;
             })
             .sort((a, b) => {

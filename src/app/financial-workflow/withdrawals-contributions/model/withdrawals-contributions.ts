@@ -25,4 +25,5 @@ export interface FundsViewModel {
       comission: Comission | any;
     startEventId?: string | null;
     endEventId?: string | null;
+    sourceIncomeId?: string | null;
 }
