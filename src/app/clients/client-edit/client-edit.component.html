@@ -126,7 +126,7 @@
 
         <section class="example-section m-b-20">
           <mat-checkbox class="example-margin" id="partner-section" [checked]="showPartner"
-            (change)="togglePartnerSection(!showPartner)">{{ 'Add a partner or spouse' | translate }}</mat-checkbox>
+            (click)="onPartnerCheckboxClick()">{{ 'Add a partner or spouse' | translate }}</mat-checkbox>
         </section>
 
       </div>
@@ -234,7 +234,7 @@
       </div>
       <div class="row ">
         <div class="col-sm-12 d-flex justify-content-end">
-          <button class="button-icon" type="submit" [disabled]="isFormInvalid">
+          <button class="button-icon" type="submit" [disabled]="isSaveDisabled">
             <span>{{ 'Save' | translate }}</span>
           </button>
         </div>
