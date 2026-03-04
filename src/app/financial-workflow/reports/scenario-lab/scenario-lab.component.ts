@@ -118,7 +118,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
   loggedInUserPreferences: any = null;
   userReturnRate: any = null;
 
-  private readonly DIALOG_SYSTEM_EVENTS = ['Inheritance', 'Wedding', 'Travel', 'Education', 'New business'];
+  private readonly DIALOG_SYSTEM_EVENTS = ['Wedding', 'Travel', 'Education', 'New business'];
   private readonly DIALOG_FINANCING_EVENTS = ['Home', 'Car', 'Boat'];
 
   private destroy$ = new Subject<void>();

@@ -28,6 +28,10 @@ export interface FinancialViewModel {
     bonus?: Bonus | null;
     startEventId?: string | null;
     endEventId?: string | null;
+    investThisAmount?: boolean;
+    inheritanceTargetPotId?: string | null;
+    inheritancePercentToInvest?: number;
+    linkedContributionId?: string | null;
 }
 
 export interface Bonus {

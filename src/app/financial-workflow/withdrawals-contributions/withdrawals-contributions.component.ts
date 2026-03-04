@@ -219,6 +219,10 @@ export class WithdrawalsContributionsComponent {
   }
 
   updateContributionClicked(item: FundsViewModel) {
+    if (item.sourceIncomeId) {
+      this.toastr.info('Edit from Incomes section', 'View only');
+      return;
+    }
     const dialogRef = this.dialog.open(AddContributionComponent, {
       width: '700px',
       disableClose: true,
@@ -296,6 +300,10 @@ export class WithdrawalsContributionsComponent {
   // }
 
   deleteContribution(element: FundsViewModel) {
+    if (element.sourceIncomeId) {
+      this.toastr.info('Edit from Incomes section to remove', 'View only');
+      return;
+    }
     this.withdrawalsContributionsHttpService
       .deleteContributions(this.selectedCashflow.id, element)
       .subscribe((res) => {

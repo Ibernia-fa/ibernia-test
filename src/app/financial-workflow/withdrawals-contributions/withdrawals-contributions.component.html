@@ -122,6 +122,9 @@
                   <th mat-header-cell *matHeaderCellDef
                     class="f-w-600 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-action"></th>
                   <td mat-cell class="column-action" *matCellDef="let element">
+                    @if(element.sourceIncomeId) {
+                    <span class="paragraph-text" matTooltip="{{ 'Edit from Incomes' | translate }}">{{ 'Edit from Incomes' | translate }}</span>
+                    } @else {
                     <div class="d-flex align-items-center justify-content-center">
                       <button (click)="$event.stopPropagation(); $event.preventDefault()" mat-icon-button
                         [matMenuTriggerFor]="menu">
@@ -146,11 +149,12 @@
                         <span>{{ 'Delete' | translate }}</span>
                       </button>
                     </mat-menu>
+                    }
                   </td>
                 </ng-container>
 
                 <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="updateContributionClicked(row)" class="cursor-pointer"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="!row.sourceIncomeId && updateContributionClicked(row)" [class.cursor-pointer]="!row.sourceIncomeId"></tr>
               </table>
 
 

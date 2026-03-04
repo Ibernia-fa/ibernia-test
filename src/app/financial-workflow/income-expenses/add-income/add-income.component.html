@@ -218,6 +218,49 @@
           </div>
         </div>
 
+        @if(isInheritance) {
+        <div class="d-flex flex-column gap-8">
+          <mat-checkbox formControlName="investThisAmount">
+            {{ 'Invest this amount' | translate }}
+          </mat-checkbox>
+        </div>
+        @if(isInvestThisAmountChecked) {
+        <div class="d-flex flex-column gap-12">
+          <div class="d-flex gap-8 align-items-center">
+            <mat-label class="f-s-16 f-w-400 d-block">{{ 'Contribute to saving pot' | translate }}</mat-label>
+            <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
+          </div>
+          <div class="w-100 form-field">
+            <div class="select-option">
+              <mat-select formControlName="inheritanceTargetPotId" hideSingleSelectionIndicator>
+                @for (saving of clientSavings; track saving) {
+                  <mat-option [value]="saving.id">{{ saving.name }}</mat-option>
+                }
+              </mat-select>
+            </div>
+            @if(incomeForm.get('inheritanceTargetPotId')?.touched && incomeForm.get('inheritanceTargetPotId')?.hasError('required')) {
+              <span class="field-error d-block">{{'Required' | translate}}</span>
+            }
+          </div>
+        </div>
+        <div class="d-flex flex-column gap-8">
+          <mat-label class="f-s-16 d-block">{{ 'Percent to invest' | translate }}</mat-label>
+          <div class="d-flex align-items-center gap-8">
+            <mat-slider class="w-100" [min]="1" [max]="100" [step]="1">
+              <input matSliderThumb formControlName="inheritancePercentToInvest" />
+            </mat-slider>
+            <span class="f-s-16">{{ incomeForm.get('inheritancePercentToInvest')?.value ?? 100 }}%</span>
+          </div>
+          @if(incomeForm.get('inheritancePercentToInvest')?.touched && incomeForm.get('inheritancePercentToInvest')?.hasError('min')) {
+            <span class="field-error d-block">{{ 'Must be at least 1%' | translate }}</span>
+          }
+          @if(incomeForm.get('inheritancePercentToInvest')?.touched && incomeForm.get('inheritancePercentToInvest')?.hasError('max')) {
+            <span class="field-error d-block">{{ 'Must be at most 100%' | translate }}</span>
+          }
+        </div>
+        }
+        }
+
         @if(showStartEnd) {
         <div class="w-100 d-flex flex-column gap-20">
           <div class="escalation-inline">

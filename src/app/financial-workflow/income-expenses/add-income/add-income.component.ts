@@ -18,7 +18,10 @@ import moment from 'moment';
 import { FinancialViewModel } from '../model/income-expense';
 import { extractEventId, resolveYear } from 'src/app/shared/utils/event-date-utils';
 import { IncomeExpensesHttpService } from '../services/income-expenses-http.service';
-import { catchError, filter, finalize } from 'rxjs';
+import { WithdrawalsContributionsHttpService } from '../../withdrawals-contributions/services/withdrawals-contributions-http.service';
+import { FundsViewModel } from '../../withdrawals-contributions/model/withdrawals-contributions';
+import { ComissionType } from '../../saving-pots/models/saving-pots.model';
+import { catchError, filter, finalize, switchMap, of, map } from 'rxjs';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 import { TranslateModule } from '@ngx-translate/core';
 import { CommonModule } from '@angular/common';
@@ -77,16 +80,21 @@ export class AddIncomeComponent {
   retirementYear: number;
   forecastEndYear: number;
   isSaving = false;
+  clientSavings: { id: string; name: string }[] = [];
+  existingContributions: any[] = [];
   private initialFormSnapshot = '';
 
   constructor(
     private dialogRef: MatDialogRef<AddIncomeComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private fb: FormBuilder,
-    private incomeExpenseHttpService: IncomeExpensesHttpService
+    private incomeExpenseHttpService: IncomeExpensesHttpService,
+    private withdrawalsContributionsHttpService: WithdrawalsContributionsHttpService
   ) {
     this.incomeTypes = data.incomeType;
     this.eventsList = data.eventsList ?? [];
+    this.clientSavings = (data.clientSavings ?? []).filter((s: { name?: string }) => (s.name ?? '').toLowerCase() !== 'cash');
+    this.existingContributions = data.existingContributions ?? [];
     this.cycles = data.amountCycles;
     this.escalationRates = data.escalataionRates;
     this.clientBirthYear = moment(data.clientBirthDate).year();
@@ -110,7 +118,8 @@ export class AddIncomeComponent {
 
     this.isNameEditable = this.selectedIncome?.description != "Salary"
       && this.selectedIncome?.description != "State pension"
-      && this.selectedIncome?.description != "Rental income";
+      && this.selectedIncome?.description != "Rental income"
+      && this.selectedIncome?.description != "Inheritance";
 
     const planEndYear = this.resolvePlanEndYear(data);
     const iterations = planEndYear - data.forecastStartDateYear + 1;
@@ -139,7 +148,10 @@ export class AddIncomeComponent {
       addBonus: [this.selectedIncome?.bonus?.enabled ?? false],
       bonusAmount: [{ value: this.selectedIncome?.bonus?.amount?.amount ?? 0, disabled: true }],
       bonusCycle: [this.selectedIncome?.bonus?.amount?.cycle?.id ?? this.getYearlyCycleId()],
-      bonusDate: [this.selectedIncome?.bonus?.bonusDate?.year ?? null]
+      bonusDate: [this.selectedIncome?.bonus?.bonusDate?.year ?? null],
+      investThisAmount: [this.selectedIncome?.investThisAmount ?? false],
+      inheritanceTargetPotId: [this.selectedIncome?.inheritanceTargetPotId ?? null],
+      inheritancePercentToInvest: [this.selectedIncome?.inheritancePercentToInvest ?? 100]
     });
     this.incomeForm.get('currencySymbol')?.disable();
     this.incomeForm.setValidators(this.endOnOrAfterStartValidator());
@@ -238,6 +250,28 @@ export class AddIncomeComponent {
           this.incomeForm.get('bonusAmount')?.enable();
         }
       }
+
+      if (this.selectedIncome?.description === 'Inheritance') {
+        const linkedContribution = this.existingContributions.find(
+          (c: any) => c.sourceIncomeId === this.selectedIncome?.id
+        );
+        if (linkedContribution) {
+          const incomeAmount = this.selectedIncome.amount?.amount ?? 0;
+          const contribAmount = linkedContribution.amount?.amount ?? 0;
+          const percent = incomeAmount > 0 ? Math.round((contribAmount / incomeAmount) * 100) : 100;
+          this.incomeForm.patchValue({
+            investThisAmount: true,
+            inheritanceTargetPotId: linkedContribution.associatedSavingPotId,
+            inheritancePercentToInvest: Math.min(100, Math.max(1, percent))
+          });
+        } else if (this.selectedIncome.investThisAmount) {
+          this.incomeForm.patchValue({
+            investThisAmount: true,
+            inheritanceTargetPotId: this.selectedIncome.inheritanceTargetPotId,
+            inheritancePercentToInvest: this.selectedIncome.inheritancePercentToInvest ?? 100
+          });
+        }
+      }
     }
 
     if (this.isEditWorkflow
@@ -245,6 +279,7 @@ export class AddIncomeComponent {
       && (this.selectedIncome.description == "Salary"
         || this.selectedIncome.description == "State pension"
         || this.selectedIncome.description == "Rental income"
+        || this.selectedIncome.description == "Inheritance"
       )) {
       this.onIncomeTypeChange(this.selectedIncome.description);
     }
@@ -257,6 +292,8 @@ export class AddIncomeComponent {
     }
 
     this.setupBonusControlHandlers();
+    this.setupInheritanceControlHandlers();
+    this.setupOneOffStartEndSync();
 
     this.setIsDefaultIncome();
     this.setIncomeIcon();
@@ -418,6 +455,88 @@ export class AddIncomeComponent {
       action$
         .pipe(
           filter((res) => !!res),
+          switchMap((incomeExpense: any) => {
+            const isInheritance = income?.description === 'Inheritance';
+            const investChecked = !!this.incomeForm.get('investThisAmount')?.value;
+            if (!isInheritance) {
+              return of(incomeExpense);
+            }
+            const allIncomes = incomeExpense?.incomes ?? incomeExpense?.Incomes ?? [];
+            const incomeId = this.isEditWorkflow
+              ? this.selectedIncome?.id
+              : allIncomes.find(
+                  (i: any) =>
+                    i.description === 'Inheritance' &&
+                    Number(i.amount?.amount) === Number(income.amount.amount) &&
+                    i.start?.year === income.start.year
+                )?.id;
+            if (!incomeId) {
+              return of(incomeExpense);
+            }
+            const linkedContribution = this.existingContributions.find(
+              (c: any) => c.sourceIncomeId === incomeId
+            );
+            if (investChecked) {
+              const targetPotId = this.incomeForm.get('inheritanceTargetPotId')?.value;
+              const percent = this.incomeForm.get('inheritancePercentToInvest')?.value ?? 100;
+              const incomeAmount = this.incomeForm.get('amount')?.value ?? 0;
+              const investedAmount = incomeAmount * (percent / 100);
+              if (!targetPotId || investedAmount <= 0) {
+                return of(incomeExpense);
+              }
+              const potName = this.clientSavings.find((s) => s.id === targetPotId)?.name ?? 'saving pot';
+              const oneOffCycle = this.cycles.find((c) => c.description === 'One-off');
+              const contribution: FundsViewModel = {
+                id: linkedContribution?.id ?? null,
+                associatedSavingPotId: targetPotId,
+                description: `Inheritance contribution to ${potName}`,
+                amount: {
+                  amount: investedAmount,
+                  currencySymbol: this.clientPreferredCurrency,
+                  cycle: {
+                    id: oneOffCycle?.id ?? '',
+                    description: oneOffCycle?.description ?? 'One-off',
+                  },
+                },
+                start: income.start,
+                end: income.end,
+                startEventId: null,
+                endEventId: null,
+                escalationRate: null,
+                contributionType: 2,
+                hasCommission: false,
+                comission: {
+                  type: ComissionType.Percentage,
+                  amount: { amount: 0, currencySymbol: '', cycle: { id: '', description: '' } },
+                  percentage: { amount: 0, currencySymbol: '', cycle: { id: '', description: '' } },
+                  escalationRate: { description: '', value: '0' },
+                },
+                sourceIncomeId: incomeId,
+              };
+              const contribAction$ = linkedContribution
+                ? this.withdrawalsContributionsHttpService.updateContributions(this.cashflowId, contribution)
+                : this.withdrawalsContributionsHttpService.addContributions(this.cashflowId, contribution);
+              return contribAction$.pipe(
+                map(() => incomeExpense),
+                catchError((err) => {
+                  console.error(err);
+                  return of(incomeExpense);
+                })
+              );
+            } else if (linkedContribution) {
+              return this.withdrawalsContributionsHttpService.deleteContributions(
+                this.cashflowId,
+                linkedContribution
+              ).pipe(
+                map(() => incomeExpense),
+                catchError((err) => {
+                  console.error(err);
+                  return of(incomeExpense);
+                })
+              );
+            }
+            return of(incomeExpense);
+          }),
           catchError((err) => {
             console.error(err);
             throw err;
@@ -514,6 +633,9 @@ export class AddIncomeComponent {
     else if (this.incomeForm.get("description")?.value == "Rental income") {
       this.incomeIcon = "rental-income";
     }
+    else if (this.incomeForm.get("description")?.value == "Inheritance") {
+      this.incomeIcon = "inheritance";
+    }
     else {
       this.incomeIcon = "custom-income";
     }
@@ -524,7 +646,8 @@ export class AddIncomeComponent {
       this.isDefaultIncome = this.selectedIncome.isDefault;
     }
     else if (this.incomeForm.get("description")?.value == "Salary"
-      || this.incomeForm.get("description")?.value == "State pension") {
+      || this.incomeForm.get("description")?.value == "State pension"
+      || this.incomeForm.get("description")?.value == "Inheritance") {
       this.isDefaultIncome = true;
     }
     else {
@@ -569,13 +692,20 @@ export class AddIncomeComponent {
         description: 'Rental income',
         requireDescription: true,
         editableName: false
+      },
+      'Inheritance': {
+        icon: 'inheritance',
+        description: 'Inheritance',
+        requireDescription: true,
+        editableName: false
       }
     };
 
     const isCustom = this.selectedIncome != null
       && this.selectedIncome.description != "Salary"
       && this.selectedIncome.description != "State pension"
-      && this.selectedIncome.description != "Rental income";
+      && this.selectedIncome.description != "Rental income"
+      && this.selectedIncome.description != "Inheritance";
 
     const config = isCustom ? incomeConfig["Custom"] : incomeConfig[value];
     if (!config || !descriptionCtrl) return;
@@ -592,6 +722,17 @@ export class AddIncomeComponent {
 
     if (!this.isEditWorkflow) {
       this.applyDefaultStartEnd(value);
+    }
+
+    if (value === 'Inheritance') {
+      const oneOffCycle = this.cycles.find(c => c.description === 'One-off');
+      if (oneOffCycle) {
+        this.incomeForm.get('cycle')?.setValue(oneOffCycle.id);
+        this.incomeForm.get('cycle')?.disable();
+        this.onCycleValueChange(oneOffCycle.id);
+      }
+    } else {
+      this.incomeForm.get('cycle')?.enable();
     }
 
     if (this.isEditWorkflow) {
@@ -639,6 +780,13 @@ export class AddIncomeComponent {
       case 'State pension':
         startCtrl.setValue(this.retirementYear);
         endCtrl.setValue(this.forecastEndYear);
+        break;
+
+      case 'Inheritance':
+        if (!this.isEditWorkflow) {
+          startCtrl.setValue(this.currentYear);
+        }
+        endCtrl.setValue(this.currentYear);
         break;
 
       default:
@@ -770,6 +918,58 @@ export class AddIncomeComponent {
     bonusAmount?.updateValueAndValidity({ emitEvent: false });
     bonusCycle?.updateValueAndValidity({ emitEvent: false });
     bonusDate?.updateValueAndValidity({ emitEvent: false });
+  }
+
+  private setupInheritanceControlHandlers(): void {
+    this.incomeForm.get('investThisAmount')?.valueChanges.subscribe(() => {
+      this.syncInheritanceControlsState();
+    });
+    this.incomeForm.get('description')?.valueChanges.subscribe(() => {
+      this.syncInheritanceControlsState();
+    });
+    this.syncInheritanceControlsState();
+  }
+
+  private setupOneOffStartEndSync(): void {
+    this.incomeForm.get('start')?.valueChanges.subscribe((startVal) => {
+      if (!this.showStartEnd && startVal != null) {
+        this.incomeForm.get('end')?.setValue(startVal, { emitEvent: false });
+        this.incomeForm.updateValueAndValidity({ emitEvent: false });
+      }
+    });
+  }
+
+  private syncInheritanceControlsState(): void {
+    const isInheritance = this.incomeForm.get('description')?.value === 'Inheritance';
+    const investChecked = !!this.incomeForm.get('investThisAmount')?.value;
+    const targetPotCtrl = this.incomeForm.get('inheritanceTargetPotId');
+    const percentCtrl = this.incomeForm.get('inheritancePercentToInvest');
+
+    if (!isInheritance) {
+      this.incomeForm.get('investThisAmount')?.setValue(false, { emitEvent: false });
+      targetPotCtrl?.clearValidators();
+      targetPotCtrl?.setValue(null, { emitEvent: false });
+      percentCtrl?.clearValidators();
+      percentCtrl?.setValue(100, { emitEvent: false });
+    } else if (investChecked) {
+      targetPotCtrl?.setValidators([Validators.required]);
+      percentCtrl?.setValidators([Validators.required, Validators.min(1), Validators.max(100)]);
+    } else {
+      targetPotCtrl?.clearValidators();
+      targetPotCtrl?.setValue(null, { emitEvent: false });
+      percentCtrl?.clearValidators();
+      percentCtrl?.setValue(100, { emitEvent: false });
+    }
+    targetPotCtrl?.updateValueAndValidity({ emitEvent: false });
+    percentCtrl?.updateValueAndValidity({ emitEvent: false });
+  }
+
+  get isInheritance(): boolean {
+    return this.incomeForm.get('description')?.value === 'Inheritance';
+  }
+
+  get isInvestThisAmountChecked(): boolean {
+    return !!this.incomeForm.get('investThisAmount')?.value;
   }
 
   private greaterThanZero(): ValidatorFn {

@@ -9,7 +9,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
 import { ActivatedRoute } from '@angular/router';
 import { FinancialWorkflowService } from '../services/financial-workflow.service';
-import { combineLatest, switchMap, tap } from 'rxjs';
+import { combineLatest, switchMap, tap, forkJoin, of } from 'rxjs';
 import { Client } from 'src/app/clients/models/client';
 import { Cashflow } from 'src/app/clients/models/cashflow';
 import { IncomeExpensesHttpService } from './services/income-expenses-http.service';
@@ -26,6 +26,10 @@ import { ToastrModule, ToastrService } from 'ngx-toastr';
 import { TranslateModule } from '@ngx-translate/core';
 import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { patchInflationRateDescription } from 'src/app/shared/utils/escalation-rate-utils';
+import { SavingsPotsHttpService } from '../saving-pots/services/savings-pots-http.service';
+import { SavingPotsModel } from '../saving-pots/models/saving-pots.model';
+import { WithdrawalsContributionsHttpService } from '../withdrawals-contributions/services/withdrawals-contributions-http.service';
+import { WithdrawalsContributions } from '../withdrawals-contributions/model/withdrawals-contributions';
 
 @Component({
   selector: 'app-income-expenses',
@@ -64,6 +68,8 @@ export class IncomeExpensesComponent {
   expenses: FinancialViewModel[];
   incomeType: string[] = [];
   expenseType: string[] = [];
+  savingsPots: SavingPotsModel;
+  contributionWithdrawal: WithdrawalsContributions;
   currentYearIncomeSummary = {
     totalIncome: 0,
     totalExpenses: 0,
@@ -79,7 +85,9 @@ export class IncomeExpensesComponent {
     private settingHttpService: SettingsHttpService,
     private timelineHttpService: TimelineHttpService,
     private navItemService: NavItemService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private savingsPotsHttpService: SavingsPotsHttpService,
+    private withdrawalsContributionsHttpService: WithdrawalsContributionsHttpService
   ) {
     this.navItemService.currentRouteName = 'Incomes & Expenses';
     this.getData();
@@ -108,15 +116,67 @@ export class IncomeExpensesComponent {
             this.settingHttpService.getEscalationRates(
               (client as Client).id
             ),
-          ]);
+            this.savingsPotsHttpService.getAllSavingsPots(
+              (cashflow as Cashflow).id
+            ),
+            this.withdrawalsContributionsHttpService.getAllWithdrawalsContributions(
+              (cashflow as Cashflow).id
+            ),
+          ]).pipe(
+            switchMap(([incomeExpense, timeline, amountCycles, escalationRatesResponse, savingsPots, contributionsData]) => {
+              const inheritanceEvents = (timeline?.clientEvents ?? []).filter(
+                (e: any) => (e?.name ?? '').toString().startsWith('Inheritance')
+              );
+              if (inheritanceEvents.length === 0) {
+                return of([incomeExpense, timeline, amountCycles, escalationRatesResponse, savingsPots, contributionsData]);
+              }
+              const cashflowId = (cashflow as Cashflow).id;
+              const oneOffCycle = (amountCycles ?? []).find((c: any) => c.description === 'One-off');
+              const currency = (incomeExpense as any)?.client?.preferredCurrency ?? this.selectedClient?.clientDetails?.preferredCurrency ?? 'USD';
+              return forkJoin(
+                inheritanceEvents.map((ev: any) => {
+                  const income: FinancialViewModel = {
+                    id: null,
+                    description: ev.name ?? 'Inheritance',
+                    amount: {
+                      amount: ev.netAmount?.amount ?? 0,
+                      currencySymbol: ev.netAmount?.currencySymbol ?? currency,
+                      cycle: { id: oneOffCycle?.id ?? '', description: 'One-off' }
+                    },
+                    start: ev.start ?? { year: new Date().getFullYear(), age: 0 },
+                    end: ev.start ?? { year: new Date().getFullYear(), age: 0 },
+                    escalationRate: null,
+                    isDefault: true,
+                    isIncomeExpenseSource: true,
+                    icon: 'inheritance'
+                  };
+                  return this.incomeExpensesHttpService.addIncome(cashflowId, income).pipe(
+                    switchMap(() => this.timelineHttpService.deleteEvent(cashflowId, ev.id))
+                  );
+                })
+              ).pipe(
+                switchMap(() => combineLatest([
+                  this.incomeExpensesHttpService.getAllIncomeExpenses(cashflowId),
+                  this.timelineHttpService.getTimelinebyCashflowId(cashflowId),
+                  this.settingHttpService.getAmountCycles(),
+                  this.settingHttpService.getEscalationRates((client as Client).id),
+                  this.savingsPotsHttpService.getAllSavingsPots(cashflowId),
+                  this.withdrawalsContributionsHttpService.getAllWithdrawalsContributions(cashflowId),
+                ]))
+              );
+            })
+          );
         }),
-        tap(([incomeExpense, timeline, amountCycles, escalationRatesResponse]) => {
+        tap((result: any[]) => {
+          const [incomeExpense, timeline, amountCycles, escalationRatesResponse, savingsPots, contributionsData] = result as [IncomeExpense, FinancialTimeline, Cycle[], any, SavingPotsModel, WithdrawalsContributions];
           this.amountCycles = amountCycles;
           this.escalationRates = patchInflationRateDescription(
             escalationRatesResponse?.escalationRates ?? [],
             this.selectedCashflow?.inflationRate ?? 0
           );
           this.applyIncomeExpenseData(incomeExpense, timeline);
+          this.savingsPots = savingsPots;
+          this.contributionWithdrawal = contributionsData;
 
           this.currency = this.selectedClient.clientDetails?.preferredCurrency ?? "USD";
           this.isLoaderVisible = false;
@@ -143,7 +203,9 @@ export class IncomeExpensesComponent {
         forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
         forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
         planEndYear: this.getPlanEndYear(),
-        incomeType: this.incomeType
+        incomeType: this.incomeType,
+        clientSavings: this.savingsPots?.clientSavings ?? [],
+        existingContributions: this.contributionWithdrawal?.contributions ?? []
       },
     });
 
@@ -200,7 +262,9 @@ export class IncomeExpensesComponent {
         forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
         forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
         planEndYear: this.getPlanEndYear(),
-        incomeType: this.incomeType
+        incomeType: this.incomeType,
+        clientSavings: this.savingsPots?.clientSavings ?? [],
+        existingContributions: this.contributionWithdrawal?.contributions ?? []
       },
     });
 
@@ -253,6 +317,9 @@ export class IncomeExpensesComponent {
     if (!this.incomes.find(x => x.description == "Rental income")) {
       this.incomeType.push("Rental income");
     }
+    if (!this.defaultIncomes.find(x => x.description == "Inheritance")) {
+      this.incomeType.push("Inheritance");
+    }
 
     this.incomeType.push("Custom");
   }
@@ -295,11 +362,15 @@ export class IncomeExpensesComponent {
         switchMap(() => {
           return combineLatest([
             this.incomeExpensesHttpService.getAllIncomeExpenses(this.selectedCashflow.id),
-            this.timelineHttpService.getTimelinebyCashflowId(this.selectedCashflow.id)
+            this.timelineHttpService.getTimelinebyCashflowId(this.selectedCashflow.id),
+            this.savingsPotsHttpService.getAllSavingsPots(this.selectedCashflow.id),
+            this.withdrawalsContributionsHttpService.getAllWithdrawalsContributions(this.selectedCashflow.id)
           ]);
         }),
-        tap(([incomeExpense, timeline]) => {
+        tap(([incomeExpense, timeline, savingsPots, contributionsData]) => {
           this.applyIncomeExpenseData(incomeExpense, timeline);
+          this.savingsPots = savingsPots;
+          this.contributionWithdrawal = contributionsData;
         })
       )
       .subscribe();
