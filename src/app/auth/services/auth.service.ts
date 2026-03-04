@@ -46,7 +46,7 @@ export class AuthService {
 
   public isAuthenticated = (): Promise<boolean> => {
     return this._userManager.getUser()
-      .then(user => {
+      .then((user: User | null) => {
         if (this._user !== user) {
           this._loginChangedSubject.next(this.checkUser(user));
         }
@@ -59,7 +59,7 @@ export class AuthService {
 
   public finishLogin = (): Promise<User> => {
     return this._userManager.signinRedirectCallback()
-      .then(user => {
+      .then((user: User) => {
         this._loginChangedSubject.next(this.checkUser(user));
         return user;
       })
@@ -73,7 +73,7 @@ export class AuthService {
       authority: this.idpSettings.authority,
       end_session_url: `${this.idpSettings.authority?.replace(/\/$/, '')}/connect/endsession`
     });
-    this._userManager.getUser().then(user => {
+    this._userManager.getUser().then((user: User | null) => {
       const args: { post_logout_redirect_uri: string; id_token_hint?: string } = { post_logout_redirect_uri: postLogoutRedirectUri };
       if (user?.id_token) args.id_token_hint = user.id_token;
       this._userManager.signoutRedirect(args);
@@ -94,7 +94,7 @@ export class AuthService {
   /** Returns the current access token for API requests. Resolves with null if not authenticated. */
   public getAccessToken = (): Promise<string | null> => {
     return this._userManager.getUser()
-      .then(user => {
+      .then((user: User | null) => {
         if (user && !user.expired && user.access_token) {
           this._user = user;
           return user.access_token;
