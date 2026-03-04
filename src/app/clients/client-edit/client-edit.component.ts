@@ -32,7 +32,11 @@ import { allCountries } from '../models/country';
 import { CountryISO, NgxIntlTelInputModule } from 'ngx-intl-tel-input';
 import { countryDialCodes } from '../models/country-code';
 import { FiveDayRangeSelectionStrategy } from 'src/app/core/five-day-range-selection-strategy';
-import { MatCheckboxModule } from '@angular/material/checkbox';
+import {
+  MAT_CHECKBOX_DEFAULT_OPTIONS,
+  MatCheckboxDefaultOptions,
+  MatCheckboxModule,
+} from '@angular/material/checkbox';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { TranslateModule } from '@ngx-translate/core';
 import { Location } from '@angular/common';
@@ -97,6 +101,10 @@ class DmyDateAdapter extends NativeDateAdapter {
   providers: [
     ClientHttpService,
     ToastrService,
+    {
+      provide: MAT_CHECKBOX_DEFAULT_OPTIONS,
+      useValue: { clickAction: 'noop' } as MatCheckboxDefaultOptions,
+    },
     { provide: DateAdapter, useClass: DmyDateAdapter },
     // {
     //   provide: MAT_DATE_RANGE_SELECTION_STRATEGY,
@@ -207,6 +215,10 @@ export class ClientEditComponent {
       || this.clientForm.controls['email'].invalid
   }
 
+  get isSaveDisabled(): boolean {
+    return this.isFormInvalid || !this.clientForm.dirty;
+  }
+
   getClient() {
     this.activatedRoute.params.pipe(
       switchMap((params) => {
@@ -231,7 +243,7 @@ export class ClientEditComponent {
 
         this.clientForm.controls['firstName'].patchValue(res.clientDetails.firstName);
         this.clientForm.controls['lastName'].patchValue(res.clientDetails.lastName);
-        this.clientForm.controls['dob'].patchValue(res.clientDetails.birthDate);
+        this.clientForm.controls['dob'].patchValue(clientBirthDate);
         this.clientForm.controls['gender'].patchValue(res.clientDetails.gender);
         this.clientForm.controls['country'].patchValue(res.clientDetails.country);
         this.clientForm.controls['currency'].patchValue(res.clientDetails?.preferredCurrency);
@@ -275,8 +287,8 @@ export class ClientEditComponent {
     ).subscribe()
   }
 
-  togglePartnerSection(visible: boolean) {
-    if (!visible && this.showPartner) {
+  onPartnerCheckboxClick() {
+    if (this.showPartner) {
       const confirmed = window.confirm(
         'Removing a partner will affect any Joint or Partner-owned saving pots. ' +
         'You will need to manually delete those pots afterwards.\n\n' +
@@ -284,7 +296,11 @@ export class ClientEditComponent {
       );
       if (!confirmed) return;
     }
+    this.togglePartnerSection(!this.showPartner);
+  }
 
+  togglePartnerSection(visible: boolean) {
+    const hadPartnerVisible = this.showPartner;
     this.showPartner = visible;
     const partnerGroup = this.clientForm.get('partner') as FormGroup;
 
@@ -317,6 +333,9 @@ export class ClientEditComponent {
         partnerGroup.get(key)?.clearValidators();
         partnerGroup.get(key)?.updateValueAndValidity();
       });
+      if (hadPartnerVisible) {
+        this.clientForm.markAsDirty();
+      }
     }
   }
 
