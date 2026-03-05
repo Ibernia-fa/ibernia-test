@@ -1259,5 +1259,35 @@ private round2(n: number): number {
   return Math.round((n + Number.EPSILON) * 100) / 100;
 }
 
+getContributionStartYear(): number {
+  const val = this.savingsForm.get('contributionStartDate')?.value;
+  return typeof val === 'number' && Number.isFinite(val) ? val : this.forecastStartDateYear;
+}
+
+getContributionEndEvents(): any[] {
+  const startYear = this.getContributionStartYear();
+  return (this.eventsList ?? []).filter((e: any) => (e?.start?.year ?? 0) >= startYear);
+}
+
+getContributionEndYears(): number[] {
+  const startYear = this.getContributionStartYear();
+  return (this.years ?? []).filter((y) => y >= startYear);
+}
+
+getLockStartYear(): number {
+  const val = this.savingsForm.get('start')?.value;
+  return typeof val === 'number' && Number.isFinite(val) ? val : this.forecastStartDateYear;
+}
+
+getLockEndEvents(): any[] {
+  const startYear = this.getLockStartYear();
+  return (this.eventsList ?? []).filter((e: any) => (e?.start?.year ?? 0) >= startYear);
+}
+
+getLockEndYears(): number[] {
+  const startYear = this.getLockStartYear();
+  return (this.years ?? []).filter((y) => y >= startYear);
+}
+
 }
 

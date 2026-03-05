@@ -80,12 +80,12 @@
                 <div class="w-100 form-field">
                   <div class="select-option">
                     <mat-select value="Select" formControlName="end" hideSingleSelectionIndicator>
-                      @for (event of eventsList; track event) {
+                      @for (event of getEndEvents(); track event.id) {
                       <mat-option [value]="event.start.year">{{ event.name }} ({{ event.start.age }})</mat-option>
                       }
                       <hr>
-                      @for (year of years; let i=$index; track year) {
-                      <mat-option [value]="year">{{ year }} ({{ clientAge + i }})</mat-option>
+                      @for (year of getEndYears(); track year) {
+                      <mat-option [value]="year">{{ year }} ({{ year - clientBirthYear }})</mat-option>
                       }
                     </mat-select>
                   </div>

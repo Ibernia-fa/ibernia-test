@@ -839,6 +839,20 @@ export class AddIncomeComponent {
     return Number(year) - this.clientBirthYear;
   }
 
+  getStartYear(): number {
+    return resolveYear(this.incomeForm.get('start')?.value, this.eventsList);
+  }
+
+  getEndEvents(): any[] {
+    const startYear = this.getStartYear();
+    return (this.eventsList ?? []).filter((e: any) => (e?.start?.year ?? 0) >= startYear);
+  }
+
+  getEndYears(): number[] {
+    const startYear = this.getStartYear();
+    return (this.years ?? []).filter((y) => y >= startYear);
+  }
+
   hasFormChanges(): boolean {
     return JSON.stringify(this.incomeForm.getRawValue()) !== this.initialFormSnapshot;
   }

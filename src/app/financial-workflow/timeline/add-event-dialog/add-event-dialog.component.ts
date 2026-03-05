@@ -1192,6 +1192,21 @@ export class AddEventDialogComponent {
       resalePrice?.updateValueAndValidity({ emitEvent: false });
     });
   }
+
+  getStartYear(): number {
+    const val = this.eventForm.get('start')?.value;
+    return typeof val === 'number' && Number.isFinite(val) ? val : this.data.forecastStartDateYear;
+  }
+
+  getEndEvents(): any[] {
+    const startYear = this.getStartYear();
+    return (this.eventsList ?? []).filter((e: any) => (e?.year ?? 0) >= startYear);
+  }
+
+  getEndYears(): number[] {
+    const startYear = this.getStartYear();
+    return (this.years ?? []).filter((y) => y >= startYear);
+  }
 }
 
 export class EventType {

@@ -594,6 +594,20 @@ export class AddExpenseComponent {
     return Number(year) - this.clientBirthYear;
   }
 
+  getStartYear(): number {
+    return resolveYear(this.expenseForm.get('start')?.value, this.eventsList);
+  }
+
+  getEndEvents(): any[] {
+    const startYear = this.getStartYear();
+    return (this.eventsList ?? []).filter((e: any) => (e?.start?.year ?? 0) >= startYear);
+  }
+
+  getEndYears(): number[] {
+    const startYear = this.getStartYear();
+    return (this.years ?? []).filter((y) => y >= startYear);
+  }
+
   private resolvePlanEndYear(data: any): number {
     const planEndYear = Number(data?.planEndYear);
     if (Number.isFinite(planEndYear) && planEndYear > 0) {

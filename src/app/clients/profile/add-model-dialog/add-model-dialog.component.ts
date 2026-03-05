@@ -11,7 +11,7 @@ import { Cashflow } from '../../models/cashflow';
 import { catchError, combineLatestWith, filter, map, switchMap, tap } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Store } from '@ngrx/store';
 import { selectedClient } from 'src/app/store/client/client.selectors';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -48,10 +48,21 @@ export class AddModelDialogComponent {
     private cashflowHttpService: CashflowHttpService,
     private toaster: ToastrService,
     private router: Router,
+    private translate: TranslateService,
   ) {
     this.birthDate = new Date(this.clientData?.clientDetails?.birthDate);
     this.minAge = this.calculateAge(this.birthDate);
     this.initForm();
+    this.prefillPlanName();
+  }
+
+  private prefillPlanName(): void {
+    if (!this.clientData?.id) return;
+    this.cashflowHttpService.getByClientId(this.clientData.id).subscribe((cashflows) => {
+      const nextNum = (cashflows?.length ?? 0) + 1;
+      const prefix = this.translate.currentLang === 'it' ? 'Piano ' : 'Plan ';
+      this.form.get('name')?.setValue(prefix + nextNum);
+    });
   }
 
   initForm() {

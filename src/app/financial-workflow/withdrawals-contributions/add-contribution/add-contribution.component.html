@@ -8,11 +8,6 @@
     <div class="d-flex align-items-center justify-content-between gap-10 modal-header">
       <div class="d-flex align-items-center gap-8">
         <h3>{{ dialogTitle }}</h3>
-        @if (isEditWorkflow && !showDescriptionField) {
-        <button type="button" (click)="showDescriptionEditor()">
-          <mat-icon>edit</mat-icon>
-        </button>
-        }
       </div>
       <button (click)="closeDialog()" type="button">
         <img src="assets/images/svgs/close-line-cion.svg" alt="close-line-cion" />
@@ -56,17 +51,6 @@
           </div>
         </div>
         
-        @if (!isEditWorkflow || showDescriptionField) {
-        <div class="w-100 form-field gap-8">
-          <mat-label class="f-s-16 d-block" style="line-height: 18px">{{ 'Description' | translate }}</mat-label>
-          <input matInput formControlName="description" placeholder="e.g. Monthly pension contribution" />
-           @if(contributionForm.get('description')?.touched &&
-              contributionForm.get('description')?.hasError('required')) {
-              <span class="field-error d-block">{{'Required' | translate}}</span>
-              }
-        </div>
-        }
-
         <div class="d-flex flex-column gap-12 tab">
             <div class="d-flex gap-8 align-items-center">
               <mat-label class="f-s-16 f-w-400 d-block">Contribute from</mat-label>
@@ -214,21 +198,16 @@
                 <div class="w-100 form-field">
                   <div class="select-option">
                     <mat-select value="Select" formControlName="end" hideSingleSelectionIndicator>
-                      <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
-                      <!-- @for (event of eventsList; track event) {
-                        <mat-option [value]="event.year">{{ event.name }} ({{ event.age }})</mat-option>
-                        }
-                        <hr> -->
-                        @if(isEditWorkflow || eventsList?.length > 0)
+                        @if((isEditWorkflow || eventsList?.length > 0) && currentYear >= getStartYear())
                         {
                           <mat-option [value]="currentYear">This year ({{ currentYear }})</mat-option>
                         }
-                        @for (event of eventsList; track event) {
+                        @for (event of getEndEvents(); track event.id) {
                       <mat-option [value]="'event:' + event.id">{{ event.name }} ({{ getAgeForYear(event.start.year) }})</mat-option>
                       }
                       <hr>
-                      @for (year of years; let i = $index; track year) {
-                      <mat-option [value]="year">{{ year }} ({{ clientAge + i }})</mat-option>
+                      @for (year of getEndYears(); track year) {
+                      <mat-option [value]="year">{{ year }} ({{ getAgeForYear(year) }})</mat-option>
                       }
                     </mat-select>
                   </div>
