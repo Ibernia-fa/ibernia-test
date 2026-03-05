@@ -31,7 +31,6 @@
   font-family: Ubuntu, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overscroll-behavior: none;
 }
 
 /* ─── Animated blob background ─── */
@@ -61,7 +60,6 @@
   border-radius: 50%;
   filter: blur(60px);
   opacity: 1;
-  will-change: transform;
   animation-timing-function: ease-in-out;
   animation-iteration-count: infinite;
   animation-direction: alternate;
@@ -405,7 +403,9 @@
   height: 100dvh;
   overflow-y: scroll;
   overflow-x: hidden;
-  scroll-snap-type: y mandatory;
+  scroll-snap-type: y proximity;
+  touch-action: manipulation;
+  overscroll-behavior-y: contain;
 
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -439,7 +439,7 @@
   max-width: 512px;
   width: 100%;
   max-height: calc(100dvh - 140px);
-  overflow-y: auto;
+  overflow-y: visible;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
