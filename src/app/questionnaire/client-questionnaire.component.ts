@@ -124,7 +124,10 @@ export class ClientQuestionnaireComponent implements OnInit {
   private dismissIntroIfReady(): void {
     if (!this.dataReady || !this.minTimeElapsed) return;
     this.introFadingOut = true;
-    setTimeout(() => { this.showIntro = false; }, 500);
+    setTimeout(() => {
+      this.showIntro = false;
+      setTimeout(() => this.onScroll(), 50);
+    }, 500);
   }
 
   initResponses(): void {
@@ -150,6 +153,25 @@ export class ClientQuestionnaireComponent implements OnInit {
   }
 
   private isScrolling = false;
+
+  get totalSections(): number {
+    const staticSections = this.advisorBio ? 5 : 4;
+    return this.questions.length + staticSections + (this.submitted ? 1 : 0);
+  }
+
+  get isLastSection(): boolean {
+    if (this.submitted) return true;
+    const lastIndex = this.totalSections - 1;
+    return this.currentIndex >= lastIndex || this.progressPercent >= 98;
+  }
+
+  onSwipeUpClick(): void {
+    if (this.currentIndex === 0) {
+      this.scrollToSection(1);
+    } else {
+      this.scrollToSection(this.currentIndex - 1);
+    }
+  }
 
   scrollToSection(index: number): void {
     const el = this.snapContainer?.nativeElement;
