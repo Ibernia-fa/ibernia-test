@@ -211,7 +211,42 @@ export class SimulateEmergencyComponent implements OnDestroy {
 
     if (this.emergencyExpense) {
       this.populateForm(this.emergencyExpense);
+    } else if (this.isLifeInsurance(this.emergency)) {
+      this.applyLifeInsuranceDefaults();
     }
+  }
+
+  private isLifeInsurance(emergency: Emergency): boolean {
+    if (!emergency || emergency.type !== 1) return false; // type 1 = insurance
+    const name = (emergency.name ?? '').toString().trim().toLowerCase();
+    return name.includes('life') || name.includes('vita'); // English + Italian
+  }
+
+  private applyLifeInsuranceDefaults(): void {
+    const mainClientSalary = this.getMainClientSalary();
+    const stopIncomeCtrl = this.simulateEmergencyForm.get('stopIncome');
+    const stoppedIncomeCtrl = this.simulateEmergencyForm.get('stoppedIncomeId');
+    stopIncomeCtrl?.setValue(true, { emitEvent: true });
+    if (mainClientSalary?.id) {
+      stoppedIncomeCtrl?.setValue(mainClientSalary.id, { emitEvent: false });
+    }
+
+    const amountControl = this.simulateEmergencyForm.get('amount');
+    const incomeControl = this.simulateEmergencyForm.get('stoppedIncomeId');
+    amountControl?.setValidators([Validators.required, Validators.min(0)]);
+    incomeControl?.setValidators([Validators.required]);
+    if (!amountControl?.value) {
+      amountControl?.setValue(0, { emitEvent: false });
+    }
+    amountControl?.updateValueAndValidity();
+    incomeControl?.updateValueAndValidity();
+  }
+
+  private getMainClientSalary(): FinancialViewModel | null {
+    const salaries = (this.incomes ?? []).filter(
+      (i) => (i?.description ?? '').toString().trim().toLowerCase() === 'salary' && i?.id
+    );
+    return salaries.length > 0 ? salaries[0] : null;
   }
 
   onCycleValueChange(event: any) {
@@ -543,6 +578,21 @@ export class SimulateEmergencyComponent implements OnDestroy {
       el.value = Number(value).toLocaleString('en-US');
       el.dispatchEvent(new Event('blur'));
     });
+  }
+
+  getStartYear(): number {
+    const val = this.simulateEmergencyForm.get('start')?.value;
+    return typeof val === 'number' && Number.isFinite(val) ? val : this.forecastStartDateYear;
+  }
+
+  getEndEvents(): any[] {
+    const startYear = this.getStartYear();
+    return (this.eventsList ?? []).filter((e: any) => (e?.start?.year ?? 0) >= startYear);
+  }
+
+  getEndYears(): number[] {
+    const startYear = this.getStartYear();
+    return (this.years ?? []).filter((y) => y >= startYear);
   }
 
   private buildEmergencySeries(report: any, year: string, amount: number): any {
