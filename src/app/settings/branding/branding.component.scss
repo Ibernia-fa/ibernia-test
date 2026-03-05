@@ -82,6 +82,31 @@ position: absolute;
   height: 120px;
 }
 
+.crop-pic {
+    position: absolute;
+    left: -12px;
+    bottom: -12px;
+    border: 1px solid #ccc;
+    border-radius: 100px;
+    width: 28px;
+    height: 28px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    cursor: pointer;
+    mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+    }
+    &:hover {
+        background-color: #e3f2fd;
+        border-color: #2196f3;
+    }
+}
+
 .remove-pic {
     position: absolute;
     right: -14px;
