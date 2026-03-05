@@ -1,22 +1,24 @@
-import { Component, ElementRef, ViewChild, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { NavItemService } from 'src/app/layouts/full/nav-item.service';
 import { OrganizationProfilesService } from '../services/organization.profiles.service';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { ToastrService } from 'ngx-toastr';
 import { TranslateModule } from '@ngx-translate/core';
 import { MatCard, MatCardContent } from '@angular/material/card';
+import { MatDialog } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { NgIf } from '@angular/common';
+import { ImageCropDialogComponent } from '../account-preferences/image-crop-dialog/image-crop-dialog.component';
 
 @Component({
   selector: 'app-branding',
   standalone: true,
-  imports: [TranslateModule, MatCard, MatCardContent, NgIf],
+  imports: [TranslateModule, MatCard, MatCardContent, NgIf, MatIconModule, MatTooltipModule],
   templateUrl: './branding.component.html',
   styleUrls: ['./branding.component.scss'],
 })
 export class BrandingComponent implements OnInit {
-  @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
-
   profileImage: string | null = null;   // Data URL preview
   backgroundImage: string | null = null;   // Data URL preview
   private initialProfileImage: string | null = null;
@@ -29,7 +31,8 @@ export class BrandingComponent implements OnInit {
     private navItemService: NavItemService,
     private orgProfiles: OrganizationProfilesService,
     private auth: AuthService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private dialog: MatDialog
   ) {
     this.navItemService.currentRouteName = 'Branding';
   }
@@ -64,16 +67,42 @@ export class BrandingComponent implements OnInit {
 
     try {
       const dataUrl = await this.fileToDataUrl(file);
-    
-      if (imageType === 'profile') {
-        this.profileImage = dataUrl;
-      } else if (imageType === 'background') {
-        this.backgroundImage = dataUrl;
-      }
-      this.updateHasChanges();
+      this.openCropDialog(dataUrl, imageType);
     } finally {
       input.value = '';
     }
+  }
+
+  openCropDialog(imageBase64: string, imageType: 'profile' | 'background'): void {
+    const isProfile = imageType === 'profile';
+    const dialogRef = this.dialog.open(ImageCropDialogComponent, {
+      width: '600px',
+      maxWidth: '95vw',
+      data: {
+        imageBase64,
+        aspectRatio: isProfile ? 1 : 16 / 9,
+        title: isProfile ? 'Crop company logo' : 'Crop background',
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((result: string | null) => {
+      if (result) {
+        if (imageType === 'profile') {
+          this.profileImage = result;
+        } else {
+          this.backgroundImage = result;
+        }
+        this.updateHasChanges();
+      }
+    });
+  }
+
+  cropImage(event: Event, imageType: 'profile' | 'background'): void {
+    event.stopPropagation();
+    event.preventDefault();
+    const img = imageType === 'profile' ? this.profileImage : this.backgroundImage;
+    if (!img) return;
+    this.openCropDialog(img, imageType);
   }
 
   clearImage(e: Event, type: 'profile' | 'background') {

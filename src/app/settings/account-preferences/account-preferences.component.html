@@ -36,6 +36,9 @@
     style="width:120px;height:120px;object-fit:cover;"
   />
 
+    <span class="crop-pic" (click)="cropImage($event)" matTooltip="{{ 'Crop' | translate }}">
+      <mat-icon>crop</mat-icon>
+    </span>
     <span class="remove-pic" (click)="clearImage($event)"><img  src="../../../assets/images/shapes/delete.svg" alt=""></span>
 
               </div>

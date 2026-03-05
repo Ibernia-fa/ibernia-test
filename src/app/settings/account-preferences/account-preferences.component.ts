@@ -20,10 +20,13 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelect, MatSelectModule } from '@angular/material/select';
+import { MatDialog } from '@angular/material/dialog';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { NgFor, NgIf } from '@angular/common';
 import { TextFieldModule } from '@angular/cdk/text-field';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
+import { ImageCropDialogComponent } from './image-crop-dialog/image-crop-dialog.component';
 
 @Component({
   selector: 'app-account-preferences',
@@ -37,6 +40,7 @@ import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
     MatInputModule,
     MatSelect,
     MatSelectModule,
+    MatTooltipModule,
     ReactiveFormsModule,
     TranslateModule,
     NgIf,
@@ -99,7 +103,8 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
     private auth: AuthService,
     private cdr: ChangeDetectorRef,
     private navItemService: NavItemService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private dialog: MatDialog
   ) {
     this.navItemService.currentRouteName = 'Account Preferences';
   }
@@ -324,19 +329,39 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
     if (!file) return;
 
     try {
-      const dataUrl = await fileToDataUrl(file); // data:image/...;base64,...
-      this.profileImagePreview = dataUrl;
-      this.form.get('profilePhotoUrl')?.setValue(dataUrl);
-      this.cdr.markForCheck();                // <-- ensure UI updates under OnPush
+      const dataUrl = await fileToDataUrl(file);
+      this.openCropDialog(dataUrl);
     } catch (e) {
       console.error('Failed to read image', e);
       this.toastr.error('Could not read the selected image', 'Error!');
     } finally {
-      // reset the native input so picking the *same file* again will fire (change)
       if (this.fileInput?.nativeElement) {
         this.fileInput.nativeElement.value = '';
       }
     }
+  }
+
+  openCropDialog(imageBase64: string): void {
+    const dialogRef = this.dialog.open(ImageCropDialogComponent, {
+      width: '600px',
+      maxWidth: '95vw',
+      data: { imageBase64 },
+    });
+
+    dialogRef.afterClosed().subscribe((result: string | null) => {
+      if (result) {
+        this.profileImagePreview = result;
+        this.form.get('profilePhotoUrl')?.setValue(result);
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  cropImage(event?: Event): void {
+    event?.stopPropagation();
+    event?.preventDefault();
+    if (!this.profileImagePreview) return;
+    this.openCropDialog(this.profileImagePreview);
   }
 
 
