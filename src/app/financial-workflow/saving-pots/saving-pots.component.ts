@@ -555,7 +555,6 @@ getOwnershipLabel(saving: ClientSaving): string {
 
 canDeleteSaving(saving: ClientSaving): boolean {
   if ((saving.name ?? '').trim().toLowerCase() !== 'cash') return true;
-  if (this.hasPartner) return false;
   const cashPotCount = (this.savingPots?.clientSavings ?? [])
     .filter(s => (s.name ?? '').trim().toLowerCase() === 'cash').length;
   return cashPotCount > 1;

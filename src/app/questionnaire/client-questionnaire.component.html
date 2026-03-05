@@ -262,13 +262,20 @@
       }
     </div>
 
-    <!-- Swipe up hint -->
-    @if (!submitted && currentIndex > 0) {
-      <div class="swipe-up-hint" (click)="scrollToSection(currentIndex - 1)">
-        <svg class="swipe-up-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="18 15 12 9 6 15"></polyline>
-        </svg>
-        <span class="swipe-up-text">{{ 'Swipe up' | translate }}</span>
+    <!-- Swipe hint (down on first page, up on others) -->
+    @if (!submitted && !isLastSection) {
+      <div class="swipe-up-hint" (click)="onSwipeUpClick()">
+        @if (currentIndex === 0) {
+          <svg class="swipe-up-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+          <span class="swipe-up-text">{{ 'Swipe down' | translate }}</span>
+        } @else {
+          <svg class="swipe-up-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="18 15 12 9 6 15"></polyline>
+          </svg>
+          <span class="swipe-up-text">{{ 'Swipe up' | translate }}</span>
+        }
       </div>
     }
   }

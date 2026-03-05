@@ -213,7 +213,8 @@ export class ProfileComponent {
         tap((questionnaireData) => {
           if (questionnaireData) {
             this.questionnaireResponses = questionnaireData;
-            const dismissed = localStorage.getItem(`questionnaire_hidden_${this.clientId}`);
+            const fromEmail = this.activatedRoute.snapshot.queryParamMap.get('responses') === '1';
+            const dismissed = fromEmail ? null : localStorage.getItem(`questionnaire_hidden_${this.clientId}`);
             this.showResponsesCard = !dismissed;
             this.responseCurrencySymbol = this.resolveCurrencySymbol(questionnaireData?.currency);
           } else {

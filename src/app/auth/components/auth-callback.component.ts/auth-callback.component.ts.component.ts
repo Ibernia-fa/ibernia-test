@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { OAuthService } from 'angular-oauth2-oidc';
 import { AuthService } from '../../services/auth.service';
+import { AUTH_RETURN_URL_KEY } from '../../../auth-guard.service';
 
 @Component({
   selector: 'app-auth-callback',
@@ -13,8 +13,11 @@ export class AuthCallbackComponent implements OnInit {
 
   ngOnInit(): void {
     this.AuthService.finishLogin().then(_ => {
-      this.router.navigate(['/clients'], { replaceUrl: true });
-    })
+      const returnUrl = sessionStorage.getItem(AUTH_RETURN_URL_KEY);
+      sessionStorage.removeItem(AUTH_RETURN_URL_KEY);
+      const target = returnUrl && returnUrl.startsWith('/') && !returnUrl.startsWith('//') ? returnUrl : '/clients';
+      this.router.navigateByUrl(target, { replaceUrl: true });
+    });
   }
 
 }

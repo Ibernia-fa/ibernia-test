@@ -302,6 +302,8 @@
     "Your responses have been shared with": "Your responses have been shared with",
     "This link is no longer available": "This link is no longer available",
     "Shared by": "Shared by",
+    "Swipe up": "Swipe up",
+    "Swipe down": "Swipe down",
 
     "ADD_EVENT": {
       "SELECT_EVENT_TYPE_TOOLTIP": "Select the type of life event or goal you want to create (for example, 'Home', 'New car' or 'Education').",
