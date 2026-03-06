@@ -339,21 +339,11 @@ describe('MortgageCalculatorComponent', () => {
     });
   });
 
-  describe('Italy rate type logic', () => {
+  describe('Italy config', () => {
     beforeEach(() => initWith('IT'));
 
-    it('should default to first rate type (fixed)', () => {
-      expect(component.mortgageForm.get('rateType')?.value).toBe('fixed');
-    });
-
-    it('should update interest rate when rate type changes to variable', () => {
-      component.mortgageForm.patchValue({ rateType: 'variable' });
-      expect(component.mortgageForm.get('interestRate')?.value).toBe(4.2);
-    });
-
-    it('should update interest rate when rate type changes back to fixed', () => {
-      component.mortgageForm.patchValue({ rateType: 'variable' });
-      component.mortgageForm.patchValue({ rateType: 'fixed' });
+    it('should load Italy config with default interest rate', () => {
+      expect(component.config.countryCode).toBe('IT');
       expect(component.mortgageForm.get('interestRate')?.value).toBe(3.2);
     });
   });

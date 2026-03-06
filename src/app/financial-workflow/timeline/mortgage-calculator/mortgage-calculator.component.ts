@@ -209,13 +209,6 @@ export class MortgageCalculatorComponent implements OnInit, OnChanges {
       this.syncTierDefaults();
     });
 
-    this.mortgageForm.get('rateType')?.valueChanges.subscribe(val => {
-      const rt = this.config.rateTypes?.find(r => r.value === val);
-      if (rt) {
-        this.mortgageForm.patchValue({ interestRate: rt.defaultRate }, { emitEvent: false });
-      }
-    });
-
     this.mortgageForm.valueChanges.subscribe(() => {
       this.stateChanged.emit(this.getState());
     });

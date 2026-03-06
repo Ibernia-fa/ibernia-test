@@ -21,19 +21,6 @@
     </div>
     }
 
-    @if(hasRateTypes) {
-    <div class="d-flex flex-column gap-6">
-      <mat-label class="calc-label">{{ 'Rate type' | translate }}</mat-label>
-      <div class="select-option">
-        <mat-select formControlName="rateType" hideSingleSelectionIndicator>
-          @for (rt of rateTypes; track rt.value) {
-          <mat-option [value]="rt.value">{{ rt.label | translate }}</mat-option>
-          }
-        </mat-select>
-      </div>
-    </div>
-    }
-
     <!-- Row 1: Property price + Down payment -->
     <div class="row calc-row">
       <div class="col-6">
