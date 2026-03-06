@@ -8,6 +8,41 @@
   </div>
   <!-- End Modal Header -->
 
+  <!-- Recommendation container - only show when profile picture or bio is missing -->
+  @if (!hasProfilePicture || !hasBio) {
+  <div class="questionnaire-recommendation">
+    <div class="recommendation-content">
+      <img src="assets/images/questionnaire/warning.png" alt="warning" class="recommendation-icon" />
+      <p class="recommendation-text">
+        {{ 'We recommend uploading your profile picture and writing a short bio to personalize the questionnaire.' | translate }}
+        <a [routerLink]="['/settings/account-preferences']" (click)="closeDialog()" class="recommendation-link">
+          {{ 'Go to Settings' | translate }}
+        </a>
+      </p>
+    </div>
+    <div class="recommendation-status">
+      <div class="status-item" [class.added]="hasProfilePicture" [class.not-added]="!hasProfilePicture">
+        <span class="status-icon">
+          <i-tabler name="user-circle" class="icon-20"></i-tabler>
+        </span>
+        <div class="status-label">
+          <span class="label-text">{{ 'Profile picture' | translate }}</span>
+          <span class="label-status">{{ (hasProfilePicture ? 'Added' : 'Not added') | translate }}</span>
+        </div>
+      </div>
+      <div class="status-item" [class.added]="hasBio" [class.not-added]="!hasBio">
+        <span class="status-icon">
+          <i-tabler name="file-text" class="icon-20"></i-tabler>
+        </span>
+        <div class="status-label">
+          <span class="label-text">{{ 'Bio' | translate }}</span>
+          <span class="label-status">{{ (hasBio ? 'Added' : 'Not added') | translate }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  }
+
   <!-- Modal Body (scrollable) -->
   <mat-dialog-content class="questionnaire-dialog-content">
   @if (isLoaderVisible) {

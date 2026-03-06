@@ -16,7 +16,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgScrollbarModule } from 'ngx-scrollbar';
 import { AppSettings } from 'src/app/config';
-import { BrandingComponent } from '../sidebar/branding.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -33,6 +32,7 @@ import { selectedClient } from 'src/app/store/client/client.selectors';
 import { selectedCashflow } from 'src/app/store/cashflow/cashflow.selectors';
 import { LanguageService } from 'src/app/core/language.service';
 import { LanguageLoaderService } from '../../language-loader.service';
+import { BrandingComponent } from '../sidebar/branding.component';
 
 interface notifications {
   id: number;
@@ -270,8 +270,10 @@ showFiller = false;
       // branding logo
       this.organizationProfiles.getProfile(this.user.sub).subscribe({
         next: (p) => {
-          this.brandingLogo = this.ensureDataUrl(p?.profilePhotoUrl ?? null);
+          const logo = this.ensureDataUrl(p?.profilePhotoUrl ?? null);
+          this.brandingLogo = logo;
           this.isBrandLogoLoaded = true;
+          this.organizationProfiles.setBrandingLogo(logo);
         },
         error: (err) => {
           console.error(err);

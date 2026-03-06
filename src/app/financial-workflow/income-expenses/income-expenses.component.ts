@@ -62,7 +62,12 @@ export class IncomeExpensesComponent {
   currency: string;
   // default
   defaultIncomes: FinancialViewModel[];
+  /** For display: separate cards for each income, with displayTitle when hasPartner (e.g. "Salary [Inam]") */
+  displayDefaultIncomes: Array<{ income: FinancialViewModel; displayTitle?: string }> = [];
   defautExpenses: FinancialViewModel[];
+  hasPartner = false;
+  clientFirstName = '';
+  partnerFirstName = '';
   // non default
   incomes: FinancialViewModel[];
   expenses: FinancialViewModel[];
@@ -197,6 +202,7 @@ export class IncomeExpensesComponent {
         escalataionRates: this.escalationRates,
         incomes: this.incomeExpense?.incomes,
         clientBirthDate: this.selectedClient?.clientDetails.birthDate,
+        partnerBirthDate: this.selectedClient?.partnerDetail?.birthDate,
         clientPreferredCurrency: this.selectedClient?.clientDetails.preferredCurrency,
         clientCountryCode: this.selectedClient?.clientDetails?.country,
         cashflowId: this.selectedCashflow?.id,
@@ -254,6 +260,7 @@ export class IncomeExpensesComponent {
         eventsList: this.timeline.clientEvents.sort((a, b) => a.start.age - b.start.age),
         escalataionRates: this.escalationRates,
         clientBirthDate: this.selectedClient?.clientDetails.birthDate,
+        partnerBirthDate: this.selectedClient?.partnerDetail?.birthDate,
         clientPreferredCurrency: this.selectedClient?.clientDetails.preferredCurrency,
         clientCountryCode: this.selectedClient?.clientDetails?.country,
         cashflowId: this.selectedCashflow?.id,
@@ -264,7 +271,7 @@ export class IncomeExpensesComponent {
         planEndYear: this.getPlanEndYear(),
         incomeType: this.incomeType,
         clientSavings: this.savingsPots?.clientSavings ?? [],
-        existingContributions: this.contributionWithdrawal?.contributions ?? []
+        existingContributions: this.contributionWithdrawal?.contributions ?? [],
       },
     });
 
@@ -311,8 +318,14 @@ export class IncomeExpensesComponent {
     if (!this.defaultIncomes.find(x => x.description == "Salary")) {
       this.incomeType.push("Salary");
     }
+    if (this.hasPartner && !this.defaultIncomes.find(x => x.description == "Salary (Partner)")) {
+      this.incomeType.push("Salary (Partner)");
+    }
     if (!this.defaultIncomes.find(x => x.description == "State pension")) {
       this.incomeType.push("State pension");
+    }
+    if (this.hasPartner && !this.defaultIncomes.find(x => x.description == "State pension (Partner)")) {
+      this.incomeType.push("State pension (Partner)");
     }
     if (!this.incomes.find(x => x.description == "Rental income")) {
       this.incomeType.push("Rental income");
@@ -380,13 +393,24 @@ export class IncomeExpensesComponent {
     this.incomeExpense = incomeExpense;
     this.timeline = timeline;
 
-    this.defaultIncomes = this.incomeExpense.incomes
+    this.hasPartner = !!this.selectedClient?.partnerDetail;
+    this.clientFirstName = this.selectedClient?.clientDetails?.firstName ?? '';
+    this.partnerFirstName = this.selectedClient?.partnerDetail?.firstName ?? '';
+
+    const allDefault = this.incomeExpense.incomes
       .filter(i => i.isDefault == true && i.isIncomeExpenseSource == true)
       .sort((a, b) => {
         if (a.description === 'Salary') return -1;
         if (b.description === 'Salary') return 1;
+        if (a.description === 'State pension') return -1;
+        if (b.description === 'State pension') return 1;
         return 0;
       });
+
+    this.defaultIncomes = allDefault;
+
+    // Build display items: merge client+partner for Salary and State pension when hasPartner
+    this.displayDefaultIncomes = this.buildDisplayDefaultIncomes(allDefault);
     this.defautExpenses = this.incomeExpense.expenses
       .filter(i => i.isDefault == true && i.isIncomeExpenseSource == true)
       .sort((a, b) => {
@@ -402,6 +426,32 @@ export class IncomeExpensesComponent {
         || i.description == "Insurance");
 
     this.updateCurrentYearIncomeSummary();
+  }
+
+  private buildDisplayDefaultIncomes(allDefault: FinancialViewModel[]): Array<{ income: FinancialViewModel; displayTitle?: string }> {
+    const result: Array<{ income: FinancialViewModel; displayTitle?: string }> = [];
+    const clientSalary = allDefault.find(i => i.description === 'Salary');
+    const partnerSalary = allDefault.find(i => i.description === 'Salary (Partner)');
+    const clientPension = allDefault.find(i => i.description === 'State pension');
+    const partnerPension = allDefault.find(i => i.description === 'State pension (Partner)');
+    const inheritance = allDefault.find(i => i.description === 'Inheritance');
+
+    if (this.hasPartner) {
+      if (clientSalary) result.push({ income: clientSalary, displayTitle: `Salary ${this.clientFirstName || 'Client'}` });
+      if (partnerSalary) result.push({ income: partnerSalary, displayTitle: `Salary ${this.partnerFirstName || 'Partner'}` });
+      if (clientPension) result.push({ income: clientPension, displayTitle: `State pension ${this.clientFirstName || 'Client'}` });
+      if (partnerPension) result.push({ income: partnerPension, displayTitle: `State pension ${this.partnerFirstName || 'Partner'}` });
+      if (inheritance) result.push({ income: inheritance });
+    } else {
+      for (const item of allDefault) {
+        result.push({ income: item });
+      }
+    }
+    return result;
+  }
+
+  trackByDisplayIncomeId(index: number, item: { income: FinancialViewModel; displayTitle?: string }): string {
+    return item.income.id ?? item.income.description ?? String(index);
   }
 
   private updateCurrentYearIncomeSummary(): void {
@@ -451,6 +501,7 @@ export class IncomeExpensesComponent {
   hasBonusAmount(item: FinancialViewModel): boolean {
     return Number(item?.bonus?.amount?.amount ?? 0) > 0;
   }
+
 
   private getPlanEndYear(): number {
     const planDuration = Number(this.selectedCashflow?.planDuration);
