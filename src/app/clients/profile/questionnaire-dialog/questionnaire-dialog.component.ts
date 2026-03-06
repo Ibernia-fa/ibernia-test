@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { Client } from '../../models/client';
 import {
@@ -14,6 +14,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ToastrService } from 'ngx-toastr';
 import { TranslateModule } from '@ngx-translate/core';
+import { RouterModule } from '@angular/router';
+import { TablerIconsModule } from 'angular-tabler-icons';
+import { Subject, takeUntil } from 'rxjs';
 import { QuestionnaireHttpService } from '../../services/questionnaire-http.service';
 import { SettingsService } from 'src/app/default-preferance/services/default-preferance.http.service';
 
@@ -37,15 +40,20 @@ export interface QuestionnaireItem {
     CdkDragHandle,
     CdkDropList,
     TranslateModule,
+    RouterModule,
+    TablerIconsModule,
   ],
   templateUrl: './questionnaire-dialog.component.html',
   styleUrl: './questionnaire-dialog.component.scss',
 })
-export class QuestionnaireDialogComponent implements OnInit {
+export class QuestionnaireDialogComponent implements OnInit, OnDestroy {
   questions: QuestionnaireItem[] = [];
   clientName: string;
   isLoaderVisible = false;
   isCopying = false;
+  hasProfilePicture = false;
+  hasBio = false;
+  private destroy$ = new Subject<void>();
 
   constructor(
     private dialogRef: MatDialogRef<QuestionnaireDialogComponent>,
@@ -62,6 +70,21 @@ export class QuestionnaireDialogComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadQuestions();
+    this.updateProfileStatus();
+    this.settingsService.userData$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => this.updateProfileStatus());
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  private updateProfileStatus(): void {
+    const profile = this.settingsService.currentUserData;
+    this.hasProfilePicture = !!(profile?.profilePhotoUrl?.trim());
+    this.hasBio = !!(profile?.bio?.trim());
   }
 
   loadQuestions(): void {
@@ -96,8 +119,6 @@ export class QuestionnaireDialogComponent implements OnInit {
       return;
     }
 
-    this.showProfileWarnings();
-
     this.isCopying = true;
     this.questionnaireHttpService
       .createLink({
@@ -122,18 +143,6 @@ export class QuestionnaireDialogComponent implements OnInit {
           console.error(err);
         },
       });
-  }
-
-  private showProfileWarnings(): void {
-    const profile = this.settingsService.currentUserData;
-    if (!profile) return;
-
-    if (!profile.bio?.trim()) {
-      this.toastr.warning('Head to your account preference to add a bio.');
-    }
-    if (!profile.profilePhotoUrl?.trim()) {
-      this.toastr.warning('Head to your account preference to add a profile image.');
-    }
   }
 
   toggleQuestion(item: QuestionnaireItem): void {

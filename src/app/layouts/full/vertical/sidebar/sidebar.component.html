@@ -1,28 +1,21 @@
-<!-- <div class="d-flex align-items-center justify-content-between">
-
-  @if(showToggle) {
-  <a
-    href="javascript:void(0)"
-    (click)="toggleMobileNav.emit()"
-    class="d-flex justify-content-center ng-star-inserted icon-40 align-items-center f-s-14"
-  >
-    <i-tabler name="x" class="icon-20 d-flex"></i-tabler>
-  </a>
-  }
-</div> -->
-
-
-<!-- sidebar.component.html -->
-<!-- <div class="d-flex align-items-center justify-content-between">
-  @if (showToggle) {
-    <a href="javascript:void(0)" (click)="toggleMobileNav.emit()" class="d-flex justify-content-center icon-40 align-items-center f-s-14">
-      <i-tabler name="x" class="icon-20 d-flex"></i-tabler>
+<!-- Sidebar header: logo + toggle (toggle only when expanded; when collapsed, toggle is in header) -->
+<div class="sidebar-header">
+  <div class="sidebar-logo-link">
+    <ng-container *ngIf="isBrandLogoLoaded">
+      <app-branding [profileImage]="brandingLogo"></app-branding>
+    </ng-container>
+    <a *ngIf="!isBrandLogoLoaded" href="/">
+      <img width="150" src="./assets/images/logos/1.png" alt="logo" class="sidebar-default-logo" />
     </a>
+  </div>
+  @if (showToggle) {
+    <button mat-icon-button (click)="toggleMobileNav.emit()" class="sidebar-toggle-btn" aria-label="Close menu">
+      <i-tabler name="x" class="icon-20 d-flex"></i-tabler>
+    </button>
+  } @else if (!sidenavCollapsed) {
+    <button mat-icon-button (click)="toggleCollapsed.emit()" class="sidebar-toggle-btn" aria-label="Toggle sidebar">
+      <img src="assets/images/sidebar/sidebar_toggle.png" alt="Toggle sidebar" class="sidebar-toggle-icon" />
+    </button>
   }
-</div> -->
-
-<!-- menu list -->
-<ng-container *ngFor="let item of items">
-  <app-nav-item [item]="item" [depth]="0" (notify)="toggleMobileNav.emit()"></app-nav-item>
-</ng-container>
+</div>
 

@@ -190,11 +190,38 @@ html .topbar {
     }
 }
 
+// Logo in header when sidebar is hidden (client list, profile pages)
+.header-logo-wrapper {
+  margin-right: 24px;
+  flex-shrink: 0;
+}
+
+// Expand sidebar toggle - shown in header when sidebar is collapsed
+.header-expand-toggle {
+  flex-shrink: 0;
+}
+
+.header-toggle-icon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
+// Header margin and width when sidebar is visible - keeps bell/avatar within viewport
+.sidebar-visible .top-navigation-bar {
+  margin-left: 295px;
+  width: calc(100% - 295px);
+  transition: margin-left 0.3s ease, width 0.3s ease;
+}
+.sidebar-visible.sidebar-collapsed .top-navigation-bar {
+  margin-left: 80px;
+  width: calc(100% - 80px);
+}
+
 // Header breadcrumb (Home icon > Client name > Plan name)
-// Fixed at 120px from left (sidebar width) so it does not move when logo width changes
 .header-breadcrumb {
   position: absolute;
-  left: 295px;
+  left: 24px;
   top: 50%;
   transform: translateY(-50%);
   margin: 0;
@@ -202,6 +229,7 @@ html .topbar {
   font-size: 14px;
   font-weight: 400;
   color: #787889;
+  transition: left 0.3s ease;
 
   .breadcrumb-home-icon {
     width: 20px;
@@ -229,4 +257,8 @@ html .topbar {
   .breadcrumb-current {
     color: #1c1c1c;
   }
+}
+
+.sidebar-collapsed .header-breadcrumb {
+  left: 64px;
 }

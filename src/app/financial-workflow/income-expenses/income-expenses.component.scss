@@ -59,6 +59,25 @@
   }
 }
 
+.amount-divider-vertical {
+  width: 1px;
+  min-width: 1px;
+  height: 1.2em;
+  background-color: #e7e7eb;
+  margin: 0 10px;
+  align-self: center;
+}
+
+.income-owner-badge {
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 13px;
+  font-weight: 500;
+  background-color: #516ce8;
+  color: white;
+}
+
+
 .income-expense-tables {
   .row {
     margin: 0;

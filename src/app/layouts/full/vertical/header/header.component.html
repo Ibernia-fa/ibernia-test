@@ -1,9 +1,20 @@
 <!-- <mat-toolbar class="topbar"> -->
 <mat-toolbar class="top-navigation-bar">
   <!-- --------------------------------------------------------------- -->
-  <!-- Desktop Menu -->
-  <!-- <div class="branding"> -->
-    <app-branding *ngIf="isBrandLogoLoaded" [profileImage]="brandingLogo"></app-branding>
+  <!-- Logo in header when sidebar is hidden (client list, profile, etc.) -->
+  @if (hideSidebarToggle && isBrandLogoLoaded) {
+    <div class="header-logo-wrapper">
+      <app-branding [profileImage]="brandingLogo"></app-branding>
+    </div>
+  }
+  <!-- Expand sidebar toggle - outside sidebar when collapsed (desktop only) -->
+  @if (!hideSidebarToggle && showToggle && options.sidenavCollapsed) {
+    <button mat-icon-button (click)="toggleCollapsed.emit()" class="header-expand-toggle m-r-8" aria-label="Expand sidebar">
+      <img src="assets/images/sidebar/sidebar_toggle.png" alt="Expand sidebar" class="header-toggle-icon" />
+    </button>
+  }
+  <!-- --------------------------------------------------------------- -->
+  <!-- Desktop Menu - Logo moved to sidebar -->
   <ng-container *ngIf="isCashflowRoute && clientProfileLink && clientFullName">
     <nav class="header-breadcrumb d-flex align-items-center" aria-label="Breadcrumb">
       <a [routerLink]="['/clients']" class="breadcrumb-link d-flex align-items-center text-decoration-none" matTooltip="Home">

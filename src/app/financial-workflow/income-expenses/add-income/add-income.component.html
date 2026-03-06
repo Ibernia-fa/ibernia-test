@@ -53,6 +53,16 @@
         </div>
         }
 
+        @if(showPersonSelector) {
+        <div class="d-flex flex-column gap-8">
+          <mat-label class="f-s-16 d-block" style="line-height: 18px">{{ 'Ownership' | translate }}</mat-label>
+          <mat-select [value]="editingPerson" (selectionChange)="onEditingPersonChange($event.value)" class="w-100" hideSingleSelectionIndicator>
+            <mat-option value="client">{{ clientDisplayName }}</mat-option>
+            <mat-option value="partner">{{ partnerDisplayName }}</mat-option>
+          </mat-select>
+        </div>
+        }
+
         <div class="d-flex flex-column gap-4 net-fields">
           <div class="d-flex flex-column gap-8">
             <mat-label class="f-s-16 d-block" style="line-height: 18px">{{ 'Net amount' | translate }}</mat-label>
@@ -87,7 +97,7 @@
         </div>
 
         <!-- Bonus -->
-        @if(incomeForm.get('description')?.value === 'Salary') {
+        @if(incomeForm.get('description')?.value === 'Salary' || incomeForm.get('description')?.value === 'Salary (Partner)') {
         <div class="d-flex flex-column gap-4 net-fields">
           <div class="d-flex flex-column gap-8">
             <mat-checkbox formControlName="addBonus">

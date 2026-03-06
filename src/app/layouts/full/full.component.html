@@ -1,4 +1,6 @@
-<span [dir]="options.dir!">
+<span [dir]="options.dir!"
+  [class.sidebar-visible]="!hideSidebar && !options.horizontal"
+  [class.sidebar-collapsed]="options.sidenavCollapsed && options.navPos !== 'top' && !resView && !hideSidebar">
   <ng-container>
     <app-header [hideSidebarToggle]="hideSidebar" [showToggle]="!isOver" (toggleCollapsed)="toggleCollapsed()"
       (toggleMobileNav)="sidenav.toggle()" (toggleMobileFilterNav)="filterNavRight.toggle()"
@@ -28,7 +30,12 @@
           !resView
         " (openedChange)="onSidenavOpenedChange($event)" (closedStart)="onSidenavClosedStart()" class="sidebarNav">
         <div class="flex-layout">
-          <app-sidebar (toggleMobileNav)="sidenav.toggle()" [showToggle]="isOver"></app-sidebar>
+          <app-sidebar
+            (toggleMobileNav)="sidenav.toggle()"
+            (toggleCollapsed)="toggleCollapsed()"
+            [showToggle]="isOver"
+            [sidenavCollapsed]="options.sidenavCollapsed"
+          ></app-sidebar>
           <div class="scrollable-content">
             <ng-scrollbar class="position-relative" style="height: 100%">
               <mat-nav-list class="sidebar-list">

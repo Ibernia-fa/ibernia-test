@@ -43,45 +43,33 @@
                                 </div>
                             </div>
                         </mat-card>
-                        @for(income of defaultIncomes; track trackByIncomeId; let i = $index) {
+                        @for(displayItem of displayDefaultIncomes; track trackByDisplayIncomeId($index, displayItem); let i = $index) {
                         <mat-card-content class="m-b-10" style="padding: 0px;">
                             <div class="cashflow-drag-wrapper">
                                 <div class="d-flex flex-column gap-20">
                                     <div class="flex-column d-flex gap-10" id="drag-boundary">
-                                        <div
-                                            class="d-flex justify-content-between align-items-center gap-12 dragable-card-wrapper">
+                                        <div class="d-flex justify-content-between align-items-center gap-12 dragable-card-wrapper">
                                             <div class="dragable-card d-flex align-items-center justify-content-between cursor-pointer"
-                                                (click)="updateIncomeClicked(income)">
+                                                (click)="updateIncomeClicked(displayItem.income)">
                                                 <div class="d-flex align-items-center gap-8">
                                                     <div class="stats-main-wrapper">
                                                         <div class="d-flex flex-column gap-8">
                                                             <div class="d-flex align-items-center gap-8">
-                                                                @if(income.amount.amount == 0)
-                                                                {
-                                                                <img height="32px;"
-                                                                    [src]="'/assets/images/svgs/' + income.icon + '-gray.svg'"
-                                                                    alt="income-icon" />
+                                                                @if(displayItem.income.amount.amount == 0) {
+                                                                <img height="32px;" [src]="'/assets/images/svgs/' + displayItem.income.icon + '-gray.svg'" alt="income-icon" />
+                                                                } @else {
+                                                                <img height="32px;" [src]="'/assets/images/svgs/' + displayItem.income.icon + '-green.svg'" alt="income-icon" />
                                                                 }
-                                                                @else {
-                                                                <img height="32px;"
-                                                                    [src]="'/assets/images/svgs/' + income.icon + '-green.svg'"
-                                                                    alt="income-icon" />
-                                                                }
-                                                                <h3 class="card-title card-title-margin">
-                                                                    {{income.description}}</h3>
+                                                                <h3 class="card-title card-title-margin">{{ displayItem.displayTitle ?? displayItem.income.description }}</h3>
                                                             </div>
                                                             <div class="d-flex align-items-center gap-10">
                                                                 <h3 class="saving-title">
-                                                                    @if(income.amount.amount == 0)
-                                                                    {
-                                                                    <span class="paragraph-text">{{'Set amount' |
-                                                                        translate}}</span>
-                                                                    }
-                                                                    @else {
+                                                                    @if(displayItem.income.amount.amount == 0) {
+                                                                    <span class="paragraph-text">{{'Set amount' | translate}}</span>
+                                                                    } @else {
                                                                     <h3 class="card-title">
-                                                                        +{{income.amount.currencySymbol|currencySymbol}}{{income.amount.amount|thousandSeparator}}
-                                                                        <span
-                                                                            class="paragraph-text">/{{getCycle(income.amount.cycle?.description)}}</span>
+                                                                        +{{displayItem.income.amount.currencySymbol|currencySymbol}}{{displayItem.income.amount.amount|thousandSeparator}}
+                                                                        <span class="paragraph-text">/{{getCycle(displayItem.income.amount.cycle?.description)}}</span>
                                                                     </h3>
                                                                     }
                                                                 </h3>
@@ -89,44 +77,32 @@
                                                         </div>
                                                     </div>
                                                 </div>
-
-                                                <div class="menu" [className]="income.description === 'Salary' ? 'menu-top-margin-13' : 'menu-top-margin'">
-                                                    <div [className]="income.description === 'Salary' ? 'd-flex align-items-center justify-content-end' : 'd-flex align-items-center justify-content-center'">
-                                                        <button
-                                                            (click)="$event.stopPropagation(); $event.preventDefault()"
-                                                            mat-icon-button [matMenuTriggerFor]="menu">
-                                                            <mat-icon>
-                                                                <img src="assets/images/svgs/dropdown-detail.svg"
-                                                                    alt="dropdown-detail" />
-                                                            </mat-icon>
+                                                <div class="menu" [className]="displayItem.income.description === 'Salary' || displayItem.income.description === 'Salary (Partner)' ? 'menu-top-margin-13' : 'menu-top-margin'">
+                                                    <div [className]="displayItem.income.description === 'Salary' || displayItem.income.description === 'Salary (Partner)' ? 'd-flex align-items-center justify-content-end' : 'd-flex align-items-center justify-content-center'">
+                                                        <button (click)="$event.stopPropagation(); $event.preventDefault()" mat-icon-button [matMenuTriggerFor]="menu">
+                                                            <mat-icon><img src="assets/images/svgs/dropdown-detail.svg" alt="dropdown-detail" /></mat-icon>
                                                         </button>
                                                     </div>
                                                     <mat-menu #menu="matMenu" xPosition="before" class="dropdown-menus">
-                                                        <button (click)="updateIncomeClicked(income)" mat-menu-item>
-                                                            <mat-icon>
-                                                                <img src="assets/images/svgs/drop-down-edit-2-line.svg"
-                                                                    alt="drop-down-copy-2-line" height="24"
-                                                                    width="24" />
-                                                            </mat-icon>
+                                                        <button (click)="updateIncomeClicked(displayItem.income)" mat-menu-item>
+                                                            <mat-icon><img src="assets/images/svgs/drop-down-edit-2-line.svg" alt="edit" height="24" width="24" /></mat-icon>
                                                             <span>{{ 'Edit' | translate }}</span>
                                                         </button>
-                                                        <button (click)="deleteIncome(income)" mat-menu-item>
-                                                            <mat-icon>
-                                                                <img src="assets/images/svgs/drop-down-delete-2-line.svg"
-                                                                    alt="drop-down-copy-2-line" height="24"
-                                                                    width="24" />
-                                                            </mat-icon>
+                                                        <button (click)="deleteIncome(displayItem.income)" mat-menu-item>
+                                                            <mat-icon><img src="assets/images/svgs/drop-down-delete-2-line.svg" alt="delete" height="24" width="24" /></mat-icon>
                                                             <span>{{ 'Delete' | translate }}</span>
                                                         </button>
                                                     </mat-menu>
-                                                    <div class="tile-bonus" *ngIf="income.description === 'Salary' && hasBonusAmount(income)">
+                                                    @if((displayItem.income.description === 'Salary' || displayItem.income.description === 'Salary (Partner)') && hasBonusAmount(displayItem.income)) {
+                                                    <div class="tile-bonus">
                                                         <h3 class="saving-title">
                                                             <h3 class="card-title">
-                                                                <span class="span-header">Bonus:</span> +{{income.bonus.amount.currencySymbol|currencySymbol}}{{income.bonus.amount.amount|thousandSeparator}}
-                                                                <span class="paragraph-text">/{{getCycle(income.bonus.amount.cycle?.description)}}</span>
+                                                                <span class="span-header">Bonus:</span> +{{displayItem.income.bonus.amount.currencySymbol|currencySymbol}}{{displayItem.income.bonus.amount.amount|thousandSeparator}}
+                                                                <span class="paragraph-text">/{{getCycle(displayItem.income.bonus.amount.cycle?.description)}}</span>
                                                             </h3>
                                                         </h3>
                                                     </div>
+                                                    }
                                                 </div>
                                             </div>
                                         </div>
