@@ -189,11 +189,9 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
           this.baselineForecastStartDate = timeline?.forecastStartDate
             ? new Date(timeline.forecastStartDate)
             : null;
-          this.baselineForecastEndDate = timeline?.forecastEndtDate
-            ? new Date(timeline.forecastEndtDate)
-            : null;
           this.populateCategoryItems();
           this.initFormFromPlan();
+          this.baselineForecastEndDate = this.getMaxForecastEndDate();
         }),
         switchMap(() => this.loadScenarioReport()),
         catchError((err) => {
@@ -304,7 +302,8 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
 
   private getMaxForecastEndDate(): Date {
     if (!this.client) return new Date();
-    const birthYear = new Date(this.client.clientDetails.birthDate).getFullYear();
+    const birthDate = new Date(this.client.clientDetails.birthDate);
+    const birthYear = birthDate.getFullYear();
     const mainAge = this.hasRetirementAge
       ? (Number(this.scenarioForm.get('retirementAge')?.value) || this.baselineRetirementAge)
       : this.baselineRetirementAge;
@@ -314,6 +313,22 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
       const partnerBirthYear = new Date(this.client.partnerDetail.birthDate).getFullYear();
       const partnerAge = Number(this.scenarioForm.get('partnerRetirementAge')?.value) || this.baselinePartnerRetirementAge;
       endYear = Math.max(endYear, partnerBirthYear + partnerAge);
+    }
+
+    if (this.cashflow && this.financialTimeline?.forecastStartDate) {
+      const forecastStartDate = new Date(this.financialTimeline.forecastStartDate);
+      const forecastStartYear = forecastStartDate.getFullYear();
+      const planDuration = Number(this.cashflow.planDuration);
+      if (Number.isFinite(planDuration) && planDuration > 0) {
+        const startAge = forecastStartDate.getFullYear() - birthYear;
+        const planEndYear = forecastStartYear + (planDuration - startAge);
+        endYear = Math.max(endYear, planEndYear);
+      }
+    }
+
+    if (this.financialTimeline?.forecastEndtDate) {
+      const timelineEndYear = new Date(this.financialTimeline.forecastEndtDate).getFullYear();
+      endYear = Math.max(endYear, timelineEndYear);
     }
 
     return new Date(endYear, 11, 31);
