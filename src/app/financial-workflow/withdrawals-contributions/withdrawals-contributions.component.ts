@@ -411,6 +411,12 @@ export class WithdrawalsContributionsComponent {
   }
 
   private isHappeningInYear(item: FinancialViewModel, year: number): boolean {
+    const desc = (item?.description ?? '').toLowerCase();
+    const isStatePension = desc === 'state pension' || desc === 'state pension (partner)';
+
+    // Include State pension (client & partner) in total like Salary & Inheritance, regardless of start year
+    if (isStatePension) return true;
+
     const startYear = Number(item?.start?.year ?? 0);
     const endYearRaw = Number(item?.end?.year ?? 0);
     const hasEnd = endYearRaw > 0;
