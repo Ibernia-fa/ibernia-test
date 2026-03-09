@@ -233,22 +233,21 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
             });
 
           // Hide/show Retirement age chip based on client age vs default retirement age.
+          // For joint accounts, always filter out generic "Retirement age" - syncRetirementChipVisibility adds named chips.
           this.systemEventsLibrary = [
             ...res[0],
             ...res[1],
           ]
             .filter(event => {
               if (event.name === 'State pension') return false;
-              if (event.name === 'Retirement age' && this.shouldHideRetirementChip()) return false;
               if (event.name === 'Inheritance') return false;
+              if (event.name === 'Retirement age') {
+                if (this.hasPartner) return false; // Joint: add named chips via syncRetirementChipVisibility
+                return !this.shouldHideRetirementChip(); // Solo: filter when on timeline
+              }
               return true;
             })
-            .sort((a, b) => {
-              return (
-                this.CHIP_ORDER.indexOf(a.name) -
-                this.CHIP_ORDER.indexOf(b.name)
-              );
-            });
+            .sort((a, b) => this.getChipSortOrder(a.name) - this.getChipSortOrder(b.name));
 
           this.cdr.detectChanges();
           // Single source of truth: hide/show Retirement age chip based on timeline state
@@ -340,17 +339,20 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
 
     this.lastValidDragTime = null;
 
-    if (this.draggedEvent?.name === 'Retirement age') {
+    if (this.draggedEvent?.name?.toLowerCase().startsWith('retirement age')) {
       const existingPrimary = this.financialTimeline.clientEvents.find(
         (event) => event.name.toLowerCase().startsWith('retirement age') && !event.isPartnerEvent
       );
       const existingPartner = this.financialTimeline.clientEvents.find(
         (event) => event.name.toLowerCase().startsWith('retirement age') && !!event.isPartnerEvent
       );
+      const isPartnerChip = !!this.draggedEvent?.isPartnerEvent;
 
-      if (!existingPrimary) {
-      } else if (this.hasPartner && !existingPartner) {
-      } else {
+      const canDropClient = !existingPrimary;
+      const canDropPartner = this.hasPartner && !existingPartner;
+      const allowed = isPartnerChip ? canDropPartner : canDropClient;
+
+      if (!allowed) {
         this.draggedEvent = null;
         return;
       }
@@ -374,11 +376,11 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
         clientEvent.name = this.getNextBirthName();
       }
 
-      const isPartnerRetirement = clientEvent.name === 'Retirement age'
-        && this.hasPartner
-        && this.financialTimeline.clientEvents.some(
-          e => e.name.toLowerCase().startsWith('retirement age') && !e.isPartnerEvent
-        );
+      const isPartnerRetirement = clientEvent.name?.toLowerCase().startsWith('retirement age')
+        && (this.draggedEvent?.isPartnerEvent === true
+          || (this.hasPartner && this.financialTimeline.clientEvents.some(
+            e => e.name.toLowerCase().startsWith('retirement age') && !e.isPartnerEvent
+          )));
 
       if (isPartnerRetirement) {
         clientEvent.isPartnerEvent = true;
@@ -1067,7 +1069,7 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
   private getContent(event: ClientEvent): string {
     const title = this.getEventTitleForDisplay(event);
     const img = event.iconUrl;
-    const extraClass = event.name === 'Retirement age' ? ' retirement-age-chip' : '';
+    const extraClass = event.name?.toLowerCase().startsWith('retirement age') ? ' retirement-age-chip' : '';
     return `
     <div class="timeline-event-chip with-padding${extraClass}" title="${title}">
       <div class="event-left">
@@ -1286,17 +1288,75 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   /**
-   * Re-evaluates whether the Retirement age chip should be shown or hidden:
-   * hide when client is below retirement age, show when at/past retirement age.
+   * Re-evaluates whether the Retirement age chip(s) should be shown or hidden.
+   * Solo: one chip when retirement not on timeline.
+   * Joint: one chip per person whose retirement is not on timeline (labeled with name).
    */
   private syncRetirementChipVisibility(): void {
     if (!this.systemEventsLibrary || !this.cachedSystemEventsLibrary) return;
 
-    if (this.shouldHideRetirementChip()) {
-      this.removeRetirementFromChips();
+    if (this.hasPartner) {
+      this.syncJointAccountRetirementChips();
     } else {
-      this.addRetirementBackToChips();
+      if (this.shouldHideRetirementChip()) {
+        this.removeRetirementFromChips();
+      } else {
+        this.addRetirementBackToChips();
+      }
     }
+  }
+
+  private syncJointAccountRetirementChips(): void {
+    const events = this.financialTimeline?.clientEvents ?? [];
+    const hasPrimaryRetirement = events.some(
+      ce => this.isRetirementEvent(ce) && !ce.isPartnerEvent && this.isEventInVisibleRange(ce)
+    );
+    const hasPartnerRetirement = events.some(
+      ce => this.isRetirementEvent(ce) && !!ce.isPartnerEvent && this.isEventInVisibleRange(ce)
+    );
+
+    const clientName = this.client?.clientDetails?.firstName?.trim() ?? '';
+    const partnerName = this.client?.partnerDetail?.firstName?.trim() ?? '';
+    const clientChipName = clientName ? `Retirement age ${clientName}` : 'Retirement age';
+    const partnerChipName = partnerName ? `Retirement age ${partnerName}` : 'Retirement age (partner)';
+
+    // Remove chips for people who have retirement on timeline
+    this.systemEventsLibrary = this.systemEventsLibrary.filter(e => {
+      if (!e.name?.toLowerCase().startsWith('retirement age')) return true;
+      if (e.name === clientChipName && hasPrimaryRetirement) return false;
+      if (e.name === partnerChipName && hasPartnerRetirement) return false;
+      if (e.name === 'Retirement age' && (hasPrimaryRetirement || hasPartnerRetirement)) return false;
+      return true;
+    });
+
+    // Add chips for people who don't have retirement on timeline
+    const retirement = this.cachedSystemEventsLibrary.find(e => e.name === 'Retirement age');
+    if (!retirement) return;
+
+    if (!hasPrimaryRetirement && !this.systemEventsLibrary.some(e => e.name === clientChipName)) {
+      this.systemEventsLibrary = [
+        ...this.systemEventsLibrary,
+        { ...retirement, name: clientChipName, isPartnerEvent: false }
+      ];
+    }
+    if (!hasPartnerRetirement && !this.systemEventsLibrary.some(e => e.name === partnerChipName)) {
+      this.systemEventsLibrary = [
+        ...this.systemEventsLibrary,
+        { ...retirement, name: partnerChipName, isPartnerEvent: true }
+      ];
+    }
+
+    this.systemEventsLibrary = [...this.systemEventsLibrary].sort(
+      (a, b) => this.getChipSortOrder(a.name) - this.getChipSortOrder(b.name)
+    );
+    this.cdr.detectChanges();
+  }
+
+  private getChipSortOrder(name: string): number {
+    if (name?.toLowerCase().startsWith('retirement age')) {
+      return this.CHIP_ORDER.indexOf('Retirement age');
+    }
+    return this.CHIP_ORDER.indexOf(name);
   }
 
   private shouldHideRetirementChip(): boolean {
@@ -1351,9 +1411,7 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
       ...this.systemEventsLibrary,
       retirement,
     ].sort(
-      (a, b) =>
-        this.CHIP_ORDER.indexOf(a.name) -
-        this.CHIP_ORDER.indexOf(b.name)
+      (a, b) => this.getChipSortOrder(a.name) - this.getChipSortOrder(b.name)
     );
 
     this.cdr.detectChanges();
