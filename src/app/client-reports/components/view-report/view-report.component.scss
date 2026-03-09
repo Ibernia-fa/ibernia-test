@@ -12,6 +12,8 @@
 :host ::ng-deep .sidebarNav {
   background-color: #16151C !important;
   border-right: 1px solid #16151C !important;
+  top: 65px !important; /* Start below fixed header */
+  height: calc(100% - 65px) !important;
 
   .mat-drawer-inner-container {
     background-color: #16151C;
@@ -566,4 +568,60 @@ tr.example-detail-row {
 
 .ibernia-dark-green {
   color: #00512C !important;
+}
+
+/* Shortfall status (synced with advisor dashboard) */
+.shortfall {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 16px;
+  width: fit-content;
+  font-size: 14px;
+}
+
+.shortfall-status-profit {
+  display: flex;
+  align-items: center;
+  padding: 4px 8px 4px 12px;
+  gap: 6px;
+  background-color: #ecfdf5;
+  border-radius: 16px;
+  border: 1px solid #59c996;
+}
+
+.shortfall-status-loss {
+  display: flex;
+  align-items: center;
+  padding: 4px 8px 4px 12px;
+  gap: 6px;
+  background-color: #fff1f2;
+  border-radius: 16px;
+  border: 1px solid #ff4444;
+}
+
+.icon-bg {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  box-sizing: content-box;
+}
+
+.leaf-bg {
+  background-color: #59c996;
+}
+
+.flag-bg {
+  background-color: #ff4444;
+}
+
+.icon-svg {
+  width: 16px;
+  height: 16px;
+  display: block;
+  filter: brightness(0) invert(1);
+  background: transparent;
 }
