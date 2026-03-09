@@ -3,7 +3,7 @@ import { MatCardModule } from '@angular/material/card';
 import { TablerIconsModule } from 'angular-tabler-icons';
 import { NgApexchartsModule } from 'ng-apexcharts';
 import moment from 'moment';
-import { ChartSeries, TimelineEvent } from '../../models/charts-series.model';
+import { ChartSeries, Series, TimelineEvent } from '../../models/charts-series.model';
 import { Client } from 'src/app/clients/models/client';
 
 @Component({
@@ -69,27 +69,46 @@ export class ViewSavingsBarStackedChartComponent implements OnChanges, OnDestroy
       },
       tooltip: {
         enabled: true,
-        shared: false,
+        shared: true,
+        intersect: false,
         custom: (opts: any) => {
-          const { series, seriesIndex, dataPointIndex, w } = opts;
+          const comp = (this as unknown as ViewSavingsBarStackedChartComponent);
+          const { series, dataPointIndex, w } = opts;
 
-          const value = series[seriesIndex][dataPointIndex];
-          const seriesName = w.globals.seriesNames[seriesIndex];
           const xValue = w.globals.labels[dataPointIndex];
           const year = Number(xValue);
-          const firstYear = Number(w.globals.labels?.[0]);
-          const age = this.getDisplayAgeForYear(year, Number.isFinite(firstYear) ? firstYear : null);
+          const labels = w.globals.labels ?? [];
+          const firstYear = labels.length ? Number(labels[0]) : null;
+          const lastYear = labels.length ? Number(labels[labels.length - 1]) : null;
+          const age = comp.getDisplayAgeForYear(year, Number.isFinite(firstYear) ? firstYear : null, Number.isFinite(lastYear) ? lastYear : null);
+
+          const bodyRows = w.globals.seriesNames
+            .map((seriesName: string, i: number) => {
+              const value = series[i]?.[dataPointIndex];
+              if (value === undefined || (typeof value === 'number' && value === 0)) return '';
+              const originalSeries = comp.report?.series?.find((s: Series) => s.name === seriesName);
+              const color = (originalSeries?.color && originalSeries.color !== 'transparent') ? originalSeries.color : w.globals.colors[i];
+              const displayValue = typeof value === 'number'
+                ? comp.formatCurrency(value)
+                : String(value ?? '');
+              return `
+              <div class="savings-tooltip__body">
+                <div class="savings-tooltip__label">
+                  <span class="circle-wrapper" style="background-color: ${color};"></span>${seriesName}:</div>
+                <div class="savings-tooltip__value">${displayValue}</div>
+              </div>`;
+            })
+            .filter(Boolean)
+            .join('');
+
           return `
-          <div class="savings-tooltip">
-            <div class="savings-tooltip__header">
-              <div>Age: ${age} </div>  <div> Year: ${xValue}</div> 
+            <div class="savings-tooltip">
+              <div class="savings-tooltip__header">
+                <div>Age: ${age} </div>  <div> Year: ${xValue}</div> 
+              </div>
+              ${bodyRows}
             </div>
-            <div class="savings-tooltip__body">
-              <div class="savings-tooltip__label">${seriesName}:</div>
-              <div class="savings-tooltip__value">${Number(value ?? 0).toLocaleString()}</div>
-            </div>
-          </div>
-        `;
+          `;
         }
       },
       responsive: [
@@ -134,18 +153,42 @@ export class ViewSavingsBarStackedChartComponent implements OnChanges, OnDestroy
     };
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['report'] && this.report?.series?.length) {
-      const seriesList = this.report.series;
+  /** Trims report to only include years up to forecastEndDate (projection end year). */
+  private trimReportToEndYear(report: ChartSeries | null | undefined): ChartSeries | null | undefined {
+    if (!report?.categories?.length || !this.forecastEndDate) return report;
+    const endYear = moment(this.forecastEndDate).year();
+    const indicesToKeep: number[] = [];
+    report.categories.forEach((cat, i) => {
+      const y = Number(cat);
+      if (Number.isFinite(y) && y <= endYear) indicesToKeep.push(i);
+    });
+    if (indicesToKeep.length === report.categories.length) return report;
+    const categories = indicesToKeep.map((i) => report.categories[i]);
+    const series = report.series.map((s) => ({
+      ...s,
+      data: indicesToKeep.map((i) => s.data[i] ?? 0),
+    }));
+    const timelineEvents = (report.timelineEvents ?? []).filter((e) =>
+      Number.isFinite(e.startYear) && e.startYear <= endYear
+    );
+    return { ...report, categories, series, timelineEvents };
+  }
 
-      // dynamically build fillColors array based on series names
-      const fillColors = seriesList.map((s) =>
-        s.name === 'Current Account (Negative)' ? 'transparent' : s.color
+  ngOnChanges(changes: SimpleChanges): void {
+    const report = this.trimReportToEndYear(this.report);
+
+    if (changes['report'] && report?.series?.length) {
+      const seriesList = report.series;
+
+      // dynamically build fillColors array based on series names (match advisor)
+      const fillColors = seriesList.map((s: Series) =>
+        s.name === 'Current Account (Negative)' || s.name === 'Emergency Expense' ? 'transparent' : s.color
       );
       this.chartOptions.legend = {
         ...this.chartOptions.legend,
+        showForZeroSeries: false, // hide Cash when all zeros (shortfall scenario)
         formatter: (seriesName: string) =>
-          seriesName === 'Current Account (Negative)' ? '' : seriesName,
+          seriesName === 'Current Account (Negative)' || seriesName === 'Emergency Expense' ? '' : seriesName,
         markers: {
           fillColors: fillColors
         },
@@ -157,9 +200,9 @@ export class ViewSavingsBarStackedChartComponent implements OnChanges, OnDestroy
         }
       };
 
-      this.events = this.report.timelineEvents ?? [];
+      this.events = report.timelineEvents ?? [];
       this.chartOptions.annotations = { points: this.buildEventAnnotations(this.events) };
-      this.chartOptions.series = this.report.series.map((s) => ({ ...s, tack: 'stack1' }));
+      this.chartOptions.series = report.series.map((s) => ({ ...s, tack: 'stack1' }));
 
       if (this.events.length === 0) {
         this.cleanupHtmlTooltips();
@@ -172,8 +215,9 @@ export class ViewSavingsBarStackedChartComponent implements OnChanges, OnDestroy
     }
 
     if (changes['report'] || changes['forecastStartDate'] || changes['forecastEndDate']) {
-      const categories = this.report?.categories ?? [];
-      const firstCategoryYear = Number(categories[0]);
+      const categories = report?.categories ?? [];
+      const firstCategoryYear = categories.length ? Number(categories[0]) : null;
+      const lastCategoryYear = categories.length ? Number(categories[categories.length - 1]) : null;
       this.chartOptions.xaxis = {
         type: 'category',
         categories,
@@ -187,7 +231,8 @@ export class ViewSavingsBarStackedChartComponent implements OnChanges, OnDestroy
             const year = Number(value);
             const age = this.getDisplayAgeForYear(
               year,
-              Number.isFinite(firstCategoryYear) ? firstCategoryYear : null
+              Number.isFinite(firstCategoryYear) ? firstCategoryYear : null,
+              Number.isFinite(lastCategoryYear) ? lastCategoryYear : null
             );
             return age === '' ? value : String(age);
           }
@@ -352,7 +397,7 @@ export class ViewSavingsBarStackedChartComponent implements OnChanges, OnDestroy
     return this.ICON_COLORS[iconUrl] ?? '#8388ff';
   }
 
-  private getDisplayAgeForYear(year: number, firstCategoryYear: number | null): number | '' {
+  private getDisplayAgeForYear(year: number, firstCategoryYear: number | null, lastCategoryYear: number | null): number | '' {
     if (!Number.isFinite(year)) {
       return '';
     }
@@ -367,13 +412,21 @@ export class ViewSavingsBarStackedChartComponent implements OnChanges, OnDestroy
       return '';
     }
 
-    let age = year - birthDate.getFullYear();
-
-    if (firstCategoryYear != null && year === firstCategoryYear && this.forecastStartDate) {
-      age = this.calculateAgeAtDate(this.forecastStartDate, birthDate);
+    const birthYear = birthDate.getFullYear();
+    // First year: age at forecast start (e.g. 45 if projection starts before they turn 46).
+    if (
+      firstCategoryYear != null &&
+      year === firstCategoryYear &&
+      this.forecastStartDate
+    ) {
+      return this.calculateAgeAtDate(this.forecastStartDate, birthDate);
     }
-
-    return age;
+    // Last year: age they turn (projection end age, e.g. 78).
+    if (lastCategoryYear != null && year === lastCategoryYear) {
+      return year - birthYear;
+    }
+    // Other years: age at start of year (matches timeline events, e.g. Age 64 Year 2045).
+    return year - birthYear - 1;
   }
 
   private calculateAgeAtDate(referenceDate: Date, birthDate: Date): number {
@@ -382,11 +435,7 @@ export class ViewSavingsBarStackedChartComponent implements OnChanges, OnDestroy
     const hasBirthdayPassed =
       date.getMonth() > birthDate.getMonth() ||
       (date.getMonth() === birthDate.getMonth() && date.getDate() >= birthDate.getDate());
-
-    if (!hasBirthdayPassed) {
-      age--;
-    }
-
+    if (!hasBirthdayPassed) age--;
     return age;
   }
 
@@ -396,5 +445,25 @@ export class ViewSavingsBarStackedChartComponent implements OnChanges, OnDestroy
 
     const parsed = new Date(raw);
     return Number.isNaN(parsed.getTime()) ? null : parsed;
+  }
+
+  formatCurrency(value: number): string {
+    if (typeof value !== 'number' || !Number.isFinite(value)) {
+      return value != null ? String(value) : '';
+    }
+    const code = this.client?.clientDetails?.preferredCurrency;
+    if (!code || code.length !== 3) {
+      return value.toLocaleString();
+    }
+    try {
+      return new Intl.NumberFormat(undefined, {
+        style: 'currency',
+        currency: code,
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }).format(value);
+    } catch {
+      return value.toLocaleString();
+    }
   }
 }

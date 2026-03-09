@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
 import { MatIconModule } from '@angular/material/icon';
@@ -63,8 +63,10 @@ import { ChartSeries } from 'src/app/financial-workflow/reports/models/charts-se
   styleUrl: './view-report.component.scss',
 })
 
-export class ViewReportComponent {
+export class ViewReportComponent implements OnChanges {
   @Input() financialSeries: any;
+  /** Cached effective end date. Set when financialSeries changes to avoid change-detection loops. */
+  effectiveReportEndDate: Date | null = null;
   
   get clientBirthDate() {
     return this.financialSeries?.client.clientDetails.birthDate;
@@ -96,6 +98,29 @@ export class ViewReportComponent {
 
   get advisorName () {
     return this.financialSeries?.client?.financialAdvisor?.advisorName;
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['financialSeries']) {
+      this.effectiveReportEndDate = this.computeEffectiveReportEndDate();
+    }
+  }
+
+  private computeEffectiveReportEndDate(): Date | null {
+    const timeline = this.financialTimeline;
+    const birthDate = this.clientBirthDate ? new Date(this.clientBirthDate) : null;
+    const cf = this.cashflow;
+    if (!timeline?.forecastStartDate || !birthDate || !cf?.planDuration) {
+      return timeline?.forecastEndtDate ? new Date(timeline.forecastEndtDate) : null;
+    }
+    const planDuration = Number(cf.planDuration);
+    if (!Number.isFinite(planDuration) || planDuration <= 0) {
+      return timeline.forecastEndtDate ? new Date(timeline.forecastEndtDate) : null;
+    }
+    const planEndYear = birthDate.getFullYear() + planDuration;
+    const forecastStartYear = new Date(timeline.forecastStartDate).getFullYear();
+    const effectiveYear = Math.max(forecastStartYear, planEndYear);
+    return new Date(Date.UTC(effectiveYear, 11, 31, 12, 0, 0));
   }
 
   get emergencies(): ClientEmergency[] {
