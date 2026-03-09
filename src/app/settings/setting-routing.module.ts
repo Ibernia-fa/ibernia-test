@@ -33,6 +33,9 @@ const routes: Routes = [
   { path: 'ai-reccomendations', loadComponent: () =>
     import('./ai-reccomendations/ai-reccomendations.component')
       .then(m => m.AiReccomendationsComponent), data: { showSidebar: true } },
+  { path: 'privacy-data', loadComponent: () =>
+    import('./privacy-data/privacy-data.component')
+      .then(m => m.PrivacyDataComponent), data: { showSidebar: true } },
 ];
 
 @NgModule({

@@ -10,11 +10,17 @@ export const settingsNavItems: NavItem[] = [
     route: '/settings/account-preferences',
   },
   {
-    displayName: 'Security & Privacy',
+    displayName: 'Security',
     iconName: '/assets/images/svgs/shield-check.svg',
     iconOutline: '/assets/images/svgs/shield-check.svg',
     route: `${environment.authority}/Manage/ChangePassword`,
     external: true,
+  },
+  {
+    displayName: 'Privacy & Data',
+    iconName: '/assets/images/svgs/shield-check.svg',
+    iconOutline: '/assets/images/svgs/shield-check.svg',
+    route: '/settings/privacy-data',
   },
   {
     displayName: 'Plans & Billing',
