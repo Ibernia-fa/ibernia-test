@@ -24,6 +24,7 @@ import { TablerIconsModule } from 'angular-tabler-icons';
 import { MaterialModule } from 'src/app/material.module';
 import { TranslateModule } from '@ngx-translate/core';
 import { ClientEmergency, EmergenciesLookupData } from '../../models/financial-series.model';
+import { ChartSeries } from 'src/app/financial-workflow/reports/models/charts-series.model';
 
 @Component({
   selector: 'app-view-report',
@@ -111,6 +112,32 @@ export class ViewReportComponent {
 
   get emergencyStats() {
     return this.emergenciesLookupData?.emergenciesStats;
+  }
+
+  get hasShortfall(): boolean {
+    return this.computeShortfallStatus().hasShortfall;
+  }
+
+  get firstShortfallAge(): number | null {
+    return this.computeShortfallStatus().firstShortfallAge;
+  }
+
+  private computeShortfallStatus(): { hasShortfall: boolean; firstShortfallAge: number | null } {
+    const r = this.report as ChartSeries | undefined;
+    if (!r?.series) return { hasShortfall: false, firstShortfallAge: null };
+
+    const shortfallSeries = r.series.find((s: { name: string }) => s.name === 'Shortfall');
+    if (!shortfallSeries) return { hasShortfall: false, firstShortfallAge: null };
+
+    const index = shortfallSeries.data?.findIndex((v: number) => v < 0);
+    if (index == null || index < 0) return { hasShortfall: false, firstShortfallAge: null };
+
+    const year = Number(r.categories?.[index]);
+    const birthDate = this.client?.clientDetails?.birthDate;
+    if (!birthDate || !Number.isFinite(year)) return { hasShortfall: true, firstShortfallAge: null };
+
+    const birthYear = new Date(birthDate).getFullYear();
+    return { hasShortfall: true, firstShortfallAge: year - birthYear };
   }
 
   private readonly defaultIcon = 'shield.svg';
