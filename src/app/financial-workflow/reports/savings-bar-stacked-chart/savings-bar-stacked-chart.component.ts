@@ -64,6 +64,27 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
     return this.client?.clientDetails?.preferredCurrency ?? '';
   }
 
+  /** Trims report to only include years up to forecastEndDate (projection end year). */
+  private trimReportToEndYear(report: ChartSeries | null | undefined): ChartSeries | null | undefined {
+    if (!report?.categories?.length || !this.forecastEndDate) return report;
+    const endYear = moment(this.forecastEndDate).year();
+    const indicesToKeep: number[] = [];
+    report.categories.forEach((cat, i) => {
+      const y = Number(cat);
+      if (Number.isFinite(y) && y <= endYear) indicesToKeep.push(i);
+    });
+    if (indicesToKeep.length === report.categories.length) return report;
+    const categories = indicesToKeep.map((i) => report.categories[i]);
+    const series = report.series.map((s) => ({
+      ...s,
+      data: indicesToKeep.map((i) => s.data[i] ?? 0),
+    }));
+    const timelineEvents = (report.timelineEvents ?? []).filter((e) =>
+      Number.isFinite(e.startYear) && e.startYear <= endYear
+    );
+    return { ...report, categories, series, timelineEvents };
+  }
+
   constructor() {
     this.chartOptions = {
       series: [],
@@ -120,8 +141,10 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
 
     const xValue = w.globals.labels[dataPointIndex];
     const year = Number(xValue);
-    const firstYear = Number(w.globals.labels?.[0]);
-    const age = this.getDisplayAgeForYear(year, firstYear);
+    const labels = w.globals.labels ?? [];
+    const firstYear = labels.length ? Number(labels[0]) : null;
+    const lastYear = labels.length ? Number(labels[labels.length - 1]) : null;
+    const age = this.getDisplayAgeForYear(year, Number.isFinite(firstYear) ? firstYear : null, Number.isFinite(lastYear) ? lastYear : null);
 
     const bodyRows = w.globals.seriesNames
       .map((seriesName: string, i: number) => {
@@ -248,7 +271,8 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
       };
     }
 
-    if (!this.report?.series?.length) {
+    const report = this.trimReportToEndYear(this.report);
+    if (!report?.series?.length) {
       if (changes['client'] && this.client) {
         this.chartOptions.yaxis = {
           title: {
@@ -262,8 +286,6 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
       }
       return;
     }
-
-    const report = this.report;
 
     if (changes['report']) {
       this.cleanupHtmlTooltips();
@@ -374,6 +396,7 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
         : 1;
 
     const firstCategoryYear = Number.isFinite(firstYear) ? Number(firstYear) : null;
+    const lastCategoryYear = Number.isFinite(lastYear) ? Number(lastYear) : null;
 
     this.chartOptions.xaxis = {
       type: 'category',
@@ -390,7 +413,7 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
         style: { cssClass: 'leftAlign' },
         formatter: (value: string) => {
           const year = Number(value);
-          const age = this.getDisplayAgeForYear(year, firstCategoryYear);
+          const age = this.getDisplayAgeForYear(year, firstCategoryYear, lastCategoryYear);
           return age === '' ? value : String(age);
         },
       },
@@ -411,14 +434,16 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
         ? moment(this.client.clientDetails.birthDate).year()
         : null;
       if (this.chartOptions.xaxis?.labels && birthYear != null) {
-        const firstCategoryYear = Number(this.chartOptions.xaxis?.categories?.[0]);
+        const cats = this.chartOptions.xaxis?.categories ?? [];
+        const firstCategoryYear = cats.length ? Number(cats[0]) : null;
+        const lastCategoryYear = cats.length ? Number(cats[cats.length - 1]) : null;
         this.chartOptions.xaxis = {
           ...this.chartOptions.xaxis,
           labels: {
             ...this.chartOptions.xaxis.labels,
             formatter: (value: string) => {
               const year = Number(value);
-              const age = this.getDisplayAgeForYear(year, Number.isFinite(firstCategoryYear) ? firstCategoryYear : null);
+              const age = this.getDisplayAgeForYear(year, Number.isFinite(firstCategoryYear) ? firstCategoryYear : null, Number.isFinite(lastCategoryYear) ? lastCategoryYear : null);
               return age === '' ? value : String(age);
             },
           },
@@ -924,26 +949,26 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
     }
   }
 
-  private getDisplayAgeForYear(year: number, firstCategoryYear: number | null): number | '' {
+  private getDisplayAgeForYear(year: number, firstCategoryYear: number | null, lastCategoryYear: number | null): number | '' {
     const birthDate = this.getClientBirthDate();
     if (!birthDate || !Number.isFinite(year)) {
       return '';
     }
-
-    // Derive every age from the precise base age at the first plotted year
-    // so the sequence always increments by exactly 1 per year (no gaps).
+    const birthYear = birthDate.getFullYear();
+    // First year: age at forecast start (e.g. 45 if projection starts before they turn 46).
     if (
       firstCategoryYear != null &&
-      Number.isFinite(firstCategoryYear) &&
+      year === firstCategoryYear &&
       this.forecastStartDate
     ) {
-      const baseAge = this.calculateAgeAtDate(this.forecastStartDate, birthDate);
-      return baseAge + (year - firstCategoryYear);
+      return this.calculateAgeAtDate(this.forecastStartDate, birthDate);
     }
-
-    // Fallback when there is no first category year or forecast start date
-    const birthYear = birthDate.getFullYear();
-    return year - birthYear;
+    // Last year: age they turn (projection end age, e.g. 78).
+    if (lastCategoryYear != null && year === lastCategoryYear) {
+      return year - birthYear;
+    }
+    // Other years: age at start of year (matches timeline events, e.g. Age 64 Year 2045).
+    return year - birthYear - 1;
   }
 
   private calculateAgeAtDate(referenceDate: Date, birthDate: Date): number {

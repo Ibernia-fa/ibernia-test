@@ -639,7 +639,7 @@
                                 <div class="d-flex flex-column gap-32">
                                     <app-view-savings-bar-stacked-chart [report]="report" [client]="client"
                                         [forecastStartDate]="financialTimeline.forecastStartDate"
-                                        [forecastEndDate]="financialTimeline.forecastEndtDate"
+                                        [forecastEndDate]="effectiveReportEndDate ?? financialTimeline?.forecastEndtDate ?? null"
                                         [cashFlowName]="cashflow?.name">
                                     </app-view-savings-bar-stacked-chart>
                                 </div>

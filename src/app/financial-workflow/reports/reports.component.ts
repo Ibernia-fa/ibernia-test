@@ -187,6 +187,10 @@ export class ReportsComponent {
   @ViewChild('compareChart') compareChart?: SavingsBarStackedChartComponent;
   hasShortfall: boolean = false;
   firstShortfallAge: number | null = null;
+  /** Cached effective end date for main chart. Set when report loads to avoid change-detection loops. */
+  effectiveReportEndDate: Date | null = null;
+  /** Cached effective end date for compare chart. Set when compare report loads. */
+  effectiveCompareReportEndDate: Date | null = null;
 
   constructor(
     private timelineHttpService: TimelineHttpService,
@@ -408,30 +412,22 @@ export class ReportsComponent {
     });
 }
 
-  private getEffectiveReportEndDate(timeline: FinancialTimeline): Date | null {
-    if (!timeline?.forecastStartDate || !this.client?.clientDetails?.birthDate || !this.cashflow) {
+  private getEffectiveReportEndDate(timeline: FinancialTimeline, cashflowOverride?: Cashflow | null): Date | null {
+    const cf = cashflowOverride ?? this.cashflow;
+    if (!timeline?.forecastStartDate || !this.client?.clientDetails?.birthDate || !cf) {
       return timeline?.forecastEndtDate ? new Date(timeline.forecastEndtDate) : null;
     }
     const forecastStartDate = new Date(timeline.forecastStartDate);
     const forecastStartYear = forecastStartDate.getFullYear();
     const birthDate = new Date(this.client.clientDetails.birthDate);
-    const planDuration = Number(this.cashflow.planDuration);
+    const planDuration = Number(cf.planDuration);
     if (!Number.isFinite(planDuration) || planDuration <= 0) {
-      return timeline.forecastEndtDate ? new Date(timeline.forecastEndtDate) : null;
+      return timeline?.forecastEndtDate ? new Date(timeline.forecastEndtDate) : null;
     }
-    const startAge = this.calculateAgeAtDate(forecastStartDate, birthDate);
-    const planEndYear = forecastStartYear + (planDuration - startAge);
+    // Year when client turns planDuration (e.g. 78) = birthYear + planDuration. Matches backend/timeline.
+    const planEndYear = birthDate.getFullYear() + planDuration;
     const effectiveYear = Math.max(forecastStartYear, planEndYear);
-    return new Date(effectiveYear, 11, 31);
-  }
-
-  private calculateAgeAtDate(date: Date, dateOfBirth: Date): number {
-    let age = date.getFullYear() - dateOfBirth.getFullYear();
-    const hasBirthdayPassed =
-      date.getMonth() > dateOfBirth.getMonth() ||
-      (date.getMonth() === dateOfBirth.getMonth() && date.getDate() >= dateOfBirth.getDate());
-    if (!hasBirthdayPassed) age--;
-    return age;
+    return new Date(Date.UTC(effectiveYear, 11, 31, 12, 0, 0));
   }
 
   private loadReportWithTimeline(
@@ -455,6 +451,7 @@ export class ReportsComponent {
       next: (report) => {
         this.report = report;
         this.getShortfallStatus(report);
+        this.effectiveReportEndDate = effectiveEndDate ?? (timeline.forecastEndtDate ? new Date(timeline.forecastEndtDate) : null);
       },
       error: (err) => {
         console.error('Failed to load report with forecast dates', err);
@@ -566,6 +563,7 @@ private applyCashflowInflation(cashflow: Cashflow | null): void {
     this.compareCashflow = null;
     this.compareReport = null;
     this.compareTimeline = null;
+    this.effectiveCompareReportEndDate = null;
     this.isCompareLoading = false;
   }
 
@@ -631,9 +629,10 @@ private applyCashflowInflation(cashflow: Cashflow | null): void {
             throw new Error('Missing comparison timeline');
           }
 
+          const effectiveEnd = this.getEffectiveReportEndDate(timeline, cashflow);
           const payload = {
             ForecastStartDate: this.toIsoString(timeline.forecastStartDate),
-            ForecastEndDate: this.toIsoString(timeline.forecastEndtDate),
+            ForecastEndDate: this.toIsoString(effectiveEnd ?? timeline.forecastEndtDate),
           };
 
           return this.reportsHttpService.getReportbyCashflowIdWithForecastDates(
@@ -645,6 +644,7 @@ private applyCashflowInflation(cashflow: Cashflow | null): void {
               this.compareCashflow = cashflow;
               this.compareReport = report;
               this.compareTimeline = timeline;
+              this.effectiveCompareReportEndDate = effectiveEnd ?? (timeline.forecastEndtDate ? new Date(timeline.forecastEndtDate) : null);
               this.isCompareLoading = false;
             })
           );

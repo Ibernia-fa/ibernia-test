@@ -101,7 +101,7 @@
 
         <app-savings-bar-stacked-chart [report]="report" [client]="client"
           [forecastStartDate]="financialTimeline.forecastStartDate"
-          [forecastEndDate]="financialTimeline.forecastEndtDate"
+          [forecastEndDate]="effectiveReportEndDate ?? financialTimeline?.forecastEndtDate ?? null"
           [cashFlowName]="cashflow?.name"
           [emergencyIconUrl]="'none'">
         </app-savings-bar-stacked-chart>
@@ -154,7 +154,7 @@
       <div class="chart-component-wrapper">
         <app-savings-bar-stacked-chart [report]="compareReport" [client]="client"
         [forecastStartDate]="compareTimeline?.forecastStartDate || financialTimeline.forecastStartDate"
-        [forecastEndDate]="compareTimeline?.forecastEndtDate || financialTimeline.forecastEndtDate"
+        [forecastEndDate]="effectiveCompareReportEndDate ?? compareTimeline?.forecastEndtDate ?? effectiveReportEndDate ?? financialTimeline?.forecastEndtDate ?? null"
         [cashFlowName]="compareCashflow?.name"
         [emergencyIconUrl]="'none'">
       </app-savings-bar-stacked-chart>
