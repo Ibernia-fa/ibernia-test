@@ -269,8 +269,8 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
 
     this.hasRetirementAge = !!mainRetirementEvent;
     if (mainRetirementEvent) {
-      this.baselineRetirementAge = mainRetirementEvent.start.year - birthYear;
-      this.minRetirementAge = Math.max(18, currentYear - birthYear);
+      this.baselineRetirementAge = mainRetirementEvent.start.age;
+      this.minRetirementAge = Math.max(18, this.calculateAgeAtDate(new Date(), new Date(this.client.clientDetails.birthDate)));
       this.maxRetirementAge = 100;
     }
 
@@ -280,9 +280,8 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
 
     this.hasPartnerRetirementAge = !!partnerRetirementEvent && !!this.client.partnerDetail;
     if (this.hasPartnerRetirementAge && this.client.partnerDetail) {
-      const partnerBirthYear = new Date(this.client.partnerDetail.birthDate).getFullYear();
-      this.baselinePartnerRetirementAge = partnerRetirementEvent!.start.year - partnerBirthYear;
-      this.minPartnerRetirementAge = Math.max(18, currentYear - partnerBirthYear);
+      this.baselinePartnerRetirementAge = partnerRetirementEvent!.start.age;
+      this.minPartnerRetirementAge = Math.max(18, this.calculateAgeAtDate(new Date(), new Date(this.client.partnerDetail.birthDate)));
       this.maxPartnerRetirementAge = 100;
       this.scenarioForm.addControl(
         'partnerRetirementAge',
@@ -320,7 +319,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
       const forecastStartYear = forecastStartDate.getFullYear();
       const planDuration = Number(this.cashflow.planDuration);
       if (Number.isFinite(planDuration) && planDuration > 0) {
-        const startAge = forecastStartDate.getFullYear() - birthYear;
+        const startAge = this.calculateAgeAtDate(forecastStartDate, birthDate);
         const planEndYear = forecastStartYear + (planDuration - startAge);
         endYear = Math.max(endYear, planEndYear);
       }
@@ -464,6 +463,15 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
 
   getScenarioForecastEndDate(): Date {
     return this.getMaxForecastEndDate();
+  }
+
+  private calculateAgeAtDate(date: Date, dateOfBirth: Date): number {
+    let age = date.getFullYear() - dateOfBirth.getFullYear();
+    const hasBirthdayPassed =
+      date.getMonth() > dateOfBirth.getMonth() ||
+      (date.getMonth() === dateOfBirth.getMonth() && date.getDate() >= dateOfBirth.getDate());
+    if (!hasBirthdayPassed) age--;
+    return age;
   }
 
   private updateScenarioForecastEndDateIfNeeded(): void {
