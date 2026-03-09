@@ -96,10 +96,19 @@
       </div>
 
       <div class="bio-field-wrapper m-t-16">
-        <mat-label class="f-s-16 f-w-400 m-b-8 d-block">{{ 'Bio' | translate }}</mat-label>
+        <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">
+          {{ 'Bio' | translate }}
+          <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4" matTooltip="{{ 'Bio tooltip' | translate }}">
+        </mat-label>
         <mat-form-field appearance="outline" class="w-100">
-          <textarea matInput formControlName="bio" placeholder="{{ 'Tell us a bit about yourself' | translate }}" cdkTextareaAutosize cdkAutosizeMinRows="5" cdkAutosizeMaxRows="10"></textarea>
+          <textarea matInput formControlName="bio" placeholder="{{ 'Tell us a bit about yourself' | translate }}" maxlength="250"></textarea>
+          <mat-hint align="end">{{ (form.get('bio')?.value?.length || 0) }} / 250</mat-hint>
         </mat-form-field>
+        <div class="m-t-8 d-flex justify-content-end">
+          <button type="submit" class="button-icon" [disabled]="form.invalid || isSaving">
+            <span>{{ 'Save' | translate }}</span>
+          </button>
+        </div>
       </div>
     </mat-card-content>
   </mat-card>

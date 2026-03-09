@@ -221,6 +221,8 @@ export class AddEventDialogComponent {
       this.eventForm.get('end')?.updateValueAndValidity({ emitEvent: false });
       this.eventForm.get('cycle')?.setValue('One-off', { emitEvent: false });
       this.eventForm.get('cycle')?.disable();
+    } else if (this.selectedEventType === EventType.CUSTOM) {
+      this.isIncomeEvent = false; // custom events are always expenses
     }
 
     if (!this.isEditWorkflow) {
@@ -306,7 +308,7 @@ export class AddEventDialogComponent {
       case EventType.CUSTOM:
         this.eventForm = this.fb.group({
           name: ['', Validators.required],
-          isIncomeEvent: [true, Validators.required],
+          isIncomeEvent: [false, Validators.required],
           currency: [this.clientPreferredCurrency, Validators.required],
           amount: ['', [Validators.required, Validators.min(0)]],
           cycle: ['One-off', [Validators.required]],
@@ -380,7 +382,7 @@ export class AddEventDialogComponent {
       case EventType.CUSTOM:
         this.selectedEventIconUrl = this.patchEvent?.iconUrl ?? "";
         this.eventForm.controls['name'].patchValue(this.patchEvent?.name);
-        this.eventForm.controls['isIncomeEvent'].patchValue(this.patchEvent?.type === EventIncomeType.Income);
+        this.eventForm.controls['isIncomeEvent'].patchValue(false); // custom events are always expenses
         this.eventForm.controls['currency'].patchValue(this.patchEvent?.netAmount.currencySymbol);
         this.eventForm.controls['amount'].patchValue(this.patchEvent?.netAmount.amount);
         this.eventForm.controls['cycle'].patchValue(this.patchEvent?.netAmount.cycle?.description);
@@ -468,7 +470,8 @@ export class AddEventDialogComponent {
     if (event === EventType.CUSTOM) {
       this.eventForm.addControl('name', new FormControl('', [Validators.required]));
       this.eventForm.updateValueAndValidity();
-      this.selectedEventIconUrl = 'custom-icon'
+      this.selectedEventIconUrl = 'custom-icon';
+      this.isIncomeEvent = false; // custom events are always expenses
     } else {
       this.eventForm.removeControl('name');
       this.eventForm.updateValueAndValidity();
@@ -477,7 +480,7 @@ export class AddEventDialogComponent {
         (customEvent) => customEvent.name === event
       );
       this.selectedEventIconUrl = cusEvent?.iconUrl ?? '';
-      this.isIncomeEvent = cusEvent?.type === EventIncomeType.Income;
+      this.isIncomeEvent = false; // custom events are always expenses
     }
   }
 
@@ -618,9 +621,7 @@ export class AddEventDialogComponent {
             value: 0,
             description: ''
           },
-        type: this.isIncomeEvent
-          ? EventIncomeType.Income
-          : EventIncomeType.Expense,
+        type: EventIncomeType.Expense, // custom events are always expenses
         iconUrl: 'custom-icon',
         isDefault: false,
         isOneOff: this.eventForm.get('cycle')?.value === 'One-off',
@@ -1205,6 +1206,21 @@ export class AddEventDialogComponent {
 
   getEndYears(): number[] {
     const startYear = this.getStartYear();
+    return (this.years ?? []).filter((y) => y >= startYear);
+  }
+
+  getFinancingStartYear(): number {
+    const val = this.eventForm.get('monthlyStart')?.value;
+    return typeof val === 'number' && Number.isFinite(val) ? val : this.data.forecastStartDateYear;
+  }
+
+  getFinancingEndEvents(): any[] {
+    const startYear = this.getFinancingStartYear();
+    return (this.eventsList ?? []).filter((e: any) => (e?.year ?? 0) >= startYear);
+  }
+
+  getFinancingEndYears(): number[] {
+    const startYear = this.getFinancingStartYear();
     return (this.years ?? []).filter((y) => y >= startYear);
   }
 }

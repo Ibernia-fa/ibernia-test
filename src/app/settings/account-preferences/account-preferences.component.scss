@@ -33,8 +33,11 @@
         .mat-mdc-form-field {
             .mat-mdc-text-field-wrapper {
                 .mat-mdc-form-field-flex {
+                    max-height: 200px;
                     .mat-mdc-form-field-infix {
-                        min-height: 140px;
+                        min-height: 120px;
+                        max-height: 200px;
+                        overflow: hidden;
                     }
                 }
             }
@@ -42,7 +45,11 @@
 
         textarea.mat-mdc-input-element {
             min-height: 120px;
+            max-height: 200px;
+            height: 120px;
             resize: vertical;
+            overflow-y: auto;
+            box-sizing: border-box;
         }
     }
 }

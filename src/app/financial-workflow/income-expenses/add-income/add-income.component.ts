@@ -169,7 +169,7 @@ export class AddIncomeComponent {
       bonusDate: [this.selectedIncome?.bonus?.bonusDate?.year ?? null],
       investThisAmount: [this.selectedIncome?.investThisAmount ?? false],
       inheritanceTargetPotId: [this.selectedIncome?.inheritanceTargetPotId ?? null],
-      inheritancePercentToInvest: [this.selectedIncome?.inheritancePercentToInvest ?? 100]
+      inheritancePercentToInvest: [this.selectedIncome?.inheritancePercentToInvest ?? 80]
     });
     this.incomeForm.get('currencySymbol')?.disable();
     this.incomeForm.setValidators(this.endOnOrAfterStartValidator());
@@ -290,7 +290,7 @@ export class AddIncomeComponent {
           this.incomeForm.patchValue({
             investThisAmount: true,
             inheritanceTargetPotId: this.selectedIncome.inheritanceTargetPotId,
-            inheritancePercentToInvest: this.selectedIncome.inheritancePercentToInvest ?? 100
+            inheritancePercentToInvest: this.selectedIncome.inheritancePercentToInvest ?? 80
           });
         }
       }
@@ -583,7 +583,7 @@ export class AddIncomeComponent {
             );
             if (investChecked) {
               const targetPotId = this.incomeForm.get('inheritanceTargetPotId')?.value;
-              const percent = this.incomeForm.get('inheritancePercentToInvest')?.value ?? 100;
+              const percent = this.incomeForm.get('inheritancePercentToInvest')?.value ?? 80;
               const incomeAmount = this.incomeForm.get('amount')?.value ?? 0;
               const investedAmount = incomeAmount * (percent / 100);
               if (!targetPotId || investedAmount <= 0) {
@@ -1089,7 +1089,7 @@ export class AddIncomeComponent {
       targetPotCtrl?.clearValidators();
       targetPotCtrl?.setValue(null, { emitEvent: false });
       percentCtrl?.clearValidators();
-      percentCtrl?.setValue(100, { emitEvent: false });
+      percentCtrl?.setValue(80, { emitEvent: false });
     } else if (investChecked) {
       targetPotCtrl?.setValidators([Validators.required]);
       percentCtrl?.setValidators([Validators.required, Validators.min(1), Validators.max(100)]);
@@ -1097,7 +1097,7 @@ export class AddIncomeComponent {
       targetPotCtrl?.clearValidators();
       targetPotCtrl?.setValue(null, { emitEvent: false });
       percentCtrl?.clearValidators();
-      percentCtrl?.setValue(100, { emitEvent: false });
+      percentCtrl?.setValue(80, { emitEvent: false });
     }
     targetPotCtrl?.updateValueAndValidity({ emitEvent: false });
     percentCtrl?.updateValueAndValidity({ emitEvent: false });
@@ -1142,6 +1142,20 @@ export class AddIncomeComponent {
     }
 
     bonusDateCtrl?.updateValueAndValidity({ emitEvent: false });
+  }
+
+  onPercentToInvestSliderInput(event: Event): void {
+    const inputElement = event.target as HTMLInputElement;
+    const value = Number(inputElement.value);
+    const val = isNaN(value) ? 80 : Math.min(10, Math.max(1, Math.round(value)));
+    this.incomeForm.get('inheritancePercentToInvest')?.setValue(val, { emitEvent: true });
+  }
+
+  onPercentToInvestInput(event: Event): void {
+    const raw = (event.target as HTMLInputElement).value;
+    const num = Number(raw);
+    const val = isNaN(num) ? 80 : Math.min(100, Math.max(1, Math.round(num)));
+    this.incomeForm.get('inheritancePercentToInvest')?.setValue(val, { emitEvent: true });
   }
 
 }
