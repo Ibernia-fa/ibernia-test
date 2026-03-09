@@ -23,7 +23,6 @@ import { MatSelect, MatSelectModule } from '@angular/material/select';
 import { MatDialog } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { NgFor, NgIf } from '@angular/common';
-import { TextFieldModule } from '@angular/cdk/text-field';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
 import { ImageCropDialogComponent } from './image-crop-dialog/image-crop-dialog.component';
@@ -45,7 +44,6 @@ import { ImageCropDialogComponent } from './image-crop-dialog/image-crop-dialog.
     TranslateModule,
     NgIf,
     NgFor,
-    TextFieldModule,
     ThousandSeparatorInputDirective
   ]
 })
@@ -83,7 +81,7 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
     firstName: ['' as string],
     lastName: ['' as string],
     email: ['' as string],
-    bio: ['' as string],
+    bio: ['' as string, [Validators.maxLength(250)]],
     preferences: this.fb.nonNullable.group({
       inflationRate: [2.5 as number, [Validators.required, Validators.min(0), Validators.max(100)]],
       investmentReturn: [6 as number, [Validators.required, Validators.min(0), Validators.max(100)]],
@@ -157,7 +155,7 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
             firstName: p.firstName ?? this.user?.firstName ?? '',
             lastName: p.lastName ?? this.user?.lastName ?? '',
             email: p.email ?? this.user?.email ?? '',
-            bio: p.bio ?? '',
+            bio: (p.bio ?? '').slice(0, 250),
             preferences: {
               inflationRate: p.preferences?.inflationRate ?? this.form.value.preferences?.inflationRate ?? 2.5,
               investmentReturn: p.preferences?.investmentReturn ?? this.form.value.preferences?.investmentReturn ?? 6,

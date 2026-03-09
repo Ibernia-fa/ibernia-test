@@ -64,3 +64,17 @@
     height: 18px;
   }
 }
+
+/* Percent to invest: slider + input layout (matches add-new-pot return rate) */
+.percent-invest-row {
+  width: 100%;
+  .slider-wrapper {
+    flex: 1;
+    min-width: 0;
+    margin-top: -15px;
+  }
+  .percentage-field {
+    flex-basis: 98px;
+    flex-shrink: 0;
+  }
+}

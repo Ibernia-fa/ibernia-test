@@ -253,13 +253,35 @@
             }
           </div>
         </div>
-        <div class="d-flex flex-column gap-8">
-          <mat-label class="f-s-16 d-block">{{ 'Percent to invest' | translate }}</mat-label>
-          <div class="d-flex align-items-center gap-8">
-            <mat-slider class="w-100" [min]="1" [max]="100" [step]="1">
-              <input matSliderThumb formControlName="inheritancePercentToInvest" />
-            </mat-slider>
-            <span class="f-s-16">{{ incomeForm.get('inheritancePercentToInvest')?.value ?? 100 }}%</span>
+        <div class="d-flex flex-column gap-12">
+          <div class="d-flex gap-8 align-items-center">
+            <mat-label class="f-s-16 f-w-400 d-block">{{ 'Percent to invest' | translate }}</mat-label>
+            <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
+          </div>
+          <div class="w-100 form-field">
+            <div class="w-100 d-flex align-items-center gap-24 percent-invest-row">
+              <div class="slider-customizer slider-wrapper">
+                <mat-slider class="w-100" [min]="1" [max]="10" [step]="1">
+                  <input
+                    matSliderThumb
+                    formControlName="inheritancePercentToInvest"
+                    (input)="onPercentToInvestSliderInput($event)"
+                  />
+                </mat-slider>
+              </div>
+              <div class="percentage-field">
+                <mat-form-field appearance="outline" class="w-full w-100 percentage-icon">
+                  <span matSuffix>%</span>
+                  <input
+                    matInput
+                    type="number"
+                    class="p-0"
+                    formControlName="inheritancePercentToInvest"
+                    (input)="onPercentToInvestInput($event)"
+                  />
+                </mat-form-field>
+              </div>
+            </div>
           </div>
           @if(incomeForm.get('inheritancePercentToInvest')?.touched && incomeForm.get('inheritancePercentToInvest')?.hasError('min')) {
             <span class="field-error d-block">{{ 'Must be at least 1%' | translate }}</span>
