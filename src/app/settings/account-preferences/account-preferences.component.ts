@@ -62,10 +62,11 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
   isLoading = false;
   isSaving = false;
   submitted = false;
-  // UI helpers
+  // UI helpers - None first, default; order: None, Percentage, Fixed Amount, Both
   comissionTypes = [
-    { label: 'Amount', value: ComissionType.Amount },
+    { label: 'None', value: ComissionType.None },
     { label: 'Percentage', value: ComissionType.Percentage },
+    { label: 'Fixed Amount', value: ComissionType.Amount },
     { label: 'Both', value: ComissionType.Both },
   ];
   user: any;
@@ -86,7 +87,7 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
       inflationRate: [2.5 as number, [Validators.required, Validators.min(0), Validators.max(100)]],
       investmentReturn: [6 as number, [Validators.required, Validators.min(0), Validators.max(100)]],
       pensionFundReturn: [4 as number, [Validators.required, Validators.min(0), Validators.max(100)]],
-      comissionType: [ComissionType.Amount as ComissionType, [Validators.required]],
+      comissionType: [ComissionType.None as ComissionType, [Validators.required]],
       comissionPercentage: [1 as number | null],
       comissionAmount: [null as number | null],
       currency: ['EUR', [Validators.required]],
@@ -215,6 +216,7 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
   //     amt.disable({ emitEvent: false });
   //     if (!pct.value) pct.setValue(1, { emitEvent: false });
   //     pct.setValidators([Validators.required, Validators.min(0), Validators.max(100)]);
+  //   } else if (t === ComissionType.None) {
   //   } else if (t === ComissionType.Both) {
   //     pct.setValidators([Validators.required, Validators.min(0), Validators.max(100)]);
   //     amt.setValidators([Validators.required, Validators.min(0.01)]);
@@ -241,7 +243,11 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
     const fromApiPct = this.apiCommissionSnapshot?.comissionPercentage ?? null;
     const fromApiAmt = this.apiCommissionSnapshot?.comissionAmount ?? null;
 
-    if (t === ComissionType.Amount) {
+    if (t === ComissionType.None) {
+      // No commission fields required when None
+      pct.disable({ emitEvent: false });
+      amt.disable({ emitEvent: false });
+    } else if (t === ComissionType.Amount) {
       // Validators
       amt.setValidators([Validators.required, Validators.min(0.01)]);
       // If amount is empty, seed from API or fallback default
@@ -388,11 +394,13 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
         pensionFundReturn: round2(raw.preferences.pensionFundReturn),
         comissionType: raw.preferences.comissionType,
         comissionPercentage:
-          raw.preferences.comissionType === ComissionType.Amount
+          raw.preferences.comissionType === ComissionType.Amount ||
+          raw.preferences.comissionType === ComissionType.None
             ? null
             : roundOrNull(raw.preferences.comissionPercentage),
         comissionAmount:
-          raw.preferences.comissionType === ComissionType.Percentage
+          raw.preferences.comissionType === ComissionType.Percentage ||
+          raw.preferences.comissionType === ComissionType.None
             ? null
             : intOrNull(raw.preferences.comissionAmount),
         currency: raw.preferences.currency,

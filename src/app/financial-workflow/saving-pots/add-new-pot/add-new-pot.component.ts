@@ -127,6 +127,7 @@ export class AddNewPotComponent {
     { label: 'Percentage', value: ComissionType.Percentage },
     { label: 'Both', value: ComissionType.Both },
   ];
+  /** When advisor preference is None, no commission type/amount/percentage is prefilled */
   loggedInUserComissionType: string | undefined;
   isAddComissionChecked: any;
   currentYear: number = new Date().getFullYear();
@@ -161,7 +162,10 @@ export class AddNewPotComponent {
     let age = forecastStart.getFullYear() - birthDate.getFullYear();
     const monthDiff = forecastStart.getMonth() - birthDate.getMonth();
     const dayDiff = forecastStart.getDate() - birthDate.getDate();
-    this.loggedInUserComissionType = this.comissionTypes.find(x => x.value == this.loggedInUserPreferences?.comissionType)?.label.toLowerCase();
+    const prefType = this.loggedInUserPreferences?.comissionType;
+    this.loggedInUserComissionType = prefType === ComissionType.None || prefType == null
+      ? undefined
+      : this.comissionTypes.find(x => x.value === prefType)?.label.toLowerCase();
     if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
       age--;
     }
@@ -225,13 +229,13 @@ export class AddNewPotComponent {
       end: [data.forecastEndDateYear-1, Validators.required],
       // Commissions always start unchecked - user must manually enable
       commissions: [false],
-      commissionType: [this.loggedInUserComissionType || 'amount'],
+      commissionType: [this.loggedInUserComissionType ?? ''],
       commissionCurrency: [this.clientPreferredCurrency],
-      commissionAmount: [this.loggedInUserPreferences?.comissionAmount || 0],
-      commissionCycle: [this.loggedInUserPreferences?.comissionCycle || this.cycles[2]?.id],
+      commissionAmount: [this.loggedInUserComissionType ? (this.loggedInUserPreferences?.comissionAmount ?? 0) : 0],
+      commissionCycle: [this.loggedInUserComissionType ? (this.loggedInUserPreferences?.comissionCycle ?? this.cycles[2]?.id) : ''],
       commissionPercentageCurrency: [this.clientPreferredCurrency],
-      commissionPercentageCycle: [this.loggedInUserPreferences?.comissionPercentageCycle || this.cycles[2]?.id],
-      commissionPercentage: [this.loggedInUserPreferences?.comissionPercentage || 0],
+      commissionPercentageCycle: [this.loggedInUserComissionType ? (this.loggedInUserPreferences?.comissionPercentageCycle ?? this.cycles[2]?.id) : ''],
+      commissionPercentage: [this.loggedInUserComissionType ? (this.loggedInUserPreferences?.comissionPercentage ?? 0) : 0],
       escalationRate: [''],
       customEscalationRate: [''],
       // Pension fund specific fields
@@ -426,6 +430,30 @@ onAmountBlur(e: Event) {
 
   ngOnInit() {
     this.updateFormattedValue('returnRate');
+    // When user selects commission type, apply type-specific validators
+    // Defer to next tick so dropdown closes immediately (better UX)
+    this.savingsForm.get('commissionType')?.valueChanges.subscribe((type: string) => {
+      setTimeout(() => {
+        if (type) {
+          this.onCommissionTypeControlClicked(type);
+        } else {
+          this.clearCommissionTypeValidators();
+        }
+      }, 0);
+    });
+  }
+
+  private clearCommissionTypeValidators(): void {
+    this.savingsForm.get('commissionCurrency')?.removeValidators(Validators.required);
+    this.savingsForm.get('commissionAmount')?.removeValidators(Validators.required);
+    this.savingsForm.get('commissionCycle')?.removeValidators(Validators.required);
+    this.savingsForm.get('commissionPercentageCurrency')?.removeValidators(Validators.required);
+    this.savingsForm.get('commissionPercentage')?.removeValidators(Validators.required);
+    this.savingsForm.get('commissionPercentageCycle')?.removeValidators(Validators.required);
+    this.savingsForm.get('escalationRate')?.removeValidators(Validators.required);
+    ['commissionCurrency', 'commissionAmount', 'commissionCycle',
+     'commissionPercentageCurrency', 'commissionPercentage', 'commissionPercentageCycle', 'escalationRate']
+      .forEach(name => this.savingsForm.get(name)?.updateValueAndValidity({ emitEvent: false }));
   }
 
   /**
@@ -682,81 +710,58 @@ onAmountBlur(e: Event) {
 
   isCommissionsChanged(event: any) {
     this.isAddComissionChecked = event;
-    this.savingsForm
-    .get('commissionType')
-    ?.setValue(this.loggedInUserComissionType || 'amount');
+    // Defer form updates to next tick so checkbox updates immediately (better UX)
+    setTimeout(() => {
+      const defaultType = this.loggedInUserComissionType ?? '';
+      this.savingsForm.get('commissionType')?.setValue(defaultType, { emitEvent: false });
 
-    if (event) {
-      this.savingsForm
-        .get('commissionCurrency')
-        ?.setValidators(Validators.required);
-      this.savingsForm
-        .get('commissionCurrency')
-        ?.setValue(this.clientPreferredCurrency);
-      this.savingsForm
-        .get('commissionPercentageCurrency')
-        ?.setValue(this.clientPreferredCurrency);
-      this.savingsForm
-        .get('commissionAmount')
-        ?.setValidators(Validators.required);
-      this.savingsForm
-        .get('commissionType')
-        ?.setValidators(Validators.required);
-      this.savingsForm
-        .get('commissionCycle')
-        ?.setValidators(Validators.required);
-        this.savingsForm
-        .get('commissionCycle')
-        ?.setValue(this.cycles[2].id);
-      this.savingsForm
-        .get('escalationRate')
-        ?.setValidators(Validators.required);
-      this.savingsForm
-        .get('escalationRate')
-        ?.setValue(this.escalationRates[1].value);
+      if (event) {
+        this.savingsForm.get('commissionCurrency')?.setValue(this.clientPreferredCurrency, { emitEvent: false });
+        this.savingsForm.get('commissionPercentageCurrency')?.setValue(this.clientPreferredCurrency, { emitEvent: false });
+        this.savingsForm.get('commissionType')?.setValidators(Validators.required);
 
-      // Populate commission values from Default Preferences
-      if (this.loggedInUserPreferences?.comissionAmount) {
-        this.savingsForm.get('commissionAmount')?.setValue(this.loggedInUserPreferences.comissionAmount);
-      }
-      if (this.loggedInUserPreferences?.comissionPercentage) {
-        this.savingsForm.get('commissionPercentage')?.setValue(this.loggedInUserPreferences.comissionPercentage);
-      }
-      if (this.loggedInUserPreferences?.comissionCycle) {
-        this.savingsForm.get('commissionCycle')?.setValue(this.loggedInUserPreferences.comissionCycle);
-      }
-      if (this.loggedInUserPreferences?.comissionPercentageCycle) {
-        this.savingsForm.get('commissionPercentageCycle')?.setValue(this.loggedInUserPreferences.comissionPercentageCycle);
-      }
+        if (this.loggedInUserComissionType) {
+          this.savingsForm.get('commissionCurrency')?.setValidators(Validators.required);
+          this.savingsForm.get('commissionAmount')?.setValidators(Validators.required);
+          this.savingsForm.get('commissionCycle')?.setValidators(Validators.required);
+          this.savingsForm.get('commissionCycle')?.setValue(this.loggedInUserPreferences?.comissionCycle ?? this.cycles[2].id, { emitEvent: false });
+          this.savingsForm.get('escalationRate')?.setValidators(Validators.required);
+          this.savingsForm.get('escalationRate')?.setValue(this.escalationRates[1].value, { emitEvent: false });
+          if (this.loggedInUserPreferences?.comissionAmount) {
+            this.savingsForm.get('commissionAmount')?.setValue(this.loggedInUserPreferences.comissionAmount, { emitEvent: false });
+          }
+          if (this.loggedInUserPreferences?.comissionPercentage) {
+            this.savingsForm.get('commissionPercentage')?.setValue(this.loggedInUserPreferences.comissionPercentage, { emitEvent: false });
+          }
+          if (this.loggedInUserPreferences?.comissionCycle) {
+            this.savingsForm.get('commissionCycle')?.setValue(this.loggedInUserPreferences.comissionCycle, { emitEvent: false });
+          }
+          if (this.loggedInUserPreferences?.comissionPercentageCycle) {
+            this.savingsForm.get('commissionPercentageCycle')?.setValue(this.loggedInUserPreferences.comissionPercentageCycle, { emitEvent: false });
+          }
+          this.onCommissionTypeControlClicked(this.loggedInUserComissionType);
+        }
 
-      this.savingsForm.get('commissionCurrency')?.updateValueAndValidity();
-      this.savingsForm.get('commissionAmount')?.updateValueAndValidity();
-      this.savingsForm.get('commissionType')?.updateValueAndValidity();
-      this.savingsForm.get('commissionCycle')?.updateValueAndValidity();
-      this.savingsForm.get('escalationRate')?.updateValueAndValidity();
-    } else {
-      this.savingsForm
-        .get('commissionCurrency')
-        ?.removeValidators(Validators.required);
-      this.savingsForm
-        .get('commissionAmount')
-        ?.removeValidators(Validators.required);
-      this.savingsForm
-        .get('commissionType')
-        ?.removeValidators(Validators.required);
-      this.savingsForm
-        .get('commissionCycle')
-        ?.removeValidators(Validators.required);
-      this.savingsForm
-        .get('escalationRate')
-        ?.removeValidators(Validators.required);
+        this.savingsForm.get('commissionCurrency')?.updateValueAndValidity({ emitEvent: false });
+        this.savingsForm.get('commissionAmount')?.updateValueAndValidity({ emitEvent: false });
+        this.savingsForm.get('commissionType')?.updateValueAndValidity({ emitEvent: false });
+        this.savingsForm.get('commissionCycle')?.updateValueAndValidity({ emitEvent: false });
+        this.savingsForm.get('escalationRate')?.updateValueAndValidity({ emitEvent: false });
+      } else {
+        this.savingsForm.get('commissionCurrency')?.removeValidators(Validators.required);
+        this.savingsForm.get('commissionAmount')?.removeValidators(Validators.required);
+        this.savingsForm.get('commissionType')?.removeValidators(Validators.required);
+        this.savingsForm.get('commissionCycle')?.removeValidators(Validators.required);
+        this.savingsForm.get('escalationRate')?.removeValidators(Validators.required);
 
-      this.savingsForm.get('commissionCurrency')?.updateValueAndValidity();
-      this.savingsForm.get('commissionAmount')?.updateValueAndValidity();
-      this.savingsForm.get('commissionType')?.updateValueAndValidity();
-      this.savingsForm.get('commissionCycle')?.updateValueAndValidity();
-      this.savingsForm.get('escalationRate')?.updateValueAndValidity();
-    }
+        this.savingsForm.get('commissionCurrency')?.updateValueAndValidity({ emitEvent: false });
+        this.savingsForm.get('commissionAmount')?.updateValueAndValidity({ emitEvent: false });
+        this.savingsForm.get('commissionType')?.updateValueAndValidity({ emitEvent: false });
+        this.savingsForm.get('commissionCycle')?.updateValueAndValidity({ emitEvent: false });
+        this.savingsForm.get('escalationRate')?.updateValueAndValidity({ emitEvent: false });
+      }
+      this.savingsForm.updateValueAndValidity();
+    }, 0);
   }
 
   // onSliderChange(value: any) {
@@ -1045,7 +1050,8 @@ onEscalationRateChange(event: MatSelectChange): void {
   }
 
   onCommissionTypeControlClicked(amountType: string) {
-    this.savingsForm.get('commissionType')?.setValue(amountType)
+    // Use emitEvent: false to avoid infinite loop with valueChanges subscription
+    this.savingsForm.get('commissionType')?.setValue(amountType, { emitEvent: false });
 
     if(amountType === 'both') {
       this.savingsForm
@@ -1062,13 +1068,13 @@ onEscalationRateChange(event: MatSelectChange): void {
         ?.setValidators(Validators.required);
         this.savingsForm
         .get('commissionCycle')
-        ?.setValue(this.cycles[2].id);
+        ?.setValue(this.cycles[2].id, { emitEvent: false });
       this.savingsForm
         .get('commissionPercentageCurrency')
         ?.setValidators(Validators.required);
       this.savingsForm
         .get('commissionPercentageCurrency')
-        ?.setValue(this.clientPreferredCurrency);
+        ?.setValue(this.clientPreferredCurrency, { emitEvent: false });
       this.savingsForm
         .get('commissionPercentage')
         ?.setValidators(Validators.required);
@@ -1077,22 +1083,22 @@ onEscalationRateChange(event: MatSelectChange): void {
         ?.setValidators(Validators.required);
         this.savingsForm
         .get('commissionPercentageCycle')
-        ?.setValue(this.cycles[2].id);
+        ?.setValue(this.cycles[2].id, { emitEvent: false });
       this.savingsForm
         .get('escalationRate')
         ?.setValidators(Validators.required);
       this.savingsForm
         .get('escalationRate')
-        ?.setValue(this.escalationRates[1].value);
+        ?.setValue(this.escalationRates[1].value, { emitEvent: false });
 
-      this.savingsForm.get('commissionCurrency')?.updateValueAndValidity();
-      this.savingsForm.get('commissionAmount')?.updateValueAndValidity();
-      this.savingsForm.get('commissionType')?.updateValueAndValidity();
-      this.savingsForm.get('commissionCycle')?.updateValueAndValidity();
-      this.savingsForm.get('commissionPercentageCurrency')?.updateValueAndValidity();
-      this.savingsForm.get('commissionPercentageCycle')?.updateValueAndValidity();
-      this.savingsForm.get('commissionPercentage')?.updateValueAndValidity();
-      this.savingsForm.get('escalationRate')?.updateValueAndValidity();
+      this.savingsForm.get('commissionCurrency')?.updateValueAndValidity({ emitEvent: false });
+      this.savingsForm.get('commissionAmount')?.updateValueAndValidity({ emitEvent: false });
+      this.savingsForm.get('commissionType')?.updateValueAndValidity({ emitEvent: false });
+      this.savingsForm.get('commissionCycle')?.updateValueAndValidity({ emitEvent: false });
+      this.savingsForm.get('commissionPercentageCurrency')?.updateValueAndValidity({ emitEvent: false });
+      this.savingsForm.get('commissionPercentageCycle')?.updateValueAndValidity({ emitEvent: false });
+      this.savingsForm.get('commissionPercentage')?.updateValueAndValidity({ emitEvent: false });
+      this.savingsForm.get('escalationRate')?.updateValueAndValidity({ emitEvent: false });
       this.updateFormattedValue('commissionPercentage')
 
     }
@@ -1106,7 +1112,7 @@ onEscalationRateChange(event: MatSelectChange): void {
         ?.setValidators(Validators.required);
       this.savingsForm
         .get('commissionCurrency')
-        ?.setValue(this.clientPreferredCurrency);
+        ?.setValue(this.clientPreferredCurrency, { emitEvent: false });
       this.savingsForm
         .get('commissionAmount')
         ?.setValidators(Validators.required);
@@ -1115,13 +1121,13 @@ onEscalationRateChange(event: MatSelectChange): void {
         ?.setValidators(Validators.required);
         this.savingsForm
         .get('commissionCycle')
-        ?.setValue(this.cycles[2].id);
+        ?.setValue(this.cycles[2].id, { emitEvent: false });
       this.savingsForm
         .get('commissionPercentageCurrency')
         ?.removeValidators(Validators.required);
       this.savingsForm
         .get('commissionPercentageCurrency')
-        ?.setValue(this.clientPreferredCurrency);
+        ?.setValue(this.clientPreferredCurrency, { emitEvent: false });
       this.savingsForm
         .get('commissionPercentage')
         ?.removeValidators(Validators.required);
@@ -1130,22 +1136,22 @@ onEscalationRateChange(event: MatSelectChange): void {
         ?.removeValidators(Validators.required);
         this.savingsForm
         .get('commissionPercentageCycle')
-        ?.setValue(this.cycles[2].id);
+        ?.setValue(this.cycles[2].id, { emitEvent: false });
       this.savingsForm
         .get('escalationRate')
         ?.setValidators(Validators.required);
       this.savingsForm
         .get('escalationRate')
-        ?.setValue(this.escalationRates[1].value);
+        ?.setValue(this.escalationRates[1].value, { emitEvent: false });
 
-      this.savingsForm.get('commissionCurrency')?.updateValueAndValidity();
-      this.savingsForm.get('commissionAmount')?.updateValueAndValidity();
-      this.savingsForm.get('commissionType')?.updateValueAndValidity();
-      this.savingsForm.get('commissionCycle')?.updateValueAndValidity();
-      this.savingsForm.get('commissionPercentageCurrency')?.updateValueAndValidity();
-      this.savingsForm.get('commissionPercentageCycle')?.updateValueAndValidity();
-      this.savingsForm.get('commissionPercentage')?.updateValueAndValidity();
-      this.savingsForm.get('escalationRate')?.updateValueAndValidity();
+      this.savingsForm.get('commissionCurrency')?.updateValueAndValidity({ emitEvent: false });
+      this.savingsForm.get('commissionAmount')?.updateValueAndValidity({ emitEvent: false });
+      this.savingsForm.get('commissionType')?.updateValueAndValidity({ emitEvent: false });
+      this.savingsForm.get('commissionCycle')?.updateValueAndValidity({ emitEvent: false });
+      this.savingsForm.get('commissionPercentageCurrency')?.updateValueAndValidity({ emitEvent: false });
+      this.savingsForm.get('commissionPercentageCycle')?.updateValueAndValidity({ emitEvent: false });
+      this.savingsForm.get('commissionPercentage')?.updateValueAndValidity({ emitEvent: false });
+      this.savingsForm.get('escalationRate')?.updateValueAndValidity({ emitEvent: false });
     }
 
 
@@ -1158,7 +1164,7 @@ onEscalationRateChange(event: MatSelectChange): void {
         ?.removeValidators(Validators.required);
       this.savingsForm
         .get('commissionPercentageCurrency')
-        ?.setValue(this.clientPreferredCurrency);
+        ?.setValue(this.clientPreferredCurrency, { emitEvent: false });
       this.savingsForm
         .get('commissionAmount')
         ?.removeValidators(Validators.required);
@@ -1167,13 +1173,13 @@ onEscalationRateChange(event: MatSelectChange): void {
         ?.removeValidators(Validators.required);
         this.savingsForm
         .get('commissionCycle')
-        ?.setValue(this.cycles[2].id);
+        ?.setValue(this.cycles[2].id, { emitEvent: false });
       this.savingsForm
         .get('commissionPercentageCurrency')
         ?.setValidators(Validators.required);
       this.savingsForm
         .get('commissionPercentageCurrency')
-        ?.setValue(this.clientPreferredCurrency);
+        ?.setValue(this.clientPreferredCurrency, { emitEvent: false });
       this.savingsForm
         .get('commissionPercentage')
         ?.setValidators(Validators.required);
@@ -1182,25 +1188,25 @@ onEscalationRateChange(event: MatSelectChange): void {
         ?.setValidators(Validators.required);
         this.savingsForm
         .get('commissionPercentageCycle')
-        ?.setValue(this.cycles[2].id);
+        ?.setValue(this.cycles[2].id, { emitEvent: false });
       this.savingsForm
         .get('escalationRate')
         ?.setValidators(Validators.required);
       this.savingsForm
         .get('escalationRate')
-        ?.setValue(this.escalationRates[1].value);
+        ?.setValue(this.escalationRates[1].value, { emitEvent: false });
 
-      this.savingsForm.get('commissionCurrency')?.updateValueAndValidity();
-      this.savingsForm.get('commissionAmount')?.updateValueAndValidity();
-      this.savingsForm.get('commissionType')?.updateValueAndValidity();
-      this.savingsForm.get('commissionCycle')?.updateValueAndValidity();
-      this.savingsForm.get('commissionPercentageCurrency')?.updateValueAndValidity();
-      this.savingsForm.get('commissionPercentageCycle')?.updateValueAndValidity();
-      this.savingsForm.get('commissionPercentage')?.updateValueAndValidity();
-      this.savingsForm.get('escalationRate')?.updateValueAndValidity();
-      this.updateFormattedValue('commissionPercentage')
-
+      this.savingsForm.get('commissionCurrency')?.updateValueAndValidity({ emitEvent: false });
+      this.savingsForm.get('commissionAmount')?.updateValueAndValidity({ emitEvent: false });
+      this.savingsForm.get('commissionType')?.updateValueAndValidity({ emitEvent: false });
+      this.savingsForm.get('commissionCycle')?.updateValueAndValidity({ emitEvent: false });
+      this.savingsForm.get('commissionPercentageCurrency')?.updateValueAndValidity({ emitEvent: false });
+      this.savingsForm.get('commissionPercentageCycle')?.updateValueAndValidity({ emitEvent: false });
+      this.savingsForm.get('commissionPercentage')?.updateValueAndValidity({ emitEvent: false });
+      this.savingsForm.get('escalationRate')?.updateValueAndValidity({ emitEvent: false });
+      this.updateFormattedValue('commissionPercentage');
     }
+    this.savingsForm.updateValueAndValidity();
   }
 
   blockComma(e: KeyboardEvent) {
