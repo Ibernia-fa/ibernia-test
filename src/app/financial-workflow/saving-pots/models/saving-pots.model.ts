@@ -73,6 +73,7 @@ export enum SavingPotOwnership
 
 export enum ComissionType
 {
+    None = 0,
     Amount = 1,
     Percentage = 2,
     Both = 3

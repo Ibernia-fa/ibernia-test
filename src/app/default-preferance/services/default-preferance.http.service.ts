@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { BehaviorSubject, map, Observable, Subject } from 'rxjs';
 
-export enum ComissionType { Amount = 1, Percentage = 2, Both = 3 }
+export enum ComissionType { None = 0, Amount = 1, Percentage = 2, Both = 3 }
 
 export interface PreferencesDto {
   inflationRate: number;

@@ -608,7 +608,7 @@ export class AddIncomeComponent {
                 startEventId: null,
                 endEventId: null,
                 escalationRate: null,
-                contributionType: 2,
+                contributionType: 1, // Cash: invested amount moves from cash to pot; remainder stays in cash
                 hasCommission: false,
                 comission: {
                   type: ComissionType.Percentage,
@@ -1147,7 +1147,7 @@ export class AddIncomeComponent {
   onPercentToInvestSliderInput(event: Event): void {
     const inputElement = event.target as HTMLInputElement;
     const value = Number(inputElement.value);
-    const val = isNaN(value) ? 80 : Math.min(10, Math.max(1, Math.round(value)));
+    const val = isNaN(value) ? 80 : Math.min(100, Math.max(1, Math.round(value)));
     this.incomeForm.get('inheritancePercentToInvest')?.setValue(val, { emitEvent: true });
   }
 
