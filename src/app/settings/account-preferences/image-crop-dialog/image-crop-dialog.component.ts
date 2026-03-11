@@ -6,6 +6,8 @@ import { TranslateModule } from '@ngx-translate/core';
 
 export interface ImageCropDialogData {
   imageBase64: string;
+  /** When false, allows free rectangular crop to fit image dimensions. Default true for profile. */
+  maintainAspectRatio?: boolean;
   aspectRatio?: number;
   title?: string;
 }
@@ -25,11 +27,11 @@ export interface ImageCropDialogData {
       <div class="crop-container">
         <image-cropper
           [imageBase64]="data.imageBase64"
-          [maintainAspectRatio]="true"
+          [maintainAspectRatio]="data.maintainAspectRatio ?? false"
           [aspectRatio]="data.aspectRatio ?? 1"
           format="png"
           output="base64"
-          [resizeToWidth]="400"
+          [resizeToWidth]="0"
           [roundCropper]="false"
           (imageCropped)="onImageCropped($event)"
           (loadImageFailed)="onLoadFailed()"

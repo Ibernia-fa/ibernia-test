@@ -760,13 +760,24 @@ export class AddContributionComponent {
       .filter((id): id is string => !!id);
   }
 
+  /** For Pension fund: use contributionAmount as fallback when startingPotValue is 0 (common for new pensions) */
   private getLargestPot(pots: ClientSaving[]): ClientSaving | null {
     if (!pots.length) return null;
     return pots.reduce((largest, pot) => {
-      const potAmount = Number(pot.startingPotValue?.amount ?? 0);
-      const largestAmount = Number(largest.startingPotValue?.amount ?? 0);
+      const potAmount = this.getEffectivePotValueForComparison(pot);
+      const largestAmount = this.getEffectivePotValueForComparison(largest);
       return potAmount > largestAmount ? pot : largest;
     });
+  }
+
+  private getEffectivePotValueForComparison(pot: ClientSaving): number {
+    const starting = Number(pot.startingPotValue?.amount ?? 0);
+    if (starting > 0) return starting;
+    const isPensionFund = (pot.name ?? '').toLowerCase() === 'pension fund';
+    if (isPensionFund && (pot.contributionAmount ?? 0) > 0) {
+      return Number(pot.contributionAmount ?? 0);
+    }
+    return starting;
   }
 
   private getDescriptionForSubmit(): string {

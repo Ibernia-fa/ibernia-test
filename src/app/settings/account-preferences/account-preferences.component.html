@@ -12,7 +12,7 @@
   </mat-card-content>
 </mat-card>
 
-<form [formGroup]="form" (ngSubmit)="submit()">
+<form [formGroup]="form">
   <mat-card class="cardWithShadow mb-20">
     <mat-card-content>
       <h3 class="f-s-20 f-w-400 m-b-20">{{ 'Profile' | translate}}</h3>
@@ -105,7 +105,7 @@
           <mat-hint align="end">{{ (form.get('bio')?.value?.length || 0) }} / 250</mat-hint>
         </mat-form-field>
         <div class="m-t-8 d-flex justify-content-end">
-          <button type="submit" class="button-icon" [disabled]="form.invalid || isSaving">
+          <button type="button" class="button-icon" [disabled]="!hasProfileChanges || isSavingProfile" (click)="submitProfile()">
             <span>{{ 'Save' | translate }}</span>
           </button>
         </div>
@@ -354,10 +354,8 @@
       </div>
 
       <div class="mt-4 d-flex justify-content-end">
-        <button type="submit" class="button-icon" [disabled]="form.invalid || isSaving">
-          <!-- {{isSaving}} -->
-          <span >{{ 'Save' | translate }}</span>
-          <!-- <span *ngIf="isSaving">Saving…</span> -->
+        <button type="button" class="button-icon" [disabled]="!hasPreferencesChanges || isSavingPreferences" (click)="submitPreferences()">
+          <span>{{ 'Save' | translate }}</span>
         </button>
       </div>
     </mat-card-content>
