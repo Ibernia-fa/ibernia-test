@@ -15,6 +15,9 @@ const routes: Routes = [
   { path: 'account-preferences',  loadComponent: () =>
     import('./account-preferences/account-preferences.component')
       .then(m => m.AccountPreferencesComponent), data: { showSidebar: true } },
+  { path: 'default-assumptions', loadComponent: () =>
+    import('./default-assumptions/default-assumptions.component')
+      .then(m => m.DefaultAssumptionsComponent), data: { showSidebar: true } },
   { path: 'plan-billing', loadComponent: () =>
     import('./plan-billing/plan-billing.component')
       .then(m => m.PlanBillingComponent), data: { showSidebar: true } },

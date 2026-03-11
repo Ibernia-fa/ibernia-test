@@ -11,7 +11,6 @@ import {
   UserProfileDto,
 } from '../../default-preferance/services/default-preferance.http.service';
 import { AuthService } from 'src/app/auth/services/auth.service';
-import { allCountries } from 'src/app/clients/models/country';
 import { NavItemService } from 'src/app/layouts/full/nav-item.service';
 import { TranslateModule } from '@ngx-translate/core';
 import { MatCardModule } from '@angular/material/card';
@@ -19,12 +18,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatSelect, MatSelectModule } from '@angular/material/select';
 import { MatDialog } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { NgFor, NgIf } from '@angular/common';
-import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
-import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
+import { NgIf } from '@angular/common';
 import { ImageCropDialogComponent } from './image-crop-dialog/image-crop-dialog.component';
 
 @Component({
@@ -37,66 +33,31 @@ import { ImageCropDialogComponent } from './image-crop-dialog/image-crop-dialog.
     MatIconModule,
     MatFormFieldModule,
     MatInputModule,
-    MatSelect,
-    MatSelectModule,
     MatTooltipModule,
     ReactiveFormsModule,
     TranslateModule,
     NgIf,
-    NgFor,
-    ThousandSeparatorInputDirective
   ]
 })
 export class AccountPreferencesComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
-  countries = allCountries;
-  ComissionType = ComissionType;
-
-  private apiCommissionSnapshot?: {
-    comissionType: ComissionType | null;
-    comissionAmount: number | null;
-    comissionPercentage: number | null;
-  };
-
   isLoading = false;
   isSavingProfile = false;
-  isSavingPreferences = false;
   submitted = false;
 
   private profileSnapshot: { firstName: string; lastName: string; bio: string; profilePhotoUrl: string } | null = null;
-  private preferencesSnapshot: Record<string, unknown> | null = null;
-  // UI helpers - None first, default; order: None, Percentage, Fixed Amount, Both
-  comissionTypes = [
-    { label: 'None', value: ComissionType.None },
-    { label: 'Percentage', value: ComissionType.Percentage },
-    { label: 'Fixed Amount', value: ComissionType.Amount },
-    { label: 'Both', value: ComissionType.Both },
-  ];
   user: any;
-  // local-only preview (no upload)
   profileImagePreview: string | null = null;
   private objectUrlToRevoke: string | null = null;
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
-  @ViewChild('commissionAmountInput') commissionAmountInput?: ElementRef<HTMLInputElement>;
-  // profileImagePreview: string | null = null;
   form = this.fb.nonNullable.group({
     userId: ['' as string],
-    profilePhotoUrl: ['' as string],  // stays whatever backend returned
+    profilePhotoUrl: ['' as string],
     firstName: ['' as string],
     lastName: ['' as string],
     email: ['' as string],
     bio: ['' as string, [Validators.maxLength(250)]],
-    preferences: this.fb.nonNullable.group({
-      inflationRate: [2.5 as number, [Validators.required, Validators.min(0), Validators.max(100)]],
-      investmentReturn: [6 as number, [Validators.required, Validators.min(0), Validators.max(100)]],
-      pensionFundReturn: [4 as number, [Validators.required, Validators.min(0), Validators.max(100)]],
-      comissionType: [ComissionType.None as ComissionType, [Validators.required]],
-      comissionPercentage: [1 as number | null],
-      comissionAmount: [null as number | null],
-      currency: ['EUR', [Validators.required]],
-      country: ['' as string],
-    }),
   });
   userprofile: UserProfileDto;
 
@@ -121,18 +82,8 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
       email: this.user?.email ?? '',
     });
 
-    // dynamic validators for commission fields
-    this.form.controls.preferences.controls.comissionType.valueChanges
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((t) => this.applyComissionValidation(t as ComissionType));
-
-    // initial apply
-    this.applyComissionValidation(this.form.controls.preferences.controls.comissionType.value);
-
-    // load existing profile (handles 204)
     this.loadProfile();
 
-    // trigger change detection when form changes so Save buttons enable/disable correctly
     this.form.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => this.cdr.markForCheck());
   }
 
@@ -151,8 +102,7 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
       )
       .subscribe((res: HttpResponse<UserProfileDto | null>) => {
         if (res.status === 204) {
-          // nothing saved yet; create userprofile placeholder and set snapshots from current form
-          this.userprofile = { id: undefined, userId: this.user?.sub, preferences: this.form.getRawValue().preferences } as UserProfileDto;
+          this.userprofile = { id: undefined, userId: this.user?.sub, preferences: DEFAULT_PREFERENCES } as UserProfileDto;
           this.updateSnapshots();
           this.cdr.markForCheck();
           return;
@@ -167,41 +117,9 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
             lastName: p.lastName ?? this.user?.lastName ?? '',
             email: p.email ?? this.user?.email ?? '',
             bio: (p.bio ?? '').slice(0, 250),
-            preferences: {
-              inflationRate: p.preferences?.inflationRate ?? this.form.value.preferences?.inflationRate ?? 2.5,
-              investmentReturn: p.preferences?.investmentReturn ?? this.form.value.preferences?.investmentReturn ?? 6,
-              pensionFundReturn: p.preferences?.pensionFundReturn ?? this.form.value.preferences?.pensionFundReturn ?? 4,
-              comissionType: (p.preferences?.comissionType as ComissionType) ?? this.form.value.preferences?.comissionType,
-              comissionPercentage: p.preferences?.comissionPercentage ?? this.form.value.preferences?.comissionPercentage ?? null,
-              comissionAmount: p.preferences?.comissionAmount ?? this.form.value.preferences?.comissionAmount ?? null,
-              currency: p.preferences?.currency ?? this.form.value.preferences?.currency,
-              country: p.preferences?.country ?? this.form.value.preferences?.country,
-            },
           });
-
-          this.apiCommissionSnapshot = {
-            comissionType: p.preferences?.comissionType ?? null,
-            comissionAmount: p.preferences?.comissionAmount ?? null,
-            comissionPercentage: p.preferences?.comissionPercentage ?? null,
-          };
-          // show backend avatar if present (local preview only)
-          // if (p.profilePhotoUrl) {
-          //   this.profileImagePreview = p.profilePhotoUrl;
-          // }
 
           this.profileImagePreview = ensureDataUrl(p.profilePhotoUrl);
-
-          // re-apply validators in case type changed
-          this.applyComissionValidation(this.form.controls.preferences.controls.comissionType.value);
-
-          // Ensure commission amount displays with thousand separators immediately
-          setTimeout(() => {
-            const el = this.commissionAmountInput?.nativeElement;
-            const amount = this.form.controls.preferences.controls.comissionAmount.value;
-            if (!el || amount === null || amount === undefined) return;
-            el.value = Number(amount).toLocaleString('en-US');
-            el.dispatchEvent(new Event('blur'));
-          });
 
           this.updateSnapshots();
           this.cdr.markForCheck();
@@ -240,11 +158,13 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
   // }
 
 
-  private applyComissionValidation(t: ComissionType) {
-    const prefs = this.form.controls.preferences;
-    const pct = prefs.controls.comissionPercentage;
+  private _removedApplyComissionValidation(_t: ComissionType) {
+    void _t;
+    const prefs = (this.form as any).controls?.preferences as any;
+    if (!prefs) return;
+    const pct = prefs.controls?.comissionPercentage;
     const amt = prefs.controls.comissionAmount;
-
+    if (!pct || !amt) return;
     // Reset validators only (don’t wipe values)
     pct.clearValidators();
     amt.clearValidators();
@@ -253,14 +173,14 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
     pct.enable({ emitEvent: false });
     amt.enable({ emitEvent: false });
 
-    const fromApiPct = this.apiCommissionSnapshot?.comissionPercentage ?? null;
-    const fromApiAmt = this.apiCommissionSnapshot?.comissionAmount ?? null;
+    const fromApiPct: number | null = null;
+    const fromApiAmt: number | null = null;
 
-    if (t === ComissionType.None) {
+    if (_t === ComissionType.None) {
       // No commission fields required when None
       pct.disable({ emitEvent: false });
       amt.disable({ emitEvent: false });
-    } else if (t === ComissionType.Amount) {
+    } else if (_t === ComissionType.Amount) {
       // Validators
       amt.setValidators([Validators.required, Validators.min(0.01)]);
       // If amount is empty, seed from API or fallback default
@@ -269,7 +189,7 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
       }
       // Disable the other without clearing its value
       pct.disable({ emitEvent: false });
-    } else if (t === ComissionType.Percentage) {
+    } else if (_t === ComissionType.Percentage) {
       pct.setValidators([Validators.required, Validators.min(0), Validators.max(100)]);
       if (pct.value == null) {
         pct.setValue(fromApiPct ?? 1, { emitEvent: false }); // <- default %
@@ -289,10 +209,6 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
   }
 
 
-  get p() {
-    return this.form.controls.preferences.controls;
-  }
-
   get hasProfileChanges(): boolean {
     if (!this.profileSnapshot) return false;
     const v = this.form.getRawValue();
@@ -304,22 +220,6 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
     );
   }
 
-  get hasPreferencesChanges(): boolean {
-    if (!this.preferencesSnapshot) return false;
-    const prefs = this.form.getRawValue().preferences;
-    const snap = this.preferencesSnapshot;
-    return (
-      prefs.inflationRate !== snap['inflationRate'] ||
-      prefs.investmentReturn !== snap['investmentReturn'] ||
-      prefs.pensionFundReturn !== snap['pensionFundReturn'] ||
-      prefs.comissionType !== snap['comissionType'] ||
-      prefs.comissionPercentage !== snap['comissionPercentage'] ||
-      prefs.comissionAmount !== snap['comissionAmount'] ||
-      prefs.currency !== snap['currency'] ||
-      (prefs.country ?? '') !== (snap['country'] ?? '')
-    );
-  }
-
   private updateSnapshots(): void {
     const v = this.form.getRawValue();
     this.profileSnapshot = {
@@ -328,12 +228,6 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
       bio: v.bio ?? '',
       profilePhotoUrl: v.profilePhotoUrl ?? '',
     };
-    this.preferencesSnapshot = { ...v.preferences };
-  }
-
-  clientCountryValueChange(countryName: string) {
-    const selectedCountry = this.countries.find(c => c.countryName === countryName);
-    this.p['currency'].patchValue(selectedCountry?.currencySymbol || '');
   }
 
   // local preview only (no upload)
@@ -430,24 +324,7 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
       lastName: raw.lastName?.trim() || this.user?.lastName,
       email: raw.email?.trim() || this.user?.email,
       bio: blankToNull(raw.bio),
-      preferences: {
-        inflationRate: round2(raw.preferences.inflationRate),
-        investmentReturn: round2(raw.preferences.investmentReturn),
-        pensionFundReturn: round2(raw.preferences.pensionFundReturn),
-        comissionType: raw.preferences.comissionType,
-        comissionPercentage:
-          raw.preferences.comissionType === ComissionType.Amount ||
-          raw.preferences.comissionType === ComissionType.None
-            ? null
-            : roundOrNull(raw.preferences.comissionPercentage),
-        comissionAmount:
-          raw.preferences.comissionType === ComissionType.Percentage ||
-          raw.preferences.comissionType === ComissionType.None
-            ? null
-            : intOrNull(raw.preferences.comissionAmount),
-        currency: raw.preferences.currency,
-        country: blankToNull(raw.preferences.country),
-      },
+      preferences: this.userprofile?.preferences ?? DEFAULT_PREFERENCES,
     };
   }
 
@@ -480,35 +357,6 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
       });
   }
 
-  submitPreferences(): void {
-    this.submitted = true;
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      this.toastr.error('Please fix the highlighted fields', 'Error!');
-      return;
-    }
-    this.isSavingPreferences = true;
-    this.api.updateUserProfile(this.buildPayload())
-      .pipe(
-        takeUntil(this.destroy$),
-        catchError((err) => {
-          const msg = err?.error?.message ?? 'Failed to save preferences';
-          this.toastr.error(msg, 'Error!');
-          return EMPTY;
-        }),
-        finalize(() => {
-          this.isSavingPreferences = false;
-          this.cdr.markForCheck();
-        })
-      )
-      .subscribe(() => {
-        this.updateSnapshots();
-        this.toastr.success('Preferences saved', 'Success!');
-        this.api.notifyProfileChanged();
-        this.cdr.markForCheck();
-      });
-  }
-
   ngOnDestroy(): void {
     if (this.objectUrlToRevoke) {
       URL.revokeObjectURL(this.objectUrlToRevoke);
@@ -535,40 +383,21 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
-  onCommissionAmountInput(rawValue: string) {
-    const value = parseFormattedNumber(rawValue);
-    this.form.controls.preferences.controls.comissionAmount.setValue(value, { emitEvent: false });
-    const el = this.commissionAmountInput?.nativeElement;
-    if (!el) return;
-    if (value === null || value === undefined || Number.isNaN(value)) {
-      el.value = '';
-      return;
-    }
-    el.value = Number(value).toLocaleString('en-US');
-  }
-
-  formatCommissionAmountOnFocus(event: Event) {
-    const input = event.target as HTMLInputElement | null;
-    const amount = this.form.controls.preferences.controls.comissionAmount.value;
-    if (!input || amount === null || amount === undefined) return;
-    input.value = Number(amount).toLocaleString('en-US');
-  }
-
 }
 
 /* helpers */
-function round2(n: number): number {
-  return Math.round(n * 100) / 100;
-}
-function roundOrNull(n: number | null): number | null {
-  return n == null || Number.isNaN(+n) ? null : round2(+n);
-}
+const DEFAULT_PREFERENCES = {
+  inflationRate: 2.5,
+  investmentReturn: 6,
+  pensionFundReturn: 4,
+  comissionType: ComissionType.None,
+  comissionPercentage: null as number | null,
+  comissionAmount: null as number | null,
+  currency: 'EUR',
+  country: '',
+};
 function blankToNull(s?: string | null): string | null {
   return s && s.trim().length ? s.trim() : null;
-}
-function intOrNull(n: number | null): number | null {
-  if (n == null || Number.isNaN(+n)) return null;
-  return Math.trunc(n);
 }
 function ensureDataUrl(s?: string | null): string | null {
   if (!s) return null;

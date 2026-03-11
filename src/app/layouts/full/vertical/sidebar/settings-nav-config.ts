@@ -10,6 +10,12 @@ export const settingsNavItems: NavItem[] = [
     route: '/settings/account-preferences',
   },
   {
+    displayName: 'Default Assumptions',
+    iconName: '/assets/images/shapes/account-preference-active.svg',
+    iconOutline: '/assets/images/shapes/account.svg',
+    route: '/settings/default-assumptions',
+  },
+  {
     displayName: 'Security',
     iconName: '/assets/images/svgs/shield-check.svg',
     iconOutline: '/assets/images/svgs/shield-check.svg',
