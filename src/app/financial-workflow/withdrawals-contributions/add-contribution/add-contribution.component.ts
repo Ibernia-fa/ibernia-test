@@ -30,7 +30,7 @@ import {
 import moment from 'moment';
 import { FundsViewModel } from '../model/withdrawals-contributions';
 import { WithdrawalsContributionsHttpService } from '../services/withdrawals-contributions-http.service';
-import { catchError, filter } from 'rxjs';
+import { catchError, concatMap, filter } from 'rxjs';
 import {
   ClientSaving,
   ComissionType,
@@ -144,7 +144,7 @@ export class AddContributionComponent {
       savingPot: [''],
       escalationRate: [this.escalationRates[0].value, Validators.required],
       customEscalationRate: [''],
-      contributionType: [1, Validators.required], // 1 = Cash, 2 = External
+      contributionType: [1, Validators.required], // 1 = Cash, 2 = External, 3 = Both
 
       // commission (percentage-only)
       commissions: [false],
@@ -271,12 +271,20 @@ export class AddContributionComponent {
     this.dialogRef.close();
   }
 
-  selectContributionType(type: 1 | 2): void {
+  selectContributionType(type: 1 | 2 | 3): void {
     this.contributionForm.patchValue({ contributionType: type });
     this.applySavingPotFilter();
+    // Both requires a saving pot selection
+    const savingPotCtrl = this.contributionForm.get('savingPot');
+    if (type === 3) {
+      savingPotCtrl?.setValidators(Validators.required);
+    } else {
+      savingPotCtrl?.clearValidators();
+    }
+    savingPotCtrl?.updateValueAndValidity({ emitEvent: false });
   }
 
-  isTypeSelected(type: 1 | 2): boolean {
+  isTypeSelected(type: 1 | 2 | 3): boolean {
     return this.contributionForm.get('contributionType')?.value === type;
   }
 
@@ -362,7 +370,7 @@ export class AddContributionComponent {
         this.contributionForm.get('savingPot')?.setValue(null);
       }
     } else {
-      // External selected ➜ show ALL (including Cash)
+      // External or Both selected ➜ show ALL (including Cash)
       this.clientSavings = (this.allClientSavings ?? []).slice();
 
       // keep current selection if still valid; otherwise clear
@@ -402,13 +410,6 @@ export class AddContributionComponent {
     const selectedPotId: string | null = this.contributionForm.get('savingPot')?.value ?? null;
     const type = Number(this.contributionForm.get('contributionType')?.value ?? 1);
 
-
-    const associatedSavingPotId =
-      type === 1
-        ? (selectedPotId || this.cashPot?.id || '')
-        : (selectedPotId || '');
-
-
     // helper NetAmount shells
     const emptyCycle = { id: '', description: '' };
     const emptyNetAmount: NetAmount = {
@@ -433,6 +434,29 @@ export class AddContributionComponent {
     const endYear = resolveYear(endVal, this.eventsList);
     const startEventId = extractEventId(startVal);
     const endEventId = extractEventId(endVal);
+
+    // For Both (type 3), we create two contributions - skip single-contribution path
+    if (type === 3 && !this.isEditWorkflow) {
+      this.submitBothContributions(
+        selectedPotId,
+        hasCommission,
+        commissionPct,
+        emptyCycle,
+        emptyNetAmount,
+        escalationRateValue,
+        matchedRate,
+        startYear,
+        endYear,
+        startEventId,
+        endEventId
+      );
+      return;
+    }
+
+    const associatedSavingPotId =
+      type === 1
+        ? (selectedPotId || this.cashPot?.id || '')
+        : (selectedPotId || '');
 
     const contribution: FundsViewModel = {
       id: this.isEditWorkflow ? this.selectedContribution.id : null,
@@ -507,6 +531,104 @@ export class AddContributionComponent {
 
     action$
       .pipe(
+        filter((res) => !!res),
+        catchError((err) => {
+          console.error(err);
+          throw err;
+        })
+      )
+      .subscribe((res) => {
+        this.dialogRef.close({
+          status: 'Success',
+          contributionWithdrawal: res,
+        });
+      });
+  }
+
+  private submitBothContributions(
+    selectedPotId: string | null,
+    hasCommission: boolean,
+    commissionPct: number,
+    emptyCycle: { id: string; description: string },
+    emptyNetAmount: NetAmount,
+    escalationRateValue: string | number | null,
+    matchedRate: EscalationRate | undefined,
+    startYear: number,
+    endYear: number,
+    startEventId: string | null,
+    endEventId: string | null
+  ): void {
+    const associatedSavingPotId = selectedPotId || '';
+    const baseContribution: Omit<FundsViewModel, 'contributionType'> = {
+      id: null,
+      associatedSavingPotId,
+      description: this.getDescriptionForSubmit(),
+      amount: {
+        amount: this.contributionForm.get('amount')?.value,
+        currencySymbol: this.contributionForm.get('currencySymbol')?.value,
+        cycle: {
+          id: this.contributionForm.get('cycle')?.value ?? '',
+          description:
+            this.cycles.find(
+              (x) => x.id === this.contributionForm.get('cycle')?.value
+            )?.description ?? '',
+        },
+      },
+      start: {
+        age: startYear ? startYear - this.clientBirthYear : 0,
+        year: startYear || 0,
+      },
+      end: {
+        age: endYear ? endYear - this.clientBirthYear : 0,
+        year: endYear || 0,
+      },
+      startEventId,
+      endEventId,
+      escalationRate:
+        escalationRateValue !== null && escalationRateValue !== ''
+          ? matchedRate ?? {
+            description: this.selectedEscalationDescription ?? '',
+            value: String(escalationRateValue),
+          }
+          : { description: '', value: '0' },
+      hasCommission: hasCommission,
+      comission: hasCommission
+        ? {
+          type: ComissionType.Percentage,
+          amount: emptyNetAmount,
+          percentage: {
+            amount: commissionPct,
+            currencySymbol: '',
+            cycle: emptyCycle,
+          },
+          escalationRate: { description: '', value: '0' },
+        }
+        : {
+          type: ComissionType.Percentage,
+          amount: emptyNetAmount,
+          percentage: emptyNetAmount,
+          escalationRate: { description: '', value: '0' },
+        },
+    };
+
+    const contributionCash: FundsViewModel = {
+      ...baseContribution,
+      contributionType: 1,
+    };
+    const contributionExternal: FundsViewModel = {
+      ...baseContribution,
+      contributionType: 2,
+    };
+
+    this.withdrawalsContributionsHttpService
+      .addContributions(this.cashflowId, contributionCash)
+      .pipe(
+        concatMap((res) =>
+          this.withdrawalsContributionsHttpService.addContributions(
+            this.cashflowId,
+            contributionExternal
+          )
+        ),
         filter((res) => !!res),
         catchError((err) => {
           console.error(err);
