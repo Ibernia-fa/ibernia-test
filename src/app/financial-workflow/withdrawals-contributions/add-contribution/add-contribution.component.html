@@ -60,7 +60,7 @@
                    <div class="tabs">
     
 <div class="row">
-  <div class="col-6">
+  <div class="col-4">
     <button
       type="button"
       class="button-icon w-100"
@@ -70,7 +70,7 @@
       <span [class.active]="isTypeSelected(1)">Cash</span>
     </button>
   </div>
-  <div class="col-6">
+  <div class="col-4">
     <button
       type="button"
       class="button-icon w-100"
@@ -78,6 +78,17 @@
       (click)="selectContributionType(2)"
     >
       <span [class.active]="isTypeSelected(2)">External</span>
+    </button>
+  </div>
+  <div class="col-4">
+    <button
+      type="button"
+      class="button-icon w-100"
+      [class.active]="isTypeSelected(3)"
+      [disabled]="isEditWorkflow"
+      (click)="selectContributionType(3)"
+    >
+      <span [class.active]="isTypeSelected(3)">Both</span>
     </button>
   </div>
 </div>
