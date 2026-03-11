@@ -1063,6 +1063,9 @@ export class AddIncomeComponent {
     this.incomeForm.get('investThisAmount')?.valueChanges.subscribe(() => {
       this.syncInheritanceControlsState();
     });
+    this.incomeForm.get('incomeType')?.valueChanges.subscribe(() => {
+      this.syncInheritanceControlsState();
+    });
     this.incomeForm.get('description')?.valueChanges.subscribe(() => {
       this.syncInheritanceControlsState();
     });
@@ -1079,7 +1082,7 @@ export class AddIncomeComponent {
   }
 
   private syncInheritanceControlsState(): void {
-    const isInheritance = this.incomeForm.get('description')?.value === 'Inheritance';
+    const isInheritance = this.getIsDefaultInheritance();
     const investChecked = !!this.incomeForm.get('investThisAmount')?.value;
     const targetPotCtrl = this.incomeForm.get('inheritanceTargetPotId');
     const percentCtrl = this.incomeForm.get('inheritancePercentToInvest');
@@ -1093,6 +1096,7 @@ export class AddIncomeComponent {
     } else if (investChecked) {
       targetPotCtrl?.setValidators([Validators.required]);
       percentCtrl?.setValidators([Validators.required, Validators.min(1), Validators.max(100)]);
+      this.setDefaultInheritanceSavingPot();
     } else {
       targetPotCtrl?.clearValidators();
       targetPotCtrl?.setValue(null, { emitEvent: false });
@@ -1103,8 +1107,88 @@ export class AddIncomeComponent {
     percentCtrl?.updateValueAndValidity({ emitEvent: false });
   }
 
+  private setDefaultInheritanceSavingPot(): void {
+    const targetPotCtrl = this.incomeForm.get('inheritanceTargetPotId');
+    if (!targetPotCtrl || targetPotCtrl.value) return;
+
+    const nonCashSavings = this.getNonCashSavingsForInheritance();
+    const withValidId = nonCashSavings.filter((pot) => !!pot.id);
+    if (!withValidId.length) return;
+
+    let candidates = withValidId;
+    if (withValidId.length > 1) {
+      const usedPotIds = this.getExistingInheritanceContributionPotIds();
+      if (usedPotIds.length > 0) {
+        const unused = withValidId.filter(
+          (pot) => pot.id && !usedPotIds.includes(pot.id)
+        );
+        if (unused.length > 0) {
+          candidates = unused;
+        }
+      }
+    }
+
+    const defaultPot = this.getLargestPotForInheritance(candidates);
+    const potToSelect = defaultPot?.id ? defaultPot : candidates[0];
+    const potId = potToSelect?.id;
+    if (!potId) return;
+
+    if (this.clientSavings?.length && !this.clientSavings.some((pot) => pot.id === potId)) {
+      return;
+    }
+
+    // Defer to next tick so mat-select is rendered after @if(isInvestThisAmountChecked) becomes true
+    setTimeout(() => {
+      if (!targetPotCtrl.value) {
+        targetPotCtrl.setValue(potId);
+      }
+    }, 0);
+  }
+
+  private getNonCashSavingsForInheritance(): Array<{ id: string | null; name?: string; startingPotValue?: { amount?: number }; contributionAmount?: number }> {
+    return (this.clientSavings ?? []) as Array<{ id: string | null; name?: string; startingPotValue?: { amount?: number }; contributionAmount?: number }>;
+  }
+
+  private getExistingInheritanceContributionPotIds(): string[] {
+    return (this.existingContributions ?? [])
+      .map((c: any) => c?.associatedSavingPotId)
+      .filter((id: string | undefined): id is string => !!id);
+  }
+
+  /** For Pension fund: use contributionAmount as fallback when startingPotValue is 0 (common for new pensions) */
+  private getLargestPotForInheritance(
+    pots: Array<{ id: string | null; name?: string; startingPotValue?: { amount?: number }; contributionAmount?: number }>
+  ): { id: string | null } | null {
+    if (!pots.length) return null;
+    return pots.reduce((largest, pot) => {
+      const potAmount = this.getEffectivePotValueForComparison(pot);
+      const largestAmount = this.getEffectivePotValueForComparison(largest);
+      return potAmount > largestAmount ? pot : largest;
+    });
+  }
+
+  private getEffectivePotValueForComparison(pot: { name?: string; startingPotValue?: { amount?: number }; contributionAmount?: number }): number {
+    const starting = Number(pot.startingPotValue?.amount ?? 0);
+    if (starting > 0) return starting;
+    const isPensionFund = (pot.name ?? '').toLowerCase() === 'pension fund';
+    if (isPensionFund && (pot.contributionAmount ?? 0) > 0) {
+      return Number(pot.contributionAmount ?? 0);
+    }
+    return starting;
+  }
+
   get isInheritance(): boolean {
-    return this.incomeForm.get('description')?.value === 'Inheritance';
+    return this.getIsDefaultInheritance();
+  }
+
+  /** Invest this amount checkbox only for default Inheritance type, not Custom with name "Inheritance" */
+  private getIsDefaultInheritance(): boolean {
+    const incomeType = this.incomeForm.get('incomeType')?.value;
+    const description = this.incomeForm.get('description')?.value;
+    if (this.isEditWorkflow) {
+      return description === 'Inheritance' && this.selectedIncome?.isDefault === true;
+    }
+    return incomeType === 'Inheritance';
   }
 
   get isInvestThisAmountChecked(): boolean {

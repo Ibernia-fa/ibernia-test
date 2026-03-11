@@ -60,8 +60,12 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
   };
 
   isLoading = false;
-  isSaving = false;
+  isSavingProfile = false;
+  isSavingPreferences = false;
   submitted = false;
+
+  private profileSnapshot: { firstName: string; lastName: string; bio: string; profilePhotoUrl: string } | null = null;
+  private preferencesSnapshot: Record<string, unknown> | null = null;
   // UI helpers - None first, default; order: None, Percentage, Fixed Amount, Both
   comissionTypes = [
     { label: 'None', value: ComissionType.None },
@@ -127,6 +131,9 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
 
     // load existing profile (handles 204)
     this.loadProfile();
+
+    // trigger change detection when form changes so Save buttons enable/disable correctly
+    this.form.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => this.cdr.markForCheck());
   }
 
   private loadProfile() {
@@ -144,7 +151,10 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
       )
       .subscribe((res: HttpResponse<UserProfileDto | null>) => {
         if (res.status === 204) {
-          // nothing saved yet; keep defaults
+          // nothing saved yet; create userprofile placeholder and set snapshots from current form
+          this.userprofile = { id: undefined, userId: this.user?.sub, preferences: this.form.getRawValue().preferences } as UserProfileDto;
+          this.updateSnapshots();
+          this.cdr.markForCheck();
           return;
         }
         if (res.ok && res.body) {
@@ -192,6 +202,9 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
             el.value = Number(amount).toLocaleString('en-US');
             el.dispatchEvent(new Event('blur'));
           });
+
+          this.updateSnapshots();
+          this.cdr.markForCheck();
         }
       });
   }
@@ -278,6 +291,44 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
 
   get p() {
     return this.form.controls.preferences.controls;
+  }
+
+  get hasProfileChanges(): boolean {
+    if (!this.profileSnapshot) return false;
+    const v = this.form.getRawValue();
+    return (
+      (v.firstName?.trim() ?? '') !== (this.profileSnapshot.firstName?.trim() ?? '') ||
+      (v.lastName?.trim() ?? '') !== (this.profileSnapshot.lastName?.trim() ?? '') ||
+      (v.bio?.trim() ?? '') !== (this.profileSnapshot.bio?.trim() ?? '') ||
+      (v.profilePhotoUrl ?? '') !== (this.profileSnapshot.profilePhotoUrl ?? '')
+    );
+  }
+
+  get hasPreferencesChanges(): boolean {
+    if (!this.preferencesSnapshot) return false;
+    const prefs = this.form.getRawValue().preferences;
+    const snap = this.preferencesSnapshot;
+    return (
+      prefs.inflationRate !== snap['inflationRate'] ||
+      prefs.investmentReturn !== snap['investmentReturn'] ||
+      prefs.pensionFundReturn !== snap['pensionFundReturn'] ||
+      prefs.comissionType !== snap['comissionType'] ||
+      prefs.comissionPercentage !== snap['comissionPercentage'] ||
+      prefs.comissionAmount !== snap['comissionAmount'] ||
+      prefs.currency !== snap['currency'] ||
+      (prefs.country ?? '') !== (snap['country'] ?? '')
+    );
+  }
+
+  private updateSnapshots(): void {
+    const v = this.form.getRawValue();
+    this.profileSnapshot = {
+      firstName: v.firstName ?? '',
+      lastName: v.lastName ?? '',
+      bio: v.bio ?? '',
+      profilePhotoUrl: v.profilePhotoUrl ?? '',
+    };
+    this.preferencesSnapshot = { ...v.preferences };
   }
 
   clientCountryValueChange(countryName: string) {
@@ -369,21 +420,12 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
   }
 
 
-  submit() {
-    this.submitted = true;
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      this.toastr.error('Please fix the highlighted fields', 'Error!');
-      return;
-    }
-
+  private buildPayload(): UserProfileDto {
     const raw = this.form.getRawValue();
-    const payload: UserProfileDto = {
-      id: this.userprofile.id,
+    return {
+      id: this.userprofile?.id,
       userId: this.user?.sub,
-      // keep existing backend URL; do not use preview blob URL
-      // profilePhotoUrl: blankToNull(raw.profilePhotoUrl),
-      profilePhotoUrl: raw.profilePhotoUrl, // <-- keep as-is (may be base64 or null)
+      profilePhotoUrl: raw.profilePhotoUrl,
       firstName: raw.firstName?.trim() || this.user?.firstName,
       lastName: raw.lastName?.trim() || this.user?.lastName,
       email: raw.email?.trim() || this.user?.email,
@@ -407,9 +449,46 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
         country: blankToNull(raw.preferences.country),
       },
     };
+  }
 
-    this.isSaving = true;
-    this.api.updateUserProfile(payload)
+  submitProfile(): void {
+    this.submitted = true;
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      this.toastr.error('Please fix the highlighted fields', 'Error!');
+      return;
+    }
+    this.isSavingProfile = true;
+    this.api.updateUserProfile(this.buildPayload())
+      .pipe(
+        takeUntil(this.destroy$),
+        catchError((err) => {
+          const msg = err?.error?.message ?? 'Failed to save profile';
+          this.toastr.error(msg, 'Error!');
+          return EMPTY;
+        }),
+        finalize(() => {
+          this.isSavingProfile = false;
+          this.cdr.markForCheck();
+        })
+      )
+      .subscribe(() => {
+        this.updateSnapshots();
+        this.toastr.success('Profile saved', 'Success!');
+        this.api.notifyProfileChanged();
+        this.cdr.markForCheck();
+      });
+  }
+
+  submitPreferences(): void {
+    this.submitted = true;
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      this.toastr.error('Please fix the highlighted fields', 'Error!');
+      return;
+    }
+    this.isSavingPreferences = true;
+    this.api.updateUserProfile(this.buildPayload())
       .pipe(
         takeUntil(this.destroy$),
         catchError((err) => {
@@ -417,12 +496,16 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
           this.toastr.error(msg, 'Error!');
           return EMPTY;
         }),
-        finalize(() => (this.isSaving = false))
+        finalize(() => {
+          this.isSavingPreferences = false;
+          this.cdr.markForCheck();
+        })
       )
       .subscribe(() => {
-        this.isSaving = false;
+        this.updateSnapshots();
         this.toastr.success('Preferences saved', 'Success!');
         this.api.notifyProfileChanged();
+        this.cdr.markForCheck();
       });
   }
 

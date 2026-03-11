@@ -80,7 +80,7 @@ export class BrandingComponent implements OnInit {
       maxWidth: '95vw',
       data: {
         imageBase64,
-        aspectRatio: isProfile ? 1 : 16 / 9,
+        maintainAspectRatio: false,
         title: isProfile ? 'Crop company logo' : 'Crop background',
       },
     });
