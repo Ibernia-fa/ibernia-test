@@ -251,6 +251,7 @@ showFiller = false;
 
   private static readonly SETTINGS_PAGE_LABELS: Record<string, string> = {
     'account-preferences': 'Account preferences',
+    'default-assumptions': 'Default assumptions',
     'plan-billing': 'Plan & billing',
     'security': 'Security',
     'notifications': 'Notifications',
