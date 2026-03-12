@@ -10,13 +10,13 @@
   <mat-card class="privacy-card legal-links-card">
     <mat-card-content>
       <div class="legal-links">
-        <a href="/privacy-policy" target="_blank" class="legal-link">
+        <a [href]="privacyPolicyUrl" target="_blank" rel="noopener" class="legal-link">
           <mat-icon>shield</mat-icon>
           <span>Privacy Policy</span>
           <mat-icon class="link-arrow">chevron_right</mat-icon>
         </a>
         <mat-divider></mat-divider>
-        <a href="/terms-and-conditions" target="_blank" class="legal-link">
+        <a [href]="termsUrl" target="_blank" rel="noopener" class="legal-link">
           <mat-icon>description</mat-icon>
           <span>Terms and Conditions</span>
           <mat-icon class="link-arrow">chevron_right</mat-icon>

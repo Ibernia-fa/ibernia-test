@@ -14,6 +14,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { NavItemService } from 'src/app/layouts/full/nav-item.service';
 import { DataPrivacyService } from './data-privacy.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-privacy-data',
@@ -37,6 +38,8 @@ export class PrivacyDataComponent implements OnInit, OnDestroy {
   isExporting = false;
   isTerminating = false;
   showTerminateConfirm = false;
+  readonly privacyPolicyUrl = `${environment.authority}/privacy-policy`;
+  readonly termsUrl = `${environment.authority}/terms-and-conditions`;
 
   constructor(
     private privacyService: DataPrivacyService,

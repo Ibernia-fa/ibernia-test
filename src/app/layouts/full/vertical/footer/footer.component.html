@@ -3,7 +3,7 @@
       <span>&copy; 2025 Ibernia</span>
       <nav>
         <a *ngIf="showFaqLink" href="/settings/help">FAQ & Support</a>
-        <a href="/terms-and-conditions">Terms and Conditions</a>
+        <a [href]="termsUrl" target="_blank" rel="noopener">Terms and Conditions</a>
       </nav>
     </div>
   </footer>

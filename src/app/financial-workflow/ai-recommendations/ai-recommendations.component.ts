@@ -18,6 +18,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { ClientHttpService } from 'src/app/clients/services/client-http.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   imports: [
@@ -44,6 +45,7 @@ export class AiRecommendationsComponent implements OnInit, OnDestroy {
   public usageLimit = 5;
   public clientNotes = '';
   public advisorGuidelines = '';
+  public readonly termsUrl = `${environment.authority}/terms-and-conditions`;
 
   public userData: any;
   client$: Observable<Client | null>;

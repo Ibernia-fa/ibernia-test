@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { filter } from 'rxjs/operators';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-footer',
@@ -11,6 +12,7 @@ import { filter } from 'rxjs/operators';
 })
 export class FooterComponent {
   showFaqLink = true;
+  readonly termsUrl = `${environment.authority}/terms-and-conditions`;
 
   constructor(private router: Router) {
     this.router.events

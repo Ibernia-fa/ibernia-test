@@ -74,7 +74,16 @@
                   }
                 </mat-select>
                 @if (editedGoals.length) {
-                  <span class="edited-label">{{ 'Edited' | translate }}: {{ editedGoals.join(', ') }}</span>
+                  <div class="edited-chips">
+                    @for (name of editedGoals; track name) {
+                      <span class="edited-chip">
+                        {{ name }}
+                        <button class="chip-remove" (click)="removeEditedItem('goals', name)" aria-label="Remove">
+                          <mat-icon>close</mat-icon>
+                        </button>
+                      </span>
+                    }
+                  </div>
                 }
               </div>
 
@@ -92,7 +101,16 @@
                   }
                 </mat-select>
                 @if (editedSavingPots.length) {
-                  <span class="edited-label">{{ 'Edited' | translate }}: {{ editedSavingPots.join(', ') }}</span>
+                  <div class="edited-chips">
+                    @for (name of editedSavingPots; track name) {
+                      <span class="edited-chip">
+                        {{ name }}
+                        <button class="chip-remove" (click)="removeEditedItem('savingPots', name)" aria-label="Remove">
+                          <mat-icon>close</mat-icon>
+                        </button>
+                      </span>
+                    }
+                  </div>
                 }
               </div>
 
@@ -110,7 +128,16 @@
                   }
                 </mat-select>
                 @if (editedIncomes.length) {
-                  <span class="edited-label">{{ 'Edited' | translate }}: {{ editedIncomes.join(', ') }}</span>
+                  <div class="edited-chips">
+                    @for (name of editedIncomes; track name) {
+                      <span class="edited-chip">
+                        {{ name }}
+                        <button class="chip-remove" (click)="removeEditedItem('incomes', name)" aria-label="Remove">
+                          <mat-icon>close</mat-icon>
+                        </button>
+                      </span>
+                    }
+                  </div>
                 }
               </div>
 
@@ -128,7 +155,16 @@
                   }
                 </mat-select>
                 @if (editedExpenses.length) {
-                  <span class="edited-label">{{ 'Edited' | translate }}: {{ editedExpenses.join(', ') }}</span>
+                  <div class="edited-chips">
+                    @for (name of editedExpenses; track name) {
+                      <span class="edited-chip">
+                        {{ name }}
+                        <button class="chip-remove" (click)="removeEditedItem('expenses', name)" aria-label="Remove">
+                          <mat-icon>close</mat-icon>
+                        </button>
+                      </span>
+                    }
+                  </div>
                 }
               </div>
 

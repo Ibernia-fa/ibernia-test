@@ -651,6 +651,18 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
     });
   }
 
+  removeEditedItem(category: 'goals' | 'savingPots' | 'incomes' | 'expenses', name: string): void {
+    const listMap: Record<string, string[]> = {
+      goals: this.editedGoals,
+      savingPots: this.editedSavingPots,
+      incomes: this.editedIncomes,
+      expenses: this.editedExpenses,
+    };
+    const list = listMap[category];
+    const idx = list.indexOf(name);
+    if (idx >= 0) list.splice(idx, 1);
+  }
+
   private refreshData(): void {
     combineLatest([
       this.timelineHttpService.getTimelinebyCashflowId(this.cashflowId),
