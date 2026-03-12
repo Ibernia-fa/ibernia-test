@@ -43,7 +43,7 @@
               class="rounded"
               style="width:120px;height:120px;object-fit:cover;"
             />
-            <span class="crop-pic" (click)="cropImage($event, 'profile')" matTooltip="{{ 'Crop' | translate }}">
+            <span class="crop-pic" (click)="cropImage($event)" matTooltip="{{ 'Crop' | translate }}">
               <mat-icon>crop</mat-icon>
             </span>
             <span class="remove-pic" (click)="clearImage($event, 'profile')">
@@ -95,9 +95,6 @@
               class="rounded"
               style="width:120px;height:120px;object-fit:cover;"
             />
-            <span class="crop-pic" (click)="cropImage($event, 'background')" matTooltip="{{ 'Crop' | translate }}">
-              <mat-icon>crop</mat-icon>
-            </span>
             <span class="remove-pic" (click)="clearImage($event, 'background')">
               <img src="../../../assets/images/shapes/delete.svg" alt="delete">
             </span>
@@ -110,7 +107,7 @@
               {{ 'Click to upload background image' | translate }}<br><span class="underline">{{ 'or drag and drop' | translate }}</span>
             </p>
             <small class="text-xs text-gray-400 f-s-12 m-0">
-              SVG, PNG, JPG or GIF (max. 800×400px)
+              SVG, PNG, JPG or GIF (min. 400×400px)
             </small>
           </ng-template>
         </div>

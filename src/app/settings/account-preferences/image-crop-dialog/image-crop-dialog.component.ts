@@ -4,11 +4,12 @@ import { MatButtonModule } from '@angular/material/button';
 import { ImageCropperComponent, ImageCroppedEvent } from 'ngx-image-cropper';
 import { TranslateModule } from '@ngx-translate/core';
 
+export type CropType = 'profile' | 'company';
+
 export interface ImageCropDialogData {
   imageBase64: string;
-  /** When false, allows free rectangular crop to fit image dimensions. Default true for profile. */
-  maintainAspectRatio?: boolean;
-  aspectRatio?: number;
+  /** 'profile' = circle, 'company' = rectangle. Controls shape and fixed dimensions. */
+  cropType?: CropType;
   title?: string;
 }
 
@@ -27,12 +28,16 @@ export interface ImageCropDialogData {
       <div class="crop-container">
         <image-cropper
           [imageBase64]="data.imageBase64"
-          [maintainAspectRatio]="data.maintainAspectRatio ?? false"
-          [aspectRatio]="data.aspectRatio ?? 1"
+          [maintainAspectRatio]="true"
+          [aspectRatio]="data.cropType === 'company' ? (4/3) : 1"
+          [roundCropper]="data.cropType === 'profile'"
+          [allowMoveImage]="true"
+          [hideResizeSquares]="true"
+          [cropperStaticWidth]="data.cropType === 'company' ? 400 : 300"
+          [cropperStaticHeight]="data.cropType === 'company' ? 300 : 300"
           format="png"
           output="base64"
           [resizeToWidth]="0"
-          [roundCropper]="false"
           (imageCropped)="onImageCropped($event)"
           (loadImageFailed)="onLoadFailed()"
         ></image-cropper>
@@ -47,11 +52,17 @@ export interface ImageCropDialogData {
   `,
   styles: [`
     .crop-container {
-      min-height: 300px;
+      min-height: 320px;
       max-height: 70vh;
     }
     .crop-container image-cropper {
       max-height: 60vh;
+      width: 100%;
+    }
+    /* Fix crop overlay in place - user moves image only, not the crop box */
+    .crop-container ::ng-deep .ngx-ic-overlay,
+    .crop-container ::ng-deep .ngx-ic-cropper {
+      pointer-events: none;
     }
   `],
 })

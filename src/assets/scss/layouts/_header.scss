@@ -121,18 +121,38 @@ html .topbar {
   outline: none;
   cursor: pointer;
 }
-.header-profile-button .pic-riple {
-  position: absolute;
-  top: -1px;
-  left: -3px;
-  z-index: -1;
-  height: 40px;
-  width: 40px;
-  background: transparent;
-  border-radius: 9999px;
-  transition: all 0.2s ease;
+.header-profile-button .avatar-ripple-wrapper {
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-right: 6px;
+  img {
+    width: 35px;
+    height: 35px;
+    margin: 0;
+    object-fit: cover;
+  }
+  .avatar-initials {
+    margin: 0;
+  }
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 40px;
+    height: 40px;
+    margin: -20px 0 0 -20px;
+    border-radius: 50%;
+    background: transparent;
+    transition: background 0.2s ease;
+    z-index: -1;
+  }
 }
-.header-profile-button:hover .pic-riple {
+.header-profile-button:hover .avatar-ripple-wrapper::before {
   background: #e3e4e4;
 }
 // End New Styles
@@ -144,9 +164,6 @@ html .topbar {
   .name-wraper {
     margin-top: -9px;
     line-height: normal;
-  }
-  img {
-    margin-top: 2px;
   }
   .sub-menu {
     position: absolute;

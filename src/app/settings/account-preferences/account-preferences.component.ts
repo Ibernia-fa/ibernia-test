@@ -294,7 +294,7 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
     const dialogRef = this.dialog.open(ImageCropDialogComponent, {
       width: '600px',
       maxWidth: '95vw',
-      data: { imageBase64 },
+      data: { imageBase64, cropType: 'profile' as const },
     });
 
     dialogRef.afterClosed().subscribe((result: string | null) => {
