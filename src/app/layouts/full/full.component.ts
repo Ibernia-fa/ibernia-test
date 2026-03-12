@@ -1,5 +1,11 @@
 import { BreakpointObserver, MediaMatcher } from '@angular/cdk/layout';
-import { Component, OnInit, ViewChild, ViewEncapsulation, OnDestroy } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ViewChild,
+  ViewEncapsulation,
+  OnDestroy,
+} from '@angular/core';
 import { Subscription, Subject, takeUntil } from 'rxjs';
 import {
   MatSidenav,
@@ -25,8 +31,14 @@ import { CustomizerComponent } from './shared/customizer/customizer.component';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatListModule } from '@angular/material/list';
-import { navItems as mainNavItems, navItemslower as mainLower } from './vertical/sidebar/sidebar-data';
-import { settingsNavItems, settingsLowerNavItems } from './vertical/sidebar/settings-nav-config';
+import {
+  navItems as mainNavItems,
+  navItemslower as mainLower,
+} from './vertical/sidebar/sidebar-data';
+import {
+  settingsNavItems,
+  settingsLowerNavItems,
+} from './vertical/sidebar/settings-nav-config';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ShareReportComponent } from 'src/app/financial-workflow/share-report/share-report.component';
 
@@ -76,7 +88,7 @@ interface quicklinks {
     MatDividerModule,
     MatListModule,
     MatDialogModule,
-    TranslateModule
+    TranslateModule,
   ],
   templateUrl: './full.component.html',
   styleUrls: [],
@@ -100,7 +112,8 @@ export class FullComponent implements OnInit, OnDestroy {
   hideSidebar = false;
   backgroundImage: string | null = null;
   backgroundImageReady = false;
-  readonly defaultBackgroundImage = 'assets/images/backgrounds/default-bg.jpg';
+  readonly defaultBackgroundImage =
+    'assets/images/backgrounds/background-img.png';
   private destroy$ = new Subject<void>();
 
   client$: Observable<Client | null>;
@@ -226,7 +239,7 @@ export class FullComponent implements OnInit, OnDestroy {
     private dialog: MatDialog,
     private store: Store,
     private organizationProfiles: OrganizationProfilesService,
-    private Authservice: AuthService
+    private Authservice: AuthService,
   ) {
     this.client$ = this.store.select(selectedClient);
 
@@ -268,7 +281,7 @@ export class FullComponent implements OnInit, OnDestroy {
 
         // keep your existing hideSidebar logic
         this.hideSidebar = this.options.sidebarHiddenOnRoutes.some((x) =>
-          currentRoute.includes(x)
+          currentRoute.includes(x),
         );
 
         // NEW: detect settings
@@ -288,7 +301,7 @@ export class FullComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.client$.subscribe(client => {
+    this.client$.subscribe((client) => {
       if (client) {
         this.clientName = client.clientDetails?.firstName;
       }
@@ -357,8 +370,7 @@ export class FullComponent implements OnInit, OnDestroy {
     const dialogRef = this.dialog.open(ShareReportComponent, {
       width: '700px',
       disableClose: true,
-      data: {
-      }
+      data: {},
     });
 
     dialogRef.afterClosed().subscribe((result: any) => {
@@ -370,11 +382,14 @@ export class FullComponent implements OnInit, OnDestroy {
     const userId = this.Authservice.getUserProfile()?.sub;
     if (!userId) return;
 
-    this.organizationProfiles.getProfile(userId)
+    this.organizationProfiles
+      .getProfile(userId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (p) => {
-          this.backgroundImage = this.ensureDataUrl(p?.backgroundPhotoUrl ?? null);
+          this.backgroundImage = this.ensureDataUrl(
+            p?.backgroundPhotoUrl ?? null,
+          );
           this.backgroundImageReady = true;
         },
         error: (err) => {
