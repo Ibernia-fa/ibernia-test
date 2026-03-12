@@ -13,6 +13,8 @@ export interface ReportScenarioPayload {
   InflationRate: number;
   SavingPotId?: string | null;
   ReturnRateOverride?: number | null;
+  IncomeOverrides?: any[];
+  ExpenseOverrides?: any[];
 }
 
 @Injectable({

@@ -78,10 +78,10 @@
                 </mat-select>
                 @if (editedGoals.length) {
                   <div class="edited-chips">
-                    @for (name of editedGoals; track name) {
+                    @for (entry of editedGoals; track entry.name) {
                       <span class="edited-chip">
-                        {{ name }}
-                        <button class="chip-remove" (click)="removeEditedItem('goals', name)" aria-label="Remove">
+                        {{ entry.name }}
+                        <button class="chip-remove" (click)="removeEditedItem('goals', entry.name)" aria-label="Remove">
                           <mat-icon>close</mat-icon>
                         </button>
                       </span>
@@ -108,10 +108,10 @@
                 </mat-select>
                 @if (editedSavingPots.length) {
                   <div class="edited-chips">
-                    @for (name of editedSavingPots; track name) {
+                    @for (entry of editedSavingPots; track entry.name) {
                       <span class="edited-chip">
-                        {{ name }}
-                        <button class="chip-remove" (click)="removeEditedItem('savingPots', name)" aria-label="Remove">
+                        {{ entry.name }}
+                        <button class="chip-remove" (click)="removeEditedItem('savingPots', entry.name)" aria-label="Remove">
                           <mat-icon>close</mat-icon>
                         </button>
                       </span>
@@ -138,10 +138,10 @@
                 </mat-select>
                 @if (editedIncomes.length) {
                   <div class="edited-chips">
-                    @for (name of editedIncomes; track name) {
+                    @for (entry of editedIncomes; track entry.name) {
                       <span class="edited-chip">
-                        {{ name }}
-                        <button class="chip-remove" (click)="removeEditedItem('incomes', name)" aria-label="Remove">
+                        {{ entry.name }}
+                        <button class="chip-remove" (click)="removeEditedItem('incomes', entry.name)" aria-label="Remove">
                           <mat-icon>close</mat-icon>
                         </button>
                       </span>
@@ -168,10 +168,10 @@
                 </mat-select>
                 @if (editedExpenses.length) {
                   <div class="edited-chips">
-                    @for (name of editedExpenses; track name) {
+                    @for (entry of editedExpenses; track entry.name) {
                       <span class="edited-chip">
-                        {{ name }}
-                        <button class="chip-remove" (click)="removeEditedItem('expenses', name)" aria-label="Remove">
+                        {{ entry.name }}
+                        <button class="chip-remove" (click)="removeEditedItem('expenses', entry.name)" aria-label="Remove">
                           <mat-icon>close</mat-icon>
                         </button>
                       </span>

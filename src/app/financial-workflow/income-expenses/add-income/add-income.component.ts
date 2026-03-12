@@ -80,6 +80,7 @@ export class AddIncomeComponent {
   retirementYear: number;
   forecastEndYear: number;
   isSaving = false;
+  scenarioMode: boolean = false;
   clientSavings: { id: string; name: string }[] = [];
   existingContributions: any[] = [];
   private initialFormSnapshot = '';
@@ -96,6 +97,7 @@ export class AddIncomeComponent {
     private incomeExpenseHttpService: IncomeExpensesHttpService,
     private withdrawalsContributionsHttpService: WithdrawalsContributionsHttpService
   ) {
+    this.scenarioMode = data.scenarioMode ?? false;
     this.incomeTypes = data.incomeType;
     this.eventsList = data.eventsList ?? [];
     this.clientSavings = (data.clientSavings ?? []).filter((s: { name?: string }) => (s.name ?? '').toLowerCase() !== 'cash');
@@ -545,6 +547,15 @@ export class AddIncomeComponent {
           }
           : null
       };
+
+      if (this.scenarioMode) {
+        this.dialogRef.close({
+          status: 'Success',
+          incomeExpense: null,
+          scenarioItem: income
+        });
+        return;
+      }
 
       var action$ = this.incomeExpenseHttpService.addIncome(
         this.cashflowId,

@@ -105,6 +105,7 @@ export class AddEventDialogComponent {
   clientCountryCode: string = '';
   showMortgageCalculator = false;
   lastCalculatorState: MortgageCalculatorState | null = null;
+  scenarioMode: boolean = false;
 
   get isHomeEvent(): boolean {
     return this.patchEvent?.name?.startsWith('Home') ?? false;
@@ -118,6 +119,7 @@ export class AddEventDialogComponent {
   ) {
     this.amountCycles = data.amountCycles;
     this.selectedEventType = data.eventType;
+    this.scenarioMode = data.scenarioMode ?? false;
     this.clientCountryCode = this.resolveCountryCode(data.clientCountryCode ?? '');
 
     // Force Financing category based on event name
@@ -563,6 +565,12 @@ export class AddEventDialogComponent {
         isParent: false
       };
 
+      if (this.scenarioMode) {
+        this.saveClicked = false;
+        this.dialogRef.close({ status: 'Success', scenarioItem: clientEvent });
+        return;
+      }
+
       this.timelineHttpService.addEvent(clientEvent, this.cashflowId)
         .pipe(
           filter(res => !!res),
@@ -630,6 +638,12 @@ export class AddEventDialogComponent {
         isFinance: false,
         isParent: false
       };
+
+      if (this.scenarioMode) {
+        this.saveClicked = false;
+        this.dialogRef.close({ status: 'Success', scenarioItem: clientEvent });
+        return;
+      }
 
       this.timelineHttpService.addEvent(clientEvent, this.cashflowId)
         .pipe(
@@ -806,6 +820,11 @@ export class AddEventDialogComponent {
       return;
     }
 
+    if (this.scenarioMode) {
+      this.saveClicked = false;
+      this.dialogRef.close({ status: 'Success', scenarioItem: events });
+      return;
+    }
 
     this.timelineHttpService.addFinancingEvents(events, this.cashflowId)
       .pipe(

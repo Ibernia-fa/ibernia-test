@@ -108,10 +108,10 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
   incomeItems: FinancialViewModel[] = [];
   expenseItems: FinancialViewModel[] = [];
 
-  editedGoals: string[] = [];
-  editedSavingPots: string[] = [];
-  editedIncomes: string[] = [];
-  editedExpenses: string[] = [];
+  editedGoals: Array<{ name: string; item: ClientEvent }> = [];
+  editedSavingPots: Array<{ name: string; item: ClientSaving }> = [];
+  editedIncomes: Array<{ name: string; item: FinancialViewModel }> = [];
+  editedExpenses: Array<{ name: string; item: FinancialViewModel }> = [];
 
   incomeExpenseData: IncomeExpense | null = null;
   amountCycles: Cycle[] = [];
@@ -342,7 +342,32 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
       ForecastEndDate: forecastEndDate.toISOString(),
       InflationRate: inflationRate,
     };
+
+    if (this.editedIncomes.length) {
+      payload.IncomeOverrides = this.editedIncomes.map(e => this.toFinancialRecordLineItem(e.item));
+    }
+    if (this.editedExpenses.length) {
+      payload.ExpenseOverrides = this.editedExpenses.map(e => this.toFinancialRecordLineItem(e.item));
+    }
+
     return payload;
+  }
+
+  private toFinancialRecordLineItem(vm: FinancialViewModel): any {
+    return {
+      Id: vm.id ?? '',
+      Description: vm.description,
+      Amount: vm.amount,
+      Start: vm.start,
+      End: vm.end,
+      EscalationRate: vm.escalationRate,
+      IsDefault: vm.isDefault ?? false,
+      IsIncomeExpenseSource: vm.isIncomeExpenseSource ?? false,
+      Icon: vm.icon,
+      Bonus: vm.bonus ?? null,
+      StartEventId: vm.startEventId ?? null,
+      EndEventId: vm.endEventId ?? null,
+    };
   }
 
   private loadScenarioReport() {
@@ -560,15 +585,18 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
         isEditWorkflow: true,
         patchEvent: event,
         financialRecords: [],
+        scenarioMode: true,
       },
     });
 
     dialogRef.afterClosed().subscribe((result: any) => {
-      if (result && result.status === 'Success') {
-        if (!this.editedGoals.includes(event.name)) {
-          this.editedGoals.push(event.name);
+      if (result?.status === 'Success' && result.scenarioItem) {
+        const existing = this.editedGoals.findIndex(e => e.name === event.name);
+        if (existing >= 0) {
+          this.editedGoals[existing] = { name: event.name, item: result.scenarioItem };
+        } else {
+          this.editedGoals.push({ name: event.name, item: result.scenarioItem });
         }
-        this.refreshData();
       }
     });
   }
@@ -597,15 +625,18 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
         hasPartner: !!this.client.partnerDetail,
         clientFirstName: this.client.clientDetails?.firstName ?? '',
         partnerFirstName: this.client.partnerDetail?.firstName ?? '',
+        scenarioMode: true,
       },
     });
 
     dialogRef.afterClosed().subscribe((result: any) => {
-      if (result?.savingPot) {
-        if (!this.editedSavingPots.includes(pot.name)) {
-          this.editedSavingPots.push(pot.name);
+      if (result?.status === 'Success' && result.scenarioItem) {
+        const existing = this.editedSavingPots.findIndex(e => e.name === pot.name);
+        if (existing >= 0) {
+          this.editedSavingPots[existing] = { name: pot.name, item: result.scenarioItem };
+        } else {
+          this.editedSavingPots.push({ name: pot.name, item: result.scenarioItem });
         }
-        this.refreshData();
       }
     });
   }
@@ -628,15 +659,18 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
         forecastEndDateYear: moment(this.financialTimeline.forecastEndtDate).year(),
         forecastStartDateYear: moment(this.financialTimeline.forecastStartDate).year(),
         incomeType: this.buildIncomeTypes(),
+        scenarioMode: true,
       },
     });
 
     dialogRef.afterClosed().subscribe((result: any) => {
-      if (result?.incomeExpense) {
-        if (!this.editedIncomes.includes(income.description)) {
-          this.editedIncomes.push(income.description);
+      if (result?.status === 'Success' && result.scenarioItem) {
+        const existing = this.editedIncomes.findIndex(e => e.name === income.description);
+        if (existing >= 0) {
+          this.editedIncomes[existing] = { name: income.description, item: result.scenarioItem };
+        } else {
+          this.editedIncomes.push({ name: income.description, item: result.scenarioItem });
         }
-        this.refreshData();
       }
     });
   }
@@ -659,28 +693,31 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
         forecastEndDateYear: moment(this.financialTimeline.forecastEndtDate).year(),
         forecastStartDateYear: moment(this.financialTimeline.forecastStartDate).year(),
         expenseType: this.buildExpenseTypes(),
+        scenarioMode: true,
       },
     });
 
     dialogRef.afterClosed().subscribe((result: any) => {
-      if (result?.incomeExpense) {
-        if (!this.editedExpenses.includes(expense.description)) {
-          this.editedExpenses.push(expense.description);
+      if (result?.status === 'Success' && result.scenarioItem) {
+        const existing = this.editedExpenses.findIndex(e => e.name === expense.description);
+        if (existing >= 0) {
+          this.editedExpenses[existing] = { name: expense.description, item: result.scenarioItem };
+        } else {
+          this.editedExpenses.push({ name: expense.description, item: result.scenarioItem });
         }
-        this.refreshData();
       }
     });
   }
 
   removeEditedItem(category: 'goals' | 'savingPots' | 'incomes' | 'expenses', name: string): void {
-    const listMap: Record<string, string[]> = {
+    const listMap: Record<string, Array<{ name: string }>> = {
       goals: this.editedGoals,
       savingPots: this.editedSavingPots,
       incomes: this.editedIncomes,
       expenses: this.editedExpenses,
     };
     const list = listMap[category];
-    const idx = list.indexOf(name);
+    const idx = list.findIndex(e => e.name === name);
     if (idx >= 0) list.splice(idx, 1);
   }
 

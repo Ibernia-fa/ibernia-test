@@ -81,6 +81,7 @@ export class AddExpenseComponent {
   showNameEdit: boolean = false;
   forecastEndYear: number;
   isSaving = false;
+  scenarioMode: boolean = false;
   private initialFormSnapshot = '';
 
   constructor(
@@ -110,6 +111,7 @@ export class AddExpenseComponent {
 
     this.clientPreferredCurrency = data.clientPreferredCurrency;
     this.cashflowId = data.cashflowId;
+    this.scenarioMode = data.scenarioMode ?? false;
     this.isEditWorkflow = data.isEditWorkflow;
     this.selectedExpense = data.selectedExpense;
     this.isNameEditable = this.selectedExpense?.description != "Living costs"
@@ -340,6 +342,16 @@ export class AddExpenseComponent {
         isIncomeExpenseSource: this.selectedExpense?.isIncomeExpenseSource ?? true,
         icon: this.expenseIcon
       };
+
+      if (this.scenarioMode) {
+        this.isSaving = false;
+        this.dialogRef.close({
+          status: 'Success',
+          incomeExpense: null,
+          scenarioItem: expense
+        });
+        return;
+      }
 
       var action$ = this.incomeExpenseHttpService.addExpense(
         this.cashflowId,

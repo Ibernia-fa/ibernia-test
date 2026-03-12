@@ -88,6 +88,7 @@ export class AddNewPotComponent {
   selectedNameIconUrl: string = '';
   inflationRate = 0;
   isEditWorkflow = false;
+  scenarioMode: boolean = false;
   selectedPot: ClientSaving;
   savingPotType= SavingPotType
   selectedEscalationDescription: string | null = null;
@@ -153,6 +154,7 @@ export class AddNewPotComponent {
     this.eventsList = data.eventsList;
     this.existingSavingPots = data.existingSavingPots || [];  // Get existing pots for smart defaults
     this.hasPartner = data.hasPartner ?? false;
+    this.scenarioMode = data.scenarioMode ?? false;
     this.clientFirstName = data.clientFirstName ?? '';
     this.partnerFirstName = data.partnerFirstName ?? '';
     this.clientBirthYear = moment(data.clientBirthDate).year();
@@ -1027,6 +1029,14 @@ onEscalationRateChange(event: MatSelectChange): void {
           : null,
         ownership: this.hasPartner ? (this.savingsForm.get('ownership')?.value ?? SavingPotOwnership.Joint) : SavingPotOwnership.Joint
       };
+      if (this.scenarioMode) {
+        this.dialogRef.close({
+          status: 'Success',
+          savingPot: null,
+          scenarioItem: clientSaving,
+        });
+        return;
+      }
       const function$ = !this.isEditWorkflow ? this.savingPotsHttpService
       .addNewSavingPot(this.cashflowId, clientSaving) :
       this.savingPotsHttpService
