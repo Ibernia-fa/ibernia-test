@@ -2,117 +2,21 @@
   <div class="privacy-header">
     <h2>Privacy & Data</h2>
     <p class="subtitle">
-      Manage your personal data, export information, and understand how your data is handled under applicable data-protection laws.
+      Export your data or manage your account closure.
     </p>
   </div>
-
-  <!-- Data Retention Policy Summary -->
-  <mat-card class="privacy-card">
-    <mat-card-header>
-      <mat-icon mat-card-avatar class="card-icon">policy</mat-icon>
-      <mat-card-title>Data Retention</mat-card-title>
-      <mat-card-subtitle>How long we keep your data</mat-card-subtitle>
-    </mat-card-header>
-    <mat-card-content>
-      <div class="retention-table">
-        <div class="retention-row header">
-          <span class="retention-category">Data Category</span>
-          <span class="retention-period">Retention Period</span>
-          <span class="retention-basis">Basis</span>
-        </div>
-        <mat-divider></mat-divider>
-        <div class="retention-row">
-          <span class="retention-category">Client Data</span>
-          <span class="retention-period">As long as you maintain the record</span>
-          <span class="retention-basis">Your instruction (controller)</span>
-        </div>
-        <div class="retention-row">
-          <span class="retention-category">Advisor Account &amp; Profile</span>
-          <span class="retention-period">Active account; 90 days after closure</span>
-          <span class="retention-basis">Contract performance</span>
-        </div>
-        <div class="retention-row">
-          <span class="retention-category">AI Usage &amp; Feedback</span>
-          <span class="retention-period">2 years</span>
-          <span class="retention-basis">Legitimate interest</span>
-        </div>
-        <div class="retention-row">
-          <span class="retention-category">Audit Logs</span>
-          <span class="retention-period">7 years</span>
-          <span class="retention-basis">Accountability</span>
-        </div>
-        <div class="retention-row">
-          <span class="retention-category">Post-Termination</span>
-          <span class="retention-period">60-day export + 30-day deletion + 90-day backup</span>
-          <span class="retention-basis">Terms §8.3</span>
-        </div>
-      </div>
-      <p class="retention-note">
-        <strong>Note:</strong> As your data processor, Ibernia stores client data for as long as you
-        (the controller) maintain the record. You are responsible for your own record-keeping obligations
-        under applicable financial regulations. Please export any required records before requesting deletion.
-      </p>
-    </mat-card-content>
-  </mat-card>
-
-  <!-- Data Inventory -->
-  <mat-card class="privacy-card">
-    <mat-card-header>
-      <mat-icon mat-card-avatar class="card-icon">inventory_2</mat-icon>
-      <mat-card-title>Your Data Inventory</mat-card-title>
-      <mat-card-subtitle>Overview of data stored in your account</mat-card-subtitle>
-    </mat-card-header>
-    <mat-card-content>
-      <div *ngIf="isLoading" class="loading-container">
-        <mat-spinner diameter="40"></mat-spinner>
-      </div>
-
-      <div *ngIf="!isLoading && retentionStatus" class="inventory-content">
-        <div class="status-summary">
-          <div class="status-item">
-            <span class="status-value">{{ retentionStatus.totalRecords | number }}</span>
-            <span class="status-label">Total Records</span>
-          </div>
-          <div class="status-item">
-            <span class="status-value">{{ retentionStatus.anonymizedRecords | number }}</span>
-            <span class="status-label">Anonymised</span>
-          </div>
-          <div class="status-item">
-            <span class="status-value">{{ retentionStatus.pendingExpiry | number }}</span>
-            <span class="status-label">Pending Deletion</span>
-          </div>
-        </div>
-
-        <mat-divider></mat-divider>
-
-        <div class="category-breakdown" *ngIf="retentionStatus.categories?.length">
-          <h4>By Category</h4>
-          <div *ngFor="let cat of retentionStatus.categories" class="category-row">
-            <span class="cat-name">{{ cat.category }}</span>
-            <span class="cat-count">{{ cat.recordCount }} records</span>
-            <span class="cat-anon" *ngIf="cat.anonymizedCount > 0">({{ cat.anonymizedCount }} anonymised)</span>
-          </div>
-        </div>
-      </div>
-
-      <div *ngIf="!isLoading && !retentionStatus" class="empty-state">
-        <p>Unable to load data inventory. Please try again later.</p>
-      </div>
-    </mat-card-content>
-  </mat-card>
 
   <!-- Data Export -->
   <mat-card class="privacy-card">
     <mat-card-header>
       <mat-icon mat-card-avatar class="card-icon">download</mat-icon>
       <mat-card-title>Export Your Data</mat-card-title>
-      <mat-card-subtitle>Right of Access and Data Portability</mat-card-subtitle>
+      <mat-card-subtitle>Download a complete copy of your data</mat-card-subtitle>
     </mat-card-header>
     <mat-card-content>
       <p>
-        Download a complete copy of all personal data we hold about you and your clients,
-        in a structured, machine-readable JSON format. This supports your right of access
-        and data portability under applicable data-protection laws.
+        Download a complete archive containing all personal data we hold about you and your clients.
+        The archive includes an Excel spreadsheet with your data and any associated images.
       </p>
       <button
         mat-flat-button
@@ -124,43 +28,6 @@
         <mat-spinner *ngIf="isExporting" diameter="20" class="inline-spinner"></mat-spinner>
         {{ isExporting ? 'Exporting...' : 'Export My Data' }}
       </button>
-    </mat-card-content>
-  </mat-card>
-
-  <!-- Your Rights -->
-  <mat-card class="privacy-card">
-    <mat-card-header>
-      <mat-icon mat-card-avatar class="card-icon">gavel</mat-icon>
-      <mat-card-title>Your Data Protection Rights</mat-card-title>
-      <mat-card-subtitle>Under applicable data-protection laws</mat-card-subtitle>
-    </mat-card-header>
-    <mat-card-content>
-      <div class="rights-list">
-        <div class="right-item">
-          <strong>Right of Access</strong>
-          <p>You can request a copy of all personal data we hold about you using the export feature above.</p>
-        </div>
-        <div class="right-item">
-          <strong>Right to Rectification</strong>
-          <p>You can correct inaccurate data through your Account Preferences or client edit screens.</p>
-        </div>
-        <div class="right-item">
-          <strong>Right to Erasure</strong>
-          <p>You can request deletion of your data. Client data will be removed from active systems within 30 days; backup copies within 90 days thereafter. Please ensure you have exported any records needed for your own regulatory obligations before requesting deletion.</p>
-        </div>
-        <div class="right-item">
-          <strong>Right to Data Portability</strong>
-          <p>Export your data in JSON format using the download button above.</p>
-        </div>
-        <div class="right-item">
-          <strong>Right to Restriction &amp; Right to Object</strong>
-          <p>Contact us at <a href="mailto:hello@ibernia.it">hello&#64;ibernia.it</a> to exercise these rights.</p>
-        </div>
-      </div>
-      <p class="rights-note">
-        We will respond to your request without undue delay and within one (1) month. For more details,
-        see our <a href="/privacy-policy" target="_blank">Privacy Policy</a>.
-      </p>
     </mat-card-content>
   </mat-card>
 

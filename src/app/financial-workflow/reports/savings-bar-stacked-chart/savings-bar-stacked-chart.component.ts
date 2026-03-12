@@ -963,12 +963,7 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
     ) {
       return this.calculateAgeAtDate(this.forecastStartDate, birthDate);
     }
-    // Last year: age they turn (projection end age, e.g. 78).
-    if (lastCategoryYear != null && year === lastCategoryYear) {
-      return year - birthYear;
-    }
-    // Other years: age at start of year (matches timeline events, e.g. Age 64 Year 2045).
-    return year - birthYear - 1;
+    return year - birthYear;
   }
 
   private calculateAgeAtDate(referenceDate: Date, birthDate: Date): number {
