@@ -7,56 +7,58 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
   selector: 'app-branding',
   standalone: true,
   imports: [CommonModule],
-  template: `
-    <a href="/" class="branding-link">
+  template: ` <a href="/" class="branding-link">
       <ng-container *ngIf="profileImage; else defaultLogo">
-        <img
-          [src]="sanitizedImage"
-          alt="logo"
-          class="brand-logo"
-        />
+        <img [src]="sanitizedImage" alt="logo" class="brand-logo" />
       </ng-container>
     </a>
 
     <ng-template #defaultLogo>
       <img
         width="150"
-        src="./assets/images/logos/1.png"
+        src="./assets/images/logos/ibernia-logo.svg"
         alt="logo"
       />
     </ng-template>`,
-    styles: [`
-    .branding-link {
-      display: flex;
-      align-items: center;
-      text-decoration: none;
-      gap: 5px;
-    }
+  styles: [
+    `
+      .branding-link {
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+        gap: 5px;
+      }
 
-    .brand-logo {
-      width: 50px;
-      height: 50px;
-      object-fit: contain;
-      object-position: center;
-      margin: 0;
-      padding: 0;
-      display: block;
-    }
-    .power-by-logo {
-      display: block;
-      width:120px;
-    }
-  `]
+      .brand-logo {
+        width: 50px;
+        height: 50px;
+        object-fit: contain;
+        object-position: center;
+        margin: 0;
+        padding: 0;
+        display: block;
+      }
+      .power-by-logo {
+        display: block;
+        width: 120px;
+      }
+    `,
+  ],
 })
 export class BrandingComponent implements OnChanges {
   @Input() profileImage: string | null = null;
   sanitizedImage: SafeUrl | null = null;
   options = this.settings.getOptions();
-  constructor(private settings: CoreService, private sanitizer: DomSanitizer) {}
+  constructor(
+    private settings: CoreService,
+    private sanitizer: DomSanitizer,
+  ) {}
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['profileImage'] && this.profileImage) {
-      this.sanitizedImage = this.sanitizer.bypassSecurityTrustUrl(this.profileImage);
+      this.sanitizedImage = this.sanitizer.bypassSecurityTrustUrl(
+        this.profileImage,
+      );
     }
   }
 }

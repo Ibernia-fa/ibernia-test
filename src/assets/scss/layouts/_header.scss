@@ -57,22 +57,38 @@ html .topbar {
 // New Styles
 .top-navigation-bar {
   position: fixed;
-  top: 0;
+  top: 1rem;
   z-index: 9;
   width: 100%;
-  padding: 16px 25px !important;
-  border-bottom: 1px solid #e7e7eb;
+  padding: 16px 16px !important;
+  background-color: transparent !important;
+  // border-bottom: 1px solid #e7e7eb;
   // height: $header-height;
   height: 65px !important;
   @media (max-width: 640px) {
     padding: 16px 16px !important;
     height: 64px !important;
   }
+  .ibr-new-header {
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 0 16px;
+    background-color: #ffffffb2 !important;
+    backdrop-filter: blur(75px);
+    justify-content: space-between;
+  }
 }
 .nav-btns {
-  gap: 16px;
+  gap: 14px;
   @media (max-width: 640px) {
     gap: 0 !important;
+  }
+  .ibr-profile-seperator {
+    height: 34px;
+    background: #0000001a;
+    width: 1px;
   }
 }
 .header-profile-icon .f-s-20 {
@@ -108,86 +124,93 @@ html .topbar {
   background: #e3e4e4;
 }
 // End New Styles
-.header-profile-button{
-    padding-top: 4px;
-    height: 65px;
-    display: flex;
-    align-items: center;
-    .name-wraper{
-      margin-top: -9px;
-      line-height: normal;
-    }
-    img{
-      margin-top: 2px;
-    }
-    .sub-menu{
-       position: absolute;
-        top: 65px;
-        right: 20px;
-        background-color: #fff;
-        border: 1px solid #e7e7eb;
-        border-top: 0px;
-        min-width: 220px;
-        list-style: none;
-        padding: 0px;
-        margin: 0px;
-        padding: 0px;
-        border-radius: 0px 0px 4px 4px;
-        display: none;
+.header-profile-button {
+  padding-top: 4px;
+  height: 65px;
+  display: flex;
+  align-items: center;
+  .name-wraper {
+    margin-top: -9px;
+    line-height: normal;
+  }
+  img {
+    margin-top: 2px;
+  }
+  .sub-menu {
+    position: absolute;
+    top: 65px;
+    right: 16px;
+    background-color: #fff;
+    border: 1px solid #e7e7eb;
+    border-top: 0px;
+    min-width: 220px;
+    list-style: none;
+    padding: 0px;
+    margin: 0px;
+    padding: 0px;
+    border-radius: 0px 0px 4px 4px;
+    display: none;
 
-        flex-direction: column;
-        li{
-          padding: 8px 12px;
-          border-radius: 4px;
-          min-height: 38px;
-          display: flex;
-          align-items: center;
-           gap: 8px;
-          flex: none;
-          cursor: pointer;
-          font-family: "Ubuntu", serif;
-          transition: all 0.3s  linear;
-          width: 100%;
-          background: #fff;
-          color: #787889 ;
-          font-size: 14px;
-          font-weight: 400;
-          line-height: normal;
-          span{
-            width: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-          }
-          &:hover{
-            background-color: #f7f7f7;
-            color:#516ce8;
-            border-color: #516ce8;
-            svg{
-              *{
-                stroke: #516ce8;
-              }
-            }
+    flex-direction: column;
+    li {
+      padding: 8px 12px;
+      border-radius: 4px;
+      min-height: 38px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: none;
+      cursor: pointer;
+      font-family: "Ubuntu", serif;
+      transition: all 0.3s linear;
+      width: 100%;
+      background: #fff;
+      color: #787889;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: normal;
+      span {
+        width: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      &:hover {
+        background-color: #f7f7f7;
+        color: #516ce8;
+        border-color: #516ce8;
+        svg {
+          * {
+            stroke: #516ce8;
           }
         }
-        
-    }
-    &:hover{
-      .sub-menu{
-       display: flex;
-
       }
     }
-}
-.bck-main{
- font-size: 14px;
-    margin-left: 120px;
-    font-weight: 500;
-    cursor: pointer;
-    color: #787889;
-    &:hover{
-      text-decoration: underline;
+  }
+  &:hover {
+    .sub-menu {
+      display: flex;
     }
+  }
+  .dropdown-icon {
+    transition: transform ease-in-out 0.3s;
+  }
+  &:hover {
+    .dropdown-icon {
+      transform: rotate(180deg);
+      transition: transform ease-in-out 0.3s;
+    }
+  }
+}
+.bck-main {
+  font-size: 14px;
+  margin-left: 120px;
+  font-weight: 500;
+  cursor: pointer;
+  color: #787889;
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
 // Logo in header when sidebar is hidden (client list, profile pages)
@@ -211,7 +234,9 @@ html .topbar {
 .sidebar-visible .top-navigation-bar {
   margin-left: 295px;
   width: calc(100% - 295px);
-  transition: margin-left 0.3s ease, width 0.3s ease;
+  transition:
+    margin-left 0.3s ease,
+    width 0.3s ease;
 }
 .sidebar-visible.sidebar-collapsed .top-navigation-bar {
   margin-left: 80px;
@@ -236,19 +261,19 @@ html .topbar {
     height: 20px;
     color: #787889;
     &:hover {
-      color: #4043AF;
+      color: #4043af;
     }
   }
 
   .breadcrumb-link {
     color: #787889;
     &:hover {
-      color: #4043AF;
+      color: #4043af;
     }
   }
 
   .breadcrumb-chevron {
-    color: #4043AF;
+    color: #4043af;
     user-select: none;
     margin: 0 2px;
     font-weight: 900;
