@@ -67,42 +67,65 @@ export class BrandingComponent implements OnInit {
 
     try {
       const dataUrl = await this.fileToDataUrl(file);
-      this.openCropDialog(dataUrl, imageType);
+      if (imageType === 'profile') {
+        this.openCropDialog(dataUrl);
+      } else {
+        const ok = await this.validateBackgroundMinSize(dataUrl);
+        if (ok) {
+          this.backgroundImage = dataUrl;
+          this.updateHasChanges();
+        }
+      }
     } finally {
       input.value = '';
     }
   }
 
-  openCropDialog(imageBase64: string, imageType: 'profile' | 'background'): void {
-    const isProfile = imageType === 'profile';
+  private readonly BACKGROUND_MIN_WIDTH = 400;
+  private readonly BACKGROUND_MIN_HEIGHT = 400;
+
+  private validateBackgroundMinSize(dataUrl: string): Promise<boolean> {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        const ok = img.width >= this.BACKGROUND_MIN_WIDTH && img.height >= this.BACKGROUND_MIN_HEIGHT;
+        if (!ok) {
+          this.toastr.error(
+            `Background image must be at least ${this.BACKGROUND_MIN_WIDTH}×${this.BACKGROUND_MIN_HEIGHT}px. Your image is ${img.width}×${img.height}px.`,
+            'Image too small'
+          );
+        }
+        resolve(ok);
+      };
+      img.onerror = () => resolve(false);
+      img.src = dataUrl;
+    });
+  }
+
+  openCropDialog(imageBase64: string): void {
     const dialogRef = this.dialog.open(ImageCropDialogComponent, {
       width: '600px',
       maxWidth: '95vw',
       data: {
         imageBase64,
-        maintainAspectRatio: false,
-        title: isProfile ? 'Crop company logo' : 'Crop background',
+        cropType: 'company' as const,
+        title: 'Crop company logo',
       },
     });
 
     dialogRef.afterClosed().subscribe((result: string | null) => {
       if (result) {
-        if (imageType === 'profile') {
-          this.profileImage = result;
-        } else {
-          this.backgroundImage = result;
-        }
+        this.profileImage = result;
         this.updateHasChanges();
       }
     });
   }
 
-  cropImage(event: Event, imageType: 'profile' | 'background'): void {
+  cropImage(event: Event): void {
     event.stopPropagation();
     event.preventDefault();
-    const img = imageType === 'profile' ? this.profileImage : this.backgroundImage;
-    if (!img) return;
-    this.openCropDialog(img, imageType);
+    if (!this.profileImage) return;
+    this.openCropDialog(this.profileImage);
   }
 
   clearImage(e: Event, type: 'profile' | 'background') {
