@@ -41,6 +41,45 @@
   }
 }
 
+.legal-links-card {
+  mat-card-content {
+    padding: 0 !important;
+  }
+}
+
+.legal-links {
+  .legal-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    color: rgba(0, 0, 0, 0.87);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background 0.15s ease;
+
+    &:hover {
+      background: #f5f7ff;
+    }
+
+    mat-icon {
+      color: #4a6cf7;
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+
+    span {
+      flex: 1;
+    }
+
+    .link-arrow {
+      color: rgba(0, 0, 0, 0.38);
+    }
+  }
+}
+
 .inline-spinner {
   display: inline-block;
   margin-right: 8px;

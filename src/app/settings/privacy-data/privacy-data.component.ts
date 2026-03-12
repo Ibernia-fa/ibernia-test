@@ -8,6 +8,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatDividerModule } from '@angular/material/divider';
 import { TranslateModule } from '@ngx-translate/core';
 
 import { AuthService } from 'src/app/auth/services/auth.service';
@@ -26,6 +27,7 @@ import { DataPrivacyService } from './data-privacy.service';
     MatIconModule,
     MatProgressSpinnerModule,
     MatDialogModule,
+    MatDividerModule,
     TranslateModule,
   ],
 })
