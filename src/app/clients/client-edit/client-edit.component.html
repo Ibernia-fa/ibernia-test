@@ -1,245 +1,208 @@
-<mat-card class="edit-client-wrapper">
-  <mat-card-content>
+<h2 mat-dialog-title class="dialog-title">{{ 'Edit client' | translate }}</h2>
 
-    <app-breadcrumb [showBackIcon]="true" [routeForBack]="backRoute"
-      title="{{ 'Edit  client' | translate }}"></app-breadcrumb>
-    <form [formGroup]="clientForm" (ngSubmit)="onSubmit()" class="client-form-wrapper">
-      <div class="row justify-content-between">
-        <div class="col-4 m-b-20">
-          <div class="w-100 form-field">
-            <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{'Client first name' |
-              translate}}</mat-label>
-            <input matInput placeholder="John " formControlName="firstName" />
-            @if(clientForm.get('firstName')?.touched &&
-            clientForm.get('firstName')?.hasError('required')) {
-            <!-- <mat-error>First Name is required</mat-error> -->
-            <mat-error>{{'Required' | translate}}</mat-error>
-            }
-          </div>
-        </div>
-        <div class="col-4 m-b-20">
-          <div class="w-100 form-field">
-            <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{'Client last name' |
-              translate}}</mat-label>
-            <input matInput placeholder="Deo" formControlName="lastName" />
-            @if(clientForm.get('lastName')?.touched &&
-            clientForm.get('lastName')?.hasError('required')) {
-            <!-- <mat-error>Last Name is required</mat-error> -->
-            <mat-error>{{'Required' | translate}}</mat-error>
+<mat-dialog-content>
+  <form [formGroup]="clientForm" class="dialog-form-grid">
 
-            }
-          </div>
-        </div>
-        <div class="col-4 m-b-20">
-          <div class="w-100 form-field">
-            <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{
-              "Date of birth" | translate
-              }}</mat-label>
-            <div class="position-relative">
-              <!-- [value]="clientDobDisplay" -->
-              <input matInput [matDatepicker]="picker" formControlName="dob" placeholder="DD/MM/YYYY"
-                inputmode="numeric" autocomplete="bday" (input)="onDobTyping(dobInput)"
-                (dateChange)="onCalendarChange($event.value)" #dobInput
-                 />
-              <div class="date-picker-position">
-                <mat-datepicker-toggle matIconSuffix [for]="picker">
-                  <mat-icon matDatepickerToggleIcon>
-                    <img src="assets/images/svgs/datepicker-icon.svg" alt="datepicker-icon" />
-                  </mat-icon>
-                </mat-datepicker-toggle>
-              </div>
-              <mat-datepicker #picker></mat-datepicker>
-            </div>
-            <div class="d-flex flex-column gap-1 m-t-4">
-              <span class="f-s-12 text-muted"></span>
-              @if(age !== null) {
-              <span class="f-s-12 f-w-500">Age: {{ age }}</span>
-              }
-            </div>
-            @if(clientForm.get('dob')?.touched &&
-            clientForm.get('dob')?.hasError('required')) {
-            <span class="field-error d-block">{{
-              "Required" | translate
-              }}</span>
-            } @if(clientForm.get('dob')?.touched && dobError) {
-            <span class="field-error d-block">{{ dobError | translate }}</span>
-            }
-          </div>
-        </div>
-      </div>
-      <div class="row justify-content-between">
-        <div class="col-6 m-b-20">
-          <div class="w-100 form-field">
-            <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{'Country' | translate}}</mat-label>
-
-            <div class="select-option">
-              <mat-select (valueChange)="clientCountryValueChange($event)" formControlName="country" value="Select">
-                @for(country of allCountries; track country) {
-                @if(country.currencySymbol) {
-                <mat-option [value]="country.countryName">{{country.countryName}}</mat-option>
-                }
-                }
-              </mat-select>
-            </div>
-          </div>
-        </div>
-        <div class="col-6 m-b-20">
-          <div class="w-100 form-field">
-            <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">
-              {{ 'Preferred currency' | translate }}</mat-label>
-            <div class="select-option">
-              <mat-select formControlName="currency" value="Select">
-                @for(country of allCountries; track country) {
-                @if(country.currencySymbol) {
-                <mat-option [value]="country.currencySymbol">{{country.currencySymbol}}</mat-option>
-                }
-                }
-              </mat-select>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="checkbox-align d-flex flex-column gap-1">
-        <div class="row justify-content-between">
-          <div class="col-6 m-b-20">
-            <div class="w-100 form-field">
-              <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Email' | translate }}</mat-label>
-              <input matInput placeholder="email@somedomain.com" formControlName="email" />
-              @if(clientForm.get('email')?.hasError('email')) {
-              <mat-error>{{'Invalid Email Address' | translate}}</mat-error>
-              }
-              @if(clientForm.get('email')?.touched && clientForm.get('email')?.hasError('required')) {
-              <mat-error>{{'Required' | translate}}</mat-error>
-              }
-            </div>
-          </div>
-          <!-- <div class="col-6 m-b-20">
-            <div class="w-100 form-field">
-              <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Telephone' | translate }}</mat-label>
-              <ngx-intl-tel-input [cssClass]="'custom'" [enableAutoCountrySelect]="true" [enablePlaceholder]="false"
-              [searchCountryFlag]="true" [selectFirstCountry]="false" [separateDialCode]="true" [selectedCountryISO]="selectedClientCountryISO"
-              [maxLength]="15" [phoneValidation]="false" name="phone"
-                formControlName="phone" class="tel-input-custom"></ngx-intl-tel-input>
-            </div>
-          </div> -->
-        </div>
-
-        <section class="example-section m-b-20">
-          <mat-checkbox class="example-margin" id="partner-section" [checked]="showPartner"
-            (click)="onPartnerCheckboxClick()">{{ 'Add a partner or spouse' | translate }}</mat-checkbox>
-        </section>
-
-      </div>
-      <!-- <mat-checkbox
-        class="example-margin"
-        [checked]="showPartner"
-        (change)="togglePartnerSection(!showPartner)"
-        >Add a partner or spouse</mat-checkbox
-      > -->
-      @if(showPartner) {
-      <ng-container formGroupName="partner">
-        <div class="row justify-content-between">
-          <div class="col-4 m-b-20">
-            <div class="w-100 form-field">
-              <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Partner first name' | translate
-                }}</mat-label>
-              <input matInput placeholder="John Deo" formControlName="firstName" />
-              @if(clientForm.get('partner.firstName')?.touched &&
-              clientForm.get('partner.firstName')?.hasError('required')) {
-              <!-- <span class="field-error d-block">First Name is required</span> -->
-              <span class="field-error d-block">{{'Required' | translate}}</span>
-
-              }
-            </div>
-          </div>
-          <div class="col-4 m-b-20">
-            <div class="w-100 form-field">
-              <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Partner last name' | translate
-                }}</mat-label>
-              <input matInput placeholder=" Deo" formControlName="lastName" />
-              @if(clientForm.get('partner.lastName')?.touched &&
-              clientForm.get('partner.lastName')?.hasError('required')) {
-              <!-- <span class="field-error d-block">Last Name is required</span> -->
-              <span class="field-error d-block">{{'Required' | translate}}</span>
-
-              }
-            </div>
-          </div>
-          <div class="col-4 m-b-20">
-            <div class="w-100 form-field">
-              <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Date of birth' | translate
-                }}</mat-label>
-              <div class="position-relative">
-                <input matInput [matDatepicker]="partnerPicker" formControlName="dob" placeholder="DD/MM/YYYY"
-                  inputmode="numeric" autocomplete="bday" (input)="onPartnerDobTyping(dobPartnerInput)"
-                  (dateChange)="onPartnerCalendarChange($event.value)" #dobPartnerInput
-                  />
-                  <!-- [readonly]="clientForm.get('partner.dob')?.disabled"  -->
-                <!-- <mat-hint>MM/DD/YYYY</mat-hint> -->
-                <div class="date-picker-position">
-                  <mat-datepicker-toggle matIconSuffix [for]="partnerPicker">
-                    <mat-icon matDatepickerToggleIcon>
-                      <img src="assets/images/svgs/datepicker-icon.svg" alt="datepicker-icon" />
-                    </mat-icon>
-                  </mat-datepicker-toggle>
-                </div>
-                <mat-datepicker #partnerPicker></mat-datepicker>
-              </div>
-              <div class="d-flex flex-column gap-1 m-t-4">
-                <span class="f-s-12 text-muted"></span>
-                @if(partnerAge !== null) {
-                <span class="f-s-12 f-w-500">Age: {{ partnerAge }}</span>
-                }
-              </div>
-              @if(clientForm.get('partner.dob')?.touched &&
-              clientForm.get('partner.dob')?.hasError('required')) {
-              <span class="field-error d-block">{{
-                "Required" | translate
-                }}</span>
-              } @if(clientForm.get('partner.dob')?.touched && partnerDobError) {
-              <span class="field-error d-block">{{ partnerDobError | translate }}</span>
-              }
-            </div>
-          </div>
-        </div>
-        <div class="row justify-content-between">
-          <div class="col-6 m-b-20">
-            <div class="w-100 form-field">
-              <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Email' | translate }}</mat-label>
-              <input matInput placeholder="email@somedomain.com" formControlName="email" />
-              @if(clientForm.get('partner.email')?.hasError('email')) {
-              <span class="field-error d-block">{{'Invalid Email Address' | translate}}</span>
-              }
-            </div>
-          </div>
-          <div class="col-6 m-b-20">
-            <!-- <div class="w-100 form-field">
-              <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Telephone' | translate }}</mat-label>
-              <ngx-intl-tel-input [cssClass]="'custom'" [enableAutoCountrySelect]="true" [enablePlaceholder]="false"
-              [searchCountryFlag]="true" [selectFirstCountry]="false" [separateDialCode]="true" 
-              [selectedCountryISO]="selectedPartnerCountryISO" [maxLength]="15" [phoneValidation]="false" name="phone"
-                formControlName="phone" class="tel-input-custom"></ngx-intl-tel-input>
-            </div> -->
-          </div>
-        </div>
-      </ng-container>
+    <!-- Client first name -->
+    <div class="form-field">
+      <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Client first name' | translate }}</mat-label>
+      <input matInput formControlName="firstName" />
+      @if(clientForm.get('firstName')?.touched && clientForm.get('firstName')?.hasError('required')) {
+        <mat-error>{{ 'Required' | translate }}</mat-error>
       }
-      <div class="row">
-        <div class="col-12 m-b-20">
-          <div class=" form-field">
-            <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Notes' | translate }}</mat-label>
-            <textarea matInput formControlName="notes"></textarea>
-          </div>
-        </div>
-      </div>
-      <div class="row ">
-        <div class="col-sm-12 d-flex justify-content-end">
-          <button class="button-icon" type="submit" [disabled]="isSaveDisabled">
-            <span>{{ 'Save' | translate }}</span>
-          </button>
-        </div>
-      </div>
-    </form>
+    </div>
 
-  </mat-card-content>
-</mat-card>
+    <!-- Client last name -->
+    <div class="form-field">
+      <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Client last name' | translate }}</mat-label>
+      <input matInput formControlName="lastName" />
+      @if(clientForm.get('lastName')?.touched && clientForm.get('lastName')?.hasError('required')) {
+        <mat-error>{{ 'Required' | translate }}</mat-error>
+      }
+    </div>
+
+    <!-- Date of birth -->
+    <div class="form-field">
+      <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Date of birth' | translate }}</mat-label>
+      <div class="position-relative">
+        <input
+          matInput
+          [matDatepicker]="picker"
+          formControlName="dob"
+          placeholder="DD/MM/YYYY"
+          inputmode="numeric"
+          autocomplete="bday"
+          (input)="onDobTyping(dobInput)"
+          (dateChange)="onCalendarChange($event.value)"
+          #dobInput
+        />
+        <div class="date-picker-position">
+          <mat-datepicker-toggle matIconSuffix [for]="picker">
+            <mat-icon matDatepickerToggleIcon>
+              <img src="assets/images/svgs/datepicker-icon.svg" alt="datepicker-icon" />
+            </mat-icon>
+          </mat-datepicker-toggle>
+        </div>
+        <mat-datepicker #picker></mat-datepicker>
+      </div>
+      <div class="d-flex flex-column gap-1 m-t-4">
+        @if(age !== null) {
+          <span class="f-s-12 f-w-500">Age: {{ age }}</span>
+        }
+      </div>
+      @if(clientForm.get('dob')?.touched && clientForm.get('dob')?.hasError('required')) {
+        <span class="field-error d-block">{{ 'Required' | translate }}</span>
+      }
+      @if(clientForm.get('dob')?.touched && dobError) {
+        <span class="field-error d-block">{{ dobError | translate }}</span>
+      }
+    </div>
+
+    <!-- Email -->
+    <div class="form-field">
+      <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Email' | translate }}</mat-label>
+      <input matInput placeholder="email@somedomain.com" formControlName="email" />
+      @if(clientForm.get('email')?.hasError('email')) {
+        <mat-error>{{ 'Invalid Email Address' | translate }}</mat-error>
+      }
+      @if(clientForm.get('email')?.touched && clientForm.get('email')?.hasError('required')) {
+        <mat-error>{{ 'Required' | translate }}</mat-error>
+      }
+    </div>
+
+    <!-- Country -->
+    <div class="form-field">
+      <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Country' | translate }}</mat-label>
+      <div class="select-option">
+        <mat-select (valueChange)="clientCountryValueChange($event)" formControlName="country" value="Select">
+          @for(country of allCountries; track country) {
+            @if(country.currencySymbol) {
+              <mat-option [value]="country.countryName">{{ country.countryName }}</mat-option>
+            }
+          }
+        </mat-select>
+      </div>
+    </div>
+
+    <!-- Preferred currency -->
+    <div class="form-field">
+      <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Preferred currency' | translate }}</mat-label>
+      <div class="select-option">
+        <mat-select formControlName="currency" value="Select">
+          @for(country of allCountries; track country) {
+            @if(country.currencySymbol) {
+              <mat-option [value]="country.currencySymbol">{{ country.currencySymbol }}</mat-option>
+            }
+          }
+        </mat-select>
+      </div>
+    </div>
+
+    <!-- Partner checkbox -->
+    <div class="full-width">
+      <section class="example-section">
+        <mat-checkbox
+          class="example-margin"
+          id="partner-section"
+          [checked]="showPartner"
+          (click)="onPartnerCheckboxClick()"
+        >{{ 'Add a partner or spouse' | translate }}</mat-checkbox>
+      </section>
+    </div>
+
+    <!-- Partner section -->
+    @if(showPartner) {
+      <ng-container formGroupName="partner">
+
+        <div class="full-width partner-divider">
+          <mat-divider></mat-divider>
+          <span class="partner-section-label">{{ 'Partner details' | translate }}</span>
+        </div>
+
+        <!-- Partner first name -->
+        <div class="form-field">
+          <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Partner first name' | translate }}</mat-label>
+          <input matInput formControlName="firstName" />
+          @if(clientForm.get('partner.firstName')?.touched && clientForm.get('partner.firstName')?.hasError('required')) {
+            <span class="field-error d-block">{{ 'Required' | translate }}</span>
+          }
+        </div>
+
+        <!-- Partner last name -->
+        <div class="form-field">
+          <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Partner last name' | translate }}</mat-label>
+          <input matInput formControlName="lastName" />
+          @if(clientForm.get('partner.lastName')?.touched && clientForm.get('partner.lastName')?.hasError('required')) {
+            <span class="field-error d-block">{{ 'Required' | translate }}</span>
+          }
+        </div>
+
+        <!-- Partner DOB -->
+        <div class="form-field">
+          <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Date of birth' | translate }}</mat-label>
+          <div class="position-relative">
+            <input
+              matInput
+              [matDatepicker]="partnerPicker"
+              formControlName="dob"
+              placeholder="DD/MM/YYYY"
+              inputmode="numeric"
+              autocomplete="bday"
+              (input)="onPartnerDobTyping(dobPartnerInput)"
+              (dateChange)="onPartnerCalendarChange($event.value)"
+              #dobPartnerInput
+            />
+            <div class="date-picker-position">
+              <mat-datepicker-toggle matIconSuffix [for]="partnerPicker">
+                <mat-icon matDatepickerToggleIcon>
+                  <img src="assets/images/svgs/datepicker-icon.svg" alt="datepicker-icon" />
+                </mat-icon>
+              </mat-datepicker-toggle>
+            </div>
+            <mat-datepicker #partnerPicker></mat-datepicker>
+          </div>
+          <div class="d-flex flex-column gap-1 m-t-4">
+            @if(partnerAge !== null) {
+              <span class="f-s-12 f-w-500">Age: {{ partnerAge }}</span>
+            }
+          </div>
+          @if(clientForm.get('partner.dob')?.touched && clientForm.get('partner.dob')?.hasError('required')) {
+            <span class="field-error d-block">{{ 'Required' | translate }}</span>
+          }
+          @if(clientForm.get('partner.dob')?.touched && partnerDobError) {
+            <span class="field-error d-block">{{ partnerDobError | translate }}</span>
+          }
+        </div>
+
+        <!-- Partner email -->
+        <div class="form-field">
+          <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Email' | translate }}</mat-label>
+          <input matInput placeholder="email@somedomain.com" formControlName="email" />
+          @if(clientForm.get('partner.email')?.hasError('email')) {
+            <span class="field-error d-block">{{ 'Invalid Email Address' | translate }}</span>
+          }
+        </div>
+
+      </ng-container>
+    }
+
+    <!-- Notes -->
+    <div class="form-field full-width">
+      <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Notes' | translate }}</mat-label>
+      <textarea matInput formControlName="notes"></textarea>
+    </div>
+
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>{{ 'Cancel' | translate }}</button>
+  <button
+    class="button-icon"
+    type="button"
+    [disabled]="isSaveDisabled"
+    (click)="onSubmit()"
+  >
+    <span>{{ 'Save' | translate }}</span>
+  </button>
+</mat-dialog-actions>

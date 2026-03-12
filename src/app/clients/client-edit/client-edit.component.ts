@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import {
   FormBuilder,
   FormControl,
@@ -14,32 +14,29 @@ import {
   NativeDateAdapter,
 } from '@angular/material/core';
 import {
-  MAT_DATE_RANGE_SELECTION_STRATEGY,
   MatDatepickerModule,
 } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
-import { AppBreadcrumbComponent } from 'src/app/layouts/full/shared/breadcrumb/breadcrumb.component';
 import { ClientHttpService } from '../services/client-http.service';
-import { catchError, filter, map, switchMap } from 'rxjs';
+import { catchError, filter, map } from 'rxjs';
 import { Client } from '../models/client';
 import { MatSelectModule } from '@angular/material/select';
-import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { allCountries } from '../models/country';
-import { CountryISO, NgxIntlTelInputModule } from 'ngx-intl-tel-input';
+import { CountryISO } from 'ngx-intl-tel-input';
 import { countryDialCodes } from '../models/country-code';
-import { FiveDayRangeSelectionStrategy } from 'src/app/core/five-day-range-selection-strategy';
 import {
   MAT_CHECKBOX_DEFAULT_OPTIONS,
   MatCheckboxDefaultOptions,
   MatCheckboxModule,
 } from '@angular/material/checkbox';
+import { MatIconModule } from '@angular/material/icon';
+import { MatDividerModule } from '@angular/material/divider';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { TranslateModule } from '@ngx-translate/core';
-import { Location } from '@angular/common';
 import { Store } from '@ngrx/store';
 import * as ClientActions from 'src/app/store/client/client.actions';
 
@@ -84,19 +81,18 @@ class DmyDateAdapter extends NativeDateAdapter {
 @Component({
   selector: 'app-client-edit',
   imports: [
-    AppBreadcrumbComponent,
     MatFormFieldModule,
     MatInputModule,
     MatCheckboxModule,
     MatDatepickerModule,
     ReactiveFormsModule,
     ToastrModule,
-    RouterModule,
     MatSelectModule,
     MatButtonModule,
-    MatCardModule,
-    NgxIntlTelInputModule,
-    TranslateModule
+    MatDialogModule,
+    MatIconModule,
+    MatDividerModule,
+    TranslateModule,
   ],
   providers: [
     ClientHttpService,
@@ -132,21 +128,21 @@ export class ClientEditComponent {
   private isPastingPartner: boolean = false;
   clientDobDisplay: string = '';
   partnerDobDisplay: string = '';
-  backRoute: string = '/clients';
 
   constructor(
     private fb: FormBuilder,
     private clientHttpService: ClientHttpService,
-    private router: Router,
     private toastr: ToastrService,
-    private activatedRoute: ActivatedRoute,
     private authService: AuthService,
-    private location: Location,
-    private store: Store
+    private store: Store,
+    private dialogRef: MatDialogRef<ClientEditComponent>,
+    @Inject(MAT_DIALOG_DATA) public dialogData: { clientId: string },
   ) {
     this.user = this.authService.getUserProfile();
 
     if (!this.user || !this.user?.sub) return;
+
+    this.clientId = this.dialogData.clientId;
 
     this.clientForm = this.fb.group({
       firstName: ['', Validators.required],
@@ -160,7 +156,6 @@ export class ClientEditComponent {
       phone: [''],
       notes: [''],
 
-      // Partner Info
       partner: this.fb.group({
         firstName: ['', Validators.required],
         lastName: ['', Validators.required],
@@ -173,15 +168,8 @@ export class ClientEditComponent {
       }),
     });
 
-    this.activatedRoute.params.subscribe(params => {
-      this.clientId = params['id'];
-      if (this.clientId) {
-        this.backRoute = `/clients/${this.clientId}/profile`;
-      }
-      this.getClient();
-    });
-
-    this.togglePartnerSection(false); // Ensure partner section validations are off initially
+    this.getClient();
+    this.togglePartnerSection(false);
   }
 
   clientCountryValueChange(event: any) {
@@ -220,13 +208,8 @@ export class ClientEditComponent {
   }
 
   getClient() {
-    this.activatedRoute.params.pipe(
-      switchMap((params) => {
-        this.clientId = params['id']
-        return this.clientHttpService.getClient(this.clientId);
-      }),
+    this.clientHttpService.getClient(this.clientId).pipe(
       map((res) => {
-        console.log('res', res);
 
         const clientBirthDate = new Date(res.clientDetails.birthDate);
         this.clientForm.controls['dob'].patchValue(clientBirthDate);
@@ -389,8 +372,8 @@ export class ClientEditComponent {
           filter((res) => !!res),
           map(() => {
             this.store.dispatch(ClientActions.selectClient({ client }));
-            this.location.back();
             this.toastr.success('Client updated successfully', 'Success!');
+            this.dialogRef.close({ action: 'updated', client });
           }),
           catchError((err) => {
             console.error(err);
@@ -399,8 +382,6 @@ export class ClientEditComponent {
           })
         )
         .subscribe();
-      console.log('Form Data:', this.clientForm.value);
-      // Submit form data to the API or service
     } else {
       console.error('Form is invalid');
     }

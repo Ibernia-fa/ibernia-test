@@ -1,25 +1,61 @@
-
-.percentage-icon{
-
-  .inner-p {
-     padding: 0 0 0 1px;
-     background: url(../../../assets/images/shapes/percentage.svg) left top no-repeat;
-    height: 20px;
-    width: 20px;
-    align-items: center;
-    justify-content: center;
-    position: absolute;
-    line-height: 11px;
-    border-radius: 4px;
-    color: white;
-    font-size: 16px;
-    right: 16px;
-    top: 50%;
-    text-align: center;
-    display: flex;
-    background-size: 20px 20px;
-    margin-top: -10px;
-    text-indent: -9999px;
-    overflow: hidden;
+::ng-deep .mat-mdc-dialog-surface {
+  border-radius: 16px !important;
 }
+
+.dialog-title {
+  text-align: center;
+  font-size: 22px;
+  font-weight: 600;
+  padding: 24px 24px 8px;
+  margin: 0;
+}
+
+.dialog-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px 24px;
+  padding: 8px 0;
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+
+  input[matInput],
+  textarea[matInput] {
+    width: 100%;
+  }
+
+  textarea[matInput] {
+    min-height: 80px;
+    resize: vertical;
+  }
+}
+
+.partner-divider {
+  margin: 8px 0 4px;
+
+  .partner-section-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #666;
+    margin-top: 12px;
+  }
+}
+
+.date-picker-position {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+mat-dialog-actions {
+  padding: 12px 24px 20px;
+  gap: 8px;
 }

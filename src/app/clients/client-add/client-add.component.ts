@@ -1,6 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, Inject, Optional } from '@angular/core';
 import {
-  AbstractControl,
   FormBuilder,
   FormControl,
   FormGroup,
@@ -20,21 +19,21 @@ import {
 } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { AppBreadcrumbComponent } from 'src/app/layouts/full/shared/breadcrumb/breadcrumb.component';
 import { ClientHttpService } from '../services/client-http.service';
 import { Client } from '../models/client';
 import { catchError, filter, map } from 'rxjs';
-import { Router, RouterModule } from '@angular/router';
+import { Router } from '@angular/router';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
 import { MatSelectModule } from '@angular/material/select';
-import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { AddModelDialogComponent } from '../profile/add-model-dialog/add-model-dialog.component';
 import { allCountries } from '../models/country';
-import { CountryISO, NgxIntlTelInputModule } from 'ngx-intl-tel-input';
+import { CountryISO } from 'ngx-intl-tel-input';
 import { FiveDayRangeSelectionStrategy } from 'src/app/core/five-day-range-selection-strategy';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatIconModule } from '@angular/material/icon';
+import { MatDividerModule } from '@angular/material/divider';
 import { SettingsService } from 'src/app/default-preferance/services/default-preferance.http.service';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { TranslateModule } from '@ngx-translate/core';
@@ -71,19 +70,18 @@ class DmyDateAdapter extends NativeDateAdapter {
 @Component({
   selector: 'app-client-add',
   imports: [
-    AppBreadcrumbComponent,
     MatFormFieldModule,
     MatInputModule,
     MatDatepickerModule,
     ReactiveFormsModule,
-    RouterModule,
     ToastrModule,
     MatSelectModule,
     MatButtonModule,
-    MatCardModule,
-    NgxIntlTelInputModule,
+    MatDialogModule,
     MatCheckboxModule,
-    TranslateModule
+    MatIconModule,
+    MatDividerModule,
+    TranslateModule,
   ],
   providers: [
     ClientHttpService,
@@ -122,7 +120,9 @@ export class ClientAddComponent {
     private dialog: MatDialog,
     private router: Router,
     private settingsService: SettingsService,
-    private authService: AuthService
+    private authService: AuthService,
+    private dialogRef: MatDialogRef<ClientAddComponent>,
+    @Optional() @Inject(MAT_DIALOG_DATA) public data: any,
   ) {
     this.clientForm = this.fb.group({
       firstName: ['', Validators.required],
@@ -366,42 +366,38 @@ export class ClientAddComponent {
       return;
     }
 
-    if (!this.isFormInvalid) {
-      var client: Client = this.getClientFormInfo();
-      this.clientHttpService
-        .addClient(client)
-        .pipe(
-          filter((res) => !!res),
-          map((res) => {
-            this.router.navigate(['/clients/' + res.id + '/profile']);
-            this.toastr.success('Client created successfully', 'Success!');
-            this.isLoading = false;
-          }),
-          catchError((err) => {
-            console.error(err);
-            this.toastr.error('An error occured while saving client', 'Error!');
-            this.isLoading = false;
-            throw err;
-          })
-        )
-        .subscribe();
-      console.log('Form Data:', this.clientForm.value);
-      // Submit form data to the API or service
-    } else {
-      console.error('Form is invalid');
-      this.isLoading = false;
-    }
+    var client: Client = this.getClientFormInfo();
+    this.clientHttpService
+      .addClient(client)
+      .pipe(
+        filter((res) => !!res),
+        map((res) => {
+          this.toastr.success('Client created successfully', 'Success!');
+          this.isLoading = false;
+          this.dialogRef.close({ action: 'added', client: res });
+        }),
+        catchError((err) => {
+          console.error(err);
+          this.toastr.error('An error occured while saving client', 'Error!');
+          this.isLoading = false;
+          throw err;
+        })
+      )
+      .subscribe();
   }
 
   openNewModelDialog(client: Client, id: string) {
-    const dialog = this.dialog.open(AddModelDialogComponent, {
+    const addModelDialog = this.dialog.open(AddModelDialogComponent, {
       width: '600px',
       disableClose: true,
       data: client,
     });
 
-    dialog.afterClosed().subscribe((res: any) => {
-      this.router.navigate([`cashflows/${res.id}/timeline`]);
+    addModelDialog.afterClosed().subscribe((res: any) => {
+      this.dialogRef.close({ action: 'addedWithPlan', client });
+      if (res?.id) {
+        this.router.navigate([`cashflows/${res.id}/timeline`]);
+      }
     });
   }
 
@@ -422,30 +418,24 @@ export class ClientAddComponent {
       return;
     }
 
-    if (!this.isFormInvalid) {
-      var client: Client = this.getClientFormInfo();
-      this.clientHttpService
-        .addClient(client)
-        .pipe(
-          filter((res) => !!res),
-          map((res) => {
-            this.toastr.success('Client created successfully', 'Success!');
-            this.openNewModelDialog(res, res.id);
-            this.isLoading = false;
-          }),
-          catchError((err) => {
-            console.error(err);
-            this.toastr.error('An error occured while saving client', 'Error!');
-            this.isLoading = false;
-            throw err;
-          })
-        )
-        .subscribe();
-      console.log('Form Data:', this.clientForm.value);
-    } else {
-      console.error('Form is invalid');
-      this.isLoading = false;
-    }
+    var client: Client = this.getClientFormInfo();
+    this.clientHttpService
+      .addClient(client)
+      .pipe(
+        filter((res) => !!res),
+        map((res) => {
+          this.toastr.success('Client created successfully', 'Success!');
+          this.isLoading = false;
+          this.openNewModelDialog(res, res.id);
+        }),
+        catchError((err) => {
+          console.error(err);
+          this.toastr.error('An error occured while saving client', 'Error!');
+          this.isLoading = false;
+          throw err;
+        })
+      )
+      .subscribe();
   }
 
   // ---------- Typing & auto-format (Client) ----------

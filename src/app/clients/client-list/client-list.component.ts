@@ -46,6 +46,8 @@ import { catchError, filter, map } from 'rxjs';
 import { Client } from '../models/client';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
 import { DialogComponent } from 'src/app/dialog/dialog.component';
+import { ClientAddComponent } from '../client-add/client-add.component';
+import { ClientEditComponent } from '../client-edit/client-edit.component';
 import { MatSort, MatSortModule, Sort } from '@angular/material/sort';
 import { TimeAgoPipe } from 'src/app/pipe/time-ago.pipe';
 import { AgeCalculatorPipe } from 'src/app/pipe/age-calculator.pipe';
@@ -393,11 +395,32 @@ private checkPrefsAndPrompt() {
   // }
 
   redirectToAdd() {
-    this.router.navigate(['/clients/add']);
+    const dialogRef = this.dialog.open(ClientAddComponent, {
+      width: '860px',
+      maxHeight: '85vh',
+      disableClose: true,
+    });
+    dialogRef.afterClosed().subscribe((result: any) => {
+      if (result?.action === 'added') {
+        this.router.navigate(['/clients/' + result.client.id + '/profile']);
+      } else if (result?.action === 'addedWithPlan') {
+        // navigation handled inside client-add via AddModelDialogComponent
+      }
+    });
   }
 
   redirectToEdit(id: string) {
-    this.router.navigate(['/clients/' + id + '/edit']);
+    const dialogRef = this.dialog.open(ClientEditComponent, {
+      width: '860px',
+      maxHeight: '85vh',
+      disableClose: true,
+      data: { clientId: id },
+    });
+    dialogRef.afterClosed().subscribe((result: any) => {
+      if (result?.action === 'updated') {
+        this.getClients(this.user.sub);
+      }
+    });
   }
 
   // tslint:disable-next-line - Disables all
