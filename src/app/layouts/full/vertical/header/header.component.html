@@ -1,36 +1,59 @@
 <!-- <mat-toolbar class="topbar"> -->
 <mat-toolbar class="top-navigation-bar">
-  <!-- --------------------------------------------------------------- -->
-  <!-- Logo in header when sidebar is hidden (client list, profile, etc.) -->
-  @if (hideSidebarToggle && isBrandLogoLoaded) {
-    <div class="header-logo-wrapper">
-      <app-branding [profileImage]="brandingLogo"></app-branding>
-    </div>
-  }
-  <!-- Expand sidebar toggle - outside sidebar when collapsed (desktop only) -->
-  @if (!hideSidebarToggle && showToggle && options.sidenavCollapsed) {
-    <button mat-icon-button (click)="toggleCollapsed.emit()" class="header-expand-toggle m-r-8" aria-label="Expand sidebar">
-      <img src="assets/images/sidebar/sidebar_toggle.png" alt="Expand sidebar" class="header-toggle-icon" />
-    </button>
-  }
-  <!-- --------------------------------------------------------------- -->
-  <!-- Desktop Menu - Logo moved to sidebar -->
-  <ng-container *ngIf="isCashflowRoute && clientProfileLink && clientFullName">
-    <nav class="header-breadcrumb d-flex align-items-center" aria-label="Breadcrumb">
-      <a [routerLink]="['/clients']" class="breadcrumb-link d-flex align-items-center text-decoration-none" matTooltip="Home">
-        <i-tabler name="home" class="breadcrumb-home-icon"></i-tabler>
-      </a>
-      <span class="breadcrumb-chevron" aria-hidden="true">&gt;</span>
-      <a [routerLink]="clientProfileLink" class="breadcrumb-link d-flex align-items-center text-decoration-none" matTooltip="Go to client page">
-        {{ clientFullName }}
-      </a>
-      <span class="breadcrumb-chevron" aria-hidden="true">&gt;</span>
-      <span class="breadcrumb-current f-w-600">{{ planName || 'Plan' }}</span>
-    </nav>
-  </ng-container>
-    
-  <!-- </div> -->
-  <!-- @if (!hideSidebarToggle) {
+  <div class="ibr-new-header">
+    <!-- --------------------------------------------------------------- -->
+    <!-- Logo in header when sidebar is hidden (client list, profile, etc.) -->
+    @if (hideSidebarToggle && isBrandLogoLoaded) {
+      <div class="header-logo-wrapper">
+        <app-branding [profileImage]="brandingLogo"></app-branding>
+      </div>
+    }
+    <!-- Expand sidebar toggle - outside sidebar when collapsed (desktop only) -->
+    @if (!hideSidebarToggle && showToggle && options.sidenavCollapsed) {
+      <button
+        mat-icon-button
+        (click)="toggleCollapsed.emit()"
+        class="header-expand-toggle m-r-8"
+        aria-label="Expand sidebar"
+      >
+        <img
+          src="assets/images/sidebar/sidebar_toggle.png"
+          alt="Expand sidebar"
+          class="header-toggle-icon"
+        />
+      </button>
+    }
+    <!-- --------------------------------------------------------------- -->
+    <!-- Desktop Menu - Logo moved to sidebar -->
+    <ng-container
+      *ngIf="isCashflowRoute && clientProfileLink && clientFullName"
+    >
+      <nav
+        class="header-breadcrumb d-flex align-items-center"
+        aria-label="Breadcrumb"
+      >
+        <a
+          [routerLink]="['/clients']"
+          class="breadcrumb-link d-flex align-items-center text-decoration-none"
+          matTooltip="Home"
+        >
+          <i-tabler name="home" class="breadcrumb-home-icon"></i-tabler>
+        </a>
+        <span class="breadcrumb-chevron" aria-hidden="true">&gt;</span>
+        <a
+          [routerLink]="clientProfileLink"
+          class="breadcrumb-link d-flex align-items-center text-decoration-none"
+          matTooltip="Go to client page"
+        >
+          {{ clientFullName }}
+        </a>
+        <span class="breadcrumb-chevron" aria-hidden="true">&gt;</span>
+        <span class="breadcrumb-current f-w-600">{{ planName || "Plan" }}</span>
+      </nav>
+    </ng-container>
+
+    <!-- </div> -->
+    <!-- @if (!hideSidebarToggle) {
       @if(showToggle) {
       <button
         mat-icon-button
@@ -41,8 +64,8 @@
       </button>
       } -->
 
-  <!-- Mobile Menu -->
-  <!-- @if(!showToggle) {
+    <!-- Mobile Menu -->
+    <!-- @if(!showToggle) {
       <button
         mat-icon-button
         (click)="toggleMobileNav.emit()"
@@ -51,13 +74,13 @@
         <i-tabler name="menu-2" class="icon-20 d-flex"></i-tabler>
       </button>
       } -->
-  <!-- --------------------------------------------------------------- -->
-  <!-- } -->
+    <!-- --------------------------------------------------------------- -->
+    <!-- } -->
 
-  <!-- --------------------------------------------------------------- -->
-  <!--  Search -->
-  <!-- --------------------------------------------------------------- -->
-  <!-- <button
+    <!-- --------------------------------------------------------------- -->
+    <!--  Search -->
+    <!-- --------------------------------------------------------------- -->
+    <!-- <button
     mat-icon-button
     (click)="openDialog()"
     class="d-flex justify-content-center"
@@ -65,11 +88,11 @@
     <i-tabler name="search" class="icon-20 d-flex"></i-tabler>
   </button> -->
 
-  <!-- <div class="d-none d-lg-flex"> -->
-  <!-- --------------------------------------------------------------- -->
-  <!--  Links -->
-  <!-- --------------------------------------------------------------- -->
-  <!-- <button
+    <!-- <div class="d-none d-lg-flex"> -->
+    <!-- --------------------------------------------------------------- -->
+    <!--  Links -->
+    <!-- --------------------------------------------------------------- -->
+    <!-- <button
       mat-button
       [matMenuTriggerFor]="appsmenu"
       aria-label="Notifications"
@@ -146,10 +169,10 @@
     <a mat-button [routerLink]="['/apps/email/inbox']">Email</a>
   </div> -->
 
-  <span class="flex-1-auto"></span>
+    <span class="flex-1-auto"></span>
 
-  <!-- Mobile Menu -->
-  <!-- <button
+    <!-- Mobile Menu -->
+    <!-- <button
     mat-icon-button
     (click)="toggleMobileFilterNav.emit()"
     class="d-flex d-lg-none justify-content-center"
@@ -157,10 +180,10 @@
     <i-tabler name="grid-dots" class="icon-20 d-flex"></i-tabler>
   </button> -->
 
-  <!-- --------------------------------------------------------------- -->
-  <!-- langugage Dropdown -->
-  <!-- --------------------------------------------------------------- -->
-  <!-- <button [matMenuTriggerFor]="flags" mat-icon-button class="m-r-5">
+    <!-- --------------------------------------------------------------- -->
+    <!-- langugage Dropdown -->
+    <!-- --------------------------------------------------------------- -->
+    <!-- <button [matMenuTriggerFor]="flags" mat-icon-button class="m-r-5">
     <img
       [src]="selectedLanguage.icon"
       class="rounded-circle object-cover icon-20"
@@ -190,75 +213,89 @@
     </button>
   } -->
 
-  <!-- --------------------------------------------------------------- -->
-  <!-- Notification Dropdown -->
-  <!-- --------------------------------------------------------------- -->
-  <!-- <button
+    <!-- --------------------------------------------------------------- -->
+    <!-- Notification Dropdown -->
+    <!-- --------------------------------------------------------------- -->
+    <!-- <button
     mat-icon-button
     [matMenuTriggerFor]="notificationmenu"
     aria-label="Notifications" class="m-x-5"
   > -->
-  <!-- <div class="d-flex justify-content-center"> -->
-  <!-- [matMenuTriggerFor]="notificationmenu" -->
-  <div class="d-flex align-items-center nav-btns">
-   
-    <!-- </div> -->
-    <!-- <div class="d-flex justify-content-center m-x-5"> -->
-    <button mat-icon-button aria-label="Notifications" class="m-x-5">
-      <!-- <i-tabler class="d-flex" name="bell" matBadgeColor="primary"></i-tabler> -->
+    <!-- <div class="d-flex justify-content-center"> -->
+    <!-- [matMenuTriggerFor]="notificationmenu" -->
+    <div class="d-flex align-items-center nav-btns">
+      <!-- </div> -->
+      <!-- <div class="d-flex justify-content-center m-x-5"> -->
+      <button mat-icon-button aria-label="Notifications" class="m-x-5">
+        <!-- <i-tabler class="d-flex" name="bell" matBadgeColor="primary"></i-tabler> -->
 
-      <svg
-        width="20"
-        height="22"
-        viewBox="0 0 20 22"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          fill-rule="evenodd"
-          clip-rule="evenodd"
-          d="M10 16.8476C15.6392 16.8476 18.2481 16.1242 18.5 13.2205C18.5 10.3188 16.6812 10.5054 16.6812 6.94511C16.6812 4.16414 14.0452 1 10 1C5.95477 1 3.31885 4.16414 3.31885 6.94511C3.31885 10.5054 1.5 10.3188 1.5 13.2205C1.75295 16.1352 4.36177 16.8476 10 16.8476Z"
-          stroke="#1C1C1C"
-          stroke-width="1.5"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        />
-        <path
-          d="M12.3889 19.8572C11.0247 21.3719 8.89672 21.3899 7.51953 19.8572"
-          stroke="#1C1C1C"
-          stroke-width="1.5"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        />
-      </svg>
-    </button>
-    <!-- </div> -->
-    <div class="header-profile-button">
-      <div
-        class="d-flex justify-content-center align-items-center header-profile-icon"
-      >
-        <!-- <button mat-icon-button> profile-dd -->
-        <div class="position-relative">
-     <img
-  [src]="profileImagePreview || '/assets/images/profile/user-1.jpg'"
-  class="rounded-circle object-cover icon-34"
-  width="35"
-  alt="profile"
-/>
-          <span class="pic-riple"></span>
-        </div>
-        <!-- </button> -->
+        <svg
+          width="19"
+          height="22"
+          viewBox="0 0 19 22"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M12.2992 19.2C12.1213 19.8866 11.7204 20.4947 11.1594 20.9287C10.5985 21.3628 9.9093 21.5984 9.20002 21.5984C8.49075 21.5984 7.80155 21.3628 7.24061 20.9287C6.67968 20.4947 6.27877 19.8866 6.10083 19.2H12.2992ZM17.8684 16.2648C17.1616 15.9556 16 14.9396 16 11.6V8C16 4.876 13.7604 2.2784 10.8 1.7164L10.4 1.6404V1.2C10.4 0.88174 10.2736 0.576516 10.0486 0.351472C9.82351 0.126428 9.51828 0 9.20002 0C8.88176 0 8.57654 0.126428 8.3515 0.351472C8.12645 0.576516 8.00002 0.88174 8.00002 1.2V1.6404L7.60002 1.7164C4.63962 2.2784 2.40002 4.876 2.40002 8V11.6C2.40002 14.9396 1.23842 15.9556 0.531625 16.2648C0.372302 16.3359 0.237161 16.4519 0.142744 16.5986C0.0483269 16.7453 -0.00126981 16.9163 2.47088e-05 17.0908C2.47088e-05 17.2102 0.0235418 17.3284 0.0692334 17.4387C0.114925 17.549 0.181896 17.6493 0.266323 17.7337C0.35075 17.8181 0.45098 17.8851 0.561289 17.9308C0.671598 17.9765 0.789827 18 0.909225 18H17.4904C17.7316 18 17.9629 17.9042 18.1335 17.7337C18.304 17.5632 18.3999 17.332 18.4 17.0908C18.4 16.7344 18.1952 16.4076 17.8684 16.2648Z"
+            fill="#5A596E"
+          />
+        </svg>
+      </button>
+      <!-- </div> -->
+      <div class="ibr-profile-seperator"></div>
+      <div class="header-profile-button">
+        <div
+          class="d-flex justify-content-center align-items-center header-profile-icon"
+        >
+          <!-- <button mat-icon-button> profile-dd -->
+          <div class="position-relative">
+            <img
+              [src]="profileImagePreview || '/assets/images/profile/user-1.jpg'"
+              class="rounded-circle object-cover icon-34"
+              width="35"
+              alt="profile"
+            />
+            <span class="pic-riple"></span>
+          </div>
+          <!-- </button> -->
           <span class="name-wraper">
-<span *ngIf="displayFirstName" class="f-w-500 f-s-16">{{displayFirstName}} </span>
-<span *ngIf="displayLastName" class="f-w-500 f-s-16">{{displayLastName}}</span>
-</span>
-      </div>
-      <ul class="sub-menu">
-        <li [routerLink]="'/settings'">
-          <span>
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M259.1 73.5C262.1 58.7 275.2 48 290.4 48L350.2 48C365.4 48 378.5 58.7 381.5 73.5L396 143.5C410.1 149.5 423.3 157.2 435.3 166.3L503.1 143.8C517.5 139 533.3 145 540.9 158.2L570.8 210C578.4 223.2 575.7 239.8 564.3 249.9L511 297.3C511.9 304.7 512.3 312.3 512.3 320C512.3 327.7 511.8 335.3 511 342.7L564.4 390.2C575.8 400.3 578.4 417 570.9 430.1L541 481.9C533.4 495 517.6 501.1 503.2 496.3L435.4 473.8C423.3 482.9 410.1 490.5 396.1 496.6L381.7 566.5C378.6 581.4 365.5 592 350.4 592L290.6 592C275.4 592 262.3 581.3 259.3 566.5L244.9 496.6C230.8 490.6 217.7 482.9 205.6 473.8L137.5 496.3C123.1 501.1 107.3 495.1 99.7 481.9L69.8 430.1C62.2 416.9 64.9 400.3 76.3 390.2L129.7 342.7C128.8 335.3 128.4 327.7 128.4 320C128.4 312.3 128.9 304.7 129.7 297.3L76.3 249.8C64.9 239.7 62.3 223 69.8 209.9L99.7 158.1C107.3 144.9 123.1 138.9 137.5 143.7L205.3 166.2C217.4 157.1 230.6 149.5 244.6 143.4L259.1 73.5zM320.3 400C364.5 399.8 400.2 363.9 400 319.7C399.8 275.5 363.9 239.8 319.7 240C275.5 240.2 239.8 276.1 240 320.3C240.2 364.5 276.1 400.2 320.3 400z"/></svg>
+            <span *ngIf="displayFirstName" class="f-w-500 f-s-16"
+              >{{ displayFirstName }}
+            </span>
+            <span *ngIf="displayLastName" class="f-w-500 f-s-16">{{
+              displayLastName
+            }}</span>
+          </span>
 
-         <!-- <svg
+          <svg
+            width="12"
+            height="7"
+            viewBox="0 0 12 7"
+            fill="none"
+            class="dropdown-icon"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M1 1L6 6L11 1"
+              stroke="#2B3942"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </div>
+        <ul class="sub-menu">
+          <li [routerLink]="'/settings'">
+            <span>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
+                <!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.-->
+                <path
+                  d="M259.1 73.5C262.1 58.7 275.2 48 290.4 48L350.2 48C365.4 48 378.5 58.7 381.5 73.5L396 143.5C410.1 149.5 423.3 157.2 435.3 166.3L503.1 143.8C517.5 139 533.3 145 540.9 158.2L570.8 210C578.4 223.2 575.7 239.8 564.3 249.9L511 297.3C511.9 304.7 512.3 312.3 512.3 320C512.3 327.7 511.8 335.3 511 342.7L564.4 390.2C575.8 400.3 578.4 417 570.9 430.1L541 481.9C533.4 495 517.6 501.1 503.2 496.3L435.4 473.8C423.3 482.9 410.1 490.5 396.1 496.6L381.7 566.5C378.6 581.4 365.5 592 350.4 592L290.6 592C275.4 592 262.3 581.3 259.3 566.5L244.9 496.6C230.8 490.6 217.7 482.9 205.6 473.8L137.5 496.3C123.1 501.1 107.3 495.1 99.7 481.9L69.8 430.1C62.2 416.9 64.9 400.3 76.3 390.2L129.7 342.7C128.8 335.3 128.4 327.7 128.4 320C128.4 312.3 128.9 304.7 129.7 297.3L76.3 249.8C64.9 239.7 62.3 223 69.8 209.9L99.7 158.1C107.3 144.9 123.1 138.9 137.5 143.7L205.3 166.2C217.4 157.1 230.6 149.5 244.6 143.4L259.1 73.5zM320.3 400C364.5 399.8 400.2 363.9 400 319.7C399.8 275.5 363.9 239.8 319.7 240C275.5 240.2 239.8 276.1 240 320.3C240.2 364.5 276.1 400.2 320.3 400z"
+                />
+              </svg>
+
+              <!-- <svg
         width="20"
         height="20"
         viewBox="0 0 20 22"
@@ -281,37 +318,44 @@
           stroke-linecap="round"
           stroke-linejoin="round"
         />
-          </svg>   -->
-        </span>{{ 'Settings' | translate }}
-        </li>
+          </svg>   --> </span
+            >{{ "Settings" | translate }}
+          </li>
 
-        <li (click)="toggleLanguage(otherLanguage)">
-          <span>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M415.9 344L225 344C227.9 408.5 242.2 467.9 262.5 511.4C273.9 535.9 286.2 553.2 297.6 563.8C308.8 574.3 316.5 576 320.5 576C324.5 576 332.2 574.3 343.4 563.8C354.8 553.2 367.1 535.8 378.5 511.4C398.8 467.9 413.1 408.5 416 344zM224.9 296L415.8 296C413 231.5 398.7 172.1 378.4 128.6C367 104.2 354.7 86.8 343.3 76.2C332.1 65.7 324.4 64 320.4 64C316.4 64 308.7 65.7 297.5 76.2C286.1 86.8 273.8 104.2 262.4 128.6C242.1 172.1 227.8 231.5 224.9 296zM176.9 296C180.4 210.4 202.5 130.9 234.8 78.7C142.7 111.3 74.9 195.2 65.5 296L176.9 296zM65.5 344C74.9 444.8 142.7 528.7 234.8 561.3C202.5 509.1 180.4 429.6 176.9 344L65.5 344zM463.9 344C460.4 429.6 438.3 509.1 406 561.3C498.1 528.6 565.9 444.8 575.3 344L463.9 344zM575.3 296C565.9 195.2 498.1 111.3 406 78.7C438.3 130.9 460.4 210.4 463.9 296L575.3 296z"/></svg>
-</span>
-{{ otherLanguage === 'en' ? 'English' : 'Italian' }}
-        </li>
+          <li (click)="toggleLanguage(otherLanguage)">
+            <span>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
+                <!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.-->
+                <path
+                  d="M415.9 344L225 344C227.9 408.5 242.2 467.9 262.5 511.4C273.9 535.9 286.2 553.2 297.6 563.8C308.8 574.3 316.5 576 320.5 576C324.5 576 332.2 574.3 343.4 563.8C354.8 553.2 367.1 535.8 378.5 511.4C398.8 467.9 413.1 408.5 416 344zM224.9 296L415.8 296C413 231.5 398.7 172.1 378.4 128.6C367 104.2 354.7 86.8 343.3 76.2C332.1 65.7 324.4 64 320.4 64C316.4 64 308.7 65.7 297.5 76.2C286.1 86.8 273.8 104.2 262.4 128.6C242.1 172.1 227.8 231.5 224.9 296zM176.9 296C180.4 210.4 202.5 130.9 234.8 78.7C142.7 111.3 74.9 195.2 65.5 296L176.9 296zM65.5 344C74.9 444.8 142.7 528.7 234.8 561.3C202.5 509.1 180.4 429.6 176.9 344L65.5 344zM463.9 344C460.4 429.6 438.3 509.1 406 561.3C498.1 528.6 565.9 444.8 575.3 344L463.9 344zM575.3 296C565.9 195.2 498.1 111.3 406 78.7C438.3 130.9 460.4 210.4 463.9 296L575.3 296z"
+                />
+              </svg>
+            </span>
+            {{ otherLanguage === "en" ? "English" : "Italian" }}
+          </li>
 
-        <li (click)="logout()">
-      <span>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M566.6 342.6C579.1 330.1 579.1 309.8 566.6 297.3L406.6 137.3C394.1 124.8 373.8 124.8 361.3 137.3C348.8 149.8 348.8 170.1 361.3 182.6L466.7 288L96 288C78.3 288 64 302.3 64 320C64 337.7 78.3 352 96 352L466.7 352L361.3 457.4C348.8 469.9 348.8 490.2 361.3 502.7C373.8 515.2 394.1 515.2 406.6 502.7L566.6 342.7z"/></svg>
-        </span>  {{ 'Logout' | translate }}
-        </li>
-      </ul>
-
-    </div>
-            <!-- <button class="p-link layout-topbar-button" >
+          <li (click)="logout()">
+            <span>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
+                <!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.-->
+                <path
+                  d="M566.6 342.6C579.1 330.1 579.1 309.8 566.6 297.3L406.6 137.3C394.1 124.8 373.8 124.8 361.3 137.3C348.8 149.8 348.8 170.1 361.3 182.6L466.7 288L96 288C78.3 288 64 302.3 64 320C64 337.7 78.3 352 96 352L466.7 352L361.3 457.4C348.8 469.9 348.8 490.2 361.3 502.7C373.8 515.2 394.1 515.2 406.6 502.7L566.6 342.7z"
+                />
+              </svg>
+            </span>
+            {{ "Logout" | translate }}
+          </li>
+        </ul>
+      </div>
+      <!-- <button class="p-link layout-topbar-button" >
             <i class="pi pi-sign-out"></i>
             <span>Logout</span>
         </button> -->
+    </div>
 
-    
-
-  </div>
-
-  <!-- matBadge="1  " -->
-  <!-- </button> -->
-  <!--<mat-menu #notificationmenu="matMenu" class="topbar-dd cardWithShadow">
+    <!-- matBadge="1  " -->
+    <!-- </button> -->
+    <!--<mat-menu #notificationmenu="matMenu" class="topbar-dd cardWithShadow">
     <div class="d-flex align-items-center p-x-32 p-y-16">
       <h6 class="f-s-16 f-w-600 m-0 ">Notifications</h6>
       <span class="m-l-auto">
@@ -342,20 +386,20 @@
     </div>
   </mat-menu> -->
 
-  <!-- --------------------------------------------------------------- -->
-  <!-- profile Dropdown -->
-  <!-- --------------------------------------------------------------- -->
-  <!-- <button
+    <!-- --------------------------------------------------------------- -->
+    <!-- profile Dropdown -->
+    <!-- --------------------------------------------------------------- -->
+    <!-- <button
     mat-icon-button
     [matMenuTriggerFor]="profilemenu"
     aria-label="Notifications" class="m-l-8"
   > -->
-  <!-- <img
+    <!-- <img
       src="/assets/images/profile/user-1.jpg"
       class="rounded-circle object-cover icon-35 profile-dd m-l-8"
       width="35"
     /> -->
-  <!-- </button>
+    <!-- </button>
   <mat-menu #profilemenu="matMenu" class="topbar-dd cardWithShadow">
     <ng-scrollbar class="position-relative" style="height: 647px">
       <div class="p-x-32 p-y-16">
@@ -403,8 +447,8 @@
         </a>
         } -->
 
-  <!-- upgrade -->
-  <!-- <div
+    <!-- upgrade -->
+    <!-- <div
           class="p-24 overflow-hidden bg-light-primary rounded position-relative m-y-16"
         >
           <div class="d-flex align-items-center">
@@ -437,4 +481,5 @@
       </div>
     </ng-scrollbar>
   </mat-menu> -->
+  </div>
 </mat-toolbar>

@@ -4,10 +4,9 @@ table {
   border-collapse: collapse; /* Ensures consistent spacing between cells */
 }
 
-
 /* Detail Row Styling */
 tr.example-detail-row {
-  background-color: #f9f9f9;
+  background-color: #ffffffb2;
 }
 
 .example-detail-row td {
@@ -23,21 +22,19 @@ tr.example-detail-row {
 }
 
 .example-element-row:not(.example-expanded-row):hover {
-  background-color: #f1f1f1; /* Subtle hover effect */
+  background-color: #ffffffb2; /* Subtle hover effect */
 }
 
 .example-element-row:not(.example-expanded-row):active {
   background-color: #e8e8e8; /* Subtle active row effect */
 }
 
-
-
-
 .mat-mdc-header-row {
-  background: rgba(247, 251, 255, 1) !important;
+  background: #ffffff !important;
 }
 .table-wrapper {
   overflow-x: auto;
+  border-radius: 12px;
 }
 
 .column-expand {
@@ -83,12 +80,14 @@ tr.example-detail-row {
 }
 
 .mat-mdc-row:nth-child(even) {
-  background-color: rgba(249, 249, 249, 1); /* Black background for even rows */
+  // background-color: rgba(249, 249, 249, 1);
+  background-color: #ffffffb2;
+  /* Black background for even rows */
   // color: #000; /* White text for contrast */
 }
 
 .mat-mdc-row:nth-child(odd) {
-  background-color: #fff; /* White background for odd rows */
+  background-color: #ffffffb2; /* White background for odd rows */
   // color: #000; /* Black text for contrast */
 }
 
@@ -102,8 +101,8 @@ tr.example-detail-row {
 
 // Table Container
 .clientTableContainer {
-  background: #ffffff;
-  border: 1px solid #e7e7eb;
+  background: #ffffffb2;
+  // border: 1px solid #e7e7eb;
   border-radius: 12px;
   overflow: hidden;
   box-shadow: none;
@@ -116,64 +115,97 @@ tr.example-detail-row {
 
 // New Styles
 
-
-
-
-
-.client-search-wrapper {
+.client-search-wrapper,
+.clientTableContainer {
   .position-relative {
-  width: 100%;
-  max-width: 473px;
-  background-color: #f7f7f7;
-  border-radius: 8px;
-  overflow: hidden;
-  position: relative;
-  @media (max-width: 768px) {
-    max-width: 100%;
+    width: 100%;
+    max-width: 352px;
+    background-color: #ffffffb2;
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    @media (max-width: 768px) {
+      max-width: 100%;
+    }
+  }
+  input {
+    display: block;
+    border: 1px solid transparent;
+    background: transparent;
+    border-radius: 12px;
+    padding: 8px 8px 8px 48px;
+    outline: none;
+    min-height: 46px;
+    line-height: 16px;
+    font-size: 14px;
+    font-family: "Ubuntu", serif;
+    letter-spacing: "2%";
+    transition: all 0.2s linear;
+    &::placeholder {
+      color: #a6abb2;
+    }
+    &:focus {
+      outline: none;
+      border: 1px solid #516ce8;
+      transition: border 0.2s linear;
+    }
+  }
+  .search-icon {
+    top: 50%;
+    left: 16px;
+    transform: translateY(-50%);
+    position: absolute;
+    z-index: 1;
+    height: 24px;
+    width: 24px;
+    pointer-events: none;
   }
 }
-input {
-  display: block;
-  border: 1px solid #e7e7eb;
-  background: transparent;
-  border-radius: 8px;
-  padding: 8px 16px;
-  outline: none;
-  min-height: 46px;
-  line-height: 16px;
-  font-size: 14px;
-  font-family: "Ubuntu", serif;
-  letter-spacing: "2%";
-  transition: all 0.2s linear;
-  &::placeholder {
-  color: #b7b6c2;
-}
-&:focus {
-  outline: none;
-  border: 1px solid #516ce8;
-  transition: border 0.2s linear;
-}
-}
-.search-icon {
-  top: 50%;
-  right: 16px;
-  transform: translateY(-50%);
-  position: absolute;
-  z-index: 1;
-  height: 24px;
-  width: 24px;
-  pointer-events: none;
-}
-}
 
+.table-main-wrapper {
+  padding: 0 24px 24px 24px;
+}
 
 // Table Heading
 .table-heading {
-  padding-top: 24px;
-  padding-left: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px;
+  // padding-left: 24px;
   @media (max-width: 768px) {
     padding-left: 16px;
     padding-top: 16px;
   }
+  .page-title {
+    font-size: 1.5rem;
+    line-height: 1.334rem;
+    color: #1c1c1c;
+  }
 }
 // End Table Heading
+
+.client-section {
+  display: flex;
+  flex-direction: column;
+  gap: 17px;
+}
+.client-search-wrapper .mat-mdc-card.mdc-card {
+  background-color: #ffffffb2 !important;
+  backdrop-filter: blur(75px);
+}
+
+.ibr-client-intro {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  p {
+    margin: 0;
+    color: #5a596e;
+  }
+  h3 {
+    font-size: 1.5rem;
+    line-height: 1.334rem;
+    color: #1c1c1c;
+  }
+}

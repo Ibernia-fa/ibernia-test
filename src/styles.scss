@@ -32,9 +32,10 @@ body {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
-
 
 /* Global tooltip width & wrapping */
 .cdk-overlay-container .mat-mdc-tooltip-surface {
@@ -43,7 +44,7 @@ body {
   font-size: 14px;
   background: #fff;
   color: #2a3547;
-  font-family: 'Ubuntu';
+  font-family: "Ubuntu";
   border: 1px solid #e7e7eb;
   padding: 15px;
 }
@@ -105,7 +106,7 @@ input[type="number"] {
 }
 
 .mat-mdc-card {
-  border: 1px solid #e7e7eb !important;
+  // border: 1px solid #e7e7eb !important;
   border-radius: 12px !important;
   box-shadow: none !important;
 }
@@ -117,7 +118,7 @@ input[type="number"] {
 .mat-mdc-table {
   tr {
     th {
-      color: #3A3A47;
+      color: #3a3a47;
       font-weight: 700;
     }
   }
@@ -161,7 +162,6 @@ table {
 }
 
 .percentage-icon {
-
   .mat-mdc-form-field-infix {
     flex: inherit;
     margin-right: 5px;
@@ -170,13 +170,14 @@ table {
       padding: 0px !important;
       min-height: inherit;
     }
-
   }
 
   .mat-mdc-form-field-icon-suffix {
     padding: 0 0 0 1px;
-    background: url(../src/assets/images/shapes/percentage.png) left top no-repeat;
-    background: url(../src/assets/images/shapes/percentage.svg) left top no-repeat;
+    background: url(../src/assets/images/shapes/percentage.png) left top
+      no-repeat;
+    background: url(../src/assets/images/shapes/percentage.svg) left top
+      no-repeat;
     height: 20px;
     width: 20px;
     align-items: center;
@@ -209,7 +210,8 @@ table {
   padding-left: 0px !important;
 }
 
-.mdc-text-field--outlined:not(.mdc-text-field--disabled).mdc-text-field--invalid .mat-mdc-notch-piece {
+.mdc-text-field--outlined:not(.mdc-text-field--disabled).mdc-text-field--invalid
+  .mat-mdc-notch-piece {
   border-color: red !important;
 }
 
@@ -233,7 +235,6 @@ button {
   }
 }
 
-
 .modal-header {
   h3 {
     text-transform: lowercase;
@@ -250,13 +251,13 @@ button {
   }
 }
 
-.mat-internal-form-field>label {
+.mat-internal-form-field > label {
   margin-top: 3px;
 }
 
 .disabled-field {
   .mat-mdc-input-element {
-    color: #b2b2b4 !important
+    color: #b2b2b4 !important;
   }
 }
 
@@ -268,20 +269,19 @@ button {
 }
 
 .mdc-switch__track::after {
-  background-color: #516CE8;
+  background-color: #516ce8;
 }
 
 .apexcharts-text,
 .apexcharts-legend-text,
 .apexcharts-text tspan {
   font-size: 14px !important;
-  font-family: 'Ubuntu' !important;
+  font-family: "Ubuntu" !important;
   font-weight: 600 !important;
 }
 
 .apexcharts-yaxis {
   .apexcharts-yaxis-texts-g {
-
     tspan {
       font-weight: bold;
       fill: #d7dbe0;
@@ -320,8 +320,6 @@ button {
     width: 12px !important;
     overflow: hidden;
     margin-right: 5px;
-    ;
-
     svg {
       border-radius: 100px;
     }
@@ -329,7 +327,6 @@ button {
 }
 
 .apexcharts-legend-text {
-
   color: #2a3547 !important;
 }
 
@@ -375,14 +372,15 @@ button {
 
 /* turn it red when invalid */
 .net-fields .form-field .mat-mdc-input-element.ng-invalid.ng-touched,
-.form-field .select-option .mat-mdc-select.mat-mdc-select-invalid .mat-mdc-select-trigger,
+.form-field
+  .select-option
+  .mat-mdc-select.mat-mdc-select-invalid
+  .mat-mdc-select-trigger,
 .form-field .mat-mdc-input-element.ng-invalid.ng-touched,
 .form-field .mat-mdc-input-element.ng-invalid.ng-dirty {
   border-color: red !important;
   /* override Material’s border: none */
 }
-
-
 
 .mat-accordion {
   .mat-expansion-panel {
@@ -400,7 +398,6 @@ button {
 // }
 .mat-mdc-form-field-hint-wrapper {
   padding-left: 0px !important;
-
 }
 
 .btn-secondary {
@@ -435,12 +432,10 @@ button {
   }
 }
 
-
-
-.mat-button-toggle-checked .mat-button-toggle-button:has(.mat-button-toggle-checkbox-wrapper) {
+.mat-button-toggle-checked
+  .mat-button-toggle-button:has(.mat-button-toggle-checkbox-wrapper) {
   padding-left: 0px !important;
 }
-
 
 .mat-button-toggle-group {
   border: none !important;
@@ -490,7 +485,6 @@ button {
 
   .mat-button-toggle-checkbox-wrapper {
     display: none;
-
   }
 
   .mat-button-toggle-checked {
@@ -506,7 +500,7 @@ button {
 }
 
 .savings-tooltip {
-  background: rgba(255, 255, 255, .96);
+  background: rgba(255, 255, 255, 0.96);
   min-width: 170px;
   font-size: 14px !important;
   font-family: "Ubuntu" !important;
@@ -534,7 +528,7 @@ button {
     }
 
     .circle-wrapper {
-      background: #00512C;
+      background: #00512c;
       height: 10px;
       width: 10px;
       display: inline-block;
@@ -542,12 +536,7 @@ button {
       margin-right: 10px;
     }
   }
-
 }
-
-
-
-
 
 /* Global Fullscreen Styles */
 .global-fullscreen-overlay {
@@ -681,7 +670,6 @@ button {
   padding: 0 !important;
   margin: 0 !important;
 
-
   &:hover {
     color: #1c1c1c !important;
     background: #ffcece !important;
@@ -700,7 +688,6 @@ button {
   position: relative !important;
   background: #fff !important;
 }
-
 
 /* Ensure chart takes full space */
 ::ng-deep app-savings-bar-stacked-chart {
@@ -724,13 +711,12 @@ button {
   }
 }
 
-
 /* Hide everything except the overlay */
-.global-fullscreen-overlay~* {
+.global-fullscreen-overlay ~ * {
   display: none !important;
 }
 
-body:has(.global-fullscreen-overlay)>*:not(.global-fullscreen-overlay) {
+body:has(.global-fullscreen-overlay) > *:not(.global-fullscreen-overlay) {
   display: none !important;
 }
 
@@ -751,7 +737,7 @@ body:has(.global-fullscreen-overlay) {
 
 /* Ensure Material icons work */
 .global-fullscreen-overlay mat-icon {
-  font-family: 'Material Icons' !important;
+  font-family: "Material Icons" !important;
   font-weight: normal !important;
   font-style: normal !important;
   font-size: 20px !important;
@@ -762,10 +748,9 @@ body:has(.global-fullscreen-overlay) {
   white-space: nowrap !important;
   word-wrap: normal !important;
   direction: ltr !important;
-  -webkit-font-feature-settings: 'liga' !important;
+  -webkit-font-feature-settings: "liga" !important;
   -webkit-font-smoothing: antialiased !important;
 }
-
 
 // event styes for lifetime model - start
 .custom-html-tooltip {
@@ -886,5 +871,5 @@ body:has(.global-fullscreen-overlay) {
 /* Only apply fit-content to box items, not range items which need to show duration */
 .vis-item.vis-box,
 .vis-item.vis-box.vis-selected {
-    width: fit-content !important;
+  width: fit-content !important;
 }
