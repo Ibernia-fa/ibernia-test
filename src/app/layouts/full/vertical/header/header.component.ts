@@ -308,6 +308,16 @@ get displayLastName(): string {
   return (this.userprofile?.lastName ?? '').trim() || (this.user?.family_name ?? '');
 }
 
+/** Initials for avatar when no profile picture (e.g. "AC" for Alex Carry) */
+get userInitials(): string {
+  const first = (this.displayFirstName || '').charAt(0).toUpperCase();
+  const last = (this.displayLastName || '').charAt(0).toUpperCase();
+  if (first && last) return first + last;
+  if (first) return first;
+  if (last) return last;
+  return '?';
+}
+
 
     private loadProfile() {
       if (!this.user?.sub) return;

@@ -250,12 +250,18 @@
         >
           <!-- <button mat-icon-button> profile-dd -->
           <div class="position-relative">
-            <img
-              [src]="profileImagePreview || '/assets/images/profile/user-1.jpg'"
-              class="rounded-circle object-cover icon-34"
-              width="35"
-              alt="profile"
-            />
+            @if (profileImagePreview) {
+              <img
+                [src]="profileImagePreview"
+                class="rounded-circle object-cover icon-34"
+                width="35"
+                alt="profile"
+              />
+            } @else {
+              <div class="avatar-initials rounded-circle icon-34 d-flex align-items-center justify-content-center">
+                {{ userInitials }}
+              </div>
+            }
             <span class="pic-riple"></span>
           </div>
           <!-- </button> -->

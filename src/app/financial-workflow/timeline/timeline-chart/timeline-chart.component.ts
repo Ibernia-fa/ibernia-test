@@ -278,12 +278,10 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
   onDragEnd(event: DragEvent) {
     event.preventDefault();
     this.isDragging = false;
-    this.clearLabelHighlight();
+    this.clearDragAndHoverVisuals();
     this.timelineContainer.nativeElement.classList.remove('external-dragging');
     this.removeDocumentDropListener();
-    this.lastValidDragTime = null; // Clear stored drag position
-    this.timeline.removeCustomTime('dragOver');
-    this.timeline.redraw();
+    this.lastValidDragTime = null;
   }
 
   private removeDocumentDropListener() {
@@ -313,6 +311,7 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
   onDrop(event: DragEvent) {
     event.preventDefault();
     this.isDragging = false;
+    this.clearDragAndHoverVisuals();
     this.timelineContainer.nativeElement.classList.remove('external-dragging');
     this.removeDocumentDropListener();
 
@@ -569,6 +568,7 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
   clearLabelHighlight() {
     const minorLabels = document.querySelectorAll('.vis-text.vis-minor');
     minorLabels.forEach((label) => {
+      const el = label as HTMLElement;
       const pTag = label.querySelector('p') as HTMLElement;
       const spanTag = label.querySelector('span') as HTMLElement;
 
@@ -581,15 +581,31 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
       if (spanTag) {
         spanTag.style.color = '';
         spanTag.style.fontWeight = '';
+        spanTag.style.fontSize = '';
+        const originalShortYear = spanTag.getAttribute('data-short-year');
+        if (originalShortYear) {
+          spanTag.textContent = originalShortYear;
+          spanTag.removeAttribute('data-short-year');
+        }
       }
 
-      (label as HTMLElement).style.display = '';
-      (label as HTMLElement).style.backgroundColor = '';
-      (label as HTMLElement).style.opacity = '';
-      (label as HTMLElement).style.zIndex = '';
-      (label as HTMLElement).style.padding = '';
-
+      el.style.display = '';
+      el.style.backgroundColor = '';
+      el.style.opacity = '';
+      el.style.zIndex = '';
+      el.style.padding = '';
+      el.classList.remove('highlighted');
     });
+  }
+
+  /** Clears blue line and year highlight after drag ends. Call from all drop/dragend paths. */
+  private clearDragAndHoverVisuals(): void {
+    if (this.timeline) {
+      try { this.timeline.removeCustomTime('dragOver'); } catch { }
+      try { this.timeline.removeCustomTime(this.hoverLineId); } catch { }
+      this.timeline.redraw();
+    }
+    this.clearLabelHighlight();
   }
 
   private getTimeFromMouseX(clientX: number): Date | null {
@@ -881,8 +897,7 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   handleEventUpdate(item: any, callback: (item: any) => void) {
-    try { this.timeline.removeCustomTime('dragOver'); } catch { }
-    this.clearLabelHighlight();
+    this.clearDragAndHoverVisuals();
 
     const snappedEnd = item.end ? this.snapToNearestYear(new Date(item.end)) : null;
 

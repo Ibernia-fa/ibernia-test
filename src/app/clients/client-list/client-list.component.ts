@@ -5,6 +5,7 @@ import {
   ViewChild,
   AfterViewInit,
   OnInit,
+  OnDestroy,
 } from '@angular/core';
 import {
   MatTableDataSource,
@@ -117,7 +118,7 @@ import { TranslateModule } from '@ngx-translate/core';
     ]),
   ],
 })
-export class ClientListComponent implements OnInit, AfterViewInit {
+export class ClientListComponent implements OnInit, AfterViewInit, OnDestroy {
   dataSource: MatTableDataSource<Client> = new MatTableDataSource(
     new Array<Client>()
   );
@@ -173,6 +174,22 @@ export class ClientListComponent implements OnInit, AfterViewInit {
   /** Advisor name from API profile (set when getUserProfileResponse returns). Used so title stays correct when OIDC is slow or missing given_name. */
   advisorNameFromApi: string | null = null;
 
+  /** Time-based greeting: morning (5–11:59), afternoon (12–17:59), evening (18–4:59). Updated every minute for automatic refresh. */
+  currentGreeting = this.getGreetingForLocalTime();
+
+  /** Current local date for display; updated every minute with the greeting. */
+  currentDate = new Date();
+
+  private greetingInterval: ReturnType<typeof setInterval> | null = null;
+
+  /** Returns greeting phrase based on user's local hour. */
+  private getGreetingForLocalTime(): string {
+    const hour = new Date().getHours();
+    if (hour >= 5 && hour < 12) return 'Good morning';
+    if (hour >= 12 && hour < 18) return 'Good afternoon';
+    return 'Good evening';
+  }
+
   /** Display name for the advisor in the page title. Uses API profile first, then OIDC claims; reads auth on each access so it updates when user loads late (same browser, intermittent missing name). */
   get advisorDisplayName(): string {
     const fromApi = (this.advisorNameFromApi ?? '').trim();
@@ -199,7 +216,18 @@ export class ClientListComponent implements OnInit, AfterViewInit {
   ngOnInit() {
     this.user = this.Authservice.getUserProfile();
     this.getClients(this.user.sub);
-    this.checkPrefsAndPrompt();  
+    this.checkPrefsAndPrompt();
+    this.greetingInterval = setInterval(() => {
+      this.currentDate = new Date();
+      this.currentGreeting = this.getGreetingForLocalTime();
+    }, 60_000);
+  }
+
+  ngOnDestroy() {
+    if (this.greetingInterval) {
+      clearInterval(this.greetingInterval);
+      this.greetingInterval = null;
+    }
   }
 
 

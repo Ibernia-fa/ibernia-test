@@ -42,8 +42,8 @@
         class="d-flex justify-content-between align-items-center"
       >
         <div class="ibr-client-intro">
-          <h3>Good morning, {{ advisorDisplayName }}</h3>
-          <p>Monday, March 1st, 2026, 8:15 am</p>
+          <h3>{{ currentGreeting }}, {{ advisorDisplayName || 'there' }}</h3>
+          <p>{{ currentDate | date:'EEEE, MMMM d, y, h:mm a' }}</p>
         </div>
         <!-- <div class="position-relative">
           <input
