@@ -1,11 +1,10 @@
-import { Component, ViewChild, Input, OnChanges, OnDestroy, SimpleChanges, ElementRef } from '@angular/core';
+import { Component, ViewChild, Input, OnChanges, OnDestroy, SimpleChanges, ElementRef, NgZone, inject } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { TablerIconsModule } from 'angular-tabler-icons';
 import { ChartComponent, NgApexchartsModule } from 'ng-apexcharts';
 import { ChartSeries, TimelineEvent } from '../models/charts-series.model';
 import { Client } from 'src/app/clients/models/client';
 import moment from 'moment';
-import { set } from 'date-fns';
 
 @Component({
   selector: 'app-savings-bar-stacked-chart',
@@ -18,8 +17,8 @@ import { set } from 'date-fns';
   styleUrl: './savings-bar-stacked-chart.component.scss'
 })
 export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
-  // @ViewChild("chart") chart: ChartComponent;
   @ViewChild("chart", { read: ElementRef }) chartElRef: ElementRef<HTMLDivElement>;
+  @ViewChild(ChartComponent) apxChartComponent: ChartComponent | undefined;
   @Input() report: ChartSeries;
   @Input() forecastStartDate: Date;
   @Input() forecastEndDate: Date;
@@ -84,6 +83,8 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
     );
     return { ...report, categories, series, timelineEvents };
   }
+
+  private ngZone = inject(NgZone);
 
   constructor() {
     this.chartOptions = {
@@ -452,7 +453,7 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
     }
 
     // final series assignment
-    this.chartOptions.series = report.series.map((s, idx) => ({
+    const mappedSeries = report.series.map((s, idx) => ({
       ...s,
       color: (s.name === 'Current Account (Negative)' || s.name === 'Emergency Expense') ? 'transparent' : s.color,
       tack: 'stack1',
@@ -474,6 +475,19 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
         }
       }
     }));
+    this.chartOptions.series = mappedSeries;
+
+    // ng-apexcharts v19 uses signal inputs + asapScheduler for hydration.
+    // When only [series] changes, it calls updateSeries() but this can silently
+    // fail if the chart's internal state is stale. Directly calling updateSeries
+    // on the ApexCharts instance as a fallback guarantees the bars re-render.
+    if (this.animateUpdates && changes['report'] && this.chartInitialized) {
+      this.ngZone.runOutsideAngular(() => {
+        setTimeout(() => {
+          this.apxChartComponent?.updateSeries(mappedSeries, true);
+        }, 0);
+      });
+    }
   }
 
   ngOnDestroy(): void {

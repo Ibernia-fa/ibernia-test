@@ -64,6 +64,9 @@
               <div class="assumption-panel category-panel">
                 <span class="assumption-label">{{ 'Goals' | translate }}</span>
                 <mat-select class="category-dropdown" [placeholder]="'Select' | translate" (selectionChange)="onGoalSelected($event.value)">
+                  @if (!goalItems.length) {
+                    <mat-option disabled class="empty-option">{{ 'No goals added' | translate }}</mat-option>
+                  }
                   @for (goal of goalItems; track goal.id) {
                     <mat-option [value]="goal">
                       <span class="category-option">
@@ -91,6 +94,9 @@
               <div class="assumption-panel category-panel">
                 <span class="assumption-label">{{ 'Saving pots' | translate }}</span>
                 <mat-select class="category-dropdown" [placeholder]="'Select' | translate" (selectionChange)="onSavingPotSelected($event.value)">
+                  @if (!savingPotItems.length) {
+                    <mat-option disabled class="empty-option">{{ 'No saving pots added' | translate }}</mat-option>
+                  }
                   @for (pot of savingPotItems; track pot.id) {
                     <mat-option [value]="pot">
                       <span class="category-option">
@@ -118,6 +124,9 @@
               <div class="assumption-panel category-panel">
                 <span class="assumption-label">{{ 'Incomes' | translate }}</span>
                 <mat-select class="category-dropdown" [placeholder]="'Select' | translate" (selectionChange)="onIncomeSelected($event.value)">
+                  @if (!incomeItems.length) {
+                    <mat-option disabled class="empty-option">{{ 'No incomes added' | translate }}</mat-option>
+                  }
                   @for (income of incomeItems; track income.id) {
                     <mat-option [value]="income">
                       <span class="category-option">
@@ -145,6 +154,9 @@
               <div class="assumption-panel category-panel">
                 <span class="assumption-label">{{ 'Expenses' | translate }}</span>
                 <mat-select class="category-dropdown" [placeholder]="'Select' | translate" (selectionChange)="onExpenseSelected($event.value)">
+                  @if (!expenseItems.length) {
+                    <mat-option disabled class="empty-option">{{ 'No expenses added' | translate }}</mat-option>
+                  }
                   @for (expense of expenseItems; track expense.id) {
                     <mat-option [value]="expense">
                       <span class="category-option">
@@ -261,10 +273,14 @@
             </form>
 
             <div class="assumptions-actions">
-              <button mat-flat-button color="primary" class="simulate-btn" (click)="onSimulate()">
-                <span class="play-badge" aria-hidden="true">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-                </span>
+              <button mat-flat-button color="primary" class="simulate-btn" (click)="onSimulate()" [disabled]="isSimulating">
+                @if (isSimulating) {
+                  <mat-spinner diameter="18" class="simulate-spinner"></mat-spinner>
+                } @else {
+                  <span class="play-badge" aria-hidden="true">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                  </span>
+                }
                 {{ 'Simulate scenario' | translate }}
               </button>
               <button mat-stroked-button class="create-plan-btn" (click)="onCreatePlanFromScenario()">

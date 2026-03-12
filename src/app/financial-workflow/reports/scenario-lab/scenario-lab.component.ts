@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subject, combineLatest, of, filter, takeUntil, switchMap, tap, catchError } from 'rxjs';
+import { Subject, combineLatest, of, filter, takeUntil, switchMap, tap, catchError, finalize } from 'rxjs';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
@@ -71,6 +71,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
   scenarioForm: FormGroup;
   hasShortfall = false;
   firstShortfallAge: number | null = null;
+  isSimulating = false;
 
   baselineReport: ChartSeries | null = null;
   displayedReport: ChartSeries | null = null;
@@ -205,7 +206,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
           this.injectTimelineEvents(report);
           this.report = report;
           if (!this.baselineReport) {
-            this.baselineReport = report;
+            this.baselineReport = this.deepCloneReport(report);
           }
           this.displayedReport = report;
           this.activeTab = 'after';
@@ -356,23 +357,35 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
   }
 
   private applyScenario(): void {
-    this.loadScenarioReport().pipe(takeUntil(this.destroy$)).subscribe((report) => {
-      if (report) {
-        this.injectTimelineEvents(report);
-        this.report = report;
-        this.alignSeriesStructure();
-        this.hasSimulated = true;
-        this.activeTab = 'after';
-        this.displayedReport = report;
-        this.updateScenarioForecastEndDateIfNeeded();
-        this.getShortfallStatus(report);
-      }
-    });
+    this.isSimulating = true;
+    this.loadScenarioReport()
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => { this.isSimulating = false; }),
+      )
+      .subscribe((report) => {
+        if (report) {
+          this.injectTimelineEvents(report);
+          this.report = report;
+          this.alignSeriesStructure();
+          this.hasSimulated = true;
+          this.activeTab = 'after';
+          // Spread creates a fresh reference so Angular and ng-apexcharts
+          // always detect the change, even if series structure is identical.
+          this.displayedReport = { ...report, series: report.series.map(s => ({ ...s, data: [...s.data] })) };
+          this.updateScenarioForecastEndDateIfNeeded();
+          this.getShortfallStatus(report);
+          this.toastr.success('Scenario simulated successfully');
+        } else {
+          this.toastr.warning('No scenario data returned');
+        }
+      });
   }
 
   switchTab(tab: 'before' | 'after'): void {
     this.activeTab = tab;
-    this.displayedReport = tab === 'before' ? this.baselineReport : this.report;
+    const source = tab === 'before' ? this.baselineReport : this.report;
+    this.displayedReport = source ? this.deepCloneReport(source) : source;
     if (tab === 'after' && this.report) this.getShortfallStatus(this.report);
     if (tab === 'before' && this.baselineReport) this.getShortfallStatus(this.baselineReport);
   }
@@ -475,6 +488,14 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
     if (!this.scenarioForecastEndDate || this.scenarioForecastEndDate.getTime() !== next.getTime()) {
       this.scenarioForecastEndDate = next;
     }
+  }
+
+  private deepCloneReport(report: ChartSeries): ChartSeries {
+    return {
+      categories: [...report.categories],
+      series: report.series.map(s => ({ ...s, data: [...s.data] })),
+      timelineEvents: report.timelineEvents?.map(e => ({ ...e })) ?? [],
+    };
   }
 
   private injectTimelineEvents(report: ChartSeries): void {
