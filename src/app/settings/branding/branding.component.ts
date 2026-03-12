@@ -81,8 +81,8 @@ export class BrandingComponent implements OnInit {
     }
   }
 
-  private readonly BACKGROUND_MIN_WIDTH = 400;
-  private readonly BACKGROUND_MIN_HEIGHT = 400;
+  private readonly BACKGROUND_MIN_WIDTH = 1280;
+  private readonly BACKGROUND_MIN_HEIGHT = 720;
 
   private validateBackgroundMinSize(dataUrl: string): Promise<boolean> {
     return new Promise((resolve) => {
