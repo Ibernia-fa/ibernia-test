@@ -161,7 +161,6 @@ export class ClientEditComponent {
         lastName: ['', Validators.required],
         dob: ['', [Validators.required, dobValidator]],
         gender: [''],
-        country: [''],
         currency: [''],
         email: ['', [Validators.email, Validators.required]],
         phone: [''],
@@ -175,13 +174,12 @@ export class ClientEditComponent {
   clientCountryValueChange(event: any) {
     const selectedCountry = allCountries.find(country => country.countryName === event);
     this.clientForm.controls['currency'].patchValue(selectedCountry?.currencySymbol);
-    this.selectedClientCountryISO = (selectedCountry?.countryCode.toLowerCase() ?? '') as CountryISO
-  }
-
-  partnerCountryValueChange(event: any) {
-    const selectedCountry = allCountries.find(country => country.countryName === event);
-    (this.clientForm.get('partner') as FormGroup).controls['currency'].patchValue(selectedCountry?.currencySymbol);
-    this.selectedPartnerCountryISO = (selectedCountry?.countryCode.toLowerCase() ?? '') as CountryISO
+    this.selectedClientCountryISO = (selectedCountry?.countryCode.toLowerCase() ?? '') as CountryISO;
+    // Partner follows client country
+    if (this.showPartner) {
+      this.selectedPartnerCountryISO = this.selectedClientCountryISO;
+      (this.clientForm.get('partner') as FormGroup).controls['currency'].patchValue(selectedCountry?.currencySymbol);
+    }
   }
 
   get isFormInvalid() {
@@ -257,11 +255,12 @@ export class ClientEditComponent {
           // partnerFormGroup.controls['dob'].patchValue(res.partnerDetail?.birthDate);
           partnerFormGroup.controls['email'].patchValue(res.partnerDetail?.email);
           partnerFormGroup.controls['gender'].patchValue(res.partnerDetail?.gender);
-          partnerFormGroup.controls['country'].patchValue(res.partnerDetail?.country);
+          // Partner follows client country; no separate partner country field
 
           const index = countryDialCodes.findIndex(x => res.partnerDetail?.phone.slice(1, res.partnerDetail?.phone.length).startsWith(x.DialCode));
           partnerFormGroup.controls['phone'].patchValue(res.partnerDetail?.phone.slice(countryDialCodes[index]?.DialCode?.length + 1));
-          this.selectedPartnerCountryISO = countryDialCodes[index].ISOCode as CountryISO;
+          // Partner follows client country for phone dial code
+          this.selectedPartnerCountryISO = this.selectedClientCountryISO;
           partnerFormGroup.controls['currency'].patchValue(res.partnerDetail?.preferredCurrency);
         }
 
@@ -292,6 +291,16 @@ export class ClientEditComponent {
       partnerGroup.get('lastName')?.setValidators(Validators.required);
       partnerGroup.get('dob')?.setValidators(Validators.required);
       partnerGroup.get('email')?.setValidators(Validators.required);
+      // Partner follows client country and currency
+      const clientCountry = this.clientForm.controls['country']?.value;
+      const clientCurrency = this.clientForm.controls['currency']?.value;
+      if (clientCountry) {
+        const selectedCountry = allCountries.find(c => c.countryName === clientCountry);
+        if (selectedCountry) {
+          partnerGroup.controls['currency'].patchValue(clientCurrency ?? selectedCountry.currencySymbol);
+          this.selectedPartnerCountryISO = (selectedCountry.countryCode.toLowerCase() ?? '') as CountryISO;
+        }
+      }
 
       // const partnerDob = partnerGroup.get('dob')?.value;
       // if (partnerDob instanceof Date) {
@@ -353,7 +362,7 @@ export class ClientEditComponent {
           birthDate: this.fixDate(partnerGroup.controls['dob']?.value),
           email: partnerGroup.controls['email']?.value,
           gender: partnerGroup.controls['gender']?.value,
-          country: partnerGroup.controls['country']?.value,
+          country: this.clientForm.controls['country']?.value,
           phone: partnerGroup.controls['phone']?.value?.e164Number,
           inflationRate: 0,
           preferredCurrency:
