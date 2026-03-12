@@ -314,14 +314,10 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
       endYear = Math.max(endYear, partnerBirthYear + partnerAge);
     }
 
-    if (this.cashflow && this.financialTimeline?.forecastStartDate) {
-      const forecastStartDate = new Date(this.financialTimeline.forecastStartDate);
-      const forecastStartYear = forecastStartDate.getFullYear();
+    if (this.cashflow) {
       const planDuration = Number(this.cashflow.planDuration);
       if (Number.isFinite(planDuration) && planDuration > 0) {
-        const startAge = this.calculateAgeAtDate(forecastStartDate, birthDate);
-        const planEndYear = forecastStartYear + (planDuration - startAge);
-        endYear = Math.max(endYear, planEndYear);
+        endYear = Math.max(endYear, birthYear + planDuration);
       }
     }
 
