@@ -143,7 +143,6 @@ export class ClientAddComponent {
         lastName: ['', Validators.required],
         dob: ['', dobValidator],
         gender: [''],
-        country: [''],
         currency: [''],
         email: ['', [Validators.email]],
         phone: [''],
@@ -214,17 +213,6 @@ export class ClientAddComponent {
       (selectedCountry?.countryCode.toLowerCase() ?? '') as CountryISO;
   }
 
-  partnerCountryValueChange(event: any) {
-    const selectedCountry = allCountries.find(
-      (country) => country.countryName === event
-    );
-    (this.clientForm.get('partner') as FormGroup).controls[
-      'currency'
-    ].patchValue(selectedCountry?.currencySymbol);
-    this.selectedPartnerCountryISO =
-      (selectedCountry?.countryCode.toLowerCase() ?? '') as CountryISO;
-  }
-
   togglePartnerSection(visible: boolean) {
     this.showPartner = visible;
     const partnerGroup = this.clientForm.get('partner') as FormGroup;
@@ -251,8 +239,7 @@ export class ClientAddComponent {
         if (selectedCountry) {
           partnerGroup.patchValue(
             {
-              country: selectedCountry.countryName,
-              // if client currency is set use it; otherwise use the country's default
+              // Partner follows client country; use client's currency
               currency: clientCurrency ?? selectedCountry.currencySymbol,
             },
             { emitEvent: false }
@@ -340,7 +327,7 @@ export class ClientAddComponent {
             birthDate: this.fixDate(partnerDob),
             email: partnerGroup.controls['email']?.value,
             gender: partnerGroup.controls['gender']?.value,
-            country: partnerGroup.controls['country']?.value,
+            country: this.clientForm.controls['country']?.value,
             firstName: partnerGroup.controls['firstName']?.value,
             lastName: partnerGroup.controls['lastName']?.value,
             phone: partnerGroup.controls['phone']?.value?.e164Number,
