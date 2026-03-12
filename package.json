@@ -7,7 +7,6 @@
     "start:local": "ng serve --configuration local",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
@@ -79,14 +78,7 @@
     "@types/date-fns": "^2.6.0",
     "@types/file-saver": "^2.0.7",
     "@types/hammerjs": "^2.0.46",
-    "@types/jasmine": "~4.3.0",
     "@types/moment": "^2.13.0",
-    "jasmine-core": "~4.5.0",
-    "karma": "~6.4.0",
-    "karma-chrome-launcher": "~3.1.0",
-    "karma-coverage": "~2.2.0",
-    "karma-jasmine": "~5.1.0",
-    "karma-jasmine-html-reporter": "~2.0.0",
     "typescript": "~5.6.3"
   }
 }
