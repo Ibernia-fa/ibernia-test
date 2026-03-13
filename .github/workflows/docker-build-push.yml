@@ -7,8 +7,6 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 jobs:
   build_push_deploy:
@@ -138,39 +136,3 @@ jobs:
             echo "$IMAGE" | sudo tee "${DEPLOY_DIR}/DEPLOYED_VERSION.txt" >/dev/null
 
             docker image prune -f
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Install frontend dependencies
-        run: npm ci
-
-      - name: Install Playwright browsers
-        run: npx playwright install --with-deps
-
-      - name: Run Playwright E2E tests (post-deploy)
-        run: npm run test:e2e:ci
-
-      - name: Upload Playwright report as artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-e2e-report-${{ steps.vars.outputs.env }}
-          path: playwright-report
-
-      - name: Upload Playwright report for GitHub Pages
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: playwright-report
-
-  deploy_test_report:
-    needs: build_push_deploy
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy Playwright report to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
