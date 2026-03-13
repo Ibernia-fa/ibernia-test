@@ -2,20 +2,7 @@
     @if(!isLoaderVisible) {
     <mat-card class="cardWithShadow">
         <mat-card-content>
-            <div class="d-flex align-items-center justify-content-between w-100 gap-16 flex-wrap">
-                <div class="d-flex align-items-center gap-16">
-                    <div class="icon-wrapper d-flex align-items-center justify-content-center">
-                        <img src="assets/images/svgs/income-expense-ticket-icon.svg" alt="income-expense-ticket-icon" />
-                    </div>
-                    <div class="d-flex flex-column justify-content-between gap-4">
-                        <div class="d-flex align-items-center gap-4">
-                            <h4 class="page-title f-w-500">{{ 'Incomes & Expenses' | translate }}</h4>
-                            <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" class="m-t-4"
-                                matTooltip="{{ 'Input all regular and one-off income sources and expenses relevant to your client. These entries will feed directly into the cashflow model, influencing the projected financial outcomes. You may link transactions to specific events, and adjust timing or frequency as needed.' | translate }}">
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <app-cashflow-nav></app-cashflow-nav>
         </mat-card-content>
     </mat-card>
 

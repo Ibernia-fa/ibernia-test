@@ -30,7 +30,6 @@ import { ActivatedRoute } from '@angular/router';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { FormsModule } from '@angular/forms';
 import { FinancialWorkflowService } from '../services/financial-workflow.service';
-import { NavItemService } from 'src/app/layouts/full/nav-item.service';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { CurrencySymbolPipe } from 'src/app/pipe/currency-symbol.pipe';
@@ -38,6 +37,7 @@ import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { SettingsService } from 'src/app/default-preferance/services/default-preferance.http.service';
 import { TranslateModule } from '@ngx-translate/core';
+import { CashflowNavComponent } from '../cashflow-nav/cashflow-nav.component';
 import { patchInflationRateDescription } from 'src/app/shared/utils/escalation-rate-utils';
 @Component({
   selector: 'app-saving-pots',
@@ -56,7 +56,8 @@ import { patchInflationRateDescription } from 'src/app/shared/utils/escalation-r
     FormsModule,
     CurrencySymbolPipe,
     ThousandSeparatorPipe,
-    TranslateModule
+    TranslateModule,
+    CashflowNavComponent
   ],
 
   templateUrl: './saving-pots.component.html',
@@ -107,12 +108,10 @@ export class SavingPotsComponent implements OnInit {
     private settingHttpService: SettingsHttpService,
     private activatedRoute: ActivatedRoute,
     private financialWorkflowService: FinancialWorkflowService,
-    private navItemService: NavItemService,
     private Authservice: AuthService,
      private settingsService: SettingsService
   ) {
-    this.navItemService.currentRouteName = 'Saving Pots';
-        this.user = this.Authservice.getUserProfile();
+    this.user = this.Authservice.getUserProfile();
       this.settingsService.userData$
         .pipe(
           filter((v): v is NonNullable<typeof v> => v != null), // skip initial null

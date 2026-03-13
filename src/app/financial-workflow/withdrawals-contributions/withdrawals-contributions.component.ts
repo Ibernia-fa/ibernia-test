@@ -22,7 +22,6 @@ import {
   FinancialTimeline,
 } from '../timeline/models/financial-timeline';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { NavItemService } from 'src/app/layouts/full/nav-item.service';
 import { TimelineHttpService } from '../timeline/services/timeline-http.service';
 import moment from 'moment';
 import { SavingsPotsHttpService } from '../saving-pots/services/savings-pots-http.service';
@@ -32,6 +31,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
 import { TranslateModule } from '@ngx-translate/core';
+import { CashflowNavComponent } from '../cashflow-nav/cashflow-nav.component';
 import { IncomeExpensesHttpService } from '../income-expenses/services/income-expenses-http.service';
 import { FinancialViewModel, IncomeExpense } from '../income-expenses/model/income-expense';
 import { patchInflationRateDescription } from 'src/app/shared/utils/escalation-rate-utils';
@@ -50,7 +50,8 @@ import { patchInflationRateDescription } from 'src/app/shared/utils/escalation-r
     MatTooltipModule,
     ThousandSeparatorPipe,
     ToastrModule,
-    TranslateModule
+    TranslateModule,
+    CashflowNavComponent
   ],
   providers: [ToastrService],
   selector: 'app-withdrawals-contributions',
@@ -89,10 +90,8 @@ export class WithdrawalsContributionsComponent {
     private incomeExpensesHttpService: IncomeExpensesHttpService,
     private settingHttpService: SettingsHttpService,
     private timelineHttpService: TimelineHttpService,
-    private navItemService: NavItemService,
     private toastr: ToastrService
   ) {
-    this.navItemService.currentRouteName = 'Contributions & Withdrawals';
     this.getData();
   }
 
