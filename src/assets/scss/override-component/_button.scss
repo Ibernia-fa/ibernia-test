@@ -137,11 +137,12 @@ html {
 
 // New Styles
 // icon button Styles
+.button-icon-white,
 .button-icon,
 .button-icon-outline {
   background-color: #4043af;
   padding: 12px 24px;
-  border-radius: 4px;
+  border-radius: 6px;
   outline: none;
   border: none;
   height: 100%;
@@ -166,7 +167,6 @@ html {
 .button-icon span,
 .button-icon-outline span {
   font-size: 14px;
-  line-height: 16px;
   font-weight: 700;
   color: white;
   display: block;
@@ -178,17 +178,25 @@ html {
 }
 
 .button-icon-outline {
-  background-color: white;
-  border: 1px solid #516ce8;
+  background-color: transparent;
+  border: 1px solid #4043af;
   transition: all 0.3s linear;
+}
+.button-icon-white span {
+  color: #5a596e;
+  font-size: 14px;
+  font-weight: 500;
 }
 .button-icon-outline span {
-  color: #516ce8;
-  font-size: 16px;
-  line-height: 18px;
+  color: #4043af;
+  font-size: 14px;
+  font-weight: 700;
 }
-.button-icon-outline:hover {
-  background-color: #516de810;
-  transition: all 0.3s linear;
+.button-icon-white {
+  background-color: white;
 }
+// .button-icon-outline:hover {
+//   background-color: #4043af;
+//   transition: all 0.3s linear;
+// }
 // End New Styles

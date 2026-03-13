@@ -4,9 +4,14 @@ table {
   border-collapse: collapse; /* Ensures consistent spacing between cells */
 }
 
+.table-wrapper .mat-mdc-table {
+  background-color: transparent !important; /* Ensures the table background is transparent to show the card's background */
+}
+
 /* Detail Row Styling */
 tr.example-detail-row {
   background-color: #ffffffb2;
+  border-bottom: 1px solid #1c1c1c;
 }
 
 .example-detail-row td {
@@ -18,11 +23,13 @@ tr.example-detail-row {
 
 /* Styling Regular Rows */
 .example-element-row td {
-  border-bottom: 0; /* Removes bottom border when expanded */
+  border-bottom: 1px solid #0000001a !important; /* Removes bottom border when expanded */
 }
 
 .example-element-row:not(.example-expanded-row):hover {
-  background-color: #ffffffb2; /* Subtle hover effect */
+  background-color: #ffffff90;
+  cursor: pointer;
+  /* Subtle hover effect */
 }
 
 .example-element-row:not(.example-expanded-row):active {
@@ -31,6 +38,7 @@ tr.example-detail-row {
 
 .mat-mdc-header-row {
   background: #ffffff !important;
+  height: 52px !important;
 }
 .table-wrapper {
   overflow-x: auto;
@@ -80,14 +88,20 @@ tr.example-detail-row {
 }
 
 .mat-mdc-row:nth-child(even) {
+  background-color: #ffffff75;
+  backdrop-filter: blur(75px);
+
   // background-color: rgba(249, 249, 249, 1);
-  background-color: #ffffffb2;
+  // background-color: #ffffffb2;
   /* Black background for even rows */
   // color: #000; /* White text for contrast */
 }
 
 .mat-mdc-row:nth-child(odd) {
-  background-color: #ffffffb2; /* White background for odd rows */
+  background-color: #ffffff75;
+  backdrop-filter: blur(75px);
+  // background-color: #ffffffb2;
+  /* White background for odd rows */
   // color: #000; /* Black text for contrast */
 }
 

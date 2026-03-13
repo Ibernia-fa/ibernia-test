@@ -15,9 +15,11 @@
   width: 100%;
   min-height: 129px;
   border-radius: 4px;
-  background-color: #FFF5F7;
+  background-color: #fff5f7;
+  border: 1px solid #00000010;
   padding: 16px;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
+  margin-top: 28px;
   flex-shrink: 0;
 }
 
@@ -40,14 +42,16 @@
   line-height: 20px;
   color: #1c1c1c;
   flex: 1;
+  font-weight: 500;
 }
 
 .recommendation-link {
-  color: #516ce8;
+  color: #4043af;
   text-decoration: underline;
   cursor: pointer;
   &:hover {
-    color: #4043AF;
+    color: #4043af;
+    text-decoration: none;
   }
 }
 
@@ -73,13 +77,13 @@
   }
 
   &.added .status-icon {
-    background-color: #e8f5e9;
-    color: #2e7d32;
+    background-color: #e2f0d7;
+    color: #34c759;
   }
 
   &.not-added .status-icon {
-    background-color: #ffebee;
-    color: #c62828;
+    background-color: #f6e8eb;
+    color: #ff383c;
   }
 
   .status-label {
@@ -94,16 +98,16 @@
   }
 
   &.added .label-text {
-    color: #2e7d32;
+    color: #34c759;
   }
 
   &.not-added .label-text {
-    color: #c62828;
+    color: #ff383c;
   }
 
   .label-status {
     font-size: 12px;
-    color: #787889;
+    color: #5a596e;
   }
 }
 
@@ -128,7 +132,7 @@
 }
 
 .questionnaire-body {
-  color: #48475d;
+  color: #5a596e;
   line-height: 20px;
   margin: 0;
 }
@@ -138,9 +142,9 @@
 }
 
 .questionnaire-item {
-  border: 1px solid #e7e7eb;
-  border-radius: 10px;
-  padding: 16px 20px;
+  border: 1px solid #00000010;
+  border-radius: 4px;
+  padding: 4px 8px 6px 16px;
   background: #fff;
   transition: background-color 0.2s ease;
 
@@ -202,6 +206,8 @@
 .question-text {
   flex: 1;
   color: #1c1c1c;
+  font-style: 16px;
+  font-weight: 500;
 }
 
 .question-subtitle {
@@ -210,6 +216,39 @@
   line-height: 1.4;
 }
 
-.questionnaire-list.cdk-drop-list-dragging .questionnaire-item:not(.cdk-drag-placeholder) {
+.questionnaire-list.cdk-drop-list-dragging
+  .questionnaire-item:not(.cdk-drag-placeholder) {
   transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+// New Styles
+.dialog-title {
+  text-align: center;
+  font-size: 24px;
+  // font-family: "Inter", sans-serif;
+  font-weight: 600;
+  color: #1c1c1c;
+  margin: 0;
+}
+.dialog-close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: white !important;
+  border: none;
+  box-shadow: none;
+}
+
+.dialog-close-btn {
+  background: transparent;
+
+  &:focus,
+  &:focus-visible {
+    outline: none;
+    background: transparent;
+  }
+  &:active {
+    outline: none;
+    background: transparent;
+  }
 }

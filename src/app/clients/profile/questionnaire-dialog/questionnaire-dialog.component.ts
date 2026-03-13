@@ -1,5 +1,9 @@
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import {
+  MAT_DIALOG_DATA,
+  MatDialogModule,
+  MatDialogRef,
+} from '@angular/material/dialog';
 import { Client } from '../../models/client';
 import {
   CdkDragDrop,
@@ -19,6 +23,7 @@ import { TablerIconsModule } from 'angular-tabler-icons';
 import { Subject, takeUntil } from 'rxjs';
 import { QuestionnaireHttpService } from '../../services/questionnaire-http.service';
 import { SettingsService } from 'src/app/default-preferance/services/default-preferance.http.service';
+import { MaterialModule } from 'src/app/material.module';
 
 export interface QuestionnaireItem {
   id: string;
@@ -42,6 +47,7 @@ export interface QuestionnaireItem {
     TranslateModule,
     RouterModule,
     TablerIconsModule,
+    MaterialModule,
   ],
   templateUrl: './questionnaire-dialog.component.html',
   styleUrl: './questionnaire-dialog.component.scss',
@@ -60,10 +66,11 @@ export class QuestionnaireDialogComponent implements OnInit, OnDestroy {
     private toastr: ToastrService,
     private questionnaireHttpService: QuestionnaireHttpService,
     private settingsService: SettingsService,
-    @Inject(MAT_DIALOG_DATA) public data: { client: Client }
+    @Inject(MAT_DIALOG_DATA) public data: { client: Client },
   ) {
     this.clientName =
-      data?.client?.clientDetails?.firstName && data?.client?.clientDetails?.lastName
+      data?.client?.clientDetails?.firstName &&
+      data?.client?.clientDetails?.lastName
         ? `${data.client.clientDetails.firstName} ${data.client.clientDetails.lastName}`
         : 'Client';
   }
@@ -83,15 +90,20 @@ export class QuestionnaireDialogComponent implements OnInit, OnDestroy {
 
   private updateProfileStatus(): void {
     const profile = this.settingsService.currentUserData;
-    this.hasProfilePicture = !!(profile?.profilePhotoUrl?.trim());
-    this.hasBio = !!(profile?.bio?.trim());
+    this.hasProfilePicture = !!profile?.profilePhotoUrl?.trim();
+    this.hasBio = !!profile?.bio?.trim();
   }
 
   loadQuestions(): void {
     this.isLoaderVisible = true;
     this.questionnaireHttpService.getQuestions().subscribe({
       next: (questions) => {
-        this.questions = questions.map((q) => ({ id: q.id, text: q.text, subtitle: q.subtitle, selected: true }));
+        this.questions = questions.map((q) => ({
+          id: q.id,
+          text: q.text,
+          subtitle: q.subtitle,
+          selected: true,
+        }));
         this.isLoaderVisible = false;
       },
       error: (err) => {
@@ -107,7 +119,9 @@ export class QuestionnaireDialogComponent implements OnInit, OnDestroy {
   }
 
   onCopyLink(): void {
-    const selectedIds = this.questions.filter((q) => q.selected).map((q) => q.id);
+    const selectedIds = this.questions
+      .filter((q) => q.selected)
+      .map((q) => q.id);
     if (selectedIds.length === 0) {
       this.toastr.warning('Please select at least one question.');
       return;
@@ -128,13 +142,18 @@ export class QuestionnaireDialogComponent implements OnInit, OnDestroy {
       })
       .subscribe({
         next: (response) => {
-          navigator.clipboard.writeText(response.shareableUrl).then(() => {
-            this.toastr.success('Link copied!');
-            this.dialogRef.close();
-          }).catch(() => {
-            this.toastr.info('Link created. Share this URL: ' + response.shareableUrl);
-            this.dialogRef.close();
-          });
+          navigator.clipboard
+            .writeText(response.shareableUrl)
+            .then(() => {
+              this.toastr.success('Link copied!');
+              this.dialogRef.close();
+            })
+            .catch(() => {
+              this.toastr.info(
+                'Link created. Share this URL: ' + response.shareableUrl,
+              );
+              this.dialogRef.close();
+            });
           this.isCopying = false;
         },
         error: (err) => {

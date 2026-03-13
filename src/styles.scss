@@ -118,8 +118,14 @@ input[type="number"] {
 .mat-mdc-table {
   tr {
     th {
-      color: #3a3a47;
-      font-weight: 700;
+      color: #5a596e;
+      font-weight: 400;
+      font-size: 14px;
+      & .mat-sort-header-content {
+        color: #5a596e;
+        font-weight: 400;
+        font-size: 14px;
+      }
     }
   }
 }
@@ -252,7 +258,7 @@ button {
 }
 
 .mat-internal-form-field > label {
-  margin-top: 3px;
+  margin-top: 4px;
 }
 
 .disabled-field {
@@ -872,4 +878,54 @@ body:has(.global-fullscreen-overlay) {
 .vis-item.vis-box,
 .vis-item.vis-box.vis-selected {
   width: fit-content !important;
+}
+
+.example-margin .mat-internal-form-field .mdc-label {
+  color: #302f47;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.example-margin {
+  /* center alignment */
+  .mdc-form-field {
+    align-items: center;
+  }
+
+  /* checkbox size */
+  .mdc-checkbox {
+    width: 18px;
+    height: 18px;
+    margin-left: -10px;
+  }
+
+  /* unchecked state */
+  .mdc-checkbox__background {
+    border: 2px solid #48475d;
+    border-radius: 4px;
+  }
+
+  /* checked state */
+  .mdc-checkbox__native-control:checked ~ .mdc-checkbox__background {
+    background-color: #4043af !important;
+    border-color: #4043af !important;
+  }
+
+  /* check icon size */
+  .mdc-checkbox__checkmark {
+    transform: scale(0.7);
+  }
+
+  /* remove ripple completely */
+  .mat-mdc-checkbox-ripple,
+  .mdc-checkbox__ripple {
+    display: none;
+  }
+}
+
+.dialog-close-btn .mat-mdc-button-persistent-ripple {
+  display: none;
+}
+.dialog-close-btn .mat-mdc-focus-indicator {
+  display: none;
 }

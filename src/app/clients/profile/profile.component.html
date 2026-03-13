@@ -1,315 +1,530 @@
-@if(client) {
-<div class="d-flex flex-column gap-24">
-  <mat-card >
-    <mat-card-content>
-      <div class="profile-main-wrapper">
-        <div
-          class="d-flex align-items-center justify-content-between w-100 gap-16 flex-wrap"
-        >
-          <div class="d-flex align-items-center gap-16">
-            <!-- Icon  -->
-            <div
+@if (client) {
+  <div class="d-flex flex-column gap-16 profile-container">
+    <mat-card>
+      <mat-card-content>
+        <div class="profile-main-wrapper">
+          <div
+            class="d-flex align-items-center justify-content-between w-100 gap-16 flex-wrap"
+          >
+            <div class="d-flex align-items-center gap-16">
+              <!-- Icon  -->
+              <!-- <div
               class="icon-wrapper d-flex align-items-center justify-content-center"
             >
               <img
                 src="assets/images/svgs/user-profile-header-icon.svg"
                 alt="user-profile-header-icon"
               />
-            </div>
-            <!-- End Icon  -->
-            <!-- headings  -->
-            <div class="d-flex flex-column justify-content-between gap-4">
-              <h4 class="page-title f-w-500 f-s-30">
-                {{ client.clientDetails.firstName }} {{ client.clientDetails.lastName }}'s {{ 'Profile' | translate }}
-              </h4>
-              <span class="sub-title">
-                {{ birthDate | date }} ({{
-                  birthDate | ageCalculator
-                }}  years old) </span
-              >
-            </div>
-            <!-- End headings  -->
-          </div>
-          <button
-            type="button"
-            class="button-icon-outline"
-            (click)="onEditClicked()"
-          >
-            <span>{{ 'Edit' | translate }}</span>
-            <img
-              src="assets/images/svgs/edit-pen-icon-button.svg"
-              alt="edit-pen-icon"
-            />
-          </button>
-        </div>
-      </div>
-    </mat-card-content>
-  </mat-card>
-
-  @if (isPageLoading) {
-    <div class="page-loader">
-      <mat-spinner diameter="48"></mat-spinner>
-    </div>
-  } @else {
-    @if(cashflows && cashflows.length > 0) {
-    <!-- Saving Section  -->
-    <mat-card >
-      <mat-card-content>
-        <div class="profile-main-wrapper total-savings-header">
-          <div class="d-flex flex-column gap-8">
-            <div class="d-flex align-items-center gap-8">
-              <img
-                src="assets/images/svgs/total-saving-wallet.svg"
-                alt="total-saving-wallet"
-              />
-              <h3 class="card-title">{{ 'Total savings' | translate }}</h3>
-            </div>
-            <div class="d-flex align-items-center gap-20">
-              <h3 class="saving-title">{{preferredCurrency | currencySymbol}}{{totalSavings | thousandSeparator}}</h3>
-            </div>
-          </div>
-          <div class="d-flex flex-column align-items-center gap-6">
-            <button
-            type="button"
-            class="button-icon-outline"
-            (click)="onQuestionnaireClicked()"
-            >
-              <span>{{ 'Questionnaire' | translate }}</span>
-              @if (!questionnaireResponses || showResponsesCard) {
-                <img class="questionnaire-icon" src="assets/images/svgs/add-icon-blue.svg" alt="add-icon" />
-              }
-            </button>
-            @if (questionnaireResponses && !showResponsesCard) {
-              <div class="questionnaire-date-badge">
-                <svg width="16" height="16" viewBox="0 0 48 48" fill="none">
-                  <circle cx="24" cy="24" r="24" fill="#22c55e"/>
-                  <path d="M15 25l6 6 12-12" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-                <span class="date-bold">{{ questionnaireResponses.submittedAt | date:'mediumDate' }}</span>
-              </div>
-            }
-          </div>
-        </div>
-      </mat-card-content>
-    </mat-card>
-    <!-- End Saving Section  -->
-
-    <!-- Client Cashflow Section  -->
-    <mat-card >
-      @if(!isLoaderVisible) {
-      <mat-card-content>
-        <div class="d-flex flex-column gap-32">
-          <!-- Cash Flow Section  -->
-          <div
-            class="d-flex align-items-center justify-content-between w-100 gap-16 flex-wrap"
-          >
-            <span class="f-s-20">{{ 'Client’s plans:' | translate }}</span>
-            <div class="d-flex align-items-center gap-32">
-              <div class="d-flex align-items-center">
-                <span class="f-s-14">{{ 'Sorting order:' | translate }}</span>
-                <mat-select (valueChange)="onSortByValueChange($event)" placeholder="Select" class="sortby-edit-profile">
-                  @for (sortDescriptor of sortDescriptors; track sortDescriptor) {
-                  <mat-option [value]="sortDescriptor.value">{{
-                    sortDescriptor.viewValue
-                  }}</mat-option>
-                  }
-                </mat-select>
-              </div>
-
-              <button
-                (click)="newModelClicked()"
-                type="button"
-                class="button-icon"
-              >
-                <span>{{ 'New plan' | translate }}</span>
-                <img src="assets/images/svgs/add-icon.svg" alt="add-icon" />
-              </button>
-            </div>
-          </div>
-          <!-- Cash Flow Section  -->
-
-          @for (cashflow of cashflows; track cashflow) {
-          <div class="simulation-wrapper">
-            <div class="d-flex flex-column gap-10">
-              <div class="d-flex align-items-center justify-content-between">
-                <a
-                (click)="loadCashflowToStore(cashflow.id)"
-                  [routerLink]="['/cashflows/' + cashflow.id + '/timeline']"
-                  class="text-decoration-none"
-                >
-                  <h3>{{ cashflow.name }}</h3>
-                </a>
-                <button
-                  mat-icon-button
-                  [matMenuTriggerFor]="beforeMenu"
-                  aria-label="icon-button with a menu"
-                >
-                  <mat-icon>
-                    <img
-                      src="assets/images/svgs/drop-down-icon-v2.svg"
-                      alt="drop-down-icon-v2"
-                    />
-                  </mat-icon>
-                </button>
-                <mat-menu
-                  #beforeMenu="matMenu"
-                  xPosition="before"
-                  class="dropdown-menus"
-                >
-                  <button (click)="onEditModelClicked(cashflow.id)" mat-menu-item>
-                    <mat-icon>
-                      <img
-                        src="assets/images/svgs/drop-down-edit-2-line.svg"
-                        alt="drop-down-edit-2-line"
-                        height="24"
-                        width="24"
-                      />
-                    </mat-icon>
-                    <span>{{ 'Edit' | translate }}</span>
-                  </button>
-                  <button (click)="onCopyModelClicked(cashflow)" mat-menu-item>
-                    <mat-icon>
-                      <img
-                        src="assets/images/svgs/drop-down-copy-2-line.svg"
-                        alt="drop-down-copy-2-line"
-                        height="24"
-                        width="24"
-                      />
-                    </mat-icon>
-                    <span>{{ 'Copy' | translate }}</span>
-                  </button>
-                  <button
-                    (click)="onDeleteModelClicked(cashflow.id)"
-                    mat-menu-item
-                  >
-                    <mat-icon>
-                      <img
-                        src="assets/images/svgs/drop-down-delete-2-line.svg"
-                        alt="drop-down-delete-2-line"
-                        height="24"
-                        width="24"
-                      />
-                    </mat-icon>
-                    <span>{{ 'Delete' | translate }}</span>
-                  </button>
-                </mat-menu>
-              </div>
-              <div class="d-flex flex-column gap-10">
-                <span>{{ 'Updated:' | translate }} {{ cashflow.updatedAt | timeAgo }}</span>
+            </div> -->
+              <!-- End Icon  -->
+              <!-- headings  -->
+              <!-- <div class="d-flex flex-column justify-content-between gap-4">
+                <h4 class="page-title f-w-500 f-s-30">
+                  {{ client.clientDetails.firstName }}
+                  {{ client.clientDetails.lastName }}'s
+                  {{ "Profile" | translate }}
+                </h4>
+                <span class="sub-title">
+                  {{ birthDate | date }} ({{ birthDate | ageCalculator }} years
+                  old)
+                </span>
+              </div> -->
+              <div class="ibr-client-intro">
+                <h3>
+                  {{ client.clientDetails.firstName }}
+                  {{ client.clientDetails.lastName }}'s
+                  {{ "Profile" | translate }}
+                </h3>
                 <p>
-                  {{ cashflow.description }}
+                  {{ birthDate | date }} ({{ birthDate | ageCalculator }} years
+                  old)
                 </p>
               </div>
+              <!-- End headings  -->
             </div>
+            <button type="button" class="button-icon" (click)="onEditClicked()">
+              <span>{{ "Edit" | translate }}</span>
+
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 20 20"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <g clip-path="url(#clip0_3206_195)">
+                  <path
+                    d="M9.16602 3.33301H3.33268C2.89065 3.33301 2.46673 3.5086 2.15417 3.82116C1.84161 4.13372 1.66602 4.55765 1.66602 4.99967V16.6663C1.66602 17.1084 1.84161 17.5323 2.15417 17.8449C2.46673 18.1574 2.89065 18.333 3.33268 18.333H14.9993C15.4414 18.333 15.8653 18.1574 16.1779 17.8449C16.4904 17.5323 16.666 17.1084 16.666 16.6663V10.833"
+                    stroke="white"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M15.417 2.0832C15.7485 1.75168 16.1982 1.56543 16.667 1.56543C17.1358 1.56543 17.5855 1.75168 17.917 2.0832C18.2485 2.41472 18.4348 2.86436 18.4348 3.3332C18.4348 3.80204 18.2485 4.25168 17.917 4.5832L10.0003 12.4999L6.66699 13.3332L7.50033 9.99986L15.417 2.0832Z"
+                    stroke="white"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </g>
+                <defs>
+                  <clipPath id="clip0_3206_195">
+                    <rect width="20" height="20" fill="white" />
+                  </clipPath>
+                </defs>
+              </svg>
+            </button>
           </div>
-          }
         </div>
       </mat-card-content>
-      } @else {
-      <div class="h-300">
-        <mat-spinner></mat-spinner>
-      </div>
-      }
     </mat-card>
-    <!-- End Client Cashflow  Section  -->
+
+    @if (isPageLoading) {
+      <div class="page-loader">
+        <mat-spinner diameter="48"></mat-spinner>
+      </div>
     } @else {
-      <mat-card>
-        <mat-card-content>
-          <div class="profile-main-wrapper">
-            <div class="d-flex align-items-center justify-content-between w-100 gap-16 flex-wrap">
-              <div class="d-flex flex-column gap-6">
-                <h3 class="card-title">{{ 'Getting started' | translate }}</h3>
-                <p class="f-s-14">{{ 'Invite the client to complete the questionnaire or directly start a plan' | translate }}</p>
+      @if (cashflows && cashflows.length > 0) {
+        <!-- Saving Section  -->
+        <mat-card>
+          <mat-card-content>
+            <div class="profile-main-wrapper total-savings-header">
+              <div class="d-flex flex-column gap-8">
+                <div class="d-flex align-items-center gap-8">
+                  <svg
+                    width="17"
+                    height="18"
+                    viewBox="0 0 17 18"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      d="M16.25 7.29167C16.25 6.68417 16.0083 6.10083 15.5792 5.67083C15.149 5.2415 14.5661 5.00026 13.9583 5H2.29167C1.68417 5 1.10083 5.24167 0.670833 5.67083C0.241496 6.10102 0.00025518 6.68389 0 7.29167V15.625C0 16.2325 0.241667 16.8158 0.670833 17.2458C1.10102 17.6752 1.68389 17.9164 2.29167 17.9167H13.9583C14.5658 17.9167 15.1492 17.675 15.5792 17.2458C16.0085 16.8156 16.2497 16.2328 16.25 15.625V7.29167ZM15 7.29167V15.625C14.9996 15.9011 14.8897 16.1658 14.6944 16.3611C14.4992 16.5563 14.2345 16.6662 13.9583 16.6667H2.29167C2.01553 16.6662 1.75084 16.5563 1.55558 16.3611C1.36033 16.1658 1.25044 15.9011 1.25 15.625V7.29167C1.25044 7.01554 1.36033 6.75084 1.55558 6.55558C1.75084 6.36033 2.01553 6.25044 2.29167 6.25H13.9583C14.2345 6.25044 14.4992 6.36033 14.6944 6.55558C14.8897 6.75084 14.9996 7.01554 15 7.29167Z"
+                      fill="#5A596E"
+                    />
+                    <path
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      d="M8.47678 3.16914L9.27594 1.4558L13.4301 3.39247L12.5118 5.3608C12.4417 5.51109 12.4342 5.68306 12.491 5.83887C12.5477 5.99468 12.664 6.12157 12.8143 6.19164C12.9646 6.2617 13.1365 6.26919 13.2923 6.21246C13.4482 6.15573 13.5751 6.03943 13.6451 5.88914L14.8268 3.35414C14.8967 3.20405 14.9042 3.03235 14.8476 2.87673C14.7911 2.72112 14.6751 2.59431 14.5251 2.52414L9.23761 0.0583018C9.08742 -0.0115564 8.91564 -0.018936 8.76001 0.0377844C8.60438 0.0945048 8.47763 0.210686 8.40761 0.360802L7.34428 2.64164C7.30642 2.7164 7.28398 2.79802 7.27829 2.88163C7.27261 2.96524 7.2838 3.04914 7.3112 3.12834C7.3386 3.20754 7.38165 3.28042 7.43778 3.34265C7.49392 3.40487 7.56199 3.45518 7.63796 3.49056C7.71393 3.52595 7.79624 3.54569 7.87999 3.54862C7.96375 3.55155 8.04724 3.53761 8.12549 3.50762C8.20375 3.47764 8.27518 3.43222 8.33552 3.37407C8.39587 3.31592 8.44391 3.24623 8.47678 3.16914Z"
+                      fill="#5A596E"
+                    />
+                    <path
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      d="M3.43065 5.88881L5.10899 2.28881L9.26315 4.22548L8.73399 5.36048C8.66833 5.51 8.6638 5.67927 8.72137 5.83209C8.77893 5.98491 8.89402 6.10912 9.04201 6.17816C9.19 6.2472 9.35913 6.25558 9.51321 6.2015C9.6673 6.14743 9.7941 6.03519 9.86649 5.88881L10.6598 4.18714C10.7297 4.03705 10.7372 3.86536 10.6807 3.70974C10.6241 3.55413 10.5081 3.42731 10.3582 3.35714L5.07065 0.89131C4.92046 0.821451 4.74868 0.814072 4.59305 0.870792C4.43742 0.927513 4.31067 1.04369 4.24065 1.19381L2.29732 5.36048C2.22726 5.51077 2.21977 5.68273 2.2765 5.83854C2.33323 5.99435 2.44953 6.12125 2.59982 6.19131C2.75011 6.26137 2.92207 6.26886 3.07789 6.21213C3.2337 6.1554 3.36059 6.0391 3.43065 5.88881ZM16.2498 8.95798C16.2498 8.79222 16.184 8.63324 16.0668 8.51604C15.9496 8.39882 15.7906 8.33298 15.6248 8.33298H12.2907C11.6829 8.33298 11.1 8.57442 10.6702 9.00419C10.2404 9.43396 9.99898 10.0169 9.99898 10.6246V12.2913C9.99898 12.8991 10.2404 13.482 10.6702 13.9118C11.1 14.3415 11.6829 14.583 12.2907 14.583H15.6248C15.7906 14.583 15.9496 14.5171 16.0668 14.3999C16.184 14.2827 16.2498 14.1237 16.2498 13.958V8.95798ZM14.9998 9.58298V13.333H12.2907C11.7157 13.333 11.249 12.8663 11.249 12.2913V10.6246C11.249 10.0496 11.7157 9.58298 12.2907 9.58298H14.9998Z"
+                      fill="#5A596E"
+                    />
+                    <path
+                      d="M12.7083 12.2917C13.1686 12.2917 13.5417 11.9186 13.5417 11.4583C13.5417 10.9981 13.1686 10.625 12.7083 10.625C12.2481 10.625 11.875 10.9981 11.875 11.4583C11.875 11.9186 12.2481 12.2917 12.7083 12.2917Z"
+                      fill="#5A596E"
+                    />
+                  </svg>
+
+                  <h3 class="card-title-new">
+                    {{ "Total savings" | translate }}
+                  </h3>
+                </div>
+                <div class="d-flex align-items-center gap-20">
+                  <h3 class="saving-title">
+                    {{ preferredCurrency | currencySymbol
+                    }}{{ totalSavings | thousandSeparator }}
+                  </h3>
+                </div>
               </div>
-              <div class="d-flex align-items-center gap-20">
-                <div class="d-flex flex-column align-items-center gap-6">
-                  <button
+              <div class="d-flex flex-column align-items-center gap-6">
+                <button
                   type="button"
                   class="button-icon-outline"
                   (click)="onQuestionnaireClicked()"
-                  >
-                    <span>{{ 'Questionnaire' | translate }}</span>
-                    @if (!questionnaireResponses || showResponsesCard) {
-                      <img class="questionnaire-icon" src="assets/images/svgs/add-icon-blue.svg" alt="add-icon" />
-                    }
-                  </button>
-                  @if (questionnaireResponses && !showResponsesCard) {
-                    <div class="questionnaire-date-badge">
-                      <svg width="16" height="16" viewBox="0 0 48 48" fill="none">
-                        <circle cx="24" cy="24" r="24" fill="#22c55e"/>
-                        <path d="M15 25l6 6 12-12" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
-                      <span class="date-bold">{{ questionnaireResponses.submittedAt | date:'mediumDate' }}</span>
-                    </div>
-                  }
-                </div>
-                <button
-                  (click)="newModelClicked()"
-                  type="button"
-                  class="button-icon"
                 >
-                  <span>{{ 'Create plan' | translate }}</span>
-                  <img src="assets/images/svgs/add-icon.svg" alt="add-icon" />
+                  <span>{{ "Questionnaire" | translate }}</span>
+                  @if (!questionnaireResponses || showResponsesCard) {
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 20 20"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M11.2478 8.7522V0H8.7522V8.7522H0V11.2478H8.7522V20H11.2478V11.2478H20V8.7522H11.2478Z"
+                        fill="#4043AF"
+                      />
+                    </svg>
+                  }
                 </button>
-              </div>
-            </div>
-          </div>
-        </mat-card-content>
-      </mat-card>
-    }
-
-    @if (questionnaireResponses && showResponsesCard) {
-      <mat-card class="questionnaire-responses-card">
-        <mat-card-content>
-          <div class="profile-main-wrapper">
-            <div class="d-flex flex-column gap-16">
-              <div class="d-flex align-items-center justify-content-between">
-                <h3 class="card-title">{{ 'Questionnaire responses' | translate }}</h3>
-                <div class="d-flex align-items-center gap-12">
-                  <button
-                    type="button"
-                    class="button-icon-outline btn-sm"
-                    (click)="onQuestionnaireClicked()"
-                  >
-                    <span>{{ 'New' | translate }}</span>
-                    <img class="questionnaire-icon" src="assets/images/svgs/add-icon-blue.svg" alt="add-icon" />
-                  </button>
+                @if (questionnaireResponses && !showResponsesCard) {
                   <div class="questionnaire-date-badge">
                     <svg width="16" height="16" viewBox="0 0 48 48" fill="none">
-                      <circle cx="24" cy="24" r="24" fill="#22c55e"/>
-                      <path d="M15 25l6 6 12-12" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                      <circle cx="24" cy="24" r="24" fill="#22c55e" />
+                      <path
+                        d="M15 25l6 6 12-12"
+                        stroke="#fff"
+                        stroke-width="4"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
                     </svg>
-                    <span class="date-bold">Completed on {{ questionnaireResponses.submittedAt | date:'mediumDate' }}</span>
-                  </div>
-                  <button
-                    type="button"
-                    class="btn-hide-responses"
-                    (click)="dismissResponses()"
-                  >
-                    {{ 'Hide' | translate }}
-                  </button>
-                </div>
-              </div>
-              <div class="responses-container">
-                @for (item of questionnaireResponses.responses; track item.questionId) {
-                  <div class="response-item">
-                    <h4 class="response-question">{{ item.questionText }}</h4>
-                    <div class="response-value-chips">
-                      @for (chip of getResponseChips(item); track chip) {
-                        <span class="chip">{{ item.type === 'InvestableAssets' ? formatAssetChip(chip) : chip }}</span>
-                      }
-                      @if (getResponseChips(item).length === 0) {
-                        <span>{{ formatResponseValue(item) }}</span>
-                      }
-                    </div>
+                    <span class="date-bold">{{
+                      questionnaireResponses.submittedAt | date: "mediumDate"
+                    }}</span>
                   </div>
                 }
               </div>
             </div>
-          </div>
-        </mat-card-content>
-      </mat-card>
+          </mat-card-content>
+        </mat-card>
+        <!-- End Saving Section  -->
+
+        <!-- Client Cashflow Section  -->
+        <mat-card>
+          @if (!isLoaderVisible) {
+            <mat-card-content>
+              <div class="d-flex flex-column gap-16">
+                <!-- Cash Flow Section  -->
+                <div
+                  class="d-flex align-items-center justify-content-between w-100 gap-16 flex-wrap"
+                >
+                  <span class="saving-title">{{
+                    "Client’s plans:" | translate
+                  }}</span>
+                  <div class="d-flex align-items-center gap-16">
+                    <!-- <div class="d-flex align-items-center">
+                      <span class="f-s-14">{{
+                        "Sorting order:" | translate
+                      }}</span>
+                      <mat-select
+                        (valueChange)="onSortByValueChange($event)"
+                        placeholder="Select"
+                        class="sortby-edit-profile"
+                      >
+                        @for (
+                          sortDescriptor of sortDescriptors;
+                          track sortDescriptor
+                        ) {
+                          <mat-option [value]="sortDescriptor.value">{{
+                            sortDescriptor.viewValue
+                          }}</mat-option>
+                        }
+                      </mat-select>
+                    </div> -->
+
+                    <!-- <button class="sort-button">
+
+                    </button> -->
+                    <button type="button" class="button-icon-white">
+                      <span>{{ "Sorting order" | translate }}</span>
+
+                      <svg
+                        width="19"
+                        height="17"
+                        viewBox="0 0 19 17"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M18.0905 11.0775C17.9342 10.9213 17.7223 10.8335 17.5013 10.8335C17.2803 10.8335 17.0684 10.9213 16.9121 11.0775L14.168 13.8217V0.833333C14.168 0.61232 14.0802 0.400358 13.9239 0.244078C13.7676 0.0877973 13.5556 0 13.3346 0C13.1136 0 12.9017 0.0877973 12.7454 0.244078C12.5891 0.400358 12.5013 0.61232 12.5013 0.833333V13.8217L9.75713 11.0775C9.59996 10.9257 9.38946 10.8417 9.17096 10.8436C8.95247 10.8455 8.74346 10.9331 8.58895 11.0877C8.43444 11.2422 8.3468 11.4512 8.3449 11.6697C8.343 11.8882 8.427 12.0987 8.5788 12.2558L12.7455 16.4225C12.8229 16.5001 12.9148 16.5617 13.0161 16.6037C13.1173 16.6457 13.2259 16.6673 13.3355 16.6673C13.4451 16.6673 13.5536 16.6457 13.6549 16.6037C13.7561 16.5617 13.8481 16.5001 13.9255 16.4225L18.0921 12.2558C18.2481 12.0993 18.3356 11.8873 18.3353 11.6663C18.335 11.4454 18.2469 11.2336 18.0905 11.0775ZM9.75713 4.41083L5.59046 0.244167C5.51285 0.166401 5.42049 0.10492 5.3188 0.0633333C5.11494 -0.0209308 4.88599 -0.0209308 4.68213 0.0633333C4.58044 0.10492 4.48807 0.166401 4.41046 0.244167L0.243797 4.41083C0.0875402 4.56731 -0.000156072 4.77945 2.08518e-07 5.00059C0.000156489 5.22173 0.0881526 5.43374 0.24463 5.59C0.401108 5.74626 0.61325 5.83395 0.834386 5.8338C1.05552 5.83364 1.26754 5.74564 1.4238 5.58917L4.16796 2.845V15.8333C4.16796 16.0543 4.25576 16.2663 4.41204 16.4226C4.56832 16.5789 4.78028 16.6667 5.0013 16.6667C5.22231 16.6667 5.43427 16.5789 5.59055 16.4226C5.74683 16.2663 5.83463 16.0543 5.83463 15.8333V2.845L8.5788 5.58917C8.73597 5.74097 8.94647 5.82496 9.16496 5.82306C9.38346 5.82116 9.59247 5.73352 9.74698 5.57902C9.90149 5.42451 9.98913 5.2155 9.99103 4.997C9.99292 4.7785 9.90893 4.568 9.75713 4.41083Z"
+                          fill="#5A596E"
+                        />
+                      </svg>
+                    </button>
+
+                    <button
+                      (click)="newModelClicked()"
+                      type="button"
+                      class="button-icon"
+                    >
+                      <span>{{ "New plan" | translate }}</span>
+                      <img
+                        src="assets/images/svgs/add-icon.svg"
+                        alt="add-icon"
+                      />
+                    </button>
+                  </div>
+                </div>
+                <!-- Cash Flow Section  -->
+                <div class="d-flex flex-column gap-16 profile-plans">
+                  @for (cashflow of cashflows; track cashflow) {
+                    <div class="simulation-wrapper">
+                      <div
+                        class="d-flex align-items-center justify-content-between"
+                      >
+                        <div class="d-flex flex-column gap-10">
+                          <a
+                            (click)="loadCashflowToStore(cashflow.id)"
+                            [routerLink]="[
+                              '/cashflows/' + cashflow.id + '/timeline',
+                            ]"
+                            class="text-decoration-none"
+                          >
+                            <h3>{{ cashflow.name }}</h3>
+                          </a>
+                          <span
+                            >{{ "Updated:" | translate }}
+                            {{ cashflow.updatedAt | timeAgo }}</span
+                          >
+                          <p>
+                            {{ cashflow.description }}
+                          </p>
+                        </div>
+                        <div>
+                          <button
+                            mat-icon-button
+                            [matMenuTriggerFor]="beforeMenu"
+                            aria-label="icon-button with a menu"
+                          >
+                            <mat-icon>
+                              <svg
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  d="M12 13C12.5523 13 13 12.5523 13 12C13 11.4477 12.5523 11 12 11C11.4477 11 11 11.4477 11 12C11 12.5523 11.4477 13 12 13Z"
+                                  stroke="#5A596E"
+                                  stroke-width="2"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                />
+                                <path
+                                  d="M12 6C12.5523 6 13 5.55228 13 5C13 4.44772 12.5523 4 12 4C11.4477 4 11 4.44772 11 5C11 5.55228 11.4477 6 12 6Z"
+                                  stroke="#5A596E"
+                                  stroke-width="2"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                />
+                                <path
+                                  d="M12 20C12.5523 20 13 19.5523 13 19C13 18.4477 12.5523 18 12 18C11.4477 18 11 18.4477 11 19C11 19.5523 11.4477 20 12 20Z"
+                                  stroke="#5A596E"
+                                  stroke-width="2"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                />
+                              </svg>
+                            </mat-icon>
+                          </button>
+                          <mat-menu
+                            #beforeMenu="matMenu"
+                            xPosition="before"
+                            class="dropdown-menus"
+                          >
+                            <button
+                              (click)="onEditModelClicked(cashflow.id)"
+                              mat-menu-item
+                            >
+                              <mat-icon>
+                                <img
+                                  src="assets/images/svgs/drop-down-edit-2-line.svg"
+                                  alt="drop-down-edit-2-line"
+                                  height="24"
+                                  width="24"
+                                />
+                              </mat-icon>
+                              <span>{{ "Edit" | translate }}</span>
+                            </button>
+                            <button
+                              (click)="onCopyModelClicked(cashflow)"
+                              mat-menu-item
+                            >
+                              <mat-icon>
+                                <img
+                                  src="assets/images/svgs/drop-down-copy-2-line.svg"
+                                  alt="drop-down-copy-2-line"
+                                  height="24"
+                                  width="24"
+                                />
+                              </mat-icon>
+                              <span>{{ "Copy" | translate }}</span>
+                            </button>
+                            <button
+                              (click)="onDeleteModelClicked(cashflow.id)"
+                              mat-menu-item
+                            >
+                              <mat-icon>
+                                <img
+                                  src="assets/images/svgs/drop-down-delete-2-line.svg"
+                                  alt="drop-down-delete-2-line"
+                                  height="24"
+                                  width="24"
+                                />
+                              </mat-icon>
+                              <span>{{ "Delete" | translate }}</span>
+                            </button>
+                          </mat-menu>
+                        </div>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+            </mat-card-content>
+          } @else {
+            <div class="h-300">
+              <mat-spinner></mat-spinner>
+            </div>
+          }
+        </mat-card>
+        <!-- End Client Cashflow  Section  -->
+      } @else {
+        <mat-card>
+          <mat-card-content>
+            <div class="profile-main-wrapper">
+              <div
+                class="d-flex align-items-center justify-content-between w-100 gap-16 flex-wrap"
+              >
+                <div class="d-flex flex-column gap-6">
+                  <h3 class="card-title">
+                    {{ "Getting started" | translate }}
+                  </h3>
+                  <p class="f-s-14">
+                    {{
+                      "Invite the client to complete the questionnaire or directly start a plan"
+                        | translate
+                    }}
+                  </p>
+                </div>
+                <div class="d-flex align-items-center gap-20">
+                  <div class="d-flex flex-column align-items-center gap-6">
+                    <button
+                      type="button"
+                      class="button-icon-outline"
+                      (click)="onQuestionnaireClicked()"
+                    >
+                      <span>{{ "Questionnaire" | translate }}</span>
+                      @if (!questionnaireResponses || showResponsesCard) {
+                        <img
+                          class="questionnaire-icon"
+                          src="assets/images/svgs/add-icon-blue.svg"
+                          alt="add-icon"
+                        />
+                      }
+                    </button>
+                    @if (questionnaireResponses && !showResponsesCard) {
+                      <div class="questionnaire-date-badge">
+                        <svg
+                          width="16"
+                          height="16"
+                          viewBox="0 0 48 48"
+                          fill="none"
+                        >
+                          <circle cx="24" cy="24" r="24" fill="#22c55e" />
+                          <path
+                            d="M15 25l6 6 12-12"
+                            stroke="#fff"
+                            stroke-width="4"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                        </svg>
+                        <span class="date-bold">{{
+                          questionnaireResponses.submittedAt
+                            | date: "mediumDate"
+                        }}</span>
+                      </div>
+                    }
+                  </div>
+                  <button
+                    (click)="newModelClicked()"
+                    type="button"
+                    class="button-icon"
+                  >
+                    <span>{{ "Create plan" | translate }}</span>
+                    <img src="assets/images/svgs/add-icon.svg" alt="add-icon" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      }
+
+      @if (questionnaireResponses && showResponsesCard) {
+        <mat-card class="questionnaire-responses-card">
+          <mat-card-content>
+            <div class="profile-main-wrapper">
+              <div class="d-flex flex-column gap-16">
+                <div class="d-flex align-items-center justify-content-between">
+                  <h3 class="card-title">
+                    {{ "Questionnaire responses" | translate }}
+                  </h3>
+                  <div class="d-flex align-items-center gap-12">
+                    <button
+                      type="button"
+                      class="button-icon-outline btn-sm"
+                      (click)="onQuestionnaireClicked()"
+                    >
+                      <span>{{ "New" | translate }}</span>
+                      <img
+                        class="questionnaire-icon"
+                        src="assets/images/svgs/add-icon-blue.svg"
+                        alt="add-icon"
+                      />
+                    </button>
+                    <div class="questionnaire-date-badge">
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 48 48"
+                        fill="none"
+                      >
+                        <circle cx="24" cy="24" r="24" fill="#22c55e" />
+                        <path
+                          d="M15 25l6 6 12-12"
+                          stroke="#fff"
+                          stroke-width="4"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                      <span class="date-bold"
+                        >Completed on
+                        {{
+                          questionnaireResponses.submittedAt
+                            | date: "mediumDate"
+                        }}</span
+                      >
+                    </div>
+                    <button
+                      type="button"
+                      class="btn-hide-responses"
+                      (click)="dismissResponses()"
+                    >
+                      {{ "Hide" | translate }}
+                    </button>
+                  </div>
+                </div>
+                <div class="responses-container">
+                  @for (
+                    item of questionnaireResponses.responses;
+                    track item.questionId
+                  ) {
+                    <div class="response-item">
+                      <h4 class="response-question">{{ item.questionText }}</h4>
+                      <div class="response-value-chips">
+                        @for (chip of getResponseChips(item); track chip) {
+                          <span class="chip">{{
+                            item.type === "InvestableAssets"
+                              ? formatAssetChip(chip)
+                              : chip
+                          }}</span>
+                        }
+                        @if (getResponseChips(item).length === 0) {
+                          <span>{{ formatResponseValue(item) }}</span>
+                        }
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      }
     }
-  }
-</div>
+  </div>
 }

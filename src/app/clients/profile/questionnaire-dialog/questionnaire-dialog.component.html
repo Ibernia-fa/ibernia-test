@@ -1,116 +1,300 @@
 <div class="d-flex flex-column questionnaire-dialog">
   <!-- Modal Header -->
-  <div class="d-flex align-items-center justify-content-between gap-10 modal-header">
-    <h3>{{ 'Questionnaire' | translate }}</h3>
+  <div class="dialog-header">
+    <h2 class="dialog-title">
+      {{ "Questionnaire" | translate }}
+    </h2>
+    <button
+      mat-icon-button
+      disableRipple
+      class="dialog-close-btn"
+      (click)="closeDialog()"
+      aria-label="Close dialog"
+    >
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+  <!-- <div
+    class="d-flex align-items-center justify-content-between gap-10 modal-header"
+  >
+    <h3>{{ "Questionnaire" | translate }}</h3>
     <button (click)="closeDialog()" type="button">
       <img src="assets/images/svgs/close-line-cion.svg" alt="close" />
     </button>
-  </div>
+  </div> -->
   <!-- End Modal Header -->
 
   <!-- Recommendation container - only show when profile picture or bio is missing -->
   @if (!hasProfilePicture || !hasBio) {
-  <div class="questionnaire-recommendation">
-    <div class="recommendation-content">
-      <img src="assets/images/questionnaire/warning.png" alt="warning" class="recommendation-icon" />
-      <p class="recommendation-text">
-        {{ 'We recommend uploading your profile picture and writing a short bio to personalize the questionnaire.' | translate }}
-        <a [routerLink]="['/settings/account-preferences']" (click)="closeDialog()" class="recommendation-link">
-          {{ 'Go to Settings' | translate }}
-        </a>
-      </p>
-    </div>
-    <div class="recommendation-status">
-      <div class="status-item" [class.added]="hasProfilePicture" [class.not-added]="!hasProfilePicture">
-        <span class="status-icon">
-          <i-tabler name="user-circle" class="icon-20"></i-tabler>
-        </span>
-        <div class="status-label">
-          <span class="label-text">{{ 'Profile picture' | translate }}</span>
-          <span class="label-status">{{ (hasProfilePicture ? 'Added' : 'Not added') | translate }}</span>
+    <div class="questionnaire-recommendation">
+      <div class="recommendation-content">
+        <div class="recommendation-icon">
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <g clip-path="url(#clip0_3206_765)">
+              <path
+                d="M23.6272 18.3422L14.4469 2.88755C13.9406 1.9875 13.0265 1.45312 12 1.45312C10.9735 1.45312 10.0594 1.9875 9.55311 2.87344L0.360548 18.3563C-0.131686 19.2422 -0.117624 20.2829 0.38872 21.1547C0.89497 22.0266 1.80894 22.5469 2.80742 22.5469H21.1945C22.193 22.5469 23.107 22.0266 23.6132 21.1547C24.1195 20.2828 24.1335 19.2422 23.6272 18.3422Z"
+                fill="#FF383C"
+              />
+              <path
+                d="M23.6131 21.1547C23.1069 22.0266 22.1929 22.5469 21.1944 22.5469H12V1.45312C13.0265 1.45312 13.9406 1.9875 14.4469 2.88755L23.6273 18.3422C24.1335 19.2422 24.1195 20.2828 23.6131 21.1547Z"
+                fill="#FF383C"
+              />
+              <path
+                d="M10.5938 16.2188H13.4062V19.0312H10.5938V16.2188ZM10.5938 7.78125H13.4062V14.8125H10.5938V7.78125Z"
+                fill="#F5F5F5"
+              />
+              <path
+                d="M12 7.78125H13.4062V14.8125H12V7.78125ZM12 16.2188H13.4062V19.0312H12V16.2188Z"
+                fill="white"
+              />
+            </g>
+            <defs>
+              <clipPath id="clip0_3206_765">
+                <rect width="24" height="24" fill="white" />
+              </clipPath>
+            </defs>
+          </svg>
+        </div>
+
+        <!-- <img
+          src="assets/images/questionnaire/warning.png"
+          alt="warning"
+          class="recommendation-icon"
+        /> -->
+        <p class="recommendation-text">
+          {{
+            "We recommend uploading your profile picture and writing a short bio to personalize the questionnaire."
+              | translate
+          }}
+          <a
+            [routerLink]="['/settings/account-preferences']"
+            (click)="closeDialog()"
+            class="recommendation-link"
+          >
+            {{ "Go to Settings" | translate }}
+          </a>
+        </p>
+      </div>
+      <div class="recommendation-status">
+        <div
+          class="status-item"
+          [class.added]="hasProfilePicture"
+          [class.not-added]="!hasProfilePicture"
+        >
+          <span class="status-icon">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 20 20"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M16.6663 17.5V15.8333C16.6663 14.9493 16.3151 14.1014 15.69 13.4763C15.0649 12.8512 14.2171 12.5 13.333 12.5H6.66634C5.78229 12.5 4.93444 12.8512 4.30932 13.4763C3.6842 14.1014 3.33301 14.9493 3.33301 15.8333V17.5"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M10.0003 9.16667C11.8413 9.16667 13.3337 7.67428 13.3337 5.83333C13.3337 3.99238 11.8413 2.5 10.0003 2.5C8.15938 2.5 6.66699 3.99238 6.66699 5.83333C6.66699 7.67428 8.15938 9.16667 10.0003 9.16667Z"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+
+            <!-- <i-tabler name="user-circle" class="icon-20"></i-tabler> -->
+          </span>
+          <div class="status-label">
+            <span class="label-text">{{ "Profile picture" | translate }}</span>
+            <span class="label-status">{{
+              (hasProfilePicture ? "Added" : "Not added") | translate
+            }}</span>
+          </div>
+        </div>
+        <div
+          class="status-item"
+          [class.added]="hasBio"
+          [class.not-added]="!hasBio"
+        >
+          <span class="status-icon">
+            <!-- <i-tabler name="file-text" class="icon-20"></i-tabler> -->
+
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 20 20"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M11.6663 1.66602H4.99967C4.55765 1.66602 4.13372 1.84161 3.82116 2.15417C3.5086 2.46673 3.33301 2.89065 3.33301 3.33268V16.666C3.33301 17.108 3.5086 17.532 3.82116 17.8445C4.13372 18.1571 4.55765 18.3327 4.99967 18.3327H14.9997C15.4417 18.3327 15.8656 18.1571 16.1782 17.8445C16.4907 17.532 16.6663 17.108 16.6663 16.666V6.66602L11.6663 1.66602Z"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M11.667 1.66602V6.66602H16.667"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M13.3337 10.834H6.66699"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M13.3337 14.166H6.66699"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M8.33366 7.5H7.50033H6.66699"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </span>
+          <div class="status-label">
+            <span class="label-text">{{ "Bio" | translate }}</span>
+            <span class="label-status">{{
+              (hasBio ? "Added" : "Not added") | translate
+            }}</span>
+          </div>
         </div>
       </div>
-      <div class="status-item" [class.added]="hasBio" [class.not-added]="!hasBio">
-        <span class="status-icon">
-          <i-tabler name="file-text" class="icon-20"></i-tabler>
-        </span>
-        <div class="status-label">
-          <span class="label-text">{{ 'Bio' | translate }}</span>
-          <span class="label-status">{{ (hasBio ? 'Added' : 'Not added') | translate }}</span>
-        </div>
-      </div>
     </div>
-  </div>
   }
 
   <!-- Modal Body (scrollable) -->
   <mat-dialog-content class="questionnaire-dialog-content">
-  @if (isLoaderVisible) {
-    <div class="d-flex justify-content-center p-32">
-      <mat-spinner diameter="40"></mat-spinner>
-    </div>
-  } @else {
-  <div class="d-flex flex-column gap-20">
-    <p class="f-s-14 questionnaire-body">
-      {{ 'Select the questions you want to share with' | translate }}
-      {{ clientName }}.
-      {{ 'You can reorder the questions or deselect any that are not relevant.' | translate }}
-      {{ 'The client will only see the questions you select.' | translate }}
-    </p>
+    @if (isLoaderVisible) {
+      <div class="d-flex justify-content-center p-32">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
+    } @else {
+      <div class="d-flex flex-column gap-20">
+        <p class="f-s-14 questionnaire-body">
+          {{ "Select the questions you want to share with" | translate }}
+          {{ clientName }}.
+          {{
+            "You can reorder the questions or deselect any that are not relevant."
+              | translate
+          }}
+          {{ "The client will only see the questions you select." | translate }}
+        </p>
 
-    <div
-      cdkDropList
-      [cdkDropListData]="questions"
-      (cdkDropListDropped)="drop($event)"
-      class="d-flex flex-column gap-10 questionnaire-list"
-    >
-      @for (question of questions; track question.id) {
         <div
-          [cdkDragData]="question"
-          cdkDrag
-          cdkDragLockAxis="y"
-          class="questionnaire-item d-flex align-items-center gap-12"
-          [class.deselected]="!question.selected"
+          cdkDropList
+          [cdkDropListData]="questions"
+          (cdkDropListDropped)="drop($event)"
+          class="d-flex flex-column gap-10 questionnaire-list"
         >
-          <button cdkDragHandle type="button" class="drag-btn" aria-label="Reorder">
-            <img src="assets/images/svgs/drag-icon.svg" alt="drag" />
-          </button>
-          <mat-checkbox
-            [checked]="question.selected"
-            (change)="toggleQuestion(question)"
-            class="question-checkbox"
-          >
-          </mat-checkbox>
-          <div class="question-text-wrapper">
-            <span class="question-text f-s-16">{{ question.text }}</span>
-            <!-- @if (question.subtitle) {
+          @for (question of questions; track question.id) {
+            <div
+              [cdkDragData]="question"
+              cdkDrag
+              cdkDragLockAxis="y"
+              class="questionnaire-item d-flex align-items-center gap-12"
+              [class.deselected]="!question.selected"
+            >
+              <button
+                cdkDragHandle
+                type="button"
+                class="drag-btn"
+                aria-label="Reorder"
+              >
+                <svg
+                  width="10"
+                  height="17"
+                  viewBox="0 0 10 17"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M1.66667 3.33333C2.58714 3.33333 3.33333 2.58714 3.33333 1.66667C3.33333 0.746192 2.58714 0 1.66667 0C0.746192 0 0 0.746192 0 1.66667C0 2.58714 0.746192 3.33333 1.66667 3.33333Z"
+                    fill="#48475D"
+                  />
+                  <path
+                    d="M1.66667 10.0003C2.58714 10.0003 3.33333 9.25413 3.33333 8.33366C3.33333 7.41318 2.58714 6.66699 1.66667 6.66699C0.746192 6.66699 0 7.41318 0 8.33366C0 9.25413 0.746192 10.0003 1.66667 10.0003Z"
+                    fill="#48475D"
+                  />
+                  <path
+                    d="M1.66667 16.6663C2.58714 16.6663 3.33333 15.9201 3.33333 14.9997C3.33333 14.0792 2.58714 13.333 1.66667 13.333C0.746192 13.333 0 14.0792 0 14.9997C0 15.9201 0.746192 16.6663 1.66667 16.6663Z"
+                    fill="#48475D"
+                  />
+                  <path
+                    d="M8.33366 3.33333C9.25413 3.33333 10.0003 2.58714 10.0003 1.66667C10.0003 0.746192 9.25413 0 8.33366 0C7.41318 0 6.66699 0.746192 6.66699 1.66667C6.66699 2.58714 7.41318 3.33333 8.33366 3.33333Z"
+                    fill="#48475D"
+                  />
+                  <path
+                    d="M8.33366 10.0003C9.25413 10.0003 10.0003 9.25413 10.0003 8.33366C10.0003 7.41318 9.25413 6.66699 8.33366 6.66699C7.41318 6.66699 6.66699 7.41318 6.66699 8.33366C6.66699 9.25413 7.41318 10.0003 8.33366 10.0003Z"
+                    fill="#48475D"
+                  />
+                  <path
+                    d="M8.33366 16.6663C9.25413 16.6663 10.0003 15.9201 10.0003 14.9997C10.0003 14.0792 9.25413 13.333 8.33366 13.333C7.41318 13.333 6.66699 14.0792 6.66699 14.9997C6.66699 15.9201 7.41318 16.6663 8.33366 16.6663Z"
+                    fill="#48475D"
+                  />
+                </svg>
+
+                <!-- <img src="assets/images/svgs/drag-icon.svg" alt="drag" /> -->
+              </button>
+              <div class="question-text-wrapper">
+                <span class="question-text f-s-16">{{ question.text }}</span>
+                <!-- @if (question.subtitle) {
               <span class="question-subtitle f-s-12">{{ question.subtitle }}</span>
             } -->
-          </div>
+              </div>
+              <mat-checkbox
+                disableRipple
+                [checked]="question.selected"
+                (change)="toggleQuestion(question)"
+                class="example-margin"
+              >
+              </mat-checkbox>
+            </div>
+          }
         </div>
-      }
-    </div>
-  </div>
-  }
+      </div>
+    }
   </mat-dialog-content>
   <!-- End Modal Body -->
 
   <!-- Modal Action Buttons -->
-  <div class="row justify-content-between modal-action">
-    <div class="col-5">
-      <button (click)="closeDialog()" class="button-icon-outline w-100 d-block">
-        <span class="f-s-16">{{ 'Close' | translate }}</span>
-      </button>
-    </div>
-    <div class="col-5">
-      <button (click)="onCopyLink()" type="button" class="button-icon w-100 d-block" [disabled]="isCopying || isLoaderVisible">
-        @if (isCopying) {
-          <mat-spinner diameter="20"></mat-spinner>
-        } @else {
-          <span class="f-s-16">{{ 'Copy questionnaire link' | translate }}</span>
-        }
-      </button>
-    </div>
+  <div class="d-flex justify-content-end gap-16 modal-action">
+    <button (click)="closeDialog()" class="button-icon-outline d-block">
+      <span class="f-s-16">{{ "Close" | translate }}</span>
+    </button>
+
+    <button
+      (click)="onCopyLink()"
+      type="button"
+      class="button-icon d-block"
+      [disabled]="isCopying || isLoaderVisible"
+    >
+      @if (isCopying) {
+        <mat-spinner diameter="20"></mat-spinner>
+      } @else {
+        <span class="f-s-16">{{ "Copy questionnaire link" | translate }}</span>
+      }
+    </button>
   </div>
   <!-- End Modal Action Buttons -->
 </div>

@@ -1,20 +1,21 @@
 ::ng-deep .mat-mdc-dialog-surface {
-  border-radius: 16px !important;
+  border-radius: 12px !important;
 }
 
 .dialog-title {
   text-align: center;
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 600;
-  padding: 24px 24px 8px;
+  color: #1c1c1c;
+  // padding: 24px 24px 8px;
   margin: 0;
 }
 
 .dialog-form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px 24px;
-  padding: 8px 0;
+  gap: 16px;
+  // padding: 8px 0;
 }
 
 .full-width {
@@ -28,11 +29,19 @@
   input[matInput],
   textarea[matInput] {
     width: 100%;
+    background-color: #f5f5f5;
+    border: 1px solid transparent;
+    outline: none;
+    color: #787889;
   }
 
   textarea[matInput] {
     min-height: 80px;
     resize: vertical;
+  }
+
+  .ibr-black {
+    color: #1c1c1c;
   }
 }
 
@@ -50,12 +59,82 @@
 
 .date-picker-position {
   position: absolute;
-  right: 0;
+  right: 6px;
   top: 50%;
   transform: translateY(-50%);
 }
 
-mat-dialog-actions {
-  padding: 12px 24px 20px;
+.mat-dialog-actions {
+  // padding: 12px 24px 20px;
   gap: 8px;
+}
+
+.dialog-actions.mat-mdc-dialog-actions {
+  padding: 24px 0 0 0 !important;
+}
+
+.dialog-content.mat-mdc-dialog-content {
+  margin-top: 28px;
+}
+
+.custom-select {
+  position: relative;
+  .custom-arrow {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: #787889;
+  }
+}
+
+.dialog-close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: white !important;
+  border: none;
+  box-shadow: none;
+}
+
+.dialog-close-btn {
+  background: transparent;
+
+  &:focus,
+  &:focus-visible {
+    outline: none;
+    background: transparent;
+  }
+  &:active {
+    outline: none;
+    background: transparent;
+  }
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+
+  .button-outline {
+    background-color: transparent;
+    border: 1px solid #4043af;
+    &:hover {
+      background-color: #4043af;
+    }
+    span {
+      color: #4043af !important;
+    }
+    &:hover span {
+      color: #fff !important;
+    }
+    &:disabled {
+      background-color: transparent;
+      border-color: #c0c0c0;
+      span {
+        color: #c0c0c0 !important;
+      }
+    }
+  }
 }

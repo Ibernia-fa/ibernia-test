@@ -4,7 +4,18 @@ import { TablerIconsModule } from 'angular-tabler-icons';
 import { ClientHttpService } from '../services/client-http.service';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Client } from '../models/client';
-import { catchError, combineLatest, combineLatestWith, distinctUntilChanged, filter, forkJoin, map, of, switchMap, tap } from 'rxjs';
+import {
+  catchError,
+  combineLatest,
+  combineLatestWith,
+  distinctUntilChanged,
+  filter,
+  forkJoin,
+  map,
+  of,
+  switchMap,
+  tap,
+} from 'rxjs';
 import { CommonModule, DatePipe } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -25,7 +36,10 @@ import { EditModelDialogComponent } from './edit-model-dialog/edit-model-dialog.
 import { ClientEditComponent } from '../client-edit/client-edit.component';
 import { QuestionnaireDialogComponent } from './questionnaire-dialog/questionnaire-dialog.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { QuestionnaireHttpService, GetClientQuestionnaireResponse } from '../services/questionnaire-http.service';
+import {
+  QuestionnaireHttpService,
+  GetClientQuestionnaireResponse,
+} from '../services/questionnaire-http.service';
 import { allCountries } from '../models/country';
 import { Store } from '@ngrx/store';
 import { selectedClient } from 'src/app/store/client/client.selectors';
@@ -62,7 +76,7 @@ interface SortDescriptor {
     RouterModule,
     CurrencySymbolPipe,
     ThousandSeparatorPipe,
-    TranslateModule
+    TranslateModule,
   ],
   providers: [RouterModule, DatePipe, AgeCalculatorPipe],
   templateUrl: './profile.component.html',
@@ -74,7 +88,7 @@ export class ProfileComponent {
   birthDate: Date | undefined;
   cashflows: Array<Cashflow> = [];
   preferredCurrency: string | undefined;
-  totalSavings: string = "0";
+  totalSavings: string = '0';
   isLoaderVisible = true;
   isPageLoading = true;
   questionnaireResponses: GetClientQuestionnaireResponse | null = null;
@@ -90,13 +104,12 @@ export class ProfileComponent {
     private cashflowHttpService: CashflowHttpService,
     private savingsPotsHttpService: SavingsPotsHttpService,
     private questionnaireHttpService: QuestionnaireHttpService,
-    private store: Store
+    private store: Store,
   ) {
     this.getClient();
   }
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
   onEditClicked() {
     const dialogRef = this.dialog.open(ClientEditComponent, {
@@ -107,7 +120,9 @@ export class ProfileComponent {
     });
     dialogRef.afterClosed().subscribe((result: any) => {
       if (result?.action === 'updated') {
-        this.store.dispatch(ClientActions.loadClient({ clientId: this.clientId }));
+        this.store.dispatch(
+          ClientActions.loadClient({ clientId: this.clientId }),
+        );
         this.getCashflows();
       }
     });
@@ -121,7 +136,7 @@ export class ProfileComponent {
     }
 
     const dialogRef = this.dialog.open(QuestionnaireDialogComponent, {
-      width: '720px',
+      width: '612px',
       disableClose: true,
       data: { client: this.client },
     });
@@ -135,9 +150,13 @@ export class ProfileComponent {
     this.questionnaireHttpService.getClientResponses(this.clientId).subscribe({
       next: (data) => {
         this.questionnaireResponses = data;
-        const dismissed = localStorage.getItem(`questionnaire_hidden_${this.clientId}`);
+        const dismissed = localStorage.getItem(
+          `questionnaire_hidden_${this.clientId}`,
+        );
         this.showResponsesCard = !dismissed;
-        this.responseCurrencySymbol = this.resolveCurrencySymbol(data?.currency);
+        this.responseCurrencySymbol = this.resolveCurrencySymbol(
+          data?.currency,
+        );
       },
       error: () => {
         this.questionnaireResponses = null;
@@ -152,13 +171,16 @@ export class ProfileComponent {
 
   private resolveCurrencySymbol(code?: string): string {
     if (!code) return '';
-    const country = allCountries.find(c => c.currencySymbol === code);
+    const country = allCountries.find((c) => c.currencySymbol === code);
     return country?.symbol || code;
   }
 
   formatAssetChip(chip: string): string {
     if (!this.responseCurrencySymbol) return chip;
-    return chip.replace(/\d[\d,]*(\.\d+)?/g, (match) => `${this.responseCurrencySymbol}${match}`);
+    return chip.replace(
+      /\d[\d,]*(\.\d+)?/g,
+      (match) => `${this.responseCurrencySymbol}${match}`,
+    );
   }
 
   formatResponseValue(item: { type: string; value: unknown }): string {
@@ -166,9 +188,13 @@ export class ProfileComponent {
     if (v == null) return '-';
     if (typeof v === 'string') return v;
     if (Array.isArray(v)) {
-      return v.map((x) => (typeof x === 'object' && x && 'name' in x && 'relationship' in x
-        ? `${(x as { name: string }).name} (${(x as { relationship: string }).relationship})`
-        : String(x))).join(', ');
+      return v
+        .map((x) =>
+          typeof x === 'object' && x && 'name' in x && 'relationship' in x
+            ? `${(x as { name: string }).name} (${(x as { relationship: string }).relationship})`
+            : String(x),
+        )
+        .join(', ');
     }
     if (typeof v === 'object') {
       const obj = v as Record<string, unknown>;
@@ -187,13 +213,18 @@ export class ProfileComponent {
     return formatted.split(', ').filter(Boolean);
   }
 
-  onSortByValueChange(event: any)
-  {
-    console.log({event})
-    if(event === 'asc') {
-      this.cashflows.sort((a, b) => new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime());
+  onSortByValueChange(event: any) {
+    console.log({ event });
+    if (event === 'asc') {
+      this.cashflows.sort(
+        (a, b) =>
+          new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime(),
+      );
     } else {
-      this.cashflows.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+      this.cashflows.sort(
+        (a, b) =>
+          new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+      );
     }
   }
 
@@ -201,16 +232,22 @@ export class ProfileComponent {
     this.activatedRoute.params
       .pipe(
         switchMap((params) => {
-          this.clientId = params['id']
-          return this.cashflowHttpService.getByClientId(this.clientId)
+          this.clientId = params['id'];
+          return this.cashflowHttpService.getByClientId(this.clientId);
         }),
-        combineLatestWith(this.store.select(selectedClient).pipe(takeUntilDestroyed())),
+        combineLatestWith(
+          this.store.select(selectedClient).pipe(takeUntilDestroyed()),
+        ),
         tap(([cashflows, client]) => {
-          if(!client || client.id !== this.clientId) {
-            this.store.dispatch(ClientActions.loadClient({clientId: this.clientId}))
+          if (!client || client.id !== this.clientId) {
+            this.store.dispatch(
+              ClientActions.loadClient({ clientId: this.clientId }),
+            );
           }
         }),
-        filter(([cashflows, client]) => !!client && client.id === this.clientId),
+        filter(
+          ([cashflows, client]) => !!client && client.id === this.clientId,
+        ),
         switchMap(([cashflows, client]) => {
           this.client = client;
           this.cashflows = cashflows || [];
@@ -218,54 +255,61 @@ export class ProfileComponent {
           this.refreshTotalSavings();
           this.isLoaderVisible = false;
 
-          return this.questionnaireHttpService.getClientResponses(this.clientId).pipe(
-            catchError(() => of(null))
-          );
+          return this.questionnaireHttpService
+            .getClientResponses(this.clientId)
+            .pipe(catchError(() => of(null)));
         }),
         tap((questionnaireData) => {
           if (questionnaireData) {
             this.questionnaireResponses = questionnaireData;
-            const fromEmail = this.activatedRoute.snapshot.queryParamMap.get('responses') === '1';
-            const dismissed = fromEmail ? null : localStorage.getItem(`questionnaire_hidden_${this.clientId}`);
+            const fromEmail =
+              this.activatedRoute.snapshot.queryParamMap.get('responses') ===
+              '1';
+            const dismissed = fromEmail
+              ? null
+              : localStorage.getItem(`questionnaire_hidden_${this.clientId}`);
             this.showResponsesCard = !dismissed;
-            this.responseCurrencySymbol = this.resolveCurrencySymbol(questionnaireData?.currency);
+            this.responseCurrencySymbol = this.resolveCurrencySymbol(
+              questionnaireData?.currency,
+            );
           } else {
             this.questionnaireResponses = null;
           }
           this.isPageLoading = false;
-        })
+        }),
       )
       .subscribe();
   }
 
-  loadCashflowToStore(cashflowId : any) {
-    var cashflow = this.cashflows.find(cashflow => cashflow.id === cashflowId)
+  loadCashflowToStore(cashflowId: any) {
+    var cashflow = this.cashflows.find(
+      (cashflow) => cashflow.id === cashflowId,
+    );
     console.log(cashflow);
-    if(cashflow)
-      this.store.dispatch(CashflowActions.selectCashflow({cashflow}));
+    if (cashflow)
+      this.store.dispatch(CashflowActions.selectCashflow({ cashflow }));
   }
 
   getCashflows() {
     this.isLoaderVisible = true;
-    this.cashflowHttpService.getByClientId(this.clientId).pipe(
-      tap((cashflows: Cashflow[]) => {
-        this.cashflows = cashflows;
-        this.refreshTotalSavings();
-        this.isLoaderVisible = false;
-      })
-    ).subscribe();
+    this.cashflowHttpService
+      .getByClientId(this.clientId)
+      .pipe(
+        tap((cashflows: Cashflow[]) => {
+          this.cashflows = cashflows;
+          this.refreshTotalSavings();
+          this.isLoaderVisible = false;
+        }),
+      )
+      .subscribe();
   }
 
   newModelClicked() {
-
-    const dialogRef = this.dialog.open(
-      AddModelDialogComponent,
-      {
-        width: '600px',
-        disableClose: true,
-        data: this.client
-      }
-    );
+    const dialogRef = this.dialog.open(AddModelDialogComponent, {
+      width: '600px',
+      disableClose: true,
+      data: this.client,
+    });
 
     dialogRef.afterClosed().subscribe((result: any) => {
       console.log('Dialog closed with result:', result);
@@ -273,44 +317,44 @@ export class ProfileComponent {
   }
 
   onEditModelClicked(cashflowId: string) {
-    const dialogRef = this.dialog.open(
-      EditModelDialogComponent,
-      {
-        width: '600px',
-        disableClose: true,
-        data: this.cashflows.find(cashflow => cashflow.id === cashflowId)
-      }
-    );
+    const dialogRef = this.dialog.open(EditModelDialogComponent, {
+      width: '600px',
+      disableClose: true,
+      data: this.cashflows.find((cashflow) => cashflow.id === cashflowId),
+    });
 
     dialogRef.afterClosed().subscribe((result: any) => {
       this.getCashflows();
       console.log('Dialog closed with result:', result);
     });
   }
-  
+
   onCopyModelClicked(cashflow: Cashflow) {
     this.isLoaderVisible = true;
     cashflow.name = 'Copy of ' + cashflow.name;
-    
-    this.cashflowHttpService.copyCashflow(cashflow).pipe(
-      filter(res => !!res),
-      catchError((err) => {
-        console.error("An error occurred while cloning cashflow", err);
-        this.toastr.error('An error occurred while cloning plan');
-        throw err;
-      })
-    ).subscribe((res) => {
-      this.toastr.success('Plan cloned successfully');
-      this.getCashflows();
-    });
+
+    this.cashflowHttpService
+      .copyCashflow(cashflow)
+      .pipe(
+        filter((res) => !!res),
+        catchError((err) => {
+          console.error('An error occurred while cloning cashflow', err);
+          this.toastr.error('An error occurred while cloning plan');
+          throw err;
+        }),
+      )
+      .subscribe((res) => {
+        this.toastr.success('Plan cloned successfully');
+        this.getCashflows();
+      });
   }
-  
+
   onDeleteModelClicked(cashflowId: string) {
     const dialogRef = this.dialog.open(DialogComponent, {
       data: {
         action: 'Delete',
         text: 'Are you sure you want to delete this plan?',
-        cashflowId
+        cashflowId,
       },
       width: '460px',
     });
@@ -325,42 +369,43 @@ export class ProfileComponent {
   deleteModel(cashflowId: string) {
     this.isLoaderVisible = true;
     this.cashflowHttpService
-          .deleteCashflow(cashflowId)
-          .pipe(
-            map((res) => {
-              this.toastr.success('Plan deleted successfully', 'Success!');
-              this.getCashflows();
-            }),
-            catchError((err) => {
-              console.error(err);
-              this.toastr.error('An error occured while deleting plan', 'Error!');
-              throw err;
-            })
-          )
-          .subscribe();
+      .deleteCashflow(cashflowId)
+      .pipe(
+        map((res) => {
+          this.toastr.success('Plan deleted successfully', 'Success!');
+          this.getCashflows();
+        }),
+        catchError((err) => {
+          console.error(err);
+          this.toastr.error('An error occured while deleting plan', 'Error!');
+          throw err;
+        }),
+      )
+      .subscribe();
   }
 
   private refreshTotalSavings() {
     this.preferredCurrency = this.client?.clientDetails.preferredCurrency;
 
     if (!this.cashflows.length) {
-      this.totalSavings = this.preferredCurrency == undefined ? "N/A" : "0";
+      this.totalSavings = this.preferredCurrency == undefined ? 'N/A' : '0';
       return;
     }
 
-    const lastUpdatedCashflow = [...this.cashflows]
-      .sort(
-        (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-      )[0];
+    const lastUpdatedCashflow = [...this.cashflows].sort(
+      (a, b) =>
+        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+    )[0];
 
     this.savingsPotsHttpService
       .getAllSavingsPots(lastUpdatedCashflow?.id)
       .subscribe({
         next: (data) => {
           const totalSavings = data.totalSavings?.toString();
-          this.totalSavings = (this.preferredCurrency == undefined || totalSavings == null)
-          ? "N/A"
-          : totalSavings;
+          this.totalSavings =
+            this.preferredCurrency == undefined || totalSavings == null
+              ? 'N/A'
+              : totalSavings;
         },
         error: (err) => {
           console.error('Error fetching saving pots:', err);
