@@ -77,7 +77,7 @@ export class AiRecommendationsComponent implements OnInit, OnDestroy {
   }
 
   onClickShow(): void {
-    this.cashflowId = this.activatedRoute.snapshot.params['id'];
+    this.cashflowId = this.activatedRoute.parent?.snapshot.params['id'] || this.activatedRoute.snapshot.params['id'];
 
     if (!this.cashflowId) {
       this.errorMessage = 'Unable to determine the cashflow. Please try again.';
@@ -119,7 +119,7 @@ export class AiRecommendationsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.cashflowId = this.activatedRoute.snapshot.params['id'];
+    this.cashflowId = this.activatedRoute.parent?.snapshot.params['id'] || this.activatedRoute.snapshot.params['id'];
     this.loadUsage();
 
     this.client$ = this.store.select(selectedClient);

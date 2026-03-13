@@ -351,7 +351,7 @@ export class ReportsComponent {
   getData() {
   this.isLoaderVisible = true;
 
-  this.activatedRoute.params
+  (this.activatedRoute.parent?.params ?? this.activatedRoute.params)
     .pipe(
       switchMap((params) =>
         this.financialWorkflowService.loadClientCashflowMetadata(params)

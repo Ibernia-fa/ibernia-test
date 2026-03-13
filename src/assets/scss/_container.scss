@@ -23,6 +23,10 @@ body {
 .sidenavContainer {
   padding-top: 66px;
   padding-bottom: 66px;
+
+  &.no-footer-padding {
+    padding-bottom: 0;
+  }
   // height: calc(100dvh - 60px);
   height: calc(100dvh - 0px);
   background-color: #fafafa !important;

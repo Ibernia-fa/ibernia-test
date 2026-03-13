@@ -25,4 +25,12 @@ export class AppComponent {
   get isQuestionnaireRoute(): boolean {
     return this.router.url.startsWith('/questionnaire/');
   }
+
+  get isCashflowRoute(): boolean {
+    return this.router.url.startsWith('/cashflows');
+  }
+
+  get showFooter(): boolean {
+    return !this.isQuestionnaireRoute && !this.isCashflowRoute;
+  }
 }

@@ -1,0 +1,17 @@
+<nav class="cashflow-nav">
+  @for (item of navItems; track item.route; let last = $last) {
+    <a
+      [routerLink]="getLink(item)"
+      class="cashflow-nav-item"
+      [class.active]="isActive(item)"
+    >
+      <div class="nav-icon" [class.active]="isActive(item)">
+        <img [src]="getIconPath(item, isActive(item))" [alt]="item.label" />
+      </div>
+      <span class="nav-label">{{ item.label | translate }}</span>
+    </a>
+    @if (!last) {
+      <span class="nav-divider"></span>
+    }
+  }
+</nav>

@@ -98,6 +98,7 @@ export class FullComponent implements OnInit, OnDestroy {
   navItems = navItems;
   navItemslower = navItemslower;
   isSettings = false;
+  isCashflowRoute = false;
   @ViewChild('leftsidenav')
   public sidenav: MatSidenav;
   resView = false;
@@ -260,6 +261,9 @@ export class FullComponent implements OnInit, OnDestroy {
     // Initialize project theme with options
     this.receiveOptions(this.options);
 
+    // Set initial route state (for direct load/refresh on cashflow routes)
+    this.isCashflowRoute = this.router.url.startsWith('/cashflows');
+
     // This is for scroll to top
     // this.router.events
     //   .pipe(filter((event) => event instanceof NavigationEnd))
@@ -286,6 +290,9 @@ export class FullComponent implements OnInit, OnDestroy {
 
         // NEW: detect settings
         this.isSettings = currentRoute.startsWith('/settings');
+
+        // Detect cashflow routes (footer is hidden, so no bottom padding needed)
+        this.isCashflowRoute = currentRoute.startsWith('/cashflows');
 
         // swap menu sources
         if (this.isSettings) {
