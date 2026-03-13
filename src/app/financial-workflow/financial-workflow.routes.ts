@@ -1,5 +1,4 @@
 import { Routes } from '@angular/router';
-import { FinancialWorkflowDashboardComponent } from './financial-workflow-dashboard/financial-workflow-dashboard.component';
 import { TimelineComponent } from './timeline/timeline/timeline.component';
 import { SavingPotsComponent } from './saving-pots/saving-pots.component';
 import { IncomeExpensesComponent } from './income-expenses/income-expenses.component';
@@ -11,60 +10,28 @@ import { WealthComponent } from './wealth/wealth.component';
 import { AiRecommendationsComponent } from './ai-recommendations/ai-recommendations.component';
 import { AgentChatComponent } from './agent-chat/agent-chat.component';
 import { CashflowResolver } from './resolvers/cashflow.resolver';
+import { CashflowLayoutComponent } from './cashflow-layout/cashflow-layout.component';
 
 export const FinancialWorkflowRoutes: Routes = [
   {
     path: '',
     children: [
       {
-        path: ':id/timeline',
-        component: TimelineComponent,
+        path: ':id',
+        component: CashflowLayoutComponent,
         resolve: { cashflow: CashflowResolver },
-      },
-      {
-        path: ':id/finances',
-        component: SavingPotsComponent,
-        resolve: { cashflow: CashflowResolver },
-      },
-      {
-        path: ':id/income',
-        component: IncomeExpensesComponent,
-        resolve: { cashflow: CashflowResolver },
-      },
-      {
-        path: ':id/withdrawal',
-        component: WithdrawalsContributionsComponent,
-        resolve: { cashflow: CashflowResolver },
-      },
-      {
-        path: ':id/reports',
-        component: ReportsComponent,
-        resolve: { cashflow: CashflowResolver },
-      },
-      {
-        path: ':id/scenario-lab',
-        component: ScenarioLabComponent,
-        resolve: { cashflow: CashflowResolver },
-      },
-      {
-        path: ':id/emergencies',
-        component: EmergenciesComponent,
-        resolve: { cashflow: CashflowResolver },
-      },
-      {
-        path: ':id/wealth',
-        component: WealthComponent,
-        resolve: { cashflow: CashflowResolver },
-      },
-      {
-        path: ':id/ai-recommendations',
-        component: AiRecommendationsComponent,
-        resolve: { cashflow: CashflowResolver },
-      },
-      {
-        path: ':id/agent-chat',
-        component: AgentChatComponent,
-        resolve: { cashflow: CashflowResolver },
+        children: [
+          { path: 'timeline', component: TimelineComponent },
+          { path: 'finances', component: SavingPotsComponent },
+          { path: 'income', component: IncomeExpensesComponent },
+          { path: 'withdrawal', component: WithdrawalsContributionsComponent },
+          { path: 'reports', component: ReportsComponent },
+          { path: 'scenario-lab', component: ScenarioLabComponent },
+          { path: 'emergencies', component: EmergenciesComponent },
+          { path: 'wealth', component: WealthComponent },
+          { path: 'ai-recommendations', component: AiRecommendationsComponent },
+          { path: 'agent-chat', component: AgentChatComponent },
+        ],
       },
       // {
       //   path: 'add',

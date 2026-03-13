@@ -40,7 +40,6 @@ import { SettingsService } from 'src/app/default-preferance/services/default-pre
 import { FullscreenData, FullscreenService } from 'src/app/services/fullscreen.service';
 import { TranslateModule } from '@ngx-translate/core';
 import { RouterLink } from '@angular/router';
-import { CashflowNavComponent } from '../cashflow-nav/cashflow-nav.component';
 
 
 export interface PeriodicElement {
@@ -143,8 +142,7 @@ const ELEMENT_DATA: PeriodicElement[] = [
     MatTooltipModule,
     ReactiveFormsModule,
     TranslateModule,
-    RouterLink,
-    CashflowNavComponent
+    RouterLink
   ],
   templateUrl: './reports.component.html',
   styleUrl: './reports.component.scss',
@@ -353,7 +351,7 @@ export class ReportsComponent {
   getData() {
   this.isLoaderVisible = true;
 
-  this.activatedRoute.params
+  (this.activatedRoute.parent?.params ?? this.activatedRoute.params)
     .pipe(
       switchMap((params) =>
         this.financialWorkflowService.loadClientCashflowMetadata(params)

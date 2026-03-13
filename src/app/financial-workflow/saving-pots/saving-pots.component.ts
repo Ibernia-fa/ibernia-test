@@ -37,7 +37,6 @@ import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { SettingsService } from 'src/app/default-preferance/services/default-preferance.http.service';
 import { TranslateModule } from '@ngx-translate/core';
-import { CashflowNavComponent } from '../cashflow-nav/cashflow-nav.component';
 import { patchInflationRateDescription } from 'src/app/shared/utils/escalation-rate-utils';
 @Component({
   selector: 'app-saving-pots',
@@ -56,8 +55,7 @@ import { patchInflationRateDescription } from 'src/app/shared/utils/escalation-r
     FormsModule,
     CurrencySymbolPipe,
     ThousandSeparatorPipe,
-    TranslateModule,
-    CashflowNavComponent
+    TranslateModule
   ],
 
   templateUrl: './saving-pots.component.html',
@@ -155,7 +153,7 @@ export class SavingPotsComponent implements OnInit {
 
   getData() {
     this.isLoaderVisible = true;
-    this.activatedRoute.params
+    (this.activatedRoute.parent?.params ?? this.activatedRoute.params)
       .pipe(
         switchMap((params) =>
           this.financialWorkflowService.loadClientCashflowMetadata(params)

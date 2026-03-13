@@ -69,7 +69,7 @@ export class AgentChatComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.cashflowId = this.route.snapshot.params['id'];
+    this.cashflowId = this.route.parent?.snapshot.params['id'] || this.route.snapshot.params['id'];
     if (!this.cashflowId) return;
     this.loadConversations();
   }

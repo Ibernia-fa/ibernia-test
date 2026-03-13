@@ -140,7 +140,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
     private dialog: MatDialog,
     private toastr: ToastrService,
   ) {
-    this.cashflowId = this.route.snapshot.params['id'] || '';
+    this.cashflowId = this.route.parent?.snapshot.params['id'] || this.route.snapshot.params['id'] || '';
     this.scenarioForm = this.fb.group({
       inflationRate: [2.5],
       retirementAge: [65],
@@ -162,7 +162,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
       });
 
     this.financialWorkflowService
-      .loadClientCashflowMetadata(this.route.snapshot.params)
+      .loadClientCashflowMetadata(this.route.parent?.snapshot.params || this.route.snapshot.params)
       .pipe(
         takeUntil(this.destroy$),
         tap(([client, cashflow]) => {

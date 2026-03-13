@@ -31,7 +31,6 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
 import { TranslateModule } from '@ngx-translate/core';
-import { CashflowNavComponent } from '../cashflow-nav/cashflow-nav.component';
 import { IncomeExpensesHttpService } from '../income-expenses/services/income-expenses-http.service';
 import { FinancialViewModel, IncomeExpense } from '../income-expenses/model/income-expense';
 import { patchInflationRateDescription } from 'src/app/shared/utils/escalation-rate-utils';
@@ -50,8 +49,7 @@ import { patchInflationRateDescription } from 'src/app/shared/utils/escalation-r
     MatTooltipModule,
     ThousandSeparatorPipe,
     ToastrModule,
-    TranslateModule,
-    CashflowNavComponent
+    TranslateModule
   ],
   providers: [ToastrService],
   selector: 'app-withdrawals-contributions',
@@ -97,7 +95,7 @@ export class WithdrawalsContributionsComponent {
 
   getData() {
     this.isLoaderVisible = true;
-    this.activatedRoute.params
+    (this.activatedRoute.parent?.params ?? this.activatedRoute.params)
       .pipe(
         switchMap((params) =>
           this.financialWorkflowService.loadClientCashflowMetadata(params)

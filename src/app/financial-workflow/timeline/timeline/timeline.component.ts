@@ -28,8 +28,6 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { Cashflow } from 'src/app/clients/models/cashflow';
 import { FinancialWorkflowService } from '../../services/financial-workflow.service';
 import { TranslateModule } from '@ngx-translate/core';
-import { CashflowNavComponent } from '../../cashflow-nav/cashflow-nav.component';
-
 @Component({
   selector: 'app-timeline',
   imports: [
@@ -44,8 +42,7 @@ import { CashflowNavComponent } from '../../cashflow-nav/cashflow-nav.component'
     TimelineChartComponent,
     MatSelectModule,
     MatTooltipModule,
-    TranslateModule,
-    CashflowNavComponent
+    TranslateModule
   ],
   providers: [provideNativeDateAdapter()],
   templateUrl: './timeline.component.html',
@@ -84,7 +81,7 @@ export class TimelineComponent implements OnDestroy {
   getTimeline() {
     this.isLoaderVisible = true;
 
-    this.activatedRoute.params
+    (this.activatedRoute.parent?.params ?? this.activatedRoute.params)
       .pipe(
         switchMap((params) => {
           this.cashflowId = params['id'];

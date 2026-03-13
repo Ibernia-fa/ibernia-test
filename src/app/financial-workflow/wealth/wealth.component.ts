@@ -80,21 +80,28 @@ export class WealthComponent implements OnInit {
     this.load();
   }
 
+  private getCashflowId(): string {
+    let r: ActivatedRoute | null = this.route;
+    while (r) {
+      const id = r.snapshot.paramMap.get('id') || r.snapshot.paramMap.get('cashflowId');
+      if (id) return id;
+      r = r.parent;
+    }
+    throw new Error('cashflowId not found in route.');
+  }
+
   private load(): void {
     this.isLoading = true;
     this.isClientLoaded = false;
     this.isDashboardLoaded = false;
 
-    this.route.paramMap
+    const cashflowId = this.getCashflowId();
+    this.cashflowId = cashflowId;
+
+    of(cashflowId)
       .pipe(
-        map(pm => {
-          const cf = pm.get('cashflowId') || pm.get('id');
-          if (!cf) throw new Error('cashflowId not found in route.');
-          this.cashflowId = cf;
-          return cf;
-        }),
-        switchMap(cashflowId =>
-          this.wealthHttp.getDashboard(cashflowId).pipe(
+        switchMap((cfId: string) =>
+          this.wealthHttp.getDashboard(cfId).pipe(
             catchError(err => {
               this.toastr.error(err?.error?.message || 'Failed to load wealth data', 'Error');
               return of(null);
