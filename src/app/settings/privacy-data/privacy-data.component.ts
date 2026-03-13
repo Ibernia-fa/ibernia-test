@@ -81,33 +81,96 @@ export class PrivacyDataComponent implements OnInit, OnDestroy {
   }
 
   private async buildAndDownloadArchive(jsonBlob: Blob): Promise<void> {
-    const [ExcelJS, JSZip, { saveAs }] = await Promise.all([
+    const [excelMod, zipMod, fsMod] = await Promise.all([
       import('exceljs'),
       import('jszip'),
       import('file-saver'),
     ]);
 
+    const ExcelJS = (excelMod as any).default ?? excelMod;
+    const JSZipCtor = (zipMod as any).default ?? zipMod;
+    const saveAs = (fsMod as any).saveAs ?? (fsMod as any).default?.saveAs;
+
     const text = await jsonBlob.text();
     const data = JSON.parse(text);
 
-    const zip = new JSZip.default();
-    const workbook = new ExcelJS.Workbook();
+    const zip = typeof JSZipCtor === 'function' ? new JSZipCtor() : new (JSZipCtor as any)();
+    const workbook = ExcelJS.Workbook
+      ? new ExcelJS.Workbook()
+      : new (ExcelJS as any).default.Workbook();
     const imageUrls: { name: string; url: string }[] = [];
 
-    this.addSheetFromArray(workbook, 'Overview', this.flattenObject(data, ['clients', 'cashflows', 'timelines', 'incomes', 'expenses', 'savingPots']));
-
-    const arrayKeys = ['clients', 'cashflows', 'timelines', 'incomes', 'expenses', 'savingPots'];
-    for (const key of arrayKeys) {
-      const items = data[key];
-      if (Array.isArray(items) && items.length > 0) {
-        const sheetName = key.charAt(0).toUpperCase() + key.slice(1);
-        const rows = items.map((item: any) => this.flattenNestedObject(item));
-        this.addSheetFromRows(workbook, sheetName, rows, imageUrls);
+    const overviewData: Record<string, any> = {
+      exportDate: data.exportDate,
+      exportType: data.exportType,
+    };
+    if (data.advisorProfile) {
+      for (const [k, v] of Object.entries(data.advisorProfile)) {
+        if (v !== null && typeof v !== 'object') overviewData[`advisor.${k}`] = v;
       }
     }
+    if (data.organizationProfile) {
+      for (const [k, v] of Object.entries(data.organizationProfile)) {
+        if (typeof v === 'string' && this.isImageUrl(v)) {
+          const ext = this.getExtensionFromUrl(v);
+          const imgName = `org_${imageUrls.length + 1}.${ext}`;
+          imageUrls.push({ name: imgName, url: v });
+          overviewData[`organization.${k}`] = `images/${imgName}`;
+        } else if (v !== null && typeof v !== 'object') {
+          overviewData[`organization.${k}`] = v;
+        }
+      }
+    }
+    this.addSheetFromArray(workbook, 'Overview', overviewData);
 
-    if (Object.keys((workbook as any)._worksheets).length === 0 ||
-        workbook.worksheets.length === 0) {
+    const clients: any[] = data.clients ?? [];
+    if (clients.length > 0) {
+      const clientRows = clients.map((c: any) => this.flattenObject(c, ['cashflowPlans']));
+      this.addSheetFromRows(workbook, 'Clients', clientRows, imageUrls);
+
+      const planRows: Record<string, any>[] = [];
+      const finRecRows: Record<string, any>[] = [];
+      const potRows: Record<string, any>[] = [];
+      const txRows: Record<string, any>[] = [];
+      const tlRows: Record<string, any>[] = [];
+      const wealthRows: Record<string, any>[] = [];
+      const emergRows: Record<string, any>[] = [];
+      const convRows: Record<string, any>[] = [];
+      const reportRows: Record<string, any>[] = [];
+
+      for (const client of clients) {
+        const clientLabel = client.clientDetails?.firstName
+          ? `${client.clientDetails.firstName} ${client.clientDetails.lastName ?? ''}`
+          : client.clientDetails?.id ?? 'Unknown';
+
+        const plans: any[] = client.cashflowPlans ?? [];
+        for (const plan of plans) {
+          const planInfo = plan.plan ?? {};
+          planRows.push({ client: clientLabel, ...this.flattenNestedObject(planInfo) });
+
+          this.pushItems(finRecRows, plan.financialRecords, clientLabel, planInfo.name);
+          this.pushItems(potRows, plan.savingPots, clientLabel, planInfo.name);
+          this.pushItems(txRows, plan.transactions, clientLabel, planInfo.name);
+          this.pushItems(tlRows, plan.timelines, clientLabel, planInfo.name);
+          this.pushItems(wealthRows, plan.wealthRecords, clientLabel, planInfo.name);
+          this.pushItems(emergRows, plan.emergencies, clientLabel, planInfo.name);
+          this.pushItems(convRows, plan.aiConversations, clientLabel, planInfo.name);
+          this.pushItems(reportRows, plan.reports, clientLabel, planInfo.name);
+        }
+      }
+
+      if (planRows.length) this.addSheetFromRows(workbook, 'Cashflow Plans', planRows, imageUrls);
+      if (finRecRows.length) this.addSheetFromRows(workbook, 'Financial Records', finRecRows, imageUrls);
+      if (potRows.length) this.addSheetFromRows(workbook, 'Saving Pots', potRows, imageUrls);
+      if (txRows.length) this.addSheetFromRows(workbook, 'Transactions', txRows, imageUrls);
+      if (tlRows.length) this.addSheetFromRows(workbook, 'Timelines', tlRows, imageUrls);
+      if (wealthRows.length) this.addSheetFromRows(workbook, 'Wealth Records', wealthRows, imageUrls);
+      if (emergRows.length) this.addSheetFromRows(workbook, 'Emergencies', emergRows, imageUrls);
+      if (convRows.length) this.addSheetFromRows(workbook, 'AI Conversations', convRows, imageUrls);
+      if (reportRows.length) this.addSheetFromRows(workbook, 'Reports', reportRows, imageUrls);
+    }
+
+    if (workbook.worksheets.length === 0) {
       const sheet = workbook.addWorksheet('Data');
       this.writeObjectToSheet(sheet, data, imageUrls);
     }
@@ -135,6 +198,18 @@ export class PrivacyDataComponent implements OnInit, OnDestroy {
 
     const archiveBlob = await zip.generateAsync({ type: 'blob' });
     saveAs(archiveBlob, `ibernia-data-export-${dateSuffix}.zip`);
+  }
+
+  private pushItems(
+    target: Record<string, any>[],
+    items: any[] | undefined | null,
+    clientLabel: string,
+    planName: string,
+  ): void {
+    if (!Array.isArray(items)) return;
+    for (const item of items) {
+      target.push({ client: clientLabel, plan: planName, ...this.flattenNestedObject(item) });
+    }
   }
 
   private flattenObject(obj: any, excludeKeys: string[]): Record<string, any> {
