@@ -42,8 +42,11 @@ html {
 .form-field textarea,
 .form-field .select-option .mat-mdc-select .mat-mdc-select-trigger {
   width: 100%;
-  background-color: #ffffff;
-  border: 1px solid #e7e7eb;
+  // background-color: #ffffff;
+  // border: 1px solid #e7e7eb;
+  background-color: #f5f5f5;
+  border: 1px solid transparent;
+  color: #787889;
   border-radius: 4px;
   padding: 8px 16px;
   outline: none;
@@ -80,3 +83,7 @@ html {
   resize: none;
 }
 // End Form Fields
+
+.form-field .select-option .mat-mdc-select-trigger .mat-mdc-select-arrow {
+  display: none !important;
+}

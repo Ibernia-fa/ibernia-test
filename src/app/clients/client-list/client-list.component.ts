@@ -84,7 +84,7 @@ import { TranslateModule } from '@ngx-translate/core';
     MatMenuModule,
     MatProgressSpinnerModule,
     DefaultPreferanceModule,
-    TranslateModule
+    TranslateModule,
   ],
   // imports: [
   //   MatCardModule,
@@ -113,14 +113,14 @@ import { TranslateModule } from '@ngx-translate/core';
       state('expanded', style({ height: '*' })),
       transition(
         'expanded <=> collapsed',
-        animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')
+        animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)'),
       ),
     ]),
   ],
 })
 export class ClientListComponent implements OnInit, AfterViewInit, OnDestroy {
   dataSource: MatTableDataSource<Client> = new MatTableDataSource(
-    new Array<Client>()
+    new Array<Client>(),
   );
   columnsToDisplay = ['client', 'dob', 'last_updated', 'notes', 'action'];
   columnsToDisplayWithExpand = ['expand', ...this.columnsToDisplay];
@@ -210,7 +210,7 @@ export class ClientListComponent implements OnInit, AfterViewInit, OnDestroy {
     private clientHttpService: ClientHttpService,
     private toastr: ToastrService,
     private settingsService: SettingsService,
-        private Authservice: AuthService  
+    private Authservice: AuthService,
   ) {}
 
   ngOnInit() {
@@ -230,38 +230,34 @@ export class ClientListComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  private checkPrefsAndPrompt() {
+    this.settingsService.getUserProfileResponse(this.user?.sub).subscribe({
+      next: (res) => {
+        if (res.status === 204) {
+          // preferences missing → open dialog
+          const ref = this.dialog.open(DefaultPreferanceComponent, {
+            width: '1265px',
+            disableClose: true,
+            autoFocus: false,
+            data: { mode: 'onboarding' },
+          });
 
-private checkPrefsAndPrompt() {
-  this.settingsService.getUserProfileResponse(this.user?.sub).subscribe({
-    next: (res) => {
-      if (res.status === 204) {
-        // preferences missing → open dialog
-        const ref = this.dialog.open(DefaultPreferanceComponent, {
-          width: '1265px',
-          disableClose: true,
-          autoFocus: false,
-          data: { mode: 'onboarding' },
-        });
-
-        ref.afterClosed().subscribe((saved) => {
-          if (saved) {
-            // this.toastr.success('Default preferences saved', 'Success!');
-          }
-        });
-      }
-      if (res.ok && res.body?.firstName != null) {
-        this.advisorNameFromApi = (res.body.firstName ?? '').trim() || null;
-      }
-    },
-    error: (err) => {
-      console.error('Error fetching user profile', err);
-      // optional: you could also open dialog on error if you want
-    },
-  });
-}
-
-
-
+          ref.afterClosed().subscribe((saved) => {
+            if (saved) {
+              // this.toastr.success('Default preferences saved', 'Success!');
+            }
+          });
+        }
+        if (res.ok && res.body?.firstName != null) {
+          this.advisorNameFromApi = (res.body.firstName ?? '').trim() || null;
+        }
+      },
+      error: (err) => {
+        console.error('Error fetching user profile', err);
+        // optional: you could also open dialog on error if you want
+      },
+    });
+  }
 
   rowExpandClicked(element: any, event?: any) {
     if (element.partnerDetail.name) {
@@ -277,7 +273,7 @@ private checkPrefsAndPrompt() {
   }
 
   clientExpandRowClicked(element: any, redirect: boolean = false) {
-    if(!element.partnerDetail?.name || redirect) {
+    if (!element.partnerDetail?.name || redirect) {
       this.router.navigate(['/clients/' + element.id + '/profile']);
     }
   }
@@ -295,14 +291,14 @@ private checkPrefsAndPrompt() {
       this.clients = this.sortList(
         this.clients,
         'lastUpdated',
-        sortState.direction === 'asc' ? 'asc' : 'desc'
+        sortState.direction === 'asc' ? 'asc' : 'desc',
       );
     }
     if (sortState.active === 'client') {
       this.clients = this.sortList(
         this.clients,
         'clientDetails.name',
-        sortState.direction === 'asc' ? 'asc' : 'desc'
+        sortState.direction === 'asc' ? 'asc' : 'desc',
       );
     }
 
@@ -335,7 +331,7 @@ private checkPrefsAndPrompt() {
   sortList<T>(
     list: T[],
     field: string,
-    direction: 'asc' | 'desc' = 'asc'
+    direction: 'asc' | 'desc' = 'asc',
   ): T[] {
     const resolveField = (obj: any, path: string) =>
       path.split('.').reduce((value, key) => value[key], obj);
@@ -354,10 +350,12 @@ private checkPrefsAndPrompt() {
     this.isLoaderVisible = true;
     this.clientHttpService
       .getClients(advisorId)
-      .pipe(filter((clients) => {
-        this.isLoaderVisible = false;
-        return !!clients
-      }))
+      .pipe(
+        filter((clients) => {
+          this.isLoaderVisible = false;
+          return !!clients;
+        }),
+      )
       .subscribe((clients) => {
         this.dataSource = new MatTableDataSource(clients);
         this.clients = clients;
@@ -382,7 +380,7 @@ private checkPrefsAndPrompt() {
             this.clients = clients;
             this.dataSource.paginator = this.paginator;
             this.dataSource.sort = this.sort;
-          })
+          }),
         )
         .subscribe();
     } else {
@@ -424,8 +422,8 @@ private checkPrefsAndPrompt() {
 
   redirectToAdd() {
     const dialogRef = this.dialog.open(ClientAddComponent, {
-      width: '860px',
-      maxHeight: '85vh',
+      width: '612px',
+      maxHeight: '90vh',
       disableClose: true,
     });
     dialogRef.afterClosed().subscribe((result: any) => {
@@ -439,8 +437,8 @@ private checkPrefsAndPrompt() {
 
   redirectToEdit(id: string) {
     const dialogRef = this.dialog.open(ClientEditComponent, {
-      width: '860px',
-      maxHeight: '85vh',
+      width: '612px',
+      maxHeight: '90vh',
       disableClose: true,
       data: { clientId: id },
     });
@@ -481,7 +479,7 @@ private checkPrefsAndPrompt() {
           console.error(err);
           this.toastr.error('An error occured while saving client', 'Error!');
           throw err;
-        })
+        }),
       )
       .subscribe();
   }

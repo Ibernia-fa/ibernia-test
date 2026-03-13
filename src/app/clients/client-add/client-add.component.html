@@ -1,29 +1,56 @@
-<h2 mat-dialog-title class="dialog-title">{{ 'Add new client' | translate }}</h2>
+<div class="dialog-header">
+  <h2 class="dialog-title">
+    {{ "Add new client" | translate }}
+  </h2>
+  <button
+    mat-icon-button
+    disableRipple
+    class="dialog-close-btn"
+    mat-dialog-close
+    aria-label="Close dialog"
+  >
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
 
-<mat-dialog-content>
+<mat-dialog-content class="dialog-content">
   <form [formGroup]="clientForm" class="dialog-form-grid">
-
     <!-- Client first name -->
     <div class="form-field">
-      <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Client first name' | translate }}</mat-label>
+      <mat-label
+        class="f-s-16 f-w-500 m-b-4 d-flex align-items-center ibr-black"
+        >{{ "Client first name" | translate }}</mat-label
+      >
       <input matInput formControlName="firstName" />
-      @if(clientForm.get('firstName')?.touched && clientForm.get('firstName')?.hasError('required')) {
-        <span class="field-error d-block">{{ 'Required' | translate }}</span>
+      @if (
+        clientForm.get("firstName")?.touched &&
+        clientForm.get("firstName")?.hasError("required")
+      ) {
+        <span class="field-error d-block">{{ "Required" | translate }}</span>
       }
     </div>
 
     <!-- Client last name -->
     <div class="form-field">
-      <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Client last name' | translate }}</mat-label>
+      <mat-label
+        class="f-s-16 f-w-500 m-b-4 d-flex align-items-center ibr-black"
+        >{{ "Client last name" | translate }}</mat-label
+      >
       <input matInput formControlName="lastName" />
-      @if(clientForm.get('lastName')?.touched && clientForm.get('lastName')?.hasError('required')) {
-        <span class="field-error d-block">{{ 'Required' | translate }}</span>
+      @if (
+        clientForm.get("lastName")?.touched &&
+        clientForm.get("lastName")?.hasError("required")
+      ) {
+        <span class="field-error d-block">{{ "Required" | translate }}</span>
       }
     </div>
 
     <!-- Date of birth -->
     <div class="form-field">
-      <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Date of birth' | translate }}</mat-label>
+      <mat-label
+        class="f-s-16 f-w-500 m-b-4 d-flex align-items-center ibr-black"
+        >{{ "Date of birth" | translate }}</mat-label
+      >
       <div class="position-relative">
         <input
           matInput
@@ -39,59 +66,157 @@
         <div class="date-picker-position">
           <mat-datepicker-toggle matIconSuffix [for]="picker">
             <mat-icon matDatepickerToggleIcon>
-              <img src="assets/images/svgs/datepicker-icon.svg" alt="datepicker-icon" />
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 20 20"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M15.8333 3.33301H4.16667C3.24619 3.33301 2.5 4.0792 2.5 4.99967V16.6663C2.5 17.5868 3.24619 18.333 4.16667 18.333H15.8333C16.7538 18.333 17.5 17.5868 17.5 16.6663V4.99967C17.5 4.0792 16.7538 3.33301 15.8333 3.33301Z"
+                  stroke="#2B3942"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M13.3335 1.66699V5.00033"
+                  stroke="#2B3942"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M6.6665 1.66699V5.00033"
+                  stroke="#2B3942"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M2.5 8.33301H17.5"
+                  stroke="#2B3942"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
             </mat-icon>
           </mat-datepicker-toggle>
         </div>
         <mat-datepicker #picker></mat-datepicker>
       </div>
       <div class="d-flex flex-column gap-1 m-t-4">
-        @if(age !== null) {
-          <span class="f-s-12 f-w-500">Age: {{ age }}</span>
+        @if (age !== null) {
+          <span class="f-s-12 f-w-500" style="line-height: 14px"
+            >Age: {{ age }}</span
+          >
         }
       </div>
-      @if(clientForm.get('dob')?.touched && clientForm.get('dob')?.hasError('required')) {
-        <span class="field-error d-block">{{ 'Required' | translate }}</span>
+      @if (
+        clientForm.get("dob")?.touched &&
+        clientForm.get("dob")?.hasError("required")
+      ) {
+        <span class="field-error d-block">{{ "Required" | translate }}</span>
       }
-      @if(clientForm.get('dob')?.touched && dobError) {
+      @if (clientForm.get("dob")?.touched && dobError) {
         <span class="field-error d-block">{{ dobError | translate }}</span>
       }
     </div>
 
     <!-- Email -->
     <div class="form-field">
-      <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Email' | translate }}</mat-label>
-      <input matInput placeholder="email@somedomain.com" formControlName="email" />
-      @if(clientForm.get('email')?.hasError('email')) {
-        <span class="field-error d-block">{{ 'Invalid Email Address' | translate }}</span>
+      <mat-label
+        class="f-s-16 f-w-500 m-b-4 d-flex align-items-center ibr-black"
+        >{{ "Email" | translate }}</mat-label
+      >
+      <input
+        matInput
+        placeholder="email@somedomain.com"
+        formControlName="email"
+      />
+      @if (clientForm.get("email")?.hasError("email")) {
+        <span class="field-error d-block">{{
+          "Invalid Email Address" | translate
+        }}</span>
       }
     </div>
 
     <!-- Country -->
     <div class="form-field">
-      <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Country' | translate }}</mat-label>
-      <div class="select-option">
-        <mat-select (valueChange)="clientCountryValueChange($event)" formControlName="country" value="Select">
-          @for(country of allCountries; track country) {
-            @if(country.currencySymbol) {
-              <mat-option [value]="country.countryName">{{ country.countryName }}</mat-option>
+      <mat-label
+        class="f-s-16 f-w-500 m-b-4 d-flex align-items-center ibr-black"
+        >{{ "Country" | translate }}</mat-label
+      >
+      <div class="select-option custom-select">
+        <mat-select
+          (valueChange)="clientCountryValueChange($event)"
+          formControlName="country"
+          value="Select"
+        >
+          @for (country of allCountries; track country) {
+            @if (country.currencySymbol) {
+              <mat-option [value]="country.countryName">{{
+                country.countryName
+              }}</mat-option>
             }
           }
         </mat-select>
+
+        <span class="custom-arrow">
+          <svg
+            width="12"
+            height="7"
+            viewBox="0 0 12 7"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M1 1L6 6L11 1"
+              stroke="#2B3942"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </span>
       </div>
     </div>
 
     <!-- Preferred currency -->
     <div class="form-field">
-      <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Preferred currency' | translate }}</mat-label>
-      <div class="select-option">
+      <mat-label
+        class="f-s-16 f-w-500 m-b-4 d-flex align-items-center ibr-black"
+        >{{ "Preferred currency" | translate }}</mat-label
+      >
+      <div class="select-option custom-select">
         <mat-select formControlName="currency" value="Select">
-          @for(country of allCountries; track country) {
-            @if(country.currencySymbol) {
-              <mat-option [value]="country.currencySymbol">{{ country.currencySymbol }}</mat-option>
+          @for (country of allCountries; track country) {
+            @if (country.currencySymbol) {
+              <mat-option [value]="country.currencySymbol">{{
+                country.currencySymbol
+              }}</mat-option>
             }
           }
         </mat-select>
+        <span class="custom-arrow">
+          <svg
+            width="12"
+            height="7"
+            viewBox="0 0 12 7"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M1 1L6 6L11 1"
+              stroke="#2B3942"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </span>
       </div>
     </div>
 
@@ -99,43 +224,65 @@
     <div class="full-width">
       <section class="example-section">
         <mat-checkbox
+          disableRipple
           class="example-margin"
           id="partner-section"
           (change)="togglePartnerSection(!showPartner)"
-        >{{ 'Add a partner or spouse' | translate }}</mat-checkbox>
+          >{{ "Add a partner or spouse" | translate }}</mat-checkbox
+        >
       </section>
     </div>
 
     <!-- Partner section -->
-    @if(showPartner) {
+    @if (showPartner) {
       <ng-container formGroupName="partner">
-
         <div class="full-width partner-divider">
           <mat-divider></mat-divider>
-          <span class="partner-section-label">{{ 'Partner details' | translate }}</span>
+          <span class="partner-section-label">{{
+            "Partner details" | translate
+          }}</span>
         </div>
 
         <!-- Partner first name -->
         <div class="form-field">
-          <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Partner first name' | translate }}</mat-label>
+          <mat-label
+            class="f-s-16 f-w-500 m-b-4 d-flex align-items-center ibr-black"
+            >{{ "Partner first name" | translate }}</mat-label
+          >
           <input matInput formControlName="firstName" />
-          @if(clientForm.get('partner.firstName')?.touched && clientForm.get('partner.firstName')?.hasError('required')) {
-            <span class="field-error d-block">{{ 'Required' | translate }}</span>
+          @if (
+            clientForm.get("partner.firstName")?.touched &&
+            clientForm.get("partner.firstName")?.hasError("required")
+          ) {
+            <span class="field-error d-block">{{
+              "Required" | translate
+            }}</span>
           }
         </div>
 
         <!-- Partner last name -->
         <div class="form-field">
-          <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Partner last name' | translate }}</mat-label>
+          <mat-label
+            class="f-s-16 f-w-500 m-b-4 d-flex align-items-center ibr-black"
+            >{{ "Partner last name" | translate }}</mat-label
+          >
           <input matInput formControlName="lastName" />
-          @if(clientForm.get('partner.lastName')?.touched && clientForm.get('partner.lastName')?.hasError('required')) {
-            <span class="field-error d-block">{{ 'Required' | translate }}</span>
+          @if (
+            clientForm.get("partner.lastName")?.touched &&
+            clientForm.get("partner.lastName")?.hasError("required")
+          ) {
+            <span class="field-error d-block">{{
+              "Required" | translate
+            }}</span>
           }
         </div>
 
         <!-- Partner DOB -->
         <div class="form-field">
-          <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Date of birth' | translate }}</mat-label>
+          <mat-label
+            class="f-s-16 f-w-500 m-b-4 d-flex align-items-center ibr-black"
+            >{{ "Date of birth" | translate }}</mat-label
+          >
           <div class="position-relative">
             <input
               matInput
@@ -151,63 +298,120 @@
             <div class="date-picker-position">
               <mat-datepicker-toggle matIconSuffix [for]="partnerPicker">
                 <mat-icon matDatepickerToggleIcon>
-                  <img src="assets/images/svgs/datepicker-icon.svg" alt="datepicker-icon" />
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M15.8333 3.33301H4.16667C3.24619 3.33301 2.5 4.0792 2.5 4.99967V16.6663C2.5 17.5868 3.24619 18.333 4.16667 18.333H15.8333C16.7538 18.333 17.5 17.5868 17.5 16.6663V4.99967C17.5 4.0792 16.7538 3.33301 15.8333 3.33301Z"
+                      stroke="#2B3942"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                    <path
+                      d="M13.3335 1.66699V5.00033"
+                      stroke="#2B3942"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                    <path
+                      d="M6.6665 1.66699V5.00033"
+                      stroke="#2B3942"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                    <path
+                      d="M2.5 8.33301H17.5"
+                      stroke="#2B3942"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
                 </mat-icon>
               </mat-datepicker-toggle>
             </div>
             <mat-datepicker #partnerPicker></mat-datepicker>
           </div>
           <div class="d-flex flex-column gap-1 m-t-4">
-            @if(partnerAge !== null) {
-              <span class="f-s-12 f-w-500">Age: {{ partnerAge }}</span>
+            @if (partnerAge !== null) {
+              <span class="f-s-12 f-w-500" style="line-height: 14px"
+                >Age: {{ partnerAge }}</span
+              >
             }
           </div>
-          @if(clientForm.get('partner.dob')?.touched && clientForm.get('partner.dob')?.hasError('required')) {
-            <span class="field-error d-block">{{ 'Required' | translate }}</span>
+          @if (
+            clientForm.get("partner.dob")?.touched &&
+            clientForm.get("partner.dob")?.hasError("required")
+          ) {
+            <span class="field-error d-block">{{
+              "Required" | translate
+            }}</span>
           }
-          @if(clientForm.get('partner.dob')?.touched && partnerDobError) {
-            <span class="field-error d-block">{{ partnerDobError | translate }}</span>
+          @if (clientForm.get("partner.dob")?.touched && partnerDobError) {
+            <span class="field-error d-block">{{
+              partnerDobError | translate
+            }}</span>
           }
         </div>
 
         <!-- Partner email -->
         <div class="form-field">
-          <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Email' | translate }}</mat-label>
-          <input matInput placeholder="email@somedomain.com" formControlName="email" />
-          @if(clientForm.get('partner.email')?.hasError('email')) {
-            <mat-error>{{ 'Invalid Email Address' | translate }}</mat-error>
+          <mat-label
+            class="f-s-16 f-w-500 m-b-4 d-flex align-items-center ibr-black"
+            >{{ "Email" | translate }}</mat-label
+          >
+          <input
+            matInput
+            placeholder="email@somedomain.com"
+            formControlName="email"
+          />
+          @if (clientForm.get("partner.email")?.hasError("email")) {
+            <mat-error>{{ "Invalid Email Address" | translate }}</mat-error>
           }
-          @if(clientForm.get('partner.email')?.touched && clientForm.get('partner.email')?.hasError('required')) {
-            <span class="field-error d-block">{{ 'Required' | translate }}</span>
+          @if (
+            clientForm.get("partner.email")?.touched &&
+            clientForm.get("partner.email")?.hasError("required")
+          ) {
+            <span class="field-error d-block">{{
+              "Required" | translate
+            }}</span>
           }
         </div>
-
       </ng-container>
     }
 
     <!-- Notes -->
     <div class="form-field full-width">
-      <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Notes' | translate }}</mat-label>
+      <mat-label
+        class="f-s-16 f-w-500 m-b-4 d-flex align-items-center ibr-black"
+        >{{ "Notes" | translate }}</mat-label
+      >
       <textarea matInput formControlName="notes"></textarea>
     </div>
-
   </form>
 </mat-dialog-content>
 
-<mat-dialog-actions align="end">
-  <button mat-button mat-dialog-close>{{ 'Cancel' | translate }}</button>
+<mat-dialog-actions align="end" class="dialog-actions">
+  <!-- <button mat-button mat-dialog-close>{{ "Cancel" | translate }}</button> -->
   <button
-    class="button-icon m-r-5"
+    class="button-icon button-outline"
     [disabled]="isFormInvalid || isLoading"
     (click)="onAddNewClientClicked()"
   >
-    <span>{{ 'Add new client' | translate }}</span>
+    <span>{{ "Add new client" | translate }}</span>
   </button>
   <button
     class="button-icon"
     (click)="onSubmit()"
     [disabled]="isFormInvalid || isLoading"
   >
-    <span>{{ 'Add new client and start the plan' | translate }}</span>
+    <span>{{ "Add new client and start plan" | translate }}</span>
   </button>
 </mat-dialog-actions>

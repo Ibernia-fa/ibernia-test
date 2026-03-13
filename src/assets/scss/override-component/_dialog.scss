@@ -22,7 +22,7 @@
 .mat-mdc-dialog-surface {
   border-radius: 12px !important;
   box-shadow: none !important;
-  padding: 32px !important;
+  padding: 24px !important;
 }
 .cdk-overlay-pane.mat-mdc-dialog-panel {
   max-width: 100% !important;
@@ -39,8 +39,8 @@
       flex: 1;
     }
     .form-field input {
-       border: 1px solid #e7e7eb;
-       border-radius: 0px;
+      border: 1px solid #e7e7eb;
+      border-radius: 0px;
     }
     .left {
       .sortby-edit-profile {
@@ -56,9 +56,9 @@
       .sortby-edit-profile {
         min-width: 150px !important;
         border-radius: 0px 4px 4px 0px;
-        
-         border: 1px solid #e7e7eb;
-          border-left: none;
+
+        border: 1px solid #e7e7eb;
+        border-left: none;
         height: 46px;
         line-height: 29px;
       }

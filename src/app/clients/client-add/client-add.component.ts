@@ -26,7 +26,12 @@ import { Router } from '@angular/router';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialog, MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import {
+  MatDialog,
+  MatDialogModule,
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+} from '@angular/material/dialog';
 import { AddModelDialogComponent } from '../profile/add-model-dialog/add-model-dialog.component';
 import { allCountries } from '../models/country';
 import { CountryISO } from 'ngx-intl-tel-input';
@@ -172,7 +177,7 @@ export class ClientAddComponent {
 
           // keep phone ISO in sync
           const countryMatch = allCountries.find(
-            (c) => c.countryName === p.country
+            (c) => c.countryName === p.country,
           );
           if (countryMatch?.countryCode) {
             this.selectedClientCountryISO =
@@ -189,7 +194,7 @@ export class ClientAddComponent {
             allCountries.find(
               (c) =>
                 (c as any).currencyCode?.toUpperCase?.() ===
-                String(p.currency).toUpperCase()
+                String(p.currency).toUpperCase(),
             ) || allCountries.find((c) => c.currencySymbol === p.currency);
 
           const preferredSymbol = curMatch?.currencySymbol ?? p.currency;
@@ -204,10 +209,10 @@ export class ClientAddComponent {
 
   clientCountryValueChange(event: any) {
     const selectedCountry = allCountries.find(
-      (country) => country.countryName === event
+      (country) => country.countryName === event,
     );
     this.clientForm.controls['currency'].patchValue(
-      selectedCountry?.currencySymbol
+      selectedCountry?.currencySymbol,
     );
     this.selectedClientCountryISO =
       (selectedCountry?.countryCode.toLowerCase() ?? '') as CountryISO;
@@ -234,7 +239,7 @@ export class ClientAddComponent {
 
       if (clientCountryName) {
         const selectedCountry = allCountries.find(
-          (c) => c.countryName === clientCountryName
+          (c) => c.countryName === clientCountryName,
         );
         if (selectedCountry) {
           partnerGroup.patchValue(
@@ -242,7 +247,7 @@ export class ClientAddComponent {
               // Partner follows client country; use client's currency
               currency: clientCurrency ?? selectedCountry.currencySymbol,
             },
-            { emitEvent: false }
+            { emitEvent: false },
           );
 
           // keep partner phone dropdown in sync
@@ -253,13 +258,13 @@ export class ClientAddComponent {
         // no country set on client, but currency is—still copy the currency
         partnerGroup.patchValue(
           { currency: clientCurrency },
-          { emitEvent: false }
+          { emitEvent: false },
         );
       }
 
       // reflect validators
       Object.keys(partnerGroup.controls).forEach((key) =>
-        partnerGroup.get(key)?.updateValueAndValidity({ emitEvent: false })
+        partnerGroup.get(key)?.updateValueAndValidity({ emitEvent: false }),
       );
     } else {
       partnerGroup.reset();
@@ -368,7 +373,7 @@ export class ClientAddComponent {
           this.toastr.error('An error occured while saving client', 'Error!');
           this.isLoading = false;
           throw err;
-        })
+        }),
       )
       .subscribe();
   }
@@ -420,7 +425,7 @@ export class ClientAddComponent {
           this.toastr.error('An error occured while saving client', 'Error!');
           this.isLoading = false;
           throw err;
-        })
+        }),
       )
       .subscribe();
   }
@@ -517,7 +522,7 @@ export class ClientAddComponent {
       '[onPartnerDobInput] Initial input.value:',
       value,
       'cursorPos:',
-      cursorPos
+      cursorPos,
     );
 
     // If form control has a Date object, convert it to string format first
@@ -538,7 +543,7 @@ export class ClientAddComponent {
         '[onPartnerDobInput] Value changed, updating from:',
         input.value,
         'to:',
-        formatted
+        formatted,
       );
 
       // Calculate new cursor position based on digits before cursor
@@ -553,20 +558,20 @@ export class ClientAddComponent {
       input.value = formatted;
       console.log(
         '[onPartnerDobInput] input.value after setting:',
-        input.value
+        input.value,
       );
 
       // Restore cursor position
       setTimeout(() => {
         console.log(
           '[onPartnerDobInput] Setting cursor position to:',
-          newCursorPos
+          newCursorPos,
         );
         if (document.activeElement === input) {
           input.setSelectionRange(newCursorPos, newCursorPos);
           console.log(
             '[onPartnerDobInput] Cursor position set, input.value:',
-            input.value
+            input.value,
           );
         }
       }, 0);
@@ -602,12 +607,12 @@ export class ClientAddComponent {
     const control = partnerGroup.get('dob');
     console.log(
       '[onPartnerDobPaste] FormControl value before:',
-      control?.value
+      control?.value,
     );
     control?.setValue(formatted, { emitEvent: false });
     console.log(
       '[onPartnerDobPaste] FormControl value after setValue:',
-      control?.value
+      control?.value,
     );
 
     console.log('[onPartnerDobPaste] Setting input.value to:', formatted);
@@ -622,7 +627,7 @@ export class ClientAddComponent {
       if (input.value !== formatted) {
         console.log(
           '[onPartnerDobPaste] Value was changed, resetting to:',
-          formatted
+          formatted,
         );
         input.value = formatted;
         control?.setValue(formatted, { emitEvent: false });
@@ -630,14 +635,14 @@ export class ClientAddComponent {
       input.setSelectionRange(formatted.length, formatted.length);
       console.log(
         '[onPartnerDobPaste] Timeout 1 - Final input.value:',
-        input.value
+        input.value,
       );
     }, 0);
 
     setTimeout(() => {
       console.log(
         '[onPartnerDobPaste] Timeout 2 - Final check input.value:',
-        input.value
+        input.value,
       );
       this.isPastingPartner = false;
     }, 100);
@@ -654,7 +659,7 @@ export class ClientAddComponent {
       const normalized = normalizeToDMY(value);
       setTimeout(() => {
         const input = document.querySelector(
-          'input[formControlName="dob"]'
+          'input[formControlName="dob"]',
         ) as HTMLInputElement;
         if (input) {
           input.value = normalized;
@@ -672,7 +677,7 @@ export class ClientAddComponent {
       control?.setValue(parsed.date, { emitEvent: false });
       setTimeout(() => {
         const input = document.querySelector(
-          'input[formControlName="dob"]'
+          'input[formControlName="dob"]',
         ) as HTMLInputElement;
         if (input) {
           input.value = parsed.normalized;
@@ -700,7 +705,7 @@ export class ClientAddComponent {
       const normalized = normalizeToDMY(value);
       setTimeout(() => {
         const allInputs = document.querySelectorAll(
-          'input[formControlName="dob"]'
+          'input[formControlName="dob"]',
         );
         const partnerInput = Array.from(allInputs).find((el: any) => {
           const formGroup = el.closest('[formGroupName="partner"]');
@@ -722,7 +727,7 @@ export class ClientAddComponent {
       control?.setValue(parsed.date, { emitEvent: false });
       setTimeout(() => {
         const allInputs = document.querySelectorAll(
-          'input[formControlName="dob"]'
+          'input[formControlName="dob"]',
         );
         const partnerInput = Array.from(allInputs).find((el: any) => {
           const formGroup = el.closest('[formGroupName="partner"]');
@@ -802,7 +807,7 @@ export class ClientAddComponent {
     partnerGroup.get('dob')?.setValue(formatted, { emitEvent: false });
     setTimeout(() => {
       const allInputs = document.querySelectorAll(
-        'input[formControlName="dob"]'
+        'input[formControlName="dob"]',
       );
       const partnerInput = Array.from(allInputs).find((el: any) => {
         const formGroup = el.closest('[formGroupName="partner"]');
@@ -849,12 +854,12 @@ function pad2(n: number): string {
 
 function normalizeToDMY(date: Date): string {
   return `${pad2(date.getDate())}/${pad2(
-    date.getMonth() + 1
+    date.getMonth() + 1,
   )}/${date.getFullYear()}`;
 }
 
 function parseDMYFromDigits(
-  digits: string
+  digits: string,
 ):
   | { ok: true; date: Date; age: number; normalized: string }
   | { ok: false; error: string } {
@@ -880,8 +885,7 @@ function parseDMYFromDigits(
 
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  if (date > today)
-    return { ok: false, error: 'Date cannot be in the future' };
+  if (date > today) return { ok: false, error: 'Date cannot be in the future' };
 
   let age = today.getFullYear() - yyyy;
   const hadBirthdayThisYear =
@@ -906,7 +910,7 @@ function calculateAge(date: Date): number {
 }
 
 function dobValidator(
-  ctrl: FormControl<string | Date | null>
+  ctrl: FormControl<string | Date | null>,
 ): ValidationErrors | null {
   const raw = ctrl.value;
 
