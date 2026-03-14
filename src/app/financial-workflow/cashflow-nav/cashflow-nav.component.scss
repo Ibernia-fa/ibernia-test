@@ -64,22 +64,22 @@
   font-weight: 500;
 }
 
-// .ibr-nav-divider {
-//   // width: 1px;
-//   flex: 1 1 0;
-//   height: 1px;
-//   background: #0000001a;
-//   margin-left: 20px;
-//   margin-right: 20px;
-//   margin-top: -20px;
-//   align-self: center;
-// }
-
 .ibr-nav-divider {
-  position: absolute;
-  top: 24px;
-  width: 95%;
+  // width: 1px;
+  flex: 1 1 0;
   height: 1px;
-  background: #00000007;
-  z-index: -1;
+  background: #0000001a;
+  margin-left: 20px;
+  margin-right: 20px;
+  margin-top: -36px;
+  align-self: center;
 }
+
+// .ibr-nav-divider {
+//   position: absolute;
+//   top: 24px;
+//   width: 95%;
+//   height: 1px;
+//   background: #00000007;
+//   z-index: -1;
+// }
