@@ -10,6 +10,7 @@ permissions:
   contents: read
   pages: write
   id-token: write
+  actions: read
 
 jobs:
   build_push_deploy:
@@ -193,9 +194,14 @@ jobs:
   deploy_test_report:
     needs: build_push_deploy
     runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+      actions: read
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    continue-on-error: true
     steps:
       - name: Deploy Playwright report to GitHub Pages
         id: deployment
