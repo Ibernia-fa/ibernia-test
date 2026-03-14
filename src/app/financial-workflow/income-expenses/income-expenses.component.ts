@@ -17,7 +17,6 @@ import { SettingsHttpService } from '../settings/services/settings-http.service'
 import { FinancialViewModel, IncomeExpense } from './model/income-expense';
 import { Cycle, EscalationRate, FinancialTimeline } from '../timeline/models/financial-timeline';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { NavItemService } from 'src/app/layouts/full/nav-item.service';
 import { TimelineHttpService } from '../timeline/services/timeline-http.service';
 import moment from 'moment';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -89,18 +88,16 @@ export class IncomeExpensesComponent {
     private incomeExpensesHttpService: IncomeExpensesHttpService,
     private settingHttpService: SettingsHttpService,
     private timelineHttpService: TimelineHttpService,
-    private navItemService: NavItemService,
     private toastr: ToastrService,
     private savingsPotsHttpService: SavingsPotsHttpService,
     private withdrawalsContributionsHttpService: WithdrawalsContributionsHttpService
   ) {
-    this.navItemService.currentRouteName = 'Incomes & Expenses';
     this.getData();
   }
 
   getData() {
     this.isLoaderVisible = true;
-    this.activatedRoute.params
+    (this.activatedRoute.parent?.params ?? this.activatedRoute.params)
       .pipe(
         switchMap((params) =>
           this.financialWorkflowService.loadClientCashflowMetadata(params)

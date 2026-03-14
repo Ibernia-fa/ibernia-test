@@ -22,7 +22,6 @@ import {
   FinancialTimeline,
 } from '../timeline/models/financial-timeline';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { NavItemService } from 'src/app/layouts/full/nav-item.service';
 import { TimelineHttpService } from '../timeline/services/timeline-http.service';
 import moment from 'moment';
 import { SavingsPotsHttpService } from '../saving-pots/services/savings-pots-http.service';
@@ -89,16 +88,14 @@ export class WithdrawalsContributionsComponent {
     private incomeExpensesHttpService: IncomeExpensesHttpService,
     private settingHttpService: SettingsHttpService,
     private timelineHttpService: TimelineHttpService,
-    private navItemService: NavItemService,
     private toastr: ToastrService
   ) {
-    this.navItemService.currentRouteName = 'Contributions & Withdrawals';
     this.getData();
   }
 
   getData() {
     this.isLoaderVisible = true;
-    this.activatedRoute.params
+    (this.activatedRoute.parent?.params ?? this.activatedRoute.params)
       .pipe(
         switchMap((params) =>
           this.financialWorkflowService.loadClientCashflowMetadata(params)

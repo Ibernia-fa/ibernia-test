@@ -30,7 +30,6 @@ import { ActivatedRoute } from '@angular/router';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { FormsModule } from '@angular/forms';
 import { FinancialWorkflowService } from '../services/financial-workflow.service';
-import { NavItemService } from 'src/app/layouts/full/nav-item.service';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { CurrencySymbolPipe } from 'src/app/pipe/currency-symbol.pipe';
@@ -107,12 +106,10 @@ export class SavingPotsComponent implements OnInit {
     private settingHttpService: SettingsHttpService,
     private activatedRoute: ActivatedRoute,
     private financialWorkflowService: FinancialWorkflowService,
-    private navItemService: NavItemService,
     private Authservice: AuthService,
      private settingsService: SettingsService
   ) {
-    this.navItemService.currentRouteName = 'Saving Pots';
-        this.user = this.Authservice.getUserProfile();
+    this.user = this.Authservice.getUserProfile();
       this.settingsService.userData$
         .pipe(
           filter((v): v is NonNullable<typeof v> => v != null), // skip initial null
@@ -156,7 +153,7 @@ export class SavingPotsComponent implements OnInit {
 
   getData() {
     this.isLoaderVisible = true;
-    this.activatedRoute.params
+    (this.activatedRoute.parent?.params ?? this.activatedRoute.params)
       .pipe(
         switchMap((params) =>
           this.financialWorkflowService.loadClientCashflowMetadata(params)

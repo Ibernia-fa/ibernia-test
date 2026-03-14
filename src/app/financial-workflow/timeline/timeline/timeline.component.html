@@ -1,27 +1,4 @@
 <div class="d-flex gap-24 flex-column">
-    <mat-card class="cardWithShadow">
-        <mat-card-content>
-            <div class="d-flex flex-column gap-32 timeline-wrapper">
-                <div class="card-main-wrapper">
-                    <div class="d-flex align-items-center justify-content-between w-100 gap-16 flex-wrap">
-                        <div class="d-flex align-items-center gap-16">
-                            <div class="icon-wrapper d-flex align-items-center justify-content-center">
-                                <img width="24" src="assets/images/svgs/clock-icon-filled.svg" alt="clock" />
-                            </div>
-                            <div class="d-flex flex-column justify-content-between gap-4">
-                                <div class="d-flex align-items-center">
-                                    <h4 class="page-title f-w-500 m-r-4 f-s-30">{{ 'Goals & Events' | translate }}</h4>
-                                    <img width="22" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon"
-                                        class="m-t-4" matTooltip="{{ 'Use this section to add your client's key life events and financial goals. These events shape the cashflow forecast and can be linked to specific transactions such as incomes or expenses. Add new events to the timeline or move existing ones to adjust their timing.' | translate }} ">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </mat-card-content>
-    </mat-card>
-
     @if(!isLoaderVisible && financialTimeline && client) {
     <app-timeline-chart
         [financialTimeline]="financialTimeline"

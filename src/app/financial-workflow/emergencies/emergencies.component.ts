@@ -193,26 +193,32 @@ export class EmergenciesComponent implements OnInit {
       .subscribe();
   }
 
+  private getParamsFromRoute(): { cashflowId: string; clientId?: string } {
+    let r: ActivatedRoute | null = this.activatedRoute;
+    let cashflowId: string | null = null;
+    let clientId: string | undefined;
+    while (r) {
+      if (!cashflowId) cashflowId = r.snapshot.paramMap.get('id') || r.snapshot.paramMap.get('cashflowId');
+      if (!clientId) clientId = r.snapshot.paramMap.get('clientId') || undefined;
+      if (cashflowId) break;
+      r = r.parent;
+    }
+    if (!cashflowId) throw new Error('cashflowId not found in route.');
+    return { cashflowId, clientId };
+  }
+
   private load(): void {
     this.isLoading = true;
     this.errorMessage = '';
 
-    this.route.paramMap
+    const { cashflowId, clientId } = this.getParamsFromRoute();
+    this.cashflowId = cashflowId;
+    this.clientId = clientId;
+
+    of(cashflowId)
       .pipe(
-        map(pm => {
-          const cf = pm.get('cashflowId') || pm.get('id');
-          const cl = pm.get('clientId') || undefined;
-
-          if (!cf)
-            throw new Error('cashflowId not found in route.');
-
-          this.cashflowId = cf;
-          this.clientId = cl;
-
-          return cf;
-        }),
-        switchMap(cashflowId =>
-          this.emergenciesHttp.getAllByCashflowId(cashflowId).pipe(
+        switchMap((cfId: string) =>
+          this.emergenciesHttp.getAllByCashflowId(cfId).pipe(
             catchError((err: HttpErrorResponse) => {
               this.errorMessage =
                 err?.error?.message || 'Failed to load emergencies';
@@ -520,7 +526,7 @@ export class EmergenciesComponent implements OnInit {
   }
 
   getSimulateData() {
-    this.activatedRoute.params
+    (this.activatedRoute.parent?.params ?? this.activatedRoute.params)
       .pipe(
         switchMap((params) =>
           runInInjectionContext(this.envInjector, () =>

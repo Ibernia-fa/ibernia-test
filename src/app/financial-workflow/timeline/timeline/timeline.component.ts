@@ -12,7 +12,6 @@ import { BehaviorSubject, combineLatestWith, concatMap, filter, map, Observable,
 import { FinancialTimeline, TimelineResponse, FinancialRecordLineItem } from '../models/financial-timeline';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TimelineChartComponent } from '../timeline-chart/timeline-chart.component';
-import { NavItemService } from 'src/app/layouts/full/nav-item.service';
 import { MatSelectModule } from '@angular/material/select';
 import moment from 'moment';
 import { DialogComponent } from 'src/app/dialog/dialog.component';
@@ -29,7 +28,6 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { Cashflow } from 'src/app/clients/models/cashflow';
 import { FinancialWorkflowService } from '../../services/financial-workflow.service';
 import { TranslateModule } from '@ngx-translate/core';
-
 @Component({
   selector: 'app-timeline',
   imports: [
@@ -70,11 +68,9 @@ export class TimelineComponent implements OnDestroy {
     private timelineHttpService: TimelineHttpService,
     private activatedRoute: ActivatedRoute,
     private dialog: MatDialog,
-    private navItemService: NavItemService,
     private store: Store
   ) {
     this.destroyed$ = new BehaviorSubject<boolean>(false);
-    this.navItemService.currentRouteName = 'Goals & Events';
     this.getTimeline();
   }
 
@@ -85,7 +81,7 @@ export class TimelineComponent implements OnDestroy {
   getTimeline() {
     this.isLoaderVisible = true;
 
-    this.activatedRoute.params
+    (this.activatedRoute.parent?.params ?? this.activatedRoute.params)
       .pipe(
         switchMap((params) => {
           this.cashflowId = params['id'];

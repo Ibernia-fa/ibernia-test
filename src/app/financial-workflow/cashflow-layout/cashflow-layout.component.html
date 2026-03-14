@@ -1,0 +1,10 @@
+<div class="d-flex gap-24 flex-column">
+  @if (showNav) {
+    <mat-card class="cardWithShadow">
+      <mat-card-content>
+        <app-cashflow-nav></app-cashflow-nav>
+      </mat-card-content>
+    </mat-card>
+  }
+  <router-outlet></router-outlet>
+</div>
