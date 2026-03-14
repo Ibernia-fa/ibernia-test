@@ -138,9 +138,9 @@ tr.example-detail-row {
     border-radius: 12px;
     overflow: hidden;
     position: relative;
-    @media (max-width: 768px) {
-      max-width: 100%;
-    }
+    // @media (max-width: 768px) {
+    //   max-width: 100%;
+    // }
   }
   input {
     display: block;

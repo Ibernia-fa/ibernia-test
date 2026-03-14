@@ -113,8 +113,8 @@ export class ProfileComponent {
 
   onEditClicked() {
     const dialogRef = this.dialog.open(ClientEditComponent, {
-      width: '860px',
-      maxHeight: '85vh',
+      width: '612px',
+      maxHeight: '90vh',
       disableClose: true,
       data: { clientId: this.clientId },
     });
