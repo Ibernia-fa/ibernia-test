@@ -929,3 +929,13 @@ body:has(.global-fullscreen-overlay) {
 .dialog-close-btn .mat-mdc-focus-indicator {
   display: none;
 }
+
+.mat-drawer.mat-drawer-end {
+  display: none;
+}
+
+.ibr-new-dashboad-card.mat-mdc-card {
+  background-color: #ffffffb2 !important;
+  -webkit-backdrop-filter: blur(75px);
+  backdrop-filter: blur(75px);
+}

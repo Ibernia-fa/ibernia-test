@@ -37,9 +37,10 @@
           class="breadcrumb-link d-flex align-items-center text-decoration-none"
           matTooltip="Home"
         >
-          <i-tabler name="home" class="breadcrumb-home-icon"></i-tabler>
+          <!-- <i-tabler name="home" class="breadcrumb-home-icon"></i-tabler> -->
+          Home
         </a>
-        <span class="breadcrumb-chevron" aria-hidden="true">&gt;</span>
+        <span class="breadcrumb-chevron" aria-hidden="true">></span>
         <a
           [routerLink]="clientProfileLink"
           class="breadcrumb-link d-flex align-items-center text-decoration-none"
@@ -47,8 +48,12 @@
         >
           {{ clientFullName }}
         </a>
-        <span class="breadcrumb-chevron" aria-hidden="true">&gt;</span>
-        <span class="breadcrumb-current f-w-600">{{ planName || "Plan" }}</span>
+        <span
+          class="breadcrumb-chevron breadcrumb-current f-w-500"
+          aria-hidden="true"
+          >></span
+        >
+        <span class="breadcrumb-current f-w-500">{{ planName || "Plan" }}</span>
       </nav>
     </ng-container>
 
@@ -258,7 +263,9 @@
                 alt="profile"
               />
             } @else {
-              <div class="avatar-initials rounded-circle icon-34 d-flex align-items-center justify-content-center">
+              <div
+                class="avatar-initials rounded-circle icon-34 d-flex align-items-center justify-content-center"
+              >
                 {{ userInitials }}
               </div>
             }

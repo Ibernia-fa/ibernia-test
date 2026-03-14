@@ -139,7 +139,7 @@ html .topbar {
     margin: 0;
   }
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 50%;
     left: 50%;
@@ -261,15 +261,15 @@ html .topbar {
 
 // Header margin and width when sidebar is visible - keeps bell/avatar within viewport
 .sidebar-visible .top-navigation-bar {
-  margin-left: 295px;
-  width: calc(100% - 295px);
+  margin-left: 273px;
+  width: calc(100% - 273px);
   transition:
     margin-left 0.3s ease,
     width 0.3s ease;
 }
 .sidebar-visible.sidebar-collapsed .top-navigation-bar {
-  margin-left: 80px;
-  width: calc(100% - 80px);
+  margin-left: 96px;
+  width: calc(100% - 96px);
 }
 
 // Header breadcrumb (Home icon > Client name > Plan name)
@@ -279,8 +279,8 @@ html .topbar {
   top: 50%;
   transform: translateY(-50%);
   margin: 0;
-  gap: 8px;
-  font-size: 14px;
+  gap: 4px;
+  font-size: 16px;
   font-weight: 400;
   color: #787889;
   transition: left 0.3s ease;
@@ -295,17 +295,17 @@ html .topbar {
   }
 
   .breadcrumb-link {
-    color: #787889;
+    color: #48475d;
     &:hover {
       color: #4043af;
     }
   }
 
   .breadcrumb-chevron {
-    color: #4043af;
+    color: #48475d;
     user-select: none;
     margin: 0 2px;
-    font-weight: 900;
+    font-weight: 400;
   }
 
   .breadcrumb-current {
