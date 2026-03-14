@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - feature/iteration-4
+      - "#IDEV-Testing-Branch"
   workflow_dispatch:
 
 permissions:
