@@ -8,9 +8,6 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
-  actions: read
 
 jobs:
   build_push_deploy:
@@ -185,12 +182,6 @@ jobs:
           path: playwright-report
         continue-on-error: true
 
-      - name: Upload Playwright report for GitHub Pages
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: playwright-report
-        continue-on-error: true
-
       - name: Upload Playwright report to app server
         if: always()
         uses: appleboy/scp-action@v0.1.7
@@ -204,19 +195,3 @@ jobs:
           source: "playwright-report/*"
           target: ${{ env.REPORT_ENV == 'prod' && '/opt/ibernia/prod/playwright-report' || '/opt/ibernia/dev/playwright-report' }}
           overwrite: true
-
-  deploy_test_report:
-    needs: build_push_deploy
-    runs-on: ubuntu-latest
-    permissions:
-      pages: write
-      id-token: write
-      actions: read
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    continue-on-error: true
-    steps:
-      - name: Deploy Playwright report to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
