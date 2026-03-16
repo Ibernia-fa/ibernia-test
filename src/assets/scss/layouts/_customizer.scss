@@ -451,6 +451,16 @@ html .customizerNav {
   padding: 0 4px 0 0 !important;
 }
 
+/* Image crop dialog - hide scrollbars on X and Y axes */
+.image-crop-dialog,
+.image-crop-dialog .mat-mdc-dialog-container,
+.image-crop-dialog .mat-mdc-dialog-surface,
+.image-crop-dialog .mat-mdc-dialog-content,
+.image-crop-dialog .image-crop-dialog-content {
+  overflow-x: hidden !important;
+  overflow-y: hidden !important;
+}
+
 // Input Telephone Styles
 
 .tel-input-custom {
