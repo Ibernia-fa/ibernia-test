@@ -17,6 +17,7 @@ import {
   getImageDimensions,
   resizeImageToMin,
   compressImage,
+  compressForProfilePayload,
   BACKGROUND_MIN_WIDTH,
   BACKGROUND_MIN_HEIGHT,
 } from 'src/app/shared/utils/image-upload.utils';
@@ -137,7 +138,7 @@ export class BrandingComponent implements OnInit {
     dialogRef.afterClosed().subscribe(async (result: string | null) => {
       if (result) {
         try {
-          this.profileImage = await compressImage(result);
+          this.profileImage = await compressForProfilePayload(result);
           this.updateHasChanges();
         } catch {
           this.profileImage = result;

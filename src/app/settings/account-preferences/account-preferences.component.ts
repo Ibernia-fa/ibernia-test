@@ -28,6 +28,7 @@ import {
   isWithinSizeLimit,
   fileToDataUrl,
   compressImage,
+  compressForProfilePayload,
 } from 'src/app/shared/utils/image-upload.utils';
 
 @Component({
@@ -325,7 +326,7 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
     dialogRef.afterClosed().subscribe(async (result: string | null) => {
       if (result) {
         try {
-          const compressed = await compressImage(result);
+          const compressed = await compressForProfilePayload(result);
           this.profileImagePreview = compressed;
           this.form.get('profilePhotoUrl')?.setValue(compressed);
         } catch {

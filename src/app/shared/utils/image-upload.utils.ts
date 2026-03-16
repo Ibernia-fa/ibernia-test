@@ -82,18 +82,20 @@ export function resizeImageToMin(
   });
 }
 
-/** Compress image: max dimension 1200px, JPEG quality 0.85 */
+/**
+ * Max base64 size for profile/logo payloads to avoid 413 from reverse proxies.
+ * ~800KB base64 ≈ 600KB raw; keeps total JSON under typical 1MB proxy limits.
+ */
+export const MAX_BASE64_PAYLOAD_BYTES = 800 * 1024;
+
+/** Compress image: max dimension 1200px, JPEG quality 0.85. Always outputs JPEG to avoid large PNG payloads. */
 export function compressImage(dataUrl: string, maxDimension = 1200, quality = 0.85): Promise<string> {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.onload = () => {
       let w = img.width;
       let h = img.height;
-      if (w <= maxDimension && h <= maxDimension) {
-        resolve(dataUrl);
-        return;
-      }
-      const scale = maxDimension / Math.max(w, h);
+      const scale = w <= maxDimension && h <= maxDimension ? 1 : maxDimension / Math.max(w, h);
       w = Math.round(w * scale);
       h = Math.round(h * scale);
       const canvas = document.createElement('canvas');
@@ -110,4 +112,13 @@ export function compressImage(dataUrl: string, maxDimension = 1200, quality = 0.
     img.onerror = () => reject(new Error('Failed to load image'));
     img.src = dataUrl;
   });
+}
+
+/** Compress profile/logo image to stay under proxy body limits. Uses smaller dimensions and enforces max size. */
+export async function compressForProfilePayload(dataUrl: string): Promise<string> {
+  let result = await compressImage(dataUrl, 600, 0.8);
+  if (result.length <= MAX_BASE64_PAYLOAD_BYTES) return result;
+  result = await compressImage(dataUrl, 400, 0.7);
+  if (result.length <= MAX_BASE64_PAYLOAD_BYTES) return result;
+  return compressImage(dataUrl, 300, 0.6);
 }

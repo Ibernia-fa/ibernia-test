@@ -49,7 +49,7 @@ export interface ImageCropDialogData {
           [cropperStaticWidth]="data.cropType === 'company' ? 400 : 300"
           [cropperStaticHeight]="data.cropType === 'company' ? 300 : 300"
           [transform]="transform"
-          format="png"
+          format="jpeg"
           output="base64"
           [resizeToWidth]="0"
           (imageCropped)="onImageCropped($event)"
