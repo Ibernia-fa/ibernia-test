@@ -1,25 +1,41 @@
 .mortgage-calculator {
-  border: 1px solid #e0e4f0;
-  border-radius: 8px;
-  background: #f8f9fc;
+  border: 1px solid #0000001a;
+  border-radius: 4px;
+  background: white;
   padding: 16px;
 }
 
 .calculator-header {
-  margin-bottom: 16px;
+  // margin-bottom: 16px;
 
   h4 {
     margin: 0;
-    color: #333;
+    font-size: 18px;
+    line-height: 24px;
+    color: #1c1c1c;
+  }
+}
+.close-mortgage-calculator {
+  padding: 0;
+  height: auto;
+  margin: 0;
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  &:hover {
+    opacity: 0.75;
   }
 }
 
 .calculator-body {
   .calc-label {
-    font-size: 13px;
-    font-weight: 500;
-    color: #555;
-    display: block;
+    // font-size: 13px;
+    // font-weight: 500;
+    color: #1c1c1c;
+    // display: block;
 
     .calc-hint {
       font-weight: 400;
@@ -32,21 +48,23 @@
 .calc-input-row {
   display: flex;
   align-items: center;
-  border: 1px solid rgba(0, 0, 0, 0.23);
+  // border: 1px solid rgba(0, 0, 0, 0.23);
+  background-color: #f5f5f5;
   border-radius: 4px;
   background: #fff;
   overflow: hidden;
-  height: 40px;
+  height: 46px;
 
   .calc-currency {
-    padding: 0 10px;
+    padding: 0 12px;
     font-size: 14px;
-    color: #555;
-    border-right: 1px solid rgba(0, 0, 0, 0.12);
+    color: #48475d;
+    font-weight: 500;
+    border-right: 1px solid #0000001a;
     display: flex;
     align-items: center;
     height: 100%;
-    background: #fafafa;
+    background: #f5f5f5;
     min-width: 40px;
     justify-content: center;
   }
@@ -58,8 +76,10 @@
     padding: 8px 12px;
     font-size: 14px;
     height: 100%;
-    background: transparent;
+    background: #f5f5f5;
     min-width: 0;
+    color: #787889;
+    font-family: "Ubuntu", serif;
 
     &::-webkit-inner-spin-button,
     &::-webkit-outer-spin-button {
@@ -73,7 +93,8 @@
   .calc-suffix {
     padding: 0 10px;
     font-size: 14px;
-    color: #888;
+    background-color: #f5f5f5;
+    // color: #f5f5f5;
     display: flex;
     align-items: center;
     height: 100%;
@@ -87,7 +108,7 @@
   padding: 0 8px;
   border-left: 1px solid rgba(0, 0, 0, 0.12);
   height: 100%;
-  background: #fafafa;
+  background: #f5f5f5;
   flex-shrink: 0;
 
   .dp-radio {
@@ -95,29 +116,32 @@
     align-items: center;
     gap: 4px;
     cursor: pointer;
-    font-size: 13px;
-    color: #666;
+    font-size: 14px;
+    font-weight: 500;
+    color: #48475d;
     white-space: nowrap;
     user-select: none;
 
     .dp-radio-circle {
-      width: 14px;
-      height: 14px;
+      width: 16px;
+      height: 16px;
       border-radius: 50%;
-      border: 2px solid #bbb;
+      border: 2px solid #48475d;
       box-sizing: border-box;
-      transition: border-color 0.15s, background 0.15s;
+      transition:
+        border-color 0.15s,
+        background 0.15s;
       position: relative;
       flex-shrink: 0;
     }
 
     &.active {
-      color: #516ce8;
+      color: #4043af;
       font-weight: 500;
 
       .dp-radio-circle {
-        border-color: #516ce8;
-        background: #516ce8;
+        border-color: #4043af;
+        background: #4043af;
         box-shadow: inset 0 0 0 2px #fff;
       }
     }
@@ -142,15 +166,18 @@
 
 .select-option {
   ::ng-deep .mat-mdc-select-trigger {
-    border: 1px solid rgba(0, 0, 0, 0.23);
+    // border: 1px solid rgba(0, 0, 0, 0.23);
     border-radius: 4px;
     padding: 8px 12px;
-    min-height: 40px;
+    min-height: 46px;
     box-sizing: border-box;
     width: 100%;
     display: flex;
     align-items: center;
-    background: #fff;
+    background: #f5f5f5;
+    .mat-mdc-select-arrow {
+      display: none;
+    }
   }
 
   ::ng-deep .mat-mdc-select {
@@ -162,11 +189,15 @@
   width: 100%;
   padding: 10px 16px;
   border-radius: 4px;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 500;
   cursor: pointer;
   border: none;
+  min-height: 46px;
+  font-weight: 700;
   transition: background-color 0.2s;
+  font-family: "Ubuntu", serif;
+  transition: opacity 0.3s linear;
 
   span {
     text-transform: none !important;
@@ -174,67 +205,69 @@
 
   &.calc-btn-secondary {
     background: #fff;
-    border: 1px solid #516ce8;
-    color: #516ce8;
+    border: 1px solid #4043af;
+    color: #4043af;
 
     &:hover {
-      background: #f0f2ff;
+      background: #4043af;
+      color: #ffffff;
     }
   }
 
   &.calc-btn-primary {
-    background: #516ce8;
+    background: #4043af;
     color: #fff;
-    margin-top: 8px;
 
     &:hover {
-      background: #3f57c9;
+      opacity: 0.9;
+      transition: opacity 0.3s linear;
     }
   }
-
 }
 
 .calc-results {
-  background: #fff;
-  border: 1px solid #e0e4f0;
-  border-radius: 6px;
-  padding: 14px;
+  background: #f5f5f5;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding: 16px;
   animation: fadeIn 0.3s ease;
 }
 
 .calc-result-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-bottom: 4px;
+  gap: 18px 12px;
+  // margin-bottom: 4px;
 }
 
 .calc-result-item {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 6px;
 
   &:first-child {
     grid-column: 1 / -1;
-    padding-bottom: 8px;
-    border-bottom: 1px solid #eef0f6;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #0000001a;
     margin-bottom: 4px;
   }
 
   .calc-result-label {
-    font-size: 12px;
-    color: #888;
+    font-size: 14px;
+    color: #787889;
     font-weight: 400;
+    line-height: 16px;
   }
 
   .calc-result-value {
     font-size: 14px;
-    color: #333;
-    font-weight: 600;
+    color: #1c1c1c;
+    font-weight: 500;
+    line-height: 16px;
 
     &.primary {
       font-size: 22px;
-      color: #516ce8;
+      color: #4043af;
       font-weight: 700;
     }
   }
@@ -252,10 +285,9 @@
 }
 
 .calc-disclaimer {
-  font-size: 11px;
-  color: #999;
-  font-style: italic;
-  line-height: 1.4;
+  font-size: 12px;
+  color: #787889;
+  line-height: 14px;
 }
 
 @keyframes fadeIn {
@@ -267,4 +299,41 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+.custom-arrow {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: #787889;
+}
+
+.apply-btn-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.back-btn {
+  min-width: 46px;
+  height: 46px;
+  border-radius: 6px;
+  border: 1px solid #4043af;
+  background: #fff;
+  color: #4043af;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease;
+}
+
+.back-btn:hover {
+  background-color: #4043af;
+  color: #fff;
 }
