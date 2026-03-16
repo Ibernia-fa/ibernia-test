@@ -29,7 +29,7 @@ jobs:
         run: npx playwright install --with-deps
 
       - name: Run Playwright login tests
-        run: BASE_URL=https://test-dev.ibernia.it/ npm run test:e2e:login
+        run: npm run test:e2e:login
 
       - name: Upload Playwright login report
         if: always()
@@ -171,7 +171,7 @@ jobs:
         run: npx playwright install --with-deps
 
       - name: Run Playwright E2E tests (post-deploy)
-        run: BASE_URL=https://test-dev.ibernia.it/ npm run test:e2e:ci
+        run: npm run test:e2e:ci
         continue-on-error: true
 
       - name: Upload Playwright report as artifact
@@ -186,76 +186,11 @@ jobs:
         uses: appleboy/scp-action@v0.1.7
         env:
           REPORT_ENV: ${{ steps.vars.outputs.env }}
-          REPORT_VERSION_TAG: ${{ steps.vars.outputs.version_tag }}
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: ${{ secrets.SERVER_PORT || 22 }}
           source: "playwright-report/*"
-          target: /opt/ibernia/${{ env.REPORT_ENV }}/playwright-report/${{ env.REPORT_VERSION_TAG }}
+          target: ${{ env.REPORT_ENV == 'prod' && '/opt/ibernia/prod/playwright-report' || '/opt/ibernia/dev/playwright-report' }}
           overwrite: true
-
-      - name: Update Playwright report index on server
-        if: always()
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          port: ${{ secrets.SERVER_PORT || 22 }}
-          script: |
-            set -euo pipefail
-            ENV="${{ steps.vars.outputs.env }}"
-            VERSION="${{ steps.vars.outputs.version }}"
-            VERSION_TAG="${{ steps.vars.outputs.version_tag }}"
-
-            INDEX_DIR="/opt/ibernia/${ENV}/playwright-index"
-            INDEX_FILE="${INDEX_DIR}/index.json"
-            REPORT_PATH="/playwright-report/${VERSION_TAG}/"
-
-            sudo mkdir -p "${INDEX_DIR}"
-
-            tmp="$(mktemp)"
-            if [ -f "${INDEX_FILE}" ]; then
-              sudo cat "${INDEX_FILE}" > "${tmp}"
-            else
-              echo "[]" > "${tmp}"
-            fi
-
-            # Append or replace entry for this VERSION_TAG
-            node - <<'NODE' "${tmp}" "${INDEX_FILE}" "${ENV}" "${VERSION}" "${VERSION_TAG}" "${REPORT_PATH}"
-            const [tmpPath, indexPath, env, version, versionTag, reportPath] = process.argv.slice(2);
-            const fs = require('fs');
-
-            let data = [];
-            try {
-              data = JSON.parse(fs.readFileSync(tmpPath, 'utf8'));
-              if (!Array.isArray(data)) data = [];
-            } catch {
-              data = [];
-            }
-
-            const now = new Date().toISOString();
-            const entry = {
-              environment: env,
-              version,
-              versionTag,
-              deployedAt: now,
-              reportUrl: reportPath,
-            };
-
-            const existingIndex = data.findIndex((d) => d.versionTag === versionTag);
-            if (existingIndex >= 0) {
-              data[existingIndex] = entry;
-            } else {
-              data.push(entry);
-            }
-
-            fs.writeFileSync(indexPath, JSON.stringify(data, null, 2));
-            NODE
-
-            # Ensure index HTML is present alongside index.json
-            if [ ! -f "${INDEX_DIR}/index.html" ]; then
-              sudo cp /opt/ibernia/${ENV}/playwright-report-index.html "${INDEX_DIR}/index.html" || true
-            fi
