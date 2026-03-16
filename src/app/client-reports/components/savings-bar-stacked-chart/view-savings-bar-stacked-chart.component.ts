@@ -412,7 +412,6 @@ export class ViewSavingsBarStackedChartComponent implements OnChanges, OnDestroy
       return '';
     }
 
-    const birthYear = birthDate.getFullYear();
     // First year: age at forecast start (e.g. 45 if projection starts before they turn 46).
     if (
       firstCategoryYear != null &&
@@ -421,12 +420,8 @@ export class ViewSavingsBarStackedChartComponent implements OnChanges, OnDestroy
     ) {
       return this.calculateAgeAtDate(this.forecastStartDate, birthDate);
     }
-    // Last year: age they turn (projection end age, e.g. 78).
-    if (lastCategoryYear != null && year === lastCategoryYear) {
-      return year - birthYear;
-    }
-    // Other years: age at start of year (matches timeline events, e.g. Age 64 Year 2045).
-    return year - birthYear - 1;
+    // Age at start of year (Jan 1) to match timeline chart convention
+    return this.calculateAgeAtDate(new Date(year, 0, 1), birthDate);
   }
 
   private calculateAgeAtDate(referenceDate: Date, birthDate: Date): number {

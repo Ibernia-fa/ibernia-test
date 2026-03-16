@@ -1,0 +1,124 @@
+<div class="questionnaire-responses-dialog">
+  <!-- Header -->
+  <div class="dialog-header">
+    <h2 class="dialog-title">{{ "Questionnaire responses" | translate }}</h2>
+    <div class="header-actions">
+      <button
+        type="button"
+        class="btn-new"
+        (click)="onNewClicked()"
+      >
+        <span>{{ "New" | translate }}</span>
+        <img
+          class="btn-icon"
+          src="assets/images/svgs/add-icon-blue.svg"
+          alt="add"
+        />
+      </button>
+      <div class="completion-badge">
+        <svg width="16" height="16" viewBox="0 0 48 48" fill="none">
+          <circle cx="24" cy="24" r="24" fill="#22c55e" />
+          <path
+            d="M15 25l6 6 12-12"
+            stroke="#fff"
+            stroke-width="4"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+        <span class="badge-text">
+          {{ "Completed on" | translate }}
+          {{ questionnaireResponses.submittedAt | date: "mediumDate" }}
+        </span>
+      </div>
+      <button
+        mat-icon-button
+        class="btn-close"
+        (click)="closeDialog()"
+        aria-label="Close"
+      >
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="dialog-content">
+    @for (section of ['Personal', 'Finance', 'Current satisfaction', 'Goals', 'Protection priorities']; track section) {
+      @let items = getSectionResponses(section);
+      @if (items.length > 0) {
+        <div class="section">
+          <h3 class="section-heading">{{ section }}</h3>
+          <div class="section-content">
+            @if (section === 'Personal') {
+              @for (item of items; track item.questionId) {
+                @for (chip of getResponseChips(item); track chip) {
+                  <div class="personal-item">
+                    <span class="item-icon person-icon">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 12C14.2091 12 16 10.2091 16 8C16 5.79086 14.2091 4 12 4C9.79086 4 8 5.79086 8 8C8 10.2091 9.79086 12 12 12Z" stroke="#1976d2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M20 21C20 16.5817 16.4183 13 12 13C7.58172 13 4 16.5817 4 21" stroke="#1976d2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </span>
+                    <span class="item-text">{{ chip }}</span>
+                  </div>
+                }
+              }
+            } @else if (section === 'Finance') {
+              @for (item of items; track item.questionId) {
+                <div class="finance-item">
+                  <span class="item-icon finance-icon">
+                    @if (item.type === 'InvestableAssets') {
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2V22M17 5H9.5C8.11929 5 7 6.11929 7 7.5C7 8.88071 8.11929 10 9.5 10H14.5C15.8807 10 17 11.1193 17 12.5C17 13.8807 15.8807 15 14.5 15H7" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    } @else {
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="3" stroke="#f59e0b" stroke-width="2"/>
+                        <path d="M12 1V4M12 20V23M4.22 4.22L6.34 6.34M17.66 17.66L19.78 19.78M1 12H4M20 12H23M4.22 19.78L6.34 17.66M17.66 6.34L19.78 4.22" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/>
+                      </svg>
+                    }
+                  </span>
+                  <span class="item-text">
+                    {{ getFinanceLabel(item.type) | lowercase }}:
+                    {{ item.type === "InvestableAssets" ? formatAssetChip(getResponseChips(item)[0] || '') : (getResponseChips(item)[0] || '-') }}
+                  </span>
+                </div>
+              }
+            } @else if (section === 'Current satisfaction') {
+              @for (item of items; track item.questionId) {
+                <div class="satisfaction-item">
+                  <span class="item-icon satisfaction-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="12" cy="12" r="10" stroke="#eab308" stroke-width="2"/>
+                      <path d="M8 14C8.5 11.5 10 10 12 10C14 10 15.5 11.5 16 14" stroke="#eab308" stroke-width="2" stroke-linecap="round"/>
+                      <path d="M9 9H9.01M15 9H15.01" stroke="#eab308" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                  </span>
+                  <span class="item-text">{{ formatResponseValue(item) }}</span>
+                </div>
+              }
+            } @else if (section === 'Goals' || section === 'Protection priorities') {
+              <div class="chips-row">
+                @for (item of items; track item.questionId) {
+                  @for (chip of getResponseChipsWithIcons(item); track chip.value) {
+                    <span class="chip chip-with-icon">
+                      @if (chip.iconUrl) {
+                        <img
+                          [src]="'assets/images/questionnaire/' + chip.iconUrl + '.svg'"
+                          [alt]="chip.value"
+                          class="chip-icon"
+                        />
+                      }
+                      {{ chip.value }}
+                    </span>
+                  }
+                }
+              </div>
+            }
+          </div>
+        </div>
+      }
+    }
+  </div>
+</div>

@@ -141,7 +141,7 @@
                   (click)="onQuestionnaireClicked()"
                 >
                   <span>{{ "Questionnaire" | translate }}</span>
-                  @if (!questionnaireResponses || showResponsesCard) {
+                  @if (!questionnaireResponses) {
                     <svg
                       width="14"
                       height="14"
@@ -156,7 +156,7 @@
                     </svg>
                   }
                 </button>
-                @if (questionnaireResponses && !showResponsesCard) {
+                @if (questionnaireResponses) {
                   <div class="questionnaire-date-badge">
                     <svg width="16" height="16" viewBox="0 0 48 48" fill="none">
                       <circle cx="24" cy="24" r="24" fill="#22c55e" />
@@ -407,7 +407,7 @@
                       (click)="onQuestionnaireClicked()"
                     >
                       <span>{{ "Questionnaire" | translate }}</span>
-                      @if (!questionnaireResponses || showResponsesCard) {
+                      @if (!questionnaireResponses) {
                         <img
                           class="questionnaire-icon"
                           src="assets/images/svgs/add-icon-blue.svg"
@@ -415,7 +415,7 @@
                         />
                       }
                     </button>
-                    @if (questionnaireResponses && !showResponsesCard) {
+                    @if (questionnaireResponses) {
                       <div class="questionnaire-date-badge">
                         <svg
                           width="16"
@@ -447,89 +447,6 @@
                     <span>{{ "Create plan" | translate }}</span>
                     <img src="assets/images/svgs/add-icon.svg" alt="add-icon" />
                   </button>
-                </div>
-              </div>
-            </div>
-          </mat-card-content>
-        </mat-card>
-      }
-
-      @if (questionnaireResponses && showResponsesCard) {
-        <mat-card class="questionnaire-responses-card">
-          <mat-card-content>
-            <div class="profile-main-wrapper">
-              <div class="d-flex flex-column gap-16">
-                <div class="d-flex align-items-center justify-content-between">
-                  <h3 class="card-title">
-                    {{ "Questionnaire responses" | translate }}
-                  </h3>
-                  <div class="d-flex align-items-center gap-12">
-                    <button
-                      type="button"
-                      class="button-icon-outline btn-sm"
-                      (click)="onQuestionnaireClicked()"
-                    >
-                      <span>{{ "New" | translate }}</span>
-                      <img
-                        class="questionnaire-icon"
-                        src="assets/images/svgs/add-icon-blue.svg"
-                        alt="add-icon"
-                      />
-                    </button>
-                    <div class="questionnaire-date-badge">
-                      <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 48 48"
-                        fill="none"
-                      >
-                        <circle cx="24" cy="24" r="24" fill="#22c55e" />
-                        <path
-                          d="M15 25l6 6 12-12"
-                          stroke="#fff"
-                          stroke-width="4"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        />
-                      </svg>
-                      <span class="date-bold"
-                        >Completed on
-                        {{
-                          questionnaireResponses.submittedAt
-                            | date: "mediumDate"
-                        }}</span
-                      >
-                    </div>
-                    <button
-                      type="button"
-                      class="btn-hide-responses"
-                      (click)="dismissResponses()"
-                    >
-                      {{ "Hide" | translate }}
-                    </button>
-                  </div>
-                </div>
-                <div class="responses-container">
-                  @for (
-                    item of questionnaireResponses.responses;
-                    track item.questionId
-                  ) {
-                    <div class="response-item">
-                      <h4 class="response-question">{{ item.questionText }}</h4>
-                      <div class="response-value-chips">
-                        @for (chip of getResponseChips(item); track chip) {
-                          <span class="chip">{{
-                            item.type === "InvestableAssets"
-                              ? formatAssetChip(chip)
-                              : chip
-                          }}</span>
-                        }
-                        @if (getResponseChips(item).length === 0) {
-                          <span>{{ formatResponseValue(item) }}</span>
-                        }
-                      </div>
-                    </div>
-                  }
                 </div>
               </div>
             </div>
