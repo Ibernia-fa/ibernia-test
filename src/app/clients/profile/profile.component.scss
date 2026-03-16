@@ -81,50 +81,6 @@
   color: #48475d;
 }
 
-.questionnaire-responses-card {
-  border: 1px solid #e7e7eb;
-  border-radius: 12px;
-}
-
-.responses-container {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.response-item {
-  padding: 16px 20px;
-  background: #f7fbff;
-  border: 1px solid #e7e7eb;
-  border-radius: 10px;
-
-  .response-question {
-    font-size: 16px;
-    font-weight: 500;
-    color: #1c1c1c;
-    margin: 0 0 12px 0;
-    line-height: 1.4;
-  }
-
-  .response-value-chips {
-    font-size: 14px;
-    color: #48475d;
-    line-height: 1.5;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-
-    .chip {
-      display: inline-block;
-      padding: 6px 12px;
-      background: #e3f2fd;
-      border-radius: 20px;
-      font-size: 13px;
-      color: #1976d2;
-    }
-  }
-}
-
 .submitted-date {
   color: #787889;
   font-weight: 400;
@@ -148,28 +104,6 @@
 
   svg {
     flex-shrink: 0;
-  }
-}
-
-.btn-hide-responses {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 6px 16px;
-  border: 1px solid #e7e7eb;
-  border-radius: 8px;
-  background: #fff;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  font-size: 13px;
-  font-weight: 500;
-  color: #787889;
-  white-space: nowrap;
-
-  &:hover {
-    background: #f5f5f5;
-    border-color: #ccc;
-    color: #48475d;
   }
 }
 

@@ -35,6 +35,7 @@ import { ToastrModule, ToastrService } from 'ngx-toastr';
 import { EditModelDialogComponent } from './edit-model-dialog/edit-model-dialog.component';
 import { ClientEditComponent } from '../client-edit/client-edit.component';
 import { QuestionnaireDialogComponent } from './questionnaire-dialog/questionnaire-dialog.component';
+import { QuestionnaireResponsesDialogComponent } from './questionnaire-responses-dialog/questionnaire-responses-dialog.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import {
   QuestionnaireHttpService,
@@ -92,7 +93,6 @@ export class ProfileComponent {
   isLoaderVisible = true;
   isPageLoading = true;
   questionnaireResponses: GetClientQuestionnaireResponse | null = null;
-  showResponsesCard = false;
   responseCurrencySymbol = '';
 
   constructor(
@@ -129,12 +129,28 @@ export class ProfileComponent {
   }
 
   onQuestionnaireClicked() {
-    if (this.questionnaireResponses && !this.showResponsesCard) {
-      this.showResponsesCard = true;
-      localStorage.removeItem(`questionnaire_hidden_${this.clientId}`);
-      return;
+    if (this.questionnaireResponses) {
+      const dialogRef = this.dialog.open(
+        QuestionnaireResponsesDialogComponent,
+        {
+          width: '612px',
+          maxHeight: '90vh',
+          data: {
+            questionnaireResponses: this.questionnaireResponses,
+            client: this.client,
+            responseCurrencySymbol: this.responseCurrencySymbol,
+          },
+        },
+      );
+      dialogRef.afterClosed().subscribe(() => {
+        this.loadQuestionnaireResponses();
+      });
+    } else {
+      this.openQuestionnaireCreateDialog();
     }
+  }
 
+  private openQuestionnaireCreateDialog() {
     const dialogRef = this.dialog.open(QuestionnaireDialogComponent, {
       width: '612px',
       disableClose: true,
@@ -150,10 +166,6 @@ export class ProfileComponent {
     this.questionnaireHttpService.getClientResponses(this.clientId).subscribe({
       next: (data) => {
         this.questionnaireResponses = data;
-        const dismissed = localStorage.getItem(
-          `questionnaire_hidden_${this.clientId}`,
-        );
-        this.showResponsesCard = !dismissed;
         this.responseCurrencySymbol = this.resolveCurrencySymbol(
           data?.currency,
         );
@@ -164,53 +176,10 @@ export class ProfileComponent {
     });
   }
 
-  dismissResponses() {
-    this.showResponsesCard = false;
-    localStorage.setItem(`questionnaire_hidden_${this.clientId}`, 'true');
-  }
-
   private resolveCurrencySymbol(code?: string): string {
     if (!code) return '';
     const country = allCountries.find((c) => c.currencySymbol === code);
     return country?.symbol || code;
-  }
-
-  formatAssetChip(chip: string): string {
-    if (!this.responseCurrencySymbol) return chip;
-    return chip.replace(
-      /\d[\d,]*(\.\d+)?/g,
-      (match) => `${this.responseCurrencySymbol}${match}`,
-    );
-  }
-
-  formatResponseValue(item: { type: string; value: unknown }): string {
-    const v = item.value;
-    if (v == null) return '-';
-    if (typeof v === 'string') return v;
-    if (Array.isArray(v)) {
-      return v
-        .map((x) =>
-          typeof x === 'object' && x && 'name' in x && 'relationship' in x
-            ? `${(x as { name: string }).name} (${(x as { relationship: string }).relationship})`
-            : String(x),
-        )
-        .join(', ');
-    }
-    if (typeof v === 'object') {
-      const obj = v as Record<string, unknown>;
-      const selected = obj['selected'] as string[] | undefined;
-      const others = obj['others'] as string | undefined;
-      const parts = selected ? [...selected] : [];
-      if (others) parts.push(`Other: ${others}`);
-      return parts.join(', ') || '-';
-    }
-    return String(v);
-  }
-
-  getResponseChips(item: { type: string; value: unknown }): string[] {
-    const formatted = this.formatResponseValue(item);
-    if (!formatted || formatted === '-') return [];
-    return formatted.split(', ').filter(Boolean);
   }
 
   onSortByValueChange(event: any) {
@@ -262,16 +231,15 @@ export class ProfileComponent {
         tap((questionnaireData) => {
           if (questionnaireData) {
             this.questionnaireResponses = questionnaireData;
-            const fromEmail =
-              this.activatedRoute.snapshot.queryParamMap.get('responses') ===
-              '1';
-            const dismissed = fromEmail
-              ? null
-              : localStorage.getItem(`questionnaire_hidden_${this.clientId}`);
-            this.showResponsesCard = !dismissed;
             this.responseCurrencySymbol = this.resolveCurrencySymbol(
               questionnaireData?.currency,
             );
+            const fromEmail =
+              this.activatedRoute.snapshot.queryParamMap.get('responses') ===
+              '1';
+            if (fromEmail) {
+              setTimeout(() => this.onQuestionnaireClicked(), 0);
+            }
           } else {
             this.questionnaireResponses = null;
           }

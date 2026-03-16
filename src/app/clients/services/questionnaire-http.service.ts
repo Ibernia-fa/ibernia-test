@@ -42,6 +42,8 @@ export interface QuestionnaireResponseItem {
   questionText?: string;
   type: string;
   value: unknown;
+  /** Maps selected option value to icon URL (from DB) for Goals and AreasOfWorry */
+  optionIcons?: Record<string, string>;
 }
 
 export interface SubmitQuestionnaireRequest {

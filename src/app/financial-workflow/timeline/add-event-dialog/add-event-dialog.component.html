@@ -1353,34 +1353,6 @@
             }
           </div>
 
-          <div class="d-flex flex-column gap-8">
-            <mat-label
-              class="f-s-16 f-w-500 d-flex ibr-black"
-              style="line-height: 16px"
-              >Type
-            </mat-label>
-            <!-- Type  -->
-            <div class="down-payment-toggle">
-              <label
-                class="dp-radio"
-                [class.active]="isCashEvent"
-                (click)="onCashControlClicked(true)"
-              >
-                <span class="dp-radio-circle"></span>
-                <span>Income</span>
-              </label>
-              <label
-                class="dp-radio"
-                [class.active]="!isCashEvent"
-                (click)="onCashControlClicked(false)"
-              >
-                <span class="dp-radio-circle"></span>
-                <span>Expense</span>
-              </label>
-            </div>
-            <!-- End TYpe  -->
-          </div>
-
           <div class="d-flex flex-column gap-8 net-fields">
             <!-- <mat-label class="f-s-16 f-w-500 m-b-8 d-flex align-items-center" -->
             <mat-label
