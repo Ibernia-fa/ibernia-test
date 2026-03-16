@@ -1,17 +1,14 @@
 import { defineConfig, devices } from '@playwright/test';
 
-const CI = !!process.env['CI'];
-const BASE_URL = process.env['BASE_URL'] ?? 'https://test-dev.ibernia.it/';
-
 export default defineConfig({
   testDir: './e2e',
   fullyParallel: true,
-  forbidOnly: CI,
-  retries: CI ? 2 : 0,
-  workers: CI ? 1 : undefined,
+  forbidOnly: !!process.env['CI'],
+  retries: process.env['CI'] ? 2 : 0,
+  workers: process.env['CI'] ? 1 : undefined,
   reporter: [['html', { open: 'never' }], ['list']],
   use: {
-    baseURL: BASE_URL,
+    baseURL: 'http://localhost:4200',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
   },
@@ -21,13 +18,11 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'] },
     },
   ],
-  // Start Angular dev server automatically when running locally
-  webServer: CI
-    ? undefined
-    : {
-        command: 'npm start',
-        url: 'http://localhost:4200',
-        reuseExistingServer: true,
-        timeout: 120_000,
-      },
+  // Start Angular dev server automatically if not already running
+  webServer: {
+    command: 'npm start',
+    url: 'http://localhost:4200',
+    reuseExistingServer: true,
+    timeout: 120_000,
+  },
 });
