@@ -1,5 +1,5 @@
 # Step 1: Use Node.js to build the Angular app
-FROM node:22.20.0 as build-stage
+FROM node:22.20.0 AS build-stage
 
 # Build configuration: "production" (api.ibernia.it) or "development" (api-dev.ibernia.it)
 # Must be passed by CI or at build time: docker build --build-arg NG_BUILD_CONFIGURATION=development
@@ -32,7 +32,7 @@ RUN test -n "$(ls /app/dist/ibernia-app/browser/financial-workflow.routes-*.js 2
     (echo "ERROR: financial-workflow.routes chunk missing from build output" && exit 1)
 
 # Step 2: Use Nginx to serve the Angular app
-FROM nginx:alpine as production-stage
+FROM nginx:alpine AS production-stage
 
 # Copy the built app to Nginx's HTML directory
 COPY --from=build-stage /app/dist/ibernia-app/browser /usr/share/nginx/html
