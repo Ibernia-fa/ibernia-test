@@ -1,3 +1,8 @@
+<div class="language-loader" *ngIf="isUploadingProfile">
+  <div class="spinner"></div>
+  <h2>{{ 'Loading...' | translate }}</h2>
+</div>
+
 <mat-card class="mat-mdc-card mdc-card cardWithShadow mb-20">
   <mat-card-content class="mat-mdc-card-content">
     <div class="d-flex align-items-center main-header-content">
@@ -49,7 +54,7 @@
                   {{ 'Click to upload picture' | translate}}
                 </p>
                 <small class="text-xs text-gray-400 f-s-12 m-0">
-                  SVG, PNG, JPG or GIF <br>(max. 800×400px)
+                  {{ 'PNG, JPG or JPEG (max. 5MB)' | translate }}
                 </small>
               </ng-template>
             </div>
@@ -59,7 +64,7 @@
   id="upload-avatar"
   #fileInput
   type="file"
-  accept="image/*"
+  accept=".png,.jpg,.jpeg,image/png,image/jpeg,image/jpg"
   hidden
   (change)="onFileSelected($event)"
 />
