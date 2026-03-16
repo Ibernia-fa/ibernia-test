@@ -1,6 +1,7 @@
 import { test, expect, Page } from '@playwright/test';
 
-const LOGIN_URL = 'https://dev.ibernia.it';
+const BASE_URL = process.env['BASE_URL'] ?? 'https://test-dev.ibernia.it/';
+const LOGIN_URL = `${BASE_URL}`;
 
 // Defaults taken from the manual login plan; can be overridden via env vars
 const VALID_EMAIL =
@@ -13,9 +14,11 @@ async function dismissCookieBanner(page: Page) {
   await cookieButton.click({ timeout: 5_000 }).catch(() => {});
 }
 
-test.describe('Login page (dev.ibernia.it)', () => {
+test.describe('Login page', () => {
   test('valid login redirects to dashboard', async ({ page }) => {
-    await page.goto(LOGIN_URL);
+    await test.step(`Open URL: ${LOGIN_URL}`, async () => {
+      await page.goto(LOGIN_URL);
+    });
     await dismissCookieBanner(page);
 
     // Basic HTTPS/security sanity check
@@ -31,13 +34,15 @@ test.describe('Login page (dev.ibernia.it)', () => {
 
     // Expect to land on a dashboard/main area, not stay on the login page
     await expect(page).not.toHaveURL(/login/i);
-    await expect(page.url()).toContain('dev.ibernia.it');
+    await expect(page.url()).toContain(new URL(BASE_URL).host);
   });
 
   test('invalid login with wrong password shows error and stays on login page', async ({
     page,
   }) => {
-    await page.goto(LOGIN_URL);
+    await test.step(`Open URL: ${LOGIN_URL}`, async () => {
+      await page.goto(LOGIN_URL);
+    });
     await dismissCookieBanner(page);
 
     const emailInput = page.getByLabel('Email', { exact: true });
@@ -60,7 +65,9 @@ test.describe('Login page (dev.ibernia.it)', () => {
   test('invalid login with wrong email shows error and stays on login page', async ({
     page,
   }) => {
-    await page.goto(LOGIN_URL);
+    await test.step(`Open URL: ${LOGIN_URL}`, async () => {
+      await page.goto(LOGIN_URL);
+    });
     await dismissCookieBanner(page);
 
     const emailInput = page.getByLabel('Email', { exact: true });

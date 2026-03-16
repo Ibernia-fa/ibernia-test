@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Ibernia Playwright Reports</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      body {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+          sans-serif;
+        margin: 2rem;
+        background: #0f172a;
+        color: #e5e7eb;
+      }
+      h1 {
+        margin-bottom: 0.5rem;
+      }
+      p {
+        margin-top: 0;
+        margin-bottom: 1.5rem;
+        color: #9ca3af;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: #020617;
+        border-radius: 0.5rem;
+        overflow: hidden;
+      }
+      thead {
+        background: #1e293b;
+      }
+      th,
+      td {
+        padding: 0.75rem 1rem;
+        text-align: left;
+        font-size: 0.9rem;
+      }
+      th {
+        font-weight: 600;
+        color: #cbd5f5;
+      }
+      tr:nth-child(even) td {
+        background: #020617;
+      }
+      tr:nth-child(odd) td {
+        background: #020617;
+      }
+      tr:hover td {
+        background: #0b1120;
+      }
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.1rem 0.5rem;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .badge-dev {
+        background: rgba(59, 130, 246, 0.15);
+        color: #60a5fa;
+      }
+      .badge-prod {
+        background: rgba(34, 197, 94, 0.15);
+        color: #4ade80;
+      }
+      a {
+        color: #60a5fa;
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      .status-ok {
+        color: #4ade80;
+      }
+      .status-unknown {
+        color: #fbbf24;
+      }
+      .empty-state {
+        padding: 1rem 0;
+        color: #9ca3af;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Ibernia Playwright reports</h1>
+    <p>
+      Each row represents a deployment. Click <strong>View report</strong> to
+      open the Playwright HTML report for that deployment.
+    </p>
+
+    <div id="empty" class="empty-state" style="display: none">
+      No deployments have been recorded yet. Once the CI pipeline runs after a
+      deployment, this page will be populated automatically.
+    </div>
+
+    <table id="table" style="display: none">
+      <thead>
+        <tr>
+          <th>Version</th>
+          <th>Environment</th>
+          <th>Deployed at</th>
+          <th>Report</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+
+    <script>
+      async function loadIndex() {
+        try {
+          const res = await fetch('index.json', { cache: 'no-store' });
+          if (!res.ok) throw new Error('Failed to fetch index.json');
+
+          const items = await res.json();
+          const tbody = document.getElementById('tbody');
+          const table = document.getElementById('table');
+          const empty = document.getElementById('empty');
+
+          if (!Array.isArray(items) || items.length === 0) {
+            empty.style.display = 'block';
+            return;
+          }
+
+          // Newest first
+          items
+            .slice()
+            .sort(
+              (a, b) =>
+                new Date(b.deployedAt).getTime() -
+                new Date(a.deployedAt).getTime()
+            )
+            .forEach((item) => {
+              const tr = document.createElement('tr');
+
+              const versionTd = document.createElement('td');
+              versionTd.textContent = item.versionTag ?? item.version ?? '-';
+              tr.appendChild(versionTd);
+
+              const envTd = document.createElement('td');
+              const span = document.createElement('span');
+              span.className =
+                'badge ' +
+                (item.environment === 'prod' ? 'badge-prod' : 'badge-dev');
+              span.textContent = item.environment ?? 'dev';
+              envTd.appendChild(span);
+              tr.appendChild(envTd);
+
+              const timeTd = document.createElement('td');
+              const date = item.deployedAt
+                ? new Date(item.deployedAt)
+                : null;
+              timeTd.textContent = date
+                ? date.toLocaleString()
+                : 'Unknown time';
+              tr.appendChild(timeTd);
+
+              const linkTd = document.createElement('td');
+              if (item.reportUrl) {
+                const a = document.createElement('a');
+                a.href = item.reportUrl;
+                a.textContent = 'View report';
+                a.target = '_blank';
+                linkTd.appendChild(a);
+              } else {
+                const spanStatus = document.createElement('span');
+                spanStatus.className = 'status-unknown';
+                spanStatus.textContent = 'No report URL';
+                linkTd.appendChild(spanStatus);
+              }
+              tr.appendChild(linkTd);
+
+              tbody.appendChild(tr);
+            });
+
+          table.style.display = 'table';
+        } catch (err) {
+          console.error('Failed to load index.json', err);
+          const empty = document.getElementById('empty');
+          empty.textContent =
+            'Failed to load deployment index. Please contact the DevOps team.';
+          empty.style.display = 'block';
+        }
+      }
+
+      loadIndex();
+    </script>
+  </body>
+</html>
+
