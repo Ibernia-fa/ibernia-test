@@ -92,6 +92,11 @@
       open the Playwright HTML report for that deployment.
     </p>
 
+    <label for="pipelineFilter">Pipeline:</label>
+    <select id="pipelineFilter">
+      <option value="all">All pipelines</option>
+    </select>
+
     <div id="empty" class="empty-state" style="display: none">
       No deployments have been recorded yet. Once the CI pipeline runs after a
       deployment, this page will be populated automatically.
@@ -119,64 +124,93 @@
           const tbody = document.getElementById('tbody');
           const table = document.getElementById('table');
           const empty = document.getElementById('empty');
+          const pipelineFilter = document.getElementById('pipelineFilter');
 
           if (!Array.isArray(items) || items.length === 0) {
             empty.style.display = 'block';
             return;
           }
 
-          // Newest first
-          items
-            .slice()
-            .sort(
-              (a, b) =>
-                new Date(b.deployedAt).getTime() -
-                new Date(a.deployedAt).getTime()
-            )
-            .forEach((item) => {
-              const tr = document.createElement('tr');
+          // Collect unique pipeline names
+          const pipelines = Array.from(
+            new Set(items.map((i) => i.pipeline || 'Unknown pipeline'))
+          );
 
-              const versionTd = document.createElement('td');
-              versionTd.textContent = item.versionTag ?? item.version ?? '-';
-              tr.appendChild(versionTd);
+          pipelines.forEach((name) => {
+            const opt = document.createElement('option');
+            opt.value = name;
+            opt.textContent = name;
+            pipelineFilter.appendChild(opt);
+          });
 
-              const envTd = document.createElement('td');
-              const span = document.createElement('span');
-              span.className =
-                'badge ' +
-                (item.environment === 'prod' ? 'badge-prod' : 'badge-dev');
-              span.textContent = item.environment ?? 'dev';
-              envTd.appendChild(span);
-              tr.appendChild(envTd);
+          function renderTable(filterValue) {
+            tbody.innerHTML = '';
 
-              const timeTd = document.createElement('td');
-              const date = item.deployedAt
-                ? new Date(item.deployedAt)
-                : null;
-              timeTd.textContent = date
-                ? date.toLocaleString()
-                : 'Unknown time';
-              tr.appendChild(timeTd);
+            items
+              .slice()
+              .sort(
+                (a, b) =>
+                  new Date(b.deployedAt).getTime() -
+                  new Date(a.deployedAt).getTime()
+              )
+              .filter((item) =>
+                filterValue === 'all'
+                  ? true
+                  : (item.pipeline || 'Unknown pipeline') === filterValue
+              )
+              .forEach((item) => {
+                const tr = document.createElement('tr');
 
-              const linkTd = document.createElement('td');
-              if (item.reportUrl) {
-                const a = document.createElement('a');
-                a.href = item.reportUrl;
-                a.textContent = 'View report';
-                a.target = '_blank';
-                linkTd.appendChild(a);
-              } else {
-                const spanStatus = document.createElement('span');
-                spanStatus.className = 'status-unknown';
-                spanStatus.textContent = 'No report URL';
-                linkTd.appendChild(spanStatus);
-              }
-              tr.appendChild(linkTd);
+                const versionTd = document.createElement('td');
+                versionTd.textContent =
+                  item.versionTag ?? item.version ?? '-';
+                tr.appendChild(versionTd);
 
-              tbody.appendChild(tr);
-            });
+                const envTd = document.createElement('td');
+                const span = document.createElement('span');
+                span.className =
+                  'badge ' +
+                  (item.environment === 'prod' ? 'badge-prod' : 'badge-dev');
+                span.textContent = item.environment ?? 'dev';
+                envTd.appendChild(span);
+                tr.appendChild(envTd);
 
-          table.style.display = 'table';
+                const timeTd = document.createElement('td');
+                const date = item.deployedAt
+                  ? new Date(item.deployedAt)
+                  : null;
+                timeTd.textContent = date
+                  ? date.toLocaleString()
+                  : 'Unknown time';
+                tr.appendChild(timeTd);
+
+                const linkTd = document.createElement('td');
+                if (item.reportUrl) {
+                  const a = document.createElement('a');
+                  a.href = item.reportUrl;
+                  a.textContent = 'View report';
+                  a.target = '_blank';
+                  linkTd.appendChild(a);
+                } else {
+                  const spanStatus = document.createElement('span');
+                  spanStatus.className = 'status-unknown';
+                  spanStatus.textContent = 'No report URL';
+                  linkTd.appendChild(spanStatus);
+                }
+                tr.appendChild(linkTd);
+
+                tbody.appendChild(tr);
+              });
+
+            table.style.display = tbody.children.length ? 'table' : 'none';
+            empty.style.display = tbody.children.length ? 'none' : 'block';
+          }
+
+          renderTable('all');
+
+          pipelineFilter.addEventListener('change', (e) => {
+            renderTable(e.target.value);
+          });
         } catch (err) {
           console.error('Failed to load index.json', err);
           const empty = document.getElementById('empty');
@@ -190,4 +224,3 @@
     </script>
   </body>
 </html>
-
