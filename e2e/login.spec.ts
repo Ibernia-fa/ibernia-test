@@ -14,7 +14,7 @@ async function dismissCookieBanner(page: Page) {
 }
 
 test.describe('Login page (dev.ibernia.it)', () => {
-  test('valid login redirects to dashboard', async ({ page }) => {
+  test(`valid login redirects to dashboard (${LOGIN_URL})`, async ({ page }) => {
     await page.goto(LOGIN_URL);
     await dismissCookieBanner(page);
 
@@ -34,7 +34,7 @@ test.describe('Login page (dev.ibernia.it)', () => {
     await expect(page.url()).toContain('dev.ibernia.it');
   });
 
-  test('invalid login with wrong password shows error and stays on login page', async ({
+  test(`invalid login with wrong password shows error and stays on login page (${LOGIN_URL}/login)`, async ({
     page,
   }) => {
     await page.goto(LOGIN_URL);
@@ -57,7 +57,7 @@ test.describe('Login page (dev.ibernia.it)', () => {
     ).toBeVisible();
   });
 
-  test('invalid login with wrong email shows error and stays on login page', async ({
+  test(`invalid login with wrong email shows error and stays on login page (${LOGIN_URL}/login)`, async ({
     page,
   }) => {
     await page.goto(LOGIN_URL);
