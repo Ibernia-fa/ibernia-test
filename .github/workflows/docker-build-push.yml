@@ -184,12 +184,13 @@ jobs:
       - name: Build deployments index JSON for this run
         shell: bash
         run: |
-          cat > index.json <<'EOF'
+          DEPLOYED_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          cat > index.json <<EOF
           [
             {
               "versionTag": "${{ steps.vars.outputs.version_tag }}",
               "environment": "${{ steps.vars.outputs.env }}",
-              "deployedAt": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+              "deployedAt": "${DEPLOYED_AT}",
               "reportUrl": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
             }
           ]
