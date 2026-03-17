@@ -184,18 +184,17 @@ jobs:
       - name: Upload Playwright report to app server
         if: always()
         uses: appleboy/scp-action@v0.1.7
-        env:
-          REPORT_ENV: ${{ steps.vars.outputs.env }}
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
-          port: ${{ secrets.SERVER_PORT }}
+          port: ${{ secrets.SERVER_PORT || 22 }}
           source: "playwright-report/*"
-          target: /opt/ibernia/dev/playwright-report
+          target: /opt/ibernia/test-reports/reports/${{ steps.vars.outputs.version_tag }}
+          strip_components: 1
           overwrite: true
 
-      - name: Update deployments index on server
+      - name: Register report in dashboard index.json
         if: always()
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -206,50 +205,31 @@ jobs:
           script: |
             set -euo pipefail
 
-            INDEX_DIR="/opt/ibernia/dev/playwright-report/playwright-report"
-            INDEX_FILE="$INDEX_DIR/index.json"
-            mkdir -p "$INDEX_DIR"
-
+            REPORT_DIR="/opt/ibernia/test-reports"
+            INDEX_FILE="${REPORT_DIR}/index.json"
+            VERSION_TAG="${{ steps.vars.outputs.version_tag }}"
+            ENV="${{ steps.vars.outputs.env }}"
+            VERSION="${{ steps.vars.outputs.version }}"
+            REPORT_URL="./reports/${VERSION_TAG}/index.html"
             DEPLOYED_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-            ENTRY_JSON=$(cat <<EOF
-            {
-              "pipeline": "Build, Push & Deploy (Docker Hub)",
-              "versionTag": "${{ steps.vars.outputs.version_tag }}",
-              "environment": "${{ steps.vars.outputs.env }}",
-              "deployedAt": "${DEPLOYED_AT}",
-              "reportUrl": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-            }
-            EOF
-            )
-            export ENTRY_JSON
+            PIPELINE="Build, Push & Deploy (Docker Hub)"
 
-            python3 - "$INDEX_FILE" << 'PY'
-            import json, os, sys
+            sudo mkdir -p "$REPORT_DIR"
 
-            path = sys.argv[1]
-            try:
-                with open(path, "r") as f:
-                    data = json.load(f)
-                    if not isinstance(data, list):
-                        data = []
-            except Exception:
-                data = []
+            if [ ! -f "$INDEX_FILE" ]; then
+              echo "[]" | sudo tee "$INDEX_FILE" > /dev/null
+            fi
 
-            entry = json.loads(os.environ["ENTRY_JSON"])
-            data.append(entry)
+            NEW_ENTRY=$(jq -n \
+              --arg vt "$VERSION_TAG" \
+              --arg v  "$VERSION" \
+              --arg env "$ENV" \
+              --arg da "$DEPLOYED_AT" \
+              --arg ru "$REPORT_URL" \
+              --arg pl "$PIPELINE" \
+              '{versionTag: $vt, version: $v, environment: $env, deployedAt: $da, reportUrl: $ru, pipeline: $pl}')
 
-            with open(path, "w") as f:
-                json.dump(data, f)
-            PY
+            jq --argjson entry "$NEW_ENTRY" '. += [$entry]' "$INDEX_FILE" \
+              | sudo tee "${INDEX_FILE}.tmp" > /dev/null
 
-      - name: Upload Playwright index page
-        if: always()
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          port: ${{ secrets.SERVER_PORT }}
-          source: "index.html"
-          target: /opt/ibernia/dev/playwright-report/playwright-report
-          overwrite: true
+            sudo mv "${INDEX_FILE}.tmp" "$INDEX_FILE"
