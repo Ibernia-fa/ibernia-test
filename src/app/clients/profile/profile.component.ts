@@ -133,7 +133,7 @@ export class ProfileComponent {
       const dialogRef = this.dialog.open(
         QuestionnaireResponsesDialogComponent,
         {
-          width: '612px',
+          width: '1090px',
           maxHeight: '90vh',
           data: {
             questionnaireResponses: this.questionnaireResponses,

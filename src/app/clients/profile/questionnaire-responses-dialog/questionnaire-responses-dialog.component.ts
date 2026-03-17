@@ -113,7 +113,8 @@ export class QuestionnaireResponsesDialogComponent {
     iconUrl?: string;
   }[] {
     const chips = this.getResponseChips(item);
-    if (!chips.length || !item.optionIcons) return chips.map((c) => ({ value: c }));
+    if (!chips.length || !item.optionIcons)
+      return chips.map((c) => ({ value: c }));
     const icons = item.optionIcons;
     return chips.map((chip) => {
       const key = chip.startsWith('Other:') ? 'Other' : chip;

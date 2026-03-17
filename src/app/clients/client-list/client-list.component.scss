@@ -78,6 +78,11 @@ tr.example-detail-row {
 .column-notes {
   // width: 20%;
   min-width: 295px;
+  max-width: 295px;
+
+  white-space: normal;
+  word-break: break-all;
+  overflow-wrap: anywhere;
   padding: 10px 8px !important;
 }
 

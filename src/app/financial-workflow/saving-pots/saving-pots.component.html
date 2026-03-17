@@ -1,228 +1,633 @@
 <div class="position-relative">
-    @if(!isLoaderVisible && savingPots) {
-    <div class="d-flex gap-24 flex-column">
-        <!-- Saving Section  -->
-        <mat-card class="cardWithShadow">
-            <mat-card-content>
-                <div class="cashflow-saving-wrapper">
-                    <div class="row align-items-center flex-wrap">
-                        <!-- stats  -->
-                        <div class="col-10">
-                            <div class="row justify-content-between">
-                                <!-- Saving Section  -->
-                                <div class="col-5">
-                                    <div class="stats-main-wrapper">
-                                        <div class="d-flex flex-column gap-8">
-                                            <div class="d-flex align-items-center gap-8">
-                                                <img src="assets/images/svgs/total-saving-wallet.svg"
-                                                    alt="total-saving-wallet" />
-                                                <h3 class="card-title">{{ 'Total savings at start' | translate }}</h3>
-                                            </div>
-                                            <div class="d-flex align-items-center gap-10">
-                                                <h3 class="saving-title">
-                                                    {{selectedClient?.clientDetails?.preferredCurrency|currencySymbol}}{{(total
-                                                    ?? 0)|thousandSeparator}}</h3>
-                                                <!-- <span
+  @if (!isLoaderVisible && savingPots) {
+    <div class="d-flex gap-16 flex-column">
+      <!-- Saving Section  -->
+      <mat-card class="ibr-new-dashboad-card">
+        <mat-card-content>
+          <div class="cashflow-saving-wrapper">
+            <div class="row align-items-center flex-wrap">
+              <!-- stats  -->
+              <div class="col-10">
+                <div class="row justify-content-between">
+                  <!-- Saving Section  -->
+                  <div class="col-5">
+                    <div class="stats-main-wrapper">
+                      <div class="d-flex flex-column gap-12">
+                        <div class="d-flex align-items-center gap-8">
+                          <svg
+                            width="17"
+                            height="18"
+                            viewBox="0 0 17 18"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              fill-rule="evenodd"
+                              clip-rule="evenodd"
+                              d="M16.25 7.29167C16.25 6.68417 16.0083 6.10083 15.5792 5.67083C15.149 5.2415 14.5661 5.00026 13.9583 5H2.29167C1.68417 5 1.10083 5.24167 0.670833 5.67083C0.241496 6.10102 0.00025518 6.68389 0 7.29167V15.625C0 16.2325 0.241667 16.8158 0.670833 17.2458C1.10102 17.6752 1.68389 17.9164 2.29167 17.9167H13.9583C14.5658 17.9167 15.1492 17.675 15.5792 17.2458C16.0085 16.8156 16.2497 16.2328 16.25 15.625V7.29167ZM15 7.29167V15.625C14.9996 15.9011 14.8897 16.1658 14.6944 16.3611C14.4992 16.5563 14.2345 16.6662 13.9583 16.6667H2.29167C2.01553 16.6662 1.75084 16.5563 1.55558 16.3611C1.36033 16.1658 1.25044 15.9011 1.25 15.625V7.29167C1.25044 7.01554 1.36033 6.75084 1.55558 6.55558C1.75084 6.36033 2.01553 6.25044 2.29167 6.25H13.9583C14.2345 6.25044 14.4992 6.36033 14.6944 6.55558C14.8897 6.75084 14.9996 7.01554 15 7.29167Z"
+                              fill="#5A596E"
+                            />
+                            <path
+                              fill-rule="evenodd"
+                              clip-rule="evenodd"
+                              d="M8.47678 3.16914L9.27594 1.4558L13.4301 3.39247L12.5118 5.3608C12.4417 5.51109 12.4342 5.68306 12.491 5.83887C12.5477 5.99468 12.664 6.12157 12.8143 6.19164C12.9646 6.2617 13.1365 6.26919 13.2923 6.21246C13.4482 6.15573 13.5751 6.03943 13.6451 5.88914L14.8268 3.35414C14.8967 3.20405 14.9042 3.03235 14.8476 2.87673C14.7911 2.72112 14.6751 2.59431 14.5251 2.52414L9.23761 0.0583018C9.08742 -0.0115564 8.91564 -0.018936 8.76001 0.0377844C8.60438 0.0945048 8.47763 0.210686 8.40761 0.360802L7.34428 2.64164C7.30642 2.7164 7.28398 2.79802 7.27829 2.88163C7.27261 2.96524 7.2838 3.04914 7.3112 3.12834C7.3386 3.20754 7.38165 3.28042 7.43778 3.34265C7.49392 3.40487 7.56199 3.45518 7.63796 3.49056C7.71393 3.52595 7.79624 3.54569 7.87999 3.54862C7.96375 3.55155 8.04724 3.53761 8.12549 3.50762C8.20375 3.47764 8.27518 3.43222 8.33552 3.37407C8.39587 3.31592 8.44391 3.24623 8.47678 3.16914Z"
+                              fill="#5A596E"
+                            />
+                            <path
+                              fill-rule="evenodd"
+                              clip-rule="evenodd"
+                              d="M3.43065 5.88881L5.10899 2.28881L9.26315 4.22548L8.73399 5.36048C8.66833 5.51 8.6638 5.67927 8.72137 5.83209C8.77893 5.98491 8.89402 6.10912 9.04201 6.17816C9.19 6.2472 9.35913 6.25558 9.51321 6.2015C9.6673 6.14743 9.7941 6.03519 9.86649 5.88881L10.6598 4.18714C10.7297 4.03705 10.7372 3.86536 10.6807 3.70974C10.6241 3.55413 10.5081 3.42731 10.3582 3.35714L5.07065 0.89131C4.92046 0.821451 4.74868 0.814072 4.59305 0.870792C4.43742 0.927513 4.31067 1.04369 4.24065 1.19381L2.29732 5.36048C2.22726 5.51077 2.21977 5.68273 2.2765 5.83854C2.33323 5.99435 2.44953 6.12125 2.59982 6.19131C2.75011 6.26137 2.92207 6.26886 3.07789 6.21213C3.2337 6.1554 3.36059 6.0391 3.43065 5.88881ZM16.2498 8.95798C16.2498 8.79222 16.184 8.63324 16.0668 8.51604C15.9496 8.39882 15.7906 8.33298 15.6248 8.33298H12.2907C11.6829 8.33298 11.1 8.57442 10.6702 9.00419C10.2404 9.43396 9.99898 10.0169 9.99898 10.6246V12.2913C9.99898 12.8991 10.2404 13.482 10.6702 13.9118C11.1 14.3415 11.6829 14.583 12.2907 14.583H15.6248C15.7906 14.583 15.9496 14.5171 16.0668 14.3999C16.184 14.2827 16.2498 14.1237 16.2498 13.958V8.95798ZM14.9998 9.58298V13.333H12.2907C11.7157 13.333 11.249 12.8663 11.249 12.2913V10.6246C11.249 10.0496 11.7157 9.58298 12.2907 9.58298H14.9998Z"
+                              fill="#5A596E"
+                            />
+                            <path
+                              d="M12.7083 12.2917C13.1686 12.2917 13.5417 11.9186 13.5417 11.4583C13.5417 10.9981 13.1686 10.625 12.7083 10.625C12.2481 10.625 11.875 10.9981 11.875 11.4583C11.875 11.9186 12.2481 12.2917 12.7083 12.2917Z"
+                              fill="#5A596E"
+                            />
+                          </svg>
+
+                          <h3 class="card-title-new">
+                            {{ "Total savings at start" | translate }}
+                          </h3>
+                        </div>
+
+                        <h3 class="card-saving-title">
+                          {{
+                            selectedClient?.clientDetails?.preferredCurrency
+                              | currencySymbol
+                          }}{{ total ?? 0 | thousandSeparator }}
+                        </h3>
+                      </div>
+                      <!-- <div class="d-flex flex-column gap-8">
+                        <div class="d-flex align-items-center gap-8">
+                          <img
+                            src="assets/images/svgs/total-saving-wallet.svg"
+                            alt="total-saving-wallet"
+                          />
+                          <h3 class="card-title-new">
+                            {{ "Total savings at start" | translate }}
+                          </h3>
+                        </div>
+                        <div class="d-flex align-items-center gap-10">
+                          <h3 class="saving-title">
+                            {{
+                              selectedClient?.clientDetails?.preferredCurrency
+                                | currencySymbol
+                            }}{{ total ?? 0 | thousandSeparator }}
+                          </h3> -->
+                      <!-- <span
                                                     [ngClass]="savingPots.totalGwothRate >= 0 ? 'badge green' : 'badge red'">{{savingPots.totalGwothRate
                                                     >= 0 ? '+' : '-'}}{{(savingPots?.totalGwothRate | number : '1.0-0')
                                                     ??
                                                     0}}%</span> -->
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- End Saving Section  -->
-
-                                <!-- Divider  -->
-                                <div class="divider"></div>
-                                <!-- End Divider  -->
-
-                                <!-- Slider Section  -->
-                                @if(false){
-                                <div class="col-5">
-                                    <div class="d-flex align-items-center gap-8">
-                                        <div class="d-flex align-items-center gap-8">
-                                            <img src="assets/images/svgs/inflation-rate-icon.svg"
-                                                alt="total-saving-wallet" />
-                                            <h3 class="card-title">{{ 'Inflation rate' | translate }}:</h3>
-                                        </div>
-                                        <div mat-raised-button matTooltipPosition="above"
-                                            matTooltip="{{ 'The assumed rate inflation is expected to rise by, per year. This assumption affects the entire cashflow model, as future values are inflation adjusted into real terms.' | translate }}">
-                                            <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon">
-                                        </div>
-                                    </div>
-                                    <div class="d-flex align-items-center gap-24">
-                                        <div class="slider-customizer slider-wrapper">
-                                            <mat-slider class="w-100">
-                                                <input value="30" matSliderThumb>
-                                            </mat-slider>
-                                        </div>
-                                        <div class="percentage-field">
-                                            <div class="w-100 form-field">
-                                                <input placeholder="No." value="8.5%" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                }
-                                <!-- End Slider Section  -->
-                            </div>
-                        </div>
-                        <!-- End stats  -->
-
-                        <!-- button  -->
-                        <div class="col-2">
-                            <div class="d-flex align-items-center justify-content-end">
-                                <button (click)="newEventClicked()" type="button" class="button-icon">
-                                    <span>{{ 'Add New' | translate}}</span>
-                                    <img src="assets/images/svgs/add-icon.svg" alt="add-icon" />
-                                </button>
-                            </div>
-                        </div>
-                        <!-- button  -->
+                      <!-- </div>
+                      </div> -->
                     </div>
+                  </div>
+                  <!-- End Saving Section  -->
+
+                  <!-- Divider  -->
+                  <!-- <div class="divider"></div> -->
+                  <!-- End Divider  -->
+
+                  <!-- Slider Section  -->
+                  @if (false) {
+                    <div class="col-5">
+                      <div class="d-flex align-items-center gap-8">
+                        <div class="d-flex align-items-center gap-8">
+                          <img
+                            src="assets/images/svgs/inflation-rate-icon.svg"
+                            alt="total-saving-wallet"
+                          />
+                          <h3 class="card-title">
+                            {{ "Inflation rate" | translate }}:
+                          </h3>
+                        </div>
+                        <div
+                          mat-raised-button
+                          matTooltipPosition="above"
+                          matTooltip="{{
+                            'The assumed rate inflation is expected to rise by, per year. This assumption affects the entire cashflow model, as future values are inflation adjusted into real terms.'
+                              | translate
+                          }}"
+                        >
+                          <img
+                            src="assets/images/svgs/help-circle-icon.svg"
+                            alt="help-circle-icon"
+                          />
+                        </div>
+                      </div>
+                      <div class="d-flex align-items-center gap-24">
+                        <div class="slider-customizer slider-wrapper">
+                          <mat-slider class="w-100">
+                            <input value="30" matSliderThumb />
+                          </mat-slider>
+                        </div>
+                        <div class="percentage-field">
+                          <div class="w-100 form-field">
+                            <input placeholder="No." value="8.5%" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  }
+                  <!-- End Slider Section  -->
                 </div>
-            </mat-card-content>
-        </mat-card>
-        <!-- End Saving Section  -->
+              </div>
+              <!-- End stats  -->
 
-        <!-- liquid savings, investments and pensions Section  -->
-        <mat-card class="cardWithShadow">
-            <mat-card-content>
-                <div class="cashflow-drag-wrapper">
-                    <div class="d-flex flex-column gap-20">
-                        <h3 class="sec-heading">{{ 'Other liquid savings, investments and pensions:' | translate }}</h3>
-                        <div cdkDropList [cdkDropListData]="savingPots?.clientSavings"
-                            (cdkDropListDropped)="drop($event)" class="flex-column d-flex gap-10" id="drag-boundary">
-                            <!-- Card One -->
-                            @for(saving of savingPots?.clientSavings; track saving; let i = $index) {
-                            <div [cdkDragData]="saving" cdkDragLockAxis="y" cdkDrag cdkDragBoundary="#drag-boundary"
-                                class="d-flex justify-content-between align-items-center gap-12 dragable-card-wrapper">
-                                <!-- Card  -->
-                                <div (click)="updateEventClicked(saving)" class="dragable-card d-flex align-items-center justify-content-between cursor-pointer">
-                                    <!-- Content  -->
-                                    <div class="d-flex align-items-center gap-8">
-                                        @if(i > 0 && !('cash' === (savingPots.clientSavings[i]?.name ||
-                                        '').toLowerCase())) {
-                                        <button cdkDragHandle type="button" class="drag-btn">
-                                            <img src="/assets/images/svgs/drag-icon.svg" alt="drag-icon">
-                                        </button>
-                                        }@else {
-                                        <span class="drag-btn drag-spacer" aria-hidden="true"></span>
-                                        }
-                                        <!-- @if((saving.name || '').toLowerCase() !== 'cash' && i < savingPots.clientSavings.length - 1) { -->
+              <!-- button  -->
+              <div class="col-2">
+                <div class="d-flex align-items-center justify-content-end">
+                  <button
+                    (click)="newEventClicked()"
+                    type="button"
+                    class="button-icon"
+                  >
+                    <span>{{ "Add New" | translate }}</span>
+                    <img src="assets/images/svgs/add-icon.svg" alt="add-icon" />
+                  </button>
+                </div>
+              </div>
+              <!-- button  -->
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+      <!-- End Saving Section  -->
 
-                                        <!-- Status  -->
-                                        <div class="stats-main-wrapper">
-                                            <div class="d-flex flex-column gap-8">
-                                                <div class="d-flex align-items-center gap-8">
-                                                    <img [src]="'assets/images/svgs/' + saving.iconUrl +'.svg'"
-                                                        alt="cashflow-moneys-icon" />
-                                                    <h3 class="card-title">{{saving.name}}</h3>
-                                                    @if (hasPartner) {
-                                                    <span class="badge ownership-badge">{{ 'Ownership' | translate }}: {{ getOwnershipLabel(saving) }}</span>
-                                                    }
-                                                </div>
-                                                <div class="d-flex align-items-center gap-10">
+      <!-- liquid savings, investments and pensions Section  -->
+      <mat-card class="ibr-new-dashboad-card">
+        <mat-card-content>
+          <div class="cashflow-drag-wrapper">
+            <div class="d-flex flex-column gap-20">
+              <h3 class="sec-heading">
+                {{
+                  "Other liquid savings, investments and pensions:" | translate
+                }}
+              </h3>
+              <div
+                cdkDropList
+                [cdkDropListData]="savingPots?.clientSavings"
+                (cdkDropListDropped)="drop($event)"
+                class="flex-column d-flex gap-16"
+                id="drag-boundary"
+              >
+                <!-- Card One -->
+                @for (
+                  saving of savingPots?.clientSavings;
+                  track saving;
+                  let i = $index
+                ) {
+                  <div
+                    [cdkDragData]="saving"
+                    cdkDragLockAxis="y"
+                    cdkDrag
+                    cdkDragBoundary="#drag-boundary"
+                    class="d-flex justify-content-between align-items-center gap-12 dragable-card-wrapper"
+                  >
+                    <!-- Card  -->
+                    <div
+                      (click)="updateEventClicked(saving)"
+                      class="dragable-card d-flex align-items-center justify-content-between cursor-pointer"
+                    >
+                      <!-- Content  -->
+                      <div class="d-flex align-items-center gap-12">
+                        @if (
+                          i > 0 &&
+                          !(
+                            "cash" ===
+                            (
+                              savingPots.clientSavings[i]?.name || ""
+                            ).toLowerCase()
+                          )
+                        ) {
+                          <button cdkDragHandle type="button" class="drag-btn">
+                            <!-- <img
+                              src="/assets/images/svgs/drag-icon.svg"
+                              alt="drag-icon"
+                            /> -->
 
-                                                    <h3 class="saving-title">
-                                                        {{selectedClient?.clientDetails?.preferredCurrency|currencySymbol}}{{saving.startingPotValue.amount|thousandSeparator}}
-                                                    </h3>
-                                                    <span
-                                                        [className]="saving.returnRate > 0 ? 'badge green' : 'badge red'">
-                                                        <!-- @if(saving.realReturn >= 0){+}{{saving.realReturn | number :
+                            <svg
+                              width="12"
+                              height="20"
+                              viewBox="0 0 12 20"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M2 4C3.10457 4 4 3.10457 4 2C4 0.89543 3.10457 0 2 0C0.89543 0 0 0.89543 0 2C0 3.10457 0.89543 4 2 4Z"
+                                fill="#516CE8"
+                              />
+                              <path
+                                d="M2 12C3.10457 12 4 11.1046 4 10C4 8.89543 3.10457 8 2 8C0.89543 8 0 8.89543 0 10C0 11.1046 0.89543 12 2 12Z"
+                                fill="#516CE8"
+                              />
+                              <path
+                                d="M2 20C3.10457 20 4 19.1046 4 18C4 16.8954 3.10457 16 2 16C0.89543 16 0 16.8954 0 18C0 19.1046 0.89543 20 2 20Z"
+                                fill="#516CE8"
+                              />
+                              <path
+                                d="M10 4C11.1046 4 12 3.10457 12 2C12 0.89543 11.1046 0 10 0C8.89543 0 8 0.89543 8 2C8 3.10457 8.89543 4 10 4Z"
+                                fill="#516CE8"
+                              />
+                              <path
+                                d="M10 12C11.1046 12 12 11.1046 12 10C12 8.89543 11.1046 8 10 8C8.89543 8 8 8.89543 8 10C8 11.1046 8.89543 12 10 12Z"
+                                fill="#516CE8"
+                              />
+                              <path
+                                d="M10 20C11.1046 20 12 19.1046 12 18C12 16.8954 11.1046 16 10 16C8.89543 16 8 16.8954 8 18C8 19.1046 8.89543 20 10 20Z"
+                                fill="#516CE8"
+                              />
+                            </svg>
+                          </button>
+                        } @else {
+                          <span
+                            class="drag-btn drag-spacer"
+                            aria-hidden="true"
+                          ></span>
+                        }
+                        <!-- @if((saving.name || '').toLowerCase() !== 'cash' && i < savingPots.clientSavings.length - 1) { -->
+
+                        <!-- Status  -->
+                        <div class="stats-main-wrapper">
+                          <div class="d-flex flex-column gap-8">
+                            <div class="d-flex align-items-center gap-8">
+                              <img
+                                [src]="
+                                  'assets/images/svgs/' +
+                                  saving.iconUrl +
+                                  '.svg'
+                                "
+                                alt="cashflow-moneys-icon"
+                              />
+                              <h3 class="card-title-new">{{ saving.name }}</h3>
+                              @if (hasPartner) {
+                                <span class="badge ownership-badge"
+                                  >{{ "Ownership" | translate }}:
+                                  {{ getOwnershipLabel(saving) }}</span
+                                >
+                              }
+                            </div>
+                            <div class="d-flex align-items-center gap-10">
+                              <h3 class="saving-title">
+                                {{
+                                  selectedClient?.clientDetails
+                                    ?.preferredCurrency | currencySymbol
+                                }}{{
+                                  saving.startingPotValue.amount
+                                    | thousandSeparator
+                                }}
+                              </h3>
+                              <span
+                                [className]="
+                                  saving.returnRate > 0
+                                    ? 'badge green'
+                                    : 'badge red'
+                                "
+                              >
+                                <!-- @if(saving.realReturn >= 0){+}{{saving.realReturn | number :
                                                         '1.2-2'}}% -->
-                                                        @if(saving.returnRate >= 0){+}{{formatReturnRate(saving.returnRate)}}%
-                                                    </span>
-                                                    <!-- <span>
+                                @if (saving.returnRate >= 0) {
+                                  +
+                                }
+                                {{ formatReturnRate(saving.returnRate) }}%
+                              </span>
+                              <!-- <span>
                                                         NV: {{saving.nominalValue | thousandSeparator}}
                                                         RV: {{saving.realValue | thousandSeparator}}
                                                     </span> -->
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <!-- End Status  -->
-                                    </div>
-                                    <!-- End Content  -->
-                                    <!--  Chart  -->
-                                    <div class="card-chart">
-                                        @if(saving.isGrowing) {
-                                        <img src="assets/images/shapes/dummy-green-graph.png" alt="dummy-green-graph">
-                                        }
-                                        @else {
-                                        <img src="assets/images/shapes/dummy-red-graph.png" alt="dummy-red-graph">
-                                        }
-                                    </div>
-                                    <!-- End Chart  -->
-                                    @if(saving.hasPotLocked) {
-                                    <div class="lock-overlay">
-                                        <div
-                                            class="d-flex align-items-center justify-content-center flex-column gap-10 h-100">
-                                            <img src="assets/images/svgs/cashflow-lock-icon.svg"
-                                                alt="cashflow-lock-icon">
-
-                                            <h4 style="color: white;">{{ 'Locked from' | translate }} {{saving.lockedFrom.year}} to
-                                                {{saving.lockedTill.year}}</h4>
-                                        </div>
-                                        <div class="help-lock-overlay">
-                                            <img src="assets/images/svgs/help-circle-lock-overlay.svg"
-                                                alt="help-circle-lock-overlay">
-                                        </div>
-                                    </div>
-                                    }
-                                    <div class="edit-icon-overlay">
-                                        <button mat-icon-button (click)="updateEventClicked(saving); $event.stopPropagation()">
-                                            <mat-icon>
-                                                <img src="assets/images/svgs/drop-down-edit-2-line.svg" alt="pen-icon" />
-                                            </mat-icon>
-                                        </button>
-                                        @if (canDeleteSaving(saving)) {
-                                            <button mat-icon-button (click)="deleteEventClicked(saving); $event.stopPropagation()">
-                                                <mat-icon>
-                                                    <img src="assets/images/svgs/drop-down-delete-2-line.svg"
-                                                        alt="del-icon" />
-                                                </mat-icon>
-                                            </button>
-                                        }
-
-                                    </div>
-                                    <!-- <div class="edit-icon-overlay">
-                                        </div> -->
-                                </div>
-                                <!-- End Card  -->
-
-                                <!-- Up and Down Buttons   -->
-                                @if(savingPots.clientSavings) {
-                                <div class="d-flex flex-column gap-10 vote-btns">
-                                    @if(i > 0 && !('cash' === (savingPots.clientSavings[i - 1]?.name ||
-                                    '').toLowerCase())) {
-                                    <button (click)="moveUp(i)" type="button">
-                                        <img src="assets/images/svgs/vote-arrow-up.svg" alt="vote-arrow-up">
-                                    </button>
-                                    }
-                                    @if((saving.name || '').toLowerCase() !== 'cash' && i <
-                                        savingPots.clientSavings.length - 1) { <button (click)="moveDown(i)"
-                                        type="button">
-                                        <img src="assets/images/svgs/vote-arrow-down.svg" alt="vote-arrow-down">
-                                        </button>
-                                        }
-                                </div>
-                                }
-                                <!-- End Up and Down Buttons   -->
                             </div>
-                            }
-                            <!-- End Card One -->
+                          </div>
                         </div>
+                        <!-- End Status  -->
+                      </div>
+                      <!-- End Content  -->
+                      <div class="d-flex align-items-center">
+                        <!--  Chart  -->
+                        <div
+                          class="d-flex flex-column align-items-center chart-wrapper"
+                        >
+                          <div class="card-chart">
+                            @if (saving.isGrowing) {
+                              <img
+                                src="assets/images/shapes/dummy-green-graph.png"
+                                alt="dummy-green-graph"
+                              />
+                            } @else {
+                              <img
+                                src="assets/images/shapes/dummy-red-graph.png"
+                                alt="dummy-red-graph"
+                              />
+                            }
+                          </div>
+                          <div class="ibr-chart-tag">
+                            Ownership: <span>Anna</span>
+                          </div>
+                        </div>
+                        <!-- End Chart  -->
+                        <div>
+                          <button
+                            mat-icon-button
+                            [matMenuTriggerFor]="beforeMenu"
+                            aria-label="icon-button with a menu"
+                            type="button"
+                            class="dropdown-button"
+                            (click)="$event.stopPropagation()"
+                          >
+                            <mat-icon>
+                              <svg
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  d="M12 13C12.5523 13 13 12.5523 13 12C13 11.4477 12.5523 11 12 11C11.4477 11 11 11.4477 11 12C11 12.5523 11.4477 13 12 13Z"
+                                  stroke="#5A596E"
+                                  stroke-width="2"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                />
+                                <path
+                                  d="M12 6C12.5523 6 13 5.55228 13 5C13 4.44772 12.5523 4 12 4C11.4477 4 11 4.44772 11 5C11 5.55228 11.4477 6 12 6Z"
+                                  stroke="#5A596E"
+                                  stroke-width="2"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                />
+                                <path
+                                  d="M12 20C12.5523 20 13 19.5523 13 19C13 18.4477 12.5523 18 12 18C11.4477 18 11 18.4477 11 19C11 19.5523 11.4477 20 12 20Z"
+                                  stroke="#5A596E"
+                                  stroke-width="2"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                />
+                              </svg>
+                            </mat-icon>
+                          </button>
+                          <mat-menu
+                            #beforeMenu="matMenu"
+                            xPosition="before"
+                            class="action-dropdown-menus"
+                          >
+                            <button
+                              mat-menu-item
+                              (click)="updateEventClicked(saving)"
+                            >
+                              <mat-icon>
+                                <svg
+                                  width="20"
+                                  height="20"
+                                  viewBox="0 0 20 20"
+                                  fill="none"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <g clip-path="url(#clip0_3194_409)">
+                                    <path
+                                      d="M9.16602 3.33203H3.33268C2.89065 3.33203 2.46673 3.50763 2.15417 3.82019C1.84161 4.13275 1.66602 4.55667 1.66602 4.9987V16.6654C1.66602 17.1074 1.84161 17.5313 2.15417 17.8439C2.46673 18.1564 2.89065 18.332 3.33268 18.332H14.9993C15.4414 18.332 15.8653 18.1564 16.1779 17.8439C16.4904 17.5313 16.666 17.1074 16.666 16.6654V10.832"
+                                      stroke="#5A596E"
+                                      stroke-width="2"
+                                      stroke-linecap="round"
+                                      stroke-linejoin="round"
+                                    />
+                                    <path
+                                      d="M15.416 2.08417C15.7475 1.75265 16.1972 1.56641 16.666 1.56641C17.1349 1.56641 17.5845 1.75265 17.916 2.08417C18.2475 2.41569 18.4338 2.86533 18.4338 3.33417C18.4338 3.80301 18.2475 4.25265 17.916 4.58417L9.99935 12.5008L6.66602 13.3342L7.49935 10.0008L15.416 2.08417Z"
+                                      stroke="#5A596E"
+                                      stroke-width="2"
+                                      stroke-linecap="round"
+                                      stroke-linejoin="round"
+                                    />
+                                  </g>
+                                  <defs>
+                                    <clipPath id="clip0_3194_409">
+                                      <rect
+                                        width="20"
+                                        height="20"
+                                        fill="white"
+                                      />
+                                    </clipPath>
+                                  </defs>
+                                </svg>
+                              </mat-icon>
+                              <span>{{ "Edit" | translate }}</span>
+                            </button>
+                            @if (canDeleteSaving(saving)) {
+                              <button
+                                class="action-dropdown-menus"
+                                (click)="deleteEventClicked(saving)"
+                                mat-menu-item
+                              >
+                                <mat-icon>
+                                  <svg
+                                    width="20"
+                                    height="20"
+                                    viewBox="0 0 20 20"
+                                    fill="none"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <path
+                                      d="M2.5 5H4.16667H17.5"
+                                      stroke="#5A596E"
+                                      stroke-width="2"
+                                      stroke-linecap="round"
+                                      stroke-linejoin="round"
+                                    />
+                                    <path
+                                      d="M15.8327 5.0013V16.668C15.8327 17.11 15.6571 17.5339 15.3445 17.8465C15.032 18.159 14.608 18.3346 14.166 18.3346H5.83268C5.39065 18.3346 4.96673 18.159 4.65417 17.8465C4.34161 17.5339 4.16602 17.11 4.16602 16.668V5.0013M6.66602 5.0013V3.33464C6.66602 2.89261 6.84161 2.46868 7.15417 2.15612C7.46673 1.84356 7.89065 1.66797 8.33268 1.66797H11.666C12.108 1.66797 12.532 1.84356 12.8445 2.15612C13.1571 2.46868 13.3327 2.89261 13.3327 3.33464V5.0013"
+                                      stroke="#5A596E"
+                                      stroke-width="2"
+                                      stroke-linecap="round"
+                                      stroke-linejoin="round"
+                                    />
+                                    <path
+                                      d="M8.33398 9.16797V14.168"
+                                      stroke="#5A596E"
+                                      stroke-width="2"
+                                      stroke-linecap="round"
+                                      stroke-linejoin="round"
+                                    />
+                                    <path
+                                      d="M11.666 9.16797V14.168"
+                                      stroke="#5A596E"
+                                      stroke-width="2"
+                                      stroke-linecap="round"
+                                      stroke-linejoin="round"
+                                    />
+                                  </svg>
+                                </mat-icon>
+                                <span>{{ "Delete" | translate }}</span>
+                              </button>
+                            }
+                          </mat-menu>
+                        </div>
+                      </div>
+                      @if (saving.hasPotLocked) {
+                        <div class="lock-overlay">
+                          <div
+                            class="d-flex align-items-center justify-content-center flex-column gap-10 h-100"
+                          >
+                            <!-- <img
+                              src="assets/images/svgs/cashflow-lock-icon.svg"
+                              alt="cashflow-lock-icon"
+                            /> -->
+
+                            <svg
+                              width="32"
+                              height="32"
+                              viewBox="0 0 32 32"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M25.3333 14.666H6.66667C5.19391 14.666 4 15.8599 4 17.3327V26.666C4 28.1388 5.19391 29.3327 6.66667 29.3327H25.3333C26.8061 29.3327 28 28.1388 28 26.666V17.3327C28 15.8599 26.8061 14.666 25.3333 14.666Z"
+                                stroke="#787889"
+                                stroke-width="2.66667"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                              />
+                              <path
+                                d="M9.3335 14.666V9.33268C9.3335 7.56457 10.0359 5.86888 11.2861 4.61864C12.5364 3.36839 14.2321 2.66602 16.0002 2.66602C17.7683 2.66602 19.464 3.36839 20.7142 4.61864C21.9644 5.86888 22.6668 7.56457 22.6668 9.33268V14.666"
+                                stroke="#787889"
+                                stroke-width="2.66667"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                              />
+                            </svg>
+
+                            <h4 class="overlay-lock-text">
+                              {{ "Locked from" | translate }}
+                              {{ saving.lockedFrom.year }} to
+                              {{ saving.lockedTill.year }}
+                            </h4>
+                          </div>
+                          <div class="help-lock-overlay">
+                            <img
+                              src="assets/images/svgs/help-circle-lock-overlay.svg"
+                              alt="help-circle-lock-overlay"
+                            />
+                          </div>
+                        </div>
+                      }
+
+                      <!-- <div class="edit-icon-overlay">
+                        <button
+                          mat-icon-button
+                          (click)="
+                            updateEventClicked(saving); $event.stopPropagation()
+                          "
+                        >
+                          <mat-icon>
+                            <img
+                              src="assets/images/svgs/drop-down-edit-2-line.svg"
+                              alt="pen-icon"
+                            />
+                          </mat-icon>
+                        </button>
+                        @if (canDeleteSaving(saving)) {
+                          <button
+                            mat-icon-button
+                            (click)="
+                              deleteEventClicked(saving);
+                              $event.stopPropagation()
+                            "
+                          >
+                            <mat-icon>
+                              <img
+                                src="assets/images/svgs/drop-down-delete-2-line.svg"
+                                alt="del-icon"
+                              />
+                            </mat-icon>
+                          </button>
+                        }
+                      </div> -->
+                      <!-- <div class="edit-icon-overlay">
+                                        </div> -->
                     </div>
-                </div>
-            </mat-card-content>
-        </mat-card>
-        <!-- End liquid savings, investments and pensions Section  -->
+                    <!-- End Card  -->
+
+                    <!-- Up and Down Buttons   -->
+                    @if (savingPots.clientSavings) {
+                      <div class="d-flex flex-column gap-10 vote-btns">
+                        @if (
+                          i > 0 &&
+                          !(
+                            "cash" ===
+                            (
+                              savingPots.clientSavings[i - 1]?.name || ""
+                            ).toLowerCase()
+                          )
+                        ) {
+                          <button (click)="moveUp(i)" type="button">
+                            <svg
+                              width="24"
+                              height="24"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M12 19L12 5"
+                                stroke="#5A596E"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                              />
+                              <path
+                                d="M5 12L12 5L19 12"
+                                stroke="#5A596E"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                              />
+                            </svg>
+                          </button>
+                        }
+                        @if (
+                          (saving.name || "").toLowerCase() !== "cash" &&
+                          i < savingPots.clientSavings.length - 1
+                        ) {
+                          <button (click)="moveDown(i)" type="button">
+                            <svg
+                              width="24"
+                              height="24"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M12 5L12 19"
+                                stroke="#5A596E"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                              />
+                              <path
+                                d="M19 12L12 19L5 12"
+                                stroke="#5A596E"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                              />
+                            </svg>
+                          </button>
+                        }
+                      </div>
+                    }
+                    <!-- End Up and Down Buttons   -->
+                  </div>
+                }
+                <!-- End Card One -->
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+      <!-- End liquid savings, investments and pensions Section  -->
     </div>
-    }
-    @else {
+  } @else {
     <div class="h-300">
-        <mat-spinner></mat-spinner>
+      <mat-spinner></mat-spinner>
     </div>
-    }
+  }
 </div>

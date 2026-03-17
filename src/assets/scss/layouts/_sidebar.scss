@@ -257,7 +257,7 @@
     color: white;
   }
   span {
-    font-size: 14px;
+    font-size: 16px;
     line-height: 20px;
     color: #a6abb2;
     font-weight: 400;
@@ -440,7 +440,7 @@
         }
       }
       span {
-        font-size: 14px;
+        font-size: 16px;
         line-height: 20px;
       }
       // &.activeMenu{
@@ -541,15 +541,16 @@
 .nav-left {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   flex: 1;
 }
 
 .menu-label {
-  font-size: 11px !important;
-  line-height: 14px !important;
-  background-color: #ff4344;
+  font-size: 7px !important;
+  line-height: 8px !important;
+  background-color: #ff383c;
   color: white;
-  border-radius: 15px;
-  padding: 1px 5px;
+  border-radius: 50px;
+  font-family: "Inter", sans-serif;
+  padding: 3px 6px;
 }

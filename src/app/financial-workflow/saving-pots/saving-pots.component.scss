@@ -1,28 +1,41 @@
 .stats-main-wrapper {
   .saving-title {
-    font-size: 24px;
-    line-height: 36px;
+    font-size: 20px;
+    line-height: 24px;
     font-weight: 700;
-     font-family: 'Ubuntu';
+    color: #1c1c1c;
+    font-family: "Ubuntu", serif;
   }
   .badge {
     border-radius: 999px;
     padding: 6px 10px;
     color: white;
-    font-size: 18px;
+    font-size: 16px;
     line-height: 18px;
     font-weight: 500;
     &.green {
-      background-color: #71bc42;
+      background-color: #34c759;
     }
     &.red {
-      background-color: #ff4444;
+      background-color: #ff383c;
     }
     &.ownership-badge {
-      background-color: #516ce8;
+      background-color: #4043af;
       font-size: 13px;
       padding: 4px 10px;
     }
+  }
+  .card-title-new {
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 18px;
+    color: #5a596e;
+  }
+  .card-saving-title {
+    font-weight: 700;
+    font-size: 40px;
+    line-height: 100%;
+    color: #1c1c1c;
   }
 }
 
@@ -66,16 +79,17 @@
 
 .cashflow-drag-wrapper {
   .sec-heading {
-    font-size: 20px;
+    font-size: 16px;
     font-weight: 400;
-    line-height: 22.98px;
-    color: #1c1c1c;
+    line-height: 100%;
+    color: #5a596e;
   }
 }
 .vote-btns {
   button {
     outline: none;
     border: none;
+    padding: 0;
     background-color: transparent;
     cursor: pointer;
     transition: all 0.3s ease-in-out;
@@ -99,18 +113,18 @@
   overflow: hidden;
   position: relative;
   flex: 1;
-  padding: 24px 16px;
+  padding: 16px 24px;
   border-radius: 10px;
   background-color: #f7fbff;
-  border: 1px solid #f7f7f7;
+  border: 1px solid #0000001a;
   .stats-main-wrapper {
     .saving-title {
-       font-family: 'Ubuntu';
+      font-family: "Ubuntu";
     }
   }
   .drag-btn {
-    height: 36px;
-    width: 36px;
+    height: 24px;
+    width: 24px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -129,12 +143,12 @@
     left: 0;
     height: 100%;
     width: 100%;
-    background-color: #3a3a4740;
+    background-color: #ffffffb2;
     backdrop-filter: blur(1px);
     -webkit-backdrop-filter: blur(1px);
     p {
       color: white;
-       font-family: 'Ubuntu';
+      font-family: "Ubuntu";
       font-size: 14px;
       line-height: 20px;
       font-weight: 500;
@@ -147,13 +161,19 @@
       right: 16px;
     }
   }
-  .edit-icon-overlay {
-    position: absolute;
-    bottom: 0px;
-    right: 16px;
-  }
+  // .edit-icon-overlay {
+  //   position: absolute;
+  //   bottom: 0px;
+  //   right: 16px;
+  // }
 }
 
+.overlay-lock-text {
+  font-size: 16px;
+  line-height: 100%;
+  color: #787889;
+  font-weight: 500;
+}
 // End Dragable Cards
 
 // Feeback Cards
@@ -308,12 +328,12 @@
   background-color: #c82333;
 }
 
-.vote-btns{
+.vote-btns {
   width: 27px;
 }
 .drag-btn,
 .drag-spacer {
-  width: 32px;           /* keep same footprint as the real button */
+  width: 32px; /* keep same footprint as the real button */
   height: 32px;
   display: inline-flex;
   align-items: center;
@@ -321,6 +341,30 @@
 }
 
 .drag-spacer {
-  pointer-events: none;  /* cannot click/drag */
+  pointer-events: none; /* cannot click/drag */
   user-select: none;
+}
+
+// New Style
+
+.chart-wrapper {
+  .card-chart {
+    img {
+      max-width: 118px;
+    }
+  }
+  .ibr-chart-tag {
+    background-color: #ffebcb;
+    border-radius: 9999px;
+    // height: 30px;
+    text-align: center;
+    padding: 10px 10px;
+    color: #fe9614;
+    font-size: 14px;
+    line-height: 16px;
+    font-weight: 400;
+    span {
+      font-weight: 500;
+    }
+  }
 }

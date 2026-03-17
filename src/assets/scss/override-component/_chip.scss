@@ -16,7 +16,7 @@
   //   height: auto !important;
   // }
   .mat-mdc-chip-set .mdc-evolution-chip-set__chips {
-    gap: 8px !important;
+    gap: 10px !important;
   }
   .mat-mdc-chip-focus-overlay {
     display: none;
@@ -24,14 +24,22 @@
   .mat-mdc-chip-ripple {
     display: none !important;
   }
+  .mat-mdc-standard-chip {
+    height: 36px;
+  }
   .chip-item {
-    padding: 4px 10px;
+    padding: 4px 14px;
     align-items: center;
     display: flex;
     width: fit-content;
     &.retirement-age-icon {
       background-color: #fff9f7 !important;
       border: 1px solid #ffede7;
+      p {
+        color: #e52ef5 !important;
+        margin: 0;
+        padding: 0;
+      }
     }
     &.inheritance-icon {
       background-color: #f8fff2 !important;
@@ -40,10 +48,20 @@
     &.birth-icon {
       background-color: #ffedd7 !important;
       // border: 1px solid #fff3e0;
+      p {
+        color: #fe9614 !important;
+        margin: 0;
+        padding: 0;
+      }
     }
     &.wedding-icon {
       background-color: #e2e0fc !important;
       // border: 1px solid #eae0ff;
+      p {
+        color: #6155f5 !important;
+        margin: 0;
+        padding: 0;
+      }
     }
     &.mortality-icon {
       background-color: #f7f7f7 !important;
@@ -69,26 +87,56 @@
     &.home-icon {
       background-color: #fddce2;
       // border: 1px solid #e0ecf4 !important;
+      p {
+        color: #ff2d55 !important;
+        margin: 0;
+        padding: 0;
+      }
     }
     &.travel-icon {
       background-color: #cee9ff;
       // border: 1px solid #dfe3ef !important;
+      p {
+        color: #0088ff !important;
+        margin: 0;
+        padding: 0;
+      }
     }
     &.car-icon {
       background-color: #fff4eb;
       // border: 1px solid #eddace !important;
+      p {
+        color: #ac7f5e !important;
+        margin: 0;
+        padding: 0;
+      }
     }
     &.education-icon {
       background-color: #d2fffb;
       // border: 1px solid #dee7f6 !important;
+      p {
+        color: #00c8b3 !important;
+        margin: 0;
+        padding: 0;
+      }
     }
     &.new-business-icon {
       background-color: #ddffe5;
       // border: 1px solid #ffe8e5 !important;
+      p {
+        color: #34c759 !important;
+        margin: 0;
+        padding: 0;
+      }
     }
     &.boat-icon {
       background-color: #ffe2d5;
       // border: 1px solid #cbf1db !important;
+      p {
+        color: #ff7504 !important;
+        margin: 0;
+        padding: 0;
+      }
     }
 
     border-radius: 999px !important;

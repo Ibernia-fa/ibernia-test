@@ -5,7 +5,7 @@
 
   height: 65px; /* Fixed height */
   padding: 0 1rem; /* Padding for spacing */
-  font-size: 14px; /* Font size */
+  font-size: 16px; /* Font size */
   color: #5a596e; /* Text color */
   position: fixed; /* Keep the footer fixed */
   bottom: 1rem; /* Stick to the bottom of the page */
@@ -29,13 +29,13 @@
 
 .footer-content nav {
   display: flex;
-  gap: 20px; /* Spacing between links */
+  gap: 32px; /* Spacing between links */
 }
 
 .footer-content nav a {
-  color: #6c757d; /* Link color */
+  color: #5a596e; /* Link color */
   text-decoration: none;
-  font-weight: 500;
+  font-weight: 400;
 }
 
 .footer-content nav a:hover {

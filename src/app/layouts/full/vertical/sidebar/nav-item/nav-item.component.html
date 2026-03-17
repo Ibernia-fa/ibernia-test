@@ -1,14 +1,14 @@
 @if (item.navCap) {
   <a
     (click)="onItemSelected(item)"
-    class="cashflow-modal d-flex align-items-center gap-8"
+    class="cashflow-modal d-flex align-items-center gap-12"
     [ngClass]="
       navItem.currentRouteName === item.displayName ? 'activeMenu' : ''
     "
   >
     <svg
-      height="20"
-      width="20"
+      height="24"
+      width="24"
       version="1.1"
       id="Layer_1"
       xmlns="http://www.w3.org/2000/svg"
@@ -41,7 +41,7 @@
       alt="cash-flow"
     /> -->
     <!-- <span>{{ item.navCap }}</span> -->
-    <span>{{ "Lifetime Plan" | translate }}</span>
+    <span>{{ "Plan" | translate }}</span>
   </a>
 }
 @if (!item.navCap && !item.external && !item.twoLines) {
@@ -87,7 +87,7 @@
     <div class="nav-item-row">
       <div class="nav-left">
         <img
-          style="flex: none; max-width: 20px"
+          style="flex: none; max-width: 24px"
           [src]="
             item.currentRouteName === item.displayName
               ? item.iconName
