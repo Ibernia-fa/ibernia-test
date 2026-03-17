@@ -1,4 +1,44 @@
-<nav class="cashflow-nav">
+@if (isReady) {
+  <nav class="cashflow-nav" role="navigation" aria-label="Cashflow navigation">
+    <ul class="cashflow-nav__list">
+      @for (item of navItems; track item.route; let last = $last) {
+        <li class="cashflow-nav__item">
+          <a
+            class="cashflow-nav__link"
+            [routerLink]="getLink(item)"
+            routerLinkActive="cashflow-nav__link--active"
+            [attr.aria-label]="item.labelKey | translate"
+          >
+            <span class="cashflow-nav__icon-wrap" aria-hidden="true">
+              <svg
+                class="cashflow-nav__icon"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                fill="none"
+                [innerHTML]="item.svgContent"
+              ></svg>
+            </span>
+
+            <span class="cashflow-nav__label">
+              {{ item.labelKey | translate }}
+            </span>
+          </a>
+        </li>
+        @if (!last) {
+          <li
+            class="cashflow-nav__divider"
+            aria-hidden="true"
+            role="separator"
+          ></li>
+        }
+      }
+    </ul>
+  </nav>
+}
+
+<!-- <nav class="cashflow-nav">
   @for (item of navItems; track item.route; let last = $last) {
     <a
       [routerLink]="getLink(item)"
@@ -11,7 +51,7 @@
       <span class="nav-label">{{ item.label | translate }}</span>
     </a>
     @if (!last) {
-      <span class="nav-divider"></span>
+      <span class="ibr-nav-divider"></span>
     }
   }
-</nav>
+</nav> -->

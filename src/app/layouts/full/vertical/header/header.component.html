@@ -32,23 +32,36 @@
         class="header-breadcrumb d-flex align-items-center"
         aria-label="Breadcrumb"
       >
-        <a
+        <!-- <a
           [routerLink]="['/clients']"
           class="breadcrumb-link d-flex align-items-center text-decoration-none"
           matTooltip="Home"
-        >
-          <i-tabler name="home" class="breadcrumb-home-icon"></i-tabler>
-        </a>
-        <span class="breadcrumb-chevron" aria-hidden="true">&gt;</span>
+        > -->
         <a
+          [routerLink]="['/clients']"
+          class="breadcrumb-link d-flex align-items-center text-decoration-none"
+        >
+          <!-- <i-tabler name="home" class="breadcrumb-home-icon"></i-tabler> -->
+          Home
+        </a>
+        <span class="breadcrumb-chevron" aria-hidden="true">></span>
+        <!-- <a
           [routerLink]="clientProfileLink"
           class="breadcrumb-link d-flex align-items-center text-decoration-none"
           matTooltip="Go to client page"
+        > -->
+        <a
+          [routerLink]="clientProfileLink"
+          class="breadcrumb-link d-flex align-items-center text-decoration-none"
         >
           {{ clientFullName }}
         </a>
-        <span class="breadcrumb-chevron" aria-hidden="true">&gt;</span>
-        <span class="breadcrumb-current f-w-600">{{ planName || "Plan" }}</span>
+        <span
+          class="breadcrumb-chevron breadcrumb-current f-w-500"
+          aria-hidden="true"
+          >></span
+        >
+        <span class="breadcrumb-current f-w-500">{{ planName || "Plan" }}</span>
       </nav>
     </ng-container>
 
@@ -226,7 +239,11 @@
     <div class="d-flex align-items-center nav-btns">
       <!-- </div> -->
       <!-- <div class="d-flex justify-content-center m-x-5"> -->
-      <button mat-icon-button aria-label="Notifications" class="m-x-5">
+      <button
+        mat-icon-button
+        aria-label="Notifications"
+        class="position-relative notification-button"
+      >
         <!-- <i-tabler class="d-flex" name="bell" matBadgeColor="primary"></i-tabler> -->
 
         <svg
@@ -258,7 +275,9 @@
                 alt="profile"
               />
             } @else {
-              <div class="avatar-initials rounded-circle icon-34 d-flex align-items-center justify-content-center">
+              <div
+                class="avatar-initials rounded-circle icon-34 d-flex align-items-center justify-content-center"
+              >
                 {{ userInitials }}
               </div>
             }

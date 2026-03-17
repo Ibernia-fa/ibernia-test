@@ -28,25 +28,31 @@
   max-width: 100% !important;
   min-width: auto !important;
 }
+.cdk-global-overlay-wrapper {
+  padding: 0 16px;
+}
 
 // Custom Dialog Field Style
 .net-fields {
   span {
-    line-height: 18px;
+    line-height: 16px;
+    color: #48475d;
+    font-size: 14px;
+    font-weight: 500;
   }
   .net-field {
     .form-field {
       flex: 1;
     }
     .form-field input {
-      border: 1px solid #e7e7eb;
+      // border: 1px solid #0000001a;
       border-radius: 0px;
     }
     .left {
       .sortby-edit-profile {
-        min-width: 105px !important;
-        border: 1px solid #e7e7eb;
-        border-right: none;
+        min-width: 0px !important;
+        border-right: 1px solid #0000001a;
+        background-color: #f5f5f5;
         height: 46px;
         line-height: 29px;
         border-radius: 4px 0px 0px 4px;
@@ -54,13 +60,28 @@
     }
     .right {
       .sortby-edit-profile {
-        min-width: 150px !important;
+        min-width: 136px !important;
         border-radius: 0px 4px 4px 0px;
 
-        border: 1px solid #e7e7eb;
-        border-left: none;
+        border-left: 1px solid #0000001a;
+        background-color: #f5f5f5;
+        // border-left: none;
         height: 46px;
         line-height: 29px;
+        .mat-mdc-select-arrow {
+          display: none;
+        }
+      }
+      &.custom-select {
+        position: relative;
+        .custom-arrow {
+          position: absolute;
+          right: 16px;
+          top: 50%;
+          transform: translateY(-50%);
+          pointer-events: none;
+          color: #787889;
+        }
       }
     }
   }

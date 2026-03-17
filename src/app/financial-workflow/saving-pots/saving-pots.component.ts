@@ -13,9 +13,21 @@ import {
 } from '@angular/cdk/drag-drop';
 import { animate, style, transition, trigger } from '@angular/animations';
 import { CommonModule } from '@angular/common';
-import { combineLatest, filter, map, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import {
+  combineLatest,
+  filter,
+  map,
+  Subject,
+  switchMap,
+  takeUntil,
+  tap,
+} from 'rxjs';
 import { SavingsPotsHttpService as SavingPotsHttpService } from './services/savings-pots-http.service';
-import { ClientSaving, SavingPotsModel as SavingPots, SavingPotOwnership } from './models/saving-pots.model';
+import {
+  ClientSaving,
+  SavingPotsModel as SavingPots,
+  SavingPotOwnership,
+} from './models/saving-pots.model';
 import { Cashflow } from 'src/app/clients/models/cashflow';
 import { TimelineHttpService } from '../timeline/services/timeline-http.service';
 import { Client } from 'src/app/clients/models/client';
@@ -38,6 +50,7 @@ import { AuthService } from 'src/app/auth/services/auth.service';
 import { SettingsService } from 'src/app/default-preferance/services/default-preferance.http.service';
 import { TranslateModule } from '@ngx-translate/core';
 import { patchInflationRateDescription } from 'src/app/shared/utils/escalation-rate-utils';
+import { MaterialModule } from 'src/app/material.module';
 @Component({
   selector: 'app-saving-pots',
   imports: [
@@ -55,7 +68,8 @@ import { patchInflationRateDescription } from 'src/app/shared/utils/escalation-r
     FormsModule,
     CurrencySymbolPipe,
     ThousandSeparatorPipe,
-    TranslateModule
+    TranslateModule,
+    MaterialModule,
   ],
 
   templateUrl: './saving-pots.component.html',
@@ -97,7 +111,7 @@ export class SavingPotsComponent implements OnInit {
   user: any;
   userRerturnRate: any;
   loggedInUserPreferences: any;
-      private destroy$ = new Subject<void>();
+  private destroy$ = new Subject<void>();
 
   constructor(
     private dialog: MatDialog,
@@ -107,22 +121,21 @@ export class SavingPotsComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private financialWorkflowService: FinancialWorkflowService,
     private Authservice: AuthService,
-     private settingsService: SettingsService
+    private settingsService: SettingsService,
   ) {
     this.user = this.Authservice.getUserProfile();
-      this.settingsService.userData$
-        .pipe(
-          filter((v): v is NonNullable<typeof v> => v != null), // skip initial null
-          takeUntil(this.destroy$)
-        )
-        .subscribe((data) => {
-                 const p = data.preferences;
-       this.loggedInUserPreferences = p;
-      this.userRerturnRate = p.investmentReturn;
-        });
+    this.settingsService.userData$
+      .pipe(
+        filter((v): v is NonNullable<typeof v> => v != null), // skip initial null
+        takeUntil(this.destroy$),
+      )
+      .subscribe((data) => {
+        const p = data.preferences;
+        this.loggedInUserPreferences = p;
+        this.userRerturnRate = p.investmentReturn;
+      });
     this.getData();
-    
-}
+  }
 
   SavingPotOwnership = SavingPotOwnership;
   transitionState = '';
@@ -142,7 +155,7 @@ export class SavingPotsComponent implements OnInit {
   currentStep = 1;
   feedbackDetail = '';
   total: number | null;
-  potAmounts: number[] | null; 
+  potAmounts: number[] | null;
 
   items = [
     { id: 1, name: 'Item 1', score: 5 },
@@ -156,7 +169,7 @@ export class SavingPotsComponent implements OnInit {
     (this.activatedRoute.parent?.params ?? this.activatedRoute.params)
       .pipe(
         switchMap((params) =>
-          this.financialWorkflowService.loadClientCashflowMetadata(params)
+          this.financialWorkflowService.loadClientCashflowMetadata(params),
         ),
         tap(([client, cashflow]) => {
           this.selectedClient = client as Client;
@@ -165,38 +178,39 @@ export class SavingPotsComponent implements OnInit {
         switchMap(([client, cashflow]) => {
           return combineLatest([
             this.savingPotsHttpService.getAllSavingsPots(
-              (cashflow as Cashflow).id
+              (cashflow as Cashflow).id,
             ),
             this.timelineHttpService.getTimelinebyCashflowId(
-              (cashflow as Cashflow).id
+              (cashflow as Cashflow).id,
             ),
             this.settingHttpService.getAmountCycles(),
-            this.settingHttpService.getEscalationRates(
-              (client as Client).id
-            ),
+            this.settingHttpService.getEscalationRates((client as Client).id),
           ]);
         }),
         tap(([savingPots, timeline, amountCycles, escalationRatesResponse]) => {
           // this.savingPots = savingPots;
-            this.savingPots = {
+          this.savingPots = {
             ...savingPots,
             clientSavings: savingPots.clientSavings
-              .map((item, index) => ({ ...item, orderNumber: item.orderNumber ?? index }))
-              .sort((a, b) => a.orderNumber - b.orderNumber)
+              .map((item, index) => ({
+                ...item,
+                orderNumber: item.orderNumber ?? index,
+              }))
+              .sort((a, b) => a.orderNumber - b.orderNumber),
           };
           this.total = this.savingPots?.totalSavings;
           this.potAmounts = this.savingPots?.clientSavings?.map(
-            (pot) => pot.startingPotValue.amount ?? 0
+            (pot) => pot.startingPotValue.amount ?? 0,
           );
           this.ensureCashFirst();
           this.timeline = timeline;
           this.amountCycles = amountCycles;
           this.escalationRates = patchInflationRateDescription(
             escalationRatesResponse?.escalationRates ?? [],
-            this.selectedCashflow?.inflationRate ?? 0
+            this.selectedCashflow?.inflationRate ?? 0,
           );
           this.isLoaderVisible = false;
-        })
+        }),
       )
       .subscribe();
   }
@@ -208,7 +222,6 @@ export class SavingPotsComponent implements OnInit {
     } else {
       this.showFeedbackPopup = true;
     }
-
   }
 
   closeFeedbackPopupClicked() {
@@ -252,26 +265,25 @@ export class SavingPotsComponent implements OnInit {
   // }
 
   drop(event: CdkDragDrop<any>) {
-  const list = this.savingPots?.clientSavings ?? [];
-  if (!list.length) return;
+    const list = this.savingPots?.clientSavings ?? [];
+    if (!list.length) return;
 
-  // Don’t let anything be dropped at index 0
-  if (event.currentIndex === 0) {
-    return;
+    // Don’t let anything be dropped at index 0
+    if (event.currentIndex === 0) {
+      return;
+    }
+
+    // Don’t let the first item (Cash) be moved at all (defense in depth)
+    if (event.previousIndex === 0) {
+      return;
+    }
+
+    moveItemInArray(list, event.previousIndex, event.currentIndex);
+    this.savingPots.clientSavings = [...list];
+
+    // Recompute order numbers and persist (you already have this)
+    this.updateOrderNumbers();
   }
-
-  // Don’t let the first item (Cash) be moved at all (defense in depth)
-  if (event.previousIndex === 0) {
-    return;
-  }
-
-  moveItemInArray(list, event.previousIndex, event.currentIndex);
-  this.savingPots.clientSavings = [...list];
-
-  // Recompute order numbers and persist (you already have this)
-  this.updateOrderNumbers();
-}
-
 
   // moveUp(index: number) {
   //   if (index > 0) {
@@ -289,121 +301,123 @@ export class SavingPotsComponent implements OnInit {
   //   }
   // }
 
+  // moveUp(index: number) {
+  //   if (index > 0) {
+  //     const currentItem = this.savingPots.clientSavings[index];
+  //     const previousItem = this.savingPots.clientSavings[index - 1];
 
-// moveUp(index: number) {
-//   if (index > 0) {
-//     const currentItem = this.savingPots.clientSavings[index];
-//     const previousItem = this.savingPots.clientSavings[index - 1];
+  //     // Swap order numbers
+  //     const tempOrder = currentItem.orderNumber;
+  //     currentItem.orderNumber = previousItem.orderNumber;
+  //     previousItem.orderNumber = tempOrder;
 
-//     // Swap order numbers
-//     const tempOrder = currentItem.orderNumber;
-//     currentItem.orderNumber = previousItem.orderNumber;
-//     previousItem.orderNumber = tempOrder;
+  //     // Swap items in array
+  //     moveItemInArray(this.savingPots.clientSavings, index, index - 1);
+  //     this.savingPots.clientSavings = [...this.savingPots.clientSavings];
 
-//     // Swap items in array
-//     moveItemInArray(this.savingPots.clientSavings, index, index - 1);
-//     this.savingPots.clientSavings = [...this.savingPots.clientSavings];
+  //     // Call API
+  //     this.updateOrderNumbers();
+  //   }
+  // }
 
-//     // Call API
-//     this.updateOrderNumbers();
-//   }
-// }
+  // moveDown(index: number) {
+  //   if (index < this.savingPots.clientSavings.length - 1) {
+  //     const currentItem = this.savingPots.clientSavings[index];
+  //     const nextItem = this.savingPots.clientSavings[index + 1];
 
-// moveDown(index: number) {
-//   if (index < this.savingPots.clientSavings.length - 1) {
-//     const currentItem = this.savingPots.clientSavings[index];
-//     const nextItem = this.savingPots.clientSavings[index + 1];
+  //     // Swap order numbers
+  //     const tempOrder = currentItem.orderNumber;
+  //     currentItem.orderNumber = nextItem.orderNumber;
+  //     nextItem.orderNumber = tempOrder;
 
-//     // Swap order numbers
-//     const tempOrder = currentItem.orderNumber;
-//     currentItem.orderNumber = nextItem.orderNumber;
-//     nextItem.orderNumber = tempOrder;
+  //     // Swap items in array
+  //     moveItemInArray(this.savingPots.clientSavings, index, index + 1);
+  //     this.savingPots.clientSavings = [...this.savingPots.clientSavings];
 
-//     // Swap items in array
-//     moveItemInArray(this.savingPots.clientSavings, index, index + 1);
-//     this.savingPots.clientSavings = [...this.savingPots.clientSavings];
+  //     // Call API
+  //     this.updateOrderNumbers();
+  //   }
+  // }
 
-//     // Call API
-//     this.updateOrderNumbers();
-//   }
-// }
+  moveUp(index: number) {
+    if (index <= 0) return;
 
-moveUp(index: number) {
-  if (index <= 0) return;
+    // If moving up would place the item into index 0, block it
+    if (index - 1 === 0) return;
 
-  // If moving up would place the item into index 0, block it
-  if (index - 1 === 0) return;
+    // Also, if the row above is Cash, block the move
+    if (this.isCashName(this.savingPots.clientSavings[index - 1]?.name)) return;
 
-  // Also, if the row above is Cash, block the move
-  if (this.isCashName(this.savingPots.clientSavings[index - 1]?.name)) return;
+    const currentItem = this.savingPots.clientSavings[index];
+    const previousItem = this.savingPots.clientSavings[index - 1];
 
-  const currentItem = this.savingPots.clientSavings[index];
-  const previousItem = this.savingPots.clientSavings[index - 1];
+    const tempOrder = currentItem.orderNumber;
+    currentItem.orderNumber = previousItem.orderNumber;
+    previousItem.orderNumber = tempOrder;
 
-  const tempOrder = currentItem.orderNumber;
-  currentItem.orderNumber = previousItem.orderNumber;
-  previousItem.orderNumber = tempOrder;
+    moveItemInArray(this.savingPots.clientSavings, index, index - 1);
+    this.savingPots.clientSavings = [...this.savingPots.clientSavings];
+    this.updateOrderNumbers();
+  }
 
-  moveItemInArray(this.savingPots.clientSavings, index, index - 1);
-  this.savingPots.clientSavings = [...this.savingPots.clientSavings];
-  this.updateOrderNumbers();
-}
+  moveDown(index: number) {
+    if (index >= this.savingPots.clientSavings.length - 1) return;
 
-moveDown(index: number) {
-  if (index >= this.savingPots.clientSavings.length - 1) return;
+    // Normal guard: the next item can be Cash (that’s fine),
+    // but moving down never touches index 0 anyway.
+    const currentItem = this.savingPots.clientSavings[index];
+    const nextItem = this.savingPots.clientSavings[index + 1];
 
-  // Normal guard: the next item can be Cash (that’s fine),
-  // but moving down never touches index 0 anyway.
-  const currentItem = this.savingPots.clientSavings[index];
-  const nextItem = this.savingPots.clientSavings[index + 1];
+    const tempOrder = currentItem.orderNumber;
+    currentItem.orderNumber = nextItem.orderNumber;
+    nextItem.orderNumber = tempOrder;
 
-  const tempOrder = currentItem.orderNumber;
-  currentItem.orderNumber = nextItem.orderNumber;
-  nextItem.orderNumber = tempOrder;
+    moveItemInArray(this.savingPots.clientSavings, index, index + 1);
+    this.savingPots.clientSavings = [...this.savingPots.clientSavings];
+    this.updateOrderNumbers();
+  }
 
-  moveItemInArray(this.savingPots.clientSavings, index, index + 1);
-  this.savingPots.clientSavings = [...this.savingPots.clientSavings];
-  this.updateOrderNumbers();
-}
+  updateOrderNumbers() {
+    if (!this.selectedCashflow) return;
 
-
-
-updateOrderNumbers() {
-  if (!this.selectedCashflow) return;
-
-  // Ensure all orderNumbers are unique and sorted by position
-  this.savingPots.clientSavings.forEach((item, index) => {
-    item.orderNumber = index;
-  });
-
-  this.savingPotsHttpService
-    .updateSavingsPots(this.selectedCashflow.id, this.savingPots.clientSavings)
-    .subscribe({
-      next: () => {
-        console.log('Updated orderNumbers successfully');
-      },
-      error: (err) => {
-        console.error('Failed to update orderNumbers', err);
-      }
+    // Ensure all orderNumbers are unique and sorted by position
+    this.savingPots.clientSavings.forEach((item, index) => {
+      item.orderNumber = index;
     });
-}
 
-
-
+    this.savingPotsHttpService
+      .updateSavingsPots(
+        this.selectedCashflow.id,
+        this.savingPots.clientSavings,
+      )
+      .subscribe({
+        next: () => {
+          console.log('Updated orderNumbers successfully');
+        },
+        error: (err) => {
+          console.error('Failed to update orderNumbers', err);
+        },
+      });
+  }
 
   updateEventClicked(event: ClientSaving) {
-    console.log('Saving Pot Data Received')
-    console.log(event)
+    console.log('Saving Pot Data Received');
+    console.log(event);
     const dialogRef = this.dialog.open(AddNewPotComponent, {
       width: '700px',
       disableClose: true,
       data: {
         returnRate: this.userRerturnRate,
-        inflationRate: this.selectedCashflow?.inflationRate ?? this.selectedClient?.clientDetails?.inflationRate ?? 0,
-        loggedInUserPreferences : this.loggedInUserPreferences,
+        inflationRate:
+          this.selectedCashflow?.inflationRate ??
+          this.selectedClient?.clientDetails?.inflationRate ??
+          0,
+        loggedInUserPreferences: this.loggedInUserPreferences,
         amountCycles: this.amountCycles,
         escalataionRates: this.escalationRates,
-        eventsList: [...this.timeline.clientEvents].sort((a, b) => a.start.age - b.start.age),
+        eventsList: [...this.timeline.clientEvents].sort(
+          (a, b) => a.start.age - b.start.age,
+        ),
         clientBirthDate: this.selectedClient?.clientDetails.birthDate,
         clientPreferredCurrency:
           this.selectedClient?.clientDetails.preferredCurrency,
@@ -415,7 +429,7 @@ updateOrderNumbers() {
         existingSavingPots: this.savingPots?.clientSavings || [],
         hasPartner: !!this.selectedClient?.partnerDetail,
         clientFirstName: this.selectedClient?.clientDetails?.firstName ?? '',
-        partnerFirstName: this.selectedClient?.partnerDetail?.firstName ?? ''
+        partnerFirstName: this.selectedClient?.partnerDetail?.firstName ?? '',
       },
     });
 
@@ -430,57 +444,67 @@ updateOrderNumbers() {
             ...item,
             orderNumber: item.orderNumber ?? index,
           }))
-          .sort((a: ClientSaving, b: ClientSaving) => a.orderNumber - b.orderNumber),
+          .sort(
+            (a: ClientSaving, b: ClientSaving) => a.orderNumber - b.orderNumber,
+          ),
       };
 
       this.total = this.savingPots?.totalSavings ?? this.total ?? 0;
       this.potAmounts = this.savingPots?.clientSavings?.map(
-        (pot) => pot.startingPotValue.amount ?? 0
+        (pot) => pot.startingPotValue.amount ?? 0,
       );
       this.ensureCashFirst();
       // this.savingPots.clientSavings.push(result.clientSaving);
     });
   }
-  
+
   deleteEventClicked(event: ClientSaving) {
-    if(this.selectedCashflow) {
-      this.savingPotsHttpService.deleteSavingPot(this.selectedCashflow?.id, event).pipe(
-        map(() => {
-          const list = [...(this.savingPots?.clientSavings ?? [])];
-          const index = list.findIndex(x => x.id === event.id);
-          if (index === -1) return;
+    if (this.selectedCashflow) {
+      this.savingPotsHttpService
+        .deleteSavingPot(this.selectedCashflow?.id, event)
+        .pipe(
+          map(() => {
+            const list = [...(this.savingPots?.clientSavings ?? [])];
+            const index = list.findIndex((x) => x.id === event.id);
+            if (index === -1) return;
 
-          list.splice(index, 1);
+            list.splice(index, 1);
 
-          this.savingPots = {
-            ...this.savingPots,
-            clientSavings: [...list]
-          };
+            this.savingPots = {
+              ...this.savingPots,
+              clientSavings: [...list],
+            };
 
-          this.total = list.reduce(
-            (sum, pot) => sum + (pot?.startingPotValue?.amount ?? 0),
-            0
-          );
-          this.potAmounts = list.map(
-            (pot) => pot.startingPotValue.amount ?? 0
-          );
-        })
-      ).subscribe();
+            this.total = list.reduce(
+              (sum, pot) => sum + (pot?.startingPotValue?.amount ?? 0),
+              0,
+            );
+            this.potAmounts = list.map(
+              (pot) => pot.startingPotValue.amount ?? 0,
+            );
+          }),
+        )
+        .subscribe();
     }
   }
-  
+
   newEventClicked() {
-    console.log("newEventClicked() called")
+    console.log('newEventClicked() called');
     const dialogRef = this.dialog.open(AddNewPotComponent, {
       width: '700px',
       disableClose: true,
       data: {
         returnRate: this.userRerturnRate,
-        inflationRate: this.selectedCashflow?.inflationRate ?? this.selectedClient?.clientDetails?.inflationRate ?? 0,
-        loggedInUserPreferences : this.loggedInUserPreferences,
+        inflationRate:
+          this.selectedCashflow?.inflationRate ??
+          this.selectedClient?.clientDetails?.inflationRate ??
+          0,
+        loggedInUserPreferences: this.loggedInUserPreferences,
         amountCycles: this.amountCycles,
         escalataionRates: this.escalationRates,
-        eventsList: this.timeline.clientEvents.sort((a, b) => a.start.age - b.start.age),
+        eventsList: this.timeline.clientEvents.sort(
+          (a, b) => a.start.age - b.start.age,
+        ),
         clientBirthDate: this.selectedClient?.clientDetails.birthDate,
         clientPreferredCurrency:
           this.selectedClient?.clientDetails.preferredCurrency,
@@ -491,13 +515,13 @@ updateOrderNumbers() {
         existingSavingPots: this.savingPots?.clientSavings || [],
         hasPartner: !!this.selectedClient?.partnerDetail,
         clientFirstName: this.selectedClient?.clientDetails?.firstName ?? '',
-        partnerFirstName: this.selectedClient?.partnerDetail?.firstName ?? ''
+        partnerFirstName: this.selectedClient?.partnerDetail?.firstName ?? '',
       },
     });
 
     dialogRef.afterClosed().subscribe((result: any) => {
       console.log('Dialog closed with result:', result);
-      if(result?.savingPot) {
+      if (result?.savingPot) {
         this.savingPots = {
           ...result.savingPot,
           clientSavings: (result.savingPot.clientSavings ?? [])
@@ -505,11 +529,14 @@ updateOrderNumbers() {
               ...item,
               orderNumber: item.orderNumber ?? index,
             }))
-            .sort((a: ClientSaving, b: ClientSaving) => a.orderNumber - b.orderNumber),
+            .sort(
+              (a: ClientSaving, b: ClientSaving) =>
+                a.orderNumber - b.orderNumber,
+            ),
         };
         this.total = this.savingPots?.totalSavings ?? this.total ?? 0;
         this.potAmounts = this.savingPots?.clientSavings?.map(
-          (pot) => pot.startingPotValue.amount ?? 0
+          (pot) => pot.startingPotValue.amount ?? 0,
         );
         this.ensureCashFirst();
       }
@@ -518,43 +545,43 @@ updateOrderNumbers() {
   }
 
   // Add these helpers to the component
-private isCashName(n?: string): boolean {
-  return (n ?? '').trim().toLowerCase() === 'cash';
-}
-
-private ensureCashFirst(): void {
-  const list = this.savingPots?.clientSavings;
-  if (!list || !list.length) return;
-  const cashPots = list.filter(x => this.isCashName(x?.name));
-  const rest = list.filter(x => !this.isCashName(x?.name));
-  if (cashPots.length === 0 || rest.length === 0) return;
-  this.savingPots!.clientSavings = [...cashPots, ...rest];
-  this.updateOrderNumbers(); // persist the invariant
-}
-
-formatReturnRate(rate: number): string {
-  if (rate == null) return '0';
-  const rounded = Math.round(rate * 10) / 10;
-  return rounded % 1 === 0 ? rounded.toFixed(0) : rounded.toString();
-}
-
-getOwnershipLabel(saving: ClientSaving): string {
-  const ownership = saving.ownership ?? SavingPotOwnership.Joint;
-  switch (ownership) {
-    case SavingPotOwnership.Person1:
-      return this.selectedClient?.clientDetails?.firstName ?? 'Person 1';
-    case SavingPotOwnership.Person2:
-      return this.selectedClient?.partnerDetail?.firstName ?? 'Person 2';
-    default:
-      return 'Joint';
+  private isCashName(n?: string): boolean {
+    return (n ?? '').trim().toLowerCase() === 'cash';
   }
-}
 
-canDeleteSaving(saving: ClientSaving): boolean {
-  if ((saving.name ?? '').trim().toLowerCase() !== 'cash') return true;
-  const cashPotCount = (this.savingPots?.clientSavings ?? [])
-    .filter(s => (s.name ?? '').trim().toLowerCase() === 'cash').length;
-  return cashPotCount > 1;
-}
+  private ensureCashFirst(): void {
+    const list = this.savingPots?.clientSavings;
+    if (!list || !list.length) return;
+    const cashPots = list.filter((x) => this.isCashName(x?.name));
+    const rest = list.filter((x) => !this.isCashName(x?.name));
+    if (cashPots.length === 0 || rest.length === 0) return;
+    this.savingPots!.clientSavings = [...cashPots, ...rest];
+    this.updateOrderNumbers(); // persist the invariant
+  }
 
+  formatReturnRate(rate: number): string {
+    if (rate == null) return '0';
+    const rounded = Math.round(rate * 10) / 10;
+    return rounded % 1 === 0 ? rounded.toFixed(0) : rounded.toString();
+  }
+
+  getOwnershipLabel(saving: ClientSaving): string {
+    const ownership = saving.ownership ?? SavingPotOwnership.Joint;
+    switch (ownership) {
+      case SavingPotOwnership.Person1:
+        return this.selectedClient?.clientDetails?.firstName ?? 'Person 1';
+      case SavingPotOwnership.Person2:
+        return this.selectedClient?.partnerDetail?.firstName ?? 'Person 2';
+      default:
+        return 'Joint';
+    }
+  }
+
+  canDeleteSaving(saving: ClientSaving): boolean {
+    if ((saving.name ?? '').trim().toLowerCase() !== 'cash') return true;
+    const cashPotCount = (this.savingPots?.clientSavings ?? []).filter(
+      (s) => (s.name ?? '').trim().toLowerCase() === 'cash',
+    ).length;
+    return cashPotCount > 1;
+  }
 }

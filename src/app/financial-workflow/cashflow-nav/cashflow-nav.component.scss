@@ -1,64 +1,241 @@
+// .cashflow-nav {
+//   position: relative;
+//   display: flex;
+//   align-items: center;
+//   justify-content: space-between;
+//   gap: 0;
+//   // padding: 16px 0;
+//   flex-wrap: wrap;
+// }
+
+// .cashflow-nav-item {
+//   display: flex;
+//   flex-direction: column;
+//   align-items: center;
+//   gap: 16px;
+//   text-decoration: none;
+//   color: #5a596e;
+//   transition: color 0.2s;
+
+//   &:hover {
+//     color: #4043af;
+//   }
+//   // &:hover {
+//   //   .nav-icon {
+//   //     background-color: #4043af;
+//   //     transition: ease-in-out all 0.2s;
+//   //   }
+//   // }
+
+//   &.active .nav-label {
+//     color: #4043af;
+//     font-weight: 500;
+//   }
+// }
+
+// .nav-icon {
+//   width: 48px;
+//   height: 48px;
+//   border-radius: 50%;
+//   background: #fff;
+//   border: 1px solid #e7e7eb;
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+
+//   // img {
+//   // width: 24px;
+//   // height: 24px;
+//   // }
+
+//   &.active,
+//   .cashflow-nav-item.active & {
+//     background: #4043af;
+//     border-color: #4043af;
+
+//     // img {
+//     //   filter: brightness(0) invert(1);
+//     // }
+//   }
+// }
+
+// .nav-label {
+//   font-size: 16px;
+//   font-weight: 500;
+// }
+
+// .ibr-nav-divider {
+//   // width: 1px;
+//   flex: 1 1 0;
+//   height: 1px;
+//   background: #0000001a;
+//   margin-left: 20px;
+//   margin-right: 20px;
+//   margin-top: -36px;
+//   align-self: center;
+// }
+
+// // .ibr-nav-divider {
+// //   position: absolute;
+// //   top: 24px;
+// //   width: 95%;
+// //   height: 1px;
+// //   background: #00000007;
+// //   z-index: -1;
+// // }
+
+// .cashflow-nav {
+//   &__list {
+//     position: relative;
+//     display: flex;
+//     align-items: center;
+//     justify-content: space-between;
+//     gap: 0;
+//     flex-wrap: wrap;
+//     width: 100%;
+//     margin: 0;
+//     padding: 0;
+//     list-style: none;
+//   }
+// }
+
+$nav-color-default: #5e5e73;
+$nav-color-active: #4043af;
+$nav-icon-bg-default: #f5f5f5;
+$nav-icon-bg-active: #4043af;
+$nav-icon-color-active: #f5f5f5;
+$nav-divider-color: #0000001a;
+$nav-icon-size: 48px;
+$nav-ease: cubic-bezier(0.4, 0, 0.2, 1);
+$nav-duration: 200ms;
+
+// ─── Container ────────────────────────────────────────────────────────────────
 .cashflow-nav {
-  display: flex;
-  align-items: center;
-  gap: 0;
-  padding: 16px 0;
-  flex-wrap: wrap;
-}
-
-.cashflow-nav-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  text-decoration: none;
-  color: #6c757d;
-  transition: color 0.2s;
-
-  &:hover {
-    color: #516ce8;
+  // ── List ──────────────────────────────────────────────────────────────────
+  &__list {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
   }
 
-  &.active .nav-label {
-    color: #516ce8;
-    font-weight: 500;
-  }
-}
+  // ── Nav Item ──────────────────────────────────────────────────────────────
+  // &__item {
 
-.nav-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: #fff;
-  border: 1px solid #e7e7eb;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  // }
 
-  img {
-    width: 24px;
-    height: 24px;
+  // ── Divider ───────────────────────────────────────────────────────────────
+  &__divider {
+    width: 100%;
+    height: 1px;
+    background-color: #0000001a;
+    margin-left: 16px;
+    margin-right: 16px;
+    margin-top: -32px;
+    margin-bottom: 0;
+    padding: 0;
+    // align-self: center;
   }
 
-  &.active,
-  .cashflow-nav-item.active & {
-    background: #516ce8;
-    border-color: #516ce8;
+  // ── Link ──────────────────────────────────────────────────────────────────
+  &__link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 48px;
+    gap: 16px;
+    text-decoration: none;
+    color: $nav-color-default;
+    border-radius: 12px;
+    cursor: pointer;
+    outline: none;
+    background: transparent;
+    transition: color $nav-duration $nav-ease;
 
-    img {
-      filter: brightness(0) invert(1);
+    // Hover
+    &:hover {
+      color: $nav-color-active;
+
+      .cashflow-nav__icon-wrap {
+        background-color: $nav-icon-bg-active;
+        // box-shadow:
+        //   0 4px 16px rgba(64, 67, 175, 0.3),
+        //   0 1px 4px rgba(64, 67, 175, 0.15);
+        // transform: translateY(-2px);
+      }
+
+      .cashflow-nav__icon {
+        color: $nav-icon-color-active;
+      }
+
+      .cashflow-nav__label {
+        font-weight: 500;
+      }
+    }
+
+    // Focus (keyboard)
+    &:focus-visible {
+      outline: 2px solid $nav-color-active;
+      outline-offset: 4px;
+      border-radius: 12px;
+    }
+
+    // Active route — mirrors hover exactly
+    &--active {
+      color: $nav-color-active;
+
+      .cashflow-nav__icon-wrap {
+        background-color: $nav-icon-bg-active;
+        // box-shadow:
+        //   0 4px 16px rgba(64, 67, 175, 0.3),
+        //   0 1px 4px rgba(64, 67, 175, 0.15);
+        // transform: translateY(-2px);
+      }
+
+      .cashflow-nav__icon {
+        color: $nav-icon-color-active;
+      }
+
+      .cashflow-nav__label {
+        font-weight: 500;
+      }
     }
   }
-}
 
-.nav-label {
-  font-size: 14px;
-}
+  // ── Icon Wrapper ──────────────────────────────────────────────────────────
+  &__icon-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: $nav-icon-size;
+    height: $nav-icon-size;
+    background-color: $nav-icon-bg-default;
+    border-radius: 50%;
+    flex-shrink: 0;
+    transition:
+      background-color $nav-duration $nav-ease,
+      transform $nav-duration $nav-ease;
+  }
 
-.nav-divider {
-  width: 1px;
-  height: 32px;
-  background: #e7e7eb;
-  margin: 0 20px;
-  align-self: center;
+  // ── SVG Icon ──────────────────────────────────────────────────────────────
+  &__icon {
+    display: block;
+    color: $nav-color-default;
+    pointer-events: none;
+    flex-shrink: 0;
+    transition: color $nav-duration $nav-ease;
+  }
+
+  // ── Label ─────────────────────────────────────────────────────────────────
+  &__label {
+    font-size: 16px;
+    font-weight: 500;
+    white-space: nowrap;
+    text-align: center;
+    line-height: 20px;
+    transition: font-weight $nav-duration $nav-ease;
+  }
 }

@@ -22,6 +22,14 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { NgIf } from '@angular/common';
 import { ImageCropDialogComponent } from './image-crop-dialog/image-crop-dialog.component';
+import { TranslateService } from '@ngx-translate/core';
+import {
+  isAllowedFileType,
+  isWithinSizeLimit,
+  fileToDataUrl,
+  compressImage,
+  compressForProfilePayload,
+} from 'src/app/shared/utils/image-upload.utils';
 
 @Component({
   selector: 'app-account-preferences',
@@ -44,6 +52,7 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
 
   isLoading = false;
   isSavingProfile = false;
+  isUploadingProfile = false;  // Loading state for profile image file read
   submitted = false;
 
   private profileSnapshot: { firstName: string; lastName: string; bio: string; profilePhotoUrl: string } | null = null;
@@ -68,7 +77,8 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private navItemService: NavItemService,
     private toastr: ToastrService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private translate: TranslateService
   ) {
     this.navItemService.currentRouteName = 'Account Preferences';
   }
@@ -277,13 +287,28 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
     const file = input?.files?.[0];
     if (!file) return;
 
+    if (!isAllowedFileType(file)) {
+      this.toastr.error(this.translate.instant('Image format not allowed'), this.translate.instant('Error'));
+      input.value = '';
+      return;
+    }
+    if (!isWithinSizeLimit(file)) {
+      this.toastr.error(this.translate.instant('Image too large'), this.translate.instant('Error'));
+      input.value = '';
+      return;
+    }
+
+    this.isUploadingProfile = true;
     try {
-      const dataUrl = await fileToDataUrl(file);
+      let dataUrl = await fileToDataUrl(file);
+      dataUrl = await compressImage(dataUrl);
       this.openCropDialog(dataUrl);
     } catch (e) {
       console.error('Failed to read image', e);
-      this.toastr.error('Could not read the selected image', 'Error!');
+      this.toastr.error(this.translate.instant('Corrupt or invalid image'), this.translate.instant('Error'));
     } finally {
+      this.isUploadingProfile = false;
+      this.cdr.markForCheck();
       if (this.fileInput?.nativeElement) {
         this.fileInput.nativeElement.value = '';
       }
@@ -294,15 +319,25 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
     const dialogRef = this.dialog.open(ImageCropDialogComponent, {
       width: '600px',
       maxWidth: '95vw',
+      panelClass: 'image-crop-dialog',
       data: { imageBase64, cropType: 'profile' as const },
     });
 
-    dialogRef.afterClosed().subscribe((result: string | null) => {
+    dialogRef.afterClosed().subscribe(async (result: string | null) => {
       if (result) {
-        this.profileImagePreview = result;
-        this.form.get('profilePhotoUrl')?.setValue(result);
-        this.cdr.markForCheck();
+        try {
+          const compressed = await compressForProfilePayload(result);
+          this.profileImagePreview = compressed;
+          this.form.get('profilePhotoUrl')?.setValue(compressed);
+        } catch {
+          this.profileImagePreview = result;
+          this.form.get('profilePhotoUrl')?.setValue(result);
+        }
+      } else {
+        // User cancelled - ensure loader is hidden (no image stored)
+        this.isUploadingProfile = false;
       }
+      this.cdr.markForCheck();
     });
   }
 
@@ -403,12 +438,4 @@ function ensureDataUrl(s?: string | null): string | null {
   if (!s) return null;
   // If it's already a data URL, keep it; otherwise assume JPEG and prefix.
   return s.startsWith('data:') ? s : `data:image/jpeg;base64,${s}`;
-}
-function fileToDataUrl(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onerror = () => reject(new Error('File read error'));
-    reader.onload = () => resolve(reader.result as string);
-    reader.readAsDataURL(file);
-  });
 }

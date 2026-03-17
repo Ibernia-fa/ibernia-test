@@ -1,57 +1,79 @@
-<mat-card class="cardWithShadow">
-    <mat-card-content>
-        <div class="d-flex flex-column gap-32">
-            <div class="d-flex align-items-center justify-content-between flex-wrap gap-16 event-main-wrapper">
-                <div class="d-flex flex-column gap-6" style="flex-direction: column">
-                    <h4 class="f-s-22 f-w-400">{{title}} </h4>
-                    @if(!showOnReports) {
-                    <p class="m-0">
-                        {{ 'Let us begin with what matters most: goals and life plans.' | translate }} <br />
-                        {{ 'Drag new events onto the timeline, or move existing ones.' | translate }}
-                    </p>
-                    }
+<mat-card class="ibr-new-dashboad-card">
+  <mat-card-content>
+    <div class="d-flex flex-column gap-16">
+      <div
+        class="d-flex align-items-center justify-content-between flex-wrap gap-16 event-main-wrapper"
+      >
+        <div class="d-flex flex-column gap-6" style="flex-direction: column">
+          <h4 class="f-w-700">{{ title }}</h4>
+          @if (!showOnReports) {
+            <p class="m-0">
+              {{
+                "Let us begin with what matters most: goals and life plans."
+                  | translate
+              }}
+              <br />
+              {{
+                "Drag new events onto the timeline, or move existing ones."
+                  | translate
+              }}
+            </p>
+          }
+        </div>
+        @if (!showOnReports) {
+          <button (click)="newEventClicked()" type="button" class="button-icon">
+            <span>{{ "Custom event" | translate }}</span>
+            <img src="assets/images/svgs/add-icon.svg" alt="add-icon" />
+          </button>
+        }
+      </div>
+      <div class="chips-custom">
+        <mat-chip-set aria-label="Dog selection">
+          @if (!showOnReports && systemEventsLibrary) {
+            @for (systemEvent of systemEventsLibrary; track systemEvent) {
+              <mat-chip
+                draggable="true"
+                (dragend)="onDragEnd($event)"
+                (dragstart)="onDragStart($event, systemEvent)"
+                class="f-s-14 chip-item"
+                [class]="systemEvent.iconUrl"
+              >
+                <div class="chip-content">
+                  <div class="d-flex gap-8 align-items-center">
+                    <img
+                      matChipAvatar
+                      [src]="
+                        '/assets/images/svgs/' + systemEvent.iconUrl + '.svg'
+                      "
+                      [alt]="systemEvent.iconUrl"
+                    />
+                    <p>{{ systemEvent.name }}</p>
+                  </div>
                 </div>
-                @if(!showOnReports) {
-                <button (click)="newEventClicked()" type="button" class="button-icon">
-                    <span>{{ 'Custom event' | translate }}</span>
-                    <img src="assets/images/svgs/add-icon.svg" alt="add-icon" />
-                </button>
-                }
-            </div>
-            <div class="chips-custom">
-                <mat-chip-set aria-label="Dog selection">
-                    @if(!showOnReports && systemEventsLibrary) {
-                    @for(systemEvent of systemEventsLibrary; track systemEvent) {
-                    <mat-chip draggable="true" (dragend)="onDragEnd($event)"
-                        (dragstart)="onDragStart($event, systemEvent)" class="f-s-14 chip-item"
-                        [class]="systemEvent.iconUrl">
-                        <div class="chip-content">
-                            <div class="d-flex gap-8 align-items-center">
-                                <img matChipAvatar [src]="'/assets/images/svgs/' + systemEvent.iconUrl + '.svg'"
-                                    [alt]="systemEvent.iconUrl" />
-                                {{ systemEvent.name }}
-                            </div>
-                        </div>
-                    </mat-chip>
-                    }
-                    }
-                </mat-chip-set>
-            </div>
-        </div>
+              </mat-chip>
+            }
+          }
+        </mat-chip-set>
+      </div>
+    </div>
 
-        <div class="timeline-wrapper">
-            <div class="timeline-labels" [class.dual-axis]="showDualAxis">
-                @if (showDualAxis) {
-                    <p>{{ 'Age' | translate }} {{ mainClientInitial }}</p>
-                    <p>{{ 'Age' | translate }} {{ partnerInitial }}</p>
-                    <span>{{ 'Year' | translate }}</span>
-                } @else {
-                    <p>{{ 'Age' | translate }}</p>
-                    <span>{{ 'Year' | translate }}</span>
-                }
-            </div>
-            <div class="timeline-container" #timelineContainer (dragover)="onDragOver($event)" (drop)="onDrop($event)">
-            </div>
-        </div>
-    </mat-card-content>
+    <div class="timeline-wrapper">
+      <div class="timeline-labels" [class.dual-axis]="showDualAxis">
+        @if (showDualAxis) {
+          <p>{{ "Age" | translate }} {{ mainClientInitial }}</p>
+          <p>{{ "Age" | translate }} {{ partnerInitial }}</p>
+          <span>{{ "Year" | translate }}</span>
+        } @else {
+          <p>{{ "Age" | translate }}</p>
+          <span>{{ "Year" | translate }}</span>
+        }
+      </div>
+      <div
+        class="timeline-container"
+        #timelineContainer
+        (dragover)="onDragOver($event)"
+        (drop)="onDrop($event)"
+      ></div>
+    </div>
+  </mat-card-content>
 </mat-card>
