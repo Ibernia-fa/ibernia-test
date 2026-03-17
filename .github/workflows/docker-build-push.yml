@@ -194,3 +194,16 @@ jobs:
           source: "playwright-report/*"
           target: /opt/ibernia/dev/playwright-report
           overwrite: true
+
+      - name: Upload Playwright report index assets
+        if: always()
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: ${{ secrets.SERVER_PORT }}
+          # Home page + JSON index for deployments list
+          source: "index.html,index.json"
+          target: /opt/ibernia/dev/playwright-report
+          overwrite: true
