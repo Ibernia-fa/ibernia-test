@@ -134,7 +134,7 @@
                   </h3>
                 </div>
               </div>
-              <div class="d-flex flex-column align-items-center gap-6">
+              <div class="d-flex flex-row-reverse align-items-center gap-6">
                 <button
                   type="button"
                   class="button-icon-outline"
@@ -408,11 +408,23 @@
                     >
                       <span>{{ "Questionnaire" | translate }}</span>
                       @if (!questionnaireResponses) {
-                        <img
+                        <svg
+                          width="14"
+                          height="14"
+                          viewBox="0 0 20 20"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M11.2478 8.7522V0H8.7522V8.7522H0V11.2478H8.7522V20H11.2478V11.2478H20V8.7522H11.2478Z"
+                            fill="#4043AF"
+                          />
+                        </svg>
+                        <!-- <img
                           class="questionnaire-icon"
                           src="assets/images/svgs/add-icon-blue.svg"
                           alt="add-icon"
-                        />
+                        /> -->
                       }
                     </button>
                     @if (questionnaireResponses) {

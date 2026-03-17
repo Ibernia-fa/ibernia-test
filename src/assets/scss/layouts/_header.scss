@@ -100,7 +100,7 @@ html .topbar {
   }
 }
 .header-profile-icon {
-  gap: 8px;
+  gap: 12px;
 }
 
 .avatar-initials {
@@ -122,16 +122,16 @@ html .topbar {
   cursor: pointer;
 }
 .header-profile-button .avatar-ripple-wrapper {
-  width: 35px;
-  height: 35px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  margin-right: 6px;
+  // margin-right: 6px;
   img {
-    width: 35px;
-    height: 35px;
+    width: 40px;
+    height: 40px;
     margin: 0;
     object-fit: cover;
   }
@@ -157,14 +157,14 @@ html .topbar {
 }
 // End New Styles
 .header-profile-button {
-  padding-top: 4px;
+  // padding-top: 4px;
   height: 65px;
   display: flex;
   align-items: center;
-  .name-wraper {
-    margin-top: -9px;
-    line-height: normal;
-  }
+  // .name-wraper {
+  //   margin-top: -9px;
+  //   line-height: normal;
+  // }
   .sub-menu {
     position: absolute;
     top: 65px;
@@ -315,4 +315,14 @@ html .topbar {
 
 .sidebar-collapsed .header-breadcrumb {
   left: 64px;
+}
+
+.notification-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  .mat-mdc-icon-button .mat-mdc-button-touch-target {
+    height: 40px;
+    width: 40px;
+  }
 }

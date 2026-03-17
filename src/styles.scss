@@ -939,3 +939,31 @@ body:has(.global-fullscreen-overlay) {
   -webkit-backdrop-filter: blur(75px);
   backdrop-filter: blur(75px);
 }
+
+.dropdown-button {
+  margin-right: -16px;
+}
+.action-dropdown-menus.mat-mdc-menu-panel {
+  min-width: 104px;
+  box-shadow: 4px 4px 40px 0px #00000024 !important;
+  border-radius: 8px;
+  padding: 8px 0;
+  .mat-mdc-menu-content {
+    padding: 0;
+    .mat-mdc-menu-item .mat-icon {
+      margin-right: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .mat-mdc-menu-item {
+      min-height: 40px;
+      .mat-mdc-menu-item-text {
+        font-size: 14px;
+        color: #5a596e;
+        line-height: 24px;
+        font-weight: 400;
+      }
+    }
+  }
+}

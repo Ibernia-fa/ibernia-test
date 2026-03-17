@@ -8,25 +8,25 @@ export const navItemslower: NavItem[] = [
   //   route: '#',
   // },
   {
-    displayName: 'Risk & Insurance',
+    displayName: 'Protection',
     iconName: '/assets/images/svgs/danger-square-icon-active.svg',
     iconOutline: '/assets/images/svgs/danger-square-icon-active.svg',
     route: '/cashflows/{cashflowId}/emergencies',
   },
   {
-    displayName: 'Wealth & Inheritance',
+    displayName: 'Wealth',
     iconName: '/assets/images/svgs/money-square-blue.svg',
     iconOutline: '/assets/images/svgs/money-square-blue.svg',
     route: '/cashflows/{cashflowId}/wealth',
   },
   {
-    displayName: 'Knowledge Hub',
+    displayName: 'Learn',
     iconName: '/assets/images/svgs/book-solid.svg',
     iconOutline: '/assets/images/svgs/book-solid.svg',
     // route: '/cashflows/{cashflowId}/emergencies',
   },
   {
-    displayName: 'AI Recommendations',
+    displayName: 'Insights',
     iconName: '/assets/images/shapes/ai-filled.svg',
     iconOutline: '/assets/images/shapes/ai-filled.svg',
     route: '/cashflows/{cashflowId}/ai-recommendations',
@@ -42,6 +42,6 @@ export const navItems: NavItem[] = [
   {
     navCap: 'Lifetime Plan',
     displayName: 'Lifetime Plan',
-    route: '/cashflows/{cashflowId}/reports'
+    route: '/cashflows/{cashflowId}/reports',
   },
 ];
