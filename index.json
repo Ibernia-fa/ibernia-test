@@ -1,14 +1,2 @@
 [
-  {
-    "versionTag": "dev-2025.03.20.1",
-    "environment": "dev",
-    "deployedAt": "2025-03-20T10:15:00Z",
-    "reportUrl": "https://github.com/Ibernia-fa/Ibernia-portal/actions/runs/<run-id-1>"
-  },
-  {
-    "versionTag": "dev-2025.03.21.2",
-    "environment": "dev",
-    "deployedAt": "2025-03-21T11:30:00Z",
-    "reportUrl": "https://github.com/Ibernia-fa/Ibernia-portal/actions/runs/<run-id-2>"
-  }
 ]
