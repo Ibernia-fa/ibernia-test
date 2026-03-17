@@ -181,6 +181,20 @@ jobs:
           path: playwright-report
         continue-on-error: true
 
+      - name: Build deployments index JSON for this run
+        shell: bash
+        run: |
+          cat > index.json <<'EOF'
+          [
+            {
+              "versionTag": "${{ steps.vars.outputs.version_tag }}",
+              "environment": "${{ steps.vars.outputs.env }}",
+              "deployedAt": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+              "reportUrl": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            }
+          ]
+          EOF
+
       - name: Upload Playwright report to app server
         if: always()
         uses: appleboy/scp-action@v0.1.7
