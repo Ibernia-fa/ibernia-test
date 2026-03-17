@@ -205,5 +205,5 @@ jobs:
           port: ${{ secrets.SERVER_PORT }}
           # Home page + JSON index for deployments list
           source: "index.html,index.json"
-          target: /opt/ibernia/dev/playwright-report
+          target: /opt/ibernia/dev/playwright-report/playwright-report
           overwrite: true
