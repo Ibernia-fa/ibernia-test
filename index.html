@@ -92,11 +92,6 @@
       open the Playwright HTML report for that deployment.
     </p>
 
-    <label for="pipelineFilter" style="display: none;">Pipeline:</label>
-    <select id="pipelineFilter" style="display: none;">
-      <option value="all">All pipelines</option>
-    </select>
-
     <div id="empty" class="empty-state" style="display: none">
       No deployments have been recorded yet. Once the CI pipeline runs after a
       deployment, this page will be populated automatically.
@@ -124,26 +119,13 @@
           const tbody = document.getElementById('tbody');
           const table = document.getElementById('table');
           const empty = document.getElementById('empty');
-          const pipelineFilter = document.getElementById('pipelineFilter');
 
           if (!Array.isArray(items) || items.length === 0) {
             empty.style.display = 'block';
             return;
           }
 
-          // Collect unique pipeline names
-          const pipelines = Array.from(
-            new Set(items.map((i) => i.pipeline || 'Unknown pipeline'))
-          );
-
-          pipelines.forEach((name) => {
-            const opt = document.createElement('option');
-            opt.value = name;
-            opt.textContent = name;
-            pipelineFilter.appendChild(opt);
-          });
-
-          function renderTable(filterValue) {
+          function renderTable() {
             tbody.innerHTML = '';
 
             items
@@ -152,11 +134,6 @@
                 (a, b) =>
                   new Date(b.deployedAt).getTime() -
                   new Date(a.deployedAt).getTime()
-              )
-              .filter((item) =>
-                filterValue === 'all'
-                  ? true
-                  : (item.pipeline || 'Unknown pipeline') === filterValue
               )
               .forEach((item) => {
                 const tr = document.createElement('tr');
@@ -206,11 +183,7 @@
             empty.style.display = tbody.children.length ? 'none' : 'block';
           }
 
-          renderTable('all');
-
-          pipelineFilter.addEventListener('change', (e) => {
-            renderTable(e.target.value);
-          });
+          renderTable();
         } catch (err) {
           console.error('Failed to load index.json', err);
           const empty = document.getElementById('empty');
