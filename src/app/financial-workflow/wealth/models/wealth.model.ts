@@ -3,6 +3,7 @@ export interface WealthDashboardModel {
   assets: WealthAssetModel[];
   liabilities: WealthLiabilityModel[];
   summary: WealthSummary;
+  hasPartner: boolean;
   client: { id: string; name: string } | null;
   cashflow: { id: string; name: string } | null;
 }
@@ -10,18 +11,20 @@ export interface WealthDashboardModel {
 export interface WealthAssetModel {
   id: string;
   category: string;
+  name?: string;
   description: string;
   value: number;
-  liquidity: string;
+  ownership: string;
   isFromSavingPots: boolean;
-  isLiquidityEditable: boolean;
 }
 
 export interface WealthLiabilityModel {
   id: string;
   type: string;
+  name?: string;
   description: string;
   outstanding: number;
+  ownership: string;
 }
 
 export interface WealthSummary {
@@ -30,7 +33,7 @@ export interface WealthSummary {
   netWorth: number;
   debtRatio: number;
   assetsByType: AssetsByType;
-  liquidityMix: LiquidityMix;
+  perPersonBreakdown?: PerPersonBreakdown;
 }
 
 export interface AssetsByType {
@@ -42,63 +45,59 @@ export interface AssetsByType {
   realEstatePercent: number;
   personalPropertyTotal: number;
   personalPropertyPercent: number;
+  otherTotal: number;
+  otherPercent: number;
 }
 
-export interface LiquidityMix {
-  liquidTotal: number;
-  liquidPercent: number;
-  partialTotal: number;
-  partialPercent: number;
-  illiquidTotal: number;
-  illiquidPercent: number;
+export interface PerPersonBreakdown {
+  clientName: string;
+  clientNetWorth: number;
+  partnerName: string;
+  partnerNetWorth: number;
 }
 
 export interface AddWealthAssetRequest {
   category: number;
+  name?: string;
   description: string;
   value: number;
-  liquidity: number;
+  ownership: number;
 }
 
 export interface UpdateWealthAssetRequest {
   id: string;
   category: number;
+  name?: string;
   description: string;
   value: number;
-  liquidity: number;
+  ownership: number;
 }
 
 export interface AddWealthLiabilityRequest {
   type: string;
+  name?: string;
   description: string;
   outstanding: number;
+  ownership: number;
 }
 
 export interface UpdateWealthLiabilityRequest {
   id: string;
   type: string;
+  name?: string;
   description: string;
   outstanding: number;
+  ownership: number;
 }
 
 export enum AssetCategory {
   RealEstate = 1,
-  PersonalProperty = 2
-}
-
-export enum LiquidityLevel {
-  Liquid = 1,
-  Partial = 2,
-  Illiquid = 3
+  PersonalProperty = 2,
+  Other = 3
 }
 
 export const ASSET_CATEGORY_LABELS: Record<number, string> = {
   [AssetCategory.RealEstate]: 'Real Estate',
-  [AssetCategory.PersonalProperty]: 'Personal Property'
-};
-
-export const LIQUIDITY_LABELS: Record<number, string> = {
-  [LiquidityLevel.Liquid]: 'Liquid',
-  [LiquidityLevel.Partial]: 'Partial liquid',
-  [LiquidityLevel.Illiquid]: 'Illiquid'
+  [AssetCategory.PersonalProperty]: 'Personal Property',
+  [AssetCategory.Other]: 'Other'
 };

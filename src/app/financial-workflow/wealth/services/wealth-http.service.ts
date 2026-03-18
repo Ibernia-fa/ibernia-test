@@ -31,13 +31,6 @@ export class WealthHttpService {
     return this.http.delete<void>(`${this.baseUrl}/${cashflowId}/assets/${assetId}`);
   }
 
-  updateAssetLiquidity(cashflowId: string, assetId: string, liquidity: string): Observable<WealthDashboardModel> {
-    return this.http.put<WealthDashboardModel>(
-      `${this.baseUrl}/${cashflowId}/assets/${assetId}/liquidity`,
-      { liquidity }
-    );
-  }
-
   addLiability(cashflowId: string, request: AddWealthLiabilityRequest): Observable<WealthDashboardModel> {
     return this.http.post<WealthDashboardModel>(`${this.baseUrl}/${cashflowId}/liabilities`, request);
   }

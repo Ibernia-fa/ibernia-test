@@ -13,7 +13,8 @@
         <div class="w-100 form-field gap-8">
           <mat-label class="f-s-16 d-block" style="line-height: 18px">Type</mat-label>
           <div class="select-option">
-            <mat-select formControlName="type" placeholder="Select type" hideSingleSelectionIndicator>
+            <mat-select formControlName="type" placeholder="Select type"
+              hideSingleSelectionIndicator (selectionChange)="onTypeChange()">
               @for (t of liabilityTypes; track t) {
                 <mat-option [value]="t">{{ t }}</mat-option>
               }
@@ -23,6 +24,16 @@
             <span class="field-error d-block">Required</span>
           }
         </div>
+
+        @if (isOtherType) {
+          <div class="w-100 form-field gap-8">
+            <mat-label class="f-s-16 d-block" style="line-height: 18px">Name</mat-label>
+            <input matInput formControlName="name" placeholder="e.g. Tax liability" />
+            @if(form.get('name')?.touched && form.get('name')?.hasError('required')) {
+              <span class="field-error d-block">Required</span>
+            }
+          </div>
+        }
 
         <div class="w-100 form-field gap-8">
           <mat-label class="f-s-16 d-block" style="line-height: 18px">Description</mat-label>
@@ -59,6 +70,20 @@
             }
           </div>
         </div>
+
+        @if (hasPartner) {
+          <div class="w-100 form-field gap-8">
+            <mat-label class="f-s-16 d-block" style="line-height: 18px">Ownership</mat-label>
+            <div class="select-option">
+              <mat-select formControlName="ownership" placeholder="Select ownership"
+                hideSingleSelectionIndicator>
+                @for (opt of ownershipOptions; track opt.value) {
+                  <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+                }
+              </mat-select>
+            </div>
+          </div>
+        }
 
       </div>
     </mat-dialog-content>
