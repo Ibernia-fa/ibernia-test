@@ -181,21 +181,28 @@ jobs:
           path: playwright-report
         continue-on-error: true
 
+      - name: Set up SSH key for file transfers
+        if: always()
+        continue-on-error: true
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SERVER_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -p ${{ secrets.SERVER_PORT || 22 }} ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
+
       - name: Upload Playwright report to app server
         if: always()
-        uses: appleboy/scp-action@v1.0.0
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          port: ${{ secrets.SERVER_PORT || 22 }}
-          source: "playwright-report/*"
-          target: /opt/ibernia/dev/playwright-report/playwright-report/reports/${{ steps.vars.outputs.version_tag }}
-          strip_components: 1
-          overwrite: true
+        continue-on-error: true
+        run: |
+          REMOTE="${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}"
+          PORT="${{ secrets.SERVER_PORT || 22 }}"
+          TARGET="/opt/ibernia/dev/playwright-report/playwright-report/reports/${{ steps.vars.outputs.version_tag }}"
+          ssh -p "$PORT" -i ~/.ssh/deploy_key "$REMOTE" "sudo mkdir -p $TARGET"
+          scp -r -P "$PORT" -i ~/.ssh/deploy_key playwright-report/* "$REMOTE:$TARGET/"
 
       - name: Build version report link file
         if: always()
+        continue-on-error: true
         shell: bash
         env:
           VERSION_TAG: ${{ steps.vars.outputs.version_tag }}
@@ -220,18 +227,16 @@ jobs:
 
       - name: Upload version report link file to server root
         if: always()
-        uses: appleboy/scp-action@v1.0.0
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          port: ${{ secrets.SERVER_PORT || 22 }}
-          source: "${{ steps.vars.outputs.version_tag }}-report.html"
-          target: /opt/ibernia/dev/playwright-report/playwright-report
-          overwrite: true
+        continue-on-error: true
+        run: |
+          REMOTE="${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}"
+          PORT="${{ secrets.SERVER_PORT || 22 }}"
+          TARGET="/opt/ibernia/dev/playwright-report/playwright-report"
+          scp -P "$PORT" -i ~/.ssh/deploy_key "${{ steps.vars.outputs.version_tag }}-report.html" "$REMOTE:$TARGET/"
 
       - name: Register report in dashboard index.json
         if: always()
+        continue-on-error: true
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SERVER_HOST }}
@@ -272,12 +277,9 @@ jobs:
 
       - name: Upload dashboard index.html to server
         if: always()
-        uses: appleboy/scp-action@v1.0.0
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          port: ${{ secrets.SERVER_PORT || 22 }}
-          source: "index.html"
-          target: /opt/ibernia/dev/playwright-report/playwright-report
-          overwrite: true
+        continue-on-error: true
+        run: |
+          REMOTE="${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}"
+          PORT="${{ secrets.SERVER_PORT || 22 }}"
+          TARGET="/opt/ibernia/dev/playwright-report/playwright-report"
+          scp -P "$PORT" -i ~/.ssh/deploy_key index.html "$REMOTE:$TARGET/"
