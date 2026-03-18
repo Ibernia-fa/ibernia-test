@@ -190,8 +190,44 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: ${{ secrets.SERVER_PORT || 22 }}
           source: "playwright-report/*"
-          target: /opt/ibernia/test-reports/reports/${{ steps.vars.outputs.version_tag }}
+          target: /opt/ibernia/dev/playwright-report/playwright-report/reports/${{ steps.vars.outputs.version_tag }}
           strip_components: 1
+          overwrite: true
+
+      - name: Build version report link file
+        if: always()
+        shell: bash
+        env:
+          VERSION_TAG: ${{ steps.vars.outputs.version_tag }}
+        run: |
+          set -euo pipefail
+          cat > "${VERSION_TAG}-report.html" <<EOF
+          <!doctype html>
+          <html lang="en">
+            <head>
+              <meta charset="utf-8" />
+              <meta http-equiv="refresh" content="0; url=./reports/${VERSION_TAG}/index.html" />
+              <title>Redirecting to Playwright report</title>
+            </head>
+            <body>
+              <p>Redirecting to <a href="./reports/${VERSION_TAG}/index.html">Playwright report</a>…</p>
+              <script>
+                window.location.replace('./reports/${VERSION_TAG}/index.html');
+              </script>
+            </body>
+          </html>
+          EOF
+
+      - name: Upload version report link file to server root
+        if: always()
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: ${{ secrets.SERVER_PORT || 22 }}
+          source: "${{ steps.vars.outputs.version_tag }}-report.html"
+          target: /opt/ibernia/dev/playwright-report/playwright-report
           overwrite: true
 
       - name: Register report in dashboard index.json
@@ -205,12 +241,12 @@ jobs:
           script: |
             set -euo pipefail
 
-            REPORT_DIR="/opt/ibernia/test-reports"
+            REPORT_DIR="/opt/ibernia/dev/playwright-report/playwright-report"
             INDEX_FILE="${REPORT_DIR}/index.json"
             VERSION_TAG="${{ steps.vars.outputs.version_tag }}"
             ENV="${{ steps.vars.outputs.env }}"
             VERSION="${{ steps.vars.outputs.version }}"
-            REPORT_URL="./reports/${VERSION_TAG}/index.html"
+            REPORT_URL="./${VERSION_TAG}-report.html"
             DEPLOYED_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
             PIPELINE="Build, Push & Deploy (Docker Hub)"
 
@@ -243,5 +279,5 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: ${{ secrets.SERVER_PORT || 22 }}
           source: "index.html"
-          target: /opt/ibernia/test-reports
+          target: /opt/ibernia/dev/playwright-report/playwright-report
           overwrite: true
