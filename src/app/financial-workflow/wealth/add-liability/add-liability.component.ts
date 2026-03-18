@@ -19,6 +19,9 @@ export interface AddLiabilityDialogData {
   cashflowId: string;
   liability?: WealthLiabilityModel;
   clientPreferredCurrency?: string;
+  hasPartner?: boolean;
+  clientFirstName?: string;
+  partnerFirstName?: string;
 }
 
 @Component({
@@ -41,6 +44,7 @@ export class AddLiabilityComponent {
   isEditMode: boolean;
   isSaving = false;
   countries = allCountries;
+  hasPartner: boolean;
 
   liabilityTypes = [
     'Mortgage',
@@ -50,6 +54,8 @@ export class AddLiabilityComponent {
     'Other'
   ];
 
+  ownershipOptions: { value: number; label: string }[] = [];
+
   constructor(
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<AddLiabilityComponent>,
@@ -58,13 +64,54 @@ export class AddLiabilityComponent {
     private toastr: ToastrService
   ) {
     this.isEditMode = data.mode === 'edit';
+    this.hasPartner = data.hasPartner ?? false;
+
+    if (this.hasPartner) {
+      this.ownershipOptions = [
+        { value: 0, label: 'Joint' },
+        { value: 1, label: data.clientFirstName || 'Client' },
+        { value: 2, label: data.partnerFirstName || 'Partner' }
+      ];
+    }
+
+    const ownershipValue = this.isEditMode
+      ? this.getOwnershipValue(data.liability!.ownership)
+      : 0;
 
     this.form = this.fb.group({
       type: [this.isEditMode ? data.liability!.type : '', Validators.required],
+      name: [this.isEditMode ? (data.liability!.name || '') : ''],
       description: [this.isEditMode ? data.liability!.description : '', Validators.required],
       outstanding: [this.isEditMode ? data.liability!.outstanding : null, [Validators.required, Validators.min(0)]],
+      ownership: [ownershipValue],
       currencySymbol: [data.clientPreferredCurrency || 'EUR']
     });
+
+    if (this.isEditMode) {
+      this.updateNameValidation(data.liability!.type);
+    }
+  }
+
+  get isOtherType(): boolean {
+    return this.form.get('type')?.value === 'Other';
+  }
+
+  onTypeChange(): void {
+    const type = this.form.get('type')?.value;
+    this.updateNameValidation(type);
+    if (type !== 'Other') {
+      this.form.patchValue({ name: '' });
+    }
+  }
+
+  private updateNameValidation(type: string): void {
+    const nameControl = this.form.get('name');
+    if (type === 'Other') {
+      nameControl?.setValidators(Validators.required);
+    } else {
+      nameControl?.clearValidators();
+    }
+    nameControl?.updateValueAndValidity();
   }
 
   onAmountInput(rawValue: string): void {
@@ -86,8 +133,10 @@ export class AddLiabilityComponent {
       const request = {
         id: this.data.liability!.id,
         type: formValue.type,
+        name: formValue.name || null,
         description: formValue.description,
-        outstanding: formValue.outstanding
+        outstanding: formValue.outstanding,
+        ownership: this.hasPartner ? formValue.ownership : 0
       };
       this.wealthHttp.updateLiability(this.data.cashflowId, request).subscribe({
         next: (dashboard) => {
@@ -102,8 +151,10 @@ export class AddLiabilityComponent {
     } else {
       const request = {
         type: formValue.type,
+        name: formValue.name || null,
         description: formValue.description,
-        outstanding: formValue.outstanding
+        outstanding: formValue.outstanding,
+        ownership: this.hasPartner ? formValue.ownership : 0
       };
       this.wealthHttp.addLiability(this.data.cashflowId, request).subscribe({
         next: (dashboard) => {
@@ -136,5 +187,13 @@ export class AddLiabilityComponent {
 
   onCancel(): void {
     this.dialogRef.close();
+  }
+
+  private getOwnershipValue(ownership: string): number {
+    switch (ownership) {
+      case 'Client': return 1;
+      case 'Partner': return 2;
+      default: return 0;
+    }
   }
 }

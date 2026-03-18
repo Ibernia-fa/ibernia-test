@@ -1,0 +1,27 @@
+<h2 mat-dialog-title>Tax Settings</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form" class="dialog-form">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Partner tax rate (%)</mat-label>
+      <input matInput type="number" formControlName="partnerTaxRate" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Child tax rate (%)</mat-label>
+      <input matInput type="number" formControlName="childTaxRate" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Sibling tax rate (%)</mat-label>
+      <input matInput type="number" formControlName="siblingTaxRate" />
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button class="dialog-btn dialog-btn-cancel" (click)="onCancel()">Cancel</button>
+  <button class="dialog-btn dialog-btn-save" [disabled]="form.invalid || isSaving" (click)="onSave()">
+    Save
+  </button>
+</mat-dialog-actions>

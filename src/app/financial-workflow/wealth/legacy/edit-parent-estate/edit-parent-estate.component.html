@@ -1,0 +1,20 @@
+<h2 mat-dialog-title>{{sideLabel}} – Joint Net Worth</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form" class="dialog-form">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Joint net worth ({{data.currency | currencySymbol}})</mat-label>
+      <input matInput
+             [value]="form.value.jointNetWorth | number:'1.0-0'"
+             (input)="onAmountInput($event)"
+             thousandSeparatorInput />
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button class="dialog-btn dialog-btn-cancel" (click)="onCancel()">Cancel</button>
+  <button class="dialog-btn dialog-btn-save" [disabled]="form.invalid || isSaving" (click)="onSave()">
+    Save
+  </button>
+</mat-dialog-actions>
