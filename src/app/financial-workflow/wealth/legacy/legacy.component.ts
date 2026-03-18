@@ -100,6 +100,14 @@ export class LegacyComponent implements OnInit, OnChanges {
     return this.dashboard?.hasPartner ?? false;
   }
 
+  get showClientBranch(): boolean {
+    return this.clientParents.length > 0 || this.clientSiblings.length > 0;
+  }
+
+  get showPartnerBranch(): boolean {
+    return this.partnerParents.length > 0 || this.partnerSiblings.length > 0;
+  }
+
   get currency(): string {
     return this.clientData?.preferredCurrency ?? 'USD';
   }

@@ -45,7 +45,7 @@ export class AiRecommendationsComponent implements OnInit, OnDestroy {
   public usageLimit = 5;
   public clientNotes = '';
   public advisorGuidelines = '';
-  public readonly termsUrl = `${environment.authority}/terms-and-conditions`;
+  public readonly termsUrl = 'https://ibernia.app/terms';
 
   public userData: any;
   client$: Observable<Client | null>;

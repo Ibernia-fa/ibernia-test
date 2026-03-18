@@ -12,7 +12,7 @@ import { environment } from 'src/environments/environment';
 })
 export class FooterComponent {
   showFaqLink = true;
-  readonly termsUrl = `${environment.authority}/terms-and-conditions`;
+  readonly termsUrl = 'https://ibernia.app/terms';
 
   constructor(private router: Router) {
     this.router.events

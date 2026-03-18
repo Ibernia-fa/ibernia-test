@@ -38,8 +38,8 @@ export class PrivacyDataComponent implements OnInit, OnDestroy {
   isExporting = false;
   isTerminating = false;
   showTerminateConfirm = false;
-  readonly privacyPolicyUrl = `${environment.authority}/privacy-policy`;
-  readonly termsUrl = `${environment.authority}/terms-and-conditions`;
+  readonly privacyPolicyUrl = 'https://ibernia.app/privacy';
+  readonly termsUrl = 'https://ibernia.app/terms';
 
   constructor(
     private privacyService: DataPrivacyService,

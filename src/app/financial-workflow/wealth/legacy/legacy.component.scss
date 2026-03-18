@@ -1,5 +1,5 @@
 $line-color: #cbd5e1;
-$line-width: 2px;
+$line-w: 2px;
 
 .section-title {
   font-size: 18px;
@@ -63,125 +63,186 @@ $line-width: 2px;
   border-radius: 16px;
   border: 1px solid #e2e8f0;
   min-height: 200px;
+  overflow-x: auto;
 }
 
-// ── Generation Rows ───────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// TREE BODY: two branches side-by-side, bottom-aligned
+// ═══════════════════════════════════════════════════════════════
 
-.generation-row {
+.tree-body {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-}
-
-// ── Couples Container (top parents row) ───────────────────────
-
-.couples-container {
-  display: flex;
+  align-items: flex-end;
   justify-content: center;
-  gap: 80px;
 }
 
-.couple-group {
+// ── Family Branch (one per side: client / partner) ────────────
+
+.family-branch {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-.couple-nodes {
+// ── Parents couple at top of a branch ─────────────────────────
+
+.branch-parents {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.couple-pair {
   display: flex;
   align-items: flex-start;
 }
 
-// ── Horizontal connector with heart/symbol ────────────────────
-
-.connector-h-heart {
+.pair-heart {
   display: flex;
   align-items: center;
-  gap: 0;
-  align-self: center;
-  padding-top: 12px;
+  padding-top: 14px;
 }
 
-.line-h {
-  width: 28px;
-  height: $line-width;
-  background: $line-color;
-}
+.parent-estate {
+  margin-top: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #f97316;
+  cursor: pointer;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 
-.couple-connector {
-  padding-top: 16px;
-
-  .line-h {
-    width: 36px;
+  .edit-sm {
+    font-size: 12px;
+    width: 12px;
+    height: 12px;
+    color: #94a3b8;
   }
 }
 
-.heart-icon {
+// ── Vertical drop from parents to bracket ─────────────────────
+
+.branch-vline {
+  width: $line-w;
+  height: 28px;
+  background: $line-color;
+}
+
+// ── Leaf row (nodes hanging from the bracket) ─────────────────
+
+.branch-leaves,
+.children-leaves {
+  display: flex;
+  align-items: flex-start;
+}
+
+.leaf {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.leaf-drop {
+  width: $line-w;
+  height: 18px;
+  background: $line-color;
+}
+
+.leaf-drop-short {
+  width: $line-w;
+  height: 10px;
+  background: $line-color;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// BRACKET via pseudo-elements on each .leaf
+// ═══════════════════════════════════════════════════════════════
+
+.has-bracket .leaf {
+  &:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 50%;
+    height: $line-w;
+    background: $line-color;
+  }
+
+  &:not(:first-child)::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 50%;
+    width: 50%;
+    height: $line-w;
+    background: $line-color;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// COUPLE LINK (heart + horizontal lines between client & partner)
+// ═══════════════════════════════════════════════════════════════
+
+.couple-link {
+  display: flex;
+  align-items: center;
+  margin-bottom: 64px;
+}
+
+.link-line {
+  width: 32px;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CHILDREN SECTION (below the main couple)
+// ═══════════════════════════════════════════════════════════════
+
+.children-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.child-vline {
+  width: $line-w;
+  height: 28px;
+  background: $line-color;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SHARED: lines & icons
+// ═══════════════════════════════════════════════════════════════
+
+.line-h {
+  width: 24px;
+  height: $line-w;
+  background: $line-color;
+}
+
+.heart-sm {
   font-size: 14px;
   width: 14px;
   height: 14px;
   color: #ec4899;
-  margin: 0 2px;
+  margin: 0 1px;
 }
 
-.heart-icon-lg {
+.heart-lg {
   font-size: 22px;
   width: 22px;
   height: 22px;
   color: #ec4899;
   cursor: pointer;
-  margin: 0 2px;
-
   &:hover { transform: scale(1.15); }
 }
 
-// ── Vertical connectors ───────────────────────────────────────
-
-.vertical-connectors {
-  display: flex;
-  justify-content: center;
-  gap: 80px;
-  width: 100%;
-}
-
-.v-line {
-  width: $line-width;
-  height: 32px;
-  background: $line-color;
-}
-
-.v-connector-section {
-  display: flex;
-  justify-content: center;
-}
-
-.center-line {
-  height: 28px;
-}
-
-// ── Middle Layout (client + partner + siblings) ───────────────
-
-.middle-layout {
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  gap: 16px;
-}
-
-.main-couple {
-  display: flex;
-  align-items: flex-start;
-}
-
-.siblings-column {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding-top: 8px;
-}
-
-// ── Tree Nodes ────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// TREE NODES
+// ═══════════════════════════════════════════════════════════════
 
 .tree-node {
   display: flex;
@@ -195,18 +256,11 @@ $line-width: 2px;
   transition: all 0.2s ease;
   min-width: 80px;
 
-  &:hover {
-    background: rgba(99, 102, 241, 0.05);
-  }
-
-  &.deceased {
-    opacity: 0.45;
-  }
+  &:hover { background: rgba(99, 102, 241, 0.05); }
+  &.deceased { opacity: 0.45; }
 }
 
-.main-node {
-  min-width: 100px;
-}
+.main-node { min-width: 100px; }
 
 .node-avatar {
   width: 48px;
@@ -216,7 +270,6 @@ $line-width: 2px;
   align-items: center;
   justify-content: center;
   color: #fff;
-
   mat-icon { font-size: 24px; width: 24px; height: 24px; }
 }
 
@@ -226,14 +279,15 @@ $line-width: 2px;
 .avatar-partnermother { background: #ec4899; }
 .avatar-clientsibling { background: rgba(99, 102, 241, 0.6); }
 .avatar-partnersibling { background: #14b8a6; }
+
 .avatar-child {
   background: transparent;
   border: 3px solid;
 }
 
-.children-nodes .child-column:nth-child(3n+1) .avatar-child { border-color: #f97316; color: #f97316; }
-.children-nodes .child-column:nth-child(3n+2) .avatar-child { border-color: #6366f1; color: #6366f1; }
-.children-nodes .child-column:nth-child(3n) .avatar-child { border-color: #a855f7; color: #a855f7; }
+.children-leaves .leaf:nth-child(3n+1) .avatar-child { border-color: #f97316; color: #f97316; }
+.children-leaves .leaf:nth-child(3n+2) .avatar-child { border-color: #6366f1; color: #6366f1; }
+.children-leaves .leaf:nth-child(3n) .avatar-child { border-color: #a855f7; color: #a855f7; }
 
 .node-name {
   font-size: 12px;
@@ -244,10 +298,7 @@ $line-width: 2px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-
-  &.strikethrough {
-    text-decoration: line-through;
-  }
+  &.strikethrough { text-decoration: line-through; }
 }
 
 .node-amount {
@@ -255,6 +306,10 @@ $line-width: 2px;
   font-weight: 700;
   color: #6366f1;
   font-family: "Ubuntu", serif;
+}
+
+.partner-amount {
+  color: #f97316;
 }
 
 .node-remove {
@@ -271,25 +326,37 @@ $line-width: 2px;
   align-items: center;
   justify-content: center;
   padding: 0;
-
-  mat-icon {
-    font-size: 12px;
-    width: 12px;
-    height: 12px;
-    color: #dc2626;
-  }
-
+  mat-icon { font-size: 12px; width: 12px; height: 12px; color: #dc2626; }
   .tree-node:hover & { display: flex; }
 }
 
-// ── Tax Node ──────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// TAX NODE (on the flow path between couple and children)
+// ═══════════════════════════════════════════════════════════════
 
-.center-symbol, .single-tax {
+.tax-node {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
+  gap: 3px;
   cursor: pointer;
+}
+
+.tax-icon-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #fee2e2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: #dc2626;
+  }
 }
 
 .tax-badge {
@@ -308,45 +375,9 @@ $line-width: 2px;
   font-family: "Ubuntu", serif;
 }
 
-// ── Children bracket ──────────────────────────────────────────
-
-.children-generation {
-  margin-top: 0;
-}
-
-.children-bracket {
-  width: 60%;
-  max-width: 400px;
-  min-width: 120px;
-  display: flex;
-  justify-content: center;
-}
-
-.bracket-line {
-  width: 100%;
-  height: $line-width;
-  background: $line-color;
-}
-
-.children-nodes {
-  display: flex;
-  justify-content: center;
-  gap: 24px;
-}
-
-.child-column {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.child-v-line {
-  width: $line-width;
-  height: 18px;
-  background: $line-color;
-}
-
-// ── Inheritance Display ───────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// INHERITANCE DISPLAY
+// ═══════════════════════════════════════════════════════════════
 
 .inheritance-pct {
   position: absolute;
@@ -367,7 +398,6 @@ $line-width: 2px;
   font-weight: 700;
   padding: 2px 8px;
   border-radius: 999px;
-  margin-bottom: 2px;
 }
 
 .inheritance-detail {
@@ -390,16 +420,16 @@ $line-width: 2px;
   font-family: "Ubuntu", serif;
 }
 
-.child-total {
-  color: #10b981;
-}
+.child-total { color: #10b981; }
 
 .estate-currency {
   font-size: 0.85em;
   margin-right: 1px;
 }
 
-// ── Tax Settings Row ──────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// TAX SETTINGS ROW
+// ═══════════════════════════════════════════════════════════════
 
 .tax-label {
   font-size: 13px;
@@ -407,7 +437,9 @@ $line-width: 2px;
   strong { color: #1c1c1c; }
 }
 
-// ── Utilities ─────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// UTILITIES
+// ═══════════════════════════════════════════════════════════════
 
 .gap-12 { gap: 12px; }
 .gap-24 { gap: 24px; }
