@@ -22,6 +22,16 @@
           </div>
         </div>
 
+        @if (isOtherCategory) {
+          <div class="w-100 form-field gap-8">
+            <mat-label class="f-s-16 d-block" style="line-height: 18px">Name</mat-label>
+            <input matInput formControlName="name" placeholder="e.g. Artwork collection" />
+            @if(form.get('name')?.touched && form.get('name')?.hasError('required')) {
+              <span class="field-error d-block">Required</span>
+            }
+          </div>
+        }
+
         <div class="w-100 form-field gap-8">
           <mat-label class="f-s-16 d-block" style="line-height: 18px">Description</mat-label>
           <input matInput formControlName="description" placeholder="e.g. Primary residence" />
@@ -58,17 +68,19 @@
           </div>
         </div>
 
-        <div class="w-100 form-field gap-8">
-          <mat-label class="f-s-16 d-block" style="line-height: 18px">Liquidity</mat-label>
-          <div class="select-option">
-            <mat-select formControlName="liquidity" placeholder="Select liquidity"
-              hideSingleSelectionIndicator>
-              @for (liq of liquidityLevels; track liq.value) {
-                <mat-option [value]="liq.value">{{ liq.label }}</mat-option>
-              }
-            </mat-select>
+        @if (hasPartner) {
+          <div class="w-100 form-field gap-8">
+            <mat-label class="f-s-16 d-block" style="line-height: 18px">Ownership</mat-label>
+            <div class="select-option">
+              <mat-select formControlName="ownership" placeholder="Select ownership"
+                hideSingleSelectionIndicator>
+                @for (opt of ownershipOptions; track opt.value) {
+                  <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+                }
+              </mat-select>
+            </div>
           </div>
-        </div>
+        }
 
       </div>
     </mat-dialog-content>

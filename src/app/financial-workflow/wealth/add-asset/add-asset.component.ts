@@ -15,9 +15,7 @@ import { WealthHttpService } from '../services/wealth-http.service';
 import {
   WealthAssetModel,
   AssetCategory,
-  LiquidityLevel,
-  ASSET_CATEGORY_LABELS,
-  LIQUIDITY_LABELS
+  ASSET_CATEGORY_LABELS
 } from '../models/wealth.model';
 
 export interface AddAssetDialogData {
@@ -25,6 +23,9 @@ export interface AddAssetDialogData {
   cashflowId: string;
   asset?: WealthAssetModel;
   clientPreferredCurrency?: string;
+  hasPartner?: boolean;
+  clientFirstName?: string;
+  partnerFirstName?: string;
 }
 
 @Component({
@@ -47,17 +48,15 @@ export class AddAssetComponent {
   isEditMode: boolean;
   isSaving = false;
   countries = allCountries;
+  hasPartner: boolean;
 
   categories = [
     { value: AssetCategory.RealEstate, label: ASSET_CATEGORY_LABELS[AssetCategory.RealEstate] },
-    { value: AssetCategory.PersonalProperty, label: ASSET_CATEGORY_LABELS[AssetCategory.PersonalProperty] }
+    { value: AssetCategory.PersonalProperty, label: ASSET_CATEGORY_LABELS[AssetCategory.PersonalProperty] },
+    { value: AssetCategory.Other, label: ASSET_CATEGORY_LABELS[AssetCategory.Other] }
   ];
 
-  liquidityLevels = [
-    { value: LiquidityLevel.Liquid, label: LIQUIDITY_LABELS[LiquidityLevel.Liquid] },
-    { value: LiquidityLevel.Partial, label: LIQUIDITY_LABELS[LiquidityLevel.Partial] },
-    { value: LiquidityLevel.Illiquid, label: LIQUIDITY_LABELS[LiquidityLevel.Illiquid] }
-  ];
+  ownershipOptions: { value: number; label: string }[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -67,29 +66,56 @@ export class AddAssetComponent {
     private toastr: ToastrService
   ) {
     this.isEditMode = data.mode === 'edit';
+    this.hasPartner = data.hasPartner ?? false;
+
+    if (this.hasPartner) {
+      this.ownershipOptions = [
+        { value: 0, label: 'Joint' },
+        { value: 1, label: data.clientFirstName || 'Client' },
+        { value: 2, label: data.partnerFirstName || 'Partner' }
+      ];
+    }
 
     const categoryValue = this.isEditMode
       ? this.getCategoryEnum(data.asset!.category)
       : AssetCategory.RealEstate;
 
-    const liquidityValue = this.isEditMode
-      ? this.getLiquidityEnum(data.asset!.liquidity)
-      : LiquidityLevel.Illiquid;
+    const ownershipValue = this.isEditMode
+      ? this.getOwnershipValue(data.asset!.ownership)
+      : 0;
 
     this.form = this.fb.group({
       category: [categoryValue, Validators.required],
+      name: [this.isEditMode ? (data.asset!.name || '') : ''],
       description: [this.isEditMode ? data.asset!.description : '', Validators.required],
       value: [this.isEditMode ? data.asset!.value : null, [Validators.required, Validators.min(0)]],
-      liquidity: [liquidityValue, Validators.required],
+      ownership: [ownershipValue],
       currencySymbol: [data.clientPreferredCurrency || 'EUR']
     });
+
+    this.updateNameValidation(categoryValue);
+  }
+
+  get isOtherCategory(): boolean {
+    return this.form.get('category')?.value === AssetCategory.Other;
   }
 
   onCategoryChange(): void {
     const cat = this.form.get('category')?.value;
-    if (cat === AssetCategory.RealEstate || cat === AssetCategory.PersonalProperty) {
-      this.form.patchValue({ liquidity: LiquidityLevel.Illiquid });
+    this.updateNameValidation(cat);
+    if (cat !== AssetCategory.Other) {
+      this.form.patchValue({ name: '' });
     }
+  }
+
+  private updateNameValidation(category: AssetCategory): void {
+    const nameControl = this.form.get('name');
+    if (category === AssetCategory.Other) {
+      nameControl?.setValidators(Validators.required);
+    } else {
+      nameControl?.clearValidators();
+    }
+    nameControl?.updateValueAndValidity();
   }
 
   onAmountInput(rawValue: string): void {
@@ -111,9 +137,10 @@ export class AddAssetComponent {
       const request = {
         id: this.data.asset!.id,
         category: formValue.category,
+        name: formValue.name || null,
         description: formValue.description,
         value: formValue.value,
-        liquidity: formValue.liquidity
+        ownership: this.hasPartner ? formValue.ownership : 0
       };
       this.wealthHttp.updateAsset(this.data.cashflowId, request).subscribe({
         next: (dashboard) => {
@@ -128,9 +155,10 @@ export class AddAssetComponent {
     } else {
       const request = {
         category: formValue.category,
+        name: formValue.name || null,
         description: formValue.description,
         value: formValue.value,
-        liquidity: formValue.liquidity
+        ownership: this.hasPartner ? formValue.ownership : 0
       };
       this.wealthHttp.addAsset(this.data.cashflowId, request).subscribe({
         next: (dashboard) => {
@@ -166,15 +194,19 @@ export class AddAssetComponent {
   }
 
   private getCategoryEnum(category: string): AssetCategory {
-    if (category === 'Real estate') return AssetCategory.RealEstate;
-    return AssetCategory.PersonalProperty;
+    switch (category) {
+      case 'Real estate': return AssetCategory.RealEstate;
+      case 'Personal property': return AssetCategory.PersonalProperty;
+      case 'Other': return AssetCategory.Other;
+      default: return AssetCategory.RealEstate;
+    }
   }
 
-  private getLiquidityEnum(liquidity: string): LiquidityLevel {
-    switch (liquidity) {
-      case 'Liquid': return LiquidityLevel.Liquid;
-      case 'Partial': return LiquidityLevel.Partial;
-      default: return LiquidityLevel.Illiquid;
+  private getOwnershipValue(ownership: string): number {
+    switch (ownership) {
+      case 'Client': return 1;
+      case 'Partner': return 2;
+      default: return 0;
     }
   }
 }

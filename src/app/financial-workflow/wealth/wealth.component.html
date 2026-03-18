@@ -1,16 +1,21 @@
 <div *ngIf="!isLoading; else loadingTpl" class="d-flex gap-24 flex-column">
 
-  <!-- Header card -->
+  <!-- Tab header: Net Worth / Legacy -->
   <mat-card class="mat-mdc-card mdc-card cardWithShadow">
     <mat-card-content class="mat-mdc-card-content">
-      <div class="d-flex align-items-center justify-content-between w-100 gap-16 flex-wrap">
-        <div class="d-flex align-items-center gap-16">
-          <div class="wealth-icon-wrapper d-flex align-items-center justify-content-center">
+      <div class="stepper-header">
+        <div class="stepper-step active">
+          <div class="stepper-icon">
             <img width="25" src="../../../assets/images/svgs/money-square-blue.svg" alt="">
           </div>
-          <div class="d-flex flex-column justify-content-between gap-4">
-            <h4 class="page-title f-w-500">Total Wealth</h4>
+          <span class="stepper-label">Net Worth</span>
+        </div>
+        <div class="stepper-line"></div>
+        <div class="stepper-step disabled">
+          <div class="stepper-icon disabled-icon">
+            <mat-icon>groups</mat-icon>
           </div>
+          <span class="stepper-label">Legacy</span>
         </div>
       </div>
     </mat-card-content>
@@ -18,8 +23,8 @@
 
   <!-- Summary row -->
   <div class="row" *ngIf="dashboard?.summary as s">
-    <!-- Net worth -->
-    <div class="col-md-4">
+    <!-- Net worth card -->
+    <div class="col-md-6">
       <mat-card class="cardWithShadow summary-stat-card">
         <mat-card-content style="padding: 28px 24px !important;">
           <div class="d-flex flex-column gap-8">
@@ -31,80 +36,67 @@
             <h3 class="saving-title">
               <span>{{clientData?.preferredCurrency | currencySymbol}}</span>{{s.netWorth | number:'1.0-0'}}
             </h3>
-            <p class="stat-subtext">Portion of assets paid with debt: {{s.debtRatio}}%</p>
+            <p class="stat-subtext">{{s.debtRatio}}% financed with debt</p>
+
+            <!-- Per-person breakdown -->
+            <div class="per-person-breakdown" *ngIf="hasPartner && s.perPersonBreakdown as pp">
+              <div class="person-chip">
+                <span class="person-name">{{pp.clientName}}</span>
+                <span class="person-value">
+                  <span>{{clientData?.preferredCurrency | currencySymbol}}</span>{{pp.clientNetWorth | number:'1.0-0'}}
+                </span>
+              </div>
+              <div class="person-chip partner">
+                <span class="person-name">{{pp.partnerName}}</span>
+                <span class="person-value">
+                  <span>{{clientData?.preferredCurrency | currencySymbol}}</span>{{pp.partnerNetWorth | number:'1.0-0'}}
+                </span>
+              </div>
+            </div>
           </div>
         </mat-card-content>
       </mat-card>
     </div>
 
-    <!-- Assets by type -->
-    <div class="col-md-4">
+    <!-- Asset mix card -->
+    <div class="col-md-6">
       <mat-card class="cardWithShadow summary-stat-card">
         <mat-card-content style="padding: 28px 24px !important;">
           <div class="d-flex flex-column gap-8">
-            <p class="stat-label">Assets by type</p>
+            <p class="stat-label">Asset Mix</p>
             <div class="stacked-bar-container">
               <div class="stacked-bar">
                 <div class="bar-segment bar-cash" [style.width.%]="s.assetsByType.cashPercent"></div>
                 <div class="bar-segment bar-investments" [style.width.%]="s.assetsByType.investmentsPercent"></div>
                 <div class="bar-segment bar-real-estate" [style.width.%]="s.assetsByType.realEstatePercent"></div>
                 <div class="bar-segment bar-personal-property" [style.width.%]="s.assetsByType.personalPropertyPercent"></div>
+                <div class="bar-segment bar-other" [style.width.%]="s.assetsByType.otherPercent"></div>
               </div>
               <div class="legend-grid">
                 <div class="legend-item">
                   <span class="legend-dot bar-cash"></span>
-                  <span class="legend-label">Cash</span>
+                  <span class="legend-label">Cash:</span>
                   <span class="legend-value">{{s.assetsByType.cashPercent}}%</span>
                 </div>
                 <div class="legend-item">
                   <span class="legend-dot bar-investments"></span>
-                  <span class="legend-label">Investments</span>
+                  <span class="legend-label">Investment:</span>
                   <span class="legend-value">{{s.assetsByType.investmentsPercent}}%</span>
                 </div>
                 <div class="legend-item">
                   <span class="legend-dot bar-real-estate"></span>
-                  <span class="legend-label">Real Estate</span>
+                  <span class="legend-label">Real estate:</span>
                   <span class="legend-value">{{s.assetsByType.realEstatePercent}}%</span>
                 </div>
                 <div class="legend-item">
                   <span class="legend-dot bar-personal-property"></span>
-                  <span class="legend-label">Personal Property</span>
+                  <span class="legend-label">Personal property:</span>
                   <span class="legend-value">{{s.assetsByType.personalPropertyPercent}}%</span>
                 </div>
-              </div>
-            </div>
-          </div>
-        </mat-card-content>
-      </mat-card>
-    </div>
-
-    <!-- Asset liquidity mix -->
-    <div class="col-md-4">
-      <mat-card class="cardWithShadow summary-stat-card">
-        <mat-card-content style="padding: 28px 24px !important;">
-          <div class="d-flex flex-column gap-8">
-            <p class="stat-label">Asset liquidity mix</p>
-            <div class="stacked-bar-container">
-              <div class="stacked-bar">
-                <div class="bar-segment bar-liquid" [style.width.%]="s.liquidityMix.liquidPercent"></div>
-                <div class="bar-segment bar-partial" [style.width.%]="s.liquidityMix.partialPercent"></div>
-                <div class="bar-segment bar-illiquid" [style.width.%]="s.liquidityMix.illiquidPercent"></div>
-              </div>
-              <div class="legend-grid">
-                <div class="legend-item">
-                  <span class="legend-dot bar-liquid"></span>
-                  <span class="legend-label">Liquid</span>
-                  <span class="legend-value">{{s.liquidityMix.liquidPercent}}%</span>
-                </div>
-                <div class="legend-item">
-                  <span class="legend-dot bar-partial"></span>
-                  <span class="legend-label">Partial liquid</span>
-                  <span class="legend-value">{{s.liquidityMix.partialPercent}}%</span>
-                </div>
-                <div class="legend-item">
-                  <span class="legend-dot bar-illiquid"></span>
-                  <span class="legend-label">Illiquid</span>
-                  <span class="legend-value">{{s.liquidityMix.illiquidPercent}}%</span>
+                <div class="legend-item" *ngIf="s.assetsByType.otherPercent > 0">
+                  <span class="legend-dot bar-other"></span>
+                  <span class="legend-label">Other:</span>
+                  <span class="legend-value">{{s.assetsByType.otherPercent}}%</span>
                 </div>
               </div>
             </div>
@@ -114,157 +106,137 @@
     </div>
   </div>
 
-  <!-- Detail cards -->
-  <div class="row">
-    <!-- Assets -->
-    <div class="col-md-6">
-      <mat-card class="cardWithShadow">
-        <mat-card-content style="padding: 28px 24px !important;">
-          <div class="d-flex align-items-center justify-content-between m-b-16">
-            <h2 class="section-title">Assets</h2>
-            <p class="section-total" *ngIf="dashboard?.summary">
-              Total <span>{{clientData?.preferredCurrency | currencySymbol}}</span>{{dashboard.summary.totalAssets | number:'1.0-0'}}
-            </p>
-          </div>
+  <!-- Assets section -->
+  <mat-card class="cardWithShadow">
+    <mat-card-content style="padding: 28px 24px !important;">
+      <div class="d-flex align-items-center justify-content-between m-b-16">
+        <div>
+          <h2 class="section-title">Assets</h2>
+          <p class="section-total" *ngIf="dashboard?.summary">
+            <span>{{clientData?.preferredCurrency | currencySymbol}}</span>{{dashboard.summary.totalAssets | number:'1.0-0'}}
+          </p>
+        </div>
+        <button class="add-btn add-btn-primary" (click)="onAddAsset()">
+          <span>Add asset</span>
+          <img src="assets/images/svgs/add-icon.svg" alt="add-icon" />
+        </button>
+      </div>
 
-          <button class="add-btn add-btn-primary" (click)="onAddAsset()">
-            <span>Add asset</span>
-            <img src="assets/images/svgs/add-icon.svg" alt="add-icon" />
-          </button>
+      <div class="table-wrapper" *ngIf="dashboard?.assets?.length">
+        <table class="wealth-table">
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th>Category</th>
+              <th *ngIf="hasPartner">Ownership</th>
+              <th class="text-right">Value</th>
+              <th class="col-actions"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of dashboard.assets; let odd = odd" [class.alt-row]="odd">
+              <td>{{row.description}}</td>
+              <td>{{row.category}}</td>
+              <td *ngIf="hasPartner">
+                <span class="ownership-badge" [ngClass]="getOwnershipClass(row.ownership)">
+                  {{getOwnershipLabel(row.ownership)}}
+                </span>
+              </td>
+              <td class="text-right">
+                <span>{{clientData?.preferredCurrency | currencySymbol}}</span>{{row.value | number:'1.0-0'}}
+              </td>
+              <td class="col-actions">
+                <button [matMenuTriggerFor]="assetMenu" class="menu-trigger-btn">
+                  <mat-icon class="menu-icon">more_vert</mat-icon>
+                </button>
+                <mat-menu #assetMenu="matMenu">
+                  <button mat-menu-item (click)="onEditAsset(row)">
+                    <mat-icon>edit</mat-icon>
+                    <span>Edit</span>
+                  </button>
+                  <button mat-menu-item class="delete-menu-item" *ngIf="!row.isFromSavingPots" (click)="onDeleteAsset(row)">
+                    <mat-icon>delete</mat-icon>
+                    <span>Delete</span>
+                  </button>
+                </mat-menu>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-          <div class="asset-sections">
-            <ng-container *ngFor="let section of assetSections">
-              <ng-container *ngIf="getAssetsForSection(section.key) as rows">
-                <div class="asset-section" *ngIf="rows.length > 0">
-                  <div class="section-header">{{section.label}}</div>
-                  <table class="wealth-table">
-                    <thead>
-                      <tr>
-                        <th class="col-desc">Description</th>
-                        <th class="col-value text-right">Value</th>
-                        <th class="col-liquidity text-right">
-                          <div class="d-flex align-items-center justify-content-end gap-8">
-                            <span>Liquidity</span>
-                            <span class="menu-spacer"></span>
-                          </div>
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr *ngFor="let row of rows; let odd = odd" [class.alt-row]="odd">
-                        <td class="col-desc">{{row.description}}</td>
-                        <td class="col-value text-right">
-                          <span>{{clientData?.preferredCurrency | currencySymbol}}</span>{{row.value | number:'1.0-0'}}
-                        </td>
-                        <td class="col-liquidity text-right">
-                          <div class="d-flex align-items-center justify-content-end gap-8">
-                            <span class="liquidity-tag"
-                                  [ngClass]="getLiquidityClass(row.liquidity)"
-                                  [class.clickable]="row.isLiquidityEditable"
-                                  (click)="row.isLiquidityEditable ? onToggleLiquidity(row) : null">
-                              {{getLiquidityLabel(row.liquidity)}}
-                            </span>
-                            <ng-container *ngIf="!row.isFromSavingPots">
-                              <button [matMenuTriggerFor]="assetMenu" class="menu-trigger-btn">
-                                <mat-icon class="menu-icon">more_vert</mat-icon>
-                              </button>
-                              <mat-menu #assetMenu="matMenu">
-                                <button mat-menu-item (click)="onEditAsset(row)">
-                                  <mat-icon>edit</mat-icon>
-                                  <span>Edit</span>
-                                </button>
-                                <button mat-menu-item class="delete-menu-item" (click)="onDeleteAsset(row)">
-                                  <mat-icon>delete</mat-icon>
-                                  <span>Delete</span>
-                                </button>
-                              </mat-menu>
-                            </ng-container>
-                            <span *ngIf="row.isFromSavingPots" class="menu-spacer"></span>
-                          </div>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </ng-container>
-            </ng-container>
-          </div>
+      <div *ngIf="!dashboard?.assets?.length" class="empty-state">
+        <p class="text-muted text-center my-4">
+          No assets found. Click <b>Add asset</b> to get started.
+        </p>
+      </div>
+    </mat-card-content>
+  </mat-card>
 
-          <div *ngIf="!dashboard?.assets?.length" class="empty-state">
-            <p class="text-muted text-center my-4">
-              No assets found. Click <b>Add asset</b> to get started.
-            </p>
-          </div>
-        </mat-card-content>
-      </mat-card>
-    </div>
+  <!-- Liabilities section -->
+  <mat-card class="cardWithShadow">
+    <mat-card-content style="padding: 28px 24px !important;">
+      <div class="d-flex align-items-center justify-content-between m-b-16">
+        <div>
+          <h2 class="section-title">Liabilities</h2>
+          <p class="section-total" *ngIf="dashboard?.summary">
+            <span>{{clientData?.preferredCurrency | currencySymbol}}</span>{{dashboard.summary.totalLiabilities | number:'1.0-0'}}
+          </p>
+        </div>
+        <button class="add-btn add-btn-outline" (click)="onAddLiability()">
+          <span>Add liability</span>
+          <img src="assets/images/svgs/add-icon.svg" alt="add-icon" />
+        </button>
+      </div>
 
-    <!-- Liabilities -->
-    <div class="col-md-6">
-      <mat-card class="cardWithShadow">
-        <mat-card-content style="padding: 28px 24px !important;">
-          <div class="d-flex align-items-center justify-content-between m-b-16">
-            <h2 class="section-title">Liabilities</h2>
-            <p class="section-total" *ngIf="dashboard?.summary">
-              Total <span>{{clientData?.preferredCurrency | currencySymbol}}</span>{{dashboard.summary.totalLiabilities | number:'1.0-0'}}
-            </p>
-          </div>
+      <div class="table-wrapper" *ngIf="dashboard?.liabilities?.length">
+        <table class="wealth-table">
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th *ngIf="hasPartner">Ownership</th>
+              <th class="text-right">Value</th>
+              <th class="col-actions"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of dashboard.liabilities; let odd = odd" [class.alt-row]="odd">
+              <td>{{row.description}}</td>
+              <td *ngIf="hasPartner">
+                <span class="ownership-badge" [ngClass]="getOwnershipClass(row.ownership)">
+                  {{getOwnershipLabel(row.ownership)}}
+                </span>
+              </td>
+              <td class="text-right">
+                <span>{{clientData?.preferredCurrency | currencySymbol}}</span>{{row.outstanding | number:'1.0-0'}}
+              </td>
+              <td class="col-actions">
+                <button [matMenuTriggerFor]="liabilityMenu" class="menu-trigger-btn">
+                  <mat-icon class="menu-icon">more_vert</mat-icon>
+                </button>
+                <mat-menu #liabilityMenu="matMenu">
+                  <button mat-menu-item (click)="onEditLiability(row)">
+                    <mat-icon>edit</mat-icon>
+                    <span>Edit</span>
+                  </button>
+                  <button mat-menu-item class="delete-menu-item" (click)="onDeleteLiability(row)">
+                    <mat-icon>delete</mat-icon>
+                    <span>Delete</span>
+                  </button>
+                </mat-menu>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-          <button class="add-btn add-btn-outline" (click)="onAddLiability()">
-            <span>Add liability</span>
-            <img src="assets/images/svgs/add-icon.svg" alt="add-icon" />
-          </button>
-
-          <div class="liability-section" *ngIf="dashboard?.liabilities?.length">
-            <table class="wealth-table">
-              <thead>
-                <tr>
-                  <th>Type</th>
-                  <th>Description</th>
-                  <th class="text-right">
-                    <div class="d-flex align-items-center justify-content-end gap-8">
-                      <span>Outstanding</span>
-                      <span class="menu-spacer"></span>
-                    </div>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let row of dashboard.liabilities; let odd = odd" [class.alt-row]="odd">
-                  <td>{{row.type}}</td>
-                  <td>{{row.description}}</td>
-                  <td class="text-right">
-                    <div class="d-flex align-items-center justify-content-end gap-8">
-                      <span><span>{{clientData?.preferredCurrency | currencySymbol}}</span>{{row.outstanding | number:'1.0-0'}}</span>
-                      <button [matMenuTriggerFor]="liabilityMenu" class="menu-trigger-btn">
-                        <mat-icon class="menu-icon">more_vert</mat-icon>
-                      </button>
-                      <mat-menu #liabilityMenu="matMenu">
-                        <button mat-menu-item (click)="onEditLiability(row)">
-                          <mat-icon>edit</mat-icon>
-                          <span>Edit</span>
-                        </button>
-                        <button mat-menu-item class="delete-menu-item" (click)="onDeleteLiability(row)">
-                          <mat-icon>delete</mat-icon>
-                          <span>Delete</span>
-                        </button>
-                      </mat-menu>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div *ngIf="!dashboard?.liabilities?.length" class="empty-state">
-            <p class="text-muted text-center my-4">
-              No liabilities found. Click <b>Add liability</b> to get started.
-            </p>
-          </div>
-        </mat-card-content>
-      </mat-card>
-    </div>
-  </div>
+      <div *ngIf="!dashboard?.liabilities?.length" class="empty-state">
+        <p class="text-muted text-center my-4">
+          No liabilities found. Click <b>Add liability</b> to get started.
+        </p>
+      </div>
+    </mat-card-content>
+  </mat-card>
 </div>
 
 <ng-template #loadingTpl>
