@@ -93,10 +93,10 @@
                   <span class="legend-label">Personal property:</span>
                   <span class="legend-value">{{s.assetsByType.personalPropertyPercent}}%</span>
                 </div>
-                <div class="legend-item" *ngIf="s.assetsByType.otherPercent > 0">
+                <div class="legend-item" *ngIf="s.assetsByType.otherTotal > 0">
                   <span class="legend-dot bar-other"></span>
                   <span class="legend-label">Other:</span>
-                  <span class="legend-value">{{s.assetsByType.otherPercent}}%</span>
+                  <span class="legend-value">{{s.assetsByType.otherPercent > 0 ? s.assetsByType.otherPercent + '%' : '< 1%'}}</span>
                 </div>
               </div>
             </div>
