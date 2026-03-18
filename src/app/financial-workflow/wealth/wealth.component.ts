@@ -29,6 +29,7 @@ import { WealthHttpService } from './services/wealth-http.service';
 import { WealthDashboardModel, WealthAssetModel, WealthLiabilityModel } from './models/wealth.model';
 import { AddAssetComponent } from './add-asset/add-asset.component';
 import { AddLiabilityComponent } from './add-liability/add-liability.component';
+import { LegacyComponent } from './legacy/legacy.component';
 
 @Component({
   selector: 'app-wealth',
@@ -39,7 +40,8 @@ import { AddLiabilityComponent } from './add-liability/add-liability.component';
     MatIconModule,
     MatMenuModule,
     MatProgressSpinnerModule,
-    CurrencySymbolPipe
+    CurrencySymbolPipe,
+    LegacyComponent
   ],
   templateUrl: './wealth.component.html',
   styleUrl: './wealth.component.scss',
@@ -48,6 +50,7 @@ import { AddLiabilityComponent } from './add-liability/add-liability.component';
 export class WealthComponent implements OnInit {
   private destroyRef = inject(DestroyRef);
 
+  activeTab: 'networth' | 'legacy' = 'networth';
   cashflowId!: string;
   isLoading = false;
   dashboard: WealthDashboardModel | null = null;
@@ -89,6 +92,11 @@ export class WealthComponent implements OnInit {
 
   ngOnInit(): void {
     this.load();
+  }
+
+  switchTab(tab: 'networth' | 'legacy'): void {
+    this.activeTab = tab;
+    this.cdr.markForCheck();
   }
 
   private getCashflowId(): string {

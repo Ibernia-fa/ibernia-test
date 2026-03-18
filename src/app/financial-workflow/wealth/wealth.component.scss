@@ -53,6 +53,10 @@
   cursor: not-allowed;
 }
 
+.stepper-step.active .stepper-icon {
+  background: rgba(0, 188, 255, 0.15);
+}
+
 // Summary stat cards
 .summary-stat-card {
   height: 100%;

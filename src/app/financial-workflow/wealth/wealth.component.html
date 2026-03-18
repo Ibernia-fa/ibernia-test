@@ -4,15 +4,15 @@
   <mat-card class="mat-mdc-card mdc-card cardWithShadow">
     <mat-card-content class="mat-mdc-card-content">
       <div class="stepper-header">
-        <div class="stepper-step active">
+        <div class="stepper-step" [class.active]="activeTab === 'networth'" (click)="switchTab('networth')" style="cursor:pointer">
           <div class="stepper-icon">
             <img width="25" src="../../../assets/images/svgs/money-square-blue.svg" alt="">
           </div>
           <span class="stepper-label">Net Worth</span>
         </div>
         <div class="stepper-line"></div>
-        <div class="stepper-step disabled">
-          <div class="stepper-icon disabled-icon">
+        <div class="stepper-step" [class.active]="activeTab === 'legacy'" (click)="switchTab('legacy')" style="cursor:pointer">
+          <div class="stepper-icon" [class.disabled-icon]="activeTab !== 'legacy'">
             <mat-icon>groups</mat-icon>
           </div>
           <span class="stepper-label">Legacy</span>
@@ -20,6 +20,16 @@
       </div>
     </mat-card-content>
   </mat-card>
+
+  <!-- Legacy tab -->
+  <app-legacy *ngIf="activeTab === 'legacy'"
+    [cashflowId]="cashflowId"
+    [clientData]="clientData"
+    [selectedClient]="selectedClient">
+  </app-legacy>
+
+  <!-- Net Worth tab content -->
+  <ng-container *ngIf="activeTab === 'networth'">
 
   <!-- Summary row -->
   <div class="row" *ngIf="dashboard?.summary as s">
@@ -237,6 +247,8 @@
       </div>
     </mat-card-content>
   </mat-card>
+
+  </ng-container>
 </div>
 
 <ng-template #loadingTpl>

@@ -1,0 +1,66 @@
+<div class="dialog-header">
+  <h2>Beneficiary rules</h2>
+  <button class="close-btn" (click)="onClose()">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+
+<p class="dialog-subtitle">Define who receives each estate and at what percentage per scenario</p>
+
+<mat-dialog-content>
+  <!-- Scenario tabs -->
+  <div class="scenario-tabs">
+    @for (tab of scenarios; track tab.type) {
+      <button class="scenario-tab" [class.active]="activeScenario?.type === tab.type"
+              (click)="selectScenario(tab)">
+        <mat-icon class="tab-icon">person</mat-icon>
+        <span>{{tab.label}}</span>
+        <span class="tab-pct" *ngIf="totalPercentage > 0 && activeScenario?.type === tab.type">
+          {{totalPercentage}}%
+        </span>
+      </button>
+    }
+  </div>
+
+  <!-- Recipients list -->
+  <div class="recipients-section" *ngIf="activeScenario">
+    <!-- Add recipient button -->
+    <button class="add-recipient-btn" (click)="addRecipient()">
+      + Add recipient
+    </button>
+
+    <div class="recipient-row" *ngFor="let row of recipients; let i = index">
+      <div class="recipient-header">
+        <span class="recipient-label">Select</span>
+        <button class="remove-recipient" (click)="removeRecipient(i)">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-select [(ngModel)]="row.memberId" [hideSingleSelectionIndicator]="true">
+          @for (m of eligibleMembers; track m.id) {
+            <mat-option [value]="m.id">{{m.firstName}} {{m.lastName}}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <div class="pct-row">
+        <div class="pct-input-wrap">
+          <input type="number" [(ngModel)]="row.percentage" min="0" max="100" class="pct-input" />
+          <span class="pct-sign">%</span>
+        </div>
+        <mat-slider min="0" max="100" step="1" class="pct-slider">
+          <input matSliderThumb [(ngModel)]="row.percentage" />
+        </mat-slider>
+      </div>
+    </div>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button class="dialog-btn dialog-btn-cancel" (click)="onClose()">Cancel</button>
+  <button class="dialog-btn dialog-btn-save" [disabled]="!isValid || isSaving" (click)="onSave()">
+    Save
+  </button>
+</mat-dialog-actions>

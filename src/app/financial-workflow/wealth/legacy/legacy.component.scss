@@ -1,0 +1,339 @@
+.section-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1c1c1c;
+  margin: 0;
+}
+
+.section-subtitle {
+  font-size: 13px;
+  color: #888;
+  margin: 4px 0 0 0;
+}
+
+// Action buttons
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 40px;
+  padding: 0 20px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  font-family: "Ubuntu", serif;
+  white-space: nowrap;
+}
+
+.action-btn-primary {
+  background-color: #6366f1;
+  color: #fff;
+  &:hover { background-color: #4f46e5; }
+}
+
+.action-btn-outline {
+  background-color: #fff;
+  color: #6366f1;
+  border: 1px solid #6366f1;
+  &:hover { background-color: #eef2ff; }
+}
+
+.action-btn-sm {
+  height: 32px;
+  font-size: 12px;
+  padding: 0 14px;
+}
+
+// Family Tree
+.family-tree {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 24px;
+  background: linear-gradient(135deg, rgba(99,102,241,0.03), rgba(244,114,182,0.03), rgba(251,191,36,0.03));
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  min-height: 300px;
+}
+
+.tree-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
+.tree-connector {
+  width: 2px;
+  height: 24px;
+  background: #cbd5e1;
+}
+
+// Tree nodes
+.tree-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  position: relative;
+  padding: 8px;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+  min-width: 80px;
+
+  &:hover {
+    background: rgba(99, 102, 241, 0.05);
+  }
+
+  &.deceased {
+    opacity: 0.45;
+    .node-name { text-decoration: line-through; }
+  }
+}
+
+.node-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+
+  mat-icon { font-size: 24px; }
+}
+
+.avatar-client, .avatar-clientfather { background: #6366f1; }
+.avatar-partner, .avatar-partnerfather { background: #f97316; }
+.avatar-clientmother { background: #84cc16; }
+.avatar-partnermother { background: #ec4899; }
+.avatar-clientsibling { background: #6366f1; opacity: 0.7; }
+.avatar-partnersibling { background: #14b8a6; }
+.avatar-child {
+  background: transparent;
+  border: 3px solid;
+}
+
+.children-row .tree-node:nth-child(3n+1) .avatar-child { border-color: #f97316; color: #f97316; }
+.children-row .tree-node:nth-child(3n+2) .avatar-child { border-color: #6366f1; color: #6366f1; }
+.children-row .tree-node:nth-child(3n) .avatar-child { border-color: #a855f7; color: #a855f7; }
+
+.node-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: #334155;
+  text-align: center;
+  max-width: 100px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.strikethrough {
+  text-decoration: line-through;
+}
+
+.node-amount {
+  font-size: 14px;
+  font-weight: 700;
+  color: #6366f1;
+  font-family: "Ubuntu", serif;
+}
+
+.node-remove {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fee2e2;
+  border: none;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+
+  mat-icon {
+    font-size: 12px;
+    width: 12px;
+    height: 12px;
+    color: #dc2626;
+  }
+
+  .tree-node:hover & { display: flex; }
+}
+
+// Couple / heart
+.parent-couple {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  position: relative;
+}
+
+.couple-heart {
+  display: flex;
+  align-items: center;
+  padding-top: 16px;
+}
+
+.heart-icon {
+  font-size: 16px;
+  color: #ec4899;
+}
+
+.parent-estate-label {
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 12px;
+  font-weight: 600;
+  color: #f97316;
+  cursor: pointer;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  .edit-icon {
+    font-size: 12px;
+    width: 12px;
+    height: 12px;
+    color: #94a3b8;
+  }
+}
+
+.couple-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding-top: 8px;
+}
+
+.heart-node {
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  &:hover { background: rgba(236, 72, 153, 0.1); }
+}
+
+.heart-icon-lg {
+  font-size: 24px;
+  color: #ec4899;
+}
+
+// Tax node
+.tax-node, .tax-node-single {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.tax-badge {
+  background: #fee2e2;
+  color: #dc2626;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.tax-amount {
+  font-size: 13px;
+  font-weight: 700;
+  color: #dc2626;
+  font-family: "Ubuntu", serif;
+}
+
+// Siblings
+.siblings-group {
+  display: flex;
+  gap: 12px;
+}
+
+.sibling-node {
+  min-width: 70px;
+}
+
+// Inheritance display
+.inheritance-pct {
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  background: #6366f1;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 999px;
+}
+
+.inheritance-pct-badge {
+  background: #10b981;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  margin-bottom: 4px;
+}
+
+.inheritance-detail {
+  font-size: 11px;
+  color: #f97316;
+  font-weight: 500;
+}
+
+.inheritance-total {
+  font-size: 15px;
+  font-weight: 700;
+  color: #f97316;
+  font-family: "Ubuntu", serif;
+}
+
+.inheritance-amount {
+  font-size: 13px;
+  font-weight: 700;
+  color: #10b981;
+  font-family: "Ubuntu", serif;
+}
+
+.child-total {
+  color: #10b981;
+}
+
+.estate-currency {
+  font-size: 0.85em;
+  margin-right: 1px;
+}
+
+// Tax settings row
+.tax-label {
+  font-size: 13px;
+  color: #64748b;
+  strong { color: #1c1c1c; }
+}
+
+// Utilities
+.gap-12 { gap: 12px; }
+.gap-24 { gap: 24px; }
+
+.h-300 {
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
