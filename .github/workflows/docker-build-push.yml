@@ -110,6 +110,7 @@ jobs:
           push: true
           build-args: |
             NG_BUILD_CONFIGURATION=${{ steps.vars.outputs.ng_config }}
+            CACHE_BUST=${{ github.sha }}
           tags: |
             ${{ steps.vars.outputs.image }}:${{ steps.vars.outputs.version_tag }}
             ${{ steps.vars.outputs.image }}:${{ steps.vars.outputs.sha_tag }}
