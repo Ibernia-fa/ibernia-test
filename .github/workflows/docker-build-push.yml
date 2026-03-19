@@ -284,3 +284,28 @@ jobs:
           PORT="${{ secrets.SERVER_PORT || 22 }}"
           TARGET="/opt/ibernia/dev/playwright-report/playwright-report"
           scp -P "$PORT" -i ~/.ssh/deploy_key index.html "$REMOTE:$TARGET/"
+
+      - name: Notify ibernia-portal-tests repo (repository_dispatch)
+        if: success()
+        env:
+          TESTS_REPO_TOKEN: ${{ secrets.TESTS_REPO_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "${TESTS_REPO_TOKEN}" ]; then
+            echo "TESTS_REPO_TOKEN is not set; skipping repository_dispatch to ibernia-portal-tests."
+            exit 0
+          fi
+          PAYLOAD=$(jq -n \
+            --arg event "portal_deployed" \
+            --arg sha "${GITHUB_SHA}" \
+            --arg branch "${GITHUB_REF_NAME}" \
+            --arg env "${{ steps.vars.outputs.env }}" \
+            --arg baseUrl "https://test-dev.ibernia.it" \
+            --arg versionTag "${{ steps.vars.outputs.version_tag }}" \
+            '{event_type: $event, client_payload: {portal_sha: $sha, portal_branch: $branch, environment: $env, baseUrl: $baseUrl, versionTag: $versionTag}}')
+          curl -sS -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${TESTS_REPO_TOKEN}" \
+            -H "Content-Type: application/json" \
+            "https://api.github.com/repos/Ibernia-fa/ibernia-portal-tests/dispatches" \
+            -d "${PAYLOAD}"
