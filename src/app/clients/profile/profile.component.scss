@@ -141,3 +141,13 @@
 .profile-plans {
   margin-top: 8px;
 }
+
+.custom-icon {
+  position: absolute;
+  right: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none; /* so clicks go to select */
+  display: flex;
+  align-items: center;
+}

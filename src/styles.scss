@@ -967,3 +967,34 @@ body:has(.global-fullscreen-overlay) {
     }
   }
 }
+
+.ibr-black {
+  color: #1c1c1c;
+}
+
+// Profile Dropdown
+.ibr-sortby-edit-profile {
+  background-color: white;
+  min-height: 46px;
+  border-radius: 6px;
+  // min-width: 161px;
+  .mat-mdc-select-trigger {
+    min-height: 46px;
+    padding: 0 52px 0 24px;
+  }
+  .mat-mdc-select-arrow-wrapper {
+    display: none !important;
+  }
+  .mat-mdc-select-placeholder {
+    color: #5a596e;
+    font-size: 14px;
+    line-height: 100%;
+    font-weight: 500;
+  }
+  .mat-mdc-select-value-text {
+    font-size: 14px;
+    line-height: 100%;
+    font-weight: 500;
+    color: #5a596e;
+  }
+}

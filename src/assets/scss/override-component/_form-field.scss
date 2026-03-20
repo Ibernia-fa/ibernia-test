@@ -67,9 +67,9 @@ html {
 }
 .field-error {
   color: #fa896b;
-  font-size: 12px;
-  line-height: 16px;
-  font-weight: 400;
+  font-size: 12px !important;
+  line-height: 16px !important;
+  font-weight: 400 !important;
 }
 .date-picker-position {
   position: absolute;
@@ -86,4 +86,155 @@ html {
 
 .form-field .select-option .mat-mdc-select-trigger .mat-mdc-select-arrow {
   display: none !important;
+}
+
+.form-field input[type="radio"] {
+  min-height: auto !important;
+}
+
+/* RADIO GROUP CONTAINER */
+.ibr-custom-radio {
+  display: flex;
+  align-items: center;
+  gap: 64px;
+  .mat-mdc-radio-touch-target {
+    display: none;
+  }
+  .mat-mdc-radio-button .mdc-radio {
+    padding: 0 !important;
+  }
+  .mat-internal-form-field > label {
+    padding: 0 !important;
+    margin: 0 !important;
+    cursor: pointer;
+  }
+  .mat-mdc-radio-button
+    .mdc-radio__native-control:enabled:checked
+    + .mdc-radio__background
+    .mdc-radio__inner-circle {
+    border-color: #4043af !important;
+    border-width: 8px !important;
+  }
+  .mat-mdc-radio-button
+    .mdc-radio__native-control:checked
+    + .mdc-radio__background
+    .mdc-radio__outer-circle {
+    border-color: #4043af !important;
+  }
+  .mat-mdc-radio-button .mdc-radio__native-control {
+    // display: none !important;
+    // background: transparent !important;
+    height: 16px !important;
+    width: 16px !important;
+  }
+  .mat-mdc-radio-button .mat-radio-ripple .mat-ripple-element {
+    opacity: 0 !important;
+  }
+}
+
+/* EACH RADIO (label wrapper) */
+.ibr-custom-radio .mdc-form-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+/* TEXT STYLE */
+.ibr-custom-radio .mdc-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #48475d;
+  user-select: none;
+}
+
+/* REMOVE RIPPLE */
+.ibr-custom-radio .mat-mdc-radio-ripple,
+.ibr-custom-radio .mdc-radio__ripple {
+  display: none !important;
+}
+
+/* RADIO SIZE */
+.ibr-custom-radio .mdc-radio {
+  width: 16px !important;
+  height: 16px !important;
+  padding: 0;
+}
+
+/* ENSURE BACKGROUND FITS 16px */
+.ibr-custom-radio .mdc-radio__background {
+  width: 16px !important;
+  height: 16px !important;
+}
+/* OUTER CIRCLE */
+.ibr-custom-radio .mdc-radio__outer-circle {
+  width: 16px !important;
+  height: 16px !important;
+  border-width: 2px !important;
+}
+
+/* OUTER CIRCLE (default) */
+.ibr-custom-radio .mdc-radio__outer-circle {
+  border-width: 2px !important;
+  border-color: #48475d !important;
+}
+
+/* HIDE DEFAULT INNER DOT */
+.ibr-custom-radio .mdc-radio__inner-circle {
+  transform: scale(0);
+}
+
+/* CHECKED STATE (your custom filled style) */
+.ibr-custom-radio .mdc-radio--checked .mdc-radio__outer-circle {
+  border-color: #4043af !important;
+  background-color: #4043af !important;
+}
+
+/* CREATE WHITE INNER DOT (like your inset effect) */
+.ibr-custom-radio .mdc-radio--checked .mdc-radio__background {
+  position: relative;
+}
+
+.ibr-custom-radio .mdc-radio--checked .mdc-radio__background::after {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  background: white;
+  border-radius: 50%;
+}
+
+/* REMOVE ALL HOVER / FOCUS / ACTIVE STATES */
+.ibr-custom-radio .mdc-radio__background::before,
+.ibr-custom-radio .mdc-radio:hover .mdc-radio__background::before,
+.ibr-custom-radio .mdc-radio:focus .mdc-radio__background::before,
+.ibr-custom-radio .mdc-radio:active .mdc-radio__background::before {
+  opacity: 0 !important;
+  display: none !important;
+}
+
+/* REMOVE FOCUS RING */
+.ibr-custom-radio
+  .mdc-radio__native-control:focus-visible
+  + .mdc-radio__background::before {
+  opacity: 0 !important;
+}
+
+/* REMOVE RIPPLE COMPLETELY (extra safe) */
+.ibr-custom-radio .mat-mdc-radio-ripple,
+.ibr-custom-radio .mdc-radio__ripple,
+.ibr-custom-radio .mat-ripple-element {
+  display: none !important;
+}
+
+/* PREVENT ANY STATE COLOR FLASH */
+.ibr-custom-radio
+  .mdc-radio__native-control:enabled:hover
+  + .mdc-radio__background,
+.ibr-custom-radio
+  .mdc-radio__native-control:enabled:focus
+  + .mdc-radio__background,
+.ibr-custom-radio
+  .mdc-radio__native-control:enabled:active
+  + .mdc-radio__background {
+  background: transparent !important;
 }

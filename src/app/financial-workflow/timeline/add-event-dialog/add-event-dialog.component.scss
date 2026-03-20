@@ -216,28 +216,28 @@
   margin: 0;
 }
 
-.dialog-close-btn {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  background: white !important;
-  border: none;
-  box-shadow: none;
-}
+// .dialog-close-btn {
+//   position: absolute;
+//   top: 16px;
+//   right: 16px;
+//   background: white !important;
+//   border: none;
+//   box-shadow: none;
+// }
 
-.dialog-close-btn {
-  background: transparent;
+// .dialog-close-btn {
+//   background: transparent;
 
-  &:focus,
-  &:focus-visible {
-    outline: none;
-    background: transparent;
-  }
-  &:active {
-    outline: none;
-    background: transparent;
-  }
-}
+//   &:focus,
+//   &:focus-visible {
+//     outline: none;
+//     background: transparent;
+//   }
+//   &:active {
+//     outline: none;
+//     background: transparent;
+//   }
+// }
 
 .form-field {
   .ibr-black {
