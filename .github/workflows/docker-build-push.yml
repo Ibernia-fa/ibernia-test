@@ -15,6 +15,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # Need parent commit so we can diff changed files for ibernia-portal-tests (no second-repo checkout).
+          fetch-depth: 2
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -148,6 +151,15 @@ jobs:
             echo "TESTS_REPO_TOKEN is not set; skipping repository_dispatch to ibernia-portal-tests."
             exit 0
           fi
+          # List files changed in this push (for impacted test selection in ibernia-portal-tests).
+          # Avoids checking out the private portal repo from the tests workflow (no extra PAT).
+          CHANGED_FILES_JSON='[]'
+          if git rev-parse --verify HEAD^ >/dev/null 2>&1; then
+            _lines="$(git diff --name-only HEAD^ HEAD 2>/dev/null || true)"
+            if [ -n "${_lines}" ]; then
+              CHANGED_FILES_JSON="$(printf '%s\n' "${_lines}" | jq -R . | jq -s .)"
+            fi
+          fi
           PAYLOAD=$(jq -n \
             --arg event "portal_deployed" \
             --arg sha "${GITHUB_SHA}" \
@@ -155,7 +167,8 @@ jobs:
             --arg env "${{ steps.vars.outputs.env }}" \
             --arg baseUrl "https://test-dev.ibernia.it" \
             --arg versionTag "${{ steps.vars.outputs.version_tag }}" \
-            '{event_type: $event, client_payload: {portal_sha: $sha, portal_branch: $branch, environment: $env, baseUrl: $baseUrl, versionTag: $versionTag}}')
+            --argjson changedFiles "${CHANGED_FILES_JSON}" \
+            '{event_type: $event, client_payload: {portal_sha: $sha, portal_branch: $branch, environment: $env, baseUrl: $baseUrl, versionTag: $versionTag, changedFiles: $changedFiles}}')
           curl -sS -X POST \
             -H "Accept: application/vnd.github+json" \
             -H "Authorization: Bearer ${TESTS_REPO_TOKEN}" \
