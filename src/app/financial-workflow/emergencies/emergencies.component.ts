@@ -1,5 +1,24 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { catchError, filter, map, Observable, of, combineLatest, switchMap, tap, forkJoin, Subject, EMPTY, groupBy, mergeMap } from 'rxjs';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  OnInit,
+} from '@angular/core';
+import {
+  catchError,
+  filter,
+  map,
+  Observable,
+  of,
+  combineLatest,
+  switchMap,
+  tap,
+  forkJoin,
+  Subject,
+  EMPTY,
+  groupBy,
+  mergeMap,
+} from 'rxjs';
 import { NavItemService } from 'src/app/layouts/full/nav-item.service';
 import { EmergenciesHttpService as EmergenciesHttpService } from './services/emergencies-http.service';
 import { ClientHttpService as ClientHttpService } from 'src/app/clients/services/client-http.service';
@@ -7,10 +26,16 @@ import { MatSliderModule } from '@angular/material/slider';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialog } from '@angular/material/dialog';
 import { AddEmergenciesComponent } from './add-emergencies/add-emergencies.component';
-import { SimulateEmergencyComponent } from './simulate-emergency/simulate-emergency.component'
+import { SimulateEmergencyComponent } from './simulate-emergency/simulate-emergency.component';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
-import { EmergenciesResponse, Emergency, LookupItem, Money, StatsAndLookupData } from './models/emergencies.model';
+import {
+  EmergenciesResponse,
+  Emergency,
+  LookupItem,
+  Money,
+  StatsAndLookupData,
+} from './models/emergencies.model';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
@@ -25,15 +50,25 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { CurrencySymbolPipe } from 'src/app/pipe/currency-symbol.pipe';
 import moment from 'moment';
 import { Cashflow } from 'src/app/clients/models/cashflow';
-import { Cycle, EscalationRate, FinancialTimeline } from '../timeline/models/financial-timeline';
+import {
+  Cycle,
+  EscalationRate,
+  FinancialTimeline,
+} from '../timeline/models/financial-timeline';
 import { IncomeExpense } from '../income-expenses/model/income-expense';
 import { FinancialWorkflowService } from '../services/financial-workflow.service';
 import { TimelineHttpService } from '../timeline/services/timeline-http.service';
 import { IncomeExpensesHttpService } from '../income-expenses/services/income-expenses-http.service';
-import { DestroyRef, EnvironmentInjector, inject, runInInjectionContext } from '@angular/core';
+import {
+  DestroyRef,
+  EnvironmentInjector,
+  inject,
+  runInInjectionContext,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { SimulateEmergencyModel } from './models/simulate-emergency.model';
 import { patchInflationRateDescription } from 'src/app/shared/utils/escalation-rate-utils';
+import { MaterialModule } from 'src/app/material.module';
 
 @Component({
   selector: 'app-emergencies',
@@ -46,13 +81,13 @@ import { patchInflationRateDescription } from 'src/app/shared/utils/escalation-r
     MatTooltipModule,
     MatButtonToggleModule,
     MatProgressSpinnerModule,
-    CurrencySymbolPipe
+    CurrencySymbolPipe,
+    MaterialModule,
   ],
   templateUrl: './emergencies.component.html',
   styleUrl: './emergencies.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-
 export class EmergenciesComponent implements OnInit {
   private destroyRef = inject(DestroyRef);
   private envInjector = inject(EnvironmentInjector);
@@ -83,7 +118,11 @@ export class EmergenciesComponent implements OnInit {
   selectedClient: Client;
   selectedCashflow: Cashflow;
   incomeExpense: IncomeExpense;
-  private coverageAdequacyUpdates$ = new Subject<{ emergency: Emergency; newId: number; previousValue: number }>();
+  private coverageAdequacyUpdates$ = new Subject<{
+    emergency: Emergency;
+    newId: number;
+    previousValue: number;
+  }>();
   private refreshEmergencies$ = new Subject<void>();
   private readonly defaultEmergencyNames = new Set([
     'Home',
@@ -91,7 +130,7 @@ export class EmergenciesComponent implements OnInit {
     'Disability',
     'Health',
     'Natural hazards',
-    'Will'
+    'Will',
   ]);
   private defaultEmergencyIds = new Set<string>();
 
@@ -118,7 +157,7 @@ export class EmergenciesComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private financialWorkflowService: FinancialWorkflowService,
     private timelineHttpService: TimelineHttpService,
-    private incomeExpensesHttpService: IncomeExpensesHttpService
+    private incomeExpensesHttpService: IncomeExpensesHttpService,
   ) {
     this.navItemService.currentRouteName = 'Risk & Insurance';
   }
@@ -129,8 +168,10 @@ export class EmergenciesComponent implements OnInit {
     this.load();
 
     this.settingHttpService.getAmountCycles().subscribe((cycles) => {
-      this.amountCycles = cycles.filter(x => x.description != "One-off");
-      this.monthlyCycleId = this.amountCycles.filter((x: any) => x.description === "Every month")[0]?.id;
+      this.amountCycles = cycles.filter((x) => x.description != 'One-off');
+      this.monthlyCycleId = this.amountCycles.filter(
+        (x: any) => x.description === 'Every month',
+      )[0]?.id;
     });
 
     // preloaded data for simulation
@@ -153,12 +194,12 @@ export class EmergenciesComponent implements OnInit {
                 err?.error?.message || 'Failed to load emergencies';
               this.toastr.error(this.errorMessage, 'Error');
               return of(null);
-            })
+            }),
           );
         }),
         filter((res): res is EmergenciesResponse => !!res),
         tap((res) => this.applyEmergenciesResponse(res)),
-        takeUntilDestroyed(this.destroyRef)
+        takeUntilDestroyed(this.destroyRef),
       )
       .subscribe();
   }
@@ -170,7 +211,10 @@ export class EmergenciesComponent implements OnInit {
         mergeMap((group$) =>
           group$.pipe(
             switchMap((update) => {
-              const updated: Emergency = { ...update.emergency, coverageAdequacy: update.newId };
+              const updated: Emergency = {
+                ...update.emergency,
+                coverageAdequacy: update.newId,
+              };
 
               return this.emergenciesHttp.updateEmergency(updated).pipe(
                 tap((res: Emergency) => {
@@ -179,16 +223,19 @@ export class EmergenciesComponent implements OnInit {
                 }),
                 catchError((err) => {
                   console.error(err);
-                  this.toastr.error('Failed to update coverage adequacy', 'Error');
+                  this.toastr.error(
+                    'Failed to update coverage adequacy',
+                    'Error',
+                  );
                   update.emergency.coverageAdequacy = update.previousValue;
                   this.cdr.markForCheck();
                   return EMPTY;
-                })
+                }),
               );
-            })
-          )
+            }),
+          ),
         ),
-        takeUntilDestroyed(this.destroyRef)
+        takeUntilDestroyed(this.destroyRef),
       )
       .subscribe();
   }
@@ -198,8 +245,12 @@ export class EmergenciesComponent implements OnInit {
     let cashflowId: string | null = null;
     let clientId: string | undefined;
     while (r) {
-      if (!cashflowId) cashflowId = r.snapshot.paramMap.get('id') || r.snapshot.paramMap.get('cashflowId');
-      if (!clientId) clientId = r.snapshot.paramMap.get('clientId') || undefined;
+      if (!cashflowId)
+        cashflowId =
+          r.snapshot.paramMap.get('id') ||
+          r.snapshot.paramMap.get('cashflowId');
+      if (!clientId)
+        clientId = r.snapshot.paramMap.get('clientId') || undefined;
       if (cashflowId) break;
       r = r.parent;
     }
@@ -224,11 +275,11 @@ export class EmergenciesComponent implements OnInit {
                 err?.error?.message || 'Failed to load emergencies';
               this.toastr.error(this.errorMessage, 'Error');
               return of(null);
-            })
-          )
+            }),
+          ),
         ),
         filter((res): res is EmergenciesResponse => !!res),
-        tap((res) => this.applyEmergenciesResponse(res))
+        tap((res) => this.applyEmergenciesResponse(res)),
       )
       .subscribe();
 
@@ -236,7 +287,7 @@ export class EmergenciesComponent implements OnInit {
     this.client$ = this.store.select(selectedClient);
     this.client$
       .pipe(
-        switchMap(client => {
+        switchMap((client) => {
           // load client from store
           if (client) {
             this.clientData = client.clientDetails;
@@ -246,23 +297,26 @@ export class EmergenciesComponent implements OnInit {
           }
 
           // if client is not in store load it from the api
-          return this.clientHttpService.getClientByCashflowId(this.cashflowId).pipe(
-            tap(apiClient => {
-              if (apiClient) {
-                this.store.dispatch({
-                  type: '[Client API] Load Success',
-                  client: apiClient
-                });
+          return this.clientHttpService
+            .getClientByCashflowId(this.cashflowId)
+            .pipe(
+              tap((apiClient) => {
+                if (apiClient) {
+                  this.store.dispatch({
+                    type: '[Client API] Load Success',
+                    client: apiClient,
+                  });
 
-                this.clientData = apiClient.clientDetails;
-                this.isClientLoaded = true;
-                this.checkFullyLoaded();
-              }
-            }),
-            catchError(() => of(null))
-          );
-        })
-      ).subscribe();
+                  this.clientData = apiClient.clientDetails;
+                  this.isClientLoaded = true;
+                  this.checkFullyLoaded();
+                }
+              }),
+              catchError(() => of(null)),
+            );
+        }),
+      )
+      .subscribe();
   }
 
   private applyEmergenciesResponse(res: EmergenciesResponse): void {
@@ -292,33 +346,34 @@ export class EmergenciesComponent implements OnInit {
   }
 
   onAddClick() {
-    this.dialog.open(AddEmergenciesComponent, {
-      width: '700px',
-      disableClose: true,
-      data: {
-        emergencyTypes: this.emergencyTypes,
-        policyStatuses: this.policyStatuses,
-        coverageAdequacies: this.coverageAdequacies,
-        willStatuses: this.willStatuses,
-        insuranceCostTemplate: this.insuranceCostTemplate,
-        client: this.clientId
-          ? { id: this.clientId, name: '' }
-          : undefined,
-        cashflow: this.cashflowId
-          ? {
-            id: this.cashflowId,
-            name: ''
-          }
-          : undefined,
-        defaultTypeId: 1, // Insurance for now; later you can pass 2 for Will etc.
-        clientPreferredCurrency: this.clientData?.preferredCurrency,
-        cycles: this.amountCycles
-      },
-    }).afterClosed().subscribe(res => {
-      if (res?.status === 'Success') {
-        this.load();
-      }
-    });
+    this.dialog
+      .open(AddEmergenciesComponent, {
+        width: '700px',
+        disableClose: true,
+        data: {
+          emergencyTypes: this.emergencyTypes,
+          policyStatuses: this.policyStatuses,
+          coverageAdequacies: this.coverageAdequacies,
+          willStatuses: this.willStatuses,
+          insuranceCostTemplate: this.insuranceCostTemplate,
+          client: this.clientId ? { id: this.clientId, name: '' } : undefined,
+          cashflow: this.cashflowId
+            ? {
+                id: this.cashflowId,
+                name: '',
+              }
+            : undefined,
+          defaultTypeId: 1, // Insurance for now; later you can pass 2 for Will etc.
+          clientPreferredCurrency: this.clientData?.preferredCurrency,
+          cycles: this.amountCycles,
+        },
+      })
+      .afterClosed()
+      .subscribe((res) => {
+        if (res?.status === 'Success') {
+          this.load();
+        }
+      });
   }
 
   getCashflowName(): string {
@@ -327,25 +382,31 @@ export class EmergenciesComponent implements OnInit {
   }
 
   getTypeName(typeId: number): string {
-    return this.emergencyTypes.find(t => t.id === typeId)?.name ?? 'Unknown';
+    return this.emergencyTypes.find((t) => t.id === typeId)?.name ?? 'Unknown';
   }
 
   getPolicyStatusLabel(statusId: number | null): string {
-    if (statusId == null)
-      return '-';
+    if (statusId == null) return '-';
 
-    return this.policyStatuses.find(p => p.id === statusId)?.description ?? 'Unknown';
+    return (
+      this.policyStatuses.find((p) => p.id === statusId)?.description ??
+      'Unknown'
+    );
   }
 
   getCoverageAdequacyLabel(id: number | null): string {
     if (id == null) return '-';
-    return this.coverageAdequacies.find(c => c.id === id)?.description ?? 'Unknown';
+    return (
+      this.coverageAdequacies.find((c) => c.id === id)?.description ?? 'Unknown'
+    );
   }
 
   getWillStatusLabel(id: number | null): string {
     if (id == null) return 'Not set';
 
-    return this.policyStatuses.find(w => w.id === id)?.description ?? 'Unknown';
+    return (
+      this.policyStatuses.find((w) => w.id === id)?.description ?? 'Unknown'
+    );
   }
 
   getIconName(e: Emergency): string {
@@ -359,17 +420,21 @@ export class EmergenciesComponent implements OnInit {
   }
 
   get computedProtectionScore(): number | null {
-    const visible = this.emergencies?.filter(e => !e.isHidden) ?? [];
+    const visible = this.emergencies?.filter((e) => !e.isHidden) ?? [];
     if (visible.length === 0) return null;
 
-    const scores = visible.map(e => {
+    const scores = visible.map((e) => {
       if (e.type === 2) return e.willStatus === 1 ? 100 : 0;
       if (e.policyStatus === 2) return 0;
       switch (e.coverageAdequacy) {
-        case 1: return 100 / 3;
-        case 2: return 200 / 3;
-        case 3: return 100;
-        default: return 0;
+        case 1:
+          return 100 / 3;
+        case 2:
+          return 200 / 3;
+        case 3:
+          return 100;
+        default:
+          return 0;
       }
     });
     return Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
@@ -390,8 +455,13 @@ export class EmergenciesComponent implements OnInit {
   getCardCssClass(e: Emergency): string {
     if (e.type === 1) {
       const isNotCovered = e.policyStatus == 2;
-      return isNotCovered ? 'danger-card'
-        : e.coverageAdequacy === 1 ? 'basic-card' : e.coverageAdequacy === 2 ? 'good-card' : 'excellent-card';
+      return isNotCovered
+        ? 'danger-card'
+        : e.coverageAdequacy === 1
+          ? 'basic-card'
+          : e.coverageAdequacy === 2
+            ? 'good-card'
+            : 'excellent-card';
     }
 
     if (e.type === 2) {
@@ -400,6 +470,25 @@ export class EmergenciesComponent implements OnInit {
     }
 
     return 'danger-card';
+  }
+  getCardHeaderCssClass(e: Emergency): string {
+    if (e.type === 1) {
+      const isNotCovered = e.policyStatus == 2;
+      return isNotCovered
+        ? 'danger-header-card'
+        : e.coverageAdequacy === 1
+          ? 'basic-header-card'
+          : e.coverageAdequacy === 2
+            ? 'good-header-card'
+            : 'excellent-header-card';
+    }
+
+    if (e.type === 2) {
+      const isNotDone = e.willStatus == 2;
+      return isNotDone ? 'danger-header-card' : 'excellent-header-card';
+    }
+
+    return 'danger-header-card';
   }
 
   getDotClass(e: Emergency): string {
@@ -414,6 +503,23 @@ export class EmergenciesComponent implements OnInit {
     }
 
     return 'dot-red';
+  }
+
+  getAdequacyClass(e: Emergency): string {
+    if (e.policyStatus === 2) {
+      return 'ibernia-red'; // not covered case
+    }
+
+    switch (e.coverageAdequacy) {
+      case 1:
+        return 'ibernia-orange'; // Basic
+      case 2:
+        return 'ibernia-light-green'; // Good
+      case 3:
+        return 'ibernia-dark-green'; // Excellent
+      default:
+        return 'ibernia-red';
+    }
   }
 
   onEditClick(emergency: Emergency): void {
@@ -432,10 +538,10 @@ export class EmergenciesComponent implements OnInit {
         coverageAdequacies: this.coverageAdequacies,
         willStatuses: this.willStatuses,
         insuranceCostTemplate: this.insuranceCostTemplate,
-        client: emergency.client,      // may be empty for now but still fine
-        cashflow: emergency.cashflow,  // has id at least
+        client: emergency.client, // may be empty for now but still fine
+        cashflow: emergency.cashflow, // has id at least
         clientPreferredCurrency: this.clientData?.preferredCurrency,
-        cycles: this.amountCycles
+        cycles: this.amountCycles,
       },
     });
 
@@ -462,19 +568,19 @@ export class EmergenciesComponent implements OnInit {
         console.error(err);
         this.toastr.error('Failed to hide emergency', 'Error');
         e.isHidden = !e.isHidden;
-      }
+      },
     });
   }
 
   showHiddenEmergencies(): void {
-    const hiddenEmergencies = this.emergencies.filter(e => e.isHidden);
+    const hiddenEmergencies = this.emergencies.filter((e) => e.isHidden);
 
     if (hiddenEmergencies.length === 0) {
       return;
     }
 
     // update all hidden emergencies in API first
-    const updates$ = hiddenEmergencies.map(e => {
+    const updates$ = hiddenEmergencies.map((e) => {
       const updated: Emergency = { ...e, isHidden: false };
       return this.emergenciesHttp.updateEmergency(updated);
     });
@@ -487,7 +593,7 @@ export class EmergenciesComponent implements OnInit {
       error: (err) => {
         console.error(err);
         this.toastr.error('Failed to show hidden emergencies', 'Error');
-      }
+      },
     });
   }
 
@@ -506,11 +612,13 @@ export class EmergenciesComponent implements OnInit {
     let annualCost = 0;
     if (!e.insuranceCost) return 0;
 
-    if (e.insuranceCost.amount > 0
-      && this.monthlyCycleId && e.insuranceCost.cycle?.id === this.monthlyCycleId) {
+    if (
+      e.insuranceCost.amount > 0 &&
+      this.monthlyCycleId &&
+      e.insuranceCost.cycle?.id === this.monthlyCycleId
+    ) {
       annualCost = e.insuranceCost.amount * 12;
-    }
-    else {
+    } else {
       annualCost = e.insuranceCost.amount ?? 0;
     }
 
@@ -518,11 +626,11 @@ export class EmergenciesComponent implements OnInit {
   }
 
   get hasHiddenEmergencies(): boolean {
-    return this.emergencies?.some(e => e.isHidden) ?? false;
+    return this.emergencies?.some((e) => e.isHidden) ?? false;
   }
 
   get filteredEmergencies(): Emergency[] {
-    return this.emergencies.filter(e => !e.isHidden);
+    return this.emergencies.filter((e) => !e.isHidden);
   }
 
   getSimulateData() {
@@ -530,8 +638,8 @@ export class EmergenciesComponent implements OnInit {
       .pipe(
         switchMap((params) =>
           runInInjectionContext(this.envInjector, () =>
-            this.financialWorkflowService.loadClientCashflowMetadata(params)
-          )
+            this.financialWorkflowService.loadClientCashflowMetadata(params),
+          ),
         ),
         takeUntilDestroyed(this.destroyRef),
         tap(([client, cashflow]) => {
@@ -540,29 +648,45 @@ export class EmergenciesComponent implements OnInit {
         }),
         switchMap(([client, cashflow]) => {
           return combineLatest([
-            this.incomeExpensesHttpService.getAllIncomeExpenses((cashflow as Cashflow).id),
-            this.timelineHttpService.getTimelinebyCashflowId((cashflow as Cashflow).id),
+            this.incomeExpensesHttpService.getAllIncomeExpenses(
+              (cashflow as Cashflow).id,
+            ),
+            this.timelineHttpService.getTimelinebyCashflowId(
+              (cashflow as Cashflow).id,
+            ),
             this.settingHttpService.getAmountCycles(),
-            this.settingHttpService.getEscalationRates((client as Client).id)
+            this.settingHttpService.getEscalationRates((client as Client).id),
           ]);
         }),
-        tap(([incomeExpense, timeline, amountCycles, escalationRatesResponse]) => {
-          this.incomeExpense = incomeExpense;
-          this.amountCyclesAll = amountCycles;
-          this.escalationRates = patchInflationRateDescription(
-            escalationRatesResponse?.escalationRates ?? [],
-            this.selectedCashflow?.inflationRate ?? 0
-          );
-          this.timeline = timeline;
-          this.eventsList = this.timeline?.clientEvents.sort((a, b) => a.start.age - b.start.age);
-        })
+        tap(
+          ([
+            incomeExpense,
+            timeline,
+            amountCycles,
+            escalationRatesResponse,
+          ]) => {
+            this.incomeExpense = incomeExpense;
+            this.amountCyclesAll = amountCycles;
+            this.escalationRates = patchInflationRateDescription(
+              escalationRatesResponse?.escalationRates ?? [],
+              this.selectedCashflow?.inflationRate ?? 0,
+            );
+            this.timeline = timeline;
+            this.eventsList = this.timeline?.clientEvents.sort(
+              (a, b) => a.start.age - b.start.age,
+            );
+          },
+        ),
       )
       .subscribe();
   }
 
   simulateEmergency(emergency: Emergency) {
-    const emergencyExpense = this.stats?.emergencyExpenses?.find(x => x.emergencyId == emergency.id) ?? null;
-     
+    const emergencyExpense =
+      this.stats?.emergencyExpenses?.find(
+        (x) => x.emergencyId == emergency.id,
+      ) ?? null;
+
     const dialogRef = this.dialog.open(SimulateEmergencyComponent, {
       width: '700px',
       disableClose: true,
@@ -575,42 +699,44 @@ export class EmergenciesComponent implements OnInit {
         emergencyExpense,
         amountCycles: this.amountCyclesAll,
         escalationRates: this.escalationRates,
-        eventsList: this.timeline.clientEvents.sort((a, b) => a.start.age - b.start.age),
+        eventsList: this.timeline.clientEvents.sort(
+          (a, b) => a.start.age - b.start.age,
+        ),
         incomes: this.incomeExpense?.incomes,
         forecastEndDate: this.timeline.forecastEndtDate,
         forecastStartDate: this.timeline.forecastStartDate,
         forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
-        forecastStartDateYear: moment(this.timeline.forecastStartDate).year()
+        forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
       },
     });
 
-    dialogRef.afterClosed()
-    .subscribe((updatedExpense: SimulateEmergencyModel | null) => {
-      if (!updatedExpense) return;
+    dialogRef
+      .afterClosed()
+      .subscribe((updatedExpense: SimulateEmergencyModel | null) => {
+        if (!updatedExpense) return;
 
-      if (this.stats != null)
-      {
-        this.stats.emergencyExpenses??= [];
+        if (this.stats != null) {
+          this.stats.emergencyExpenses ??= [];
 
-        const index = 
-          this.stats?.emergencyExpenses.findIndex(x => x.emergencyId === updatedExpense.emergencyId) ?? -1;
+          const index =
+            this.stats?.emergencyExpenses.findIndex(
+              (x) => x.emergencyId === updatedExpense.emergencyId,
+            ) ?? -1;
 
-        if (index > -1) {
-          this.stats.emergencyExpenses[index] = updatedExpense;
-        } else {
-          this.stats?.emergencyExpenses.push(updatedExpense);
+          if (index > -1) {
+            this.stats.emergencyExpenses[index] = updatedExpense;
+          } else {
+            this.stats?.emergencyExpenses.push(updatedExpense);
+          }
         }
-      }
-    });
+      });
   }
 
   private markDefaultEmergencyIds(emergencies: Emergency[]): void {
-    emergencies.forEach(e => {
+    emergencies.forEach((e) => {
       if (this.defaultEmergencyNames.has(e.name)) {
         this.defaultEmergencyIds.add(e.id);
       }
     });
   }
 }
-
-

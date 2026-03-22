@@ -1,66 +1,133 @@
 <div class="w-100">
-  <div class="d-flex flex-column gap-32">
-    <div class="d-flex align-items-center justify-content-between gap-10 modal-header">
-      <div class="d-flex align-items-center gap-10">
-        <h3 style="text-transform: none;">{{expenseTitle}}</h3>
+  <div class="d-flex flex-column">
+    <div class="dialog-header">
+      <div class="d-flex align-items-center justify-content-center gap-4">
+        <h3 class="dialog-title text-center">{{ expenseTitle }}</h3>
         <ng-container *ngIf="isEditWorkflow && isNameEditable">
-          <img src="assets/images/svgs/drop-down-edit-2-line.svg" alt="edit" class="cursor-pointer edit-name-icon"
-            (click)="toggleNameEdit()" />
+          <img
+            src="assets/images/svgs/drop-down-edit-2-line.svg"
+            alt="edit"
+            class="cursor-pointer edit-name-icon"
+            (click)="toggleNameEdit()"
+          />
         </ng-container>
       </div>
-      <button (click)="closeDialog()" type="button">
-        <img src="assets/images/svgs/close-line-cion.svg" alt="close-line-cion" />
+      <button
+        type="button"
+        mat-icon-button
+        disableRipple
+        class="dialog-close-btn"
+        mat-dialog-close
+        aria-label="Close dialog"
+        (click)="closeDialog()"
+      >
+        <mat-icon>close</mat-icon>
       </button>
     </div>
-    <mat-dialog-content>
-      <div [formGroup]="expenseForm" class="d-flex flex-column gap-20">
-        @if(!isEditWorkflow) {
-        <div class="d-flex flex-column gap-8">
+    <mat-dialog-content class="event-dialog-content">
+      <div [formGroup]="expenseForm" class="d-flex flex-column gap-16">
+        @if (!isEditWorkflow) {
+          <div class="d-flex flex-column gap-8">
             <div class="d-flex gap-8 align-items-center">
-              <mat-label class="f-s-16 f-w-400 d-block">{{ 'Type' | translate }}</mat-label>
-              <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
+              <mat-label
+                class="f-s-16 f-w-500 d-block ibr-black"
+                style="line-height: 16px"
+                >{{ "Type" | translate }}</mat-label
+              >
+              <img
+                width="18"
+                src="assets/images/svgs/help-circle-icon.svg"
+                alt="help-circle-icon"
+              />
             </div>
             <div class="justify-content-between align-items-start flex-nowrap">
-                <div class="w-100 form-field">
-                  <div class="select-option">
-                    <mat-select
-                      formControlName="expenseType" 
-                      (selectionChange)="onExpenseTypeChange($event.value)"
-                      hideSingleSelectionIndicator>
+              <div class="w-100 form-field">
+                <div class="select-option position-relative">
+                  <mat-select
+                    formControlName="expenseType"
+                    (selectionChange)="onExpenseTypeChange($event.value)"
+                    hideSingleSelectionIndicator
+                  >
                     @for (expenseType of expenseTypes; track expenseType) {
-                    <mat-option [value]="expenseType">{{expenseType}}</mat-option>
+                      <mat-option [value]="expenseType">{{
+                        expenseType
+                      }}</mat-option>
                     }
-                    </mat-select>
-                  </div>
-                  @if(expenseForm.get('expenseType')?.touched && expenseForm.get('expenseType')?.hasError('required')) {
-                  <span class="field-error d-block">{{'Required' | translate}}</span>
-                  }
+                  </mat-select>
+                  <span class="custom-arrow">
+                    <svg
+                      width="12"
+                      height="7"
+                      viewBox="0 0 12 7"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M1 1L6 6L11 1"
+                        stroke="#2B3942"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  </span>
                 </div>
-
+                @if (
+                  expenseForm.get("expenseType")?.touched &&
+                  expenseForm.get("expenseType")?.hasError("required")
+                ) {
+                  <span class="field-error d-block">{{
+                    "Required" | translate
+                  }}</span>
+                }
+              </div>
             </div>
           </div>
         }
 
-        @if(isNameEditable && showNameEdit) {
-        <div class="w-100 form-field gap-8">
-          <mat-label class="f-s-16 d-block" style="line-height: 18px">{{ 'Name' | translate }}</mat-label>
-          <input matInput formControlName="description" placeholder="e.g. Bills" />
-          
-          @if(expenseForm.get('description')?.touched && expenseForm.get('description')?.hasError('required')) {
-            <span class="field-error d-block">{{'Required' | translate}}</span>
-          }
-        </div>
+        @if (isNameEditable && showNameEdit) {
+          <div class="w-100 form-field gap-8">
+            <mat-label
+              class="f-s-16 f-w-500 ibr-black d-block"
+              style="line-height: 16px"
+              >{{ "Name" | translate }}</mat-label
+            >
+            <input
+              matInput
+              formControlName="description"
+              placeholder="e.g. Bills"
+            />
+
+            @if (
+              expenseForm.get("description")?.touched &&
+              expenseForm.get("description")?.hasError("required")
+            ) {
+              <span class="field-error d-block">{{
+                "Required" | translate
+              }}</span>
+            }
+          </div>
         }
-          
+
         <div class="d-flex flex-column gap-4 net-fields">
           <div class="d-flex flex-column gap-8">
-            <mat-label class="f-s-16 d-block" style="line-height: 18px">{{ 'Net amount' | translate }} </mat-label>
+            <mat-label
+              class="f-s-16 d-block f-w-500 ibr-black"
+              style="line-height: 16px"
+              >{{ "Net amount" | translate }}
+            </mat-label>
             <div class="net-field d-flex align-items-center">
               <div class="left hide-arrow">
-                <mat-select formControlName="currencySymbol" class="sortby-edit-profile" hideSingleSelectionIndicator>
+                <mat-select
+                  formControlName="currencySymbol"
+                  class="sortby-edit-profile"
+                  hideSingleSelectionIndicator
+                >
                   @for (country of countries; track country) {
-                    @if(country.currencySymbol) {
-                      <mat-option [value]="country.currencySymbol">{{ country.currencySymbol }}</mat-option>
+                    @if (country.currencySymbol) {
+                      <mat-option [value]="country.currencySymbol">{{
+                        country.currencySymbol
+                      }}</mat-option>
                     }
                   }
                 </mat-select>
@@ -77,78 +144,192 @@
                   placeholder="0"
                 />
               </div>
-              <div class="right">
+              <div class="right position-relative">
                 <mat-select
                   (valueChange)="onCycleValueChange($event)"
                   value="Select"
                   formControlName="cycle"
                   class="sortby-edit-profile"
-                  hideSingleSelectionIndicator>
+                  hideSingleSelectionIndicator
+                >
                   @for (cycle of cycles; track cycle) {
-                    <mat-option [value]="cycle.id">{{ cycle.description }}</mat-option>
+                    <mat-option [value]="cycle.id">{{
+                      cycle.description
+                    }}</mat-option>
                   }
                 </mat-select>
+                <span class="custom-arrow">
+                  <svg
+                    width="12"
+                    height="7"
+                    viewBox="0 0 12 7"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M1 1L6 6L11 1"
+                      stroke="#2B3942"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </span>
               </div>
             </div>
-            @if(expenseForm.get('amount')?.touched && (expenseForm.get('amount')?.hasError('required') || expenseForm.get('amount')?.hasError('greaterThanZero'))) {
-            <span class="field-error d-block">{{'Amount must be greater than 0' | translate}}</span>
+            @if (
+              expenseForm.get("amount")?.touched &&
+              (expenseForm.get("amount")?.hasError("required") ||
+                expenseForm.get("amount")?.hasError("greaterThanZero"))
+            ) {
+              <span class="field-error d-block">{{
+                "Amount must be greater than 0" | translate
+              }}</span>
             }
           </div>
         </div>
-        
+
         <div class="start-end">
-          <div class="d-flex flex-column gap-12">
+          <div class="d-flex flex-column gap-8">
             <div class="d-flex gap-8 align-items-center">
-              <mat-label class="f-s-16 f-w-400 d-block">@if(showStartEnd) {Start & end} @else {Date}</mat-label>
-              <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
+              <mat-label
+                class="f-s-16 f-w-500 ibr-black d-block"
+                style="line-height: 16px"
+              >
+                @if (showStartEnd) {
+                  Start & end
+                } @else {
+                  Date
+                }
+              </mat-label>
+              <img
+                width="18"
+                src="assets/images/svgs/help-circle-icon.svg"
+                alt="help-circle-icon"
+              />
             </div>
-            <div class="row justify-content-between align-items-start flex-nowrap">
+            <div
+              class="row justify-content-between align-items-start flex-nowrap"
+            >
               <div [className]="showStartEnd ? 'col-6' : 'w-100'">
                 <div class="w-100 form-field">
-                  <div class="select-option">
-                    <mat-select value="Select" formControlName="start" hideSingleSelectionIndicator>
-                      @if(isEditWorkflow || eventsList?.length > 0)
-                        {
-                          <mat-option [value]="currentYear">This year ({{ currentYear }})</mat-option>
-                        }
-                      @for (event of eventsList; track event) {
-                        <mat-option [value]="'event:' + event.id">{{ event.name }} ({{ getAgeForYear(event.start.year) }})</mat-option>
+                  <div class="select-option position-relative">
+                    <mat-select
+                      value="Select"
+                      formControlName="start"
+                      hideSingleSelectionIndicator
+                    >
+                      @if (isEditWorkflow || eventsList?.length > 0) {
+                        <mat-option [value]="currentYear"
+                          >This year ({{ currentYear }})</mat-option
+                        >
                       }
-                      <hr>
-                      @for (year of years; let i=$index; track year) {
-                        <mat-option [value]="year">{{ year }} ({{ getAgeForYear(year) }})</mat-option>
+                      @for (event of eventsList; track event) {
+                        <mat-option [value]="'event:' + event.id"
+                          >{{ event.name }} ({{
+                            getAgeForYear(event.start.year)
+                          }})</mat-option
+                        >
+                      }
+                      <hr />
+                      @for (year of years; let i = $index; track year) {
+                        <mat-option [value]="year"
+                          >{{ year }} ({{ getAgeForYear(year) }})</mat-option
+                        >
                       }
                     </mat-select>
+                    <span class="custom-arrow">
+                      <svg
+                        width="12"
+                        height="7"
+                        viewBox="0 0 12 7"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M1 1L6 6L11 1"
+                          stroke="#2B3942"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                    </span>
                   </div>
-                  @if(expenseForm.get('start')?.touched && expenseForm.get('start')?.hasError('required')) {
-                    <span class="field-error d-block">{{'Required' | translate}}</span>
+                  @if (
+                    expenseForm.get("start")?.touched &&
+                    expenseForm.get("start")?.hasError("required")
+                  ) {
+                    <span class="field-error d-block">{{
+                      "Required" | translate
+                    }}</span>
                   }
                 </div>
               </div>
 
-              @if(showStartEnd) {
+              @if (showStartEnd) {
                 <div class="d-flex justify-content-start align-items-start">
-                  <img src="assets/images/svgs/chevron-right-date-icon.svg" alt="chevron-right-date-icon" />
+                  <img
+                    src="assets/images/svgs/chevron-right-date-icon.svg"
+                    alt="chevron-right-date-icon"
+                  />
                 </div>
 
                 <div class="col-6">
                   <div class="w-100 form-field">
-                    <div class="select-option">
-                      <mat-select value="Select" formControlName="end" hideSingleSelectionIndicator>
+                    <div class="select-option position-relative">
+                      <mat-select
+                        value="Select"
+                        formControlName="end"
+                        hideSingleSelectionIndicator
+                      >
                         @for (event of getEndEvents(); track event.id) {
-                          <mat-option [value]="'event:' + event.id">{{ event.name }} ({{ getAgeForYear(event.start.year) }})</mat-option>
+                          <mat-option [value]="'event:' + event.id"
+                            >{{ event.name }} ({{
+                              getAgeForYear(event.start.year)
+                            }})</mat-option
+                          >
                         }
-                        <hr>
+                        <hr />
                         @for (year of getEndYears(); track year) {
-                          <mat-option [value]="year">{{ year }} ({{ getAgeForYear(year) }})</mat-option>
+                          <mat-option [value]="year"
+                            >{{ year }} ({{ getAgeForYear(year) }})</mat-option
+                          >
                         }
                       </mat-select>
+                      <span class="custom-arrow">
+                        <svg
+                          width="12"
+                          height="7"
+                          viewBox="0 0 12 7"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M1 1L6 6L11 1"
+                            stroke="#2B3942"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                        </svg>
+                      </span>
                     </div>
-                    @if(expenseForm.get('end')?.touched && expenseForm.get('end')?.hasError('required')) {  
-                      <span class="field-error d-block">{{'Required' | translate}}</span>
+                    @if (
+                      expenseForm.get("end")?.touched &&
+                      expenseForm.get("end")?.hasError("required")
+                    ) {
+                      <span class="field-error d-block">{{
+                        "Required" | translate
+                      }}</span>
                     }
-                    @if(expenseForm.get('end')?.touched && expenseForm.get('end')?.hasError('endBeforeStart')) {
-                      <span class="field-error d-block">End year cannot be before start year</span>
+                    @if (
+                      expenseForm.get("end")?.touched &&
+                      expenseForm.get("end")?.hasError("endBeforeStart")
+                    ) {
+                      <span class="field-error d-block"
+                        >End year cannot be before start year</span
+                      >
                     }
                   </div>
                 </div>
@@ -157,37 +338,130 @@
           </div>
         </div>
 
-        @if(showStartEnd) {
+        @if (showStartEnd) {
           <div class="w-100 d-flex flex-column gap-20">
             <div class="escalation-inline">
-              <div class="d-flex flex-column gap-8 escalation-field"
-                [class.escalation-full]="selectedEscalationDescription !== 'Increases at custom rate'">
-                <mat-label class="f-s-16 f-w-400 d-flex gap-8 align-items-center">Escalation rate 
-                  <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
+              <div
+                class="d-flex flex-column gap-8 escalation-field"
+                [class.escalation-full]="
+                  selectedEscalationDescription !== 'Increases at custom rate'
+                "
+              >
+                <mat-label
+                  class="f-s-16 f-w-500 ibr-black d-flex gap-8 align-items-center"
+                  >Escalation rate
+                  <img
+                    width="18"
+                    src="assets/images/svgs/help-circle-icon.svg"
+                    alt="help-circle-icon"
+                  />
                 </mat-label>
                 <div class="w-100 form-field">
-                  <div class="select-option">
-                    <mat-select formControlName="escalationRate" (selectionChange)="onEscalationRateChange($event)">
-                      @for (escalationRate of escalationRates; track escalationRate) {
-                        <mat-option [value]="escalationRate.value">{{ escalationRate.description }}</mat-option>
+                  <div class="select-option position-relative">
+                    <mat-select
+                      formControlName="escalationRate"
+                      (selectionChange)="onEscalationRateChange($event)"
+                    >
+                      @for (
+                        escalationRate of escalationRates;
+                        track escalationRate
+                      ) {
+                        <mat-option [value]="escalationRate.value">{{
+                          escalationRate.description
+                        }}</mat-option>
                       }
                     </mat-select>
+                    <span class="custom-arrow">
+                      <svg
+                        width="12"
+                        height="7"
+                        viewBox="0 0 12 7"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M1 1L6 6L11 1"
+                          stroke="#2B3942"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                    </span>
                   </div>
-                  @if(expenseForm.get('escalationRate')?.touched && expenseForm.get('escalationRate')?.hasError('required')) {
-                    <span class="field-error d-block">{{'Required' | translate}}</span>
+                  @if (
+                    expenseForm.get("escalationRate")?.touched &&
+                    expenseForm.get("escalationRate")?.hasError("required")
+                  ) {
+                    <span class="field-error d-block">{{
+                      "Required" | translate
+                    }}</span>
                   }
                 </div>
               </div>
-             
-              @if(selectedEscalationDescription === 'Increases at custom rate') {
-                <div class="d-flex flex-column gap-8 escalation-field escalation-custom">
-                  <mat-label class="f-s-16 d-block">Custom escalation rate</mat-label>
+
+              @if (
+                selectedEscalationDescription === "Increases at custom rate"
+              ) {
+                <div
+                  class="d-flex flex-column gap-8 escalation-field escalation-custom"
+                >
+                  <mat-label class="f-s-16 f-w-500 ibr-black d-block"
+                    >Custom escalation rate</mat-label
+                  >
                   <div class="w-100 form-field custom-rate-input">
-                    <input matInput type="number" formControlName="customEscalationRate" placeholder="0"/>
-                    <img class="custom-rate-suffix" src="assets/images/shapes/percentage.svg" alt="percentage" />
+                    <input
+                      matInput
+                      type="number"
+                      formControlName="customEscalationRate"
+                      placeholder="0"
+                    />
+                    <div class="custom-rate-suffix">
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 20 20"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M15.8337 4.16602L4.16699 15.8327"
+                          stroke="#48475D"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                        <path
+                          d="M5.41634 7.50065C6.56693 7.50065 7.49967 6.56791 7.49967 5.41732C7.49967 4.26672 6.56693 3.33398 5.41634 3.33398C4.26575 3.33398 3.33301 4.26672 3.33301 5.41732C3.33301 6.56791 4.26575 7.50065 5.41634 7.50065Z"
+                          stroke="#48475D"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                        <path
+                          d="M14.5833 16.6667C15.7339 16.6667 16.6667 15.7339 16.6667 14.5833C16.6667 13.4327 15.7339 12.5 14.5833 12.5C13.4327 12.5 12.5 13.4327 12.5 14.5833C12.5 15.7339 13.4327 16.6667 14.5833 16.6667Z"
+                          stroke="#48475D"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                    </div>
+                    <!-- <img
+                      class="custom-rate-suffix"
+                      src="assets/images/shapes/percentage.svg"
+                      alt="percentage"
+                    /> -->
                   </div>
-                  @if(expenseForm.get('customEscalationRate')?.touched && expenseForm.get('customEscalationRate')?.hasError('required')) {
-                    <span class="field-error d-block">{{'Required' | translate}}</span>
+                  @if (
+                    expenseForm.get("customEscalationRate")?.touched &&
+                    expenseForm
+                      .get("customEscalationRate")
+                      ?.hasError("required")
+                  ) {
+                    <span class="field-error d-block">{{
+                      "Required" | translate
+                    }}</span>
                   }
                 </div>
               }
@@ -197,19 +471,30 @@
       </div>
     </mat-dialog-content>
 
-    <div class="row justify-content-between modal-action">
-      <div class="col-5">
-        <button (click)="closeDialog()" class="button-icon-outline w-100 d-block">
-          <span class="f-s-16">{{ 'Cancel' | translate }}</span>
+    <div class="d-flex justify-content-end gap-16 modal-action p-t-24">
+      <div>
+        <button
+          (click)="closeDialog()"
+          class="button-icon-outline w-100 d-block"
+        >
+          <span class="f-s-16">{{ "Cancel" | translate }}</span>
         </button>
       </div>
-      <div class="col-5">
-        <button (click)="addExpense()" type="button"
-          [disabled]="isSaving || expenseForm.invalid || (isEditWorkflow && !hasFormChanges())" class="button-icon w-100 d-block">
+      <div>
+        <button
+          (click)="addExpense()"
+          type="button"
+          [disabled]="
+            isSaving ||
+            expenseForm.invalid ||
+            (isEditWorkflow && !hasFormChanges())
+          "
+          class="button-icon w-100 d-block"
+        >
           @if (isSaving) {
-          <span class="f-s-16">Saving...</span>
+            <span class="f-s-16">Saving...</span>
           } @else {
-          <span class="f-s-16">Save</span>
+            <span class="f-s-16">Save</span>
           }
         </button>
       </div>

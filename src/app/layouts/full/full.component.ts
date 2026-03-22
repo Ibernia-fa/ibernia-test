@@ -375,7 +375,7 @@ export class FullComponent implements OnInit, OnDestroy {
 
   openShareModal() {
     const dialogRef = this.dialog.open(ShareReportComponent, {
-      width: '700px',
+      width: '612px',
       disableClose: true,
       data: {},
     });

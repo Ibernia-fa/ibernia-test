@@ -31,20 +31,18 @@
   }
 }
 
-
-
 .input-container {
   position: relative;
   display: inline-block;
-  
-  .suffix {
-  position: absolute;
-  right: 8px;
-  top: 50%;
-  transform: translateY(-50%);
-  pointer-events: none;
-}}
 
+  .suffix {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+}
 
 .start-end {
   .row {
@@ -64,11 +62,11 @@
   flex: 1;
 }
 .return-rate {
-  color: #5e5e73;
+  color: #787889;
   font-size: 14px;
-  line-height: 16.09px;
+  line-height: 16px;
   display: inline-block;
-  margin-bottom: 12px;
+  // margin-bottom: 12px;
 }
 .checkbox-box {
   display: flex;
@@ -100,11 +98,14 @@
     font-weight: 400;
   }
 }
-.slider-wrapper{
-  margin-top: -15px;
+.slider-wrapper {
+  // margin-top: -15px;
+  .mat-mdc-slider {
+    margin: 0 !important;
+  }
 }
 
-.custom-body{
+.custom-body {
   padding: 4px !important;
 }
 

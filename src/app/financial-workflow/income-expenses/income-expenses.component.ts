@@ -15,7 +15,11 @@ import { Cashflow } from 'src/app/clients/models/cashflow';
 import { IncomeExpensesHttpService } from './services/income-expenses-http.service';
 import { SettingsHttpService } from '../settings/services/settings-http.service';
 import { FinancialViewModel, IncomeExpense } from './model/income-expense';
-import { Cycle, EscalationRate, FinancialTimeline } from '../timeline/models/financial-timeline';
+import {
+  Cycle,
+  EscalationRate,
+  FinancialTimeline,
+} from '../timeline/models/financial-timeline';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TimelineHttpService } from '../timeline/services/timeline-http.service';
 import moment from 'moment';
@@ -44,7 +48,7 @@ import { WithdrawalsContributions } from '../withdrawals-contributions/model/wit
     CurrencySymbolPipe,
     ThousandSeparatorPipe,
     ToastrModule,
-    TranslateModule
+    TranslateModule,
   ],
   providers: [ToastrService],
   templateUrl: './income-expenses.component.html',
@@ -62,7 +66,10 @@ export class IncomeExpensesComponent {
   // default
   defaultIncomes: FinancialViewModel[];
   /** For display: separate cards for each income, with displayTitle when hasPartner (e.g. "Salary [Inam]") */
-  displayDefaultIncomes: Array<{ income: FinancialViewModel; displayTitle?: string }> = [];
+  displayDefaultIncomes: Array<{
+    income: FinancialViewModel;
+    displayTitle?: string;
+  }> = [];
   defautExpenses: FinancialViewModel[];
   hasPartner = false;
   clientFirstName = '';
@@ -90,7 +97,7 @@ export class IncomeExpensesComponent {
     private timelineHttpService: TimelineHttpService,
     private toastr: ToastrService,
     private savingsPotsHttpService: SavingsPotsHttpService,
-    private withdrawalsContributionsHttpService: WithdrawalsContributionsHttpService
+    private withdrawalsContributionsHttpService: WithdrawalsContributionsHttpService,
   ) {
     this.getData();
   }
@@ -100,7 +107,7 @@ export class IncomeExpensesComponent {
     (this.activatedRoute.parent?.params ?? this.activatedRoute.params)
       .pipe(
         switchMap((params) =>
-          this.financialWorkflowService.loadClientCashflowMetadata(params)
+          this.financialWorkflowService.loadClientCashflowMetadata(params),
         ),
         tap(([client, cashflow]) => {
           this.selectedClient = client as Client;
@@ -109,80 +116,142 @@ export class IncomeExpensesComponent {
         switchMap(([client, cashflow]) => {
           return combineLatest([
             this.incomeExpensesHttpService.getAllIncomeExpenses(
-              (cashflow as Cashflow).id
+              (cashflow as Cashflow).id,
             ),
             this.timelineHttpService.getTimelinebyCashflowId(
-              (cashflow as Cashflow).id
+              (cashflow as Cashflow).id,
             ),
             this.settingHttpService.getAmountCycles(),
-            this.settingHttpService.getEscalationRates(
-              (client as Client).id
-            ),
+            this.settingHttpService.getEscalationRates((client as Client).id),
             this.savingsPotsHttpService.getAllSavingsPots(
-              (cashflow as Cashflow).id
+              (cashflow as Cashflow).id,
             ),
             this.withdrawalsContributionsHttpService.getAllWithdrawalsContributions(
-              (cashflow as Cashflow).id
+              (cashflow as Cashflow).id,
             ),
           ]).pipe(
-            switchMap(([incomeExpense, timeline, amountCycles, escalationRatesResponse, savingsPots, contributionsData]) => {
-              const inheritanceEvents = (timeline?.clientEvents ?? []).filter(
-                (e: any) => (e?.name ?? '').toString().startsWith('Inheritance')
-              );
-              if (inheritanceEvents.length === 0) {
-                return of([incomeExpense, timeline, amountCycles, escalationRatesResponse, savingsPots, contributionsData]);
-              }
-              const cashflowId = (cashflow as Cashflow).id;
-              const oneOffCycle = (amountCycles ?? []).find((c: any) => c.description === 'One-off');
-              const currency = (incomeExpense as any)?.client?.preferredCurrency ?? this.selectedClient?.clientDetails?.preferredCurrency ?? 'USD';
-              return forkJoin(
-                inheritanceEvents.map((ev: any) => {
-                  const income: FinancialViewModel = {
-                    id: null,
-                    description: ev.name ?? 'Inheritance',
-                    amount: {
-                      amount: ev.netAmount?.amount ?? 0,
-                      currencySymbol: ev.netAmount?.currencySymbol ?? currency,
-                      cycle: { id: oneOffCycle?.id ?? '', description: 'One-off' }
-                    },
-                    start: ev.start ?? { year: new Date().getFullYear(), age: 0 },
-                    end: ev.start ?? { year: new Date().getFullYear(), age: 0 },
-                    escalationRate: null,
-                    isDefault: true,
-                    isIncomeExpenseSource: true,
-                    icon: 'inheritance'
-                  };
-                  return this.incomeExpensesHttpService.addIncome(cashflowId, income).pipe(
-                    switchMap(() => this.timelineHttpService.deleteEvent(cashflowId, ev.id))
-                  );
-                })
-              ).pipe(
-                switchMap(() => combineLatest([
-                  this.incomeExpensesHttpService.getAllIncomeExpenses(cashflowId),
-                  this.timelineHttpService.getTimelinebyCashflowId(cashflowId),
-                  this.settingHttpService.getAmountCycles(),
-                  this.settingHttpService.getEscalationRates((client as Client).id),
-                  this.savingsPotsHttpService.getAllSavingsPots(cashflowId),
-                  this.withdrawalsContributionsHttpService.getAllWithdrawalsContributions(cashflowId),
-                ]))
-              );
-            })
+            switchMap(
+              ([
+                incomeExpense,
+                timeline,
+                amountCycles,
+                escalationRatesResponse,
+                savingsPots,
+                contributionsData,
+              ]) => {
+                const inheritanceEvents = (timeline?.clientEvents ?? []).filter(
+                  (e: any) =>
+                    (e?.name ?? '').toString().startsWith('Inheritance'),
+                );
+                if (inheritanceEvents.length === 0) {
+                  return of([
+                    incomeExpense,
+                    timeline,
+                    amountCycles,
+                    escalationRatesResponse,
+                    savingsPots,
+                    contributionsData,
+                  ]);
+                }
+                const cashflowId = (cashflow as Cashflow).id;
+                const oneOffCycle = (amountCycles ?? []).find(
+                  (c: any) => c.description === 'One-off',
+                );
+                const currency =
+                  (incomeExpense as any)?.client?.preferredCurrency ??
+                  this.selectedClient?.clientDetails?.preferredCurrency ??
+                  'USD';
+                return forkJoin(
+                  inheritanceEvents.map((ev: any) => {
+                    const income: FinancialViewModel = {
+                      id: null,
+                      description: ev.name ?? 'Inheritance',
+                      amount: {
+                        amount: ev.netAmount?.amount ?? 0,
+                        currencySymbol:
+                          ev.netAmount?.currencySymbol ?? currency,
+                        cycle: {
+                          id: oneOffCycle?.id ?? '',
+                          description: 'One-off',
+                        },
+                      },
+                      start: ev.start ?? {
+                        year: new Date().getFullYear(),
+                        age: 0,
+                      },
+                      end: ev.start ?? {
+                        year: new Date().getFullYear(),
+                        age: 0,
+                      },
+                      escalationRate: null,
+                      isDefault: true,
+                      isIncomeExpenseSource: true,
+                      icon: 'inheritance',
+                    };
+                    return this.incomeExpensesHttpService
+                      .addIncome(cashflowId, income)
+                      .pipe(
+                        switchMap(() =>
+                          this.timelineHttpService.deleteEvent(
+                            cashflowId,
+                            ev.id,
+                          ),
+                        ),
+                      );
+                  }),
+                ).pipe(
+                  switchMap(() =>
+                    combineLatest([
+                      this.incomeExpensesHttpService.getAllIncomeExpenses(
+                        cashflowId,
+                      ),
+                      this.timelineHttpService.getTimelinebyCashflowId(
+                        cashflowId,
+                      ),
+                      this.settingHttpService.getAmountCycles(),
+                      this.settingHttpService.getEscalationRates(
+                        (client as Client).id,
+                      ),
+                      this.savingsPotsHttpService.getAllSavingsPots(cashflowId),
+                      this.withdrawalsContributionsHttpService.getAllWithdrawalsContributions(
+                        cashflowId,
+                      ),
+                    ]),
+                  ),
+                );
+              },
+            ),
           );
         }),
         tap((result: any[]) => {
-          const [incomeExpense, timeline, amountCycles, escalationRatesResponse, savingsPots, contributionsData] = result as [IncomeExpense, FinancialTimeline, Cycle[], any, SavingPotsModel, WithdrawalsContributions];
+          const [
+            incomeExpense,
+            timeline,
+            amountCycles,
+            escalationRatesResponse,
+            savingsPots,
+            contributionsData,
+          ] = result as [
+            IncomeExpense,
+            FinancialTimeline,
+            Cycle[],
+            any,
+            SavingPotsModel,
+            WithdrawalsContributions,
+          ];
           this.amountCycles = amountCycles;
           this.escalationRates = patchInflationRateDescription(
             escalationRatesResponse?.escalationRates ?? [],
-            this.selectedCashflow?.inflationRate ?? 0
+            this.selectedCashflow?.inflationRate ?? 0,
           );
           this.applyIncomeExpenseData(incomeExpense, timeline);
           this.savingsPots = savingsPots;
           this.contributionWithdrawal = contributionsData;
 
-          this.currency = this.selectedClient.clientDetails?.preferredCurrency ?? "USD";
+          this.currency =
+            this.selectedClient.clientDetails?.preferredCurrency ?? 'USD';
           this.isLoaderVisible = false;
-        })
+        }),
       )
       .subscribe();
   }
@@ -191,16 +260,19 @@ export class IncomeExpensesComponent {
     this.setIncomeType();
 
     const dialogRef = this.dialog.open(AddIncomeComponent, {
-      width: '700px',
+      width: '612px',
       disableClose: true,
       data: {
         amountCycles: this.amountCycles,
-        eventsList: this.timeline.clientEvents.sort((a, b) => a.start.age - b.start.age),
+        eventsList: this.timeline.clientEvents.sort(
+          (a, b) => a.start.age - b.start.age,
+        ),
         escalataionRates: this.escalationRates,
         incomes: this.incomeExpense?.incomes,
         clientBirthDate: this.selectedClient?.clientDetails.birthDate,
         partnerBirthDate: this.selectedClient?.partnerDetail?.birthDate,
-        clientPreferredCurrency: this.selectedClient?.clientDetails.preferredCurrency,
+        clientPreferredCurrency:
+          this.selectedClient?.clientDetails.preferredCurrency,
         clientCountryCode: this.selectedClient?.clientDetails?.country,
         cashflowId: this.selectedCashflow?.id,
         forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
@@ -208,7 +280,7 @@ export class IncomeExpensesComponent {
         planEndYear: this.getPlanEndYear(),
         incomeType: this.incomeType,
         clientSavings: this.savingsPots?.clientSavings ?? [],
-        existingContributions: this.contributionWithdrawal?.contributions ?? []
+        existingContributions: this.contributionWithdrawal?.contributions ?? [],
       },
     });
 
@@ -221,12 +293,14 @@ export class IncomeExpensesComponent {
     this.setExpenseType();
 
     const dialogRef = this.dialog.open(AddExpenseComponent, {
-      width: '700px',
+      width: '612px',
       disableClose: true,
       data: {
         amountCycles: this.amountCycles,
         escalataionRates: this.escalationRates,
-        eventsList: this.timeline.clientEvents.sort((a, b) => a.start.age - b.start.age),
+        eventsList: this.timeline.clientEvents.sort(
+          (a, b) => a.start.age - b.start.age,
+        ),
         expenses: this.incomeExpense?.expenses,
         clientBirthDate: this.selectedClient?.clientDetails.birthDate,
         clientPreferredCurrency:
@@ -235,7 +309,7 @@ export class IncomeExpensesComponent {
         forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
         forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
         planEndYear: this.getPlanEndYear(),
-        expenseType: this.expenseType
+        expenseType: this.expenseType,
       },
     });
 
@@ -245,20 +319,22 @@ export class IncomeExpensesComponent {
   }
 
   updateIncomeClicked(item: FinancialViewModel) {
-    if (item.description?.toLowerCase() === 'pension fund')
-      return;
+    if (item.description?.toLowerCase() === 'pension fund') return;
 
     this.setIncomeType();
     const dialogRef = this.dialog.open(AddIncomeComponent, {
-      width: '700px',
+      width: '612px',
       disableClose: true,
       data: {
         amountCycles: this.amountCycles,
-        eventsList: this.timeline.clientEvents.sort((a, b) => a.start.age - b.start.age),
+        eventsList: this.timeline.clientEvents.sort(
+          (a, b) => a.start.age - b.start.age,
+        ),
         escalataionRates: this.escalationRates,
         clientBirthDate: this.selectedClient?.clientDetails.birthDate,
         partnerBirthDate: this.selectedClient?.partnerDetail?.birthDate,
-        clientPreferredCurrency: this.selectedClient?.clientDetails.preferredCurrency,
+        clientPreferredCurrency:
+          this.selectedClient?.clientDetails.preferredCurrency,
         clientCountryCode: this.selectedClient?.clientDetails?.country,
         cashflowId: this.selectedCashflow?.id,
         selectedIncome: item,
@@ -278,27 +354,29 @@ export class IncomeExpensesComponent {
   }
 
   updateExpenseClicked(item: FinancialViewModel) {
-    if (item.description == "Insurance")
-      return;
+    if (item.description == 'Insurance') return;
 
     this.setExpenseType();
 
     const dialogRef = this.dialog.open(AddExpenseComponent, {
-      width: '700px',
+      width: '612px',
       disableClose: true,
       data: {
         amountCycles: this.amountCycles,
-        eventsList: this.timeline.clientEvents.sort((a, b) => a.start.age - b.start.age),
+        eventsList: this.timeline.clientEvents.sort(
+          (a, b) => a.start.age - b.start.age,
+        ),
         escalataionRates: this.escalationRates,
         clientBirthDate: this.selectedClient?.clientDetails.birthDate,
-        clientPreferredCurrency: this.selectedClient?.clientDetails.preferredCurrency,
+        clientPreferredCurrency:
+          this.selectedClient?.clientDetails.preferredCurrency,
         cashflowId: this.selectedCashflow?.id,
         selectedExpense: item,
         isEditWorkflow: true,
         forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
         forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
         planEndYear: this.getPlanEndYear(),
-        expenseType: this.expenseType
+        expenseType: this.expenseType,
       },
     });
 
@@ -312,42 +390,50 @@ export class IncomeExpensesComponent {
   setIncomeType() {
     this.incomeType = [];
 
-    if (!this.defaultIncomes.find(x => x.description == "Salary")) {
-      this.incomeType.push("Salary");
+    if (!this.defaultIncomes.find((x) => x.description == 'Salary')) {
+      this.incomeType.push('Salary');
     }
-    if (this.hasPartner && !this.defaultIncomes.find(x => x.description == "Salary (Partner)")) {
-      this.incomeType.push("Salary (Partner)");
+    if (
+      this.hasPartner &&
+      !this.defaultIncomes.find((x) => x.description == 'Salary (Partner)')
+    ) {
+      this.incomeType.push('Salary (Partner)');
     }
-    if (!this.defaultIncomes.find(x => x.description == "State pension")) {
-      this.incomeType.push("State pension");
+    if (!this.defaultIncomes.find((x) => x.description == 'State pension')) {
+      this.incomeType.push('State pension');
     }
-    if (this.hasPartner && !this.defaultIncomes.find(x => x.description == "State pension (Partner)")) {
-      this.incomeType.push("State pension (Partner)");
+    if (
+      this.hasPartner &&
+      !this.defaultIncomes.find(
+        (x) => x.description == 'State pension (Partner)',
+      )
+    ) {
+      this.incomeType.push('State pension (Partner)');
     }
-    if (!this.incomes.find(x => x.description == "Rental income")) {
-      this.incomeType.push("Rental income");
+    if (!this.incomes.find((x) => x.description == 'Rental income')) {
+      this.incomeType.push('Rental income');
     }
-    if (!this.defaultIncomes.find(x => x.description == "Inheritance")) {
-      this.incomeType.push("Inheritance");
+    if (!this.defaultIncomes.find((x) => x.description == 'Inheritance')) {
+      this.incomeType.push('Inheritance');
     }
 
-    this.incomeType.push("Custom");
+    this.incomeType.push('Custom');
   }
 
   setExpenseType() {
     this.expenseType = [];
 
-    if (!this.defautExpenses.find(x => x.description == "Living costs")) {
-      this.expenseType.push("Living costs");
+    if (!this.defautExpenses.find((x) => x.description == 'Living costs')) {
+      this.expenseType.push('Living costs');
     }
-    if (!this.defautExpenses.find(x => x.description == "Housing")) {
-      this.expenseType.push("Housing");
+    if (!this.defautExpenses.find((x) => x.description == 'Housing')) {
+      this.expenseType.push('Housing');
     }
-    if (!this.expenses.find(x => x.description == "Debt repayment")) {
-      this.expenseType.push("Debt repayment");
+    if (!this.expenses.find((x) => x.description == 'Debt repayment')) {
+      this.expenseType.push('Debt repayment');
     }
 
-    this.expenseType.push("Custom");
+    this.expenseType.push('Custom');
   }
 
   deleteIncome(element: FinancialViewModel) {
@@ -371,22 +457,33 @@ export class IncomeExpensesComponent {
       .pipe(
         switchMap(() => {
           return combineLatest([
-            this.incomeExpensesHttpService.getAllIncomeExpenses(this.selectedCashflow.id),
-            this.timelineHttpService.getTimelinebyCashflowId(this.selectedCashflow.id),
-            this.savingsPotsHttpService.getAllSavingsPots(this.selectedCashflow.id),
-            this.withdrawalsContributionsHttpService.getAllWithdrawalsContributions(this.selectedCashflow.id)
+            this.incomeExpensesHttpService.getAllIncomeExpenses(
+              this.selectedCashflow.id,
+            ),
+            this.timelineHttpService.getTimelinebyCashflowId(
+              this.selectedCashflow.id,
+            ),
+            this.savingsPotsHttpService.getAllSavingsPots(
+              this.selectedCashflow.id,
+            ),
+            this.withdrawalsContributionsHttpService.getAllWithdrawalsContributions(
+              this.selectedCashflow.id,
+            ),
           ]);
         }),
         tap(([incomeExpense, timeline, savingsPots, contributionsData]) => {
           this.applyIncomeExpenseData(incomeExpense, timeline);
           this.savingsPots = savingsPots;
           this.contributionWithdrawal = contributionsData;
-        })
+        }),
       )
       .subscribe();
   }
 
-  private applyIncomeExpenseData(incomeExpense: IncomeExpense, timeline: FinancialTimeline): void {
+  private applyIncomeExpenseData(
+    incomeExpense: IncomeExpense,
+    timeline: FinancialTimeline,
+  ): void {
     this.incomeExpense = incomeExpense;
     this.timeline = timeline;
 
@@ -395,7 +492,7 @@ export class IncomeExpensesComponent {
     this.partnerFirstName = this.selectedClient?.partnerDetail?.firstName ?? '';
 
     const allDefault = this.incomeExpense.incomes
-      .filter(i => i.isDefault == true && i.isIncomeExpenseSource == true)
+      .filter((i) => i.isDefault == true && i.isIncomeExpenseSource == true)
       .sort((a, b) => {
         if (a.description === 'Salary') return -1;
         if (b.description === 'Salary') return 1;
@@ -409,35 +506,63 @@ export class IncomeExpensesComponent {
     // Build display items: merge client+partner for Salary and State pension when hasPartner
     this.displayDefaultIncomes = this.buildDisplayDefaultIncomes(allDefault);
     this.defautExpenses = this.incomeExpense.expenses
-      .filter(i => i.isDefault == true && i.isIncomeExpenseSource == true)
+      .filter((i) => i.isDefault == true && i.isIncomeExpenseSource == true)
       .sort((a, b) => {
         if (a.description === 'Living costs') return -1;
         if (b.description === 'Housing') return 1;
         return 0;
       });
 
-    this.incomes = this.incomeExpense.incomes
-      .filter(i => i.isDefault == false && i.isIncomeExpenseSource == true);
-    this.expenses = this.incomeExpense.expenses
-      .filter(i => (i.isDefault == false && i.isIncomeExpenseSource == true)
-        || i.description == "Insurance");
+    this.incomes = this.incomeExpense.incomes.filter(
+      (i) => i.isDefault == false && i.isIncomeExpenseSource == true,
+    );
+    this.expenses = this.incomeExpense.expenses.filter(
+      (i) =>
+        (i.isDefault == false && i.isIncomeExpenseSource == true) ||
+        i.description == 'Insurance',
+    );
 
     this.updateCurrentYearIncomeSummary();
   }
 
-  private buildDisplayDefaultIncomes(allDefault: FinancialViewModel[]): Array<{ income: FinancialViewModel; displayTitle?: string }> {
-    const result: Array<{ income: FinancialViewModel; displayTitle?: string }> = [];
-    const clientSalary = allDefault.find(i => i.description === 'Salary');
-    const partnerSalary = allDefault.find(i => i.description === 'Salary (Partner)');
-    const clientPension = allDefault.find(i => i.description === 'State pension');
-    const partnerPension = allDefault.find(i => i.description === 'State pension (Partner)');
-    const inheritance = allDefault.find(i => i.description === 'Inheritance');
+  private buildDisplayDefaultIncomes(
+    allDefault: FinancialViewModel[],
+  ): Array<{ income: FinancialViewModel; displayTitle?: string }> {
+    const result: Array<{ income: FinancialViewModel; displayTitle?: string }> =
+      [];
+    const clientSalary = allDefault.find((i) => i.description === 'Salary');
+    const partnerSalary = allDefault.find(
+      (i) => i.description === 'Salary (Partner)',
+    );
+    const clientPension = allDefault.find(
+      (i) => i.description === 'State pension',
+    );
+    const partnerPension = allDefault.find(
+      (i) => i.description === 'State pension (Partner)',
+    );
+    const inheritance = allDefault.find((i) => i.description === 'Inheritance');
 
     if (this.hasPartner) {
-      if (clientSalary) result.push({ income: clientSalary, displayTitle: `Salary ${this.clientFirstName || 'Client'}` });
-      if (partnerSalary) result.push({ income: partnerSalary, displayTitle: `Salary ${this.partnerFirstName || 'Partner'}` });
-      if (clientPension) result.push({ income: clientPension, displayTitle: `State pension ${this.clientFirstName || 'Client'}` });
-      if (partnerPension) result.push({ income: partnerPension, displayTitle: `State pension ${this.partnerFirstName || 'Partner'}` });
+      if (clientSalary)
+        result.push({
+          income: clientSalary,
+          displayTitle: `Salary ${this.clientFirstName || 'Client'}`,
+        });
+      if (partnerSalary)
+        result.push({
+          income: partnerSalary,
+          displayTitle: `Salary ${this.partnerFirstName || 'Partner'}`,
+        });
+      if (clientPension)
+        result.push({
+          income: clientPension,
+          displayTitle: `State pension ${this.clientFirstName || 'Client'}`,
+        });
+      if (partnerPension)
+        result.push({
+          income: partnerPension,
+          displayTitle: `State pension ${this.partnerFirstName || 'Partner'}`,
+        });
       if (inheritance) result.push({ income: inheritance });
     } else {
       for (const item of allDefault) {
@@ -447,7 +572,10 @@ export class IncomeExpensesComponent {
     return result;
   }
 
-  trackByDisplayIncomeId(index: number, item: { income: FinancialViewModel; displayTitle?: string }): string {
+  trackByDisplayIncomeId(
+    index: number,
+    item: { income: FinancialViewModel; displayTitle?: string },
+  ): string {
     return item.income.id ?? item.income.description ?? String(index);
   }
 
@@ -475,22 +603,23 @@ export class IncomeExpensesComponent {
 
   getCycle(cycle: string) {
     switch (cycle) {
-      case "One-off": return "One-off"
-      case "Every year": return "year";
-      default: return "month";
+      case 'One-off':
+        return 'One-off';
+      case 'Every year':
+        return 'year';
+      default:
+        return 'month';
     }
   }
 
   isEditableIncome(name: string): boolean {
-    if (name?.toLowerCase() === 'pension fund')
-      return false;
+    if (name?.toLowerCase() === 'pension fund') return false;
 
     return true;
   }
 
   isEditableExpense(name: string): boolean {
-    if (name == "Insurance")
-      return false;
+    if (name == 'Insurance') return false;
 
     return true;
   }
@@ -499,10 +628,14 @@ export class IncomeExpensesComponent {
     return Number(item?.bonus?.amount?.amount ?? 0) > 0;
   }
 
-
   private getPlanEndYear(): number {
     const planDuration = Number(this.selectedCashflow?.planDuration);
-    if (Number.isFinite(planDuration) && planDuration > 0 && this.timeline?.forecastStartDate && this.selectedClient?.clientDetails?.birthDate) {
+    if (
+      Number.isFinite(planDuration) &&
+      planDuration > 0 &&
+      this.timeline?.forecastStartDate &&
+      this.selectedClient?.clientDetails?.birthDate
+    ) {
       const forecastStartDate = new Date(this.timeline.forecastStartDate);
       const forecastStartYear = forecastStartDate.getFullYear();
       const birthDate = new Date(this.selectedClient.clientDetails.birthDate);
@@ -516,7 +649,8 @@ export class IncomeExpensesComponent {
     let age = atDate.getFullYear() - birthDate.getFullYear();
     const hasBirthdayPassed =
       atDate.getMonth() > birthDate.getMonth() ||
-      (atDate.getMonth() === birthDate.getMonth() && atDate.getDate() >= birthDate.getDate());
+      (atDate.getMonth() === birthDate.getMonth() &&
+        atDate.getDate() >= birthDate.getDate());
     if (!hasBirthdayPassed) {
       age--;
     }

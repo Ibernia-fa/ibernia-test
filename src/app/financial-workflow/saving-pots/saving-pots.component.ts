@@ -404,7 +404,7 @@ export class SavingPotsComponent implements OnInit {
     console.log('Saving Pot Data Received');
     console.log(event);
     const dialogRef = this.dialog.open(AddNewPotComponent, {
-      width: '700px',
+      width: '612px',
       disableClose: true,
       data: {
         returnRate: this.userRerturnRate,
@@ -491,7 +491,7 @@ export class SavingPotsComponent implements OnInit {
   newEventClicked() {
     console.log('newEventClicked() called');
     const dialogRef = this.dialog.open(AddNewPotComponent, {
-      width: '700px',
+      width: '612px',
       disableClose: true,
       data: {
         returnRate: this.userRerturnRate,

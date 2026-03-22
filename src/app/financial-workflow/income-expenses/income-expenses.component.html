@@ -1,390 +1,899 @@
-<div class="d-flex gap-24 flex-column">
-    @if(!isLoaderVisible) {
-    <div class="income-expense-tables">
-        <div class="row justify-content-between">
-            <mat-card class="cardWithShadow w-100">
-                <div class="row" style="padding: 16px;">
-                    <div class="col-6">
-                        <!-- left column -->
-                        <mat-card class="income-expense-wrapper m-b-10">
-                            <div class="heading-btn-wrapper">
-                                <div class="d-flex align-items-center justify-content-between w-100 gap-16 flex-wrap">
-                                    <div class="d-flex gap-12 align-items-end">
-                                        <h3>{{ 'Incomes' | translate }}</h3>
-                                        <h3 class="expense-income-green">
-                                            +{{currency|currencySymbol}}{{currentYearIncomeSummary.totalIncome|thousandSeparator}}
-                                        </h3>
-                                    </div>
-
-                                    <div class="d-flex gap-12 align-items-end">
-                                        <button (click)="newIncomeClicked()" type="button" class="button-icon">
-                                            <span class="f-s-16">{{ 'Add income' | translate}}</span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </mat-card>
-                        @for(displayItem of displayDefaultIncomes; track trackByDisplayIncomeId($index, displayItem); let i = $index) {
-                        <mat-card-content class="m-b-10" style="padding: 0px;">
-                            <div class="cashflow-drag-wrapper">
-                                <div class="d-flex flex-column gap-20">
-                                    <div class="flex-column d-flex gap-10" id="drag-boundary">
-                                        <div class="d-flex justify-content-between align-items-center gap-12 dragable-card-wrapper">
-                                            <div class="dragable-card d-flex align-items-center justify-content-between cursor-pointer"
-                                                (click)="updateIncomeClicked(displayItem.income)">
-                                                <div class="d-flex align-items-center gap-8">
-                                                    <div class="stats-main-wrapper">
-                                                        <div class="d-flex flex-column gap-8">
-                                                            <div class="d-flex align-items-center gap-8">
-                                                                @if(displayItem.income.amount.amount == 0) {
-                                                                <img height="32px;" [src]="'/assets/images/svgs/' + displayItem.income.icon + '-gray.svg'" alt="income-icon" />
-                                                                } @else {
-                                                                <img height="32px;" [src]="'/assets/images/svgs/' + displayItem.income.icon + '-green.svg'" alt="income-icon" />
-                                                                }
-                                                                <h3 class="card-title card-title-margin">{{ displayItem.displayTitle ?? displayItem.income.description }}</h3>
-                                                            </div>
-                                                            <div class="d-flex align-items-center gap-10">
-                                                                <h3 class="saving-title">
-                                                                    @if(displayItem.income.amount.amount == 0) {
-                                                                    <span class="paragraph-text">{{'Set amount' | translate}}</span>
-                                                                    } @else {
-                                                                    <h3 class="card-title">
-                                                                        +{{displayItem.income.amount.currencySymbol|currencySymbol}}{{displayItem.income.amount.amount|thousandSeparator}}
-                                                                        <span class="paragraph-text">/{{getCycle(displayItem.income.amount.cycle?.description)}}</span>
-                                                                    </h3>
-                                                                    }
-                                                                </h3>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="menu" [className]="displayItem.income.description === 'Salary' || displayItem.income.description === 'Salary (Partner)' ? 'menu-top-margin-13' : 'menu-top-margin'">
-                                                    <div [className]="displayItem.income.description === 'Salary' || displayItem.income.description === 'Salary (Partner)' ? 'd-flex align-items-center justify-content-end' : 'd-flex align-items-center justify-content-center'">
-                                                        <button (click)="$event.stopPropagation(); $event.preventDefault()" mat-icon-button [matMenuTriggerFor]="menu">
-                                                            <mat-icon><img src="assets/images/svgs/dropdown-detail.svg" alt="dropdown-detail" /></mat-icon>
-                                                        </button>
-                                                    </div>
-                                                    <mat-menu #menu="matMenu" xPosition="before" class="dropdown-menus">
-                                                        <button (click)="updateIncomeClicked(displayItem.income)" mat-menu-item>
-                                                            <mat-icon><img src="assets/images/svgs/drop-down-edit-2-line.svg" alt="edit" height="24" width="24" /></mat-icon>
-                                                            <span>{{ 'Edit' | translate }}</span>
-                                                        </button>
-                                                        <button (click)="deleteIncome(displayItem.income)" mat-menu-item>
-                                                            <mat-icon><img src="assets/images/svgs/drop-down-delete-2-line.svg" alt="delete" height="24" width="24" /></mat-icon>
-                                                            <span>{{ 'Delete' | translate }}</span>
-                                                        </button>
-                                                    </mat-menu>
-                                                    @if((displayItem.income.description === 'Salary' || displayItem.income.description === 'Salary (Partner)') && hasBonusAmount(displayItem.income)) {
-                                                    <div class="tile-bonus">
-                                                        <h3 class="saving-title">
-                                                            <h3 class="card-title">
-                                                                <span class="span-header">Bonus:</span> +{{displayItem.income.bonus.amount.currencySymbol|currencySymbol}}{{displayItem.income.bonus.amount.amount|thousandSeparator}}
-                                                                <span class="paragraph-text">/{{getCycle(displayItem.income.bonus.amount.cycle?.description)}}</span>
-                                                            </h3>
-                                                        </h3>
-                                                    </div>
-                                                    }
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </mat-card-content>
-                        }
-
-                        <div class="row">
-                            @for(income of incomes; track trackByIncomeId; let i = $index) {
-                            <div class="col-6">
-                                <mat-card-content class="m-b-10" style="padding: 0px;">
-                                    <div class="cashflow-drag-wrapper">
-                                        <div class="d-flex flex-column gap-20">
-                                            <div class="flex-column d-flex gap-10" id="drag-boundary">
-                                                <div
-                                                    class="d-flex justify-content-between align-items-center gap-12 dragable-card-wrapper">
-                                                    <div class="dragable-card d-flex align-items-center justify-content-between cursor-pointer"
-                                                        (click)="updateIncomeClicked(income)">
-                                                        <div class="d-flex align-items-center gap-8">
-                                                            <div class="stats-main-wrapper">
-                                                                <div class="d-flex flex-column gap-8">
-                                                                    <div class="d-flex align-items-center gap-8">
-                                                                        @if(income.amount.amount == 0)
-                                                                        {
-                                                                        <img height="32px;"
-                                                                            [src]="'/assets/images/svgs/' + income.icon + '-gray.svg'"
-                                                                            alt="income-icon" />
-                                                                        }
-                                                                        @else {
-                                                                        <img height="32px;"
-                                                                            [src]="'/assets/images/svgs/' + income.icon + '-green.svg'"
-                                                                            alt="income-icon" />
-                                                                        }
-                                                                        <h3 class="card-title card-title-margin">
-                                                                            {{income.description}}
-                                                                        </h3>
-                                                                    </div>
-                                                                    <div class="d-flex align-items-center gap-10">
-                                                                        <h3 class="card-title">
-                                                                            +{{income.amount.currencySymbol|currencySymbol}}{{income.amount.amount|thousandSeparator}}
-                                                                            <span
-                                                                                class="paragraph-text">/{{getCycle(income.amount.cycle?.description)}}</span>
-                                                                        </h3>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        @if(isEditableIncome(income.description)) {
-                                                        <div class="menu menu-top-margin">
-                                                            <div
-                                                                class="d-flex align-items-center justify-content-center">
-                                                                <button
-                                                                    (click)="$event.stopPropagation(); $event.preventDefault()"
-                                                                    mat-icon-button [matMenuTriggerFor]="menu">
-                                                                    <mat-icon>
-                                                                        <img src="assets/images/svgs/dropdown-detail.svg"
-                                                                            alt="dropdown-detail" />
-                                                                    </mat-icon>
-                                                                </button>
-                                                            </div>
-                                                            <mat-menu #menu="matMenu" xPosition="before"
-                                                                class="dropdown-menus">
-                                                                <button (click)="updateIncomeClicked(income)"
-                                                                    mat-menu-item>
-                                                                    <mat-icon>
-                                                                        <img src="assets/images/svgs/drop-down-edit-2-line.svg"
-                                                                            alt="drop-down-copy-2-line" height="24"
-                                                                            width="24" />
-                                                                    </mat-icon>
-                                                                    <span>{{ 'Edit' | translate }}</span>
-                                                                </button>
-                                                                <button (click)="deleteIncome(income)" mat-menu-item>
-                                                                    <mat-icon>
-                                                                        <img src="assets/images/svgs/drop-down-delete-2-line.svg"
-                                                                            alt="drop-down-copy-2-line" height="24"
-                                                                            width="24" />
-                                                                    </mat-icon>
-                                                                    <span>{{ 'Delete' | translate }}</span>
-                                                                </button>
-                                                            </mat-menu>
-                                                        </div>
-                                                        }
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </mat-card-content>
-                            </div>
-                            }
-                        </div>
-                        <!-- end left column -->
-                    </div>
-
-                    <div class="col-6">
-                        <!-- right column -->
-                        <mat-card class="income-expense-wrapper m-b-10">
-                            <div class="heading-btn-wrapper">
-                                <div class="d-flex align-items-center justify-content-between w-100 gap-16 flex-wrap">
-                                    <div class="d-flex gap-12 align-items-end">
-                                        <h3>{{ 'Expenses' | translate }}</h3>
-                                        <h3 class="expense-income-red">
-                                            -{{currency|currencySymbol}}{{currentYearIncomeSummary.totalExpenses|thousandSeparator}}
-                                        </h3>
-                                    </div>
-
-                                    <div class="d-flex gap-12 align-items-end">
-                                        <button (click)="newExpenseClicked()" type="button"
-                                            class="w-100 button-icon-outline">
-                                            <span>{{ 'Add expense' | translate }}</span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </mat-card>
-
-                        @for(expense of defautExpenses; track trackByExpenseId; let i = $index) {
-                        <mat-card-content class="m-b-10" style="padding: 0px;">
-                            <div class="cashflow-drag-wrapper">
-                                <div class="d-flex flex-column gap-20">
-                                    <div class="flex-column d-flex gap-10" id="drag-boundary">
-                                        <div class="d-flex justify-content-between align-items-center gap-12 dragable-card-wrapper"
-                                            (click)="updateExpenseClicked(expense)">
-                                            <div
-                                                class="dragable-card d-flex align-items-center justify-content-between cursor-pointer">
-                                                <div class="d-flex align-items-center gap-8">
-                                                    <div class="stats-main-wrapper">
-                                                        <div class="d-flex flex-column gap-8">
-                                                            <div class="d-flex align-items-center gap-8">
-                                                                @if(expense.amount.amount == 0)
-                                                                {
-                                                                <img height="32px;"
-                                                                    [src]="'/assets/images/svgs/' + expense.icon + '-gray.svg'"
-                                                                    alt="income-icon" />
-                                                                }
-                                                                @else {
-                                                                <img height="32px;"
-                                                                    [src]="'/assets/images/svgs/' + expense.icon + '-red.svg'"
-                                                                    alt="income-icon" />
-                                                                }
-                                                                <h3 class="card-title card-title-margin">
-                                                                    {{expense.description}}</h3>
-                                                            </div>
-                                                            <div class="d-flex align-items-center gap-10">
-                                                                <h3 class="saving-title">
-                                                                    @if(expense.amount.amount == 0)
-                                                                    {
-                                                                    <span class="paragraph-text">{{'Set amount' |
-                                                                        translate}}</span>
-                                                                    }
-                                                                    @else {
-                                                                    <h3 class="card-title">
-                                                                        -{{expense.amount.currencySymbol|currencySymbol}}{{expense.amount.amount|thousandSeparator}}
-                                                                        <span
-                                                                            class="paragraph-text">/{{getCycle(expense.amount.cycle?.description)}}</span>
-                                                                    </h3>
-                                                                    }
-                                                                </h3>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <div class="menu menu-top-margin">
-                                                    <div class="d-flex align-items-center justify-content-center">
-                                                        <button
-                                                            (click)="$event.stopPropagation(); $event.preventDefault()"
-                                                            mat-icon-button [matMenuTriggerFor]="menu">
-                                                            <mat-icon>
-                                                                <img src="assets/images/svgs/dropdown-detail.svg"
-                                                                    alt="dropdown-detail" />
-                                                            </mat-icon>
-                                                        </button>
-                                                    </div>
-                                                    <mat-menu #menu="matMenu" xPosition="before" class="dropdown-menus">
-                                                        <button (click)="updateExpenseClicked(expense)" mat-menu-item>
-                                                            <mat-icon>
-                                                                <img src="assets/images/svgs/drop-down-edit-2-line.svg"
-                                                                    alt="drop-down-copy-2-line" height="24"
-                                                                    width="24" />
-                                                            </mat-icon>
-                                                            <span>{{ 'Edit' | translate }}</span>
-                                                        </button>
-                                                        <button (click)="deleteExpense(expense)" mat-menu-item>
-                                                            <mat-icon>
-                                                                <img src="assets/images/svgs/drop-down-delete-2-line.svg"
-                                                                    alt="drop-down-copy-2-line" height="24"
-                                                                    width="24" />
-                                                            </mat-icon>
-                                                            <span>{{ 'Delete' | translate }}</span>
-                                                        </button>
-                                                    </mat-menu>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </mat-card-content>
-                        }
-
-                        <div class="row">
-                            @for(expense of expenses; track trackByExpenseId; let i = $index) {
-                            <div class="col-6">
-                                <mat-card-content class="m-b-10" style="padding: 0px;">
-                                    <div class="cashflow-drag-wrapper">
-                                        <div class="d-flex flex-column gap-20">
-                                            <div class="flex-column d-flex gap-10" id="drag-boundary">
-                                                <div
-                                                    class="d-flex justify-content-between align-items-center gap-12 dragable-card-wrapper">
-                                                    <div class="dragable-card d-flex align-items-center justify-content-between cursor-pointer"
-                                                        (click)="updateExpenseClicked(expense)">
-                                                        <div class="d-flex align-items-center gap-8">
-                                                            <div class="stats-main-wrapper">
-                                                                <div class="d-flex flex-column gap-8">
-                                                                    <div class="d-flex align-items-center gap-8">
-                                                                        @if(expense.amount.amount == 0)
-                                                                        {
-                                                                        <img height="32px;"
-                                                                            [src]="'/assets/images/svgs/' + expense.icon + '-gray.svg'"
-                                                                            alt="income-icon" />
-                                                                        }
-                                                                        @else {
-                                                                        <img height="32px;"
-                                                                            [src]="'/assets/images/svgs/' + expense.icon + '-red.svg'"
-                                                                            alt="income-icon" />
-                                                                        }
-
-                                                                        <h3 class="card-title card-title-margin">
-                                                                            {{expense.description}}
-                                                                        </h3>
-                                                                    </div>
-                                                                    <div class="d-flex align-items-center gap-10">
-                                                                        <h3 class="card-title">
-                                                                            -{{expense.amount.currencySymbol|currencySymbol}}{{expense.amount.amount|thousandSeparator}}
-                                                                            <span
-                                                                                class="paragraph-text">/{{getCycle(expense.amount.cycle?.description)}}</span>
-                                                                        </h3>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        @if(isEditableExpense(expense.description)) {
-                                                        <div class="menu menu-top-margin">
-                                                            <div
-                                                                class="d-flex align-items-center justify-content-center">
-                                                                <button
-                                                                    (click)="$event.stopPropagation(); $event.preventDefault()"
-                                                                    mat-icon-button [matMenuTriggerFor]="menu">
-                                                                    <mat-icon>
-                                                                        <img src="assets/images/svgs/dropdown-detail.svg"
-                                                                            alt="dropdown-detail" />
-                                                                    </mat-icon>
-                                                                </button>
-                                                            </div>
-                                                            <mat-menu #menu="matMenu" xPosition="before"
-                                                                class="dropdown-menus">
-                                                                <button (click)="updateExpenseClicked(expense)"
-                                                                    mat-menu-item>
-                                                                    <mat-icon>
-                                                                        <img src="assets/images/svgs/drop-down-edit-2-line.svg"
-                                                                            alt="drop-down-copy-2-line" height="24"
-                                                                            width="24" />
-                                                                    </mat-icon>
-                                                                    <span>{{ 'Edit' | translate }}</span>
-                                                                </button>
-                                                                <button (click)="deleteExpense(expense)" mat-menu-item>
-                                                                    <mat-icon>
-                                                                        <img src="assets/images/svgs/drop-down-delete-2-line.svg"
-                                                                            alt="drop-down-copy-2-line" height="24"
-                                                                            width="24" />
-                                                                    </mat-icon>
-                                                                    <span>{{ 'Delete' | translate }}</span>
-                                                                </button>
-                                                            </mat-menu>
-                                                        </div>
-                                                        }
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </mat-card-content>
-                            </div>
-                            }
-                        </div>
-                        <!-- right column -->
-                    </div>
+@if (!isLoaderVisible) {
+  <mat-card class="ibr-new-dashboad-card">
+    <mat-card-content class="w-100">
+      <div class="ibr-income-expense-grid">
+        <div class="income-wrapper">
+          <!-- left column -->
+          <mat-card class="income-header-wrapper">
+            <div class="heading-btn-wrapper">
+              <div
+                class="d-flex align-items-center justify-content-between w-100 gap-16 flex-wrap"
+              >
+                <div class="d-flex flex-column gap-12">
+                  <h3>{{ "Incomes" | translate }}</h3>
+                  <h3 class="sub-heading expense-income-green">
+                    +{{ currency | currencySymbol
+                    }}{{
+                      currentYearIncomeSummary.totalIncome | thousandSeparator
+                    }}
+                  </h3>
                 </div>
-            </mat-card>
-        </div>
-    </div>
 
-    }
-    @else {
-    <div class="h-300">
-        <mat-spinner></mat-spinner>
-    </div>
-    }
-</div>
+                <!-- <button
+                  (click)="newIncomeClicked()"
+                  type="button"
+                  class="button-icon"
+                >
+                  <span >{{ "Add income" | translate }}</span>
+                </button> -->
+                <button
+                  (click)="newIncomeClicked()"
+                  type="button"
+                  class="button-icon"
+                >
+                  <span class="f-s-16 f-w-500">{{
+                    "Add income" | translate
+                  }}</span>
+                  <img src="assets/images/svgs/add-icon.svg" alt="add-icon" />
+                </button>
+              </div>
+            </div>
+          </mat-card>
+          @for (
+            displayItem of displayDefaultIncomes;
+            track trackByDisplayIncomeId($index, displayItem);
+            let i = $index
+          ) {
+            <mat-card-content class="income-items">
+              <div
+                class="dragable-card d-flex align-items-center justify-content-between cursor-pointer"
+                (click)="updateIncomeClicked(displayItem.income)"
+              >
+                <div class="stats-main-wrapper">
+                  <div class="d-flex align-items-start gap-10">
+                    @if (displayItem.income.amount.amount == 0) {
+                      <!-- height="32px;" -->
+                      <img
+                        [src]="
+                          '/assets/images/svgs/' +
+                          displayItem.income.icon +
+                          '-gray.svg'
+                        "
+                        alt="income-icon"
+                      />
+                    } @else {
+                      <!-- height="32px;" -->
+                      <img
+                        [src]="
+                          '/assets/images/svgs/' +
+                          displayItem.income.icon +
+                          '-green.svg'
+                        "
+                        alt="income-icon"
+                      />
+                    }
+                    <div class="d-flex flex-column gap-6">
+                      <h3 class="card-title">
+                        {{
+                          displayItem.displayTitle ??
+                            displayItem.income.description
+                        }}
+                      </h3>
+
+                      <div class="d-flex flex-wrap gap-12 align-items-stretch">
+                        <div>
+                          @if (displayItem.income.amount.amount == 0) {
+                            <span class="paragraph-text">{{
+                              "Set amount" | translate
+                            }}</span>
+                          } @else {
+                            <h3
+                              class="paragraph-text d-flex align-items-baseline"
+                            >
+                              +{{
+                                displayItem.income.amount.currencySymbol
+                                  | currencySymbol
+                              }}{{
+                                displayItem.income.amount.amount
+                                  | thousandSeparator
+                              }}
+                              <span class="card-title"
+                                >/{{
+                                  getCycle(
+                                    displayItem.income.amount.cycle?.description
+                                  )
+                                }}</span
+                              >
+                            </h3>
+                          }
+                        </div>
+                        @if (
+                          (displayItem.income.description === "Salary" ||
+                            displayItem.income.description ===
+                              "Salary (Partner)") &&
+                          hasBonusAmount(displayItem.income)
+                        ) {
+                          <div class="items-divider"></div>
+                          <div class="d-flex flex-col gap-10 bonus-list">
+                            <div class="d-flex align-items-center tile-bonus">
+                              <span class="card-title">Bonus:</span>
+                              <h3
+                                class="paragraph-text d-flex align-items-baseline"
+                              >
+                                +{{
+                                  displayItem.income.bonus.amount.currencySymbol
+                                    | currencySymbol
+                                }}{{
+                                  displayItem.income.bonus.amount.amount
+                                    | thousandSeparator
+                                }}
+                                <span class="card-title"
+                                  >/{{
+                                    getCycle(
+                                      displayItem.income.bonus.amount.cycle
+                                        ?.description
+                                    )
+                                  }}</span
+                                >
+                              </h3>
+                            </div>
+                          </div>
+                        }
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- DropDown Action -->
+                <div>
+                  <button
+                    mat-icon-button
+                    aria-label="icon-button with a menu"
+                    type="button"
+                    class="dropdown-button"
+                    (click)="$event.stopPropagation(); $event.preventDefault()"
+                    mat-icon-button
+                    [matMenuTriggerFor]="menu"
+                  >
+                    <mat-icon>
+                      <svg
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M12 13C12.5523 13 13 12.5523 13 12C13 11.4477 12.5523 11 12 11C11.4477 11 11 11.4477 11 12C11 12.5523 11.4477 13 12 13Z"
+                          stroke="#5A596E"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                        <path
+                          d="M12 6C12.5523 6 13 5.55228 13 5C13 4.44772 12.5523 4 12 4C11.4477 4 11 4.44772 11 5C11 5.55228 11.4477 6 12 6Z"
+                          stroke="#5A596E"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                        <path
+                          d="M12 20C12.5523 20 13 19.5523 13 19C13 18.4477 12.5523 18 12 18C11.4477 18 11 18.4477 11 19C11 19.5523 11.4477 20 12 20Z"
+                          stroke="#5A596E"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                    </mat-icon>
+                  </button>
+                  <mat-menu
+                    #menu="matMenu"
+                    xPosition="before"
+                    class="action-dropdown-menus"
+                  >
+                    <button
+                      (click)="updateIncomeClicked(displayItem.income)"
+                      mat-menu-item
+                    >
+                      <mat-icon>
+                        <svg
+                          width="20"
+                          height="20"
+                          viewBox="0 0 20 20"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <g clip-path="url(#clip0_3194_409)">
+                            <path
+                              d="M9.16602 3.33203H3.33268C2.89065 3.33203 2.46673 3.50763 2.15417 3.82019C1.84161 4.13275 1.66602 4.55667 1.66602 4.9987V16.6654C1.66602 17.1074 1.84161 17.5313 2.15417 17.8439C2.46673 18.1564 2.89065 18.332 3.33268 18.332H14.9993C15.4414 18.332 15.8653 18.1564 16.1779 17.8439C16.4904 17.5313 16.666 17.1074 16.666 16.6654V10.832"
+                              stroke="#5A596E"
+                              stroke-width="2"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            />
+                            <path
+                              d="M15.416 2.08417C15.7475 1.75265 16.1972 1.56641 16.666 1.56641C17.1349 1.56641 17.5845 1.75265 17.916 2.08417C18.2475 2.41569 18.4338 2.86533 18.4338 3.33417C18.4338 3.80301 18.2475 4.25265 17.916 4.58417L9.99935 12.5008L6.66602 13.3342L7.49935 10.0008L15.416 2.08417Z"
+                              stroke="#5A596E"
+                              stroke-width="2"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            />
+                          </g>
+                          <defs>
+                            <clipPath id="clip0_3194_409">
+                              <rect width="20" height="20" fill="white" />
+                            </clipPath>
+                          </defs>
+                        </svg>
+                      </mat-icon>
+                      <span>{{ "Edit" | translate }}</span>
+                    </button>
+
+                    <button
+                      class="action-dropdown-menus"
+                      (click)="deleteIncome(displayItem.income)"
+                      mat-menu-item
+                    >
+                      <mat-icon>
+                        <svg
+                          width="20"
+                          height="20"
+                          viewBox="0 0 20 20"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M2.5 5H4.16667H17.5"
+                            stroke="#5A596E"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                          <path
+                            d="M15.8327 5.0013V16.668C15.8327 17.11 15.6571 17.5339 15.3445 17.8465C15.032 18.159 14.608 18.3346 14.166 18.3346H5.83268C5.39065 18.3346 4.96673 18.159 4.65417 17.8465C4.34161 17.5339 4.16602 17.11 4.16602 16.668V5.0013M6.66602 5.0013V3.33464C6.66602 2.89261 6.84161 2.46868 7.15417 2.15612C7.46673 1.84356 7.89065 1.66797 8.33268 1.66797H11.666C12.108 1.66797 12.532 1.84356 12.8445 2.15612C13.1571 2.46868 13.3327 2.89261 13.3327 3.33464V5.0013"
+                            stroke="#5A596E"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                          <path
+                            d="M8.33398 9.16797V14.168"
+                            stroke="#5A596E"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                          <path
+                            d="M11.666 9.16797V14.168"
+                            stroke="#5A596E"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                        </svg>
+                      </mat-icon>
+                      <span>{{ "Delete" | translate }}</span>
+                    </button>
+                  </mat-menu>
+                </div>
+              </div>
+            </mat-card-content>
+          }
+
+          @for (income of incomes; track trackByIncomeId; let i = $index) {
+            <mat-card-content class="income-items">
+              <div
+                class="dragable-card d-flex align-items-center justify-content-between cursor-pointer"
+                (click)="updateIncomeClicked(income)"
+              >
+                <div class="stats-main-wrapper">
+                  <div class="d-flex align-items-start gap-10">
+                    @if (income.amount.amount == 0) {
+                      <!-- height="32px;" -->
+                      <img
+                        [src]="
+                          '/assets/images/svgs/' + income.icon + '-gray.svg'
+                        "
+                        alt="income-icon"
+                      />
+                    } @else {
+                      <!-- height="32px;" -->
+                      <img
+                        [src]="
+                          '/assets/images/svgs/' + income.icon + '-green.svg'
+                        "
+                        alt="income-icon"
+                      />
+                    }
+                    <div class="d-flex flex-column gap-6">
+                      <h3 class="card-title">
+                        {{ income.description }}
+                      </h3>
+
+                      <h3 class="paragraph-text d-flex align-items-baseline">
+                        +{{ income.amount.currencySymbol | currencySymbol
+                        }}{{ income.amount.amount | thousandSeparator }}
+                        <span class="card-title"
+                          >/{{
+                            getCycle(income.amount.cycle?.description)
+                          }}</span
+                        >
+                      </h3>
+                    </div>
+                  </div>
+                </div>
+
+                @if (isEditableIncome(income.description)) {
+                  <div>
+                    <button
+                      mat-icon-button
+                      aria-label="icon-button with a menu"
+                      type="button"
+                      class="dropdown-button"
+                      (click)="
+                        $event.stopPropagation(); $event.preventDefault()
+                      "
+                      mat-icon-button
+                      [matMenuTriggerFor]="menu"
+                    >
+                      <mat-icon>
+                        <svg
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M12 13C12.5523 13 13 12.5523 13 12C13 11.4477 12.5523 11 12 11C11.4477 11 11 11.4477 11 12C11 12.5523 11.4477 13 12 13Z"
+                            stroke="#5A596E"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                          <path
+                            d="M12 6C12.5523 6 13 5.55228 13 5C13 4.44772 12.5523 4 12 4C11.4477 4 11 4.44772 11 5C11 5.55228 11.4477 6 12 6Z"
+                            stroke="#5A596E"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                          <path
+                            d="M12 20C12.5523 20 13 19.5523 13 19C13 18.4477 12.5523 18 12 18C11.4477 18 11 18.4477 11 19C11 19.5523 11.4477 20 12 20Z"
+                            stroke="#5A596E"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                        </svg>
+                      </mat-icon>
+                    </button>
+                    <mat-menu
+                      #menu="matMenu"
+                      xPosition="before"
+                      class="action-dropdown-menus"
+                    >
+                      <button
+                        (click)="updateIncomeClicked(income)"
+                        mat-menu-item
+                      >
+                        <mat-icon>
+                          <svg
+                            width="20"
+                            height="20"
+                            viewBox="0 0 20 20"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <g clip-path="url(#clip0_3194_409)">
+                              <path
+                                d="M9.16602 3.33203H3.33268C2.89065 3.33203 2.46673 3.50763 2.15417 3.82019C1.84161 4.13275 1.66602 4.55667 1.66602 4.9987V16.6654C1.66602 17.1074 1.84161 17.5313 2.15417 17.8439C2.46673 18.1564 2.89065 18.332 3.33268 18.332H14.9993C15.4414 18.332 15.8653 18.1564 16.1779 17.8439C16.4904 17.5313 16.666 17.1074 16.666 16.6654V10.832"
+                                stroke="#5A596E"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                              />
+                              <path
+                                d="M15.416 2.08417C15.7475 1.75265 16.1972 1.56641 16.666 1.56641C17.1349 1.56641 17.5845 1.75265 17.916 2.08417C18.2475 2.41569 18.4338 2.86533 18.4338 3.33417C18.4338 3.80301 18.2475 4.25265 17.916 4.58417L9.99935 12.5008L6.66602 13.3342L7.49935 10.0008L15.416 2.08417Z"
+                                stroke="#5A596E"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                              />
+                            </g>
+                            <defs>
+                              <clipPath id="clip0_3194_409">
+                                <rect width="20" height="20" fill="white" />
+                              </clipPath>
+                            </defs>
+                          </svg>
+                        </mat-icon>
+                        <span>{{ "Edit" | translate }}</span>
+                      </button>
+
+                      <button
+                        class="action-dropdown-menus"
+                        (click)="deleteIncome(income)"
+                        mat-menu-item
+                      >
+                        <mat-icon>
+                          <svg
+                            width="20"
+                            height="20"
+                            viewBox="0 0 20 20"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M2.5 5H4.16667H17.5"
+                              stroke="#5A596E"
+                              stroke-width="2"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            />
+                            <path
+                              d="M15.8327 5.0013V16.668C15.8327 17.11 15.6571 17.5339 15.3445 17.8465C15.032 18.159 14.608 18.3346 14.166 18.3346H5.83268C5.39065 18.3346 4.96673 18.159 4.65417 17.8465C4.34161 17.5339 4.16602 17.11 4.16602 16.668V5.0013M6.66602 5.0013V3.33464C6.66602 2.89261 6.84161 2.46868 7.15417 2.15612C7.46673 1.84356 7.89065 1.66797 8.33268 1.66797H11.666C12.108 1.66797 12.532 1.84356 12.8445 2.15612C13.1571 2.46868 13.3327 2.89261 13.3327 3.33464V5.0013"
+                              stroke="#5A596E"
+                              stroke-width="2"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            />
+                            <path
+                              d="M8.33398 9.16797V14.168"
+                              stroke="#5A596E"
+                              stroke-width="2"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            />
+                            <path
+                              d="M11.666 9.16797V14.168"
+                              stroke="#5A596E"
+                              stroke-width="2"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            />
+                          </svg>
+                        </mat-icon>
+                        <span>{{ "Delete" | translate }}</span>
+                      </button>
+                    </mat-menu>
+                  </div>
+                }
+              </div>
+            </mat-card-content>
+          }
+
+          <!-- end left column -->
+        </div>
+
+        <div class="income-wrapper">
+          <!-- right column -->
+          <mat-card class="income-header-wrapper">
+            <div class="heading-btn-wrapper">
+              <div
+                class="d-flex align-items-center justify-content-between w-100 gap-16 flex-wrap"
+              >
+                <div class="d-flex flex-column gap-12">
+                  <h3>{{ "Expenses" | translate }}</h3>
+                  <h3 class="sub-heading expense-income-red">
+                    -{{ currency | currencySymbol
+                    }}{{
+                      currentYearIncomeSummary.totalExpenses | thousandSeparator
+                    }}
+                  </h3>
+                </div>
+
+                <div class="d-flex gap-12 align-items-end">
+                  <button
+                    (click)="newExpenseClicked()"
+                    type="button"
+                    class="w-100 button-icon-outline"
+                  >
+                    <span class="f-s-16 f-w-500">{{
+                      "Add expense" | translate
+                    }}</span>
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 20 20"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M11.2478 8.7522V0H8.7522V8.7522H0V11.2478H8.7522V20H11.2478V11.2478H20V8.7522H11.2478Z"
+                        fill="#4043AF"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </mat-card>
+
+          @for (
+            expense of defautExpenses;
+            track trackByExpenseId;
+            let i = $index
+          ) {
+            <mat-card-content class="income-items">
+              <div
+                class="dragable-card d-flex align-items-center justify-content-between cursor-pointer"
+                (click)="updateExpenseClicked(expense)"
+              >
+                <div class="stats-main-wrapper">
+                  <div class="d-flex align-items-start gap-10">
+                    @if (expense.amount.amount == 0) {
+                      <img
+                        [src]="
+                          '/assets/images/svgs/' + expense.icon + '-gray.svg'
+                        "
+                        alt="income-icon"
+                      />
+                    } @else {
+                      <img
+                        [src]="
+                          '/assets/images/svgs/' + expense.icon + '-red.svg'
+                        "
+                        alt="income-icon"
+                      />
+                    }
+                    <div class="d-flex flex-column gap-6">
+                      <h3 class="card-title">
+                        {{ expense.description }}
+                      </h3>
+
+                      <div class="d-flex flex-wrap gap-12 align-items-stretch">
+                        <div>
+                          @if (expense.amount.amount == 0) {
+                            <span class="paragraph-text">{{
+                              "Set amount" | translate
+                            }}</span>
+                          } @else {
+                            <h3
+                              class="paragraph-text d-flex align-items-baseline"
+                            >
+                              -{{
+                                expense.amount.currencySymbol | currencySymbol
+                              }}{{ expense.amount.amount | thousandSeparator }}
+                              <span class="card-title"
+                                >/{{
+                                  getCycle(expense.amount.cycle?.description)
+                                }}</span
+                              >
+                            </h3>
+                          }
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <button
+                    mat-icon-button
+                    aria-label="icon-button with a menu"
+                    type="button"
+                    class="dropdown-button"
+                    (click)="$event.stopPropagation(); $event.preventDefault()"
+                    mat-icon-button
+                    [matMenuTriggerFor]="menu"
+                  >
+                    <mat-icon>
+                      <svg
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M12 13C12.5523 13 13 12.5523 13 12C13 11.4477 12.5523 11 12 11C11.4477 11 11 11.4477 11 12C11 12.5523 11.4477 13 12 13Z"
+                          stroke="#5A596E"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                        <path
+                          d="M12 6C12.5523 6 13 5.55228 13 5C13 4.44772 12.5523 4 12 4C11.4477 4 11 4.44772 11 5C11 5.55228 11.4477 6 12 6Z"
+                          stroke="#5A596E"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                        <path
+                          d="M12 20C12.5523 20 13 19.5523 13 19C13 18.4477 12.5523 18 12 18C11.4477 18 11 18.4477 11 19C11 19.5523 11.4477 20 12 20Z"
+                          stroke="#5A596E"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                    </mat-icon>
+                  </button>
+                  <mat-menu
+                    #menu="matMenu"
+                    xPosition="before"
+                    class="action-dropdown-menus"
+                  >
+                    <button
+                      (click)="updateExpenseClicked(expense)"
+                      mat-menu-item
+                    >
+                      <mat-icon>
+                        <svg
+                          width="20"
+                          height="20"
+                          viewBox="0 0 20 20"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <g clip-path="url(#clip0_3194_409)">
+                            <path
+                              d="M9.16602 3.33203H3.33268C2.89065 3.33203 2.46673 3.50763 2.15417 3.82019C1.84161 4.13275 1.66602 4.55667 1.66602 4.9987V16.6654C1.66602 17.1074 1.84161 17.5313 2.15417 17.8439C2.46673 18.1564 2.89065 18.332 3.33268 18.332H14.9993C15.4414 18.332 15.8653 18.1564 16.1779 17.8439C16.4904 17.5313 16.666 17.1074 16.666 16.6654V10.832"
+                              stroke="#5A596E"
+                              stroke-width="2"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            />
+                            <path
+                              d="M15.416 2.08417C15.7475 1.75265 16.1972 1.56641 16.666 1.56641C17.1349 1.56641 17.5845 1.75265 17.916 2.08417C18.2475 2.41569 18.4338 2.86533 18.4338 3.33417C18.4338 3.80301 18.2475 4.25265 17.916 4.58417L9.99935 12.5008L6.66602 13.3342L7.49935 10.0008L15.416 2.08417Z"
+                              stroke="#5A596E"
+                              stroke-width="2"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            />
+                          </g>
+                          <defs>
+                            <clipPath id="clip0_3194_409">
+                              <rect width="20" height="20" fill="white" />
+                            </clipPath>
+                          </defs>
+                        </svg>
+                      </mat-icon>
+                      <span>{{ "Edit" | translate }}</span>
+                    </button>
+
+                    <button
+                      class="action-dropdown-menus"
+                      (click)="deleteExpense(expense)"
+                      mat-menu-item
+                    >
+                      <mat-icon>
+                        <svg
+                          width="20"
+                          height="20"
+                          viewBox="0 0 20 20"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M2.5 5H4.16667H17.5"
+                            stroke="#5A596E"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                          <path
+                            d="M15.8327 5.0013V16.668C15.8327 17.11 15.6571 17.5339 15.3445 17.8465C15.032 18.159 14.608 18.3346 14.166 18.3346H5.83268C5.39065 18.3346 4.96673 18.159 4.65417 17.8465C4.34161 17.5339 4.16602 17.11 4.16602 16.668V5.0013M6.66602 5.0013V3.33464C6.66602 2.89261 6.84161 2.46868 7.15417 2.15612C7.46673 1.84356 7.89065 1.66797 8.33268 1.66797H11.666C12.108 1.66797 12.532 1.84356 12.8445 2.15612C13.1571 2.46868 13.3327 2.89261 13.3327 3.33464V5.0013"
+                            stroke="#5A596E"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                          <path
+                            d="M8.33398 9.16797V14.168"
+                            stroke="#5A596E"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                          <path
+                            d="M11.666 9.16797V14.168"
+                            stroke="#5A596E"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                        </svg>
+                      </mat-icon>
+                      <span>{{ "Delete" | translate }}</span>
+                    </button>
+                  </mat-menu>
+                </div>
+              </div>
+            </mat-card-content>
+          }
+
+          @for (expense of expenses; track trackByExpenseId; let i = $index) {
+            <mat-card-content class="income-items">
+              <div
+                class="dragable-card d-flex align-items-center justify-content-between cursor-pointer"
+                (click)="updateExpenseClicked(expense)"
+              >
+                <div class="stats-main-wrapper">
+                  <div class="d-flex align-items-start gap-10">
+                    @if (expense.amount.amount == 0) {
+                      <img
+                        [src]="
+                          '/assets/images/svgs/' + expense.icon + '-gray.svg'
+                        "
+                        alt="income-icon"
+                      />
+                    } @else {
+                      <img
+                        [src]="
+                          '/assets/images/svgs/' + expense.icon + '-red.svg'
+                        "
+                        alt="income-icon"
+                      />
+                    }
+
+                    <div class="d-flex flex-column gap-6">
+                      <h3 class="card-title">
+                        {{ expense.description }}
+                      </h3>
+
+                      <h3 class="paragraph-text d-flex align-items-baseline">
+                        -{{ expense.amount.currencySymbol | currencySymbol
+                        }}{{ expense.amount.amount | thousandSeparator }}
+                        <span class="card-title"
+                          >/{{
+                            getCycle(expense.amount.cycle?.description)
+                          }}</span
+                        >
+                      </h3>
+                    </div>
+                  </div>
+                </div>
+
+                @if (isEditableExpense(expense.description)) {
+                  <div>
+                    <button
+                      mat-icon-button
+                      aria-label="icon-button with a menu"
+                      type="button"
+                      class="dropdown-button"
+                      (click)="
+                        $event.stopPropagation(); $event.preventDefault()
+                      "
+                      mat-icon-button
+                      [matMenuTriggerFor]="menu"
+                    >
+                      <mat-icon>
+                        <svg
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M12 13C12.5523 13 13 12.5523 13 12C13 11.4477 12.5523 11 12 11C11.4477 11 11 11.4477 11 12C11 12.5523 11.4477 13 12 13Z"
+                            stroke="#5A596E"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                          <path
+                            d="M12 6C12.5523 6 13 5.55228 13 5C13 4.44772 12.5523 4 12 4C11.4477 4 11 4.44772 11 5C11 5.55228 11.4477 6 12 6Z"
+                            stroke="#5A596E"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                          <path
+                            d="M12 20C12.5523 20 13 19.5523 13 19C13 18.4477 12.5523 18 12 18C11.4477 18 11 18.4477 11 19C11 19.5523 11.4477 20 12 20Z"
+                            stroke="#5A596E"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                        </svg>
+                      </mat-icon>
+                    </button>
+                    <mat-menu
+                      #menu="matMenu"
+                      xPosition="before"
+                      class="action-dropdown-menus"
+                    >
+                      <button
+                        (click)="updateExpenseClicked(expense)"
+                        mat-menu-item
+                      >
+                        <mat-icon>
+                          <svg
+                            width="20"
+                            height="20"
+                            viewBox="0 0 20 20"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <g clip-path="url(#clip0_3194_409)">
+                              <path
+                                d="M9.16602 3.33203H3.33268C2.89065 3.33203 2.46673 3.50763 2.15417 3.82019C1.84161 4.13275 1.66602 4.55667 1.66602 4.9987V16.6654C1.66602 17.1074 1.84161 17.5313 2.15417 17.8439C2.46673 18.1564 2.89065 18.332 3.33268 18.332H14.9993C15.4414 18.332 15.8653 18.1564 16.1779 17.8439C16.4904 17.5313 16.666 17.1074 16.666 16.6654V10.832"
+                                stroke="#5A596E"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                              />
+                              <path
+                                d="M15.416 2.08417C15.7475 1.75265 16.1972 1.56641 16.666 1.56641C17.1349 1.56641 17.5845 1.75265 17.916 2.08417C18.2475 2.41569 18.4338 2.86533 18.4338 3.33417C18.4338 3.80301 18.2475 4.25265 17.916 4.58417L9.99935 12.5008L6.66602 13.3342L7.49935 10.0008L15.416 2.08417Z"
+                                stroke="#5A596E"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                              />
+                            </g>
+                            <defs>
+                              <clipPath id="clip0_3194_409">
+                                <rect width="20" height="20" fill="white" />
+                              </clipPath>
+                            </defs>
+                          </svg>
+                        </mat-icon>
+                        <span>{{ "Edit" | translate }}</span>
+                      </button>
+
+                      <button
+                        class="action-dropdown-menus"
+                        (click)="deleteExpense(expense)"
+                        mat-menu-item
+                      >
+                        <mat-icon>
+                          <svg
+                            width="20"
+                            height="20"
+                            viewBox="0 0 20 20"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M2.5 5H4.16667H17.5"
+                              stroke="#5A596E"
+                              stroke-width="2"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            />
+                            <path
+                              d="M15.8327 5.0013V16.668C15.8327 17.11 15.6571 17.5339 15.3445 17.8465C15.032 18.159 14.608 18.3346 14.166 18.3346H5.83268C5.39065 18.3346 4.96673 18.159 4.65417 17.8465C4.34161 17.5339 4.16602 17.11 4.16602 16.668V5.0013M6.66602 5.0013V3.33464C6.66602 2.89261 6.84161 2.46868 7.15417 2.15612C7.46673 1.84356 7.89065 1.66797 8.33268 1.66797H11.666C12.108 1.66797 12.532 1.84356 12.8445 2.15612C13.1571 2.46868 13.3327 2.89261 13.3327 3.33464V5.0013"
+                              stroke="#5A596E"
+                              stroke-width="2"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            />
+                            <path
+                              d="M8.33398 9.16797V14.168"
+                              stroke="#5A596E"
+                              stroke-width="2"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            />
+                            <path
+                              d="M11.666 9.16797V14.168"
+                              stroke="#5A596E"
+                              stroke-width="2"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            />
+                          </svg>
+                        </mat-icon>
+                        <span>{{ "Delete" | translate }}</span>
+                      </button>
+                    </mat-menu>
+                  </div>
+                }
+              </div>
+            </mat-card-content>
+          }
+
+          <!-- right column -->
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+} @else {
+  <div class="h-300">
+    <mat-spinner></mat-spinner>
+  </div>
+}

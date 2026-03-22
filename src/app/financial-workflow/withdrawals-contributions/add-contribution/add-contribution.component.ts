@@ -41,7 +41,11 @@ import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 import { TranslateModule } from '@ngx-translate/core';
-import { extractEventId, resolveYear } from 'src/app/shared/utils/event-date-utils';
+import {
+  extractEventId,
+  resolveYear,
+} from 'src/app/shared/utils/event-date-utils';
+import { MaterialModule } from 'src/app/material.module';
 
 @Component({
   selector: 'app-add-contribution',
@@ -60,7 +64,8 @@ import { extractEventId, resolveYear } from 'src/app/shared/utils/event-date-uti
     MatCheckboxModule,
     ThousandSeparatorPipe,
     ThousandSeparatorInputDirective,
-    TranslateModule
+    TranslateModule,
+    MaterialModule,
   ],
   providers: [provideNativeDateAdapter()],
   templateUrl: './add-contribution.component.html',
@@ -87,7 +92,7 @@ export class AddContributionComponent {
 
   // 🔽 New helpers for filtering
   allClientSavings: ClientSaving[] = [];
-  clientSavings: ClientSaving[] = [];  // <-- bound in template
+  clientSavings: ClientSaving[] = []; // <-- bound in template
   private cashPot?: ClientSaving;
   currentYear: number = new Date().getFullYear();
 
@@ -95,7 +100,7 @@ export class AddContributionComponent {
     private dialogRef: MatDialogRef<AddContributionComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private fb: FormBuilder,
-    private withdrawalsContributionsHttpService: WithdrawalsContributionsHttpService
+    private withdrawalsContributionsHttpService: WithdrawalsContributionsHttpService,
   ) {
     this.eventsList = data.eventsList ?? [];
     this.cycles = data.amountCycles;
@@ -123,12 +128,12 @@ export class AddContributionComponent {
     // keep originals and find Cash pot
     this.allClientSavings = (this.savingPots?.clientSavings ?? []).slice();
     this.cashPot = this.allClientSavings.find(
-      (s) => (s.name ?? '').toLowerCase() === 'cash'
+      (s) => (s.name ?? '').toLowerCase() === 'cash',
     );
 
     const endYear = data.forecastEndDateYear + 1;
     const iterations = endYear - data.forecastStartDateYear + 1;
-    
+
     for (let i = 0; i < iterations; i++) {
       this.years.push(data.forecastStartDateYear + i);
     }
@@ -163,7 +168,8 @@ export class AddContributionComponent {
 
     if (this.isEditWorkflow) {
       // hydrate commission
-      const pctInit = this.selectedContribution?.comission?.percentage?.amount ?? 0;
+      const pctInit =
+        this.selectedContribution?.comission?.percentage?.amount ?? 0;
       const hasCommInit = pctInit > 0;
 
       // hydrate core fields
@@ -186,7 +192,8 @@ export class AddContributionComponent {
       setTimeout(() => {
         const el = this.amountInput?.nativeElement;
         const amount = this.contributionForm.get('amount')?.value;
-        if (!el || amount === null || amount === undefined || amount === '') return;
+        if (!el || amount === null || amount === undefined || amount === '')
+          return;
         el.value = Number(amount).toLocaleString('en-US');
         el.dispatchEvent(new Event('blur'));
       });
@@ -208,18 +215,24 @@ export class AddContributionComponent {
       // }
 
       const savedId = this.selectedContribution.associatedSavingPotId;
-      const type = Number(this.contributionForm.get('contributionType')?.value ?? 1);
+      const type = Number(
+        this.contributionForm.get('contributionType')?.value ?? 1,
+      );
 
       if (type === 1) {
         // Cash mode: do NOT show Cash in list; preselect only if savedId is non-cash and present
-        if (savedId && savedId !== this.cashPot?.id && this.clientSavings.some(s => s.id === savedId)) {
+        if (
+          savedId &&
+          savedId !== this.cashPot?.id &&
+          this.clientSavings.some((s) => s.id === savedId)
+        ) {
           this.contributionForm.get('savingPot')?.patchValue(savedId);
         } else {
           this.contributionForm.get('savingPot')?.patchValue(null);
         }
       } else {
         // External mode: show all, including Cash
-        if (savedId && this.clientSavings.some(s => s.id === savedId)) {
+        if (savedId && this.clientSavings.some((s) => s.id === savedId)) {
           this.contributionForm.get('savingPot')?.patchValue(savedId);
         } else {
           this.contributionForm.get('savingPot')?.patchValue(null);
@@ -227,31 +240,45 @@ export class AddContributionComponent {
       }
 
       // const pct = this.selectedContribution?.comission?.percentage?.amount ?? 0;
-      const pct = this.selectedContribution?.comission?.percentage?.amount ?? null;
+      const pct =
+        this.selectedContribution?.comission?.percentage?.amount ?? null;
       const hasComm = pct > 0;
       this.contributionForm.get('commissions')?.patchValue(hasComm);
-      this.contributionForm.get('commissionPercentage')?.patchValue(pct === 0 ? null : pct);
+      this.contributionForm
+        .get('commissionPercentage')
+        ?.patchValue(pct === 0 ? null : pct);
       this.isCommissionsChanged(hasCommInit);
       this.onCycleValueChange(this.selectedContribution.amount.cycle?.id);
     }
 
-    const matchedEscalation = this.escalationRates.find(x => x.value === this.selectedContribution?.escalationRate?.value);
+    const matchedEscalation = this.escalationRates.find(
+      (x) => x.value === this.selectedContribution?.escalationRate?.value,
+    );
 
     if (matchedEscalation) {
-      this.contributionForm.get('escalationRate')?.patchValue(matchedEscalation.value);
+      this.contributionForm
+        .get('escalationRate')
+        ?.patchValue(matchedEscalation.value);
       this.selectedEscalationDescription = matchedEscalation.description;
     } else if (
       this.selectedContribution?.escalationRate &&
-      this.selectedContribution?.escalationRate.description === 'Increases at custom rate'
+      this.selectedContribution?.escalationRate.description ===
+        'Increases at custom rate'
     ) {
-      this.escalationRates = this.escalationRates.filter(x => x.description !== 'Increases at custom rate')
+      this.escalationRates = this.escalationRates.filter(
+        (x) => x.description !== 'Increases at custom rate',
+      );
       this.escalationRates.push({
         description: 'Increases at custom rate',
-        value: this.selectedContribution?.escalationRate.value
+        value: this.selectedContribution?.escalationRate.value,
       });
 
-      this.contributionForm.get('escalationRate')?.patchValue(this.selectedContribution?.escalationRate.value);
-      this.contributionForm.get('customEscalationRate')?.patchValue(this.selectedContribution?.escalationRate.value);
+      this.contributionForm
+        .get('escalationRate')
+        ?.patchValue(this.selectedContribution?.escalationRate.value);
+      this.contributionForm
+        .get('customEscalationRate')
+        ?.patchValue(this.selectedContribution?.escalationRate.value);
       this.selectedEscalationDescription = 'Increases at custom rate';
 
       // Trigger validators for custom rate
@@ -259,7 +286,6 @@ export class AddContributionComponent {
       customControl?.setValidators([Validators.required, Validators.min(0)]);
       customControl?.updateValueAndValidity();
     }
-
   }
 
   get dialogTitle(): string {
@@ -289,7 +315,9 @@ export class AddContributionComponent {
   }
 
   onCycleValueChange(event: any) {
-    const isOneOff = this.cycles.find(cycle => cycle.id === event)?.description === 'One-off';
+    const isOneOff =
+      this.cycles.find((cycle) => cycle.id === event)?.description ===
+      'One-off';
     this.showStartEnd = !isOneOff;
 
     if (!this.showStartEnd) {
@@ -356,17 +384,23 @@ export class AddContributionComponent {
   // }
 
   private applySavingPotFilter(): void {
-    const type = Number(this.contributionForm.get('contributionType')?.value ?? 1);
+    const type = Number(
+      this.contributionForm.get('contributionType')?.value ?? 1,
+    );
 
     if (type === 1) {
       // Cash selected ➜ hide Cash from the dropdown
       this.clientSavings = (this.allClientSavings ?? []).filter(
-        (s) => (s.name ?? '').toLowerCase() !== 'cash'
+        (s) => (s.name ?? '').toLowerCase() !== 'cash',
       );
 
       // if previously selected is Cash (or not in list), clear it
       const currentId = this.contributionForm.get('savingPot')?.value;
-      if (!currentId || currentId === this.cashPot?.id || !this.clientSavings.some(s => s.id === currentId)) {
+      if (
+        !currentId ||
+        currentId === this.cashPot?.id ||
+        !this.clientSavings.some((s) => s.id === currentId)
+      ) {
         this.contributionForm.get('savingPot')?.setValue(null);
       }
     } else {
@@ -375,12 +409,11 @@ export class AddContributionComponent {
 
       // keep current selection if still valid; otherwise clear
       const currentId = this.contributionForm.get('savingPot')?.value;
-      if (currentId && !this.clientSavings.some(s => s.id === currentId)) {
+      if (currentId && !this.clientSavings.some((s) => s.id === currentId)) {
         this.contributionForm.get('savingPot')?.setValue(null);
       }
     }
   }
-
 
   //   private applySavingPotFilter(): void {
   //   // Show everything, no filtering based on type
@@ -404,11 +437,14 @@ export class AddContributionComponent {
 
     const hasCommission = !!this.contributionForm.get('commissions')?.value;
     const commissionPct = Number(
-      this.contributionForm.get('commissionPercentage')?.value ?? 0
+      this.contributionForm.get('commissionPercentage')?.value ?? 0,
     );
 
-    const selectedPotId: string | null = this.contributionForm.get('savingPot')?.value ?? null;
-    const type = Number(this.contributionForm.get('contributionType')?.value ?? 1);
+    const selectedPotId: string | null =
+      this.contributionForm.get('savingPot')?.value ?? null;
+    const type = Number(
+      this.contributionForm.get('contributionType')?.value ?? 1,
+    );
 
     // helper NetAmount shells
     const emptyCycle = { id: '', description: '' };
@@ -425,7 +461,7 @@ export class AddContributionComponent {
       ? this.contributionForm.get('customEscalationRate')?.value
       : this.contributionForm.get('escalationRate')?.value;
     const matchedRate = this.escalationRates.find(
-      (x) => x.value === escalationRateValue
+      (x) => x.value === escalationRateValue,
     );
 
     const startVal = this.contributionForm.get('start')?.value;
@@ -448,15 +484,15 @@ export class AddContributionComponent {
         startYear,
         endYear,
         startEventId,
-        endEventId
+        endEventId,
       );
       return;
     }
 
     const associatedSavingPotId =
       type === 1
-        ? (selectedPotId || this.cashPot?.id || '')
-        : (selectedPotId || '');
+        ? selectedPotId || this.cashPot?.id || ''
+        : selectedPotId || '';
 
     const contribution: FundsViewModel = {
       id: this.isEditWorkflow ? this.selectedContribution.id : null,
@@ -469,7 +505,7 @@ export class AddContributionComponent {
           id: this.contributionForm.get('cycle')?.value ?? '',
           description:
             this.cycles.find(
-              (x) => x.id === this.contributionForm.get('cycle')?.value
+              (x) => x.id === this.contributionForm.get('cycle')?.value,
             )?.description ?? '',
         },
       },
@@ -485,48 +521,49 @@ export class AddContributionComponent {
       endEventId,
       escalationRate:
         escalationRateValue !== null && escalationRateValue !== ''
-          ? matchedRate ?? {
-            description: this.selectedEscalationDescription ?? '',
-            value: escalationRateValue,
-          }
+          ? (matchedRate ?? {
+              description: this.selectedEscalationDescription ?? '',
+              value: escalationRateValue,
+            })
           : { description: '', value: 0 },
 
-      contributionType: Number(this.contributionForm.get('contributionType')?.value),
+      contributionType: Number(
+        this.contributionForm.get('contributionType')?.value,
+      ),
 
       // commission payload (percentage-only)
       hasCommission: hasCommission,
       comission: hasCommission
         ? {
-          type: ComissionType.Percentage,
-          amount: emptyNetAmount, // not used here
-          percentage: {
-            amount: commissionPct, // e.g. 2.5
-            currencySymbol: '',
-            cycle: emptyCycle,
-          },
-          // IMPORTANT: value is a string per your Comission model typing
-          escalationRate: { description: '', value: '0' },
-        }
+            type: ComissionType.Percentage,
+            amount: emptyNetAmount, // not used here
+            percentage: {
+              amount: commissionPct, // e.g. 2.5
+              currencySymbol: '',
+              cycle: emptyCycle,
+            },
+            // IMPORTANT: value is a string per your Comission model typing
+            escalationRate: { description: '', value: '0' },
+          }
         : {
-          // send empty-but-valid object when disabled
-          type: ComissionType.Percentage, // keep consistent with your API
-          amount: emptyNetAmount,
-          percentage: emptyNetAmount,
-          escalationRate: { description: '', value: '0' },
-        },
+            // send empty-but-valid object when disabled
+            type: ComissionType.Percentage, // keep consistent with your API
+            amount: emptyNetAmount,
+            percentage: emptyNetAmount,
+            escalationRate: { description: '', value: '0' },
+          },
     };
 
     let action$ = this.withdrawalsContributionsHttpService.addContributions(
       this.cashflowId,
-      contribution
+      contribution,
     );
 
     if (this.isEditWorkflow) {
-      action$ =
-        this.withdrawalsContributionsHttpService.updateContributions(
-          this.cashflowId,
-          contribution
-        );
+      action$ = this.withdrawalsContributionsHttpService.updateContributions(
+        this.cashflowId,
+        contribution,
+      );
     }
 
     action$
@@ -535,7 +572,7 @@ export class AddContributionComponent {
         catchError((err) => {
           console.error(err);
           throw err;
-        })
+        }),
       )
       .subscribe((res) => {
         this.dialogRef.close({
@@ -556,7 +593,7 @@ export class AddContributionComponent {
     startYear: number,
     endYear: number,
     startEventId: string | null,
-    endEventId: string | null
+    endEventId: string | null,
   ): void {
     const associatedSavingPotId = selectedPotId || '';
     const baseContribution: Omit<FundsViewModel, 'contributionType'> = {
@@ -570,7 +607,7 @@ export class AddContributionComponent {
           id: this.contributionForm.get('cycle')?.value ?? '',
           description:
             this.cycles.find(
-              (x) => x.id === this.contributionForm.get('cycle')?.value
+              (x) => x.id === this.contributionForm.get('cycle')?.value,
             )?.description ?? '',
         },
       },
@@ -586,29 +623,29 @@ export class AddContributionComponent {
       endEventId,
       escalationRate:
         escalationRateValue !== null && escalationRateValue !== ''
-          ? matchedRate ?? {
-            description: this.selectedEscalationDescription ?? '',
-            value: String(escalationRateValue),
-          }
+          ? (matchedRate ?? {
+              description: this.selectedEscalationDescription ?? '',
+              value: String(escalationRateValue),
+            })
           : { description: '', value: '0' },
       hasCommission: hasCommission,
       comission: hasCommission
         ? {
-          type: ComissionType.Percentage,
-          amount: emptyNetAmount,
-          percentage: {
-            amount: commissionPct,
-            currencySymbol: '',
-            cycle: emptyCycle,
-          },
-          escalationRate: { description: '', value: '0' },
-        }
+            type: ComissionType.Percentage,
+            amount: emptyNetAmount,
+            percentage: {
+              amount: commissionPct,
+              currencySymbol: '',
+              cycle: emptyCycle,
+            },
+            escalationRate: { description: '', value: '0' },
+          }
         : {
-          type: ComissionType.Percentage,
-          amount: emptyNetAmount,
-          percentage: emptyNetAmount,
-          escalationRate: { description: '', value: '0' },
-        },
+            type: ComissionType.Percentage,
+            amount: emptyNetAmount,
+            percentage: emptyNetAmount,
+            escalationRate: { description: '', value: '0' },
+          },
     };
 
     const contributionCash: FundsViewModel = {
@@ -626,14 +663,14 @@ export class AddContributionComponent {
         concatMap((res) =>
           this.withdrawalsContributionsHttpService.addContributions(
             this.cashflowId,
-            contributionExternal
-          )
+            contributionExternal,
+          ),
         ),
         filter((res) => !!res),
         catchError((err) => {
           console.error(err);
           throw err;
-        })
+        }),
       )
       .subscribe((res) => {
         this.dialogRef.close({
@@ -695,7 +732,12 @@ export class AddContributionComponent {
 
   private setDefaultStartEndDates(): void {
     const startControl = this.contributionForm.get('start');
-    if (startControl && (startControl.value === null || startControl.value === undefined || startControl.value === '')) {
+    if (
+      startControl &&
+      (startControl.value === null ||
+        startControl.value === undefined ||
+        startControl.value === '')
+    ) {
       startControl.setValue(this.currentYear);
     }
 
@@ -704,18 +746,29 @@ export class AddContributionComponent {
     if (!endControl || !retirementEvent) return;
 
     const retirementYear = retirementEvent?.start?.year;
-    if (retirementYear === null || retirementYear === undefined || retirementYear === '') return;
-    if (endControl.value === null || endControl.value === undefined || endControl.value === '') {
+    if (
+      retirementYear === null ||
+      retirementYear === undefined ||
+      retirementYear === ''
+    )
+      return;
+    if (
+      endControl.value === null ||
+      endControl.value === undefined ||
+      endControl.value === ''
+    ) {
       endControl.setValue(retirementYear);
     }
   }
 
   private getRetirementEvent(): any | null {
     const events = this.eventsList ?? [];
-    return events.find(
-      (event: any) =>
-        (event?.name ?? '').toString().toLowerCase() === 'retirement age'
-    ) ?? null;
+    return (
+      events.find(
+        (event: any) =>
+          (event?.name ?? '').toString().toLowerCase() === 'retirement age',
+      ) ?? null
+    );
   }
 
   private setDefaultSavingPot(): void {
@@ -730,7 +783,7 @@ export class AddContributionComponent {
       const usedPotIds = this.getExistingContributionPotIds();
       if (usedPotIds.length > 0) {
         const unused = nonCashSavings.filter(
-          (pot) => pot.id && !usedPotIds.includes(pot.id)
+          (pot) => pot.id && !usedPotIds.includes(pot.id),
         );
         if (unused.length > 0) {
           candidates = unused;
@@ -741,7 +794,10 @@ export class AddContributionComponent {
     const defaultPot = this.getLargestPot(candidates);
     if (!defaultPot) return;
 
-    if (this.clientSavings?.length && !this.clientSavings.some((pot) => pot.id === defaultPot.id)) {
+    if (
+      this.clientSavings?.length &&
+      !this.clientSavings.some((pot) => pot.id === defaultPot.id)
+    ) {
       return;
     }
 
@@ -750,7 +806,7 @@ export class AddContributionComponent {
 
   private getNonCashSavings(): ClientSaving[] {
     return (this.allClientSavings ?? []).filter(
-      (pot) => (pot.name ?? '').toLowerCase() !== 'cash'
+      (pot) => (pot.name ?? '').toLowerCase() !== 'cash',
     );
   }
 
@@ -782,8 +838,11 @@ export class AddContributionComponent {
 
   private getDescriptionForSubmit(): string {
     const selectedPotId = this.contributionForm.get('savingPot')?.value ?? null;
-    const type = Number(this.contributionForm.get('contributionType')?.value ?? 1);
-    const effectiveId = type === 1 ? (selectedPotId || this.cashPot?.id) : selectedPotId;
+    const type = Number(
+      this.contributionForm.get('contributionType')?.value ?? 1,
+    );
+    const effectiveId =
+      type === 1 ? selectedPotId || this.cashPot?.id : selectedPotId;
     const pot = (this.allClientSavings ?? []).find((p) => p.id === effectiveId);
     return this.buildDefaultDescription(pot?.name);
   }
@@ -798,12 +857,17 @@ export class AddContributionComponent {
   }
 
   getStartYear(): number {
-    return resolveYear(this.contributionForm.get('start')?.value, this.eventsList);
+    return resolveYear(
+      this.contributionForm.get('start')?.value,
+      this.eventsList,
+    );
   }
 
   getEndEvents(): any[] {
     const startYear = this.getStartYear();
-    return (this.eventsList ?? []).filter((e: any) => (e?.start?.year ?? 0) >= startYear);
+    return (this.eventsList ?? []).filter(
+      (e: any) => (e?.start?.year ?? 0) >= startYear,
+    );
   }
 
   getEndYears(): number[] {

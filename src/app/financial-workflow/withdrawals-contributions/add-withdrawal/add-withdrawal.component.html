@@ -1,35 +1,75 @@
 <!--  Add Expense-->
 <div class="w-100">
-  <div class="d-flex flex-column gap-32">
+  <div class="d-flex flex-column">
     <!-- Modal Header  -->
-    <div class="d-flex align-items-center justify-content-between gap-10 modal-header">
-      <div class="d-flex align-items-center gap-8">
-        <h3>{{ dialogTitle }}</h3>
-      </div>
-      <button (click)="closeDialog()" type="button">
-        <img src="assets/images/svgs/close-line-cion.svg" alt="close-line-cion" />
+    <div class="dialog-header">
+      <h2 class="dialog-title text-center">
+        {{ dialogTitle }}
+      </h2>
+      <button
+        type="button"
+        mat-icon-button
+        disableRipple
+        class="dialog-close-btn"
+        mat-dialog-close
+        aria-label="Close dialog"
+        (click)="closeDialog()"
+      >
+        <mat-icon>close</mat-icon>
       </button>
     </div>
+
     <!-- End Modal Header  -->
 
     <!-- Modal Body  -->
-    <mat-dialog-content>
-      <div [formGroup]="withdrawalForm" class="d-flex flex-column gap-20">
+    <mat-dialog-content class="event-dialog-content">
+      <div [formGroup]="withdrawalForm" class="d-flex flex-column gap-16">
         <div class="start-end">
-          <div class="d-flex flex-column gap-12">
+          <div class="d-flex flex-column gap-8">
             <div class="d-flex gap-8 align-items-center">
-              <mat-label class="f-s-16 f-w-400 d-block">Withdraw from saving pot</mat-label>
-              <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
+              <mat-label class="f-s-16 f-w-500 ibr-black d-block"
+                >Withdraw from saving pot</mat-label
+              >
+              <img
+                width="18"
+                src="assets/images/svgs/help-circle-icon.svg"
+                alt="help-circle-icon"
+              />
             </div>
-            <div class="row justify-content-between align-items-start flex-nowrap">
+            <div
+              class="row justify-content-between align-items-start flex-nowrap"
+            >
               <div class="w-100">
                 <div class="w-100 form-field">
-                  <div class="select-option">
-                    <mat-select value="Select" formControlName="savingPot" hideSingleSelectionIndicator>
+                  <div class="select-option position-relative">
+                    <mat-select
+                      value="Select"
+                      formControlName="savingPot"
+                      hideSingleSelectionIndicator
+                    >
                       @for (saving of savingPots.clientSavings; track saving) {
-                      <mat-option [value]="saving.id">{{ saving.name }}</mat-option>
+                        <mat-option [value]="saving.id">{{
+                          saving.name
+                        }}</mat-option>
                       }
                     </mat-select>
+                    <span class="custom-arrow">
+                      <svg
+                        width="12"
+                        height="7"
+                        viewBox="0 0 12 7"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M1 1L6 6L11 1"
+                          stroke="#2B3942"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                    </span>
                   </div>
                 </div>
               </div>
@@ -40,30 +80,73 @@
         <!-- Net Amount Field  -->
         <div class="d-flex flex-column gap-4 net-fields">
           <div class="d-flex flex-column gap-8">
-            <mat-label class="f-s-16 d-block" style="line-height: 18px">{{ 'Net amount' | translate }}</mat-label>
+            <mat-label
+              class="f-s-16 d-block f-w-500 ibr-black"
+              style="line-height: 16px"
+              >{{ "Net amount" | translate }}</mat-label
+            >
             <div class="net-field d-flex align-items-center">
-              <div class="left  hide-arrow">
-                <mat-select formControlName="currencySymbol" class="sortby-edit-profile" [disabled]="true"
-                  hideSingleSelectionIndicator>
+              <div class="left hide-arrow">
+                <mat-select
+                  formControlName="currencySymbol"
+                  class="sortby-edit-profile"
+                  [disabled]="true"
+                  hideSingleSelectionIndicator
+                >
                   @for (country of countries; track country) {
-                  @if(country.currencySymbol) {
-                  <mat-option [value]="country.currencySymbol">{{ country.currencySymbol }}</mat-option>
-                  }
+                    @if (country.currencySymbol) {
+                      <mat-option [value]="country.currencySymbol">{{
+                        country.currencySymbol
+                      }}</mat-option>
+                    }
                   }
                 </mat-select>
               </div>
               <div class="w-100 form-field">
-                <input matInput type="text" formControlName="amount" #amountInput
-                  [value]="withdrawalForm.get('amount')?.value | thousandSeparator" thousandSeparatorInput
-                  (input)="onAmountInput($event.target.value)" placeholder="0" />
+                <input
+                  matInput
+                  type="text"
+                  formControlName="amount"
+                  #amountInput
+                  [value]="
+                    withdrawalForm.get('amount')?.value | thousandSeparator
+                  "
+                  thousandSeparatorInput
+                  (input)="onAmountInput($event.target.value)"
+                  placeholder="0"
+                />
               </div>
-              <div class="right">
-                <mat-select (valueChange)="onCycleValueChange($event)" value="Select" formControlName="cycle"
-                  class="sortby-edit-profile" hideSingleSelectionIndicator>
+              <div class="right position-relative">
+                <mat-select
+                  (valueChange)="onCycleValueChange($event)"
+                  value="Select"
+                  formControlName="cycle"
+                  class="sortby-edit-profile"
+                  hideSingleSelectionIndicator
+                >
                   @for (cycle of cycles; track cycle) {
-                  <mat-option [value]="cycle.id">{{ cycle.description }}</mat-option>
+                    <mat-option [value]="cycle.id">{{
+                      cycle.description
+                    }}</mat-option>
                   }
                 </mat-select>
+                <span class="custom-arrow">
+                  <svg
+                    width="12"
+                    height="7"
+                    viewBox="0 0 12 7"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M1 1L6 6L11 1"
+                      stroke="#2B3942"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </span>
               </div>
             </div>
           </div>
@@ -71,73 +154,163 @@
 
         <!-- Start/End -->
         <div class="start-end">
-          <div class="d-flex flex-column gap-12">
+          <div class="d-flex flex-column gap-8">
             <div class="d-flex gap-8 align-items-center">
-              <mat-label class="f-s-16 f-w-400 d-block">@if(showStartEnd) {Start & end} @else {Date}</mat-label>
-              <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
+              <mat-label
+                class="f-s-16 f-w-400 ibr-black d-block"
+                style="line-height: 16px"
+              >
+                @if (showStartEnd) {
+                  Start & end
+                } @else {
+                  Date
+                }
+              </mat-label>
+              <img
+                width="18"
+                src="assets/images/svgs/help-circle-icon.svg"
+                alt="help-circle-icon"
+              />
             </div>
-            <div class="row justify-content-between align-items-start flex-nowrap">
+            <div
+              class="row justify-content-between align-items-start flex-nowrap"
+            >
               <div [className]="showStartEnd ? 'col-6' : 'w-100'">
                 <div class="w-100 form-field">
-                  <div class="select-option">
-                    <mat-select value="Select" formControlName="start" hideSingleSelectionIndicator>
-                      @if(isEditWorkflow || eventsList?.length > 0)
-                        {
-                          <mat-option [value]="currentYear">This year ({{ currentYear }})</mat-option>
-                        }
+                  <div class="select-option position-relative">
+                    <mat-select
+                      value="Select"
+                      formControlName="start"
+                      hideSingleSelectionIndicator
+                    >
+                      @if (isEditWorkflow || eventsList?.length > 0) {
+                        <mat-option [value]="currentYear"
+                          >This year ({{ currentYear }})</mat-option
+                        >
+                      }
                       @for (event of eventsList; track event) {
-                      <mat-option [value]="'event:' + event.id">{{ event.name }} ({{ getAgeForYear(event.start.year) }})</mat-option>
+                        <mat-option [value]="'event:' + event.id"
+                          >{{ event.name }} ({{
+                            getAgeForYear(event.start.year)
+                          }})</mat-option
+                        >
                       }
-                      <hr>
+                      <hr />
                       @for (year of years; let i = $index; track year) {
-                      <mat-option [value]="year">{{ year }} ({{ clientAge + i }})</mat-option>
+                        <mat-option [value]="year"
+                          >{{ year }} ({{ clientAge + i }})</mat-option
+                        >
                       }
                     </mat-select>
+                    <span class="custom-arrow">
+                      <svg
+                        width="12"
+                        height="7"
+                        viewBox="0 0 12 7"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M1 1L6 6L11 1"
+                          stroke="#2B3942"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                    </span>
                   </div>
-                  @if(withdrawalForm.get('start')?.touched && withdrawalForm.get('start')?.hasError('required')) {
-                  <!-- <span class="field-error d-block">Start is required</span> -->
-                  <span class="field-error d-block">{{'Required' | translate}}</span>
-
+                  @if (
+                    withdrawalForm.get("start")?.touched &&
+                    withdrawalForm.get("start")?.hasError("required")
+                  ) {
+                    <!-- <span class="field-error d-block">Start is required</span> -->
+                    <span class="field-error d-block">{{
+                      "Required" | translate
+                    }}</span>
                   }
                 </div>
               </div>
 
-              @if(showStartEnd) {
-              <div class="d-flex justify-content-start align-items-start">
-                <img src="assets/images/svgs/chevron-right-date-icon.svg" alt="chevron-right-date-icon" />
-              </div>
-              <div class="col-6">
-                <div class="w-100 form-field">
-                  <div class="select-option">
-                    <mat-select value="Select" formControlName="end" hideSingleSelectionIndicator>
-                      @if((isEditWorkflow || eventsList?.length > 0) && currentYear >= getStartYear())
-                        {
-                          <mat-option [value]="currentYear">This year ({{ currentYear }})</mat-option>
+              @if (showStartEnd) {
+                <div class="d-flex justify-content-start align-items-start">
+                  <img
+                    src="assets/images/svgs/chevron-right-date-icon.svg"
+                    alt="chevron-right-date-icon"
+                  />
+                </div>
+                <div class="col-6">
+                  <div class="w-100 form-field">
+                    <div class="select-option position-relative">
+                      <mat-select
+                        value="Select"
+                        formControlName="end"
+                        hideSingleSelectionIndicator
+                      >
+                        @if (
+                          (isEditWorkflow || eventsList?.length > 0) &&
+                          currentYear >= getStartYear()
+                        ) {
+                          <mat-option [value]="currentYear"
+                            >This year ({{ currentYear }})</mat-option
+                          >
                         }
-                      @for (event of getEndEvents(); track event.id) {
-                      <mat-option [value]="'event:' + event.id">{{ event.name }} ({{ getAgeForYear(event.start.year) }})</mat-option>
-                      }
-                      <hr>
-                      @for (year of getEndYears(); track year) {
-                      <mat-option [value]="year">{{ year }} ({{ getAgeForYear(year) }})</mat-option>
-                      }
-                    </mat-select>
+                        @for (event of getEndEvents(); track event.id) {
+                          <mat-option [value]="'event:' + event.id"
+                            >{{ event.name }} ({{
+                              getAgeForYear(event.start.year)
+                            }})</mat-option
+                          >
+                        }
+                        <hr />
+                        @for (year of getEndYears(); track year) {
+                          <mat-option [value]="year"
+                            >{{ year }} ({{ getAgeForYear(year) }})</mat-option
+                          >
+                        }
+                      </mat-select>
+                      <span class="custom-arrow">
+                        <svg
+                          width="12"
+                          height="7"
+                          viewBox="0 0 12 7"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M1 1L6 6L11 1"
+                            stroke="#2B3942"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                        </svg>
+                      </span>
+                    </div>
+                    @if (
+                      withdrawalForm.get("end")?.touched &&
+                      withdrawalForm.get("end")?.hasError("required")
+                    ) {
+                      <!-- <span class="field-error d-block">End is required</span> -->
+                      <span class="field-error d-block">{{
+                        "Required" | translate
+                      }}</span>
+                    }
+                    @if (
+                      withdrawalForm.get("end")?.touched &&
+                      withdrawalForm.get("end")?.hasError("endBeforeStart")
+                    ) {
+                      <span class="field-error d-block"
+                        >End year cannot be before start year</span
+                      >
+                    }
                   </div>
-                  @if(withdrawalForm.get('end')?.touched && withdrawalForm.get('end')?.hasError('required')) {
-                  <!-- <span class="field-error d-block">End is required</span> -->
-                  <span class="field-error d-block">{{'Required' | translate}}</span>
-
-                  }
-                  @if(withdrawalForm.get('end')?.touched && withdrawalForm.get('end')?.hasError('endBeforeStart')) {
-                  <span class="field-error d-block">End year cannot be before start year</span>
-                  }
                 </div>
-              </div>
               }
             </div>
           </div>
         </div>
-        
+
         <!-- @if(showStartEnd) {
         <div class="w-100 form-field gap-20">
           <div class="w-100 form-field gap-8 ">
@@ -180,15 +353,22 @@
     </mat-dialog-content>
 
     <!-- Modal Action Button  -->
-    <div class="row justify-content-between modal-action">
-      <div class="col-5">
-        <button (click)="closeDialog()" class="button-icon-outline w-100 d-block">
-          <span class="f-s-16">{{ 'Cancel' | translate }}</span>
+    <div class="d-flex justify-content-end modal-action gap-16 p-t-24">
+      <div>
+        <button
+          (click)="closeDialog()"
+          class="button-icon-outline w-100 d-block"
+        >
+          <span class="f-s-16">{{ "Cancel" | translate }}</span>
         </button>
       </div>
-      <div class="col-5">
-        <button (click)="addExpense()" type="button" [disabled]="withdrawalForm.invalid"
-          class="button-icon w-100 d-block">
+      <div>
+        <button
+          (click)="addExpense()"
+          type="button"
+          [disabled]="withdrawalForm.invalid"
+          class="button-icon w-100 d-block"
+        >
           <!-- <span class="f-s-16">{{isEditWorkflow ? 'Save' : 'Add'}} Withdrawal</span> -->
           <span class="f-s-16">Save</span>
         </button>
