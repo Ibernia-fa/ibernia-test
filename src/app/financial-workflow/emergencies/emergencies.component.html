@@ -1,5 +1,5 @@
-<div *ngIf="!isLoading; else loadingTpl" class="d-flex gap-24 flex-column">
-  <mat-card class="mat-mdc-card mdc-card cardWithShadow">
+<div *ngIf="!isLoading; else loadingTpl" class="d-flex gap-16 flex-column">
+  <!-- <mat-card class="mat-mdc-card mdc-card cardWithShadow">
     <mat-card-content class="mat-mdc-card-content">
       <div class="d-flex align-items-center justify-content-between w-100 gap-16 flex-wrap">
         <div class="d-flex align-items-center gap-16">
@@ -12,158 +12,602 @@
         </div>
       </div>
     </mat-card-content>
-  </mat-card>
+  </mat-card> -->
 
-  <mat-card class="cardWithShadow">
-    <mat-card-content style="padding: 28px 24px !important;">
-      <div class="d-flex align-items-center gap-8 justify-content-between">
-        <div class="income-expense-wrapper w-100">
-          <div class="row justify-content-between" *ngIf="stats as s">
-            <div class="col-3">
-              <div class="d-flex flex-column gap-8">
-                <div class="d-flex align-items-center gap-8">
-                  <h3 class="card-title expense-income">  <img src="/assets/images/svgs/shield.svg" alt="chart" />    Total coverage</h3>
-                </div>
-                <h3 class="saving-title">
-                  <span>{{clientData?.preferredCurrency | currencySymbol}}</span>{{s.emergenciesStats?.totalCoverage | number:'1.0-0'}}
-                </h3>
-              </div>
+  <mat-card class="ibr-new-dashboad-card">
+    <mat-card-content>
+      <div class="statistics-grid" *ngIf="stats as s">
+        <div class="d-flex flex-column gap-8">
+          <h3 class="ibr-card-title">Protection score</h3>
+          <div class="gauge-wrapper">
+            <div class="gauge-background">
+              <div class="gauge-progress" style="width: 50%"></div>
             </div>
-
-            <div class="divider"></div>
-
-            <div class="col-3">
-              <div class="d-flex flex-column gap-8">
-                <div class="d-flex align-items-center gap-8">
-                  <h3 class="card-title expenses-deduct"><img src="/assets/images/svgs/will.svg" alt="chart" /> Total annual cost</h3>
-                </div>
-                <h3 class="saving-title"> <span>{{clientData?.preferredCurrency | currencySymbol}}</span>{{s.emergenciesStats?.totalCost | number:'1.0-0'}}
-                </h3>
-              </div>
-            </div>
-
-            <div class="divider"></div>
-
-            <div class="col-3">
-              <div class="d-flex flex-column gap-8">
-                <div class="d-flex align-items-center gap-8">
-                  <h3 class="card-title expenses-total"><img width="24" src="/assets/images/svgs/gauge.png" alt="chart" /> Protection score</h3>
-                </div>
-                <h3 class="saving-title" [ngClass]="getProtectionScoreCssClass(computedProtectionScore ?? s.emergenciesStats?.protectionScore)"> {{computedProtectionScore ?? s.emergenciesStats?.protectionScore}}/100</h3>
-              </div>
-            </div>
-
-            <div class="divider"></div>
-
-            <div class="col-2 align-items-center d-flex">
-              <button style="height: auto;" (click)="onAddClick()" type="button" class="button-icon" style="margin-left: 27px; height: 0%;">
-                <span>Add new</span>
-                <img src="assets/images/svgs/add-icon.svg" alt="add-icon" />
-              </button>
-            </div>
+            <h3
+              class="gauge-text"
+              [ngClass]="
+                getProtectionScoreCssClass(
+                  computedProtectionScore ?? s.emergenciesStats?.protectionScore
+                )
+              "
+            >
+              {{ computedProtectionScore ?? s.emergenciesStats?.protectionScore
+              }}<span class="gauge-total">/100</span>
+            </h3>
           </div>
         </div>
+        <div
+          class="d-flex align-items-center justify-content-between statistics-right-section"
+        >
+          <div class="w-full d-flex flex-column gap-8">
+            <div class="w-100">
+              <div class="d-flex flex-row align-items-center gap-4">
+                <div class="d-flex align-items-center gap-8">
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M9.99967 18.3346C9.99967 18.3346 16.6663 15.0013 16.6663 10.0013V4.16797L9.99967 1.66797L3.33301 4.16797V10.0013C3.33301 15.0013 9.99967 18.3346 9.99967 18.3346Z"
+                      stroke="#5A596E"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                  <h3 class="ibr-card-title">Total coverage:</h3>
+                </div>
+                <h3 class="saving-title-new">
+                  <span>{{
+                    clientData?.preferredCurrency | currencySymbol
+                  }}</span
+                  >{{ s.emergenciesStats?.totalCoverage | number: "1.0-0" }}
+                </h3>
+              </div>
+            </div>
+
+            <div class="w-100">
+              <div class="d-flex flex-row align-items-center gap-4">
+                <div class="d-flex align-items-center gap-8">
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M11.6663 1.66797H4.99967C4.55765 1.66797 4.13372 1.84356 3.82116 2.15612C3.5086 2.46868 3.33301 2.89261 3.33301 3.33464V16.668C3.33301 17.11 3.5086 17.5339 3.82116 17.8465C4.13372 18.159 4.55765 18.3346 4.99967 18.3346H14.9997C15.4417 18.3346 15.8656 18.159 16.1782 17.8465C16.4907 17.5339 16.6663 17.11 16.6663 16.668V6.66797L11.6663 1.66797Z"
+                      stroke="#5A596E"
+                      stroke-width="1.2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                    <path
+                      d="M11.667 1.66797V6.66797H16.667"
+                      stroke="#5A596E"
+                      stroke-width="1.2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                    <path
+                      d="M13.3337 10.832H6.66699"
+                      stroke="#5A596E"
+                      stroke-width="1.2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                    <path
+                      d="M13.3337 14.168H6.66699"
+                      stroke="#5A596E"
+                      stroke-width="1.2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                    <path
+                      d="M8.33317 7.5H7.49984H6.6665"
+                      stroke="#5A596E"
+                      stroke-width="1.2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                  <h3 class="ibr-card-title">Total annual cost:</h3>
+                </div>
+                <h3 class="saving-title-new">
+                  <span>{{
+                    clientData?.preferredCurrency | currencySymbol
+                  }}</span
+                  >{{ s.emergenciesStats?.totalCost | number: "1.0-0" }}
+                </h3>
+              </div>
+            </div>
+          </div>
+
+          <button (click)="onAddClick()" type="button" class="button-icon">
+            <span class="f-w-500 f-s-16">Add new</span>
+            <img src="assets/images/svgs/add-icon.svg" alt="add-icon" />
+          </button>
+        </div>
       </div>
+      <!-- <div class="d-flex align-items-center gap-8 justify-content-between">
+        <div class="income-expense-wrapper w-100"> -->
+      <!-- <div class="justify-content-between" *ngIf="stats as s">
+        <div class="">
+          <div class="d-flex flex-row align-items-center gap-4">
+            <div class="d-flex align-items-center gap-8"> -->
+      <!-- <svg
+                width="20"
+                height="20"
+                viewBox="0 0 20 20"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M9.99967 18.3346C9.99967 18.3346 16.6663 15.0013 16.6663 10.0013V4.16797L9.99967 1.66797L3.33301 4.16797V10.0013C3.33301 15.0013 9.99967 18.3346 9.99967 18.3346Z"
+                  stroke="#5A596E"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg> -->
+
+      <!-- <h3 class="card-title expense-income">Total coverage</h3> -->
+      <!-- <h3 class="ibr-card-title">Total coverage:</h3>
+            </div> -->
+      <!-- <h3 class="saving-title-new">
+              <span>{{ clientData?.preferredCurrency | currencySymbol }}</span
+              >{{ s.emergenciesStats?.totalCoverage | number: "1.0-0" }}
+            </h3>
+          </div>
+        </div> -->
+
+      <!-- <div class="divider"></div> -->
+
+      <!-- <div class="">
+          <div class="d-flex flex-row align-items-center gap-4">
+            <div class="d-flex align-items-center gap-8">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 20 20"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M11.6663 1.66797H4.99967C4.55765 1.66797 4.13372 1.84356 3.82116 2.15612C3.5086 2.46868 3.33301 2.89261 3.33301 3.33464V16.668C3.33301 17.11 3.5086 17.5339 3.82116 17.8465C4.13372 18.159 4.55765 18.3346 4.99967 18.3346H14.9997C15.4417 18.3346 15.8656 18.159 16.1782 17.8465C16.4907 17.5339 16.6663 17.11 16.6663 16.668V6.66797L11.6663 1.66797Z"
+                  stroke="#5A596E"
+                  stroke-width="1.2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M11.667 1.66797V6.66797H16.667"
+                  stroke="#5A596E"
+                  stroke-width="1.2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M13.3337 10.832H6.66699"
+                  stroke="#5A596E"
+                  stroke-width="1.2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M13.3337 14.168H6.66699"
+                  stroke="#5A596E"
+                  stroke-width="1.2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M8.33317 7.5H7.49984H6.6665"
+                  stroke="#5A596E"
+                  stroke-width="1.2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg> -->
+
+      <!-- <h3 class="card-title expenses-deduct">Total annual cost</h3> -->
+      <!-- <h3 class="ibr-card-title">Total annual cost:</h3>
+            </div>
+            <h3 class="saving-title-new">
+              <span>{{ clientData?.preferredCurrency | currencySymbol }}</span
+              >{{ s.emergenciesStats?.totalCost | number: "1.0-0" }}
+            </h3>
+          </div>
+        </div> -->
+
+      <!-- <div class=""> -->
+      <!-- <div class="d-flex flex-column gap-8"> -->
+      <!-- <div class="d-flex align-items-center gap-8"> -->
+      <!-- <h3 class="card-title expenses-total">Protection score</h3> -->
+      <!-- <h3 class="ibr-card-title">Protection score</h3> -->
+      <!-- </div> -->
+      <!-- <div class="gauge-wrapper">
+            <div class="gauge-background">
+              <div class="gauge-progress" style="width: 50%"></div>
+            </div>
+            <h3
+              class="gauge-text"
+              [ngClass]="
+                getProtectionScoreCssClass(
+                  computedProtectionScore ?? s.emergenciesStats?.protectionScore
+                )
+              "
+            >
+              {{ computedProtectionScore ?? s.emergenciesStats?.protectionScore
+              }}<span class="gauge-total">/100</span>
+            </h3>
+          </div> -->
+      <!-- </div> -->
+      <!-- </div> -->
+
+      <!-- <div class="align-items-center d-flex">
+          <button (click)="onAddClick()" type="button" class="button-icon">
+            <span class="f-w-500 f-s-16">Add new</span>
+            <img src="assets/images/svgs/add-icon.svg" alt="add-icon" />
+          </button>
+        </div>
+      </div> -->
+      <!-- </div>
+      </div> -->
     </mat-card-content>
   </mat-card>
 
-  <mat-card class="mat-mdc-card mdc-card cardWithShadow">
+  <!-- <mat-card class="mat-mdc-card mdc-card cardWithShadow"> -->
+  <mat-card class="ibr-new-dashboad-card">
     <mat-card-content class="mat-mdc-card-content protection-center">
-      <div class="d-flex gap-10 flex-wrap">
-
-        <div class="card-em-outer" *ngFor="let e of filteredEmergencies; trackBy: trackById">
-          <mat-card class="summary-card item-card cursor-pointer" (click)="onEditClick(e)" [ngClass]="getCardCssClass(e)">
-            <div class="d-flex justify-content-between m-b-5">
+      <div class="protection-center-grid">
+        <div
+          class="card-em-outer"
+          *ngFor="let e of filteredEmergencies; trackBy: trackById"
+        >
+          <mat-card
+            class="summary-card item-card cursor-pointer"
+            (click)="onEditClick(e)"
+            [ngClass]="getCardCssClass(e)"
+          >
+            <div
+              [ngClass]="getCardHeaderCssClass(e)"
+              class="d-flex card-header justify-content-between"
+            >
               <div class="d-flex gap-10 align-items-center">
-                <div [ngClass]="getDotClass(e)"></div>
-                <img width="18" [src]="getIconName(e)" alt="">
-                <span class="card-title">
+                <!-- <div [ngClass]="getDotClass(e)"></div> -->
+                <img width="18" [src]="getIconName(e)" alt="" />
+                <span class="ibr-new-card-title">
                   {{ e.name || getTypeName(e.type) }}
                 </span>
               </div>
 
-              <div class="d-flex align-items-center">
-                <button class="hide-button" mat-icon-button (click)="hideEmergency(e)">Hide</button>
-                <button (click)="onEditClick(e); $event.stopPropagation()">
-                  <img src="assets/images/svgs/pen-icon.svg" alt="pen-icon" style="height: 18px;"/>
+              <div>
+                <button
+                  mat-icon-button
+                  [matMenuTriggerFor]="beforeMenu"
+                  aria-label="icon-button with a menu"
+                  type="button"
+                  style="margin-right: 0"
+                  class="dropdown-button"
+                  (click)="$event.stopPropagation()"
+                >
+                  <mat-icon>
+                    <svg
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M12 13C12.5523 13 13 12.5523 13 12C13 11.4477 12.5523 11 12 11C11.4477 11 11 11.4477 11 12C11 12.5523 11.4477 13 12 13Z"
+                        stroke="white"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                      <path
+                        d="M12 6C12.5523 6 13 5.55228 13 5C13 4.44772 12.5523 4 12 4C11.4477 4 11 4.44772 11 5C11 5.55228 11.4477 6 12 6Z"
+                        stroke="white"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                      <path
+                        d="M12 20C12.5523 20 13 19.5523 13 19C13 18.4477 12.5523 18 12 18C11.4477 18 11 18.4477 11 19C11 19.5523 11.4477 20 12 20Z"
+                        stroke="white"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  </mat-icon>
                 </button>
+                <mat-menu
+                  #beforeMenu="matMenu"
+                  xPosition="before"
+                  class="action-dropdown-menus"
+                >
+                  <button
+                    mat-menu-item
+                    (click)="onEditClick(e); $event.stopPropagation()"
+                  >
+                    <mat-icon>
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 20 20"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <g clip-path="url(#clip0_3194_409)">
+                          <path
+                            d="M9.16602 3.33203H3.33268C2.89065 3.33203 2.46673 3.50763 2.15417 3.82019C1.84161 4.13275 1.66602 4.55667 1.66602 4.9987V16.6654C1.66602 17.1074 1.84161 17.5313 2.15417 17.8439C2.46673 18.1564 2.89065 18.332 3.33268 18.332H14.9993C15.4414 18.332 15.8653 18.1564 16.1779 17.8439C16.4904 17.5313 16.666 17.1074 16.666 16.6654V10.832"
+                            stroke="#5A596E"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                          <path
+                            d="M15.416 2.08417C15.7475 1.75265 16.1972 1.56641 16.666 1.56641C17.1349 1.56641 17.5845 1.75265 17.916 2.08417C18.2475 2.41569 18.4338 2.86533 18.4338 3.33417C18.4338 3.80301 18.2475 4.25265 17.916 4.58417L9.99935 12.5008L6.66602 13.3342L7.49935 10.0008L15.416 2.08417Z"
+                            stroke="#5A596E"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                        </g>
+                        <defs>
+                          <clipPath id="clip0_3194_409">
+                            <rect width="20" height="20" fill="white" />
+                          </clipPath>
+                        </defs>
+                      </svg>
+                    </mat-icon>
+                    <span>Edit</span>
+                  </button>
+
+                  <button
+                    class="action-dropdown-menus"
+                    (click)="hideEmergency(e)"
+                    mat-menu-item
+                  >
+                    <mat-icon>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="#5A596E"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path
+                          d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49"
+                        />
+                        <path d="M14.084 14.158a3 3 0 0 1-4.242-4.242" />
+                        <path
+                          d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143"
+                        />
+                        <path d="m2 2 20 20" />
+                      </svg>
+                    </mat-icon>
+                    <span>Hide</span>
+                  </button>
+                </mat-menu>
               </div>
+
+              <!-- <div class="d-flex align-items-center"> -->
+              <!-- <button
+                class="hide-button"
+                mat-icon-button
+                (click)="hideEmergency(e)"
+              >
+                Hide
+              </button>
+              <button (click)="onEditClick(e); $event.stopPropagation()">
+                <img
+                  src="assets/images/svgs/pen-icon.svg"
+                  alt="pen-icon"
+                  style="height: 18px"
+                />
+              </button> -->
+              <!-- </div> -->
             </div>
 
             <!-- Insurance -->
-            @if(e.type === 1){
+            @if (e.type === 1) {
               <!-- covered -->
-              <ng-container *ngIf="e.policyStatus === 1; else insuranceTemplate">
-                <div class="d-flex m-b-10">
-                  <div class="inner-information w-50">
-                    <div class="label">Coverage</div>
-                    <div class="f-w-500 f-s-14">
-                      <span>{{clientData?.preferredCurrency | currencySymbol}}</span>{{e.coverage | number:'1.0-0'}}
-                    </div>
-                  </div>
+              <ng-container
+                *ngIf="e.policyStatus === 1; else insuranceTemplate"
+              >
+                <div class="info-container">
+                  <div class="d-flex justify-content-between info-wrapper">
+                    <div class="d-flex align-items-center gap-8">
+                      <svg
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M22 11.0799V11.9999C21.9988 14.1563 21.3005 16.2545 20.0093 17.9817C18.7182 19.7088 16.9033 20.9723 14.8354 21.5838C12.7674 22.1952 10.5573 22.1218 8.53447 21.3744C6.51168 20.6271 4.78465 19.246 3.61096 17.4369C2.43727 15.6279 1.87979 13.4879 2.02168 11.3362C2.16356 9.18443 2.99721 7.13619 4.39828 5.49694C5.79935 3.85768 7.69279 2.71525 9.79619 2.24001C11.8996 1.76477 14.1003 1.9822 16.07 2.85986"
+                          stroke="#5A596E"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                        <path
+                          d="M22 4L12 14.01L9 11.01"
+                          stroke="#5A596E"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
 
-                  <div class="inner-information">
-                    <div class="label">Annual cost</div>
-                    <div class="f-w-500 f-s-14">
-                      <span>{{clientData?.preferredCurrency | currencySymbol}}</span>{{ calculateAnnualCost(e) | number:'1.0-0' }}
+                      <div class="inner-information d-flex flex-column gap-2">
+                        <div class="label">Coverage</div>
+                        <div class="sub-label">
+                          <span>{{
+                            clientData?.preferredCurrency | currencySymbol
+                          }}</span
+                          >{{ e.coverage | number: "1.0-0" }}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-8">
+                      <svg
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M12 1V23"
+                          stroke="#5A596E"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                        <path
+                          d="M17 5H9.5C8.57174 5 7.6815 5.36875 7.02513 6.02513C6.36875 6.6815 6 7.57174 6 8.5C6 9.42826 6.36875 10.3185 7.02513 10.9749C7.6815 11.6313 8.57174 12 9.5 12H14.5C15.4283 12 16.3185 12.3687 16.9749 13.0251C17.6313 13.6815 18 14.5717 18 15.5C18 16.4283 17.6313 17.3185 16.9749 17.9749C16.3185 18.6313 15.4283 19 14.5 19H6"
+                          stroke="#5A596E"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+
+                      <div class="inner-information d-flex flex-column gap-2">
+                        <div class="label">Annual cost</div>
+                        <div class="sub-label">
+                          <span>{{
+                            clientData?.preferredCurrency | currencySymbol
+                          }}</span
+                          >{{ calculateAnnualCost(e) | number: "1.0-0" }}
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
-                <div class="inner-information">
-                  <div class="label m-b-5">Adequacy</div>
-                  
-                  <mat-button-toggle-group class="coverage-toggle-group" [value]="e.coverageAdequacy"
-                    (change)="onCoverageAdequacyChange(e, $event.value)" (click)="$event.stopPropagation()"
-                    aria-label="Coverage adequacy">
-                    <mat-button-toggle *ngFor="let ca of coverageAdequacies" [value]="ca.id">
+                <div class="status-container">
+                  <div class="d-flex align-items-center justify-content-center">
+                    <div class="d-flex align-items-center gap-2 tag">
+                      <span class="label-tag">Adequacy:</span>
+                      <span
+                        class="dynamic-color"
+                        [ngClass]="getAdequacyClass(e)"
+                      >
+                        {{ getCoverageAdequacyLabel(e.coverageAdequacy) }}
+                      </span>
+                    </div>
+                  </div>
+
+                  <!-- <mat-button-toggle-group
+                    class="coverage-toggle-group"
+                    [value]="e.coverageAdequacy"
+                    (change)="onCoverageAdequacyChange(e, $event.value)"
+                    (click)="$event.stopPropagation()"
+                    aria-label="Coverage adequacy"
+                  >
+                    <mat-button-toggle
+                      *ngFor="let ca of coverageAdequacies"
+                      [value]="ca.id"
+                    >
                       {{ ca.description }}
                     </mat-button-toggle>
-                  </mat-button-toggle-group>
+                  </mat-button-toggle-group> -->
                 </div>
               </ng-container>
 
               <!-- not covered -->
               <ng-template #insuranceTemplate>
-                <div class="inner-information">
-                  <div class="label">Status</div>
-                  <div class="f-w-500 f-s-14"
-                    [ngClass]="{ 'text-danger': e.policyStatus !== 1, 'text-success': e.policyStatus === 1 }">
-                    Not covered
+                <div class="info-container">
+                  <div class="info-wrapper">
+                    <div
+                      class="inner-information text-center d-flex flex-column gap-4"
+                    >
+                      <div class="label">Status</div>
+                      <div
+                        class="not-cover-label"
+                        [ngClass]="{
+                          'text-danger': e.policyStatus !== 1,
+                          'text-success': e.policyStatus === 1,
+                        }"
+                      >
+                        Not covered
+                      </div>
+                    </div>
                   </div>
                 </div>
-                
+
                 <!-- if insurance and not covered show simulation button -->
-                <div class="inner-information">
-                  <div class="simulate-button-section">
-                    <button class="simulate-button" mat-icon-button (click)="simulateEmergency(e); $event.stopPropagation()">Simulate</button>
-                  </div>
+
+                <div
+                  class="status-container d-flex align-items-center justify-content-center"
+                >
+                  <button
+                    class="simulate-button"
+                    (click)="simulateEmergency(e); $event.stopPropagation()"
+                  >
+                    Simulate
+                  </button>
                 </div>
               </ng-template>
             }
 
             <!-- Will -->
-            @if(e.type === 2){
-              <div class="inner-information">
-                <div class="label">Status</div>
-                <div class="f-w-500 f-s-14"
-                  [ngClass]="{ 'text-danger': e.willStatus !== 1, 'will-done-text': e.willStatus === 1 }">
-                  {{e.willStatus === 1 ? 'Done' : 'Not done' }}
+            @if (e.type === 2) {
+              <div class="info-container">
+                <div class="info-wrapper">
+                  <div
+                    class="inner-information text-center d-flex flex-column gap-4"
+                  >
+                    <div class="label">Status</div>
+                    <div
+                      class="not-cover-label"
+                      [ngClass]="{
+                        'text-danger': e.willStatus !== 1,
+                        'will-done-text': e.willStatus === 1,
+                      }"
+                    >
+                      {{ e.willStatus === 1 ? "Done" : "Not done" }}
+                    </div>
+                  </div>
                 </div>
               </div>
             }
           </mat-card>
         </div>
-
-        <div class="col-12" *ngIf="!isLoading && emergencies.length === 0">
-          <p class="text-muted text-center my-4">
-            No protection items added yet. Click <b>Add new</b> to get started.
-          </p>
-        </div>
       </div>
 
-      <div class="d-flex align-items-center m-t-24 justify-content-center">
-        <button *ngIf="hasHiddenEmergencies" class="btn-secondary" mat-stroked-button color="primary"
-          (click)="showHiddenEmergencies()">
+      <div *ngIf="!isLoading && emergencies.length === 0">
+        <p class="text-muted text-center my-4">
+          No protection items added yet. Click <b>Add new</b> to get started.
+        </p>
+      </div>
+      <div
+        *ngIf="hasHiddenEmergencies"
+        class="d-flex align-items-center m-t-24 justify-content-center"
+      >
+        <!-- mat-stroked-button -->
+        <!-- color="primary" -->
+        <button
+          type="button"
+          *ngIf="hasHiddenEmergencies"
+          class="button-icon-outline"
+          (click)="showHiddenEmergencies()"
+        >
           <span>Show hidden</span>
         </button>
       </div>
