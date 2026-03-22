@@ -1,14 +1,14 @@
 .start-end {
-    .row {
-      margin: 0 !important;
-      .col-6 {
-        padding: 0 !important;
-        max-width: 45% !important;
-        flex: 0 0 45% !important;
-      }
+  .row {
+    margin: 0 !important;
+    .col-6 {
+      padding: 0 !important;
+      max-width: 45% !important;
+      flex: 0 0 45% !important;
     }
   }
-  .input-container {
+}
+.input-container {
   position: relative;
 
   .percent-input {
@@ -34,12 +34,12 @@
 }
 
 .escalation-field {
-  flex: 1 1 260px;
+  flex: 1 1 0;
   min-width: 0;
 }
 
 .escalation-custom {
-  flex: 1 1 170px;
+  flex: 1 1 0px;
 }
 
 .escalation-full {

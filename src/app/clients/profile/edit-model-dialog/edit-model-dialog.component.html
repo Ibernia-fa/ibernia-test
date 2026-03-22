@@ -5,121 +5,196 @@
   </mat-card>
 </div> -->
 <!-- <mat-dialog-container> -->
-    <div class="d-flex flex-column gap-32">
-        <!-- Modal Header  -->
-        <div class="d-flex align-items-center justify-content-between gap-10 modal-header">
+<div class="d-flex flex-column">
+  <!-- Modal Header  -->
+  <div class="dialog-header">
+    <h3 class="dialog-title text-center">{{ "Edit plan" | translate }}</h3>
+
+    <button
+      type="button"
+      mat-icon-button
+      disableRipple
+      class="dialog-close-btn"
+      mat-dialog-close
+      aria-label="Close dialog"
+      (click)="closeDialog()"
+    >
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+  <!-- <div class="d-flex align-items-center justify-content-between gap-10 modal-header">
             <h3>{{ 'Edit plan' | translate}}</h3>
             <button (click)="closeDialog()" type="button">
                 <img src="assets/images/svgs/close-line-cion.svg" alt="close-line-cion" />
             </button>
+        </div> -->
+  <!-- End Modal Header  -->
+
+  <!-- Modal Body  -->
+  <mat-dialog-content class="event-dialog-content">
+    <div [formGroup]="form" class="d-flex flex-column gap-16">
+      <div class="w-100 form-field gap-8">
+        <mat-label class="f-s-16 f-w-500 d-flex align-items-center ibr-black">{{
+          "Model name" | translate
+        }}</mat-label>
+        <input matInput formControlName="name" />
+        @if (
+          form.get("name")?.touched && form.get("name")?.hasError("required")
+        ) {
+          <!-- <span class="field-error d-block">Name is required</span> -->
+          <span class="field-error d-block">{{ "Required" | translate }}</span>
+        }
+      </div>
+
+      <div class="w-100 form-field gap-8">
+        <mat-label class="f-s-16 f-w-500 d-flex align-items-center ibr-black">{{
+          "Projection ends at age:" | translate
+        }}</mat-label>
+        <input
+          matInput
+          type="number"
+          formControlName="planDuration"
+          [min]="minAge"
+          max="100"
+        />
+        @if (
+          form.get("planDuration")?.touched &&
+          form.get("planDuration")?.hasError("required")
+        ) {
+          <!-- <span class="field-error d-block">Name is required</span> -->
+          <span class="field-error d-block">{{ "Required" | translate }}</span>
+        }
+        @if (form.get("planDuration")?.hasError("min")) {
+          <span class="field-error d-block">
+            Plan end age must be greater than the current age
+          </span>
+        }
+
+        @if (form.get("planDuration")?.hasError("max")) {
+          <span class="field-error d-block">
+            Plan end age cannot exceed 100
+          </span>
+        }
+      </div>
+
+      <div class="w-100 form-field gap-4">
+        <div class="d-flex align-items-center gap-8">
+          <label class="f-s-16 f-w-500 d-flex align-items-center ibr-black">{{
+            "Inflation" | translate
+          }}</label>
         </div>
-        <!-- End Modal Header  -->
-    
-        <!-- Modal Body  -->
-        <!-- <mat-dialog-content> -->
-        <div [formGroup]="form" class="d-flex flex-column gap-20">
-            <div class="w-100 form-field gap-8">
-                <mat-label class="f-s-16 d-block">{{ 'Model name' | translate }}</mat-label>
-                <input matInput formControlName="name" />
-                @if(form.get('name')?.touched &&
-                 form.get('name')?.hasError('required')) {
-                    <!-- <span class="field-error d-block">Name is required</span> -->
-              <span class="field-error d-block">{{'Required' | translate}}</span>
 
-                }
-            </div>
+        <div class="d-flex align-items-center gap-24">
+          <div class="slider-customizer slider-wrapper">
+            <mat-slider class="w-100" [min]="0" [max]="10" [step]="0.5">
+              <input
+                matSliderThumb
+                formControlName="inflationRate"
+                (input)="onInflationSliderInput($event)"
+              />
+            </mat-slider>
+          </div>
 
-            <div class="w-100 form-field gap-8">
-                <mat-label class="f-s-16 d-block">{{ 'Projection ends at age:' | translate }}</mat-label>
+          <div class="percentage-field">
+            <div class="w-100 form-field custom-rate-input">
+              <input
+                matInput
+                type="number"
+                formControlName="inflationRate"
+                min="0"
+                max="1000"
+                (input)="onInflationInput($event)"
+              />
+              <div class="custom-rate-suffix">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M15.8337 4.16602L4.16699 15.8327"
+                    stroke="#48475D"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M5.41634 7.50065C6.56693 7.50065 7.49967 6.56791 7.49967 5.41732C7.49967 4.26672 6.56693 3.33398 5.41634 3.33398C4.26575 3.33398 3.33301 4.26672 3.33301 5.41732C3.33301 6.56791 4.26575 7.50065 5.41634 7.50065Z"
+                    stroke="#48475D"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M14.5833 16.6667C15.7339 16.6667 16.6667 15.7339 16.6667 14.5833C16.6667 13.4327 15.7339 12.5 14.5833 12.5C13.4327 12.5 12.5 13.4327 12.5 14.5833C12.5 15.7339 13.4327 16.6667 14.5833 16.6667Z"
+                    stroke="#48475D"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </div>
+              <!-- <mat-form-field
+                appearance="outline"
+                class="w-full w-100 percentage-icon"
+              >
+                <span matSuffix>%</span>
                 <input
-                    matInput
-                    type="number"
-                    formControlName="planDuration"
-                    [min]="minAge"
-                    max="100"
+                  matInput
+                  type="number"
+                  class="p-0"
+                  formControlName="inflationRate"
+                  min="0"
+                  max="1000"
+                  (input)="onInflationInput($event)"
                 />
-                @if(form.get('planDuration')?.touched &&
-                 form.get('planDuration')?.hasError('required')) {
-                    <!-- <span class="field-error d-block">Name is required</span> -->
-              <span class="field-error d-block">{{'Required' | translate}}</span>
-
-                }
-                 @if(form.get('planDuration')?.hasError('min')) {
-                    <span class="field-error d-block">
-                        Plan end age must be greater than the current age
-                    </span>
-                }
-
-                @if(form.get('planDuration')?.hasError('max')) {
-                <span class="field-error d-block">
-                    Plan end age cannot exceed 100
-                </span>
-                }
+              </mat-form-field> -->
             </div>
-
-            <div class="w-100 form-field gap-8">
-                <div class="d-flex align-items-center gap-8">
-                    <label>{{ 'Inflation' | translate}}</label>
-                </div>
-
-                <div class="d-flex align-items-center gap-24">
-                    <div class="slider-customizer slider-wrapper">
-                        <mat-slider class="w-100" [min]="0" [max]="10" [step]="0.5">
-                            <input 
-                            matSliderThumb 
-                            formControlName="inflationRate"
-                            (input)="onInflationSliderInput($event)"
-                             />
-                        </mat-slider>
-                    </div>
-
-                    <div class="percentage-field" style="width: 100px;">
-                        <div class="w-100 form-field infilation-check">
-                            <mat-form-field appearance="outline" class="w-full w-100 percentage-icon">
-                                <span matSuffix>%</span>
-                                <input
-                                    matInput
-                                    type="number"
-                                    class="p-0"
-                                    formControlName="inflationRate"
-                                    min="0"
-                                    max="1000"
-                                    (input)="onInflationInput($event)"
-                                />
-                            </mat-form-field>
-                        </div>
-                    </div>
-                </div>
-
-                @if(form.get('inflationRate')?.touched &&
-                 form.get('inflationRate')?.hasError('required')) {
-              <span class="field-error d-block">{{'Required' | translate}}</span>
-                }
-            </div>
-
-            <div class="w-100 form-field gap-8">
-                <mat-label class="f-s-16 d-block">{{ 'Description (optional)' | translate }}</mat-label>
-                <textarea formControlName="description" placeholder="Enter description"></textarea>
-            </div>
+          </div>
         </div>
-        <!-- </mat-dialog-content> -->
-        <!-- End Modal Body  -->
-        <!-- Modal Action Button  -->
-        <!-- <mat-dialog-actions> -->
-        <div class="row justify-content-between modal-action">
-            <div class="col-5">
-                <button (click)="closeDialog()" class="button-icon-outline w-100 d-block">
-                    <span class="f-s-16">{{ 'Cancel' | translate }}</span>
-                </button>
-            </div>
-            <div class="col-5">
-                <button [disabled]="form.invalid || isLoading" (click)="onSubmit()" class="button-icon w-100 d-block">
-                    <span class="f-s-16">{{ 'Save' | translate}}</span>
-                </button>
-            </div>
-        </div>
-        <!-- </mat-dialog-actions> -->
-        <!-- End Modal Action Button  -->
+
+        @if (
+          form.get("inflationRate")?.touched &&
+          form.get("inflationRate")?.hasError("required")
+        ) {
+          <span class="field-error d-block">{{ "Required" | translate }}</span>
+        }
+      </div>
+
+      <div class="w-100 form-field gap-8">
+        <mat-label class="f-s-16 d-block">{{
+          "Description (optional)" | translate
+        }}</mat-label>
+        <textarea
+          formControlName="description"
+          placeholder="Enter description"
+        ></textarea>
+      </div>
     </div>
-    
-    <!-- </mat-dialog-container> -->
+  </mat-dialog-content>
+  <!-- End Modal Body  -->
+  <!-- Modal Action Button  -->
+  <!-- <mat-dialog-actions> -->
+  <div class="row justify-content-end gap-16 modal-action p-t-24">
+    <div>
+      <button (click)="closeDialog()" class="button-icon-outline w-100 d-block">
+        <span class="f-s-16">{{ "Cancel" | translate }}</span>
+      </button>
+    </div>
+    <div>
+      <button
+        [disabled]="form.invalid || isLoading"
+        (click)="onSubmit()"
+        class="button-icon w-100 d-block"
+      >
+        <span class="f-s-16">{{ "Save" | translate }}</span>
+      </button>
+    </div>
+  </div>
+  <!-- </mat-dialog-actions> -->
+  <!-- End Modal Action Button  -->
+</div>
+
+<!-- </mat-dialog-container> -->

@@ -274,7 +274,7 @@ export class ProfileComponent {
 
   newModelClicked() {
     const dialogRef = this.dialog.open(AddModelDialogComponent, {
-      width: '600px',
+      width: '612px',
       disableClose: true,
       data: this.client,
     });
@@ -286,7 +286,7 @@ export class ProfileComponent {
 
   onEditModelClicked(cashflowId: string) {
     const dialogRef = this.dialog.open(EditModelDialogComponent, {
-      width: '600px',
+      width: '612px',
       disableClose: true,
       data: this.cashflows.find((cashflow) => cashflow.id === cashflowId),
     });

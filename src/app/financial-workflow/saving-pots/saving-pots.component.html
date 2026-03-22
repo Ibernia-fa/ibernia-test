@@ -261,12 +261,12 @@
                                 alt="cashflow-moneys-icon"
                               />
                               <h3 class="card-title-new">{{ saving.name }}</h3>
-                              @if (hasPartner) {
+                              <!-- @if (hasPartner) {
                                 <span class="badge ownership-badge"
                                   >{{ "Ownership" | translate }}:
                                   {{ getOwnershipLabel(saving) }}</span
                                 >
-                              }
+                              } -->
                             </div>
                             <div class="d-flex align-items-center gap-10">
                               <h3 class="saving-title">
@@ -320,9 +320,16 @@
                               />
                             }
                           </div>
-                          <div class="ibr-chart-tag">
-                            Ownership: <span>Anna</span>
-                          </div>
+                          @if (hasPartner) {
+                            <!-- <span class="badge ownership-badge"
+                                  >{{ "Ownership" | translate }}:
+                                  {{ getOwnershipLabel(saving) }}</span
+                                > -->
+                            <div class="ibr-chart-tag">
+                              {{ "Ownership" | translate }}:
+                              <span>{{ getOwnershipLabel(saving) }}</span>
+                            </div>
+                          }
                         </div>
                         <!-- End Chart  -->
                         <div>

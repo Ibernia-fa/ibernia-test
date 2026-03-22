@@ -1,9 +1,4 @@
 .protection-center {
-  .card-em-outer {
-    width: calc((100% - 20px) / 3);
-    min-height: 161px;
-  }
-
   .dot {
     height: 8px;
     width: 8px;
@@ -23,22 +18,36 @@
   }
 
   .summary-card {
-
-    .w-50 {
-      width: 50%;
+    .status-container {
+      padding: 16px 24px;
+      .tag {
+        background-color: white;
+        border-radius: 10000px;
+        padding: 10px 12px;
+        .label-tag {
+          color: #a6abb2;
+          font-size: 14px;
+          line-height: 16px;
+        }
+        .dynamic-color {
+          font-weight: 500;
+          font-size: 14px;
+          line-height: 16px;
+        }
+      }
     }
 
-    padding: 15px;
+    overflow: hidden;
     border-radius: 4px;
-    height:100%;
+    height: 100%;
 
     button {
       border: none;
       background: none;
-      color: #8d8d8d;
+      // color: #8d8d8d;
       border-radius: 100px;
-      height: 35px;
-      width: 35px;
+      // height: 35px;
+      // width: 35px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -51,8 +60,7 @@
       }
 
       &:hover {
-        background-color: #e9edf1;
-
+        background-color: #e9edf131;
       }
 
       &.hide-button {
@@ -66,46 +74,46 @@
       }
     }
 
-    .inner-information {
-      line-height: normal;
-
-      label {
-        font-size: 14px;
-        color: #747474;
+    .info-container {
+      padding: 0px 24px;
+      .info-wrapper {
+        padding: 24px 0 16px 0;
+        border-bottom: 1px solid #0000001a;
       }
-    }
-
-    .simulate-button-section {
-      margin-top: 33px; 
+      .inner-information {
+        .label {
+          font-size: 14px;
+          font-weight: 400;
+          color: #5a596e;
+          line-height: 16px;
+        }
+        .sub-label {
+          font-size: 18px;
+          font-weight: 500;
+          color: #1c1c1c;
+          line-height: 24px;
+        }
+      }
+      .not-cover-label {
+        font-size: 18px;
+        line-height: 22px;
+        color: #1c1c1c;
+        font-weight: 500;
+      }
     }
 
     .simulate-button {
-      font-family: "Ubuntu", serif;
-      font-size: 12px;
+      background-color: white;
+      color: #ff383c;
+      padding: 10px 12px;
+      line-height: 16px;
+      font-size: 14px;
       font-weight: 500;
-      line-height: 27px;
-      height: 30px;
-      padding: 0px 12px;
-      margin-right: 5px;
-      margin-top: -2px;
-      border-radius: 4px;
-      border: 1px solid #ffccd3 !important;
-      background: none;
-      color: #ff0000;
-      width: auto;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      border: 1px solid transparent;
       cursor: pointer;
-      
-      mat-icon {
-        font-size: 20px;
-        margin-top: 2px;
-      }
-
       &:hover {
-        background-color: #fff1f2;
-        cursor: pointer;
+        background-color: #ffffff !important;
+        border: 1px solid #0000001a;
       }
     }
   }
@@ -123,7 +131,7 @@
 }
 
 .summary-card .value.text-danger {
-  color: #c70036;
+  color: #ff383c;
 }
 
 .danger-outline {
@@ -132,8 +140,8 @@
 }
 
 .item-card {
-  border-radius: 16px;
-  padding: 20px;
+  border-radius: 12px;
+  // padding: 20px;
 }
 
 .health-card {
@@ -145,30 +153,59 @@
   color: #006045;
 }
 
+.card-header {
+  height: 52px;
+  padding: 6px 16px;
+}
+.danger-header-card {
+  background-color: #ff383ccc;
+  backdrop-filter: blur(75px);
+}
 .danger-card {
-  background: #fff1f2;
-  border: 1px solid #ffccd3 !important;
+  // background: #fff1f2;
+  // border: 1px solid #ffccd3 !important;
+  background-color: #ffededb2;
+  backdrop-filter: blur(124px);
+  border: 0px solid transparent !important;
 }
 
+.basic-header-card {
+  background-color: #deb511cc;
+  backdrop-filter: blur(75px);
+}
 .basic-card {
-  background-color: #fef3e4;
-  border: 1px solid #f6ce98 !important;
+  background-color: #fff7eeb2;
+  backdrop-filter: blur(124px);
+  border: 0px solid transparent !important;
+  // border: 1px solid #f6ce98 !important;
 }
 
+.good-header-card {
+  background-color: #54e97ccc;
+  backdrop-filter: blur(75px);
+}
 .good-card {
-  background-color: #ecfdf5;
-  border: 1px solid #a4f4cf !important;
+  background-color: #e4ffebb2;
+  border: 0px solid transparent !important;
+  backdrop-filter: blur(124px);
+  // border: 1px solid #a4f4cf !important;
 }
 
+.excellent-header-card {
+  background-color: #09ac65cc;
+  backdrop-filter: blur(75px);
+}
 .excellent-card {
-  background-color: #b6f6d9;
-  border: 1px solid #59c996 !important;
+  background-color: #eafff5b2;
+  backdrop-filter: blur(124px);
+  border: 0px solid transparent !important;
+  // border: 1px solid #59c996 !important;
 }
 
-.card-title {
-  font-size: 18px;
-  font-weight: 500;
-}
+// .card-title {
+//   font-size: 18px;
+//   font-weight: 500;
+// }
 
 .hide-btn {
   font-size: 12px;
@@ -195,7 +232,6 @@
 }
 
 .income-expense-wrapper {
-
   .card-title {
     font-size: 18px;
     line-height: 19px;
@@ -217,17 +253,95 @@
 }
 
 .ibernia-red {
-  color: #ff0000 !important;
+  color: #ff383c !important;
 }
 
 .ibernia-orange {
-  color: #ff9902 !important;
+  color: #deb511cc !important;
 }
 
 .ibernia-light-green {
-  color: #71bc42 !important;
+  color: #54e97ccc !important;
 }
 
 .ibernia-dark-green {
-  color: #00512C !important;
+  color: #09ac65cc !important;
+}
+
+// New style
+
+.statistics-grid {
+  display: grid;
+  grid-template-columns: 40% 60%;
+  align-items: center;
+}
+
+.ibr-card-title {
+  font-weight: 400;
+  color: #5a596e;
+  font-size: 16px;
+  line-height: 100%;
+  letter-spacing: 0%;
+}
+
+.saving-title-new {
+  font-weight: 500;
+  color: #1c1c1c;
+  font-size: 16px;
+  line-height: 100%;
+  letter-spacing: 0%;
+}
+
+.gauge-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  width: 100%;
+  max-width: 328px;
+}
+.gauge-background {
+  background-color: white;
+  border-radius: 50px;
+  flex: 1;
+  height: 16px;
+  width: 100%;
+}
+.gauge-progress {
+  background-color: #ff383c;
+  height: 100%;
+  border-radius: 50px;
+}
+.gauge-text {
+  color: #ff383c;
+  font-size: 40px;
+  font-weight: 700;
+  line-height: none;
+  display: flex;
+  align-items: baseline;
+  .gauge-total {
+    font-weight: 500;
+    font-size: 24px;
+    line-height: none;
+  }
+}
+
+.statistics-right-section {
+  border-left: 1px solid #0000001a;
+  padding: 8px 0 8px 16px;
+}
+
+// Protection Section
+
+.protection-center-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.ibr-new-card-title {
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 24px;
+  color: white;
 }

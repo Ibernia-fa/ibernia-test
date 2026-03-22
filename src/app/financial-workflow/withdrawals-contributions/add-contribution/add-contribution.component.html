@@ -3,115 +3,174 @@
 
 <!--  Add Expense-->
 <div class="w-100">
-  <div class="d-flex flex-column gap-32">
+  <div class="d-flex flex-column">
     <!-- Modal Header  -->
-    <div class="d-flex align-items-center justify-content-between gap-10 modal-header">
-      <div class="d-flex align-items-center gap-8">
-        <h3>{{ dialogTitle }}</h3>
-      </div>
-      <button (click)="closeDialog()" type="button">
-        <img src="assets/images/svgs/close-line-cion.svg" alt="close-line-cion" />
+    <div class="dialog-header">
+      <h2 class="dialog-title text-center">
+        {{ dialogTitle }}
+      </h2>
+      <button
+        type="button"
+        mat-icon-button
+        disableRipple
+        class="dialog-close-btn"
+        mat-dialog-close
+        aria-label="Close dialog"
+        (click)="closeDialog()"
+      >
+        <mat-icon>close</mat-icon>
       </button>
     </div>
     <!-- End Modal Header  -->
 
     <!-- Modal Body  -->
-    <mat-dialog-content>
-      <div [formGroup]="contributionForm" class="d-flex flex-column gap-20">
-        
-        <div class="start-end">
-          <div class="d-flex flex-column gap-12">
-            <div class="d-flex gap-8 align-items-center">
-              <mat-label class="f-s-16 f-w-400 d-block">Contribute to saving pot</mat-label>
-              <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
+    <mat-dialog-content class="event-dialog-content">
+      <div [formGroup]="contributionForm" class="d-flex flex-column gap-16">
+        <div class="d-flex flex-column gap-8">
+          <div class="d-flex gap-8 align-items-center">
+            <mat-label
+              class="f-s-16 f-w-500 d-flex align-items-center ibr-black"
+              >Contribute to saving pot</mat-label
+            >
+            <img
+              width="18"
+              src="assets/images/svgs/help-circle-icon.svg"
+              alt="help-circle-icon"
+            />
+          </div>
+          <!-- Start date  -->
+          <div class="w-100 form-field">
+            <div class="select-option position-relative">
+              <mat-select
+                value="Select"
+                formControlName="savingPot"
+                hideSingleSelectionIndicator
+              >
+                @for (saving of clientSavings; track saving) {
+                  <mat-option [value]="saving.id">{{ saving.name }}</mat-option>
+                }
+              </mat-select>
+              <span class="custom-arrow">
+                <svg
+                  width="12"
+                  height="7"
+                  viewBox="0 0 12 7"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M1 1L6 6L11 1"
+                    stroke="#2B3942"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </span>
             </div>
-            <div class="row justify-content-between align-items-start flex-nowrap">
-              <!-- Start date  -->
-              <div class="w-100">
-                <div class="w-100 form-field">
-                  <div class="select-option">
-                    <mat-select value="Select" formControlName="savingPot" hideSingleSelectionIndicator>
-                      @for (saving of clientSavings; track saving) {
-                        <mat-option [value]="saving.id">{{ saving.name }}</mat-option>
-                        }
-                    </mat-select>
-                  </div>
-                  <!-- Error  -->
-                  <!-- <span class="field-error d-block">Start is required</span> -->
-                  <!-- End Error  -->
-
-                </div>
-              </div>
-            </div>
-            <!-- <div class="d-flex gap-8 align-items-center">
-              <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
-              <mat-label class="f-s-16 f-w-400 d-block withdrawals-info-text">To show contributions are added, you may
-                also need to add a corresponding income.</mat-label>
-            </div> -->
           </div>
         </div>
-        
-        <div class="d-flex flex-column gap-12 tab">
-            <div class="d-flex gap-8 align-items-center">
-              <mat-label class="f-s-16 f-w-400 d-block">Contribute from</mat-label>
-              <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
-            </div>
-              <!-- Start date  -->
-                   <div class="tabs">
-    
-<div class="row">
-  <div class="col-4">
-    <button
-      type="button"
-      class="button-icon w-100"
-      [class.active]="isTypeSelected(1)"
-      (click)="selectContributionType(1)"
-    >
-      <span [class.active]="isTypeSelected(1)">Cash</span>
-    </button>
-  </div>
-  <div class="col-4">
-    <button
-      type="button"
-      class="button-icon w-100"
-      [class.active]="isTypeSelected(2)"
-      (click)="selectContributionType(2)"
-    >
-      <span [class.active]="isTypeSelected(2)">External</span>
-    </button>
-  </div>
-  <div class="col-4">
-    <button
-      type="button"
-      class="button-icon w-100"
-      [class.active]="isTypeSelected(3)"
-      [disabled]="isEditWorkflow"
-      (click)="selectContributionType(3)"
-    >
-      <span [class.active]="isTypeSelected(3)">Both</span>
-    </button>
-  </div>
-</div>
-    </div>
+
+        <div class="d-flex flex-column gap-8 tab">
+          <div class="d-flex gap-8 align-items-center">
+            <mat-label
+              class="f-s-16 f-w-500 d-flex align-items-center ibr-black"
+              >Contribute from</mat-label
+            >
+            <img
+              width="18"
+              src="assets/images/svgs/help-circle-icon.svg"
+              alt="help-circle-icon"
+            />
           </div>
-                
-        <!--End >{{ 'Description' | translate }}< Field  --> 
+          <!-- Start date  -->
+          <div class="down-payment-toggle">
+            <label
+              class="dp-radio"
+              [class.active]="isTypeSelected(1)"
+              (click)="selectContributionType(1)"
+            >
+              <span class="dp-radio-circle"></span>
+              <span>Cash</span>
+            </label>
+            <label
+              class="dp-radio"
+              [class.active]="isTypeSelected(2)"
+              (click)="selectContributionType(2)"
+            >
+              <span class="dp-radio-circle"></span>
+              <span>External</span>
+            </label>
+            <label
+              class="dp-radio"
+              [class.active]="isTypeSelected(3)"
+              [class.disabled]="isEditWorkflow"
+              (click)="selectContributionType(3)"
+            >
+              <span class="dp-radio-circle"></span>
+              <span>Both</span>
+            </label>
+          </div>
+          <!-- <div class="tabs">
+            <div class="row">
+              <div class="col-4">
+                <button
+                  type="button"
+                  class="button-icon w-100"
+                  [class.active]="isTypeSelected(1)"
+                  (click)="selectContributionType(1)"
+                >
+                  <span [class.active]="isTypeSelected(1)">Cash</span>
+                </button>
+              </div>
+              <div class="col-4">
+                <button
+                  type="button"
+                  class="button-icon w-100"
+                  [class.active]="isTypeSelected(2)"
+                  (click)="selectContributionType(2)"
+                >
+                  <span [class.active]="isTypeSelected(2)">External</span>
+                </button>
+              </div>
+              <div class="col-4">
+                <button
+                  type="button"
+                  class="button-icon w-100"
+                  [class.active]="isTypeSelected(3)"
+                  [disabled]="isEditWorkflow"
+                  (click)="selectContributionType(3)"
+                >
+                  <span [class.active]="isTypeSelected(3)">Both</span>
+                </button>
+              </div>
+            </div>
+          </div> -->
+        </div>
+
+        <!--End >{{ 'Description' | translate }}< Field  -->
 
         <!-- Net Amount Field  -->
         <div class="d-flex flex-column gap-4 net-fields">
           <div class="d-flex flex-column gap-8">
-            <mat-label class="f-s-16 d-block" style="line-height: 18px">{{ 'Net amount' | translate }}</mat-label>
+            <mat-label
+              class="f-s-16 f-w-500 ibr-black d-flex align-items-center"
+              >{{ "Net amount" | translate }}</mat-label
+            >
             <div class="net-field d-flex align-items-center">
               <!-- Currency Selector  -->
               <div class="left hide-arrow">
-                <mat-select formControlName="currencySymbol" class="sortby-edit-profile" hideSingleSelectionIndicator>
+                <mat-select
+                  formControlName="currencySymbol"
+                  class="sortby-edit-profile"
+                  hideSingleSelectionIndicator
+                >
                   @for (country of countries; track country) {
-                  @if(country.currencySymbol) {
-                  <mat-option [value]="country.currencySymbol">{{
-                    country.currencySymbol
-                    }}</mat-option>
-
-                  }
+                    @if (country.currencySymbol) {
+                      <mat-option [value]="country.currencySymbol">{{
+                        country.currencySymbol
+                      }}</mat-option>
+                    }
                   }
                 </mat-select>
               </div>
@@ -123,21 +182,47 @@
                   type="text"
                   formControlName="amount"
                   #amountInput
-                  [value]="contributionForm.get('amount')?.value | thousandSeparator"
-                thousandSeparatorInput
+                  [value]="
+                    contributionForm.get('amount')?.value | thousandSeparator
+                  "
+                  thousandSeparatorInput
                   (input)="onAmountInput($event.target.value)"
                   placeholder="0"
                 />
               </div>
               <!-- End Price Field  -->
               <!-- End Type Field  -->
-              <div class="right">
-                <mat-select (valueChange)="onCycleValueChange($event)" value="Select" formControlName="cycle"
-                  class="sortby-edit-profile" hideSingleSelectionIndicator>
+              <div class="right position-relative">
+                <mat-select
+                  (valueChange)="onCycleValueChange($event)"
+                  value="Select"
+                  formControlName="cycle"
+                  class="sortby-edit-profile"
+                  hideSingleSelectionIndicator
+                >
                   @for (cycle of cycles; track cycle) {
-                  <mat-option [value]="cycle.id">{{ cycle.description }}</mat-option>
+                    <mat-option [value]="cycle.id">{{
+                      cycle.description
+                    }}</mat-option>
                   }
                 </mat-select>
+                <span class="custom-arrow">
+                  <svg
+                    width="12"
+                    height="7"
+                    viewBox="0 0 12 7"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M1 1L6 6L11 1"
+                      stroke="#2B3942"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </span>
               </div>
               <!-- End Type Field  -->
             </div>
@@ -165,82 +250,165 @@
         </div> -->
 
         <div class="start-end">
-          <div class="d-flex flex-column gap-12">
+          <div class="d-flex flex-column gap-8">
             <div class="d-flex gap-8 align-items-center">
-              <mat-label class="f-s-16 f-w-400 d-block">@if(showStartEnd) {Start & end} @else {Date}</mat-label>
-              <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
+              <mat-label class="f-s-16 f-w-500 ibr-black d-block">
+                @if (showStartEnd) {
+                  Start & end
+                } @else {
+                  Date
+                }
+              </mat-label>
+              <img
+                width="18"
+                src="assets/images/svgs/help-circle-icon.svg"
+                alt="help-circle-icon"
+              />
             </div>
-            <div class="row justify-content-between align-items-start flex-nowrap">
+            <div
+              class="row justify-content-between align-items-start flex-nowrap"
+            >
               <!-- Start date  -->
               <div [className]="showStartEnd ? 'col-6' : 'w-100'">
                 <div class="w-100 form-field">
-                  <div class="select-option">
-                    <mat-select value="Select" formControlName="start" hideSingleSelectionIndicator>
+                  <div class="select-option position-relative">
+                    <mat-select
+                      value="Select"
+                      formControlName="start"
+                      hideSingleSelectionIndicator
+                    >
                       <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
-                      @if(isEditWorkflow || eventsList?.length > 0)
-                        {
-                          <mat-option [value]="currentYear">This year ({{ currentYear }})</mat-option>
-                        }
-                      @for (event of eventsList; track event) {
-                      <mat-option [value]="'event:' + event.id">{{ event.name }} ({{ getAgeForYear(event.start.year) }})</mat-option>
+                      @if (isEditWorkflow || eventsList?.length > 0) {
+                        <mat-option [value]="currentYear"
+                          >This year ({{ currentYear }})</mat-option
+                        >
                       }
-                      <hr>
+                      @for (event of eventsList; track event) {
+                        <mat-option [value]="'event:' + event.id"
+                          >{{ event.name }} ({{
+                            getAgeForYear(event.start.year)
+                          }})</mat-option
+                        >
+                      }
+                      <hr />
                       @for (year of years; let i = $index; track year) {
-                      <mat-option [value]="year">{{ year }} ({{ clientAge + i }})</mat-option>
+                        <mat-option [value]="year"
+                          >{{ year }} ({{ clientAge + i }})</mat-option
+                        >
                       }
                     </mat-select>
+                    <span class="custom-arrow">
+                      <svg
+                        width="12"
+                        height="7"
+                        viewBox="0 0 12 7"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M1 1L6 6L11 1"
+                          stroke="#2B3942"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                    </span>
                   </div>
-                  @if(contributionForm.get('start')?.touched &&
-                  contributionForm.get('start')?.hasError('required')) {
-                  <!-- <span class="field-error d-block">Start is required</span> -->
-              <span class="field-error d-block">{{'Required' | translate}}</span>
-
+                  @if (
+                    contributionForm.get("start")?.touched &&
+                    contributionForm.get("start")?.hasError("required")
+                  ) {
+                    <!-- <span class="field-error d-block">Start is required</span> -->
+                    <span class="field-error d-block">{{
+                      "Required" | translate
+                    }}</span>
                   }
                 </div>
               </div>
 
-              @if(showStartEnd) {
-              <!-- Divider  -->
-              <div class="d-flex justify-content-start align-items-start">
-                <img src="assets/images/svgs/chevron-right-date-icon.svg" alt="chevron-right-date-icon" />
-              </div>
-              <!-- End date  -->
-              <div class="col-6">
-                <div class="w-100 form-field">
-                  <div class="select-option">
-                    <mat-select value="Select" formControlName="end" hideSingleSelectionIndicator>
-                        @if((isEditWorkflow || eventsList?.length > 0) && currentYear >= getStartYear())
-                        {
-                          <mat-option [value]="currentYear">This year ({{ currentYear }})</mat-option>
+              @if (showStartEnd) {
+                <!-- Divider  -->
+                <div class="d-flex justify-content-start align-items-start">
+                  <img
+                    src="assets/images/svgs/chevron-right-date-icon.svg"
+                    alt="chevron-right-date-icon"
+                  />
+                </div>
+                <!-- End date  -->
+                <div class="col-6">
+                  <div class="w-100 form-field">
+                    <div class="select-option position-relative">
+                      <mat-select
+                        value="Select"
+                        formControlName="end"
+                        hideSingleSelectionIndicator
+                      >
+                        @if (
+                          (isEditWorkflow || eventsList?.length > 0) &&
+                          currentYear >= getStartYear()
+                        ) {
+                          <mat-option [value]="currentYear"
+                            >This year ({{ currentYear }})</mat-option
+                          >
                         }
                         @for (event of getEndEvents(); track event.id) {
-                      <mat-option [value]="'event:' + event.id">{{ event.name }} ({{ getAgeForYear(event.start.year) }})</mat-option>
-                      }
-                      <hr>
-                      @for (year of getEndYears(); track year) {
-                      <mat-option [value]="year">{{ year }} ({{ getAgeForYear(year) }})</mat-option>
-                      }
-                    </mat-select>
-                  </div>
-                  @if(contributionForm.get('end')?.touched &&
-                  contributionForm.get('end')?.hasError('required')) {
-                  <!-- <span class="field-error d-block">End is required</span> -->
-              <span class="field-error d-block">{{'Required' | translate}}</span>
-
-                  }
-                  @if(contributionForm.get('end')?.touched &&
-                        contributionForm.get('end')?.hasError('endBeforeStart')) {
-                      <span class="field-error d-block">End year cannot be before start year</span>
+                          <mat-option [value]="'event:' + event.id"
+                            >{{ event.name }} ({{
+                              getAgeForYear(event.start.year)
+                            }})</mat-option
+                          >
+                        }
+                        <hr />
+                        @for (year of getEndYears(); track year) {
+                          <mat-option [value]="year"
+                            >{{ year }} ({{ getAgeForYear(year) }})</mat-option
+                          >
+                        }
+                      </mat-select>
+                      <span class="custom-arrow">
+                        <svg
+                          width="12"
+                          height="7"
+                          viewBox="0 0 12 7"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M1 1L6 6L11 1"
+                            stroke="#2B3942"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                        </svg>
+                      </span>
+                    </div>
+                    @if (
+                      contributionForm.get("end")?.touched &&
+                      contributionForm.get("end")?.hasError("required")
+                    ) {
+                      <!-- <span class="field-error d-block">End is required</span> -->
+                      <span class="field-error d-block">{{
+                        "Required" | translate
+                      }}</span>
                     }
+                    @if (
+                      contributionForm.get("end")?.touched &&
+                      contributionForm.get("end")?.hasError("endBeforeStart")
+                    ) {
+                      <span class="field-error d-block"
+                        >End year cannot be before start year</span
+                      >
+                    }
+                  </div>
                 </div>
-              </div>
               }
             </div>
           </div>
         </div>
 
-
-   <!-- @if(showStartEnd) {
+        <!-- @if(showStartEnd) {
           <div class="w-100 form-field gap-20">
             <div class="w-100 form-field gap-8">
               <mat-label class="f-s-16 f-w-400 d-flex gap-8 align-items-center">Escalation rate <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" /></mat-label>
@@ -288,39 +456,108 @@
         } -->
 
         <section class="example-section">
-  <mat-checkbox
-    type="checkbox"
-    id="commissions"
-    formControlName="commissions"
-    (change)="isCommissionsChanged(contributionForm.get('commissions')?.value)"
-  >
-    Add commission
-  </mat-checkbox>
-</section>
+          <mat-checkbox
+            class="example-margin"
+            type="checkbox"
+            id="commissions"
+            formControlName="commissions"
+            (change)="
+              isCommissionsChanged(contributionForm.get('commissions')?.value)
+            "
+          >
+            Add commission
+          </mat-checkbox>
+        </section>
 
-@if (contributionForm.get('commissions')?.value) {
-  <div class="d-flex flex-column gap-12 ">
-    <div class="d-flex gap-8 align-items-center">
-      <mat-label class="f-s-16 f-w-400 d-block">Commission percentage</mat-label>
-      <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
-    </div>
-    <div class="w-100 form-field input-container">
-      <mat-form-field appearance="outline" class="w-full w-100 percentage-icon">
-        <span matSuffix>%</span>
-        <input matInput type="number" placeholder="0" formControlName="commissionPercentage" />
-      </mat-form-field>
-      @if (contributionForm.get('commissionPercentage')?.touched &&
-            contributionForm.get('commissionPercentage')?.hasError('required')) {
-        <!-- <span class="field-error d-block">Commission percentage is required</span> -->
-              <span class="field-error d-block">{{'Required' | translate}}</span>
+        @if (contributionForm.get("commissions")?.value) {
+          <div class="d-flex flex-column gap-8">
+            <div class="d-flex gap-8 align-items-center">
+              <mat-label class="f-s-16 f-w-500 d-block ibr-black"
+                >Commission percentage</mat-label
+              >
+              <img
+                width="18"
+                src="assets/images/svgs/help-circle-icon.svg"
+                alt="help-circle-icon"
+              />
+            </div>
+            <div class="w-100 form-field position-relative">
+              <input
+                matInput
+                type="number"
+                formControlName="commissionPercentage"
+                placeholder="0"
+              />
+              <div class="custom-rate-suffix">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M15.8337 4.16602L4.16699 15.8327"
+                    stroke="#48475D"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M5.41634 7.50065C6.56693 7.50065 7.49967 6.56791 7.49967 5.41732C7.49967 4.26672 6.56693 3.33398 5.41634 3.33398C4.26575 3.33398 3.33301 4.26672 3.33301 5.41732C3.33301 6.56791 4.26575 7.50065 5.41634 7.50065Z"
+                    stroke="#48475D"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M14.5833 16.6667C15.7339 16.6667 16.6667 15.7339 16.6667 14.5833C16.6667 13.4327 15.7339 12.5 14.5833 12.5C13.4327 12.5 12.5 13.4327 12.5 14.5833C12.5 15.7339 13.4327 16.6667 14.5833 16.6667Z"
+                    stroke="#48475D"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </div>
+            </div>
+            @if (
+              contributionForm.get("commissionPercentage")?.touched &&
+              contributionForm.get("commissionPercentage")?.hasError("required")
+            ) {
+              <!-- <span class="field-error d-block">Commission percentage is required</span> -->
+              <span class="field-error d-block">{{
+                "Required" | translate
+              }}</span>
+            }
+            <!-- <div class="w-100 form-field input-container"> -->
+            <!-- <mat-form-field
+                appearance="outline"
+                class="w-full w-100 percentage-icon"
+              >
+                <span matSuffix>%</span>
+                <input
+                  matInput
+                  type="number"
+                  placeholder="0"
+                  formControlName="commissionPercentage"
+                />
+              </mat-form-field> -->
+            <!-- @if (
+                contributionForm.get("commissionPercentage")?.touched &&
+                contributionForm
+                  .get("commissionPercentage")
+                  ?.hasError("required")
+              ) { -->
+            <!-- <span class="field-error d-block">Commission percentage is required</span> -->
+            <!-- <span class="field-error d-block">{{
+                  "Required" | translate
+                }}</span>
+              } -->
+            <!-- </div> -->
+          </div>
+        }
 
-      }
-    </div>
-  </div>
-}
-
-
-              <!-- <mat-checkbox type="checkbox" id="commissions"
+        <!-- <mat-checkbox type="checkbox" id="commissions"
               (change)="isCommissionsChanged(savingsForm.get('commissions')?.value)" formControlName="commissions">Add commissions</mat-checkbox>
       </section> -->
       </div>
@@ -328,14 +565,22 @@
     <!-- End Modal Body  -->
 
     <!-- Modal Action Button  -->
-    <div class="row justify-content-between modal-action">
-      <div class="col-5">
-        <button (click)="closeDialog()" class="button-icon-outline w-100 d-block">
-          <span class="f-s-16">{{ 'Cancel' | translate }}</span>
+    <div class="row justify-content-end gap-16 modal-action p-t-24">
+      <div>
+        <button
+          (click)="closeDialog()"
+          class="button-icon-outline w-100 d-block"
+        >
+          <span class="f-s-16">{{ "Cancel" | translate }}</span>
         </button>
       </div>
-      <div class="col-5">
-        <button (click)="addIncome()" type="button" [disabled]="contributionForm.invalid"  class="button-icon w-100 d-block">
+      <div>
+        <button
+          (click)="addIncome()"
+          type="button"
+          [disabled]="contributionForm.invalid"
+          class="button-icon w-100 d-block"
+        >
           <!-- <span class="f-s-16">{{isEditWorkflow ? 'Save' : 'Add'}} contribution</span> -->
           <span class="f-s-16">Save</span>
         </button>

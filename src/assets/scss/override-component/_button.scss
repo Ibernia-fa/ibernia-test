@@ -154,7 +154,7 @@ html {
   gap: 8px;
   cursor: pointer;
   font-family: "Ubuntu", serif;
-  transition: all 0.3s linear;
+  transition: all 0.2s linear;
 
   @media (max-width: 520px) {
     width: 100%;
@@ -174,13 +174,13 @@ html {
 .button-icon:hover,
 .button-icon-outline:hover {
   opacity: 0.9;
-  transition: opacity 0.3s linear;
+  transition: opacity 0.2s linear;
 }
 
 .button-icon-outline {
   background-color: transparent;
   border: 1px solid #4043af;
-  transition: all 0.3s linear;
+  transition: all 0.2s linear;
 }
 .button-icon-white span {
   color: #5a596e;

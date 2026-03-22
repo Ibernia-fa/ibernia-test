@@ -1,14 +1,14 @@
 .start-end {
-    .row {
-      margin: 0 !important;
-      .col-6 {
-        padding: 0 !important;
-        max-width: 45% !important;
-        flex: 0 0 45% !important;
-      }
+  .row {
+    margin: 0 !important;
+    .col-6 {
+      padding: 0 !important;
+      max-width: 45% !important;
+      flex: 0 0 45% !important;
     }
   }
-    .input-container {
+}
+.input-container {
   position: relative;
 
   .percent-input {
@@ -34,16 +34,18 @@
 }
 
 .escalation-field {
-  flex: 1 1 260px;
-  min-width: 0;
+  // flex: 1 1 260px;
+  // flex: 1 1 0%;
+  // min-width: 0;
+  flex: 1 1 0;
 }
 
 .escalation-custom {
-  flex: 1 1 170px;
+  // flex: 1 1 170px;
 }
 
 .escalation-full {
-  flex: 1 1 100%;
+  // flex: 1 1 100%;
 }
 
 /* Custom escalation rate: same look as other form inputs, with % suffix */
@@ -71,7 +73,9 @@
   .slider-wrapper {
     flex: 1;
     min-width: 0;
-    margin-top: -15px;
+    .mat-mdc-slider {
+      margin: 0 !important;
+    }
   }
   .percentage-field {
     flex-basis: 98px;
