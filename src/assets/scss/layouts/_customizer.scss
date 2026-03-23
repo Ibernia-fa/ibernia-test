@@ -133,6 +133,11 @@ html .customizerNav {
 .vis-item {
   padding: 6px 10px;
   color: #1c1c1c;
+  z-index: auto !important;
+}
+
+.vis-item.vis-selected {
+  z-index: 2 !important;
 }
 
 .vis-item.vis-box,
@@ -202,6 +207,7 @@ html .customizerNav {
   border-radius: 12px !important;
   border: none !important;
   overflow: hidden !important;
+  isolation: isolate;
 }
 // Tags
 
@@ -336,7 +342,7 @@ html .customizerNav {
   width: 2px;
   height: 500px;
   pointer-events: none;
-  z-index: 0;
+  z-index: -1;
 }
 
 .vis-item.birth-icon::after { background-color: #fe9614; }

@@ -46,6 +46,7 @@ export class LegacyComponent implements OnInit, OnChanges {
   dashboard: LegacyDashboardModel | null = null;
   activeScenario: ScenarioType | null = null;
   scenarioResult: ScenarioResultModel | null = null;
+  markedDeceased = new Set<string>();
 
   constructor(
     private legacyHttp: LegacyHttpService,
@@ -115,7 +116,7 @@ export class LegacyComponent implements OnInit, OnChanges {
   // ── Scenario Helpers ───────────────────────────────────────────
 
   isDeceased(memberId: string): boolean {
-    return this.scenarioResult?.deceasedMemberIds?.includes(memberId) ?? false;
+    return this.markedDeceased.has(memberId);
   }
 
   getMemberInheritance(memberId: string) {
@@ -152,13 +153,20 @@ export class LegacyComponent implements OnInit, OnChanges {
   }
 
   selectScenario(scenario: ScenarioType): void {
-    if (this.activeScenario === scenario) {
-      this.activeScenario = null;
-      this.scenarioResult = null;
+    const ids = this.getScenarioMemberIds(scenario);
+    const allAlreadyMarked = ids.length > 0 && ids.every(id => this.markedDeceased.has(id));
+
+    if (allAlreadyMarked) {
+      ids.forEach(id => this.markedDeceased.delete(id));
+      if (this.markedDeceased.size === 0) {
+        this.activeScenario = null;
+        this.scenarioResult = null;
+      }
       this.cdr.markForCheck();
       return;
     }
 
+    ids.forEach(id => this.markedDeceased.add(id));
     this.activeScenario = scenario;
     this.legacyHttp.simulateScenario(this.cashflowId, scenario).subscribe({
       next: (result) => {
@@ -167,11 +175,32 @@ export class LegacyComponent implements OnInit, OnChanges {
       },
       error: (err) => {
         this.toastr.error(err?.error?.message || 'Failed to simulate scenario', 'Error');
-        this.activeScenario = null;
-        this.scenarioResult = null;
+        ids.forEach(id => this.markedDeceased.delete(id));
+        if (this.markedDeceased.size === 0) {
+          this.activeScenario = null;
+          this.scenarioResult = null;
+        }
         this.cdr.markForCheck();
       }
     });
+  }
+
+  private getScenarioMemberIds(scenario: ScenarioType): string[] {
+    const members = this.dashboard?.familyMembers ?? [];
+    switch (scenario) {
+      case ScenarioType.ClientDies:
+        return members.filter(m => m.role === 'Client').map(m => m.id);
+      case ScenarioType.PartnerDies:
+        return members.filter(m => m.role === 'Partner').map(m => m.id);
+      case ScenarioType.BothDie:
+        return members.filter(m => m.role === 'Client' || m.role === 'Partner').map(m => m.id);
+      case ScenarioType.ClientParentsDie:
+        return members.filter(m => m.role === 'ClientFather' || m.role === 'ClientMother').map(m => m.id);
+      case ScenarioType.PartnerParentsDie:
+        return members.filter(m => m.role === 'PartnerFather' || m.role === 'PartnerMother').map(m => m.id);
+      default:
+        return [];
+    }
   }
 
   onClickClientParent(): void {
@@ -287,6 +316,7 @@ export class LegacyComponent implements OnInit, OnChanges {
   private clearScenario(): void {
     this.activeScenario = null;
     this.scenarioResult = null;
+    this.markedDeceased.clear();
     this.cdr.markForCheck();
   }
 }
