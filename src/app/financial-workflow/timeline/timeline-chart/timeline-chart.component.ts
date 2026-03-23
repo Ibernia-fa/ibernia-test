@@ -714,6 +714,10 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
     this.initTimelineHover();
     this.stripTimelineTooltips();
 
+    this.timeline.on('changed', () => {
+      this.adjustItemZIndex();
+    });
+
     this.timeline.on('doubleClick', (event) => {
       event.event.preventDefault();
       event.event.stopPropagation();
@@ -725,6 +729,20 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
         if (clientEvent && !clientEvent.isPlaceHolder)
           this.updateEventByDoubleClick(clientEvent);
       }
+    });
+  }
+
+  private adjustItemZIndex(): void {
+    const container = this.timelineContainer?.nativeElement;
+    if (!container) return;
+
+    const items = Array.from(
+      container.querySelectorAll('.vis-item'),
+    ) as HTMLElement[];
+
+    items.forEach((item) => {
+      const top = parseFloat(item.style.top) || 0;
+      item.style.zIndex = String(Math.max(1, Math.round(top) + 1));
     });
   }
 

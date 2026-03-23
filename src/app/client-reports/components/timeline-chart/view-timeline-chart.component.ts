@@ -229,6 +229,24 @@ export class ViewTimelineChartComponent implements OnInit {
         this.timeline.setSelection(props.item);
       }
     });
+
+    this.timeline.on('changed', () => {
+      this.adjustItemZIndex();
+    });
+  }
+
+  private adjustItemZIndex(): void {
+    const container = this.timelineContainer?.nativeElement;
+    if (!container) return;
+
+    const items = Array.from(
+      container.querySelectorAll('.vis-item'),
+    ) as HTMLElement[];
+
+    items.forEach((item) => {
+      const top = parseFloat(item.style.top) || 0;
+      item.style.zIndex = String(Math.max(1, Math.round(top) + 1));
+    });
   }
 
   get timelineData(): DataSet<
