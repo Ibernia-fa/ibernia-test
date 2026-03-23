@@ -9,14 +9,6 @@
   "
 >
   <ng-container>
-    <app-header
-      [hideSidebarToggle]="hideSidebar"
-      [showToggle]="!isOver"
-      (toggleCollapsed)="toggleCollapsed()"
-      (toggleMobileNav)="sidenav.toggle()"
-      (toggleMobileFilterNav)="filterNavRight.toggle()"
-      (optionsChange)="receiveOptions($event)"
-    ></app-header>
     <mat-sidenav-container
       autosize
       autoFocus
@@ -257,6 +249,14 @@
             maxWidth: options.boxed,
           }"
         >
+          <app-header
+            [hideSidebarToggle]="hideSidebar"
+            [showToggle]="!isOver"
+            (toggleCollapsed)="toggleCollapsed()"
+            (toggleMobileNav)="sidenav.toggle()"
+            (toggleMobileFilterNav)="filterNavRight.toggle()"
+            (optionsChange)="receiveOptions($event)"
+          ></app-header>
           <!-- <app-breadcrumb></app-breadcrumb> -->
           <!-- ============================================================== -->
           <!-- Outlet -->

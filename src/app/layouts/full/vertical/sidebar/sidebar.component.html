@@ -1,16 +1,31 @@
 <!-- Sidebar header: logo + toggle (toggle only when expanded; when collapsed, toggle is in header) -->
 <div class="sidebar-header">
   <div class="sidebar-logo-link">
-    <ng-container *ngIf="isBrandLogoLoaded">
-      <app-branding [profileImage]="brandingLogo"></app-branding>
-    </ng-container>
-    <a *ngIf="!isBrandLogoLoaded" href="/">
+    <!-- COLLAPSED: show mini icon -->
+    <ng-container *ngIf="sidenavCollapsed; else expandedLogo">
       <img
-        src="./assets/images/logos/sidebar-fallback-logo.svg"
-        alt="logo"
-        class="sidebar-default-logo"
+        src="./assets/images/logos/sidebar-mini-fallback-icon.svg"
+        alt="mini logo"
+        class="sidebar-mini-logo"
       />
-    </a>
+    </ng-container>
+
+    <!-- EXPANDED: show brand logo -->
+    <ng-template #expandedLogo>
+      <ng-container *ngIf="isBrandLogoLoaded; else fallbackLogo">
+        <app-branding [profileImage]="brandingLogo"></app-branding>
+      </ng-container>
+
+      <ng-template #fallbackLogo>
+        <a href="/">
+          <img
+            src="./assets/images/logos/sidebar-fallback-logo.svg"
+            alt="logo"
+            class="sidebar-default-logo"
+          />
+        </a>
+      </ng-template>
+    </ng-template>
   </div>
   @if (showToggle) {
     <button
