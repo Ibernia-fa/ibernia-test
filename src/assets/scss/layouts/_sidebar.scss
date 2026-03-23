@@ -22,8 +22,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 12px 6px 12px;
-  height: 64px;
+  padding: 12px 12px 0px 12px;
+  height: 70px;
   // min-height: 65px;
   flex-shrink: 0;
   // border-bottom: 1px solid rgba(255, 255, 255, 0.08);
@@ -275,15 +275,15 @@
       color: white;
     }
   }
-  &:hover svg path {
-    // fill: white;
-    stroke: white;
-  }
+  // &:hover svg path {
+  //   // fill: white;
+  //   stroke: white;
+  // }
 
-  &.activeMenu svg path {
-    // fill: white;
-    stroke: white;
-  }
+  // &.activeMenu svg path {
+  //   // fill: white;
+  //   stroke: white;
+  // }
   &.activeMenu {
     &::after {
       content: "";
@@ -465,6 +465,37 @@
   }
   // }
 }
+// ---------------------------------------------------------------------------
+// Make "premium" (lower) sidebar items match `cashflow-modal.activeMenu`
+// so all nav items look consistent when active.
+// ---------------------------------------------------------------------------
+.sidebar-list.preimum-nav {
+  .menu-list-item.activeMenu {
+    background-color: #516ce8 !important;
+    // border-left: none !important;
+    color: white !important;
+
+    span {
+      color: white !important;
+    }
+
+    // Reuse the same right-side active indicator bar as Plan.
+    &::after {
+      content: "";
+      position: absolute;
+      right: 4px;
+      top: 50%;
+      left: auto;
+      transform: translateY(-50%);
+      width: 4px;
+      height: 36px;
+      background: white;
+      border-radius: 10px;
+      display: block !important;
+      z-index: 1;
+    }
+  }
+}
 // End upper side Menus
 
 // Lower Side Menu
@@ -556,4 +587,13 @@
   border-radius: 50px;
   font-family: "Inter", sans-serif;
   padding: 3px 6px;
+}
+
+.sidebarNav-mini {
+  .menu-list-item.activeMenu::after,
+  .cashflow-modal.activeMenu::after,
+  .sidebar-list.preimum-nav .menu-list-item.activeMenu::after {
+    display: none !important;
+    content: none !important;
+  }
 }

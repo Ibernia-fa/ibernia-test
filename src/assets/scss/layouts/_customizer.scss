@@ -127,11 +127,11 @@ html .customizerNav {
   // border-right: 1px solid red !important;
   // border-left: 1px solid red !important;
   // background: white !important;
-  background: transparent !important;
+  // background: transparent !important;
 }
 
 .vis-item {
-  padding: 4px 10px;
+  padding: 6px 10px;
   color: #1c1c1c;
 }
 
@@ -139,13 +139,13 @@ html .customizerNav {
 .vis-item.vis-range {
   border-radius: 9999px !important;
 }
-.vis-item.vis-line {
-  background-color: transparent;
-  border: none !important;
-}
-.vis-item.vis-dot {
-  display: none;
-}
+// .vis-item.vis-line {
+//   background-color: transparent;
+//   border: none !important;
+// }
+// .vis-item.vis-dot {
+//   display: none;
+// }
 .vis-item .vis-item-overflow {
   min-height: 24px !important;
   display: flex !important;
@@ -176,6 +176,11 @@ html .customizerNav {
   background-color: #b0b0b0 !important;
   width: 1px !important;
 }
+.vis-time-axis .vis-grid.vis-major {
+  border-width: 2px;
+  border-color: black !important;
+  display: none;
+}
 .vis-time-axis .vis-grid.vis-minor {
   border-width: 2px;
   border-color: pink;
@@ -184,13 +189,14 @@ html .customizerNav {
   border-color: #f7f7f7 !important;
 }
 .vis-panel.vis-horizontal {
-  border: 1px solid #cfcfd7 !important;
-  border-radius: 12px !important;
+  // border: 1px solid #cfcfd7 !important;
+  // border-radius: 12px !important;
+  border-bottom: 1px solid #5a596e !important;
 }
-.vis-panel.vis-vertical {
-  border-top: 1px solid #cfcfd7 !important;
-  border-radius: 12px !important;
-}
+// .vis-panel.vis-vertical {
+//   border-top: 1px solid #cfcfd7 !important;
+//   border-radius: 12px !important;
+// }
 .vis-panel.vis-center {
   border-color: #cfcfd7;
   border-radius: 12px !important;
@@ -200,9 +206,10 @@ html .customizerNav {
 
 .vis-item.retirement-age-icon,
 .vis-item.retirement-age-icon.vis-selected {
-  background-color: #fff9f7;
-  color: #1c1c1c;
-  border: 1px solid #ffede7 !important;
+  background-color: #c6e1ff;
+  color: #3088ed;
+  border: none !important;
+  font-weight: 500;
 }
 .vis-item.mortality-icon,
 .vis-item.mortality-icon.vis-selected {
@@ -220,19 +227,33 @@ html .customizerNav {
 
 .vis-item.birth-icon,
 .vis-item.birth-icon.vis-selected {
-  background-color: #fffbf5;
-  color: #1c1c1c;
-  border: 1px solid #fff3e0 !important;
+  // background-color: #fffbf5;
+  // color: #1c1c1c;
+  background-color: #ffedd7;
+  color: #fe9614;
+  border: none !important;
+  font-weight: 500;
 }
-.vis-item.birth-icon.vis-line {
-  display: none !important;
+// .vis-item.birth-icon.vis-line {
+//   display: none !important;
+// }
+
+.vis-item.vis-line {
+  border: 4px solid black !important;
+  background-color: black !important;
+}
+.vis-panel.vis-bottom {
+  padding: 24px 0 24px 0 !important;
 }
 
 .vis-item.wedding-icon,
 .vis-item.wedding-icon.vis-selected {
-  background-color: #f8f5ff;
-  border: 1px solid #eae0ff !important;
-  color: #1c1c1c;
+  // background-color: #f8f5ff;
+  // border: 1px solid #eae0ff !important;
+  background-color: #e2e0fc;
+  border: none !important;
+  color: #6155f5;
+  font-weight: 500;
 }
 
 .vis-item.state-pension-icon,
@@ -243,45 +264,55 @@ html .customizerNav {
 }
 .vis-item.education-icon,
 .vis-item.education-icon.vis-selected {
-  background-color: #eef4ff;
-  color: #1c1c1c;
-  border: 1px solid #dee7f6 !important;
+  background-color: #d2fffb;
+  color: #00c8b3;
+  border: none !important;
+  font-weight: 500;
 }
 .vis-item.car-icon,
 .vis-item.car-icon.vis-selected {
-  background-color: #fff4ed;
-  color: #1c1c1c;
-  border: 1px solid #eddace !important;
+  background-color: #fff4eb;
+  color: #ac7f5e;
+  border: none !important;
+  font-weight: 500;
 }
 .vis-item.home-icon,
 .vis-item.home-icon.vis-selected {
-  background-color: #f0f9ff;
-  color: #1c1c1c;
-  border: 1px solid #e0ecf4 !important;
+  background-color: #fddce2;
+  color: #ff2d55;
+  border: none !important;
+  font-weight: 500;
+  // background-color: #f0f9ff;
+  // color: #1c1c1c;
+  // border: 1px solid #e0ecf4 !important;
 }
 .vis-item.new-business-icon,
 .vis-item.new-business-icon.vis-selected {
-  background-color: #fef3f2;
-  color: #1c1c1c;
-  border: 1px solid #ffe8e5 !important;
+  background-color: #ddffe5;
+  color: #34c759;
+  border: none !important;
+  font-weight: 500;
 }
 .vis-item.boat-icon,
 .vis-item.boat-icon.vis-selected {
-  background-color: #ecfdf3;
-  color: #1c1c1c;
-  border: 1px solid #cbf1db !important;
+  background-color: #ffe2d5;
+  color: #ff7504;
+  border: none !important;
+  font-weight: 500;
 }
 .vis-item.travel-icon,
 .vis-item.travel-icon.vis-selected {
-  background-color: #f8f9fc;
-  color: #1c1c1c;
-  border: 1px solid #dfe3ef !important;
+  background-color: #cee9ff;
+  color: #0088ff;
+  border: none !important;
+  font-weight: 500;
 }
 .vis-item.custom-icon,
 .vis-item.custom-icon.vis-selected {
-  background-color: #f9f9ff;
-  color: #1c1c1c;
-  border: 1px solid #ebecff !important;
+  background-color: #cee9ff;
+  color: #0088ff;
+  border: none !important;
+  font-weight: 500;
 }
 
 .vis-item .vis-delete {
@@ -325,10 +356,13 @@ html .customizerNav {
 
 .vis-custom-time.dragOver,
 .vis-custom-time.hoverLine {
-  height: 77% !important;
-  top: 8px !important;
-  background-color: #516ce8 !important;
+  display: none !important;
 }
+// .vis-custom-time.hoverLine {
+//   height: 77% !important;
+//   top: 8px !important;
+//   background-color: #516ce8 !important;
+// }
 .vis-time-axis .vis-grid.vis-vertical {
   height: 77% !important;
   top: 8px;
@@ -340,12 +374,13 @@ html .customizerNav {
 
 // Style Date of Vis Timeline
 .vis-time-axis .vis-text.vis-minor {
-  opacity: 30%;
+  // opacity: 30%;
   width: fit-content !important;
   div {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 10px;
+    text-align: center;
     p {
       margin: 0px;
       font-size: 10px;
@@ -523,10 +558,10 @@ html .customizerNav {
   }
 }
 // End Range Input
-.vis-panel.vis-center,
-.vis-timeline {
-  overflow: visible !important;
-}
+// .vis-panel.vis-center,
+// .vis-timeline {
+//   overflow: visible !important;
+// }
 .vis-panel.vis-bottom {
   border: none !important;
 }
