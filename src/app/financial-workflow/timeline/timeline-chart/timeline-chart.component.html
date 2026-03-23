@@ -57,15 +57,19 @@
       </div>
     </div>
 
-    <div class="timeline-wrapper">
+    <div class="ibr-timeline-wrapper">
       <div class="timeline-labels" [class.dual-axis]="showDualAxis">
         @if (showDualAxis) {
-          <p>{{ "Age" | translate }} {{ mainClientInitial }}</p>
-          <p>{{ "Age" | translate }} {{ partnerInitial }}</p>
-          <span>{{ "Year" | translate }}</span>
+          <p class="timeline-age-label">
+            {{ "Age" | translate }} {{ mainClientInitial }}
+          </p>
+          <p class="timeline-age-label">
+            {{ "Age" | translate }} {{ partnerInitial }}
+          </p>
+          <span class="timeline-year-label">{{ "Year" | translate }}</span>
         } @else {
-          <p>{{ "Age" | translate }}</p>
-          <span>{{ "Year" | translate }}</span>
+          <p class="timeline-age-label">{{ "Age" | translate }}</p>
+          <span class="timeline-year-label">{{ "Year" | translate }}</span>
         }
       </div>
       <div

@@ -13,12 +13,9 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
       </ng-container>
     </a>
 
+    <!-- width="150" -->
     <ng-template #defaultLogo>
-      <img
-        width="150"
-        src="./assets/images/logos/ibernia-logo.svg"
-        alt="logo"
-      />
+      <img src="./assets/images/logos/ibernia-logo.svg" alt="logo" />
     </ng-template>`,
   styles: [
     `
@@ -30,13 +27,16 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
       }
 
       .brand-logo {
-        width: 50px;
-        height: 50px;
-        object-fit: contain;
-        object-position: center;
-        margin: 0;
-        padding: 0;
-        display: block;
+        // width: 100%;
+        max-width: 120px;
+        height: auto;
+        // width: 50px;
+        // height: 50px;
+        // object-fit: contain;
+        // object-position: center;
+        // margin: 0;
+        // padding: 0;
+        // display: block;
       }
       .power-by-logo {
         display: block;

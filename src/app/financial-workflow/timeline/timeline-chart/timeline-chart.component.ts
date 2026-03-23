@@ -861,7 +861,7 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
       min: new Date(startYear, 0, 1),
       end: timelineEndDate,
       max: timelineEndDate,
-      minHeight: '304px',
+      minHeight: '376px',
       width: '100%',
       align: 'left',
       showCurrentTime: false, // Hide default current time marker

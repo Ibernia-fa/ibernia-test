@@ -351,10 +351,16 @@ button {
 /* Style age (<p>) and year (<span>) */
 .vis-panel .vis-time-axis .vis-text.vis-minor p,
 .vis-panel .vis-time-axis .vis-text.vis-minor span {
-  font-size: 18px !important;
+  font-size: 16px !important;
   /* adjust as you like */
-  font-weight: bold;
-  line-height: 1 !important;
+  font-weight: 400;
+  // line-height: 22px !important;
+}
+.vis-panel .vis-time-axis .vis-text.vis-minor p {
+  color: #4043af !important;
+}
+.vis-panel .vis-time-axis .vis-text.vis-minor span {
+  color: #5a596e !important;
 }
 
 /* Allow the last year label to overflow outside the chart */
@@ -874,11 +880,11 @@ body:has(.global-fullscreen-overlay) {
   margin-left: 0px !important;
 }
 
-/* Only apply fit-content to box items, not range items which need to show duration */
-.vis-item.vis-box,
-.vis-item.vis-box.vis-selected {
-  width: fit-content !important;
-}
+// /* Only apply fit-content to box items, not range items which need to show duration */
+// .vis-item.vis-box,
+// .vis-item.vis-box.vis-selected {
+//   width: fit-content !important;
+// }
 
 .example-margin .mat-internal-form-field .mdc-label {
   color: #302f47;

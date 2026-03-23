@@ -329,31 +329,33 @@
             }
           </div>
           <!-- </button> -->
-          <span class="name-wraper">
-            <span *ngIf="displayFirstName" class="f-w-500 f-s-16"
-              >{{ displayFirstName }}
+          <div class="d-flex flex-row gap-12 align-items-baseline">
+            <span class="name-wraper">
+              <span *ngIf="displayFirstName" class="f-w-500 f-s-16"
+                >{{ displayFirstName }}
+              </span>
+              <span *ngIf="displayLastName" class="f-w-500 f-s-16">{{
+                displayLastName
+              }}</span>
             </span>
-            <span *ngIf="displayLastName" class="f-w-500 f-s-16">{{
-              displayLastName
-            }}</span>
-          </span>
 
-          <svg
-            width="12"
-            height="7"
-            viewBox="0 0 12 7"
-            fill="none"
-            class="dropdown-icon"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M1 1L6 6L11 1"
-              stroke="#2B3942"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </svg>
+            <svg
+              width="12"
+              height="7"
+              viewBox="0 0 12 7"
+              fill="none"
+              class="dropdown-icon"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M1 1L6 6L11 1"
+                stroke="#2B3942"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </div>
         </div>
         <ul class="sub-menu">
           <li [routerLink]="'/settings'">

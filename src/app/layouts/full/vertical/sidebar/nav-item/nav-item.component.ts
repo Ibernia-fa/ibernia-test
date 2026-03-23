@@ -86,6 +86,44 @@ export class AppNavItemComponent implements OnChanges {
     }
   }
 
+  /**
+   * Determines whether this nav item should be highlighted as "active".
+   * Highlighting must be based on the route (not displayName), because
+   * displayName can be translated/changed independently of navigation.
+   */
+  isItemActive(item: NavItem | any): boolean {
+    if (!item) return false;
+
+    // If this is a group item, highlight it if any child is active.
+    if (item.children?.length) {
+      return item.children.some((child: NavItem | any) => this.isItemActive(child));
+    }
+
+    const url = this.navService.currentUrl();
+    if (!url || !item.route) return false;
+
+    let resolvedRoute = String(item.route);
+
+    // Resolve dynamic route params used by this project (ex: {cashflowId}).
+    if (resolvedRoute.includes('{cashflowId}') && this.selectedCashflowId) {
+      resolvedRoute = resolvedRoute.replace('{cashflowId}', this.selectedCashflowId);
+    }
+
+    // Normalize leading slash because nav item routes are often relative.
+    if (!resolvedRoute.startsWith('/')) {
+      resolvedRoute = `/${resolvedRoute}`;
+    }
+
+    // Strip query/hash from router url.
+    const currentPath = String(url).split('?')[0].split('#')[0];
+
+    return (
+      currentPath === resolvedRoute ||
+      currentPath.startsWith(`${resolvedRoute}/`) ||
+      currentPath.startsWith(resolvedRoute)
+    );
+  }
+
   onItemSelected(item: NavItem) {
     if (!item.children || !item.children.length) {
       var newRoute = item.route;

@@ -2,9 +2,7 @@
   <a
     (click)="onItemSelected(item)"
     class="cashflow-modal d-flex align-items-center gap-12"
-    [ngClass]="
-      navItem.currentRouteName === item.displayName ? 'activeMenu' : ''
-    "
+    [ngClass]="isItemActive(item) ? 'activeMenu' : ''"
   >
     <svg
       height="24"
@@ -51,7 +49,7 @@
     [disableRipple]="true"
     [ngClass]="{
       'mat-toolbar mat-primary activeMenu': item.route
-        ? navItem.currentRouteName === item.displayName
+        ? isItemActive(item)
         : false,
       expanded: expanded,
       disabled: item.disabled,
@@ -88,11 +86,7 @@
       <div class="nav-left">
         <img
           style="flex: none; max-width: 24px"
-          [src]="
-            item.currentRouteName === item.displayName
-              ? item.iconName
-              : item.iconOutline
-          "
+          [src]="isItemActive(item) ? item.iconName : item.iconOutline"
           alt="item"
         />
         <span class="hide-menu">{{ item.displayName | translate }}</span>

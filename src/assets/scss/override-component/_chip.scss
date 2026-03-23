@@ -8,7 +8,7 @@
 );
 
 .chips-custom {
-  margin-bottom: 8px;
+  margin-bottom: 16px;
   .mdc-evolution-chip {
     margin: 0 !important;
   }
@@ -33,10 +33,10 @@
     display: flex;
     width: fit-content;
     &.retirement-age-icon {
-      background-color: #fff9f7 !important;
-      border: 1px solid #ffede7;
+      background-color: #c6e1ff;
+      // border: 1px solid #ffede7;
       p {
-        color: #e52ef5 !important;
+        color: #3088ed !important;
         margin: 0;
         padding: 0;
       }
