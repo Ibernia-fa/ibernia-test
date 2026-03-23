@@ -201,6 +201,7 @@ html .customizerNav {
   border-color: #cfcfd7;
   border-radius: 12px !important;
   border: none !important;
+  overflow: hidden !important;
 }
 // Tags
 
@@ -314,6 +315,40 @@ html .customizerNav {
   border: none !important;
   font-weight: 500;
 }
+
+// Vertical connector lines from event chips down to the year/age axis.
+// Each line color matches the event type's accent color.
+// The lines are clipped at the axis boundary by .vis-panel.vis-center overflow:hidden.
+.vis-item.birth-icon::after,
+.vis-item.wedding-icon::after,
+.vis-item.home-icon::after,
+.vis-item.travel-icon::after,
+.vis-item.car-icon::after,
+.vis-item.education-icon::after,
+.vis-item.new-business-icon::after,
+.vis-item.boat-icon::after,
+.vis-item.retirement-age-icon::after,
+.vis-item.custom-icon::after {
+  content: '';
+  position: absolute;
+  left: 12px;
+  top: 100%;
+  width: 2px;
+  height: 500px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.vis-item.birth-icon::after { background-color: #fe9614; }
+.vis-item.wedding-icon::after { background-color: #6155f5; }
+.vis-item.home-icon::after { background-color: #ff2d55; }
+.vis-item.travel-icon::after { background-color: #0088ff; }
+.vis-item.car-icon::after { background-color: #ac7f5e; }
+.vis-item.education-icon::after { background-color: #00c8b3; }
+.vis-item.new-business-icon::after { background-color: #34c759; }
+.vis-item.boat-icon::after { background-color: #ff7504; }
+.vis-item.retirement-age-icon::after { background-color: #e52ef5; }
+.vis-item.custom-icon::after { background-color: #7b7b9b; }
 
 .vis-item .vis-delete {
   right: 0 !important;
