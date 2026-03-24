@@ -5,7 +5,9 @@ import {
   Input,
   ViewEncapsulation,
   OnInit,
-  OnDestroy } from '@angular/core';
+  OnDestroy,
+  ChangeDetectorRef,
+} from '@angular/core';
 import { CoreService } from 'src/app/services/core.service';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { navItems } from '../sidebar/sidebar-data';
@@ -24,7 +26,12 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatDividerModule } from '@angular/material/divider';
 import { AuthService } from 'src/app/auth/services/auth.service';
-import { SettingsService, UserProfileDto } from 'src/app/default-preferance/services/default-preferance.http.service';
+import {
+  SettingsService,
+  UserProfileDto,
+  readUserDisplayCache,
+  clearUserDisplayCache,
+} from 'src/app/default-preferance/services/default-preferance.http.service';
 import { HttpResponse } from '@angular/common/http';
 import { takeUntil, catchError, of, finalize, Subject, Subscription, filter } from 'rxjs';
 import { OrganizationProfilesService } from 'src/app/settings/services/organization.profiles.service';
@@ -153,6 +160,9 @@ showFiller = false;
   clientFirstName: string;
   clientLastName: string;
 
+  /** Last-known display names from sessionStorage (first paint after F5 before GET completes). */
+  private hydratedDisplay: { firstName: string; lastName: string } | null = null;
+
   // Notification center
   userNotifications: UserNotificationItem[] = [];
   unreadCount = 0;
@@ -173,16 +183,22 @@ showFiller = false;
     private store: Store,
     private languageService: LanguageService,
     private languageLoader: LanguageLoaderService,
-    private myNotifications: MyNotificationsService
+    private myNotifications: MyNotificationsService,
+    private cdr: ChangeDetectorRef
   ) {
     translate.setDefaultLang('en');
     this.user = this.Authservice.getUserProfile();
-    
+    this.hydratedDisplay = this.user?.sub ? readUserDisplayCache(this.user.sub) : null;
+
     this.loadProfile();
     
     this.settingsService.profileChanged$
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => this.loadProfile());
+
+    this.settingsService.userData$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => this.cdr.markForCheck());
 
     this.store.select(selectedClient)
       .pipe(takeUntil(this.destroy$))
@@ -316,13 +332,25 @@ showFiller = false;
     }
 
     
-// Prefer saved profile names; fallback to OIDC claims; otherwise blank
+// Prefer in-memory profile, then sessionStorage (instant after refresh), then OIDC claims.
 get displayFirstName(): string {
-  return (this.userprofile?.firstName ?? '').trim() || (this.user?.given_name ?? '');
+  const fromCache = (this.settingsService.currentUserData?.firstName ?? '').trim();
+  if (fromCache) return fromCache;
+  const fromProfile = (this.userprofile?.firstName ?? '').trim();
+  if (fromProfile) return fromProfile;
+  const fromSession = (this.hydratedDisplay?.firstName ?? '').trim();
+  if (fromSession) return fromSession;
+  return (this.user?.given_name ?? '').trim();
 }
 
 get displayLastName(): string {
-  return (this.userprofile?.lastName ?? '').trim() || (this.user?.family_name ?? '');
+  const fromCache = (this.settingsService.currentUserData?.lastName ?? '').trim();
+  if (fromCache) return fromCache;
+  const fromProfile = (this.userprofile?.lastName ?? '').trim();
+  if (fromProfile) return fromProfile;
+  const fromSession = (this.hydratedDisplay?.lastName ?? '').trim();
+  if (fromSession) return fromSession;
+  return (this.user?.family_name ?? '').trim();
 }
 
 /** Initials for avatar when no profile picture (e.g. "AC" for Alex Carry) */
@@ -377,6 +405,9 @@ get userInitials(): string {
     }
 
       logout() {
+        if (this.user?.sub) {
+          clearUserDisplayCache(this.user.sub);
+        }
         this.Authservice.logout();
     }
   options = this.settings.getOptions();
