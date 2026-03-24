@@ -297,7 +297,14 @@ export class FullComponent implements OnInit, OnDestroy {
         // swap menu sources
         if (this.isSettings) {
           this.navItems = settingsNavItems;
-          this.navItemslower = settingsLowerNavItems ?? []; // or [] if you don’t have a lower list
+          const allLower = settingsLowerNavItems ?? [];
+          this.navItemslower = allLower.filter((item) => item.displayName !== 'Admin Notifications');
+          Promise.all([
+            this.Authservice.hasRole('Administrator'),
+            this.Authservice.hasRole('IberniaIdentityAdminAdministrator')
+          ]).then(([admin, idAdmin]) => {
+            this.navItemslower = (admin || idAdmin) ? allLower : allLower.filter((item) => item.displayName !== 'Admin Notifications');
+          }); // or [] if you don’t have a lower list
         } else {
           this.navItems = mainNavItems;
           this.navItemslower = mainLower;
