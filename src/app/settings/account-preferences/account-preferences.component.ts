@@ -387,6 +387,9 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
       .subscribe(() => {
         this.updateSnapshots();
         this.toastr.success('Profile saved', 'Success!');
+        const payload = this.buildPayload();
+        this.userprofile = { ...(this.userprofile ?? { preferences: DEFAULT_PREFERENCES }), ...payload };
+        this.api.setUserData(this.userprofile);
         this.api.notifyProfileChanged();
         this.cdr.markForCheck();
       });

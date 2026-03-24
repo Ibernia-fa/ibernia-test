@@ -30,6 +30,52 @@ export interface UserProfileDto {
   advisorGuidelines?: string | null;
 }
 
+/** Sync header name on refresh before UserProfile GET returns (keyed by auth sub). */
+const displayCacheKey = (userId: string) => `ibernia-user-display:${userId}`;
+
+export function readUserDisplayCache(userId: string): { firstName: string; lastName: string } | null {
+  if (!userId) return null;
+  try {
+    const raw = sessionStorage.getItem(displayCacheKey(userId));
+    if (!raw) return null;
+    const o = JSON.parse(raw) as { firstName?: string; lastName?: string };
+    if (!o || typeof o !== 'object') return null;
+    return {
+      firstName: (o.firstName ?? '').trim(),
+      lastName: (o.lastName ?? '').trim(),
+    };
+  } catch {
+    return null;
+  }
+}
+
+export function clearUserDisplayCache(userId: string): void {
+  if (!userId) return;
+  try {
+    sessionStorage.removeItem(displayCacheKey(userId));
+  } catch {
+    /* private mode / quota */
+  }
+}
+
+function persistUserDisplayCache(
+  userId: string,
+  firstName?: string | null,
+  lastName?: string | null
+): void {
+  try {
+    sessionStorage.setItem(
+      displayCacheKey(userId),
+      JSON.stringify({
+        firstName: (firstName ?? '').trim(),
+        lastName: (lastName ?? '').trim(),
+      })
+    );
+  } catch {
+    /* private mode / quota */
+  }
+}
+
 @Injectable({ providedIn: 'root' })
 export class SettingsService {
   private readonly baseUrl = '/api/v1';
@@ -85,6 +131,12 @@ export class SettingsService {
 
   setUserData(value: UserProfileDto | null) {
     this._userData.next(value);
+    if (value) {
+      const uid = `${value.userId ?? value.id ?? ''}`.trim();
+      if (uid) {
+        persistUserDisplayCache(uid, value.firstName, value.lastName);
+      }
+    }
   }
 
   // optional synchronous getter
