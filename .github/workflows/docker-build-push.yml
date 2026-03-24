@@ -174,9 +174,19 @@ jobs:
             --arg versionTag "${{ steps.vars.outputs.version_tag }}" \
             --argjson changedFiles "${CHANGED_FILES_JSON}" \
             '{event_type: $event, client_payload: {portal_sha: $sha, portal_branch: $branch, environment: $env, baseUrl: $baseUrl, versionTag: $versionTag, changedFiles: $changedFiles}}')
-          curl -sS -X POST \
+          RESPONSE_FILE="$(mktemp)"
+          HTTP_CODE=$(curl -sS -o "${RESPONSE_FILE}" -w '%{http_code}' -X POST \
             -H "Accept: application/vnd.github+json" \
             -H "Authorization: Bearer ${TESTS_REPO_TOKEN}" \
             -H "Content-Type: application/json" \
             "https://api.github.com/repos/Ibernia-fa/ibernia-portal-tests/dispatches" \
-            -d "${PAYLOAD}"
+            -d "${PAYLOAD}")
+          echo "repository_dispatch HTTP ${HTTP_CODE}"
+          if [[ "${HTTP_CODE}" != "204" ]]; then
+            echo "Expected HTTP 204 from GitHub dispatches API. Response body:"
+            cat "${RESPONSE_FILE}" || true
+            rm -f "${RESPONSE_FILE}"
+            exit 1
+          fi
+          rm -f "${RESPONSE_FILE}"
+          echo "repository_dispatch accepted; ibernia-portal-tests workflow should queue."
