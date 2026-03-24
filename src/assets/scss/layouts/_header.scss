@@ -269,8 +269,8 @@ html .topbar {
     width 0.3s ease;
 }
 .sidebar-visible.sidebar-collapsed .top-navigation-bar {
-  margin-left: 96px;
-  width: calc(100% - 96px);
+  margin-left: 88px;
+  width: calc(100% - 88px);
   transition:
     margin-left 0.3s ease,
     width 0.3s ease;
@@ -342,7 +342,8 @@ html .topbar {
     line-height: 18px;
     text-align: center;
     color: #fff;
-    background: $primary;
+    // background: $primary;
+    background: #ff383c;
     border-radius: 9px;
     border: 2px solid #fff;
   }
