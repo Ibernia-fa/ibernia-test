@@ -200,6 +200,20 @@ showFiller = false;
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => this.cdr.markForCheck());
 
+    this.myNotifications.listsChanged$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.lastNotificationsFetchAt = 0;
+        this.myNotifications.getList(this.notificationFilter).subscribe({
+          next: (list) => {
+            this.userNotifications = list;
+            this.cdr.markForCheck();
+          },
+          error: () => this.cdr.markForCheck(),
+        });
+        this.loadUnreadCount();
+      });
+
     this.store.select(selectedClient)
       .pipe(takeUntil(this.destroy$))
       .subscribe(client => {
@@ -467,15 +481,23 @@ get userInitials(): string {
     });
   }
 
-  setNotificationFilter(filter: 'all' | 'unread'): void {
+  setNotificationFilter(filter: 'all' | 'unread', event?: Event): void {
+    event?.stopPropagation();
+    if (this.notificationFilter === filter) return;
     this.notificationFilter = filter;
     this.notificationsLoading = true;
+    this.lastNotificationsFetchAt = 0;
     this.myNotifications.getList(filter).subscribe({
       next: (list) => {
         this.userNotifications = list;
         this.notificationsLoading = false;
+        this.lastNotificationsFetchAt = Date.now();
+        this.cdr.markForCheck();
       },
-      error: () => (this.notificationsLoading = false)
+      error: () => {
+        this.notificationsLoading = false;
+        this.cdr.markForCheck();
+      },
     });
   }
 
@@ -493,12 +515,12 @@ get userInitials(): string {
     }
   }
 
-  onMarkAllAsRead(): void {
+  onMarkAllAsRead(event?: Event): void {
+    event?.stopPropagation();
     this.myNotifications.markAllAsRead().subscribe({
       next: () => {
         this.unreadCount = 0;
-        this.userNotifications.forEach((n) => (n.isRead = true));
-      }
+      },
     });
   }
 
