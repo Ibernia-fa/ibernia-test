@@ -107,15 +107,35 @@ export class AuthService {
 
   /** Returns the current access token for API requests. Resolves with null if not authenticated. */
   public getAccessToken = (): Promise<string | null> => {
-    return this._userManager.getUser()
-      .then((user: User | null) => {
-        if (user && !user.expired && user.access_token) {
-          this._user = user;
-          return user.access_token;
-        }
-        return null;
-      })
-      .catch(() => null);
+    try {
+      const mgr = this._userManager;
+      if (!mgr) {
+        console.error('[Auth] _userManager is falsy:', mgr);
+        return Promise.resolve(null);
+      }
+      return mgr.getUser()
+        .then((user: User | null) => {
+          if (user && !user.expired && user.access_token) {
+            this._user = user;
+            return user.access_token;
+          }
+          console.warn('[Auth] getAccessToken → null', {
+            userExists: !!user,
+            expired: user?.expired,
+            hasToken: !!user?.access_token,
+            expiresAt: user?.expires_at,
+            now: Math.floor(Date.now() / 1000),
+          });
+          return null;
+        })
+        .catch((err) => {
+          console.error('[Auth] getUser() rejected:', err);
+          return null;
+        });
+    } catch (err) {
+      console.error('[Auth] getAccessToken sync throw:', err);
+      return Promise.resolve(null);
+    }
   }
 
   private checkUser = (user: User | any): boolean => {

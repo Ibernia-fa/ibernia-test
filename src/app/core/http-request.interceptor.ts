@@ -31,6 +31,9 @@ export function httpRequestInterceptor(
 
   return token$.pipe(
     switchMap((token) => {
+      if (!token) {
+        console.warn('[Interceptor] No token for', req.url);
+      }
       const newReq = token
         ? req.clone({
             url: apiUrl,
