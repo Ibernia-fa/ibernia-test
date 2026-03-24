@@ -63,14 +63,19 @@ body {
   // padding-top: calc($header-height + 24px);
   // min-height: calc(100vh - 70px);
   // top: calc(100vh - $header-height);
-  margin: 0 auto;
+  // margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  flex: 1;
+  min-height: 0;
 
-  &.maxWidth {
-    // max-width: $boxedWidth;
-  }
-  @media (max-width: "768px") {
-    padding: 24px 16px;
-  }
+  // &.maxWidth {
+  //   // max-width: $boxedWidth;
+  // }
+  // @media (max-width: "768px") {
+  //   padding: 24px 16px;
+  // }
 }
 
 .icon-circle {
