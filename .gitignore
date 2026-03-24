@@ -42,6 +42,6 @@ testem.log
 Thumbs.db
 src/environments/environment.development.ts
 
-# Playwright
+# Local E2E artifacts (tests run from ibernia-portal-tests)
 playwright-report/
 test-results/

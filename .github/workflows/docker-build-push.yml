@@ -160,12 +160,17 @@ jobs:
               CHANGED_FILES_JSON="$(printf '%s\n' "${_lines}" | jq -R . | jq -s .)"
             fi
           fi
+          # E2E must hit the Angular app, not the Playwright reports host (test-dev.ibernia.it).
+          BASE_URL_E2E="https://dev.ibernia.it"
+          if [ "${{ steps.vars.outputs.env }}" = "prod" ]; then
+            BASE_URL_E2E="https://ibernia.it"
+          fi
           PAYLOAD=$(jq -n \
             --arg event "portal_deployed" \
             --arg sha "${GITHUB_SHA}" \
             --arg branch "${GITHUB_REF_NAME}" \
             --arg env "${{ steps.vars.outputs.env }}" \
-            --arg baseUrl "https://test-dev.ibernia.it" \
+            --arg baseUrl "${BASE_URL_E2E}" \
             --arg versionTag "${{ steps.vars.outputs.version_tag }}" \
             --argjson changedFiles "${CHANGED_FILES_JSON}" \
             '{event_type: $event, client_payload: {portal_sha: $sha, portal_branch: $branch, environment: $env, baseUrl: $baseUrl, versionTag: $versionTag, changedFiles: $changedFiles}}')
