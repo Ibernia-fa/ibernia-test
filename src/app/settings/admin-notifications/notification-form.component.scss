@@ -1,0 +1,27 @@
+.selected-users-section {
+  .selected-advisors-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  }
+  .advisor-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    background: rgba(0, 0, 0, 0.08);
+    border-radius: 16px;
+    font-size: 13px;
+    .chip-remove {
+      width: 20px;
+      height: 20px;
+      line-height: 20px;
+      mat-icon {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+      }
+    }
+  }
+}

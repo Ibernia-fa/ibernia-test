@@ -3,6 +3,8 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { BrandingComponent } from './branding/branding.component';
 import { NotificationsComponent } from './notifications/notifications.component';
+import { AdminGuard } from './admin-notifications/admin-guard.service';
+import { AdminNotificationsContainerComponent } from './admin-notifications/admin-notifications-container.component';
 import { SecurityComponent } from './security/security.component';
 import { PlanBillingComponent } from './plan-billing/plan-billing.component';
 import { AccountPreferencesComponent } from './account-preferences/account-preferences.component';
@@ -27,6 +29,11 @@ const routes: Routes = [
   { path: 'notifications', loadComponent: () =>
     import('./notifications/notifications.component')
       .then(m => m.NotificationsComponent), data: { showSidebar: true } },
+  { path: 'admin-notifications', component: AdminNotificationsContainerComponent, canActivate: [AdminGuard], data: { showSidebar: true }, children: [
+    { path: '', loadComponent: () => import('./admin-notifications/admin-notifications.component').then(m => m.AdminNotificationsComponent) },
+    { path: 'create', loadComponent: () => import('./admin-notifications/notification-form.component').then(m => m.NotificationFormComponent) },
+    { path: 'detail/:id', loadComponent: () => import('./admin-notifications/notification-detail.component').then(m => m.NotificationDetailComponent) },
+  ]},
   { path: 'branding', loadComponent: () =>
     import('./branding/branding.component')
       .then(m => m.BrandingComponent), data: { showSidebar: true } },
@@ -42,7 +49,7 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [RouterModule.forChild(routes)],
+  imports: [RouterModule.forChild(routes), AdminNotificationsContainerComponent],
   exports: [RouterModule],
 })
 export class SettingsRoutingModule {}

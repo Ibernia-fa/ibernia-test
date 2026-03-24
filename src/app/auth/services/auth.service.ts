@@ -91,6 +91,20 @@ export class AuthService {
     return this._user ? this._user.profile : null;
   }
 
+  /** Check if current user has a given role. Resolves after user is loaded. */
+  public hasRole = (role: string): Promise<boolean> => {
+    return this._userManager.getUser()
+      .then((user: User | null) => {
+        if (!user?.profile) return false;
+        const p = user.profile as Record<string, unknown>;
+        // role can be string, string[], or in various claim keys
+        const roles = p['role'] ?? p['roles'] ?? p['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] ?? [];
+        const arr = Array.isArray(roles) ? roles : (typeof roles === 'string' ? [roles] : []);
+        return arr.includes(role);
+      })
+      .catch(() => false);
+  }
+
   /** Returns the current access token for API requests. Resolves with null if not authenticated. */
   public getAccessToken = (): Promise<string | null> => {
     return this._userManager.getUser()

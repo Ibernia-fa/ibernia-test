@@ -1,0 +1,79 @@
+<mat-card class="mat-mdc-card mdc-card cardWithShadow mb-20">
+  <mat-card-content class="mat-mdc-card-content">
+    <h4 class="page-title f-w-500 m-b-20">{{ 'Create notification' | translate }}</h4>
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>{{ 'Title' | translate }}</mat-label>
+        <input matInput formControlName="title" required>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>{{ 'Message' | translate }}</mat-label>
+        <textarea matInput formControlName="body" rows="4" required></textarea>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>{{ 'Channel' | translate }}</mat-label>
+        <mat-select formControlName="channel">
+          <mat-option value="both">{{ 'Both' | translate }}</mat-option>
+          <mat-option value="email">Email</mat-option>
+          <mat-option value="push">Push</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>{{ 'Audience' | translate }}</mat-label>
+        <mat-select formControlName="audienceType" (selectionChange)="onAudienceChange()">
+          <mat-option value="all">{{ 'All users' | translate }}</mat-option>
+          <mat-option value="selected">{{ 'Selected users' | translate }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      @if (form.get('audienceType')?.value === 'selected') {
+        <div class="selected-users-section m-b-16">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>{{ 'Search advisors by name or email' | translate }}</mat-label>
+            <input matInput [formControl]="searchControl" [matAutocomplete]="auto" placeholder="{{ 'Type to search...' | translate }}">
+            <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onAdvisorSelected($event)">
+              @if (searchLoading) {
+                <mat-option disabled>{{ 'Loading...' | translate }}</mat-option>
+              } @else if (searchResults.length === 0 && searchControl.value?.length >= 2) {
+                <mat-option disabled>{{ 'No advisors found' | translate }}</mat-option>
+              } @else {
+                @for (a of searchResults; track a.userId) {
+                  <mat-option [value]="a" [disabled]="isSelected(a.userId)">
+                    {{ a.firstName }} {{ a.lastName }} ({{ a.email }})
+                  </mat-option>
+                }
+              }
+            </mat-autocomplete>
+          </mat-form-field>
+          @if (selectedAdvisors.length > 0) {
+            <div class="selected-advisors-list m-t-8">
+              <span class="f-s-13 f-w-500 m-b-8 d-block">{{ 'Selected' | translate }}:</span>
+              @for (a of selectedAdvisors; track a.userId) {
+                <span class="advisor-chip">
+                  {{ a.firstName }} {{ a.lastName }}
+                  <button mat-icon-button type="button" (click)="removeAdvisor(a.userId)" class="chip-remove">
+                    <mat-icon>close</mat-icon>
+                  </button>
+                </span>
+              }
+            </div>
+          }
+        </div>
+      }
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>{{ 'Schedule (optional)' | translate }}</mat-label>
+        <input matInput formControlName="scheduledAt" type="datetime-local">
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>{{ 'Deep link (optional)' | translate }}</mat-label>
+        <input matInput formControlName="deepLink" placeholder="/">
+      </mat-form-field>
+      @if (form.get('audienceType')?.value === 'selected' && selectedAdvisors.length === 0) {
+        <p class="text-warning f-s-13 m-b-8">{{ 'Select at least one advisor' | translate }}</p>
+      }
+      <div class="d-flex gap-10 m-t-20">
+        <button mat-raised-button color="primary" type="submit" [disabled]="form.get('audienceType')?.value === 'selected' && selectedAdvisors.length === 0">{{ 'Create' | translate }}</button>
+        <button mat-button type="button" (click)="cancel()">{{ 'Cancel' | translate }}</button>
+      </div>
+    </form>
+  </mat-card-content>
+</mat-card>

@@ -17,10 +17,12 @@ import { FormsModule } from '@angular/forms';
 import { NgScrollbarModule } from 'ngx-scrollbar';
 import { AppSettings } from 'src/app/config';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatDividerModule } from '@angular/material/divider';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatBadgeModule } from '@angular/material/badge';
+import { MatDividerModule } from '@angular/material/divider';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { SettingsService, UserProfileDto } from 'src/app/default-preferance/services/default-preferance.http.service';
 import { HttpResponse } from '@angular/common/http';
@@ -33,6 +35,7 @@ import { selectedCashflow } from 'src/app/store/cashflow/cashflow.selectors';
 import { LanguageService } from 'src/app/core/language.service';
 import { LanguageLoaderService } from '../../language-loader.service';
 import { BrandingComponent } from '../sidebar/branding.component';
+import { MyNotificationsService, UserNotificationItem } from 'src/app/core/services/my-notifications.service';
 
 interface notifications {
   id: number;
@@ -77,6 +80,9 @@ type LanguageCode = 'en' | 'it';
         MatToolbarModule,
         MatButtonModule,
         MatTooltipModule,
+        MatMenuModule,
+        MatBadgeModule,
+        MatDividerModule,
         TranslateModule
     ],
     templateUrl: './header.component.html',
@@ -146,6 +152,15 @@ showFiller = false;
   currentClient: Client | null = null;
   clientFirstName: string;
   clientLastName: string;
+
+  // Notification center
+  userNotifications: UserNotificationItem[] = [];
+  unreadCount = 0;
+  notificationFilter: 'all' | 'unread' = 'all';
+  notificationsLoading = false;
+  private lastNotificationsFetchAt = 0;
+  private readonly NOTIFICATIONS_CACHE_MS = 60000; // 1 min
+
   constructor(
     private settings: CoreService,
     private vsidenav: CoreService,
@@ -155,9 +170,10 @@ showFiller = false;
     private settingsService: SettingsService,
     private organizationProfiles: OrganizationProfilesService,
         private router: Router, // Add Router
-    private store: Store ,
+    private store: Store,
     private languageService: LanguageService,
-    private languageLoader: LanguageLoaderService
+    private languageLoader: LanguageLoaderService,
+    private myNotifications: MyNotificationsService
   ) {
     translate.setDefaultLang('en');
     this.user = this.Authservice.getUserProfile();
@@ -268,6 +284,7 @@ showFiller = false;
 
 
     ngOnInit() {
+      this.loadUnreadCount();
       // branding logo
       this.organizationProfiles.getProfile(this.user.sub).subscribe({
         next: (p) => {
@@ -390,6 +407,68 @@ get userInitials(): string {
   setlightDark(theme: string) {
     this.options.theme = theme;
     this.emitOptions();
+  }
+
+  loadUnreadCount(): void {
+    this.myNotifications.getUnreadCount().subscribe({
+      next: (c) => (this.unreadCount = c),
+      error: () => {}
+    });
+  }
+
+  onNotificationMenuOpened(): void {
+    const now = Date.now();
+    const hasCache = this.userNotifications.length > 0;
+    const cacheFresh = now - this.lastNotificationsFetchAt < this.NOTIFICATIONS_CACHE_MS;
+
+    if (hasCache && cacheFresh) {
+      return; // Use cache, no API call
+    }
+
+    this.notificationsLoading = !hasCache; // Only show loading if no cache
+    this.myNotifications.getList(this.notificationFilter).subscribe({
+      next: (list) => {
+        this.userNotifications = list;
+        this.notificationsLoading = false;
+        this.lastNotificationsFetchAt = Date.now();
+      },
+      error: () => (this.notificationsLoading = false)
+    });
+  }
+
+  setNotificationFilter(filter: 'all' | 'unread'): void {
+    this.notificationFilter = filter;
+    this.notificationsLoading = true;
+    this.myNotifications.getList(filter).subscribe({
+      next: (list) => {
+        this.userNotifications = list;
+        this.notificationsLoading = false;
+      },
+      error: () => (this.notificationsLoading = false)
+    });
+  }
+
+  onNotificationClick(n: UserNotificationItem): void {
+    if (!n.isRead) {
+      this.myNotifications.markAsRead(n.id).subscribe({
+        next: () => {
+          n.isRead = true;
+          this.unreadCount = Math.max(0, this.unreadCount - 1);
+        }
+      });
+    }
+    if (n.deepLink) {
+      this.router.navigateByUrl(n.deepLink);
+    }
+  }
+
+  onMarkAllAsRead(): void {
+    this.myNotifications.markAllAsRead().subscribe({
+      next: () => {
+        this.unreadCount = 0;
+        this.userNotifications.forEach((n) => (n.isRead = true));
+      }
+    });
   }
 
   changeLanguage(lang: any): void {
