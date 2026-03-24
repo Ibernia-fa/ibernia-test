@@ -11,6 +11,8 @@
 html {
   .mat-mdc-menu-panel {
     box-shadow: var(--mat-sys-level3) !important;
+    // Material default max-width is 280px; allow wider panels (e.g. notifications).
+    max-width: none !important;
   }
 
   .mat-mdc-select-panel {

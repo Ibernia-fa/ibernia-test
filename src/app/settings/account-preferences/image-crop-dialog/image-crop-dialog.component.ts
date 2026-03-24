@@ -16,6 +16,14 @@ export interface ImageCropDialogData {
   title?: string;
 }
 
+/**
+ * Crop frame = viewport: static cropper size must match the visible box so the mask
+ * sits on the model edges (not a smaller shape centered in empty space).
+ */
+const PROFILE_VIEWPORT_PX = 300;
+const COMPANY_CROP_W = 400;
+const COMPANY_CROP_H = 300;
+
 @Component({
   selector: 'app-image-crop-dialog',
   standalone: true,
@@ -34,11 +42,15 @@ export interface ImageCropDialogData {
       <p class="crop-hint">{{ 'Drag the image to position it.' | translate }}</p>
       <div class="zoom-control">
         <label class="zoom-label">{{ 'Zoom' | translate }}</label>
-        <mat-slider [min]="1" [max]="3" [step]="0.1" discrete>
+        <mat-slider [min]="1" [max]="2.5" [step]="0.05">
           <input matSliderThumb [(ngModel)]="scale" (ngModelChange)="onZoomChange()">
         </mat-slider>
       </div>
-      <div class="crop-container" [class.crop-container--company]="data.cropType === 'company'">
+      <div
+        class="crop-container"
+        [class.crop-container--profile]="data.cropType !== 'company'"
+        [class.crop-container--company]="data.cropType === 'company'"
+      >
         <image-cropper
           [imageBase64]="data.imageBase64"
           [maintainAspectRatio]="true"
@@ -46,13 +58,14 @@ export interface ImageCropDialogData {
           [roundCropper]="data.cropType === 'profile'"
           [allowMoveImage]="true"
           [hideResizeSquares]="true"
-          [cropperStaticWidth]="data.cropType === 'company' ? 400 : 300"
-          [cropperStaticHeight]="data.cropType === 'company' ? 300 : 300"
+          [cropperStaticWidth]="data.cropType === 'company' ? companyCropW : profileCropPx"
+          [cropperStaticHeight]="data.cropType === 'company' ? companyCropH : profileCropPx"
           [transform]="transform"
           format="jpeg"
           output="base64"
           [resizeToWidth]="0"
           (imageCropped)="onImageCropped($event)"
+          (transformChange)="onTransformChange($event)"
           (loadImageFailed)="onLoadFailed()"
         ></image-cropper>
       </div>
@@ -88,18 +101,47 @@ export interface ImageCropDialogData {
       flex: 1;
     }
     .crop-container {
-      min-height: 320px;
-      max-height: 70vh;
+      margin: 0 auto;
       overflow: hidden;
-      margin-top: 0;
+      flex-shrink: 0;
     }
-    /* Company logo: remove top spacing between zoom and image (ngx-image-cropper has padding: 5px) */
-    .crop-container--company ::ng-deep image-cropper {
+    .crop-container--profile {
+      width: min(${PROFILE_VIEWPORT_PX}px, 85vw);
+      aspect-ratio: 1;
+      height: auto;
+    }
+    .crop-container--company {
+      width: min(${COMPANY_CROP_W}px, 92vw);
+      aspect-ratio: 4 / 3;
+      height: auto;
+    }
+    .crop-container ::ng-deep image-cropper {
+      display: block !important;
+      width: 100% !important;
+      height: 100% !important;
+      max-height: none !important;
       padding: 0 !important;
+      box-sizing: border-box;
     }
-    .crop-container image-cropper {
-      max-height: 60vh;
-      overflow: hidden;
+    .crop-container ::ng-deep image-cropper > div {
+      width: 100%;
+      height: 100%;
+    }
+    /* Force the stage to the viewport so maxSize matches the frame (not the raw bitmap size). */
+    .crop-container ::ng-deep .ngx-ic-source-image {
+      display: block !important;
+      width: 100% !important;
+      height: 100% !important;
+      max-width: none !important;
+      max-height: none !important;
+      object-fit: contain;
+      box-sizing: border-box;
+    }
+    .crop-container ::ng-deep .ngx-ic-overlay {
+      box-sizing: border-box;
+    }
+    .crop-container ::ng-deep .ngx-ic-draggable {
+      touch-action: none;
     }
     .crop-container ::ng-deep image-cropper,
     .crop-container ::ng-deep .ngx-ic-source-image,
@@ -116,7 +158,12 @@ export interface ImageCropDialogData {
 export class ImageCropDialogComponent {
   croppedBase64: string | null = null;
   scale = 1;
-  transform: ImageTransform = {};
+  /** Pixel translation: default % in ngx-image-cropper makes drags feel wildly oversensitive. */
+  transform: ImageTransform = { translateUnit: 'px', scale: 1 };
+
+  readonly profileCropPx = PROFILE_VIEWPORT_PX;
+  readonly companyCropW = COMPANY_CROP_W;
+  readonly companyCropH = COMPANY_CROP_H;
 
   constructor(
     private dialogRef: MatDialogRef<ImageCropDialogComponent>,
@@ -129,8 +176,16 @@ export class ImageCropDialogComponent {
     }
   }
 
+  onTransformChange(t: ImageTransform): void {
+    this.transform = { ...t, translateUnit: 'px' };
+    const s = t.scale;
+    if (s != null && Math.abs(s - this.scale) > 0.001) {
+      this.scale = s;
+    }
+  }
+
   onZoomChange(): void {
-    this.transform = { ...this.transform, scale: this.scale };
+    this.transform = { ...this.transform, scale: this.scale, translateUnit: 'px' };
   }
 
   onLoadFailed(): void {

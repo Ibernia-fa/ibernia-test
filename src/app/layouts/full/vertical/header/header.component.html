@@ -428,53 +428,78 @@
         </button> -->
     </div>
 
-    <mat-menu #notificationmenu="matMenu" class="notification-dropdown topbar-dd cardWithShadow" xPosition="before">
-      <div class="notification-dropdown-header p-x-20 p-y-16">
-        <h6 class="f-s-16 f-w-600 m-0">{{ 'Notifications' | translate }}</h6>
-      </div>
-      <mat-divider></mat-divider>
-      <div class="notification-list" style="max-height: 360px; overflow-y: auto;">
-        @if (notificationsLoading) {
-          <div class="p-20 text-center">{{ 'Loading...' | translate }}</div>
-        } @else if (userNotifications.length === 0) {
-          <div class="p-20 text-center text-muted">{{ 'No notifications' | translate }}</div>
-        } @else {
-          @for (n of userNotifications; track n.id) {
-            <button mat-menu-item class="notification-item" (click)="onNotificationClick(n)">
-              <div class="d-flex align-items-start w-100">
-                <div class="notification-avatar-wrapper m-r-14">
-                  <div class="notification-avatar rounded-circle d-flex align-items-center justify-content-center" [class.birthday]="n.iconType === 'birthday'">
-                    @if (n.iconType === 'birthday') {
-                      <span class="avatar-icon">&#127874;</span>
-                    } @else {
-                      <span class="avatar-icon">&#128276;</span>
-                    }
-                  </div>
-                </div>
-                <div class="flex-grow-1 min-w-0">
-                  <div class="f-s-14 f-w-600 m-b-4">{{ n.title }}</div>
-                  <p class="f-s-13 m-0 text-muted line-clamp-2 m-b-4">{{ n.preview }}</p>
-                  <div class="d-flex align-items-center justify-content-between flex-wrap gap-4">
-                    <span class="f-s-11 text-muted">{{ n.sentAtUtc | date:'EEE MMM d - HH:mm' }}</span>
-                    <span class="notification-type-pill" [class.birthday]="n.iconType === 'birthday'">
-                      {{ n.iconType === 'birthday' ? ('Birthday' | translate) : ('News' | translate) }}
-                    </span>
-                  </div>
-                </div>
-                <div class="notification-status-dot m-l-8" [class.unread]="!n.isRead"></div>
-              </div>
+    <mat-menu #notificationmenu="matMenu" class="notification-dropdown" panelClass="notification-menu-panel" xPosition="before">
+      <div class="notification-menu-shell">
+        <div class="notification-dropdown-header">
+          <h6 class="notification-menu-title m-0">{{ 'Notifications' | translate }}</h6>
+          <div class="notification-filter-toggle" (click)="$event.stopPropagation()">
+            <button
+              type="button"
+              class="notification-filter-btn"
+              [class.is-active]="notificationFilter === 'all'"
+              (click)="setNotificationFilter('all', $event)"
+            >
+              {{ 'All' | translate }}
             </button>
-            <mat-divider></mat-divider>
+            <button
+              type="button"
+              class="notification-filter-btn"
+              [class.is-active]="notificationFilter === 'unread'"
+              (click)="setNotificationFilter('unread', $event)"
+            >
+              {{ 'Unread' | translate }}
+            </button>
+          </div>
+        </div>
+        <div class="notification-list-scroll">
+          @if (notificationsLoading) {
+            <div class="notification-list-state">{{ 'Loading...' | translate }}</div>
+          } @else if (userNotifications.length === 0) {
+            <div class="notification-list-state text-muted">{{ 'No notifications' | translate }}</div>
+          } @else {
+            @for (n of userNotifications; track n.id) {
+              <button mat-menu-item class="notification-item" (click)="onNotificationClick(n)">
+                <div class="d-flex align-items-start w-100">
+                  <div class="notification-avatar-wrapper m-r-14">
+                    <div
+                      class="notification-avatar rounded-circle d-flex align-items-center justify-content-center"
+                      [class.birthday]="n.iconType === 'birthday'"
+                    >
+                      <i-tabler name="message" class="notification-message-icon"></i-tabler>
+                    </div>
+                  </div>
+                  <div class="flex-grow-1 min-w-0">
+                    <div class="notification-item-title line-clamp-1 m-b-4">{{ n.title }}</div>
+                    <p class="notification-item-preview m-0 line-clamp-2 m-b-4">{{ n.preview }}</p>
+                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-4">
+                      <span class="notification-item-meta">{{ n.sentAtUtc | date:'EEE MMM d - HH:mm' }}</span>
+                      <span class="notification-type-pill" [class.birthday]="n.iconType === 'birthday'">
+                        {{ n.iconType === 'birthday' ? ('Birthday' | translate) : ('News' | translate) }}
+                      </span>
+                    </div>
+                  </div>
+                  <div class="notification-status-dot m-l-8" [class.unread]="!n.isRead"></div>
+                </div>
+              </button>
+              <mat-divider class="notification-row-divider"></mat-divider>
+            }
           }
-        }
-      </div>
-      <mat-divider></mat-divider>
-      <div class="notification-dropdown-footer d-flex align-items-center justify-content-between p-x-20 p-y-14">
-        <button mat-button class="mark-all-read-btn" (click)="onMarkAllAsRead()" [disabled]="unreadCount === 0">
-          <i-tabler name="checks" class="mark-all-read-icon"></i-tabler>
-          {{ 'Mark all as read' | translate }}
-        </button>
-        <a mat-raised-button color="primary" routerLink="/settings/notifications" class="view-all-btn">{{ 'View all notifications' | translate }}</a>
+        </div>
+        <div class="notification-dropdown-footer">
+          <button
+            mat-stroked-button
+            type="button"
+            class="mark-all-read-btn"
+            (click)="onMarkAllAsRead($event)"
+            [disabled]="unreadCount === 0"
+          >
+            <i-tabler name="checks" class="mark-all-read-icon"></i-tabler>
+            {{ 'Mark all as read' | translate }}
+          </button>
+          <a mat-stroked-button color="primary" routerLink="/settings/notifications" class="view-all-btn">
+            {{ 'View all notifications' | translate }}
+          </a>
+        </div>
       </div>
     </mat-menu>
 

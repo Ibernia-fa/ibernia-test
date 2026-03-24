@@ -221,7 +221,8 @@ table {
   border-color: red !important;
 }
 
-button {
+// Do not apply to mat-menu-item: MDC wraps row content in span; lowercase would inherit to title/body.
+button:not(.mat-mdc-menu-item):not(.mat-menu-item) {
   span {
     text-transform: lowercase;
 
