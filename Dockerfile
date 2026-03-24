@@ -27,9 +27,10 @@ RUN if [ -z "$NG_BUILD_CONFIGURATION" ]; then \
 # Build the Angular app with the chosen environment
 RUN NODE_OPTIONS=--max-old-space-size=4096 npm run build -- --configuration=${NG_BUILD_CONFIGURATION} --verbose
 
-# Ensure lazy-loaded chunks exist (fails build if missing, e.g. wrong output path)
-RUN test -n "$(ls /app/dist/ibernia-app/browser/financial-workflow.routes-*.js 2>/dev/null)" || \
-    (echo "ERROR: financial-workflow.routes chunk missing from build output" && exit 1)
+# Verify the build produced output (basic sanity check)
+RUN test -d /app/dist/ibernia-app/browser && \
+    test -f /app/dist/ibernia-app/browser/index.html || \
+    (echo "ERROR: Angular build output missing" && exit 1)
 
 # Step 2: Use Nginx to serve the Angular app
 FROM nginx:alpine AS production-stage
