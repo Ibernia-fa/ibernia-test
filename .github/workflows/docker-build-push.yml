@@ -2,7 +2,9 @@ name: Build, Push & Deploy (Docker Hub)
 on:
   push:
     branches:
-      - feature/iteration-4
+      - dev
+    tags:
+      - 'v*'
   workflow_dispatch:
 
 permissions:
@@ -26,7 +28,7 @@ jobs:
         id: vars
         shell: bash
         run: |
-          if [[ "${GITHUB_REF_NAME}" == "main" ]]; then
+          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
             ENVIRONMENT="prod"
           else
             ENVIRONMENT="dev"
@@ -114,17 +116,18 @@ jobs:
               NAME="ibernia-app"
               PORT="8082"
               DEPLOY_DIR="/opt/ibernia/prod"
-              ASPNETCORE_ENVIRONMENT="Production"
+              NETWORK="ibernia-prod-net"
             else
               NAME="ibernia-app-dev"
               PORT="8085"
               DEPLOY_DIR="/opt/ibernia/dev"
-              ASPNETCORE_ENVIRONMENT="Development"
+              NETWORK="ibernia-dev-net"
             fi
 
             echo "Deploying ENV=$ENV NAME=$NAME PORT=$PORT IMAGE=$IMAGE"
 
             sudo mkdir -p "$DEPLOY_DIR"
+            docker network create "$NETWORK" 2>/dev/null || true
 
             docker pull "$IMAGE"
             docker stop "$NAME" || true
@@ -132,8 +135,8 @@ jobs:
 
             docker run -d \
               --restart unless-stopped \
+              --network "$NETWORK" \
               -p "${PORT}:80" \
-              -e ASPNETCORE_ENVIRONMENT="$ASPNETCORE_ENVIRONMENT" \
               --name "$NAME" \
               "$IMAGE"
 
