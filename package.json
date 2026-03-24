@@ -7,7 +7,7 @@
     "start:local": "ng serve --configuration local",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "echo \"No test runner configured in portal repo. Playwright tests live in ibernia-portal-tests.\""
+    "test": "echo \"No tests in this repo. E2E lives in ibernia-portal-tests (triggered after deploy via repository_dispatch).\""
   },
   "private": true,
   "dependencies": {
@@ -21,6 +21,7 @@
     "@angular/platform-browser": "^19.0.4",
     "@angular/platform-browser-dynamic": "^19.0.4",
     "@angular/router": "^19.0.4",
+    "@angular/service-worker": "^19.0.4",
     "@kolkov/angular-editor": "^2.1.0",
     "@ng-matero/extensions": "^17.0.0",
     "@ngrx/effects": "^19.0.1",
@@ -70,7 +71,6 @@
     "@angular-devkit/build-angular": "^19.0.5",
     "@angular/cli": "~19.0.5",
     "@angular/compiler-cli": "^19.0.4",
-    "@playwright/test": "^1.58.2",
     "@types/chance": "^1.1.6",
     "@types/date-fns": "^2.6.0",
     "@types/file-saver": "^2.0.7",

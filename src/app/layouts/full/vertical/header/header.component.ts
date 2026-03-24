@@ -5,7 +5,9 @@ import {
   Input,
   ViewEncapsulation,
   OnInit,
-  OnDestroy } from '@angular/core';
+  OnDestroy,
+  ChangeDetectorRef,
+} from '@angular/core';
 import { CoreService } from 'src/app/services/core.service';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { navItems } from '../sidebar/sidebar-data';
@@ -17,12 +19,19 @@ import { FormsModule } from '@angular/forms';
 import { NgScrollbarModule } from 'ngx-scrollbar';
 import { AppSettings } from 'src/app/config';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatDividerModule } from '@angular/material/divider';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatBadgeModule } from '@angular/material/badge';
+import { MatDividerModule } from '@angular/material/divider';
 import { AuthService } from 'src/app/auth/services/auth.service';
-import { SettingsService, UserProfileDto } from 'src/app/default-preferance/services/default-preferance.http.service';
+import {
+  SettingsService,
+  UserProfileDto,
+  readUserDisplayCache,
+  clearUserDisplayCache,
+} from 'src/app/default-preferance/services/default-preferance.http.service';
 import { HttpResponse } from '@angular/common/http';
 import { takeUntil, catchError, of, finalize, Subject, Subscription, filter } from 'rxjs';
 import { OrganizationProfilesService } from 'src/app/settings/services/organization.profiles.service';
@@ -33,6 +42,7 @@ import { selectedCashflow } from 'src/app/store/cashflow/cashflow.selectors';
 import { LanguageService } from 'src/app/core/language.service';
 import { LanguageLoaderService } from '../../language-loader.service';
 import { BrandingComponent } from '../sidebar/branding.component';
+import { MyNotificationsService, UserNotificationItem } from 'src/app/core/services/my-notifications.service';
 
 interface notifications {
   id: number;
@@ -77,6 +87,9 @@ type LanguageCode = 'en' | 'it';
         MatToolbarModule,
         MatButtonModule,
         MatTooltipModule,
+        MatMenuModule,
+        MatBadgeModule,
+        MatDividerModule,
         TranslateModule
     ],
     templateUrl: './header.component.html',
@@ -146,6 +159,18 @@ showFiller = false;
   currentClient: Client | null = null;
   clientFirstName: string;
   clientLastName: string;
+
+  /** Last-known display names from sessionStorage (first paint after F5 before GET completes). */
+  private hydratedDisplay: { firstName: string; lastName: string } | null = null;
+
+  // Notification center
+  userNotifications: UserNotificationItem[] = [];
+  unreadCount = 0;
+  notificationFilter: 'all' | 'unread' = 'all';
+  notificationsLoading = false;
+  private lastNotificationsFetchAt = 0;
+  private readonly NOTIFICATIONS_CACHE_MS = 60000; // 1 min
+
   constructor(
     private settings: CoreService,
     private vsidenav: CoreService,
@@ -155,18 +180,25 @@ showFiller = false;
     private settingsService: SettingsService,
     private organizationProfiles: OrganizationProfilesService,
         private router: Router, // Add Router
-    private store: Store ,
+    private store: Store,
     private languageService: LanguageService,
-    private languageLoader: LanguageLoaderService
+    private languageLoader: LanguageLoaderService,
+    private myNotifications: MyNotificationsService,
+    private cdr: ChangeDetectorRef
   ) {
     translate.setDefaultLang('en');
     this.user = this.Authservice.getUserProfile();
-    
+    this.hydratedDisplay = this.user?.sub ? readUserDisplayCache(this.user.sub) : null;
+
     this.loadProfile();
     
     this.settingsService.profileChanged$
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => this.loadProfile());
+
+    this.settingsService.userData$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => this.cdr.markForCheck());
 
     this.store.select(selectedClient)
       .pipe(takeUntil(this.destroy$))
@@ -268,6 +300,7 @@ showFiller = false;
 
 
     ngOnInit() {
+      this.loadUnreadCount();
       // branding logo
       this.organizationProfiles.getProfile(this.user.sub).subscribe({
         next: (p) => {
@@ -299,13 +332,25 @@ showFiller = false;
     }
 
     
-// Prefer saved profile names; fallback to OIDC claims; otherwise blank
+// Prefer in-memory profile, then sessionStorage (instant after refresh), then OIDC claims.
 get displayFirstName(): string {
-  return (this.userprofile?.firstName ?? '').trim() || (this.user?.given_name ?? '');
+  const fromCache = (this.settingsService.currentUserData?.firstName ?? '').trim();
+  if (fromCache) return fromCache;
+  const fromProfile = (this.userprofile?.firstName ?? '').trim();
+  if (fromProfile) return fromProfile;
+  const fromSession = (this.hydratedDisplay?.firstName ?? '').trim();
+  if (fromSession) return fromSession;
+  return (this.user?.given_name ?? '').trim();
 }
 
 get displayLastName(): string {
-  return (this.userprofile?.lastName ?? '').trim() || (this.user?.family_name ?? '');
+  const fromCache = (this.settingsService.currentUserData?.lastName ?? '').trim();
+  if (fromCache) return fromCache;
+  const fromProfile = (this.userprofile?.lastName ?? '').trim();
+  if (fromProfile) return fromProfile;
+  const fromSession = (this.hydratedDisplay?.lastName ?? '').trim();
+  if (fromSession) return fromSession;
+  return (this.user?.family_name ?? '').trim();
 }
 
 /** Initials for avatar when no profile picture (e.g. "AC" for Alex Carry) */
@@ -360,6 +405,9 @@ get userInitials(): string {
     }
 
       logout() {
+        if (this.user?.sub) {
+          clearUserDisplayCache(this.user.sub);
+        }
         this.Authservice.logout();
     }
   options = this.settings.getOptions();
@@ -390,6 +438,68 @@ get userInitials(): string {
   setlightDark(theme: string) {
     this.options.theme = theme;
     this.emitOptions();
+  }
+
+  loadUnreadCount(): void {
+    this.myNotifications.getUnreadCount().subscribe({
+      next: (c) => (this.unreadCount = c),
+      error: () => {}
+    });
+  }
+
+  onNotificationMenuOpened(): void {
+    const now = Date.now();
+    const hasCache = this.userNotifications.length > 0;
+    const cacheFresh = now - this.lastNotificationsFetchAt < this.NOTIFICATIONS_CACHE_MS;
+
+    if (hasCache && cacheFresh) {
+      return; // Use cache, no API call
+    }
+
+    this.notificationsLoading = !hasCache; // Only show loading if no cache
+    this.myNotifications.getList(this.notificationFilter).subscribe({
+      next: (list) => {
+        this.userNotifications = list;
+        this.notificationsLoading = false;
+        this.lastNotificationsFetchAt = Date.now();
+      },
+      error: () => (this.notificationsLoading = false)
+    });
+  }
+
+  setNotificationFilter(filter: 'all' | 'unread'): void {
+    this.notificationFilter = filter;
+    this.notificationsLoading = true;
+    this.myNotifications.getList(filter).subscribe({
+      next: (list) => {
+        this.userNotifications = list;
+        this.notificationsLoading = false;
+      },
+      error: () => (this.notificationsLoading = false)
+    });
+  }
+
+  onNotificationClick(n: UserNotificationItem): void {
+    if (!n.isRead) {
+      this.myNotifications.markAsRead(n.id).subscribe({
+        next: () => {
+          n.isRead = true;
+          this.unreadCount = Math.max(0, this.unreadCount - 1);
+        }
+      });
+    }
+    if (n.deepLink) {
+      this.router.navigateByUrl(n.deepLink);
+    }
+  }
+
+  onMarkAllAsRead(): void {
+    this.myNotifications.markAllAsRead().subscribe({
+      next: () => {
+        this.unreadCount = 0;
+        this.userNotifications.forEach((n) => (n.isRead = true));
+      }
+    });
   }
 
   changeLanguage(lang: any): void {

@@ -79,6 +79,12 @@ export const settingsLowerNavItems: NavItem[] = [
     route: '/settings/branding',
   },
   {
+    displayName: 'Admin Notifications',
+    iconName: '/assets/images/shapes/Notification-active.svg',
+    iconOutline: '/assets/images/shapes/Notification.svg',
+    route: '/settings/admin-notifications',
+  },
+  {
     displayName: 'Identity Admin',
     iconName: '/assets/images/shapes/branding.svg',
     iconOutline: '/assets/images/shapes/branding.svg',
