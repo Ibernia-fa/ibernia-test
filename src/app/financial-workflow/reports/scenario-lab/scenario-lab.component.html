@@ -1,297 +1,567 @@
 <div class="d-flex gap-24 flex-column">
   @if (!isLoaderVisible && client && cashflow && financialTimeline) {
-
     <!-- ── Header card ── -->
-    <mat-card class="cardWithShadow">
+    <mat-card class="ibr-new-dashboad-card">
       <mat-card-content>
-        <div class="d-flex align-items-center justify-content-between w-100 gap-16 flex-wrap">
+        <div class="ibr-lifetime-plan-header">
+          <div class="d-flex flex-column gap-8 ibr-lifetime-header">
+            <div class="d-flex align-items-center gap-4">
+              <button type="button" (click)="onBack()" class="back-btn">
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M19 12L5 12"
+                    stroke="#1C1C1C"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M12 19L5 12L12 5"
+                    stroke="#1C1C1C"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </button>
+              <h3>
+                {{ "Scenario Lab" | translate }}
+              </h3>
+            </div>
+            <p>
+              {{
+                "Change assumptions and see how the plan evolves." | translate
+              }}
+            </p>
+          </div>
+          <!-- Before / After tabs (space reserved; visible after first simulation) -->
+          <div class="ibr-scenario-tabs-btns">
+            <div
+              class="graph-tabs d-flex align-items-center"
+              [class.tabs-hidden]="!hasSimulated"
+            >
+              <button
+                class="tab-btn"
+                [class.active]="activeTab === 'after'"
+                (click)="switchTab('after')"
+              >
+                {{ "After" | translate }}
+              </button>
+              <button
+                class="tab-btn"
+                [class.active]="activeTab === 'before'"
+                (click)="switchTab('before')"
+              >
+                {{ "Before" | translate }}
+              </button>
+            </div>
+          </div>
+        </div>
+        <!-- <div
+          class="d-flex align-items-center justify-content-between w-100 gap-16 flex-wrap"
+        >
           <div class="d-flex align-items-center gap-16">
-            <div class="icon-wrapper d-flex align-items-center justify-content-center">
-              <img width="24" src="assets/images/svgs/scenario-lab-icon.svg" alt="Scenario Lab" class="scenario-lab-page-icon" />
+            <div
+              class="icon-wrapper d-flex align-items-center justify-content-center"
+            >
+              <img
+                width="24"
+                src="assets/images/svgs/scenario-lab-icon.svg"
+                alt="Scenario Lab"
+                class="scenario-lab-page-icon"
+              />
             </div>
             <div class="d-flex flex-column justify-content-between gap-4">
-              <h4 class="page-title f-w-500">{{ 'Scenario Lab' | translate }}</h4>
-              <p class="mat-body-2 text-muted">{{ 'Change assumptions and see how the plan evolves.' | translate }}</p>
+              <h4 class="page-title f-w-500">
+                {{ "Scenario Lab" | translate }}
+              </h4>
+              <p class="mat-body-2 text-muted">
+                {{
+                  "Change assumptions and see how the plan evolves." | translate
+                }}
+              </p>
             </div>
           </div>
           <button mat-stroked-button (click)="onBack()">
-            {{ 'Back to Lifetime Plan' | translate }}
+            {{ "Back to Lifetime Plan" | translate }}
           </button>
+        </div> -->
+
+        <!-- Graph and Simulation Form  -->
+
+        <!-- ── Chart card ── -->
+        <div class="simulation-graph-container">
+          <div
+            class="chart-component-wrapper"
+            *ngIf="displayedReport && client && financialTimeline"
+          >
+            <app-savings-bar-stacked-chart
+              [report]="displayedReport"
+              [client]="client"
+              [forecastStartDate]="
+                $any(
+                  baselineForecastStartDate ||
+                    financialTimeline.forecastStartDate
+                )
+              "
+              [forecastEndDate]="
+                $any(
+                  activeTab === 'before'
+                    ? baselineForecastEndDate ||
+                        financialTimeline.forecastEndtDate
+                    : scenarioForecastEndDate
+                )
+              "
+              [cashFlowName]="cashflow.name"
+              [emergencyIconUrl]="'none'"
+              [animateUpdates]="true"
+            >
+            </app-savings-bar-stacked-chart>
+          </div>
+
+          <!-- ── End Chart card ── -->
+
+          <!-- ── Scenario assumptions card ── -->
+          <div class="assumptions-card">
+            <div class="assumptions-shell">
+              <div class="assumptions-title">
+                <h3>
+                  {{ "Scenario assumptions" | translate }}
+                </h3>
+                <div class="assumptions-actions">
+                  <!-- mat-flat-button
+                  color="primary"
+                  class="simulate-btn" -->
+                  <!-- mat-stroked-button -->
+                  <button
+                    type="button"
+                    class="button-icon-outline"
+                    (click)="onCreatePlanFromScenario()"
+                  >
+                    <span>{{ "Create plan from scenario" | translate }}</span>
+                  </button>
+                  <button
+                    type="button"
+                    class="button-icon"
+                    (click)="onSimulate()"
+                    [disabled]="isSimulating"
+                  >
+                    @if (isSimulating) {
+                      <mat-spinner
+                        diameter="18"
+                        class="simulate-spinner"
+                      ></mat-spinner>
+                    } @else {
+                      <!-- <span class="play-badge" aria-hidden="true">
+                        <svg
+                          width="14"
+                          height="14"
+                          viewBox="0 0 24 24"
+                          fill="currentColor"
+                        >
+                          <path d="M8 5v14l11-7z" />
+                        </svg>
+                      </span> -->
+
+                      <svg
+                        width="12"
+                        height="14"
+                        viewBox="0 0 12 14"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M0.694336 0.695312L10.4166 6.94531L0.694336 13.1953V0.695312Z"
+                          fill="white"
+                          stroke="white"
+                          stroke-width="1.38889"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                    }
+                    <span>{{ "Simulate scenario" | translate }}</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="assumptions-body">
+                <form [formGroup]="scenarioForm" class="assumptions-form">
+                  <!-- Row 1 Left: Goals -->
+                  <div class="assumption-panel category-panel">
+                    <span class="assumption-label">{{
+                      "Goals" | translate
+                    }}</span>
+                    <mat-select
+                      class="category-dropdown"
+                      [placeholder]="'Select' | translate"
+                      (selectionChange)="onGoalSelected($event.value)"
+                    >
+                      @if (!goalItems.length) {
+                        <mat-option disabled class="empty-option">{{
+                          "No goals added" | translate
+                        }}</mat-option>
+                      }
+                      @for (goal of goalItems; track goal.id) {
+                        <mat-option [value]="goal">
+                          <span class="category-option">
+                            <img
+                              [src]="
+                                'assets/images/svgs/' + goal.iconUrl + '.svg'
+                              "
+                              [alt]="goal.name"
+                              width="18"
+                              class="category-option-icon"
+                            />
+                            {{ goal.name }}
+                          </span>
+                        </mat-option>
+                      }
+                    </mat-select>
+                    @if (editedGoals.length) {
+                      <div class="edited-chips">
+                        @for (entry of editedGoals; track entry.name) {
+                          <span class="edited-chip">
+                            {{ entry.name }}
+                            <button
+                              class="chip-remove"
+                              (click)="removeEditedItem('goals', entry.name)"
+                              aria-label="Remove"
+                            >
+                              <mat-icon>close</mat-icon>
+                            </button>
+                          </span>
+                        }
+                      </div>
+                    }
+                  </div>
+
+                  <!-- Row 1 Right: Saving pots -->
+                  <div class="assumption-panel category-panel">
+                    <span class="assumption-label">{{
+                      "Saving pots" | translate
+                    }}</span>
+                    <mat-select
+                      class="category-dropdown"
+                      [placeholder]="'Select' | translate"
+                      (selectionChange)="onSavingPotSelected($event.value)"
+                    >
+                      @if (!savingPotItems.length) {
+                        <mat-option disabled class="empty-option">{{
+                          "No saving pots added" | translate
+                        }}</mat-option>
+                      }
+                      @for (pot of savingPotItems; track pot.id) {
+                        <mat-option [value]="pot">
+                          <span class="category-option">
+                            <i-tabler
+                              name="wallet"
+                              class="category-option-icon"
+                            ></i-tabler>
+                            {{ pot.name }}
+                          </span>
+                        </mat-option>
+                      }
+                    </mat-select>
+                    @if (editedSavingPots.length) {
+                      <div class="edited-chips">
+                        @for (entry of editedSavingPots; track entry.name) {
+                          <span class="edited-chip">
+                            {{ entry.name }}
+                            <button
+                              class="chip-remove"
+                              (click)="
+                                removeEditedItem('savingPots', entry.name)
+                              "
+                              aria-label="Remove"
+                            >
+                              <mat-icon>close</mat-icon>
+                            </button>
+                          </span>
+                        }
+                      </div>
+                    }
+                  </div>
+
+                  <!-- Row 2 Left: Incomes -->
+                  <div class="assumption-panel category-panel">
+                    <span class="assumption-label">{{
+                      "Incomes" | translate
+                    }}</span>
+                    <mat-select
+                      class="category-dropdown"
+                      [placeholder]="'Select' | translate"
+                      (selectionChange)="onIncomeSelected($event.value)"
+                    >
+                      @if (!incomeItems.length) {
+                        <mat-option disabled class="empty-option">{{
+                          "No incomes added" | translate
+                        }}</mat-option>
+                      }
+                      @for (income of incomeItems; track income.id) {
+                        <mat-option [value]="income">
+                          <span class="category-option">
+                            <img
+                              [src]="
+                                'assets/images/svgs/' +
+                                (income.icon || 'custom-icon') +
+                                '-gray.svg'
+                              "
+                              [alt]="income.description"
+                              width="18"
+                              class="category-option-icon"
+                            />
+                            {{ income.description }}
+                          </span>
+                        </mat-option>
+                      }
+                    </mat-select>
+                    @if (editedIncomes.length) {
+                      <div class="edited-chips">
+                        @for (entry of editedIncomes; track entry.name) {
+                          <span class="edited-chip">
+                            {{ entry.name }}
+                            <button
+                              class="chip-remove"
+                              (click)="removeEditedItem('incomes', entry.name)"
+                              aria-label="Remove"
+                            >
+                              <mat-icon>close</mat-icon>
+                            </button>
+                          </span>
+                        }
+                      </div>
+                    }
+                  </div>
+
+                  <!-- Row 2 Right: Expenses -->
+                  <div class="assumption-panel category-panel">
+                    <span class="assumption-label">{{
+                      "Expenses" | translate
+                    }}</span>
+                    <mat-select
+                      class="category-dropdown"
+                      [placeholder]="'Select' | translate"
+                      (selectionChange)="onExpenseSelected($event.value)"
+                    >
+                      @if (!expenseItems.length) {
+                        <mat-option disabled class="empty-option">{{
+                          "No expenses added" | translate
+                        }}</mat-option>
+                      }
+                      @for (expense of expenseItems; track expense.id) {
+                        <mat-option [value]="expense">
+                          <span class="category-option">
+                            <img
+                              [src]="
+                                'assets/images/svgs/' +
+                                (expense.icon || 'custom-icon') +
+                                '-gray.svg'
+                              "
+                              [alt]="expense.description"
+                              width="18"
+                              class="category-option-icon"
+                            />
+                            {{ expense.description }}
+                          </span>
+                        </mat-option>
+                      }
+                    </mat-select>
+                    @if (editedExpenses.length) {
+                      <div class="edited-chips">
+                        @for (entry of editedExpenses; track entry.name) {
+                          <span class="edited-chip">
+                            {{ entry.name }}
+                            <button
+                              class="chip-remove"
+                              (click)="removeEditedItem('expenses', entry.name)"
+                              aria-label="Remove"
+                            >
+                              <mat-icon>close</mat-icon>
+                            </button>
+                          </span>
+                        }
+                      </div>
+                    }
+                  </div>
+
+                  <!-- Bottom row: Inflation rate + Retirement age card(s) -->
+                  <div class="bottom-assumptions-row">
+                    <!-- Inflation rate -->
+                    <div class="assumption-panel top-rate-panel">
+                      <div class="inflation-header">
+                        <span class="assumption-label">{{
+                          "Inflation rate" | translate
+                        }}</span>
+                      </div>
+                      <div class="slider-row">
+                        <mat-slider
+                          class="slider-flex"
+                          [min]="0"
+                          [max]="10"
+                          [step]="0.5"
+                        >
+                          <input
+                            matSliderThumb
+                            formControlName="inflationRate"
+                          />
+                        </mat-slider>
+                        <div class="value-input-box">
+                          <input
+                            type="number"
+                            class="value-input"
+                            [value]="scenarioForm.get('inflationRate')?.value"
+                            (change)="
+                              onNumericInputChange('inflationRate', $event)
+                            "
+                            min="0"
+                            max="10"
+                            step="0.5"
+                          />
+                          <span class="pct-badge">%</span>
+                        </div>
+                      </div>
+                      @if (inflationEdited) {
+                        <span class="before-label"
+                          >{{ "Before" | translate }}:
+                          {{ baselineInflationRate }}%</span
+                        >
+                      }
+                    </div>
+
+                    <!-- Retirement age (main client) -->
+                    @if (hasRetirementAge) {
+                      <div class="assumption-panel top-rate-panel">
+                        <div class="inflation-header">
+                          <span class="assumption-label">
+                            {{ "Retirement age" | translate }}
+                            @if (hasPartnerRetirementAge) {
+                              {{ clientFirstName }}
+                            }
+                          </span>
+                        </div>
+                        <div class="slider-row">
+                          <mat-slider
+                            class="slider-flex"
+                            [min]="minRetirementAge"
+                            [max]="maxRetirementAge"
+                            [step]="1"
+                          >
+                            <input
+                              matSliderThumb
+                              formControlName="retirementAge"
+                            />
+                          </mat-slider>
+                          <div class="value-input-box">
+                            <input
+                              type="number"
+                              class="value-input"
+                              [value]="scenarioForm.get('retirementAge')?.value"
+                              (change)="
+                                onNumericInputChange('retirementAge', $event)
+                              "
+                              [min]="minRetirementAge"
+                              [max]="maxRetirementAge"
+                              step="1"
+                            />
+                            <span class="pct-badge age-badge">
+                              <img
+                                src="assets/images/svgs/scenario-lab-icon.svg"
+                                alt="age"
+                                width="14"
+                              />
+                            </span>
+                          </div>
+                        </div>
+                        @if (retirementAgeEdited) {
+                          <span class="before-label"
+                            >{{ "Before" | translate }}:
+                            {{ baselineRetirementAge }}</span
+                          >
+                        }
+                      </div>
+                    }
+
+                    <!-- Retirement age (partner) -->
+                    @if (hasPartnerRetirementAge) {
+                      <div class="assumption-panel top-rate-panel">
+                        <div class="inflation-header">
+                          <span class="assumption-label"
+                            >{{ "Retirement age" | translate }}
+                            {{ partnerFirstName }}</span
+                          >
+                        </div>
+                        <div class="slider-row">
+                          <mat-slider
+                            class="slider-flex"
+                            [min]="minPartnerRetirementAge"
+                            [max]="maxPartnerRetirementAge"
+                            [step]="1"
+                          >
+                            <input
+                              matSliderThumb
+                              formControlName="partnerRetirementAge"
+                            />
+                          </mat-slider>
+                          <div class="value-input-box">
+                            <input
+                              type="number"
+                              class="value-input"
+                              [value]="
+                                scenarioForm.get('partnerRetirementAge')?.value
+                              "
+                              (change)="
+                                onNumericInputChange(
+                                  'partnerRetirementAge',
+                                  $event
+                                )
+                              "
+                              [min]="minPartnerRetirementAge"
+                              [max]="maxPartnerRetirementAge"
+                              step="1"
+                            />
+                            <span class="pct-badge age-badge">
+                              <img
+                                src="assets/images/svgs/scenario-lab-icon.svg"
+                                alt="age"
+                                width="14"
+                              />
+                            </span>
+                          </div>
+                        </div>
+                        @if (partnerRetirementAgeEdited) {
+                          <span class="before-label"
+                            >{{ "Before" | translate }}:
+                            {{ baselinePartnerRetirementAge }}</span
+                          >
+                        }
+                      </div>
+                    }
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+          <!-- ── End Scenario assumptions card ── -->
         </div>
+
+        <!-- End Graph and Simulation Form  -->
       </mat-card-content>
     </mat-card>
 
     <!-- ── Chart card ── -->
-    <mat-card class="cardWithShadow">
-      <mat-card-content style="padding-bottom: 10px !important;">
-
-        <!-- Before / After tabs (space reserved; visible after first simulation) -->
-        <div class="graph-tabs d-flex gap-12" [class.tabs-hidden]="!hasSimulated">
-          <button class="tab-btn" [class.active]="activeTab === 'before'" (click)="switchTab('before')">
-            {{ 'Before' | translate }}
-          </button>
-          <button class="tab-btn" [class.active]="activeTab === 'after'" (click)="switchTab('after')">
-            {{ 'After' | translate }}
-          </button>
-        </div>
-
-        <div class="chart-component-wrapper" *ngIf="displayedReport && client && financialTimeline">
-          <app-savings-bar-stacked-chart
-            [report]="displayedReport"
-            [client]="client"
-            [forecastStartDate]="$any(baselineForecastStartDate || financialTimeline.forecastStartDate)"
-            [forecastEndDate]="$any(activeTab === 'before' ? (baselineForecastEndDate || financialTimeline.forecastEndtDate) : scenarioForecastEndDate)"
-            [cashFlowName]="cashflow.name"
-            [emergencyIconUrl]="'none'"
-            [animateUpdates]="true">
-          </app-savings-bar-stacked-chart>
-        </div>
+    <!-- <mat-card class="cardWithShadow">
+      <mat-card-content style="padding-bottom: 10px !important">
       </mat-card-content>
-    </mat-card>
+    </mat-card> -->
 
     <!-- ── Scenario assumptions card ── -->
-    <mat-card class="cardWithShadow assumptions-card">
-      <mat-card-content>
-        <div class="assumptions-shell">
-          <div class="assumptions-title">
-            <h5 class="f-w-500 m-0">{{ 'Scenario assumptions' | translate }}</h5>
-          </div>
-
-          <div class="assumptions-body">
-            <form [formGroup]="scenarioForm" class="assumptions-form">
-
-              <!-- Row 1 Left: Goals -->
-              <div class="assumption-panel category-panel">
-                <span class="assumption-label">{{ 'Goals' | translate }}</span>
-                <mat-select class="category-dropdown" [placeholder]="'Select' | translate" (selectionChange)="onGoalSelected($event.value)">
-                  @if (!goalItems.length) {
-                    <mat-option disabled class="empty-option">{{ 'No goals added' | translate }}</mat-option>
-                  }
-                  @for (goal of goalItems; track goal.id) {
-                    <mat-option [value]="goal">
-                      <span class="category-option">
-                        <img [src]="'assets/images/svgs/' + goal.iconUrl + '.svg'" [alt]="goal.name" width="18" class="category-option-icon" />
-                        {{ goal.name }}
-                      </span>
-                    </mat-option>
-                  }
-                </mat-select>
-                @if (editedGoals.length) {
-                  <div class="edited-chips">
-                    @for (entry of editedGoals; track entry.name) {
-                      <span class="edited-chip">
-                        {{ entry.name }}
-                        <button class="chip-remove" (click)="removeEditedItem('goals', entry.name)" aria-label="Remove">
-                          <mat-icon>close</mat-icon>
-                        </button>
-                      </span>
-                    }
-                  </div>
-                }
-              </div>
-
-              <!-- Row 1 Right: Saving pots -->
-              <div class="assumption-panel category-panel">
-                <span class="assumption-label">{{ 'Saving pots' | translate }}</span>
-                <mat-select class="category-dropdown" [placeholder]="'Select' | translate" (selectionChange)="onSavingPotSelected($event.value)">
-                  @if (!savingPotItems.length) {
-                    <mat-option disabled class="empty-option">{{ 'No saving pots added' | translate }}</mat-option>
-                  }
-                  @for (pot of savingPotItems; track pot.id) {
-                    <mat-option [value]="pot">
-                      <span class="category-option">
-                        <i-tabler name="wallet" class="category-option-icon"></i-tabler>
-                        {{ pot.name }}
-                      </span>
-                    </mat-option>
-                  }
-                </mat-select>
-                @if (editedSavingPots.length) {
-                  <div class="edited-chips">
-                    @for (entry of editedSavingPots; track entry.name) {
-                      <span class="edited-chip">
-                        {{ entry.name }}
-                        <button class="chip-remove" (click)="removeEditedItem('savingPots', entry.name)" aria-label="Remove">
-                          <mat-icon>close</mat-icon>
-                        </button>
-                      </span>
-                    }
-                  </div>
-                }
-              </div>
-
-              <!-- Row 2 Left: Incomes -->
-              <div class="assumption-panel category-panel">
-                <span class="assumption-label">{{ 'Incomes' | translate }}</span>
-                <mat-select class="category-dropdown" [placeholder]="'Select' | translate" (selectionChange)="onIncomeSelected($event.value)">
-                  @if (!incomeItems.length) {
-                    <mat-option disabled class="empty-option">{{ 'No incomes added' | translate }}</mat-option>
-                  }
-                  @for (income of incomeItems; track income.id) {
-                    <mat-option [value]="income">
-                      <span class="category-option">
-                        <img [src]="'assets/images/svgs/' + (income.icon || 'custom-icon') + '-gray.svg'" [alt]="income.description" width="18" class="category-option-icon" />
-                        {{ income.description }}
-                      </span>
-                    </mat-option>
-                  }
-                </mat-select>
-                @if (editedIncomes.length) {
-                  <div class="edited-chips">
-                    @for (entry of editedIncomes; track entry.name) {
-                      <span class="edited-chip">
-                        {{ entry.name }}
-                        <button class="chip-remove" (click)="removeEditedItem('incomes', entry.name)" aria-label="Remove">
-                          <mat-icon>close</mat-icon>
-                        </button>
-                      </span>
-                    }
-                  </div>
-                }
-              </div>
-
-              <!-- Row 2 Right: Expenses -->
-              <div class="assumption-panel category-panel">
-                <span class="assumption-label">{{ 'Expenses' | translate }}</span>
-                <mat-select class="category-dropdown" [placeholder]="'Select' | translate" (selectionChange)="onExpenseSelected($event.value)">
-                  @if (!expenseItems.length) {
-                    <mat-option disabled class="empty-option">{{ 'No expenses added' | translate }}</mat-option>
-                  }
-                  @for (expense of expenseItems; track expense.id) {
-                    <mat-option [value]="expense">
-                      <span class="category-option">
-                        <img [src]="'assets/images/svgs/' + (expense.icon || 'custom-icon') + '-gray.svg'" [alt]="expense.description" width="18" class="category-option-icon" />
-                        {{ expense.description }}
-                      </span>
-                    </mat-option>
-                  }
-                </mat-select>
-                @if (editedExpenses.length) {
-                  <div class="edited-chips">
-                    @for (entry of editedExpenses; track entry.name) {
-                      <span class="edited-chip">
-                        {{ entry.name }}
-                        <button class="chip-remove" (click)="removeEditedItem('expenses', entry.name)" aria-label="Remove">
-                          <mat-icon>close</mat-icon>
-                        </button>
-                      </span>
-                    }
-                  </div>
-                }
-              </div>
-
-              <!-- Bottom row: Inflation rate + Retirement age card(s) -->
-              <div class="bottom-assumptions-row">
-
-                <!-- Inflation rate -->
-                <div class="assumption-panel top-rate-panel">
-                  <div class="inflation-header">
-                    <span class="assumption-label">{{ 'Inflation rate' | translate }}</span>
-                  </div>
-                  <div class="slider-row">
-                    <mat-slider class="slider-flex" [min]="0" [max]="10" [step]="0.5">
-                      <input matSliderThumb formControlName="inflationRate" />
-                    </mat-slider>
-                    <div class="value-input-box">
-                      <input
-                        type="number"
-                        class="value-input"
-                        [value]="scenarioForm.get('inflationRate')?.value"
-                        (change)="onNumericInputChange('inflationRate', $event)"
-                        min="0" max="10" step="0.5" />
-                      <span class="pct-badge">%</span>
-                    </div>
-                  </div>
-                  @if (inflationEdited) {
-                    <span class="before-label">{{ 'Before' | translate }}: {{ baselineInflationRate }}%</span>
-                  }
-                </div>
-
-                <!-- Retirement age (main client) -->
-                @if (hasRetirementAge) {
-                  <div class="assumption-panel top-rate-panel">
-                    <div class="inflation-header">
-                      <span class="assumption-label">
-                        {{ 'Retirement age' | translate }}
-                        @if (hasPartnerRetirementAge) {
-                          {{ clientFirstName }}
-                        }
-                      </span>
-                    </div>
-                    <div class="slider-row">
-                      <mat-slider class="slider-flex" [min]="minRetirementAge" [max]="maxRetirementAge" [step]="1">
-                        <input matSliderThumb formControlName="retirementAge" />
-                      </mat-slider>
-                      <div class="value-input-box">
-                        <input
-                          type="number"
-                          class="value-input"
-                          [value]="scenarioForm.get('retirementAge')?.value"
-                          (change)="onNumericInputChange('retirementAge', $event)"
-                          [min]="minRetirementAge" [max]="maxRetirementAge" step="1" />
-                        <span class="pct-badge age-badge">
-                          <img src="assets/images/svgs/scenario-lab-icon.svg" alt="age" width="14" />
-                        </span>
-                      </div>
-                    </div>
-                    @if (retirementAgeEdited) {
-                      <span class="before-label">{{ 'Before' | translate }}: {{ baselineRetirementAge }}</span>
-                    }
-                  </div>
-                }
-
-                <!-- Retirement age (partner) -->
-                @if (hasPartnerRetirementAge) {
-                  <div class="assumption-panel top-rate-panel">
-                    <div class="inflation-header">
-                      <span class="assumption-label">{{ 'Retirement age' | translate }} {{ partnerFirstName }}</span>
-                    </div>
-                    <div class="slider-row">
-                      <mat-slider class="slider-flex" [min]="minPartnerRetirementAge" [max]="maxPartnerRetirementAge" [step]="1">
-                        <input matSliderThumb formControlName="partnerRetirementAge" />
-                      </mat-slider>
-                      <div class="value-input-box">
-                        <input
-                          type="number"
-                          class="value-input"
-                          [value]="scenarioForm.get('partnerRetirementAge')?.value"
-                          (change)="onNumericInputChange('partnerRetirementAge', $event)"
-                          [min]="minPartnerRetirementAge" [max]="maxPartnerRetirementAge" step="1" />
-                        <span class="pct-badge age-badge">
-                          <img src="assets/images/svgs/scenario-lab-icon.svg" alt="age" width="14" />
-                        </span>
-                      </div>
-                    </div>
-                    @if (partnerRetirementAgeEdited) {
-                      <span class="before-label">{{ 'Before' | translate }}: {{ baselinePartnerRetirementAge }}</span>
-                    }
-                  </div>
-                }
-
-              </div>
-
-            </form>
-
-            <div class="assumptions-actions">
-              <button mat-flat-button color="primary" class="simulate-btn" (click)="onSimulate()" [disabled]="isSimulating">
-                @if (isSimulating) {
-                  <mat-spinner diameter="18" class="simulate-spinner"></mat-spinner>
-                } @else {
-                  <span class="play-badge" aria-hidden="true">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-                  </span>
-                }
-                {{ 'Simulate scenario' | translate }}
-              </button>
-              <button mat-stroked-button class="create-plan-btn" (click)="onCreatePlanFromScenario()">
-                {{ 'Create plan from scenario' | translate }}
-              </button>
-            </div>
-          </div>
-        </div>
-      </mat-card-content>
-    </mat-card>
-
   } @else {
     <div class="h-300 d-flex align-items-center justify-content-center">
       <mat-spinner></mat-spinner>

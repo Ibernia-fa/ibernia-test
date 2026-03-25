@@ -1,173 +1,386 @@
-<div class="d-flex gap-24 flex-column">
-  @if(!isLoaderVisible && client && cashflow && report && financialTimeline) {
-
-  <mat-card class="cardWithShadow">
+<!-- <div class="d-flex gap-24 flex-column"> -->
+@if (!isLoaderVisible && client && cashflow && report && financialTimeline) {
+  <mat-card class="ibr-new-dashboad-card">
     <mat-card-content>
-      <div class="d-flex flex-column gap-32 timeline-wrapper">
-        <div class="card-main-wrapper">
-          <div class="d-flex align-items-center justify-content-between w-100 gap-16 flex-wrap">
-            <div class="d-flex align-items-center gap-16 d-none">
-              <div class="icon-wrapper d-flex align-items-center justify-content-center">
-                <img width="24" src="assets/images/svgs/inheritance-icon.svg" alt="clock" />
+      <!-- <div class="d-flex flex-column gap-32 timeline-wrapper"> -->
+      <!-- <div class="card-main-wrapper"> -->
+      <!-- <div
+        class="d-flex align-items-center justify-content-between w-100 gap-16 flex-wrap"
+      > -->
+      <!-- <div class="d-flex align-items-center gap-16 d-none">
+        <div
+                class="icon-wrapper d-flex align-items-center justify-content-center"
+              >
+                <img
+                  width="24"
+                  src="assets/images/svgs/inheritance-icon.svg"
+                  alt="clock"
+                />
               </div>
-              <div class="d-flex flex-column justify-content-between gap-4">
-                <h4 class="page-title f-w-500">{{ 'Lifetime Plan' | translate }}</h4>
-              </div>
-            </div>
+        <div class="d-flex flex-column justify-content-between gap-4">
+          <h4 class="page-title f-w-500">
+            {{ "Lifetime Plan" | translate }}
+          </h4>
+        </div>
+      </div> -->
 
-            <div class="d-flex align-items-center gap-12">
-              <!-- Cashflow name (visible when NOT in comparison mode) -->
-              <div class="d-flex align-items-center gap-8">
-                <a [routerLink]="['/cashflows', cashflow?.id, 'scenario-lab']" class="button-icon scenario-lab-btn">
-                  <svg class="scenario-lab-icon" width="20" height="20" viewBox="0 0 100 110" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
-                    <mask id="scenarioLabIconCutout">
-                      <rect width="100" height="110" fill="white" />
-                      <circle cx="58" cy="76" r="5.5" fill="black" />
-                    </mask>
-                    <g mask="url(#scenarioLabIconCutout)" fill="white">
-                      <circle cx="50" cy="8" r="8" />
-                      <rect x="22" y="18" width="56" height="11" rx="5.5" />
-                      <rect x="38" y="29" width="24" height="18" />
-                      <path d="M38 47 L9 88 Q5 98 16 100 H84 Q95 98 91 88 L62 47 Z" />
-                    </g>
-                  </svg>
-                  <span>{{ 'Scenario Lab' | translate }}</span>
-                </a>
-
-                <ng-container *ngIf="!(compareReport || compareCashflow)">
-                  <button class="button-icon" (click)="onComparePlansClicked()">
-                    <span>{{ 'Compare plans' | translate }}</span>
-                  </button>
-                </ng-container>
-
-                <ng-container *ngIf="compareReport || compareCashflow">
-                  <button class="button-icon" (click)="exitComparison()">
-                    <span>{{ 'Exit Comparison' | translate }}</span>
-                  </button>
-                </ng-container>
-              </div>
-            </div>
+      <!-- Header  -->
+      <div class="ibr-lifetime">
+        <div class="ibr-lifetime-plan-header">
+          <div class="d-flex flex-column gap-8 ibr-lifetime-header">
+            <h3>
+              {{ "Lifetime Plan" | translate }}
+            </h3>
+            <p>The full picture of your finances over time</p>
           </div>
+          <!-- <div class="d-flex align-items-center gap-16"> -->
+          <!-- Cashflow name (visible when NOT in comparison mode) -->
+          <div class="d-flex align-items-center gap-16 ibr-lifetime-btns">
+            <a
+              [routerLink]="['/cashflows', cashflow?.id, 'scenario-lab']"
+              class="button-icon-outline scenario-lab-btn"
+            >
+              <svg
+                width="15"
+                height="17"
+                viewBox="0 0 15 17"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                  d="M3.32992 0.833333C3.32992 1.05435 3.41771 1.26631 3.57399 1.42259C3.73027 1.57887 3.94224 1.66667 4.16325 1.66667V6.38083L0.411583 12.4742C-0.67425 14.2375 0.497417 16.6667 2.64908 16.6667H12.3441C14.4957 16.6667 15.6674 14.2375 14.5816 12.4742L10.8299 6.38083V1.66667C11.0509 1.66667 11.2629 1.57887 11.4192 1.42259C11.5755 1.26631 11.6632 1.05435 11.6632 0.833333C11.6632 0.61232 11.5755 0.400358 11.4192 0.244078C11.2629 0.0877973 11.0509 0 10.8299 0H4.16325C3.94224 0 3.73027 0.0877973 3.57399 0.244078C3.41771 0.400358 3.32992 0.61232 3.32992 0.833333ZM5.82992 1.66667H9.16325V6.61667C9.16318 6.77083 9.20587 6.92199 9.28658 7.05333L10.5883 9.16667H4.40492L5.70658 7.05333C5.78729 6.92199 5.82999 6.77083 5.82992 6.61667V1.66667ZM3.37908 10.8333L1.82992 13.3475C1.36158 14.1092 1.92575 15 2.64825 15H12.3433C13.0658 15 13.6299 14.1083 13.1616 13.3475L11.6133 10.8333H3.37908Z"
+                  fill="#4043AF"
+                />
+              </svg>
+
+              <span>{{ "Scenario Lab" | translate }}</span>
+            </a>
+
+            <ng-container *ngIf="!(compareReport || compareCashflow)">
+              <button class="button-icon" (click)="onComparePlansClicked()">
+                <span>{{ "Compare plans" | translate }}</span>
+              </button>
+            </ng-container>
+
+            <ng-container *ngIf="compareReport || compareCashflow">
+              <button class="button-icon" (click)="exitComparison()">
+                <span>{{ "Exit Comparison" | translate }}</span>
+              </button>
+            </ng-container>
+          </div>
+          <!-- </div> -->
+        </div>
+
+        <div class="ibr-lifetime-graphs">
+          <!-- Graph One  -->
+          <mat-card class="ibr-lifetime-graph-container ibr-plan-chart">
+            <mat-card-content>
+              <ng-container *ngIf="!compareReport || !compareCashflow">
+                <button
+                  matTooltip="{{ 'Full screen' | translate }}"
+                  class="button-full-screen"
+                  (click)="enterFullscreen()"
+                >
+                  <img
+                    width="16"
+                    src="../../../assets/images/svgs/full-screen.svg"
+                    alt=""
+                  />
+                </button>
+              </ng-container>
+
+              <ng-container *ngIf="compareCashflow">
+                <p class="compare-chart-name">{{ cashflow?.name }}</p>
+              </ng-container>
+
+              <div class="shortfall" *ngIf="report">
+                <ng-container *ngIf="!hasShortfall; else lossTpl">
+                  <div class="shortfall-status-profit">
+                    <span class="icon-bg leaf-bg">
+                      <img
+                        src="../../../assets/images/svgs/leaf.svg"
+                        alt="leaf"
+                        class="icon-svg"
+                      />
+                    </span>
+                    <span class="status-text">Goals on track and funded</span>
+                  </div>
+                </ng-container>
+                <ng-template #lossTpl>
+                  <div class="shortfall-status-loss">
+                    <span class="icon-bg flag-bg">
+                      <img
+                        src="../../../assets/images/svgs/triangle-flag.svg"
+                        alt="flag"
+                        class="icon-svg"
+                      />
+                    </span>
+                    <span class="status-text">
+                      Savings hit zero at {{ firstShortfallAge }} y.o.
+                    </span>
+                  </div>
+                </ng-template>
+              </div>
+
+              <div class="chart-component-wrapper">
+                <app-savings-bar-stacked-chart
+                  [report]="report"
+                  [client]="client"
+                  [forecastStartDate]="financialTimeline.forecastStartDate"
+                  [forecastEndDate]="
+                    effectiveReportEndDate ??
+                    financialTimeline?.forecastEndtDate ??
+                    null
+                  "
+                  [cashFlowName]="cashflow?.name"
+                  [emergencyIconUrl]="'none'"
+                >
+                </app-savings-bar-stacked-chart>
+              </div>
+
+              <!-- Insights Section -->
+              <div class="ibr-insights-section">
+                <h3 class="ibr-insights-title">Insights</h3>
+                <div class="ibr-insights-grid">
+                  <div class="ibr-insight-card">
+                    <div class="ibr-insight-icon">
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 20 20"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M3.33325 12.4993C3.33325 12.4993 4.16659 11.666 6.66659 11.666C9.16659 11.666 10.8333 13.3327 13.3333 13.3327C15.8333 13.3327 16.6666 12.4993 16.6666 12.4993V2.49935C16.6666 2.49935 15.8333 3.33268 13.3333 3.33268C10.8333 3.33268 9.16659 1.66602 6.66659 1.66602C4.16659 1.66602 3.33325 2.49935 3.33325 2.49935V12.4993Z"
+                          stroke="#5A596E"
+                          stroke-width="1.875"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                        <path
+                          d="M3.33325 18.3333V12.5"
+                          stroke="#5A596E"
+                          stroke-width="1.875"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                    </div>
+                    <div class="ibr-insight-content">
+                      <h4>Savings hit zero at 65 y.o</h4>
+                      <p>
+                        Your current savings and withdrawal rate will cause your
+                        savings to run out by the time you turn 65
+                      </p>
+                    </div>
+                  </div>
+                  <div class="ibr-insight-card">
+                    <div class="ibr-insight-icon">
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 20 20"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M3.33325 12.4993C3.33325 12.4993 4.16659 11.666 6.66659 11.666C9.16659 11.666 10.8333 13.3327 13.3333 13.3327C15.8333 13.3327 16.6666 12.4993 16.6666 12.4993V2.49935C16.6666 2.49935 15.8333 3.33268 13.3333 3.33268C10.8333 3.33268 9.16659 1.66602 6.66659 1.66602C4.16659 1.66602 3.33325 2.49935 3.33325 2.49935V12.4993Z"
+                          stroke="#5A596E"
+                          stroke-width="1.875"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                        <path
+                          d="M3.33325 18.3333V12.5"
+                          stroke="#5A596E"
+                          stroke-width="1.875"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                    </div>
+                    <div class="ibr-insight-content">
+                      <h4>Savings hit zero at 65 y.o</h4>
+                      <p>
+                        Your current savings and withdrawal rate will cause your
+                        savings to run out by the time you turn 65
+                      </p>
+                    </div>
+                  </div>
+                  <div class="ibr-insight-card">
+                    <div class="ibr-insight-icon">
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 20 20"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M3.33325 12.4993C3.33325 12.4993 4.16659 11.666 6.66659 11.666C9.16659 11.666 10.8333 13.3327 13.3333 13.3327C15.8333 13.3327 16.6666 12.4993 16.6666 12.4993V2.49935C16.6666 2.49935 15.8333 3.33268 13.3333 3.33268C10.8333 3.33268 9.16659 1.66602 6.66659 1.66602C4.16659 1.66602 3.33325 2.49935 3.33325 2.49935V12.4993Z"
+                          stroke="#5A596E"
+                          stroke-width="1.875"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                        <path
+                          d="M3.33325 18.3333V12.5"
+                          stroke="#5A596E"
+                          stroke-width="1.875"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                    </div>
+                    <div class="ibr-insight-content">
+                      <h4>Savings hit zero at 65 y.o</h4>
+                      <p>
+                        Your current savings and withdrawal rate will cause your
+                        savings to run out by the time you turn 65
+                      </p>
+                    </div>
+                  </div>
+                  <div class="ibr-insight-card">
+                    <div class="ibr-insight-icon">
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 20 20"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M3.33325 12.4993C3.33325 12.4993 4.16659 11.666 6.66659 11.666C9.16659 11.666 10.8333 13.3327 13.3333 13.3327C15.8333 13.3327 16.6666 12.4993 16.6666 12.4993V2.49935C16.6666 2.49935 15.8333 3.33268 13.3333 3.33268C10.8333 3.33268 9.16659 1.66602 6.66659 1.66602C4.16659 1.66602 3.33325 2.49935 3.33325 2.49935V12.4993Z"
+                          stroke="#5A596E"
+                          stroke-width="1.875"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                        <path
+                          d="M3.33325 18.3333V12.5"
+                          stroke="#5A596E"
+                          stroke-width="1.875"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                    </div>
+                    <div class="ibr-insight-content">
+                      <h4 class="ibr-insight-title-red">
+                        Savings hit zero at 65 y.o
+                      </h4>
+                      <p>
+                        Your current savings and withdrawal rate will cause your
+                        savings to run out by the time you turn 65
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+
+          <!-- Comparison chart card -->
+          <mat-card
+            class="ibr-lifetime-graph-container ibr-plan-comparison-chart"
+            *ngIf="compareReport && compareCashflow"
+          >
+            <mat-card-content style="padding-bottom: 10px !important">
+              <ng-container *ngIf="!compareReport || !compareCashflow">
+                <button
+                  matTooltip="Full screen"
+                  class="button-full-screen"
+                  (click)="enterFullscreen(true)"
+                >
+                  <img
+                    width="20"
+                    src="../../../assets/images/svgs/full-screen.svg"
+                    alt=""
+                  />
+                </button>
+              </ng-container>
+
+              <ng-container *ngIf="compareCashflow">
+                <p class="compare-chart-name">{{ compareCashflow?.name }}</p>
+              </ng-container>
+
+              <div class="d-flex flex-column">
+                <div class="shortfall" *ngIf="report">
+                  <ng-container *ngIf="!hasShortfall; else lossTpl">
+                    <div class="shortfall-status-profit">
+                      <span class="icon-bg leaf-bg">
+                        <img
+                          src="../../../assets/images/svgs/leaf.svg"
+                          alt="leaf"
+                          class="icon-svg"
+                        />
+                      </span>
+                      <span class="status-text">Goals on track and funded</span>
+                    </div>
+                  </ng-container>
+                  <ng-template #lossTpl>
+                    <div class="shortfall-status-loss">
+                      <span class="icon-bg flag-bg">
+                        <img
+                          src="../../../assets/images/svgs/triangle-flag.svg"
+                          alt="flag"
+                          class="icon-svg"
+                        />
+                      </span>
+                      <span class="status-text">
+                        Savings hit zero at {{ firstShortfallAge }} y.o.
+                      </span>
+                    </div>
+                  </ng-template>
+                </div>
+                <div class="chart-component-wrapper">
+                  <app-savings-bar-stacked-chart
+                    [report]="compareReport"
+                    [client]="client"
+                    [forecastStartDate]="
+                      compareTimeline?.forecastStartDate ||
+                      financialTimeline.forecastStartDate
+                    "
+                    [forecastEndDate]="
+                      effectiveCompareReportEndDate ??
+                      compareTimeline?.forecastEndtDate ??
+                      effectiveReportEndDate ??
+                      financialTimeline?.forecastEndtDate ??
+                      null
+                    "
+                    [cashFlowName]="compareCashflow?.name"
+                    [emergencyIconUrl]="'none'"
+                  >
+                  </app-savings-bar-stacked-chart>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+          <!-- Graph Two  -->
         </div>
       </div>
-    </mat-card-content>
-  </mat-card>
-  <mat-card class="cardWithShadow ">
-    <mat-card-content style="padding-bottom: 10px !important;">
-        <ng-container *ngIf="!compareReport || !compareCashflow">
-          <button matTooltip="{{ 'Full screen' | translate}}" class="button-full-screen" (click)="enterFullscreen()">
-            <img width="16" src="../../../assets/images/svgs/full-screen.svg" alt="">
-          </button>
-        </ng-container>
 
-        <ng-container *ngIf="compareCashflow">
-          <p class="compare-chart-name">{{cashflow?.name}}</p>
-        </ng-container>
+      <!-- End Header  -->
 
-        <div class="shortfall" *ngIf="report">
-          <ng-container *ngIf="!hasShortfall; else lossTpl">
-            <div class="shortfall-status-profit">
-              <span class="icon-bg leaf-bg">
-                <img
-                  src="../../../assets/images/svgs/leaf.svg"
-                  alt="leaf"
-                  class="icon-svg"
-                />
-              </span>
-              <span class="status-text">Goals on track and funded</span>
-            </div>
-          </ng-container>
-          <ng-template #lossTpl>
-            <div class="shortfall-status-loss">
-              <span class="icon-bg flag-bg">
-                <img
-                  src="../../../assets/images/svgs/triangle-flag.svg"
-                  alt="flag"
-                  class="icon-svg"
-                />
-              </span>
-              <span class="status-text">
-                Savings hit zero at {{ firstShortfallAge }} y.o.
-              </span>
-            </div>
-          </ng-template>
-      </div>
-
-      <div class="chart-component-wrapper">
-
-        <app-savings-bar-stacked-chart [report]="report" [client]="client"
-          [forecastStartDate]="financialTimeline.forecastStartDate"
-          [forecastEndDate]="effectiveReportEndDate ?? financialTimeline?.forecastEndtDate ?? null"
-          [cashFlowName]="cashflow?.name"
-          [emergencyIconUrl]="'none'">
-        </app-savings-bar-stacked-chart>
-      </div>
-    </mat-card-content>
-  </mat-card>
-
-  <!-- Comparison chart card -->
-  <mat-card class="cardWithShadow" *ngIf="compareReport && compareCashflow">
-    <mat-card-content style="padding-bottom: 10px !important;">
-      <ng-container *ngIf="!compareReport || !compareCashflow">
-        <button matTooltip="Full screen" class="button-full-screen" (click)="enterFullscreen(true)">
-          <img width="20" src="../../../assets/images/svgs/full-screen.svg" alt="">
-        </button>
-      </ng-container>
-
-      <ng-container *ngIf="compareCashflow">
-        <p class="compare-chart-name">{{compareCashflow?.name}}</p>
-      </ng-container>
-
-      <div class="d-flex flex-column">
-        <div class="shortfall" *ngIf="report">
-            <ng-container *ngIf="!hasShortfall; else lossTpl">
-              <div class="shortfall-status-profit">
-                <span class="icon-bg leaf-bg">
-                  <img
-                    src="../../../assets/images/svgs/leaf.svg"
-                    alt="leaf"
-                    class="icon-svg"
-                  />
-                </span>
-                <span class="status-text">Goals on track and funded</span>
-              </div>
-            </ng-container>
-            <ng-template #lossTpl>
-              <div class="shortfall-status-loss">
-                <span class="icon-bg flag-bg">
-                  <img
-                    src="../../../assets/images/svgs/triangle-flag.svg"
-                    alt="flag"
-                    class="icon-svg"
-                  />
-                </span>
-                <span class="status-text">
-                  Savings hit zero at {{ firstShortfallAge }} y.o.
-                </span>
-              </div>
-            </ng-template>
-      </div>
-      <div class="chart-component-wrapper">
-        <app-savings-bar-stacked-chart [report]="compareReport" [client]="client"
-        [forecastStartDate]="compareTimeline?.forecastStartDate || financialTimeline.forecastStartDate"
-        [forecastEndDate]="effectiveCompareReportEndDate ?? compareTimeline?.forecastEndtDate ?? effectiveReportEndDate ?? financialTimeline?.forecastEndtDate ?? null"
-        [cashFlowName]="compareCashflow?.name"
-        [emergencyIconUrl]="'none'">
-      </app-savings-bar-stacked-chart>
-    </div>
-    </div>
+      <!-- </div> -->
+      <!-- </div> -->
+      <!-- </div> -->
     </mat-card-content>
   </mat-card>
 
   <!-- show loading while second plan is being fetched -->
-  <div class="h-300 d-flex align-items-center justify-content-center" *ngIf="isCompareLoading">
+  <div
+    class="h-300 d-flex align-items-center justify-content-center"
+    *ngIf="isCompareLoading"
+  >
     <mat-spinner></mat-spinner>
   </div>
-  
-  }
-  @else {
+} @else {
   <div class="h-300">
     <mat-spinner></mat-spinner>
   </div>
-  }
-</div>
+}
+<!-- </div> -->

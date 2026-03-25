@@ -238,3 +238,18 @@ html {
   + .mdc-radio__background {
   background: transparent !important;
 }
+
+.compare-radio-group {
+  .mdc-form-field {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    cursor: pointer;
+  }
+  .mdc-label {
+    font-weight: 400;
+    font-size: 14px;
+    color: #1c1c1c;
+  }
+}

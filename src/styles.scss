@@ -281,16 +281,36 @@ button {
 .apexcharts-text,
 .apexcharts-legend-text,
 .apexcharts-text tspan {
-  font-size: 14px !important;
+  // font-size: 14px !important;
   font-family: "Ubuntu" !important;
-  font-weight: 600 !important;
+  // font-weight: 600 !important;
+}
+.apexcharts-text.apexcharts-xaxis-title-text {
+  font-size: 16px !important;
+  line-height: 100%;
+  font-weight: 500 !important;
+  color: #1c1c1c !important;
+}
+.apexcharts-text.apexcharts-yaxis-title-text {
+  font-size: 16px !important;
+  line-height: 100%;
+  font-weight: 500 !important;
+  color: #1c1c1c !important;
+}
+.apexcharts-legend-text {
+  font-size: 16px !important;
+  line-height: 100%;
+  font-weight: 400 !important;
+  color: #5a596e !important;
 }
 
 .apexcharts-yaxis {
   .apexcharts-yaxis-texts-g {
     tspan {
-      font-weight: bold;
-      fill: #d7dbe0;
+      font-weight: 400;
+      font-size: 14px;
+      fill: #a6abb2;
+      line-height: 100%;
     }
   }
 }
@@ -302,20 +322,26 @@ button {
     }
 
     tspan {
-      font-weight: bold;
-      fill: #d7dbe0;
+      font-weight: 400;
+      font-size: 14px;
+      fill: #a6abb2;
+      line-height: 100%;
     }
   }
 }
 
-.apexcharts-legend.apx-legend-position-bottom.apexcharts-align-center,
-.apexcharts-legend.apx-legend-position-top.apexcharts-align-center {
-  // justify-content: end !important;
-  margin-left: -135px !important;
+.apexcharts-xaxis-tick {
+  display: none !important;
 }
 
+// .apexcharts-legend.apx-legend-position-bottom.apexcharts-align-center,
+// .apexcharts-legend.apx-legend-position-top.apexcharts-align-center {
+//   // justify-content: end !important;
+//   margin-left: -135px !important;
+// }
+
 .apexcharts-legend-series {
-  margin-right: 10px !important;
+  margin-right: 12px !important;
 
   &:last-child {
     margin-right: 0px !important;
@@ -332,9 +358,9 @@ button {
   }
 }
 
-.apexcharts-legend-text {
-  color: #2a3547 !important;
-}
+// .apexcharts-legend-text {
+//   color: #2a3547 !important;
+// }
 
 /* Hide all minor labels first */
 .vis-panel .vis-time-axis .vis-text.vis-minor {
@@ -1003,4 +1029,26 @@ body:has(.global-fullscreen-overlay) {
     font-weight: 500;
     color: #5a596e;
   }
+}
+
+// Apex chart Custome Label on X and Y Axis
+
+/* Y-axis currency label positioned via JS at the legend row */
+.y-axis-top-label {
+  font-size: 16px;
+  font-weight: 500;
+  font-family: "Ubuntu", serif;
+  color: #1c1c1c;
+  white-space: nowrap;
+  line-height: 100%;
+}
+
+/* X-axis "Age" label positioned via JS near the origin */
+.x-axis-origin-label {
+  font-size: 16px;
+  font-weight: 500;
+  font-family: "Ubuntu", serif;
+  color: #1c1c1c;
+  white-space: nowrap;
+  line-height: 100%;
 }
