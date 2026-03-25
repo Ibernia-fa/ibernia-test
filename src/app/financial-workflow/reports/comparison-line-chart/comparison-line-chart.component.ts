@@ -63,9 +63,24 @@ export class ComparisonLineChartComponent implements OnChanges {
     const { categories, seriesA, seriesB } = this.alignAndSum(planA, planB);
 
     const currency = this.client?.clientDetails?.preferredCurrency ?? '';
-    const forecastStart = this.forecastStartDate;
-
     const firstYear = categories.length ? Number(categories[0]) : null;
+
+    const getAge = (year: number): number | null => {
+      const raw = this.client?.clientDetails?.birthDate;
+      if (!raw || !Number.isFinite(year)) return null;
+      const birthDate = new Date(raw);
+      if (Number.isNaN(birthDate.getTime())) return null;
+
+      if (firstYear != null && year === firstYear && this.forecastStartDate) {
+        const start = new Date(this.forecastStartDate);
+        if (!Number.isNaN(start.getTime())) {
+          return this.ageAtDate(start, birthDate);
+        }
+      }
+      return this.ageAtDate(new Date(year, 0, 1), birthDate);
+    };
+
+    const fmtCurrency = (value: number): string => this.formatCurrency(value);
 
     this.chartOptions = {
       ...this.chartOptions,
@@ -84,7 +99,7 @@ export class ComparisonLineChartComponent implements OnChanges {
           style: { cssClass: 'leftAlign' },
           formatter: (value: string) => {
             const year = Number(value);
-            const age = this.getDisplayAge(year, firstYear);
+            const age = getAge(year);
             return age !== null ? String(age) : value;
           },
         },
@@ -93,7 +108,7 @@ export class ComparisonLineChartComponent implements OnChanges {
         title: { text: currency, style: { fontWeight: 500 } },
         labels: {
           formatter: (value: any) =>
-            value != null ? this.formatCurrency(Number(value)) : '',
+            value != null ? fmtCurrency(Number(value)) : '',
         },
       },
       tooltip: {
@@ -103,14 +118,14 @@ export class ComparisonLineChartComponent implements OnChanges {
         custom: (opts: any) => {
           const { series, dataPointIndex, w } = opts;
           const year = w.globals.labels[dataPointIndex];
-          const age = this.getDisplayAge(Number(year), firstYear);
+          const age = getAge(Number(year));
 
           const rows = w.globals.seriesNames
             .map((name: string, i: number) => {
               const val = series[i]?.[dataPointIndex];
               if (val === undefined) return '';
               const color = w.globals.colors[i];
-              const formatted = this.formatCurrency(val);
+              const formatted = fmtCurrency(val);
               return `
                 <div style="display:flex;align-items:center;gap:6px;padding:2px 0">
                   <span style="width:10px;height:10px;border-radius:50%;background:${color};display:inline-block"></span>
