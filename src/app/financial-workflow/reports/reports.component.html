@@ -65,6 +65,9 @@
             </ng-container>
 
             <ng-container *ngIf="compareReport || compareCashflow">
+              <button class="button-icon" (click)="toggleLineChart()">
+                <span>{{ showLineChart ? ("Bar chart" | translate) : ("Line chart" | translate) }}</span>
+              </button>
               <button class="button-icon" (click)="exitComparison()">
                 <span>{{ "Exit Comparison" | translate }}</span>
               </button>
@@ -75,7 +78,7 @@
 
         <div class="ibr-lifetime-graphs">
           <!-- Graph One  -->
-          <mat-card class="ibr-lifetime-graph-container ibr-plan-chart">
+          <mat-card class="ibr-lifetime-graph-container ibr-plan-chart" *ngIf="!showLineChart">
             <mat-card-content>
               <ng-container *ngIf="!compareReport || !compareCashflow">
                 <button
@@ -286,7 +289,7 @@
           <!-- Comparison chart card -->
           <mat-card
             class="ibr-lifetime-graph-container ibr-plan-comparison-chart"
-            *ngIf="compareReport && compareCashflow"
+            *ngIf="compareReport && compareCashflow && !showLineChart"
           >
             <mat-card-content style="padding-bottom: 10px !important">
               <ng-container *ngIf="!compareReport || !compareCashflow">
@@ -357,6 +360,28 @@
                   </app-savings-bar-stacked-chart>
                 </div>
               </div>
+            </mat-card-content>
+          </mat-card>
+
+          <!-- Comparison line chart overlay -->
+          <mat-card
+            class="ibr-lifetime-graph-container"
+            *ngIf="showLineChart && compareReport && compareCashflow"
+          >
+            <mat-card-content>
+              <app-comparison-line-chart
+                [report]="report"
+                [compareReport]="compareReport"
+                [planAName]="cashflow?.name ?? 'Plan A'"
+                [planBName]="compareCashflow?.name ?? 'Plan B'"
+                [client]="client"
+                [forecastStartDate]="financialTimeline.forecastStartDate"
+                [forecastEndDate]="
+                  effectiveReportEndDate ??
+                  financialTimeline?.forecastEndtDate ??
+                  null
+                "
+              ></app-comparison-line-chart>
             </mat-card-content>
           </mat-card>
           <!-- Graph Two  -->
