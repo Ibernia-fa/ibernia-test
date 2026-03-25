@@ -21,6 +21,24 @@
       <!-- Family Tree -->
       <div class="family-tree" *ngIf="dashboard">
 
+        <!-- ═══ OTHER MEMBERS (standalone, no connectors, left of client) ═══ -->
+        <div class="other-members" *ngIf="otherMembers.length > 0">
+          <div class="tree-node other-node" *ngFor="let other of otherMembers">
+            <div class="node-avatar avatar-other">
+              <mat-icon>person</mat-icon>
+            </div>
+            <span class="node-name">{{other.firstName}} {{other.lastName}}</span>
+            <ng-container *ngIf="getMemberInheritance(other.id) as inh">
+              <span class="inheritance-amount">
+                <span class="estate-currency">{{currency | currencySymbol}}</span>{{inh.netReceived | number:'1.0-0'}}
+              </span>
+            </ng-container>
+            <button class="node-remove" (click)="onRemoveMember(other)">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+        </div>
+
         <!-- ═══ MAIN BODY: two branches + couple link ═══ -->
         <div class="tree-body">
 
