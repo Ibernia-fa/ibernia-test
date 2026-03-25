@@ -49,6 +49,7 @@ import { ToastrService } from 'ngx-toastr';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { CompareCashflowsComponent } from './compare-cashflows/compare-cashflows.component';
+import { ComparisonLineChartComponent } from './comparison-line-chart/comparison-line-chart.component';
 import { SettingsService } from 'src/app/default-preferance/services/default-preferance.http.service';
 import {
   FullscreenData,
@@ -152,6 +153,7 @@ const ELEMENT_DATA: PeriodicElement[] = [
     MatProgressSpinnerModule,
     MatSelectModule,
     SavingsBarStackedChartComponent,
+    ComparisonLineChartComponent,
     MatTableModule,
     CommonModule,
     MatTooltipModule,
@@ -185,6 +187,7 @@ export class ReportsComponent {
   compareReport: ChartSeries | null = null;
   compareTimeline: FinancialTimeline | null = null;
   isCompareLoading = false;
+  showLineChart = false;
   incomeDataSource: MatTableDataSource<FinancialViewModel> =
     new MatTableDataSource(new Array<FinancialViewModel>());
   expenseDataSource: MatTableDataSource<FinancialViewModel> =
@@ -620,6 +623,11 @@ export class ReportsComponent {
     this.compareTimeline = null;
     this.effectiveCompareReportEndDate = null;
     this.isCompareLoading = false;
+    this.showLineChart = false;
+  }
+
+  toggleLineChart() {
+    this.showLineChart = !this.showLineChart;
   }
 
   onComparePlansClicked() {
