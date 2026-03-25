@@ -222,7 +222,8 @@ table {
 }
 
 // Do not apply to mat-menu-item: MDC wraps row content in span; lowercase would inherit to title/body.
-button:not(.mat-mdc-menu-item):not(.mat-menu-item) {
+// Exclude .submit-btn (client questionnaire share) — it uses its own loading/disabled styling.
+button:not(.mat-mdc-menu-item):not(.mat-menu-item):not(.submit-btn) {
   span {
     text-transform: lowercase;
 
