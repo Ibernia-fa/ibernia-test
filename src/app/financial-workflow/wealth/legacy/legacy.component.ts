@@ -97,6 +97,10 @@ export class LegacyComponent implements OnInit, OnChanges {
     return this.dashboard?.familyMembers.filter(m => m.role === 'Child') ?? [];
   }
 
+  get otherMembers(): FamilyMemberModel[] {
+    return this.dashboard?.familyMembers.filter(m => m.role === 'Other') ?? [];
+  }
+
   get hasPartner(): boolean {
     return this.dashboard?.hasPartner ?? false;
   }

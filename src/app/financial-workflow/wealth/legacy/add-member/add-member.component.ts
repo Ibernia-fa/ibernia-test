@@ -59,39 +59,52 @@ export class AddMemberComponent {
     const hasPartnerMother = existing.some(m => m.role === 'PartnerMother');
 
     const roles: RoleOption[] = [
-      { value: FamilyRole.ClientFather, label: "Client's Father", disabled: hasClientFather },
-      { value: FamilyRole.ClientMother, label: "Client's Mother", disabled: hasClientMother },
+      { value: FamilyRole.Child, label: 'Child', disabled: false },
+      { value: FamilyRole.ClientFather, label: 'Father', disabled: hasClientFather },
+      { value: FamilyRole.ClientMother, label: 'Mother', disabled: hasClientMother },
     ];
 
     if (this.data.hasPartner) {
       roles.push(
-        { value: FamilyRole.PartnerFather, label: "Partner's Father", disabled: hasPartnerFather },
-        { value: FamilyRole.PartnerMother, label: "Partner's Mother", disabled: hasPartnerMother },
+        { value: FamilyRole.PartnerFather, label: "Partner's father", disabled: hasPartnerFather },
+        { value: FamilyRole.PartnerMother, label: "Partner's mother", disabled: hasPartnerMother },
       );
     }
 
     roles.push(
-      { value: FamilyRole.ClientSibling, label: "Client's Sibling", disabled: false },
+      { value: FamilyRole.ClientSibling, label: 'Sibling', disabled: false },
     );
 
     if (this.data.hasPartner) {
       roles.push(
-        { value: FamilyRole.PartnerSibling, label: "Partner's Sibling", disabled: false },
+        { value: FamilyRole.PartnerSibling, label: "Partner's sibling", disabled: false },
       );
     }
 
     roles.push(
-      { value: FamilyRole.Child, label: 'Child', disabled: false },
+      { value: FamilyRole.Other, label: 'Other', disabled: false },
     );
 
     this.roleOptions = roles;
   }
 
+  private static readonly PARTNER_ROLES = new Set([
+    FamilyRole.PartnerFather,
+    FamilyRole.PartnerMother,
+    FamilyRole.PartnerSibling,
+  ]);
+
   onSave(): void {
     if (this.form.invalid) return;
 
-    this.isSaving = true;
     const { firstName, lastName, role } = this.form.value;
+
+    if (!this.data.hasPartner && AddMemberComponent.PARTNER_ROLES.has(role)) {
+      this.toastr.error('Cannot add a partner-related member when no partner exists', 'Error');
+      return;
+    }
+
+    this.isSaving = true;
 
     this.legacyHttp.addFamilyMember(this.data.cashflowId, { firstName, lastName, role }).subscribe({
       next: (dashboard) => {
