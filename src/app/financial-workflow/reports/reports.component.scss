@@ -5,7 +5,7 @@
   border-radius: 12px;
   padding: 24px;
   background-color: #fff;
-  .card-title{
+  .card-title {
     font-size: 14px;
   }
 }
@@ -120,7 +120,7 @@
   border: 1px solid #f7f7f7;
   .stats-main-wrapper {
     .saving-title {
-       font-family: 'Ubuntu';
+      font-family: "Ubuntu";
     }
   }
   .drag-btn {
@@ -149,7 +149,7 @@
     -webkit-backdrop-filter: blur(2px);
     p {
       color: white;
-       font-family: 'Ubuntu';
+      font-family: "Ubuntu";
       font-size: 14px;
       line-height: 20px;
       font-weight: 500;
@@ -209,7 +209,7 @@
 .table-main-wrapper {
   h3 {
     font-size: 16px;
- 
+
     margin-bottom: 16px;
     font-weight: 600;
   }
@@ -332,28 +332,29 @@ tr.example-detail-row {
 }
 // End Cashflow Styles
 
-.slider-wrapper{
-    width: 250px;
+.slider-wrapper {
+  width: 250px;
 }
-.button-full-screen{
-     padding: 5px 8px;
-    border-radius: 4px;
-    border: none;
-    position: absolute;
-    display: flex;
-    cursor: pointer;
-    background: none;
-    left: 27px;
-    top: 27px;
-    z-index: 99;
-  &:hover{
+.button-full-screen {
+  padding: 5px 8px;
+  border-radius: 4px;
+  border: none;
+  position: absolute;
+  // display: flex;
+  display: none;
+  cursor: pointer;
+  background: none;
+  left: 27px;
+  top: 27px;
+  z-index: 99;
+  &:hover {
     background-color: #f7f7f7;
   }
 }
-.col-red{
+.col-red {
   color: #ff0000;
 }
-.col-green{
+.col-green {
   color: green;
 }
 
@@ -368,7 +369,8 @@ tr.example-detail-row {
 }
 
 .shortfall {
-  display: flex;
+  display: none;
+  // display: flex;
   align-items: center;
   gap: 6;
   margin-left: 83px;
@@ -470,7 +472,7 @@ tr.example-detail-row {
   display: flex;
   flex-direction: column;
   gap: 32px;
-  margin-top: -32px;
+  // margin-top: -32px;
 }
 
 .compare-chart-name {
@@ -483,10 +485,125 @@ tr.example-detail-row {
 .scenario-lab-btn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  // gap: 6px;
   text-decoration: none;
   color: inherit;
   .scenario-lab-icon {
     display: block;
+  }
+}
+
+// New Styles
+.ibr-lifetime {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.ibr-lifetime-plan-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  .ibr-lifetime-header {
+    h3 {
+      font-size: 24px;
+      line-height: 100%;
+      font-weight: 700;
+      color: #1c1c1c;
+    }
+    p {
+      font-size: 16px;
+      line-height: 100%;
+      font-weight: 400;
+      color: #5a596e;
+      margin: 0;
+    }
+  }
+  .ibr-lifetime-btn {
+    .scenario-lab-btn {
+      gap: 8px;
+    }
+  }
+}
+
+.ibr-lifetime-graph-container {
+  background-color: white;
+  border-radius: 12px;
+  border: 1px solid #0000001a;
+}
+// .ibr-plan-chart {
+//   margin-top: 16px;
+// }
+.ibr-plan-comparison-chart {
+  margin-top: 16px;
+}
+
+// Insights Section
+.ibr-insights-section {
+  margin-top: 24px;
+  background-color: #f8f8f8b2;
+  border: 1px solid #0000001a;
+  backdrop-filter: blur(75px);
+  border-radius: 12px;
+  padding: 16px;
+
+  .ibr-insights-title {
+    font-size: 16px;
+    font-weight: 500;
+    color: #1c1c1c;
+    line-height: 100%;
+    margin: 0 0 16px 0;
+  }
+}
+
+.ibr-insights-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.ibr-insight-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 14px;
+  background-color: #ffffff;
+  border-radius: 8px;
+
+  .ibr-insight-icon {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #fff3f3;
+    border-radius: 999px;
+  }
+
+  .ibr-insight-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    h4 {
+      font-size: 14px;
+      font-weight: 500;
+      color: #1c1c1c;
+      margin: 0;
+      line-height: 100%;
+    }
+
+    // h4.ibr-insight-title-red {
+    //   color: #ff4444;
+    // }
+
+    p {
+      font-size: 12px;
+      font-weight: 400;
+      color: #787889;
+      margin: 0;
+      line-height: 16px;
+    }
   }
 }

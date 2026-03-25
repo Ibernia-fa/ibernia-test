@@ -1,6 +1,34 @@
-.border-wraper{
-       border: 1px solid #E7E7EB;
-    padding: 5px;
-    border-radius: 4px;
-    margin-bottom: 10px;
+.compare-subtitle {
+  color: #1c1c1c;
+  line-height: 100%;
+}
+
+.compare-radio-group {
+  gap: 16px !important;
+  align-items: start !important;
+}
+
+.compare-radio-item {
+  display: flex;
+  align-items: center;
+  padding: 14px 16px;
+  border: 1px solid #0000001a;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 100%;
+
+  mat-radio-button {
+    width: 100%;
+  }
+
+  .mdc-form-field {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .mdc-label {
+    font-size: 16px !important;
+    font-weight: 400;
+    color: #1c1c1c;
+  }
 }

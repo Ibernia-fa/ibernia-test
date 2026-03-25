@@ -1,4 +1,14 @@
-import { Component, ViewChild, Input, OnChanges, OnDestroy, SimpleChanges, ElementRef, NgZone, inject } from '@angular/core';
+import {
+  Component,
+  ViewChild,
+  Input,
+  OnChanges,
+  OnDestroy,
+  SimpleChanges,
+  ElementRef,
+  NgZone,
+  inject,
+} from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { TablerIconsModule } from 'angular-tabler-icons';
 import { ChartComponent, NgApexchartsModule } from 'ng-apexcharts';
@@ -8,16 +18,13 @@ import moment from 'moment';
 
 @Component({
   selector: 'app-savings-bar-stacked-chart',
-  imports: [
-    TablerIconsModule,
-    MatCardModule,
-    NgApexchartsModule
-  ],
+  imports: [TablerIconsModule, MatCardModule, NgApexchartsModule],
   templateUrl: './savings-bar-stacked-chart.component.html',
-  styleUrl: './savings-bar-stacked-chart.component.scss'
+  styleUrl: './savings-bar-stacked-chart.component.scss',
 })
 export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
-  @ViewChild("chart", { read: ElementRef }) chartElRef: ElementRef<HTMLDivElement>;
+  @ViewChild('chart', { read: ElementRef })
+  chartElRef: ElementRef<HTMLDivElement>;
   @ViewChild(ChartComponent) apxChartComponent: ChartComponent | undefined;
   @Input() report: ChartSeries;
   @Input() forecastStartDate: Date;
@@ -46,6 +53,8 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
   private emergencyExpenseLineEl: HTMLElement | null = null;
   private emergencyExpenseBandEl: HTMLElement | null = null;
   private eventLabelElements: HTMLElement[] = [];
+  private yAxisLabelEl: HTMLElement | null = null;
+  private xAxisLabelEl: HTMLElement | null = null;
   private shortfallDataPointIndex: number = -1;
   private emergencyExpenseDataPointIndex: number = -1;
   /** Tracks whether the chart has been rendered at least once (used to skip full re-inits on subsequent series updates). */
@@ -64,7 +73,9 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
   }
 
   /** Trims report to only include years up to forecastEndDate (projection end year). */
-  private trimReportToEndYear(report: ChartSeries | null | undefined): ChartSeries | null | undefined {
+  private trimReportToEndYear(
+    report: ChartSeries | null | undefined,
+  ): ChartSeries | null | undefined {
     if (!report?.categories?.length || !this.forecastEndDate) return report;
     const endYear = moment(this.forecastEndDate).year();
     const indicesToKeep: number[] = [];
@@ -78,8 +89,8 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
       ...s,
       data: indicesToKeep.map((i) => s.data[i] ?? 0),
     }));
-    const timelineEvents = (report.timelineEvents ?? []).filter((e) =>
-      Number.isFinite(e.startYear) && e.startYear <= endYear
+    const timelineEvents = (report.timelineEvents ?? []).filter(
+      (e) => Number.isFinite(e.startYear) && e.startYear <= endYear,
     );
     return { ...report, categories, series, timelineEvents };
   }
@@ -90,7 +101,7 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
     this.chartOptions = {
       series: [],
       chart: {
-        type: "bar",
+        type: 'bar',
         height: 500,
         stacked: true,
         animations: {
@@ -112,14 +123,14 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
         states: {
           hover: {
             filter: {
-              type: 'none'
-            }
+              type: 'none',
+            },
           },
           active: {
             filter: {
-              type: 'none'
-            }
-          }
+              type: 'none',
+            },
+          },
         },
         events: {
           dataPointSelection: () => undefined,
@@ -127,48 +138,64 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
           updated: (chartContext: any) => this.postRenderSetup(chartContext),
         },
         selection: {
-          enabled: false
-        }
+          enabled: false,
+        },
       },
       dataLabels: {
-        enabled: false
+        enabled: false,
       },
       tooltip: {
-  enabled: true,
-  shared: true,
-  intersect: false,
-  custom: (opts: any) => {
-    const { series, dataPointIndex, w } = opts;
+        enabled: true,
+        shared: true,
+        intersect: false,
+        custom: (opts: any) => {
+          const { series, dataPointIndex, w } = opts;
 
-    const xValue = w.globals.labels[dataPointIndex];
-    const year = Number(xValue);
-    const labels = w.globals.labels ?? [];
-    const firstYear = labels.length ? Number(labels[0]) : null;
-    const lastYear = labels.length ? Number(labels[labels.length - 1]) : null;
-    const age = this.getDisplayAgeForYear(year, Number.isFinite(firstYear) ? firstYear : null, Number.isFinite(lastYear) ? lastYear : null);
+          const xValue = w.globals.labels[dataPointIndex];
+          const year = Number(xValue);
+          const labels = w.globals.labels ?? [];
+          const firstYear = labels.length ? Number(labels[0]) : null;
+          const lastYear = labels.length
+            ? Number(labels[labels.length - 1])
+            : null;
+          const age = this.getDisplayAgeForYear(
+            year,
+            Number.isFinite(firstYear) ? firstYear : null,
+            Number.isFinite(lastYear) ? lastYear : null,
+          );
 
-    const bodyRows = w.globals.seriesNames
-      .map((seriesName: string, i: number) => {
-        if (seriesName === 'Emergency Expense') return '';
-        const value = series[i]?.[dataPointIndex];
-        if (value === undefined || (typeof value === 'number' && value === 0)) return '';
-        // Use the original series color (before transparent override) so tooltip dots are always visible
-        const originalSeries = this.report?.series?.find(s => s.name === seriesName);
-        const color = (originalSeries?.color && originalSeries.color !== 'transparent') ? originalSeries.color : w.globals.colors[i];
-        const displayValue = typeof value === 'number'
-          ? this.formatCurrency(value)
-          : String(value ?? '');
-        return `
+          const bodyRows = w.globals.seriesNames
+            .map((seriesName: string, i: number) => {
+              if (seriesName === 'Emergency Expense') return '';
+              const value = series[i]?.[dataPointIndex];
+              if (
+                value === undefined ||
+                (typeof value === 'number' && value === 0)
+              )
+                return '';
+              // Use the original series color (before transparent override) so tooltip dots are always visible
+              const originalSeries = this.report?.series?.find(
+                (s) => s.name === seriesName,
+              );
+              const color =
+                originalSeries?.color && originalSeries.color !== 'transparent'
+                  ? originalSeries.color
+                  : w.globals.colors[i];
+              const displayValue =
+                typeof value === 'number'
+                  ? this.formatCurrency(value)
+                  : String(value ?? '');
+              return `
         <div class="savings-tooltip__body">
           <div class="savings-tooltip__label">
             <span class="circle-wrapper" style="background-color: ${color};"></span>${seriesName}:</div>
           <div class="savings-tooltip__value">${displayValue}</div>
         </div>`;
-      })
-      .filter(Boolean)
-      .join('');
+            })
+            .filter(Boolean)
+            .join('');
 
-    return `
+          return `
       <div class="savings-tooltip">
         <div class="savings-tooltip__header">
           <div>Age: ${age} </div>  <div> Year: ${xValue}</div> 
@@ -176,19 +203,19 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
         ${bodyRows}
       </div>
     `;
-  }
-},
+        },
+      },
       responsive: [
         {
           breakpoint: 480,
           options: {
             legend: {
-              position: "bottom",
+              position: 'bottom',
               offsetX: -10,
               offsetY: 0,
               onItemClick: {
-                toggleDataSeries: false
-              }
+                toggleDataSeries: false,
+              },
             },
           },
         },
@@ -199,32 +226,32 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
           states: {
             active: {
               filter: {
-                type: 'none'
-              }
-            }
-          }
+                type: 'none',
+              },
+            },
+          },
         },
       },
       grid: {
         show: true,
+        borderColor: '#0000001a',
         xaxis: {
           lines: {
-            show: false
-          }
+            show: false,
+          },
         },
         yaxis: {
           lines: {
-            show: true
-          }
+            show: true,
+          },
         },
       },
       legend: {
-        position: "top",
-        horizontalAlign: "right",
+        position: 'top',
+        horizontalAlign: 'center',
         offsetX: 0,
         fillColors: ['#4CAF50', '#8BC34A', '#FF5722', '#FF5700'],
         showForZeroSeries: false,
-
       },
       fill: {
         opacity: 1,
@@ -237,7 +264,7 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
           filter: { type: 'none' },
         },
       },
-      annotations: { points: [] }
+      annotations: { points: [] },
     };
   }
 
@@ -247,16 +274,14 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
 
     const parsedHeight = Number(this.chartHeight);
     const effectiveHeight =
-      Number.isFinite(parsedHeight) && parsedHeight > 0
-        ? parsedHeight
-        : 500;
+      Number.isFinite(parsedHeight) && parsedHeight > 0 ? parsedHeight : 500;
 
     // Only update chart options (triggers full re-render) when chartHeight itself changed.
     // Doing this unconditionally was causing a full re-render on every series update.
     if (changes['chartHeight']) {
       this.chartOptions.chart = {
         ...this.chartOptions.chart,
-        height: effectiveHeight
+        height: effectiveHeight,
       };
     }
 
@@ -268,22 +293,20 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
         animations: {
           ...this.chartOptions.chart.animations,
           enabled: !!this.animateUpdates,
-        }
+        },
       };
     }
 
     const report = this.trimReportToEndYear(this.report);
     if (!report?.series?.length) {
       if (changes['client'] && this.client) {
-        this.chartOptions.yaxis = {
-          title: {
-            text: this.getCurrencyAxisTitle(),
-            style: { fontWeight: 500 }
-          },
-          labels: {
-            formatter: (value: any) => value != null ? Number(value).toLocaleString() : '',
-          },
-        };
+      this.chartOptions.yaxis = {
+        title: { text: '' },
+        labels: {
+          formatter: (value: any) =>
+            value != null ? Number(value).toLocaleString() : '',
+        },
+      };
       }
       return;
     }
@@ -297,8 +320,12 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
       this.events = report.timelineEvents ?? [];
 
       // Always compute shortfall/emergency indices (needed for overlay rendering)
-      const emergencyXAxis = hideEmergencyOverlays ? [] : this.buildEmergencyAnnotation(report);
-      const emergencyExpenseXAxis = hideEmergencyOverlays ? [] : this.buildEmergencyExpenseAnnotation(report);
+      const emergencyXAxis = hideEmergencyOverlays
+        ? []
+        : this.buildEmergencyAnnotation(report);
+      const emergencyExpenseXAxis = hideEmergencyOverlays
+        ? []
+        : this.buildEmergencyExpenseAnnotation(report);
 
       // Only rebuild legend and annotations when NOT in animated-update mode (or on first render).
       // Re-assigning these inputs triggers ng-apexcharts updateOptions → full re-render.
@@ -307,10 +334,13 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
 
         // dynamically build fillColors array based on series names
         const fillColors = seriesList.map((s, i) => {
-          if (s.name === 'Current Account (Negative)' || s.name === 'Emergency Expense') {
+          if (
+            s.name === 'Current Account (Negative)' ||
+            s.name === 'Emergency Expense'
+          ) {
             return 'transparent';
           }
-          return s.color
+          return s.color;
         });
 
         // legends formatter to hide specific series names
@@ -318,27 +348,30 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
           ...this.chartOptions.legend,
 
           formatter: (seriesName: string) => {
-            if (seriesName === 'Current Account (Negative)' || seriesName === 'Emergency Expense') {
+            if (
+              seriesName === 'Current Account (Negative)' ||
+              seriesName === 'Emergency Expense'
+            ) {
               return '';
             }
             return seriesName;
           },
           markers: {
-            fillColors: fillColors
+            fillColors: fillColors,
           },
           onItemClick: {
-            toggleDataSeries: true
+            toggleDataSeries: true,
           },
           onItemHover: {
-            highlightDataSeries: true
-          }
+            highlightDataSeries: true,
+          },
         };
 
         const points = this.buildEventAnnotations(this.events);
         this.currentAnnotationPoints = points;
         this.chartOptions.annotations = {
           points,
-          xaxis: [...emergencyXAxis, ...emergencyExpenseXAxis]
+          xaxis: [...emergencyXAxis, ...emergencyExpenseXAxis],
         };
       }
 
@@ -371,65 +404,73 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
     // the Scenario Lab aligns categories between baseline/scenario, making categories the
     // authoritative source. This keeps ng-apexcharts on the updateSeries path (smooth animation).
     const currentCategoriesKey = (report.categories ?? []).join(',');
-    const categoriesChanged = currentCategoriesKey !== this.previousCategoriesKey;
+    const categoriesChanged =
+      currentCategoriesKey !== this.previousCategoriesKey;
     this.previousCategoriesKey = currentCategoriesKey;
     this.chartInitialized = true;
 
     if (!this.animateUpdates || categoriesChanged) {
-    const categories = report.categories ?? [];
+      const categories = report.categories ?? [];
 
-    let firstYear = categories.length ? Number(categories[0]) : undefined;
-    let lastYear = categories.length ? Number(categories[categories.length - 1]) : undefined;
+      let firstYear = categories.length ? Number(categories[0]) : undefined;
+      let lastYear = categories.length
+        ? Number(categories[categories.length - 1])
+        : undefined;
 
-    // Fallback to forecast dates only if categories are missing
-    if (!Number.isFinite(firstYear) && this.forecastStartDate) {
-      firstYear = moment(this.forecastStartDate).year();
-    }
-    if (!Number.isFinite(lastYear) && this.forecastEndDate) {
-      lastYear = moment(this.forecastEndDate).year();
-    }
+      // Fallback to forecast dates only if categories are missing
+      if (!Number.isFinite(firstYear) && this.forecastStartDate) {
+        firstYear = moment(this.forecastStartDate).year();
+      }
+      if (!Number.isFinite(lastYear) && this.forecastEndDate) {
+        lastYear = moment(this.forecastEndDate).year();
+      }
 
-    const tickAmount =
-      Number.isFinite(firstYear) &&
-      Number.isFinite(lastYear) &&
-      lastYear! > firstYear!
-        ? Math.max(1, Math.floor((lastYear! - firstYear!) / 5))
-        : 1;
+      const tickAmount =
+        Number.isFinite(firstYear) &&
+        Number.isFinite(lastYear) &&
+        lastYear! > firstYear!
+          ? Math.max(1, Math.floor((lastYear! - firstYear!) / 5))
+          : 1;
 
-    const firstCategoryYear = Number.isFinite(firstYear) ? Number(firstYear) : null;
-    const lastCategoryYear = Number.isFinite(lastYear) ? Number(lastYear) : null;
+      const firstCategoryYear = Number.isFinite(firstYear)
+        ? Number(firstYear)
+        : null;
+      const lastCategoryYear = Number.isFinite(lastYear)
+        ? Number(lastYear)
+        : null;
 
-    this.chartOptions.xaxis = {
-      type: 'category',
-      categories, // keep years for data mapping; display as age via formatter
-      tickAmount,
-      title: {
-        text: 'Age',
-        offsetY: 0,
-        style: {
-          fontWeight: 500
-        }
-      },
-      labels: {
-        style: { cssClass: 'leftAlign' },
-        formatter: (value: string) => {
-          const year = Number(value);
-          const age = this.getDisplayAgeForYear(year, firstCategoryYear, lastCategoryYear);
-          return age === '' ? value : String(age);
+      this.chartOptions.xaxis = {
+        type: 'category',
+        categories, // keep years for data mapping; display as age via formatter
+        tickAmount,
+        title: { text: '' },
+        axisBorder: {
+          show: true,
+          color: '#0000001a', // change to whatever color you want
+          height: 1, // thickness of the line
         },
-      },
-    };
-  }
+        labels: {
+          style: { cssClass: 'leftAlign' },
+          formatter: (value: string) => {
+            const year = Number(value);
+            const age = this.getDisplayAgeForYear(
+              year,
+              firstCategoryYear,
+              lastCategoryYear,
+            );
+            return age === '' ? value : String(age);
+          },
+        },
+      };
+    }
 
     if (changes['client']) {
       this.chartOptions.yaxis = {
-        title: {
-          text: this.getCurrencyAxisTitle(),
-          style: { fontWeight: 500 }
-        },
+        title: { text: '' },
         labels: {
-          formatter: (value: any) => value != null ? Number(value).toLocaleString() : '',
-        }
+          formatter: (value: any) =>
+            value != null ? Number(value).toLocaleString() : '',
+        },
       };
       const birthYear = this.client?.clientDetails?.birthDate
         ? moment(this.client.clientDetails.birthDate).year()
@@ -437,14 +478,20 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
       if (this.chartOptions.xaxis?.labels && birthYear != null) {
         const cats = this.chartOptions.xaxis?.categories ?? [];
         const firstCategoryYear = cats.length ? Number(cats[0]) : null;
-        const lastCategoryYear = cats.length ? Number(cats[cats.length - 1]) : null;
+        const lastCategoryYear = cats.length
+          ? Number(cats[cats.length - 1])
+          : null;
         this.chartOptions.xaxis = {
           ...this.chartOptions.xaxis,
           labels: {
             ...this.chartOptions.xaxis.labels,
             formatter: (value: string) => {
               const year = Number(value);
-              const age = this.getDisplayAgeForYear(year, Number.isFinite(firstCategoryYear) ? firstCategoryYear : null, Number.isFinite(lastCategoryYear) ? lastCategoryYear : null);
+              const age = this.getDisplayAgeForYear(
+                year,
+                Number.isFinite(firstCategoryYear) ? firstCategoryYear : null,
+                Number.isFinite(lastCategoryYear) ? lastCategoryYear : null,
+              );
               return age === '' ? value : String(age);
             },
           },
@@ -455,25 +502,29 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
     // final series assignment
     const mappedSeries = report.series.map((s, idx) => ({
       ...s,
-      color: (s.name === 'Current Account (Negative)' || s.name === 'Emergency Expense') ? 'transparent' : s.color,
+      color:
+        s.name === 'Current Account (Negative)' ||
+        s.name === 'Emergency Expense'
+          ? 'transparent'
+          : s.color,
       tack: 'stack1',
       order: s.name === 'Emergency Expense' ? report.series.length : idx,
       fill: {
-        opacity: 1
+        opacity: 1,
       },
       states: {
         hover: {
           filter: {
             type: 'lighten',
-            value: 0.15
-          }
+            value: 0.15,
+          },
         },
         active: {
           filter: {
-            type: 'none'
-          }
-        }
-      }
+            type: 'none',
+          },
+        },
+      },
     }));
     this.chartOptions.series = mappedSeries;
 
@@ -496,28 +547,149 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
     this.cleanupHtmlTooltips();
     this.cleanupEmergencyElements();
     this.cleanupEventLabels();
+    this.cleanupYAxisLabel();
+    this.cleanupXAxisLabel();
   }
 
   private cleanupEmergencyElements(): void {
     for (const key of [
-      'emergencyIconEl', 'emergencyIconLineEl', 'emergencyIconBandEl',
-      'emergencyExpenseIconEl', 'emergencyExpenseLineEl', 'emergencyExpenseBandEl'
+      'emergencyIconEl',
+      'emergencyIconLineEl',
+      'emergencyIconBandEl',
+      'emergencyExpenseIconEl',
+      'emergencyExpenseLineEl',
+      'emergencyExpenseBandEl',
     ] as const) {
       const el = this[key] as HTMLElement | null;
-      if (el) { el.remove(); (this as any)[key] = null; }
+      if (el) {
+        el.remove();
+        (this as any)[key] = null;
+      }
     }
   }
 
   private cleanupEventLabels(): void {
-    this.eventLabelElements.forEach(el => el.remove());
+    this.eventLabelElements.forEach((el) => el.remove());
     this.eventLabelElements = [];
+  }
+
+  private cleanupYAxisLabel(): void {
+    if (this.yAxisLabelEl) {
+      this.yAxisLabelEl.remove();
+      this.yAxisLabelEl = null;
+    }
+  }
+
+  /**
+   * Creates an HTML label for the y-axis currency title and positions it
+   * by reading the actual rendered positions of the legend and y-axis.
+   */
+  private positionYAxisLabel(): void {
+    this.cleanupYAxisLabel();
+
+    const chartHost = this.chartElRef?.nativeElement;
+    if (!chartHost) return;
+
+    const currencyText = this.getCurrencyAxisTitle();
+    if (!currencyText) return;
+
+    const legend = chartHost.querySelector<HTMLElement>('.apexcharts-legend');
+    const yAxisTexts = chartHost.querySelector<SVGGElement>(
+      '.apexcharts-yaxis-texts-g',
+    );
+    if (!legend) return;
+
+    const hostRect = chartHost.getBoundingClientRect();
+    const legendRect = legend.getBoundingClientRect();
+
+    if (getComputedStyle(chartHost).position === 'static') {
+      chartHost.style.position = 'relative';
+    }
+
+    const label = document.createElement('div');
+    label.textContent = currencyText;
+    label.className = 'y-axis-top-label';
+    chartHost.appendChild(label);
+
+    const labelTop =
+      legendRect.top - hostRect.top + legendRect.height / 2 - 7;
+
+    let labelLeft = 10;
+    if (yAxisTexts) {
+      const textsRect = yAxisTexts.getBoundingClientRect();
+      labelLeft = textsRect.left - hostRect.left;
+    }
+
+    label.style.position = 'absolute';
+    label.style.top = `${labelTop}px`;
+    label.style.left = `${labelLeft}px`;
+    label.style.pointerEvents = 'none';
+    label.style.zIndex = '5';
+
+    this.yAxisLabelEl = label;
+  }
+
+  private cleanupXAxisLabel(): void {
+    if (this.xAxisLabelEl) {
+      this.xAxisLabelEl.remove();
+      this.xAxisLabelEl = null;
+    }
+  }
+
+  /**
+   * Creates an HTML label for the x-axis "Age" title and positions it
+   * near the origin (bottom-left of the plot area), aligned with the
+   * x-axis tick labels row but to the left of the first number.
+   */
+  private positionXAxisLabel(): void {
+    this.cleanupXAxisLabel();
+
+    const chartHost = this.chartElRef?.nativeElement;
+    if (!chartHost) return;
+
+    const gridEl = chartHost.querySelector<SVGElement>('.apexcharts-grid');
+    const xAxisTexts = chartHost.querySelector<SVGGElement>(
+      '.apexcharts-xaxis-texts-g',
+    );
+    if (!gridEl) return;
+
+    const hostRect = chartHost.getBoundingClientRect();
+    const gridRect = gridEl.getBoundingClientRect();
+
+    if (getComputedStyle(chartHost).position === 'static') {
+      chartHost.style.position = 'relative';
+    }
+
+    const label = document.createElement('div');
+    label.textContent = 'Age';
+    label.className = 'x-axis-origin-label';
+    chartHost.appendChild(label);
+
+    const labelLeft = gridRect.left - hostRect.left;
+
+    const firstXTick = xAxisTexts?.querySelector<SVGTextElement>(
+      '.apexcharts-xaxis-label',
+    );
+    let labelTop = gridRect.bottom - hostRect.top + 8;
+    if (firstXTick) {
+      const tickRect = firstXTick.getBoundingClientRect();
+      labelTop = tickRect.bottom - hostRect.top + 4;
+    }
+
+    label.style.position = 'absolute';
+    label.style.top = `${labelTop}px`;
+    label.style.left = `${labelLeft}px`;
+    label.style.pointerEvents = 'none';
+    label.style.zIndex = '5';
+
+    this.xAxisLabelEl = label;
   }
 
   buildEventAnnotations(events: TimelineEvent[]) {
     const eventsByYear = new Map<string, TimelineEvent[]>();
     const DOT_SPACING = 10;
 
-    events.forEach(event => {
+    events.forEach((event) => {
       const year = event.startYear.toString();
       if (!eventsByYear.has(year)) eventsByYear.set(year, []);
       eventsByYear.get(year)!.push(event);
@@ -543,7 +715,7 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
             <div class="event-tooltip ${event.iconUrl}">
               <img src="/assets/images/svgs/${event.iconUrl}.svg" alt="${event.iconUrl}" />
               <span>${event.name}</span>
-            </div>`
+            </div>`,
         });
       });
     });
@@ -570,7 +742,7 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
     const plotBottom = gridRect ? gridRect.bottom : window.innerHeight - 10;
 
     const eventsByYear = new Map<string, TimelineEvent[]>();
-    this.events.forEach(event => {
+    this.events.forEach((event) => {
       const year = event.startYear.toString();
       if (!eventsByYear.has(year)) eventsByYear.set(year, []);
       eventsByYear.get(year)!.push(event);
@@ -581,7 +753,9 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
     eventsByYear.forEach((groupEvents, year) => {
       groupEvents.forEach((event, index) => {
         // Find marker position for this event
-        const markers = chartHost.querySelectorAll<SVGElement>('.apexcharts-point-annotation-marker');
+        const markers = chartHost.querySelectorAll<SVGElement>(
+          '.apexcharts-point-annotation-marker',
+        );
         let markerCenterX = 0;
         let markerCenterY = 0;
         let found = false;
@@ -590,7 +764,11 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
         markers.forEach((marker) => {
           if (found) return;
           const annotationIdx = Array.from(markers).indexOf(marker);
-          if (this.currentAnnotationPoints[annotationIdx]?.customTooltip?.includes(event.name)) {
+          if (
+            this.currentAnnotationPoints[
+              annotationIdx
+            ]?.customTooltip?.includes(event.name)
+          ) {
             const rect = marker.getBoundingClientRect();
             markerCenterX = rect.left + rect.width / 2;
             markerCenterY = rect.top + rect.height / 2;
@@ -624,15 +802,15 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
         setTimeout(() => {
           const labelRect = label.getBoundingClientRect();
           const labelHeight = labelRect.height;
-          
+
           // Try to position above the marker
           let labelTop = Math.max(5, markerCenterY - 45 - index * 25);
-          
+
           // If it goes off the top of the viewport, position it below instead
           if (labelTop < 5) {
             labelTop = plotBottom + 10 + index * 25;
           }
-          
+
           label.style.left = `${markerCenterX}px`;
           label.style.top = `${labelTop}px`;
         }, 0);
@@ -648,7 +826,7 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
    */
   private buildEmergencyAnnotation(report: ChartSeries): any[] {
     this.shortfallDataPointIndex = -1;
-    const shortfallSeries = report?.series?.find(s => s.name === 'Shortfall');
+    const shortfallSeries = report?.series?.find((s) => s.name === 'Shortfall');
     if (!shortfallSeries) return [];
 
     const index = shortfallSeries.data.findIndex((v: number) => v < 0);
@@ -664,7 +842,9 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
    */
   private buildEmergencyExpenseAnnotation(report: ChartSeries): any[] {
     this.emergencyExpenseDataPointIndex = -1;
-    const emergencySeries = report?.series?.find(s => s.name === 'Emergency Expense');
+    const emergencySeries = report?.series?.find(
+      (s) => s.name === 'Emergency Expense',
+    );
     if (!emergencySeries) return [];
 
     const index = emergencySeries.data.findIndex((v: number) => v > 0);
@@ -679,9 +859,18 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
    * draws a full-height background band, and a vertical connector line from icon to bar top.
    */
   private attachEmergencyExpenseIcon(): void {
-    if (this.emergencyExpenseIconEl) { this.emergencyExpenseIconEl.remove(); this.emergencyExpenseIconEl = null; }
-    if (this.emergencyExpenseLineEl) { this.emergencyExpenseLineEl.remove(); this.emergencyExpenseLineEl = null; }
-    if (this.emergencyExpenseBandEl) { this.emergencyExpenseBandEl.remove(); this.emergencyExpenseBandEl = null; }
+    if (this.emergencyExpenseIconEl) {
+      this.emergencyExpenseIconEl.remove();
+      this.emergencyExpenseIconEl = null;
+    }
+    if (this.emergencyExpenseLineEl) {
+      this.emergencyExpenseLineEl.remove();
+      this.emergencyExpenseLineEl = null;
+    }
+    if (this.emergencyExpenseBandEl) {
+      this.emergencyExpenseBandEl.remove();
+      this.emergencyExpenseBandEl = null;
+    }
     if (this.emergencyExpenseDataPointIndex < 0) return;
 
     this.attachColumnOverlay(
@@ -690,7 +879,7 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
         this.emergencyExpenseIconEl = icon;
         this.emergencyExpenseLineEl = line;
         this.emergencyExpenseBandEl = band;
-      }
+      },
     );
   }
 
@@ -699,9 +888,18 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
    * background band, and a vertical connector line from icon to the bar top.
    */
   private attachEmergencyIcon(): void {
-    if (this.emergencyIconEl) { this.emergencyIconEl.remove(); this.emergencyIconEl = null; }
-    if (this.emergencyIconLineEl) { this.emergencyIconLineEl.remove(); this.emergencyIconLineEl = null; }
-    if (this.emergencyIconBandEl) { this.emergencyIconBandEl.remove(); this.emergencyIconBandEl = null; }
+    if (this.emergencyIconEl) {
+      this.emergencyIconEl.remove();
+      this.emergencyIconEl = null;
+    }
+    if (this.emergencyIconLineEl) {
+      this.emergencyIconLineEl.remove();
+      this.emergencyIconLineEl = null;
+    }
+    if (this.emergencyIconBandEl) {
+      this.emergencyIconBandEl.remove();
+      this.emergencyIconBandEl = null;
+    }
     if (this.shortfallDataPointIndex < 0) return;
 
     this.attachColumnOverlay(
@@ -710,7 +908,7 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
         this.emergencyIconEl = icon;
         this.emergencyIconLineEl = line;
         this.emergencyIconBandEl = band;
-      }
+      },
     );
   }
 
@@ -722,12 +920,18 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
    */
   private attachColumnOverlay(
     dataPointIndex: number,
-    assign: (icon: HTMLElement, line: HTMLElement | null, band: HTMLElement | null) => void
+    assign: (
+      icon: HTMLElement,
+      line: HTMLElement | null,
+      band: HTMLElement | null,
+    ) => void,
   ): void {
     const chartHost = this.chartElRef?.nativeElement;
     if (!chartHost) return;
 
-    const allSeries = chartHost.querySelectorAll('.apexcharts-bar-series .apexcharts-series');
+    const allSeries = chartHost.querySelectorAll(
+      '.apexcharts-bar-series .apexcharts-series',
+    );
     if (!allSeries.length) return;
 
     // Locate bar center-X and width at the target column
@@ -737,7 +941,9 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
 
     allSeries.forEach((seriesGroup: Element) => {
       if (foundBar) return;
-      const bars = seriesGroup.querySelectorAll<SVGPathElement>('path.apexcharts-bar-area');
+      const bars = seriesGroup.querySelectorAll<SVGPathElement>(
+        'path.apexcharts-bar-area',
+      );
       const bar = bars[dataPointIndex];
       if (!bar) return;
       const rect = bar.getBoundingClientRect();
@@ -760,7 +966,9 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
     const gridEl = chartHost.querySelector<SVGElement>('.apexcharts-grid');
     const gridRect = gridEl?.getBoundingClientRect();
     const plotTop = gridRect ? gridRect.top - hostRect.top : 10;
-    const plotBottom = gridRect ? gridRect.bottom - hostRect.top : hostRect.height - 10;
+    const plotBottom = gridRect
+      ? gridRect.bottom - hostRect.top
+      : hostRect.height - 10;
 
     // ── full-height band (stays within the grid area) ────────────────────
     const band = document.createElement('div');
@@ -807,20 +1015,29 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
       // For animated updates (Scenario Lab), updateSeries destroys annotation markers.
       // Re-add them via the chart API when missing.
       if (this.animateUpdates) {
-        const markers = chartHost.querySelectorAll<SVGElement>('.apexcharts-point-annotation-marker');
+        const markers = chartHost.querySelectorAll<SVGElement>(
+          '.apexcharts-point-annotation-marker',
+        );
 
         if ((!markers || markers.length === 0) && this.events.length > 0) {
           const points = this.buildEventAnnotations(this.events);
           this.currentAnnotationPoints = points;
-          points.forEach(a => chartContext.addPointAnnotation(a, false));
+          points.forEach((a) => chartContext.addPointAnnotation(a, false));
 
           if (!this._hideEmergencyOverlays) {
             const emergencyXAxis = this.buildEmergencyAnnotation(this.report);
-            const emergencyExpenseXAxis = this.buildEmergencyExpenseAnnotation(this.report);
-            [...emergencyXAxis, ...emergencyExpenseXAxis].forEach(a => chartContext.addXaxisAnnotation(a, false));
+            const emergencyExpenseXAxis = this.buildEmergencyExpenseAnnotation(
+              this.report,
+            );
+            [...emergencyXAxis, ...emergencyExpenseXAxis].forEach((a) =>
+              chartContext.addXaxisAnnotation(a, false),
+            );
           }
         }
       }
+
+      this.positionYAxisLabel();
+      this.positionXAxisLabel();
 
       this.cleanupHtmlTooltips();
       if (this.events.length > 0) {
@@ -834,9 +1051,18 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
         if (this.emergencyExpenseDataPointIndex < 0) {
           this.attachEmergencyIcon();
         } else {
-          if (this.emergencyIconEl) { this.emergencyIconEl.remove(); this.emergencyIconEl = null; }
-          if (this.emergencyIconLineEl) { this.emergencyIconLineEl.remove(); this.emergencyIconLineEl = null; }
-          if (this.emergencyIconBandEl) { this.emergencyIconBandEl.remove(); this.emergencyIconBandEl = null; }
+          if (this.emergencyIconEl) {
+            this.emergencyIconEl.remove();
+            this.emergencyIconEl = null;
+          }
+          if (this.emergencyIconLineEl) {
+            this.emergencyIconLineEl.remove();
+            this.emergencyIconLineEl = null;
+          }
+          if (this.emergencyIconBandEl) {
+            this.emergencyIconBandEl.remove();
+            this.emergencyIconBandEl = null;
+          }
         }
       }
     }, 50);
@@ -851,14 +1077,16 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
     const chartHost = this.chartElRef?.nativeElement;
     if (!chartHost) return;
 
-    const markers = chartHost.querySelectorAll<SVGElement>('.apexcharts-point-annotation-marker');
+    const markers = chartHost.querySelectorAll<SVGElement>(
+      '.apexcharts-point-annotation-marker',
+    );
 
     // SVG annotation markers may not exist yet if the chart is still rendering.
     // Retry with progressive back-off to avoid the intermittent hover failure.
     if (markers.length === 0 && this.events.length > 0 && retryCount < 6) {
       this._tooltipRetryTimer = setTimeout(
         () => this.attachHtmlTooltips(retryCount + 1),
-        150 * (retryCount + 1)
+        150 * (retryCount + 1),
       );
       return;
     }
@@ -902,10 +1130,14 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
   private getTooltipHost(): HTMLElement {
     // Fullscreen overlay hides all other body children (including .cdk-overlay-container)
     // via CSS, so it must be checked first to keep tooltips visible.
-    const fullscreenOverlay = document.querySelector<HTMLElement>('.global-fullscreen-overlay');
+    const fullscreenOverlay = document.querySelector<HTMLElement>(
+      '.global-fullscreen-overlay',
+    );
     if (fullscreenOverlay) return fullscreenOverlay;
 
-    const dialogContainer = document.querySelector<HTMLElement>('.cdk-overlay-container');
+    const dialogContainer = document.querySelector<HTMLElement>(
+      '.cdk-overlay-container',
+    );
     if (dialogContainer) return dialogContainer;
 
     return document.body;
@@ -936,7 +1168,7 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
     'car-icon': '#b93814',
     'education-icon': '#3538cd',
     'new-business-icon': '#b42318',
-    'boat-icon': '#047a48'
+    'boat-icon': '#047a48',
   };
 
   calculateDotColor(iconUrl: string): string {
@@ -963,7 +1195,11 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
     }
   }
 
-  private getDisplayAgeForYear(year: number, firstCategoryYear: number | null, lastCategoryYear: number | null): number | '' {
+  private getDisplayAgeForYear(
+    year: number,
+    firstCategoryYear: number | null,
+    lastCategoryYear: number | null,
+  ): number | '' {
     const birthDate = this.getClientBirthDate();
     if (!birthDate || !Number.isFinite(year)) {
       return '';
