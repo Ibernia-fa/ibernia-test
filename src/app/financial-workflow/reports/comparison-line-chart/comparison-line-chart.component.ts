@@ -8,7 +8,6 @@ import {
 import { NgApexchartsModule } from 'ng-apexcharts';
 import { ChartSeries } from '../models/charts-series.model';
 import { Client } from 'src/app/clients/models/client';
-import moment from 'moment';
 
 const EXCLUDED_SERIES = ['Current Account (Negative)', 'Emergency Expense'];
 
@@ -182,7 +181,9 @@ export class ComparisonLineChartComponent implements OnChanges {
     report: ChartSeries
   ): ChartSeries | null {
     if (!report?.categories?.length || !this.forecastEndDate) return report;
-    const endYear = moment(this.forecastEndDate).year();
+    const endDate = new Date(this.forecastEndDate);
+    if (Number.isNaN(endDate.getTime())) return report;
+    const endYear = endDate.getFullYear();
     const indices: number[] = [];
     report.categories.forEach((cat, i) => {
       const y = Number(cat);
@@ -209,7 +210,10 @@ export class ComparisonLineChartComponent implements OnChanges {
     if (Number.isNaN(birthDate.getTime())) return null;
 
     if (firstYear != null && year === firstYear && this.forecastStartDate) {
-      return this.ageAtDate(this.forecastStartDate, birthDate);
+      const start = new Date(this.forecastStartDate);
+      if (!Number.isNaN(start.getTime())) {
+        return this.ageAtDate(start, birthDate);
+      }
     }
     return this.ageAtDate(new Date(year, 0, 1), birthDate);
   }
