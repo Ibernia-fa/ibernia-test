@@ -417,8 +417,6 @@ export class SimulateEmergencyComponent implements OnDestroy {
 
             this.alignSeriesStructure();
 
-            this.activeTab = 'baseline';
-            this.displayedReport = this.baselineResult;
             this.dialogRef.updateSize('92vw', '88vh');
             this.emergencyExpense = simulateEmergency;
             this.emergencyExpense.id = res.emergencyExpenseId;
@@ -426,7 +424,8 @@ export class SimulateEmergencyComponent implements OnDestroy {
             this.isUpdateParentItem = true;
 
             this.activeTab = 'simulated';
-            this.displayedReport = this.simulationResult;
+            // Fresh reference + animateUpdates so bars animate like Scenario Lab / lifetime report.
+            this.displayedReport = this.cloneReportForChart(simulated);
           },
           error: (err: any) => {
             this.isSimulating = false;
@@ -451,7 +450,20 @@ export class SimulateEmergencyComponent implements OnDestroy {
 
   switchToTab(tab: 'baseline' | 'simulated'): void {
     this.activeTab = tab;
-    this.displayedReport = tab === 'baseline' ? this.baselineResult : this.simulationResult;
+    const source = tab === 'baseline' ? this.baselineResult : this.simulationResult;
+    this.displayedReport = source ? this.cloneReportForChart(source) : null;
+  }
+
+  private cloneReportForChart(report: {
+    categories: string[];
+    series: any[];
+    timelineEvents?: any[];
+  }) {
+    return {
+      categories: [...report.categories],
+      series: report.series.map((s: any) => ({ ...s, data: [...s.data] })),
+      timelineEvents: report.timelineEvents?.map((e: any) => ({ ...e })) ?? [],
+    };
   }
 
   private alignSeriesStructure(): void {

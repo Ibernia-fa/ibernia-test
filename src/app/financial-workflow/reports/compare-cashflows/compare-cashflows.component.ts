@@ -28,6 +28,8 @@ import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatDialogModule } from '@angular/material/dialog';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Cashflow } from 'src/app/clients/models/cashflow';
@@ -46,6 +48,8 @@ interface CompareDialogData {
     FormsModule,
     MatRadioModule,
     MatButtonModule,
+    MatIconModule,
+    MatDialogModule,
     TranslateModule
   ],
   templateUrl: './compare-cashflows.component.html',

@@ -20,7 +20,7 @@
     <div class="d-flex align-items-center justify-content-between m-b-20">
       <h3 class="f-s-20 f-w-400 m-0">{{ 'All notifications' | translate }}</h3>
       @if (unreadCount > 0) {
-        <button mat-button color="primary" (click)="onMarkAllAsRead()">
+        <button mat-stroked-button type="button" class="notification-page-mark-all" (click)="onMarkAllAsRead()">
           <i-tabler name="checks" class="icon-18 m-r-6"></i-tabler>
           {{ 'Mark all as read' | translate }}
         </button>
@@ -35,18 +35,17 @@
         @for (n of notifications; track n.id) {
           <button class="notification-center-item" (click)="onNotificationClick(n)">
             <div class="d-flex align-items-start w-100">
-              <div class="notification-avatar rounded-circle d-flex align-items-center justify-content-center m-r-14" [class.birthday]="n.iconType === 'birthday'">
-                @if (n.iconType === 'birthday') {
-                  <span class="avatar-icon">&#127874;</span>
-                } @else {
-                  <span class="avatar-icon">&#128276;</span>
-                }
+              <div
+                class="notification-avatar rounded-circle d-flex align-items-center justify-content-center m-r-14"
+                [class.birthday]="n.iconType === 'birthday'"
+              >
+                <i-tabler name="message" class="notification-message-icon"></i-tabler>
               </div>
               <div class="flex-grow-1 min-w-0">
-                <div class="f-s-14 f-w-600 m-b-4">{{ n.title }}</div>
-                <p class="f-s-13 m-0 text-muted line-clamp-2 m-b-4">{{ n.preview }}</p>
+                <div class="notification-item-title line-clamp-1 m-b-4">{{ n.title }}</div>
+                <p class="notification-item-preview m-0 line-clamp-2 m-b-4">{{ n.preview }}</p>
                 <div class="d-flex align-items-center gap-8">
-                  <span class="f-s-12 text-muted">{{ n.sentAtUtc | date:'medium' }}</span>
+                  <span class="notification-item-meta">{{ n.sentAtUtc | date:'medium' }}</span>
                   <span class="notification-type-pill" [class.birthday]="n.iconType === 'birthday'">
                     {{ n.iconType === 'birthday' ? ('Birthday' | translate) : ('News' | translate) }}
                   </span>

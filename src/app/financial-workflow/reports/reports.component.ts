@@ -1,7 +1,14 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { BehaviorSubject, combineLatest, Observable, Subject, switchMap, tap } from 'rxjs';
+import {
+  BehaviorSubject,
+  combineLatest,
+  Observable,
+  Subject,
+  switchMap,
+  tap,
+} from 'rxjs';
 import { NavItemService } from 'src/app/layouts/full/nav-item.service';
 import { TimelineHttpService } from '../timeline/services/timeline-http.service';
 import { Client, Details } from 'src/app/clients/models/client';
@@ -24,8 +31,14 @@ import { SavingsPotsHttpService } from '../saving-pots/services/savings-pots-htt
 import { SavingPotsModel } from '../saving-pots/models/saving-pots.model';
 import { CommonModule } from '@angular/common';
 import { IncomeExpensesHttpService } from '../income-expenses/services/income-expenses-http.service';
-import { FinancialViewModel, IncomeExpense } from '../income-expenses/model/income-expense';
-import { FundsViewModel, WithdrawalsContributions } from '../withdrawals-contributions/model/withdrawals-contributions';
+import {
+  FinancialViewModel,
+  IncomeExpense,
+} from '../income-expenses/model/income-expense';
+import {
+  FundsViewModel,
+  WithdrawalsContributions,
+} from '../withdrawals-contributions/model/withdrawals-contributions';
 import { WithdrawalsContributionsHttpService } from '../withdrawals-contributions/services/withdrawals-contributions-http.service';
 import { ReportsHttpService } from './services/reports-http.service';
 import { ChartSeries } from './models/charts-series.model';
@@ -37,10 +50,12 @@ import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { CompareCashflowsComponent } from './compare-cashflows/compare-cashflows.component';
 import { SettingsService } from 'src/app/default-preferance/services/default-preferance.http.service';
-import { FullscreenData, FullscreenService } from 'src/app/services/fullscreen.service';
+import {
+  FullscreenData,
+  FullscreenService,
+} from 'src/app/services/fullscreen.service';
 import { TranslateModule } from '@ngx-translate/core';
 import { RouterLink } from '@angular/router';
-
 
 export interface PeriodicElement {
   name: string;
@@ -142,7 +157,7 @@ const ELEMENT_DATA: PeriodicElement[] = [
     MatTooltipModule,
     ReactiveFormsModule,
     TranslateModule,
-    RouterLink
+    RouterLink,
   ],
   templateUrl: './reports.component.html',
   styleUrl: './reports.component.scss',
@@ -165,15 +180,19 @@ export class ReportsComponent {
   financialTimeline: FinancialTimeline;
   savingPots: SavingPotsModel;
   incomeExpense: IncomeExpense;
-  contributionWithdrawal: WithdrawalsContributions
+  contributionWithdrawal: WithdrawalsContributions;
   compareCashflow: Cashflow | null = null;
   compareReport: ChartSeries | null = null;
   compareTimeline: FinancialTimeline | null = null;
   isCompareLoading = false;
-  incomeDataSource: MatTableDataSource<FinancialViewModel> = new MatTableDataSource(new Array<FinancialViewModel>());
-  expenseDataSource: MatTableDataSource<FinancialViewModel> = new MatTableDataSource(new Array<FinancialViewModel>());
-  contributionDataSource: MatTableDataSource<FundsViewModel> = new MatTableDataSource(new Array<FundsViewModel>());
-  withdrawalDataSource: MatTableDataSource<FundsViewModel> = new MatTableDataSource(new Array<FundsViewModel>());
+  incomeDataSource: MatTableDataSource<FinancialViewModel> =
+    new MatTableDataSource(new Array<FinancialViewModel>());
+  expenseDataSource: MatTableDataSource<FinancialViewModel> =
+    new MatTableDataSource(new Array<FinancialViewModel>());
+  contributionDataSource: MatTableDataSource<FundsViewModel> =
+    new MatTableDataSource(new Array<FundsViewModel>());
+  withdrawalDataSource: MatTableDataSource<FundsViewModel> =
+    new MatTableDataSource(new Array<FundsViewModel>());
   clientBirthDate: Date;
   report: ChartSeries;
   cashflows: Cashflow[] = [];
@@ -208,61 +227,66 @@ export class ReportsComponent {
     private settingsService: SettingsService,
     private store: Store,
     private fullscreenService: FullscreenService,
-    private elementRef: ElementRef
+    private elementRef: ElementRef,
   ) {
     this.destroyed$ = new BehaviorSubject<boolean>(false);
     this.navItemService.currentRouteName = 'Lifetime Plan';
     this.savingsForm = this.fb.group({ returnRate: [0] });
 
     this.client$ = this.store.select(selectedClient);
-    this.client$
-      .subscribe(client => {
-        if (client) {
-          this.clientData = client.clientDetails;
-        }
-        this.getData();
-      });
-    }
+    this.client$.subscribe((client) => {
+      if (client) {
+        this.clientData = client.clientDetails;
+      }
+      this.getData();
+    });
+  }
 
-  getShortfallStatus(report: ChartSeries) {  
-   this.hasShortfall = false;
-  this.firstShortfallAge = null;
+  getShortfallStatus(report: ChartSeries) {
+    this.hasShortfall = false;
+    this.firstShortfallAge = null;
 
-  const shortfallSeries = report?.series?.find(s => s.name === 'Shortfall');
-  if (!shortfallSeries) return;
+    const shortfallSeries = report?.series?.find((s) => s.name === 'Shortfall');
+    if (!shortfallSeries) return;
 
-  const index = shortfallSeries.data.findIndex(v => v < 0);
-  if (index < 0) return;
+    const index = shortfallSeries.data.findIndex((v) => v < 0);
+    if (index < 0) return;
 
-  this.hasShortfall = true;
+    this.hasShortfall = true;
 
-  const year = Number(report.categories[index]);
-  const birthYear = new Date(this.client.clientDetails.birthDate).getFullYear();
+    const year = Number(report.categories[index]);
+    const birthYear = new Date(
+      this.client.clientDetails.birthDate,
+    ).getFullYear();
 
-  this.firstShortfallAge = year - birthYear;
+    this.firstShortfallAge = year - birthYear;
   }
 
   ngAfterViewInit(): void {
     // Listen for fullscreen changes
-    this.fullscreenService.isFullscreen$.subscribe(isFullscreen => { });
+    this.fullscreenService.isFullscreen$.subscribe((isFullscreen) => {});
   }
 
   enterFullscreen(isComparison = false): void {
     const chartData = {
       report: isComparison ? this.compareReport : this.report,
       client: this.client,
-      forecastStartDate: isComparison ?
-        (this.compareTimeline?.forecastStartDate || this.financialTimeline.forecastStartDate) :
-        this.financialTimeline.forecastStartDate,
-      forecastEndDate: isComparison ?
-        (this.compareTimeline?.forecastEndtDate || this.financialTimeline.forecastEndtDate) :
-        this.financialTimeline.forecastEndtDate,
-      cashFlowName: isComparison ?
-        (this.compareCashflow?.name || this.compareTimeline?.cashflow?.name || this.financialTimeline?.cashflow?.name) :
-        (this.cashflow?.name || this.financialTimeline?.cashflow?.name),
+      forecastStartDate: isComparison
+        ? this.compareTimeline?.forecastStartDate ||
+          this.financialTimeline.forecastStartDate
+        : this.financialTimeline.forecastStartDate,
+      forecastEndDate: isComparison
+        ? this.compareTimeline?.forecastEndtDate ||
+          this.financialTimeline.forecastEndtDate
+        : this.financialTimeline.forecastEndtDate,
+      cashFlowName: isComparison
+        ? this.compareCashflow?.name ||
+          this.compareTimeline?.cashflow?.name ||
+          this.financialTimeline?.cashflow?.name
+        : this.cashflow?.name || this.financialTimeline?.cashflow?.name,
       isComparison: isComparison,
       hasShortfall: this.hasShortfall,
-      firstShortfallAge: this.firstShortfallAge
+      firstShortfallAge: this.firstShortfallAge,
     };
 
     this.fullscreenService.enterFullscreen(chartData);
@@ -305,7 +329,7 @@ export class ReportsComponent {
   //             (cashflow as Cashflow).id,
   //             inflationRate
   //           ),
-           
+
   //           this.cashflowHttpService.getByClientId(clientId),
   //         ]);
   //       }),
@@ -349,80 +373,103 @@ export class ReportsComponent {
   // }
 
   getData() {
-  this.isLoaderVisible = true;
+    this.isLoaderVisible = true;
 
-  (this.activatedRoute.parent?.params ?? this.activatedRoute.params)
-    .pipe(
-      switchMap((params) =>
-        this.financialWorkflowService.loadClientCashflowMetadata(params)
-      ),
-      tap(([client, cashflow]) => {
-        this.client = client as Client;
-        this.cashflow = cashflow as Cashflow;
-        this.applyCashflowInflation(this.cashflow);
-      }),
-      switchMap(([client, cashflow]) => {
-        const clientId = (client as Client).id;
-        const cashflowId = (cashflow as Cashflow).id;
-        const inflationRate = this.savingsForm.get('returnRate')?.value;
+    (this.activatedRoute.parent?.params ?? this.activatedRoute.params)
+      .pipe(
+        switchMap((params) =>
+          this.financialWorkflowService.loadClientCashflowMetadata(params),
+        ),
+        tap(([client, cashflow]) => {
+          this.client = client as Client;
+          this.cashflow = cashflow as Cashflow;
+          this.applyCashflowInflation(this.cashflow);
+        }),
+        switchMap(([client, cashflow]) => {
+          const clientId = (client as Client).id;
+          const cashflowId = (cashflow as Cashflow).id;
+          const inflationRate = this.savingsForm.get('returnRate')?.value;
 
-        return combineLatest([
-          this.savingPotsHttpService.getAllSavingsPots(cashflowId),
-          this.timelineHttpService.getTimelinebyCashflowId(cashflowId),
-          this.incomeExpensesHttpService.getAllIncomeExpenses(cashflowId),
-          this.withdrawalsContributionsHttpService.getAllWithdrawalsContributions(
-            cashflowId
-          ),
-          this.cashflowHttpService.getByClientId(clientId),
-        ]).pipe(
-          tap(([savingPots, timeline, incomeExpense, contributionWithdrawal, cashflows]) => {
-            this.financialTimeline = timeline;
-            this.clientBirthDate = this.client.clientDetails.birthDate;
-            this.savingPots = savingPots;
-            this.incomeExpense = incomeExpense;
-            this.cashflows = cashflows as Cashflow[];
-            this.contributionWithdrawal = contributionWithdrawal;
+          return combineLatest([
+            this.savingPotsHttpService.getAllSavingsPots(cashflowId),
+            this.timelineHttpService.getTimelinebyCashflowId(cashflowId),
+            this.incomeExpensesHttpService.getAllIncomeExpenses(cashflowId),
+            this.withdrawalsContributionsHttpService.getAllWithdrawalsContributions(
+              cashflowId,
+            ),
+            this.cashflowHttpService.getByClientId(clientId),
+          ]).pipe(
+            tap(
+              ([
+                savingPots,
+                timeline,
+                incomeExpense,
+                contributionWithdrawal,
+                cashflows,
+              ]) => {
+                this.financialTimeline = timeline;
+                this.clientBirthDate = this.client.clientDetails.birthDate;
+                this.savingPots = savingPots;
+                this.incomeExpense = incomeExpense;
+                this.cashflows = cashflows as Cashflow[];
+                this.contributionWithdrawal = contributionWithdrawal;
 
-            this.incomeDataSource = new MatTableDataSource(
-              this.incomeExpense?.incomes
-            );
-            this.expenseDataSource = new MatTableDataSource(
-              this.incomeExpense?.expenses
-            );
-            this.contributionDataSource = new MatTableDataSource(
-              this.contributionWithdrawal?.contributions
-            );
-            this.withdrawalDataSource = new MatTableDataSource(
-              this.contributionWithdrawal?.withdrawals
-            );
+                this.incomeDataSource = new MatTableDataSource(
+                  this.incomeExpense?.incomes,
+                );
+                this.expenseDataSource = new MatTableDataSource(
+                  this.incomeExpense?.expenses,
+                );
+                this.contributionDataSource = new MatTableDataSource(
+                  this.contributionWithdrawal?.contributions,
+                );
+                this.withdrawalDataSource = new MatTableDataSource(
+                  this.contributionWithdrawal?.withdrawals,
+                );
 
-            this.loadReportWithTimeline(cashflowId, this.financialTimeline, inflationRate);
-          })
-        );
-      })
-    )
-    .subscribe({
-      next: () => {
-        this.isLoaderVisible = false;
-      },
-      error: (err) => {
-        console.error('Failed to load report data', err);
-        this.isLoaderVisible = false;
-      },
-    });
-}
+                this.loadReportWithTimeline(
+                  cashflowId,
+                  this.financialTimeline,
+                  inflationRate,
+                );
+              },
+            ),
+          );
+        }),
+      )
+      .subscribe({
+        next: () => {
+          this.isLoaderVisible = false;
+        },
+        error: (err) => {
+          console.error('Failed to load report data', err);
+          this.isLoaderVisible = false;
+        },
+      });
+  }
 
-  private getEffectiveReportEndDate(timeline: FinancialTimeline, cashflowOverride?: Cashflow | null): Date | null {
+  private getEffectiveReportEndDate(
+    timeline: FinancialTimeline,
+    cashflowOverride?: Cashflow | null,
+  ): Date | null {
     const cf = cashflowOverride ?? this.cashflow;
-    if (!timeline?.forecastStartDate || !this.client?.clientDetails?.birthDate || !cf) {
-      return timeline?.forecastEndtDate ? new Date(timeline.forecastEndtDate) : null;
+    if (
+      !timeline?.forecastStartDate ||
+      !this.client?.clientDetails?.birthDate ||
+      !cf
+    ) {
+      return timeline?.forecastEndtDate
+        ? new Date(timeline.forecastEndtDate)
+        : null;
     }
     const forecastStartDate = new Date(timeline.forecastStartDate);
     const forecastStartYear = forecastStartDate.getFullYear();
     const birthDate = new Date(this.client.clientDetails.birthDate);
     const planDuration = Number(cf.planDuration);
     if (!Number.isFinite(planDuration) || planDuration <= 0) {
-      return timeline?.forecastEndtDate ? new Date(timeline.forecastEndtDate) : null;
+      return timeline?.forecastEndtDate
+        ? new Date(timeline.forecastEndtDate)
+        : null;
     }
     // Year when client turns planDuration (e.g. 78) = birthYear + planDuration. Matches backend/timeline.
     const planEndYear = birthDate.getFullYear() + planDuration;
@@ -431,63 +478,72 @@ export class ReportsComponent {
   }
 
   private loadReportWithTimeline(
-  cashflowId: string,
-  timeline: any,
-  inflationRate?: number
-): void {
-  if (!timeline) {
-    return;
+    cashflowId: string,
+    timeline: any,
+    inflationRate?: number,
+  ): void {
+    if (!timeline) {
+      return;
+    }
+
+    const effectiveEndDate = this.getEffectiveReportEndDate(timeline);
+    const payload = {
+      ForecastStartDate: this.toIsoString(timeline.forecastStartDate),
+      ForecastEndDate: this.toIsoString(
+        effectiveEndDate ?? timeline.forecastEndtDate,
+      ),
+    };
+
+    this.reportsHttpService
+      .getReportbyCashflowIdWithForecastDates(
+        cashflowId,
+        payload,
+        inflationRate,
+      )
+      .subscribe({
+        next: (report) => {
+          this.report = report;
+          this.getShortfallStatus(report);
+          this.effectiveReportEndDate =
+            effectiveEndDate ??
+            (timeline.forecastEndtDate
+              ? new Date(timeline.forecastEndtDate)
+              : null);
+        },
+        error: (err) => {
+          console.error('Failed to load report with forecast dates', err);
+        },
+      });
   }
 
-  const effectiveEndDate = this.getEffectiveReportEndDate(timeline);
-  const payload = {
-    ForecastStartDate: this.toIsoString(timeline.forecastStartDate),
-    ForecastEndDate: this.toIsoString(effectiveEndDate ?? timeline.forecastEndtDate),
-  };
-
-  this.reportsHttpService
-    .getReportbyCashflowIdWithForecastDates(cashflowId, payload, inflationRate)
-    .subscribe({
-      next: (report) => {
-        this.report = report;
-        this.getShortfallStatus(report);
-        this.effectiveReportEndDate = effectiveEndDate ?? (timeline.forecastEndtDate ? new Date(timeline.forecastEndtDate) : null);
-      },
-      error: (err) => {
-        console.error('Failed to load report with forecast dates', err);
-      },
-    });
-}
-
-private toIsoString(value: Date | string): string {
-  const date = typeof value === 'string' ? new Date(value) : value;
-  if (!date || Number.isNaN(date.getTime())) {
-    return '';
-  }
-  return date.toISOString();
-}
-
-private applyCashflowInflation(cashflow: Cashflow | null): void {
-  const control = this.savingsForm.get('returnRate');
-  if (!control) return;
-
-  const rate =
-    cashflow?.inflationRate ?? this.clientData?.inflationRate;
-  const num = Number(rate);
-  if (!Number.isFinite(num)) {
-    return;
+  private toIsoString(value: Date | string): string {
+    const date = typeof value === 'string' ? new Date(value) : value;
+    if (!date || Number.isNaN(date.getTime())) {
+      return '';
+    }
+    return date.toISOString();
   }
 
-  const currentId = cashflow?.id ?? null;
-  const cashflowChanged = currentId !== this.lastCashflowId;
-  if (currentId) {
-    this.lastCashflowId = currentId;
-  }
+  private applyCashflowInflation(cashflow: Cashflow | null): void {
+    const control = this.savingsForm.get('returnRate');
+    if (!control) return;
 
-  if (!control.dirty || cashflowChanged) {
-    control.setValue(this.round2(num), { emitEvent: false });
+    const rate = cashflow?.inflationRate ?? this.clientData?.inflationRate;
+    const num = Number(rate);
+    if (!Number.isFinite(num)) {
+      return;
+    }
+
+    const currentId = cashflow?.id ?? null;
+    const cashflowChanged = currentId !== this.lastCashflowId;
+    if (currentId) {
+      this.lastCashflowId = currentId;
+    }
+
+    if (!control.dirty || cashflowChanged) {
+      control.setValue(this.round2(num), { emitEvent: false });
+    }
   }
-}
 
   onReturnRateInput(event: Event) {
     // when typing, ensure the control holds a clean number so slider updates
@@ -526,7 +582,6 @@ private applyCashflowInflation(cashflow: Cashflow | null): void {
   //   const cashflowId = this.cashflow.id;
   //   const returnRate = val;
 
-
   //   this.reportsHttpService
   //     .getReportbyCashflowId(cashflowId, returnRate)
   //     .pipe(
@@ -540,24 +595,24 @@ private applyCashflowInflation(cashflow: Cashflow | null): void {
   // }
 
   onReturnRateCommitted(): void {
-  const control = this.savingsForm.get('returnRate');
-  if (!control) return;
+    const control = this.savingsForm.get('returnRate');
+    if (!control) return;
 
-  const num = Number(control.value);
-  const val = isNaN(num) ? 0 : this.round2(num);
+    const num = Number(control.value);
+    const val = isNaN(num) ? 0 : this.round2(num);
 
-  // Normalise the value
-  control.setValue(val, { emitEvent: false });
+    // Normalise the value
+    control.setValue(val, { emitEvent: false });
 
-  // Make sure we have a cashflow and timeline loaded
-  if (!this.cashflow || !this.financialTimeline) {
-    return;
+    // Make sure we have a cashflow and timeline loaded
+    if (!this.cashflow || !this.financialTimeline) {
+      return;
+    }
+
+    const cashflowId = this.cashflow.id;
+
+    this.loadReportWithTimeline(cashflowId, this.financialTimeline, val);
   }
-
-  const cashflowId = this.cashflow.id;
-
-  this.loadReportWithTimeline(cashflowId, this.financialTimeline, val);
-}
 
   exitComparison() {
     this.compareCashflow = null;
@@ -570,7 +625,7 @@ private applyCashflowInflation(cashflow: Cashflow | null): void {
   onComparePlansClicked() {
     if (!this.cashflows || this.cashflows.length < 2) {
       this.toaster.info(
-        'You need at least two plans to compare. Please create another plan first'
+        'You need at least two plans to compare. Please create another plan first',
       );
       return;
     }
@@ -578,7 +633,9 @@ private applyCashflowInflation(cashflow: Cashflow | null): void {
     // If exactly 2 cashflows total, automatically compare with the other one
     if (this.cashflows.length === 2 && this.cashflow) {
       // Find the other cashflow (not the current one)
-      const otherCashflow = this.cashflows.find(c => c.id !== this.cashflow?.id);
+      const otherCashflow = this.cashflows.find(
+        (c) => c.id !== this.cashflow?.id,
+      );
 
       if (otherCashflow) {
         this.loadComparisonPlan(otherCashflow.id, otherCashflow);
@@ -588,7 +645,7 @@ private applyCashflowInflation(cashflow: Cashflow | null): void {
 
     // If more than 2 cashflows, show dialog to choose
     const dialogRef = this.dialog.open(CompareCashflowsComponent, {
-      width: '700px',
+      width: '612px',
       disableClose: true,
       data: {
         cashflows: this.cashflows,
@@ -601,7 +658,8 @@ private applyCashflowInflation(cashflow: Cashflow | null): void {
         return; // dialog cancelled
       }
 
-      const selected = this.cashflows.find(c => c.id === selectedOtherId) || null;
+      const selected =
+        this.cashflows.find((c) => c.id === selectedOtherId) || null;
       if (!selected) {
         // this.toaster.error('Selected plan not found', 'Error');
         return;
@@ -629,33 +687,44 @@ private applyCashflowInflation(cashflow: Cashflow | null): void {
             throw new Error('Missing comparison timeline');
           }
 
-          const effectiveEnd = this.getEffectiveReportEndDate(timeline, cashflow);
+          const effectiveEnd = this.getEffectiveReportEndDate(
+            timeline,
+            cashflow,
+          );
           const payload = {
             ForecastStartDate: this.toIsoString(timeline.forecastStartDate),
-            ForecastEndDate: this.toIsoString(effectiveEnd ?? timeline.forecastEndtDate),
+            ForecastEndDate: this.toIsoString(
+              effectiveEnd ?? timeline.forecastEndtDate,
+            ),
           };
 
-          return this.reportsHttpService.getReportbyCashflowIdWithForecastDates(
-            cashflowId,
-            payload,
-            inflationRate
-          ).pipe(
-            tap((report) => {
-              this.compareCashflow = cashflow;
-              this.compareReport = report;
-              this.compareTimeline = timeline;
-              this.effectiveCompareReportEndDate = effectiveEnd ?? (timeline.forecastEndtDate ? new Date(timeline.forecastEndtDate) : null);
-              this.isCompareLoading = false;
-            })
-          );
-        })
+          return this.reportsHttpService
+            .getReportbyCashflowIdWithForecastDates(
+              cashflowId,
+              payload,
+              inflationRate,
+            )
+            .pipe(
+              tap((report) => {
+                this.compareCashflow = cashflow;
+                this.compareReport = report;
+                this.compareTimeline = timeline;
+                this.effectiveCompareReportEndDate =
+                  effectiveEnd ??
+                  (timeline.forecastEndtDate
+                    ? new Date(timeline.forecastEndtDate)
+                    : null);
+                this.isCompareLoading = false;
+              }),
+            );
+        }),
       )
       .subscribe({
         error: (err) => {
           console.error('Failed to load comparison plan', err);
           this.toaster.error(
             'Failed to load comparison plan. Please try again',
-            'Error'
+            'Error',
           );
           this.isCompareLoading = false;
         },

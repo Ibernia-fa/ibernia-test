@@ -1,4 +1,79 @@
-     <!-- <div class="d-flex flex-column gap-32">
+<div class="w-100">
+  <div class="d-flex flex-column">
+    <!-- Header -->
+    <div class="dialog-header">
+      <h2 class="dialog-title text-center">
+        {{ "Compare plans" | translate }}
+      </h2>
+      <button
+        type="button"
+        mat-icon-button
+        disableRipple
+        class="dialog-close-btn"
+        aria-label="Close dialog"
+        (click)="closeDialog()"
+      >
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <mat-dialog-content class="event-dialog-content">
+      <p class="f-s-16 f-w-500 m-t-16 m-b-16 compare-subtitle">
+        Select plan to compare with {{ baseCashflow?.name }}
+      </p>
+
+      <mat-radio-group
+        class="d-flex flex-column ibr-custom-radio compare-radio-group"
+        [(ngModel)]="selectedOtherId"
+      >
+        <div
+          class="compare-radio-item"
+          *ngFor="let cf of otherCashflows"
+          (click)="selectedOtherId = cf.id"
+        >
+          <mat-radio-button [value]="cf.id" labelPosition="before">
+            {{ cf.name }}
+          </mat-radio-button>
+        </div>
+      </mat-radio-group>
+    </mat-dialog-content>
+
+    <!-- Actions -->
+    <div class="row justify-content-end gap-16 modal-action p-t-24">
+      <div>
+        <button
+          type="button"
+          class="button-icon-outline w-100 d-block"
+          (click)="closeDialog()"
+        >
+          <span class="f-s-16">{{ "Cancel" | translate }}</span>
+        </button>
+      </div>
+      <div>
+        <button
+          type="button"
+          class="button-icon w-100 d-block"
+          (click)="save()"
+          [disabled]="!selectedOtherId"
+        >
+          <span class="f-s-16">Compare</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Fixed base model (current route cashflow) -->
+<!-- <p class="f-s-14 m-b-8"><strong>Base model (fixed)</strong></p>
+    <div class="d-flex align-items-center border-wraper" *ngIf="baseCashflow">
+      <span class="f-s-16">
+        {{ baseCashflow.name }}
+      </span>
+     Optionally: show created/updated date, etc
+    </div> -->
+
+<!-- <div class="d-flex flex-column gap-32">
       <div class="d-flex align-items-center justify-content-between gap-10 modal-header">
         <h3>Compare models</h3>
         <button (click)="closeDialog()" type="button">
@@ -36,63 +111,3 @@
      
      
     -->
-
-
-    <div class="d-flex flex-column gap-32">
-  <!-- Header -->
-  <div class="d-flex align-items-center justify-content-between gap-10 modal-header">
-    <h3>Compare plans</h3>
-    <button (click)="closeDialog()" type="button">
-      <img src="assets/images/svgs/close-line-cion.svg" alt="close-line-cion" />
-    </button>
-  </div>
-
-  <!-- Body -->
-  <div class="custom-body">
-    <p class="f-s-16 m-t-0">Select a plan to compare with  {{ baseCashflow?.name }}:</p>
-
-    <!-- Fixed base model (current route cashflow) -->
-    <!-- <p class="f-s-14 m-b-8"><strong>Base model (fixed)</strong></p>
-    <div class="d-flex align-items-center border-wraper" *ngIf="baseCashflow">
-      <span class="f-s-16">
-        {{ baseCashflow.name }}
-      </span>
-     Optionally: show created/updated date, etc
-    </div> -->
-
-    <div class="m-t-16">
-      <mat-radio-group
-        class="d-flex flex-column gap-8"
-        [(ngModel)]="selectedOtherId"
-      >
-        <div
-          class="d-flex align-items-center border-wraper"
-          *ngFor="let cf of otherCashflows"
-        >
-          <mat-radio-button [value]="cf.id">
-            {{ cf.name }}
-          </mat-radio-button>
-        </div>
-      </mat-radio-group>
-    </div>
-  </div>
-
-  <!-- Actions -->
-  <div class="row justify-content-between modal-action">
-    <div class="col-5">
-      <button class="button-icon-outline w-100 d-block" type="button" (click)="closeDialog()">
-        <span class="f-s-16">{{ 'Cancel' | translate }}</span>
-      </button>
-    </div>
-    <div class="col-5">
-      <button
-        type="button"
-        class="button-icon w-100 d-block"
-        (click)="save()"
-        [disabled]="!selectedOtherId"
-      >
-        <span class="f-s-16">Compare</span>
-      </button>
-    </div>
-  </div>
-</div>

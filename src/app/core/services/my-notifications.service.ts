@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject, tap } from 'rxjs';
+import { Observable, BehaviorSubject, Subject, tap } from 'rxjs';
 
 export interface UserNotificationItem {
   id: string;
@@ -18,6 +18,10 @@ export interface UserNotificationItem {
 export class MyNotificationsService {
   private readonly baseUrl = '/api/v1/MyNotifications';
   private readonly unreadCount$ = new BehaviorSubject<number>(0);
+  private readonly _listsChanged = new Subject<void>();
+
+  /** Emits when read state changes so header + /settings/notifications can reload lists. */
+  readonly listsChanged$ = this._listsChanged.asObservable();
 
   constructor(private http: HttpClient) {}
 
@@ -47,7 +51,10 @@ export class MyNotificationsService {
 
   markAllAsRead(): Observable<void> {
     return this.http.patch<void>(`${this.baseUrl}/read-all`, {}).pipe(
-      tap(() => this.unreadCount$.next(0))
+      tap(() => {
+        this.unreadCount$.next(0);
+        this._listsChanged.next();
+      })
     );
   }
 

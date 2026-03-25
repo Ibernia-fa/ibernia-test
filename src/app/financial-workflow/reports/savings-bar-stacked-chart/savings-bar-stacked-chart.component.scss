@@ -12,7 +12,7 @@
   }
 }
 
-.apexcharts-tooltip .savings-tooltip__label {  
+.apexcharts-tooltip .savings-tooltip__label {
   font-weight: 500;
   display: inline-flex;
   align-items: center;
@@ -83,10 +83,15 @@
   }
 }
 
+/* Hide the empty SVG axis titles so they don't consume space */
+:host ::ng-deep .apexcharts-yaxis-title,
+:host ::ng-deep .apexcharts-xaxis-title {
+  display: none;
+}
+
 /* Disable all ApexCharts bar grow/transition animations */
 :host ::ng-deep .apexcharts-bar-area,
 :host ::ng-deep .apexcharts-series path {
   animation: none !important;
   transition: none !important;
 }
-

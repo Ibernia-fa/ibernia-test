@@ -150,6 +150,7 @@ html .customizerNav {
   min-height: 24px !important;
   display: flex !important;
   align-items: center !important;
+  overflow: visible !important;
 }
 .vis-item .vis-item-content {
   padding: 0 !important;
@@ -212,12 +213,14 @@ html .customizerNav {
   color: #3088ed;
   border: none !important;
   font-weight: 500;
+  width: auto !important;
 }
 .vis-item.mortality-icon,
 .vis-item.mortality-icon.vis-selected {
   background-color: #f7f7f7;
   color: #1c1c1c;
   border: 1px solid #e7e7eb !important;
+  width: auto !important;
 }
 
 .vis-item.inheritance-icon,
@@ -225,6 +228,7 @@ html .customizerNav {
   background-color: #f8fff2;
   color: #1c1c1c;
   border: 1px solid #e8f4e1 !important;
+  width: auto !important;
 }
 
 .vis-item.birth-icon,
@@ -235,6 +239,7 @@ html .customizerNav {
   color: #fe9614;
   border: none !important;
   font-weight: 500;
+  width: auto !important;
 }
 // .vis-item.birth-icon.vis-line {
 //   display: none !important;
@@ -256,13 +261,16 @@ html .customizerNav {
   border: none !important;
   color: #6155f5;
   font-weight: 500;
+  width: auto !important;
 }
 
 .vis-item.state-pension-icon,
 .vis-item.state-pension-icon.vis-selected {
   background-color: #f9f9ff;
   color: #1c1c1c;
-  border: 1px solid #ebecff !important;
+  border: none !important;
+  font-weight: 500;
+  width: auto !important;
 }
 .vis-item.education-icon,
 .vis-item.education-icon.vis-selected {
@@ -270,6 +278,7 @@ html .customizerNav {
   color: #00c8b3;
   border: none !important;
   font-weight: 500;
+  width: auto !important;
 }
 .vis-item.car-icon,
 .vis-item.car-icon.vis-selected {
@@ -277,6 +286,7 @@ html .customizerNav {
   color: #ac7f5e;
   border: none !important;
   font-weight: 500;
+  width: auto !important;
 }
 .vis-item.home-icon,
 .vis-item.home-icon.vis-selected {
@@ -284,6 +294,7 @@ html .customizerNav {
   color: #ff2d55;
   border: none !important;
   font-weight: 500;
+  width: auto !important;
   // background-color: #f0f9ff;
   // color: #1c1c1c;
   // border: 1px solid #e0ecf4 !important;
@@ -294,6 +305,7 @@ html .customizerNav {
   color: #34c759;
   border: none !important;
   font-weight: 500;
+  width: auto !important;
 }
 .vis-item.boat-icon,
 .vis-item.boat-icon.vis-selected {
@@ -301,6 +313,7 @@ html .customizerNav {
   color: #ff7504;
   border: none !important;
   font-weight: 500;
+  width: auto !important;
 }
 .vis-item.travel-icon,
 .vis-item.travel-icon.vis-selected {
@@ -308,6 +321,7 @@ html .customizerNav {
   color: #0088ff;
   border: none !important;
   font-weight: 500;
+  width: auto !important;
 }
 .vis-item.custom-icon,
 .vis-item.custom-icon.vis-selected {
@@ -315,6 +329,7 @@ html .customizerNav {
   color: #0088ff;
   border: none !important;
   font-weight: 500;
+  width: auto !important;
 }
 
 // Vertical connector lines from event chips down to the year/age axis.
@@ -330,26 +345,47 @@ html .customizerNav {
 .vis-item.boat-icon::after,
 .vis-item.retirement-age-icon::after,
 .vis-item.custom-icon::after {
-  content: '';
+  content: "";
   position: absolute;
-  left: 12px;
+  left: 50%;
+  transform: translateX(-50%);
   top: 100%;
-  width: 2px;
+  width: 1.5px;
   height: 500px;
-  pointer-events: none;
+  // pointer-events: none;
   z-index: -1;
 }
 
-.vis-item.birth-icon::after { background-color: #fe9614; }
-.vis-item.wedding-icon::after { background-color: #6155f5; }
-.vis-item.home-icon::after { background-color: #ff2d55; }
-.vis-item.travel-icon::after { background-color: #0088ff; }
-.vis-item.car-icon::after { background-color: #ac7f5e; }
-.vis-item.education-icon::after { background-color: #00c8b3; }
-.vis-item.new-business-icon::after { background-color: #34c759; }
-.vis-item.boat-icon::after { background-color: #ff7504; }
-.vis-item.retirement-age-icon::after { background-color: #e52ef5; }
-.vis-item.custom-icon::after { background-color: #7b7b9b; }
+.vis-item.birth-icon::after {
+  background-color: #fe9614;
+}
+.vis-item.wedding-icon::after {
+  background-color: #6155f5;
+}
+.vis-item.home-icon::after {
+  background-color: #ff2d55;
+}
+.vis-item.travel-icon::after {
+  background-color: #0088ff;
+}
+.vis-item.car-icon::after {
+  background-color: #ac7f5e;
+}
+.vis-item.education-icon::after {
+  background-color: #00c8b3;
+}
+.vis-item.new-business-icon::after {
+  background-color: #34c759;
+}
+.vis-item.boat-icon::after {
+  background-color: #ff7504;
+}
+.vis-item.retirement-age-icon::after {
+  background-color: #0088ff;
+}
+.vis-item.custom-icon::after {
+  background-color: #0088ff;
+}
 
 .vis-item .vis-delete {
   right: 0 !important;
@@ -392,13 +428,14 @@ html .customizerNav {
 
 .vis-custom-time.dragOver,
 .vis-custom-time.hoverLine {
-  display: none !important;
+  height: 77% !important;
+  top: 8px !important;
+  background-color: #4043af !important;
+  width: 1px !important;
+  pointer-events: none !important;
+  cursor: default !important;
+  z-index: 2;
 }
-// .vis-custom-time.hoverLine {
-//   height: 77% !important;
-//   top: 8px !important;
-//   background-color: #516ce8 !important;
-// }
 .vis-time-axis .vis-grid.vis-vertical {
   height: 77% !important;
   top: 8px;

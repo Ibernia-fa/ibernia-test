@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -57,6 +58,9 @@ export class NotificationsComponent implements OnInit {
     private router: Router
   ) {
     this.navItemService.currentRouteName = 'Notifications';
+    this.myNotifications.listsChanged$
+      .pipe(takeUntilDestroyed())
+      .subscribe(() => this.loadNotifications());
   }
 
   ngOnInit(): void {
@@ -160,8 +164,7 @@ export class NotificationsComponent implements OnInit {
     this.myNotifications.markAllAsRead().subscribe({
       next: () => {
         this.unreadCount = 0;
-        this.notifications.forEach((n) => (n.isRead = true));
-      }
+      },
     });
   }
 }
