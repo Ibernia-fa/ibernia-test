@@ -65,6 +65,10 @@ export interface MortgageCalculatorState {
 export class MortgageCalculatorComponent implements OnInit, OnChanges {
   @Input() clientCountryCode: string = '';
   @Input() currencySymbol: string = '';
+  /** When set, pre-fills interest rate and overrides tier defaults (e.g. advisor Default Assumptions). */
+  @Input() advisorDefaultInterestRate: number | null = null;
+  /** UI label: Home uses mortgage; Car, Boat, custom use loan. */
+  @Input() calculatorKind: 'mortgage' | 'loan' = 'loan';
   @Input() initialState: MortgageCalculatorState | null = null;
   @Output() calculated = new EventEmitter<MortgageOutput>();
   @Output() stateChanged = new EventEmitter<MortgageCalculatorState>();
@@ -140,6 +144,16 @@ export class MortgageCalculatorComponent implements OnInit, OnChanges {
       this.buildLoanTermOptions();
       this.initForm();
     }
+    const advisorCh = changes['advisorDefaultInterestRate'];
+    if (
+      advisorCh &&
+      !advisorCh.firstChange &&
+      this.mortgageForm &&
+      this.advisorDefaultInterestRate != null &&
+      !Number.isNaN(this.advisorDefaultInterestRate)
+    ) {
+      this.mortgageForm.patchValue({ interestRate: this.advisorDefaultInterestRate }, { emitEvent: true });
+    }
   }
 
   getState(): MortgageCalculatorState {
@@ -186,7 +200,11 @@ export class MortgageCalculatorComponent implements OnInit, OnChanges {
   private initForm(): void {
     const state = this.initialState;
     const defaultDown = state?.downPaymentValue ?? this.config.minDownPaymentPercent;
-    const defaultRate = state?.interestRate ?? this.config.defaultInterestRate;
+    const advisor =
+      this.advisorDefaultInterestRate != null && !Number.isNaN(this.advisorDefaultInterestRate)
+        ? this.advisorDefaultInterestRate
+        : null;
+    const defaultRate = state?.interestRate ?? advisor ?? this.config.defaultInterestRate;
     const defaultTerm = state?.loanTermYears ?? this.config.defaultLoanTermYears;
 
     this.downPaymentMode = state?.downPaymentMode ?? 'percent';
@@ -248,7 +266,12 @@ export class MortgageCalculatorComponent implements OnInit, OnChanges {
       return;
     }
 
-    this.mortgageForm.patchValue({ interestRate: tier.defaultInterestRate }, { emitEvent: false });
+    const tierRate = tier.defaultInterestRate;
+    const rate =
+      this.advisorDefaultInterestRate != null && !Number.isNaN(this.advisorDefaultInterestRate)
+        ? this.advisorDefaultInterestRate
+        : tierRate;
+    this.mortgageForm.patchValue({ interestRate: rate }, { emitEvent: false });
 
     if (this.isHighValueProperty && tier.highValueMinDownPaymentPercent != null) {
       const threshold = this.config.propertyValueThreshold!;

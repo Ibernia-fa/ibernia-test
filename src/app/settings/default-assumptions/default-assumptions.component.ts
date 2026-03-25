@@ -84,6 +84,8 @@ export class DefaultAssumptionsComponent implements OnInit, OnDestroy {
       comissionAmount: [null as number | null],
       currency: ['EUR', [Validators.required]],
       country: ['' as string],
+      mortgageInterestRate: [3.5 as number, [Validators.required, Validators.min(0), Validators.max(100)]],
+      loanInterestRate: [8 as number, [Validators.required, Validators.min(0), Validators.max(100)]],
     }),
   });
 
@@ -150,6 +152,8 @@ export class DefaultAssumptionsComponent implements OnInit, OnDestroy {
               comissionAmount: p.preferences?.comissionAmount ?? null,
               currency: p.preferences?.currency ?? 'EUR',
               country: p.preferences?.country ?? '',
+              mortgageInterestRate: p.preferences?.mortgageInterestRate ?? 3.5,
+              loanInterestRate: p.preferences?.loanInterestRate ?? 8,
             },
           });
 
@@ -233,7 +237,9 @@ export class DefaultAssumptionsComponent implements OnInit, OnDestroy {
       prefs.comissionPercentage !== snap['comissionPercentage'] ||
       prefs.comissionAmount !== snap['comissionAmount'] ||
       prefs.currency !== snap['currency'] ||
-      (prefs.country ?? '') !== (snap['country'] ?? '')
+      (prefs.country ?? '') !== (snap['country'] ?? '') ||
+      prefs.mortgageInterestRate !== snap['mortgageInterestRate'] ||
+      prefs.loanInterestRate !== snap['loanInterestRate']
     );
   }
 
@@ -275,6 +281,8 @@ export class DefaultAssumptionsComponent implements OnInit, OnDestroy {
             : intOrNull(raw.preferences.comissionAmount),
         currency: raw.preferences.currency,
         country: blankToNull(raw.preferences.country),
+        mortgageInterestRate: round2(raw.preferences.mortgageInterestRate),
+        loanInterestRate: round2(raw.preferences.loanInterestRate),
       },
     };
   }

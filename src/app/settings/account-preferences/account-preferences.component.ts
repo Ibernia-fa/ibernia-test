@@ -433,6 +433,8 @@ const DEFAULT_PREFERENCES = {
   comissionAmount: null as number | null,
   currency: 'EUR',
   country: '',
+  mortgageInterestRate: 3.5,
+  loanInterestRate: 8,
 };
 function blankToNull(s?: string | null): string | null {
   return s && s.trim().length ? s.trim() : null;

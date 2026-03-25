@@ -87,6 +87,18 @@
   "Update your profile and default settings": "Aggiorna il tuo profilo e le impostazioni predefinite",
   "Default preferences": "Preferenze predefinite",
   "These preferences can be adjusted individually for each client": "Queste preferenze possono essere regolate individualmente per ogni cliente",
+  "Mortgage interest rate": "Tasso d'interesse mutuo",
+  "Loan interest rate": "Tasso d'interesse prestito",
+  "Mortgage calculator": "Calcolatore mutuo",
+  "Loan calculator": "Calcolatore prestito",
+  "Use mortgage calculator": "Usa calcolatore mutuo",
+  "Hide mortgage calculator": "Nascondi calcolatore mutuo",
+  "Use loan calculator": "Usa calcolatore prestito",
+  "Hide loan calculator": "Nascondi calcolatore prestito",
+  "ASSUMPTIONS": {
+    "MORTGAGE_INTEREST_RATE_TOOLTIP": "Tasso annuo predefinito solo per il calcolatore mutuo dell'evento di finanziamento Casa.",
+    "LOAN_INTEREST_RATE_TOOLTIP": "Tasso annuo predefinito per il calcolatore prestito su finanziamento Auto e Barca, eventi personalizzati e Casa (prestito)."
+  },
   "Both": "Entrambi",
   "Save": "Salva",
   "Crop": "Ritaglia",

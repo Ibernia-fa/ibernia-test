@@ -15,6 +15,10 @@ export interface PreferencesDto {
   currency: string;
   country?: string | null;
   language?: string;
+  /** Default % p.a. for the Home financing mortgage calculator. */
+  mortgageInterestRate?: number | null;
+  /** Default % p.a. for loan-style calculator (Home/Boat financing, custom events). */
+  loanInterestRate?: number | null;
 }
 
 export interface UserProfileDto {
