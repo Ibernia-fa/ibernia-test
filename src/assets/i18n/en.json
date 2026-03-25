@@ -87,6 +87,18 @@
   "Update your profile and default settings": "Update your profile and default settings",
   "Default preferences": "Default preferences",
   "These preferences can be adjusted individually for each client": "These preferences can be adjusted individually for each client",
+  "Mortgage interest rate": "Mortgage interest rate",
+  "Loan interest rate": "Loan interest rate",
+  "Mortgage calculator": "Mortgage calculator",
+  "Loan calculator": "Loan calculator",
+  "Use mortgage calculator": "Use mortgage calculator",
+  "Hide mortgage calculator": "Hide mortgage calculator",
+  "Use loan calculator": "Use loan calculator",
+  "Hide loan calculator": "Hide loan calculator",
+  "ASSUMPTIONS": {
+    "MORTGAGE_INTEREST_RATE_TOOLTIP": "Default annual rate for the Home financing mortgage calculator only.",
+    "LOAN_INTEREST_RATE_TOOLTIP": "Default annual rate for the loan calculator on Car and Boat financing, custom events, and Home (loan)."
+  },
   "Both": "Both",
   "Save": "Save",
   "Crop": "Crop",

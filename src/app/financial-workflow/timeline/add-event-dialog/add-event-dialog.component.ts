@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, ElementRef, Inject, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Inject, ViewChild } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatCardModule } from '@angular/material/card';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -24,6 +25,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MortgageCalculatorComponent, MortgageCalculatorState } from '../mortgage-calculator/mortgage-calculator.component';
 import { MortgageOutput } from '../mortgage-calculator/mortgage-calculator.component';
+import { SettingsService } from 'src/app/default-preferance/services/default-preferance.http.service';
 
 @Component({
   selector: 'app-add-event-dialog',
@@ -104,6 +106,7 @@ export class AddEventDialogComponent {
   financialRecords: FinancialRecordLineItem[] = [];
   clientCountryCode: string = '';
   showMortgageCalculator = false;
+  showMortgageCalculatorCustom = false;
   lastCalculatorState: MortgageCalculatorState | null = null;
   scenarioMode: boolean = false;
 
@@ -111,12 +114,64 @@ export class AddEventDialogComponent {
     return this.patchEvent?.name?.startsWith('Home') ?? false;
   }
 
+  /** Home, Car, Boat financing: show mortgage/loan calculator when paying with financing. */
+  get showFinancingMortgageCalculator(): boolean {
+    const name = this.patchEvent?.name ?? '';
+    return (
+      this.selectedEventType === EventType.FINANCING &&
+      !this.isCashEvent &&
+      (name.startsWith('Home') || name.startsWith('Car') || name.startsWith('Boat'))
+    );
+  }
+
+  private get prefsMortgageInterestRate(): number {
+    return this.settings.currentUserData?.preferences?.mortgageInterestRate ?? 3.5;
+  }
+
+  private get prefsLoanInterestRate(): number {
+    return this.settings.currentUserData?.preferences?.loanInterestRate ?? 8;
+  }
+
+  /** Interest default for financing calculator: mortgage rate for Home; loan rate for Car and Boat. */
+  get financingCalculatorAdvisorRate(): number {
+    if (this.patchEvent?.name?.startsWith('Home')) return this.prefsMortgageInterestRate;
+    return this.prefsLoanInterestRate;
+  }
+
+  get customCalculatorAdvisorRate(): number {
+    return this.prefsLoanInterestRate;
+  }
+
+  /** Home → mortgage UI; Car/Boat → loan UI. */
+  get financingCalculatorKind(): 'mortgage' | 'loan' {
+    return this.patchEvent?.name?.startsWith('Home') ? 'mortgage' : 'loan';
+  }
+
+  get financingCalculatorToggleLabelKey(): string {
+    return this.showMortgageCalculator
+      ? this.financingCalculatorKind === 'mortgage'
+        ? 'Hide mortgage calculator'
+        : 'Hide loan calculator'
+      : this.financingCalculatorKind === 'mortgage'
+        ? 'Use mortgage calculator'
+        : 'Use loan calculator';
+  }
+
+  get customCalculatorToggleLabelKey(): string {
+    return this.showMortgageCalculatorCustom
+      ? 'Hide loan calculator'
+      : 'Use loan calculator';
+  }
+
   constructor(
     private dialogRef: MatDialogRef<AddEventDialogComponent>,
     private fb: FormBuilder,
     private timelineHttpService: TimelineHttpService,
+    private cdr: ChangeDetectorRef,
+    private settings: SettingsService,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
+    this.settings.profileChanged$.pipe(takeUntilDestroyed()).subscribe(() => this.cdr.markForCheck());
     this.amountCycles = data.amountCycles;
     this.selectedEventType = data.eventType;
     this.scenarioMode = data.scenarioMode ?? false;
@@ -858,6 +913,10 @@ export class AddEventDialogComponent {
     this.showMortgageCalculator = !this.showMortgageCalculator;
   }
 
+  toggleMortgageCalculatorCustom(): void {
+    this.showMortgageCalculatorCustom = !this.showMortgageCalculatorCustom;
+  }
+
   onCalculatorStateChanged(state: MortgageCalculatorState): void {
     this.lastCalculatorState = state;
   }
@@ -897,6 +956,31 @@ export class AddEventDialogComponent {
     });
 
     this.showMortgageCalculator = false;
+  }
+
+  onMortgageAppliedCustom(output: MortgageOutput): void {
+    const startYear =
+      this.eventForm.get('start')?.value ?? this.data.forecastStartDateYear;
+    const endYear = startYear + output.loanTermYears;
+    this.eventForm.patchValue(
+      {
+        cycle: 'Every month',
+        amount: output.monthlyEMI,
+        start: startYear,
+        end: endYear,
+      },
+      { emitEvent: false }
+    );
+    this.onCycleValueChange('Every month');
+    setTimeout(() => {
+      const el = this.amountInput?.nativeElement;
+      if (el) {
+        el.value = Number(output.monthlyEMI).toLocaleString('en-US');
+        el.dispatchEvent(new Event('blur'));
+      }
+    });
+    this.showMortgageCalculatorCustom = false;
+    this.cdr.markForCheck();
   }
 
   private applyFinancingValidators(paymentType: 'Cash' | 'Financing') {

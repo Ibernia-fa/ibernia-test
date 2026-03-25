@@ -3,7 +3,11 @@
     <div class="calculator-header d-flex align-items-center gap-8">
       <!-- <img src="assets/images/svgs/cashflow-moneys-icon.svg" alt="calculator" width="20" /> -->
       <h4 class="f-w-700">
-        {{ "Mortgage or loan calculator" | translate }}
+        {{
+          (calculatorKind === "mortgage"
+            ? "Mortgage calculator"
+            : "Loan calculator") | translate
+        }}
       </h4>
       <img
         src="assets/images/svgs/help-circle-icon.svg"

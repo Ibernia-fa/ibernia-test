@@ -99,6 +99,32 @@
 
           <div class="col-4">
             <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">
+              {{ 'Mortgage interest rate' | translate }}
+              <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4" matTooltip="{{ 'ASSUMPTIONS.MORTGAGE_INTEREST_RATE_TOOLTIP' | translate }}">
+            </mat-label>
+            <mat-form-field appearance="outline" class="w-100 percentage-icon">
+              <span matSuffix>%</span>
+              <input matInput type="number" step="0.01" formControlName="mortgageInterestRate" />
+              <mat-error *ngIf="p.mortgageInterestRate.hasError('required')">{{'Required' | translate}}</mat-error>
+              <mat-error *ngIf="p.mortgageInterestRate.hasError('min') || p.mortgageInterestRate.hasError('max')">0–100</mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="col-4">
+            <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">
+              {{ 'Loan interest rate' | translate }}
+              <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4" matTooltip="{{ 'ASSUMPTIONS.LOAN_INTEREST_RATE_TOOLTIP' | translate }}">
+            </mat-label>
+            <mat-form-field appearance="outline" class="w-100 percentage-icon">
+              <span matSuffix>%</span>
+              <input matInput type="number" step="0.01" formControlName="loanInterestRate" />
+              <mat-error *ngIf="p.loanInterestRate.hasError('required')">{{'Required' | translate}}</mat-error>
+              <mat-error *ngIf="p.loanInterestRate.hasError('min') || p.loanInterestRate.hasError('max')">0–100</mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="col-4">
+            <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">
               {{ 'Advisor commission type' | translate }}
               <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4" matTooltip="Defines how advisor commissions are calculated. You can set a fixed amount (e.g., €100 per year), a percentage of assets (e.g., 1% annually), or both. This acts as your default method and can be customized for each client.">
             </mat-label>
