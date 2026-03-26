@@ -219,7 +219,7 @@
   "Description": "Descrizione",
   "Add saving pot, investment or pension": "Aggiungi risparmi, investimenti o fondi pensione",
   "Starting pot value": "Valore iniziale",
-  "This asset is linked to Saving Pots. Any changes made here will be reflected there as well.": "Questo asset è collegato ai Saving Pots. Qualsiasi modifica apportata qui sarà riflessa anche lì.",
+  "This asset is linked to the Savings section. Any changes made here will be reflected there as well.": "Questo asset è collegato alla sezione Risparmi. Qualsiasi modifica apportata qui sarà riflessa anche lì.",
   "Return rate": "Tasso di rendimento",
   "Real return: x% (net of x% inflation)": "Rendimento reale: x% (al netto di x% di inflazione)",
   "Lock this pot from automatically covering an income shortfall": "Blocca questo capitale: non coprirà automaticamente un deficit di reddito",

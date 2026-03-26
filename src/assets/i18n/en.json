@@ -221,7 +221,7 @@
   "Description": "Description",
   "Add saving pot, investment or pension": "Add saving pot, investment or pension",
   "Starting pot value": "Starting pot value",
-  "This asset is linked to Saving Pots. Any changes made here will be reflected there as well.": "This asset is linked to Saving Pots. Any changes made here will be reflected there as well.",
+  "This asset is linked to the Savings section. Any changes made here will be reflected there as well.": "This asset is linked to the Savings section. Any changes made here will be reflected there as well.",
   "Return rate": "Return rate",
   "Real return: x% (net of x% inflation)": "Real return: x% (net of x% inflation)",
   "Lock this pot from automatically covering an income shortfall": "Lock this pot from automatically covering an income shortfall",
