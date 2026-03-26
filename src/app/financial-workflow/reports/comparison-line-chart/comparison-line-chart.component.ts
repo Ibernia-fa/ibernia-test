@@ -112,37 +112,32 @@ export class ComparisonLineChartComponent implements OnChanges {
     const planB = this.trimToEndYear(this.compareReport);
     if (!planA || !planB) return;
 
-    const { categories, seriesA, seriesB } = this.alignAndSum(planA, planB);
+    const { categories: yearCategories, seriesA, seriesB } =
+      this.alignAndSum(planA, planB);
 
     const currencyCode = this.client?.clientDetails?.preferredCurrency ?? '';
     const birthDate = toDate(this.client?.clientDetails?.birthDate);
     const forecastStart = toDate(this.forecastStartDate);
-    const firstCatYear = categories.length ? Number(categories[0]) : null;
 
-    const yearToAge = new Map<string, number>();
-    if (birthDate) {
-      categories.forEach((cat, i) => {
-        const yr = Number(cat);
-        if (!Number.isFinite(yr)) return;
+    const ageLabels: string[] = [];
+    const yearLabels: string[] = [];
+
+    yearCategories.forEach((cat, i) => {
+      const yr = Number(cat);
+      yearLabels.push(String(yr));
+
+      if (birthDate && Number.isFinite(yr)) {
         let age: number;
         if (i === 0 && forecastStart) {
           age = calcAge(forecastStart, birthDate);
         } else {
           age = calcAge(new Date(yr, 0, 1), birthDate);
         }
-        if (age >= 0) yearToAge.set(cat, age);
-      });
-    }
-
-    const categoriesRef = categories;
-
-    const resolveYear = (value: any, index?: number): string => {
-      const v = String(value);
-      if (categoriesRef.includes(v)) return v;
-      const idx = index != null ? index : Number(v) - 1;
-      if (idx >= 0 && idx < categoriesRef.length) return categoriesRef[idx];
-      return v;
-    };
+        ageLabels.push(age >= 0 ? String(age) : cat);
+      } else {
+        ageLabels.push(cat);
+      }
+    });
 
     const fmtCurrency = (value: number): string => {
       if (!Number.isFinite(value)) return String(value ?? '');
@@ -208,16 +203,11 @@ export class ComparisonLineChartComponent implements OnChanges {
       colors,
       xaxis: {
         type: 'category',
-        categories,
-        tickAmount: Math.max(1, Math.floor(categories.length / 5)),
+        categories: ageLabels,
+        tickAmount: Math.max(1, Math.floor(ageLabels.length / 5)),
         title: { text: 'Age', style: { fontWeight: 500 } },
         labels: {
           style: { cssClass: 'leftAlign' },
-          formatter(value: string, _timestamp: any, opts: any) {
-            const yearStr = resolveYear(value, opts?.i);
-            const age = yearToAge.get(yearStr);
-            return age != null ? String(age) : yearStr;
-          },
         },
       },
       yaxis: {
@@ -241,9 +231,8 @@ export class ComparisonLineChartComponent implements OnChanges {
         intersect: false,
         custom(opts: any) {
           const { series, dataPointIndex, w } = opts;
-          const cats: string[] = w.config.xaxis.categories ?? categoriesRef;
-          const yearStr = cats[dataPointIndex] ?? String(dataPointIndex);
-          const age = yearToAge.get(yearStr);
+          const age = ageLabels[dataPointIndex] ?? '–';
+          const year = yearLabels[dataPointIndex] ?? '–';
 
           const shown = new Map<string, { color: string; value: number }>();
 
@@ -272,7 +261,7 @@ export class ComparisonLineChartComponent implements OnChanges {
 
           return `
             <div style="padding:8px 12px;font-size:13px">
-              <div style="font-weight:600;margin-bottom:4px">Age: ${age ?? '–'}  |  Year: ${yearStr}</div>
+              <div style="font-weight:600;margin-bottom:4px">Age: ${age}  |  Year: ${year}</div>
               ${rows}
             </div>`;
         },
