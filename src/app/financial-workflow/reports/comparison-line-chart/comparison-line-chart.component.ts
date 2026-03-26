@@ -11,6 +11,22 @@ import { Client } from 'src/app/clients/models/client';
 
 const EXCLUDED_SERIES = ['Current Account (Negative)', 'Emergency Expense'];
 
+function toDate(value: any): Date | null {
+  if (!value) return null;
+  if (value instanceof Date) return Number.isNaN(value.getTime()) ? null : value;
+  const d = new Date(value);
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
+function ageAtDate(ref: Date, birth: Date): number {
+  let age = ref.getFullYear() - birth.getFullYear();
+  const hasPassed =
+    ref.getMonth() > birth.getMonth() ||
+    (ref.getMonth() === birth.getMonth() && ref.getDate() >= birth.getDate());
+  if (!hasPassed) age--;
+  return age;
+}
+
 @Component({
   selector: 'app-comparison-line-chart',
   standalone: true,
@@ -25,8 +41,8 @@ export class ComparisonLineChartComponent implements OnChanges {
   @Input() planAName = 'Plan A';
   @Input() planBName = 'Plan B';
   @Input() client!: Client;
-  @Input() forecastStartDate!: Date;
-  @Input() forecastEndDate!: Date;
+  @Input() forecastStartDate: any;
+  @Input() forecastEndDate: any;
 
   chartOptions: any = {
     series: [],
@@ -51,7 +67,7 @@ export class ComparisonLineChartComponent implements OnChanges {
     markers: { size: 0, hover: { size: 5 } },
   };
 
-  ngOnChanges(changes: SimpleChanges): void {
+  ngOnChanges(_changes: SimpleChanges): void {
     if (!this.report?.series?.length || !this.compareReport?.series?.length) {
       return;
     }
@@ -62,25 +78,33 @@ export class ComparisonLineChartComponent implements OnChanges {
 
     const { categories, seriesA, seriesB } = this.alignAndSum(planA, planB);
 
-    const currency = this.client?.clientDetails?.preferredCurrency ?? '';
+    const currencyCode = this.client?.clientDetails?.preferredCurrency ?? '';
     const firstYear = categories.length ? Number(categories[0]) : null;
+    const birthDate = toDate(this.client?.clientDetails?.birthDate);
+    const forecastStart = toDate(this.forecastStartDate);
 
     const getAge = (year: number): number | null => {
-      const raw = this.client?.clientDetails?.birthDate;
-      if (!raw || !Number.isFinite(year)) return null;
-      const birthDate = new Date(raw);
-      if (Number.isNaN(birthDate.getTime())) return null;
-
-      if (firstYear != null && year === firstYear && this.forecastStartDate) {
-        const start = new Date(this.forecastStartDate);
-        if (!Number.isNaN(start.getTime())) {
-          return this.ageAtDate(start, birthDate);
-        }
+      if (!birthDate || !Number.isFinite(year)) return null;
+      if (firstYear != null && year === firstYear && forecastStart) {
+        return ageAtDate(forecastStart, birthDate);
       }
-      return this.ageAtDate(new Date(year, 0, 1), birthDate);
+      return ageAtDate(new Date(year, 0, 1), birthDate);
     };
 
-    const fmtCurrency = (value: number): string => this.formatCurrency(value);
+    const fmtCurrency = (value: number): string => {
+      if (!Number.isFinite(value)) return String(value ?? '');
+      if (!currencyCode || currencyCode.length !== 3) return value.toLocaleString();
+      try {
+        return new Intl.NumberFormat(undefined, {
+          style: 'currency',
+          currency: currencyCode,
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }).format(value);
+      } catch {
+        return value.toLocaleString();
+      }
+    };
 
     this.chartOptions = {
       ...this.chartOptions,
@@ -97,7 +121,7 @@ export class ComparisonLineChartComponent implements OnChanges {
         title: { text: 'Age', style: { fontWeight: 500 } },
         labels: {
           style: { cssClass: 'leftAlign' },
-          formatter: (value: string) => {
+          formatter(value: string) {
             const year = Number(value);
             const age = getAge(year);
             return age !== null ? String(age) : value;
@@ -105,17 +129,18 @@ export class ComparisonLineChartComponent implements OnChanges {
         },
       },
       yaxis: {
-        title: { text: currency, style: { fontWeight: 500 } },
+        title: { text: currencyCode, style: { fontWeight: 500 } },
         labels: {
-          formatter: (value: any) =>
-            value != null ? fmtCurrency(Number(value)) : '',
+          formatter(value: any) {
+            return value != null ? fmtCurrency(Number(value)) : '';
+          },
         },
       },
       tooltip: {
         enabled: true,
         shared: true,
         intersect: false,
-        custom: (opts: any) => {
+        custom(opts: any) {
           const { series, dataPointIndex, w } = opts;
           const year = w.globals.labels[dataPointIndex];
           const age = getAge(Number(year));
@@ -150,8 +175,6 @@ export class ComparisonLineChartComponent implements OnChanges {
     planA: ChartSeries,
     planB: ChartSeries
   ): { categories: string[]; seriesA: number[]; seriesB: number[] } {
-    const catSetA = new Set(planA.categories);
-    const catSetB = new Set(planB.categories);
     const allYears = [
       ...new Set([...planA.categories, ...planB.categories]),
     ].sort((a, b) => Number(a) - Number(b));
@@ -192,12 +215,10 @@ export class ComparisonLineChartComponent implements OnChanges {
     return totals;
   }
 
-  private trimToEndYear(
-    report: ChartSeries
-  ): ChartSeries | null {
+  private trimToEndYear(report: ChartSeries): ChartSeries | null {
     if (!report?.categories?.length || !this.forecastEndDate) return report;
-    const endDate = new Date(this.forecastEndDate);
-    if (Number.isNaN(endDate.getTime())) return report;
+    const endDate = toDate(this.forecastEndDate);
+    if (!endDate) return report;
     const endYear = endDate.getFullYear();
     const indices: number[] = [];
     report.categories.forEach((cat, i) => {
@@ -216,45 +237,5 @@ export class ComparisonLineChartComponent implements OnChanges {
         (e) => Number.isFinite(e.startYear) && e.startYear <= endYear
       ),
     };
-  }
-
-  private getDisplayAge(year: number, firstYear: number | null): number | null {
-    const raw = this.client?.clientDetails?.birthDate;
-    if (!raw || !Number.isFinite(year)) return null;
-    const birthDate = new Date(raw);
-    if (Number.isNaN(birthDate.getTime())) return null;
-
-    if (firstYear != null && year === firstYear && this.forecastStartDate) {
-      const start = new Date(this.forecastStartDate);
-      if (!Number.isNaN(start.getTime())) {
-        return this.ageAtDate(start, birthDate);
-      }
-    }
-    return this.ageAtDate(new Date(year, 0, 1), birthDate);
-  }
-
-  private ageAtDate(ref: Date, birth: Date): number {
-    let age = ref.getFullYear() - birth.getFullYear();
-    const hasPassed =
-      ref.getMonth() > birth.getMonth() ||
-      (ref.getMonth() === birth.getMonth() && ref.getDate() >= birth.getDate());
-    if (!hasPassed) age--;
-    return age;
-  }
-
-  private formatCurrency(value: number): string {
-    if (!Number.isFinite(value)) return String(value ?? '');
-    const code = this.client?.clientDetails?.preferredCurrency;
-    if (!code || code.length !== 3) return value.toLocaleString();
-    try {
-      return new Intl.NumberFormat(undefined, {
-        style: 'currency',
-        currency: code,
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }).format(value);
-    } catch {
-      return value.toLocaleString();
-    }
   }
 }
