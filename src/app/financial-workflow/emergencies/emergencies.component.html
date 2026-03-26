@@ -21,7 +21,7 @@
           <h3 class="ibr-card-title">Protection score</h3>
           <div class="gauge-wrapper">
             <div class="gauge-background">
-              <div class="gauge-progress" style="width: 50%"></div>
+              <div class="gauge-progress" [ngStyle]="getProgressBarStyles(computedProtectionScore ?? s.emergenciesStats?.protectionScore)"></div>
             </div>
             <h3
               class="gauge-text"

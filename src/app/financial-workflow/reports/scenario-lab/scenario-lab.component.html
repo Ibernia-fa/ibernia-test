@@ -198,48 +198,68 @@
                     <span class="assumption-label">{{
                       "Goals" | translate
                     }}</span>
-                    <mat-select
-                      class="category-dropdown"
-                      [placeholder]="'Select' | translate"
-                      (selectionChange)="onGoalSelected($event.value)"
-                    >
-                      @if (!goalItems.length) {
-                        <mat-option disabled class="empty-option">{{
-                          "No goals added" | translate
-                        }}</mat-option>
-                      }
-                      @for (goal of goalItems; track goal.id) {
-                        <mat-option [value]="goal">
-                          <span class="category-option">
-                            <img
-                              [src]="
-                                'assets/images/svgs/' + goal.iconUrl + '.svg'
-                              "
-                              [alt]="goal.name"
-                              width="18"
-                              class="category-option-icon"
-                            />
-                            {{ goal.name }}
-                          </span>
-                        </mat-option>
-                      }
-                    </mat-select>
-                    @if (editedGoals.length) {
-                      <div class="edited-chips">
-                        @for (entry of editedGoals; track entry.name) {
-                          <span class="edited-chip">
-                            {{ entry.name }}
-                            <button
-                              class="chip-remove"
-                              (click)="removeEditedItem('goals', entry.name)"
-                              aria-label="Remove"
-                            >
-                              <mat-icon>close</mat-icon>
-                            </button>
-                          </span>
+                    <div class="position-relative">
+                      <mat-select
+                        class="category-dropdown"
+                        [placeholder]="'Select' | translate"
+                        (selectionChange)="onGoalSelected($event.value)"
+                      >
+                        @if (!goalItems.length) {
+                          <mat-option disabled class="empty-option">{{
+                            "No goals added" | translate
+                          }}</mat-option>
                         }
+                        @for (goal of goalItems; track goal.id) {
+                          <mat-option [value]="goal">
+                            <span class="category-option">
+                              <img
+                                [src]="
+                                  'assets/images/svgs/' + goal.iconUrl + '.svg'
+                                "
+                                [alt]="goal.name"
+                                width="18"
+                                class="category-option-icon"
+                              />
+                              {{ goal.name }}
+                            </span>
+                          </mat-option>
+                        }
+                      </mat-select>
+                      @if (editedGoals.length) {
+                        <div class="edited-chips">
+                          @for (entry of editedGoals; track entry.name) {
+                            <span class="edited-chip">
+                              {{ entry.name }}
+                              <button
+                                class="chip-remove"
+                                (click)="removeEditedItem('goals', entry.name)"
+                                aria-label="Remove"
+                              >
+                                <mat-icon>close</mat-icon>
+                              </button>
+                            </span>
+                          }
+                        </div>
+                      }
+
+                      <!-- Custom Icon  -->
+                      <div class="custom-icon">
+                        <svg
+                          width="14"
+                          height="14"
+                          viewBox="0 0 12 12"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M3 4.5L6 7.5L9 4.5"
+                            stroke="#A6ABB2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                        </svg>
                       </div>
-                    }
+                    </div>
                   </div>
 
                   <!-- Row 1 Right: Saving pots -->
@@ -247,46 +267,65 @@
                     <span class="assumption-label">{{
                       "Saving pots" | translate
                     }}</span>
-                    <mat-select
-                      class="category-dropdown"
-                      [placeholder]="'Select' | translate"
-                      (selectionChange)="onSavingPotSelected($event.value)"
-                    >
-                      @if (!savingPotItems.length) {
-                        <mat-option disabled class="empty-option">{{
-                          "No saving pots added" | translate
-                        }}</mat-option>
-                      }
-                      @for (pot of savingPotItems; track pot.id) {
-                        <mat-option [value]="pot">
-                          <span class="category-option">
-                            <i-tabler
-                              name="wallet"
-                              class="category-option-icon"
-                            ></i-tabler>
-                            {{ pot.name }}
-                          </span>
-                        </mat-option>
-                      }
-                    </mat-select>
-                    @if (editedSavingPots.length) {
-                      <div class="edited-chips">
-                        @for (entry of editedSavingPots; track entry.name) {
-                          <span class="edited-chip">
-                            {{ entry.name }}
-                            <button
-                              class="chip-remove"
-                              (click)="
-                                removeEditedItem('savingPots', entry.name)
-                              "
-                              aria-label="Remove"
-                            >
-                              <mat-icon>close</mat-icon>
-                            </button>
-                          </span>
+                    <div class="position-relative">
+                      <mat-select
+                        class="category-dropdown"
+                        [placeholder]="'Select' | translate"
+                        (selectionChange)="onSavingPotSelected($event.value)"
+                      >
+                        @if (!savingPotItems.length) {
+                          <mat-option disabled class="empty-option">{{
+                            "No saving pots added" | translate
+                          }}</mat-option>
                         }
+                        @for (pot of savingPotItems; track pot.id) {
+                          <mat-option [value]="pot">
+                            <span class="category-option">
+                              <i-tabler
+                                name="wallet"
+                                class="category-option-icon"
+                              ></i-tabler>
+                              {{ pot.name }}
+                            </span>
+                          </mat-option>
+                        }
+                      </mat-select>
+                      @if (editedSavingPots.length) {
+                        <div class="edited-chips">
+                          @for (entry of editedSavingPots; track entry.name) {
+                            <span class="edited-chip">
+                              {{ entry.name }}
+                              <button
+                                class="chip-remove"
+                                (click)="
+                                  removeEditedItem('savingPots', entry.name)
+                                "
+                                aria-label="Remove"
+                              >
+                                <mat-icon>close</mat-icon>
+                              </button>
+                            </span>
+                          }
+                        </div>
+                      }
+                      <!-- Custom Icon  -->
+                      <div class="custom-icon">
+                        <svg
+                          width="14"
+                          height="14"
+                          viewBox="0 0 12 12"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M3 4.5L6 7.5L9 4.5"
+                            stroke="#A6ABB2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                        </svg>
                       </div>
-                    }
+                    </div>
                   </div>
 
                   <!-- Row 2 Left: Incomes -->
@@ -294,50 +333,71 @@
                     <span class="assumption-label">{{
                       "Incomes" | translate
                     }}</span>
-                    <mat-select
-                      class="category-dropdown"
-                      [placeholder]="'Select' | translate"
-                      (selectionChange)="onIncomeSelected($event.value)"
-                    >
-                      @if (!incomeItems.length) {
-                        <mat-option disabled class="empty-option">{{
-                          "No incomes added" | translate
-                        }}</mat-option>
-                      }
-                      @for (income of incomeItems; track income.id) {
-                        <mat-option [value]="income">
-                          <span class="category-option">
-                            <img
-                              [src]="
-                                'assets/images/svgs/' +
-                                (income.icon || 'custom-icon') +
-                                '-gray.svg'
-                              "
-                              [alt]="income.description"
-                              width="18"
-                              class="category-option-icon"
-                            />
-                            {{ income.description }}
-                          </span>
-                        </mat-option>
-                      }
-                    </mat-select>
-                    @if (editedIncomes.length) {
-                      <div class="edited-chips">
-                        @for (entry of editedIncomes; track entry.name) {
-                          <span class="edited-chip">
-                            {{ entry.name }}
-                            <button
-                              class="chip-remove"
-                              (click)="removeEditedItem('incomes', entry.name)"
-                              aria-label="Remove"
-                            >
-                              <mat-icon>close</mat-icon>
-                            </button>
-                          </span>
+                    <div class="position-relative">
+                      <mat-select
+                        class="category-dropdown"
+                        [placeholder]="'Select' | translate"
+                        (selectionChange)="onIncomeSelected($event.value)"
+                      >
+                        @if (!incomeItems.length) {
+                          <mat-option disabled class="empty-option">{{
+                            "No incomes added" | translate
+                          }}</mat-option>
                         }
+                        @for (income of incomeItems; track income.id) {
+                          <mat-option [value]="income">
+                            <span class="category-option">
+                              <img
+                                [src]="
+                                  'assets/images/svgs/' +
+                                  (income.icon || 'custom-icon') +
+                                  '-gray.svg'
+                                "
+                                [alt]="income.description"
+                                width="18"
+                                class="category-option-icon"
+                              />
+                              {{ income.description }}
+                            </span>
+                          </mat-option>
+                        }
+                      </mat-select>
+                      @if (editedIncomes.length) {
+                        <div class="edited-chips">
+                          @for (entry of editedIncomes; track entry.name) {
+                            <span class="edited-chip">
+                              {{ entry.name }}
+                              <button
+                                class="chip-remove"
+                                (click)="
+                                  removeEditedItem('incomes', entry.name)
+                                "
+                                aria-label="Remove"
+                              >
+                                <mat-icon>close</mat-icon>
+                              </button>
+                            </span>
+                          }
+                        </div>
+                      }
+                      <!-- Custom Icon  -->
+                      <div class="custom-icon">
+                        <svg
+                          width="14"
+                          height="14"
+                          viewBox="0 0 12 12"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M3 4.5L6 7.5L9 4.5"
+                            stroke="#A6ABB2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                        </svg>
                       </div>
-                    }
+                    </div>
                   </div>
 
                   <!-- Row 2 Right: Expenses -->
@@ -345,50 +405,71 @@
                     <span class="assumption-label">{{
                       "Expenses" | translate
                     }}</span>
-                    <mat-select
-                      class="category-dropdown"
-                      [placeholder]="'Select' | translate"
-                      (selectionChange)="onExpenseSelected($event.value)"
-                    >
-                      @if (!expenseItems.length) {
-                        <mat-option disabled class="empty-option">{{
-                          "No expenses added" | translate
-                        }}</mat-option>
-                      }
-                      @for (expense of expenseItems; track expense.id) {
-                        <mat-option [value]="expense">
-                          <span class="category-option">
-                            <img
-                              [src]="
-                                'assets/images/svgs/' +
-                                (expense.icon || 'custom-icon') +
-                                '-gray.svg'
-                              "
-                              [alt]="expense.description"
-                              width="18"
-                              class="category-option-icon"
-                            />
-                            {{ expense.description }}
-                          </span>
-                        </mat-option>
-                      }
-                    </mat-select>
-                    @if (editedExpenses.length) {
-                      <div class="edited-chips">
-                        @for (entry of editedExpenses; track entry.name) {
-                          <span class="edited-chip">
-                            {{ entry.name }}
-                            <button
-                              class="chip-remove"
-                              (click)="removeEditedItem('expenses', entry.name)"
-                              aria-label="Remove"
-                            >
-                              <mat-icon>close</mat-icon>
-                            </button>
-                          </span>
+                    <div class="position-relative">
+                      <mat-select
+                        class="category-dropdown"
+                        [placeholder]="'Select' | translate"
+                        (selectionChange)="onExpenseSelected($event.value)"
+                      >
+                        @if (!expenseItems.length) {
+                          <mat-option disabled class="empty-option">{{
+                            "No expenses added" | translate
+                          }}</mat-option>
                         }
+                        @for (expense of expenseItems; track expense.id) {
+                          <mat-option [value]="expense">
+                            <span class="category-option">
+                              <img
+                                [src]="
+                                  'assets/images/svgs/' +
+                                  (expense.icon || 'custom-icon') +
+                                  '-gray.svg'
+                                "
+                                [alt]="expense.description"
+                                width="18"
+                                class="category-option-icon"
+                              />
+                              {{ expense.description }}
+                            </span>
+                          </mat-option>
+                        }
+                      </mat-select>
+                      @if (editedExpenses.length) {
+                        <div class="edited-chips">
+                          @for (entry of editedExpenses; track entry.name) {
+                            <span class="edited-chip">
+                              {{ entry.name }}
+                              <button
+                                class="chip-remove"
+                                (click)="
+                                  removeEditedItem('expenses', entry.name)
+                                "
+                                aria-label="Remove"
+                              >
+                                <mat-icon>close</mat-icon>
+                              </button>
+                            </span>
+                          }
+                        </div>
+                      }
+                      <!-- Custom Icon  -->
+                      <div class="custom-icon">
+                        <svg
+                          width="14"
+                          height="14"
+                          viewBox="0 0 12 12"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M3 4.5L6 7.5L9 4.5"
+                            stroke="#A6ABB2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                        </svg>
                       </div>
-                    }
+                    </div>
                   </div>
 
                   <!-- Bottom row: Inflation rate + Retirement age card(s) -->
@@ -424,7 +505,37 @@
                             max="10"
                             step="0.5"
                           />
-                          <span class="pct-badge">%</span>
+                          <span class="pct-badge">
+                            <svg
+                              width="16"
+                              height="16"
+                              viewBox="0 0 16 16"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M12.6663 3.33398L3.33301 12.6673"
+                                stroke="#5A596E"
+                                stroke-width="1.33333"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                              />
+                              <path
+                                d="M4.33366 5.99935C5.25413 5.99935 6.00033 5.25316 6.00033 4.33268C6.00033 3.41221 5.25413 2.66602 4.33366 2.66602C3.41318 2.66602 2.66699 3.41221 2.66699 4.33268C2.66699 5.25316 3.41318 5.99935 4.33366 5.99935Z"
+                                stroke="#5A596E"
+                                stroke-width="1.33333"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                              />
+                              <path
+                                d="M11.6667 13.3333C12.5871 13.3333 13.3333 12.5871 13.3333 11.6667C13.3333 10.7462 12.5871 10 11.6667 10C10.7462 10 10 10.7462 10 11.6667C10 12.5871 10.7462 13.3333 11.6667 13.3333Z"
+                                stroke="#5A596E"
+                                stroke-width="1.33333"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                              />
+                            </svg>
+                          </span>
                         </div>
                       </div>
                       @if (inflationEdited) {
@@ -471,11 +582,20 @@
                               step="1"
                             />
                             <span class="pct-badge age-badge">
-                              <img
-                                src="assets/images/svgs/scenario-lab-icon.svg"
-                                alt="age"
-                                width="14"
-                              />
+                              <svg
+                                width="13"
+                                height="17"
+                                viewBox="0 0 15 17"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  fill-rule="evenodd"
+                                  clip-rule="evenodd"
+                                  d="M3.32992 0.833333C3.32992 1.05435 3.41771 1.26631 3.57399 1.42259C3.73027 1.57887 3.94224 1.66667 4.16325 1.66667V6.38083L0.411583 12.4742C-0.67425 14.2375 0.497417 16.6667 2.64908 16.6667H12.3441C14.4957 16.6667 15.6674 14.2375 14.5816 12.4742L10.8299 6.38083V1.66667C11.0509 1.66667 11.2629 1.57887 11.4192 1.42259C11.5755 1.26631 11.6632 1.05435 11.6632 0.833333C11.6632 0.61232 11.5755 0.400358 11.4192 0.244078C11.2629 0.0877973 11.0509 0 10.8299 0H4.16325C3.94224 0 3.73027 0.0877973 3.57399 0.244078C3.41771 0.400358 3.32992 0.61232 3.32992 0.833333ZM5.82992 1.66667H9.16325V6.61667C9.16318 6.77083 9.20587 6.92199 9.28658 7.05333L10.5883 9.16667H4.40492L5.70658 7.05333C5.78729 6.92199 5.82999 6.77083 5.82992 6.61667V1.66667ZM3.37908 10.8333L1.82992 13.3475C1.36158 14.1092 1.92575 15 2.64825 15H12.3433C13.0658 15 13.6299 14.1083 13.1616 13.3475L11.6133 10.8333H3.37908Z"
+                                  fill="#4043AF"
+                                />
+                              </svg>
                             </span>
                           </div>
                         </div>
@@ -527,11 +647,20 @@
                               step="1"
                             />
                             <span class="pct-badge age-badge">
-                              <img
-                                src="assets/images/svgs/scenario-lab-icon.svg"
-                                alt="age"
-                                width="14"
-                              />
+                              <svg
+                                width="13"
+                                height="17"
+                                viewBox="0 0 15 17"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  fill-rule="evenodd"
+                                  clip-rule="evenodd"
+                                  d="M3.32992 0.833333C3.32992 1.05435 3.41771 1.26631 3.57399 1.42259C3.73027 1.57887 3.94224 1.66667 4.16325 1.66667V6.38083L0.411583 12.4742C-0.67425 14.2375 0.497417 16.6667 2.64908 16.6667H12.3441C14.4957 16.6667 15.6674 14.2375 14.5816 12.4742L10.8299 6.38083V1.66667C11.0509 1.66667 11.2629 1.57887 11.4192 1.42259C11.5755 1.26631 11.6632 1.05435 11.6632 0.833333C11.6632 0.61232 11.5755 0.400358 11.4192 0.244078C11.2629 0.0877973 11.0509 0 10.8299 0H4.16325C3.94224 0 3.73027 0.0877973 3.57399 0.244078C3.41771 0.400358 3.32992 0.61232 3.32992 0.833333ZM5.82992 1.66667H9.16325V6.61667C9.16318 6.77083 9.20587 6.92199 9.28658 7.05333L10.5883 9.16667H4.40492L5.70658 7.05333C5.78729 6.92199 5.82999 6.77083 5.82992 6.61667V1.66667ZM3.37908 10.8333L1.82992 13.3475C1.36158 14.1092 1.92575 15 2.64825 15H12.3433C13.0658 15 13.6299 14.1083 13.1616 13.3475L11.6133 10.8333H3.37908Z"
+                                  fill="#4043AF"
+                                />
+                              </svg>
                             </span>
                           </div>
                         </div>

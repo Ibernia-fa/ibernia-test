@@ -54,7 +54,6 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
   private emergencyExpenseBandEl: HTMLElement | null = null;
   private eventLabelElements: HTMLElement[] = [];
   private yAxisLabelEl: HTMLElement | null = null;
-  private xAxisLabelEl: HTMLElement | null = null;
   private shortfallDataPointIndex: number = -1;
   private emergencyExpenseDataPointIndex: number = -1;
   /** Tracks whether the chart has been rendered at least once (used to skip full re-inits on subsequent series updates). */
@@ -441,9 +440,9 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
 
       this.chartOptions.xaxis = {
         type: 'category',
-        categories, // keep years for data mapping; display as age via formatter
+        categories,
         tickAmount,
-        title: { text: '' },
+        title: { text: 'Age' },
         axisBorder: {
           show: true,
           color: '#0000001a', // change to whatever color you want
@@ -548,7 +547,6 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
     this.cleanupEmergencyElements();
     this.cleanupEventLabels();
     this.cleanupYAxisLabel();
-    this.cleanupXAxisLabel();
   }
 
   private cleanupEmergencyElements(): void {
@@ -629,61 +627,6 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
     this.yAxisLabelEl = label;
   }
 
-  private cleanupXAxisLabel(): void {
-    if (this.xAxisLabelEl) {
-      this.xAxisLabelEl.remove();
-      this.xAxisLabelEl = null;
-    }
-  }
-
-  /**
-   * Creates an HTML label for the x-axis "Age" title and positions it
-   * near the origin (bottom-left of the plot area), aligned with the
-   * x-axis tick labels row but to the left of the first number.
-   */
-  private positionXAxisLabel(): void {
-    this.cleanupXAxisLabel();
-
-    const chartHost = this.chartElRef?.nativeElement;
-    if (!chartHost) return;
-
-    const gridEl = chartHost.querySelector<SVGElement>('.apexcharts-grid');
-    const xAxisTexts = chartHost.querySelector<SVGGElement>(
-      '.apexcharts-xaxis-texts-g',
-    );
-    if (!gridEl) return;
-
-    const hostRect = chartHost.getBoundingClientRect();
-    const gridRect = gridEl.getBoundingClientRect();
-
-    if (getComputedStyle(chartHost).position === 'static') {
-      chartHost.style.position = 'relative';
-    }
-
-    const label = document.createElement('div');
-    label.textContent = 'Age';
-    label.className = 'x-axis-origin-label';
-    chartHost.appendChild(label);
-
-    const labelLeft = gridRect.left - hostRect.left;
-
-    const firstXTick = xAxisTexts?.querySelector<SVGTextElement>(
-      '.apexcharts-xaxis-label',
-    );
-    let labelTop = gridRect.bottom - hostRect.top + 8;
-    if (firstXTick) {
-      const tickRect = firstXTick.getBoundingClientRect();
-      labelTop = tickRect.bottom - hostRect.top + 4;
-    }
-
-    label.style.position = 'absolute';
-    label.style.top = `${labelTop}px`;
-    label.style.left = `${labelLeft}px`;
-    label.style.pointerEvents = 'none';
-    label.style.zIndex = '5';
-
-    this.xAxisLabelEl = label;
-  }
 
   buildEventAnnotations(events: TimelineEvent[]) {
     const eventsByYear = new Map<string, TimelineEvent[]>();
@@ -1037,7 +980,6 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
       }
 
       this.positionYAxisLabel();
-      this.positionXAxisLabel();
 
       this.cleanupHtmlTooltips();
       if (this.events.length > 0) {
