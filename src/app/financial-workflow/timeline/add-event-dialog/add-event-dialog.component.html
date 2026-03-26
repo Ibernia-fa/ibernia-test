@@ -129,7 +129,7 @@
           <div class="net-field d-flex align-items-center">
             <div class="left hide-arrow">
               <mat-select
-                value="£"
+                value="Â£"
                 formControlName="currency"
                 class="sortby-edit-profile"
                 hideSingleSelectionIndicator
@@ -806,7 +806,7 @@
           <div class="net-field d-flex align-items-center">
             <div class="left hide-arrow">
               <mat-select
-                value="£"
+                value="Â£"
                 formControlName="currency"
                 class="sortby-edit-profile"
                 hideSingleSelectionIndicator
@@ -948,7 +948,7 @@
             <div class="net-field d-flex align-items-center">
               <div class="left hide-arrow">
                 <mat-select
-                  value="£"
+                  value="Â£"
                   formControlName="currency"
                   class="sortby-edit-profile"
                   hideSingleSelectionIndicator
@@ -1211,7 +1211,7 @@
                   <div class="net-field d-flex align-items-center">
                     <div class="left hide-arrow">
                       <mat-select
-                        value="£"
+                        value="Â£"
                         formControlName="currency"
                         class="sortby-edit-profile"
                         hideSingleSelectionIndicator
@@ -1276,7 +1276,7 @@
           {{
             isEditWorkflow
               ? eventForm.get("name")?.value
-              : ("Custom event" | translate)
+              : ("Custom goal" | translate)
           }}
           <ng-container *ngIf="isEditWorkflow">
             <img
@@ -1309,7 +1309,7 @@
           {{
             isEditWorkflow
               ? eventForm.get("name")?.value
-              : ("Custom event" | translate)
+              : ("Custom goal" | translate)
           }}
           <ng-container *ngIf="isEditWorkflow">
             <img
@@ -1351,6 +1351,38 @@
             }
           </div>
 
+          <div class="d-flex flex-column gap-8 tab">
+            <mat-label class="f-s-16 f-w-500 ibr-black d-flex align-items-center"
+              >{{ "Payment method" | translate }}
+              <img
+                src="assets/images/svgs/help-circle-icon.svg"
+                alt="help"
+                width="18"
+                class="m-l-4"
+                matTooltip="{{ 'ADD_EVENT.EVENT_TYPE_TOOLTIP' | translate }}"
+              />
+            </mat-label>
+            <div class="down-payment-toggle">
+              <label
+                class="dp-radio"
+                [class.active]="isCustomCashEvent"
+                (click)="onCustomCashControlClicked(true)"
+              >
+                <span class="dp-radio-circle"></span>
+                <span>{{ "Cash" | translate }}</span>
+              </label>
+              <label
+                class="dp-radio"
+                [class.active]="!isCustomCashEvent"
+                (click)="onCustomCashControlClicked(false)"
+              >
+                <span class="dp-radio-circle"></span>
+                <span>{{ "Financing" | translate }}</span>
+              </label>
+            </div>
+          </div>
+
+          @if (isCustomCashEvent) {
           <div class="d-flex flex-column gap-8 net-fields">
             <!-- <mat-label class="f-s-16 f-w-500 m-b-8 d-flex align-items-center" -->
             <mat-label
@@ -1369,7 +1401,7 @@
             <div class="net-field d-flex align-items-center">
               <div class="left hide-arrow">
                 <mat-select
-                  value="£"
+                  value="Â£"
                   formControlName="currency"
                   class="sortby-edit-profile"
                   hideSingleSelectionIndicator
@@ -1437,30 +1469,6 @@
               <span class="field-error d-block">{{
                 "Required" | translate
               }}</span>
-            }
-          </div>
-
-          <div class="d-flex flex-column gap-8">
-            <div class="d-flex m-b-8">
-              <button
-                (click)="toggleMortgageCalculatorCustom()"
-                type="button"
-                class="mortgage-toggle-btn"
-              >
-                <span>{{ customCalculatorToggleLabelKey | translate }}</span>
-              </button>
-            </div>
-            @if (showMortgageCalculatorCustom) {
-              <app-mortgage-calculator
-                [clientCountryCode]="clientCountryCode"
-                [currencySymbol]="clientPreferredCurrency"
-                calculatorKind="loan"
-                [advisorDefaultInterestRate]="customCalculatorAdvisorRate"
-                [initialState]="lastCalculatorState"
-                (calculated)="onMortgageAppliedCustom($event)"
-                (stateChanged)="onCalculatorStateChanged($event)"
-              >
-              </app-mortgage-calculator>
             }
           </div>
 
@@ -1753,6 +1761,407 @@
                 }
               </div>
             </div>
+          }
+          } @else {
+          <div class="d-flex flex-column gap-8">
+            <div class="d-flex m-b-8">
+              <button
+                (click)="toggleMortgageCalculatorCustom()"
+                type="button"
+                class="mortgage-toggle-btn"
+              >
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  xmlns:xlink="http://www.w3.org/1999/xlink"
+                  aria-hidden="true"
+                >
+                  <mask
+                    id="mask_custom_loan_calc"
+                    style="mask-type: alpha"
+                    maskUnits="userSpaceOnUse"
+                    x="0"
+                    y="0"
+                    width="24"
+                    height="24"
+                  >
+                    <rect
+                      width="24"
+                      height="24"
+                      fill="url(#pattern_custom_loan_calc)"
+                    />
+                  </mask>
+                  <g mask="url(#mask_custom_loan_calc)">
+                    <rect
+                      x="-71"
+                      y="-25"
+                      width="146"
+                      height="158"
+                      fill="currentColor"
+                    />
+                  </g>
+                  <defs>
+                    <pattern
+                      id="pattern_custom_loan_calc"
+                      patternContentUnits="objectBoundingBox"
+                      width="1"
+                      height="1"
+                    >
+                      <use
+                        xlink:href="#image_custom_loan_calc"
+                        transform="scale(0.0078125)"
+                      />
+                    </pattern>
+                    <image
+                      id="image_custom_loan_calc"
+                      width="128"
+                      height="128"
+                      preserveAspectRatio="none"
+                      xlink:href="data:image/png;base64,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"
+                    />
+                  </defs>
+                </svg>
+                <span>{{ customCalculatorToggleLabelKey | translate }}</span>
+              </button>
+            </div>
+            @if (showMortgageCalculatorCustom) {
+              <app-mortgage-calculator
+                [clientCountryCode]="clientCountryCode"
+                [currencySymbol]="clientPreferredCurrency"
+                calculatorKind="loan"
+                [advisorDefaultInterestRate]="customCalculatorAdvisorRate"
+                [initialState]="lastCalculatorState"
+                (calculated)="onMortgageAppliedCustom($event)"
+                (stateChanged)="onCalculatorStateChanged($event)"
+              >
+              </app-mortgage-calculator>
+            }
+          </div>
+
+        <div class="d-flex flex-column gap-8 net-fields">
+            <mat-label
+              class="f-s-16 f-w-500 ibr-black d-flex align-items-center"
+              >{{ "Downpayment" | translate }}
+              <img
+                src="assets/images/svgs/help-circle-icon.svg"
+                alt="help"
+                width="18"
+                class="m-l-4"
+                matTooltip="{{ 'ADD_EVENT.ENTER_AMOUNT_TOOLTIP' | translate }}"
+              />
+            </mat-label>
+
+          <div class="net-field d-flex align-items-center">
+            <div class="left hide-arrow">
+              <mat-select
+                value="Â£"
+                formControlName="currency"
+                class="sortby-edit-profile"
+                hideSingleSelectionIndicator
+              >
+                @for (country of countries; track country) {
+                  @if (country.currencySymbol) {
+                    <mat-option [value]="country.currencySymbol">{{
+                      country.currencySymbol
+                    }}</mat-option>
+                  }
+                }
+              </mat-select>
+            </div>
+            <div class="w-100 form-field">
+              <input
+                matInput
+                type="text"
+                inputmode="decimal"
+                formControlName="amount"
+                #amountInput
+                thousandSeparatorInput
+                placeholder="0"
+              />
+            </div>
+            <div class="right hide-arrow custom-select">
+              <mat-select
+                (valueChange)="onCycleValueChange($event)"
+                value="Select"
+                formControlName="cycle"
+                class="sortby-edit-profile"
+                hideSingleSelectionIndicator
+              >
+                @for (cycle of cycles; track cycle) {
+                  <mat-option [value]="cycle">{{ cycle }}</mat-option>
+                }
+              </mat-select>
+              <span class="custom-arrow">
+                <svg
+                  width="12"
+                  height="7"
+                  viewBox="0 0 12 7"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M1 1L6 6L11 1"
+                    stroke="#2B3942"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </span>
+            </div>
+          </div>
+          @if (
+            (eventForm.get("cycle")?.touched &&
+              eventForm.get("cycle")?.hasError("required")) ||
+            (eventForm.get("amount")?.touched &&
+              eventForm.get("amount")?.hasError("required")) ||
+            (eventForm.get("currency")?.touched &&
+              eventForm.get("currency")?.hasError("required"))
+          ) {
+            <span class="field-error d-block">{{
+              "Required" | translate
+            }}</span>
+          }
+        </div>
+
+        <div class="w-100 form-field gap-8">
+          <div class="d-flex gap-4 align-items-center">
+            <mat-label class="f-s-16 f-w-500 ibr-black d-block">{{
+              "Date" | translate
+            }}</mat-label>
+            <img
+              width="18"
+              src="assets/images/svgs/help-circle-icon.svg"
+              alt="help-circle-icon"
+            />
+          </div>
+          <div class="position-relative">
+            <div class="w-100 form-field">
+              <div class="select-option position-relative">
+                <mat-select
+                  value="Select"
+                  formControlName="start"
+                  hideSingleSelectionIndicator
+                >
+                  @for (year of years; let i = $index; track year) {
+                    <mat-option [value]="year"
+                      >{{ year }} ({{ clientAge + i }})</mat-option
+                    >
+                  }
+                </mat-select>
+                <span class="custom-arrow">
+                  <svg
+                    width="12"
+                    height="7"
+                    viewBox="0 0 12 7"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M1 1L6 6L11 1"
+                      stroke="#2B3942"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </span>
+              </div>
+              @if (
+                eventForm.get("start")?.touched &&
+                eventForm.get("start")?.hasError("required")
+              ) {
+                <span class="field-error d-block">{{
+                  "Required" | translate
+                }}</span>
+              }
+            </div>
+          </div>
+        </div>
+
+          <div class="d-flex flex-column gap-8 net-fields">
+            <div class="d-flex gap-4 align-items-center">
+              <mat-label class="f-s-16 f-w-500 ibr-black d-block">{{
+                "Monthly payment" | translate
+              }}</mat-label>
+              <img
+                width="18"
+                src="assets/images/svgs/help-circle-icon.svg"
+                alt="help-circle-icon"
+              />
+            </div>
+            <div class="net-field d-flex align-items-center">
+              <div class="left hide-arrow">
+                <mat-select
+                  value="Â£"
+                  formControlName="currency"
+                  class="sortby-edit-profile"
+                  hideSingleSelectionIndicator
+                >
+                  @for (country of countries; track country) {
+                    @if (country.currencySymbol) {
+                      <mat-option [value]="country.currencySymbol">{{
+                        country.currencySymbol
+                      }}</mat-option>
+                    }
+                  }
+                </mat-select>
+              </div>
+              <div class="w-100 form-field">
+                <input
+                  matInput
+                  type="text"
+                  inputmode="decimal"
+                  formControlName="monthlyPayment"
+                  #monthlyPayment
+                  thousandSeparatorInput
+                  placeholder="0"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="start-end">
+            <div class="d-flex flex-column gap-8">
+              <div class="d-flex gap-4 align-items-center">
+                <mat-label class="f-s-16 f-w-500 ibr-black d-block">
+                  {{ "Start & end" | translate }}
+                </mat-label>
+                <img
+                  src="assets/images/svgs/help-circle-icon.svg"
+                  alt="help"
+                  width="18"
+                  class="m-l-4"
+                  matTooltip="{{
+                    'ADD_EVENT.DEFINE_EVENT_PERIOD_TOOLTIP' | translate
+                  }}"
+                />
+              </div>
+              <div
+                class="row justify-content-between align-items-start flex-nowrap"
+              >
+                <div class="col-6">
+                  <div class="w-100 form-field">
+                    <div class="select-option position-relative">
+                      <mat-select
+                        value="Select"
+                        formControlName="monthlyStart"
+                        hideSingleSelectionIndicator
+                      >
+                        @for (year of years; let i = $index; track year) {
+                          <mat-option [value]="year"
+                            >{{ year }} ({{ clientAge + i }})</mat-option
+                          >
+                        }
+                      </mat-select>
+                      <span class="custom-arrow">
+                        <svg
+                          width="12"
+                          height="7"
+                          viewBox="0 0 12 7"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M1 1L6 6L11 1"
+                            stroke="#2B3942"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                        </svg>
+                      </span>
+                    </div>
+                    @if (
+                      eventForm.get("monthlyStart")?.touched &&
+                      eventForm.get("monthlyStart")?.hasError("required")
+                    ) {
+                      <span class="field-error d-block">{{
+                        "Required" | translate
+                      }}</span>
+                    }
+                  </div>
+                </div>
+
+                <div class="d-flex justify-content-start align-items-start">
+                  <img
+                    src="assets/images/svgs/chevron-right-date-icon.svg"
+                    alt="chevron-right-date-icon"
+                  />
+                </div>
+
+                <div class="col-6">
+                  <div class="w-100 form-field">
+                    <div class="select-option position-relative">
+                      <mat-select
+                        value="Select"
+                        formControlName="monthlyEnd"
+                        hideSingleSelectionIndicator
+                      >
+                        @for (
+                          event of getFinancingEndEvents();
+                          track event.name + event.year
+                        ) {
+                          <mat-option [value]="event.year"
+                            >{{ event.name }} ({{ event.age }})</mat-option
+                          >
+                        }
+                        @if (
+                          getFinancingEndEvents().length > 0 &&
+                          getFinancingEndYears().length > 0
+                        ) {
+                          <hr />
+                        }
+                        @for (year of getFinancingEndYears(); track year) {
+                          <mat-option [value]="year"
+                            >{{ year }} ({{
+                              year - clientBirthYear
+                            }})</mat-option
+                          >
+                        }
+                      </mat-select>
+                      <span class="custom-arrow">
+                        <svg
+                          width="12"
+                          height="7"
+                          viewBox="0 0 12 7"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M1 1L6 6L11 1"
+                            stroke="#2B3942"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                        </svg>
+                      </span>
+                    </div>
+                    @if (
+                      eventForm.get("monthlyEnd")?.touched &&
+                      eventForm.get("monthlyEnd")?.hasError("required")
+                    ) {
+                      <span class="field-error d-block">{{
+                        "Required" | translate
+                      }}</span>
+                    }
+                    @if (
+                      eventForm.get("monthlyEnd")?.touched &&
+                      eventForm.get("monthlyEnd")?.hasError("endBeforeStart")
+                    ) {
+                      <span class="field-error d-block"
+                        >End year cannot be before start year</span
+                      >
+                    }
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
           }
         </div>
       </mat-dialog-content>

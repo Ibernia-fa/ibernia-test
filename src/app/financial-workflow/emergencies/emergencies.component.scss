@@ -308,12 +308,11 @@
   width: 100%;
 }
 .gauge-progress {
-  background-color: #ff383c;
   height: 100%;
   border-radius: 50px;
+  transition: width 0.4s ease, background-color 0.4s ease;
 }
 .gauge-text {
-  color: #ff383c;
   font-size: 40px;
   font-weight: 700;
   line-height: none;
