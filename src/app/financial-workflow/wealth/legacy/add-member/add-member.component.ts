@@ -8,7 +8,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
 import { ToastrService } from 'ngx-toastr';
 import { LegacyHttpService } from '../services/legacy-http.service';
-import { FamilyRole, FamilyMemberModel, FAMILY_ROLE_LABELS } from '../models/legacy.model';
+import { FamilyRole, FamilyMemberModel } from '../models/legacy.model';
 
 interface RoleOption {
   value: FamilyRole;
@@ -43,8 +43,7 @@ export class AddMemberComponent {
     }
   ) {
     this.form = this.fb.group({
-      firstName: ['', Validators.required],
-      lastName: ['', Validators.required],
+      name: ['', Validators.required],
       role: [null, Validators.required]
     });
 
@@ -97,7 +96,7 @@ export class AddMemberComponent {
   onSave(): void {
     if (this.form.invalid) return;
 
-    const { firstName, lastName, role } = this.form.value;
+    const { name, role } = this.form.value;
 
     if (!this.data.hasPartner && AddMemberComponent.PARTNER_ROLES.has(role)) {
       this.toastr.error('Cannot add a partner-related member when no partner exists', 'Error');
@@ -106,7 +105,11 @@ export class AddMemberComponent {
 
     this.isSaving = true;
 
-    this.legacyHttp.addFamilyMember(this.data.cashflowId, { firstName, lastName, role }).subscribe({
+    this.legacyHttp.addFamilyMember(this.data.cashflowId, {
+      firstName: name,
+      lastName: '',
+      role
+    }).subscribe({
       next: (dashboard) => {
         this.toastr.success('Member added', 'Success');
         this.dialogRef.close({ dashboard });

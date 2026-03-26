@@ -39,7 +39,7 @@
 
       <mat-form-field appearance="outline" class="full-width">
         <mat-select [(ngModel)]="row.memberId" [hideSingleSelectionIndicator]="true">
-          @for (m of eligibleMembers; track m.id) {
+          @for (m of getAvailableMembersForRow(i); track m.id) {
             <mat-option [value]="m.id">{{m.firstName}} {{m.lastName}}</mat-option>
           }
         </mat-select>

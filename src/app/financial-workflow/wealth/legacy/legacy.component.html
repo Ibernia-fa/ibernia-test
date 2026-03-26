@@ -80,7 +80,7 @@
               <div class="leaf" *ngFor="let sib of clientSiblings">
                 <div class="leaf-drop" *ngIf="showClientBranch"></div>
                 <ng-container *ngIf="getMemberInheritance(sib.id) as inh">
-                  <span class="inheritance-pct-badge">{{inh.percentage | number:'1.0-0'}}%</span>
+                  <span class="inheritance-pct-badge">{{inh.percentage | number:'1.1-1'}}%</span>
                   <div class="leaf-drop-short"></div>
                 </ng-container>
                 <div class="tree-node sibling-node" [class.deceased]="isDeceased(sib.id)">
@@ -101,6 +101,10 @@
 
               <div class="leaf">
                 <div class="leaf-drop" *ngIf="showClientBranch"></div>
+                <ng-container *ngIf="getMemberInheritance(clientMember?.id) as inh">
+                  <span class="inheritance-pct-badge">{{inh.percentage | number:'1.1-1'}}%</span>
+                  <div class="leaf-drop-short"></div>
+                </ng-container>
                 <div class="tree-node main-node" *ngIf="clientMember as cm"
                      [class.deceased]="isDeceased(cm.id)"
                      (click)="onClickClient()">
@@ -170,12 +174,13 @@
             <div class="branch-leaves" [class.has-bracket]="showPartnerBranch">
               <div class="leaf">
                 <div class="leaf-drop" *ngIf="showPartnerBranch"></div>
+                <ng-container *ngIf="getMemberInheritance(partnerMember?.id) as inh">
+                  <span class="inheritance-pct-badge">{{inh.percentage | number:'1.1-1'}}%</span>
+                  <div class="leaf-drop-short"></div>
+                </ng-container>
                 <div class="tree-node main-node" *ngIf="partnerMember as pm"
                      [class.deceased]="isDeceased(pm.id)"
                      (click)="onClickPartner()">
-                  <ng-container *ngIf="getMemberInheritance(pm.id) as inh">
-                    <span class="inheritance-pct" *ngIf="inh.percentage < 100">{{inh.percentage}}%</span>
-                  </ng-container>
                   <div class="node-avatar avatar-partner">
                     <mat-icon>person</mat-icon>
                   </div>
@@ -199,7 +204,7 @@
               <div class="leaf" *ngFor="let sib of partnerSiblings">
                 <div class="leaf-drop" *ngIf="showPartnerBranch"></div>
                 <ng-container *ngIf="getMemberInheritance(sib.id) as inh">
-                  <span class="inheritance-pct-badge">{{inh.percentage | number:'1.0-0'}}%</span>
+                  <span class="inheritance-pct-badge">{{inh.percentage | number:'1.1-1'}}%</span>
                   <div class="leaf-drop-short"></div>
                 </ng-container>
                 <div class="tree-node sibling-node" [class.deceased]="isDeceased(sib.id)">
@@ -244,7 +249,7 @@
             <div class="leaf" *ngFor="let child of children">
               <div class="leaf-drop"></div>
               <ng-container *ngIf="getMemberInheritance(child.id) as inh">
-                <span class="inheritance-pct-badge">{{inh.percentage | number:'1.0-0'}}%</span>
+                <span class="inheritance-pct-badge">{{inh.percentage | number:'1.1-1'}}%</span>
                 <div class="leaf-drop-short"></div>
               </ng-container>
               <div class="tree-node child-node" [class.deceased]="isDeceased(child.id)">
@@ -254,7 +259,7 @@
                 <span class="node-name">{{child.firstName}} {{child.lastName}}</span>
                 <ng-container *ngIf="getMemberInheritance(child.id) as inh">
                   <span class="inheritance-total child-total">
-                    <span class="estate-currency">{{currency | currencySymbol}}</span>{{inh.finalTotal | number:'1.0-0'}}
+                    <span class="estate-currency">{{currency | currencySymbol}}</span>{{inh.netReceived | number:'1.0-0'}}
                   </span>
                 </ng-container>
                 <button class="node-remove" (click)="onRemoveMember(child)">
