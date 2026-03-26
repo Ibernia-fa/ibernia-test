@@ -171,8 +171,11 @@ export class LegacyComponent implements OnInit, OnChanges {
     }
 
     ids.forEach(id => this.markedDeceased.add(id));
-    this.activeScenario = scenario;
-    this.legacyHttp.simulateScenario(this.cashflowId, scenario).subscribe({
+
+    const effectiveScenario = this.resolveEffectiveScenario(scenario);
+
+    this.activeScenario = effectiveScenario;
+    this.legacyHttp.simulateScenario(this.cashflowId, effectiveScenario).subscribe({
       next: (result) => {
         this.scenarioResult = result;
         this.cdr.markForCheck();
@@ -187,6 +190,19 @@ export class LegacyComponent implements OnInit, OnChanges {
         this.cdr.markForCheck();
       }
     });
+  }
+
+  private resolveEffectiveScenario(requestedScenario: ScenarioType): ScenarioType {
+    const clientId = this.clientMember?.id;
+    const partnerId = this.partnerMember?.id;
+
+    if (clientId && partnerId
+        && this.markedDeceased.has(clientId)
+        && this.markedDeceased.has(partnerId)) {
+      return ScenarioType.BothDie;
+    }
+
+    return requestedScenario;
   }
 
   private getScenarioMemberIds(scenario: ScenarioType): string[] {
