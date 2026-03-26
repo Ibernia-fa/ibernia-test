@@ -87,7 +87,6 @@ export class AddAssetComponent {
     this.form = this.fb.group({
       category: [categoryValue, Validators.required],
       name: [this.isEditMode ? (data.asset!.name || '') : ''],
-      description: [this.isEditMode ? data.asset!.description : '', Validators.required],
       value: [this.isEditMode ? data.asset!.value : null, [Validators.required, Validators.min(0)]],
       ownership: [ownershipValue],
       currencySymbol: [data.clientPreferredCurrency || 'EUR']
@@ -138,7 +137,6 @@ export class AddAssetComponent {
         id: this.data.asset!.id,
         category: formValue.category,
         name: formValue.name || null,
-        description: formValue.description,
         value: formValue.value,
         ownership: this.hasPartner ? formValue.ownership : 0
       };
@@ -156,7 +154,6 @@ export class AddAssetComponent {
       const request = {
         category: formValue.category,
         name: formValue.name || null,
-        description: formValue.description,
         value: formValue.value,
         ownership: this.hasPartner ? formValue.ownership : 0
       };

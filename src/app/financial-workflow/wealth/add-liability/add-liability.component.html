@@ -35,14 +35,6 @@
           </div>
         }
 
-        <div class="w-100 form-field gap-8">
-          <mat-label class="f-s-16 d-block" style="line-height: 18px">Description</mat-label>
-          <input matInput formControlName="description" placeholder="e.g. Home mortgage" />
-          @if(form.get('description')?.touched && form.get('description')?.hasError('required')) {
-            <span class="field-error d-block">Required</span>
-          }
-        </div>
-
         <div class="d-flex flex-column gap-4 net-fields">
           <div class="d-flex flex-column gap-8">
             <mat-label class="f-s-16 d-block" style="line-height: 18px">Outstanding amount</mat-label>

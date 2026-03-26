@@ -81,7 +81,6 @@ export class AddLiabilityComponent {
     this.form = this.fb.group({
       type: [this.isEditMode ? data.liability!.type : '', Validators.required],
       name: [this.isEditMode ? (data.liability!.name || '') : ''],
-      description: [this.isEditMode ? data.liability!.description : '', Validators.required],
       outstanding: [this.isEditMode ? data.liability!.outstanding : null, [Validators.required, Validators.min(0)]],
       ownership: [ownershipValue],
       currencySymbol: [data.clientPreferredCurrency || 'EUR']
@@ -134,7 +133,6 @@ export class AddLiabilityComponent {
         id: this.data.liability!.id,
         type: formValue.type,
         name: formValue.name || null,
-        description: formValue.description,
         outstanding: formValue.outstanding,
         ownership: this.hasPartner ? formValue.ownership : 0
       };
@@ -152,7 +150,6 @@ export class AddLiabilityComponent {
       const request = {
         type: formValue.type,
         name: formValue.name || null,
-        description: formValue.description,
         outstanding: formValue.outstanding,
         ownership: this.hasPartner ? formValue.ownership : 0
       };

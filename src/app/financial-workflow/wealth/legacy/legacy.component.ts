@@ -223,19 +223,6 @@ export class LegacyComponent implements OnInit, OnChanges {
     }
   }
 
-  private resolveEffectiveScenario(requestedScenario: ScenarioType): ScenarioType {
-    const clientId = this.clientMember?.id;
-    const partnerId = this.partnerMember?.id;
-
-    if (clientId && partnerId
-        && this.markedDeceased.has(clientId)
-        && this.markedDeceased.has(partnerId)) {
-      return ScenarioType.BothDie;
-    }
-
-    return requestedScenario;
-  }
-
   onClickClientParent(): void {
     this.selectScenario(ScenarioType.ClientParentsDie);
   }
