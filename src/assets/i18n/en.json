@@ -396,6 +396,10 @@
   "Shared by": "Shared by",
   "Swipe up": "Swipe up",
   "Swipe down": "Swipe down",
+  "MFA_REMINDER_TITLE": "Set up two-factor authentication",
+  "MFA_REMINDER_PREVIEW_GENERIC": "You have 7 days from your first sign-in to enable 2FA. Open your account security page to complete setup.",
+  "MFA_REMINDER_PREVIEW_DEADLINE": "Enable 2FA before {{date}} to keep access to Ibernia.",
+  "Security": "Security",
 
   "ADD_EVENT": {
     "SELECT_EVENT_TYPE_TOOLTIP": "Select the type of life event or goal you want to create (for example, 'Home', 'New car' or 'Education').",

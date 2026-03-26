@@ -12,6 +12,8 @@ export interface UserNotificationItem {
   isRead: boolean;
   deepLink: string;
   iconType: string;
+  /** Interpolation params when preview/title are translation keys (e.g. MFA reminder). */
+  previewParams?: Record<string, string>;
 }
 
 @Injectable({ providedIn: 'root' })
