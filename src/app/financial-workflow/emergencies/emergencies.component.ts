@@ -452,6 +452,23 @@ export class EmergenciesComponent implements OnInit {
     }
   }
 
+  getProgressBarStyles(score: number | null): Record<string, string> {
+    const pct = score != null ? Math.min(Math.max(score, 0), 100) : 0;
+    let color: string;
+
+    if (score == null || score < 50) {
+      color = '#ff383c';
+    } else if (score < 75) {
+      color = '#deb511';
+    } else if (score < 89) {
+      color = '#54e97c';
+    } else {
+      color = '#09ac65';
+    }
+
+    return { width: `${pct}%`, 'background-color': color };
+  }
+
   getCardCssClass(e: Emergency): string {
     if (e.type === 1) {
       const isNotCovered = e.policyStatus == 2;

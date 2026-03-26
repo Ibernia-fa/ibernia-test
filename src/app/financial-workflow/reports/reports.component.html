@@ -66,7 +66,11 @@
 
             <ng-container *ngIf="compareReport || compareCashflow">
               <button class="button-icon" (click)="toggleLineChart()">
-                <span>{{ showLineChart ? ("Bar chart" | translate) : ("Line chart" | translate) }}</span>
+                <span>{{
+                  showLineChart
+                    ? ("Bar chart" | translate)
+                    : ("Line chart" | translate)
+                }}</span>
               </button>
               <button class="button-icon" (click)="exitComparison()">
                 <span>{{ "Exit Comparison" | translate }}</span>
@@ -78,7 +82,10 @@
 
         <div class="ibr-lifetime-graphs">
           <!-- Graph One  -->
-          <mat-card class="ibr-lifetime-graph-container ibr-plan-chart" *ngIf="!showLineChart">
+          <mat-card
+            class="ibr-lifetime-graph-container ibr-plan-chart"
+            *ngIf="!showLineChart"
+          >
             <mat-card-content>
               <ng-container *ngIf="!compareReport || !compareCashflow">
                 <button
@@ -191,14 +198,14 @@
                       >
                         <path
                           d="M3.33325 12.4993C3.33325 12.4993 4.16659 11.666 6.66659 11.666C9.16659 11.666 10.8333 13.3327 13.3333 13.3327C15.8333 13.3327 16.6666 12.4993 16.6666 12.4993V2.49935C16.6666 2.49935 15.8333 3.33268 13.3333 3.33268C10.8333 3.33268 9.16659 1.66602 6.66659 1.66602C4.16659 1.66602 3.33325 2.49935 3.33325 2.49935V12.4993Z"
-                          stroke="#5A596E"
+                          stroke="#FF383C"
                           stroke-width="1.875"
                           stroke-linecap="round"
                           stroke-linejoin="round"
                         />
                         <path
                           d="M3.33325 18.3333V12.5"
-                          stroke="#5A596E"
+                          stroke="#FF383C"
                           stroke-width="1.875"
                           stroke-linecap="round"
                           stroke-linejoin="round"
@@ -224,14 +231,14 @@
                       >
                         <path
                           d="M3.33325 12.4993C3.33325 12.4993 4.16659 11.666 6.66659 11.666C9.16659 11.666 10.8333 13.3327 13.3333 13.3327C15.8333 13.3327 16.6666 12.4993 16.6666 12.4993V2.49935C16.6666 2.49935 15.8333 3.33268 13.3333 3.33268C10.8333 3.33268 9.16659 1.66602 6.66659 1.66602C4.16659 1.66602 3.33325 2.49935 3.33325 2.49935V12.4993Z"
-                          stroke="#5A596E"
+                          stroke="#FF8D28"
                           stroke-width="1.875"
                           stroke-linecap="round"
                           stroke-linejoin="round"
                         />
                         <path
                           d="M3.33325 18.3333V12.5"
-                          stroke="#5A596E"
+                          stroke="#FF8D28"
                           stroke-width="1.875"
                           stroke-linecap="round"
                           stroke-linejoin="round"
@@ -257,14 +264,14 @@
                       >
                         <path
                           d="M3.33325 12.4993C3.33325 12.4993 4.16659 11.666 6.66659 11.666C9.16659 11.666 10.8333 13.3327 13.3333 13.3327C15.8333 13.3327 16.6666 12.4993 16.6666 12.4993V2.49935C16.6666 2.49935 15.8333 3.33268 13.3333 3.33268C10.8333 3.33268 9.16659 1.66602 6.66659 1.66602C4.16659 1.66602 3.33325 2.49935 3.33325 2.49935V12.4993Z"
-                          stroke="#5A596E"
+                          stroke="#34C759"
                           stroke-width="1.875"
                           stroke-linecap="round"
                           stroke-linejoin="round"
                         />
                         <path
                           d="M3.33325 18.3333V12.5"
-                          stroke="#5A596E"
+                          stroke="#34C759"
                           stroke-width="1.875"
                           stroke-linecap="round"
                           stroke-linejoin="round"
