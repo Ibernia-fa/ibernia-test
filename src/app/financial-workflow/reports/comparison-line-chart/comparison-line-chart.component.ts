@@ -18,13 +18,53 @@ function toDate(value: any): Date | null {
   return Number.isNaN(d.getTime()) ? null : d;
 }
 
-function ageAtDate(ref: Date, birth: Date): number {
+function calcAge(ref: Date, birth: Date): number {
   let age = ref.getFullYear() - birth.getFullYear();
   const hasPassed =
     ref.getMonth() > birth.getMonth() ||
     (ref.getMonth() === birth.getMonth() && ref.getDate() >= birth.getDate());
   if (!hasPassed) age--;
   return age;
+}
+
+interface SplitSeries {
+  solidName: string;
+  dashedName: string;
+  solidData: (number | null)[];
+  dashedData: (number | null)[];
+}
+
+function splitAtZeroCrossing(
+  name: string,
+  data: number[]
+): SplitSeries {
+  const solidData: (number | null)[] = [];
+  const dashedData: (number | null)[] = [];
+
+  let crossedToNegative = false;
+
+  for (let i = 0; i < data.length; i++) {
+    if (!crossedToNegative) {
+      solidData.push(data[i]);
+      if (data[i] < 0) {
+        crossedToNegative = true;
+        dashedData.push(data[i]);
+        if (i > 0) dashedData[i - 1] = data[i - 1];
+      } else {
+        dashedData.push(null);
+      }
+    } else {
+      solidData.push(null);
+      dashedData.push(data[i]);
+    }
+  }
+
+  return {
+    solidName: name,
+    dashedName: `${name} (deficit)`,
+    solidData,
+    dashedData,
+  };
 }
 
 @Component({
@@ -85,10 +125,13 @@ export class ComparisonLineChartComponent implements OnChanges {
 
     const getAge = (year: number): number | null => {
       if (!birthDate || !Number.isFinite(year)) return null;
+      let age: number;
       if (firstYear != null && year === firstYear && forecastStart) {
-        return ageAtDate(forecastStart, birthDate);
+        age = calcAge(forecastStart, birthDate);
+      } else {
+        age = calcAge(new Date(year, 0, 1), birthDate);
       }
-      return ageAtDate(new Date(year, 0, 1), birthDate);
+      return age >= 0 ? age : null;
     };
 
     const fmtCurrency = (value: number): string => {
@@ -106,14 +149,53 @@ export class ComparisonLineChartComponent implements OnChanges {
       }
     };
 
+    const planALabel = this.planAName || 'Plan A';
+    const planBLabel = this.planBName || 'Plan B';
+
+    const splitA = splitAtZeroCrossing(planALabel, seriesA);
+    const splitB = splitAtZeroCrossing(planBLabel, seriesB);
+
+    const planAColor = '#5D87FF';
+    const planBColor = '#FA896B';
+
+    const aHasDeficit = splitA.dashedData.some((v) => v !== null);
+    const bHasDeficit = splitB.dashedData.some((v) => v !== null);
+
+    const seriesList: any[] = [
+      { name: splitA.solidName, data: splitA.solidData },
+    ];
+    const colors: string[] = [planAColor];
+    const widths: number[] = [3];
+    const dashes: number[] = [0];
+
+    if (aHasDeficit) {
+      seriesList.push({ name: splitA.dashedName, data: splitA.dashedData });
+      colors.push(planAColor);
+      widths.push(3);
+      dashes.push(6);
+    }
+
+    seriesList.push({ name: splitB.solidName, data: splitB.solidData });
+    colors.push(planBColor);
+    widths.push(3);
+    dashes.push(0);
+
+    if (bHasDeficit) {
+      seriesList.push({ name: splitB.dashedName, data: splitB.dashedData });
+      colors.push(planBColor);
+      widths.push(3);
+      dashes.push(6);
+    }
+
+    const deficitSeriesNames = new Set<string>();
+    if (aHasDeficit) deficitSeriesNames.add(splitA.dashedName);
+    if (bHasDeficit) deficitSeriesNames.add(splitB.dashedName);
+
     this.chartOptions = {
       ...this.chartOptions,
-      series: [
-        { name: this.planAName || 'Plan A', data: seriesA },
-        { name: this.planBName || 'Plan B', data: seriesB },
-      ],
-      stroke: { width: [3, 3], dashArray: [0, 8], curve: 'smooth' },
-      colors: ['#5D87FF', '#FA896B'],
+      series: seriesList,
+      stroke: { width: widths, dashArray: dashes, curve: 'smooth' as const },
+      colors,
       xaxis: {
         type: 'category',
         categories,
@@ -136,6 +218,13 @@ export class ComparisonLineChartComponent implements OnChanges {
           },
         },
       },
+      legend: {
+        position: 'top',
+        horizontalAlign: 'right',
+        showForSingleSeries: true,
+        customLegendItems: [planALabel, planBLabel],
+        markers: { fillColors: [planAColor, planBColor] },
+      },
       tooltip: {
         enabled: true,
         shared: true,
@@ -145,20 +234,29 @@ export class ComparisonLineChartComponent implements OnChanges {
           const year = w.globals.labels[dataPointIndex];
           const age = getAge(Number(year));
 
-          const rows = w.globals.seriesNames
-            .map((name: string, i: number) => {
-              const val = series[i]?.[dataPointIndex];
-              if (val === undefined) return '';
-              const color = w.globals.colors[i];
-              const formatted = fmtCurrency(val);
+          const shown = new Map<string, { color: string; value: number }>();
+
+          w.globals.seriesNames.forEach((name: string, i: number) => {
+            const val = series[i]?.[dataPointIndex];
+            if (val == null) return;
+            const color = w.globals.colors[i];
+            const baseName = deficitSeriesNames.has(name)
+              ? name.replace(' (deficit)', '')
+              : name;
+            if (!shown.has(baseName) || val !== 0) {
+              shown.set(baseName, { color, value: val });
+            }
+          });
+
+          const rows = Array.from(shown.entries())
+            .map(([name, { color, value }]) => {
               return `
                 <div style="display:flex;align-items:center;gap:6px;padding:2px 0">
                   <span style="width:10px;height:10px;border-radius:50%;background:${color};display:inline-block"></span>
                   <span>${name}:</span>
-                  <strong>${formatted}</strong>
+                  <strong>${fmtCurrency(value)}</strong>
                 </div>`;
             })
-            .filter(Boolean)
             .join('');
 
           return `
