@@ -17,9 +17,10 @@
     <mat-card-content>
       <p class="f-s-14 m-b-20 p-t-0 m-t-0">{{ 'These preferences can be adjusted individually for each client' | translate }}</p>
       <div formGroupName="preferences">
+
+        <!-- Section 1: Plan setup -->
+        <h5 class="assumptions-section-title">{{ 'Plan setup' | translate }}</h5>
         <div class="row">
-
-
           <div class="col-6">
             <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Country' | translate }}
               <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4" matTooltip="Sets the main currency for all new client plans. All figures will be shown in this currency by default, but you can change it for individual clients later.">
@@ -50,10 +51,11 @@
               <mat-error *ngIf="p.currency.invalid">{{'Required' | translate}}</mat-error>
             </mat-form-field>
           </div>
+        </div>
 
-
-
-
+        <!-- Section 2: Projection assumptions -->
+        <h5 class="assumptions-section-title">{{ 'Projection assumptions' | translate }}</h5>
+        <div class="row">
           <div class="col-4">
             <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">
               {{ 'Inflation rate' | translate }}
@@ -66,10 +68,6 @@
               <mat-error *ngIf="p.inflationRate.hasError('min') || p.inflationRate.hasError('max')">0–100</mat-error>
             </mat-form-field>
           </div>
-
-
-
-
 
           <div class="col-4">
             <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">
@@ -96,7 +94,11 @@
               <mat-error *ngIf="p.pensionFundReturn.hasError('min') || p.pensionFundReturn.hasError('max')">0–100</mat-error>
             </mat-form-field>
           </div>
+        </div>
 
+        <!-- Section 3: Financing assumptions -->
+        <h5 class="assumptions-section-title">{{ 'Financing assumptions' | translate }}</h5>
+        <div class="row">
           <div class="col-4">
             <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">
               {{ 'Mortgage interest rate' | translate }}
@@ -122,7 +124,11 @@
               <mat-error *ngIf="p.loanInterestRate.hasError('min') || p.loanInterestRate.hasError('max')">0–100</mat-error>
             </mat-form-field>
           </div>
+        </div>
 
+        <!-- Section 4: Advisor compensation -->
+        <h5 class="assumptions-section-title">{{ 'Advisor compensation' | translate }}</h5>
+        <div class="row">
           <div class="col-4">
             <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">
               {{ 'Advisor commission type' | translate }}
@@ -137,12 +143,6 @@
               <mat-error *ngIf="p.comissionType.invalid">{{'Required' | translate}}</mat-error>
             </mat-form-field>
           </div>
-
-
-
-
-
-
 
           @if (form.controls.preferences.controls.comissionType.value !== ComissionType.None) {
           @if (form.controls.preferences.controls.comissionType.value === ComissionType.Percentage) {
@@ -159,16 +159,8 @@
           </div>
           }
 
-
           <div class="col-8">
             <div class="row">
-
-
-
-
-
-
-
               @if (form.controls.preferences.controls.comissionType.value === ComissionType.Amount) {
               <div class="col-2">
                 <mat-label class="f-s-16 f-w-400 m-b-8 d-block">{{ 'Currency' | translate }}</mat-label>
@@ -258,6 +250,7 @@
           </div>
           }
         </div>
+
       </div>
 
       <div class="mt-4 d-flex justify-content-end">
