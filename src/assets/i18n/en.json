@@ -11,6 +11,7 @@
   "Email": "Email",
   "Telephone": "Telephone",
   "Add a partner or spouse": "Add a partner or spouse",
+  "A saved partner cannot be removed from this screen.": "A saved partner cannot be removed from this screen.",
   "Notes": "Notes",
   "Partner first name": "Partner first name",
   "Partner last name": "Partner last name",
@@ -396,6 +397,10 @@
   "Shared by": "Shared by",
   "Swipe up": "Swipe up",
   "Swipe down": "Swipe down",
+  "MFA_REMINDER_TITLE": "Set up two-factor authentication",
+  "MFA_REMINDER_PREVIEW_GENERIC": "You have 7 days from your first sign-in to enable 2FA. Open your account security page to complete setup.",
+  "MFA_REMINDER_PREVIEW_DEADLINE": "Enable 2FA before {{date}} to keep access to Ibernia.",
+  "Security": "Security",
 
   "ADD_EVENT": {
     "SELECT_EVENT_TYPE_TOOLTIP": "Select the type of life event or goal you want to create (for example, 'Home', 'New car' or 'Education').",

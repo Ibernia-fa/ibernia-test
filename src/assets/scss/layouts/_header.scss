@@ -534,6 +534,9 @@ html .topbar {
       &.birthday::before {
         background: #e91e63;
       }
+      &.notification-type-security::before {
+        background: #d97706;
+      }
     }
 
     .notification-status-dot {

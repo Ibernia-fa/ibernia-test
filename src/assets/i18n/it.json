@@ -11,6 +11,7 @@
   "Email": "E-mail",
   "Telephone": "Numero di telefono",
   "Add a partner or spouse": "Aggiungi partner o coniuge",
+  "A saved partner cannot be removed from this screen.": "Un partner già salvato non può essere rimosso da questa schermata.",
   "Notes": "Note",
   "Partner first name": "Nome partner",
   "Partner last name": "Cognome partner",
@@ -376,6 +377,11 @@
   "Added": "Aggiunto",
   "Not added": "Non aggiunto",
   "Copy questionnaire link": "Copia link questionario",
+
+  "MFA_REMINDER_TITLE": "Configura l'autenticazione a due fattori",
+  "MFA_REMINDER_PREVIEW_GENERIC": "Hai 7 giorni dal primo accesso per attivare il 2FA. Apri la pagina di sicurezza dell'account per completare la configurazione.",
+  "MFA_REMINDER_PREVIEW_DEADLINE": "Attiva il 2FA entro il {{date}} per mantenere l'accesso a Ibernia.",
+  "Security": "Sicurezza",
 
   "ADD_EVENT": {
     "SELECT_EVENT_TYPE_TOOLTIP": "Seleziona il tipo di evento della vita o di obiettivo che desideri creare (ad esempio, 'Casa', 'Auto nuova' o 'Istruzione').",
