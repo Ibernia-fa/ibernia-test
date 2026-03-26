@@ -67,6 +67,21 @@ $line-w: 2px;
 }
 
 // ═══════════════════════════════════════════════════════════════
+// OTHER MEMBERS (standalone, no connectors, left of client)
+// ═══════════════════════════════════════════════════════════════
+
+.other-members {
+  display: flex;
+  gap: 16px;
+  align-self: flex-start;
+  margin-bottom: 16px;
+}
+
+.other-node {
+  cursor: default;
+}
+
+// ═══════════════════════════════════════════════════════════════
 // TREE BODY: two branches side-by-side, bottom-aligned
 // ═══════════════════════════════════════════════════════════════
 
@@ -284,6 +299,8 @@ $line-w: 2px;
   background: transparent;
   border: 3px solid;
 }
+
+.avatar-other { background: #94a3b8; }
 
 .children-leaves .leaf:nth-child(3n+1) .avatar-child { border-color: #f97316; color: #f97316; }
 .children-leaves .leaf:nth-child(3n+2) .avatar-child { border-color: #6366f1; color: #6366f1; }

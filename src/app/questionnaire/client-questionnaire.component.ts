@@ -1,4 +1,11 @@
-import { Component, OnInit, ViewChild, ElementRef, HostListener } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  HostListener,
+  OnInit,
+  ViewChild,
+  ElementRef,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -56,9 +63,7 @@ export class ClientQuestionnaireComponent implements OnInit {
   introFadingOut = false;
   isSubmitting = false;
   submitted = false;
-  showBubbles = false;
   errorMessage = '';
-  bubbleCount = Array.from({ length: 30 });
 
   private dataReady = false;
   private minTimeElapsed = false;
@@ -77,7 +82,8 @@ export class ClientQuestionnaireComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private questionnaireHttpService: QuestionnaireHttpService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
@@ -400,14 +406,18 @@ export class ClientQuestionnaireComponent implements OnInit {
   }
 
   onSubmit(): void {
+    if (this.isSubmitting || this.submitted) {
+      return;
+    }
     this.isSubmitting = true;
+    this.cdr.detectChanges();
+
     const payload = { responses: this.buildSubmitPayload() };
 
     this.questionnaireHttpService.submit(this.token, payload).subscribe({
       next: () => {
         this.isSubmitting = false;
         this.submitted = true;
-        this.showBubbles = true;
 
         setTimeout(() => {
           const el = this.snapContainer?.nativeElement;
@@ -416,8 +426,6 @@ export class ClientQuestionnaireComponent implements OnInit {
           }
           this.progressPercent = 100;
         }, 50);
-
-        setTimeout(() => { this.showBubbles = false; }, 3000);
       },
       error: (err) => {
         this.isSubmitting = false;

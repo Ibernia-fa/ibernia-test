@@ -14,6 +14,13 @@ import { NavItemService } from 'src/app/layouts/full/nav-item.service';
 import { NotificationPreferencesService, NotificationPreference } from './notification-preferences.service';
 import { WebPushService } from './web-push.service';
 import { MyNotificationsService, UserNotificationItem } from 'src/app/core/services/my-notifications.service';
+import {
+  MFA_REMINDER_NOTIFICATION_ID,
+  prependMfaReminderNotification,
+  userNeedsMfaReminder,
+} from 'src/app/core/mfa-reminder-notification';
+import { AuthService } from 'src/app/auth/services/auth.service';
+import { environment } from 'src/environments/environment';
 import { TablerIconsModule } from 'angular-tabler-icons';
 
 @Component({
@@ -49,13 +56,15 @@ export class NotificationsComponent implements OnInit {
   notifications: UserNotificationItem[] = [];
   notificationsLoading = false;
   unreadCount = 0;
+  readonly mfaReminderId = MFA_REMINDER_NOTIFICATION_ID;
 
   constructor(
     private navItemService: NavItemService,
     private prefsService: NotificationPreferencesService,
     private webPushService: WebPushService,
     private myNotifications: MyNotificationsService,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {
     this.navItemService.currentRouteName = 'Notifications';
     this.myNotifications.listsChanged$
@@ -136,17 +145,32 @@ export class NotificationsComponent implements OnInit {
     this.notificationsLoading = true;
     this.myNotifications.getList().subscribe({
       next: (list) => {
-        this.notifications = list;
+        this.notifications = prependMfaReminderNotification(
+          list,
+          this.authService.getUserProfile() as Record<string, unknown> | null,
+          environment.authority
+        );
         this.notificationsLoading = false;
       },
       error: () => (this.notificationsLoading = false)
     });
     this.myNotifications.getUnreadCount().subscribe({
-      next: (c) => (this.unreadCount = c)
+      next: (c) =>
+        (this.unreadCount = userNeedsMfaReminder(
+          this.authService.getUserProfile() as Record<string, unknown> | null
+        )
+          ? c + 1
+          : c)
     });
   }
 
   onNotificationClick(n: UserNotificationItem): void {
+    if (n.id === MFA_REMINDER_NOTIFICATION_ID) {
+      if (n.deepLink?.startsWith('http')) {
+        window.open(n.deepLink, '_blank', 'noopener,noreferrer');
+      }
+      return;
+    }
     if (!n.isRead) {
       this.myNotifications.markAsRead(n.id).subscribe({
         next: () => {
@@ -156,14 +180,21 @@ export class NotificationsComponent implements OnInit {
       });
     }
     if (n.deepLink) {
-      this.router.navigateByUrl(n.deepLink);
+      if (n.deepLink.startsWith('http')) {
+        window.open(n.deepLink, '_blank', 'noopener,noreferrer');
+      } else {
+        this.router.navigateByUrl(n.deepLink);
+      }
     }
   }
 
   onMarkAllAsRead(): void {
     this.myNotifications.markAllAsRead().subscribe({
       next: () => {
-        this.unreadCount = 0;
+        this.notifications.forEach((x) => {
+          if (x.id !== MFA_REMINDER_NOTIFICATION_ID) x.isRead = true;
+        });
+        this.loadNotifications();
       },
     });
   }

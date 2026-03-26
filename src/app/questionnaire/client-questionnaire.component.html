@@ -219,8 +219,10 @@
             <button
               type="button"
               class="button-icon submit-btn"
+              [class.submit-btn--loading]="isSubmitting"
+              [attr.aria-busy]="isSubmitting ? 'true' : null"
               (click)="onSubmit()"
-              [disabled]="isSubmitting"
+              [disabled]="isSubmitting || submitted"
             >
               @if (isSubmitting) {
                 <mat-spinner diameter="24"></mat-spinner>
@@ -237,13 +239,6 @@
       @if (submitted) {
         <div class="snap-section" #successSection>
           <div class="section-inner narrative-section no-scroll success-section">
-            <!-- Bubble particles -->
-            <div class="bubbles-container" [class.bubbles-active]="showBubbles" aria-hidden="true">
-              @for (b of bubbleCount; track $index) {
-                <span class="bubble" [style.--i]="$index"></span>
-              }
-            </div>
-
             <div class="success-badge">
               <svg width="56" height="56" viewBox="0 0 48 48" fill="none">
                 <circle cx="24" cy="24" r="22" stroke="#22c55e" stroke-width="3" fill="none"/>

@@ -35,6 +35,7 @@ import {
 } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { TranslateModule } from '@ngx-translate/core';
 import { Store } from '@ngrx/store';
@@ -92,6 +93,7 @@ class DmyDateAdapter extends NativeDateAdapter {
     MatDialogModule,
     MatIconModule,
     MatDividerModule,
+    MatTooltipModule,
     TranslateModule,
   ],
   providers: [
@@ -116,6 +118,8 @@ export class ClientEditComponent {
   clientForm: FormGroup;
   clientId: string;
   showPartner: boolean = false;
+  /** True when the API returned a partner with a first name (cannot remove from this screen). */
+  hasPersistedPartner = false;
   allCountries = allCountries;
   selectedClientCountryISO = CountryISO.UnitedStates;
   selectedPartnerCountryISO = CountryISO.UnitedStates;
@@ -240,6 +244,7 @@ export class ClientEditComponent {
         this.clientForm.controls['notes'].patchValue(res?.notes);
 
         if (res.partnerDetail?.firstName) {
+          this.hasPersistedPartner = true;
           this.togglePartnerSection(true);
           var partnerFormGroup = this.clientForm.get('partner') as FormGroup
 
@@ -270,13 +275,8 @@ export class ClientEditComponent {
   }
 
   onPartnerCheckboxClick() {
-    if (this.showPartner) {
-      const confirmed = window.confirm(
-        'Removing a partner will affect any Joint or Partner-owned saving pots. ' +
-        'You will need to manually delete those pots afterwards.\n\n' +
-        'Do you want to continue?'
-      );
-      if (!confirmed) return;
+    if (this.hasPersistedPartner) {
+      return;
     }
     this.togglePartnerSection(!this.showPartner);
   }
@@ -356,7 +356,7 @@ export class ClientEditComponent {
           phone: this.clientForm.controls['phone'].value?.e164Number,
           inflationRate: round2(this.clientForm.controls['inflationRate'].value),
         },
-        partnerDetail: this.showPartner ? {
+        partnerDetail: this.showPartner || this.hasPersistedPartner ? {
           firstName: partnerGroup.controls['firstName']?.value,
           lastName: partnerGroup.controls['lastName']?.value,
           birthDate: this.fixDate(partnerGroup.controls['dob']?.value),

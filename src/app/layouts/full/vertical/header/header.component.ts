@@ -43,6 +43,12 @@ import { LanguageService } from 'src/app/core/language.service';
 import { LanguageLoaderService } from '../../language-loader.service';
 import { BrandingComponent } from '../sidebar/branding.component';
 import { MyNotificationsService, UserNotificationItem } from 'src/app/core/services/my-notifications.service';
+import {
+  MFA_REMINDER_NOTIFICATION_ID,
+  prependMfaReminderNotification,
+  userNeedsMfaReminder,
+} from 'src/app/core/mfa-reminder-notification';
+import { environment } from 'src/environments/environment';
 
 interface notifications {
   id: number;
@@ -171,6 +177,8 @@ showFiller = false;
   private lastNotificationsFetchAt = 0;
   private readonly NOTIFICATIONS_CACHE_MS = 60000; // 1 min
 
+  readonly mfaReminderId = MFA_REMINDER_NOTIFICATION_ID;
+
   constructor(
     private settings: CoreService,
     private vsidenav: CoreService,
@@ -206,7 +214,7 @@ showFiller = false;
         this.lastNotificationsFetchAt = 0;
         this.myNotifications.getList(this.notificationFilter).subscribe({
           next: (list) => {
-            this.userNotifications = list;
+            this.userNotifications = this.mergeNotificationsList(list);
             this.cdr.markForCheck();
           },
           error: () => this.cdr.markForCheck(),
@@ -456,9 +464,23 @@ get userInitials(): string {
 
   loadUnreadCount(): void {
     this.myNotifications.getUnreadCount().subscribe({
-      next: (c) => (this.unreadCount = c),
+      next: (c) =>
+        (this.unreadCount = this.adjustUnreadForMfa(c)),
       error: () => {}
     });
+  }
+
+  private mergeNotificationsList(list: UserNotificationItem[]): UserNotificationItem[] {
+    return prependMfaReminderNotification(
+      list,
+      this.Authservice.getUserProfile() as Record<string, unknown> | null,
+      environment.authority
+    );
+  }
+
+  private adjustUnreadForMfa(serverCount: number): number {
+    const profile = this.Authservice.getUserProfile() as Record<string, unknown> | null;
+    return userNeedsMfaReminder(profile) ? serverCount + 1 : serverCount;
   }
 
   onNotificationMenuOpened(): void {
@@ -473,7 +495,7 @@ get userInitials(): string {
     this.notificationsLoading = !hasCache; // Only show loading if no cache
     this.myNotifications.getList(this.notificationFilter).subscribe({
       next: (list) => {
-        this.userNotifications = list;
+        this.userNotifications = this.mergeNotificationsList(list);
         this.notificationsLoading = false;
         this.lastNotificationsFetchAt = Date.now();
       },
@@ -489,7 +511,7 @@ get userInitials(): string {
     this.lastNotificationsFetchAt = 0;
     this.myNotifications.getList(filter).subscribe({
       next: (list) => {
-        this.userNotifications = list;
+        this.userNotifications = this.mergeNotificationsList(list);
         this.notificationsLoading = false;
         this.lastNotificationsFetchAt = Date.now();
         this.cdr.markForCheck();
@@ -502,6 +524,12 @@ get userInitials(): string {
   }
 
   onNotificationClick(n: UserNotificationItem): void {
+    if (n.id === MFA_REMINDER_NOTIFICATION_ID) {
+      if (n.deepLink?.startsWith('http')) {
+        window.open(n.deepLink, '_blank', 'noopener,noreferrer');
+      }
+      return;
+    }
     if (!n.isRead) {
       this.myNotifications.markAsRead(n.id).subscribe({
         next: () => {
@@ -511,7 +539,11 @@ get userInitials(): string {
       });
     }
     if (n.deepLink) {
-      this.router.navigateByUrl(n.deepLink);
+      if (n.deepLink.startsWith('http')) {
+        window.open(n.deepLink, '_blank', 'noopener,noreferrer');
+      } else {
+        this.router.navigateByUrl(n.deepLink);
+      }
     }
   }
 
@@ -519,7 +551,10 @@ get userInitials(): string {
     event?.stopPropagation();
     this.myNotifications.markAllAsRead().subscribe({
       next: () => {
-        this.unreadCount = 0;
+        this.userNotifications.forEach((x) => {
+          if (x.id !== MFA_REMINDER_NOTIFICATION_ID) x.isRead = true;
+        });
+        this.loadUnreadCount();
       },
     });
   }

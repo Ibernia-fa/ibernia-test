@@ -83,9 +83,8 @@
   }
 }
 
-/* Hide the empty SVG axis titles so they don't consume space */
-:host ::ng-deep .apexcharts-yaxis-title,
-:host ::ng-deep .apexcharts-xaxis-title {
+/* Hide the empty SVG y-axis title so it doesn't consume space */
+:host ::ng-deep .apexcharts-yaxis-title {
   display: none;
 }
 

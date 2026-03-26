@@ -347,9 +347,10 @@ html .customizerNav {
 .vis-item.custom-icon::after {
   content: "";
   position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  top: 100%;
+  left: 1px;
+  top: 24px;
+  // transform: translateX(-50%);
+  // top: 100%;
   width: 1.5px;
   height: 500px;
   // pointer-events: none;

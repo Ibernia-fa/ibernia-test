@@ -264,16 +264,22 @@ html .topbar {
 .sidebar-visible .top-navigation-bar {
   margin-left: 273px;
   width: calc(100% - 273px);
-  transition:
-    margin-left 0.3s ease,
-    width 0.3s ease;
+  // transition:
+  //   margin-left 0.3s ease,
+  //   width 0.3s ease;
+  transition-duration: 400ms;
+  transition-timing-function: cubic-bezier(0.25, 0.8, 0.25, 1);
+  transition-property: transform, margin-left, width;
 }
 .sidebar-visible.sidebar-collapsed .top-navigation-bar {
   margin-left: 88px;
   width: calc(100% - 88px);
-  transition:
-    margin-left 0.3s ease,
-    width 0.3s ease;
+  // transition:
+  //   margin-left 0.3s ease,
+  //   width 0.3s ease;
+  transition-duration: 400ms;
+  transition-timing-function: cubic-bezier(0.25, 0.8, 0.25, 1);
+  transition-property: transform, margin-left, width;
 }
 
 // Header breadcrumb (Home icon > Client name > Plan name)
@@ -533,6 +539,9 @@ html .topbar {
       }
       &.birthday::before {
         background: #e91e63;
+      }
+      &.notification-type-security::before {
+        background: #d97706;
       }
     }
 

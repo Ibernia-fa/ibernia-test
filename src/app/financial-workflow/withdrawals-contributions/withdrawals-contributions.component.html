@@ -161,50 +161,8 @@
     </mat-card>
 
     <div class="income-expense-tables">
-      <mat-card class="ibr-new-dashboad-card colab-widthdraw-onboard">
-        <div class="d-flex flex-column onboard-wrapper">
-          <h3 class="onboard-heading">You're just getting started 👋</h3>
-          <p>
-            You haven’t added any contributions or withdrawals yet. <br />
-            Set up recurring investments or plan future withdrawals.
-          </p>
-          <div class="onboard-button">
-            <button
-              (click)="newContributionClicked()"
-              type="button"
-              class="button-icon"
-            >
-              <span class="f-s-16 f-w-500">{{
-                "Add contribution" | translate
-              }}</span>
-              <img src="assets/images/svgs/add-icon.svg" alt="add-icon" />
-            </button>
-            <button
-              (click)="newWithdrawalClicked()"
-              type="button"
-              class="button-icon-outline"
-            >
-              <span class="f-s-16 f-w-500">{{
-                "Add withdrawal" | translate
-              }}</span>
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 20 20"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M11.2478 8.7522V0H8.7522V8.7522H0V11.2478H8.7522V20H11.2478V11.2478H20V8.7522H11.2478Z"
-                  fill="#4043AF"
-                />
-              </svg>
-            </button>
-          </div>
-        </div>
-      </mat-card>
-
       <!-- Contribution Table -->
+      @if (contributionDataSource.data.length > 0) {
       <mat-card class="ibr-new-dashboad-card clientTableContainer">
         <div class="heading-btn-wrapper">
           <div
@@ -452,9 +410,11 @@
         </div>
         <!-- End Table Wrapper  -->
       </mat-card>
+      }
       <!-- End Contribution Table Income -->
 
       <!-- Withdraw Table -->
+      @if (withdrawalDataSource.data.length > 0) {
       <mat-card class="ibr-new-dashboad-card clientTableContainer">
         <div class="heading-btn-wrapper">
           <div
@@ -695,7 +655,58 @@
         </div>
         <!-- End Table Wrapper  -->
       </mat-card>
+      }
       <!-- End Withdraw Table Income -->
+
+      <!-- OnBoard Withdraw and Contribution  -->
+      @if (contributionDataSource.data.length === 0 || withdrawalDataSource.data.length === 0) {
+      <mat-card class="ibr-new-dashboad-card colab-widthdraw-onboard">
+        <div class="d-flex flex-column onboard-wrapper">
+          <h3 class="onboard-heading">You're just getting started 👋</h3>
+          <p>
+            You haven’t added any contributions or withdrawals yet. <br />
+            Set up recurring investments or plan future withdrawals.
+          </p>
+          <div class="onboard-button">
+            @if (contributionDataSource.data.length === 0) {
+            <button
+              (click)="newContributionClicked()"
+              type="button"
+              class="button-icon"
+            >
+              <span class="f-s-16 f-w-500">{{
+                "Add contribution" | translate
+              }}</span>
+              <img src="assets/images/svgs/add-icon.svg" alt="add-icon" />
+            </button>
+            }
+            @if (withdrawalDataSource.data.length === 0) {
+            <button
+              (click)="newWithdrawalClicked()"
+              type="button"
+              class="button-icon-outline"
+            >
+              <span class="f-s-16 f-w-500">{{
+                "Add withdrawal" | translate
+              }}</span>
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 20 20"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M11.2478 8.7522V0H8.7522V8.7522H0V11.2478H8.7522V20H11.2478V11.2478H20V8.7522H11.2478Z"
+                  fill="#4043AF"
+                />
+              </svg>
+            </button>
+            }
+          </div>
+        </div>
+      </mat-card>
+      }
     </div>
   } @else {
     <div class="h-300">

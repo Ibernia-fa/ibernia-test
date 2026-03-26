@@ -106,7 +106,7 @@
           <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4" matTooltip="{{ 'Bio tooltip' | translate }}">
         </mat-label>
         <mat-form-field appearance="outline" class="w-100">
-          <textarea matInput formControlName="bio" placeholder="{{ 'Tell us a bit about yourself' | translate }}" maxlength="250"></textarea>
+          <textarea matInput formControlName="bio" placeholder="{{ 'This bio is included in your client questionnaire to give clients a more personal introduction to who you are. Use it to share your professional background, your advisory style, and a few personal details that help build confidence and rapport.' | translate }}" maxlength="250"></textarea>
           <mat-hint align="end">{{ (form.get('bio')?.value?.length || 0) }} / 250</mat-hint>
         </mat-form-field>
         <div class="m-t-8 d-flex justify-content-end">
