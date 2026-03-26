@@ -187,7 +187,6 @@ export class ReportsComponent {
   compareReport: ChartSeries | null = null;
   compareTimeline: FinancialTimeline | null = null;
   isCompareLoading = false;
-  showLineChart = false;
   incomeDataSource: MatTableDataSource<FinancialViewModel> =
     new MatTableDataSource(new Array<FinancialViewModel>());
   expenseDataSource: MatTableDataSource<FinancialViewModel> =
@@ -623,11 +622,6 @@ export class ReportsComponent {
     this.compareTimeline = null;
     this.effectiveCompareReportEndDate = null;
     this.isCompareLoading = false;
-    this.showLineChart = false;
-  }
-
-  toggleLineChart() {
-    this.showLineChart = !this.showLineChart;
   }
 
   onComparePlansClicked() {
