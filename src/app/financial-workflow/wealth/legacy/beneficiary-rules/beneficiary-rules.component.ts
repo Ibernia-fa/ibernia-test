@@ -75,6 +75,11 @@ export class BeneficiaryRulesComponent {
     return this.getEligibleMembers(this.activeScenario.type);
   }
 
+  get canAddRecipient(): boolean {
+    const selectedIds = new Set(this.recipients.map(r => r.memberId).filter(id => !!id));
+    return this.eligibleMembers.some(m => !selectedIds.has(m.id));
+  }
+
   getAvailableMembersForRow(rowIndex: number): FamilyMemberModel[] {
     const selectedInOtherRows = new Set(
       this.recipients
