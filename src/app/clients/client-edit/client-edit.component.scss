@@ -112,6 +112,11 @@
   }
 }
 
+.partner-checkbox-disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
 .dialog-actions {
   display: flex;
   justify-content: flex-end;

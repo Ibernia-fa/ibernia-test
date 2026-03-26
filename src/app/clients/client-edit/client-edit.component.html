@@ -226,20 +226,21 @@
 
     <!-- Partner checkbox -->
     <div class="full-width">
-      <section class="example-section d-flex flex-column gap-4">
-        <mat-checkbox
-          class="example-margin"
-          id="partner-section"
-          [checked]="showPartner"
-          [disabled]="hasPersistedPartner"
-          (click)="onPartnerCheckboxClick()"
-          >{{ "Add a partner or spouse" | translate }}</mat-checkbox
+      <section class="example-section">
+        <div
+          [matTooltip]="hasPersistedPartner ? ('A saved partner cannot be removed' | translate) : ''"
+          matTooltipPosition="above"
         >
-        @if (hasPersistedPartner) {
-          <span class="f-s-12 text-muted">{{
-            "A saved partner cannot be removed from this screen." | translate
-          }}</span>
-        }
+          <mat-checkbox
+            class="example-margin"
+            [class.partner-checkbox-disabled]="hasPersistedPartner"
+            id="partner-section"
+            [checked]="showPartner"
+            [disabled]="hasPersistedPartner"
+            (click)="onPartnerCheckboxClick()"
+            >{{ "Add a partner or spouse" | translate }}</mat-checkbox
+          >
+        </div>
       </section>
     </div>
 
