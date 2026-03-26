@@ -262,8 +262,9 @@
         </div>
         <!-- End Starting pot value Field  -->
 
-        <!-- Slider Section - Return Rate (NOT for Cash or Pension fund) -->
+        <!-- Slider Section - Return Rate (NOT for Cash or Pension fund, hidden in Net Worth) -->
         @if (
+          !fromNetWorth &&
           savingsForm.get("name")?.value !== "Cash" &&
           savingsForm.get("name")?.value !== "Pension fund"
         ) {
@@ -368,8 +369,8 @@
         }
         <!-- End Slider Section  -->
 
-        <!-- Pension fund specific fields -->
-        @if (savingsForm.get("name")?.value === "Pension fund") {
+        <!-- Pension fund specific fields (hidden in Net Worth) -->
+        @if (!fromNetWorth && savingsForm.get("name")?.value === "Pension fund") {
           <div class="d-flex flex-column gap-20">
             <!-- Contribution Amount Field - Matched to "Net amount" layout -->
             <div class="d-flex flex-column gap-4 net-fields">
@@ -621,7 +622,8 @@
         }
         <!-- End Pension fund specific fields -->
 
-        <!-- Lock Pot and Commissions Section -->
+        <!-- Lock Pot and Commissions Section (hidden in Net Worth) -->
+        @if (!fromNetWorth) {
         <div class="d-flex flex-column">
           @if (savingsForm.get("name")?.value !== "Cash") {
             <!-- Lock Pot Checkbox -->
@@ -1274,6 +1276,13 @@
             }
           }
         </div>
+        }
+
+        @if (fromNetWorth) {
+          <p class="net-worth-helper-note">
+            {{ 'This asset is linked to Saving Pots. Any changes made here will be reflected there as well.' | translate }}
+          </p>
+        }
       </div>
     </mat-dialog-content>
     <!-- End Modal Body  -->

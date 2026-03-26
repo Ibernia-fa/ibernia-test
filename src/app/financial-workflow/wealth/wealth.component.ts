@@ -285,7 +285,8 @@ export class WealthComponent implements OnInit {
             existingSavingPots: savingPots?.clientSavings || [],
             hasPartner: this.hasPartner,
             clientFirstName: this.clientFirstName,
-            partnerFirstName: this.partnerFirstName
+            partnerFirstName: this.partnerFirstName,
+            fromNetWorth: true
           }
         });
 
