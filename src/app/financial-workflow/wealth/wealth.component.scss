@@ -278,6 +278,15 @@
   }
 }
 
+.clickable-row {
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background-color: #f1f5f9 !important;
+  }
+}
+
 .col-actions {
   width: 40px;
   text-align: center;

@@ -143,7 +143,8 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let row of dashboard.assets; let odd = odd" [class.alt-row]="odd">
+            <tr *ngFor="let row of dashboard.assets; let odd = odd" [class.alt-row]="odd"
+                class="clickable-row" (click)="onEditAsset(row)">
               <td>{{row.category}}</td>
               <td *ngIf="hasPartner">
                 <span class="ownership-badge" [ngClass]="getOwnershipClass(row.ownership)">
@@ -153,7 +154,7 @@
               <td class="text-right">
                 <span>{{clientData?.preferredCurrency | currencySymbol}}</span>{{row.value | number:'1.0-0'}}
               </td>
-              <td class="col-actions">
+              <td class="col-actions" (click)="$event.stopPropagation()">
                 <button [matMenuTriggerFor]="assetMenu" class="menu-trigger-btn">
                   <mat-icon class="menu-icon">more_vert</mat-icon>
                 </button>
@@ -208,7 +209,8 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let row of dashboard.liabilities; let odd = odd" [class.alt-row]="odd">
+            <tr *ngFor="let row of dashboard.liabilities; let odd = odd" [class.alt-row]="odd"
+                class="clickable-row" (click)="onEditLiability(row)">
               <td>{{row.type}}</td>
               <td *ngIf="hasPartner">
                 <span class="ownership-badge" [ngClass]="getOwnershipClass(row.ownership)">
@@ -218,7 +220,7 @@
               <td class="text-right">
                 <span>{{clientData?.preferredCurrency | currencySymbol}}</span>{{row.outstanding | number:'1.0-0'}}
               </td>
-              <td class="col-actions">
+              <td class="col-actions" (click)="$event.stopPropagation()">
                 <button [matMenuTriggerFor]="liabilityMenu" class="menu-trigger-btn">
                   <mat-icon class="menu-icon">more_vert</mat-icon>
                 </button>
