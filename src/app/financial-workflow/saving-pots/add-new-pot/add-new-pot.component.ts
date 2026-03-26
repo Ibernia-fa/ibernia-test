@@ -98,6 +98,7 @@ export class AddNewPotComponent {
   existingSavingPots: any[] = [];
   showNameEdit: boolean = false;
   hasPartner: boolean = false;
+  fromNetWorth: boolean = false;
   clientFirstName: string = '';
   partnerFirstName: string = '';
   SavingPotOwnership = SavingPotOwnership;
@@ -154,6 +155,7 @@ export class AddNewPotComponent {
     this.eventsList = data.eventsList;
     this.existingSavingPots = data.existingSavingPots || [];  // Get existing pots for smart defaults
     this.hasPartner = data.hasPartner ?? false;
+    this.fromNetWorth = data.fromNetWorth ?? false;
     this.scenarioMode = data.scenarioMode ?? false;
     this.clientFirstName = data.clientFirstName ?? '';
     this.partnerFirstName = data.partnerFirstName ?? '';

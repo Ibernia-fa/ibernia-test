@@ -136,7 +136,6 @@
         <table class="wealth-table">
           <thead>
             <tr>
-              <th>Description</th>
               <th>Category</th>
               <th *ngIf="hasPartner">Ownership</th>
               <th class="text-right">Value</th>
@@ -145,7 +144,6 @@
           </thead>
           <tbody>
             <tr *ngFor="let row of dashboard.assets; let odd = odd" [class.alt-row]="odd">
-              <td>{{row.description}}</td>
               <td>{{row.category}}</td>
               <td *ngIf="hasPartner">
                 <span class="ownership-badge" [ngClass]="getOwnershipClass(row.ownership)">
@@ -203,7 +201,7 @@
         <table class="wealth-table">
           <thead>
             <tr>
-              <th>Description</th>
+              <th>Category</th>
               <th *ngIf="hasPartner">Ownership</th>
               <th class="text-right">Value</th>
               <th class="col-actions"></th>
@@ -211,7 +209,7 @@
           </thead>
           <tbody>
             <tr *ngFor="let row of dashboard.liabilities; let odd = odd" [class.alt-row]="odd">
-              <td>{{row.description}}</td>
+              <td>{{row.type}}</td>
               <td *ngIf="hasPartner">
                 <span class="ownership-badge" [ngClass]="getOwnershipClass(row.ownership)">
                   {{getOwnershipLabel(row.ownership)}}
