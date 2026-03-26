@@ -14,8 +14,7 @@ export function userNeedsMfaReminder(profile: Record<string, unknown> | null | u
 /** Prepends a synthetic 2FA reminder when MFA is not enabled (claims from Identity). */
 export function prependMfaReminderNotification(
   list: UserNotificationItem[],
-  userProfile: Record<string, unknown> | null | undefined,
-  identityAuthority: string
+  userProfile: Record<string, unknown> | null | undefined
 ): UserNotificationItem[] {
   if (!userProfile || !userNeedsMfaReminder(userProfile)) {
     return list;
@@ -34,9 +33,6 @@ export function prependMfaReminderNotification(
     }
   }
 
-  const base = identityAuthority.replace(/\/$/, '');
-  const setupUrl = `${base}/Manage/TwoFactorAuthentication`;
-
   const synthetic: UserNotificationItem = {
     id: MFA_REMINDER_NOTIFICATION_ID,
     type: 'mfa_reminder',
@@ -45,7 +41,7 @@ export function prependMfaReminderNotification(
     preview: previewKey,
     sentAtUtc: new Date().toISOString(),
     isRead: false,
-    deepLink: setupUrl,
+    deepLink: '/settings/security',
     iconType: 'security',
     previewParams,
   };
