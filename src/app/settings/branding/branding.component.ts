@@ -9,7 +9,11 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { NgIf } from '@angular/common';
-import { ImageCropDialogComponent } from '../account-preferences/image-crop-dialog/image-crop-dialog.component';
+import {
+  ImageCropDialogComponent,
+  ImageCropDialogResult,
+} from '../account-preferences/image-crop-dialog/image-crop-dialog.component';
+import type { ImageTransform } from 'ngx-image-cropper';
 import {
   isAllowedFileType,
   isWithinSizeLimit,
@@ -32,6 +36,8 @@ import {
 export class BrandingComponent implements OnInit {
   profileImage: string | null = null;   // Data URL preview
   backgroundImage: string | null = null;   // Data URL preview
+  private logoCropSource: string | null = null;
+  private logoCropTransform: ImageTransform | null = null;
   private initialProfileImage: string | null = null;
   private initialBackgroundImage: string | null = null;
   hasChanges = false;
@@ -60,6 +66,8 @@ export class BrandingComponent implements OnInit {
       next: (p) => {
         console.log(p);
         this.profileImage = ensureDataUrl(p?.profilePhotoUrl ?? null);
+        this.logoCropSource = this.profileImage;
+        this.logoCropTransform = null;
         this.backgroundImage = ensureDataUrl(p?.backgroundPhotoUrl ?? null);
         this.initialProfileImage = this.profileImage;
         this.initialBackgroundImage = this.backgroundImage;
@@ -94,6 +102,8 @@ export class BrandingComponent implements OnInit {
       let dataUrl = await fileToDataUrl(file);
       if (imageType === 'profile') {
         dataUrl = await compressImage(dataUrl);
+        this.logoCropSource = dataUrl;
+        this.logoCropTransform = null;
         this.openCropDialog(dataUrl);
       } else {
         const dims = await getImageDimensions(dataUrl);
@@ -132,20 +142,21 @@ export class BrandingComponent implements OnInit {
         imageBase64,
         cropType: 'company' as const,
         title: 'Crop company logo',
+        initialTransform: this.logoCropTransform ?? undefined,
       },
     });
 
-    dialogRef.afterClosed().subscribe(async (result: string | null) => {
-      if (result) {
+    dialogRef.afterClosed().subscribe(async (result: ImageCropDialogResult | null) => {
+      if (result?.croppedBase64) {
+        this.logoCropTransform = result.transform;
         try {
-          this.profileImage = await compressForProfilePayload(result);
+          this.profileImage = await compressForProfilePayload(result.croppedBase64);
           this.updateHasChanges();
         } catch {
-          this.profileImage = result;
+          this.profileImage = result.croppedBase64;
           this.updateHasChanges();
         }
       } else {
-        // User cancelled - ensure loader is hidden (no image stored)
         this.isUploading = false;
       }
     });
@@ -154,8 +165,9 @@ export class BrandingComponent implements OnInit {
   cropImage(event: Event): void {
     event.stopPropagation();
     event.preventDefault();
-    if (!this.profileImage) return;
-    this.openCropDialog(this.profileImage);
+    const src = this.logoCropSource ?? this.profileImage;
+    if (!src) return;
+    this.openCropDialog(src);
   }
 
   clearImage(e: Event, type: 'profile' | 'background') {
@@ -163,6 +175,8 @@ export class BrandingComponent implements OnInit {
     e.preventDefault();
     if (type === 'profile') {
       this.profileImage = null;
+      this.logoCropSource = null;
+      this.logoCropTransform = null;
     } else if (type === 'background') {
       this.backgroundImage = null;
     }
