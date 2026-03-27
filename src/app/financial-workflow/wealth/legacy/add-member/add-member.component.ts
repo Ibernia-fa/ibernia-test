@@ -52,18 +52,22 @@ export class AddMemberComponent {
 
   private buildRoleOptions(): void {
     const existing = this.data.existingMembers;
+    const hasPartnerMember = existing.some(m => m.role === 'Partner' || m.role === FamilyRole.Partner);
     const hasClientFather = existing.some(m => m.role === 'ClientFather');
     const hasClientMother = existing.some(m => m.role === 'ClientMother');
     const hasPartnerFather = existing.some(m => m.role === 'PartnerFather');
     const hasPartnerMother = existing.some(m => m.role === 'PartnerMother');
 
+    const hasPartner = this.data.hasPartner || hasPartnerMember;
+
     const roles: RoleOption[] = [
       { value: FamilyRole.Child, label: 'Child', disabled: false },
+      { value: FamilyRole.Partner, label: 'Partner', disabled: hasPartner },
       { value: FamilyRole.ClientFather, label: 'Father', disabled: hasClientFather },
       { value: FamilyRole.ClientMother, label: 'Mother', disabled: hasClientMother },
     ];
 
-    if (this.data.hasPartner) {
+    if (hasPartner) {
       roles.push(
         { value: FamilyRole.PartnerFather, label: "Partner's father", disabled: hasPartnerFather },
         { value: FamilyRole.PartnerMother, label: "Partner's mother", disabled: hasPartnerMother },
@@ -74,7 +78,7 @@ export class AddMemberComponent {
       { value: FamilyRole.ClientSibling, label: 'Sibling', disabled: false },
     );
 
-    if (this.data.hasPartner) {
+    if (hasPartner) {
       roles.push(
         { value: FamilyRole.PartnerSibling, label: "Partner's sibling", disabled: false },
       );
