@@ -473,7 +473,8 @@ get userInitials(): string {
   private mergeNotificationsList(list: UserNotificationItem[]): UserNotificationItem[] {
     return prependMfaReminderNotification(
       list,
-      this.Authservice.getUserProfile() as Record<string, unknown> | null
+      this.Authservice.getUserProfile() as Record<string, unknown> | null,
+      environment.authority
     );
   }
 

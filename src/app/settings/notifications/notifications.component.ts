@@ -20,6 +20,7 @@ import {
   userNeedsMfaReminder,
 } from 'src/app/core/mfa-reminder-notification';
 import { AuthService } from 'src/app/auth/services/auth.service';
+import { environment } from 'src/environments/environment';
 import { TablerIconsModule } from 'angular-tabler-icons';
 
 @Component({
@@ -146,7 +147,8 @@ export class NotificationsComponent implements OnInit {
       next: (list) => {
         this.notifications = prependMfaReminderNotification(
           list,
-          this.authService.getUserProfile() as Record<string, unknown> | null
+          this.authService.getUserProfile() as Record<string, unknown> | null,
+          environment.authority
         );
         this.notificationsLoading = false;
       },
