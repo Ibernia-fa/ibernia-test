@@ -29,6 +29,7 @@ body {
   }
   // height: calc(100dvh - 60px);
   height: calc(100dvh - 0px);
+  overscroll-behavior-y: none;
   background-color: #fafafa !important;
   /* Frosted veil over default asset only — backdrop-filter blurs custom uploads into a color wash */
   &::after {
