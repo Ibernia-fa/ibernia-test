@@ -40,6 +40,8 @@ export class AddMemberComponent {
       cashflowId: string;
       hasPartner: boolean;
       existingMembers: FamilyMemberModel[];
+      clientFirstName: string;
+      partnerFirstName: string;
     }
   ) {
     this.form = this.fb.group({
@@ -59,28 +61,30 @@ export class AddMemberComponent {
     const hasPartnerMother = existing.some(m => m.role === 'PartnerMother');
 
     const hasPartner = this.data.hasPartner || hasPartnerMember;
+    const clientName = this.data.clientFirstName || 'Client';
+    const partnerName = this.data.partnerFirstName || 'Partner';
 
     const roles: RoleOption[] = [
       { value: FamilyRole.Child, label: 'Child', disabled: false },
       { value: FamilyRole.Partner, label: 'Partner', disabled: hasPartner },
-      { value: FamilyRole.ClientFather, label: 'Father', disabled: hasClientFather },
-      { value: FamilyRole.ClientMother, label: 'Mother', disabled: hasClientMother },
+      { value: FamilyRole.ClientFather, label: `${clientName}\u2019s father`, disabled: hasClientFather },
+      { value: FamilyRole.ClientMother, label: `${clientName}\u2019s mother`, disabled: hasClientMother },
     ];
 
     if (hasPartner) {
       roles.push(
-        { value: FamilyRole.PartnerFather, label: "Partner's father", disabled: hasPartnerFather },
-        { value: FamilyRole.PartnerMother, label: "Partner's mother", disabled: hasPartnerMother },
+        { value: FamilyRole.PartnerFather, label: `${partnerName}\u2019s father`, disabled: hasPartnerFather },
+        { value: FamilyRole.PartnerMother, label: `${partnerName}\u2019s mother`, disabled: hasPartnerMother },
       );
     }
 
     roles.push(
-      { value: FamilyRole.ClientSibling, label: 'Sibling', disabled: false },
+      { value: FamilyRole.ClientSibling, label: `${clientName}\u2019s sibling`, disabled: false },
     );
 
     if (hasPartner) {
       roles.push(
-        { value: FamilyRole.PartnerSibling, label: "Partner's sibling", disabled: false },
+        { value: FamilyRole.PartnerSibling, label: `${partnerName}\u2019s sibling`, disabled: false },
       );
     }
 

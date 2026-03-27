@@ -280,7 +280,9 @@ export class LegacyComponent implements OnInit, OnChanges {
       data: {
         cashflowId: this.cashflowId,
         hasPartner: this.hasPartner,
-        existingMembers: this.dashboard?.familyMembers ?? []
+        existingMembers: this.dashboard?.familyMembers ?? [],
+        clientFirstName: this.clientMember?.firstName ?? '',
+        partnerFirstName: this.partnerMember?.firstName ?? '',
       }
     });
 
