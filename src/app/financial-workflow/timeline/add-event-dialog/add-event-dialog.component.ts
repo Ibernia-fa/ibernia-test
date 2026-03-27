@@ -151,7 +151,7 @@ export class AddEventDialogComponent {
 
   get financingCalculatorToggleLabelKey(): string {
     return this.financingCalculatorKind === 'mortgage'
-      ? 'Use mortgage calculator'
+      ? 'See a Mortgage calculator'
       : 'Use loan calculator';
   }
 
@@ -1057,7 +1057,7 @@ export class AddEventDialogComponent {
       maxWidth: '95vw',
       autoFocus: false,
       data: {
-        title: 'Mortgage Calculator',
+        title: 'Mortgage calculator',
         clientCountryCode: this.clientCountryCode,
         currencySymbol: this.clientPreferredCurrency,
         calculatorKind: this.financingCalculatorKind,
@@ -1080,7 +1080,7 @@ export class AddEventDialogComponent {
       maxWidth: '95vw',
       autoFocus: false,
       data: {
-        title: 'Mortgage Calculator',
+        title: 'Mortgage calculator',
         clientCountryCode: this.clientCountryCode,
         currencySymbol: this.clientPreferredCurrency,
         calculatorKind: 'loan',
