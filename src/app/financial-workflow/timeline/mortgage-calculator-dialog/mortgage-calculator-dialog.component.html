@@ -18,6 +18,7 @@
       [clientCountryCode]="data.clientCountryCode"
       [currencySymbol]="data.currencySymbol"
       [calculatorKind]="data.calculatorKind"
+      [priceLabel]="data.priceLabel || 'Property price'"
       [advisorDefaultInterestRate]="data.advisorDefaultInterestRate"
       [initialState]="data.initialState"
       (stateChanged)="onCalculatorStateChanged($event)"
