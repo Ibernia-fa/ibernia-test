@@ -164,7 +164,8 @@
   box-sizing: border-box;
 }
 
-::ng-deep .timeline-event-chip.retirement-age-chip {
+::ng-deep .timeline-event-chip.retirement-age-chip,
+::ng-deep .timeline-event-chip.partner-retirement-age-chip {
   padding: 1px 24px 1px 8px;
   font-size: 12px;
   width: 230.358px;
@@ -172,7 +173,8 @@
   max-width: 230.358px;
 }
 
-::ng-deep .timeline-event-chip.retirement-age-chip .icon {
+::ng-deep .timeline-event-chip.retirement-age-chip .icon,
+::ng-deep .timeline-event-chip.partner-retirement-age-chip .icon {
   width: 16px;
   height: 16px;
 }

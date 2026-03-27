@@ -577,6 +577,32 @@ export class SavingPotsComponent implements OnInit {
     }
   }
 
+  /** Label key for translate: Joint | Client | Partner (joint-account saving pots). */
+  getOwnershipKindLabelKey(saving: ClientSaving): string {
+    const ownership = saving.ownership ?? SavingPotOwnership.Joint;
+    switch (ownership) {
+      case SavingPotOwnership.Person1:
+        return 'Client';
+      case SavingPotOwnership.Person2:
+        return 'Partner';
+      default:
+        return 'Joint';
+    }
+  }
+
+  /** CSS modifier for `.ibr-chart-tag` background and text colour. */
+  getOwnershipBadgeModifierClass(saving: ClientSaving): string {
+    const ownership = saving.ownership ?? SavingPotOwnership.Joint;
+    switch (ownership) {
+      case SavingPotOwnership.Person1:
+        return 'ownership-client';
+      case SavingPotOwnership.Person2:
+        return 'ownership-partner';
+      default:
+        return 'ownership-joint';
+    }
+  }
+
   canDeleteSaving(saving: ClientSaving): boolean {
     if ((saving.name ?? '').trim().toLowerCase() !== 'cash') return true;
     const cashPotCount = (this.savingPots?.clientSavings ?? []).filter(

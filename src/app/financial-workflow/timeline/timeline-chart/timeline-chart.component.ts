@@ -813,7 +813,7 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
             start: new Date(startYear, 0, 1),
             end: new Date(startYear + visualWidth, 0, 1),
             type: 'range',
-            className: event.iconUrl,
+            className: this.getTimelineVisClassName(event),
             editable: {
               updateTime: true,
               remove: true,
@@ -830,7 +830,7 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
             content: this.getContent(event),
             start: new Date(startYear, 0, 1),
             end: new Date(clampedEndYear, 0, 1),
-            className: event.iconUrl,
+            className: this.getTimelineVisClassName(event),
             editable: {
               updateTime: true,
               remove: true,
@@ -1187,11 +1187,36 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
     }
   }
 
+  private isPartnerRetirementEvent(event: ClientEvent): boolean {
+    return !!(
+      event?.name?.toLowerCase().startsWith('retirement age') &&
+      event.isPartnerEvent
+    );
+  }
+
+  /** SVG base name for draggable chips and vis item content (distinct asset for partner retirement). */
+  getTimelineEventIconBase(event: ClientEvent): string {
+    if (this.isPartnerRetirementEvent(event)) {
+      return 'partner-retirement-age-icon';
+    }
+    return event.iconUrl;
+  }
+
+  /** vis-timeline CSS class for item background, connector line, and selection state. */
+  getTimelineVisClassName(event: ClientEvent): string {
+    if (this.isPartnerRetirementEvent(event)) {
+      return 'partner-retirement-age-icon';
+    }
+    return event.iconUrl;
+  }
+
   private getContent(event: ClientEvent): string {
     const title = this.getEventTitleForDisplay(event);
-    const img = event.iconUrl;
+    const img = this.getTimelineEventIconBase(event);
     const extraClass = event.name?.toLowerCase().startsWith('retirement age')
-      ? ' retirement-age-chip'
+      ? this.isPartnerRetirementEvent(event)
+        ? ' partner-retirement-age-chip'
+        : ' retirement-age-chip'
       : '';
     return `
     <div class="timeline-event-chip with-padding${extraClass}" title="${title}">

@@ -215,6 +215,14 @@ html .customizerNav {
   font-weight: 500;
   width: auto !important;
 }
+.vis-item.partner-retirement-age-icon,
+.vis-item.partner-retirement-age-icon.vis-selected {
+  background-color: #ffebcb;
+  color: #fe9614;
+  border: none !important;
+  font-weight: 500;
+  width: auto !important;
+}
 .vis-item.mortality-icon,
 .vis-item.mortality-icon.vis-selected {
   background-color: #f7f7f7;
@@ -344,6 +352,7 @@ html .customizerNav {
 .vis-item.new-business-icon::after,
 .vis-item.boat-icon::after,
 .vis-item.retirement-age-icon::after,
+.vis-item.partner-retirement-age-icon::after,
 .vis-item.custom-icon::after {
   content: "";
   position: absolute;
@@ -384,6 +393,9 @@ html .customizerNav {
 .vis-item.retirement-age-icon::after {
   background-color: #0088ff;
 }
+.vis-item.partner-retirement-age-icon::after {
+  background-color: #fe9614;
+}
 .vis-item.custom-icon::after {
   background-color: #0088ff;
 }
@@ -406,6 +418,7 @@ html .customizerNav {
 }
 .vis-item.birth-icon.vis-selected .vis-item-content,
 .vis-item.retirement-age-icon.vis-selected .vis-item-content,
+.vis-item.partner-retirement-age-icon.vis-selected .vis-item-content,
 .vis-item.home-icon.vis-selected .vis-item-content,
 .vis-item.car-icon.vis-selected .vis-item-content,
 .vis-item.new-business-icon.vis-selected .vis-item-content,

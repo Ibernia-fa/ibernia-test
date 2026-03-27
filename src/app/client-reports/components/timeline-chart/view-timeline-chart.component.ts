@@ -269,11 +269,11 @@ export class ViewTimelineChartComponent implements OnInit {
         if (!isOneOff && hasRealEnd) {
           return {
             id: event.id,
-            content: this.getContent(event.name, event.iconUrl),
+            content: this.getContentForEvent(event),
             start: new Date(startYear, 0, 1),
             end: new Date(event.end!.year, 0, 1),
             type: 'range',
-            className: event.iconUrl,
+            className: this.getTimelineVisClassName(event),
             editable: {
               updateTime: false,
               remove: false,
@@ -284,10 +284,10 @@ export class ViewTimelineChartComponent implements OnInit {
           const calculatedWidth = Math.floor(0.5 * event.name.length + 5);
           return {
             id: event.id,
-            content: this.getContent(event.name, event.iconUrl),
+            content: this.getContentForEvent(event),
             start: new Date(startYear, 0, 1),
             end: new Date(startYear + calculatedWidth, 0, 1),
-            className: event.iconUrl,
+            className: this.getTimelineVisClassName(event),
             editable: {
               updateTime: false,
               remove: false,
@@ -392,9 +392,38 @@ export class ViewTimelineChartComponent implements OnInit {
     }
   }
 
-  private getContent(title: string, img: string): string {
-  return `
-    <div class="timeline-event-chip with-padding">
+  private isPartnerRetirementEvent(event: ClientEvent): boolean {
+    return !!(
+      event?.name?.toLowerCase().startsWith('retirement age') &&
+      event.isPartnerEvent
+    );
+  }
+
+  private getTimelineEventIconBase(event: ClientEvent): string {
+    if (this.isPartnerRetirementEvent(event)) {
+      return 'partner-retirement-age-icon';
+    }
+    return event.iconUrl;
+  }
+
+  private getTimelineVisClassName(event: ClientEvent): string {
+    if (this.isPartnerRetirementEvent(event)) {
+      return 'partner-retirement-age-icon';
+    }
+    return event.iconUrl;
+  }
+
+  private getContentForEvent(event: ClientEvent): string {
+    const title = event.name ?? '';
+    const img = this.getTimelineEventIconBase(event);
+    const extraClass =
+      event.name?.toLowerCase().startsWith('retirement age')
+        ? this.isPartnerRetirementEvent(event)
+          ? ' partner-retirement-age-chip'
+          : ' retirement-age-chip'
+        : '';
+    return `
+    <div class="timeline-event-chip with-padding${extraClass}">
       <div class="event-left">
         <img src="/assets/images/svgs/${img}.svg" class="icon" />
         <span class="label">${title}</span>
