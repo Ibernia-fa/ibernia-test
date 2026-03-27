@@ -232,6 +232,11 @@ export class MortgageCalculatorComponent implements OnInit, OnChanges {
     });
   }
 
+  onBack(): void {
+    this.initForm();
+    this.stateChanged.emit(this.getState());
+  }
+
   onPropertyPriceInput(): void {
     setTimeout(() => {
       this.syncTierDefaults();

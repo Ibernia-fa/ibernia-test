@@ -1,8 +1,9 @@
-<form class="d-flex flex-column gap-32" [formGroup]="form" (ngSubmit)="onSave()">
-  <div class="d-flex align-items-center justify-content-between gap-10 modal-header">
-    @if (data.mode === 'edit') {
-      <div class="d-flex align-items-center gap-10">
-        <h3>
+<div class="w-100">
+  <div class="d-flex flex-column">
+    <!-- Header -->
+    <div class="dialog-header">
+      <h2 class="dialog-title text-center">
+        @if (data.mode === "edit") {
           {{ displayEmergencyName }}
           @if (canEditName) {
             <img
@@ -12,251 +13,302 @@
               (click)="toggleNameEdit()"
             />
           }
-        </h3>
-      </div>
-    }
-    @else {
-      <h3>{{ data.mode === 'edit' ? 'Edit cover' : 'Add cover' }}</h3>
-    }
-    <button (click)="closeDialog()" type="button">
-      <img src="assets/images/svgs/close-line-cion.svg" alt="close-line-cion" />
-    </button>
-  </div>
-
-  <mat-dialog-content class="d-flex flex-column gap-20">
-    @if (showNameInput) {
-      <div class="w-100 form-field gap-8">
-        <mat-label class="f-s-16 d-block" style="line-height: 18px">Name</mat-label>
-        <input matInput formControlName="name" placeholder="e.g. Life Insurance" />
-
-        @if(form.get('name')?.touched && form.get('name')?.hasError('required')) {
-          <span class="field-error d-block">{{'Required' | translate}}</span>
+        } @else {
+          {{ data.mode === "edit" ? "Edit cover" : "Add cover" }}
         }
-      </div>
-    }
-
-    <!-- Will status (only type 2) -->
-    @if(isWill) {
-      <div class="w-100 form-field gap-8 tab">
-        <mat-label class="f-s-16 d-block" style="line-height: 18px">Will Status</mat-label>
-        <!-- <div class="select-option">
-          <mat-select formControlName="willStatus" placeholder="Select">
-            @for (ws of willStatuses; track ws) {
-              <mat-option [value]="ws.id">{{ ws.name == 'NotDone' ? 'Not done' : ws.name }}</mat-option>
-            }
-          </mat-select>
-        </div> -->
-
-        <div class="tabs">
-      <div class="row">
-        @for (ws of willStatuses; track ws; let i = $index) {
-          <div class="col-6">
-            <button
-              type="button"
-              class="button-icon w-100"
-              (click)="form.get('willStatus')?.setValue(ws.id)"
-              [class.active]="form.get('willStatus')?.value === ws.id"
-            >
-              <span
-                [class.active]="form.get('willStatus')?.value === ws.id"
-              >
-                {{ ws.name == 'NotDone' ? 'Not done' : ws.name }}
-              </span>
-            </button>
-          </div>
-        }
-      </div>
-    </div>
-        @if(form.get('willStatus')?.touched && form.get('willStatus')?.hasError('required')) {
-          <span class="field-error">{{'Required' | translate}}</span>
-        }
-      </div>
-    }
-
-    <!-- Insurance fields (type 1) -->
-    @if(!isWill) {
-      <!-- <div class="w-100 form-field gap-8">
-        <mat-label class="f-s-16 d-block" style="line-height: 18px">Status</mat-label>
-        <div class="select-option">
-          <mat-select formControlName="policyStatus" hideSingleSelectionIndicator placeholder="Select">
-            @for (s of policyStatuses; track s) {
-              <mat-option [value]="s.id">{{ s.name == 'NotCovered' ? 'Not covered' : s.name }}</mat-option>
-            }
-          </mat-select>
-        </div>
-        @if(form.get('policyStatus')?.touched && form.get('policyStatus')?.hasError('required')) {
-          <span class="field-error d-block">{{'Required' | translate}}</span>
-        }
-      </div> -->
-
-      <!-- New Start -->
-       @if(!isWill) {
-  <div class="w-100 form-field gap-8 tab">
-    <span class="f-s-16 d-block" style="line-height: 18px">Status</span>
-
-    <div class="tabs">
-      <div class="row">
-        @for (s of policyStatuses; track s; let i = $index) {
-          <div class="col-6">
-            <button
-              type="button"
-              class="button-icon w-100"
-              (click)="form.get('policyStatus')?.setValue(s.id)"
-              [class.active]="form.get('policyStatus')?.value === s.id"
-            >
-              <span
-                [class.active]="form.get('policyStatus')?.value === s.id"
-              >
-                {{ s.name === 'NotCovered' ? 'Not covered' : s.name }}
-              </span>
-            </button>
-          </div>
-        }
-      </div>
+      </h2>
+      <button
+        type="button"
+        mat-icon-button
+        disableRipple
+        class="dialog-close-btn"
+        mat-dialog-close
+        aria-label="Close dialog"
+        (click)="closeDialog()"
+      >
+        <mat-icon>close</mat-icon>
+      </button>
     </div>
 
-    @if(form.get('policyStatus')?.touched && form.get('policyStatus')?.hasError('required')) {
-      <span class="field-error d-block">Required</span>
-    }
-  </div>
-}
-      <!-- New End -->
+    <mat-dialog-content class="event-dialog-content">
+      <div class="d-flex flex-column gap-16" [formGroup]="form">
+        @if (showNameInput) {
+          <div class="w-100 form-field gap-8">
+            <mat-label
+              class="f-s-16 f-w-500 d-block ibr-black"
+              style="line-height: 16px"
+              >Name</mat-label
+            >
+            <input
+              matInput
+              formControlName="name"
+              placeholder="e.g. Life Insurance"
+            />
 
-      @if(form.get('policyStatus')?.value != 2){
-      <div class="d-flex flex-column gap-4 net-fields">
-        <div class="d-flex flex-column gap-8">
-          <mat-label class="f-s-16 d-block" style="line-height: 18px">Insurance cost</mat-label>
-          <div class="net-field d-flex align-items-center">
-            <div class="left hide-arrow">
-              <mat-select formControlName="currencySymbol" class="sortby-edit-profile" hideSingleSelectionIndicator disabled>
-                @for (country of countries; track country) {
-                  @if(country.currencySymbol) {
-                    <mat-option [value]="country.currencySymbol">{{country.currencySymbol}}</mat-option>
-                  }
-                }
-              </mat-select>
+            @if (
+              form.get("name")?.touched &&
+              form.get("name")?.hasError("required")
+            ) {
+              <span class="field-error d-block">{{
+                "Required" | translate
+              }}</span>
+            }
+          </div>
+        }
+
+        <!-- Will status (only type 2) -->
+        @if (isWill) {
+          <div class="w-100 form-field gap-8 tab">
+            <mat-label
+              class="f-s-16 f-w-500 d-block ibr-black"
+              style="line-height: 16px"
+              >Will Status</mat-label
+            >
+
+            <div class="down-payment-toggle">
+              @for (ws of willStatuses; track ws; let i = $index) {
+                <label
+                  class="dp-radio"
+                  [class.active]="form.get('willStatus')?.value === ws.id"
+                  (click)="form.get('willStatus')?.setValue(ws.id)"
+                >
+                  <span class="dp-radio-circle"></span>
+                  <span>{{ ws.name == "NotDone" ? "Not done" : ws.name }}</span>
+                </label>
+              }
             </div>
 
-            <div class="w-100 form-field">
-              <input 
-                matInput
-                type="text"
-                formControlName="insuranceAmount"
-                placeholder="0"
-                thousandSeparatorInput
-                />
+            @if (
+              form.get("willStatus")?.touched &&
+              form.get("willStatus")?.hasError("required")
+            ) {
+              <span class="field-error">{{ "Required" | translate }}</span>
+            }
+          </div>
+        }
+
+        <!-- Insurance fields (type 1) -->
+        @if (!isWill) {
+          @if (!isWill) {
+            <div class="w-100 form-field gap-8 tab">
+              <mat-label
+                class="f-s-16 f-w-500 d-block ibr-black"
+                style="line-height: 16px"
+                >Status</mat-label
+              >
+
+              <div class="down-payment-toggle">
+                @for (s of policyStatuses; track s; let i = $index) {
+                  <label
+                    class="dp-radio"
+                    [class.active]="form.get('policyStatus')?.value === s.id"
+                    (click)="form.get('policyStatus')?.setValue(s.id)"
+                  >
+                    <span class="dp-radio-circle"></span>
+                    <span>{{
+                      s.name === "NotCovered" ? "Not covered" : s.name
+                    }}</span>
+                  </label>
+                }
               </div>
 
-            <div class="right">
-              <mat-select formControlName="insuranceCycleId" class="sortby-edit-profile" hideSingleSelectionIndicator>
-                @for (cycle of insuranceCycles; track cycle) { 
-                  <mat-option [value]="cycle.id"> {{ cycle.description }} </mat-option>
-                }
-              </mat-select>
+              @if (
+                form.get("policyStatus")?.touched &&
+                form.get("policyStatus")?.hasError("required")
+              ) {
+                <span class="field-error d-block">Required</span>
+              }
+            </div>
+          }
+
+          @if (form.get("policyStatus")?.value != 2) {
+            <div class="d-flex flex-column gap-4 net-fields">
+              <div class="d-flex flex-column gap-8">
+                <mat-label
+                  class="f-s-16 f-w-500 ibr-black d-flex align-items-center"
+                  style="line-height: 16px"
+                  >Insurance cost</mat-label
+                >
+                <div class="net-field d-flex align-items-center">
+                  <div class="left hide-arrow">
+                    <mat-select
+                      formControlName="currencySymbol"
+                      class="sortby-edit-profile"
+                      hideSingleSelectionIndicator
+                      disabled
+                    >
+                      @for (country of countries; track country) {
+                        @if (country.currencySymbol) {
+                          <mat-option [value]="country.currencySymbol">{{
+                            country.currencySymbol
+                          }}</mat-option>
+                        }
+                      }
+                    </mat-select>
+                  </div>
+
+                  <div class="w-100 form-field">
+                    <input
+                      matInput
+                      type="text"
+                      formControlName="insuranceAmount"
+                      placeholder="0"
+                      thousandSeparatorInput
+                    />
+                  </div>
+
+                  <div class="right position-relative">
+                    <mat-select
+                      formControlName="insuranceCycleId"
+                      class="sortby-edit-profile"
+                      hideSingleSelectionIndicator
+                    >
+                      @for (cycle of insuranceCycles; track cycle) {
+                        <mat-option [value]="cycle.id">
+                          {{ cycle.description }}
+                        </mat-option>
+                      }
+                    </mat-select>
+                    <span class="custom-arrow">
+                      <svg
+                        width="12"
+                        height="7"
+                        viewBox="0 0 12 7"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M1 1L6 6L11 1"
+                          stroke="#2B3942"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
 
-          </div>
-          <!-- @if(form.get('insuranceAmount')?.touched && form.get('insuranceAmount')?.hasError('required')) {
-            <span class="field-error d-block">{{'Required' | translate}}</span>
-          } -->
-        </div>
-      </div>
+            <div class="w-100 form-field gap-8 tab">
+              <mat-label
+                class="f-s-16 f-w-500 ibr-black d-flex align-items-center"
+                style="line-height: 16px"
+                >Coverage adequacy</mat-label
+              >
 
-      <!-- <div class="w-100 form-field gap-8">
-        <mat-label class="f-s-16 d-block" style="line-height: 18px">Coverage adequacy</mat-label>
-        <div class="select-option">
-          <mat-select formControlName="coverageAdequacy" hideSingleSelectionIndicator placeholder="Select">
-            @for (a of coverageAdequacies; track a) {
-              <mat-option [value]="a.id">{{ a.name }}</mat-option>
-            }
-          </mat-select>
-        </div>
-        @if(form.get('coverageAdequacy')?.touched && form.get('coverageAdequacy')?.hasError('required')) {
-          <span class="field-error d-block">{{'Required' | translate}}</span>
+              <div class="down-payment-toggle coverage-toggle">
+                @for (a of coverageAdequacies; track a) {
+                  <label
+                    class="dp-radio"
+                    [class.active]="
+                      form.get('coverageAdequacy')?.value === a.id
+                    "
+                    [ngClass]="
+                      getCoverageClass(
+                        a.name,
+                        form.get('coverageAdequacy')?.value === a.id
+                      )
+                    "
+                    (click)="form.get('coverageAdequacy')?.setValue(a.id)"
+                  >
+                    <span class="dp-radio-circle"></span>
+                    <span>{{ a.name }}</span>
+                  </label>
+                }
+              </div>
+
+              @if (
+                form.get("coverageAdequacy")?.touched &&
+                form.get("coverageAdequacy")?.hasError("required")
+              ) {
+                <span class="field-error d-block">{{
+                  "Required" | translate
+                }}</span>
+              }
+            </div>
+
+            <div class="d-flex flex-column gap-4 net-fields">
+              <div class="d-flex flex-column gap-8">
+                <mat-label
+                  class="f-s-16 f-w-500 ibr-black d-flex align-items-center"
+                  style="line-height: 16px"
+                  >Coverage</mat-label
+                >
+                <div class="net-field d-flex align-items-center">
+                  <div class="left hide-arrow">
+                    <mat-select
+                      formControlName="currencySymbol"
+                      class="sortby-edit-profile"
+                      hideSingleSelectionIndicator
+                      disabled
+                    >
+                      @for (country of countries; track country) {
+                        @if (country.currencySymbol) {
+                          <mat-option [value]="country.currencySymbol">{{
+                            country.currencySymbol
+                          }}</mat-option>
+                        }
+                      }
+                    </mat-select>
+                  </div>
+
+                  <div class="w-100 form-field">
+                    <input
+                      matInput
+                      type="text"
+                      formControlName="coverage"
+                      placeholder="0"
+                      thousandSeparatorInput
+                    />
+                  </div>
+                </div>
+                @if (
+                  form.get("coverage")?.touched &&
+                  form.get("coverage")?.hasError("required")
+                ) {
+                  <span class="field-error d-block">{{
+                    "Required" | translate
+                  }}</span>
+                }
+              </div>
+            </div>
+          }
         }
-      </div> -->
+      </div>
+    </mat-dialog-content>
 
-      <div class="w-100 form-field gap-8 tab">
-  <mat-label class="f-s-16 d-block" style="line-height: 18px">Coverage adequacy</mat-label>
-  
-  <div class="coverageTabs">
-    <div class="row">
-      @for (a of coverageAdequacies; track a) {
-        <div class="col-4 coverage-wrapper">
-          <button 
-          type="button" 
-          class="button-icon coverage-btn-colours w-100"
-          [class.active]="form.get('coverageAdequacy')?.value === a.id"
-          [ngClass]="getCoverageClass(a.name, form.get('coverageAdequacy')?.value === a.id)"
-          (click)="form.get('coverageAdequacy')?.setValue(a.id)">
-          <span [class.active]="form.get('coverageAdequacy')?.value === a.id">{{ a.name }}</span>
+    <div class="row justify-content-end gap-16 modal-action p-t-24">
+      <div>
+        @if (isDeleteEnabled) {
+          <button
+            type="button"
+            class="button-icon-outline w-100 d-block"
+            (click)="onDelete()"
+          >
+            <span class="f-s-16">Delete</span>
+          </button>
+        }
+        @if (!isDeleteEnabled) {
+          <button
+            type="button"
+            class="button-icon-outline w-100 d-block"
+            (click)="closeDialog()"
+          >
+            <span class="f-s-16">{{ "Cancel" | translate }}</span>
+          </button>
+        }
+      </div>
+      <div>
+        <button
+          type="button"
+          class="button-icon w-100 d-block"
+          (click)="onSave()"
+        >
+          <span class="f-s-16">Save</span>
         </button>
-        </div>
-      }
+      </div>
     </div>
   </div>
-
-  @if(form.get('coverageAdequacy')?.touched && form.get('coverageAdequacy')?.hasError('required')) {
-    <span class="field-error d-block">{{'Required' | translate}}</span>
-  }
 </div>
-
-
-      <div class="d-flex flex-column gap-4 net-fields">
-
-      <div class="d-flex flex-column gap-8">
-        <mat-label class="f-s-16 f-w-400 d-flex align-items-center">
-          Coverage
-        </mat-label>
-        <div class="net-field d-flex align-items-center">
-          <div class="left hide-arrow">
-              <mat-select formControlName="currencySymbol" class="sortby-edit-profile" hideSingleSelectionIndicator disabled>
-                @for (country of countries; track country) {
-                  @if(country.currencySymbol) {
-                    <mat-option [value]="country.currencySymbol">{{country.currencySymbol}}</mat-option>
-                  }
-                }
-              </mat-select>
-            </div>
-
-            <div class="w-100 form-field">
-              <input 
-                matInput 
-                type="text" 
-                formControlName="coverage"
-                placeholder="0"
-                thousandSeparatorInput
-              />
-            </div>
-        </div>
-        @if(form.get('coverage')?.touched && form.get('coverage')?.hasError('required')) {
-          <span class="field-error d-block">{{'Required' | translate}}</span>
-        }
-      </div>
-
-      </div>
-      }
-    }
-  </mat-dialog-content>
-
-  <div class="row justify-content-between modal-action">
-    <div class="col-5">
-      @if(isDeleteEnabled) {
-        <button type="button" class="button-icon-outline w-100 d-block" (click)="onDelete()">
-        <span class="f-s-16">Delete</span>
-      </button>
-      } 
-      @if(!isDeleteEnabled) {
-        <button type="button" class="button-icon-outline w-100 d-block" (click)="closeDialog()">
-          <span class="f-s-16">{{ 'Cancel' | translate }}</span>
-        </button>
-      }
-    </div>
-    <div class="col-5">
-      <button type="button" class="button-icon w-100 d-block" (click)="onSave()">
-        <!-- <span class="f-s-16">{{ data.mode === 'edit' ? 'Save' : 'Save' }}</span> -->
-        <span class="f-s-16">Save</span>
-      </button>
-    </div>
-  </div>
-</form>

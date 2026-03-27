@@ -269,10 +269,13 @@
           savingsForm.get("name")?.value !== "Pension fund"
         ) {
           <div class="d-flex flex-column gap-4">
-            <div class="d-flex gap-8 align-items-center">
-              <mat-label class="f-s-16 f-w-500 d-block ibr-black">{{
-                "Return rate" | translate
-              }}</mat-label>
+            <div class="d-flex gap-4 align-items-center">
+              <mat-label
+                class="f-s-16 f-w-500 d-block ibr-black"
+                line-height:
+                16px
+                >{{ "Return rate" | translate }}</mat-label
+              >
               <img
                 width="18"
                 src="assets/images/svgs/help-circle-icon.svg"
@@ -647,7 +650,7 @@
               savingsForm.get("lockPot")?.value &&
               savingsForm.get("name")?.value !== "Pension fund"
             ) {
-              <div class="start-end m-t-12 m-b-8">
+              <div class="start-end">
                 <div class="d-flex flex-column gap-8">
                   <div class="d-flex gap-8 align-items-center">
                     <mat-label class="f-s-16 f-w-500 d-block ibr-black">{{
@@ -806,7 +809,7 @@
 
             <!-- Commissions Section -->
             @if (savingsForm.get("commissions")?.value) {
-              <div class="d-flex flex-column gap-16 m-t-12">
+              <div class="d-flex flex-column gap-16">
                 <div class="d-flex flex-column gap-8">
                   <mat-label
                     class="f-s-16 f-w-500 d-block ibr-black"
@@ -1059,7 +1062,7 @@
                         'Increases at custom rate'
                       "
                     >
-                      <div class="d-flex gap-8 align-items-center">
+                      <div class="d-flex gap-4 align-items-center">
                         <mat-label class="f-s-16 f-w-500 d-block ibr-black">{{
                           "Commission amount escalation rate" | translate
                         }}</mat-label>

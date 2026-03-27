@@ -274,6 +274,8 @@
   display: grid;
   grid-template-columns: 40% 60%;
   align-items: center;
+  margin-top: 10px !important;
+  margin-bottom: 10px !important;
 }
 
 .ibr-card-title {
@@ -310,7 +312,9 @@
 .gauge-progress {
   height: 100%;
   border-radius: 50px;
-  transition: width 0.4s ease, background-color 0.4s ease;
+  transition:
+    width 0.4s ease,
+    background-color 0.4s ease;
 }
 .gauge-text {
   font-size: 40px;

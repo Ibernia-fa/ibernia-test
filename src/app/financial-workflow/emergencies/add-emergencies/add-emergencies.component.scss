@@ -1,119 +1,32 @@
-.icon-percentage {
-     padding: 0 0 0 1px;
-    background: url(../../../../assets/images/shapes/percentage.svg) left top no-repeat;
-
-    height: 20px;
-    width: 20px;
-    align-items: center;
-    justify-content: center;
-    position: absolute;
-    line-height: 11px;
-    border-radius: 4px;
-    color: white;
-    font-size: 16px;
-    right: 200px;
-    top: 50%;
-    text-align: center;
-    display: flex;
-    background-size: 20px 20px;
-    margin-top: -15px;
-    overflow: hidden;
-    text-indent: -9999px;
-}
-
-.tab {
-  span {
-    line-height: 18px;
-  }
-  .tabs {
-    border: 1px solid #516ce8;
-    border-radius: 4px;
-    padding: 2px;
-    button {
-      &.active {
-        background-color: #516ce8;
-      }
-      background-color: white;
-      text-align: center;
-      padding-top: 8px;
-      padding-bottom: 8px;
-      span {
-        &.active {
-          color: white;
-        }
-        font-weight: 500;
-        color: #516ce8;
-      }
-    }
-    .row {
-      margin: 0 !important;
-      .col-6 {
-        padding: 0 !important;
-      }
-    }
-    .coverage-btn{
-      padding: 0;
-    }
-  }
-}
-
-.coverageTabs {
-  border-radius: 4px;
-  padding: 2px;
-  span {
-    color: #45556c;
-  }
-  .row {
-    margin: 0 !important;
-    .col-6 {
-      padding: 0 !important;
-    }
-  }
-  .coverage-wrapper{
-    padding: 0;
-  }
-  .coverage-btn-colours {
-    text-align: center;
-    padding: 8px 0;
-    border-radius: 4px;
-    font-weight: 500;
-
-    &.basic {
-      background-color: transparent;
-      color: #45556c;
-      border: 1px solid #e2e8f0;
-    }
+.coverage-toggle.down-payment-toggle {
+  .dp-radio {
     &.basic-active {
-      background-color: #fef3e4;
-      border: 1px solid #bb4d00;
-      span {
-        color: #bb4d00;
+      color: #DEB511;
+
+      .dp-radio-circle {
+        border-color: #DEB511;
+        background: #DEB511;
+        box-shadow: inset 0 0 0 2px #fff;
       }
     }
 
-    &.good {
-      background-color: transparent;
-      color: #45556c;
-      border: 1px solid #e2e8f0;
-    }
     &.good-active {
-      background-color: #ecfdf5;
-      border: 1px solid #a4f4cf;
-      span {
-        color: #007a55;
+      color: #54E97C;
+
+      .dp-radio-circle {
+        border-color: #54E97C;
+        background: #54E97C;
+        box-shadow: inset 0 0 0 2px #fff;
       }
     }
 
-    &.excellent {
-      background-color: transparent;
-      color: #45556c;
-      border: 1px solid #e2e8f0;
-    }
     &.excellent-active {
-      background-color: #b6f6d9;
-      border: 1px solid #006045;
-      span {
-        color: #006045;
+      color: #09AC65;
+
+      .dp-radio-circle {
+        border-color: #09AC65;
+        background: #09AC65;
+        box-shadow: inset 0 0 0 2px #fff;
       }
     }
   }
@@ -126,5 +39,47 @@
   margin-top: -2px;
 }
 
+.down-payment-toggle {
+  display: flex;
+  align-items: center;
+  gap: 64px;
+  padding-top: 8px;
+  height: 100%;
+  flex-shrink: 0;
 
+  .dp-radio {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: #48475d;
+    white-space: nowrap;
+    user-select: none;
 
+    .dp-radio-circle {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 2px solid #48475d;
+      box-sizing: border-box;
+      transition:
+        border-color 0.15s,
+        background 0.15s;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    &.active {
+      color: #4043af;
+      font-weight: 500;
+
+      .dp-radio-circle {
+        border-color: #4043af;
+        background: #4043af;
+        box-shadow: inset 0 0 0 2px #fff;
+      }
+    }
+  }
+}

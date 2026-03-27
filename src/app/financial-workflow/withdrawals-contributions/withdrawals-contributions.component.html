@@ -1,7 +1,7 @@
 <div class="d-flex gap-16 flex-column">
   @if (!isLoaderVisible) {
     <mat-card class="ibr-new-dashboad-card">
-      <mat-card-content>
+      <mat-card-content class="withdrawl-contribution-header">
         <div class="income-expense-wrapper">
           <div>
             <div class="d-flex flex-column gap-8">
@@ -113,16 +113,46 @@
                       : 'saving-title red'
                   "
                 > -->
-                <h3 class="saving-title ibr-primary-dark-gray">
+                <h3
+                  [ngClass]="
+                    (contributionSummary?.savingRate ?? 0) > 0
+                      ? 'saving-title green'
+                      : 'saving-title red'
+                  "
+                >
                   {{ contributionSummary?.savingRate ?? 0 | number: "1.0-0" }}%
                 </h3>
                 <!-- Emoji  -->
                 @if ((contributionSummary?.savingRate ?? 0) > 0) {
-                  <img
-                    src="assets/images/shapes/happy-feedback-icon.png"
-                    alt="smile-emoji"
-                  />
-                } @else {
+                  <svg
+                    width="30"
+                    height="30"
+                    viewBox="0 0 30 30"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M15 30C23.2843 30 30 23.2843 30 15C30 6.71573 23.2843 0 15 0C6.71573 0 0 6.71573 0 15C0 23.2843 6.71573 30 15 30Z"
+                      fill="#FFCA28"
+                    />
+                    <path
+                      d="M27.5277 6.75195C28.2811 8.63665 28.6677 10.6479 28.6667 12.6776C28.6667 21.5076 21.5083 28.6659 12.6783 28.6659C10.6486 28.667 8.63739 28.2804 6.75269 27.5269C9.19931 29.1432 12.0678 30.0031 15 29.9993C23.2843 29.9993 30 23.2836 30 14.9993C30.0038 12.067 29.1439 9.19858 27.5277 6.75195Z"
+                      fill="#E7B622"
+                    />
+                    <path
+                      d="M9.375 13.75C10.4105 13.75 11.25 12.9105 11.25 11.875C11.25 10.8395 10.4105 10 9.375 10C8.33947 10 7.5 10.8395 7.5 11.875C7.5 12.9105 8.33947 13.75 9.375 13.75Z"
+                      fill="#6D4C41"
+                    />
+                    <path
+                      d="M20.625 13.75C21.6605 13.75 22.5 12.9105 22.5 11.875C22.5 10.8395 21.6605 10 20.625 10C19.5895 10 18.75 10.8395 18.75 11.875C18.75 12.9105 19.5895 13.75 20.625 13.75Z"
+                      fill="#6D4C41"
+                    />
+                    <path
+                      d="M15.3845 23.3097C13.9368 23.3099 12.525 22.8586 11.3458 22.0186C10.1666 21.1787 9.27875 19.9919 8.8058 18.6236C8.76572 18.5202 8.74689 18.4098 8.75042 18.299C8.75395 18.1882 8.77977 18.0792 8.82635 17.9786C8.87292 17.878 8.9393 17.7878 9.0215 17.7134C9.10371 17.639 9.20006 17.5819 9.30481 17.5456C9.40956 17.5092 9.52056 17.4944 9.63118 17.5019C9.7418 17.5094 9.84977 17.5391 9.94865 17.5893C10.0475 17.6395 10.1353 17.709 10.2067 17.7939C10.2781 17.8787 10.3316 17.977 10.3642 18.083C10.7232 19.1291 11.4 20.0369 12.3001 20.6796C13.2002 21.3223 14.2785 21.6678 15.3845 21.6678C16.4905 21.6678 17.5689 21.3223 18.4689 20.6796C19.369 20.0369 20.0458 19.1291 20.4049 18.083C20.4374 17.977 20.491 17.8787 20.5624 17.7939C20.6338 17.709 20.7215 17.6395 20.8204 17.5893C20.9193 17.5391 21.0272 17.5094 21.1379 17.5019C21.2485 17.4944 21.3595 17.5092 21.4642 17.5456C21.569 17.5819 21.6653 17.639 21.7475 17.7134C21.8297 17.7878 21.8961 17.878 21.9427 17.9786C21.9893 18.0792 22.0151 18.1882 22.0186 18.299C22.0222 18.4098 22.0033 18.5202 21.9632 18.6236C21.4903 19.9919 20.6024 21.1787 19.4232 22.0186C18.244 22.8586 16.8323 23.3099 15.3845 23.3097Z"
+                      fill="#6D4C41"
+                    />
+                  </svg>
+                } @else if ((contributionSummary?.savingRate ?? 0) === 0) {
                   <svg
                     width="30"
                     height="30"
@@ -151,6 +181,35 @@
                       fill="#6D4C41"
                     />
                   </svg>
+                } @else {
+                  <svg
+                    width="30"
+                    height="30"
+                    viewBox="0 0 30 30"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M15 30C23.2843 30 30 23.2843 30 15C30 6.71573 23.2843 0 15 0C6.71573 0 0 6.71573 0 15C0 23.2843 6.71573 30 15 30Z"
+                      fill="#FFCA28"
+                    />
+                    <path
+                      d="M10.6249 13.75C11.6604 13.75 12.4999 12.9105 12.4999 11.875C12.4999 10.8395 11.6604 10 10.6249 10C9.58934 10 8.74988 10.8395 8.74988 11.875C8.74988 12.9105 9.58934 13.75 10.6249 13.75Z"
+                      fill="#604323"
+                    />
+                    <path
+                      d="M19.3749 13.75C20.4104 13.75 21.2499 12.9105 21.2499 11.875C21.2499 10.8395 20.4104 10 19.3749 10C18.3393 10 17.4999 10.8395 17.4999 11.875C17.4999 12.9105 18.3393 13.75 19.3749 13.75Z"
+                      fill="#604323"
+                    />
+                    <path
+                      d="M21.0288 22.4477C20.9187 22.4479 20.8103 22.4208 20.7132 22.3688C20.6162 22.3168 20.5336 22.2415 20.4728 22.1497C19.2491 20.3067 17.2031 19.2064 14.9998 19.2064C12.7965 19.2064 10.7501 20.3067 9.52714 22.1497C9.42936 22.297 9.27706 22.3995 9.10375 22.4345C8.93044 22.4696 8.7503 22.4343 8.60297 22.3365C8.45564 22.2388 8.35319 22.0865 8.31815 21.9132C8.28312 21.7398 8.31836 21.5597 8.41614 21.4124C9.88714 19.196 12.3485 17.873 14.9998 17.873C17.6511 17.873 20.1125 19.196 21.5835 21.412C21.6502 21.5124 21.6884 21.629 21.6942 21.7494C21.6999 21.8698 21.6728 21.9895 21.6159 22.0958C21.559 22.202 21.4744 22.2909 21.371 22.3529C21.2676 22.4148 21.1493 22.4476 21.0288 22.4477Z"
+                      fill="#604323"
+                    />
+                    <path
+                      d="M27.5277 6.75195C28.2811 8.63665 28.6677 10.6479 28.6667 12.6776C28.6667 21.5076 21.5083 28.6659 12.6783 28.6659C10.6486 28.667 8.63739 28.2804 6.75269 27.5269C9.19931 29.1432 12.0678 30.0031 15 29.9993C23.2843 29.9993 30 23.2836 30 14.9993C30.0038 12.067 29.1439 9.19858 27.5277 6.75195Z"
+                      fill="#E7B622"
+                    />
+                  </svg>
                 }
                 <!-- End Emoji  -->
               </div>
@@ -163,94 +222,351 @@
     <div class="income-expense-tables">
       <!-- Contribution Table -->
       @if (contributionDataSource.data.length > 0) {
-      <mat-card class="ibr-new-dashboad-card clientTableContainer">
-        <div class="heading-btn-wrapper">
-          <div
-            class="d-flex flex-row justify-content-between align-items-center gap-12"
-          >
-            <div class="d-flex flex-column gap-12">
-              <h3>{{ "Contributions" | translate }}</h3>
-              <p class="ibr-card-title">Invest regularly for your future</p>
+        <mat-card class="ibr-new-dashboad-card clientTableContainer">
+          <div class="heading-btn-wrapper">
+            <div
+              class="d-flex flex-row justify-content-between align-items-center gap-12"
+            >
+              <div class="d-flex flex-column gap-12">
+                <h3>{{ "Contributions" | translate }}</h3>
+                <p class="ibr-card-title">Invest regularly for your future</p>
+              </div>
+              <button
+                (click)="newContributionClicked()"
+                type="button"
+                class="button-icon"
+              >
+                <span class="f-s-16 f-w-500">{{
+                  "Add contribution" | translate
+                }}</span>
+                <img src="assets/images/svgs/add-icon.svg" alt="add-icon" />
+              </button>
             </div>
-            <button
-              (click)="newContributionClicked()"
-              type="button"
-              class="button-icon"
-            >
-              <span class="f-s-16 f-w-500">{{
-                "Add contribution" | translate
-              }}</span>
-              <img src="assets/images/svgs/add-icon.svg" alt="add-icon" />
-            </button>
           </div>
-        </div>
 
-        <!-- Table Wrapper  -->
-        <div class="table-main-wrapper">
-          <div class="table-responsive-sm table-wrapper">
-            <table
-              mat-table
-              [dataSource]="contributionDataSource"
-              class="mat-elevation-z8"
+          <!-- Table Wrapper  -->
+          <div class="table-main-wrapper">
+            <div class="table-responsive-sm table-wrapper">
+              <table
+                mat-table
+                [dataSource]="contributionDataSource"
+                class="mat-elevation-z8"
+              >
+                <!-- Position Column -->
+                <ng-container matColumnDef="position">
+                  <th
+                    mat-header-cell
+                    *matHeaderCellDef
+                    class="mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-client"
+                  >
+                    {{ "Description" | translate }}
+                  </th>
+                  <td
+                    mat-cell
+                    *matCellDef="let element"
+                    class="p-x-24 f-s-14 p-l-0 column-client"
+                  >
+                    {{ getContributionDisplayDescription(element) }}
+                  </td>
+                </ng-container>
+
+                <!-- Name Column -->
+                <ng-container matColumnDef="name">
+                  <th
+                    mat-header-cell
+                    *matHeaderCellDef
+                    class="mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-net-amount"
+                  >
+                    {{ "Net amount" | translate }}
+                  </th>
+                  <td
+                    mat-cell
+                    *matCellDef="let element"
+                    class="p-x-24 f-s-14 p-l-0 column-net-amount"
+                  >
+                    {{
+                      selectedClient?.clientDetails?.preferredCurrency
+                        | currencySymbol
+                    }}{{ element.amount.amount | thousandSeparator }}/{{
+                      element.amount.cycle.description
+                    }}
+                  </td>
+                </ng-container>
+
+                <!-- Symbol Column -->
+                <ng-container matColumnDef="action">
+                  <th
+                    mat-header-cell
+                    *matHeaderCellDef
+                    class="text-center mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-action"
+                  >
+                    Action
+                  </th>
+                  <td mat-cell class="column-action" *matCellDef="let element">
+                    @if (element.sourceIncomeId) {
+                      <span
+                        class="paragraph-text"
+                        matTooltip="{{ 'Edit from Incomes' | translate }}"
+                        >{{ "Edit from Incomes" | translate }}</span
+                      >
+                    } @else {
+                      <div
+                        class="d-flex align-items-center justify-content-center"
+                      >
+                        <button
+                          aria-label="icon-button with a menu"
+                          type="button"
+                          class="dropdown-button"
+                          style="margin-right: 0"
+                          (click)="
+                            $event.stopPropagation(); $event.preventDefault()
+                          "
+                          mat-icon-button
+                          [matMenuTriggerFor]="menu"
+                        >
+                          <mat-icon>
+                            <svg
+                              width="24"
+                              height="24"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M12 13C12.5523 13 13 12.5523 13 12C13 11.4477 12.5523 11 12 11C11.4477 11 11 11.4477 11 12C11 12.5523 11.4477 13 12 13Z"
+                                stroke="#5A596E"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                              />
+                              <path
+                                d="M12 6C12.5523 6 13 5.55228 13 5C13 4.44772 12.5523 4 12 4C11.4477 4 11 4.44772 11 5C11 5.55228 11.4477 6 12 6Z"
+                                stroke="#5A596E"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                              />
+                              <path
+                                d="M12 20C12.5523 20 13 19.5523 13 19C13 18.4477 12.5523 18 12 18C11.4477 18 11 18.4477 11 19C11 19.5523 11.4477 20 12 20Z"
+                                stroke="#5A596E"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                              />
+                            </svg>
+
+                            <!-- <img
+                        src="assets/images/svgs/dropdown-detail.svg"
+                        alt="dropdown-detail"
+                      /> -->
+
+                            <!-- <i-tabler name="dots-vertical" class="icon-20"></i-tabler> -->
+                          </mat-icon>
+                        </button>
+                      </div>
+                      <mat-menu
+                        #menu="matMenu"
+                        xPosition="before"
+                        class="action-dropdown-menus"
+                      >
+                        <button
+                          (click)="updateContributionClicked(element)"
+                          mat-menu-item
+                        >
+                          <mat-icon>
+                            <svg
+                              width="20"
+                              height="20"
+                              viewBox="0 0 20 20"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <g clip-path="url(#clip0_3194_409)">
+                                <path
+                                  d="M9.16602 3.33203H3.33268C2.89065 3.33203 2.46673 3.50763 2.15417 3.82019C1.84161 4.13275 1.66602 4.55667 1.66602 4.9987V16.6654C1.66602 17.1074 1.84161 17.5313 2.15417 17.8439C2.46673 18.1564 2.89065 18.332 3.33268 18.332H14.9993C15.4414 18.332 15.8653 18.1564 16.1779 17.8439C16.4904 17.5313 16.666 17.1074 16.666 16.6654V10.832"
+                                  stroke="#5A596E"
+                                  stroke-width="2"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                />
+                                <path
+                                  d="M15.416 2.08417C15.7475 1.75265 16.1972 1.56641 16.666 1.56641C17.1349 1.56641 17.5845 1.75265 17.916 2.08417C18.2475 2.41569 18.4338 2.86533 18.4338 3.33417C18.4338 3.80301 18.2475 4.25265 17.916 4.58417L9.99935 12.5008L6.66602 13.3342L7.49935 10.0008L15.416 2.08417Z"
+                                  stroke="#5A596E"
+                                  stroke-width="2"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                />
+                              </g>
+                              <defs>
+                                <clipPath id="clip0_3194_409">
+                                  <rect width="20" height="20" fill="white" />
+                                </clipPath>
+                              </defs>
+                            </svg>
+                          </mat-icon>
+                          <span>{{ "Edit" | translate }}</span>
+                        </button>
+                        <button
+                          class="action-dropdown-menus"
+                          (click)="deleteContribution(element)"
+                          mat-menu-item
+                        >
+                          <mat-icon>
+                            <svg
+                              width="20"
+                              height="20"
+                              viewBox="0 0 20 20"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M2.5 5H4.16667H17.5"
+                                stroke="#5A596E"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                              />
+                              <path
+                                d="M15.8327 5.0013V16.668C15.8327 17.11 15.6571 17.5339 15.3445 17.8465C15.032 18.159 14.608 18.3346 14.166 18.3346H5.83268C5.39065 18.3346 4.96673 18.159 4.65417 17.8465C4.34161 17.5339 4.16602 17.11 4.16602 16.668V5.0013M6.66602 5.0013V3.33464C6.66602 2.89261 6.84161 2.46868 7.15417 2.15612C7.46673 1.84356 7.89065 1.66797 8.33268 1.66797H11.666C12.108 1.66797 12.532 1.84356 12.8445 2.15612C13.1571 2.46868 13.3327 2.89261 13.3327 3.33464V5.0013"
+                                stroke="#5A596E"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                              />
+                              <path
+                                d="M8.33398 9.16797V14.168"
+                                stroke="#5A596E"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                              />
+                              <path
+                                d="M11.666 9.16797V14.168"
+                                stroke="#5A596E"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                              />
+                            </svg>
+                          </mat-icon>
+                          <span>{{ "Delete" | translate }}</span>
+                        </button>
+                      </mat-menu>
+                    }
+                  </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr
+                  mat-row
+                  *matRowDef="let row; columns: displayedColumns"
+                  (click)="
+                    !row.sourceIncomeId && updateContributionClicked(row)
+                  "
+                  [class.cursor-pointer]="!row.sourceIncomeId"
+                  class="example-element-row"
+                ></tr>
+              </table>
+            </div>
+          </div>
+          <!-- End Table Wrapper  -->
+        </mat-card>
+      }
+      <!-- End Contribution Table Income -->
+
+      <!-- Withdraw Table -->
+      @if (withdrawalDataSource.data.length > 0) {
+        <mat-card class="ibr-new-dashboad-card clientTableContainer">
+          <div class="heading-btn-wrapper">
+            <div
+              class="d-flex flex-row justify-content-between align-items-center gap-12"
             >
-              <!-- Position Column -->
-              <ng-container matColumnDef="position">
-                <th
-                  mat-header-cell
-                  *matHeaderCellDef
-                  class="mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-client"
+              <div class="d-flex flex-column gap-12">
+                <h3>{{ "Withdrawals" | translate }}</h3>
+                <p class="ibr-card-title">Use your savings when needed</p>
+              </div>
+              <button
+                (click)="newWithdrawalClicked()"
+                type="button"
+                class="button-icon-outline"
+              >
+                <span class="f-s-16 f-w-500">{{
+                  "Add withdrawal" | translate
+                }}</span>
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
                 >
-                  {{ "Description" | translate }}
-                </th>
-                <td
-                  mat-cell
-                  *matCellDef="let element"
-                  class="p-x-24 f-s-14 p-l-0 column-client"
-                >
-                  {{ getContributionDisplayDescription(element) }}
-                </td>
-              </ng-container>
+                  <path
+                    d="M11.2478 8.7522V0H8.7522V8.7522H0V11.2478H8.7522V20H11.2478V11.2478H20V8.7522H11.2478Z"
+                    fill="#4043AF"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+          <!-- Table Wrapper  -->
+          <div class="table-main-wrapper">
+            <div class="table-responsive-sm table-wrapper">
+              <table
+                mat-table
+                [dataSource]="withdrawalDataSource"
+                class="mat-elevation-z8"
+              >
+                <!-- Position Column -->
+                <ng-container matColumnDef="position">
+                  <th
+                    mat-header-cell
+                    *matHeaderCellDef
+                    class="mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-client"
+                  >
+                    {{ "Description" | translate }}
+                  </th>
+                  <td
+                    mat-cell
+                    *matCellDef="let element"
+                    class="p-x-24 f-s-14 p-l-0 column-client"
+                  >
+                    {{ getWithdrawalDisplayDescription(element) }}
+                  </td>
+                </ng-container>
 
-              <!-- Name Column -->
-              <ng-container matColumnDef="name">
-                <th
-                  mat-header-cell
-                  *matHeaderCellDef
-                  class="mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-net-amount"
-                >
-                  {{ "Net amount" | translate }}
-                </th>
-                <td
-                  mat-cell
-                  *matCellDef="let element"
-                  class="p-x-24 f-s-14 p-l-0 column-net-amount"
-                >
-                  {{
-                    selectedClient?.clientDetails?.preferredCurrency
-                      | currencySymbol
-                  }}{{ element.amount.amount | thousandSeparator }}/{{
-                    element.amount.cycle.description
-                  }}
-                </td>
-              </ng-container>
+                <!-- Name Column -->
+                <ng-container matColumnDef="name">
+                  <th
+                    mat-header-cell
+                    *matHeaderCellDef
+                    class="mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-net-amount"
+                  >
+                    {{ "Net amount" | translate }}
+                  </th>
+                  <td
+                    mat-cell
+                    *matCellDef="let element"
+                    class="p-x-24 f-s-14 p-l-0 column-net-amount"
+                  >
+                    {{
+                      selectedClient?.clientDetails?.preferredCurrency
+                        | currencySymbol
+                    }}{{ element.amount.amount | thousandSeparator }}/{{
+                      element.amount.cycle.description
+                    }}
+                  </td>
+                </ng-container>
 
-              <!-- Symbol Column -->
-              <ng-container matColumnDef="action">
-                <th
-                  mat-header-cell
-                  *matHeaderCellDef
-                  class="text-center mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-action"
-                >
-                  Action
-                </th>
-                <td mat-cell class="column-action" *matCellDef="let element">
-                  @if (element.sourceIncomeId) {
-                    <span
-                      class="paragraph-text"
-                      matTooltip="{{ 'Edit from Incomes' | translate }}"
-                      >{{ "Edit from Incomes" | translate }}</span
-                    >
-                  } @else {
+                <!-- Symbol Column -->
+                <ng-container matColumnDef="action">
+                  <th
+                    mat-header-cell
+                    *matHeaderCellDef
+                    class="text-center f-w-400 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-action"
+                  >
+                    Action
+                  </th>
+                  <td mat-cell class="column-action" *matCellDef="let element">
                     <div
                       class="d-flex align-items-center justify-content-center"
                     >
@@ -295,13 +611,6 @@
                               stroke-linejoin="round"
                             />
                           </svg>
-
-                          <!-- <img
-                        src="assets/images/svgs/dropdown-detail.svg"
-                        alt="dropdown-detail"
-                      /> -->
-
-                          <!-- <i-tabler name="dots-vertical" class="icon-20"></i-tabler> -->
                         </mat-icon>
                       </button>
                     </div>
@@ -311,7 +620,7 @@
                       class="action-dropdown-menus"
                     >
                       <button
-                        (click)="updateContributionClicked(element)"
+                        (click)="updateWithdrawalClicked(element)"
                         mat-menu-item
                       >
                         <mat-icon>
@@ -349,7 +658,7 @@
                       </button>
                       <button
                         class="action-dropdown-menus"
-                        (click)="deleteContribution(element)"
+                        (click)="deleteWithdrawal(element)"
                         mat-menu-item
                       >
                         <mat-icon>
@@ -393,319 +702,85 @@
                         <span>{{ "Delete" | translate }}</span>
                       </button>
                     </mat-menu>
-                  }
-                </td>
-              </ng-container>
+                  </td>
+                </ng-container>
 
-              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-              <tr
-                mat-row
-                *matRowDef="let row; columns: displayedColumns"
-                (click)="!row.sourceIncomeId && updateContributionClicked(row)"
-                [class.cursor-pointer]="!row.sourceIncomeId"
-                class="example-element-row"
-              ></tr>
-            </table>
-          </div>
-        </div>
-        <!-- End Table Wrapper  -->
-      </mat-card>
-      }
-      <!-- End Contribution Table Income -->
-
-      <!-- Withdraw Table -->
-      @if (withdrawalDataSource.data.length > 0) {
-      <mat-card class="ibr-new-dashboad-card clientTableContainer">
-        <div class="heading-btn-wrapper">
-          <div
-            class="d-flex flex-row justify-content-between align-items-center gap-12"
-          >
-            <div class="d-flex flex-column gap-12">
-              <h3>{{ "Withdrawals" | translate }}</h3>
-              <p class="ibr-card-title">Use your savings when needed</p>
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr
+                  mat-row
+                  *matRowDef="let row; columns: displayedColumns"
+                  (click)="updateWithdrawalClicked(row)"
+                  class="cursor-pointer"
+                  class="example-element-row"
+                ></tr>
+              </table>
             </div>
-            <button
-              (click)="newWithdrawalClicked()"
-              type="button"
-              class="button-icon-outline"
-            >
-              <span class="f-s-16 f-w-500">{{
-                "Add withdrawal" | translate
-              }}</span>
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 20 20"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M11.2478 8.7522V0H8.7522V8.7522H0V11.2478H8.7522V20H11.2478V11.2478H20V8.7522H11.2478Z"
-                  fill="#4043AF"
-                />
-              </svg>
-            </button>
           </div>
-        </div>
-        <!-- Table Wrapper  -->
-        <div class="table-main-wrapper">
-          <div class="table-responsive-sm table-wrapper">
-            <table
-              mat-table
-              [dataSource]="withdrawalDataSource"
-              class="mat-elevation-z8"
-            >
-              <!-- Position Column -->
-              <ng-container matColumnDef="position">
-                <th
-                  mat-header-cell
-                  *matHeaderCellDef
-                  class="mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-client"
-                >
-                  {{ "Description" | translate }}
-                </th>
-                <td
-                  mat-cell
-                  *matCellDef="let element"
-                  class="p-x-24 f-s-14 p-l-0 column-client"
-                >
-                  {{ getWithdrawalDisplayDescription(element) }}
-                </td>
-              </ng-container>
-
-              <!-- Name Column -->
-              <ng-container matColumnDef="name">
-                <th
-                  mat-header-cell
-                  *matHeaderCellDef
-                  class="mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-net-amount"
-                >
-                  {{ "Net amount" | translate }}
-                </th>
-                <td
-                  mat-cell
-                  *matCellDef="let element"
-                  class="p-x-24 f-s-14 p-l-0 column-net-amount"
-                >
-                  {{
-                    selectedClient?.clientDetails?.preferredCurrency
-                      | currencySymbol
-                  }}{{ element.amount.amount | thousandSeparator }}/{{
-                    element.amount.cycle.description
-                  }}
-                </td>
-              </ng-container>
-
-              <!-- Symbol Column -->
-              <ng-container matColumnDef="action">
-                <th
-                  mat-header-cell
-                  *matHeaderCellDef
-                  class="text-center f-w-400 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-action"
-                >
-                  Action
-                </th>
-                <td mat-cell class="column-action" *matCellDef="let element">
-                  <div class="d-flex align-items-center justify-content-center">
-                    <button
-                      aria-label="icon-button with a menu"
-                      type="button"
-                      class="dropdown-button"
-                      style="margin-right: 0"
-                      (click)="
-                        $event.stopPropagation(); $event.preventDefault()
-                      "
-                      mat-icon-button
-                      [matMenuTriggerFor]="menu"
-                    >
-                      <mat-icon>
-                        <svg
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            d="M12 13C12.5523 13 13 12.5523 13 12C13 11.4477 12.5523 11 12 11C11.4477 11 11 11.4477 11 12C11 12.5523 11.4477 13 12 13Z"
-                            stroke="#5A596E"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                          />
-                          <path
-                            d="M12 6C12.5523 6 13 5.55228 13 5C13 4.44772 12.5523 4 12 4C11.4477 4 11 4.44772 11 5C11 5.55228 11.4477 6 12 6Z"
-                            stroke="#5A596E"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                          />
-                          <path
-                            d="M12 20C12.5523 20 13 19.5523 13 19C13 18.4477 12.5523 18 12 18C11.4477 18 11 18.4477 11 19C11 19.5523 11.4477 20 12 20Z"
-                            stroke="#5A596E"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                          />
-                        </svg>
-                      </mat-icon>
-                    </button>
-                  </div>
-                  <mat-menu
-                    #menu="matMenu"
-                    xPosition="before"
-                    class="action-dropdown-menus"
-                  >
-                    <button
-                      (click)="updateWithdrawalClicked(element)"
-                      mat-menu-item
-                    >
-                      <mat-icon>
-                        <svg
-                          width="20"
-                          height="20"
-                          viewBox="0 0 20 20"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <g clip-path="url(#clip0_3194_409)">
-                            <path
-                              d="M9.16602 3.33203H3.33268C2.89065 3.33203 2.46673 3.50763 2.15417 3.82019C1.84161 4.13275 1.66602 4.55667 1.66602 4.9987V16.6654C1.66602 17.1074 1.84161 17.5313 2.15417 17.8439C2.46673 18.1564 2.89065 18.332 3.33268 18.332H14.9993C15.4414 18.332 15.8653 18.1564 16.1779 17.8439C16.4904 17.5313 16.666 17.1074 16.666 16.6654V10.832"
-                              stroke="#5A596E"
-                              stroke-width="2"
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                            />
-                            <path
-                              d="M15.416 2.08417C15.7475 1.75265 16.1972 1.56641 16.666 1.56641C17.1349 1.56641 17.5845 1.75265 17.916 2.08417C18.2475 2.41569 18.4338 2.86533 18.4338 3.33417C18.4338 3.80301 18.2475 4.25265 17.916 4.58417L9.99935 12.5008L6.66602 13.3342L7.49935 10.0008L15.416 2.08417Z"
-                              stroke="#5A596E"
-                              stroke-width="2"
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                            />
-                          </g>
-                          <defs>
-                            <clipPath id="clip0_3194_409">
-                              <rect width="20" height="20" fill="white" />
-                            </clipPath>
-                          </defs>
-                        </svg>
-                      </mat-icon>
-                      <span>{{ "Edit" | translate }}</span>
-                    </button>
-                    <button
-                      class="action-dropdown-menus"
-                      (click)="deleteWithdrawal(element)"
-                      mat-menu-item
-                    >
-                      <mat-icon>
-                        <svg
-                          width="20"
-                          height="20"
-                          viewBox="0 0 20 20"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            d="M2.5 5H4.16667H17.5"
-                            stroke="#5A596E"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                          />
-                          <path
-                            d="M15.8327 5.0013V16.668C15.8327 17.11 15.6571 17.5339 15.3445 17.8465C15.032 18.159 14.608 18.3346 14.166 18.3346H5.83268C5.39065 18.3346 4.96673 18.159 4.65417 17.8465C4.34161 17.5339 4.16602 17.11 4.16602 16.668V5.0013M6.66602 5.0013V3.33464C6.66602 2.89261 6.84161 2.46868 7.15417 2.15612C7.46673 1.84356 7.89065 1.66797 8.33268 1.66797H11.666C12.108 1.66797 12.532 1.84356 12.8445 2.15612C13.1571 2.46868 13.3327 2.89261 13.3327 3.33464V5.0013"
-                            stroke="#5A596E"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                          />
-                          <path
-                            d="M8.33398 9.16797V14.168"
-                            stroke="#5A596E"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                          />
-                          <path
-                            d="M11.666 9.16797V14.168"
-                            stroke="#5A596E"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                          />
-                        </svg>
-                      </mat-icon>
-                      <span>{{ "Delete" | translate }}</span>
-                    </button>
-                  </mat-menu>
-                </td>
-              </ng-container>
-
-              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-              <tr
-                mat-row
-                *matRowDef="let row; columns: displayedColumns"
-                (click)="updateWithdrawalClicked(row)"
-                class="cursor-pointer"
-                class="example-element-row"
-              ></tr>
-            </table>
-          </div>
-        </div>
-        <!-- End Table Wrapper  -->
-      </mat-card>
+          <!-- End Table Wrapper  -->
+        </mat-card>
       }
       <!-- End Withdraw Table Income -->
 
       <!-- OnBoard Withdraw and Contribution  -->
-      @if (contributionDataSource.data.length === 0 || withdrawalDataSource.data.length === 0) {
-      <mat-card class="ibr-new-dashboad-card colab-widthdraw-onboard">
-        <div class="d-flex flex-column onboard-wrapper">
-          <h3 class="onboard-heading">You're just getting started 👋</h3>
-          <p>
-            You haven’t added any contributions or withdrawals yet. <br />
-            Set up recurring investments or plan future withdrawals.
-          </p>
-          <div class="onboard-button">
-            @if (contributionDataSource.data.length === 0) {
-            <button
-              (click)="newContributionClicked()"
-              type="button"
-              class="button-icon"
-            >
-              <span class="f-s-16 f-w-500">{{
-                "Add contribution" | translate
-              }}</span>
-              <img src="assets/images/svgs/add-icon.svg" alt="add-icon" />
-            </button>
+      @if (
+        contributionDataSource.data.length === 0 ||
+        withdrawalDataSource.data.length === 0
+      ) {
+        <mat-card class="ibr-new-dashboad-card colab-widthdraw-onboard">
+          <div class="d-flex flex-column onboard-wrapper">
+            @if (
+              contributionDataSource.data.length === 0 &&
+              withdrawalDataSource.data.length === 0
+            ) {
+              <h3 class="onboard-heading">You're just getting started 👋</h3>
+              <p>
+                You haven’t added any contributions or withdrawals yet. <br />
+                Set up recurring investments or plan future withdrawals.
+              </p>
+            } @else if (contributionDataSource.data.length === 0) {
+              <p>You haven't added any contributions yet.</p>
+            } @else if (withdrawalDataSource.data.length === 0) {
+              <p>You haven't added any withdrawals yet.</p>
             }
-            @if (withdrawalDataSource.data.length === 0) {
-            <button
-              (click)="newWithdrawalClicked()"
-              type="button"
-              class="button-icon-outline"
-            >
-              <span class="f-s-16 f-w-500">{{
-                "Add withdrawal" | translate
-              }}</span>
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 20 20"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M11.2478 8.7522V0H8.7522V8.7522H0V11.2478H8.7522V20H11.2478V11.2478H20V8.7522H11.2478Z"
-                  fill="#4043AF"
-                />
-              </svg>
-            </button>
-            }
+            <div class="onboard-button">
+              @if (contributionDataSource.data.length === 0) {
+                <button
+                  (click)="newContributionClicked()"
+                  type="button"
+                  class="button-icon"
+                >
+                  <span class="f-s-16 f-w-500">{{
+                    "Add contribution" | translate
+                  }}</span>
+                  <img src="assets/images/svgs/add-icon.svg" alt="add-icon" />
+                </button>
+              }
+              @if (withdrawalDataSource.data.length === 0) {
+                <button
+                  (click)="newWithdrawalClicked()"
+                  type="button"
+                  class="button-icon-outline"
+                >
+                  <span class="f-s-16 f-w-500">{{
+                    "Add withdrawal" | translate
+                  }}</span>
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M11.2478 8.7522V0H8.7522V8.7522H0V11.2478H8.7522V20H11.2478V11.2478H20V8.7522H11.2478Z"
+                      fill="#4043AF"
+                    />
+                  </svg>
+                </button>
+              }
+            </div>
           </div>
-        </div>
-      </mat-card>
+        </mat-card>
       }
     </div>
   } @else {
