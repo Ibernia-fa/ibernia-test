@@ -128,6 +128,12 @@ export class FullComponent implements OnInit, OnDestroy {
     return this.resView;
   }
 
+  /** User-uploaded org background — disable frosted overlay so the photo stays sharp. */
+  get usesCustomBackground(): boolean {
+    const s = this.backgroundImage?.trim();
+    return !!s;
+  }
+
   // for mobile app sidebar
   apps: apps[] = [
     {
