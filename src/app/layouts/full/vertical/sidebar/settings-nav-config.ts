@@ -19,7 +19,8 @@ export const settingsNavItems: NavItem[] = [
     displayName: 'Security',
     iconName: '/assets/images/svgs/shield-check.svg',
     iconOutline: '/assets/images/svgs/shield-check.svg',
-    route: '/settings/security',
+    route: `${environment.authority}/Manage/ChangePassword`,
+    external: true,
   },
   {
     displayName: 'Privacy & Data',
