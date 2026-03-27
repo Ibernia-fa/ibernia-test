@@ -1,31 +1,31 @@
 .coverage-toggle.down-payment-toggle {
   .dp-radio {
     &.basic-active {
-      color: #DEB511;
+      color: #E1B025;
 
       .dp-radio-circle {
-        border-color: #DEB511;
-        background: #DEB511;
+        border-color: #E1B025;
+        background: #E1B025;
         box-shadow: inset 0 0 0 2px #fff;
       }
     }
 
     &.good-active {
-      color: #54E97C;
-
-      .dp-radio-circle {
-        border-color: #54E97C;
-        background: #54E97C;
-        box-shadow: inset 0 0 0 2px #fff;
-      }
-    }
-
-    &.excellent-active {
       color: #09AC65;
 
       .dp-radio-circle {
         border-color: #09AC65;
         background: #09AC65;
+        box-shadow: inset 0 0 0 2px #fff;
+      }
+    }
+
+    &.excellent-active {
+      color: #166A41;
+
+      .dp-radio-circle {
+        border-color: #166A41;
+        background: #166A41;
         box-shadow: inset 0 0 0 2px #fff;
       }
     }

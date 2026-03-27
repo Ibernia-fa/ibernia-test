@@ -459,11 +459,11 @@ export class EmergenciesComponent implements OnInit {
     if (score == null || score < 50) {
       color = '#ff383c';
     } else if (score < 75) {
-      color = '#deb511';
+      color = '#E1B025';
     } else if (score < 89) {
-      color = '#54e97c';
+      color = '#09AC65';
     } else {
-      color = '#09ac65';
+      color = '#166A41';
     }
 
     return { width: `${pct}%`, 'background-color': color };
