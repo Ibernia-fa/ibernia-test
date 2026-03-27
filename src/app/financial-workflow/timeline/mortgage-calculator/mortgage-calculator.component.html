@@ -29,7 +29,7 @@
         <div class="col-6">
           <div class="d-flex flex-column gap-6">
             <mat-label class="f-s-16 f-w-500 d-block ibr-black calc-label">{{
-              "Property price" | translate
+              priceLabel | translate
             }}</mat-label>
             <div class="calc-input-row">
               <span class="calc-currency">{{ currencySymbol }}</span>
@@ -119,9 +119,9 @@
       <div class="row calc-row">
         <div class="col-6">
           <div class="d-flex flex-column gap-6">
-            <mat-label class="f-s-16 f-w-500 d-block ibr-black calc-label"
-              >{{ "Interest rate" | translate }} (% p.a.)</mat-label
-            >
+            <mat-label class="f-s-16 f-w-500 d-block ibr-black calc-label">{{
+              "Interest rate" | translate
+            }}</mat-label>
             <div class="calc-input-row">
               <input
                 matInput

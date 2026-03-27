@@ -151,8 +151,22 @@ export class AddEventDialogComponent {
 
   get financingCalculatorToggleLabelKey(): string {
     return this.financingCalculatorKind === 'mortgage'
-      ? 'See a Mortgage calculator'
+      ? 'Use mortgage calculator'
       : 'Use loan calculator';
+  }
+
+  get financingCalculatorTitle(): string {
+    return this.financingCalculatorKind === 'mortgage'
+      ? 'Mortgage calculator'
+      : 'Loan calculator';
+  }
+
+  get financingCalculatorPriceLabel(): string {
+    const name = this.patchEvent?.name ?? '';
+    if (name.startsWith('Home')) return 'Property price';
+    if (name.startsWith('Car')) return 'Car price';
+    if (name.startsWith('Boat')) return 'Boat price';
+    return 'Price';
   }
 
   get customCalculatorToggleLabelKey(): string {
@@ -1057,10 +1071,11 @@ export class AddEventDialogComponent {
       maxWidth: '95vw',
       autoFocus: false,
       data: {
-        title: 'Mortgage calculator',
+        title: this.financingCalculatorTitle,
         clientCountryCode: this.clientCountryCode,
         currencySymbol: this.clientPreferredCurrency,
         calculatorKind: this.financingCalculatorKind,
+        priceLabel: this.financingCalculatorPriceLabel,
         advisorDefaultInterestRate: this.financingCalculatorAdvisorRate,
         initialState: this.lastCalculatorState,
       },
@@ -1080,10 +1095,11 @@ export class AddEventDialogComponent {
       maxWidth: '95vw',
       autoFocus: false,
       data: {
-        title: 'Mortgage calculator',
+        title: 'Loan calculator',
         clientCountryCode: this.clientCountryCode,
         currencySymbol: this.clientPreferredCurrency,
         calculatorKind: 'loan',
+        priceLabel: 'Price',
         advisorDefaultInterestRate: this.customCalculatorAdvisorRate,
         initialState: this.lastCalculatorState,
       },

@@ -12,6 +12,7 @@ export interface MortgageCalculatorDialogData {
   clientCountryCode: string;
   currencySymbol: string;
   calculatorKind: 'mortgage' | 'loan';
+  priceLabel?: string;
   advisorDefaultInterestRate: number | null;
   initialState: MortgageCalculatorState | null;
 }
