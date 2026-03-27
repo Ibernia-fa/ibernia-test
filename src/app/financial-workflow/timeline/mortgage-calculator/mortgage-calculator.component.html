@@ -1,51 +1,4 @@
 <div class="mortgage-calculator">
-  <div class="d-flex items-center justify-content-between m-b-16">
-    <div class="calculator-header d-flex align-items-center gap-8">
-      <!-- <img src="assets/images/svgs/cashflow-moneys-icon.svg" alt="calculator" width="20" /> -->
-      <h4 class="f-w-700">
-        {{
-          (calculatorKind === "mortgage"
-            ? "Mortgage calculator"
-            : "Loan calculator") | translate
-        }}
-      </h4>
-      <img
-        src="assets/images/svgs/help-circle-icon.svg"
-        alt="help"
-        width="16"
-        matTooltip="{{
-          config?.notes ||
-            ('Calculate your monthly payment based on property price, down payment, interest rate and loan term.'
-              | translate)
-        }}"
-      />
-    </div>
-    <button type="button" class="close-mortgage-calculator">
-      <svg
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          d="M18 6L6 18"
-          stroke="#787889"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        />
-        <path
-          d="M6 6L18 18"
-          stroke="#787889"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        />
-      </svg>
-    </button>
-  </div>
-
   <div
     [formGroup]="mortgageForm"
     class="calculator-body d-flex flex-column gap-16"
@@ -326,7 +279,7 @@
         </div>
 
         <div class="apply-btn-group">
-          <button type="button" class="back-btn">
+          <button type="button" class="back-btn" (click)="onBack()">
             <svg
               width="24"
               height="24"

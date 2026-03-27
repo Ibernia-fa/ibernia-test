@@ -122,6 +122,7 @@
 
 .dragable-card {
   overflow: hidden;
+  min-height: 91px !important;
   position: relative;
   flex: 1;
   padding: 24px;

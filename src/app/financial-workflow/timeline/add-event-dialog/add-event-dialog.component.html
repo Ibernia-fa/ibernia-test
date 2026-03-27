@@ -202,7 +202,19 @@
         </div>
         @if (isInheritanceOneOff) {
           <div class="w-100 form-field gap-8">
-            <div class="d-flex gap-4 align-items-center">
+            <mat-label
+              class="f-s-16 f-w-500 ibr-black d-flex align-items-center"
+              style="line-height: 16px !important"
+            >
+              {{ "Date" | translate }}
+              <img
+                src="assets/images/svgs/help-circle-icon.svg"
+                alt="help"
+                width="18"
+                class="m-l-4"
+              />
+            </mat-label>
+            <!-- <div class="d-flex gap-4 align-items-center">
               <mat-label class="f-s-16 f-w-500 ibr-black d-block">{{
                 "Date" | translate
               }}</mat-label>
@@ -212,7 +224,7 @@
                 src="assets/images/svgs/help-circle-icon.svg"
                 alt="help-circle-icon"
               />
-            </div>
+            </div> -->
             <div class="position-relative">
               <div class="w-100 form-field">
                 <div class="select-option">
@@ -242,15 +254,16 @@
         } @else {
           <div class="start-end">
             <div class="d-flex flex-column gap-8">
-              <div class="d-flex gap-4 align-items-center">
-                <mat-label class="f-s-16 f-w-500 d-block ibr-black">
-                  {{
-                    (eventForm.get("cycle")?.value === "One-off"
-                      ? "Date"
-                      : "Start & end"
-                    ) | translate
-                  }}
-                </mat-label>
+              <mat-label
+                class="f-s-16 f-w-500 ibr-black d-flex align-items-center"
+                style="line-height: 16px !important"
+              >
+                {{
+                  (eventForm.get("cycle")?.value === "One-off"
+                    ? "Date"
+                    : "Start & end"
+                  ) | translate
+                }}
                 <img
                   src="assets/images/svgs/help-circle-icon.svg"
                   alt="help"
@@ -260,7 +273,8 @@
                     'ADD_EVENT.DEFINE_EVENT_PERIOD_TOOLTIP' | translate
                   }}"
                 />
-              </div>
+              </mat-label>
+
               <div
                 class="row justify-content-between align-items-start flex-nowrap"
               >
@@ -403,10 +417,11 @@
                   selectedEscalationDescription !== 'Increases at custom rate'
                 "
               >
-                <div class="d-flex gap-4 align-items-center">
-                  <mat-label class="f-s-16 f-w-500 d-block ibr-black">{{
-                    "Escalation rate" | translate
-                  }}</mat-label>
+                <mat-label
+                  class="f-s-16 f-w-500 ibr-black d-flex align-items-center"
+                  style="line-height: 16px !important"
+                >
+                  {{ "Escalation rate" | translate }}
                   <img
                     src="assets/images/svgs/help-circle-icon.svg"
                     alt="help"
@@ -416,7 +431,8 @@
                       'ADD_EVENT.AMOUNT_GROWTH_TOOLTIP' | translate
                     }}"
                   />
-                </div>
+                </mat-label>
+
                 <div class="position-relative">
                   <div class="w-100 form-field">
                     <div class="select-option position-relative">
@@ -469,9 +485,11 @@
                 <div
                   class="d-flex flex-column gap-8 escalation-field escalation-custom"
                 >
-                  <mat-label class="f-s-16 f-w-500 ibr-black d-block">{{
-                    "Custom escalation rate" | translate
-                  }}</mat-label>
+                  <mat-label
+                    class="f-s-16 f-w-500 ibr-black d-block"
+                    style="line-height: 18px"
+                    >{{ "Custom escalation rate" | translate }}</mat-label
+                  >
                   <div class="w-100 form-field custom-rate-input">
                     <input
                       matInput
@@ -630,7 +648,9 @@
 
         <!-- cash vs financing selector -->
         <div class="d-flex flex-column gap-8 tab">
-          <mat-label class="f-s-16 f-w-500 ibr-black d-flex align-items-center"
+          <mat-label
+            class="f-s-16 f-w-500 ibr-black d-flex align-items-center"
+            style="line-height: 16px"
             >{{ "Payment method" | translate }}
             <img
               src="assets/images/svgs/help-circle-icon.svg"
@@ -691,9 +711,9 @@
 
         @if (showFinancingMortgageCalculator) {
           <div class="d-flex flex-column gap-8">
-            <div class="d-flex m-b-8">
+            <div class="d-flex">
               <button
-                (click)="toggleMortgageCalculator()"
+                (click)="openFinancingCalculatorModal()"
                 type="button"
                 class="mortgage-toggle-btn"
               >
@@ -760,19 +780,6 @@
                 <span>{{ financingCalculatorToggleLabelKey | translate }}</span>
               </button>
             </div>
-
-            @if (showMortgageCalculator) {
-              <app-mortgage-calculator
-                [clientCountryCode]="clientCountryCode"
-                [currencySymbol]="clientPreferredCurrency"
-                [calculatorKind]="financingCalculatorKind"
-                [advisorDefaultInterestRate]="financingCalculatorAdvisorRate"
-                [initialState]="lastCalculatorState"
-                (calculated)="onMortgageApplied($event)"
-                (stateChanged)="onCalculatorStateChanged($event)"
-              >
-              </app-mortgage-calculator>
-            }
           </div>
         }
 
@@ -780,6 +787,7 @@
           @if (isCashEvent) {
             <mat-label
               class="f-s-16 f-w-500 ibr-black d-flex align-items-center"
+              style="line-height: 16px !important"
               >{{ "Net amount" | translate }}
               <img
                 src="assets/images/svgs/help-circle-icon.svg"
@@ -792,6 +800,7 @@
           } @else {
             <mat-label
               class="f-s-16 f-w-500 ibr-black d-flex align-items-center"
+              style="line-height: 16px !important"
               >{{ "Downpayment" | translate }}
               <img
                 src="assets/images/svgs/help-circle-icon.svg"
@@ -877,16 +886,17 @@
         </div>
 
         <div class="w-100 form-field gap-8">
-          <div class="d-flex gap-4 align-items-center">
-            <mat-label class="f-s-16 f-w-500 ibr-black d-block">{{
-              "Date" | translate
-            }}</mat-label>
+          <mat-label
+            class="f-s-16 f-w-500 ibr-black d-flex align-items-center"
+            style="line-height: 16px !important"
+            >{{ "Date" | translate }}
             <img
-              width="18"
               src="assets/images/svgs/help-circle-icon.svg"
-              alt="help-circle-icon"
+              alt="help"
+              width="18"
+              class="m-l-4"
             />
-          </div>
+          </mat-label>
           <div class="position-relative">
             <div class="w-100 form-field">
               <div class="select-option position-relative">
@@ -935,16 +945,18 @@
         @if (!isCashEvent) {
           <!-- monthly payment -->
           <div class="d-flex flex-column gap-8 net-fields">
-            <div class="d-flex gap-4 align-items-center">
-              <mat-label class="f-s-16 f-w-500 ibr-black d-block">{{
-                "Monthly payment" | translate
-              }}</mat-label>
+            <mat-label
+              class="f-s-16 f-w-500 ibr-black d-flex align-items-center"
+              style="line-height: 16px !important"
+              >{{ "Monthly payment" | translate }}
               <img
                 width="18"
+                class="m-l-4"
                 src="assets/images/svgs/help-circle-icon.svg"
                 alt="help-circle-icon"
               />
-            </div>
+            </mat-label>
+
             <div class="net-field d-flex align-items-center">
               <div class="left hide-arrow">
                 <mat-select
@@ -979,10 +991,11 @@
           <!-- start / end -->
           <div class="start-end">
             <div class="d-flex flex-column gap-8">
-              <div class="d-flex gap-4 align-items-center">
-                <mat-label class="f-s-16 f-w-500 ibr-black d-block">
-                  {{ "Start & end" | translate }}
-                </mat-label>
+              <mat-label
+                class="f-s-16 f-w-500 ibr-black d-flex align-items-center"
+                style="line-height: 16px !important"
+              >
+                {{ "Start & end" | translate }}
                 <img
                   src="assets/images/svgs/help-circle-icon.svg"
                   alt="help"
@@ -992,7 +1005,7 @@
                     'ADD_EVENT.DEFINE_EVENT_PERIOD_TOOLTIP' | translate
                   }}"
                 />
-              </div>
+              </mat-label>
               <div
                 class="row justify-content-between align-items-start flex-nowrap"
               >
@@ -1133,21 +1146,23 @@
 
         @if (eventForm.get("hasResale")?.value) {
           <div class="start-start">
-            <div class="row">
-              <div class="col-6">
-                <div class="d-flex gap-4 align-items-center m-b-8">
-                  <mat-label class="f-s-16 f-w-500 ibr-black d-block">{{
-                    "Resale date" | translate
-                  }}</mat-label>
-                  <img
-                    src="assets/images/svgs/help-circle-icon.svg"
-                    alt="help"
-                    width="18"
-                    class="m-l-4"
-                    matTooltip="{{
-                      'ADD_EVENT.DEFINE_EVENT_PERIOD_TOOLTIP' | translate
-                    }}"
-                  />
+            <div class="resale-wrapper">
+              <div class="d-flex flex-column gap-8">
+                <div>
+                  <mat-label
+                    class="f-s-16 f-w-500 ibr-black d-flex align-items-center"
+                    style="line-height: 16px !important"
+                    >{{ "Resale date" | translate }}
+                    <img
+                      src="assets/images/svgs/help-circle-icon.svg"
+                      alt="help"
+                      width="18"
+                      class="m-l-4"
+                      matTooltip="{{
+                        'ADD_EVENT.DEFINE_EVENT_PERIOD_TOOLTIP' | translate
+                      }}"
+                    />
+                  </mat-label>
                 </div>
                 <div
                   class="row justify-content-between align-items-start flex-nowrap"
@@ -1196,9 +1211,20 @@
                 </div>
               </div>
 
-              <div class="col-6">
+              <div class="">
                 <div class="d-flex flex-column gap-8 net-fields">
-                  <div class="d-flex gap-4 align-items-center">
+                  <mat-label
+                    class="f-s-16 f-w-500 ibr-black d-flex align-items-center"
+                    style="line-height: 16px !important"
+                    >{{ "Resale price" | translate }}
+                    <img
+                      src="assets/images/svgs/help-circle-icon.svg"
+                      alt="help"
+                      width="18"
+                      class="m-l-4"
+                    />
+                  </mat-label>
+                  <!-- <div class="d-flex gap-4 align-items-center">
                     <mat-label class="f-s-16 f-w-500 ibr-black d-block">{{
                       "Resale price" | translate
                     }}</mat-label>
@@ -1207,7 +1233,7 @@
                       src="assets/images/svgs/help-circle-icon.svg"
                       alt="help-circle-icon"
                     />
-                  </div>
+                  </div> -->
                   <div class="net-field d-flex align-items-center">
                     <div class="left hide-arrow">
                       <mat-select
@@ -1352,10 +1378,9 @@
           </div>
 
           <div class="d-flex flex-column gap-8 net-fields">
-            <!-- <mat-label class="f-s-16 f-w-500 m-b-8 d-flex align-items-center" -->
             <mat-label
-              class="f-s-16 f-w-500 d-flex ibr-black"
-              style="line-height: 16px"
+              class="f-s-16 f-w-500 d-flex align-items-center ibr-black"
+              style="line-height: 16px !important"
               >{{ "Net amount" | translate }}
               <img
                 src="assets/images/svgs/help-circle-icon.svg"
@@ -1441,40 +1466,29 @@
           </div>
 
           <div class="d-flex flex-column gap-8">
-            <div class="d-flex m-b-8">
+            <div class="d-flex">
               <button
-                (click)="toggleMortgageCalculatorCustom()"
+                (click)="openCustomCalculatorModal()"
                 type="button"
                 class="mortgage-toggle-btn"
               >
                 <span>{{ customCalculatorToggleLabelKey | translate }}</span>
               </button>
             </div>
-            @if (showMortgageCalculatorCustom) {
-              <app-mortgage-calculator
-                [clientCountryCode]="clientCountryCode"
-                [currencySymbol]="clientPreferredCurrency"
-                calculatorKind="loan"
-                [advisorDefaultInterestRate]="customCalculatorAdvisorRate"
-                [initialState]="lastCalculatorState"
-                (calculated)="onMortgageAppliedCustom($event)"
-                (stateChanged)="onCalculatorStateChanged($event)"
-              >
-              </app-mortgage-calculator>
-            }
           </div>
 
           <div class="start-end">
             <div class="d-flex flex-column gap-8">
-              <div class="d-flex gap-4 align-items-center">
-                <mat-label class="f-s-16 f-w-500 d-block ibr-black">
-                  {{
-                    (eventForm.get("cycle")?.value === "One-off"
-                      ? "Date"
-                      : "Start & end"
-                    ) | translate
-                  }}
-                </mat-label>
+              <mat-label
+                class="f-s-16 f-w-500 d-flex align-items-center ibr-black"
+                style="line-height: 16px !important"
+              >
+                {{
+                  (eventForm.get("cycle")?.value === "One-off"
+                    ? "Date"
+                    : "Start & end"
+                  ) | translate
+                }}
                 <img
                   src="assets/images/svgs/help-circle-icon.svg"
                   alt="help"
@@ -1484,7 +1498,8 @@
                     'ADD_EVENT.DEFINE_EVENT_PERIOD_TOOLTIP' | translate
                   }}"
                 />
-              </div>
+              </mat-label>
+
               <div
                 class="row justify-content-between align-items-start flex-nowrap"
               >
@@ -1626,10 +1641,10 @@
                     selectedEscalationDescription !== 'Increases at custom rate'
                   "
                 >
-                  <div class="d-flex gap-4 align-items-center">
-                    <mat-label class="f-s-16 f-w-500 d-block ibr-black">{{
-                      "Escalation rate" | translate
-                    }}</mat-label>
+                  <mat-label
+                    class="f-s-16 f-w-500 d-flex align-items-center ibr-black"
+                    style="line-height: 16px !important"
+                    >{{ "Escalation rate" | translate }}
                     <img
                       src="assets/images/svgs/help-circle-icon.svg"
                       alt="help"
@@ -1639,7 +1654,7 @@
                         'ADD_EVENT.AMOUNT_GROWTH_TOOLTIP' | translate
                       }}"
                     />
-                  </div>
+                  </mat-label>
                   <div class="position-relative">
                     <div class="w-100 form-field">
                       <div class="select-option position-relative">
@@ -1692,9 +1707,11 @@
                   <div
                     class="d-flex flex-column gap-8 escalation-field escalation-custom"
                   >
-                    <mat-label class="f-s-16 f-w-500 d-block ibr-black">{{
-                      "Custom escalation rate" | translate
-                    }}</mat-label>
+                    <mat-label
+                      class="f-s-16 f-w-500 d-block ibr-black"
+                      style="line-height: 18px"
+                      >{{ "Custom escalation rate" | translate }}</mat-label
+                    >
                     <div class="w-100 form-field custom-rate-input">
                       <input
                         matInput

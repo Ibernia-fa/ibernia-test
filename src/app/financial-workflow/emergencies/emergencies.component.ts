@@ -348,7 +348,7 @@ export class EmergenciesComponent implements OnInit {
   onAddClick() {
     this.dialog
       .open(AddEmergenciesComponent, {
-        width: '700px',
+        width: '612px',
         disableClose: true,
         data: {
           emergencyTypes: this.emergencyTypes,
@@ -544,7 +544,7 @@ export class EmergenciesComponent implements OnInit {
       this.defaultEmergencyIds.has(emergency.id) ||
       this.defaultEmergencyNames.has(emergency.name);
     const dialogRef = this.dialog.open(AddEmergenciesComponent, {
-      width: '700px',
+      width: '612px',
       disableClose: true,
       data: {
         mode: 'edit',
@@ -705,7 +705,7 @@ export class EmergenciesComponent implements OnInit {
       ) ?? null;
 
     const dialogRef = this.dialog.open(SimulateEmergencyComponent, {
-      width: '700px',
+      width: '612px',
       disableClose: true,
       data: {
         client: this.selectedClient,

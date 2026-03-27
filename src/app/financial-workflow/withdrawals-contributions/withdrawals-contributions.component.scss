@@ -1,7 +1,11 @@
+.withdrawl-contribution-header {
+  min-height: 107px;
+}
 .income-expense-wrapper {
   display: grid;
   grid-template-columns: 1fr 1px 1fr;
   gap: 24px;
+  align-items: center;
   // flex: 1;
   // .row {
   //   margin: 0 !important;
@@ -48,6 +52,7 @@
     // margin-left: 12px;
     // margin-right: 12px;
     background-color: #cbcbcb;
+    height: 100%;
   }
 }
 .income-expense-tables {

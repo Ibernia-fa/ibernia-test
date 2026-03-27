@@ -35,12 +35,12 @@
 }
 
 .escalation-field {
-  flex: 1 1 260px;
+  flex: 1 1 0;
   min-width: 0;
 }
 
 .escalation-custom {
-  flex: 1 1 170px;
+  flex: 1 1 0;
 }
 
 .escalation-full {
@@ -66,28 +66,41 @@
 }
 
 .graph-tabs {
-  border-bottom: 1px solid #e5e7eb;
+  background: #ffffff;
+  border-radius: 6px;
+  gap: 0 !important;
+  justify-content: flex-end;
+  margin-top: 8px;
+  margin-bottom: 20px;
 }
 
 .tab-btn {
-  position: relative;
-  font-size: 14px !important;
-  font-family: "Ubuntu" !important;
+  font-family: "Ubuntu", sans-serif !important;
+  font-size: 16px !important;
   font-weight: 500 !important;
-  background: none;
+  background: white;
   border: none;
-  padding: 8px 16px;
-  font-size: 14px;
+  padding: 10px 24px;
+  width: 100px;
   cursor: pointer;
-  color: #6b7280;
-  border-bottom: 2px solid transparent;
-  transition: color 0.3s ease, border-bottom-color 0.3s ease;
-}
+  color: #5a596e;
+  border-radius: 6px;
+  min-height: 46px;
+  transition:
+    color 0.25s ease,
+    background-color 0.25s ease,
+    box-shadow 0.25s ease;
 
-.tab-btn.active {
-  color: #111827;
-  border-bottom-color: #516ce8;
-  font-weight: 500;
+  &.active {
+    background-color: #4043af;
+    color: #fff;
+    font-weight: 500 !important;
+  }
+
+  &:hover:not(.active) {
+    color: #5a596e;
+    background-color: rgba(0, 0, 0, 0.03);
+  }
 }
 
 .auto-play-bar {

@@ -3,7 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatCardModule } from '@angular/material/card';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -23,9 +23,10 @@ import { CommonModule } from '@angular/common';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 import { TranslateModule } from '@ngx-translate/core';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MortgageCalculatorComponent, MortgageCalculatorState } from '../mortgage-calculator/mortgage-calculator.component';
+import { MortgageCalculatorState } from '../mortgage-calculator/mortgage-calculator.component';
 import { MortgageOutput } from '../mortgage-calculator/mortgage-calculator.component';
 import { SettingsService } from 'src/app/default-preferance/services/default-preferance.http.service';
+import { MortgageCalculatorDialogComponent, MortgageCalculatorDialogResult } from '../mortgage-calculator-dialog/mortgage-calculator-dialog.component';
 
 @Component({
   selector: 'app-add-event-dialog',
@@ -44,8 +45,7 @@ import { SettingsService } from 'src/app/default-preferance/services/default-pre
     CommonModule,
     ThousandSeparatorInputDirective,
     TranslateModule,
-    MatCheckboxModule,
-    MortgageCalculatorComponent
+    MatCheckboxModule
   ],
   providers: [provideNativeDateAdapter(),
     AgeCalculatorPipe,
@@ -105,8 +105,6 @@ export class AddEventDialogComponent {
   isCashEvent = false;
   financialRecords: FinancialRecordLineItem[] = [];
   clientCountryCode: string = '';
-  showMortgageCalculator = false;
-  showMortgageCalculatorCustom = false;
   lastCalculatorState: MortgageCalculatorState | null = null;
   scenarioMode: boolean = false;
 
@@ -148,23 +146,18 @@ export class AddEventDialogComponent {
   }
 
   get financingCalculatorToggleLabelKey(): string {
-    return this.showMortgageCalculator
-      ? this.financingCalculatorKind === 'mortgage'
-        ? 'Hide mortgage calculator'
-        : 'Hide loan calculator'
-      : this.financingCalculatorKind === 'mortgage'
-        ? 'Use mortgage calculator'
-        : 'Use loan calculator';
+    return this.financingCalculatorKind === 'mortgage'
+      ? 'Use mortgage calculator'
+      : 'Use loan calculator';
   }
 
   get customCalculatorToggleLabelKey(): string {
-    return this.showMortgageCalculatorCustom
-      ? 'Hide loan calculator'
-      : 'Use loan calculator';
+    return 'Use loan calculator';
   }
 
   constructor(
     private dialogRef: MatDialogRef<AddEventDialogComponent>,
+    private dialog: MatDialog,
     private fb: FormBuilder,
     private timelineHttpService: TimelineHttpService,
     private cdr: ChangeDetectorRef,
@@ -909,16 +902,50 @@ export class AddEventDialogComponent {
     this.setupResaleValidation();
   }
 
-  toggleMortgageCalculator(): void {
-    this.showMortgageCalculator = !this.showMortgageCalculator;
+  openFinancingCalculatorModal(): void {
+    const dialogRef = this.dialog.open(MortgageCalculatorDialogComponent, {
+      width: '612px',
+      maxWidth: '95vw',
+      autoFocus: false,
+      data: {
+        title: 'Mortgage Calculator',
+        clientCountryCode: this.clientCountryCode,
+        currencySymbol: this.clientPreferredCurrency,
+        calculatorKind: this.financingCalculatorKind,
+        advisorDefaultInterestRate: this.financingCalculatorAdvisorRate,
+        initialState: this.lastCalculatorState,
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((result: MortgageCalculatorDialogResult | undefined) => {
+      if (!result) return;
+      if (result.state) this.lastCalculatorState = result.state;
+      if (result.applied && result.output) this.onMortgageApplied(result.output);
+      this.cdr.markForCheck();
+    });
   }
 
-  toggleMortgageCalculatorCustom(): void {
-    this.showMortgageCalculatorCustom = !this.showMortgageCalculatorCustom;
-  }
+  openCustomCalculatorModal(): void {
+    const dialogRef = this.dialog.open(MortgageCalculatorDialogComponent, {
+      width: '612px',
+      maxWidth: '95vw',
+      autoFocus: false,
+      data: {
+        title: 'Mortgage Calculator',
+        clientCountryCode: this.clientCountryCode,
+        currencySymbol: this.clientPreferredCurrency,
+        calculatorKind: 'loan',
+        advisorDefaultInterestRate: this.customCalculatorAdvisorRate,
+        initialState: this.lastCalculatorState,
+      },
+    });
 
-  onCalculatorStateChanged(state: MortgageCalculatorState): void {
-    this.lastCalculatorState = state;
+    dialogRef.afterClosed().subscribe((result: MortgageCalculatorDialogResult | undefined) => {
+      if (!result) return;
+      if (result.state) this.lastCalculatorState = result.state;
+      if (result.applied && result.output) this.onMortgageAppliedCustom(result.output);
+      this.cdr.markForCheck();
+    });
   }
 
   onMortgageApplied(output: MortgageOutput): void {
@@ -955,7 +982,6 @@ export class AddEventDialogComponent {
       }
     });
 
-    this.showMortgageCalculator = false;
   }
 
   onMortgageAppliedCustom(output: MortgageOutput): void {
@@ -979,7 +1005,6 @@ export class AddEventDialogComponent {
         el.dispatchEvent(new Event('blur'));
       }
     });
-    this.showMortgageCalculatorCustom = false;
     this.cdr.markForCheck();
   }
 
