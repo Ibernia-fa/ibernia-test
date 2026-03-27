@@ -50,7 +50,7 @@
               <div class="couple-pair">
                 <ng-container *ngFor="let parent of clientParents; let i = index">
                   <div class="tree-node" [class.deceased]="isDeceased(parent.id)"
-                       (click)="onClickClientParent()">
+                       (click)="onClickParentMember(parent)">
                     <div class="node-avatar" [ngClass]="'avatar-' + parent.role.toLowerCase()">
                       <mat-icon>person</mat-icon>
                     </div>
@@ -145,7 +145,7 @@
               <div class="couple-pair">
                 <ng-container *ngFor="let parent of partnerParents; let i = index">
                   <div class="tree-node" [class.deceased]="isDeceased(parent.id)"
-                       (click)="onClickPartnerParent()">
+                       (click)="onClickParentMember(parent)">
                     <div class="node-avatar" [ngClass]="'avatar-' + parent.role.toLowerCase()">
                       <mat-icon>person</mat-icon>
                     </div>
