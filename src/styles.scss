@@ -3,6 +3,9 @@
 html,
 body {
   height: 100%;
+  /* Edge (and some touchpad paths) elastic overscroll otherwise shifts the page and
+     exposes gaps over the default document background behind the shell background. */
+  overscroll-behavior-y: none;
 }
 
 body {
