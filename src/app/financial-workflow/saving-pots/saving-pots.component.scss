@@ -357,17 +357,27 @@
     }
   }
   .ibr-chart-tag {
-    background-color: #ffebcb;
     border-radius: 9999px;
-    // height: 30px;
     text-align: center;
     padding: 10px 10px;
-    color: #fe9614;
     font-size: 14px;
     line-height: 16px;
     font-weight: 400;
     span {
       font-weight: 500;
+    }
+
+    &.ownership-joint {
+      background-color: #c9fcdc;
+      color: #00ba3e;
+    }
+    &.ownership-client {
+      background-color: #c6e1ff;
+      color: #3088ed;
+    }
+    &.ownership-partner {
+      background-color: #ffebcb;
+      color: #fe9614;
     }
   }
 }

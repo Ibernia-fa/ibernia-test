@@ -36,16 +36,18 @@
                 (dragend)="onDragEnd($event)"
                 (dragstart)="onDragStart($event, systemEvent)"
                 class="f-s-14 chip-item"
-                [class]="systemEvent.iconUrl"
+                [class]="getTimelineVisClassName(systemEvent)"
               >
                 <div class="chip-content">
                   <div class="d-flex gap-8 align-items-center">
                     <img
                       matChipAvatar
                       [src]="
-                        '/assets/images/svgs/' + systemEvent.iconUrl + '.svg'
+                        '/assets/images/svgs/' +
+                        getTimelineEventIconBase(systemEvent) +
+                        '.svg'
                       "
-                      [alt]="systemEvent.iconUrl"
+                      [alt]="getTimelineEventIconBase(systemEvent)"
                     />
                     <p>{{ systemEvent.name }}</p>
                   </div>

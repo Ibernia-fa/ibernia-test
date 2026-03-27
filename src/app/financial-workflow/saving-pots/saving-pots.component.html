@@ -321,13 +321,14 @@
                             }
                           </div>
                           @if (hasPartner) {
-                            <!-- <span class="badge ownership-badge"
-                                  >{{ "Ownership" | translate }}:
-                                  {{ getOwnershipLabel(saving) }}</span
-                                > -->
-                            <div class="ibr-chart-tag">
+                            <div
+                              class="ibr-chart-tag"
+                              [ngClass]="getOwnershipBadgeModifierClass(saving)"
+                            >
                               {{ "Ownership" | translate }}:
-                              <span>{{ getOwnershipLabel(saving) }}</span>
+                              <span>{{
+                                getOwnershipKindLabelKey(saving) | translate
+                              }}</span>
                             </div>
                           }
                         </div>
