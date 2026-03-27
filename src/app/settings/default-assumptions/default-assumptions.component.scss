@@ -6,3 +6,17 @@
     margin-bottom: 10px;
   }
 }
+
+.assumptions-section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1c1c1c;
+  margin: 0 0 16px;
+  padding-top: 20px;
+  border-top: 1px solid #e8e8e8;
+
+  &:first-of-type {
+    border-top: none;
+    padding-top: 0;
+  }
+}

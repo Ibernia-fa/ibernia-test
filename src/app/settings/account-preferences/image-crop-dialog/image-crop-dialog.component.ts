@@ -1,4 +1,9 @@
-import { Component, Inject } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  Inject,
+  ViewChild,
+} from '@angular/core';
 import { MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSliderModule } from '@angular/material/slider';
@@ -14,6 +19,26 @@ export interface ImageCropDialogData {
   /** 'profile' = circle, 'company' = rectangle. Controls shape and fixed dimensions. */
   cropType?: CropType;
   title?: string;
+  /** Pan/zoom from last session (same source image) — reopen without resetting the editor. */
+  initialTransform?: ImageTransform;
+}
+
+/** Returned on Select so parent can keep preview/save aligned with the cropper and restore state. */
+export interface ImageCropDialogResult {
+  croppedBase64: string;
+  transform: ImageTransform;
+}
+
+function normalizeTransform(t?: ImageTransform): ImageTransform {
+  return {
+    translateUnit: 'px',
+    scale: t?.scale ?? 1,
+    translateH: t?.translateH ?? 0,
+    translateV: t?.translateV ?? 0,
+    rotate: t?.rotate,
+    flipH: t?.flipH,
+    flipV: t?.flipV,
+  };
 }
 
 /**
@@ -52,8 +77,10 @@ const COMPANY_CROP_H = 300;
         [class.crop-container--company]="data.cropType === 'company'"
       >
         <image-cropper
+          #cropper
           [imageBase64]="data.imageBase64"
           [maintainAspectRatio]="true"
+          [containWithinAspectRatio]="true"
           [aspectRatio]="data.cropType === 'company' ? (4/3) : 1"
           [roundCropper]="data.cropType === 'profile'"
           [allowMoveImage]="true"
@@ -66,6 +93,7 @@ const COMPANY_CROP_H = 300;
           [resizeToWidth]="0"
           (imageCropped)="onImageCropped($event)"
           (transformChange)="onTransformChange($event)"
+          (cropperReady)="onCropperReady()"
           (loadImageFailed)="onLoadFailed()"
         ></image-cropper>
       </div>
@@ -127,16 +155,11 @@ const COMPANY_CROP_H = 300;
       width: 100%;
       height: 100%;
     }
-    /* Force the stage to the viewport so maxSize matches the frame (not the raw bitmap size). */
-    .crop-container ::ng-deep .ngx-ic-source-image {
-      display: block !important;
-      width: 100% !important;
-      height: 100% !important;
-      max-width: none !important;
-      max-height: none !important;
-      object-fit: contain;
-      box-sizing: border-box;
-    }
+    /*
+     * Do NOT set object-fit / forced 100% width+height on .ngx-ic-source-image: the crop canvas
+     * math assumes the same layout ngx computes; CSS letterboxing breaks preview vs export.
+     * containWithinAspectRatio pads the bitmap inside ngx so display and crop() stay aligned.
+     */
     .crop-container ::ng-deep .ngx-ic-overlay {
       box-sizing: border-box;
     }
@@ -156,19 +179,27 @@ const COMPANY_CROP_H = 300;
   `],
 })
 export class ImageCropDialogComponent {
+  @ViewChild('cropper') cropperRef?: ImageCropperComponent;
+
   croppedBase64: string | null = null;
   scale = 1;
   /** Pixel translation: default % in ngx-image-cropper makes drags feel wildly oversensitive. */
-  transform: ImageTransform = { translateUnit: 'px', scale: 1 };
+  transform: ImageTransform = normalizeTransform();
 
   readonly profileCropPx = PROFILE_VIEWPORT_PX;
   readonly companyCropW = COMPANY_CROP_W;
   readonly companyCropH = COMPANY_CROP_H;
 
   constructor(
-    private dialogRef: MatDialogRef<ImageCropDialogComponent>,
+    private dialogRef: MatDialogRef<ImageCropDialogComponent, ImageCropDialogResult | null>,
     @Inject(MAT_DIALOG_DATA) public data: ImageCropDialogData,
-  ) {}
+    private cdr: ChangeDetectorRef,
+  ) {
+    if (data.initialTransform) {
+      this.transform = normalizeTransform(data.initialTransform);
+      this.scale = this.transform.scale ?? 1;
+    }
+  }
 
   onImageCropped(event: ImageCroppedEvent): void {
     if (event.base64) {
@@ -177,7 +208,7 @@ export class ImageCropDialogComponent {
   }
 
   onTransformChange(t: ImageTransform): void {
-    this.transform = { ...t, translateUnit: 'px' };
+    this.transform = normalizeTransform(t);
     const s = t.scale;
     if (s != null && Math.abs(s - this.scale) > 0.001) {
       this.scale = s;
@@ -185,7 +216,15 @@ export class ImageCropDialogComponent {
   }
 
   onZoomChange(): void {
-    this.transform = { ...this.transform, scale: this.scale, translateUnit: 'px' };
+    this.transform = normalizeTransform({ ...this.transform, scale: this.scale });
+  }
+
+  /** Re-sync transform after layout when reopening so ngx applies pan/zoom to the loaded image. */
+  onCropperReady(): void {
+    if (!this.data.initialTransform) {
+      return;
+    }
+    this.transform = normalizeTransform(this.transform);
   }
 
   onLoadFailed(): void {
@@ -193,6 +232,18 @@ export class ImageCropDialogComponent {
   }
 
   apply(): void {
-    this.dialogRef.close(this.croppedBase64 ?? null);
+    this.cdr.detectChanges();
+    requestAnimationFrame(() => {
+      const latest = this.cropperRef?.crop('base64');
+      const raw = latest?.base64 ?? this.croppedBase64;
+      if (!raw) {
+        return;
+      }
+      const croppedBase64 = raw.startsWith('data:') ? raw : `data:image/jpeg;base64,${raw}`;
+      this.dialogRef.close({
+        croppedBase64,
+        transform: normalizeTransform(this.transform),
+      });
+    });
   }
 }

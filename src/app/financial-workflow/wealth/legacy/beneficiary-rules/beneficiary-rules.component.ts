@@ -75,6 +75,21 @@ export class BeneficiaryRulesComponent {
     return this.getEligibleMembers(this.activeScenario.type);
   }
 
+  get canAddRecipient(): boolean {
+    const selectedIds = new Set(this.recipients.map(r => r.memberId).filter(id => !!id));
+    return this.eligibleMembers.some(m => !selectedIds.has(m.id));
+  }
+
+  getAvailableMembersForRow(rowIndex: number): FamilyMemberModel[] {
+    const selectedInOtherRows = new Set(
+      this.recipients
+        .filter((_, i) => i !== rowIndex)
+        .map(r => r.memberId)
+        .filter(id => !!id)
+    );
+    return this.eligibleMembers.filter(m => !selectedInOtherRows.has(m.id));
+  }
+
   private buildScenarioTabs(): void {
     const d = this.data.dashboard;
     const tabs: ScenarioTab[] = [];

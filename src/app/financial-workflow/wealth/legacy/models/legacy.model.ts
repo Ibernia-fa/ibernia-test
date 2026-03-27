@@ -103,6 +103,7 @@ export interface BeneficiaryRuleModel {
   scenario: string;
   recipients: BeneficiaryRecipientModel[];
   totalPercentage: number;
+  isDefault: boolean;
 }
 
 export interface BeneficiaryRecipientModel {

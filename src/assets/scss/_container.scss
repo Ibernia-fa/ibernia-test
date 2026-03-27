@@ -30,6 +30,7 @@ body {
   // height: calc(100dvh - 60px);
   height: calc(100dvh - 0px);
   background-color: #fafafa !important;
+  /* Frosted veil over default asset only — backdrop-filter blurs custom uploads into a color wash */
   &::after {
     content: "";
     position: absolute;
@@ -40,6 +41,13 @@ body {
     background: #ffffff12;
     backdrop-filter: blur(150.60000610351562px);
     z-index: -1;
+    pointer-events: none;
+  }
+
+  &.custom-branded-background {
+    &::after {
+      display: none;
+    }
   }
 }
 // .app-container {

@@ -171,8 +171,11 @@ export class LegacyComponent implements OnInit, OnChanges {
     }
 
     ids.forEach(id => this.markedDeceased.add(id));
-    this.activeScenario = scenario;
-    this.legacyHttp.simulateScenario(this.cashflowId, scenario).subscribe({
+
+    const effectiveScenario = this.resolveEffectiveScenario(scenario);
+
+    this.activeScenario = effectiveScenario;
+    this.legacyHttp.simulateScenario(this.cashflowId, effectiveScenario).subscribe({
       next: (result) => {
         this.scenarioResult = result;
         this.cdr.markForCheck();
@@ -187,6 +190,19 @@ export class LegacyComponent implements OnInit, OnChanges {
         this.cdr.markForCheck();
       }
     });
+  }
+
+  private resolveEffectiveScenario(requestedScenario: ScenarioType): ScenarioType {
+    const clientId = this.clientMember?.id;
+    const partnerId = this.partnerMember?.id;
+
+    if (clientId && partnerId
+        && this.markedDeceased.has(clientId)
+        && this.markedDeceased.has(partnerId)) {
+      return ScenarioType.BothDie;
+    }
+
+    return requestedScenario;
   }
 
   private getScenarioMemberIds(scenario: ScenarioType): string[] {
@@ -207,12 +223,42 @@ export class LegacyComponent implements OnInit, OnChanges {
     }
   }
 
-  onClickClientParent(): void {
-    this.selectScenario(ScenarioType.ClientParentsDie);
-  }
+  onClickParentMember(member: FamilyMemberModel): void {
+    const memberId = member.id;
 
-  onClickPartnerParent(): void {
-    this.selectScenario(ScenarioType.PartnerParentsDie);
+    if (this.markedDeceased.has(memberId)) {
+      this.markedDeceased.delete(memberId);
+    } else {
+      this.markedDeceased.add(memberId);
+    }
+
+    const isClientSide = member.role === 'ClientFather' || member.role === 'ClientMother';
+    const scenario = isClientSide ? ScenarioType.ClientParentsDie : ScenarioType.PartnerParentsDie;
+    const parentMembers = isClientSide ? this.clientParents : this.partnerParents;
+
+    const allParentsDead = parentMembers.length > 0
+      && parentMembers.every(p => this.markedDeceased.has(p.id));
+
+    if (allParentsDead) {
+      this.activeScenario = scenario;
+      this.legacyHttp.simulateScenario(this.cashflowId, scenario).subscribe({
+        next: (result) => {
+          this.scenarioResult = result;
+          this.cdr.markForCheck();
+        },
+        error: (err) => {
+          this.toastr.error(err?.error?.message || 'Failed to simulate scenario', 'Error');
+          parentMembers.forEach(p => this.markedDeceased.delete(p.id));
+          this.activeScenario = null;
+          this.scenarioResult = null;
+          this.cdr.markForCheck();
+        }
+      });
+    } else {
+      this.activeScenario = null;
+      this.scenarioResult = null;
+      this.cdr.markForCheck();
+    }
   }
 
   onClickClient(): void {

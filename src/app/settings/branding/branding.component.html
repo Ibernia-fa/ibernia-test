@@ -41,12 +41,11 @@
       <label for="company-logo-input" class="cursor-pointer">
         <div class="text-center">
           <!-- WHEN an image is present, show preview with delete (same as Profile) -->
-          <div *ngIf="profileImage; else placeholder" class="image-preview-wrapper position-relative">
+          <div *ngIf="profileImage; else placeholder" class="image-preview-wrapper company-logo-preview position-relative">
             <img
               [src]="profileImage"
               alt="company logo preview"
-              class="rounded"
-              style="width:120px;height:120px;object-fit:cover;"
+              class="company-logo-preview__img"
             />
             <span class="crop-pic" (click)="cropImage($event)" matTooltip="{{ 'Crop' | translate }}">
               <mat-icon>crop</mat-icon>
