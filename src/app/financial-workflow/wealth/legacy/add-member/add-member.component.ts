@@ -52,7 +52,7 @@ export class AddMemberComponent {
 
   private buildRoleOptions(): void {
     const existing = this.data.existingMembers;
-    const hasPartnerMember = existing.some(m => m.role === 'Partner' || m.role === FamilyRole.Partner);
+    const hasPartnerMember = existing.some(m => m.role === 'Partner');
     const hasClientFather = existing.some(m => m.role === 'ClientFather');
     const hasClientMother = existing.some(m => m.role === 'ClientMother');
     const hasPartnerFather = existing.some(m => m.role === 'PartnerFather');
