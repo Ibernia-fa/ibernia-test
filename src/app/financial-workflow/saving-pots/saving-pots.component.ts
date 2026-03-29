@@ -264,24 +264,22 @@ export class SavingPotsComponent implements OnInit {
   //   );
   // }
 
-  drop(event: CdkDragDrop<any>) {
+  drop(event: CdkDragDrop<ClientSaving[]>) {
     const list = this.savingPots?.clientSavings ?? [];
     if (!list.length) return;
 
-    // Don’t let anything be dropped at index 0
-    if (event.currentIndex === 0) {
-      return;
-    }
+    const cashCount = list.filter((s) => this.isCashName(s?.name)).length;
+    const nonCashCount = list.length - cashCount;
+    if (nonCashCount <= 0) return;
 
-    // Don’t let the first item (Cash) be moved at all (defense in depth)
-    if (event.previousIndex === 0) {
-      return;
-    }
+    if (event.previousIndex === event.currentIndex) return;
 
-    moveItemInArray(list, event.previousIndex, event.currentIndex);
+    const prevFull = cashCount + event.previousIndex;
+    const currFull = cashCount + event.currentIndex;
+
+    moveItemInArray(list, prevFull, currFull);
     this.savingPots.clientSavings = [...list];
 
-    // Recompute order numbers and persist (you already have this)
     this.updateOrderNumbers();
   }
 
@@ -547,6 +545,46 @@ export class SavingPotsComponent implements OnInit {
   // Add these helpers to the component
   private isCashName(n?: string): boolean {
     return (n ?? '').trim().toLowerCase() === 'cash';
+  }
+
+  /** Public for template: identify cash saving pots (name "Cash"). */
+  isCashPot(saving: ClientSaving | undefined | null): boolean {
+    return this.isCashName(saving?.name);
+  }
+
+  get cashSavingPots(): ClientSaving[] {
+    return (this.savingPots?.clientSavings ?? []).filter((s) =>
+      this.isCashName(s?.name),
+    );
+  }
+
+  get nonCashSavingPots(): ClientSaving[] {
+    return (this.savingPots?.clientSavings ?? []).filter(
+      (s) => !this.isCashName(s?.name),
+    );
+  }
+
+  getCashPotsGridModifier(): Record<string, boolean> {
+    const n = this.cashSavingPots.length;
+    return {
+      'cash-saving-pots-grid': true,
+      'cash-saving-pots-grid--cols-1': n <= 1,
+      'cash-saving-pots-grid--cols-2': n === 2,
+      'cash-saving-pots-grid--cols-3': n >= 3,
+    };
+  }
+
+  /** Full `clientSavings` index for the non-cash row at `localIndex`. */
+  fullIndexForNonCash(localIndex: number): number {
+    return this.cashSavingPots.length + localIndex;
+  }
+
+  dragColumnForNonCashPot(localIndex: number): 'handle' | 'spacer' {
+    return this.fullIndexForNonCash(localIndex) > 0 ? 'handle' : 'spacer';
+  }
+
+  trackSavingPot(index: number, saving: ClientSaving): string {
+    return saving.id ?? `idx-${index}`;
   }
 
   private ensureCashFirst(): void {
