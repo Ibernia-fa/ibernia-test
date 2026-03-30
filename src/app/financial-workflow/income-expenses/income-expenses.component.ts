@@ -281,6 +281,9 @@ export class IncomeExpensesComponent {
         incomeType: this.incomeType,
         clientSavings: this.savingsPots?.clientSavings ?? [],
         existingContributions: this.contributionWithdrawal?.contributions ?? [],
+        clientFirstName: this.clientFirstName,
+        partnerFirstName: this.partnerFirstName,
+        hasPartner: this.hasPartner,
       },
     });
 
@@ -345,6 +348,9 @@ export class IncomeExpensesComponent {
         incomeType: this.incomeType,
         clientSavings: this.savingsPots?.clientSavings ?? [],
         existingContributions: this.contributionWithdrawal?.contributions ?? [],
+        clientFirstName: this.clientFirstName,
+        partnerFirstName: this.partnerFirstName,
+        hasPartner: this.hasPartner,
       },
     });
 
@@ -390,17 +396,20 @@ export class IncomeExpensesComponent {
   setIncomeType() {
     this.incomeType = [];
 
+    const cName = this.clientFirstName || 'Client';
+    const pName = this.partnerFirstName || 'Partner';
+
     if (!this.defaultIncomes.find((x) => x.description == 'Salary')) {
-      this.incomeType.push('Salary');
+      this.incomeType.push(this.hasPartner ? `Salary ${cName}` : 'Salary');
     }
     if (
       this.hasPartner &&
       !this.defaultIncomes.find((x) => x.description == 'Salary (Partner)')
     ) {
-      this.incomeType.push('Salary (Partner)');
+      this.incomeType.push(`Salary ${pName}`);
     }
     if (!this.defaultIncomes.find((x) => x.description == 'State pension')) {
-      this.incomeType.push('State pension');
+      this.incomeType.push(this.hasPartner ? `State pension ${cName}` : 'State pension');
     }
     if (
       this.hasPartner &&
@@ -408,7 +417,7 @@ export class IncomeExpensesComponent {
         (x) => x.description == 'State pension (Partner)',
       )
     ) {
-      this.incomeType.push('State pension (Partner)');
+      this.incomeType.push(`State pension ${pName}`);
     }
     if (!this.incomes.find((x) => x.description == 'Rental income')) {
       this.incomeType.push('Rental income');
