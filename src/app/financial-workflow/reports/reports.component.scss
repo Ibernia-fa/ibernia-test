@@ -554,6 +554,15 @@ tr.example-detail-row {
     line-height: 100%;
     margin: 0 0 16px 0;
   }
+
+  .ibr-insights-loading {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 0;
+    color: #787889;
+    font-size: 14px;
+  }
 }
 
 .ibr-insights-grid {
