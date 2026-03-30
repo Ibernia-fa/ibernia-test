@@ -1,0 +1,3 @@
+Execution ID,Tester Name,Date,Module,Test Case ID Range,Total Cases Assigned,Passed,Failed,Blocked,Not Run,Bugs Raised,Retest Needed,Execution Status,Comments
+EX-001,,,,APP-001–APP-168,168,,,,168,,,Not Started,Template row — duplicate per tester or per sprint
+EX-002,,,,,,,,,,,,,,Add one row per execution batch (e.g. "Sprint 12 DEV regression")
