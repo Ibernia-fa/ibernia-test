@@ -544,14 +544,14 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
     const allMinorLabels = document.querySelectorAll('.vis-text.vis-minor');
 
     allMinorLabels.forEach((label) => {
-      const pTag = label.querySelector('p') as HTMLElement;
+      const pTags = label.querySelectorAll('p');
       const spanTag = label.querySelector('span') as HTMLElement;
 
-      if (pTag) {
+      pTags.forEach((pTag) => {
         pTag.style.color = '';
         pTag.style.fontWeight = '';
         pTag.style.fontSize = '';
-      }
+      });
 
       if (spanTag) {
         spanTag.style.color = '';
@@ -574,7 +574,7 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
 
     // Highlight the matching year
     allMinorLabels.forEach((label) => {
-      const pTag = label.querySelector('p') as HTMLElement;
+      const pTags = label.querySelectorAll('p');
       const spanTag = label.querySelector('span') as HTMLElement;
 
       if (spanTag?.textContent?.trim() === snappedYear.toString()) {
@@ -593,11 +593,11 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
           spanTag.style.color = '#1c1c1c';
         }
 
-        if (pTag) {
+        pTags.forEach((pTag) => {
           pTag.style.fontSize = '14px';
-          pTag.style.fontWeight = '500';
+          pTag.style.fontWeight = 'bold';
           pTag.style.color = '#333';
-        }
+        });
       }
     });
   }
@@ -606,14 +606,14 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
     const minorLabels = document.querySelectorAll('.vis-text.vis-minor');
     minorLabels.forEach((label) => {
       const el = label as HTMLElement;
-      const pTag = label.querySelector('p') as HTMLElement;
+      const pTags = label.querySelectorAll('p');
       const spanTag = label.querySelector('span') as HTMLElement;
 
-      if (pTag) {
+      pTags.forEach((pTag) => {
         pTag.style.color = '';
         pTag.style.fontWeight = '';
         pTag.style.fontSize = '';
-      }
+      });
 
       if (spanTag) {
         spanTag.style.color = '';
