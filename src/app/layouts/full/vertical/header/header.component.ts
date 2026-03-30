@@ -437,7 +437,10 @@ get userInitials(): string {
         }
         this.Authservice.logout();
     }
-  options = this.settings.getOptions();
+
+  get options(): AppSettings {
+    return this.settings.getOptions();
+  }
 
   openDialog() {
     const dialogRef = this.dialog.open(AppSearchDialogComponent);
@@ -448,7 +451,7 @@ get userInitials(): string {
   }
 
   private emitOptions() {
-    this.optionsChange.emit(this.options);
+    this.optionsChange.emit(this.settings.getOptions());
   }
 
     get clientFullName(): string {
@@ -463,7 +466,7 @@ get userInitials(): string {
   }
 
   setlightDark(theme: string) {
-    this.options.theme = theme;
+    this.settings.setOptions({ theme });
     this.emitOptions();
   }
 

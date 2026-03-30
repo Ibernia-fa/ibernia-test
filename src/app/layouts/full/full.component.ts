@@ -109,8 +109,12 @@ export class FullComponent implements OnInit, OnDestroy {
   public sidenav: MatSidenav;
   resView = false;
   @ViewChild('content', { static: true }) content!: MatSidenavContent;
-  //get options from service
-  options = this.settings.getOptions();
+
+  /** Always read from CoreService so layout state matches after setOptions (avoids stale ref after toggle in prod). */
+  get options(): AppSettings {
+    return this.settings.getOptions();
+  }
+
   private layoutChangesSubscription = Subscription.EMPTY;
   private isMobileScreen = false;
   private isContentWidthFixed = true;
@@ -260,15 +264,22 @@ export class FullComponent implements OnInit, OnDestroy {
     this.layoutChangesSubscription = this.breakpointObserver
       .observe([MOBILE_VIEW, TABLET_VIEW, MONITOR_VIEW, BELOWMONITOR])
       .subscribe((state) => {
-        // SidenavOpened must be reset true when layout changes
-        this.options.sidenavOpened = true;
+        const o = this.settings.getOptions();
+        let sidenavCollapsed = o.sidenavCollapsed;
+        if (o.sidenavCollapsed === false) {
+          sidenavCollapsed = state.breakpoints[TABLET_VIEW];
+        }
+        this.settings.setOptions({
+          sidenavOpened: true,
+          sidenavCollapsed,
+        });
         this.isMobileScreen = state.breakpoints[BELOWMONITOR];
         this.isContentWidthFixed = state.breakpoints[MONITOR_VIEW];
         this.resView = state.breakpoints[BELOWMONITOR];
       });
 
     // Initialize project theme with options
-    this.receiveOptions(this.options);
+    this.receiveOptions(this.settings.getOptions());
 
     // Set initial route state (for direct load/refresh on cashflow routes)
     this.isCashflowRoute = this.router.url.startsWith('/cashflows');
@@ -351,12 +362,16 @@ export class FullComponent implements OnInit, OnDestroy {
 
   toggleCollapsed() {
     this.isContentWidthFixed = false;
-    this.options.sidenavCollapsed = !this.options.sidenavCollapsed;
+    const o = this.settings.getOptions();
+    this.settings.setOptions({ sidenavCollapsed: !o.sidenavCollapsed });
     this.resetCollapsedState();
   }
 
   resetCollapsedState(timer = 400) {
-    setTimeout(() => this.settings.setOptions(this.options), timer);
+    setTimeout(() => {
+      const o = this.settings.getOptions();
+      this.settings.setOptions({ ...o });
+    }, timer);
   }
 
   onSidenavClosedStart() {
@@ -365,8 +380,7 @@ export class FullComponent implements OnInit, OnDestroy {
 
   onSidenavOpenedChange(isOpened: boolean) {
     this.isCollapsedWidthFixed = !this.isOver;
-    this.options.sidenavOpened = isOpened;
-    this.settings.setOptions(this.options);
+    this.settings.setOptions({ sidenavOpened: isOpened });
   }
 
   receiveOptions(options: AppSettings): void {
