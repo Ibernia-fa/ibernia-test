@@ -20,7 +20,7 @@ export const navItemslower: NavItem[] = [
     route: '/cashflows/{cashflowId}/wealth',
   },
   {
-    displayName: 'Learn',
+    displayName: 'School',
     iconName: '/assets/images/svgs/book-solid.svg',
     iconOutline: '/assets/images/svgs/book-solid.svg',
     // route: '/cashflows/{cashflowId}/emergencies',
