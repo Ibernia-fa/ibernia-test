@@ -39,14 +39,14 @@ export class SidebarComponent implements OnInit, OnDestroy {
   @Output() toggleCollapsed = new EventEmitter<void>();
 
   isSettings = false;
+  /** Organization-uploaded logo; when null, sidebar uses static SVG fallbacks. */
   brandingLogo: string | null = null;
-  isBrandLogoLoaded = false;
 
   ngOnInit(): void {
     this.router.events
       .pipe(
         filter((e) => e instanceof NavigationEnd),
-        startWith(null)
+        startWith(null),
       )
       .subscribe(() => {
         const url = this.router.url.split('?')[0];
@@ -55,14 +55,12 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
     const userId = this.authService.getUserProfile()?.sub;
     if (userId) {
-      // Use cached logo immediately if available (e.g. from header or previous load)
       this.organizationProfiles.brandingLogo$
         .pipe(take(1))
         .subscribe((url) => {
           const cached = this.ensureDataUrl(url);
           if (cached) {
             this.brandingLogo = cached;
-            this.isBrandLogoLoaded = true;
           }
         });
 
@@ -73,24 +71,19 @@ export class SidebarComponent implements OnInit, OnDestroy {
           next: (p) => {
             const logo = this.ensureDataUrl(p?.profilePhotoUrl ?? null);
             this.brandingLogo = logo;
-            this.isBrandLogoLoaded = true;
             this.organizationProfiles.setBrandingLogo(logo);
           },
-          error: () => {
-            this.isBrandLogoLoaded = true;
-          },
+          error: () => {},
         });
+
       this.organizationProfiles.brandingLogo$
         .pipe(takeUntil(this.destroy$))
         .subscribe((url) => {
           const logo = this.ensureDataUrl(url);
           if (logo) {
             this.brandingLogo = logo;
-            this.isBrandLogoLoaded = true;
           }
         });
-    } else {
-      this.isBrandLogoLoaded = true;
     }
   }
 

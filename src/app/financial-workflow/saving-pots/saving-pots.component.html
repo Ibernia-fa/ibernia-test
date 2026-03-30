@@ -326,9 +326,7 @@
                               [ngClass]="getOwnershipBadgeModifierClass(saving)"
                             >
                               {{ "Ownership" | translate }}:
-                              <span>{{
-                                getOwnershipKindLabelKey(saving) | translate
-                              }}</span>
+                              <span>{{ getOwnershipBadgeCaption(saving) }}</span>
                             </div>
                           }
                         </div>

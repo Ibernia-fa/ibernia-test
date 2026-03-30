@@ -173,7 +173,7 @@
                 isOwnershipAvailableForCash(SavingPotOwnership.Person1)
               ) {
                 <mat-radio-button [value]="SavingPotOwnership.Person1">{{
-                  clientFirstName || ("Person 1" | translate)
+                  clientDisplayName || ("Person 1" | translate)
                 }}</mat-radio-button>
               }
               @if (
@@ -181,7 +181,7 @@
                 isOwnershipAvailableForCash(SavingPotOwnership.Person2)
               ) {
                 <mat-radio-button [value]="SavingPotOwnership.Person2">{{
-                  partnerFirstName || ("Person 2" | translate)
+                  partnerDisplayName || ("Person 2" | translate)
                 }}</mat-radio-button>
               }
             </mat-radio-group>

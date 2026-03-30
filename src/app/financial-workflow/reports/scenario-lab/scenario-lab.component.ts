@@ -37,6 +37,7 @@ import { AddExpenseComponent } from '../../income-expenses/add-expense/add-expen
 import { AddEventDialogComponent, EventType } from '../../timeline/add-event-dialog/add-event-dialog.component';
 import { AddNewPotComponent } from '../../saving-pots/add-new-pot/add-new-pot.component';
 import { patchInflationRateDescription } from 'src/app/shared/utils/escalation-rate-utils';
+import { formatClientPersonDisplayName } from 'src/app/shared/utils/person-display-name';
 
 @Component({
   selector: 'app-scenario-lab',
@@ -625,6 +626,12 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
         hasPartner: !!this.client.partnerDetail,
         clientFirstName: this.client.clientDetails?.firstName ?? '',
         partnerFirstName: this.client.partnerDetail?.firstName ?? '',
+        clientDisplayName: formatClientPersonDisplayName(
+          this.client.clientDetails,
+        ),
+        partnerDisplayName: formatClientPersonDisplayName(
+          this.client.partnerDetail,
+        ),
         scenarioMode: true,
       },
     });

@@ -1,4 +1,7 @@
-import { Component, ElementRef, Input, OnChanges, OnDestroy, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, ElementRef, inject, Input, OnChanges, OnDestroy, SimpleChanges, ViewChild } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
+import { formatLifetimePlanSeriesDisplayName } from 'src/app/shared/utils/lifetime-plan-series-display';
+import { ensureUniqueSavingsChartSeriesColors } from 'src/app/shared/utils/unique-savings-chart-series-colors';
 import { MatCardModule } from '@angular/material/card';
 import { TablerIconsModule } from 'angular-tabler-icons';
 import { NgApexchartsModule } from 'ng-apexcharts';
@@ -17,6 +20,8 @@ import { Client } from 'src/app/clients/models/client';
   styleUrl: './view-savings-bar-stacked-chart.component.scss'
 })
 export class ViewSavingsBarStackedChartComponent implements OnChanges, OnDestroy {
+  private translate = inject(TranslateService);
+
   @ViewChild("chart", { read: ElementRef }) chartElRef: ElementRef<HTMLDivElement>;
   @Input() report: ChartSeries;
   @Input() forecastStartDate: Date;
@@ -35,6 +40,7 @@ export class ViewSavingsBarStackedChartComponent implements OnChanges, OnDestroy
   }> = [];
   private _postRenderTimer: any = null;
   private _tooltipRetryTimer: any = null;
+  private seriesColorsForTooltip: Series[] = [];
 
   constructor() {
     this.chartOptions = {
@@ -87,7 +93,7 @@ export class ViewSavingsBarStackedChartComponent implements OnChanges, OnDestroy
               const value = series[i]?.[dataPointIndex];
               if (value === undefined || (typeof value === 'number' && value === 0)) return '';
               // Index must match series order — duplicate pot names break find-by-name.
-              const originalSeries = comp.report?.series?.[i] as Series | undefined;
+              const originalSeries = comp.seriesColorsForTooltip[i] as Series | undefined;
               const color = (originalSeries?.color && originalSeries.color !== 'transparent') ? originalSeries.color : w.globals.colors[i];
               const displayValue = typeof value === 'number'
                 ? comp.formatCurrency(value)
@@ -178,11 +184,11 @@ export class ViewSavingsBarStackedChartComponent implements OnChanges, OnDestroy
   ngOnChanges(changes: SimpleChanges): void {
     const report = this.trimReportToEndYear(this.report);
 
-    if (changes['report'] && report?.series?.length) {
-      const seriesList = report.series;
+    if ((changes['report'] || changes['client']) && report?.series?.length) {
+      const seriesForChart = ensureUniqueSavingsChartSeriesColors(report.series);
+      this.seriesColorsForTooltip = seriesForChart;
 
-      // dynamically build fillColors array based on series names (match advisor)
-      const fillColors = seriesList.map((s: Series) =>
+      const fillColors = seriesForChart.map((s: Series) =>
         s.name === 'Current Account (Negative)' || s.name === 'Emergency Expense' ? 'transparent' : s.color
       );
       this.chartOptions.legend = {
@@ -203,7 +209,15 @@ export class ViewSavingsBarStackedChartComponent implements OnChanges, OnDestroy
 
       this.events = report.timelineEvents ?? [];
       this.chartOptions.annotations = { points: this.buildEventAnnotations(this.events) };
-      this.chartOptions.series = report.series.map((s) => ({ ...s, tack: 'stack1' }));
+      this.chartOptions.series = seriesForChart.map((s) => ({
+        ...s,
+        name: formatLifetimePlanSeriesDisplayName(s, this.client, this.translate),
+        color:
+          s.name === 'Current Account (Negative)' || s.name === 'Emergency Expense'
+            ? 'transparent'
+            : s.color,
+        tack: 'stack1',
+      }));
 
       if (this.events.length === 0) {
         this.cleanupHtmlTooltips();

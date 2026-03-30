@@ -25,6 +25,7 @@ import { AuthService } from 'src/app/auth/services/auth.service';
 import { SettingsService } from 'src/app/default-preferance/services/default-preferance.http.service';
 import { AddNewPotComponent } from '../saving-pots/add-new-pot/add-new-pot.component';
 import { patchInflationRateDescription } from 'src/app/shared/utils/escalation-rate-utils';
+import { formatClientPersonDisplayName } from 'src/app/shared/utils/person-display-name';
 import { WealthHttpService } from './services/wealth-http.service';
 import { WealthDashboardModel, WealthAssetModel, WealthLiabilityModel } from './models/wealth.model';
 import { AddAssetComponent } from './add-asset/add-asset.component';
@@ -286,6 +287,12 @@ export class WealthComponent implements OnInit {
             hasPartner: this.hasPartner,
             clientFirstName: this.clientFirstName,
             partnerFirstName: this.partnerFirstName,
+            clientDisplayName: formatClientPersonDisplayName(
+              this.selectedClient?.clientDetails,
+            ),
+            partnerDisplayName: formatClientPersonDisplayName(
+              this.selectedClient?.partnerDetail,
+            ),
             fromNetWorth: true
           }
         });
@@ -361,8 +368,20 @@ export class WealthComponent implements OnInit {
 
   getOwnershipLabel(ownership: string): string {
     if (!ownership || ownership === 'Joint') return 'Joint';
-    if (ownership === 'Client') return this.clientFirstName || 'Client';
-    if (ownership === 'Partner') return this.partnerFirstName || 'Partner';
+    if (ownership === 'Client') {
+      return (
+        formatClientPersonDisplayName(this.selectedClient?.clientDetails) ||
+        this.clientFirstName ||
+        'Client'
+      );
+    }
+    if (ownership === 'Partner') {
+      return (
+        formatClientPersonDisplayName(this.selectedClient?.partnerDetail) ||
+        this.partnerFirstName ||
+        'Partner'
+      );
+    }
     return ownership;
   }
 
