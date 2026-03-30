@@ -86,7 +86,8 @@ export class ViewSavingsBarStackedChartComponent implements OnChanges, OnDestroy
             .map((seriesName: string, i: number) => {
               const value = series[i]?.[dataPointIndex];
               if (value === undefined || (typeof value === 'number' && value === 0)) return '';
-              const originalSeries = comp.report?.series?.find((s: Series) => s.name === seriesName);
+              // Index must match series order — duplicate pot names break find-by-name.
+              const originalSeries = comp.report?.series?.[i] as Series | undefined;
               const color = (originalSeries?.color && originalSeries.color !== 'transparent') ? originalSeries.color : w.globals.colors[i];
               const displayValue = typeof value === 'number'
                 ? comp.formatCurrency(value)
@@ -379,18 +380,22 @@ export class ViewSavingsBarStackedChartComponent implements OnChanges, OnDestroy
     return fullscreenOverlay ?? document.body;
   }
 
+  /** Marker fill — timeline accent (matches .vis-item chip styling in _customizer.scss) */
   private readonly ICON_COLORS: Record<string, string> = {
-    'birth-icon': '#feb63d',
-    'retirement-age-icon': '#ff8f6b',
-    'inheritance-icon': '#00d492',
-    'wedding-icon': '#7b3dfe',
-    'state-pension-icon': '#516ce8',
-    'home-icon': '#016aa2',
-    'travel-icon': '#363f72',
-    'car-icon': '#b93814',
-    'education-icon': '#3538cd',
-    'new-business-icon': '#b42318',
-    'boat-icon': '#047a48'
+    'birth-icon': '#fe9614',
+    'retirement-age-icon': '#3088ed',
+    'partner-retirement-age-icon': '#fe9614',
+    'mortality-icon': '#1c1c1c',
+    'inheritance-icon': '#1c1c1c',
+    'wedding-icon': '#6155f5',
+    'state-pension-icon': '#1c1c1c',
+    'home-icon': '#ff2d55',
+    'travel-icon': '#0088ff',
+    'car-icon': '#ac7f5e',
+    'education-icon': '#00c8b3',
+    'new-business-icon': '#34c759',
+    'boat-icon': '#ff7504',
+    'custom-icon': '#0088ff',
   };
 
   private calculateDotColor(iconUrl: string): string {
