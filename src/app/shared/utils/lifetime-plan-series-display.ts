@@ -33,6 +33,9 @@ export function formatLifetimePlanSeriesDisplayName(
   if (LIFETIME_PLAN_SERIES_NAME_EXCLUSIONS.has(base)) {
     return base;
   }
+  if ((base ?? '').trim().toLowerCase() === 'cash') {
+    return base;
+  }
   if (!client?.partnerDetail) {
     return base;
   }
