@@ -1,7 +1,7 @@
 @if (item.navCap) {
   <a
     (click)="onItemSelected(item)"
-    class="cashflow-modal d-flex align-items-center gap-12"
+    class="cashflow-modal d-flex align-items-center gap-10"
     [ngClass]="isItemActive(item) ? 'activeMenu' : ''"
   >
     <svg
@@ -82,13 +82,19 @@
     <!-- </div> -->
     <!-- <span class="hide-menu">{{ item.displayName | translate }}</span> -->
 
+    <!-- class="ibr-new-setting-icon" -->
     <div class="nav-item-row">
       <div class="nav-left">
-        <img
-          style="flex: none; max-width: 24px"
-          [src]="isItemActive(item) ? item.iconName : item.iconOutline"
-          alt="item"
-        />
+        <div
+          style="width: 24px"
+          class="d-flex align-items-center justify-content-center"
+        >
+          <img
+            style="flex: none; width: 100%"
+            [src]="isItemActive(item) ? item.iconName : item.iconOutline"
+            alt="item"
+          />
+        </div>
         <span class="hide-menu">{{ item.displayName | translate }}</span>
         @if (showLabel) {
           <span class="menu-label">{{ label }}</span>
@@ -120,7 +126,40 @@
 <!-- external Link -->
 
 @if (!item.navCap && item.external) {
-  <mat-list-item
+  <a
+    mat-list-item
+    (click)="onExternalLinkClick(item.route)"
+    [disableRipple]="true"
+    [ngClass]="{
+      'mat-toolbar mat-primary activeMenu': item.route
+        ? isItemActive(item)
+        : false,
+      expanded: expanded,
+      disabled: item.disabled,
+    }"
+    class="menu-list-item"
+  >
+    <div class="nav-item-row">
+      <div class="nav-left">
+        <!-- class="ibr-new-setting-icon" -->
+        <div
+          style="width: 24px"
+          class="d-flex align-items-center justify-content-center"
+        >
+          <img
+            style="flex: none; width: 100%"
+            [src]="isItemActive(item) ? item.iconName : item.iconOutline"
+            alt="item"
+          />
+        </div>
+        <span class="hide-menu">{{ item.displayName | translate }}</span>
+        @if (showLabel) {
+          <span class="menu-label">{{ label }}</span>
+        }
+      </div>
+    </div>
+  </a>
+  <!-- <mat-list-item
     (click)="onExternalLinkClick(item.route)"
     class="menu-list-item"
   >
@@ -130,7 +169,7 @@
       alt="item"
     />
     <span class="hide-menu">{{ item.displayName | translate }}</span>
-  </mat-list-item>
+  </mat-list-item> -->
 }
 
 <!-- children -->

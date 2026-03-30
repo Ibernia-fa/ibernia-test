@@ -348,6 +348,16 @@
   cursor: default !important;
 }
 
+::ng-deep .connector-lines-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
 // Disable vis-item pointer events during external chip drag
 // so that drops land on the timeline background, not on existing items
 ::ng-deep .external-dragging .vis-item {
