@@ -89,6 +89,9 @@ export class AddIncomeComponent {
   clientDisplayName = '';
   partnerDisplayName = '';
   private combinedEdit: { client: FinancialViewModel; partner?: FinancialViewModel } | null = null;
+  private hasPartner = false;
+  private clientFirstName = '';
+  private partnerFirstName = '';
 
   constructor(
     private dialogRef: MatDialogRef<AddIncomeComponent>,
@@ -104,8 +107,9 @@ export class AddIncomeComponent {
     this.existingContributions = data.existingContributions ?? [];
     this.cycles = data.amountCycles;
     this.escalationRates = data.escalataionRates;
+    const preselectedApi = this.displayLabelToApiDesc(data.preselectedIncomeType ?? '');
     const isPartnerIncome = this.selectedIncome?.description === 'Salary (Partner)' || this.selectedIncome?.description === 'State pension (Partner)'
-      || data.preselectedIncomeType === 'Salary (Partner)' || data.preselectedIncomeType === 'State pension (Partner)';
+      || preselectedApi === 'Salary (Partner)' || preselectedApi === 'State pension (Partner)';
     const birthDateToUse = isPartnerIncome && data.partnerBirthDate ? data.partnerBirthDate : data.clientBirthDate;
     this.clientBirthYear = moment(birthDateToUse).year();
     const birthDate = new Date(birthDateToUse);
@@ -129,6 +133,9 @@ export class AddIncomeComponent {
     this.showPersonSelector = !!this.combinedEdit;
     this.clientDisplayName = data.clientFirstName || 'Person 1';
     this.partnerDisplayName = data.partnerFirstName || 'Person 2';
+    this.hasPartner = !!data.hasPartner;
+    this.clientFirstName = data.clientFirstName || '';
+    this.partnerFirstName = data.partnerFirstName || '';
     this.editingPerson = (this.selectedIncome?.description === 'Salary (Partner)' || this.selectedIncome?.description === 'State pension (Partner)') ? 'partner' : 'client';
 
     this.isNameEditable = this.selectedIncome?.description != "Salary"
@@ -733,7 +740,33 @@ export class AddIncomeComponent {
 
   get incomeTitle(): string {
     if (!this.isEditWorkflow) return 'Add income';
-    return this.selectedIncome?.description ?? this.customDescriptionAutoRenamed ?? 'Income';
+    const desc = this.selectedIncome?.description;
+    if (desc) return this.apiDescToDisplayLabel(desc);
+    return this.customDescriptionAutoRenamed ?? 'Income';
+  }
+
+  private apiDescToDisplayLabel(apiDesc: string): string {
+    if (!this.hasPartner) return apiDesc;
+    const cName = this.clientFirstName || 'Client';
+    const pName = this.partnerFirstName || 'Partner';
+    switch (apiDesc) {
+      case 'Salary': return `Salary ${cName}`;
+      case 'Salary (Partner)': return `Salary ${pName}`;
+      case 'State pension': return `State pension ${cName}`;
+      case 'State pension (Partner)': return `State pension ${pName}`;
+      default: return apiDesc;
+    }
+  }
+
+  private displayLabelToApiDesc(label: string): string {
+    if (!this.hasPartner) return label;
+    const cName = this.clientFirstName || 'Client';
+    const pName = this.partnerFirstName || 'Partner';
+    if (label === `Salary ${cName}`) return 'Salary';
+    if (label === `Salary ${pName}`) return 'Salary (Partner)';
+    if (label === `State pension ${cName}`) return 'State pension';
+    if (label === `State pension ${pName}`) return 'State pension (Partner)';
+    return label;
   }
 
   setIncomeIcon(): void {
@@ -772,6 +805,7 @@ export class AddIncomeComponent {
   }
 
   onIncomeTypeChange(value: string): void {
+    const apiValue = this.displayLabelToApiDesc(value);
     const descriptionCtrl = this.incomeForm.get('description');
     if (!descriptionCtrl) return;
 
@@ -839,8 +873,8 @@ export class AddIncomeComponent {
       && this.selectedIncome.description != "Rental income"
       && this.selectedIncome.description != "Inheritance";
 
-    const baseValue = value === 'Salary (Partner)' ? 'Salary' : value === 'State pension (Partner)' ? 'State pension' : value;
-    const config = isCustom ? incomeConfig["Custom"] : (incomeConfig[value] ?? incomeConfig[baseValue]);
+    const baseValue = apiValue === 'Salary (Partner)' ? 'Salary' : apiValue === 'State pension (Partner)' ? 'State pension' : apiValue;
+    const config = isCustom ? incomeConfig["Custom"] : (incomeConfig[apiValue] ?? incomeConfig[baseValue]);
     if (!config || !descriptionCtrl) return;
 
     this.incomeIcon = config.icon;
@@ -854,10 +888,10 @@ export class AddIncomeComponent {
     }
 
     if (!this.isEditWorkflow) {
-      this.applyDefaultStartEnd(value);
+      this.applyDefaultStartEnd(apiValue);
     }
 
-    if (value === 'Inheritance') {
+    if (apiValue === 'Inheritance') {
       const oneOffCycle = this.cycles.find(c => c.description === 'One-off');
       if (oneOffCycle) {
         this.incomeForm.get('cycle')?.setValue(oneOffCycle.id);
@@ -873,17 +907,17 @@ export class AddIncomeComponent {
         descriptionCtrl.setValue(this.selectedIncome?.description, { emitEvent: true });
       }
       else {
-        descriptionCtrl.setValue(value, { emitEvent: true });
+        descriptionCtrl.setValue(apiValue, { emitEvent: true });
       }
     }
     else {
-      const nextDescription = value === 'Custom'
+      const nextDescription = apiValue === 'Custom'
         ? ''
-        : (config.description ?? value);
+        : (config.description ?? apiValue);
       descriptionCtrl.setValue(nextDescription, { emitEvent: true });
     }
 
-    if (config.requireDescription || value === 'Custom') {
+    if (config.requireDescription || apiValue === 'Custom') {
       descriptionCtrl.setValidators([Validators.required]);
     } else {
       descriptionCtrl.clearValidators();
