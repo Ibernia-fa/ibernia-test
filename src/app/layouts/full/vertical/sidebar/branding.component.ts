@@ -9,7 +9,13 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
   imports: [CommonModule],
   template: ` <a href="/" class="branding-link">
       <ng-container *ngIf="profileImage; else defaultLogo">
-        <img [src]="sanitizedImage" alt="logo" class="brand-logo" />
+        <img
+          [src]="sanitizedImage"
+          alt="logo"
+          class="brand-logo"
+          loading="eager"
+          decoding="sync"
+        />
       </ng-container>
     </a>
 
@@ -55,10 +61,13 @@ export class BrandingComponent implements OnChanges {
   ) {}
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['profileImage'] && this.profileImage) {
+    if (!changes['profileImage']) return;
+    if (this.profileImage) {
       this.sanitizedImage = this.sanitizer.bypassSecurityTrustUrl(
         this.profileImage,
       );
+    } else {
+      this.sanitizedImage = null;
     }
   }
 }

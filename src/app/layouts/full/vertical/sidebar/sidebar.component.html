@@ -1,57 +1,49 @@
 <!-- Sidebar header: logo + toggle (toggle only when expanded; when collapsed, toggle is in header) -->
 <div class="sidebar-header">
   <div class="sidebar-logo-link">
-    <!-- COLLAPSED: org logo if uploaded, else mini fallback SVG -->
-    <ng-container *ngIf="sidenavCollapsed; else expandedLogo">
-      <ng-container *ngIf="brandingLogo; else collapsedFallback">
+    @if (brandingLogo) {
+      <!-- Single instance: sizing comes from .sidebarNav-mini .sidebar-logo-link img (no destroy on toggle). -->
+      <app-branding [profileImage]="brandingLogo"></app-branding>
+    } @else {
+      <div class="sidebar-static-logos">
         <a
           href="/"
-          style="
-            max-width: 48px !important;
-            width: 48px !important;
-            height: 48px !important;
-          "
-        >
-          <app-branding [profileImage]="brandingLogo"></app-branding>
-        </a>
-      </ng-container>
-      <ng-template #collapsedFallback>
-        <a
-          href="/"
-          style="
-            max-width: 48px !important;
-            width: 48px !important;
-            height: 48px !important;
-          "
+          class="sidebar-static-logo-slot sidebar-static-logo-slot--expanded"
+          [class.sidebar-static-logo-slot--active]="!sidenavCollapsed"
+          [attr.aria-hidden]="sidenavCollapsed || null"
+          [attr.tabindex]="sidenavCollapsed ? -1 : null"
         >
           <img
-            src="assets/images/logos/sidebar-mini-fallback-icon.svg"
-            alt="mini logo"
-            class="sidebar-mini-logo"
-            loading="eager"
-            fetchpriority="high"
-          />
-        </a>
-      </ng-template>
-    </ng-container>
-
-    <!-- EXPANDED: org logo if uploaded, else full fallback SVG -->
-    <ng-template #expandedLogo>
-      <ng-container *ngIf="brandingLogo; else expandedFallback">
-        <app-branding [profileImage]="brandingLogo"></app-branding>
-      </ng-container>
-      <ng-template #expandedFallback>
-        <a href="/">
-          <img
-            src="assets/images/logos/sidebar-fallback-logo.svg"
+            [src]="staticExpandedLogoSrc"
             alt="Ibernia"
             class="sidebar-default-logo"
+            width="160"
+            height="40"
             loading="eager"
             fetchpriority="high"
+            decoding="sync"
           />
         </a>
-      </ng-template>
-    </ng-template>
+        <a
+          href="/"
+          class="sidebar-static-logo-slot sidebar-static-logo-slot--collapsed"
+          [class.sidebar-static-logo-slot--active]="sidenavCollapsed"
+          [attr.aria-hidden]="!sidenavCollapsed || null"
+          [attr.tabindex]="!sidenavCollapsed ? -1 : null"
+        >
+          <img
+            [src]="staticCollapsedLogoSrc"
+            alt="Ibernia"
+            class="sidebar-mini-logo"
+            width="48"
+            height="48"
+            loading="eager"
+            fetchpriority="high"
+            decoding="sync"
+          />
+        </a>
+      </div>
+    }
   </div>
   @if (showToggle) {
     <button
