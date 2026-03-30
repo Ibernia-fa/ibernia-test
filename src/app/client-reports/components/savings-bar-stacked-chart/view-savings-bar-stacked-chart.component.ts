@@ -124,7 +124,7 @@ export class ViewSavingsBarStackedChartComponent implements OnChanges, OnDestroy
           options: {
             legend: {
               position: "bottom",
-              offsetX: -10,
+              offsetX: 0,
               offsetY: 0,
             },
           },
@@ -150,7 +150,7 @@ export class ViewSavingsBarStackedChartComponent implements OnChanges, OnDestroy
       },
       legend: {
         position: "top",
-        offsetX: 100,
+        offsetX: 128,
         fillColors: ['#4CAF50', '#8BC34A', '#FF5722', '#FF5700']
       },
       fill: {

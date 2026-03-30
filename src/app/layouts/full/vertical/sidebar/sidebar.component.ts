@@ -42,6 +42,15 @@ export class SidebarComponent implements OnInit, OnDestroy {
   /** Organization-uploaded logo; when null, sidebar uses static SVG fallbacks. */
   brandingLogo: string | null = null;
 
+  /**
+   * Stable asset URLs for default sidebar logos. Both images stay mounted; only CSS
+   * visibility toggles with the sidebar so the browser does not reload on collapse/expand.
+   */
+  readonly staticExpandedLogoSrc =
+    'assets/images/logos/sidebar-fallback-logo.svg';
+  readonly staticCollapsedLogoSrc =
+    'assets/images/logos/sidebar-mini-fallback-icon.svg';
+
   ngOnInit(): void {
     this.router.events
       .pipe(

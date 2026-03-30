@@ -221,7 +221,7 @@ export class SavingsBarStackedChartComponent
           options: {
             legend: {
               position: 'bottom',
-              offsetX: -10,
+              offsetX: 0,
               offsetY: 0,
               onItemClick: {
                 toggleDataSeries: false,
@@ -259,7 +259,7 @@ export class SavingsBarStackedChartComponent
       legend: {
         position: 'top',
         horizontalAlign: 'center',
-        offsetX: 0,
+        offsetX: 28,
         fillColors: ['#4CAF50', '#8BC34A', '#FF5722', '#FF5700'],
         showForZeroSeries: false,
       },
