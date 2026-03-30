@@ -334,70 +334,10 @@ html .customizerNav {
 .vis-item.custom-icon,
 .vis-item.custom-icon.vis-selected {
   background-color: #cee9ff;
-  color: #0088ff;
+  color: #8388ff;
   border: none !important;
   font-weight: 500;
   width: auto !important;
-}
-
-// Vertical connector lines from event chips down to the year/age axis.
-// Each line color matches the event type's accent color.
-// The lines are clipped at the axis boundary by .vis-panel.vis-center overflow:hidden.
-.vis-item.birth-icon::after,
-.vis-item.wedding-icon::after,
-.vis-item.home-icon::after,
-.vis-item.travel-icon::after,
-.vis-item.car-icon::after,
-.vis-item.education-icon::after,
-.vis-item.new-business-icon::after,
-.vis-item.boat-icon::after,
-.vis-item.retirement-age-icon::after,
-.vis-item.partner-retirement-age-icon::after,
-.vis-item.custom-icon::after {
-  content: "";
-  position: absolute;
-  left: 1px;
-  top: 24px;
-  // transform: translateX(-50%);
-  // top: 100%;
-  width: 1.5px;
-  height: 500px;
-  // pointer-events: none;
-  z-index: -1;
-}
-
-.vis-item.birth-icon::after {
-  background-color: #fe9614;
-}
-.vis-item.wedding-icon::after {
-  background-color: #6155f5;
-}
-.vis-item.home-icon::after {
-  background-color: #ff2d55;
-}
-.vis-item.travel-icon::after {
-  background-color: #0088ff;
-}
-.vis-item.car-icon::after {
-  background-color: #ac7f5e;
-}
-.vis-item.education-icon::after {
-  background-color: #00c8b3;
-}
-.vis-item.new-business-icon::after {
-  background-color: #34c759;
-}
-.vis-item.boat-icon::after {
-  background-color: #ff7504;
-}
-.vis-item.retirement-age-icon::after {
-  background-color: #0088ff;
-}
-.vis-item.partner-retirement-age-icon::after {
-  background-color: #fe9614;
-}
-.vis-item.custom-icon::after {
-  background-color: #0088ff;
 }
 
 .vis-item .vis-delete {
@@ -442,7 +382,7 @@ html .customizerNav {
 
 .vis-custom-time.dragOver,
 .vis-custom-time.hoverLine {
-  height: 77% !important;
+  height: 70.6% !important;
   top: 8px !important;
   background-color: #4043af !important;
   width: 1px !important;
@@ -527,11 +467,11 @@ html .customizerNav {
   min-width: 140px !important;
 }
 
-.sortby-edit-profile {
-  width: auto !important;
-  min-width: 156px !important;
-  padding: 8px 16px !important;
-}
+// .sortby-edit-profile {
+//   width: auto !important;
+//   min-width: 156px !important;
+//   padding: 8px 16px !important;
+// }
 
 // Modal Styles
 .modal-header {

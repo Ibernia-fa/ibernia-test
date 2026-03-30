@@ -348,7 +348,7 @@ export class EmergenciesComponent implements OnInit {
   onAddClick() {
     this.dialog
       .open(AddEmergenciesComponent, {
-        width: '700px',
+        width: '612px',
         disableClose: true,
         data: {
           emergencyTypes: this.emergencyTypes,
@@ -459,11 +459,11 @@ export class EmergenciesComponent implements OnInit {
     if (score == null || score < 50) {
       color = '#ff383c';
     } else if (score < 75) {
-      color = '#deb511';
+      color = '#E1B025cc';
     } else if (score < 89) {
-      color = '#54e97c';
+      color = '#09AC65cc';
     } else {
-      color = '#09ac65';
+      color = '#166A41cc';
     }
 
     return { width: `${pct}%`, 'background-color': color };
@@ -544,7 +544,7 @@ export class EmergenciesComponent implements OnInit {
       this.defaultEmergencyIds.has(emergency.id) ||
       this.defaultEmergencyNames.has(emergency.name);
     const dialogRef = this.dialog.open(AddEmergenciesComponent, {
-      width: '700px',
+      width: '612px',
       disableClose: true,
       data: {
         mode: 'edit',
@@ -705,7 +705,7 @@ export class EmergenciesComponent implements OnInit {
       ) ?? null;
 
     const dialogRef = this.dialog.open(SimulateEmergencyComponent, {
-      width: '700px',
+      width: '612px',
       disableClose: true,
       data: {
         client: this.selectedClient,

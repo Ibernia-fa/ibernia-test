@@ -7,6 +7,7 @@
     !resView &&
     !hideSidebar
   "
+  [class.layout-with-footer]="showFooter"
 >
   <ng-container>
     <mat-sidenav-container
@@ -62,7 +63,9 @@
             ></app-sidebar>
             <div class="scrollable-content">
               <ng-scrollbar class="position-relative" style="height: 100%">
-                <mat-nav-list class="sidebar-list">
+                <mat-nav-list
+                  class="sidebar-list preimum-nav ibr-new-setting-icon"
+                >
                   @for (item of navItems; track item) {
                     <app-nav-item
                       [class.nav-divider]="!isSettings"
@@ -85,12 +88,16 @@
                 }
               </mat-nav-list> -->
                 <mat-nav-list
-                  class="sidebar-list {{ !isSettings ? 'preimum-nav' : '' }}"
+                  class="sidebar-list {{
+                    !isSettings
+                      ? 'preimum-nav'
+                      : 'preimum-nav ibr-new-setting-icon'
+                  }}"
                 >
                   @for (item of navItemslower; let i = $index; track item) {
                     <app-nav-item
                       [item]="item"
-                      [showLabel]="i >= navItemslower.length - 3"
+                      [showLabel]="i >= navItemslower.length - 2"
                       label="BETA"
                     >
                     </app-nav-item>
@@ -104,7 +111,7 @@
                   <div class="p-12 rounded d-flex flex-column gap-12">
                     <a
                       (click)="openShareModal()"
-                      class="cashflow-modal d-flex align-items-center gap-12"
+                      class="cashflow-modal d-flex align-items-center gap-10"
                     >
                       <!-- <img
                         src="assets/images/svgs/share-android-solid.svg"
@@ -296,6 +303,9 @@
         ></app-customizer>
       </mat-sidenav>
     </mat-sidenav-container>
+    @if (showFooter) {
+      <app-footer></app-footer>
+    }
   </ng-container>
 
   <!-- ------------------------------------------------------------------

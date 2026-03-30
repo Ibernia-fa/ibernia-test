@@ -3,7 +3,7 @@
     <div class="d-flex gap-16 flex-column">
       <!-- Saving Section  -->
       <mat-card class="ibr-new-dashboad-card">
-        <mat-card-content>
+        <mat-card-content class="saving-pot-header">
           <div class="cashflow-saving-wrapper">
             <div class="row align-items-center flex-wrap">
               <!-- stats  -->
@@ -12,7 +12,7 @@
                   <!-- Saving Section  -->
                   <div class="col-5">
                     <div class="stats-main-wrapper">
-                      <div class="d-flex flex-column gap-12">
+                      <div class="d-flex flex-column gap-10">
                         <div class="d-flex align-items-center gap-8">
                           <svg
                             width="17"
@@ -166,87 +166,82 @@
                 }}
               </h3>
               <div
-                cdkDropList
-                [cdkDropListData]="savingPots?.clientSavings"
-                (cdkDropListDropped)="drop($event)"
-                class="flex-column d-flex gap-16"
+                class="flex-column d-flex gap-14 saving-pots-list-boundary"
                 id="drag-boundary"
               >
-                <!-- Card One -->
-                @for (
-                  saving of savingPots?.clientSavings;
-                  track saving;
-                  let i = $index
-                ) {
-                  <div
-                    [cdkDragData]="saving"
-                    cdkDragLockAxis="y"
-                    cdkDrag
-                    cdkDragBoundary="#drag-boundary"
-                    class="d-flex justify-content-between align-items-center gap-12 dragable-card-wrapper"
-                  >
-                    <!-- Card  -->
-                    <div
-                      (click)="updateEventClicked(saving)"
-                      class="dragable-card d-flex align-items-center justify-content-between cursor-pointer"
-                    >
-                      <!-- Content  -->
-                      <div class="d-flex align-items-center gap-12">
-                        @if (
-                          i > 0 &&
-                          !(
-                            "cash" ===
-                            (
-                              savingPots.clientSavings[i]?.name || ""
-                            ).toLowerCase()
-                          )
-                        ) {
-                          <button cdkDragHandle type="button" class="drag-btn">
-                            <!-- <img
-                              src="/assets/images/svgs/drag-icon.svg"
-                              alt="drag-icon"
-                            /> -->
+                @if (cashSavingPots.length) {
+                  <div [ngClass]="getCashPotsGridModifier()">
+                    @for (
+                      saving of cashSavingPots;
+                      track trackSavingPot($index, saving)
+                    ) {
+                      <div
+                        class="cash-saving-pot-cell d-flex align-items-stretch gap-12 dragable-card-wrapper"
+                      >
+                        <ng-container
+                          *ngTemplateOutlet="
+                            savingPotCardInner;
+                            context: { $implicit: saving, dragColumn: 'omit' }
+                          "
+                        ></ng-container>
+                      </div>
+                    }
+                  </div>
+                }
 
-                            <svg
-                              width="12"
-                              height="20"
-                              viewBox="0 0 12 20"
-                              fill="none"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                d="M2 4C3.10457 4 4 3.10457 4 2C4 0.89543 3.10457 0 2 0C0.89543 0 0 0.89543 0 2C0 3.10457 0.89543 4 2 4Z"
-                                fill="#516CE8"
-                              />
-                              <path
-                                d="M2 12C3.10457 12 4 11.1046 4 10C4 8.89543 3.10457 8 2 8C0.89543 8 0 8.89543 0 10C0 11.1046 0.89543 12 2 12Z"
-                                fill="#516CE8"
-                              />
-                              <path
-                                d="M2 20C3.10457 20 4 19.1046 4 18C4 16.8954 3.10457 16 2 16C0.89543 16 0 16.8954 0 18C0 19.1046 0.89543 20 2 20Z"
-                                fill="#516CE8"
-                              />
-                              <path
-                                d="M10 4C11.1046 4 12 3.10457 12 2C12 0.89543 11.1046 0 10 0C8.89543 0 8 0.89543 8 2C8 3.10457 8.89543 4 10 4Z"
-                                fill="#516CE8"
-                              />
-                              <path
-                                d="M10 12C11.1046 12 12 11.1046 12 10C12 8.89543 11.1046 8 10 8C8.89543 8 8 8.89543 8 10C8 11.1046 8.89543 12 10 12Z"
-                                fill="#516CE8"
-                              />
-                              <path
-                                d="M10 20C11.1046 20 12 19.1046 12 18C12 16.8954 11.1046 16 10 16C8.89543 16 8 16.8954 8 18C8 19.1046 8.89543 20 10 20Z"
-                                fill="#516CE8"
-                              />
-                            </svg>
-                          </button>
-                        } @else {
-                          <span
-                            class="drag-btn drag-spacer"
-                            aria-hidden="true"
-                          ></span>
-                        }
-                        <!-- @if((saving.name || '').toLowerCase() !== 'cash' && i < savingPots.clientSavings.length - 1) { -->
+                <ng-template
+                  #savingPotCardInner
+                  let-saving
+                  let-dragColumn="dragColumn"
+                >
+                  <div
+                    (click)="updateEventClicked(saving)"
+                    class="dragable-card d-flex align-items-center justify-content-between cursor-pointer flex-grow-1"
+                  >
+                    <div
+                      class="d-flex align-items-center gap-12 flex-grow-1 min-w-0 saving-pot-card-main"
+                    >
+                      @if (dragColumn === "handle") {
+                        <button cdkDragHandle type="button" class="drag-btn">
+                          <svg
+                            width="12"
+                            height="20"
+                            viewBox="0 0 12 20"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M2 4C3.10457 4 4 3.10457 4 2C4 0.89543 3.10457 0 2 0C0.89543 0 0 0.89543 0 2C0 3.10457 0.89543 4 2 4Z"
+                              fill="#516CE8"
+                            />
+                            <path
+                              d="M2 12C3.10457 12 4 11.1046 4 10C4 8.89543 3.10457 8 2 8C0.89543 8 0 8.89543 0 10C0 11.1046 0.89543 12 2 12Z"
+                              fill="#516CE8"
+                            />
+                            <path
+                              d="M2 20C3.10457 20 4 19.1046 4 18C4 16.8954 3.10457 16 2 16C0.89543 16 0 16.8954 0 18C0 19.1046 0.89543 20 2 20Z"
+                              fill="#516CE8"
+                            />
+                            <path
+                              d="M10 4C11.1046 4 12 3.10457 12 2C12 0.89543 11.1046 0 10 0C8.89543 0 8 0.89543 8 2C8 3.10457 8.89543 4 10 4Z"
+                              fill="#516CE8"
+                            />
+                            <path
+                              d="M10 12C11.1046 12 12 11.1046 12 10C12 8.89543 11.1046 8 10 8C8.89543 8 8 8.89543 8 10C8 11.1046 8.89543 12 10 12Z"
+                              fill="#516CE8"
+                            />
+                            <path
+                              d="M10 20C11.1046 20 12 19.1046 12 18C12 16.8954 11.1046 16 10 16C8.89543 16 8 16.8954 8 18C8 19.1046 8.89543 20 10 20Z"
+                              fill="#516CE8"
+                            />
+                          </svg>
+                        </button>
+                      } @else if (dragColumn === "spacer") {
+                        <span
+                          class="drag-btn drag-spacer"
+                          aria-hidden="true"
+                        ></span>
+                      }
 
                         <!-- Status  -->
                         <div class="stats-main-wrapper">
@@ -268,7 +263,9 @@
                                 >
                               } -->
                             </div>
-                            <div class="d-flex align-items-center gap-10">
+                            <div
+                              class="d-flex align-items-center gap-10 flex-wrap saving-pot-value-row"
+                            >
                               <h3 class="saving-title">
                                 {{
                                   selectedClient?.clientDetails
@@ -302,7 +299,7 @@
                         <!-- End Status  -->
                       </div>
                       <!-- End Content  -->
-                      <div class="d-flex align-items-center">
+                      <div class="d-flex align-items-center shrink-0">
                         <!--  Chart  -->
                         <div
                           class="d-flex flex-column align-items-center chart-wrapper"
@@ -549,81 +546,112 @@
                       </div> -->
                       <!-- <div class="edit-icon-overlay">
                                         </div> -->
-                    </div>
-                    <!-- End Card  -->
-
-                    <!-- Up and Down Buttons   -->
-                    @if (savingPots.clientSavings) {
-                      <div class="d-flex flex-column gap-10 vote-btns">
-                        @if (
-                          i > 0 &&
-                          !(
-                            "cash" ===
-                            (
-                              savingPots.clientSavings[i - 1]?.name || ""
-                            ).toLowerCase()
-                          )
-                        ) {
-                          <button (click)="moveUp(i)" type="button">
-                            <svg
-                              width="24"
-                              height="24"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                d="M12 19L12 5"
-                                stroke="#5A596E"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                              />
-                              <path
-                                d="M5 12L12 5L19 12"
-                                stroke="#5A596E"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                              />
-                            </svg>
-                          </button>
-                        }
-                        @if (
-                          (saving.name || "").toLowerCase() !== "cash" &&
-                          i < savingPots.clientSavings.length - 1
-                        ) {
-                          <button (click)="moveDown(i)" type="button">
-                            <svg
-                              width="24"
-                              height="24"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                d="M12 5L12 19"
-                                stroke="#5A596E"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                              />
-                              <path
-                                d="M19 12L12 19L5 12"
-                                stroke="#5A596E"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                              />
-                            </svg>
-                          </button>
-                        }
-                      </div>
-                    }
-                    <!-- End Up and Down Buttons   -->
                   </div>
-                }
-                <!-- End Card One -->
+                </ng-template>
+
+                <div
+                  cdkDropList
+                  [cdkDropListData]="nonCashSavingPots"
+                  (cdkDropListDropped)="drop($event)"
+                  class="flex-column d-flex gap-14 non-cash-saving-pots-list"
+                >
+                  @for (
+                    saving of nonCashSavingPots;
+                    track trackSavingPot($index, saving);
+                    let i = $index
+                  ) {
+                    <div
+                      [cdkDragData]="saving"
+                      cdkDragLockAxis="y"
+                      cdkDrag
+                      cdkDragBoundary="#drag-boundary"
+                      class="d-flex justify-content-between align-items-center gap-12 dragable-card-wrapper"
+                    >
+                      <ng-container
+                        *ngTemplateOutlet="
+                          savingPotCardInner;
+                          context: {
+                            $implicit: saving,
+                            dragColumn: dragColumnForNonCashPot(i)
+                          }
+                        "
+                      ></ng-container>
+
+                      @if (savingPots?.clientSavings) {
+                        <div class="d-flex flex-column gap-10 vote-btns">
+                          @if (
+                            fullIndexForNonCash(i) > 0 &&
+                            !isCashPot(
+                              savingPots.clientSavings[
+                                fullIndexForNonCash(i) - 1
+                              ]
+                            )
+                          ) {
+                            <button
+                              (click)="moveUp(fullIndexForNonCash(i))"
+                              type="button"
+                            >
+                              <svg
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  d="M12 19L12 5"
+                                  stroke="#5A596E"
+                                  stroke-width="2"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                />
+                                <path
+                                  d="M5 12L12 5L19 12"
+                                  stroke="#5A596E"
+                                  stroke-width="2"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                />
+                              </svg>
+                            </button>
+                          }
+                          @if (
+                            fullIndexForNonCash(i) <
+                            savingPots.clientSavings.length - 1
+                          ) {
+                            <button
+                              (click)="moveDown(fullIndexForNonCash(i))"
+                              type="button"
+                            >
+                              <svg
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  d="M12 5L12 19"
+                                  stroke="#5A596E"
+                                  stroke-width="2"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                />
+                                <path
+                                  d="M19 12L12 19L5 12"
+                                  stroke="#5A596E"
+                                  stroke-width="2"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                />
+                              </svg>
+                            </button>
+                          }
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
               </div>
             </div>
           </div>

@@ -17,6 +17,11 @@
   transform: none !important;
 }
 
+/* Fixed footer band: viewport bottom margin + bar height + gap above bar (matches footer.component) */
+.layout-with-footer .mat-drawer.sidebarNav {
+  bottom: calc(16px + 65px + 16px);
+}
+
 /* Sidebar header: logo + toggle */
 .sidebar-header {
   display: flex;
@@ -308,7 +313,7 @@
     color: white;
   }
   span {
-    font-size: 16px;
+    font-size: 18px;
     line-height: 20px;
     color: #a6abb2;
     font-weight: 400;
@@ -491,7 +496,7 @@
         }
       }
       span {
-        font-size: 16px;
+        font-size: 18px;
         line-height: 20px;
       }
       // &.activeMenu{
@@ -509,6 +514,9 @@
           color: white;
         }
       }
+    }
+    &.ibr-new-setting-icon img {
+      mix-blend-mode: plus-lighter;
     }
   }
   // }
@@ -623,7 +631,7 @@
 .nav-left {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   flex: 1;
 }
 

@@ -1,3 +1,22 @@
+/* Let the chart fill flex/grid parents (e.g. main + sidebar); min-width:0 allows shrinking. */
+:host {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+#chart {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+:host ::ng-deep apx-chart {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
 .apexcharts-text .apexcharts-xaxis-label {
   text-anchor: start !important;
 }

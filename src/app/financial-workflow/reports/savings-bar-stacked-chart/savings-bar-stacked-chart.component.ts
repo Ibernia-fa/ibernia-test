@@ -1,4 +1,5 @@
 import {
+  AfterViewInit,
   Component,
   ViewChild,
   Input,
@@ -25,7 +26,9 @@ import moment from 'moment';
   templateUrl: './savings-bar-stacked-chart.component.html',
   styleUrl: './savings-bar-stacked-chart.component.scss',
 })
-export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
+export class SavingsBarStackedChartComponent
+  implements AfterViewInit, OnChanges, OnDestroy
+{
   @ViewChild('chart', { read: ElementRef })
   chartElRef: ElementRef<HTMLDivElement>;
   @ViewChild(ChartComponent) apxChartComponent: ChartComponent | undefined;
@@ -71,6 +74,10 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
   private _postRenderTimer: any = null;
   /** Series colours after client-side de-dupe (legend + shared tooltip must match bars). */
   private seriesColorsForTooltip: Series[] = [];
+
+  /** Observes wrapper size (e.g. sidebar open/close); Apex only watches its direct parent. */
+  private chartResizeObserver: ResizeObserver | null = null;
+  private chartLayoutDebounceTimer: ReturnType<typeof setTimeout> | null = null;
 
   private getCurrencyAxisTitle(): string {
     return this.client?.clientDetails?.preferredCurrency ?? '';
@@ -269,6 +276,67 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
       },
       annotations: { points: [] },
     };
+  }
+
+  ngAfterViewInit(): void {
+    this.setupChartResizeObserver();
+  }
+
+  /**
+   * Fires when ng-apexcharts finishes creating the instance (report may load after view init).
+   */
+  onApexChartReady(): void {
+    this.ngZone.runOutsideAngular(() =>
+      this.flushApexChartWidthAfterLayout(),
+    );
+  }
+
+  /**
+   * Re-layout ApexCharts when the host width changes without a window resize
+   * (common with CSS layout / sidebar transitions).
+   */
+  private setupChartResizeObserver(): void {
+    if (typeof ResizeObserver === 'undefined') {
+      return;
+    }
+    const el = this.chartElRef?.nativeElement;
+    if (!el) {
+      return;
+    }
+    this.chartResizeObserver?.disconnect();
+    this.chartResizeObserver = new ResizeObserver(() => {
+      if (this.chartLayoutDebounceTimer !== null) {
+        clearTimeout(this.chartLayoutDebounceTimer);
+      }
+      this.chartLayoutDebounceTimer = setTimeout(() => {
+        this.chartLayoutDebounceTimer = null;
+        this.ngZone.runOutsideAngular(() =>
+          this.flushApexChartWidthAfterLayout(),
+        );
+      }, 150);
+    });
+    this.chartResizeObserver.observe(el);
+  }
+
+  /**
+   * Apex often keeps the initial pixel width; `update()` does not reliably
+   * re-read % width when only the flex layout changes. Set an explicit width
+   * from the wrapper after layout (double rAF avoids stale measurements).
+   */
+  private flushApexChartWidthAfterLayout(): void {
+    const apx = this.apxChartComponent;
+    const host = this.chartElRef?.nativeElement;
+    if (!apx || !host) {
+      return;
+    }
+    const apply = () => {
+      const width = Math.floor(host.getBoundingClientRect().width);
+      if (width < 32) {
+        return;
+      }
+      void apx.updateOptions({ chart: { width } }, false, false, false);
+    };
+    requestAnimationFrame(() => requestAnimationFrame(apply));
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -547,6 +615,11 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    if (this.chartLayoutDebounceTimer !== null) {
+      clearTimeout(this.chartLayoutDebounceTimer);
+    }
+    this.chartResizeObserver?.disconnect();
+    this.chartResizeObserver = null;
     clearTimeout(this._postRenderTimer);
     clearTimeout(this._tooltipRetryTimer);
     this.cleanupHtmlTooltips();

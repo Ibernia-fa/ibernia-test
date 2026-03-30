@@ -269,10 +269,13 @@
           savingsForm.get("name")?.value !== "Pension fund"
         ) {
           <div class="d-flex flex-column gap-4">
-            <div class="d-flex gap-8 align-items-center">
-              <mat-label class="f-s-16 f-w-500 d-block ibr-black">{{
-                "Return rate" | translate
-              }}</mat-label>
+            <div class="d-flex gap-4 align-items-center">
+              <mat-label
+                class="f-s-16 f-w-500 d-block ibr-black"
+                line-height:
+                16px
+                >{{ "Return rate" | translate }}</mat-label
+              >
               <img
                 width="18"
                 src="assets/images/svgs/help-circle-icon.svg"
@@ -370,7 +373,9 @@
         <!-- End Slider Section  -->
 
         <!-- Pension fund specific fields (hidden in Net Worth) -->
-        @if (!fromNetWorth && savingsForm.get("name")?.value === "Pension fund") {
+        @if (
+          !fromNetWorth && savingsForm.get("name")?.value === "Pension fund"
+        ) {
           <div class="d-flex flex-column gap-20">
             <!-- Contribution Amount Field - Matched to "Net amount" layout -->
             <div class="d-flex flex-column gap-4 net-fields">
@@ -624,203 +629,290 @@
 
         <!-- Lock Pot and Commissions Section (hidden in Net Worth) -->
         @if (!fromNetWorth) {
-        <div class="d-flex flex-column">
-          @if (savingsForm.get("name")?.value !== "Cash") {
-            <!-- Lock Pot Checkbox -->
-            <section class="example-section">
-              <mat-checkbox
-                class="example-margin"
-                type="checkbox"
-                id="lock-pot"
-                (change)="isLockPotChanged(savingsForm.get('lockPot')?.value)"
-                formControlName="lockPot"
-              >
-                {{
-                  "Lock this pot from automatically covering an income shortfall"
-                    | translate
-                }}
-              </mat-checkbox>
-            </section>
+          <div class="d-flex flex-column gap-16">
+            @if (savingsForm.get("name")?.value !== "Cash") {
+              <!-- Lock Pot Checkbox -->
+              <section class="example-section">
+                <mat-checkbox
+                  class="example-margin"
+                  type="checkbox"
+                  id="lock-pot"
+                  (change)="isLockPotChanged(savingsForm.get('lockPot')?.value)"
+                  formControlName="lockPot"
+                >
+                  {{
+                    "Lock this pot from automatically covering an income shortfall"
+                      | translate
+                  }}
+                </mat-checkbox>
+              </section>
 
-            <!-- Lock Pot Date Range -->
-            @if (
-              savingsForm.get("lockPot")?.value &&
-              savingsForm.get("name")?.value !== "Pension fund"
-            ) {
-              <div class="start-end m-t-12 m-b-8">
-                <div class="d-flex flex-column gap-8">
-                  <div class="d-flex gap-8 align-items-center">
-                    <mat-label class="f-s-16 f-w-500 d-block ibr-black">{{
-                      "Savings pot is locked between" | translate
-                    }}</mat-label>
-                  </div>
+              <!-- Lock Pot Date Range -->
+              @if (
+                savingsForm.get("lockPot")?.value &&
+                savingsForm.get("name")?.value !== "Pension fund"
+              ) {
+                <div class="start-end">
+                  <div class="d-flex flex-column gap-8">
+                    <div class="d-flex gap-8 align-items-center">
+                      <mat-label class="f-s-16 f-w-500 d-block ibr-black">{{
+                        "Savings pot is locked between" | translate
+                      }}</mat-label>
+                    </div>
 
-                  <div
-                    class="row justify-content-between align-items-start flex-nowrap"
-                  >
-                    <div class="col-6">
-                      <div class="w-100 form-field">
-                        <div class="select-option position-relative">
-                          <mat-select
-                            value="Select"
-                            formControlName="start"
-                            hideSingleSelectionIndicator
-                          >
-                            @if (eventsList.length > 0) {
-                              <mat-option [value]="currentYear"
-                                >This year ({{ currentYear }})</mat-option
-                              >
+                    <div
+                      class="row justify-content-between align-items-start flex-nowrap"
+                    >
+                      <div class="col-6">
+                        <div class="w-100 form-field">
+                          <div class="select-option position-relative">
+                            <mat-select
+                              value="Select"
+                              formControlName="start"
+                              hideSingleSelectionIndicator
+                            >
+                              @if (eventsList.length > 0) {
+                                <mat-option [value]="currentYear"
+                                  >This year ({{ currentYear }})</mat-option
+                                >
+                                <hr />
+                              }
+                              @for (event of eventsList; track event) {
+                                <mat-option [value]="event.start.year"
+                                  >{{ event.name }} ({{
+                                    event.start.age
+                                  }})</mat-option
+                                >
+                              }
                               <hr />
-                            }
-                            @for (event of eventsList; track event) {
-                              <mat-option [value]="event.start.year"
-                                >{{ event.name }} ({{
-                                  event.start.age
-                                }})</mat-option
+                              @for (year of years; let i = $index; track year) {
+                                <mat-option [value]="year"
+                                  >{{ year }} ({{ clientAge + i }})</mat-option
+                                >
+                              }
+                            </mat-select>
+                            <span class="custom-arrow">
+                              <svg
+                                width="12"
+                                height="7"
+                                viewBox="0 0 12 7"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
                               >
-                            }
-                            <hr />
-                            @for (year of years; let i = $index; track year) {
-                              <mat-option [value]="year"
-                                >{{ year }} ({{ clientAge + i }})</mat-option
-                              >
-                            }
-                          </mat-select>
-                          <span class="custom-arrow">
-                            <svg
-                              width="12"
-                              height="7"
-                              viewBox="0 0 12 7"
-                              fill="none"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                d="M1 1L6 6L11 1"
-                                stroke="#2B3942"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                              />
-                            </svg>
-                          </span>
-                        </div>
+                                <path
+                                  d="M1 1L6 6L11 1"
+                                  stroke="#2B3942"
+                                  stroke-width="2"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                />
+                              </svg>
+                            </span>
+                          </div>
 
-                        @if (
-                          savingsForm.get("start")?.touched &&
-                          savingsForm.get("start")?.hasError("required")
-                        ) {
-                          <span class="field-error d-block">{{
-                            "Required" | translate
-                          }}</span>
-                        }
+                          @if (
+                            savingsForm.get("start")?.touched &&
+                            savingsForm.get("start")?.hasError("required")
+                          ) {
+                            <span class="field-error d-block">{{
+                              "Required" | translate
+                            }}</span>
+                          }
+                        </div>
                       </div>
-                    </div>
 
-                    <div class="d-flex justify-content-start align-items-start">
-                      <img
-                        src="assets/images/svgs/chevron-right-date-icon.svg"
-                        alt="chevron-right-date-icon"
-                      />
-                    </div>
+                      <div
+                        class="d-flex justify-content-start align-items-start"
+                      >
+                        <img
+                          src="assets/images/svgs/chevron-right-date-icon.svg"
+                          alt="chevron-right-date-icon"
+                        />
+                      </div>
 
-                    <div class="col-6">
-                      <div class="w-100 form-field">
-                        <div class="select-option position-relative">
-                          <mat-select
-                            value="Select"
-                            formControlName="end"
-                            hideSingleSelectionIndicator
-                          >
-                            @for (event of getLockEndEvents(); track event.id) {
-                              <mat-option [value]="event.start.year"
-                                >{{ event.name }} ({{
-                                  event.start.age
-                                }})</mat-option
-                              >
-                            }
-                            <hr />
-                            @for (year of getLockEndYears(); track year) {
-                              <mat-option [value]="year"
-                                >{{ year }} ({{
-                                  year - clientBirthYear
-                                }})</mat-option
-                              >
-                            }
-                          </mat-select>
-                          <span class="custom-arrow">
-                            <svg
-                              width="12"
-                              height="7"
-                              viewBox="0 0 12 7"
-                              fill="none"
-                              xmlns="http://www.w3.org/2000/svg"
+                      <div class="col-6">
+                        <div class="w-100 form-field">
+                          <div class="select-option position-relative">
+                            <mat-select
+                              value="Select"
+                              formControlName="end"
+                              hideSingleSelectionIndicator
                             >
-                              <path
-                                d="M1 1L6 6L11 1"
-                                stroke="#2B3942"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                              />
-                            </svg>
-                          </span>
-                        </div>
+                              @for (
+                                event of getLockEndEvents();
+                                track event.id
+                              ) {
+                                <mat-option [value]="event.start.year"
+                                  >{{ event.name }} ({{
+                                    event.start.age
+                                  }})</mat-option
+                                >
+                              }
+                              <hr />
+                              @for (year of getLockEndYears(); track year) {
+                                <mat-option [value]="year"
+                                  >{{ year }} ({{
+                                    year - clientBirthYear
+                                  }})</mat-option
+                                >
+                              }
+                            </mat-select>
+                            <span class="custom-arrow">
+                              <svg
+                                width="12"
+                                height="7"
+                                viewBox="0 0 12 7"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  d="M1 1L6 6L11 1"
+                                  stroke="#2B3942"
+                                  stroke-width="2"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                />
+                              </svg>
+                            </span>
+                          </div>
 
-                        @if (
-                          savingsForm.get("end")?.touched &&
-                          savingsForm.get("end")?.hasError("required")
-                        ) {
-                          <span class="field-error d-block">{{
-                            "Required" | translate
-                          }}</span>
-                        }
-                        @if (
-                          savingsForm.get("end")?.touched &&
-                          savingsForm.get("end")?.hasError("endBeforeStart")
-                        ) {
-                          <span class="field-error d-block">{{
-                            "End year cannot be before start year" | translate
-                          }}</span>
-                        }
+                          @if (
+                            savingsForm.get("end")?.touched &&
+                            savingsForm.get("end")?.hasError("required")
+                          ) {
+                            <span class="field-error d-block">{{
+                              "Required" | translate
+                            }}</span>
+                          }
+                          @if (
+                            savingsForm.get("end")?.touched &&
+                            savingsForm.get("end")?.hasError("endBeforeStart")
+                          ) {
+                            <span class="field-error d-block">{{
+                              "End year cannot be before start year" | translate
+                            }}</span>
+                          }
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            }
+              }
 
-            <!-- Commissions Checkbox -->
-            <section class="example-section">
-              <mat-checkbox
-                class="example-margin"
-                type="checkbox"
-                id="commissions"
-                (change)="
-                  isCommissionsChanged(savingsForm.get('commissions')?.value)
-                "
-                formControlName="commissions"
-              >
-                {{ "Add commissions" | translate }}
-              </mat-checkbox>
-            </section>
+              <!-- Commissions Checkbox -->
+              <section class="example-section">
+                <mat-checkbox
+                  class="example-margin"
+                  type="checkbox"
+                  id="commissions"
+                  (change)="
+                    isCommissionsChanged(savingsForm.get('commissions')?.value)
+                  "
+                  formControlName="commissions"
+                >
+                  {{ "Add commissions" | translate }}
+                </mat-checkbox>
+              </section>
 
-            <!-- Commissions Section -->
-            @if (savingsForm.get("commissions")?.value) {
-              <div class="d-flex flex-column gap-16 m-t-12">
-                <div class="d-flex flex-column gap-8">
-                  <mat-label
-                    class="f-s-16 f-w-500 d-block ibr-black"
-                    style="line-height: 16px"
-                    >{{ "Commission type" | translate }}</mat-label
-                  >
-                  @if (
-                    savingsForm.get("commissionType")?.value === "percentage"
-                  ) {
-                    <!-- Inline layout for Percentage only: dropdown + number field side by side -->
-                    <div
-                      class="d-flex align-items-center gap-16 commission-percentage-inline"
+              <!-- Commissions Section -->
+              @if (savingsForm.get("commissions")?.value) {
+                <div class="d-flex flex-column gap-16">
+                  <div class="d-flex flex-column gap-8">
+                    <mat-label
+                      class="f-s-16 f-w-500 d-block ibr-black"
+                      style="line-height: 16px"
+                      >{{ "Commission type" | translate }}</mat-label
                     >
-                      <div class="position-relative flex-grow-1">
+                    @if (
+                      savingsForm.get("commissionType")?.value === "percentage"
+                    ) {
+                      <!-- Inline layout for Percentage only: dropdown + number field side by side -->
+                      <div
+                        class="d-flex align-items-center gap-16 commission-percentage-inline"
+                      >
+                        <div class="position-relative flex-grow-1">
+                          <div class="w-100 form-field">
+                            <div class="select-option position-relative">
+                              <mat-select
+                                formControlName="commissionType"
+                                placeholder="{{
+                                  'Select commission type' | translate
+                                }}"
+                              >
+                                <mat-option value="amount">{{
+                                  "Fixed Amount" | translate
+                                }}</mat-option>
+                                <mat-option value="percentage">{{
+                                  "Percentage" | translate
+                                }}</mat-option>
+                                <mat-option value="both">{{
+                                  "Both" | translate
+                                }}</mat-option>
+                              </mat-select>
+                              <span class="custom-arrow">
+                                <svg
+                                  width="12"
+                                  height="7"
+                                  viewBox="0 0 12 7"
+                                  fill="none"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <path
+                                    d="M1 1L6 6L11 1"
+                                    stroke="#2B3942"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                  />
+                                </svg>
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="flex-grow-1">
+                          <div class="w-100 form-field custom-rate-input">
+                            <input
+                              matInput
+                              type="number"
+                              formControlName="commissionPercentage"
+                              placeholder="0"
+                            />
+                            <div class="custom-rate-suffix">
+                              <svg
+                                width="20"
+                                height="20"
+                                viewBox="0 0 20 20"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  d="M15.8337 4.16602L4.16699 15.8327"
+                                  stroke="#48475D"
+                                  stroke-width="2"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                />
+                                <path
+                                  d="M5.41634 7.50065C6.56693 7.50065 7.49967 6.56791 7.49967 5.41732C7.49967 4.26672 6.56693 3.33398 5.41634 3.33398C4.26575 3.33398 3.33301 4.26672 3.33301 5.41732C3.33301 6.56791 4.26575 7.50065 5.41634 7.50065Z"
+                                  stroke="#48475D"
+                                  stroke-width="2"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                />
+                                <path
+                                  d="M14.5833 16.6667C15.7339 16.6667 16.6667 15.7339 16.6667 14.5833C16.6667 13.4327 15.7339 12.5 14.5833 12.5C13.4327 12.5 12.5 13.4327 12.5 14.5833C12.5 15.7339 13.4327 16.6667 14.5833 16.6667Z"
+                                  stroke="#48475D"
+                                  stroke-width="2"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                />
+                              </svg>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    } @else {
+                      <div class="position-relative">
                         <div class="w-100 form-field">
                           <div class="select-option position-relative">
                             <mat-select
@@ -859,231 +951,69 @@
                           </div>
                         </div>
                       </div>
-                      <div class="flex-grow-1">
-                        <div class="w-100 form-field custom-rate-input">
-                          <input
-                            matInput
-                            type="number"
-                            formControlName="commissionPercentage"
-                            placeholder="0"
-                          />
-                          <div class="custom-rate-suffix">
-                            <svg
-                              width="20"
-                              height="20"
-                              viewBox="0 0 20 20"
-                              fill="none"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                d="M15.8337 4.16602L4.16699 15.8327"
-                                stroke="#48475D"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                              />
-                              <path
-                                d="M5.41634 7.50065C6.56693 7.50065 7.49967 6.56791 7.49967 5.41732C7.49967 4.26672 6.56693 3.33398 5.41634 3.33398C4.26575 3.33398 3.33301 4.26672 3.33301 5.41732C3.33301 6.56791 4.26575 7.50065 5.41634 7.50065Z"
-                                stroke="#48475D"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                              />
-                              <path
-                                d="M14.5833 16.6667C15.7339 16.6667 16.6667 15.7339 16.6667 14.5833C16.6667 13.4327 15.7339 12.5 14.5833 12.5C13.4327 12.5 12.5 13.4327 12.5 14.5833C12.5 15.7339 13.4327 16.6667 14.5833 16.6667Z"
-                                stroke="#48475D"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                              />
-                            </svg>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  } @else {
-                    <div class="position-relative">
-                      <div class="w-100 form-field">
-                        <div class="select-option position-relative">
-                          <mat-select
-                            formControlName="commissionType"
-                            placeholder="{{
-                              'Select commission type' | translate
-                            }}"
-                          >
-                            <mat-option value="amount">{{
-                              "Fixed Amount" | translate
-                            }}</mat-option>
-                            <mat-option value="percentage">{{
-                              "Percentage" | translate
-                            }}</mat-option>
-                            <mat-option value="both">{{
-                              "Both" | translate
-                            }}</mat-option>
-                          </mat-select>
-                          <span class="custom-arrow">
-                            <svg
-                              width="12"
-                              height="7"
-                              viewBox="0 0 12 7"
-                              fill="none"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                d="M1 1L6 6L11 1"
-                                stroke="#2B3942"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                              />
-                            </svg>
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  }
-                </div>
-
-                <!-- Commission Amount -->
-                @if (
-                  savingsForm.get("commissionType")?.value === "amount" ||
-                  savingsForm.get("commissionType")?.value === "both"
-                ) {
-                  <div class="d-flex flex-column gap-8">
-                    @if (savingsForm.get("commissionType")?.value === "both") {
-                      <div class="d-flex gap-8 align-items-center">
-                        <mat-label class="f-s-16 f-w-500 d-block ibr-black">{{
-                          "Commission amount" | translate
-                        }}</mat-label>
-                        <img
-                          width="18"
-                          src="assets/images/svgs/help-circle-icon.svg"
-                          alt="help-circle-icon"
-                        />
-                      </div>
                     }
+                  </div>
 
-                    <div class="d-flex flex-column gap-4 net-fields">
-                      <div class="d-flex align-items-center net-field">
-                        <div class="left hide-arrow">
-                          <mat-select
-                            value="£"
-                            formControlName="commissionCurrency"
-                            class="sortby-edit-profile"
-                            hideSingleSelectionIndicator
-                          >
-                            @for (country of countries; track country) {
-                              @if (country.currencySymbol) {
-                                <mat-option [value]="country.currencySymbol">{{
-                                  country.currencySymbol
-                                }}</mat-option>
-                              }
-                            }
-                          </mat-select>
-                        </div>
-
-                        <div class="w-100 form-field">
-                          <input
-                            matInput
-                            type="number"
-                            formControlName="commissionAmount"
-                            placeholder="0"
+                  <!-- Commission Amount -->
+                  @if (
+                    savingsForm.get("commissionType")?.value === "amount" ||
+                    savingsForm.get("commissionType")?.value === "both"
+                  ) {
+                    <div class="d-flex flex-column gap-8">
+                      @if (
+                        savingsForm.get("commissionType")?.value === "both"
+                      ) {
+                        <div class="d-flex gap-8 align-items-center">
+                          <mat-label class="f-s-16 f-w-500 d-block ibr-black">{{
+                            "Commission amount" | translate
+                          }}</mat-label>
+                          <img
+                            width="18"
+                            src="assets/images/svgs/help-circle-icon.svg"
+                            alt="help-circle-icon"
                           />
                         </div>
-
-                        <div class="right position-relative">
-                          <mat-select
-                            value="Select"
-                            formControlName="commissionCycle"
-                            class="sortby-edit-profile"
-                            hideSingleSelectionIndicator
-                          >
-                            @for (cycle of cycles; track cycle) {
-                              <mat-option [value]="cycle.id">{{
-                                cycle.description
-                              }}</mat-option>
-                            }
-                          </mat-select>
-                          <span class="custom-arrow">
-                            <svg
-                              width="12"
-                              height="7"
-                              viewBox="0 0 12 7"
-                              fill="none"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                d="M1 1L6 6L11 1"
-                                stroke="#2B3942"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                              />
-                            </svg>
-                          </span>
-                        </div>
-                      </div>
-
-                      @if (
-                        (savingsForm.get("commissionCycle")?.touched &&
-                          savingsForm
-                            .get("commissionCycle")
-                            ?.hasError("required")) ||
-                        (savingsForm.get("commissionAmount")?.touched &&
-                          savingsForm
-                            .get("commissionAmount")
-                            ?.hasError("required")) ||
-                        (savingsForm.get("commissionCurrency")?.touched &&
-                          savingsForm
-                            .get("commissionCurrency")
-                            ?.hasError("required"))
-                      ) {
-                        <span class="field-error d-block">{{
-                          "Required" | translate
-                        }}</span>
                       }
-                    </div>
-                  </div>
-                }
 
-                <!-- Commission Escalation -->
-                @if (
-                  savingsForm.get("commissionType")?.value !== "percentage" &&
-                  !isOneOff
-                ) {
-                  <div class="escalation-inline">
-                    <div
-                      class="d-flex flex-column gap-8 escalation-field"
-                      [class.escalation-full]="
-                        selectedEscalationDescription !==
-                        'Increases at custom rate'
-                      "
-                    >
-                      <div class="d-flex gap-8 align-items-center">
-                        <mat-label class="f-s-16 f-w-500 d-block ibr-black">{{
-                          "Commission amount escalation rate" | translate
-                        }}</mat-label>
-                        <img
-                          width="18"
-                          src="assets/images/svgs/help-circle-icon.svg"
-                          alt="help-circle-icon"
-                        />
-                      </div>
-
-                      <div class="position-relative">
-                        <div class="w-100 form-field">
-                          <div class="select-option position-relative">
+                      <div class="d-flex flex-column gap-4 net-fields">
+                        <div class="d-flex align-items-center net-field">
+                          <div class="left hide-arrow">
                             <mat-select
-                              formControlName="escalationRate"
-                              value="Select"
-                              (selectionChange)="onEscalationRateChange($event)"
+                              value="£"
+                              formControlName="commissionCurrency"
+                              class="sortby-edit-profile"
+                              hideSingleSelectionIndicator
                             >
-                              @for (
-                                escalationRate of escalationRates;
-                                track escalationRate
-                              ) {
-                                <mat-option [value]="escalationRate.value">{{
-                                  escalationRate.description
+                              @for (country of countries; track country) {
+                                @if (country.currencySymbol) {
+                                  <mat-option
+                                    [value]="country.currencySymbol"
+                                    >{{ country.currencySymbol }}</mat-option
+                                  >
+                                }
+                              }
+                            </mat-select>
+                          </div>
+
+                          <div class="w-100 form-field">
+                            <input
+                              matInput
+                              type="number"
+                              formControlName="commissionAmount"
+                              placeholder="0"
+                            />
+                          </div>
+
+                          <div class="right position-relative">
+                            <mat-select
+                              value="Select"
+                              formControlName="commissionCycle"
+                              class="sortby-edit-profile"
+                              hideSingleSelectionIndicator
+                            >
+                              @for (cycle of cycles; track cycle) {
+                                <mat-option [value]="cycle.id">{{
+                                  cycle.description
                                 }}</mat-option>
                               }
                             </mat-select>
@@ -1105,11 +1035,160 @@
                               </svg>
                             </span>
                           </div>
+                        </div>
+
+                        @if (
+                          (savingsForm.get("commissionCycle")?.touched &&
+                            savingsForm
+                              .get("commissionCycle")
+                              ?.hasError("required")) ||
+                          (savingsForm.get("commissionAmount")?.touched &&
+                            savingsForm
+                              .get("commissionAmount")
+                              ?.hasError("required")) ||
+                          (savingsForm.get("commissionCurrency")?.touched &&
+                            savingsForm
+                              .get("commissionCurrency")
+                              ?.hasError("required"))
+                        ) {
+                          <span class="field-error d-block">{{
+                            "Required" | translate
+                          }}</span>
+                        }
+                      </div>
+                    </div>
+                  }
+
+                  <!-- Commission Escalation -->
+                  @if (
+                    savingsForm.get("commissionType")?.value !== "percentage" &&
+                    !isOneOff
+                  ) {
+                    <div class="escalation-inline">
+                      <div
+                        class="d-flex flex-column gap-8 escalation-field"
+                        [class.escalation-full]="
+                          selectedEscalationDescription !==
+                          'Increases at custom rate'
+                        "
+                      >
+                        <div class="d-flex gap-4 align-items-center">
+                          <mat-label class="f-s-16 f-w-500 d-block ibr-black">{{
+                            "Commission amount escalation rate" | translate
+                          }}</mat-label>
+                          <img
+                            width="18"
+                            src="assets/images/svgs/help-circle-icon.svg"
+                            alt="help-circle-icon"
+                          />
+                        </div>
+
+                        <div class="position-relative">
+                          <div class="w-100 form-field">
+                            <div class="select-option position-relative">
+                              <mat-select
+                                formControlName="escalationRate"
+                                value="Select"
+                                (selectionChange)="
+                                  onEscalationRateChange($event)
+                                "
+                              >
+                                @for (
+                                  escalationRate of escalationRates;
+                                  track escalationRate
+                                ) {
+                                  <mat-option [value]="escalationRate.value">{{
+                                    escalationRate.description
+                                  }}</mat-option>
+                                }
+                              </mat-select>
+                              <span class="custom-arrow">
+                                <svg
+                                  width="12"
+                                  height="7"
+                                  viewBox="0 0 12 7"
+                                  fill="none"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <path
+                                    d="M1 1L6 6L11 1"
+                                    stroke="#2B3942"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                  />
+                                </svg>
+                              </span>
+                            </div>
+
+                            @if (
+                              savingsForm.get("escalationRate")?.touched &&
+                              savingsForm
+                                .get("escalationRate")
+                                ?.hasError("required")
+                            ) {
+                              <span class="field-error d-block">{{
+                                "Required" | translate
+                              }}</span>
+                            }
+                          </div>
+                        </div>
+                      </div>
+
+                      @if (
+                        selectedEscalationDescription ===
+                        "Increases at custom rate"
+                      ) {
+                        <div
+                          class="d-flex flex-column gap-8 escalation-field escalation-custom"
+                        >
+                          <mat-label class="f-s-16 f-w-500 d-block ibr-black">{{
+                            "Custom escalation rate" | translate
+                          }}</mat-label>
+                          <div class="w-100 form-field custom-rate-input">
+                            <input
+                              matInput
+                              type="number"
+                              formControlName="customEscalationRate"
+                              placeholder="0"
+                            />
+                            <div class="custom-rate-suffix">
+                              <svg
+                                width="20"
+                                height="20"
+                                viewBox="0 0 20 20"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  d="M15.8337 4.16602L4.16699 15.8327"
+                                  stroke="#48475D"
+                                  stroke-width="2"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                />
+                                <path
+                                  d="M5.41634 7.50065C6.56693 7.50065 7.49967 6.56791 7.49967 5.41732C7.49967 4.26672 6.56693 3.33398 5.41634 3.33398C4.26575 3.33398 3.33301 4.26672 3.33301 5.41732C3.33301 6.56791 4.26575 7.50065 5.41634 7.50065Z"
+                                  stroke="#48475D"
+                                  stroke-width="2"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                />
+                                <path
+                                  d="M14.5833 16.6667C15.7339 16.6667 16.6667 15.7339 16.6667 14.5833C16.6667 13.4327 15.7339 12.5 14.5833 12.5C13.4327 12.5 12.5 13.4327 12.5 14.5833C12.5 15.7339 13.4327 16.6667 14.5833 16.6667Z"
+                                  stroke="#48475D"
+                                  stroke-width="2"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                />
+                              </svg>
+                            </div>
+                          </div>
 
                           @if (
-                            savingsForm.get("escalationRate")?.touched &&
+                            savingsForm.get("customEscalationRate")?.touched &&
                             savingsForm
-                              .get("escalationRate")
+                              .get("customEscalationRate")
                               ?.hasError("required")
                           ) {
                             <span class="field-error d-block">{{
@@ -1117,129 +1196,65 @@
                             }}</span>
                           }
                         </div>
-                      </div>
+                      }
                     </div>
+                  }
 
-                    @if (
-                      selectedEscalationDescription ===
-                      "Increases at custom rate"
-                    ) {
-                      <div
-                        class="d-flex flex-column gap-8 escalation-field escalation-custom"
-                      >
+                  @if (savingsForm.get("commissionType")?.value === "both") {
+                    <div class="d-flex flex-column gap-8">
+                      <div class="d-flex gap-8 align-items-center">
                         <mat-label class="f-s-16 f-w-500 d-block ibr-black">{{
-                          "Custom escalation rate" | translate
+                          "Commission percentage" | translate
                         }}</mat-label>
-                        <div class="w-100 form-field custom-rate-input">
-                          <input
-                            matInput
-                            type="number"
-                            formControlName="customEscalationRate"
-                            placeholder="0"
-                          />
-                          <div class="custom-rate-suffix">
-                            <svg
-                              width="20"
-                              height="20"
-                              viewBox="0 0 20 20"
-                              fill="none"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                d="M15.8337 4.16602L4.16699 15.8327"
-                                stroke="#48475D"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                              />
-                              <path
-                                d="M5.41634 7.50065C6.56693 7.50065 7.49967 6.56791 7.49967 5.41732C7.49967 4.26672 6.56693 3.33398 5.41634 3.33398C4.26575 3.33398 3.33301 4.26672 3.33301 5.41732C3.33301 6.56791 4.26575 7.50065 5.41634 7.50065Z"
-                                stroke="#48475D"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                              />
-                              <path
-                                d="M14.5833 16.6667C15.7339 16.6667 16.6667 15.7339 16.6667 14.5833C16.6667 13.4327 15.7339 12.5 14.5833 12.5C13.4327 12.5 12.5 13.4327 12.5 14.5833C12.5 15.7339 13.4327 16.6667 14.5833 16.6667Z"
-                                stroke="#48475D"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                              />
-                            </svg>
-                          </div>
-                        </div>
-
-                        @if (
-                          savingsForm.get("customEscalationRate")?.touched &&
-                          savingsForm
-                            .get("customEscalationRate")
-                            ?.hasError("required")
-                        ) {
-                          <span class="field-error d-block">{{
-                            "Required" | translate
-                          }}</span>
-                        }
+                        <img
+                          width="18"
+                          src="assets/images/svgs/help-circle-icon.svg"
+                          alt="help-circle-icon"
+                        />
                       </div>
-                    }
-                  </div>
-                }
 
-                @if (savingsForm.get("commissionType")?.value === "both") {
-                  <div class="d-flex flex-column gap-8">
-                    <div class="d-flex gap-8 align-items-center">
-                      <mat-label class="f-s-16 f-w-500 d-block ibr-black">{{
-                        "Commission percentage" | translate
-                      }}</mat-label>
-                      <img
-                        width="18"
-                        src="assets/images/svgs/help-circle-icon.svg"
-                        alt="help-circle-icon"
-                      />
-                    </div>
-
-                    <div class="d-flex flex-column gap-4">
-                      <div class="d-flex align-items-center">
-                        <div class="w-100 form-field custom-rate-input">
-                          <input
-                            matInput
-                            type="number"
-                            formControlName="commissionPercentage"
-                            placeholder="0"
-                          />
-                          <div class="custom-rate-suffix">
-                            <svg
-                              width="20"
-                              height="20"
-                              viewBox="0 0 20 20"
-                              fill="none"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                d="M15.8337 4.16602L4.16699 15.8327"
-                                stroke="#48475D"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                              />
-                              <path
-                                d="M5.41634 7.50065C6.56693 7.50065 7.49967 6.56791 7.49967 5.41732C7.49967 4.26672 6.56693 3.33398 5.41634 3.33398C4.26575 3.33398 3.33301 4.26672 3.33301 5.41732C3.33301 6.56791 4.26575 7.50065 5.41634 7.50065Z"
-                                stroke="#48475D"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                              />
-                              <path
-                                d="M14.5833 16.6667C15.7339 16.6667 16.6667 15.7339 16.6667 14.5833C16.6667 13.4327 15.7339 12.5 14.5833 12.5C13.4327 12.5 12.5 13.4327 12.5 14.5833C12.5 15.7339 13.4327 16.6667 14.5833 16.6667Z"
-                                stroke="#48475D"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                              />
-                            </svg>
+                      <div class="d-flex flex-column gap-4">
+                        <div class="d-flex align-items-center">
+                          <div class="w-100 form-field custom-rate-input">
+                            <input
+                              matInput
+                              type="number"
+                              formControlName="commissionPercentage"
+                              placeholder="0"
+                            />
+                            <div class="custom-rate-suffix">
+                              <svg
+                                width="20"
+                                height="20"
+                                viewBox="0 0 20 20"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  d="M15.8337 4.16602L4.16699 15.8327"
+                                  stroke="#48475D"
+                                  stroke-width="2"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                />
+                                <path
+                                  d="M5.41634 7.50065C6.56693 7.50065 7.49967 6.56791 7.49967 5.41732C7.49967 4.26672 6.56693 3.33398 5.41634 3.33398C4.26575 3.33398 3.33301 4.26672 3.33301 5.41732C3.33301 6.56791 4.26575 7.50065 5.41634 7.50065Z"
+                                  stroke="#48475D"
+                                  stroke-width="2"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                />
+                                <path
+                                  d="M14.5833 16.6667C15.7339 16.6667 16.6667 15.7339 16.6667 14.5833C16.6667 13.4327 15.7339 12.5 14.5833 12.5C13.4327 12.5 12.5 13.4327 12.5 14.5833C12.5 15.7339 13.4327 16.6667 14.5833 16.6667Z"
+                                  stroke="#48475D"
+                                  stroke-width="2"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                />
+                              </svg>
+                            </div>
                           </div>
-                        </div>
-                        <!-- <div class="w-100 form-field input-container">
+                          <!-- <div class="w-100 form-field input-container">
                         <mat-form-field
                           appearance="outline"
                           class="w-full w-100 percentage-icon"
@@ -1251,36 +1266,39 @@
                           />
                         </mat-form-field>
                       </div> -->
-                      </div>
+                        </div>
 
-                      @if (
-                        (savingsForm.get("commissionPercentageCycle")
-                          ?.touched &&
-                          savingsForm
-                            .get("commissionPercentageCycle")
-                            ?.hasError("required")) ||
-                        (savingsForm.get("commissionPercentageCurrency")
-                          ?.touched &&
-                          savingsForm
-                            .get("commissionPercentageCurrency")
-                            ?.hasError("required"))
-                      ) {
-                        <span class="field-error d-block">{{
-                          "Required" | translate
-                        }}</span>
-                      }
+                        @if (
+                          (savingsForm.get("commissionPercentageCycle")
+                            ?.touched &&
+                            savingsForm
+                              .get("commissionPercentageCycle")
+                              ?.hasError("required")) ||
+                          (savingsForm.get("commissionPercentageCurrency")
+                            ?.touched &&
+                            savingsForm
+                              .get("commissionPercentageCurrency")
+                              ?.hasError("required"))
+                        ) {
+                          <span class="field-error d-block">{{
+                            "Required" | translate
+                          }}</span>
+                        }
+                      </div>
                     </div>
-                  </div>
-                }
-              </div>
+                  }
+                </div>
+              }
             }
-          }
-        </div>
+          </div>
         }
 
         @if (fromNetWorth) {
           <p class="net-worth-helper-note">
-            {{ 'This asset is linked to the Savings section. Any changes made here will be reflected there as well.' | translate }}
+            {{
+              "This asset is linked to the Savings section. Any changes made here will be reflected there as well."
+                | translate
+            }}
           </p>
         }
       </div>

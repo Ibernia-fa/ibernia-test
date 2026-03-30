@@ -36,13 +36,9 @@
     <!-- Net worth card -->
     <div class="col-md-6">
       <mat-card class="cardWithShadow summary-stat-card">
-        <mat-card-content style="padding: 28px 24px !important;">
+        <mat-card-content style="padding: 24px !important;">
           <div class="d-flex flex-column gap-8">
-            <div class="d-flex align-items-center gap-8">
-              <h3 class="card-title stat-label">
-                <img src="/assets/images/svgs/shield.svg" alt="net-worth" /> Net worth
-              </h3>
-            </div>
+            <p class="stat-label">Net worth</p>
             <h3 class="saving-title">
               <span>{{clientData?.preferredCurrency | currencySymbol}}</span>{{s.netWorth | number:'1.0-0'}}
             </h3>
@@ -71,14 +67,14 @@
     <!-- Asset mix card -->
     <div class="col-md-6">
       <mat-card class="cardWithShadow summary-stat-card">
-        <mat-card-content style="padding: 28px 24px !important;">
+        <mat-card-content style="padding: 24px !important;">
           <div class="d-flex flex-column gap-8">
             <p class="stat-label">Asset Mix</p>
             <div class="stacked-bar-container">
               <div class="stacked-bar">
                 <div class="bar-segment bar-cash" [style.width.%]="s.assetsByType.cashPercent"></div>
-                <div class="bar-segment bar-investments" [style.width.%]="s.assetsByType.investmentsPercent"></div>
                 <div class="bar-segment bar-real-estate" [style.width.%]="s.assetsByType.realEstatePercent"></div>
+                <div class="bar-segment bar-investments" [style.width.%]="s.assetsByType.investmentsPercent"></div>
                 <div class="bar-segment bar-personal-property" [style.width.%]="s.assetsByType.personalPropertyPercent"></div>
                 <div class="bar-segment bar-other" [style.width.%]="s.assetsByType.otherPercent"></div>
               </div>
@@ -106,7 +102,7 @@
                 <div class="legend-item" *ngIf="s.assetsByType.otherTotal > 0">
                   <span class="legend-dot bar-other"></span>
                   <span class="legend-label">Other:</span>
-                  <span class="legend-value">{{s.assetsByType.otherPercent > 0 ? s.assetsByType.otherPercent + '%' : '< 1%'}}</span>
+                  <span class="legend-value">{{s.assetsByType.otherPercent > 0 ? s.assetsByType.otherPercent + '%' : '&lt; 1%'}}</span>
                 </div>
               </div>
             </div>
@@ -118,7 +114,7 @@
 
   <!-- Assets section -->
   <mat-card class="cardWithShadow">
-    <mat-card-content style="padding: 28px 24px !important;">
+    <mat-card-content style="padding: 24px !important;">
       <div class="d-flex align-items-center justify-content-between m-b-16">
         <div>
           <h2 class="section-title">Assets</h2>
@@ -184,7 +180,7 @@
 
   <!-- Liabilities section -->
   <mat-card class="cardWithShadow">
-    <mat-card-content style="padding: 28px 24px !important;">
+    <mat-card-content style="padding: 24px !important;">
       <div class="d-flex align-items-center justify-content-between m-b-16">
         <div>
           <h2 class="section-title">Liabilities</h2>

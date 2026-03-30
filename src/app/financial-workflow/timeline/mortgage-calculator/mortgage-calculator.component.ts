@@ -69,6 +69,7 @@ export class MortgageCalculatorComponent implements OnInit, OnChanges {
   @Input() advisorDefaultInterestRate: number | null = null;
   /** UI label: Home uses mortgage; Car, Boat, custom use loan. */
   @Input() calculatorKind: 'mortgage' | 'loan' = 'loan';
+  @Input() priceLabel: string = 'Property price';
   @Input() initialState: MortgageCalculatorState | null = null;
   @Output() calculated = new EventEmitter<MortgageOutput>();
   @Output() stateChanged = new EventEmitter<MortgageCalculatorState>();
@@ -230,6 +231,10 @@ export class MortgageCalculatorComponent implements OnInit, OnChanges {
     this.mortgageForm.valueChanges.subscribe(() => {
       this.stateChanged.emit(this.getState());
     });
+  }
+
+  onBack(): void {
+    this.result = null;
   }
 
   onPropertyPriceInput(): void {

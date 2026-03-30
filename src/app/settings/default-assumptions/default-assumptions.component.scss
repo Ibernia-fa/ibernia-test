@@ -1,3 +1,27 @@
+.settings-form-field {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Custom chevron for mat-select (same pattern as add-new-pot) */
+.settings-custom-input {
+  .position-relative {
+    height: 100%;
+  }
+
+  .custom-arrow {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+  }
+}
+
 .main-header-content {
   .header-icon {
     margin-right: 10px;
@@ -18,5 +42,17 @@
   &:first-of-type {
     border-top: none;
     padding-top: 0;
+  }
+}
+
+.assumption-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.m-t-20.d-flex.justify-content-end {
+  .button-icon {
+    min-width: 135px;
   }
 }

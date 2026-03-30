@@ -1,104 +1,164 @@
-.upload-avatar-wrapper{
-    border: 2px dashed #d5d5d5 ;
-    padding: 15px;
-    border-radius: 4px;
-    width: 200px;
-    margin-right: 20px;
-    height: 172px;
-    font-size: 14px;
-    line-height: 16px;
+.upload-avatar-wrapper {
+  padding: 16px;
+  border-radius: 12px;
+  width: 230px;
+  height: 168px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  background-color: #ffffffb2;
+  backdrop-filter: blur(75px);
+  border: 1px solid #0000001a;
+}
+.uploader-text {
+  color: #1c1c1c;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 100%;
+  margin: 0;
+}
+.uploader-files {
+  color: #5a596e;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 100%;
+  margin: 0;
+}
+.upload-file-info {
+  width: 400px;
+}
+.settings-details {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px 16px;
+  .settings-form-field {
+    width: 100%;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    margin-top: 5px;
-    small{
-        color: #B7B6C2;
+    flex-direction: column;
+    gap: 10px;
+    &:last-child {
+      grid-column: span 2;
     }
+  }
 }
-.upload-file-info{
-    width: 400px;
-}
-.main-header-content{
-    .header-icon{
-        margin-right: 10px;
-    
-    }
-    h2{
-        margin-bottom: 10px;
-    }
+
+.main-header-content {
+  .header-icon {
+    margin-right: 10px;
+  }
+  h2 {
+    margin-bottom: 10px;
+  }
 }
 .bio-field-wrapper {
-    ::ng-deep {
-        .mat-mdc-form-field {
-            .mat-mdc-text-field-wrapper {
-                .mat-mdc-form-field-flex {
-                    max-height: 200px;
-                    .mat-mdc-form-field-infix {
-                        min-height: 120px;
-                        max-height: 200px;
-                        overflow: hidden;
-                    }
-                }
-            }
-        }
-
-        textarea.mat-mdc-input-element {
-            min-height: 120px;
-            max-height: 200px;
-            height: 120px;
-            resize: vertical;
-            overflow-y: auto;
-            box-sizing: border-box;
-        }
+  margin-top: 24px;
+  ::ng-deep {
+    .mdc-notched-outline {
+      display: none !important; // removes outline border
     }
+    .mat-mdc-form-field {
+      .mat-mdc-text-field-wrapper {
+        background-color: #ffffffb2;
+        backdrop-filter: blur(75px);
+        border-radius: 12px;
+        border: none !important;
+        padding: 0 !important;
+        .mat-mdc-form-field-flex {
+          border: none !important;
+          padding: 0 !important;
+          .mat-mdc-form-field-infix {
+            padding: 0 !important;
+            overflow: visible !important;
+            padding: 0 !important;
+          }
+        }
+      }
+    }
+    .mat-mdc-text-field-wrapper,
+    .mat-mdc-form-field-flex,
+    .mat-mdc-form-field-infix {
+      height: auto !important;
+      max-height: none !important;
+      overflow: visible !important;
+    }
+    .mdc-notched-outline__leading,
+    .mdc-notched-outline__notch,
+    .mdc-notched-outline__trailing {
+      border-color: #0000001a !important;
+      border-width: 1px !important;
+    }
+
+    textarea.mat-mdc-input-element {
+      min-height: 120px;
+      max-height: auto !important;
+      height: auto !important;
+      resize: none !important;
+      overflow-y: auto !important;
+      box-sizing: border-box;
+      color: #787889 !important;
+      font-size: 14px;
+      line-height: 18px;
+      padding: 16px;
+    }
+    textarea.mat-mdc-input-element::placeholder {
+      color: #787889;
+      opacity: 1;
+      line-height: 18px;
+    }
+  }
+
+  .button-icon {
+    min-width: 135px !important;
+  }
 }
 
 .crop-pic {
-    position: absolute;
-    left: -12px;
-    bottom: -12px;
-    border: 1px solid #ccc;
-    border-radius: 100px;
-    width: 28px;
-    height: 28px;
-    text-align: center;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: white;
-    cursor: pointer;
-    mat-icon {
-        font-size: 18px;
-        width: 18px;
-        height: 18px;
-    }
-    &:hover {
-        background-color: #e3f2fd;
-        border-color: #2196f3;
-    }
+  position: absolute;
+  left: -12px;
+  bottom: -12px;
+  border: 1px solid #ccc;
+  border-radius: 100px;
+  width: 28px;
+  height: 28px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  cursor: pointer;
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+  &:hover {
+    background-color: #e3f2fd;
+    border-color: #2196f3;
+  }
 }
 
 .profile-avatar-circle {
   border-radius: 50%;
 }
 
-.remove-pic{
-    position: absolute;
-    right: -50px;
-    top: -35px;
-    border: 1px solid #ccc;
-    border-radius: 100px;
-    width: 28px;
-    height: 28px;
-    text-align: center;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: white;
-    cursor: pointer;
-    &:hover{
-        background-color: #ffb4b4;
-        border-color: #ffb4b4;
-    }
+.remove-pic {
+  position: absolute;
+  right: -50px;
+  top: -35px;
+  border: 1px solid #ccc;
+  border-radius: 100px;
+  width: 28px;
+  height: 28px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  cursor: pointer;
+  &:hover {
+    background-color: #ffb4b4;
+    border-color: #ffb4b4;
+  }
 }
