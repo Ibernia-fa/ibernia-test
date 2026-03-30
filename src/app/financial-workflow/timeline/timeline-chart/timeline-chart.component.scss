@@ -5,7 +5,8 @@
   border-radius: 12px;
   border: 1px solid #0000001a !important;
   padding-left: 64px;
-  padding-right: 16px;
+  /* Extra room so last x-axis tick labels are not clipped (vis centers labels on ticks). */
+  padding-right: 40px;
   .card-main-wrapper {
     span.f-s-16 {
       line-height: 18px;
@@ -300,6 +301,27 @@
 
 .timeline-container {
   flex: 1;
+}
+
+/*
+ * vis-timeline default CSS (node_modules/vis-timeline/styles/vis-timeline-graph2d.css) sets:
+ *   .vis-timeline { overflow: hidden; }
+ *   .vis-time-axis { overflow: hidden; }
+ *   .vis-time-axis .vis-text { overflow: hidden; }
+ * The last minor tick sits at the right edge of the window; each label is wider than a tick, so the
+ * right half of the text extends past the timeline box and gets clipped. Hover highlight (larger
+ * font in .vis-text.vis-minor.highlighted) makes this worse. Allow overflow for our chart only.
+ */
+::ng-deep .timeline-container .vis-timeline {
+  overflow: visible;
+}
+
+::ng-deep .timeline-container .vis-time-axis {
+  overflow: visible;
+}
+
+::ng-deep .timeline-container .vis-time-axis .vis-text {
+  overflow: visible;
 }
 
 .timeline-tooltip {
