@@ -38,8 +38,47 @@ export class OrganizationProfilesService {
       );
   }
 
-  setBrandingLogo(newLogoUrl: string | null) {
-    this.brandingLogoSource.next(newLogoUrl); // + '?v=' + new Date().getTime()
+  /** Current in-memory branding logo (includes session-hydrated value). */
+  getBrandingLogoValue(): string | null {
+    return this.brandingLogoSource.getValue();
+  }
+
+  /** Restore last-known logo before HTTP completes (avoids empty sidebar/header after F5). */
+  hydrateBrandingLogoFromSession(userId: string): void {
+    try {
+      const raw = sessionStorage.getItem(this.brandingLogoSessionKey(userId));
+      if (raw?.trim()) {
+        this.brandingLogoSource.next(raw);
+      }
+    } catch {
+      /* storage disabled or unavailable */
+    }
+  }
+
+  private brandingLogoSessionKey(userId: string): string {
+    return `ibernia_org_branding_logo_${userId}`;
+  }
+
+  private persistBrandingLogoSession(userId: string, logo: string | null): void {
+    try {
+      const key = this.brandingLogoSessionKey(userId);
+      if (logo?.trim()) {
+        sessionStorage.setItem(key, logo);
+      } else {
+        sessionStorage.removeItem(key);
+      }
+    } catch {
+      /* quota exceeded or storage disabled */
+    }
+  }
+
+  setBrandingLogo(newLogoUrl: string | null, persistForUserId?: string | null) {
+    const normalized =
+      newLogoUrl && String(newLogoUrl).trim() !== '' ? newLogoUrl : null;
+    this.brandingLogoSource.next(normalized);
+    if (persistForUserId) {
+      this.persistBrandingLogoSession(persistForUserId, normalized);
+    }
   }
 
   setBackgroundImage(newBackgroundImageUrl: string | null) {

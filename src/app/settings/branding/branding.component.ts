@@ -195,7 +195,10 @@ export class BrandingComponent implements OnInit {
       .saveProfile({ userId, profilePhotoUrl: this.profileImage || "", backgroundPhotoUrl: this.backgroundImage || "" })
       .subscribe({
         next: () => {
-          this.orgProfiles.setBrandingLogo(this.profileImage || null);
+          this.orgProfiles.setBrandingLogo(
+            this.profileImage || null,
+            userId,
+          );
           this.orgProfiles.setBackgroundImage(this.backgroundImage || null);
 
           this.toastr.success('Image saved', 'Success!');
