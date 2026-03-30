@@ -162,17 +162,35 @@ export class LegacyComponent implements OnInit, OnChanges {
 
     if (allAlreadyMarked) {
       ids.forEach(id => this.markedDeceased.delete(id));
-      if (this.markedDeceased.size === 0) {
+
+      const remainingScenario = this.resolveScenarioFromDeceased();
+
+      if (remainingScenario) {
+        this.activeScenario = remainingScenario;
+        this.legacyHttp.simulateScenario(this.cashflowId, remainingScenario).subscribe({
+          next: (result) => {
+            this.scenarioResult = result;
+            this.cdr.markForCheck();
+          },
+          error: (err) => {
+            this.toastr.error(err?.error?.message || 'Failed to simulate scenario', 'Error');
+            this.activeScenario = null;
+            this.scenarioResult = null;
+            this.markedDeceased.clear();
+            this.cdr.markForCheck();
+          }
+        });
+      } else {
         this.activeScenario = null;
         this.scenarioResult = null;
+        this.cdr.markForCheck();
       }
-      this.cdr.markForCheck();
       return;
     }
 
     ids.forEach(id => this.markedDeceased.add(id));
 
-    const effectiveScenario = this.resolveEffectiveScenario(scenario);
+    const effectiveScenario = this.resolveScenarioFromDeceased() ?? scenario;
 
     this.activeScenario = effectiveScenario;
     this.legacyHttp.simulateScenario(this.cashflowId, effectiveScenario).subscribe({
@@ -192,17 +210,27 @@ export class LegacyComponent implements OnInit, OnChanges {
     });
   }
 
-  private resolveEffectiveScenario(requestedScenario: ScenarioType): ScenarioType {
+  private resolveScenarioFromDeceased(): ScenarioType | null {
+    if (this.markedDeceased.size === 0) return null;
+
     const clientId = this.clientMember?.id;
     const partnerId = this.partnerMember?.id;
+    const clientDead = !!clientId && this.markedDeceased.has(clientId);
+    const partnerDead = !!partnerId && this.markedDeceased.has(partnerId);
 
-    if (clientId && partnerId
-        && this.markedDeceased.has(clientId)
-        && this.markedDeceased.has(partnerId)) {
-      return ScenarioType.BothDie;
-    }
+    if (clientDead && partnerDead) return ScenarioType.BothDie;
+    if (clientDead) return ScenarioType.ClientDies;
+    if (partnerDead) return ScenarioType.PartnerDies;
 
-    return requestedScenario;
+    const allClientParentsDead = this.clientParents.length > 0
+      && this.clientParents.every(p => this.markedDeceased.has(p.id));
+    if (allClientParentsDead) return ScenarioType.ClientParentsDie;
+
+    const allPartnerParentsDead = this.partnerParents.length > 0
+      && this.partnerParents.every(p => this.markedDeceased.has(p.id));
+    if (allPartnerParentsDead) return ScenarioType.PartnerParentsDie;
+
+    return null;
   }
 
   private getScenarioMemberIds(scenario: ScenarioType): string[] {
