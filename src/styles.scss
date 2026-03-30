@@ -1079,3 +1079,107 @@ body:has(.global-fullscreen-overlay) {
   white-space: nowrap;
   line-height: 100%;
 }
+
+.settings-custom-input {
+  .mat-mdc-text-field-wrapper {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+
+  .mat-mdc-form-field-flex {
+    border: none !important;
+    padding: 0 !important;
+    height: auto !important;
+  }
+
+  .mdc-notched-outline {
+    display: none !important; // removes outline border
+  }
+
+  .mat-mdc-text-field-wrapper {
+    // height: 46px;
+    background-color: #ffffffb2;
+    backdrop-filter: blur(75px);
+
+    border-radius: 12px;
+    .mat-mdc-form-field-infix {
+      height: 46px !important;
+      line-height: 20px !important;
+      padding: 0 !important;
+      min-height: 46px !important;
+    }
+  }
+
+  .mdc-text-field--outlined {
+    --mdc-outlined-text-field-container-shape: 12px;
+  }
+
+  .mdc-notched-outline__leading,
+  .mdc-notched-outline__notch,
+  .mdc-notched-outline__trailing {
+    border-color: #0000001a !important;
+    border-width: 1px !important;
+  }
+
+  input.mat-mdc-input-element {
+    height: 46px !important;
+    padding: 0 16px;
+    box-sizing: border-box;
+    color: #787889 !important;
+    font-size: 14px;
+    line-height: 100%;
+    font-weight: 400;
+  }
+
+  // Select Field
+  .mat-mdc-select {
+    height: 100%;
+    .mat-mdc-select-trigger {
+      height: 100%;
+      padding: 0 16px;
+    }
+    .mat-mdc-select-arrow-wrapper {
+      display: none !important;
+    }
+  }
+
+  /* % icon suffix (same SVG as add-new-pot custom escalation rate) */
+  .settings-percent-suffix {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    line-height: 0;
+
+    svg {
+      display: block;
+      flex-shrink: 0;
+    }
+  }
+
+  .mat-mdc-form-field-icon-suffix:has(.settings-percent-suffix) {
+    padding: 0 12px 0 4px;
+    display: flex;
+    align-items: center;
+  }
+}
+
+.custom-select-panel {
+  margin-top: 8px;
+  &.mat-mdc-select-panel {
+    border-radius: 12px !important;
+    padding: 8px !important;
+    border: 1px solid #0000001a;
+    box-shadow: 4px 4px 4px 2px #0000000d;
+
+    .mat-mdc-option {
+      padding: 0 8px;
+      min-height: 32px;
+    }
+    .mdc-list-item {
+      border-radius: 5px !important;
+    }
+  }
+}
