@@ -17,6 +17,11 @@
   transform: none !important;
 }
 
+/* Fixed footer band: viewport bottom margin + bar height + gap above bar (matches footer.component) */
+.layout-with-footer .mat-drawer.sidebarNav {
+  bottom: calc(16px + 65px + 16px);
+}
+
 /* Sidebar header: logo + toggle */
 .sidebar-header {
   display: flex;

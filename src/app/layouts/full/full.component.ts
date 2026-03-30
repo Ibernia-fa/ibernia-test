@@ -49,6 +49,7 @@ import { Client } from 'src/app/clients/models/client';
 import { TranslateModule } from '@ngx-translate/core';
 import { OrganizationProfilesService } from 'src/app/settings/services/organization.profiles.service';
 import { AuthService } from 'src/app/auth/services/auth.service';
+import { FooterComponent } from './vertical/footer/footer.component';
 
 const MOBILE_VIEW = 'screen and (max-width: 768px)';
 const TABLET_VIEW = 'screen and (min-width: 769px) and (max-width: 1024px)';
@@ -89,6 +90,7 @@ interface quicklinks {
     MatListModule,
     MatDialogModule,
     TranslateModule,
+    FooterComponent,
   ],
   templateUrl: './full.component.html',
   styleUrls: [],
@@ -99,6 +101,10 @@ export class FullComponent implements OnInit, OnDestroy {
   navItemslower = navItemslower;
   isSettings = false;
   isCashflowRoute = false;
+
+  /** Hidden on cashflows and questionnaire (same rules as former AppComponent.showFooter). */
+  showFooter = true;
+
   @ViewChild('leftsidenav')
   public sidenav: MatSidenav;
   resView = false;
@@ -269,6 +275,9 @@ export class FullComponent implements OnInit, OnDestroy {
 
     // Set initial route state (for direct load/refresh on cashflow routes)
     this.isCashflowRoute = this.router.url.startsWith('/cashflows');
+    this.showFooter =
+      !this.isCashflowRoute &&
+      !this.router.url.startsWith('/questionnaire/');
 
     // This is for scroll to top
     // this.router.events
@@ -299,6 +308,9 @@ export class FullComponent implements OnInit, OnDestroy {
 
         // Detect cashflow routes (footer is hidden, so no bottom padding needed)
         this.isCashflowRoute = currentRoute.startsWith('/cashflows');
+        this.showFooter =
+          !this.isCashflowRoute &&
+          !currentRoute.startsWith('/questionnaire/');
 
         // swap menu sources
         if (this.isSettings) {
