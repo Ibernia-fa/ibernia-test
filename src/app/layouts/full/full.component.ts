@@ -327,6 +327,11 @@ export class FullComponent implements OnInit, OnDestroy {
 
         this.content?.scrollTo({ top: 0 });
       });
+
+    const uid = this.Authservice.getUserProfile()?.sub;
+    if (uid) {
+      this.organizationProfiles.hydrateBrandingLogoFromSession(uid);
+    }
   }
 
   ngOnInit(): void {

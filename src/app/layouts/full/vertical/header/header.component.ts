@@ -197,6 +197,9 @@ showFiller = false;
     translate.setDefaultLang('en');
     this.user = this.Authservice.getUserProfile();
     this.hydratedDisplay = this.user?.sub ? readUserDisplayCache(this.user.sub) : null;
+    if (this.user?.sub) {
+      this.organizationProfiles.hydrateBrandingLogoFromSession(this.user.sub);
+    }
 
     this.loadProfile();
     
@@ -323,23 +326,25 @@ showFiller = false;
 
     ngOnInit() {
       this.loadUnreadCount();
-      // branding logo
+      this.brandingLogo = this.ensureDataUrl(
+        this.organizationProfiles.getBrandingLogoValue(),
+      );
+      this.isBrandLogoLoaded = true;
+
       this.organizationProfiles.getProfile(this.user.sub).subscribe({
         next: (p) => {
           const logo = this.ensureDataUrl(p?.profilePhotoUrl ?? null);
           this.brandingLogo = logo;
-          this.isBrandLogoLoaded = true;
-          this.organizationProfiles.setBrandingLogo(logo);
+          this.organizationProfiles.setBrandingLogo(logo, this.user.sub);
         },
         error: (err) => {
           console.error(err);
-          this.isBrandLogoLoaded = true;
         },
       });
 
       this.sub = this.organizationProfiles.brandingLogo$.subscribe((url) => {
-      this.brandingLogo = this.ensureDataUrl(url);
-    });
+        this.brandingLogo = this.ensureDataUrl(url);
+      });
     }
 
     ensureDataUrl(s: string | null): string | null {

@@ -10,7 +10,7 @@ import {
 import { Subject } from 'rxjs';
 import { NavigationEnd, Router } from '@angular/router';
 import { TablerIconsModule } from 'angular-tabler-icons';
-import { filter, startWith, takeUntil, take } from 'rxjs';
+import { filter, startWith, takeUntil } from 'rxjs';
 import { BrandingComponent } from './branding.component';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
@@ -55,14 +55,12 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
     const userId = this.authService.getUserProfile()?.sub;
     if (userId) {
-      this.organizationProfiles.brandingLogo$
-        .pipe(take(1))
-        .subscribe((url) => {
-          const cached = this.ensureDataUrl(url);
-          if (cached) {
-            this.brandingLogo = cached;
-          }
-        });
+      const immediate = this.ensureDataUrl(
+        this.organizationProfiles.getBrandingLogoValue(),
+      );
+      if (immediate) {
+        this.brandingLogo = immediate;
+      }
 
       this.organizationProfiles
         .getProfile(userId)
@@ -71,7 +69,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
           next: (p) => {
             const logo = this.ensureDataUrl(p?.profilePhotoUrl ?? null);
             this.brandingLogo = logo;
-            this.organizationProfiles.setBrandingLogo(logo);
+            this.organizationProfiles.setBrandingLogo(logo, userId);
           },
           error: () => {},
         });
@@ -80,9 +78,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
         .pipe(takeUntil(this.destroy$))
         .subscribe((url) => {
           const logo = this.ensureDataUrl(url);
-          if (logo) {
-            this.brandingLogo = logo;
-          }
+          this.brandingLogo = logo;
         });
     }
   }
