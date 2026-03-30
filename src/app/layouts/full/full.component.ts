@@ -263,9 +263,6 @@ export class FullComponent implements OnInit, OnDestroy {
         // SidenavOpened must be reset true when layout changes
         this.options.sidenavOpened = true;
         this.isMobileScreen = state.breakpoints[BELOWMONITOR];
-        if (this.options.sidenavCollapsed == false) {
-          this.options.sidenavCollapsed = state.breakpoints[TABLET_VIEW];
-        }
         this.isContentWidthFixed = state.breakpoints[MONITOR_VIEW];
         this.resView = state.breakpoints[BELOWMONITOR];
       });
