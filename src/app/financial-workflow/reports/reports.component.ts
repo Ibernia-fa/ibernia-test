@@ -57,6 +57,8 @@ import {
 } from 'src/app/services/fullscreen.service';
 import { TranslateModule } from '@ngx-translate/core';
 import { RouterLink } from '@angular/router';
+import { AiRecommendationsHttpService } from '../ai-recommendations/services/ai-recommendations-http.service';
+import { RecommendationItem } from '../ai-recommendations/models/ai-recommendations.model';
 
 export interface PeriodicElement {
   name: string;
@@ -213,6 +215,12 @@ export class ReportsComponent {
   /** Cached effective end date for compare chart. Set when compare report loads. */
   effectiveCompareReportEndDate: Date | null = null;
 
+  insights: RecommendationItem[] = [];
+  insightsLoading = false;
+  private insightsLoadedForCashflow: string | null = null;
+  readonly insightIconColors = ['#4043AF', '#FF383C', '#FF8D28', '#34C759', '#4043AF', '#FF383C'];
+  readonly insightIconBgs = ['#f0f0ff', '#fff3f3', '#fff8f0', '#f0fff4', '#f0f0ff', '#fff3f3'];
+
   constructor(
     private timelineHttpService: TimelineHttpService,
     private reportsHttpService: ReportsHttpService,
@@ -230,6 +238,7 @@ export class ReportsComponent {
     private store: Store,
     private fullscreenService: FullscreenService,
     private elementRef: ElementRef,
+    private aiRecommendationsHttpService: AiRecommendationsHttpService,
   ) {
     this.destroyed$ = new BehaviorSubject<boolean>(false);
     this.navItemService.currentRouteName = 'Lifetime Plan';
@@ -511,9 +520,30 @@ export class ReportsComponent {
             (timeline.forecastEndtDate
               ? new Date(timeline.forecastEndtDate)
               : null);
+          this.loadInsights(cashflowId);
         },
         error: (err) => {
           console.error('Failed to load report with forecast dates', err);
+        },
+      });
+  }
+
+  private loadInsights(cashflowId: string): void {
+    if (this.insightsLoadedForCashflow === cashflowId) return;
+    this.insightsLoadedForCashflow = cashflowId;
+    this.insightsLoading = true;
+    this.insights = [];
+
+    this.aiRecommendationsHttpService
+      .analyzePlan({ cashflowId })
+      .subscribe({
+        next: (data) => {
+          const items = data.recommendations ?? [];
+          this.insights = items.slice(0, 6);
+          this.insightsLoading = false;
+        },
+        error: () => {
+          this.insightsLoading = false;
         },
       });
   }
