@@ -10,10 +10,13 @@ import {
   NgZone,
   inject,
 } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
+import { formatLifetimePlanSeriesDisplayName } from 'src/app/shared/utils/lifetime-plan-series-display';
 import { MatCardModule } from '@angular/material/card';
 import { TablerIconsModule } from 'angular-tabler-icons';
 import { ChartComponent, NgApexchartsModule } from 'ng-apexcharts';
-import { ChartSeries, TimelineEvent } from '../models/charts-series.model';
+import { ChartSeries, Series, TimelineEvent } from '../models/charts-series.model';
+import { ensureUniqueSavingsChartSeriesColors } from 'src/app/shared/utils/unique-savings-chart-series-colors';
 import { Client } from 'src/app/clients/models/client';
 import moment from 'moment';
 
@@ -69,6 +72,8 @@ export class SavingsBarStackedChartComponent
   private _hideEmergencyOverlays = false;
   /** Debounce handle for postRenderSetup. */
   private _postRenderTimer: any = null;
+  /** Series colours after client-side de-dupe (legend + shared tooltip must match bars). */
+  private seriesColorsForTooltip: Series[] = [];
 
   /** Observes wrapper size (e.g. sidebar open/close); Apex only watches its direct parent. */
   private chartResizeObserver: ResizeObserver | null = null;
@@ -102,6 +107,7 @@ export class SavingsBarStackedChartComponent
   }
 
   private ngZone = inject(NgZone);
+  private translate = inject(TranslateService);
 
   constructor() {
     this.chartOptions = {
@@ -180,7 +186,7 @@ export class SavingsBarStackedChartComponent
               )
                 return '';
               // Index must match series order — duplicate pot names (e.g. two "Investment") break find-by-name.
-              const originalSeries = this.report?.series?.[i];
+              const originalSeries = this.seriesColorsForTooltip[i];
               const color =
                 originalSeries?.color && originalSeries.color !== 'transparent'
                   ? originalSeries.color
@@ -364,6 +370,7 @@ export class SavingsBarStackedChartComponent
 
     const report = this.trimReportToEndYear(this.report);
     if (!report?.series?.length) {
+      this.seriesColorsForTooltip = [];
       if (changes['client'] && this.client) {
       this.chartOptions.yaxis = {
         title: { text: '' },
@@ -375,6 +382,9 @@ export class SavingsBarStackedChartComponent
       }
       return;
     }
+
+    const seriesForChart = ensureUniqueSavingsChartSeriesColors(report.series);
+    this.seriesColorsForTooltip = seriesForChart;
 
     if (changes['report']) {
       this.cleanupHtmlTooltips();
@@ -395,20 +405,7 @@ export class SavingsBarStackedChartComponent
       // Only rebuild legend and annotations when NOT in animated-update mode (or on first render).
       // Re-assigning these inputs triggers ng-apexcharts updateOptions → full re-render.
       if (!this.animateUpdates || !this.chartInitialized) {
-        const seriesList = report.series;
-
-        // dynamically build fillColors array based on series names
-        const fillColors = seriesList.map((s, i) => {
-          if (
-            s.name === 'Current Account (Negative)' ||
-            s.name === 'Emergency Expense'
-          ) {
-            return 'transparent';
-          }
-          return s.color;
-        });
-
-        // legends formatter to hide specific series names
+        // legends formatter to hide specific series names (marker colours set below for every update)
         this.chartOptions.legend = {
           ...this.chartOptions.legend,
 
@@ -420,9 +417,6 @@ export class SavingsBarStackedChartComponent
               return '';
             }
             return seriesName;
-          },
-          markers: {
-            fillColors: fillColors,
           },
           onItemClick: {
             toggleDataSeries: true,
@@ -564,16 +558,30 @@ export class SavingsBarStackedChartComponent
       }
     }
 
+    const legendFillColors = seriesForChart.map((s) =>
+      s.name === 'Current Account (Negative)' || s.name === 'Emergency Expense'
+        ? 'transparent'
+        : s.color,
+    );
+    this.chartOptions.legend = {
+      ...this.chartOptions.legend,
+      markers: {
+        ...(this.chartOptions.legend?.markers ?? {}),
+        fillColors: legendFillColors,
+      },
+    };
+
     // final series assignment
-    const mappedSeries = report.series.map((s, idx) => ({
+    const mappedSeries = seriesForChart.map((s, idx) => ({
       ...s,
+      name: formatLifetimePlanSeriesDisplayName(s, this.client, this.translate),
       color:
         s.name === 'Current Account (Negative)' ||
         s.name === 'Emergency Expense'
           ? 'transparent'
           : s.color,
       tack: 'stack1',
-      order: s.name === 'Emergency Expense' ? report.series.length : idx,
+      order: s.name === 'Emergency Expense' ? seriesForChart.length : idx,
       fill: {
         opacity: 1,
       },

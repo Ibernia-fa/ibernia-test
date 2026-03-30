@@ -48,8 +48,9 @@ import { CurrencySymbolPipe } from 'src/app/pipe/currency-symbol.pipe';
 import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { SettingsService } from 'src/app/default-preferance/services/default-preferance.http.service';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { patchInflationRateDescription } from 'src/app/shared/utils/escalation-rate-utils';
+import { formatClientPersonDisplayName } from 'src/app/shared/utils/person-display-name';
 import { MaterialModule } from 'src/app/material.module';
 @Component({
   selector: 'app-saving-pots',
@@ -122,6 +123,7 @@ export class SavingPotsComponent implements OnInit {
     private financialWorkflowService: FinancialWorkflowService,
     private Authservice: AuthService,
     private settingsService: SettingsService,
+    private translate: TranslateService,
   ) {
     this.user = this.Authservice.getUserProfile();
     this.settingsService.userData$
@@ -428,6 +430,12 @@ export class SavingPotsComponent implements OnInit {
         hasPartner: !!this.selectedClient?.partnerDetail,
         clientFirstName: this.selectedClient?.clientDetails?.firstName ?? '',
         partnerFirstName: this.selectedClient?.partnerDetail?.firstName ?? '',
+        clientDisplayName: formatClientPersonDisplayName(
+          this.selectedClient?.clientDetails,
+        ),
+        partnerDisplayName: formatClientPersonDisplayName(
+          this.selectedClient?.partnerDetail,
+        ),
       },
     });
 
@@ -514,6 +522,12 @@ export class SavingPotsComponent implements OnInit {
         hasPartner: !!this.selectedClient?.partnerDetail,
         clientFirstName: this.selectedClient?.clientDetails?.firstName ?? '',
         partnerFirstName: this.selectedClient?.partnerDetail?.firstName ?? '',
+        clientDisplayName: formatClientPersonDisplayName(
+          this.selectedClient?.clientDetails,
+        ),
+        partnerDisplayName: formatClientPersonDisplayName(
+          this.selectedClient?.partnerDetail,
+        ),
       },
     });
 
@@ -603,29 +617,22 @@ export class SavingPotsComponent implements OnInit {
     return rounded % 1 === 0 ? rounded.toFixed(0) : rounded.toString();
   }
 
-  getOwnershipLabel(saving: ClientSaving): string {
-    const ownership = saving.ownership ?? SavingPotOwnership.Joint;
-    switch (ownership) {
-      case SavingPotOwnership.Person1:
-        return this.selectedClient?.clientDetails?.firstName ?? 'Person 1';
-      case SavingPotOwnership.Person2:
-        return this.selectedClient?.partnerDetail?.firstName ?? 'Person 2';
-      default:
-        return 'Joint';
+  /** Ownership line under chart: Joint (translated) or client/partner display names. */
+  getOwnershipBadgeCaption(saving: ClientSaving): string {
+    const o = saving.ownership ?? SavingPotOwnership.Joint;
+    if (o === SavingPotOwnership.Joint) {
+      return this.translate.instant('Joint');
     }
+    if (o === SavingPotOwnership.Person1) {
+      const n = formatClientPersonDisplayName(this.selectedClient?.clientDetails);
+      return n || this.translate.instant('Client');
+    }
+    const n = formatClientPersonDisplayName(this.selectedClient?.partnerDetail);
+    return n || this.translate.instant('Partner');
   }
 
-  /** Label key for translate: Joint | Client | Partner (joint-account saving pots). */
-  getOwnershipKindLabelKey(saving: ClientSaving): string {
-    const ownership = saving.ownership ?? SavingPotOwnership.Joint;
-    switch (ownership) {
-      case SavingPotOwnership.Person1:
-        return 'Client';
-      case SavingPotOwnership.Person2:
-        return 'Partner';
-      default:
-        return 'Joint';
-    }
+  getOwnershipLabel(saving: ClientSaving): string {
+    return this.getOwnershipBadgeCaption(saving);
   }
 
   /** CSS modifier for `.ibr-chart-tag` background and text colour. */

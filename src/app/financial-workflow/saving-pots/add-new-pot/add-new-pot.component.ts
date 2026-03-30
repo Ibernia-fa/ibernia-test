@@ -101,6 +101,9 @@ export class AddNewPotComponent {
   fromNetWorth: boolean = false;
   clientFirstName: string = '';
   partnerFirstName: string = '';
+  /** Full display label for ownership radio (first + last); falls back to firstName. */
+  clientDisplayName: string = '';
+  partnerDisplayName: string = '';
   SavingPotOwnership = SavingPotOwnership;
   savingPotValues = [
     {
@@ -159,6 +162,16 @@ export class AddNewPotComponent {
     this.scenarioMode = data.scenarioMode ?? false;
     this.clientFirstName = data.clientFirstName ?? '';
     this.partnerFirstName = data.partnerFirstName ?? '';
+    this.clientDisplayName = (
+      data.clientDisplayName ??
+      data.clientFirstName ??
+      ''
+    ).trim();
+    this.partnerDisplayName = (
+      data.partnerDisplayName ??
+      data.partnerFirstName ??
+      ''
+    ).trim();
     this.clientBirthYear = moment(data.clientBirthDate).year();
     this.userReturnRate = data.returnRate;
     const birthDate = new Date(data.clientBirthDate);

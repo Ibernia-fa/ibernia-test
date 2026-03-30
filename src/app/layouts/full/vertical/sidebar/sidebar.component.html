@@ -1,35 +1,48 @@
 <!-- Sidebar header: logo + toggle (toggle only when expanded; when collapsed, toggle is in header) -->
 <div class="sidebar-header">
   <div class="sidebar-logo-link">
-    <!-- COLLAPSED: show mini icon -->
+    <!-- COLLAPSED: org logo if uploaded, else mini fallback SVG -->
     <ng-container *ngIf="sidenavCollapsed; else expandedLogo">
-      <a
-        href="/"
-        style="
-          max-width: 48px !important;
-          width: 48px !important;
-          height: 48px !important;
-        "
-      >
-        <img
-          src="./assets/images/logos/sidebar-mini-fallback-icon.svg"
-          alt="mini logo"
-          class="sidebar-mini-logo"
-        />
-      </a>
+      <ng-container *ngIf="brandingLogo; else collapsedFallback">
+        <a
+          href="/"
+          style="
+            max-width: 48px !important;
+            width: 48px !important;
+            height: 48px !important;
+          "
+        >
+          <app-branding [profileImage]="brandingLogo"></app-branding>
+        </a>
+      </ng-container>
+      <ng-template #collapsedFallback>
+        <a
+          href="/"
+          style="
+            max-width: 48px !important;
+            width: 48px !important;
+            height: 48px !important;
+          "
+        >
+          <img
+            src="./assets/images/logos/sidebar-mini-fallback-icon.svg"
+            alt="mini logo"
+            class="sidebar-mini-logo"
+          />
+        </a>
+      </ng-template>
     </ng-container>
 
-    <!-- EXPANDED: show brand logo -->
+    <!-- EXPANDED: org logo if uploaded, else full fallback SVG -->
     <ng-template #expandedLogo>
-      <ng-container *ngIf="isBrandLogoLoaded; else fallbackLogo">
+      <ng-container *ngIf="brandingLogo; else expandedFallback">
         <app-branding [profileImage]="brandingLogo"></app-branding>
       </ng-container>
-
-      <ng-template #fallbackLogo>
+      <ng-template #expandedFallback>
         <a href="/">
           <img
             src="./assets/images/logos/sidebar-fallback-logo.svg"
-            alt="logo"
+            alt="Ibernia"
             class="sidebar-default-logo"
           />
         </a>
