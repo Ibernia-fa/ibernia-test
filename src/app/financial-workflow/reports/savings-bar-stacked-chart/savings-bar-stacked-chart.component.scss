@@ -44,42 +44,26 @@
   overflow: visible !important;
 }
 
-/* Event tooltip styling - ensure minimum width for full text display */
-.custom-html-tooltip {
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  padding: 8px 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  min-width: 140px;
-  text-align: center;
-  font-size: 12px;
+/* Inner .event-tooltip (global styles.scss) supplies pill chrome; wrapper stays transparent */
+:host ::ng-deep .custom-html-tooltip {
+  background: transparent;
+  border: none;
+  padding: 0;
+  box-shadow: none;
+  min-width: 0;
   white-space: nowrap;
-  z-index: 9999;
 
-  &.birth-icon,
-  &.retirement-age-icon,
-  &.inheritance-icon,
-  &.wedding-icon,
-  &.state-pension-icon,
-  &.home-icon,
-  &.travel-icon,
-  &.car-icon,
-  &.education-icon,
-  &.new-business-icon,
-  &.boat-icon {
-    img {
-      display: inline-block;
-      width: 18px;
-      height: 18px;
-      margin-right: 6px;
-      vertical-align: middle;
-    }
+  .event-tooltip img {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    margin-right: 0;
+    vertical-align: middle;
+  }
 
-    span {
-      display: inline-block;
-      vertical-align: middle;
-    }
+  .event-tooltip span {
+    display: inline-block;
+    vertical-align: middle;
   }
 }
 

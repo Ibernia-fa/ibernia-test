@@ -804,6 +804,17 @@ body:has(.global-fullscreen-overlay) {
     transform 180ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Tooltips are portaled to body / fullscreen overlay — wrapper must not paint over .event-tooltip */
+body .custom-html-tooltip,
+.global-fullscreen-overlay .custom-html-tooltip {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  min-width: 0;
+  text-align: left;
+}
+
 .event-tooltip {
   display: flex;
   align-items: center;
@@ -819,83 +830,94 @@ body:has(.global-fullscreen-overlay) {
   height: 20px;
 }
 
-/* icon-based coloring */
+/* Lifetime plan hover tooltips — match timeline chart .vis-item chip colors (_customizer.scss) */
+.event-tooltip span {
+  color: inherit;
+  font-weight: 500;
+}
+
 .event-tooltip.birth-icon {
-  background-color: #fffbf5 !important;
-  border: 1px solid #fff3e0;
-  color: #1c1c1c;
+  background-color: #ffedd7 !important;
+  border: none;
+  color: #fe9614;
 }
 
 .event-tooltip.retirement-age-icon {
-  background-color: #fff9f7 !important;
-  border: 1px solid #ffede7;
-  color: #1c1c1c;
+  background-color: #c6e1ff !important;
+  border: none;
+  color: #3088ed;
 }
 
 .event-tooltip.partner-retirement-age-icon {
   background-color: #ffebcb !important;
-  border: 1px solid #fe9614;
+  border: none;
+  color: #fe9614;
+}
+
+.event-tooltip.mortality-icon {
+  background-color: #f7f7f7 !important;
+  border: 1px solid #e7e7eb !important;
   color: #1c1c1c;
 }
 
 .event-tooltip.inheritance-icon {
   background-color: #f8fff2 !important;
-  border: 1px solid #e8f4e1;
+  border: 1px solid #e8f4e1 !important;
   color: #1c1c1c;
 }
 
 .event-tooltip.wedding-icon {
-  background-color: #f8f5ff !important;
-  border: 1px solid #eae0ff;
-  color: #1c1c1c;
+  background-color: #e2e0fc !important;
+  border: none;
+  color: #6155f5;
 }
 
 .event-tooltip.state-pension-icon {
   background-color: #f9f9ff !important;
-  border: 1px solid #ebecff;
+  border: none;
   color: #1c1c1c;
 }
 
 .event-tooltip.home-icon {
-  background-color: #f0f9ff;
-  border: 1px solid #e0ecf4 !important;
-  color: #1c1c1c;
+  background-color: #fddce2 !important;
+  border: none;
+  color: #ff2d55;
 }
 
 .event-tooltip.travel-icon {
-  background-color: #f8f9fc;
-  border: 1px solid #dfe3ef !important;
-  color: #1c1c1c;
+  background-color: #cee9ff !important;
+  border: none;
+  color: #0088ff;
 }
 
 .event-tooltip.car-icon {
-  background-color: #fff4ed;
-  border: 1px solid #eddace !important;
-  color: #1c1c1c;
+  background-color: #fff4eb !important;
+  border: none;
+  color: #ac7f5e;
 }
 
 .event-tooltip.education-icon {
-  background-color: #eef4ff;
-  border: 1px solid #dee7f6 !important;
-  color: #1c1c1c;
+  background-color: #d2fffb !important;
+  border: none;
+  color: #00c8b3;
 }
 
 .event-tooltip.new-business-icon {
-  background-color: #fef3f2;
-  border: 1px solid #ffe8e5 !important;
-  color: #1c1c1c;
+  background-color: #ddffe5 !important;
+  border: none;
+  color: #34c759;
 }
 
 .event-tooltip.boat-icon {
-  background-color: #ecfdf3;
-  border: 1px solid #cbf1db !important;
-  color: #1c1c1c;
+  background-color: #ffe2d5 !important;
+  border: none;
+  color: #ff7504;
 }
 
 .event-tooltip.custom-icon {
-  background-color: #f9f9ff;
-  border: 1px solid #ebecff !important;
-  color: #1c1c1c;
+  background-color: #cee9ff !important;
+  border: none;
+  color: #0088ff;
 }
 // event styes for lifetime model - end
 
