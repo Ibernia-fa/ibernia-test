@@ -473,6 +473,17 @@
   }
   // }
 }
+
+.settings-sidebar {
+  .sidebar-list.preimum-nav .mat-mdc-list-item span {
+    font-size: 14px;
+  }
+
+  .cashflow-modal span {
+    font-size: 14px;
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Make "premium" (lower) sidebar items match `cashflow-modal.activeMenu`
 // so all nav items look consistent when active.
