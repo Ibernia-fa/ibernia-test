@@ -582,7 +582,7 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
         (label as HTMLElement).style.backgroundColor = '#ffffffff';
         (label as HTMLElement).style.opacity = '1';
         (label as HTMLElement).style.zIndex = '9999';
-        (label as HTMLElement).style.padding = '2px 6px';
+        (label as HTMLElement).style.padding = '3px';
         (label as HTMLElement).classList.add('highlighted');
 
         if (spanTag) {
@@ -590,7 +590,7 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
           spanTag.textContent = snappedYear.toString();
           spanTag.style.fontSize = '16px';
           spanTag.style.fontWeight = 'bold';
-          spanTag.style.color = '#000000';
+          spanTag.style.color = '#1c1c1c';
         }
 
         if (pTag) {
@@ -716,6 +716,7 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
 
     this.timeline.on('changed', () => {
       this.adjustItemZIndex();
+      this.renderConnectorLines();
     });
 
     this.timeline.on('doubleClick', (event) => {
@@ -744,6 +745,70 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
       const top = parseFloat(item.style.top) || 0;
       item.style.zIndex = String(Math.max(1, Math.round(top) + 1));
     });
+  }
+
+  private readonly CONNECTOR_LINE_COLORS: Record<string, string> = {
+    'birth-icon': '#fe9614',
+    'wedding-icon': '#6155f5',
+    'home-icon': '#ff2d55',
+    'travel-icon': '#0088ff',
+    'car-icon': '#ac7f5e',
+    'education-icon': '#00c8b3',
+    'new-business-icon': '#34c759',
+    'boat-icon': '#ff7504',
+    'retirement-age-icon': '#0088ff',
+    'partner-retirement-age-icon': '#fe9614',
+    'custom-icon': '#8388ff',
+  };
+
+  private renderConnectorLines(): void {
+    const container = this.timelineContainer?.nativeElement;
+    if (!container) return;
+
+    const centerPanel = container.querySelector(
+      '.vis-panel.vis-center',
+    ) as HTMLElement;
+    if (!centerPanel) return;
+
+    let linesLayer = centerPanel.querySelector(
+      '.connector-lines-layer',
+    ) as HTMLElement;
+    if (!linesLayer) {
+      linesLayer = document.createElement('div');
+      linesLayer.className = 'connector-lines-layer';
+      centerPanel.insertBefore(linesLayer, centerPanel.firstChild);
+    }
+    linesLayer.innerHTML = '';
+
+    const centerRect = centerPanel.getBoundingClientRect();
+    const items = Array.from(
+      container.querySelectorAll('.vis-item'),
+    ) as HTMLElement[];
+
+    items.forEach((item) => {
+      const itemRect = item.getBoundingClientRect();
+      const lineLeft = itemRect.left - centerRect.left + 1;
+      const lineTop = itemRect.bottom - centerRect.top - 12;
+      const lineHeight = centerRect.height - lineTop - 4;
+      if (lineHeight <= 0) return;
+
+      const line = document.createElement('div');
+      line.className = 'connector-line';
+      line.style.position = 'absolute';
+      line.style.left = `${lineLeft}px`;
+      line.style.top = `${lineTop}px`;
+      line.style.width = '1.5px';
+      line.style.height = `${lineHeight}px`;
+      line.style.backgroundColor = this.getConnectorLineColor(item);
+      linesLayer.appendChild(line);
+    });
+  }
+
+  private getConnectorLineColor(item: HTMLElement): string {
+    for (const [cls, color] of Object.entries(this.CONNECTOR_LINE_COLORS)) {
+      if (item.classList.contains(cls)) return color;
+    }
+    return '#ccc';
   }
 
   get timelineData(): DataSet<

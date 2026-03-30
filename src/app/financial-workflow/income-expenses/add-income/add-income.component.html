@@ -29,7 +29,7 @@
       <div [formGroup]="incomeForm" class="d-flex flex-column gap-16">
         @if (!isEditWorkflow) {
           <div class="d-flex flex-column gap-8">
-            <div class="d-flex gap-8 align-items-center">
+            <div class="d-flex gap-4 align-items-center">
               <mat-label
                 class="f-s-16 f-w-500 d-block ibr-black"
                 style="line-height: 16px"
@@ -96,7 +96,7 @@
             <input
               matInput
               formControlName="description"
-              placeholder="e.g. Salary"
+              placeholder="e.g. Dividend income"
             />
 
             @if (
@@ -392,8 +392,11 @@
 
         <div class="start-end">
           <div class="d-flex flex-column gap-8">
-            <div class="d-flex gap-8 align-items-center">
-              <mat-label class="f-s-16 f-w-500 ibr-black d-block">
+            <div class="d-flex gap-4 align-items-center">
+              <mat-label
+                class="f-s-16 f-w-500 ibr-black d-block"
+                style="line-height: 16px !important"
+              >
                 @if (showStartEnd) {
                   Start & end
                 } @else {
@@ -704,7 +707,7 @@
                 "
               >
                 <mat-label
-                  class="f-s-16 f-w-500 ibr-black d-flex gap-8 align-items-center"
+                  class="f-s-16 f-w-500 ibr-black d-flex gap-4 align-items-center"
                   >Escalation rate
                   <img
                     width="18"

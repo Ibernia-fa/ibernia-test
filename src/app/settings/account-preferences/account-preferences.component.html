@@ -1,120 +1,206 @@
-<div class="language-loader" *ngIf="isUploadingProfile">
-  <div class="spinner"></div>
-  <h2>{{ 'Loading...' | translate }}</h2>
-</div>
+<div class="m-l-16 m-t-16">
+  <div class="language-loader" *ngIf="isUploadingProfile">
+    <div class="spinner"></div>
+    <h2>{{ "Loading..." | translate }}</h2>
+  </div>
 
-<mat-card class="mat-mdc-card mdc-card cardWithShadow mb-20">
-  <mat-card-content class="mat-mdc-card-content">
-    <div class="d-flex align-items-center main-header-content">
-      <div class="header-icon">
-        <img width="56" src="../../../assets/images/shapes/small-icon-1.svg" alt="">
+  <!-- <mat-card class="mat-mdc-card mdc-card cardWithShadow mb-16">
+    <mat-card-content class="mat-mdc-card-content">
+      <div class="d-flex align-items-center main-header-content">
+        <div class="header-icon">
+          <img
+            width="56"
+            src="../../../assets/images/shapes/small-icon-1.svg"
+            alt=""
+          />
+        </div>
+        <div class="d-flex flex-column justify-content-between gap-4">
+          <h4 class="page-title f-w-500">
+            {{ "Account Preferences" | translate }}
+          </h4>
+          <span class="sub-title">{{ "Update your profile" | translate }}</span>
+        </div>
       </div>
-      <div class="d-flex flex-column justify-content-between gap-4">
-        <h4 class="page-title f-w-500">{{'Account Preferences' | translate}}</h4>
-        <span class="sub-title">{{ 'Update your profile' | translate}}</span>
-      </div>
-    </div>
-  </mat-card-content>
-</mat-card>
+    </mat-card-content>
+  </mat-card> -->
 
-<form [formGroup]="form">
-  <mat-card class="cardWithShadow mb-20">
-    <mat-card-content>
-      <h3 class="f-s-20 f-w-400 m-b-20">{{ 'Profile' | translate}}</h3>
+  <form [formGroup]="form">
+    <mat-card class="ibr-new-dashboad-card">
+      <mat-card-content>
+        <div class="d-flex flex-column gap-10 m-b-16">
+          <h3 class="ibr-new-heading">{{ "Profile" | translate }}</h3>
+          <p class="ibr-new-subheading">Update your profile</p>
+        </div>
 
-      <div class="d-flex align-items-start gap-24">
-        <!-- Upload Avatar -->
-        <div class="upload-avatar-wrapper">
-
-          <label for="upload-avatar" class="cursor-pointer">
-            <div class="text-center">
-              <!-- <img *ngIf="profileImagePreview; else placeholder"
+        <div class="d-flex align-items-start gap-24">
+          <!-- Upload Avatar -->
+          <div class="upload-avatar-wrapper">
+            <label for="upload-avatar" class="cursor-pointer">
+              <div class="text-center">
+                <!-- <img *ngIf="profileImagePreview; else placeholder"
      [src]="profileImagePreview"
      alt="avatar"
      class="rounded"
      style="width:120px;height:120px;object-fit:cover;"> -->
-              <div *ngIf="profileImagePreview; else placeholder" class="image-preview-wrapper position-relative">
-  <img
-    [src]="profileImagePreview"
-    alt="avatar"
-    class="profile-avatar-circle"
-    style="width:120px;height:120px;object-fit:cover;"
-  />
+                <div
+                  *ngIf="profileImagePreview; else placeholder"
+                  class="image-preview-wrapper position-relative"
+                >
+                  <img
+                    [src]="profileImagePreview"
+                    alt="avatar"
+                    class="profile-avatar-circle"
+                    style="width: 120px; height: 120px; object-fit: cover"
+                  />
 
-    <span class="crop-pic" (click)="cropImage($event)" matTooltip="{{ 'Crop' | translate }}">
-      <mat-icon>crop</mat-icon>
-    </span>
-    <span class="remove-pic" (click)="clearImage($event)"><img  src="../../../assets/images/shapes/delete.svg" alt=""></span>
+                  <span
+                    class="crop-pic"
+                    (click)="cropImage($event)"
+                    matTooltip="{{ 'Crop' | translate }}"
+                  >
+                    <mat-icon>crop</mat-icon>
+                  </span>
+                  <span class="remove-pic" (click)="clearImage($event)"
+                    ><img src="../../../assets/images/shapes/delete.svg" alt=""
+                  /></span>
+                </div>
 
+                <ng-template #placeholder>
+                  <div class="d-flex flex-column gap-14">
+                    <div
+                      class="d-flex justify-content-center align-items-center"
+                    >
+                      <img
+                        src="../../../assets/images/shapes/new-upload-icon.svg"
+                        alt="new-upload-icon"
+                      />
+                    </div>
+                    <p class="uploader-text">
+                      {{ "Click to upload picture" | translate }}
+                    </p>
+                    <small class="uploader-files">
+                      {{ "PNG, JPG or JPEG (max. 5MB)" | translate }}
+                    </small>
+                  </div>
+                </ng-template>
               </div>
+            </label>
+            <!-- <input id="upload-avatar" type="file" accept="image/*" hidden (change)="onFileSelected($event)"> -->
+            <input
+              id="upload-avatar"
+              #fileInput
+              type="file"
+              accept=".png,.jpg,.jpeg,image/png,image/jpeg,image/jpg"
+              hidden
+              (change)="onFileSelected($event)"
+            />
+          </div>
 
-              <ng-template #placeholder>
-                <img class="m-b-10" src="../../../assets/images/shapes/small-icon.svg" alt="">
-                <p class="text-sm text-gray-500 f-s-14 m-b-10 m-0">
-                  {{ 'Click to upload picture' | translate}}
-                </p>
-                <small class="text-xs text-gray-400 f-s-12 m-0">
-                  {{ 'PNG, JPG or JPEG (max. 5MB)' | translate }}
-                </small>
-              </ng-template>
+          <!-- Name / Email -->
+          <div class="settings-details">
+            <div class="settings-form-field">
+              <mat-label
+                class="f-s-16 f-w-500 ibr-black d-block"
+                style="line-height: 100%"
+                >{{ "First name" | translate }}</mat-label
+              >
+              <mat-form-field
+                appearance="outline"
+                subscriptSizing="dynamic"
+                class="w-100 settings-custom-input"
+              >
+                <input
+                  matInput
+                  formControlName="firstName"
+                  placeholder="{{ 'First name' | translate }}"
+                />
+              </mat-form-field>
             </div>
-          </label>
-          <!-- <input id="upload-avatar" type="file" accept="image/*" hidden (change)="onFileSelected($event)"> -->
-        <input
-  id="upload-avatar"
-  #fileInput
-  type="file"
-  accept=".png,.jpg,.jpeg,image/png,image/jpeg,image/jpg"
-  hidden
-  (change)="onFileSelected($event)"
-/>
+            <div class="settings-form-field">
+              <mat-label
+                class="f-s-16 f-w-500 ibr-black d-block"
+                style="line-height: 100%"
+                >{{ "Last name" | translate }}</mat-label
+              >
+              <mat-form-field
+                appearance="outline"
+                subscriptSizing="dynamic"
+                class="w-100 settings-custom-input"
+              >
+                <input
+                  matInput
+                  formControlName="lastName"
+                  placeholder="{{ 'Last name' | translate }}"
+                />
+              </mat-form-field>
+            </div>
+            <div class="settings-form-field">
+              <mat-label
+                class="f-s-16 f-w-500 ibr-black d-block"
+                style="line-height: 100%"
+                >{{ "Email address" | translate }}</mat-label
+              >
+              <mat-form-field
+                appearance="outline"
+                subscriptSizing="dynamic"
+                class="w-100 settings-custom-input disabled-field"
+              >
+                <input
+                  matInput
+                  formControlName="email"
+                  type="email"
+                  placeholder="{{ 'Email address' | translate }}"
+                  readonly
+                />
+              </mat-form-field>
 
-
+              <!-- Hidden field holds uploaded URL -->
+              <input type="hidden" formControlName="profilePhotoUrl" />
+            </div>
+          </div>
         </div>
 
-        <!-- Name / Email -->
-        <div class="row">
-          <div class="col-6">
-            <mat-label class="f-s-16 f-w-400 m-b-8 d-block">{{ 'First name' | translate }}</mat-label>
+        <div class="bio-field-wrapper">
+          <div class="d-flex flex-column gap-10">
+            <mat-label
+              class="f-s-16 f-w-500 ibr-black d-flex align-items-center"
+            >
+              {{ "Bio" | translate }}
+              <img
+                src="assets/images/svgs/help-circle-icon.svg"
+                alt="help"
+                width="18"
+                class="m-l-4"
+                matTooltip="{{ 'Bio tooltip' | translate }}"
+              />
+            </mat-label>
             <mat-form-field appearance="outline" class="w-100">
-              <input matInput formControlName="firstName" placeholder="{{ 'First name' | translate }}">
+              <textarea
+                matInput
+                formControlName="bio"
+                placeholder="{{
+                  'This bio is included in your client questionnaire to give clients a more personal introduction to who you are. Use it to share your professional background, your advisory style, and a few personal details that help build confidence and rapport.'
+                    | translate
+                }}"
+                maxlength="250"
+              ></textarea>
+              <mat-hint align="end"
+                >{{ form.get("bio")?.value?.length || 0 }} / 250</mat-hint
+              >
             </mat-form-field>
           </div>
-          <div class="col-6">
-            <mat-label class="f-s-16 f-w-400 m-b-8 d-block">{{ 'Last name' | translate }}</mat-label>
-            <mat-form-field appearance="outline" class="w-100">
-              <input matInput formControlName="lastName" placeholder="{{ 'Last name' | translate }}">
-            </mat-form-field>
+          <div class="d-flex justify-content-end m-t-16">
+            <button
+              type="button"
+              class="button-icon"
+              [disabled]="!hasProfileChanges || isSavingProfile"
+              (click)="submitProfile()"
+            >
+              <span class="f-s-16">{{ "Save" | translate }}</span>
+            </button>
           </div>
-
-          <div class="col-12">
-            <mat-label class="f-s-16 f-w-400 m-b-8 d-block">{{ 'Email address' | translate }}</mat-label>
-            <mat-form-field appearance="outline" class="w-100 disabled-field">
-            <input matInput formControlName="email" type="email" placeholder="{{ 'Email address' | translate }}" readonly>
-            </mat-form-field>
-
-            <!-- Hidden field holds uploaded URL -->
-            <input type="hidden" formControlName="profilePhotoUrl">
-          </div>
-
         </div>
-      </div>
-
-      <div class="bio-field-wrapper m-t-16">
-        <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">
-          {{ 'Bio' | translate }}
-          <img src="assets/images/svgs/help-circle-icon.svg" alt="help" width="18" class="m-l-4" matTooltip="{{ 'Bio tooltip' | translate }}">
-        </mat-label>
-        <mat-form-field appearance="outline" class="w-100">
-          <textarea matInput formControlName="bio" placeholder="{{ 'This bio is included in your client questionnaire to give clients a more personal introduction to who you are. Use it to share your professional background, your advisory style, and a few personal details that help build confidence and rapport.' | translate }}" maxlength="250"></textarea>
-          <mat-hint align="end">{{ (form.get('bio')?.value?.length || 0) }} / 250</mat-hint>
-        </mat-form-field>
-        <div class="m-t-8 d-flex justify-content-end">
-          <button type="button" class="button-icon" [disabled]="!hasProfileChanges || isSavingProfile" (click)="submitProfile()">
-            <span>{{ 'Save' | translate }}</span>
-          </button>
-        </div>
-      </div>
-    </mat-card-content>
-  </mat-card>
-</form>
+      </mat-card-content>
+    </mat-card>
+  </form>
+</div>

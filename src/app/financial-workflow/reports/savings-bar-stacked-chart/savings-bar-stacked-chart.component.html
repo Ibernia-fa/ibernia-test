@@ -2,10 +2,21 @@
     <!-- @if(cashFlowName) { <div class="text-right f-w-500"> {{cashFlowName}}</div> } -->
 
     @if(report?.series) {
-    <apx-chart [series]="chartOptions.series" [chart]="chartOptions.chart" [xaxis]="chartOptions.xaxis"
-        [yaxis]="chartOptions.yaxis" [dataLabels]="chartOptions.dataLabels" [annotations]="chartOptions.annotations"
-        [tooltip]="chartOptions.tooltip" [fill]="chartOptions.fill" [legend]="chartOptions.legend"
-        [grid]="chartOptions.grid" [states]="chartOptions.states" [plotOptions]="chartOptions.plotOptions">
+    <apx-chart
+        [series]="chartOptions.series"
+        [chart]="chartOptions.chart"
+        [xaxis]="chartOptions.xaxis"
+        [yaxis]="chartOptions.yaxis"
+        [dataLabels]="chartOptions.dataLabels"
+        [annotations]="chartOptions.annotations"
+        [tooltip]="chartOptions.tooltip"
+        [fill]="chartOptions.fill"
+        [legend]="chartOptions.legend"
+        [grid]="chartOptions.grid"
+        [states]="chartOptions.states"
+        [plotOptions]="chartOptions.plotOptions"
+        (chartReady)="onApexChartReady()"
+    >
     </apx-chart>
     }
 </div>

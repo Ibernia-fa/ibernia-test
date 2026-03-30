@@ -28,7 +28,7 @@
       <div [formGroup]="expenseForm" class="d-flex flex-column gap-16">
         @if (!isEditWorkflow) {
           <div class="d-flex flex-column gap-8">
-            <div class="d-flex gap-8 align-items-center">
+            <div class="d-flex gap-4 align-items-center">
               <mat-label
                 class="f-s-16 f-w-500 d-block ibr-black"
                 style="line-height: 16px"
@@ -95,7 +95,7 @@
             <input
               matInput
               formControlName="description"
-              placeholder="e.g. Bills"
+              placeholder="e.g. Elderly parent support"
             />
 
             @if (
@@ -191,7 +191,7 @@
 
         <div class="start-end">
           <div class="d-flex flex-column gap-8">
-            <div class="d-flex gap-8 align-items-center">
+            <div class="d-flex gap-4 align-items-center">
               <mat-label
                 class="f-s-16 f-w-500 ibr-black d-block"
                 style="line-height: 16px"
@@ -348,7 +348,8 @@
                 "
               >
                 <mat-label
-                  class="f-s-16 f-w-500 ibr-black d-flex gap-8 align-items-center"
+                  class="f-s-16 f-w-500 ibr-black d-flex gap-4 align-items-center"
+                  style="line-height: 16px"
                   >Escalation rate
                   <img
                     width="18"

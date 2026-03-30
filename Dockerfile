@@ -38,7 +38,19 @@ FROM nginx:alpine AS production-stage
 # Copy the built app to Nginx's HTML directory
 COPY --from=build-stage /app/dist/ibernia-app/browser /usr/share/nginx/html
 
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Select freshness-first (development) vs performance/versioning-first (production) site config
+COPY nginx.dev.conf nginx.prod.conf /tmp/nginx-configs/
+ARG NG_BUILD_CONFIGURATION
+RUN set -eux; \
+    if [ "$NG_BUILD_CONFIGURATION" = "development" ]; then \
+      cp /tmp/nginx-configs/nginx.dev.conf /etc/nginx/conf.d/default.conf; \
+    elif [ "$NG_BUILD_CONFIGURATION" = "production" ]; then \
+      cp /tmp/nginx-configs/nginx.prod.conf /etc/nginx/conf.d/default.conf; \
+    else \
+      echo "ERROR: NG_BUILD_CONFIGURATION must be development or production (got: ${NG_BUILD_CONFIGURATION:-empty})" >&2; \
+      exit 1; \
+    fi; \
+    rm -rf /tmp/nginx-configs
 # Expose port 80
 EXPOSE 80
 
