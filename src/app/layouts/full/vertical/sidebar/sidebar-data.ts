@@ -23,7 +23,7 @@ export const navItemslower: NavItem[] = [
     displayName: 'School',
     iconName: '/assets/images/svgs/book-solid.svg',
     iconOutline: '/assets/images/svgs/book-solid.svg',
-    // route: '/cashflows/{cashflowId}/emergencies',
+    route: '/cashflows/{cashflowId}/school',
   },
   {
     displayName: 'AI Chat',
