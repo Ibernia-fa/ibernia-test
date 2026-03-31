@@ -8,6 +8,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { ToastrService } from 'ngx-toastr';
 import { LegacyHttpService } from '../services/legacy-http.service';
 import { TaxSettingsModel } from '../models/legacy.model';
+import { SettingsService, UserProfileDto } from 'src/app/default-preferance/services/default-preferance.http.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-tax-settings',
@@ -28,16 +30,22 @@ export class TaxSettingsComponent {
     private legacyHttp: LegacyHttpService,
     private toastr: ToastrService,
     private dialogRef: MatDialogRef<TaxSettingsComponent>,
+    private settingsService: SettingsService,
     @Inject(MAT_DIALOG_DATA) public data: {
       cashflowId: string;
       taxSettings: TaxSettingsModel;
     }
   ) {
     const ts = data.taxSettings;
+    const userPrefs = (this.settingsService.currentUserData as UserProfileDto | null)?.preferences;
+    const defaultPartner = userPrefs?.partnerInheritanceTaxRate ?? 4;
+    const defaultChild = userPrefs?.childInheritanceTaxRate ?? 4;
+    const defaultSibling = userPrefs?.siblingInheritanceTaxRate ?? 6;
+
     this.form = this.fb.group({
-      partnerTaxRate: [ts?.partnerTaxRate ?? 0, [Validators.required, Validators.min(0), Validators.max(100)]],
-      childTaxRate: [ts?.childTaxRate ?? 7, [Validators.required, Validators.min(0), Validators.max(100)]],
-      siblingTaxRate: [ts?.siblingTaxRate ?? 15, [Validators.required, Validators.min(0), Validators.max(100)]]
+      partnerTaxRate: [ts?.partnerTaxRate ?? defaultPartner, [Validators.required, Validators.min(0), Validators.max(100)]],
+      childTaxRate: [ts?.childTaxRate ?? defaultChild, [Validators.required, Validators.min(0), Validators.max(100)]],
+      siblingTaxRate: [ts?.siblingTaxRate ?? defaultSibling, [Validators.required, Validators.min(0), Validators.max(100)]]
     });
   }
 
