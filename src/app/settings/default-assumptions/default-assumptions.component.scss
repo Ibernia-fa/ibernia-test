@@ -32,17 +32,17 @@
 }
 
 .assumptions-section-title {
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 20px;
+  font-weight: 500;
   color: #1c1c1c;
-  margin: 0 0 16px;
-  padding-top: 20px;
-  border-top: 1px solid #e8e8e8;
+  // margin: 0 0 16px;
+  // padding-top: 20px;
+  // border-top: 1px solid #e8e8e8;
 
-  &:first-of-type {
-    border-top: none;
-    padding-top: 0;
-  }
+  // &:first-of-type {
+  //   border-top: none;
+  //   padding-top: 0;
+  // }
 }
 
 .assumption-container {
@@ -50,7 +50,9 @@
   grid-template-columns: repeat(2, 1fr);
   gap: 16px;
 }
-
+.assumption-container > :last-child:nth-child(odd) {
+  grid-column: 1 / -1; /* span full width only if odd */
+}
 .m-t-20.d-flex.justify-content-end {
   .button-icon {
     min-width: 135px;

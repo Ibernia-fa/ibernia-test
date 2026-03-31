@@ -45,7 +45,7 @@
       </div>
     }
   </div>
-  @if (showToggle) {
+  @if (showToggle && !isSettings) {
     <button
       mat-icon-button
       (click)="toggleMobileNav.emit()"
@@ -54,7 +54,7 @@
     >
       <i-tabler name="x" class="icon-20 d-flex"></i-tabler>
     </button>
-  } @else if (!sidenavCollapsed) {
+  } @else if (!sidenavCollapsed && !isSettings) {
     <button
       (click)="toggleCollapsed.emit()"
       class="sidebar-toggle-btn"

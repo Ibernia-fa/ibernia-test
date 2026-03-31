@@ -49,6 +49,7 @@ import {
   userNeedsMfaReminder,
 } from 'src/app/core/mfa-reminder-notification';
 import { environment } from 'src/environments/environment';
+import { NotificationRelativeTimePipe } from 'src/app/pipe/notification-relative-time.pipe';
 
 interface notifications {
   id: number;
@@ -96,7 +97,8 @@ type LanguageCode = 'en' | 'it';
         MatMenuModule,
         MatBadgeModule,
         MatDividerModule,
-        TranslateModule
+        TranslateModule,
+        NotificationRelativeTimePipe,
     ],
     templateUrl: './header.component.html',
     encapsulation: ViewEncapsulation.None

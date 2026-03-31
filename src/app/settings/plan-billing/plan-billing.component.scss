@@ -2,7 +2,16 @@
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
+  margin: 16px 0 0 16px;
+}
+
+.ibr-payment-details {
+  background-color: #ffffffb2;
+  border: 1px solid #0000001a;
+  // backdrop-filter: blur(50px);
+  border-radius: 12px;
+  padding: 20px;
 }
 
 .plans {
@@ -11,8 +20,6 @@
   gap: 16px;
 }
 
-
-
 .plan-header {
   display: flex;
   align-items: center;
@@ -20,25 +27,27 @@
   font-size: 20px;
 }
 
-
 .plan-price {
-  font-size: 20px;
-  strong{
+  font-size: 16px;
+  margin: 8px 0 0 0;
+
+  color: #5a596e;
+  strong {
     font-weight: 700;
+    color: #1c1c1c;
   }
 }
 
 .features-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px 16px;
-  margin-top: 12px;
-  font-size: 14px;
-  >div{
+  gap: 16px;
+  margin-top: 20px;
+  font-size: 16px;
+  line-height: 100%;
+  color: #1c1c1c;
+  > div {
     display: flex;
-  gap: 8px ;
+    gap: 8px;
   }
 }
-
-
-

@@ -797,7 +797,7 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
       line.style.position = 'absolute';
       line.style.left = `${lineLeft}px`;
       line.style.top = `${lineTop}px`;
-      line.style.width = '1.5px';
+      line.style.width = '1px';
       line.style.height = `${lineHeight}px`;
       line.style.backgroundColor = this.getConnectorLineColor(item);
       linesLayer.appendChild(line);
