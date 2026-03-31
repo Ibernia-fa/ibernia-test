@@ -26,661 +26,505 @@
           </p>
         </div>
 
-        <div formGroupName="preferences" class="assumption-container">
+        <div formGroupName="preferences" class="d-flex flex-column gap-20">
           <!-- Section 1: Plan setup -->
-          <!-- <h5 class="assumptions-section-title">
-            {{ "Plan setup" | translate }}
-          </h5> -->
-          <!-- <div class=""> -->
-          <div class="settings-form-field">
-            <mat-label
-              class="f-s-16 f-w-500 ibr-black d-flex align-items-center"
-              >{{ "Country" | translate }}
-              <img
-                src="assets/images/svgs/ibr-new-info.svg"
-                alt="help"
-                width="18"
-                class="m-l-4"
-                matTooltip="Sets the main currency for all new client plans. All figures will be shown in this currency by default, but you can change it for individual clients later."
-              />
-            </mat-label>
-            <mat-form-field
-              appearance="outline"
-              class="w-100 settings-custom-input"
-              subscriptSizing="dynamic"
-            >
-              <div class="position-relative">
-                <mat-select
-                  formControlName="country"
-                  panelClass="custom-select-panel"
-                  placeholder="{{ 'Select country' | translate }}"
-                  (selectionChange)="clientCountryValueChange($event.value)"
+          <div class="d-flex flex-column gap-16">
+            <h5 class="assumptions-section-title">
+              {{ "Plan setup" | translate }}
+            </h5>
+            <div class="assumption-container">
+              <div class="settings-form-field">
+                <mat-label
+                  class="f-s-16 f-w-500 ibr-black d-flex align-items-center"
+                  >{{ "Country" | translate }}
+                  <img
+                    src="assets/images/svgs/ibr-new-info.svg"
+                    alt="help"
+                    width="18"
+                    class="m-l-4"
+                    matTooltip="Sets the main currency for all new client plans. All figures will be shown in this currency by default, but you can change it for individual clients later."
+                  />
+                </mat-label>
+                <mat-form-field
+                  appearance="outline"
+                  class="w-100 settings-custom-input"
+                  subscriptSizing="dynamic"
                 >
-                  @for (country of countries; track country.countryName) {
-                    @if (country.currencySymbol) {
-                      <mat-option [value]="country.countryName">{{
-                        country.countryName
-                      }}</mat-option>
-                    }
-                  }
-                </mat-select>
-                <span class="custom-arrow">
-                  <svg
-                    width="12"
-                    height="7"
-                    viewBox="0 0 12 7"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M1 1L6 6L11 1"
-                      stroke="#2B3942"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                  </svg>
-                </span>
+                  <div class="position-relative">
+                    <mat-select
+                      formControlName="country"
+                      panelClass="custom-select-panel"
+                      placeholder="{{ 'Select country' | translate }}"
+                      (selectionChange)="clientCountryValueChange($event.value)"
+                    >
+                      @for (country of countries; track country.countryName) {
+                        @if (country.currencySymbol) {
+                          <mat-option [value]="country.countryName">{{
+                            country.countryName
+                          }}</mat-option>
+                        }
+                      }
+                    </mat-select>
+                    <span class="custom-arrow">
+                      <svg
+                        width="12"
+                        height="7"
+                        viewBox="0 0 12 7"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M1 1L6 6L11 1"
+                          stroke="#2B3942"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                    </span>
+                  </div>
+                </mat-form-field>
               </div>
-            </mat-form-field>
-          </div>
-          <div class="settings-form-field">
-            <mat-label
-              class="f-s-16 f-w-500 ibr-black d-flex align-items-center"
-            >
-              {{ "Currency" | translate }}
-              <img
-                src="assets/images/svgs/ibr-new-info.svg"
-                alt="help"
-                width="18"
-                class="m-l-4"
-                matTooltip="Sets the main currency for all new client plans. All figures will be shown in this currency by default, but you can change it for individual clients later."
-              />
-            </mat-label>
-            <mat-form-field
-              appearance="outline"
-              class="w-100 settings-custom-input"
-              subscriptSizing="dynamic"
-            >
-              <div class="position-relative">
-                <mat-select
-                  formControlName="currency"
-                  panelClass="custom-select-panel"
-                  hideSingleSelectionIndicator
+              <div class="settings-form-field">
+                <mat-label
+                  class="f-s-16 f-w-500 ibr-black d-flex align-items-center"
                 >
-                  @for (country of countries; track country) {
-                    @if (country.currencySymbol) {
-                      <mat-option [value]="country.currencySymbol">{{
-                        country.currencySymbol
-                      }}</mat-option>
-                    }
-                  }
-                </mat-select>
-                <span class="custom-arrow">
-                  <svg
-                    width="12"
-                    height="7"
-                    viewBox="0 0 12 7"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M1 1L6 6L11 1"
-                      stroke="#2B3942"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                  </svg>
-                </span>
+                  {{ "Currency" | translate }}
+                  <img
+                    src="assets/images/svgs/ibr-new-info.svg"
+                    alt="help"
+                    width="18"
+                    class="m-l-4"
+                    matTooltip="Sets the main currency for all new client plans. All figures will be shown in this currency by default, but you can change it for individual clients later."
+                  />
+                </mat-label>
+                <mat-form-field
+                  appearance="outline"
+                  class="w-100 settings-custom-input"
+                  subscriptSizing="dynamic"
+                >
+                  <div class="position-relative">
+                    <mat-select
+                      formControlName="currency"
+                      panelClass="custom-select-panel"
+                      hideSingleSelectionIndicator
+                    >
+                      @for (country of countries; track country) {
+                        @if (country.currencySymbol) {
+                          <mat-option [value]="country.currencySymbol">{{
+                            country.currencySymbol
+                          }}</mat-option>
+                        }
+                      }
+                    </mat-select>
+                    <span class="custom-arrow">
+                      <svg
+                        width="12"
+                        height="7"
+                        viewBox="0 0 12 7"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M1 1L6 6L11 1"
+                          stroke="#2B3942"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                    </span>
+                  </div>
+                  <mat-error *ngIf="p.currency.invalid">{{
+                    "Required" | translate
+                  }}</mat-error>
+                </mat-form-field>
               </div>
-              <mat-error *ngIf="p.currency.invalid">{{
-                "Required" | translate
-              }}</mat-error>
-            </mat-form-field>
+            </div>
           </div>
-          <!-- </div> -->
 
           <!-- Section 2: Projection assumptions -->
-          <!-- <h5 class="assumptions-section-title">
-            {{ "Projection assumptions" | translate }}
-          </h5> -->
-          <!-- <div class="row"> -->
-          <div class="settings-form-field">
-            <mat-label
-              class="f-s-16 f-w-500 ibr-black d-flex align-items-center"
-            >
-              {{ "Inflation rate" | translate }}
-              <img
-                src="assets/images/svgs/ibr-new-info.svg"
-                alt="help"
-                width="18"
-                class="m-l-4"
-                matTooltip="Sets the default annual inflation rate used in projections. You can modify it in each client's cashflow model to show how inflation impacts their future results."
-              />
-            </mat-label>
-            <!-- <mat-form-field appearance="outline" class="w-100 percentage-icon"> -->
-            <mat-form-field
-              appearance="outline"
-              class="w-100 settings-custom-input"
-              subscriptSizing="dynamic"
-            >
-              <span matSuffix class="settings-percent-suffix">
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 20 20"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M15.8337 4.16602L4.16699 15.8327"
-                    stroke="#48475D"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  />
-                  <path
-                    d="M5.41634 7.50065C6.56693 7.50065 7.49967 6.56791 7.49967 5.41732C7.49967 4.26672 6.56693 3.33398 5.41634 3.33398C4.26575 3.33398 3.33301 4.26672 3.33301 5.41732C3.33301 6.56791 4.26575 7.50065 5.41634 7.50065Z"
-                    stroke="#48475D"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  />
-                  <path
-                    d="M14.5833 16.6667C15.7339 16.6667 16.6667 15.7339 16.6667 14.5833C16.6667 13.4327 15.7339 12.5 14.5833 12.5C13.4327 12.5 12.5 13.4327 12.5 14.5833C12.5 15.7339 13.4327 16.6667 14.5833 16.6667Z"
-                    stroke="#48475D"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  />
-                </svg>
-              </span>
-              <input
-                matInput
-                type="number"
-                step="0.1"
-                formControlName="inflationRate"
-              />
-              <mat-error *ngIf="p.inflationRate.hasError('required')">{{
-                "Required" | translate
-              }}</mat-error>
-              <mat-error
-                *ngIf="
-                  p.inflationRate.hasError('min') ||
-                  p.inflationRate.hasError('max')
-                "
-                >0–100</mat-error
-              >
-            </mat-form-field>
-          </div>
+          <div class="d-flex flex-column gap-16">
+            <h5 class="assumptions-section-title">
+              {{ "Projection assumptions" | translate }}
+            </h5>
 
-          <div class="settings-form-field">
-            <mat-label
-              class="f-s-16 f-w-500 ibr-black d-flex align-items-center"
-            >
-              {{ "Investment net return" | translate }}
-              <img
-                src="assets/images/svgs/ibr-new-info.svg"
-                alt="help"
-                width="18"
-                class="m-l-4"
-                matTooltip="Defines the expected yearly return after taxes. Ibernia uses this to estimate how investments grow over time. You can adapt it for each Saving Pot or individual client."
-              />
-            </mat-label>
-            <mat-form-field
-              appearance="outline"
-              class="w-100 settings-custom-input"
-              subscriptSizing="dynamic"
-            >
-              <span matSuffix class="settings-percent-suffix">
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 20 20"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
+            <div class="assumption-container">
+              <div class="settings-form-field">
+                <mat-label
+                  class="f-s-16 f-w-500 ibr-black d-flex align-items-center"
                 >
-                  <path
-                    d="M15.8337 4.16602L4.16699 15.8327"
-                    stroke="#48475D"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
+                  {{ "Inflation rate" | translate }}
+                  <img
+                    src="assets/images/svgs/ibr-new-info.svg"
+                    alt="help"
+                    width="18"
+                    class="m-l-4"
+                    matTooltip="Sets the default annual inflation rate used in projections. You can modify it in each client's cashflow model to show how inflation impacts their future results."
                   />
-                  <path
-                    d="M5.41634 7.50065C6.56693 7.50065 7.49967 6.56791 7.49967 5.41732C7.49967 4.26672 6.56693 3.33398 5.41634 3.33398C4.26575 3.33398 3.33301 4.26672 3.33301 5.41732C3.33301 6.56791 4.26575 7.50065 5.41634 7.50065Z"
-                    stroke="#48475D"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
+                </mat-label>
+                <!-- <mat-form-field appearance="outline" class="w-100 percentage-icon"> -->
+                <mat-form-field
+                  appearance="outline"
+                  class="w-100 settings-custom-input"
+                  subscriptSizing="dynamic"
+                >
+                  <span matSuffix class="settings-percent-suffix">
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 20 20"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M15.8337 4.16602L4.16699 15.8327"
+                        stroke="#48475D"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                      <path
+                        d="M5.41634 7.50065C6.56693 7.50065 7.49967 6.56791 7.49967 5.41732C7.49967 4.26672 6.56693 3.33398 5.41634 3.33398C4.26575 3.33398 3.33301 4.26672 3.33301 5.41732C3.33301 6.56791 4.26575 7.50065 5.41634 7.50065Z"
+                        stroke="#48475D"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                      <path
+                        d="M14.5833 16.6667C15.7339 16.6667 16.6667 15.7339 16.6667 14.5833C16.6667 13.4327 15.7339 12.5 14.5833 12.5C13.4327 12.5 12.5 13.4327 12.5 14.5833C12.5 15.7339 13.4327 16.6667 14.5833 16.6667Z"
+                        stroke="#48475D"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  </span>
+                  <input
+                    matInput
+                    type="number"
+                    step="0.1"
+                    formControlName="inflationRate"
                   />
-                  <path
-                    d="M14.5833 16.6667C15.7339 16.6667 16.6667 15.7339 16.6667 14.5833C16.6667 13.4327 15.7339 12.5 14.5833 12.5C13.4327 12.5 12.5 13.4327 12.5 14.5833C12.5 15.7339 13.4327 16.6667 14.5833 16.6667Z"
-                    stroke="#48475D"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  />
-                </svg>
-              </span>
-              <input
-                matInput
-                type="number"
-                step="0.1"
-                formControlName="investmentReturn"
-              />
-              <mat-error *ngIf="p.investmentReturn.hasError('required')">{{
-                "Required" | translate
-              }}</mat-error>
-              <mat-error
-                *ngIf="
-                  p.investmentReturn.hasError('min') ||
-                  p.investmentReturn.hasError('max')
-                "
-                >0–100</mat-error
-              >
-            </mat-form-field>
-          </div>
+                  <mat-error *ngIf="p.inflationRate.hasError('required')">{{
+                    "Required" | translate
+                  }}</mat-error>
+                  <mat-error
+                    *ngIf="
+                      p.inflationRate.hasError('min') ||
+                      p.inflationRate.hasError('max')
+                    "
+                    >0–100</mat-error
+                  >
+                </mat-form-field>
+              </div>
 
-          <div class="settings-form-field">
-            <mat-label
-              class="f-s-16 f-w-500 ibr-black d-flex align-items-center"
-            >
-              {{ "Pension fund net return" | translate }}
-              <img
-                src="assets/images/svgs/ibr-new-info.svg"
-                alt="help"
-                width="18"
-                class="m-l-4"
-                matTooltip="Sets the default return rate for pension funds."
-              />
-            </mat-label>
-            <mat-form-field
-              appearance="outline"
-              class="w-100 settings-custom-input"
-              subscriptSizing="dynamic"
-            >
-              <span matSuffix class="settings-percent-suffix">
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 20 20"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
+              <div class="settings-form-field">
+                <mat-label
+                  class="f-s-16 f-w-500 ibr-black d-flex align-items-center"
                 >
-                  <path
-                    d="M15.8337 4.16602L4.16699 15.8327"
-                    stroke="#48475D"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
+                  {{ "Investment net return" | translate }}
+                  <img
+                    src="assets/images/svgs/ibr-new-info.svg"
+                    alt="help"
+                    width="18"
+                    class="m-l-4"
+                    matTooltip="Defines the expected yearly return after taxes. Ibernia uses this to estimate how investments grow over time. You can adapt it for each Saving Pot or individual client."
                   />
-                  <path
-                    d="M5.41634 7.50065C6.56693 7.50065 7.49967 6.56791 7.49967 5.41732C7.49967 4.26672 6.56693 3.33398 5.41634 3.33398C4.26575 3.33398 3.33301 4.26672 3.33301 5.41732C3.33301 6.56791 4.26575 7.50065 5.41634 7.50065Z"
-                    stroke="#48475D"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
+                </mat-label>
+                <mat-form-field
+                  appearance="outline"
+                  class="w-100 settings-custom-input"
+                  subscriptSizing="dynamic"
+                >
+                  <span matSuffix class="settings-percent-suffix">
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 20 20"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M15.8337 4.16602L4.16699 15.8327"
+                        stroke="#48475D"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                      <path
+                        d="M5.41634 7.50065C6.56693 7.50065 7.49967 6.56791 7.49967 5.41732C7.49967 4.26672 6.56693 3.33398 5.41634 3.33398C4.26575 3.33398 3.33301 4.26672 3.33301 5.41732C3.33301 6.56791 4.26575 7.50065 5.41634 7.50065Z"
+                        stroke="#48475D"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                      <path
+                        d="M14.5833 16.6667C15.7339 16.6667 16.6667 15.7339 16.6667 14.5833C16.6667 13.4327 15.7339 12.5 14.5833 12.5C13.4327 12.5 12.5 13.4327 12.5 14.5833C12.5 15.7339 13.4327 16.6667 14.5833 16.6667Z"
+                        stroke="#48475D"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  </span>
+                  <input
+                    matInput
+                    type="number"
+                    step="0.1"
+                    formControlName="investmentReturn"
                   />
-                  <path
-                    d="M14.5833 16.6667C15.7339 16.6667 16.6667 15.7339 16.6667 14.5833C16.6667 13.4327 15.7339 12.5 14.5833 12.5C13.4327 12.5 12.5 13.4327 12.5 14.5833C12.5 15.7339 13.4327 16.6667 14.5833 16.6667Z"
-                    stroke="#48475D"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
+                  <mat-error *ngIf="p.investmentReturn.hasError('required')">{{
+                    "Required" | translate
+                  }}</mat-error>
+                  <mat-error
+                    *ngIf="
+                      p.investmentReturn.hasError('min') ||
+                      p.investmentReturn.hasError('max')
+                    "
+                    >0–100</mat-error
+                  >
+                </mat-form-field>
+              </div>
+
+              <div class="settings-form-field">
+                <mat-label
+                  class="f-s-16 f-w-500 ibr-black d-flex align-items-center"
+                >
+                  {{ "Pension fund net return" | translate }}
+                  <img
+                    src="assets/images/svgs/ibr-new-info.svg"
+                    alt="help"
+                    width="18"
+                    class="m-l-4"
+                    matTooltip="Sets the default return rate for pension funds."
                   />
-                </svg>
-              </span>
-              <input
-                matInput
-                type="number"
-                step="0.1"
-                formControlName="pensionFundReturn"
-              />
-              <mat-error *ngIf="p.pensionFundReturn.hasError('required')">{{
-                "Required" | translate
-              }}</mat-error>
-              <mat-error
-                *ngIf="
-                  p.pensionFundReturn.hasError('min') ||
-                  p.pensionFundReturn.hasError('max')
-                "
-                >0–100</mat-error
-              >
-            </mat-form-field>
+                </mat-label>
+                <mat-form-field
+                  appearance="outline"
+                  class="w-100 settings-custom-input"
+                  subscriptSizing="dynamic"
+                >
+                  <span matSuffix class="settings-percent-suffix">
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 20 20"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M15.8337 4.16602L4.16699 15.8327"
+                        stroke="#48475D"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                      <path
+                        d="M5.41634 7.50065C6.56693 7.50065 7.49967 6.56791 7.49967 5.41732C7.49967 4.26672 6.56693 3.33398 5.41634 3.33398C4.26575 3.33398 3.33301 4.26672 3.33301 5.41732C3.33301 6.56791 4.26575 7.50065 5.41634 7.50065Z"
+                        stroke="#48475D"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                      <path
+                        d="M14.5833 16.6667C15.7339 16.6667 16.6667 15.7339 16.6667 14.5833C16.6667 13.4327 15.7339 12.5 14.5833 12.5C13.4327 12.5 12.5 13.4327 12.5 14.5833C12.5 15.7339 13.4327 16.6667 14.5833 16.6667Z"
+                        stroke="#48475D"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  </span>
+                  <input
+                    matInput
+                    type="number"
+                    step="0.1"
+                    formControlName="pensionFundReturn"
+                  />
+                  <mat-error *ngIf="p.pensionFundReturn.hasError('required')">{{
+                    "Required" | translate
+                  }}</mat-error>
+                  <mat-error
+                    *ngIf="
+                      p.pensionFundReturn.hasError('min') ||
+                      p.pensionFundReturn.hasError('max')
+                    "
+                    >0–100</mat-error
+                  >
+                </mat-form-field>
+              </div>
+            </div>
           </div>
-          <!-- </div> -->
 
           <!-- Section 3: Financing assumptions -->
-          <!-- <h5 class="assumptions-section-title">
-            {{ "Financing assumptions" | translate }}
-          </h5> -->
-          <!-- <div class="row"> -->
-          <!-- <div class="col-4"> -->
-          <div class="settings-form-field">
-            <mat-label
-              class="f-s-16 f-w-500 ibr-black d-flex align-items-center"
-            >
-              {{ "Mortgage interest rate" | translate }}
-              <img
-                src="assets/images/svgs/ibr-new-info.svg"
-                alt="help"
-                width="18"
-                class="m-l-4"
-                matTooltip="{{
-                  'ASSUMPTIONS.MORTGAGE_INTEREST_RATE_TOOLTIP' | translate
-                }}"
-              />
-            </mat-label>
-            <mat-form-field
-              appearance="outline"
-              class="w-100 settings-custom-input"
-              subscriptSizing="dynamic"
-            >
-              <span matSuffix class="settings-percent-suffix">
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 20 20"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
+          <div class="d-flex flex-column gap-16">
+            <h5 class="assumptions-section-title">
+              {{ "Financing assumptions" | translate }}
+            </h5>
+            <div class="assumption-container">
+              <div class="settings-form-field">
+                <mat-label
+                  class="f-s-16 f-w-500 ibr-black d-flex align-items-center"
                 >
-                  <path
-                    d="M15.8337 4.16602L4.16699 15.8327"
-                    stroke="#48475D"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
+                  {{ "Mortgage interest rate" | translate }}
+                  <img
+                    src="assets/images/svgs/ibr-new-info.svg"
+                    alt="help"
+                    width="18"
+                    class="m-l-4"
+                    matTooltip="{{
+                      'ASSUMPTIONS.MORTGAGE_INTEREST_RATE_TOOLTIP' | translate
+                    }}"
                   />
-                  <path
-                    d="M5.41634 7.50065C6.56693 7.50065 7.49967 6.56791 7.49967 5.41732C7.49967 4.26672 6.56693 3.33398 5.41634 3.33398C4.26575 3.33398 3.33301 4.26672 3.33301 5.41732C3.33301 6.56791 4.26575 7.50065 5.41634 7.50065Z"
-                    stroke="#48475D"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
+                </mat-label>
+                <mat-form-field
+                  appearance="outline"
+                  class="w-100 settings-custom-input"
+                  subscriptSizing="dynamic"
+                >
+                  <span matSuffix class="settings-percent-suffix">
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 20 20"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M15.8337 4.16602L4.16699 15.8327"
+                        stroke="#48475D"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                      <path
+                        d="M5.41634 7.50065C6.56693 7.50065 7.49967 6.56791 7.49967 5.41732C7.49967 4.26672 6.56693 3.33398 5.41634 3.33398C4.26575 3.33398 3.33301 4.26672 3.33301 5.41732C3.33301 6.56791 4.26575 7.50065 5.41634 7.50065Z"
+                        stroke="#48475D"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                      <path
+                        d="M14.5833 16.6667C15.7339 16.6667 16.6667 15.7339 16.6667 14.5833C16.6667 13.4327 15.7339 12.5 14.5833 12.5C13.4327 12.5 12.5 13.4327 12.5 14.5833C12.5 15.7339 13.4327 16.6667 14.5833 16.6667Z"
+                        stroke="#48475D"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  </span>
+                  <input
+                    matInput
+                    type="number"
+                    step="0.01"
+                    formControlName="mortgageInterestRate"
                   />
-                  <path
-                    d="M14.5833 16.6667C15.7339 16.6667 16.6667 15.7339 16.6667 14.5833C16.6667 13.4327 15.7339 12.5 14.5833 12.5C13.4327 12.5 12.5 13.4327 12.5 14.5833C12.5 15.7339 13.4327 16.6667 14.5833 16.6667Z"
-                    stroke="#48475D"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  />
-                </svg>
-              </span>
-              <input
-                matInput
-                type="number"
-                step="0.01"
-                formControlName="mortgageInterestRate"
-              />
-              <mat-error *ngIf="p.mortgageInterestRate.hasError('required')">{{
-                "Required" | translate
-              }}</mat-error>
-              <mat-error
-                *ngIf="
-                  p.mortgageInterestRate.hasError('min') ||
-                  p.mortgageInterestRate.hasError('max')
-                "
-                >0–100</mat-error
-              >
-            </mat-form-field>
-          </div>
-          <!-- </div> -->
+                  <mat-error
+                    *ngIf="p.mortgageInterestRate.hasError('required')"
+                    >{{ "Required" | translate }}</mat-error
+                  >
+                  <mat-error
+                    *ngIf="
+                      p.mortgageInterestRate.hasError('min') ||
+                      p.mortgageInterestRate.hasError('max')
+                    "
+                    >0–100</mat-error
+                  >
+                </mat-form-field>
+              </div>
 
-          <!-- <div class="col-4"> -->
-          <div class="settings-form-field">
-            <mat-label
-              class="f-s-16 f-w-500 ibr-black d-flex align-items-center"
-            >
-              {{ "Loan interest rate" | translate }}
-              <img
-                src="assets/images/svgs/ibr-new-info.svg"
-                alt="help"
-                width="18"
-                class="m-l-4"
-                matTooltip="{{
-                  'ASSUMPTIONS.LOAN_INTEREST_RATE_TOOLTIP' | translate
-                }}"
-              />
-            </mat-label>
-            <mat-form-field
-              appearance="outline"
-              class="w-100 settings-custom-input"
-              subscriptSizing="dynamic"
-            >
-              <span matSuffix class="settings-percent-suffix">
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 20 20"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
+              <div class="settings-form-field">
+                <mat-label
+                  class="f-s-16 f-w-500 ibr-black d-flex align-items-center"
                 >
-                  <path
-                    d="M15.8337 4.16602L4.16699 15.8327"
-                    stroke="#48475D"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
+                  {{ "Loan interest rate" | translate }}
+                  <img
+                    src="assets/images/svgs/ibr-new-info.svg"
+                    alt="help"
+                    width="18"
+                    class="m-l-4"
+                    matTooltip="{{
+                      'ASSUMPTIONS.LOAN_INTEREST_RATE_TOOLTIP' | translate
+                    }}"
                   />
-                  <path
-                    d="M5.41634 7.50065C6.56693 7.50065 7.49967 6.56791 7.49967 5.41732C7.49967 4.26672 6.56693 3.33398 5.41634 3.33398C4.26575 3.33398 3.33301 4.26672 3.33301 5.41732C3.33301 6.56791 4.26575 7.50065 5.41634 7.50065Z"
-                    stroke="#48475D"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
+                </mat-label>
+                <mat-form-field
+                  appearance="outline"
+                  class="w-100 settings-custom-input"
+                  subscriptSizing="dynamic"
+                >
+                  <span matSuffix class="settings-percent-suffix">
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 20 20"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M15.8337 4.16602L4.16699 15.8327"
+                        stroke="#48475D"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                      <path
+                        d="M5.41634 7.50065C6.56693 7.50065 7.49967 6.56791 7.49967 5.41732C7.49967 4.26672 6.56693 3.33398 5.41634 3.33398C4.26575 3.33398 3.33301 4.26672 3.33301 5.41732C3.33301 6.56791 4.26575 7.50065 5.41634 7.50065Z"
+                        stroke="#48475D"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                      <path
+                        d="M14.5833 16.6667C15.7339 16.6667 16.6667 15.7339 16.6667 14.5833C16.6667 13.4327 15.7339 12.5 14.5833 12.5C13.4327 12.5 12.5 13.4327 12.5 14.5833C12.5 15.7339 13.4327 16.6667 14.5833 16.6667Z"
+                        stroke="#48475D"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  </span>
+                  <input
+                    matInput
+                    type="number"
+                    step="0.01"
+                    formControlName="loanInterestRate"
                   />
-                  <path
-                    d="M14.5833 16.6667C15.7339 16.6667 16.6667 15.7339 16.6667 14.5833C16.6667 13.4327 15.7339 12.5 14.5833 12.5C13.4327 12.5 12.5 13.4327 12.5 14.5833C12.5 15.7339 13.4327 16.6667 14.5833 16.6667Z"
-                    stroke="#48475D"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  />
-                </svg>
-              </span>
-              <input
-                matInput
-                type="number"
-                step="0.01"
-                formControlName="loanInterestRate"
-              />
-              <mat-error *ngIf="p.loanInterestRate.hasError('required')">{{
-                "Required" | translate
-              }}</mat-error>
-              <mat-error
-                *ngIf="
-                  p.loanInterestRate.hasError('min') ||
-                  p.loanInterestRate.hasError('max')
-                "
-                >0–100</mat-error
-              >
-            </mat-form-field>
+                  <mat-error *ngIf="p.loanInterestRate.hasError('required')">{{
+                    "Required" | translate
+                  }}</mat-error>
+                  <mat-error
+                    *ngIf="
+                      p.loanInterestRate.hasError('min') ||
+                      p.loanInterestRate.hasError('max')
+                    "
+                    >0–100</mat-error
+                  >
+                </mat-form-field>
+              </div>
+            </div>
           </div>
-          <!-- </div> -->
-          <!-- </div> -->
 
           <!-- Section 4: Advisor compensation -->
-          <!-- <h5 class="assumptions-section-title">
-            {{ "Advisor compensation" | translate }}
-          </h5> -->
-          <!-- <div class="row"> -->
-          <!-- <div class="col-4"> -->
-          <div class="settings-form-field">
-            <mat-label
-              class="f-s-16 f-w-500 ibr-black d-flex align-items-center"
-            >
-              {{ "Advisor commission type" | translate }}
-              <img
-                src="assets/images/svgs/ibr-new-info.svg"
-                alt="help"
-                width="18"
-                class="m-l-4"
-                matTooltip="Defines how advisor commissions are calculated. You can set a fixed amount (e.g., €100 per year), a percentage of assets (e.g., 1% annually), or both. This acts as your default method and can be customized for each client."
-              />
-            </mat-label>
-            <mat-form-field
-              appearance="outline"
-              class="w-100 settings-custom-input"
-              subscriptSizing="dynamic"
-            >
-              <div class="position-relative">
-                <mat-select
-                  formControlName="comissionType"
-                  panelClass="custom-select-panel"
-                  placeholder="{{ 'Select commission type' | translate }}"
-                >
-                  <mat-option
-                    *ngFor="let t of comissionTypes"
-                    [value]="t.value"
-                  >
-                    {{ t.label }}
-                  </mat-option>
-                </mat-select>
-                <span class="custom-arrow">
-                  <svg
-                    width="12"
-                    height="7"
-                    viewBox="0 0 12 7"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M1 1L6 6L11 1"
-                      stroke="#2B3942"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                  </svg>
-                </span>
-              </div>
-              <mat-error *ngIf="p.comissionType.invalid">{{
-                "Required" | translate
-              }}</mat-error>
-            </mat-form-field>
-          </div>
-          <!-- </div> -->
-
-          @if (
-            form.controls.preferences.controls.comissionType.value !==
-            ComissionType.None
-          ) {
-            @if (
-              form.controls.preferences.controls.comissionType.value ===
-              ComissionType.Percentage
-            ) {
-              <!-- <div class="col-8"> -->
-              <div class="settings-form-field">
-                <mat-label
-                  class="f-s-16 f-w-500 ibr-black d-flex align-items-center"
-                  >{{ "Commission percentage" | translate }}
-                  <img
-                    src="assets/images/svgs/ibr-new-info.svg"
-                    alt="help"
-                    width="18"
-                    class="m-l-4"
-                    matTooltip="Sets the default percentage commission for new plans (e.g., 1% annually on the value of invested savings). This applies to each Saving Pot by default, and you can adjust it for each client when needed."
-                  />
-                </mat-label>
-                <mat-form-field
-                  appearance="outline"
-                  class="w-100 settings-custom-input"
-                  subscriptSizing="dynamic"
-                >
-                  <span matSuffix class="settings-percent-suffix">
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 20 20"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M15.8337 4.16602L4.16699 15.8327"
-                        stroke="#48475D"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      />
-                      <path
-                        d="M5.41634 7.50065C6.56693 7.50065 7.49967 6.56791 7.49967 5.41732C7.49967 4.26672 6.56693 3.33398 5.41634 3.33398C4.26575 3.33398 3.33301 4.26672 3.33301 5.41732C3.33301 6.56791 4.26575 7.50065 5.41634 7.50065Z"
-                        stroke="#48475D"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      />
-                      <path
-                        d="M14.5833 16.6667C15.7339 16.6667 16.6667 15.7339 16.6667 14.5833C16.6667 13.4327 15.7339 12.5 14.5833 12.5C13.4327 12.5 12.5 13.4327 12.5 14.5833C12.5 15.7339 13.4327 16.6667 14.5833 16.6667Z"
-                        stroke="#48475D"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      />
-                    </svg>
-                  </span>
-                  <input
-                    matInput
-                    type="number"
-                    step="0.1"
-                    formControlName="comissionPercentage"
-                  />
-                  <mat-error
-                    *ngIf="p.comissionPercentage.hasError('required')"
-                    >{{ "Required" | translate }}</mat-error
-                  >
-                  <mat-error
-                    *ngIf="
-                      p.comissionPercentage.hasError('min') ||
-                      p.comissionPercentage.hasError('max')
-                    "
-                    >0–100</mat-error
-                  >
-                </mat-form-field>
-              </div>
-              <!-- </div> -->
-            }
-
-            <!-- <div class="col-8"> -->
+          <div class="d-flex flex-column gap-16">
+            <h5 class="assumptions-section-title">
+              {{ "Advisor compensation" | translate }}
+            </h5>
             <!-- <div class="row"> -->
-            @if (
-              form.controls.preferences.controls.comissionType.value ===
-              ComissionType.Amount
-            ) {
-              <!-- <div class="col-2"> -->
-              <div class="settings-form-field">
-                <mat-label class="f-s-16 f-w-500 ibr-black d-block">{{
-                  "Currency" | translate
-                }}</mat-label>
-                <mat-form-field
-                  appearance="outline"
-                  class="w-full w-100 disabled-field settings-custom-input"
-                  subscriptSizing="dynamic"
-                >
-                  <input
-                    matInput
-                    [value]="p.currency?.value || ''"
-                    disabled
-                    readonly
-                    aria-readonly="true"
-                    placeholder="—"
-                  />
-                </mat-form-field>
-              </div>
-              <!-- </div> -->
-              <!-- <div class="col-10"> -->
+            <!-- <div class="col-4"> -->
+            <div class="assumption-container">
               <div class="settings-form-field">
                 <mat-label
                   class="f-s-16 f-w-500 ibr-black d-flex align-items-center"
-                  >{{ "Commission amount" | translate }}
+                >
+                  {{ "Advisor commission type" | translate }}
                   <img
                     src="assets/images/svgs/ibr-new-info.svg"
                     alt="help"
                     width="18"
                     class="m-l-4"
-                    matTooltip="Sets the standard fixed commission value applied when creating new plans (e.g., €100 per year). This applies to each Saving Pot by default, but you can change it per client if needed."
+                    matTooltip="Defines how advisor commissions are calculated. You can set a fixed amount (e.g., €100 per year), a percentage of assets (e.g., 1% annually), or both. This acts as your default method and can be customized for each client."
                   />
                 </mat-label>
                 <mat-form-field
@@ -688,167 +532,333 @@
                   class="w-100 settings-custom-input"
                   subscriptSizing="dynamic"
                 >
-                  <input
-                    matInput
-                    type="text"
-                    formControlName="comissionAmount"
-                    #commissionAmountInput
-                    thousandSeparatorInput
-                    (input)="
-                      onCommissionAmountInput($event.target?.value ?? '')
-                    "
-                    (focus)="formatCommissionAmountOnFocus($event)"
-                    placeholder="{{ 'Enter amount' | translate }}"
-                  />
-                  <mat-error *ngIf="p.comissionAmount.hasError('required')">{{
-                    "Required" | translate
-                  }}</mat-error>
-                  <mat-error *ngIf="p.comissionAmount.hasError('min')"
-                    >{{ "Must be" | translate }} &gt; 0</mat-error
-                  >
-                </mat-form-field>
-              </div>
-              <!-- </div> -->
-            }
-
-            @if (
-              form.controls.preferences.controls.comissionType.value ===
-              ComissionType.Both
-            ) {
-              <!-- <div class="col-2"> -->
-              <div class="settings-form-field">
-                <mat-label class="f-s-16 f-w-500 ibr-black d-block">{{
-                  "Currency" | translate
-                }}</mat-label>
-                <mat-form-field
-                  appearance="outline"
-                  class="w-full w-100 disabled-field settings-custom-input"
-                  subscriptSizing="dynamic"
-                >
-                  <input
-                    matInput
-                    [value]="p.currency?.value || ''"
-                    readonly
-                    disabled
-                    aria-readonly="true"
-                    placeholder="—"
-                  />
-                </mat-form-field>
-              </div>
-              <!-- </div> -->
-              <!-- <div class="col-5"> -->
-              <div class="settings-form-field">
-                <mat-label
-                  class="f-s-16 f-w-500 ibr-black d-flex align-items-center"
-                  >{{ "Commission amount" | translate }}
-                  <img
-                    src="assets/images/svgs/ibr-new-info.svg"
-                    alt="help"
-                    width="18"
-                    class="m-l-4"
-                    matTooltip="Sets the standard fixed commission value applied when creating new plans (e.g., €100 per year). This applies to each Saving Pot by default, but you can change it per client if needed."
-                  />
-                </mat-label>
-                <mat-form-field
-                  appearance="outline"
-                  class="w-100 settings-custom-input"
-                  subscriptSizing="dynamic"
-                >
-                  <input
-                    matInput
-                    type="text"
-                    formControlName="comissionAmount"
-                    #commissionAmountInput
-                    thousandSeparatorInput
-                    (input)="
-                      onCommissionAmountInput($event.target?.value ?? '')
-                    "
-                    (focus)="formatCommissionAmountOnFocus($event)"
-                    placeholder="Enter amount"
-                  />
-                  <mat-error *ngIf="p.comissionAmount.hasError('required')">{{
-                    "Required" | translate
-                  }}</mat-error>
-                  <mat-error *ngIf="p.comissionAmount.hasError('min')"
-                    >{{ "Must be" | translate }} &gt; 0</mat-error
-                  >
-                </mat-form-field>
-              </div>
-              <!-- </div> -->
-              <!-- <div class="col-5"> -->
-              <div class="settings-form-field">
-                <mat-label
-                  class="f-s-16 f-w-500 ibr-black d-flex align-items-center"
-                  >{{ "Commission percentage" | translate }}
-                  <img
-                    src="assets/images/svgs/ibr-new-info.svg"
-                    alt="help"
-                    width="18"
-                    class="m-l-4"
-                    matTooltip="Sets the default percentage commission for new plans (e.g., 1% annually on the value of invested savings). This applies to each Saving Pot by default, and you can adjust it for each client when needed.
-  "
-                  />
-                </mat-label>
-                <mat-form-field
-                  appearance="outline"
-                  class="w-100 settings-custom-input"
-                  subscriptSizing="dynamic"
-                >
-                  <span matSuffix class="settings-percent-suffix">
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 20 20"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
+                  <div class="position-relative">
+                    <mat-select
+                      formControlName="comissionType"
+                      panelClass="custom-select-panel"
+                      placeholder="{{ 'Select commission type' | translate }}"
                     >
-                      <path
-                        d="M15.8337 4.16602L4.16699 15.8327"
-                        stroke="#48475D"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      />
-                      <path
-                        d="M5.41634 7.50065C6.56693 7.50065 7.49967 6.56791 7.49967 5.41732C7.49967 4.26672 6.56693 3.33398 5.41634 3.33398C4.26575 3.33398 3.33301 4.26672 3.33301 5.41732C3.33301 6.56791 4.26575 7.50065 5.41634 7.50065Z"
-                        stroke="#48475D"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      />
-                      <path
-                        d="M14.5833 16.6667C15.7339 16.6667 16.6667 15.7339 16.6667 14.5833C16.6667 13.4327 15.7339 12.5 14.5833 12.5C13.4327 12.5 12.5 13.4327 12.5 14.5833C12.5 15.7339 13.4327 16.6667 14.5833 16.6667Z"
-                        stroke="#48475D"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      />
-                    </svg>
-                  </span>
-                  <input
-                    matInput
-                    type="number"
-                    step="0.1"
-                    formControlName="comissionPercentage"
-                  />
-                  <mat-error
-                    *ngIf="p.comissionPercentage.hasError('required')"
-                    >{{ "Required" | translate }}</mat-error
-                  >
-                  <mat-error
-                    *ngIf="
-                      p.comissionPercentage.hasError('min') ||
-                      p.comissionPercentage.hasError('max')
-                    "
-                    >0–100</mat-error
-                  >
+                      <mat-option
+                        *ngFor="let t of comissionTypes"
+                        [value]="t.value"
+                      >
+                        {{ t.label }}
+                      </mat-option>
+                    </mat-select>
+                    <span class="custom-arrow">
+                      <svg
+                        width="12"
+                        height="7"
+                        viewBox="0 0 12 7"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M1 1L6 6L11 1"
+                          stroke="#2B3942"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                    </span>
+                  </div>
+                  <mat-error *ngIf="p.comissionType.invalid">{{
+                    "Required" | translate
+                  }}</mat-error>
                 </mat-form-field>
               </div>
               <!-- </div> -->
-            }
-            <!-- </div> -->
-            <!-- </div> -->
-          }
+
+              @if (
+                form.controls.preferences.controls.comissionType.value !==
+                ComissionType.None
+              ) {
+                @if (
+                  form.controls.preferences.controls.comissionType.value ===
+                  ComissionType.Percentage
+                ) {
+                  <!-- <div class="col-8"> -->
+                  <div class="settings-form-field">
+                    <mat-label
+                      class="f-s-16 f-w-500 ibr-black d-flex align-items-center"
+                      >{{ "Commission percentage" | translate }}
+                      <img
+                        src="assets/images/svgs/ibr-new-info.svg"
+                        alt="help"
+                        width="18"
+                        class="m-l-4"
+                        matTooltip="Sets the default percentage commission for new plans (e.g., 1% annually on the value of invested savings). This applies to each Saving Pot by default, and you can adjust it for each client when needed."
+                      />
+                    </mat-label>
+                    <mat-form-field
+                      appearance="outline"
+                      class="w-100 settings-custom-input"
+                      subscriptSizing="dynamic"
+                    >
+                      <span matSuffix class="settings-percent-suffix">
+                        <svg
+                          width="20"
+                          height="20"
+                          viewBox="0 0 20 20"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M15.8337 4.16602L4.16699 15.8327"
+                            stroke="#48475D"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                          <path
+                            d="M5.41634 7.50065C6.56693 7.50065 7.49967 6.56791 7.49967 5.41732C7.49967 4.26672 6.56693 3.33398 5.41634 3.33398C4.26575 3.33398 3.33301 4.26672 3.33301 5.41732C3.33301 6.56791 4.26575 7.50065 5.41634 7.50065Z"
+                            stroke="#48475D"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                          <path
+                            d="M14.5833 16.6667C15.7339 16.6667 16.6667 15.7339 16.6667 14.5833C16.6667 13.4327 15.7339 12.5 14.5833 12.5C13.4327 12.5 12.5 13.4327 12.5 14.5833C12.5 15.7339 13.4327 16.6667 14.5833 16.6667Z"
+                            stroke="#48475D"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                        </svg>
+                      </span>
+                      <input
+                        matInput
+                        type="number"
+                        step="0.1"
+                        formControlName="comissionPercentage"
+                      />
+                      <mat-error
+                        *ngIf="p.comissionPercentage.hasError('required')"
+                        >{{ "Required" | translate }}</mat-error
+                      >
+                      <mat-error
+                        *ngIf="
+                          p.comissionPercentage.hasError('min') ||
+                          p.comissionPercentage.hasError('max')
+                        "
+                        >0–100</mat-error
+                      >
+                    </mat-form-field>
+                  </div>
+                  <!-- </div> -->
+                }
+
+                <!-- <div class="col-8"> -->
+                <!-- <div class="row"> -->
+                @if (
+                  form.controls.preferences.controls.comissionType.value ===
+                  ComissionType.Amount
+                ) {
+                  <!-- <div class="col-2"> -->
+                  <div class="settings-form-field">
+                    <mat-label class="f-s-16 f-w-500 ibr-black d-block">{{
+                      "Currency" | translate
+                    }}</mat-label>
+                    <mat-form-field
+                      appearance="outline"
+                      class="w-full w-100 disabled-field settings-custom-input"
+                      subscriptSizing="dynamic"
+                    >
+                      <input
+                        matInput
+                        [value]="p.currency?.value || ''"
+                        disabled
+                        readonly
+                        aria-readonly="true"
+                        placeholder="—"
+                      />
+                    </mat-form-field>
+                  </div>
+                  <!-- </div> -->
+                  <!-- <div class="col-10"> -->
+                  <div class="settings-form-field">
+                    <mat-label
+                      class="f-s-16 f-w-500 ibr-black d-flex align-items-center"
+                      >{{ "Commission amount" | translate }}
+                      <img
+                        src="assets/images/svgs/ibr-new-info.svg"
+                        alt="help"
+                        width="18"
+                        class="m-l-4"
+                        matTooltip="Sets the standard fixed commission value applied when creating new plans (e.g., €100 per year). This applies to each Saving Pot by default, but you can change it per client if needed."
+                      />
+                    </mat-label>
+                    <mat-form-field
+                      appearance="outline"
+                      class="w-100 settings-custom-input"
+                      subscriptSizing="dynamic"
+                    >
+                      <input
+                        matInput
+                        type="text"
+                        formControlName="comissionAmount"
+                        #commissionAmountInput
+                        thousandSeparatorInput
+                        (input)="
+                          onCommissionAmountInput($event.target?.value ?? '')
+                        "
+                        (focus)="formatCommissionAmountOnFocus($event)"
+                        placeholder="{{ 'Enter amount' | translate }}"
+                      />
+                      <mat-error
+                        *ngIf="p.comissionAmount.hasError('required')"
+                        >{{ "Required" | translate }}</mat-error
+                      >
+                      <mat-error *ngIf="p.comissionAmount.hasError('min')"
+                        >{{ "Must be" | translate }} &gt; 0</mat-error
+                      >
+                    </mat-form-field>
+                  </div>
+                  <!-- </div> -->
+                }
+
+                @if (
+                  form.controls.preferences.controls.comissionType.value ===
+                  ComissionType.Both
+                ) {
+                  <!-- <div class="col-2"> -->
+                  <div class="settings-form-field">
+                    <mat-label class="f-s-16 f-w-500 ibr-black d-block">{{
+                      "Currency" | translate
+                    }}</mat-label>
+                    <mat-form-field
+                      appearance="outline"
+                      class="w-full w-100 disabled-field settings-custom-input"
+                      subscriptSizing="dynamic"
+                    >
+                      <input
+                        matInput
+                        [value]="p.currency?.value || ''"
+                        readonly
+                        disabled
+                        aria-readonly="true"
+                        placeholder="—"
+                      />
+                    </mat-form-field>
+                  </div>
+                  <!-- </div> -->
+                  <!-- <div class="col-5"> -->
+                  <div class="settings-form-field">
+                    <mat-label
+                      class="f-s-16 f-w-500 ibr-black d-flex align-items-center"
+                      >{{ "Commission amount" | translate }}
+                      <img
+                        src="assets/images/svgs/ibr-new-info.svg"
+                        alt="help"
+                        width="18"
+                        class="m-l-4"
+                        matTooltip="Sets the standard fixed commission value applied when creating new plans (e.g., €100 per year). This applies to each Saving Pot by default, but you can change it per client if needed."
+                      />
+                    </mat-label>
+                    <mat-form-field
+                      appearance="outline"
+                      class="w-100 settings-custom-input"
+                      subscriptSizing="dynamic"
+                    >
+                      <input
+                        matInput
+                        type="text"
+                        formControlName="comissionAmount"
+                        #commissionAmountInput
+                        thousandSeparatorInput
+                        (input)="
+                          onCommissionAmountInput($event.target?.value ?? '')
+                        "
+                        (focus)="formatCommissionAmountOnFocus($event)"
+                        placeholder="Enter amount"
+                      />
+                      <mat-error
+                        *ngIf="p.comissionAmount.hasError('required')"
+                        >{{ "Required" | translate }}</mat-error
+                      >
+                      <mat-error *ngIf="p.comissionAmount.hasError('min')"
+                        >{{ "Must be" | translate }} &gt; 0</mat-error
+                      >
+                    </mat-form-field>
+                  </div>
+                  <!-- </div> -->
+                  <!-- <div class="col-5"> -->
+                  <div class="settings-form-field">
+                    <mat-label
+                      class="f-s-16 f-w-500 ibr-black d-flex align-items-center"
+                      >{{ "Commission percentage" | translate }}
+                      <img
+                        src="assets/images/svgs/ibr-new-info.svg"
+                        alt="help"
+                        width="18"
+                        class="m-l-4"
+                        matTooltip="Sets the default percentage commission for new plans (e.g., 1% annually on the value of invested savings). This applies to each Saving Pot by default, and you can adjust it for each client when needed.
+  "
+                      />
+                    </mat-label>
+                    <mat-form-field
+                      appearance="outline"
+                      class="w-100 settings-custom-input"
+                      subscriptSizing="dynamic"
+                    >
+                      <span matSuffix class="settings-percent-suffix">
+                        <svg
+                          width="20"
+                          height="20"
+                          viewBox="0 0 20 20"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M15.8337 4.16602L4.16699 15.8327"
+                            stroke="#48475D"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                          <path
+                            d="M5.41634 7.50065C6.56693 7.50065 7.49967 6.56791 7.49967 5.41732C7.49967 4.26672 6.56693 3.33398 5.41634 3.33398C4.26575 3.33398 3.33301 4.26672 3.33301 5.41732C3.33301 6.56791 4.26575 7.50065 5.41634 7.50065Z"
+                            stroke="#48475D"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                          <path
+                            d="M14.5833 16.6667C15.7339 16.6667 16.6667 15.7339 16.6667 14.5833C16.6667 13.4327 15.7339 12.5 14.5833 12.5C13.4327 12.5 12.5 13.4327 12.5 14.5833C12.5 15.7339 13.4327 16.6667 14.5833 16.6667Z"
+                            stroke="#48475D"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                        </svg>
+                      </span>
+                      <input
+                        matInput
+                        type="number"
+                        step="0.1"
+                        formControlName="comissionPercentage"
+                      />
+                      <mat-error
+                        *ngIf="p.comissionPercentage.hasError('required')"
+                        >{{ "Required" | translate }}</mat-error
+                      >
+                      <mat-error
+                        *ngIf="
+                          p.comissionPercentage.hasError('min') ||
+                          p.comissionPercentage.hasError('max')
+                        "
+                        >0–100</mat-error
+                      >
+                    </mat-form-field>
+                  </div>
+                  <!-- </div> -->
+                }
+                <!-- </div> -->
+                <!-- </div> -->
+              }
+            </div>
+          </div>
         </div>
         <!-- </div> -->
 

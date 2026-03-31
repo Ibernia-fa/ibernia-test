@@ -243,140 +243,177 @@
                         ></span>
                       }
 
-                        <!-- Status  -->
-                        <div class="stats-main-wrapper">
-                          <div class="d-flex flex-column gap-8">
-                            <div class="d-flex align-items-center gap-8">
-                              <img
-                                [src]="
-                                  'assets/images/svgs/' +
-                                  saving.iconUrl +
-                                  '.svg'
-                                "
-                                alt="cashflow-moneys-icon"
-                              />
-                              <h3 class="card-title-new">{{ saving.name }}</h3>
-                              <!-- @if (hasPartner) {
+                      <!-- Status  -->
+                      <div class="stats-main-wrapper">
+                        <div class="d-flex flex-column gap-8">
+                          <div class="d-flex align-items-center gap-8">
+                            <img
+                              [src]="
+                                'assets/images/svgs/' + saving.iconUrl + '.svg'
+                              "
+                              alt="cashflow-moneys-icon"
+                            />
+                            <h3 class="card-title-new">{{ saving.name }}</h3>
+                            <!-- @if (hasPartner) {
                                 <span class="badge ownership-badge"
                                   >{{ "Ownership" | translate }}:
                                   {{ getOwnershipLabel(saving) }}</span
                                 >
                               } -->
-                            </div>
-                            <div
-                              class="d-flex align-items-center gap-10 flex-wrap saving-pot-value-row"
+                          </div>
+                          <div
+                            class="d-flex align-items-center gap-10 flex-wrap saving-pot-value-row"
+                          >
+                            <h3 class="saving-title">
+                              {{
+                                selectedClient?.clientDetails?.preferredCurrency
+                                  | currencySymbol
+                              }}{{
+                                saving.startingPotValue.amount
+                                  | thousandSeparator
+                              }}
+                            </h3>
+                            <span
+                              [className]="
+                                saving.returnRate > 0
+                                  ? 'badge green'
+                                  : 'badge red'
+                              "
                             >
-                              <h3 class="saving-title">
-                                {{
-                                  selectedClient?.clientDetails
-                                    ?.preferredCurrency | currencySymbol
-                                }}{{
-                                  saving.startingPotValue.amount
-                                    | thousandSeparator
-                                }}
-                              </h3>
-                              <span
-                                [className]="
-                                  saving.returnRate > 0
-                                    ? 'badge green'
-                                    : 'badge red'
-                                "
-                              >
-                                <!-- @if(saving.realReturn >= 0){+}{{saving.realReturn | number :
+                              <!-- @if(saving.realReturn >= 0){+}{{saving.realReturn | number :
                                                         '1.2-2'}}% -->
-                                @if (saving.returnRate >= 0) {
-                                  +
-                                }
-                                {{ formatReturnRate(saving.returnRate) }}%
-                              </span>
-                              <!-- <span>
+                              @if (saving.returnRate >= 0) {
+                                +
+                              }
+                              {{ formatReturnRate(saving.returnRate) }}%
+                            </span>
+                            <!-- <span>
                                                         NV: {{saving.nominalValue | thousandSeparator}}
                                                         RV: {{saving.realValue | thousandSeparator}}
                                                     </span> -->
-                            </div>
                           </div>
                         </div>
-                        <!-- End Status  -->
                       </div>
-                      <!-- End Content  -->
-                      <div class="d-flex align-items-center shrink-0">
-                        <!--  Chart  -->
-                        <div
-                          class="d-flex flex-column align-items-center chart-wrapper"
-                        >
-                          <div class="card-chart">
-                            @if (saving.isGrowing) {
-                              <img
-                                src="assets/images/shapes/dummy-green-graph.png"
-                                alt="dummy-green-graph"
-                              />
-                            } @else {
-                              <img
-                                src="assets/images/shapes/dummy-red-graph.png"
-                                alt="dummy-red-graph"
-                              />
-                            }
-                          </div>
-                          @if (hasPartner) {
-                            <div
-                              class="ibr-chart-tag"
-                              [ngClass]="getOwnershipBadgeModifierClass(saving)"
-                            >
-                              {{ "Ownership" | translate }}:
-                              <span>{{ getOwnershipBadgeCaption(saving) }}</span>
-                            </div>
+                      <!-- End Status  -->
+                    </div>
+                    <!-- End Content  -->
+                    <div class="d-flex align-items-center shrink-0">
+                      <!--  Chart  -->
+                      <div
+                        class="d-flex flex-column align-items-center chart-wrapper"
+                      >
+                        <div class="card-chart">
+                          @if (saving.isGrowing) {
+                            <img
+                              src="assets/images/shapes/dummy-green-graph.png"
+                              alt="dummy-green-graph"
+                            />
+                          } @else {
+                            <img
+                              src="assets/images/shapes/dummy-red-graph.png"
+                              alt="dummy-red-graph"
+                            />
                           }
                         </div>
-                        <!-- End Chart  -->
-                        <div>
+                        @if (hasPartner) {
+                          <div
+                            class="ibr-chart-tag"
+                            [ngClass]="getOwnershipBadgeModifierClass(saving)"
+                          >
+                            {{ "Ownership" | translate }}:
+                            <span>{{ getOwnershipBadgeCaption(saving) }}</span>
+                          </div>
+                        }
+                      </div>
+                      <!-- End Chart  -->
+                      <div>
+                        <button
+                          mat-icon-button
+                          [matMenuTriggerFor]="beforeMenu"
+                          aria-label="icon-button with a menu"
+                          type="button"
+                          class="dropdown-button"
+                          (click)="$event.stopPropagation()"
+                        >
+                          <mat-icon>
+                            <svg
+                              width="24"
+                              height="24"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M12 13C12.5523 13 13 12.5523 13 12C13 11.4477 12.5523 11 12 11C11.4477 11 11 11.4477 11 12C11 12.5523 11.4477 13 12 13Z"
+                                stroke="#5A596E"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                              />
+                              <path
+                                d="M12 6C12.5523 6 13 5.55228 13 5C13 4.44772 12.5523 4 12 4C11.4477 4 11 4.44772 11 5C11 5.55228 11.4477 6 12 6Z"
+                                stroke="#5A596E"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                              />
+                              <path
+                                d="M12 20C12.5523 20 13 19.5523 13 19C13 18.4477 12.5523 18 12 18C11.4477 18 11 18.4477 11 19C11 19.5523 11.4477 20 12 20Z"
+                                stroke="#5A596E"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                              />
+                            </svg>
+                          </mat-icon>
+                        </button>
+                        <mat-menu
+                          #beforeMenu="matMenu"
+                          xPosition="before"
+                          class="action-dropdown-menus"
+                        >
                           <button
-                            mat-icon-button
-                            [matMenuTriggerFor]="beforeMenu"
-                            aria-label="icon-button with a menu"
-                            type="button"
-                            class="dropdown-button"
-                            (click)="$event.stopPropagation()"
+                            mat-menu-item
+                            (click)="updateEventClicked(saving)"
                           >
                             <mat-icon>
                               <svg
-                                width="24"
-                                height="24"
-                                viewBox="0 0 24 24"
+                                width="20"
+                                height="20"
+                                viewBox="0 0 20 20"
                                 fill="none"
                                 xmlns="http://www.w3.org/2000/svg"
                               >
-                                <path
-                                  d="M12 13C12.5523 13 13 12.5523 13 12C13 11.4477 12.5523 11 12 11C11.4477 11 11 11.4477 11 12C11 12.5523 11.4477 13 12 13Z"
-                                  stroke="#5A596E"
-                                  stroke-width="2"
-                                  stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                />
-                                <path
-                                  d="M12 6C12.5523 6 13 5.55228 13 5C13 4.44772 12.5523 4 12 4C11.4477 4 11 4.44772 11 5C11 5.55228 11.4477 6 12 6Z"
-                                  stroke="#5A596E"
-                                  stroke-width="2"
-                                  stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                />
-                                <path
-                                  d="M12 20C12.5523 20 13 19.5523 13 19C13 18.4477 12.5523 18 12 18C11.4477 18 11 18.4477 11 19C11 19.5523 11.4477 20 12 20Z"
-                                  stroke="#5A596E"
-                                  stroke-width="2"
-                                  stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                />
+                                <g clip-path="url(#clip0_3194_409)">
+                                  <path
+                                    d="M9.16602 3.33203H3.33268C2.89065 3.33203 2.46673 3.50763 2.15417 3.82019C1.84161 4.13275 1.66602 4.55667 1.66602 4.9987V16.6654C1.66602 17.1074 1.84161 17.5313 2.15417 17.8439C2.46673 18.1564 2.89065 18.332 3.33268 18.332H14.9993C15.4414 18.332 15.8653 18.1564 16.1779 17.8439C16.4904 17.5313 16.666 17.1074 16.666 16.6654V10.832"
+                                    stroke="#5A596E"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                  />
+                                  <path
+                                    d="M15.416 2.08417C15.7475 1.75265 16.1972 1.56641 16.666 1.56641C17.1349 1.56641 17.5845 1.75265 17.916 2.08417C18.2475 2.41569 18.4338 2.86533 18.4338 3.33417C18.4338 3.80301 18.2475 4.25265 17.916 4.58417L9.99935 12.5008L6.66602 13.3342L7.49935 10.0008L15.416 2.08417Z"
+                                    stroke="#5A596E"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                  />
+                                </g>
+                                <defs>
+                                  <clipPath id="clip0_3194_409">
+                                    <rect width="20" height="20" fill="white" />
+                                  </clipPath>
+                                </defs>
                               </svg>
                             </mat-icon>
+                            <span>{{ "Edit" | translate }}</span>
                           </button>
-                          <mat-menu
-                            #beforeMenu="matMenu"
-                            xPosition="before"
-                            class="action-dropdown-menus"
-                          >
+                          @if (canDeleteSaving(saving)) {
                             <button
+                              class="action-dropdown-menus"
+                              (click)="deleteEventClicked(saving)"
                               mat-menu-item
-                              (click)="updateEventClicked(saving)"
                             >
                               <mat-icon>
                                 <svg
@@ -386,134 +423,91 @@
                                   fill="none"
                                   xmlns="http://www.w3.org/2000/svg"
                                 >
-                                  <g clip-path="url(#clip0_3194_409)">
-                                    <path
-                                      d="M9.16602 3.33203H3.33268C2.89065 3.33203 2.46673 3.50763 2.15417 3.82019C1.84161 4.13275 1.66602 4.55667 1.66602 4.9987V16.6654C1.66602 17.1074 1.84161 17.5313 2.15417 17.8439C2.46673 18.1564 2.89065 18.332 3.33268 18.332H14.9993C15.4414 18.332 15.8653 18.1564 16.1779 17.8439C16.4904 17.5313 16.666 17.1074 16.666 16.6654V10.832"
-                                      stroke="#5A596E"
-                                      stroke-width="2"
-                                      stroke-linecap="round"
-                                      stroke-linejoin="round"
-                                    />
-                                    <path
-                                      d="M15.416 2.08417C15.7475 1.75265 16.1972 1.56641 16.666 1.56641C17.1349 1.56641 17.5845 1.75265 17.916 2.08417C18.2475 2.41569 18.4338 2.86533 18.4338 3.33417C18.4338 3.80301 18.2475 4.25265 17.916 4.58417L9.99935 12.5008L6.66602 13.3342L7.49935 10.0008L15.416 2.08417Z"
-                                      stroke="#5A596E"
-                                      stroke-width="2"
-                                      stroke-linecap="round"
-                                      stroke-linejoin="round"
-                                    />
-                                  </g>
-                                  <defs>
-                                    <clipPath id="clip0_3194_409">
-                                      <rect
-                                        width="20"
-                                        height="20"
-                                        fill="white"
-                                      />
-                                    </clipPath>
-                                  </defs>
+                                  <path
+                                    d="M2.5 5H4.16667H17.5"
+                                    stroke="#5A596E"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                  />
+                                  <path
+                                    d="M15.8327 5.0013V16.668C15.8327 17.11 15.6571 17.5339 15.3445 17.8465C15.032 18.159 14.608 18.3346 14.166 18.3346H5.83268C5.39065 18.3346 4.96673 18.159 4.65417 17.8465C4.34161 17.5339 4.16602 17.11 4.16602 16.668V5.0013M6.66602 5.0013V3.33464C6.66602 2.89261 6.84161 2.46868 7.15417 2.15612C7.46673 1.84356 7.89065 1.66797 8.33268 1.66797H11.666C12.108 1.66797 12.532 1.84356 12.8445 2.15612C13.1571 2.46868 13.3327 2.89261 13.3327 3.33464V5.0013"
+                                    stroke="#5A596E"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                  />
+                                  <path
+                                    d="M8.33398 9.16797V14.168"
+                                    stroke="#5A596E"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                  />
+                                  <path
+                                    d="M11.666 9.16797V14.168"
+                                    stroke="#5A596E"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                  />
                                 </svg>
                               </mat-icon>
-                              <span>{{ "Edit" | translate }}</span>
+                              <span>{{ "Delete" | translate }}</span>
                             </button>
-                            @if (canDeleteSaving(saving)) {
-                              <button
-                                class="action-dropdown-menus"
-                                (click)="deleteEventClicked(saving)"
-                                mat-menu-item
-                              >
-                                <mat-icon>
-                                  <svg
-                                    width="20"
-                                    height="20"
-                                    viewBox="0 0 20 20"
-                                    fill="none"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                  >
-                                    <path
-                                      d="M2.5 5H4.16667H17.5"
-                                      stroke="#5A596E"
-                                      stroke-width="2"
-                                      stroke-linecap="round"
-                                      stroke-linejoin="round"
-                                    />
-                                    <path
-                                      d="M15.8327 5.0013V16.668C15.8327 17.11 15.6571 17.5339 15.3445 17.8465C15.032 18.159 14.608 18.3346 14.166 18.3346H5.83268C5.39065 18.3346 4.96673 18.159 4.65417 17.8465C4.34161 17.5339 4.16602 17.11 4.16602 16.668V5.0013M6.66602 5.0013V3.33464C6.66602 2.89261 6.84161 2.46868 7.15417 2.15612C7.46673 1.84356 7.89065 1.66797 8.33268 1.66797H11.666C12.108 1.66797 12.532 1.84356 12.8445 2.15612C13.1571 2.46868 13.3327 2.89261 13.3327 3.33464V5.0013"
-                                      stroke="#5A596E"
-                                      stroke-width="2"
-                                      stroke-linecap="round"
-                                      stroke-linejoin="round"
-                                    />
-                                    <path
-                                      d="M8.33398 9.16797V14.168"
-                                      stroke="#5A596E"
-                                      stroke-width="2"
-                                      stroke-linecap="round"
-                                      stroke-linejoin="round"
-                                    />
-                                    <path
-                                      d="M11.666 9.16797V14.168"
-                                      stroke="#5A596E"
-                                      stroke-width="2"
-                                      stroke-linecap="round"
-                                      stroke-linejoin="round"
-                                    />
-                                  </svg>
-                                </mat-icon>
-                                <span>{{ "Delete" | translate }}</span>
-                              </button>
-                            }
-                          </mat-menu>
-                        </div>
+                          }
+                        </mat-menu>
                       </div>
-                      @if (saving.hasPotLocked) {
-                        <div class="lock-overlay">
-                          <div
-                            class="d-flex align-items-center justify-content-center flex-column gap-10 h-100"
-                          >
-                            <!-- <img
+                    </div>
+                    @if (saving.hasPotLocked) {
+                      <div class="lock-overlay">
+                        <div
+                          class="d-flex align-items-center justify-content-center flex-column gap-10 h-100"
+                        >
+                          <!-- <img
                               src="assets/images/svgs/cashflow-lock-icon.svg"
                               alt="cashflow-lock-icon"
                             /> -->
 
-                            <svg
-                              width="32"
-                              height="32"
-                              viewBox="0 0 32 32"
-                              fill="none"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                d="M25.3333 14.666H6.66667C5.19391 14.666 4 15.8599 4 17.3327V26.666C4 28.1388 5.19391 29.3327 6.66667 29.3327H25.3333C26.8061 29.3327 28 28.1388 28 26.666V17.3327C28 15.8599 26.8061 14.666 25.3333 14.666Z"
-                                stroke="#787889"
-                                stroke-width="2.66667"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                              />
-                              <path
-                                d="M9.3335 14.666V9.33268C9.3335 7.56457 10.0359 5.86888 11.2861 4.61864C12.5364 3.36839 14.2321 2.66602 16.0002 2.66602C17.7683 2.66602 19.464 3.36839 20.7142 4.61864C21.9644 5.86888 22.6668 7.56457 22.6668 9.33268V14.666"
-                                stroke="#787889"
-                                stroke-width="2.66667"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                              />
-                            </svg>
-
-                            <h4 class="overlay-lock-text">
-                              {{ "Locked from" | translate }}
-                              {{ saving.lockedFrom.year }} to
-                              {{ saving.lockedTill.year }}
-                            </h4>
-                          </div>
-                          <div class="help-lock-overlay">
-                            <img
-                              src="assets/images/svgs/help-circle-lock-overlay.svg"
-                              alt="help-circle-lock-overlay"
+                          <svg
+                            width="32"
+                            height="32"
+                            viewBox="0 0 32 32"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M25.3333 14.666H6.66667C5.19391 14.666 4 15.8599 4 17.3327V26.666C4 28.1388 5.19391 29.3327 6.66667 29.3327H25.3333C26.8061 29.3327 28 28.1388 28 26.666V17.3327C28 15.8599 26.8061 14.666 25.3333 14.666Z"
+                              stroke="#787889"
+                              stroke-width="2.66667"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
                             />
-                          </div>
-                        </div>
-                      }
+                            <path
+                              d="M9.3335 14.666V9.33268C9.3335 7.56457 10.0359 5.86888 11.2861 4.61864C12.5364 3.36839 14.2321 2.66602 16.0002 2.66602C17.7683 2.66602 19.464 3.36839 20.7142 4.61864C21.9644 5.86888 22.6668 7.56457 22.6668 9.33268V14.666"
+                              stroke="#787889"
+                              stroke-width="2.66667"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            />
+                          </svg>
 
-                      <!-- <div class="edit-icon-overlay">
+                          <h4 class="overlay-lock-text">
+                            {{ "Locked from" | translate }}
+                            {{ saving.lockedFrom.year }} to
+                            {{ saving.lockedTill.year }}
+                          </h4>
+                        </div>
+                        <div class="help-lock-overlay">
+                          <img
+                            src="assets/images/svgs/help-circle-lock-overlay.svg"
+                            alt="help-circle-lock-overlay"
+                          />
+                        </div>
+                      </div>
+                    }
+
+                    <!-- <div class="edit-icon-overlay">
                         <button
                           mat-icon-button
                           (click)="
@@ -544,7 +538,7 @@
                           </button>
                         }
                       </div> -->
-                      <!-- <div class="edit-icon-overlay">
+                    <!-- <div class="edit-icon-overlay">
                                         </div> -->
                   </div>
                 </ng-template>
@@ -572,12 +566,12 @@
                           savingPotCardInner;
                           context: {
                             $implicit: saving,
-                            dragColumn: dragColumnForNonCashPot(i)
+                            dragColumn: dragColumnForNonCashPot(i),
                           }
                         "
                       ></ng-container>
 
-                      @if (savingPots?.clientSavings) {
+                      <!-- @if (savingPots?.clientSavings) {
                         <div class="d-flex flex-column gap-10 vote-btns">
                           @if (
                             fullIndexForNonCash(i) > 0 &&
@@ -648,7 +642,7 @@
                             </button>
                           }
                         </div>
-                      }
+                      } -->
                     </div>
                   }
                 </div>

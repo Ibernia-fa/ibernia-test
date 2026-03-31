@@ -178,12 +178,12 @@ html .customizerNav {
   width: 1px !important;
 }
 .vis-time-axis .vis-grid.vis-major {
-  border-width: 2px;
+  border-width: 1px !important;
   border-color: black !important;
   display: none;
 }
 .vis-time-axis .vis-grid.vis-minor {
-  border-width: 2px;
+  border-width: 1px !important;
   border-color: pink;
 }
 .vis-time-axis .vis-grid.vis-minor {

@@ -7,13 +7,14 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatDialogModule } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { TranslateModule } from '@ngx-translate/core';
 
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { NavItemService } from 'src/app/layouts/full/nav-item.service';
 import { DataPrivacyService } from './data-privacy.service';
+import { AccountClosureConfirmDialogComponent } from './account-closure-confirm-dialog/account-closure-confirm-dialog.component';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -37,7 +38,6 @@ export class PrivacyDataComponent implements OnInit, OnDestroy {
   user: any;
   isExporting = false;
   isTerminating = false;
-  showTerminateConfirm = false;
   readonly privacyPolicyUrl = 'https://ibernia.app/privacy';
   readonly termsUrl = 'https://ibernia.app/terms';
 
@@ -46,6 +46,7 @@ export class PrivacyDataComponent implements OnInit, OnDestroy {
     private auth: AuthService,
     private navItemService: NavItemService,
     private toastr: ToastrService,
+    private dialog: MatDialog,
   ) {
     this.navItemService.currentRouteName = 'Privacy & Data';
   }
@@ -348,6 +349,21 @@ export class PrivacyDataComponent implements OnInit, OnDestroy {
     }
   }
 
+  openAccountClosureConfirmDialog(): void {
+    if (this.isTerminating) return;
+
+    const dialogRef = this.dialog.open(AccountClosureConfirmDialogComponent, {
+      width: '612px',
+      disableClose: true,
+    });
+
+    dialogRef.afterClosed().subscribe((confirmed) => {
+      if (confirmed === true) {
+        this.terminateAccount();
+      }
+    });
+  }
+
   terminateAccount(): void {
     this.isTerminating = true;
 
@@ -363,7 +379,6 @@ export class PrivacyDataComponent implements OnInit, OnDestroy {
         finalize(() => (this.isTerminating = false)),
       )
       .subscribe((response) => {
-        this.showTerminateConfirm = false;
         this.toastr.success(response.message, 'Account Closure Initiated');
       });
   }

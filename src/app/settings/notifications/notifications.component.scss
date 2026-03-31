@@ -1,36 +1,59 @@
 .notification-page-mark-all {
-  border-radius: 10px !important;
-  font-weight: 600 !important;
-  border-width: 1.5px !important;
-  border-color: #cbd5e1 !important;
-  color: #334155 !important;
+  border-radius: 6px;
+  font-weight: 500;
+  color: #4043af;
+  border: none;
+  padding: 12px 20px;
+  background-color: transparent;
+  border: 1px solid #4043af;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  &:hover {
+    background-color: #4043af;
+    color: white;
+    transition: all 0.2s ease-in-out;
+  }
+}
+.new-notification-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 16px 0 0 16px;
 }
 
 .notification-center-list {
-  max-height: 480px;
-  overflow-y: auto;
+  overflow: hidden;
+  border-radius: 12px;
 
   .notification-center-item {
+    background-color: #ffffffb2 !important;
     display: block;
     width: 100%;
-    padding: 16px 0;
+    padding: 16px;
     text-align: left;
     background: none;
     border: none;
     cursor: pointer;
     transition: background 0.15s ease;
     &:hover {
-      background: rgba(15, 23, 42, 0.04);
+      background: #f5f7ff !important;
     }
     .notification-avatar {
       width: 44px;
       height: 44px;
       min-width: 44px;
-      background: #eef2ff;
+      background: #3824c71a;
       color: #4f46e5;
       &.birthday {
         background: #fdf2f8;
         color: #db2777;
+      }
+      &.rounded-circle {
+        border-radius: 12px !important;
       }
     }
 
@@ -41,14 +64,14 @@
 
     .notification-item-title {
       font-size: 14px;
-      font-weight: 700;
-      color: #0f172a;
+      font-weight: 600;
+      color: #1c1c1c;
     }
 
     .notification-item-preview {
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 400;
-      color: #64748b;
+      color: #464555;
       line-height: 1.45;
     }
 
@@ -61,12 +84,13 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 2px 10px;
+      padding: 2px 8px;
       border-radius: 999px;
       font-size: 11px;
       font-weight: 500;
-      border: 1px solid #e2e8f0;
+      // border: 1px solid #e2e8f0;
       color: #64748b;
+      background-color: #4231cf1a;
       &::before {
         content: "";
         width: 6px;
@@ -105,5 +129,14 @@
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
+  }
+}
+
+.new-notifcation-headings {
+  h3 {
+    color: #1c1c1c;
+  }
+  p {
+    color: #5a596e;
   }
 }

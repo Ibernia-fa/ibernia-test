@@ -1,25 +1,44 @@
-.main-header-content{
-    .header-icon{
-        margin-right: 10px;
-    }
-    h2{
-        margin-bottom: 10px;
-    }
+.pricing-container {
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 16px 0 0 16px;
 }
-.logo-update-wrapper{
-    position: relative;
-    width: 200px;
-    height: 100%;
-    display: flex
-;
-    align-items: center;
-    justify-content: center;
-    img{
-        max-width: 100%;
-    }
-    .delete-icon{
-          
-position: absolute;
+.uploader-text {
+  color: #1c1c1c;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 100%;
+  margin: 0;
+}
+.uploader-files {
+  color: #5a596e;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 100%;
+  margin: 0;
+}
+.main-header-content {
+  .header-icon {
+    margin-right: 10px;
+  }
+  h2 {
+    margin-bottom: 10px;
+  }
+}
+.logo-update-wrapper {
+  position: relative;
+  width: 200px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  img {
+    max-width: 100%;
+  }
+  .delete-icon {
+    position: absolute;
     right: -14px;
     top: -14px;
     border: 1px solid #ccc;
@@ -27,57 +46,52 @@ position: absolute;
     width: 28px;
     height: 28px;
     text-align: center;
-    display: flex
-;
+    display: flex;
     align-items: center;
     justify-content: center;
     background: white;
     cursor: pointer;
 
-
-
-
-        &:hover{
-             background-color: #ffb4b4;
-        border-color: #ffb4b4;
-        }
+    &:hover {
+      background-color: #ffb4b4;
+      border-color: #ffb4b4;
     }
+  }
 }
 
 .upload-background-wrapper,
-.upload-avatar-wrapper{
-    border: 2px dashed #d5d5d5 ;
-    padding: 15px;
-    border-radius: 4px;
-    width: 200px;
-    height: 171px;
-    font-size: 14px;
-    line-height: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.upload-avatar-wrapper {
+  border: 1px dashed #0000001a;
+  padding: 15px;
+  background-color: #ffffffb2;
+  border-radius: 12px;
+  //   width: 200px;
+  height: 170px;
+  font-size: 14px;
+  line-height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-    &.upload-background,
-    &.upload-company-avatar{
-        width: 400px;
-        margin: auto;
-    }
-    small{
-        color: #B7B6C2;
-    }
+  //   &.upload-background,
+  //   &.upload-company-avatar {
+  //     // width: 400px;
+  //     // margin: auto;
+  //   }
+  small {
+    color: #b7b6c2;
+  }
 }
 
-.bor-w-2{
-    border-width: 2px !important ;
-    border-radius: 4px !important ;
-    border-color: #d5d5d5 !important
+.bor-w-2 {
+  border-width: 2px !important ;
+  border-radius: 4px !important ;
+  border-color: #d5d5d5 !important;
 }
 
 /* Shared uploader styles (use in both components) */
 
-
 .image-preview-wrapper {
-
   width: 120px;
   height: 120px;
 }
@@ -98,48 +112,48 @@ position: absolute;
 }
 
 .crop-pic {
-    position: absolute;
-    left: -12px;
-    bottom: -12px;
-    border: 1px solid #ccc;
-    border-radius: 100px;
-    width: 28px;
-    height: 28px;
-    text-align: center;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: white;
-    cursor: pointer;
-    mat-icon {
-        font-size: 18px;
-        width: 18px;
-        height: 18px;
-    }
-    &:hover {
-        background-color: #e3f2fd;
-        border-color: #2196f3;
-    }
+  position: absolute;
+  left: -12px;
+  bottom: -12px;
+  border: 1px solid #ccc;
+  border-radius: 100px;
+  width: 28px;
+  height: 28px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  cursor: pointer;
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+  &:hover {
+    background-color: #e3f2fd;
+    border-color: #2196f3;
+  }
 }
 
 .remove-pic {
-    position: absolute;
-    right: -14px;
-    top: -16px;
-    border: 1px solid #ccc;
-    border-radius: 100px;
-    width: 28px;
-    height: 28px;
-    text-align: center;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: white;
-    cursor: pointer;
-      &:hover{
-        background-color: #ffb4b4;
-        border-color: #ffb4b4;
-    }
+  position: absolute;
+  right: -14px;
+  top: -16px;
+  border: 1px solid #ccc;
+  border-radius: 100px;
+  width: 28px;
+  height: 28px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  cursor: pointer;
+  &:hover {
+    background-color: #ffb4b4;
+    border-color: #ffb4b4;
+  }
 }
 
 @media (max-width: 768px) {
@@ -155,4 +169,8 @@ position: absolute;
     width: 26px;
     height: 26px;
   }
+}
+
+.pull-right {
+  min-width: 135px;
 }

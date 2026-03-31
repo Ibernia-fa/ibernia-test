@@ -15,7 +15,11 @@ import { formatLifetimePlanSeriesDisplayName } from 'src/app/shared/utils/lifeti
 import { MatCardModule } from '@angular/material/card';
 import { TablerIconsModule } from 'angular-tabler-icons';
 import { ChartComponent, NgApexchartsModule } from 'ng-apexcharts';
-import { ChartSeries, Series, TimelineEvent } from '../models/charts-series.model';
+import {
+  ChartSeries,
+  Series,
+  TimelineEvent,
+} from '../models/charts-series.model';
 import { ensureUniqueSavingsChartSeriesColors } from 'src/app/shared/utils/unique-savings-chart-series-colors';
 import { Client } from 'src/app/clients/models/client';
 import moment from 'moment';
@@ -286,9 +290,7 @@ export class SavingsBarStackedChartComponent
    * Fires when ng-apexcharts finishes creating the instance (report may load after view init).
    */
   onApexChartReady(): void {
-    this.ngZone.runOutsideAngular(() =>
-      this.flushApexChartWidthAfterLayout(),
-    );
+    this.ngZone.runOutsideAngular(() => this.flushApexChartWidthAfterLayout());
   }
 
   /**
@@ -372,13 +374,13 @@ export class SavingsBarStackedChartComponent
     if (!report?.series?.length) {
       this.seriesColorsForTooltip = [];
       if (changes['client'] && this.client) {
-      this.chartOptions.yaxis = {
-        title: { text: '' },
-        labels: {
-          formatter: (value: any) =>
-            value != null ? Number(value).toLocaleString() : '',
-        },
-      };
+        this.chartOptions.yaxis = {
+          title: { text: '' },
+          labels: {
+            formatter: (value: any) =>
+              value != null ? Number(value).toLocaleString() : '',
+          },
+        };
       }
       return;
     }
@@ -688,8 +690,7 @@ export class SavingsBarStackedChartComponent
     label.className = 'y-axis-top-label';
     chartHost.appendChild(label);
 
-    const labelTop =
-      legendRect.top - hostRect.top + legendRect.height / 2 - 7;
+    const labelTop = legendRect.top - hostRect.top + legendRect.height / 2 - 7;
 
     let labelLeft = 10;
     if (yAxisTexts) {
@@ -705,7 +706,6 @@ export class SavingsBarStackedChartComponent
 
     this.yAxisLabelEl = label;
   }
-
 
   buildEventAnnotations(events: TimelineEvent[]) {
     const eventsByYear = new Map<string, TimelineEvent[]>();
@@ -1193,7 +1193,7 @@ export class SavingsBarStackedChartComponent
     'education-icon': '#00c8b3',
     'new-business-icon': '#34c759',
     'boat-icon': '#ff7504',
-    'custom-icon': '#0088ff',
+    'custom-icon': '#8388ff',
   };
 
   calculateDotColor(iconUrl: string): string {

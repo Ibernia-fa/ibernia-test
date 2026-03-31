@@ -1,74 +1,307 @@
 <div class="privacy-container">
-  <div class="privacy-header">
+  <!-- <div class="privacy-header">
     <h2>Privacy & Data</h2>
-    <p class="subtitle">
-      Export your data or manage your account closure.
-    </p>
-  </div>
+    <p class="subtitle">Export your data or manage your account closure.</p>
+  </div> -->
 
   <!-- Legal Links -->
-  <mat-card class="privacy-card legal-links-card">
+  <!-- <mat-card class="privacy-card legal-links-card ibr-new-dashboad-card"> -->
+  <mat-card class="ibr-new-dashboad-card">
     <mat-card-content>
+      <div class="d-flex flex-column gap-10 m-b-16">
+        <h3 class="ibr-new-heading">Privacy & Data</h3>
+        <p class="ibr-new-subheading">
+          Export your data or manage your account closure.
+        </p>
+      </div>
       <div class="legal-links">
-        <a [href]="privacyPolicyUrl" target="_blank" rel="noopener" class="legal-link">
-          <mat-icon>shield</mat-icon>
-          <span>Privacy Policy</span>
-          <mat-icon class="link-arrow">chevron_right</mat-icon>
+        <a
+          [href]="privacyPolicyUrl"
+          target="_blank"
+          rel="noopener"
+          class="legal-link"
+        >
+          <div class="d-flex align-items-center gap-12">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M4 3H20C20.5304 3 21.0391 3.21071 21.4142 3.58579C21.7893 3.96086 22 4.46957 22 5V11C22 13.6522 20.9464 16.1957 19.0711 18.0711C17.1957 19.9464 14.6522 21 12 21C10.6868 21 9.38642 20.7413 8.17317 20.2388C6.95991 19.7362 5.85752 18.9997 4.92893 18.0711C3.05357 16.1957 2 13.6522 2 11V5C2 4.46957 2.21071 3.96086 2.58579 3.58579C2.96086 3.21071 3.46957 3 4 3Z"
+                stroke="#1C1C1C"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M8 10L12 14L16 10"
+                stroke="#1C1C1C"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+            <!-- <mat-icon>shield</mat-icon> -->
+            <span>Privacy Policy</span>
+          </div>
+
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M5 12H19"
+              stroke="#A6ABB2"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M12 5L19 12L12 19"
+              stroke="#A6ABB2"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
         </a>
-        <mat-divider></mat-divider>
+        <!-- <mat-divider></mat-divider> -->
         <a [href]="termsUrl" target="_blank" rel="noopener" class="legal-link">
-          <mat-icon>description</mat-icon>
+          <div class="d-flex align-items-center gap-12">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M4 3H20C20.5304 3 21.0391 3.21071 21.4142 3.58579C21.7893 3.96086 22 4.46957 22 5V11C22 13.6522 20.9464 16.1957 19.0711 18.0711C17.1957 19.9464 14.6522 21 12 21C10.6868 21 9.38642 20.7413 8.17317 20.2388C6.95991 19.7362 5.85752 18.9997 4.92893 18.0711C3.05357 16.1957 2 13.6522 2 11V5C2 4.46957 2.21071 3.96086 2.58579 3.58579C2.96086 3.21071 3.46957 3 4 3Z"
+                stroke="#1C1C1C"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M8 10L12 14L16 10"
+                stroke="#1C1C1C"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+            <!-- <mat-icon>shield</mat-icon> -->
+            <span>Terms and Conditions</span>
+          </div>
+
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M5 12H19"
+              stroke="#A6ABB2"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M12 5L19 12L12 19"
+              stroke="#A6ABB2"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          <!-- <mat-icon>description</mat-icon>
           <span>Terms and Conditions</span>
-          <mat-icon class="link-arrow">chevron_right</mat-icon>
+          <mat-icon class="link-arrow">chevron_right</mat-icon> -->
         </a>
       </div>
     </mat-card-content>
   </mat-card>
 
   <!-- Data Export -->
-  <mat-card class="privacy-card">
-    <mat-card-header>
-      <mat-icon mat-card-avatar class="card-icon">download</mat-icon>
-      <mat-card-title>Export Your Data</mat-card-title>
-      <mat-card-subtitle>Download a complete copy of your data</mat-card-subtitle>
-    </mat-card-header>
+  <mat-card class="ibr-new-dashboad-card">
     <mat-card-content>
-      <p>
-        Download a complete archive containing all personal data we hold about you and your clients.
-        The archive includes an Excel spreadsheet with your data and any associated images.
-      </p>
-      <button
-        mat-flat-button
-        color="primary"
-        (click)="exportMyData()"
-        [disabled]="isExporting"
-      >
-        <mat-icon *ngIf="!isExporting">download</mat-icon>
-        <mat-spinner *ngIf="isExporting" diameter="20" class="inline-spinner"></mat-spinner>
-        {{ isExporting ? 'Exporting...' : 'Export My Data' }}
-      </button>
+      <div class="exporting-section">
+        <div class="text-wrapper d-flex flex-column gap-10">
+          <div class="d-flex flex-column gap-10">
+            <h3 class="ibr-new-heading">Export Your Data</h3>
+            <p class="ibr-new-subheading">
+              Download a complete copy of your data
+            </p>
+          </div>
+          <p class="info-text">
+            Download a complete archive containing all personal data we hold
+            about you and your clients. The archive includes an Excel
+            spreadsheet with your data and any associated images.
+          </p>
+        </div>
+        <!-- mat-flat-button
+        color="primary" -->
+        <button
+        type="button"
+          class="privacy-export-data-btn"
+          (click)="exportMyData()"
+          [disabled]="isExporting"
+        >
+          <svg
+            *ngIf="!isExporting"
+            class="privacy-export-data-btn__icon"
+            width="20"
+            height="20"
+            viewBox="0 0 20 20"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+          >
+            <path
+              d="M17.5 12.5V15.8333C17.5 16.2754 17.3244 16.6993 17.0118 17.0118C16.6993 17.3244 16.2754 17.5 15.8333 17.5H4.16667C3.72464 17.5 3.30072 17.3244 2.98816 17.0118C2.67559 16.6993 2.5 16.2754 2.5 15.8333V12.5"
+              stroke="white"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M5.83325 8.33203L9.99992 12.4987L14.1666 8.33203"
+              stroke="white"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M10 12.5V2.5"
+              stroke="white"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          <mat-spinner
+            *ngIf="isExporting"
+            diameter="20"
+            class="inline-spinner"
+          ></mat-spinner>
+          {{ isExporting ? "Exporting..." : "Export My Data" }}
+        </button>
+      </div>
     </mat-card-content>
   </mat-card>
 
   <!-- Account Closure -->
-  <mat-card class="privacy-card account-closure-card">
+  <mat-card class="ibr-new-dashboad-card">
+    <mat-card-content>
+      <div class="exporting-section">
+        <div class="text-wrapper d-flex flex-column gap-10">
+          <div class="d-flex flex-column gap-10">
+            <h3 class="ibr-new-heading">Account Closure</h3>
+            <p class="ibr-new-subheading">
+              Initiate the post-termination data lifecycle
+            </p>
+          </div>
+          <p class="info-text">
+            If you wish to close your account, the following lifecycle applies
+            per our Terms of Service (§8.3):
+          </p>
+          <ol class="lifecycle-steps">
+            <li>
+              <strong>Export window (60 days):</strong> Your account converts to
+              read-only mode. You may download all your data.
+            </li>
+            <li>
+              <strong>Active deletion (30 days):</strong> All data is deleted or
+              anonymised from active systems.
+            </li>
+            <li>
+              <strong>Backup removal (up to 90 days):</strong> Encrypted backup
+              copies are overwritten.
+            </li>
+          </ol>
+
+          <!-- <p class="closure-warning">
+            Please ensure you have exported any records needed for your own
+            regulatory record-keeping obligations before proceeding. This action
+            cannot be easily reversed.
+          </p> -->
+        </div>
+        <div class="ibr-destructive-btn">
+          <button
+            type="button"
+            (click)="openAccountClosureConfirmDialog()"
+            [disabled]="isTerminating"
+          >
+            <mat-spinner
+              *ngIf="isTerminating"
+              diameter="20"
+              class="inline-spinner"
+            ></mat-spinner>
+            <ng-container *ngIf="!isTerminating">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="lucide lucide-trash2-icon lucide-trash-2"
+              >
+                <path d="M10 11v6" />
+                <path d="M14 11v6" />
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
+                <path d="M3 6h18" />
+                <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+              </svg>
+            </ng-container>
+            {{ isTerminating ? "Processing..." : "Request Account Closure" }}
+          </button>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+  <!-- <mat-card class="privacy-card account-closure-card">
     <mat-card-header>
       <mat-icon mat-card-avatar class="card-icon danger-icon">warning</mat-icon>
       <mat-card-title>Account Closure</mat-card-title>
-      <mat-card-subtitle>Initiate the post-termination data lifecycle</mat-card-subtitle>
+      <mat-card-subtitle
+        >Initiate the post-termination data lifecycle</mat-card-subtitle
+      >
     </mat-card-header>
     <mat-card-content>
       <p>
-        If you wish to close your account, the following lifecycle applies per our Terms of Service (§8.3):
+        If you wish to close your account, the following lifecycle applies per
+        our Terms of Service (§8.3):
       </p>
       <ol class="lifecycle-steps">
-        <li><strong>Export window (60 days):</strong> Your account converts to read-only mode. You may download all your data.</li>
-        <li><strong>Active deletion (30 days):</strong> All data is deleted or anonymised from active systems.</li>
-        <li><strong>Backup removal (up to 90 days):</strong> Encrypted backup copies are overwritten.</li>
+        <li>
+          <strong>Export window (60 days):</strong> Your account converts to
+          read-only mode. You may download all your data.
+        </li>
+        <li>
+          <strong>Active deletion (30 days):</strong> All data is deleted or
+          anonymised from active systems.
+        </li>
+        <li>
+          <strong>Backup removal (up to 90 days):</strong> Encrypted backup
+          copies are overwritten.
+        </li>
       </ol>
       <p class="closure-warning">
-        Please ensure you have exported any records needed for your own regulatory record-keeping
-        obligations before proceeding. This action cannot be easily reversed.
+        Please ensure you have exported any records needed for your own
+        regulatory record-keeping obligations before proceeding. This action
+        cannot be easily reversed.
       </p>
 
       <div *ngIf="!showTerminateConfirm">
@@ -83,7 +316,10 @@
       </div>
 
       <div *ngIf="showTerminateConfirm" class="confirm-section">
-        <p class="confirm-text">Are you sure you want to close your account? This will start the data deletion process.</p>
+        <p class="confirm-text">
+          Are you sure you want to close your account? This will start the data
+          deletion process.
+        </p>
         <div class="confirm-actions">
           <button
             mat-flat-button
@@ -91,8 +327,12 @@
             (click)="terminateAccount()"
             [disabled]="isTerminating"
           >
-            <mat-spinner *ngIf="isTerminating" diameter="20" class="inline-spinner"></mat-spinner>
-            {{ isTerminating ? 'Processing...' : 'Confirm Account Closure' }}
+            <mat-spinner
+              *ngIf="isTerminating"
+              diameter="20"
+              class="inline-spinner"
+            ></mat-spinner>
+            {{ isTerminating ? "Processing..." : "Confirm Account Closure" }}
           </button>
           <button
             mat-stroked-button
@@ -104,5 +344,5 @@
         </div>
       </div>
     </mat-card-content>
-  </mat-card>
+  </mat-card> -->
 </div>

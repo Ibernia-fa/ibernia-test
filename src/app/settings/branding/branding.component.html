@@ -1,142 +1,192 @@
-<div class="language-loader" *ngIf="isSaving">
-  <div class="spinner"></div>
-  <h2>{{ 'Saving branding...' | translate }}</h2>
-</div>
+<div class="pricing-container">
+  <div class="language-loader" *ngIf="isSaving">
+    <div class="spinner"></div>
+    <h2>{{ "Saving branding..." | translate }}</h2>
+  </div>
 
-<div class="language-loader" *ngIf="isUploading">
-  <div class="spinner"></div>
-  <h2>{{ 'Loading...' | translate }}</h2>
-</div>
+  <div class="language-loader" *ngIf="isUploading">
+    <div class="spinner"></div>
+    <h2>{{ "Loading..." | translate }}</h2>
+  </div>
 
-<mat-card class="mat-mdc-card mdc-card cardWithShadow mb-20">
+  <!-- <mat-card class="mat-mdc-card mdc-card cardWithShadow mb-20">
   <mat-card-content class="mat-mdc-card-content">
     <div class="d-flex align-items-center main-header-content gap-10">
       <div class="icon-wrapper d-flex align-items-center justify-content-center">
 <img width="22" src="../../../assets/images/shapes/branding-active.svg" alt="">
-      </div>
-      <!-- <div class="header-icon">
+      </div> -->
+  <!-- <div class="header-icon">
         <img width="56" src="../../../assets/images/shapes/small-icon-7.svg" alt="">
       </div> -->
-      <div class="d-flex flex-column justify-content-between gap-4">
+  <!-- <div class="d-flex flex-column justify-content-between gap-4">
         <h4 class="page-title f-w-500">{{ 'Branding' | translate }}</h4>
         <span class="sub-title">{{ 'Personalize Ibernia' | translate }}</span>
       </div>
     </div>
   </mat-card-content>
-</mat-card>
+</mat-card> -->
 
+  <!-- branding.component.html -->
 
-<!-- branding.component.html -->
+  <mat-card class="ibr-new-dashboad-card">
+    <mat-card-content>
+      <div class="d-flex flex-column gap-10 m-b-16">
+        <h3 class="ibr-new-heading">{{ "Company logo" | translate }}</h3>
+        <p class="ibr-new-subheading">
+          {{
+            "Upload your company logo to display it in the top-left corner. For best results, use a horizontal logo with a white background."
+              | translate
+          }}
+        </p>
+      </div>
 
-
-
-<mat-card class="mat-mdc-card mdc-card cardWithShadow mb-20">
-  <mat-card-content class="mat-mdc-card-content">
-    <h3 class="f-s-20 f-w-400 m-b-5">{{ 'Company logo' | translate }}</h3>
-    <p class="f-s-14 m-b-20 p-t-0 m-t-0">
-      {{ 'Upload your company logo to display it in the top-left corner. For best results, use a horizontal logo with a white background.' | translate }}
-    </p>
-
-    <div class="upload-avatar-wrapper upload-company-avatar position-relative m-b-20">
-      <label for="company-logo-input" class="cursor-pointer">
-        <div class="text-center">
-          <!-- WHEN an image is present, show preview with delete (same as Profile) -->
-          <div *ngIf="profileImage; else placeholder" class="image-preview-wrapper company-logo-preview position-relative">
-            <img
-              [src]="profileImage"
-              alt="company logo preview"
-              class="company-logo-preview__img"
-            />
-            <span class="crop-pic" (click)="cropImage($event)" matTooltip="{{ 'Crop' | translate }}">
-              <mat-icon>crop</mat-icon>
-            </span>
-            <span class="remove-pic" (click)="clearImage($event, 'profile')">
-              <img src="../../../assets/images/shapes/delete.svg" alt="delete">
-            </span>
-          </div>
-
-          <!-- ELSE show the selection UI -->
-          <ng-template #placeholder>
-            <img class="m-b-10" src="../../../assets/images/shapes/small-icon.svg" alt="">
-            <p class="text-sm text-gray-500 f-s-14 m-b-10 m-0">
-              {{ 'Click to upload logo' | translate }}
-            </p>
-            <small class="text-xs text-gray-400 f-s-12 m-0">
-              {{ 'PNG, JPG or JPEG (max. 5MB)' | translate }}
-            </small>
-          </ng-template>
-        </div>
-      </label>
-
-      <!-- Hidden input; reset value after each use so same file can be reselected -->
-      <input
-        #companyLogoInput
-        id="company-logo-input"
-        type="file"
-        accept=".png,.jpg,.jpeg,image/png,image/jpeg,image/jpg"
-        hidden
-        (change)="onFileSelected($event, 'profile')"
-      />
-    </div>
-  </mat-card-content>
-</mat-card>
-
-<mat-card class="mat-mdc-card mdc-card cardWithShadow mb-20">
-  <mat-card-content class="mat-mdc-card-content">
-    <h3 class="f-s-20 f-w-400 m-b-5">{{ 'Custom background' | translate }}</h3>
-    <p class="f-s-14 m-b-20 p-t-0 m-t-0">
-      {{ 'Upload your custom background to personalize the client experience and keep your brand consistent across every screen.' | translate }}
-    </p>
-
-    <div class="upload-background-wrapper upload-background position-relative m-b-20">
-      <label for="background-input" class="cursor-pointer">
-        <div class="text-center">
-          <!-- WHEN an image is present, show preview with delete (same as Profile) -->
-          <div *ngIf="backgroundImage; else backgroundPlaceholder" class="image-preview-wrapper position-relative">
-            <img
-              [src]="backgroundImage"
-              alt="background preview"
-              class="rounded"
-              style="width:120px;height:120px;object-fit:cover;"
-            />
-            <span class="remove-pic" (click)="clearImage($event, 'background')">
-              <img src="../../../assets/images/shapes/delete.svg" alt="delete">
-            </span>
-          </div>
-
-          <!-- ELSE show the selection UI -->
-          <ng-template #backgroundPlaceholder>
-            <img class="m-b-10" src="../../../assets/images/shapes/small-icon.svg" alt="">
-            <p class="text-sm text-gray-500 f-s-14 m-b-10 m-0">
-              {{ 'Click to upload background image' | translate }}
-            </p>
-            <small class="text-xs text-gray-400 f-s-12 m-0">
-              {{ 'PNG, JPG or JPEG (max. 5MB)' | translate }}<br>{{ 'Background min. 800×400px' | translate }}
-            </small>
-          </ng-template>
-        </div>
-      </label>
-
-      <!-- Hidden input; reset value after each use so same file can be reselected -->
-      <input
-        #backgroundInput
-        id="background-input"
-        type="file"
-        accept=".png,.jpg,.jpeg,image/png,image/jpeg,image/jpg"
-        hidden
-        (change)="onFileSelected($event, 'background')"
-      />
-    </div>
-
-    <div class="mt-4 text-right">
-      <button
-        class="button-icon pull-right"
-        type="button"
-        (click)="save()"
-        [disabled]="!hasChanges || isLoading || isSaving"
+      <div
+        class="upload-avatar-wrapper upload-company-avatar position-relative"
       >
-        <span>{{ isSaving ? ('Saving…' | translate) : ('Save' | translate) }}</span>
-      </button>
-    </div>
-  </mat-card-content>
-</mat-card>
+        <label for="company-logo-input" class="cursor-pointer">
+          <div class="text-center">
+            <!-- WHEN an image is present, show preview with delete (same as Profile) -->
+            <div
+              *ngIf="profileImage; else placeholder"
+              class="image-preview-wrapper company-logo-preview position-relative"
+            >
+              <img
+                [src]="profileImage"
+                alt="company logo preview"
+                class="company-logo-preview__img"
+              />
+              <span
+                class="crop-pic"
+                (click)="cropImage($event)"
+                matTooltip="{{ 'Crop' | translate }}"
+              >
+                <mat-icon>crop</mat-icon>
+              </span>
+              <span class="remove-pic" (click)="clearImage($event, 'profile')">
+                <img
+                  src="../../../assets/images/shapes/delete.svg"
+                  alt="delete"
+                />
+              </span>
+            </div>
+
+            <!-- ELSE show the selection UI -->
+            <ng-template #placeholder>
+              <div class="d-flex flex-column gap-14">
+                <div class="d-flex justify-content-center align-items-center">
+                  <img
+                    src="../../../assets/images/shapes/new-upload-icon.svg"
+                    alt="new-upload-icon"
+                  />
+                </div>
+                <p class="uploader-text">
+                  {{ "Click to upload logo" | translate }}
+                </p>
+                <small class="uploader-files">
+                  {{ "PNG, JPG or JPEG (max. 5MB)" | translate }}
+                </small>
+              </div>
+            </ng-template>
+          </div>
+        </label>
+
+        <!-- Hidden input; reset value after each use so same file can be reselected -->
+        <input
+          #companyLogoInput
+          id="company-logo-input"
+          type="file"
+          accept=".png,.jpg,.jpeg,image/png,image/jpeg,image/jpg"
+          hidden
+          (change)="onFileSelected($event, 'profile')"
+        />
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="ibr-new-dashboad-card">
+    <mat-card-content>
+      <div class="d-flex flex-column gap-10 m-b-16">
+        <h3 class="ibr-new-heading">{{ "Custom background" | translate }}</h3>
+        <p class="ibr-new-subheading">
+          {{
+            "Upload your custom background to personalize the client experience and keep your brand consistent across every screen."
+              | translate
+          }}
+        </p>
+      </div>
+
+      <div
+        class="upload-background-wrapper upload-background position-relative"
+      >
+        <label for="background-input" class="cursor-pointer">
+          <div class="text-center">
+            <!-- WHEN an image is present, show preview with delete (same as Profile) -->
+            <div
+              *ngIf="backgroundImage; else backgroundPlaceholder"
+              class="image-preview-wrapper position-relative"
+            >
+              <img
+                [src]="backgroundImage"
+                alt="background preview"
+                class="rounded"
+                style="width: 120px; height: 120px; object-fit: cover"
+              />
+              <span
+                class="remove-pic"
+                (click)="clearImage($event, 'background')"
+              >
+                <img
+                  src="../../../assets/images/shapes/delete.svg"
+                  alt="delete"
+                />
+              </span>
+            </div>
+
+            <!-- ELSE show the selection UI -->
+            <ng-template #backgroundPlaceholder>
+              <div class="d-flex flex-column gap-14">
+                <div class="d-flex justify-content-center align-items-center">
+                  <img
+                    src="../../../assets/images/shapes/new-upload-icon.svg"
+                    alt="new-upload-icon"
+                  />
+                </div>
+                <p class="uploader-text">
+                  {{ "Click to upload background image" | translate }}
+                </p>
+                <small class="uploader-files" style="line-height: 22px">
+                  {{ "PNG, JPG or JPEG (max. 5MB)" | translate }}<br />{{
+                    "Background min. 800×400px" | translate
+                  }}
+                </small>
+              </div>
+            </ng-template>
+          </div>
+        </label>
+
+        <!-- Hidden input; reset value after each use so same file can be reselected -->
+        <input
+          #backgroundInput
+          id="background-input"
+          type="file"
+          accept=".png,.jpg,.jpeg,image/png,image/jpeg,image/jpg"
+          hidden
+          (change)="onFileSelected($event, 'background')"
+        />
+      </div>
+
+      <div class="m-t-16">
+        <button
+          class="button-icon pull-right"
+          type="button"
+          (click)="save()"
+          [disabled]="!hasChanges || isLoading || isSaving"
+        >
+          <span class="f-s-16">{{
+            isSaving ? ("Saving…" | translate) : ("Save" | translate)
+          }}</span>
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
