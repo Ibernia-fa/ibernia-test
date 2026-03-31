@@ -531,21 +531,110 @@ export class ReportsComponent {
   }
 
   regenerateInsights(): void {
-    if (!this.cashflow?.id || this.insightsLimitExceeded) return;
+    if (!this.cashflow?.id || this.insightsLimitExceeded) {
+      // #region agent log
+      fetch('http://127.0.0.1:7465/ingest/9753e61c-3583-48b3-aac4-63e35a17e932',{
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json',
+          'X-Debug-Session-Id':'84984c'
+        },
+        body:JSON.stringify({
+          sessionId:'84984c',
+          runId:'reports-regenerate',
+          hypothesisId:'A',
+          location:'reports.component.ts:regenerateInsights',
+          message:'regenerateInsights early-exit',
+          data:{
+            hasCashflow:!!this.cashflow?.id,
+            insightsLimitExceeded:this.insightsLimitExceeded
+          },
+          timestamp:Date.now()
+        })
+      }).catch(()=>{});
+      // #endregion agent log
+      return;
+    }
+
     const cashflowId = this.cashflow.id;
     this.insightsLoading = true;
     this.insights = [];
+
+    // #region agent log
+    fetch('http://127.0.0.1:7465/ingest/9753e61c-3583-48b3-aac4-63e35a17e932',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'X-Debug-Session-Id':'84984c'
+      },
+      body:JSON.stringify({
+        sessionId:'84984c',
+        runId:'reports-regenerate',
+        hypothesisId:'B',
+        location:'reports.component.ts:regenerateInsights',
+        message:'regenerateInsights start',
+        data:{
+          cashflowId,
+          previousInsightsCount:this.insights.length
+        },
+        timestamp:Date.now()
+      })
+    }).catch(()=>{});
+    // #endregion agent log
 
     this.aiRecommendationsHttpService
       .analyzePlan({ cashflowId })
       .subscribe({
         next: (data) => {
           const items = data.recommendations ?? [];
+
+          // #region agent log
+          fetch('http://127.0.0.1:7465/ingest/9753e61c-3583-48b3-aac4-63e35a17e932',{
+            method:'POST',
+            headers:{
+              'Content-Type':'application/json',
+              'X-Debug-Session-Id':'84984c'
+            },
+            body:JSON.stringify({
+              sessionId:'84984c',
+              runId:'reports-regenerate',
+              hypothesisId:'C',
+              location:'reports.component.ts:regenerateInsights',
+              message:'regenerateInsights success',
+              data:{
+                rawCount:items.length
+              },
+              timestamp:Date.now()
+            })
+          }).catch(()=>{});
+          // #endregion agent log
+
           this.insights = items.slice(0, 6);
           this.insightsLoading = false;
           this.insightsLoadAttempted = true;
         },
         error: (err) => {
+          // #region agent log
+          fetch('http://127.0.0.1:7465/ingest/9753e61c-3583-48b3-aac4-63e35a17e932',{
+            method:'POST',
+            headers:{
+              'Content-Type':'application/json',
+              'X-Debug-Session-Id':'84984c'
+            },
+            body:JSON.stringify({
+              sessionId:'84984c',
+              runId:'reports-regenerate',
+              hypothesisId:'D',
+              location:'reports.component.ts:regenerateInsights',
+              message:'regenerateInsights error',
+              data:{
+                status:err?.status ?? null
+              },
+              timestamp:Date.now()
+            })
+          }).catch(()=>{});
+          // #endregion agent log
+
           this.insightsLoading = false;
           this.insightsLoadAttempted = true;
           if (err?.status === 429) {
