@@ -138,14 +138,9 @@
           <div class="d-flex flex-column gap-10">
             <h3 class="ibr-new-heading">Export Your Data</h3>
             <p class="ibr-new-subheading">
-              Download a complete copy of your data
+              Download a complete archive of your data, including an Excel spreadsheet and any associated images
             </p>
           </div>
-          <p class="info-text">
-            Download a complete archive containing all personal data we hold
-            about you and your clients. The archive includes an Excel
-            spreadsheet with your data and any associated images.
-          </p>
         </div>
         <!-- mat-flat-button
         color="primary" -->
@@ -192,7 +187,7 @@
             diameter="20"
             class="inline-spinner"
           ></mat-spinner>
-          {{ isExporting ? "Exporting..." : "Export My Data" }}
+          {{ isExporting ? "Exporting..." : "Export my data" }}
         </button>
       </div>
     </mat-card-content>
@@ -206,27 +201,9 @@
           <div class="d-flex flex-column gap-10">
             <h3 class="ibr-new-heading">Account Closure</h3>
             <p class="ibr-new-subheading">
-              Initiate the post-termination data lifecycle
+              Please refer to our Terms and Conditions to learn more about how your data is managed after account closure
             </p>
           </div>
-          <p class="info-text">
-            If you wish to close your account, the following lifecycle applies
-            per our Terms of Service (§8.3):
-          </p>
-          <ol class="lifecycle-steps">
-            <li>
-              <strong>Export window (60 days):</strong> Your account converts to
-              read-only mode. You may download all your data.
-            </li>
-            <li>
-              <strong>Active deletion (30 days):</strong> All data is deleted or
-              anonymised from active systems.
-            </li>
-            <li>
-              <strong>Backup removal (up to 90 days):</strong> Encrypted backup
-              copies are overwritten.
-            </li>
-          </ol>
 
           <!-- <p class="closure-warning">
             Please ensure you have exported any records needed for your own
@@ -265,7 +242,7 @@
                 <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
               </svg>
             </ng-container>
-            {{ isTerminating ? "Processing..." : "Request Account Closure" }}
+            {{ isTerminating ? "Processing..." : "Close account" }}
           </button>
         </div>
       </div>
