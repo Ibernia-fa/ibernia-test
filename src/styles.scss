@@ -1189,6 +1189,22 @@ body .custom-html-tooltip,
     display: flex;
     align-items: center;
   }
+
+  .settings-currency-prefix {
+    display: inline-flex;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 500;
+    color: #48475d;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+
+  .mat-mdc-form-field-icon-prefix:has(.settings-currency-prefix) {
+    padding: 0 2px 0 12px;
+    display: flex;
+    align-items: center;
+  }
 }
 
 .custom-select-panel {
