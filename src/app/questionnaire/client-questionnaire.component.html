@@ -21,10 +21,11 @@
       <p>{{ errorMessage }}</p>
     </div>
   } @else {
-    <!-- Top progress bar -->
-    <div class="progress-track">
-      <div class="progress-fill" [style.width.%]="progressPercent"></div>
-    </div>
+    @if (!submitted) {
+      <div class="progress-track">
+        <div class="progress-fill" [style.width.%]="progressPercent"></div>
+      </div>
+    }
 
     <!-- Snap scroll container (one question per viewport) -->
     <div class="snap-container" #snapContainer (scroll)="onScroll()">
