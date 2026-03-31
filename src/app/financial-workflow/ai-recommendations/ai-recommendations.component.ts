@@ -18,7 +18,6 @@ import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { ClientHttpService } from 'src/app/clients/services/client-http.service';
-import { environment } from 'src/environments/environment';
 
 @Component({
   imports: [
@@ -36,13 +35,15 @@ import { environment } from 'src/environments/environment';
   styleUrl: './ai-recommendations.component.scss'
 })
 export class AiRecommendationsComponent implements OnInit, OnDestroy {
-  public isReccShown = false;
-  public isLoading = false;
+  public isInitialLoading = true;
+  public isGenerating = false;
   public errorMessage: string | null = null;
   public analysis: PlanAnalysisResponse | null = null;
+  public isSavedInsight = false;
 
   public usageUsed = 0;
   public usageLimit = 5;
+  public limitExceeded = false;
   public clientNotes = '';
   public advisorGuidelines = '';
   public readonly termsUrl = 'https://ibernia.app/terms';
@@ -66,33 +67,54 @@ export class AiRecommendationsComponent implements OnInit, OnDestroy {
     this.navItemService.currentRouteName = 'AI Recommendations';
   }
 
-  loadUsage(): void {
-    this.aiRecommendationsHttpService.getUsage().pipe(takeUntil(this.destroy$)).subscribe({
-      next: (u) => {
-        this.usageUsed = u.used;
-        this.usageLimit = u.limit;
-      },
-      error: () => {}
-    });
+  get canGenerate(): boolean {
+    return !this.limitExceeded && !this.isGenerating;
   }
 
-  onClickShow(): void {
+  ngOnInit(): void {
     this.cashflowId = this.activatedRoute.parent?.snapshot.params['id'] || this.activatedRoute.snapshot.params['id'];
+    this.loadUsage();
+    this.loadClientAndAdvisorData();
 
+    if (this.cashflowId) {
+      this.loadSavedOrGenerate();
+    } else {
+      this.isInitialLoading = false;
+      this.errorMessage = 'Unable to determine the cashflow. Please try again.';
+    }
+  }
+
+  private loadSavedOrGenerate(): void {
+    this.isInitialLoading = true;
+    this.aiRecommendationsHttpService.getSavedInsights(this.cashflowId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (saved) => {
+          this.analysis = saved;
+          this.isSavedInsight = true;
+          this.isInitialLoading = false;
+        },
+        error: (err) => {
+          if (err?.status === 404) {
+            this.generateInsights();
+          } else {
+            this.isInitialLoading = false;
+            this.errorMessage = 'Failed to load insights. Please try again.';
+          }
+        }
+      });
+  }
+
+  generateInsights(): void {
     if (!this.cashflowId) {
       this.errorMessage = 'Unable to determine the cashflow. Please try again.';
       return;
     }
 
-    if (this.usageUsed >= this.usageLimit) {
-      this.errorMessage = `Daily limit reached (${this.usageUsed}/${this.usageLimit}). Try again tomorrow.`;
-      return;
-    }
+    if (this.limitExceeded) return;
 
-    this.isLoading = true;
-    this.isReccShown = false;
+    this.isGenerating = true;
     this.errorMessage = null;
-    this.analysis = null;
 
     this.aiRecommendationsHttpService.analyzePlan({
       cashflowId: this.cashflowId,
@@ -101,15 +123,18 @@ export class AiRecommendationsComponent implements OnInit, OnDestroy {
     }).pipe(takeUntil(this.destroy$)).subscribe({
       next: (data) => {
         this.analysis = data;
-        this.isReccShown = true;
-        this.isLoading = false;
+        this.isSavedInsight = false;
+        this.isGenerating = false;
+        this.isInitialLoading = false;
         this.loadUsage();
       },
       error: (err) => {
-        this.isLoading = false;
+        this.isGenerating = false;
+        this.isInitialLoading = false;
         if (err?.status === 429) {
           this.usageUsed = err?.error?.used ?? this.usageUsed;
           this.usageLimit = err?.error?.limit ?? this.usageLimit;
+          this.limitExceeded = true;
           this.errorMessage = `Daily limit reached (${this.usageUsed}/${this.usageLimit}). Try again tomorrow.`;
         } else {
           this.errorMessage = 'Failed to generate recommendations. Please try again.';
@@ -118,10 +143,18 @@ export class AiRecommendationsComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnInit(): void {
-    this.cashflowId = this.activatedRoute.parent?.snapshot.params['id'] || this.activatedRoute.snapshot.params['id'];
-    this.loadUsage();
+  loadUsage(): void {
+    this.aiRecommendationsHttpService.getUsage().pipe(takeUntil(this.destroy$)).subscribe({
+      next: (u) => {
+        this.usageUsed = u.used;
+        this.usageLimit = u.limit;
+        this.limitExceeded = u.used >= u.limit;
+      },
+      error: () => {}
+    });
+  }
 
+  private loadClientAndAdvisorData(): void {
     this.client$ = this.store.select(selectedClient);
     this.client$.pipe(takeUntil(this.destroy$)).subscribe(client => {
       if (client) {

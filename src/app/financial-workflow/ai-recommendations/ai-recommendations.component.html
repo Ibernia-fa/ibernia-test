@@ -23,95 +23,109 @@
     </mat-card-content>
   </mat-card>
 
-  <!-- Action card -->
-  <mat-card class="mat-mdc-card mdc-card cardWithShadow">
-    <mat-card-content class="mat-mdc-card-content">
-      <div class="d-flex flex-column gap-16">
-        <div class="d-flex flex-wrap gap-16 align-items-start">
-          <mat-form-field appearance="outline" class="flex-grow-1" style="min-width: 200px;">
-            <mat-label>Client notes (included in AI context)</mat-label>
-            <textarea matInput [(ngModel)]="clientNotes" rows="2" placeholder="Optional notes about this client..."></textarea>
-          </mat-form-field>
-          <mat-form-field appearance="outline" class="flex-grow-1" style="min-width: 200px;">
-            <mat-label>Advisor/company guidelines</mat-label>
-            <textarea matInput [(ngModel)]="advisorGuidelines" rows="2" placeholder="Risk tolerance, tone, compliance..."></textarea>
-          </mat-form-field>
-        </div>
-        <div class="d-flex justify-content-between align-items-center flex-wrap gap-16">
-          <span class="text-muted">These are passed to the AI to tailor recommendations.</span>
-          <div class="d-flex align-items-center gap-8">
-            <small class="text-muted">Today: {{ usageUsed }}/{{ usageLimit }} used</small>
-            <button class="button-icon" (click)="onClickShow()" [disabled]="isLoading || usageUsed >= usageLimit">
-              <span>{{ isLoading ? 'Generating...' : 'Generate recommendations' }}</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    </mat-card-content>
-  </mat-card>
-
-  <!-- Loading state -->
-  <ng-container *ngIf="isLoading">
+  <!-- Initial loading state -->
+  <ng-container *ngIf="isInitialLoading">
     <mat-card class="mat-mdc-card mdc-card cardWithShadow">
       <mat-card-content class="mat-mdc-card-content d-flex justify-content-center align-items-center" style="min-height: 120px;">
         <mat-spinner diameter="40"></mat-spinner>
-        <span class="m-l-16">Analysing your cashflow plan with AI...</span>
+        <span class="m-l-16">Loading insights...</span>
       </mat-card-content>
     </mat-card>
   </ng-container>
 
-  <!-- Error state -->
-  <ng-container *ngIf="errorMessage">
+  <!-- Main content (after initial load) -->
+  <ng-container *ngIf="!isInitialLoading">
+
+    <!-- Action card -->
     <mat-card class="mat-mdc-card mdc-card cardWithShadow">
       <mat-card-content class="mat-mdc-card-content">
-        <div class="d-flex align-items-center gap-12">
-          <img src="assets/images/svgs/Info-icon.svg" alt="error" width="20" />
-          <span class="text-error">{{ errorMessage }}</span>
+        <div class="d-flex flex-column gap-16">
+          <div class="d-flex flex-wrap gap-16 align-items-start">
+            <mat-form-field appearance="outline" class="flex-grow-1" style="min-width: 200px;">
+              <mat-label>Client notes (included in AI context)</mat-label>
+              <textarea matInput [(ngModel)]="clientNotes" rows="2" placeholder="Optional notes about this client..."></textarea>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="flex-grow-1" style="min-width: 200px;">
+              <mat-label>Advisor/company guidelines</mat-label>
+              <textarea matInput [(ngModel)]="advisorGuidelines" rows="2" placeholder="Risk tolerance, tone, compliance..."></textarea>
+            </mat-form-field>
+          </div>
+          <div class="d-flex justify-content-between align-items-center flex-wrap gap-16">
+            <div class="d-flex align-items-center gap-8">
+              <small class="text-muted">Today: {{ usageUsed }}/{{ usageLimit }} used</small>
+              <span *ngIf="limitExceeded" class="text-error f-s-12">Daily limit reached. Try again tomorrow.</span>
+            </div>
+            <button class="button-icon" (click)="generateInsights()" [disabled]="!canGenerate">
+              <span>{{ isGenerating ? 'Generating...' : (analysis ? 'Generate New Insights' : 'Generate Insights') }}</span>
+            </button>
+          </div>
         </div>
       </mat-card-content>
     </mat-card>
+
+    <!-- Generating state -->
+    <ng-container *ngIf="isGenerating">
+      <mat-card class="mat-mdc-card mdc-card cardWithShadow">
+        <mat-card-content class="mat-mdc-card-content d-flex justify-content-center align-items-center" style="min-height: 120px;">
+          <mat-spinner diameter="40"></mat-spinner>
+          <span class="m-l-16">Analysing your cashflow plan with AI...</span>
+        </mat-card-content>
+      </mat-card>
+    </ng-container>
+
+    <!-- Error state -->
+    <ng-container *ngIf="errorMessage && !analysis">
+      <mat-card class="mat-mdc-card mdc-card cardWithShadow">
+        <mat-card-content class="mat-mdc-card-content">
+          <div class="d-flex align-items-center gap-12">
+            <img src="assets/images/svgs/Info-icon.svg" alt="error" width="20" />
+            <span class="text-error">{{ errorMessage }}</span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </ng-container>
+
+    <!-- Results card -->
+    <ng-container *ngIf="analysis">
+      <mat-card class="mat-mdc-card mdc-card cardWithShadow">
+        <mat-card-content class="mat-mdc-card-content">
+
+          <!-- Disclaimer -->
+          <div class="d-flex align-items-start ai-rec-sugg m-b-16">
+            <div class="m-r-10">
+              <img src="assets/images/svgs/Info-icon.svg" alt="info" />
+            </div>
+            <div>
+              Recommendations are produced by AI and can be <strong>incomplete</strong> or <strong>incorrect</strong>.<br />
+              They do not constitute financial advice and must be reviewed and approved by a licensed financial advisor before any action.<br />
+              For more info, please consult our <a [href]="termsUrl" target="_blank" rel="noopener"><em>Terms & Conditions</em></a>
+            </div>
+          </div>
+
+          <div class="position-relative outer-recmendation">
+            <div class="edit-rec-sugg">
+              <button matTooltip="Edit"><img width="16" src="assets/images/svgs/edit-icon.svg" alt="edit" /></button>
+              <button matTooltip="Copy"><img width="16" src="assets/images/svgs/copy-icon.svg" alt="copy" /></button>
+              <ng-container *ngIf="analysis?.providerName">
+                <span class="m-l-8 text-muted" style="font-size: 12px;">{{ analysis.providerName }}</span>
+                <button matTooltip="Good response" (click)="onFeedback(1)" type="button" class="m-l-4 p-0 border-0 bg-transparent">👍</button>
+                <button matTooltip="Poor response" (click)="onFeedback(0)" type="button" class="m-l-2 p-0 border-0 bg-transparent">👎</button>
+              </ng-container>
+            </div>
+
+            <!-- Recommendations -->
+            <div *ngFor="let rec of analysis.recommendations; let i = index" class="ai-rec-sugg">
+              <h3>{{ i + 1 }}. {{ rec.action }}</h3>
+              <ul>
+                <li><strong>Why:</strong> {{ rec.why }}</li>
+                <li><strong>Impact:</strong> {{ rec.impact }}</li>
+              </ul>
+            </div>
+
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </ng-container>
+
   </ng-container>
-
-  <!-- Results card -->
-  <ng-container *ngIf="isReccShown && analysis">
-    <mat-card class="mat-mdc-card mdc-card cardWithShadow">
-      <mat-card-content class="mat-mdc-card-content">
-
-        <!-- Disclaimer -->
-        <div class="d-flex align-items-start ai-rec-sugg m-b-16">
-          <div class="m-r-10">
-            <img src="assets/images/svgs/Info-icon.svg" alt="info" />
-          </div>
-          <div>
-            Recommendations are produced by AI and can be <strong>incomplete</strong> or <strong>incorrect</strong>.<br />
-            They do not constitute financial advice and must be reviewed and approved by a licensed financial advisor before any action.<br />
-            For more info, please consult our <a [href]="termsUrl" target="_blank" rel="noopener"><em>Terms & Conditions</em></a>
-          </div>
-        </div>
-
-        <div class="position-relative outer-recmendation">
-          <div class="edit-rec-sugg">
-            <button matTooltip="Edit"><img width="16" src="assets/images/svgs/edit-icon.svg" alt="edit" /></button>
-            <button matTooltip="Copy"><img width="16" src="assets/images/svgs/copy-icon.svg" alt="copy" /></button>
-            <ng-container *ngIf="analysis?.providerName">
-              <span class="m-l-8 text-muted" style="font-size: 12px;">{{ analysis.providerName }}</span>
-              <button matTooltip="Good response" (click)="onFeedback(1)" type="button" class="m-l-4 p-0 border-0 bg-transparent">👍</button>
-              <button matTooltip="Poor response" (click)="onFeedback(0)" type="button" class="m-l-2 p-0 border-0 bg-transparent">👎</button>
-            </ng-container>
-          </div>
-
-          <!-- Recommendations -->
-          <div *ngFor="let rec of analysis.recommendations; let i = index" class="ai-rec-sugg">
-            <h3>{{ i + 1 }}. {{ rec.action }}</h3>
-            <ul>
-              <li><strong>Why:</strong> {{ rec.why }}</li>
-              <li><strong>Impact:</strong> {{ rec.impact }}</li>
-            </ul>
-          </div>
-
-        </div>
-      </mat-card-content>
-    </mat-card>
-  </ng-container>
-
 </div>
