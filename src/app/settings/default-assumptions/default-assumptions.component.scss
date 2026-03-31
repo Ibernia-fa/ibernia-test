@@ -54,9 +54,6 @@
   grid-template-columns: repeat(2, 1fr);
   gap: 16px;
 }
-.assumption-container > :last-child:nth-child(odd) {
-  grid-column: 1 / -1; /* span full width only if odd */
-}
 .m-t-20.d-flex.justify-content-end {
   .button-icon {
     min-width: 135px;
