@@ -275,17 +275,17 @@
   margin-bottom: 10px !important;
 }
 
-.protection-score-title {
-  font-size: 24px;
-  color: #000000;
-}
-
 .ibr-card-title {
   font-weight: 400;
   color: #5a596e;
   font-size: 16px;
   line-height: 100%;
   letter-spacing: 0%;
+}
+
+.ibr-card-title.protection-score-title {
+  font-size: 24px;
+  color: #000000;
 }
 
 .saving-title-new {
