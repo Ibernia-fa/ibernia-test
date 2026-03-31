@@ -2,6 +2,8 @@ import { Component, Inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { CommonModule } from '@angular/common';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { ToastrService } from 'ngx-toastr';
@@ -35,6 +37,8 @@ export interface AddAssetDialogData {
     CommonModule,
     ReactiveFormsModule,
     MatDialogModule,
+    MatButtonModule,
+    MatIconModule,
     MatInputModule,
     MatSelectModule,
     ThousandSeparatorPipe,

@@ -1,15 +1,16 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, LOCALE_ID, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { CommonModule, formatNumber } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatButtonModule } from '@angular/material/button';
+import { MatTableModule } from '@angular/material/table';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialog } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
 import { Store } from '@ngrx/store';
 import { of, switchMap, tap, catchError, filter, forkJoin } from 'rxjs';
-import { DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import moment from 'moment';
 
@@ -40,6 +41,8 @@ import { LegacyComponent } from './legacy/legacy.component';
     MatCardModule,
     MatIconModule,
     MatMenuModule,
+    MatButtonModule,
+    MatTableModule,
     MatProgressSpinnerModule,
     CurrencySymbolPipe,
     LegacyComponent
@@ -50,6 +53,7 @@ import { LegacyComponent } from './legacy/legacy.component';
 })
 export class WealthComponent implements OnInit {
   private destroyRef = inject(DestroyRef);
+  private readonly locale = inject(LOCALE_ID);
 
   activeTab: 'networth' | 'legacy' = 'networth';
   cashflowId!: string;
@@ -81,6 +85,18 @@ export class WealthComponent implements OnInit {
 
   get hasPartner(): boolean {
     return this.dashboard?.hasPartner ?? false;
+  }
+
+  get displayedAssetColumns(): string[] {
+    return this.hasPartner
+      ? ['category', 'ownership', 'value', 'action']
+      : ['category', 'value', 'action'];
+  }
+
+  get displayedLiabilityColumns(): string[] {
+    return this.hasPartner
+      ? ['category', 'ownership', 'value', 'action']
+      : ['category', 'value', 'action'];
   }
 
   get clientFirstName(): string {
@@ -177,7 +193,7 @@ export class WealthComponent implements OnInit {
 
   onAddAsset(): void {
     const dialogRef = this.dialog.open(AddAssetComponent, {
-      width: '500px',
+      width: '612px',
       disableClose: true,
       data: {
         mode: 'add',
@@ -204,7 +220,7 @@ export class WealthComponent implements OnInit {
     }
 
     const dialogRef = this.dialog.open(AddAssetComponent, {
-      width: '500px',
+      width: '612px',
       disableClose: true,
       data: {
         mode: 'edit',
@@ -267,7 +283,7 @@ export class WealthComponent implements OnInit {
         });
 
         const dialogRef = this.dialog.open(AddNewPotComponent, {
-          width: '700px',
+          width: '612px',
           disableClose: true,
           data: {
             returnRate,
@@ -311,7 +327,7 @@ export class WealthComponent implements OnInit {
 
   onAddLiability(): void {
     const dialogRef = this.dialog.open(AddLiabilityComponent, {
-      width: '500px',
+      width: '612px',
       disableClose: true,
       data: {
         mode: 'add',
@@ -333,7 +349,7 @@ export class WealthComponent implements OnInit {
 
   onEditLiability(liability: WealthLiabilityModel): void {
     const dialogRef = this.dialog.open(AddLiabilityComponent, {
-      width: '500px',
+      width: '612px',
       disableClose: true,
       data: {
         mode: 'edit',
@@ -391,6 +407,29 @@ export class WealthComponent implements OnInit {
       case 'Partner': return 'ownership-partner';
       default: return 'ownership-joint';
     }
+  }
+
+  /**
+   * Compact amount for per-person net worth chips: K from 1k, M from 1M; otherwise same as number pipe.
+   */
+  formatPerPersonNetWorthDisplay(value: number | null | undefined): string {
+    if (value == null || Number.isNaN(value)) {
+      return formatNumber(0, this.locale, '1.0-0');
+    }
+    const sign = value < 0 ? '-' : '';
+    const abs = Math.abs(value);
+    if (abs >= 1_000_000) {
+      return sign + this.compactScaledSuffix(abs / 1_000_000, 'M');
+    }
+    if (abs >= 1_000) {
+      return sign + this.compactScaledSuffix(abs / 1_000, 'K');
+    }
+    return sign + formatNumber(Math.round(abs), this.locale, '1.0-0');
+  }
+
+  private compactScaledSuffix(scaled: number, suffix: string): string {
+    const s = scaled.toFixed(1);
+    return s.replace(/\.0$/, '') + suffix;
   }
 
   private refreshDashboard(): void {
