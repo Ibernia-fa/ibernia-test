@@ -164,9 +164,14 @@
                   </div>
                 </div>
 
-                <div class="ibr-insights-loading" *ngIf="insightsLoading">
-                  <mat-spinner diameter="28"></mat-spinner>
-                  <span>Generating insights...</span>
+                <!-- Skeleton loading state -->
+                <div class="ibr-insights-skeleton" *ngIf="insightsLoading">
+                  <div class="ibr-insight-skeleton-card" *ngFor="let _ of [0, 1, 2, 3]">
+                    <div class="skeleton-line skeleton-title"></div>
+                    <div class="skeleton-line skeleton-body"></div>
+                    <div class="skeleton-line skeleton-body"></div>
+                    <div class="skeleton-line skeleton-body skeleton-body-short"></div>
+                  </div>
                 </div>
 
                 <div
