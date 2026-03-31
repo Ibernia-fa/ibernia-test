@@ -11,6 +11,11 @@
         <textarea matInput formControlName="body" rows="4" required></textarea>
       </mat-form-field>
       <mat-form-field appearance="outline" class="w-100">
+        <mat-label>{{ 'Notification label' | translate }}</mat-label>
+        <input matInput formControlName="categoryLabel" maxlength="64" placeholder="{{ 'Shown next to the date for advisors (e.g. News, Update)' | translate }}">
+        <mat-hint align="end">{{ form.get('categoryLabel')?.value?.length || 0 }}/64</mat-hint>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="w-100">
         <mat-label>{{ 'Channel' | translate }}</mat-label>
         <mat-select formControlName="channel">
           <mat-option value="both">{{ 'Both' | translate }}</mat-option>

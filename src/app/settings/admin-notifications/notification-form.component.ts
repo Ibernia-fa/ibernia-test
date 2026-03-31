@@ -51,6 +51,7 @@ export class NotificationFormComponent implements OnInit, OnDestroy {
     this.form = this.fb.group({
       title: [''],
       body: [''],
+      categoryLabel: [''],
       channel: ['both'],
       audienceType: ['all'],
       scheduledAt: [null],
@@ -120,10 +121,18 @@ export class NotificationFormComponent implements OnInit, OnDestroy {
     if (v.audienceType === 'selected' && this.selectedAdvisors.length === 0) {
       return; // Don't submit without selected users
     }
+    const labelTrim = (v.categoryLabel ?? '').trim();
+    const templateData: Record<string, string> = {
+      title: v.title ?? '',
+      body: v.body ?? ''
+    };
+    if (labelTrim) {
+      templateData['categoryLabel'] = labelTrim.slice(0, 64);
+    }
     const req: CreateNotificationRequest = {
       type: 'admin',
       templateKey: 'admin_announcement',
-      templateData: { title: v.title ?? '', body: v.body ?? '' },
+      templateData,
       channel: v.channel || 'both',
       audienceType: v.audienceType || 'all',
       targetUserIds: v.audienceType === 'selected' ? this.selectedAdvisors.map((a) => a.userId) : [],

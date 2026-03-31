@@ -286,7 +286,7 @@
       <button
         mat-icon-button
         [matMenuTriggerFor]="notificationmenu"
-        (menuOpened)="onNotificationMenuOpened()"
+        (menuOpened)="onBellMenuOpened()"
         aria-label="Notifications"
         class="position-relative notification-button"
       >
@@ -435,6 +435,7 @@
       class="notification-dropdown"
       panelClass="notification-menu-panel"
       xPosition="before"
+      (closed)="onBellMenuClosed()"
     >
       <div class="notification-menu-shell">
         <div class="notification-dropdown-header">
@@ -443,15 +444,6 @@
               <h6 class="notification-menu-title m-0">
                 {{ "Notifications" | translate }}
               </h6>
-              <button
-                type="button"
-                class="new-mark-all-read-btn"
-                (click)="onMarkAllAsRead($event)"
-                [disabled]="unreadCount === 0"
-              >
-                <!-- <i-tabler name="checks" class="mark-all-read-icon"></i-tabler> -->
-                {{ "Mark all as read" | translate }}
-              </button>
             </div>
             <!-- Filter Section  -->
             <div
@@ -481,7 +473,13 @@
               class="position-relative notification-search"
               (click)="$event.stopPropagation()"
             >
-              <input type="text" placeholder="Search notifications..." />
+              <input
+                type="text"
+                [(ngModel)]="notificationSearchQuery"
+                (ngModelChange)="onNotificationSearchQueryChange()"
+                placeholder="{{ 'Search notifications...' | translate }}"
+                (keydown)="$event.key !== 'Escape' && $event.stopPropagation()"
+              />
 
               <svg
                 width="14"
@@ -519,20 +517,29 @@
           </div> -->
         </div>
 
-        <div class="notification-list-scroll">
+        <div
+          #notificationListScroll
+          class="notification-list-scroll"
+          (scroll)="onNotificationListScroll($event)"
+        >
           @if (notificationsLoading) {
             <div class="notification-list-state">
               {{ "Loading..." | translate }}
             </div>
-          } @else if (userNotifications.length === 0) {
+          } @else if (filteredUserNotifications.length === 0) {
             <div class="notification-list-state text-muted">
-              {{ "No notifications" | translate }}
+              {{
+                userNotifications.length === 0
+                  ? ("No notifications" | translate)
+                  : ("No matching notifications" | translate)
+              }}
             </div>
           } @else {
-            @for (n of userNotifications; track n.id) {
+            @for (n of filteredUserNotifications; track n.id) {
               <button
                 mat-menu-item
                 class="notification-item"
+                [attr.data-notification-id]="n.id"
                 (click)="onNotificationClick(n)"
               >
                 <div class="d-flex align-items-start w-100">
@@ -540,48 +547,39 @@
                     <div
                       class="notification-avatar rounded-circle d-flex align-items-center justify-content-center"
                       [class.birthday]="n.iconType === 'birthday'"
+                      [class.notification-type-security]="n.id === mfaReminderId"
                     >
                       @if (n.id === mfaReminderId) {
-                        <i-tabler
-                          name="shield-lock"
-                          class="notification-message-icon"
-                        ></i-tabler>
+                        <img
+                          class="notification-row-type-icon"
+                          src="assets/images/logos/security.png"
+                          width="28"
+                          height="28"
+                          alt=""
+                        />
+                      } @else if (n.iconType === "birthday") {
+                        <img
+                          class="notification-row-type-icon"
+                          src="assets/images/logos/birthday.png"
+                          width="28"
+                          height="28"
+                          alt=""
+                        />
                       } @else {
-                        <!-- <i-tabler
-                          name="message"
-                          class="notification-message-icon"
-                        ></i-tabler> -->
-                        <svg
-                          width="20"
-                          height="20"
-                          viewBox="0 0 20 20"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            d="M0 20V2C0 1.45 0.195833 0.979167 0.5875 0.5875C0.979167 0.195833 1.45 0 2 0H18C18.55 0 19.0208 0.195833 19.4125 0.5875C19.8042 0.979167 20 1.45 20 2V14C20 14.55 19.8042 15.0208 19.4125 15.4125C19.0208 15.8042 18.55 16 18 16H4L0 20Z"
-                            fill="#4043AF"
-                          />
-                        </svg>
+                        <img
+                          class="notification-row-type-icon"
+                          src="assets/images/logos/admin.png"
+                          width="28"
+                          height="28"
+                          alt=""
+                        />
                       }
                     </div>
                   </div>
                   <div class="flex-grow-1 min-w-0">
                     @if (n.id === mfaReminderId) {
-                      <div
-                        class="d-flex align-items-center justify-between m-b-4"
-                      >
-                        <div class="notification-item-title line-clamp-1">
-                          {{ n.title | translate }}
-                        </div>
-                        <span class="new-notification-time">{{
-                          n.sentAtUtc | notificationRelativeTime
-                        }}</span>
-
-                        <div
-                          class="notification-status-dot"
-                          [class.unread]="!n.isRead"
-                        ></div>
+                      <div class="notification-item-title line-clamp-1 m-b-4">
+                        {{ n.title | translate }}
                       </div>
                       <p
                         class="notification-item-preview m-0 line-clamp-2 m-b-4"
@@ -589,20 +587,8 @@
                         {{ n.preview | translate: n.previewParams || {} }}
                       </p>
                     } @else {
-                      <div
-                        class="d-flex align-items-center justify-between m-b-4"
-                      >
-                        <div class="notification-item-title line-clamp-1">
-                          {{ n.title }}
-                        </div>
-                        <span class="new-notification-time">{{
-                          n.sentAtUtc | notificationRelativeTime
-                        }}</span>
-
-                        <div
-                          class="notification-status-dot"
-                          [class.unread]="!n.isRead"
-                        ></div>
+                      <div class="notification-item-title line-clamp-1 m-b-4">
+                        {{ n.title }}
                       </div>
                       <p
                         class="notification-item-preview m-0 line-clamp-2 m-b-4"
@@ -621,6 +607,9 @@
                     <div
                       class="d-flex align-items-center justify-content-between flex-wrap gap-4"
                     >
+                      <span class="notification-item-meta text-muted">{{
+                        n.sentAtUtc | date: "mediumDate"
+                      }}</span>
                       <span
                         class="notification-type-pill"
                         [class.birthday]="n.iconType === 'birthday'"
@@ -629,16 +618,15 @@
                         "
                       >
                         @if (n.id === mfaReminderId) {
-                          {{ "Security" | translate }}
+                          {{ ("Security" | translate) | capitalizeFirst }}
                         } @else if (n.iconType === "birthday") {
-                          {{ "Birthday" | translate }}
+                          {{ ("Birthday" | translate) | capitalizeFirst }}
+                        } @else if (n.categoryLabel?.trim()) {
+                          {{ n.categoryLabel.trim() | capitalizeFirst }}
                         } @else {
-                          {{ "News" | translate }}
+                          {{ ("News" | translate) | capitalizeFirst }}
                         }
                       </span>
-                      <!-- <span class="notification-item-meta">{{
-                        n.sentAtUtc | notificationRelativeTime
-                      }}</span> -->
                     </div>
                   </div>
                 </div>
@@ -648,16 +636,6 @@
           }
         </div>
         <div class="notification-dropdown-footer">
-          <!-- <button
-            mat-stroked-button
-            type="button"
-            class="mark-all-read-btn"
-            (click)="onMarkAllAsRead($event)"
-            [disabled]="unreadCount === 0"
-          >
-            <i-tabler name="checks" class="mark-all-read-icon"></i-tabler>
-            {{ "Mark all as read" | translate }}
-          </button> -->
           <a
             mat-stroked-button
             color="primary"
