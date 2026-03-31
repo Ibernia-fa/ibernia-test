@@ -323,14 +323,7 @@ export class FullComponent implements OnInit, OnDestroy {
         // swap menu sources
         if (this.isSettings) {
           this.navItems = settingsNavItems;
-          const allLower = settingsLowerNavItems ?? [];
-          this.navItemslower = allLower.filter((item) => item.displayName !== 'Admin Notifications');
-          Promise.all([
-            this.Authservice.hasRole('Administrator'),
-            this.Authservice.hasRole('IberniaIdentityAdminAdministrator')
-          ]).then(([admin, idAdmin]) => {
-            this.navItemslower = (admin || idAdmin) ? allLower : allLower.filter((item) => item.displayName !== 'Admin Notifications');
-          }); // or [] if you don’t have a lower list
+          this.applySettingsLowerNav();
         } else {
           this.navItems = mainNavItems;
           this.navItemslower = mainLower;
@@ -343,6 +336,30 @@ export class FullComponent implements OnInit, OnDestroy {
     if (uid) {
       this.organizationProfiles.hydrateBrandingLogoFromSession(uid);
     }
+
+    if (this.router.url.startsWith('/settings')) {
+      this.isSettings = true;
+      this.navItems = settingsNavItems;
+      this.applySettingsLowerNav();
+    }
+  }
+
+  /** Admin Notifications + Identity Admin: visible only to Administrator / IberniaIdentityAdminAdministrator. */
+  private applySettingsLowerNav(): void {
+    const allLower = settingsLowerNavItems ?? [];
+    this.navItemslower = allLower.filter(
+      (item) =>
+        item.displayName !== 'Admin Notifications' &&
+        item.displayName !== 'Identity Admin',
+    );
+    Promise.all([
+      this.Authservice.hasRole('Administrator'),
+      this.Authservice.hasRole('IberniaIdentityAdminAdministrator'),
+    ]).then(([admin, idAdmin]) => {
+      if (admin || idAdmin) {
+        this.navItemslower = allLower;
+      }
+    });
   }
 
   ngOnInit(): void {

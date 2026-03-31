@@ -1,3 +1,13 @@
+.ibr-hide-push-master-toggle {
+  display: none !important;
+}
+
+.notification-list-search-field {
+  flex: 1 1 220px;
+  max-width: 320px;
+  min-width: 180px;
+}
+
 .notification-page-mark-all {
   border-radius: 6px;
   font-weight: 500;
@@ -39,6 +49,15 @@
     border: none;
     cursor: pointer;
     transition: background 0.15s ease;
+
+    // styles.scss applies `button span { text-transform: lowercase }` + ::first-letter uppercase,
+    // which overrides capitalizeFirst (only first glyph is capital; rest stay lower).
+    span {
+      text-transform: none !important;
+    }
+    span::first-letter {
+      text-transform: none !important;
+    }
     &:hover {
       background: #f5f7ff !important;
     }
@@ -46,26 +65,32 @@
       width: 44px;
       height: 44px;
       min-width: 44px;
-      background: #3824c71a;
+      background: #eef2ff;
       color: #4f46e5;
       &.birthday {
         background: #fdf2f8;
         color: #db2777;
+      }
+      &.notification-type-security {
+        background: #fef2f2;
+      }
+
+      .notification-row-type-icon {
+        width: 28px;
+        height: 28px;
+        object-fit: contain;
+        display: block;
+        flex-shrink: 0;
       }
       &.rounded-circle {
         border-radius: 12px !important;
       }
     }
 
-    .notification-message-icon {
-      width: 22px;
-      height: 22px;
-    }
-
     .notification-item-title {
       font-size: 14px;
-      font-weight: 600;
-      color: #1c1c1c;
+      font-weight: 500;
+      color: #191c1d;
     }
 
     .notification-item-preview {
@@ -76,33 +101,39 @@
     }
 
     .notification-item-meta {
-      font-size: 12px;
+      font-size: 11px;
       color: #94a3b8;
     }
 
+    // Match header notification dropdown pill + avatar styling (read/unread agnostic)
     .notification-type-pill {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 2px 8px;
+      padding: 2px 10px;
       border-radius: 999px;
-      font-size: 11px;
-      font-weight: 500;
-      // border: 1px solid #e2e8f0;
-      color: #64748b;
+      font-size: 10px;
+      height: 16px;
+      font-weight: 700;
       background-color: #4231cf1a;
-      &::before {
-        content: "";
-        width: 6px;
-        height: 6px;
-        border-radius: 50%;
-        background: #94a3b8;
+      color: #4043af;
+
+      &.notification-type-security {
+        background-color: rgba(185, 28, 28, 0.14);
+        color: #b91c1c;
       }
-      &.birthday::before {
-        background: #e91e63;
-      }
-      &.notification-type-security::before {
-        background: #d97706;
+
+      &.birthday {
+        background-color: #fdf2f8;
+        color: #db2777;
+        &::before {
+          content: "";
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          flex-shrink: 0;
+          background: #a855f7;
+        }
       }
     }
     .notification-status-dot {
