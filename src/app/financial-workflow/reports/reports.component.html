@@ -147,11 +147,11 @@
               <!-- Insights Section -->
               <div
                 class="ibr-insights-section"
-                *ngIf="insights.length >= 2 || insightsLoading || insightsLimitExceeded"
+                *ngIf="insights.length > 0 || insightsLoading || insightsLimitExceeded || insightsLoadAttempted"
               >
                 <div class="d-flex align-items-center justify-content-between m-b-8">
                   <h3 class="ibr-insights-title m-b-0">Insights</h3>
-                  <div class="d-flex align-items-center gap-8" *ngIf="!insightsLoading">
+                  <div class="d-flex align-items-center gap-8" *ngIf="!insightsLoading && insightsLoadAttempted">
                     <span *ngIf="insightsLimitExceeded" class="text-error f-s-12">Daily limit reached</span>
                     <button
                       class="button-icon"
@@ -171,7 +171,7 @@
 
                 <div
                   class="ibr-insights-grid"
-                  *ngIf="!insightsLoading && insights.length >= 2"
+                  *ngIf="!insightsLoading && insights.length > 0"
                 >
                   <div
                     class="ibr-insight-card"

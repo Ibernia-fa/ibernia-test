@@ -218,6 +218,7 @@ export class ReportsComponent {
   insights: RecommendationItem[] = [];
   insightsLoading = false;
   insightsLimitExceeded = false;
+  insightsLoadAttempted = false;
   private insightsLoadedForCashflow: string | null = null;
   readonly insightIconColors = ['#4043AF', '#FF383C', '#FF8D28', '#34C759', '#4043AF', '#FF383C'];
   readonly insightIconBgs = ['#f0f0ff', '#fff3f3', '#fff8f0', '#f0fff4', '#f0f0ff', '#fff3f3'];
@@ -542,9 +543,11 @@ export class ReportsComponent {
           const items = data.recommendations ?? [];
           this.insights = items.slice(0, 6);
           this.insightsLoading = false;
+          this.insightsLoadAttempted = true;
         },
         error: (err) => {
           this.insightsLoading = false;
+          this.insightsLoadAttempted = true;
           if (err?.status === 429) {
             this.insightsLimitExceeded = true;
           }
@@ -565,12 +568,14 @@ export class ReportsComponent {
           const items = data.recommendations ?? [];
           this.insights = items.slice(0, 6);
           this.insightsLoading = false;
+          this.insightsLoadAttempted = true;
         },
         error: (err) => {
           if (err?.status === 404) {
             this.generateFirstInsights(cashflowId);
           } else {
             this.insightsLoading = false;
+            this.insightsLoadAttempted = true;
           }
         },
       });
@@ -584,9 +589,11 @@ export class ReportsComponent {
           const items = data.recommendations ?? [];
           this.insights = items.slice(0, 6);
           this.insightsLoading = false;
+          this.insightsLoadAttempted = true;
         },
         error: (err) => {
           this.insightsLoading = false;
+          this.insightsLoadAttempted = true;
           if (err?.status === 429) {
             this.insightsLimitExceeded = true;
           }
