@@ -86,6 +86,9 @@ export class DefaultAssumptionsComponent implements OnInit, OnDestroy {
       country: ['' as string],
       mortgageInterestRate: [3.5 as number, [Validators.required, Validators.min(0), Validators.max(100)]],
       loanInterestRate: [8 as number, [Validators.required, Validators.min(0), Validators.max(100)]],
+      partnerInheritanceTaxRate: [4 as number, [Validators.required, Validators.min(0), Validators.max(100)]],
+      childInheritanceTaxRate: [4 as number, [Validators.required, Validators.min(0), Validators.max(100)]],
+      siblingInheritanceTaxRate: [6 as number, [Validators.required, Validators.min(0), Validators.max(100)]],
     }),
   });
 
@@ -154,6 +157,9 @@ export class DefaultAssumptionsComponent implements OnInit, OnDestroy {
               country: p.preferences?.country ?? '',
               mortgageInterestRate: p.preferences?.mortgageInterestRate ?? 3.5,
               loanInterestRate: p.preferences?.loanInterestRate ?? 8,
+              partnerInheritanceTaxRate: p.preferences?.partnerInheritanceTaxRate ?? 4,
+              childInheritanceTaxRate: p.preferences?.childInheritanceTaxRate ?? 4,
+              siblingInheritanceTaxRate: p.preferences?.siblingInheritanceTaxRate ?? 6,
             },
           });
 
@@ -239,7 +245,10 @@ export class DefaultAssumptionsComponent implements OnInit, OnDestroy {
       prefs.currency !== snap['currency'] ||
       (prefs.country ?? '') !== (snap['country'] ?? '') ||
       prefs.mortgageInterestRate !== snap['mortgageInterestRate'] ||
-      prefs.loanInterestRate !== snap['loanInterestRate']
+      prefs.loanInterestRate !== snap['loanInterestRate'] ||
+      prefs.partnerInheritanceTaxRate !== snap['partnerInheritanceTaxRate'] ||
+      prefs.childInheritanceTaxRate !== snap['childInheritanceTaxRate'] ||
+      prefs.siblingInheritanceTaxRate !== snap['siblingInheritanceTaxRate']
     );
   }
 
@@ -283,6 +292,9 @@ export class DefaultAssumptionsComponent implements OnInit, OnDestroy {
         country: blankToNull(raw.preferences.country),
         mortgageInterestRate: round2(raw.preferences.mortgageInterestRate),
         loanInterestRate: round2(raw.preferences.loanInterestRate),
+        partnerInheritanceTaxRate: round2(raw.preferences.partnerInheritanceTaxRate),
+        childInheritanceTaxRate: round2(raw.preferences.childInheritanceTaxRate),
+        siblingInheritanceTaxRate: round2(raw.preferences.siblingInheritanceTaxRate),
       },
     };
   }

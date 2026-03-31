@@ -19,6 +19,10 @@ export interface PreferencesDto {
   mortgageInterestRate?: number | null;
   /** Default % p.a. for loan-style calculator (Home/Boat financing, custom events). */
   loanInterestRate?: number | null;
+  /** Default inheritance tax rates used by the Legacy module when tax settings are not yet customised. */
+  partnerInheritanceTaxRate?: number | null;
+  childInheritanceTaxRate?: number | null;
+  siblingInheritanceTaxRate?: number | null;
 }
 
 export interface UserProfileDto {
