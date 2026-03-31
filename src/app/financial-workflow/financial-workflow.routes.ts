@@ -11,6 +11,7 @@ import { AiRecommendationsComponent } from './ai-recommendations/ai-recommendati
 import { AgentChatComponent } from './agent-chat/agent-chat.component';
 import { CashflowResolver } from './resolvers/cashflow.resolver';
 import { CashflowLayoutComponent } from './cashflow-layout/cashflow-layout.component';
+import { SchoolComponent } from './school/school.component';
 
 export const FinancialWorkflowRoutes: Routes = [
   {
@@ -30,6 +31,7 @@ export const FinancialWorkflowRoutes: Routes = [
           { path: 'emergencies', component: EmergenciesComponent },
           { path: 'wealth', component: WealthComponent },
           { path: 'ai-recommendations', component: AiRecommendationsComponent },
+          { path: 'school', component: SchoolComponent },
           { path: 'agent-chat', component: AgentChatComponent },
         ],
       },
