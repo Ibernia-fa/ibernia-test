@@ -26,7 +26,7 @@
           </p>
         </div>
 
-        <div formGroupName="preferences" class="d-flex flex-column gap-20">
+        <div formGroupName="preferences" class="d-flex flex-column gap-20 assumptions-form-content">
           <!-- Section 1: Plan setup -->
           <div class="d-flex flex-column gap-16">
             <h5 class="assumptions-section-title">
@@ -655,28 +655,6 @@
                   form.controls.preferences.controls.comissionType.value ===
                   ComissionType.Amount
                 ) {
-                  <!-- <div class="col-2"> -->
-                  <div class="settings-form-field">
-                    <mat-label class="f-s-16 f-w-500 ibr-black d-block">{{
-                      "Currency" | translate
-                    }}</mat-label>
-                    <mat-form-field
-                      appearance="outline"
-                      class="w-full w-100 disabled-field settings-custom-input"
-                      subscriptSizing="dynamic"
-                    >
-                      <input
-                        matInput
-                        [value]="p.currency?.value || ''"
-                        disabled
-                        readonly
-                        aria-readonly="true"
-                        placeholder="—"
-                      />
-                    </mat-form-field>
-                  </div>
-                  <!-- </div> -->
-                  <!-- <div class="col-10"> -->
                   <div class="settings-form-field">
                     <mat-label
                       class="f-s-16 f-w-500 ibr-black d-flex align-items-center"
@@ -694,6 +672,7 @@
                       class="w-100 settings-custom-input"
                       subscriptSizing="dynamic"
                     >
+                      <span matPrefix class="settings-currency-prefix">{{ p.currency?.value || '' }}</span>
                       <input
                         matInput
                         type="text"
@@ -715,35 +694,12 @@
                       >
                     </mat-form-field>
                   </div>
-                  <!-- </div> -->
                 }
 
                 @if (
                   form.controls.preferences.controls.comissionType.value ===
                   ComissionType.Both
                 ) {
-                  <!-- <div class="col-2"> -->
-                  <div class="settings-form-field">
-                    <mat-label class="f-s-16 f-w-500 ibr-black d-block">{{
-                      "Currency" | translate
-                    }}</mat-label>
-                    <mat-form-field
-                      appearance="outline"
-                      class="w-full w-100 disabled-field settings-custom-input"
-                      subscriptSizing="dynamic"
-                    >
-                      <input
-                        matInput
-                        [value]="p.currency?.value || ''"
-                        readonly
-                        disabled
-                        aria-readonly="true"
-                        placeholder="—"
-                      />
-                    </mat-form-field>
-                  </div>
-                  <!-- </div> -->
-                  <!-- <div class="col-5"> -->
                   <div class="settings-form-field">
                     <mat-label
                       class="f-s-16 f-w-500 ibr-black d-flex align-items-center"
@@ -761,6 +717,7 @@
                       class="w-100 settings-custom-input"
                       subscriptSizing="dynamic"
                     >
+                      <span matPrefix class="settings-currency-prefix">{{ p.currency?.value || '' }}</span>
                       <input
                         matInput
                         type="text"
@@ -771,7 +728,7 @@
                           onCommissionAmountInput($event.target?.value ?? '')
                         "
                         (focus)="formatCommissionAmountOnFocus($event)"
-                        placeholder="Enter amount"
+                        placeholder="{{ 'Enter amount' | translate }}"
                       />
                       <mat-error
                         *ngIf="p.comissionAmount.hasError('required')"
@@ -782,8 +739,6 @@
                       >
                     </mat-form-field>
                   </div>
-                  <!-- </div> -->
-                  <!-- <div class="col-5"> -->
                   <div class="settings-form-field">
                     <mat-label
                       class="f-s-16 f-w-500 ibr-black d-flex align-items-center"

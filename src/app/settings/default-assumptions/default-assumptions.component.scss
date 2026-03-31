@@ -45,6 +45,10 @@
   // }
 }
 
+.assumptions-form-content {
+  max-width: 720px;
+}
+
 .assumption-container {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
