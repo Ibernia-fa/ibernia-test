@@ -24,6 +24,10 @@ export class AiRecommendationsHttpService {
     return this.httpClient.get<AgenticUsageResponse>('/api/v1/agentic/usage');
   }
 
+  getSavedInsights(cashflowId: string): Observable<PlanAnalysisResponse> {
+    return this.httpClient.get<PlanAnalysisResponse>(`/api/v1/agentic/insights/${cashflowId}`);
+  }
+
   analyzePlan(request: AnalyzePlanRequest): Observable<PlanAnalysisResponse> {
     return this.httpClient.post<PlanAnalysisResponse>('/api/v1/agentic/plan', {
       cashflowId: request.cashflowId,
