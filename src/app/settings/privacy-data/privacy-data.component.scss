@@ -111,8 +111,11 @@
   align-items: center;
   gap: 8px;
   cursor: pointer;
+  font-family: inherit;
   font-size: 14px;
   font-weight: 500;
+  line-height: 18px;
+  letter-spacing: 0;
   min-height: 40px;
   color: white;
   background-color: #4043af;
@@ -176,8 +179,11 @@
     align-items: center;
     gap: 8px;
     cursor: pointer;
+    font-family: inherit;
     font-size: 14px;
     font-weight: 500;
+    line-height: 18px;
+    letter-spacing: 0;
     min-height: 40px;
     color: white;
   }
