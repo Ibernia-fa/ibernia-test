@@ -147,9 +147,22 @@
               <!-- Insights Section -->
               <div
                 class="ibr-insights-section"
-                *ngIf="insights.length >= 2 || insightsLoading"
+                *ngIf="insights.length >= 2 || insightsLoading || insightsLimitExceeded"
               >
-                <h3 class="ibr-insights-title">Insights</h3>
+                <div class="d-flex align-items-center justify-content-between m-b-8">
+                  <h3 class="ibr-insights-title m-b-0">Insights</h3>
+                  <div class="d-flex align-items-center gap-8" *ngIf="!insightsLoading">
+                    <span *ngIf="insightsLimitExceeded" class="text-error f-s-12">Daily limit reached</span>
+                    <button
+                      class="button-icon"
+                      style="padding: 4px 12px; font-size: 12px;"
+                      (click)="regenerateInsights()"
+                      [disabled]="insightsLoading || insightsLimitExceeded"
+                    >
+                      <span>Generate New</span>
+                    </button>
+                  </div>
+                </div>
 
                 <div class="ibr-insights-loading" *ngIf="insightsLoading">
                   <mat-spinner diameter="28"></mat-spinner>

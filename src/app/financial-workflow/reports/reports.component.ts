@@ -217,6 +217,7 @@ export class ReportsComponent {
 
   insights: RecommendationItem[] = [];
   insightsLoading = false;
+  insightsLimitExceeded = false;
   private insightsLoadedForCashflow: string | null = null;
   readonly insightIconColors = ['#4043AF', '#FF383C', '#FF8D28', '#34C759', '#4043AF', '#FF383C'];
   readonly insightIconBgs = ['#f0f0ff', '#fff3f3', '#fff8f0', '#f0fff4', '#f0f0ff', '#fff3f3'];
@@ -528,9 +529,9 @@ export class ReportsComponent {
       });
   }
 
-  private loadInsights(cashflowId: string): void {
-    if (this.insightsLoadedForCashflow === cashflowId) return;
-    this.insightsLoadedForCashflow = cashflowId;
+  regenerateInsights(): void {
+    if (!this.cashflow?.id || this.insightsLimitExceeded) return;
+    const cashflowId = this.cashflow.id;
     this.insightsLoading = true;
     this.insights = [];
 
@@ -542,8 +543,53 @@ export class ReportsComponent {
           this.insights = items.slice(0, 6);
           this.insightsLoading = false;
         },
-        error: () => {
+        error: (err) => {
           this.insightsLoading = false;
+          if (err?.status === 429) {
+            this.insightsLimitExceeded = true;
+          }
+        },
+      });
+  }
+
+  private loadInsights(cashflowId: string): void {
+    if (this.insightsLoadedForCashflow === cashflowId) return;
+    this.insightsLoadedForCashflow = cashflowId;
+    this.insightsLoading = true;
+    this.insights = [];
+
+    this.aiRecommendationsHttpService
+      .getSavedInsights(cashflowId)
+      .subscribe({
+        next: (data) => {
+          const items = data.recommendations ?? [];
+          this.insights = items.slice(0, 6);
+          this.insightsLoading = false;
+        },
+        error: (err) => {
+          if (err?.status === 404) {
+            this.generateFirstInsights(cashflowId);
+          } else {
+            this.insightsLoading = false;
+          }
+        },
+      });
+  }
+
+  private generateFirstInsights(cashflowId: string): void {
+    this.aiRecommendationsHttpService
+      .analyzePlan({ cashflowId })
+      .subscribe({
+        next: (data) => {
+          const items = data.recommendations ?? [];
+          this.insights = items.slice(0, 6);
+          this.insightsLoading = false;
+        },
+        error: (err) => {
+          this.insightsLoading = false;
+          if (err?.status === 429) {
+            this.insightsLimitExceeded = true;
+          }
         },
       });
   }
