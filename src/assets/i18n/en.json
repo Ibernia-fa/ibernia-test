@@ -417,6 +417,7 @@
   "Shared by": "Shared by",
   "Swipe up": "Swipe up",
   "Swipe down": "Swipe down",
+  "Please answer this question before continuing.": "Please answer this question before continuing.",
   "MFA_REMINDER_TITLE": "Set up two-factor authentication",
   "MFA_REMINDER_PREVIEW_GENERIC": "You have 7 days from your first sign-in to enable 2FA. Open your account security page to complete setup.",
   "MFA_REMINDER_PREVIEW_DEADLINE": "Enable 2FA before {{date}} to keep access to Ibernia.",

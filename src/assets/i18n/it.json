@@ -397,6 +397,7 @@
   "Added": "Aggiunto",
   "Not added": "Non aggiunto",
   "Copy questionnaire link": "Copia link questionario",
+  "Please answer this question before continuing.": "Rispondi a questa domanda prima di continuare.",
 
   "MFA_REMINDER_TITLE": "Configura l'autenticazione a due fattori",
   "MFA_REMINDER_PREVIEW_GENERIC": "Hai 7 giorni dal primo accesso per attivare il 2FA. Apri la pagina di sicurezza dell'account per completare la configurazione.",
