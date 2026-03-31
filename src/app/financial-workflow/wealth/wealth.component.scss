@@ -1,23 +1,29 @@
 :host {
   display: block;
-  font-family: 'Ubuntu', sans-serif;
+  font-family: "Ubuntu", sans-serif;
 }
 
+.stepper-container {
+  max-width: 768px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
 // Stepper header (Net Worth / Legacy tab bar)
 .stepper-header {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   gap: 0;
-  padding: 12px 0;
+  // padding: 12px 0;
 }
 
 .stepper-step {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  min-width: 100px;
+  gap: 16px;
+  min-width: 84px;
   cursor: pointer;
 }
 
@@ -25,7 +31,7 @@
   width: 48px;
   height: 48px;
   border-radius: 100px;
-  background: #FFFFFF;
+  background: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -37,39 +43,51 @@
   }
 
   mat-icon {
-    color: #5A596E;
+    color: #5a596e;
     font-size: 24px;
     width: 24px;
     height: 24px;
   }
 
   &.disabled-icon {
-    background: #FFFFFF;
+    background: #ffffff;
 
     mat-icon {
-      color: #5A596E;
+      color: #5a596e;
     }
   }
 }
 
 .stepper-label {
-  font-family: 'Ubuntu', sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-weight: 500;
-  font-size: 18px;
-  line-height: 21px;
-  color: #5A596E;
+  font-size: 16px;
+  line-height: 20px;
+  color: #5a596e;
   transition: color 0.2s ease;
 }
 
 .stepper-line {
-  height: 0;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  margin: 0 60px;
-  margin-bottom: 30px;
-  align-self: center;
-  min-width: 200px;
-  flex: none;
+  width: 90%;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 1px;
+  background-color: #0000001a;
+  position: absolute;
+  z-index: -1;
+  align-self: flex-start;
+  margin-top: 24px;
+  flex: 1 1 auto;
 }
+// .stepper-line {
+//   flex: 1 1 auto;
+//   height: 0;
+//   border: none;
+//   border-top: 1px solid rgba(0, 0, 0, 0.1);
+//   margin: 0 16px; // space from icons — adjust to taste
+//   align-self: center;
+//   min-width: 0; // allows shrinking in tight layouts
+// }
 
 .stepper-step.disabled {
   opacity: 0.5;
@@ -78,19 +96,19 @@
 
 .stepper-step.active {
   .stepper-icon {
-    background: #4043AF;
+    background: #4043af;
 
     img {
       filter: brightness(0) invert(1);
     }
 
     mat-icon {
-      color: #FFFFFF;
+      color: #ffffff;
     }
   }
 
   .stepper-label {
-    color: #4043AF;
+    color: #4043af;
   }
 }
 
@@ -110,11 +128,11 @@
 }
 
 .stat-label {
-  font-family: 'Ubuntu', sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-weight: 400;
   font-size: 16px;
   line-height: 18px;
-  color: #5A596E;
+  color: #5a596e;
   display: flex;
   align-items: center;
   gap: 5px;
@@ -122,29 +140,32 @@
 }
 
 .stat-subtext {
-  font-family: 'Ubuntu', sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-weight: 400;
   font-size: 16px;
   line-height: 18px;
-  color: #5A596E;
-  margin: 0;
+  color: #5a596e;
+  margin: 6px 0 0 0;
 }
 
 .saving-title {
-  font-family: 'Ubuntu', sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-weight: 700;
   font-size: 40px;
   line-height: 46px;
-  color: #1C1C1C;
+  color: #1c1c1c;
   margin: 0;
 }
 
 // Per-person breakdown
 .per-person-breakdown {
   display: flex;
+  display: grid;
+  flex-shrink: 0;
+  grid-template-columns: 1fr 1px auto;
   align-items: stretch;
   gap: 0;
-  margin-top: 8px;
+  margin-top: 16px;
   background: rgba(255, 255, 255, 0.7);
   border: 1px solid rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(37.5px);
@@ -152,50 +173,54 @@
   padding: 14px 16px;
 }
 
+.networth-wrapper {
+  flex-wrap: wrap;
+}
+
 .person-chip {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 10px;
   flex: 1;
-  padding: 4px 0;
+  // padding: 4px 0;
   background: transparent;
   border: none;
   border-radius: 0;
   min-width: unset;
 
   &:first-child {
-    padding-right: 20px;
-    border-right: 1px solid #DCD9D9;
+    padding-right: 24px;
+    border-right: 1px solid #dcd9d9;
   }
 
   &.partner {
-    padding-left: 20px;
+    padding-left: 24px;
     background: transparent;
     border: none;
   }
 }
 
 .person-name {
-  font-family: 'Ubuntu', sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-weight: 400;
   font-size: 14px;
   line-height: 16px;
-  color: #3088ED;
+  color: #3088ed;
 
   .partner & {
-    color: #FE9614;
+    color: #fe9614;
   }
 }
 
 .person-value {
-  font-family: 'Ubuntu', sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-weight: 500;
   font-size: 18px;
   line-height: 21px;
-  color: #3088ED;
+  color: #3088ed;
 
   .partner & {
-    color: #FE9614;
+    color: #fe9614;
   }
 }
 
@@ -217,16 +242,26 @@
   transition: width 0.3s ease;
 }
 
-.bar-cash { background-color: #00BCFF; }
-.bar-real-estate { background-color: #09AC65; }
-.bar-investments { background-color: #9345FA; }
-.bar-personal-property { background-color: #FF637F; }
-.bar-other { background-color: #fbbf24; }
+.bar-cash {
+  background-color: #00bcff;
+}
+.bar-real-estate {
+  background-color: #09ac65;
+}
+.bar-investments {
+  background-color: #9345fa;
+}
+.bar-personal-property {
+  background-color: #ff637f;
+}
+.bar-other {
+  background-color: #fbbf24;
+}
 
 // Legend
 .legend-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr auto;
   gap: 10px 24px;
   margin-top: 16px;
 }
@@ -245,37 +280,37 @@
 }
 
 .legend-label {
-  font-family: 'Ubuntu', sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-weight: 400;
   font-size: 14px;
   line-height: 16px;
-  color: #5A596E;
+  color: #5a596e;
 }
 
 .legend-value {
-  font-family: 'Ubuntu', sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-weight: 500;
   font-size: 18px;
   line-height: 20px;
-  color: #1C1C1C;
+  color: #1c1c1c;
 }
 
 // Section titles
 .section-title {
-  font-family: 'Ubuntu', sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-weight: 700;
   font-size: 24px;
   line-height: 28px;
-  color: #1C1C1C;
+  color: #1c1c1c;
   margin: 0;
 }
 
 .section-total {
-  font-family: 'Ubuntu', sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-weight: 400;
   font-size: 16px;
   line-height: 18px;
-  color: #5A596E;
+  color: #5a596e;
   margin: 4px 0 0;
 }
 
@@ -288,7 +323,7 @@
   height: 48px;
   padding: 0 20px;
   border-radius: 6px;
-  font-family: 'Ubuntu', sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-weight: 500;
   font-size: 16px;
   line-height: 18px;
@@ -304,8 +339,8 @@
 }
 
 .add-btn-primary {
-  background-color: #4043AF;
-  color: #FFFFFF;
+  background-color: #4043af;
+  color: #ffffff;
 
   &:hover {
     background-color: #363996;
@@ -318,74 +353,100 @@
 
 .add-btn-outline {
   background-color: transparent;
-  color: #4043AF;
-  border: 1px solid #4043AF;
+  color: #4043af;
+  border: 1px solid #4043af;
 
   &:hover {
     background-color: rgba(64, 67, 175, 0.05);
   }
 }
 
-// Tables
+// Tables (aligned with withdrawals-contributions / client-list)
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
 .table-wrapper {
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  overflow-x: auto;
+  border-radius: 12px;
+}
+
+.table-wrapper .mat-mdc-table {
+  background-color: transparent !important;
+
+  .example-element-row:hover {
+    background-color: #ffffff90 !important;
+    cursor: pointer;
+  }
+
+  .example-element-row:active {
+    background-color: #e8e8e8 !important;
+  }
+
+  .mat-mdc-header-row {
+    background: #ffffff !important;
+    height: 50px !important;
+  }
+
+  .column-client {
+    min-width: 295px;
+    padding: 10px 24px !important;
+  }
+
+  .column-net-amount {
+    min-width: 250px;
+    padding: 10px 8px !important;
+
+    @media (max-width: 768px) {
+      min-width: 190px;
+    }
+  }
+
+  .column-action {
+    min-width: 96px;
+    padding: 10px 8px !important;
+  }
+
+  .mat-mdc-row {
+    background-color: #ffffff75 !important;
+    transition: background-color 0.3s ease;
+  }
+}
+
+.clientTableContainer {
+  background: #ffffffb2;
   border-radius: 12px;
   overflow: hidden;
-}
+  box-shadow: none;
 
-.wealth-table {
-  width: 100%;
-  text-align: left;
-  border-collapse: collapse;
-
-  thead {
-    background: #FFFFFF;
-
-    th {
-      padding: 16px 24px;
-      font-family: 'Ubuntu', sans-serif;
-      font-weight: 400;
-      font-size: 14px;
-      line-height: 16px;
-      color: #5A596E;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-    }
-  }
-
-  tbody {
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(37.5px);
-
-    tr {
-      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-
-      &:last-child {
-        border-bottom: none;
-      }
-
-      &.alt-row {
-        background: transparent;
-      }
-    }
-
-    td {
-      padding: 16px 24px;
-      font-family: 'Ubuntu', sans-serif;
-      font-weight: 400;
-      font-size: 14px;
-      line-height: 16px;
-      color: #1C1C1C;
-      vertical-align: middle;
-    }
+  .button-icon,
+  .button-icon-outline {
+    border: 1px solid #4043af;
+    padding: 12px 16px;
   }
 }
 
-.clickable-row {
-  cursor: pointer;
-  transition: background-color 0.15s ease;
+.table-main-wrapper {
+  padding: 0 24px 24px 24px;
+}
 
-  &:hover {
-    background-color: #f1f5f9 !important;
+.heading-btn-wrapper {
+  padding: 24px;
+
+  @media (max-width: 768px) {
+    padding-left: 16px;
+    padding-top: 16px;
+  }
+
+  h3 {
+    color: #1c1c1c;
+    font-size: 24px;
+    font-weight: 700;
+  }
+
+  p {
+    margin: 0;
   }
 }
 
@@ -401,7 +462,7 @@
   justify-content: center;
   border-radius: 20px;
   padding: 4px 16px;
-  font-family: 'Ubuntu', sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-weight: 500;
   font-size: 11.2px;
   line-height: 13px;
@@ -411,51 +472,18 @@
 }
 
 .ownership-joint {
-  background-color: #C9FCDC;
-  color: #00BA3E;
+  background-color: #c9fcdc;
+  color: #00ba3e;
 }
 
 .ownership-client {
-  background-color: #C6E1FF;
-  color: #3088ED;
+  background-color: #c6e1ff;
+  color: #3088ed;
 }
 
 .ownership-partner {
-  background-color: #FFEBCB;
-  color: #FE9614;
-}
-
-// 3-dot menu
-.menu-trigger-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  border: none;
-  background: none;
-  cursor: pointer;
-  padding: 0;
-
-  &:hover {
-    background-color: #f1f5f9;
-  }
-}
-
-.menu-icon {
-  font-size: 18px !important;
-  width: 18px !important;
-  height: 18px !important;
-  color: #5A596E;
-}
-
-.delete-menu-item {
-  color: #e11d48 !important;
-
-  mat-icon {
-    color: #e11d48 !important;
-  }
+  background-color: #ffebcb;
+  color: #fe9614;
 }
 
 // Empty state
@@ -473,4 +501,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+// New Styles
+.summary-section {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
 }

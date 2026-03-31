@@ -1,98 +1,201 @@
 <div class="w-100">
-  <div class="d-flex flex-column gap-32">
-    <div class="d-flex align-items-center justify-content-between gap-10 modal-header">
-      <h3>{{ isEditMode ? 'Edit Asset' : 'Add Asset' }}</h3>
-      <button (click)="onCancel()" type="button">
-        <img src="assets/images/svgs/close-line-cion.svg" alt="close" />
+  <div class="d-flex flex-column">
+    <div class="dialog-header">
+      <h2 class="dialog-title text-center">
+        {{ isEditMode ? "Edit Asset" : "Add Asset" }}
+      </h2>
+      <button
+        type="button"
+        mat-icon-button
+        disableRipple
+        class="dialog-close-btn"
+        mat-dialog-close
+        aria-label="Close dialog"
+        (click)="onCancel()"
+      >
+        <mat-icon>close</mat-icon>
       </button>
     </div>
 
-    <mat-dialog-content>
-      <div [formGroup]="form" class="d-flex flex-column gap-20">
-
+    <mat-dialog-content class="event-dialog-content">
+      <div [formGroup]="form" class="d-flex flex-column gap-16">
         <div class="w-100 form-field gap-8">
-          <mat-label class="f-s-16 d-block" style="line-height: 18px">Category</mat-label>
-          <div class="select-option">
-            <mat-select formControlName="category" placeholder="Select category"
-              hideSingleSelectionIndicator (selectionChange)="onCategoryChange()">
-              @for (cat of categories; track cat.value) {
-                <mat-option [value]="cat.value">{{ cat.label }}</mat-option>
-              }
-            </mat-select>
+          <mat-label
+            class="f-s-16 f-w-500 d-block ibr-black"
+            style="line-height: 16px"
+            >Category</mat-label
+          >
+          <div class="position-relative">
+            <div class="w-100 form-field">
+              <div class="select-option position-relative">
+                <mat-select
+                  formControlName="category"
+                  placeholder="Select category"
+                  hideSingleSelectionIndicator
+                  (selectionChange)="onCategoryChange()"
+                >
+                  @for (cat of categories; track cat.value) {
+                    <mat-option [value]="cat.value">{{ cat.label }}</mat-option>
+                  }
+                </mat-select>
+                <span class="custom-arrow">
+                  <svg
+                    width="12"
+                    height="7"
+                    viewBox="0 0 12 7"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M1 1L6 6L11 1"
+                      stroke="#2B3942"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </span>
+              </div>
+            </div>
           </div>
         </div>
 
         @if (isOtherCategory) {
           <div class="w-100 form-field gap-8">
-            <mat-label class="f-s-16 d-block" style="line-height: 18px">Name</mat-label>
-            <input matInput formControlName="name" placeholder="e.g. Artwork collection" />
-            @if(form.get('name')?.touched && form.get('name')?.hasError('required')) {
+            <mat-label
+              class="f-s-16 f-w-500 d-block ibr-black"
+              style="line-height: 16px"
+              >Name</mat-label
+            >
+            <input
+              matInput
+              formControlName="name"
+              placeholder="e.g. Artwork collection"
+            />
+            @if (
+              form.get("name")?.touched && form.get("name")?.hasError("required")
+            ) {
               <span class="field-error d-block">Required</span>
             }
           </div>
         }
 
-        <div class="d-flex flex-column gap-4 net-fields">
-          <div class="d-flex flex-column gap-8">
-            <mat-label class="f-s-16 d-block" style="line-height: 18px">Value</mat-label>
-            <div class="net-field d-flex align-items-center">
-              <div class="left hide-arrow">
-                <mat-select formControlName="currencySymbol" class="sortby-edit-profile"
-                  hideSingleSelectionIndicator disabled>
-                  @for (country of countries; track country) {
-                    @if(country.currencySymbol) {
-                      <mat-option [value]="country.currencySymbol">{{country.currencySymbol}}</mat-option>
-                    }
+        <div class="d-flex flex-column gap-8 net-fields">
+          <mat-label
+            class="f-s-16 f-w-500 d-flex align-items-center ibr-black"
+            style="line-height: 16px !important"
+            >Value</mat-label
+          >
+
+          <div class="net-field d-flex align-items-center">
+            <div class="left hide-arrow">
+              <mat-select
+                formControlName="currencySymbol"
+                class="sortby-edit-profile"
+                hideSingleSelectionIndicator
+                disabled
+              >
+                @for (country of countries; track country) {
+                  @if (country.currencySymbol) {
+                    <mat-option [value]="country.currencySymbol">{{
+                      country.currencySymbol
+                    }}</mat-option>
                   }
-                </mat-select>
-              </div>
-              <div class="w-100 form-field">
-                <input matInput type="text" formControlName="value"
-                  [value]="form.get('value')?.value | thousandSeparator"
-                  thousandSeparatorInput
-                  (input)="onAmountInput($event.target.value)"
-                  placeholder="0" />
-              </div>
+                }
+              </mat-select>
             </div>
-            @if(form.get('value')?.touched && form.get('value')?.hasError('required')) {
-              <span class="field-error d-block">Required</span>
-            }
+            <div class="w-100 form-field">
+              <input
+                matInput
+                type="text"
+                formControlName="value"
+                [value]="form.get('value')?.value | thousandSeparator"
+                thousandSeparatorInput
+                (input)="onAmountInput($event.target.value)"
+                placeholder="0"
+              />
+            </div>
           </div>
+          @if (
+            form.get("value")?.touched && form.get("value")?.hasError("required")
+          ) {
+            <span class="field-error d-block">Required</span>
+          }
         </div>
 
         @if (hasPartner) {
           <div class="w-100 form-field gap-8">
-            <mat-label class="f-s-16 d-block" style="line-height: 18px">Ownership</mat-label>
-            <div class="select-option">
-              <mat-select formControlName="ownership" placeholder="Select ownership"
-                hideSingleSelectionIndicator>
-                @for (opt of ownershipOptions; track opt.value) {
-                  <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
-                }
-              </mat-select>
+            <mat-label
+              class="f-s-16 f-w-500 d-block ibr-black"
+              style="line-height: 16px"
+              >Ownership</mat-label
+            >
+            <div class="position-relative">
+              <div class="w-100 form-field">
+                <div class="select-option position-relative">
+                  <mat-select
+                    formControlName="ownership"
+                    placeholder="Select ownership"
+                    hideSingleSelectionIndicator
+                  >
+                    @for (opt of ownershipOptions; track opt.value) {
+                      <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+                    }
+                  </mat-select>
+                  <span class="custom-arrow">
+                    <svg
+                      width="12"
+                      height="7"
+                      viewBox="0 0 12 7"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M1 1L6 6L11 1"
+                        stroke="#2B3942"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         }
-
       </div>
     </mat-dialog-content>
 
-    <div class="row justify-content-between modal-action">
-      <div class="col-5">
-        @if(isEditMode) {
-          <button type="button" class="button-icon-outline w-100 d-block" (click)="onDelete()" [disabled]="isSaving">
+    <div class="row justify-content-end gap-16 modal-action p-t-24">
+      <div>
+        @if (isEditMode) {
+          <button
+            type="button"
+            class="button-icon-outline w-100 d-block"
+            (click)="onDelete()"
+            [disabled]="isSaving"
+          >
             <span class="f-s-16">Delete</span>
           </button>
         } @else {
-          <button type="button" class="button-icon-outline w-100 d-block" (click)="onCancel()">
+          <button
+            type="button"
+            class="button-icon-outline w-100 d-block"
+            (click)="onCancel()"
+          >
             <span class="f-s-16">Cancel</span>
           </button>
         }
       </div>
-      <div class="col-5">
-        <button type="button" class="button-icon w-100 d-block" (click)="onSave()"
-          [disabled]="form.invalid || isSaving">
-          @if(isSaving) {
+      <div>
+        <button
+          type="button"
+          class="button-icon w-100 d-block"
+          (click)="onSave()"
+          [disabled]="form.invalid || isSaving"
+        >
+          @if (isSaving) {
             <span class="f-s-16">Saving...</span>
           } @else {
             <span class="f-s-16">Save</span>
