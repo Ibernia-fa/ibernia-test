@@ -659,33 +659,9 @@ export class ReportsComponent {
           this.insightsLoading = false;
           this.insightsLoadAttempted = true;
         },
-        error: (err) => {
-          if (err?.status === 404) {
-            this.generateFirstInsights(cashflowId);
-          } else {
-            this.insightsLoading = false;
-            this.insightsLoadAttempted = true;
-          }
-        },
-      });
-  }
-
-  private generateFirstInsights(cashflowId: string): void {
-    this.aiRecommendationsHttpService
-      .analyzePlan({ cashflowId })
-      .subscribe({
-        next: (data) => {
-          const items = data.recommendations ?? [];
-          this.insights = items.slice(0, 6);
+        error: () => {
           this.insightsLoading = false;
           this.insightsLoadAttempted = true;
-        },
-        error: (err) => {
-          this.insightsLoading = false;
-          this.insightsLoadAttempted = true;
-          if (err?.status === 429) {
-            this.insightsLimitExceeded = true;
-          }
         },
       });
   }
