@@ -97,7 +97,7 @@
               />
             </svg>
             <!-- <mat-icon>shield</mat-icon> -->
-            <span>Terms and Conditions</span>
+            <span>{{ 'Footer.TERMS' | translate }}</span>
           </div>
 
           <svg
@@ -136,9 +136,11 @@
       <div class="exporting-section">
         <div class="text-wrapper d-flex flex-column gap-10">
           <div class="d-flex flex-column gap-10">
-            <h3 class="ibr-new-heading">Export Your Data</h3>
+            <h3 class="ibr-new-heading">
+              {{ 'PRIVACY.EXPORT_DATA_TITLE' | translate }}
+            </h3>
             <p class="ibr-new-subheading">
-              Download a complete archive of your data, including an Excel spreadsheet and any associated images
+              {{ 'PRIVACY.EXPORT_DATA_DESCRIPTION' | translate }}
             </p>
           </div>
         </div>
@@ -187,7 +189,7 @@
             diameter="20"
             class="inline-spinner"
           ></mat-spinner>
-          {{ isExporting ? "Exporting..." : "Export my data" }}
+          {{ isExporting ? ('PRIVACY.EXPORTING' | translate) : ('PRIVACY.EXPORT_MY_DATA' | translate) }}
         </button>
       </div>
     </mat-card-content>
@@ -199,9 +201,11 @@
       <div class="exporting-section">
         <div class="text-wrapper d-flex flex-column gap-10">
           <div class="d-flex flex-column gap-10">
-            <h3 class="ibr-new-heading">Account Closure</h3>
+            <h3 class="ibr-new-heading">
+              {{ 'PRIVACY.ACCOUNT_CLOSURE_TITLE' | translate }}
+            </h3>
             <p class="ibr-new-subheading">
-              Please refer to our Terms and Conditions to learn more about how your data is managed after account closure
+              {{ 'PRIVACY.ACCOUNT_CLOSURE_COPY' | translate }}
             </p>
           </div>
 
@@ -242,7 +246,7 @@
                 <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
               </svg>
             </ng-container>
-            {{ isTerminating ? "Processing..." : "Close account" }}
+            {{ isTerminating ? ('PRIVACY.PROCESSING' | translate) : ('PRIVACY.CLOSE_ACCOUNT' | translate) }}
           </button>
         </div>
       </div>

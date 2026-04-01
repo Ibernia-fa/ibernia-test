@@ -1,11 +1,15 @@
 import { Pipe, PipeTransform } from '@angular/core';
+import { inject } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 
 @Pipe({
-  name: 'timeAgo'
+  name: 'timeAgo',
 })
 export class TimeAgoPipe implements PipeTransform {
+  private translate = inject(TranslateService);
+
   transform(value: Date | string | number): string {
-    if (!value) return 'Invalid date';
+    if (!value) return this.translate.instant('TIME.INVALID');
 
     const date = new Date(value);
     const now = new Date();
@@ -16,13 +20,21 @@ export class TimeAgoPipe implements PipeTransform {
     const diffInDays = Math.floor(diffInHours / 24);
 
     if (diffInSeconds < 60 && diffInSeconds > 0) {
-      return `${diffInSeconds} seconds ago`;
+      return this.translate.instant('TIME.SECONDS_AGO', {
+        value: diffInSeconds,
+      });
     } else if (diffInMinutes < 60) {
-      return `${diffInMinutes} minutes ago`;
+      return this.translate.instant('TIME.MINUTES_AGO', {
+        value: diffInMinutes,
+      });
     } else if (diffInHours < 24) {
-      return `${diffInHours} hours ago`;
+      return this.translate.instant('TIME.HOURS_AGO', {
+        value: diffInHours,
+      });
     } else {
-      return `${diffInDays} days ago`;
+      return this.translate.instant('TIME.DAYS_AGO', {
+        value: diffInDays,
+      });
     }
   }
 }
