@@ -69,5 +69,11 @@ export const routes: Routes = [
   },
   { path: 'signin-oidc', loadChildren: () => import('./auth/auth.module').then(m => m.AuthModule) },
 
-  { path: 'signout-callback-oidc', redirectTo: '' },
+  {
+    path: 'signout-callback-oidc',
+    loadComponent: () =>
+      import('./auth/components/signout-callback/signout-callback.component').then(
+        (m) => m.SignoutCallbackComponent
+      ),
+  },
 ];

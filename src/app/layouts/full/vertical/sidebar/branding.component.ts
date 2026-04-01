@@ -12,8 +12,10 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
         <img
           src="assets/images/logos/ibernia-logo.svg"
           alt="Ibernia"
-          class="brand-logo brand-logo--default"
+          class="brand-layer brand-logo--default"
           [class.brand-logo--default-hidden]="!!profileImage"
+          width="120"
+          height="40"
           loading="eager"
           fetchpriority="high"
           decoding="sync"
@@ -22,7 +24,9 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
           *ngIf="profileImage && sanitizedImage"
           [src]="sanitizedImage"
           alt="Company logo"
-          class="brand-logo brand-logo--custom"
+          class="brand-layer brand-logo--custom"
+          width="120"
+          height="40"
           loading="eager"
           decoding="sync"
         />
@@ -30,47 +34,53 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
     </a>`,
   styles: [
     `
+      :host {
+        display: block;
+        max-width: 100%;
+        min-width: 0;
+      }
+
       .branding-link {
         display: flex;
         align-items: center;
         text-decoration: none;
         gap: 5px;
+        max-width: 100%;
+        min-width: 0;
       }
 
+      /* Same grid cell = no absolute centering (avoids wrong x/y before parent has size or while data-URL decodes) */
       .brand-logo-stack {
-        position: relative;
-        display: inline-flex;
+        display: grid;
+        grid-template-columns: minmax(0, 160px);
+        grid-template-rows: auto;
+        justify-items: start;
         align-items: center;
-        justify-content: center;
+        width: fit-content;
+        max-width: 100%;
+        min-height: 40px;
+        overflow: hidden;
+      }
+
+      .brand-layer {
+        grid-area: 1 / 1;
+        display: block;
+        max-width: 100%;
+        width: auto;
+        height: auto;
+        max-height: 48px;
+        object-fit: contain;
+        object-position: left center;
       }
 
       .brand-logo--default {
-        display: block;
-        max-width: 120px;
-        height: auto;
+        max-width: 160px;
       }
 
       /* In DOM for instant swap when custom is removed; invisible while custom shows */
       .brand-logo--default-hidden {
         opacity: 0;
         visibility: hidden;
-      }
-
-      .brand-logo--custom {
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
-        max-width: 120px;
-        max-height: 48px;
-        width: auto;
-        height: auto;
-        object-fit: contain;
-      }
-
-      .brand-logo {
-        max-width: 120px;
-        height: auto;
       }
 
       .power-by-logo {

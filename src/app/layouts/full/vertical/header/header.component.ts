@@ -45,6 +45,7 @@ import { LanguageService } from 'src/app/core/language.service';
 import { LanguageLoaderService } from '../../language-loader.service';
 import { BrandingComponent } from '../sidebar/branding.component';
 import { MyNotificationsService, UserNotificationItem } from 'src/app/core/services/my-notifications.service';
+import { portalOriginForIdentityReturn } from 'src/app/core/identity-security-url';
 import {
   MFA_REMINDER_NOTIFICATION_ID,
   prependMfaReminderNotification,
@@ -613,7 +614,8 @@ get userInitials(): string {
     return prependMfaReminderNotification(
       list,
       this.Authservice.getUserProfile() as Record<string, unknown> | null,
-      environment.authority
+      environment.authority,
+      portalOriginForIdentityReturn()
     );
   }
 
