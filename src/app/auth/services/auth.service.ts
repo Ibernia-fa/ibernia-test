@@ -14,8 +14,17 @@ export class AuthService {
 
   public loginChanged = this._loginChangedSubject.asObservable();
 
+  /** Canonical portal origin for redirect URIs (avoids wrong host behind proxies / PWA). */
+  private portalOrigin(): string {
+    const configured = environment.appUrl?.trim();
+    if (configured) {
+      return configured.replace(/\/$/, '');
+    }
+    return typeof window !== 'undefined' ? window.location.origin : '';
+  }
+
   private get idpSettings(): UserManagerSettings {
-    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    const origin = this.portalOrigin();
     const redirectUri = origin + '/signin-oidc';
     const postLogoutUri = origin + '/signout-callback-oidc';
     return {
@@ -66,7 +75,7 @@ export class AuthService {
   }
 
   public logout = () => {
-    const postLogoutRedirectUri = window.location.origin + '/signout-callback-oidc';
+    const postLogoutRedirectUri = this.portalOrigin() + '/signout-callback-oidc';
     console.info('[Auth] Logout:', {
       post_logout_redirect_uri: postLogoutRedirectUri,
       window_origin: window.location.origin,
