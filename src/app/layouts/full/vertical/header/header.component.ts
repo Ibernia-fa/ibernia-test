@@ -7,6 +7,8 @@ import {
   OnInit,
   OnDestroy,
   ChangeDetectorRef,
+  ViewChild,
+  ElementRef,
 } from '@angular/core';
 import { CoreService } from 'src/app/services/core.service';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -33,7 +35,7 @@ import {
   clearUserDisplayCache,
 } from 'src/app/default-preferance/services/default-preferance.http.service';
 import { HttpResponse } from '@angular/common/http';
-import { takeUntil, catchError, of, finalize, Subject, Subscription, filter } from 'rxjs';
+import { takeUntil, catchError, of, finalize, Subject, Subscription, filter, map, distinctUntilChanged } from 'rxjs';
 import { OrganizationProfilesService } from 'src/app/settings/services/organization.profiles.service';
 import { Store } from '@ngrx/store';
 import { Client } from 'src/app/clients/models/client';
@@ -43,13 +45,15 @@ import { LanguageService } from 'src/app/core/language.service';
 import { LanguageLoaderService } from '../../language-loader.service';
 import { BrandingComponent } from '../sidebar/branding.component';
 import { MyNotificationsService, UserNotificationItem } from 'src/app/core/services/my-notifications.service';
+import { portalOriginForIdentityReturn } from 'src/app/core/identity-security-url';
 import {
   MFA_REMINDER_NOTIFICATION_ID,
   prependMfaReminderNotification,
   userNeedsMfaReminder,
 } from 'src/app/core/mfa-reminder-notification';
+import { notificationMatchesSearchQuery } from 'src/app/core/notification-search';
+import { CapitalizeFirstPipe } from 'src/app/core/pipes/capitalize-first.pipe';
 import { environment } from 'src/environments/environment';
-import { NotificationRelativeTimePipe } from 'src/app/pipe/notification-relative-time.pipe';
 
 interface notifications {
   id: number;
@@ -98,7 +102,8 @@ type LanguageCode = 'en' | 'it';
         MatBadgeModule,
         MatDividerModule,
         TranslateModule,
-        NotificationRelativeTimePipe,
+        FormsModule,
+        CapitalizeFirstPipe,
     ],
     templateUrl: './header.component.html',
     encapsulation: ViewEncapsulation.None
@@ -176,10 +181,30 @@ showFiller = false;
   unreadCount = 0;
   notificationFilter: 'all' | 'unread' = 'all';
   notificationsLoading = false;
+  notificationSearchQuery = '';
   private lastNotificationsFetchAt = 0;
   private readonly NOTIFICATIONS_CACHE_MS = 60000; // 1 min
+  /** Matches MyNotificationsService feeds revision last applied to userNotifications. */
+  private headerNotificationsFeedsRevision = -1;
 
   readonly mfaReminderId = MFA_REMINDER_NOTIFICATION_ID;
+
+  @ViewChild('notificationListScroll') notificationListScroll?: ElementRef<HTMLElement>;
+
+  private notificationsMenuOpen = false;
+  private notificationVisibilityIo: IntersectionObserver | null = null;
+  /** While scrollTop is 0, at most this many non-security unread rows may be auto-marked via visibility. */
+  private initialVisibilityMarksRemaining = 2;
+  private allowUnlimitedVisibilityOnScroll = false;
+  private readonly visibilityMarkInFlight = new Set<string>();
+
+  get filteredUserNotifications(): UserNotificationItem[] {
+    const q = this.notificationSearchQuery.trim().toLowerCase();
+    if (!q) return this.userNotifications;
+    return this.userNotifications.filter((n) =>
+      notificationMatchesSearchQuery(n, q, this.translate)
+    );
+  }
 
   constructor(
     private settings: CoreService,
@@ -211,20 +236,12 @@ showFiller = false;
 
     this.settingsService.userData$
       .pipe(takeUntil(this.destroy$))
-      .subscribe(() => this.cdr.markForCheck());
-
-    this.myNotifications.listsChanged$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(() => {
-        this.lastNotificationsFetchAt = 0;
-        this.myNotifications.getList(this.notificationFilter).subscribe({
-          next: (list) => {
-            this.userNotifications = this.mergeNotificationsList(list);
-            this.cdr.markForCheck();
-          },
-          error: () => this.cdr.markForCheck(),
-        });
-        this.loadUnreadCount();
+      .subscribe((data) => {
+        if (!data) return;
+        const raw = data.profilePhotoUrl;
+        const trimmed = raw != null ? String(raw).trim() : '';
+        this.profileImagePreview = trimmed ? this.ensureDataUrl(raw ?? null) : null;
+        this.cdr.markForCheck();
       });
 
     this.store.select(selectedClient)
@@ -327,6 +344,16 @@ showFiller = false;
 
 
     ngOnInit() {
+      this.myNotifications.serverUnreadCount
+        .pipe(
+          takeUntil(this.destroy$),
+          map((c) => this.adjustUnreadForMfa(c)),
+          distinctUntilChanged()
+        )
+        .subscribe((n) => {
+          this.unreadCount = n;
+          this.cdr.markForCheck();
+        });
       this.loadUnreadCount();
       this.brandingLogo = this.ensureDataUrl(
         this.organizationProfiles.getBrandingLogoValue(),
@@ -421,13 +448,8 @@ get userInitials(): string {
             this.setOtherLanguage();
             this.languageService.setFromApi(p.preferences?.language as LanguageCode);
             this.settingsService.setUserData(res.body);
+            // profileImagePreview is synced from userData$ (including cleared photo)
 
-  
-            // show backend avatar if present (local preview only)
-            if (p.profilePhotoUrl) {
-              this.profileImagePreview = p.profilePhotoUrl;
-            }
-  
             // re-apply validators in case type changed
           }
         });
@@ -473,10 +495,118 @@ get userInitials(): string {
   }
 
   loadUnreadCount(): void {
-    this.myNotifications.getUnreadCount().subscribe({
-      next: (c) =>
-        (this.unreadCount = this.adjustUnreadForMfa(c)),
-      error: () => {}
+    this.myNotifications.refreshUnreadCount();
+  }
+
+  onBellMenuOpened(): void {
+    this.notificationsMenuOpen = true;
+    this.resetNotificationModalVisibilityState();
+    this.onNotificationMenuOpened();
+  }
+
+  onBellMenuClosed(): void {
+    this.notificationsMenuOpen = false;
+    this.teardownNotificationVisibilityObserver();
+    this.visibilityMarkInFlight.clear();
+  }
+
+  onNotificationListScroll(event: Event): void {
+    const el = event.target as HTMLElement;
+    if (el.scrollTop > 2) {
+      this.allowUnlimitedVisibilityOnScroll = true;
+    }
+  }
+
+  onNotificationSearchQueryChange(): void {
+    if (!this.notificationsMenuOpen) return;
+    this.rebindNotificationVisibilityObserver();
+  }
+
+  private resetNotificationModalVisibilityState(): void {
+    this.initialVisibilityMarksRemaining = 2;
+    this.allowUnlimitedVisibilityOnScroll = false;
+    this.visibilityMarkInFlight.clear();
+    this.teardownNotificationVisibilityObserver();
+  }
+
+  private rebindNotificationVisibilityObserver(): void {
+    this.initialVisibilityMarksRemaining = 2;
+    this.allowUnlimitedVisibilityOnScroll = false;
+    this.visibilityMarkInFlight.clear();
+    this.teardownNotificationVisibilityObserver();
+    this.scheduleNotificationVisibilitySetup();
+  }
+
+  private scheduleNotificationVisibilitySetup(): void {
+    setTimeout(() => this.setupNotificationVisibilityObserver(), 0);
+    setTimeout(() => this.setupNotificationVisibilityObserver(), 100);
+  }
+
+  private teardownNotificationVisibilityObserver(): void {
+    this.notificationVisibilityIo?.disconnect();
+    this.notificationVisibilityIo = null;
+  }
+
+  private setupNotificationVisibilityObserver(): void {
+    this.teardownNotificationVisibilityObserver();
+    if (!this.notificationsMenuOpen || this.notificationsLoading) return;
+    let root: HTMLElement | undefined = this.notificationListScroll?.nativeElement;
+    if (!root && typeof document !== 'undefined') {
+      root =
+        (document.querySelector(
+          '.notification-menu-panel .notification-list-scroll'
+        ) as HTMLElement | null) ?? undefined;
+    }
+    if (!root) return;
+    const buttons = root.querySelectorAll<HTMLElement>('.notification-item[data-notification-id]');
+    if (!buttons.length) return;
+
+    const minRatio = 0.35;
+    this.notificationVisibilityIo = new IntersectionObserver(
+      (entries) => {
+        const visible = entries.filter(
+          (e) => e.isIntersecting && e.intersectionRatio >= minRatio
+        );
+        visible.sort((a, b) => {
+          const aId = a.target.getAttribute('data-notification-id') ?? '';
+          const bId = b.target.getAttribute('data-notification-id') ?? '';
+          const ia = this.filteredUserNotifications.findIndex((x) => x.id === aId);
+          const ib = this.filteredUserNotifications.findIndex((x) => x.id === bId);
+          return (ia === -1 ? 9999 : ia) - (ib === -1 ? 9999 : ib);
+        });
+        for (const entry of visible) {
+          const id = entry.target.getAttribute('data-notification-id');
+          if (!id || id === MFA_REMINDER_NOTIFICATION_ID) continue;
+          const n = this.filteredUserNotifications.find((x) => x.id === id);
+          if (!n || n.isRead) continue;
+          if (this.visibilityMarkInFlight.has(n.id)) continue;
+          const canSpendBudget =
+            this.allowUnlimitedVisibilityOnScroll || this.initialVisibilityMarksRemaining > 0;
+          if (!canSpendBudget) continue;
+          if (!this.allowUnlimitedVisibilityOnScroll) {
+            this.initialVisibilityMarksRemaining--;
+          }
+          this.markNotificationReadIfEligible(n);
+        }
+        this.cdr.markForCheck();
+      },
+      { root, rootMargin: '0px', threshold: [0, minRatio, 0.6, 1] }
+    );
+
+    buttons.forEach((el) => this.notificationVisibilityIo!.observe(el));
+  }
+
+  private markNotificationReadIfEligible(n: UserNotificationItem): void {
+    if (n.id === MFA_REMINDER_NOTIFICATION_ID || n.isRead) return;
+    if (this.visibilityMarkInFlight.has(n.id)) return;
+    this.visibilityMarkInFlight.add(n.id);
+    this.myNotifications.markAsRead(n.id).subscribe({
+      next: () => {
+        n.isRead = true;
+        this.visibilityMarkInFlight.delete(n.id);
+        this.cdr.markForCheck();
+      },
+      error: () => this.visibilityMarkInFlight.delete(n.id),
     });
   }
 
@@ -484,7 +614,8 @@ get userInitials(): string {
     return prependMfaReminderNotification(
       list,
       this.Authservice.getUserProfile() as Record<string, unknown> | null,
-      environment.authority
+      environment.authority,
+      portalOriginForIdentityReturn()
     );
   }
 
@@ -494,12 +625,16 @@ get userInitials(): string {
   }
 
   onNotificationMenuOpened(): void {
+    this.notificationSearchQuery = '';
     const now = Date.now();
     const hasCache = this.userNotifications.length > 0;
     const cacheFresh = now - this.lastNotificationsFetchAt < this.NOTIFICATIONS_CACHE_MS;
+    const serviceRev = this.myNotifications.getFeedsRevision();
+    const cacheMatchesFeeds = this.headerNotificationsFeedsRevision === serviceRev;
 
-    if (hasCache && cacheFresh) {
-      return; // Use cache, no API call
+    if (hasCache && cacheFresh && cacheMatchesFeeds) {
+      this.scheduleNotificationVisibilitySetup();
+      return;
     }
 
     this.notificationsLoading = !hasCache; // Only show loading if no cache
@@ -508,6 +643,8 @@ get userInitials(): string {
         this.userNotifications = this.mergeNotificationsList(list);
         this.notificationsLoading = false;
         this.lastNotificationsFetchAt = Date.now();
+        this.headerNotificationsFeedsRevision = this.myNotifications.getFeedsRevision();
+        this.scheduleNotificationVisibilitySetup();
       },
       error: () => (this.notificationsLoading = false)
     });
@@ -517,6 +654,7 @@ get userInitials(): string {
     event?.stopPropagation();
     if (this.notificationFilter === filter) return;
     this.notificationFilter = filter;
+    this.notificationSearchQuery = '';
     this.notificationsLoading = true;
     this.lastNotificationsFetchAt = 0;
     this.myNotifications.getList(filter).subscribe({
@@ -524,7 +662,11 @@ get userInitials(): string {
         this.userNotifications = this.mergeNotificationsList(list);
         this.notificationsLoading = false;
         this.lastNotificationsFetchAt = Date.now();
+        this.headerNotificationsFeedsRevision = this.myNotifications.getFeedsRevision();
         this.cdr.markForCheck();
+        if (this.notificationsMenuOpen) {
+          this.rebindNotificationVisibilityObserver();
+        }
       },
       error: () => {
         this.notificationsLoading = false;
@@ -541,12 +683,7 @@ get userInitials(): string {
       return;
     }
     if (!n.isRead) {
-      this.myNotifications.markAsRead(n.id).subscribe({
-        next: () => {
-          n.isRead = true;
-          this.unreadCount = Math.max(0, this.unreadCount - 1);
-        }
-      });
+      this.markNotificationReadIfEligible(n);
     }
     if (n.deepLink) {
       if (n.deepLink.startsWith('http')) {
@@ -555,18 +692,6 @@ get userInitials(): string {
         this.router.navigateByUrl(n.deepLink);
       }
     }
-  }
-
-  onMarkAllAsRead(event?: Event): void {
-    event?.stopPropagation();
-    this.myNotifications.markAllAsRead().subscribe({
-      next: () => {
-        this.userNotifications.forEach((x) => {
-          if (x.id !== MFA_REMINDER_NOTIFICATION_ID) x.isRead = true;
-        });
-        this.loadUnreadCount();
-      },
-    });
   }
 
   changeLanguage(lang: any): void {

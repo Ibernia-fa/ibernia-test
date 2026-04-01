@@ -388,7 +388,8 @@ html .topbar {
     .notification-item-title,
     .notification-item-preview,
     .notification-item-meta,
-    .notification-type-pill {
+    .notification-type-pill,
+    .notification-new-label {
       text-transform: none !important;
     }
   }
@@ -459,33 +460,6 @@ html .topbar {
     }
   }
 
-  .notification-search {
-    input {
-      width: 100%;
-      background-color: white;
-      border: 1px solid #c8c4d833;
-      color: #6b7280;
-      border-radius: 8px;
-      min-height: 36px;
-      outline: none;
-      padding: 0 16px 0 36px;
-      font-size: 14px;
-      font-weight: 400;
-      font-family: "Ubuntu", serif;
-      line-height: 16px;
-      &:focus {
-        border: 1px solid #4043af;
-      }
-    }
-    .notification-search-icon {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      left: 14px;
-      pointer-events: none;
-    }
-  }
-
   .notification-list-scroll {
     flex: 1;
     min-height: 0;
@@ -529,20 +503,40 @@ html .topbar {
         background: #fdf2f8;
         color: #db2777;
       }
+      &.notification-type-security {
+        background: #fef2f2;
+      }
+
+      .notification-row-type-icon {
+        width: 28px;
+        height: 28px;
+        object-fit: contain;
+        display: block;
+        flex-shrink: 0;
+      }
       &.rounded-circle {
         border-radius: 12px !important;
       }
-    }
-
-    .notification-message-icon {
-      width: 22px;
-      height: 22px;
     }
 
     .notification-item-title {
       font-size: 14px;
       font-weight: 500;
       color: #191c1d;
+    }
+
+    // Same lavender pill as default category badge (“Read”-style background in dropdown).
+    .notification-new-label {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 10px;
+      border-radius: 999px;
+      font-size: 10px;
+      height: 16px;
+      font-weight: 700;
+      line-height: 1;
+      color: #fff;
+      background: #dc2626;
     }
 
     .notification-item-preview {
@@ -566,22 +560,26 @@ html .topbar {
       font-size: 10px;
       height: 16px;
       font-weight: 700;
-      // border: 1px solid #e2e8f0;
       background-color: #4231cf1a;
       color: #4043af;
-      // &::before {
-      //   content: "";
-      //   width: 6px;
-      //   height: 6px;
-      //   border-radius: 50%;
-      //   background: #94a3b8;
-      // }
-      // &.birthday::before {
-      //   background: #e91e63;
-      // }
-      // &.notification-type-security::before {
-      //   background: #d97706;
-      // }
+
+      &.notification-type-security {
+        background-color: rgba(185, 28, 28, 0.14);
+        color: #b91c1c;
+      }
+
+      &.birthday {
+        background-color: #fdf2f8;
+        color: #db2777;
+        &::before {
+          content: "";
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          flex-shrink: 0;
+          background: #a855f7;
+        }
+      }
     }
 
     .notification-status-dot {
@@ -672,6 +670,34 @@ html .topbar {
       align-items: center;
       justify-content: center;
     }
+  }
+}
+
+// Shared: header dropdown + settings /notifications page
+.notification-search {
+  input {
+    width: 100%;
+    background-color: white;
+    border: 1px solid #c8c4d833;
+    color: #6b7280;
+    border-radius: 8px;
+    min-height: 36px;
+    outline: none;
+    padding: 0 16px 0 36px;
+    font-size: 14px;
+    font-weight: 400;
+    font-family: "Ubuntu", serif;
+    line-height: 16px;
+    &:focus {
+      border: 1px solid #4043af;
+    }
+  }
+  .notification-search-icon {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 14px;
+    pointer-events: none;
   }
 }
 

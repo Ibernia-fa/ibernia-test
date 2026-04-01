@@ -8,42 +8,81 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
   standalone: true,
   imports: [CommonModule],
   template: ` <a href="/" class="branding-link">
-      <ng-container *ngIf="profileImage; else defaultLogo">
+      <span class="brand-logo-stack">
         <img
+          src="assets/images/logos/ibernia-logo.svg"
+          alt="Ibernia"
+          class="brand-layer brand-logo--default"
+          [class.brand-logo--default-hidden]="!!profileImage"
+          width="120"
+          height="40"
+          loading="eager"
+          fetchpriority="high"
+          decoding="sync"
+        />
+        <img
+          *ngIf="profileImage && sanitizedImage"
           [src]="sanitizedImage"
-          alt="logo"
-          class="brand-logo"
+          alt="Company logo"
+          class="brand-layer brand-logo--custom"
+          width="120"
+          height="40"
           loading="eager"
           decoding="sync"
         />
-      </ng-container>
-    </a>
-
-    <!-- width="150" -->
-    <ng-template #defaultLogo>
-      <img src="./assets/images/logos/ibernia-logo.svg" alt="logo" />
-    </ng-template>`,
+      </span>
+    </a>`,
   styles: [
     `
+      :host {
+        display: block;
+        max-width: 100%;
+        min-width: 0;
+      }
+
       .branding-link {
         display: flex;
         align-items: center;
         text-decoration: none;
         gap: 5px;
+        max-width: 100%;
+        min-width: 0;
       }
 
-      .brand-logo {
-        // width: 100%;
-        max-width: 120px;
-        height: auto;
-        // width: 50px;
-        // height: 50px;
-        // object-fit: contain;
-        // object-position: center;
-        // margin: 0;
-        // padding: 0;
-        // display: block;
+      /* Same grid cell = no absolute centering (avoids wrong x/y before parent has size or while data-URL decodes) */
+      .brand-logo-stack {
+        display: grid;
+        grid-template-columns: minmax(0, 160px);
+        grid-template-rows: auto;
+        justify-items: start;
+        align-items: center;
+        width: fit-content;
+        max-width: 100%;
+        min-height: 40px;
+        overflow: hidden;
       }
+
+      .brand-layer {
+        grid-area: 1 / 1;
+        display: block;
+        max-width: 100%;
+        width: auto;
+        height: auto;
+        max-height: 48px;
+        object-fit: contain;
+        object-position: left center;
+      }
+
+      .brand-logo--default {
+        max-width: 160px;
+      }
+
+      /* In DOM for instant swap when custom is removed; invisible while custom shows */
+      .brand-logo--default-hidden {
+        opacity: 0;
+        visibility: hidden;
+      }
+
       .power-by-logo {
         display: block;
         width: 120px;

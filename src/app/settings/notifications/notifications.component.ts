@@ -1,28 +1,26 @@
 import { Component, OnInit } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MatCard, MatCardContent } from '@angular/material/card';
 import { MatSlideToggle } from '@angular/material/slide-toggle';
 import { MatSelectModule } from '@angular/material/select';
-import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { NavItemService } from 'src/app/layouts/full/nav-item.service';
 import { NotificationPreferencesService, NotificationPreference } from './notification-preferences.service';
 import { WebPushService } from './web-push.service';
 import { MyNotificationsService, UserNotificationItem } from 'src/app/core/services/my-notifications.service';
+import { portalOriginForIdentityReturn } from 'src/app/core/identity-security-url';
 import {
   MFA_REMINDER_NOTIFICATION_ID,
   prependMfaReminderNotification,
-  userNeedsMfaReminder,
 } from 'src/app/core/mfa-reminder-notification';
+import { notificationMatchesSearchQuery } from 'src/app/core/notification-search';
+import { CapitalizeFirstPipe } from 'src/app/core/pipes/capitalize-first.pipe';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { environment } from 'src/environments/environment';
-import { TablerIconsModule } from 'angular-tabler-icons';
-
 @Component({
   selector: 'app-notifications',
   standalone: true,
@@ -33,11 +31,10 @@ import { TablerIconsModule } from 'angular-tabler-icons';
     MatCardContent,
     MatSlideToggle,
     MatSelectModule,
-    MatFormFieldModule,
     MatButtonModule,
     MatDividerModule,
-    TablerIconsModule,
-    FormsModule
+    FormsModule,
+    CapitalizeFirstPipe,
   ],
   templateUrl: './notifications.component.html',
   styleUrl: './notifications.component.scss'
@@ -55,8 +52,18 @@ export class NotificationsComponent implements OnInit {
 
   notifications: UserNotificationItem[] = [];
   notificationsLoading = false;
-  unreadCount = 0;
+  notificationSearchQuery = '';
   readonly mfaReminderId = MFA_REMINDER_NOTIFICATION_ID;
+  /** One bulk read-all per page visit (component instance). */
+  private bulkMarkAllReadRequested = false;
+
+  get filteredNotifications(): UserNotificationItem[] {
+    const q = this.notificationSearchQuery.trim().toLowerCase();
+    if (!q) return this.notifications;
+    return this.notifications.filter((n) =>
+      notificationMatchesSearchQuery(n, q, this.translate)
+    );
+  }
 
   constructor(
     private navItemService: NavItemService,
@@ -64,12 +71,10 @@ export class NotificationsComponent implements OnInit {
     private webPushService: WebPushService,
     private myNotifications: MyNotificationsService,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private translate: TranslateService
   ) {
     this.navItemService.currentRouteName = 'Notifications';
-    this.myNotifications.listsChanged$
-      .pipe(takeUntilDestroyed())
-      .subscribe(() => this.loadNotifications());
   }
 
   ngOnInit(): void {
@@ -148,19 +153,30 @@ export class NotificationsComponent implements OnInit {
         this.notifications = prependMfaReminderNotification(
           list,
           this.authService.getUserProfile() as Record<string, unknown> | null,
-          environment.authority
+          environment.authority,
+          portalOriginForIdentityReturn()
         );
         this.notificationsLoading = false;
+        if (!this.bulkMarkAllReadRequested) {
+          this.bulkMarkAllReadRequested = true;
+          this.markAllReadExceptSecurityOnPage();
+        }
       },
       error: () => (this.notificationsLoading = false)
     });
-    this.myNotifications.getUnreadCount().subscribe({
-      next: (c) =>
-        (this.unreadCount = userNeedsMfaReminder(
-          this.authService.getUserProfile() as Record<string, unknown> | null
-        )
-          ? c + 1
-          : c)
+  }
+
+  /** Marks every server-backed notification read; synthetic MFA row stays unread (not on API). */
+  private markAllReadExceptSecurityOnPage(): void {
+    this.myNotifications.markAllAsRead().subscribe({
+      next: () => {
+        for (const n of this.notifications) {
+          if (n.id !== MFA_REMINDER_NOTIFICATION_ID) {
+            n.isRead = true;
+          }
+        }
+      },
+      error: () => {},
     });
   }
 
@@ -175,8 +191,7 @@ export class NotificationsComponent implements OnInit {
       this.myNotifications.markAsRead(n.id).subscribe({
         next: () => {
           n.isRead = true;
-          this.unreadCount = Math.max(0, this.unreadCount - 1);
-        }
+        },
       });
     }
     if (n.deepLink) {
@@ -188,14 +203,4 @@ export class NotificationsComponent implements OnInit {
     }
   }
 
-  onMarkAllAsRead(): void {
-    this.myNotifications.markAllAsRead().subscribe({
-      next: () => {
-        this.notifications.forEach((x) => {
-          if (x.id !== MFA_REMINDER_NOTIFICATION_ID) x.isRead = true;
-        });
-        this.loadNotifications();
-      },
-    });
-  }
 }

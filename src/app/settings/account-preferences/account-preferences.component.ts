@@ -407,6 +407,7 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
         this.toastr.success('Profile saved', 'Success!');
         const payload = this.buildPayload();
         this.userprofile = { ...(this.userprofile ?? { preferences: DEFAULT_PREFERENCES }), ...payload };
+        this.profileImagePreview = ensureDataUrl(payload.profilePhotoUrl ?? null);
         this.api.setUserData(this.userprofile);
         this.api.notifyProfileChanged();
         this.cdr.markForCheck();

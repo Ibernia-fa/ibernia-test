@@ -75,6 +75,20 @@
             <!-- Vertical drop from parents -->
             <div class="branch-vline" *ngIf="clientParents.length > 0"></div>
 
+            <!-- Tax node for client-parents-die scenario -->
+            <ng-container *ngIf="showTaxOnClientBranch">
+              <div class="tax-node" (click)="onOpenTaxSettings()">
+                <div class="tax-icon-circle">
+                  <mat-icon>account_balance</mat-icon>
+                </div>
+                <div class="tax-badge">Tax</div>
+                <span class="tax-amount">
+                  <span class="estate-currency">{{currency | currencySymbol}}</span>{{scenarioResult!.totalTax | number:'1.0-0'}}
+                </span>
+              </div>
+              <div class="branch-vline"></div>
+            </ng-container>
+
             <!-- Leaf nodes: [siblings..., client] -->
             <div class="branch-leaves" [class.has-bracket]="showClientBranch">
               <div class="leaf" *ngFor="let sib of clientSiblings">
@@ -170,6 +184,20 @@
             <!-- Vertical drop from parents -->
             <div class="branch-vline" *ngIf="partnerParents.length > 0"></div>
 
+            <!-- Tax node for partner-parents-die scenario -->
+            <ng-container *ngIf="showTaxOnPartnerBranch">
+              <div class="tax-node" (click)="onOpenTaxSettings()">
+                <div class="tax-icon-circle">
+                  <mat-icon>account_balance</mat-icon>
+                </div>
+                <div class="tax-badge">Tax</div>
+                <span class="tax-amount">
+                  <span class="estate-currency">{{currency | currencySymbol}}</span>{{scenarioResult!.totalTax | number:'1.0-0'}}
+                </span>
+              </div>
+              <div class="branch-vline"></div>
+            </ng-container>
+
             <!-- Leaf nodes: [partner, siblings...] -->
             <div class="branch-leaves" [class.has-bracket]="showPartnerBranch">
               <div class="leaf">
@@ -231,18 +259,18 @@
         <div class="children-section" *ngIf="children.length > 0">
           <div class="child-vline"></div>
 
-          <!-- Tax node on the flow path -->
-          <div class="tax-node" *ngIf="scenarioResult && scenarioResult.totalTax > 0"
+          <!-- Tax node on the flow path (only for client/partner death scenarios) -->
+          <div class="tax-node" *ngIf="showTaxOnChildrenSection"
                (click)="onOpenTaxSettings()">
             <div class="tax-icon-circle">
               <mat-icon>account_balance</mat-icon>
             </div>
             <div class="tax-badge">Tax</div>
             <span class="tax-amount">
-              <span class="estate-currency">{{currency | currencySymbol}}</span>{{scenarioResult.totalTax | number:'1.0-0'}}
+              <span class="estate-currency">{{currency | currencySymbol}}</span>{{scenarioResult!.totalTax | number:'1.0-0'}}
             </span>
           </div>
-          <div class="child-vline" *ngIf="scenarioResult && scenarioResult.totalTax > 0"></div>
+          <div class="child-vline" *ngIf="showTaxOnChildrenSection"></div>
 
           <!-- Children bracket + nodes -->
           <div class="children-leaves" [class.has-bracket]="children.length > 1">

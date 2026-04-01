@@ -1,47 +1,48 @@
 <!-- Sidebar header: logo + toggle (toggle only when expanded; when collapsed, toggle is in header) -->
 <div class="sidebar-header">
-  <div class="sidebar-logo-link">
+  <div class="sidebar-logo-link" [class.sidebar-logo-link--custom]="!!brandingLogo">
+    <!-- Defaults stay mounted; custom logo overlays when set (avoids blank flash on remove). -->
+    <div class="sidebar-static-logos">
+      <a
+        href="/"
+        class="sidebar-static-logo-slot sidebar-static-logo-slot--expanded"
+        [class.sidebar-static-logo-slot--active]="!sidenavCollapsed"
+        [attr.aria-hidden]="sidenavCollapsed || null"
+        [attr.tabindex]="sidenavCollapsed ? -1 : null"
+      >
+        <img
+          [src]="staticExpandedLogoSrc"
+          alt="Ibernia"
+          class="sidebar-default-logo"
+          width="160"
+          height="40"
+          loading="eager"
+          fetchpriority="high"
+          decoding="sync"
+        />
+      </a>
+      <a
+        href="/"
+        class="sidebar-static-logo-slot sidebar-static-logo-slot--collapsed"
+        [class.sidebar-static-logo-slot--active]="sidenavCollapsed"
+        [attr.aria-hidden]="!sidenavCollapsed || null"
+        [attr.tabindex]="!sidenavCollapsed ? -1 : null"
+      >
+        <img
+          [src]="staticCollapsedLogoSrc"
+          alt="Ibernia"
+          class="sidebar-mini-logo"
+          width="48"
+          height="48"
+          loading="eager"
+          fetchpriority="high"
+          decoding="sync"
+        />
+      </a>
+    </div>
     @if (brandingLogo) {
-      <!-- Single instance: sizing comes from .sidebarNav-mini .sidebar-logo-link img (no destroy on toggle). -->
-      <app-branding [profileImage]="brandingLogo"></app-branding>
-    } @else {
-      <div class="sidebar-static-logos">
-        <a
-          href="/"
-          class="sidebar-static-logo-slot sidebar-static-logo-slot--expanded"
-          [class.sidebar-static-logo-slot--active]="!sidenavCollapsed"
-          [attr.aria-hidden]="sidenavCollapsed || null"
-          [attr.tabindex]="sidenavCollapsed ? -1 : null"
-        >
-          <img
-            [src]="staticExpandedLogoSrc"
-            alt="Ibernia"
-            class="sidebar-default-logo"
-            width="160"
-            height="40"
-            loading="eager"
-            fetchpriority="high"
-            decoding="sync"
-          />
-        </a>
-        <a
-          href="/"
-          class="sidebar-static-logo-slot sidebar-static-logo-slot--collapsed"
-          [class.sidebar-static-logo-slot--active]="sidenavCollapsed"
-          [attr.aria-hidden]="!sidenavCollapsed || null"
-          [attr.tabindex]="!sidenavCollapsed ? -1 : null"
-        >
-          <img
-            [src]="staticCollapsedLogoSrc"
-            alt="Ibernia"
-            class="sidebar-mini-logo"
-            width="48"
-            height="48"
-            loading="eager"
-            fetchpriority="high"
-            decoding="sync"
-          />
-        </a>
+      <div class="sidebar-custom-brand-layer">
+        <app-branding [profileImage]="brandingLogo"></app-branding>
       </div>
     }
   </div>

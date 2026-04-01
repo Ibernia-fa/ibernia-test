@@ -34,11 +34,48 @@
   // border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-// .sidebar-logo-link {
-//   display: flex;
-//   align-items: center;
-//   text-decoration: none;
-// }
+.sidebar-logo-link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  min-height: 48px;
+  /* Stable width in header row so absolute overlay’s inset matches immediately */
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Custom org logo sits above static fallbacks (same slot); removing custom reveals defaults instantly. */
+.sidebar-custom-brand-layer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  box-sizing: border-box;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.sidebarNav-mini .sidebar-custom-brand-layer {
+  justify-content: center;
+}
+
+.sidebar-custom-brand-layer app-branding {
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* Hide static fallbacks while custom logo layer is shown (they stay mounted for instant restore). */
+.sidebar-logo-link--custom .sidebar-static-logos {
+  opacity: 0;
+  visibility: hidden;
+}
 
 .sidebar-default-logo {
   // max-width: 120px;

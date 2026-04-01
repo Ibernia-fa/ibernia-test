@@ -220,8 +220,17 @@ export class ReportsComponent {
   insightsLimitExceeded = false;
   insightsLoadAttempted = false;
   private insightsLoadedForCashflow: string | null = null;
-  readonly insightIconColors = ['#4043AF', '#FF383C', '#FF8D28', '#34C759', '#4043AF', '#FF383C'];
-  readonly insightIconBgs = ['#f0f0ff', '#fff3f3', '#fff8f0', '#f0fff4', '#f0f0ff', '#fff3f3'];
+  readonly insightIconMap: Record<string, { color: string; bg: string }> = {
+    flag_red:    { color: '#FF383C', bg: '#fff3f3' },
+    flag_orange: { color: '#FF8D28', bg: '#fff8f0' },
+    flag_green:  { color: '#34C759', bg: '#f0fff4' },
+    bulb:        { color: '#4043AF', bg: '#f0f0ff' },
+  };
+  private readonly defaultIcon = { color: '#4043AF', bg: '#f0f0ff' };
+
+  getInsightStyle(insight: any): { color: string; bg: string } {
+    return this.insightIconMap[insight.impact] ?? this.defaultIcon;
+  }
 
   constructor(
     private timelineHttpService: TimelineHttpService,
@@ -659,33 +668,9 @@ export class ReportsComponent {
           this.insightsLoading = false;
           this.insightsLoadAttempted = true;
         },
-        error: (err) => {
-          if (err?.status === 404) {
-            this.generateFirstInsights(cashflowId);
-          } else {
-            this.insightsLoading = false;
-            this.insightsLoadAttempted = true;
-          }
-        },
-      });
-  }
-
-  private generateFirstInsights(cashflowId: string): void {
-    this.aiRecommendationsHttpService
-      .analyzePlan({ cashflowId })
-      .subscribe({
-        next: (data) => {
-          const items = data.recommendations ?? [];
-          this.insights = items.slice(0, 6);
+        error: () => {
           this.insightsLoading = false;
           this.insightsLoadAttempted = true;
-        },
-        error: (err) => {
-          this.insightsLoading = false;
-          this.insightsLoadAttempted = true;
-          if (err?.status === 429) {
-            this.insightsLimitExceeded = true;
-          }
         },
       });
   }

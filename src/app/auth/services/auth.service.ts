@@ -87,6 +87,13 @@ export class AuthService {
     return this._userManager.signoutRedirectCallback();
   }
 
+  /** Clears OIDC storage when the user did not complete a normal endsession redirect (e.g. logged out on STS only). */
+  public clearLocalOidcSession = (): Promise<void> => {
+    this._user = null;
+    this._loginChangedSubject.next(false);
+    return this._userManager.removeUser();
+  }
+
   public getUserProfile = (): User | any => {
     return this._user ? this._user.profile : null;
   }
