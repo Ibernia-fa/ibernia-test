@@ -220,8 +220,17 @@ export class ReportsComponent {
   insightsLimitExceeded = false;
   insightsLoadAttempted = false;
   private insightsLoadedForCashflow: string | null = null;
-  readonly insightIconColors = ['#4043AF', '#FF383C', '#FF8D28', '#34C759', '#4043AF', '#FF383C'];
-  readonly insightIconBgs = ['#f0f0ff', '#fff3f3', '#fff8f0', '#f0fff4', '#f0f0ff', '#fff3f3'];
+  readonly insightIconMap: Record<string, { color: string; bg: string }> = {
+    flag_red:    { color: '#FF383C', bg: '#fff3f3' },
+    flag_orange: { color: '#FF8D28', bg: '#fff8f0' },
+    flag_green:  { color: '#34C759', bg: '#f0fff4' },
+    bulb:        { color: '#4043AF', bg: '#f0f0ff' },
+  };
+  private readonly defaultIcon = { color: '#4043AF', bg: '#f0f0ff' };
+
+  getInsightStyle(insight: any): { color: string; bg: string } {
+    return this.insightIconMap[insight.impact] ?? this.defaultIcon;
+  }
 
   constructor(
     private timelineHttpService: TimelineHttpService,
