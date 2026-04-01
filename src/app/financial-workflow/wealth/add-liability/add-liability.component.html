@@ -2,7 +2,7 @@
   <div class="d-flex flex-column">
     <div class="dialog-header">
       <h2 class="dialog-title text-center">
-        {{ isEditMode ? "Edit Liability" : "Add Liability" }}
+        {{ isEditMode ? ('WEALTH.EDIT_LIABILITY' | translate) : ('WEALTH.ADD_LIABILITY' | translate) }}
       </h2>
       <button
         type="button"
@@ -23,14 +23,14 @@
           <mat-label
             class="f-s-16 f-w-500 d-block ibr-black"
             style="line-height: 16px"
-            >Category</mat-label
+            >{{ 'WEALTH.CATEGORY' | translate }}</mat-label
           >
           <div class="position-relative">
             <div class="w-100 form-field">
               <div class="select-option position-relative">
                 <mat-select
                   formControlName="type"
-                  placeholder="Select category"
+                  [placeholder]="'PLACEHOLDER.SELECT_CATEGORY' | translate"
                   hideSingleSelectionIndicator
                   (selectionChange)="onTypeChange()"
                 >
@@ -70,12 +70,12 @@
             <mat-label
               class="f-s-16 f-w-500 d-block ibr-black"
               style="line-height: 16px"
-              >Name</mat-label
-            >
+            >{{ 'Name' | translate }}</mat-label
+          >
             <input
               matInput
               formControlName="name"
-              placeholder="e.g. Tax liability"
+              [placeholder]="'PLACEHOLDER.TAX_LIABILITY' | translate"
             />
             @if (
               form.get("name")?.touched && form.get("name")?.hasError("required")
@@ -89,7 +89,7 @@
           <mat-label
             class="f-s-16 f-w-500 d-flex align-items-center ibr-black"
             style="line-height: 16px !important"
-            >Outstanding amount</mat-label
+            >{{ 'WEALTH.OUTSTANDING_AMOUNT' | translate }}</mat-label
           >
 
           <div class="net-field d-flex align-items-center">
@@ -134,14 +134,14 @@
             <mat-label
               class="f-s-16 f-w-500 d-block ibr-black"
               style="line-height: 16px"
-              >Ownership</mat-label
+              >{{ 'Ownership' | translate }}</mat-label
             >
             <div class="position-relative">
               <div class="w-100 form-field">
                 <div class="select-option position-relative">
                   <mat-select
                     formControlName="ownership"
-                    placeholder="Select ownership"
+                    [placeholder]="'PLACEHOLDER.SELECT_OWNERSHIP' | translate"
                     hideSingleSelectionIndicator
                   >
                     @for (opt of ownershipOptions; track opt.value) {

@@ -141,7 +141,7 @@ export class BrandingComponent implements OnInit {
       data: {
         imageBase64,
         cropType: 'company' as const,
-        title: 'Crop company logo',
+        title: this.translate.instant('Crop company logo'),
         initialTransform: this.logoCropTransform ?? undefined,
       },
     });
@@ -186,7 +186,7 @@ export class BrandingComponent implements OnInit {
   save() {
     const userId = this.auth.getUserProfile()?.sub;
     if (!userId) {
-      this.toastr.error('No user id found. Please sign in again', 'Error!');
+      this.toastr.error(this.translate.instant('ERROR.NO_USER_SIGN_IN'), this.translate.instant('LABEL.ERROR'));
       return;
     }
 
@@ -201,7 +201,7 @@ export class BrandingComponent implements OnInit {
           );
           this.orgProfiles.setBackgroundImage(this.backgroundImage || null);
 
-          this.toastr.success('Image saved', 'Success!');
+          this.toastr.success(this.translate.instant('TOAST.IMAGE_SAVED'), this.translate.instant('LABEL.SUCCESS'));
           this.initialProfileImage = this.profileImage;
           this.initialBackgroundImage = this.backgroundImage;
           this.hasChanges = false;
@@ -209,7 +209,7 @@ export class BrandingComponent implements OnInit {
         },
         error: (err) => {
           console.error(err);
-          this.toastr.error('Failed to save image', 'Error!');
+          this.toastr.error(this.translate.instant('TOAST.FAILED_SAVE_IMAGE'), this.translate.instant('LABEL.ERROR'));
           this.isSaving = false;
         },
       });

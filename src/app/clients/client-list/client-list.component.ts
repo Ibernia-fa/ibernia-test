@@ -59,7 +59,7 @@ import { DefaultPreferanceModule } from 'src/app/default-preferance/default-pref
 import { SettingsService } from 'src/app/default-preferance/services/default-preferance.http.service';
 import { DefaultPreferanceComponent } from 'src/app/default-preferance/default-preferance/default-preferance.component';
 import { AuthService } from 'src/app/auth/services/auth.service';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-client-list',
@@ -211,6 +211,7 @@ export class ClientListComponent implements OnInit, AfterViewInit, OnDestroy {
     private toastr: ToastrService,
     private settingsService: SettingsService,
     private Authservice: AuthService,
+    private translate: TranslateService,
   ) {}
 
   ngOnInit() {
@@ -307,7 +308,7 @@ export class ClientListComponent implements OnInit, AfterViewInit, OnDestroy {
 
   timeAgo(value: Date | string | number) {
     console.log(value);
-    if (!value) return 'Invalid date';
+    if (!value) return this.translate.instant('LABEL.INVALID_DATE');
 
     const date = new Date(value);
     const now = new Date();
@@ -318,13 +319,13 @@ export class ClientListComponent implements OnInit, AfterViewInit, OnDestroy {
     const diffInDays = Math.floor(diffInHours / 24);
 
     if (diffInSeconds < 60) {
-      return `${diffInSeconds} seconds ago`;
+      return this.translate.instant('TIME.SECONDS_AGO', { value: diffInSeconds });
     } else if (diffInMinutes < 60) {
-      return `${diffInMinutes} minutes ago`;
+      return this.translate.instant('TIME.MINUTES_AGO', { value: diffInMinutes });
     } else if (diffInHours < 24) {
-      return `${diffInHours} hours ago`;
+      return this.translate.instant('TIME.HOURS_AGO', { value: diffInHours });
     } else {
-      return `${diffInDays} days ago`;
+      return this.translate.instant('TIME.DAYS_AGO', { value: diffInDays });
     }
   }
 
@@ -391,7 +392,7 @@ export class ClientListComponent implements OnInit, AfterViewInit, OnDestroy {
 
   openDialog(action: string, obj: any): void {
     obj.action = action;
-    obj.text = 'Are you sure you want to delete this client?';
+    obj.text = this.translate.instant('CONFIRM.DELETE_CLIENT');
     const dialogRef = this.dialog.open(DialogComponent, {
       data: obj,
       width: '460px',
@@ -472,12 +473,12 @@ export class ClientListComponent implements OnInit, AfterViewInit, OnDestroy {
       .deleteClient(client.id)
       .pipe(
         map((res) => {
-          this.toastr.success('Client deleted successfully', 'Success!');
+          this.toastr.success(this.translate.instant('TOAST.CLIENT_DELETED'), this.translate.instant('LABEL.SUCCESS'));
           this.getClients(this.user.sub);
         }),
         catchError((err) => {
           console.error(err);
-          this.toastr.error('An error occured while saving client', 'Error!');
+          this.toastr.error(this.translate.instant('TOAST.ERROR_SAVING_CLIENT'), this.translate.instant('LABEL.ERROR'));
           throw err;
         }),
       )

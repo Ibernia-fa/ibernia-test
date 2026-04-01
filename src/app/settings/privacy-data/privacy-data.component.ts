@@ -9,7 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { NavItemService } from 'src/app/layouts/full/nav-item.service';
@@ -47,8 +47,9 @@ export class PrivacyDataComponent implements OnInit, OnDestroy {
     private navItemService: NavItemService,
     private toastr: ToastrService,
     private dialog: MatDialog,
+    private translate: TranslateService,
   ) {
-    this.navItemService.currentRouteName = 'Privacy & Data';
+    this.navItemService.currentRouteName = this.translate.instant('LABEL.PRIVACY_DATA');
   }
 
   ngOnInit(): void {
@@ -65,7 +66,7 @@ export class PrivacyDataComponent implements OnInit, OnDestroy {
         takeUntil(this.destroy$),
         catchError((err) => {
           console.error('Export failed', err);
-          this.toastr.error('Failed to export data', 'Error');
+          this.toastr.error(this.translate.instant('ERROR.EXPORT_FAILED'), this.translate.instant('LABEL.ERROR'));
           return EMPTY;
         }),
         finalize(() => (this.isExporting = false)),
@@ -73,10 +74,10 @@ export class PrivacyDataComponent implements OnInit, OnDestroy {
       .subscribe(async (blob) => {
         try {
           await this.buildAndDownloadArchive(blob);
-          this.toastr.success('Data exported successfully', 'Success');
+          this.toastr.success(this.translate.instant('TOAST.DATA_EXPORTED'), this.translate.instant('LABEL.SUCCESS'));
         } catch (e) {
           console.error('Archive build failed', e);
-          this.toastr.error('Failed to build export archive', 'Error');
+          this.toastr.error(this.translate.instant('ERROR.EXPORT_ARCHIVE_FAILED'), this.translate.instant('LABEL.ERROR'));
         }
       });
   }
@@ -373,13 +374,13 @@ export class PrivacyDataComponent implements OnInit, OnDestroy {
         takeUntil(this.destroy$),
         catchError((err) => {
           console.error('Account termination failed', err);
-          this.toastr.error('Failed to process account closure request', 'Error');
+          this.toastr.error(this.translate.instant('ERROR.ACCOUNT_CLOSURE_FAILED'), this.translate.instant('LABEL.ERROR'));
           return EMPTY;
         }),
         finalize(() => (this.isTerminating = false)),
       )
       .subscribe((response) => {
-        this.toastr.success(response.message, 'Account Closure Initiated');
+        this.toastr.success(response.message, this.translate.instant('LABEL.ACCOUNT_CLOSURE_INITIATED'));
       });
   }
 

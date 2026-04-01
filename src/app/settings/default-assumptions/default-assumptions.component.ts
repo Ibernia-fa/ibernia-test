@@ -13,7 +13,7 @@ import {
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { allCountries } from 'src/app/clients/models/country';
 import { NavItemService } from 'src/app/layouts/full/nav-item.service';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -64,12 +64,7 @@ export class DefaultAssumptionsComponent implements OnInit, OnDestroy {
   private preferencesSnapshot: Record<string, unknown> | null = null;
   private loadedProfile: UserProfileDto | null = null;
 
-  comissionTypes = [
-    { label: 'None', value: ComissionType.None },
-    { label: 'Percentage', value: ComissionType.Percentage },
-    { label: 'Fixed Amount', value: ComissionType.Amount },
-    { label: 'Both', value: ComissionType.Both },
-  ];
+  comissionTypes: { label: string; value: ComissionType }[] = [];
 
   user: any;
   @ViewChild('commissionAmountInput') commissionAmountInput?: ElementRef<HTMLInputElement>;
@@ -98,12 +93,19 @@ export class DefaultAssumptionsComponent implements OnInit, OnDestroy {
     private auth: AuthService,
     private cdr: ChangeDetectorRef,
     private navItemService: NavItemService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private translate: TranslateService
   ) {
     this.navItemService.currentRouteName = 'Default Assumptions';
   }
 
   ngOnInit(): void {
+    this.comissionTypes = [
+      { label: this.translate.instant('LABEL.NONE'), value: ComissionType.None },
+      { label: this.translate.instant('Percentage'), value: ComissionType.Percentage },
+      { label: this.translate.instant('Fixed Amount'), value: ComissionType.Amount },
+      { label: this.translate.instant('Both'), value: ComissionType.Both },
+    ];
     this.user = this.auth.getUserProfile();
 
     this.form.controls.preferences.controls.comissionType.valueChanges
@@ -303,7 +305,7 @@ export class DefaultAssumptionsComponent implements OnInit, OnDestroy {
     this.submitted = true;
     if (this.form.invalid) {
       this.form.markAllAsTouched();
-      this.toastr.error('Please fix the highlighted fields', 'Error!');
+      this.toastr.error(this.translate.instant('ERROR.FIX_FIELDS'), this.translate.instant('LABEL.ERROR'));
       return;
     }
     this.isSavingPreferences = true;
@@ -312,8 +314,8 @@ export class DefaultAssumptionsComponent implements OnInit, OnDestroy {
       .pipe(
         takeUntil(this.destroy$),
         catchError((err) => {
-          const msg = err?.error?.message ?? 'Failed to save preferences';
-          this.toastr.error(msg, 'Error!');
+          const msg = err?.error?.message ?? this.translate.instant('ERROR.FAILED_SAVE_PREFERENCES');
+          this.toastr.error(msg, this.translate.instant('LABEL.ERROR'));
           return EMPTY;
         }),
         finalize(() => {
@@ -324,7 +326,7 @@ export class DefaultAssumptionsComponent implements OnInit, OnDestroy {
       .subscribe(() => {
         this.updateSnapshots();
         this.loadedProfile = { ...this.loadedProfile!, preferences: this.form.getRawValue().preferences };
-        this.toastr.success('Preferences saved', 'Success!');
+        this.toastr.success(this.translate.instant('TOAST.PREFERENCES_SAVED'), this.translate.instant('LABEL.SUCCESS'));
         this.api.notifyProfileChanged();
         this.cdr.markForCheck();
       });

@@ -10,7 +10,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { TablerIconsModule } from 'angular-tabler-icons';
 import moment from 'moment';
 
@@ -140,6 +140,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private dialog: MatDialog,
     private toastr: ToastrService,
+    private translate: TranslateService,
   ) {
     this.cashflowId = this.route.parent?.snapshot.params['id'] || this.route.snapshot.params['id'] || '';
     this.scenarioForm = this.fb.group({
@@ -198,7 +199,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
         switchMap(() => this.loadScenarioReport()),
         catchError((err) => {
           console.error('Scenario Lab load error', err);
-          this.toastr.error('Failed to load Scenario Lab');
+          this.toastr.error(this.translate.instant('ERROR.FAILED_LOAD_SCENARIO_LAB'));
           return of(null);
         }),
       )
@@ -401,9 +402,9 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
           this.displayedReport = { ...report, series: report.series.map(s => ({ ...s, data: [...s.data] })) };
           this.updateScenarioForecastEndDateIfNeeded();
           this.getShortfallStatus(report);
-          this.toastr.success('Scenario simulated successfully');
+          this.toastr.success(this.translate.instant('TOAST.SCENARIO_SIMULATED'));
         } else {
-          this.toastr.warning('No scenario data returned');
+          this.toastr.warning(this.translate.instant('ERROR.NO_SCENARIO_DATA'));
         }
       });
   }
@@ -781,14 +782,14 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
             takeUntil(this.destroy$),
             catchError((err) => {
               this.isLoaderVisible = false;
-              this.toastr.error(err?.error?.message || 'Failed to create plan from scenario');
+              this.toastr.error(err?.error?.message || this.translate.instant('ERROR.FAILED_CREATE_PLAN_SCENARIO'));
               return of(null);
             }),
           )
           .subscribe((newPlan) => {
             this.isLoaderVisible = false;
             if (newPlan) {
-              this.toastr.success('Plan created from scenario');
+              this.toastr.success(this.translate.instant('TOAST.PLAN_CREATED_FROM_SCENARIO'));
               this.router.navigate(['/cashflows', newPlan.id, 'reports']);
             }
           });

@@ -7,7 +7,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { NavItemService } from 'src/app/layouts/full/nav-item.service';
 import { NotificationsHttpService, NotificationResponse } from './notifications-http.service';
 
@@ -35,9 +35,10 @@ export class AdminNotificationsComponent implements OnInit {
 
   constructor(
     private navItemService: NavItemService,
-    private http: NotificationsHttpService
+    private http: NotificationsHttpService,
+    private translate: TranslateService
   ) {
-    this.navItemService.currentRouteName = 'Admin Notifications';
+    this.navItemService.currentRouteName = this.translate.instant('LABEL.ADMIN_NOTIFICATIONS');
   }
 
   ngOnInit(): void {
@@ -63,7 +64,7 @@ export class AdminNotificationsComponent implements OnInit {
   }
 
   delete(id: string): void {
-    if (confirm('Delete this notification?')) {
+    if (confirm(this.translate.instant('CONFIRM.DELETE_NOTIFICATION'))) {
       this.http.delete(id).subscribe({
         next: () => this.load(),
         error: () => {}
