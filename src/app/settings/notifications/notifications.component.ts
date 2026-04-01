@@ -12,6 +12,7 @@ import { NavItemService } from 'src/app/layouts/full/nav-item.service';
 import { NotificationPreferencesService, NotificationPreference } from './notification-preferences.service';
 import { WebPushService } from './web-push.service';
 import { MyNotificationsService, UserNotificationItem } from 'src/app/core/services/my-notifications.service';
+import { portalOriginForIdentityReturn } from 'src/app/core/identity-security-url';
 import {
   MFA_REMINDER_NOTIFICATION_ID,
   prependMfaReminderNotification,
@@ -152,7 +153,8 @@ export class NotificationsComponent implements OnInit {
         this.notifications = prependMfaReminderNotification(
           list,
           this.authService.getUserProfile() as Record<string, unknown> | null,
-          environment.authority
+          environment.authority,
+          portalOriginForIdentityReturn()
         );
         this.notificationsLoading = false;
         if (!this.bulkMarkAllReadRequested) {

@@ -578,8 +578,19 @@
                   </div>
                   <div class="flex-grow-1 min-w-0">
                     @if (n.id === mfaReminderId) {
-                      <div class="notification-item-title line-clamp-1 m-b-4">
-                        {{ n.title | translate }}
+                      <div
+                        class="notification-item-title-row d-flex align-items-center justify-content-between gap-8 m-b-4 w-100 min-w-0"
+                      >
+                        <div
+                          class="notification-item-title line-clamp-1 min-w-0 flex-grow-1"
+                        >
+                          {{ n.title | translate }}
+                        </div>
+                        @if (!n.isRead) {
+                          <span class="notification-new-label flex-shrink-0">{{
+                            "New" | translate
+                          }}</span>
+                        }
                       </div>
                       <p
                         class="notification-item-preview m-0 line-clamp-2 m-b-4"
@@ -587,8 +598,19 @@
                         {{ n.preview | translate: n.previewParams || {} }}
                       </p>
                     } @else {
-                      <div class="notification-item-title line-clamp-1 m-b-4">
-                        {{ n.title }}
+                      <div
+                        class="notification-item-title-row d-flex align-items-center justify-content-between gap-8 m-b-4 w-100 min-w-0"
+                      >
+                        <div
+                          class="notification-item-title line-clamp-1 min-w-0 flex-grow-1"
+                        >
+                          {{ n.title }}
+                        </div>
+                        @if (!n.isRead) {
+                          <span class="notification-new-label flex-shrink-0">{{
+                            "New" | translate
+                          }}</span>
+                        }
                       </div>
                       <p
                         class="notification-item-preview m-0 line-clamp-2 m-b-4"

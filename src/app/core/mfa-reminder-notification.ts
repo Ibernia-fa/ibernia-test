@@ -15,7 +15,9 @@ export function userNeedsMfaReminder(profile: Record<string, unknown> | null | u
 export function prependMfaReminderNotification(
   list: UserNotificationItem[],
   userProfile: Record<string, unknown> | null | undefined,
-  identityAuthority: string
+  identityAuthority: string,
+  /** When set, STS logout returns to this portal (same as Security menu). */
+  portalReturnOrigin?: string
 ): UserNotificationItem[] {
   if (!userProfile || !userNeedsMfaReminder(userProfile)) {
     return list;
@@ -35,7 +37,11 @@ export function prependMfaReminderNotification(
   }
 
   const base = identityAuthority.replace(/\/$/, '');
-  const securityUrl = `${base}/Manage/ChangePassword`;
+  let securityUrl = `${base}/Manage/ChangePassword`;
+  const origin = portalReturnOrigin?.trim();
+  if (origin) {
+    securityUrl += `?returnUrl=${encodeURIComponent(origin.replace(/\/$/, ''))}`;
+  }
 
   const synthetic: UserNotificationItem = {
     id: MFA_REMINDER_NOTIFICATION_ID,

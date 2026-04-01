@@ -388,7 +388,8 @@ html .topbar {
     .notification-item-title,
     .notification-item-preview,
     .notification-item-meta,
-    .notification-type-pill {
+    .notification-type-pill,
+    .notification-new-label {
       text-transform: none !important;
     }
   }
@@ -522,6 +523,20 @@ html .topbar {
       font-size: 14px;
       font-weight: 500;
       color: #191c1d;
+    }
+
+    // Same lavender pill as default category badge (“Read”-style background in dropdown).
+    .notification-new-label {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 10px;
+      border-radius: 999px;
+      font-size: 10px;
+      height: 16px;
+      font-weight: 700;
+      line-height: 1;
+      color: #fff;
+      background: #dc2626;
     }
 
     .notification-item-preview {
