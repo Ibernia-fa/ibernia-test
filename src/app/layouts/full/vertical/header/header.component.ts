@@ -235,7 +235,13 @@ showFiller = false;
 
     this.settingsService.userData$
       .pipe(takeUntil(this.destroy$))
-      .subscribe(() => this.cdr.markForCheck());
+      .subscribe((data) => {
+        if (!data) return;
+        const raw = data.profilePhotoUrl;
+        const trimmed = raw != null ? String(raw).trim() : '';
+        this.profileImagePreview = trimmed ? this.ensureDataUrl(raw ?? null) : null;
+        this.cdr.markForCheck();
+      });
 
     this.store.select(selectedClient)
       .pipe(takeUntil(this.destroy$))
@@ -441,13 +447,8 @@ get userInitials(): string {
             this.setOtherLanguage();
             this.languageService.setFromApi(p.preferences?.language as LanguageCode);
             this.settingsService.setUserData(res.body);
+            // profileImagePreview is synced from userData$ (including cleared photo)
 
-  
-            // show backend avatar if present (local preview only)
-            if (p.profilePhotoUrl) {
-              this.profileImagePreview = p.profilePhotoUrl;
-            }
-  
             // re-apply validators in case type changed
           }
         });
