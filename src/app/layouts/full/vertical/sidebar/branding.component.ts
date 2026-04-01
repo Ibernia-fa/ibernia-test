@@ -13,6 +13,7 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
           src="assets/images/logos/ibernia-logo.svg"
           alt="Ibernia"
           class="brand-logo brand-logo--default"
+          [class.brand-logo--default-hidden]="!!profileImage"
           loading="eager"
           fetchpriority="high"
           decoding="sync"
@@ -47,6 +48,12 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
         display: block;
         max-width: 120px;
         height: auto;
+      }
+
+      /* In DOM for instant swap when custom is removed; invisible while custom shows */
+      .brand-logo--default-hidden {
+        opacity: 0;
+        visibility: hidden;
       }
 
       .brand-logo--custom {

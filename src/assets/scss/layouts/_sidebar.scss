@@ -57,6 +57,12 @@
   justify-content: center;
 }
 
+/* Hide static fallbacks while custom logo layer is shown (they stay mounted for instant restore). */
+.sidebar-logo-link--custom .sidebar-static-logos {
+  opacity: 0;
+  visibility: hidden;
+}
+
 .sidebar-default-logo {
   // max-width: 120px;
   width: 100%;

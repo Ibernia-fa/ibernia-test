@@ -1,6 +1,6 @@
 <!-- Sidebar header: logo + toggle (toggle only when expanded; when collapsed, toggle is in header) -->
 <div class="sidebar-header">
-  <div class="sidebar-logo-link">
+  <div class="sidebar-logo-link" [class.sidebar-logo-link--custom]="!!brandingLogo">
     <!-- Defaults stay mounted; custom logo overlays when set (avoids blank flash on remove). -->
     <div class="sidebar-static-logos">
       <a
