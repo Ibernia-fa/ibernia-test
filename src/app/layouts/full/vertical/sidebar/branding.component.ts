@@ -8,21 +8,25 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
   standalone: true,
   imports: [CommonModule],
   template: ` <a href="/" class="branding-link">
-      <ng-container *ngIf="profileImage; else defaultLogo">
+      <span class="brand-logo-stack">
         <img
+          src="assets/images/logos/ibernia-logo.svg"
+          alt="Ibernia"
+          class="brand-logo brand-logo--default"
+          loading="eager"
+          fetchpriority="high"
+          decoding="sync"
+        />
+        <img
+          *ngIf="profileImage && sanitizedImage"
           [src]="sanitizedImage"
-          alt="logo"
-          class="brand-logo"
+          alt="Company logo"
+          class="brand-logo brand-logo--custom"
           loading="eager"
           decoding="sync"
         />
-      </ng-container>
-    </a>
-
-    <!-- width="150" -->
-    <ng-template #defaultLogo>
-      <img src="./assets/images/logos/ibernia-logo.svg" alt="logo" />
-    </ng-template>`,
+      </span>
+    </a>`,
   styles: [
     `
       .branding-link {
@@ -32,18 +36,36 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
         gap: 5px;
       }
 
-      .brand-logo {
-        // width: 100%;
+      .brand-logo-stack {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .brand-logo--default {
+        display: block;
         max-width: 120px;
         height: auto;
-        // width: 50px;
-        // height: 50px;
-        // object-fit: contain;
-        // object-position: center;
-        // margin: 0;
-        // padding: 0;
-        // display: block;
       }
+
+      .brand-logo--custom {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        max-width: 120px;
+        max-height: 48px;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+      }
+
+      .brand-logo {
+        max-width: 120px;
+        height: auto;
+      }
+
       .power-by-logo {
         display: block;
         width: 120px;
