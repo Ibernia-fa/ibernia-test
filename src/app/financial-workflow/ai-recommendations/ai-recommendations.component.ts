@@ -10,6 +10,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { FormsModule } from '@angular/forms';
+import { TranslateModule } from '@ngx-translate/core';
 import { SettingsService } from 'src/app/default-preferance/services/default-preferance.http.service';
 import { Store } from '@ngrx/store';
 import { Client } from 'src/app/clients/models/client';
@@ -27,7 +28,8 @@ import { ClientHttpService } from 'src/app/clients/services/client-http.service'
     MatTooltipModule,
     MatProgressSpinnerModule,
     MatFormFieldModule,
-    MatInputModule
+    MatInputModule,
+    TranslateModule
   ],
   selector: 'app-ai-recommendations',
   templateUrl: './ai-recommendations.component.html',
