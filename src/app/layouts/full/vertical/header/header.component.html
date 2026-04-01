@@ -586,7 +586,7 @@
                         >
                           {{ n.title | translate }}
                         </div>
-                        @if (!n.isRead) {
+                        @if (shouldShowNewLabel(n)) {
                           <span class="notification-new-label flex-shrink-0">{{
                             "New" | translate
                           }}</span>
@@ -606,7 +606,7 @@
                         >
                           {{ n.title }}
                         </div>
-                        @if (!n.isRead) {
+                        @if (shouldShowNewLabel(n)) {
                           <span class="notification-new-label flex-shrink-0">{{
                             "New" | translate
                           }}</span>
