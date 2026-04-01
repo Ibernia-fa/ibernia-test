@@ -42,8 +42,8 @@
         class="d-flex justify-content-between align-items-center"
       >
         <div class="ibr-client-intro">
-          <h3>{{ currentGreeting }}, {{ advisorDisplayName || "there" }}</h3>
-          <p>{{ currentDate | date: "EEEE, MMMM d, y, h:mm a" }}</p>
+          <h3>{{ currentGreeting | translate }}, {{ advisorDisplayName || "there" }}</h3>
+          <p>{{ currentDate | date: "EEEE d MMMM y, HH:mm" }}</p>
         </div>
         <!-- <div class="position-relative">
           <input
@@ -79,8 +79,7 @@
           <img src="assets/images/svgs/bag-icon.svg" alt="bag-icon" />
         </div> -->
         <h4 class="f-w-700 page-title">
-          <!-- {{ advisorDisplayName }}'s {{ "Clients" | translate }} -->
-          Your {{ "clients" | translate }}
+          {{ "Your clients" | translate }}
         </h4>
       </div>
       <div class="position-relative">
@@ -145,7 +144,7 @@
                 {{ "Date of birth" | translate }}
               </th>
               <td mat-cell *matCellDef="let element" class="column-dob">
-                {{ element.clientDetails.birthDate | date }} ({{
+                {{ element.clientDetails.birthDate | date: "d MMM y" }} ({{
                   element.clientDetails.birthDate | ageCalculator
                 }})
                 @if (
@@ -153,7 +152,7 @@
                   element.partnerDetail?.name
                 ) {
                   <br />
-                  {{ element.partnerDetail?.birthDate | date }} ({{
+                  {{ element.partnerDetail?.birthDate | date: "d MMM y" }} ({{
                     element.partnerDetail?.birthDate | ageCalculator
                   }})
                 }
@@ -173,7 +172,7 @@
                 *matCellDef="let element"
                 class="column-last_updated"
               >
-                {{ element.lastUpdated | date }} <br />
+                {{ element.lastUpdated | date: "d MMM y" }} <br />
                 <span style="color: #9495a2">
                   {{ element.lastUpdated | timeAgo }}
                 </span>

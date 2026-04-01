@@ -182,12 +182,12 @@ export class ClientListComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private greetingInterval: ReturnType<typeof setInterval> | null = null;
 
-  /** Returns greeting phrase based on user's local hour. */
+  /** Returns greeting translation key based on user's local hour. */
   private getGreetingForLocalTime(): string {
     const hour = new Date().getHours();
-    if (hour >= 5 && hour < 12) return 'Good morning';
-    if (hour >= 12 && hour < 18) return 'Good afternoon';
-    return 'Good evening';
+    if (hour >= 5 && hour < 12) return 'GREETING.MORNING';
+    if (hour >= 12 && hour < 18) return 'GREETING.AFTERNOON';
+    return 'GREETING.EVENING';
   }
 
   /** Display name for the advisor in the page title. Uses API profile first, then OIDC claims; reads auth on each access so it updates when user loads late (same browser, intermittent missing name). */
