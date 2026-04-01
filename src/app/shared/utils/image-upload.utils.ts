@@ -74,6 +74,8 @@ export function resizeImageToMin(
         reject(new Error('Canvas not supported'));
         return;
       }
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, w, h);
       ctx.drawImage(img, 0, 0, w, h);
       resolve(canvas.toDataURL('image/jpeg', 0.9));
     };
@@ -106,6 +108,8 @@ export function compressImage(dataUrl: string, maxDimension = 1200, quality = 0.
         resolve(dataUrl);
         return;
       }
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, w, h);
       ctx.drawImage(img, 0, 0, w, h);
       resolve(canvas.toDataURL('image/jpeg', quality));
     };
