@@ -1,75 +1,230 @@
-<div class="dialog-header">
-  <h2>Beneficiary rules</h2>
-  <button class="close-btn" (click)="onClose()">
-    <mat-icon>close</mat-icon>
-  </button>
-</div>
-
-<p class="dialog-subtitle">Define who receives each estate and at what percentage per scenario</p>
-
-<mat-dialog-content>
-  <!-- Scenario tabs -->
-  <div class="scenario-tabs">
-    @for (tab of scenarios; track tab.type) {
-      <button class="scenario-tab" [class.active]="activeScenario?.type === tab.type"
-              (click)="selectScenario(tab)">
-        <mat-icon class="tab-icon">person</mat-icon>
-        <span>{{tab.label}}</span>
-        <span class="tab-pct" *ngIf="totalPercentage > 0 && activeScenario?.type === tab.type">
-          {{totalPercentage}}%
-        </span>
-      </button>
-    }
-  </div>
-
-  <!-- Recipients list -->
-  <div class="recipients-section" *ngIf="activeScenario">
-    <!-- Add recipient button -->
-    <button class="add-recipient-btn" [disabled]="!canAddRecipient" (click)="addRecipient()">
-      {{ canAddRecipient ? '+ Add recipient' : 'All eligible beneficiaries added' }}
+<div class="d-flex flex-column">
+  <div class="dialog-header">
+    <h2 class="dialog-title text-center">Beneficiary rules</h2>
+    <button
+      type="button"
+      mat-icon-button
+      disableRipple
+      class="dialog-close-btn"
+      aria-label="Close dialog"
+      (click)="onClose()"
+    >
+      <mat-icon>close</mat-icon>
     </button>
+  </div>
 
-    <div class="recipient-row" *ngFor="let row of recipients; let i = index">
-      <div class="recipient-header">
-        <span class="recipient-label">Select</span>
-        <button class="remove-recipient" (click)="removeRecipient(i)">
-          <mat-icon>close</mat-icon>
-        </button>
-      </div>
-
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-select [(ngModel)]="row.memberId" [hideSingleSelectionIndicator]="true">
-          @for (m of getAvailableMembersForRow(i); track m.id) {
-            <mat-option [value]="m.id">{{m.firstName}} {{m.lastName}}</mat-option>
-          }
-        </mat-select>
-      </mat-form-field>
-
-      <div class="pct-row">
-        <div class="pct-input-wrap">
-          <input type="number" [(ngModel)]="row.percentage" min="0" max="100" class="pct-input" />
-          <span class="pct-sign">%</span>
-        </div>
-        <mat-slider min="0" max="100" step="1" class="pct-slider">
-          <input matSliderThumb [(ngModel)]="row.percentage" />
-        </mat-slider>
+  <mat-dialog-content class="event-dialog-content">
+    <div class="d-flex flex-column gap-12">
+      <p class="dialog-subtitle">
+        Define who receives each estate and at what percentage per scenario
+      </p>
+      <!-- Scenario tabs -->
+      <div class="scenario-tabs">
+        @for (tab of scenarios; track tab.type) {
+          <button
+            type="button"
+            class="scenario-tab"
+            [class.active]="activeScenario?.type === tab.type"
+            (click)="selectScenario(tab)"
+          >
+            <!-- <mat-icon class="tab-icon">person</mat-icon> -->
+             
+<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M16.6663 17.5V15.8333C16.6663 14.9493 16.3151 14.1014 15.69 13.4763C15.0649 12.8512 14.2171 12.5 13.333 12.5H6.66634C5.78229 12.5 4.93444 12.8512 4.30932 13.4763C3.6842 14.1014 3.33301 14.9493 3.33301 15.8333V17.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M10.0003 9.16667C11.8413 9.16667 13.3337 7.67428 13.3337 5.83333C13.3337 3.99238 11.8413 2.5 10.0003 2.5C8.15938 2.5 6.66699 3.99238 6.66699 5.83333C6.66699 7.67428 8.15938 9.16667 10.0003 9.16667Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+  
+            <span>{{ tab.label }}</span>
+            <span
+              class="tab-pct"
+              *ngIf="totalPercentage > 0 && activeScenario?.type === tab.type"
+            >
+              {{ totalPercentage }}%
+            </span>
+          </button>
+        }
       </div>
     </div>
 
-    <!-- Total percentage display -->
-    <div class="total-pct-row" *ngIf="recipients.length > 0">
-      <span class="total-pct-label">Total:</span>
-      <span class="total-pct-value" [class.total-valid]="isValid" [class.total-invalid]="!isValid">
-        {{totalPercentage | number:'1.0-1'}}%
-      </span>
-      <span class="total-pct-hint" *ngIf="!isValid">Must equal 100%</span>
+    <!-- Recipients list -->
+    <div class="recipients-section d-flex flex-column gap-16" *ngIf="activeScenario">
+
+      <button
+        type="button"
+        class="button-icon-outline add-recipient-btn w-100 d-flex align-items-center justify-content-center"
+        [disabled]="!canAddRecipient"
+        (click)="addRecipient()"
+      >
+        @if (canAddRecipient) {
+          <svg
+            class="add-recipient-icon"
+            width="20"
+            height="20"
+            viewBox="0 0 20 20"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+          >
+            <path
+              d="M10 4.16699V15.8337"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M4.16699 10H15.8337"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        }
+        <span class="f-s-16">{{
+          canAddRecipient ? "Add recipient" : "All eligible beneficiaries added"
+        }}</span>
+      </button>
+
+      <div class="recipient-row" *ngFor="let row of recipients; let i = index">
+        <div class="recipient-header position-relative">
+          <mat-label class="f-s-16 f-w-500 d-block ibr-black recipient-select-label"
+            >Select</mat-label
+          >
+          <button
+            type="button"
+            class="remove-recipient"
+            (click)="removeRecipient(i)"
+          >
+            <!-- <mat-icon>close</mat-icon> -->
+             
+<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M15 5L5 15" stroke="#1C1C1C" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M5 5L15 15" stroke="#1C1C1C" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+  
+          </button>
+        </div>
+
+        <div class="w-100 form-field beneficiary-select-field">
+          <div class="select-option position-relative">
+            <mat-select
+              [(ngModel)]="row.memberId"
+              class="sortby-edit-profile"
+              hideSingleSelectionIndicator
+            >
+              @for (m of getAvailableMembersForRow(i); track m.id) {
+                <mat-option [value]="m.id"
+                  >{{ m.firstName }} {{ m.lastName }}</mat-option
+                >
+              }
+            </mat-select>
+            <span class="custom-arrow">
+              <svg
+                width="12"
+                height="7"
+                viewBox="0 0 12 7"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M1 1L6 6L11 1"
+                  stroke="#2B3942"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </span>
+          </div>
+        </div>
+
+        <div class="d-flex align-items-center gap-24 pct-row">
+          <div class="slider-customizer slider-wrapper pct-slider-wrap">
+            <mat-slider class="w-100" min="0" max="100" step="1">
+              <input matSliderThumb [(ngModel)]="row.percentage" />
+            </mat-slider>
+          </div>
+          <div class="percentage-field">
+            <div class="w-100 form-field custom-rate-input">
+              <input
+                matInput
+                type="number"
+                [(ngModel)]="row.percentage"
+                min="0"
+                max="100"
+                placeholder="0"
+              />
+              <div class="custom-rate-suffix">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M15.8337 4.16602L4.16699 15.8327"
+                    stroke="#48475D"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M5.41634 7.50065C6.56693 7.50065 7.49967 6.56791 7.49967 5.41732C7.49967 4.26672 6.56693 3.33398 5.41634 3.33398C4.26575 3.33398 3.33301 4.26672 3.33301 5.41732C3.33301 6.56791 4.26575 7.50065 5.41634 7.50065Z"
+                    stroke="#48475D"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M14.5833 16.6667C15.7339 16.6667 16.6667 15.7339 16.6667 14.5833C16.6667 13.4327 15.7339 12.5 14.5833 12.5C13.4327 12.5 12.5 13.4327 12.5 14.5833C12.5 15.7339 13.4327 16.6667 14.5833 16.6667Z"
+                    stroke="#48475D"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Total percentage display -->
+      <div class="total-pct-row" *ngIf="recipients.length > 0">
+        <span class="total-pct-label">Total:</span>
+        <span
+          class="total-pct-value"
+          [class.total-valid]="isValid"
+          [class.total-invalid]="!isValid"
+        >
+          {{ totalPercentage | number: "1.0-1" }}%
+        </span>
+        <span class="total-pct-hint" *ngIf="!isValid">Must equal 100%</span>
+      </div>
+    </div>
+  </mat-dialog-content>
+
+  <div class="row justify-content-end gap-16 modal-action p-t-24">
+    <div>
+      <button
+        type="button"
+        (click)="onClose()"
+        class="button-icon-outline w-100 d-block"
+      >
+        <span class="f-s-16">Cancel</span>
+      </button>
+    </div>
+    <div>
+      <button
+        type="button"
+        (click)="onSave()"
+        [disabled]="!isValid || isSaving"
+        class="button-icon w-100 d-block"
+      >
+        <span class="f-s-16">Save</span>
+      </button>
     </div>
   </div>
-</mat-dialog-content>
-
-<mat-dialog-actions align="end">
-  <button class="dialog-btn dialog-btn-cancel" (click)="onClose()">Cancel</button>
-  <button class="dialog-btn dialog-btn-save" [disabled]="!isValid || isSaving" (click)="onSave()">
-    Save
-  </button>
-</mat-dialog-actions>
+</div>

@@ -2,7 +2,9 @@ import { Component, Inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
+import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { ToastrService } from 'ngx-toastr';
 import { CurrencySymbolPipe } from 'src/app/pipe/currency-symbol.pipe';
@@ -14,9 +16,15 @@ import { LegacyHttpService } from '../services/legacy-http.service';
   selector: 'app-edit-parent-estate',
   standalone: true,
   imports: [
-    CommonModule, ReactiveFormsModule, MatDialogModule,
-    MatFormFieldModule, MatInputModule, CurrencySymbolPipe,
-    ThousandSeparatorInputDirective
+    CommonModule,
+    ReactiveFormsModule,
+    MatDialogModule,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatIconModule,
+    MatInputModule,
+    CurrencySymbolPipe,
+    ThousandSeparatorInputDirective,
   ],
   templateUrl: './edit-parent-estate.component.html',
   styleUrl: './edit-parent-estate.component.scss'

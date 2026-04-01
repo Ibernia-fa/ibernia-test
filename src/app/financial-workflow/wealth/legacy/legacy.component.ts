@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  Input,
+  OnInit,
+  OnChanges,
+  SimpleChanges,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -15,7 +23,7 @@ import {
   ScenarioResultModel,
   ScenarioType,
   FamilyRole,
-  FAMILY_ROLE_LABELS
+  FAMILY_ROLE_LABELS,
 } from './models/legacy.model';
 import { AddMemberComponent } from './add-member/add-member.component';
 import { BeneficiaryRulesComponent } from './beneficiary-rules/beneficiary-rules.component';
@@ -31,7 +39,7 @@ import { EditParentEstateComponent } from './edit-parent-estate/edit-parent-esta
     MatIconModule,
     MatMenuModule,
     MatProgressSpinnerModule,
-    CurrencySymbolPipe
+    CurrencySymbolPipe,
   ],
   templateUrl: './legacy.component.html',
   styleUrl: './legacy.component.scss',
@@ -68,37 +76,54 @@ export class LegacyComponent implements OnInit, OnChanges {
   // ── Tree Layout Helpers ────────────────────────────────────────
 
   get clientMember(): FamilyMemberModel | undefined {
-    return this.dashboard?.familyMembers.find(m => m.role === 'Client');
+    return this.dashboard?.familyMembers.find((m) => m.role === 'Client');
   }
 
   get partnerMember(): FamilyMemberModel | undefined {
-    return this.dashboard?.familyMembers.find(m => m.role === 'Partner');
+    return this.dashboard?.familyMembers.find((m) => m.role === 'Partner');
   }
 
   get clientParents(): FamilyMemberModel[] {
-    return this.dashboard?.familyMembers.filter(m =>
-      m.role === 'ClientFather' || m.role === 'ClientMother') ?? [];
+    return (
+      this.dashboard?.familyMembers.filter(
+        (m) => m.role === 'ClientFather' || m.role === 'ClientMother',
+      ) ?? []
+    );
   }
 
   get partnerParents(): FamilyMemberModel[] {
-    return this.dashboard?.familyMembers.filter(m =>
-      m.role === 'PartnerFather' || m.role === 'PartnerMother') ?? [];
+    return (
+      this.dashboard?.familyMembers.filter(
+        (m) => m.role === 'PartnerFather' || m.role === 'PartnerMother',
+      ) ?? []
+    );
   }
 
   get clientSiblings(): FamilyMemberModel[] {
-    return this.dashboard?.familyMembers.filter(m => m.role === 'ClientSibling') ?? [];
+    return (
+      this.dashboard?.familyMembers.filter((m) => m.role === 'ClientSibling') ??
+      []
+    );
   }
 
   get partnerSiblings(): FamilyMemberModel[] {
-    return this.dashboard?.familyMembers.filter(m => m.role === 'PartnerSibling') ?? [];
+    return (
+      this.dashboard?.familyMembers.filter(
+        (m) => m.role === 'PartnerSibling',
+      ) ?? []
+    );
   }
 
   get children(): FamilyMemberModel[] {
-    return this.dashboard?.familyMembers.filter(m => m.role === 'Child') ?? [];
+    return (
+      this.dashboard?.familyMembers.filter((m) => m.role === 'Child') ?? []
+    );
   }
 
   get otherMembers(): FamilyMemberModel[] {
-    return this.dashboard?.familyMembers.filter(m => m.role === 'Other') ?? [];
+    return (
+      this.dashboard?.familyMembers.filter((m) => m.role === 'Other') ?? []
+    );
   }
 
   get hasPartner(): boolean {
@@ -144,7 +169,9 @@ export class LegacyComponent implements OnInit, OnChanges {
   }
 
   getMemberInheritance(memberId: string) {
-    return this.scenarioResult?.beneficiaryShares?.find(s => s.memberId === memberId);
+    return this.scenarioResult?.beneficiaryShares?.find(
+      (s) => s.memberId === memberId,
+    );
   }
 
   getMemberBaseAmount(member: FamilyMemberModel): number {
@@ -172,34 +199,40 @@ export class LegacyComponent implements OnInit, OnChanges {
         this.toastr.error('Failed to load legacy data', 'Error');
         this.isLoading = false;
         this.cdr.markForCheck();
-      }
+      },
     });
   }
 
   selectScenario(scenario: ScenarioType): void {
     const ids = this.getScenarioMemberIds(scenario);
-    const allAlreadyMarked = ids.length > 0 && ids.every(id => this.markedDeceased.has(id));
+    const allAlreadyMarked =
+      ids.length > 0 && ids.every((id) => this.markedDeceased.has(id));
 
     if (allAlreadyMarked) {
-      ids.forEach(id => this.markedDeceased.delete(id));
+      ids.forEach((id) => this.markedDeceased.delete(id));
 
       const remainingScenario = this.resolveScenarioFromDeceased();
 
       if (remainingScenario) {
         this.activeScenario = remainingScenario;
-        this.legacyHttp.simulateScenario(this.cashflowId, remainingScenario).subscribe({
-          next: (result) => {
-            this.scenarioResult = result;
-            this.cdr.markForCheck();
-          },
-          error: (err) => {
-            this.toastr.error(err?.error?.message || 'Failed to simulate scenario', 'Error');
-            this.activeScenario = null;
-            this.scenarioResult = null;
-            this.markedDeceased.clear();
-            this.cdr.markForCheck();
-          }
-        });
+        this.legacyHttp
+          .simulateScenario(this.cashflowId, remainingScenario)
+          .subscribe({
+            next: (result) => {
+              this.scenarioResult = result;
+              this.cdr.markForCheck();
+            },
+            error: (err) => {
+              this.toastr.error(
+                err?.error?.message || 'Failed to simulate scenario',
+                'Error',
+              );
+              this.activeScenario = null;
+              this.scenarioResult = null;
+              this.markedDeceased.clear();
+              this.cdr.markForCheck();
+            },
+          });
       } else {
         this.activeScenario = null;
         this.scenarioResult = null;
@@ -208,26 +241,31 @@ export class LegacyComponent implements OnInit, OnChanges {
       return;
     }
 
-    ids.forEach(id => this.markedDeceased.add(id));
+    ids.forEach((id) => this.markedDeceased.add(id));
 
     const effectiveScenario = this.resolveScenarioFromDeceased() ?? scenario;
 
     this.activeScenario = effectiveScenario;
-    this.legacyHttp.simulateScenario(this.cashflowId, effectiveScenario).subscribe({
-      next: (result) => {
-        this.scenarioResult = result;
-        this.cdr.markForCheck();
-      },
-      error: (err) => {
-        this.toastr.error(err?.error?.message || 'Failed to simulate scenario', 'Error');
-        ids.forEach(id => this.markedDeceased.delete(id));
-        if (this.markedDeceased.size === 0) {
-          this.activeScenario = null;
-          this.scenarioResult = null;
-        }
-        this.cdr.markForCheck();
-      }
-    });
+    this.legacyHttp
+      .simulateScenario(this.cashflowId, effectiveScenario)
+      .subscribe({
+        next: (result) => {
+          this.scenarioResult = result;
+          this.cdr.markForCheck();
+        },
+        error: (err) => {
+          this.toastr.error(
+            err?.error?.message || 'Failed to simulate scenario',
+            'Error',
+          );
+          ids.forEach((id) => this.markedDeceased.delete(id));
+          if (this.markedDeceased.size === 0) {
+            this.activeScenario = null;
+            this.scenarioResult = null;
+          }
+          this.cdr.markForCheck();
+        },
+      });
   }
 
   private resolveScenarioFromDeceased(): ScenarioType | null {
@@ -242,12 +280,14 @@ export class LegacyComponent implements OnInit, OnChanges {
     if (clientDead) return ScenarioType.ClientDies;
     if (partnerDead) return ScenarioType.PartnerDies;
 
-    const allClientParentsDead = this.clientParents.length > 0
-      && this.clientParents.every(p => this.markedDeceased.has(p.id));
+    const allClientParentsDead =
+      this.clientParents.length > 0 &&
+      this.clientParents.every((p) => this.markedDeceased.has(p.id));
     if (allClientParentsDead) return ScenarioType.ClientParentsDie;
 
-    const allPartnerParentsDead = this.partnerParents.length > 0
-      && this.partnerParents.every(p => this.markedDeceased.has(p.id));
+    const allPartnerParentsDead =
+      this.partnerParents.length > 0 &&
+      this.partnerParents.every((p) => this.markedDeceased.has(p.id));
     if (allPartnerParentsDead) return ScenarioType.PartnerParentsDie;
 
     return null;
@@ -257,15 +297,23 @@ export class LegacyComponent implements OnInit, OnChanges {
     const members = this.dashboard?.familyMembers ?? [];
     switch (scenario) {
       case ScenarioType.ClientDies:
-        return members.filter(m => m.role === 'Client').map(m => m.id);
+        return members.filter((m) => m.role === 'Client').map((m) => m.id);
       case ScenarioType.PartnerDies:
-        return members.filter(m => m.role === 'Partner').map(m => m.id);
+        return members.filter((m) => m.role === 'Partner').map((m) => m.id);
       case ScenarioType.BothDie:
-        return members.filter(m => m.role === 'Client' || m.role === 'Partner').map(m => m.id);
+        return members
+          .filter((m) => m.role === 'Client' || m.role === 'Partner')
+          .map((m) => m.id);
       case ScenarioType.ClientParentsDie:
-        return members.filter(m => m.role === 'ClientFather' || m.role === 'ClientMother').map(m => m.id);
+        return members
+          .filter((m) => m.role === 'ClientFather' || m.role === 'ClientMother')
+          .map((m) => m.id);
       case ScenarioType.PartnerParentsDie:
-        return members.filter(m => m.role === 'PartnerFather' || m.role === 'PartnerMother').map(m => m.id);
+        return members
+          .filter(
+            (m) => m.role === 'PartnerFather' || m.role === 'PartnerMother',
+          )
+          .map((m) => m.id);
       default:
         return [];
     }
@@ -280,12 +328,18 @@ export class LegacyComponent implements OnInit, OnChanges {
       this.markedDeceased.add(memberId);
     }
 
-    const isClientSide = member.role === 'ClientFather' || member.role === 'ClientMother';
-    const scenario = isClientSide ? ScenarioType.ClientParentsDie : ScenarioType.PartnerParentsDie;
-    const parentMembers = isClientSide ? this.clientParents : this.partnerParents;
+    const isClientSide =
+      member.role === 'ClientFather' || member.role === 'ClientMother';
+    const scenario = isClientSide
+      ? ScenarioType.ClientParentsDie
+      : ScenarioType.PartnerParentsDie;
+    const parentMembers = isClientSide
+      ? this.clientParents
+      : this.partnerParents;
 
-    const allParentsDead = parentMembers.length > 0
-      && parentMembers.every(p => this.markedDeceased.has(p.id));
+    const allParentsDead =
+      parentMembers.length > 0 &&
+      parentMembers.every((p) => this.markedDeceased.has(p.id));
 
     if (allParentsDead) {
       this.activeScenario = scenario;
@@ -295,12 +349,15 @@ export class LegacyComponent implements OnInit, OnChanges {
           this.cdr.markForCheck();
         },
         error: (err) => {
-          this.toastr.error(err?.error?.message || 'Failed to simulate scenario', 'Error');
-          parentMembers.forEach(p => this.markedDeceased.delete(p.id));
+          this.toastr.error(
+            err?.error?.message || 'Failed to simulate scenario',
+            'Error',
+          );
+          parentMembers.forEach((p) => this.markedDeceased.delete(p.id));
           this.activeScenario = null;
           this.scenarioResult = null;
           this.cdr.markForCheck();
-        }
+        },
       });
     } else {
       this.activeScenario = null;
@@ -323,7 +380,7 @@ export class LegacyComponent implements OnInit, OnChanges {
 
   onAddMember(): void {
     const dialogRef = this.dialog.open(AddMemberComponent, {
-      width: '450px',
+      width: '612px',
       disableClose: true,
       data: {
         cashflowId: this.cashflowId,
@@ -331,10 +388,10 @@ export class LegacyComponent implements OnInit, OnChanges {
         existingMembers: this.dashboard?.familyMembers ?? [],
         clientFirstName: this.clientMember?.firstName ?? '',
         partnerFirstName: this.partnerMember?.firstName ?? '',
-      }
+      },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result?.dashboard) {
         this.dashboard = result.dashboard;
         this.clearScenario();
@@ -349,27 +406,28 @@ export class LegacyComponent implements OnInit, OnChanges {
         this.clearScenario();
         this.toastr.success('Member removed', 'Success');
       },
-      error: () => this.toastr.error('Failed to remove member', 'Error')
+      error: () => this.toastr.error('Failed to remove member', 'Error'),
     });
   }
 
   onEditParentEstate(side: 'client' | 'partner'): void {
-    const current = side === 'client'
-      ? this.dashboard?.parentEstates?.clientParentsNetWorth ?? 0
-      : this.dashboard?.parentEstates?.partnerParentsNetWorth ?? 0;
+    const current =
+      side === 'client'
+        ? (this.dashboard?.parentEstates?.clientParentsNetWorth ?? 0)
+        : (this.dashboard?.parentEstates?.partnerParentsNetWorth ?? 0);
 
     const dialogRef = this.dialog.open(EditParentEstateComponent, {
-      width: '400px',
+      width: '612px',
       disableClose: true,
       data: {
         cashflowId: this.cashflowId,
         side,
         currentValue: current,
-        currency: this.currency
-      }
+        currency: this.currency,
+      },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result?.dashboard) {
         this.dashboard = result.dashboard;
         this.clearScenario();
@@ -379,15 +437,15 @@ export class LegacyComponent implements OnInit, OnChanges {
 
   onOpenBeneficiaryRules(): void {
     const dialogRef = this.dialog.open(BeneficiaryRulesComponent, {
-      width: '600px',
+      width: '612px',
       disableClose: true,
       data: {
         cashflowId: this.cashflowId,
-        dashboard: this.dashboard
-      }
+        dashboard: this.dashboard,
+      },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result?.dashboard) {
         this.dashboard = result.dashboard;
         this.clearScenario();
@@ -397,15 +455,15 @@ export class LegacyComponent implements OnInit, OnChanges {
 
   onOpenTaxSettings(): void {
     const dialogRef = this.dialog.open(TaxSettingsComponent, {
-      width: '450px',
+      width: '612px',
       disableClose: true,
       data: {
         cashflowId: this.cashflowId,
-        taxSettings: this.dashboard?.taxSettings
-      }
+        taxSettings: this.dashboard?.taxSettings,
+      },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result?.dashboard) {
         this.dashboard = result.dashboard;
         this.clearScenario();
