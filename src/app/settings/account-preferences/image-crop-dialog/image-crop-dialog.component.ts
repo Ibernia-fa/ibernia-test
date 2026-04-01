@@ -88,7 +88,7 @@ const COMPANY_CROP_H = 300;
           [cropperStaticWidth]="data.cropType === 'company' ? companyCropW : profileCropPx"
           [cropperStaticHeight]="data.cropType === 'company' ? companyCropH : profileCropPx"
           [transform]="transform"
-          format="jpeg"
+          format="png"
           output="base64"
           [resizeToWidth]="0"
           (imageCropped)="onImageCropped($event)"
@@ -239,7 +239,7 @@ export class ImageCropDialogComponent {
       if (!raw) {
         return;
       }
-      const croppedBase64 = raw.startsWith('data:') ? raw : `data:image/jpeg;base64,${raw}`;
+      const croppedBase64 = raw.startsWith('data:') ? raw : `data:image/png;base64,${raw}`;
       this.dialogRef.close({
         croppedBase64,
         transform: normalizeTransform(this.transform),

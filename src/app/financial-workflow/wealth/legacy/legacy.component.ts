@@ -142,6 +142,26 @@ export class LegacyComponent implements OnInit, OnChanges {
     return this.clientData?.preferredCurrency ?? 'USD';
   }
 
+  get showTaxOnClientBranch(): boolean {
+    return this.activeScenario === ScenarioType.ClientParentsDie
+      && !!this.scenarioResult
+      && this.scenarioResult.totalTax > 0;
+  }
+
+  get showTaxOnPartnerBranch(): boolean {
+    return this.activeScenario === ScenarioType.PartnerParentsDie
+      && !!this.scenarioResult
+      && this.scenarioResult.totalTax > 0;
+  }
+
+  get showTaxOnChildrenSection(): boolean {
+    return (this.activeScenario === ScenarioType.ClientDies
+      || this.activeScenario === ScenarioType.PartnerDies
+      || this.activeScenario === ScenarioType.BothDie)
+      && !!this.scenarioResult
+      && this.scenarioResult.totalTax > 0;
+  }
+
   // ── Scenario Helpers ───────────────────────────────────────────
 
   isDeceased(memberId: string): boolean {

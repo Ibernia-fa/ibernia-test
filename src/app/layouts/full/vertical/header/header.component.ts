@@ -45,6 +45,7 @@ import { LanguageService } from 'src/app/core/language.service';
 import { LanguageLoaderService } from '../../language-loader.service';
 import { BrandingComponent } from '../sidebar/branding.component';
 import { MyNotificationsService, UserNotificationItem } from 'src/app/core/services/my-notifications.service';
+import { NotificationNewLabelGraceService } from 'src/app/core/services/notification-new-label-grace.service';
 import { portalOriginForIdentityReturn } from 'src/app/core/identity-security-url';
 import {
   MFA_REMINDER_NOTIFICATION_ID,
@@ -206,6 +207,14 @@ showFiller = false;
     );
   }
 
+  shouldShowNewLabel(n: UserNotificationItem): boolean {
+    return this.newLabelGrace.shouldShowNewLabel(n.id, n.isRead);
+  }
+
+  private scheduleNewLabelGraceRefresh(): void {
+    setTimeout(() => this.cdr.markForCheck(), this.newLabelGrace.graceMs);
+  }
+
   constructor(
     private settings: CoreService,
     private vsidenav: CoreService,
@@ -219,6 +228,7 @@ showFiller = false;
     private languageService: LanguageService,
     private languageLoader: LanguageLoaderService,
     private myNotifications: MyNotificationsService,
+    private newLabelGrace: NotificationNewLabelGraceService,
     private cdr: ChangeDetectorRef
   ) {
     translate.setDefaultLang('en');
@@ -603,6 +613,8 @@ get userInitials(): string {
     this.myNotifications.markAsRead(n.id).subscribe({
       next: () => {
         n.isRead = true;
+        this.newLabelGrace.recordMarkedRead(n.id);
+        this.scheduleNewLabelGraceRefresh();
         this.visibilityMarkInFlight.delete(n.id);
         this.cdr.markForCheck();
       },

@@ -2,10 +2,12 @@
   <div class="footer-content">
     <span>© 2025 Ibernia</span>
     <nav>
-      <a *ngIf="showFaqLink" href="/settings/help">FAQ & Support</a>
-      <a [href]="termsUrl" target="_blank" rel="noopener"
-        >Terms and Conditions</a
-      >
+      <a *ngIf="showFaqLink" href="/settings/help">
+        {{ 'Footer.FAQ_SUPPORT' | translate }}
+      </a>
+      <a [href]="termsUrl" target="_blank" rel="noopener">
+        {{ 'Footer.TERMS' | translate }}
+      </a>
     </nav>
   </div>
 </footer>

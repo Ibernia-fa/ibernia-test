@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -12,6 +12,7 @@ import { NavItemService } from 'src/app/layouts/full/nav-item.service';
 import { NotificationPreferencesService, NotificationPreference } from './notification-preferences.service';
 import { WebPushService } from './web-push.service';
 import { MyNotificationsService, UserNotificationItem } from 'src/app/core/services/my-notifications.service';
+import { NotificationNewLabelGraceService } from 'src/app/core/services/notification-new-label-grace.service';
 import { portalOriginForIdentityReturn } from 'src/app/core/identity-security-url';
 import {
   MFA_REMINDER_NOTIFICATION_ID,
@@ -65,11 +66,21 @@ export class NotificationsComponent implements OnInit {
     );
   }
 
+  shouldShowNewLabel(n: UserNotificationItem): boolean {
+    return this.newLabelGrace.shouldShowNewLabel(n.id, n.isRead);
+  }
+
+  private scheduleNewLabelGraceRefresh(): void {
+    setTimeout(() => this.cdr.markForCheck(), this.newLabelGrace.graceMs);
+  }
+
   constructor(
     private navItemService: NavItemService,
     private prefsService: NotificationPreferencesService,
     private webPushService: WebPushService,
     private myNotifications: MyNotificationsService,
+    private newLabelGrace: NotificationNewLabelGraceService,
+    private cdr: ChangeDetectorRef,
     private router: Router,
     private authService: AuthService,
     private translate: TranslateService
@@ -168,12 +179,24 @@ export class NotificationsComponent implements OnInit {
 
   /** Marks every server-backed notification read; synthetic MFA row stays unread (not on API). */
   private markAllReadExceptSecurityOnPage(): void {
+    const unreadIds = this.notifications
+      .filter(
+        (n) => n.id !== MFA_REMINDER_NOTIFICATION_ID && !n.isRead
+      )
+      .map((n) => n.id);
     this.myNotifications.markAllAsRead().subscribe({
       next: () => {
         for (const n of this.notifications) {
           if (n.id !== MFA_REMINDER_NOTIFICATION_ID) {
             n.isRead = true;
           }
+        }
+        for (const id of unreadIds) {
+          this.newLabelGrace.recordMarkedRead(id);
+        }
+        if (unreadIds.length) {
+          this.scheduleNewLabelGraceRefresh();
+          this.cdr.markForCheck();
         }
       },
       error: () => {},
@@ -191,6 +214,9 @@ export class NotificationsComponent implements OnInit {
       this.myNotifications.markAsRead(n.id).subscribe({
         next: () => {
           n.isRead = true;
+          this.newLabelGrace.recordMarkedRead(n.id);
+          this.scheduleNewLabelGraceRefresh();
+          this.cdr.markForCheck();
         },
       });
     }
