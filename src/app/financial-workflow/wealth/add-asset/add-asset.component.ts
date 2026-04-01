@@ -7,6 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { ToastrService } from 'ngx-toastr';
+import { TranslateModule } from '@ngx-translate/core';
 
 import { allCountries } from 'src/app/clients/models/country';
 import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
@@ -42,7 +43,8 @@ export interface AddAssetDialogData {
     MatInputModule,
     MatSelectModule,
     ThousandSeparatorPipe,
-    ThousandSeparatorInputDirective
+    ThousandSeparatorInputDirective,
+    TranslateModule,
   ],
   templateUrl: './add-asset.component.html',
   styleUrl: './add-asset.component.scss',

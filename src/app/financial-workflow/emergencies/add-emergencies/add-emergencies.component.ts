@@ -17,7 +17,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { ToastrService } from 'ngx-toastr';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import {
   Emergency,
   CreateEmergencyRequest,
@@ -60,6 +60,7 @@ export interface AddEmergencyDialogData {
     ThousandSeparatorInputDirective,
     MatButtonToggleModule,
     MaterialModule,
+    TranslateModule,
   ],
   templateUrl: './add-emergencies.component.html',
   styleUrl: './add-emergencies.component.scss',
