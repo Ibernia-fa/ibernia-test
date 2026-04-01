@@ -1,33 +1,15 @@
-.dialog-form {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding-top: 8px;
-}
+.event-dialog-content {
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 
-.full-width { width: 100%; }
+  &::-webkit-scrollbar {
+    display: none;
+  }
 
-.dialog-btn {
-  height: 40px;
-  padding: 0 24px;
-  border-radius: 12px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  font-family: "Ubuntu", serif;
-  border: none;
-}
-
-.dialog-btn-cancel {
-  background: #fff;
-  color: #64748b;
-  border: 1px solid #e2e8f0;
-  &:hover { background: #f8fafc; }
-}
-
-.dialog-btn-save {
-  background: #6366f1;
-  color: #fff;
-  &:hover { background: #4f46e5; }
-  &:disabled { opacity: 0.5; cursor: not-allowed; }
+  &.mat-mdc-dialog-content {
+    margin-top: 24px;
+    padding: 0px !important;
+  }
 }

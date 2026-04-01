@@ -1,20 +1,58 @@
-<h2 mat-dialog-title>{{sideLabel}} – Joint Net Worth</h2>
+<div class="d-flex flex-column">
+  <div class="dialog-header">
+    <h2 class="dialog-title text-center">
+      {{ sideLabel }} – Joint Net Worth
+    </h2>
+    <button
+      type="button"
+      mat-icon-button
+      disableRipple
+      class="dialog-close-btn"
+      mat-dialog-close
+      aria-label="Close dialog"
+      (click)="onCancel()"
+    >
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
 
-<mat-dialog-content>
-  <form [formGroup]="form" class="dialog-form">
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Joint net worth ({{data.currency | currencySymbol}})</mat-label>
-      <input matInput
-             [value]="form.value.jointNetWorth | number:'1.0-0'"
-             (input)="onAmountInput($event)"
-             thousandSeparatorInput />
-    </mat-form-field>
-  </form>
-</mat-dialog-content>
+  <mat-dialog-content class="event-dialog-content">
+    <form [formGroup]="form" class="d-flex flex-column gap-16">
+      <div class="w-100 form-field gap-8">
+        <mat-label
+          class="f-s-16 f-w-500 d-block ibr-black"
+          style="line-height: 16px"
+          >Joint net worth ({{ data.currency | currencySymbol }})</mat-label
+        >
+        <input
+          matInput
+          [value]="form.value.jointNetWorth | number: '1.0-0'"
+          (input)="onAmountInput($event)"
+          thousandSeparatorInput
+        />
+      </div>
+    </form>
+  </mat-dialog-content>
 
-<mat-dialog-actions align="end">
-  <button class="dialog-btn dialog-btn-cancel" (click)="onCancel()">Cancel</button>
-  <button class="dialog-btn dialog-btn-save" [disabled]="form.invalid || isSaving" (click)="onSave()">
-    Save
-  </button>
-</mat-dialog-actions>
+  <div class="row justify-content-end gap-16 modal-action p-t-24">
+    <div>
+      <button
+        type="button"
+        (click)="onCancel()"
+        class="button-icon-outline w-100 d-block"
+      >
+        <span class="f-s-16">Cancel</span>
+      </button>
+    </div>
+    <div>
+      <button
+        type="button"
+        (click)="onSave()"
+        [disabled]="form.invalid || isSaving"
+        class="button-icon w-100 d-block"
+      >
+        <span class="f-s-16">Save</span>
+      </button>
+    </div>
+  </div>
+</div>
