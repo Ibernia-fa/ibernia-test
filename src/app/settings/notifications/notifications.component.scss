@@ -93,6 +93,19 @@
       color: #191c1d;
     }
 
+    .notification-new-label {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 10px;
+      border-radius: 999px;
+      font-size: 10px;
+      height: 16px;
+      font-weight: 700;
+      line-height: 1;
+      color: #fff;
+      background: #dc2626;
+    }
+
     .notification-item-preview {
       font-size: 12px;
       font-weight: 400;
