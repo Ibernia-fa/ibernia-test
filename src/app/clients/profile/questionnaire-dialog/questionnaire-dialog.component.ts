@@ -17,7 +17,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ToastrService } from 'ngx-toastr';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { RouterModule } from '@angular/router';
 import { TablerIconsModule } from 'angular-tabler-icons';
 import { Subject, takeUntil } from 'rxjs';
@@ -64,6 +64,7 @@ export class QuestionnaireDialogComponent implements OnInit, OnDestroy {
   constructor(
     private dialogRef: MatDialogRef<QuestionnaireDialogComponent>,
     private toastr: ToastrService,
+    private translate: TranslateService,
     private questionnaireHttpService: QuestionnaireHttpService,
     private settingsService: SettingsService,
     @Inject(MAT_DIALOG_DATA) public data: { client: Client },
@@ -108,7 +109,7 @@ export class QuestionnaireDialogComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         this.isLoaderVisible = false;
-        this.toastr.error('Failed to load questions. Please try again.');
+        this.toastr.error(this.translate.instant('ERROR.FAILED_LOAD_QUESTIONS'));
         console.error(err);
       },
     });
@@ -123,13 +124,13 @@ export class QuestionnaireDialogComponent implements OnInit, OnDestroy {
       .filter((q) => q.selected)
       .map((q) => q.id);
     if (selectedIds.length === 0) {
-      this.toastr.warning('Please select at least one question.');
+      this.toastr.warning(this.translate.instant('ERROR.SELECT_QUESTION'));
       return;
     }
 
     const advisorId = this.data?.client?.financialAdvisor?.advisorId ?? '';
     if (!advisorId) {
-      this.toastr.error('Unable to identify advisor.');
+      this.toastr.error(this.translate.instant('ERROR.UNABLE_IDENTIFY_ADVISOR'));
       return;
     }
 
@@ -145,12 +146,12 @@ export class QuestionnaireDialogComponent implements OnInit, OnDestroy {
           navigator.clipboard
             .writeText(response.shareableUrl)
             .then(() => {
-              this.toastr.success('Link copied!');
+              this.toastr.success(this.translate.instant('TOAST.LINK_COPIED'));
               this.dialogRef.close();
             })
             .catch(() => {
               this.toastr.info(
-                'Link created. Share this URL: ' + response.shareableUrl,
+                this.translate.instant('TOAST.LINK_CREATED') + ' ' + response.shareableUrl,
               );
               this.dialogRef.close();
             });
@@ -158,7 +159,7 @@ export class QuestionnaireDialogComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           this.isCopying = false;
-          this.toastr.error('Failed to create link. Please try again.');
+          this.toastr.error(this.translate.instant('ERROR.FAILED_CREATE_LINK'));
           console.error(err);
         },
       });

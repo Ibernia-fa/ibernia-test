@@ -15,6 +15,7 @@ import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-sep
 import moment from 'moment';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
+import { TranslateService } from '@ngx-translate/core';
 import { allCountries } from 'src/app/clients/models/country';
 import { Client, ClientViewModel } from 'src/app/clients/models/client';
 import { Cashflow } from 'src/app/clients/models/cashflow';
@@ -108,7 +109,8 @@ export class SimulateEmergencyComponent implements OnDestroy {
     @Inject(MAT_DIALOG_DATA) public data: any,
     private fb: FormBuilder,
     private emergenciesHttpService: EmergenciesHttpService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private translate: TranslateService,
   ) {
     this.client = data.client;
     this.cashflow = data.cashflow;
@@ -431,7 +433,7 @@ export class SimulateEmergencyComponent implements OnDestroy {
           error: (err: any) => {
             this.isSimulating = false;
             console.error(err);
-            this.toastr.error('Failed to simulate cover', 'Error');
+            this.toastr.error(this.translate.instant('ERROR.FAILED_SIMULATE_COVER'), this.translate.instant('LABEL.ERROR'));
           }
         });
     }

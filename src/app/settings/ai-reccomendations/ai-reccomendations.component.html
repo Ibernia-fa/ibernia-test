@@ -17,7 +17,7 @@
     <mat-tab-group>
 
       <!-- Tab 1: Advisor Guidelines -->
-      <mat-tab label="My Guidelines">
+      <mat-tab [label]="'LABEL.MY_GUIDELINES' | translate">
         <div class="tab-body">
           @if (isGuidelinesLoading) {
             <div class="d-flex justify-content-center p-24">
@@ -36,7 +36,7 @@
               <mat-form-field appearance="outline" class="full-width textarea-wrapper w-100">
                 <textarea
                   matInput
-                  placeholder="Your company context"
+                  [placeholder]="'PLACEHOLDER.COMPANY_CONTEXT' | translate"
                   [(ngModel)]="advisorGuidelines"
                   maxlength="10000"
                   rows="6">
@@ -60,7 +60,7 @@
 
       <!-- Tab 2: System Prompt (admin only) -->
       @if (isAdmin) {
-        <mat-tab label="System Prompt (Admin)">
+        <mat-tab [label]="'LABEL.SYSTEM_PROMPT_ADMIN' | translate">
           <div class="tab-body">
             @if (isPromptLoading) {
               <div class="d-flex justify-content-center p-24">
@@ -75,7 +75,7 @@
                 <mat-form-field appearance="outline" class="full-width textarea-wrapper w-100">
                   <textarea
                     matInput
-                    placeholder="System prompt"
+                    [placeholder]="'PLACEHOLDER.SYSTEM_PROMPT' | translate"
                     [(ngModel)]="promptContent"
                     maxlength="20000"
                     rows="16">

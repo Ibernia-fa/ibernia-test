@@ -385,7 +385,7 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
     this.submitted = true;
     if (this.form.invalid) {
       this.form.markAllAsTouched();
-      this.toastr.error('Please fix the highlighted fields', 'Error!');
+      this.toastr.error(this.translate.instant('ERROR.FIX_FIELDS'), this.translate.instant('LABEL.ERROR'));
       return;
     }
     this.isSavingProfile = true;
@@ -393,8 +393,8 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
       .pipe(
         takeUntil(this.destroy$),
         catchError((err) => {
-          const msg = err?.error?.message ?? 'Failed to save profile';
-          this.toastr.error(msg, 'Error!');
+          const msg = err?.error?.message ?? this.translate.instant('ERROR.FAILED_SAVE_PROFILE');
+          this.toastr.error(msg, this.translate.instant('LABEL.ERROR'));
           return EMPTY;
         }),
         finalize(() => {
@@ -404,7 +404,7 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
       )
       .subscribe(() => {
         this.updateSnapshots();
-        this.toastr.success('Profile saved', 'Success!');
+        this.toastr.success(this.translate.instant('TOAST.PROFILE_SAVED'), this.translate.instant('LABEL.SUCCESS'));
         const payload = this.buildPayload();
         this.userprofile = { ...(this.userprofile ?? { preferences: DEFAULT_PREFERENCES }), ...payload };
         this.profileImagePreview = ensureDataUrl(payload.profilePhotoUrl ?? null);

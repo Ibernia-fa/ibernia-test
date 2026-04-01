@@ -50,7 +50,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { SavingsPotsHttpService } from 'src/app/financial-workflow/saving-pots/services/savings-pots-http.service';
 import { CurrencySymbolPipe } from 'src/app/pipe/currency-symbol.pipe';
 import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 interface SortDescriptor {
   value: string;
@@ -105,6 +105,7 @@ export class ProfileComponent {
     private savingsPotsHttpService: SavingsPotsHttpService,
     private questionnaireHttpService: QuestionnaireHttpService,
     private store: Store,
+    private translate: TranslateService,
   ) {
     this.getClient();
   }
@@ -299,7 +300,7 @@ export class ProfileComponent {
 
   onCopyModelClicked(cashflow: Cashflow) {
     this.isLoaderVisible = true;
-    cashflow.name = 'Copy of ' + cashflow.name;
+    cashflow.name = this.translate.instant('LABEL.COPY_OF') + ' ' + cashflow.name;
 
     this.cashflowHttpService
       .copyCashflow(cashflow)
@@ -307,12 +308,12 @@ export class ProfileComponent {
         filter((res) => !!res),
         catchError((err) => {
           console.error('An error occurred while cloning cashflow', err);
-          this.toastr.error('An error occurred while cloning plan');
+          this.toastr.error(this.translate.instant('TOAST.ERROR_CLONING_PLAN'));
           throw err;
         }),
       )
       .subscribe((res) => {
-        this.toastr.success('Plan cloned successfully');
+        this.toastr.success(this.translate.instant('TOAST.PLAN_CLONED'));
         this.getCashflows();
       });
   }
@@ -321,7 +322,7 @@ export class ProfileComponent {
     const dialogRef = this.dialog.open(DialogComponent, {
       data: {
         action: 'Delete',
-        text: 'Are you sure you want to delete this plan?',
+        text: this.translate.instant('CONFIRM.DELETE_PLAN'),
         cashflowId,
       },
       width: '460px',
@@ -340,12 +341,12 @@ export class ProfileComponent {
       .deleteCashflow(cashflowId)
       .pipe(
         map((res) => {
-          this.toastr.success('Plan deleted successfully', 'Success!');
+          this.toastr.success(this.translate.instant('TOAST.PLAN_DELETED'), this.translate.instant('LABEL.SUCCESS'));
           this.getCashflows();
         }),
         catchError((err) => {
           console.error(err);
-          this.toastr.error('An error occured while deleting plan', 'Error!');
+          this.toastr.error(this.translate.instant('TOAST.ERROR_DELETING_PLAN'), this.translate.instant('LABEL.ERROR'));
           throw err;
         }),
       )

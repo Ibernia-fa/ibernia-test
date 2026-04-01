@@ -37,7 +37,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { AuthService } from 'src/app/auth/services/auth.service';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Store } from '@ngrx/store';
 import * as ClientActions from 'src/app/store/client/client.actions';
 
@@ -139,6 +139,7 @@ export class ClientEditComponent {
     private toastr: ToastrService,
     private authService: AuthService,
     private store: Store,
+    private translate: TranslateService,
     private dialogRef: MatDialogRef<ClientEditComponent>,
     @Inject(MAT_DIALOG_DATA) public dialogData: { clientId: string },
   ) {
@@ -381,12 +382,12 @@ export class ClientEditComponent {
           filter((res) => !!res),
           map(() => {
             this.store.dispatch(ClientActions.selectClient({ client }));
-            this.toastr.success('Client updated successfully', 'Success!');
+            this.toastr.success(this.translate.instant('TOAST.CLIENT_UPDATED'), this.translate.instant('LABEL.SUCCESS'));
             this.dialogRef.close({ action: 'updated', client });
           }),
           catchError((err) => {
             console.error(err);
-            this.toastr.error('An error occured while saving client', 'Error!');
+            this.toastr.error(this.translate.instant('TOAST.ERROR_SAVING_CLIENT'), this.translate.instant('LABEL.ERROR'));
             throw err;
           })
         )
