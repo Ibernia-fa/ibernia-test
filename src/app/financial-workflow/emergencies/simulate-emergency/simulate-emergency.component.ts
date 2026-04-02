@@ -279,6 +279,46 @@ export class SimulateEmergencyComponent implements OnDestroy {
     escalationControl?.updateValueAndValidity();
   }
 
+  getCycleLabel(cycle: { description?: string } | null | undefined): string {
+    const raw = (cycle?.description ?? '').toString().trim();
+    if (!raw) return '';
+
+    const normalized = raw.toLowerCase();
+    const key =
+      normalized === 'one-off'
+        ? 'CYCLE.ONE_OFF'
+        : normalized === 'every month'
+          ? 'CYCLE.EVERY_MONTH'
+          : normalized === 'every year'
+            ? 'CYCLE.EVERY_YEAR'
+            : null;
+
+    return key ? this.translate.instant(key) : raw;
+  }
+
+  getEmergencyLabel(emergency: { name?: string } | null | undefined): string {
+    const raw = (emergency?.name ?? '').toString().trim();
+    if (!raw) return '';
+
+    const normalized = raw.toLowerCase();
+    const key =
+      normalized === 'home'
+        ? 'EMERGENCIES.TYPE_HOME'
+        : normalized === 'life'
+          ? 'EMERGENCIES.TYPE_LIFE'
+          : normalized === 'disability'
+            ? 'EMERGENCIES.TYPE_DISABILITY'
+            : normalized === 'health'
+              ? 'EMERGENCIES.TYPE_HEALTH'
+              : normalized === 'natural hazards'
+                ? 'EMERGENCIES.TYPE_NATURAL_HAZARDS'
+                : normalized === 'will'
+                  ? 'EMERGENCIES.TYPE_WILL'
+                  : null;
+
+    return key ? this.translate.instant(key) : raw;
+  }
+
   onEscalationRateChange(event: MatSelectChange): void {
     const selectedOption = event.source.selected;
 

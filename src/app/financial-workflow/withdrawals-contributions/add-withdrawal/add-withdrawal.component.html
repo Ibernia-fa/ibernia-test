@@ -161,9 +161,9 @@
                 style="line-height: 16px"
               >
                 @if (showStartEnd) {
-                  Start & end
+                  {{ 'Start & end' | translate }}
                 } @else {
-                  Date
+                  {{ 'Date' | translate }}
                 }
               </mat-label>
               <img
@@ -185,7 +185,7 @@
                     >
                       @if (isEditWorkflow || eventsList?.length > 0) {
                         <mat-option [value]="currentYear"
-                          >This year ({{ currentYear }})</mat-option
+                          >{{ 'LABEL.THIS_YEAR' | translate }} ({{ currentYear }})</mat-option
                         >
                       }
                       @for (event of eventsList; track event) {
@@ -252,7 +252,7 @@
                           currentYear >= getStartYear()
                         ) {
                           <mat-option [value]="currentYear"
-                            >This year ({{ currentYear }})</mat-option
+                            >{{ 'LABEL.THIS_YEAR' | translate }} ({{ currentYear }})</mat-option
                           >
                         }
                         @for (event of getEndEvents(); track event.id) {

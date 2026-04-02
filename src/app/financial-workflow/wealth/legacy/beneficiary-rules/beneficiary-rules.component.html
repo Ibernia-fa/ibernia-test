@@ -82,7 +82,9 @@
           </svg>
         }
         <span class="f-s-16">{{
-          canAddRecipient ? "Add recipient" : "All eligible beneficiaries added"
+          canAddRecipient
+            ? ("Add recipient" | translate)
+            : ("All eligible beneficiaries added" | translate)
         }}</span>
       </button>
 
