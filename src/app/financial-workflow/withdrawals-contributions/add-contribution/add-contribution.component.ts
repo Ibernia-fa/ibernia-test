@@ -40,7 +40,8 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { getAmountCycleLabel } from 'src/app/shared/utils/amount-cycle-label';
 import {
   extractEventId,
   resolveYear,
@@ -101,6 +102,7 @@ export class AddContributionComponent {
     @Inject(MAT_DIALOG_DATA) public data: any,
     private fb: FormBuilder,
     private withdrawalsContributionsHttpService: WithdrawalsContributionsHttpService,
+    private translate: TranslateService,
   ) {
     this.eventsList = data.eventsList ?? [];
     this.cycles = data.amountCycles;
@@ -336,6 +338,10 @@ export class AddContributionComponent {
       escalationControl?.setValidators(Validators.required);
     }
     escalationControl?.updateValueAndValidity();
+  }
+
+  getCycleLabel(cycle: Cycle): string {
+    return getAmountCycleLabel(cycle, this.translate);
   }
 
   isCommissionsChanged(enabled: boolean) {

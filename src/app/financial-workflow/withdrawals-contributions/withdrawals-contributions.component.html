@@ -288,7 +288,7 @@
                       selectedClient?.clientDetails?.preferredCurrency
                         | currencySymbol
                     }}{{ element.amount.amount | thousandSeparator }}/{{
-                      element.amount.cycle.description
+                      element.amount.cycle.description | translate
                     }}
                   </td>
                 </ng-container>
@@ -552,7 +552,7 @@
                       selectedClient?.clientDetails?.preferredCurrency
                         | currencySymbol
                     }}{{ element.amount.amount | thousandSeparator }}/{{
-                      element.amount.cycle.description
+                      element.amount.cycle.description | translate
                     }}
                   </td>
                 </ng-container>

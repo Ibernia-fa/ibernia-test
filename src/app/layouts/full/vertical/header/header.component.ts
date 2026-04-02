@@ -881,6 +881,7 @@ get userInitials(): string {
     MatDividerModule,
     MatDialogModule,
     MatToolbarModule,
+    TranslateModule,
   ],
   templateUrl: 'search-dialog.component.html',
 })

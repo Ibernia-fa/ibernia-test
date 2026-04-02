@@ -165,7 +165,7 @@
                     >
                       @for (cycle of insuranceCycles; track cycle) {
                         <mat-option [value]="cycle.id">
-                          {{ cycle.description }}
+                          {{ getCycleLabel(cycle) }}
                         </mat-option>
                       }
                     </mat-select>

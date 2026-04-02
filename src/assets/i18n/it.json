@@ -846,5 +846,7 @@
   "EMERGENCIES.TYPE_WILL": "Testamento",
   "WEALTH.FINANCED_WITH_DEBT": "{{ratio}}% finanziato con debito",
   "PROFILE.CLIENT_PAGE_TITLE": "Profilo di {{firstName}} {{lastName}}",
-  "PROFILE.AGE_YEARS": "{{age}} anni"
+  "PROFILE.AGE_YEARS": "{{age}} anni",
+  "Protection": "Protezione",
+  "Wealth": "Patrimonio"
 }

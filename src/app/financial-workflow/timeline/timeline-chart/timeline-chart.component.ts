@@ -3,6 +3,7 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  DestroyRef,
   ElementRef,
   EventEmitter,
   Input,
@@ -13,6 +14,7 @@ import {
   SimpleChanges,
   ViewChild,
   AfterViewChecked,
+  inject,
 } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
@@ -55,8 +57,9 @@ import { CommonModule } from '@angular/common';
 import { Client } from 'src/app/clients/models/client';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
 import { SettingsHttpService } from '../../settings/services/settings-http.service';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { patchInflationRateDescription } from 'src/app/shared/utils/escalation-rate-utils';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-timeline-chart',
@@ -79,6 +82,8 @@ import { patchInflationRateDescription } from 'src/app/shared/utils/escalation-r
   styleUrl: './timeline-chart.component.scss',
 })
 export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
+  private readonly destroyRef = inject(DestroyRef);
+
   private readonly CHIP_ORDER = [
     'Retirement age',
     'Birth',
@@ -165,6 +170,7 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
     private cdr: ChangeDetectorRef,
     private toastrService: ToastrService,
     private settingHttpService: SettingsHttpService,
+    private translate: TranslateService,
   ) {
     this.updateTimelines = new EventEmitter<boolean>();
   }
@@ -196,6 +202,16 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
     this.lastRetirementDependencyKey = this.getRetirementDependencyKey();
     this.initTimelineContainer();
     this.getTimelineEventsLibrary();
+
+    this.translate.onLangChange
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        if (this.timeline && this.financialTimeline) {
+          this.timeline.setItems(this.timelineData);
+          this.timeline.redraw();
+        }
+        this.cdr.markForCheck();
+      });
   }
 
   ngOnDestroy() {
@@ -1218,15 +1234,12 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   handleEventRemoval(item: any, callback: (item: any) => void) {
-    let isDeleteFinanceEvent = false;
-
-    if (
-      item.content?.includes('Home') ||
-      item.content?.includes('Car') ||
-      item.content?.includes('Boat')
-    ) {
-      isDeleteFinanceEvent = true;
-    }
+    const clientEvent = this.financialTimeline?.clientEvents?.find(
+      (e) => e.id === item.id,
+    );
+    const isDeleteFinanceEvent =
+      clientEvent?.isFinance === true ||
+      ['Home', 'Car', 'Boat'].includes(clientEvent?.name ?? '');
 
     const onSuccess = () => {
       // Let the parent refresh handle state updates via ngOnChanges
@@ -1277,6 +1290,8 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
 
   private getContent(event: ClientEvent): string {
     const title = this.getEventTitleForDisplay(event);
+    const titleAttr = this.escapeHtmlAttr(title);
+    const labelHtml = this.escapeHtmlText(title);
     const img = this.getTimelineEventIconBase(event);
     const extraClass = event.name?.toLowerCase().startsWith('retirement age')
       ? this.isPartnerRetirementEvent(event)
@@ -1284,29 +1299,46 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
         : ' retirement-age-chip'
       : '';
     return `
-    <div class="timeline-event-chip with-padding${extraClass}" title="${title}">
+    <div class="timeline-event-chip with-padding${extraClass}" title="${titleAttr}">
       <div class="event-left">
         <img src="/assets/images/svgs/${img}.svg" class="icon" />
-        <span class="label">${title}</span>
+        <span class="label">${labelHtml}</span>
       </div>
     </div>`;
+  }
+
+  private escapeHtmlAttr(value: string): string {
+    return value
+      .replace(/&/g, '&amp;')
+      .replace(/"/g, '&quot;')
+      .replace(/</g, '&lt;');
+  }
+
+  private escapeHtmlText(value: string): string {
+    return value
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
   }
 
   private getEventTitleForDisplay(event: ClientEvent): string {
     const rawTitle = (event?.name ?? '').trim();
     if (!rawTitle.toLowerCase().startsWith('retirement age')) {
-      return rawTitle;
+      const t = this.translate.instant(rawTitle);
+      return t && t !== rawTitle ? t : rawTitle;
     }
 
+    const base = this.translate.instant('Retirement age');
+
     if (!this.hasPartner) {
-      return 'Retirement age';
+      return base;
     }
 
     const personName = event.isPartnerEvent
       ? this.client?.partnerDetail?.firstName?.trim()
       : this.client?.clientDetails?.firstName?.trim();
 
-    return personName ? `Retirement age ${personName}` : 'Retirement age';
+    return personName ? `${base} ${personName}` : base;
   }
 
   private calculateAge(dateOfBirth: Date): number {
@@ -1360,27 +1392,30 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
       !clientEvent.name ||
       !clientEvent.name.toLowerCase().startsWith('retirement age')
     ) {
-      return clientEvent.name ?? '';
+      const n = clientEvent.name ?? '';
+      const t = this.translate.instant(n);
+      return t && t !== n ? t : n;
     }
+    const base = this.translate.instant('Retirement age');
     if (!this.hasPartner) {
-      return 'Retirement age';
+      return base;
     }
     const hasPrimary = this.financialTimeline.clientEvents.some(
       (e) =>
         e.name?.toLowerCase().startsWith('retirement age') && !e.isPartnerEvent,
     );
-    const hasPartner = this.financialTimeline.clientEvents.some(
+    const hasPartnerEv = this.financialTimeline.clientEvents.some(
       (e) =>
         e.name?.toLowerCase().startsWith('retirement age') &&
         !!e.isPartnerEvent,
     );
-    if (!hasPrimary || !hasPartner) {
-      return 'Retirement age';
+    if (!hasPrimary || !hasPartnerEv) {
+      return base;
     }
     const personName = clientEvent.isPartnerEvent
       ? this.client?.partnerDetail?.firstName?.trim()
       : this.client?.clientDetails?.firstName?.trim();
-    return personName ? `Retirement age ${personName}` : 'Retirement age';
+    return personName ? `${base} ${personName}` : base;
   }
 
   private isEventInVisibleRange(event: any): boolean {
