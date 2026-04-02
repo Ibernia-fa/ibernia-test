@@ -41,7 +41,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { SettingsService } from 'src/app/default-preferance/services/default-preferance.http.service';
 import { AuthService } from 'src/app/auth/services/auth.service';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MY_DATE_FORMATS } from 'src/app/shared/utils/custom-date-formatter';
 
 class DmyDateAdapter extends NativeDateAdapter {
@@ -126,6 +126,7 @@ export class ClientAddComponent {
     private router: Router,
     private settingsService: SettingsService,
     private authService: AuthService,
+    private translate: TranslateService,
     private dialogRef: MatDialogRef<ClientAddComponent>,
     @Optional() @Inject(MAT_DIALOG_DATA) public data: any,
   ) {
@@ -364,13 +365,13 @@ export class ClientAddComponent {
       .pipe(
         filter((res) => !!res),
         map((res) => {
-          this.toastr.success('Client created successfully', 'Success!');
+          this.toastr.success(this.translate.instant('TOAST.CLIENT_CREATED'), this.translate.instant('LABEL.SUCCESS'));
           this.isLoading = false;
           this.dialogRef.close({ action: 'added', client: res });
         }),
         catchError((err) => {
           console.error(err);
-          this.toastr.error('An error occured while saving client', 'Error!');
+          this.toastr.error(this.translate.instant('TOAST.ERROR_SAVING_CLIENT'), this.translate.instant('LABEL.ERROR'));
           this.isLoading = false;
           throw err;
         }),
@@ -416,13 +417,13 @@ export class ClientAddComponent {
       .pipe(
         filter((res) => !!res),
         map((res) => {
-          this.toastr.success('Client created successfully', 'Success!');
+          this.toastr.success(this.translate.instant('TOAST.CLIENT_CREATED'), this.translate.instant('LABEL.SUCCESS'));
           this.isLoading = false;
           this.openNewModelDialog(res, res.id);
         }),
         catchError((err) => {
           console.error(err);
-          this.toastr.error('An error occured while saving client', 'Error!');
+          this.toastr.error(this.translate.instant('TOAST.ERROR_SAVING_CLIENT'), this.translate.instant('LABEL.ERROR'));
           this.isLoading = false;
           throw err;
         }),

@@ -9,7 +9,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ViewReportHttpService } from './services/view-report-http.service';
 import { ViewReportPasswordComponent } from './components/view-report-password/view-report-password.component';
 import { ViewReportComponent } from './components/view-report/view-report.component';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-client-report',
@@ -51,7 +51,8 @@ export class ClientReportComponent {
     private dialog: MatDialog,
     private viewReportHttpService: ViewReportHttpService,
     private activatedRoute: ActivatedRoute,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private translate: TranslateService,
   ) { }
 
   ngOnInit(): void {
@@ -59,7 +60,7 @@ export class ClientReportComponent {
       this.token = params['token'];
 
       if (!this.token) {
-        this.toastr.error('Invalid or missing token in URL', 'Error!');
+        this.toastr.error(this.translate.instant('ERROR.INVALID_TOKEN'), this.translate.instant('LABEL.ERROR'));
       }
 
       this.checkExistingAuthentication();
@@ -93,7 +94,7 @@ export class ClientReportComponent {
     this.isLoaderVisible = true;
 
     if (!this.token || !this.password) {
-      this.toastr.error('Missing token or password, cannot load report', 'Error!');
+      this.toastr.error(this.translate.instant('ERROR.MISSING_TOKEN_PASSWORD'), this.translate.instant('LABEL.ERROR'));
       return;
     }
 
@@ -105,7 +106,7 @@ export class ClientReportComponent {
       error: (err: any) => {
         this.isLoaderVisible = false;
         console.log(err);
-        this.toastr.error('Unable to load report. Please try again later', 'Error!');
+        this.toastr.error(this.translate.instant('ERROR.UNABLE_LOAD_REPORT'), this.translate.instant('LABEL.ERROR'));
         localStorage.removeItem(this.AUTH_KEY_PREFIX + this.token);
         this.isAuthenticated = false;
       }
@@ -117,7 +118,7 @@ export class ClientReportComponent {
     this.isLoaderVisible = true;
 
     if (!this.password) {
-      this.toastr.error('Please enter a password', 'Error!');
+      this.toastr.error(this.translate.instant('ERROR.ENTER_PASSWORD'), this.translate.instant('LABEL.ERROR'));
       this.isLoaderVisible = false;
       return;
     }
@@ -149,13 +150,13 @@ export class ClientReportComponent {
         this.isLoaderVisible = false;
 
         if (err.status === 401) {
-          this.toastr.error('Incorrect password. Please try again', 'Error!');
+          this.toastr.error(this.translate.instant('ERROR.INCORRECT_PASSWORD'), this.translate.instant('LABEL.ERROR'));
         } else if (err.status === 410) {
-          this.toastr.error('This link has expired. Please contact support', 'Error!');
+          this.toastr.error(this.translate.instant('ERROR.LINK_EXPIRED'), this.translate.instant('LABEL.ERROR'));
         } else if (err.status === 400) {
-          this.toastr.error('Invalid or missing link', 'Error!');
+          this.toastr.error(this.translate.instant('ERROR.INVALID_LINK'), this.translate.instant('LABEL.ERROR'));
         } else {
-          this.toastr.error('Unable to load report. Please try again later', 'Error!');
+          this.toastr.error(this.translate.instant('ERROR.UNABLE_LOAD_REPORT'), this.translate.instant('LABEL.ERROR'));
         }
       }
     });
@@ -178,12 +179,12 @@ export class ClientReportComponent {
         if (res.success && res.answer != null) {
           this.consumerAnswer = res.answer;
         } else {
-          this.consumerError = res.message ?? 'Unable to get an answer.';
+          this.consumerError = res.message ?? this.translate.instant('ERROR.UNABLE_GET_ANSWER');
         }
       },
       error: (err) => {
         this.consumerAskLoading = false;
-        this.consumerError = err?.error?.message ?? 'Something went wrong. Try again.';
+        this.consumerError = err?.error?.message ?? this.translate.instant('ERROR.SOMETHING_WENT_WRONG');
       }
     });
   }

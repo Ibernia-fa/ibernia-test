@@ -5,7 +5,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTabsModule } from '@angular/material/tabs';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ToastrService } from 'ngx-toastr';
 import { Subject, EMPTY } from 'rxjs';
 import { catchError, filter, finalize, takeUntil } from 'rxjs/operators';
@@ -54,7 +54,8 @@ export class AiReccomendationsComponent implements OnInit, OnDestroy {
     private settingsService: SettingsService,
     private systemPromptService: SystemPromptService,
     private toastr: ToastrService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private translate: TranslateService
   ) {
     this.navItemService.currentRouteName = 'AI Recommendations';
   }
@@ -96,7 +97,7 @@ export class AiReccomendationsComponent implements OnInit, OnDestroy {
       .pipe(
         takeUntil(this.destroy$),
         catchError(() => {
-          this.toastr.error('Failed to load advisor guidelines', 'Error!');
+          this.toastr.error(this.translate.instant('ERROR.FAILED_LOAD_GUIDELINES'), this.translate.instant('LABEL.ERROR'));
           return EMPTY;
         }),
         finalize(() => {
@@ -129,8 +130,8 @@ export class AiReccomendationsComponent implements OnInit, OnDestroy {
       .pipe(
         takeUntil(this.destroy$),
         catchError((err) => {
-          const msg = err?.error?.message ?? 'Failed to save guidelines';
-          this.toastr.error(msg, 'Error!');
+          const msg = err?.error?.message ?? this.translate.instant('ERROR.FAILED_SAVE_GUIDELINES');
+          this.toastr.error(msg, this.translate.instant('LABEL.ERROR'));
           return EMPTY;
         }),
         finalize(() => {
@@ -140,7 +141,7 @@ export class AiReccomendationsComponent implements OnInit, OnDestroy {
       )
       .subscribe(() => {
         this.savedGuidelinesSnapshot = this.advisorGuidelines;
-        this.toastr.success('Guidelines saved', 'Success!');
+        this.toastr.success(this.translate.instant('TOAST.GUIDELINES_SAVED'), this.translate.instant('LABEL.SUCCESS'));
         this.cdr.markForCheck();
       });
   }
@@ -152,7 +153,7 @@ export class AiReccomendationsComponent implements OnInit, OnDestroy {
       .pipe(
         takeUntil(this.destroy$),
         catchError(() => {
-          this.toastr.error('Failed to load system prompt', 'Error!');
+          this.toastr.error(this.translate.instant('ERROR.FAILED_LOAD_SYSTEM_PROMPT'), this.translate.instant('LABEL.ERROR'));
           return EMPTY;
         }),
         finalize(() => {
@@ -176,8 +177,8 @@ export class AiReccomendationsComponent implements OnInit, OnDestroy {
       .pipe(
         takeUntil(this.destroy$),
         catchError((err) => {
-          const msg = err?.error?.message ?? 'Failed to save system prompt';
-          this.toastr.error(msg, 'Error!');
+          const msg = err?.error?.message ?? this.translate.instant('ERROR.FAILED_SAVE_SYSTEM_PROMPT');
+          this.toastr.error(msg, this.translate.instant('LABEL.ERROR'));
           return EMPTY;
         }),
         finalize(() => {
@@ -187,7 +188,7 @@ export class AiReccomendationsComponent implements OnInit, OnDestroy {
       )
       .subscribe(() => {
         this.savedPromptSnapshot = this.promptContent;
-        this.toastr.success('System prompt saved', 'Success!');
+        this.toastr.success(this.translate.instant('TOAST.SYSTEM_PROMPT_SAVED'), this.translate.instant('LABEL.SUCCESS'));
         this.cdr.markForCheck();
       });
   }

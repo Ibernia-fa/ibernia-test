@@ -39,6 +39,7 @@ import {
 import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { TranslateService } from '@ngx-translate/core';
 import { CommonModule } from '@angular/common';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Client, Details } from 'src/app/clients/models/client';
@@ -149,6 +150,7 @@ export class EmergenciesComponent implements OnInit {
     private emergenciesHttp: EmergenciesHttpService,
     private clientHttpService: ClientHttpService,
     private toastr: ToastrService,
+    private translate: TranslateService,
     private dialog: MatDialog,
     private navItemService: NavItemService,
     private store: Store,
@@ -602,7 +604,7 @@ export class EmergenciesComponent implements OnInit {
       },
       error: (err) => {
         console.error(err);
-        this.toastr.error('Failed to hide emergency', 'Error');
+        this.toastr.error(this.translate.instant('ERROR.FAILED_HIDE_EMERGENCY'), this.translate.instant('LABEL.ERROR'));
         e.isHidden = !e.isHidden;
       },
     });
@@ -628,7 +630,7 @@ export class EmergenciesComponent implements OnInit {
       },
       error: (err) => {
         console.error(err);
-        this.toastr.error('Failed to show hidden emergencies', 'Error');
+        this.toastr.error(this.translate.instant('ERROR.FAILED_SHOW_EMERGENCIES'), this.translate.instant('LABEL.ERROR'));
       },
     });
   }

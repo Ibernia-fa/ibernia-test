@@ -17,6 +17,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { ToastrService } from 'ngx-toastr';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import {
   Emergency,
   CreateEmergencyRequest,
@@ -59,6 +60,7 @@ export interface AddEmergencyDialogData {
     ThousandSeparatorInputDirective,
     MatButtonToggleModule,
     MaterialModule,
+    TranslateModule,
   ],
   templateUrl: './add-emergencies.component.html',
   styleUrl: './add-emergencies.component.scss',
@@ -92,6 +94,7 @@ export class AddEmergenciesComponent {
     private fb: FormBuilder,
     private emergenciesHttp: EmergenciesHttpService,
     private toastr: ToastrService,
+    private translate: TranslateService,
   ) {
     this.emergencyTypes = data.emergencyTypes ?? [];
     this.policyStatuses = data.policyStatuses ?? [];
@@ -278,14 +281,14 @@ export class AddEmergenciesComponent {
         next: (res: Emergency) => {
           console.log('Data received for update: ', res);
           this.toastr.success(
-            `${emergencyType} updated successfully`,
-            'Success',
+            this.translate.instant('TOAST.UPDATED_SUCCESSFULLY', { type: emergencyType }),
+            this.translate.instant('LABEL.SUCCESS'),
           );
           this.dialogRef.close({ status: 'Success', emergency: res });
         },
         error: (err) => {
           console.error(err);
-          this.toastr.error('Failed to update cover', 'Error');
+          this.toastr.error(this.translate.instant('ERROR.FAILED_UPDATE_COVER'), this.translate.instant('LABEL.ERROR'));
         },
       });
     } else {
@@ -293,12 +296,12 @@ export class AddEmergenciesComponent {
       this.emergenciesHttp.createEmergency(createPayload).subscribe({
         next: (res: Emergency) => {
           console.log('Data received for create: ', res);
-          this.toastr.success(`${emergencyType} added successfully`, 'Success');
+          this.toastr.success(this.translate.instant('TOAST.ADDED_SUCCESSFULLY', { type: emergencyType }), this.translate.instant('LABEL.SUCCESS'));
           this.dialogRef.close({ status: 'Success', emergency: res });
         },
         error: (err) => {
           console.error(err);
-          this.toastr.error('Failed to add cover', 'Error');
+          this.toastr.error(this.translate.instant('ERROR.FAILED_ADD_COVER'), this.translate.instant('LABEL.ERROR'));
         },
       });
     }
@@ -401,12 +404,12 @@ export class AddEmergenciesComponent {
       if (emergencyId) {
         this.emergenciesHttp.deleteEmergency(emergencyId).subscribe({
           next: () => {
-            this.toastr.success(`Coverage deleted successfully`, 'Success');
+            this.toastr.success(this.translate.instant('TOAST.COVERAGE_DELETED'), this.translate.instant('LABEL.SUCCESS'));
             this.dialogRef.close({ deleted: true });
           },
           error: (err) => {
             console.error(err);
-            this.toastr.error('Failed to delete coverage', 'Error');
+            this.toastr.error(this.translate.instant('ERROR.FAILED_DELETE_COVERAGE'), this.translate.instant('LABEL.ERROR'));
           },
         });
       } else {

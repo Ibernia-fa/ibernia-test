@@ -8,7 +8,7 @@ import { OnlyPreferanceService, ComissionType, UserProfileDto } from '../service
 import { allCountries } from 'src/app/clients/models/country'; 
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { LanguageCode, LanguageService } from 'src/app/core/language.service';
 
 @Component({
@@ -25,17 +25,10 @@ export class DefaultPreferanceComponent implements OnInit, OnDestroy {
   submitted = false;
   countries = allCountries;
   currentLanguage: LanguageCode = 'en';
-  readonly languages: { label: string; value: LanguageCode }[] = [
-    { label: 'English', value: 'en' },
-    { label: 'Italian', value: 'it' },
-  ];
+  readonly languages: { label: string; value: LanguageCode }[] = [];
 
   // UI helpers
-  comissionTypes = [
-    { label: 'Amount', value: ComissionType.Amount },
-    { label: 'Percentage', value: ComissionType.Percentage },
-    { label: 'Both', value: ComissionType.Both },
-  ];
+  comissionTypes: { label: string; value: ComissionType }[] = [];
 
   // Form structure mirrors Swagger exactly
   form = this.fb.nonNullable.group({
@@ -65,11 +58,21 @@ ComissionType = ComissionType;
     private router: Router,
     private Authservice: AuthService,
     private languageService: LanguageService,
+    private translate: TranslateService,
     @Optional() private dialogRef?: MatDialogRef<DefaultPreferanceComponent>,
     @Optional() @Inject(MAT_DIALOG_DATA) public data?: any
   ) {}
 
   ngOnInit(): void {
+    (this.languages as { label: string; value: LanguageCode }[]) = [
+      { label: this.translate.instant('LABEL.ENGLISH'), value: 'en' },
+      { label: this.translate.instant('LABEL.ITALIAN'), value: 'it' },
+    ];
+    this.comissionTypes = [
+      { label: this.translate.instant('Amount'), value: ComissionType.Amount },
+      { label: this.translate.instant('Percentage'), value: ComissionType.Percentage },
+      { label: this.translate.instant('Both'), value: ComissionType.Both },
+    ];
     this.user = this.Authservice.getUserProfile();
     this.currentLanguage = this.form.controls.preferences.controls.language.value === 'it' ? 'it' : 'en';
     this.p.language.setValue(this.currentLanguage);
@@ -132,7 +135,7 @@ ComissionType = ComissionType;
     this.form.markAllAsTouched();
     // this.form.markAsDirty();
     if (this.form.invalid) {
-      this.toastr.error('Please complete the highlighted fields', 'Error!');
+      this.toastr.error(this.translate.instant('ERROR.COMPLETE_FIELDS'), this.translate.instant('LABEL.ERROR'));
       return;
     }
 
@@ -170,8 +173,8 @@ ComissionType = ComissionType;
         switchMap(() => this.api.getUserProfileResponse(this.user?.sub)),
         takeUntil(this.destroy$),
         catchError((err) => {
-          const msg = err?.error?.message ?? 'Failed to save preferences';
-          this.toastr.error(msg, 'Error!');
+          const msg = err?.error?.message ?? this.translate.instant('ERROR.FAILED_SAVE_PREFERENCES');
+          this.toastr.error(msg, this.translate.instant('LABEL.ERROR'));
           return EMPTY;
         }),
         finalize(() => (this.isSaving = false))
@@ -182,7 +185,7 @@ ComissionType = ComissionType;
           this.api.setUserData(res.body);
         }
         this.api.notifyProfileChanged();
-        this.toastr.success('Preferences saved', 'Success!');
+        this.toastr.success(this.translate.instant('TOAST.PREFERENCES_SAVED'), this.translate.instant('LABEL.SUCCESS'));
           if (this.dialogRef) {
           this.dialogRef.close(true);
           return;

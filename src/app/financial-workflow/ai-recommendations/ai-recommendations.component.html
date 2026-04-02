@@ -11,7 +11,7 @@
               </div>
               <div class="d-flex flex-column justify-content-between gap-4">
                 <div class="d-flex align-items-center">
-                  <h4 class="page-title f-w-500 m-r-4 f-s-30">AI Recommendations</h4>
+                  <h4 class="page-title f-w-500 m-r-4 f-s-30">{{ 'LABEL.AI_RECOMMENDATIONS' | translate }}</h4>
                   <img width="22" src="assets/images/svgs/help-circle-icon.svg" alt="help" class="m-t-4"
                     matTooltip="AI-powered analysis of your client's cashflow plan. Generates actionable recommendations based on the full financial picture." />
                 </div>
@@ -28,7 +28,7 @@
     <mat-card class="mat-mdc-card mdc-card cardWithShadow">
       <mat-card-content class="mat-mdc-card-content d-flex justify-content-center align-items-center" style="min-height: 120px;">
         <mat-spinner diameter="40"></mat-spinner>
-        <span class="m-l-16">Loading insights...</span>
+        <span class="m-l-16">{{ 'LABEL.LOADING_INSIGHTS' | translate }}</span>
       </mat-card-content>
     </mat-card>
   </ng-container>
@@ -42,21 +42,21 @@
         <div class="d-flex flex-column gap-16">
           <div class="d-flex flex-wrap gap-16 align-items-start">
             <mat-form-field appearance="outline" class="flex-grow-1" style="min-width: 200px;">
-              <mat-label>Client notes (included in AI context)</mat-label>
-              <textarea matInput [(ngModel)]="clientNotes" rows="2" placeholder="Optional notes about this client..."></textarea>
+              <mat-label>{{ 'LABEL.CLIENT_NOTES_AI' | translate }}</mat-label>
+              <textarea matInput [(ngModel)]="clientNotes" rows="2" [placeholder]="'PLACEHOLDER.CLIENT_NOTES' | translate"></textarea>
             </mat-form-field>
             <mat-form-field appearance="outline" class="flex-grow-1" style="min-width: 200px;">
-              <mat-label>Advisor/company guidelines</mat-label>
-              <textarea matInput [(ngModel)]="advisorGuidelines" rows="2" placeholder="Risk tolerance, tone, compliance..."></textarea>
+              <mat-label>{{ 'LABEL.ADVISOR_GUIDELINES' | translate }}</mat-label>
+              <textarea matInput [(ngModel)]="advisorGuidelines" rows="2" [placeholder]="'PLACEHOLDER.RISK_TONE' | translate"></textarea>
             </mat-form-field>
           </div>
           <div class="d-flex justify-content-between align-items-center flex-wrap gap-16">
             <div class="d-flex align-items-center gap-8">
               <small class="text-muted">Today: {{ usageUsed }}/{{ usageLimit }} used</small>
-              <span *ngIf="limitExceeded" class="text-error f-s-12">Daily limit reached. Try again tomorrow.</span>
+              <span *ngIf="limitExceeded" class="text-error f-s-12">{{ 'LABEL.DAILY_LIMIT' | translate }}</span>
             </div>
             <button class="button-icon" (click)="generateInsights()" [disabled]="!canGenerate">
-              <span>{{ isGenerating ? 'Generating...' : (analysis ? 'Generate New Insights' : 'Generate Insights') }}</span>
+              <span>{{ isGenerating ? ('LABEL.GENERATING' | translate) : (analysis ? ('LABEL.GENERATE_NEW_INSIGHTS' | translate) : ('LABEL.GENERATE_INSIGHTS' | translate)) }}</span>
             </button>
           </div>
         </div>
@@ -68,7 +68,7 @@
       <mat-card class="mat-mdc-card mdc-card cardWithShadow">
         <mat-card-content class="mat-mdc-card-content d-flex justify-content-center align-items-center" style="min-height: 120px;">
           <mat-spinner diameter="40"></mat-spinner>
-          <span class="m-l-16">Analysing your cashflow plan with AI...</span>
+          <span class="m-l-16">{{ 'LABEL.ANALYSING' | translate }}</span>
         </mat-card-content>
       </mat-card>
     </ng-container>
