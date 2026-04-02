@@ -844,5 +844,7 @@
   "EMERGENCIES.TYPE_HEALTH": "Salute",
   "EMERGENCIES.TYPE_NATURAL_HAZARDS": "Eventi naturali",
   "EMERGENCIES.TYPE_WILL": "Testamento",
-  "WEALTH.FINANCED_WITH_DEBT": "{{ratio}}% finanziato con debito"
+  "WEALTH.FINANCED_WITH_DEBT": "{{ratio}}% finanziato con debito",
+  "PROFILE.CLIENT_PAGE_TITLE": "Profilo di {{firstName}} {{lastName}}",
+  "PROFILE.AGE_YEARS": "{{age}} anni"
 }

@@ -43,7 +43,12 @@
       >
         <div class="ibr-client-intro">
           <h3>{{ currentGreeting | translate }}, {{ advisorDisplayName || "there" }}</h3>
-          <p>{{ currentDate | date: "EEEE d MMMM y, HH:mm" }}</p>
+          <p>
+            {{
+              currentDate
+                | date: "EEEE d MMMM y, HH:mm":undefined:dateLocale
+            }}
+          </p>
         </div>
         <!-- <div class="position-relative">
           <input

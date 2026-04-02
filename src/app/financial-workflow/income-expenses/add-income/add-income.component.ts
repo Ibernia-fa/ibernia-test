@@ -23,7 +23,8 @@ import { FundsViewModel } from '../../withdrawals-contributions/model/withdrawal
 import { ComissionType } from '../../saving-pots/models/saving-pots.model';
 import { catchError, filter, finalize, switchMap, of, map } from 'rxjs';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { getAmountCycleLabel } from 'src/app/shared/utils/amount-cycle-label';
 import { CommonModule } from '@angular/common';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 
@@ -98,7 +99,8 @@ export class AddIncomeComponent {
     @Inject(MAT_DIALOG_DATA) public data: any,
     private fb: FormBuilder,
     private incomeExpenseHttpService: IncomeExpensesHttpService,
-    private withdrawalsContributionsHttpService: WithdrawalsContributionsHttpService
+    private withdrawalsContributionsHttpService: WithdrawalsContributionsHttpService,
+    private translate: TranslateService,
   ) {
     this.scenarioMode = data.scenarioMode ?? false;
     this.incomeTypes = data.incomeType;
@@ -466,6 +468,10 @@ export class AddIncomeComponent {
       escalationControl?.setValidators(Validators.required);
     }
     escalationControl?.updateValueAndValidity();
+  }
+
+  getCycleLabel(cycle: Cycle): string {
+    return getAmountCycleLabel(cycle, this.translate);
   }
 
   addIncome(): void {

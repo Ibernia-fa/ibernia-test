@@ -844,5 +844,7 @@
   "EMERGENCIES.TYPE_HEALTH": "Health",
   "EMERGENCIES.TYPE_NATURAL_HAZARDS": "Natural hazards",
   "EMERGENCIES.TYPE_WILL": "Will",
-  "WEALTH.FINANCED_WITH_DEBT": "{{ratio}}% financed with debt"
+  "WEALTH.FINANCED_WITH_DEBT": "{{ratio}}% financed with debt",
+  "PROFILE.CLIENT_PAGE_TITLE": "{{firstName}} {{lastName}}'s Profile",
+  "PROFILE.AGE_YEARS": "{{age}} years old"
 }
