@@ -176,25 +176,6 @@ export class EmergenciesComponent implements OnInit {
 
     // preloaded data for simulation
     this.getSimulateData();
-
-    // #region agent log
-    fetch('http://127.0.0.1:7465/ingest/9753e61c-3583-48b3-aac4-63e35a17e932',{
-      method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'X-Debug-Session-Id':'23206c'
-      },
-      body:JSON.stringify({
-        sessionId:'23206c',
-        runId:'emergencies-protection-title',
-        hypothesisId:'H2',
-        location:'emergencies.component.ts:ngOnInit',
-        message:'EmergenciesComponent initialized for Protection section',
-        data:{},
-        timestamp:Date.now()
-      })
-    }).catch(()=>{});
-    // #endregion agent log
   }
 
   private bindRefreshEmergencies(): void {
