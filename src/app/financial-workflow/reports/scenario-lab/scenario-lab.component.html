@@ -357,7 +357,7 @@
                                 width="18"
                                 class="category-option-icon"
                               />
-                              {{ income.description }}
+                              {{ income.description | translateIncomeExpenseLabel }}
                             </span>
                           </mat-option>
                         }
@@ -429,7 +429,7 @@
                                 width="18"
                                 class="category-option-icon"
                               />
-                              {{ expense.description }}
+                              {{ expense.description | translateIncomeExpenseLabel }}
                             </span>
                           </mat-option>
                         }

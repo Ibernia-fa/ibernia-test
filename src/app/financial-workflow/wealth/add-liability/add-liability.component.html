@@ -35,7 +35,7 @@
                   (selectionChange)="onTypeChange()"
                 >
                   @for (t of liabilityTypes; track t) {
-                    <mat-option [value]="t">{{ t }}</mat-option>
+                    <mat-option [value]="t">{{ t | translate }}</mat-option>
                   }
                 </mat-select>
                 <span class="custom-arrow">
@@ -145,7 +145,13 @@
                     hideSingleSelectionIndicator
                   >
                     @for (opt of ownershipOptions; track opt.value) {
-                      <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+                      <mat-option [value]="opt.value">
+                        @if (opt.value === 0) {
+                          {{ 'Joint' | translate }}
+                        } @else {
+                          {{ opt.label }}
+                        }
+                      </mat-option>
                     }
                   </mat-select>
                   <span class="custom-arrow">

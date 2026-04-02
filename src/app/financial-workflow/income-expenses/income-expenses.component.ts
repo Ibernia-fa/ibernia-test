@@ -28,6 +28,7 @@ import { CurrencySymbolPipe } from 'src/app/pipe/currency-symbol.pipe';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
 import { TranslateModule } from '@ngx-translate/core';
 import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
+import { TranslateIncomeExpenseLabelPipe } from 'src/app/core/pipes/translate-income-expense-label.pipe';
 import { patchInflationRateDescription } from 'src/app/shared/utils/escalation-rate-utils';
 import { SavingsPotsHttpService } from '../saving-pots/services/savings-pots-http.service';
 import { SavingPotsModel } from '../saving-pots/models/saving-pots.model';
@@ -49,6 +50,7 @@ import { WithdrawalsContributions } from '../withdrawals-contributions/model/wit
     ThousandSeparatorPipe,
     ToastrModule,
     TranslateModule,
+    TranslateIncomeExpenseLabelPipe,
   ],
   providers: [ToastrService],
   templateUrl: './income-expenses.component.html',

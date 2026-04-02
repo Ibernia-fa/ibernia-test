@@ -38,6 +38,7 @@ import { AddEventDialogComponent, EventType } from '../../timeline/add-event-dia
 import { AddNewPotComponent } from '../../saving-pots/add-new-pot/add-new-pot.component';
 import { patchInflationRateDescription } from 'src/app/shared/utils/escalation-rate-utils';
 import { formatClientPersonDisplayName } from 'src/app/shared/utils/person-display-name';
+import { TranslateIncomeExpenseLabelPipe } from 'src/app/core/pipes/translate-income-expense-label.pipe';
 
 @Component({
   selector: 'app-scenario-lab',
@@ -54,6 +55,7 @@ import { formatClientPersonDisplayName } from 'src/app/shared/utils/person-displ
     SavingsBarStackedChartComponent,
     TranslateModule,
     TablerIconsModule,
+    TranslateIncomeExpenseLabelPipe,
   ],
   templateUrl: './scenario-lab.component.html',
   styleUrl: './scenario-lab.component.scss',
