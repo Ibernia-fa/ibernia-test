@@ -92,6 +92,11 @@ export class ClientQuestionnaireComponent implements OnInit, OnDestroy {
     lastDelta: 0,
     lastDir: 0,
     preventedCount: 0,
+    lastStep: '',
+    lastStepResult: '',
+    idxBeforeRecalc: -1,
+    idxAfterRecalc: -1,
+    touchTarget: '',
   };
 
   constructor(
@@ -295,21 +300,55 @@ export class ClientQuestionnaireComponent implements OnInit, OnDestroy {
     const el = this.snapContainer?.nativeElement;
     if (!el) return false;
 
+    const oldIdx = this.currentIndex;
+    const sectionHeight = el.clientHeight;
+    if (sectionHeight > 0) {
+      this.currentIndex = Math.round(el.scrollTop / sectionHeight);
+    }
+
+    if (this.debugMode) {
+      this.debugState.idxBeforeRecalc = oldIdx;
+      this.debugState.idxAfterRecalc = this.currentIndex;
+    }
+
     const last = this.totalSections - 1;
     let target = this.currentIndex + direction;
     target = Math.max(0, Math.min(target, last));
-    if (target === this.currentIndex) return false;
+    if (target === this.currentIndex) {
+      if (this.debugMode) {
+        this.debugState.lastStep = `dir=${direction} cur=${this.currentIndex} tgt=${target}`;
+        this.debugState.lastStepResult = 'NOOP(same)';
+        this.cdr.detectChanges();
+      }
+      return false;
+    }
 
     if (direction > 0) {
       if (this.currentIndex >= this.submitSectionIndex) {
+        if (this.debugMode) {
+          this.debugState.lastStep = `dir=${direction} cur=${this.currentIndex} tgt=${target}`;
+          this.debugState.lastStepResult = 'BLOCK(submit)';
+          this.cdr.detectChanges();
+        }
         return false;
       }
       if (!this.canLeaveSection(this.currentIndex)) {
         this.toastr.warning(
           this.translate.instant('Please answer this question before continuing.'),
         );
+        if (this.debugMode) {
+          this.debugState.lastStep = `dir=${direction} cur=${this.currentIndex} tgt=${target}`;
+          this.debugState.lastStepResult = 'BLOCK(unanswered)';
+          this.cdr.detectChanges();
+        }
         return false;
       }
+    }
+
+    if (this.debugMode) {
+      this.debugState.lastStep = `dir=${direction} cur=${this.currentIndex} tgt=${target}`;
+      this.debugState.lastStepResult = 'OK';
+      this.cdr.detectChanges();
     }
 
     this.scrollToSection(target);
@@ -470,6 +509,8 @@ export class ClientQuestionnaireComponent implements OnInit, OnDestroy {
       this.touchMoveCount = 0;
       if (this.debugMode) {
         this.debugState.touchStarts++;
+        const t = e.target as HTMLElement;
+        this.debugState.touchTarget = `${t.tagName}.${Array.from(t.classList).join('.')}`.substring(0, 30);
       }
     }, { passive: true });
 

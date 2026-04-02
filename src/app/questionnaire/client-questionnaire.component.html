@@ -286,6 +286,10 @@
       <span>delta: {{ debugState.lastDelta }} dir: {{ debugState.lastDir }}</span>
       <span>ts/tm/te: {{ debugState.touchStarts }}/{{ debugState.touchMoves }}/{{ debugState.touchEnds }}</span>
       <span>prevented: {{ debugState.preventedCount }}</span>
+      <span>step: {{ debugState.lastStep }}</span>
+      <span>result: {{ debugState.lastStepResult }}</span>
+      <span>recalc: {{ debugState.idxBeforeRecalc }}→{{ debugState.idxAfterRecalc }}</span>
+      <span>target: {{ debugState.touchTarget }}</span>
     </div>
   }
 </div>

@@ -458,6 +458,9 @@
   align-items: flex-start;
   gap: 16px;
   padding-right: 20px;
+  /* Explicit — inherited touch-action: none from .snap-container is not always
+     honoured by WebKit for child scroll containers with overflow-y: auto. */
+  touch-action: none;
 }
 
 .section-inner.welcome-section {
