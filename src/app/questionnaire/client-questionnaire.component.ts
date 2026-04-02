@@ -523,7 +523,11 @@ export class ClientQuestionnaireComponent implements OnInit, OnDestroy {
     const el = this.snapContainer?.nativeElement;
     if (!el) return;
 
-    el.addEventListener('touchstart', (e: TouchEvent) => {
+    // Listen on the wrapper (parent of snap-container) so touches on fixed
+    // overlays like .swipe-up-hint and .progress-track are also captured.
+    const wrapper = el.closest('.questionnaire-wrapper') as HTMLElement || el;
+
+    wrapper.addEventListener('touchstart', (e: TouchEvent) => {
       this.touchStartY = e.touches[0].clientY;
       this.touchLastY = this.touchStartY;
       this.touchCumulativeDeltaY = 0;
@@ -535,7 +539,7 @@ export class ClientQuestionnaireComponent implements OnInit, OnDestroy {
       }
     }, { passive: true });
 
-    el.addEventListener('touchmove', (e: TouchEvent) => {
+    wrapper.addEventListener('touchmove', (e: TouchEvent) => {
       const currentY = e.touches[0].clientY;
       this.touchCumulativeDeltaY += this.touchLastY - currentY;
       this.touchLastY = currentY;
@@ -549,7 +553,7 @@ export class ClientQuestionnaireComponent implements OnInit, OnDestroy {
       }
     }, { passive: false });
 
-    el.addEventListener('touchend', (e: TouchEvent) => {
+    wrapper.addEventListener('touchend', (e: TouchEvent) => {
       if (this.debugMode) {
         this.debugState.touchEnds++;
       }
