@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 
@@ -19,7 +19,7 @@ interface SchoolModule {
 @Component({
   selector: 'app-school',
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatButtonModule],
+  imports: [CommonModule, MatCardModule, MatButtonModule, TranslateModule],
   templateUrl: './school.component.html',
   styleUrl: './school.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

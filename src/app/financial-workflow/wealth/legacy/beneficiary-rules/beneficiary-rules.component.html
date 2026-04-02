@@ -1,6 +1,6 @@
 <div class="d-flex flex-column">
   <div class="dialog-header">
-    <h2 class="dialog-title text-center">Beneficiary rules</h2>
+    <h2 class="dialog-title text-center">{{ 'Beneficiary rules' | translate }}</h2>
     <button
       type="button"
       mat-icon-button
@@ -89,7 +89,7 @@
       <div class="recipient-row" *ngFor="let row of recipients; let i = index">
         <div class="recipient-header position-relative">
           <mat-label class="f-s-16 f-w-500 d-block ibr-black recipient-select-label"
-            >Select</mat-label
+            >{{ 'Select' | translate }}</mat-label
           >
           <button
             type="button"
@@ -193,7 +193,7 @@
 
       <!-- Total percentage display -->
       <div class="total-pct-row" *ngIf="recipients.length > 0">
-        <span class="total-pct-label">Total:</span>
+        <span class="total-pct-label">{{ 'Total' | translate }}:</span>
         <span
           class="total-pct-value"
           [class.total-valid]="isValid"
@@ -201,7 +201,7 @@
         >
           {{ totalPercentage | number: "1.0-1" }}%
         </span>
-        <span class="total-pct-hint" *ngIf="!isValid">Must equal 100%</span>
+        <span class="total-pct-hint" *ngIf="!isValid">{{ 'Must equal 100%' | translate }}</span>
       </div>
     </div>
   </mat-dialog-content>
@@ -213,7 +213,7 @@
         (click)="onClose()"
         class="button-icon-outline w-100 d-block"
       >
-        <span class="f-s-16">Cancel</span>
+        <span class="f-s-16">{{ 'Cancel' | translate }}</span>
       </button>
     </div>
     <div>
@@ -223,7 +223,7 @@
         [disabled]="!isValid || isSaving"
         class="button-icon w-100 d-block"
       >
-        <span class="f-s-16">Save</span>
+        <span class="f-s-16">{{ 'Save' | translate }}</span>
       </button>
     </div>
   </div>

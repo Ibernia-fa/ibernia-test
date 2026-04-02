@@ -1,6 +1,6 @@
 <div class="d-flex flex-column">
   <div class="dialog-header">
-    <h2 class="dialog-title text-center">Tax Settings</h2>
+    <h2 class="dialog-title text-center">{{ 'Tax Settings' | translate }}</h2>
     <button
       type="button"
       mat-icon-button
@@ -18,7 +18,7 @@
     <form [formGroup]="form" class="d-flex flex-column gap-16">
       <div class="d-flex flex-column gap-8">
         <mat-label class="f-s-16 f-w-500 d-block ibr-black"
-          >Partner tax rate</mat-label
+          >{{ 'Partner tax rate' | translate }}</mat-label
         >
         <div class="w-100 form-field position-relative">
           <input
@@ -63,7 +63,7 @@
 
       <div class="d-flex flex-column gap-8">
         <mat-label class="f-s-16 f-w-500 d-block ibr-black"
-          >Child tax rate</mat-label
+          >{{ 'Child tax rate' | translate }}</mat-label
         >
         <div class="w-100 form-field position-relative">
           <input
@@ -108,7 +108,7 @@
 
       <div class="d-flex flex-column gap-8">
         <mat-label class="f-s-16 f-w-500 d-block ibr-black"
-          >Sibling tax rate</mat-label
+          >{{ 'Sibling tax rate' | translate }}</mat-label
         >
         <div class="w-100 form-field position-relative">
           <input
@@ -160,7 +160,7 @@
         (click)="onCancel()"
         class="button-icon-outline w-100 d-block"
       >
-        <span class="f-s-16">Cancel</span>
+        <span class="f-s-16">{{ 'Cancel' | translate }}</span>
       </button>
     </div>
     <div>
@@ -170,7 +170,7 @@
         [disabled]="form.invalid || isSaving"
         class="button-icon w-100 d-block"
       >
-        <span class="f-s-16">Save</span>
+        <span class="f-s-16">{{ 'Save' | translate }}</span>
       </button>
     </div>
   </div>

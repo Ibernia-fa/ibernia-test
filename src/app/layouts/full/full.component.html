@@ -287,7 +287,7 @@
         <div
           class="p-x-16 p-y-20 d-flex align-items-center justify-content-between"
         >
-          <h3 class="f-s-21 f-w-600">Settings</h3>
+          <h3 class="f-s-21 f-w-600">{{ 'Settings' | translate }}</h3>
           <button
             class="d-lg-none"
             mat-button
@@ -345,7 +345,7 @@
       <mat-accordion>
         <mat-expansion-panel class="shadow-none">
           <mat-expansion-panel-header>
-            <mat-panel-title class="f-s-16 f-w-500"> Apps </mat-panel-title>
+            <mat-panel-title class="f-s-16 f-w-500"> {{ 'Apps' | translate }} </mat-panel-title>
           </mat-expansion-panel-header>
           <div>
             <div class="row">
@@ -374,7 +374,7 @@
                 </div>
               }
             </div>
-            <h4 class="f-s-18 f-w-600 m-b-16">Quick Links</h4>
+            <h4 class="f-s-18 f-w-600 m-b-16">{{ 'Quick Links' | translate }}</h4>
             @for (quicklink of quicklinks; track quicklink.title) {
               <div class="text-hover-primary">
                 <a
@@ -393,19 +393,19 @@
           [routerLink]="['/apps/calendar']"
           class="d-flex align-items-center text-decoration-none f-s-14 p-y-16 gap-8"
         >
-          <span class="f-s-15 f-w-500 m-l-8">Calendar</span>
+          <span class="f-s-15 f-w-500 m-l-8">{{ 'Calendar' | translate }}</span>
         </a>
         <a
           [routerLink]="['/apps/chat']"
           class="d-flex align-items-center text-decoration-none f-s-14 p-y-16"
         >
-          <span class="f-s-15 f-w-500 m-l-8">Chat</span>
+          <span class="f-s-15 f-w-500 m-l-8">{{ 'Chat' | translate }}</span>
         </a>
         <a
           [routerLink]="['/apps/email/inbox']"
           class="d-flex align-items-center text-decoration-none f-s-14 p-y-16 gap-8"
         >
-          <span class="f-s-15 f-w-500 m-l-8">Email</span>
+          <span class="f-s-15 f-w-500 m-l-8">{{ 'Email' | translate }}</span>
         </a>
       </div>
     </div>

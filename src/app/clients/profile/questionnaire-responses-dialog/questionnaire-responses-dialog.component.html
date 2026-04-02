@@ -51,7 +51,7 @@
     @let personalItems = getSectionResponses("Personal");
     @if (personalItems.length > 0) {
       <div class="section">
-        <h3 class="section-heading">Personal</h3>
+        <h3 class="section-heading">{{ 'Personal' | translate }}</h3>
         <div class="section-content">
           <div class="personal-grid-wrapper">
             @for (item of personalItems; track item.questionId) {
@@ -96,7 +96,7 @@
       @let financeItems = getSectionResponses("Finance");
       @if (financeItems.length > 0) {
         <div class="section">
-          <h3 class="section-heading">Finance</h3>
+          <h3 class="section-heading">{{ 'Finance' | translate }}</h3>
           <div class="section-content">
             <div class="finace-grid-wrapper">
               @for (item of financeItems; track item.questionId) {
@@ -173,7 +173,7 @@
       @let satisfactionItems = getSectionResponses("Current satisfaction");
       @if (satisfactionItems.length > 0) {
         <div class="section">
-          <h3 class="section-heading">Current satisfaction</h3>
+          <h3 class="section-heading">{{ 'Current satisfaction' | translate }}</h3>
           <div class="section-content">
             @for (item of satisfactionItems; track item.questionId) {
               <div class="satisfaction-item">
@@ -236,7 +236,7 @@
     @let goalsItems = getSectionResponses("Goals");
     @if (goalsItems.length > 0) {
       <div class="section">
-        <h3 class="section-heading">Goals</h3>
+        <h3 class="section-heading">{{ 'Goals' | translate }}</h3>
         <div class="section-content">
           <div class="chips-row">
             @for (item of goalsItems; track item.questionId) {
@@ -264,7 +264,7 @@
     @let protectionItems = getSectionResponses("Protection priorities");
     @if (protectionItems.length > 0) {
       <div class="section">
-        <h3 class="section-heading">Protection priorities</h3>
+        <h3 class="section-heading">{{ 'Protection priorities' | translate }}</h3>
         <div class="section-content">
           <div class="chips-row">
             @for (item of protectionItems; track item.questionId) {

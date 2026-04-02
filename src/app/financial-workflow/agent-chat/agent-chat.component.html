@@ -1,8 +1,8 @@
 <div class="d-flex gap-24 flex-column">
   <mat-card class="cardWithShadow">
     <mat-card-content>
-      <h4 class="page-title f-w-500 f-s-30">AI Chat</h4>
-      <p class="text-muted m-t-8">Ask follow-up questions about this cashflow plan. The AI uses the same plan data as recommendations.</p>
+      <h4 class="page-title f-w-500 f-s-30">{{ 'AI Chat' | translate }}</h4>
+      <p class="text-muted m-t-8">{{ 'Ask follow-up questions about this cashflow plan. The AI uses the same plan data and your guidelines.' | translate }}</p>
     </mat-card-content>
   </mat-card>
 
@@ -14,7 +14,7 @@
             New conversation
           </button>
           <ng-container *ngIf="conversations.length > 0">
-            <span class="text-muted">Conversations:</span>
+            <span class="text-muted">{{ 'Conversations:' | translate }}</span>
             <button
               *ngFor="let c of conversations"
               mat-stroked-button
@@ -35,7 +35,7 @@
               <mat-spinner diameter="32"></mat-spinner>
             </ng-container>
             <ng-container *ngIf="!loading && messages.length === 0">
-              <p class="text-muted">No messages yet. Type below to start.</p>
+              <p class="text-muted">{{ 'No messages yet. Type below to start.' | translate }}</p>
             </ng-container>
             <div *ngFor="let m of messages" class="m-b-12" [class.text-end]="m.role === 'User'">
               <span class="fw-500">{{ m.role }}:</span>
@@ -89,17 +89,17 @@
             </div>
             <!-- Processing indicator when waiting for AI reply -->
             <div *ngIf="sending" class="m-b-12">
-              <span class="fw-500">Assistant:</span>
+              <span class="fw-500">{{ 'Assistant:' | translate }}</span>
               <div class="p-8 rounded bg-light d-inline-flex align-items-center gap-8">
                 <mat-spinner diameter="24"></mat-spinner>
-                <span class="text-muted">Thinking...</span>
+                <span class="text-muted">{{ 'Thinking...' | translate }}</span>
               </div>
             </div>
           </div>
 
           <div class="d-flex gap-8 align-items-center">
             <mat-form-field appearance="outline" class="flex-grow-1">
-              <mat-label>Your message</mat-label>
+              <mat-label>{{ 'Your message' | translate }}</mat-label>
               <input matInput [(ngModel)]="inputText" (keydown.enter)="$event.preventDefault(); send()" placeholder="e.g. Why did you suggest that?" />
             </mat-form-field>
             <button mat-flat-button color="primary" (click)="send()" [disabled]="sending || !inputText?.trim()">
@@ -107,13 +107,13 @@
                 <mat-spinner diameter="18" style="display: inline-block;"></mat-spinner>
                 Sending...
               </span>
-              <span *ngIf="!sending">Send</span>
+              <span *ngIf="!sending">{{ 'Send' | translate }}</span>
             </button>
           </div>
         </ng-container>
 
         <ng-container *ngIf="!conversationId && conversations.length === 0 && !sending">
-          <p class="text-muted">Start a conversation to ask questions about this plan.</p>
+          <p class="text-muted">{{ 'Start a conversation to ask questions about this plan.' | translate }}</p>
         </ng-container>
       </div>
     </mat-card-content>

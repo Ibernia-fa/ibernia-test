@@ -42,7 +42,7 @@
                     alt="help"
                     width="18"
                     class="m-l-4"
-                    matTooltip="Sets the main currency for all new client plans. All figures will be shown in this currency by default, but you can change it for individual clients later."
+                    [matTooltip]="'TOOLTIP.DEFAULT_CURRENCY' | translate"
                   />
                 </mat-label>
                 <mat-form-field
@@ -95,7 +95,7 @@
                     alt="help"
                     width="18"
                     class="m-l-4"
-                    matTooltip="Sets the main currency for all new client plans. All figures will be shown in this currency by default, but you can change it for individual clients later."
+                    [matTooltip]="'TOOLTIP.DEFAULT_CURRENCY' | translate"
                   />
                 </mat-label>
                 <mat-form-field
@@ -160,7 +160,7 @@
                     alt="help"
                     width="18"
                     class="m-l-4"
-                    matTooltip="Sets the default annual inflation rate used in projections. You can modify it in each client's cashflow model to show how inflation impacts their future results."
+                    [matTooltip]="'TOOLTIP.INFLATION_RATE' | translate"
                   />
                 </mat-label>
                 <!-- <mat-form-field appearance="outline" class="w-100 percentage-icon"> -->
@@ -229,7 +229,7 @@
                     alt="help"
                     width="18"
                     class="m-l-4"
-                    matTooltip="Defines the expected yearly return after taxes. Ibernia uses this to estimate how investments grow over time. You can adapt it for each Saving Pot or individual client."
+                    [matTooltip]="'TOOLTIP.INVESTMENT_RETURN' | translate"
                   />
                 </mat-label>
                 <mat-form-field
@@ -297,7 +297,7 @@
                     alt="help"
                     width="18"
                     class="m-l-4"
-                    matTooltip="Sets the default return rate for pension funds."
+                    [matTooltip]="'TOOLTIP.PENSION_RETURN' | translate"
                   />
                 </mat-label>
                 <mat-form-field
@@ -524,7 +524,7 @@
                     alt="help"
                     width="18"
                     class="m-l-4"
-                    matTooltip="Defines how advisor commissions are calculated. You can set a fixed amount (e.g., €100 per year), a percentage of assets (e.g., 1% annually), or both. This acts as your default method and can be customized for each client."
+                    [matTooltip]="'TOOLTIP.COMMISSION_TYPE' | translate"
                   />
                 </mat-label>
                 <mat-form-field
@@ -588,7 +588,7 @@
                         alt="help"
                         width="18"
                         class="m-l-4"
-                        matTooltip="Sets the default percentage commission for new plans (e.g., 1% annually on the value of invested savings). This applies to each Saving Pot by default, and you can adjust it for each client when needed."
+                        [matTooltip]="'TOOLTIP.COMMISSION_PERCENTAGE' | translate"
                       />
                     </mat-label>
                     <mat-form-field
@@ -664,7 +664,7 @@
                         alt="help"
                         width="18"
                         class="m-l-4"
-                        matTooltip="Sets the standard fixed commission value applied when creating new plans (e.g., €100 per year). This applies to each Saving Pot by default, but you can change it per client if needed."
+                        [matTooltip]="'TOOLTIP.COMMISSION_AMOUNT' | translate"
                       />
                     </mat-label>
                     <mat-form-field
@@ -709,7 +709,7 @@
                         alt="help"
                         width="18"
                         class="m-l-4"
-                        matTooltip="Sets the standard fixed commission value applied when creating new plans (e.g., €100 per year). This applies to each Saving Pot by default, but you can change it per client if needed."
+                        [matTooltip]="'TOOLTIP.COMMISSION_AMOUNT' | translate"
                       />
                     </mat-label>
                     <mat-form-field
@@ -748,8 +748,7 @@
                         alt="help"
                         width="18"
                         class="m-l-4"
-                        matTooltip="Sets the default percentage commission for new plans (e.g., 1% annually on the value of invested savings). This applies to each Saving Pot by default, and you can adjust it for each client when needed.
-  "
+                        [matTooltip]="'TOOLTIP.COMMISSION_PERCENTAGE' | translate"
                       />
                     </mat-label>
                     <mat-form-field
@@ -831,7 +830,7 @@
                     alt="help"
                     width="18"
                     class="m-l-4"
-                    matTooltip="Default inheritance tax rate applied to partners in Legacy when no scenario-specific tax settings have been customised."
+                    [matTooltip]="'TOOLTIP.PARTNER_TAX' | translate"
                   />
                 </mat-label>
                 <mat-form-field
@@ -900,7 +899,7 @@
                     alt="help"
                     width="18"
                     class="m-l-4"
-                    matTooltip="Default inheritance tax rate applied to children in Legacy when no scenario-specific tax settings have been customised."
+                    [matTooltip]="'TOOLTIP.CHILD_TAX' | translate"
                   />
                 </mat-label>
                 <mat-form-field
@@ -969,7 +968,7 @@
                     alt="help"
                     width="18"
                     class="m-l-4"
-                    matTooltip="Default inheritance tax rate applied to siblings in Legacy when no scenario-specific tax settings have been customised."
+                    [matTooltip]="'TOOLTIP.SIBLING_TAX' | translate"
                   />
                 </mat-label>
                 <mat-form-field

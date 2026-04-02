@@ -776,7 +776,7 @@
                                                     <div class="label">{{ 'Status' | translate }}</div>
                                                     <div class="f-w-500 f-s-14"
                                                         [ngClass]="{ 'text-danger': e.willStatus !== 1, 'will-done-text': e.willStatus === 1 }">
-                                                        {{e.willStatus === 1 ? 'Done' : 'Not done'}}
+                                                        {{e.willStatus === 1 ? ('Done' | translate) : ('Not done' | translate)}}
                                                     </div>
                                                 </div>
                                             </ng-container>

@@ -39,7 +39,7 @@ import {
 import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { CommonModule } from '@angular/common';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Client, Details } from 'src/app/clients/models/client';
@@ -84,6 +84,7 @@ import { MaterialModule } from 'src/app/material.module';
     MatProgressSpinnerModule,
     CurrencySymbolPipe,
     MaterialModule,
+    TranslateModule,
   ],
   templateUrl: './emergencies.component.html',
   styleUrl: './emergencies.component.scss',

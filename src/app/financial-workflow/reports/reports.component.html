@@ -31,7 +31,7 @@
             <h3>
               {{ "Lifetime Plan" | translate }}
             </h3>
-            <p>The full picture of your finances over time</p>
+            <p>{{ 'The full picture of your finances over time' | translate }}</p>
           </div>
           <!-- <div class="d-flex align-items-center gap-16"> -->
           <!-- Cashflow name (visible when NOT in comparison mode) -->
@@ -109,7 +109,7 @@
                         class="icon-svg"
                       />
                     </span>
-                    <span class="status-text">Goals on track and funded</span>
+                    <span class="status-text">{{ 'Goals on track and funded' | translate }}</span>
                   </div>
                 </ng-container>
                 <ng-template #lossTpl>
@@ -150,16 +150,16 @@
                 *ngIf="insights.length > 0 || insightsLoading || insightsLimitExceeded || insightsLoadAttempted"
               >
                 <div class="d-flex align-items-center justify-content-between m-b-8">
-                  <h3 class="ibr-insights-title m-b-0">Insights</h3>
+                  <h3 class="ibr-insights-title m-b-0">{{ 'Insights' | translate }}</h3>
                   <div class="d-flex align-items-center gap-8" *ngIf="!insightsLoading && insightsLoadAttempted">
-                    <span *ngIf="insightsLimitExceeded" class="text-error f-s-12">Daily limit reached</span>
+                    <span *ngIf="insightsLimitExceeded" class="text-error f-s-12">{{ 'Daily limit reached' | translate }}</span>
                     <button
                       class="button-icon"
                       style="padding: 4px 12px; font-size: 12px;"
                       (click)="regenerateInsights()"
                       [disabled]="insightsLoading || insightsLimitExceeded"
                     >
-                      <span>Generate New</span>
+                      <span>{{ 'Generate New' | translate }}</span>
                     </button>
                   </div>
                 </div>
@@ -178,7 +178,7 @@
                   class="f-s-13 text-muted m-t-8 m-b-0"
                   *ngIf="!insightsLoading && insightsLoadAttempted && insights.length === 0 && !insightsLimitExceeded"
                 >
-                  No insights yet. Click <strong>Generate New</strong> to analyse this plan.
+                  {{ 'No insights yet. Click' | translate }} <strong>{{ 'Generate New' | translate }}</strong> {{ 'to analyse this plan.' | translate }}
                 </p>
 
                 <div
@@ -273,7 +273,7 @@
                           class="icon-svg"
                         />
                       </span>
-                      <span class="status-text">Goals on track and funded</span>
+                      <span class="status-text">{{ 'Goals on track and funded' | translate }}</span>
                     </div>
                   </ng-container>
                   <ng-template #lossTpl>

@@ -1,6 +1,6 @@
 <div class="d-flex flex-column">
   <div class="dialog-header">
-    <h2 class="dialog-title text-center">Account closure</h2>
+    <h2 class="dialog-title text-center">{{ 'Account closure' | translate }}</h2>
     <button
       type="button"
       mat-icon-button
@@ -32,7 +32,7 @@
         (click)="close()"
         class="button-icon-outline w-100 d-block"
       >
-        <span class="f-s-16">Cancel</span>
+        <span class="f-s-16">{{ 'Cancel' | translate }}</span>
       </button>
     </div>
     <div>
@@ -41,7 +41,7 @@
         (click)="confirm()"
         class="button-icon-destructive w-100 d-block"
       >
-        <span class="f-s-16">Delete the account</span>
+        <span class="f-s-16">{{ 'Delete the account' | translate }}</span>
       </button>
     </div>
   </div>

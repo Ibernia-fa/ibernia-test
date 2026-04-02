@@ -18,7 +18,7 @@
             />
           }
         } @else {
-          {{ isEditWorkflow ? "Edit" : "Add" }} saving pot, investment or
+          {{ isEditWorkflow ? ('Edit' | translate) : ('Add New' | translate) }} saving pot, investment or
           pension
         }
       </h2>
@@ -49,7 +49,7 @@
             <div class="select-option position-relative">
               <mat-select
                 formControlName="name"
-                placeholder="Select"
+                [placeholder]="'Select' | translate"
                 (selectionChange)="onNameValueChange($event.value)"
               >
                 <!-- Your normal options -->
@@ -80,7 +80,7 @@
                       height="24"
                       width="24"
                     />
-                    <span>Custom</span>
+                    <span>{{ 'Custom' | translate }}</span>
                   </div>
                 </mat-option>
               </mat-select>
@@ -124,12 +124,12 @@
             <mat-label
               class="f-s-16 f-w-500 d-block ibr-black"
               style="line-height: 16px"
-              >Name</mat-label
+              >{{ 'Name' | translate }}</mat-label
             >
             @if (savingsForm.get("customName")) {
               <input matInput formControlName="customName" />
             } @else {
-              <input matInput placeholder="Enter name" />
+              <input matInput [placeholder]="'Enter name' | translate" />
             }
             @if (
               savingsForm.get("customName")?.touched &&
@@ -142,7 +142,7 @@
             @if (
               savingsForm.get("customName")?.hasError("cashNameNotAllowed")
             ) {
-              <span class="field-error d-block">A Cash pot already exists</span>
+              <span class="field-error d-block">{{ 'A Cash pot already exists' | translate }}</span>
             }
           </div>
         }
@@ -189,7 +189,7 @@
               savingsForm.get("ownership")?.hasError("duplicateCashOwnership")
             ) {
               <span class="field-error d-block"
-                >A Cash pot already exists for this ownership</span
+                >{{ 'A Cash pot already exists for this ownership' | translate }}</span
               >
             }
           </div>
@@ -1322,7 +1322,7 @@
           [disabled]="savingsForm.invalid"
           class="button-icon w-100 d-block"
         >
-          <span class="f-s-16">Save</span>
+          <span class="f-s-16">{{ 'Save' | translate }}</span>
         </button>
       </div>
     </div>

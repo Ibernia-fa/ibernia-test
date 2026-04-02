@@ -3,7 +3,7 @@
     
 <form [formGroup]="form" (ngSubmit)="submit()">
 
-    <h1 class="f-s-30 f-w-500 m-0 m-b-30 p-b-15">Your account preferences</h1>
+    <h1 class="f-s-30 f-w-500 m-0 m-b-30 p-b-15">{{ 'Your account preferences' | translate }}</h1>
   <div class="container" formGroupName="preferences">
     
     <!-- Row 1: Inflation + Country -->
@@ -16,11 +16,11 @@
              alt="help-circle-icon"
               width="18"
              class="m-l-4 cursor-pointer"
-             matTooltip="Sets the main currency for all new client plans. All figures will be shown in this currency by default, but you can change it for individual clients later.">
+             [matTooltip]="'TOOLTIP.DEFAULT_CURRENCY' | translate">
 
         </mat-label>
         <mat-form-field appearance="outline" class="w-full w-100">
-          <mat-select formControlName="country" placeholder="Select country"
+          <mat-select formControlName="country" [placeholder]="'Select country' | translate"
                       (valueChange)="clientCountryValueChange($event)">
             @for (country of countries; track country) {
               @if (country.currencySymbol) {
@@ -32,13 +32,12 @@
         </mat-form-field>
       </div> 
       <div class="col-6">
-        <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">Currency
+        <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Currency' | translate }}
          <img src="assets/images/svgs/help-circle-icon.svg"
              alt="help-circle-icon"
               width="18"
              class="m-l-4 cursor-pointer"
-             matTooltip="Sets the main currency for all new client plans. All figures will be shown in this currency by default, but you can change it for individual clients later.
-">
+             [matTooltip]="'TOOLTIP.DEFAULT_CURRENCY' | translate">
 
         </mat-label>
       
@@ -60,7 +59,7 @@
                alt="help-circle-icon"
                width="18"
                class="m-l-4 cursor-pointer"
-               matTooltip="Sets your app language. You can switch anytime from the header.">
+               [matTooltip]="'TOOLTIP.LANGUAGE' | translate">
         </mat-label>
         <mat-form-field appearance="outline" class="w-full w-100">
           <mat-select formControlName="language" (selectionChange)="onLanguageChange($event.value)">
@@ -119,7 +118,7 @@
              alt="help-circle-icon "
              class="m-l-4 cursor-pointer"
               width="18"
-             matTooltip="Sets the default return rate for pension funds. You can modify it for each Saving Pot or individual client.">
+             [matTooltip]="'TOOLTIP.PENSION_RETURN' | translate">
         </mat-label>
      
         <mat-form-field appearance="outline" class="w-full w-100 percentage-icon">
@@ -175,8 +174,8 @@
     </section>
 
     <button type="submit" class="button-icon pull-right" >
-      <span *ngIf="!isSaving">Finish and go to your dashboard</span>
-      <span *ngIf="isSaving">Saving…</span>
+      <span *ngIf="!isSaving">{{ 'Finish and go to your dashboard' | translate }}</span>
+      <span *ngIf="isSaving">{{ 'Saving…' | translate }}</span>
     </button>
   </div>
     </div>
