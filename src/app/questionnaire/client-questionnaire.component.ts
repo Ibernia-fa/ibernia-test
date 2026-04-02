@@ -97,6 +97,8 @@ export class ClientQuestionnaireComponent implements OnInit, OnDestroy {
     idxBeforeRecalc: -1,
     idxAfterRecalc: -1,
     touchTarget: '',
+    stepCount: 0,
+    scrollOverrideCount: 0,
   };
 
   constructor(
@@ -283,6 +285,24 @@ export class ClientQuestionnaireComponent implements OnInit, OnDestroy {
     const targetTop = el.clientHeight * clamped;
     el.scrollTop = targetTop;
     this.onScroll();
+
+    // iOS can override a programmatic scrollTop when its compositor is still
+    // processing a touch gesture (momentum/settle). Re-apply on the next two
+    // animation frames to guarantee the position sticks.
+    let retries = 2;
+    const enforce = () => {
+      if (retries-- <= 0) return;
+      if (Math.abs(el.scrollTop - targetTop) > 2) {
+        el.scrollTop = targetTop;
+        this.onScroll();
+        if (this.debugMode) {
+          this.debugState.scrollOverrideCount++;
+          this.cdr.detectChanges();
+        }
+      }
+      requestAnimationFrame(enforce);
+    };
+    requestAnimationFrame(enforce);
   }
 
   /**
@@ -346,6 +366,7 @@ export class ClientQuestionnaireComponent implements OnInit, OnDestroy {
     }
 
     if (this.debugMode) {
+      this.debugState.stepCount++;
       this.debugState.lastStep = `dir=${direction} cur=${this.currentIndex} tgt=${target}`;
       this.debugState.lastStepResult = 'OK';
       this.cdr.detectChanges();
