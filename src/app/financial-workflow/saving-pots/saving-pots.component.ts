@@ -27,6 +27,7 @@ import {
   ClientSaving,
   SavingPotsModel as SavingPots,
   SavingPotOwnership,
+  SavingPotType,
 } from './models/saving-pots.model';
 import { Cashflow } from 'src/app/clients/models/cashflow';
 import { TimelineHttpService } from '../timeline/services/timeline-http.service';
@@ -615,6 +616,11 @@ export class SavingPotsComponent implements OnInit {
     if (rate == null) return '0';
     const rounded = Math.round(rate * 10) / 10;
     return rounded % 1 === 0 ? rounded.toFixed(0) : rounded.toString();
+  }
+
+  /** Cash pots show 0% in the UI; hide the badge to reduce clutter (display-only). */
+  shouldShowReturnRateBadge(saving: ClientSaving): boolean {
+    return saving.type !== SavingPotType.Cash;
   }
 
   /** Ownership line under chart: Joint (translated) or client/partner display names. */
