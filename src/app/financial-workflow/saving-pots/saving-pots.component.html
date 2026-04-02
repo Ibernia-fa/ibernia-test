@@ -273,20 +273,20 @@
                                   | thousandSeparator
                               }}
                             </h3>
-                            <span
-                              [className]="
-                                saving.returnRate > 0
-                                  ? 'badge green'
-                                  : 'badge red'
-                              "
-                            >
-                              <!-- @if(saving.realReturn >= 0){+}{{saving.realReturn | number :
-                                                        '1.2-2'}}% -->
-                              @if (saving.returnRate >= 0) {
-                                +
-                              }
-                              {{ formatReturnRate(saving.returnRate) }}%
-                            </span>
+                            @if (shouldShowReturnRateBadge(saving)) {
+                              <span
+                                [className]="
+                                  saving.returnRate > 0
+                                    ? 'badge green'
+                                    : 'badge red'
+                                "
+                              >
+                                @if (saving.returnRate >= 0) {
+                                  +
+                                }
+                                {{ formatReturnRate(saving.returnRate) }}%
+                              </span>
+                            }
                             <!-- <span>
                                                         NV: {{saving.nominalValue | thousandSeparator}}
                                                         RV: {{saving.realValue | thousandSeparator}}
