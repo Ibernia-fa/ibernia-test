@@ -148,9 +148,11 @@
     .notification-item-preview {
       font-size: 14px;
       font-weight: 400;
-      color: #787889;
-      line-height: 20px;
-      margin: 2px 0 6px 0 !important;
+      color: #464555;
+      line-height: 1.45;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      word-break: break-word;
     }
 
     .notification-item-meta {

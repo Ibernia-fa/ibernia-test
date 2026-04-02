@@ -163,9 +163,23 @@ table {
 
   &.textarea-wrapper {
     .mat-mdc-text-field-wrapper {
+      height: auto;
+
+      .mat-mdc-form-field-flex {
+        align-items: stretch;
+      }
+
       .mat-mdc-form-field-infix {
         height: auto;
+        min-height: 49px;
+        line-height: normal;
+        padding-top: 10px;
+        padding-bottom: 10px;
       }
+    }
+
+    textarea.mat-mdc-input-element {
+      align-self: stretch;
     }
   }
 }

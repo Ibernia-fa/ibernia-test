@@ -1,27 +1,201 @@
-<mat-card *ngIf="notification" class="mat-mdc-card mdc-card cardWithShadow mb-20">
-  <mat-card-content class="mat-mdc-card-content">
-    <div class="d-flex justify-content-between align-items-center m-b-20">
-      <h4 class="page-title f-w-500 m-0">{{ 'Notification details' | translate }}</h4>
-      <a mat-button routerLink="/settings/admin-notifications">{{ 'Back' | translate }}</a>
-    </div>
-    <p><strong>{{ 'Type' | translate }}:</strong> {{ notification.type }}</p>
-    <p><strong>{{ 'Status' | translate }}:</strong> {{ notification.status }}</p>
-    <p><strong>{{ 'Channel' | translate }}:</strong> {{ notification.channel }}</p>
-    <p><strong>{{ 'Created' | translate }}:</strong> {{ notification.createdAt | date:'medium' }}</p>
-    <p *ngIf="notification.sentAtUtc"><strong>{{ 'Sent' | translate }}:</strong> {{ notification.sentAtUtc | date:'medium' }}</p>
-    <div *ngIf="notification.deliveryStats" class="m-t-20">
-      <h5 class="f-s-16 f-w-600 m-b-10">{{ 'Delivery stats' | translate }}</h5>
-      <p>Queued: {{ notification.deliveryStats.queued }}, Sent: {{ notification.deliveryStats.sent }}, Failed: {{ notification.deliveryStats.failed }}</p>
-    </div>
-    <div *ngIf="notification.failedDeliveries?.length" class="m-t-20">
-      <h5 class="f-s-16 f-w-600 m-b-10">{{ 'Failed deliveries' | translate }}</h5>
-      <p class="f-s-13 text-muted m-b-10">{{ 'Users do not see failed deliveries in the notification bell.' | translate }}</p>
-      <ul class="m-0 p-l-20">
-        <li *ngFor="let f of notification.failedDeliveries" class="m-b-8">
-          <strong>{{ f.channel }}</strong> — {{ f.userId }}<br />
-          <span class="f-s-13 text-muted">{{ f.failureReason }}</span>
-        </li>
-      </ul>
-    </div>
-  </mat-card-content>
-</mat-card>
+<div class="notification-detail-page">
+  <mat-card *ngIf="loading" class="ibr-new-dashboad-card w-100">
+    <mat-card-content class="notification-detail-loading">
+      <p class="m-0">{{ "Loading..." | translate }}</p>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card *ngIf="!loading && !notification" class="ibr-new-dashboad-card w-100">
+    <mat-card-content class="notification-detail-not-found">
+      <p class="m-0">{{ "Notification not found" | translate }}</p>
+      <a
+        routerLink="/settings/admin-notifications"
+        class="button-icon-outline notification-detail-back"
+      >
+        <span class="f-s-16">{{ "Back" | translate }}</span>
+      </a>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card
+    *ngIf="!loading && notification"
+    class="ibr-new-dashboad-card w-100"
+  >
+    <mat-card-content>
+      <div
+        class="notification-detail-toolbar d-flex flex-wrap justify-content-between align-items-start gap-12 m-b-24"
+      >
+        <div>
+          <h3 class="notification-detail-title m-b-8 m-t-0">
+            {{ "Notification details" | translate }}
+          </h3>
+          <p class="notification-detail-subtitle m-0">
+            {{ "Summary of this announcement and delivery." | translate }}
+          </p>
+        </div>
+        <a
+          routerLink="/settings/admin-notifications"
+          class="button-icon-outline notification-detail-back"
+        >
+          <span class="f-s-16">{{ "Back" | translate }}</span>
+        </a>
+      </div>
+
+      <div class="notification-detail-meta-grid m-b-24">
+        <div class="notification-detail-meta-item">
+          <span class="notification-detail-meta-label">{{
+            "Status" | translate
+          }}</span>
+          <span [class]="statusPillClass(notification.status)">{{
+            adminStatusLabel(notification.status)
+          }}</span>
+        </div>
+        <div class="notification-detail-meta-item">
+          <span class="notification-detail-meta-label">{{
+            "Type" | translate
+          }}</span>
+          <span class="notification-detail-meta-value text-capitalize">{{
+            notification.type
+          }}</span>
+        </div>
+        <div class="notification-detail-meta-item">
+          <span class="notification-detail-meta-label">{{
+            "Channel" | translate
+          }}</span>
+          <span class="notification-detail-meta-value text-capitalize">{{
+            notification.channel
+          }}</span>
+        </div>
+        <div class="notification-detail-meta-item">
+          <span class="notification-detail-meta-label">{{
+            "Audience" | translate
+          }}</span>
+          <span class="notification-detail-meta-value text-capitalize">{{
+            notification.audienceType
+          }}</span>
+        </div>
+        <div class="notification-detail-meta-item">
+          <span class="notification-detail-meta-label">{{
+            "Created" | translate
+          }}</span>
+          <span class="notification-detail-meta-value">{{
+            notification.createdAt | date : "medium"
+          }}</span>
+        </div>
+        <div class="notification-detail-meta-item" *ngIf="notification.sentAtUtc">
+          <span class="notification-detail-meta-label">{{
+            "Sent" | translate
+          }}</span>
+          <span class="notification-detail-meta-value">{{
+            notification.sentAtUtc | date : "medium"
+          }}</span>
+        </div>
+      </div>
+
+      <div
+        *ngIf="notification.templateKey"
+        class="notification-detail-section m-b-24"
+      >
+        <h4 class="notification-detail-section-title m-t-0 m-b-12">
+          {{ "Template" | translate }}
+        </h4>
+        <p class="notification-detail-template-key m-0">
+          {{ notification.templateKey }}
+        </p>
+      </div>
+
+      <div
+        *ngIf="
+          notification.templateData && objectKeys(notification.templateData).length
+        "
+        class="notification-detail-content-panel m-b-24"
+      >
+        <h4 class="notification-detail-section-title m-t-0 m-b-12">
+          {{ "Content" | translate }}
+        </h4>
+        <dl class="notification-detail-dl m-0">
+          <ng-container *ngIf="notification.templateData['title'] as title">
+            <dt>{{ "Title" | translate }}</dt>
+            <dd>{{ title }}</dd>
+          </ng-container>
+          <ng-container *ngIf="notification.templateData['body'] as body">
+            <dt>{{ "Message" | translate }}</dt>
+            <dd class="notification-detail-body">{{ body }}</dd>
+          </ng-container>
+          <ng-container
+            *ngIf="notification.templateData['categoryLabel'] as label"
+          >
+            <dt>{{ "Notification label" | translate }}</dt>
+            <dd>{{ label }}</dd>
+          </ng-container>
+        </dl>
+      </div>
+
+      <div *ngIf="notification.deepLink" class="notification-detail-section m-b-24">
+        <h4 class="notification-detail-section-title m-t-0 m-b-12">
+          {{ "Deep link" | translate }}
+        </h4>
+        <code class="notification-detail-code">{{ notification.deepLink }}</code>
+      </div>
+
+      <div
+        *ngIf="notification.targetUserIds?.length"
+        class="notification-detail-section m-b-24"
+      >
+        <h4 class="notification-detail-section-title m-t-0 m-b-12">
+          {{ "Targeted advisors" | translate }}
+        </h4>
+        <p class="notification-detail-meta-value m-0">
+          {{ notification.targetUserIds!.length }}
+          {{ "selected user(s)" | translate }}
+        </p>
+      </div>
+
+      <div *ngIf="notification.deliveryStats as stats" class="m-b-24">
+        <h4 class="notification-detail-section-title m-t-0 m-b-16">
+          {{ "Delivery stats" | translate }}
+        </h4>
+        <div class="notification-detail-stats-row">
+          <div class="notification-detail-stat">
+            <span class="notification-detail-stat-value">{{
+              stats.queued
+            }}</span>
+            <span class="notification-detail-stat-label">{{
+              "Queued" | translate
+            }}</span>
+          </div>
+          <div class="notification-detail-stat">
+            <span class="notification-detail-stat-value">{{ stats.sent }}</span>
+            <span class="notification-detail-stat-label">{{
+              "Sent" | translate
+            }}</span>
+          </div>
+          <div class="notification-detail-stat">
+            <span class="notification-detail-stat-value">{{
+              stats.delivered ?? 0
+            }}</span>
+            <span class="notification-detail-stat-label">{{
+              "Delivered" | translate
+            }}</span>
+          </div>
+          <div class="notification-detail-stat">
+            <span
+              class="notification-detail-stat-value"
+              [class.notification-detail-stat-value--warn]="stats.failed > 0"
+              >{{ stats.failed }}</span
+            >
+            <span class="notification-detail-stat-label">{{
+              "Failed" | translate
+            }}</span>
+          </div>
+        </div>
+        <p
+          *ngIf="stats.failed > 0"
+          class="notification-detail-delivery-note m-0 m-t-16"
+        >
+          {{ "Notification delivery failed hint" | translate }}
+        </p>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

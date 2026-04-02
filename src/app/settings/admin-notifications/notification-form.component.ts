@@ -1,7 +1,16 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import {
+  AbstractControl,
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  ValidationErrors,
+  ValidatorFn,
+  Validators,
+} from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -9,10 +18,33 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatIconModule } from '@angular/material/icon';
+import { TextFieldModule } from '@angular/cdk/text-field';
 import { TranslateModule } from '@ngx-translate/core';
 import { Subject, debounceTime, distinctUntilChanged, switchMap, of, takeUntil } from 'rxjs';
 import { NotificationsHttpService, CreateNotificationRequest } from './notifications-http.service';
 import { AdvisorsHttpService, AdvisorSearchResult } from './advisors-http.service';
+
+const MAX_MESSAGE_WORDS = 500;
+
+function countWords(value: unknown): number {
+  const s = typeof value === 'string' ? value : '';
+  const t = s.trim();
+  if (!t) return 0;
+  return t.split(/\s+/).filter(Boolean).length;
+}
+
+function maxWordsValidator(max: number): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const n = countWords(control.value);
+    return n > max ? { maxWords: { max, actual: n } } : null;
+  };
+}
+
+/** Required after trim (blocks whitespace-only). */
+function trimmedRequired(control: AbstractControl): ValidationErrors | null {
+  const s = (control.value ?? '').toString().trim();
+  return s.length > 0 ? null : { required: true };
+}
 
 @Component({
   selector: 'app-notification-form',
@@ -28,12 +60,14 @@ import { AdvisorsHttpService, AdvisorSearchResult } from './advisors-http.servic
     MatButtonModule,
     MatAutocompleteModule,
     MatIconModule,
+    TextFieldModule,
     TranslateModule
   ],
   templateUrl: './notification-form.component.html',
   styleUrl: './notification-form.component.scss'
 })
 export class NotificationFormComponent implements OnInit, OnDestroy {
+  readonly maxMessageWords = MAX_MESSAGE_WORDS;
   form: FormGroup;
   searchControl = new FormControl('');
   searchResults: AdvisorSearchResult[] = [];
@@ -49,9 +83,9 @@ export class NotificationFormComponent implements OnInit, OnDestroy {
     private router: Router
   ) {
     this.form = this.fb.group({
-      title: [''],
-      body: [''],
-      categoryLabel: [''],
+      title: ['', Validators.required],
+      body: ['', [Validators.required, maxWordsValidator(MAX_MESSAGE_WORDS)]],
+      categoryLabel: ['', trimmedRequired],
       channel: ['both'],
       audienceType: ['all'],
       scheduledAt: [null],
@@ -116,19 +150,25 @@ export class NotificationFormComponent implements OnInit, OnDestroy {
     this.selectedAdvisors = this.selectedAdvisors.filter((a) => a.userId !== userId);
   }
 
+  get messageWordCount(): number {
+    return countWords(this.form.get('body')?.value);
+  }
+
   submit(): void {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
     const v = this.form.value;
     if (v.audienceType === 'selected' && this.selectedAdvisors.length === 0) {
       return; // Don't submit without selected users
     }
-    const labelTrim = (v.categoryLabel ?? '').trim();
+    const labelTrim = (v.categoryLabel ?? '').trim().slice(0, 64);
     const templateData: Record<string, string> = {
       title: v.title ?? '',
-      body: v.body ?? ''
+      body: v.body ?? '',
+      categoryLabel: labelTrim
     };
-    if (labelTrim) {
-      templateData['categoryLabel'] = labelTrim.slice(0, 64);
-    }
     const req: CreateNotificationRequest = {
       type: 'admin',
       templateKey: 'admin_announcement',

@@ -1,84 +1,266 @@
-<mat-card class="mat-mdc-card mdc-card cardWithShadow mb-20">
-  <mat-card-content class="mat-mdc-card-content">
-    <h4 class="page-title f-w-500 m-b-20">{{ 'Create notification' | translate }}</h4>
-    <form [formGroup]="form" (ngSubmit)="submit()">
-      <mat-form-field appearance="outline" class="w-100">
-        <mat-label>{{ 'Title' | translate }}</mat-label>
-        <input matInput formControlName="title" required>
-      </mat-form-field>
-      <mat-form-field appearance="outline" class="w-100">
-        <mat-label>{{ 'Message' | translate }}</mat-label>
-        <textarea matInput formControlName="body" rows="4" required></textarea>
-      </mat-form-field>
-      <mat-form-field appearance="outline" class="w-100">
-        <mat-label>{{ 'Notification label' | translate }}</mat-label>
-        <input matInput formControlName="categoryLabel" maxlength="64" placeholder="{{ 'Shown next to the date for advisors (e.g. News, Update)' | translate }}">
-        <mat-hint align="end">{{ form.get('categoryLabel')?.value?.length || 0 }}/64</mat-hint>
-      </mat-form-field>
-      <mat-form-field appearance="outline" class="w-100">
-        <mat-label>{{ 'Channel' | translate }}</mat-label>
-        <mat-select formControlName="channel">
-          <mat-option value="both">{{ 'Both' | translate }}</mat-option>
-          <mat-option value="email">{{ 'Email' | translate }}</mat-option>
-          <mat-option value="push">{{ 'Push' | translate }}</mat-option>
-        </mat-select>
-      </mat-form-field>
-      <mat-form-field appearance="outline" class="w-100">
-        <mat-label>{{ 'Audience' | translate }}</mat-label>
-        <mat-select formControlName="audienceType" (selectionChange)="onAudienceChange()">
-          <mat-option value="all">{{ 'All users' | translate }}</mat-option>
-          <mat-option value="selected">{{ 'Selected users' | translate }}</mat-option>
-        </mat-select>
-      </mat-form-field>
-      @if (form.get('audienceType')?.value === 'selected') {
-        <div class="selected-users-section m-b-16">
-          <mat-form-field appearance="outline" class="w-100">
-            <mat-label>{{ 'Search advisors by name or email' | translate }}</mat-label>
-            <input matInput [formControl]="searchControl" [matAutocomplete]="auto" placeholder="{{ 'Type to search...' | translate }}">
-            <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onAdvisorSelected($event)">
-              @if (searchLoading) {
-                <mat-option disabled>{{ 'Loading...' | translate }}</mat-option>
-              } @else if (searchResults.length === 0 && searchControl.value?.length >= 2) {
-                <mat-option disabled>{{ 'No advisors found' | translate }}</mat-option>
-              } @else {
-                @for (a of searchResults; track a.userId) {
-                  <mat-option [value]="a" [disabled]="isSelected(a.userId)">
-                    {{ a.firstName }} {{ a.lastName }} ({{ a.email }})
-                  </mat-option>
-                }
+<div class="notification-form-page">
+  <mat-card class="ibr-new-dashboad-card w-100">
+    <mat-card-content>
+      <h3 class="notification-form-page-title m-b-20">
+        {{ "Create notification" | translate }}
+      </h3>
+      <div class="p-l-24">
+        <form
+          [formGroup]="form"
+          (ngSubmit)="submit()"
+          class="d-flex flex-column gap-16"
+        >
+          <div class="notification-form-row d-flex flex-wrap gap-16">
+            <mat-form-field
+              appearance="outline"
+              class="notification-form-field notification-form-field-grow"
+            >
+              <mat-label>{{ "Title" | translate }}</mat-label>
+              <input matInput formControlName="title" required />
+            </mat-form-field>
+            <mat-form-field
+              appearance="outline"
+              class="notification-form-field notification-form-field-grow"
+            >
+              <mat-label>{{ "Notification label" | translate }}</mat-label>
+              <input
+                matInput
+                formControlName="categoryLabel"
+                maxlength="64"
+                required
+                placeholder="{{
+                  'Shown next to the date for advisors (e.g. News, Update)'
+                    | translate
+                }}"
+              />
+              <mat-hint align="end"
+                >{{ form.get("categoryLabel")?.value?.length || 0 }}/64</mat-hint
+              >
+              @if (
+                form.get("categoryLabel")?.invalid &&
+                (form.get("categoryLabel")?.dirty ||
+                  form.get("categoryLabel")?.touched)
+              ) {
+                <mat-error>
+                  @if (form.get("categoryLabel")?.hasError("required")) {
+                    {{
+                      "Notification label is required" | translate
+                    }}
+                  }
+                </mat-error>
               }
-            </mat-autocomplete>
-          </mat-form-field>
-          @if (selectedAdvisors.length > 0) {
-            <div class="selected-advisors-list m-t-8">
-              <span class="f-s-13 f-w-500 m-b-8 d-block">{{ 'Selected' | translate }}:</span>
-              @for (a of selectedAdvisors; track a.userId) {
-                <span class="advisor-chip">
-                  {{ a.firstName }} {{ a.lastName }}
-                  <button mat-icon-button type="button" (click)="removeAdvisor(a.userId)" class="chip-remove">
-                    <mat-icon>close</mat-icon>
-                  </button>
-                </span>
+            </mat-form-field>
+          </div>
+
+          <div class="notification-form-row d-flex flex-wrap gap-16">
+            <mat-form-field
+              appearance="outline"
+              class="notification-form-field notification-form-field-grow"
+            >
+              <mat-label>{{ "Channel" | translate }}</mat-label>
+              <mat-select formControlName="channel">
+                <mat-select-trigger>
+                  @switch (form.get("channel")?.value) {
+                    @case ("both") {
+                      {{ "Both" | translate }}
+                    }
+                    @case ("email") {
+                      {{ "Email" | translate }}
+                    }
+                    @case ("push") {
+                      {{ "Push" | translate }}
+                    }
+                    @default {
+                      {{ "Both" | translate }}
+                    }
+                  }
+                </mat-select-trigger>
+                <mat-option value="both">{{ "Both" | translate }}</mat-option>
+                <mat-option value="email">{{ "Email" | translate }}</mat-option>
+                <mat-option value="push">{{ "Push" | translate }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field
+              appearance="outline"
+              class="notification-form-field notification-form-field-grow"
+            >
+              <mat-label>{{ "Audience" | translate }}</mat-label>
+              <mat-select
+                formControlName="audienceType"
+                (selectionChange)="onAudienceChange()"
+              >
+                <mat-select-trigger>
+                  @switch (form.get("audienceType")?.value) {
+                    @case ("all") {
+                      {{ "All users" | translate }}
+                    }
+                    @case ("selected") {
+                      {{ "Selected users" | translate }}
+                    }
+                    @default {
+                      {{ "All users" | translate }}
+                    }
+                  }
+                </mat-select-trigger>
+                <mat-option value="all">{{ "All users" | translate }}</mat-option>
+                <mat-option value="selected">{{
+                  "Selected users" | translate
+                }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          @if (form.get("audienceType")?.value === "selected") {
+            <div class="selected-users-section">
+              <mat-form-field
+                appearance="outline"
+                class="notification-form-field w-100"
+              >
+                <mat-label>{{
+                  "Search advisors by name or email" | translate
+                }}</mat-label>
+                <input
+                  matInput
+                  [formControl]="searchControl"
+                  [matAutocomplete]="auto"
+                  placeholder="{{ 'Type to search...' | translate }}"
+                />
+                <mat-autocomplete
+                  #auto="matAutocomplete"
+                  (optionSelected)="onAdvisorSelected($event)"
+                >
+                  @if (searchLoading) {
+                    <mat-option disabled>{{
+                      "Loading..." | translate
+                    }}</mat-option>
+                  } @else if (
+                    searchResults.length === 0 &&
+                    searchControl.value?.length >= 2
+                  ) {
+                    <mat-option disabled>{{
+                      "No advisors found" | translate
+                    }}</mat-option>
+                  } @else {
+                    @for (a of searchResults; track a.userId) {
+                      <mat-option [value]="a" [disabled]="isSelected(a.userId)">
+                        {{ a.firstName }} {{ a.lastName }} ({{ a.email }})
+                      </mat-option>
+                    }
+                  }
+                </mat-autocomplete>
+              </mat-form-field>
+              @if (selectedAdvisors.length > 0) {
+                <div class="selected-advisors-list m-t-8">
+                  <span class="selected-advisors-label d-block m-b-8">{{
+                    "Selected" | translate
+                  }}</span>
+                  @for (a of selectedAdvisors; track a.userId) {
+                    <span class="advisor-chip">
+                      {{ a.firstName }} {{ a.lastName }}
+                      <button
+                        mat-icon-button
+                        type="button"
+                        (click)="removeAdvisor(a.userId)"
+                        class="chip-remove"
+                      >
+                        <mat-icon>close</mat-icon>
+                      </button>
+                    </span>
+                  }
+                </div>
               }
             </div>
           }
-        </div>
-      }
-      <mat-form-field appearance="outline" class="w-100">
-        <mat-label>{{ 'Schedule (optional)' | translate }}</mat-label>
-        <input matInput formControlName="scheduledAt" type="datetime-local">
-      </mat-form-field>
-      <mat-form-field appearance="outline" class="w-100">
-        <mat-label>{{ 'Deep link (optional)' | translate }}</mat-label>
-        <input matInput formControlName="deepLink" placeholder="/">
-      </mat-form-field>
-      @if (form.get('audienceType')?.value === 'selected' && selectedAdvisors.length === 0) {
-        <p class="text-warning f-s-13 m-b-8">{{ 'Select at least one advisor' | translate }}</p>
-      }
-      <div class="d-flex gap-10 m-t-20">
-        <button mat-raised-button color="primary" type="submit" [disabled]="form.get('audienceType')?.value === 'selected' && selectedAdvisors.length === 0">{{ 'Create' | translate }}</button>
-        <button mat-button type="button" (click)="cancel()">{{ 'Cancel' | translate }}</button>
+
+          <mat-form-field
+            appearance="outline"
+            class="w-100 notification-form-field notification-message-field textarea-wrapper"
+            subscriptSizing="dynamic"
+          >
+            <mat-label>{{ "Message" | translate }}</mat-label>
+            <textarea
+              matInput
+              formControlName="body"
+              cdkTextareaAutosize
+              cdkAutosizeMinRows="4"
+              cdkAutosizeMaxRows="120"
+              required
+            ></textarea>
+            <mat-hint
+              align="end"
+              [class.notification-message-word-hint-over]="
+                messageWordCount > maxMessageWords
+              "
+              >{{ messageWordCount }}/{{ maxMessageWords }}</mat-hint
+            >
+            @if (
+              form.get("body")?.invalid &&
+              (form.get("body")?.dirty || form.get("body")?.touched)
+            ) {
+              <mat-error>
+                @if (form.get("body")?.hasError("required")) {
+                  {{ "Message is required" | translate }}
+                } @else if (form.get("body")?.hasError("maxWords")) {
+                  {{ "Message is limited to 500 words" | translate }}
+                }
+              </mat-error>
+            }
+          </mat-form-field>
+
+          <div class="notification-form-row d-flex flex-wrap gap-16">
+            <mat-form-field
+              appearance="outline"
+              class="notification-form-field notification-form-field-grow"
+            >
+              <mat-label>{{ "Deep link (optional)" | translate }}</mat-label>
+              <input matInput formControlName="deepLink" placeholder="/" />
+            </mat-form-field>
+            <mat-form-field
+              appearance="outline"
+              class="notification-form-field notification-form-field-grow"
+            >
+              <mat-label>{{ "Schedule (optional)" | translate }}</mat-label>
+              <input
+                matInput
+                formControlName="scheduledAt"
+                type="datetime-local"
+              />
+            </mat-form-field>
+          </div>
+
+          @if (
+            form.get("audienceType")?.value === "selected" &&
+            selectedAdvisors.length === 0
+          ) {
+            <p class="notification-form-warning m-0">
+              {{ "Select at least one advisor" | translate }}
+            </p>
+          }
+
+          <div
+            class="notification-form-actions d-flex flex-wrap align-items-center gap-12"
+          >
+            <button
+              type="submit"
+              class="button-icon"
+              [disabled]="
+                form.invalid ||
+                (form.get('audienceType')?.value === 'selected' &&
+                  selectedAdvisors.length === 0)
+              "
+            >
+              <span class="f-s-16">{{ "Create" | translate }}</span>
+            </button>
+            <button
+              type="button"
+              class="button-icon-outline"
+              (click)="cancel()"
+            >
+              <span class="f-s-16">{{ "Cancel" | translate }}</span>
+            </button>
+          </div>
+        </form>
       </div>
-    </form>
-  </mat-card-content>
-</mat-card>
+    </mat-card-content>
+  </mat-card>
+</div>
