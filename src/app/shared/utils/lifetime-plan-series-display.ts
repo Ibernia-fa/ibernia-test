@@ -31,29 +31,30 @@ export function formatLifetimePlanSeriesDisplayName(
 ): string {
   const base = series.name;
   if (LIFETIME_PLAN_SERIES_NAME_EXCLUSIONS.has(base)) {
-    return base;
+    return translate.instant(base);
   }
   if ((base ?? '').trim().toLowerCase() === 'cash') {
-    return base;
+    return translate.instant(base);
   }
   if (!client?.partnerDetail) {
-    return base;
+    return translate.instant(base);
   }
   if (series.ownership === undefined || series.ownership === null) {
-    return base;
+    return translate.instant(base);
   }
 
+  const translatedBase = translate.instant(base);
   const o = series.ownership;
   if (o === LifetimePlanPotOwnership.Joint) {
-    return `${base} (${translate.instant('Joint')})`;
+    return `${translatedBase} (${translate.instant('Joint')})`;
   }
   if (o === LifetimePlanPotOwnership.Person1) {
     const n = formatClientPersonDisplayName(client.clientDetails);
-    return `${base} (${n || translate.instant('Client')})`;
+    return `${translatedBase} (${n || translate.instant('Client')})`;
   }
   if (o === LifetimePlanPotOwnership.Person2) {
     const n = formatClientPersonDisplayName(client.partnerDetail);
-    return `${base} (${n || translate.instant('Partner')})`;
+    return `${translatedBase} (${n || translate.instant('Partner')})`;
   }
-  return base;
+  return translatedBase;
 }

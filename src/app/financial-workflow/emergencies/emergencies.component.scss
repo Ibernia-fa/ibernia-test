@@ -320,15 +320,15 @@
     background-color 0.4s ease;
 }
 .gauge-text {
-  font-size: 40px;
+  font-size: 24px;
   font-weight: 700;
-  line-height: none;
+  line-height: 1.2;
   display: flex;
   align-items: baseline;
   .gauge-total {
     font-weight: 500;
     font-size: 24px;
-    line-height: none;
+    line-height: 1.2;
   }
 }
 
