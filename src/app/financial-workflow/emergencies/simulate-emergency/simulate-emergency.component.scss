@@ -70,8 +70,9 @@
   border-radius: 6px;
   gap: 0 !important;
   justify-content: flex-end;
-  margin-top: 8px;
-  margin-bottom: 20px;
+  margin-top: 4px;
+  margin-bottom: 8px;
+  flex-shrink: 0;
 }
 
 .tab-btn {
@@ -139,15 +140,29 @@
   color: #ff9902 !important;
 }
 
+:host ::ng-deep .mdc-dialog__surface {
+  display: flex;
+  flex-direction: column;
+}
+
 :host ::ng-deep .graph-dialog-content.mat-mdc-dialog-content {
   max-height: none;
   overflow: hidden;
   padding-right: 0;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+:host ::ng-deep .graph-dialog-content app-savings-bar-stacked-chart {
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 :host ::ng-deep .graph-dialog-content #chart {
   width: 100%;
-  overflow: hidden;
+  overflow: visible;
 }
 
 :host ::ng-deep .graph-dialog-content .apexcharts-canvas,

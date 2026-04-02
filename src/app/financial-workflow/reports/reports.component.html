@@ -31,7 +31,9 @@
             <h3>
               {{ "Lifetime Plan" | translate }}
             </h3>
-            <p>{{ 'The full picture of your finances over time' | translate }}</p>
+            <p>
+              {{ "The full picture of your finances over time" | translate }}
+            </p>
           </div>
           <!-- <div class="d-flex align-items-center gap-16"> -->
           <!-- Cashflow name (visible when NOT in comparison mode) -->
@@ -109,7 +111,9 @@
                         class="icon-svg"
                       />
                     </span>
-                    <span class="status-text">{{ 'Goals on track and funded' | translate }}</span>
+                    <span class="status-text">{{
+                      "Goals on track and funded" | translate
+                    }}</span>
                   </div>
                 </ng-container>
                 <ng-template #lossTpl>
@@ -147,38 +151,66 @@
               <!-- Insights Section -->
               <div
                 class="ibr-insights-section"
-                *ngIf="insights.length > 0 || insightsLoading || insightsLimitExceeded || insightsLoadAttempted"
+                *ngIf="
+                  insights.length > 0 ||
+                  insightsLoading ||
+                  insightsLimitExceeded ||
+                  insightsLoadAttempted
+                "
               >
-                <div class="d-flex align-items-center justify-content-between m-b-8">
-                  <h3 class="ibr-insights-title m-b-0">{{ 'Insights' | translate }}</h3>
-                  <div class="d-flex align-items-center gap-8" *ngIf="!insightsLoading && insightsLoadAttempted">
-                    <span *ngIf="insightsLimitExceeded" class="text-error f-s-12">{{ 'Daily limit reached' | translate }}</span>
+                <div
+                  class="d-flex align-items-center justify-content-between m-b-8"
+                >
+                  <h3 class="ibr-insights-title m-b-0">
+                    {{ "Insights" | translate }}
+                  </h3>
+                  <div
+                    class="d-flex align-items-center gap-8"
+                    *ngIf="!insightsLoading && insightsLoadAttempted"
+                  >
+                    <span
+                      *ngIf="insightsLimitExceeded"
+                      class="text-error f-s-12"
+                      >{{ "Daily limit reached" | translate }}</span
+                    >
                     <button
                       class="button-icon"
-                      style="padding: 4px 12px; font-size: 12px;"
+                      style="padding: 4px 12px; font-size: 12px"
                       (click)="regenerateInsights()"
                       [disabled]="insightsLoading || insightsLimitExceeded"
                     >
-                      <span>{{ 'Generate New' | translate }}</span>
+                      <span>{{ "Generate New" | translate }}</span>
                     </button>
                   </div>
                 </div>
 
                 <!-- Skeleton loading state -->
                 <div class="ibr-insights-skeleton" *ngIf="insightsLoading">
-                  <div class="ibr-insight-skeleton-card" *ngFor="let _ of [0, 1, 2, 3]">
+                  <div
+                    class="ibr-insight-skeleton-card"
+                    *ngFor="let _ of [0, 1, 2, 3]"
+                  >
                     <div class="skeleton-line skeleton-title"></div>
                     <div class="skeleton-line skeleton-body"></div>
                     <div class="skeleton-line skeleton-body"></div>
-                    <div class="skeleton-line skeleton-body skeleton-body-short"></div>
+                    <div
+                      class="skeleton-line skeleton-body skeleton-body-short"
+                    ></div>
                   </div>
                 </div>
 
                 <p
                   class="f-s-13 text-muted m-t-8 m-b-0"
-                  *ngIf="!insightsLoading && insightsLoadAttempted && insights.length === 0 && !insightsLimitExceeded"
+                  *ngIf="
+                    !insightsLoading &&
+                    insightsLoadAttempted &&
+                    insights.length === 0 &&
+                    !insightsLimitExceeded
+                  "
                 >
-                  {{ 'No insights yet. Click' | translate }} <strong>{{ 'Generate New' | translate }}</strong> {{ 'to analyse this plan.' | translate }}
+                  {{ "No insights yet. Click" | translate }}
+                  <strong>{{ "Generate New" | translate }}</strong>
+                  {{ "to analyse this plan." | translate }}
                 </p>
 
                 <div
@@ -196,26 +228,36 @@
                       <!-- Flag icon (flag_red, flag_orange, flag_green) -->
                       <svg
                         *ngIf="insight.impact !== 'bulb'"
-                        width="20" height="20" viewBox="0 0 20 20" fill="none"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 20 20"
+                        fill="none"
                         style="margin-top: 2px"
                         xmlns="http://www.w3.org/2000/svg"
                       >
                         <path
                           d="M3.33325 12.4993C3.33325 12.4993 4.16659 11.666 6.66659 11.666C9.16659 11.666 10.8333 13.3327 13.3333 13.3327C15.8333 13.3327 16.6666 12.4993 16.6666 12.4993V2.49935C16.6666 2.49935 15.8333 3.33268 13.3333 3.33268C10.8333 3.33268 9.16659 1.66602 6.66659 1.66602C4.16659 1.66602 3.33325 2.49935 3.33325 2.49935V12.4993Z"
                           [attr.stroke]="getInsightStyle(insight).color"
-                          stroke-width="1.875" stroke-linecap="round" stroke-linejoin="round"
+                          stroke-width="1.875"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
                         />
                         <path
                           d="M3.33325 18.3333V12.5"
                           [attr.stroke]="getInsightStyle(insight).color"
-                          stroke-width="1.875" stroke-linecap="round" stroke-linejoin="round"
+                          stroke-width="1.875"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
                         />
                       </svg>
                       <!-- Bulb icon -->
                       <svg
                         *ngIf="insight.impact === 'bulb'"
-                        width="20" height="20" viewBox="0 0 22 21" fill="none"
-                        style="margin-top: 2px"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 22 21"
+                        fill="none"
+                        style="margin-top: -2px"
                         xmlns="http://www.w3.org/2000/svg"
                       >
                         <path
@@ -273,7 +315,9 @@
                           class="icon-svg"
                         />
                       </span>
-                      <span class="status-text">{{ 'Goals on track and funded' | translate }}</span>
+                      <span class="status-text">{{
+                        "Goals on track and funded" | translate
+                      }}</span>
                     </div>
                   </ng-container>
                   <ng-template #lossTpl>
