@@ -4,7 +4,6 @@ import { RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
-import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -20,7 +19,6 @@ import { NotificationsHttpService, NotificationResponse } from './notifications-
     MatCardModule,
     MatTableModule,
     MatButtonModule,
-    MatChipsModule,
     MatIconModule,
     MatTooltipModule,
     TranslateModule
@@ -32,6 +30,7 @@ export class AdminNotificationsComponent implements OnInit {
   dataSource = new MatTableDataSource<NotificationResponse>([]);
   displayedColumns = ['type', 'status', 'channel', 'audienceType', 'createdAt', 'actions'];
   loading = true;
+  loadError = false;
 
   constructor(
     private navItemService: NavItemService,
@@ -47,12 +46,17 @@ export class AdminNotificationsComponent implements OnInit {
 
   load(): void {
     this.loading = true;
+    this.loadError = false;
     this.http.list({}).subscribe({
       next: (list) => {
         this.dataSource.data = list;
         this.loading = false;
+        this.loadError = false;
       },
-      error: () => { this.loading = false; }
+      error: () => {
+        this.loading = false;
+        this.loadError = true;
+      }
     });
   }
 
@@ -72,13 +76,20 @@ export class AdminNotificationsComponent implements OnInit {
     }
   }
 
-  getStatusColor(status: string): string {
-    switch (status) {
-      case 'draft': return 'warn';
-      case 'scheduled': return 'accent';
-      case 'sent': return 'primary';
-      case 'failed': return 'warn';
-      default: return '';
-    }
+  /** CSS classes for status pill in template */
+  statusPillClass(status: string): string {
+    const s = (status ?? '').toLowerCase();
+    const known = ['draft', 'scheduled', 'sent', 'failed', 'partial', 'processing'];
+    const key = known.includes(s) ? s : 'default';
+    return `admin-status-pill status-${key}`;
+  }
+
+  /** Human-readable status (API may return partial when some deliveries failed). */
+  adminStatusLabel(status: string | undefined): string {
+    const raw = (status ?? '').trim();
+    if (!raw) return '';
+    const key = `NOTIFICATION.ADMIN_STATUS.${raw.toLowerCase()}`;
+    const t = this.translate.instant(key);
+    return t !== key ? t : raw;
   }
 }

@@ -1,0 +1,230 @@
+:host {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.notification-detail-page {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  margin: 16px 0 0;
+  padding: 0 16px 24px;
+}
+
+.notification-detail-loading {
+  padding: 48px 24px;
+  text-align: center;
+  color: #5a596e;
+  font-size: 15px;
+}
+
+.notification-detail-not-found {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 48px 24px;
+  text-align: center;
+  color: #5a596e;
+  font-size: 15px;
+}
+
+.notification-detail-title {
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: #1c1c1c;
+}
+
+.notification-detail-subtitle {
+  font-size: 15px;
+  line-height: 1.45;
+  color: #5a596e;
+  max-width: 560px;
+}
+
+.notification-detail-back {
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.notification-detail-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px 24px;
+}
+
+.notification-detail-meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.notification-detail-meta-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.notification-detail-meta-value {
+  font-size: 14px;
+  color: #1c1c1c;
+  font-weight: 500;
+}
+
+.notification-detail-section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1c1c1c;
+}
+
+.notification-detail-template-key {
+  font-size: 14px;
+  color: #4043af;
+  font-weight: 500;
+}
+
+.notification-detail-content-panel {
+  background: #ffffff;
+  border: 1px solid rgba(200, 196, 216, 0.45);
+  border-radius: 12px;
+  padding: 20px 20px 12px;
+}
+
+.notification-detail-dl {
+  dt {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #64748b;
+    margin: 16px 0 6px;
+
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+
+  dd {
+    margin: 0 0 8px;
+    font-size: 14px;
+    color: #1c1c1c;
+    line-height: 1.5;
+  }
+}
+
+.notification-detail-body {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.notification-detail-code {
+  display: block;
+  padding: 12px 14px;
+  background: #f8f9fc;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #4043af;
+  word-break: break-all;
+}
+
+.notification-detail-stats-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.notification-detail-stat {
+  flex: 1 1 120px;
+  min-width: 100px;
+  background: #ffffff;
+  border: 1px solid rgba(200, 196, 216, 0.45);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+}
+
+.notification-detail-stat-value {
+  display: block;
+  font-size: 24px;
+  font-weight: 700;
+  color: #1c1c1c;
+  line-height: 1.2;
+  margin-bottom: 4px;
+
+  &--warn {
+    color: #b45309;
+  }
+}
+
+.notification-detail-stat-label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #64748b;
+}
+
+.notification-detail-delivery-note {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #5a596e;
+  padding: 14px 16px;
+  background: rgba(245, 158, 11, 0.08);
+  border-radius: 10px;
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  max-width: 720px;
+}
+
+// Status pills (match admin list)
+.admin-status-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  width: fit-content;
+}
+
+.admin-status-pill.status-draft {
+  background: rgba(245, 158, 11, 0.16);
+  color: #b45309;
+}
+
+.admin-status-pill.status-scheduled {
+  background: rgba(64, 67, 175, 0.14);
+  color: #4043af;
+}
+
+.admin-status-pill.status-sent {
+  background: rgba(34, 197, 94, 0.16);
+  color: #15803d;
+}
+
+.admin-status-pill.status-partial {
+  background: rgba(245, 158, 11, 0.18);
+  color: #b45309;
+}
+
+.admin-status-pill.status-processing {
+  background: rgba(100, 116, 139, 0.16);
+  color: #475569;
+}
+
+.admin-status-pill.status-failed {
+  background: rgba(239, 68, 68, 0.14);
+  color: #b91c1c;
+}
+
+.admin-status-pill.status-default {
+  background: rgba(100, 116, 139, 0.14);
+  color: #475569;
+}

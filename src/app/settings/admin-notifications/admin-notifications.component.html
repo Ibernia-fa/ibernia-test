@@ -1,61 +1,145 @@
-<mat-card class="mat-mdc-card mdc-card cardWithShadow mb-20">
-  <mat-card-content class="mat-mdc-card-content">
-    <div class="d-flex align-items-center main-header-content">
-      <h4 class="page-title f-w-500">{{ 'Admin Notifications' | translate }}</h4>
-    </div>
-  </mat-card-content>
-</mat-card>
+<div class="admin-notifications-page">
+  <mat-card *ngIf="loading" class="ibr-new-dashboad-card w-100">
+    <mat-card-content class="admin-notifications-loading-inner">
+      <p class="admin-notifications-loading-text m-0">
+        {{ "Loading..." | translate }}
+      </p>
+    </mat-card-content>
+  </mat-card>
 
-<div *ngIf="loading" class="p-20">{{ 'Loading...' | translate }}</div>
+  <mat-card *ngIf="!loading && loadError" class="ibr-new-dashboad-card w-100">
+    <mat-card-content class="admin-notifications-error-inner">
+      <p class="admin-notifications-error-text m-0 m-b-16">
+        {{ "ERROR.FAILED_LOAD_ADMIN_NOTIFICATIONS" | translate }}
+      </p>
+      <button
+        type="button"
+        mat-stroked-button
+        color="primary"
+        (click)="load()"
+        class="admin-notifications-retry-btn"
+      >
+        {{ "LABEL.RETRY" | translate }}
+      </button>
+    </mat-card-content>
+  </mat-card>
 
-<mat-card *ngIf="!loading" class="mat-mdc-card mdc-card cardWithShadow mb-20">
-  <mat-card-content class="mat-mdc-card-content">
-    <div class="d-flex justify-content-between align-items-center m-b-20">
-      <h3 class="f-s-18 f-w-500 m-0">{{ 'Notifications' | translate }}</h3>
-      <a mat-raised-button color="primary" routerLink="create">{{ 'Create notification' | translate }}</a>
-    </div>
-    <table mat-table [dataSource]="dataSource" class="w-100">
-      <ng-container matColumnDef="type">
-        <th mat-header-cell *matHeaderCellDef>{{ 'Type' | translate }}</th>
-        <td mat-cell *matCellDef="let row">{{ row.type }}</td>
-      </ng-container>
-      <ng-container matColumnDef="status">
-        <th mat-header-cell *matHeaderCellDef>{{ 'Status' | translate }}</th>
-        <td mat-cell *matCellDef="let row">
-          <mat-chip [color]="getStatusColor(row.status)">{{ row.status }}</mat-chip>
-        </td>
-      </ng-container>
-      <ng-container matColumnDef="channel">
-        <th mat-header-cell *matHeaderCellDef>{{ 'Channel' | translate }}</th>
-        <td mat-cell *matCellDef="let row">{{ row.channel }}</td>
-      </ng-container>
-      <ng-container matColumnDef="audienceType">
-        <th mat-header-cell *matHeaderCellDef>{{ 'Audience' | translate }}</th>
-        <td mat-cell *matCellDef="let row">{{ row.audienceType }}</td>
-      </ng-container>
-      <ng-container matColumnDef="createdAt">
-        <th mat-header-cell *matHeaderCellDef>{{ 'Created' | translate }}</th>
-        <td mat-cell *matCellDef="let row">{{ row.createdAt | date:'short' }}</td>
-      </ng-container>
-      <ng-container matColumnDef="actions">
-        <th mat-header-cell *matHeaderCellDef>{{ 'Actions' | translate }}</th>
-        <td mat-cell *matCellDef="let row">
-          <a mat-icon-button [routerLink]="['detail', row.id]" matTooltip="View">
-            <mat-icon>visibility</mat-icon>
-          </a>
-          <button *ngIf="row.status === 'draft' || row.status === 'scheduled'" mat-icon-button (click)="send(row.id)" matTooltip="Send now">
-            <mat-icon>send</mat-icon>
-          </button>
-          <button *ngIf="row.status === 'draft'" mat-icon-button (click)="delete(row.id)" matTooltip="Delete">
-            <mat-icon>delete</mat-icon>
-          </button>
-        </td>
-      </ng-container>
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-      <tr class="mat-row" *matNoDataRow>
-        <td class="mat-cell" [attr.colspan]="displayedColumns.length">{{ 'No notifications' | translate }}</td>
-      </tr>
-    </table>
-  </mat-card-content>
-</mat-card>
+  <mat-card *ngIf="!loading && !loadError" class="ibr-new-dashboad-card w-100">
+    <mat-card-content>
+      <h3 class="admin-notifications-page-title m-b-8">
+        {{ "Admin Notifications" | translate }}
+      </h3>
+      <p class="admin-notifications-subtitle m-0 m-b-24">
+        {{ "Create and manage announcements sent to advisors." | translate }}
+      </p>
+
+      <div
+        class="admin-notifications-toolbar d-flex flex-wrap justify-content-between align-items-center gap-12 m-b-20"
+      >
+        <h4 class="admin-notifications-section-title m-0">
+          {{ "Notifications" | translate }}
+        </h4>
+        <a routerLink="create" class="button-icon admin-notifications-create-link">
+          <span class="f-s-16">{{ "Create notification" | translate }}</span>
+        </a>
+      </div>
+
+      <div class="admin-notifications-table-wrap">
+        <table
+          mat-table
+          [dataSource]="dataSource"
+          class="admin-notifications-table w-100"
+        >
+          <ng-container matColumnDef="type">
+            <th mat-header-cell *matHeaderCellDef>
+              {{ "Type" | translate }}
+            </th>
+            <td mat-cell *matCellDef="let row" class="admin-notifications-cell-muted">
+              {{ row.type }}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>
+              {{ "Status" | translate }}
+            </th>
+            <td mat-cell *matCellDef="let row">
+              <span [class]="statusPillClass(row.status)">{{
+                adminStatusLabel(row.status)
+              }}</span>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="channel">
+            <th mat-header-cell *matHeaderCellDef>
+              {{ "Channel" | translate }}
+            </th>
+            <td mat-cell *matCellDef="let row" class="admin-notifications-cell-muted">
+              {{ row.channel }}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="audienceType">
+            <th mat-header-cell *matHeaderCellDef>
+              {{ "Audience" | translate }}
+            </th>
+            <td mat-cell *matCellDef="let row" class="admin-notifications-cell-muted">
+              {{ row.audienceType }}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="createdAt">
+            <th mat-header-cell *matHeaderCellDef>
+              {{ "Created" | translate }}
+            </th>
+            <td mat-cell *matCellDef="let row" class="admin-notifications-cell-date">
+              {{ row.createdAt | date : "medium" }}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef class="admin-notifications-actions-col">
+              {{ "Actions" | translate }}
+            </th>
+            <td mat-cell *matCellDef="let row" class="admin-notifications-actions-col">
+              <div class="admin-notifications-actions">
+                <a
+                  mat-icon-button
+                  [routerLink]="['detail', row.id]"
+                  [matTooltip]="'View' | translate"
+                  class="admin-notifications-icon-btn"
+                >
+                  <mat-icon>visibility</mat-icon>
+                </a>
+                <button
+                  *ngIf="
+                    row.status === 'draft' || row.status === 'scheduled'
+                  "
+                  mat-icon-button
+                  type="button"
+                  (click)="send(row.id)"
+                  [matTooltip]="'Send now' | translate"
+                  class="admin-notifications-icon-btn"
+                >
+                  <mat-icon>send</mat-icon>
+                </button>
+                <button
+                  *ngIf="row.status === 'draft'"
+                  mat-icon-button
+                  type="button"
+                  (click)="delete(row.id)"
+                  [matTooltip]="'Delete' | translate"
+                  class="admin-notifications-icon-btn admin-notifications-icon-btn--danger"
+                >
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+          <tr class="mat-row admin-notifications-empty-row" *matNoDataRow>
+            <td class="mat-cell" [attr.colspan]="displayedColumns.length">
+              {{ "No notifications" | translate }}
+            </td>
+          </tr>
+        </table>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

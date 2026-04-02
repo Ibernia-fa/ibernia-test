@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 export interface NotificationResponse {
   id: string;
@@ -20,7 +21,7 @@ export interface NotificationResponse {
     queued: number;
     sent: number;
     failed: number;
-    delivered: number;
+    delivered?: number;
   };
   failedDeliveries?: { userId: string; channel: string; failureReason: string }[];
 }
@@ -50,7 +51,21 @@ export class NotificationsHttpService {
     if (params?.type) httpParams = httpParams.set('type', params.type);
     if (params?.from) httpParams = httpParams.set('from', params.from);
     if (params?.to) httpParams = httpParams.set('to', params.to);
-    return this.http.get<NotificationResponse[]>(this.baseUrl, { params: httpParams });
+    return this.http.get<unknown>(this.baseUrl, { params: httpParams }).pipe(
+      map((raw) => NotificationsHttpService.coerceNotificationList(raw))
+    );
+  }
+
+  /** MatTableDataSource treats non-arrays as empty; normalize common API wrapper shapes. */
+  private static coerceNotificationList(raw: unknown): NotificationResponse[] {
+    if (Array.isArray(raw)) return raw as NotificationResponse[];
+    if (raw && typeof raw === 'object') {
+      const o = raw as Record<string, unknown>;
+      if (Array.isArray(o['items'])) return o['items'] as NotificationResponse[];
+      if (Array.isArray(o['data'])) return o['data'] as NotificationResponse[];
+      if (Array.isArray(o['value'])) return o['value'] as NotificationResponse[];
+    }
+    return [];
   }
 
   get(id: string): Observable<NotificationResponse> {

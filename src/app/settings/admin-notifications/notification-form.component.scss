@@ -1,26 +1,135 @@
+:host {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+// Use horizontal padding (not margin) with width:100% so the right edge doesn’t sit flush
+// against the viewport when margins would overflow the parent.
+.notification-form-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  margin: 16px 0 0;
+  padding: 0px 5px 0px 24px;
+}
+
+.notification-form-page-title {
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: #1c1c1c;
+}
+
+.notification-form-row {
+  width: 100%;
+  align-items: flex-start;
+}
+
+.notification-form-field-grow {
+  flex: 1 1 280px;
+  min-width: 0;
+}
+
+// Solid white field surface on frosted card (Material internals)
+:host ::ng-deep {
+  .notification-form-field {
+    width: 100%;
+
+    .mat-mdc-text-field-wrapper {
+      background-color: #ffffff !important;
+      border-radius: 8px;
+    }
+
+    .mat-mdc-form-field-focus-overlay {
+      background-color: transparent;
+    }
+
+    // Ensure select value is visible on white (default text was blending with glass theme).
+    .mat-mdc-select-value,
+    .mat-mdc-select-value-text,
+    .mat-mdc-select-trigger {
+      color: #1c1c1c !important;
+      opacity: 1 !important;
+    }
+  }
+}
+
+// Same primary/secondary pattern as Default Assumptions (global .button-icon / .button-icon-outline + disabled in styles.scss).
+.notification-form-actions {
+  margin-top: 8px;
+  padding-top: 4px;
+
+  .button-icon,
+  .button-icon-outline {
+    min-width: 135px;
+  }
+}
+
+.notification-form-warning {
+  font-size: 13px;
+  color: #b45309;
+  line-height: 1.4;
+}
+
+.notification-message-word-hint-over {
+  color: var(--mat-form-field-error-text-color, #f44336);
+}
+
+.notification-message-field {
+  textarea.mat-mdc-input-element {
+    line-height: 1.5;
+    overflow-x: hidden;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+}
+
 .selected-users-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+
+  .selected-advisors-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #5a596e;
+  }
+
   .selected-advisors-list {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
     align-items: center;
   }
+
   .advisor-chip {
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    padding: 4px 8px;
-    background: rgba(0, 0, 0, 0.08);
-    border-radius: 16px;
+    padding: 6px 10px 6px 12px;
+    background: rgba(64, 67, 175, 0.12);
+    color: #4043af;
+    border-radius: 999px;
     font-size: 13px;
+    font-weight: 500;
+
     .chip-remove {
-      width: 20px;
-      height: 20px;
-      line-height: 20px;
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      line-height: 28px;
+      color: #4043af;
+
       mat-icon {
-        font-size: 16px;
-        width: 16px;
-        height: 16px;
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
       }
     }
   }
