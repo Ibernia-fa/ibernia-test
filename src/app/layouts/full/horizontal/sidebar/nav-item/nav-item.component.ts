@@ -8,10 +8,11 @@ import { NavService } from '../../../../../services/nav.service';
 import { TablerIconsModule } from 'angular-tabler-icons';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-horizontal-nav-item',
-    imports: [TablerIconsModule, CommonModule, MatIconModule],
+    imports: [TablerIconsModule, CommonModule, MatIconModule, TranslateModule],
     templateUrl: './nav-item.component.html'
 })
 export class AppHorizontalNavItemComponent implements OnInit {

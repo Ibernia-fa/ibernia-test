@@ -846,5 +846,7 @@
   "EMERGENCIES.TYPE_WILL": "Will",
   "WEALTH.FINANCED_WITH_DEBT": "{{ratio}}% financed with debt",
   "PROFILE.CLIENT_PAGE_TITLE": "{{firstName}} {{lastName}}'s Profile",
-  "PROFILE.AGE_YEARS": "{{age}} years old"
+  "PROFILE.AGE_YEARS": "{{age}} years old",
+  "Protection": "Protection",
+  "Wealth": "Wealth"
 }

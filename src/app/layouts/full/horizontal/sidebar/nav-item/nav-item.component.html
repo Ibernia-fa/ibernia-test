@@ -7,7 +7,7 @@
   }"
 >
   <i-tabler class="routeIcon icon-18" name="{{ item.iconName }}"></i-tabler>
-  {{ item.displayName }}
+  {{ item.displayName | translate }}
   @if(item.children && item.children.length) {
   <span class="down-icon d-flex m-l-auto">
     <mat-icon> expand_more </mat-icon>
