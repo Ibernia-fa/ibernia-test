@@ -403,7 +403,7 @@
               <mat-select formControlName="stoppedIncomeId" placeholder="">
                 @for (income of incomes; track income.id) {
                   <mat-option [value]="income.id">
-                    {{ income.description }}
+                    {{ income.description | translateIncomeExpenseLabel }}
                   </mat-option>
                 }
               </mat-select>

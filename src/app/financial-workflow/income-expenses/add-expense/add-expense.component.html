@@ -2,7 +2,7 @@
   <div class="d-flex flex-column">
     <div class="dialog-header">
       <div class="d-flex align-items-center justify-content-center gap-4">
-        <h3 class="dialog-title text-center">{{ expenseTitle }}</h3>
+        <h3 class="dialog-title text-center">{{ expenseTitle | translateIncomeExpenseLabel }}</h3>
         <ng-container *ngIf="isEditWorkflow && isNameEditable">
           <img
             src="assets/images/svgs/drop-down-edit-2-line.svg"
@@ -50,7 +50,7 @@
                   >
                     @for (expenseType of expenseTypes; track expenseType) {
                       <mat-option [value]="expenseType">{{
-                        expenseType
+                        expenseType | translateIncomeExpenseLabel
                       }}</mat-option>
                     }
                   </mat-select>

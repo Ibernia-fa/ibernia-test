@@ -35,7 +35,7 @@
                   (selectionChange)="onCategoryChange()"
                 >
                   @for (cat of categories; track cat.value) {
-                    <mat-option [value]="cat.value">{{ cat.label }}</mat-option>
+                    <mat-option [value]="cat.value">{{ cat.label | translate }}</mat-option>
                   }
                 </mat-select>
                 <span class="custom-arrow">
@@ -139,7 +139,13 @@
                     hideSingleSelectionIndicator
                   >
                     @for (opt of ownershipOptions; track opt.value) {
-                      <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+                      <mat-option [value]="opt.value">
+                        @if (opt.value === 0) {
+                          {{ 'Joint' | translate }}
+                        } @else {
+                          {{ opt.label }}
+                        }
+                      </mat-option>
                     }
                   </mat-select>
                   <span class="custom-arrow">
