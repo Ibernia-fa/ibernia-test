@@ -81,6 +81,19 @@ export class ClientQuestionnaireComponent implements OnInit, OnDestroy {
 
   @ViewChild('snapContainer') snapContainer!: ElementRef<HTMLDivElement>;
 
+  /** Temporary debug panel — activate with ?debug=1 URL param. Remove after iOS fix is confirmed. */
+  debugMode = false;
+  debugState = {
+    scrollTop: 0,
+    containerHeight: 0,
+    touchStarts: 0,
+    touchMoves: 0,
+    touchEnds: 0,
+    lastDelta: 0,
+    lastDir: 0,
+    preventedCount: 0,
+  };
+
   constructor(
     private route: ActivatedRoute,
     private questionnaireHttpService: QuestionnaireHttpService,
@@ -98,6 +111,10 @@ export class ClientQuestionnaireComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.route.queryParams.subscribe((qp) => {
+      this.debugMode = qp['debug'] === '1';
+    });
+
     setTimeout(() => {
       this.minTimeElapsed = true;
       this.dismissIntroIfReady();
@@ -160,6 +177,9 @@ export class ClientQuestionnaireComponent implements OnInit, OnDestroy {
   /* ─── Scroll tracking & progress ─── */
 
   private touchStartY = 0;
+  private touchLastY = 0;
+  private touchCumulativeDeltaY = 0;
+  private touchMoveCount = 0;
   /**
    * One section change per wheel *burst*: trackpads emit many wheel events in one flick. A fixed ms gap
    * still allows N steps in a long gesture; instead, consume one step per burst and reset after wheel
@@ -226,6 +246,11 @@ export class ClientQuestionnaireComponent implements OnInit, OnDestroy {
     if (maxScroll > 0) {
       this.currentIndex = Math.round(el.scrollTop / sectionHeight);
       this.progressPercent = (el.scrollTop / maxScroll) * 100;
+    }
+
+    if (this.debugMode) {
+      this.debugState.scrollTop = Math.round(el.scrollTop);
+      this.debugState.containerHeight = Math.round(el.clientHeight);
     }
   }
 
@@ -440,19 +465,42 @@ export class ClientQuestionnaireComponent implements OnInit, OnDestroy {
 
     el.addEventListener('touchstart', (e: TouchEvent) => {
       this.touchStartY = e.touches[0].clientY;
+      this.touchLastY = this.touchStartY;
+      this.touchCumulativeDeltaY = 0;
+      this.touchMoveCount = 0;
+      if (this.debugMode) {
+        this.debugState.touchStarts++;
+      }
     }, { passive: true });
 
     el.addEventListener('touchmove', (e: TouchEvent) => {
+      const currentY = e.touches[0].clientY;
+      this.touchCumulativeDeltaY += this.touchLastY - currentY;
+      this.touchLastY = currentY;
+      this.touchMoveCount++;
       if (!this.isInsideScrollableChild(e.target as HTMLElement)) {
         e.preventDefault();
+        if (this.debugMode) { this.debugState.preventedCount++; }
+      }
+      if (this.debugMode) {
+        this.debugState.touchMoves++;
       }
     }, { passive: false });
 
     el.addEventListener('touchend', (e: TouchEvent) => {
+      if (this.debugMode) {
+        this.debugState.touchEnds++;
+      }
       if (this.showIntro || this.errorMessage) return;
       if (this.submitted && !this.successViewLocked) return;
 
-      const deltaY = this.touchStartY - e.changedTouches[0].clientY;
+      const endpointDelta = this.touchStartY - e.changedTouches[0].clientY;
+      const deltaY = this.touchMoveCount > 0 ? this.touchCumulativeDeltaY : endpointDelta;
+      if (this.debugMode) {
+        this.debugState.lastDelta = Math.round(deltaY);
+        this.debugState.lastDir = deltaY > 0 ? 1 : deltaY < 0 ? -1 : 0;
+        this.cdr.detectChanges();
+      }
       if (Math.abs(deltaY) <= 40) return;
 
       const dir = deltaY > 0 ? 1 : -1;

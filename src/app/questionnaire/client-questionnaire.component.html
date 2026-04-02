@@ -275,4 +275,17 @@
       </div>
     }
   }
+
+  <!-- Temporary debug panel — remove after iOS scroll fix is confirmed -->
+  @if (debugMode) {
+    <div class="debug-panel">
+      <strong>iOS Debug</strong>
+      <span>idx: {{ currentIndex }}/{{ totalSections }}</span>
+      <span>scrollTop: {{ debugState.scrollTop }}</span>
+      <span>height: {{ debugState.containerHeight }}</span>
+      <span>delta: {{ debugState.lastDelta }} dir: {{ debugState.lastDir }}</span>
+      <span>ts/tm/te: {{ debugState.touchStarts }}/{{ debugState.touchMoves }}/{{ debugState.touchEnds }}</span>
+      <span>prevented: {{ debugState.preventedCount }}</span>
+    </div>
+  }
 </div>
