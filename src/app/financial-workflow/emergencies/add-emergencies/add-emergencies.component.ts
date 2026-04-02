@@ -29,6 +29,7 @@ import { allCountries } from 'src/app/clients/models/country';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MaterialModule } from 'src/app/material.module';
+import { getAmountCycleLabel } from 'src/app/shared/utils/amount-cycle-label';
 
 export interface AddEmergencyDialogData {
   mode: 'add' | 'edit';
@@ -420,5 +421,9 @@ export class AddEmergenciesComponent {
 
   get isDeleteEnabled(): boolean {
     return !this.isDefaultEmergency;
+  }
+
+  getCycleLabel(cycle: { id: string; description: string }): string {
+    return getAmountCycleLabel(cycle, this.translate);
   }
 }
