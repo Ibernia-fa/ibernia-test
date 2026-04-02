@@ -178,16 +178,12 @@
                   class="notification-center-item notification-item"
                   (click)="onNotificationClick(n)"
                 >
-                  <div class="d-flex align-items-start w-100">
-                    <div class="notification-avatar-wrapper m-r-12">
-                      <div
-                        class="notification-avatar rounded-circle d-flex align-items-center justify-content-center"
-                        [class.birthday]="n.iconType === 'birthday'"
-                        [class.notification-type-security]="
-                          n.id === mfaReminderId
-                        "
-                      >
-                        @if (n.id === mfaReminderId) {
+                  @if (n.id === mfaReminderId) {
+                    <div class="d-flex align-items-start w-100">
+                      <div class="notification-avatar-wrapper m-r-12">
+                        <div
+                          class="notification-avatar rounded-circle d-flex align-items-center justify-content-center notification-type-security"
+                        >
                           <svg
                             width="24"
                             height="24"
@@ -204,76 +200,73 @@
                               d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"
                             />
                           </svg>
-
-                          <!-- <img
-                            class="notification-row-type-icon"
-                            src="assets/images/logos/security.png"
-                            width="28"
-                            height="28"
-                            alt=""
-                          /> -->
-                        } @else if (n.iconType === "birthday") {
-                          <img
-                            class="notification-row-type-icon"
-                            src="assets/images/logos/birthday.png"
-                            width="28"
-                            height="28"
-                            alt=""
-                          />
-                        } @else {
-                          <!-- <img
-                            class="notification-row-type-icon"
-                            src="assets/images/logos/admin.png"
-                            width="28"
-                            height="28"
-                            alt=""
-                          /> -->
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="#516CE8"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            class="lucide lucide-user-cog-icon lucide-user-cog"
-                          >
-                            <path d="M10 15H6a4 4 0 0 0-4 4v2" />
-                            <path d="m14.305 16.53.923-.382" />
-                            <path d="m15.228 13.852-.923-.383" />
-                            <path d="m16.852 12.228-.383-.923" />
-                            <path d="m16.852 17.772-.383.924" />
-                            <path d="m19.148 12.228.383-.923" />
-                            <path d="m19.53 18.696-.382-.924" />
-                            <path d="m20.772 13.852.924-.383" />
-                            <path d="m20.772 16.148.924.383" />
-                            <circle cx="18" cy="15" r="3" />
-                            <circle cx="9" cy="7" r="4" />
-                          </svg>
-                        }
+                        </div>
                       </div>
+                      <p class="notification-item-preview m-0 m-b-4">
+                        {{
+                          (n.preview | translate: (n.previewParams || {}))
+                            | capitalizeFirst
+                        }}
+                      </p>
                     </div>
-                    <p class="notification-item-preview m-0 m-b-4">
-                      {{
-                        (n.preview | translate: (n.previewParams || {}))
-                          | capitalizeFirst
-                      }}
-                    </p>
                   } @else {
-                    <div
-                      class="notification-item-title-row d-flex align-items-center justify-content-between gap-8 m-b-4 w-100 min-w-0"
-                    >
-                      <div
-                        class="notification-item-title line-clamp-1 min-w-0 flex-grow-1"
-                      >
-                        {{ n.title | capitalizeFirst }}
+                    <div class="d-flex align-items-start w-100">
+                      <div class="notification-avatar-wrapper m-r-12">
+                        <div
+                          class="notification-avatar rounded-circle d-flex align-items-center justify-content-center"
+                          [class.birthday]="n.iconType === 'birthday'"
+                        >
+                          @if (n.iconType === "birthday") {
+                            <img
+                              class="notification-row-type-icon"
+                              src="assets/images/logos/birthday.png"
+                              width="28"
+                              height="28"
+                              alt=""
+                            />
+                          } @else {
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="24"
+                              height="24"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="#516CE8"
+                              stroke-width="2"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              class="lucide lucide-user-cog-icon lucide-user-cog"
+                            >
+                              <path d="M10 15H6a4 4 0 0 0-4 4v2" />
+                              <path d="m14.305 16.53.923-.382" />
+                              <path d="m15.228 13.852-.923-.383" />
+                              <path d="m16.852 12.228-.383-.923" />
+                              <path d="m16.852 17.772-.383.924" />
+                              <path d="m19.148 12.228.383-.923" />
+                              <path d="m19.53 18.696-.382-.924" />
+                              <path d="m20.772 13.852.924-.383" />
+                              <path d="m20.772 16.148.924.383" />
+                              <circle cx="18" cy="15" r="3" />
+                              <circle cx="9" cy="7" r="4" />
+                            </svg>
+                          }
+                        </div>
+                      </div>
+                      <div class="flex-grow-1 min-w-0">
+                        <div
+                          class="notification-item-title-row d-flex align-items-center justify-content-between gap-8 m-b-4 w-100 min-w-0"
+                        >
+                          <div
+                            class="notification-item-title line-clamp-1 min-w-0 flex-grow-1"
+                          >
+                            {{ n.title | capitalizeFirst }}
+                          </div>
+                        </div>
+                        <p class="notification-item-preview m-0 m-b-4">
+                          {{ n.preview | capitalizeFirst }}
+                        </p>
                       </div>
                     </div>
-                    <p class="notification-item-preview m-0 m-b-4">
-                      {{ n.preview | capitalizeFirst }}
-                    </p>
                   }
                   <div class="d-flex align-items-center gap-8">
                     <span class="notification-item-meta">{{
