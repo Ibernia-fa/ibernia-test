@@ -4,7 +4,13 @@
     <!-- Header -->
     <div class="dialog-header">
       <h2 class="dialog-title text-center" style="text-transform: none;">
-        Simulation - {{ emergency.name }}
+        {{
+          'EMERGENCIES.SIMULATION_TITLE'
+            | translate
+              : {
+                  name: getEmergencyLabel(emergency),
+                }
+        }}
       </h2>
       <button
         type="button"
@@ -65,7 +71,7 @@
                 >
                   @for (cycle of amountCycles; track cycle) {
                     <mat-option [value]="cycle.id">{{
-                      cycle.description
+                      getCycleLabel(cycle)
                     }}</mat-option>
                   }
                 </mat-select>
@@ -98,9 +104,9 @@
               style="line-height: 16px !important"
             >
               @if (showStartEnd) {
-                {{ "Start & end" }}
+                {{ "Start & end" | translate }}
               } @else {
-                {{ "Date" }}
+                {{ "Date" | translate }}
               }
               <img
                 src="assets/images/svgs/help-circle-icon.svg"
@@ -120,7 +126,7 @@
                     >
                       @if (eventsList.length > 0) {
                         <mat-option [value]="currentYear"
-                          >This year ({{ currentYear }})</mat-option
+                          >{{ 'LABEL.THIS_YEAR' | translate }} ({{ currentYear }})</mat-option
                         >
                         <hr />
                       }
@@ -375,7 +381,7 @@
             class="example-margin"
             formControlName="stopIncome"
           >
-            Stop income
+            {{ 'EMERGENCIES.STOP_INCOME' | translate }}
           </mat-checkbox>
           @if (
             simulateEmergencyForm.get("stopIncome")?.touched &&
@@ -467,7 +473,13 @@
     <!-- Header -->
     <div class="dialog-header">
       <h2 class="dialog-title text-center" style="text-transform: none;">
-        Simulation - {{ emergency.name }}
+        {{
+          'EMERGENCIES.SIMULATION_TITLE'
+            | translate
+              : {
+                  name: getEmergencyLabel(emergency),
+                }
+        }}
       </h2>
       <button
         type="button"

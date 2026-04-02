@@ -38,7 +38,7 @@
                 </svg>
 
                 <h3 class="ibr-card-title">
-                  Available to invest
+                  {{ 'LABEL.AVAILABLE_TO_INVEST' | translate }}
                   <!-- {{ "Total" | translate }} -->
                 </h3>
               </div>
@@ -300,7 +300,7 @@
                     *matHeaderCellDef
                     class="text-center mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-action"
                   >
-                    Action
+                    {{ 'LABEL.ACTION' | translate }}
                   </th>
                   <td mat-cell class="column-action" *matCellDef="let element">
                     @if (element.sourceIncomeId) {
@@ -564,7 +564,7 @@
                     *matHeaderCellDef
                     class="text-center f-w-400 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-action"
                   >
-                    Action
+                    {{ 'LABEL.ACTION' | translate }}
                   </th>
                   <td mat-cell class="column-action" *matCellDef="let element">
                     <div

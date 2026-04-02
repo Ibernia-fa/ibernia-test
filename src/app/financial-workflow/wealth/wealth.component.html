@@ -78,7 +78,13 @@
                   >{{ s.netWorth | number: "1.0-0" }}
                 </h3>
                 <p class="stat-subtext">
-                  {{ s.debtRatio }}% financed with debt
+                  {{
+                    'WEALTH.FINANCED_WITH_DEBT'
+                      | translate
+                        : {
+                            ratio: s.debtRatio,
+                          }
+                  }}
                 </p>
               </div>
               <!-- Per-person breakdown -->
@@ -222,7 +228,7 @@
                 *matHeaderCellDef
                 class="mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-client"
               >
-                Category
+                {{ 'WEALTH.CATEGORY' | translate }}
               </th>
               <td
                 mat-cell
@@ -239,7 +245,7 @@
                 *matHeaderCellDef
                 class="mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-net-amount"
               >
-                Ownership
+                {{ 'Ownership' | translate }}
               </th>
               <td
                 mat-cell
@@ -261,7 +267,7 @@
                 *matHeaderCellDef
                 class="mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-net-amount"
               >
-                Value
+                {{ 'WEALTH.VALUE' | translate }}
               </th>
               <td
                 mat-cell
@@ -279,7 +285,7 @@
                 *matHeaderCellDef
                 class="text-center mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-action"
               >
-                Action
+                {{ 'LABEL.ACTION' | translate }}
               </th>
               <td
                 mat-cell
@@ -489,7 +495,7 @@
                 *matHeaderCellDef
                 class="mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-client"
               >
-                Category
+                {{ 'WEALTH.CATEGORY' | translate }}
               </th>
               <td
                 mat-cell
@@ -506,7 +512,7 @@
                 *matHeaderCellDef
                 class="mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-net-amount"
               >
-                Ownership
+                {{ 'Ownership' | translate }}
               </th>
               <td
                 mat-cell
@@ -528,7 +534,7 @@
                 *matHeaderCellDef
                 class="mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-net-amount"
               >
-                Value
+                {{ 'WEALTH.OUTSTANDING_AMOUNT' | translate }}
               </th>
               <td
                 mat-cell
@@ -546,7 +552,7 @@
                 *matHeaderCellDef
                 class="text-center f-w-400 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-action"
               >
-                Action
+                {{ 'LABEL.ACTION' | translate }}
               </th>
               <td
                 mat-cell

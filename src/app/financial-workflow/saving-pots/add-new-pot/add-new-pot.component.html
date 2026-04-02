@@ -423,10 +423,10 @@
                       hideSingleSelectionIndicator
                     >
                       <mat-option [value]="1">{{
-                        "Every month" | translate
+                        "CYCLE.EVERY_MONTH" | translate
                       }}</mat-option>
                       <mat-option [value]="3">{{
-                        "Every year" | translate
+                        "CYCLE.EVERY_YEAR" | translate
                       }}</mat-option>
                     </mat-select>
                     <span class="custom-arrow">
@@ -673,7 +673,7 @@
                             >
                               @if (eventsList.length > 0) {
                                 <mat-option [value]="currentYear"
-                                  >This year ({{ currentYear }})</mat-option
+                                  >{{ 'LABEL.THIS_YEAR' | translate }} ({{ currentYear }})</mat-option
                                 >
                                 <hr />
                               }

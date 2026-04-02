@@ -165,6 +165,29 @@ export class EmergenciesComponent implements OnInit {
     this.navItemService.currentRouteName = 'Risk & Insurance';
   }
 
+  getEmergencyLabel(e: Emergency): string {
+    const raw = (e?.name || this.getTypeName(e?.type)).toString().trim();
+    if (!raw) return '';
+
+    const normalized = raw.toLowerCase();
+    const key =
+      normalized === 'home'
+        ? 'EMERGENCIES.TYPE_HOME'
+        : normalized === 'life'
+          ? 'EMERGENCIES.TYPE_LIFE'
+          : normalized === 'disability'
+            ? 'EMERGENCIES.TYPE_DISABILITY'
+            : normalized === 'health'
+              ? 'EMERGENCIES.TYPE_HEALTH'
+              : normalized === 'natural hazards'
+                ? 'EMERGENCIES.TYPE_NATURAL_HAZARDS'
+                : normalized === 'will'
+                  ? 'EMERGENCIES.TYPE_WILL'
+                  : null;
+
+    return key ? this.translate.instant(key) : raw;
+  }
+
   ngOnInit(): void {
     this.bindRefreshEmergencies();
     this.bindCoverageAdequacyUpdates();

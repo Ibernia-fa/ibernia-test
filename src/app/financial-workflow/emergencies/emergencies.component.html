@@ -293,7 +293,7 @@
                 <!-- <div [ngClass]="getDotClass(e)"></div> -->
                 <img width="18" [src]="getIconName(e)" alt="" />
                 <span class="ibr-new-card-title">
-                  {{ e.name || getTypeName(e.type) }}
+                  {{ getEmergencyLabel(e) }}
                 </span>
               </div>
 
