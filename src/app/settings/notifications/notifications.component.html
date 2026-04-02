@@ -255,47 +255,70 @@
                         }
                       </div>
                     </div>
-                    <p class="notification-item-preview m-0 m-b-4">
-                      {{
-                        (n.preview | translate: (n.previewParams || {}))
-                          | capitalizeFirst
-                      }}
-                    </p>
-                  } @else {
-                    <div
-                      class="notification-item-title-row d-flex align-items-center justify-content-between gap-8 m-b-4 w-100 min-w-0"
-                    >
-                      <div
-                        class="notification-item-title line-clamp-1 min-w-0 flex-grow-1"
-                      >
-                        {{ n.title | capitalizeFirst }}
+                    <div class="flex-grow-1 min-w-0">
+                      @if (n.id === mfaReminderId) {
+                        <div
+                          class="notification-item-title-row d-flex align-items-center justify-content-between gap-8 m-b-4 w-100 min-w-0"
+                        >
+                          <div
+                            class="notification-item-title line-clamp-1 min-w-0 flex-grow-1"
+                          >
+                            {{ (n.title | translate) | capitalizeFirst }}
+                          </div>
+                          @if (shouldShowNewLabel(n)) {
+                            <span class="notification-new-label flex-shrink-0">{{
+                              "New" | translate
+                            }}</span>
+                          }
+                        </div>
+                        <p class="notification-item-preview m-0 m-b-4">
+                          {{
+                            (n.preview | translate: (n.previewParams || {}))
+                              | capitalizeFirst
+                          }}
+                        </p>
+                      } @else {
+                        <div
+                          class="notification-item-title-row d-flex align-items-center justify-content-between gap-8 m-b-4 w-100 min-w-0"
+                        >
+                          <div
+                            class="notification-item-title line-clamp-1 min-w-0 flex-grow-1"
+                          >
+                            {{ n.title | capitalizeFirst }}
+                          </div>
+                          @if (shouldShowNewLabel(n)) {
+                            <span class="notification-new-label flex-shrink-0">{{
+                              "New" | translate
+                            }}</span>
+                          }
+                        </div>
+                        <p class="notification-item-preview m-0 m-b-4">
+                          {{ n.preview | capitalizeFirst }}
+                        </p>
+                      }
+                      <div class="d-flex align-items-center gap-8">
+                        <span class="notification-item-meta">{{
+                          n.sentAtUtc | date: "mediumDate"
+                        }}</span>
+                        <span
+                          class="notification-type-pill"
+                          [class.birthday]="n.iconType === 'birthday'"
+                          [class.notification-type-security]="
+                            n.id === mfaReminderId
+                          "
+                        >
+                          @if (n.id === mfaReminderId) {
+                            {{ ("Security" | translate) | capitalizeFirst }}
+                          } @else if (n.iconType === "birthday") {
+                            {{ ("Birthday" | translate) | capitalizeFirst }}
+                          } @else if (n.categoryLabel?.trim()) {
+                            {{ n.categoryLabel.trim() | capitalizeFirst }}
+                          } @else {
+                            {{ ("News" | translate) | capitalizeFirst }}
+                          }
+                        </span>
                       </div>
                     </div>
-                    <p class="notification-item-preview m-0 m-b-4">
-                      {{ n.preview | capitalizeFirst }}
-                    </p>
-                  }
-                  <div class="d-flex align-items-center gap-8">
-                    <span class="notification-item-meta">{{
-                      n.sentAtUtc | date: "mediumDate"
-                    }}</span>
-                    <span
-                      class="notification-type-pill"
-                      [class.birthday]="n.iconType === 'birthday'"
-                      [class.notification-type-security]="
-                        n.id === mfaReminderId
-                      "
-                    >
-                      @if (n.id === mfaReminderId) {
-                        {{ ("Security" | translate) | capitalizeFirst }}
-                      } @else if (n.iconType === "birthday") {
-                        {{ ("Birthday" | translate) | capitalizeFirst }}
-                      } @else if (n.categoryLabel?.trim()) {
-                        {{ n.categoryLabel.trim() | capitalizeFirst }}
-                      } @else {
-                        {{ ("News" | translate) | capitalizeFirst }}
-                      }
-                    </span>
                   </div>
                 </button>
                 @if (!last) {
