@@ -425,7 +425,7 @@ export class FullComponent implements OnInit, OnDestroy {
     this.resetCollapsedState();
   }
 
-  resetCollapsedState(timer = 400) {
+  resetCollapsedState(timer = 320) {
     setTimeout(() => {
       const o = this.settings.getOptions();
       this.settings.setOptions({ ...o });
