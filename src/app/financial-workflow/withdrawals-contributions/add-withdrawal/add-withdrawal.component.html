@@ -28,7 +28,7 @@
           <div class="d-flex flex-column gap-8">
             <div class="d-flex gap-4 align-items-center">
               <mat-label class="f-s-16 f-w-500 ibr-black d-block"
-                >Withdraw from saving pot</mat-label
+                >{{ 'Withdraw from saving pot' | translate }}</mat-label
               >
               <img
                 width="18"
@@ -126,7 +126,7 @@
                 >
                   @for (cycle of cycles; track cycle) {
                     <mat-option [value]="cycle.id">{{
-                      cycle.description
+                      getCycleLabel(cycle)
                     }}</mat-option>
                   }
                 </mat-select>
@@ -161,9 +161,9 @@
                 style="line-height: 16px"
               >
                 @if (showStartEnd) {
-                  Start & end
+                  {{ 'Start & end' | translate }}
                 } @else {
-                  Date
+                  {{ 'Date' | translate }}
                 }
               </mat-label>
               <img
@@ -185,7 +185,7 @@
                     >
                       @if (isEditWorkflow || eventsList?.length > 0) {
                         <mat-option [value]="currentYear"
-                          >This year ({{ currentYear }})</mat-option
+                          >{{ 'LABEL.THIS_YEAR' | translate }} ({{ currentYear }})</mat-option
                         >
                       }
                       @for (event of eventsList; track event) {
@@ -252,7 +252,7 @@
                           currentYear >= getStartYear()
                         ) {
                           <mat-option [value]="currentYear"
-                            >This year ({{ currentYear }})</mat-option
+                            >{{ 'LABEL.THIS_YEAR' | translate }} ({{ currentYear }})</mat-option
                           >
                         }
                         @for (event of getEndEvents(); track event.id) {
@@ -301,7 +301,7 @@
                       withdrawalForm.get("end")?.hasError("endBeforeStart")
                     ) {
                       <span class="field-error d-block"
-                        >End year cannot be before start year</span
+                        >{{ 'End year cannot be before start year' | translate }}</span
                       >
                     }
                   </div>
@@ -314,7 +314,7 @@
         <!-- @if(showStartEnd) {
         <div class="w-100 form-field gap-20">
           <div class="w-100 form-field gap-8 ">
-            <mat-label class="f-s-16 f-w-400 d-flex gap-8 align-items-center">Escalation rate <img width="18"
+            <mat-label class="f-s-16 f-w-400 d-flex gap-8 align-items-center">{{ 'Escalation rate' | translate }} <img width="18"
                 src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" /></mat-label>
             <div class="w-100 form-field">
               <div class="select-option">
@@ -335,7 +335,7 @@
 
           @if(selectedEscalationDescription === 'Increases at custom rate') {
           <div class="w-100 form-field gap-8">
-            <mat-label class="f-s-16 d-block">Custom escalation rate</mat-label>
+            <mat-label class="f-s-16 d-block">{{ 'Custom escalation rate' | translate }}</mat-label>
             <mat-form-field appearance="outline" class="w-full w-100 percentage-icon">
               <span matSuffix>%</span>
               <input matInput type="number" formControlName="customEscalationRate" placeholder="0" />
@@ -370,7 +370,7 @@
           class="button-icon w-100 d-block"
         >
           <!-- <span class="f-s-16">{{isEditWorkflow ? 'Save' : 'Add'}} Withdrawal</span> -->
-          <span class="f-s-16">Save</span>
+          <span class="f-s-16">{{ 'Save' | translate }}</span>
         </button>
       </div>
     </div>

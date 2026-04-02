@@ -14,6 +14,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialog } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
+import { TranslateModule } from '@ngx-translate/core';
 import { CurrencySymbolPipe } from 'src/app/pipe/currency-symbol.pipe';
 import { Client, Details } from 'src/app/clients/models/client';
 import { LegacyHttpService } from './services/legacy-http.service';
@@ -40,6 +41,7 @@ import { EditParentEstateComponent } from './edit-parent-estate/edit-parent-esta
     MatMenuModule,
     MatProgressSpinnerModule,
     CurrencySymbolPipe,
+    TranslateModule,
   ],
   templateUrl: './legacy.component.html',
   styleUrl: './legacy.component.scss',

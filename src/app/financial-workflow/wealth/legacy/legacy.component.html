@@ -4,13 +4,13 @@
     <mat-card-content>
       <div class="d-flex align-items-center justify-content-between">
         <div class="d-flex flex-column gap-10">
-          <h3 class="ibr-new-heading">Family Tree</h3>
+          <h3 class="ibr-new-heading">{{ 'Family Tree' | translate }}</h3>
           <p class="ibr-new-subheading">
             Visualize how your wealth flows to each generation
           </p>
         </div>
         <!-- <div>
-          <h2 class="section-title">Family Tree</h2>
+          <h2 class="section-title">{{ 'Family Tree' | translate }}</h2>
           <p class="section-subtitle">
             Visualize how your wealth flows to each generation
           </p>
@@ -21,11 +21,11 @@
             class="button-icon-outline"
             (click)="onOpenBeneficiaryRules()"
           >
-            <span class="f-s-16 f-w-500"> Beneficiary rules</span>
+            <span class="f-s-16 f-w-500"> {{ 'Beneficiary rules' | translate }}</span>
           </button>
 
           <button (click)="onAddMember()" type="button" class="button-icon">
-            <span class="f-s-16 f-w-500"> Add member</span>
+            <span class="f-s-16 f-w-500"> {{ 'Add member' | translate }}</span>
             <img src="assets/images/svgs/add-icon.svg" alt="add-icon" />
           </button>
         </div>
@@ -118,7 +118,7 @@
                 <div class="tax-icon-circle">
                   <mat-icon>account_balance</mat-icon>
                 </div>
-                <div class="tax-badge">Tax</div>
+                <div class="tax-badge">{{ 'Tax' | translate }}</div>
                 <span class="tax-amount">
                   <span class="estate-currency">{{currency | currencySymbol}}</span>{{scenarioResult!.totalTax | number:'1.0-0'}}
                 </span>
@@ -285,7 +285,7 @@
                 <div class="tax-icon-circle">
                   <mat-icon>account_balance</mat-icon>
                 </div>
-                <div class="tax-badge">Tax</div>
+                <div class="tax-badge">{{ 'Tax' | translate }}</div>
                 <span class="tax-amount">
                   <span class="estate-currency">{{currency | currencySymbol}}</span>{{scenarioResult!.totalTax | number:'1.0-0'}}
                 </span>
@@ -391,7 +391,7 @@
             <div class="tax-icon-circle">
               <mat-icon>account_balance</mat-icon>
             </div>
-            <div class="tax-badge">Tax</div>
+            <div class="tax-badge">{{ 'Tax' | translate }}</div>
             <span class="tax-amount">
               <span class="estate-currency">{{currency | currencySymbol}}</span>{{scenarioResult!.totalTax | number:'1.0-0'}}
             </span>
@@ -446,20 +446,20 @@
       <div class="d-flex align-items-center justify-content-between">
         <div class="d-flex flex-wrap gap-24 align-items-center tax-settings-legend">
           <div class="legend-item">
-            <span class="legend-label">Partner tax:</span>
+            <span class="legend-label">{{ 'Partner tax' | translate }}:</span>
             <span class="legend-value">{{ ts.partnerTaxRate }}%</span>
           </div>
           <div class="legend-item">
-            <span class="legend-label">Child tax:</span>
+            <span class="legend-label">{{ 'Child tax' | translate }}:</span>
             <span class="legend-value">{{ ts.childTaxRate }}%</span>
           </div>
           <div class="legend-item">
-            <span class="legend-label">Sibling tax:</span>
+            <span class="legend-label">{{ 'Sibling tax' | translate }}:</span>
             <span class="legend-value">{{ ts.siblingTaxRate }}%</span>
           </div>
         </div>
         <button class="button-icon-outline" (click)="onOpenTaxSettings()">
-          <span class="f-s-16 f-w-500">Edit tax settings</span>
+          <span class="f-s-16 f-w-500">{{ 'Edit tax settings' | translate }}</span>
         </button>
       </div>
     </mat-card-content>

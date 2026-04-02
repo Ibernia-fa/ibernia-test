@@ -6,6 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
+import { TranslateModule } from '@ngx-translate/core';
 import { ToastrService } from 'ngx-toastr';
 import { LegacyHttpService } from '../services/legacy-http.service';
 import { TaxSettingsModel } from '../models/legacy.model';
@@ -23,6 +24,7 @@ import { firstValueFrom } from 'rxjs';
     MatFormFieldModule,
     MatInputModule,
     MatIconModule,
+    TranslateModule,
   ],
   templateUrl: './tax-settings.component.html',
   styleUrl: './tax-settings.component.scss'

@@ -1,0 +1,231 @@
+// Top row: title (left) + tab labels (right); second row: full-width tab panels
+.ai-rec-page {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto auto;
+  align-items: center;
+  column-gap: 24px;
+  row-gap: 16px;
+}
+
+.ai-rec-tabs {
+  display: contents;
+}
+
+.ai-rec-tab-group.mat-mdc-tab-group {
+  display: contents;
+}
+
+// Hoisted grid items (via display:contents on wrappers + tab group)
+.ai-rec-titles {
+  grid-column: 1;
+  grid-row: 1;
+  min-width: 0;
+}
+
+:host ::ng-deep .ai-rec-page .mat-mdc-tab-header {
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: end;
+  align-self: center;
+  width: fit-content;
+  max-width: 100%;
+  flex-shrink: 0;
+}
+
+:host ::ng-deep .ai-rec-page .mat-mdc-tab-body-wrapper {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  min-width: 0;
+}
+
+@media (max-width: 768px) {
+  .ai-rec-page {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+  }
+
+  .ai-rec-titles {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  :host ::ng-deep .ai-rec-page .mat-mdc-tab-header {
+    grid-column: 1;
+    grid-row: 2;
+    justify-self: start;
+    max-width: 100%;
+  }
+
+  :host ::ng-deep .ai-rec-page .mat-mdc-tab-body-wrapper {
+    grid-column: 1;
+    grid-row: 3;
+  }
+}
+
+// Scenario Lab–style tab header (matches graph-tabs / tab-btn)
+.ai-rec-tabs {
+  ::ng-deep .mat-mdc-tab-group {
+    --mdc-secondary-navigation-tab-container-height: 46px;
+  }
+
+  ::ng-deep .mat-mdc-tab-header {
+    border-bottom: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: #ffffff;
+    border-radius: 6px;
+    margin-bottom: 0;
+  }
+
+  ::ng-deep .mat-mdc-tab-label-container {
+    border-bottom: none !important;
+    flex-grow: 0;
+    width: fit-content;
+  }
+
+  ::ng-deep .mat-mdc-tab-list {
+    gap: 0 !important;
+    width: fit-content;
+  }
+
+  ::ng-deep .mdc-tab {
+    flex: 0 0 auto !important;
+    min-width: 100px !important;
+    width: auto;
+    max-width: none;
+    padding: 10px 24px !important;
+    border-radius: 6px;
+    font-family: "Ubuntu", sans-serif !important;
+    font-size: 16px !important;
+    font-weight: 500 !important;
+    line-height: 1.25 !important;
+    color: #5a596e !important;
+    background: white !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition:
+      color 0.25s ease,
+      background-color 0.25s ease,
+      box-shadow 0.25s ease;
+  }
+
+  ::ng-deep .mdc-tab__content {
+    align-items: center !important;
+    justify-content: center !important;
+    height: 100% !important;
+  }
+
+  ::ng-deep .mdc-tab__text-label {
+    color: inherit !important;
+    line-height: 1.25 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    font-size: 16px !important;
+  }
+
+  ::ng-deep .mdc-tab--active {
+    background-color: #4043af !important;
+    color: #fff !important;
+  }
+
+  ::ng-deep .mdc-tab--active .mdc-tab__text-label {
+    color: #fff !important;
+    font-size: 16px !important;
+    font-weight: 400 !important;
+  }
+
+  ::ng-deep .mdc-tab:hover:not(.mdc-tab--active) {
+    color: #5a596e !important;
+    background-color: rgba(0, 0, 0, 0.03) !important;
+  }
+
+  ::ng-deep .mdc-tab-indicator {
+    display: none !important;
+  }
+
+  // Disable MDC + Angular ripple visuals (disableRipple handles mat-ripple; this clears ::before)
+  ::ng-deep .mdc-tab__ripple {
+    display: none !important;
+  }
+
+  ::ng-deep .mat-mdc-tab-ripple {
+    display: none !important;
+  }
+}
+
+
+.description {
+  font-size: 16px;
+  line-height: 24px;
+  color: #5a596e;
+  margin: 0;
+}
+
+// Matches account-preferences `.bio-field-wrapper` textarea / outline treatment
+.ai-rec-textarea-field {
+  ::ng-deep {
+    .mdc-notched-outline {
+      display: none !important;
+    }
+
+    .mat-mdc-form-field {
+      .mat-mdc-text-field-wrapper {
+        background-color: #ffffffb2;
+        backdrop-filter: blur(75px);
+        border-radius: 12px;
+        border: none !important;
+        padding: 0 !important;
+
+        .mat-mdc-form-field-flex {
+          border: none !important;
+          padding: 0 !important;
+
+          .mat-mdc-form-field-infix {
+            padding: 0 !important;
+            overflow: visible !important;
+          }
+        }
+      }
+    }
+
+    .mat-mdc-text-field-wrapper,
+    .mat-mdc-form-field-flex,
+    .mat-mdc-form-field-infix {
+      height: auto !important;
+      max-height: none !important;
+      overflow: visible !important;
+    }
+
+    .mdc-notched-outline__leading,
+    .mdc-notched-outline__notch,
+    .mdc-notched-outline__trailing {
+      border-color: #0000001a !important;
+      border-width: 1px !important;
+    }
+
+    textarea.mat-mdc-input-element {
+      min-height: 220px;
+      max-height: auto !important;
+      height: auto !important;
+      resize: none !important;
+      overflow-y: auto !important;
+      box-sizing: border-box;
+      color: #787889 !important;
+      font-size: 14px;
+      line-height: 18px;
+      padding: 16px;
+    }
+
+    textarea.mat-mdc-input-element::placeholder {
+      color: #787889;
+      opacity: 1;
+      line-height: 18px;
+    }
+  }
+}
+
+.ai-rec-save-btn button{
+  min-width: 135px !important;
+}

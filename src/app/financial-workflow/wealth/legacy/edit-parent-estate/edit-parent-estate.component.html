@@ -41,7 +41,7 @@
         (click)="onCancel()"
         class="button-icon-outline w-100 d-block"
       >
-        <span class="f-s-16">Cancel</span>
+        <span class="f-s-16">{{ 'Cancel' | translate }}</span>
       </button>
     </div>
     <div>
@@ -51,7 +51,7 @@
         [disabled]="form.invalid || isSaving"
         class="button-icon w-100 d-block"
       >
-        <span class="f-s-16">Save</span>
+        <span class="f-s-16">{{ 'Save' | translate }}</span>
       </button>
     </div>
   </div>

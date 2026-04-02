@@ -59,7 +59,7 @@
               @if (
                 form.get("type")?.touched && form.get("type")?.hasError("required")
               ) {
-                <span class="field-error d-block">Required</span>
+                <span class="field-error d-block">{{ 'Required' | translate }}</span>
               }
             </div>
           </div>
@@ -80,7 +80,7 @@
             @if (
               form.get("name")?.touched && form.get("name")?.hasError("required")
             ) {
-              <span class="field-error d-block">Required</span>
+              <span class="field-error d-block">{{ 'Required' | translate }}</span>
             }
           </div>
         }
@@ -125,7 +125,7 @@
             form.get("outstanding")?.touched &&
             form.get("outstanding")?.hasError("required")
           ) {
-            <span class="field-error d-block">Required</span>
+            <span class="field-error d-block">{{ 'Required' | translate }}</span>
           }
         </div>
 
@@ -182,7 +182,7 @@
             (click)="onDelete()"
             [disabled]="isSaving"
           >
-            <span class="f-s-16">Delete</span>
+            <span class="f-s-16">{{ 'Delete' | translate }}</span>
           </button>
         } @else {
           <button
@@ -190,7 +190,7 @@
             class="button-icon-outline w-100 d-block"
             (click)="onCancel()"
           >
-            <span class="f-s-16">Cancel</span>
+            <span class="f-s-16">{{ 'Cancel' | translate }}</span>
           </button>
         }
       </div>
@@ -202,9 +202,9 @@
           [disabled]="form.invalid || isSaving"
         >
           @if (isSaving) {
-            <span class="f-s-16">Saving...</span>
+            <span class="f-s-16">{{ 'Saving...' | translate }}</span>
           } @else {
-            <span class="f-s-16">Save</span>
+            <span class="f-s-16">{{ 'Save' | translate }}</span>
           }
         </button>
       </div>

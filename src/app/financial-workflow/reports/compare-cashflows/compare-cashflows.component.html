@@ -57,7 +57,7 @@
           (click)="save()"
           [disabled]="!selectedOtherId"
         >
-          <span class="f-s-16">Compare</span>
+          <span class="f-s-16">{{ 'Compare' | translate }}</span>
         </button>
       </div>
     </div>
@@ -75,22 +75,22 @@
 
 <!-- <div class="d-flex flex-column gap-32">
       <div class="d-flex align-items-center justify-content-between gap-10 modal-header">
-        <h3>Compare models</h3>
+        <h3>{{ 'Compare models' | translate }}</h3>
         <button (click)="closeDialog()" type="button">
         <img src="assets/images/svgs/close-line-cion.svg" alt="close-line-cion" />
       </button>
       </div>
 
       <div class="custom-body">
-        <p class="f-s-16 m-t-0">Select 2 models to compare</p>
+        <p class="f-s-16 m-t-0">{{ 'Select 2 models to compare' | translate }}</p>
           <div class="d-flex align-items-center border-wraper">
-              <mat-checkbox>Cashflow Simulator #1</mat-checkbox>
+              <mat-checkbox>{{ 'Cashflow Simulator' | translate }} #1</mat-checkbox>
           </div>
              <div class="d-flex align-items-center  border-wraper">
-              <mat-checkbox>Cashflow Simulator #2</mat-checkbox>
+              <mat-checkbox>{{ 'Cashflow Simulator' | translate }} #2</mat-checkbox>
           </div>
  <div class="d-flex align-items-center  border-wraper">
-              <mat-checkbox>Cashflow Simulator #3</mat-checkbox>
+              <mat-checkbox>{{ 'Cashflow Simulator' | translate }} #3</mat-checkbox>
           </div>
           
    </div>
@@ -103,7 +103,7 @@
       </div>
       <div class="col-5">
         <button  type="button"  class="button-icon w-100 d-block">
-          <span class="f-s-16">Save</span>
+          <span class="f-s-16">{{ 'Save' | translate }}</span>
         </button>
       </div>
     </div>

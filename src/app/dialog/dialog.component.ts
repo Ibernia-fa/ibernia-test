@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { TablerIconsModule } from 'angular-tabler-icons';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-dialog',
@@ -12,6 +13,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
     FormsModule,
     TablerIconsModule,
     MatFormFieldModule,
+    TranslateModule,
   ],
   providers: [DatePipe],
   templateUrl: './dialog.component.html',

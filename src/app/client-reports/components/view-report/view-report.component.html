@@ -416,7 +416,7 @@
                                                             class="p-x-24 f-s-14 p-l-0 column-net-amount">
                                                             {{client?.clientDetails?.preferredCurrency |
                                                             currencySymbol}}{{element.amount.amount |
-                                                            thousandSeparator}}/{{element.amount.cycle.description}}
+                                                            thousandSeparator}}/{{element.amount.cycle.description | translate}}
                                                         </td>
                                                     </ng-container>
                                                     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
@@ -457,7 +457,7 @@
                                                             class="p-x-24 f-s-14 p-l-0 column-net-amount">
                                                             {{client?.clientDetails?.preferredCurrency |
                                                             currencySymbol}}{{element.amount.amount |
-                                                            thousandSeparator}}/{{element.amount.cycle.description}}
+                                                            thousandSeparator}}/{{element.amount.cycle.description | translate}}
                                                         </td>
                                                     </ng-container>
 
@@ -535,7 +535,7 @@
                                                             class="p-x-24 f-s-14 p-l-0 column-net-amount">
                                                             {{client?.clientDetails?.preferredCurrency |
                                                             currencySymbol}}{{element.amount.amount |
-                                                            thousandSeparator}}/{{element.amount.cycle.description}}
+                                                            thousandSeparator}}/{{element.amount.cycle.description | translate}}
                                                         </td>
                                                     </ng-container>
                                                     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
@@ -574,7 +574,7 @@
                                                             class="p-x-24 f-s-14 p-l-0 column-net-amount">
                                                             {{client?.clientDetails?.preferredCurrency |
                                                             currencySymbol}}{{element.amount.amount |
-                                                            thousandSeparator}}/{{element.amount.cycle.description}}
+                                                            thousandSeparator}}/{{element.amount.cycle.description | translate}}
                                                         </td>
                                                     </ng-container>
                                                     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
@@ -776,7 +776,7 @@
                                                     <div class="label">{{ 'Status' | translate }}</div>
                                                     <div class="f-w-500 f-s-14"
                                                         [ngClass]="{ 'text-danger': e.willStatus !== 1, 'will-done-text': e.willStatus === 1 }">
-                                                        {{e.willStatus === 1 ? 'Done' : 'Not done'}}
+                                                        {{e.willStatus === 1 ? ('Done' | translate) : ('Not done' | translate)}}
                                                     </div>
                                                 </div>
                                             </ng-container>

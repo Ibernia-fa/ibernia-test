@@ -43,6 +43,7 @@ import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { getAmountCycleLabel } from 'src/app/shared/utils/amount-cycle-label';
 @Component({
   selector: 'app-add-new-pot',
   imports: [
@@ -1318,6 +1319,10 @@ getLockEndEvents(): any[] {
 getLockEndYears(): number[] {
   const startYear = this.getLockStartYear();
   return (this.years ?? []).filter((y) => y >= startYear);
+}
+
+getCycleLabel(cycle: Cycle): string {
+  return getAmountCycleLabel(cycle, this.translate);
 }
 
 }

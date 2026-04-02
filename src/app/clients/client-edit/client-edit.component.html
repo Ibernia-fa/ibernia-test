@@ -57,7 +57,7 @@
           matInput
           [matDatepicker]="picker"
           formControlName="dob"
-          placeholder="DD/MM/YYYY"
+          [placeholder]="'DD/MM/YYYY' | translate"
           inputmode="numeric"
           autocomplete="bday"
           (input)="onDobTyping(dobInput)"
@@ -134,7 +134,7 @@
       >
       <input
         matInput
-        placeholder="email@somedomain.com"
+        [placeholder]="'PLACEHOLDER.EMAIL_EXAMPLE' | translate"
         formControlName="email"
       />
       @if (clientForm.get("email")?.hasError("email")) {
@@ -299,7 +299,7 @@
               matInput
               [matDatepicker]="partnerPicker"
               formControlName="dob"
-              placeholder="DD/MM/YYYY"
+              [placeholder]="'DD/MM/YYYY' | translate"
               inputmode="numeric"
               autocomplete="bday"
               (input)="onPartnerDobTyping(dobPartnerInput)"
@@ -380,7 +380,7 @@
           >
           <input
             matInput
-            placeholder="email@somedomain.com"
+            [placeholder]="'PLACEHOLDER.EMAIL_EXAMPLE' | translate"
             formControlName="email"
           />
           @if (clientForm.get("partner.email")?.hasError("email")) {

@@ -153,72 +153,107 @@
           </svg>
         </div>
       </div>
-      @if (notificationsLoading) {
-        <div class="p-20 text-center ibr-black">
-          {{ ("Loading..." | translate) | capitalizeFirst }}
-        </div>
-      } @else if (filteredNotifications.length === 0) {
-        <div class="p-24 text-center text-muted">
-          {{
-            notifications.length === 0
-              ? (("No notifications" | translate) | capitalizeFirst)
-              : (("No matching notifications" | translate) | capitalizeFirst)
-          }}
-        </div>
-      } @else {
-        <div class="notification-center-list">
-          @for (n of filteredNotifications; track n.id) {
-            <button
-              class="notification-center-item"
-              (click)="onNotificationClick(n)"
-            >
-              <div class="d-flex align-items-start w-100">
-                <div
-                  class="notification-avatar rounded-circle d-flex align-items-center justify-content-center m-r-14"
-                  [class.birthday]="n.iconType === 'birthday'"
-                  [class.notification-type-security]="n.id === mfaReminderId"
+      <div class="ibr-settings-notifications-list">
+        <div class="notification-list-scroll">
+          @if (notificationsLoading) {
+            <div class="notification-list-state">
+              {{ ("Loading..." | translate) | capitalizeFirst }}
+            </div>
+          } @else if (filteredNotifications.length === 0) {
+            <div class="notification-list-state text-muted">
+              {{
+                notifications.length === 0
+                  ? (("No notifications" | translate) | capitalizeFirst)
+                  : (("No matching notifications" | translate) | capitalizeFirst)
+              }}
+            </div>
+          } @else {
+            <div class="notification-center-list">
+              @for (
+                n of filteredNotifications;
+                track n.id;
+                let last = $last
+              ) {
+                <button
+                  class="notification-center-item notification-item"
+                  (click)="onNotificationClick(n)"
                 >
-                  @if (n.id === mfaReminderId) {
-                    <img
-                      class="notification-row-type-icon"
-                      src="assets/images/logos/security.png"
-                      width="28"
-                      height="28"
-                      alt=""
-                    />
-                  } @else if (n.iconType === "birthday") {
-                    <img
-                      class="notification-row-type-icon"
-                      src="assets/images/logos/birthday.png"
-                      width="28"
-                      height="28"
-                      alt=""
-                    />
-                  } @else {
-                    <img
-                      class="notification-row-type-icon"
-                      src="assets/images/logos/admin.png"
-                      width="28"
-                      height="28"
-                      alt=""
-                    />
-                  }
-                </div>
-                <div class="flex-grow-1 min-w-0">
-                  @if (n.id === mfaReminderId) {
-                    <div
-                      class="notification-item-title-row d-flex align-items-center justify-content-between gap-8 m-b-4 w-100 min-w-0"
-                    >
+                  <div class="d-flex align-items-start w-100">
+                    <div class="notification-avatar-wrapper m-r-12">
                       <div
-                        class="notification-item-title line-clamp-1 min-w-0 flex-grow-1"
+                        class="notification-avatar rounded-circle d-flex align-items-center justify-content-center"
+                        [class.birthday]="n.iconType === 'birthday'"
+                        [class.notification-type-security]="
+                          n.id === mfaReminderId
+                        "
                       >
-                        {{ (n.title | translate) | capitalizeFirst }}
+                        @if (n.id === mfaReminderId) {
+                          <svg
+                            width="24"
+                            height="24"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke-width="1.5"
+                            stroke="#FF383C"
+                            class="size-6"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"
+                            />
+                          </svg>
+
+                          <!-- <img
+                            class="notification-row-type-icon"
+                            src="assets/images/logos/security.png"
+                            width="28"
+                            height="28"
+                            alt=""
+                          /> -->
+                        } @else if (n.iconType === "birthday") {
+                          <img
+                            class="notification-row-type-icon"
+                            src="assets/images/logos/birthday.png"
+                            width="28"
+                            height="28"
+                            alt=""
+                          />
+                        } @else {
+                          <!-- <img
+                            class="notification-row-type-icon"
+                            src="assets/images/logos/admin.png"
+                            width="28"
+                            height="28"
+                            alt=""
+                          /> -->
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="#516CE8"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="lucide lucide-user-cog-icon lucide-user-cog"
+                          >
+                            <path d="M10 15H6a4 4 0 0 0-4 4v2" />
+                            <path d="m14.305 16.53.923-.382" />
+                            <path d="m15.228 13.852-.923-.383" />
+                            <path d="m16.852 12.228-.383-.923" />
+                            <path d="m16.852 17.772-.383.924" />
+                            <path d="m19.148 12.228.383-.923" />
+                            <path d="m19.53 18.696-.382-.924" />
+                            <path d="m20.772 13.852.924-.383" />
+                            <path d="m20.772 16.148.924.383" />
+                            <circle cx="18" cy="15" r="3" />
+                            <circle cx="9" cy="7" r="4" />
+                          </svg>
+                        }
                       </div>
-                      @if (shouldShowNewLabel(n)) {
-                        <span class="notification-new-label flex-shrink-0">{{
-                          "New" | translate
-                        }}</span>
-                      }
                     </div>
                     <p class="notification-item-preview m-0 m-b-4">
                       {{
@@ -235,11 +270,6 @@
                       >
                         {{ n.title | capitalizeFirst }}
                       </div>
-                      @if (shouldShowNewLabel(n)) {
-                        <span class="notification-new-label flex-shrink-0">{{
-                          "New" | translate
-                        }}</span>
-                      }
                     </div>
                     <p class="notification-item-preview m-0 m-b-4">
                       {{ n.preview | capitalizeFirst }}
@@ -267,13 +297,17 @@
                       }
                     </span>
                   </div>
-                </div>
-              </div>
-            </button>
-            <mat-divider></mat-divider>
+                </button>
+                @if (!last) {
+                  <mat-divider
+                    class="notification-settings-row-divider"
+                  ></mat-divider>
+                }
+              }
+            </div>
           }
         </div>
-      }
+      </div>
     </mat-card-content>
   </mat-card>
 </div>

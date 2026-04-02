@@ -30,7 +30,7 @@
           <div class="d-flex gap-4 align-items-center">
             <mat-label
               class="f-s-16 f-w-500 d-flex align-items-center ibr-black"
-              >Contribute to saving pot</mat-label
+              >{{ 'Contribute to saving pot' | translate }}</mat-label
             >
             <img
               width="18"
@@ -75,7 +75,7 @@
           <div class="d-flex gap-4 align-items-center">
             <mat-label
               class="f-s-16 f-w-500 d-flex align-items-center ibr-black"
-              >Contribute from</mat-label
+              >{{ 'Contribute from' | translate }}</mat-label
             >
             <img
               width="18"
@@ -91,7 +91,7 @@
               (click)="selectContributionType(1)"
             >
               <span class="dp-radio-circle"></span>
-              <span>Cash</span>
+              <span>{{ 'Cash' | translate }}</span>
             </label>
             <label
               class="dp-radio"
@@ -99,7 +99,7 @@
               (click)="selectContributionType(2)"
             >
               <span class="dp-radio-circle"></span>
-              <span>External</span>
+              <span>{{ 'External' | translate }}</span>
             </label>
             <label
               class="dp-radio"
@@ -108,7 +108,7 @@
               (click)="selectContributionType(3)"
             >
               <span class="dp-radio-circle"></span>
-              <span>Both</span>
+              <span>{{ 'Both' | translate }}</span>
             </label>
           </div>
           <!-- <div class="tabs">
@@ -120,7 +120,7 @@
                   [class.active]="isTypeSelected(1)"
                   (click)="selectContributionType(1)"
                 >
-                  <span [class.active]="isTypeSelected(1)">Cash</span>
+                  <span [class.active]="isTypeSelected(1)">{{ 'Cash' | translate }}</span>
                 </button>
               </div>
               <div class="col-4">
@@ -130,7 +130,7 @@
                   [class.active]="isTypeSelected(2)"
                   (click)="selectContributionType(2)"
                 >
-                  <span [class.active]="isTypeSelected(2)">External</span>
+                  <span [class.active]="isTypeSelected(2)">{{ 'External' | translate }}</span>
                 </button>
               </div>
               <div class="col-4">
@@ -141,7 +141,7 @@
                   [disabled]="isEditWorkflow"
                   (click)="selectContributionType(3)"
                 >
-                  <span [class.active]="isTypeSelected(3)">Both</span>
+                  <span [class.active]="isTypeSelected(3)">{{ 'Both' | translate }}</span>
                 </button>
               </div>
             </div>
@@ -202,7 +202,7 @@
                 >
                   @for (cycle of cycles; track cycle) {
                     <mat-option [value]="cycle.id">{{
-                      cycle.description
+                      getCycleLabel(cycle)
                     }}</mat-option>
                   }
                 </mat-select>
@@ -236,7 +236,7 @@
         <!-- <div class="d-flex flex-column gap-8">
           <div class="w-100 form-field gap-12">
             <div class="d-flex gap-8 align-items-center">
-              <mat-label class="f-s-16 f-w-400 d-block">Date</mat-label>
+              <mat-label class="f-s-16 f-w-400 d-block">{{ 'Date' | translate }}</mat-label>
               <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
             </div>
             <div class="select-option">
@@ -254,9 +254,9 @@
             <div class="d-flex gap-4 align-items-center">
               <mat-label class="f-s-16 f-w-500 ibr-black d-block">
                 @if (showStartEnd) {
-                  Start & end
+                  {{ 'Start & end' | translate }}
                 } @else {
-                  Date
+                  {{ 'Date' | translate }}
                 }
               </mat-label>
               <img
@@ -280,7 +280,7 @@
                       <!-- <mat-icon matPrefix>expand_more</mat-icon> -->
                       @if (isEditWorkflow || eventsList?.length > 0) {
                         <mat-option [value]="currentYear"
-                          >This year ({{ currentYear }})</mat-option
+                          >{{ 'LABEL.THIS_YEAR' | translate }} ({{ currentYear }})</mat-option
                         >
                       }
                       @for (event of eventsList; track event) {
@@ -349,7 +349,7 @@
                           currentYear >= getStartYear()
                         ) {
                           <mat-option [value]="currentYear"
-                            >This year ({{ currentYear }})</mat-option
+                            >{{ 'LABEL.THIS_YEAR' | translate }} ({{ currentYear }})</mat-option
                           >
                         }
                         @for (event of getEndEvents(); track event.id) {
@@ -398,7 +398,7 @@
                       contributionForm.get("end")?.hasError("endBeforeStart")
                     ) {
                       <span class="field-error d-block"
-                        >End year cannot be before start year</span
+                        >{{ 'End year cannot be before start year' | translate }}</span
                       >
                     }
                   </div>
@@ -411,7 +411,7 @@
         <!-- @if(showStartEnd) {
           <div class="w-100 form-field gap-20">
             <div class="w-100 form-field gap-8">
-              <mat-label class="f-s-16 f-w-400 d-flex gap-8 align-items-center">Escalation rate <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" /></mat-label>
+              <mat-label class="f-s-16 f-w-400 d-flex gap-8 align-items-center">{{ 'Escalation rate' | translate }} <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" /></mat-label>
                <div class="w-100 form-field">
                 <div class="select-option">
                     <mat-select formControlName="escalationRate" (selectionChange)="onEscalationRateChange($event)">
@@ -430,7 +430,7 @@
           
           @if(selectedEscalationDescription === 'Increases at custom rate') {
           <div class="w-100 form-field gap-8">
-            <mat-label class="f-s-16 d-block">Custom escalation rate</mat-label>
+            <mat-label class="f-s-16 d-block">{{ 'Custom escalation rate' | translate }}</mat-label>
 
               <mat-form-field  appearance="outline" class="w-full w-100 percentage-icon">
               <span matSuffix>%</span> 
@@ -465,7 +465,7 @@
               isCommissionsChanged(contributionForm.get('commissions')?.value)
             "
           >
-            Add commission
+            {{ 'LABEL.ADD_COMMISSION' | translate }}
           </mat-checkbox>
         </section>
 
@@ -473,7 +473,7 @@
           <div class="d-flex flex-column gap-8">
             <div class="d-flex gap-4 align-items-center">
               <mat-label class="f-s-16 f-w-500 d-block ibr-black"
-                >Commission percentage</mat-label
+                >{{ 'Commission percentage' | translate }}</mat-label
               >
               <img
                 width="18"
@@ -558,7 +558,7 @@
         }
 
         <!-- <mat-checkbox type="checkbox" id="commissions"
-              (change)="isCommissionsChanged(savingsForm.get('commissions')?.value)" formControlName="commissions">Add commissions</mat-checkbox>
+              (change)="isCommissionsChanged(savingsForm.get('commissions')?.value)" formControlName="commissions">{{ 'Add commissions' | translate }}</mat-checkbox>
       </section> -->
       </div>
     </mat-dialog-content>
@@ -582,7 +582,7 @@
           class="button-icon w-100 d-block"
         >
           <!-- <span class="f-s-16">{{isEditWorkflow ? 'Save' : 'Add'}} contribution</span> -->
-          <span class="f-s-16">Save</span>
+          <span class="f-s-16">{{ 'Save' | translate }}</span>
         </button>
       </div>
     </div>

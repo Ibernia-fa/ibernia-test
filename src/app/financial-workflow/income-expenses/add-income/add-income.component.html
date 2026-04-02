@@ -190,7 +190,7 @@
                 >
                   @for (cycle of cycles; let i = $index; track cycle) {
                     <mat-option [value]="cycle.id">{{
-                      cycle.description
+                      getCycleLabel(cycle)
                     }}</mat-option>
                   }
                 </mat-select>
@@ -286,7 +286,7 @@
                   >
                     @for (cycle of cycles; let i = $index; track cycle) {
                       <mat-option [value]="cycle.id">{{
-                        cycle.description
+                        getCycleLabel(cycle)
                       }}</mat-option>
                     }
                   </mat-select>
@@ -328,7 +328,7 @@
                   <mat-label
                     class="f-s-16 f-w-500 ibr-black d-block"
                     style="line-height: 16px"
-                    >Bonus date</mat-label
+                    >{{ 'Bonus date' | translate }}</mat-label
                   >
                   <img
                     width="18"
@@ -398,9 +398,9 @@
                 style="line-height: 16px !important"
               >
                 @if (showStartEnd) {
-                  Start & end
+                  {{ 'Start & end' | translate }}
                 } @else {
-                  Date
+                  {{ 'Date' | translate }}
                 }
               </mat-label>
               <img
@@ -422,7 +422,7 @@
                     >
                       @if (isEditWorkflow || eventsList?.length > 0) {
                         <mat-option [value]="currentYear"
-                          >This year ({{ currentYear }})</mat-option
+                          >{{ 'LABEL.THIS_YEAR' | translate }} ({{ currentYear }})</mat-option
                         >
                       }
                       @for (event of eventsList; track event) {
@@ -528,7 +528,7 @@
                       incomeForm.get("end")?.hasError("endBeforeStart")
                     ) {
                       <span class="field-error d-block"
-                        >End year cannot be before start year</span
+                        >{{ 'End year cannot be before start year' | translate }}</span
                       >
                     }
                   </div>
@@ -766,7 +766,7 @@
                   class="d-flex flex-column gap-8 escalation-field escalation-custom"
                 >
                   <mat-label class="f-s-16 f-w-500 ibr-black d-block"
-                    >Custom escalation rate</mat-label
+                    >{{ 'Custom escalation rate' | translate }}</mat-label
                   >
                   <div class="w-100 form-field custom-rate-input">
                     <input
@@ -849,9 +849,9 @@
           class="button-icon w-100 d-block"
         >
           @if (isSaving) {
-            <span class="f-s-16">Saving...</span>
+            <span class="f-s-16">{{ 'Saving...' | translate }}</span>
           } @else {
-            <span class="f-s-16">Save</span>
+            <span class="f-s-16">{{ 'Save' | translate }}</span>
           }
         </button>
       </div>

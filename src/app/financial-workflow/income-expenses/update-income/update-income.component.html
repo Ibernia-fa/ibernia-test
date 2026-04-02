@@ -2,7 +2,7 @@
   <div class="d-flex flex-column gap-32">
     <!-- Modal Header  -->
     <div class="d-flex align-items-center justify-content-between gap-10 modal-header">
-      <h3>Update Income</h3>
+      <h3>{{ 'Update Income' | translate }}</h3>
       <button (click)="closeDialog()" type="button">
         <img src="assets/images/svgs/close-line-cion.svg" alt="close-line-cion" />
       </button>
@@ -15,7 +15,7 @@
         <!-- >{{ 'Description' | translate }}< Field  -->
         <div class="w-100 form-field gap-12">
           <mat-label class="f-s-16 d-block" style="line-height: 18px">>{{ 'Description' | translate }}<</mat-label>
-          <input matInput formControlName="name" placeholder="e.g. State Pension" />
+          <input matInput formControlName="name" [placeholder]="'State Pension' | translate" />
           <!-- Error  -->
           <!-- <span class="field-error d-block">Name is required</span> -->
           <!-- End Error  -->
@@ -24,17 +24,17 @@
 
         <!-- Modal tabs  -->
         <div class="d-flex flex-column gap-12 tab">
-          <span class="f-s-16 f-w-400">Type</span>
+          <span class="f-s-16 f-w-400">{{ 'Type' | translate }}</span>
           <div class="tabs">
             <div class="row">
               <div class="col-6">
                 <button class="button-icon w-100 active ">
-                  <span class="uppercase active ">Income</span>
+                  <span class="uppercase active ">{{ 'Income' | translate }}</span>
                 </button>
               </div>
               <div class="col-6">
                 <button class="button-icon w-100">
-                  <span >Expense</span>
+                  <span >{{ 'Expense' | translate }}</span>
                 </button>
               </div>
             </div>
@@ -84,7 +84,7 @@
         <div class="start-end">
           <div class="d-flex flex-column gap-12">
             <div class="d-flex gap-8 align-items-center">
-              <mat-label class="f-s-16 f-w-400 d-block">Start & End</mat-label>
+              <mat-label class="f-s-16 f-w-400 d-block">{{ 'Start & end' | translate }}</mat-label>
               <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
             </div>
             <div class="row justify-content-between align-items-start flex-nowrap">
@@ -129,7 +129,7 @@
 
         <div class="w-100 form-field gap-12">
           <div class="d-flex gap-8 align-items-center">
-            <mat-label class="f-s-16 f-w-400 d-block">Escalation rate</mat-label>
+            <mat-label class="f-s-16 f-w-400 d-block">{{ 'Escalation rate' | translate }}</mat-label>
             <img src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
           </div>
           <div class="position-relative">
@@ -137,7 +137,7 @@
               <div class="select-option">
                 <mat-select formControlName="escalationRate" value="Select">
                   <mat-option value="2.5%">{{ inflationRateLabel }}</mat-option>
-                  <mat-option value="0%">Don't increases with inflation</mat-option>
+                  <mat-option value="0%">{{ "Doesn't increase with inflation" | translate }}</mat-option>
                 </mat-select>
               </div>
               <!-- Error  -->
@@ -159,7 +159,7 @@
       </div>
       <div class="col-5">
         <button class="button-icon w-100 d-block">
-          <span class="f-s-16">Save</span>
+          <span class="f-s-16">{{ 'Save' | translate }}</span>
         </button>
       </div>
     </div>

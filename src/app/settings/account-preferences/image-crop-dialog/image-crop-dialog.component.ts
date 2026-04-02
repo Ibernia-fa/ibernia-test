@@ -1,15 +1,20 @@
+import { ChangeDetectorRef, Component, Inject, ViewChild } from '@angular/core';
 import {
-  ChangeDetectorRef,
-  Component,
-  Inject,
-  ViewChild,
-} from '@angular/core';
-import { MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+  MatDialogModule,
+  MAT_DIALOG_DATA,
+  MatDialogRef,
+} from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormsModule } from '@angular/forms';
-import { ImageCropperComponent, ImageCroppedEvent, ImageTransform } from 'ngx-image-cropper';
+import {
+  ImageCropperComponent,
+  ImageCroppedEvent,
+  ImageTransform,
+} from 'ngx-image-cropper';
 import { TranslateModule } from '@ngx-translate/core';
 
 export type CropType = 'profile' | 'company';
@@ -55,6 +60,8 @@ const COMPANY_CROP_H = 300;
   imports: [
     MatDialogModule,
     MatButtonModule,
+    MatFormFieldModule,
+    MatIconModule,
     MatSliderModule,
     MatTooltipModule,
     FormsModule,
@@ -62,15 +69,45 @@ const COMPANY_CROP_H = 300;
     TranslateModule,
   ],
   template: `
-    <h2 mat-dialog-title>{{ (data.title || 'Crop profile photo') | translate }}</h2>
-    <mat-dialog-content class="image-crop-dialog-content">
-      <p class="crop-hint">{{ 'Drag the image to position it.' | translate }}</p>
-      <div class="zoom-control">
-        <label class="zoom-label">{{ 'Zoom' | translate }}</label>
-        <mat-slider [min]="1" [max]="2.5" [step]="0.05">
-          <input matSliderThumb [(ngModel)]="scale" (ngModelChange)="onZoomChange()">
-        </mat-slider>
+    <div class="d-flex flex-column">
+      <div class="dialog-header">
+        <h2 class="dialog-title text-center">
+          {{ data.title || 'Crop profile photo' | translate }}
+        </h2>
+        <button
+          type="button"
+          mat-icon-button
+          disableRipple
+          class="dialog-close-btn"
+          mat-dialog-close
+          aria-label="Close dialog"
+        >
+          <mat-icon>close</mat-icon>
+        </button>
       </div>
+
+      <mat-dialog-content
+        class="event-dialog-content image-crop-dialog-content"
+      >
+        <div class="d-flex flex-column gap-16 image-crop-dialog-body">
+          <p class="crop-hint">
+            {{ 'Drag the image to position it.' | translate }}
+          </p>
+          <div class="zoom-control">
+            <mat-label
+              class="f-s-16 f-w-500 d-block ibr-black zoom-field-label"
+              >{{ 'Zoom' | translate }}</mat-label
+            >
+            <div class="slider-customizer slider-wrapper zoom-slider-wrap">
+              <mat-slider class="w-100" [min]="1" [max]="2.5" [step]="0.05">
+                <input
+                  matSliderThumb
+                  [(ngModel)]="scale"
+                  (ngModelChange)="onZoomChange()"
+                />
+              </mat-slider>
+            </div>
+          </div>
       <div
         class="crop-container"
         [class.crop-container--profile]="data.cropType !== 'company'"
@@ -81,12 +118,16 @@ const COMPANY_CROP_H = 300;
           [imageBase64]="data.imageBase64"
           [maintainAspectRatio]="true"
           [containWithinAspectRatio]="true"
-          [aspectRatio]="data.cropType === 'company' ? (4/3) : 1"
+          [aspectRatio]="data.cropType === 'company' ? 4 / 3 : 1"
           [roundCropper]="data.cropType === 'profile'"
           [allowMoveImage]="true"
           [hideResizeSquares]="true"
-          [cropperStaticWidth]="data.cropType === 'company' ? companyCropW : profileCropPx"
-          [cropperStaticHeight]="data.cropType === 'company' ? companyCropH : profileCropPx"
+          [cropperStaticWidth]="
+            data.cropType === 'company' ? companyCropW : profileCropPx
+          "
+          [cropperStaticHeight]="
+            data.cropType === 'company' ? companyCropH : profileCropPx
+          "
           [transform]="transform"
           format="png"
           output="base64"
@@ -97,86 +138,125 @@ const COMPANY_CROP_H = 300;
           (loadImageFailed)="onLoadFailed()"
         ></image-cropper>
       </div>
-    </mat-dialog-content>
-    <mat-dialog-actions align="end">
-      <button mat-button mat-dialog-close>{{ 'Cancel' | translate }}</button>
-      <button mat-flat-button color="primary" [disabled]="!croppedBase64" (click)="apply()" [matTooltip]="!croppedBase64 ? ('Drag the image to position it.' | translate) : ''">
-        {{ 'Select' | translate }}
-      </button>
-    </mat-dialog-actions>
+        </div>
+      </mat-dialog-content>
+
+      <div class="row justify-content-end gap-16 modal-action p-t-32">
+        <div>
+          <button
+            type="button"
+            mat-dialog-close
+            class="button-icon-outline w-100 d-block"
+          >
+            <span class="f-s-16">{{ 'Cancel' | translate }}</span>
+          </button>
+        </div>
+        <div>
+          <button
+            type="button"
+            [disabled]="!croppedBase64"
+            (click)="apply()"
+            class="button-icon w-100 d-block"
+            [matTooltip]="
+              !croppedBase64 ? ('Drag the image to position it.' | translate) : ''
+            "
+          >
+            <span class="f-s-16">{{ 'Select' | translate }}</span>
+          </button>
+        </div>
+      </div>
+    </div>
   `,
-  styles: [`
-    :host ::ng-deep .image-crop-dialog-content.mat-mdc-dialog-content {
-      overflow-x: hidden !important;
-      overflow-y: hidden !important;
-    }
-    .crop-hint {
-      margin: 0 0 12px 0;
-      font-size: 14px;
-      color: #666;
-    }
-    .zoom-control {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 0;
-    }
-    .zoom-label {
-      font-size: 14px;
-      min-width: 40px;
-    }
-    .zoom-control mat-slider {
-      flex: 1;
-    }
-    .crop-container {
-      margin: 0 auto;
-      overflow: hidden;
-      flex-shrink: 0;
-    }
-    .crop-container--profile {
-      width: min(${PROFILE_VIEWPORT_PX}px, 85vw);
-      aspect-ratio: 1;
-      height: auto;
-    }
-    .crop-container--company {
-      width: min(${COMPANY_CROP_W}px, 92vw);
-      aspect-ratio: 4 / 3;
-      height: auto;
-    }
-    .crop-container ::ng-deep image-cropper {
-      display: block !important;
-      width: 100% !important;
-      height: 100% !important;
-      max-height: none !important;
-      padding: 0 !important;
-      box-sizing: border-box;
-    }
-    .crop-container ::ng-deep image-cropper > div {
-      width: 100%;
-      height: 100%;
-    }
-    /*
+  styles: [
+    `
+      :host ::ng-deep .image-crop-dialog-content.mat-mdc-dialog-content {
+        overflow-x: hidden !important;
+        overflow-y: hidden !important;
+      }
+      .event-dialog-content.image-crop-dialog-content.mat-mdc-dialog-content {
+        margin-top: 24px;
+        padding: 0 !important;
+      }
+      .image-crop-dialog-body {
+        width: 100%;
+      }
+      .crop-hint {
+        margin: 0;
+        font-size: 14px;
+        line-height: 16px;
+        color: #5a596e;
+      }
+      .zoom-field-label {
+        margin: 0;
+      }
+      .zoom-control {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+        width: 100%;
+        margin-bottom: 0;
+      }
+      .zoom-slider-wrap {
+        width: 100% !important;
+        flex: 1 1 auto;
+        min-width: 0;
+        margin-left:9px ;
+      }
+      .zoom-slider-wrap .mat-mdc-slider {
+        width: 100% !important;
+        margin: 0 !important;
+      }
+      .crop-container {
+        margin: 0 auto;
+        overflow: hidden;
+        flex-shrink: 0;
+      }
+      .crop-container--profile {
+        width: min(${PROFILE_VIEWPORT_PX}px, 85vw);
+        aspect-ratio: 1;
+        height: auto;
+      }
+      .crop-container--company {
+        width: min(${COMPANY_CROP_W}px, 92vw);
+        aspect-ratio: 4 / 3;
+        height: auto;
+      }
+      .crop-container ::ng-deep image-cropper {
+        display: block !important;
+        width: 100% !important;
+        height: 100% !important;
+        max-height: none !important;
+        padding: 0 !important;
+        box-sizing: border-box;
+      }
+      .crop-container ::ng-deep image-cropper > div {
+        width: 100%;
+        height: 100%;
+      }
+      /*
      * Do NOT set object-fit / forced 100% width+height on .ngx-ic-source-image: the crop canvas
      * math assumes the same layout ngx computes; CSS letterboxing breaks preview vs export.
      * containWithinAspectRatio pads the bitmap inside ngx so display and crop() stay aligned.
      */
-    .crop-container ::ng-deep .ngx-ic-overlay {
-      box-sizing: border-box;
-    }
-    .crop-container ::ng-deep .ngx-ic-draggable {
-      touch-action: none;
-    }
-    .crop-container ::ng-deep image-cropper,
-    .crop-container ::ng-deep .ngx-ic-source-image,
-    .crop-container ::ng-deep .ngx-ic-draggable {
-      overflow: hidden !important;
-    }
-    /* Fix crop overlay in place - user moves image only, not the crop box */
-    .crop-container ::ng-deep .ngx-ic-overlay,
-    .crop-container ::ng-deep .ngx-ic-cropper {
-      pointer-events: none;
-    }
-  `],
+      .crop-container ::ng-deep .ngx-ic-overlay {
+        box-sizing: border-box;
+      }
+      .crop-container ::ng-deep .ngx-ic-draggable {
+        touch-action: none;
+      }
+      .crop-container ::ng-deep image-cropper,
+      .crop-container ::ng-deep .ngx-ic-source-image,
+      .crop-container ::ng-deep .ngx-ic-draggable {
+        overflow: hidden !important;
+      }
+      /* Fix crop overlay in place - user moves image only, not the crop box */
+      .crop-container ::ng-deep .ngx-ic-overlay,
+      .crop-container ::ng-deep .ngx-ic-cropper {
+        pointer-events: none;
+      }
+    `,
+  ],
 })
 export class ImageCropDialogComponent {
   @ViewChild('cropper') cropperRef?: ImageCropperComponent;
@@ -191,7 +271,10 @@ export class ImageCropDialogComponent {
   readonly companyCropH = COMPANY_CROP_H;
 
   constructor(
-    private dialogRef: MatDialogRef<ImageCropDialogComponent, ImageCropDialogResult | null>,
+    private dialogRef: MatDialogRef<
+      ImageCropDialogComponent,
+      ImageCropDialogResult | null
+    >,
     @Inject(MAT_DIALOG_DATA) public data: ImageCropDialogData,
     private cdr: ChangeDetectorRef,
   ) {
@@ -216,7 +299,10 @@ export class ImageCropDialogComponent {
   }
 
   onZoomChange(): void {
-    this.transform = normalizeTransform({ ...this.transform, scale: this.scale });
+    this.transform = normalizeTransform({
+      ...this.transform,
+      scale: this.scale,
+    });
   }
 
   /** Re-sync transform after layout when reopening so ngx applies pan/zoom to the loaded image. */
@@ -239,7 +325,9 @@ export class ImageCropDialogComponent {
       if (!raw) {
         return;
       }
-      const croppedBase64 = raw.startsWith('data:') ? raw : `data:image/png;base64,${raw}`;
+      const croppedBase64 = raw.startsWith('data:')
+        ? raw
+        : `data:image/png;base64,${raw}`;
       this.dialogRef.close({
         croppedBase64,
         transform: normalizeTransform(this.transform),

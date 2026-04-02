@@ -63,7 +63,7 @@
           <mat-label
             class="f-s-16 f-w-500 d-block ibr-black"
             style="line-height: 16px"
-            >Name</mat-label
+            >{{ 'Name' | translate }}</mat-label
           >
           <input matInput formControlName="name" />
           @if (
@@ -165,7 +165,7 @@
                 hideSingleSelectionIndicator
               >
                 @for (cycle of cycles; track cycle) {
-                  <mat-option [value]="cycle">{{ cycle }}</mat-option>
+                  <mat-option [value]="cycle">{{ cycle | translate }}</mat-option>
                 }
               </mat-select>
               <span class="custom-arrow">
@@ -398,7 +398,7 @@
                         eventForm.get("end")?.hasError("endBeforeStart")
                       ) {
                         <span class="field-error d-block"
-                          >End year cannot be before start year</span
+                          >{{ 'End year cannot be before start year' | translate }}</span
                         >
                       }
                     </div>
@@ -633,7 +633,7 @@
           <mat-label
             class="f-s-16 ibr-black f-w-500 d-block"
             style="line-height: 16px"
-            >Name</mat-label
+            >{{ 'Name' | translate }}</mat-label
           >
           <input matInput formControlName="name" />
           @if (
@@ -849,7 +849,7 @@
                 hideSingleSelectionIndicator
               >
                 @for (cycle of cycles; track cycle) {
-                  <mat-option [value]="cycle">{{ cycle }}</mat-option>
+                  <mat-option [value]="cycle">{{ cycle | translate }}</mat-option>
                 }
               </mat-select>
               <span class="custom-arrow">
@@ -1120,7 +1120,7 @@
                       eventForm.get("monthlyEnd")?.hasError("endBeforeStart")
                     ) {
                       <span class="field-error d-block"
-                        >End year cannot be before start year</span
+                        >{{ 'End year cannot be before start year' | translate }}</span
                       >
                     }
                   </div>
@@ -1364,7 +1364,7 @@
             <mat-label
               class="f-s-16 f-w-500 d-block ibr-black"
               style="line-height: 16px"
-              >Name</mat-label
+              >{{ 'Name' | translate }}</mat-label
             >
             <input matInput formControlName="name" />
             @if (
@@ -1460,7 +1460,7 @@
                   hideSingleSelectionIndicator
                 >
                   @for (cycle of cycles; track cycle) {
-                    <mat-option [value]="cycle">{{ cycle }}</mat-option>
+                    <mat-option [value]="cycle">{{ cycle | translate }}</mat-option>
                   }
                 </mat-select>
 
@@ -1642,7 +1642,7 @@
                         eventForm.get("end")?.hasError("endBeforeStart")
                       ) {
                         <span class="field-error d-block"
-                          >End year cannot be before start year</span
+                          >{{ 'End year cannot be before start year' | translate }}</span
                         >
                       }
                     </div>
@@ -1921,7 +1921,7 @@
                 hideSingleSelectionIndicator
               >
                 @for (cycle of cycles; track cycle) {
-                  <mat-option [value]="cycle">{{ cycle }}</mat-option>
+                  <mat-option [value]="cycle">{{ cycle | translate }}</mat-option>
                 }
               </mat-select>
               <span class="custom-arrow">
@@ -2184,7 +2184,7 @@
                       eventForm.get("monthlyEnd")?.hasError("endBeforeStart")
                     ) {
                       <span class="field-error d-block"
-                        >End year cannot be before start year</span
+                        >{{ 'End year cannot be before start year' | translate }}</span
                       >
                     }
                   </div>

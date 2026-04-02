@@ -1,11 +1,13 @@
 import {
   Component,
+  DestroyRef,
   Inject,
   Optional,
   ViewChild,
   AfterViewInit,
   OnInit,
   OnDestroy,
+  inject,
 } from '@angular/core';
 import {
   MatTableDataSource,
@@ -60,6 +62,7 @@ import { SettingsService } from 'src/app/default-preferance/services/default-pre
 import { DefaultPreferanceComponent } from 'src/app/default-preferance/default-preferance/default-preferance.component';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-client-list',
@@ -180,6 +183,11 @@ export class ClientListComponent implements OnInit, AfterViewInit, OnDestroy {
   /** Current local date for display; updated every minute with the greeting. */
   currentDate = new Date();
 
+  /** Angular `DatePipe` locale: matches active UI language so weekday/month names localize. */
+  dateLocale: string;
+
+  private readonly destroyRef = inject(DestroyRef);
+
   private greetingInterval: ReturnType<typeof setInterval> | null = null;
 
   /** Returns greeting translation key based on user's local hour. */
@@ -212,7 +220,18 @@ export class ClientListComponent implements OnInit, AfterViewInit, OnDestroy {
     private settingsService: SettingsService,
     private Authservice: AuthService,
     private translate: TranslateService,
-  ) {}
+  ) {
+    this.dateLocale = this.localeFromLang(this.translate.currentLang);
+    this.translate.onLangChange
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((e) => {
+        this.dateLocale = this.localeFromLang(e.lang);
+      });
+  }
+
+  private localeFromLang(lang: string | undefined): string {
+    return lang?.toLowerCase().startsWith('it') ? 'it' : 'en';
+  }
 
   ngOnInit() {
     this.user = this.Authservice.getUserProfile();

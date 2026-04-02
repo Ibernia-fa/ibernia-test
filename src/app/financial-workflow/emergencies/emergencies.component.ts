@@ -39,7 +39,7 @@ import {
 import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { CommonModule } from '@angular/common';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Client, Details } from 'src/app/clients/models/client';
@@ -84,6 +84,7 @@ import { MaterialModule } from 'src/app/material.module';
     MatProgressSpinnerModule,
     CurrencySymbolPipe,
     MaterialModule,
+    TranslateModule,
   ],
   templateUrl: './emergencies.component.html',
   styleUrl: './emergencies.component.scss',
@@ -164,6 +165,29 @@ export class EmergenciesComponent implements OnInit {
     this.navItemService.currentRouteName = 'Risk & Insurance';
   }
 
+  getEmergencyLabel(e: Emergency): string {
+    const raw = (e?.name || this.getTypeName(e?.type)).toString().trim();
+    if (!raw) return '';
+
+    const normalized = raw.toLowerCase();
+    const key =
+      normalized === 'home'
+        ? 'EMERGENCIES.TYPE_HOME'
+        : normalized === 'life'
+          ? 'EMERGENCIES.TYPE_LIFE'
+          : normalized === 'disability'
+            ? 'EMERGENCIES.TYPE_DISABILITY'
+            : normalized === 'health'
+              ? 'EMERGENCIES.TYPE_HEALTH'
+              : normalized === 'natural hazards'
+                ? 'EMERGENCIES.TYPE_NATURAL_HAZARDS'
+                : normalized === 'will'
+                  ? 'EMERGENCIES.TYPE_WILL'
+                  : null;
+
+    return key ? this.translate.instant(key) : raw;
+  }
+
   ngOnInit(): void {
     this.bindRefreshEmergencies();
     this.bindCoverageAdequacyUpdates();
@@ -178,25 +202,6 @@ export class EmergenciesComponent implements OnInit {
 
     // preloaded data for simulation
     this.getSimulateData();
-
-    // #region agent log
-    fetch('http://127.0.0.1:7465/ingest/9753e61c-3583-48b3-aac4-63e35a17e932',{
-      method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'X-Debug-Session-Id':'23206c'
-      },
-      body:JSON.stringify({
-        sessionId:'23206c',
-        runId:'emergencies-protection-title',
-        hypothesisId:'H2',
-        location:'emergencies.component.ts:ngOnInit',
-        message:'EmergenciesComponent initialized for Protection section',
-        data:{},
-        timestamp:Date.now()
-      })
-    }).catch(()=>{});
-    // #endregion agent log
   }
 
   private bindRefreshEmergencies(): void {

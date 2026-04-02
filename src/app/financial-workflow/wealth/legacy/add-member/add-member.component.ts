@@ -7,6 +7,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
+import { TranslateModule } from '@ngx-translate/core';
 import { ToastrService } from 'ngx-toastr';
 import { LegacyHttpService } from '../services/legacy-http.service';
 import { FamilyRole, FamilyMemberModel } from '../models/legacy.model';
@@ -29,6 +30,7 @@ interface RoleOption {
     MatInputModule,
     MatSelectModule,
     MatIconModule,
+    TranslateModule,
   ],
   templateUrl: './add-member.component.html',
   styleUrl: './add-member.component.scss'

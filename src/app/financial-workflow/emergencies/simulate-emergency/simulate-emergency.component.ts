@@ -15,7 +15,7 @@ import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-sep
 import moment from 'moment';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { allCountries } from 'src/app/clients/models/country';
 import { Client, ClientViewModel } from 'src/app/clients/models/client';
 import { Cashflow } from 'src/app/clients/models/cashflow';
@@ -25,6 +25,7 @@ import { Cycle, EscalationRate, FinancialTimeline } from '../../timeline/models/
 import { SimulateEmergencyModel } from '../models/simulate-emergency.model';
 import { EmergenciesHttpService } from '../services/emergencies-http.service';
 import { SavingsBarStackedChartComponent } from '../../reports/savings-bar-stacked-chart/savings-bar-stacked-chart.component';
+import { getAmountCycleLabel } from 'src/app/shared/utils/amount-cycle-label';
 
 @Component({
   selector: 'simulate-emergency',
@@ -43,7 +44,8 @@ import { SavingsBarStackedChartComponent } from '../../reports/savings-bar-stack
     ReactiveFormsModule,
     ThousandSeparatorPipe,
     ThousandSeparatorInputDirective,
-    SavingsBarStackedChartComponent
+    SavingsBarStackedChartComponent,
+    TranslateModule,
   ],
   providers: [provideNativeDateAdapter()],
   templateUrl: './simulate-emergency.component.html',
@@ -276,6 +278,33 @@ export class SimulateEmergencyComponent implements OnDestroy {
 
     endControl?.updateValueAndValidity();
     escalationControl?.updateValueAndValidity();
+  }
+
+  getCycleLabel(cycle: { description?: string } | null | undefined): string {
+    return getAmountCycleLabel(cycle, this.translate);
+  }
+
+  getEmergencyLabel(emergency: { name?: string } | null | undefined): string {
+    const raw = (emergency?.name ?? '').toString().trim();
+    if (!raw) return '';
+
+    const normalized = raw.toLowerCase();
+    const key =
+      normalized === 'home'
+        ? 'EMERGENCIES.TYPE_HOME'
+        : normalized === 'life'
+          ? 'EMERGENCIES.TYPE_LIFE'
+          : normalized === 'disability'
+            ? 'EMERGENCIES.TYPE_DISABILITY'
+            : normalized === 'health'
+              ? 'EMERGENCIES.TYPE_HEALTH'
+              : normalized === 'natural hazards'
+                ? 'EMERGENCIES.TYPE_NATURAL_HAZARDS'
+                : normalized === 'will'
+                  ? 'EMERGENCIES.TYPE_WILL'
+                  : null;
+
+    return key ? this.translate.instant(key) : raw;
   }
 
   onEscalationRateChange(event: MatSelectChange): void {

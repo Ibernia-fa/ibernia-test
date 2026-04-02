@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { TablerIconsModule } from 'angular-tabler-icons';
 import { ClientHttpService } from '../services/client-http.service';
@@ -84,9 +84,14 @@ interface SortDescriptor {
   styleUrl: './profile.component.scss',
 })
 export class ProfileComponent {
+  private readonly destroyRef = inject(DestroyRef);
+
   clientId: string;
   client: Client | null;
   birthDate: Date | undefined;
+
+  /** `DatePipe` locale for formatted birth date (matches UI language). */
+  dateLocale = 'en';
   cashflows: Array<Cashflow> = [];
   preferredCurrency: string | undefined;
   totalSavings: string = '0';
@@ -107,10 +112,20 @@ export class ProfileComponent {
     private store: Store,
     private translate: TranslateService,
   ) {
+    this.dateLocale = this.localeFromLang(this.translate.currentLang);
+    this.translate.onLangChange
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((e) => {
+        this.dateLocale = this.localeFromLang(e.lang);
+      });
     this.getClient();
   }
 
   ngOnInit() {}
+
+  private localeFromLang(lang: string | undefined): string {
+    return lang?.toLowerCase().startsWith('it') ? 'it' : 'en';
+  }
 
   onEditClicked() {
     const dialogRef = this.dialog.open(ClientEditComponent, {

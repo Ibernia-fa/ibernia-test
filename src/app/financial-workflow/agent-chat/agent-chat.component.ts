@@ -15,6 +15,7 @@ import {
   AgentMessage,
   ConversationWithMessages
 } from './agent-chat-http.service';
+import { TranslateModule } from '@ngx-translate/core';
 
 export type MessageDisplayType = 'text' | 'list' | 'table' | 'sections';
 
@@ -43,7 +44,8 @@ export interface MessageDisplay {
     MatButtonModule,
     MatFormFieldModule,
     MatInputModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    TranslateModule
   ],
   selector: 'app-agent-chat',
   templateUrl: './agent-chat.component.html',

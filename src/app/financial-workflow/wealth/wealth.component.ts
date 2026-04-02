@@ -32,6 +32,7 @@ import { WealthDashboardModel, WealthAssetModel, WealthLiabilityModel } from './
 import { AddAssetComponent } from './add-asset/add-asset.component';
 import { AddLiabilityComponent } from './add-liability/add-liability.component';
 import { LegacyComponent } from './legacy/legacy.component';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-wealth',
@@ -45,7 +46,8 @@ import { LegacyComponent } from './legacy/legacy.component';
     MatTableModule,
     MatProgressSpinnerModule,
     CurrencySymbolPipe,
-    LegacyComponent
+    LegacyComponent,
+    TranslateModule,
   ],
   templateUrl: './wealth.component.html',
   styleUrl: './wealth.component.scss',

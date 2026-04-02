@@ -4,7 +4,13 @@
     <!-- Header -->
     <div class="dialog-header">
       <h2 class="dialog-title text-center" style="text-transform: none;">
-        Simulation - {{ emergency.name }}
+        {{
+          'EMERGENCIES.SIMULATION_TITLE'
+            | translate
+              : {
+                  name: getEmergencyLabel(emergency),
+                }
+        }}
       </h2>
       <button
         type="button"
@@ -25,7 +31,7 @@
           <div class="d-flex flex-column gap-8">
             <mat-label
               class="f-s-16 f-w-500 ibr-black d-flex align-items-center"
-              >Emergency cost</mat-label
+              >{{ 'Emergency cost' | translate }}</mat-label
             >
             <div class="net-field d-flex align-items-center">
               <div class="left hide-arrow">
@@ -65,7 +71,7 @@
                 >
                   @for (cycle of amountCycles; track cycle) {
                     <mat-option [value]="cycle.id">{{
-                      cycle.description
+                      getCycleLabel(cycle)
                     }}</mat-option>
                   }
                 </mat-select>
@@ -98,9 +104,9 @@
               style="line-height: 16px !important"
             >
               @if (showStartEnd) {
-                {{ "Start & end" }}
+                {{ "Start & end" | translate }}
               } @else {
-                {{ "Date" }}
+                {{ "Date" | translate }}
               }
               <img
                 src="assets/images/svgs/help-circle-icon.svg"
@@ -120,7 +126,7 @@
                     >
                       @if (eventsList.length > 0) {
                         <mat-option [value]="currentYear"
-                          >This year ({{ currentYear }})</mat-option
+                          >{{ 'LABEL.THIS_YEAR' | translate }} ({{ currentYear }})</mat-option
                         >
                         <hr />
                       }
@@ -158,7 +164,7 @@
                     simulateEmergencyForm.get("start")?.touched &&
                     simulateEmergencyForm.get("start")?.hasError("required")
                   ) {
-                    <span class="field-error d-block">Required</span>
+                    <span class="field-error d-block">{{ 'Required' | translate }}</span>
                   }
                 </div>
               </div>
@@ -217,7 +223,7 @@
                       simulateEmergencyForm.get("end")?.touched &&
                       simulateEmergencyForm.get("end")?.hasError("required")
                     ) {
-                      <span class="field-error d-block">Required</span>
+                      <span class="field-error d-block">{{ 'Required' | translate }}</span>
                     }
                     @if (
                       simulateEmergencyForm.get("end")?.touched &&
@@ -226,7 +232,7 @@
                         ?.hasError("endBeforeStart")
                     ) {
                       <span class="field-error d-block"
-                        >End year cannot be before start year</span
+                        >{{ 'End year cannot be before start year' | translate }}</span
                       >
                     }
                   </div>
@@ -298,7 +304,7 @@
                         .get("escalationRate")
                         ?.hasError("required")
                     ) {
-                      <span class="field-error d-block">Required</span>
+                      <span class="field-error d-block">{{ 'Required' | translate }}</span>
                     }
                   </div>
                 </div>
@@ -313,7 +319,7 @@
                   <mat-label
                     class="f-s-16 f-w-500 ibr-black d-block"
                     style="line-height: 18px"
-                    >Custom escalation rate</mat-label
+                    >{{ 'Custom escalation rate' | translate }}</mat-label
                   >
                   <div class="w-100 form-field custom-rate-input">
                     <input
@@ -361,7 +367,7 @@
                       .get("customEscalationRate")
                       ?.hasError("required")
                   ) {
-                    <span class="field-error d-block">Required</span>
+                    <span class="field-error d-block">{{ 'Required' | translate }}</span>
                   }
                 </div>
               }
@@ -375,13 +381,13 @@
             class="example-margin"
             formControlName="stopIncome"
           >
-            Stop income
+            {{ 'EMERGENCIES.STOP_INCOME' | translate }}
           </mat-checkbox>
           @if (
             simulateEmergencyForm.get("stopIncome")?.touched &&
             simulateEmergencyForm.get("stopIncome")?.hasError("required")
           ) {
-            <span class="field-error d-block">Required</span>
+            <span class="field-error d-block">{{ 'Required' | translate }}</span>
           }
         </section>
 
@@ -390,7 +396,7 @@
             <mat-label
               class="f-s-16 f-w-500 ibr-black d-block"
               style="line-height: 16px"
-              >Income</mat-label
+              >{{ 'Income' | translate }}</mat-label
             >
 
             <div class="select-option position-relative">
@@ -426,7 +432,7 @@
                 .get("stoppedIncomeId")
                 ?.hasError("required")
             ) {
-              <span class="field-error d-block">Required</span>
+              <span class="field-error d-block">{{ 'Required' | translate }}</span>
             }
           </div>
         }
@@ -439,7 +445,7 @@
           (click)="closeDialog()"
           class="button-icon-outline w-100 d-block"
         >
-          <span class="f-s-16">Cancel</span>
+          <span class="f-s-16">{{ 'Cancel' | translate }}</span>
         </button>
       </div>
       <div>
@@ -450,9 +456,9 @@
           class="button-icon w-100 d-block"
         >
           @if (isSimulating) {
-            <span class="f-s-16">Simulating...</span>
+            <span class="f-s-16">{{ 'Simulating...' | translate }}</span>
           } @else {
-            <span class="f-s-16">Simulate</span>
+            <span class="f-s-16">{{ 'Simulate' | translate }}</span>
           }
         </button>
       </div>
@@ -467,7 +473,13 @@
     <!-- Header -->
     <div class="dialog-header">
       <h2 class="dialog-title text-center" style="text-transform: none;">
-        Simulation - {{ emergency.name }}
+        {{
+          'EMERGENCIES.SIMULATION_TITLE'
+            | translate
+              : {
+                  name: getEmergencyLabel(emergency),
+                }
+        }}
       </h2>
       <button
         type="button"

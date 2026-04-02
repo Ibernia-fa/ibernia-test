@@ -55,7 +55,7 @@
         <input
           matInput
           [matDatepicker]="picker"
-          placeholder="DD/MM/YYYY"
+          [placeholder]="'DD/MM/YYYY' | translate"
           inputmode="numeric"
           autocomplete="bday"
           (input)="onDobInput($event)"
@@ -133,7 +133,7 @@
       >
       <input
         matInput
-        placeholder="email@somedomain.com"
+        [placeholder]="'PLACEHOLDER.EMAIL_EXAMPLE' | translate"
         formControlName="email"
       />
       @if (clientForm.get("email")?.hasError("email")) {
@@ -287,7 +287,7 @@
             <input
               matInput
               [matDatepicker]="partnerPicker"
-              placeholder="DD/MM/YYYY"
+              [placeholder]="'DD/MM/YYYY' | translate"
               inputmode="numeric"
               autocomplete="bday"
               (input)="onPartnerDobInput($event)"
@@ -369,7 +369,7 @@
           >
           <input
             matInput
-            placeholder="email@somedomain.com"
+            [placeholder]="'PLACEHOLDER.EMAIL_EXAMPLE' | translate"
             formControlName="email"
           />
           @if (clientForm.get("partner.email")?.hasError("email")) {

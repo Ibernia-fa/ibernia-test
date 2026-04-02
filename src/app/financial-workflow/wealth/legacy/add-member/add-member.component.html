@@ -1,6 +1,6 @@
 <div class="d-flex flex-column">
   <div class="dialog-header">
-    <h2 class="dialog-title text-center">Add member</h2>
+    <h2 class="dialog-title text-center">{{ 'Add member' | translate }}</h2>
     <button
       type="button"
       mat-icon-button
@@ -20,7 +20,7 @@
         <mat-label
           class="f-s-16 f-w-500 d-block ibr-black"
           style="line-height: 16px"
-          >Relationship</mat-label
+          >{{ 'Relationship' | translate }}</mat-label
         >
         <div class="position-relative">
           <div class="w-100 form-field">
@@ -62,7 +62,7 @@
         <mat-label
           class="f-s-16 f-w-500 d-block ibr-black"
           style="line-height: 16px"
-          >Name</mat-label
+          >{{ 'Name' | translate }}</mat-label
         >
         <input matInput formControlName="name" />
       </div>
@@ -76,7 +76,7 @@
         (click)="onCancel()"
         class="button-icon-outline w-100 d-block"
       >
-        <span class="f-s-16">Cancel</span>
+        <span class="f-s-16">{{ 'Cancel' | translate }}</span>
       </button>
     </div>
     <div>
@@ -86,7 +86,7 @@
         [disabled]="form.invalid || isSaving"
         class="button-icon w-100 d-block"
       >
-        <span class="f-s-16">Save</span>
+        <span class="f-s-16">{{ 'Save' | translate }}</span>
       </button>
     </div>
   </div>
