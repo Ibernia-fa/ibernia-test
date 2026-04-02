@@ -498,18 +498,18 @@
       <div class="graph-tabs d-flex align-items-center">
         <button
           class="tab-btn"
-          [class.active]="activeTab === 'simulated'"
-          (click)="switchToTab('simulated')"
-        >
-          After
-        </button>
-
-        <button
-          class="tab-btn"
           [class.active]="activeTab === 'baseline'"
           (click)="switchToTab('baseline')"
         >
           Before
+        </button>
+
+        <button
+          class="tab-btn"
+          [class.active]="activeTab === 'simulated'"
+          (click)="switchToTab('simulated')"
+        >
+          After
         </button>
       </div>
 
