@@ -12,6 +12,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatMenuModule } from '@angular/material/menu';
+import { TranslateModule } from '@ngx-translate/core';
 
 interface notifications {
   id: number;
@@ -49,7 +50,8 @@ interface quicklinks {
     TablerIconsModule,
     BrandingComponent,
     MatToolbarModule,
-    MatMenuModule
+    MatMenuModule,
+    TranslateModule,
   ],
   templateUrl: './header.component.html',
 })
@@ -298,6 +300,7 @@ export class AppHorizontalHeaderComponent {
     MatDividerModule,
     MatDialogModule,
     MatToolbarModule,
+    TranslateModule,
   ],
   templateUrl: 'search-dialog.component.html',
 })
