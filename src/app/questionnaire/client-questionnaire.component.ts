@@ -97,6 +97,8 @@ export class ClientQuestionnaireComponent implements OnInit, OnDestroy {
     idxBeforeRecalc: -1,
     idxAfterRecalc: -1,
     touchTarget: '',
+    stepCount: 0,
+    scrollOverrideCount: 0,
   };
 
   constructor(
@@ -283,6 +285,24 @@ export class ClientQuestionnaireComponent implements OnInit, OnDestroy {
     const targetTop = el.clientHeight * clamped;
     el.scrollTop = targetTop;
     this.onScroll();
+
+    // iOS can override a programmatic scrollTop when its compositor is still
+    // processing a touch gesture (momentum/settle). Re-apply on the next two
+    // animation frames to guarantee the position sticks.
+    let retries = 2;
+    const enforce = () => {
+      if (retries-- <= 0) return;
+      if (Math.abs(el.scrollTop - targetTop) > 2) {
+        el.scrollTop = targetTop;
+        this.onScroll();
+        if (this.debugMode) {
+          this.debugState.scrollOverrideCount++;
+          this.cdr.detectChanges();
+        }
+      }
+      requestAnimationFrame(enforce);
+    };
+    requestAnimationFrame(enforce);
   }
 
   /**
@@ -346,6 +366,7 @@ export class ClientQuestionnaireComponent implements OnInit, OnDestroy {
     }
 
     if (this.debugMode) {
+      this.debugState.stepCount++;
       this.debugState.lastStep = `dir=${direction} cur=${this.currentIndex} tgt=${target}`;
       this.debugState.lastStepResult = 'OK';
       this.cdr.detectChanges();
@@ -502,7 +523,11 @@ export class ClientQuestionnaireComponent implements OnInit, OnDestroy {
     const el = this.snapContainer?.nativeElement;
     if (!el) return;
 
-    el.addEventListener('touchstart', (e: TouchEvent) => {
+    // Listen on the wrapper (parent of snap-container) so touches on fixed
+    // overlays like .swipe-up-hint and .progress-track are also captured.
+    const wrapper = el.closest('.questionnaire-wrapper') as HTMLElement || el;
+
+    wrapper.addEventListener('touchstart', (e: TouchEvent) => {
       this.touchStartY = e.touches[0].clientY;
       this.touchLastY = this.touchStartY;
       this.touchCumulativeDeltaY = 0;
@@ -514,7 +539,7 @@ export class ClientQuestionnaireComponent implements OnInit, OnDestroy {
       }
     }, { passive: true });
 
-    el.addEventListener('touchmove', (e: TouchEvent) => {
+    wrapper.addEventListener('touchmove', (e: TouchEvent) => {
       const currentY = e.touches[0].clientY;
       this.touchCumulativeDeltaY += this.touchLastY - currentY;
       this.touchLastY = currentY;
@@ -528,7 +553,7 @@ export class ClientQuestionnaireComponent implements OnInit, OnDestroy {
       }
     }, { passive: false });
 
-    el.addEventListener('touchend', (e: TouchEvent) => {
+    wrapper.addEventListener('touchend', (e: TouchEvent) => {
       if (this.debugMode) {
         this.debugState.touchEnds++;
       }
