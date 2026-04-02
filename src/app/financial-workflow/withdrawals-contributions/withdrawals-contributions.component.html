@@ -738,9 +738,9 @@
                 Set up recurring investments or plan future withdrawals.
               </p>
             } @else if (contributionDataSource.data.length === 0) {
-              <p>{{ "You haven't added any contributions yet." | translate }}</p>
+              <p>{{ "You haven't added any contributions yet" | translate }}</p>
             } @else if (withdrawalDataSource.data.length === 0) {
-              <p>{{ "You haven't added any withdrawals yet." | translate }}</p>
+              <p>{{ "You haven't added any withdrawals yet" | translate }}</p>
             }
             <div class="onboard-button">
               @if (contributionDataSource.data.length === 0) {
