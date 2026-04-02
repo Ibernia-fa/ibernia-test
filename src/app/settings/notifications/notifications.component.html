@@ -205,9 +205,9 @@
                       <div
                         class="flex-grow-1 min-w-0 d-flex align-items-start justify-content-between gap-8"
                       >
-                        <p class="notification-item-preview m-0 m-b-4">
+                        <p class="notification-item-preview m-0 m-b-4 flex-grow-1 min-w-0">
                           {{
-                            (n.preview | translate: (n.previewParams || {}))
+                            (n.body | translate: (n.previewParams || {}))
                               | capitalizeFirst
                           }}
                         </p>
@@ -263,10 +263,10 @@
                       </div>
                       <div class="flex-grow-1 min-w-0">
                         <div
-                          class="notification-item-title-row d-flex align-items-center justify-content-between gap-8 m-b-4 w-100 min-w-0"
+                          class="notification-item-title-row d-flex align-items-start justify-content-between gap-8 m-b-4 w-100 min-w-0"
                         >
                           <div
-                            class="notification-item-title line-clamp-1 min-w-0 flex-grow-1"
+                            class="notification-item-title notification-item-title--wrap min-w-0 flex-grow-1"
                           >
                             {{ n.title | capitalizeFirst }}
                           </div>
@@ -277,7 +277,7 @@
                           }
                         </div>
                         <p class="notification-item-preview m-0 m-b-4">
-                          {{ n.preview | capitalizeFirst }}
+                          {{ n.body | capitalizeFirst }}
                         </p>
                       </div>
                     </div>

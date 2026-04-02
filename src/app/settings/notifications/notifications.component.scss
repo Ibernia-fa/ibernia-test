@@ -52,7 +52,7 @@
   }
 
   .notification-center-list {
-    overflow: hidden;
+    overflow: visible;
     border-radius: 12px;
   }
 
@@ -84,7 +84,7 @@
 
   .notification-center-item.notification-item {
     position: relative;
-    min-height: 88px;
+    min-height: 0;
     padding: 14px 18px !important;
     text-align: left;
     margin-bottom: 0;
@@ -130,6 +130,15 @@
       font-size: 16px;
       font-weight: 500;
       color: #1c1c1c;
+
+      &.notification-item-title--wrap {
+        display: block;
+        white-space: normal;
+        overflow: visible;
+        word-break: break-word;
+        overflow-wrap: anywhere;
+        line-height: 1.35;
+      }
     }
 
     .notification-new-label {
