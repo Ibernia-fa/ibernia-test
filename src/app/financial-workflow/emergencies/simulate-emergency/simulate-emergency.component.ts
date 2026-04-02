@@ -26,6 +26,7 @@ import { SimulateEmergencyModel } from '../models/simulate-emergency.model';
 import { EmergenciesHttpService } from '../services/emergencies-http.service';
 import { SavingsBarStackedChartComponent } from '../../reports/savings-bar-stacked-chart/savings-bar-stacked-chart.component';
 import { getAmountCycleLabel } from 'src/app/shared/utils/amount-cycle-label';
+import { TranslateIncomeExpenseLabelPipe } from 'src/app/core/pipes/translate-income-expense-label.pipe';
 
 @Component({
   selector: 'simulate-emergency',
@@ -46,6 +47,7 @@ import { getAmountCycleLabel } from 'src/app/shared/utils/amount-cycle-label';
     ThousandSeparatorInputDirective,
     SavingsBarStackedChartComponent,
     TranslateModule,
+    TranslateIncomeExpenseLabelPipe,
   ],
   providers: [provideNativeDateAdapter()],
   templateUrl: './simulate-emergency.component.html',

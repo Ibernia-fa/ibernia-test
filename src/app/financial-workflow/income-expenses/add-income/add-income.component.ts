@@ -24,6 +24,7 @@ import { ComissionType } from '../../saving-pots/models/saving-pots.model';
 import { catchError, filter, finalize, switchMap, of, map } from 'rxjs';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateIncomeExpenseLabelPipe } from 'src/app/core/pipes/translate-income-expense-label.pipe';
 import { getAmountCycleLabel } from 'src/app/shared/utils/amount-cycle-label';
 import { CommonModule } from '@angular/common';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -46,7 +47,8 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
     CommonModule,
     ThousandSeparatorPipe,
     ThousandSeparatorInputDirective,
-    TranslateModule
+    TranslateModule,
+    TranslateIncomeExpenseLabelPipe,
   ],
   providers: [provideNativeDateAdapter()],
   templateUrl: './add-income.component.html',

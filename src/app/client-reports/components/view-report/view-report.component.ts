@@ -23,6 +23,7 @@ import {
 import { TablerIconsModule } from 'angular-tabler-icons';
 import { MaterialModule } from 'src/app/material.module';
 import { TranslateModule } from '@ngx-translate/core';
+import { TranslateIncomeExpenseLabelPipe } from 'src/app/core/pipes/translate-income-expense-label.pipe';
 import { ClientEmergency, EmergenciesLookupData } from '../../models/financial-series.model';
 import { ChartSeries } from 'src/app/financial-workflow/reports/models/charts-series.model';
 
@@ -47,7 +48,8 @@ import { ChartSeries } from 'src/app/financial-workflow/reports/models/charts-se
     MatRippleModule,
     TablerIconsModule,
     MaterialModule,
-    TranslateModule
+    TranslateModule,
+    TranslateIncomeExpenseLabelPipe,
   ],
    animations: [
     trigger('indicatorRotate', [

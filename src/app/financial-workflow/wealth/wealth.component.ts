@@ -32,7 +32,7 @@ import { WealthDashboardModel, WealthAssetModel, WealthLiabilityModel } from './
 import { AddAssetComponent } from './add-asset/add-asset.component';
 import { AddLiabilityComponent } from './add-liability/add-liability.component';
 import { LegacyComponent } from './legacy/legacy.component';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-wealth',
@@ -81,6 +81,7 @@ export class WealthComponent implements OnInit {
     private navItemService: NavItemService,
     private store: Store,
     private cdr: ChangeDetectorRef,
+    private translate: TranslateService,
   ) {
     this.navItemService.currentRouteName = 'Wealth & Inheritance';
   }
@@ -110,6 +111,9 @@ export class WealthComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.translate.onLangChange
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.cdr.markForCheck());
     this.load();
   }
 
@@ -385,19 +389,21 @@ export class WealthComponent implements OnInit {
   }
 
   getOwnershipLabel(ownership: string): string {
-    if (!ownership || ownership === 'Joint') return 'Joint';
+    if (!ownership || ownership === 'Joint') {
+      return this.translate.instant('Joint');
+    }
     if (ownership === 'Client') {
       return (
         formatClientPersonDisplayName(this.selectedClient?.clientDetails) ||
         this.clientFirstName ||
-        'Client'
+        this.translate.instant('Client')
       );
     }
     if (ownership === 'Partner') {
       return (
         formatClientPersonDisplayName(this.selectedClient?.partnerDetail) ||
         this.partnerFirstName ||
-        'Partner'
+        this.translate.instant('Partner')
       );
     }
     return ownership;

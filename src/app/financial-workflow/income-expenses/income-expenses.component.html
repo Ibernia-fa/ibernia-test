@@ -75,8 +75,10 @@
                     <div class="d-flex flex-column gap-6">
                       <h3 class="card-title">
                         {{
-                          displayItem.displayTitle ??
+                          (
+                            displayItem.displayTitle ??
                             displayItem.income.description
+                          ) | translateIncomeExpenseLabel
                         }}
                       </h3>
 
@@ -308,7 +310,7 @@
                     }
                     <div class="d-flex flex-column gap-6">
                       <h3 class="card-title">
-                        {{ income.description }}
+                        {{ income.description | translateIncomeExpenseLabel }}
                       </h3>
 
                       <h3 class="paragraph-text d-flex align-items-baseline">
@@ -540,7 +542,7 @@
                     }
                     <div class="d-flex flex-column gap-6">
                       <h3 class="card-title">
-                        {{ expense.description }}
+                        {{ expense.description | translateIncomeExpenseLabel }}
                       </h3>
 
                       <div class="d-flex flex-wrap gap-12 align-items-stretch">
@@ -731,7 +733,7 @@
 
                     <div class="d-flex flex-column gap-6">
                       <h3 class="card-title">
-                        {{ expense.description }}
+                        {{ expense.description | translateIncomeExpenseLabel }}
                       </h3>
 
                       <h3 class="paragraph-text d-flex align-items-baseline">
