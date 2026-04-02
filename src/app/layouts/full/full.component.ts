@@ -105,6 +105,13 @@ export class FullComponent implements OnInit, OnDestroy {
   /** Hidden on cashflows and questionnaire (same rules as former AppComponent.showFooter). */
   showFooter = true;
 
+  /**
+   * While on `/settings/*`, the sidebar is forced expanded (labels visible).
+   * On exit, we restore the collapsed state from before entering Settings.
+   */
+  private inSettingsRoute = false;
+  private preSettingsSidenavCollapsed: boolean | null = null;
+
   @ViewChild('leftsidenav')
   public sidenav: MatSidenav;
   resView = false;
@@ -261,12 +268,16 @@ export class FullComponent implements OnInit, OnDestroy {
     this.client$ = this.store.select(selectedClient);
 
     this.htmlElement = document.querySelector('html')!;
+    this.syncSidebarForSettingsRoute(this.normalizePath(this.router.url));
+
     this.layoutChangesSubscription = this.breakpointObserver
       .observe([MOBILE_VIEW, TABLET_VIEW, MONITOR_VIEW, BELOWMONITOR])
       .subscribe((state) => {
         const o = this.settings.getOptions();
         let sidenavCollapsed = o.sidenavCollapsed;
-        if (o.sidenavCollapsed === false) {
+        // On `/settings/*`, skip tablet auto-collapse so entry expand isn't undone;
+        // user toggle still updates `o.sidenavCollapsed` directly.
+        if (!this.inSettingsRoute && o.sidenavCollapsed === false) {
           sidenavCollapsed = state.breakpoints[TABLET_VIEW];
         }
         this.settings.setOptions({
@@ -282,10 +293,10 @@ export class FullComponent implements OnInit, OnDestroy {
     this.receiveOptions(this.settings.getOptions());
 
     // Set initial route state (for direct load/refresh on cashflow routes)
-    this.isCashflowRoute = this.router.url.startsWith('/cashflows');
+    const bootPath = this.normalizePath(this.router.url);
+    this.isCashflowRoute = bootPath.startsWith('/cashflows');
     this.showFooter =
-      !this.isCashflowRoute &&
-      !this.router.url.startsWith('/questionnaire/');
+      !this.isCashflowRoute && !bootPath.startsWith('/questionnaire/');
 
     // This is for scroll to top
     // this.router.events
@@ -305,6 +316,7 @@ export class FullComponent implements OnInit, OnDestroy {
       .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe((e: NavigationEnd) => {
         const currentRoute = e.urlAfterRedirects;
+        const path = this.normalizePath(currentRoute);
 
         // keep your existing hideSidebar logic
         this.hideSidebar = this.options.sidebarHiddenOnRoutes.some((x) =>
@@ -312,13 +324,12 @@ export class FullComponent implements OnInit, OnDestroy {
         );
 
         // NEW: detect settings
-        this.isSettings = currentRoute.startsWith('/settings');
+        this.isSettings = path.startsWith('/settings');
 
         // Detect cashflow routes (footer is hidden, so no bottom padding needed)
-        this.isCashflowRoute = currentRoute.startsWith('/cashflows');
+        this.isCashflowRoute = path.startsWith('/cashflows');
         this.showFooter =
-          !this.isCashflowRoute &&
-          !currentRoute.startsWith('/questionnaire/');
+          !this.isCashflowRoute && !path.startsWith('/questionnaire/');
 
         // swap menu sources
         if (this.isSettings) {
@@ -329,6 +340,8 @@ export class FullComponent implements OnInit, OnDestroy {
           this.navItemslower = mainLower;
         }
 
+        this.syncSidebarForSettingsRoute(path);
+
         this.content?.scrollTo({ top: 0 });
       });
 
@@ -337,11 +350,39 @@ export class FullComponent implements OnInit, OnDestroy {
       this.organizationProfiles.hydrateBrandingLogoFromSession(uid);
     }
 
-    if (this.router.url.startsWith('/settings')) {
+    const initialPath = this.normalizePath(this.router.url);
+    if (initialPath.startsWith('/settings')) {
       this.isSettings = true;
       this.navItems = settingsNavItems;
       this.applySettingsLowerNav();
     }
+  }
+
+  private normalizePath(url: string): string {
+    return url.split('?')[0].split('#')[0];
+  }
+
+  /**
+   * Expands the sidebar on any `/settings/*` route; restores the previous
+   * collapsed preference when navigating away.
+   */
+  private syncSidebarForSettingsRoute(path: string): void {
+    const nowSettings = path.startsWith('/settings');
+
+    if (nowSettings && !this.inSettingsRoute) {
+      this.preSettingsSidenavCollapsed =
+        this.settings.getOptions().sidenavCollapsed;
+      this.settings.setOptions({ sidenavCollapsed: false });
+    } else if (!nowSettings && this.inSettingsRoute) {
+      if (this.preSettingsSidenavCollapsed !== null) {
+        this.settings.setOptions({
+          sidenavCollapsed: this.preSettingsSidenavCollapsed,
+        });
+        this.preSettingsSidenavCollapsed = null;
+      }
+    }
+
+    this.inSettingsRoute = nowSettings;
   }
 
   /** Admin Notifications + Identity Admin: visible only to Administrator / IberniaIdentityAdminAdministrator. */
