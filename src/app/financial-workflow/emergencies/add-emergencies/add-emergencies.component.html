@@ -4,7 +4,7 @@
     <div class="dialog-header">
       <h2 class="dialog-title text-center">
         @if (data.mode === "edit") {
-          {{ displayEmergencyName }}
+          {{ displayEmergencyName | translate }}
           @if (canEditName) {
             <img
               src="assets/images/svgs/drop-down-edit-2-line.svg"
@@ -73,7 +73,9 @@
                   (click)="form.get('willStatus')?.setValue(ws.id)"
                 >
                   <span class="dp-radio-circle"></span>
-                  <span>{{ ws.name == "NotDone" ? "Not done" : ws.name }}</span>
+                  <span>{{
+                    (ws.name == "NotDone" ? "Not done" : ws.name) | translate
+                  }}</span>
                 </label>
               }
             </div>
@@ -106,7 +108,8 @@
                   >
                     <span class="dp-radio-circle"></span>
                     <span>{{
-                      s.name === "NotCovered" ? "Not covered" : s.name
+                      (s.name === "NotCovered" ? "Not covered" : s.name)
+                        | translate
                     }}</span>
                   </label>
                 }
@@ -214,7 +217,7 @@
                     (click)="form.get('coverageAdequacy')?.setValue(a.id)"
                   >
                     <span class="dp-radio-circle"></span>
-                    <span>{{ a.name }}</span>
+                    <span>{{ a.name | translate }}</span>
                   </label>
                 }
               </div>

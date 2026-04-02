@@ -182,7 +182,8 @@ export class SavingsBarStackedChartComponent
 
           const bodyRows = w.globals.seriesNames
             .map((seriesName: string, i: number) => {
-              if (seriesName === 'Emergency Expense') return '';
+              const rawName = this.seriesColorsForTooltip[i]?.name;
+              if (rawName === 'Emergency Expense') return '';
               const value = series[i]?.[dataPointIndex];
               if (
                 value === undefined ||
@@ -209,10 +210,12 @@ export class SavingsBarStackedChartComponent
             .filter(Boolean)
             .join('');
 
+          const ageLbl = this.translate.instant('Age');
+          const yearLbl = this.translate.instant('Year');
           return `
       <div class="savings-tooltip">
         <div class="savings-tooltip__header">
-          <div>Age: ${age} </div>  <div> Year: ${xValue}</div> 
+          <div>${ageLbl}: ${age} </div>  <div> ${yearLbl}: ${xValue}</div> 
         </div>
         ${bodyRows}
       </div>
@@ -411,10 +414,15 @@ export class SavingsBarStackedChartComponent
         this.chartOptions.legend = {
           ...this.chartOptions.legend,
 
-          formatter: (seriesName: string) => {
+          formatter: (seriesName: string, opts?: { seriesIndex?: number }) => {
+            const idx = opts?.seriesIndex;
+            const raw =
+              typeof idx === 'number'
+                ? this.seriesColorsForTooltip[idx]?.name
+                : undefined;
             if (
-              seriesName === 'Current Account (Negative)' ||
-              seriesName === 'Emergency Expense'
+              raw === 'Current Account (Negative)' ||
+              raw === 'Emergency Expense'
             ) {
               return '';
             }
@@ -504,7 +512,7 @@ export class SavingsBarStackedChartComponent
         type: 'category',
         categories,
         tickAmount,
-        title: { text: 'Age' },
+        title: { text: this.translate.instant('Age') },
         axisBorder: {
           show: true,
           color: '#0000001a', // change to whatever color you want
@@ -544,6 +552,7 @@ export class SavingsBarStackedChartComponent
           : null;
         this.chartOptions.xaxis = {
           ...this.chartOptions.xaxis,
+          title: { text: this.translate.instant('Age') },
           labels: {
             ...this.chartOptions.xaxis.labels,
             formatter: (value: string) => {
@@ -735,8 +744,9 @@ export class SavingsBarStackedChartComponent
           label: { text: '' },
           customTooltip: `
             <div class="event-tooltip ${event.iconUrl}">
+              <span style="display:none">${event.name}</span>
               <img src="/assets/images/svgs/${event.iconUrl}.svg" alt="${event.iconUrl}" />
-              <span>${event.name}</span>
+              <span>${this.translate.instant(event.name)}</span>
             </div>`,
         });
       });
@@ -802,7 +812,7 @@ export class SavingsBarStackedChartComponent
 
         // Create label element with FIXED positioning (not clipped by chart overflow)
         const label = document.createElement('div');
-        label.textContent = event.name;
+        label.textContent = this.translate.instant(event.name);
         label.className = 'event-label';
         label.style.position = 'fixed';
         label.style.pointerEvents = 'none';
