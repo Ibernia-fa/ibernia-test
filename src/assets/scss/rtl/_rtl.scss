@@ -62,7 +62,9 @@
     .contentWrapper {
       margin-right: $sidenav-mini !important;
       margin-left: 0 !important;
-      transition: swift-ease-out(width);
+      transition:
+        margin-left 280ms ease-in-out,
+        margin-right 280ms ease-in-out;
     }
 
     .sidebarNav {
