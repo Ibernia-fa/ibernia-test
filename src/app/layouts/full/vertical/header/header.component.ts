@@ -364,7 +364,31 @@ showFiller = false;
           this.unreadCount = n;
           this.cdr.markForCheck();
         });
-      this.loadUnreadCount();
+      this.myNotifications.notificationFeedStale
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(() => {
+          this.lastNotificationsFetchAt = 0;
+          if (this.notificationsMenuOpen) {
+            this.notificationsLoading = this.userNotifications.length === 0;
+            this.myNotifications.getList(this.notificationFilter).subscribe({
+              next: (list) => {
+                this.userNotifications = this.mergeNotificationsList(list);
+                this.notificationsLoading = false;
+                this.lastNotificationsFetchAt = Date.now();
+                this.headerNotificationsFeedsRevision =
+                  this.myNotifications.getFeedsRevision();
+                this.scheduleNotificationVisibilitySetup();
+                this.cdr.markForCheck();
+              },
+              error: () => {
+                this.notificationsLoading = false;
+                this.cdr.markForCheck();
+              },
+            });
+          }
+          this.cdr.markForCheck();
+        });
+      this.myNotifications.startUnreadPolling();
       this.brandingLogo = this.ensureDataUrl(
         this.organizationProfiles.getBrandingLogoValue(),
       );
@@ -392,6 +416,7 @@ showFiller = false;
     }
 
     ngOnDestroy(): void {
+      this.myNotifications.stopUnreadPolling();
       this.destroy$.next();
       this.destroy$.complete();
       this.sub?.unsubscribe();
@@ -502,10 +527,6 @@ get userInitials(): string {
   setlightDark(theme: string) {
     this.settings.setOptions({ theme });
     this.emitOptions();
-  }
-
-  loadUnreadCount(): void {
-    this.myNotifications.refreshUnreadCount();
   }
 
   onBellMenuOpened(): void {

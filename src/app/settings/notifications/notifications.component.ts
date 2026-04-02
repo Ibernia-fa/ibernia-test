@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -22,6 +22,8 @@ import { notificationMatchesSearchQuery } from 'src/app/core/notification-search
 import { CapitalizeFirstPipe } from 'src/app/core/pipes/capitalize-first.pipe';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { environment } from 'src/environments/environment';
+import { Subject, takeUntil } from 'rxjs';
+
 @Component({
   selector: 'app-notifications',
   standalone: true,
@@ -40,7 +42,7 @@ import { environment } from 'src/environments/environment';
   templateUrl: './notifications.component.html',
   styleUrl: './notifications.component.scss'
 })
-export class NotificationsComponent implements OnInit {
+export class NotificationsComponent implements OnInit, OnDestroy {
   toggleStatus = true;   // Email News
   toggleStatus1 = true;  // Email Birthdays
   toggleStatus2 = true;  // Push News
@@ -57,6 +59,7 @@ export class NotificationsComponent implements OnInit {
   readonly mfaReminderId = MFA_REMINDER_NOTIFICATION_ID;
   /** One bulk read-all per page visit (component instance). */
   private bulkMarkAllReadRequested = false;
+  private readonly destroy$ = new Subject<void>();
 
   get filteredNotifications(): UserNotificationItem[] {
     const q = this.notificationSearchQuery.trim().toLowerCase();
@@ -91,6 +94,9 @@ export class NotificationsComponent implements OnInit {
   ngOnInit(): void {
     this.loadPreferences();
     this.loadNotifications();
+    this.myNotifications.notificationFeedStale
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => this.loadNotifications());
     if (typeof Intl !== 'undefined' && Intl.supportedValuesOf) {
       try {
         this.timezones = ['UTC', ...Intl.supportedValuesOf('timeZone').filter(t => t.startsWith('Europe/') || t.startsWith('America/')).slice(0, 20)];
@@ -98,6 +104,11 @@ export class NotificationsComponent implements OnInit {
         // fallback to curated list
       }
     }
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   loadPreferences(): void {
