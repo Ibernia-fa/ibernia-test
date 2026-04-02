@@ -1,17 +1,9 @@
 @use "../variables" as *;
 
-/* Sidebar expand/collapse: rail + labels (total feel under ~300ms) */
-$sidebar-rail-duration: 280ms;
-$sidebar-rail-ease: ease-in-out;
-$sidebar-label-in-duration: 150ms;
-$sidebar-label-in-delay: 100ms;
-$sidebar-label-out-duration: 100ms;
-$sidebar-rail-delay-collapse: 100ms;
-
 .mat-drawer.sidebarNav {
   width: 257px;
   flex-shrink: 0;
-  transition: width $sidebar-rail-duration $sidebar-rail-ease 0ms;
+  transition: swift-ease-out(width);
   position: fixed;
   top: 16px;
   left: 16px;
@@ -23,19 +15,6 @@ $sidebar-rail-delay-collapse: 100ms;
   border-right: 1px solid #1c1c1c;
   border-radius: 12px !important;
   transform: none !important;
-}
-
-/* Collapsing: fade labels first, then contract rail (delay matches label fade-out) */
-.sidenavContainer.sidebarNav-mini .mat-drawer.sidebarNav {
-  width: $sidenav-mini;
-  transition: width $sidebar-rail-duration $sidebar-rail-ease
-    $sidebar-rail-delay-collapse;
-}
-
-/* Main content push: same timing as rail (Material autosize updates margin during width anim) */
-.sidenavContainer.mat-drawer-transition .mat-drawer-content.contentWrapper {
-  transition-duration: $sidebar-rail-duration;
-  transition-timing-function: $sidebar-rail-ease;
 }
 
 /* Fixed footer band: viewport bottom margin + bar height + gap above bar (matches footer.component) */
@@ -250,36 +229,11 @@ $sidebar-rail-delay-collapse: 100ms;
   padding: 20px;
 }
 
-/* Expanded (default): labels fade in slightly after rail starts opening */
-.sidebar-list.mdc-list .menu-list-item .nav-left {
-  min-width: 0;
-}
-
-.sidebar-list.mdc-list .menu-list-item .hide-menu,
-.sidebar-list.mdc-list .menu-list-item .menu-label {
-  opacity: 1;
-  max-width: 260px;
-  overflow: hidden;
-  white-space: nowrap;
-  transition:
-    opacity $sidebar-label-in-duration $sidebar-rail-ease $sidebar-label-in-delay,
-    max-width $sidebar-rail-duration $sidebar-rail-ease 0ms;
-}
-
-.sidebar-list.mdc-list .mdc-list-group__subheader {
-  opacity: 1;
-  max-height: 120px;
-  overflow: hidden;
-  transition:
-    opacity $sidebar-label-in-duration $sidebar-rail-ease $sidebar-label-in-delay,
-    max-height $sidebar-rail-duration $sidebar-rail-ease 0ms,
-    padding $sidebar-rail-duration $sidebar-rail-ease 0ms,
-    margin $sidebar-rail-duration $sidebar-rail-ease 0ms;
-}
-
 /* Collapsed sidebar - icons only */
 .sidebarNav-mini {
   .sidebarNav {
+    width: $sidenav-mini;
+
     .sidebar-header {
       padding: 12px 12px 6px 12px;
       flex-direction: column;
@@ -314,16 +268,8 @@ $sidebar-rail-delay-collapse: 100ms;
         padding: 8px !important;
         justify-content: center;
 
-        .hide-menu,
-        .menu-label {
-          opacity: 0;
-          max-width: 0;
-          margin: 0;
-          padding: 0;
-          transition:
-            opacity $sidebar-label-out-duration $sidebar-rail-ease 0ms,
-            max-width $sidebar-rail-duration $sidebar-rail-ease
-              $sidebar-rail-delay-collapse;
+        .hide-menu {
+          display: none !important;
         }
 
         .nav-item-row {
@@ -333,34 +279,18 @@ $sidebar-rail-delay-collapse: 100ms;
         .nav-left {
           justify-content: center;
         }
+
+        .menu-label {
+          display: none;
+        }
       }
 
       .mdc-list-group__subheader {
-        opacity: 0;
-        max-height: 0;
-        margin: 0 !important;
-        padding: 0 !important;
-        overflow: hidden;
-        transition:
-          opacity $sidebar-label-out-duration $sidebar-rail-ease 0ms,
-          max-height $sidebar-rail-duration $sidebar-rail-ease
-            $sidebar-rail-delay-collapse,
-          margin $sidebar-rail-duration $sidebar-rail-ease
-            $sidebar-rail-delay-collapse,
-          padding $sidebar-rail-duration $sidebar-rail-ease
-            $sidebar-rail-delay-collapse;
+        display: none;
       }
 
       .nav-caption {
-        opacity: 0;
-        max-height: 0;
-        margin: 0 !important;
-        padding: 0 !important;
-        overflow: hidden;
-        transition:
-          opacity $sidebar-label-out-duration $sidebar-rail-ease 0ms,
-          max-height $sidebar-rail-duration $sidebar-rail-ease
-            $sidebar-rail-delay-collapse;
+        display: none;
       }
     }
 
@@ -369,24 +299,14 @@ $sidebar-rail-delay-collapse: 100ms;
       padding: 8px;
 
       span {
-        display: block;
-        opacity: 0;
-        max-width: 0;
-        overflow: hidden;
-        white-space: nowrap;
-        transition:
-          opacity $sidebar-label-out-duration $sidebar-rail-ease 0ms,
-          max-width $sidebar-rail-duration $sidebar-rail-ease
-            $sidebar-rail-delay-collapse;
+        display: none !important;
       }
     }
   }
 
   .contentWrapper {
     // margin-left: $sidenav-mini !important;
-    transition:
-      margin-left $sidebar-rail-duration $sidebar-rail-ease,
-      margin-right $sidebar-rail-duration $sidebar-rail-ease;
+    transition: swift-ease-out(margin-left);
   }
 }
 
