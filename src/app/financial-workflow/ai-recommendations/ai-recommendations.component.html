@@ -13,7 +13,7 @@
                 <div class="d-flex align-items-center">
                   <h4 class="page-title f-w-500 m-r-4 f-s-30">{{ 'LABEL.AI_RECOMMENDATIONS' | translate }}</h4>
                   <img width="22" src="assets/images/svgs/help-circle-icon.svg" alt="help" class="m-t-4"
-                    matTooltip="AI-powered analysis of your client's cashflow plan. Generates actionable recommendations based on the full financial picture." />
+                    [matTooltip]="'TOOLTIP.AI_ANALYSIS' | translate" />
                 </div>
               </div>
             </div>
@@ -96,20 +96,20 @@
               <img src="assets/images/svgs/Info-icon.svg" alt="info" />
             </div>
             <div>
-              Recommendations are produced by AI and can be <strong>incomplete</strong> or <strong>incorrect</strong>.<br />
-              They do not constitute financial advice and must be reviewed and approved by a licensed financial advisor before any action.<br />
-              For more info, please consult our <a [href]="termsUrl" target="_blank" rel="noopener"><em>Terms & Conditions</em></a>
+              {{ 'DISCLAIMER.AI_INCOMPLETE' | translate }}<br />
+              {{ 'DISCLAIMER.AI_NOT_ADVICE' | translate }}<br />
+              {{ 'DISCLAIMER.CONSULT_TERMS' | translate }} <a [href]="termsUrl" target="_blank" rel="noopener"><em>{{ 'LABEL.TERMS_CONDITIONS' | translate }}</em></a>
             </div>
           </div>
 
           <div class="position-relative outer-recmendation">
             <div class="edit-rec-sugg">
-              <button matTooltip="Edit"><img width="16" src="assets/images/svgs/edit-icon.svg" alt="edit" /></button>
-              <button matTooltip="Copy"><img width="16" src="assets/images/svgs/copy-icon.svg" alt="copy" /></button>
+              <button [matTooltip]="'Edit' | translate"><img width="16" src="assets/images/svgs/edit-icon.svg" alt="edit" /></button>
+              <button [matTooltip]="'Copy' | translate"><img width="16" src="assets/images/svgs/copy-icon.svg" alt="copy" /></button>
               <ng-container *ngIf="analysis?.providerName">
                 <span class="m-l-8 text-muted" style="font-size: 12px;">{{ analysis.providerName }}</span>
-                <button matTooltip="Good response" (click)="onFeedback(1)" type="button" class="m-l-4 p-0 border-0 bg-transparent">👍</button>
-                <button matTooltip="Poor response" (click)="onFeedback(0)" type="button" class="m-l-2 p-0 border-0 bg-transparent">👎</button>
+                <button [matTooltip]="'LABEL.GOOD_RESPONSE' | translate" (click)="onFeedback(1)" type="button" class="m-l-4 p-0 border-0 bg-transparent">👍</button>
+                <button [matTooltip]="'LABEL.POOR_RESPONSE' | translate" (click)="onFeedback(0)" type="button" class="m-l-2 p-0 border-0 bg-transparent">👎</button>
               </ng-container>
             </div>
 
@@ -117,8 +117,8 @@
             <div *ngFor="let rec of analysis.recommendations; let i = index" class="ai-rec-sugg">
               <h3>{{ i + 1 }}. {{ rec.action }}</h3>
               <ul>
-                <li><strong>Why:</strong> {{ rec.why }}</li>
-                <li><strong>Impact:</strong> {{ rec.impact }}</li>
+                <li><strong>{{ 'LABEL.WHY' | translate }}:</strong> {{ rec.why }}</li>
+                <li><strong>{{ 'LABEL.IMPACT' | translate }}:</strong> {{ rec.impact }}</li>
               </ul>
             </div>
 

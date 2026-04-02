@@ -53,7 +53,7 @@
                     ? (contributionSummary?.total ?? 0) * -1
                     : (contributionSummary?.total ?? 0)
                   ) | thousandSeparator
-                }}<span>/year</span>
+                }}<span>{{ '/year' | translate }}</span>
               </h3>
             </div>
             <!-- <div class="d-flex flex-column gap-8">
@@ -229,7 +229,7 @@
             >
               <div class="d-flex flex-column gap-12">
                 <h3>{{ "Contributions" | translate }}</h3>
-                <p class="ibr-card-title">Invest regularly for your future</p>
+                <p class="ibr-card-title">{{ 'Invest regularly for your future' | translate }}</p>
               </div>
               <button
                 (click)="newContributionClicked()"
@@ -483,7 +483,7 @@
             >
               <div class="d-flex flex-column gap-12">
                 <h3>{{ "Withdrawals" | translate }}</h3>
-                <p class="ibr-card-title">Use your savings when needed</p>
+                <p class="ibr-card-title">{{ 'Use your savings when needed' | translate }}</p>
               </div>
               <button
                 (click)="newWithdrawalClicked()"
@@ -732,15 +732,15 @@
               contributionDataSource.data.length === 0 &&
               withdrawalDataSource.data.length === 0
             ) {
-              <h3 class="onboard-heading">You're just getting started 👋</h3>
+              <h3 class="onboard-heading">{{ "You're just getting started 👋" | translate }}</h3>
               <p>
                 You haven’t added any contributions or withdrawals yet. <br />
                 Set up recurring investments or plan future withdrawals.
               </p>
             } @else if (contributionDataSource.data.length === 0) {
-              <p>You haven't added any contributions yet.</p>
+              <p>{{ "You haven't added any contributions yet." | translate }}</p>
             } @else if (withdrawalDataSource.data.length === 0) {
-              <p>You haven't added any withdrawals yet.</p>
+              <p>{{ "You haven't added any withdrawals yet." | translate }}</p>
             }
             <div class="onboard-button">
               @if (contributionDataSource.data.length === 0) {

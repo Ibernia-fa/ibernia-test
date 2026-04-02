@@ -15,7 +15,7 @@ import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-sep
 import moment from 'moment';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { allCountries } from 'src/app/clients/models/country';
 import { Client, ClientViewModel } from 'src/app/clients/models/client';
 import { Cashflow } from 'src/app/clients/models/cashflow';
@@ -43,7 +43,8 @@ import { SavingsBarStackedChartComponent } from '../../reports/savings-bar-stack
     ReactiveFormsModule,
     ThousandSeparatorPipe,
     ThousandSeparatorInputDirective,
-    SavingsBarStackedChartComponent
+    SavingsBarStackedChartComponent,
+    TranslateModule,
   ],
   providers: [provideNativeDateAdapter()],
   templateUrl: './simulate-emergency.component.html',

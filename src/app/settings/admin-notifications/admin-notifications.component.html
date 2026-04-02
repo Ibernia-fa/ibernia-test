@@ -40,13 +40,13 @@
       <ng-container matColumnDef="actions">
         <th mat-header-cell *matHeaderCellDef>{{ 'Actions' | translate }}</th>
         <td mat-cell *matCellDef="let row">
-          <a mat-icon-button [routerLink]="['detail', row.id]" matTooltip="View">
+          <a mat-icon-button [routerLink]="['detail', row.id]" [matTooltip]="'View' | translate">
             <mat-icon>visibility</mat-icon>
           </a>
           <button *ngIf="row.status === 'draft' || row.status === 'scheduled'" mat-icon-button (click)="send(row.id)" matTooltip="Send now">
             <mat-icon>send</mat-icon>
           </button>
-          <button *ngIf="row.status === 'draft'" mat-icon-button (click)="delete(row.id)" matTooltip="Delete">
+          <button *ngIf="row.status === 'draft'" mat-icon-button (click)="delete(row.id)" [matTooltip]="'Delete' | translate">
             <mat-icon>delete</mat-icon>
           </button>
         </td>

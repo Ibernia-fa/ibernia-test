@@ -9,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatInputModule } from '@angular/material/input';
 import { ToastrService } from 'ngx-toastr';
+import { TranslateModule } from '@ngx-translate/core';
 import { LegacyHttpService } from '../services/legacy-http.service';
 import {
   LegacyDashboardModel,
@@ -40,6 +41,7 @@ interface RecipientRow {
     MatIconModule,
     MatSliderModule,
     MatInputModule,
+    TranslateModule,
   ],
   templateUrl: './beneficiary-rules.component.html',
   styleUrl: './beneficiary-rules.component.scss'

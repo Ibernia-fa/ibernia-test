@@ -7,6 +7,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { ToastrService } from 'ngx-toastr';
+import { TranslateModule } from '@ngx-translate/core';
 import { CurrencySymbolPipe } from 'src/app/pipe/currency-symbol.pipe';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
@@ -25,6 +26,7 @@ import { LegacyHttpService } from '../services/legacy-http.service';
     MatInputModule,
     CurrencySymbolPipe,
     ThousandSeparatorInputDirective,
+    TranslateModule,
   ],
   templateUrl: './edit-parent-estate.component.html',
   styleUrl: './edit-parent-estate.component.scss'

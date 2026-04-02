@@ -14,7 +14,7 @@
             />
           }
         } @else {
-          {{ data.mode === "edit" ? "Edit cover" : "Add cover" }}
+          {{ data.mode === "edit" ? ('Edit cover' | translate) : ('Add cover' | translate) }}
         }
       </h2>
       <button
@@ -37,7 +37,7 @@
             <mat-label
               class="f-s-16 f-w-500 d-block ibr-black"
               style="line-height: 16px"
-              >Name</mat-label
+              >{{ 'Name' | translate }}</mat-label
             >
             <input
               matInput
@@ -62,7 +62,7 @@
             <mat-label
               class="f-s-16 f-w-500 d-block ibr-black"
               style="line-height: 16px"
-              >Will Status</mat-label
+              >{{ 'Will Status' | translate }}</mat-label
             >
 
             <div class="down-payment-toggle">
@@ -94,7 +94,7 @@
               <mat-label
                 class="f-s-16 f-w-500 d-block ibr-black"
                 style="line-height: 16px"
-                >Status</mat-label
+                >{{ 'Status' | translate }}</mat-label
               >
 
               <div class="down-payment-toggle">
@@ -116,7 +116,7 @@
                 form.get("policyStatus")?.touched &&
                 form.get("policyStatus")?.hasError("required")
               ) {
-                <span class="field-error d-block">Required</span>
+                <span class="field-error d-block">{{ 'Required' | translate }}</span>
               }
             </div>
           }
@@ -127,7 +127,7 @@
                 <mat-label
                   class="f-s-16 f-w-500 ibr-black d-flex align-items-center"
                   style="line-height: 16px"
-                  >Insurance cost</mat-label
+                  >{{ 'Insurance cost' | translate }}</mat-label
                 >
                 <div class="net-field d-flex align-items-center">
                   <div class="left hide-arrow">
@@ -195,7 +195,7 @@
               <mat-label
                 class="f-s-16 f-w-500 ibr-black d-flex align-items-center"
                 style="line-height: 16px"
-                >Coverage adequacy</mat-label
+                >{{ 'Coverage adequacy' | translate }}</mat-label
               >
 
               <div class="down-payment-toggle coverage-toggle">
@@ -234,7 +234,7 @@
                 <mat-label
                   class="f-s-16 f-w-500 ibr-black d-flex align-items-center"
                   style="line-height: 16px"
-                  >Coverage</mat-label
+                  >{{ 'Coverage' | translate }}</mat-label
                 >
                 <div class="net-field d-flex align-items-center">
                   <div class="left hide-arrow">
@@ -287,7 +287,7 @@
             class="button-icon-outline w-100 d-block"
             (click)="onDelete()"
           >
-            <span class="f-s-16">Delete</span>
+            <span class="f-s-16">{{ 'Delete' | translate }}</span>
           </button>
         }
         @if (!isDeleteEnabled) {
@@ -306,7 +306,7 @@
           class="button-icon w-100 d-block"
           (click)="onSave()"
         >
-          <span class="f-s-16">Save</span>
+          <span class="f-s-16">{{ 'Save' | translate }}</span>
         </button>
       </div>
     </div>

@@ -176,7 +176,7 @@
             (click)="onDelete()"
             [disabled]="isSaving"
           >
-            <span class="f-s-16">Delete</span>
+            <span class="f-s-16">{{ 'Delete' | translate }}</span>
           </button>
         } @else {
           <button
@@ -184,7 +184,7 @@
             class="button-icon-outline w-100 d-block"
             (click)="onCancel()"
           >
-            <span class="f-s-16">Cancel</span>
+            <span class="f-s-16">{{ 'Cancel' | translate }}</span>
           </button>
         }
       </div>
@@ -196,9 +196,9 @@
           [disabled]="form.invalid || isSaving"
         >
           @if (isSaving) {
-            <span class="f-s-16">Saving...</span>
+            <span class="f-s-16">{{ 'Saving...' | translate }}</span>
           } @else {
-            <span class="f-s-16">Save</span>
+            <span class="f-s-16">{{ 'Save' | translate }}</span>
           }
         </button>
       </div>

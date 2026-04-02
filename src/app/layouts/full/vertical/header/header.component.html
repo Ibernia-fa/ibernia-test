@@ -408,7 +408,7 @@
                 />
               </svg>
             </span>
-            {{ otherLanguage === "en" ? "English" : "Italian" }}
+            {{ otherLanguage === "en" ? ('LABEL.ENGLISH' | translate) : ('LABEL.ITALIAN' | translate) }}
           </li>
 
           <li (click)="logout()">
