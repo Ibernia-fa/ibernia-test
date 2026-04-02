@@ -48,17 +48,17 @@
             >
               <button
                 class="tab-btn"
-                [class.active]="activeTab === 'after'"
-                (click)="switchTab('after')"
-              >
-                {{ "After" | translate }}
-              </button>
-              <button
-                class="tab-btn"
                 [class.active]="activeTab === 'before'"
                 (click)="switchTab('before')"
               >
                 {{ "Before" | translate }}
+              </button>
+              <button
+                class="tab-btn"
+                [class.active]="activeTab === 'after'"
+                (click)="switchTab('after')"
+              >
+                {{ "After" | translate }}
               </button>
             </div>
           </div>
