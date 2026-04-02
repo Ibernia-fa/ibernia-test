@@ -19,7 +19,8 @@ import { FinancialViewModel } from '../model/income-expense';
 import { extractEventId, resolveYear } from 'src/app/shared/utils/event-date-utils';
 import { catchError, filter, finalize } from 'rxjs';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { getAmountCycleLabel } from 'src/app/shared/utils/amount-cycle-label';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -88,7 +89,8 @@ export class AddExpenseComponent {
     private dialogRef: MatDialogRef<AddExpenseComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private fb: FormBuilder,
-    private incomeExpenseHttpService: IncomeExpensesHttpService
+    private incomeExpenseHttpService: IncomeExpensesHttpService,
+    private translate: TranslateService,
   ) {
     this.expenseTypes = data.expenseType;
     this.eventsList = data.eventsList ?? [];
@@ -281,6 +283,10 @@ export class AddExpenseComponent {
     }
 
     escalationControl?.updateValueAndValidity();
+  }
+
+  getCycleLabel(cycle: Cycle): string {
+    return getAmountCycleLabel(cycle, this.translate);
   }
 
   addExpense(): void {

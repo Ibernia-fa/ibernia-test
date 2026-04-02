@@ -25,6 +25,7 @@ import { Cycle, EscalationRate, FinancialTimeline } from '../../timeline/models/
 import { SimulateEmergencyModel } from '../models/simulate-emergency.model';
 import { EmergenciesHttpService } from '../services/emergencies-http.service';
 import { SavingsBarStackedChartComponent } from '../../reports/savings-bar-stacked-chart/savings-bar-stacked-chart.component';
+import { getAmountCycleLabel } from 'src/app/shared/utils/amount-cycle-label';
 
 @Component({
   selector: 'simulate-emergency',
@@ -280,20 +281,7 @@ export class SimulateEmergencyComponent implements OnDestroy {
   }
 
   getCycleLabel(cycle: { description?: string } | null | undefined): string {
-    const raw = (cycle?.description ?? '').toString().trim();
-    if (!raw) return '';
-
-    const normalized = raw.toLowerCase();
-    const key =
-      normalized === 'one-off'
-        ? 'CYCLE.ONE_OFF'
-        : normalized === 'every month'
-          ? 'CYCLE.EVERY_MONTH'
-          : normalized === 'every year'
-            ? 'CYCLE.EVERY_YEAR'
-            : null;
-
-    return key ? this.translate.instant(key) : raw;
+    return getAmountCycleLabel(cycle, this.translate);
   }
 
   getEmergencyLabel(emergency: { name?: string } | null | undefined): string {

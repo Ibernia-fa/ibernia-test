@@ -31,13 +31,24 @@
               </div> -->
               <div class="ibr-client-intro">
                 <h3>
-                  {{ client.clientDetails.firstName }}
-                  {{ client.clientDetails.lastName }}'s
-                  {{ "Profile" | translate }}
+                  {{
+                    "PROFILE.CLIENT_PAGE_TITLE"
+                      | translate
+                        : {
+                            firstName: client.clientDetails.firstName,
+                            lastName: client.clientDetails.lastName,
+                          }
+                  }}
                 </h3>
                 <p>
-                  {{ birthDate | date }} ({{ birthDate | ageCalculator }} years
-                  old)
+                  @if (birthDate) {
+                    {{ birthDate | date: "d MMMM y":undefined:dateLocale }}
+                    ({{
+                      "PROFILE.AGE_YEARS"
+                        | translate
+                          : { age: (birthDate | ageCalculator) }
+                    }})
+                  }
                 </p>
               </div>
               <!-- End headings  -->

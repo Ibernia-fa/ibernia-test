@@ -190,7 +190,7 @@
                 >
                   @for (cycle of cycles; let i = $index; track cycle) {
                     <mat-option [value]="cycle.id">{{
-                      cycle.description
+                      getCycleLabel(cycle)
                     }}</mat-option>
                   }
                 </mat-select>
@@ -286,7 +286,7 @@
                   >
                     @for (cycle of cycles; let i = $index; track cycle) {
                       <mat-option [value]="cycle.id">{{
-                        cycle.description
+                        getCycleLabel(cycle)
                       }}</mat-option>
                     }
                   </mat-select>
