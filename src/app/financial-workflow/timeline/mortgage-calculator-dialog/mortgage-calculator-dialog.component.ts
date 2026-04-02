@@ -1,6 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { TranslateModule } from '@ngx-translate/core';
 import {
   MortgageCalculatorComponent,
   MortgageCalculatorState,
@@ -26,7 +27,7 @@ export interface MortgageCalculatorDialogResult {
 @Component({
   selector: 'app-mortgage-calculator-dialog',
   standalone: true,
-  imports: [MatDialogModule, MatIconModule, MortgageCalculatorComponent],
+  imports: [MatDialogModule, MatIconModule, TranslateModule, MortgageCalculatorComponent],
   templateUrl: './mortgage-calculator-dialog.component.html',
   styleUrl: './mortgage-calculator-dialog.component.scss',
 })

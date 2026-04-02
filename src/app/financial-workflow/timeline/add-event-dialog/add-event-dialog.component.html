@@ -4,7 +4,7 @@
     <!-- New Modal Header -->
     <div class="dialog-header">
       <h2 class="dialog-title text-center">
-        {{ eventForm.get("name")?.value }}
+        {{ eventForm.get("name")?.value | translate }}
         <ng-container *ngIf="isAllowRename">
           <img
             src="assets/images/svgs/drop-down-edit-2-line.svg"
@@ -38,7 +38,7 @@
           class="bold-icon"
         />
         <h3>
-          {{ eventForm.get("name")?.value }}
+          {{ eventForm.get("name")?.value | translate }}
           <ng-container *ngIf="isAllowRename">
             <img
               src="assets/images/svgs/drop-down-edit-2-line.svg"
@@ -578,7 +578,7 @@
     <!-- New Modal Header -->
     <div class="dialog-header">
       <h2 class="dialog-title text-center">
-        {{ eventForm.get("name")?.value }}
+        {{ eventForm.get("name")?.value | translate }}
         <ng-container *ngIf="isAllowRename">
           <img
             src="assets/images/svgs/drop-down-edit-2-line.svg"
@@ -611,7 +611,7 @@
           class="bold-icon"
         />
         <h3>
-          {{ eventForm.get("name")?.value }}
+          {{ eventForm.get("name")?.value | translate }}
           <ng-container *ngIf="isAllowRename">
             <img
               src="assets/images/svgs/drop-down-edit-2-line.svg"
@@ -1301,7 +1301,7 @@
         <h2 class="dialog-title text-center">
           {{
             isEditWorkflow
-              ? eventForm.get("name")?.value
+              ? (eventForm.get("name")?.value | translate)
               : ("Custom goal" | translate)
           }}
           <ng-container *ngIf="isEditWorkflow">
@@ -1334,7 +1334,7 @@
       <!-- <h3>
           {{
             isEditWorkflow
-              ? eventForm.get("name")?.value
+              ? (eventForm.get("name")?.value | translate)
               : ("Custom goal" | translate)
           }}
           <ng-container *ngIf="isEditWorkflow">
