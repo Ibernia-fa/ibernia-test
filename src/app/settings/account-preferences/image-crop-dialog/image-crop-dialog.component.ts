@@ -201,7 +201,7 @@ const COMPANY_CROP_H = 300;
         width: 100% !important;
         flex: 1 1 auto;
         min-width: 0;
-        margin-left:9px ;
+        padding: 0 9px;
       }
       .zoom-slider-wrap .mat-mdc-slider {
         width: 100% !important;

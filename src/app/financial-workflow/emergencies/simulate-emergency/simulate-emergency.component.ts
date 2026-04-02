@@ -106,6 +106,7 @@ export class SimulateEmergencyComponent implements OnDestroy {
     categories: string[];
     timelineEvents: any[];
   } | null = null;
+  simulationChartHeight: number = 420;
 
 
   constructor(
@@ -453,6 +454,7 @@ export class SimulateEmergencyComponent implements OnDestroy {
             this.activeTab = 'baseline';
             this.displayedReport = this.baselineResult;
             this.dialogRef.updateSize('92vw', '88vh');
+            this.simulationChartHeight = Math.max(Math.round(window.innerHeight * 0.88 - 150), 300);
             this.emergencyExpense = simulateEmergency;
             this.emergencyExpense.id = res.emergencyExpenseId;
             this.isSimulationCompleted = true;
