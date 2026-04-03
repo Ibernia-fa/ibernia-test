@@ -1,4 +1,4 @@
-$line-color: #cbd5e1;
+$line-color: #dadada;
 $line-w: 2px;
 
 .section-title {
@@ -100,6 +100,7 @@ $line-w: 2px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  flex: 1;
 }
 
 // ── Parents couple at top of a branch ─────────────────────────
@@ -125,9 +126,9 @@ $line-w: 2px;
 
 .parent-estate {
   margin-top: 4px;
-  font-size: 12px;
+  font-size: 16px;
   font-weight: 600;
-  color: #f97316;
+  color: #fe9614;
   cursor: pointer;
   white-space: nowrap;
   display: flex;
@@ -135,9 +136,9 @@ $line-w: 2px;
   gap: 4px;
 
   .edit-sm {
-    font-size: 12px;
-    width: 12px;
-    height: 12px;
+    font-size: 16px;
+    width: 20px;
+    height: 20px;
     color: #94a3b8;
   }
 }
@@ -146,7 +147,7 @@ $line-w: 2px;
 
 .branch-vline {
   width: $line-w;
-  height: 28px;
+  height: 44px;
   background: $line-color;
 }
 
@@ -163,11 +164,12 @@ $line-w: 2px;
   flex-direction: column;
   align-items: center;
   position: relative;
+  min-width: 128px;
 }
 
 .leaf-drop {
   width: $line-w;
-  height: 18px;
+  height: 64px;
   background: $line-color;
 }
 
@@ -231,7 +233,7 @@ $line-w: 2px;
 
 .child-vline {
   width: $line-w;
-  height: 28px;
+  height: 44px;
   background: $line-color;
 }
 
@@ -293,8 +295,8 @@ $line-w: 2px;
 }
 
 .node-avatar {
-  width: 48px;
-  height: 48px;
+  width: 45px;
+  height: 45px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -302,35 +304,55 @@ $line-w: 2px;
   color: #fff;
   mat-icon {
     font-size: 24px;
-    width: 24px;
-    height: 24px;
+    // width: 24px;
+    // height: 24px;
+    width: auto !important;
+    height: auto !important;
   }
 }
 
 .avatar-client,
+.avatar-partner {
+  height: 60px;
+  width: 60px;
+}
+.avatar-client,
 .avatar-clientfather {
-  background: #6366f1;
+  background: #3088ed;
 }
 .avatar-partner,
 .avatar-partnerfather {
-  background: #f97316;
+  background: #fe9614;
+}
+.avatar-partnerfather {
+  background-color: #ee6700;
 }
 .avatar-clientmother {
-  background: #84cc16;
+  // background: #84cc16;
+  background-color: #2234c2;
+}
+.avatar-clientfather {
+  // background: #84cc16;
+  background-color: #2234c2;
 }
 .avatar-partnermother {
-  background: #ec4899;
+  // background: #ec4899;
+  background-color: #ee6700;
 }
 .avatar-clientsibling {
-  background: rgba(99, 102, 241, 0.6);
+  // background: rgba(99, 102, 241, 0.6);
+  background-color: #47c9f4;
 }
 .avatar-partnersibling {
-  background: #14b8a6;
+  // background: #14b8a6;
+  background-color: #ecc125;
 }
 
 .avatar-child {
   background: transparent;
-  border: 3px solid;
+  // border: 3px solid;
+  height: 45px;
+  width: 45px;
 }
 
 .avatar-other {
@@ -338,22 +360,28 @@ $line-w: 2px;
 }
 
 .children-leaves .leaf:nth-child(3n + 1) .avatar-child {
-  border-color: #f97316;
-  color: #f97316;
+  // border-color: #34c759;
+  // color: #1c1c1c;
+  color: white;
+  background-color: #34c759;
 }
 .children-leaves .leaf:nth-child(3n + 2) .avatar-child {
-  border-color: #6366f1;
-  color: #6366f1;
+  // border-color: #6366f1;
+  // color: #6366f1;
+  color: white;
+  background-color: #34c759;
 }
 .children-leaves .leaf:nth-child(3n) .avatar-child {
-  border-color: #a855f7;
-  color: #a855f7;
+  // border-color: #a855f7;
+  // color: #a855f7;
+  color: white;
+  background-color: #34c759;
 }
 
 .node-name {
-  font-size: 12px;
+  font-size: 16px;
   font-weight: 500;
-  color: #334155;
+  color: #1c1c1c;
   text-align: center;
   max-width: 110px;
   white-space: nowrap;
@@ -365,14 +393,16 @@ $line-w: 2px;
 }
 
 .node-amount {
-  font-size: 14px;
+  font-size: 24px;
   font-weight: 700;
-  color: #6366f1;
+  // color: #6366f1;
+  color: #3088ed;
+  margin-top: 8px;
   font-family: "Ubuntu", serif;
 }
 
 .partner-amount {
-  color: #f97316;
+  color: #fe9614;
 }
 
 .node-remove {
@@ -408,15 +438,16 @@ $line-w: 2px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3px;
+  gap: 6px;
   cursor: pointer;
 }
 
 .tax-icon-circle {
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  background: #fee2e2;
+  // background: #fee2e2;
+  background-color: #ff383c;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -430,18 +461,21 @@ $line-w: 2px;
 }
 
 .tax-badge {
-  background: #fee2e2;
-  color: #dc2626;
-  font-size: 10px;
+  background: #ffdbdb;
+  color: #ff383c;
+  font-size: 12px;
   font-weight: 700;
   padding: 2px 8px;
+  line-height: 16px;
+  min-width: 48px;
+  text-align: center;
   border-radius: 999px;
 }
 
 .tax-amount {
-  font-size: 13px;
-  font-weight: 700;
-  color: #dc2626;
+  font-size: 18px;
+  font-weight: 500;
+  color: #ff383c;
   font-family: "Ubuntu", serif;
 }
 
@@ -462,24 +496,25 @@ $line-w: 2px;
 }
 
 .inheritance-pct-badge {
-  background: #10b981;
+  background: #4043af;
   color: #fff;
-  font-size: 10px;
-  font-weight: 700;
-  padding: 2px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 8px;
+  line-height: 16px;
   border-radius: 999px;
 }
 
 .inheritance-detail {
-  font-size: 11px;
-  color: #f97316;
+  font-size: 14px;
+  color: #fe9614;
   font-weight: 500;
 }
 
 .inheritance-total {
-  font-size: 15px;
+  font-size: 24px;
   font-weight: 700;
-  color: #f97316;
+  color: #fe9614;
   font-family: "Ubuntu", serif;
 }
 
@@ -491,7 +526,7 @@ $line-w: 2px;
 }
 
 .child-total {
-  color: #10b981;
+  color: #34c759;
 }
 
 .estate-currency {
@@ -543,4 +578,37 @@ $line-w: 2px;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.new-heart-icon {
+  background-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #516ce8;
+  height: 40px;
+  width: 40px;
+  cursor: pointer;
+  &:hover {
+    scale: 0.98;
+  }
+}
+
+.new-heart-icon-sm {
+  background-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #516ce8;
+  height: 32px;
+  width: 32px;
+  img {
+    margin-top: 3px;
+  }
 }

@@ -4,7 +4,7 @@
     <mat-card-content>
       <div class="d-flex align-items-center justify-content-between">
         <div class="d-flex flex-column gap-10">
-          <h3 class="ibr-new-heading">{{ 'Family Tree' | translate }}</h3>
+          <h3 class="ibr-new-heading">{{ "Family Tree" | translate }}</h3>
           <p class="ibr-new-subheading">
             Visualize how your wealth flows to each generation
           </p>
@@ -21,11 +21,13 @@
             class="button-icon-outline"
             (click)="onOpenBeneficiaryRules()"
           >
-            <span class="f-s-16 f-w-500"> {{ 'Beneficiary rules' | translate }}</span>
+            <span class="f-s-16 f-w-500">
+              {{ "Beneficiary rules" | translate }}</span
+            >
           </button>
 
           <button (click)="onAddMember()" type="button" class="button-icon">
-            <span class="f-s-16 f-w-500"> {{ 'Add member' | translate }}</span>
+            <span class="f-s-16 f-w-500"> {{ "Add member" | translate }}</span>
             <img src="assets/images/svgs/add-icon.svg" alt="add-icon" />
           </button>
         </div>
@@ -37,7 +39,30 @@
         <div class="other-members" *ngIf="otherMembers.length > 0">
           <div class="tree-node other-node" *ngFor="let other of otherMembers">
             <div class="node-avatar avatar-other">
-              <mat-icon>person</mat-icon>
+              <mat-icon>
+                <svg
+                  width="30"
+                  height="30"
+                  viewBox="0 0 30 30"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M25 26.25V23.75C25 22.4239 24.4732 21.1521 23.5355 20.2145C22.5979 19.2768 21.3261 18.75 20 18.75H10C8.67392 18.75 7.40215 19.2768 6.46447 20.2145C5.52678 21.1521 5 22.4239 5 23.75V26.25"
+                    stroke="white"
+                    stroke-width="2.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M15 13.75C17.7614 13.75 20 11.5114 20 8.75C20 5.98858 17.7614 3.75 15 3.75C12.2386 3.75 10 5.98858 10 8.75C10 11.5114 12.2386 13.75 15 13.75Z"
+                    stroke="white"
+                    stroke-width="2.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </mat-icon>
             </div>
             <span class="node-name"
               >{{ other.firstName }} {{ other.lastName }}</span
@@ -75,7 +100,30 @@
                       class="node-avatar"
                       [ngClass]="'avatar-' + parent.role.toLowerCase()"
                     >
-                      <mat-icon>person</mat-icon>
+                      <mat-icon>
+                        <svg
+                          width="30"
+                          height="30"
+                          viewBox="0 0 30 30"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M25 26.25V23.75C25 22.4239 24.4732 21.1521 23.5355 20.2145C22.5979 19.2768 21.3261 18.75 20 18.75H10C8.67392 18.75 7.40215 19.2768 6.46447 20.2145C5.52678 21.1521 5 22.4239 5 23.75V26.25"
+                            stroke="white"
+                            stroke-width="2.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                          <path
+                            d="M15 13.75C17.7614 13.75 20 11.5114 20 8.75C20 5.98858 17.7614 3.75 15 3.75C12.2386 3.75 10 5.98858 10 8.75C10 11.5114 12.2386 13.75 15 13.75Z"
+                            stroke="white"
+                            stroke-width="2.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                        </svg>
+                      </mat-icon>
                     </div>
                     <span class="node-name"
                       >{{ parent.firstName }} {{ parent.lastName }}</span
@@ -92,7 +140,13 @@
                     *ngIf="i === 0 && clientParents.length > 1"
                   >
                     <div class="line-h"></div>
-                    <mat-icon class="heart-sm">favorite</mat-icon>
+                    <!-- <mat-icon class="heart-sm">favorite</mat-icon> -->
+                    <div class="new-heart-icon-sm">
+                      <img
+                        src="../../../../assets/images/svgs/new-legacy-heart-icon-sm.svg"
+                        alt="new-legacy-heart-icon-sm"
+                      />
+                    </div>
                     <div class="line-h"></div>
                   </div>
                 </ng-container>
@@ -116,11 +170,20 @@
             <ng-container *ngIf="showTaxOnClientBranch">
               <div class="tax-node" (click)="onOpenTaxSettings()">
                 <div class="tax-icon-circle">
-                  <mat-icon>account_balance</mat-icon>
+                  <!-- <mat-icon>account_balance</mat-icon> -->
+                  <img
+                    src="../../../../assets/images/svgs/new-legacy-tax-icon.svg"
+                    alt="new-legacy-tax-icon"
+                  />
                 </div>
-                <div class="tax-badge">{{ 'Tax' | translate }}</div>
+                <div class="tax-badge">
+                  <span>{{ "Tax" | translate }}</span>
+                </div>
                 <span class="tax-amount">
-                  <span class="estate-currency">{{currency | currencySymbol}}</span>{{scenarioResult!.totalTax | number:'1.0-0'}}
+                  <span class="estate-currency">{{
+                    currency | currencySymbol
+                  }}</span
+                  >{{ scenarioResult!.totalTax | number: "1.0-0" }}
                 </span>
               </div>
               <div class="branch-vline"></div>
@@ -141,7 +204,30 @@
                   [class.deceased]="isDeceased(sib.id)"
                 >
                   <div class="node-avatar avatar-clientsibling">
-                    <mat-icon>person</mat-icon>
+                    <mat-icon>
+                      <svg
+                        width="30"
+                        height="30"
+                        viewBox="0 0 30 30"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M25 26.25V23.75C25 22.4239 24.4732 21.1521 23.5355 20.2145C22.5979 19.2768 21.3261 18.75 20 18.75H10C8.67392 18.75 7.40215 19.2768 6.46447 20.2145C5.52678 21.1521 5 22.4239 5 23.75V26.25"
+                          stroke="white"
+                          stroke-width="2.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                        <path
+                          d="M15 13.75C17.7614 13.75 20 11.5114 20 8.75C20 5.98858 17.7614 3.75 15 3.75C12.2386 3.75 10 5.98858 10 8.75C10 11.5114 12.2386 13.75 15 13.75Z"
+                          stroke="white"
+                          stroke-width="2.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                    </mat-icon>
                   </div>
                   <span class="node-name"
                     >{{ sib.firstName }} {{ sib.lastName }}</span
@@ -177,7 +263,30 @@
                   (click)="onClickClient()"
                 >
                   <div class="node-avatar avatar-client">
-                    <mat-icon>person</mat-icon>
+                    <mat-icon>
+                      <svg
+                        width="40"
+                        height="40"
+                        viewBox="0 0 40 40"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M33.3334 35V31.6667C33.3334 29.8986 32.631 28.2029 31.3808 26.9526C30.1305 25.7024 28.4349 25 26.6667 25H13.3334C11.5653 25 9.86961 25.7024 8.61937 26.9526C7.36913 28.2029 6.66675 29.8986 6.66675 31.6667V35"
+                          stroke="white"
+                          stroke-width="3.33333"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                        <path
+                          d="M19.9999 18.3333C23.6818 18.3333 26.6666 15.3486 26.6666 11.6667C26.6666 7.98477 23.6818 5 19.9999 5C16.318 5 13.3333 7.98477 13.3333 11.6667C13.3333 15.3486 16.318 18.3333 19.9999 18.3333Z"
+                          stroke="white"
+                          stroke-width="3.33333"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                    </mat-icon>
                   </div>
                   <span
                     class="node-name"
@@ -216,9 +325,19 @@
           <!-- ── COUPLE CONNECTOR (heart always shown) ── -->
           <div class="couple-link" *ngIf="hasPartner">
             <div class="line-h link-line"></div>
-            <mat-icon class="heart-lg" (click)="onClickCouple()"
+            <!-- <mat-icon class="heart-lg" 
               >favorite</mat-icon
+            > -->
+            <button
+              type="button"
+              (click)="onClickCouple()"
+              class="new-heart-icon"
             >
+              <img
+                src="../../../../assets/images/svgs/new-legacy-heart-icon.svg"
+                alt="new-legacy-heart-icon"
+              />
+            </button>
             <div class="line-h link-line"></div>
           </div>
 
@@ -239,7 +358,30 @@
                       class="node-avatar"
                       [ngClass]="'avatar-' + parent.role.toLowerCase()"
                     >
-                      <mat-icon>person</mat-icon>
+                      <mat-icon>
+                        <svg
+                          width="30"
+                          height="30"
+                          viewBox="0 0 30 30"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M25 26.25V23.75C25 22.4239 24.4732 21.1521 23.5355 20.2145C22.5979 19.2768 21.3261 18.75 20 18.75H10C8.67392 18.75 7.40215 19.2768 6.46447 20.2145C5.52678 21.1521 5 22.4239 5 23.75V26.25"
+                            stroke="white"
+                            stroke-width="2.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                          <path
+                            d="M15 13.75C17.7614 13.75 20 11.5114 20 8.75C20 5.98858 17.7614 3.75 15 3.75C12.2386 3.75 10 5.98858 10 8.75C10 11.5114 12.2386 13.75 15 13.75Z"
+                            stroke="white"
+                            stroke-width="2.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                        </svg>
+                      </mat-icon>
                     </div>
                     <span class="node-name"
                       >{{ parent.firstName }} {{ parent.lastName }}</span
@@ -256,7 +398,13 @@
                     *ngIf="i === 0 && partnerParents.length > 1"
                   >
                     <div class="line-h"></div>
-                    <mat-icon class="heart-sm">favorite</mat-icon>
+                    <!-- <mat-icon class="heart-sm">favorite</mat-icon> -->
+                    <div class="new-heart-icon-sm">
+                      <img
+                        src="../../../../assets/images/svgs/new-legacy-heart-icon-sm.svg"
+                        alt="new-legacy-heart-icon-sm"
+                      />
+                    </div>
                     <div class="line-h"></div>
                   </div>
                 </ng-container>
@@ -283,11 +431,20 @@
             <ng-container *ngIf="showTaxOnPartnerBranch">
               <div class="tax-node" (click)="onOpenTaxSettings()">
                 <div class="tax-icon-circle">
-                  <mat-icon>account_balance</mat-icon>
+                  <!-- <mat-icon>account_balance</mat-icon> -->
+                  <img
+                    src="../../../../assets/images/svgs/new-legacy-tax-icon.svg"
+                    alt="new-legacy-tax-icon"
+                  />
                 </div>
-                <div class="tax-badge">{{ 'Tax' | translate }}</div>
+                <div class="tax-badge">
+                  <span>{{ "Tax" | translate }}</span>
+                </div>
                 <span class="tax-amount">
-                  <span class="estate-currency">{{currency | currencySymbol}}</span>{{scenarioResult!.totalTax | number:'1.0-0'}}
+                  <span class="estate-currency">{{
+                    currency | currencySymbol
+                  }}</span
+                  >{{ scenarioResult!.totalTax | number: "1.0-0" }}
                 </span>
               </div>
               <div class="branch-vline"></div>
@@ -312,7 +469,30 @@
                   (click)="onClickPartner()"
                 >
                   <div class="node-avatar avatar-partner">
-                    <mat-icon>person</mat-icon>
+                    <mat-icon>
+                      <svg
+                        width="40"
+                        height="40"
+                        viewBox="0 0 40 40"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M33.3334 35V31.6667C33.3334 29.8986 32.631 28.2029 31.3808 26.9526C30.1305 25.7024 28.4349 25 26.6667 25H13.3334C11.5653 25 9.86961 25.7024 8.61937 26.9526C7.36913 28.2029 6.66675 29.8986 6.66675 31.6667V35"
+                          stroke="white"
+                          stroke-width="3.33333"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                        <path
+                          d="M19.9999 18.3333C23.6818 18.3333 26.6666 15.3486 26.6666 11.6667C26.6666 7.98477 23.6818 5 19.9999 5C16.318 5 13.3333 7.98477 13.3333 11.6667C13.3333 15.3486 16.318 18.3333 19.9999 18.3333Z"
+                          stroke="white"
+                          stroke-width="3.33333"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                    </mat-icon>
                   </div>
                   <span
                     class="node-name"
@@ -359,7 +539,30 @@
                   [class.deceased]="isDeceased(sib.id)"
                 >
                   <div class="node-avatar avatar-partnersibling">
-                    <mat-icon>person</mat-icon>
+                    <mat-icon>
+                      <svg
+                        width="30"
+                        height="30"
+                        viewBox="0 0 30 30"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M25 26.25V23.75C25 22.4239 24.4732 21.1521 23.5355 20.2145C22.5979 19.2768 21.3261 18.75 20 18.75H10C8.67392 18.75 7.40215 19.2768 6.46447 20.2145C5.52678 21.1521 5 22.4239 5 23.75V26.25"
+                          stroke="white"
+                          stroke-width="2.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                        <path
+                          d="M15 13.75C17.7614 13.75 20 11.5114 20 8.75C20 5.98858 17.7614 3.75 15 3.75C12.2386 3.75 10 5.98858 10 8.75C10 11.5114 12.2386 13.75 15 13.75Z"
+                          stroke="white"
+                          stroke-width="2.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                    </mat-icon>
                   </div>
                   <span class="node-name"
                     >{{ sib.firstName }} {{ sib.lastName }}</span
@@ -386,14 +589,26 @@
           <div class="child-vline"></div>
 
           <!-- Tax node on the flow path (only for client/partner death scenarios) -->
-          <div class="tax-node" *ngIf="showTaxOnChildrenSection"
-               (click)="onOpenTaxSettings()">
+          <div
+            class="tax-node"
+            *ngIf="showTaxOnChildrenSection"
+            (click)="onOpenTaxSettings()"
+          >
             <div class="tax-icon-circle">
-              <mat-icon>account_balance</mat-icon>
+              <!-- <mat-icon>account_balance</mat-icon> -->
+              <img
+                src="../../../../assets/images/svgs/new-legacy-tax-icon.svg"
+                alt="new-legacy-tax-icon"
+              />
             </div>
-            <div class="tax-badge">{{ 'Tax' | translate }}</div>
+            <div class="tax-badge">
+              <span>{{ "Tax" | translate }}</span>
+            </div>
             <span class="tax-amount">
-              <span class="estate-currency">{{currency | currencySymbol}}</span>{{scenarioResult!.totalTax | number:'1.0-0'}}
+              <span class="estate-currency">{{
+                currency | currencySymbol
+              }}</span
+              >{{ scenarioResult!.totalTax | number: "1.0-0" }}
             </span>
           </div>
           <div class="child-vline" *ngIf="showTaxOnChildrenSection"></div>
@@ -416,7 +631,30 @@
                 [class.deceased]="isDeceased(child.id)"
               >
                 <div class="node-avatar avatar-child">
-                  <mat-icon>person</mat-icon>
+                  <mat-icon>
+                    <svg
+                      width="30"
+                      height="30"
+                      viewBox="0 0 30 30"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M25 26.25V23.75C25 22.4239 24.4732 21.1521 23.5355 20.2145C22.5979 19.2768 21.3261 18.75 20 18.75H10C8.67392 18.75 7.40215 19.2768 6.46447 20.2145C5.52678 21.1521 5 22.4239 5 23.75V26.25"
+                        stroke="white"
+                        stroke-width="2.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                      <path
+                        d="M15 13.75C17.7614 13.75 20 11.5114 20 8.75C20 5.98858 17.7614 3.75 15 3.75C12.2386 3.75 10 5.98858 10 8.75C10 11.5114 12.2386 13.75 15 13.75Z"
+                        stroke="white"
+                        stroke-width="2.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  </mat-icon>
                 </div>
                 <span class="node-name"
                   >{{ child.firstName }} {{ child.lastName }}</span
@@ -444,22 +682,26 @@
   <mat-card class="ibr-new-dashboad-card" *ngIf="dashboard?.taxSettings as ts">
     <mat-card-content>
       <div class="d-flex align-items-center justify-content-between">
-        <div class="d-flex flex-wrap gap-24 align-items-center tax-settings-legend">
+        <div
+          class="d-flex flex-wrap gap-24 align-items-center tax-settings-legend"
+        >
           <div class="legend-item">
-            <span class="legend-label">{{ 'Partner tax' | translate }}:</span>
+            <span class="legend-label">{{ "Partner tax" | translate }}:</span>
             <span class="legend-value">{{ ts.partnerTaxRate }}%</span>
           </div>
           <div class="legend-item">
-            <span class="legend-label">{{ 'Child tax' | translate }}:</span>
+            <span class="legend-label">{{ "Child tax" | translate }}:</span>
             <span class="legend-value">{{ ts.childTaxRate }}%</span>
           </div>
           <div class="legend-item">
-            <span class="legend-label">{{ 'Sibling tax' | translate }}:</span>
+            <span class="legend-label">{{ "Sibling tax" | translate }}:</span>
             <span class="legend-value">{{ ts.siblingTaxRate }}%</span>
           </div>
         </div>
         <button class="button-icon-outline" (click)="onOpenTaxSettings()">
-          <span class="f-s-16 f-w-500">{{ 'Edit tax settings' | translate }}</span>
+          <span class="f-s-16 f-w-500">{{
+            "Edit tax settings" | translate
+          }}</span>
         </button>
       </div>
     </mat-card-content>
