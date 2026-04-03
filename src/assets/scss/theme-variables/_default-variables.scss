@@ -1,4 +1,6 @@
 html {
+  /** Fallback before theme class is applied (matches light-theme token). */
+  --ib-text-secondary-muted: #787889;
   --mat-sys-error-fixed-dim: rgba(247, 68, 86, 0.15);
   --mat-select-container-elevation-shadow: var(--mat-sys-level3);
   --mdc-list-list-item-label-text-tracking: 0;

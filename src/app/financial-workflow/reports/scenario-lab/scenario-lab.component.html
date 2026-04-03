@@ -226,19 +226,24 @@
                         }
                       </mat-select>
                       @if (editedGoals.length) {
-                        <div class="edited-chips">
-                          @for (entry of editedGoals; track entry.name) {
-                            <span class="edited-chip">
-                              {{ entry.name }}
-                              <button
-                                class="chip-remove"
-                                (click)="removeEditedItem('goals', entry.name)"
-                                aria-label="Remove"
-                              >
-                                <mat-icon>close</mat-icon>
-                              </button>
-                            </span>
-                          }
+                        <div class="edited-chips-block">
+                          <span class="edited-prefix">{{
+                            "SCENARIO_LAB.EDITED_PREFIX" | translate
+                          }}</span>
+                          <div class="edited-chips">
+                            @for (entry of editedGoals; track entry.name) {
+                              <span class="edited-chip">
+                                {{ editedGoalChipLabel(entry.name) }}
+                                <button
+                                  class="chip-remove"
+                                  (click)="removeEditedItem('goals', entry.name)"
+                                  aria-label="Remove"
+                                >
+                                  <mat-icon>close</mat-icon>
+                                </button>
+                              </span>
+                            }
+                          </div>
                         </div>
                       }
 
@@ -291,21 +296,26 @@
                         }
                       </mat-select>
                       @if (editedSavingPots.length) {
-                        <div class="edited-chips">
-                          @for (entry of editedSavingPots; track entry.name) {
-                            <span class="edited-chip">
-                              {{ entry.name }}
-                              <button
-                                class="chip-remove"
-                                (click)="
-                                  removeEditedItem('savingPots', entry.name)
-                                "
-                                aria-label="Remove"
-                              >
-                                <mat-icon>close</mat-icon>
-                              </button>
-                            </span>
-                          }
+                        <div class="edited-chips-block">
+                          <span class="edited-prefix">{{
+                            "SCENARIO_LAB.EDITED_PREFIX" | translate
+                          }}</span>
+                          <div class="edited-chips">
+                            @for (entry of editedSavingPots; track entry.name) {
+                              <span class="edited-chip">
+                                {{ entry.name | translate }}
+                                <button
+                                  class="chip-remove"
+                                  (click)="
+                                    removeEditedItem('savingPots', entry.name)
+                                  "
+                                  aria-label="Remove"
+                                >
+                                  <mat-icon>close</mat-icon>
+                                </button>
+                              </span>
+                            }
+                          </div>
                         </div>
                       }
                       <!-- Custom Icon  -->
@@ -363,21 +373,28 @@
                         }
                       </mat-select>
                       @if (editedIncomes.length) {
-                        <div class="edited-chips">
-                          @for (entry of editedIncomes; track entry.name) {
-                            <span class="edited-chip">
-                              {{ entry.name }}
-                              <button
-                                class="chip-remove"
-                                (click)="
-                                  removeEditedItem('incomes', entry.name)
-                                "
-                                aria-label="Remove"
-                              >
-                                <mat-icon>close</mat-icon>
-                              </button>
-                            </span>
-                          }
+                        <div class="edited-chips-block">
+                          <span class="edited-prefix">{{
+                            "SCENARIO_LAB.EDITED_PREFIX" | translate
+                          }}</span>
+                          <div class="edited-chips">
+                            @for (entry of editedIncomes; track entry.name) {
+                              <span class="edited-chip">
+                                {{
+                                  entry.name | translateIncomeExpenseLabel
+                                }}
+                                <button
+                                  class="chip-remove"
+                                  (click)="
+                                    removeEditedItem('incomes', entry.name)
+                                  "
+                                  aria-label="Remove"
+                                >
+                                  <mat-icon>close</mat-icon>
+                                </button>
+                              </span>
+                            }
+                          </div>
                         </div>
                       }
                       <!-- Custom Icon  -->
@@ -435,21 +452,28 @@
                         }
                       </mat-select>
                       @if (editedExpenses.length) {
-                        <div class="edited-chips">
-                          @for (entry of editedExpenses; track entry.name) {
-                            <span class="edited-chip">
-                              {{ entry.name }}
-                              <button
-                                class="chip-remove"
-                                (click)="
-                                  removeEditedItem('expenses', entry.name)
-                                "
-                                aria-label="Remove"
-                              >
-                                <mat-icon>close</mat-icon>
-                              </button>
-                            </span>
-                          }
+                        <div class="edited-chips-block">
+                          <span class="edited-prefix">{{
+                            "SCENARIO_LAB.EDITED_PREFIX" | translate
+                          }}</span>
+                          <div class="edited-chips">
+                            @for (entry of editedExpenses; track entry.name) {
+                              <span class="edited-chip">
+                                {{
+                                  entry.name | translateIncomeExpenseLabel
+                                }}
+                                <button
+                                  class="chip-remove"
+                                  (click)="
+                                    removeEditedItem('expenses', entry.name)
+                                  "
+                                  aria-label="Remove"
+                                >
+                                  <mat-icon>close</mat-icon>
+                                </button>
+                              </span>
+                            }
+                          </div>
                         </div>
                       }
                       <!-- Custom Icon  -->
@@ -569,7 +593,7 @@
                               formControlName="retirementAge"
                             />
                           </mat-slider>
-                          <div class="value-input-box">
+                          <div class="value-input-box value-input-box--retirement-age">
                             <input
                               type="number"
                               class="value-input"
@@ -581,22 +605,6 @@
                               [max]="maxRetirementAge"
                               step="1"
                             />
-                            <span class="pct-badge age-badge">
-                              <svg
-                                width="13"
-                                height="17"
-                                viewBox="0 0 15 17"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <path
-                                  fill-rule="evenodd"
-                                  clip-rule="evenodd"
-                                  d="M3.32992 0.833333C3.32992 1.05435 3.41771 1.26631 3.57399 1.42259C3.73027 1.57887 3.94224 1.66667 4.16325 1.66667V6.38083L0.411583 12.4742C-0.67425 14.2375 0.497417 16.6667 2.64908 16.6667H12.3441C14.4957 16.6667 15.6674 14.2375 14.5816 12.4742L10.8299 6.38083V1.66667C11.0509 1.66667 11.2629 1.57887 11.4192 1.42259C11.5755 1.26631 11.6632 1.05435 11.6632 0.833333C11.6632 0.61232 11.5755 0.400358 11.4192 0.244078C11.2629 0.0877973 11.0509 0 10.8299 0H4.16325C3.94224 0 3.73027 0.0877973 3.57399 0.244078C3.41771 0.400358 3.32992 0.61232 3.32992 0.833333ZM5.82992 1.66667H9.16325V6.61667C9.16318 6.77083 9.20587 6.92199 9.28658 7.05333L10.5883 9.16667H4.40492L5.70658 7.05333C5.78729 6.92199 5.82999 6.77083 5.82992 6.61667V1.66667ZM3.37908 10.8333L1.82992 13.3475C1.36158 14.1092 1.92575 15 2.64825 15H12.3433C13.0658 15 13.6299 14.1083 13.1616 13.3475L11.6133 10.8333H3.37908Z"
-                                  fill="#4043AF"
-                                />
-                              </svg>
-                            </span>
                           </div>
                         </div>
                         @if (retirementAgeEdited) {
@@ -629,7 +637,9 @@
                               formControlName="partnerRetirementAge"
                             />
                           </mat-slider>
-                          <div class="value-input-box">
+                          <div
+                            class="value-input-box value-input-box--retirement-age"
+                          >
                             <input
                               type="number"
                               class="value-input"
@@ -646,22 +656,6 @@
                               [max]="maxPartnerRetirementAge"
                               step="1"
                             />
-                            <span class="pct-badge age-badge">
-                              <svg
-                                width="13"
-                                height="17"
-                                viewBox="0 0 15 17"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <path
-                                  fill-rule="evenodd"
-                                  clip-rule="evenodd"
-                                  d="M3.32992 0.833333C3.32992 1.05435 3.41771 1.26631 3.57399 1.42259C3.73027 1.57887 3.94224 1.66667 4.16325 1.66667V6.38083L0.411583 12.4742C-0.67425 14.2375 0.497417 16.6667 2.64908 16.6667H12.3441C14.4957 16.6667 15.6674 14.2375 14.5816 12.4742L10.8299 6.38083V1.66667C11.0509 1.66667 11.2629 1.57887 11.4192 1.42259C11.5755 1.26631 11.6632 1.05435 11.6632 0.833333C11.6632 0.61232 11.5755 0.400358 11.4192 0.244078C11.2629 0.0877973 11.0509 0 10.8299 0H4.16325C3.94224 0 3.73027 0.0877973 3.57399 0.244078C3.41771 0.400358 3.32992 0.61232 3.32992 0.833333ZM5.82992 1.66667H9.16325V6.61667C9.16318 6.77083 9.20587 6.92199 9.28658 7.05333L10.5883 9.16667H4.40492L5.70658 7.05333C5.78729 6.92199 5.82999 6.77083 5.82992 6.61667V1.66667ZM3.37908 10.8333L1.82992 13.3475C1.36158 14.1092 1.92575 15 2.64825 15H12.3433C13.0658 15 13.6299 14.1083 13.1616 13.3475L11.6133 10.8333H3.37908Z"
-                                  fill="#4043AF"
-                                />
-                              </svg>
-                            </span>
                           </div>
                         </div>
                         @if (partnerRetirementAgeEdited) {

@@ -8,8 +8,10 @@ import {
   SimpleChanges,
   ElementRef,
   NgZone,
+  DestroyRef,
   inject,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslateService } from '@ngx-translate/core';
 import { formatLifetimePlanSeriesDisplayName } from 'src/app/shared/utils/lifetime-plan-series-display';
 import { MatCardModule } from '@angular/material/card';
@@ -21,6 +23,7 @@ import {
   TimelineEvent,
 } from '../models/charts-series.model';
 import { ensureUniqueSavingsChartSeriesColors } from 'src/app/shared/utils/unique-savings-chart-series-colors';
+import { translateTimelineEventDisplayName } from 'src/app/shared/utils/timeline-event-display-name';
 import { Client } from 'src/app/clients/models/client';
 import moment from 'moment';
 
@@ -72,6 +75,12 @@ export class SavingsBarStackedChartComponent
   private previousCategoriesKey = '';
   /** Annotation data decoupled from chartOptions to avoid triggering ng-apexcharts change detection. */
   private currentAnnotationPoints: any[] = [];
+  /**
+   * Scenario Lab (`animateUpdates`): report changes skip `chartOptions.annotations` so Apex can
+   * use `updateSeries` only. We must clear and re-add point annotations after each report swap
+   * (Before/After) or tooltips keep stale `customTooltip` HTML / wrong marker alignment.
+   */
+  private _pointAnnotationsNeedResync = false;
   /** Cached flag for use inside ApexCharts event callbacks. */
   private _hideEmergencyOverlays = false;
   /** Debounce handle for postRenderSetup. */
@@ -112,6 +121,7 @@ export class SavingsBarStackedChartComponent
 
   private ngZone = inject(NgZone);
   private translate = inject(TranslateService);
+  private readonly destroyRef = inject(DestroyRef);
 
   constructor() {
     this.chartOptions = {
@@ -283,6 +293,10 @@ export class SavingsBarStackedChartComponent
       },
       annotations: { points: [] },
     };
+
+    this.translate.onLangChange
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.onChartTranslationsChanged());
   }
 
   ngAfterViewInit(): void {
@@ -407,6 +421,9 @@ export class SavingsBarStackedChartComponent
         ? []
         : this.buildEmergencyExpenseAnnotation(report);
 
+      const points = this.buildEventAnnotations(this.events);
+      this.currentAnnotationPoints = points;
+
       // Only rebuild legend and annotations when NOT in animated-update mode (or on first render).
       // Re-assigning these inputs triggers ng-apexcharts updateOptions → full re-render.
       if (!this.animateUpdates || !this.chartInitialized) {
@@ -436,12 +453,13 @@ export class SavingsBarStackedChartComponent
           },
         };
 
-        const points = this.buildEventAnnotations(this.events);
-        this.currentAnnotationPoints = points;
         this.chartOptions.annotations = {
           points,
           xaxis: [...emergencyXAxis, ...emergencyExpenseXAxis],
         };
+      } else if (this.chartInitialized) {
+        // Scenario Lab: `updateSeries` path — Apex keeps old point markers; resync after render.
+        this._pointAnnotationsNeedResync = true;
       }
 
       // Tooltip attachment and emergency overlays are now handled reliably by
@@ -746,7 +764,7 @@ export class SavingsBarStackedChartComponent
             <div class="event-tooltip ${event.iconUrl}">
               <span style="display:none">${event.name}</span>
               <img src="/assets/images/svgs/${event.iconUrl}.svg" alt="${event.iconUrl}" />
-              <span>${this.translate.instant(event.name)}</span>
+              <span>${translateTimelineEventDisplayName(this.translate, event.name)}</span>
             </div>`,
         });
       });
@@ -812,7 +830,10 @@ export class SavingsBarStackedChartComponent
 
         // Create label element with FIXED positioning (not clipped by chart overflow)
         const label = document.createElement('div');
-        label.textContent = this.translate.instant(event.name);
+        label.textContent = translateTimelineEventDisplayName(
+          this.translate,
+          event.name,
+        );
         label.className = 'event-label';
         label.style.position = 'fixed';
         label.style.pointerEvents = 'none';
@@ -1033,6 +1054,61 @@ export class SavingsBarStackedChartComponent
   }
 
   /**
+   * Clears Apex annotations and reapplies point markers (and x-axis annotations) from
+   * `currentAnnotationPoints`, using the trimmed report for emergency index calculation.
+   */
+  private applyPointAnnotationResync(chartContext: any): void {
+    const report = this.trimReportToEndYear(this.report);
+    if (!report) {
+      return;
+    }
+
+    chartContext.clearAnnotations();
+
+    if (!this._hideEmergencyOverlays) {
+      const emergencyXAxis = this.buildEmergencyAnnotation(report);
+      const emergencyExpenseXAxis = this.buildEmergencyExpenseAnnotation(report);
+      [...emergencyXAxis, ...emergencyExpenseXAxis].forEach((a) =>
+        chartContext.addXaxisAnnotation(a, false),
+      );
+    }
+
+    this.currentAnnotationPoints.forEach((a) =>
+      chartContext.addPointAnnotation(a, false),
+    );
+  }
+
+  /** Rebuild event annotation strings when the UI language changes (Scenario Lab animated chart). */
+  private onChartTranslationsChanged(): void {
+    if (!this.chartInitialized) {
+      return;
+    }
+    const report = this.trimReportToEndYear(this.report);
+    if (!report?.series?.length) {
+      return;
+    }
+
+    this.events = report.timelineEvents ?? [];
+    this.currentAnnotationPoints = this.buildEventAnnotations(this.events);
+
+    if (!this.animateUpdates) {
+      return;
+    }
+
+    this._pointAnnotationsNeedResync = true;
+    this.ngZone.runOutsideAngular(() => {
+      setTimeout(() => {
+        const comp = this.apxChartComponent;
+        const series = this.chartOptions?.series;
+        if (!comp?.chart || !series?.length) {
+          return;
+        }
+        this.ngZone.run(() => comp.updateSeries(series, true));
+      }, 0);
+    });
+  }
+
+  /**
    * Called by ApexCharts `mounted` (after initial render / full rebuild) and
    * `updated` (after updateSeries animation completes). Only active when
    * animateUpdates=true (Scenario Lab). Rebuilds annotation markers that
@@ -1047,23 +1123,30 @@ export class SavingsBarStackedChartComponent
       // For animated updates (Scenario Lab), updateSeries destroys annotation markers.
       // Re-add them via the chart API when missing.
       if (this.animateUpdates) {
-        const markers = chartHost.querySelectorAll<SVGElement>(
-          '.apexcharts-point-annotation-marker',
-        );
+        if (this._pointAnnotationsNeedResync) {
+          this.applyPointAnnotationResync(chartContext);
+          this._pointAnnotationsNeedResync = false;
+        } else {
+          const markers = chartHost.querySelectorAll<SVGElement>(
+            '.apexcharts-point-annotation-marker',
+          );
 
-        if ((!markers || markers.length === 0) && this.events.length > 0) {
-          const points = this.buildEventAnnotations(this.events);
-          this.currentAnnotationPoints = points;
-          points.forEach((a) => chartContext.addPointAnnotation(a, false));
+          if ((!markers || markers.length === 0) && this.events.length > 0) {
+            const points = this.buildEventAnnotations(this.events);
+            this.currentAnnotationPoints = points;
+            points.forEach((a) => chartContext.addPointAnnotation(a, false));
 
-          if (!this._hideEmergencyOverlays) {
-            const emergencyXAxis = this.buildEmergencyAnnotation(this.report);
-            const emergencyExpenseXAxis = this.buildEmergencyExpenseAnnotation(
-              this.report,
-            );
-            [...emergencyXAxis, ...emergencyExpenseXAxis].forEach((a) =>
-              chartContext.addXaxisAnnotation(a, false),
-            );
+            if (!this._hideEmergencyOverlays) {
+              const trimmed = this.trimReportToEndYear(this.report);
+              if (trimmed) {
+                const emergencyXAxis = this.buildEmergencyAnnotation(trimmed);
+                const emergencyExpenseXAxis =
+                  this.buildEmergencyExpenseAnnotation(trimmed);
+                [...emergencyXAxis, ...emergencyExpenseXAxis].forEach((a) =>
+                  chartContext.addXaxisAnnotation(a, false),
+                );
+              }
+            }
           }
         }
       }
