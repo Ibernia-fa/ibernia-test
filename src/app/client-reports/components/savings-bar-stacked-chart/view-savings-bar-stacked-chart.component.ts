@@ -7,6 +7,7 @@ import { TablerIconsModule } from 'angular-tabler-icons';
 import { NgApexchartsModule } from 'ng-apexcharts';
 import moment from 'moment';
 import { ChartSeries, Series, TimelineEvent } from '../../models/charts-series.model';
+import { translateTimelineEventDisplayName } from 'src/app/shared/utils/timeline-event-display-name';
 import { Client } from 'src/app/clients/models/client';
 
 @Component({
@@ -313,7 +314,7 @@ export class ViewSavingsBarStackedChartComponent implements OnChanges, OnDestroy
           customTooltip: `
             <div class="event-tooltip ${event.iconUrl}">
               <img src="/assets/images/svgs/${event.iconUrl}.svg" alt="${event.iconUrl}" />
-              <span>${event.name}</span>
+              <span>${translateTimelineEventDisplayName(this.translate, event.name)}</span>
             </div>`
         });
       });

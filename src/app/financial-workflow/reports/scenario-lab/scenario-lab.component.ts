@@ -39,6 +39,7 @@ import { AddNewPotComponent } from '../../saving-pots/add-new-pot/add-new-pot.co
 import { patchInflationRateDescription } from 'src/app/shared/utils/escalation-rate-utils';
 import { formatClientPersonDisplayName } from 'src/app/shared/utils/person-display-name';
 import { TranslateIncomeExpenseLabelPipe } from 'src/app/core/pipes/translate-income-expense-label.pipe';
+import { translateTimelineEventDisplayName } from 'src/app/shared/utils/timeline-event-display-name';
 
 @Component({
   selector: 'app-scenario-lab',
@@ -552,6 +553,11 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
     if (!isNaN(val)) {
       this.scenarioForm.patchValue({ [field]: val });
     }
+  }
+
+  /** Localized label for edited-goal chips (e.g. composite retirement names from the API). */
+  editedGoalChipLabel(name: string): string {
+    return translateTimelineEventDisplayName(this.translate, name);
   }
 
   // ── Category editor methods ─────────────────────────────────────────────

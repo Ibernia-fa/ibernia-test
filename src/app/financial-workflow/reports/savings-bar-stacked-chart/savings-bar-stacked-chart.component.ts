@@ -21,6 +21,7 @@ import {
   TimelineEvent,
 } from '../models/charts-series.model';
 import { ensureUniqueSavingsChartSeriesColors } from 'src/app/shared/utils/unique-savings-chart-series-colors';
+import { translateTimelineEventDisplayName } from 'src/app/shared/utils/timeline-event-display-name';
 import { Client } from 'src/app/clients/models/client';
 import moment from 'moment';
 
@@ -746,7 +747,7 @@ export class SavingsBarStackedChartComponent
             <div class="event-tooltip ${event.iconUrl}">
               <span style="display:none">${event.name}</span>
               <img src="/assets/images/svgs/${event.iconUrl}.svg" alt="${event.iconUrl}" />
-              <span>${this.translate.instant(event.name)}</span>
+              <span>${translateTimelineEventDisplayName(this.translate, event.name)}</span>
             </div>`,
         });
       });
@@ -812,7 +813,10 @@ export class SavingsBarStackedChartComponent
 
         // Create label element with FIXED positioning (not clipped by chart overflow)
         const label = document.createElement('div');
-        label.textContent = this.translate.instant(event.name);
+        label.textContent = translateTimelineEventDisplayName(
+          this.translate,
+          event.name,
+        );
         label.className = 'event-label';
         label.style.position = 'fixed';
         label.style.pointerEvents = 'none';

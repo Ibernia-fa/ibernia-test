@@ -226,19 +226,24 @@
                         }
                       </mat-select>
                       @if (editedGoals.length) {
-                        <div class="edited-chips">
-                          @for (entry of editedGoals; track entry.name) {
-                            <span class="edited-chip">
-                              {{ entry.name }}
-                              <button
-                                class="chip-remove"
-                                (click)="removeEditedItem('goals', entry.name)"
-                                aria-label="Remove"
-                              >
-                                <mat-icon>close</mat-icon>
-                              </button>
-                            </span>
-                          }
+                        <div class="edited-chips-block">
+                          <span class="edited-prefix">{{
+                            "SCENARIO_LAB.EDITED_PREFIX" | translate
+                          }}</span>
+                          <div class="edited-chips">
+                            @for (entry of editedGoals; track entry.name) {
+                              <span class="edited-chip">
+                                {{ editedGoalChipLabel(entry.name) }}
+                                <button
+                                  class="chip-remove"
+                                  (click)="removeEditedItem('goals', entry.name)"
+                                  aria-label="Remove"
+                                >
+                                  <mat-icon>close</mat-icon>
+                                </button>
+                              </span>
+                            }
+                          </div>
                         </div>
                       }
 
@@ -291,21 +296,26 @@
                         }
                       </mat-select>
                       @if (editedSavingPots.length) {
-                        <div class="edited-chips">
-                          @for (entry of editedSavingPots; track entry.name) {
-                            <span class="edited-chip">
-                              {{ entry.name }}
-                              <button
-                                class="chip-remove"
-                                (click)="
-                                  removeEditedItem('savingPots', entry.name)
-                                "
-                                aria-label="Remove"
-                              >
-                                <mat-icon>close</mat-icon>
-                              </button>
-                            </span>
-                          }
+                        <div class="edited-chips-block">
+                          <span class="edited-prefix">{{
+                            "SCENARIO_LAB.EDITED_PREFIX" | translate
+                          }}</span>
+                          <div class="edited-chips">
+                            @for (entry of editedSavingPots; track entry.name) {
+                              <span class="edited-chip">
+                                {{ entry.name | translate }}
+                                <button
+                                  class="chip-remove"
+                                  (click)="
+                                    removeEditedItem('savingPots', entry.name)
+                                  "
+                                  aria-label="Remove"
+                                >
+                                  <mat-icon>close</mat-icon>
+                                </button>
+                              </span>
+                            }
+                          </div>
                         </div>
                       }
                       <!-- Custom Icon  -->
@@ -363,21 +373,28 @@
                         }
                       </mat-select>
                       @if (editedIncomes.length) {
-                        <div class="edited-chips">
-                          @for (entry of editedIncomes; track entry.name) {
-                            <span class="edited-chip">
-                              {{ entry.name }}
-                              <button
-                                class="chip-remove"
-                                (click)="
-                                  removeEditedItem('incomes', entry.name)
-                                "
-                                aria-label="Remove"
-                              >
-                                <mat-icon>close</mat-icon>
-                              </button>
-                            </span>
-                          }
+                        <div class="edited-chips-block">
+                          <span class="edited-prefix">{{
+                            "SCENARIO_LAB.EDITED_PREFIX" | translate
+                          }}</span>
+                          <div class="edited-chips">
+                            @for (entry of editedIncomes; track entry.name) {
+                              <span class="edited-chip">
+                                {{
+                                  entry.name | translateIncomeExpenseLabel
+                                }}
+                                <button
+                                  class="chip-remove"
+                                  (click)="
+                                    removeEditedItem('incomes', entry.name)
+                                  "
+                                  aria-label="Remove"
+                                >
+                                  <mat-icon>close</mat-icon>
+                                </button>
+                              </span>
+                            }
+                          </div>
                         </div>
                       }
                       <!-- Custom Icon  -->
@@ -435,21 +452,28 @@
                         }
                       </mat-select>
                       @if (editedExpenses.length) {
-                        <div class="edited-chips">
-                          @for (entry of editedExpenses; track entry.name) {
-                            <span class="edited-chip">
-                              {{ entry.name }}
-                              <button
-                                class="chip-remove"
-                                (click)="
-                                  removeEditedItem('expenses', entry.name)
-                                "
-                                aria-label="Remove"
-                              >
-                                <mat-icon>close</mat-icon>
-                              </button>
-                            </span>
-                          }
+                        <div class="edited-chips-block">
+                          <span class="edited-prefix">{{
+                            "SCENARIO_LAB.EDITED_PREFIX" | translate
+                          }}</span>
+                          <div class="edited-chips">
+                            @for (entry of editedExpenses; track entry.name) {
+                              <span class="edited-chip">
+                                {{
+                                  entry.name | translateIncomeExpenseLabel
+                                }}
+                                <button
+                                  class="chip-remove"
+                                  (click)="
+                                    removeEditedItem('expenses', entry.name)
+                                  "
+                                  aria-label="Remove"
+                                >
+                                  <mat-icon>close</mat-icon>
+                                </button>
+                              </span>
+                            }
+                          </div>
                         </div>
                       }
                       <!-- Custom Icon  -->
