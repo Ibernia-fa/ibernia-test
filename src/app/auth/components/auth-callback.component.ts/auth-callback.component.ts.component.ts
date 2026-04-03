@@ -12,12 +12,20 @@ export class AuthCallbackComponent implements OnInit {
   constructor(private router: Router, private AuthService: AuthService) { }
 
   ngOnInit(): void {
-    this.AuthService.finishLogin().then(_ => {
-      const returnUrl = sessionStorage.getItem(AUTH_RETURN_URL_KEY);
-      sessionStorage.removeItem(AUTH_RETURN_URL_KEY);
-      const target = returnUrl && returnUrl.startsWith('/') && !returnUrl.startsWith('//') ? returnUrl : '/clients';
-      this.router.navigateByUrl(target, { replaceUrl: true });
-    });
+    this.AuthService.finishLogin()
+      .then(_ => {
+        const returnUrl = sessionStorage.getItem(AUTH_RETURN_URL_KEY);
+        sessionStorage.removeItem(AUTH_RETURN_URL_KEY);
+        const target = returnUrl && returnUrl.startsWith('/') && !returnUrl.startsWith('//') ? returnUrl : '/clients';
+        void this.router.navigateByUrl(target, { replaceUrl: true });
+      })
+      .catch((err: unknown) => {
+        console.error('[Auth] signin-oidc callback failed', err);
+        sessionStorage.removeItem(AUTH_RETURN_URL_KEY);
+        void this.AuthService.clearLocalOidcSession().then(() => {
+          void this.router.navigateByUrl('/clients', { replaceUrl: true });
+        });
+      });
   }
 
 }
