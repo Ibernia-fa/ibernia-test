@@ -33,7 +33,7 @@ import { CurrencySymbolPipe } from 'src/app/pipe/currency-symbol.pipe';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { IncomeExpensesHttpService } from '../income-expenses/services/income-expenses-http.service';
 import {
   FinancialViewModel,
@@ -95,6 +95,7 @@ export class WithdrawalsContributionsComponent {
     private settingHttpService: SettingsHttpService,
     private timelineHttpService: TimelineHttpService,
     private toastr: ToastrService,
+    private translate: TranslateService,
   ) {
     this.getData();
   }
@@ -396,7 +397,7 @@ export class WithdrawalsContributionsComponent {
       return currentDescription;
     }
 
-    return `${prefix} ${potName}`;
+    return `${prefix} ${this.translate.instant(potName)}`;
   }
 
   private rebuildSavingPotNameMap(): void {
