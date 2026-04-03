@@ -564,6 +564,15 @@ tr.example-detail-row {
     font-size: 14px;
   }
 
+  // Match .ibr-lifetime-header > p (lifetime chart subtitle)
+  .ibr-insights-empty-hint {
+    font-size: 16px;
+    line-height: 100%;
+    font-weight: 400;
+    color: #5a596e;
+    margin: 8px 0 0;
+  }
+
   .ibr-insights-skeleton {
     display: grid;
     grid-template-columns: 1fr 1fr;
