@@ -174,7 +174,7 @@
     outline: none;
     padding: 8px 0px 8px 12px;
     font-size: 14px;
-    color: #a6abb2;
+    color: var(--ib-text-secondary-muted);
     font-family: "Ubuntu", serif;
     // text-align: center;
     background: transparent;
@@ -204,22 +204,30 @@
     display: flex;
     align-items: center;
     justify-content: center;
-  }
-}
 
-// ── Age badge ──────────────────────────────────────────────────────────────
-.age-badge {
-  padding: 0 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    svg path {
+      stroke: var(--ib-text-secondary-muted);
+    }
+  }
+
+  // Narrow centered field for ages (no suffix icon; fits up to 100)
+  &--retirement-age {
+    width: 60px;
+
+    .value-input {
+      width: 100%;
+      box-sizing: border-box;
+      text-align: center;
+      padding: 8px 4px;
+    }
+  }
 }
 
 // ── Before label ───────────────────────────────────────────────────────────
 .before-label {
   font-size: 14px;
   font-weight: 400;
-  color: #5a596e;
+  color: var(--ib-text-secondary-muted);
   line-height: 1.25;
 }
 
@@ -291,7 +299,7 @@
 .edited-prefix {
   font-size: 14px;
   font-weight: 400;
-  color: #787889;
+  color: var(--ib-text-secondary-muted);
   line-height: 1.25;
   flex-shrink: 0;
 }
