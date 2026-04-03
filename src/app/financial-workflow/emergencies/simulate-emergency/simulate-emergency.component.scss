@@ -70,8 +70,8 @@
   border-radius: 6px;
   gap: 0 !important;
   justify-content: flex-end;
-  margin-top: 4px;
-  margin-bottom: 8px;
+  margin-top: 24px;
+  margin-bottom: 12px;
   flex-shrink: 0;
 }
 
@@ -114,8 +114,12 @@
 }
 
 @keyframes autoPlayFill {
-  from { width: 0; }
-  to { width: 100%; }
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
 }
 
 .replay-btn {

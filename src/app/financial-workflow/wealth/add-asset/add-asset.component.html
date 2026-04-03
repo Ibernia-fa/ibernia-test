@@ -124,50 +124,26 @@
         </div>
 
         @if (hasPartner) {
-          <div class="w-100 form-field gap-8">
+          <div class="w-100 form-field gap-12">
             <mat-label
               class="f-s-16 f-w-500 d-block ibr-black"
               style="line-height: 16px"
               >{{ 'Ownership' | translate }}</mat-label
             >
-            <div class="position-relative">
-              <div class="w-100 form-field">
-                <div class="select-option position-relative">
-                  <mat-select
-                    formControlName="ownership"
-                    [placeholder]="'PLACEHOLDER.SELECT_OWNERSHIP' | translate"
-                    hideSingleSelectionIndicator
-                  >
-                    @for (opt of ownershipOptions; track opt.value) {
-                      <mat-option [value]="opt.value">
-                        @if (opt.value === 0) {
-                          {{ 'Joint' | translate }}
-                        } @else {
-                          {{ opt.label }}
-                        }
-                      </mat-option>
-                    }
-                  </mat-select>
-                  <span class="custom-arrow">
-                    <svg
-                      width="12"
-                      height="7"
-                      viewBox="0 0 12 7"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M1 1L6 6L11 1"
-                        stroke="#2B3942"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      />
-                    </svg>
-                  </span>
-                </div>
-              </div>
-            </div>
+            <mat-radio-group
+              formControlName="ownership"
+              class="d-flex ibr-custom-radio"
+            >
+              @for (opt of ownershipOptions; track opt.value) {
+                <mat-radio-button [value]="opt.value">
+                  @if (opt.value === 0) {
+                    {{ 'Joint' | translate }}
+                  } @else {
+                    {{ opt.label }}
+                  }
+                </mat-radio-button>
+              }
+            </mat-radio-group>
           </div>
         }
       </div>
