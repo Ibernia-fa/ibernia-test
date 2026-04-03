@@ -49,7 +49,7 @@
                     >
                       @for (saving of savingPots.clientSavings; track saving) {
                         <mat-option [value]="saving.id">{{
-                          saving.name
+                          saving.name | translate
                         }}</mat-option>
                       }
                     </mat-select>

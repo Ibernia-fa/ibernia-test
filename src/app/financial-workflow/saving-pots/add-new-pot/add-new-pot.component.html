@@ -8,7 +8,11 @@
     <div class="dialog-header">
       <h2 class="dialog-title text-center">
         @if (isEditWorkflow) {
-          {{ displayPotName }}
+          @if (savingsForm.get("name")?.value === "Custom") {
+            {{ displayPotName }}
+          } @else {
+            {{ displayPotName | translate }}
+          }
           @if (canEditName) {
             <img
               src="assets/images/svgs/drop-down-edit-2-line.svg"
@@ -51,6 +55,17 @@
                 [placeholder]="'Select' | translate"
                 (selectionChange)="onNameValueChange($event.value)"
               >
+                <mat-select-trigger>
+                  @if (savingsForm.get("name")?.value === "Custom") {
+                    {{
+                      savingsForm.get("customName")?.value?.trim()
+                        ? savingsForm.get("customName")?.value
+                        : ("Custom" | translate)
+                    }}
+                  } @else if (savingsForm.get("name")?.value) {
+                    {{ savingsForm.get("name")?.value | translate }}
+                  }
+                </mat-select-trigger>
                 <!-- Your normal options -->
                 @for (event of savingPotValues; track event) {
                   @if (event.name !== "Cash" || hasPartner) {
@@ -65,7 +80,7 @@
                           "
                           [alt]="event.iconUrl"
                         />
-                        <span>{{ event.name }}</span>
+                        <span>{{ event.name | translate }}</span>
                       </div>
                     </mat-option>
                   }
@@ -351,13 +366,16 @@
               </div>
             </div>
 
-            <span class="return-rate">
-              Real return:
-              {{
-                (savingsForm.get("returnRate")?.value || 0) - inflationRate
-                  | number: "1.2-2"
-              }}% (net of {{ inflationRate | number: "1.2-2" }}% inflation)
-            </span>
+            @let realReturnPct =
+              (savingsForm.get("returnRate")?.value || 0) - inflationRate;
+            <span class="return-rate">{{
+              "SAVINGS_POT.REAL_RETURN_HINT"
+                | translate
+                  : {
+                      real: realReturnPct | number: "1.2-2",
+                      inflation: inflationRate | number: "1.2-2",
+                    }
+            }}</span>
 
             @if (
               savingsForm.get("returnRate")?.touched &&

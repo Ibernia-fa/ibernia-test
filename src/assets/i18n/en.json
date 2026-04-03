@@ -701,6 +701,7 @@
   "WEALTH.OUTSTANDING_AMOUNT": "Outstanding amount",
   "WEALTH.SAVING": "Saving...",
   "WEALTH.VALUE": "Value",
+  "SAVINGS_POT.REAL_RETURN_HINT": "Real return: {{real}}% (net of {{inflation}}% inflation)",
   "SCHOOL.INFLATION_TITLE": "Inflation",
   "SCHOOL.INFLATION_SUBTITLE": "How prices rise over time",
   "SCHOOL.CORE_CONCEPT": "Core concept",
