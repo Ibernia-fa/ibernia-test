@@ -13,7 +13,8 @@ const EXCLUDED_SERIES = ['Current Account (Negative)', 'Emergency Expense'];
 
 function toDate(value: any): Date | null {
   if (!value) return null;
-  if (value instanceof Date) return Number.isNaN(value.getTime()) ? null : value;
+  if (value instanceof Date)
+    return Number.isNaN(value.getTime()) ? null : value;
   const d = new Date(value);
   return Number.isNaN(d.getTime()) ? null : d;
 }
@@ -83,7 +84,7 @@ export class ComparisonLineChartComponent implements OnChanges {
   chartOptions: any = {
     series: [],
     chart: {
-      type: 'line',
+      type: 'area',
       height: 500,
       toolbar: { show: false },
       zoom: { enabled: false },
@@ -93,7 +94,7 @@ export class ComparisonLineChartComponent implements OnChanges {
     xaxis: { type: 'category', categories: [] },
     yaxis: {},
     tooltip: { enabled: true, shared: true, intersect: false },
-    legend: { position: 'top', horizontalAlign: 'right' },
+    legend: { position: 'top', horizontalAlign: 'center' },
     grid: {
       show: true,
       xaxis: { lines: { show: false } },
@@ -112,8 +113,11 @@ export class ComparisonLineChartComponent implements OnChanges {
     const planB = this.trimToEndYear(this.compareReport);
     if (!planA || !planB) return;
 
-    const { categories: yearCategories, seriesA, seriesB } =
-      this.alignAndSum(planA, planB);
+    const {
+      categories: yearCategories,
+      seriesA,
+      seriesB,
+    } = this.alignAndSum(planA, planB);
 
     const currencyCode = this.client?.clientDetails?.preferredCurrency ?? '';
     const birthDate = toDate(this.client?.clientDetails?.birthDate);
@@ -141,7 +145,8 @@ export class ComparisonLineChartComponent implements OnChanges {
 
     const fmtCurrency = (value: number): string => {
       if (!Number.isFinite(value)) return String(value ?? '');
-      if (!currencyCode || currencyCode.length !== 3) return value.toLocaleString();
+      if (!currencyCode || currencyCode.length !== 3)
+        return value.toLocaleString();
       try {
         return new Intl.NumberFormat(undefined, {
           style: 'currency',
@@ -209,6 +214,7 @@ export class ComparisonLineChartComponent implements OnChanges {
         labels: {
           style: { cssClass: 'leftAlign' },
         },
+        tooltip: { enabled: false },
       },
       yaxis: {
         title: { text: currencyCode, style: { fontWeight: 500 } },
@@ -220,10 +226,19 @@ export class ComparisonLineChartComponent implements OnChanges {
       },
       legend: {
         position: 'top',
-        horizontalAlign: 'right',
+        horizontalAlign: 'center',
         showForSingleSeries: true,
         customLegendItems: [planALabel, planBLabel],
         markers: { fillColors: [planAColor, planBColor] },
+      },
+      fill: {
+        type: 'gradient',
+        gradient: {
+          shadeIntensity: 1,
+          opacityFrom: 0.25,
+          opacityTo: 0.05,
+          stops: [0, 90, 100],
+        },
       },
       tooltip: {
         enabled: true,
@@ -271,7 +286,7 @@ export class ComparisonLineChartComponent implements OnChanges {
 
   private alignAndSum(
     planA: ChartSeries,
-    planB: ChartSeries
+    planB: ChartSeries,
   ): { categories: string[]; seriesA: number[]; seriesB: number[] } {
     const allYears = [
       ...new Set([...planA.categories, ...planB.categories]),
@@ -298,7 +313,7 @@ export class ComparisonLineChartComponent implements OnChanges {
 
   private sumSeries(report: ChartSeries): number[] {
     const validSeries = report.series.filter(
-      (s) => !EXCLUDED_SERIES.includes(s.name)
+      (s) => !EXCLUDED_SERIES.includes(s.name),
     );
     if (!validSeries.length) return [];
 
@@ -332,7 +347,7 @@ export class ComparisonLineChartComponent implements OnChanges {
         data: indices.map((i) => s.data[i] ?? 0),
       })),
       timelineEvents: (report.timelineEvents ?? []).filter(
-        (e) => Number.isFinite(e.startYear) && e.startYear <= endYear
+        (e) => Number.isFinite(e.startYear) && e.startYear <= endYear,
       ),
     };
   }
