@@ -1,4 +1,4 @@
-<div class="comparison-line-chart">
+<div class="comparison-line-chart" #chart>
   @if (report?.series && compareReport?.series) {
   <apx-chart
     [series]="chartOptions.series"
@@ -11,7 +11,8 @@
     [legend]="chartOptions.legend"
     [grid]="chartOptions.grid"
     [dataLabels]="chartOptions.dataLabels"
-    [markers]="chartOptions.markers">
+    [markers]="chartOptions.markers"
+    [fill]="chartOptions.fill">
   </apx-chart>
   }
 </div>

@@ -1,9 +1,14 @@
 import {
   Component,
+  ElementRef,
   Input,
+  NgZone,
   OnChanges,
+  OnDestroy,
   SimpleChanges,
+  ViewChild,
   ChangeDetectionStrategy,
+  inject,
 } from '@angular/core';
 import { NgApexchartsModule } from 'ng-apexcharts';
 import { ChartSeries } from '../models/charts-series.model';
@@ -72,7 +77,11 @@ function splitAtZeroCrossing(name: string, data: number[]): SplitSeries {
   styleUrl: './comparison-line-chart.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ComparisonLineChartComponent implements OnChanges {
+export class ComparisonLineChartComponent
+  implements OnChanges, OnDestroy
+{
+  @ViewChild('chart', { read: ElementRef })
+  chartElRef: ElementRef<HTMLDivElement>;
   @Input() report!: ChartSeries;
   @Input() compareReport!: ChartSeries;
   @Input() planAName = 'Plan A';
@@ -80,6 +89,10 @@ export class ComparisonLineChartComponent implements OnChanges {
   @Input() client!: Client;
   @Input() forecastStartDate: any;
   @Input() forecastEndDate: any;
+
+  private readonly ngZone = inject(NgZone);
+  private yAxisLabelEl: HTMLElement | null = null;
+  private _postRenderTimer: any = null;
 
   chartOptions: any = {
     series: [],
@@ -89,6 +102,10 @@ export class ComparisonLineChartComponent implements OnChanges {
       toolbar: { show: false },
       zoom: { enabled: false },
       animations: { enabled: true, easing: 'easeinout', speed: 600 },
+      events: {
+        mounted: () => this.postRenderSetup(),
+        updated: () => this.postRenderSetup(),
+      },
     },
     stroke: { width: [3, 3], dashArray: [0, 8], curve: 'smooth' },
     xaxis: { type: 'category', categories: [] },
@@ -217,7 +234,7 @@ export class ComparisonLineChartComponent implements OnChanges {
         tooltip: { enabled: false },
       },
       yaxis: {
-        title: { text: currencyCode, style: { fontWeight: 500 } },
+        title: { text: '' },
         labels: {
           formatter(value: any) {
             return value != null ? fmtCurrency(Number(value)) : '';
@@ -326,6 +343,71 @@ export class ComparisonLineChartComponent implements OnChanges {
       }
     }
     return totals;
+  }
+
+  ngOnDestroy(): void {
+    clearTimeout(this._postRenderTimer);
+    this.cleanupYAxisLabel();
+  }
+
+  private getCurrencyAxisTitle(): string {
+    return this.client?.clientDetails?.preferredCurrency ?? '';
+  }
+
+  private postRenderSetup(): void {
+    clearTimeout(this._postRenderTimer);
+    this._postRenderTimer = setTimeout(() => this.positionYAxisLabel(), 50);
+  }
+
+  private cleanupYAxisLabel(): void {
+    if (this.yAxisLabelEl) {
+      this.yAxisLabelEl.remove();
+      this.yAxisLabelEl = null;
+    }
+  }
+
+  private positionYAxisLabel(): void {
+    this.cleanupYAxisLabel();
+
+    const chartHost = this.chartElRef?.nativeElement;
+    if (!chartHost) return;
+
+    const currencyText = this.getCurrencyAxisTitle();
+    if (!currencyText) return;
+
+    const legend = chartHost.querySelector<HTMLElement>('.apexcharts-legend');
+    const yAxisTexts = chartHost.querySelector<SVGGElement>(
+      '.apexcharts-yaxis-texts-g',
+    );
+    if (!legend) return;
+
+    const hostRect = chartHost.getBoundingClientRect();
+    const legendRect = legend.getBoundingClientRect();
+
+    if (getComputedStyle(chartHost).position === 'static') {
+      chartHost.style.position = 'relative';
+    }
+
+    const label = document.createElement('div');
+    label.textContent = currencyText;
+    label.className = 'y-axis-top-label';
+    chartHost.appendChild(label);
+
+    const labelTop = legendRect.top - hostRect.top + legendRect.height / 2 - 7;
+
+    let labelLeft = 10;
+    if (yAxisTexts) {
+      const textsRect = yAxisTexts.getBoundingClientRect();
+      labelLeft = textsRect.left - hostRect.left;
+    }
+
+    label.style.position = 'absolute';
+    label.style.top = `${labelTop}px`;
+    label.style.left = `${labelLeft}px`;
+    label.style.pointerEvents = 'none';
+    label.style.zIndex = '5';
+
+    this.yAxisLabelEl = label;
   }
 
   private trimToEndYear(report: ChartSeries): ChartSeries | null {
