@@ -1,22 +1,14 @@
 import {
+  HttpErrorResponse,
   HttpEvent,
   HttpHandlerFn,
   HttpRequest,
 } from '@angular/common/http';
-import { from, Observable, of, switchMap } from 'rxjs';
+import { from, Observable, of, switchMap, throwError } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { AuthService } from '../auth/services/auth.service';
 import { inject } from '@angular/core';
-
-/** Public API paths that must not wait for auth (e.g. questionnaire shared with clients). Avoids iOS hang when getAccessToken() never resolves in unauthenticated / in-app browser contexts. */
-function isPublicNoAuthRequest(url: string): boolean {
-  const u = url || '';
-  return (
-    u.includes('/Questionnaire/view/') ||
-    u.includes('/Questionnaire/submit/') ||
-    u.includes('/ClientReport/view/')
-  );
-}
+import { isPublicNoAuthRequest } from './http-public-request';
 
 export function httpRequestInterceptor(
   req: HttpRequest<unknown>,
@@ -31,6 +23,16 @@ export function httpRequestInterceptor(
 
   return token$.pipe(
     switchMap((token) => {
+      if (!token && !isPublicNoAuthRequest(req.url)) {
+        return throwError(
+          () =>
+            new HttpErrorResponse({
+              status: 401,
+              statusText: 'Unauthorized',
+              url: req.url,
+            })
+        );
+      }
       if (!token) {
         console.warn('[Interceptor] No token for', req.url);
       }

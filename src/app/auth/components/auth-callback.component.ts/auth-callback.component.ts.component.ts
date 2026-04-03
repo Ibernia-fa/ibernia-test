@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
-import { AUTH_RETURN_URL_KEY } from '../../../auth-guard.service';
+import { AUTH_RETURN_URL_KEY } from '../../../auth/auth.constants';
 
 @Component({
   selector: 'app-auth-callback',

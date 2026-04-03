@@ -3,6 +3,7 @@ import { UserManager, User, UserManagerSettings } from 'oidc-client';
 // import { Constants } from '../constants';
 import { Subject } from 'rxjs';
 import { environment } from 'src/environments/environment';
+import { AUTH_RETURN_URL_KEY } from '../auth.constants';
 
 @Injectable({
   providedIn: 'root'
@@ -11,6 +12,7 @@ export class AuthService {
   private _userManager: UserManager;
   private _user: User | any;
   private _loginChangedSubject = new Subject<boolean>();
+  private _loginRedirectInProgress = false;
 
   public loginChanged = this._loginChangedSubject.asObservable();
 
@@ -52,6 +54,28 @@ export class AuthService {
   public login = () => {
     return this._userManager.signinRedirect();
   }
+
+  /**
+   * Clears local OIDC state and starts sign-in. Used when the access token is missing or expired,
+   * or when the API returns 401. Coalesces concurrent calls. Preserves return URL like AuthGuard.
+   */
+  public redirectToLogin = (): void => {
+    if (this._loginRedirectInProgress || typeof window === 'undefined') {
+      return;
+    }
+    this._loginRedirectInProgress = true;
+    const path =
+      window.location.pathname + window.location.search + window.location.hash;
+    if (
+      path &&
+      path !== '/' &&
+      !path.startsWith('/signin-oidc') &&
+      !path.startsWith('/signout-callback-oidc')
+    ) {
+      sessionStorage.setItem(AUTH_RETURN_URL_KEY, path);
+    }
+    void this.clearLocalOidcSession().then(() => this.login());
+  };
 
   public isAuthenticated = (): Promise<boolean> => {
     return this._userManager.getUser()

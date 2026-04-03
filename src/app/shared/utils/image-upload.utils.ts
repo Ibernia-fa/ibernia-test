@@ -90,13 +90,25 @@ export function resizeImageToMin(
  */
 export const MAX_BASE64_PAYLOAD_BYTES = 800 * 1024;
 
-/** Compress image: max dimension 1200px, JPEG quality 0.85. Always outputs JPEG to avoid large PNG payloads. */
-export function compressImage(dataUrl: string, maxDimension = 1200, quality = 0.85): Promise<string> {
+/**
+ * Compress image: max dimension 1200px, JPEG quality 0.85. Always outputs JPEG to avoid large PNG payloads.
+ * @param skipEncodeWhenWithinMax If true and both sides are already ≤ maxDimension, return the original data URL (no canvas re-encode).
+ */
+export function compressImage(
+  dataUrl: string,
+  maxDimension = 1200,
+  quality = 0.85,
+  skipEncodeWhenWithinMax = false,
+): Promise<string> {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.onload = () => {
       let w = img.width;
       let h = img.height;
+      if (skipEncodeWhenWithinMax && w <= maxDimension && h <= maxDimension) {
+        resolve(dataUrl);
+        return;
+      }
       const scale = w <= maxDimension && h <= maxDimension ? 1 : maxDimension / Math.max(w, h);
       w = Math.round(w * scale);
       h = Math.round(h * scale);
@@ -116,6 +128,15 @@ export function compressImage(dataUrl: string, maxDimension = 1200, quality = 0.
     img.onerror = () => reject(new Error('Failed to load image'));
     img.src = dataUrl;
   });
+}
+
+/** Full-width backgrounds need more pixels than logos; file upload is already capped at 5MB. */
+const BACKGROUND_MAX_DIMENSION = 2560;
+const BACKGROUND_JPEG_QUALITY = 0.92;
+
+/** Resize if oversized, else keep original encoding to avoid double JPEG loss. */
+export function compressForBackground(dataUrl: string): Promise<string> {
+  return compressImage(dataUrl, BACKGROUND_MAX_DIMENSION, BACKGROUND_JPEG_QUALITY, true);
 }
 
 /** Compress profile/logo image to stay under proxy body limits. Uses smaller dimensions and enforces max size. */
