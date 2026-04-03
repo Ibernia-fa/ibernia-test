@@ -20,6 +20,7 @@ import {
   fileToDataUrl,
   getImageDimensions,
   resizeImageToMin,
+  compressForBackground,
   compressImage,
   compressForProfilePayload,
   BACKGROUND_MIN_WIDTH,
@@ -108,13 +109,13 @@ export class BrandingComponent implements OnInit {
       } else {
         const dims = await getImageDimensions(dataUrl);
         if (dims.width >= BACKGROUND_MIN_WIDTH && dims.height >= BACKGROUND_MIN_HEIGHT) {
-          dataUrl = await compressImage(dataUrl);
+          dataUrl = await compressForBackground(dataUrl);
           this.backgroundImage = dataUrl;
           this.updateHasChanges();
         } else {
           try {
             const resized = await resizeImageToMin(dataUrl, BACKGROUND_MIN_WIDTH, BACKGROUND_MIN_HEIGHT);
-            this.backgroundImage = await compressImage(resized);
+            this.backgroundImage = await compressForBackground(resized);
             this.updateHasChanges();
             this.toastr.info(this.translate.instant('Image resized to meet minimum size.'));
           } catch {

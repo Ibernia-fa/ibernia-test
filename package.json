@@ -6,6 +6,7 @@
     "start": "ng serve",
     "start:local": "ng serve --configuration local",
     "build": "ng build",
+    "build:prod": "ng build --configuration production",
     "watch": "ng build --watch --configuration development",
     "test": "echo \"No tests in this repo. E2E lives in ibernia-portal-tests (triggered after deploy via repository_dispatch).\""
   },
