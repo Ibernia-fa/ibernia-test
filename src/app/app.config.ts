@@ -41,6 +41,7 @@ import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
 import { provideHighlightOptions } from 'ngx-highlightjs';
 import 'highlight.js/styles/atom-one-dark.min.css';
 import { httpRequestInterceptor } from './core/http-request.interceptor';
+import { httpAuthErrorInterceptor } from './core/http-auth-error.interceptor';
 import { provideStore } from '@ngrx/store';
 import { provideEffects } from '@ngrx/effects';
 import { FinancialAdvisorEffects } from './store/financial-advisor/financial-advisor.effects';
@@ -75,7 +76,10 @@ export const appConfig: ApplicationConfig = {
         scrollPositionRestoration: 'enabled',
         anchorScrolling: 'enabled',
     }), withComponentInputBinding()),
-    provideHttpClient(withInterceptorsFromDi(), withInterceptors([httpRequestInterceptor])),
+    provideHttpClient(
+      withInterceptorsFromDi(),
+      withInterceptors([httpRequestInterceptor, httpAuthErrorInterceptor])
+    ),
     provideClientHydration(),
     importProvidersFrom(FormsModule, ToastrModule.forRoot(), ReactiveFormsModule, MaterialModule, NgxPermissionsModule.forRoot(), TablerIconsModule.pick(TablerIcons), NgScrollbarModule, CalendarModule.forRoot({
         provide: DateAdapter,
