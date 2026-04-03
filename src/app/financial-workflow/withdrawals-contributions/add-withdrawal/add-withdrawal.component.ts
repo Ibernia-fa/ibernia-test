@@ -42,7 +42,7 @@ import { extractEventId, resolveYear } from 'src/app/shared/utils/event-date-uti
     MatCheckboxModule,
     ThousandSeparatorPipe,
     ThousandSeparatorInputDirective,
-    TranslateModule
+    TranslateModule,
   ],
   providers: [provideNativeDateAdapter()],
   templateUrl: './add-withdrawal.component.html',
@@ -196,8 +196,9 @@ export class AddWithdrawalComponent {
 
   }
 
+  /** i18n key — use with `| translate` in template (sentence case in EN/IT). */
   get dialogTitle(): string {
-    return this.isEditWorkflow ? 'Edit Withdrawal' : 'Add Withdrawal';
+    return this.isEditWorkflow ? 'Edit withdrawal' : 'Add withdrawal';
   }
 
   onAmountInput(rawValue: string) {
@@ -388,17 +389,11 @@ export class AddWithdrawalComponent {
   }
 
   onEscalationRateChange(event: MatSelectChange): void {
-    const selectedOption = event.source.selected;
+    const val = event.value;
+    const rate = this.escalationRates.find((e) => e.value === val);
+    const description = rate?.description ?? null;
 
-    let description: string | null = null;
-
-    if (Array.isArray(selectedOption)) {
-      description = selectedOption[0]?.viewValue ?? null;
-    } else {
-      description = selectedOption?.viewValue ?? null;
-    }
-
-    this.selectedEscalationDescription = description;
+    this.selectedEscalationDescription = description ?? '';
 
     const customControl = this.withdrawalForm.get('customEscalationRate');
 

@@ -4,7 +4,7 @@
     <!-- Modal Header  -->
     <div class="dialog-header">
       <h2 class="dialog-title text-center">
-        {{ dialogTitle }}
+        {{ dialogTitle | translate }}
       </h2>
       <button
         type="button"
@@ -157,7 +157,7 @@
           <div class="d-flex flex-column gap-8">
             <div class="d-flex gap-4 align-items-center">
               <mat-label
-                class="f-s-16 f-w-400 ibr-black d-block"
+                class="f-s-16 f-w-500 ibr-black d-block"
                 style="line-height: 16px"
               >
                 @if (showStartEnd) {
@@ -320,7 +320,9 @@
               <div class="select-option">
                 <mat-select formControlName="escalationRate" (selectionChange)="onEscalationRateChange($event)">
                   @for (escalationRate of escalationRates; track escalationRate) {
-                  <mat-option [value]="escalationRate.value">{{ escalationRate.description }}</mat-option>
+                  <mat-option [value]="escalationRate.value">{{
+                  escalationRate.description | translateEscalationDescription
+                }}</mat-option>
                   }
                 </mat-select>
               </div>

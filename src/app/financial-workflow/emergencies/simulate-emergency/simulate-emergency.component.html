@@ -271,7 +271,7 @@
                     class="f-s-16 f-w-500 ibr-black d-flex align-items-center"
                     style="line-height: 16px !important"
                   >
-                    Escalation rate
+                    {{ "Escalation rate" | translate }}
                     <img
                       src="assets/images/svgs/help-circle-icon.svg"
                       alt="help"
@@ -293,6 +293,7 @@
                           ) {
                             <mat-option [value]="escalationRate.value">{{
                               escalationRate.description
+                                | translateEscalationDescription
                             }}</mat-option>
                           }
                         </mat-select>

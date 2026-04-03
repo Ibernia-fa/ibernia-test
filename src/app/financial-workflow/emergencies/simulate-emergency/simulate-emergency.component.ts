@@ -27,6 +27,7 @@ import { EmergenciesHttpService } from '../services/emergencies-http.service';
 import { SavingsBarStackedChartComponent } from '../../reports/savings-bar-stacked-chart/savings-bar-stacked-chart.component';
 import { getAmountCycleLabel } from 'src/app/shared/utils/amount-cycle-label';
 import { TranslateIncomeExpenseLabelPipe } from 'src/app/core/pipes/translate-income-expense-label.pipe';
+import { TranslateEscalationDescriptionPipe } from 'src/app/core/pipes/translate-escalation-description.pipe';
 
 @Component({
   selector: 'simulate-emergency',
@@ -48,6 +49,7 @@ import { TranslateIncomeExpenseLabelPipe } from 'src/app/core/pipes/translate-in
     SavingsBarStackedChartComponent,
     TranslateModule,
     TranslateIncomeExpenseLabelPipe,
+    TranslateEscalationDescriptionPipe,
   ],
   providers: [provideNativeDateAdapter()],
   templateUrl: './simulate-emergency.component.html',
@@ -311,17 +313,11 @@ export class SimulateEmergencyComponent implements OnDestroy {
   }
 
   onEscalationRateChange(event: MatSelectChange): void {
-    const selectedOption = event.source.selected;
+    const val = event.value;
+    const rate = this.escalationRates.find((e) => e.value === val);
+    const description = rate?.description ?? null;
 
-    let description: string | null = null;
-
-    if (Array.isArray(selectedOption)) {
-      description = selectedOption[0]?.viewValue ?? null;
-    } else {
-      description = selectedOption?.viewValue ?? null;
-    }
-
-    this.selectedEscalationDescription = description;
+    this.selectedEscalationDescription = description ?? '';
     const customControl = this.simulateEmergencyForm.get('customEscalationRate');
 
     if (description === 'Increases at custom rate') {

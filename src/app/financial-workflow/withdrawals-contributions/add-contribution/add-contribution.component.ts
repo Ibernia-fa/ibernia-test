@@ -290,8 +290,9 @@ export class AddContributionComponent {
     }
   }
 
+  /** i18n key — use with `| translate` in template (sentence case in EN/IT). */
   get dialogTitle(): string {
-    return this.isEditWorkflow ? 'Edit Contribution' : 'Add Contribution';
+    return this.isEditWorkflow ? 'Edit contribution' : 'Add contribution';
   }
 
   // === UI helpers ===
@@ -709,16 +710,11 @@ export class AddContributionComponent {
   }
 
   onEscalationRateChange(event: MatSelectChange): void {
-    const selectedOption = event.source.selected;
-    let description: string | null = null;
+    const val = event.value;
+    const rate = this.escalationRates.find((e) => e.value === val);
+    const description = rate?.description ?? null;
 
-    if (Array.isArray(selectedOption)) {
-      description = selectedOption[0]?.viewValue ?? null;
-    } else {
-      description = selectedOption?.viewValue ?? null;
-    }
-
-    this.selectedEscalationDescription = description;
+    this.selectedEscalationDescription = description ?? '';
 
     const customControl = this.contributionForm.get('customEscalationRate');
     if (description === 'Increases at custom rate') {
