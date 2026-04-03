@@ -200,7 +200,7 @@
                 </div>
 
                 <p
-                  class="f-s-13 text-muted m-t-8 m-b-0"
+                  class="ibr-insights-empty-hint"
                   *ngIf="
                     !insightsLoading &&
                     insightsLoadAttempted &&
@@ -208,9 +208,9 @@
                     !insightsLimitExceeded
                   "
                 >
-                  {{ "No insights yet. Click" | translate }}
-                  <strong>{{ "Generate New" | translate }}</strong>
-                  {{ "to analyse this plan." | translate }}
+                  {{ "REPORTS.INSIGHTS_EMPTY_BEFORE" | translate }}<strong>{{
+                    "Generate New" | translate
+                  }}</strong>{{ "REPORTS.INSIGHTS_EMPTY_AFTER" | translate }}
                 </p>
 
                 <div

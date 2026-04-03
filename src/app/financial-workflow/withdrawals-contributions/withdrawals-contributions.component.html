@@ -732,10 +732,13 @@
               contributionDataSource.data.length === 0 &&
               withdrawalDataSource.data.length === 0
             ) {
-              <h3 class="onboard-heading">{{ "You're just getting started 👋" | translate }}</h3>
+              <h3 class="onboard-heading">
+                {{ "FLOWS.ONBOARD_HEADING" | translate }}
+              </h3>
               <p>
-                You haven’t added any contributions or withdrawals yet. <br />
-                Set up recurring investments or plan future withdrawals.
+                {{ "FLOWS.ONBOARD_CONTRIBUTIONS_WITHDRAWALS_LINE1" | translate }}
+                <br />
+                {{ "FLOWS.ONBOARD_CONTRIBUTIONS_WITHDRAWALS_LINE2" | translate }}
               </p>
             } @else if (contributionDataSource.data.length === 0) {
               <p>{{ "You haven't added any contributions yet" | translate }}</p>
