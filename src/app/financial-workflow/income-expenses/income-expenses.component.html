@@ -101,9 +101,9 @@
                               }}
                               <span class="card-title"
                                 >/{{
-                                  getCycle(
+                                  getCycleLabelKey(
                                     displayItem.income.amount.cycle?.description
-                                  )
+                                  ) | translate
                                 }}</span
                               >
                             </h3>
@@ -131,10 +131,10 @@
                                 }}
                                 <span class="card-title"
                                   >/{{
-                                    getCycle(
+                                    getCycleLabelKey(
                                       displayItem.income.bonus.amount.cycle
                                         ?.description
-                                    )
+                                    ) | translate
                                   }}</span
                                 >
                               </h3>
@@ -318,7 +318,9 @@
                         }}{{ income.amount.amount | thousandSeparator }}
                         <span class="card-title"
                           >/{{
-                            getCycle(income.amount.cycle?.description)
+                            getCycleLabelKey(
+                              income.amount.cycle?.description
+                            ) | translate
                           }}</span
                         >
                       </h3>
@@ -560,7 +562,9 @@
                               }}{{ expense.amount.amount | thousandSeparator }}
                               <span class="card-title"
                                 >/{{
-                                  getCycle(expense.amount.cycle?.description)
+                                  getCycleLabelKey(
+                                    expense.amount.cycle?.description
+                                  ) | translate
                                 }}</span
                               >
                             </h3>
@@ -741,7 +745,9 @@
                         }}{{ expense.amount.amount | thousandSeparator }}
                         <span class="card-title"
                           >/{{
-                            getCycle(expense.amount.cycle?.description)
+                            getCycleLabelKey(
+                              expense.amount.cycle?.description
+                            ) | translate
                           }}</span
                         >
                       </h3>

@@ -22,6 +22,7 @@ import { AgeCalculatorPipe } from 'src/app/pipe/age-calculator.pipe';
 import { CommonModule } from '@angular/common';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 import { TranslateModule } from '@ngx-translate/core';
+import { TranslateEscalationDescriptionPipe } from 'src/app/core/pipes/translate-escalation-description.pipe';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MortgageCalculatorState } from '../mortgage-calculator/mortgage-calculator.component';
 import { MortgageOutput } from '../mortgage-calculator/mortgage-calculator.component';
@@ -45,7 +46,8 @@ import { MortgageCalculatorDialogComponent, MortgageCalculatorDialogResult } fro
     CommonModule,
     ThousandSeparatorInputDirective,
     TranslateModule,
-    MatCheckboxModule
+    MatCheckboxModule,
+    TranslateEscalationDescriptionPipe,
   ],
   providers: [provideNativeDateAdapter(),
     AgeCalculatorPipe,
@@ -875,15 +877,9 @@ export class AddEventDialogComponent {
   }
 
   onEscalationRateChange(event: MatSelectChange): void {
-    const selectedOption = event.source.selected;
-
-    let description: string | null = null;
-
-    if (Array.isArray(selectedOption)) {
-      description = selectedOption[0]?.viewValue ?? null;
-    } else {
-      description = selectedOption?.viewValue ?? null;
-    }
+    const val = event.value;
+    const rate = this.escalationRates.find((e) => e.value === val);
+    const description = rate?.description ?? null;
 
     this.selectedEscalationDescription = description;
 

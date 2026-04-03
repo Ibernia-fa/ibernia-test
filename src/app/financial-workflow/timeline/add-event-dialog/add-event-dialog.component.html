@@ -447,6 +447,7 @@
                         ) {
                           <mat-option [value]="escalationRate.value">{{
                             escalationRate.description
+                              | translateEscalationDescription
                           }}</mat-option>
                         }
                       </mat-select>
@@ -1689,6 +1690,7 @@
                           ) {
                             <mat-option [value]="escalationRate.value">{{
                               escalationRate.description
+                                | translateEscalationDescription
                             }}</mat-option>
                           }
                         </mat-select>

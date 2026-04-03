@@ -21,6 +21,7 @@ import { catchError, filter, finalize } from 'rxjs';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { TranslateIncomeExpenseLabelPipe } from 'src/app/core/pipes/translate-income-expense-label.pipe';
+import { TranslateEscalationDescriptionPipe } from 'src/app/core/pipes/translate-escalation-description.pipe';
 import { getAmountCycleLabel } from 'src/app/shared/utils/amount-cycle-label';
 import { CommonModule } from '@angular/common';
 
@@ -43,6 +44,7 @@ import { CommonModule } from '@angular/common';
     ThousandSeparatorInputDirective,
     TranslateModule,
     TranslateIncomeExpenseLabelPipe,
+    TranslateEscalationDescriptionPipe,
   ],
   providers: [provideNativeDateAdapter()],
   templateUrl: './add-expense.component.html',
@@ -404,17 +406,11 @@ export class AddExpenseComponent {
   }
 
   onEscalationRateChange(event: MatSelectChange): void {
-    const selectedOption = event.source.selected;
+    const val = event.value;
+    const rate = this.escalationRates.find((e) => e.value === val);
+    const description = rate?.description ?? null;
 
-    let description: string | null = null;
-
-    if (Array.isArray(selectedOption)) {
-      description = selectedOption[0]?.viewValue ?? null;
-    } else {
-      description = selectedOption?.viewValue ?? null;
-    }
-
-    this.selectedEscalationDescription = description;
+    this.selectedEscalationDescription = description ?? '';
 
     const customControl = this.expenseForm.get('customEscalationRate');
 

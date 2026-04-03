@@ -612,14 +612,15 @@ export class IncomeExpensesComponent {
     return item.id ?? item.description;
   }
 
-  getCycle(cycle: string) {
+  /** i18n key for the short frequency after "/" (e.g. +€1.000/mese). */
+  getCycleLabelKey(cycle: string | undefined): string {
     switch (cycle) {
       case 'One-off':
-        return 'One-off';
+        return 'INCOME_EXPENSE.FREQUENCY.ONE_OFF';
       case 'Every year':
-        return 'year';
+        return 'INCOME_EXPENSE.FREQUENCY.YEAR';
       default:
-        return 'month';
+        return 'INCOME_EXPENSE.FREQUENCY.MONTH';
     }
   }
 

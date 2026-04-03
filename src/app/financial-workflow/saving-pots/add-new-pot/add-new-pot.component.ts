@@ -43,6 +43,7 @@ import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateEscalationDescriptionPipe } from 'src/app/core/pipes/translate-escalation-description.pipe';
 import { getAmountCycleLabel } from 'src/app/shared/utils/amount-cycle-label';
 @Component({
   selector: 'app-add-new-pot',
@@ -64,6 +65,7 @@ import { getAmountCycleLabel } from 'src/app/shared/utils/amount-cycle-label';
     ThousandSeparatorPipe,
     ThousandSeparatorInputDirective,
     TranslateModule,
+    TranslateEscalationDescriptionPipe,
   ],
   templateUrl: './add-new-pot.component.html',
   styleUrl: './add-new-pot.component.scss',
@@ -807,15 +809,9 @@ get isCustomEscalationSelected(): boolean {
 
 
 onEscalationRateChange(event: MatSelectChange): void {
-  const selectedOption = event.source.selected;
-
-  let description: string | null = null;
-
-  if (Array.isArray(selectedOption)) {
-    description = selectedOption[0]?.viewValue ?? null;
-  } else {
-    description = selectedOption?.viewValue ?? null;
-  }
+  const val = event.value;
+  const rate = this.escalationRates.find((e) => e.value === val);
+  const description = rate?.description ?? null;
 
   this.selectedEscalationDescription = description;
 

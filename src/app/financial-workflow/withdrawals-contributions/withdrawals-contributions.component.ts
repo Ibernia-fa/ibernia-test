@@ -171,8 +171,8 @@ export class WithdrawalsContributionsComponent {
         this.savingsPots.clientSavings[0].name.toLowerCase() === 'cash')
     ) {
       this.toastr.error(
-        'Before adding this, please create a new Saving Pot',
-        'Error!',
+        this.translate.instant('FLOWS.CREATE_SAVING_POT_FIRST'),
+        this.translate.instant('LABEL.ERROR'),
         { timeOut: 5000 },
       );
     } else {
@@ -212,8 +212,8 @@ export class WithdrawalsContributionsComponent {
         this.savingsPots.clientSavings[0].name.toLowerCase() === 'cash')
     ) {
       this.toastr.error(
-        'Before adding this, please create a new Saving Pot',
-        'Error!',
+        this.translate.instant('FLOWS.CREATE_SAVING_POT_FIRST'),
+        this.translate.instant('LABEL.ERROR'),
         { timeOut: 5000 },
       );
     } else {
