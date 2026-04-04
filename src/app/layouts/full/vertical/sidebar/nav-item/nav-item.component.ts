@@ -58,6 +58,7 @@ export class AppNavItemComponent implements OnChanges {
     'income',
     'withdrawal',
     'reports',
+    'scenario-lab',
   ]);
 
   @Output() toggleMobileLink: any = new EventEmitter<void>();
@@ -113,7 +114,7 @@ export class AppNavItemComponent implements OnChanges {
 
     const currentPath = String(url).split('?')[0].split('#')[0];
 
-    // Lifetime Plan hub: highlight only on core plan routes (not scenario-lab, emergencies, etc.).
+    // Lifetime Plan hub: highlight on plan sub-routes (excludes emergencies, wealth-only routes, etc.).
     if (this.isLifetimePlanHubNavItem(item) && this.selectedCashflowId) {
       const base = `/cashflows/${this.selectedCashflowId}`;
       if (currentPath === base || currentPath.startsWith(`${base}/`)) {
