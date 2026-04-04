@@ -1,11 +1,17 @@
 import {
-  Component,
-  Input,
-  OnChanges,
-  SimpleChanges,
+  AfterViewInit,
   ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  Input,
+  NgZone,
+  OnChanges,
+  OnDestroy,
+  SimpleChanges,
+  ViewChild,
+  inject,
 } from '@angular/core';
-import { NgApexchartsModule } from 'ng-apexcharts';
+import { ChartComponent, NgApexchartsModule } from 'ng-apexcharts';
 import { ChartSeries } from '../models/charts-series.model';
 import { Client } from 'src/app/clients/models/client';
 
@@ -72,7 +78,12 @@ function splitAtZeroCrossing(name: string, data: number[]): SplitSeries {
   styleUrl: './comparison-line-chart.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ComparisonLineChartComponent implements OnChanges {
+export class ComparisonLineChartComponent
+  implements AfterViewInit, OnChanges, OnDestroy
+{
+  @ViewChild('chart', { read: ElementRef })
+  chartElRef: ElementRef<HTMLDivElement>;
+  @ViewChild(ChartComponent) apxChartComponent: ChartComponent | undefined;
   @Input() report!: ChartSeries;
   @Input() compareReport!: ChartSeries;
   @Input() planAName = 'Plan A';
@@ -80,6 +91,13 @@ export class ComparisonLineChartComponent implements OnChanges {
   @Input() client!: Client;
   @Input() forecastStartDate: any;
   @Input() forecastEndDate: any;
+
+  private readonly ngZone = inject(NgZone);
+  private yAxisLabelEl: HTMLElement | null = null;
+  private _postRenderTimer: ReturnType<typeof setTimeout> | null = null;
+
+  private chartResizeObserver: ResizeObserver | null = null;
+  private chartLayoutDebounceTimer: ReturnType<typeof setTimeout> | null = null;
 
   chartOptions: any = {
     series: [],
@@ -89,6 +107,10 @@ export class ComparisonLineChartComponent implements OnChanges {
       toolbar: { show: false },
       zoom: { enabled: false },
       animations: { enabled: true, easing: 'easeinout', speed: 600 },
+      events: {
+        mounted: () => this.postRenderSetup(),
+        updated: () => this.postRenderSetup(),
+      },
     },
     stroke: { width: [3, 3], dashArray: [0, 8], curve: 'smooth' },
     xaxis: { type: 'category', categories: [] },
@@ -103,6 +125,55 @@ export class ComparisonLineChartComponent implements OnChanges {
     dataLabels: { enabled: false },
     markers: { size: 0, hover: { size: 5 } },
   };
+
+  ngAfterViewInit(): void {
+    this.setupChartResizeObserver();
+  }
+
+  onApexChartReady(): void {
+    this.ngZone.runOutsideAngular(() =>
+      this.flushApexChartWidthAfterLayout(),
+    );
+  }
+
+  private setupChartResizeObserver(): void {
+    if (typeof ResizeObserver === 'undefined') {
+      return;
+    }
+    const el = this.chartElRef?.nativeElement;
+    if (!el) {
+      return;
+    }
+    this.chartResizeObserver?.disconnect();
+    this.chartResizeObserver = new ResizeObserver(() => {
+      if (this.chartLayoutDebounceTimer !== null) {
+        clearTimeout(this.chartLayoutDebounceTimer);
+      }
+      this.chartLayoutDebounceTimer = setTimeout(() => {
+        this.chartLayoutDebounceTimer = null;
+        this.ngZone.runOutsideAngular(() =>
+          this.flushApexChartWidthAfterLayout(),
+        );
+      }, 150);
+    });
+    this.chartResizeObserver.observe(el);
+  }
+
+  private flushApexChartWidthAfterLayout(): void {
+    const apx = this.apxChartComponent;
+    const host = this.chartElRef?.nativeElement;
+    if (!apx || !host) {
+      return;
+    }
+    const apply = () => {
+      const width = Math.floor(host.getBoundingClientRect().width);
+      if (width < 32) {
+        return;
+      }
+      void apx.updateOptions({ chart: { width } }, false, false, false);
+    };
+    requestAnimationFrame(() => requestAnimationFrame(apply));
+  }
 
   ngOnChanges(_changes: SimpleChanges): void {
     if (!this.report?.series?.length || !this.compareReport?.series?.length) {
@@ -142,6 +213,14 @@ export class ComparisonLineChartComponent implements OnChanges {
         ageLabels.push(cat);
       }
     });
+
+    const fmtAxisFigure = (value: number): string => {
+      if (!Number.isFinite(value)) return '';
+      return value.toLocaleString(undefined, {
+        maximumFractionDigits: 0,
+        minimumFractionDigits: 0,
+      });
+    };
 
     const fmtCurrency = (value: number): string => {
       if (!Number.isFinite(value)) return String(value ?? '');
@@ -217,10 +296,11 @@ export class ComparisonLineChartComponent implements OnChanges {
         tooltip: { enabled: false },
       },
       yaxis: {
-        title: { text: currencyCode, style: { fontWeight: 500 } },
+        title: { text: '' },
         labels: {
           formatter(value: any) {
-            return value != null ? fmtCurrency(Number(value)) : '';
+            const n = value != null ? Number(value) : NaN;
+            return Number.isFinite(n) ? fmtAxisFigure(n) : '';
           },
         },
       },
@@ -234,10 +314,10 @@ export class ComparisonLineChartComponent implements OnChanges {
       fill: {
         type: 'gradient',
         gradient: {
-          shadeIntensity: 1,
-          opacityFrom: 0.25,
-          opacityTo: 0.05,
-          stops: [0, 90, 100],
+          shadeIntensity: 0.9,
+          opacityFrom: 0.42,
+          opacityTo: 0.12,
+          stops: [0, 88, 100],
         },
       },
       tooltip: {
@@ -326,6 +406,80 @@ export class ComparisonLineChartComponent implements OnChanges {
       }
     }
     return totals;
+  }
+
+  ngOnDestroy(): void {
+    if (this.chartLayoutDebounceTimer !== null) {
+      clearTimeout(this.chartLayoutDebounceTimer);
+    }
+    this.chartResizeObserver?.disconnect();
+    this.chartResizeObserver = null;
+    if (this._postRenderTimer !== null) {
+      clearTimeout(this._postRenderTimer);
+    }
+    this.cleanupYAxisLabel();
+  }
+
+  private getCurrencyAxisTitle(): string {
+    return this.client?.clientDetails?.preferredCurrency ?? '';
+  }
+
+  private postRenderSetup(): void {
+    if (this._postRenderTimer !== null) {
+      clearTimeout(this._postRenderTimer);
+    }
+    this._postRenderTimer = setTimeout(() => this.positionYAxisLabel(), 50);
+  }
+
+  private cleanupYAxisLabel(): void {
+    if (this.yAxisLabelEl) {
+      this.yAxisLabelEl.remove();
+      this.yAxisLabelEl = null;
+    }
+  }
+
+  private positionYAxisLabel(): void {
+    this.cleanupYAxisLabel();
+
+    const chartHost = this.chartElRef?.nativeElement;
+    if (!chartHost) return;
+
+    const currencyText = this.getCurrencyAxisTitle();
+    if (!currencyText) return;
+
+    const legend = chartHost.querySelector<HTMLElement>('.apexcharts-legend');
+    const yAxisTexts = chartHost.querySelector<SVGGElement>(
+      '.apexcharts-yaxis-texts-g',
+    );
+    if (!legend) return;
+
+    const hostRect = chartHost.getBoundingClientRect();
+    const legendRect = legend.getBoundingClientRect();
+
+    if (getComputedStyle(chartHost).position === 'static') {
+      chartHost.style.position = 'relative';
+    }
+
+    const label = document.createElement('div');
+    label.textContent = currencyText;
+    label.className = 'y-axis-top-label';
+    chartHost.appendChild(label);
+
+    const labelTop = legendRect.top - hostRect.top + legendRect.height / 2 - 7;
+
+    let labelLeft = 10;
+    if (yAxisTexts) {
+      const textsRect = yAxisTexts.getBoundingClientRect();
+      labelLeft = textsRect.left - hostRect.left;
+    }
+
+    label.style.position = 'absolute';
+    label.style.top = `${labelTop}px`;
+    label.style.left = `${labelLeft}px`;
+    label.style.pointerEvents = 'none';
+    label.style.zIndex = '5';
+
+    this.yAxisLabelEl = label;
   }
 
   private trimToEndYear(report: ChartSeries): ChartSeries | null {

@@ -4,9 +4,9 @@
     <!-- --------------------------------------------------------------- -->
     <!-- Logo in header when sidebar is hidden (client list, profile, etc.) -->
     @if (hideSidebarToggle && isBrandLogoLoaded) {
-      <div class="header-logo-wrapper">
-        <app-branding [profileImage]="brandingLogo"></app-branding>
-      </div>
+      <!-- <div class="header-logo-wrapper"> -->
+      <app-branding [profileImage]="brandingLogo"></app-branding>
+      <!-- </div> -->
     }
     <!-- Expand sidebar toggle - outside sidebar when collapsed (desktop only) -->
     @if (!hideSidebarToggle && showToggle && options.sidenavCollapsed) {
@@ -404,7 +404,11 @@
                 <path d="M2 12h20" />
               </svg>
             </span>
-            {{ otherLanguage === "en" ? ('LABEL.ENGLISH' | translate) : ('LABEL.ITALIAN' | translate) }}
+            {{
+              otherLanguage === "en"
+                ? ("LABEL.ENGLISH" | translate)
+                : ("LABEL.ITALIAN" | translate)
+            }}
           </li>
 
           <li (click)="logout()">
