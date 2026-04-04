@@ -1,4 +1,18 @@
-.comparison-line-chart {
+:host {
+  display: block;
   width: 100%;
+  min-width: 0;
+}
+
+.comparison-line-chart {
+  display: block;
+  width: 100%;
+  min-width: 0;
   min-height: 500px;
+}
+
+:host ::ng-deep apx-chart {
+  display: block;
+  width: 100%;
+  min-width: 0;
 }

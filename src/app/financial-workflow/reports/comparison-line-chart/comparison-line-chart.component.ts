@@ -1,4 +1,6 @@
 import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
   Component,
   ElementRef,
   Input,
@@ -7,10 +9,9 @@ import {
   OnDestroy,
   SimpleChanges,
   ViewChild,
-  ChangeDetectionStrategy,
   inject,
 } from '@angular/core';
-import { NgApexchartsModule } from 'ng-apexcharts';
+import { ChartComponent, NgApexchartsModule } from 'ng-apexcharts';
 import { ChartSeries } from '../models/charts-series.model';
 import { Client } from 'src/app/clients/models/client';
 
@@ -78,10 +79,11 @@ function splitAtZeroCrossing(name: string, data: number[]): SplitSeries {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ComparisonLineChartComponent
-  implements OnChanges, OnDestroy
+  implements AfterViewInit, OnChanges, OnDestroy
 {
   @ViewChild('chart', { read: ElementRef })
   chartElRef: ElementRef<HTMLDivElement>;
+  @ViewChild(ChartComponent) apxChartComponent: ChartComponent | undefined;
   @Input() report!: ChartSeries;
   @Input() compareReport!: ChartSeries;
   @Input() planAName = 'Plan A';
@@ -92,7 +94,10 @@ export class ComparisonLineChartComponent
 
   private readonly ngZone = inject(NgZone);
   private yAxisLabelEl: HTMLElement | null = null;
-  private _postRenderTimer: any = null;
+  private _postRenderTimer: ReturnType<typeof setTimeout> | null = null;
+
+  private chartResizeObserver: ResizeObserver | null = null;
+  private chartLayoutDebounceTimer: ReturnType<typeof setTimeout> | null = null;
 
   chartOptions: any = {
     series: [],
@@ -120,6 +125,55 @@ export class ComparisonLineChartComponent
     dataLabels: { enabled: false },
     markers: { size: 0, hover: { size: 5 } },
   };
+
+  ngAfterViewInit(): void {
+    this.setupChartResizeObserver();
+  }
+
+  onApexChartReady(): void {
+    this.ngZone.runOutsideAngular(() =>
+      this.flushApexChartWidthAfterLayout(),
+    );
+  }
+
+  private setupChartResizeObserver(): void {
+    if (typeof ResizeObserver === 'undefined') {
+      return;
+    }
+    const el = this.chartElRef?.nativeElement;
+    if (!el) {
+      return;
+    }
+    this.chartResizeObserver?.disconnect();
+    this.chartResizeObserver = new ResizeObserver(() => {
+      if (this.chartLayoutDebounceTimer !== null) {
+        clearTimeout(this.chartLayoutDebounceTimer);
+      }
+      this.chartLayoutDebounceTimer = setTimeout(() => {
+        this.chartLayoutDebounceTimer = null;
+        this.ngZone.runOutsideAngular(() =>
+          this.flushApexChartWidthAfterLayout(),
+        );
+      }, 150);
+    });
+    this.chartResizeObserver.observe(el);
+  }
+
+  private flushApexChartWidthAfterLayout(): void {
+    const apx = this.apxChartComponent;
+    const host = this.chartElRef?.nativeElement;
+    if (!apx || !host) {
+      return;
+    }
+    const apply = () => {
+      const width = Math.floor(host.getBoundingClientRect().width);
+      if (width < 32) {
+        return;
+      }
+      void apx.updateOptions({ chart: { width } }, false, false, false);
+    };
+    requestAnimationFrame(() => requestAnimationFrame(apply));
+  }
 
   ngOnChanges(_changes: SimpleChanges): void {
     if (!this.report?.series?.length || !this.compareReport?.series?.length) {
@@ -159,6 +213,14 @@ export class ComparisonLineChartComponent
         ageLabels.push(cat);
       }
     });
+
+    const fmtAxisFigure = (value: number): string => {
+      if (!Number.isFinite(value)) return '';
+      return value.toLocaleString(undefined, {
+        maximumFractionDigits: 0,
+        minimumFractionDigits: 0,
+      });
+    };
 
     const fmtCurrency = (value: number): string => {
       if (!Number.isFinite(value)) return String(value ?? '');
@@ -237,7 +299,8 @@ export class ComparisonLineChartComponent
         title: { text: '' },
         labels: {
           formatter(value: any) {
-            return value != null ? fmtCurrency(Number(value)) : '';
+            const n = value != null ? Number(value) : NaN;
+            return Number.isFinite(n) ? fmtAxisFigure(n) : '';
           },
         },
       },
@@ -251,10 +314,10 @@ export class ComparisonLineChartComponent
       fill: {
         type: 'gradient',
         gradient: {
-          shadeIntensity: 1,
-          opacityFrom: 0.25,
-          opacityTo: 0.05,
-          stops: [0, 90, 100],
+          shadeIntensity: 0.9,
+          opacityFrom: 0.42,
+          opacityTo: 0.12,
+          stops: [0, 88, 100],
         },
       },
       tooltip: {
@@ -346,7 +409,14 @@ export class ComparisonLineChartComponent
   }
 
   ngOnDestroy(): void {
-    clearTimeout(this._postRenderTimer);
+    if (this.chartLayoutDebounceTimer !== null) {
+      clearTimeout(this.chartLayoutDebounceTimer);
+    }
+    this.chartResizeObserver?.disconnect();
+    this.chartResizeObserver = null;
+    if (this._postRenderTimer !== null) {
+      clearTimeout(this._postRenderTimer);
+    }
     this.cleanupYAxisLabel();
   }
 
@@ -355,7 +425,9 @@ export class ComparisonLineChartComponent
   }
 
   private postRenderSetup(): void {
-    clearTimeout(this._postRenderTimer);
+    if (this._postRenderTimer !== null) {
+      clearTimeout(this._postRenderTimer);
+    }
     this._postRenderTimer = setTimeout(() => this.positionYAxisLabel(), 50);
   }
 

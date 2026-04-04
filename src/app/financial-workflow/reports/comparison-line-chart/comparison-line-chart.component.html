@@ -12,7 +12,9 @@
     [grid]="chartOptions.grid"
     [dataLabels]="chartOptions.dataLabels"
     [markers]="chartOptions.markers"
-    [fill]="chartOptions.fill">
+    [fill]="chartOptions.fill"
+    (chartReady)="onApexChartReady()"
+  >
   </apx-chart>
   }
 </div>
