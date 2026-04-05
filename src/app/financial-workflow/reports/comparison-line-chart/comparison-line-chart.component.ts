@@ -11,6 +11,7 @@ import {
   ViewChild,
   inject,
 } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 import { ChartComponent, NgApexchartsModule } from 'ng-apexcharts';
 import { ChartSeries } from '../models/charts-series.model';
 import { Client } from 'src/app/clients/models/client';
@@ -93,6 +94,7 @@ export class ComparisonLineChartComponent
   @Input() forecastEndDate: any;
 
   private readonly ngZone = inject(NgZone);
+  private readonly translate = inject(TranslateService);
   private yAxisLabelEl: HTMLElement | null = null;
   private _postRenderTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -131,9 +133,7 @@ export class ComparisonLineChartComponent
   }
 
   onApexChartReady(): void {
-    this.ngZone.runOutsideAngular(() =>
-      this.flushApexChartWidthAfterLayout(),
-    );
+    this.ngZone.runOutsideAngular(() => this.flushApexChartWidthAfterLayout());
   }
 
   private setupChartResizeObserver(): void {
@@ -314,7 +314,7 @@ export class ComparisonLineChartComponent
       fill: {
         type: 'gradient',
         gradient: {
-          shadeIntensity: 0.9,
+          shadeIntensity: 1,
           opacityFrom: 0.42,
           opacityTo: 0.12,
           stops: [0, 88, 100],
@@ -324,7 +324,7 @@ export class ComparisonLineChartComponent
         enabled: true,
         shared: true,
         intersect: false,
-        custom(opts: any) {
+        custom: (opts: any) => {
           const { series, dataPointIndex, w } = opts;
           const age = ageLabels[dataPointIndex] ?? '–';
           const year = yearLabels[dataPointIndex] ?? '–';
@@ -346,19 +346,24 @@ export class ComparisonLineChartComponent
           const rows = Array.from(shown.entries())
             .map(([name, { color, value }]) => {
               return `
-                <div style="display:flex;align-items:center;gap:6px;padding:2px 0">
-                  <span style="width:10px;height:10px;border-radius:50%;background:${color};display:inline-block"></span>
-                  <span>${name}:</span>
-                  <strong>${fmtCurrency(value)}</strong>
-                </div>`;
+        <div class="savings-tooltip__body">
+          <div class="savings-tooltip__label">
+            <span class="circle-wrapper" style="background-color: ${color};"></span>${name}:</div>
+          <div class="savings-tooltip__value">${fmtCurrency(value)}</div>
+        </div>`;
             })
             .join('');
 
+          const ageLbl = this.translate.instant('Age');
+          const yearLbl = this.translate.instant('Year');
           return `
-            <div style="padding:8px 12px;font-size:13px">
-              <div style="font-weight:600;margin-bottom:4px">Age: ${age}  |  Year: ${year}</div>
-              ${rows}
-            </div>`;
+      <div class="savings-tooltip">
+        <div class="savings-tooltip__header">
+          <div>${ageLbl}: ${age} </div>  <div> ${yearLbl}: ${year}</div> 
+        </div>
+        ${rows}
+      </div>
+    `;
         },
       },
     };
