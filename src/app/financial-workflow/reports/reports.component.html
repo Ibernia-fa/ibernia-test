@@ -175,7 +175,6 @@
                     >
                     <button
                       class="button-icon"
-                      style="padding: 4px 12px; font-size: 12px"
                       (click)="regenerateInsights()"
                       [disabled]="insightsLoading || insightsLimitExceeded"
                     >
@@ -208,9 +207,9 @@
                     !insightsLimitExceeded
                   "
                 >
-                  {{ "REPORTS.INSIGHTS_EMPTY_BEFORE" | translate }}<strong>{{
-                    "Generate New" | translate
-                  }}</strong>{{ "REPORTS.INSIGHTS_EMPTY_AFTER" | translate }}
+                  {{ "REPORTS.INSIGHTS_EMPTY_BEFORE" | translate
+                  }}<strong>{{ "Generate New" | translate }}</strong
+                  >{{ "REPORTS.INSIGHTS_EMPTY_AFTER" | translate }}
                 </p>
 
                 <div
