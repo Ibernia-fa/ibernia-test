@@ -11,7 +11,6 @@ import { ToastrService } from 'ngx-toastr';
 import { LegacyHttpService } from '../services/legacy-http.service';
 import { TaxSettingsModel } from '../models/legacy.model';
 import { SettingsService, UserProfileDto } from 'src/app/default-preferance/services/default-preferance.http.service';
-import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-tax-settings',
@@ -64,6 +63,7 @@ export class TaxSettingsComponent {
     this.legacyHttp.updateTaxSettings(this.data.cashflowId, this.form.value).subscribe({
       next: (dashboard) => {
         this.toastr.success('Tax settings updated', 'Success');
+        this.settingsService.notifyProfileChanged();
         this.dialogRef.close({ dashboard });
       },
       error: (err) => {

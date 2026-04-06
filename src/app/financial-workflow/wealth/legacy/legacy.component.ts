@@ -5,6 +5,7 @@ import {
   Input,
   OnInit,
   OnChanges,
+  OnDestroy,
   SimpleChanges,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -30,6 +31,8 @@ import { AddMemberComponent } from './add-member/add-member.component';
 import { BeneficiaryRulesComponent } from './beneficiary-rules/beneficiary-rules.component';
 import { TaxSettingsComponent } from './tax-settings/tax-settings.component';
 import { EditParentEstateComponent } from './edit-parent-estate/edit-parent-estate.component';
+import { SettingsService } from 'src/app/default-preferance/services/default-preferance.http.service';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-legacy',
@@ -47,7 +50,7 @@ import { EditParentEstateComponent } from './edit-parent-estate/edit-parent-esta
   styleUrl: './legacy.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class LegacyComponent implements OnInit, OnChanges {
+export class LegacyComponent implements OnInit, OnChanges, OnDestroy {
   @Input() cashflowId!: string;
   @Input() clientData: Details | null = null;
   @Input() selectedClient: Client | null = null;
@@ -58,15 +61,31 @@ export class LegacyComponent implements OnInit, OnChanges {
   scenarioResult: ScenarioResultModel | null = null;
   markedDeceased = new Set<string>();
 
+  private readonly destroy$ = new Subject<void>();
+
   constructor(
     private legacyHttp: LegacyHttpService,
     private toastr: ToastrService,
     private dialog: MatDialog,
     private cdr: ChangeDetectorRef,
+    private settingsService: SettingsService,
   ) {}
 
   ngOnInit(): void {
     this.loadDashboard();
+    this.settingsService.profileChanged$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        if (this.cashflowId) {
+          this.clearScenario();
+          this.loadDashboard();
+        }
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
