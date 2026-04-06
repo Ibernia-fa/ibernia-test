@@ -51,6 +51,7 @@ import { SavingsPotsHttpService } from 'src/app/financial-workflow/saving-pots/s
 import { CurrencySymbolPipe } from 'src/app/pipe/currency-symbol.pipe';
 import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { nextUniqueCopyPlanName } from 'src/app/shared/utils/plan-copy-name';
 
 interface SortDescriptor {
   value: string;
@@ -315,10 +316,17 @@ export class ProfileComponent {
 
   onCopyModelClicked(cashflow: Cashflow) {
     this.isLoaderVisible = true;
-    cashflow.name = this.translate.instant('LABEL.COPY_OF') + ' ' + cashflow.name;
+    const copyOfLabel = this.translate.instant('LABEL.COPY_OF');
+    const existingNames = this.cashflows.map((c) => c.name);
+    const newName = nextUniqueCopyPlanName(
+      cashflow.name,
+      existingNames,
+      copyOfLabel,
+    );
+    const payload: Cashflow = { ...cashflow, name: newName };
 
     this.cashflowHttpService
-      .copyCashflow(cashflow)
+      .copyCashflow(payload)
       .pipe(
         filter((res) => !!res),
         catchError((err) => {

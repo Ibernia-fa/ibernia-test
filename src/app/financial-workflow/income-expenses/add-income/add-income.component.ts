@@ -128,20 +128,9 @@ export class AddIncomeComponent {
       isPartnerStatePensionApiDescription(this.selectedIncome?.description) ||
       isPartnerSalaryApiDescription(preselectedApi) ||
       isPartnerStatePensionApiDescription(preselectedApi);
-    const birthDateToUse = isPartnerIncome && data.partnerBirthDate ? data.partnerBirthDate : data.clientBirthDate;
-    this.clientBirthYear = moment(birthDateToUse).year();
-    const birthDate = new Date(birthDateToUse);
-    const forecastStart = new Date(data.forecastStartDateYear, 0, 1);
-    let age = forecastStart.getFullYear() - birthDate.getFullYear();
-    const monthDiff = forecastStart.getMonth() - birthDate.getMonth();
-    const dayDiff = forecastStart.getDate() - birthDate.getDate();
-
-    if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
-      age--;
-    }
-
-    this.clientAge = age;
-    if (data.forecastStartDateYear - this.clientBirthYear > this.clientAge) this.clientBirthYear = this.clientBirthYear + 1
+    const usePartnerBirthDate =
+      !!isPartnerIncome && !!data.partnerBirthDate;
+    this.applyBirthDateContextForSalaryPerson(usePartnerBirthDate);
 
     this.clientPreferredCurrency = data.clientPreferredCurrency;
     this.cashflowId = data.cashflowId;
@@ -177,10 +166,6 @@ export class AddIncomeComponent {
       this.years.push(element);
     }
 
-    const country = (this.data.clientCountryCode ?? '').toUpperCase();
-    this.retirementAge = (country === 'IT' || country === 'ITALY') ? 67 : 64;
-    this.retirementEventYear = this.getRetirementEventYear();
-    this.retirementYear = this.retirementEventYear ?? (this.clientBirthYear + this.retirementAge);
     this.forecastEndYear = planEndYear;
 
     const initialIncomeType = data.preselectedIncomeType && this.incomeTypes.includes(data.preselectedIncomeType)
@@ -450,14 +435,20 @@ export class AddIncomeComponent {
     const baseType = isSalaryTypeForBonus(clientDesc)
       ? 'Salary (Partner)'
       : 'State pension (Partner)';
-    this.setupForPartnerBirthDate();
+    const isSalary = isSalaryTypeForBonus(clientDesc);
+    this.updateSalaryRetirementDefaults(true);
+    const partnerRetirementEvent = this.findRetirementAgeEventForPerson(true);
+    const defaultEnd =
+      isSalary && partnerRetirementEvent?.id
+        ? 'event:' + partnerRetirementEvent.id
+        : this.retirementYear;
     this.incomeForm.patchValue({
       description: baseType,
       incomeType: baseType,
       amount: '',
       cycle: this.cycles[1]?.id,
       start: this.currentYear,
-      end: this.retirementYear,
+      end: defaultEnd,
       addBonus: false,
       bonusAmount: 0,
       bonusCycle: this.getYearlyCycleId(),
@@ -466,21 +457,6 @@ export class AddIncomeComponent {
     this.onCycleValueChange(this.cycles[1]?.id);
     this.onIncomeTypeChange(baseType);
     this.setIncomeIcon();
-  }
-
-  private setupForPartnerBirthDate(): void {
-    if (!this.data.partnerBirthDate) return;
-    const birthDate = new Date(this.data.partnerBirthDate);
-    this.clientBirthYear = moment(birthDate).year();
-    const forecastStart = new Date(this.data.forecastStartDateYear, 0, 1);
-    let age = forecastStart.getFullYear() - birthDate.getFullYear();
-    const monthDiff = forecastStart.getMonth() - birthDate.getMonth();
-    const dayDiff = forecastStart.getDate() - birthDate.getDate();
-    if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) age--;
-    this.clientAge = age;
-    const country = (this.data.clientCountryCode ?? '').toUpperCase();
-    this.retirementAge = (country === 'IT' || country === 'ITALY') ? 67 : 64;
-    this.retirementYear = this.clientBirthYear + this.retirementAge;
   }
 
   onCycleValueChange(event: any) {
@@ -514,6 +490,17 @@ export class AddIncomeComponent {
 
     if (this.incomeForm.valid) {
       this.isSaving = true;
+      const descSubmit = this.incomeForm.get('description')?.value;
+      if (isClientSalaryApiDescription(descSubmit)) {
+        this.updateSalaryRetirementDefaults(false);
+      } else if (isPartnerSalaryApiDescription(descSubmit)) {
+        this.updateSalaryRetirementDefaults(true);
+      } else if (isClientStatePensionApiDescription(descSubmit)) {
+        this.updateSalaryRetirementDefaults(false);
+      } else if (isPartnerStatePensionApiDescription(descSubmit)) {
+        this.updateSalaryRetirementDefaults(true);
+      }
+
       const isSalary = isSalaryTypeForBonus(
         this.incomeForm.get('description')?.value,
       );
@@ -1005,14 +992,21 @@ export class AddIncomeComponent {
       isClientSalaryApiDescription(incomeType) ||
       isPartnerSalaryApiDescription(incomeType)
     ) {
+      const isPartnerSalary = isPartnerSalaryApiDescription(incomeType);
+      this.updateSalaryRetirementDefaults(isPartnerSalary);
       if (!this.isEditWorkflow) {
         startCtrl.setValue(this.currentYear);
       }
-      endCtrl.setValue(this.retirementYear);
+      const retirementEvt = this.findRetirementAgeEventForPerson(isPartnerSalary);
+      endCtrl.setValue(
+        retirementEvt?.id ? 'event:' + retirementEvt.id : this.retirementYear,
+      );
     } else if (
       isClientStatePensionApiDescription(incomeType) ||
       isPartnerStatePensionApiDescription(incomeType)
     ) {
+      const isPartnerPension = isPartnerStatePensionApiDescription(incomeType);
+      this.updateSalaryRetirementDefaults(isPartnerPension);
       startCtrl.setValue(this.retirementYear);
       endCtrl.setValue(this.forecastEndYear);
     } else if (incomeType === 'Inheritance') {
@@ -1092,14 +1086,67 @@ export class AddIncomeComponent {
     this.incomeForm.markAsPristine();
   }
 
-  private getRetirementEventYear(): number | null {
-    const retirementEvent = (this.eventsList ?? []).find(
-      (event: any) =>
-        (event?.name ?? '').toString().toLowerCase() === 'retirement age'
-    );
+  /** Timeline labels are e.g. "Retirement Age {name}", not the literal "retirement age". */
+  private eventNameIsRetirementAge(name: unknown): boolean {
+    return (name ?? '')
+      .toString()
+      .trim()
+      .toLowerCase()
+      .startsWith('retirement age');
+  }
 
-    const retirementYear = Number(retirementEvent?.start?.year);
-    return Number.isFinite(retirementYear) && retirementYear > 0 ? retirementYear : null;
+  private findRetirementAgeEventForPerson(isPartner: boolean): any | null {
+    const events = this.eventsList ?? [];
+    return (
+      events.find(
+        (e: any) =>
+          this.eventNameIsRetirementAge(e?.name) &&
+          !!e?.isPartnerEvent === isPartner,
+      ) ?? null
+    );
+  }
+
+  /**
+   * Sets clientBirthYear / clientAge for the person the income row belongs to
+   * (main client vs partner), used for age labels and persisted age fields.
+   */
+  private applyBirthDateContextForSalaryPerson(usePartnerBirthDate: boolean): void {
+    const birthDateToUse =
+      usePartnerBirthDate && this.data.partnerBirthDate
+        ? this.data.partnerBirthDate
+        : this.data.clientBirthDate;
+    this.clientBirthYear = moment(birthDateToUse).year();
+    const birthDate = new Date(birthDateToUse);
+    const forecastStart = new Date(this.data.forecastStartDateYear, 0, 1);
+    let age = forecastStart.getFullYear() - birthDate.getFullYear();
+    const monthDiff = forecastStart.getMonth() - birthDate.getMonth();
+    const dayDiff = forecastStart.getDate() - birthDate.getDate();
+
+    if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+      age--;
+    }
+
+    this.clientAge = age;
+    if (this.data.forecastStartDateYear - this.clientBirthYear > this.clientAge) {
+      this.clientBirthYear = this.clientBirthYear + 1;
+    }
+  }
+
+  /**
+   * Default retirement calendar year and timeline event for salary (and state pension start)
+   * for the given person — matches timeline "Retirement Age …" chips, not a generic age.
+   */
+  private updateSalaryRetirementDefaults(isPartnerSalary: boolean): void {
+    this.applyBirthDateContextForSalaryPerson(
+      isPartnerSalary && !!this.data.partnerBirthDate,
+    );
+    const country = (this.data.clientCountryCode ?? '').toUpperCase();
+    this.retirementAge = country === 'IT' || country === 'ITALY' ? 67 : 64;
+    const evt = this.findRetirementAgeEventForPerson(isPartnerSalary);
+    const y = Number(evt?.start?.year);
+    this.retirementEventYear = Number.isFinite(y) && y > 0 ? y : null;
+    this.retirementYear =
+      this.retirementEventYear ?? this.clientBirthYear + this.retirementAge;
   }
 
   private setupBonusControlHandlers(): void {

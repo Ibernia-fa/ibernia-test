@@ -5,7 +5,6 @@ import {
 } from '@angular/core';
 import {
   HttpBackend,
-  HttpClient,
   provideHttpClient,
   withInterceptors,
   withInterceptorsFromDi,
@@ -19,7 +18,6 @@ import {
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideClientHydration } from '@angular/platform-browser';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
-import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
 import { ToastrModule } from 'ngx-toastr';
 import { provideToastr } from 'ngx-toastr';
@@ -42,6 +40,8 @@ import { provideHighlightOptions } from 'ngx-highlightjs';
 import 'highlight.js/styles/atom-one-dark.min.css';
 import { httpRequestInterceptor } from './core/http-request.interceptor';
 import { httpAuthErrorInterceptor } from './core/http-auth-error.interceptor';
+import { httpUiErrorMessageInterceptor } from './core/http-ui-error-message.interceptor';
+import { iberniaTranslateLoaderFactory } from './core/i18n/ibernia-translate-http-loader';
 import { provideStore } from '@ngrx/store';
 import { provideEffects } from '@ngrx/effects';
 import { FinancialAdvisorEffects } from './store/financial-advisor/financial-advisor.effects';
@@ -52,11 +52,6 @@ import { clientReducer } from './store/client/client.reducer';
 import { cashflowReducer } from './store/cashflow/cashflow.reducer';
 import { provideServiceWorker } from '@angular/service-worker';
 
-
-export function HttpLoaderFactory(handler: HttpBackend): any {
-  const http = new HttpClient(handler);
-  return new TranslateHttpLoader(http, './assets/i18n/', '.json');
-}
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -78,7 +73,11 @@ export const appConfig: ApplicationConfig = {
     }), withComponentInputBinding()),
     provideHttpClient(
       withInterceptorsFromDi(),
-      withInterceptors([httpRequestInterceptor, httpAuthErrorInterceptor])
+      withInterceptors([
+        httpRequestInterceptor,
+        httpAuthErrorInterceptor,
+        httpUiErrorMessageInterceptor,
+      ])
     ),
     provideClientHydration(),
     importProvidersFrom(FormsModule, ToastrModule.forRoot(), ReactiveFormsModule, MaterialModule, NgxPermissionsModule.forRoot(), TablerIconsModule.pick(TablerIcons), NgScrollbarModule, CalendarModule.forRoot({
@@ -88,7 +87,7 @@ export const appConfig: ApplicationConfig = {
       defaultLanguage: 'en',
         loader: {
             provide: TranslateLoader,
-            useFactory: HttpLoaderFactory,
+            useFactory: iberniaTranslateLoaderFactory,
             deps: [HttpBackend],
         },
     })),
