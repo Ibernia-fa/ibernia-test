@@ -24,13 +24,24 @@ export class CoreService {
     return this.optionsSignal();
   }
 
-  setOptions(options: Partial<AppSettings>) {
+  /**
+   * @param persistSidenavCollapsed When false, updates in-memory `sidenavCollapsed` only (viewport
+   *   or temporary UI). User choices (toggle, settings restore) should pass true so preference
+   *   survives sessions. Default true keeps other `setOptions` callers persisting as before.
+   */
+  setOptions(
+    options: Partial<AppSettings>,
+    persistSidenavCollapsed = true,
+  ) {
     this.optionsSignal.update((current) => ({
       ...current,
       ...options,
     }));
 
-    if (options.sidenavCollapsed !== undefined) {
+    if (
+      options.sidenavCollapsed !== undefined &&
+      persistSidenavCollapsed
+    ) {
       try {
         localStorage.setItem(SIDEBAR_COLLAPSED_KEY, String(options.sidenavCollapsed));
       } catch { /* storage unavailable */ }

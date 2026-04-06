@@ -16,6 +16,8 @@ export interface MortgageCalculatorDialogData {
   priceLabel?: string;
   advisorDefaultInterestRate: number | null;
   initialState: MortgageCalculatorState | null;
+  /** When `initialState` has no `loanTermYears`, seed the term dropdown (from goal type in parent). */
+  defaultLoanTermYears?: number;
 }
 
 export interface MortgageCalculatorDialogResult {

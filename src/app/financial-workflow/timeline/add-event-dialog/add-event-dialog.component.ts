@@ -171,6 +171,15 @@ export class AddEventDialogComponent {
     return 'Price';
   }
 
+  /** Default loan term for financing calculator when there is no saved calculator state yet. */
+  get financingCalculatorDefaultLoanTermYears(): number {
+    const name = this.patchEvent?.name ?? '';
+    if (name.startsWith('Home')) return 25;
+    if (name.startsWith('Car')) return 5;
+    if (name.startsWith('Boat')) return 10;
+    return 5;
+  }
+
   get customCalculatorToggleLabelKey(): string {
     return 'Use loan calculator';
   }
@@ -1074,6 +1083,7 @@ export class AddEventDialogComponent {
         priceLabel: this.financingCalculatorPriceLabel,
         advisorDefaultInterestRate: this.financingCalculatorAdvisorRate,
         initialState: this.lastCalculatorState,
+        defaultLoanTermYears: this.financingCalculatorDefaultLoanTermYears,
       },
     });
 
@@ -1098,6 +1108,7 @@ export class AddEventDialogComponent {
         priceLabel: 'Price',
         advisorDefaultInterestRate: this.customCalculatorAdvisorRate,
         initialState: this.lastCalculatorState,
+        defaultLoanTermYears: 5,
       },
     });
 

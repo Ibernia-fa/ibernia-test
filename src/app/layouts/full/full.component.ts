@@ -280,10 +280,13 @@ export class FullComponent implements OnInit, OnDestroy {
         if (!this.inSettingsRoute && o.sidenavCollapsed === false) {
           sidenavCollapsed = state.breakpoints[TABLET_VIEW];
         }
-        this.settings.setOptions({
-          sidenavOpened: true,
-          sidenavCollapsed,
-        });
+        this.settings.setOptions(
+          {
+            sidenavOpened: true,
+            sidenavCollapsed,
+          },
+          false,
+        );
         this.isMobileScreen = state.breakpoints[BELOWMONITOR];
         this.isContentWidthFixed = state.breakpoints[MONITOR_VIEW];
         this.resView = state.breakpoints[BELOWMONITOR];
@@ -372,7 +375,7 @@ export class FullComponent implements OnInit, OnDestroy {
     if (nowSettings && !this.inSettingsRoute) {
       this.preSettingsSidenavCollapsed =
         this.settings.getOptions().sidenavCollapsed;
-      this.settings.setOptions({ sidenavCollapsed: false });
+      this.settings.setOptions({ sidenavCollapsed: false }, false);
     } else if (!nowSettings && this.inSettingsRoute) {
       if (this.preSettingsSidenavCollapsed !== null) {
         this.settings.setOptions({
