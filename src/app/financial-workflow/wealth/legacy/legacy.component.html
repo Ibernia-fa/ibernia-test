@@ -195,7 +195,7 @@
                 <div class="leaf-drop" *ngIf="showClientBranch"></div>
                 <ng-container *ngIf="getMemberInheritance(sib.id) as inh">
                   <span class="inheritance-pct-badge"
-                    >{{ inh.percentage | number: "1.1-1" }}%</span
+                    >{{ inh.percentage | number: "1.0-0" }}%</span
                   >
                   <div class="leaf-drop-short"></div>
                 </ng-container>
@@ -252,7 +252,7 @@
                   *ngIf="getMemberInheritance(clientMember?.id) as inh"
                 >
                   <span class="inheritance-pct-badge"
-                    >{{ inh.percentage | number: "1.1-1" }}%</span
+                    >{{ inh.percentage | number: "1.0-0" }}%</span
                   >
                   <div class="leaf-drop-short"></div>
                 </ng-container>
@@ -458,7 +458,7 @@
                   *ngIf="getMemberInheritance(partnerMember?.id) as inh"
                 >
                   <span class="inheritance-pct-badge"
-                    >{{ inh.percentage | number: "1.1-1" }}%</span
+                    >{{ inh.percentage | number: "1.0-0" }}%</span
                   >
                   <div class="leaf-drop-short"></div>
                 </ng-container>
@@ -530,7 +530,7 @@
                 <div class="leaf-drop" *ngIf="showPartnerBranch"></div>
                 <ng-container *ngIf="getMemberInheritance(sib.id) as inh">
                   <span class="inheritance-pct-badge"
-                    >{{ inh.percentage | number: "1.1-1" }}%</span
+                    >{{ inh.percentage | number: "1.0-0" }}%</span
                   >
                   <div class="leaf-drop-short"></div>
                 </ng-container>
@@ -622,7 +622,7 @@
               <div class="leaf-drop"></div>
               <ng-container *ngIf="getMemberInheritance(child.id) as inh">
                 <span class="inheritance-pct-badge"
-                  >{{ inh.percentage | number: "1.1-1" }}%</span
+                  >{{ inh.percentage | number: "1.0-0" }}%</span
                 >
                 <div class="leaf-drop-short"></div>
               </ng-container>
@@ -700,7 +700,7 @@
         </div>
         <button class="button-icon-outline" (click)="onOpenTaxSettings()">
           <span class="f-s-16 f-w-500">{{
-            "Edit tax settings" | translate
+            "Tax settings" | translate
           }}</span>
         </button>
       </div>
