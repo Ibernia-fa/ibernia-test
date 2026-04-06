@@ -15,16 +15,16 @@
         fetchpriority="high"
         decoding="sync"
       />
-      @if (!sidenavCollapsed) {
-        <img
-          src="../../../../../assets/images/logos/ibernia-text-logo.png"
-          alt="Ibernia text logo"
-          loading="eager"
-          style="max-width: 105px"
-          fetchpriority="high"
-          decoding="sync"
-        />
-      }
+      <img
+        class="sidebar-ibernia-text-logo"
+        [class.sidebar-ibernia-text-logo--collapsed]="sidenavCollapsed"
+        src="../../../../../assets/images/logos/ibernia-text-logo.png"
+        alt="Ibernia text logo"
+        loading="eager"
+        fetchpriority="high"
+        decoding="sync"
+        [attr.aria-hidden]="sidenavCollapsed ? true : null"
+      />
     </a>
   }
   <!-- <div class="sidebar-static-logos">

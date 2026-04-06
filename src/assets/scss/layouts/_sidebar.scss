@@ -34,6 +34,17 @@
   // border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+/* Text logo stays in DOM; only CSS toggles with collapse so the image is not recreated/re-decoded. */
+.sidebar-ibernia-text-logo {
+  max-width: 105px;
+  height: auto;
+  flex-shrink: 0;
+}
+
+.sidebar-ibernia-text-logo--collapsed {
+  display: none;
+}
+
 .sidebar-logo-link {
   position: relative;
   display: flex;
