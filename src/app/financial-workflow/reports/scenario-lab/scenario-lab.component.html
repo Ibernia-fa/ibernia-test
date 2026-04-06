@@ -367,7 +367,11 @@
                                 width="18"
                                 class="category-option-icon"
                               />
-                              {{ income.description | translateIncomeExpenseLabel }}
+                              {{
+                                income.description
+                                  | translateIncomeExpenseLabel
+                                    : incomeDisplayLabelContext
+                              }}
                             </span>
                           </mat-option>
                         }
@@ -381,7 +385,9 @@
                             @for (entry of editedIncomes; track entry.name) {
                               <span class="edited-chip">
                                 {{
-                                  entry.name | translateIncomeExpenseLabel
+                                  entry.name
+                                    | translateIncomeExpenseLabel
+                                      : incomeDisplayLabelContext
                                 }}
                                 <button
                                   class="chip-remove"
