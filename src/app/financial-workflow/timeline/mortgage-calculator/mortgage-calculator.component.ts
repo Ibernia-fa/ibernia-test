@@ -70,6 +70,11 @@ export class MortgageCalculatorComponent implements OnInit, OnChanges {
   /** UI label: Home uses mortgage; Car, Boat, custom use loan. */
   @Input() calculatorKind: 'mortgage' | 'loan' = 'loan';
   @Input() priceLabel: string = 'Property price';
+  /**
+   * Preferred default for the loan term when `initialState.loanTermYears` is absent
+   * (set by parent from goal type: Home / Car / Boat / Custom).
+   */
+  @Input() defaultLoanTermYears: number | null = null;
   @Input() initialState: MortgageCalculatorState | null = null;
   @Output() calculated = new EventEmitter<MortgageOutput>();
   @Output() stateChanged = new EventEmitter<MortgageCalculatorState>();
@@ -206,7 +211,9 @@ export class MortgageCalculatorComponent implements OnInit, OnChanges {
         ? this.advisorDefaultInterestRate
         : null;
     const defaultRate = state?.interestRate ?? advisor ?? this.config.defaultInterestRate;
-    const defaultTerm = state?.loanTermYears ?? this.config.defaultLoanTermYears;
+    const defaultTerm =
+      state?.loanTermYears ??
+      (this.defaultLoanTermYears != null ? this.defaultLoanTermYears : this.config.defaultLoanTermYears);
 
     this.downPaymentMode = state?.downPaymentMode ?? 'percent';
 
