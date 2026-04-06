@@ -42,11 +42,10 @@
                 </h3>
                 <p>
                   @if (birthDate) {
-                    {{ birthDate | date: "d MMMM y":undefined:dateLocale }}
+                    {{ birthDate | date: "d MMMM y" : undefined : dateLocale }}
                     ({{
                       "PROFILE.AGE_YEARS"
-                        | translate
-                          : { age: (birthDate | ageCalculator) }
+                        | translate: { age: (birthDate | ageCalculator) }
                     }})
                   }
                 </p>
@@ -449,7 +448,7 @@
                         /> -->
                       }
                     </button>
-                    @if (questionnaireResponses) {
+                    <!-- @if (questionnaireResponses) {
                       <div class="questionnaire-date-badge">
                         <svg
                           width="16"
@@ -471,7 +470,7 @@
                             | date: "mediumDate"
                         }}</span>
                       </div>
-                    }
+                    } -->
                   </div>
                   <button
                     (click)="newModelClicked()"
