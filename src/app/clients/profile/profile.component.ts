@@ -410,8 +410,9 @@ export class ProfileComponent {
   }
 
   get partnerBirthDate(): Date | undefined {
-    const raw = this.client?.partnerDetail?.birthDate;
-    if (raw == null || raw === '') return undefined;
-    return raw instanceof Date ? raw : new Date(raw as string | number);
+    const raw = this.client?.partnerDetail?.birthDate as Date | string | number | undefined | null;
+    if (raw == null) return undefined;
+    if (typeof raw === 'string' && raw.trim() === '') return undefined;
+    return raw instanceof Date ? raw : new Date(raw);
   }
 }
