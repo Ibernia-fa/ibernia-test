@@ -1,5 +1,5 @@
 <div class="add-client-wrapper">
-  <div class="add-client-content-wrapper p-t-10">
+  <div class="add-client-content-wrapper">
 
 <form [formGroup]="form" (ngSubmit)="submit()">
 
@@ -71,24 +71,24 @@
       </div>
     </div>
 
-      <!-- Footer -->
+      <!-- Footer: stacked hint then CTA so spacing matches other Ibernia modals -->
    <div class="row preferences-onboarding-footer">
     <div class="col-12">
-  <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-    <section class="example-section">
-        <p class="d-flex align-items-center m-0">
+      <div class="preferences-onboarding-actions">
+        <section class="preferences-onboarding-hint">
+          <p class="d-flex align-items-center m-0">
             <img src="assets/images/svgs/Info-icon.svg" alt="" class="m-r-5">
             {{ 'PREFERENCES.CHANGE_LATER_HINT' | translate }}
-        </p>
-    </section>
-
-    <button type="submit" class="button-icon pull-right" >
-      <span *ngIf="!isSaving">{{ 'Finish and go to your dashboard' | translate }}</span>
-      <span *ngIf="isSaving">{{ 'Saving…' | translate }}</span>
-    </button>
-  </div>
+          </p>
+        </section>
+        <div class="preferences-onboarding-cta">
+          <button type="submit" class="button-icon">
+            <span *ngIf="!isSaving">{{ 'Finish and go to your dashboard' | translate }}</span>
+            <span *ngIf="isSaving">{{ 'Saving…' | translate }}</span>
+          </button>
+        </div>
+      </div>
     </div>
-
    </div>
   </div>
 
