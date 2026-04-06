@@ -139,6 +139,24 @@ export function compressForBackground(dataUrl: string): Promise<string> {
   return compressImage(dataUrl, BACKGROUND_MAX_DIMENSION, BACKGROUND_JPEG_QUALITY, true);
 }
 
+/**
+ * Shrink background data URL if it is still huge after preview compression (detailed photos at 2560px
+ * can exceed ~2–3MB base64). Call before POST /Organizations/profiles so strict proxies/CDNs are less
+ * likely to return 413. Does nothing if already under the cap.
+ */
+const MAX_BACKGROUND_DATA_URL_CHARS = 3_000_000;
+
+export async function ensureBackgroundDataUrlWithinLimit(dataUrl: string): Promise<string> {
+  if (!dataUrl || dataUrl.length <= MAX_BACKGROUND_DATA_URL_CHARS) return dataUrl;
+  let step = await compressImage(dataUrl, 1920, 0.82, false);
+  if (step.length <= MAX_BACKGROUND_DATA_URL_CHARS) return step;
+  step = await compressImage(dataUrl, 1600, 0.76, false);
+  if (step.length <= MAX_BACKGROUND_DATA_URL_CHARS) return step;
+  step = await compressImage(dataUrl, 1280, 0.72, false);
+  if (step.length <= MAX_BACKGROUND_DATA_URL_CHARS) return step;
+  return compressImage(dataUrl, 1200, 0.68, false);
+}
+
 /** Compress profile/logo image to stay under proxy body limits. Uses smaller dimensions and enforces max size. */
 export async function compressForProfilePayload(dataUrl: string): Promise<string> {
   let result = await compressImage(dataUrl, 600, 0.8);
