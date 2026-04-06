@@ -40,8 +40,8 @@ export class MyNotificationsService {
   private readonly feedStale$ = new Subject<void>();
   readonly notificationFeedStale = this.feedStale$.asObservable();
   private pollSubscription: Subscription | null = null;
-  /** Default 45s; also refreshes when the tab becomes visible again. */
-  private static readonly DEFAULT_POLL_MS = 5000;
+  /** Default 15s; also refreshes when the tab becomes visible again. */
+  private static readonly DEFAULT_POLL_MS = 15000;
 
   constructor(private http: HttpClient) {}
 
