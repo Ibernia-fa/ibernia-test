@@ -8,36 +8,33 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
   standalone: true,
   imports: [CommonModule],
   template: ` <a href="/" class="branding-link">
-    <!-- <span class="brand-logo-stack"> -->
-    <!-- width="120"
-      height="40" -->
     <img
       src="assets/images/logos/ibernia-logo.svg"
       alt="Ibernia"
-      class="brand-layer brand-logo--default"
+      class="brand-layer"
       [class.brand-logo--default-hidden]="!!profileImage"
       loading="eager"
       fetchpriority="high"
       decoding="sync"
     />
-    <!-- width="120"
-      height="40" -->
+
     <img
       *ngIf="profileImage && sanitizedImage"
       [src]="sanitizedImage"
       alt="Company logo"
-      class="brand-layer brand-logo--custom"
+      class="brand-layer"
       loading="eager"
       decoding="sync"
     />
-    <!-- </span> -->
   </a>`,
   styles: [
     `
       .brand-layer {
         width: 100%;
         max-width: 160px;
-        height: auto;
+        height: 52px;
+        object-fit: cover;
+        object-position: center;
       }
       // :host {
       //   display: block;
@@ -83,10 +80,11 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
       // }
 
       /* In DOM for instant swap when custom is removed; invisible while custom shows */
-      // .brand-logo--default-hidden {
-      //   opacity: 0;
-      //   visibility: hidden;
-      // }
+      .brand-logo--default-hidden {
+        // opacity: 0;
+        // visibility: hidden;
+        display: none;
+      }
 
       // .power-by-logo {
       //   display: block;
