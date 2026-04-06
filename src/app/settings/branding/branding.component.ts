@@ -23,6 +23,7 @@ import {
   compressForBackground,
   compressImage,
   compressForProfilePayload,
+  ensureBackgroundDataUrlWithinLimit,
   BACKGROUND_MIN_WIDTH,
   BACKGROUND_MIN_HEIGHT,
 } from 'src/app/shared/utils/image-upload.utils';
@@ -184,16 +185,29 @@ export class BrandingComponent implements OnInit {
     this.updateHasChanges();
   }
 
-  save() {
+  async save() {
     const userId = this.auth.getUserProfile()?.sub;
     if (!userId) {
       this.toastr.error(this.translate.instant('ERROR.NO_USER_SIGN_IN'), this.translate.instant('LABEL.ERROR'));
       return;
     }
 
+    let backgroundPhotoUrl = this.backgroundImage || "";
+    if (backgroundPhotoUrl) {
+      try {
+        const shrunk = await ensureBackgroundDataUrlWithinLimit(backgroundPhotoUrl);
+        if (shrunk !== backgroundPhotoUrl) {
+          this.backgroundImage = shrunk;
+          backgroundPhotoUrl = shrunk;
+        }
+      } catch (e) {
+        console.error('Background shrink before save failed', e);
+      }
+    }
+
     this.isSaving = true;
     this.orgProfiles
-      .saveProfile({ userId, profilePhotoUrl: this.profileImage || "", backgroundPhotoUrl: this.backgroundImage || "" })
+      .saveProfile({ userId, profilePhotoUrl: this.profileImage || "", backgroundPhotoUrl })
       .subscribe({
         next: () => {
           this.orgProfiles.setBrandingLogo(
