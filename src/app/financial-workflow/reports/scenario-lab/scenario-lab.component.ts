@@ -68,6 +68,11 @@ import { patchInflationRateDescription } from 'src/app/shared/utils/escalation-r
 import { formatClientPersonDisplayName } from 'src/app/shared/utils/person-display-name';
 import { TranslateIncomeExpenseLabelPipe } from 'src/app/core/pipes/translate-income-expense-label.pipe';
 import { translateTimelineEventDisplayName } from 'src/app/shared/utils/timeline-event-display-name';
+import {
+  IncomeDisplayLabelContext,
+  isPartnerSalaryApiDescription,
+  isPartnerStatePensionApiDescription,
+} from 'src/app/shared/utils/income-display-label';
 
 @Component({
   selector: 'app-scenario-lab',
@@ -142,6 +147,18 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
       this.scenarioForm.get('partnerRetirementAge')?.value !==
       this.baselinePartnerRetirementAge
     );
+  }
+
+  get hasPartner(): boolean {
+    return !!this.client?.partnerDetail;
+  }
+
+  get incomeDisplayLabelContext(): IncomeDisplayLabelContext {
+    return {
+      hasPartner: this.hasPartner,
+      clientFirstName: this.clientFirstName,
+      partnerFirstName: this.partnerFirstName,
+    };
   }
 
   goalItems: ClientEvent[] = [];
@@ -251,8 +268,8 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
             this.baselineForecastStartDate = timeline?.forecastStartDate
               ? new Date(timeline.forecastStartDate)
               : null;
-            this.populateCategoryItems();
             this.initFormFromPlan();
+            this.populateCategoryItems();
             this.baselineForecastEndDate = this.getMaxForecastEndDate();
           },
         ),
@@ -300,11 +317,30 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
       (i) => i.isDefault,
     );
     const allIncomes = this.incomeExpenseData?.incomes ?? [];
+    const hasPartner = this.hasPartner;
+    const cName = this.clientFirstName || 'Client';
+    const pName = this.partnerFirstName || 'Partner';
     const types: string[] = [];
-    if (!defaultIncomes.find((x) => x.description === 'Salary'))
-      types.push('Salary');
-    if (!defaultIncomes.find((x) => x.description === 'State pension'))
-      types.push('State pension');
+    if (!defaultIncomes.find((x) => x.description === 'Salary')) {
+      types.push(hasPartner ? `Salary ${cName}` : 'Salary');
+    }
+    if (
+      hasPartner &&
+      !defaultIncomes.find((x) => isPartnerSalaryApiDescription(x.description))
+    ) {
+      types.push(`Salary ${pName}`);
+    }
+    if (!defaultIncomes.find((x) => x.description === 'State pension')) {
+      types.push(hasPartner ? `State pension ${cName}` : 'State pension');
+    }
+    if (
+      hasPartner &&
+      !defaultIncomes.find((x) =>
+        isPartnerStatePensionApiDescription(x.description),
+      )
+    ) {
+      types.push(`State pension ${pName}`);
+    }
     if (!allIncomes.find((x) => x.description === 'Rental income'))
       types.push('Rental income');
     types.push('Custom');
@@ -432,6 +468,10 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
     }
 
     return new Date(endYear, 11, 31);
+  }
+
+  private getPlanEndYearForScenarioLab(): number {
+    return this.getMaxForecastEndDate().getFullYear();
   }
 
   private buildScenarioPayload(): ReportScenarioPayload | null {
@@ -840,7 +880,9 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
           (a, b) => a.start.age - b.start.age,
         ),
         clientBirthDate: this.client.clientDetails.birthDate,
+        partnerBirthDate: this.client.partnerDetail?.birthDate,
         clientPreferredCurrency: this.client.clientDetails.preferredCurrency,
+        clientCountryCode: this.client.clientDetails?.country,
         cashflowId: this.cashflowId,
         selectedIncome: income,
         isEditWorkflow: true,
@@ -850,7 +892,14 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
         forecastStartDateYear: moment(
           this.financialTimeline.forecastStartDate,
         ).year(),
+        planEndYear: this.getPlanEndYearForScenarioLab(),
         incomeType: this.buildIncomeTypes(),
+        incomes: this.incomeExpenseData?.incomes ?? [],
+        clientSavings: this.savingPots?.clientSavings ?? [],
+        existingContributions: [],
+        clientFirstName: this.clientFirstName,
+        partnerFirstName: this.partnerFirstName,
+        hasPartner: this.hasPartner,
         scenarioMode: true,
       },
     });

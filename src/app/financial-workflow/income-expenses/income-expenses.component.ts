@@ -30,6 +30,14 @@ import { TranslateModule } from '@ngx-translate/core';
 import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { TranslateIncomeExpenseLabelPipe } from 'src/app/core/pipes/translate-income-expense-label.pipe';
 import { patchInflationRateDescription } from 'src/app/shared/utils/escalation-rate-utils';
+import {
+  IncomeDisplayLabelContext,
+  isClientSalaryApiDescription,
+  isClientStatePensionApiDescription,
+  isPartnerSalaryApiDescription,
+  isPartnerStatePensionApiDescription,
+  isSalaryTypeForBonus,
+} from 'src/app/shared/utils/income-display-label';
 import { SavingsPotsHttpService } from '../saving-pots/services/savings-pots-http.service';
 import { SavingPotsModel } from '../saving-pots/models/saving-pots.model';
 import { WithdrawalsContributionsHttpService } from '../withdrawals-contributions/services/withdrawals-contributions-http.service';
@@ -67,11 +75,8 @@ export class IncomeExpensesComponent {
   currency: string;
   // default
   defaultIncomes: FinancialViewModel[];
-  /** For display: separate cards for each income, with displayTitle when hasPartner (e.g. "Salary [Inam]") */
-  displayDefaultIncomes: Array<{
-    income: FinancialViewModel;
-    displayTitle?: string;
-  }> = [];
+  /** For display: separate cards for each default income (ordering when hasPartner). */
+  displayDefaultIncomes: Array<{ income: FinancialViewModel }> = [];
   defautExpenses: FinancialViewModel[];
   hasPartner = false;
   clientFirstName = '';
@@ -89,6 +94,14 @@ export class IncomeExpensesComponent {
     total: 0,
     savingRate: 0,
   };
+
+  get incomeDisplayLabelContext(): IncomeDisplayLabelContext {
+    return {
+      hasPartner: this.hasPartner,
+      clientFirstName: this.clientFirstName,
+      partnerFirstName: this.partnerFirstName,
+    };
+  }
 
   constructor(
     private dialog: MatDialog,
@@ -406,7 +419,7 @@ export class IncomeExpensesComponent {
     }
     if (
       this.hasPartner &&
-      !this.defaultIncomes.find((x) => x.description == 'Salary (Partner)')
+      !this.defaultIncomes.find((x) => isPartnerSalaryApiDescription(x.description))
     ) {
       this.incomeType.push(`Salary ${pName}`);
     }
@@ -415,8 +428,8 @@ export class IncomeExpensesComponent {
     }
     if (
       this.hasPartner &&
-      !this.defaultIncomes.find(
-        (x) => x.description == 'State pension (Partner)',
+      !this.defaultIncomes.find((x) =>
+        isPartnerStatePensionApiDescription(x.description),
       )
     ) {
       this.incomeType.push(`State pension ${pName}`);
@@ -538,46 +551,47 @@ export class IncomeExpensesComponent {
 
   private buildDisplayDefaultIncomes(
     allDefault: FinancialViewModel[],
-  ): Array<{ income: FinancialViewModel; displayTitle?: string }> {
-    const result: Array<{ income: FinancialViewModel; displayTitle?: string }> =
-      [];
-    const clientSalary = allDefault.find((i) => i.description === 'Salary');
-    const partnerSalary = allDefault.find(
-      (i) => i.description === 'Salary (Partner)',
+  ): Array<{ income: FinancialViewModel }> {
+    const result: Array<{ income: FinancialViewModel }> = [];
+    const clientSalary = allDefault.find((i) =>
+      isClientSalaryApiDescription(i.description),
     );
-    const clientPension = allDefault.find(
-      (i) => i.description === 'State pension',
+    const partnerSalary = allDefault.find((i) =>
+      isPartnerSalaryApiDescription(i.description),
     );
-    const partnerPension = allDefault.find(
-      (i) => i.description === 'State pension (Partner)',
+    const clientPension = allDefault.find((i) =>
+      isClientStatePensionApiDescription(i.description),
+    );
+    const partnerPension = allDefault.find((i) =>
+      isPartnerStatePensionApiDescription(i.description),
     );
     const inheritance = allDefault.find((i) => i.description === 'Inheritance');
 
+    const pushIncome = (income: FinancialViewModel) => {
+      result.push({ income });
+    };
+
     if (this.hasPartner) {
-      if (clientSalary)
-        result.push({
-          income: clientSalary,
-          displayTitle: `Salary ${this.clientFirstName || 'Client'}`,
-        });
-      if (partnerSalary)
-        result.push({
-          income: partnerSalary,
-          displayTitle: `Salary ${this.partnerFirstName || 'Partner'}`,
-        });
-      if (clientPension)
-        result.push({
-          income: clientPension,
-          displayTitle: `State pension ${this.clientFirstName || 'Client'}`,
-        });
-      if (partnerPension)
-        result.push({
-          income: partnerPension,
-          displayTitle: `State pension ${this.partnerFirstName || 'Partner'}`,
-        });
-      if (inheritance) result.push({ income: inheritance });
+      if (clientSalary) pushIncome(clientSalary);
+      if (partnerSalary) pushIncome(partnerSalary);
+      if (clientPension) pushIncome(clientPension);
+      if (partnerPension) pushIncome(partnerPension);
+      if (inheritance) pushIncome(inheritance);
+      const used = new Set(
+        [clientSalary, partnerSalary, clientPension, partnerPension, inheritance]
+          .filter(Boolean)
+          .map((i) => i!.id ?? `desc:${i!.description}`),
+      );
+      for (const item of allDefault) {
+        const key = item.id ?? `desc:${item.description}`;
+        if (!used.has(key)) {
+          used.add(key);
+          pushIncome(item);
+        }
+      }
     } else {
       for (const item of allDefault) {
-        result.push({ income: item });
+        pushIncome(item);
       }
     }
     return result;
@@ -585,7 +599,7 @@ export class IncomeExpensesComponent {
 
   trackByDisplayIncomeId(
     index: number,
-    item: { income: FinancialViewModel; displayTitle?: string },
+    item: { income: FinancialViewModel },
   ): string {
     return item.income.id ?? item.income.description ?? String(index);
   }
@@ -638,6 +652,10 @@ export class IncomeExpensesComponent {
 
   hasBonusAmount(item: FinancialViewModel): boolean {
     return Number(item?.bonus?.amount?.amount ?? 0) > 0;
+  }
+
+  isSalaryIncomeForBonus(description: string | null | undefined): boolean {
+    return isSalaryTypeForBonus(description);
   }
 
   private getPlanEndYear(): number {

@@ -405,7 +405,11 @@
                                                         </th>
                                                         <td mat-cell *matCellDef="let element"
                                                             class="p-x-24 f-s-14 p-l-0 column-client">
-                                                            {{element.description | translateIncomeExpenseLabel}} </td>
+                                                            {{
+                                                              element.description
+                                                                | translateIncomeExpenseLabel
+                                                                  : incomeDisplayLabelContext
+                                                            }} </td>
                                                     </ng-container>
                                                     <ng-container matColumnDef="name">
                                                         <th mat-header-cell *matHeaderCellDef
@@ -445,7 +449,11 @@
                                                         </th>
                                                         <td mat-cell *matCellDef="let element"
                                                             class="p-x-24 f-s-14 p-l-0 column-client">
-                                                            {{element.description | translateIncomeExpenseLabel}} </td>
+                                                            {{
+                                                              element.description
+                                                                | translateIncomeExpenseLabel
+                                                                  : incomeDisplayLabelContext
+                                                            }} </td>
                                                     </ng-container>
 
                                                     <ng-container matColumnDef="name">
@@ -524,7 +532,11 @@
                                                         </th>
                                                         <td mat-cell *matCellDef="let element"
                                                             class="p-x-24 f-s-14 p-l-0 column-client">
-                                                            {{element.description | translateIncomeExpenseLabel}} </td>
+                                                            {{
+                                                              element.description
+                                                                | translateIncomeExpenseLabel
+                                                                  : incomeDisplayLabelContext
+                                                            }} </td>
                                                     </ng-container>
                                                     <ng-container matColumnDef="name">
                                                         <th mat-header-cell *matHeaderCellDef
@@ -563,7 +575,11 @@
                                                         </th>
                                                         <td mat-cell *matCellDef="let element"
                                                             class="p-x-24 f-s-14 p-l-0 column-client">
-                                                            {{element.description | translateIncomeExpenseLabel}} </td>
+                                                            {{
+                                                              element.description
+                                                                | translateIncomeExpenseLabel
+                                                                  : incomeDisplayLabelContext
+                                                            }} </td>
                                                     </ng-container>
                                                     <ng-container matColumnDef="name">
                                                         <th mat-header-cell *matHeaderCellDef

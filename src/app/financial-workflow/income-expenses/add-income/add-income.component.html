@@ -2,7 +2,12 @@
   <div class="d-flex flex-column">
     <div class="dialog-header">
       <div class="d-flex align-items-center justify-content-center gap-4">
-        <h3 class="dialog-title text-center">{{ incomeTitle | translateIncomeExpenseLabel }}</h3>
+        <h3 class="dialog-title text-center">
+          {{
+            incomeTitle
+              | translateIncomeExpenseLabel : incomeDisplayLabelContext
+          }}
+        </h3>
         <ng-container *ngIf="isEditWorkflow && isNameEditable">
           <img
             src="assets/images/svgs/drop-down-edit-2-line.svg"
@@ -51,7 +56,9 @@
                   >
                     @for (incomeType of incomeTypes; track incomeType) {
                       <mat-option [value]="incomeType">{{
-                        incomeType | translateIncomeExpenseLabel
+                        incomeType
+                          | translateIncomeExpenseLabel
+                            : incomeDisplayLabelContext
                       }}</mat-option>
                     }
                   </mat-select>
@@ -226,10 +233,7 @@
         </div>
 
         <!-- Bonus -->
-        @if (
-          incomeForm.get("description")?.value === "Salary" ||
-          incomeForm.get("description")?.value === "Salary (Partner)"
-        ) {
+        @if (isFormSalaryForBonus()) {
           <div class="d-flex flex-column gap-4 net-fields">
             <div class="d-flex flex-column gap-8">
               <mat-checkbox class="example-margin" formControlName="addBonus">
