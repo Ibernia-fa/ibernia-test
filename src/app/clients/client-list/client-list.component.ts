@@ -256,7 +256,8 @@ export class ClientListComponent implements OnInit, AfterViewInit, OnDestroy {
         if (res.status === 204) {
           // preferences missing → open dialog
           const ref = this.dialog.open(DefaultPreferanceComponent, {
-            width: '1265px',
+            width: '560px',
+            maxWidth: '92vw',
             disableClose: true,
             autoFocus: false,
             data: { mode: 'onboarding' },

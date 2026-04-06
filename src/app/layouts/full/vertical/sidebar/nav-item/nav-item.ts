@@ -2,6 +2,8 @@ export interface NavItem {
   displayName?: string;
   disabled?: boolean;
   external?: boolean;
+  /** When true with external, open Identity Manage/ChangePassword with portal language (Security menu). */
+  identitySecurityUrl?: boolean;
   twoLines?: boolean;
   chip?: boolean;
   iconName?: string;
