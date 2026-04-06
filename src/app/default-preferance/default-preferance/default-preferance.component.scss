@@ -41,13 +41,18 @@
 //     }
 // }
 
+:host .add-client-content-wrapper {
+  box-sizing: border-box;
+  padding: 16px 20px 0;
+}
+
 // First-login / onboarding: narrow, single-column field stack
 .preferences-onboarding-grid {
   max-width: 440px;
-  margin: 0 auto 32px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 24px;
 }
 
 .preferences-field {
@@ -55,8 +60,25 @@
 }
 
 .preferences-onboarding-footer {
-  margin-top: 8px;
-  padding-top: 8px;
+  margin-top: 32px;
+  padding-bottom: 32px;
+}
+
+.preferences-onboarding-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 20px;
+}
+
+.preferences-onboarding-hint {
+  flex: 0 0 auto;
+}
+
+.preferences-onboarding-cta {
+  display: flex;
+  justify-content: flex-end;
+  flex: 0 0 auto;
 }
 
 // .btn-submit {
