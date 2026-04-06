@@ -17,7 +17,8 @@ import {
   transition,
   trigger,
 } from '@angular/animations';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { identitySecurityManageUrl } from 'src/app/core/identity-security-url';
 import { TablerIconsModule } from 'angular-tabler-icons';
 import { MaterialModule } from 'src/app/material.module';
 import { CommonModule } from '@angular/common';
@@ -76,7 +77,8 @@ export class AppNavItemComponent implements OnChanges {
 
 
   constructor(public navService: NavService, public router: Router, public navItem: NavItemService,
-    private store: Store
+    private store: Store,
+    private translate: TranslateService,
   ) {
     if (this.depth === undefined) {
       this.depth = 0;
@@ -206,10 +208,13 @@ export class AppNavItemComponent implements OnChanges {
     }
   }
 
-  onExternalLinkClick(url: string) {
-  if (!url) return;
-  // Ensure protocol is correct and open in new tab
-  const finalUrl = url.startsWith('http') ? url : `https://${url}`;
-  window.open(finalUrl, '_blank', 'noopener,noreferrer');
-}
+  onExternalLinkClick(item: NavItem) {
+    let url = item.route;
+    if (item.identitySecurityUrl) {
+      url = identitySecurityManageUrl(this.translate.currentLang || undefined);
+    }
+    if (!url) return;
+    const finalUrl = url.startsWith('http') ? url : `https://${url}`;
+    window.open(finalUrl, '_blank', 'noopener,noreferrer');
+  }
 }

@@ -1,4 +1,5 @@
 import { UserNotificationItem } from 'src/app/core/services/my-notifications.service';
+import { identitySecurityManageUrl } from 'src/app/core/identity-security-url';
 
 export const MFA_REMINDER_NOTIFICATION_ID = '__mfa_grace__';
 
@@ -15,9 +16,8 @@ export function userNeedsMfaReminder(profile: Record<string, unknown> | null | u
 export function prependMfaReminderNotification(
   list: UserNotificationItem[],
   userProfile: Record<string, unknown> | null | undefined,
-  identityAuthority: string,
-  /** When set, STS logout returns to this portal (same as Security menu). */
-  portalReturnOrigin?: string
+  /** Portal UI language (ngx-translate) so STS opens in Italian when the app is in Italian. */
+  portalLang?: string
 ): UserNotificationItem[] {
   if (!userProfile || !userNeedsMfaReminder(userProfile)) {
     return list;
@@ -36,12 +36,7 @@ export function prependMfaReminderNotification(
     }
   }
 
-  const base = identityAuthority.replace(/\/$/, '');
-  let securityUrl = `${base}/Manage/ChangePassword`;
-  const origin = portalReturnOrigin?.trim();
-  if (origin) {
-    securityUrl += `?returnUrl=${encodeURIComponent(origin.replace(/\/$/, ''))}`;
-  }
+  const securityUrl = identitySecurityManageUrl(portalLang);
 
   const synthetic: UserNotificationItem = {
     id: MFA_REMINDER_NOTIFICATION_ID,

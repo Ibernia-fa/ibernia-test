@@ -41,6 +41,24 @@
 //     }
 // }
 
+// First-login / onboarding: narrow, single-column field stack
+.preferences-onboarding-grid {
+  max-width: 440px;
+  margin: 0 auto 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.preferences-field {
+  width: 100%;
+}
+
+.preferences-onboarding-footer {
+  margin-top: 8px;
+  padding-top: 8px;
+}
+
 // .btn-submit {
 //   float: inline-end;
 // }

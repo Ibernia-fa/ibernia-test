@@ -13,7 +13,6 @@ import { NotificationPreferencesService, NotificationPreference } from './notifi
 import { WebPushService } from './web-push.service';
 import { MyNotificationsService, UserNotificationItem } from 'src/app/core/services/my-notifications.service';
 import { NotificationNewLabelGraceService } from 'src/app/core/services/notification-new-label-grace.service';
-import { portalOriginForIdentityReturn } from 'src/app/core/identity-security-url';
 import {
   MFA_REMINDER_NOTIFICATION_ID,
   prependMfaReminderNotification,
@@ -21,7 +20,6 @@ import {
 import { notificationMatchesSearchQuery } from 'src/app/core/notification-search';
 import { CapitalizeFirstPipe } from 'src/app/core/pipes/capitalize-first.pipe';
 import { AuthService } from 'src/app/auth/services/auth.service';
-import { environment } from 'src/environments/environment';
 import { Subject, takeUntil } from 'rxjs';
 
 @Component({
@@ -175,8 +173,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
         this.notifications = prependMfaReminderNotification(
           list,
           this.authService.getUserProfile() as Record<string, unknown> | null,
-          environment.authority,
-          portalOriginForIdentityReturn()
+          this.translate.currentLang || undefined
         );
         this.notificationsLoading = false;
         if (!this.bulkMarkAllReadRequested) {

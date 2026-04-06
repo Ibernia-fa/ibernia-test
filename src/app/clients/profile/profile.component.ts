@@ -401,4 +401,17 @@ export class ProfileComponent {
     { value: 'asc', viewValue: 'Ascending' },
     { value: 'desc', viewValue: 'Descending' },
   ];
+
+  /** Partner row is shown when partner details exist with at least a first or last name. */
+  get hasPartner(): boolean {
+    const p = this.client?.partnerDetail;
+    if (!p) return false;
+    return !!(p.firstName?.trim() || p.lastName?.trim());
+  }
+
+  get partnerBirthDate(): Date | undefined {
+    const raw = this.client?.partnerDetail?.birthDate;
+    if (raw == null || raw === '') return undefined;
+    return raw instanceof Date ? raw : new Date(raw as string | number);
+  }
 }

@@ -1,5 +1,4 @@
 // src/app/layouts/full/sidebar/settings-nav.config.ts
-import { identitySecurityManageUrl } from 'src/app/core/identity-security-url';
 import { NavItem } from './nav-item/nav-item';
 import { environment } from 'src/environments/environment';
 
@@ -20,8 +19,9 @@ export const settingsNavItems: NavItem[] = [
     displayName: 'Security',
     iconName: '/assets/images/shapes/user-securities-active.svg',
     iconOutline: '/assets/images/shapes/user-securities.svg',
-    route: identitySecurityManageUrl(),
+    route: '',
     external: true,
+    identitySecurityUrl: true,
   },
   {
     displayName: 'Privacy & Data',
