@@ -16,6 +16,11 @@ import {
   ConversationWithMessages
 } from './agent-chat-http.service';
 import { TranslateModule } from '@ngx-translate/core';
+import { AuthService } from 'src/app/auth/services/auth.service';
+import {
+  readUserDisplayCache,
+  SettingsService,
+} from 'src/app/default-preferance/services/default-preferance.http.service';
 
 export type MessageDisplayType = 'text' | 'list' | 'table' | 'sections';
 
@@ -60,12 +65,16 @@ export class AgentChatComponent implements OnInit, OnDestroy {
   loading = false;
   sending = false;
   error: string | null = null;
+  /** First name for empty-state greeting (aligned with header display name). */
+  advisorFirstName = '';
   private destroy$ = new Subject<void>();
 
   constructor(
     private route: ActivatedRoute,
     private navItemService: NavItemService,
-    private chatService: AgentChatHttpService
+    private chatService: AgentChatHttpService,
+    private authService: AuthService,
+    private settingsService: SettingsService,
   ) {
     this.navItemService.currentRouteName = 'AI Chat';
   }
@@ -73,7 +82,30 @@ export class AgentChatComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.cashflowId = this.route.parent?.snapshot.params['id'] || this.route.snapshot.params['id'];
     if (!this.cashflowId) return;
+    this.refreshAdvisorFirstName();
+    void this.authService.isAuthenticated().then(() => this.refreshAdvisorFirstName());
+    this.settingsService.userData$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => this.refreshAdvisorFirstName());
     this.loadConversations();
+  }
+
+  private refreshAdvisorFirstName(): void {
+    const fromSettings = (this.settingsService.currentUserData?.firstName ?? '').trim();
+    if (fromSettings) {
+      this.advisorFirstName = fromSettings;
+      return;
+    }
+    const profile = this.authService.getUserProfile();
+    const sub = profile?.sub as string | undefined;
+    if (sub) {
+      const cached = readUserDisplayCache(sub);
+      if (cached?.firstName) {
+        this.advisorFirstName = cached.firstName;
+        return;
+      }
+    }
+    this.advisorFirstName = (profile?.given_name ?? '').trim();
   }
 
   loadConversations(): void {
