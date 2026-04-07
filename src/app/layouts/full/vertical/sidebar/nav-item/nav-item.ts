@@ -1,5 +1,7 @@
 export interface NavItem {
   displayName?: string;
+  /** When true, item is omitted from the main sidebar (module kept for later use). */
+  hidden?: boolean;
   disabled?: boolean;
   external?: boolean;
   /** When true with external, open Identity Manage/ChangePassword with portal language (Security menu). */

@@ -16,7 +16,6 @@ import { CoreService } from 'src/app/services/core.service';
 import { AppSettings } from 'src/app/config';
 import { filter } from 'rxjs/operators';
 import { NavigationEnd, Router } from '@angular/router';
-import { navItems, navItemslower } from './vertical/sidebar/sidebar-data';
 import { NavService } from '../../services/nav.service';
 import { AppNavItemComponent } from './vertical/sidebar/nav-item/nav-item.component';
 import { RouterModule } from '@angular/router';
@@ -33,7 +32,8 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatListModule } from '@angular/material/list';
 import {
   navItems as mainNavItems,
-  navItemslower as mainLower,
+  navItemslower as allLowerNavItems,
+  visibleNavItemsLower,
 } from './vertical/sidebar/sidebar-data';
 import {
   settingsNavItems,
@@ -97,8 +97,8 @@ interface quicklinks {
   encapsulation: ViewEncapsulation.None,
 })
 export class FullComponent implements OnInit, OnDestroy {
-  navItems = navItems;
-  navItemslower = navItemslower;
+  navItems = mainNavItems;
+  navItemslower = visibleNavItemsLower(allLowerNavItems);
   isSettings = false;
   isCashflowRoute = false;
 
@@ -340,7 +340,7 @@ export class FullComponent implements OnInit, OnDestroy {
           this.applySettingsLowerNav();
         } else {
           this.navItems = mainNavItems;
-          this.navItemslower = mainLower;
+          this.navItemslower = visibleNavItemsLower(allLowerNavItems);
         }
 
         this.syncSidebarForSettingsRoute(path);
