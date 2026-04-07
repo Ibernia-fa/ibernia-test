@@ -18,18 +18,33 @@
 
   <mat-dialog-content class="event-dialog-content">
     <form [formGroup]="form" class="d-flex flex-column gap-16">
-      <div class="w-100 form-field gap-8">
+      <div class="d-flex flex-column gap-8 net-fields">
         <mat-label
           class="f-s-16 f-w-500 d-block ibr-black"
           style="line-height: 16px"
-          >Joint net worth ({{ data.currency | currencySymbol }})</mat-label
+          >Joint net worth</mat-label
         >
-        <input
-          matInput
-          [value]="form.value.jointNetWorth | number: '1.0-0'"
-          (input)="onAmountInput($event)"
-          thousandSeparatorInput
-        />
+        <div class="net-field d-flex align-items-center">
+          <!-- Currency Display -->
+          <div class="left hide-arrow">
+            <div class="sortby-edit-profile currency-display">
+              {{ data.currency | currencySymbol }}
+            </div>
+          </div>
+          <!-- End Currency Display -->
+
+          <!-- Amount Field -->
+          <div class="w-100 form-field">
+            <input
+              matInput
+              style="border-radius: 0px 4px 4px 0px"
+              [value]="form.value.jointNetWorth | number: '1.0-0'"
+              (input)="onAmountInput($event)"
+              thousandSeparatorInput
+            />
+          </div>
+          <!-- End Amount Field -->
+        </div>
       </div>
     </form>
   </mat-dialog-content>

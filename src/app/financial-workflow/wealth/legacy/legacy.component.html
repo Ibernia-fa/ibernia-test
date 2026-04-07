@@ -84,7 +84,10 @@
         <!-- ═══ MAIN BODY: two branches + couple link ═══ -->
         <div class="tree-body">
           <!-- ── CLIENT BRANCH ── -->
-          <div class="family-branch">
+          <div
+            class="family-branch"
+            [class.family-branch--flex-grow]="familyBranchUseFlexGrow"
+          >
             <!-- Client parents couple -->
             <div class="branch-parents" *ngIf="clientParents.length > 0">
               <div class="couple-pair">
@@ -342,7 +345,11 @@
           </div>
 
           <!-- ── PARTNER BRANCH ── -->
-          <div class="family-branch" *ngIf="hasPartner">
+          <div
+            class="family-branch"
+            *ngIf="hasPartner"
+            [class.family-branch--flex-grow]="familyBranchUseFlexGrow"
+          >
             <!-- Partner parents couple -->
             <div class="branch-parents" *ngIf="partnerParents.length > 0">
               <div class="couple-pair">

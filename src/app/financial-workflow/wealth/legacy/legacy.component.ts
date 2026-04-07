@@ -151,6 +151,19 @@ export class LegacyComponent implements OnInit, OnChanges, OnDestroy {
     return this.dashboard?.hasPartner ?? false;
   }
 
+  get familyBranchUseFlexGrow(): boolean {
+    if (!this.dashboard) return true;
+    if (!this.hasPartner) return true;
+    const hasExtraMembers =
+      this.clientParents.length > 0 ||
+      this.partnerParents.length > 0 ||
+      this.clientSiblings.length > 0 ||
+      this.partnerSiblings.length > 0 ||
+      this.children.length > 0 ||
+      this.otherMembers.length > 0;
+    return hasExtraMembers;
+  }
+
   get showClientBranch(): boolean {
     return this.clientParents.length > 0 || this.clientSiblings.length > 0;
   }
@@ -164,23 +177,29 @@ export class LegacyComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   get showTaxOnClientBranch(): boolean {
-    return this.activeScenario === ScenarioType.ClientParentsDie
-      && !!this.scenarioResult
-      && this.scenarioResult.totalTax > 0;
+    return (
+      this.activeScenario === ScenarioType.ClientParentsDie &&
+      !!this.scenarioResult &&
+      this.scenarioResult.totalTax > 0
+    );
   }
 
   get showTaxOnPartnerBranch(): boolean {
-    return this.activeScenario === ScenarioType.PartnerParentsDie
-      && !!this.scenarioResult
-      && this.scenarioResult.totalTax > 0;
+    return (
+      this.activeScenario === ScenarioType.PartnerParentsDie &&
+      !!this.scenarioResult &&
+      this.scenarioResult.totalTax > 0
+    );
   }
 
   get showTaxOnChildrenSection(): boolean {
-    return (this.activeScenario === ScenarioType.ClientDies
-      || this.activeScenario === ScenarioType.PartnerDies
-      || this.activeScenario === ScenarioType.BothDie)
-      && !!this.scenarioResult
-      && this.scenarioResult.totalTax > 0;
+    return (
+      (this.activeScenario === ScenarioType.ClientDies ||
+        this.activeScenario === ScenarioType.PartnerDies ||
+        this.activeScenario === ScenarioType.BothDie) &&
+      !!this.scenarioResult &&
+      this.scenarioResult.totalTax > 0
+    );
   }
 
   // ── Scenario Helpers ───────────────────────────────────────────

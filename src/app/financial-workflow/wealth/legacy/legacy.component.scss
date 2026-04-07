@@ -58,11 +58,12 @@ $line-w: 2px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   padding: 16px;
   background-color: white;
   border-radius: 12px;
   border: 1px solid #0000001a;
-  min-height: 200px;
+  min-height: 220px;
   overflow-x: auto;
   width: 100%;
 }
@@ -94,13 +95,22 @@ $line-w: 2px;
   width: 100%;
 }
 
+.tree-node:has(.avatar-client) {
+  .inheritance-detail,
+  .inheritance-total {
+    color: #3088ed;
+  }
+}
+
 // ── Family Branch (one per side: client / partner) ────────────
 
 .family-branch {
   display: flex;
   flex-direction: column;
   align-items: center;
-  flex: 1;
+  &--flex-grow {
+    flex: 1;
+  }
 }
 
 // ── Parents couple at top of a branch ─────────────────────────
@@ -213,8 +223,6 @@ $line-w: 2px;
   display: flex;
   align-items: center;
   margin-bottom: 64px;
-  margin-left: -12px;
-  margin-right: -12px;
 }
 
 .link-line {
