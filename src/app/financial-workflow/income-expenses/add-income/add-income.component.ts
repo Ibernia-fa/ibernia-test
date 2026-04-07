@@ -28,7 +28,8 @@ import { TranslateIncomeExpenseLabelPipe } from 'src/app/core/pipes/translate-in
 import { TranslateEscalationDescriptionPipe } from 'src/app/core/pipes/translate-escalation-description.pipe';
 import { getAmountCycleLabel } from 'src/app/shared/utils/amount-cycle-label';
 import { CommonModule } from '@angular/common';
-import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
+import { ToastrService } from 'ngx-toastr';
 import {
   IncomeDisplayLabelContext,
   incomeApiDescriptionToDisplayLabel,
@@ -95,6 +96,9 @@ export class AddIncomeComponent {
   forecastEndYear: number;
   isSaving = false;
   scenarioMode: boolean = false;
+  /** Full list as provided by parent (may include Cash). */
+  private allSavingPots: Array<{ id: string; name?: string; startingPotValue?: { amount?: number }; contributionAmount?: number }> = [];
+  /** Eligible list for inheritance investing UI (non-cash only). */
   clientSavings: { id: string; name: string }[] = [];
   existingContributions: any[] = [];
   private initialFormSnapshot = '';
@@ -114,11 +118,16 @@ export class AddIncomeComponent {
     private incomeExpenseHttpService: IncomeExpensesHttpService,
     private withdrawalsContributionsHttpService: WithdrawalsContributionsHttpService,
     private translate: TranslateService,
+    private toastr: ToastrService,
   ) {
     this.scenarioMode = data.scenarioMode ?? false;
     this.incomeTypes = data.incomeType;
     this.eventsList = data.eventsList ?? [];
-    this.clientSavings = (data.clientSavings ?? []).filter((s: { name?: string }) => (s.name ?? '').toLowerCase() !== 'cash');
+    this.allSavingPots = (data.clientSavings ?? []) as Array<{ id: string; name?: string; startingPotValue?: { amount?: number }; contributionAmount?: number }>;
+    // Keep the non-cash list for the select, but compute eligibility from the full list (so Cash never qualifies).
+    this.clientSavings = this.allSavingPots
+      .filter((s) => !this.isCashSavingPotName(s?.name))
+      .map((s) => ({ id: s.id as string, name: (s.name ?? '').toString() }));
     this.existingContributions = data.existingContributions ?? [];
     this.cycles = data.amountCycles;
     this.escalationRates = data.escalataionRates;
@@ -1298,8 +1307,24 @@ export class AddIncomeComponent {
     }, 0);
   }
 
+  onInvestThisAmountChange(event: MatCheckboxChange): void {
+    // Only gate the action for default Inheritance.
+    if (!this.getIsDefaultInheritance()) return;
+
+    if (event.checked && !this.hasEligibleNonCashSavingPot()) {
+      this.toastr.error(
+        this.translate.instant('FLOWS.CREATE_SAVING_POT_FIRST'),
+        this.translate.instant('LABEL.ERROR'),
+        { timeOut: 5000 },
+      );
+      // Keep the control unchecked/inactive.
+      this.incomeForm.get('investThisAmount')?.setValue(false, { emitEvent: true });
+    }
+  }
+
   private getNonCashSavingsForInheritance(): Array<{ id: string | null; name?: string; startingPotValue?: { amount?: number }; contributionAmount?: number }> {
-    return (this.clientSavings ?? []) as Array<{ id: string | null; name?: string; startingPotValue?: { amount?: number }; contributionAmount?: number }>;
+    // Use the full list so changes propagate without relying on the filtered copy.
+    return (this.allSavingPots ?? []).filter((s) => !this.isCashSavingPotName(s?.name));
   }
 
   private getExistingInheritanceContributionPotIds(): string[] {
@@ -1342,6 +1367,17 @@ export class AddIncomeComponent {
       return description === 'Inheritance' && this.selectedIncome?.isDefault === true;
     }
     return incomeType === 'Inheritance';
+  }
+
+  private hasEligibleNonCashSavingPot(): boolean {
+    return this.getNonCashSavingsForInheritance().some((p) => !!p?.id);
+  }
+
+  private isCashSavingPotName(name: unknown): boolean {
+    return (name ?? '')
+      .toString()
+      .trim()
+      .toLowerCase() === 'cash';
   }
 
   get isInvestThisAmountChecked(): boolean {
