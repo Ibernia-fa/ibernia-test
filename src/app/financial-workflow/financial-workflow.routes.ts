@@ -12,6 +12,7 @@ import { AgentChatComponent } from './agent-chat/agent-chat.component';
 import { CashflowResolver } from './resolvers/cashflow.resolver';
 import { CashflowLayoutComponent } from './cashflow-layout/cashflow-layout.component';
 import { SchoolComponent } from './school/school.component';
+import { redirectHiddenCashflowModuleGuard } from './guards/hidden-cashflow-modules.guard';
 
 export const FinancialWorkflowRoutes: Routes = [
   {
@@ -31,8 +32,16 @@ export const FinancialWorkflowRoutes: Routes = [
           { path: 'emergencies', component: EmergenciesComponent },
           { path: 'wealth', component: WealthComponent },
           { path: 'ai-recommendations', component: AiRecommendationsComponent },
-          { path: 'school', component: SchoolComponent },
-          { path: 'agent-chat', component: AgentChatComponent },
+          {
+            path: 'school',
+            canActivate: [redirectHiddenCashflowModuleGuard],
+            component: SchoolComponent,
+          },
+          {
+            path: 'agent-chat',
+            canActivate: [redirectHiddenCashflowModuleGuard],
+            component: AgentChatComponent,
+          },
         ],
       },
       // {

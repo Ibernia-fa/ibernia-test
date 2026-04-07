@@ -1,5 +1,10 @@
 import { NavItem } from './nav-item/nav-item';
 
+/** Lower sidebar items excluding any marked `hidden`. */
+export function visibleNavItemsLower(items: NavItem[]): NavItem[] {
+  return items.filter((item) => !item.hidden);
+}
+
 export const navItemslower: NavItem[] = [
   // {
   //   displayName: 'Goals',
@@ -24,12 +29,14 @@ export const navItemslower: NavItem[] = [
     iconName: '/assets/images/svgs/book-solid.svg',
     iconOutline: '/assets/images/svgs/book-solid.svg',
     route: '/cashflows/{cashflowId}/school',
+    hidden: true,
   },
   {
     displayName: 'AI Chat',
     iconName: '/assets/images/shapes/ai-filled.svg',
     iconOutline: '/assets/images/shapes/ai-filled.svg',
     route: '/cashflows/{cashflowId}/agent-chat',
+    hidden: true,
   },
 ];
 export const navItems: NavItem[] = [
