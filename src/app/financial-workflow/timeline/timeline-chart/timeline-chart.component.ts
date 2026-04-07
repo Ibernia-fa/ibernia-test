@@ -141,6 +141,16 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
     const name = this.client?.partnerDetail?.firstName ?? '';
     return name.trim().length ? name.trim().charAt(0).toUpperCase() : '?';
   }
+  /** Main client first name for axis hover (full word, not initial). */
+  get mainClientFirstName(): string {
+    const name = (this.client?.clientDetails?.firstName ?? '').trim();
+    return name.length ? name : '?';
+  }
+  /** Partner first name for axis hover (full word, not initial). */
+  get partnerFirstName(): string {
+    const name = (this.client?.partnerDetail?.firstName ?? '').trim();
+    return name.length ? name : '?';
+  }
   /** Partner birth date for age calculation; null if no partner. */
   get partnerBirthDate(): Date | null {
     const d = this.client?.partnerDetail?.birthDate;
