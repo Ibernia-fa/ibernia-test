@@ -168,6 +168,31 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
   incomeItems: FinancialViewModel[] = [];
   expenseItems: FinancialViewModel[] = [];
 
+  /** Dropdown options excluding items already in the edited list (same keys as chip `name`). */
+  get availableGoalItems(): ClientEvent[] {
+    const edited = new Set(this.editedGoals.map((e) => e.name));
+    return this.goalItems.filter((g) => !edited.has(g.name));
+  }
+
+  get availableSavingPotItems(): ClientSaving[] {
+    const edited = new Set(this.editedSavingPots.map((e) => e.name));
+    return this.savingPotItems.filter((p) => !edited.has(p.name));
+  }
+
+  get availableIncomeItems(): FinancialViewModel[] {
+    const edited = new Set(this.editedIncomes.map((e) => e.name));
+    return this.incomeItems.filter(
+      (i) => i.description != null && !edited.has(i.description),
+    );
+  }
+
+  get availableExpenseItems(): FinancialViewModel[] {
+    const edited = new Set(this.editedExpenses.map((e) => e.name));
+    return this.expenseItems.filter(
+      (e) => e.description != null && !edited.has(e.description),
+    );
+  }
+
   editedGoals: Array<{ name: string; item: ClientEvent | ClientEvent[] }> = [];
   editedSavingPots: Array<{ name: string; item: ClientSaving }> = [];
   editedIncomes: Array<{ name: string; item: FinancialViewModel }> = [];

@@ -1,7 +1,10 @@
 <div class="d-flex flex-column">
   <div class="dialog-header">
     <h2 class="dialog-title text-center">
-      {{ sideLabel }} – Joint Net Worth
+      {{
+        'LEGACY.PARENTS_NET_WORTH_MODAL_TITLE'
+          | translate : parentsModalTitleParams
+      }}
     </h2>
     <button
       type="button"
