@@ -9,7 +9,6 @@ import {
   switchMap,
   tap,
   catchError,
-  finalize,
 } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
@@ -110,7 +109,6 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
   scenarioForm: FormGroup;
   hasShortfall = false;
   firstShortfallAge: number | null = null;
-  isSimulating = false;
 
   baselineReport: ChartSeries | null = null;
   displayedReport: ChartSeries | null = null;
@@ -581,19 +579,13 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
 
   /**
    * Recomputes the scenario chart from current form + edits.
-   * @param showSuccessToast use true when the user explicitly clicked "Simulate scenario"
+   * @param showSuccessToast reserved for optional success feedback (auto-refresh passes false)
    */
   private runScenarioUpdate(showSuccessToast: boolean): void {
     if (!this.financialTimeline || !this.client || !this.baselineReport) return;
 
-    this.isSimulating = true;
     this.loadScenarioReport()
-      .pipe(
-        takeUntil(this.destroy$),
-        finalize(() => {
-          this.isSimulating = false;
-        }),
-      )
+      .pipe(takeUntil(this.destroy$))
       .subscribe((report) => {
         if (report) {
           this.injectTimelineEvents(report);
@@ -658,10 +650,6 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
           return of(null);
         }),
       );
-  }
-
-  private applyScenario(): void {
-    this.runScenarioUpdate(true);
   }
 
   switchTab(tab: 'before' | 'after'): void {
@@ -812,10 +800,6 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
 
   onBack(): void {
     this.router.navigate(['/cashflows', this.cashflowId, 'reports']);
-  }
-
-  onSimulate(): void {
-    if (this.financialTimeline && this.client) this.applyScenario();
   }
 
   getRetirementAge(): number {
