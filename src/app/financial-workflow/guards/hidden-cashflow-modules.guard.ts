@@ -7,7 +7,7 @@ import { CanActivateFn, Router } from '@angular/router';
  */
 export const redirectHiddenCashflowModuleGuard: CanActivateFn = (route) => {
   const router = inject(Router);
-  const cashflowId = route.parent?.snapshot.paramMap.get('id');
+  const cashflowId = route.parent?.paramMap.get('id');
   if (cashflowId) {
     return router.createUrlTree(['/cashflows', cashflowId, 'reports']);
   }

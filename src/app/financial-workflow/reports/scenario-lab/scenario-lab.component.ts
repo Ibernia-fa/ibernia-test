@@ -547,7 +547,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
   private getFinancialRecordsForEventDialogs(): FinancialRecordLineItem[] {
     const incomes = this.incomeExpenseData?.incomes ?? [];
     const expenses = this.incomeExpenseData?.expenses ?? [];
-    return [...incomes, ...expenses] as FinancialRecordLineItem[];
+    return [...incomes, ...expenses] as unknown as FinancialRecordLineItem[];
   }
 
   /**
