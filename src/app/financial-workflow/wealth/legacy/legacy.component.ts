@@ -456,6 +456,17 @@ export class LegacyComponent implements OnInit, OnChanges, OnDestroy {
         ? (this.dashboard?.parentEstates?.clientParentsNetWorth ?? 0)
         : (this.dashboard?.parentEstates?.partnerParentsNetWorth ?? 0);
 
+    const personFirstName = (
+      side === 'client'
+        ? (this.clientMember?.firstName ||
+            this.selectedClient?.clientDetails?.firstName ||
+            this.clientData?.firstName ||
+            '')
+        : (this.partnerMember?.firstName ||
+            this.selectedClient?.partnerDetail?.firstName ||
+            '')
+    ).trim();
+
     const dialogRef = this.dialog.open(EditParentEstateComponent, {
       width: '612px',
       disableClose: true,
@@ -464,6 +475,7 @@ export class LegacyComponent implements OnInit, OnChanges, OnDestroy {
         side,
         currentValue: current,
         currency: this.currency,
+        personFirstName,
       },
     });
 

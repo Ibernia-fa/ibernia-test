@@ -208,8 +208,12 @@
                           <mat-option disabled class="empty-option">{{
                             "No goals added" | translate
                           }}</mat-option>
+                        } @else if (!availableGoalItems.length) {
+                          <mat-option disabled class="empty-option">{{
+                            "SCENARIO_LAB.NO_ITEMS_LEFT_TO_EDIT" | translate
+                          }}</mat-option>
                         }
-                        @for (goal of goalItems; track goal.id) {
+                        @for (goal of availableGoalItems; track goal.id) {
                           <mat-option [value]="goal">
                             <span class="category-option">
                               <img
@@ -282,8 +286,12 @@
                           <mat-option disabled class="empty-option">{{
                             "No saving pots added" | translate
                           }}</mat-option>
+                        } @else if (!availableSavingPotItems.length) {
+                          <mat-option disabled class="empty-option">{{
+                            "SCENARIO_LAB.NO_ITEMS_LEFT_TO_EDIT" | translate
+                          }}</mat-option>
                         }
-                        @for (pot of savingPotItems; track pot.id) {
+                        @for (pot of availableSavingPotItems; track pot.id) {
                           <mat-option [value]="pot">
                             <span class="category-option">
                               <i-tabler
@@ -353,8 +361,15 @@
                           <mat-option disabled class="empty-option">{{
                             "No incomes added" | translate
                           }}</mat-option>
+                        } @else if (!availableIncomeItems.length) {
+                          <mat-option disabled class="empty-option">{{
+                            "SCENARIO_LAB.NO_ITEMS_LEFT_TO_EDIT" | translate
+                          }}</mat-option>
                         }
-                        @for (income of incomeItems; track income.id) {
+                        @for (
+                          income of availableIncomeItems;
+                          track income.id
+                        ) {
                           <mat-option [value]="income">
                             <span class="category-option">
                               <img
@@ -438,8 +453,15 @@
                           <mat-option disabled class="empty-option">{{
                             "No expenses added" | translate
                           }}</mat-option>
+                        } @else if (!availableExpenseItems.length) {
+                          <mat-option disabled class="empty-option">{{
+                            "SCENARIO_LAB.NO_ITEMS_LEFT_TO_EDIT" | translate
+                          }}</mat-option>
                         }
-                        @for (expense of expenseItems; track expense.id) {
+                        @for (
+                          expense of availableExpenseItems;
+                          track expense.id
+                        ) {
                           <mat-option [value]="expense">
                             <span class="category-option">
                               <img
