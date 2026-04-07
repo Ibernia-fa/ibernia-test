@@ -32,8 +32,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatListModule } from '@angular/material/list';
 import {
   navItems as mainNavItems,
-  navItemslower as allLowerNavItems,
-  visibleNavItemsLower,
+  navItemslower as mainLower,
 } from './vertical/sidebar/sidebar-data';
 import {
   settingsNavItems,
@@ -98,7 +97,7 @@ interface quicklinks {
 })
 export class FullComponent implements OnInit, OnDestroy {
   navItems = mainNavItems;
-  navItemslower = visibleNavItemsLower(allLowerNavItems);
+  navItemslower = mainLower;
   isSettings = false;
   isCashflowRoute = false;
 
@@ -340,7 +339,7 @@ export class FullComponent implements OnInit, OnDestroy {
           this.applySettingsLowerNav();
         } else {
           this.navItems = mainNavItems;
-          this.navItemslower = visibleNavItemsLower(allLowerNavItems);
+          this.navItemslower = mainLower;
         }
 
         this.syncSidebarForSettingsRoute(path);

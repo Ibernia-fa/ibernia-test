@@ -94,13 +94,10 @@
                       : 'preimum-nav ibr-new-setting-icon'
                   }}"
                 >
-                  @for (item of navItemslower; track item) {
+                  @for (item of navItemslower; let i = $index; track item) {
                     <app-nav-item
                       [item]="item"
-                      [showLabel]="
-                        item.displayName === 'School' ||
-                        item.displayName === 'AI Chat'
-                      "
+                      [showLabel]="i >= navItemslower.length - 2"
                       label="BETA"
                     >
                     </app-nav-item>
