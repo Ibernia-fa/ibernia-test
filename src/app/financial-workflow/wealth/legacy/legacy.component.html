@@ -34,7 +34,7 @@
       </div>
 
       <!-- Family Tree -->
-      <div class="family-tree" *ngIf="dashboard">
+      <div class="family-tree" *ngIf="dashboard" #familyTree>
         <!-- ═══ OTHER MEMBERS (standalone, no connectors, left of client) ═══ -->
         <div class="other-members" *ngIf="otherMembers.length > 0">
           <div class="tree-node other-node" *ngFor="let other of otherMembers">
@@ -82,15 +82,19 @@
         </div>
 
         <!-- ═══ MAIN BODY: two branches + couple link ═══ -->
-        <div class="tree-body">
+        <div class="tree-body" [class.has-partner]="hasPartner" #treeBody>
           <!-- ── CLIENT BRANCH ── -->
           <div
             class="family-branch"
             [class.family-branch--flex-grow]="familyBranchUseFlexGrow"
           >
             <!-- Client parents couple -->
-            <div class="branch-parents" *ngIf="clientParents.length > 0">
-              <div class="couple-pair">
+            <div
+              class="branch-parents"
+              *ngIf="clientParents.length > 0"
+              #clientBranchParents
+            >
+              <div class="couple-pair" #clientParentsPair>
                 <ng-container
                   *ngFor="let parent of clientParents; let i = index"
                 >
@@ -143,7 +147,6 @@
                     *ngIf="i === 0 && clientParents.length > 1"
                   >
                     <div class="line-h"></div>
-                    <!-- <mat-icon class="heart-sm">favorite</mat-icon> -->
                     <div class="new-heart-icon-sm">
                       <img
                         src="../../../../assets/images/svgs/new-legacy-heart-icon-sm.svg"
@@ -153,6 +156,11 @@
                     <div class="line-h"></div>
                   </div>
                 </ng-container>
+                <div
+                  class="parents-line"
+                  *ngIf="clientParents.length > 1"
+                  #clientParentsLine
+                ></div>
               </div>
               <div class="parent-estate" (click)="onEditParentEstate('client')">
                 <span class="estate-currency">{{
@@ -164,6 +172,11 @@
                 }}
                 <mat-icon class="edit-sm">edit</mat-icon>
               </div>
+              <div
+                class="heart-estate-vline"
+                *ngIf="clientParents.length > 1"
+                #clientHeartEstateLine
+              ></div>
             </div>
 
             <!-- Vertical drop from parents -->
@@ -249,7 +262,7 @@
                 </div>
               </div>
 
-              <div class="leaf">
+              <div class="leaf main-leaf">
                 <div class="leaf-drop" *ngIf="showClientBranch"></div>
                 <ng-container
                   *ngIf="getMemberInheritance(clientMember?.id) as inh"
@@ -264,8 +277,9 @@
                   *ngIf="clientMember as cm"
                   [class.deceased]="isDeceased(cm.id)"
                   (click)="onClickClient()"
+                  #clientMainNode
                 >
-                  <div class="node-avatar avatar-client">
+                  <div class="node-avatar avatar-client" #clientAvatar>
                     <mat-icon>
                       <svg
                         width="40"
@@ -326,7 +340,7 @@
           </div>
 
           <!-- ── COUPLE CONNECTOR (heart always shown) ── -->
-          <div class="couple-link" *ngIf="hasPartner">
+          <div class="couple-link" *ngIf="hasPartner" #coupleLink>
             <div class="line-h link-line"></div>
             <!-- <mat-icon class="heart-lg" 
               >favorite</mat-icon
@@ -351,8 +365,12 @@
             [class.family-branch--flex-grow]="familyBranchUseFlexGrow"
           >
             <!-- Partner parents couple -->
-            <div class="branch-parents" *ngIf="partnerParents.length > 0">
-              <div class="couple-pair">
+            <div
+              class="branch-parents"
+              *ngIf="partnerParents.length > 0"
+              #partnerBranchParents
+            >
+              <div class="couple-pair" #partnerParentsPair>
                 <ng-container
                   *ngFor="let parent of partnerParents; let i = index"
                 >
@@ -405,7 +423,6 @@
                     *ngIf="i === 0 && partnerParents.length > 1"
                   >
                     <div class="line-h"></div>
-                    <!-- <mat-icon class="heart-sm">favorite</mat-icon> -->
                     <div class="new-heart-icon-sm">
                       <img
                         src="../../../../assets/images/svgs/new-legacy-heart-icon-sm.svg"
@@ -415,6 +432,11 @@
                     <div class="line-h"></div>
                   </div>
                 </ng-container>
+                <div
+                  class="parents-line"
+                  *ngIf="partnerParents.length > 1"
+                  #partnerParentsLine
+                ></div>
               </div>
               <div
                 class="parent-estate"
@@ -429,6 +451,11 @@
                 }}
                 <mat-icon class="edit-sm">edit</mat-icon>
               </div>
+              <div
+                class="heart-estate-vline"
+                *ngIf="partnerParents.length > 1"
+                #partnerHeartEstateLine
+              ></div>
             </div>
 
             <!-- Vertical drop from parents -->
@@ -459,7 +486,7 @@
 
             <!-- Leaf nodes: [partner, siblings...] -->
             <div class="branch-leaves" [class.has-bracket]="showPartnerBranch">
-              <div class="leaf">
+              <div class="leaf main-leaf">
                 <div class="leaf-drop" *ngIf="showPartnerBranch"></div>
                 <ng-container
                   *ngIf="getMemberInheritance(partnerMember?.id) as inh"
@@ -474,8 +501,9 @@
                   *ngIf="partnerMember as pm"
                   [class.deceased]="isDeceased(pm.id)"
                   (click)="onClickPartner()"
+                  #partnerMainNode
                 >
-                  <div class="node-avatar avatar-partner">
+                  <div class="node-avatar avatar-partner" #partnerAvatar>
                     <mat-icon>
                       <svg
                         width="40"
@@ -589,10 +617,20 @@
               </div>
             </div>
           </div>
+          <div class="couple-line" *ngIf="hasPartner" #coupleLine></div>
         </div>
 
         <!-- ═══ CHILDREN / FLOW SECTION ═══ -->
-        <div class="children-section" *ngIf="children.length > 0">
+        <div
+          class="heart-children-vline"
+          *ngIf="hasPartner && children.length > 0"
+          #heartChildrenLine
+        ></div>
+        <div
+          class="children-section"
+          *ngIf="children.length > 0"
+          #childrenSection
+        >
           <div class="child-vline"></div>
 
           <!-- Tax node on the flow path (only for client/partner death scenarios) -->

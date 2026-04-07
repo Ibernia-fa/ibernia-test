@@ -66,6 +66,7 @@ $line-w: 2px;
   min-height: 220px;
   overflow-x: auto;
   width: 100%;
+  position: relative;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -93,6 +94,8 @@ $line-w: 2px;
   // justify-content: center;
   justify-content: space-between;
   width: 100%;
+  min-width: max-content;
+  position: relative;
 }
 
 .tree-node:has(.avatar-client) {
@@ -119,19 +122,32 @@ $line-w: 2px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: 100%;
+  position: relative;
 }
 
 .couple-pair {
   display: flex;
   align-items: flex-start;
+  position: relative;
+  width: 100%;
+
+  > .tree-node {
+    flex: 1;
+    min-width: 0;
+  }
 }
 
 .pair-heart {
   display: flex;
   align-items: center;
-  padding-top: 14px;
   margin-left: -12px;
   margin-right: -12px;
+  z-index: 1;
+
+  .line-h {
+    display: none;
+  }
 }
 
 .parent-estate {
@@ -189,6 +205,14 @@ $line-w: 2px;
   background: $line-color;
 }
 
+.main-leaf {
+  align-self: stretch;
+
+  > .leaf-drop {
+    flex: 1 0 auto;
+  }
+}
+
 // ═══════════════════════════════════════════════════════════════
 // BRACKET via pseudo-elements on each .leaf
 // ═══════════════════════════════════════════════════════════════
@@ -222,11 +246,14 @@ $line-w: 2px;
 .couple-link {
   display: flex;
   align-items: center;
-  margin-bottom: 64px;
+  justify-content: center;
+  flex: 1;
+  position: relative;
+  z-index: 1;
 }
 
 .link-line {
-  width: 32px;
+  display: none;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -237,6 +264,7 @@ $line-w: 2px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  min-width: max-content;
 }
 
 .child-vline {
@@ -287,7 +315,7 @@ $line-w: 2px;
   position: relative;
   padding: 8px 12px;
   border-radius: 12px;
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease, opacity 0.2s ease;
   min-width: 80px;
 
   &:hover {
@@ -299,7 +327,8 @@ $line-w: 2px;
 }
 
 .main-node {
-  min-width: 100px;
+  // min-width: 100px;
+  min-width: 144px;
 }
 
 .node-avatar {
@@ -323,6 +352,24 @@ $line-w: 2px;
 .avatar-partner {
   height: 60px;
   width: 60px;
+  position: relative;
+}
+
+.couple-line,
+.parents-line {
+  position: absolute;
+  height: $line-w;
+  background: $line-color;
+  pointer-events: none;
+}
+
+.heart-estate-vline,
+.heart-children-vline {
+  position: absolute;
+  width: $line-w;
+  background: $line-color;
+  pointer-events: none;
+  transform: translateX(-50%);
 }
 .avatar-client,
 .avatar-clientfather {
@@ -589,7 +636,7 @@ $line-w: 2px;
 }
 
 .new-heart-icon {
-  background-color: transparent;
+  background-color: white;
   -webkit-user-select: none;
   user-select: none;
   border-radius: 999px;
@@ -606,7 +653,7 @@ $line-w: 2px;
 }
 
 .new-heart-icon-sm {
-  background-color: transparent;
+  background-color: white;
   -webkit-user-select: none;
   user-select: none;
   border-radius: 999px;

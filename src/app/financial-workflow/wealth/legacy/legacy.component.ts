@@ -1,11 +1,18 @@
 import {
+  AfterViewChecked,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  ElementRef,
+  HostListener,
   Input,
+  NgZone,
+  OnDestroy,
   OnInit,
   OnChanges,
+  Renderer2,
   SimpleChanges,
+  ViewChild,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
@@ -47,10 +54,31 @@ import { EditParentEstateComponent } from './edit-parent-estate/edit-parent-esta
   styleUrl: './legacy.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class LegacyComponent implements OnInit, OnChanges {
+export class LegacyComponent
+  implements OnInit, OnChanges, AfterViewChecked, OnDestroy
+{
   @Input() cashflowId!: string;
   @Input() clientData: Details | null = null;
   @Input() selectedClient: Client | null = null;
+
+  @ViewChild('treeBody') treeBodyRef?: ElementRef<HTMLElement>;
+  @ViewChild('clientAvatar') clientAvatarRef?: ElementRef<HTMLElement>;
+  @ViewChild('partnerAvatar') partnerAvatarRef?: ElementRef<HTMLElement>;
+  @ViewChild('coupleLine') coupleLineRef?: ElementRef<HTMLElement>;
+  @ViewChild('coupleLink') coupleLinkRef?: ElementRef<HTMLElement>;
+  @ViewChild('clientMainNode') clientMainNodeRef?: ElementRef<HTMLElement>;
+  @ViewChild('partnerMainNode') partnerMainNodeRef?: ElementRef<HTMLElement>;
+  @ViewChild('clientParentsPair') clientParentsPairRef?: ElementRef<HTMLElement>;
+  @ViewChild('partnerParentsPair') partnerParentsPairRef?: ElementRef<HTMLElement>;
+  @ViewChild('clientParentsLine') clientParentsLineRef?: ElementRef<HTMLElement>;
+  @ViewChild('partnerParentsLine') partnerParentsLineRef?: ElementRef<HTMLElement>;
+  @ViewChild('clientBranchParents') clientBranchParentsRef?: ElementRef<HTMLElement>;
+  @ViewChild('partnerBranchParents') partnerBranchParentsRef?: ElementRef<HTMLElement>;
+  @ViewChild('clientHeartEstateLine') clientHeartEstateLineRef?: ElementRef<HTMLElement>;
+  @ViewChild('partnerHeartEstateLine') partnerHeartEstateLineRef?: ElementRef<HTMLElement>;
+  @ViewChild('familyTree') familyTreeRef?: ElementRef<HTMLElement>;
+  @ViewChild('childrenSection') childrenSectionRef?: ElementRef<HTMLElement>;
+  @ViewChild('heartChildrenLine') heartChildrenLineRef?: ElementRef<HTMLElement>;
 
   isLoading = false;
   dashboard: LegacyDashboardModel | null = null;
@@ -58,15 +86,38 @@ export class LegacyComponent implements OnInit, OnChanges {
   scenarioResult: ScenarioResultModel | null = null;
   markedDeceased = new Set<string>();
 
+  private rafId: number | null = null;
+  private mutationObs?: MutationObserver;
+  private resizeObs?: ResizeObserver;
+  private observedElement?: HTMLElement;
+
   constructor(
     private legacyHttp: LegacyHttpService,
     private toastr: ToastrService,
     private dialog: MatDialog,
     private cdr: ChangeDetectorRef,
+    private renderer: Renderer2,
+    private ngZone: NgZone,
   ) {}
 
   ngOnInit(): void {
     this.loadDashboard();
+  }
+
+  ngAfterViewChecked(): void {
+    this.ensureTreeObserver();
+    this.scheduleLineUpdate();
+  }
+
+  ngOnDestroy(): void {
+    this.mutationObs?.disconnect();
+    this.resizeObs?.disconnect();
+    if (this.rafId !== null) cancelAnimationFrame(this.rafId);
+  }
+
+  @HostListener('window:resize')
+  onResize(): void {
+    this.scheduleLineUpdate();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -490,6 +541,257 @@ export class LegacyComponent implements OnInit, OnChanges {
         this.clearScenario();
       }
     });
+  }
+
+  private ensureTreeObserver(): void {
+    const familyEl = this.familyTreeRef?.nativeElement;
+    if (!familyEl || familyEl === this.observedElement) return;
+
+    this.mutationObs?.disconnect();
+    this.resizeObs?.disconnect();
+    this.observedElement = familyEl;
+
+    this.ngZone.runOutsideAngular(() => {
+      this.mutationObs = new MutationObserver(() =>
+        this.scheduleLineUpdate(),
+      );
+      this.mutationObs.observe(familyEl, {
+        childList: true,
+        subtree: true,
+      });
+
+      this.resizeObs = new ResizeObserver(() =>
+        this.scheduleLineUpdate(),
+      );
+      this.resizeObs.observe(familyEl);
+    });
+  }
+
+  private scheduleLineUpdate(): void {
+    if (this.rafId !== null) cancelAnimationFrame(this.rafId);
+    this.rafId = requestAnimationFrame(() => {
+      this.rafId = null;
+      this.updateCoupleLine();
+      this.updateParentPairLine(
+        this.clientParentsPairRef,
+        this.clientParentsLineRef,
+      );
+      this.updateParentPairLine(
+        this.partnerParentsPairRef,
+        this.partnerParentsLineRef,
+      );
+      this.updateHeartEstateLine(
+        this.clientBranchParentsRef,
+        this.clientHeartEstateLineRef,
+      );
+      this.updateHeartEstateLine(
+        this.partnerBranchParentsRef,
+        this.partnerHeartEstateLineRef,
+      );
+      this.updateHeartChildrenLine();
+    });
+  }
+
+  private updateCoupleLine(): void {
+    if (
+      !this.treeBodyRef?.nativeElement ||
+      !this.clientAvatarRef?.nativeElement ||
+      !this.partnerAvatarRef?.nativeElement ||
+      !this.coupleLineRef?.nativeElement
+    ) {
+      return;
+    }
+
+    const clientNode = this.clientMainNodeRef?.nativeElement;
+    const partnerNode = this.partnerMainNodeRef?.nativeElement;
+    if (clientNode && partnerNode) {
+      this.renderer.removeStyle(clientNode, 'min-height');
+      this.renderer.removeStyle(partnerNode, 'min-height');
+
+      const maxH = Math.max(
+        clientNode.offsetHeight,
+        partnerNode.offsetHeight,
+      );
+      this.renderer.setStyle(clientNode, 'min-height', `${maxH}px`);
+      this.renderer.setStyle(partnerNode, 'min-height', `${maxH}px`);
+    }
+
+    const treeRect =
+      this.treeBodyRef.nativeElement.getBoundingClientRect();
+    const clientRect =
+      this.clientAvatarRef.nativeElement.getBoundingClientRect();
+    const partnerRect =
+      this.partnerAvatarRef.nativeElement.getBoundingClientRect();
+
+    const clientCenterY =
+      clientRect.top + clientRect.height / 2 - treeRect.top;
+    const partnerCenterY =
+      partnerRect.top + partnerRect.height / 2 - treeRect.top;
+    const lineY = (clientCenterY + partnerCenterY) / 2;
+
+    const clientRight = clientRect.right - treeRect.left;
+    const partnerLeft = partnerRect.left - treeRect.left;
+
+    const line = this.coupleLineRef.nativeElement;
+    this.renderer.setStyle(line, 'top', `${lineY}px`);
+    this.renderer.setStyle(line, 'left', `${clientRight}px`);
+    this.renderer.setStyle(
+      line,
+      'width',
+      `${partnerLeft - clientRight}px`,
+    );
+
+    if (this.coupleLinkRef?.nativeElement) {
+      const linkHeight =
+        this.coupleLinkRef.nativeElement.offsetHeight;
+      const marginBottom = Math.max(
+        0,
+        treeRect.height - lineY - linkHeight / 2,
+      );
+      this.renderer.setStyle(
+        this.coupleLinkRef.nativeElement,
+        'margin-bottom',
+        `${marginBottom}px`,
+      );
+    }
+  }
+
+  private updateParentPairLine(
+    pairRef: ElementRef<HTMLElement> | undefined,
+    lineRef: ElementRef<HTMLElement> | undefined,
+  ): void {
+    if (!pairRef?.nativeElement || !lineRef?.nativeElement) return;
+
+    const pairEl = pairRef.nativeElement;
+    const avatars = pairEl.querySelectorAll('.node-avatar');
+    if (avatars.length < 2) return;
+
+    const first = avatars[0] as HTMLElement;
+    const last = avatars[avatars.length - 1] as HTMLElement;
+    const pairRect = pairEl.getBoundingClientRect();
+    const firstRect = first.getBoundingClientRect();
+    const lastRect = last.getBoundingClientRect();
+
+    const firstCenterY =
+      firstRect.top + firstRect.height / 2 - pairRect.top;
+    const lastCenterY =
+      lastRect.top + lastRect.height / 2 - pairRect.top;
+    const lineY = (firstCenterY + lastCenterY) / 2;
+
+    const lineLeft = firstRect.right - pairRect.left;
+    const lineWidth = lastRect.left - pairRect.left - lineLeft;
+
+    const line = lineRef.nativeElement;
+    this.renderer.setStyle(line, 'top', `${lineY}px`);
+    this.renderer.setStyle(line, 'left', `${lineLeft}px`);
+    this.renderer.setStyle(line, 'width', `${lineWidth}px`);
+
+    const heart = pairEl.querySelector('.pair-heart') as HTMLElement;
+    if (heart) {
+      this.renderer.setStyle(heart, 'padding-top', '0');
+      const heartH = heart.offsetHeight;
+      this.renderer.setStyle(
+        heart,
+        'margin-top',
+        `${lineY - heartH / 2}px`,
+      );
+    }
+  }
+
+  private updateHeartEstateLine(
+    branchParentsRef: ElementRef<HTMLElement> | undefined,
+    lineRef: ElementRef<HTMLElement> | undefined,
+  ): void {
+    if (!branchParentsRef?.nativeElement || !lineRef?.nativeElement) return;
+
+    const container = branchParentsRef.nativeElement;
+    const heart = container.querySelector(
+      '.new-heart-icon-sm',
+    ) as HTMLElement;
+    const estate = container.querySelector(
+      '.parent-estate',
+    ) as HTMLElement;
+    if (!heart || !estate) return;
+
+    const containerRect = container.getBoundingClientRect();
+    const heartRect = heart.getBoundingClientRect();
+    const estateRect = estate.getBoundingClientRect();
+
+    const heartCenterX =
+      heartRect.left + heartRect.width / 2 - containerRect.left;
+    const top = heartRect.bottom - containerRect.top;
+    const bottom = estateRect.top - containerRect.top;
+
+    const line = lineRef.nativeElement;
+    this.renderer.setStyle(line, 'left', `${heartCenterX}px`);
+    this.renderer.setStyle(line, 'top', `${top}px`);
+    this.renderer.setStyle(
+      line,
+      'height',
+      `${Math.max(0, bottom - top)}px`,
+    );
+  }
+
+  private updateHeartChildrenLine(): void {
+    if (
+      !this.coupleLinkRef?.nativeElement &&
+      this.childrenSectionRef?.nativeElement
+    ) {
+      this.renderer.removeStyle(
+        this.childrenSectionRef.nativeElement,
+        'transform',
+      );
+    }
+
+    if (
+      !this.familyTreeRef?.nativeElement ||
+      !this.coupleLinkRef?.nativeElement ||
+      !this.childrenSectionRef?.nativeElement ||
+      !this.heartChildrenLineRef?.nativeElement
+    ) {
+      return;
+    }
+
+    const heart = this.coupleLinkRef.nativeElement.querySelector(
+      '.new-heart-icon',
+    ) as HTMLElement;
+    if (!heart) return;
+
+    const familyEl = this.familyTreeRef.nativeElement;
+    const familyRect = familyEl.getBoundingClientRect();
+    const bTop = familyEl.clientTop;
+    const bLeft = familyEl.clientLeft;
+    const heartRect = heart.getBoundingClientRect();
+
+    const heartCenterX =
+      heartRect.left + heartRect.width / 2 - familyRect.left - bLeft;
+    const heartBottom = heartRect.bottom - familyRect.top - bTop;
+
+    const familyCenterX = familyEl.clientWidth / 2;
+    const offset = heartCenterX - familyCenterX;
+    this.renderer.setStyle(
+      this.childrenSectionRef.nativeElement,
+      'transform',
+      `translateX(${offset}px)`,
+    );
+
+    const childVline =
+      this.childrenSectionRef.nativeElement.querySelector(
+        '.child-vline',
+      ) as HTMLElement;
+    if (!childVline) return;
+
+    const vlineRect = childVline.getBoundingClientRect();
+    const vlineTop = vlineRect.top - familyRect.top - bTop;
+
+    const line = this.heartChildrenLineRef.nativeElement;
+    this.renderer.setStyle(line, 'left', `${heartCenterX}px`);
+    this.renderer.setStyle(line, 'top', `${heartBottom}px`);
+    this.renderer.setStyle(
+      line,
+      'height',
+      `${Math.max(0, vlineTop - heartBottom + 1)}px`,
+    );
   }
 
   private clearScenario(): void {
