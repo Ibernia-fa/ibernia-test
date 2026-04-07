@@ -252,7 +252,7 @@
                                 name="wallet"
                                 class="category-option-icon"
                               ></i-tabler>
-                              {{ pot.name | translate }}
+                              {{ getSavingPotSelectLabel(pot) }}
                             </span>
                           </mat-option>
                         }
@@ -265,7 +265,7 @@
                           <div class="edited-chips">
                             @for (entry of editedSavingPots; track entry.name) {
                               <span class="edited-chip">
-                                {{ entry.name | translate }}
+                                {{ getSavingPotSelectLabel(entry.item) }}
                                 <button
                                   class="chip-remove"
                                   (click)="

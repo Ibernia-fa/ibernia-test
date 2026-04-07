@@ -47,7 +47,9 @@
                 hideSingleSelectionIndicator
               >
                 @for (saving of clientSavings; track saving) {
-                  <mat-option [value]="saving.id">{{ saving.name | translate }}</mat-option>
+                  <mat-option [value]="saving.id">{{
+                    getSavingPotSelectLabel(saving)
+                  }}</mat-option>
                 }
               </mat-select>
               <span class="custom-arrow">

@@ -14,7 +14,8 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { CommonModule } from '@angular/common';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { formatAppDisplayNumber } from 'src/app/shared/utils/number-utils';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import {
@@ -136,7 +137,10 @@ export class MortgageCalculatorComponent implements OnInit, OnChanges {
     return this.config.maxLTV;
   }
 
-  constructor(private fb: FormBuilder) {}
+  constructor(
+    private fb: FormBuilder,
+    private translate: TranslateService,
+  ) {}
 
   ngOnInit(): void {
     this.config = getMortgageConfig(this.clientCountryCode);
@@ -287,7 +291,7 @@ export class MortgageCalculatorComponent implements OnInit, OnChanges {
 
     if (this.isHighValueProperty && tier.highValueMinDownPaymentPercent != null) {
       const threshold = this.config.propertyValueThreshold!;
-      this.highValueWarning = `Property exceeds ${threshold.toLocaleString('en-US')}.`;
+      this.highValueWarning = `Property exceeds ${formatAppDisplayNumber(this.translate.currentLang, threshold)}.`;
     } else {
       this.highValueWarning = null;
     }

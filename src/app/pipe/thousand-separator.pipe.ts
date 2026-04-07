@@ -1,5 +1,6 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
+import { formatAppDisplayNumber } from 'src/app/shared/utils/number-utils';
 
 @Pipe({
   name: 'thousandSeparator',
@@ -20,13 +21,6 @@ export class ThousandSeparatorPipe implements PipeTransform {
     const num = Number(raw);
     if (isNaN(num)) return String(value);
 
-    const locale = this.translate.currentLang === 'it'
-      ? 'it-IT'
-      : 'en-US';
-
-    return new Intl.NumberFormat(locale, {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2
-    }).format(num);
+    return formatAppDisplayNumber(this.translate.currentLang, num);
   }
 }
