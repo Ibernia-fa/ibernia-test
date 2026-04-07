@@ -1144,6 +1144,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
               this.toastr.error(
                 err?.error?.message ||
                   this.translate.instant('ERROR.FAILED_CREATE_PLAN_SCENARIO'),
+                this.translate.instant('LABEL.ERROR'),
               );
               return of(null);
             }),
@@ -1153,6 +1154,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
             if (newPlan) {
               this.toastr.success(
                 this.translate.instant('TOAST.PLAN_CREATED_FROM_SCENARIO'),
+                this.translate.instant('LABEL.SUCCESS'),
               );
               this.router.navigate(['/cashflows', newPlan.id, 'reports']);
             }

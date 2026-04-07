@@ -19,7 +19,7 @@ import { Cashflow } from '../../models/cashflow';
 import { EMPTY, catchError, filter, map, switchMap, take } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Client } from '../../models/client';
 import { ReportsHttpService } from 'src/app/financial-workflow/reports/services/reports-http.service';
 import { TimelineHttpService } from 'src/app/financial-workflow/timeline/services/timeline-http.service';
@@ -57,7 +57,8 @@ export class EditModelDialogComponent {
     private timelineHttpService: TimelineHttpService,
     private toaster: ToastrService,
     private router: Router,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private translate: TranslateService,
   ) {
     const birthDateValue =
       this.cashflow?.clientBirthDate ?? this.clientData?.clientDetails?.birthDate;
@@ -123,10 +124,17 @@ export class EditModelDialogComponent {
             return res;
           }),
           catchError((err) => {
-            if (err.error)
-              this.toaster.error(err.error);
-            else
-              this.toaster.error('An error occurred while updating plan');
+            const title = this.translate.instant('LABEL.ERROR');
+            const fallback = this.translate.instant('ERROR.PLAN_UPDATE_FAILED');
+            let msg = fallback;
+            if (typeof err?.error === 'string' && err.error.trim()) {
+              msg = err.error;
+            } else if (typeof err?.error?.message === 'string' && err.error.message.trim()) {
+              msg = err.error.message;
+            } else if (typeof err?.message === 'string' && err.message.trim()) {
+              msg = err.message;
+            }
+            this.toaster.error(msg, title);
             this.isLoading = false;
             console.error('An error occurred while updating cashflow', err);
             throw err;
@@ -135,7 +143,10 @@ export class EditModelDialogComponent {
         .subscribe((res) => {
           this.isLoading = false;
           console.log(res);
-          this.toaster.success('Plan Updated Successfully');
+          this.toaster.success(
+            this.translate.instant('TOAST.PLAN_UPDATED_SUCCESSFULLY'),
+            this.translate.instant('LABEL.SUCCESS'),
+          );
           this.refreshReportForecastEndDate(res);
           this.dialogRef.close();
           // this.router.navigate([`cashflows/${res.id}/timeline`]);
