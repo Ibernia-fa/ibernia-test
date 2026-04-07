@@ -11,6 +11,7 @@ import {
   catchError,
   finalize,
 } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
@@ -43,6 +44,7 @@ import {
   Cycle,
   EscalationRate,
   EventIncomeType,
+  FinancialRecordLineItem,
   FinancialTimeline,
 } from '../../timeline/models/financial-timeline';
 import {
@@ -166,7 +168,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
   incomeItems: FinancialViewModel[] = [];
   expenseItems: FinancialViewModel[] = [];
 
-  editedGoals: Array<{ name: string; item: ClientEvent }> = [];
+  editedGoals: Array<{ name: string; item: ClientEvent | ClientEvent[] }> = [];
   editedSavingPots: Array<{ name: string; item: ClientSaving }> = [];
   editedIncomes: Array<{ name: string; item: FinancialViewModel }> = [];
   editedExpenses: Array<{ name: string; item: FinancialViewModel }> = [];
@@ -216,6 +218,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.navItemService.currentRouteName = 'Scenario Lab';
+    this.setupScenarioFormAutoRefresh();
 
     this.settingsService.userData$
       .pipe(
@@ -488,6 +491,15 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
       InflationRate: inflationRate,
     };
 
+    if (this.hasRetirementAge) {
+      const ra = Number(this.scenarioForm.get('retirementAge')?.value);
+      if (Number.isFinite(ra)) payload.ClientRetirementAge = ra;
+    }
+    if (this.hasPartnerRetirementAge && this.scenarioForm.get('partnerRetirementAge')) {
+      const pra = Number(this.scenarioForm.get('partnerRetirementAge')?.value);
+      if (Number.isFinite(pra)) payload.PartnerRetirementAge = pra;
+    }
+
     if (this.editedIncomes.length) {
       payload.IncomeOverrides = this.editedIncomes.map((e) =>
         this.toFinancialRecordLineItem(e.item),
@@ -499,7 +511,94 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
       );
     }
 
+    const clientEventOverrides = this.collectClientEventOverrides();
+    if (clientEventOverrides.length) {
+      payload.ClientEventOverrides = clientEventOverrides;
+    }
+
+    if (this.editedSavingPots.length) {
+      const potOverrides = this.editedSavingPots
+        .map(e => e.item)
+        .filter((p): p is ClientSaving => !!p?.id)
+        .map(p => ({ SavingPotId: p.id as string, ReturnRate: p.returnRate }));
+      if (potOverrides.length) {
+        payload.SavingPotReturnOverrides = potOverrides;
+      }
+    }
+
     return payload;
+  }
+
+  /** Flattens goal edits (single event or financing arrays) for the scenario API */
+  private collectClientEventOverrides(): ClientEvent[] {
+    const out: ClientEvent[] = [];
+    for (const g of this.editedGoals) {
+      const item = g.item;
+      if (Array.isArray(item)) {
+        out.push(...item);
+      } else if (item) {
+        out.push(item);
+      }
+    }
+    return out;
+  }
+
+  /** Income + expense lines for timeline dialogs (ids for Home / financing monthly + resale rows). */
+  private getFinancialRecordsForEventDialogs(): FinancialRecordLineItem[] {
+    const incomes = this.incomeExpenseData?.incomes ?? [];
+    const expenses = this.incomeExpenseData?.expenses ?? [];
+    return [...incomes, ...expenses] as FinancialRecordLineItem[];
+  }
+
+  /**
+   * Recomputes the scenario chart from current form + edits.
+   * @param showSuccessToast use true when the user explicitly clicked "Simulate scenario"
+   */
+  private runScenarioUpdate(showSuccessToast: boolean): void {
+    if (!this.financialTimeline || !this.client || !this.baselineReport) return;
+
+    this.isSimulating = true;
+    this.loadScenarioReport()
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => {
+          this.isSimulating = false;
+        }),
+      )
+      .subscribe((report) => {
+        if (report) {
+          this.injectTimelineEvents(report);
+          this.report = report;
+          this.alignSeriesStructure();
+          this.hasSimulated = true;
+          this.activeTab = 'after';
+          this.displayedReport = {
+            ...report,
+            series: report.series.map(s => ({ ...s, data: [...s.data] })),
+          };
+          this.updateScenarioForecastEndDateIfNeeded();
+          this.getShortfallStatus(report);
+          if (showSuccessToast) {
+            this.toastr.success(this.translate.instant('TOAST.SCENARIO_SIMULATED'));
+          }
+        } else if (showSuccessToast) {
+          this.toastr.warning(this.translate.instant('ERROR.NO_SCENARIO_DATA'));
+        }
+      });
+  }
+
+  private setupScenarioFormAutoRefresh(): void {
+    this.scenarioForm.valueChanges
+      .pipe(
+        debounceTime(450),
+        distinctUntilChanged(
+          (a, b) => JSON.stringify(a) === JSON.stringify(b),
+        ),
+        takeUntil(this.destroy$),
+      )
+      .subscribe(() => {
+        this.runScenarioUpdate(false);
+      });
   }
 
   private toFinancialRecordLineItem(vm: FinancialViewModel): any {
@@ -533,36 +632,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
   }
 
   private applyScenario(): void {
-    this.isSimulating = true;
-    this.loadScenarioReport()
-      .pipe(
-        takeUntil(this.destroy$),
-        finalize(() => {
-          this.isSimulating = false;
-        }),
-      )
-      .subscribe((report) => {
-        if (report) {
-          this.injectTimelineEvents(report);
-          this.report = report;
-          this.alignSeriesStructure();
-          this.hasSimulated = true;
-          this.activeTab = 'after';
-          // Spread creates a fresh reference so Angular and ng-apexcharts
-          // always detect the change, even if series structure is identical.
-          this.displayedReport = {
-            ...report,
-            series: report.series.map((s) => ({ ...s, data: [...s.data] })),
-          };
-          this.updateScenarioForecastEndDateIfNeeded();
-          this.getShortfallStatus(report);
-          this.toastr.success(
-            this.translate.instant('TOAST.SCENARIO_SIMULATED'),
-          );
-        } else {
-          this.toastr.warning(this.translate.instant('ERROR.NO_SCENARIO_DATA'));
-        }
-      });
+    this.runScenarioUpdate(true);
   }
 
   switchTab(tab: 'before' | 'after'): void {
@@ -777,7 +847,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
         })),
         isEditWorkflow: true,
         patchEvent: event,
-        financialRecords: [],
+        financialRecords: this.getFinancialRecordsForEventDialogs(),
         scenarioMode: true,
       },
     });
@@ -798,6 +868,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
             item: result.scenarioItem,
           });
         }
+        this.runScenarioUpdate(false);
       }
     });
   }
@@ -862,6 +933,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
             item: result.scenarioItem,
           });
         }
+        this.runScenarioUpdate(false);
       }
     });
   }
@@ -920,6 +992,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
             item: result.scenarioItem,
           });
         }
+        this.runScenarioUpdate(false);
       }
     });
   }
@@ -969,6 +1042,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
             item: result.scenarioItem,
           });
         }
+        this.runScenarioUpdate(false);
       }
     });
   }
@@ -985,7 +1059,12 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
     };
     const list = listMap[category];
     const idx = list.findIndex((e) => e.name === name);
-    if (idx >= 0) list.splice(idx, 1);
+    if (idx >= 0) {
+      list.splice(idx, 1);
+      if (this.baselineReport) {
+        this.runScenarioUpdate(false);
+      }
+    }
   }
 
   private refreshData(): void {

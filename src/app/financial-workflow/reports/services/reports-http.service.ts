@@ -15,6 +15,12 @@ export interface ReportScenarioPayload {
   ReturnRateOverride?: number | null;
   IncomeOverrides?: any[];
   ExpenseOverrides?: any[];
+  ClientRetirementAge?: number | null;
+  PartnerRetirementAge?: number | null;
+  /** Timeline event overrides (goals / Home / Car / etc.) merged server-side into scenario projection */
+  ClientEventOverrides?: any[];
+  /** Per-pot return rate overrides from Scenario Lab pot edits */
+  SavingPotReturnOverrides?: Array<{ SavingPotId: string; ReturnRate: number }>;
 }
 
 @Injectable({
