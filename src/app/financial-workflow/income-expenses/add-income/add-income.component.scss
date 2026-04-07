@@ -82,3 +82,18 @@
     flex-shrink: 0;
   }
 }
+
+/* Inheritance: frequency is fixed "One-off" and should not look interactive */
+.inheritance-cycle-static {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .inheritance-cycle-label {
+    width: 100%;
+    text-align: center;
+    // keep same typography as selects
+    font-size: 14px;
+    color: #2b3942;
+  }
+}
