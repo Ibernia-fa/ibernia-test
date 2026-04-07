@@ -135,58 +135,12 @@
                   {{ "Scenario assumptions" | translate }}
                 </h3>
                 <div class="assumptions-actions">
-                  <!-- mat-flat-button
-                  color="primary"
-                  class="simulate-btn" -->
-                  <!-- mat-stroked-button -->
                   <button
                     type="button"
                     class="button-icon-outline"
                     (click)="onCreatePlanFromScenario()"
                   >
                     <span>{{ "Create plan from scenario" | translate }}</span>
-                  </button>
-                  <button
-                    type="button"
-                    class="button-icon"
-                    (click)="onSimulate()"
-                    [disabled]="isSimulating"
-                  >
-                    @if (isSimulating) {
-                      <mat-spinner
-                        diameter="18"
-                        class="simulate-spinner"
-                      ></mat-spinner>
-                    } @else {
-                      <!-- <span class="play-badge" aria-hidden="true">
-                        <svg
-                          width="14"
-                          height="14"
-                          viewBox="0 0 24 24"
-                          fill="currentColor"
-                        >
-                          <path d="M8 5v14l11-7z" />
-                        </svg>
-                      </span> -->
-
-                      <svg
-                        width="12"
-                        height="14"
-                        viewBox="0 0 12 14"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M0.694336 0.695312L10.4166 6.94531L0.694336 13.1953V0.695312Z"
-                          fill="white"
-                          stroke="white"
-                          stroke-width="1.38889"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        />
-                      </svg>
-                    }
-                    <span>{{ "Simulate scenario" | translate }}</span>
                   </button>
                 </div>
               </div>
@@ -208,8 +162,12 @@
                           <mat-option disabled class="empty-option">{{
                             "No goals added" | translate
                           }}</mat-option>
+                        } @else if (!availableGoalItems.length) {
+                          <mat-option disabled class="empty-option">{{
+                            "SCENARIO_LAB.NO_ITEMS_LEFT_TO_EDIT" | translate
+                          }}</mat-option>
                         }
-                        @for (goal of goalItems; track goal.id) {
+                        @for (goal of availableGoalItems; track goal.id) {
                           <mat-option [value]="goal">
                             <span class="category-option">
                               <img
@@ -282,15 +240,19 @@
                           <mat-option disabled class="empty-option">{{
                             "No saving pots added" | translate
                           }}</mat-option>
+                        } @else if (!availableSavingPotItems.length) {
+                          <mat-option disabled class="empty-option">{{
+                            "SCENARIO_LAB.NO_ITEMS_LEFT_TO_EDIT" | translate
+                          }}</mat-option>
                         }
-                        @for (pot of savingPotItems; track pot.id) {
+                        @for (pot of availableSavingPotItems; track pot.id) {
                           <mat-option [value]="pot">
                             <span class="category-option">
                               <i-tabler
                                 name="wallet"
                                 class="category-option-icon"
                               ></i-tabler>
-                              {{ pot.name | translate }}
+                              {{ getSavingPotSelectLabel(pot) }}
                             </span>
                           </mat-option>
                         }
@@ -303,7 +265,7 @@
                           <div class="edited-chips">
                             @for (entry of editedSavingPots; track entry.name) {
                               <span class="edited-chip">
-                                {{ entry.name | translate }}
+                                {{ getSavingPotSelectLabel(entry.item) }}
                                 <button
                                   class="chip-remove"
                                   (click)="
@@ -353,8 +315,15 @@
                           <mat-option disabled class="empty-option">{{
                             "No incomes added" | translate
                           }}</mat-option>
+                        } @else if (!availableIncomeItems.length) {
+                          <mat-option disabled class="empty-option">{{
+                            "SCENARIO_LAB.NO_ITEMS_LEFT_TO_EDIT" | translate
+                          }}</mat-option>
                         }
-                        @for (income of incomeItems; track income.id) {
+                        @for (
+                          income of availableIncomeItems;
+                          track income.id
+                        ) {
                           <mat-option [value]="income">
                             <span class="category-option">
                               <img
@@ -367,7 +336,11 @@
                                 width="18"
                                 class="category-option-icon"
                               />
-                              {{ income.description | translateIncomeExpenseLabel }}
+                              {{
+                                income.description
+                                  | translateIncomeExpenseLabel
+                                    : incomeDisplayLabelContext
+                              }}
                             </span>
                           </mat-option>
                         }
@@ -381,7 +354,9 @@
                             @for (entry of editedIncomes; track entry.name) {
                               <span class="edited-chip">
                                 {{
-                                  entry.name | translateIncomeExpenseLabel
+                                  entry.name
+                                    | translateIncomeExpenseLabel
+                                      : incomeDisplayLabelContext
                                 }}
                                 <button
                                   class="chip-remove"
@@ -432,8 +407,15 @@
                           <mat-option disabled class="empty-option">{{
                             "No expenses added" | translate
                           }}</mat-option>
+                        } @else if (!availableExpenseItems.length) {
+                          <mat-option disabled class="empty-option">{{
+                            "SCENARIO_LAB.NO_ITEMS_LEFT_TO_EDIT" | translate
+                          }}</mat-option>
                         }
-                        @for (expense of expenseItems; track expense.id) {
+                        @for (
+                          expense of availableExpenseItems;
+                          track expense.id
+                        ) {
                           <mat-option [value]="expense">
                             <span class="category-option">
                               <img

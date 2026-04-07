@@ -1,13 +1,13 @@
 <div class="d-flex flex-column">
   <div class="dialog-header">
-    <h2 class="dialog-title text-center">{{ 'Tax Settings' | translate }}</h2>
+    <h2 class="dialog-title text-center">{{ 'Tax settings' | translate }}</h2>
     <button
       type="button"
       mat-icon-button
       disableRipple
       class="dialog-close-btn"
       mat-dialog-close
-      aria-label="Close dialog"
+      [attr.aria-label]="'LEGACY.CLOSE_DIALOG' | translate"
       (click)="onCancel()"
     >
       <mat-icon>close</mat-icon>

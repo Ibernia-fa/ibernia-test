@@ -24,12 +24,14 @@ export const navItemslower: NavItem[] = [
     iconName: '/assets/images/svgs/book-solid.svg',
     iconOutline: '/assets/images/svgs/book-solid.svg',
     route: '/cashflows/{cashflowId}/school',
+    nonNavigable: true,
   },
   {
     displayName: 'AI Chat',
     iconName: '/assets/images/shapes/ai-filled.svg',
     iconOutline: '/assets/images/shapes/ai-filled.svg',
     route: '/cashflows/{cashflowId}/agent-chat',
+    nonNavigable: true,
   },
 ];
 export const navItems: NavItem[] = [

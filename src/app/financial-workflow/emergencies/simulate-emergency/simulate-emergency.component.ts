@@ -27,6 +27,7 @@ import { EmergenciesHttpService } from '../services/emergencies-http.service';
 import { SavingsBarStackedChartComponent } from '../../reports/savings-bar-stacked-chart/savings-bar-stacked-chart.component';
 import { getAmountCycleLabel } from 'src/app/shared/utils/amount-cycle-label';
 import { TranslateIncomeExpenseLabelPipe } from 'src/app/core/pipes/translate-income-expense-label.pipe';
+import { IncomeDisplayLabelContext } from 'src/app/shared/utils/income-display-label';
 import { TranslateEscalationDescriptionPipe } from 'src/app/core/pipes/translate-escalation-description.pipe';
 
 @Component({
@@ -110,6 +111,14 @@ export class SimulateEmergencyComponent implements OnDestroy {
   } | null = null;
   simulationChartHeight: number = 420;
 
+  get incomeDisplayLabelContext(): IncomeDisplayLabelContext {
+    const c = this.client;
+    return {
+      hasPartner: !!c?.partnerDetail,
+      clientFirstName: c?.clientDetails?.firstName ?? '',
+      partnerFirstName: c?.partnerDetail?.firstName ?? '',
+    };
+  }
 
   constructor(
     private dialogRef: MatDialogRef<SimulateEmergencyComponent>,

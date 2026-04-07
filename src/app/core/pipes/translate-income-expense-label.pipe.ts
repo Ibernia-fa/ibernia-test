@@ -1,10 +1,17 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
+import {
+  IncomeDisplayLabelContext,
+  incomeApiDescriptionToDisplayLabel,
+} from 'src/app/shared/utils/income-display-label';
 
 /**
  * Localizes default income/expense descriptions from the API (English canonical strings)
  * and composed titles such as "Salary Matteo" or "State pension Luisa".
  * Custom user-entered descriptions are passed through translate.instant (no key → unchanged).
+ *
+ * Optional `ctx` resolves client/partner salary and pension labels when a plan has a partner
+ * (see incomeApiDescriptionToDisplayLabel).
  */
 @Pipe({
   name: 'translateIncomeExpenseLabel',
@@ -14,11 +21,16 @@ import { TranslateService } from '@ngx-translate/core';
 export class TranslateIncomeExpenseLabelPipe implements PipeTransform {
   constructor(private translate: TranslateService) {}
 
-  transform(description: string | null | undefined): string {
+  transform(
+    description: string | null | undefined,
+    ctx?: IncomeDisplayLabelContext | null,
+  ): string {
     if (description == null || description === '') {
       return '';
     }
-    const d = description.trim();
+    const d = ctx
+      ? incomeApiDescriptionToDisplayLabel(description, ctx)
+      : description.trim();
 
     if (d === 'Salary (Partner)') {
       return this.translate.instant('Salary (Partner)');

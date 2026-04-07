@@ -46,7 +46,6 @@ import { LanguageLoaderService } from '../../language-loader.service';
 import { BrandingComponent } from '../sidebar/branding.component';
 import { MyNotificationsService, UserNotificationItem } from 'src/app/core/services/my-notifications.service';
 import { NotificationNewLabelGraceService } from 'src/app/core/services/notification-new-label-grace.service';
-import { portalOriginForIdentityReturn } from 'src/app/core/identity-security-url';
 import {
   MFA_REMINDER_NOTIFICATION_ID,
   prependMfaReminderNotification,
@@ -54,7 +53,6 @@ import {
 } from 'src/app/core/mfa-reminder-notification';
 import { notificationMatchesSearchQuery } from 'src/app/core/notification-search';
 import { CapitalizeFirstPipe } from 'src/app/core/pipes/capitalize-first.pipe';
-import { environment } from 'src/environments/environment';
 
 interface notifications {
   id: number;
@@ -647,8 +645,7 @@ get userInitials(): string {
     return prependMfaReminderNotification(
       list,
       this.Authservice.getUserProfile() as Record<string, unknown> | null,
-      environment.authority,
-      portalOriginForIdentityReturn()
+      this.translate.currentLang || undefined
     );
   }
 

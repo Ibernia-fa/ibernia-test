@@ -11,6 +11,7 @@ import {
   OnInit,
   OnChanges,
   Renderer2,
+  OnDestroy,
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
@@ -37,6 +38,8 @@ import { AddMemberComponent } from './add-member/add-member.component';
 import { BeneficiaryRulesComponent } from './beneficiary-rules/beneficiary-rules.component';
 import { TaxSettingsComponent } from './tax-settings/tax-settings.component';
 import { EditParentEstateComponent } from './edit-parent-estate/edit-parent-estate.component';
+import { SettingsService } from 'src/app/default-preferance/services/default-preferance.http.service';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-legacy',
@@ -90,6 +93,7 @@ export class LegacyComponent
   private mutationObs?: MutationObserver;
   private resizeObs?: ResizeObserver;
   private observedElement?: HTMLElement;
+  private readonly destroy$ = new Subject<void>();
 
   constructor(
     private legacyHttp: LegacyHttpService,
@@ -98,10 +102,24 @@ export class LegacyComponent
     private cdr: ChangeDetectorRef,
     private renderer: Renderer2,
     private ngZone: NgZone,
+    private settingsService: SettingsService,
   ) {}
 
   ngOnInit(): void {
     this.loadDashboard();
+    this.settingsService.profileChanged$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        if (this.cashflowId) {
+          this.clearScenario();
+          this.loadDashboard();
+        }
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   ngAfterViewChecked(): void {
@@ -488,6 +506,17 @@ export class LegacyComponent
         ? (this.dashboard?.parentEstates?.clientParentsNetWorth ?? 0)
         : (this.dashboard?.parentEstates?.partnerParentsNetWorth ?? 0);
 
+    const personFirstName = (
+      side === 'client'
+        ? (this.clientMember?.firstName ||
+            this.selectedClient?.clientDetails?.firstName ||
+            this.clientData?.firstName ||
+            '')
+        : (this.partnerMember?.firstName ||
+            this.selectedClient?.partnerDetail?.firstName ||
+            '')
+    ).trim();
+
     const dialogRef = this.dialog.open(EditParentEstateComponent, {
       width: '612px',
       disableClose: true,
@@ -496,6 +525,7 @@ export class LegacyComponent
         side,
         currentValue: current,
         currency: this.currency,
+        personFirstName,
       },
     });
 

@@ -75,10 +75,9 @@
                     <div class="d-flex flex-column gap-6">
                       <h3 class="card-title">
                         {{
-                          (
-                            displayItem.displayTitle ??
-                            displayItem.income.description
-                          ) | translateIncomeExpenseLabel
+                          displayItem.income.description
+                            | translateIncomeExpenseLabel
+                              : incomeDisplayLabelContext
                         }}
                       </h3>
 
@@ -110,10 +109,9 @@
                           }
                         </div>
                         @if (
-                          (displayItem.income.description === "Salary" ||
-                            displayItem.income.description ===
-                              "Salary (Partner)") &&
-                          hasBonusAmount(displayItem.income)
+                          isSalaryIncomeForBonus(
+                            displayItem.income.description
+                          ) && hasBonusAmount(displayItem.income)
                         ) {
                           <div class="items-divider"></div>
                           <div class="d-flex flex-col gap-10 bonus-list">
@@ -310,7 +308,11 @@
                     }
                     <div class="d-flex flex-column gap-6">
                       <h3 class="card-title">
-                        {{ income.description | translateIncomeExpenseLabel }}
+                        {{
+                          income.description
+                            | translateIncomeExpenseLabel
+                              : incomeDisplayLabelContext
+                        }}
                       </h3>
 
                       <h3 class="paragraph-text d-flex align-items-baseline">

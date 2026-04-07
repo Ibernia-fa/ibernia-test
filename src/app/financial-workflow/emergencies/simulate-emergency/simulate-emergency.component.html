@@ -426,7 +426,11 @@
                 <mat-select formControlName="stoppedIncomeId" placeholder="">
                   @for (income of incomes; track income.id) {
                     <mat-option [value]="income.id">
-                      {{ income.description | translateIncomeExpenseLabel }}
+                      {{
+                        income.description
+                          | translateIncomeExpenseLabel
+                            : incomeDisplayLabelContext
+                      }}
                     </mat-option>
                   }
                 </mat-select>
@@ -546,7 +550,7 @@
             [forecastEndDate]="forecastEndDate"
             [chartHeight]="simulationChartHeight"
             [emergencyIconUrl]="
-              activeTab === 'simulated' ? emergency?.iconUrl : undefined
+              activeTab === 'simulated' ? emergency?.iconUrl : 'none'
             "
             [animateUpdates]="true"
             cashFlowName=""

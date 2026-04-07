@@ -16,7 +16,6 @@ import { CoreService } from 'src/app/services/core.service';
 import { AppSettings } from 'src/app/config';
 import { filter } from 'rxjs/operators';
 import { NavigationEnd, Router } from '@angular/router';
-import { navItems, navItemslower } from './vertical/sidebar/sidebar-data';
 import { NavService } from '../../services/nav.service';
 import { AppNavItemComponent } from './vertical/sidebar/nav-item/nav-item.component';
 import { RouterModule } from '@angular/router';
@@ -97,8 +96,8 @@ interface quicklinks {
   encapsulation: ViewEncapsulation.None,
 })
 export class FullComponent implements OnInit, OnDestroy {
-  navItems = navItems;
-  navItemslower = navItemslower;
+  navItems = mainNavItems;
+  navItemslower = mainLower;
   isSettings = false;
   isCashflowRoute = false;
 
@@ -280,10 +279,13 @@ export class FullComponent implements OnInit, OnDestroy {
         if (!this.inSettingsRoute && o.sidenavCollapsed === false) {
           sidenavCollapsed = state.breakpoints[TABLET_VIEW];
         }
-        this.settings.setOptions({
-          sidenavOpened: true,
-          sidenavCollapsed,
-        });
+        this.settings.setOptions(
+          {
+            sidenavOpened: true,
+            sidenavCollapsed,
+          },
+          false,
+        );
         this.isMobileScreen = state.breakpoints[BELOWMONITOR];
         this.isContentWidthFixed = state.breakpoints[MONITOR_VIEW];
         this.resView = state.breakpoints[BELOWMONITOR];
@@ -372,7 +374,7 @@ export class FullComponent implements OnInit, OnDestroy {
     if (nowSettings && !this.inSettingsRoute) {
       this.preSettingsSidenavCollapsed =
         this.settings.getOptions().sidenavCollapsed;
-      this.settings.setOptions({ sidenavCollapsed: false });
+      this.settings.setOptions({ sidenavCollapsed: false }, false);
     } else if (!nowSettings && this.inSettingsRoute) {
       if (this.preSettingsSidenavCollapsed !== null) {
         this.settings.setOptions({

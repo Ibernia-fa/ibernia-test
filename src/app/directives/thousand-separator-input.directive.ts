@@ -7,6 +7,10 @@ import {
 } from '@angular/core';
 import { NgControl } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
+import {
+  APP_DISPLAY_NUMBER_FORMAT,
+  localeFromAppLanguage,
+} from 'src/app/shared/utils/number-utils';
 
 @Directive({
   selector: '[thousandSeparatorInput]',
@@ -83,7 +87,8 @@ export class ThousandSeparatorInputDirective implements OnInit {
     }
 
     this.el.nativeElement.value = new Intl.NumberFormat(
-      this.translate.currentLang === 'it' ? 'it-IT' : 'en-US'
+      localeFromAppLanguage(this.translate.currentLang),
+      APP_DISPLAY_NUMBER_FORMAT,
     ).format(value);
   }
 
@@ -93,9 +98,11 @@ export class ThousandSeparatorInputDirective implements OnInit {
     const intNum = Number(ints);
     const intFmt = isNaN(intNum)
       ? ints
-      : intNum.toLocaleString(
-          this.translate.currentLang === 'it' ? 'it-IT' : 'en-US'
-        );
+      : intNum.toLocaleString(localeFromAppLanguage(this.translate.currentLang), {
+          ...APP_DISPLAY_NUMBER_FORMAT,
+          maximumFractionDigits: 0,
+          minimumFractionDigits: 0,
+        });
 
     return decs !== undefined ? `${intFmt}${this.decimal}${decs}` : intFmt;
   }

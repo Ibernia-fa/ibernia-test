@@ -1,12 +1,19 @@
 {
-  "name": "Modernize",
-  "short_name": "Modernize",
-  "theme_color": "#1976d2",
-  "background_color": "#fafafa",
+  "name": "Ibernia",
+  "short_name": "Ibernia",
+  "description": "Ibernia — financial planning made simple.",
+  "theme_color": "#516ce8",
+  "background_color": "#ffffff",
   "display": "standalone",
   "scope": "./",
   "start_url": "./",
   "icons": [
+    {
+      "src": "icons/ibernia-app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
     {
       "src": "icons/icon-72x72.png",
       "sizes": "72x72",

@@ -13,6 +13,7 @@ import { environment } from 'src/environments/environment';
 })
 export class FooterComponent {
   showFaqLink = true;
+  readonly currentYear = new Date().getFullYear();
   readonly termsUrl = 'https://ibernia.app/terms';
 
   constructor(private router: Router) {

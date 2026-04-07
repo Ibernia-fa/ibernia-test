@@ -22,6 +22,7 @@
       [calculatorKind]="data.calculatorKind"
       [priceLabel]="data.priceLabel || 'Property price'"
       [advisorDefaultInterestRate]="data.advisorDefaultInterestRate"
+      [defaultLoanTermYears]="data.defaultLoanTermYears"
       [initialState]="data.initialState"
       (stateChanged)="onCalculatorStateChanged($event)"
       (calculated)="onApply($event)"

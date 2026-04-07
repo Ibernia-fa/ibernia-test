@@ -14,7 +14,8 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { CommonModule } from '@angular/common';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { formatAppDisplayNumber } from 'src/app/shared/utils/number-utils';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import {
@@ -70,6 +71,11 @@ export class MortgageCalculatorComponent implements OnInit, OnChanges {
   /** UI label: Home uses mortgage; Car, Boat, custom use loan. */
   @Input() calculatorKind: 'mortgage' | 'loan' = 'loan';
   @Input() priceLabel: string = 'Property price';
+  /**
+   * Preferred default for the loan term when `initialState.loanTermYears` is absent
+   * (set by parent from goal type: Home / Car / Boat / Custom).
+   */
+  @Input() defaultLoanTermYears: number | null = null;
   @Input() initialState: MortgageCalculatorState | null = null;
   @Output() calculated = new EventEmitter<MortgageOutput>();
   @Output() stateChanged = new EventEmitter<MortgageCalculatorState>();
@@ -131,7 +137,10 @@ export class MortgageCalculatorComponent implements OnInit, OnChanges {
     return this.config.maxLTV;
   }
 
-  constructor(private fb: FormBuilder) {}
+  constructor(
+    private fb: FormBuilder,
+    private translate: TranslateService,
+  ) {}
 
   ngOnInit(): void {
     this.config = getMortgageConfig(this.clientCountryCode);
@@ -206,7 +215,9 @@ export class MortgageCalculatorComponent implements OnInit, OnChanges {
         ? this.advisorDefaultInterestRate
         : null;
     const defaultRate = state?.interestRate ?? advisor ?? this.config.defaultInterestRate;
-    const defaultTerm = state?.loanTermYears ?? this.config.defaultLoanTermYears;
+    const defaultTerm =
+      state?.loanTermYears ??
+      (this.defaultLoanTermYears != null ? this.defaultLoanTermYears : this.config.defaultLoanTermYears);
 
     this.downPaymentMode = state?.downPaymentMode ?? 'percent';
 
@@ -280,7 +291,7 @@ export class MortgageCalculatorComponent implements OnInit, OnChanges {
 
     if (this.isHighValueProperty && tier.highValueMinDownPaymentPercent != null) {
       const threshold = this.config.propertyValueThreshold!;
-      this.highValueWarning = `Property exceeds ${threshold.toLocaleString('en-US')}.`;
+      this.highValueWarning = `Property exceeds ${formatAppDisplayNumber(this.translate.currentLang, threshold)}.`;
     } else {
       this.highValueWarning = null;
     }

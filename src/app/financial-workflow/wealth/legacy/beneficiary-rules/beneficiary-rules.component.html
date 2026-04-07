@@ -6,7 +6,7 @@
       mat-icon-button
       disableRipple
       class="dialog-close-btn"
-      aria-label="Close dialog"
+      [attr.aria-label]="'LEGACY.CLOSE_DIALOG' | translate"
       (click)="onClose()"
     >
       <mat-icon>close</mat-icon>
@@ -16,7 +16,7 @@
   <mat-dialog-content class="event-dialog-content">
     <div class="d-flex flex-column gap-12">
       <p class="dialog-subtitle">
-        Define who receives each estate and at what percentage per scenario
+        {{ "LEGACY.BENEFICIARY_RULES_SUBTITLE" | translate }}
       </p>
       <!-- Scenario tabs -->
       <div class="scenario-tabs">

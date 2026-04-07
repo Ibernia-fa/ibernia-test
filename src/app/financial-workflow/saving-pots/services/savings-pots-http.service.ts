@@ -16,12 +16,13 @@ export class SavingsPotsHttpService {
     return this.httpClient.get<SavingPotsModel>(`/api/v1/cashflows/${cashflowId}/saving-pots`);
   }
 
+  /** Persists OrderNumber for all pots after drag-and-drop reorder (not the single-pot PUT). */
   updateSavingsPots(cashflowId: string, clientSavings: ClientSaving[]) {
-  return this.httpClient.put<any>(
-    `/api/v1/cashflows/${cashflowId}/saving-pots`,
-    clientSavings 
-  );
-}
+    return this.httpClient.put<SavingPotsModel>(
+      `/api/v1/cashflows/${cashflowId}/saving-pots/order`,
+      clientSavings,
+    );
+  }
 
   addNewSavingPot(cashflowId: string, clientSaving: ClientSaving) {
     return this.httpClient.post<SavingPotsModel>(`/api/v1/cashflows/${cashflowId}/saving-pots`, clientSaving);

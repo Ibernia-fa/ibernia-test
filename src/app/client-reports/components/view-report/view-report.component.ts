@@ -24,6 +24,7 @@ import { TablerIconsModule } from 'angular-tabler-icons';
 import { MaterialModule } from 'src/app/material.module';
 import { TranslateModule } from '@ngx-translate/core';
 import { TranslateIncomeExpenseLabelPipe } from 'src/app/core/pipes/translate-income-expense-label.pipe';
+import { IncomeDisplayLabelContext } from 'src/app/shared/utils/income-display-label';
 import { ClientEmergency, EmergenciesLookupData } from '../../models/financial-series.model';
 import { ChartSeries } from 'src/app/financial-workflow/reports/models/charts-series.model';
 
@@ -96,6 +97,15 @@ export class ViewReportComponent implements OnChanges {
   }
   get clientName () {
     return `${this.financialSeries?.client.clientDetails?.firstName} ${this.financialSeries?.client.clientDetails?.lastName}`;
+  }
+
+  get incomeDisplayLabelContext(): IncomeDisplayLabelContext {
+    const c = this.financialSeries?.client;
+    return {
+      hasPartner: !!c?.partnerDetail,
+      clientFirstName: c?.clientDetails?.firstName ?? '',
+      partnerFirstName: c?.partnerDetail?.firstName ?? '',
+    };
   }
 
   get advisorName () {

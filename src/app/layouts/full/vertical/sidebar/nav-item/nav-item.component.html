@@ -128,7 +128,7 @@
 @if (!item.navCap && item.external) {
   <a
     mat-list-item
-    (click)="onExternalLinkClick(item.route)"
+    (click)="onExternalLinkClick(item)"
     [disableRipple]="true"
     [ngClass]="{
       'mat-toolbar mat-primary activeMenu': item.route
@@ -180,7 +180,7 @@
     </div>
   </a>
   <!-- <mat-list-item
-    (click)="onExternalLinkClick(item.route)"
+    (click)="onExternalLinkClick(item)"
     class="menu-list-item"
   >
     <img

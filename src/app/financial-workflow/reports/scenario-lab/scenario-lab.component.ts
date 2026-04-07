@@ -9,8 +9,8 @@ import {
   switchMap,
   tap,
   catchError,
-  finalize,
 } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
@@ -43,6 +43,7 @@ import {
   Cycle,
   EscalationRate,
   EventIncomeType,
+  FinancialRecordLineItem,
   FinancialTimeline,
 } from '../../timeline/models/financial-timeline';
 import {
@@ -68,6 +69,12 @@ import { patchInflationRateDescription } from 'src/app/shared/utils/escalation-r
 import { formatClientPersonDisplayName } from 'src/app/shared/utils/person-display-name';
 import { TranslateIncomeExpenseLabelPipe } from 'src/app/core/pipes/translate-income-expense-label.pipe';
 import { translateTimelineEventDisplayName } from 'src/app/shared/utils/timeline-event-display-name';
+import {
+  IncomeDisplayLabelContext,
+  isPartnerSalaryApiDescription,
+  isPartnerStatePensionApiDescription,
+} from 'src/app/shared/utils/income-display-label';
+import { formatSavingPotSelectLabel } from 'src/app/shared/utils/saving-pot-select-label';
 
 @Component({
   selector: 'app-scenario-lab',
@@ -103,7 +110,6 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
   scenarioForm: FormGroup;
   hasShortfall = false;
   firstShortfallAge: number | null = null;
-  isSimulating = false;
 
   baselineReport: ChartSeries | null = null;
   displayedReport: ChartSeries | null = null;
@@ -144,12 +150,57 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
     );
   }
 
+  get hasPartner(): boolean {
+    return !!this.client?.partnerDetail;
+  }
+
+  get incomeDisplayLabelContext(): IncomeDisplayLabelContext {
+    return {
+      hasPartner: this.hasPartner,
+      clientFirstName: this.clientFirstName,
+      partnerFirstName: this.partnerFirstName,
+    };
+  }
+
+  getSavingPotSelectLabel(pot: ClientSaving): string {
+    return formatSavingPotSelectLabel(
+      { name: pot.name, ownership: pot.ownership },
+      this.client,
+      this.translate,
+    );
+  }
+
   goalItems: ClientEvent[] = [];
   savingPotItems: ClientSaving[] = [];
   incomeItems: FinancialViewModel[] = [];
   expenseItems: FinancialViewModel[] = [];
 
-  editedGoals: Array<{ name: string; item: ClientEvent }> = [];
+  /** Dropdown options excluding items already in the edited list (same keys as chip `name`). */
+  get availableGoalItems(): ClientEvent[] {
+    const edited = new Set(this.editedGoals.map((e) => e.name));
+    return this.goalItems.filter((g) => !edited.has(g.name));
+  }
+
+  get availableSavingPotItems(): ClientSaving[] {
+    const edited = new Set(this.editedSavingPots.map((e) => e.name));
+    return this.savingPotItems.filter((p) => !edited.has(p.name));
+  }
+
+  get availableIncomeItems(): FinancialViewModel[] {
+    const edited = new Set(this.editedIncomes.map((e) => e.name));
+    return this.incomeItems.filter(
+      (i) => i.description != null && !edited.has(i.description),
+    );
+  }
+
+  get availableExpenseItems(): FinancialViewModel[] {
+    const edited = new Set(this.editedExpenses.map((e) => e.name));
+    return this.expenseItems.filter(
+      (e) => e.description != null && !edited.has(e.description),
+    );
+  }
+
+  editedGoals: Array<{ name: string; item: ClientEvent | ClientEvent[] }> = [];
   editedSavingPots: Array<{ name: string; item: ClientSaving }> = [];
   editedIncomes: Array<{ name: string; item: FinancialViewModel }> = [];
   editedExpenses: Array<{ name: string; item: FinancialViewModel }> = [];
@@ -199,6 +250,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.navItemService.currentRouteName = 'Scenario Lab';
+    this.setupScenarioFormAutoRefresh();
 
     this.settingsService.userData$
       .pipe(
@@ -251,8 +303,8 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
             this.baselineForecastStartDate = timeline?.forecastStartDate
               ? new Date(timeline.forecastStartDate)
               : null;
-            this.populateCategoryItems();
             this.initFormFromPlan();
+            this.populateCategoryItems();
             this.baselineForecastEndDate = this.getMaxForecastEndDate();
           },
         ),
@@ -300,11 +352,30 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
       (i) => i.isDefault,
     );
     const allIncomes = this.incomeExpenseData?.incomes ?? [];
+    const hasPartner = this.hasPartner;
+    const cName = this.clientFirstName || 'Client';
+    const pName = this.partnerFirstName || 'Partner';
     const types: string[] = [];
-    if (!defaultIncomes.find((x) => x.description === 'Salary'))
-      types.push('Salary');
-    if (!defaultIncomes.find((x) => x.description === 'State pension'))
-      types.push('State pension');
+    if (!defaultIncomes.find((x) => x.description === 'Salary')) {
+      types.push(hasPartner ? `Salary ${cName}` : 'Salary');
+    }
+    if (
+      hasPartner &&
+      !defaultIncomes.find((x) => isPartnerSalaryApiDescription(x.description))
+    ) {
+      types.push(`Salary ${pName}`);
+    }
+    if (!defaultIncomes.find((x) => x.description === 'State pension')) {
+      types.push(hasPartner ? `State pension ${cName}` : 'State pension');
+    }
+    if (
+      hasPartner &&
+      !defaultIncomes.find((x) =>
+        isPartnerStatePensionApiDescription(x.description),
+      )
+    ) {
+      types.push(`State pension ${pName}`);
+    }
     if (!allIncomes.find((x) => x.description === 'Rental income'))
       types.push('Rental income');
     types.push('Custom');
@@ -434,6 +505,10 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
     return new Date(endYear, 11, 31);
   }
 
+  private getPlanEndYearForScenarioLab(): number {
+    return this.getMaxForecastEndDate().getFullYear();
+  }
+
   private buildScenarioPayload(): ReportScenarioPayload | null {
     if (!this.financialTimeline || !this.client) return null;
     const forecastEndDate = this.getMaxForecastEndDate();
@@ -448,6 +523,15 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
       InflationRate: inflationRate,
     };
 
+    if (this.hasRetirementAge) {
+      const ra = Number(this.scenarioForm.get('retirementAge')?.value);
+      if (Number.isFinite(ra)) payload.ClientRetirementAge = ra;
+    }
+    if (this.hasPartnerRetirementAge && this.scenarioForm.get('partnerRetirementAge')) {
+      const pra = Number(this.scenarioForm.get('partnerRetirementAge')?.value);
+      if (Number.isFinite(pra)) payload.PartnerRetirementAge = pra;
+    }
+
     if (this.editedIncomes.length) {
       payload.IncomeOverrides = this.editedIncomes.map((e) =>
         this.toFinancialRecordLineItem(e.item),
@@ -459,7 +543,92 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
       );
     }
 
+    const clientEventOverrides = this.collectClientEventOverrides();
+    if (clientEventOverrides.length) {
+      payload.ClientEventOverrides = clientEventOverrides;
+    }
+
+    if (this.editedSavingPots.length) {
+      const potOverrides = this.editedSavingPots
+        .map(e => e.item)
+        .filter((p): p is ClientSaving => !!p?.id)
+        .map(p => ({
+          SavingPotId: p.id as string,
+          ReturnRate: p.returnRate,
+          StartingPotAmount: p.startingPotValue?.amount,
+        }));
+      if (potOverrides.length) {
+        payload.SavingPotReturnOverrides = potOverrides;
+      }
+    }
+
     return payload;
+  }
+
+  /** Flattens goal edits (single event or financing arrays) for the scenario API */
+  private collectClientEventOverrides(): ClientEvent[] {
+    const out: ClientEvent[] = [];
+    for (const g of this.editedGoals) {
+      const item = g.item;
+      if (Array.isArray(item)) {
+        out.push(...item);
+      } else if (item) {
+        out.push(item);
+      }
+    }
+    return out;
+  }
+
+  /** Income + expense lines for timeline dialogs (ids for Home / financing monthly + resale rows). */
+  private getFinancialRecordsForEventDialogs(): FinancialRecordLineItem[] {
+    const incomes = this.incomeExpenseData?.incomes ?? [];
+    const expenses = this.incomeExpenseData?.expenses ?? [];
+    return [...incomes, ...expenses] as unknown as FinancialRecordLineItem[];
+  }
+
+  /**
+   * Recomputes the scenario chart from current form + edits.
+   * @param showSuccessToast reserved for optional success feedback (auto-refresh passes false)
+   */
+  private runScenarioUpdate(showSuccessToast: boolean): void {
+    if (!this.financialTimeline || !this.client || !this.baselineReport) return;
+
+    this.loadScenarioReport()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((report) => {
+        if (report) {
+          this.injectTimelineEvents(report);
+          this.report = report;
+          this.alignSeriesStructure();
+          this.hasSimulated = true;
+          this.activeTab = 'after';
+          this.displayedReport = {
+            ...report,
+            series: report.series.map(s => ({ ...s, data: [...s.data] })),
+          };
+          this.updateScenarioForecastEndDateIfNeeded();
+          this.getShortfallStatus(report);
+          if (showSuccessToast) {
+            this.toastr.success(this.translate.instant('TOAST.SCENARIO_SIMULATED'));
+          }
+        } else if (showSuccessToast) {
+          this.toastr.warning(this.translate.instant('ERROR.NO_SCENARIO_DATA'));
+        }
+      });
+  }
+
+  private setupScenarioFormAutoRefresh(): void {
+    this.scenarioForm.valueChanges
+      .pipe(
+        debounceTime(450),
+        distinctUntilChanged(
+          (a, b) => JSON.stringify(a) === JSON.stringify(b),
+        ),
+        takeUntil(this.destroy$),
+      )
+      .subscribe(() => {
+        this.runScenarioUpdate(false);
+      });
   }
 
   private toFinancialRecordLineItem(vm: FinancialViewModel): any {
@@ -490,39 +659,6 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
           return of(null);
         }),
       );
-  }
-
-  private applyScenario(): void {
-    this.isSimulating = true;
-    this.loadScenarioReport()
-      .pipe(
-        takeUntil(this.destroy$),
-        finalize(() => {
-          this.isSimulating = false;
-        }),
-      )
-      .subscribe((report) => {
-        if (report) {
-          this.injectTimelineEvents(report);
-          this.report = report;
-          this.alignSeriesStructure();
-          this.hasSimulated = true;
-          this.activeTab = 'after';
-          // Spread creates a fresh reference so Angular and ng-apexcharts
-          // always detect the change, even if series structure is identical.
-          this.displayedReport = {
-            ...report,
-            series: report.series.map((s) => ({ ...s, data: [...s.data] })),
-          };
-          this.updateScenarioForecastEndDateIfNeeded();
-          this.getShortfallStatus(report);
-          this.toastr.success(
-            this.translate.instant('TOAST.SCENARIO_SIMULATED'),
-          );
-        } else {
-          this.toastr.warning(this.translate.instant('ERROR.NO_SCENARIO_DATA'));
-        }
-      });
   }
 
   switchTab(tab: 'before' | 'after'): void {
@@ -675,10 +811,6 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
     this.router.navigate(['/cashflows', this.cashflowId, 'reports']);
   }
 
-  onSimulate(): void {
-    if (this.financialTimeline && this.client) this.applyScenario();
-  }
-
   getRetirementAge(): number {
     return Number(this.scenarioForm.get('retirementAge')?.value) || 65;
   }
@@ -737,7 +869,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
         })),
         isEditWorkflow: true,
         patchEvent: event,
-        financialRecords: [],
+        financialRecords: this.getFinancialRecordsForEventDialogs(),
         scenarioMode: true,
       },
     });
@@ -758,6 +890,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
             item: result.scenarioItem,
           });
         }
+        this.runScenarioUpdate(false);
       }
     });
   }
@@ -822,6 +955,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
             item: result.scenarioItem,
           });
         }
+        this.runScenarioUpdate(false);
       }
     });
   }
@@ -840,7 +974,9 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
           (a, b) => a.start.age - b.start.age,
         ),
         clientBirthDate: this.client.clientDetails.birthDate,
+        partnerBirthDate: this.client.partnerDetail?.birthDate,
         clientPreferredCurrency: this.client.clientDetails.preferredCurrency,
+        clientCountryCode: this.client.clientDetails?.country,
         cashflowId: this.cashflowId,
         selectedIncome: income,
         isEditWorkflow: true,
@@ -850,7 +986,15 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
         forecastStartDateYear: moment(
           this.financialTimeline.forecastStartDate,
         ).year(),
+        planEndYear: this.getPlanEndYearForScenarioLab(),
         incomeType: this.buildIncomeTypes(),
+        incomes: this.incomeExpenseData?.incomes ?? [],
+        clientSavings: this.savingPots?.clientSavings ?? [],
+        existingContributions: [],
+        clientFirstName: this.clientFirstName,
+        partnerFirstName: this.partnerFirstName,
+        hasPartner: this.hasPartner,
+        selectedClient: this.client,
         scenarioMode: true,
       },
     });
@@ -871,6 +1015,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
             item: result.scenarioItem,
           });
         }
+        this.runScenarioUpdate(false);
       }
     });
   }
@@ -920,6 +1065,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
             item: result.scenarioItem,
           });
         }
+        this.runScenarioUpdate(false);
       }
     });
   }
@@ -936,7 +1082,12 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
     };
     const list = listMap[category];
     const idx = list.findIndex((e) => e.name === name);
-    if (idx >= 0) list.splice(idx, 1);
+    if (idx >= 0) {
+      list.splice(idx, 1);
+      if (this.baselineReport) {
+        this.runScenarioUpdate(false);
+      }
+    }
   }
 
   private refreshData(): void {
@@ -1003,6 +1154,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
               this.toastr.error(
                 err?.error?.message ||
                   this.translate.instant('ERROR.FAILED_CREATE_PLAN_SCENARIO'),
+                this.translate.instant('LABEL.ERROR'),
               );
               return of(null);
             }),
@@ -1012,6 +1164,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
             if (newPlan) {
               this.toastr.success(
                 this.translate.instant('TOAST.PLAN_CREATED_FROM_SCENARIO'),
+                this.translate.instant('LABEL.SUCCESS'),
               );
               this.router.navigate(['/cashflows', newPlan.id, 'reports']);
             }

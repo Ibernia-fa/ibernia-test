@@ -1,21 +1,27 @@
-import { Component, Inject } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  Inject,
+  OnDestroy,
+  ViewChild,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
+import { MatSelect, MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ToastrService } from 'ngx-toastr';
 import { LegacyHttpService } from '../services/legacy-http.service';
 import { FamilyRole, FamilyMemberModel } from '../models/legacy.model';
 
 interface RoleOption {
   value: FamilyRole;
-  label: string;
-  disabled: boolean;
+  labelKey: string;
+  labelParams?: Record<string, string>;
 }
 
 @Component({
@@ -35,15 +41,20 @@ interface RoleOption {
   templateUrl: './add-member.component.html',
   styleUrl: './add-member.component.scss'
 })
-export class AddMemberComponent {
+export class AddMemberComponent implements AfterViewInit, OnDestroy {
+  @ViewChild('roleSelect') roleSelect?: MatSelect;
+
   form: FormGroup;
   roleOptions: RoleOption[] = [];
   isSaving = false;
+
+  private rolePanelOpenTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
     private fb: FormBuilder,
     private legacyHttp: LegacyHttpService,
     private toastr: ToastrService,
+    private translate: TranslateService,
     private dialogRef: MatDialogRef<AddMemberComponent>,
     @Inject(MAT_DIALOG_DATA) public data: {
       cashflowId: string;
@@ -61,6 +72,20 @@ export class AddMemberComponent {
     this.buildRoleOptions();
   }
 
+  ngAfterViewInit(): void {
+    // Defer until after the dialog enter animation so the overlay positions correctly
+    this.rolePanelOpenTimer = setTimeout(() => {
+      this.rolePanelOpenTimer = null;
+      this.roleSelect?.open();
+    }, 200);
+  }
+
+  ngOnDestroy(): void {
+    if (this.rolePanelOpenTimer != null) {
+      clearTimeout(this.rolePanelOpenTimer);
+    }
+  }
+
   private buildRoleOptions(): void {
     const existing = this.data.existingMembers;
     const hasPartnerMember = existing.some(m => m.role === 'Partner');
@@ -70,36 +95,63 @@ export class AddMemberComponent {
     const hasPartnerMother = existing.some(m => m.role === 'PartnerMother');
 
     const hasPartner = this.data.hasPartner || hasPartnerMember;
-    const clientName = this.data.clientFirstName || 'Client';
-    const partnerName = this.data.partnerFirstName || 'Partner';
+    const clientName = this.data.clientFirstName ||
+      this.translate.instant('LEGACY.PARENTS_NET_WORTH_MODAL_NAME_FALLBACK_CLIENT');
+    const partnerName = this.data.partnerFirstName ||
+      this.translate.instant('LEGACY.PARENTS_NET_WORTH_MODAL_NAME_FALLBACK_PARTNER');
 
     const roles: RoleOption[] = [
-      { value: FamilyRole.Child, label: 'Child', disabled: false },
-      { value: FamilyRole.Partner, label: 'Partner', disabled: hasPartner },
-      { value: FamilyRole.ClientFather, label: `${clientName}\u2019s father`, disabled: hasClientFather },
-      { value: FamilyRole.ClientMother, label: `${clientName}\u2019s mother`, disabled: hasClientMother },
+      { value: FamilyRole.Child, labelKey: 'LEGACY.RELATIONSHIP_CHILD' },
     ];
 
-    if (hasPartner) {
-      roles.push(
-        { value: FamilyRole.PartnerFather, label: `${partnerName}\u2019s father`, disabled: hasPartnerFather },
-        { value: FamilyRole.PartnerMother, label: `${partnerName}\u2019s mother`, disabled: hasPartnerMother },
-      );
+    if (!hasPartnerMember) {
+      roles.push({ value: FamilyRole.Partner, labelKey: 'LEGACY.RELATIONSHIP_PARTNER' });
+    }
+    if (!hasClientFather) {
+      roles.push({
+        value: FamilyRole.ClientFather,
+        labelKey: 'LEGACY.RELATIONSHIP_FATHER_OF',
+        labelParams: { name: clientName },
+      });
+    }
+    if (!hasClientMother) {
+      roles.push({
+        value: FamilyRole.ClientMother,
+        labelKey: 'LEGACY.RELATIONSHIP_MOTHER_OF',
+        labelParams: { name: clientName },
+      });
     }
 
-    roles.push(
-      { value: FamilyRole.ClientSibling, label: `${clientName}\u2019s sibling`, disabled: false },
-    );
-
     if (hasPartner) {
-      roles.push(
-        { value: FamilyRole.PartnerSibling, label: `${partnerName}\u2019s sibling`, disabled: false },
-      );
+      if (!hasPartnerFather) {
+        roles.push({
+          value: FamilyRole.PartnerFather,
+          labelKey: 'LEGACY.RELATIONSHIP_FATHER_OF',
+          labelParams: { name: partnerName },
+        });
+      }
+      if (!hasPartnerMother) {
+        roles.push({
+          value: FamilyRole.PartnerMother,
+          labelKey: 'LEGACY.RELATIONSHIP_MOTHER_OF',
+          labelParams: { name: partnerName },
+        });
+      }
     }
 
-    roles.push(
-      { value: FamilyRole.Other, label: 'Other', disabled: false },
-    );
+    roles.push({
+      value: FamilyRole.ClientSibling,
+      labelKey: 'LEGACY.RELATIONSHIP_SIBLING_OF',
+      labelParams: { name: clientName },
+    });
+
+    if (hasPartner) {
+      roles.push({
+        value: FamilyRole.PartnerSibling,
+        labelKey: 'LEGACY.RELATIONSHIP_SIBLING_OF',
+        labelParams: { name: partnerName },
+      });
+    }
 
     this.roleOptions = roles;
   }
@@ -116,7 +168,10 @@ export class AddMemberComponent {
     const { name, role } = this.form.value;
 
     if (!this.data.hasPartner && AddMemberComponent.PARTNER_ROLES.has(role)) {
-      this.toastr.error('Cannot add a partner-related member when no partner exists', 'Error');
+      this.toastr.error(
+        this.translate.instant('LEGACY.PARTNER_ROLE_WITHOUT_PARTNER'),
+        this.translate.instant('Error'),
+      );
       return;
     }
 
@@ -128,11 +183,17 @@ export class AddMemberComponent {
       role
     }).subscribe({
       next: (dashboard) => {
-        this.toastr.success('Member added', 'Success');
+        this.toastr.success(
+          this.translate.instant('LEGACY.MEMBER_ADDED'),
+          this.translate.instant('LABEL.SUCCESS'),
+        );
         this.dialogRef.close({ dashboard });
       },
       error: (err) => {
-        this.toastr.error(err?.error?.message || 'Failed to add member', 'Error');
+        this.toastr.error(
+          err?.error?.message || this.translate.instant('LEGACY.MEMBER_ADD_FAILED'),
+          this.translate.instant('Error'),
+        );
         this.isSaving = false;
       }
     });

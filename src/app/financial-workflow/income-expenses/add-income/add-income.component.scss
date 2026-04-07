@@ -82,3 +82,29 @@
     flex-shrink: 0;
   }
 }
+
+/* Inheritance: fixed "One-off" — same shell as Salary `.right .sortby-edit-profile`, no chevron */
+.inheritance-cycle-static {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  min-width: 136px;
+  height: 46px;
+  padding: 0 16px;
+  border-radius: 0 4px 4px 0;
+  border-left: 1px solid #0000001a;
+  background-color: #f5f5f5;
+  cursor: default;
+
+  .inheritance-cycle-label {
+    margin: 0;
+    width: 100%;
+    text-align: left;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 100%;
+    color: #5a596e;
+  }
+}
