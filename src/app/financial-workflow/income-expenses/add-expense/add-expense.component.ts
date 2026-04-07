@@ -180,7 +180,16 @@ export class AddExpenseComponent {
       if (this.selectedExpense.endEventId) {
         this.expenseForm.get('end')?.patchValue('event:' + this.selectedExpense.endEventId);
       } else {
-        this.expenseForm.get('end')?.patchValue(this.selectedExpense.end?.year);
+        let endYear = this.selectedExpense.end?.year;
+        if (
+          (endYear === null || endYear === undefined) &&
+          this.selectedExpense.isDefault &&
+          (this.selectedExpense.description === 'Living costs' ||
+            this.selectedExpense.description === 'Housing')
+        ) {
+          endYear = this.getDefaultEndPlanYear();
+        }
+        this.expenseForm.get('end')?.patchValue(endYear);
       }
       const matchedEscalation = this.escalationRates.find(x => x.value === this.selectedExpense.escalationRate?.value);
 
@@ -593,7 +602,7 @@ export class AddExpenseComponent {
       case 'Living costs':
       case 'Housing':
         startCtrl.setValue(this.currentYear);
-        endCtrl.setValue(this.forecastEndYear);
+        endCtrl.setValue(this.getDefaultEndPlanYear());
         break;
 
       default:
@@ -634,6 +643,15 @@ export class AddExpenseComponent {
       return fallback;
     }
     return new Date().getFullYear();
+  }
+
+  /** Final calendar year in the plan horizon — same as the last year option in start/end dropdowns. */
+  private getDefaultEndPlanYear(): number {
+    const ys = this.years;
+    if (ys.length > 0) {
+      return ys[ys.length - 1];
+    }
+    return this.forecastEndYear;
   }
 
   hasFormChanges(): boolean {
