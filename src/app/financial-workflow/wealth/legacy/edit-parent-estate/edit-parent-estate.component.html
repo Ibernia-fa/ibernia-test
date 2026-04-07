@@ -12,7 +12,7 @@
       disableRipple
       class="dialog-close-btn"
       mat-dialog-close
-      aria-label="Close dialog"
+      [attr.aria-label]="'LEGACY.CLOSE_DIALOG' | translate"
       (click)="onCancel()"
     >
       <mat-icon>close</mat-icon>
@@ -25,7 +25,7 @@
         <mat-label
           class="f-s-16 f-w-500 d-block ibr-black"
           style="line-height: 16px"
-          >Joint net worth</mat-label
+          >{{ 'Joint net worth' | translate }}</mat-label
         >
         <div class="net-field d-flex align-items-center">
           <!-- Currency Display -->

@@ -7,7 +7,7 @@
       disableRipple
       class="dialog-close-btn"
       mat-dialog-close
-      aria-label="Close dialog"
+      [attr.aria-label]="'LEGACY.CLOSE_DIALOG' | translate"
       (click)="onCancel()"
     >
       <mat-icon>close</mat-icon>
@@ -26,12 +26,15 @@
           <div class="w-100 form-field">
             <div class="select-option position-relative">
               <mat-select
+                #roleSelect
                 formControlName="role"
                 class="sortby-edit-profile"
                 hideSingleSelectionIndicator
               >
                 @for (opt of roleOptions; track opt.value) {
-                  <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+                  <mat-option [value]="opt.value">{{
+                    opt.labelKey | translate : opt.labelParams
+                  }}</mat-option>
                 }
               </mat-select>
               <span class="custom-arrow">
