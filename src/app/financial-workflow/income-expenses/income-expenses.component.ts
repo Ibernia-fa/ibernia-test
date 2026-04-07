@@ -299,6 +299,7 @@ export class IncomeExpensesComponent {
         clientFirstName: this.clientFirstName,
         partnerFirstName: this.partnerFirstName,
         hasPartner: this.hasPartner,
+        selectedClient: this.selectedClient,
       },
     });
 
@@ -366,6 +367,7 @@ export class IncomeExpensesComponent {
         clientFirstName: this.clientFirstName,
         partnerFirstName: this.partnerFirstName,
         hasPartner: this.hasPartner,
+        selectedClient: this.selectedClient,
       },
     });
 

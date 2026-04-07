@@ -74,6 +74,7 @@ import {
   isPartnerSalaryApiDescription,
   isPartnerStatePensionApiDescription,
 } from 'src/app/shared/utils/income-display-label';
+import { formatSavingPotSelectLabel } from 'src/app/shared/utils/saving-pot-select-label';
 
 @Component({
   selector: 'app-scenario-lab',
@@ -159,6 +160,14 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
       clientFirstName: this.clientFirstName,
       partnerFirstName: this.partnerFirstName,
     };
+  }
+
+  getSavingPotSelectLabel(pot: ClientSaving): string {
+    return formatSavingPotSelectLabel(
+      { name: pot.name, ownership: pot.ownership },
+      this.client,
+      this.translate,
+    );
   }
 
   goalItems: ClientEvent[] = [];
@@ -985,6 +994,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
         clientFirstName: this.clientFirstName,
         partnerFirstName: this.partnerFirstName,
         hasPartner: this.hasPartner,
+        selectedClient: this.client,
         scenarioMode: true,
       },
     });

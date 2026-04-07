@@ -28,6 +28,8 @@ import { MortgageCalculatorState } from '../mortgage-calculator/mortgage-calcula
 import { MortgageOutput } from '../mortgage-calculator/mortgage-calculator.component';
 import { SettingsService } from 'src/app/default-preferance/services/default-preferance.http.service';
 import { MortgageCalculatorDialogComponent, MortgageCalculatorDialogResult } from '../mortgage-calculator-dialog/mortgage-calculator-dialog.component';
+import { LanguageService } from 'src/app/core/language.service';
+import { formatAppDisplayNumber } from 'src/app/shared/utils/number-utils';
 
 @Component({
   selector: 'app-add-event-dialog',
@@ -191,6 +193,7 @@ export class AddEventDialogComponent {
     private timelineHttpService: TimelineHttpService,
     private cdr: ChangeDetectorRef,
     private settings: SettingsService,
+    private language: LanguageService,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
     this.settings.profileChanged$.pipe(takeUntilDestroyed()).subscribe(() => this.cdr.markForCheck());
@@ -1143,13 +1146,13 @@ export class AddEventDialogComponent {
     setTimeout(() => {
       const el = this.amountInput?.nativeElement;
       if (el) {
-        el.value = Number(output.downPaymentAmount).toLocaleString('en-US');
+        el.value = formatAppDisplayNumber(this.language.current, Number(output.downPaymentAmount));
         el.dispatchEvent(new Event('blur'));
       }
 
       const elMonthly = this.monthlyPayment?.nativeElement;
       if (elMonthly) {
-        elMonthly.value = Number(output.monthlyEMI).toLocaleString('en-US');
+        elMonthly.value = formatAppDisplayNumber(this.language.current, Number(output.monthlyEMI));
         elMonthly.dispatchEvent(new Event('blur'));
       }
     });
@@ -1180,12 +1183,12 @@ export class AddEventDialogComponent {
     setTimeout(() => {
       const el = this.amountInput?.nativeElement;
       if (el) {
-        el.value = Number(output.downPaymentAmount).toLocaleString('en-US');
+        el.value = formatAppDisplayNumber(this.language.current, Number(output.downPaymentAmount));
         el.dispatchEvent(new Event('blur'));
       }
       const elMonthly = this.monthlyPayment?.nativeElement;
       if (elMonthly) {
-        elMonthly.value = Number(output.monthlyEMI).toLocaleString('en-US');
+        elMonthly.value = formatAppDisplayNumber(this.language.current, Number(output.monthlyEMI));
         elMonthly.dispatchEvent(new Event('blur'));
       }
     });

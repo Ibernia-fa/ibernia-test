@@ -20,7 +20,9 @@ import { extractEventId, resolveYear } from 'src/app/shared/utils/event-date-uti
 import { IncomeExpensesHttpService } from '../services/income-expenses-http.service';
 import { WithdrawalsContributionsHttpService } from '../../withdrawals-contributions/services/withdrawals-contributions-http.service';
 import { FundsViewModel } from '../../withdrawals-contributions/model/withdrawals-contributions';
-import { ComissionType } from '../../saving-pots/models/saving-pots.model';
+import { ClientSaving, ComissionType } from '../../saving-pots/models/saving-pots.model';
+import { Client } from 'src/app/clients/models/client';
+import { formatSavingPotSelectLabel } from 'src/app/shared/utils/saving-pot-select-label';
 import { catchError, filter, finalize, switchMap, of, map } from 'rxjs';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -97,9 +99,9 @@ export class AddIncomeComponent {
   isSaving = false;
   scenarioMode: boolean = false;
   /** Full list as provided by parent (may include Cash). */
-  private allSavingPots: Array<{ id: string; name?: string; startingPotValue?: { amount?: number }; contributionAmount?: number }> = [];
+  private allSavingPots: ClientSaving[] = [];
   /** Eligible list for inheritance investing UI (non-cash only). */
-  clientSavings: { id: string; name: string }[] = [];
+  clientSavings: { id: string; name: string; ownership?: number | null }[] = [];
   existingContributions: any[] = [];
   private initialFormSnapshot = '';
   showPersonSelector = false;
@@ -110,6 +112,7 @@ export class AddIncomeComponent {
   private hasPartner = false;
   private clientFirstName = '';
   private partnerFirstName = '';
+  private selectedClient: Client | null = null;
 
   constructor(
     private dialogRef: MatDialogRef<AddIncomeComponent>,
@@ -123,11 +126,16 @@ export class AddIncomeComponent {
     this.scenarioMode = data.scenarioMode ?? false;
     this.incomeTypes = data.incomeType;
     this.eventsList = data.eventsList ?? [];
-    this.allSavingPots = (data.clientSavings ?? []) as Array<{ id: string; name?: string; startingPotValue?: { amount?: number }; contributionAmount?: number }>;
+    this.allSavingPots = (data.clientSavings ?? []) as ClientSaving[];
+    this.selectedClient = data.selectedClient ?? null;
     // Keep the non-cash list for the select, but compute eligibility from the full list (so Cash never qualifies).
     this.clientSavings = this.allSavingPots
       .filter((s) => !this.isCashSavingPotName(s?.name))
-      .map((s) => ({ id: s.id as string, name: (s.name ?? '').toString() }));
+      .map((s) => ({
+        id: s.id as string,
+        name: (s.name ?? '').toString(),
+        ownership: s.ownership,
+      }));
     this.existingContributions = data.existingContributions ?? [];
     this.cycles = data.amountCycles;
     this.escalationRates = data.escalataionRates;
@@ -1373,7 +1381,7 @@ export class AddIncomeComponent {
     }
   }
 
-  private getNonCashSavingsForInheritance(): Array<{ id: string | null; name?: string; startingPotValue?: { amount?: number }; contributionAmount?: number }> {
+  private getNonCashSavingsForInheritance(): ClientSaving[] {
     // Use the full list so changes propagate without relying on the filtered copy.
     return (this.allSavingPots ?? []).filter((s) => !this.isCashSavingPotName(s?.name));
   }
@@ -1386,7 +1394,7 @@ export class AddIncomeComponent {
 
   /** For Pension fund: use contributionAmount as fallback when startingPotValue is 0 (common for new pensions) */
   private getLargestPotForInheritance(
-    pots: Array<{ id: string | null; name?: string; startingPotValue?: { amount?: number }; contributionAmount?: number }>
+    pots: ClientSaving[],
   ): { id: string | null } | null {
     if (!pots.length) return null;
     return pots.reduce((largest, pot) => {
@@ -1396,7 +1404,7 @@ export class AddIncomeComponent {
     });
   }
 
-  private getEffectivePotValueForComparison(pot: { name?: string; startingPotValue?: { amount?: number }; contributionAmount?: number }): number {
+  private getEffectivePotValueForComparison(pot: Pick<ClientSaving, 'name' | 'startingPotValue' | 'contributionAmount'>): number {
     const starting = Number(pot.startingPotValue?.amount ?? 0);
     if (starting > 0) return starting;
     const isPensionFund = (pot.name ?? '').toLowerCase() === 'pension fund';
@@ -1422,6 +1430,17 @@ export class AddIncomeComponent {
 
   private hasEligibleNonCashSavingPot(): boolean {
     return this.getNonCashSavingsForInheritance().some((p) => !!p?.id);
+  }
+
+  getSavingPotSelectLabel(saving: {
+    name: string;
+    ownership?: number | null;
+  }): string {
+    return formatSavingPotSelectLabel(
+      { name: saving.name, ownership: saving.ownership },
+      this.selectedClient,
+      this.translate,
+    );
   }
 
   private isCashSavingPotName(name: unknown): boolean {

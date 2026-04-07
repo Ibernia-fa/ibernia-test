@@ -192,6 +192,7 @@ export class WithdrawalsContributionsComponent {
           forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
           forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
           savingPots: this.savingsPots,
+          selectedClient: this.selectedClient,
           existingContributions:
             this.contributionWithdrawal?.contributions ?? [],
         },
@@ -233,6 +234,7 @@ export class WithdrawalsContributionsComponent {
           forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
           forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
           savingPots: this.savingsPots,
+          selectedClient: this.selectedClient,
           existingWithdrawals: this.contributionWithdrawal?.withdrawals ?? [],
         },
       });
@@ -269,6 +271,7 @@ export class WithdrawalsContributionsComponent {
         forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
         forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
         savingPots: this.savingsPots,
+        selectedClient: this.selectedClient,
         existingContributions: this.contributionWithdrawal?.contributions ?? [],
       },
     });
@@ -299,6 +302,7 @@ export class WithdrawalsContributionsComponent {
         forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
         forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
         savingPots: this.savingsPots,
+        selectedClient: this.selectedClient,
         existingWithdrawals: this.contributionWithdrawal?.withdrawals ?? [],
       },
     });

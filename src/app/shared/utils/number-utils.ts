@@ -1,3 +1,24 @@
+/** BCP 47 locale for number formatting from app language (Ibernia: en | it). */
+export function localeFromAppLanguage(lang: string | undefined): string {
+  return lang === 'it' ? 'it-IT' : 'en-US';
+}
+
+/**
+ * Display options for amounts across the app (ThousandSeparatorPipe, calculator summaries, inputs).
+ * `useGrouping: 'always'` ensures e.g. 1135 → "1.135" in Italian (ICU defaults omit grouping for some 4-digit values).
+ */
+/** `useGrouping: 'always'` is valid in modern runtimes but not yet in ES2022 typings. */
+export const APP_DISPLAY_NUMBER_FORMAT = {
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 2,
+  useGrouping: 'always',
+} as unknown as Intl.NumberFormatOptions;
+
+export function formatAppDisplayNumber(lang: string | undefined, value: number): string {
+  if (!Number.isFinite(value)) return '';
+  return new Intl.NumberFormat(localeFromAppLanguage(lang), APP_DISPLAY_NUMBER_FORMAT).format(value);
+}
+
 export function parseFormattedNumber(raw: string): number {
   if (raw == null) return 0;
 
@@ -60,4 +81,4 @@ export function parseFormattedNumber(raw: string): number {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
-export default { parseFormattedNumber };
+export default { parseFormattedNumber, formatAppDisplayNumber, localeFromAppLanguage };

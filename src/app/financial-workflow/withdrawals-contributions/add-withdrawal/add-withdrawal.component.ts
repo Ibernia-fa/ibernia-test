@@ -24,6 +24,8 @@ import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-sep
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { getAmountCycleLabel } from 'src/app/shared/utils/amount-cycle-label';
 import { extractEventId, resolveYear } from 'src/app/shared/utils/event-date-utils';
+import { Client } from 'src/app/clients/models/client';
+import { formatSavingPotSelectLabel } from 'src/app/shared/utils/saving-pot-select-label';
 
 @Component({
   selector: 'app-add-withdrawal',
@@ -67,6 +69,7 @@ export class AddWithdrawalComponent {
   selectedEscalationDescription: string;
   existingWithdrawals: FundsViewModel[] = [];
   currentYear: number = new Date().getFullYear();
+  selectedClient: Client | null = null;
 
   constructor(
     private dialogRef: MatDialogRef<AddWithdrawalComponent>,
@@ -97,6 +100,7 @@ export class AddWithdrawalComponent {
     this.isEditWorkflow = data.isEditWorkflow;
     this.selectedWithdrawal = data.selectedWithdrawal;
     this.savingPots = data.savingPots;
+    this.selectedClient = data.selectedClient ?? null;
     this.existingWithdrawals = data.existingWithdrawals ?? [];
 
     const availableSavings = (this.savingPots?.clientSavings ?? []).filter(
@@ -199,6 +203,14 @@ export class AddWithdrawalComponent {
   /** i18n key — use with `| translate` in template (sentence case in EN/IT). */
   get dialogTitle(): string {
     return this.isEditWorkflow ? 'Edit withdrawal' : 'Add withdrawal';
+  }
+
+  getSavingPotSelectLabel(saving: ClientSaving): string {
+    return formatSavingPotSelectLabel(
+      { name: saving.name, ownership: saving.ownership },
+      this.selectedClient,
+      this.translate,
+    );
   }
 
   onAmountInput(rawValue: string) {

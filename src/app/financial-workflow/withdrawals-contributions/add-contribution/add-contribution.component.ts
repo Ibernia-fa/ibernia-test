@@ -47,6 +47,8 @@ import {
   resolveYear,
 } from 'src/app/shared/utils/event-date-utils';
 import { MaterialModule } from 'src/app/material.module';
+import { Client } from 'src/app/clients/models/client';
+import { formatSavingPotSelectLabel } from 'src/app/shared/utils/saving-pot-select-label';
 
 @Component({
   selector: 'app-add-contribution',
@@ -96,6 +98,7 @@ export class AddContributionComponent {
   clientSavings: ClientSaving[] = []; // <-- bound in template
   private cashPot?: ClientSaving;
   currentYear: number = new Date().getFullYear();
+  selectedClient: Client | null = null;
 
   constructor(
     private dialogRef: MatDialogRef<AddContributionComponent>,
@@ -125,6 +128,7 @@ export class AddContributionComponent {
     this.isEditWorkflow = data.isEditWorkflow;
     this.selectedContribution = data.selectedContribution;
     this.savingPots = data.savingPots;
+    this.selectedClient = data.selectedClient ?? null;
     this.existingContributions = data.existingContributions ?? [];
 
     // keep originals and find Cash pot
@@ -420,6 +424,14 @@ export class AddContributionComponent {
         this.contributionForm.get('savingPot')?.setValue(null);
       }
     }
+  }
+
+  getSavingPotSelectLabel(saving: ClientSaving): string {
+    return formatSavingPotSelectLabel(
+      { name: saving.name, ownership: saving.ownership },
+      this.selectedClient,
+      this.translate,
+    );
   }
 
   //   private applySavingPotFilter(): void {
