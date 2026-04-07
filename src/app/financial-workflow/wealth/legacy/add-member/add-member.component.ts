@@ -15,7 +15,6 @@ import { FamilyRole, FamilyMemberModel } from '../models/legacy.model';
 interface RoleOption {
   value: FamilyRole;
   label: string;
-  disabled: boolean;
 }
 
 @Component({
@@ -74,32 +73,33 @@ export class AddMemberComponent {
     const partnerName = this.data.partnerFirstName || 'Partner';
 
     const roles: RoleOption[] = [
-      { value: FamilyRole.Child, label: 'Child', disabled: false },
-      { value: FamilyRole.Partner, label: 'Partner', disabled: hasPartner },
-      { value: FamilyRole.ClientFather, label: `${clientName}\u2019s father`, disabled: hasClientFather },
-      { value: FamilyRole.ClientMother, label: `${clientName}\u2019s mother`, disabled: hasClientMother },
+      { value: FamilyRole.Child, label: 'Child' },
     ];
 
-    if (hasPartner) {
-      roles.push(
-        { value: FamilyRole.PartnerFather, label: `${partnerName}\u2019s father`, disabled: hasPartnerFather },
-        { value: FamilyRole.PartnerMother, label: `${partnerName}\u2019s mother`, disabled: hasPartnerMother },
-      );
+    if (!hasPartnerMember) {
+      roles.push({ value: FamilyRole.Partner, label: 'Partner' });
+    }
+    if (!hasClientFather) {
+      roles.push({ value: FamilyRole.ClientFather, label: `${clientName}\u2019s father` });
+    }
+    if (!hasClientMother) {
+      roles.push({ value: FamilyRole.ClientMother, label: `${clientName}\u2019s mother` });
     }
 
-    roles.push(
-      { value: FamilyRole.ClientSibling, label: `${clientName}\u2019s sibling`, disabled: false },
-    );
-
     if (hasPartner) {
-      roles.push(
-        { value: FamilyRole.PartnerSibling, label: `${partnerName}\u2019s sibling`, disabled: false },
-      );
+      if (!hasPartnerFather) {
+        roles.push({ value: FamilyRole.PartnerFather, label: `${partnerName}\u2019s father` });
+      }
+      if (!hasPartnerMother) {
+        roles.push({ value: FamilyRole.PartnerMother, label: `${partnerName}\u2019s mother` });
+      }
     }
 
-    roles.push(
-      { value: FamilyRole.Other, label: 'Other', disabled: false },
-    );
+    roles.push({ value: FamilyRole.ClientSibling, label: `${clientName}\u2019s sibling` });
+
+    if (hasPartner) {
+      roles.push({ value: FamilyRole.PartnerSibling, label: `${partnerName}\u2019s sibling` });
+    }
 
     this.roleOptions = roles;
   }
