@@ -520,7 +520,11 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
       const potOverrides = this.editedSavingPots
         .map(e => e.item)
         .filter((p): p is ClientSaving => !!p?.id)
-        .map(p => ({ SavingPotId: p.id as string, ReturnRate: p.returnRate }));
+        .map(p => ({
+          SavingPotId: p.id as string,
+          ReturnRate: p.returnRate,
+          StartingPotAmount: p.startingPotValue?.amount,
+        }));
       if (potOverrides.length) {
         payload.SavingPotReturnOverrides = potOverrides;
       }
