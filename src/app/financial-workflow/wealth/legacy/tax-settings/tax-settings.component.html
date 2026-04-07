@@ -7,7 +7,7 @@
       disableRipple
       class="dialog-close-btn"
       mat-dialog-close
-      aria-label="Close dialog"
+      [attr.aria-label]="'LEGACY.CLOSE_DIALOG' | translate"
       (click)="onCancel()"
     >
       <mat-icon>close</mat-icon>
