@@ -161,6 +161,10 @@ export class AppNavItemComponent implements OnChanges {
   }
 
   onItemSelected(item: NavItem) {
+    if (item.nonNavigable) {
+      return;
+    }
+
     if (!item.children || !item.children.length) {
       var newRoute = item.route;
 
