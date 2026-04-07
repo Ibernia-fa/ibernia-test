@@ -119,10 +119,17 @@ export class AddModelDialogComponent {
           return res;
         }),
         catchError((err) => {
-          if (err.error)
-            this.toaster.error(err.error);
-          else
-            this.toaster.error('An error occurred while creating plan');
+          const title = this.translate.instant('LABEL.ERROR');
+          const fallback = this.translate.instant('ERROR.PLAN_CREATE_FAILED');
+          let msg = fallback;
+          if (typeof err?.error === 'string' && err.error.trim()) {
+            msg = err.error;
+          } else if (typeof err?.error?.message === 'string' && err.error.message.trim()) {
+            msg = err.error.message;
+          } else if (typeof err?.message === 'string' && err.message.trim()) {
+            msg = err.message;
+          }
+          this.toaster.error(msg, title);
           this.isLoading = false;
           console.error("An error occurred while creating cashflow", err);
           throw err;
@@ -130,7 +137,10 @@ export class AddModelDialogComponent {
       ).subscribe((res) => {
         this.isLoading = false;
         console.log("Cashflow created successfully", res);
-        this.toaster.success('Plan Created Successfully');
+        this.toaster.success(
+          this.translate.instant('TOAST.PLAN_CREATED_SUCCESSFULLY'),
+          this.translate.instant('LABEL.SUCCESS'),
+        );
         this.dialogRef.close();
         this.router.navigate([`cashflows/${res.id}/timeline`]);
       });
