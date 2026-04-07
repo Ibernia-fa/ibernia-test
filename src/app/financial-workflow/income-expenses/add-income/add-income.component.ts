@@ -508,6 +508,8 @@ export class AddIncomeComponent {
         this.updateSalaryRetirementDefaults(false);
       } else if (isPartnerStatePensionApiDescription(descSubmit)) {
         this.updateSalaryRetirementDefaults(true);
+      } else if (descSubmit === 'Inheritance') {
+        this.applyBirthDateContextForSalaryPerson(false);
       }
 
       const isSalary = isSalaryTypeForBonus(
@@ -1019,10 +1021,14 @@ export class AddIncomeComponent {
       startCtrl.setValue(this.retirementYear);
       endCtrl.setValue(this.forecastEndYear);
     } else if (incomeType === 'Inheritance') {
+      // Inheritance always reflects the main client for age/date defaults and persisted ages.
+      this.applyBirthDateContextForSalaryPerson(false);
+      const inheritanceYear = this.getDefaultInheritanceStartYear();
+      this.ensureYearInSelectableYears(inheritanceYear);
       if (!this.isEditWorkflow) {
-        startCtrl.setValue(this.currentYear);
+        startCtrl.setValue(inheritanceYear);
       }
-      endCtrl.setValue(this.currentYear);
+      endCtrl.setValue(inheritanceYear);
     } else {
       if (!this.isEditWorkflow) {
         startCtrl.reset();
@@ -1048,6 +1054,51 @@ export class AddIncomeComponent {
       return fallback;
     }
     return new Date().getFullYear();
+  }
+
+  /**
+   * Default one-off year for new Inheritance income (main client only):
+   * under 60 → calendar year when client turns 65; 60+ → five years after plan reference year.
+   * If birth date is missing/invalid, fall back to reference year + 5.
+   */
+  private getDefaultInheritanceStartYear(): number {
+    const forecastStartYear = Number(this.data?.forecastStartDateYear);
+    const refYear =
+      Number.isFinite(forecastStartYear) && forecastStartYear > 0
+        ? forecastStartYear
+        : this.currentYear;
+
+    const clientBd = this.data?.clientBirthDate;
+    if (!clientBd || !moment(clientBd).isValid()) {
+      return refYear + 5;
+    }
+
+    let birthYear = moment(clientBd).year();
+    const birthDate = new Date(clientBd);
+    const forecastStart = new Date(refYear, 0, 1);
+    let age = forecastStart.getFullYear() - birthDate.getFullYear();
+    const monthDiff = forecastStart.getMonth() - birthDate.getMonth();
+    const dayDiff = forecastStart.getDate() - birthDate.getDate();
+    if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+      age--;
+    }
+    if (refYear - birthYear > age) {
+      birthYear = birthYear + 1;
+    }
+
+    if (age < 60) {
+      return birthYear + 65;
+    }
+    return refYear + 5;
+  }
+
+  /** Ensures the mat-select can bind and display the computed default year. */
+  private ensureYearInSelectableYears(year: number): void {
+    if (!Number.isFinite(year)) return;
+    if (!this.years.includes(year)) {
+      this.years.push(year);
+      this.years.sort((a, b) => a - b);
+    }
   }
 
   onBonusAmountInput(rawValue: string) {
