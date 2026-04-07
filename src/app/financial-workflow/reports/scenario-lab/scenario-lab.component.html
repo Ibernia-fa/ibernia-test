@@ -135,58 +135,12 @@
                   {{ "Scenario assumptions" | translate }}
                 </h3>
                 <div class="assumptions-actions">
-                  <!-- mat-flat-button
-                  color="primary"
-                  class="simulate-btn" -->
-                  <!-- mat-stroked-button -->
                   <button
                     type="button"
                     class="button-icon-outline"
                     (click)="onCreatePlanFromScenario()"
                   >
                     <span>{{ "Create plan from scenario" | translate }}</span>
-                  </button>
-                  <button
-                    type="button"
-                    class="button-icon"
-                    (click)="onSimulate()"
-                    [disabled]="isSimulating"
-                  >
-                    @if (isSimulating) {
-                      <mat-spinner
-                        diameter="18"
-                        class="simulate-spinner"
-                      ></mat-spinner>
-                    } @else {
-                      <!-- <span class="play-badge" aria-hidden="true">
-                        <svg
-                          width="14"
-                          height="14"
-                          viewBox="0 0 24 24"
-                          fill="currentColor"
-                        >
-                          <path d="M8 5v14l11-7z" />
-                        </svg>
-                      </span> -->
-
-                      <svg
-                        width="12"
-                        height="14"
-                        viewBox="0 0 12 14"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M0.694336 0.695312L10.4166 6.94531L0.694336 13.1953V0.695312Z"
-                          fill="white"
-                          stroke="white"
-                          stroke-width="1.38889"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        />
-                      </svg>
-                    }
-                    <span>{{ "Simulate scenario" | translate }}</span>
                   </button>
                 </div>
               </div>
