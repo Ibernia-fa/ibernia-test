@@ -15,7 +15,7 @@
                     +{{ currency | currencySymbol
                     }}{{
                       currentYearIncomeSummary.totalIncome | thousandSeparator
-                    }}
+                    }}<span>/{{ "INCOME_EXPENSE.FREQUENCY.YEAR" | translate }}</span>
                   </h3>
                 </div>
 
@@ -486,7 +486,7 @@
                     -{{ currency | currencySymbol
                     }}{{
                       currentYearIncomeSummary.totalExpenses | thousandSeparator
-                    }}
+                    }}<span>/{{ "INCOME_EXPENSE.FREQUENCY.YEAR" | translate }}</span>
                   </h3>
                 </div>
 
