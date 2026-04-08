@@ -11,7 +11,7 @@
 
     <!-- Modal Body  -->
     <mat-dialog-content>
-      <div class="d-flex flex-column gap-20">
+      <div [formGroup]="incomeForm" class="d-flex flex-column gap-20">
         <!-- >{{ 'Description' | translate }}< Field  -->
         <div class="w-100 form-field gap-12">
           <mat-label class="f-s-16 d-block" style="line-height: 18px">>{{ 'Description' | translate }}<</mat-label>
@@ -58,7 +58,7 @@
               <input
                 matInput
                 type="text"
-                [value]="(data?.selectedIncome?.amount?.amount ?? 0) | thousandSeparator"
+                formControlName="amount"
                 thousandSeparatorInput
                 (input)="onAmountInput($event.target.value)"
               
