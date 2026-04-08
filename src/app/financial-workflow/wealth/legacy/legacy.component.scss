@@ -135,6 +135,30 @@ $line-w: 2px;
   > .tree-node {
     flex: 1;
     min-width: 0;
+    padding: 0;
+    &:hover {
+      background: transparent;
+    }
+  }
+}
+
+.node-inner {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  position: relative;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background: rgba(99, 102, 241, 0.05);
+
+    .node-remove {
+      display: flex;
+    }
   }
 }
 
@@ -157,6 +181,14 @@ $line-w: 2px;
   color: #fe9614;
   cursor: pointer;
   white-space: nowrap;
+
+  &.client-estate {
+    color: #2234c2;
+  }
+
+  &.partner-estate {
+    color: #ee6700;
+  }
   display: flex;
   align-items: center;
   gap: 4px;
@@ -313,9 +345,11 @@ $line-w: 2px;
   gap: 4px;
   cursor: pointer;
   position: relative;
-  padding: 8px 12px;
+  padding: 0px 12px;
   border-radius: 12px;
-  transition: background-color 0.2s ease, opacity 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    opacity 0.2s ease;
   min-width: 80px;
 
   &:hover {
@@ -438,7 +472,7 @@ $line-w: 2px;
   font-weight: 500;
   color: #1c1c1c;
   text-align: center;
-  max-width: 128px;
+  max-width: 112px;
   // white-space: nowrap;
   // overflow: hidden;
   // text-overflow: ellipsis;
