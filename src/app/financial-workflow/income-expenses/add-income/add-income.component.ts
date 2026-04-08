@@ -45,6 +45,11 @@ import {
   isPartnerStatePensionApiDescription,
   isSalaryTypeForBonus,
 } from 'src/app/shared/utils/income-display-label';
+import {
+  annualEquivalentForIncomeCycle,
+  findSalaryIncomeForStatePensionRow,
+  roundPercentOf,
+} from 'src/app/shared/utils/state-pension-salary-utils';
 
 @Component({
   selector: 'app-add-income',
@@ -818,6 +823,40 @@ export class AddIncomeComponent {
     };
   }
 
+  /** Whole percent of salary (annualized); null when not applicable or data is insufficient. */
+  get statePensionSalaryPctHint(): number | null {
+    const desc = this.incomeForm.get('description')?.value;
+    if (
+      !isClientStatePensionApiDescription(desc) &&
+      !isPartnerStatePensionApiDescription(desc)
+    ) {
+      return null;
+    }
+
+    const salary = findSalaryIncomeForStatePensionRow(this.data?.incomes, desc);
+    if (!salary) return null;
+
+    const salaryAnnual = annualEquivalentForIncomeCycle(
+      Number(salary.amount?.amount ?? 0),
+      salary.amount?.cycle?.description,
+    );
+    if (salaryAnnual == null || !(salaryAnnual > 0)) return null;
+
+    const cycleId = this.incomeForm.get('cycle')?.value;
+    const pensionCycle = this.cycles.find((c) => c.id === cycleId);
+    const rawAmount = this.incomeForm.get('amount')?.value;
+    const pensionNum =
+      rawAmount === '' || rawAmount === null || rawAmount === undefined
+        ? NaN
+        : Number(rawAmount);
+    if (!Number.isFinite(pensionNum)) return null;
+
+    const pensionAnnual = annualEquivalentForIncomeCycle(pensionNum, pensionCycle?.description);
+    if (pensionAnnual == null) return null;
+
+    return roundPercentOf(pensionAnnual, salaryAnnual);
+  }
+
   isFormSalaryForBonus(): boolean {
     return isSalaryTypeForBonus(this.incomeForm.get('description')?.value);
   }
@@ -1052,11 +1091,8 @@ export class AddIncomeComponent {
     const existing = amountCtrl.value;
     if (existing !== '' && existing !== null && existing !== undefined && Number(existing) > 0) return;
 
-    const isPartner = isPartnerStatePensionApiDescription(apiDesc);
-    const salaryDesc = isPartner ? 'Salary (Partner)' : 'Salary';
-
     const incomes: FinancialViewModel[] = (this.data?.incomes ?? []) as FinancialViewModel[];
-    const salary = incomes.find((i) => (i?.description ?? '') === salaryDesc);
+    const salary = findSalaryIncomeForStatePensionRow(incomes, apiDesc);
     const salaryAmount = Number(salary?.amount?.amount ?? 0);
     if (!(salaryAmount > 0)) return;
 

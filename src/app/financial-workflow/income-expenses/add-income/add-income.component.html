@@ -226,6 +226,12 @@
                 </div>
               }
             </div>
+            @if (statePensionSalaryPctHint !== null) {
+              <span class="return-rate">{{
+                "INCOME_EXPENSE.STATE_PENSION_PCT_OF_SALARY"
+                  | translate : { pct: statePensionSalaryPctHint }
+              }}</span>
+            }
             @if (
               incomeForm.get("amount")?.touched &&
               (incomeForm.get("amount")?.hasError("required") ||
