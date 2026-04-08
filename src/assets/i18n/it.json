@@ -730,6 +730,7 @@
   "INCOME_EXPENSE.FREQUENCY.MONTH": "mese",
   "INCOME_EXPENSE.FREQUENCY.YEAR": "anno",
   "INCOME_EXPENSE.FREQUENCY.ONE_OFF": "una volta",
+  "INCOME_EXPENSE.STATE_PENSION_PCT_OF_SALARY": "{{pct}}% dello stipendio",
   "SAVINGS_POT.REAL_RETURN_HINT": "Rendimento reale: {{real}}% (già al netto di inflazione al {{inflation}}%)",
   "SCHOOL.INFLATION_TITLE": "Inflazione",
   "SCHOOL.INFLATION_SUBTITLE": "Come i prezzi aumentano nel tempo",
