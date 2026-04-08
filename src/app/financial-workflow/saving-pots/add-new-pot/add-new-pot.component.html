@@ -548,7 +548,7 @@
                             >
                           }
                           <hr />
-                          @for (year of years; let i = $index; track year) {
+                          @for (year of years; track year) {
                             @if (year === retirementAge) {
                               <mat-option [value]="year"
                                 >{{ "Retirement age" | translate }} ({{
@@ -557,7 +557,7 @@
                               >
                             } @else {
                               <mat-option [value]="year"
-                                >{{ year }} ({{ clientAge + i }})</mat-option
+                                >{{ year }} ({{ getAgeForYear(year) }})</mat-option
                               >
                             }
                           }
@@ -621,7 +621,7 @@
                             } @else {
                               <mat-option [value]="year"
                                 >{{ year }} ({{
-                                  year - clientBirthYear
+                                  getAgeForYear(year)
                                 }})</mat-option
                               >
                             }
@@ -731,9 +731,9 @@
                                 >
                               }
                               <hr />
-                              @for (year of years; let i = $index; track year) {
+                              @for (year of years; track year) {
                                 <mat-option [value]="year"
-                                  >{{ year }} ({{ clientAge + i }})</mat-option
+                                  >{{ year }} ({{ getAgeForYear(year) }})</mat-option
                                 >
                               }
                             </mat-select>
@@ -798,7 +798,7 @@
                               @for (year of getLockEndYears(); track year) {
                                 <mat-option [value]="year"
                                   >{{ year }} ({{
-                                    year - clientBirthYear
+                                    getAgeForYear(year)
                                   }})</mat-option
                                 >
                               }

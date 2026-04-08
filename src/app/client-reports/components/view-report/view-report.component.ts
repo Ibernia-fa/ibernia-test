@@ -27,6 +27,7 @@ import { TranslateIncomeExpenseLabelPipe } from 'src/app/core/pipes/translate-in
 import { IncomeDisplayLabelContext } from 'src/app/shared/utils/income-display-label';
 import { ClientEmergency, EmergenciesLookupData } from '../../models/financial-series.model';
 import { ChartSeries } from 'src/app/financial-workflow/reports/models/charts-series.model';
+import { getProjectionColumnAgeLabel } from 'src/app/shared/utils/client-age-at-reference';
 
 @Component({
   selector: 'app-view-report',
@@ -173,8 +174,16 @@ export class ViewReportComponent implements OnChanges {
     const birthDate = this.client?.clientDetails?.birthDate;
     if (!birthDate || !Number.isFinite(year)) return { hasShortfall: true, firstShortfallAge: null };
 
-    const birthYear = new Date(birthDate).getFullYear();
-    return { hasShortfall: true, firstShortfallAge: year - birthYear };
+    const age = getProjectionColumnAgeLabel(
+      birthDate,
+      year,
+      this.financialTimeline?.forecastStartDate,
+      this.cashflow?.planDuration,
+    );
+    return {
+      hasShortfall: true,
+      firstShortfallAge: Number.isNaN(age) ? null : age,
+    };
   }
 
   private readonly defaultIcon = 'shield.svg';

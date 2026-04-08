@@ -750,6 +750,7 @@ export class EmergenciesComponent implements OnInit {
         forecastStartDate: this.timeline.forecastStartDate,
         forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
         forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
+        planDuration: this.selectedCashflow?.planDuration,
       },
     });
 

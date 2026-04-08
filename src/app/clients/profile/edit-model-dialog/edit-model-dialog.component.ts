@@ -80,6 +80,7 @@ export class EditModelDialogComponent {
       ],
       description: [this.cashflow.description],
     });
+    this.form.get('planDuration')?.disable({ emitEvent: false });
     this.form.updateValueAndValidity();
   }
 

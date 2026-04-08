@@ -26,6 +26,12 @@ import { getAmountCycleLabel } from 'src/app/shared/utils/amount-cycle-label';
 import { extractEventId, resolveYear } from 'src/app/shared/utils/event-date-utils';
 import { Client } from 'src/app/clients/models/client';
 import { formatSavingPotSelectLabel } from 'src/app/shared/utils/saving-pot-select-label';
+import {
+  getCashflowDialogEndCalendarYear,
+  getCompletedYearsAgeAtDate,
+  getPersistedAgeForCalendarYear,
+  getProjectionColumnAgeLabel,
+} from 'src/app/shared/utils/client-age-at-reference';
 
 @Component({
   selector: 'app-add-withdrawal',
@@ -70,6 +76,7 @@ export class AddWithdrawalComponent {
   existingWithdrawals: FundsViewModel[] = [];
   currentYear: number = new Date().getFullYear();
   selectedClient: Client | null = null;
+  dialogEndCalendarYear = 0;
 
   constructor(
     private dialogRef: MatDialogRef<AddWithdrawalComponent>,
@@ -83,17 +90,10 @@ export class AddWithdrawalComponent {
     this.escalationRates = data.escalataionRates;
     this.clientBirthYear = moment(data.clientBirthDate).year();
     const birthDate = new Date(data.clientBirthDate);
-    const forecastStart = new Date(data.forecastStartDateYear, 0, 1);
-    let age = forecastStart.getFullYear() - birthDate.getFullYear();
-    const monthDiff = forecastStart.getMonth() - birthDate.getMonth();
-    const dayDiff = forecastStart.getDate() - birthDate.getDate();
-
-    if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
-      age--;
-    }
-
-    this.clientAge = age
-    if (data.forecastStartDateYear - this.clientBirthYear > this.clientAge) this.clientBirthYear = this.clientBirthYear + 1
+    const forecastStart = data.forecastStartDate
+      ? new Date(data.forecastStartDate)
+      : new Date(data.forecastStartDateYear, 0, 1);
+    this.clientAge = getCompletedYearsAgeAtDate(birthDate, forecastStart);
 
     this.clientPreferredCurrency = data.clientPreferredCurrency;
     this.cashflowId = data.cashflowId;
@@ -110,7 +110,18 @@ export class AddWithdrawalComponent {
     );
     this.savingPots.clientSavings = availableSavings;
     
-    const endYear = data.forecastEndDateYear + 1;
+    const resolvedEndYear = getCashflowDialogEndCalendarYear(
+      data.clientBirthDate,
+      data.planDuration,
+      data.forecastEndDateYear,
+    );
+    let endYear = Number.isFinite(resolvedEndYear)
+      ? resolvedEndYear
+      : Number(data.forecastEndDateYear);
+    if (!Number.isFinite(endYear)) {
+      endYear = data.forecastStartDateYear;
+    }
+    this.dialogEndCalendarYear = endYear;
     const iterations = endYear - data.forecastStartDateYear + 1;
 
     for (let index = 0; index < iterations; index++) {
@@ -303,11 +314,27 @@ export class AddWithdrawalComponent {
           },
         },
         start: {
-          age: startYear ? startYear - this.clientBirthYear : 0,
+          age: startYear
+            ? getPersistedAgeForCalendarYear(
+                this.data.clientBirthDate,
+                startYear,
+                this.data.forecastStartDate,
+                this.data.planDuration,
+                this.dialogEndCalendarYear,
+              )
+            : 0,
           year: startYear || 0,
         },
         end: {
-          age: endYear ? endYear - this.clientBirthYear : 0,
+          age: endYear
+            ? getPersistedAgeForCalendarYear(
+                this.data.clientBirthDate,
+                endYear,
+                this.data.forecastStartDate,
+                this.data.planDuration,
+                this.dialogEndCalendarYear,
+              )
+            : 0,
           year: endYear || 0,
         },
         startEventId,
@@ -509,7 +536,14 @@ export class AddWithdrawalComponent {
   }
 
   getAgeForYear(year: number): number {
-    return Number(year) - this.clientBirthYear;
+    const a = getProjectionColumnAgeLabel(
+      this.data.clientBirthDate,
+      Number(year),
+      this.data.forecastStartDate,
+      this.data.planDuration,
+      this.dialogEndCalendarYear,
+    );
+    return Number.isNaN(a) ? 0 : a;
   }
 
   getStartYear(): number {

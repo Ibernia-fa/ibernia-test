@@ -244,7 +244,7 @@
             <div class="select-option">
               <mat-select value="Select" formControlName="start" hideSingleSelectionIndicator>
                 @for (year of years; track year) {
-                <mat-option [value]="year">{{ year }} ({{ clientAge + i }})</mat-option>
+                <mat-option [value]="year">{{ year }} ({{ getAgeForYear(year) }})</mat-option>
                 }
               </mat-select>
             </div>
@@ -293,9 +293,9 @@
                         >
                       }
                       <hr />
-                      @for (year of years; let i = $index; track year) {
+                      @for (year of years; track year) {
                         <mat-option [value]="year"
-                          >{{ year }} ({{ clientAge + i }})</mat-option
+                          >{{ year }} ({{ getAgeForYear(year) }})</mat-option
                         >
                       }
                     </mat-select>
