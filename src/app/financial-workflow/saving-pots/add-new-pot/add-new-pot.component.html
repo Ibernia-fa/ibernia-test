@@ -1105,11 +1105,8 @@
                     </div>
                   }
 
-                  <!-- Commission Escalation -->
-                  @if (
-                    savingsForm.get("commissionType")?.value !== "percentage" &&
-                    !isOneOff
-                  ) {
+                  <!-- Commission escalation (all types; amount cycle may be one-off — still show rate) -->
+                  @if (savingsForm.get("commissionType")?.value) {
                     <div class="escalation-inline">
                       <div
                         class="d-flex flex-column gap-8 escalation-field"
@@ -1143,7 +1140,7 @@
                                   escalationRate of escalationRates;
                                   track escalationRate
                                 ) {
-                                  <mat-option [value]="escalationRate.value">{{
+                                  <mat-option [value]="escalationRate.description">{{
                                     escalationRate.description
                                       | translateEscalationDescription
                                   }}</mat-option>

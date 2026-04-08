@@ -45,6 +45,7 @@ import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-sep
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { TranslateEscalationDescriptionPipe } from 'src/app/core/pipes/translate-escalation-description.pipe';
 import { getAmountCycleLabel } from 'src/app/shared/utils/amount-cycle-label';
+import { resolveEscalationMatch } from 'src/app/shared/utils/escalation-rate-utils';
 @Component({
   selector: 'app-add-new-pot',
   imports: [
@@ -413,18 +414,13 @@ onAmountBlur(e: Event) {
       this.savingsForm.get('commissionPercentage')?.patchValue(this.selectedPot.comission.percentage?.amount, { emitEvent: false });
     }
 
-    const matchedEscalation =
-      this.escalationRates.find(
-        x =>
-          x.value === this.selectedPot.comission.escalationRate?.value &&
-          x.description === this.selectedPot.comission.escalationRate?.description
-      ) ??
-      this.escalationRates.find(
-        x => x.value === this.selectedPot.comission.escalationRate?.value
-      );
+    const matchedEscalation = resolveEscalationMatch(
+      this.escalationRates,
+      this.selectedPot.comission.escalationRate,
+    );
 
     if (matchedEscalation) {
-      this.savingsForm.get('escalationRate')?.patchValue(matchedEscalation.value, { emitEvent: false });
+      this.savingsForm.get('escalationRate')?.patchValue(matchedEscalation.description, { emitEvent: false });
       this.selectedEscalationDescription = matchedEscalation.description;
     } else if (
       this.selectedPot.comission.escalationRate &&
@@ -435,7 +431,7 @@ onAmountBlur(e: Event) {
         description: 'Increases at custom rate',
         value: this.selectedPot?.comission?.escalationRate?.value,
       });
-      this.savingsForm.get('escalationRate')?.patchValue(this.selectedPot.comission.escalationRate.value, { emitEvent: false });
+      this.savingsForm.get('escalationRate')?.patchValue('Increases at custom rate', { emitEvent: false });
       this.savingsForm.get('customEscalationRate')?.patchValue(this.selectedPot.comission.escalationRate.value, { emitEvent: false });
       this.selectedEscalationDescription = 'Increases at custom rate';
 
@@ -746,7 +742,7 @@ onAmountBlur(e: Event) {
           this.savingsForm.get('commissionCycle')?.setValidators(Validators.required);
           this.savingsForm.get('commissionCycle')?.setValue(this.loggedInUserPreferences?.comissionCycle ?? this.cycles[2].id, { emitEvent: false });
           this.savingsForm.get('escalationRate')?.setValidators(Validators.required);
-          this.savingsForm.get('escalationRate')?.setValue(this.escalationRates[1].value, { emitEvent: false });
+          this.savingsForm.get('escalationRate')?.setValue(this.escalationRates[1]?.description ?? '', { emitEvent: false });
           if (this.loggedInUserPreferences?.comissionAmount) {
             this.savingsForm.get('commissionAmount')?.setValue(this.loggedInUserPreferences.comissionAmount, { emitEvent: false });
           }
@@ -790,42 +786,27 @@ onAmountBlur(e: Event) {
   //   }
   // }
 
-get isCustomEscalationSelected(): boolean {
-  const selectedValue = this.savingsForm.get('escalationRate')?.value;
-
-
-  // Find exact match by both value and description
-  return this.escalationRates.some(e =>
-    e.value === selectedValue && e.description === 'Increases at custom rate'
-  );
-}
-
-  get isOneOff(): boolean {
-    // const selectedValue = this.savingsForm.get('escalationRate')?.value;
-    return this.cycles.find(cycle => cycle.id === this.savingsForm.get('commissionCycle')?.value)?.description === 'One-off';
+  get isCustomEscalationSelected(): boolean {
+    return this.savingsForm.get('escalationRate')?.value === 'Increases at custom rate';
   }
 
 
+  onEscalationRateChange(event: MatSelectChange): void {
+    const description = (event.value as string) ?? null;
 
+    this.selectedEscalationDescription = description;
 
-onEscalationRateChange(event: MatSelectChange): void {
-  const val = event.value;
-  const rate = this.escalationRates.find((e) => e.value === val);
-  const description = rate?.description ?? null;
+    const customControl = this.savingsForm.get('customEscalationRate');
 
-  this.selectedEscalationDescription = description;
+    if (description === 'Increases at custom rate') {
+      customControl?.setValidators([Validators.required, Validators.min(0)]);
+    } else {
+      customControl?.clearValidators();
+      customControl?.setValue(null); // Optionally reset field
+    }
 
-  const customControl = this.savingsForm.get('customEscalationRate');
-
-  if (description === 'Increases at custom rate') {
-    customControl?.setValidators([Validators.required, Validators.min(0)]);
-  } else {
-    customControl?.clearValidators();
-    customControl?.setValue(null); // Optionally reset field
+    customControl?.updateValueAndValidity();
   }
-
-  customControl?.updateValueAndValidity();
-}
 
   onInputChange(event: any, controlName: string) {
     let value = event.target.value.replace('%', '').trim();
@@ -863,10 +844,15 @@ onEscalationRateChange(event: MatSelectChange): void {
 
   saveCashflow(): void {
     this.savingsForm.markAllAsTouched();
-    const isCustomEscalation = this.selectedEscalationDescription === 'Increases at custom rate';
+    const selectedEscDesc = this.savingsForm.get('escalationRate')?.value as string;
+    const isCustomEscalation = selectedEscDesc === 'Increases at custom rate';
     const selectedEscalationRateValue = isCustomEscalation
       ? this.savingsForm.get('customEscalationRate')?.value
-      : this.savingsForm.get('escalationRate')?.value;
+      : this.escalationRates.find((x) => x.description === selectedEscDesc)?.value;
+    const picked =
+      !isCustomEscalation
+        ? this.escalationRates.find((x) => x.description === selectedEscDesc)
+        : undefined;
  const rr = this.round2(this.savingsForm.get('returnRate')?.value ?? 0);
   const real = this.savingsForm.get('name')?.value !== 'Cash'
     ? this.round2(rr - this.inflationRate)
@@ -937,9 +923,11 @@ onEscalationRateChange(event: MatSelectChange): void {
           },
   escalationRate:
   selectedEscalationRateValue !== null && selectedEscalationRateValue !== ''
-    ? this.escalationRates.find(x => x.value === selectedEscalationRateValue) ??
+    ? picked ??
       {
-        description: this.selectedEscalationDescription ?? selectedEscalationRateValue,
+        description: isCustomEscalation
+          ? 'Increases at custom rate'
+          : this.selectedEscalationDescription ?? selectedEscDesc,
         value: selectedEscalationRateValue
       }
     : {
@@ -1111,7 +1099,7 @@ onEscalationRateChange(event: MatSelectChange): void {
         ?.setValidators(Validators.required);
       this.savingsForm
         .get('escalationRate')
-        ?.setValue(this.escalationRates[1].value, { emitEvent: false });
+        ?.setValue(this.escalationRates[1]?.description ?? '', { emitEvent: false });
 
       this.savingsForm.get('commissionCurrency')?.updateValueAndValidity({ emitEvent: false });
       this.savingsForm.get('commissionAmount')?.updateValueAndValidity({ emitEvent: false });
@@ -1164,7 +1152,7 @@ onEscalationRateChange(event: MatSelectChange): void {
         ?.setValidators(Validators.required);
       this.savingsForm
         .get('escalationRate')
-        ?.setValue(this.escalationRates[1].value, { emitEvent: false });
+        ?.setValue(this.escalationRates[1]?.description ?? '', { emitEvent: false });
 
       this.savingsForm.get('commissionCurrency')?.updateValueAndValidity({ emitEvent: false });
       this.savingsForm.get('commissionAmount')?.updateValueAndValidity({ emitEvent: false });
@@ -1216,7 +1204,7 @@ onEscalationRateChange(event: MatSelectChange): void {
         ?.setValidators(Validators.required);
       this.savingsForm
         .get('escalationRate')
-        ?.setValue(this.escalationRates[1].value, { emitEvent: false });
+        ?.setValue(this.escalationRates[1]?.description ?? '', { emitEvent: false });
 
       this.savingsForm.get('commissionCurrency')?.updateValueAndValidity({ emitEvent: false });
       this.savingsForm.get('commissionAmount')?.updateValueAndValidity({ emitEvent: false });

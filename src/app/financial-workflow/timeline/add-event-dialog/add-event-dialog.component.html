@@ -445,7 +445,7 @@
                           escalationRate of escalationRates;
                           track escalationRate
                         ) {
-                          <mat-option [value]="escalationRate.value">{{
+                          <mat-option [value]="escalationRate.description">{{
                             escalationRate.description
                               | translateEscalationDescription
                           }}</mat-option>
@@ -1688,7 +1688,7 @@
                             escalationRate of escalationRates;
                             track escalationRate
                           ) {
-                            <mat-option [value]="escalationRate.value">{{
+                            <mat-option [value]="escalationRate.description">{{
                               escalationRate.description
                                 | translateEscalationDescription
                             }}</mat-option>

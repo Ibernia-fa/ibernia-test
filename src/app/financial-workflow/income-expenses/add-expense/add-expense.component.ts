@@ -23,6 +23,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { TranslateIncomeExpenseLabelPipe } from 'src/app/core/pipes/translate-income-expense-label.pipe';
 import { TranslateEscalationDescriptionPipe } from 'src/app/core/pipes/translate-escalation-description.pipe';
 import { getAmountCycleLabel } from 'src/app/shared/utils/amount-cycle-label';
+import { resolveEscalationMatch } from 'src/app/shared/utils/escalation-rate-utils';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -142,7 +143,7 @@ export class AddExpenseComponent {
       cycle: [this.cycles[1].id, Validators.required],
       start: ['', Validators.required],
       end: [''],
-      escalationRate: [this.escalationRates[0].value, Validators.required],
+      escalationRate: [this.escalationRates[0]?.description ?? '', Validators.required],
       customEscalationRate: ['']
     });
     this.expenseForm.get('currencySymbol')?.disable();
@@ -191,7 +192,10 @@ export class AddExpenseComponent {
         }
         this.expenseForm.get('end')?.patchValue(endYear);
       }
-      const matchedEscalation = this.escalationRates.find(x => x.value === this.selectedExpense.escalationRate?.value);
+      const matchedEscalation = resolveEscalationMatch(
+        this.escalationRates,
+        this.selectedExpense.escalationRate,
+      );
 
       const cycleId = this.selectedExpense.amount.cycle?.id;
       const cycle = this.cycles.find(x => x.id === cycleId);
@@ -201,7 +205,7 @@ export class AddExpenseComponent {
       }
 
       if (matchedEscalation) {
-        this.expenseForm.get('escalationRate')?.patchValue(matchedEscalation.value);
+        this.expenseForm.get('escalationRate')?.patchValue(matchedEscalation.description);
         this.selectedEscalationDescription = matchedEscalation.description;
       } else if (
         this.selectedExpense.escalationRate &&
@@ -216,7 +220,7 @@ export class AddExpenseComponent {
           value: this.selectedExpense.escalationRate.value
         });
 
-        this.expenseForm.get('escalationRate')?.patchValue(this.selectedExpense.escalationRate.value);
+        this.expenseForm.get('escalationRate')?.patchValue('Increases at custom rate');
         this.expenseForm.get('customEscalationRate')?.patchValue(this.selectedExpense.escalationRate.value);
         this.selectedEscalationDescription = 'Increases at custom rate';
 
@@ -309,13 +313,14 @@ export class AddExpenseComponent {
 
     if (this.expenseForm.valid) {
       this.isSaving = true;
-      const isCustomEscalation = this.selectedEscalationDescription === 'Increases at custom rate';
+      const selectedEscDesc = this.expenseForm.get('escalationRate')?.value as string;
+      const isCustomEscalation = selectedEscDesc === 'Increases at custom rate';
       const escalationRateValue = isCustomEscalation
         ? this.expenseForm.get('customEscalationRate')?.value
-        : this.expenseForm.get('escalationRate')?.value;
-      const matchedRate = this.escalationRates.find(
-        (x) => x.value === escalationRateValue
-      );
+        : this.escalationRates.find((x) => x.description === selectedEscDesc)?.value;
+      const matchedRate = isCustomEscalation
+        ? undefined
+        : this.escalationRates.find((x) => x.description === selectedEscDesc);
 
       const startVal = this.expenseForm.get('start')?.value;
       const endVal = this.expenseForm.get('end')?.value;
@@ -350,7 +355,9 @@ export class AddExpenseComponent {
         endEventId,
         escalationRate: escalationRateValue !== null && escalationRateValue !== ''
           ? matchedRate ?? {
-            description: this.selectedEscalationDescription ?? '', // Use actual description
+            description: isCustomEscalation
+              ? 'Increases at custom rate'
+              : selectedEscDesc ?? '',
             value: escalationRateValue
           }
           : {
@@ -406,20 +413,13 @@ export class AddExpenseComponent {
   }
 
   get isCustomEscalationSelected(): boolean {
-    const selectedValue = this.expenseForm.get('escalationRate')?.value;
-
-    // Find exact match by both value and description
-    return this.escalationRates.some(e =>
-      e.value === selectedValue && e.description === 'Increases at custom rate'
-    );
+    return this.expenseForm.get('escalationRate')?.value === 'Increases at custom rate';
   }
 
   onEscalationRateChange(event: MatSelectChange): void {
-    const val = event.value;
-    const rate = this.escalationRates.find((e) => e.value === val);
-    const description = rate?.description ?? null;
+    const description = (event.value as string) ?? '';
 
-    this.selectedEscalationDescription = description ?? '';
+    this.selectedEscalationDescription = description;
 
     const customControl = this.expenseForm.get('customEscalationRate');
 

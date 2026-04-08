@@ -30,6 +30,7 @@ import { SettingsService } from 'src/app/default-preferance/services/default-pre
 import { MortgageCalculatorDialogComponent, MortgageCalculatorDialogResult } from '../mortgage-calculator-dialog/mortgage-calculator-dialog.component';
 import { LanguageService } from 'src/app/core/language.service';
 import { formatAppDisplayNumber } from 'src/app/shared/utils/number-utils';
+import { resolveEscalationMatch } from 'src/app/shared/utils/escalation-rate-utils';
 
 @Component({
   selector: 'app-add-event-dialog',
@@ -347,7 +348,7 @@ export class AddEventDialogComponent {
           ageDate: [moment(this.dropTime).year(), Validators.required],
           start: [moment(this.dropTime).year(), Validators.required],
           end: [0, Validators.required],
-          escalationRate: [this.escalationRates[0].value, Validators.required],
+          escalationRate: [this.escalationRates[0]?.description ?? '', Validators.required],
           customEscalationRate: ['']
         });
         break;
@@ -401,7 +402,7 @@ export class AddEventDialogComponent {
           cycle: ['One-off', [Validators.required]],
           start: [null, Validators.required],
           end: [0],
-          escalationRate: [this.escalationRates[0].value],
+          escalationRate: [this.escalationRates[0]?.description ?? ''],
           customEscalationRate: [''],
         });
         this.isCustomCashEvent = true;
@@ -566,7 +567,7 @@ export class AddEventDialogComponent {
         description: 'Increases at custom rate',
         value: value
       });
-      this.eventForm.controls['escalationRate'].patchValue(value);
+      this.eventForm.controls['escalationRate'].patchValue('Increases at custom rate');
       this.selectedEscalationDescription = 'Increases at custom rate';
 
       // Configure the custom field
@@ -575,9 +576,19 @@ export class AddEventDialogComponent {
       customControl?.setValue(value);
       customControl?.updateValueAndValidity();
     } else {
-      // For standard rates, set by value and reset custom control
-      this.eventForm.controls['escalationRate'].patchValue(value);
-      this.selectedEscalationDescription = description;
+      let descToSet = description as string;
+      if (
+        typeof descToSet === 'string' &&
+        !this.escalationRates.some((x) => x.description === descToSet)
+      ) {
+        const m = resolveEscalationMatch(this.escalationRates, {
+          value,
+          description,
+        });
+        if (m) descToSet = m.description;
+      }
+      this.eventForm.controls['escalationRate'].patchValue(descToSet);
+      this.selectedEscalationDescription = descToSet;
 
       const customControl = this.eventForm.get('customEscalationRate');
       customControl?.clearValidators();
@@ -603,7 +614,7 @@ export class AddEventDialogComponent {
 
       const currentValue = this.eventForm.get('escalationRate')?.value;
       if (currentValue === null || currentValue === '' || currentValue === undefined) {
-        this.eventForm.get('escalationRate')?.setValue(this.escalationRates[0]?.value);
+        this.eventForm.get('escalationRate')?.setValue(this.escalationRates[0]?.description ?? '');
       }
     }
     this.eventForm.updateValueAndValidity();
@@ -644,16 +655,23 @@ export class AddEventDialogComponent {
 
       // non inheritance 
       if (!this.isInheritanceOneOff) {
-        const isCustomEscalation = this.selectedEscalationDescription === 'Increases at custom rate';
+        const selectedEscDesc = this.eventForm.get('escalationRate')?.value as string;
+        const isCustomEscalation = selectedEscDesc === 'Increases at custom rate';
         const selectedEscalationRateValue = isCustomEscalation
           ? this.eventForm.get('customEscalationRate')?.value
-          : this.eventForm.get('escalationRate')?.value;
+          : this.escalationRates.find((x) => x.description === selectedEscDesc)?.value;
+        const picked =
+          !isCustomEscalation
+            ? this.escalationRates.find((x) => x.description === selectedEscDesc)
+            : undefined;
 
         escalataionRatesToSubmit =
           selectedEscalationRateValue !== null && selectedEscalationRateValue !== ''
-            ? this.escalationRates.find(x => x.value === selectedEscalationRateValue) ?? {
+            ? picked ?? {
               value: selectedEscalationRateValue,
-              description: isCustomEscalation ? 'Increases at custom rate' : selectedEscalationRateValue
+              description: isCustomEscalation
+                ? 'Increases at custom rate'
+                : selectedEscDesc,
             }
             : {
               value: 0,
@@ -748,11 +766,15 @@ export class AddEventDialogComponent {
 
     this.saveClicked = true;
 
-    const isCustomEscalation =
-      this.selectedEscalationDescription === 'Increases at custom rate';
+    const selectedEscDesc = this.eventForm.get('escalationRate')?.value as string;
+    const isCustomEscalation = selectedEscDesc === 'Increases at custom rate';
     const selectedEscalationRateValue = isCustomEscalation
       ? this.eventForm.get('customEscalationRate')?.value
-      : this.eventForm.get('escalationRate')?.value;
+      : this.escalationRates.find((x) => x.description === selectedEscDesc)?.value;
+    const picked =
+      !isCustomEscalation
+        ? this.escalationRates.find((x) => x.description === selectedEscDesc)
+        : undefined;
 
     const clientEvent: ClientEvent = {
       id: this.isEditWorkflow ? this.patchEvent?.id ?? '' : '',
@@ -781,13 +803,11 @@ export class AddEventDialogComponent {
       },
       escalationRate:
         selectedEscalationRateValue !== null && selectedEscalationRateValue !== ''
-          ? this.escalationRates.find(
-              (x) => x.value === selectedEscalationRateValue
-            ) ?? {
+          ? picked ?? {
               value: selectedEscalationRateValue,
               description: isCustomEscalation
                 ? 'Increases at custom rate'
-                : selectedEscalationRateValue,
+                : selectedEscDesc,
             }
           : {
               value: 0,
@@ -880,18 +900,11 @@ export class AddEventDialogComponent {
   events: string[] = ['$', '£', '€'];
 
   get isCustomEscalationSelected(): boolean {
-    const selectedValue = this.eventForm.get('escalationRate')?.value;
-
-    // Find exact match by both value and description
-    return this.escalationRates.some(e =>
-      e.value === selectedValue && e.description === 'Increases at custom rate'
-    );
+    return this.eventForm.get('escalationRate')?.value === 'Increases at custom rate';
   }
 
   onEscalationRateChange(event: MatSelectChange): void {
-    const val = event.value;
-    const rate = this.escalationRates.find((e) => e.value === val);
-    const description = rate?.description ?? null;
+    const description = (event.value as string) ?? null;
 
     this.selectedEscalationDescription = description;
 
