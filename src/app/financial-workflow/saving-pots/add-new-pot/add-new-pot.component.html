@@ -328,7 +328,7 @@
                 <mat-slider class="w-100" [min]="0" [max]="10" [step]="0.5">
                   <input
                     matSliderThumb
-                    formControlName="returnRate"
+                    [value]="sliderReturnRate"
                     (input)="onSliderInput($event)"
                   />
                 </mat-slider>
@@ -338,9 +338,11 @@
                 <div class="w-100 form-field custom-rate-input">
                   <input
                     matInput
-                    type="number"
-                    formControlName="returnRate"
-                    (input)="onReturnRateInput($event)"
+                    type="text"
+                    inputmode="decimal"
+                    [value]="returnRateText"
+                    (input)="onReturnRateTextInput($event)"
+                    (blur)="onReturnRateBlur()"
                   />
                   <div class="custom-rate-suffix">
                     <svg
