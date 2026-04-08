@@ -33,6 +33,8 @@ import { resolveEscalationMatch } from 'src/app/shared/utils/escalation-rate-uti
 import { CommonModule } from '@angular/common';
 import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
 import { ToastrService } from 'ngx-toastr';
+import { AuthService } from 'src/app/auth/services/auth.service';
+import { SettingsService } from 'src/app/default-preferance/services/default-preferance.http.service';
 import {
   IncomeDisplayLabelContext,
   incomeApiDescriptionToDisplayLabel,
@@ -114,6 +116,7 @@ export class AddIncomeComponent {
   private clientFirstName = '';
   private partnerFirstName = '';
   private selectedClient: Client | null = null;
+  private pensionReplacementRatePct: number = 50;
 
   constructor(
     private dialogRef: MatDialogRef<AddIncomeComponent>,
@@ -123,6 +126,8 @@ export class AddIncomeComponent {
     private withdrawalsContributionsHttpService: WithdrawalsContributionsHttpService,
     private translate: TranslateService,
     private toastr: ToastrService,
+    private auth: AuthService,
+    private settingsService: SettingsService,
   ) {
     this.scenarioMode = data.scenarioMode ?? false;
     this.incomeTypes = data.incomeType;
@@ -369,6 +374,9 @@ export class AddIncomeComponent {
     this.setIsDefaultIncome();
     this.setIncomeIcon();
     this.captureInitialFormState();
+
+    // Load replacement rate for state pension prefill (fallback to 50%).
+    this.loadPensionReplacementRate();
   }
 
   autoRenameCustom(): string {
@@ -998,6 +1006,69 @@ export class AddIncomeComponent {
     }
 
     descriptionCtrl.updateValueAndValidity();
+
+    // If re-adding State pension (after deletion), prefill net amount from Salary.
+    this.prefillStatePensionFromSalaryIfEligible(apiValue);
+  }
+
+  private loadPensionReplacementRate(): void {
+    // Prefer already-cached profile (header sets it), otherwise fetch.
+    const cached = this.settingsService.currentUserData?.preferences?.pensionReplacementRate;
+    if (cached != null && !Number.isNaN(Number(cached))) {
+      this.pensionReplacementRatePct = Number(cached);
+      return;
+    }
+
+    const user = this.auth.getUserProfile();
+    const userId = (user?.sub ?? '').toString().trim();
+    if (!userId) return;
+
+    this.settingsService.getUserProfileResponse(userId).subscribe({
+      next: (res: any) => {
+        const rate = res?.body?.preferences?.pensionReplacementRate;
+        if (rate != null && !Number.isNaN(Number(rate))) {
+          this.pensionReplacementRatePct = Number(rate);
+        }
+      },
+      error: () => {
+        /* ignore; keep fallback */
+      },
+    });
+  }
+
+  private prefillStatePensionFromSalaryIfEligible(apiDesc: string): void {
+    if (!isClientStatePensionApiDescription(apiDesc) && !isPartnerStatePensionApiDescription(apiDesc)) return;
+
+    const amountCtrl = this.incomeForm.get('amount');
+    const cycleCtrl = this.incomeForm.get('cycle');
+    if (!amountCtrl || !cycleCtrl) return;
+
+    // Do not overwrite user-entered value.
+    const existing = amountCtrl.value;
+    if (existing !== '' && existing !== null && existing !== undefined && Number(existing) > 0) return;
+
+    const isPartner = isPartnerStatePensionApiDescription(apiDesc);
+    const salaryDesc = isPartner ? 'Salary (Partner)' : 'Salary';
+
+    const incomes: FinancialViewModel[] = (this.data?.incomes ?? []) as FinancialViewModel[];
+    const salary = incomes.find((i) => (i?.description ?? '') === salaryDesc);
+    const salaryAmount = Number(salary?.amount?.amount ?? 0);
+    if (!(salaryAmount > 0)) return;
+
+    const ratePct = Number(this.pensionReplacementRatePct ?? 50);
+    if (!(ratePct > 0)) return;
+
+    const pensionAmount = salaryAmount * (ratePct / 100);
+    if (!(pensionAmount > 0)) return;
+
+    amountCtrl.setValue(pensionAmount, { emitEvent: true });
+
+    // Align frequency with salary where possible.
+    const salaryCycleId = salary?.amount?.cycle?.id;
+    if (salaryCycleId) {
+      cycleCtrl.setValue(salaryCycleId, { emitEvent: true });
+      this.onCycleValueChange(salaryCycleId);
+    }
   }
 
   toggleNameEdit() {
