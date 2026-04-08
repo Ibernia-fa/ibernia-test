@@ -75,6 +75,12 @@ import {
   isPartnerStatePensionApiDescription,
 } from 'src/app/shared/utils/income-display-label';
 import { formatSavingPotSelectLabel } from 'src/app/shared/utils/saving-pot-select-label';
+import {
+  getCashflowDialogEndCalendarYear,
+  getCompletedYearsAgeAtDate,
+  getPersistedAgeForCalendarYear,
+  getProjectionColumnAgeLabel,
+} from 'src/app/shared/utils/client-age-at-reference';
 
 @Component({
   selector: 'app-scenario-lab',
@@ -400,10 +406,6 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
 
   private initFormFromPlan(): void {
     if (!this.client || !this.financialTimeline || !this.cashflow) return;
-    const currentYear = new Date().getFullYear();
-    const birthYear = new Date(
-      this.client.clientDetails.birthDate,
-    ).getFullYear();
     const inflation =
       this.cashflow.inflationRate ??
       this.client.clientDetails?.inflationRate ??
@@ -425,9 +427,9 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
       this.baselineRetirementAge = mainRetirementEvent.start.age;
       this.minRetirementAge = Math.max(
         18,
-        this.calculateAgeAtDate(
+        getCompletedYearsAgeAtDate(
+          this.client.clientDetails.birthDate,
           new Date(),
-          new Date(this.client.clientDetails.birthDate),
         ),
       );
       this.maxRetirementAge = 100;
@@ -445,9 +447,9 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
       this.baselinePartnerRetirementAge = partnerRetirementEvent!.start.age;
       this.minPartnerRetirementAge = Math.max(
         18,
-        this.calculateAgeAtDate(
+        getCompletedYearsAgeAtDate(
+          this.client.partnerDetail.birthDate,
           new Date(),
-          new Date(this.client.partnerDetail.birthDate),
         ),
       );
       this.maxPartnerRetirementAge = 100;
@@ -757,24 +759,17 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
     if (index < 0) return;
     this.hasShortfall = true;
     const year = Number(report.categories[index]);
-    const birthYear = new Date(
+    const age = getProjectionColumnAgeLabel(
       this.client.clientDetails.birthDate,
-    ).getFullYear();
-    this.firstShortfallAge = year - birthYear;
+      year,
+      this.financialTimeline?.forecastStartDate,
+      this.cashflow?.planDuration,
+    );
+    this.firstShortfallAge = Number.isNaN(age) ? null : age;
   }
 
   getScenarioForecastEndDate(): Date {
     return this.getMaxForecastEndDate();
-  }
-
-  private calculateAgeAtDate(date: Date, dateOfBirth: Date): number {
-    let age = date.getFullYear() - dateOfBirth.getFullYear();
-    const hasBirthdayPassed =
-      date.getMonth() > dateOfBirth.getMonth() ||
-      (date.getMonth() === dateOfBirth.getMonth() &&
-        date.getDate() >= dateOfBirth.getDate());
-    if (!hasBirthdayPassed) age--;
-    return age;
   }
 
   private updateScenarioForecastEndDateIfNeeded(): void {
@@ -840,6 +835,18 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
         ? EventType.FINANCING
         : EventType.CUSTOM;
 
+    const forecastEndY = moment(
+      this.financialTimeline.forecastEndtDate,
+    ).year();
+    const resolvedGoalsDialogEnd = getCashflowDialogEndCalendarYear(
+      this.client.clientDetails.birthDate,
+      this.cashflow?.planDuration,
+      forecastEndY,
+    );
+    const goalsDialogEndCalendarYear = Number.isFinite(resolvedGoalsDialogEnd)
+      ? resolvedGoalsDialogEnd
+      : forecastEndY;
+
     const dialogRef = this.dialog.open(AddEventDialogComponent, {
       width: '612px',
       disableClose: true,
@@ -857,16 +864,26 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
         forecastStartDateYear: moment(
           this.financialTimeline.forecastStartDate,
         ).year(),
-        forecastEndDateYear: moment(
-          this.financialTimeline.forecastEndtDate,
-        ).year(),
-        eventsList: this.financialTimeline.clientEvents.map((e) => ({
-          name: e.name,
-          year: e.start.year,
-          age:
-            e.start.year -
-            moment(new Date(this.client!.clientDetails.birthDate)).year(),
-        })),
+        forecastStartDate: this.financialTimeline.forecastStartDate,
+        planDuration: this.cashflow?.planDuration,
+        forecastEndDateYear: forecastEndY,
+        eventsList: this.financialTimeline.clientEvents.map((e) => {
+          const birth =
+            e.isPartnerEvent && this.client?.partnerDetail?.birthDate
+              ? this.client.partnerDetail.birthDate
+              : this.client!.clientDetails.birthDate;
+          return {
+            name: e.name,
+            year: e.start.year,
+            age: getPersistedAgeForCalendarYear(
+              birth,
+              e.start.year,
+              this.financialTimeline!.forecastStartDate,
+              this.cashflow?.planDuration,
+              goalsDialogEndCalendarYear,
+            ),
+          };
+        }),
         isEditWorkflow: true,
         patchEvent: event,
         financialRecords: this.getFinancialRecordsForEventDialogs(),
@@ -922,6 +939,8 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
         forecastStartDateYear: moment(
           this.financialTimeline.forecastStartDate,
         ).year(),
+        forecastStartDate: this.financialTimeline.forecastStartDate,
+        planDuration: this.cashflow.planDuration,
         cashflowId: this.cashflowId,
         isEditWorkflow: true,
         event: pot,
@@ -986,6 +1005,8 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
         forecastStartDateYear: moment(
           this.financialTimeline.forecastStartDate,
         ).year(),
+        forecastStartDate: this.financialTimeline.forecastStartDate,
+        planDuration: this.cashflow?.planDuration,
         planEndYear: this.getPlanEndYearForScenarioLab(),
         incomeType: this.buildIncomeTypes(),
         incomes: this.incomeExpenseData?.incomes ?? [],
@@ -1044,6 +1065,8 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
         forecastStartDateYear: moment(
           this.financialTimeline.forecastStartDate,
         ).year(),
+        forecastStartDate: this.financialTimeline.forecastStartDate,
+        planDuration: this.cashflow?.planDuration,
         expenseType: this.buildExpenseTypes(),
         scenarioMode: true,
       },

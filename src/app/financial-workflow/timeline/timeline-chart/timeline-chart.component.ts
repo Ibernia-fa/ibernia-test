@@ -59,6 +59,11 @@ import { ToastrModule, ToastrService } from 'ngx-toastr';
 import { SettingsHttpService } from '../../settings/services/settings-http.service';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { patchInflationRateDescription } from 'src/app/shared/utils/escalation-rate-utils';
+import {
+  getCompletedYearsAgeAtDate,
+  getPlanEndCalendarYear,
+  getProjectionColumnAgeLabel,
+} from 'src/app/shared/utils/client-age-at-reference';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
@@ -516,11 +521,12 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
         forecastEndDateYear: moment(
           this.financialTimeline.forecastEndtDate,
         ).year(),
+        forecastStartDate: this.financialTimeline.forecastStartDate,
+        planDuration: this.planDuration,
         isIncomeEvent: this.draggedEvent.type === EventIncomeType.Income,
         isCashEvent: dropEventType === EventType.FINANCING ? true : false,
         patchEvent: this.draggedEvent,
         dropTime: new Date(moment(dropTime).year(), 0),
-        forecastStartDate: new Date(this.financialTimeline.forecastStartDate),
         eventsList: this.financialTimeline.clientEvents.map((event) => ({
           name: this.getEventDisplayNameForList(event),
           year: event.start.year,
@@ -711,10 +717,8 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
       this.financialTimeline.forecastStartDate,
     );
     const forecastStartYear = moment(forecastStartDate).year();
-    const birthDate = new Date(this.clientBirthDate);
-    const startAge = this.calculateAgeForTimeline(forecastStartDate, birthDate);
     const planEndYear = Number.isFinite(this.planDuration as number)
-      ? forecastStartYear + (Number(this.planDuration) - startAge)
+      ? getPlanEndCalendarYear(this.clientBirthDate, Number(this.planDuration))
       : null;
     const forecastEndYear = moment(
       this.financialTimeline.forecastEndtDate,
@@ -1025,13 +1029,17 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
 
   private getTimelineLabelAge(
     year: number,
-    forecastStartYear: number,
+    _forecastStartYear: number,
     forecastStartDate: Date,
     birthDate: Date,
     _birthYear: number,
   ): number {
-    const baseAge = this.calculateAgeForTimeline(forecastStartDate, birthDate);
-    return baseAge + (year - forecastStartYear);
+    return getProjectionColumnAgeLabel(
+      birthDate,
+      year,
+      forecastStartDate,
+      this.planDuration,
+    );
   }
 
   handleEventMoving(item: any, callback: (item: any) => void) {
@@ -1189,6 +1197,7 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
           this.financialTimeline.forecastEndtDate,
         ).year(),
         forecastStartDate: new Date(this.financialTimeline.forecastStartDate),
+        planDuration: this.planDuration,
         eventsList: this.financialTimeline.clientEvents.map((event) => ({
           name: this.getEventDisplayNameForList(event),
           year: event.start.year,
@@ -1228,6 +1237,7 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
           this.financialTimeline.forecastEndtDate,
         ).year(),
         forecastStartDate: new Date(this.financialTimeline.forecastStartDate),
+        planDuration: this.planDuration,
         eventsList: this.financialTimeline.clientEvents.map((event) => ({
           name: this.getEventDisplayNameForList(event),
           year: event.start.year,
@@ -1352,49 +1362,21 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   private calculateAge(dateOfBirth: Date): number {
-    const today = new Date();
-    let age = today.getFullYear() - dateOfBirth.getFullYear();
-    const birthMonth = dateOfBirth.getMonth();
-    const birthDay = dateOfBirth.getDate();
-
-    // If birthday hasn't occurred yet this year, subtract one from age
-    const hasBirthdayPassedThisYear =
-      today.getMonth() > birthMonth ||
-      (today.getMonth() === birthMonth && today.getDate() >= birthDay);
-
-    if (!hasBirthdayPassedThisYear) {
-      age--;
-    }
-
-    return age;
+    return getCompletedYearsAgeAtDate(dateOfBirth, new Date());
   }
-
-  private calculateAgeForTimeline = (date: Date, dateOfBirth: Date): number => {
-    let age = date.getFullYear() - dateOfBirth.getFullYear();
-
-    const hasBirthdayPassed =
-      date.getMonth() > dateOfBirth.getMonth() ||
-      (date.getMonth() === dateOfBirth.getMonth() &&
-        date.getDate() >= dateOfBirth.getDate());
-
-    if (!hasBirthdayPassed) {
-      age--;
-    }
-
-    return age;
-  };
 
   private getAgeAtYearForEvent(clientEvent: ClientEvent, year: number): number {
     const birthDate =
       clientEvent.isPartnerEvent && this.partnerBirthDate
         ? new Date(this.partnerBirthDate)
         : new Date(this.clientBirthDate);
-    const forecastStartDate = new Date(
+    return getProjectionColumnAgeLabel(
+      birthDate,
+      year,
       this.financialTimeline.forecastStartDate,
+      this.planDuration,
+      this.effectiveForecastEndYear,
     );
-    const forecastStartYear = moment(forecastStartDate).year();
-    const baseAge = this.calculateAgeForTimeline(forecastStartDate, birthDate);
-    return baseAge + (year - forecastStartYear);
   }
 
   private getEventDisplayNameForList(clientEvent: ClientEvent): string {
@@ -1448,7 +1430,7 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
       this.financialTimeline.forecastStartDate,
     );
     const forecastStartYear = moment(forecastStartDate).year();
-    const baseAge = this.calculateAgeForTimeline(forecastStartDate, birthDate);
+    const baseAge = getCompletedYearsAgeAtDate(birthDate, forecastStartDate);
     return forecastStartYear + (this.getDefaultRetirementAge() - baseAge);
   }
 

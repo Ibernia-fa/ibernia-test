@@ -30,6 +30,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { TranslateIncomeExpenseLabelPipe } from 'src/app/core/pipes/translate-income-expense-label.pipe';
 import { patchInflationRateDescription } from 'src/app/shared/utils/escalation-rate-utils';
+import { getPlanEndCalendarYear } from 'src/app/shared/utils/client-age-at-reference';
 import {
   IncomeDisplayLabelContext,
   isClientSalaryApiDescription,
@@ -292,6 +293,8 @@ export class IncomeExpensesComponent {
         cashflowId: this.selectedCashflow?.id,
         forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
         forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
+        forecastStartDate: this.timeline.forecastStartDate,
+        planDuration: this.selectedCashflow?.planDuration,
         planEndYear: this.getPlanEndYear(),
         incomeType: this.incomeType,
         clientSavings: this.savingsPots?.clientSavings ?? [],
@@ -327,6 +330,8 @@ export class IncomeExpensesComponent {
         cashflowId: this.selectedCashflow?.id,
         forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
         forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
+        forecastStartDate: this.timeline.forecastStartDate,
+        planDuration: this.selectedCashflow?.planDuration,
         planEndYear: this.getPlanEndYear(),
         expenseType: this.expenseType,
       },
@@ -360,6 +365,8 @@ export class IncomeExpensesComponent {
         isEditWorkflow: true,
         forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
         forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
+        forecastStartDate: this.timeline.forecastStartDate,
+        planDuration: this.selectedCashflow?.planDuration,
         planEndYear: this.getPlanEndYear(),
         incomeType: this.incomeType,
         clientSavings: this.savingsPots?.clientSavings ?? [],
@@ -398,6 +405,8 @@ export class IncomeExpensesComponent {
         isEditWorkflow: true,
         forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
         forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
+        forecastStartDate: this.timeline.forecastStartDate,
+        planDuration: this.selectedCashflow?.planDuration,
         planEndYear: this.getPlanEndYear(),
         expenseType: this.expenseType,
       },
@@ -668,24 +677,17 @@ export class IncomeExpensesComponent {
       this.timeline?.forecastStartDate &&
       this.selectedClient?.clientDetails?.birthDate
     ) {
-      const forecastStartDate = new Date(this.timeline.forecastStartDate);
-      const forecastStartYear = forecastStartDate.getFullYear();
-      const birthDate = new Date(this.selectedClient.clientDetails.birthDate);
-      const startAge = this.calculateClientAge(forecastStartDate, birthDate);
-      return forecastStartYear + (planDuration - startAge);
+      const forecastStartYear = new Date(
+        this.timeline.forecastStartDate,
+      ).getFullYear();
+      const planEndYear = getPlanEndCalendarYear(
+        this.selectedClient.clientDetails.birthDate,
+        planDuration,
+      );
+      if (planEndYear != null) {
+        return Math.max(forecastStartYear, planEndYear);
+      }
     }
     return moment(this.timeline?.forecastEndtDate).year();
-  }
-
-  private calculateClientAge(atDate: Date, birthDate: Date): number {
-    let age = atDate.getFullYear() - birthDate.getFullYear();
-    const hasBirthdayPassed =
-      atDate.getMonth() > birthDate.getMonth() ||
-      (atDate.getMonth() === birthDate.getMonth() &&
-        atDate.getDate() >= birthDate.getDate());
-    if (!hasBirthdayPassed) {
-      age--;
-    }
-    return age;
   }
 }

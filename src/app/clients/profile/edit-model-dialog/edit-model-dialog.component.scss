@@ -16,6 +16,13 @@
   display: none !important;
 }
 
+.plan-duration-field {
+  input:disabled,
+  input.mat-mdc-input-element:disabled {
+    cursor: not-allowed;
+  }
+}
+
 .custom-rate-input {
   position: relative;
 

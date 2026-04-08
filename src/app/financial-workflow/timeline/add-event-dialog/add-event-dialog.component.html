@@ -233,9 +233,9 @@
                     formControlName="ageDate"
                     hideSingleSelectionIndicator
                   >
-                    @for (year of years; let i = $index; track year) {
+                    @for (year of years; track year) {
                       <mat-option [value]="year"
-                        >{{ year }} ({{ clientAge + i }})</mat-option
+                        >{{ year }} ({{ getAgeForYear(year) }})</mat-option
                       >
                     }
                   </mat-select>
@@ -292,9 +292,9 @@
                         formControlName="start"
                         hideSingleSelectionIndicator
                       >
-                        @for (year of years; let i = $index; track year) {
+                        @for (year of years; track year) {
                           <mat-option [value]="year"
-                            >{{ year }} ({{ clientAge + i }})</mat-option
+                            >{{ year }} ({{ getAgeForYear(year) }})</mat-option
                           >
                         }
                       </mat-select>
@@ -361,7 +361,7 @@
                           @for (year of getEndYears(); track year) {
                             <mat-option [value]="year"
                               >{{ year }} ({{
-                                year - clientBirthYear
+                                getAgeForYear(year)
                               }})</mat-option
                             >
                           }
@@ -906,9 +906,9 @@
                   formControlName="start"
                   hideSingleSelectionIndicator
                 >
-                  @for (year of years; let i = $index; track year) {
+                  @for (year of years; track year) {
                     <mat-option [value]="year"
-                      >{{ year }} ({{ clientAge + i }})</mat-option
+                      >{{ year }} ({{ getAgeForYear(year) }})</mat-option
                     >
                   }
                 </mat-select>
@@ -1018,9 +1018,9 @@
                         formControlName="monthlyStart"
                         hideSingleSelectionIndicator
                       >
-                        @for (year of years; let i = $index; track year) {
+                        @for (year of years; track year) {
                           <mat-option [value]="year"
-                            >{{ year }} ({{ clientAge + i }})</mat-option
+                            >{{ year }} ({{ getAgeForYear(year) }})</mat-option
                           >
                         }
                       </mat-select>
@@ -1085,7 +1085,7 @@
                         @for (year of getFinancingEndYears(); track year) {
                           <mat-option [value]="year"
                             >{{ year }} ({{
-                              year - clientBirthYear
+                              getAgeForYear(year)
                             }})</mat-option
                           >
                         }
@@ -1175,9 +1175,9 @@
                           formControlName="resaleDate"
                           hideSingleSelectionIndicator
                         >
-                          @for (year of years; let i = $index; track year) {
+                          @for (year of years; track year) {
                             <mat-option [value]="year">
-                              {{ year }} ({{ clientAge + i }})
+                              {{ year }} ({{ getAgeForYear(year) }})
                             </mat-option>
                           }
                         </mat-select>
@@ -1538,9 +1538,9 @@
                         formControlName="start"
                         hideSingleSelectionIndicator
                       >
-                        @for (year of years; let i = $index; track year) {
+                        @for (year of years; track year) {
                           <mat-option [value]="year"
-                            >{{ year }} ({{ clientAge + i }})</mat-option
+                            >{{ year }} ({{ getAgeForYear(year) }})</mat-option
                           >
                         }
                       </mat-select>
@@ -1607,7 +1607,7 @@
                           @for (year of getEndYears(); track year) {
                             <mat-option [value]="year"
                               >{{ year }} ({{
-                                year - clientBirthYear
+                                getAgeForYear(year)
                               }})</mat-option
                             >
                           }
@@ -1978,9 +1978,9 @@
                   formControlName="start"
                   hideSingleSelectionIndicator
                 >
-                  @for (year of years; let i = $index; track year) {
+                  @for (year of years; track year) {
                     <mat-option [value]="year"
-                      >{{ year }} ({{ clientAge + i }})</mat-option
+                      >{{ year }} ({{ getAgeForYear(year) }})</mat-option
                     >
                   }
                 </mat-select>
@@ -2083,9 +2083,9 @@
                         formControlName="monthlyStart"
                         hideSingleSelectionIndicator
                       >
-                        @for (year of years; let i = $index; track year) {
+                        @for (year of years; track year) {
                           <mat-option [value]="year"
-                            >{{ year }} ({{ clientAge + i }})</mat-option
+                            >{{ year }} ({{ getAgeForYear(year) }})</mat-option
                           >
                         }
                       </mat-select>
@@ -2150,7 +2150,7 @@
                         @for (year of getFinancingEndYears(); track year) {
                           <mat-option [value]="year"
                             >{{ year }} ({{
-                              year - clientBirthYear
+                              getAgeForYear(year)
                             }})</mat-option
                           >
                         }
