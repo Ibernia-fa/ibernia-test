@@ -39,7 +39,6 @@ import {
 import { catchError, filter } from 'rxjs';
 import { TablerIconsModule } from 'angular-tabler-icons';
 import { CommonModule } from '@angular/common';
-import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -69,7 +68,6 @@ import {
     MatSliderModule,
     TablerIconsModule,
     MatCheckboxModule,
-    ThousandSeparatorPipe,
     ThousandSeparatorInputDirective,
     TranslateModule,
     TranslateEscalationDescriptionPipe,
@@ -350,7 +348,7 @@ export class AddNewPotComponent {
 onAmountBlur(e: Event) {
   const c = this.savingsForm.get('amount')!;
   const rawValue = (e.target as HTMLInputElement).value;
-  const num = parseFormattedNumber(rawValue);
+  const num = parseFormattedNumber(rawValue, this.translate.currentLang);
   c.setValue(num, { emitEvent: false }); // model stays numeric
 
   const locale = this.translate.currentLang === 'it' ? 'it-IT' : 'en-US';
@@ -853,7 +851,7 @@ onAmountBlur(e: Event) {
   }
 
   onAmountInput(rawValue: string) {
-    const value = parseFormattedNumber(rawValue ?? '');
+    const value = parseFormattedNumber(rawValue ?? '', this.translate.currentLang);
     this.savingsForm.get('amount')?.setValue(value, { emitEvent: true });
     this.amount = value;
   }

@@ -59,10 +59,6 @@
                     formControlName="amount"
                     #amountInput
                     placeholder="0"
-                    [value]="
-                      simulateEmergencyForm.get('amount')?.value
-                        | thousandSeparator
-                    "
                     thousandSeparatorInput
                     (input)="onAmountInput($event.target.value)"
                   />
@@ -142,7 +138,7 @@
                         }
                         @for (event of eventsList; track event) {
                           <mat-option [value]="event.start.year"
-                            >{{ event.name }} ({{
+                            >{{ getTimelineEventLabel(event.name) }} ({{
                               event.start.age
                             }})</mat-option
                           >
@@ -201,7 +197,7 @@
                         >
                           @for (event of getEndEvents(); track event.id) {
                             <mat-option [value]="event.start.year"
-                              >{{ event.name }} ({{
+                              >{{ getTimelineEventLabel(event.name) }} ({{
                                 event.start.age
                               }})</mat-option
                             >
@@ -530,7 +526,7 @@
             [class.active]="activeTab === 'baseline'"
             (click)="switchToTab('baseline')"
           >
-            Before
+            {{ "Before" | translate }}
           </button>
 
           <button
@@ -538,7 +534,7 @@
             [class.active]="activeTab === 'simulated'"
             (click)="switchToTab('simulated')"
           >
-            After
+            {{ "After" | translate }}
           </button>
         </div>
 

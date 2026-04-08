@@ -10,7 +10,6 @@ import { MatCardModule } from '@angular/material/card';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { provideNativeDateAdapter } from '@angular/material/core';
-import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 import moment from 'moment';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
@@ -51,7 +50,6 @@ import {
     MatCheckboxModule,
     MatSliderModule,
     ReactiveFormsModule,
-    ThousandSeparatorPipe,
     ThousandSeparatorInputDirective,
     SavingsBarStackedChartComponent,
     TranslateModule,
@@ -65,8 +63,7 @@ import {
 export class SimulateEmergencyComponent implements OnDestroy {
   @ViewChild('amountInput') amountInput?: ElementRef<HTMLInputElement>;
   onAmountInput(rawValue: string) {
-    const { parseFormattedNumber } = require('src/app/shared/utils/number-utils');
-    const value = parseFormattedNumber(rawValue);
+    const value = parseFormattedNumber(rawValue, this.translate.currentLang);
     this.simulateEmergencyForm.get('amount')?.setValue(value);
   }
 
@@ -330,6 +327,10 @@ export class SimulateEmergencyComponent implements OnDestroy {
     return key ? this.translate.instant(key) : raw;
   }
 
+  getTimelineEventLabel(rawName: string): string {
+    return translateTimelineEventDisplayName(this.translate, rawName);
+  }
+
   onEscalationRateChange(event: MatSelectChange): void {
     const val = event.value;
     const rate = this.escalationRates.find((e) => e.value === val);
@@ -374,10 +375,11 @@ export class SimulateEmergencyComponent implements OnDestroy {
       // convert amount back to number if it's still a formatted string
       const rawAmountControl = this.simulateEmergencyForm.get('amount');
       if (rawAmountControl) {
-        const { parseFormattedNumber } = require('src/app/shared/utils/number-utils');
         const currentValue = rawAmountControl.value;
-        // only convert if it's a string with commas
-        rawAmountControl.setValue(parseFormattedNumber(currentValue), { emitEvent: false });
+        rawAmountControl.setValue(
+          parseFormattedNumber(currentValue, this.translate.currentLang),
+          { emitEvent: false },
+        );
       }
       const rawAmount = this.simulateEmergencyForm.get('amount')?.value;
 

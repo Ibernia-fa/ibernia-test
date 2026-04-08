@@ -37,7 +37,6 @@ import {
   SavingPotsModel,
 } from '../../saving-pots/models/saving-pots.model';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -71,7 +70,6 @@ import {
     MatSliderModule,
     ReactiveFormsModule,
     MatCheckboxModule,
-    ThousandSeparatorPipe,
     ThousandSeparatorInputDirective,
     TranslateModule,
     MaterialModule,
@@ -362,6 +360,10 @@ export class AddContributionComponent {
     return getAmountCycleLabel(cycle, this.translate);
   }
 
+  getTimelineEventLabel(rawName: string): string {
+    return translateTimelineEventDisplayName(this.translate, rawName);
+  }
+
   isCommissionsChanged(enabled: boolean) {
     const ctrl = this.contributionForm.get('commissionPercentage');
     if (enabled) {
@@ -377,7 +379,7 @@ export class AddContributionComponent {
   }
 
   onAmountInput(rawValue: string) {
-    const value = parseFormattedNumber(rawValue);
+    const value = parseFormattedNumber(rawValue, this.translate.currentLang);
     this.contributionForm.get('amount')?.setValue(value, { emitEvent: true });
   }
 

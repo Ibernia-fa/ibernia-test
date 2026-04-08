@@ -9,7 +9,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { provideNativeDateAdapter } from '@angular/material/core';
-import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 import { allCountries } from 'src/app/clients/models/country';
 import { Cycle, EscalationRate } from '../../timeline/models/financial-timeline';
@@ -20,6 +19,7 @@ import { extractEventId, resolveYear } from 'src/app/shared/utils/event-date-uti
 import { catchError, filter, finalize } from 'rxjs';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
 import { TranslateIncomeExpenseLabelPipe } from 'src/app/core/pipes/translate-income-expense-label.pipe';
 import { TranslateEscalationDescriptionPipe } from 'src/app/core/pipes/translate-escalation-description.pipe';
 import { getAmountCycleLabel } from 'src/app/shared/utils/amount-cycle-label';
@@ -46,7 +46,6 @@ import {
     MatSliderModule,
     ReactiveFormsModule,
     CommonModule,
-    ThousandSeparatorPipe,
     ThousandSeparatorInputDirective,
     TranslateModule,
     TranslateIncomeExpenseLabelPipe,
@@ -60,12 +59,11 @@ export class AddExpenseComponent {
   @ViewChild('amountInput') amountInput?: ElementRef<HTMLInputElement>;
 
   onAmountInput(rawValue: string) {
-    const { parseFormattedNumber } = require('src/app/shared/utils/number-utils');
     if (!rawValue || rawValue.trim() === '') {
       this.expenseForm.get('amount')?.setValue('');
       return;
     }
-    const value = parseFormattedNumber(rawValue);
+    const value = parseFormattedNumber(rawValue, this.translate.currentLang);
     this.expenseForm.get('amount')?.setValue(value);
   }
 
@@ -301,6 +299,10 @@ export class AddExpenseComponent {
 
   getCycleLabel(cycle: Cycle): string {
     return getAmountCycleLabel(cycle, this.translate);
+  }
+
+  getTimelineEventLabel(rawName: string): string {
+    return translateTimelineEventDisplayName(this.translate, rawName);
   }
 
   addExpense(): void {

@@ -81,7 +81,9 @@
                       />
                     </svg>
                   </span>
-                  <span class="item-text team-relation">{{ chip }}</span>
+                  <span class="item-text team-relation">{{
+                    localizePersonalChip(chip)
+                  }}</span>
                 </div>
               }
             }
@@ -152,13 +154,13 @@
 
                   <span class="item-text">
                     <span class="team-relation">
-                      {{ getFinanceLabel(item.type) | lowercase }}:
+                      {{ getFinanceLabel(item.type) | translate }}:
                     </span>
                     <span class="values">
                       {{
                         item.type === "InvestableAssets"
                           ? formatAssetChip(getResponseChips(item)[0] || "")
-                          : getResponseChips(item)[0] || "-"
+                          : localizeChipValue(getResponseChips(item)[0] || "-")
                       }}
                     </span>
                   </span>
@@ -251,7 +253,7 @@
                       class="chip-icon"
                     />
                   }
-                  {{ chip.value }}
+                  {{ localizeChipValue(chip.value) }}
                 </span>
               }
             }
@@ -279,7 +281,7 @@
                       class="chip-icon"
                     />
                   }
-                  {{ chip.value }}
+                  {{ localizeChipValue(chip.value) }}
                 </span>
               }
             }

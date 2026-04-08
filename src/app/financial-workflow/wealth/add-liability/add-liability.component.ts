@@ -8,10 +8,9 @@ import { MatInputModule } from '@angular/material/input';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatSelectModule } from '@angular/material/select';
 import { ToastrService } from 'ngx-toastr';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 import { allCountries } from 'src/app/clients/models/country';
-import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
 
@@ -40,7 +39,6 @@ export interface AddLiabilityDialogData {
     MatInputModule,
     MatRadioModule,
     MatSelectModule,
-    ThousandSeparatorPipe,
     ThousandSeparatorInputDirective,
     TranslateModule,
   ],
@@ -69,7 +67,8 @@ export class AddLiabilityComponent {
     private dialogRef: MatDialogRef<AddLiabilityComponent>,
     @Inject(MAT_DIALOG_DATA) public data: AddLiabilityDialogData,
     private wealthHttp: WealthHttpService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private translate: TranslateService,
   ) {
     this.isEditMode = data.mode === 'edit';
     this.hasPartner = data.hasPartner ?? false;
@@ -126,7 +125,7 @@ export class AddLiabilityComponent {
       this.form.get('outstanding')?.setValue('', { emitEvent: true });
       return;
     }
-    const value = parseFormattedNumber(rawValue);
+    const value = parseFormattedNumber(rawValue, this.translate.currentLang);
     this.form.get('outstanding')?.setValue(value, { emitEvent: true });
   }
 

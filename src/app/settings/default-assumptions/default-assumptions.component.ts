@@ -74,6 +74,7 @@ export class DefaultAssumptionsComponent implements OnInit, OnDestroy {
       inflationRate: [2.5 as number, [Validators.required, Validators.min(0), Validators.max(100)]],
       investmentReturn: [6 as number, [Validators.required, Validators.min(0), Validators.max(100)]],
       pensionFundReturn: [4 as number, [Validators.required, Validators.min(0), Validators.max(100)]],
+      pensionReplacementRate: [50 as number, [Validators.required, Validators.min(0), Validators.max(100)]],
       comissionType: [ComissionType.None as ComissionType, [Validators.required]],
       comissionPercentage: [1 as number | null],
       comissionAmount: [null as number | null],
@@ -152,6 +153,7 @@ export class DefaultAssumptionsComponent implements OnInit, OnDestroy {
               inflationRate: p.preferences?.inflationRate ?? 2.5,
               investmentReturn: p.preferences?.investmentReturn ?? 6,
               pensionFundReturn: p.preferences?.pensionFundReturn ?? 4,
+              pensionReplacementRate: p.preferences?.pensionReplacementRate ?? 50,
               comissionType: (p.preferences?.comissionType as ComissionType) ?? ComissionType.None,
               comissionPercentage: p.preferences?.comissionPercentage ?? null,
               comissionAmount: p.preferences?.comissionAmount ?? null,
@@ -241,6 +243,7 @@ export class DefaultAssumptionsComponent implements OnInit, OnDestroy {
       prefs.inflationRate !== snap['inflationRate'] ||
       prefs.investmentReturn !== snap['investmentReturn'] ||
       prefs.pensionFundReturn !== snap['pensionFundReturn'] ||
+      prefs.pensionReplacementRate !== snap['pensionReplacementRate'] ||
       prefs.comissionType !== snap['comissionType'] ||
       prefs.comissionPercentage !== snap['comissionPercentage'] ||
       prefs.comissionAmount !== snap['comissionAmount'] ||
@@ -279,6 +282,7 @@ export class DefaultAssumptionsComponent implements OnInit, OnDestroy {
         inflationRate: round2(raw.preferences.inflationRate),
         investmentReturn: round2(raw.preferences.investmentReturn),
         pensionFundReturn: round2(raw.preferences.pensionFundReturn),
+        pensionReplacementRate: round2(raw.preferences.pensionReplacementRate),
         comissionType: raw.preferences.comissionType,
         comissionPercentage:
           raw.preferences.comissionType === ComissionType.Amount ||
@@ -338,7 +342,7 @@ export class DefaultAssumptionsComponent implements OnInit, OnDestroy {
   }
 
   onCommissionAmountInput(rawValue: string) {
-    const value = parseFormattedNumber(rawValue);
+    const value = parseFormattedNumber(rawValue, this.translate.currentLang);
     this.form.controls.preferences.controls.comissionAmount.setValue(value, { emitEvent: false });
     const el = this.commissionAmountInput?.nativeElement;
     if (!el) return;

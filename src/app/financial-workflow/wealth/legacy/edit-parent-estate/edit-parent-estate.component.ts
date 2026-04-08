@@ -10,7 +10,6 @@ import { ToastrService } from 'ngx-toastr';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { CurrencySymbolPipe } from 'src/app/pipe/currency-symbol.pipe';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
-import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
 import { LegacyHttpService } from '../services/legacy-http.service';
 
 @Component({
@@ -64,11 +63,6 @@ export class EditParentEstateComponent {
         ? 'LEGACY.PARENTS_NET_WORTH_MODAL_NAME_FALLBACK_CLIENT'
         : 'LEGACY.PARENTS_NET_WORTH_MODAL_NAME_FALLBACK_PARTNER';
     return { name: this.translate.instant(fallbackKey) };
-  }
-
-  onAmountInput(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    this.form.patchValue({ jointNetWorth: parseFormattedNumber(input.value) }, { emitEvent: false });
   }
 
   onSave(): void {

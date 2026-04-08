@@ -22,6 +22,7 @@ import { AgeCalculatorPipe } from 'src/app/pipe/age-calculator.pipe';
 import { CommonModule } from '@angular/common';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 import { TranslateModule } from '@ngx-translate/core';
+import { TranslateService } from '@ngx-translate/core';
 import { TranslateEscalationDescriptionPipe } from 'src/app/core/pipes/translate-escalation-description.pipe';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MortgageCalculatorState } from '../mortgage-calculator/mortgage-calculator.component';
@@ -203,6 +204,7 @@ export class AddEventDialogComponent {
     private cdr: ChangeDetectorRef,
     private settings: SettingsService,
     private language: LanguageService,
+    private translate: TranslateService,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
     this.settings.profileChanged$.pipe(takeUntilDestroyed()).subscribe(() => this.cdr.markForCheck());
