@@ -35,6 +35,7 @@ import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox
 import { ToastrService } from 'ngx-toastr';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { SettingsService } from 'src/app/default-preferance/services/default-preferance.http.service';
+import { translateTimelineEventDisplayName } from 'src/app/shared/utils/timeline-event-display-name';
 import {
   IncomeDisplayLabelContext,
   incomeApiDescriptionToDisplayLabel,
@@ -510,6 +511,10 @@ export class AddIncomeComponent {
 
   getCycleLabel(cycle: Cycle): string {
     return getAmountCycleLabel(cycle, this.translate);
+  }
+
+  getTimelineEventLabel(rawName: string): string {
+    return translateTimelineEventDisplayName(this.translate, rawName);
   }
 
   addIncome(): void {

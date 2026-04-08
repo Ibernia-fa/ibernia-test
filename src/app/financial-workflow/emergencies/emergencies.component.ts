@@ -422,9 +422,10 @@ export class EmergenciesComponent implements OnInit {
 
   getCoverageAdequacyLabel(id: number | null): string {
     if (id == null) return '-';
-    return (
-      this.coverageAdequacies.find((c) => c.id === id)?.description ?? 'Unknown'
-    );
+    const raw =
+      this.coverageAdequacies.find((c) => c.id === id)?.description ?? 'Unknown';
+    const t = this.translate.instant(raw);
+    return t && t !== raw ? t : raw;
   }
 
   getWillStatusLabel(id: number | null): string {

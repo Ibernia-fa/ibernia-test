@@ -26,6 +26,7 @@ import { getAmountCycleLabel } from 'src/app/shared/utils/amount-cycle-label';
 import { extractEventId, resolveYear } from 'src/app/shared/utils/event-date-utils';
 import { Client } from 'src/app/clients/models/client';
 import { formatSavingPotSelectLabel } from 'src/app/shared/utils/saving-pot-select-label';
+import { translateTimelineEventDisplayName } from 'src/app/shared/utils/timeline-event-display-name';
 
 @Component({
   selector: 'app-add-withdrawal',
@@ -247,6 +248,10 @@ export class AddWithdrawalComponent {
 
   getCycleLabel(cycle: Cycle): string {
     return getAmountCycleLabel(cycle, this.translate);
+  }
+
+  getTimelineEventLabel(rawName: string): string {
+    return translateTimelineEventDisplayName(this.translate, rawName);
   }
 
   addExpense(): void {

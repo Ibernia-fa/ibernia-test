@@ -49,6 +49,7 @@ import {
 import { MaterialModule } from 'src/app/material.module';
 import { Client } from 'src/app/clients/models/client';
 import { formatSavingPotSelectLabel } from 'src/app/shared/utils/saving-pot-select-label';
+import { translateTimelineEventDisplayName } from 'src/app/shared/utils/timeline-event-display-name';
 
 @Component({
   selector: 'app-add-contribution',
@@ -347,6 +348,10 @@ export class AddContributionComponent {
 
   getCycleLabel(cycle: Cycle): string {
     return getAmountCycleLabel(cycle, this.translate);
+  }
+
+  getTimelineEventLabel(rawName: string): string {
+    return translateTimelineEventDisplayName(this.translate, rawName);
   }
 
   isCommissionsChanged(enabled: boolean) {

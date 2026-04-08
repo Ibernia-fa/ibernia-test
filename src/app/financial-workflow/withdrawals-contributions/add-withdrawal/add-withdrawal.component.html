@@ -190,7 +190,7 @@
                       }
                       @for (event of eventsList; track event) {
                         <mat-option [value]="'event:' + event.id"
-                          >{{ event.name }} ({{
+                          >{{ getTimelineEventLabel(event.name) }} ({{
                             getAgeForYear(event.start.year)
                           }})</mat-option
                         >
@@ -257,7 +257,7 @@
                         }
                         @for (event of getEndEvents(); track event.id) {
                           <mat-option [value]="'event:' + event.id"
-                            >{{ event.name }} ({{
+                            >{{ getTimelineEventLabel(event.name) }} ({{
                               getAgeForYear(event.start.year)
                             }})</mat-option
                           >

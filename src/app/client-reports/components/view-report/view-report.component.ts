@@ -22,7 +22,7 @@ import {
 } from '@angular/animations';
 import { TablerIconsModule } from 'angular-tabler-icons';
 import { MaterialModule } from 'src/app/material.module';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { TranslateIncomeExpenseLabelPipe } from 'src/app/core/pipes/translate-income-expense-label.pipe';
 import { IncomeDisplayLabelContext } from 'src/app/shared/utils/income-display-label';
 import { ClientEmergency, EmergenciesLookupData } from '../../models/financial-series.model';
@@ -202,7 +202,7 @@ export class ViewReportComponent implements OnChanges {
   section: string = 'lifetimePlan';
   displayedColumns: string[] = ['position', 'name'];
   
-  constructor() { }
+  constructor(private translate: TranslateService) { }
 
   ngOnInit(): void {
     if (this.financialSeries) {
@@ -255,7 +255,11 @@ export class ViewReportComponent implements OnChanges {
 
   getCoverageAdequacyLabel(id: number | null): string {
     if (id == null) return '-';
-    return this.emergenciesLookupData?.coverageAdequacies?.find(c => c.id === id)?.description ?? 'Unknown';
+    const raw =
+      this.emergenciesLookupData?.coverageAdequacies?.find((c) => c.id === id)
+        ?.description ?? 'Unknown';
+    const t = this.translate.instant(raw);
+    return t && t !== raw ? t : raw;
   }
 
   calculateAnnualCost(e: ClientEmergency): number {
