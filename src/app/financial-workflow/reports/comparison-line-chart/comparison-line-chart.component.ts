@@ -42,24 +42,27 @@ interface SplitSeries {
   dashedData: (number | null)[];
 }
 
+/**
+ * Splits one net-worth line into solid (non-negative) and dashed (negative) segments.
+ * Style follows the value at each age: if the line dips below zero and later recovers,
+ * the positive stretch is solid again; only negative Y values use dashes.
+ */
 function splitAtZeroCrossing(name: string, data: number[]): SplitSeries {
   const solidData: (number | null)[] = [];
   const dashedData: (number | null)[] = [];
-  let crossedToNegative = false;
 
   for (let i = 0; i < data.length; i++) {
-    if (!crossedToNegative) {
-      solidData.push(data[i]);
-      if (data[i] < 0) {
-        crossedToNegative = true;
-        dashedData.push(data[i]);
-        if (i > 0) dashedData[i - 1] = data[i - 1];
-      } else {
-        dashedData.push(null);
-      }
+    const v = data[i];
+    if (v >= 0) {
+      solidData.push(v);
+      dashedData.push(null);
     } else {
       solidData.push(null);
-      dashedData.push(data[i]);
+      dashedData.push(v);
+      // Bridge so the dashed segment connects to the last non-negative point (smooth curve)
+      if (i > 0 && data[i - 1] >= 0) {
+        dashedData[i - 1] = data[i - 1];
+      }
     }
   }
 
