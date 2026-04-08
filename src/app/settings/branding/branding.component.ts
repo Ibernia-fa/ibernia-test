@@ -24,9 +24,11 @@ import {
   compressImage,
   compressForProfilePayload,
   ensureBackgroundDataUrlWithinLimit,
+  dataUrlToBlob,
   BACKGROUND_MIN_WIDTH,
   BACKGROUND_MIN_HEIGHT,
 } from 'src/app/shared/utils/image-upload.utils';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-branding',
@@ -63,18 +65,54 @@ export class BrandingComponent implements OnInit {
     const userId = user?.sub;
     if (!userId) return;
 
+    // Session + BehaviorSubject so previews render before GET /profiles completes (matches logo in header/sidebar).
+    this.orgProfiles.hydrateBrandingLogoFromSession(userId);
+    this.orgProfiles.hydrateBackgroundFromSession(userId);
+    const logoCached = this.orgProfiles.getBrandingLogoValue();
+    const bgCached = this.orgProfiles.getBackgroundImageValue();
+    if (logoCached?.trim()) {
+      this.profileImage = ensureDataUrl(logoCached);
+      this.logoCropSource = this.profileImage;
+    }
+    if (bgCached?.trim()) {
+      this.backgroundImage = ensureDataUrl(bgCached);
+    }
+
+    // Dirty-check baseline must match what we show from cache; otherwise clearing before GET completes
+    // leaves both current and initial null and Save stays disabled.
+    this.initialProfileImage = this.profileImage;
+    this.initialBackgroundImage = this.backgroundImage;
+    this.hasChanges = false;
+
+    const formSnapshotProfile = this.profileImage;
+    const formSnapshotBg = this.backgroundImage;
+
     this.isLoading = true;
     this.orgProfiles.getProfile(userId).subscribe({
       next: (p) => {
-        console.log(p);
-        this.profileImage = ensureDataUrl(p?.profilePhotoUrl ?? null);
-        this.logoCropSource = this.profileImage;
-        this.logoCropTransform = null;
-        this.backgroundImage = ensureDataUrl(p?.backgroundPhotoUrl ?? null);
-        this.initialProfileImage = this.profileImage;
-        this.initialBackgroundImage = this.backgroundImage;
-        this.hasChanges = false;
+        const serverProfile = ensureDataUrl(p?.profilePhotoUrl ?? null);
+        const serverBg = ensureDataUrl(p?.backgroundPhotoUrl ?? null);
+
+        const userEditedWhileLoading =
+          normalizeBrandingImageRef(this.profileImage) !==
+            normalizeBrandingImageRef(formSnapshotProfile) ||
+          normalizeBrandingImageRef(this.backgroundImage) !==
+            normalizeBrandingImageRef(formSnapshotBg);
+
+        this.initialProfileImage = serverProfile;
+        this.initialBackgroundImage = serverBg;
+
+        if (!userEditedWhileLoading) {
+          this.profileImage = serverProfile;
+          this.logoCropSource = this.profileImage;
+          this.logoCropTransform = null;
+          this.backgroundImage = serverBg;
+          this.orgProfiles.setBrandingLogo(this.profileImage || null, userId);
+          this.orgProfiles.setBackgroundImage(this.backgroundImage || null, userId);
+        }
+
         this.isLoading = false;
+        this.updateHasChanges();
       },
       error: (err) => {
         console.error(err);
@@ -192,13 +230,22 @@ export class BrandingComponent implements OnInit {
       return;
     }
 
-    let backgroundPhotoUrl = this.backgroundImage || "";
-    if (backgroundPhotoUrl) {
+    const logoChanged =
+      normalizeBrandingImageRef(this.profileImage) !==
+      normalizeBrandingImageRef(this.initialProfileImage);
+    const bgChanged =
+      normalizeBrandingImageRef(this.backgroundImage) !==
+      normalizeBrandingImageRef(this.initialBackgroundImage);
+
+    if (!logoChanged && !bgChanged) {
+      return;
+    }
+
+    if (bgChanged && this.backgroundImage) {
       try {
-        const shrunk = await ensureBackgroundDataUrlWithinLimit(backgroundPhotoUrl);
-        if (shrunk !== backgroundPhotoUrl) {
+        const shrunk = await ensureBackgroundDataUrlWithinLimit(this.backgroundImage);
+        if (shrunk !== this.backgroundImage) {
           this.backgroundImage = shrunk;
-          backgroundPhotoUrl = shrunk;
         }
       } catch (e) {
         console.error('Background shrink before save failed', e);
@@ -206,34 +253,63 @@ export class BrandingComponent implements OnInit {
     }
 
     this.isSaving = true;
-    this.orgProfiles
-      .saveProfile({ userId, profilePhotoUrl: this.profileImage || "", backgroundPhotoUrl })
-      .subscribe({
-        next: () => {
-          this.orgProfiles.setBrandingLogo(
-            this.profileImage || null,
-            userId,
+    try {
+      const requests: Array<ReturnType<typeof firstValueFrom>> = [];
+      if (logoChanged) {
+        if (this.profileImage) {
+          requests.push(
+            firstValueFrom(
+              this.orgProfiles.postOrganizationImage('logo', dataUrlToBlob(this.profileImage), false),
+            ),
           );
-          this.orgProfiles.setBackgroundImage(this.backgroundImage || null);
+        } else {
+          requests.push(
+            firstValueFrom(this.orgProfiles.postOrganizationImage('logo', null, true)),
+          );
+        }
+      }
+      if (bgChanged) {
+        if (this.backgroundImage) {
+          requests.push(
+            firstValueFrom(
+              this.orgProfiles.postOrganizationImage(
+                'background',
+                dataUrlToBlob(this.backgroundImage),
+                false,
+              ),
+            ),
+          );
+        } else {
+          requests.push(
+            firstValueFrom(this.orgProfiles.postOrganizationImage('background', null, true)),
+          );
+        }
+      }
+      if (requests.length > 0) {
+        await Promise.all(requests);
+      }
 
-          this.toastr.success(this.translate.instant('TOAST.IMAGE_SAVED'), this.translate.instant('LABEL.SUCCESS'));
-          this.initialProfileImage = this.profileImage;
-          this.initialBackgroundImage = this.backgroundImage;
-          this.hasChanges = false;
-          this.isSaving = false;
-        },
-        error: (err) => {
-          console.error(err);
-          this.toastr.error(this.translate.instant('TOAST.FAILED_SAVE_IMAGE'), this.translate.instant('LABEL.ERROR'));
-          this.isSaving = false;
-        },
-      });
+      this.orgProfiles.setBrandingLogo(this.profileImage || null, userId);
+      this.orgProfiles.setBackgroundImage(this.backgroundImage || null, userId);
+
+      this.toastr.success(this.translate.instant('TOAST.IMAGE_SAVED'), this.translate.instant('LABEL.SUCCESS'));
+      this.initialProfileImage = this.profileImage;
+      this.initialBackgroundImage = this.backgroundImage;
+      this.hasChanges = false;
+    } catch (err) {
+      console.error(err);
+      this.toastr.error(this.translate.instant('TOAST.FAILED_SAVE_IMAGE'), this.translate.instant('LABEL.ERROR'));
+    } finally {
+      this.isSaving = false;
+    }
   }
 
   private updateHasChanges() {
     this.hasChanges =
-      this.profileImage !== this.initialProfileImage ||
-      this.backgroundImage !== this.initialBackgroundImage;
+      normalizeBrandingImageRef(this.profileImage) !==
+        normalizeBrandingImageRef(this.initialProfileImage) ||
+      normalizeBrandingImageRef(this.backgroundImage) !==
+        normalizeBrandingImageRef(this.initialBackgroundImage);
   }
 }
 
@@ -241,4 +317,10 @@ export class BrandingComponent implements OnInit {
 function ensureDataUrl(s: string | null): string | null {
   if (!s) return null;
   return s.startsWith('data:') ? s : `data:image/jpeg;base64,${s}`;
+}
+
+/** Treat null/empty as equivalent so clear vs "" matches server and dirty state is correct. */
+function normalizeBrandingImageRef(s: string | null | undefined): string | null {
+  if (s == null || String(s).trim() === '') return null;
+  return s;
 }

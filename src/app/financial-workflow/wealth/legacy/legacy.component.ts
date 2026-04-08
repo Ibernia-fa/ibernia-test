@@ -11,7 +11,6 @@ import {
   OnInit,
   OnChanges,
   Renderer2,
-  OnDestroy,
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
@@ -120,17 +119,14 @@ export class LegacyComponent
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+    this.mutationObs?.disconnect();
+    this.resizeObs?.disconnect();
+    if (this.rafId !== null) cancelAnimationFrame(this.rafId);
   }
 
   ngAfterViewChecked(): void {
     this.ensureTreeObserver();
     this.scheduleLineUpdate();
-  }
-
-  ngOnDestroy(): void {
-    this.mutationObs?.disconnect();
-    this.resizeObs?.disconnect();
-    if (this.rafId !== null) cancelAnimationFrame(this.rafId);
   }
 
   @HostListener('window:resize')
