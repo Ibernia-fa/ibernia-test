@@ -13,10 +13,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { provideNativeDateAdapter } from '@angular/material/core';
-import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-update-income',
@@ -31,9 +31,9 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
     MatSelectModule,
     MatDatepickerModule,
     MatSliderModule,
-    ThousandSeparatorPipe,
     ThousandSeparatorInputDirective,
-    TranslateModule
+    TranslateModule,
+    ReactiveFormsModule,
   ],
   providers: [provideNativeDateAdapter()],
   templateUrl: './update-income.component.html',
@@ -41,11 +41,21 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 })
 export class UpdateIncomeComponent {
   inflationRateLabel: string;
+  incomeForm = this.fb.group({
+    name: ['' as string, [Validators.required]],
+    currency: ['£' as string],
+    amount: [0 as number],
+    cycle: ['' as string],
+    start: ['' as string],
+    end: ['' as string],
+    escalationRate: ['' as string],
+  });
 
   constructor(
     private dialogRef: MatDialogRef<UpdateIncomeComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private translate: TranslateService,
+    private fb: FormBuilder,
   ) {
     const rate = Number(data?.inflationRate ?? 0);
     const formatted = Number.isInteger(rate) ? `${rate}.0` : `${rate}`;
@@ -53,16 +63,28 @@ export class UpdateIncomeComponent {
       'ESCALATION.MATCH_INFLATION',
       { rate: formatted },
     );
+
+    // Best-effort initialization (this component previously relied on [value] bindings).
+    const selected = data?.selectedIncome;
+    if (selected) {
+      this.incomeForm.patchValue(
+        {
+          name: selected?.name ?? selected?.description ?? '',
+          currency: selected?.amount?.currencySymbol ?? '£',
+          amount: Number(selected?.amount?.amount ?? 0),
+          cycle: selected?.amount?.cycle?.id ?? selected?.amount?.cycle ?? '',
+          start: selected?.start?.year ?? selected?.start ?? '',
+          end: selected?.end?.year ?? selected?.end ?? '',
+          escalationRate: selected?.escalationRate ?? '',
+        },
+        { emitEvent: false },
+      );
+    }
   }
 
   onAmountInput(rawValue: string) {
     const value = parseFormattedNumber(rawValue, this.translate.currentLang);
-    // attempt to set a control named 'amount' if present
-    try {
-      (this as any)['incomeForm']?.get('amount')?.setValue(value, { emitEvent: true });
-    } catch (e) {
-      // swallow - component may not have a reactive form
-    }
+    this.incomeForm.get('amount')?.setValue(value, { emitEvent: true });
   }
 
   closeDialog(): void {
