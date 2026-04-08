@@ -9,6 +9,7 @@ import moment from 'moment';
 import { ChartSeries, Series, TimelineEvent } from '../../models/charts-series.model';
 import { translateTimelineEventDisplayName } from 'src/app/shared/utils/timeline-event-display-name';
 import { Client } from 'src/app/clients/models/client';
+import { getProjectionColumnAgeLabel } from 'src/app/shared/utils/client-age-at-reference';
 
 @Component({
   selector: 'app-view-savings-bar-stacked-chart',
@@ -28,6 +29,7 @@ export class ViewSavingsBarStackedChartComponent implements OnChanges, OnDestroy
   @Input() forecastStartDate: Date;
   @Input() forecastEndDate: Date;
   @Input() client: Client;
+  @Input() planDuration?: number;
   @Input() cashFlowName: string;
 
   isFullscreen: any;
@@ -417,12 +419,15 @@ export class ViewSavingsBarStackedChartComponent implements OnChanges, OnDestroy
     return this.ICON_COLORS[iconUrl] ?? '#8388ff';
   }
 
-  private getDisplayAgeForYear(year: number, firstCategoryYear: number | null, lastCategoryYear: number | null): number | '' {
+  private getDisplayAgeForYear(
+    year: number,
+    _firstCategoryYear: number | null,
+    _lastCategoryYear: number | null,
+  ): number | '' {
     if (!Number.isFinite(year)) {
       return '';
     }
 
-    // If report already sends age values instead of calendar years, keep them as-is.
     if (year < 1000) {
       return year;
     }
@@ -432,31 +437,13 @@ export class ViewSavingsBarStackedChartComponent implements OnChanges, OnDestroy
       return '';
     }
 
-    const birthYear = birthDate.getFullYear();
-    // First year: age at forecast start (e.g. 45 if projection starts before they turn 46).
-    if (
-      firstCategoryYear != null &&
-      year === firstCategoryYear &&
-      this.forecastStartDate
-    ) {
-      return this.calculateAgeAtDate(this.forecastStartDate, birthDate);
-    }
-    // Last year: age they turn (projection end age, e.g. 78).
-    if (lastCategoryYear != null && year === lastCategoryYear) {
-      return year - birthYear;
-    }
-    // Other years: age at start of year (matches timeline events, e.g. Age 64 Year 2045).
-    return year - birthYear - 1;
-  }
-
-  private calculateAgeAtDate(referenceDate: Date, birthDate: Date): number {
-    const date = new Date(referenceDate);
-    let age = date.getFullYear() - birthDate.getFullYear();
-    const hasBirthdayPassed =
-      date.getMonth() > birthDate.getMonth() ||
-      (date.getMonth() === birthDate.getMonth() && date.getDate() >= birthDate.getDate());
-    if (!hasBirthdayPassed) age--;
-    return age;
+    const age = getProjectionColumnAgeLabel(
+      birthDate,
+      year,
+      this.forecastStartDate ?? undefined,
+      this.planDuration,
+    );
+    return Number.isNaN(age) ? '' : age;
   }
 
   private getClientBirthDate(): Date | null {

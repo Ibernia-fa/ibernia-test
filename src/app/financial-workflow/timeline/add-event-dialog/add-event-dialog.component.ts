@@ -32,7 +32,12 @@ import { MortgageCalculatorDialogComponent, MortgageCalculatorDialogResult } fro
 import { LanguageService } from 'src/app/core/language.service';
 import { formatAppDisplayNumber } from 'src/app/shared/utils/number-utils';
 import { resolveEscalationMatch } from 'src/app/shared/utils/escalation-rate-utils';
-import { translateTimelineEventDisplayName } from 'src/app/shared/utils/timeline-event-display-name';
+import {
+  getCashflowDialogEndCalendarYear,
+  getCompletedYearsAgeAtDate,
+  getPersistedAgeForCalendarYear,
+  getProjectionColumnAgeLabel,
+} from 'src/app/shared/utils/client-age-at-reference';
 
 @Component({
   selector: 'app-add-event-dialog',
@@ -118,6 +123,8 @@ export class AddEventDialogComponent {
   isCustomCashEvent = true;
   lastCalculatorState: MortgageCalculatorState | null = null;
   scenarioMode: boolean = false;
+  /** Inclusive last calendar year in year dropdowns — for terminal age labels (90 in plan end year). */
+  dialogEndCalendarYear = 0;
 
   get isHomeEvent(): boolean {
     return this.patchEvent?.name?.startsWith('Home') ?? false;
@@ -227,16 +234,7 @@ export class AddEventDialogComponent {
     const forecastStart = data.forecastStartDate
       ? new Date(data.forecastStartDate)
       : new Date(data.forecastStartDateYear, 0, 1);
-    let age = forecastStart.getFullYear() - birthDate.getFullYear();
-    const monthDiff = forecastStart.getMonth() - birthDate.getMonth();
-    const dayDiff = forecastStart.getDate() - birthDate.getDate();
-
-    if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
-      age--;
-    }
-
-    this.clientAge = age;
-    if (data.forecastStartDateYear - this.clientBirthYear > this.clientAge) this.clientBirthYear = this.clientBirthYear + 1
+    this.clientAge = getCompletedYearsAgeAtDate(birthDate, forecastStart);
 
     this.eventsList = data.eventsList;
     this.eventsList?.sort((a: any, b: any) => a.age - b.age);
@@ -245,8 +243,19 @@ export class AddEventDialogComponent {
     this.clientPreferredCurrency = data.clientPreferredCurrency
 
 
-    const endYear = data.forecastEndDateYear + 1;
-    var iterations = endYear - data.forecastStartDateYear + 1
+    const resolvedEndYear = getCashflowDialogEndCalendarYear(
+      data.clientBirthDate,
+      data.planDuration,
+      data.forecastEndDateYear,
+    );
+    let endYear = Number.isFinite(resolvedEndYear)
+      ? resolvedEndYear
+      : Number(data.forecastEndDateYear);
+    if (!Number.isFinite(endYear)) {
+      endYear = data.forecastStartDateYear;
+    }
+    this.dialogEndCalendarYear = endYear;
+    var iterations = endYear - data.forecastStartDateYear + 1;
 
     for (let index = 0; index < iterations; index++) {
       const element = data.forecastStartDateYear + index;
@@ -710,13 +719,32 @@ export class AddEventDialogComponent {
         start: {
           year: this.isInheritanceOneOff ? this.eventForm.get('ageDate')?.value  // for inheritance one-off event
             : this.eventForm.get('start')?.value,
-          age: this.isInheritanceOneOff ? this.eventForm.get('ageDate')?.value - this.clientBirthYear // for inheritance one-off event
-            : this.eventForm.get('start')?.value - this.clientBirthYear,
+          age: this.isInheritanceOneOff
+            ? getPersistedAgeForCalendarYear(
+                this.data.clientBirthDate,
+                this.eventForm.get('ageDate')?.value,
+                this.data.forecastStartDate,
+                this.data.planDuration,
+                this.dialogEndCalendarYear,
+              )
+            : getPersistedAgeForCalendarYear(
+                this.data.clientBirthDate,
+                this.eventForm.get('start')?.value,
+                this.data.forecastStartDate,
+                this.data.planDuration,
+                this.dialogEndCalendarYear,
+              ),
         },
         end: this.isInheritanceOneOff ? null // for inheritance one-off event
           : {
             year: this.eventForm.get('end')?.value,
-            age: (this.eventForm.get('end')?.value > this.clientBirthYear) ? this.eventForm.get('end')?.value - this.clientBirthYear : 0,
+            age: getPersistedAgeForCalendarYear(
+              this.data.clientBirthDate,
+              this.eventForm.get('end')?.value,
+              this.data.forecastStartDate,
+              this.data.planDuration,
+              this.dialogEndCalendarYear,
+            ),
           },
         escalationRate: escalataionRatesToSubmit,
         type: this.isIncomeEvent ? EventIncomeType.Income : EventIncomeType.Expense,
@@ -795,14 +823,23 @@ export class AddEventDialogComponent {
       },
       start: {
         year: this.eventForm.get('start')?.value,
-        age: this.eventForm.get('start')?.value - this.clientBirthYear,
+        age: getPersistedAgeForCalendarYear(
+          this.data.clientBirthDate,
+          this.eventForm.get('start')?.value,
+          this.data.forecastStartDate,
+          this.data.planDuration,
+          this.dialogEndCalendarYear,
+        ),
       },
       end: {
         year: this.eventForm.get('end')?.value,
-        age:
-          this.eventForm.get('end')?.value > this.clientBirthYear
-            ? this.eventForm.get('end')?.value - this.clientBirthYear
-            : 0,
+        age: getPersistedAgeForCalendarYear(
+          this.data.clientBirthDate,
+          this.eventForm.get('end')?.value,
+          this.data.forecastStartDate,
+          this.data.planDuration,
+          this.dialogEndCalendarYear,
+        ),
       },
       escalationRate:
         selectedEscalationRateValue !== null && selectedEscalationRateValue !== ''
@@ -1348,13 +1385,25 @@ export class AddEventDialogComponent {
       },
       start: {
         year,
-        age: year - this.clientBirthYear
+        age: getPersistedAgeForCalendarYear(
+          this.data.clientBirthDate,
+          year,
+          this.data.forecastStartDate,
+          this.data.planDuration,
+          this.dialogEndCalendarYear,
+        ),
       },
       end: cycle === 'One-off'
         ? null
         : {
           year,
-          age: year - this.clientBirthYear
+          age: getPersistedAgeForCalendarYear(
+            this.data.clientBirthDate,
+            year,
+            this.data.forecastStartDate,
+            this.data.planDuration,
+            this.dialogEndCalendarYear,
+          ),
         },
       escalationRate: {
         value: "0",
@@ -1445,7 +1494,13 @@ export class AddEventDialogComponent {
 
     event.end = {
       year: endYear,
-      age: endYear - this.clientBirthYear
+      age: getPersistedAgeForCalendarYear(
+        this.data.clientBirthDate,
+        endYear,
+        this.data.forecastStartDate,
+        this.data.planDuration,
+        this.dialogEndCalendarYear,
+      ),
     };
 
     return event;
@@ -1636,8 +1691,15 @@ export class AddEventDialogComponent {
     return (this.years ?? []).filter((y) => y >= startYear);
   }
 
-  getTimelineEventLabel(rawName: string): string {
-    return translateTimelineEventDisplayName(this.translate, rawName);
+  getAgeForYear(year: number): number {
+    const a = getProjectionColumnAgeLabel(
+      this.data.clientBirthDate,
+      Number(year),
+      this.data.forecastStartDate,
+      this.data.planDuration,
+      this.dialogEndCalendarYear,
+    );
+    return Number.isNaN(a) ? 0 : a;
   }
 }
 

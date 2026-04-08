@@ -124,7 +124,7 @@
                         </mat-card>
                         <app-view-timeline-chart title="Timeline" [showOnReports]="true"
                             [financialTimeline]="financialTimeline" [clientBirthDate]="clientBirthDate"
-                            [client]="client">
+                            [client]="client" [planDuration]="cashflow?.planDuration">
                         </app-view-timeline-chart>
                     </div>
                     <!-- end goals & events  -->
@@ -656,6 +656,7 @@
                                     <app-view-savings-bar-stacked-chart [report]="report" [client]="client"
                                         [forecastStartDate]="financialTimeline.forecastStartDate"
                                         [forecastEndDate]="effectiveReportEndDate ?? financialTimeline?.forecastEndtDate ?? null"
+                                        [planDuration]="cashflow?.planDuration"
                                         [cashFlowName]="cashflow?.name">
                                     </app-view-savings-bar-stacked-chart>
                                 </div>

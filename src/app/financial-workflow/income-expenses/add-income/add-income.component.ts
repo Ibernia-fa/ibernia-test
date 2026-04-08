@@ -45,10 +45,10 @@ import {
   isSalaryTypeForBonus,
 } from 'src/app/shared/utils/income-display-label';
 import {
-  annualEquivalentForIncomeCycle,
-  findSalaryIncomeForStatePensionRow,
-  roundPercentOf,
-} from 'src/app/shared/utils/state-pension-salary-utils';
+  getCompletedYearsAgeAtDate,
+  getPersistedAgeForCalendarYear,
+  getProjectionColumnAgeLabel,
+} from 'src/app/shared/utils/client-age-at-reference';
 
 @Component({
   selector: 'app-add-income',
@@ -432,6 +432,7 @@ export class AddIncomeComponent {
         this.loadIncomeIntoFormForNewPartner();
       }
     }
+    this.refreshBirthContextFromCurrentDescription();
   }
 
   private loadIncomeIntoForm(income: FinancialViewModel): void {
@@ -574,11 +575,27 @@ export class AddIncomeComponent {
           },
         },
         start: {
-          age: startYear ? startYear - this.clientBirthYear : 0,
+          age: startYear
+            ? getPersistedAgeForCalendarYear(
+                this.resolveBirthDateForAgeCalculations(),
+                startYear,
+                this.data.forecastStartDate,
+                this.data.planDuration,
+                this.forecastEndYear,
+              )
+            : 0,
           year: startYear || 0,
         },
         end: {
-          age: endYear ? endYear - this.clientBirthYear : 0,
+          age: endYear
+            ? getPersistedAgeForCalendarYear(
+                this.resolveBirthDateForAgeCalculations(),
+                endYear,
+                this.data.forecastStartDate,
+                this.data.planDuration,
+                this.forecastEndYear,
+              )
+            : 0,
           year: endYear || 0,
         },
         startEventId,
@@ -612,10 +629,17 @@ export class AddIncomeComponent {
             bonusDate:
               this.cycles.find(x => x.id === this.incomeForm.get('bonusCycle')?.value)?.description === 'One-off'
                 ? {
-                  age: this.incomeForm.get('bonusDate')?.value !== null &&
+                  age:
+                    this.incomeForm.get('bonusDate')?.value !== null &&
                     this.incomeForm.get('bonusDate')?.value !== ''
-                    ? this.incomeForm.get('bonusDate')?.value - this.clientBirthYear
-                    : 0,
+                      ? getPersistedAgeForCalendarYear(
+                          this.resolveBirthDateForAgeCalculations(),
+                          this.incomeForm.get('bonusDate')?.value,
+                          this.data.forecastStartDate,
+                          this.data.planDuration,
+                          this.forecastEndYear,
+                        )
+                      : 0,
                   year:
                     this.incomeForm.get('bonusDate')?.value !== null &&
                       this.incomeForm.get('bonusDate')?.value !== ''
@@ -1241,7 +1265,15 @@ export class AddIncomeComponent {
   }
 
   getAgeForYear(year: number): number {
-    return Number(year) - this.clientBirthYear;
+    const birth = this.resolveBirthDateForAgeCalculations();
+    const a = getProjectionColumnAgeLabel(
+      birth,
+      Number(year),
+      this.data.forecastStartDate,
+      this.data.planDuration,
+      this.forecastEndYear,
+    );
+    return Number.isNaN(a) ? 0 : a;
   }
 
   getStartYear(): number {
@@ -1298,18 +1330,53 @@ export class AddIncomeComponent {
         : this.data.clientBirthDate;
     this.clientBirthYear = moment(birthDateToUse).year();
     const birthDate = new Date(birthDateToUse);
-    const forecastStart = new Date(this.data.forecastStartDateYear, 0, 1);
-    let age = forecastStart.getFullYear() - birthDate.getFullYear();
-    const monthDiff = forecastStart.getMonth() - birthDate.getMonth();
-    const dayDiff = forecastStart.getDate() - birthDate.getDate();
+    const forecastStart = this.data.forecastStartDate
+      ? new Date(this.data.forecastStartDate)
+      : new Date(this.data.forecastStartDateYear, 0, 1);
+    this.clientAge = getCompletedYearsAgeAtDate(birthDate, forecastStart);
+  }
 
-    if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
-      age--;
+  /**
+   * Birth date used for age labels and persisted `age` fields for the current row.
+   */
+  private resolveBirthDateForAgeCalculations(): Date | string | null {
+    const desc = (this.incomeForm.get('description')?.value ??
+      this.selectedIncome?.description ??
+      '') as string;
+
+    if (desc === 'Inheritance') {
+      return this.data.clientBirthDate;
     }
 
-    this.clientAge = age;
-    if (this.data.forecastStartDateYear - this.clientBirthYear > this.clientAge) {
-      this.clientBirthYear = this.clientBirthYear + 1;
+    if (this.showPersonSelector && this.combinedEdit) {
+      if (this.editingPerson === 'partner' && this.data.partnerBirthDate) {
+        return this.data.partnerBirthDate;
+      }
+      return this.data.clientBirthDate;
+    }
+
+    if (
+      isPartnerSalaryApiDescription(desc) ||
+      isPartnerStatePensionApiDescription(desc)
+    ) {
+      return this.data.partnerBirthDate ?? this.data.clientBirthDate;
+    }
+
+    return this.data.clientBirthDate;
+  }
+
+  private refreshBirthContextFromCurrentDescription(): void {
+    const desc = (this.incomeForm.get('description')?.value ?? '') as string;
+    if (isPartnerSalaryApiDescription(desc)) {
+      this.updateSalaryRetirementDefaults(true);
+    } else if (isClientSalaryApiDescription(desc)) {
+      this.updateSalaryRetirementDefaults(false);
+    } else if (isPartnerStatePensionApiDescription(desc)) {
+      this.updateSalaryRetirementDefaults(true);
+    } else if (isClientStatePensionApiDescription(desc)) {
+      this.updateSalaryRetirementDefaults(false);
+    } else if (desc === 'Inheritance') {
+      this.applyBirthDateContextForSalaryPerson(false);
     }
   }
 

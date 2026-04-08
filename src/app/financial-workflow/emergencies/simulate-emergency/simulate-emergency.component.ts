@@ -28,8 +28,12 @@ import { getAmountCycleLabel } from 'src/app/shared/utils/amount-cycle-label';
 import { TranslateIncomeExpenseLabelPipe } from 'src/app/core/pipes/translate-income-expense-label.pipe';
 import { IncomeDisplayLabelContext } from 'src/app/shared/utils/income-display-label';
 import { TranslateEscalationDescriptionPipe } from 'src/app/core/pipes/translate-escalation-description.pipe';
-import { translateTimelineEventDisplayName } from 'src/app/shared/utils/timeline-event-display-name';
-import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
+import {
+  getCashflowDialogEndCalendarYear,
+  getCompletedYearsAgeAtDate,
+  getPersistedAgeForCalendarYear,
+  getProjectionColumnAgeLabel,
+} from 'src/app/shared/utils/client-age-at-reference';
 
 @Component({
   selector: 'simulate-emergency',
@@ -86,6 +90,7 @@ export class SimulateEmergencyComponent implements OnDestroy {
   forecastStartDate: Date;
   forecastEndDateYear: number;
   forecastStartDateYear: number;
+  dialogEndCalendarYear = 0;
 
   isSimulating = false;
   isSimulationCompleted = false;
@@ -146,22 +151,24 @@ export class SimulateEmergencyComponent implements OnDestroy {
 
     this.clientBirthYear = moment(this.clientBirthDate).year();
     const birthDate = new Date(this.clientBirthDate);
-    const forecastStart = new Date(this.forecastStartDateYear, 0, 1);
-    let age = forecastStart.getFullYear() - birthDate.getFullYear();
-    const monthDiff = forecastStart.getMonth() - birthDate.getMonth();
-    const dayDiff = forecastStart.getDate() - birthDate.getDate();
+    const forecastStart = this.forecastStartDate
+      ? new Date(this.forecastStartDate)
+      : new Date(this.forecastStartDateYear, 0, 1);
+    this.clientAge = getCompletedYearsAgeAtDate(birthDate, forecastStart);
 
-    if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
-      age--;
+    const resolvedEndYear = getCashflowDialogEndCalendarYear(
+      data.clientBirthDate,
+      data.cashflow?.planDuration,
+      data.forecastEndDateYear,
+    );
+    let endYear = Number.isFinite(resolvedEndYear)
+      ? resolvedEndYear
+      : Number(data.forecastEndDateYear);
+    if (!Number.isFinite(endYear)) {
+      endYear = this.forecastStartDateYear;
     }
-
-    this.clientAge = age;
-
-    if (this.forecastStartDateYear - this.clientBirthYear > this.clientAge)
-      this.clientBirthYear = this.clientBirthYear + 1
-
-    const endYear = data.forecastEndDateYear + 1;
-    const iterations = endYear - data.forecastStartDateYear + 1;
+    this.dialogEndCalendarYear = endYear;
+    const iterations = endYear - this.forecastStartDateYear + 1;
 
     for (let index = 0; index < iterations; index++) {
       const element = this.forecastStartDateYear + index;
@@ -395,7 +402,13 @@ export class SimulateEmergencyComponent implements OnDestroy {
           age:
             this.simulateEmergencyForm.get('start')?.value !== null &&
               this.simulateEmergencyForm.get('start')?.value !== ''
-              ? this.simulateEmergencyForm.get('start')?.value - this.clientBirthYear
+              ? getPersistedAgeForCalendarYear(
+                  this.clientBirthDate,
+                  this.simulateEmergencyForm.get('start')?.value,
+                  this.forecastStartDate,
+                  this.data.cashflow?.planDuration,
+                  this.dialogEndCalendarYear,
+                )
               : 0,
           year:
             this.simulateEmergencyForm.get('start')?.value !== null &&
@@ -407,7 +420,13 @@ export class SimulateEmergencyComponent implements OnDestroy {
           age:
             this.simulateEmergencyForm.get('end')?.value !== null &&
               this.simulateEmergencyForm.get('end')?.value !== ''
-              ? this.simulateEmergencyForm.get('end')?.value - this.clientBirthYear
+              ? getPersistedAgeForCalendarYear(
+                  this.clientBirthDate,
+                  this.simulateEmergencyForm.get('end')?.value,
+                  this.forecastStartDate,
+                  this.data.cashflow?.planDuration,
+                  this.dialogEndCalendarYear,
+                )
               : 0,
           year:
             this.simulateEmergencyForm.get('end')?.value !== null &&
@@ -637,6 +656,17 @@ export class SimulateEmergencyComponent implements OnDestroy {
   getEndYears(): number[] {
     const startYear = this.getStartYear();
     return (this.years ?? []).filter((y) => y >= startYear);
+  }
+
+  getAgeForYear(year: number): number {
+    const a = getProjectionColumnAgeLabel(
+      this.clientBirthDate,
+      Number(year),
+      this.forecastStartDate,
+      this.data.cashflow?.planDuration,
+      this.dialogEndCalendarYear,
+    );
+    return Number.isNaN(a) ? 0 : a;
   }
 
   private buildEmergencySeries(report: any, year: string, amount: number): any {

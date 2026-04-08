@@ -142,6 +142,7 @@
                     financialTimeline?.forecastEndtDate ??
                     null
                   "
+                  [planDuration]="cashflow?.planDuration"
                   [cashFlowName]="cashflow?.name"
                   [emergencyIconUrl]="'none'"
                 >
@@ -349,6 +350,7 @@
                       financialTimeline?.forecastEndtDate ??
                       null
                     "
+                    [planDuration]="compareCashflow?.planDuration"
                     [cashFlowName]="compareCashflow?.name"
                     [emergencyIconUrl]="'none'"
                   >

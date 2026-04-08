@@ -302,6 +302,7 @@ export class WealthComponent implements OnInit {
             clientPreferredCurrency: this.selectedClient?.clientDetails?.preferredCurrency,
             forecastEndDateYear: moment(timeline?.forecastEndtDate).year(),
             forecastStartDateYear: moment(timeline?.forecastStartDate).year(),
+            forecastStartDate: timeline?.forecastStartDate,
             cashflowId: this.cashflowId,
             isEditWorkflow: true,
             event: pot,

@@ -26,6 +26,7 @@ import { ensureUniqueSavingsChartSeriesColors } from 'src/app/shared/utils/uniqu
 import { translateTimelineEventDisplayName } from 'src/app/shared/utils/timeline-event-display-name';
 import { Client } from 'src/app/clients/models/client';
 import moment from 'moment';
+import { getProjectionColumnAgeLabel } from 'src/app/shared/utils/client-age-at-reference';
 
 @Component({
   selector: 'app-savings-bar-stacked-chart',
@@ -43,6 +44,8 @@ export class SavingsBarStackedChartComponent
   @Input() forecastStartDate: Date;
   @Input() forecastEndDate: Date;
   @Input() client: Client;
+  /** Cashflow plan end age (e.g. 90); aligns last bar label year with birthYear + planDuration. */
+  @Input() planDuration?: number;
   @Input() cashFlowName: string;
   @Input() chartHeight: number = 500;
   @Input() emergencyIconUrl?: string;
@@ -1315,38 +1318,20 @@ export class SavingsBarStackedChartComponent
 
   private getDisplayAgeForYear(
     year: number,
-    firstCategoryYear: number | null,
-    lastCategoryYear: number | null,
+    _firstCategoryYear: number | null,
+    _lastCategoryYear: number | null,
   ): number | '' {
     const birthDate = this.getClientBirthDate();
     if (!birthDate || !Number.isFinite(year)) {
       return '';
     }
-    // First year: age at forecast start (e.g. 45 if projection starts before they turn 46).
-    if (
-      firstCategoryYear != null &&
-      year === firstCategoryYear &&
-      this.forecastStartDate
-    ) {
-      return this.calculateAgeAtDate(this.forecastStartDate, birthDate);
-    }
-    // Age at start of year (Jan 1) to match timeline chart convention
-    return this.calculateAgeAtDate(new Date(year, 0, 1), birthDate);
-  }
-
-  private calculateAgeAtDate(referenceDate: Date, birthDate: Date): number {
-    const date = new Date(referenceDate);
-    let age = date.getFullYear() - birthDate.getFullYear();
-    const hasBirthdayPassed =
-      date.getMonth() > birthDate.getMonth() ||
-      (date.getMonth() === birthDate.getMonth() &&
-        date.getDate() >= birthDate.getDate());
-
-    if (!hasBirthdayPassed) {
-      age--;
-    }
-
-    return age;
+    const age = getProjectionColumnAgeLabel(
+      birthDate,
+      year,
+      this.forecastStartDate ?? undefined,
+      this.planDuration,
+    );
+    return Number.isNaN(age) ? '' : age;
   }
 
   private getClientBirthDate(): Date | null {

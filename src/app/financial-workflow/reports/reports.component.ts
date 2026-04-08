@@ -58,6 +58,7 @@ import {
 import { TranslateModule } from '@ngx-translate/core';
 import { RouterLink } from '@angular/router';
 import { AiRecommendationsHttpService } from '../ai-recommendations/services/ai-recommendations-http.service';
+import { getProjectionColumnAgeLabel } from 'src/app/shared/utils/client-age-at-reference';
 import { RecommendationItem } from '../ai-recommendations/models/ai-recommendations.model';
 
 export interface PeriodicElement {
@@ -277,11 +278,13 @@ export class ReportsComponent {
     this.hasShortfall = true;
 
     const year = Number(report.categories[index]);
-    const birthYear = new Date(
+    const age = getProjectionColumnAgeLabel(
       this.client.clientDetails.birthDate,
-    ).getFullYear();
-
-    this.firstShortfallAge = year - birthYear;
+      year,
+      this.financialTimeline?.forecastStartDate,
+      this.cashflow?.planDuration,
+    );
+    this.firstShortfallAge = Number.isNaN(age) ? null : age;
   }
 
   ngAfterViewInit(): void {

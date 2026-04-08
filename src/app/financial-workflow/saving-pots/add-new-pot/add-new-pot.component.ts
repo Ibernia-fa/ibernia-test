@@ -45,6 +45,12 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { TranslateEscalationDescriptionPipe } from 'src/app/core/pipes/translate-escalation-description.pipe';
 import { getAmountCycleLabel } from 'src/app/shared/utils/amount-cycle-label';
 import { resolveEscalationMatch } from 'src/app/shared/utils/escalation-rate-utils';
+import {
+  getCashflowDialogEndCalendarYear,
+  getCompletedYearsAgeAtDate,
+  getPersistedAgeForCalendarYear,
+  getProjectionColumnAgeLabel,
+} from 'src/app/shared/utils/client-age-at-reference';
 @Component({
   selector: 'app-add-new-pot',
   imports: [
@@ -126,6 +132,8 @@ export class AddNewPotComponent {
   ];
   forecastEndDateYear: any;
   forecastStartDateYear: any;
+  /** Inclusive last calendar year in this dialog’s year dropdowns (plan end, not API+1). */
+  dialogEndCalendarYear: number;
   isCashPotEditMode: boolean;
   userReturnRate: any = 3.5;
   loggedInUserPreferences: any;
@@ -177,20 +185,14 @@ export class AddNewPotComponent {
     this.clientBirthYear = moment(data.clientBirthDate).year();
     this.userReturnRate = data.returnRate;
     const birthDate = new Date(data.clientBirthDate);
-    const forecastStart = new Date(data.forecastStartDateYear, 0, 1);
-    let age = forecastStart.getFullYear() - birthDate.getFullYear();
-    const monthDiff = forecastStart.getMonth() - birthDate.getMonth();
-    const dayDiff = forecastStart.getDate() - birthDate.getDate();
+    const forecastStart = data.forecastStartDate
+      ? new Date(data.forecastStartDate)
+      : new Date(data.forecastStartDateYear, 0, 1);
     const prefType = this.loggedInUserPreferences?.comissionType;
     this.loggedInUserComissionType = prefType === ComissionType.None || prefType == null
       ? undefined
       : this.comissionTypes.find(x => x.value === prefType)?.label.toLowerCase();
-    if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
-      age--;
-    }
-
-    this.clientAge = age
-    if(data.forecastStartDateYear - this.clientBirthYear > this.clientAge) this.clientBirthYear =  this.clientBirthYear+1
+    this.clientAge = getCompletedYearsAgeAtDate(birthDate, forecastStart);
 
     // Extract retirement age from events if available
     const retirementEvent = this.eventsList?.find((e: any) => 
@@ -198,8 +200,11 @@ export class AddNewPotComponent {
       e.name?.toLowerCase().includes('pensione')
     );
     if (retirementEvent) {
-      this.retirementAgeValue = retirementEvent.start.age;  // Store the age (e.g., 64)
-      this.retirementAge = retirementEvent.start.age + this.clientBirthYear;  // Store the year
+      this.retirementAgeValue = retirementEvent.start.age;
+      const ry = Number(retirementEvent.start?.year);
+      this.retirementAge = Number.isFinite(ry)
+        ? ry
+        : this.retirementAgeValue + this.clientBirthYear;
     }
 
     this.clientPreferredCurrency = data.clientPreferredCurrency;
@@ -208,6 +213,17 @@ export class AddNewPotComponent {
     this.selectedPot = data.event
     this.forecastStartDateYear = data.forecastStartDateYear;
     this.forecastEndDateYear = data.forecastEndDateYear;
+    const resolvedDialogEnd = getCashflowDialogEndCalendarYear(
+      data.clientBirthDate,
+      data.planDuration,
+      data.forecastEndDateYear,
+    );
+    this.dialogEndCalendarYear = Number.isFinite(resolvedDialogEnd)
+      ? resolvedDialogEnd
+      : Number(data.forecastEndDateYear);
+    if (!Number.isFinite(this.dialogEndCalendarYear)) {
+      this.dialogEndCalendarYear = data.forecastStartDateYear;
+    }
 
     // Determine if this is a Cash pot edit mode EARLY (before form creation)
     if (this.isEditWorkflow) {
@@ -219,7 +235,7 @@ export class AddNewPotComponent {
       this.editDialogTitle = `Edit ${this.selectedPot.name}`;
     }
 
-    const endYear = data.forecastEndDateYear + 1;
+    const endYear = this.dialogEndCalendarYear;
     const iterations = endYear - data.forecastStartDateYear + 1;
 
     for (let index = 0; index < iterations; index++) {
@@ -245,7 +261,7 @@ export class AddNewPotComponent {
       // lockPot: [true],
       lockPot: [defaultType === 'Pension fund'],  // Auto-check for Pension fund only
       start: [data.forecastStartDateYear, Validators.required],
-      end: [data.forecastEndDateYear-1, Validators.required],
+      end: [this.dialogEndCalendarYear, Validators.required],
       // Commissions always start unchecked - user must manually enable
       commissions: [false],
       commissionType: [this.loggedInUserComissionType ?? ''],
@@ -383,7 +399,10 @@ onAmountBlur(e: Event) {
     );
     this.savingsForm.get('lockPot')?.patchValue(this.selectedPot.hasPotLocked, { emitEvent: false });
     this.savingsForm.get('start')?.patchValue(this.selectedPot.lockedFrom?.year ?? this.forecastStartDateYear, { emitEvent: false });
-    this.savingsForm.get('end')?.patchValue(this.selectedPot.lockedTill?.year ?? (this.forecastEndDateYear - 1), { emitEvent: false });
+    this.savingsForm.get('end')?.patchValue(
+      this.selectedPot.lockedTill?.year ?? this.dialogEndCalendarYear,
+      { emitEvent: false },
+    );
     
     // Patch Pension fund specific fields if applicable
     if (this.selectedPot.name === 'Pension fund') {
@@ -718,7 +737,7 @@ onAmountBlur(e: Event) {
       this.savingsForm.get('end')?.removeValidators(Validators.required);
       this.savingsForm.get('end')?.updateValueAndValidity();
 
-      this.savingsForm.get('end')?.patchValue(this.forecastEndDateYear)
+      this.savingsForm.get('end')?.patchValue(this.dialogEndCalendarYear)
     }
   }
 
@@ -950,7 +969,13 @@ onAmountBlur(e: Event) {
         start: {
           age:
             this.forecastStartDateYear != null
-              ? this.forecastStartDateYear - this.clientBirthYear
+              ? getPersistedAgeForCalendarYear(
+                  this.data.clientBirthDate,
+                  this.forecastStartDateYear,
+                  this.data.forecastStartDate,
+                  this.data.planDuration,
+                  this.dialogEndCalendarYear,
+                )
               : 0,
           year:
             this.forecastStartDateYear != null
@@ -961,7 +986,13 @@ onAmountBlur(e: Event) {
           age:
             isPotLocked && this.savingsForm.get('start')?.value !== null &&
             this.savingsForm.get('start')?.value !== ''
-              ? this.savingsForm.get('start')?.value - this.clientBirthYear
+              ? getPersistedAgeForCalendarYear(
+                  this.data.clientBirthDate,
+                  this.savingsForm.get('start')?.value,
+                  this.data.forecastStartDate,
+                  this.data.planDuration,
+                  this.dialogEndCalendarYear,
+                )
               : 0,
           year:
             isPotLocked &&  this.savingsForm.get('start')?.value !== null &&
@@ -973,7 +1004,13 @@ onAmountBlur(e: Event) {
           age:
              isPotLocked && this.savingsForm.get('end')?.value !== null &&
             this.savingsForm.get('end')?.value !== ''
-              ? this.savingsForm.get('end')?.value - this.clientBirthYear
+              ? getPersistedAgeForCalendarYear(
+                  this.data.clientBirthDate,
+                  this.savingsForm.get('end')?.value,
+                  this.data.forecastStartDate,
+                  this.data.planDuration,
+                  this.dialogEndCalendarYear,
+                )
               : 0,
           year:
              isPotLocked && this.savingsForm.get('end')?.value !== null &&
@@ -983,13 +1020,18 @@ onAmountBlur(e: Event) {
         },
         end: {
           age:
-            this.forecastEndDateYear != null
-              ? this.forecastEndDateYear - this.clientBirthYear
+            Number.isFinite(this.dialogEndCalendarYear)
+              ? getPersistedAgeForCalendarYear(
+                  this.data.clientBirthDate,
+                  this.dialogEndCalendarYear,
+                  this.data.forecastStartDate,
+                  this.data.planDuration,
+                  this.dialogEndCalendarYear,
+                )
               : 0,
-          year:
-            this.forecastEndDateYear != null
-              ? this.forecastEndDateYear
-              : 0,
+          year: Number.isFinite(this.dialogEndCalendarYear)
+            ? this.dialogEndCalendarYear
+            : 0,
         },
         // returnRate: this.savingsForm.get('name')?.value !== 'Cash' ? this.savingsForm.get('returnRate')?.value : 0,
           returnRate: this.savingsForm.get('name')?.value !== 'Cash' ? rr : 0,
@@ -1013,13 +1055,25 @@ onAmountBlur(e: Event) {
         contributionStartDate: this.savingsForm.get('name')?.value === 'Pension fund'
           ? {
               year: this.savingsForm.get('contributionStartDate')?.value,
-              age: (this.savingsForm.get('contributionStartDate')?.value || 0) - this.clientBirthYear
+              age: getPersistedAgeForCalendarYear(
+                this.data.clientBirthDate,
+                this.savingsForm.get('contributionStartDate')?.value,
+                this.data.forecastStartDate,
+                this.data.planDuration,
+                this.dialogEndCalendarYear,
+              ),
             }
           : null,
         contributionEndDate: this.savingsForm.get('name')?.value === 'Pension fund'
           ? {
               year: this.savingsForm.get('contributionEndDate')?.value,
-              age: (this.savingsForm.get('contributionEndDate')?.value || 0) - this.clientBirthYear
+              age: getPersistedAgeForCalendarYear(
+                this.data.clientBirthDate,
+                this.savingsForm.get('contributionEndDate')?.value,
+                this.data.forecastStartDate,
+                this.data.planDuration,
+                this.dialogEndCalendarYear,
+              ),
             }
           : null,
         retirementAge: this.savingsForm.get('name')?.value === 'Pension fund'
@@ -1302,6 +1356,17 @@ getLockEndYears(): number[] {
   const startYear = this.getLockStartYear();
   return (this.years ?? []).filter((y) => y >= startYear);
 }
+
+  getAgeForYear(year: number): number {
+    const a = getProjectionColumnAgeLabel(
+      this.data.clientBirthDate,
+      Number(year),
+      this.data.forecastStartDate,
+      this.data.planDuration,
+      this.dialogEndCalendarYear,
+    );
+    return Number.isNaN(a) ? 0 : a;
+  }
 
 getCycleLabel(cycle: Cycle): string {
   return getAmountCycleLabel(cycle, this.translate);
