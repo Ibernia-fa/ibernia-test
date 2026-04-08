@@ -126,7 +126,7 @@ export class AddEmergenciesComponent {
         this.data.emergency?.coverage === 0
           ? null
           : (this.data.emergency?.coverage ?? null),
-        [Validators.required, Validators.min(0)],
+        [Validators.min(0)],
       ],
       willStatus: [null],
     });
@@ -346,7 +346,7 @@ export class AddEmergenciesComponent {
       // insuranceAmountCtrl.setValidators([Validators.required, Validators.min(0)]);
       insuranceCycleIdCtrl.setValidators([Validators.required]);
       coverageAdequacyCtrl.setValidators([Validators.required]);
-      coverageCtrl.setValidators([Validators.required, Validators.min(0)]);
+      coverageCtrl.setValidators([Validators.min(0)]);
     }
 
     // insuranceAmountCtrl.updateValueAndValidity({ emitEvent: false });
