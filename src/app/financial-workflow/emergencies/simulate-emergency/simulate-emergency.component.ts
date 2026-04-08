@@ -28,6 +28,8 @@ import { getAmountCycleLabel } from 'src/app/shared/utils/amount-cycle-label';
 import { TranslateIncomeExpenseLabelPipe } from 'src/app/core/pipes/translate-income-expense-label.pipe';
 import { IncomeDisplayLabelContext } from 'src/app/shared/utils/income-display-label';
 import { TranslateEscalationDescriptionPipe } from 'src/app/core/pipes/translate-escalation-description.pipe';
+import { translateTimelineEventDisplayName } from 'src/app/shared/utils/timeline-event-display-name';
+import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
 import {
   getCashflowDialogEndCalendarYear,
   getCompletedYearsAgeAtDate,

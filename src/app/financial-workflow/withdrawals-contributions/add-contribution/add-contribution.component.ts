@@ -48,6 +48,7 @@ import {
 import { MaterialModule } from 'src/app/material.module';
 import { Client } from 'src/app/clients/models/client';
 import { formatSavingPotSelectLabel } from 'src/app/shared/utils/saving-pot-select-label';
+import { translateTimelineEventDisplayName } from 'src/app/shared/utils/timeline-event-display-name';
 import {
   getCompletedYearsAgeAtDate,
   getPersistedAgeForCalendarYear,
