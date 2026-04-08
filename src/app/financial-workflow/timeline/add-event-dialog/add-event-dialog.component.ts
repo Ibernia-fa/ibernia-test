@@ -22,6 +22,7 @@ import { AgeCalculatorPipe } from 'src/app/pipe/age-calculator.pipe';
 import { CommonModule } from '@angular/common';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 import { TranslateModule } from '@ngx-translate/core';
+import { TranslateService } from '@ngx-translate/core';
 import { TranslateEscalationDescriptionPipe } from 'src/app/core/pipes/translate-escalation-description.pipe';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MortgageCalculatorState } from '../mortgage-calculator/mortgage-calculator.component';
@@ -31,6 +32,7 @@ import { MortgageCalculatorDialogComponent, MortgageCalculatorDialogResult } fro
 import { LanguageService } from 'src/app/core/language.service';
 import { formatAppDisplayNumber } from 'src/app/shared/utils/number-utils';
 import { resolveEscalationMatch } from 'src/app/shared/utils/escalation-rate-utils';
+import { translateTimelineEventDisplayName } from 'src/app/shared/utils/timeline-event-display-name';
 
 @Component({
   selector: 'app-add-event-dialog',
@@ -195,6 +197,7 @@ export class AddEventDialogComponent {
     private cdr: ChangeDetectorRef,
     private settings: SettingsService,
     private language: LanguageService,
+    private translate: TranslateService,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
     this.settings.profileChanged$.pipe(takeUntilDestroyed()).subscribe(() => this.cdr.markForCheck());
@@ -1631,6 +1634,10 @@ export class AddEventDialogComponent {
   getFinancingEndYears(): number[] {
     const startYear = this.getFinancingStartYear();
     return (this.years ?? []).filter((y) => y >= startYear);
+  }
+
+  getTimelineEventLabel(rawName: string): string {
+    return translateTimelineEventDisplayName(this.translate, rawName);
   }
 }
 

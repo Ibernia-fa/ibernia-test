@@ -25,6 +25,7 @@ import { TranslateEscalationDescriptionPipe } from 'src/app/core/pipes/translate
 import { getAmountCycleLabel } from 'src/app/shared/utils/amount-cycle-label';
 import { resolveEscalationMatch } from 'src/app/shared/utils/escalation-rate-utils';
 import { CommonModule } from '@angular/common';
+import { translateTimelineEventDisplayName } from 'src/app/shared/utils/timeline-event-display-name';
 
 @Component({
   selector: 'app-add-expense',
@@ -304,6 +305,10 @@ export class AddExpenseComponent {
 
   getCycleLabel(cycle: Cycle): string {
     return getAmountCycleLabel(cycle, this.translate);
+  }
+
+  getTimelineEventLabel(rawName: string): string {
+    return translateTimelineEventDisplayName(this.translate, rawName);
   }
 
   addExpense(): void {

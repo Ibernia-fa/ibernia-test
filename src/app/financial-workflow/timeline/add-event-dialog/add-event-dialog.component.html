@@ -354,7 +354,7 @@
                             track event.name + event.year
                           ) {
                             <mat-option [value]="event.year"
-                              >{{ event.name }} ({{ event.age }})</mat-option
+                              >{{ getTimelineEventLabel(event.name) }} ({{ event.age }})</mat-option
                             >
                           }
                           <hr />
@@ -1073,7 +1073,7 @@
                           track event.name + event.year
                         ) {
                           <mat-option [value]="event.year"
-                            >{{ event.name }} ({{ event.age }})</mat-option
+                            >{{ getTimelineEventLabel(event.name) }} ({{ event.age }})</mat-option
                           >
                         }
                         @if (
@@ -1600,7 +1600,7 @@
                             track event.name + event.year
                           ) {
                             <mat-option [value]="event.year"
-                              >{{ event.name }} ({{ event.age }})</mat-option
+                              >{{ getTimelineEventLabel(event.name) }} ({{ event.age }})</mat-option
                             >
                           }
                           <hr />
@@ -2138,7 +2138,7 @@
                           track event.name + event.year
                         ) {
                           <mat-option [value]="event.year"
-                            >{{ event.name }} ({{ event.age }})</mat-option
+                            >{{ getTimelineEventLabel(event.name) }} ({{ event.age }})</mat-option
                           >
                         }
                         @if (
