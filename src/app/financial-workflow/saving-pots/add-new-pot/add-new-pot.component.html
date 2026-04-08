@@ -271,7 +271,6 @@
                 style="border-radius: 0px 4px 4px 0px"
                 formControlName="amount"
                 #amountInput
-                [value]="amount | thousandSeparator"
                 thousandSeparatorInput
                 (input)="onAmountInput($event.target.value)"
                 (blur)="onAmountBlur($event)"

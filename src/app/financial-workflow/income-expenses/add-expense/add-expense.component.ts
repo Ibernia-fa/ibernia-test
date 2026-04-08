@@ -9,7 +9,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { provideNativeDateAdapter } from '@angular/material/core';
-import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 import { allCountries } from 'src/app/clients/models/country';
 import { Cycle, EscalationRate } from '../../timeline/models/financial-timeline';
@@ -43,7 +42,6 @@ import { translateTimelineEventDisplayName } from 'src/app/shared/utils/timeline
     MatSliderModule,
     ReactiveFormsModule,
     CommonModule,
-    ThousandSeparatorPipe,
     ThousandSeparatorInputDirective,
     TranslateModule,
     TranslateIncomeExpenseLabelPipe,

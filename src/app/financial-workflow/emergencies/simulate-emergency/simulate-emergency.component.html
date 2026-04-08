@@ -59,10 +59,6 @@
                     formControlName="amount"
                     #amountInput
                     placeholder="0"
-                    [value]="
-                      simulateEmergencyForm.get('amount')?.value
-                        | thousandSeparator
-                    "
                     thousandSeparatorInput
                     (input)="onAmountInput($event.target.value)"
                   />

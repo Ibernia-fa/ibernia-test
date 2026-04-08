@@ -13,7 +13,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { provideNativeDateAdapter } from '@angular/material/core';
-import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -31,7 +30,6 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
     MatSelectModule,
     MatDatepickerModule,
     MatSliderModule,
-    ThousandSeparatorPipe,
     ThousandSeparatorInputDirective,
     TranslateModule
   ],

@@ -41,8 +41,7 @@
             <input
               matInput
               style="border-radius: 0px 4px 4px 0px"
-              [value]="form.value.jointNetWorth | number: '1.0-0'"
-              (input)="onAmountInput($event)"
+              formControlName="jointNetWorth"
               thousandSeparatorInput
             />
           </div>

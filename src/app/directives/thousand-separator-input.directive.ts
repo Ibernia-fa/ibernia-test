@@ -80,9 +80,12 @@ export class ThousandSeparatorInputDirective implements OnInit {
       .replace(/(\..*)\./g, '$1');
 
     const num = raw === '' || raw === '.' ? null : Number(raw);
+    // emitEvent must be true so host templates that also bind [value] to FormControl
+    // (e.g. amount | thousandSeparator) sync on the same tick; emit false left them stale
+    // and change detection overwrote the input back to the old grouped value.
     this.ngControl?.control?.setValue(
       isNaN(Number(num)) ? null : num,
-      { emitEvent: false }
+      { emitEvent: true },
     );
 
     const formatted = this.formatNumber(raw);

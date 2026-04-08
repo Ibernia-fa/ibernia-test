@@ -182,7 +182,6 @@
                   type="text"
                   formControlName="amount"
                   #amountInput
-                  [value]="incomeForm.get('amount')?.value | thousandSeparator"
                   thousandSeparatorInput
                   (input)="onAmountInput($event.target.value)"
                   placeholder="0"
@@ -286,9 +285,6 @@
                     type="text"
                     formControlName="bonusAmount"
                     #bonusAmountInput
-                    [value]="
-                      incomeForm.get('bonusAmount')?.value | thousandSeparator
-                    "
                     thousandSeparatorInput
                     (input)="onBonusAmountInput($event.target.value)"
                     placeholder="0"

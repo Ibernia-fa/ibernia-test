@@ -108,9 +108,6 @@
                   type="text"
                   formControlName="amount"
                   #amountInput
-                  [value]="
-                    withdrawalForm.get('amount')?.value | thousandSeparator
-                  "
                   thousandSeparatorInput
                   (input)="onAmountInput($event.target.value)"
                   placeholder="0"

@@ -11,7 +11,6 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 import { allCountries } from 'src/app/clients/models/country';
-import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
 import { Cycle, EscalationRate } from '../../timeline/models/financial-timeline';
 import moment from 'moment';
@@ -67,7 +66,6 @@ import {
     MatCheckboxModule,
     ReactiveFormsModule,
     CommonModule,
-    ThousandSeparatorPipe,
     ThousandSeparatorInputDirective,
     TranslateModule,
     TranslateIncomeExpenseLabelPipe,

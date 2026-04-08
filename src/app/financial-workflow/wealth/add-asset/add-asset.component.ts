@@ -11,7 +11,6 @@ import { ToastrService } from 'ngx-toastr';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 import { allCountries } from 'src/app/clients/models/country';
-import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
 
@@ -44,7 +43,6 @@ export interface AddAssetDialogData {
     MatInputModule,
     MatRadioModule,
     MatSelectModule,
-    ThousandSeparatorPipe,
     ThousandSeparatorInputDirective,
     TranslateModule,
   ],
