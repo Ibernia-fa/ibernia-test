@@ -34,6 +34,11 @@ import { CommonModule } from '@angular/common';
 import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
 import { ToastrService } from 'ngx-toastr';
 import {
+  annualEquivalentForIncomeCycle,
+  findSalaryIncomeForStatePensionRow,
+  roundPercentOf,
+} from 'src/app/shared/utils/state-pension-salary-utils';
+import {
   IncomeDisplayLabelContext,
   incomeApiDescriptionToDisplayLabel,
   isClientSalaryApiDescription,
