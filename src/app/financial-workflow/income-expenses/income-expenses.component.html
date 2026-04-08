@@ -716,8 +716,16 @@
           @for (expense of expenses; track trackByExpenseId; let i = $index) {
             <mat-card-content class="income-items">
               <div
-                class="dragable-card d-flex align-items-center justify-content-between cursor-pointer"
-                (click)="updateExpenseClicked(expense)"
+                class="dragable-card d-flex align-items-center justify-content-between"
+                [class.cursor-pointer]="expense.description !== 'Insurance'"
+                [matTooltip]="'INCOME_EXPENSE.INSURANCE_CARD_TOOLTIP' | translate"
+                [matTooltipDisabled]="expense.description !== 'Insurance'"
+                matTooltipPosition="above"
+                matTooltipClass="income-expense-insurance-tooltip"
+                (click)="
+                  expense.description !== 'Insurance' &&
+                    updateExpenseClicked(expense)
+                "
               >
                 <div class="stats-main-wrapper">
                   <div class="d-flex align-items-start gap-10">
