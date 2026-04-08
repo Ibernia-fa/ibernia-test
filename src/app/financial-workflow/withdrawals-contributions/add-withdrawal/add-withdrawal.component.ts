@@ -18,7 +18,6 @@ import { FundsViewModel } from '../model/withdrawals-contributions';
 import { catchError, filter } from 'rxjs';
 import { ClientSaving, ComissionType, SavingPotsModel } from '../../saving-pots/models/saving-pots.model';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -43,7 +42,6 @@ import { translateTimelineEventDisplayName } from 'src/app/shared/utils/timeline
     MatSliderModule,
     ReactiveFormsModule,
     MatCheckboxModule,
-    ThousandSeparatorPipe,
     ThousandSeparatorInputDirective,
     TranslateModule,
   ],

@@ -114,7 +114,6 @@
                 matInput
                 type="text"
                 formControlName="outstanding"
-                [value]="form.get('outstanding')?.value | thousandSeparator"
                 thousandSeparatorInput
                 (input)="onAmountInput($event.target.value)"
                 placeholder="0"

@@ -10,7 +10,6 @@ import { MatCardModule } from '@angular/material/card';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { provideNativeDateAdapter } from '@angular/material/core';
-import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 import moment from 'moment';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
@@ -47,7 +46,6 @@ import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
     MatCheckboxModule,
     MatSliderModule,
     ReactiveFormsModule,
-    ThousandSeparatorPipe,
     ThousandSeparatorInputDirective,
     SavingsBarStackedChartComponent,
     TranslateModule,
