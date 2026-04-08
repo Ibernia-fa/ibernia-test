@@ -342,7 +342,7 @@ export class DefaultAssumptionsComponent implements OnInit, OnDestroy {
   }
 
   onCommissionAmountInput(rawValue: string) {
-    const value = parseFormattedNumber(rawValue);
+    const value = parseFormattedNumber(rawValue, this.translate.currentLang);
     this.form.controls.preferences.controls.comissionAmount.setValue(value, { emitEvent: false });
     const el = this.commissionAmountInput?.nativeElement;
     if (!el) return;

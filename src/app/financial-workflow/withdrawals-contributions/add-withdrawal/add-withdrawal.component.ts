@@ -215,7 +215,7 @@ export class AddWithdrawalComponent {
   }
 
   onAmountInput(rawValue: string) {
-    const value = parseFormattedNumber(rawValue);
+    const value = parseFormattedNumber(rawValue, this.translate.currentLang);
     this.withdrawalForm.get('amount')?.setValue(value, { emitEvent: true });
   }
 

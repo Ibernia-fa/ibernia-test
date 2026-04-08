@@ -68,7 +68,10 @@ export class EditParentEstateComponent {
 
   onAmountInput(event: Event): void {
     const input = event.target as HTMLInputElement;
-    this.form.patchValue({ jointNetWorth: parseFormattedNumber(input.value) }, { emitEvent: false });
+    this.form.patchValue(
+      { jointNetWorth: parseFormattedNumber(input.value, this.translate.currentLang) },
+      { emitEvent: false },
+    );
   }
 
   onSave(): void {

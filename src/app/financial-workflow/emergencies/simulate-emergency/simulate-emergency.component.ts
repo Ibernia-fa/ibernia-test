@@ -30,6 +30,7 @@ import { TranslateIncomeExpenseLabelPipe } from 'src/app/core/pipes/translate-in
 import { IncomeDisplayLabelContext } from 'src/app/shared/utils/income-display-label';
 import { TranslateEscalationDescriptionPipe } from 'src/app/core/pipes/translate-escalation-description.pipe';
 import { translateTimelineEventDisplayName } from 'src/app/shared/utils/timeline-event-display-name';
+import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
 
 @Component({
   selector: 'simulate-emergency',
@@ -60,8 +61,7 @@ import { translateTimelineEventDisplayName } from 'src/app/shared/utils/timeline
 export class SimulateEmergencyComponent implements OnDestroy {
   @ViewChild('amountInput') amountInput?: ElementRef<HTMLInputElement>;
   onAmountInput(rawValue: string) {
-    const { parseFormattedNumber } = require('src/app/shared/utils/number-utils');
-    const value = parseFormattedNumber(rawValue);
+    const value = parseFormattedNumber(rawValue, this.translate.currentLang);
     this.simulateEmergencyForm.get('amount')?.setValue(value);
   }
 
@@ -370,10 +370,11 @@ export class SimulateEmergencyComponent implements OnDestroy {
       // convert amount back to number if it's still a formatted string
       const rawAmountControl = this.simulateEmergencyForm.get('amount');
       if (rawAmountControl) {
-        const { parseFormattedNumber } = require('src/app/shared/utils/number-utils');
         const currentValue = rawAmountControl.value;
-        // only convert if it's a string with commas
-        rawAmountControl.setValue(parseFormattedNumber(currentValue), { emitEvent: false });
+        rawAmountControl.setValue(
+          parseFormattedNumber(currentValue, this.translate.currentLang),
+          { emitEvent: false },
+        );
       }
       const rawAmount = this.simulateEmergencyForm.get('amount')?.value;
 
