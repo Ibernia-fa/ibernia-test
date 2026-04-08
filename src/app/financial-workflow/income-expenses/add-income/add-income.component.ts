@@ -36,6 +36,11 @@ import { AuthService } from 'src/app/auth/services/auth.service';
 import { SettingsService } from 'src/app/default-preferance/services/default-preferance.http.service';
 import { translateTimelineEventDisplayName } from 'src/app/shared/utils/timeline-event-display-name';
 import {
+  annualEquivalentForIncomeCycle,
+  findSalaryIncomeForStatePensionRow,
+  roundPercentOf,
+} from 'src/app/shared/utils/state-pension-salary-utils';
+import {
   IncomeDisplayLabelContext,
   incomeApiDescriptionToDisplayLabel,
   isClientSalaryApiDescription,
