@@ -25,6 +25,7 @@ import { TranslateEscalationDescriptionPipe } from 'src/app/core/pipes/translate
 import { getAmountCycleLabel } from 'src/app/shared/utils/amount-cycle-label';
 import { resolveEscalationMatch } from 'src/app/shared/utils/escalation-rate-utils';
 import { CommonModule } from '@angular/common';
+import { translateTimelineEventDisplayName } from 'src/app/shared/utils/timeline-event-display-name';
 import {
   getCompletedYearsAgeAtDate,
   getPersistedAgeForCalendarYear,
