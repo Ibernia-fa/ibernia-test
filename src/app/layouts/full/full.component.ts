@@ -350,6 +350,7 @@ export class FullComponent implements OnInit, OnDestroy {
     const uid = this.Authservice.getUserProfile()?.sub;
     if (uid) {
       this.organizationProfiles.hydrateBrandingLogoFromSession(uid);
+      this.organizationProfiles.hydrateBackgroundFromSession(uid);
     }
 
     const initialPath = this.normalizePath(this.router.url);
@@ -499,6 +500,13 @@ export class FullComponent implements OnInit, OnDestroy {
             p?.backgroundPhotoUrl ?? null,
           );
           this.backgroundImageReady = true;
+          const uid = this.Authservice.getUserProfile()?.sub;
+          if (uid) {
+            this.organizationProfiles.setBackgroundImage(
+              this.backgroundImage,
+              uid,
+            );
+          }
         },
         error: (err) => {
           console.error(err);

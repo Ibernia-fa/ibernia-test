@@ -38,6 +38,24 @@ export function fileToDataUrl(file: File): Promise<string> {
   });
 }
 
+/** Convert a data URL to a Blob for multipart upload (e.g. POST /api/v1/organizations/logo). */
+export function dataUrlToBlob(dataUrl: string): Blob {
+  const comma = dataUrl.indexOf(',');
+  if (comma < 0) {
+    throw new Error('Invalid data URL');
+  }
+  const header = dataUrl.slice(0, comma);
+  const base64 = dataUrl.slice(comma + 1);
+  const mimeMatch = /^data:([^;]+)/.exec(header);
+  const mime = mimeMatch?.[1]?.trim() || 'image/jpeg';
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return new Blob([bytes], { type: mime });
+}
+
 /** Get image dimensions from data URL */
 export function getImageDimensions(dataUrl: string): Promise<{ width: number; height: number }> {
   return new Promise((resolve, reject) => {
@@ -141,7 +159,7 @@ export function compressForBackground(dataUrl: string): Promise<string> {
 
 /**
  * Shrink background data URL if it is still huge after preview compression (detailed photos at 2560px
- * can exceed ~2–3MB base64). Call before POST /Organizations/profiles so strict proxies/CDNs are less
+ * can exceed ~2–3MB base64). Call before POST /api/v1/organizations/background so strict proxies/CDNs are less
  * likely to return 413. Does nothing if already under the cap.
  */
 const MAX_BACKGROUND_DATA_URL_CHARS = 3_000_000;

@@ -180,7 +180,7 @@
           class="button-icon pull-right"
           type="button"
           (click)="save()"
-          [disabled]="!hasChanges || isLoading || isSaving"
+          [disabled]="!hasChanges || isSaving"
         >
           <span class="f-s-16">{{
             isSaving ? ("Saving…" | translate) : ("Save" | translate)
