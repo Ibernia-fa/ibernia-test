@@ -103,44 +103,46 @@
                     [class.deceased]="isDeceased(parent.id)"
                     (click)="onClickParentMember(parent)"
                   >
-                    <div
-                      class="node-avatar"
-                      [ngClass]="'avatar-' + parent.role.toLowerCase()"
-                    >
-                      <mat-icon>
-                        <svg
-                          width="30"
-                          height="30"
-                          viewBox="0 0 30 30"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            d="M25 26.25V23.75C25 22.4239 24.4732 21.1521 23.5355 20.2145C22.5979 19.2768 21.3261 18.75 20 18.75H10C8.67392 18.75 7.40215 19.2768 6.46447 20.2145C5.52678 21.1521 5 22.4239 5 23.75V26.25"
-                            stroke="white"
-                            stroke-width="2.5"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                          />
-                          <path
-                            d="M15 13.75C17.7614 13.75 20 11.5114 20 8.75C20 5.98858 17.7614 3.75 15 3.75C12.2386 3.75 10 5.98858 10 8.75C10 11.5114 12.2386 13.75 15 13.75Z"
-                            stroke="white"
-                            stroke-width="2.5"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                          />
-                        </svg>
-                      </mat-icon>
+                    <div class="node-inner">
+                      <div
+                        class="node-avatar"
+                        [ngClass]="'avatar-' + parent.role.toLowerCase()"
+                      >
+                        <mat-icon>
+                          <svg
+                            width="30"
+                            height="30"
+                            viewBox="0 0 30 30"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M25 26.25V23.75C25 22.4239 24.4732 21.1521 23.5355 20.2145C22.5979 19.2768 21.3261 18.75 20 18.75H10C8.67392 18.75 7.40215 19.2768 6.46447 20.2145C5.52678 21.1521 5 22.4239 5 23.75V26.25"
+                              stroke="white"
+                              stroke-width="2.5"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            />
+                            <path
+                              d="M15 13.75C17.7614 13.75 20 11.5114 20 8.75C20 5.98858 17.7614 3.75 15 3.75C12.2386 3.75 10 5.98858 10 8.75C10 11.5114 12.2386 13.75 15 13.75Z"
+                              stroke="white"
+                              stroke-width="2.5"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            />
+                          </svg>
+                        </mat-icon>
+                      </div>
+                      <span class="node-name"
+                        >{{ parent.firstName }} {{ parent.lastName }}</span
+                      >
+                      <button
+                        class="node-remove"
+                        (click)="onRemoveMember(parent); $event.stopPropagation()"
+                      >
+                        <mat-icon>close</mat-icon>
+                      </button>
                     </div>
-                    <span class="node-name"
-                      >{{ parent.firstName }} {{ parent.lastName }}</span
-                    >
-                    <button
-                      class="node-remove"
-                      (click)="onRemoveMember(parent); $event.stopPropagation()"
-                    >
-                      <mat-icon>close</mat-icon>
-                    </button>
                   </div>
                   <div
                     class="pair-heart"
@@ -162,7 +164,7 @@
                   #clientParentsLine
                 ></div>
               </div>
-              <div class="parent-estate" (click)="onEditParentEstate('client')">
+              <div class="parent-estate client-estate" (click)="onEditParentEstate('client')">
                 <span class="estate-currency">{{
                   currency | currencySymbol
                 }}</span
@@ -379,44 +381,46 @@
                     [class.deceased]="isDeceased(parent.id)"
                     (click)="onClickParentMember(parent)"
                   >
-                    <div
-                      class="node-avatar"
-                      [ngClass]="'avatar-' + parent.role.toLowerCase()"
-                    >
-                      <mat-icon>
-                        <svg
-                          width="30"
-                          height="30"
-                          viewBox="0 0 30 30"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            d="M25 26.25V23.75C25 22.4239 24.4732 21.1521 23.5355 20.2145C22.5979 19.2768 21.3261 18.75 20 18.75H10C8.67392 18.75 7.40215 19.2768 6.46447 20.2145C5.52678 21.1521 5 22.4239 5 23.75V26.25"
-                            stroke="white"
-                            stroke-width="2.5"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                          />
-                          <path
-                            d="M15 13.75C17.7614 13.75 20 11.5114 20 8.75C20 5.98858 17.7614 3.75 15 3.75C12.2386 3.75 10 5.98858 10 8.75C10 11.5114 12.2386 13.75 15 13.75Z"
-                            stroke="white"
-                            stroke-width="2.5"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                          />
-                        </svg>
-                      </mat-icon>
+                    <div class="node-inner">
+                      <div
+                        class="node-avatar"
+                        [ngClass]="'avatar-' + parent.role.toLowerCase()"
+                      >
+                        <mat-icon>
+                          <svg
+                            width="30"
+                            height="30"
+                            viewBox="0 0 30 30"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M25 26.25V23.75C25 22.4239 24.4732 21.1521 23.5355 20.2145C22.5979 19.2768 21.3261 18.75 20 18.75H10C8.67392 18.75 7.40215 19.2768 6.46447 20.2145C5.52678 21.1521 5 22.4239 5 23.75V26.25"
+                              stroke="white"
+                              stroke-width="2.5"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            />
+                            <path
+                              d="M15 13.75C17.7614 13.75 20 11.5114 20 8.75C20 5.98858 17.7614 3.75 15 3.75C12.2386 3.75 10 5.98858 10 8.75C10 11.5114 12.2386 13.75 15 13.75Z"
+                              stroke="white"
+                              stroke-width="2.5"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            />
+                          </svg>
+                        </mat-icon>
+                      </div>
+                      <span class="node-name"
+                        >{{ parent.firstName }} {{ parent.lastName }}</span
+                      >
+                      <button
+                        class="node-remove"
+                        (click)="onRemoveMember(parent); $event.stopPropagation()"
+                      >
+                        <mat-icon>close</mat-icon>
+                      </button>
                     </div>
-                    <span class="node-name"
-                      >{{ parent.firstName }} {{ parent.lastName }}</span
-                    >
-                    <button
-                      class="node-remove"
-                      (click)="onRemoveMember(parent); $event.stopPropagation()"
-                    >
-                      <mat-icon>close</mat-icon>
-                    </button>
                   </div>
                   <div
                     class="pair-heart"
@@ -439,7 +443,7 @@
                 ></div>
               </div>
               <div
-                class="parent-estate"
+                class="parent-estate partner-estate"
                 (click)="onEditParentEstate('partner')"
               >
                 <span class="estate-currency">{{
