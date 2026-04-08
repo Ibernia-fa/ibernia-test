@@ -406,7 +406,7 @@ export class AddIncomeComponent {
       this.incomeForm.get('amount')?.setValue('', { emitEvent: true });
       return;
     }
-    const value = parseFormattedNumber(rawValue);
+    const value = parseFormattedNumber(rawValue, this.translate.currentLang);
     this.incomeForm.get('amount')?.setValue(value, { emitEvent: true });
   }
 
@@ -1193,7 +1193,7 @@ export class AddIncomeComponent {
       this.incomeForm.get('bonusAmount')?.setValue('', { emitEvent: true });
       return;
     }
-    const value = parseFormattedNumber(rawValue);
+    const value = parseFormattedNumber(rawValue, this.translate.currentLang);
     this.incomeForm.get('bonusAmount')?.setValue(value, { emitEvent: true });
   }
 

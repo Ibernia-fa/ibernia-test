@@ -56,7 +56,7 @@ export class UpdateIncomeComponent {
   }
 
   onAmountInput(rawValue: string) {
-    const value = parseFormattedNumber(rawValue);
+    const value = parseFormattedNumber(rawValue, this.translate.currentLang);
     // attempt to set a control named 'amount' if present
     try {
       (this as any)['incomeForm']?.get('amount')?.setValue(value, { emitEvent: true });

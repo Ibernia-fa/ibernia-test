@@ -369,7 +369,7 @@ export class AddContributionComponent {
   }
 
   onAmountInput(rawValue: string) {
-    const value = parseFormattedNumber(rawValue);
+    const value = parseFormattedNumber(rawValue, this.translate.currentLang);
     this.contributionForm.get('amount')?.setValue(value, { emitEvent: true });
   }
 

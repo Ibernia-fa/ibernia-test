@@ -8,7 +8,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatSelectModule } from '@angular/material/select';
 import { ToastrService } from 'ngx-toastr';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 import { allCountries } from 'src/app/clients/models/country';
 import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
@@ -71,7 +71,8 @@ export class AddAssetComponent {
     private dialogRef: MatDialogRef<AddAssetComponent>,
     @Inject(MAT_DIALOG_DATA) public data: AddAssetDialogData,
     private wealthHttp: WealthHttpService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private translate: TranslateService,
   ) {
     this.isEditMode = data.mode === 'edit';
     this.hasPartner = data.hasPartner ?? false;
@@ -130,7 +131,7 @@ export class AddAssetComponent {
       this.form.get('value')?.setValue('', { emitEvent: true });
       return;
     }
-    const value = parseFormattedNumber(rawValue);
+    const value = parseFormattedNumber(rawValue, this.translate.currentLang);
     this.form.get('value')?.setValue(value, { emitEvent: true });
   }
 
