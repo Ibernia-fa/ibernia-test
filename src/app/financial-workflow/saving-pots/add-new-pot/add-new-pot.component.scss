@@ -176,3 +176,10 @@
     flex: 1 1 0;
   }
 }
+
+/* Tall saving-pot dialog: cap content height and pad bottom so fields stay scrollable / not clipped */
+.event-dialog-content.mat-mdc-dialog-content {
+  max-height: min(78vh, 760px);
+  padding-bottom: 28px !important;
+  box-sizing: border-box;
+}

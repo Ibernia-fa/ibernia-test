@@ -29,6 +29,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { TranslateIncomeExpenseLabelPipe } from 'src/app/core/pipes/translate-income-expense-label.pipe';
 import { TranslateEscalationDescriptionPipe } from 'src/app/core/pipes/translate-escalation-description.pipe';
 import { getAmountCycleLabel } from 'src/app/shared/utils/amount-cycle-label';
+import { resolveEscalationMatch } from 'src/app/shared/utils/escalation-rate-utils';
 import { CommonModule } from '@angular/common';
 import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
 import { ToastrService } from 'ngx-toastr';
@@ -196,7 +197,7 @@ export class AddIncomeComponent {
       cycle: [this.cycles[1].id, Validators.required],
       start: ['', Validators.required],
       end: [''],
-      escalationRate: [this.escalationRates[0].value, Validators.required],
+      escalationRate: [this.escalationRates[0]?.description ?? '', Validators.required],
       customEscalationRate: [''],
       addBonus: [this.selectedIncome?.bonus?.enabled ?? false],
       bonusAmount: [{ value: this.selectedIncome?.bonus?.amount?.amount ?? 0, disabled: true }],
@@ -256,7 +257,10 @@ export class AddIncomeComponent {
         this.incomeForm.get('end')?.patchValue(this.selectedIncome.end?.year);
       }
 
-      const matchedEscalation = this.escalationRates.find(x => x.value === this.selectedIncome!.escalationRate?.value);
+      const matchedEscalation = resolveEscalationMatch(
+        this.escalationRates,
+        this.selectedIncome!.escalationRate,
+      );
       const cycleId = this.selectedIncome.amount?.cycle?.id;
       const cycle = this.cycles.find(x => x.id === cycleId);
 
@@ -266,7 +270,7 @@ export class AddIncomeComponent {
 
       if (matchedEscalation) {
         // Standard escalation rate selected
-        this.incomeForm.get('escalationRate')?.patchValue(matchedEscalation.value);
+        this.incomeForm.get('escalationRate')?.patchValue(matchedEscalation.description);
         this.selectedEscalationDescription = matchedEscalation.description;
       } else if (
         this.selectedIncome!.escalationRate &&
@@ -283,7 +287,7 @@ export class AddIncomeComponent {
           value: this.selectedIncome!.escalationRate!.value
         });
 
-        this.incomeForm.get('escalationRate')?.patchValue(this.selectedIncome!.escalationRate!.value);
+        this.incomeForm.get('escalationRate')?.patchValue('Increases at custom rate');
         this.incomeForm.get('customEscalationRate')?.patchValue(this.selectedIncome!.escalationRate!.value);
         this.selectedEscalationDescription = 'Increases at custom rate';
 
@@ -432,14 +436,14 @@ export class AddIncomeComponent {
       bonusDate: income.bonus?.bonusDate?.year ?? null,
     });
     this.onCycleValueChange(income.amount?.cycle?.id ?? this.cycles[1]?.id);
-    const matchedEscalation = this.escalationRates.find(x => x.value === income.escalationRate?.value);
+    const matchedEscalation = resolveEscalationMatch(this.escalationRates, income.escalationRate);
     if (matchedEscalation) {
-      this.incomeForm.get('escalationRate')?.patchValue(matchedEscalation.value);
+      this.incomeForm.get('escalationRate')?.patchValue(matchedEscalation.description);
       this.selectedEscalationDescription = matchedEscalation.description;
     } else if (income.escalationRate?.description === 'Increases at custom rate') {
       this.escalationRates = this.escalationRates.filter(x => x.description !== 'Increases at custom rate');
       this.escalationRates.push({ description: 'Increases at custom rate', value: income.escalationRate?.value ?? 0 });
-      this.incomeForm.get('escalationRate')?.patchValue(income.escalationRate?.value);
+      this.incomeForm.get('escalationRate')?.patchValue('Increases at custom rate');
       this.incomeForm.get('customEscalationRate')?.patchValue(income.escalationRate?.value);
       this.selectedEscalationDescription = 'Increases at custom rate';
     }
@@ -524,11 +528,14 @@ export class AddIncomeComponent {
         this.incomeForm.get('description')?.value,
       );
 
-      const isCustomEscalation = this.selectedEscalationDescription === 'Increases at custom rate';
+      const selectedEscDesc = this.incomeForm.get('escalationRate')?.value as string;
+      const isCustomEscalation = selectedEscDesc === 'Increases at custom rate';
       const escalationRateValue = isCustomEscalation
         ? this.incomeForm.get('customEscalationRate')?.value
-        : this.incomeForm.get('escalationRate')?.value;
-      const matchedRate = this.escalationRates.find((x) => x.value === escalationRateValue);
+        : this.escalationRates.find((x) => x.description === selectedEscDesc)?.value;
+      const matchedRate = isCustomEscalation
+        ? undefined
+        : this.escalationRates.find((x) => x.description === selectedEscDesc);
       const startVal = this.incomeForm.get('start')?.value;
       const endVal = this.incomeForm.get('end')?.value;
       const startYear = resolveYear(startVal, this.eventsList);
@@ -562,7 +569,9 @@ export class AddIncomeComponent {
         endEventId,
         escalationRate: escalationRateValue !== null && escalationRateValue !== ''
           ? matchedRate ?? {
-            description: this.selectedEscalationDescription ?? '',
+            description: isCustomEscalation
+              ? 'Increases at custom rate'
+              : selectedEscDesc ?? '',
             value: escalationRateValue
           }
           : {
@@ -727,17 +736,11 @@ export class AddIncomeComponent {
   }
 
   get isCustomEscalationSelected(): boolean {
-    const selectedValue = this.incomeForm.get('escalationRate')?.value;
-
-    return this.escalationRates.some(e =>
-      e.value === selectedValue && e.description === 'Increases at custom rate'
-    );
+    return this.incomeForm.get('escalationRate')?.value === 'Increases at custom rate';
   }
 
   onEscalationRateChange(event: MatSelectChange): void {
-    const val = event.value;
-    const rate = this.escalationRates.find((e) => e.value === val);
-    const description = rate?.description ?? null;
+    const description = (event.value as string) ?? null;
 
     this.selectedEscalationDescription = description;
 
