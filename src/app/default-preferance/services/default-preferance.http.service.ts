@@ -9,6 +9,8 @@ export interface PreferencesDto {
   inflationRate: number;
   investmentReturn: number;
   pensionFundReturn: number;
+  /** % of salary used to prefill default state pension amounts. */
+  pensionReplacementRate?: number | null;
   comissionType: ComissionType;         // 1|2|3
   comissionPercentage?: number | null;  // 0..100 when Percentage/Both
   comissionAmount?: number | null;      // >0 when Amount/Both
