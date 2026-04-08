@@ -1,8 +1,8 @@
 .dialog-subtitle {
   font-size: 14px;
-    color: #5a596e;
-    margin: 16px 0 0 0;
-    line-height: 100%;
+  color: #5a596e;
+  margin: 16px 0 0 0;
+  line-height: 100%;
 }
 
 .scenario-tabs {
@@ -19,17 +19,17 @@
   padding: 14px 16px;
   border-radius: 6px;
   border: 1px solid transparent;
-  background: #F5F5F5;
+  background: #f5f5f5;
   cursor: pointer;
   font-size: 14px;
   font-weight: 400;
-  color: #5A596E;
+  color: #5a596e;
   transition: all 0.2s;
   font-family: "Ubuntu", serif;
 
   &.active {
     border-color: #4043af;
-    background: #F5F5F5;
+    background: #f5f5f5;
     color: #4043af;
     font-weight: 500;
   }
@@ -42,8 +42,8 @@
 }
 
 .tab-pct {
-  background: #C9FCDC;
-  color: #00BA3E;
+  background: #c9fcdc;
+  color: #00ba3e;
   font-size: 10px;
   font-weight: 500;
   padding: 1px 6px;
@@ -89,7 +89,7 @@
   align-items: center;
   gap: 8px;
   padding: 12px 16px;
-  border-radius:4px;
+  border-radius: 4px;
   background: #f8fafc;
   margin-top: 4px;
 }
@@ -199,9 +199,9 @@
   flex: 1;
   min-width: 0;
 
-  .mat-mdc-slider {
-    margin: 0 !important;
-  }
+  // .mat-mdc-slider {
+  //   margin: 0 !important;
+  // }
 }
 
 .pct-row {
@@ -251,4 +251,3 @@ button:not(.mat-mdc-menu-item):not(.mat-menu-item):not(.submit-btn):disabled {
   background: transparent !important;
   cursor: not-allowed;
 }
-
