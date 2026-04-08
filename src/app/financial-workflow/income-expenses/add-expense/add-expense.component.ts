@@ -31,7 +31,6 @@ import {
   getPersistedAgeForCalendarYear,
   getProjectionColumnAgeLabel,
 } from 'src/app/shared/utils/client-age-at-reference';
-import { translateTimelineEventDisplayName } from 'src/app/shared/utils/timeline-event-display-name';
 
 @Component({
   selector: 'app-add-expense',

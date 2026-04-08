@@ -54,11 +54,6 @@ import {
   getPersistedAgeForCalendarYear,
   getProjectionColumnAgeLabel,
 } from 'src/app/shared/utils/client-age-at-reference';
-import {
-  annualEquivalentForIncomeCycle,
-  findSalaryIncomeForStatePensionRow,
-  roundPercentOf,
-} from 'src/app/shared/utils/state-pension-salary-utils';
 
 @Component({
   selector: 'app-add-income',
