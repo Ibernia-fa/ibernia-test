@@ -53,7 +53,8 @@ body {
 }
 
 .cdk-overlay-container .mat-mdc-tooltip-surface.income-expense-insurance-tooltip {
-  max-width: 280px !important;
+  // Cap width vs. viewport so CDK is less likely to “push” the panel left off the tile center.
+  max-width: min(280px, calc(100vw - 24px)) !important;
   font-size: 12px !important;
   line-height: 1.45 !important;
   padding: 10px 12px !important;

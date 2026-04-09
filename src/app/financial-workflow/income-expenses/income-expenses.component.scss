@@ -251,4 +251,11 @@
     align-self: stretch;
     background-color: #d9d9d9;
   }
+
+  // Anchor matTooltip to the full expense tile width so the overlay centers above this row only.
+  .insurance-expense-tooltip-host.mat-mdc-tooltip-trigger {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+  }
 }
