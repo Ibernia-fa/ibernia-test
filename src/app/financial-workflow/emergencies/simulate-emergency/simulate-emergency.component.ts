@@ -36,6 +36,7 @@ import {
   getPersistedAgeForCalendarYear,
   getProjectionColumnAgeLabel,
 } from 'src/app/shared/utils/client-age-at-reference';
+import { resolveEscalationMatch } from 'src/app/shared/utils/escalation-rate-utils';
 
 @Component({
   selector: 'simulate-emergency',
@@ -185,7 +186,7 @@ export class SimulateEmergencyComponent implements OnDestroy {
       cycle: [this.amountCycles[0].id, Validators.required],
       start: ['', Validators.required],
       end: [''],
-      escalationRate: [this.escalationRates[0]?.value, Validators.required],
+      escalationRate: [this.escalationRates[0]?.description ?? '', Validators.required],
       customEscalationRate: [''],
       stopIncome: [false],
       stoppedIncomeId: [null]
@@ -233,6 +234,7 @@ export class SimulateEmergencyComponent implements OnDestroy {
 
     this.simulateEmergencyForm.setValidators(this.endOnOrAfterStartValidator());
     this.simulateEmergencyForm.updateValueAndValidity({ emitEvent: false });
+    this.selectedEscalationDescription = this.escalationRates[0]?.description ?? '';
     this.onCycleValueChange(this.amountCycles[0].id);
 
     if (this.emergencyExpense) {
@@ -334,11 +336,9 @@ export class SimulateEmergencyComponent implements OnDestroy {
   }
 
   onEscalationRateChange(event: MatSelectChange): void {
-    const val = event.value;
-    const rate = this.escalationRates.find((e) => e.value === val);
-    const description = rate?.description ?? null;
+    const description = (event.value as string) ?? '';
 
-    this.selectedEscalationDescription = description ?? '';
+    this.selectedEscalationDescription = description;
     const customControl = this.simulateEmergencyForm.get('customEscalationRate');
 
     if (description === 'Increases at custom rate') {
@@ -356,20 +356,22 @@ export class SimulateEmergencyComponent implements OnDestroy {
     this.simulateEmergencyForm.markAsDirty();
 
     if (this.simulateEmergencyForm.valid) {
-      const isCustomEscalation = this.selectedEscalationDescription === 'Increases at custom rate';
+      const selectedEscDesc = this.simulateEmergencyForm.get('escalationRate')?.value as string;
+      const isCustomEscalation = selectedEscDesc === 'Increases at custom rate';
       const escalationRateValue = isCustomEscalation
         ? this.simulateEmergencyForm.get('customEscalationRate')?.value
-        : this.simulateEmergencyForm.get('escalationRate')?.value;
-      const selectedEscalationRateValue = this.simulateEmergencyForm.get('escalationRate')?.value;
-      const matchedRate = this.escalationRates.find((x) => x.value === selectedEscalationRateValue);
+        : this.escalationRates.find((x) => x.description === selectedEscDesc)?.value;
+      const matchedRate = !isCustomEscalation
+        ? this.escalationRates.find((x) => x.description === selectedEscDesc)
+        : undefined;
       const escalationRateModel = isCustomEscalation
         ? {
           description: 'Increases at custom rate',
           value: escalationRateValue
         }
         : (matchedRate ?? {
-          description: this.selectedEscalationDescription ?? '',
-          value: selectedEscalationRateValue
+          description: selectedEscDesc ?? '',
+          value: escalationRateValue
         });
       const stopIncome = this.simulateEmergencyForm.get('stopIncome')?.value;
       const stoppedIncomeId = this.simulateEmergencyForm.get('stoppedIncomeId')?.value;
@@ -545,12 +547,7 @@ export class SimulateEmergencyComponent implements OnDestroy {
   }
 
   get isCustomEscalationSelected(): boolean {
-    const selectedValue = this.simulateEmergencyForm.get('escalationRate')?.value;
-
-    // find exact match by both value and description
-    return this.escalationRates.some(e =>
-      e.value === selectedValue && e.description === 'Increases at custom rate'
-    );
+    return this.simulateEmergencyForm.get('escalationRate')?.value === 'Increases at custom rate';
   }
 
   private endOnOrAfterStartValidator(): ValidatorFn {
@@ -583,7 +580,10 @@ export class SimulateEmergencyComponent implements OnDestroy {
     const cycleId = expense.amount?.cycle?.id ?? this.amountCycles[0].id;
     const amount = expense.amount?.amount ?? 0;
 
-    const matchedEscalation = this.escalationRates.find(x => x.value === expense.escalationRate?.value);
+    const matchedEscalation = resolveEscalationMatch(
+      this.escalationRates,
+      expense.escalationRate,
+    );
 
     if (
       expense.escalationRate &&
@@ -602,7 +602,7 @@ export class SimulateEmergencyComponent implements OnDestroy {
         amount,
         start: expense.start?.year ?? null,
         end: expense.end?.year ?? null,
-        escalationRate: expense.escalationRate.value,
+        escalationRate: 'Increases at custom rate',
         customEscalationRate: expense.escalationRate.value,
         stopIncome: expense.stopIncome ?? false
       }, { emitEvent: false });
@@ -618,11 +618,11 @@ export class SimulateEmergencyComponent implements OnDestroy {
         amount,
         start: expense.start?.year ?? null,
         end: expense.end?.year ?? null,
-        escalationRate: matchedEscalation?.value ?? this.escalationRates[0]?.value,
+        escalationRate: matchedEscalation?.description ?? this.escalationRates[0]?.description ?? '',
         stopIncome: expense.stopIncome ?? false
       }, { emitEvent: false });
 
-      this.selectedEscalationDescription = matchedEscalation?.description ?? '';
+      this.selectedEscalationDescription = matchedEscalation?.description ?? this.escalationRates[0]?.description ?? '';
     }
 
     this.onCycleValueChange(cycleId);
