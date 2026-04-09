@@ -138,6 +138,10 @@ export class AddNewPotComponent {
   dialogEndCalendarYear: number;
   isCashPotEditMode: boolean;
   userReturnRate: any = 3.5;
+  /** Mat slider thumb binding (must be defined — template uses [value]). */
+  sliderReturnRate = 0;
+  /** Return rate text field next to slider (numeric part only; % is separate in UI). */
+  returnRateText = '0';
   loggedInUserPreferences: any;
   comissionTypes = [
     { label: 'Amount', value: ComissionType.Amount },
@@ -259,7 +263,7 @@ export class AddNewPotComponent {
       currency: [this.clientPreferredCurrency, Validators.required],
       amount: [0, [Validators.required, this.minPositiveValue()]],
       customName: [''],  // For Custom pots
-      returnRate: [this.userReturnRate],
+      returnRate: [this.normalizeReturnRate(this.userReturnRate)],
       // lockPot: [true],
       lockPot: [defaultType === 'Pension fund'],  // Auto-check for Pension fund only
       start: [data.forecastStartDateYear, Validators.required],
@@ -291,6 +295,9 @@ export class AddNewPotComponent {
 
     this.savingsForm.get('returnRate')?.valueChanges.subscribe((value) => {
       this.formattedReturnRate = this.formatWithPercentage(value);
+      const n = typeof value === 'number' ? value : Number(value);
+      this.sliderReturnRate = Number.isFinite(n) ? this.round2(n) : 0;
+      this.syncReturnRateTextFromForm();
     });
 
     // Keep the local amount property in sync with the form control
@@ -314,6 +321,8 @@ export class AddNewPotComponent {
     }
 
     this.syncOwnershipForSelectedType();
+    this.syncReturnRateTextFromForm();
+    this.syncSliderReturnRateFromForm();
   }
 
 
@@ -461,6 +470,8 @@ onAmountBlur(e: Event) {
 
     // Force form to recalculate validity after all patches are applied
     this.savingsForm.updateValueAndValidity();
+    this.syncReturnRateTextFromForm();
+    this.syncSliderReturnRateFromForm();
   }
 
   ngOnInit() {
@@ -857,8 +868,37 @@ onAmountBlur(e: Event) {
     this.savingsForm.get('amount')?.setValue(value, { emitEvent: true });
     this.amount = value;
   }
-  formatWithPercentage(value: number | string): string {
-    return value !== null && value !== '' ? `${value}%` : '0%';
+  formatWithPercentage(value: number | string | null | undefined): string {
+    if (value === null || value === undefined || value === '') return '0%';
+    const n = typeof value === 'number' ? value : Number(value);
+    if (!Number.isFinite(n)) return '0%';
+    return `${this.round2(n)}%`;
+  }
+
+  private normalizeReturnRate(v: unknown): number {
+    const n = typeof v === 'number' ? v : Number(v);
+    return Number.isFinite(n) ? this.round2(n) : 3.5;
+  }
+
+  private syncReturnRateTextFromForm(): void {
+    const raw = this.savingsForm.get('returnRate')?.value;
+    const n = typeof raw === 'number' ? raw : Number(raw);
+    const val = Number.isFinite(n) ? this.round2(n) : 0;
+    this.returnRateText = this.formatReturnRateInputLabel(val);
+  }
+
+  private syncSliderReturnRateFromForm(): void {
+    const raw = this.savingsForm.get('returnRate')?.value;
+    const n = typeof raw === 'number' ? raw : Number(raw);
+    this.sliderReturnRate = Number.isFinite(n) ? this.round2(n) : 0;
+  }
+
+  /** Human-readable percent for the side input (no % suffix). */
+  private formatReturnRateInputLabel(n: number): string {
+    if (!Number.isFinite(n)) return '0';
+    const r = this.round2(n);
+    if (Math.abs(r - Math.round(r)) < 1e-9) return String(Math.round(r));
+    return String(r);
   }
 
   saveCashflow(): void {
@@ -1310,6 +1350,24 @@ onAmountBlur(e: Event) {
   this.savingsForm.get('returnRate')?.setValue(val, { emitEvent: true });
 
 }
+
+  onReturnRateTextInput(event: Event): void {
+    const el = event.target as HTMLInputElement;
+    this.returnRateText = el.value.replace('%', '').trim();
+    const normalized = this.returnRateText.replace(',', '.');
+    if (normalized === '' || normalized === '-' || normalized === '.') return;
+    if (/^\d+\.$/.test(normalized)) return;
+    const num = parseFloat(normalized);
+    if (Number.isNaN(num)) return;
+    const clamped = Math.max(0, Math.min(10, this.round2(num)));
+    this.savingsForm.get('returnRate')?.setValue(clamped, { emitEvent: true });
+  }
+
+  
+
+  onReturnRateBlur(): void {
+    this.syncReturnRateTextFromForm();
+  }
 
 // onSliderChange(val: number) {
 //   // coerce to number and push into the form control
