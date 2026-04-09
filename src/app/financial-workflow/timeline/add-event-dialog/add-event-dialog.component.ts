@@ -31,7 +31,7 @@ import { MortgageCalculatorDialogComponent, MortgageCalculatorDialogResult } fro
 import { LanguageService } from 'src/app/core/language.service';
 import { formatAppDisplayNumber } from 'src/app/shared/utils/number-utils';
 import { resolveEscalationMatch } from 'src/app/shared/utils/escalation-rate-utils';
-import { translateTimelineEventDisplayName } from 'src/app/shared/utils/timeline-event-display-name';
+
 import {
   getCashflowDialogEndCalendarYear,
   getCompletedYearsAgeAtDate,
@@ -1701,9 +1701,6 @@ export class AddEventDialogComponent {
     return Number.isNaN(a) ? 0 : a;
   }
 
-  getTimelineEventLabel(rawName: string): string {
-    return translateTimelineEventDisplayName(this.translate, rawName);
-  }
 }
 
 export class EventType {
