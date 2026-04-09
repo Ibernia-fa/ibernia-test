@@ -68,13 +68,18 @@
           <mat-label
             class="f-s-16 f-w-500 d-block ibr-black"
             style="line-height: 16px"
-            >{{ 'Name' | translate }}</mat-label
+            >{{ liabilityNameLabelKey | translate }}</mat-label
           >
           <input
             matInput
             formControlName="name"
             [placeholder]="liabilityNamePlaceholderKey | translate"
           />
+          @if (
+            form.get("name")?.touched && form.get("name")?.hasError("required")
+          ) {
+            <span class="field-error d-block">{{ 'Required' | translate }}</span>
+          }
         </div>
 
         <div class="d-flex flex-column gap-8 net-fields">

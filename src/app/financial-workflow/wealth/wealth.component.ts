@@ -339,6 +339,7 @@ export class WealthComponent implements OnInit {
       data: {
         mode: 'add',
         cashflowId: this.cashflowId,
+        existingLiabilities: this.dashboard?.liabilities ?? [],
         clientPreferredCurrency: this.clientData?.preferredCurrency,
         hasPartner: this.hasPartner,
         clientFirstName: this.clientFirstName,
