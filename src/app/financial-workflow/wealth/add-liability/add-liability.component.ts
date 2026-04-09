@@ -92,32 +92,25 @@ export class AddLiabilityComponent {
       ownership: [ownershipValue],
       currencySymbol: [data.clientPreferredCurrency || 'EUR']
     });
-
-    if (this.isEditMode) {
-      this.updateNameValidation(data.liability!.type);
-    }
   }
 
-  get isOtherType(): boolean {
-    return this.form.get('type')?.value === 'Other';
-  }
-
-  onTypeChange(): void {
-    const type = this.form.get('type')?.value;
-    this.updateNameValidation(type);
-    if (type !== 'Other') {
-      this.form.patchValue({ name: '' });
+  /** i18n key for contextual name placeholder by selected liability category */
+  get liabilityNamePlaceholderKey(): string {
+    const type = this.form.get('type')?.value as string;
+    switch (type) {
+      case 'Mortgage':
+        return 'WEALTH.NAME_PLACEHOLDER_LIABILITY_MORTGAGE';
+      case 'Loan':
+        return 'WEALTH.NAME_PLACEHOLDER_LIABILITY_LOAN';
+      case 'Credit Card':
+        return 'WEALTH.NAME_PLACEHOLDER_LIABILITY_CREDIT_CARD';
+      case 'Student Loan':
+        return 'WEALTH.NAME_PLACEHOLDER_LIABILITY_STUDENT_LOAN';
+      case 'Other':
+        return 'WEALTH.NAME_PLACEHOLDER_LIABILITY_OTHER';
+      default:
+        return 'WEALTH.NAME_PLACEHOLDER_LIABILITY_PENDING';
     }
-  }
-
-  private updateNameValidation(type: string): void {
-    const nameControl = this.form.get('name');
-    if (type === 'Other') {
-      nameControl?.setValidators(Validators.required);
-    } else {
-      nameControl?.clearValidators();
-    }
-    nameControl?.updateValueAndValidity();
   }
 
   onAmountInput(rawValue: string): void {
@@ -134,12 +127,14 @@ export class AddLiabilityComponent {
     this.isSaving = true;
 
     const formValue = this.form.value;
+    const trimmedName = typeof formValue.name === 'string' ? formValue.name.trim() : '';
+    const nameOrNull = trimmedName ? trimmedName : null;
 
     if (this.isEditMode) {
       const request = {
         id: this.data.liability!.id,
         type: formValue.type,
-        name: formValue.name || null,
+        name: nameOrNull,
         outstanding: formValue.outstanding,
         ownership: this.hasPartner ? formValue.ownership : 0
       };
@@ -156,7 +151,7 @@ export class AddLiabilityComponent {
     } else {
       const request = {
         type: formValue.type,
-        name: formValue.name || null,
+        name: nameOrNull,
         outstanding: formValue.outstanding,
         ownership: this.hasPartner ? formValue.ownership : 0
       };

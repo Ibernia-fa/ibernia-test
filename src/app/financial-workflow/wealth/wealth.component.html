@@ -235,7 +235,7 @@
                 *matCellDef="let row"
                 class="p-x-24 f-s-14 p-l-0 column-client"
               >
-                {{ row.category | translate }}
+                {{ getAssetSummaryLabel(row) }}
               </td>
             </ng-container>
 
@@ -502,7 +502,7 @@
                 *matCellDef="let row"
                 class="p-x-24 f-s-14 p-l-0 column-client"
               >
-                {{ row.type | translate }}
+                {{ getLiabilitySummaryLabel(row) }}
               </td>
             </ng-container>
 

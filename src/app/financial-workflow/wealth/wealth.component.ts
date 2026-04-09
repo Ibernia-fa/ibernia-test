@@ -418,6 +418,24 @@ export class WealthComponent implements OnInit {
     }
   }
 
+  /** Summary table: custom name when set; otherwise translated category (charts still use category). */
+  getAssetSummaryLabel(asset: WealthAssetModel): string {
+    const custom = asset.name?.trim();
+    if (custom) {
+      return custom;
+    }
+    return this.translate.instant(asset.category);
+  }
+
+  /** Summary table: custom name when set; otherwise translated liability type. */
+  getLiabilitySummaryLabel(liability: WealthLiabilityModel): string {
+    const custom = liability.name?.trim();
+    if (custom) {
+      return custom;
+    }
+    return this.translate.instant(liability.type);
+  }
+
   /**
    * Compact amount for per-person net worth chips: K from 1k, M from 1M; otherwise same as number pipe.
    */

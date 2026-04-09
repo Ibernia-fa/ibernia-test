@@ -98,30 +98,20 @@ export class AddAssetComponent {
       ownership: [ownershipValue],
       currencySymbol: [data.clientPreferredCurrency || 'EUR']
     });
-
-    this.updateNameValidation(categoryValue);
   }
 
-  get isOtherCategory(): boolean {
-    return this.form.get('category')?.value === AssetCategory.Other;
-  }
-
-  onCategoryChange(): void {
-    const cat = this.form.get('category')?.value;
-    this.updateNameValidation(cat);
-    if (cat !== AssetCategory.Other) {
-      this.form.patchValue({ name: '' });
+  /** i18n key for contextual name placeholder by selected asset category */
+  get assetNamePlaceholderKey(): string {
+    const cat = this.form.get('category')?.value as AssetCategory;
+    switch (cat) {
+      case AssetCategory.PersonalProperty:
+        return 'WEALTH.NAME_PLACEHOLDER_ASSET_PERSONAL_PROPERTY';
+      case AssetCategory.Other:
+        return 'WEALTH.NAME_PLACEHOLDER_ASSET_OTHER';
+      case AssetCategory.RealEstate:
+      default:
+        return 'WEALTH.NAME_PLACEHOLDER_ASSET_REAL_ESTATE';
     }
-  }
-
-  private updateNameValidation(category: AssetCategory): void {
-    const nameControl = this.form.get('name');
-    if (category === AssetCategory.Other) {
-      nameControl?.setValidators(Validators.required);
-    } else {
-      nameControl?.clearValidators();
-    }
-    nameControl?.updateValueAndValidity();
   }
 
   onAmountInput(rawValue: string): void {
@@ -138,12 +128,14 @@ export class AddAssetComponent {
     this.isSaving = true;
 
     const formValue = this.form.value;
+    const trimmedName = typeof formValue.name === 'string' ? formValue.name.trim() : '';
+    const nameOrNull = trimmedName ? trimmedName : null;
 
     if (this.isEditMode) {
       const request = {
         id: this.data.asset!.id,
         category: formValue.category,
-        name: formValue.name || null,
+        name: nameOrNull,
         value: formValue.value,
         ownership: this.hasPartner ? formValue.ownership : 0
       };
@@ -160,7 +152,7 @@ export class AddAssetComponent {
     } else {
       const request = {
         category: formValue.category,
-        name: formValue.name || null,
+        name: nameOrNull,
         value: formValue.value,
         ownership: this.hasPartner ? formValue.ownership : 0
       };
