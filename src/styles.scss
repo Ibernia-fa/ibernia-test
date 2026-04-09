@@ -52,12 +52,10 @@ body {
   padding: 15px;
 }
 
-.cdk-overlay-container .mat-mdc-tooltip-surface.income-expense-insurance-tooltip {
-  // Cap width vs. viewport so CDK is less likely to “push” the panel left off the tile center.
-  max-width: min(280px, calc(100vw - 24px)) !important;
-  font-size: 12px !important;
-  line-height: 1.45 !important;
-  padding: 10px 12px !important;
+// Insurance expense custom overlay: match Material tooltip hit-testing so the bubble does not
+// steal hover from mat-card-content (avoids flicker when centered on the tile).
+.cdk-overlay-container .insurance-expense-tooltip-overlay-panel {
+  pointer-events: none;
 }
 
 .hint {

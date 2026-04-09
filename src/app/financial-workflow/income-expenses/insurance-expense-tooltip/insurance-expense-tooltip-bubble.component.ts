@@ -11,7 +11,7 @@ import {
   template: `
     <div
       role="tooltip"
-      class="mat-mdc-tooltip-surface mdc-tooltip__surface income-expense-insurance-tooltip"
+      class="mat-mdc-tooltip-surface mdc-tooltip__surface"
     >
       {{ message }}
     </div>
