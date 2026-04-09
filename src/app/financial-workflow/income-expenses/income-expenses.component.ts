@@ -79,6 +79,10 @@ export class IncomeExpensesComponent {
   /** For display: separate cards for each default income (ordering when hasPartner). */
   displayDefaultIncomes: Array<{ income: FinancialViewModel }> = [];
   defautExpenses: FinancialViewModel[];
+  /** Insurance row: API omits until Protection has cost; placeholder shows €0 until then. */
+  insuranceExpenseDisplay: FinancialViewModel;
+  /** Non-default expenses for screen: Insurance first, then others (Debt repayment, Custom, …). */
+  expensesOrderedForDisplay: FinancialViewModel[] = [];
   hasPartner = false;
   clientFirstName = '';
   partnerFirstName = '';
@@ -551,13 +555,59 @@ export class IncomeExpensesComponent {
     this.incomes = this.incomeExpense.incomes.filter(
       (i) => i.isDefault == false && i.isIncomeExpenseSource == true,
     );
+
+    const currency =
+      this.selectedClient?.clientDetails?.preferredCurrency ??
+      this.incomeExpense.expenses.find((e) => e?.amount?.currencySymbol)
+        ?.amount?.currencySymbol ??
+      'USD';
+
+    const apiInsurance = this.incomeExpense.expenses.find(
+      (e) => e.description === 'Insurance',
+    );
+    this.insuranceExpenseDisplay =
+      apiInsurance ?? this.createPlaceholderInsuranceExpense(currency);
+
     this.expenses = this.incomeExpense.expenses.filter(
       (i) =>
-        (i.isDefault == false && i.isIncomeExpenseSource == true) ||
-        i.description == 'Insurance',
+        i.description !== 'Insurance' &&
+        i.isDefault == false &&
+        i.isIncomeExpenseSource == true,
     );
 
+    this.expensesOrderedForDisplay = [
+      this.insuranceExpenseDisplay,
+      ...this.expenses,
+    ];
+
     this.updateCurrentYearIncomeSummary();
+  }
+
+  private createPlaceholderInsuranceExpense(
+    currencySymbol: string,
+  ): FinancialViewModel {
+    const year = moment(this.timeline?.forecastStartDate).year();
+    const startYear = Number.isFinite(year) ? year : new Date().getFullYear();
+    const yearlyCycle = this.amountCycles?.find(
+      (c) => c.description === 'Every year',
+    );
+    return {
+      id: null,
+      description: 'Insurance',
+      amount: {
+        amount: 0,
+        currencySymbol,
+        cycle: yearlyCycle
+          ? { id: yearlyCycle.id, description: yearlyCycle.description }
+          : { id: '', description: 'Every year' },
+      },
+      start: { year: startYear, age: 0 },
+      end: { year: startYear, age: 0 },
+      escalationRate: null,
+      isDefault: false,
+      isIncomeExpenseSource: true,
+      icon: 'insurance',
+    };
   }
 
   private buildDisplayDefaultIncomes(
