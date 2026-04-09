@@ -1044,6 +1044,7 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
       year,
       forecastStartDate,
       this.planDuration,
+      this.effectiveForecastEndYear,
     );
   }
 
