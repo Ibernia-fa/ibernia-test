@@ -713,7 +713,11 @@
             </mat-card-content>
           }
 
-          @for (expense of expenses; track trackByExpenseId; let i = $index) {
+          @for (
+            expense of expensesOrderedForDisplay;
+            track trackByExpenseId;
+            let i = $index
+          ) {
             <mat-card-content class="income-items">
               <div
                 class="dragable-card d-flex align-items-center justify-content-between"
