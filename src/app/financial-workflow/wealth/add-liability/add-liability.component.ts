@@ -1,5 +1,6 @@
-import { Component, Inject } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, DestroyRef, Inject, inject } from '@angular/core';
+import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
@@ -21,10 +22,44 @@ export interface AddLiabilityDialogData {
   mode: 'add' | 'edit';
   cashflowId: string;
   liability?: WealthLiabilityModel;
+  /** Existing liabilities on the dashboard (add mode) — used to preselect the first unused category. */
+  existingLiabilities?: WealthLiabilityModel[];
   clientPreferredCurrency?: string;
   hasPartner?: boolean;
   clientFirstName?: string;
   partnerFirstName?: string;
+}
+
+/** Order matches the dropdown and backend `AllowedLiabilityTypes`. */
+export const LIABILITY_CATEGORY_ORDER = [
+  'Mortgage',
+  'Loan',
+  'Credit Card',
+  'Student Loan',
+  'Other',
+] as const;
+
+export function pickDefaultLiabilityCategory(
+  existing: Pick<WealthLiabilityModel, 'type'>[],
+): string {
+  const used = new Set(
+    existing
+      .map((l) => l.type?.trim())
+      .filter((t): t is string => !!t)
+      .map((t) => t.toLowerCase()),
+  );
+  for (const type of LIABILITY_CATEGORY_ORDER) {
+    if (!used.has(type.toLowerCase())) {
+      return type;
+    }
+  }
+  return 'Other';
+}
+
+function trimmedRequired(control: AbstractControl): ValidationErrors | null {
+  const v = control.value;
+  const s = typeof v === 'string' ? v.trim() : '';
+  return s ? null : { required: true };
 }
 
 @Component({
@@ -46,19 +81,15 @@ export interface AddLiabilityDialogData {
   styleUrl: './add-liability.component.scss',
 })
 export class AddLiabilityComponent {
+  private readonly destroyRef = inject(DestroyRef);
+
   form: FormGroup;
   isEditMode: boolean;
   isSaving = false;
   countries = allCountries;
   hasPartner: boolean;
 
-  liabilityTypes = [
-    'Mortgage',
-    'Loan',
-    'Credit Card',
-    'Student Loan',
-    'Other'
-  ];
+  liabilityTypes = [...LIABILITY_CATEGORY_ORDER];
 
   ownershipOptions: { value: number; label: string }[] = [];
 
@@ -85,13 +116,37 @@ export class AddLiabilityComponent {
       ? this.getOwnershipValue(data.liability!.ownership)
       : 0;
 
+    const initialType = this.isEditMode
+      ? data.liability!.type
+      : pickDefaultLiabilityCategory(data.existingLiabilities ?? []);
+
     this.form = this.fb.group({
-      type: [this.isEditMode ? data.liability!.type : '', Validators.required],
+      type: [initialType, Validators.required],
       name: [this.isEditMode ? (data.liability!.name || '') : ''],
       outstanding: [this.isEditMode ? data.liability!.outstanding : null, [Validators.required, Validators.min(0)]],
       ownership: [ownershipValue],
       currencySymbol: [data.clientPreferredCurrency || 'EUR']
     });
+
+    this.form
+      .get('type')
+      ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.syncNameValidators());
+    this.syncNameValidators();
+  }
+
+  get liabilityNameLabelKey(): string {
+    return this.form.get('type')?.value === 'Other' ? 'Name' : 'WEALTH.NAME_OPTIONAL';
+  }
+
+  private syncNameValidators(): void {
+    const nameCtrl = this.form.get('name');
+    if (this.form.get('type')?.value === 'Other') {
+      nameCtrl?.setValidators([trimmedRequired]);
+    } else {
+      nameCtrl?.clearValidators();
+    }
+    nameCtrl?.updateValueAndValidity({ emitEvent: false });
   }
 
   /** i18n key for contextual name placeholder by selected liability category */

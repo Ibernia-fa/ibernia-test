@@ -1367,7 +1367,15 @@
               style="line-height: 16px"
               >{{ 'Name' | translate }}</mat-label
             >
-            <input matInput formControlName="name" />
+            <input
+              matInput
+              formControlName="name"
+              [attr.placeholder]="
+                !isEditWorkflow
+                  ? ('ADD_EVENT.CUSTOM_GOAL_NAME_PLACEHOLDER' | translate)
+                  : null
+              "
+            />
             @if (
               eventForm.get("name")?.touched &&
               eventForm.get("name")?.hasError("required")

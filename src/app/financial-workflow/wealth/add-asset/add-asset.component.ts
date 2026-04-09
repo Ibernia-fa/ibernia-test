@@ -1,5 +1,6 @@
-import { Component, Inject } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, DestroyRef, Inject, inject } from '@angular/core';
+import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
@@ -31,6 +32,12 @@ export interface AddAssetDialogData {
   partnerFirstName?: string;
 }
 
+function trimmedRequired(control: AbstractControl): ValidationErrors | null {
+  const v = control.value;
+  const s = typeof v === 'string' ? v.trim() : '';
+  return s ? null : { required: true };
+}
+
 @Component({
   selector: 'app-add-asset',
   standalone: true,
@@ -50,6 +57,8 @@ export interface AddAssetDialogData {
   styleUrl: './add-asset.component.scss',
 })
 export class AddAssetComponent {
+  private readonly destroyRef = inject(DestroyRef);
+
   form: FormGroup;
   isEditMode: boolean;
   isSaving = false;
@@ -98,6 +107,26 @@ export class AddAssetComponent {
       ownership: [ownershipValue],
       currencySymbol: [data.clientPreferredCurrency || 'EUR']
     });
+
+    this.form
+      .get('category')
+      ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.syncNameValidators());
+    this.syncNameValidators();
+  }
+
+  get assetNameLabelKey(): string {
+    return this.form.get('category')?.value === AssetCategory.Other ? 'Name' : 'WEALTH.NAME_OPTIONAL';
+  }
+
+  private syncNameValidators(): void {
+    const nameCtrl = this.form.get('name');
+    if (this.form.get('category')?.value === AssetCategory.Other) {
+      nameCtrl?.setValidators([trimmedRequired]);
+    } else {
+      nameCtrl?.clearValidators();
+    }
+    nameCtrl?.updateValueAndValidity({ emitEvent: false });
   }
 
   /** i18n key for contextual name placeholder by selected asset category */
