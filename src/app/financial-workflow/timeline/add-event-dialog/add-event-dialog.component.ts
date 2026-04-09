@@ -14,7 +14,7 @@ import { ClientEvent, Cycle, EscalationRate, EventIncomeType, FinancialRecordLin
 import { AbstractControl, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 import { Timeline } from 'vis-timeline';
 import { TimelineHttpService } from '../services/timeline-http.service';
-import { catchError, filter, take } from 'rxjs';
+import { catchError, filter } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
 import moment from 'moment';
 import { allCountries } from 'src/app/clients/models/country';
@@ -111,6 +111,8 @@ export class AddEventDialogComponent {
   saveClicked: boolean = false;
   currentYear: number = new Date().getFullYear();
   showNameEdit: boolean = false;
+  /** Resolved async so the raw i18n key is never shown before translations load. */
+  customGoalNamePlaceholderText = '';
   isAllowRename: boolean = false;
   hideEventType = false;
   isInheritanceOneOff = false;
@@ -325,20 +327,24 @@ export class AddEventDialogComponent {
       this.eventForm.get('name')?.setValue(updatedName, { emitEvent: false });
     }
 
-    // OnPush: refresh placeholder when translations load or language changes
-    this.translate.onLangChange.pipe(takeUntilDestroyed()).subscribe(() => this.cdr.markForCheck());
-    this.translate
-      .get('ADD_EVENT.CUSTOM_GOAL_NAME_PLACEHOLDER')
-      .pipe(take(1))
-      .subscribe(() => this.cdr.markForCheck());
+    this.translate.onLangChange.pipe(takeUntilDestroyed()).subscribe(() => {
+      this.refreshCustomGoalNamePlaceholder();
+    });
+    this.refreshCustomGoalNamePlaceholder();
   }
 
-  /** Placeholder for the custom goal name field (add workflow only). */
-  get customGoalNamePlaceholder(): string {
+  private refreshCustomGoalNamePlaceholder(): void {
+    const key = 'ADD_EVENT.CUSTOM_GOAL_NAME_PLACEHOLDER';
     if (this.isEditWorkflow) {
-      return '';
+      this.customGoalNamePlaceholderText = '';
+      this.cdr.markForCheck();
+      return;
     }
-    return this.translate.instant('ADD_EVENT.CUSTOM_GOAL_NAME_PLACEHOLDER');
+    this.translate.get(key).subscribe((text) => {
+      // Avoid showing the key if the bundle is stale or the string is not loaded yet
+      this.customGoalNamePlaceholderText = text === key ? '' : text;
+      this.cdr.markForCheck();
+    });
   }
 
   doAction(): void {
