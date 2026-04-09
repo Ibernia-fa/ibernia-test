@@ -723,10 +723,11 @@
               [class.insurance-expense-tooltip-host]="
                 expense.description === 'Insurance'
               "
-              [matTooltip]="'INCOME_EXPENSE.INSURANCE_CARD_TOOLTIP' | translate"
-              [matTooltipDisabled]="expense.description !== 'Insurance'"
-              matTooltipPosition="above"
-              matTooltipClass="income-expense-insurance-tooltip"
+              [appInsuranceExpenseTooltip]="
+                expense.description === 'Insurance'
+                  ? ('INCOME_EXPENSE.INSURANCE_CARD_TOOLTIP' | translate)
+                  : ''
+              "
             >
               <div
                 class="dragable-card d-flex align-items-center justify-content-between"

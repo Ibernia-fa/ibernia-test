@@ -23,7 +23,6 @@ import {
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TimelineHttpService } from '../timeline/services/timeline-http.service';
 import moment from 'moment';
-import { MatTooltipModule } from '@angular/material/tooltip';
 import { CurrencySymbolPipe } from 'src/app/pipe/currency-symbol.pipe';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
 import { TranslateModule } from '@ngx-translate/core';
@@ -43,6 +42,7 @@ import { SavingsPotsHttpService } from '../saving-pots/services/savings-pots-htt
 import { SavingPotsModel } from '../saving-pots/models/saving-pots.model';
 import { WithdrawalsContributionsHttpService } from '../withdrawals-contributions/services/withdrawals-contributions-http.service';
 import { WithdrawalsContributions } from '../withdrawals-contributions/model/withdrawals-contributions';
+import { InsuranceExpenseTooltipDirective } from './insurance-expense-tooltip/insurance-expense-tooltip.directive';
 
 @Component({
   selector: 'app-income-expenses',
@@ -54,7 +54,7 @@ import { WithdrawalsContributions } from '../withdrawals-contributions/model/wit
     MatMenuModule,
     MatButtonModule,
     MatProgressSpinnerModule,
-    MatTooltipModule,
+    InsuranceExpenseTooltipDirective,
     CurrencySymbolPipe,
     ThousandSeparatorPipe,
     ToastrModule,
