@@ -29,5 +29,10 @@ export function translateTimelineEventDisplayName(
     return `${base} (${partner})`;
   }
 
+  // Italian reads more naturally with a connector ("di") when a person name follows.
+  if ((translate.currentLang ?? '').toLowerCase().startsWith('it')) {
+    return `${base} di ${rest}`;
+  }
+
   return `${base} ${rest}`;
 }

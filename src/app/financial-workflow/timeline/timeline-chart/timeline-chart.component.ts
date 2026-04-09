@@ -65,6 +65,7 @@ import {
   getProjectionColumnAgeLabel,
 } from 'src/app/shared/utils/client-age-at-reference';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { translateTimelineEventDisplayName } from 'src/app/shared/utils/timeline-event-display-name';
 
 @Component({
   selector: 'app-timeline-chart',
@@ -188,6 +189,10 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
     private translate: TranslateService,
   ) {
     this.updateTimelines = new EventEmitter<boolean>();
+  }
+
+  getTimelineChipLabel(event: ClientEvent): string {
+    return translateTimelineEventDisplayName(this.translate, event?.name ?? '');
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -1343,22 +1348,19 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
 
   private getEventTitleForDisplay(event: ClientEvent): string {
     const rawTitle = (event?.name ?? '').trim();
-    if (!rawTitle.toLowerCase().startsWith('retirement age')) {
-      const t = this.translate.instant(rawTitle);
-      return t && t !== rawTitle ? t : rawTitle;
+
+    // When "Retirement age" appears on the timeline for joint accounts, the saved event name
+    // is often just "Retirement age" with `isPartnerEvent`. In that case, derive the display
+    // label using the person's name, then localize via the shared helper.
+    if (rawTitle.toLowerCase().startsWith('retirement age') && this.hasPartner) {
+      const personName = event.isPartnerEvent
+        ? this.client?.partnerDetail?.firstName?.trim()
+        : this.client?.clientDetails?.firstName?.trim();
+      const composite = personName ? `Retirement age ${personName}` : 'Retirement age';
+      return translateTimelineEventDisplayName(this.translate, composite);
     }
 
-    const base = this.translate.instant('Retirement age');
-
-    if (!this.hasPartner) {
-      return base;
-    }
-
-    const personName = event.isPartnerEvent
-      ? this.client?.partnerDetail?.firstName?.trim()
-      : this.client?.clientDetails?.firstName?.trim();
-
-    return personName ? `${base} ${personName}` : base;
+    return translateTimelineEventDisplayName(this.translate, rawTitle);
   }
 
   private calculateAge(dateOfBirth: Date): number {
@@ -1380,34 +1382,33 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   private getEventDisplayNameForList(clientEvent: ClientEvent): string {
-    if (
-      !clientEvent.name ||
-      !clientEvent.name.toLowerCase().startsWith('retirement age')
-    ) {
-      const n = clientEvent.name ?? '';
-      const t = this.translate.instant(n);
-      return t && t !== n ? t : n;
+    const raw = (clientEvent?.name ?? '').trim();
+    if (!raw) return '';
+
+    if (!raw.toLowerCase().startsWith('retirement age')) {
+      return translateTimelineEventDisplayName(this.translate, raw);
     }
-    const base = this.translate.instant('Retirement age');
+
     if (!this.hasPartner) {
-      return base;
+      return translateTimelineEventDisplayName(this.translate, 'Retirement age');
     }
+
+    // Only add names when both primary + partner retirement events exist in the plan.
     const hasPrimary = this.financialTimeline.clientEvents.some(
-      (e) =>
-        e.name?.toLowerCase().startsWith('retirement age') && !e.isPartnerEvent,
+      (e) => e.name?.toLowerCase().startsWith('retirement age') && !e.isPartnerEvent,
     );
     const hasPartnerEv = this.financialTimeline.clientEvents.some(
-      (e) =>
-        e.name?.toLowerCase().startsWith('retirement age') &&
-        !!e.isPartnerEvent,
+      (e) => e.name?.toLowerCase().startsWith('retirement age') && !!e.isPartnerEvent,
     );
     if (!hasPrimary || !hasPartnerEv) {
-      return base;
+      return translateTimelineEventDisplayName(this.translate, 'Retirement age');
     }
+
     const personName = clientEvent.isPartnerEvent
       ? this.client?.partnerDetail?.firstName?.trim()
       : this.client?.clientDetails?.firstName?.trim();
-    return personName ? `${base} ${personName}` : base;
+    const composite = personName ? `Retirement age ${personName}` : 'Retirement age';
+    return translateTimelineEventDisplayName(this.translate, composite);
   }
 
   private isEventInVisibleRange(event: any): boolean {
