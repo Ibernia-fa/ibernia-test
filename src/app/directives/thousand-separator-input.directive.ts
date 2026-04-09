@@ -11,6 +11,7 @@ import { TranslateService } from '@ngx-translate/core';
 import {
   APP_DISPLAY_NUMBER_FORMAT,
   localeFromAppLanguage,
+  parseFormattedNumber,
 } from 'src/app/shared/utils/number-utils';
 import { Subscription } from 'rxjs';
 
@@ -23,6 +24,8 @@ export class ThousandSeparatorInputDirective implements OnInit {
   private thousand = ',';
   private decimal = '.';
   private subs = new Subscription();
+  /** Guard: true while onInput is running so valueChanges doesn't re-enter. */
+  private handlingInput = false;
 
   constructor(
     private el: ElementRef<HTMLInputElement>,
@@ -41,9 +44,13 @@ export class ThousandSeparatorInputDirective implements OnInit {
 
     // Ensure programmatic updates (patchValue, reopening with saved data, toggles)
     // also render with locale-aware grouping.
+    // Skipped while onInput is active to avoid conflict with DefaultValueAccessor
+    // which also sets the control value (as a raw string) on the same input event.
     this.subs.add(
       this.ngControl?.control?.valueChanges?.subscribe(() => {
-        this.formatViewPreserveCursor();
+        if (!this.handlingInput) {
+          this.formatViewPreserveCursor();
+        }
       }) ?? new Subscription()
     );
 
@@ -67,32 +74,34 @@ export class ThousandSeparatorInputDirective implements OnInit {
 
   @HostListener('input')
   onInput() {
-    const el = this.el.nativeElement;
-    const prevValue = el.value;
-    const cursor = el.selectionStart ?? prevValue.length;
+    this.handlingInput = true;
+    try {
+      const el = this.el.nativeElement;
+      const prevValue = el.value;
+      const cursor = el.selectionStart ?? prevValue.length;
 
-    const digitsBefore = this.countDigits(prevValue.slice(0, cursor));
+      const digitsBefore = this.countDigits(prevValue.slice(0, cursor));
 
-    const raw = prevValue
-      .split(this.thousand).join('')
-      .replace(this.decimal, '.')
-      .replace(/[^\d.]/g, '')
-      .replace(/(\..*)\./g, '$1');
+      const raw = prevValue
+        .split(this.thousand).join('')
+        .replace(this.decimal, '.')
+        .replace(/[^\d.]/g, '')
+        .replace(/(\..*)\./g, '$1');
 
-    const num = raw === '' || raw === '.' ? null : Number(raw);
-    // emitEvent must be true so host templates that also bind [value] to FormControl
-    // (e.g. amount | thousandSeparator) sync on the same tick; emit false left them stale
-    // and change detection overwrote the input back to the old grouped value.
-    this.ngControl?.control?.setValue(
-      isNaN(Number(num)) ? null : num,
-      { emitEvent: true },
-    );
+      const num = raw === '' || raw === '.' ? null : Number(raw);
+      this.ngControl?.control?.setValue(
+        isNaN(Number(num)) ? null : num,
+        { emitEvent: true },
+      );
 
-    const formatted = this.formatNumber(raw);
+      const formatted = this.formatNumber(raw);
 
-    el.value = formatted;
-    const newCursor = this.indexForDigitCount(formatted, digitsBefore);
-    queueMicrotask(() => el.setSelectionRange(newCursor, newCursor));
+      el.value = formatted;
+      const newCursor = this.indexForDigitCount(formatted, digitsBefore);
+      queueMicrotask(() => el.setSelectionRange(newCursor, newCursor));
+    } finally {
+      this.handlingInput = false;
+    }
   }
 
   @HostListener('blur')
@@ -101,9 +110,18 @@ export class ThousandSeparatorInputDirective implements OnInit {
   }
 
   private formatView() {
-    const value = this.ngControl?.control?.value;
+    let value = this.ngControl?.control?.value;
     if (value === null || value === undefined || value === '') {
       this.el.nativeElement.value = '';
+      return;
+    }
+
+    // DefaultValueAccessor may have set the control value to a raw string
+    // (e.g. "1,2345") instead of a number. Parse it back so format() doesn't get NaN.
+    if (typeof value === 'string') {
+      value = parseFormattedNumber(value, this.translate.currentLang);
+    }
+    if (!Number.isFinite(value)) {
       return;
     }
 

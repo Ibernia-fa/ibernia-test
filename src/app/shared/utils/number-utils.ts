@@ -20,9 +20,9 @@ export function formatAppDisplayNumber(lang: string | undefined, value: number):
 }
 
 /**
- * Parses typed/display amounts using the same rules as {@link ThousandSeparatorInputDirective}:
- * strip grouping for the active locale, normalize decimal to `.`, then parseFloat.
- * Without a correct `lang`, en-style input (`3,3333` while typing) was misparsed as `3.333`.
+ * Parses typed/display amounts:
+ * - When `lang` is provided, uses exact locale separators (preferred path).
+ * - When `lang` is omitted (legacy callers), falls back to heuristic detection.
  */
 export function parseFormattedNumber(raw: string | number, lang?: string | null): number {
   if (raw == null) return 0;
@@ -31,15 +31,68 @@ export function parseFormattedNumber(raw: string | number, lang?: string | null)
   const value = String(raw).trim();
   if (value === '') return 0;
 
-  const useIt = lang === 'it';
-  const thousand = useIt ? '.' : ',';
-  const decimal = useIt ? ',' : '.';
+  if (lang) {
+    const useIt = lang === 'it';
+    const thousand = useIt ? '.' : ',';
+    const decimal = useIt ? ',' : '.';
 
-  const normalized = value
-    .split(thousand).join('')
-    .replace(decimal, '.')
-    .replace(/[^\d.]/g, '')
-    .replace(/(\..*)\./g, '$1');
+    const normalized = value
+      .split(thousand).join('')
+      .replace(decimal, '.')
+      .replace(/[^\d.]/g, '')
+      .replace(/(\..*)\./g, '$1');
+
+    if (normalized === '' || normalized === '.') return 0;
+    const parsed = parseFloat(normalized);
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+
+  // Heuristic fallback for callers that don't pass a locale.
+  let clean = value.replace(/[^0-9.,]/g, '');
+  if (clean === '') return 0;
+
+  const lastDot = clean.lastIndexOf('.');
+  const lastComma = clean.lastIndexOf(',');
+
+  let decimalSep: '.' | ',' | null = null;
+  let thousandSep: '.' | ',' | null = null;
+
+  if (lastDot !== -1 && lastComma !== -1) {
+    decimalSep = lastDot > lastComma ? '.' : ',';
+    thousandSep = decimalSep === '.' ? ',' : '.';
+  } else if (lastDot !== -1) {
+    const dotCount = (clean.match(/\./g) ?? []).length;
+    if (dotCount > 1) {
+      thousandSep = '.';
+    } else {
+      const digitsAfter = clean.length - lastDot - 1;
+      if (digitsAfter === 3 && clean.length > 4) {
+        thousandSep = '.';
+      } else {
+        decimalSep = '.';
+      }
+    }
+  } else if (lastComma !== -1) {
+    const commaCount = (clean.match(/,/g) ?? []).length;
+    if (commaCount > 1) {
+      thousandSep = ',';
+    } else {
+      const digitsAfter = clean.length - lastComma - 1;
+      if (digitsAfter === 3 && clean.length > 4) {
+        thousandSep = ',';
+      } else {
+        decimalSep = ',';
+      }
+    }
+  }
+
+  let normalized = clean;
+  if (thousandSep) {
+    normalized = normalized.split(thousandSep).join('');
+  }
+  if (decimalSep && decimalSep !== '.') {
+    normalized = normalized.split(decimalSep).join('.');
+  }
 
   if (normalized === '' || normalized === '.') return 0;
   const parsed = parseFloat(normalized);
