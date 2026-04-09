@@ -32,7 +32,6 @@
                   formControlName="category"
                   [placeholder]="'PLACEHOLDER.SELECT_CATEGORY' | translate"
                   hideSingleSelectionIndicator
-                  (selectionChange)="onCategoryChange()"
                 >
                   @for (cat of categories; track cat.value) {
                     <mat-option [value]="cat.value">{{ cat.label | translate }}</mat-option>
@@ -60,25 +59,18 @@
           </div>
         </div>
 
-        @if (isOtherCategory) {
-          <div class="w-100 form-field gap-8">
-            <mat-label
-              class="f-s-16 f-w-500 d-block ibr-black"
-              style="line-height: 16px"
+        <div class="w-100 form-field gap-8">
+          <mat-label
+            class="f-s-16 f-w-500 d-block ibr-black"
+            style="line-height: 16px"
             >{{ 'Name' | translate }}</mat-label
           >
-            <input
-              matInput
-              formControlName="name"
-              [placeholder]="'PLACEHOLDER.ARTWORK' | translate"
-            />
-            @if (
-              form.get("name")?.touched && form.get("name")?.hasError("required")
-            ) {
-              <span class="field-error d-block">{{ 'Required' | translate }}</span>
-            }
-          </div>
-        }
+          <input
+            matInput
+            formControlName="name"
+            [placeholder]="assetNamePlaceholderKey | translate"
+          />
+        </div>
 
         <div class="d-flex flex-column gap-8 net-fields">
           <mat-label
