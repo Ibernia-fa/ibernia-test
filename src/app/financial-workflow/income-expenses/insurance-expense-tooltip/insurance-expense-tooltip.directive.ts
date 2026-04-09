@@ -12,7 +12,7 @@ import { ComponentPortal } from '@angular/cdk/portal';
 import { ScrollDispatcher } from '@angular/cdk/scrolling';
 import { InsuranceExpenseTooltipBubbleComponent } from './insurance-expense-tooltip-bubble.component';
 
-/** Insurance tile only: centered above the host, without CDK “push” (fixes sideways shift). */
+/** Insurance tile only: centered over the host; no CDK push; styling matches global mat tooltips. */
 @Directive({
   standalone: true,
   selector: '[appInsuranceExpenseTooltip]',
@@ -73,24 +73,16 @@ export class InsuranceExpenseTooltipDirective implements OnDestroy {
       .withPositions([
         {
           originX: 'center',
-          originY: 'top',
+          originY: 'center',
           overlayX: 'center',
-          overlayY: 'bottom',
-          offsetY: -8,
-        },
-        {
-          originX: 'center',
-          originY: 'bottom',
-          overlayX: 'center',
-          overlayY: 'top',
-          offsetY: 8,
+          overlayY: 'center',
         },
       ]);
 
     this.overlayRef = this.overlay.create({
       positionStrategy: strategy,
       scrollStrategy: this.overlay.scrollStrategies.reposition({ scrollThrottle: 20 }),
-      panelClass: 'mat-mdc-tooltip-panel',
+      panelClass: ['mat-mdc-tooltip-panel', 'insurance-expense-tooltip-overlay-panel'],
     });
 
     const portal = new ComponentPortal(
