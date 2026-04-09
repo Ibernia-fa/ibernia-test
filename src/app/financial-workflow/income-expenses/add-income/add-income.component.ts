@@ -33,7 +33,14 @@ import { resolveEscalationMatch } from 'src/app/shared/utils/escalation-rate-uti
 import { CommonModule } from '@angular/common';
 import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
 import { ToastrService } from 'ngx-toastr';
-
+import { AuthService } from 'src/app/auth/services/auth.service';
+import { SettingsService } from 'src/app/default-preferance/services/default-preferance.http.service';
+import { translateTimelineEventDisplayName } from 'src/app/shared/utils/timeline-event-display-name';
+import {
+  annualEquivalentForIncomeCycle,
+  findSalaryIncomeForStatePensionRow,
+  roundPercentOf,
+} from 'src/app/shared/utils/state-pension-salary-utils';
 import {
   IncomeDisplayLabelContext,
   incomeApiDescriptionToDisplayLabel,
@@ -120,6 +127,7 @@ export class AddIncomeComponent {
   private clientFirstName = '';
   private partnerFirstName = '';
   private selectedClient: Client | null = null;
+  private pensionReplacementRatePct: number = 50;
 
   constructor(
     private dialogRef: MatDialogRef<AddIncomeComponent>,
@@ -129,6 +137,8 @@ export class AddIncomeComponent {
     private withdrawalsContributionsHttpService: WithdrawalsContributionsHttpService,
     private translate: TranslateService,
     private toastr: ToastrService,
+    private auth: AuthService,
+    private settingsService: SettingsService,
   ) {
     this.scenarioMode = data.scenarioMode ?? false;
     this.incomeTypes = data.incomeType;
@@ -375,6 +385,8 @@ export class AddIncomeComponent {
     this.setIsDefaultIncome();
     this.setIncomeIcon();
     this.captureInitialFormState();
+
+    this.loadPensionReplacementRate();
   }
 
   autoRenameCustom(): string {
@@ -509,6 +521,10 @@ export class AddIncomeComponent {
 
   getCycleLabel(cycle: Cycle): string {
     return getAmountCycleLabel(cycle, this.translate);
+  }
+
+  getTimelineEventLabel(rawName: string): string {
+    return translateTimelineEventDisplayName(this.translate, rawName);
   }
 
   addIncome(): void {
@@ -835,6 +851,39 @@ export class AddIncomeComponent {
     };
   }
 
+  get statePensionSalaryPctHint(): number | null {
+    const desc = this.incomeForm.get('description')?.value;
+    if (
+      !isClientStatePensionApiDescription(desc) &&
+      !isPartnerStatePensionApiDescription(desc)
+    ) {
+      return null;
+    }
+
+    const salary = findSalaryIncomeForStatePensionRow(this.data?.incomes, desc);
+    if (!salary) return null;
+
+    const salaryAnnual = annualEquivalentForIncomeCycle(
+      Number(salary.amount?.amount ?? 0),
+      salary.amount?.cycle?.description,
+    );
+    if (salaryAnnual == null || !(salaryAnnual > 0)) return null;
+
+    const cycleId = this.incomeForm.get('cycle')?.value;
+    const pensionCycle = this.cycles.find((c) => c.id === cycleId);
+    const rawAmount = this.incomeForm.get('amount')?.value;
+    const pensionNum =
+      rawAmount === '' || rawAmount === null || rawAmount === undefined
+        ? NaN
+        : Number(rawAmount);
+    if (!Number.isFinite(pensionNum)) return null;
+
+    const pensionAnnual = annualEquivalentForIncomeCycle(pensionNum, pensionCycle?.description);
+    if (pensionAnnual == null) return null;
+
+    return roundPercentOf(pensionAnnual, salaryAnnual);
+  }
+
   isFormSalaryForBonus(): boolean {
     return isSalaryTypeForBonus(this.incomeForm.get('description')?.value);
   }
@@ -1028,6 +1077,62 @@ export class AddIncomeComponent {
     }
 
     descriptionCtrl.updateValueAndValidity();
+
+    this.prefillStatePensionFromSalaryIfEligible(apiValue);
+  }
+
+  private loadPensionReplacementRate(): void {
+    const cached = this.settingsService.currentUserData?.preferences?.pensionReplacementRate;
+    if (cached != null && !Number.isNaN(Number(cached))) {
+      this.pensionReplacementRatePct = Number(cached);
+      return;
+    }
+
+    const user = this.auth.getUserProfile();
+    const userId = (user?.sub ?? '').toString().trim();
+    if (!userId) return;
+
+    this.settingsService.getUserProfileResponse(userId).subscribe({
+      next: (res: any) => {
+        const rate = res?.body?.preferences?.pensionReplacementRate;
+        if (rate != null && !Number.isNaN(Number(rate))) {
+          this.pensionReplacementRatePct = Number(rate);
+        }
+      },
+      error: () => {
+        /* ignore; keep fallback */
+      },
+    });
+  }
+
+  private prefillStatePensionFromSalaryIfEligible(apiDesc: string): void {
+    if (!isClientStatePensionApiDescription(apiDesc) && !isPartnerStatePensionApiDescription(apiDesc)) return;
+
+    const amountCtrl = this.incomeForm.get('amount');
+    const cycleCtrl = this.incomeForm.get('cycle');
+    if (!amountCtrl || !cycleCtrl) return;
+
+    const existing = amountCtrl.value;
+    if (existing !== '' && existing !== null && existing !== undefined && Number(existing) > 0) return;
+
+    const incomes: FinancialViewModel[] = (this.data?.incomes ?? []) as FinancialViewModel[];
+    const salary = findSalaryIncomeForStatePensionRow(incomes, apiDesc);
+    const salaryAmount = Number(salary?.amount?.amount ?? 0);
+    if (!(salaryAmount > 0)) return;
+
+    const ratePct = Number(this.pensionReplacementRatePct ?? 50);
+    if (!(ratePct > 0)) return;
+
+    const pensionAmount = salaryAmount * (ratePct / 100);
+    if (!(pensionAmount > 0)) return;
+
+    amountCtrl.setValue(pensionAmount, { emitEvent: true });
+
+    const salaryCycleId = salary?.amount?.cycle?.id;
+    if (salaryCycleId) {
+      cycleCtrl.setValue(salaryCycleId, { emitEvent: true });
+      this.onCycleValueChange(salaryCycleId);
+    }
   }
 
   toggleNameEdit() {

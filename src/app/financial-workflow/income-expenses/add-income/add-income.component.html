@@ -226,6 +226,12 @@
                 </div>
               }
             </div>
+            @if (statePensionSalaryPctHint !== null) {
+              <span class="state-pension-salary-pct-hint">{{
+                "INCOME_EXPENSE.STATE_PENSION_PCT_OF_SALARY"
+                  | translate : { pct: statePensionSalaryPctHint }
+              }}</span>
+            }
             @if (
               incomeForm.get("amount")?.touched &&
               (incomeForm.get("amount")?.hasError("required") ||
@@ -437,7 +443,7 @@
                       }
                       @for (event of eventsList; track event) {
                         <mat-option [value]="'event:' + event.id"
-                          >{{ event.name }} ({{
+                          >{{ getTimelineEventLabel(event.name) }} ({{
                             getAgeForYear(event.start.year)
                           }})</mat-option
                         >
@@ -495,7 +501,7 @@
                       >
                         @for (event of getEndEvents(); track event.id) {
                           <mat-option [value]="'event:' + event.id"
-                            >{{ event.name }} ({{
+                            >{{ getTimelineEventLabel(event.name) }} ({{
                               getAgeForYear(event.start.year)
                             }})</mat-option
                           >
