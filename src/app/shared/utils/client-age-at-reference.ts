@@ -83,6 +83,10 @@ export function getCashflowDialogEndCalendarYear(
  * for that year we use completed age at end of that calendar year so it matches the
  * target life age (e.g. 90 in year `birthYear + 90`), not the linear step (which can be 89).
  *
+ * {@link projectionInclusiveEndYear} when it **equals** `calendarYear` triggers the same EOY
+ * rule for that column (e.g. joint timeline ends in the primary client’s last year so the
+ * partner’s age in that year matches end-of-year completed age, not a linear carry).
+ *
  * If `forecastStartDate` is missing, falls back to completed age at end of `calendarYear`.
  */
 export function getProjectionColumnAgeLabel(
@@ -91,9 +95,8 @@ export function getProjectionColumnAgeLabel(
   forecastStartDate?: Date | string | null,
   planDuration?: number | null,
   /**
-   * Inclusive last calendar year of this dialog/chart’s year range. When set and
-   * `planDuration` does not yield a plan end year, we still use EOY age for that
-   * year so the final column matches life age (e.g. 90 in 2080), not the linear step (89).
+   * Inclusive last calendar year of this dialog/chart’s year range. Used when it equals
+   * `calendarYear` for EOY age (and when `planDuration` yields no plan end year, as before).
    */
   projectionInclusiveEndYear?: number | null,
 ): number {
@@ -105,8 +108,10 @@ export function getProjectionColumnAgeLabel(
   const planEndY = getPlanEndCalendarYear(birthDate, planDuration);
   const hintY = Number(projectionInclusiveEndYear);
   const hintEnd = Number.isFinite(hintY) ? Math.trunc(hintY) : null;
-  const terminalYear = planEndY ?? hintEnd;
-  if (terminalYear != null && yi === Math.trunc(terminalYear)) {
+  if (planEndY != null && yi === Math.trunc(planEndY)) {
+    return getCompletedYearsAgeAtDate(birthDate, endOfCalendarYear(yi));
+  }
+  if (hintEnd != null && yi === hintEnd) {
     return getCompletedYearsAgeAtDate(birthDate, endOfCalendarYear(yi));
   }
   if (forecastStartDate) {
