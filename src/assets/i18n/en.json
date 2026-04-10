@@ -568,7 +568,8 @@
     "EVENT_TYPE_TOOLTIP": "Choose whether this event represents an Income (money coming in) or an Expense (money going out).",
     "ENTER_AMOUNT_TOOLTIP": "Enter the amount linked to this event. Use the dropdown to define how often it occurs (e.g., every month, every year, or one-off).",
     "DEFINE_EVENT_PERIOD_TOOLTIP": "Define when this event starts and, if applicable, when it ends. Ibernia will include this period in the client’s cashflow projection.",
-    "AMOUNT_GROWTH_TOOLTIP": "Defines how this amount will evolve over time. You can choose to: Keep it fixed (the amount stays the same each year), Match inflation (it increases automatically based on the default inflation rate set in Preferences), or Apply a custom rate (you decide the exact yearly percentage change). This setting helps make projections more realistic by accounting for rising costs or expected income growth."
+    "AMOUNT_GROWTH_TOOLTIP": "Defines how this amount will evolve over time. You can choose to: Keep it fixed (the amount stays the same each year), Match inflation (it increases automatically based on the default inflation rate set in Preferences), or Apply a custom rate (you decide the exact yearly percentage change). This setting helps make projections more realistic by accounting for rising costs or expected income growth.",
+    "CUSTOM_GOAL_NAME_PLACEHOLDER": "E.g. Dream kitchen renovation"
   },
   "A few words about me": "A few words about me",
   "Add person": "Add person",
@@ -858,7 +859,6 @@
   "ADD_EVENT.ENTER_AMOUNT_TOOLTIP": "Enter the amount associated with this event.",
   "ADD_EVENT.DEFINE_EVENT_PERIOD_TOOLTIP": "Define when this event starts and ends in the timeline.",
   "ADD_EVENT.AMOUNT_GROWTH_TOOLTIP": "Set how the amount grows over time (e.g. with inflation).",
-  "ADD_EVENT.CUSTOM_GOAL_NAME_PLACEHOLDER": "E.g. Dream kitchen renovation",
   "ASSUMPTIONS.MORTGAGE_INTEREST_RATE_TOOLTIP": "Sets the default mortgage interest rate used in property calculations.",
   "ASSUMPTIONS.LOAN_INTEREST_RATE_TOOLTIP": "Sets the default loan interest rate used in calculations.",
   "Tax": "Tax",
