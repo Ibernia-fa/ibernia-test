@@ -652,12 +652,37 @@
                                         </div>
                                     </ng-template>
                                 </div>
+                                <div
+                                    class="chart-year-range d-flex align-items-center flex-wrap gap-16 m-b-16"
+                                    *ngIf="chartYearOptions.length > 0"
+                                >
+                                    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                        <mat-label>{{ 'Chart from year' | translate }}</mat-label>
+                                        <mat-select
+                                            [value]="chartViewStartYear"
+                                            (selectionChange)="onChartStartYearChange($event.value)"
+                                        >
+                                            <mat-option *ngFor="let y of chartYearOptions" [value]="y">{{ y }}</mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                        <mat-label>{{ 'Chart to year' | translate }}</mat-label>
+                                        <mat-select
+                                            [value]="chartViewEndYear"
+                                            (selectionChange)="onChartEndYearChange($event.value)"
+                                        >
+                                            <mat-option *ngFor="let y of chartYearOptions" [value]="y">{{ y }}</mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                </div>
                                 <div class="d-flex flex-column gap-32">
                                     <app-view-savings-bar-stacked-chart [report]="report" [client]="client"
                                         [forecastStartDate]="financialTimeline.forecastStartDate"
                                         [forecastEndDate]="effectiveReportEndDate ?? financialTimeline?.forecastEndtDate ?? null"
                                         [planDuration]="cashflow?.planDuration"
-                                        [cashFlowName]="cashflow?.name">
+                                        [cashFlowName]="cashflow?.name"
+                                        [chartViewStartYear]="chartViewStartYear"
+                                        [chartViewEndYear]="chartViewEndYear">
                                     </app-view-savings-bar-stacked-chart>
                                 </div>
                             </mat-card-content>

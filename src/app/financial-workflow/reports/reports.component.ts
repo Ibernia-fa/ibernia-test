@@ -58,7 +58,14 @@ import {
 import { TranslateModule } from '@ngx-translate/core';
 import { RouterLink } from '@angular/router';
 import { AiRecommendationsHttpService } from '../ai-recommendations/services/ai-recommendations-http.service';
-import { getProjectionColumnAgeLabel } from 'src/app/shared/utils/client-age-at-reference';
+import {
+  getPlanEndCalendarYear,
+  getProjectionColumnAgeLabel,
+} from 'src/app/shared/utils/client-age-at-reference';
+import {
+  getReportYearBounds,
+  parseReportCategoryYears,
+} from 'src/app/shared/utils/chart-series-year-range';
 import { RecommendationItem } from '../ai-recommendations/models/ai-recommendations.model';
 
 export interface PeriodicElement {
@@ -221,6 +228,10 @@ export class ReportsComponent {
   insightsLimitExceeded = false;
   insightsLoadAttempted = false;
   private insightsLoadedForCashflow: string | null = null;
+  /** Inclusive calendar-year window for lifetime / compare charts (dropdowns). */
+  chartViewStartYear: number | null = null;
+  chartViewEndYear: number | null = null;
+  chartYearOptions: number[] = [];
   readonly insightIconMap: Record<string, { color: string; bg: string }> = {
     flag_red:    { color: '#FF383C', bg: '#fff3f3' },
     flag_orange: { color: '#FF8D28', bg: '#fff8f0' },
@@ -301,9 +312,11 @@ export class ReportsComponent {
           this.financialTimeline.forecastStartDate
         : this.financialTimeline.forecastStartDate,
       forecastEndDate: isComparison
-        ? this.compareTimeline?.forecastEndtDate ||
-          this.financialTimeline.forecastEndtDate
-        : this.financialTimeline.forecastEndtDate,
+        ? (this.effectiveCompareReportEndDate ??
+            this.compareTimeline?.forecastEndtDate ??
+            this.financialTimeline?.forecastEndtDate)
+        : (this.effectiveReportEndDate ??
+            this.financialTimeline?.forecastEndtDate),
       cashFlowName: isComparison
         ? this.compareCashflow?.name ||
           this.compareTimeline?.cashflow?.name ||
@@ -312,6 +325,11 @@ export class ReportsComponent {
       isComparison: isComparison,
       hasShortfall: this.hasShortfall,
       firstShortfallAge: this.firstShortfallAge,
+      planDuration: isComparison
+        ? this.compareCashflow?.planDuration
+        : this.cashflow?.planDuration,
+      chartViewStartYear: this.chartViewStartYear,
+      chartViewEndYear: this.chartViewEndYear,
     };
 
     this.fullscreenService.enterFullscreen(chartData);
@@ -497,9 +515,73 @@ export class ReportsComponent {
         : null;
     }
     // Year when client turns planDuration (e.g. 78) = birthYear + planDuration. Matches backend/timeline.
-    const planEndYear = birthDate.getFullYear() + planDuration;
+    const planEndYear = getPlanEndCalendarYear(
+      this.client.clientDetails.birthDate,
+      cf.planDuration,
+    );
+    if (planEndYear == null) {
+      return timeline?.forecastEndtDate
+        ? new Date(timeline.forecastEndtDate)
+        : null;
+    }
     const effectiveYear = Math.max(forecastStartYear, planEndYear);
     return new Date(Date.UTC(effectiveYear, 11, 31, 12, 0, 0));
+  }
+
+  private syncChartYearRangeFromReport(): void {
+    const categories =
+      this.report?.categories && this.compareReport?.categories
+        ? [
+            ...new Set([
+              ...this.report.categories.map(String),
+              ...this.compareReport.categories.map(String),
+            ]),
+          ].sort((a, b) => Number(a) - Number(b))
+        : this.report?.categories;
+    const bounds = getReportYearBounds(categories);
+    if (!bounds) {
+      this.chartYearOptions = [];
+      this.chartViewStartYear = null;
+      this.chartViewEndYear = null;
+      return;
+    }
+    this.chartYearOptions = parseReportCategoryYears(categories);
+    if (
+      this.chartViewStartYear == null ||
+      this.chartViewStartYear < bounds.min ||
+      this.chartViewStartYear > bounds.max
+    ) {
+      this.chartViewStartYear = bounds.min;
+    }
+    if (
+      this.chartViewEndYear == null ||
+      this.chartViewEndYear < bounds.min ||
+      this.chartViewEndYear > bounds.max
+    ) {
+      this.chartViewEndYear = bounds.max;
+    }
+    if (
+      this.chartViewStartYear != null &&
+      this.chartViewEndYear != null &&
+      this.chartViewStartYear > this.chartViewEndYear
+    ) {
+      this.chartViewStartYear = bounds.min;
+      this.chartViewEndYear = bounds.max;
+    }
+  }
+
+  onChartStartYearChange(year: number): void {
+    this.chartViewStartYear = year;
+    if (this.chartViewEndYear != null && year > this.chartViewEndYear) {
+      this.chartViewEndYear = year;
+    }
+  }
+
+  onChartEndYearChange(year: number): void {
+    this.chartViewEndYear = year;
+    if (this.chartViewStartYear != null && year < this.chartViewStartYear) {
+      this.chartViewStartYear = year;
+    }
   }
 
   private loadReportWithTimeline(
@@ -528,6 +610,7 @@ export class ReportsComponent {
       .subscribe({
         next: (report) => {
           this.report = report;
+          this.syncChartYearRangeFromReport();
           this.getShortfallStatus(report);
           this.effectiveReportEndDate =
             effectiveEndDate ??
@@ -694,6 +777,7 @@ export class ReportsComponent {
     this.compareTimeline = null;
     this.effectiveCompareReportEndDate = null;
     this.isCompareLoading = false;
+    this.syncChartYearRangeFromReport();
   }
 
   onComparePlansClicked() {
@@ -789,6 +873,7 @@ export class ReportsComponent {
                     ? new Date(timeline.forecastEndtDate)
                     : null);
                 this.isCompareLoading = false;
+                this.syncChartYearRangeFromReport();
               }),
             );
         }),

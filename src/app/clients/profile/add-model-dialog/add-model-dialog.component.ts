@@ -18,6 +18,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import * as ClientActions from 'src/app/store/client/client.actions';
 import { ClientHttpService } from '../../services/client-http.service';
 import { MaterialModule } from "src/app/material.module";
+import { getCompletedYearsAgeAtDate } from 'src/app/shared/utils/client-age-at-reference';
 
 @Component({
   selector: 'app-add-model-dialog',
@@ -51,7 +52,8 @@ export class AddModelDialogComponent {
     private translate: TranslateService,
   ) {
     this.birthDate = new Date(this.clientData?.clientDetails?.birthDate);
-    this.minAge = this.calculateAge(this.birthDate);
+    const computedMin = getCompletedYearsAgeAtDate(this.birthDate, new Date());
+    this.minAge = Number.isFinite(computedMin) ? computedMin : 0;
     this.initForm();
     this.prefillPlanName();
   }
@@ -159,17 +161,6 @@ export class AddModelDialogComponent {
     const num = Number(raw);
     const val = isNaN(num) ? 0 : this.round1(num);
     this.form.get('inflationRate')?.setValue(val, { emitEvent: true });
-  }
-
-  private calculateAge(birthDate: Date): number {
-    const today = new Date();
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const m = today.getMonth() - birthDate.getMonth();
-
-    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
-    }
-    return age;
   }
 
   private round1(n: number): number {

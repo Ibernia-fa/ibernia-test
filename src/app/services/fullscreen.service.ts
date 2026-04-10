@@ -13,6 +13,9 @@ export interface FullscreenData {
   isComparison?: boolean;
   hasShortfall: boolean;
   firstShortfallAge: number | null;
+  planDuration?: number;
+  chartViewStartYear?: number | null;
+  chartViewEndYear?: number | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -219,6 +222,13 @@ private initializeChart(data: FullscreenData): void {
   this.chartComponentRef.instance.forecastEndDate = data.forecastEndDate;
   this.chartComponentRef.instance.cashFlowName = data.cashFlowName;
   this.chartComponentRef.instance.isFullscreen = true;
+  if (data.planDuration != null) {
+    this.chartComponentRef.instance.planDuration = data.planDuration;
+  }
+  this.chartComponentRef.instance.chartViewStartYear =
+    data.chartViewStartYear ?? null;
+  this.chartComponentRef.instance.chartViewEndYear =
+    data.chartViewEndYear ?? null;
   
   // Attach to application
   this.appRef.attachView(this.chartComponentRef.hostView);
@@ -259,7 +269,25 @@ private initializeChart(data: FullscreenData): void {
         previousValue: undefined,
         firstChange: true,
         isFirstChange: () => true
-      }
+      },
+      planDuration: {
+        currentValue: data.planDuration,
+        previousValue: undefined,
+        firstChange: true,
+        isFirstChange: () => true,
+      },
+      chartViewStartYear: {
+        currentValue: data.chartViewStartYear ?? null,
+        previousValue: undefined,
+        firstChange: true,
+        isFirstChange: () => true,
+      },
+      chartViewEndYear: {
+        currentValue: data.chartViewEndYear ?? null,
+        previousValue: undefined,
+        firstChange: true,
+        isFirstChange: () => true,
+      },
     });
   }
   
