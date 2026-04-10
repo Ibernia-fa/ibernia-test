@@ -6,7 +6,7 @@
         <div class="d-flex flex-column gap-10">
           <h3 class="ibr-new-heading">{{ "Family Tree" | translate }}</h3>
           <p class="ibr-new-subheading legacy-family-tree-intro">
-            {{ "LEGACY.FAMILY_TREE_SUBTITLE_LINE1" | translate }}<br />
+            {{ "LEGACY.FAMILY_TREE_SUBTITLE_LINE1" | translate }}
             {{ "LEGACY.FAMILY_TREE_SUBTITLE_LINE2" | translate }}
           </p>
         </div>
@@ -140,7 +140,9 @@
                       >
                       <button
                         class="node-remove"
-                        (click)="onRemoveMember(parent); $event.stopPropagation()"
+                        (click)="
+                          onRemoveMember(parent); $event.stopPropagation()
+                        "
                       >
                         <mat-icon>close</mat-icon>
                       </button>
@@ -166,14 +168,19 @@
                   #clientParentsLine
                 ></div>
               </div>
-              <div class="parent-estate client-estate" (click)="onEditParentEstate('client')">
-                <span class="estate-currency">{{
-                  currency | currencySymbol
-                }}</span
-                >{{
-                  dashboard.parentEstates.clientParentsNetWorth
-                    | number: "1.0-0"
-                }}
+              <div
+                class="parent-estate client-estate"
+                (click)="onEditParentEstate('client')"
+              >
+                <div class="d-flex align-items-center">
+                  <span class="estate-currency">{{
+                    currency | currencySymbol
+                  }}</span
+                  >{{
+                    dashboard.parentEstates.clientParentsNetWorth
+                      | number: "1.0-0"
+                  }}
+                </div>
                 <mat-icon class="edit-sm">edit</mat-icon>
               </div>
               <div
@@ -418,7 +425,9 @@
                       >
                       <button
                         class="node-remove"
-                        (click)="onRemoveMember(parent); $event.stopPropagation()"
+                        (click)="
+                          onRemoveMember(parent); $event.stopPropagation()
+                        "
                       >
                         <mat-icon>close</mat-icon>
                       </button>
@@ -448,13 +457,15 @@
                 class="parent-estate partner-estate"
                 (click)="onEditParentEstate('partner')"
               >
-                <span class="estate-currency">{{
-                  currency | currencySymbol
-                }}</span
-                >{{
-                  dashboard.parentEstates.partnerParentsNetWorth
-                    | number: "1.0-0"
-                }}
+                <div class="d-flex align-items-center">
+                  <span class="estate-currency">{{
+                    currency | currencySymbol
+                  }}</span
+                  >{{
+                    dashboard.parentEstates.partnerParentsNetWorth
+                      | number: "1.0-0"
+                  }}
+                </div>
                 <mat-icon class="edit-sm">edit</mat-icon>
               </div>
               <div
@@ -750,9 +761,7 @@
           </div>
         </div>
         <button class="button-icon-outline" (click)="onOpenTaxSettings()">
-          <span class="f-s-16 f-w-500">{{
-            "Tax settings" | translate
-          }}</span>
+          <span class="f-s-16 f-w-500">{{ "Tax settings" | translate }}</span>
         </button>
       </div>
     </mat-card-content>

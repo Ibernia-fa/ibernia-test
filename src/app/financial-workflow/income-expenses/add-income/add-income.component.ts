@@ -54,6 +54,8 @@ import {
   getPersistedAgeForCalendarYear,
   getProjectionColumnAgeLabel,
 } from 'src/app/shared/utils/client-age-at-reference';
+import { calendarYearOrEventRefValidator } from 'src/app/shared/utils/calendar-year-or-event-ref.validator';
+import { recurringEndYearNotSelected } from 'src/app/shared/utils/recurring-end-save-guard';
 
 @Component({
   selector: 'app-add-income',
@@ -209,7 +211,7 @@ export class AddIncomeComponent {
       currencySymbol: [this.clientPreferredCurrency, [Validators.required]],
       amount: ['', [Validators.required, this.greaterThanZero()]],
       cycle: [this.cycles[1].id, Validators.required],
-      start: ['', Validators.required],
+      start: [''],
       end: [''],
       escalationRate: [this.escalationRates[0]?.description ?? '', Validators.required],
       customEscalationRate: [''],
@@ -501,13 +503,18 @@ export class AddIncomeComponent {
   onCycleValueChange(event: any) {
     const isOneOff = this.cycles.find(cycle => cycle.id === event)?.description === 'One-off';
     this.showStartEnd = !isOneOff;
+    const startCtrl = this.incomeForm.get('start');
+    const endCtrl = this.incomeForm.get('end');
     if (!this.showStartEnd) {
-      this.incomeForm.controls['end'].clearValidators();
-      this.incomeForm.controls['end'].updateValueAndValidity();
-    }
-    else {
-      this.incomeForm.controls['end'].addValidators(Validators.required);
-      this.incomeForm.controls['end'].updateValueAndValidity();
+      endCtrl?.clearValidators();
+      endCtrl?.updateValueAndValidity();
+      startCtrl?.setValidators([calendarYearOrEventRefValidator()]);
+      startCtrl?.updateValueAndValidity();
+    } else {
+      endCtrl?.setValidators([calendarYearOrEventRefValidator()]);
+      endCtrl?.updateValueAndValidity();
+      startCtrl?.setValidators([calendarYearOrEventRefValidator()]);
+      startCtrl?.updateValueAndValidity();
     }
     const escalationControl = this.incomeForm.get('escalationRate');
     if (isOneOff) {
@@ -524,6 +531,26 @@ export class AddIncomeComponent {
 
   getTimelineEventLabel(rawName: string): string {
     return translateTimelineEventDisplayName(this.translate, rawName);
+  }
+
+  /** Save disabled until form is valid and recurring rows have an end year or event. */
+  get isIncomeSaveButtonDisabled(): boolean {
+    if (this.isSaving) {
+      return true;
+    }
+    if (this.isEditWorkflow && !this.hasFormChanges()) {
+      return true;
+    }
+    if (this.incomeForm.invalid) {
+      return true;
+    }
+    const cycleId = this.incomeForm.get('cycle')?.value;
+    const desc = this.cycles.find((c) => c.id === cycleId)?.description;
+    return recurringEndYearNotSelected(
+      desc,
+      this.incomeForm.get('end')?.value,
+      this.eventsList,
+    );
   }
 
   addIncome(): void {

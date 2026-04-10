@@ -395,6 +395,14 @@
                       }
                       @if (
                         eventForm.get("end")?.touched &&
+                        eventForm.get("end")?.hasError("invalidYear")
+                      ) {
+                        <span class="field-error d-block">{{
+                          "Select a valid end year" | translate
+                        }}</span>
+                      }
+                      @if (
+                        eventForm.get("end")?.touched &&
                         eventForm.get("end")?.hasError("endBeforeStart")
                       ) {
                         <span class="field-error d-block"
@@ -564,6 +572,8 @@
       <div>
         <button
           (click)="onSystemEventSubmit()"
+          type="button"
+          [disabled]="isSystemEventSaveButtonDisabled"
           class="button-icon w-100 d-block"
         >
           <span class="f-s-16">{{ "Save" | translate }}</span>
@@ -1118,6 +1128,14 @@
                     }
                     @if (
                       eventForm.get("monthlyEnd")?.touched &&
+                      eventForm.get("monthlyEnd")?.hasError("invalidYear")
+                    ) {
+                      <span class="field-error d-block">{{
+                        "Select a valid end year" | translate
+                      }}</span>
+                    }
+                    @if (
+                      eventForm.get("monthlyEnd")?.touched &&
                       eventForm.get("monthlyEnd")?.hasError("endBeforeStart")
                     ) {
                       <span class="field-error d-block"
@@ -1284,6 +1302,8 @@
       <div>
         <button
           (click)="onFinancingEventSubmit()"
+          type="button"
+          [disabled]="isFinancingEventSaveButtonDisabled"
           class="button-icon w-100 d-block"
         >
           <span class="f-s-16">{{ "Save" | translate }}</span>
@@ -1641,6 +1661,14 @@
                       ) {
                         <span class="field-error d-block">{{
                           "Required" | translate
+                        }}</span>
+                      }
+                      @if (
+                        eventForm.get("end")?.touched &&
+                        eventForm.get("end")?.hasError("invalidYear")
+                      ) {
+                        <span class="field-error d-block">{{
+                          "Select a valid end year" | translate
                         }}</span>
                       }
                       @if (
@@ -2188,6 +2216,14 @@
                     }
                     @if (
                       eventForm.get("monthlyEnd")?.touched &&
+                      eventForm.get("monthlyEnd")?.hasError("invalidYear")
+                    ) {
+                      <span class="field-error d-block">{{
+                        "Select a valid end year" | translate
+                      }}</span>
+                    }
+                    @if (
+                      eventForm.get("monthlyEnd")?.touched &&
                       eventForm.get("monthlyEnd")?.hasError("endBeforeStart")
                     ) {
                       <span class="field-error d-block"
@@ -2215,7 +2251,8 @@
         <div>
           <button
             (click)="onCustomEventSubmit()"
-            [disabled]="eventForm.invalid"
+            type="button"
+            [disabled]="isCustomEventSaveButtonDisabled"
             class="button-icon w-100 d-block"
           >
             <span class="f-s-16">{{ "Save" | translate }}</span>

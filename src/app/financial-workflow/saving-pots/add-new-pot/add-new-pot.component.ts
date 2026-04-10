@@ -51,6 +51,8 @@ import {
   getPersistedAgeForCalendarYear,
   getProjectionColumnAgeLabel,
 } from 'src/app/shared/utils/client-age-at-reference';
+import { calendarYearOrEventRefValidator } from 'src/app/shared/utils/calendar-year-or-event-ref.validator';
+
 @Component({
   selector: 'app-add-new-pot',
   imports: [
@@ -264,8 +266,8 @@ export class AddNewPotComponent {
       returnRate: [this.normalizeReturnRate(this.userReturnRate)],
       // lockPot: [true],
       lockPot: [defaultType === 'Pension fund'],  // Auto-check for Pension fund only
-      start: [data.forecastStartDateYear, Validators.required],
-      end: [this.dialogEndCalendarYear, Validators.required],
+      start: [data.forecastStartDateYear, [calendarYearOrEventRefValidator()]],
+      end: [this.dialogEndCalendarYear, [calendarYearOrEventRefValidator()]],
       // Commissions always start unchecked - user must manually enable
       commissions: [false],
       commissionType: [this.loggedInUserComissionType ?? ''],
@@ -281,7 +283,8 @@ export class AddNewPotComponent {
       contributionAmount: [0],
       contributionFrequency: [1],  // Monthly (1) by default
       contributionStartDate: [data.forecastStartDateYear],  // This year
-      contributionEndDate: [this.retirementAge],  // Retirement year
+      // No default — user must choose contribution end (validators + API enforce).
+      contributionEndDate: [null as number | null],
       ownership: [SavingPotOwnership.Joint]
     });
 
@@ -294,7 +297,7 @@ export class AddNewPotComponent {
     this.savingsForm.get('returnRate')?.valueChanges.subscribe((value) => {
       this.formattedReturnRate = this.formatWithPercentage(value);
       const n = typeof value === 'number' ? value : Number(value);
-      this.sliderReturnRate = Number.isFinite(n) ? this.round2(n) : 0;
+      this.sliderReturnRate = Number.isFinite(n) ? Math.max(0, Math.min(10, this.round2(n))) : 0;
       this.syncReturnRateTextFromForm();
     });
 
@@ -672,6 +675,9 @@ onAmountBlur(e: Event) {
     // Auto-tick lockPot for Pension fund, untick for other types
     if (name === 'Pension fund') {
       this.savingsForm.get('lockPot')?.setValue(true);
+      if (!this.isEditWorkflow) {
+        this.savingsForm.get('contributionEndDate')?.reset(null, { emitEvent: false });
+      }
     } else {
       this.savingsForm.get('lockPot')?.setValue(false);
     }
@@ -691,8 +697,8 @@ onAmountBlur(e: Event) {
     if (potType === 'Pension fund') {
       // Make Pension fund fields required
       contributionAmountControl?.setValidators([Validators.required, this.minPositiveValue()]);
-      contributionStartControl?.setValidators([Validators.required]);
-      contributionEndControl?.setValidators([Validators.required]);
+      contributionStartControl?.setValidators([calendarYearOrEventRefValidator()]);
+      contributionEndControl?.setValidators([calendarYearOrEventRefValidator()]);
       
       // Do NOT auto-check commissions - user must manually enable it
     } else {
@@ -736,19 +742,19 @@ onAmountBlur(e: Event) {
 
   isLockPotChanged(event: any) {
     if (event) {
-      this.savingsForm.get('start')?.setValidators(Validators.required);
+      this.savingsForm.get('start')?.setValidators([calendarYearOrEventRefValidator()]);
       this.savingsForm.get('start')?.updateValueAndValidity();
-      this.savingsForm.get('end')?.setValidators(Validators.required);
+      this.savingsForm.get('end')?.setValidators([calendarYearOrEventRefValidator()]);
       this.savingsForm.get('end')?.updateValueAndValidity();
 
       this.savingsForm.get('end')?.patchValue(this.eventsList[0].start.year > 0 ? this.eventsList[0].start.year : this.forecastStartDateYear)
     } else {
-      this.savingsForm.get('start')?.removeValidators(Validators.required);
+      this.savingsForm.get('start')?.clearValidators();
       this.savingsForm.get('start')?.updateValueAndValidity();
-      this.savingsForm.get('end')?.removeValidators(Validators.required);
+      this.savingsForm.get('end')?.clearValidators();
       this.savingsForm.get('end')?.updateValueAndValidity();
 
-      this.savingsForm.get('end')?.patchValue(this.dialogEndCalendarYear)
+      this.savingsForm.get('end')?.patchValue(this.dialogEndCalendarYear);
     }
   }
 
@@ -888,7 +894,7 @@ onAmountBlur(e: Event) {
   private syncSliderReturnRateFromForm(): void {
     const raw = this.savingsForm.get('returnRate')?.value;
     const n = typeof raw === 'number' ? raw : Number(raw);
-    this.sliderReturnRate = Number.isFinite(n) ? this.round2(n) : 0;
+    this.sliderReturnRate = Number.isFinite(n) ? Math.max(0, Math.min(10, this.round2(n))) : 0;
   }
 
   /** Human-readable percent for the side input (no % suffix). */
@@ -897,6 +903,25 @@ onAmountBlur(e: Event) {
     const r = this.round2(n);
     if (Math.abs(r - Math.round(r)) < 1e-9) return String(Math.round(r));
     return String(r);
+  }
+
+  /**
+   * Save stays off until the form is valid and (for pension fund) a contribution end calendar year is chosen.
+   */
+  get isSaveDisabled(): boolean {
+    if (this.savingsForm.invalid) {
+      return true;
+    }
+    if (this.fromNetWorth) {
+      return false;
+    }
+    if (this.savingsForm.get('name')?.value !== 'Pension fund') {
+      return false;
+    }
+    const raw = this.savingsForm.get('contributionEndDate')?.value;
+    const year =
+      typeof raw === 'number' && Number.isFinite(raw) ? raw : 0;
+    return year <= 0;
   }
 
   saveCashflow(): void {
@@ -923,6 +948,25 @@ onAmountBlur(e: Event) {
         this.savingsForm.markAllAsTouched();
         return;
       }
+    }
+
+    const potName = this.savingsForm.get('name')?.value;
+    const isPensionFundPot = potName === 'Pension fund';
+    const contribAmt = Number(this.savingsForm.get('contributionAmount')?.value ?? 0);
+    const contribEndRaw = this.savingsForm.get('contributionEndDate')?.value;
+    const contribEndYear =
+      typeof contribEndRaw === 'number' && Number.isFinite(contribEndRaw)
+        ? contribEndRaw
+        : 0;
+    if (
+      isPensionFundPot &&
+      contribAmt > 0 &&
+      contribEndYear <= 0
+    ) {
+      const endCtrl = this.savingsForm.get('contributionEndDate');
+      endCtrl?.setErrors({ ...(endCtrl.errors ?? {}), required: true });
+      endCtrl?.markAsTouched();
+      return;
     }
 
     if (this.savingsForm.valid) {
@@ -1354,11 +1398,10 @@ onAmountBlur(e: Event) {
     this.returnRateText = el.value.replace('%', '').trim();
     const normalized = this.returnRateText.replace(',', '.');
     if (normalized === '' || normalized === '-' || normalized === '.') return;
-    if (/^\d+\.$/.test(normalized)) return;
+    if (/^-?\d+\.$/.test(normalized)) return;
     const num = parseFloat(normalized);
     if (Number.isNaN(num)) return;
-    const clamped = Math.max(0, Math.min(10, this.round2(num)));
-    this.savingsForm.get('returnRate')?.setValue(clamped, { emitEvent: true });
+    this.savingsForm.get('returnRate')?.setValue(this.round2(num), { emitEvent: true });
   }
 
   

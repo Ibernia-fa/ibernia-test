@@ -55,6 +55,8 @@ import {
   getProjectionColumnAgeLabel,
   getCashflowDialogEndCalendarYear,
 } from 'src/app/shared/utils/client-age-at-reference';
+import { calendarYearOrEventRefValidator } from 'src/app/shared/utils/calendar-year-or-event-ref.validator';
+import { recurringEndYearNotSelected } from 'src/app/shared/utils/recurring-end-save-guard';
 
 @Component({
   selector: 'app-add-contribution',
@@ -339,12 +341,19 @@ export class AddContributionComponent {
       'One-off';
     this.showStartEnd = !isOneOff;
 
+    const startCtrl = this.contributionForm.get('start');
+    const endCtrl = this.contributionForm.get('end');
+
     if (!this.showStartEnd) {
-      this.contributionForm.controls['end'].clearValidators();
-      this.contributionForm.controls['end'].updateValueAndValidity();
+      endCtrl?.clearValidators();
+      endCtrl?.updateValueAndValidity();
+      startCtrl?.setValidators([Validators.required]);
+      startCtrl?.updateValueAndValidity();
     } else {
-      this.contributionForm.controls['end'].addValidators(Validators.required);
-      this.contributionForm.controls['end'].updateValueAndValidity();
+      endCtrl?.setValidators([calendarYearOrEventRefValidator()]);
+      endCtrl?.updateValueAndValidity();
+      startCtrl?.setValidators([calendarYearOrEventRefValidator()]);
+      startCtrl?.updateValueAndValidity();
     }
 
     const escalationControl = this.contributionForm.get('escalationRate');
@@ -363,6 +372,19 @@ export class AddContributionComponent {
 
   getTimelineEventLabel(rawName: string): string {
     return translateTimelineEventDisplayName(this.translate, rawName);
+  }
+
+  get isContributionSaveButtonDisabled(): boolean {
+    if (this.contributionForm.invalid) {
+      return true;
+    }
+    const cycleId = this.contributionForm.get('cycle')?.value;
+    const desc = this.cycles.find((c) => c.id === cycleId)?.description;
+    return recurringEndYearNotSelected(
+      desc,
+      this.contributionForm.get('end')?.value,
+      this.eventsList,
+    );
   }
 
   isCommissionsChanged(enabled: boolean) {

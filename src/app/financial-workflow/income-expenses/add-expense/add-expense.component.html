@@ -257,7 +257,8 @@
                   </div>
                   @if (
                     expenseForm.get("start")?.touched &&
-                    expenseForm.get("start")?.hasError("required")
+                    (expenseForm.get("start")?.hasError("required") ||
+                      expenseForm.get("start")?.hasError("invalidYear"))
                   ) {
                     <span class="field-error d-block">{{
                       "Required" | translate
@@ -316,7 +317,8 @@
                     </div>
                     @if (
                       expenseForm.get("end")?.touched &&
-                      expenseForm.get("end")?.hasError("required")
+                      (expenseForm.get("end")?.hasError("required") ||
+                        expenseForm.get("end")?.hasError("invalidYear"))
                     ) {
                       <span class="field-error d-block">{{
                         "Required" | translate
@@ -485,11 +487,7 @@
         <button
           (click)="addExpense()"
           type="button"
-          [disabled]="
-            isSaving ||
-            expenseForm.invalid ||
-            (isEditWorkflow && !hasFormChanges())
-          "
+          [disabled]="isExpenseSaveButtonDisabled"
           class="button-icon w-100 d-block"
         >
           @if (isSaving) {

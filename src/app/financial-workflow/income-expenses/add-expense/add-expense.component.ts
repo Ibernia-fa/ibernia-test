@@ -31,6 +31,8 @@ import {
   getPersistedAgeForCalendarYear,
   getProjectionColumnAgeLabel,
 } from 'src/app/shared/utils/client-age-at-reference';
+import { calendarYearOrEventRefValidator } from 'src/app/shared/utils/calendar-year-or-event-ref.validator';
+import { recurringEndYearNotSelected } from 'src/app/shared/utils/recurring-end-save-guard';
 
 @Component({
   selector: 'app-add-expense',
@@ -137,7 +139,7 @@ export class AddExpenseComponent {
       currencySymbol: [this.clientPreferredCurrency, [Validators.required]],
       amount: ['', [Validators.required, this.greaterThanZero()]],
       cycle: [this.cycles[1].id, Validators.required],
-      start: ['', Validators.required],
+      start: [''],
       end: [''],
       escalationRate: [this.escalationRates[0]?.description ?? '', Validators.required],
       customEscalationRate: ['']
@@ -277,14 +279,20 @@ export class AddExpenseComponent {
     const isOneOff = this.cycles.find(cycle => cycle.id === event)?.description === 'One-off';
 
     this.showStartEnd = !isOneOff;
+    const startCtrl = this.expenseForm.get('start');
+    const endCtrl = this.expenseForm.get('end');
 
     if (!this.showStartEnd) {
-      this.expenseForm.controls['end'].clearValidators();
-      this.expenseForm.controls['end'].updateValueAndValidity();
+      endCtrl?.clearValidators();
+      endCtrl?.updateValueAndValidity();
+      startCtrl?.setValidators([calendarYearOrEventRefValidator()]);
+      startCtrl?.updateValueAndValidity();
     }
     else {
-      this.expenseForm.controls['end'].addValidators(Validators.required);
-      this.expenseForm.controls['end'].updateValueAndValidity();
+      endCtrl?.setValidators([calendarYearOrEventRefValidator()]);
+      endCtrl?.updateValueAndValidity();
+      startCtrl?.setValidators([calendarYearOrEventRefValidator()]);
+      startCtrl?.updateValueAndValidity();
     }
 
     const escalationControl = this.expenseForm.get('escalationRate');
@@ -304,6 +312,25 @@ export class AddExpenseComponent {
 
   getTimelineEventLabel(rawName: string): string {
     return translateTimelineEventDisplayName(this.translate, rawName);
+  }
+
+  get isExpenseSaveButtonDisabled(): boolean {
+    if (this.isSaving) {
+      return true;
+    }
+    if (this.isEditWorkflow && !this.hasFormChanges()) {
+      return true;
+    }
+    if (this.expenseForm.invalid) {
+      return true;
+    }
+    const cycleId = this.expenseForm.get('cycle')?.value;
+    const desc = this.cycles.find((c) => c.id === cycleId)?.description;
+    return recurringEndYearNotSelected(
+      desc,
+      this.expenseForm.get('end')?.value,
+      this.eventsList,
+    );
   }
 
   addExpense(): void {

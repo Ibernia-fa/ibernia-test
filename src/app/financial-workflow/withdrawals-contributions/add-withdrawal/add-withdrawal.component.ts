@@ -32,6 +32,8 @@ import {
   getPersistedAgeForCalendarYear,
   getProjectionColumnAgeLabel,
 } from 'src/app/shared/utils/client-age-at-reference';
+import { calendarYearOrEventRefValidator } from 'src/app/shared/utils/calendar-year-or-event-ref.validator';
+import { recurringEndYearNotSelected } from 'src/app/shared/utils/recurring-end-save-guard';
 
 @Component({
   selector: 'app-add-withdrawal',
@@ -233,16 +235,22 @@ export class AddWithdrawalComponent {
   }
 
   onCycleValueChange(event: any) {
-    console.log({ event });
     const isOneOff = this.cycles.find(cycle => cycle.id === event)?.description === 'One-off';
     this.showStartEnd = !isOneOff;
 
+    const startCtrl = this.withdrawalForm.get('start');
+    const endCtrl = this.withdrawalForm.get('end');
+
     if (!this.showStartEnd) {
-      this.withdrawalForm.controls['end'].clearValidators();
-      this.withdrawalForm.controls['end'].updateValueAndValidity();
+      endCtrl?.clearValidators();
+      endCtrl?.updateValueAndValidity();
+      startCtrl?.setValidators([Validators.required]);
+      startCtrl?.updateValueAndValidity();
     } else {
-      this.withdrawalForm.controls['end'].addValidators(Validators.required);
-      this.withdrawalForm.controls['end'].updateValueAndValidity();
+      endCtrl?.setValidators([calendarYearOrEventRefValidator()]);
+      endCtrl?.updateValueAndValidity();
+      startCtrl?.setValidators([calendarYearOrEventRefValidator()]);
+      startCtrl?.updateValueAndValidity();
     }
 
     const escalationControl = this.withdrawalForm.get('escalationRate');
@@ -261,6 +269,19 @@ export class AddWithdrawalComponent {
 
   getTimelineEventLabel(rawName: string): string {
     return translateTimelineEventDisplayName(this.translate, rawName);
+  }
+
+  get isWithdrawalSaveButtonDisabled(): boolean {
+    if (this.withdrawalForm.invalid) {
+      return true;
+    }
+    const cycleId = this.withdrawalForm.get('cycle')?.value;
+    const desc = this.cycles.find((c) => c.id === cycleId)?.description;
+    return recurringEndYearNotSelected(
+      desc,
+      this.withdrawalForm.get('end')?.value,
+      this.eventsList,
+    );
   }
 
   addExpense(): void {
@@ -285,7 +306,6 @@ export class AddWithdrawalComponent {
 
       const neutralCommissionEscRate: EscalationRate = { description: '', value: '0' };
 
-      console.log('Form Submitted', this.withdrawalForm.value);
       const isCustomEscalation =
         this.selectedEscalationDescription === 'Increases at custom rate';
       const escalationRateValue = isCustomEscalation
@@ -399,8 +419,6 @@ export class AddWithdrawalComponent {
           });
         });
       // Handle form submission logic
-    } else {
-      console.log('Form is invalid');
     }
   }
 
