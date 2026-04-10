@@ -40,6 +40,7 @@ import { AuthService } from 'src/app/auth/services/auth.service';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Store } from '@ngrx/store';
 import * as ClientActions from 'src/app/store/client/client.actions';
+import { getCompletedYearsAgeAtDate } from 'src/app/shared/utils/client-age-at-reference';
 
 export const DMY_FORMATS = {
   parse: { dateInput: 'DD/MM/YYYY' },
@@ -217,7 +218,7 @@ export class ClientEditComponent {
         const clientBirthDate = new Date(res.clientDetails.birthDate);
         this.clientForm.controls['dob'].patchValue(clientBirthDate);
         this.clientDobDisplay = normalizeToDMY(clientBirthDate);
-        this.age = calculateAge(clientBirthDate);
+        this.age = getCompletedYearsAgeAtDate(clientBirthDate, new Date());
 
         
 
@@ -252,7 +253,10 @@ export class ClientEditComponent {
           const partnerBirthDate = new Date(res.partnerDetail.birthDate);
           partnerFormGroup.controls['dob'].patchValue(partnerBirthDate);
           this.partnerDobDisplay = normalizeToDMY(partnerBirthDate);
-          this.partnerAge = calculateAge(partnerBirthDate);
+          this.partnerAge = getCompletedYearsAgeAtDate(
+            partnerBirthDate,
+            new Date(),
+          );
 
           
 
@@ -306,7 +310,7 @@ export class ClientEditComponent {
       // const partnerDob = partnerGroup.get('dob')?.value;
       // if (partnerDob instanceof Date) {
       //   this.partnerDobDisplay = normalizeToDMY(partnerDob);
-      //   this.partnerAge = calculateAge(partnerDob);
+      //   this.partnerAge = getCompletedYearsAgeAtDate(partnerDob);
 
       //   setTimeout(() => {
       //     const allInputs = document.querySelectorAll('input[matDatepicker]');
@@ -631,7 +635,7 @@ export class ClientEditComponent {
           input.value = normalized;
         }
       }, 0);
-      this.age = calculateAge(value);
+      this.age = getCompletedYearsAgeAtDate(value, new Date());
       control?.updateValueAndValidity({ emitEvent: false });
       return;
     }
@@ -681,7 +685,7 @@ export class ClientEditComponent {
           partnerInput.value = normalized;
         }
       }, 0);
-      this.partnerAge = calculateAge(value);
+      this.partnerAge = getCompletedYearsAgeAtDate(value, new Date());
       control?.updateValueAndValidity({ emitEvent: false });
       return;
     }
@@ -744,7 +748,7 @@ export class ClientEditComponent {
       return;
     }
     const formatted = normalizeToDMY(value);
-    this.age = calculateAge(value);
+    this.age = getCompletedYearsAgeAtDate(value, new Date());
     this.clientDobDisplay = formatted;
 
     this.clientForm.get('dob')?.setValue(value, { emitEvent: false });
@@ -768,7 +772,7 @@ export class ClientEditComponent {
       return;
     }
     const formatted = normalizeToDMY(value);
-    this.partnerAge = calculateAge(value);
+    this.partnerAge = getCompletedYearsAgeAtDate(value, new Date());
     this.partnerDobDisplay = formatted;
     const partnerGroup = this.clientForm.get('partner') as FormGroup;
     partnerGroup.get('dob')?.setValue(value, { emitEvent: false });
@@ -926,23 +930,13 @@ function parseDMYFromDigits(
   return { ok: true, date, age, normalized: normalizeToDMY(date) };
 }
 
-function calculateAge(date: Date): number {
-  const today = new Date();
-  let age = today.getFullYear() - date.getFullYear();
-  const hadBirthdayThisYear =
-    today.getMonth() > date.getMonth() ||
-    (today.getMonth() === date.getMonth() && today.getDate() >= date.getDate());
-  if (!hadBirthdayThisYear) age -= 1;
-  return age;
-}
-
 function dobValidator(
   ctrl: FormControl<string | Date | null>
 ): ValidationErrors | null {
   const raw = ctrl.value;
 
   if (raw instanceof Date) {
-    const age = calculateAge(raw);
+    const age = getCompletedYearsAgeAtDate(raw, new Date());
     if (age < 0) return { dob: 'Date cannot be in the future' };
     if (age > MAX_AGE) return { dob: `Age must be ≤ ${MAX_AGE}` };
     return null;

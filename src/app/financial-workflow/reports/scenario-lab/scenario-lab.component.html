@@ -101,6 +101,33 @@
             class="chart-component-wrapper"
             *ngIf="displayedReport && client && financialTimeline"
           >
+            <div
+              class="chart-year-range d-flex align-items-center flex-wrap gap-16 m-b-16"
+              *ngIf="chartYearOptions.length > 0"
+            >
+              <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                <mat-label>{{ "Chart from year" | translate }}</mat-label>
+                <mat-select
+                  [value]="chartViewStartYear"
+                  (selectionChange)="onChartStartYearChange($event.value)"
+                >
+                  <mat-option *ngFor="let y of chartYearOptions" [value]="y">
+                    {{ y }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                <mat-label>{{ "Chart to year" | translate }}</mat-label>
+                <mat-select
+                  [value]="chartViewEndYear"
+                  (selectionChange)="onChartEndYearChange($event.value)"
+                >
+                  <mat-option *ngFor="let y of chartYearOptions" [value]="y">
+                    {{ y }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
             <app-savings-bar-stacked-chart
               [report]="displayedReport"
               [client]="client"
@@ -119,9 +146,11 @@
                 )
               "
               [planDuration]="cashflow?.planDuration"
-              [cashFlowName]="cashflow.name"
+              [cashFlowName]="cashflow?.name ?? ''"
               [emergencyIconUrl]="'none'"
               [animateUpdates]="true"
+              [chartViewStartYear]="chartViewStartYear"
+              [chartViewEndYear]="chartViewEndYear"
             >
             </app-savings-bar-stacked-chart>
           </div>

@@ -60,6 +60,7 @@ import { SettingsHttpService } from '../../settings/services/settings-http.servi
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { patchInflationRateDescription } from 'src/app/shared/utils/escalation-rate-utils';
 import {
+  getAgeInCalendarYear,
   getCompletedYearsAgeAtDate,
   getPlanEndCalendarYear,
   getProjectionColumnAgeLabel,
@@ -453,9 +454,11 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
           ? this.partnerBirthDate
           : this.clientBirthDate;
 
+      const dropYear = moment(dropTime).year();
+      const dropAge = getAgeInCalendarYear(birthDate, dropYear);
       clientEvent.start = {
-        year: moment(dropTime).year(),
-        age: moment(dropTime).year() - moment(birthDate).year(),
+        year: dropYear,
+        age: Number.isNaN(dropAge) ? 0 : dropAge,
       };
 
       clientEvent.id = '';
@@ -1130,17 +1133,24 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
       return;
     }
 
+    const birthForAge =
+      existing.isPartnerEvent && this.partnerBirthDate
+        ? this.partnerBirthDate
+        : this.clientBirthDate;
+
+    const startAge = getAgeInCalendarYear(birthForAge, newStartYear);
     const updated = {
       ...existing,
       start: {
         year: newStartYear,
-        age: newStartYear - moment(this.clientBirthDate).year(),
+        age: Number.isNaN(startAge) ? 0 : startAge,
       },
       end: (() => {
         if (!existing.end || !existing.end.year) return existing.end;
+        const endAge = getAgeInCalendarYear(birthForAge, newEndYear);
         return {
           year: newEndYear,
-          age: newEndYear - moment(this.clientBirthDate).year(),
+          age: Number.isNaN(endAge) ? 0 : endAge,
         };
       })(),
     };

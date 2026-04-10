@@ -14,6 +14,7 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -79,8 +80,13 @@ import {
   getCashflowDialogEndCalendarYear,
   getCompletedYearsAgeAtDate,
   getPersistedAgeForCalendarYear,
+  getPlanEndCalendarYear,
   getProjectionColumnAgeLabel,
 } from 'src/app/shared/utils/client-age-at-reference';
+import {
+  getReportYearBounds,
+  parseReportCategoryYears,
+} from 'src/app/shared/utils/chart-series-year-range';
 
 @Component({
   selector: 'app-scenario-lab',
@@ -89,6 +95,7 @@ import {
     CommonModule,
     ReactiveFormsModule,
     MatCardModule,
+    MatFormFieldModule,
     MatSelectModule,
     MatButtonModule,
     MatProgressSpinnerModule,
@@ -119,6 +126,9 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
 
   baselineReport: ChartSeries | null = null;
   displayedReport: ChartSeries | null = null;
+  chartViewStartYear: number | null = null;
+  chartViewEndYear: number | null = null;
+  chartYearOptions: number[] = [];
   activeTab: 'before' | 'after' = 'after';
   hasSimulated = false;
 
@@ -331,6 +341,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
             this.baselineReport = this.deepCloneReport(report);
           }
           this.displayedReport = report;
+          this.syncChartYearRangeFromDisplayedReport();
           this.activeTab = 'after';
           this.updateScenarioForecastEndDateIfNeeded();
           this.getShortfallStatus(report);
@@ -493,7 +504,10 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
     if (this.cashflow) {
       const planDuration = Number(this.cashflow.planDuration);
       if (Number.isFinite(planDuration) && planDuration > 0) {
-        endYear = Math.max(endYear, birthYear + planDuration);
+        const planEnd = getPlanEndCalendarYear(birthDate, planDuration);
+        if (planEnd != null) {
+          endYear = Math.max(endYear, planEnd);
+        }
       }
     }
 
@@ -505,6 +519,55 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
     }
 
     return new Date(endYear, 11, 31);
+  }
+
+  private syncChartYearRangeFromDisplayedReport(): void {
+    const bounds = getReportYearBounds(this.displayedReport?.categories);
+    if (!bounds) {
+      this.chartYearOptions = [];
+      this.chartViewStartYear = null;
+      this.chartViewEndYear = null;
+      return;
+    }
+    this.chartYearOptions = parseReportCategoryYears(
+      this.displayedReport!.categories,
+    );
+    if (
+      this.chartViewStartYear == null ||
+      this.chartViewStartYear < bounds.min ||
+      this.chartViewStartYear > bounds.max
+    ) {
+      this.chartViewStartYear = bounds.min;
+    }
+    if (
+      this.chartViewEndYear == null ||
+      this.chartViewEndYear < bounds.min ||
+      this.chartViewEndYear > bounds.max
+    ) {
+      this.chartViewEndYear = bounds.max;
+    }
+    if (
+      this.chartViewStartYear != null &&
+      this.chartViewEndYear != null &&
+      this.chartViewStartYear > this.chartViewEndYear
+    ) {
+      this.chartViewStartYear = bounds.min;
+      this.chartViewEndYear = bounds.max;
+    }
+  }
+
+  onChartStartYearChange(year: number): void {
+    this.chartViewStartYear = year;
+    if (this.chartViewEndYear != null && year > this.chartViewEndYear) {
+      this.chartViewEndYear = year;
+    }
+  }
+
+  onChartEndYearChange(year: number): void {
+    this.chartViewEndYear = year;
+    if (this.chartViewStartYear != null && year < this.chartViewStartYear) {
+      this.chartViewStartYear = year;
+    }
   }
 
   private getPlanEndYearForScenarioLab(): number {
@@ -610,6 +673,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
           };
           this.updateScenarioForecastEndDateIfNeeded();
           this.getShortfallStatus(report);
+          this.syncChartYearRangeFromDisplayedReport();
           if (showSuccessToast) {
             this.toastr.success(this.translate.instant('TOAST.SCENARIO_SIMULATED'));
           }
@@ -667,6 +731,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
     this.activeTab = tab;
     const source = tab === 'before' ? this.baselineReport : this.report;
     this.displayedReport = source ? this.deepCloneReport(source) : source;
+    this.syncChartYearRangeFromDisplayedReport();
     if (tab === 'after' && this.report) this.getShortfallStatus(this.report);
     if (tab === 'before' && this.baselineReport)
       this.getShortfallStatus(this.baselineReport);

@@ -15,6 +15,8 @@ import { TranslateService } from '@ngx-translate/core';
 import { ChartComponent, NgApexchartsModule } from 'ng-apexcharts';
 import { ChartSeries } from '../models/charts-series.model';
 import { Client } from 'src/app/clients/models/client';
+import { getProjectionColumnAgeLabel } from 'src/app/shared/utils/client-age-at-reference';
+import { sliceChartSeriesToInclusiveYearRange } from 'src/app/shared/utils/chart-series-year-range';
 
 const EXCLUDED_SERIES = ['Current Account (Negative)', 'Emergency Expense'];
 
@@ -24,15 +26,6 @@ function toDate(value: any): Date | null {
     return Number.isNaN(value.getTime()) ? null : value;
   const d = new Date(value);
   return Number.isNaN(d.getTime()) ? null : d;
-}
-
-function calcAge(ref: Date, birth: Date): number {
-  let age = ref.getFullYear() - birth.getFullYear();
-  const hasPassed =
-    ref.getMonth() > birth.getMonth() ||
-    (ref.getMonth() === birth.getMonth() && ref.getDate() >= birth.getDate());
-  if (!hasPassed) age--;
-  return age;
 }
 
 interface SplitSeries {
@@ -95,6 +88,9 @@ export class ComparisonLineChartComponent
   @Input() client!: Client;
   @Input() forecastStartDate: any;
   @Input() forecastEndDate: any;
+  @Input() planDuration?: number;
+  @Input() chartViewStartYear: number | null = null;
+  @Input() chartViewEndYear: number | null = null;
 
   private readonly ngZone = inject(NgZone);
   private readonly translate = inject(TranslateService);
@@ -183,9 +179,16 @@ export class ComparisonLineChartComponent
       return;
     }
 
-    const planA = this.trimToEndYear(this.report);
-    const planB = this.trimToEndYear(this.compareReport);
+    let planA = this.trimToEndYear(this.report);
+    let planB = this.trimToEndYear(this.compareReport);
     if (!planA || !planB) return;
+
+    const vs = Number(this.chartViewStartYear);
+    const ve = Number(this.chartViewEndYear);
+    if (Number.isFinite(vs) && Number.isFinite(ve)) {
+      planA = sliceChartSeriesToInclusiveYearRange(planA, vs, ve) as ChartSeries;
+      planB = sliceChartSeriesToInclusiveYearRange(planB, vs, ve) as ChartSeries;
+    }
 
     const {
       categories: yearCategories,
@@ -196,22 +199,26 @@ export class ComparisonLineChartComponent
     const currencyCode = this.client?.clientDetails?.preferredCurrency ?? '';
     const birthDate = toDate(this.client?.clientDetails?.birthDate);
     const forecastStart = toDate(this.forecastStartDate);
+    const lastYr = yearCategories.length
+      ? Number(yearCategories[yearCategories.length - 1])
+      : NaN;
 
     const ageLabels: string[] = [];
     const yearLabels: string[] = [];
 
-    yearCategories.forEach((cat, i) => {
+    yearCategories.forEach((cat) => {
       const yr = Number(cat);
       yearLabels.push(String(yr));
 
       if (birthDate && Number.isFinite(yr)) {
-        let age: number;
-        if (i === 0 && forecastStart) {
-          age = calcAge(forecastStart, birthDate);
-        } else {
-          age = calcAge(new Date(yr, 0, 1), birthDate);
-        }
-        ageLabels.push(age >= 0 ? String(age) : cat);
+        const age = getProjectionColumnAgeLabel(
+          birthDate,
+          yr,
+          forecastStart ?? undefined,
+          this.planDuration,
+          Number.isFinite(lastYr) ? lastYr : null,
+        );
+        ageLabels.push(Number.isNaN(age) || age < 0 ? String(cat) : String(age));
       } else {
         ageLabels.push(cat);
       }
