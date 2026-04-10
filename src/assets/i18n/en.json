@@ -717,6 +717,7 @@
   "WEALTH.ADD_LIABILITY": "Add liability",
   "WEALTH.EDIT_LIABILITY": "Edit liability",
   "WEALTH.CATEGORY": "Category",
+  "WEALTH.DESCRIPTION": "Description",
   "WEALTH.OUTSTANDING_AMOUNT": "Outstanding amount",
   "WEALTH.SAVING": "Saving...",
   "WEALTH.VALUE": "Value",

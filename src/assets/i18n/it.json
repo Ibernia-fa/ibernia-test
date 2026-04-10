@@ -724,6 +724,7 @@
   "WEALTH.ADD_LIABILITY": "Aggiungi una passività",
   "WEALTH.EDIT_LIABILITY": "Modifica la passività",
   "WEALTH.CATEGORY": "Categoria",
+  "WEALTH.DESCRIPTION": "Descrizione",
   "WEALTH.OUTSTANDING_AMOUNT": "Importo residuo",
   "WEALTH.SAVING": "Salvataggio...",
   "WEALTH.VALUE": "Valore",
