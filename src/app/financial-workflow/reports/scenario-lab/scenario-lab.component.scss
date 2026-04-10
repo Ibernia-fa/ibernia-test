@@ -265,6 +265,12 @@
   }
 }
 
+// Wraps only the select + chevron so `top: 50%` on `.custom-icon` is not affected
+// by the edited-chips block below (which was shifting the arrow downward).
+.category-dropdown-trigger-wrap {
+  width: 100%;
+}
+
 .custom-icon {
   position: absolute;
   right: 16px;

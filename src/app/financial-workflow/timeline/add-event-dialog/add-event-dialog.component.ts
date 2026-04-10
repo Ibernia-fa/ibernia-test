@@ -38,6 +38,7 @@ import {
   getPersistedAgeForCalendarYear,
   getProjectionColumnAgeLabel,
 } from 'src/app/shared/utils/client-age-at-reference';
+import { calendarYearOrEventRefValidator } from 'src/app/shared/utils/calendar-year-or-event-ref.validator';
 
 @Component({
   selector: 'app-add-event-dialog',
@@ -380,7 +381,7 @@ export class AddEventDialogComponent {
           cycle: [defaultCycle, [Validators.required]],
           ageDate: [moment(this.dropTime).year(), Validators.required],
           start: [moment(this.dropTime).year(), Validators.required],
-          end: [0, Validators.required],
+          end: [null as number | null],
           escalationRate: [this.escalationRates[0]?.description ?? '', Validators.required],
           customEscalationRate: ['']
         });
@@ -434,7 +435,7 @@ export class AddEventDialogComponent {
           monthlyEnd: [null as number | null],
           cycle: ['One-off', [Validators.required]],
           start: [null, Validators.required],
-          end: [0],
+          end: [null as number | null],
           escalationRate: [this.escalationRates[0]?.description ?? ''],
           customEscalationRate: [''],
         });
@@ -456,7 +457,7 @@ export class AddEventDialogComponent {
       // Only require end and escalationRate for recurrent (non-one-off) events
       const currentCycle = this.eventForm.get('cycle')?.value;
       if (currentCycle && currentCycle !== 'One-off') {
-        this.eventForm.get('end')?.setValidators(Validators.required);
+        this.eventForm.get('end')?.setValidators([calendarYearOrEventRefValidator()]);
         this.eventForm.get('escalationRate')?.setValidators(Validators.required);
       } else {
         this.eventForm.get('end')?.clearValidators();
@@ -640,7 +641,7 @@ export class AddEventDialogComponent {
       this.eventForm.controls['customEscalationRate'].updateValueAndValidity();
     }
     else {
-      this.eventForm.controls['end'].setValidators(Validators.required);
+      this.eventForm.controls['end'].setValidators([calendarYearOrEventRefValidator()]);
       this.eventForm.controls['end'].updateValueAndValidity();
       this.eventForm.controls['escalationRate'].setValidators(Validators.required);
       this.eventForm.controls['escalationRate'].updateValueAndValidity();
@@ -992,10 +993,11 @@ export class AddEventDialogComponent {
 
       const existing = endCtrl.errors ?? null;
 
-      // validate only when cycle is not One-off and both numbers are present
+      // validate only when cycle is not One-off and both years are positive
       const shouldValidate =
         !!cycle && cycle !== 'One-off' &&
-        start != null && end != null;
+        start != null && end != null &&
+        Number(start) > 0 && Number(end) > 0;
 
       if (shouldValidate && end < start) {
         endCtrl.setErrors({ ...(existing ?? {}), endBeforeStart: true });
@@ -1018,8 +1020,9 @@ export class AddEventDialogComponent {
 
       const existing = endCtrl.errors ?? null;
 
-      // validate only when cycle is not One-off and both numbers are present
-      const shouldValidate = start != null && end != null;
+      const shouldValidate =
+        start != null && end != null &&
+        Number(start) > 0 && Number(end) > 0;
 
       if (shouldValidate && end < start) {
         endCtrl.setErrors({ ...(existing ?? {}), endBeforeStart: true });
@@ -1308,7 +1311,7 @@ export class AddEventDialogComponent {
       amount?.setValidators([Validators.required, Validators.min(1)]);
       monthlyPayment?.setValidators([Validators.required, Validators.min(1)]);
       monthlyStart?.setValidators(Validators.required);
-      monthlyEnd?.setValidators(Validators.required);
+      monthlyEnd?.setValidators([calendarYearOrEventRefValidator()]);
       if (!monthlyStart?.value) {
         monthlyStart?.setValue(this.eventForm.get('start')?.value, {
           emitEvent: false,
@@ -1357,7 +1360,7 @@ export class AddEventDialogComponent {
       amount?.setValidators([Validators.required, Validators.min(1)]);
       monthlyPayment?.setValidators([Validators.required, Validators.min(1)]);
       monthlyStart?.setValidators(Validators.required);
-      monthlyEnd?.setValidators(Validators.required);
+      monthlyEnd?.setValidators([calendarYearOrEventRefValidator()]);
 
       if (!monthlyStart?.value) {
         monthlyStart?.setValue(this.eventForm.get('start')?.value, { emitEvent: false });

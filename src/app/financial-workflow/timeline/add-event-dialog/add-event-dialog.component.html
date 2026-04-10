@@ -395,6 +395,14 @@
                       }
                       @if (
                         eventForm.get("end")?.touched &&
+                        eventForm.get("end")?.hasError("invalidYear")
+                      ) {
+                        <span class="field-error d-block">{{
+                          "Select a valid end year" | translate
+                        }}</span>
+                      }
+                      @if (
+                        eventForm.get("end")?.touched &&
                         eventForm.get("end")?.hasError("endBeforeStart")
                       ) {
                         <span class="field-error d-block"
@@ -1118,6 +1126,14 @@
                     }
                     @if (
                       eventForm.get("monthlyEnd")?.touched &&
+                      eventForm.get("monthlyEnd")?.hasError("invalidYear")
+                    ) {
+                      <span class="field-error d-block">{{
+                        "Select a valid end year" | translate
+                      }}</span>
+                    }
+                    @if (
+                      eventForm.get("monthlyEnd")?.touched &&
                       eventForm.get("monthlyEnd")?.hasError("endBeforeStart")
                     ) {
                       <span class="field-error d-block"
@@ -1641,6 +1657,14 @@
                       ) {
                         <span class="field-error d-block">{{
                           "Required" | translate
+                        }}</span>
+                      }
+                      @if (
+                        eventForm.get("end")?.touched &&
+                        eventForm.get("end")?.hasError("invalidYear")
+                      ) {
+                        <span class="field-error d-block">{{
+                          "Select a valid end year" | translate
                         }}</span>
                       }
                       @if (
@@ -2184,6 +2208,14 @@
                     ) {
                       <span class="field-error d-block">{{
                         "Required" | translate
+                      }}</span>
+                    }
+                    @if (
+                      eventForm.get("monthlyEnd")?.touched &&
+                      eventForm.get("monthlyEnd")?.hasError("invalidYear")
+                    ) {
+                      <span class="field-error d-block">{{
+                        "Select a valid end year" | translate
                       }}</span>
                     }
                     @if (
