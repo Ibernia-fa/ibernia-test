@@ -51,6 +51,7 @@ import {
   EventIncomeType,
   FinancialRecordLineItem,
   FinancialTimeline,
+  TimelineResponse,
 } from '../../timeline/models/financial-timeline';
 import {
   SavingPotsModel,
@@ -262,6 +263,8 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
   editedExpenses: Array<{ name: string; item: FinancialViewModel }> = [];
 
   incomeExpenseData: IncomeExpense | null = null;
+  /** Linked financing child records (monthly payment, resale) from the financing timeline endpoint. */
+  financingRecords: FinancialRecordLineItem[] = [];
   amountCycles: Cycle[] = [];
   escalationRates: EscalationRate[] = [];
   loggedInUserPreferences: any = null;
@@ -331,7 +334,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
         }),
         switchMap(() =>
           combineLatest([
-            this.timelineHttpService.getTimelinebyCashflowId(this.cashflowId),
+            this.timelineHttpService.getTimelineWithLinkedFinancialRecordsByCashflowId(this.cashflowId),
             this.savingPotsHttpService.getAllSavingsPots(this.cashflowId),
             this.incomeExpensesHttpService.getAllIncomeExpenses(
               this.cashflowId,
@@ -342,13 +345,14 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
         ),
         tap(
           ([
-            timeline,
+            timelineResponse,
             savingPots,
             incomeExpense,
             amountCycles,
             escalationRatesResponse,
           ]) => {
-            this.financialTimeline = timeline;
+            this.financialTimeline = timelineResponse.timeline;
+            this.financingRecords = timelineResponse.financialRecords ?? [];
             this.savingPots = savingPots;
             this.incomeExpenseData = incomeExpense;
             this.amountCycles = amountCycles;
@@ -356,8 +360,8 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
               escalationRatesResponse?.escalationRates ?? [],
               this.cashflow?.inflationRate ?? 0,
             );
-            this.baselineForecastStartDate = timeline?.forecastStartDate
-              ? new Date(timeline.forecastStartDate)
+            this.baselineForecastStartDate = this.financialTimeline?.forecastStartDate
+              ? new Date(this.financialTimeline.forecastStartDate)
               : null;
             this.initFormFromPlan();
             this.populateCategoryItems();
@@ -955,6 +959,11 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
       ? resolvedGoalsDialogEnd
       : forecastEndY;
 
+    const financialRecords =
+      eventType === EventType.FINANCING || event.isFinance
+        ? this.financingRecords.filter((r) => r.parentId === event.id)
+        : this.getFinancialRecordsForEventDialogs();
+
     const dialogRef = this.dialog.open(AddEventDialogComponent, {
       width: '612px',
       disableClose: true,
@@ -994,7 +1003,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
         }),
         isEditWorkflow: true,
         patchEvent: event,
-        financialRecords: this.getFinancialRecordsForEventDialogs(),
+        financialRecords,
         scenarioMode: true,
       },
     });
@@ -1235,13 +1244,14 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
 
   private refreshData(): void {
     combineLatest([
-      this.timelineHttpService.getTimelinebyCashflowId(this.cashflowId),
+      this.timelineHttpService.getTimelineWithLinkedFinancialRecordsByCashflowId(this.cashflowId),
       this.savingPotsHttpService.getAllSavingsPots(this.cashflowId),
       this.incomeExpensesHttpService.getAllIncomeExpenses(this.cashflowId),
     ])
       .pipe(takeUntil(this.destroy$))
-      .subscribe(([timeline, savingPots, incomeExpense]) => {
-        this.financialTimeline = timeline;
+      .subscribe(([timelineResponse, savingPots, incomeExpense]) => {
+        this.financialTimeline = timelineResponse.timeline;
+        this.financingRecords = timelineResponse.financialRecords ?? [];
         this.savingPots = savingPots;
         this.incomeExpenseData = incomeExpense;
         this.populateCategoryItems();
