@@ -38,6 +38,9 @@ export class TranslateIncomeExpenseLabelPipe implements PipeTransform {
     if (d === 'State pension (Partner)') {
       return this.translate.instant('State pension (Partner)');
     }
+    if (d === 'Inheritance (Partner)') {
+      return this.translate.instant('Inheritance (Partner)');
+    }
 
     const salaryWithName = /^Salary (.+)$/.exec(d);
     if (salaryWithName) {
@@ -52,6 +55,15 @@ export class TranslateIncomeExpenseLabelPipe implements PipeTransform {
       const name = this.localizePlaceholderName(pensionWithName[1]);
       return this.translate.instant(
         'INCOME_EXPENSE_LABEL.STATE_PENSION_WITH_NAME',
+        { name },
+      );
+    }
+
+    const inheritanceWithName = /^Inheritance (.+)$/.exec(d);
+    if (inheritanceWithName) {
+      const name = this.localizePlaceholderName(inheritanceWithName[1]);
+      return this.translate.instant(
+        'INCOME_EXPENSE_LABEL.INHERITANCE_WITH_NAME',
         { name },
       );
     }

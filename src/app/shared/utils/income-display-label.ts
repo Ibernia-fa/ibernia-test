@@ -38,6 +38,19 @@ export function isClientStatePensionApiDescription(
   return (desc ?? '').trim() === 'State pension';
 }
 
+export function isClientInheritanceApiDescription(
+  desc: string | null | undefined,
+): boolean {
+  return (desc ?? '').trim() === 'Inheritance';
+}
+
+/** Case/whitespace-tolerant match for API partner inheritance. */
+export function isPartnerInheritanceApiDescription(
+  desc: string | null | undefined,
+): boolean {
+  return /^inheritance\s*\(\s*partner\s*\)$/i.test((desc ?? '').trim());
+}
+
 /** Salary rows that support bonus in the UI (client, partner, or already-named). */
 export function isSalaryTypeForBonus(
   desc: string | null | undefined,
@@ -72,12 +85,18 @@ export function incomeApiDescriptionToDisplayLabel(
   if (isPartnerStatePensionApiDescription(d)) {
     return `State pension ${p}`;
   }
+  if (isPartnerInheritanceApiDescription(d)) {
+    return `Inheritance ${p}`;
+  }
 
   if (d === 'Salary') {
     return `Salary ${c}`;
   }
   if (d === 'State pension') {
     return `State pension ${c}`;
+  }
+  if (d === 'Inheritance') {
+    return `Inheritance ${c}`;
   }
 
   const salaryNamed = /^Salary\s+(.+)$/i.exec(d);

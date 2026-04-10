@@ -45,8 +45,10 @@ import {
   incomeApiDescriptionToDisplayLabel,
   isClientSalaryApiDescription,
   isClientStatePensionApiDescription,
+  isClientInheritanceApiDescription,
   isPartnerSalaryApiDescription,
   isPartnerStatePensionApiDescription,
+  isPartnerInheritanceApiDescription,
   isSalaryTypeForBonus,
 } from 'src/app/shared/utils/income-display-label';
 import {
@@ -163,8 +165,10 @@ export class AddIncomeComponent {
     const isPartnerIncome =
       isPartnerSalaryApiDescription(this.selectedIncome?.description) ||
       isPartnerStatePensionApiDescription(this.selectedIncome?.description) ||
+      isPartnerInheritanceApiDescription(this.selectedIncome?.description) ||
       isPartnerSalaryApiDescription(preselectedApi) ||
-      isPartnerStatePensionApiDescription(preselectedApi);
+      isPartnerStatePensionApiDescription(preselectedApi) ||
+      isPartnerInheritanceApiDescription(preselectedApi);
     const usePartnerBirthDate =
       !!isPartnerIncome && !!data.partnerBirthDate;
     this.applyBirthDateContextForSalaryPerson(usePartnerBirthDate);
@@ -182,7 +186,8 @@ export class AddIncomeComponent {
     this.partnerFirstName = data.partnerFirstName || '';
     this.editingPerson =
       isPartnerSalaryApiDescription(this.selectedIncome?.description) ||
-      isPartnerStatePensionApiDescription(this.selectedIncome?.description)
+      isPartnerStatePensionApiDescription(this.selectedIncome?.description) ||
+      isPartnerInheritanceApiDescription(this.selectedIncome?.description)
         ? 'partner'
         : 'client';
 
@@ -192,8 +197,9 @@ export class AddIncomeComponent {
       !isPartnerSalaryApiDescription(selDesc) &&
       !isClientStatePensionApiDescription(selDesc) &&
       !isPartnerStatePensionApiDescription(selDesc) &&
-      this.selectedIncome?.description != 'Rental income' &&
-      this.selectedIncome?.description != 'Inheritance';
+      !isClientInheritanceApiDescription(selDesc) &&
+      !isPartnerInheritanceApiDescription(selDesc) &&
+      this.selectedIncome?.description != 'Rental income';
 
     const planEndYear = this.resolvePlanEndYear(data);
     const iterations = planEndYear - data.forecastStartDateYear + 1;
@@ -343,7 +349,10 @@ export class AddIncomeComponent {
         }
       }
 
-      if (this.selectedIncome?.description === 'Inheritance') {
+      if (
+        isClientInheritanceApiDescription(this.selectedIncome?.description) ||
+        isPartnerInheritanceApiDescription(this.selectedIncome?.description)
+      ) {
         const linkedContribution = this.existingContributions.find(
           (c: any) => c.sourceIncomeId === this.selectedIncome?.id
         );
@@ -723,17 +732,20 @@ export class AddIncomeComponent {
         .pipe(
           filter((res) => !!res),
           switchMap((incomeExpense: any) => {
-            const isInheritance = income?.description === 'Inheritance';
+            const isInheritance =
+              isClientInheritanceApiDescription(income?.description) ||
+              isPartnerInheritanceApiDescription(income?.description);
             const investChecked = !!this.incomeForm.get('investThisAmount')?.value;
             if (!isInheritance) {
               return of(incomeExpense);
             }
             const allIncomes = incomeExpense?.incomes ?? incomeExpense?.Incomes ?? [];
+            const savedDesc = income?.description;
             const incomeId = this.isEditWorkflow
               ? this.selectedIncome?.id
               : allIncomes.find(
                   (i: any) =>
-                    i.description === 'Inheritance' &&
+                    i.description === savedDesc &&
                     Number(i.amount?.amount) === Number(income.amount.amount) &&
                     i.start?.year === income.start.year
                 )?.id;
@@ -939,6 +951,8 @@ export class AddIncomeComponent {
     if (label === `Salary ${pName}`) return 'Salary (Partner)';
     if (label === `State pension ${cName}`) return 'State pension';
     if (label === `State pension ${pName}`) return 'State pension (Partner)';
+    if (label === `Inheritance ${cName}`) return 'Inheritance';
+    if (label === `Inheritance ${pName}`) return 'Inheritance (Partner)';
     return label;
   }
 
@@ -965,7 +979,10 @@ export class AddIncomeComponent {
     else if (this.incomeForm.get("description")?.value == "Rental income") {
       this.incomeIcon = "rental-income";
     }
-    else if (this.incomeForm.get("description")?.value == "Inheritance") {
+    else if (
+      isClientInheritanceApiDescription(this.incomeForm.get("description")?.value) ||
+      isPartnerInheritanceApiDescription(this.incomeForm.get("description")?.value)
+    ) {
       this.incomeIcon = "inheritance";
     }
     else {
@@ -985,7 +1002,8 @@ export class AddIncomeComponent {
       isPartnerStatePensionApiDescription(
         this.incomeForm.get('description')?.value,
       ) ||
-      this.incomeForm.get('description')?.value == 'Inheritance'
+      isClientInheritanceApiDescription(this.incomeForm.get('description')?.value) ||
+      isPartnerInheritanceApiDescription(this.incomeForm.get('description')?.value)
     ) {
       this.isDefaultIncome = true;
     }
@@ -1050,6 +1068,14 @@ export class AddIncomeComponent {
       'Inheritance': {
         icon: 'inheritance',
         description: 'Inheritance',
+        isDefault: true,
+        requireDescription: true,
+        editableName: false
+      },
+      'Inheritance (Partner)': {
+        icon: 'inheritance',
+        description: 'Inheritance (Partner)',
+        isDefault: true,
         requireDescription: true,
         editableName: false
       }
@@ -1062,14 +1088,17 @@ export class AddIncomeComponent {
       !isPartnerSalaryApiDescription(sd) &&
       !isClientStatePensionApiDescription(sd) &&
       !isPartnerStatePensionApiDescription(sd) &&
-      this.selectedIncome.description != 'Rental income' &&
-      this.selectedIncome.description != 'Inheritance';
+      !isClientInheritanceApiDescription(sd) &&
+      !isPartnerInheritanceApiDescription(sd) &&
+      this.selectedIncome.description != 'Rental income';
 
     const baseValue = isPartnerSalaryApiDescription(apiValue)
       ? 'Salary'
       : isPartnerStatePensionApiDescription(apiValue)
         ? 'State pension'
-        : apiValue;
+        : isPartnerInheritanceApiDescription(apiValue)
+          ? 'Inheritance'
+          : apiValue;
     const config = isCustom ? incomeConfig["Custom"] : (incomeConfig[apiValue] ?? incomeConfig[baseValue]);
     if (!config || !descriptionCtrl) return;
 
@@ -1087,7 +1116,7 @@ export class AddIncomeComponent {
       this.applyDefaultStartEnd(apiValue);
     }
 
-    if (apiValue === 'Inheritance') {
+    if (apiValue === 'Inheritance' || apiValue === 'Inheritance (Partner)') {
       const oneOffCycle = this.cycles.find(c => c.description === 'One-off');
       if (oneOffCycle) {
         this.incomeForm.get('cycle')?.setValue(oneOffCycle.id);
@@ -1213,9 +1242,9 @@ export class AddIncomeComponent {
       this.updateSalaryRetirementDefaults(isPartnerPension);
       startCtrl.setValue(this.retirementYear);
       endCtrl.setValue(this.forecastEndYear);
-    } else if (incomeType === 'Inheritance') {
-      // Inheritance always reflects the main client for age/date defaults and persisted ages.
-      this.applyBirthDateContextForSalaryPerson(false);
+    } else if (incomeType === 'Inheritance' || incomeType === 'Inheritance (Partner)') {
+      const isPartner = isPartnerInheritanceApiDescription(incomeType);
+      this.applyBirthDateContextForSalaryPerson(isPartner);
       const inheritanceYear = this.getDefaultInheritanceStartYear();
       this.ensureYearInSelectableYears(inheritanceYear);
       if (!this.isEditWorkflow) {
@@ -1651,9 +1680,12 @@ export class AddIncomeComponent {
     const incomeType = this.incomeForm.get('incomeType')?.value;
     const description = this.incomeForm.get('description')?.value;
     if (this.isEditWorkflow) {
-      return description === 'Inheritance' && this.selectedIncome?.isDefault === true;
+      return (isClientInheritanceApiDescription(description) ||
+        isPartnerInheritanceApiDescription(description)) &&
+        this.selectedIncome?.isDefault === true;
     }
-    return incomeType === 'Inheritance';
+    const apiDesc = this.displayLabelToApiDesc(incomeType ?? '');
+    return isClientInheritanceApiDescription(apiDesc) || isPartnerInheritanceApiDescription(apiDesc);
   }
 
   private hasEligibleNonCashSavingPot(): boolean {
