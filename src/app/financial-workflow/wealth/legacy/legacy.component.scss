@@ -1,6 +1,15 @@
 $line-color: #dadada;
 $line-w: 2px;
 
+// Match Timeline card body copy (`.event-main-wrapper p` in timeline-chart.component.scss).
+.legacy-family-tree-intro {
+  font-size: 16px;
+  line-height: 20px;
+  color: #5a596e;
+  margin: 0;
+  max-width: 540px;
+}
+
 .section-title {
   font-size: 18px;
   font-weight: 700;
