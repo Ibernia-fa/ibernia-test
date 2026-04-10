@@ -471,7 +471,8 @@
                   </div>
                   @if (
                     incomeForm.get("start")?.touched &&
-                    incomeForm.get("start")?.hasError("required")
+                    (incomeForm.get("start")?.hasError("required") ||
+                      incomeForm.get("start")?.hasError("invalidYear"))
                   ) {
                     <span class="field-error d-block">{{
                       "Required" | translate
@@ -529,7 +530,8 @@
                     </div>
                     @if (
                       incomeForm.get("end")?.touched &&
-                      incomeForm.get("end")?.hasError("required")
+                      (incomeForm.get("end")?.hasError("required") ||
+                        incomeForm.get("end")?.hasError("invalidYear"))
                     ) {
                       <span class="field-error d-block">{{
                         "Required" | translate

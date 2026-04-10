@@ -32,6 +32,7 @@ import {
   getPersistedAgeForCalendarYear,
   getProjectionColumnAgeLabel,
 } from 'src/app/shared/utils/client-age-at-reference';
+import { calendarYearOrEventRefValidator } from 'src/app/shared/utils/calendar-year-or-event-ref.validator';
 
 @Component({
   selector: 'app-add-withdrawal',
@@ -233,16 +234,22 @@ export class AddWithdrawalComponent {
   }
 
   onCycleValueChange(event: any) {
-    console.log({ event });
     const isOneOff = this.cycles.find(cycle => cycle.id === event)?.description === 'One-off';
     this.showStartEnd = !isOneOff;
 
+    const startCtrl = this.withdrawalForm.get('start');
+    const endCtrl = this.withdrawalForm.get('end');
+
     if (!this.showStartEnd) {
-      this.withdrawalForm.controls['end'].clearValidators();
-      this.withdrawalForm.controls['end'].updateValueAndValidity();
+      endCtrl?.clearValidators();
+      endCtrl?.updateValueAndValidity();
+      startCtrl?.setValidators([Validators.required]);
+      startCtrl?.updateValueAndValidity();
     } else {
-      this.withdrawalForm.controls['end'].addValidators(Validators.required);
-      this.withdrawalForm.controls['end'].updateValueAndValidity();
+      endCtrl?.setValidators([calendarYearOrEventRefValidator()]);
+      endCtrl?.updateValueAndValidity();
+      startCtrl?.setValidators([calendarYearOrEventRefValidator()]);
+      startCtrl?.updateValueAndValidity();
     }
 
     const escalationControl = this.withdrawalForm.get('escalationRate');
@@ -285,7 +292,6 @@ export class AddWithdrawalComponent {
 
       const neutralCommissionEscRate: EscalationRate = { description: '', value: '0' };
 
-      console.log('Form Submitted', this.withdrawalForm.value);
       const isCustomEscalation =
         this.selectedEscalationDescription === 'Increases at custom rate';
       const escalationRateValue = isCustomEscalation
@@ -399,8 +405,6 @@ export class AddWithdrawalComponent {
           });
         });
       // Handle form submission logic
-    } else {
-      console.log('Form is invalid');
     }
   }
 

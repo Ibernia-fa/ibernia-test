@@ -11,7 +11,12 @@ import {
   catchError,
 } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import {
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+} from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatSelectModule } from '@angular/material/select';
@@ -114,6 +119,11 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
   baselineForecastEndDate: Date | null = null;
   isLoaderVisible = false;
   scenarioForm: FormGroup;
+  /** Dropdowns use standalone controls so we can clear selection after picking (chips show edits). */
+  goalDropdownControl = new FormControl<ClientEvent | null>(null);
+  potDropdownControl = new FormControl<ClientSaving | null>(null);
+  incomeDropdownControl = new FormControl<FinancialViewModel | null>(null);
+  expenseDropdownControl = new FormControl<FinancialViewModel | null>(null);
   hasShortfall = false;
   firstShortfallAge: number | null = null;
 
@@ -166,6 +176,36 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
       clientFirstName: this.clientFirstName,
       partnerFirstName: this.partnerFirstName,
     };
+  }
+
+  compareGoalOptions = (a: ClientEvent | null, b: ClientEvent | null): boolean =>
+    !!a && !!b && String(a.id) === String(b.id);
+
+  comparePotOptions = (a: ClientSaving | null, b: ClientSaving | null): boolean =>
+    !!a && !!b && String(a.id) === String(b.id);
+
+  compareIncomeOptions = (
+    a: FinancialViewModel | null,
+    b: FinancialViewModel | null,
+  ): boolean =>
+    !!a &&
+    !!b &&
+    (a.id && b.id ? a.id === b.id : a.description === b.description);
+
+  compareExpenseOptions = (
+    a: FinancialViewModel | null,
+    b: FinancialViewModel | null,
+  ): boolean =>
+    !!a &&
+    !!b &&
+    (a.id && b.id ? a.id === b.id : a.description === b.description);
+
+  private clearCategoryDropdown(
+    control: FormControl<
+      ClientEvent | ClientSaving | FinancialViewModel | null
+    >,
+  ): void {
+    queueMicrotask(() => control.setValue(null, { emitEvent: false }));
   }
 
   getSavingPotSelectLabel(pot: ClientSaving): string {
@@ -826,6 +866,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
 
   onGoalSelected(event: ClientEvent): void {
     if (!event || !this.financialTimeline || !this.client) return;
+    this.clearCategoryDropdown(this.goalDropdownControl);
 
     const eventType = this.DIALOG_SYSTEM_EVENTS.some((name) =>
       event.name.startsWith(name),
@@ -915,6 +956,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
   onSavingPotSelected(pot: ClientSaving): void {
     if (!pot || !this.financialTimeline || !this.client || !this.cashflow)
       return;
+    this.clearCategoryDropdown(this.potDropdownControl);
 
     const dialogRef = this.dialog.open(AddNewPotComponent, {
       width: '612px',
@@ -982,6 +1024,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
   onIncomeSelected(income: FinancialViewModel): void {
     if (!income || !this.financialTimeline || !this.client || !this.cashflow)
       return;
+    this.clearCategoryDropdown(this.incomeDropdownControl);
 
     const dialogRef = this.dialog.open(AddIncomeComponent, {
       width: '612px',
@@ -1044,6 +1087,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
   onExpenseSelected(expense: FinancialViewModel): void {
     if (!expense || !this.financialTimeline || !this.client || !this.cashflow)
       return;
+    this.clearCategoryDropdown(this.expenseDropdownControl);
 
     const dialogRef = this.dialog.open(AddExpenseComponent, {
       width: '612px',
@@ -1107,6 +1151,15 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
     const idx = list.findIndex((e) => e.name === name);
     if (idx >= 0) {
       list.splice(idx, 1);
+      if (category === 'goals') {
+        this.goalDropdownControl.setValue(null, { emitEvent: false });
+      } else if (category === 'savingPots') {
+        this.potDropdownControl.setValue(null, { emitEvent: false });
+      } else if (category === 'incomes') {
+        this.incomeDropdownControl.setValue(null, { emitEvent: false });
+      } else if (category === 'expenses') {
+        this.expenseDropdownControl.setValue(null, { emitEvent: false });
+      }
       if (this.baselineReport) {
         this.runScenarioUpdate(false);
       }

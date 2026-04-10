@@ -156,6 +156,8 @@
                     <div class="position-relative">
                       <mat-select
                         class="category-dropdown"
+                        [formControl]="goalDropdownControl"
+                        [compareWith]="compareGoalOptions"
                         [placeholder]="'Select' | translate"
                         (selectionChange)="onGoalSelected($event.value)"
                       >
@@ -234,6 +236,8 @@
                     <div class="position-relative">
                       <mat-select
                         class="category-dropdown"
+                        [formControl]="potDropdownControl"
+                        [compareWith]="comparePotOptions"
                         [placeholder]="'Select' | translate"
                         (selectionChange)="onSavingPotSelected($event.value)"
                       >
@@ -309,6 +313,8 @@
                     <div class="position-relative">
                       <mat-select
                         class="category-dropdown"
+                        [formControl]="incomeDropdownControl"
+                        [compareWith]="compareIncomeOptions"
                         [placeholder]="'Select' | translate"
                         (selectionChange)="onIncomeSelected($event.value)"
                       >
@@ -401,6 +407,8 @@
                     <div class="position-relative">
                       <mat-select
                         class="category-dropdown"
+                        [formControl]="expenseDropdownControl"
+                        [compareWith]="compareExpenseOptions"
                         [placeholder]="'Select' | translate"
                         (selectionChange)="onExpenseSelected($event.value)"
                       >

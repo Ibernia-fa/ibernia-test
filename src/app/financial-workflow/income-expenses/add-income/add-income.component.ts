@@ -54,6 +54,7 @@ import {
   getPersistedAgeForCalendarYear,
   getProjectionColumnAgeLabel,
 } from 'src/app/shared/utils/client-age-at-reference';
+import { calendarYearOrEventRefValidator } from 'src/app/shared/utils/calendar-year-or-event-ref.validator';
 
 @Component({
   selector: 'app-add-income',
@@ -209,7 +210,7 @@ export class AddIncomeComponent {
       currencySymbol: [this.clientPreferredCurrency, [Validators.required]],
       amount: ['', [Validators.required, this.greaterThanZero()]],
       cycle: [this.cycles[1].id, Validators.required],
-      start: ['', Validators.required],
+      start: [''],
       end: [''],
       escalationRate: [this.escalationRates[0]?.description ?? '', Validators.required],
       customEscalationRate: [''],
@@ -501,13 +502,18 @@ export class AddIncomeComponent {
   onCycleValueChange(event: any) {
     const isOneOff = this.cycles.find(cycle => cycle.id === event)?.description === 'One-off';
     this.showStartEnd = !isOneOff;
+    const startCtrl = this.incomeForm.get('start');
+    const endCtrl = this.incomeForm.get('end');
     if (!this.showStartEnd) {
-      this.incomeForm.controls['end'].clearValidators();
-      this.incomeForm.controls['end'].updateValueAndValidity();
-    }
-    else {
-      this.incomeForm.controls['end'].addValidators(Validators.required);
-      this.incomeForm.controls['end'].updateValueAndValidity();
+      endCtrl?.clearValidators();
+      endCtrl?.updateValueAndValidity();
+      startCtrl?.setValidators([calendarYearOrEventRefValidator()]);
+      startCtrl?.updateValueAndValidity();
+    } else {
+      endCtrl?.setValidators([calendarYearOrEventRefValidator()]);
+      endCtrl?.updateValueAndValidity();
+      startCtrl?.setValidators([calendarYearOrEventRefValidator()]);
+      startCtrl?.updateValueAndValidity();
     }
     const escalationControl = this.incomeForm.get('escalationRate');
     if (isOneOff) {
