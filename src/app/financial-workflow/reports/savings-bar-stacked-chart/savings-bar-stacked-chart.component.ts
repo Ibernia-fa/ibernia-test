@@ -99,6 +99,16 @@ export class SavingsBarStackedChartComponent
     return this.client?.clientDetails?.preferredCurrency ?? '';
   }
 
+  /** X-axis label: "Age", or "Age {main first name}" when the plan has a partner. */
+  private getXAxisTitleText(): string {
+    const ageWord = this.translate.instant('Age');
+    if (!this.client?.partnerDetail) {
+      return ageWord;
+    }
+    const first = this.client.clientDetails?.firstName?.trim() ?? '';
+    return first ? `${ageWord} ${first}` : ageWord;
+  }
+
   /** Trims report to only include years up to forecastEndDate (projection end year). */
   private trimReportToEndYear(
     report: ChartSeries | null | undefined,
@@ -533,7 +543,7 @@ export class SavingsBarStackedChartComponent
         type: 'category',
         categories,
         tickAmount,
-        title: { text: this.translate.instant('Age') },
+        title: { text: this.getXAxisTitleText() },
         axisBorder: {
           show: true,
           color: '#0000001a', // change to whatever color you want
@@ -562,6 +572,12 @@ export class SavingsBarStackedChartComponent
             value != null ? Number(value).toLocaleString() : '',
         },
       };
+      if (this.chartOptions.xaxis) {
+        this.chartOptions.xaxis = {
+          ...this.chartOptions.xaxis,
+          title: { text: this.getXAxisTitleText() },
+        };
+      }
       const birthYear = this.client?.clientDetails?.birthDate
         ? moment(this.client.clientDetails.birthDate).year()
         : null;
@@ -573,7 +589,7 @@ export class SavingsBarStackedChartComponent
           : null;
         this.chartOptions.xaxis = {
           ...this.chartOptions.xaxis,
-          title: { text: this.translate.instant('Age') },
+          title: { text: this.getXAxisTitleText() },
           labels: {
             ...this.chartOptions.xaxis.labels,
             formatter: (value: string) => {
