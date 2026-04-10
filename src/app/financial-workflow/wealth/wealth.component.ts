@@ -419,12 +419,12 @@ export class WealthComponent implements OnInit {
     }
   }
 
-  /** Assets table Description column: saving-pot label from API description; else manual name; else category. */
+  /** Assets table Description column: saving-pot name via same keys as Saving Pots (`name | translate`); else manual name; else category. */
   getAssetSummaryLabel(asset: WealthAssetModel): string {
     if (asset.isFromSavingPots) {
       const fromPot = asset.description?.trim() || asset.name?.trim();
       if (fromPot) {
-        return fromPot;
+        return this.translate.instant(fromPot);
       }
       return this.translate.instant(asset.category);
     }
