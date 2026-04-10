@@ -673,8 +673,56 @@ export class EmergenciesComponent implements OnInit {
     return this.emergencies?.some((e) => e.isHidden) ?? false;
   }
 
+  /**
+   * Display sort rank: 0 Excellent, 1 Good, 2 Basic, 3 Not covered / Not done.
+   * Will: Done (willStatus === 1) → Excellent; otherwise → Not covered.
+   */
+  private getProtectionDisplaySortRank(e: Emergency): number {
+    if (e.type === 2) {
+      return e.willStatus === 1 ? 0 : 3;
+    }
+    if (e.type === 1) {
+      if (e.policyStatus === 2) {
+        return 3;
+      }
+      switch (e.coverageAdequacy) {
+        case 3:
+          return 0;
+        case 2:
+          return 1;
+        case 1:
+          return 2;
+        default:
+          return 3;
+      }
+    }
+    if (e.policyStatus === 2) {
+      return 3;
+    }
+    switch (e.coverageAdequacy) {
+      case 3:
+        return 0;
+      case 2:
+        return 1;
+      case 1:
+        return 2;
+      default:
+        return 3;
+    }
+  }
+
   get filteredEmergencies(): Emergency[] {
-    return this.emergencies.filter((e) => !e.isHidden);
+    const visible = this.emergencies.filter((e) => !e.isHidden);
+    const indexById = new Map<string, number>();
+    this.emergencies.forEach((em, i) => indexById.set(em.id, i));
+    return [...visible].sort((a, b) => {
+      const ra = this.getProtectionDisplaySortRank(a);
+      const rb = this.getProtectionDisplaySortRank(b);
+      if (ra !== rb) {
+        return ra - rb;
+      }
+      return (indexById.get(a.id) ?? 0) - (indexById.get(b.id) ?? 0);
+    });
   }
 
   getSimulateData() {

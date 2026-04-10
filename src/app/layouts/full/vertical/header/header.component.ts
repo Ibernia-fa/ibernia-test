@@ -53,6 +53,7 @@ import {
 } from 'src/app/core/mfa-reminder-notification';
 import { notificationMatchesSearchQuery } from 'src/app/core/notification-search';
 import { CapitalizeFirstPipe } from 'src/app/core/pipes/capitalize-first.pipe';
+import { formatClientPersonDisplayName } from 'src/app/shared/utils/person-display-name';
 
 interface notifications {
   id: number;
@@ -520,6 +521,27 @@ get userInitials(): string {
       return this.clientLastName;
     }
     return 'Client'; // Fallback text
+  }
+
+  /**
+   * Cashflow header breadcrumb middle segment: full client name, or
+   * "FirstName and FirstName" / "Nome e Nome" when a partner exists on the client.
+   */
+  get cashflowBreadcrumbClientLabel(): string {
+    const client = this.currentClient;
+    if (!client?.partnerDetail) {
+      return this.clientFullName;
+    }
+    const mainFirst = formatClientPersonDisplayName(client.clientDetails);
+    const partnerFirst = formatClientPersonDisplayName(client.partnerDetail);
+    if (mainFirst && partnerFirst) {
+      const conjunction = this.languageService.current === 'it' ? 'e' : 'and';
+      return `${mainFirst} ${conjunction} ${partnerFirst}`;
+    }
+    if (mainFirst || partnerFirst) {
+      return mainFirst || partnerFirst;
+    }
+    return this.clientFullName;
   }
 
   setlightDark(theme: string) {

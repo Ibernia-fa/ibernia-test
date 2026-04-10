@@ -38,7 +38,7 @@
     <!-- --------------------------------------------------------------- -->
     <!-- Desktop Menu - Logo moved to sidebar -->
     <ng-container
-      *ngIf="isCashflowRoute && clientProfileLink && clientFullName"
+      *ngIf="isCashflowRoute && clientProfileLink && cashflowBreadcrumbClientLabel"
     >
       <nav
         class="header-breadcrumb d-flex align-items-center"
@@ -83,7 +83,7 @@
           [routerLink]="clientProfileLink"
           class="breadcrumb-link d-flex align-items-center text-decoration-none"
         >
-          {{ clientFullName }}
+          {{ cashflowBreadcrumbClientLabel }}
         </a>
         <!-- <span
           class="breadcrumb-chevron breadcrumb-current f-w-500"
