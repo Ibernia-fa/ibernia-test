@@ -203,10 +203,12 @@ export class AddContributionComponent {
         cycle: this.selectedContribution.amount.cycle?.id,
         start: this.selectedContribution.startEventId
           ? 'event:' + this.selectedContribution.startEventId
-          : this.selectedContribution.start.year,
+          : (Number.isFinite(Number(this.selectedContribution.start?.year)) && Number(this.selectedContribution.start?.year) > 0
+              ? Number(this.selectedContribution.start.year) : null),
         end: this.selectedContribution.endEventId
           ? 'event:' + this.selectedContribution.endEventId
-          : this.selectedContribution.end.year,
+          : (Number.isFinite(Number(this.selectedContribution.end?.year)) && Number(this.selectedContribution.end?.year) > 0
+              ? Number(this.selectedContribution.end.year) : null),
         commissions: hasCommInit,
         commissionPercentage: pctInit,
       });
@@ -381,6 +383,12 @@ export class AddContributionComponent {
     if (this.contributionForm.invalid) {
       return true;
     }
+    if (this.showStartEnd) {
+      const endRaw = this.contributionForm.get('end')?.value;
+      if (!extractEventId(endRaw) && resolveYear(endRaw, this.eventsList) <= 0) {
+        return true;
+      }
+    }
     const cycleId = this.contributionForm.get('cycle')?.value;
     const desc = resolveCycleDescriptionForRecurringEndGuard(this.cycles, cycleId);
     return recurringEndYearNotSelected(
@@ -488,6 +496,7 @@ export class AddContributionComponent {
   // }
 
   addIncome(): void {
+    if (this.isContributionSaveButtonDisabled) return;
     this.contributionForm.markAllAsTouched();
     this.contributionForm.markAsDirty();
     if (!this.contributionForm.valid) {

@@ -177,21 +177,23 @@ export class AddExpenseComponent {
       if (this.selectedExpense.startEventId) {
         this.expenseForm.get('start')?.patchValue('event:' + this.selectedExpense.startEventId);
       } else {
-        this.expenseForm.get('start')?.patchValue(this.selectedExpense.start?.year);
+        const sy = Number(this.selectedExpense.start?.year);
+        this.expenseForm.get('start')?.patchValue(Number.isFinite(sy) && sy > 0 ? sy : null);
       }
       if (this.selectedExpense.endEventId) {
         this.expenseForm.get('end')?.patchValue('event:' + this.selectedExpense.endEventId);
       } else {
-        let endYear = this.selectedExpense.end?.year;
+        let rawEnd = this.selectedExpense.end?.year;
         if (
-          (endYear === null || endYear === undefined) &&
+          (rawEnd === null || rawEnd === undefined) &&
           this.selectedExpense.isDefault &&
           (this.selectedExpense.description === 'Living costs' ||
             this.selectedExpense.description === 'Housing')
         ) {
-          endYear = this.getDefaultEndPlanYear();
+          rawEnd = this.getDefaultEndPlanYear();
         }
-        this.expenseForm.get('end')?.patchValue(endYear);
+        const ey = Number(rawEnd);
+        this.expenseForm.get('end')?.patchValue(Number.isFinite(ey) && ey > 0 ? ey : null);
       }
       const matchedEscalation = resolveEscalationMatch(
         this.escalationRates,
@@ -327,6 +329,12 @@ export class AddExpenseComponent {
     if (this.expenseForm.invalid) {
       return true;
     }
+    if (this.showStartEnd) {
+      const endRaw = this.expenseForm.get('end')?.value;
+      if (!extractEventId(endRaw) && resolveYear(endRaw, this.eventsList) <= 0) {
+        return true;
+      }
+    }
     const cycleId = this.expenseForm.get('cycle')?.value;
     const desc = resolveCycleDescriptionForRecurringEndGuard(this.cycles, cycleId);
     return recurringEndYearNotSelected(
@@ -338,6 +346,7 @@ export class AddExpenseComponent {
 
   addExpense(): void {
     if (this.isSaving) return;
+    if (this.isExpenseSaveButtonDisabled) return;
     this.expenseForm.markAllAsTouched();
     this.expenseForm.markAsDirty();
 

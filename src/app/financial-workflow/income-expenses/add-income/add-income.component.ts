@@ -268,12 +268,14 @@ export class AddIncomeComponent {
       if (this.selectedIncome.startEventId) {
         this.incomeForm.get('start')?.patchValue('event:' + this.selectedIncome.startEventId);
       } else {
-        this.incomeForm.get('start')?.patchValue(this.selectedIncome.start?.year);
+        const sy = Number(this.selectedIncome.start?.year);
+        this.incomeForm.get('start')?.patchValue(Number.isFinite(sy) && sy > 0 ? sy : null);
       }
       if (this.selectedIncome.endEventId) {
         this.incomeForm.get('end')?.patchValue('event:' + this.selectedIncome.endEventId);
       } else {
-        this.incomeForm.get('end')?.patchValue(this.selectedIncome.end?.year);
+        const ey = Number(this.selectedIncome.end?.year);
+        this.incomeForm.get('end')?.patchValue(Number.isFinite(ey) && ey > 0 ? ey : null);
       }
 
       const matchedEscalation = resolveEscalationMatch(
@@ -547,8 +549,12 @@ export class AddIncomeComponent {
     if (this.incomeForm.invalid) {
       return true;
     }
-    // Use resolved cycle description, not showStartEnd — salary/state pension can mismatch `cycles`
-    // by id so showStartEnd is false while the line is still recurring (e.g. after amount blur).
+    if (this.showStartEnd) {
+      const endRaw = this.incomeForm.get('end')?.value;
+      if (!extractEventId(endRaw) && resolveYear(endRaw, this.eventsList) <= 0) {
+        return true;
+      }
+    }
     const cycleId = this.incomeForm.get('cycle')?.value;
     const desc = resolveCycleDescriptionForRecurringEndGuard(this.cycles, cycleId);
     return recurringEndYearNotSelected(
@@ -560,6 +566,7 @@ export class AddIncomeComponent {
 
   addIncome(): void {
     if (this.isSaving) return;
+    if (this.isIncomeSaveButtonDisabled) return;
     this.incomeForm.markAllAsTouched();
     this.incomeForm.markAsDirty();
 

@@ -410,9 +410,9 @@ onAmountBlur(e: Event) {
       { emitEvent: false }
     );
     this.savingsForm.get('lockPot')?.patchValue(this.selectedPot.hasPotLocked, { emitEvent: false });
-    this.savingsForm.get('start')?.patchValue(this.selectedPot.lockedFrom?.year ?? this.forecastStartDateYear, { emitEvent: false });
+    this.savingsForm.get('start')?.patchValue(this.selectedPot.lockedFrom?.year || this.forecastStartDateYear, { emitEvent: false });
     this.savingsForm.get('end')?.patchValue(
-      this.selectedPot.lockedTill?.year ?? this.dialogEndCalendarYear,
+      this.selectedPot.lockedTill?.year || this.dialogEndCalendarYear,
       { emitEvent: false },
     );
     
@@ -467,6 +467,15 @@ onAmountBlur(e: Event) {
       const customControl = this.savingsForm.get('customEscalationRate');
       customControl?.setValidators([Validators.required, Validators.min(0)]);
       customControl?.updateValueAndValidity({ emitEvent: false });
+    }
+
+    // Sync lock-pot validators: clear start/end validators when pot is not locked
+    const isLocked = this.savingsForm.get('lockPot')?.value;
+    if (!isLocked) {
+      this.savingsForm.get('start')?.clearValidators();
+      this.savingsForm.get('start')?.updateValueAndValidity({ emitEvent: false });
+      this.savingsForm.get('end')?.clearValidators();
+      this.savingsForm.get('end')?.updateValueAndValidity({ emitEvent: false });
     }
 
     // Force form to recalculate validity after all patches are applied
@@ -905,6 +914,20 @@ onAmountBlur(e: Event) {
     return String(r);
   }
 
+  /** mat-select may bind year as number or string; both must count for Save guards. */
+  private parseCalendarYearFromControl(raw: unknown): number {
+    if (typeof raw === 'number' && Number.isFinite(raw)) {
+      return raw;
+    }
+    if (typeof raw === 'string' && raw.trim() !== '') {
+      const n = Number(raw);
+      if (Number.isFinite(n)) {
+        return n;
+      }
+    }
+    return 0;
+  }
+
   /**
    * Save stays off until the form is valid and (for pension fund) a contribution end calendar year is chosen.
    */
@@ -919,9 +942,7 @@ onAmountBlur(e: Event) {
       return false;
     }
     const raw = this.savingsForm.get('contributionEndDate')?.value;
-    const year =
-      typeof raw === 'number' && Number.isFinite(raw) ? raw : 0;
-    return year <= 0;
+    return this.parseCalendarYearFromControl(raw) <= 0;
   }
 
   saveCashflow(): void {
@@ -954,10 +975,7 @@ onAmountBlur(e: Event) {
     const isPensionFundPot = potName === 'Pension fund';
     const contribAmt = Number(this.savingsForm.get('contributionAmount')?.value ?? 0);
     const contribEndRaw = this.savingsForm.get('contributionEndDate')?.value;
-    const contribEndYear =
-      typeof contribEndRaw === 'number' && Number.isFinite(contribEndRaw)
-        ? contribEndRaw
-        : 0;
+    const contribEndYear = this.parseCalendarYearFromControl(contribEndRaw);
     if (
       isPensionFundPot &&
       contribAmt > 0 &&

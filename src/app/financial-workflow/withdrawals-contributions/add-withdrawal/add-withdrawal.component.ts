@@ -175,12 +175,14 @@ export class AddWithdrawalComponent {
       if (this.selectedWithdrawal.startEventId) {
         this.withdrawalForm.get('start')?.patchValue('event:' + this.selectedWithdrawal.startEventId);
       } else {
-        this.withdrawalForm.get('start')?.patchValue(this.selectedWithdrawal.start.year);
+        const sy = Number(this.selectedWithdrawal.start?.year);
+        this.withdrawalForm.get('start')?.patchValue(Number.isFinite(sy) && sy > 0 ? sy : null);
       }
       if (this.selectedWithdrawal.endEventId) {
         this.withdrawalForm.get('end')?.patchValue('event:' + this.selectedWithdrawal.endEventId);
       } else {
-        this.withdrawalForm.get('end')?.patchValue(this.selectedWithdrawal.end.year);
+        const ey = Number(this.selectedWithdrawal.end?.year);
+        this.withdrawalForm.get('end')?.patchValue(Number.isFinite(ey) && ey > 0 ? ey : null);
       }
 
       const matchedEscalation = this.escalationRates.find(x => x.value === this.selectedWithdrawal?.escalationRate?.value);
@@ -278,6 +280,12 @@ export class AddWithdrawalComponent {
     if (this.withdrawalForm.invalid) {
       return true;
     }
+    if (this.showStartEnd) {
+      const endRaw = this.withdrawalForm.get('end')?.value;
+      if (!extractEventId(endRaw) && resolveYear(endRaw, this.eventsList) <= 0) {
+        return true;
+      }
+    }
     const cycleId = this.withdrawalForm.get('cycle')?.value;
     const desc = resolveCycleDescriptionForRecurringEndGuard(this.cycles, cycleId);
     return recurringEndYearNotSelected(
@@ -288,6 +296,7 @@ export class AddWithdrawalComponent {
   }
 
   addExpense(): void {
+    if (this.isWithdrawalSaveButtonDisabled) return;
     this.withdrawalForm.markAllAsTouched();
     this.withdrawalForm.markAsDirty();
     if (this.withdrawalForm.valid) {
