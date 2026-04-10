@@ -367,6 +367,7 @@ export class IncomeExpensesComponent {
         cashflowId: this.selectedCashflow?.id,
         selectedIncome: item,
         isEditWorkflow: true,
+        incomes: this.incomeExpense?.incomes,
         forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
         forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
         forecastStartDate: this.timeline.forecastStartDate,
