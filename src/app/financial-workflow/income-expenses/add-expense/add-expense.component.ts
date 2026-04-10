@@ -178,7 +178,9 @@ export class AddExpenseComponent {
         this.expenseForm.get('start')?.patchValue('event:' + this.selectedExpense.startEventId);
       } else {
         const sy = Number(this.selectedExpense.start?.year);
-        this.expenseForm.get('start')?.patchValue(Number.isFinite(sy) && sy > 0 ? sy : null);
+        const startNum = Number.isFinite(sy) && sy > 0 ? sy : null;
+        if (startNum) this.ensureYearInSelectableYears(startNum);
+        this.expenseForm.get('start')?.patchValue(startNum);
       }
       if (this.selectedExpense.endEventId) {
         this.expenseForm.get('end')?.patchValue('event:' + this.selectedExpense.endEventId);
@@ -193,7 +195,9 @@ export class AddExpenseComponent {
           rawEnd = this.getDefaultEndPlanYear();
         }
         const ey = Number(rawEnd);
-        this.expenseForm.get('end')?.patchValue(Number.isFinite(ey) && ey > 0 ? ey : null);
+        const endNum = Number.isFinite(ey) && ey > 0 ? ey : null;
+        if (endNum) this.ensureYearInSelectableYears(endNum);
+        this.expenseForm.get('end')?.patchValue(endNum);
       }
       const matchedEscalation = resolveEscalationMatch(
         this.escalationRates,
@@ -693,6 +697,14 @@ export class AddExpenseComponent {
   getEndYears(): number[] {
     const startYear = this.getStartYear();
     return (this.years ?? []).filter((y) => y >= startYear);
+  }
+
+  private ensureYearInSelectableYears(year: number): void {
+    if (!Number.isFinite(year)) return;
+    if (!this.years.includes(year)) {
+      this.years.push(year);
+      this.years.sort((a, b) => a - b);
+    }
   }
 
   private resolvePlanEndYear(data: any): number {

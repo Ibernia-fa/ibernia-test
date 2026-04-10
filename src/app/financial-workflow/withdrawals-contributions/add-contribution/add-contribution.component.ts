@@ -196,19 +196,21 @@ export class AddContributionComponent {
       const hasCommInit = pctInit > 0;
 
       // hydrate core fields
+      const startVal = this.selectedContribution.startEventId
+        ? 'event:' + this.selectedContribution.startEventId
+        : (() => { const n = Number(this.selectedContribution.start?.year); return Number.isFinite(n) && n > 0 ? n : null; })();
+      const endVal = this.selectedContribution.endEventId
+        ? 'event:' + this.selectedContribution.endEventId
+        : (() => { const n = Number(this.selectedContribution.end?.year); return Number.isFinite(n) && n > 0 ? n : null; })();
+      if (typeof startVal === 'number') this.ensureYearInSelectableYears(startVal);
+      if (typeof endVal === 'number') this.ensureYearInSelectableYears(endVal);
       this.contributionForm.patchValue({
         contributionType: this.selectedContribution?.contributionType ?? 1,
         currencySymbol: this.clientPreferredCurrency,
         amount: this.selectedContribution.amount.amount,
         cycle: this.selectedContribution.amount.cycle?.id,
-        start: this.selectedContribution.startEventId
-          ? 'event:' + this.selectedContribution.startEventId
-          : (Number.isFinite(Number(this.selectedContribution.start?.year)) && Number(this.selectedContribution.start?.year) > 0
-              ? Number(this.selectedContribution.start.year) : null),
-        end: this.selectedContribution.endEventId
-          ? 'event:' + this.selectedContribution.endEventId
-          : (Number.isFinite(Number(this.selectedContribution.end?.year)) && Number(this.selectedContribution.end?.year) > 0
-              ? Number(this.selectedContribution.end.year) : null),
+        start: startVal,
+        end: endVal,
         commissions: hasCommInit,
         commissionPercentage: pctInit,
       });
@@ -976,5 +978,13 @@ export class AddContributionComponent {
   getEndYears(): number[] {
     const startYear = this.getStartYear();
     return (this.years ?? []).filter((y) => y >= startYear);
+  }
+
+  private ensureYearInSelectableYears(year: number): void {
+    if (!Number.isFinite(year)) return;
+    if (!this.years.includes(year)) {
+      this.years.push(year);
+      this.years.sort((a, b) => a - b);
+    }
   }
 }

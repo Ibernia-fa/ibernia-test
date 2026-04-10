@@ -269,13 +269,17 @@ export class AddIncomeComponent {
         this.incomeForm.get('start')?.patchValue('event:' + this.selectedIncome.startEventId);
       } else {
         const sy = Number(this.selectedIncome.start?.year);
-        this.incomeForm.get('start')?.patchValue(Number.isFinite(sy) && sy > 0 ? sy : null);
+        const startNum = Number.isFinite(sy) && sy > 0 ? sy : null;
+        if (startNum) this.ensureYearInSelectableYears(startNum);
+        this.incomeForm.get('start')?.patchValue(startNum);
       }
       if (this.selectedIncome.endEventId) {
         this.incomeForm.get('end')?.patchValue('event:' + this.selectedIncome.endEventId);
       } else {
         const ey = Number(this.selectedIncome.end?.year);
-        this.incomeForm.get('end')?.patchValue(Number.isFinite(ey) && ey > 0 ? ey : null);
+        const endNum = Number.isFinite(ey) && ey > 0 ? ey : null;
+        if (endNum) this.ensureYearInSelectableYears(endNum);
+        this.incomeForm.get('end')?.patchValue(endNum);
       }
 
       const matchedEscalation = resolveEscalationMatch(

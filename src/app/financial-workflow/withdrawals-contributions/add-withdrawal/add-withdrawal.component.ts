@@ -176,13 +176,17 @@ export class AddWithdrawalComponent {
         this.withdrawalForm.get('start')?.patchValue('event:' + this.selectedWithdrawal.startEventId);
       } else {
         const sy = Number(this.selectedWithdrawal.start?.year);
-        this.withdrawalForm.get('start')?.patchValue(Number.isFinite(sy) && sy > 0 ? sy : null);
+        const startNum = Number.isFinite(sy) && sy > 0 ? sy : null;
+        if (startNum) this.ensureYearInSelectableYears(startNum);
+        this.withdrawalForm.get('start')?.patchValue(startNum);
       }
       if (this.selectedWithdrawal.endEventId) {
         this.withdrawalForm.get('end')?.patchValue('event:' + this.selectedWithdrawal.endEventId);
       } else {
         const ey = Number(this.selectedWithdrawal.end?.year);
-        this.withdrawalForm.get('end')?.patchValue(Number.isFinite(ey) && ey > 0 ? ey : null);
+        const endNum = Number.isFinite(ey) && ey > 0 ? ey : null;
+        if (endNum) this.ensureYearInSelectableYears(endNum);
+        this.withdrawalForm.get('end')?.patchValue(endNum);
       }
 
       const matchedEscalation = this.escalationRates.find(x => x.value === this.selectedWithdrawal?.escalationRate?.value);
@@ -591,5 +595,13 @@ export class AddWithdrawalComponent {
   getEndYears(): number[] {
     const startYear = this.getStartYear();
     return (this.years ?? []).filter((y) => y >= startYear);
+  }
+
+  private ensureYearInSelectableYears(year: number): void {
+    if (!Number.isFinite(year)) return;
+    if (!this.years.includes(year)) {
+      this.years.push(year);
+      this.years.sort((a, b) => a - b);
+    }
   }
 }
