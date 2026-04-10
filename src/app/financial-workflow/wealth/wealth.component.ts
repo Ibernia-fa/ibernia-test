@@ -419,8 +419,15 @@ export class WealthComponent implements OnInit {
     }
   }
 
-  /** Summary table: custom name when set; otherwise translated category (charts still use category). */
+  /** Assets table Description column: saving-pot label from API description; else manual name; else category. */
   getAssetSummaryLabel(asset: WealthAssetModel): string {
+    if (asset.isFromSavingPots) {
+      const fromPot = asset.description?.trim() || asset.name?.trim();
+      if (fromPot) {
+        return fromPot;
+      }
+      return this.translate.instant(asset.category);
+    }
     const custom = asset.name?.trim();
     if (custom) {
       return custom;
