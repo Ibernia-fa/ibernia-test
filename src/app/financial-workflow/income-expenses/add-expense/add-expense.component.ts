@@ -32,7 +32,10 @@ import {
   getProjectionColumnAgeLabel,
 } from 'src/app/shared/utils/client-age-at-reference';
 import { calendarYearOrEventRefValidator } from 'src/app/shared/utils/calendar-year-or-event-ref.validator';
-import { recurringEndYearNotSelected } from 'src/app/shared/utils/recurring-end-save-guard';
+import {
+  recurringEndYearNotSelected,
+  resolveCycleDescriptionForRecurringEndGuard,
+} from 'src/app/shared/utils/recurring-end-save-guard';
 
 @Component({
   selector: 'app-add-expense',
@@ -325,8 +328,7 @@ export class AddExpenseComponent {
       return true;
     }
     const cycleId = this.expenseForm.get('cycle')?.value;
-    const desc =
-      this.cycles.find((c) => c.id === cycleId)?.description ?? 'Every month';
+    const desc = resolveCycleDescriptionForRecurringEndGuard(this.cycles, cycleId);
     return recurringEndYearNotSelected(
       desc,
       this.expenseForm.get('end')?.value,

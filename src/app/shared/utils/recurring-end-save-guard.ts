@@ -8,6 +8,19 @@ export function isRecurringAmountCycleDescription(
 }
 
 /**
+ * Resolves cycle description from `cycles` + `cycleId` for Save guards.
+ * Empty string from API (e.g. salary-aligned cycle) must not skip recurring rules — falls back to "Every month".
+ */
+export function resolveCycleDescriptionForRecurringEndGuard(
+  cycles: { id?: string; description?: string | null }[] | undefined | null,
+  cycleId: unknown,
+): string {
+  const found = cycles?.find((c) => c.id === cycleId);
+  const t = (found?.description ?? '').trim();
+  return t || 'Every month';
+}
+
+/**
  * True when a recurring line still has no valid end (no positive calendar year and no `event:…` reference).
  * Use this to keep Save disabled even if Angular form state is edge-case wrong.
  */
