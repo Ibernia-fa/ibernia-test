@@ -378,9 +378,6 @@ export class AddContributionComponent {
     if (this.contributionForm.invalid) {
       return true;
     }
-    if (!this.showStartEnd) {
-      return false;
-    }
     const cycleId = this.contributionForm.get('cycle')?.value;
     const desc =
       this.cycles.find((c) => c.id === cycleId)?.description ?? 'Every month';

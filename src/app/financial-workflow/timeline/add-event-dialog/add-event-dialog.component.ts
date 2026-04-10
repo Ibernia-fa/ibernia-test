@@ -684,11 +684,19 @@ export class AddEventDialogComponent {
     this.eventForm.markAllAsTouched();
 
     if (
-      this.eventForm.valid &&
-      this.selectedEventType === EventType.SYSTEM &&
-      this.patchEvent
+      this.selectedEventType !== EventType.SYSTEM ||
+      !this.patchEvent
     ) {
-      this.saveClicked = true;
+      return;
+    }
+    if (this.isSystemEventSaveButtonDisabled) {
+      return;
+    }
+    if (!this.eventForm.valid) {
+      return;
+    }
+
+    this.saveClicked = true;
 
       // inheritance
       let escalataionRatesToSubmit = null;
@@ -805,13 +813,15 @@ export class AddEventDialogComponent {
             status: 'Success'
           });
         })
-    }
   }
 
   onCustomEventSubmit() {
     this.eventForm.markAllAsTouched();
 
     if (!this.eventForm.valid) {
+      return;
+    }
+    if (this.isCustomEventSaveButtonDisabled) {
       return;
     }
 
@@ -918,6 +928,9 @@ export class AddEventDialogComponent {
   private submitCustomFinancingPurchase(): void {
     this.eventForm.markAllAsTouched();
     if (!this.eventForm.valid) {
+      return;
+    }
+    if (this.isFinancingEventSaveButtonDisabled) {
       return;
     }
 
@@ -1119,6 +1132,7 @@ export class AddEventDialogComponent {
     this.eventForm.markAllAsTouched();
 
     if (!this.eventForm.valid) return;
+    if (this.isFinancingEventSaveButtonDisabled) return;
 
     this.saveClicked = true;
     const paymentType = this.eventForm.get('paymentType')?.value;
