@@ -555,7 +555,8 @@
     "EVENT_TYPE_TOOLTIP": "Scegli se questo evento rappresenta un'entrata (denaro in entrata) o una spesa (denaro in uscita).",
     "ENTER_AMOUNT_TOOLTIP": "Inserisci l'importo legato a questo evento. Utilizza il menu a discesa per definire la frequenza con cui si verifica (ad esempio, ogni mese, ogni anno o una volta).",
     "DEFINE_EVENT_PERIOD_TOOLTIP": "Definisci quando inizia questo evento e, se applicabile, quando finisce. Ibernia includerà questo periodo nella proiezione del flusso di cassa del cliente.",
-    "AMOUNT_GROWTH_TOOLTIP": "Definisce come questo importo si evolverà nel tempo. Puoi scegliere di: Mantienilo fisso (l'importo rimane lo stesso ogni anno), Abbina l'inflazione (aumenta automaticamente in base al tasso di inflazione predefinito impostato nelle Preferenze), oppure Applica una tariffa personalizzata (decidi tu l'esatta variazione percentuale annua). Questa impostazione aiuta a rendere le proiezioni più realistiche tenendo conto dell'aumento dei costi o della crescita prevista del reddito."
+    "AMOUNT_GROWTH_TOOLTIP": "Definisce come questo importo si evolverà nel tempo. Puoi scegliere di: Mantienilo fisso (l'importo rimane lo stesso ogni anno), Abbina l'inflazione (aumenta automaticamente in base al tasso di inflazione predefinito impostato nelle Preferenze), oppure Applica una tariffa personalizzata (decidi tu l'esatta variazione percentuale annua). Questa impostazione aiuta a rendere le proiezioni più realistiche tenendo conto dell'aumento dei costi o della crescita prevista del reddito.",
+    "CUSTOM_GOAL_NAME_PLACEHOLDER": "Es. Ristrutturazione cucina e zona giorno"
   },
   "Add another": "Aggiungi un altro",
   "Create plan": "Crea piano",
@@ -865,7 +866,6 @@
   "ADD_EVENT.ENTER_AMOUNT_TOOLTIP": "Inserisci l'importo associato a questo evento.",
   "ADD_EVENT.DEFINE_EVENT_PERIOD_TOOLTIP": "Definisci quando questo evento inizia e finisce nella linea temporale.",
   "ADD_EVENT.AMOUNT_GROWTH_TOOLTIP": "Imposta come l'importo cresce nel tempo (es. con l'inflazione).",
-  "ADD_EVENT.CUSTOM_GOAL_NAME_PLACEHOLDER": "Es. Ristrutturazione cucina e zona giorno",
   "ASSUMPTIONS.MORTGAGE_INTEREST_RATE_TOOLTIP": "Imposta il tasso di interesse ipotecario predefinito utilizzato nei calcoli immobiliari.",
   "ASSUMPTIONS.LOAN_INTEREST_RATE_TOOLTIP": "Imposta il tasso di interesse predefinito per i prestiti utilizzato nei calcoli.",
   "Tax": "Imposta",
