@@ -1152,6 +1152,8 @@ export class AddIncomeComponent {
 
     // If re-adding State pension (after deletion), prefill net amount from Salary.
     this.prefillStatePensionFromSalaryIfEligible(apiValue);
+
+    this.prefillInheritanceFromLegacyIfEligible(apiValue);
   }
 
   private loadPensionReplacementRate(): void {
@@ -1211,6 +1213,28 @@ export class AddIncomeComponent {
     }
   }
 
+  private prefillInheritanceFromLegacyIfEligible(apiDesc: string): void {
+    if (!isClientInheritanceApiDescription(apiDesc) && !isPartnerInheritanceApiDescription(apiDesc)) return;
+    if (this.isEditWorkflow) return;
+
+    const amountCtrl = this.incomeForm.get('amount');
+    if (!amountCtrl) return;
+
+    const existing = amountCtrl.value;
+    if (existing !== '' && existing !== null && existing !== undefined && Number(existing) > 0) return;
+
+    const prefill = this.data?.legacyInheritancePrefill;
+    if (!prefill) return;
+
+    const prefillAmount = isPartnerInheritanceApiDescription(apiDesc)
+      ? prefill.partner
+      : prefill.client;
+
+    if (prefillAmount > 0) {
+      amountCtrl.setValue(prefillAmount, { emitEvent: true });
+    }
+  }
+
   toggleNameEdit() {
     this.showNameEdit = !this.showNameEdit;
   }
@@ -1245,12 +1269,10 @@ export class AddIncomeComponent {
     } else if (incomeType === 'Inheritance' || incomeType === 'Inheritance (Partner)') {
       const isPartner = isPartnerInheritanceApiDescription(incomeType);
       this.applyBirthDateContextForSalaryPerson(isPartner);
-      const inheritanceYear = this.getDefaultInheritanceStartYear();
-      this.ensureYearInSelectableYears(inheritanceYear);
       if (!this.isEditWorkflow) {
-        startCtrl.setValue(inheritanceYear);
+        startCtrl.reset();
+        endCtrl.reset();
       }
-      endCtrl.setValue(inheritanceYear);
     } else {
       if (!this.isEditWorkflow) {
         startCtrl.reset();
