@@ -56,7 +56,10 @@ import {
   getCashflowDialogEndCalendarYear,
 } from 'src/app/shared/utils/client-age-at-reference';
 import { calendarYearOrEventRefValidator } from 'src/app/shared/utils/calendar-year-or-event-ref.validator';
-import { recurringEndYearNotSelected } from 'src/app/shared/utils/recurring-end-save-guard';
+import {
+  recurringEndYearNotSelected,
+  resolveCycleDescriptionForRecurringEndGuard,
+} from 'src/app/shared/utils/recurring-end-save-guard';
 
 @Component({
   selector: 'app-add-contribution',
@@ -193,17 +196,21 @@ export class AddContributionComponent {
       const hasCommInit = pctInit > 0;
 
       // hydrate core fields
+      const startVal = this.selectedContribution.startEventId
+        ? 'event:' + this.selectedContribution.startEventId
+        : (() => { const n = Number(this.selectedContribution.start?.year); return Number.isFinite(n) && n > 0 ? n : null; })();
+      const endVal = this.selectedContribution.endEventId
+        ? 'event:' + this.selectedContribution.endEventId
+        : (() => { const n = Number(this.selectedContribution.end?.year); return Number.isFinite(n) && n > 0 ? n : null; })();
+      if (typeof startVal === 'number') this.ensureYearInSelectableYears(startVal);
+      if (typeof endVal === 'number') this.ensureYearInSelectableYears(endVal);
       this.contributionForm.patchValue({
         contributionType: this.selectedContribution?.contributionType ?? 1,
         currencySymbol: this.clientPreferredCurrency,
         amount: this.selectedContribution.amount.amount,
         cycle: this.selectedContribution.amount.cycle?.id,
-        start: this.selectedContribution.startEventId
-          ? 'event:' + this.selectedContribution.startEventId
-          : this.selectedContribution.start.year,
-        end: this.selectedContribution.endEventId
-          ? 'event:' + this.selectedContribution.endEventId
-          : this.selectedContribution.end.year,
+        start: startVal,
+        end: endVal,
         commissions: hasCommInit,
         commissionPercentage: pctInit,
       });
@@ -378,9 +385,14 @@ export class AddContributionComponent {
     if (this.contributionForm.invalid) {
       return true;
     }
+    if (this.showStartEnd) {
+      const endRaw = this.contributionForm.get('end')?.value;
+      if (!extractEventId(endRaw) && resolveYear(endRaw, this.eventsList) <= 0) {
+        return true;
+      }
+    }
     const cycleId = this.contributionForm.get('cycle')?.value;
-    const desc =
-      this.cycles.find((c) => c.id === cycleId)?.description ?? 'Every month';
+    const desc = resolveCycleDescriptionForRecurringEndGuard(this.cycles, cycleId);
     return recurringEndYearNotSelected(
       desc,
       this.contributionForm.get('end')?.value,
@@ -486,6 +498,7 @@ export class AddContributionComponent {
   // }
 
   addIncome(): void {
+    if (this.isContributionSaveButtonDisabled) return;
     this.contributionForm.markAllAsTouched();
     this.contributionForm.markAsDirty();
     if (!this.contributionForm.valid) {
@@ -965,5 +978,13 @@ export class AddContributionComponent {
   getEndYears(): number[] {
     const startYear = this.getStartYear();
     return (this.years ?? []).filter((y) => y >= startYear);
+  }
+
+  private ensureYearInSelectableYears(year: number): void {
+    if (!Number.isFinite(year)) return;
+    if (!this.years.includes(year)) {
+      this.years.push(year);
+      this.years.sort((a, b) => a - b);
+    }
   }
 }

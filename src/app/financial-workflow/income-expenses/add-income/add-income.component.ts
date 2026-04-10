@@ -55,7 +55,10 @@ import {
   getProjectionColumnAgeLabel,
 } from 'src/app/shared/utils/client-age-at-reference';
 import { calendarYearOrEventRefValidator } from 'src/app/shared/utils/calendar-year-or-event-ref.validator';
-import { recurringEndYearNotSelected } from 'src/app/shared/utils/recurring-end-save-guard';
+import {
+  recurringEndYearNotSelected,
+  resolveCycleDescriptionForRecurringEndGuard,
+} from 'src/app/shared/utils/recurring-end-save-guard';
 
 @Component({
   selector: 'app-add-income',
@@ -265,12 +268,18 @@ export class AddIncomeComponent {
       if (this.selectedIncome.startEventId) {
         this.incomeForm.get('start')?.patchValue('event:' + this.selectedIncome.startEventId);
       } else {
-        this.incomeForm.get('start')?.patchValue(this.selectedIncome.start?.year);
+        const sy = Number(this.selectedIncome.start?.year);
+        const startNum = Number.isFinite(sy) && sy > 0 ? sy : null;
+        if (startNum) this.ensureYearInSelectableYears(startNum);
+        this.incomeForm.get('start')?.patchValue(startNum);
       }
       if (this.selectedIncome.endEventId) {
         this.incomeForm.get('end')?.patchValue('event:' + this.selectedIncome.endEventId);
       } else {
-        this.incomeForm.get('end')?.patchValue(this.selectedIncome.end?.year);
+        const ey = Number(this.selectedIncome.end?.year);
+        const endNum = Number.isFinite(ey) && ey > 0 ? ey : null;
+        if (endNum) this.ensureYearInSelectableYears(endNum);
+        this.incomeForm.get('end')?.patchValue(endNum);
       }
 
       const matchedEscalation = resolveEscalationMatch(
@@ -544,11 +553,14 @@ export class AddIncomeComponent {
     if (this.incomeForm.invalid) {
       return true;
     }
-    // Use resolved cycle description, not showStartEnd — salary/state pension can mismatch `cycles`
-    // by id so showStartEnd is false while the line is still recurring (e.g. after amount blur).
+    if (this.showStartEnd) {
+      const endRaw = this.incomeForm.get('end')?.value;
+      if (!extractEventId(endRaw) && resolveYear(endRaw, this.eventsList) <= 0) {
+        return true;
+      }
+    }
     const cycleId = this.incomeForm.get('cycle')?.value;
-    const desc =
-      this.cycles.find((c) => c.id === cycleId)?.description ?? 'Every month';
+    const desc = resolveCycleDescriptionForRecurringEndGuard(this.cycles, cycleId);
     return recurringEndYearNotSelected(
       desc,
       this.incomeForm.get('end')?.value,
@@ -558,6 +570,7 @@ export class AddIncomeComponent {
 
   addIncome(): void {
     if (this.isSaving) return;
+    if (this.isIncomeSaveButtonDisabled) return;
     this.incomeForm.markAllAsTouched();
     this.incomeForm.markAsDirty();
 

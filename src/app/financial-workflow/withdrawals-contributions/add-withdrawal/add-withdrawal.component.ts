@@ -33,7 +33,10 @@ import {
   getProjectionColumnAgeLabel,
 } from 'src/app/shared/utils/client-age-at-reference';
 import { calendarYearOrEventRefValidator } from 'src/app/shared/utils/calendar-year-or-event-ref.validator';
-import { recurringEndYearNotSelected } from 'src/app/shared/utils/recurring-end-save-guard';
+import {
+  recurringEndYearNotSelected,
+  resolveCycleDescriptionForRecurringEndGuard,
+} from 'src/app/shared/utils/recurring-end-save-guard';
 
 @Component({
   selector: 'app-add-withdrawal',
@@ -172,12 +175,18 @@ export class AddWithdrawalComponent {
       if (this.selectedWithdrawal.startEventId) {
         this.withdrawalForm.get('start')?.patchValue('event:' + this.selectedWithdrawal.startEventId);
       } else {
-        this.withdrawalForm.get('start')?.patchValue(this.selectedWithdrawal.start.year);
+        const sy = Number(this.selectedWithdrawal.start?.year);
+        const startNum = Number.isFinite(sy) && sy > 0 ? sy : null;
+        if (startNum) this.ensureYearInSelectableYears(startNum);
+        this.withdrawalForm.get('start')?.patchValue(startNum);
       }
       if (this.selectedWithdrawal.endEventId) {
         this.withdrawalForm.get('end')?.patchValue('event:' + this.selectedWithdrawal.endEventId);
       } else {
-        this.withdrawalForm.get('end')?.patchValue(this.selectedWithdrawal.end.year);
+        const ey = Number(this.selectedWithdrawal.end?.year);
+        const endNum = Number.isFinite(ey) && ey > 0 ? ey : null;
+        if (endNum) this.ensureYearInSelectableYears(endNum);
+        this.withdrawalForm.get('end')?.patchValue(endNum);
       }
 
       const matchedEscalation = this.escalationRates.find(x => x.value === this.selectedWithdrawal?.escalationRate?.value);
@@ -275,9 +284,14 @@ export class AddWithdrawalComponent {
     if (this.withdrawalForm.invalid) {
       return true;
     }
+    if (this.showStartEnd) {
+      const endRaw = this.withdrawalForm.get('end')?.value;
+      if (!extractEventId(endRaw) && resolveYear(endRaw, this.eventsList) <= 0) {
+        return true;
+      }
+    }
     const cycleId = this.withdrawalForm.get('cycle')?.value;
-    const desc =
-      this.cycles.find((c) => c.id === cycleId)?.description ?? 'Every month';
+    const desc = resolveCycleDescriptionForRecurringEndGuard(this.cycles, cycleId);
     return recurringEndYearNotSelected(
       desc,
       this.withdrawalForm.get('end')?.value,
@@ -286,6 +300,7 @@ export class AddWithdrawalComponent {
   }
 
   addExpense(): void {
+    if (this.isWithdrawalSaveButtonDisabled) return;
     this.withdrawalForm.markAllAsTouched();
     this.withdrawalForm.markAsDirty();
     if (this.withdrawalForm.valid) {
@@ -580,5 +595,13 @@ export class AddWithdrawalComponent {
   getEndYears(): number[] {
     const startYear = this.getStartYear();
     return (this.years ?? []).filter((y) => y >= startYear);
+  }
+
+  private ensureYearInSelectableYears(year: number): void {
+    if (!Number.isFinite(year)) return;
+    if (!this.years.includes(year)) {
+      this.years.push(year);
+      this.years.sort((a, b) => a - b);
+    }
   }
 }

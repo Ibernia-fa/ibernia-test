@@ -10,6 +10,7 @@ import { ChartSeries, Series, TimelineEvent } from '../../models/charts-series.m
 import { translateTimelineEventDisplayName } from 'src/app/shared/utils/timeline-event-display-name';
 import { Client } from 'src/app/clients/models/client';
 import { getProjectionColumnAgeLabel } from 'src/app/shared/utils/client-age-at-reference';
+import { sliceChartSeriesToInclusiveYearRange } from 'src/app/shared/utils/chart-series-year-range';
 
 @Component({
   selector: 'app-view-savings-bar-stacked-chart',
@@ -31,6 +32,8 @@ export class ViewSavingsBarStackedChartComponent implements OnChanges, OnDestroy
   @Input() client: Client;
   @Input() planDuration?: number;
   @Input() cashFlowName: string;
+  @Input() chartViewStartYear: number | null = null;
+  @Input() chartViewEndYear: number | null = null;
 
   isFullscreen: any;
   public chartOptions: any;
@@ -184,8 +187,22 @@ export class ViewSavingsBarStackedChartComponent implements OnChanges, OnDestroy
     return { ...report, categories, series, timelineEvents };
   }
 
+  private applyOptionalViewYearSlice(
+    report: ChartSeries | null | undefined,
+  ): ChartSeries | null | undefined {
+    if (!report?.categories?.length) return report;
+    const a = Number(this.chartViewStartYear);
+    const b = Number(this.chartViewEndYear);
+    if (!Number.isFinite(a) || !Number.isFinite(b)) return report;
+    return sliceChartSeriesToInclusiveYearRange(report, a, b);
+  }
+
+  private getProcessedReport(): ChartSeries | null | undefined {
+    return this.applyOptionalViewYearSlice(this.trimReportToEndYear(this.report));
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
-    const report = this.trimReportToEndYear(this.report);
+    const report = this.getProcessedReport();
 
     if ((changes['report'] || changes['client']) && report?.series?.length) {
       const seriesForChart = ensureUniqueSavingsChartSeriesColors(report.series);

@@ -24,6 +24,10 @@ import { Client } from '../../models/client';
 import { ReportsHttpService } from 'src/app/financial-workflow/reports/services/reports-http.service';
 import { TimelineHttpService } from 'src/app/financial-workflow/timeline/services/timeline-http.service';
 import { MaterialModule } from "src/app/material.module";
+import {
+  getCompletedYearsAgeAtDate,
+  getPlanEndDate,
+} from 'src/app/shared/utils/client-age-at-reference';
 
 @Component({
   selector: 'app-edit-model-dialog',
@@ -63,7 +67,8 @@ export class EditModelDialogComponent {
     const birthDateValue =
       this.cashflow?.clientBirthDate ?? this.clientData?.clientDetails?.birthDate;
     this.birthDate = birthDateValue ? new Date(birthDateValue) : new Date();
-    this.minAge = this.calculateAge(this.birthDate);
+    const computedMin = getCompletedYearsAgeAtDate(this.birthDate, new Date());
+    this.minAge = Number.isFinite(computedMin) ? computedMin : 0;
     this.initForm();
   }
 
@@ -207,16 +212,14 @@ export class EditModelDialogComponent {
     birthDate: Date,
     existingEndDate?: Date
   ): Date {
-    const birthYear = birthDate.getFullYear();
-    const endYear = birthYear + planDuration;
-
-    if (existingEndDate && !Number.isNaN(existingEndDate.getTime())) {
-      const nextEnd = new Date(existingEndDate);
-      nextEnd.setFullYear(endYear);
-      return nextEnd;
+    const canonical = getPlanEndDate(birthDate, planDuration);
+    if (canonical) {
+      return canonical;
     }
-
-    return new Date(endYear, 1);
+    if (existingEndDate && !Number.isNaN(existingEndDate.getTime())) {
+      return existingEndDate;
+    }
+    return new Date(birthDate.getFullYear() + planDuration, 1);
   }
 
   private toIsoString(value: Date | string): string {
@@ -245,17 +248,4 @@ export class EditModelDialogComponent {
     return Math.round((n + Number.EPSILON) * 10) / 10;
   }
 
-  private calculateAge(birthDate: Date): number {
-    if (Number.isNaN(birthDate.getTime())) {
-      return 0;
-    }
-    const today = new Date();
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const m = today.getMonth() - birthDate.getMonth();
-
-    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
-    }
-    return age;
-  }
 }

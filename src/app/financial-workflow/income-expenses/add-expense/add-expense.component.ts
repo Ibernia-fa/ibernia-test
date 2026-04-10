@@ -32,7 +32,10 @@ import {
   getProjectionColumnAgeLabel,
 } from 'src/app/shared/utils/client-age-at-reference';
 import { calendarYearOrEventRefValidator } from 'src/app/shared/utils/calendar-year-or-event-ref.validator';
-import { recurringEndYearNotSelected } from 'src/app/shared/utils/recurring-end-save-guard';
+import {
+  recurringEndYearNotSelected,
+  resolveCycleDescriptionForRecurringEndGuard,
+} from 'src/app/shared/utils/recurring-end-save-guard';
 
 @Component({
   selector: 'app-add-expense',
@@ -174,21 +177,27 @@ export class AddExpenseComponent {
       if (this.selectedExpense.startEventId) {
         this.expenseForm.get('start')?.patchValue('event:' + this.selectedExpense.startEventId);
       } else {
-        this.expenseForm.get('start')?.patchValue(this.selectedExpense.start?.year);
+        const sy = Number(this.selectedExpense.start?.year);
+        const startNum = Number.isFinite(sy) && sy > 0 ? sy : null;
+        if (startNum) this.ensureYearInSelectableYears(startNum);
+        this.expenseForm.get('start')?.patchValue(startNum);
       }
       if (this.selectedExpense.endEventId) {
         this.expenseForm.get('end')?.patchValue('event:' + this.selectedExpense.endEventId);
       } else {
-        let endYear = this.selectedExpense.end?.year;
+        let rawEnd = this.selectedExpense.end?.year;
         if (
-          (endYear === null || endYear === undefined) &&
+          (rawEnd === null || rawEnd === undefined) &&
           this.selectedExpense.isDefault &&
           (this.selectedExpense.description === 'Living costs' ||
             this.selectedExpense.description === 'Housing')
         ) {
-          endYear = this.getDefaultEndPlanYear();
+          rawEnd = this.getDefaultEndPlanYear();
         }
-        this.expenseForm.get('end')?.patchValue(endYear);
+        const ey = Number(rawEnd);
+        const endNum = Number.isFinite(ey) && ey > 0 ? ey : null;
+        if (endNum) this.ensureYearInSelectableYears(endNum);
+        this.expenseForm.get('end')?.patchValue(endNum);
       }
       const matchedEscalation = resolveEscalationMatch(
         this.escalationRates,
@@ -324,9 +333,14 @@ export class AddExpenseComponent {
     if (this.expenseForm.invalid) {
       return true;
     }
+    if (this.showStartEnd) {
+      const endRaw = this.expenseForm.get('end')?.value;
+      if (!extractEventId(endRaw) && resolveYear(endRaw, this.eventsList) <= 0) {
+        return true;
+      }
+    }
     const cycleId = this.expenseForm.get('cycle')?.value;
-    const desc =
-      this.cycles.find((c) => c.id === cycleId)?.description ?? 'Every month';
+    const desc = resolveCycleDescriptionForRecurringEndGuard(this.cycles, cycleId);
     return recurringEndYearNotSelected(
       desc,
       this.expenseForm.get('end')?.value,
@@ -336,6 +350,7 @@ export class AddExpenseComponent {
 
   addExpense(): void {
     if (this.isSaving) return;
+    if (this.isExpenseSaveButtonDisabled) return;
     this.expenseForm.markAllAsTouched();
     this.expenseForm.markAsDirty();
 
@@ -682,6 +697,14 @@ export class AddExpenseComponent {
   getEndYears(): number[] {
     const startYear = this.getStartYear();
     return (this.years ?? []).filter((y) => y >= startYear);
+  }
+
+  private ensureYearInSelectableYears(year: number): void {
+    if (!Number.isFinite(year)) return;
+    if (!this.years.includes(year)) {
+      this.years.push(year);
+      this.years.sort((a, b) => a - b);
+    }
   }
 
   private resolvePlanEndYear(data: any): number {

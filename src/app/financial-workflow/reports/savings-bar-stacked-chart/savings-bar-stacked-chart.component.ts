@@ -27,6 +27,7 @@ import { translateTimelineEventDisplayName } from 'src/app/shared/utils/timeline
 import { Client } from 'src/app/clients/models/client';
 import moment from 'moment';
 import { getProjectionColumnAgeLabel } from 'src/app/shared/utils/client-age-at-reference';
+import { sliceChartSeriesToInclusiveYearRange } from 'src/app/shared/utils/chart-series-year-range';
 
 @Component({
   selector: 'app-savings-bar-stacked-chart',
@@ -51,6 +52,9 @@ export class SavingsBarStackedChartComponent
   @Input() emergencyIconUrl?: string;
   /** When true, enables smooth bar morphing animation on data updates (dynamicAnimation). */
   @Input() animateUpdates: boolean = false;
+  /** Optional inclusive calendar-year window (after end-year trim). Null = full trimmed range. */
+  @Input() chartViewStartYear: number | null = null;
+  @Input() chartViewEndYear: number | null = null;
   isFullscreen: any;
 
   private readonly EVENT_DOT_SPACING = 20;
@@ -115,11 +119,15 @@ export class SavingsBarStackedChartComponent
   ): ChartSeries | null | undefined {
     if (!report?.categories?.length || !this.forecastEndDate) return report;
     const endYear = moment(this.forecastEndDate).year();
+    if (!Number.isFinite(endYear)) return report;
     const indicesToKeep: number[] = [];
     report.categories.forEach((cat, i) => {
       const y = Number(cat);
       if (Number.isFinite(y) && y <= endYear) indicesToKeep.push(i);
     });
+    // If nothing matches (e.g. categories start after forecast end year, or bad dates),
+    // do not strip — otherwise series keep `name` but `data: []` and Apex renders blank.
+    if (indicesToKeep.length === 0) return report;
     if (indicesToKeep.length === report.categories.length) return report;
     const categories = indicesToKeep.map((i) => report.categories[i]);
     const series = report.series.map((s) => ({
@@ -130,6 +138,21 @@ export class SavingsBarStackedChartComponent
       (e) => Number.isFinite(e.startYear) && e.startYear <= endYear,
     );
     return { ...report, categories, series, timelineEvents };
+  }
+
+  private applyOptionalViewYearSlice(
+    report: ChartSeries | null | undefined,
+  ): ChartSeries | null | undefined {
+    if (!report?.categories?.length) return report;
+    const a = Number(this.chartViewStartYear);
+    const b = Number(this.chartViewEndYear);
+    if (!Number.isFinite(a) || !Number.isFinite(b)) return report;
+    return sliceChartSeriesToInclusiveYearRange(report, a, b);
+  }
+
+  /** Report after end-year trim and optional chart year window. */
+  private getProcessedReport(): ChartSeries | null | undefined {
+    return this.applyOptionalViewYearSlice(this.trimReportToEndYear(this.report));
   }
 
   private ngZone = inject(NgZone);
@@ -372,6 +395,8 @@ export class SavingsBarStackedChartComponent
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    /** Only used to skip eager `updateSeries` on first paint (emergency sim uses animateUpdates). */
+    const chartWasAlreadyInitialized = this.chartInitialized;
     const hideEmergencyOverlays = this.emergencyIconUrl === 'none';
     this._hideEmergencyOverlays = hideEmergencyOverlays;
 
@@ -400,7 +425,7 @@ export class SavingsBarStackedChartComponent
       };
     }
 
-    const report = this.trimReportToEndYear(this.report);
+    const report = this.getProcessedReport();
     if (!report?.series?.length) {
       this.seriesColorsForTooltip = [];
       if (changes['client'] && this.client) {
@@ -653,7 +678,7 @@ export class SavingsBarStackedChartComponent
     // When only [series] changes, it calls updateSeries() but this can silently
     // fail if the chart's internal state is stale. Directly calling updateSeries
     // on the ApexCharts instance as a fallback guarantees the bars re-render.
-    if (this.animateUpdates && changes['report'] && this.chartInitialized) {
+    if (this.animateUpdates && changes['report'] && chartWasAlreadyInitialized) {
       this.ngZone.runOutsideAngular(() => {
         setTimeout(() => {
           this.apxChartComponent?.updateSeries(mappedSeries, true);
@@ -1077,7 +1102,7 @@ export class SavingsBarStackedChartComponent
    * `currentAnnotationPoints`, using the trimmed report for emergency index calculation.
    */
   private applyPointAnnotationResync(chartContext: any): void {
-    const report = this.trimReportToEndYear(this.report);
+    const report = this.getProcessedReport();
     if (!report) {
       return;
     }
@@ -1102,7 +1127,7 @@ export class SavingsBarStackedChartComponent
     if (!this.chartInitialized) {
       return;
     }
-    const report = this.trimReportToEndYear(this.report);
+    const report = this.getProcessedReport();
     if (!report?.series?.length) {
       return;
     }
@@ -1156,7 +1181,7 @@ export class SavingsBarStackedChartComponent
             points.forEach((a) => chartContext.addPointAnnotation(a, false));
 
             if (!this._hideEmergencyOverlays) {
-              const trimmed = this.trimReportToEndYear(this.report);
+              const trimmed = this.getProcessedReport();
               if (trimmed) {
                 const emergencyXAxis = this.buildEmergencyAnnotation(trimmed);
                 const emergencyExpenseXAxis =
