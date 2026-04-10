@@ -20,7 +20,7 @@
                 alt=""
               />
             </div>
-            <span class="stepper-label">{{ 'Net Worth' | translate }}</span>
+            <span class="stepper-label">{{ "Net Worth" | translate }}</span>
           </div>
           <div class="stepper-line"></div>
           <div
@@ -42,7 +42,7 @@
             >
               <mat-icon>groups</mat-icon>
             </div> -->
-            <span class="stepper-label">{{ 'Legacy' | translate }}</span>
+            <span class="stepper-label">{{ "Legacy" | translate }}</span>
           </div>
         </div>
       </div>
@@ -70,7 +70,7 @@
               class="d-flex align-items-end justify-between networth-wrapper"
             >
               <div class="d-flex flex-column gap-14">
-                <p class="stat-label">{{ 'Net worth' | translate }}</p>
+                <p class="stat-label">{{ "Net worth" | translate }}</p>
                 <h3 class="saving-title">
                   <span>{{
                     clientData?.preferredCurrency | currencySymbol
@@ -79,7 +79,7 @@
                 </h3>
                 <p class="stat-subtext">
                   {{
-                    'WEALTH.FINANCED_WITH_DEBT'
+                    "WEALTH.FINANCED_WITH_DEBT"
                       | translate
                         : {
                             ratio: s.debtRatio,
@@ -122,7 +122,7 @@
         <mat-card class="cardWithShadow summary-stat-card">
           <mat-card-content style="padding: 24px !important">
             <div class="d-flex flex-column gap-8">
-              <p class="stat-label">{{ 'Asset Mix' | translate }}</p>
+              <p class="stat-label">{{ "Asset Mix" | translate }}</p>
               <div class="stacked-bar-container">
                 <div class="stacked-bar">
                   <div
@@ -149,28 +149,34 @@
                 <div class="legend-grid">
                   <div class="legend-item">
                     <span class="legend-dot bar-cash"></span>
-                    <span class="legend-label">{{ 'Cash:' | translate }}</span>
+                    <span class="legend-label">{{ "Cash:" | translate }}</span>
                     <span class="legend-value"
                       >{{ s.assetsByType.cashPercent }}%</span
                     >
                   </div>
                   <div class="legend-item">
                     <span class="legend-dot bar-investments"></span>
-                    <span class="legend-label">{{ 'Investment:' | translate }}</span>
+                    <span class="legend-label">{{
+                      "Investment:" | translate
+                    }}</span>
                     <span class="legend-value"
                       >{{ s.assetsByType.investmentsPercent }}%</span
                     >
                   </div>
                   <div class="legend-item">
                     <span class="legend-dot bar-real-estate"></span>
-                    <span class="legend-label">{{ 'Real estate:' | translate }}</span>
+                    <span class="legend-label">{{
+                      "Real estate:" | translate
+                    }}</span>
                     <span class="legend-value"
                       >{{ s.assetsByType.realEstatePercent }}%</span
                     >
                   </div>
                   <div class="legend-item">
                     <span class="legend-dot bar-personal-property"></span>
-                    <span class="legend-label">{{ 'Personal property:' | translate }}</span>
+                    <span class="legend-label">{{
+                      "Personal property:" | translate
+                    }}</span>
                     <span class="legend-value"
                       >{{ s.assetsByType.personalPropertyPercent }}%</span
                     >
@@ -180,7 +186,7 @@
                     *ngIf="s.assetsByType.otherTotal > 0"
                   >
                     <span class="legend-dot bar-other"></span>
-                    <span class="legend-label">{{ 'Other:' | translate }}</span>
+                    <span class="legend-label">{{ "Other:" | translate }}</span>
                     <span class="legend-value">{{
                       s.assetsByType.otherPercent > 0
                         ? s.assetsByType.otherPercent + "%"
@@ -201,15 +207,15 @@
         <div
           class="d-flex flex-row justify-content-between align-items-center gap-12"
         >
-          <div class="d-flex flex-column gap-12">
-            <h3>{{ 'Assets' | translate }}</h3>
+          <div class="d-flex flex-column gap-10">
+            <h3>{{ "Assets" | translate }}</h3>
             <p class="ibr-card-title" *ngIf="dashboard?.summary">
               <span>{{ clientData?.preferredCurrency | currencySymbol }}</span
               >{{ dashboard.summary.totalAssets | number: "1.0-0" }}
             </p>
           </div>
           <button (click)="onAddAsset()" type="button" class="button-icon">
-            <span class="f-s-16 f-w-500">{{ 'Add asset' | translate }}</span>
+            <span class="f-s-16 f-w-500">{{ "Add asset" | translate }}</span>
             <img src="assets/images/svgs/add-icon.svg" alt="add-icon" />
           </button>
         </div>
@@ -228,7 +234,7 @@
                 *matHeaderCellDef
                 class="mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-client"
               >
-                {{ 'WEALTH.CATEGORY' | translate }}
+                {{ "WEALTH.CATEGORY" | translate }}
               </th>
               <td
                 mat-cell
@@ -245,7 +251,7 @@
                 *matHeaderCellDef
                 class="mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-net-amount"
               >
-                {{ 'Ownership' | translate }}
+                {{ "Ownership" | translate }}
               </th>
               <td
                 mat-cell
@@ -267,7 +273,7 @@
                 *matHeaderCellDef
                 class="mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-net-amount"
               >
-                {{ 'WEALTH.VALUE' | translate }}
+                {{ "WEALTH.VALUE" | translate }}
               </th>
               <td
                 mat-cell
@@ -285,7 +291,7 @@
                 *matHeaderCellDef
                 class="text-center mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-action"
               >
-                {{ 'LABEL.ACTION' | translate }}
+                {{ "LABEL.ACTION" | translate }}
               </th>
               <td
                 mat-cell
@@ -377,7 +383,7 @@
                         </defs>
                       </svg>
                     </mat-icon>
-                    <span>{{ 'Edit' | translate }}</span>
+                    <span>{{ "Edit" | translate }}</span>
                   </button>
                   <button
                     *ngIf="!row.isFromSavingPots"
@@ -423,7 +429,7 @@
                         />
                       </svg>
                     </mat-icon>
-                    <span>{{ 'Delete' | translate }}</span>
+                    <span>{{ "Delete" | translate }}</span>
                   </button>
                 </mat-menu>
               </td>
@@ -442,7 +448,7 @@
 
       <div *ngIf="!dashboard?.assets?.length" class="empty-state">
         <p class="text-muted text-center my-4">
-          {{ 'No protection items available.' | translate }}
+          {{ "No protection items available." | translate }}
         </p>
       </div>
     </mat-card>
@@ -453,8 +459,8 @@
         <div
           class="d-flex flex-row justify-content-between align-items-center gap-12"
         >
-          <div class="d-flex flex-column gap-12">
-            <h3>{{ 'Liabilities' | translate }}</h3>
+          <div class="d-flex flex-column gap-10">
+            <h3>{{ "Liabilities" | translate }}</h3>
             <p class="ibr-card-title" *ngIf="dashboard?.summary">
               <span>{{ clientData?.preferredCurrency | currencySymbol }}</span
               >{{ dashboard.summary.totalLiabilities | number: "1.0-0" }}
@@ -465,7 +471,9 @@
             type="button"
             class="button-icon-outline"
           >
-            <span class="f-s-16 f-w-500">{{ 'Add liability' | translate }}</span>
+            <span class="f-s-16 f-w-500">{{
+              "Add liability" | translate
+            }}</span>
             <svg
               width="14"
               height="14"
@@ -495,7 +503,7 @@
                 *matHeaderCellDef
                 class="mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-client"
               >
-                {{ 'WEALTH.CATEGORY' | translate }}
+                {{ "WEALTH.CATEGORY" | translate }}
               </th>
               <td
                 mat-cell
@@ -512,7 +520,7 @@
                 *matHeaderCellDef
                 class="mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-net-amount"
               >
-                {{ 'Ownership' | translate }}
+                {{ "Ownership" | translate }}
               </th>
               <td
                 mat-cell
@@ -534,7 +542,7 @@
                 *matHeaderCellDef
                 class="mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-net-amount"
               >
-                {{ 'WEALTH.OUTSTANDING_AMOUNT' | translate }}
+                {{ "WEALTH.OUTSTANDING_AMOUNT" | translate }}
               </th>
               <td
                 mat-cell
@@ -552,7 +560,7 @@
                 *matHeaderCellDef
                 class="text-center f-w-400 mat-subtitle-1 f-s-14 p-x-24 p-l-0 column-action"
               >
-                {{ 'LABEL.ACTION' | translate }}
+                {{ "LABEL.ACTION" | translate }}
               </th>
               <td
                 mat-cell
@@ -644,7 +652,7 @@
                         </defs>
                       </svg>
                     </mat-icon>
-                    <span>{{ 'Edit' | translate }}</span>
+                    <span>{{ "Edit" | translate }}</span>
                   </button>
                   <button
                     class="action-dropdown-menus"
@@ -689,7 +697,7 @@
                         />
                       </svg>
                     </mat-icon>
-                    <span>{{ 'Delete' | translate }}</span>
+                    <span>{{ "Delete" | translate }}</span>
                   </button>
                 </mat-menu>
               </td>

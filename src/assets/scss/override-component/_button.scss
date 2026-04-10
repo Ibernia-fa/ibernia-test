@@ -141,7 +141,7 @@ html {
 .button-icon,
 .button-icon-outline {
   background-color: #4043af;
-  padding: 12px 24px;
+  padding: 12px 20px;
   border-radius: 6px;
   outline: none;
   border: none;
@@ -166,8 +166,8 @@ html {
 }
 .button-icon span,
 .button-icon-outline span {
-  font-size: 14px;
-  font-weight: 700;
+  font-size: 16px;
+  font-weight: 500;
   color: white;
   display: block;
 }
@@ -184,13 +184,13 @@ html {
 }
 .button-icon-white span {
   color: #5a596e;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 500;
 }
 .button-icon-outline span {
   color: #4043af;
-  font-size: 14px;
-  font-weight: 700;
+  font-size: 16px;
+  font-weight: 500;
 }
 .button-icon-white {
   background-color: white;
