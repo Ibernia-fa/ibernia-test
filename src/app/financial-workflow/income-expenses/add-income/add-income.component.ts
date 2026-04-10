@@ -544,8 +544,13 @@ export class AddIncomeComponent {
     if (this.incomeForm.invalid) {
       return true;
     }
+    // UI shows start/end only when recurring; cycle id may not match `cycles` (e.g. salary-aligned id).
+    if (!this.showStartEnd) {
+      return false;
+    }
     const cycleId = this.incomeForm.get('cycle')?.value;
-    const desc = this.cycles.find((c) => c.id === cycleId)?.description;
+    const desc =
+      this.cycles.find((c) => c.id === cycleId)?.description ?? 'Every month';
     return recurringEndYearNotSelected(
       desc,
       this.incomeForm.get('end')?.value,

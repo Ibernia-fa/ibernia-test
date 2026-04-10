@@ -453,13 +453,13 @@ export class WithdrawalsContributionsComponent {
     const activeIncomes = (this.incomeExpense?.incomes ?? []).filter(
       (item) =>
         this.isIncludedIncome(item) &&
-        this.isHappeningInYear(item, currentYear),
+        this.isIncludedInAnnualTotal(item, currentYear),
     );
 
     const activeExpenses = (this.incomeExpense?.expenses ?? []).filter(
       (item) =>
         this.isIncludedExpense(item) &&
-        this.isHappeningInYear(item, currentYear),
+        this.isIncludedInAnnualTotal(item, currentYear),
     );
 
     const totalIncome = activeIncomes.reduce(
@@ -495,29 +495,25 @@ export class WithdrawalsContributionsComponent {
     );
   }
 
-  private isHappeningInYear(item: FinancialViewModel, year: number): boolean {
-    const desc = (item?.description ?? '').toLowerCase();
-    const isStatePension =
-      desc === 'state pension' || desc === 'state pension (partner)';
-
-    // Include State pension (client & partner) in total like Salary & Inheritance, regardless of start year
-    if (isStatePension) return true;
-
-    const startYear = Number(item?.start?.year ?? 0);
-    const endYearRaw = Number(item?.end?.year ?? 0);
-    const hasEnd = endYearRaw > 0;
+  /**
+   * One-off / every year: only when start year equals the target year.
+   * Other recurring: start on or before that year, and on or before end year when end is set (aligned with API).
+   */
+  private isIncludedInAnnualTotal(item: FinancialViewModel, year: number): boolean {
     const cycleDescription = (item?.amount?.cycle?.description ?? '')
       .toString()
       .toLowerCase();
     const isOneOff = cycleDescription === 'one-off';
+    const isYearly =
+      cycleDescription === 'every year' || cycleDescription === 'yearly';
+    const startYear = Number(item?.start?.year ?? 0);
+    const endYearRaw = Number(item?.end?.year ?? 0);
+    const hasEnd = endYearRaw > 0;
 
-    // If no start year is set, treat the item as currently active
-    if (!startYear) return !isOneOff;
-    if (isOneOff) {
+    if (isOneOff || isYearly) {
       return startYear === year;
     }
-
-    if (year < startYear) return false;
+    if (startYear && year < startYear) return false;
     if (hasEnd && year > endYearRaw) return false;
     return true;
   }
@@ -528,9 +524,18 @@ export class WithdrawalsContributionsComponent {
       .toString()
       .toLowerCase();
 
-    let yearlyAmount = cycleDescription.includes('month')
-      ? baseAmount * 12
-      : baseAmount;
+    let yearlyAmount: number;
+    if (cycleDescription.includes('month')) {
+      yearlyAmount = baseAmount * 12;
+    } else if (
+      cycleDescription === 'every year' ||
+      cycleDescription === 'yearly'
+    ) {
+      const sy = Number(item?.start?.year ?? 0);
+      yearlyAmount = sy === year ? baseAmount : 0;
+    } else {
+      yearlyAmount = baseAmount;
+    }
 
     if (item?.bonus?.enabled && Number(item?.bonus?.amount?.amount ?? 0) > 0) {
       const bonusCycleDesc = (
@@ -547,6 +552,12 @@ export class WithdrawalsContributionsComponent {
         const bonusAmount = Number(item.bonus.amount.amount ?? 0);
         if (bonusCycleDesc.includes('month')) {
           yearlyAmount += bonusAmount * 12;
+        } else if (
+          bonusCycleDesc === 'every year' ||
+          bonusCycleDesc === 'yearly'
+        ) {
+          const sy = Number(item?.start?.year ?? 0);
+          if (sy === year) yearlyAmount += bonusAmount;
         } else {
           yearlyAmount += bonusAmount;
         }

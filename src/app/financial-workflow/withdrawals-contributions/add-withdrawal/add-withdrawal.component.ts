@@ -275,8 +275,12 @@ export class AddWithdrawalComponent {
     if (this.withdrawalForm.invalid) {
       return true;
     }
+    if (!this.showStartEnd) {
+      return false;
+    }
     const cycleId = this.withdrawalForm.get('cycle')?.value;
-    const desc = this.cycles.find((c) => c.id === cycleId)?.description;
+    const desc =
+      this.cycles.find((c) => c.id === cycleId)?.description ?? 'Every month';
     return recurringEndYearNotSelected(
       desc,
       this.withdrawalForm.get('end')?.value,

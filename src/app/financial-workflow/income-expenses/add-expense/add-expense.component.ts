@@ -324,8 +324,12 @@ export class AddExpenseComponent {
     if (this.expenseForm.invalid) {
       return true;
     }
+    if (!this.showStartEnd) {
+      return false;
+    }
     const cycleId = this.expenseForm.get('cycle')?.value;
-    const desc = this.cycles.find((c) => c.id === cycleId)?.description;
+    const desc =
+      this.cycles.find((c) => c.id === cycleId)?.description ?? 'Every month';
     return recurringEndYearNotSelected(
       desc,
       this.expenseForm.get('end')?.value,
