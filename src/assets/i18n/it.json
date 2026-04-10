@@ -742,7 +742,7 @@
   "INCOME_EXPENSE.FREQUENCY.YEAR": "anno",
   "INCOME_EXPENSE.FREQUENCY.ONE_OFF": "una volta",
   "INCOME_EXPENSE.INSURANCE_CARD_TOOLTIP": "Questo è il totale di tutti i costi assicurativi inseriti nel modulo Protezione. Puoi modificarlo lì.",
-  "INCOME_EXPENSE.STATE_PENSION_PCT_OF_SALARY": "{{pct}}% dello stipendio",
+  "INCOME_EXPENSE.STATE_PENSION_PCT_OF_SALARY": "{{pct}}% dello stipendio netto",
   "SAVINGS_POT.REAL_RETURN_HINT": "Rendimento reale: {{real}}% (già al netto di inflazione al {{inflation}}%)",
   "SCHOOL.INFLATION_TITLE": "Inflazione",
   "SCHOOL.INFLATION_SUBTITLE": "Come i prezzi aumentano nel tempo",
