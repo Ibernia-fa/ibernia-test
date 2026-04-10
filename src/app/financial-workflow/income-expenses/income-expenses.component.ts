@@ -9,7 +9,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
 import { ActivatedRoute } from '@angular/router';
 import { FinancialWorkflowService } from '../services/financial-workflow.service';
-import { combineLatest, switchMap, tap, forkJoin, of } from 'rxjs';
+import { combineLatest, switchMap, tap, forkJoin, of, catchError } from 'rxjs';
 import { Client } from 'src/app/clients/models/client';
 import { Cashflow } from 'src/app/clients/models/cashflow';
 import { IncomeExpensesHttpService } from './services/income-expenses-http.service';
@@ -45,6 +45,7 @@ import { SavingPotsModel } from '../saving-pots/models/saving-pots.model';
 import { WithdrawalsContributionsHttpService } from '../withdrawals-contributions/services/withdrawals-contributions-http.service';
 import { WithdrawalsContributions } from '../withdrawals-contributions/model/withdrawals-contributions';
 import { InsuranceExpenseTooltipDirective } from './insurance-expense-tooltip/insurance-expense-tooltip.directive';
+import { LegacyHttpService } from '../wealth/legacy/services/legacy-http.service';
 
 @Component({
   selector: 'app-income-expenses',
@@ -95,6 +96,7 @@ export class IncomeExpensesComponent {
   expenseType: string[] = [];
   savingsPots: SavingPotsModel;
   contributionWithdrawal: WithdrawalsContributions;
+  legacyInheritancePrefill: { client: number; partner: number } = { client: 0, partner: 0 };
   currentYearIncomeSummary = {
     totalIncome: 0,
     totalExpenses: 0,
@@ -120,6 +122,7 @@ export class IncomeExpensesComponent {
     private toastr: ToastrService,
     private savingsPotsHttpService: SavingsPotsHttpService,
     private withdrawalsContributionsHttpService: WithdrawalsContributionsHttpService,
+    private legacyHttpService: LegacyHttpService,
   ) {
     this.getData();
   }
@@ -151,6 +154,9 @@ export class IncomeExpensesComponent {
             this.withdrawalsContributionsHttpService.getAllWithdrawalsContributions(
               (cashflow as Cashflow).id,
             ),
+            this.legacyHttpService.getDashboard((cashflow as Cashflow).id).pipe(
+              catchError(() => of(null)),
+            ),
           ]).pipe(
             switchMap(
               ([
@@ -160,11 +166,17 @@ export class IncomeExpensesComponent {
                 escalationRatesResponse,
                 savingsPots,
                 contributionsData,
+                legacyDashboard,
               ]) => {
                 const inheritanceEvents = (timeline?.clientEvents ?? []).filter(
                   (e: any) =>
                     (e?.name ?? '').toString().startsWith('Inheritance'),
                 );
+                this.legacyInheritancePrefill = {
+                  client: (legacyDashboard as any)?.parentEstates?.clientParentsNetWorth ?? 0,
+                  partner: (legacyDashboard as any)?.parentEstates?.partnerParentsNetWorth ?? 0,
+                };
+
                 if (inheritanceEvents.length === 0) {
                   return of([
                     incomeExpense,
@@ -309,6 +321,7 @@ export class IncomeExpensesComponent {
         partnerFirstName: this.partnerFirstName,
         hasPartner: this.hasPartner,
         selectedClient: this.selectedClient,
+        legacyInheritancePrefill: this.legacyInheritancePrefill,
       },
     });
 
@@ -382,6 +395,7 @@ export class IncomeExpensesComponent {
         partnerFirstName: this.partnerFirstName,
         hasPartner: this.hasPartner,
         selectedClient: this.selectedClient,
+        legacyInheritancePrefill: this.legacyInheritancePrefill,
       },
     });
 
@@ -517,12 +531,19 @@ export class IncomeExpensesComponent {
             this.withdrawalsContributionsHttpService.getAllWithdrawalsContributions(
               this.selectedCashflow.id,
             ),
+            this.legacyHttpService.getDashboard(this.selectedCashflow.id).pipe(
+              catchError(() => of(null)),
+            ),
           ]);
         }),
-        tap(([incomeExpense, timeline, savingsPots, contributionsData]) => {
+        tap(([incomeExpense, timeline, savingsPots, contributionsData, legacyDashboard]) => {
           this.applyIncomeExpenseData(incomeExpense, timeline);
           this.savingsPots = savingsPots;
           this.contributionWithdrawal = contributionsData;
+          this.legacyInheritancePrefill = {
+            client: (legacyDashboard as any)?.parentEstates?.clientParentsNetWorth ?? 0,
+            partner: (legacyDashboard as any)?.parentEstates?.partnerParentsNetWorth ?? 0,
+          };
         }),
       )
       .subscribe();
