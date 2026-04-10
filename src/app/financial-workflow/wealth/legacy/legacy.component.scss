@@ -7,7 +7,7 @@ $line-w: 2px;
   line-height: 20px;
   color: #5a596e;
   margin: 0;
-  max-width: 540px;
+  max-width: 420px;
 }
 
 .section-title {
@@ -147,6 +147,7 @@ $line-w: 2px;
     padding: 0;
     &:hover {
       background: transparent;
+      cursor: default;
     }
   }
 }
