@@ -22,9 +22,6 @@ export function formatSavingPotSelectLabel(
   translate: TranslateService,
 ): string {
   const base = saving.name ?? '';
-  if (base.trim().toLowerCase() === 'cash') {
-    return translate.instant(base);
-  }
   if (!client?.partnerDetail) {
     return translate.instant(base);
   }

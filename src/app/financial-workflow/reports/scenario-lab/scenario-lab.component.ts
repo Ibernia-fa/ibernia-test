@@ -401,7 +401,9 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
       (i) => i.description?.toLowerCase() !== 'pension fund',
     );
 
-    this.expenseItems = this.incomeExpenseData?.expenses ?? [];
+    this.expenseItems = (this.incomeExpenseData?.expenses ?? []).filter(
+      (e) => e.description?.toLowerCase() !== 'insurance',
+    );
   }
 
   private buildIncomeTypes(): string[] {
