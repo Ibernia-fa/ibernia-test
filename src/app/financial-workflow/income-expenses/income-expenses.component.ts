@@ -34,8 +34,10 @@ import {
   IncomeDisplayLabelContext,
   isClientSalaryApiDescription,
   isClientStatePensionApiDescription,
+  isClientInheritanceApiDescription,
   isPartnerSalaryApiDescription,
   isPartnerStatePensionApiDescription,
+  isPartnerInheritanceApiDescription,
   isSalaryTypeForBonus,
 } from 'src/app/shared/utils/income-display-label';
 import { SavingsPotsHttpService } from '../saving-pots/services/savings-pots-http.service';
@@ -453,8 +455,14 @@ export class IncomeExpensesComponent {
     if (!this.incomes.find((x) => x.description == 'Rental income')) {
       this.incomeType.push('Rental income');
     }
-    if (!this.defaultIncomes.find((x) => x.description == 'Inheritance')) {
-      this.incomeType.push('Inheritance');
+    if (!this.defaultIncomes.find((x) => isClientInheritanceApiDescription(x.description))) {
+      this.incomeType.push(this.hasPartner ? `Inheritance ${cName}` : 'Inheritance');
+    }
+    if (
+      this.hasPartner &&
+      !this.defaultIncomes.find((x) => isPartnerInheritanceApiDescription(x.description))
+    ) {
+      this.incomeType.push(`Inheritance ${pName}`);
     }
 
     this.incomeType.push('Custom');
@@ -627,7 +635,12 @@ export class IncomeExpensesComponent {
     const partnerPension = allDefault.find((i) =>
       isPartnerStatePensionApiDescription(i.description),
     );
-    const inheritance = allDefault.find((i) => i.description === 'Inheritance');
+    const clientInheritance = allDefault.find((i) =>
+      isClientInheritanceApiDescription(i.description),
+    );
+    const partnerInheritance = allDefault.find((i) =>
+      isPartnerInheritanceApiDescription(i.description),
+    );
 
     const pushIncome = (income: FinancialViewModel) => {
       result.push({ income });
@@ -638,9 +651,10 @@ export class IncomeExpensesComponent {
       if (partnerSalary) pushIncome(partnerSalary);
       if (clientPension) pushIncome(clientPension);
       if (partnerPension) pushIncome(partnerPension);
-      if (inheritance) pushIncome(inheritance);
+      if (clientInheritance) pushIncome(clientInheritance);
+      if (partnerInheritance) pushIncome(partnerInheritance);
       const used = new Set(
-        [clientSalary, partnerSalary, clientPension, partnerPension, inheritance]
+        [clientSalary, partnerSalary, clientPension, partnerPension, clientInheritance, partnerInheritance]
           .filter(Boolean)
           .map((i) => i!.id ?? `desc:${i!.description}`),
       );
