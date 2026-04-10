@@ -39,6 +39,10 @@ import {
   getProjectionColumnAgeLabel,
 } from 'src/app/shared/utils/client-age-at-reference';
 import { calendarYearOrEventRefValidator } from 'src/app/shared/utils/calendar-year-or-event-ref.validator';
+import {
+  financingMonthlyEndYearNotSelected,
+  recurringEndYearNotSelected,
+} from 'src/app/shared/utils/recurring-end-save-guard';
 
 @Component({
   selector: 'app-add-event-dialog',
@@ -310,6 +314,8 @@ export class AddEventDialogComponent {
     }
 
     this.initForm();
+
+    this.eventForm.valueChanges.pipe(takeUntilDestroyed()).subscribe(() => this.cdr.markForCheck());
 
     if (this.selectedEventType === EventType.FINANCING) {
       this.isIncomeEvent = false; // financing is always expense
@@ -980,6 +986,53 @@ export class AddEventDialogComponent {
     }
 
     customControl?.updateValueAndValidity();
+  }
+
+  /** System timeline event: recurring (e.g. monthly/yearly) requires end year or event. */
+  get isSystemEventSaveButtonDisabled(): boolean {
+    if (this.eventForm.invalid) {
+      return true;
+    }
+    if (this.isInheritanceOneOff) {
+      return false;
+    }
+    const cycle = this.eventForm.get('cycle')?.value as string | undefined;
+    return recurringEndYearNotSelected(
+      cycle,
+      this.eventForm.get('end')?.value,
+      this.eventsList,
+    );
+  }
+
+  /** Financing (Home/Car/Boat): loan schedule requires monthly payment end year. */
+  get isFinancingEventSaveButtonDisabled(): boolean {
+    if (this.eventForm.invalid) {
+      return true;
+    }
+    if (this.eventForm.get('paymentType')?.value === 'Financing') {
+      return financingMonthlyEndYearNotSelected(
+        this.eventForm.get('monthlyEnd')?.value,
+      );
+    }
+    return false;
+  }
+
+  /** Custom goal: recurring cash expense uses end; financing uses monthly end. */
+  get isCustomEventSaveButtonDisabled(): boolean {
+    if (this.eventForm.invalid) {
+      return true;
+    }
+    if (this.eventForm.get('paymentType')?.value === 'Financing') {
+      return financingMonthlyEndYearNotSelected(
+        this.eventForm.get('monthlyEnd')?.value,
+      );
+    }
+    const cycle = this.eventForm.get('cycle')?.value as string | undefined;
+    return recurringEndYearNotSelected(
+      cycle,
+      this.eventForm.get('end')?.value,
+      this.eventsList,
+    );
   }
 
   private endOnOrAfterStartValidator(): ValidatorFn {

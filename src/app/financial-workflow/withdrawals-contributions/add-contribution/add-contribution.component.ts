@@ -56,6 +56,7 @@ import {
   getCashflowDialogEndCalendarYear,
 } from 'src/app/shared/utils/client-age-at-reference';
 import { calendarYearOrEventRefValidator } from 'src/app/shared/utils/calendar-year-or-event-ref.validator';
+import { recurringEndYearNotSelected } from 'src/app/shared/utils/recurring-end-save-guard';
 
 @Component({
   selector: 'app-add-contribution',
@@ -371,6 +372,19 @@ export class AddContributionComponent {
 
   getTimelineEventLabel(rawName: string): string {
     return translateTimelineEventDisplayName(this.translate, rawName);
+  }
+
+  get isContributionSaveButtonDisabled(): boolean {
+    if (this.contributionForm.invalid) {
+      return true;
+    }
+    const cycleId = this.contributionForm.get('cycle')?.value;
+    const desc = this.cycles.find((c) => c.id === cycleId)?.description;
+    return recurringEndYearNotSelected(
+      desc,
+      this.contributionForm.get('end')?.value,
+      this.eventsList,
+    );
   }
 
   isCommissionsChanged(enabled: boolean) {

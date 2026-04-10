@@ -283,7 +283,8 @@ export class AddNewPotComponent {
       contributionAmount: [0],
       contributionFrequency: [1],  // Monthly (1) by default
       contributionStartDate: [data.forecastStartDateYear],  // This year
-      contributionEndDate: [this.retirementAge],  // Retirement year
+      // No default — user must choose contribution end (validators + API enforce).
+      contributionEndDate: [null as number | null],
       ownership: [SavingPotOwnership.Joint]
     });
 
@@ -674,6 +675,9 @@ onAmountBlur(e: Event) {
     // Auto-tick lockPot for Pension fund, untick for other types
     if (name === 'Pension fund') {
       this.savingsForm.get('lockPot')?.setValue(true);
+      if (!this.isEditWorkflow) {
+        this.savingsForm.get('contributionEndDate')?.reset(null, { emitEvent: false });
+      }
     } else {
       this.savingsForm.get('lockPot')?.setValue(false);
     }
@@ -901,6 +905,25 @@ onAmountBlur(e: Event) {
     return String(r);
   }
 
+  /**
+   * Save stays off until the form is valid and (for pension fund) a contribution end calendar year is chosen.
+   */
+  get isSaveDisabled(): boolean {
+    if (this.savingsForm.invalid) {
+      return true;
+    }
+    if (this.fromNetWorth) {
+      return false;
+    }
+    if (this.savingsForm.get('name')?.value !== 'Pension fund') {
+      return false;
+    }
+    const raw = this.savingsForm.get('contributionEndDate')?.value;
+    const year =
+      typeof raw === 'number' && Number.isFinite(raw) ? raw : 0;
+    return year <= 0;
+  }
+
   saveCashflow(): void {
     this.savingsForm.markAllAsTouched();
     const selectedEscDesc = this.savingsForm.get('escalationRate')?.value as string;
@@ -925,6 +948,25 @@ onAmountBlur(e: Event) {
         this.savingsForm.markAllAsTouched();
         return;
       }
+    }
+
+    const potName = this.savingsForm.get('name')?.value;
+    const isPensionFundPot = potName === 'Pension fund';
+    const contribAmt = Number(this.savingsForm.get('contributionAmount')?.value ?? 0);
+    const contribEndRaw = this.savingsForm.get('contributionEndDate')?.value;
+    const contribEndYear =
+      typeof contribEndRaw === 'number' && Number.isFinite(contribEndRaw)
+        ? contribEndRaw
+        : 0;
+    if (
+      isPensionFundPot &&
+      contribAmt > 0 &&
+      contribEndYear <= 0
+    ) {
+      const endCtrl = this.savingsForm.get('contributionEndDate');
+      endCtrl?.setErrors({ ...(endCtrl.errors ?? {}), required: true });
+      endCtrl?.markAsTouched();
+      return;
     }
 
     if (this.savingsForm.valid) {

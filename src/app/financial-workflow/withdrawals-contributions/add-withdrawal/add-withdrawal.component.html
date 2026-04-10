@@ -365,7 +365,7 @@
         <button
           (click)="addExpense()"
           type="button"
-          [disabled]="withdrawalForm.invalid"
+          [disabled]="isWithdrawalSaveButtonDisabled"
           class="button-icon w-100 d-block"
         >
           <!-- <span class="f-s-16">{{isEditWorkflow ? 'Save' : 'Add'}} Withdrawal</span> -->

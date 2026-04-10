@@ -55,6 +55,7 @@ import {
   getProjectionColumnAgeLabel,
 } from 'src/app/shared/utils/client-age-at-reference';
 import { calendarYearOrEventRefValidator } from 'src/app/shared/utils/calendar-year-or-event-ref.validator';
+import { recurringEndYearNotSelected } from 'src/app/shared/utils/recurring-end-save-guard';
 
 @Component({
   selector: 'app-add-income',
@@ -530,6 +531,26 @@ export class AddIncomeComponent {
 
   getTimelineEventLabel(rawName: string): string {
     return translateTimelineEventDisplayName(this.translate, rawName);
+  }
+
+  /** Save disabled until form is valid and recurring rows have an end year or event. */
+  get isIncomeSaveButtonDisabled(): boolean {
+    if (this.isSaving) {
+      return true;
+    }
+    if (this.isEditWorkflow && !this.hasFormChanges()) {
+      return true;
+    }
+    if (this.incomeForm.invalid) {
+      return true;
+    }
+    const cycleId = this.incomeForm.get('cycle')?.value;
+    const desc = this.cycles.find((c) => c.id === cycleId)?.description;
+    return recurringEndYearNotSelected(
+      desc,
+      this.incomeForm.get('end')?.value,
+      this.eventsList,
+    );
   }
 
   addIncome(): void {

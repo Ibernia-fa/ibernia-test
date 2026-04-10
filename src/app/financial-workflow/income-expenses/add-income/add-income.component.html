@@ -857,11 +857,7 @@
         <button
           (click)="addIncome()"
           type="button"
-          [disabled]="
-            isSaving ||
-            incomeForm.invalid ||
-            (isEditWorkflow && !hasFormChanges())
-          "
+          [disabled]="isIncomeSaveButtonDisabled"
           class="button-icon w-100 d-block"
         >
           @if (isSaving) {

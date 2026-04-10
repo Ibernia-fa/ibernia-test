@@ -572,6 +572,8 @@
       <div>
         <button
           (click)="onSystemEventSubmit()"
+          type="button"
+          [disabled]="isSystemEventSaveButtonDisabled"
           class="button-icon w-100 d-block"
         >
           <span class="f-s-16">{{ "Save" | translate }}</span>
@@ -1300,6 +1302,8 @@
       <div>
         <button
           (click)="onFinancingEventSubmit()"
+          type="button"
+          [disabled]="isFinancingEventSaveButtonDisabled"
           class="button-icon w-100 d-block"
         >
           <span class="f-s-16">{{ "Save" | translate }}</span>
@@ -2247,7 +2251,8 @@
         <div>
           <button
             (click)="onCustomEventSubmit()"
-            [disabled]="eventForm.invalid"
+            type="button"
+            [disabled]="isCustomEventSaveButtonDisabled"
             class="button-icon w-100 d-block"
           >
             <span class="f-s-16">{{ "Save" | translate }}</span>

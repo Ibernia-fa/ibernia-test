@@ -660,7 +660,8 @@
                 }
                 @if (
                   savingsForm.get("contributionEndDate")?.touched &&
-                  savingsForm.get("contributionEndDate")?.hasError("required")
+                  (savingsForm.get("contributionEndDate")?.hasError("required") ||
+                    savingsForm.get("contributionEndDate")?.hasError("invalidYear"))
                 ) {
                   <span class="field-error d-block">{{
                     "End date is required" | translate
@@ -1364,7 +1365,7 @@
         <button
           (click)="saveCashflow()"
           type="button"
-          [disabled]="savingsForm.invalid"
+          [disabled]="isSaveDisabled"
           class="button-icon w-100 d-block"
         >
           <span class="f-s-16">{{ "Save" | translate }}</span>

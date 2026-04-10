@@ -33,6 +33,7 @@ import {
   getProjectionColumnAgeLabel,
 } from 'src/app/shared/utils/client-age-at-reference';
 import { calendarYearOrEventRefValidator } from 'src/app/shared/utils/calendar-year-or-event-ref.validator';
+import { recurringEndYearNotSelected } from 'src/app/shared/utils/recurring-end-save-guard';
 
 @Component({
   selector: 'app-add-withdrawal',
@@ -268,6 +269,19 @@ export class AddWithdrawalComponent {
 
   getTimelineEventLabel(rawName: string): string {
     return translateTimelineEventDisplayName(this.translate, rawName);
+  }
+
+  get isWithdrawalSaveButtonDisabled(): boolean {
+    if (this.withdrawalForm.invalid) {
+      return true;
+    }
+    const cycleId = this.withdrawalForm.get('cycle')?.value;
+    const desc = this.cycles.find((c) => c.id === cycleId)?.description;
+    return recurringEndYearNotSelected(
+      desc,
+      this.withdrawalForm.get('end')?.value,
+      this.eventsList,
+    );
   }
 
   addExpense(): void {

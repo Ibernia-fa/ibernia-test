@@ -579,7 +579,7 @@
         <button
           (click)="addIncome()"
           type="button"
-          [disabled]="contributionForm.invalid"
+          [disabled]="isContributionSaveButtonDisabled"
           class="button-icon w-100 d-block"
         >
           <!-- <span class="f-s-16">{{isEditWorkflow ? 'Save' : 'Add'}} contribution</span> -->
