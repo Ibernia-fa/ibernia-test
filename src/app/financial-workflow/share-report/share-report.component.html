@@ -1,52 +1,120 @@
 <div class="w-100">
-  <div class="d-flex flex-column gap-32">
-    <div class="d-flex align-items-center justify-content-between gap-10 modal-header">
-      <h3>{{ 'Share with' | translate }} <span style="text-transform: capitalize;">{{clientName}}</span></h3>
-      <button (click)="closeDialog()" type="button">
-        <img src="assets/images/svgs/close-line-cion.svg" alt="close-line-cion" />
+  <div class="d-flex flex-column">
+    <div class="dialog-header">
+      <h2 class="dialog-title text-center">
+        {{ "Share with" | translate }}
+        <span style="text-transform: capitalize">{{ clientName }}</span>
+      </h2>
+      <button
+        type="button"
+        mat-icon-button
+        disableRipple
+        class="dialog-close-btn"
+        mat-dialog-close
+        aria-label="Close dialog"
+        (click)="closeDialog()"
+      >
+        <mat-icon>close</mat-icon>
       </button>
     </div>
 
-    <mat-dialog-content class="custom-body">
-      <div class="d-flex flex-column gap-20" [formGroup]="reportForm">
+    <mat-dialog-content class="event-dialog-content">
+      <div class="d-flex flex-column gap-16" [formGroup]="reportForm">
         <div class="w-100 form-field gap-8">
-          <p>
-            {{ 'Send a secure, view-only version of this plan to your client at this address:' | translate}} <span style="color: #516ce8;">{{clientEmail}}</span>
-            <br>
-            {{ 'They’ll receive an email with a unique access link and password.' | translate}}
-            <br><br>
-            {{ 'This link will automatically expire in:' | translate }}
+          <p class="info-text">
+            {{
+              "Send a secure, view-only version of this plan to your client at this address:"
+                | translate
+            }}
+            <span style="color: #516ce8">{{ clientEmail }}</span>
+            <br />
+            {{
+              "They’ll receive an email with a unique access link and password."
+                | translate
+            }}
+            <br /><br />
+            {{ "This link will automatically expire in:" | translate }}
           </p>
-          
-          <div class="select-option" style="width: 50%;">
-            <mat-select formControlName="expiry" [(value)]="selectedExpiry">
-              <mat-option *ngFor="let day of expiryOptions" [value]="day">
-                {{ day }} {{ 'days' | translate}}
-              </mat-option>
-            </mat-select>
+
+          <div class="d-flex flex-column gap-8">
+            <mat-label
+              class="f-s-16 f-w-500 d-block ibr-black"
+              style="line-height: 16px"
+              >{{ "Select days" | translate }}</mat-label
+            >
+            <div class="w-100 form-field">
+              <div class="select-option position-relative">
+                <mat-select
+                  formControlName="expiry"
+                  [(value)]="selectedExpiry"
+                  hideSingleSelectionIndicator
+                >
+                  <mat-option *ngFor="let day of expiryOptions" [value]="day">
+                    {{ day }} {{ "days" | translate }}
+                  </mat-option>
+                </mat-select>
+                <span class="custom-arrow">
+                  <svg
+                    width="12"
+                    height="7"
+                    viewBox="0 0 12 7"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M1 1L6 6L11 1"
+                      stroke="#2B3942"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </span>
+              </div>
+            </div>
           </div>
-          
+
           <p>
-            {{ 'Note: the AI Recommendations section will not be visible to your client.' | translate }}
+            {{
+              "Note: the AI Recommendations section will not be visible to your client."
+                | translate
+            }}
           </p>
-          
-          @if(reportForm.get('expiry')?.touched && reportForm.get('expiry')?.hasError('required')) {
-              <span class="field-error d-block">{{ 'Expiry period is required' | translate}}</span>
+
+          @if (
+            reportForm.get("expiry")?.touched &&
+            reportForm.get("expiry")?.hasError("required")
+          ) {
+            <span class="field-error d-block">{{
+              "Expiry period is required" | translate
+            }}</span>
           }
         </div>
       </div>
     </mat-dialog-content>
 
-    <div class="row justify-content-between modal-action">
-      <div class="col-5">
-        <button (click)="closeDialog()" class="button-icon-outline w-100 d-block">
-          <span class="f-s-16">{{ 'Close' | translate}}</span>
+    <div class="row justify-content-end gap-16 modal-action p-t-24">
+      <div>
+        <button
+          (click)="closeDialog()"
+          class="button-icon-outline w-100 d-block"
+        >
+          <span class="f-s-16">{{ "Close" | translate }}</span>
         </button>
       </div>
-      <div class="col-5">
-        <button (click)="shareReport()" type="button" [disabled]="reportForm.invalid || isLoaderVisible" class="button-icon w-100 d-block">
+      <div>
+        <button
+          (click)="shareReport()"
+          type="button"
+          [disabled]="reportForm.invalid || isLoaderVisible"
+          class="button-icon w-100 d-block"
+        >
           <span class="f-s-16">
-            {{ isLoaderVisible ? ('Sending...' | translate) : ('Send' | translate) }}
+            {{
+              isLoaderVisible
+                ? ("Sending..." | translate)
+                : ("Send" | translate)
+            }}
           </span>
         </button>
       </div>

@@ -62,7 +62,9 @@
     <div class="ibr-timeline-wrapper">
       <div class="timeline-labels" [class.dual-axis]="showDualAxis">
         @if (showDualAxis) {
-          <p class="timeline-age-label timeline-age-label--hover-expand">
+          <p
+            class="timeline-client-age timeline-age-label timeline-age-label--hover-expand"
+          >
             <span class="timeline-age-label__compact"
               >{{ "Age" | translate }} {{ mainClientInitial }}</span
             >
@@ -70,7 +72,9 @@
               >{{ "Age" | translate }} {{ mainClientFirstName }}</span
             >
           </p>
-          <p class="timeline-age-label timeline-age-label--hover-expand">
+          <p
+            class="timeline-partner-age timeline-age-label timeline-age-label--hover-expand"
+          >
             <span class="timeline-age-label__compact"
               >{{ "Age" | translate }} {{ partnerInitial }}</span
             >
@@ -78,10 +82,16 @@
               >{{ "Age" | translate }} {{ partnerFirstName }}</span
             >
           </p>
-          <span class="timeline-year-label">{{ "Year" | translate }}</span>
+          <span class="ibr-timeline-year-label timeline-year-label">{{
+            "Year" | translate
+          }}</span>
         } @else {
-          <p class="timeline-age-label">{{ "Age" | translate }}</p>
-          <span class="timeline-year-label">{{ "Year" | translate }}</span>
+          <p class="timeline-client-age timeline-age-label">
+            {{ "Age" | translate }}
+          </p>
+          <span class="ibr-timeline-year-label timeline-year-label">{{
+            "Year" | translate
+          }}</span>
         }
       </div>
       <div
