@@ -280,7 +280,7 @@
   min-width: 40px;
   line-height: 100%;
   font-weight: 500;
-  gap: 6px;
+  // gap: 6px;
 
   p {
     margin: 0;
@@ -409,4 +409,14 @@
 // so that drops land on the timeline background, not on existing items
 ::ng-deep .external-dragging .vis-item {
   pointer-events: none !important;
+}
+
+.timeline-client-age {
+  margin-top: 2px !important;
+}
+.timeline-partner-age {
+  margin-top: 5px !important;
+}
+.ibr-timeline-year-label {
+  margin-top: 6px !important;
 }

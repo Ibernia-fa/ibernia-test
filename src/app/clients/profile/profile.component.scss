@@ -13,6 +13,11 @@
     line-height: 18px;
     color: #5a596e;
   }
+  .button-icon {
+    span {
+      align-self: flex-end;
+    }
+  }
 }
 
 .total-savings-header {
