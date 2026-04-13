@@ -269,6 +269,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
   escalationRates: EscalationRate[] = [];
   loggedInUserPreferences: any = null;
   userReturnRate: any = null;
+  pensionFundReturnRate: any = null;
 
   private readonly DIALOG_SYSTEM_EVENTS = [
     'Wedding',
@@ -320,6 +321,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
         const p = data.preferences;
         this.loggedInUserPreferences = p;
         this.userReturnRate = p.investmentReturn;
+        this.pensionFundReturnRate = p.pensionFundReturn;
       });
 
     this.financialWorkflowService
@@ -1039,6 +1041,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
       disableClose: true,
       data: {
         returnRate: this.userReturnRate,
+        pensionFundReturnRate: this.pensionFundReturnRate,
         inflationRate:
           this.cashflow.inflationRate ??
           this.client.clientDetails?.inflationRate ??

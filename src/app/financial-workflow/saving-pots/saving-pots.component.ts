@@ -112,6 +112,7 @@ import { MaterialModule } from 'src/app/material.module';
 export class SavingPotsComponent implements OnInit {
   user: any;
   userRerturnRate: any;
+  pensionFundReturnRate: any;
   loggedInUserPreferences: any;
   private destroy$ = new Subject<void>();
 
@@ -136,6 +137,7 @@ export class SavingPotsComponent implements OnInit {
         const p = data.preferences;
         this.loggedInUserPreferences = p;
         this.userRerturnRate = p.investmentReturn;
+        this.pensionFundReturnRate = p.pensionFundReturn;
       });
     this.getData();
   }
@@ -409,6 +411,7 @@ export class SavingPotsComponent implements OnInit {
       disableClose: true,
       data: {
         returnRate: this.userRerturnRate,
+        pensionFundReturnRate: this.pensionFundReturnRate,
         inflationRate:
           this.selectedCashflow?.inflationRate ??
           this.selectedClient?.clientDetails?.inflationRate ??
@@ -504,6 +507,7 @@ export class SavingPotsComponent implements OnInit {
       disableClose: true,
       data: {
         returnRate: this.userRerturnRate,
+        pensionFundReturnRate: this.pensionFundReturnRate,
         inflationRate:
           this.selectedCashflow?.inflationRate ??
           this.selectedClient?.clientDetails?.inflationRate ??
