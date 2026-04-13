@@ -1,4 +1,5 @@
 import {
+  APP_INITIALIZER,
   ApplicationConfig,
   provideZoneChangeDetection,
   importProvidersFrom, isDevMode,
@@ -17,7 +18,8 @@ import {
 } from '@angular/router';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideClientHydration } from '@angular/platform-browser';
-import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
+import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
+import { firstValueFrom } from 'rxjs';
 
 import { ToastrModule } from 'ngx-toastr';
 import { provideToastr } from 'ngx-toastr';
@@ -51,6 +53,9 @@ import { CashflowEffects } from './store/cashflow/cashflow.effects';
 import { clientReducer } from './store/client/client.reducer';
 import { cashflowReducer } from './store/cashflow/cashflow.reducer';
 
+function preloadTranslations(translate: TranslateService): () => Promise<unknown> {
+  return () => firstValueFrom(translate.use(translate.defaultLang));
+}
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -90,6 +95,12 @@ export const appConfig: ApplicationConfig = {
             deps: [HttpBackend],
         },
     })),
+    {
+      provide: APP_INITIALIZER,
+      useFactory: preloadTranslations,
+      deps: [TranslateService],
+      multi: true,
+    },
     provideStore({client: clientReducer, cashflow: cashflowReducer}),
     provideEffects(FinancialAdvisorEffects, ClientEffects, CashflowEffects),
     provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() })
