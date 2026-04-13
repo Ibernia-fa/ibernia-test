@@ -329,6 +329,7 @@ export class AddNewPotComponent {
     }
 
     this.syncOwnershipForSelectedType();
+    this.syncLockPotForPensionFund();
     this.syncReturnRateTextFromForm();
     this.syncSliderReturnRateFromForm();
   }
@@ -699,6 +700,22 @@ onAmountBlur(e: Event) {
     }
   }
 
+  /**
+   * Pension funds must always be locked. Call after any change that
+   * affects pot type or lock state to keep UI + model in sync.
+   */
+  private syncLockPotForPensionFund(): void {
+    const lockPotCtrl = this.savingsForm.get('lockPot');
+    if (!lockPotCtrl) return;
+
+    if (this.savingsForm.get('name')?.value === 'Pension fund') {
+      lockPotCtrl.setValue(true, { emitEvent: false });
+      lockPotCtrl.disable({ emitEvent: false });
+    } else {
+      lockPotCtrl.enable({ emitEvent: false });
+    }
+  }
+
   onNameValueChange(name: any) {
     this.selectedName = name;
     this.renamedCustomName = '';  // Reset renamed value when type changes
@@ -723,7 +740,6 @@ onAmountBlur(e: Event) {
     
     // Auto-tick lockPot for Pension fund, untick for other types
     if (name === 'Pension fund') {
-      this.savingsForm.get('lockPot')?.setValue(true);
       if (!this.isEditWorkflow) {
         this.contributionEndManuallyOverridden = false;
         const ownership = this.savingsForm.get('ownership')?.value ?? SavingPotOwnership.Joint;
@@ -734,6 +750,7 @@ onAmountBlur(e: Event) {
       this.savingsForm.get('lockPot')?.setValue(false);
     }
 
+    this.syncLockPotForPensionFund();
     // Update Pension fund field validators based on type
     this.updatePensionFundValidators(name);
     this.syncOwnershipForSelectedType();
@@ -793,6 +810,10 @@ onAmountBlur(e: Event) {
   }
 
   isLockPotChanged(event: any) {
+    if (this.savingsForm.get('name')?.value === 'Pension fund') {
+      this.savingsForm.get('lockPot')?.setValue(true, { emitEvent: false });
+      return;
+    }
     if (event) {
       this.savingsForm.get('start')?.setValidators([calendarYearOrEventRefValidator()]);
       this.savingsForm.get('start')?.updateValueAndValidity();
