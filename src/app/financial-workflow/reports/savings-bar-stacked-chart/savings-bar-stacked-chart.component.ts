@@ -172,7 +172,7 @@ export class SavingsBarStackedChartComponent
           enabled: false,
           dynamicAnimation: {
             enabled: true,
-            speed: 450,
+            speed: 1500,
           },
           animateGradually: { enabled: false },
         },

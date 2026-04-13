@@ -713,11 +713,11 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
           this.alignSeriesStructure();
           this.hasSimulated = true;
           this.activeTab = 'after';
+          this.updateScenarioForecastEndDateIfNeeded();
           this.displayedReport = {
             ...report,
             series: report.series.map(s => ({ ...s, data: [...s.data] })),
           };
-          this.updateScenarioForecastEndDateIfNeeded();
           this.getShortfallStatus(report);
           this.syncChartYearRangeFromDisplayedReport();
           if (showSuccessToast) {
