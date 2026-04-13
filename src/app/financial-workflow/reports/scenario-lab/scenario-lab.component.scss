@@ -490,15 +490,6 @@
   overflow: hidden;
 }
 
-// ── Chart crossfade on Before/After tab switch ───────────────────────────
-.chart-component-wrapper {
-  transition: opacity 0.3s ease;
-
-  &.chart-fading {
-    opacity: 0;
-  }
-}
-
 // ── Mat-slider custom styling ────────────────────────────────────────────
 :host ::ng-deep .slider-flex {
   &.mat-mdc-slider {

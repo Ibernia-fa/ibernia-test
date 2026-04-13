@@ -142,8 +142,6 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
   chartYearOptions: number[] = [];
   activeTab: 'before' | 'after' = 'after';
   hasSimulated = false;
-  chartFading = false;
-  private _tabSwitchTimer: any = null;
 
   baselineInflationRate = 2.5;
   baselineRetirementAge = 65;
@@ -776,21 +774,13 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
   }
 
   switchTab(tab: 'before' | 'after'): void {
-    if (tab === this.activeTab) return;
-    clearTimeout(this._tabSwitchTimer);
-
     this.activeTab = tab;
-    this.chartFading = true;
-
-    this._tabSwitchTimer = setTimeout(() => {
-      const source = tab === 'before' ? this.baselineReport : this.report;
-      this.displayedReport = source ? this.deepCloneReport(source) : source;
-      this.syncChartYearRangeFromDisplayedReport();
-      if (tab === 'after' && this.report) this.getShortfallStatus(this.report);
-      if (tab === 'before' && this.baselineReport)
-        this.getShortfallStatus(this.baselineReport);
-      this.chartFading = false;
-    }, 300);
+    const source = tab === 'before' ? this.baselineReport : this.report;
+    this.displayedReport = source ? this.deepCloneReport(source) : source;
+    this.syncChartYearRangeFromDisplayedReport();
+    if (tab === 'after' && this.report) this.getShortfallStatus(this.report);
+    if (tab === 'before' && this.baselineReport)
+      this.getShortfallStatus(this.baselineReport);
   }
 
   private alignSeriesStructure(): void {
@@ -1337,7 +1327,6 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    clearTimeout(this._tabSwitchTimer);
     this.destroy$.next();
     this.destroy$.complete();
   }

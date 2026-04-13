@@ -91,9 +91,9 @@
   display: none;
 }
 
-/* Disable the initial bar-grow entrance animation but keep dynamicAnimation
-   morphing (used by Scenario Lab Before/After transitions) working. */
+/* Disable all ApexCharts bar grow/transition animations */
 :host ::ng-deep .apexcharts-bar-area,
 :host ::ng-deep .apexcharts-series path {
   animation: none !important;
+  transition: none !important;
 }
