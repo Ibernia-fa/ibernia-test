@@ -190,6 +190,7 @@ export class ClientQuestionnaireComponent implements OnInit, OnDestroy {
   private touchStartTarget: HTMLElement | null = null;
   private inputFocusLocked = false;
   private inputFocusLockTimer: ReturnType<typeof setTimeout> | null = null;
+  private programmaticScroll = false;
   /**
    * One section change per wheel *burst*: trackpads emit many wheel events in one flick. A fixed ms gap
    * still allows N steps in a long gesture; instead, consume one step per burst and reset after wheel
@@ -258,9 +259,9 @@ export class ClientQuestionnaireComponent implements OnInit, OnDestroy {
 
       // While an input was recently focused the browser may natively scroll
       // the container (keyboard show/hide, Safari autocomplete fill, dvh
-      // resize).  The flag stays true for 600 ms after blur so it covers
-      // the gap where Safari blurs the input before the scroll fires.
-      if (this.inputFocusLocked && newIndex !== this.currentIndex) {
+      // resize).  Block only browser-initiated scrolls; allow programmatic
+      // ones from scrollToSection() so intentional swipes still work.
+      if (this.inputFocusLocked && !this.programmaticScroll && newIndex !== this.currentIndex) {
         el.scrollTop = this.currentIndex * sectionHeight;
         return;
       }
@@ -294,6 +295,8 @@ export class ClientQuestionnaireComponent implements OnInit, OnDestroy {
     const el = this.snapContainer?.nativeElement;
     if (!el) return;
 
+    this.programmaticScroll = true;
+
     const last = this.totalSections - 1;
     const clamped = this.submitted ? last : Math.max(0, Math.min(index, last));
     const targetTop = el.clientHeight * clamped;
@@ -305,7 +308,7 @@ export class ClientQuestionnaireComponent implements OnInit, OnDestroy {
     // animation frames to guarantee the position sticks.
     let retries = 2;
     const enforce = () => {
-      if (retries-- <= 0) return;
+      if (retries-- <= 0) { this.programmaticScroll = false; return; }
       if (Math.abs(el.scrollTop - targetTop) > 2) {
         el.scrollTop = targetTop;
         this.onScroll();
