@@ -52,6 +52,7 @@ import {
   getProjectionColumnAgeLabel,
 } from 'src/app/shared/utils/client-age-at-reference';
 import { calendarYearOrEventRefValidator } from 'src/app/shared/utils/calendar-year-or-event-ref.validator';
+import { extractEventId, resolveYear } from 'src/app/shared/utils/event-date-utils';
 
 @Component({
   selector: 'app-add-new-pot',
@@ -289,9 +290,8 @@ export class AddNewPotComponent {
       // Pension fund specific fields
       contributionAmount: [0],
       contributionFrequency: [1],  // Monthly (1) by default
-      contributionStartDate: [data.forecastStartDateYear],  // This year
-      // No default — user must choose contribution end (validators + API enforce).
-      contributionEndDate: [null as number | null],
+      contributionStartDate: [data.forecastStartDateYear, [calendarYearOrEventRefValidator()]],
+      contributionEndDate: [null as number | string | null, [calendarYearOrEventRefValidator()]],
       ownership: [SavingPotOwnership.Joint]
     });
 
@@ -425,18 +425,29 @@ onAmountBlur(e: Event) {
     );
     const isPensionFundEdit = this.selectedPot.name === 'Pension fund';
     this.savingsForm.get('lockPot')?.patchValue(isPensionFundEdit ? true : this.selectedPot.hasPotLocked, { emitEvent: false });
-    this.savingsForm.get('start')?.patchValue(this.selectedPot.lockedFrom?.year || this.forecastStartDateYear, { emitEvent: false });
-    this.savingsForm.get('end')?.patchValue(
-      this.selectedPot.lockedTill?.year || this.dialogEndCalendarYear,
-      { emitEvent: false },
-    );
+
+    const lockStartVal = this.selectedPot.startEventId
+      ? 'event:' + this.selectedPot.startEventId
+      : (this.selectedPot.lockedFrom?.year || this.forecastStartDateYear);
+    const lockEndVal = this.selectedPot.endEventId
+      ? 'event:' + this.selectedPot.endEventId
+      : (this.selectedPot.lockedTill?.year || this.dialogEndCalendarYear);
+    this.savingsForm.get('start')?.patchValue(lockStartVal, { emitEvent: false });
+    this.savingsForm.get('end')?.patchValue(lockEndVal, { emitEvent: false });
     
     // Patch Pension fund specific fields if applicable
     if (this.selectedPot.name === 'Pension fund') {
       this.savingsForm.get('contributionAmount')?.patchValue(this.selectedPot.contributionAmount, { emitEvent: false });
       this.savingsForm.get('contributionFrequency')?.patchValue(this.selectedPot.contributionFrequency, { emitEvent: false });
-      this.savingsForm.get('contributionStartDate')?.patchValue(this.selectedPot.contributionStartDate?.year, { emitEvent: false });
-      this.savingsForm.get('contributionEndDate')?.patchValue(this.selectedPot.contributionEndDate?.year, { emitEvent: false });
+
+      const contribStartVal = this.selectedPot.contributionStartEventId
+        ? 'event:' + this.selectedPot.contributionStartEventId
+        : this.selectedPot.contributionStartDate?.year ?? null;
+      const contribEndVal = this.selectedPot.contributionEndEventId
+        ? 'event:' + this.selectedPot.contributionEndEventId
+        : this.selectedPot.contributionEndDate?.year ?? null;
+      this.savingsForm.get('contributionStartDate')?.patchValue(contribStartVal, { emitEvent: false });
+      this.savingsForm.get('contributionEndDate')?.patchValue(contribEndVal, { emitEvent: false });
     }
     
     this.savingsForm.get('ownership')?.patchValue(this.selectedPot.ownership ?? SavingPotOwnership.Joint, { emitEvent: false });
@@ -1027,7 +1038,7 @@ onAmountBlur(e: Event) {
       return false;
     }
     const raw = this.savingsForm.get('contributionEndDate')?.value;
-    return this.parseCalendarYearFromControl(raw) <= 0;
+    return resolveYear(raw, this.eventsList) <= 0;
   }
 
   saveCashflow(): void {
@@ -1061,7 +1072,7 @@ onAmountBlur(e: Event) {
     const isPensionFundPot = potName === 'Pension fund';
     const contribAmt = Number(this.savingsForm.get('contributionAmount')?.value ?? 0);
     const contribEndRaw = this.savingsForm.get('contributionEndDate')?.value;
-    const contribEndYear = this.parseCalendarYearFromControl(contribEndRaw);
+    const contribEndYear = resolveYear(contribEndRaw, this.eventsList);
     if (
       isPensionFundPot &&
       contribAmt > 0 &&
@@ -1170,42 +1181,30 @@ onAmountBlur(e: Event) {
               ? this.forecastStartDateYear
               : 0,
         },
-        lockedFrom: {
-          age:
-            isPotLocked && this.savingsForm.get('start')?.value !== null &&
-            this.savingsForm.get('start')?.value !== ''
-              ? getPersistedAgeForCalendarYear(
-                  this.data.clientBirthDate,
-                  this.savingsForm.get('start')?.value,
-                  this.data.forecastStartDate,
-                  this.data.planDuration,
-                  this.dialogEndCalendarYear,
-                )
-              : 0,
-          year:
-            isPotLocked &&  this.savingsForm.get('start')?.value !== null &&
-            this.savingsForm.get('start')?.value !== ''
-              ? this.savingsForm.get('start')?.value
-              : 0,
-        },
-        lockedTill: {
-          age:
-             isPotLocked && this.savingsForm.get('end')?.value !== null &&
-            this.savingsForm.get('end')?.value !== ''
-              ? getPersistedAgeForCalendarYear(
-                  this.data.clientBirthDate,
-                  this.savingsForm.get('end')?.value,
-                  this.data.forecastStartDate,
-                  this.data.planDuration,
-                  this.dialogEndCalendarYear,
-                )
-              : 0,
-          year:
-             isPotLocked && this.savingsForm.get('end')?.value !== null &&
-            this.savingsForm.get('end')?.value !== ''
-              ? this.savingsForm.get('end')?.value
-              : 0,
-        },
+        lockedFrom: (() => {
+          const raw = this.savingsForm.get('start')?.value;
+          const yr = isPotLocked && raw != null && raw !== ''
+            ? resolveYear(raw, this.eventsList) : 0;
+          return {
+            age: yr > 0 ? getPersistedAgeForCalendarYear(
+              this.data.clientBirthDate, yr,
+              this.data.forecastStartDate, this.data.planDuration,
+              this.dialogEndCalendarYear) : 0,
+            year: yr,
+          };
+        })(),
+        lockedTill: (() => {
+          const raw = this.savingsForm.get('end')?.value;
+          const yr = isPotLocked && raw != null && raw !== ''
+            ? resolveYear(raw, this.eventsList) : 0;
+          return {
+            age: yr > 0 ? getPersistedAgeForCalendarYear(
+              this.data.clientBirthDate, yr,
+              this.data.forecastStartDate, this.data.planDuration,
+              this.dialogEndCalendarYear) : 0,
+            year: yr,
+          };
+        })(),
         end: {
           age:
             Number.isFinite(this.dialogEndCalendarYear)
@@ -1241,31 +1240,41 @@ onAmountBlur(e: Event) {
           ? this.savingsForm.get('contributionFrequency')?.value
           : null,
         contributionStartDate: this.savingsForm.get('name')?.value === 'Pension fund'
-          ? {
-              year: this.savingsForm.get('contributionStartDate')?.value,
-              age: getPersistedAgeForCalendarYear(
-                this.data.clientBirthDate,
-                this.savingsForm.get('contributionStartDate')?.value,
-                this.data.forecastStartDate,
-                this.data.planDuration,
-                this.dialogEndCalendarYear,
-              ),
-            }
+          ? (() => {
+              const raw = this.savingsForm.get('contributionStartDate')?.value;
+              const yr = resolveYear(raw, this.eventsList);
+              return {
+                year: yr,
+                age: yr > 0 ? getPersistedAgeForCalendarYear(
+                  this.data.clientBirthDate, yr,
+                  this.data.forecastStartDate, this.data.planDuration,
+                  this.dialogEndCalendarYear) : 0,
+              };
+            })()
           : null,
         contributionEndDate: this.savingsForm.get('name')?.value === 'Pension fund'
-          ? {
-              year: this.savingsForm.get('contributionEndDate')?.value,
-              age: getPersistedAgeForCalendarYear(
-                this.data.clientBirthDate,
-                this.savingsForm.get('contributionEndDate')?.value,
-                this.data.forecastStartDate,
-                this.data.planDuration,
-                this.dialogEndCalendarYear,
-              ),
-            }
+          ? (() => {
+              const raw = this.savingsForm.get('contributionEndDate')?.value;
+              const yr = resolveYear(raw, this.eventsList);
+              return {
+                year: yr,
+                age: yr > 0 ? getPersistedAgeForCalendarYear(
+                  this.data.clientBirthDate, yr,
+                  this.data.forecastStartDate, this.data.planDuration,
+                  this.dialogEndCalendarYear) : 0,
+              };
+            })()
           : null,
         retirementAge: this.savingsForm.get('name')?.value === 'Pension fund'
           ? this.retirementAge
+          : null,
+        startEventId: extractEventId(this.savingsForm.get('start')?.value),
+        endEventId: extractEventId(this.savingsForm.get('end')?.value),
+        contributionStartEventId: this.savingsForm.get('name')?.value === 'Pension fund'
+          ? extractEventId(this.savingsForm.get('contributionStartDate')?.value)
+          : null,
+        contributionEndEventId: this.savingsForm.get('name')?.value === 'Pension fund'
+          ? extractEventId(this.savingsForm.get('contributionEndDate')?.value)
           : null,
         ownership: this.hasPartner ? (this.savingsForm.get('ownership')?.value ?? SavingPotOwnership.Joint) : SavingPotOwnership.Joint
       };
@@ -1465,15 +1474,16 @@ onAmountBlur(e: Event) {
 
       private endOnOrAfterStartValidator(): ValidatorFn {
       return (group: AbstractControl) => {
-        const start = group.get('start')?.value;
-        const end   = group.get('end')?.value;
+        const startRaw = group.get('start')?.value;
+        const endRaw   = group.get('end')?.value;
         const endCtrl = group.get('end');
-    
-        // Only validate when both are present (or when end is present)
+        const start = resolveYear(startRaw, this.eventsList);
+        const end   = resolveYear(endRaw, this.eventsList);
+
         if (endCtrl) {
           const existing = endCtrl.errors ?? null;
     
-          if (start != null && start !== '' && end != null && end !== '' && end < start) {
+          if (start > 0 && end > 0 && end < start) {
             // attach/merge the error onto the END control
             endCtrl.setErrors({ ...(existing ?? {}), endBeforeStart: true });
           } else {

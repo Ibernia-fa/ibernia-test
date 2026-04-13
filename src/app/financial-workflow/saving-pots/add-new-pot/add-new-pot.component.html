@@ -636,7 +636,7 @@
                             <hr />
                           }
                           @for (event of eventsList; track event) {
-                            <mat-option [value]="event.start.year"
+                            <mat-option [value]="'event:' + event.id"
                               >{{ event.name }} ({{
                                 event.start.age
                               }})</mat-option
@@ -699,7 +699,7 @@
                             event of getContributionEndEvents();
                             track event.id
                           ) {
-                            <mat-option [value]="event.start.year"
+                            <mat-option [value]="'event:' + event.id"
                               >{{ event.name }} ({{
                                 event.start.age
                               }})</mat-option
@@ -820,7 +820,7 @@
                                 <hr />
                               }
                               @for (event of eventsList; track event) {
-                                <mat-option [value]="event.start.year"
+                                <mat-option [value]="'event:' + event.id"
                                   >{{ event.name }} ({{
                                     event.start.age
                                   }})</mat-option
@@ -884,7 +884,7 @@
                                 event of getLockEndEvents();
                                 track event.id
                               ) {
-                                <mat-option [value]="event.start.year"
+                                <mat-option [value]="'event:' + event.id"
                                   >{{ event.name }} ({{
                                     event.start.age
                                   }})</mat-option
