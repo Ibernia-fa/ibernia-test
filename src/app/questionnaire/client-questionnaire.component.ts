@@ -666,11 +666,35 @@ export class ClientQuestionnaireComponent implements OnInit, OnDestroy {
   /* ─── ImportantPeople helpers ─── */
 
   addImportantPerson(): void {
+    const snapEl = this.snapContainer?.nativeElement;
+    const savedTop = snapEl?.scrollTop ?? 0;
+
     this.importantPeople.push({ name: '', relationship: '' });
+    this.cdr.detectChanges();
+
+    // Restore snap position (browser auto-scrolls new inputs into view,
+    // which cascades through .section-inner and .snap-container).
+    if (snapEl && Math.abs(snapEl.scrollTop - savedTop) > 2) {
+      snapEl.scrollTop = savedTop;
+    }
+
+    // Scroll the .important-people list to the bottom to show the new row.
+    const list = snapEl?.querySelector('.important-people') as HTMLElement;
+    if (list) {
+      list.scrollTop = list.scrollHeight;
+    }
   }
 
   removeImportantPerson(index: number): void {
+    const snapEl = this.snapContainer?.nativeElement;
+    const savedTop = snapEl?.scrollTop ?? 0;
+
     this.importantPeople.splice(index, 1);
+    this.cdr.detectChanges();
+
+    if (snapEl && Math.abs(snapEl.scrollTop - savedTop) > 2) {
+      snapEl.scrollTop = savedTop;
+    }
   }
 
   getImportantPeopleValue(): { name: string; relationship: string }[] {
