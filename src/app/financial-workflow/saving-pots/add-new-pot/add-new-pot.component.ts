@@ -158,6 +158,7 @@ export class AddNewPotComponent {
     SavingPotOwnership.Person1,
     SavingPotOwnership.Person2
   ];
+  private contributionEndManuallyOverridden = false;
 
   constructor(
     private dialogRef: MatDialogRef<AddNewPotComponent>,
@@ -310,7 +311,13 @@ export class AddNewPotComponent {
     
     // Set up initial validators for Pension fund fields if default type is Pension fund
     this.updatePensionFundValidators(defaultType);
-    
+
+    if (!this.isEditWorkflow && defaultType === 'Pension fund') {
+      const ownership = this.savingsForm.get('ownership')?.value ?? SavingPotOwnership.Joint;
+      const retirementYear = this.getRetirementYearForOwnership(ownership);
+      this.savingsForm.get('contributionEndDate')?.setValue(retirementYear, { emitEvent: false });
+    }
+
     if(this.isEditWorkflow) {
       this.patchFormValues();
       if (this.isCashPotEditMode) {
@@ -498,6 +505,20 @@ onAmountBlur(e: Event) {
         }
       }, 0);
     });
+
+    this.savingsForm.get('contributionEndDate')?.valueChanges.subscribe(() => {
+      this.contributionEndManuallyOverridden = true;
+    });
+
+    this.savingsForm.get('ownership')?.valueChanges.subscribe((ownership: SavingPotOwnership) => {
+      if (
+        this.savingsForm.get('name')?.value === 'Pension fund' &&
+        !this.contributionEndManuallyOverridden
+      ) {
+        const retirementYear = this.getRetirementYearForOwnership(ownership);
+        this.savingsForm.get('contributionEndDate')?.setValue(retirementYear, { emitEvent: false });
+      }
+    });
   }
 
   private clearCommissionTypeValidators(): void {
@@ -558,6 +579,24 @@ onAmountBlur(e: Event) {
     return 'Investment';
   }
   
+  private findRetirementEventForPerson(isPartner: boolean): any | null {
+    const events = this.eventsList ?? [];
+    return (
+      events.find(
+        (e: any) =>
+          (e?.name ?? '').toString().trim().toLowerCase().startsWith('retirement age') &&
+          !!e?.isPartnerEvent === isPartner,
+      ) ?? null
+    );
+  }
+
+  private getRetirementYearForOwnership(ownership: SavingPotOwnership): number | null {
+    const isPartner = ownership === SavingPotOwnership.Person2;
+    const event = this.findRetirementEventForPerson(isPartner);
+    const year = Number(event?.start?.year);
+    return Number.isFinite(year) && year > 0 ? year : null;
+  }
+
   closeDialog(): void {
     this.dialogRef.close();
   }
@@ -686,7 +725,10 @@ onAmountBlur(e: Event) {
     if (name === 'Pension fund') {
       this.savingsForm.get('lockPot')?.setValue(true);
       if (!this.isEditWorkflow) {
-        this.savingsForm.get('contributionEndDate')?.reset(null, { emitEvent: false });
+        this.contributionEndManuallyOverridden = false;
+        const ownership = this.savingsForm.get('ownership')?.value ?? SavingPotOwnership.Joint;
+        const retirementYear = this.getRetirementYearForOwnership(ownership);
+        this.savingsForm.get('contributionEndDate')?.setValue(retirementYear, { emitEvent: false });
       }
     } else {
       this.savingsForm.get('lockPot')?.setValue(false);
