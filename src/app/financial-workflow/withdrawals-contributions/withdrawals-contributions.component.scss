@@ -190,19 +190,24 @@ table {
     height: 50px !important;
   }
   .column-client {
-    // width: 20%;
-    min-width: 295px;
+    width: 30%;
+    min-width: 180px;
     padding: 10px 24px !important;
   }
   .column-net-amount {
-    min-width: 250px;
-    padding: 10px 8px !important;
-    @media (max-width: 768px) {
-      min-width: 190px;
-    }
+    width: 28%;
+    min-width: 160px;
+    padding: 10px 24px !important;
+  }
+  .column-start-end {
+    width: 32%;
+    min-width: 180px;
+    padding: 10px 24px !important;
   }
   .column-action {
-    min-width: 96px;
+    width: 10%;
+    min-width: 48px;
+    max-width: 64px;
     padding: 10px 8px !important;
   }
   .mat-mdc-row {
@@ -290,12 +295,11 @@ table {
     margin: 16px auto 0 auto;
     width: 100%;
     gap: 16px;
-    // .button-icon,
-    // .button-icon-outline {
-    //   // width: 100%;
-    //   // flex: 1;
-    //   border: 1px solid #4043af;
-    //   padding: 12px 16px;
-    // }
   }
+}
+
+.insurance-expense-tooltip-host {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
 }

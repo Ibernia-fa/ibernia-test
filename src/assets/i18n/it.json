@@ -745,6 +745,8 @@
   "INCOME_EXPENSE.FREQUENCY.ONE_OFF": "una volta",
   "INCOME_EXPENSE.INSURANCE_CARD_TOOLTIP": "Questo è il totale di tutti i costi assicurativi inseriti nel modulo Protezione. Puoi modificarlo lì.",
   "INCOME_EXPENSE.PENSION_FUND_INCOME_TOOLTIP": "Questo reddito è generato automaticamente dal fondo pensione nei Risparmi. Il valore è calcolato in base a quel fondo, e puoi modificare le ipotesi nella sezione Risparmi.",
+  "FLOWS.PENSION_FUND_CONTRIBUTION_TOOLTIP": "Questo contributo è generato automaticamente dal fondo pensione nei Risparmi. Puoi modificare le ipotesi nella sezione Risparmi.",
+  "FLOWS.PENSION_FUND_WITHDRAWAL_TOOLTIP": "Questo prelievo è generato automaticamente dal fondo pensione nei Risparmi. Puoi modificare le ipotesi nella sezione Risparmi.",
   "INCOME_EXPENSE.STATE_PENSION_PCT_OF_SALARY": "{{pct}}% dello stipendio netto",
   "SAVINGS_POT.REAL_RETURN_HINT": "Rendimento reale: {{real}}% (già al netto di inflazione al {{inflation}}%)",
   "SCHOOL.INFLATION_TITLE": "Inflazione",

@@ -40,6 +40,8 @@ import {
   IncomeExpense,
 } from '../income-expenses/model/income-expense';
 import { patchInflationRateDescription } from 'src/app/shared/utils/escalation-rate-utils';
+import { InsuranceExpenseTooltipDirective } from '../income-expenses/insurance-expense-tooltip/insurance-expense-tooltip.directive';
+import { SavingPotType } from '../saving-pots/models/saving-pots.model';
 
 @Component({
   imports: [
@@ -56,6 +58,7 @@ import { patchInflationRateDescription } from 'src/app/shared/utils/escalation-r
     ThousandSeparatorPipe,
     ToastrModule,
     TranslateModule,
+    InsuranceExpenseTooltipDirective,
   ],
   providers: [ToastrService],
   selector: 'app-withdrawals-contributions',
@@ -63,7 +66,7 @@ import { patchInflationRateDescription } from 'src/app/shared/utils/escalation-r
   styleUrl: './withdrawals-contributions.component.scss',
 })
 export class WithdrawalsContributionsComponent {
-  displayedColumns: string[] = ['position', 'name', 'action'];
+  displayedColumns: string[] = ['position', 'name', 'startEnd', 'action'];
   contributionDataSource: MatTableDataSource<FundsViewModel> =
     new MatTableDataSource(new Array<FundsViewModel>());
   withdrawalDataSource: MatTableDataSource<FundsViewModel> =
@@ -84,6 +87,7 @@ export class WithdrawalsContributionsComponent {
     totalWithdrawals: 0,
   };
   private savingPotNameById: Record<string, string> = {};
+  private savingPotTypeById: Record<string, SavingPotType> = {};
 
   constructor(
     private dialog: MatDialog,
@@ -252,9 +256,24 @@ export class WithdrawalsContributionsComponent {
     }
   }
 
+  isPensionFundItem(item: FundsViewModel): boolean {
+    return this.savingPotTypeById[item?.associatedSavingPotId] === SavingPotType.PensionFund;
+  }
+
+  isNonEditableItem(item: FundsViewModel): boolean {
+    return !!item.sourceIncomeId || this.isPensionFundItem(item);
+  }
+
   updateContributionClicked(item: FundsViewModel) {
     if (item.sourceIncomeId) {
       this.toastr.info('Edit from Incomes section', 'View only');
+      return;
+    }
+    if (this.isPensionFundItem(item)) {
+      this.toastr.info(
+        this.translate.instant('FLOWS.PENSION_FUND_CONTRIBUTION_TOOLTIP'),
+        this.translate.instant('LABEL.VIEW_ONLY', { defaultValue: 'View only' }),
+      );
       return;
     }
     const dialogRef = this.dialog.open(AddContributionComponent, {
@@ -290,6 +309,13 @@ export class WithdrawalsContributionsComponent {
   }
 
   updateWithdrawalClicked(item: FundsViewModel) {
+    if (this.isPensionFundItem(item)) {
+      this.toastr.info(
+        this.translate.instant('FLOWS.PENSION_FUND_WITHDRAWAL_TOOLTIP'),
+        this.translate.instant('LABEL.VIEW_ONLY', { defaultValue: 'View only' }),
+      );
+      return;
+    }
     const dialogRef = this.dialog.open(AddWithdrawalComponent, {
       width: '612px',
       disableClose: true,
@@ -352,6 +378,13 @@ export class WithdrawalsContributionsComponent {
       this.toastr.info('Edit from Incomes section to remove', 'View only');
       return;
     }
+    if (this.isPensionFundItem(element)) {
+      this.toastr.info(
+        this.translate.instant('FLOWS.PENSION_FUND_CONTRIBUTION_TOOLTIP'),
+        this.translate.instant('LABEL.VIEW_ONLY', { defaultValue: 'View only' }),
+      );
+      return;
+    }
     this.withdrawalsContributionsHttpService
       .deleteContributions(this.selectedCashflow.id, element)
       .subscribe((res) => {
@@ -360,6 +393,13 @@ export class WithdrawalsContributionsComponent {
   }
 
   deleteWithdrawal(element: FundsViewModel) {
+    if (this.isPensionFundItem(element)) {
+      this.toastr.info(
+        this.translate.instant('FLOWS.PENSION_FUND_WITHDRAWAL_TOOLTIP'),
+        this.translate.instant('LABEL.VIEW_ONLY', { defaultValue: 'View only' }),
+      );
+      return;
+    }
     this.withdrawalsContributionsHttpService
       .deleteWithdrawals(this.selectedCashflow.id, element)
       .subscribe((res) => {
@@ -376,6 +416,22 @@ export class WithdrawalsContributionsComponent {
       this.contributionWithdrawal.withdrawals,
     );
     this.updateContributionSummary();
+  }
+
+  getStartEndLabel(item: FundsViewModel): string {
+    const startYear = item.start?.year ?? 0;
+    const endYear = item.end?.year ?? 0;
+    const startAge = item.start?.age ?? 0;
+    const endAge = item.end?.age ?? 0;
+
+    const startStr = startYear > 0 && startAge > 0
+      ? `${startYear} (${startAge})`
+      : startYear > 0 ? `${startYear}` : '–';
+    const endStr = endYear > 0 && endAge > 0
+      ? `${endYear} (${endAge})`
+      : endYear > 0 ? `${endYear}` : '–';
+
+    return `${startStr} → ${endStr}`;
   }
 
   getContributionDisplayDescription(item: FundsViewModel): string {
@@ -437,12 +493,15 @@ export class WithdrawalsContributionsComponent {
   }
 
   private rebuildSavingPotNameMap(): void {
-    const map: Record<string, string> = {};
+    const nameMap: Record<string, string> = {};
+    const typeMap: Record<string, SavingPotType> = {};
     for (const pot of this.savingsPots?.clientSavings ?? []) {
       if (!pot?.id) continue;
-      map[pot.id] = (pot.name ?? '').toString();
+      nameMap[pot.id] = (pot.name ?? '').toString();
+      typeMap[pot.id] = pot.type;
     }
-    this.savingPotNameById = map;
+    this.savingPotNameById = nameMap;
+    this.savingPotTypeById = typeMap;
   }
 
   private updateContributionSummary(): void {
