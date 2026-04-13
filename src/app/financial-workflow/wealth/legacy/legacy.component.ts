@@ -240,9 +240,24 @@ export class LegacyComponent
 
   get showTaxOnChildrenSection(): boolean {
     return (
+      this.activeScenario === ScenarioType.BothDie &&
+      !!this.scenarioResult &&
+      this.scenarioResult.totalTax > 0
+    );
+  }
+
+  get isOnlyClientDeceased(): boolean {
+    return this.activeScenario === ScenarioType.ClientDies;
+  }
+
+  get isOnlyPartnerDeceased(): boolean {
+    return this.activeScenario === ScenarioType.PartnerDies;
+  }
+
+  get showTaxOnCoupleLink(): boolean {
+    return (
       (this.activeScenario === ScenarioType.ClientDies ||
-        this.activeScenario === ScenarioType.PartnerDies ||
-        this.activeScenario === ScenarioType.BothDie) &&
+        this.activeScenario === ScenarioType.PartnerDies) &&
       !!this.scenarioResult &&
       this.scenarioResult.totalTax > 0
     );

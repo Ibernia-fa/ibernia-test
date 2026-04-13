@@ -73,6 +73,10 @@ $line-w: 2px;
   border-radius: 12px;
   border: 1px solid #0000001a;
   min-height: 220px;
+
+  &:not(:has(.branch-parents, .children-section, .sibling-node, .other-members)) {
+    min-height: max(220px, calc(100vh - 400px));
+  }
   overflow-x: auto;
   width: 100%;
   position: relative;
@@ -304,6 +308,26 @@ $line-w: 2px;
 
 .link-line {
   display: none;
+}
+
+.couple-link--spread {
+  // justify-content: space-evenly;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.couple-tax-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  z-index: 1;
+  background-color: white;
+}
+
+.couple-pct-badge {
+  z-index: 1;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -630,6 +654,14 @@ $line-w: 2px;
   font-weight: 700;
   color: #10b981;
   font-family: "Ubuntu", serif;
+
+  .tree-node:has(.avatar-clientsibling) & {
+    color: #47c9f4;
+  }
+
+  .tree-node:has(.avatar-partnersibling) & {
+    color: #ecc125;
+  }
 }
 
 .child-total {
