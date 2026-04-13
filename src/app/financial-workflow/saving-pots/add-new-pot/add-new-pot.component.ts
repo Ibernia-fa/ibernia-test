@@ -138,6 +138,7 @@ export class AddNewPotComponent {
   dialogEndCalendarYear: number;
   isCashPotEditMode: boolean;
   userReturnRate: any = 3.5;
+  pensionFundReturnRate: any = 4;
   /** Mat slider thumb binding (must be defined — template uses [value]). */
   sliderReturnRate = 0;
   /** Return rate text field next to slider (numeric part only; % is separate in UI). */
@@ -191,6 +192,7 @@ export class AddNewPotComponent {
     ).trim();
     this.clientBirthYear = moment(data.clientBirthDate).year();
     this.userReturnRate = data.returnRate;
+    this.pensionFundReturnRate = data.pensionFundReturnRate ?? 4;
     const birthDate = new Date(data.clientBirthDate);
     const forecastStart = data.forecastStartDate
       ? new Date(data.forecastStartDate)
@@ -259,12 +261,16 @@ export class AddNewPotComponent {
       defaultType = this.selectedPot?.name || 'Investment';
     }
 
+    const defaultReturnRate = defaultType === 'Pension fund'
+      ? this.normalizeReturnRate(this.pensionFundReturnRate)
+      : this.normalizeReturnRate(this.userReturnRate);
+
     this.savingsForm = this.fb.group({
       name: [defaultType, Validators.required],
       currency: [this.clientPreferredCurrency, Validators.required],
       amount: [0, [Validators.required, this.minPositiveValue()]],
       customName: [''],  // For Custom pots
-      returnRate: [this.normalizeReturnRate(this.userReturnRate)],
+      returnRate: [defaultReturnRate],
       // lockPot: [true],
       lockPot: [defaultType === 'Pension fund'],  // Auto-check for Pension fund only
       start: [data.forecastStartDateYear, [calendarYearOrEventRefValidator()]],
@@ -738,6 +744,21 @@ onAmountBlur(e: Event) {
       this.selectedNameIconUrl = cusEvent?.iconUrl ?? '';
     }
     
+    // Switch return rate default based on pot type
+    if (!this.isEditWorkflow) {
+      if (name === 'Pension fund') {
+        this.savingsForm.get('returnRate')?.setValue(
+          this.normalizeReturnRate(this.pensionFundReturnRate),
+          { emitEvent: true }
+        );
+      } else if (name !== 'Cash') {
+        this.savingsForm.get('returnRate')?.setValue(
+          this.normalizeReturnRate(this.userReturnRate),
+          { emitEvent: true }
+        );
+      }
+    }
+
     // Auto-tick lockPot for Pension fund, untick for other types
     if (name === 'Pension fund') {
       if (!this.isEditWorkflow) {
