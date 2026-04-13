@@ -282,9 +282,20 @@
           }
 
           @for (income of incomes; track trackByIncomeId; let i = $index) {
-            <mat-card-content class="income-items">
+            <mat-card-content
+              class="income-items"
+              [class.insurance-expense-tooltip-host]="
+                income.icon === 'pension-fund'
+              "
+              [appInsuranceExpenseTooltip]="
+                income.icon === 'pension-fund'
+                  ? ('INCOME_EXPENSE.PENSION_FUND_INCOME_TOOLTIP' | translate)
+                  : ''
+              "
+            >
               <div
-                class="dragable-card d-flex align-items-center justify-content-between cursor-pointer"
+                class="dragable-card d-flex align-items-center justify-content-between"
+                [class.cursor-pointer]="income.icon !== 'pension-fund'"
                 (click)="updateIncomeClicked(income)"
               >
                 <div class="stats-main-wrapper">

@@ -409,7 +409,8 @@ onAmountBlur(e: Event) {
       this.round2(this.selectedPot.returnRate),
       { emitEvent: false }
     );
-    this.savingsForm.get('lockPot')?.patchValue(this.selectedPot.hasPotLocked, { emitEvent: false });
+    const isPensionFundEdit = this.selectedPot.name === 'Pension fund';
+    this.savingsForm.get('lockPot')?.patchValue(isPensionFundEdit ? true : this.selectedPot.hasPotLocked, { emitEvent: false });
     this.savingsForm.get('start')?.patchValue(this.selectedPot.lockedFrom?.year || this.forecastStartDateYear, { emitEvent: false });
     this.savingsForm.get('end')?.patchValue(
       this.selectedPot.lockedTill?.year || this.dialogEndCalendarYear,
@@ -960,7 +961,8 @@ onAmountBlur(e: Event) {
   const real = this.savingsForm.get('name')?.value !== 'Cash'
     ? this.round2(rr - this.inflationRate)
     : 0;
-    const isPotLocked = this.savingsForm.get('lockPot')?.value;
+    const isPensionFund = this.savingsForm.get('name')?.value === 'Pension fund';
+    const isPotLocked = isPensionFund ? true : this.savingsForm.get('lockPot')?.value;
     if (this.isCashTypeSelected) {
       const selectedOwnership =
         (this.savingsForm.get('ownership')?.value ?? SavingPotOwnership.Joint) as SavingPotOwnership;
@@ -1062,7 +1064,7 @@ onAmountBlur(e: Event) {
         },
         hasCommission: this.savingsForm.get('commissions')?.value,
         orderNumber: this.isEditWorkflow ? this.selectedPot.orderNumber : 0,
-        hasPotLocked: this.savingsForm.get('lockPot')?.value,
+        hasPotLocked: isPotLocked,
         iconUrl: this.savingsForm.get('name')?.value !== 'Custom'
           ? this.savingPotValues.find(
             (x) => this.savingsForm.get('name')?.value === x.name
