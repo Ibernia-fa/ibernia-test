@@ -9,6 +9,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MaterialModule } from '../material.module';
 import { MatDialogModule } from '@angular/material/dialog';
+import { TranslateModule } from '@ngx-translate/core';
 
 
 @NgModule({
@@ -24,7 +25,8 @@ import { MatDialogModule } from '@angular/material/dialog';
         MaterialModule,
     
     ReactiveFormsModule,
-    MatDialogModule
+    MatDialogModule,
+    TranslateModule
   ],
     exports: [DefaultPreferanceComponent] 
 })

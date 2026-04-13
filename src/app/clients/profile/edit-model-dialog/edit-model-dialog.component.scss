@@ -2,11 +2,11 @@
   flex: 1;
 }
 
-.slider-wrapper {
-  .mat-mdc-slider {
-    margin: 0 !important;
-  }
-}
+// .slider-wrapper {
+//   .mat-mdc-slider {
+//     margin: 0 !important;
+//   }
+// }
 
 .percentage-field {
   flex-basis: 98px;
@@ -14,6 +14,13 @@
 
 ::ng-deep .infilation-check .mat-mdc-form-field-subscript-wrapper {
   display: none !important;
+}
+
+.plan-duration-field {
+  input:disabled,
+  input.mat-mdc-input-element:disabled {
+    cursor: not-allowed;
+  }
 }
 
 .custom-rate-input {

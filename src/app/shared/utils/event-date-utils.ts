@@ -12,5 +12,14 @@ export function resolveYear(val: any, eventsList: any[] | undefined | null): num
     const event = (eventsList ?? []).find((e: any) => e.id === eventId);
     return event?.start?.year ?? 0;
   }
-  return typeof val === 'number' ? val : 0;
+  if (typeof val === 'number' && Number.isFinite(val)) {
+    return val;
+  }
+  if (typeof val === 'string' && val.trim() !== '') {
+    const n = Number(val);
+    if (Number.isFinite(n)) {
+      return n;
+    }
+  }
+  return 0;
 }

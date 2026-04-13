@@ -9,12 +9,22 @@ export interface PreferencesDto {
   inflationRate: number;
   investmentReturn: number;
   pensionFundReturn: number;
+  /** % of salary used to prefill default state pension amounts. */
+  pensionReplacementRate?: number | null;
   comissionType: ComissionType;         // 1|2|3
   comissionPercentage?: number | null;  // 0..100 when Percentage/Both
   comissionAmount?: number | null;      // >0 when Amount/Both
   currency: string;
   country?: string | null;
   language?: string;
+  /** Default % p.a. for the Home financing mortgage calculator. */
+  mortgageInterestRate?: number | null;
+  /** Default % p.a. for loan-style calculator (Home/Boat financing, custom events). */
+  loanInterestRate?: number | null;
+  /** Default inheritance tax rates used by the Legacy module when tax settings are not yet customised. */
+  partnerInheritanceTaxRate?: number | null;
+  childInheritanceTaxRate?: number | null;
+  siblingInheritanceTaxRate?: number | null;
 }
 
 export interface UserProfileDto {

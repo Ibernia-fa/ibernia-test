@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { TablerIconsModule } from 'angular-tabler-icons';
 import { ClientHttpService } from '../services/client-http.service';
@@ -50,7 +50,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { SavingsPotsHttpService } from 'src/app/financial-workflow/saving-pots/services/savings-pots-http.service';
 import { CurrencySymbolPipe } from 'src/app/pipe/currency-symbol.pipe';
 import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { nextUniqueCopyPlanName } from 'src/app/shared/utils/plan-copy-name';
 
 interface SortDescriptor {
   value: string;
@@ -84,9 +85,14 @@ interface SortDescriptor {
   styleUrl: './profile.component.scss',
 })
 export class ProfileComponent {
+  private readonly destroyRef = inject(DestroyRef);
+
   clientId: string;
   client: Client | null;
   birthDate: Date | undefined;
+
+  /** `DatePipe` locale for formatted birth date (matches UI language). */
+  dateLocale = 'en';
   cashflows: Array<Cashflow> = [];
   preferredCurrency: string | undefined;
   totalSavings: string = '0';
@@ -105,11 +111,22 @@ export class ProfileComponent {
     private savingsPotsHttpService: SavingsPotsHttpService,
     private questionnaireHttpService: QuestionnaireHttpService,
     private store: Store,
+    private translate: TranslateService,
   ) {
+    this.dateLocale = this.localeFromLang(this.translate.currentLang);
+    this.translate.onLangChange
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((e) => {
+        this.dateLocale = this.localeFromLang(e.lang);
+      });
     this.getClient();
   }
 
   ngOnInit() {}
+
+  private localeFromLang(lang: string | undefined): string {
+    return lang?.toLowerCase().startsWith('it') ? 'it' : 'en';
+  }
 
   onEditClicked() {
     const dialogRef = this.dialog.open(ClientEditComponent, {
@@ -299,20 +316,27 @@ export class ProfileComponent {
 
   onCopyModelClicked(cashflow: Cashflow) {
     this.isLoaderVisible = true;
-    cashflow.name = 'Copy of ' + cashflow.name;
+    const copyOfLabel = this.translate.instant('LABEL.COPY_OF');
+    const existingNames = this.cashflows.map((c) => c.name);
+    const newName = nextUniqueCopyPlanName(
+      cashflow.name,
+      existingNames,
+      copyOfLabel,
+    );
+    const payload: Cashflow = { ...cashflow, name: newName };
 
     this.cashflowHttpService
-      .copyCashflow(cashflow)
+      .copyCashflow(payload)
       .pipe(
         filter((res) => !!res),
         catchError((err) => {
           console.error('An error occurred while cloning cashflow', err);
-          this.toastr.error('An error occurred while cloning plan');
+          this.toastr.error(this.translate.instant('TOAST.ERROR_CLONING_PLAN'));
           throw err;
         }),
       )
       .subscribe((res) => {
-        this.toastr.success('Plan cloned successfully');
+        this.toastr.success(this.translate.instant('TOAST.PLAN_CLONED'));
         this.getCashflows();
       });
   }
@@ -321,7 +345,7 @@ export class ProfileComponent {
     const dialogRef = this.dialog.open(DialogComponent, {
       data: {
         action: 'Delete',
-        text: 'Are you sure you want to delete this plan?',
+        text: this.translate.instant('CONFIRM.DELETE_PLAN'),
         cashflowId,
       },
       width: '460px',
@@ -340,12 +364,12 @@ export class ProfileComponent {
       .deleteCashflow(cashflowId)
       .pipe(
         map((res) => {
-          this.toastr.success('Plan deleted successfully', 'Success!');
+          this.toastr.success(this.translate.instant('TOAST.PLAN_DELETED'), this.translate.instant('LABEL.SUCCESS'));
           this.getCashflows();
         }),
         catchError((err) => {
           console.error(err);
-          this.toastr.error('An error occured while deleting plan', 'Error!');
+          this.toastr.error(this.translate.instant('TOAST.ERROR_DELETING_PLAN'), this.translate.instant('LABEL.ERROR'));
           throw err;
         }),
       )
@@ -385,4 +409,18 @@ export class ProfileComponent {
     { value: 'asc', viewValue: 'Ascending' },
     { value: 'desc', viewValue: 'Descending' },
   ];
+
+  /** Partner row is shown when partner details exist with at least a first or last name. */
+  get hasPartner(): boolean {
+    const p = this.client?.partnerDetail;
+    if (!p) return false;
+    return !!(p.firstName?.trim() || p.lastName?.trim());
+  }
+
+  get partnerBirthDate(): Date | undefined {
+    const raw = this.client?.partnerDetail?.birthDate as Date | string | number | undefined | null;
+    if (raw == null) return undefined;
+    if (typeof raw === 'string' && raw.trim() === '') return undefined;
+    return raw instanceof Date ? raw : new Date(raw);
+  }
 }

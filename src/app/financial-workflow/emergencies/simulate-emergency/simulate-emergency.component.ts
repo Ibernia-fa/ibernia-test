@@ -10,11 +10,11 @@ import { MatCardModule } from '@angular/material/card';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { provideNativeDateAdapter } from '@angular/material/core';
-import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 import moment from 'moment';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { allCountries } from 'src/app/clients/models/country';
 import { Client, ClientViewModel } from 'src/app/clients/models/client';
 import { Cashflow } from 'src/app/clients/models/cashflow';
@@ -24,6 +24,19 @@ import { Cycle, EscalationRate, FinancialTimeline } from '../../timeline/models/
 import { SimulateEmergencyModel } from '../models/simulate-emergency.model';
 import { EmergenciesHttpService } from '../services/emergencies-http.service';
 import { SavingsBarStackedChartComponent } from '../../reports/savings-bar-stacked-chart/savings-bar-stacked-chart.component';
+import { getAmountCycleLabel } from 'src/app/shared/utils/amount-cycle-label';
+import { TranslateIncomeExpenseLabelPipe } from 'src/app/core/pipes/translate-income-expense-label.pipe';
+import { IncomeDisplayLabelContext } from 'src/app/shared/utils/income-display-label';
+import { TranslateEscalationDescriptionPipe } from 'src/app/core/pipes/translate-escalation-description.pipe';
+import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
+import { translateTimelineEventDisplayName } from 'src/app/shared/utils/timeline-event-display-name';
+import {
+  getCashflowDialogEndCalendarYear,
+  getCompletedYearsAgeAtDate,
+  getPersistedAgeForCalendarYear,
+  getProjectionColumnAgeLabel,
+} from 'src/app/shared/utils/client-age-at-reference';
+import { resolveEscalationMatch } from 'src/app/shared/utils/escalation-rate-utils';
 
 @Component({
   selector: 'simulate-emergency',
@@ -40,9 +53,11 @@ import { SavingsBarStackedChartComponent } from '../../reports/savings-bar-stack
     MatCheckboxModule,
     MatSliderModule,
     ReactiveFormsModule,
-    ThousandSeparatorPipe,
     ThousandSeparatorInputDirective,
-    SavingsBarStackedChartComponent
+    SavingsBarStackedChartComponent,
+    TranslateModule,
+    TranslateIncomeExpenseLabelPipe,
+    TranslateEscalationDescriptionPipe,
   ],
   providers: [provideNativeDateAdapter()],
   templateUrl: './simulate-emergency.component.html',
@@ -51,8 +66,7 @@ import { SavingsBarStackedChartComponent } from '../../reports/savings-bar-stack
 export class SimulateEmergencyComponent implements OnDestroy {
   @ViewChild('amountInput') amountInput?: ElementRef<HTMLInputElement>;
   onAmountInput(rawValue: string) {
-    const { parseFormattedNumber } = require('src/app/shared/utils/number-utils');
-    const value = parseFormattedNumber(rawValue);
+    const value = parseFormattedNumber(rawValue, this.translate.currentLang);
     this.simulateEmergencyForm.get('amount')?.setValue(value);
   }
 
@@ -79,6 +93,7 @@ export class SimulateEmergencyComponent implements OnDestroy {
   forecastStartDate: Date;
   forecastEndDateYear: number;
   forecastStartDateYear: number;
+  dialogEndCalendarYear = 0;
 
   isSimulating = false;
   isSimulationCompleted = false;
@@ -101,14 +116,24 @@ export class SimulateEmergencyComponent implements OnDestroy {
     categories: string[];
     timelineEvents: any[];
   } | null = null;
+  simulationChartHeight: number = 420;
 
+  get incomeDisplayLabelContext(): IncomeDisplayLabelContext {
+    const c = this.client;
+    return {
+      hasPartner: !!c?.partnerDetail,
+      clientFirstName: c?.clientDetails?.firstName ?? '',
+      partnerFirstName: c?.partnerDetail?.firstName ?? '',
+    };
+  }
 
   constructor(
     private dialogRef: MatDialogRef<SimulateEmergencyComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private fb: FormBuilder,
     private emergenciesHttpService: EmergenciesHttpService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private translate: TranslateService,
   ) {
     this.client = data.client;
     this.cashflow = data.cashflow;
@@ -129,22 +154,24 @@ export class SimulateEmergencyComponent implements OnDestroy {
 
     this.clientBirthYear = moment(this.clientBirthDate).year();
     const birthDate = new Date(this.clientBirthDate);
-    const forecastStart = new Date(this.forecastStartDateYear, 0, 1);
-    let age = forecastStart.getFullYear() - birthDate.getFullYear();
-    const monthDiff = forecastStart.getMonth() - birthDate.getMonth();
-    const dayDiff = forecastStart.getDate() - birthDate.getDate();
+    const forecastStart = this.forecastStartDate
+      ? new Date(this.forecastStartDate)
+      : new Date(this.forecastStartDateYear, 0, 1);
+    this.clientAge = getCompletedYearsAgeAtDate(birthDate, forecastStart);
 
-    if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
-      age--;
+    const resolvedEndYear = getCashflowDialogEndCalendarYear(
+      data.clientBirthDate,
+      data.cashflow?.planDuration,
+      data.forecastEndDateYear,
+    );
+    let endYear = Number.isFinite(resolvedEndYear)
+      ? resolvedEndYear
+      : Number(data.forecastEndDateYear);
+    if (!Number.isFinite(endYear)) {
+      endYear = this.forecastStartDateYear;
     }
-
-    this.clientAge = age;
-
-    if (this.forecastStartDateYear - this.clientBirthYear > this.clientAge)
-      this.clientBirthYear = this.clientBirthYear + 1
-
-    const endYear = data.forecastEndDateYear + 1;
-    const iterations = endYear - data.forecastStartDateYear + 1;
+    this.dialogEndCalendarYear = endYear;
+    const iterations = endYear - this.forecastStartDateYear + 1;
 
     for (let index = 0; index < iterations; index++) {
       const element = this.forecastStartDateYear + index;
@@ -159,7 +186,7 @@ export class SimulateEmergencyComponent implements OnDestroy {
       cycle: [this.amountCycles[0].id, Validators.required],
       start: ['', Validators.required],
       end: [''],
-      escalationRate: [this.escalationRates[0]?.value, Validators.required],
+      escalationRate: [this.escalationRates[0]?.description ?? '', Validators.required],
       customEscalationRate: [''],
       stopIncome: [false],
       stoppedIncomeId: [null]
@@ -207,6 +234,7 @@ export class SimulateEmergencyComponent implements OnDestroy {
 
     this.simulateEmergencyForm.setValidators(this.endOnOrAfterStartValidator());
     this.simulateEmergencyForm.updateValueAndValidity({ emitEvent: false });
+    this.selectedEscalationDescription = this.escalationRates[0]?.description ?? '';
     this.onCycleValueChange(this.amountCycles[0].id);
 
     if (this.emergencyExpense) {
@@ -276,16 +304,39 @@ export class SimulateEmergencyComponent implements OnDestroy {
     escalationControl?.updateValueAndValidity();
   }
 
+  getCycleLabel(cycle: { description?: string } | null | undefined): string {
+    return getAmountCycleLabel(cycle, this.translate);
+  }
+
+  getEmergencyLabel(emergency: { name?: string } | null | undefined): string {
+    const raw = (emergency?.name ?? '').toString().trim();
+    if (!raw) return '';
+
+    const normalized = raw.toLowerCase();
+    const key =
+      normalized === 'home'
+        ? 'EMERGENCIES.TYPE_HOME'
+        : normalized === 'life'
+          ? 'EMERGENCIES.TYPE_LIFE'
+          : normalized === 'disability'
+            ? 'EMERGENCIES.TYPE_DISABILITY'
+            : normalized === 'health'
+              ? 'EMERGENCIES.TYPE_HEALTH'
+              : normalized === 'natural hazards'
+                ? 'EMERGENCIES.TYPE_NATURAL_HAZARDS'
+                : normalized === 'will'
+                  ? 'EMERGENCIES.TYPE_WILL'
+                  : null;
+
+    return key ? this.translate.instant(key) : raw;
+  }
+
+  getTimelineEventLabel(rawName: string): string {
+    return translateTimelineEventDisplayName(this.translate, rawName);
+  }
+
   onEscalationRateChange(event: MatSelectChange): void {
-    const selectedOption = event.source.selected;
-
-    let description: string | null = null;
-
-    if (Array.isArray(selectedOption)) {
-      description = selectedOption[0]?.viewValue ?? null;
-    } else {
-      description = selectedOption?.viewValue ?? null;
-    }
+    const description = (event.value as string) ?? '';
 
     this.selectedEscalationDescription = description;
     const customControl = this.simulateEmergencyForm.get('customEscalationRate');
@@ -305,20 +356,22 @@ export class SimulateEmergencyComponent implements OnDestroy {
     this.simulateEmergencyForm.markAsDirty();
 
     if (this.simulateEmergencyForm.valid) {
-      const isCustomEscalation = this.selectedEscalationDescription === 'Increases at custom rate';
+      const selectedEscDesc = this.simulateEmergencyForm.get('escalationRate')?.value as string;
+      const isCustomEscalation = selectedEscDesc === 'Increases at custom rate';
       const escalationRateValue = isCustomEscalation
         ? this.simulateEmergencyForm.get('customEscalationRate')?.value
-        : this.simulateEmergencyForm.get('escalationRate')?.value;
-      const selectedEscalationRateValue = this.simulateEmergencyForm.get('escalationRate')?.value;
-      const matchedRate = this.escalationRates.find((x) => x.value === selectedEscalationRateValue);
+        : this.escalationRates.find((x) => x.description === selectedEscDesc)?.value;
+      const matchedRate = !isCustomEscalation
+        ? this.escalationRates.find((x) => x.description === selectedEscDesc)
+        : undefined;
       const escalationRateModel = isCustomEscalation
         ? {
           description: 'Increases at custom rate',
           value: escalationRateValue
         }
         : (matchedRate ?? {
-          description: this.selectedEscalationDescription ?? '',
-          value: selectedEscalationRateValue
+          description: selectedEscDesc ?? '',
+          value: escalationRateValue
         });
       const stopIncome = this.simulateEmergencyForm.get('stopIncome')?.value;
       const stoppedIncomeId = this.simulateEmergencyForm.get('stoppedIncomeId')?.value;
@@ -326,10 +379,11 @@ export class SimulateEmergencyComponent implements OnDestroy {
       // convert amount back to number if it's still a formatted string
       const rawAmountControl = this.simulateEmergencyForm.get('amount');
       if (rawAmountControl) {
-        const { parseFormattedNumber } = require('src/app/shared/utils/number-utils');
         const currentValue = rawAmountControl.value;
-        // only convert if it's a string with commas
-        rawAmountControl.setValue(parseFormattedNumber(currentValue), { emitEvent: false });
+        rawAmountControl.setValue(
+          parseFormattedNumber(currentValue, this.translate.currentLang),
+          { emitEvent: false },
+        );
       }
       const rawAmount = this.simulateEmergencyForm.get('amount')?.value;
 
@@ -352,7 +406,13 @@ export class SimulateEmergencyComponent implements OnDestroy {
           age:
             this.simulateEmergencyForm.get('start')?.value !== null &&
               this.simulateEmergencyForm.get('start')?.value !== ''
-              ? this.simulateEmergencyForm.get('start')?.value - this.clientBirthYear
+              ? getPersistedAgeForCalendarYear(
+                  this.clientBirthDate,
+                  this.simulateEmergencyForm.get('start')?.value,
+                  this.forecastStartDate,
+                  this.data.cashflow?.planDuration,
+                  this.dialogEndCalendarYear,
+                )
               : 0,
           year:
             this.simulateEmergencyForm.get('start')?.value !== null &&
@@ -364,7 +424,13 @@ export class SimulateEmergencyComponent implements OnDestroy {
           age:
             this.simulateEmergencyForm.get('end')?.value !== null &&
               this.simulateEmergencyForm.get('end')?.value !== ''
-              ? this.simulateEmergencyForm.get('end')?.value - this.clientBirthYear
+              ? getPersistedAgeForCalendarYear(
+                  this.clientBirthDate,
+                  this.simulateEmergencyForm.get('end')?.value,
+                  this.forecastStartDate,
+                  this.data.cashflow?.planDuration,
+                  this.dialogEndCalendarYear,
+                )
               : 0,
           year:
             this.simulateEmergencyForm.get('end')?.value !== null &&
@@ -417,20 +483,22 @@ export class SimulateEmergencyComponent implements OnDestroy {
 
             this.alignSeriesStructure();
 
+            this.activeTab = 'baseline';
+            this.displayedReport = this.baselineResult;
             this.dialogRef.updateSize('92vw', '88vh');
+            this.simulationChartHeight = Math.max(Math.round(window.innerHeight * 0.88 - 150), 300);
             this.emergencyExpense = simulateEmergency;
             this.emergencyExpense.id = res.emergencyExpenseId;
             this.isSimulationCompleted = true;
             this.isUpdateParentItem = true;
 
             this.activeTab = 'simulated';
-            // Fresh reference + animateUpdates so bars animate like Scenario Lab / lifetime report.
-            this.displayedReport = this.cloneReportForChart(simulated);
+            this.displayedReport = this.simulationResult;
           },
           error: (err: any) => {
             this.isSimulating = false;
             console.error(err);
-            this.toastr.error('Failed to simulate cover', 'Error');
+            this.toastr.error(this.translate.instant('ERROR.FAILED_SIMULATE_COVER'), this.translate.instant('LABEL.ERROR'));
           }
         });
     }
@@ -450,20 +518,7 @@ export class SimulateEmergencyComponent implements OnDestroy {
 
   switchToTab(tab: 'baseline' | 'simulated'): void {
     this.activeTab = tab;
-    const source = tab === 'baseline' ? this.baselineResult : this.simulationResult;
-    this.displayedReport = source ? this.cloneReportForChart(source) : null;
-  }
-
-  private cloneReportForChart(report: {
-    categories: string[];
-    series: any[];
-    timelineEvents?: any[];
-  }) {
-    return {
-      categories: [...report.categories],
-      series: report.series.map((s: any) => ({ ...s, data: [...s.data] })),
-      timelineEvents: report.timelineEvents?.map((e: any) => ({ ...e })) ?? [],
-    };
+    this.displayedReport = tab === 'baseline' ? this.baselineResult : this.simulationResult;
   }
 
   private alignSeriesStructure(): void {
@@ -471,17 +526,49 @@ export class SimulateEmergencyComponent implements OnDestroy {
     const baseline = this.baselineResult;
     const simulated = this.simulationResult;
 
+    // Unify categories so both reports share the same x-axis
+    // (prevents full chart rebuild when switching tabs).
+    const allCategoriesSet = new Set<string>([
+      ...baseline.categories.map(String),
+      ...simulated.categories.map(String),
+    ]);
+    const unifiedCategories = Array.from(allCategoriesSet).sort(
+      (a, b) => Number(a) - Number(b),
+    );
+
+    const padReport = (report: typeof baseline, oldCategories: string[]) => {
+      const insertionMap = unifiedCategories.map((c) => oldCategories.indexOf(c));
+      report.series.forEach((s: any) => {
+        s.data = insertionMap.map((idx) => (idx >= 0 ? s.data[idx] : 0));
+      });
+      report.categories = [...unifiedCategories];
+    };
+
+    if (baseline.categories.join(',') !== unifiedCategories.join(',')) {
+      padReport(baseline, baseline.categories.map(String));
+    }
+    if (simulated.categories.join(',') !== unifiedCategories.join(',')) {
+      padReport(simulated, simulated.categories.map(String));
+    }
+
+    // Unify series names so both reports have the same stacked structure.
     const allNames: string[] = [];
     [...simulated.series, ...baseline.series].forEach((s: any) => {
       if (!allNames.includes(s.name)) allNames.push(s.name);
     });
 
-    const categoryCount = baseline.categories.length;
+    const categoryCount = unifiedCategories.length;
     allNames.forEach(name => {
       if (!baseline.series.find((s: any) => s.name === name)) {
         const ref = simulated.series.find((s: any) => s.name === name);
         if (ref) {
           baseline.series.push({ ...ref, data: new Array(categoryCount).fill(0) });
+        }
+      }
+      if (!simulated.series.find((s: any) => s.name === name)) {
+        const ref = baseline.series.find((s: any) => s.name === name);
+        if (ref) {
+          simulated.series.push({ ...ref, data: new Array(categoryCount).fill(0) });
         }
       }
     });
@@ -492,12 +579,7 @@ export class SimulateEmergencyComponent implements OnDestroy {
   }
 
   get isCustomEscalationSelected(): boolean {
-    const selectedValue = this.simulateEmergencyForm.get('escalationRate')?.value;
-
-    // find exact match by both value and description
-    return this.escalationRates.some(e =>
-      e.value === selectedValue && e.description === 'Increases at custom rate'
-    );
+    return this.simulateEmergencyForm.get('escalationRate')?.value === 'Increases at custom rate';
   }
 
   private endOnOrAfterStartValidator(): ValidatorFn {
@@ -530,7 +612,10 @@ export class SimulateEmergencyComponent implements OnDestroy {
     const cycleId = expense.amount?.cycle?.id ?? this.amountCycles[0].id;
     const amount = expense.amount?.amount ?? 0;
 
-    const matchedEscalation = this.escalationRates.find(x => x.value === expense.escalationRate?.value);
+    const matchedEscalation = resolveEscalationMatch(
+      this.escalationRates,
+      expense.escalationRate,
+    );
 
     if (
       expense.escalationRate &&
@@ -549,7 +634,7 @@ export class SimulateEmergencyComponent implements OnDestroy {
         amount,
         start: expense.start?.year ?? null,
         end: expense.end?.year ?? null,
-        escalationRate: expense.escalationRate.value,
+        escalationRate: 'Increases at custom rate',
         customEscalationRate: expense.escalationRate.value,
         stopIncome: expense.stopIncome ?? false
       }, { emitEvent: false });
@@ -565,11 +650,11 @@ export class SimulateEmergencyComponent implements OnDestroy {
         amount,
         start: expense.start?.year ?? null,
         end: expense.end?.year ?? null,
-        escalationRate: matchedEscalation?.value ?? this.escalationRates[0]?.value,
+        escalationRate: matchedEscalation?.description ?? this.escalationRates[0]?.description ?? '',
         stopIncome: expense.stopIncome ?? false
       }, { emitEvent: false });
 
-      this.selectedEscalationDescription = matchedEscalation?.description ?? '';
+      this.selectedEscalationDescription = matchedEscalation?.description ?? this.escalationRates[0]?.description ?? '';
     }
 
     this.onCycleValueChange(cycleId);
@@ -605,6 +690,17 @@ export class SimulateEmergencyComponent implements OnDestroy {
   getEndYears(): number[] {
     const startYear = this.getStartYear();
     return (this.years ?? []).filter((y) => y >= startYear);
+  }
+
+  getAgeForYear(year: number): number {
+    const a = getProjectionColumnAgeLabel(
+      this.clientBirthDate,
+      Number(year),
+      this.forecastStartDate,
+      this.data.cashflow?.planDuration,
+      this.dialogEndCalendarYear,
+    );
+    return Number.isNaN(a) ? 0 : a;
   }
 
   private buildEmergencySeries(report: any, year: string, amount: number): any {

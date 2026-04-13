@@ -1,10 +1,10 @@
-<mat-card class="ibr-new-dashboad-card">
+<mat-card class="ibr-new-dashboad-card" style="height: calc(100% - 16px)">
   <mat-card-content>
     <div class="d-flex flex-column gap-16">
       <div
         class="d-flex align-items-center justify-content-between flex-wrap gap-16 event-main-wrapper"
       >
-        <div class="d-flex flex-column gap-6" style="flex-direction: column">
+        <div class="d-flex flex-column gap-10" style="flex-direction: column">
           <h4 class="f-w-700">{{ title }}</h4>
           @if (!showOnReports) {
             <p class="m-0">
@@ -36,18 +36,20 @@
                 (dragend)="onDragEnd($event)"
                 (dragstart)="onDragStart($event, systemEvent)"
                 class="f-s-14 chip-item"
-                [class]="systemEvent.iconUrl"
+                [class]="getTimelineVisClassName(systemEvent)"
               >
                 <div class="chip-content">
                   <div class="d-flex gap-8 align-items-center">
                     <img
                       matChipAvatar
                       [src]="
-                        '/assets/images/svgs/' + systemEvent.iconUrl + '.svg'
+                        '/assets/images/svgs/' +
+                        getTimelineEventIconBase(systemEvent) +
+                        '.svg'
                       "
-                      [alt]="systemEvent.iconUrl"
+                      [alt]="getTimelineEventIconBase(systemEvent)"
                     />
-                    <p>{{ systemEvent.name }}</p>
+                    <p>{{ getTimelineChipLabel(systemEvent) }}</p>
                   </div>
                 </div>
               </mat-chip>
@@ -60,16 +62,36 @@
     <div class="ibr-timeline-wrapper">
       <div class="timeline-labels" [class.dual-axis]="showDualAxis">
         @if (showDualAxis) {
-          <p class="timeline-age-label">
-            {{ "Age" | translate }} {{ mainClientInitial }}
+          <p
+            class="timeline-client-age timeline-age-label timeline-age-label--hover-expand"
+          >
+            <span class="timeline-age-label__compact"
+              >{{ "Age" | translate }} {{ mainClientInitial }}</span
+            >
+            <span class="timeline-age-label__expanded" aria-hidden="true"
+              >{{ "Age" | translate }} {{ mainClientFirstName }}</span
+            >
           </p>
-          <p class="timeline-age-label">
-            {{ "Age" | translate }} {{ partnerInitial }}
+          <p
+            class="timeline-partner-age timeline-age-label timeline-age-label--hover-expand"
+          >
+            <span class="timeline-age-label__compact"
+              >{{ "Age" | translate }} {{ partnerInitial }}</span
+            >
+            <span class="timeline-age-label__expanded" aria-hidden="true"
+              >{{ "Age" | translate }} {{ partnerFirstName }}</span
+            >
           </p>
-          <span class="timeline-year-label">{{ "Year" | translate }}</span>
+          <span class="ibr-timeline-year-label timeline-year-label">{{
+            "Year" | translate
+          }}</span>
         } @else {
-          <p class="timeline-age-label">{{ "Age" | translate }}</p>
-          <span class="timeline-year-label">{{ "Year" | translate }}</span>
+          <p class="timeline-client-age timeline-age-label">
+            {{ "Age" | translate }}
+          </p>
+          <span class="ibr-timeline-year-label timeline-year-label">{{
+            "Year" | translate
+          }}</span>
         }
       </div>
       <div

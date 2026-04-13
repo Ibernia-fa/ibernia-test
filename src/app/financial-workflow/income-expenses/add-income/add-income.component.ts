@@ -11,7 +11,6 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 import { allCountries } from 'src/app/clients/models/country';
-import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
 import { Cycle, EscalationRate } from '../../timeline/models/financial-timeline';
 import moment from 'moment';
@@ -20,12 +19,48 @@ import { extractEventId, resolveYear } from 'src/app/shared/utils/event-date-uti
 import { IncomeExpensesHttpService } from '../services/income-expenses-http.service';
 import { WithdrawalsContributionsHttpService } from '../../withdrawals-contributions/services/withdrawals-contributions-http.service';
 import { FundsViewModel } from '../../withdrawals-contributions/model/withdrawals-contributions';
-import { ComissionType } from '../../saving-pots/models/saving-pots.model';
+import { ClientSaving, ComissionType } from '../../saving-pots/models/saving-pots.model';
+import { Client } from 'src/app/clients/models/client';
+import { formatSavingPotSelectLabel } from 'src/app/shared/utils/saving-pot-select-label';
 import { catchError, filter, finalize, switchMap, of, map } from 'rxjs';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateIncomeExpenseLabelPipe } from 'src/app/core/pipes/translate-income-expense-label.pipe';
+import { TranslateEscalationDescriptionPipe } from 'src/app/core/pipes/translate-escalation-description.pipe';
+import { getAmountCycleLabel } from 'src/app/shared/utils/amount-cycle-label';
+import { resolveEscalationMatch } from 'src/app/shared/utils/escalation-rate-utils';
 import { CommonModule } from '@angular/common';
-import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
+import { ToastrService } from 'ngx-toastr';
+import { AuthService } from 'src/app/auth/services/auth.service';
+import { SettingsService } from 'src/app/default-preferance/services/default-preferance.http.service';
+import { translateTimelineEventDisplayName } from 'src/app/shared/utils/timeline-event-display-name';
+import {
+  annualEquivalentForIncomeCycle,
+  findSalaryIncomeForStatePensionRow,
+  roundPercentOf,
+} from 'src/app/shared/utils/state-pension-salary-utils';
+import {
+  IncomeDisplayLabelContext,
+  incomeApiDescriptionToDisplayLabel,
+  isClientSalaryApiDescription,
+  isClientStatePensionApiDescription,
+  isClientInheritanceApiDescription,
+  isPartnerSalaryApiDescription,
+  isPartnerStatePensionApiDescription,
+  isPartnerInheritanceApiDescription,
+  isSalaryTypeForBonus,
+} from 'src/app/shared/utils/income-display-label';
+import {
+  getCompletedYearsAgeAtDate,
+  getPersistedAgeForCalendarYear,
+  getProjectionColumnAgeLabel,
+} from 'src/app/shared/utils/client-age-at-reference';
+import { calendarYearOrEventRefValidator } from 'src/app/shared/utils/calendar-year-or-event-ref.validator';
+import {
+  recurringEndYearNotSelected,
+  resolveCycleDescriptionForRecurringEndGuard,
+} from 'src/app/shared/utils/recurring-end-save-guard';
 
 @Component({
   selector: 'app-add-income',
@@ -43,9 +78,10 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
     MatCheckboxModule,
     ReactiveFormsModule,
     CommonModule,
-    ThousandSeparatorPipe,
     ThousandSeparatorInputDirective,
-    TranslateModule
+    TranslateModule,
+    TranslateIncomeExpenseLabelPipe,
+    TranslateEscalationDescriptionPipe,
   ],
   providers: [provideNativeDateAdapter()],
   templateUrl: './add-income.component.html',
@@ -81,7 +117,10 @@ export class AddIncomeComponent {
   forecastEndYear: number;
   isSaving = false;
   scenarioMode: boolean = false;
-  clientSavings: { id: string; name: string }[] = [];
+  /** Full list as provided by parent (may include Cash). */
+  private allSavingPots: ClientSaving[] = [];
+  /** Eligible list for inheritance investing UI (non-cash only). */
+  clientSavings: { id: string; name: string; ownership?: number | null }[] = [];
   existingContributions: any[] = [];
   private initialFormSnapshot = '';
   showPersonSelector = false;
@@ -89,37 +128,50 @@ export class AddIncomeComponent {
   clientDisplayName = '';
   partnerDisplayName = '';
   private combinedEdit: { client: FinancialViewModel; partner?: FinancialViewModel } | null = null;
+  private hasPartner = false;
+  private clientFirstName = '';
+  private partnerFirstName = '';
+  private selectedClient: Client | null = null;
+  private pensionReplacementRatePct: number = 50;
 
   constructor(
     private dialogRef: MatDialogRef<AddIncomeComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private fb: FormBuilder,
     private incomeExpenseHttpService: IncomeExpensesHttpService,
-    private withdrawalsContributionsHttpService: WithdrawalsContributionsHttpService
+    private withdrawalsContributionsHttpService: WithdrawalsContributionsHttpService,
+    private translate: TranslateService,
+    private toastr: ToastrService,
+    private auth: AuthService,
+    private settingsService: SettingsService,
   ) {
     this.scenarioMode = data.scenarioMode ?? false;
     this.incomeTypes = data.incomeType;
     this.eventsList = data.eventsList ?? [];
-    this.clientSavings = (data.clientSavings ?? []).filter((s: { name?: string }) => (s.name ?? '').toLowerCase() !== 'cash');
+    this.allSavingPots = (data.clientSavings ?? []) as ClientSaving[];
+    this.selectedClient = data.selectedClient ?? null;
+    // Keep the non-cash list for the select, but compute eligibility from the full list (so Cash never qualifies).
+    this.clientSavings = this.allSavingPots
+      .filter((s) => !this.isCashSavingPotName(s?.name))
+      .map((s) => ({
+        id: s.id as string,
+        name: (s.name ?? '').toString(),
+        ownership: s.ownership,
+      }));
     this.existingContributions = data.existingContributions ?? [];
     this.cycles = data.amountCycles;
     this.escalationRates = data.escalataionRates;
-    const isPartnerIncome = this.selectedIncome?.description === 'Salary (Partner)' || this.selectedIncome?.description === 'State pension (Partner)'
-      || data.preselectedIncomeType === 'Salary (Partner)' || data.preselectedIncomeType === 'State pension (Partner)';
-    const birthDateToUse = isPartnerIncome && data.partnerBirthDate ? data.partnerBirthDate : data.clientBirthDate;
-    this.clientBirthYear = moment(birthDateToUse).year();
-    const birthDate = new Date(birthDateToUse);
-    const forecastStart = new Date(data.forecastStartDateYear, 0, 1);
-    let age = forecastStart.getFullYear() - birthDate.getFullYear();
-    const monthDiff = forecastStart.getMonth() - birthDate.getMonth();
-    const dayDiff = forecastStart.getDate() - birthDate.getDate();
-
-    if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
-      age--;
-    }
-
-    this.clientAge = age;
-    if (data.forecastStartDateYear - this.clientBirthYear > this.clientAge) this.clientBirthYear = this.clientBirthYear + 1
+    const preselectedApi = this.displayLabelToApiDesc(data.preselectedIncomeType ?? '');
+    const isPartnerIncome =
+      isPartnerSalaryApiDescription(this.selectedIncome?.description) ||
+      isPartnerStatePensionApiDescription(this.selectedIncome?.description) ||
+      isPartnerInheritanceApiDescription(this.selectedIncome?.description) ||
+      isPartnerSalaryApiDescription(preselectedApi) ||
+      isPartnerStatePensionApiDescription(preselectedApi) ||
+      isPartnerInheritanceApiDescription(preselectedApi);
+    const usePartnerBirthDate =
+      !!isPartnerIncome && !!data.partnerBirthDate;
+    this.applyBirthDateContextForSalaryPerson(usePartnerBirthDate);
 
     this.clientPreferredCurrency = data.clientPreferredCurrency;
     this.cashflowId = data.cashflowId;
@@ -129,14 +181,25 @@ export class AddIncomeComponent {
     this.showPersonSelector = !!this.combinedEdit;
     this.clientDisplayName = data.clientFirstName || 'Person 1';
     this.partnerDisplayName = data.partnerFirstName || 'Person 2';
-    this.editingPerson = (this.selectedIncome?.description === 'Salary (Partner)' || this.selectedIncome?.description === 'State pension (Partner)') ? 'partner' : 'client';
+    this.hasPartner = !!data.hasPartner;
+    this.clientFirstName = data.clientFirstName || '';
+    this.partnerFirstName = data.partnerFirstName || '';
+    this.editingPerson =
+      isPartnerSalaryApiDescription(this.selectedIncome?.description) ||
+      isPartnerStatePensionApiDescription(this.selectedIncome?.description) ||
+      isPartnerInheritanceApiDescription(this.selectedIncome?.description)
+        ? 'partner'
+        : 'client';
 
-    this.isNameEditable = this.selectedIncome?.description != "Salary"
-      && this.selectedIncome?.description != "Salary (Partner)"
-      && this.selectedIncome?.description != "State pension"
-      && this.selectedIncome?.description != "State pension (Partner)"
-      && this.selectedIncome?.description != "Rental income"
-      && this.selectedIncome?.description != "Inheritance";
+    const selDesc = this.selectedIncome?.description ?? '';
+    this.isNameEditable =
+      !isClientSalaryApiDescription(selDesc) &&
+      !isPartnerSalaryApiDescription(selDesc) &&
+      !isClientStatePensionApiDescription(selDesc) &&
+      !isPartnerStatePensionApiDescription(selDesc) &&
+      !isClientInheritanceApiDescription(selDesc) &&
+      !isPartnerInheritanceApiDescription(selDesc) &&
+      this.selectedIncome?.description != 'Rental income';
 
     const planEndYear = this.resolvePlanEndYear(data);
     const iterations = planEndYear - data.forecastStartDateYear + 1;
@@ -146,10 +209,6 @@ export class AddIncomeComponent {
       this.years.push(element);
     }
 
-    const country = (this.data.clientCountryCode ?? '').toUpperCase();
-    this.retirementAge = (country === 'IT' || country === 'ITALY') ? 67 : 64;
-    this.retirementEventYear = this.getRetirementEventYear();
-    this.retirementYear = this.retirementEventYear ?? (this.clientBirthYear + this.retirementAge);
     this.forecastEndYear = planEndYear;
 
     const initialIncomeType = data.preselectedIncomeType && this.incomeTypes.includes(data.preselectedIncomeType)
@@ -161,9 +220,9 @@ export class AddIncomeComponent {
       currencySymbol: [this.clientPreferredCurrency, [Validators.required]],
       amount: ['', [Validators.required, this.greaterThanZero()]],
       cycle: [this.cycles[1].id, Validators.required],
-      start: ['', Validators.required],
+      start: [''],
       end: [''],
-      escalationRate: [this.escalationRates[0].value, Validators.required],
+      escalationRate: [this.escalationRates[0]?.description ?? '', Validators.required],
       customEscalationRate: [''],
       addBonus: [this.selectedIncome?.bonus?.enabled ?? false],
       bonusAmount: [{ value: this.selectedIncome?.bonus?.amount?.amount ?? 0, disabled: true }],
@@ -186,7 +245,10 @@ export class AddIncomeComponent {
       this.onCycleValueChange(this.selectedIncome.amount?.cycle?.id)
       this.incomeForm.get('description')?.patchValue(this.selectedIncome.description);
       const desc = this.selectedIncome.description;
-      if (desc === 'Salary (Partner)' || desc === 'State pension (Partner)') {
+      if (
+        isPartnerSalaryApiDescription(desc) ||
+        isPartnerStatePensionApiDescription(desc)
+      ) {
         this.incomeForm.get('description')?.disable();
       }
       this.incomeForm.get('currencySymbol')?.patchValue(this.clientPreferredCurrency);
@@ -212,15 +274,24 @@ export class AddIncomeComponent {
       if (this.selectedIncome.startEventId) {
         this.incomeForm.get('start')?.patchValue('event:' + this.selectedIncome.startEventId);
       } else {
-        this.incomeForm.get('start')?.patchValue(this.selectedIncome.start?.year);
+        const sy = Number(this.selectedIncome.start?.year);
+        const startNum = Number.isFinite(sy) && sy > 0 ? sy : null;
+        if (startNum) this.ensureYearInSelectableYears(startNum);
+        this.incomeForm.get('start')?.patchValue(startNum);
       }
       if (this.selectedIncome.endEventId) {
         this.incomeForm.get('end')?.patchValue('event:' + this.selectedIncome.endEventId);
       } else {
-        this.incomeForm.get('end')?.patchValue(this.selectedIncome.end?.year);
+        const ey = Number(this.selectedIncome.end?.year);
+        const endNum = Number.isFinite(ey) && ey > 0 ? ey : null;
+        if (endNum) this.ensureYearInSelectableYears(endNum);
+        this.incomeForm.get('end')?.patchValue(endNum);
       }
 
-      const matchedEscalation = this.escalationRates.find(x => x.value === this.selectedIncome!.escalationRate?.value);
+      const matchedEscalation = resolveEscalationMatch(
+        this.escalationRates,
+        this.selectedIncome!.escalationRate,
+      );
       const cycleId = this.selectedIncome.amount?.cycle?.id;
       const cycle = this.cycles.find(x => x.id === cycleId);
 
@@ -230,7 +301,7 @@ export class AddIncomeComponent {
 
       if (matchedEscalation) {
         // Standard escalation rate selected
-        this.incomeForm.get('escalationRate')?.patchValue(matchedEscalation.value);
+        this.incomeForm.get('escalationRate')?.patchValue(matchedEscalation.description);
         this.selectedEscalationDescription = matchedEscalation.description;
       } else if (
         this.selectedIncome!.escalationRate &&
@@ -247,7 +318,7 @@ export class AddIncomeComponent {
           value: this.selectedIncome!.escalationRate!.value
         });
 
-        this.incomeForm.get('escalationRate')?.patchValue(this.selectedIncome!.escalationRate!.value);
+        this.incomeForm.get('escalationRate')?.patchValue('Increases at custom rate');
         this.incomeForm.get('customEscalationRate')?.patchValue(this.selectedIncome!.escalationRate!.value);
         this.selectedEscalationDescription = 'Increases at custom rate';
 
@@ -257,7 +328,10 @@ export class AddIncomeComponent {
         customControl?.updateValueAndValidity();
       }
 
-      if ((this.selectedIncome?.description === 'Salary' || this.selectedIncome?.description === 'Salary (Partner)') && this.selectedIncome?.bonus) {
+      if (
+        isSalaryTypeForBonus(this.selectedIncome?.description) &&
+        this.selectedIncome?.bonus
+      ) {
         const bonus = this.selectedIncome.bonus;
         const amount = bonus.amount;
         const cycle = amount?.cycle;
@@ -275,7 +349,10 @@ export class AddIncomeComponent {
         }
       }
 
-      if (this.selectedIncome?.description === 'Inheritance') {
+      if (
+        isClientInheritanceApiDescription(this.selectedIncome?.description) ||
+        isPartnerInheritanceApiDescription(this.selectedIncome?.description)
+      ) {
         const linkedContribution = this.existingContributions.find(
           (c: any) => c.sourceIncomeId === this.selectedIncome?.id
         );
@@ -298,16 +375,18 @@ export class AddIncomeComponent {
       }
     }
 
-    if (this.isEditWorkflow
-      && this.selectedIncome?.description != null
-      && (this.selectedIncome.description == "Salary"
-        || this.selectedIncome.description == "Salary (Partner)"
-        || this.selectedIncome.description == "State pension"
-        || this.selectedIncome.description == "State pension (Partner)"
-        || this.selectedIncome.description == "Rental income"
-        || this.selectedIncome.description == "Inheritance"
-      )) {
-      this.onIncomeTypeChange(this.selectedIncome.description);
+    const sd = this.selectedIncome?.description;
+    if (
+      this.isEditWorkflow &&
+      sd != null &&
+      (isClientSalaryApiDescription(sd) ||
+        isPartnerSalaryApiDescription(sd) ||
+        isClientStatePensionApiDescription(sd) ||
+        isPartnerStatePensionApiDescription(sd) ||
+        sd === 'Rental income' ||
+        sd === 'Inheritance')
+    ) {
+      this.onIncomeTypeChange(this.selectedIncome!.description);
     }
     else if (this.isEditWorkflow && this.selectedIncome != null) {
       this.incomeForm.get('incomeType')?.patchValue('Custom');
@@ -324,6 +403,9 @@ export class AddIncomeComponent {
     this.setIsDefaultIncome();
     this.setIncomeIcon();
     this.captureInitialFormState();
+
+    // Load replacement rate for state pension prefill (fallback to 50%).
+    this.loadPensionReplacementRate();
   }
 
   autoRenameCustom(): string {
@@ -352,7 +434,7 @@ export class AddIncomeComponent {
       this.incomeForm.get('amount')?.setValue('', { emitEvent: true });
       return;
     }
-    const value = parseFormattedNumber(rawValue);
+    const value = parseFormattedNumber(rawValue, this.translate.currentLang);
     this.incomeForm.get('amount')?.setValue(value, { emitEvent: true });
   }
 
@@ -375,6 +457,7 @@ export class AddIncomeComponent {
         this.loadIncomeIntoFormForNewPartner();
       }
     }
+    this.refreshBirthContextFromCurrentDescription();
   }
 
   private loadIncomeIntoForm(income: FinancialViewModel): void {
@@ -391,14 +474,14 @@ export class AddIncomeComponent {
       bonusDate: income.bonus?.bonusDate?.year ?? null,
     });
     this.onCycleValueChange(income.amount?.cycle?.id ?? this.cycles[1]?.id);
-    const matchedEscalation = this.escalationRates.find(x => x.value === income.escalationRate?.value);
+    const matchedEscalation = resolveEscalationMatch(this.escalationRates, income.escalationRate);
     if (matchedEscalation) {
-      this.incomeForm.get('escalationRate')?.patchValue(matchedEscalation.value);
+      this.incomeForm.get('escalationRate')?.patchValue(matchedEscalation.description);
       this.selectedEscalationDescription = matchedEscalation.description;
     } else if (income.escalationRate?.description === 'Increases at custom rate') {
       this.escalationRates = this.escalationRates.filter(x => x.description !== 'Increases at custom rate');
       this.escalationRates.push({ description: 'Increases at custom rate', value: income.escalationRate?.value ?? 0 });
-      this.incomeForm.get('escalationRate')?.patchValue(income.escalationRate?.value);
+      this.incomeForm.get('escalationRate')?.patchValue('Increases at custom rate');
       this.incomeForm.get('customEscalationRate')?.patchValue(income.escalationRate?.value);
       this.selectedEscalationDescription = 'Increases at custom rate';
     }
@@ -407,15 +490,24 @@ export class AddIncomeComponent {
   }
 
   private loadIncomeIntoFormForNewPartner(): void {
-    const baseType = this.combinedEdit?.client.description === 'Salary' ? 'Salary (Partner)' : 'State pension (Partner)';
-    this.setupForPartnerBirthDate();
+    const clientDesc = this.combinedEdit?.client.description ?? '';
+    const baseType = isSalaryTypeForBonus(clientDesc)
+      ? 'Salary (Partner)'
+      : 'State pension (Partner)';
+    const isSalary = isSalaryTypeForBonus(clientDesc);
+    this.updateSalaryRetirementDefaults(true);
+    const partnerRetirementEvent = this.findRetirementAgeEventForPerson(true);
+    const defaultEnd =
+      isSalary && partnerRetirementEvent?.id
+        ? 'event:' + partnerRetirementEvent.id
+        : this.retirementYear;
     this.incomeForm.patchValue({
       description: baseType,
       incomeType: baseType,
       amount: '',
       cycle: this.cycles[1]?.id,
       start: this.currentYear,
-      end: this.retirementYear,
+      end: defaultEnd,
       addBonus: false,
       bonusAmount: 0,
       bonusCycle: this.getYearlyCycleId(),
@@ -426,31 +518,21 @@ export class AddIncomeComponent {
     this.setIncomeIcon();
   }
 
-  private setupForPartnerBirthDate(): void {
-    if (!this.data.partnerBirthDate) return;
-    const birthDate = new Date(this.data.partnerBirthDate);
-    this.clientBirthYear = moment(birthDate).year();
-    const forecastStart = new Date(this.data.forecastStartDateYear, 0, 1);
-    let age = forecastStart.getFullYear() - birthDate.getFullYear();
-    const monthDiff = forecastStart.getMonth() - birthDate.getMonth();
-    const dayDiff = forecastStart.getDate() - birthDate.getDate();
-    if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) age--;
-    this.clientAge = age;
-    const country = (this.data.clientCountryCode ?? '').toUpperCase();
-    this.retirementAge = (country === 'IT' || country === 'ITALY') ? 67 : 64;
-    this.retirementYear = this.clientBirthYear + this.retirementAge;
-  }
-
   onCycleValueChange(event: any) {
     const isOneOff = this.cycles.find(cycle => cycle.id === event)?.description === 'One-off';
     this.showStartEnd = !isOneOff;
+    const startCtrl = this.incomeForm.get('start');
+    const endCtrl = this.incomeForm.get('end');
     if (!this.showStartEnd) {
-      this.incomeForm.controls['end'].clearValidators();
-      this.incomeForm.controls['end'].updateValueAndValidity();
-    }
-    else {
-      this.incomeForm.controls['end'].addValidators(Validators.required);
-      this.incomeForm.controls['end'].updateValueAndValidity();
+      endCtrl?.clearValidators();
+      endCtrl?.updateValueAndValidity();
+      startCtrl?.setValidators([calendarYearOrEventRefValidator()]);
+      startCtrl?.updateValueAndValidity();
+    } else {
+      endCtrl?.setValidators([calendarYearOrEventRefValidator()]);
+      endCtrl?.updateValueAndValidity();
+      startCtrl?.setValidators([calendarYearOrEventRefValidator()]);
+      startCtrl?.updateValueAndValidity();
     }
     const escalationControl = this.incomeForm.get('escalationRate');
     if (isOneOff) {
@@ -461,20 +543,73 @@ export class AddIncomeComponent {
     escalationControl?.updateValueAndValidity();
   }
 
+  getCycleLabel(cycle: Cycle): string {
+    return getAmountCycleLabel(cycle, this.translate);
+  }
+
+  getTimelineEventLabel(rawName: string): string {
+    return translateTimelineEventDisplayName(this.translate, rawName);
+  }
+
+  /** Save disabled until form is valid and recurring rows have an end year or event. */
+  get isIncomeSaveButtonDisabled(): boolean {
+    if (this.isSaving) {
+      return true;
+    }
+    if (this.isEditWorkflow && !this.hasFormChanges()) {
+      return true;
+    }
+    if (this.incomeForm.invalid) {
+      return true;
+    }
+    if (this.showStartEnd) {
+      const endRaw = this.incomeForm.get('end')?.value;
+      if (!extractEventId(endRaw) && resolveYear(endRaw, this.eventsList) <= 0) {
+        return true;
+      }
+    }
+    const cycleId = this.incomeForm.get('cycle')?.value;
+    const desc = resolveCycleDescriptionForRecurringEndGuard(this.cycles, cycleId);
+    return recurringEndYearNotSelected(
+      desc,
+      this.incomeForm.get('end')?.value,
+      this.eventsList,
+    );
+  }
+
   addIncome(): void {
     if (this.isSaving) return;
+    if (this.isIncomeSaveButtonDisabled) return;
     this.incomeForm.markAllAsTouched();
     this.incomeForm.markAsDirty();
 
     if (this.incomeForm.valid) {
       this.isSaving = true;
-      const isSalary = this.incomeForm.get('description')?.value === 'Salary' || this.incomeForm.get('description')?.value === 'Salary (Partner)';
+      const descSubmit = this.incomeForm.get('description')?.value;
+      if (isClientSalaryApiDescription(descSubmit)) {
+        this.updateSalaryRetirementDefaults(false);
+      } else if (isPartnerSalaryApiDescription(descSubmit)) {
+        this.updateSalaryRetirementDefaults(true);
+      } else if (isClientStatePensionApiDescription(descSubmit)) {
+        this.updateSalaryRetirementDefaults(false);
+      } else if (isPartnerStatePensionApiDescription(descSubmit)) {
+        this.updateSalaryRetirementDefaults(true);
+      } else if (descSubmit === 'Inheritance') {
+        this.applyBirthDateContextForSalaryPerson(false);
+      }
 
-      const isCustomEscalation = this.selectedEscalationDescription === 'Increases at custom rate';
+      const isSalary = isSalaryTypeForBonus(
+        this.incomeForm.get('description')?.value,
+      );
+
+      const selectedEscDesc = this.incomeForm.get('escalationRate')?.value as string;
+      const isCustomEscalation = selectedEscDesc === 'Increases at custom rate';
       const escalationRateValue = isCustomEscalation
         ? this.incomeForm.get('customEscalationRate')?.value
-        : this.incomeForm.get('escalationRate')?.value;
-      const matchedRate = this.escalationRates.find((x) => x.value === escalationRateValue);
+        : this.escalationRates.find((x) => x.description === selectedEscDesc)?.value;
+      const matchedRate = isCustomEscalation
+        ? undefined
+        : this.escalationRates.find((x) => x.description === selectedEscDesc);
       const startVal = this.incomeForm.get('start')?.value;
       const endVal = this.incomeForm.get('end')?.value;
       const startYear = resolveYear(startVal, this.eventsList);
@@ -497,18 +632,36 @@ export class AddIncomeComponent {
           },
         },
         start: {
-          age: startYear ? startYear - this.clientBirthYear : 0,
+          age: startYear
+            ? getPersistedAgeForCalendarYear(
+                this.resolveBirthDateForAgeCalculations(),
+                startYear,
+                this.data.forecastStartDate,
+                this.data.planDuration,
+                this.forecastEndYear,
+              )
+            : 0,
           year: startYear || 0,
         },
         end: {
-          age: endYear ? endYear - this.clientBirthYear : 0,
+          age: endYear
+            ? getPersistedAgeForCalendarYear(
+                this.resolveBirthDateForAgeCalculations(),
+                endYear,
+                this.data.forecastStartDate,
+                this.data.planDuration,
+                this.forecastEndYear,
+              )
+            : 0,
           year: endYear || 0,
         },
         startEventId,
         endEventId,
         escalationRate: escalationRateValue !== null && escalationRateValue !== ''
           ? matchedRate ?? {
-            description: this.selectedEscalationDescription ?? '',
+            description: isCustomEscalation
+              ? 'Increases at custom rate'
+              : selectedEscDesc ?? '',
             value: escalationRateValue
           }
           : {
@@ -533,10 +686,17 @@ export class AddIncomeComponent {
             bonusDate:
               this.cycles.find(x => x.id === this.incomeForm.get('bonusCycle')?.value)?.description === 'One-off'
                 ? {
-                  age: this.incomeForm.get('bonusDate')?.value !== null &&
+                  age:
+                    this.incomeForm.get('bonusDate')?.value !== null &&
                     this.incomeForm.get('bonusDate')?.value !== ''
-                    ? this.incomeForm.get('bonusDate')?.value - this.clientBirthYear
-                    : 0,
+                      ? getPersistedAgeForCalendarYear(
+                          this.resolveBirthDateForAgeCalculations(),
+                          this.incomeForm.get('bonusDate')?.value,
+                          this.data.forecastStartDate,
+                          this.data.planDuration,
+                          this.forecastEndYear,
+                        )
+                      : 0,
                   year:
                     this.incomeForm.get('bonusDate')?.value !== null &&
                       this.incomeForm.get('bonusDate')?.value !== ''
@@ -572,17 +732,20 @@ export class AddIncomeComponent {
         .pipe(
           filter((res) => !!res),
           switchMap((incomeExpense: any) => {
-            const isInheritance = income?.description === 'Inheritance';
+            const isInheritance =
+              isClientInheritanceApiDescription(income?.description) ||
+              isPartnerInheritanceApiDescription(income?.description);
             const investChecked = !!this.incomeForm.get('investThisAmount')?.value;
             if (!isInheritance) {
               return of(incomeExpense);
             }
             const allIncomes = incomeExpense?.incomes ?? incomeExpense?.Incomes ?? [];
+            const savedDesc = income?.description;
             const incomeId = this.isEditWorkflow
               ? this.selectedIncome?.id
               : allIncomes.find(
                   (i: any) =>
-                    i.description === 'Inheritance' &&
+                    i.description === savedDesc &&
                     Number(i.amount?.amount) === Number(income.amount.amount) &&
                     i.start?.year === income.start.year
                 )?.id;
@@ -673,23 +836,11 @@ export class AddIncomeComponent {
   }
 
   get isCustomEscalationSelected(): boolean {
-    const selectedValue = this.incomeForm.get('escalationRate')?.value;
-
-    return this.escalationRates.some(e =>
-      e.value === selectedValue && e.description === 'Increases at custom rate'
-    );
+    return this.incomeForm.get('escalationRate')?.value === 'Increases at custom rate';
   }
 
   onEscalationRateChange(event: MatSelectChange): void {
-    const selectedOption = event.source.selected;
-
-    let description: string | null = null;
-
-    if (Array.isArray(selectedOption)) {
-      description = selectedOption[0]?.viewValue ?? null;
-    } else {
-      description = selectedOption?.viewValue ?? null;
-    }
+    const description = (event.value as string) ?? null;
 
     this.selectedEscalationDescription = description;
 
@@ -733,23 +884,105 @@ export class AddIncomeComponent {
 
   get incomeTitle(): string {
     if (!this.isEditWorkflow) return 'Add income';
-    return this.selectedIncome?.description ?? this.customDescriptionAutoRenamed ?? 'Income';
+    const desc = this.selectedIncome?.description;
+    if (desc) return this.apiDescToDisplayLabel(desc);
+    return this.customDescriptionAutoRenamed ?? 'Income';
+  }
+
+  private apiDescToDisplayLabel(apiDesc: string): string {
+    return incomeApiDescriptionToDisplayLabel(apiDesc, {
+      hasPartner: this.hasPartner,
+      clientFirstName: this.clientFirstName,
+      partnerFirstName: this.partnerFirstName,
+    });
+  }
+
+  get incomeDisplayLabelContext(): IncomeDisplayLabelContext {
+    return {
+      hasPartner: this.hasPartner,
+      clientFirstName: this.clientFirstName,
+      partnerFirstName: this.partnerFirstName,
+    };
+  }
+
+  /** Whole percent of salary (annualized); null when not applicable or data is insufficient. */
+  get statePensionSalaryPctHint(): number | null {
+    const desc = this.incomeForm.get('description')?.value;
+    if (
+      !isClientStatePensionApiDescription(desc) &&
+      !isPartnerStatePensionApiDescription(desc)
+    ) {
+      return null;
+    }
+
+    const salary = findSalaryIncomeForStatePensionRow(this.data?.incomes, desc);
+    if (!salary) return null;
+
+    const salaryAnnual = annualEquivalentForIncomeCycle(
+      Number(salary.amount?.amount ?? 0),
+      salary.amount?.cycle?.description,
+    );
+    if (salaryAnnual == null || !(salaryAnnual > 0)) return null;
+
+    const cycleId = this.incomeForm.get('cycle')?.value;
+    const pensionCycle = this.cycles.find((c) => c.id === cycleId);
+    const rawAmount = this.incomeForm.get('amount')?.value;
+    const pensionNum =
+      rawAmount === '' || rawAmount === null || rawAmount === undefined
+        ? NaN
+        : Number(rawAmount);
+    if (!Number.isFinite(pensionNum)) return null;
+
+    const pensionAnnual = annualEquivalentForIncomeCycle(pensionNum, pensionCycle?.description);
+    if (pensionAnnual == null) return null;
+
+    return roundPercentOf(pensionAnnual, salaryAnnual);
+  }
+
+  isFormSalaryForBonus(): boolean {
+    return isSalaryTypeForBonus(this.incomeForm.get('description')?.value);
+  }
+
+  private displayLabelToApiDesc(label: string): string {
+    if (!this.hasPartner) return label;
+    const cName = this.clientFirstName || 'Client';
+    const pName = this.partnerFirstName || 'Partner';
+    if (label === `Salary ${cName}`) return 'Salary';
+    if (label === `Salary ${pName}`) return 'Salary (Partner)';
+    if (label === `State pension ${cName}`) return 'State pension';
+    if (label === `State pension ${pName}`) return 'State pension (Partner)';
+    if (label === `Inheritance ${cName}`) return 'Inheritance';
+    if (label === `Inheritance ${pName}`) return 'Inheritance (Partner)';
+    return label;
   }
 
   setIncomeIcon(): void {
     if (this.selectedIncome?.icon != null) {
       this.incomeIcon = this.selectedIncome.icon;
     }
-    else if (this.incomeForm.get("description")?.value == "Salary") {
-      this.incomeIcon = "salary";
+    else if (
+      isClientSalaryApiDescription(this.incomeForm.get('description')?.value) ||
+      isPartnerSalaryApiDescription(this.incomeForm.get('description')?.value)
+    ) {
+      this.incomeIcon = 'salary';
     }
-    else if (this.incomeForm.get("description")?.value == "State pension") {
-      this.incomeIcon = "state-pension";
+    else if (
+      isClientStatePensionApiDescription(
+        this.incomeForm.get('description')?.value,
+      ) ||
+      isPartnerStatePensionApiDescription(
+        this.incomeForm.get('description')?.value,
+      )
+    ) {
+      this.incomeIcon = 'state-pension';
     }
     else if (this.incomeForm.get("description")?.value == "Rental income") {
       this.incomeIcon = "rental-income";
     }
-    else if (this.incomeForm.get("description")?.value == "Inheritance") {
+    else if (
+      isClientInheritanceApiDescription(this.incomeForm.get("description")?.value) ||
+      isPartnerInheritanceApiDescription(this.incomeForm.get("description")?.value)
+    ) {
       this.incomeIcon = "inheritance";
     }
     else {
@@ -761,9 +994,17 @@ export class AddIncomeComponent {
     if (this.selectedIncome?.isDefault != null) {
       this.isDefaultIncome = this.selectedIncome.isDefault;
     }
-    else if (this.incomeForm.get("description")?.value == "Salary"
-      || this.incomeForm.get("description")?.value == "State pension"
-      || this.incomeForm.get("description")?.value == "Inheritance") {
+    else if (
+      isSalaryTypeForBonus(this.incomeForm.get('description')?.value) ||
+      isClientStatePensionApiDescription(
+        this.incomeForm.get('description')?.value,
+      ) ||
+      isPartnerStatePensionApiDescription(
+        this.incomeForm.get('description')?.value,
+      ) ||
+      isClientInheritanceApiDescription(this.incomeForm.get('description')?.value) ||
+      isPartnerInheritanceApiDescription(this.incomeForm.get('description')?.value)
+    ) {
       this.isDefaultIncome = true;
     }
     else {
@@ -772,6 +1013,7 @@ export class AddIncomeComponent {
   }
 
   onIncomeTypeChange(value: string): void {
+    const apiValue = this.displayLabelToApiDesc(value);
     const descriptionCtrl = this.incomeForm.get('description');
     if (!descriptionCtrl) return;
 
@@ -826,21 +1068,38 @@ export class AddIncomeComponent {
       'Inheritance': {
         icon: 'inheritance',
         description: 'Inheritance',
+        isDefault: true,
+        requireDescription: true,
+        editableName: false
+      },
+      'Inheritance (Partner)': {
+        icon: 'inheritance',
+        description: 'Inheritance (Partner)',
+        isDefault: true,
         requireDescription: true,
         editableName: false
       }
     };
 
-    const isCustom = this.selectedIncome != null
-      && this.selectedIncome.description != "Salary"
-      && this.selectedIncome.description != "Salary (Partner)"
-      && this.selectedIncome.description != "State pension"
-      && this.selectedIncome.description != "State pension (Partner)"
-      && this.selectedIncome.description != "Rental income"
-      && this.selectedIncome.description != "Inheritance";
+    const sd = this.selectedIncome?.description ?? '';
+    const isCustom =
+      this.selectedIncome != null &&
+      !isClientSalaryApiDescription(sd) &&
+      !isPartnerSalaryApiDescription(sd) &&
+      !isClientStatePensionApiDescription(sd) &&
+      !isPartnerStatePensionApiDescription(sd) &&
+      !isClientInheritanceApiDescription(sd) &&
+      !isPartnerInheritanceApiDescription(sd) &&
+      this.selectedIncome.description != 'Rental income';
 
-    const baseValue = value === 'Salary (Partner)' ? 'Salary' : value === 'State pension (Partner)' ? 'State pension' : value;
-    const config = isCustom ? incomeConfig["Custom"] : (incomeConfig[value] ?? incomeConfig[baseValue]);
+    const baseValue = isPartnerSalaryApiDescription(apiValue)
+      ? 'Salary'
+      : isPartnerStatePensionApiDescription(apiValue)
+        ? 'State pension'
+        : isPartnerInheritanceApiDescription(apiValue)
+          ? 'Inheritance'
+          : apiValue;
+    const config = isCustom ? incomeConfig["Custom"] : (incomeConfig[apiValue] ?? incomeConfig[baseValue]);
     if (!config || !descriptionCtrl) return;
 
     this.incomeIcon = config.icon;
@@ -854,10 +1113,10 @@ export class AddIncomeComponent {
     }
 
     if (!this.isEditWorkflow) {
-      this.applyDefaultStartEnd(value);
+      this.applyDefaultStartEnd(apiValue);
     }
 
-    if (value === 'Inheritance') {
+    if (apiValue === 'Inheritance' || apiValue === 'Inheritance (Partner)') {
       const oneOffCycle = this.cycles.find(c => c.description === 'One-off');
       if (oneOffCycle) {
         this.incomeForm.get('cycle')?.setValue(oneOffCycle.id);
@@ -873,23 +1132,107 @@ export class AddIncomeComponent {
         descriptionCtrl.setValue(this.selectedIncome?.description, { emitEvent: true });
       }
       else {
-        descriptionCtrl.setValue(value, { emitEvent: true });
+        descriptionCtrl.setValue(apiValue, { emitEvent: true });
       }
     }
     else {
-      const nextDescription = value === 'Custom'
+      const nextDescription = apiValue === 'Custom'
         ? ''
-        : (config.description ?? value);
+        : (config.description ?? apiValue);
       descriptionCtrl.setValue(nextDescription, { emitEvent: true });
     }
 
-    if (config.requireDescription || value === 'Custom') {
+    if (config.requireDescription || apiValue === 'Custom') {
       descriptionCtrl.setValidators([Validators.required]);
     } else {
       descriptionCtrl.clearValidators();
     }
 
     descriptionCtrl.updateValueAndValidity();
+
+    // If re-adding State pension (after deletion), prefill net amount from Salary.
+    this.prefillStatePensionFromSalaryIfEligible(apiValue);
+
+    this.prefillInheritanceFromLegacyIfEligible(apiValue);
+  }
+
+  private loadPensionReplacementRate(): void {
+    // Prefer already-cached profile (header sets it), otherwise fetch.
+    const cached = this.settingsService.currentUserData?.preferences?.pensionReplacementRate;
+    if (cached != null && !Number.isNaN(Number(cached))) {
+      this.pensionReplacementRatePct = Number(cached);
+      return;
+    }
+
+    const user = this.auth.getUserProfile();
+    const userId = (user?.sub ?? '').toString().trim();
+    if (!userId) return;
+
+    this.settingsService.getUserProfileResponse(userId).subscribe({
+      next: (res: any) => {
+        const rate = res?.body?.preferences?.pensionReplacementRate;
+        if (rate != null && !Number.isNaN(Number(rate))) {
+          this.pensionReplacementRatePct = Number(rate);
+        }
+      },
+      error: () => {
+        /* ignore; keep fallback */
+      },
+    });
+  }
+
+  private prefillStatePensionFromSalaryIfEligible(apiDesc: string): void {
+    if (!isClientStatePensionApiDescription(apiDesc) && !isPartnerStatePensionApiDescription(apiDesc)) return;
+
+    const amountCtrl = this.incomeForm.get('amount');
+    const cycleCtrl = this.incomeForm.get('cycle');
+    if (!amountCtrl || !cycleCtrl) return;
+
+    // Do not overwrite user-entered value.
+    const existing = amountCtrl.value;
+    if (existing !== '' && existing !== null && existing !== undefined && Number(existing) > 0) return;
+
+    const incomes: FinancialViewModel[] = (this.data?.incomes ?? []) as FinancialViewModel[];
+    const salary = findSalaryIncomeForStatePensionRow(incomes, apiDesc);
+    const salaryAmount = Number(salary?.amount?.amount ?? 0);
+    if (!(salaryAmount > 0)) return;
+
+    const ratePct = Number(this.pensionReplacementRatePct ?? 50);
+    if (!(ratePct > 0)) return;
+
+    const pensionAmount = salaryAmount * (ratePct / 100);
+    if (!(pensionAmount > 0)) return;
+
+    amountCtrl.setValue(pensionAmount, { emitEvent: true });
+
+    // Align frequency with salary where possible.
+    const salaryCycleId = salary?.amount?.cycle?.id;
+    if (salaryCycleId) {
+      cycleCtrl.setValue(salaryCycleId, { emitEvent: true });
+      this.onCycleValueChange(salaryCycleId);
+    }
+  }
+
+  private prefillInheritanceFromLegacyIfEligible(apiDesc: string): void {
+    if (!isClientInheritanceApiDescription(apiDesc) && !isPartnerInheritanceApiDescription(apiDesc)) return;
+    if (this.isEditWorkflow) return;
+
+    const amountCtrl = this.incomeForm.get('amount');
+    if (!amountCtrl) return;
+
+    const existing = amountCtrl.value;
+    if (existing !== '' && existing !== null && existing !== undefined && Number(existing) > 0) return;
+
+    const prefill = this.data?.legacyInheritancePrefill;
+    if (!prefill) return;
+
+    const prefillAmount = isPartnerInheritanceApiDescription(apiDesc)
+      ? prefill.partner
+      : prefill.client;
+
+    if (prefillAmount > 0) {
+      amountCtrl.setValue(prefillAmount, { emitEvent: true });
+    }
   }
 
   toggleNameEdit() {
@@ -902,34 +1245,39 @@ export class AddIncomeComponent {
 
     if (!startCtrl || !endCtrl) return;
 
-    switch (incomeType) {
-      case 'Salary':
-      case 'Salary (Partner)':
-        if (!this.isEditWorkflow) {
-          startCtrl.setValue(this.currentYear);
-        }
-        endCtrl.setValue(this.retirementYear);
-        break;
-
-      case 'State pension':
-      case 'State pension (Partner)':
-        startCtrl.setValue(this.retirementYear);
-        endCtrl.setValue(this.forecastEndYear);
-        break;
-
-      case 'Inheritance':
-        if (!this.isEditWorkflow) {
-          startCtrl.setValue(this.currentYear);
-        }
-        endCtrl.setValue(this.currentYear);
-        break;
-
-      default:
-        if (!this.isEditWorkflow) {
-          startCtrl.reset();
-          endCtrl.reset();
-        }
-        break;
+    if (
+      isClientSalaryApiDescription(incomeType) ||
+      isPartnerSalaryApiDescription(incomeType)
+    ) {
+      const isPartnerSalary = isPartnerSalaryApiDescription(incomeType);
+      this.updateSalaryRetirementDefaults(isPartnerSalary);
+      if (!this.isEditWorkflow) {
+        startCtrl.setValue(this.currentYear);
+      }
+      const retirementEvt = this.findRetirementAgeEventForPerson(isPartnerSalary);
+      endCtrl.setValue(
+        retirementEvt?.id ? 'event:' + retirementEvt.id : this.retirementYear,
+      );
+    } else if (
+      isClientStatePensionApiDescription(incomeType) ||
+      isPartnerStatePensionApiDescription(incomeType)
+    ) {
+      const isPartnerPension = isPartnerStatePensionApiDescription(incomeType);
+      this.updateSalaryRetirementDefaults(isPartnerPension);
+      startCtrl.setValue(this.retirementYear);
+      endCtrl.setValue(this.forecastEndYear);
+    } else if (incomeType === 'Inheritance' || incomeType === 'Inheritance (Partner)') {
+      const isPartner = isPartnerInheritanceApiDescription(incomeType);
+      this.applyBirthDateContextForSalaryPerson(isPartner);
+      if (!this.isEditWorkflow) {
+        startCtrl.reset();
+        endCtrl.reset();
+      }
+    } else {
+      if (!this.isEditWorkflow) {
+        startCtrl.reset();
+        endCtrl.reset();
+      }
     }
 
     startCtrl.updateValueAndValidity();
@@ -952,12 +1300,57 @@ export class AddIncomeComponent {
     return new Date().getFullYear();
   }
 
+  /**
+   * Default one-off year for new Inheritance income (main client only):
+   * under 60 → calendar year when client turns 65; 60+ → five years after plan reference year.
+   * If birth date is missing/invalid, fall back to reference year + 5.
+   */
+  private getDefaultInheritanceStartYear(): number {
+    const forecastStartYear = Number(this.data?.forecastStartDateYear);
+    const refYear =
+      Number.isFinite(forecastStartYear) && forecastStartYear > 0
+        ? forecastStartYear
+        : this.currentYear;
+
+    const clientBd = this.data?.clientBirthDate;
+    if (!clientBd || !moment(clientBd).isValid()) {
+      return refYear + 5;
+    }
+
+    let birthYear = moment(clientBd).year();
+    const birthDate = new Date(clientBd);
+    const forecastStart = new Date(refYear, 0, 1);
+    let age = forecastStart.getFullYear() - birthDate.getFullYear();
+    const monthDiff = forecastStart.getMonth() - birthDate.getMonth();
+    const dayDiff = forecastStart.getDate() - birthDate.getDate();
+    if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+      age--;
+    }
+    if (refYear - birthYear > age) {
+      birthYear = birthYear + 1;
+    }
+
+    if (age < 60) {
+      return birthYear + 65;
+    }
+    return refYear + 5;
+  }
+
+  /** Ensures the mat-select can bind and display the computed default year. */
+  private ensureYearInSelectableYears(year: number): void {
+    if (!Number.isFinite(year)) return;
+    if (!this.years.includes(year)) {
+      this.years.push(year);
+      this.years.sort((a, b) => a - b);
+    }
+  }
+
   onBonusAmountInput(rawValue: string) {
     if (!rawValue || rawValue.trim() === '') {
       this.incomeForm.get('bonusAmount')?.setValue('', { emitEvent: true });
       return;
     }
-    const value = parseFormattedNumber(rawValue);
+    const value = parseFormattedNumber(rawValue, this.translate.currentLang);
     this.incomeForm.get('bonusAmount')?.setValue(value, { emitEvent: true });
   }
 
@@ -971,7 +1364,15 @@ export class AddIncomeComponent {
   }
 
   getAgeForYear(year: number): number {
-    return Number(year) - this.clientBirthYear;
+    const birth = this.resolveBirthDateForAgeCalculations();
+    const a = getProjectionColumnAgeLabel(
+      birth,
+      Number(year),
+      this.data.forecastStartDate,
+      this.data.planDuration,
+      this.forecastEndYear,
+    );
+    return Number.isNaN(a) ? 0 : a;
   }
 
   getStartYear(): number {
@@ -997,14 +1398,102 @@ export class AddIncomeComponent {
     this.incomeForm.markAsPristine();
   }
 
-  private getRetirementEventYear(): number | null {
-    const retirementEvent = (this.eventsList ?? []).find(
-      (event: any) =>
-        (event?.name ?? '').toString().toLowerCase() === 'retirement age'
-    );
+  /** Timeline labels are e.g. "Retirement Age {name}", not the literal "retirement age". */
+  private eventNameIsRetirementAge(name: unknown): boolean {
+    return (name ?? '')
+      .toString()
+      .trim()
+      .toLowerCase()
+      .startsWith('retirement age');
+  }
 
-    const retirementYear = Number(retirementEvent?.start?.year);
-    return Number.isFinite(retirementYear) && retirementYear > 0 ? retirementYear : null;
+  private findRetirementAgeEventForPerson(isPartner: boolean): any | null {
+    const events = this.eventsList ?? [];
+    return (
+      events.find(
+        (e: any) =>
+          this.eventNameIsRetirementAge(e?.name) &&
+          !!e?.isPartnerEvent === isPartner,
+      ) ?? null
+    );
+  }
+
+  /**
+   * Sets clientBirthYear / clientAge for the person the income row belongs to
+   * (main client vs partner), used for age labels and persisted age fields.
+   */
+  private applyBirthDateContextForSalaryPerson(usePartnerBirthDate: boolean): void {
+    const birthDateToUse =
+      usePartnerBirthDate && this.data.partnerBirthDate
+        ? this.data.partnerBirthDate
+        : this.data.clientBirthDate;
+    this.clientBirthYear = moment(birthDateToUse).year();
+    const birthDate = new Date(birthDateToUse);
+    const forecastStart = this.data.forecastStartDate
+      ? new Date(this.data.forecastStartDate)
+      : new Date(this.data.forecastStartDateYear, 0, 1);
+    this.clientAge = getCompletedYearsAgeAtDate(birthDate, forecastStart);
+  }
+
+  /**
+   * Birth date used for age labels and persisted `age` fields for the current row.
+   */
+  private resolveBirthDateForAgeCalculations(): Date | string | null {
+    const desc = (this.incomeForm.get('description')?.value ??
+      this.selectedIncome?.description ??
+      '') as string;
+
+    if (desc === 'Inheritance') {
+      return this.data.clientBirthDate;
+    }
+
+    if (this.showPersonSelector && this.combinedEdit) {
+      if (this.editingPerson === 'partner' && this.data.partnerBirthDate) {
+        return this.data.partnerBirthDate;
+      }
+      return this.data.clientBirthDate;
+    }
+
+    if (
+      isPartnerSalaryApiDescription(desc) ||
+      isPartnerStatePensionApiDescription(desc)
+    ) {
+      return this.data.partnerBirthDate ?? this.data.clientBirthDate;
+    }
+
+    return this.data.clientBirthDate;
+  }
+
+  private refreshBirthContextFromCurrentDescription(): void {
+    const desc = (this.incomeForm.get('description')?.value ?? '') as string;
+    if (isPartnerSalaryApiDescription(desc)) {
+      this.updateSalaryRetirementDefaults(true);
+    } else if (isClientSalaryApiDescription(desc)) {
+      this.updateSalaryRetirementDefaults(false);
+    } else if (isPartnerStatePensionApiDescription(desc)) {
+      this.updateSalaryRetirementDefaults(true);
+    } else if (isClientStatePensionApiDescription(desc)) {
+      this.updateSalaryRetirementDefaults(false);
+    } else if (desc === 'Inheritance') {
+      this.applyBirthDateContextForSalaryPerson(false);
+    }
+  }
+
+  /**
+   * Default retirement calendar year and timeline event for salary (and state pension start)
+   * for the given person — matches timeline "Retirement Age …" chips, not a generic age.
+   */
+  private updateSalaryRetirementDefaults(isPartnerSalary: boolean): void {
+    this.applyBirthDateContextForSalaryPerson(
+      isPartnerSalary && !!this.data.partnerBirthDate,
+    );
+    const country = (this.data.clientCountryCode ?? '').toUpperCase();
+    this.retirementAge = country === 'IT' || country === 'ITALY' ? 67 : 64;
+    const evt = this.findRetirementAgeEventForPerson(isPartnerSalary);
+    const y = Number(evt?.start?.year);
+    this.retirementEventYear = Number.isFinite(y) && y > 0 ? y : null;
+    this.retirementYear =
+      this.retirementEventYear ?? this.clientBirthYear + this.retirementAge;
   }
 
   private setupBonusControlHandlers(): void {
@@ -1025,7 +1514,7 @@ export class AddIncomeComponent {
 
   private syncBonusControlsState(): void {
     const desc = this.incomeForm.get('description')?.value;
-    const isSalary = desc === 'Salary' || desc === 'Salary (Partner)';
+    const isSalary = isSalaryTypeForBonus(desc);
     const isBonusEnabled = !!this.incomeForm.get('addBonus')?.value;
     const bonusAmount = this.incomeForm.get('bonusAmount');
     const bonusCycle = this.incomeForm.get('bonusCycle');
@@ -1156,8 +1645,24 @@ export class AddIncomeComponent {
     }, 0);
   }
 
-  private getNonCashSavingsForInheritance(): Array<{ id: string | null; name?: string; startingPotValue?: { amount?: number }; contributionAmount?: number }> {
-    return (this.clientSavings ?? []) as Array<{ id: string | null; name?: string; startingPotValue?: { amount?: number }; contributionAmount?: number }>;
+  onInvestThisAmountChange(event: MatCheckboxChange): void {
+    // Only gate the action for default Inheritance.
+    if (!this.getIsDefaultInheritance()) return;
+
+    if (event.checked && !this.hasEligibleNonCashSavingPot()) {
+      this.toastr.error(
+        this.translate.instant('FLOWS.CREATE_SAVING_POT_FIRST'),
+        this.translate.instant('LABEL.ERROR'),
+        { timeOut: 5000 },
+      );
+      // Keep the control unchecked/inactive.
+      this.incomeForm.get('investThisAmount')?.setValue(false, { emitEvent: true });
+    }
+  }
+
+  private getNonCashSavingsForInheritance(): ClientSaving[] {
+    // Use the full list so changes propagate without relying on the filtered copy.
+    return (this.allSavingPots ?? []).filter((s) => !this.isCashSavingPotName(s?.name));
   }
 
   private getExistingInheritanceContributionPotIds(): string[] {
@@ -1168,7 +1673,7 @@ export class AddIncomeComponent {
 
   /** For Pension fund: use contributionAmount as fallback when startingPotValue is 0 (common for new pensions) */
   private getLargestPotForInheritance(
-    pots: Array<{ id: string | null; name?: string; startingPotValue?: { amount?: number }; contributionAmount?: number }>
+    pots: ClientSaving[],
   ): { id: string | null } | null {
     if (!pots.length) return null;
     return pots.reduce((largest, pot) => {
@@ -1178,7 +1683,7 @@ export class AddIncomeComponent {
     });
   }
 
-  private getEffectivePotValueForComparison(pot: { name?: string; startingPotValue?: { amount?: number }; contributionAmount?: number }): number {
+  private getEffectivePotValueForComparison(pot: Pick<ClientSaving, 'name' | 'startingPotValue' | 'contributionAmount'>): number {
     const starting = Number(pot.startingPotValue?.amount ?? 0);
     if (starting > 0) return starting;
     const isPensionFund = (pot.name ?? '').toLowerCase() === 'pension fund';
@@ -1197,9 +1702,34 @@ export class AddIncomeComponent {
     const incomeType = this.incomeForm.get('incomeType')?.value;
     const description = this.incomeForm.get('description')?.value;
     if (this.isEditWorkflow) {
-      return description === 'Inheritance' && this.selectedIncome?.isDefault === true;
+      return (isClientInheritanceApiDescription(description) ||
+        isPartnerInheritanceApiDescription(description)) &&
+        this.selectedIncome?.isDefault === true;
     }
-    return incomeType === 'Inheritance';
+    const apiDesc = this.displayLabelToApiDesc(incomeType ?? '');
+    return isClientInheritanceApiDescription(apiDesc) || isPartnerInheritanceApiDescription(apiDesc);
+  }
+
+  private hasEligibleNonCashSavingPot(): boolean {
+    return this.getNonCashSavingsForInheritance().some((p) => !!p?.id);
+  }
+
+  getSavingPotSelectLabel(saving: {
+    name: string;
+    ownership?: number | null;
+  }): string {
+    return formatSavingPotSelectLabel(
+      { name: saving.name, ownership: saving.ownership },
+      this.selectedClient,
+      this.translate,
+    );
+  }
+
+  private isCashSavingPotName(name: unknown): boolean {
+    return (name ?? '')
+      .toString()
+      .trim()
+      .toLowerCase() === 'cash';
   }
 
   get isInvestThisAmountChecked(): boolean {
@@ -1216,7 +1746,7 @@ export class AddIncomeComponent {
 
   private syncBonusDateState(): void {
     const desc = this.incomeForm.get('description')?.value;
-    const isSalary = desc === 'Salary' || desc === 'Salary (Partner)';
+    const isSalary = isSalaryTypeForBonus(desc);
     const isBonusEnabled = !!this.incomeForm.get('addBonus')?.value;
     const bonusDateCtrl = this.incomeForm.get('bonusDate');
     const cycleId = this.incomeForm.get('bonusCycle')?.value;

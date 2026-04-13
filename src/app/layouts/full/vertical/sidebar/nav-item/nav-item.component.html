@@ -1,7 +1,7 @@
 @if (item.navCap) {
   <a
     (click)="onItemSelected(item)"
-    class="cashflow-modal d-flex align-items-center gap-12"
+    class="cashflow-modal d-flex align-items-center gap-10"
     [ngClass]="isItemActive(item) ? 'activeMenu' : ''"
   >
     <svg
@@ -82,13 +82,19 @@
     <!-- </div> -->
     <!-- <span class="hide-menu">{{ item.displayName | translate }}</span> -->
 
+    <!-- class="ibr-new-setting-icon" -->
     <div class="nav-item-row">
       <div class="nav-left">
-        <img
-          style="flex: none; max-width: 24px"
-          [src]="isItemActive(item) ? item.iconName : item.iconOutline"
-          alt="item"
-        />
+        <div
+          style="width: 24px"
+          class="d-flex align-items-center justify-content-center"
+        >
+          <img
+            style="flex: none; width: 100%"
+            [src]="isItemActive(item) ? item.iconName : item.iconOutline"
+            alt="item"
+          />
+        </div>
         <span class="hide-menu">{{ item.displayName | translate }}</span>
         @if (showLabel) {
           <span class="menu-label">{{ label }}</span>
@@ -120,8 +126,61 @@
 <!-- external Link -->
 
 @if (!item.navCap && item.external) {
-  <mat-list-item
-    (click)="onExternalLinkClick(item.route)"
+  <a
+    mat-list-item
+    (click)="onExternalLinkClick(item)"
+    [disableRipple]="true"
+    [ngClass]="{
+      'mat-toolbar mat-primary activeMenu': item.route
+        ? isItemActive(item)
+        : false,
+      expanded: expanded,
+      disabled: item.disabled,
+    }"
+    class="menu-list-item"
+  >
+    <div class="nav-item-row">
+      <div class="nav-left">
+        <!-- class="ibr-new-setting-icon" -->
+        <div
+          style="width: 24px"
+          class="d-flex align-items-center justify-content-center"
+        >
+          <img
+            style="flex: none; width: 100%"
+            [src]="isItemActive(item) ? item.iconName : item.iconOutline"
+            alt="item"
+          />
+        </div>
+        <span class="hide-menu">{{ item.displayName | translate }}</span>
+        @if (showLabel) {
+          <span class="menu-label">{{ label }}</span>
+        }
+      </div>
+      <span
+        class="d-flex align-items-center justify-content-center flex-shrink-0 nav-external-link-icon"
+        aria-hidden="true"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M21 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6" />
+          <path d="m21 3-9 9" />
+          <path d="M15 3h6v6" />
+        </svg>
+      </span>
+    </div>
+  </a>
+  <!-- <mat-list-item
+    (click)="onExternalLinkClick(item)"
     class="menu-list-item"
   >
     <img
@@ -130,7 +189,7 @@
       alt="item"
     />
     <span class="hide-menu">{{ item.displayName | translate }}</span>
-  </mat-list-item>
+  </mat-list-item> -->
 }
 
 <!-- children -->

@@ -1,31 +1,94 @@
-<h2 mat-dialog-title>Add Family Member</h2>
+<div class="d-flex flex-column">
+  <div class="dialog-header">
+    <h2 class="dialog-title text-center">{{ 'Add member' | translate }}</h2>
+    <button
+      type="button"
+      mat-icon-button
+      disableRipple
+      class="dialog-close-btn"
+      mat-dialog-close
+      [attr.aria-label]="'LEGACY.CLOSE_DIALOG' | translate"
+      (click)="onCancel()"
+    >
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
 
-<mat-dialog-content>
-  <form [formGroup]="form" class="dialog-form">
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Relationship</mat-label>
-      <mat-select formControlName="role" [hideSingleSelectionIndicator]="true">
-        @for (opt of roleOptions; track opt.value) {
-          <mat-option [value]="opt.value" [disabled]="opt.disabled">{{opt.label}}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
+  <mat-dialog-content class="event-dialog-content">
+    <form [formGroup]="form" class="d-flex flex-column gap-16">
+      <div class="w-100 form-field gap-8">
+        <mat-label
+          class="f-s-16 f-w-500 d-block ibr-black"
+          style="line-height: 16px"
+          >{{ 'Relationship' | translate }}</mat-label
+        >
+        <div class="position-relative">
+          <div class="w-100 form-field">
+            <div class="select-option position-relative">
+              <mat-select
+                #roleSelect
+                formControlName="role"
+                class="sortby-edit-profile"
+                hideSingleSelectionIndicator
+              >
+                @for (opt of roleOptions; track opt.value) {
+                  <mat-option [value]="opt.value">{{
+                    opt.labelKey | translate : opt.labelParams
+                  }}</mat-option>
+                }
+              </mat-select>
+              <span class="custom-arrow">
+                <svg
+                  width="12"
+                  height="7"
+                  viewBox="0 0 12 7"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M1 1L6 6L11 1"
+                    stroke="#2B3942"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
 
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>First name</mat-label>
-      <input matInput formControlName="firstName" />
-    </mat-form-field>
+      <div class="w-100 form-field gap-8">
+        <mat-label
+          class="f-s-16 f-w-500 d-block ibr-black"
+          style="line-height: 16px"
+          >{{ 'Name' | translate }}</mat-label
+        >
+        <input matInput formControlName="name" />
+      </div>
+    </form>
+  </mat-dialog-content>
 
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Last name</mat-label>
-      <input matInput formControlName="lastName" />
-    </mat-form-field>
-  </form>
-</mat-dialog-content>
-
-<mat-dialog-actions align="end">
-  <button class="dialog-btn dialog-btn-cancel" (click)="onCancel()">Cancel</button>
-  <button class="dialog-btn dialog-btn-save" [disabled]="form.invalid || isSaving" (click)="onSave()">
-    Save
-  </button>
-</mat-dialog-actions>
+  <div class="row justify-content-end gap-16 modal-action p-t-24">
+    <div>
+      <button
+        type="button"
+        (click)="onCancel()"
+        class="button-icon-outline w-100 d-block"
+      >
+        <span class="f-s-16">{{ 'Cancel' | translate }}</span>
+      </button>
+    </div>
+    <div>
+      <button
+        type="button"
+        (click)="onSave()"
+        [disabled]="form.invalid || isSaving"
+        class="button-icon w-100 d-block"
+      >
+        <span class="f-s-16">{{ 'Save' | translate }}</span>
+      </button>
+    </div>
+  </div>
+</div>

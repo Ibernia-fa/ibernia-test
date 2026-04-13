@@ -16,7 +16,7 @@
               <!-- End Icon  -->
               <!-- headings  -->
               <div class="d-flex flex-column justify-content-between gap-4">
-                <h4 class="page-title f-w-500">Timeline</h4>
+                <h4 class="page-title f-w-500">{{ 'Timeline' | translate }}</h4>
                 <span class="sub-title">John Devidson</span>
               </div>
               <!-- End headings  -->
@@ -26,7 +26,7 @@
                 src="/assets/images/svgs/chart-histogram-two-icon.svg"
                 alt="chart"
               />
-              <span class="f-s-16">Cashflow Simulator #1</span>
+              <span class="f-s-16">{{ 'Cashflow Simulator' | translate }} #1</span>
             </div>
           </div>
         </div>
@@ -36,7 +36,7 @@
             <div class="w-100 form-field gap-12">
               <div class="d-flex gap-8 align-items-center">
                 <mat-label class="f-s-16 f-w-400 d-block"
-                  >Forecast start date:</mat-label
+                  >{{ 'Forecast start date' | translate }}:</mat-label
                 >
                 <img
                   src="assets/images/svgs/help-circle-icon.svg"
@@ -74,7 +74,7 @@
             <div class="w-100 form-field gap-12">
               <div class="d-flex gap-8 align-items-center">
                 <mat-label class="f-s-16 f-w-400 d-block"
-                  >Forecast end date:</mat-label
+                  >{{ 'Forecast end date' | translate }}:</mat-label
                 >
                 <img
                   src="assets/images/svgs/help-circle-icon.svg"
@@ -116,7 +116,7 @@
           class="d-flex align-items-center justify-content-between flex-wrap gap-16 event-main-wrapper"
         >
           <div class="d-flex flex-column gap-6" style="flex-direction: column">
-            <h4 class="f-s-22 f-w-400">Events</h4>
+            <h4 class="f-s-22 f-w-400">{{ 'Events' | translate }}</h4>
             <p class="m-0">
               Drag new events onto the timeline, or drag to re-arrange existing
               events. <br />
@@ -125,7 +125,7 @@
             </p>
           </div>
           <button (click)="newEventClicked()" type="button" class="button-icon">
-            <span>New Event</span>
+            <span>{{ 'New Event' | translate }}</span>
             <img src="assets/images/svgs/add-icon.svg" alt="add-icon" />
           </button>
         </div>

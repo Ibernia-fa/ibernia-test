@@ -1,4 +1,4 @@
-<mat-card class="mat-mdc-card mdc-card cardWithShadow mb-20">
+<!-- <mat-card class="mat-mdc-card mdc-card cardWithShadow mb-20">
   <mat-card-content class="mat-mdc-card-content">
     <div class="d-flex align-items-center main-header-content">
       <div class="header-icon">
@@ -10,108 +10,332 @@
       </div>
     </div>
   </mat-card-content>
-</mat-card>
+</mat-card> -->
 
-<div *ngIf="loading" class="p-20">{{ 'Loading...' | translate }}</div>
+<div *ngIf="loading" class="p-20">
+  {{ ("Loading..." | translate) | capitalizeFirst }}
+</div>
 
-<!-- All notifications section -->
-<mat-card class="mat-mdc-card mdc-card cardWithShadow mb-20">
-  <mat-card-content class="mat-mdc-card-content">
-    <div class="d-flex align-items-center justify-content-between m-b-20">
-      <h3 class="f-s-20 f-w-400 m-0">{{ 'All notifications' | translate }}</h3>
-      @if (unreadCount > 0) {
-        <button mat-stroked-button type="button" class="notification-page-mark-all" (click)="onMarkAllAsRead()">
-          <i-tabler name="checks" class="icon-18 m-r-6"></i-tabler>
-          {{ 'Mark all as read' | translate }}
-        </button>
-      }
-    </div>
-    @if (notificationsLoading) {
-      <div class="p-20 text-center">{{ 'Loading...' | translate }}</div>
-    } @else if (notifications.length === 0) {
-      <div class="p-24 text-center text-muted">{{ 'No notifications' | translate }}</div>
-    } @else {
-      <div class="notification-center-list">
-        @for (n of notifications; track n.id) {
-          <button class="notification-center-item" (click)="onNotificationClick(n)">
-            <div class="d-flex align-items-start w-100">
-              <div
-                class="notification-avatar rounded-circle d-flex align-items-center justify-content-center m-r-14"
-                [class.birthday]="n.iconType === 'birthday'"
-              >
-                <i-tabler name="message" class="notification-message-icon"></i-tabler>
-              </div>
-              <div class="flex-grow-1 min-w-0">
-                <div class="notification-item-title line-clamp-1 m-b-4">{{ n.title }}</div>
-                <p class="notification-item-preview m-0 line-clamp-2 m-b-4">{{ n.preview }}</p>
-                <div class="d-flex align-items-center gap-8">
-                  <span class="notification-item-meta">{{ n.sentAtUtc | date:'medium' }}</span>
-                  <span class="notification-type-pill" [class.birthday]="n.iconType === 'birthday'">
-                    {{ n.iconType === 'birthday' ? ('Birthday' | translate) : ('News' | translate) }}
-                  </span>
-                </div>
-              </div>
-              <div class="notification-status-dot m-l-12" [class.unread]="!n.isRead"></div>
-            </div>
-          </button>
-          <mat-divider></mat-divider>
-        }
+<div class="new-notification-wrapper">
+  <mat-card *ngIf="!loading" class="ibr-new-dashboad-card">
+    <mat-card-content>
+      <h3 class="ibr-new-heading m-b-20">
+        {{ ("Email notifications" | translate) | capitalizeFirst }}
+      </h3>
+      <div class="p-l-24">
+        <div class="d-flex justify-space-between align-items-center m-b-20">
+          <div class="new-notifcation-headings">
+            <h3 class="f-s-16 f-w-600 m-b-0 d-block">
+              {{ ("News and updates" | translate) | capitalizeFirst }}
+            </h3>
+            <p class="f-s-14 m-b-0 m-t-0 d-block">
+              {{ ("News about product and feature updates" | translate) | capitalizeFirst }}
+            </p>
+          </div>
+          <div>
+            <mat-slide-toggle
+              [(ngModel)]="toggleStatus"
+              (change)="onToggleChange()"
+              labelPosition="before"
+            ></mat-slide-toggle>
+          </div>
+        </div>
+        <div class="d-flex justify-space-between align-items-center">
+          <div class="new-notifcation-headings">
+            <h3 class="f-s-16 f-w-600 m-b-0 d-block">
+              {{ ("Clients’ birthdays" | translate) | capitalizeFirst }}
+            </h3>
+            <p class="f-s-14 m-b-0 m-t-0 d-block">
+              {{ ("Reminders on your clients’ birthdays" | translate) | capitalizeFirst }}
+            </p>
+          </div>
+          <div>
+            <mat-slide-toggle
+              [(ngModel)]="toggleStatus1"
+              (change)="onToggleChange()"
+              labelPosition="before"
+            ></mat-slide-toggle>
+          </div>
+        </div>
       </div>
-    }
-  </mat-card-content>
-</mat-card>
+    </mat-card-content>
+  </mat-card>
 
-<mat-card *ngIf="!loading" class="mat-mdc-card mdc-card cardWithShadow mb-20">
+  <mat-card *ngIf="!loading" class="ibr-new-dashboad-card">
+    <mat-card-content>
+      <h3 class="ibr-new-heading m-b-20">
+        {{ ("Push notifications" | translate) | capitalizeFirst }}
+      </h3>
+      <div class="p-l-24">
+        <!-- Hidden: master browser push toggle (logic kept in component). -->
+        <div class="ibr-hide-push-master-toggle d-none">
+          <div class="d-flex justify-space-between align-items-center m-b-20">
+            <div class="new-notifcation-headings">
+              <h3 class="f-s-16 f-w-600 m-b-0 d-block">
+                {{ ("Enable push notifications" | translate) | capitalizeFirst }}
+              </h3>
+              <p class="f-s-14 m-b-0 m-t-0 d-block">
+                {{ ("Enable browser push notifications" | translate) | capitalizeFirst }}
+              </p>
+            </div>
+            <div>
+              <mat-slide-toggle
+                [(ngModel)]="pushEnabled"
+                (change)="onPushToggleChange()"
+                labelPosition="before"
+              ></mat-slide-toggle>
+            </div>
+          </div>
+        </div>
+        <div class="d-flex justify-space-between align-items-center m-b-20">
+          <div class="new-notifcation-headings">
+            <h3 class="f-s-16 f-w-600 m-b-0 d-block">
+              {{ ("News and updates" | translate) | capitalizeFirst }}
+            </h3>
+            <p class="f-s-14 m-b-0 m-t-0 d-block">
+              {{ ("News about product and feature updates" | translate) | capitalizeFirst }}
+            </p>
+          </div>
+          <div>
+            <mat-slide-toggle
+              [(ngModel)]="toggleStatus2"
+              (change)="onToggleChange()"
+              labelPosition="before"
+            ></mat-slide-toggle>
+          </div>
+        </div>
+        <div class="d-flex justify-space-between align-items-center">
+          <div class="new-notifcation-headings">
+            <h3 class="f-s-16 f-w-600 m-b-0 d-block">
+              {{ ("Clients’ birthdays" | translate) | capitalizeFirst }}
+            </h3>
+            <p class="f-s-14 m-b-0 m-t-0 d-block">
+              {{ ("Reminders on your clients’ birthdays" | translate) | capitalizeFirst }}
+            </p>
+          </div>
+          <div>
+            <mat-slide-toggle
+              [(ngModel)]="toggleStatus3"
+              (change)="onToggleChange()"
+              labelPosition="before"
+            ></mat-slide-toggle>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- All notifications section -->
+  <mat-card class="ibr-new-dashboad-card">
+    <mat-card-content>
+      <div class="d-flex align-items-center justify-content-between m-b-20 flex-wrap gap-12">
+        <h3 class="ibr-new-heading m-0">
+          {{ ("All notifications" | translate) | capitalizeFirst }}
+        </h3>
+        <div class="position-relative notification-search notification-list-search-field m-0">
+          <input
+            type="text"
+            [(ngModel)]="notificationSearchQuery"
+            placeholder="{{ ('Search notifications...' | translate) | capitalizeFirst }}"
+          />
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 14 14"
+            fill="none"
+            class="notification-search-icon"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M12.45 13.5L7.725 8.775C7.35 9.075 6.91875 9.3125 6.43125 9.4875C5.94375 9.6625 5.425 9.75 4.875 9.75C3.5125 9.75 2.35938 9.27813 1.41562 8.33438C0.471875 7.39063 0 6.2375 0 4.875C0 3.5125 0.471875 2.35938 1.41562 1.41562C2.35938 0.471875 3.5125 0 4.875 0C6.2375 0 7.39063 0.471875 8.33438 1.41562C9.27813 2.35938 9.75 3.5125 9.75 4.875C9.75 5.425 9.6625 5.94375 9.4875 6.43125C9.3125 6.91875 9.075 7.35 8.775 7.725L13.5 12.45L12.45 13.5ZM4.875 8.25C5.8125 8.25 6.60938 7.92188 7.26562 7.26562C7.92188 6.60938 8.25 5.8125 8.25 4.875C8.25 3.9375 7.92188 3.14062 7.26562 2.48438C6.60938 1.82812 5.8125 1.5 4.875 1.5C3.9375 1.5 3.14062 1.82812 2.48438 2.48438C1.82812 3.14062 1.5 3.9375 1.5 4.875C1.5 5.8125 1.82812 6.60938 2.48438 7.26562C3.14062 7.92188 3.9375 8.25 4.875 8.25Z"
+              fill="#464555"
+            />
+          </svg>
+        </div>
+      </div>
+      <div class="ibr-settings-notifications-list">
+        <div class="notification-list-scroll">
+          @if (notificationsLoading) {
+            <div class="notification-list-state">
+              {{ ("Loading..." | translate) | capitalizeFirst }}
+            </div>
+          } @else if (filteredNotifications.length === 0) {
+            <div class="notification-list-state text-muted">
+              {{
+                notifications.length === 0
+                  ? (("No notifications" | translate) | capitalizeFirst)
+                  : (("No matching notifications" | translate) | capitalizeFirst)
+              }}
+            </div>
+          } @else {
+            <div class="notification-center-list">
+              @for (
+                n of filteredNotifications;
+                track n.id;
+                let last = $last
+              ) {
+                <button
+                  class="notification-center-item notification-item"
+                  (click)="onNotificationClick(n)"
+                >
+                  @if (n.id === mfaReminderId) {
+                    <div class="d-flex align-items-start w-100">
+                      <div class="notification-avatar-wrapper m-r-12">
+                        <div
+                          class="notification-avatar rounded-circle d-flex align-items-center justify-content-center notification-type-security"
+                        >
+                          <svg
+                            width="24"
+                            height="24"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke-width="1.5"
+                            stroke="#FF383C"
+                            class="size-6"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"
+                            />
+                          </svg>
+                        </div>
+                      </div>
+                      <div class="flex-grow-1 min-w-0">
+                        <p class="notification-item-preview m-0 m-b-4">
+                          {{
+                            (n.body | translate: (n.previewParams || {}))
+                              | capitalizeFirst
+                          }}
+                        </p>
+                      </div>
+                    </div>
+                  } @else {
+                    <div class="d-flex align-items-start w-100">
+                      <div class="notification-avatar-wrapper m-r-12">
+                        <div
+                          class="notification-avatar rounded-circle d-flex align-items-center justify-content-center"
+                          [class.birthday]="n.iconType === 'birthday'"
+                        >
+                          @if (n.iconType === "birthday") {
+                            <img
+                              class="notification-row-type-icon"
+                              src="assets/images/logos/birthday.png"
+                              width="28"
+                              height="28"
+                              alt=""
+                            />
+                          } @else {
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="24"
+                              height="24"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="#516CE8"
+                              stroke-width="2"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              class="lucide lucide-user-cog-icon lucide-user-cog"
+                            >
+                              <path d="M10 15H6a4 4 0 0 0-4 4v2" />
+                              <path d="m14.305 16.53.923-.382" />
+                              <path d="m15.228 13.852-.923-.383" />
+                              <path d="m16.852 12.228-.383-.923" />
+                              <path d="m16.852 17.772-.383.924" />
+                              <path d="m19.148 12.228.383-.923" />
+                              <path d="m19.53 18.696-.382-.924" />
+                              <path d="m20.772 13.852.924-.383" />
+                              <path d="m20.772 16.148.924.383" />
+                              <circle cx="18" cy="15" r="3" />
+                              <circle cx="9" cy="7" r="4" />
+                            </svg>
+                          }
+                        </div>
+                      </div>
+                      <div class="flex-grow-1 min-w-0">
+                        <div
+                          class="notification-item-title-row d-flex align-items-start justify-content-between gap-8 m-b-4 w-100 min-w-0"
+                        >
+                          <div
+                            class="notification-item-title notification-item-title--wrap min-w-0 flex-grow-1"
+                          >
+                            {{ n.title | capitalizeFirst }}
+                          </div>
+                          @if (shouldShowNewLabel(n)) {
+                            <span class="notification-new-label flex-shrink-0">{{
+                              "New" | translate
+                            }}</span>
+                          }
+                        </div>
+                        <p class="notification-item-preview m-0 m-b-4">
+                          {{ n.body | capitalizeFirst }}
+                        </p>
+                      </div>
+                    </div>
+                  }
+                  <div
+                    class="notification-item-footer-meta d-flex align-items-center justify-content-between gap-8 w-100"
+                  >
+                    <span class="notification-item-meta">{{
+                      n.sentAtUtc | date: "mediumDate"
+                    }}</span>
+                    <div
+                      class="notification-footer-trailing d-flex align-items-center gap-8 flex-shrink-0"
+                    >
+                      @if (n.id === mfaReminderId) {
+                        @if (shouldShowNewLabel(n)) {
+                          <span class="notification-new-label">{{
+                            "New" | translate
+                          }}</span>
+                        }
+                        <span
+                          class="notification-type-pill notification-type-security"
+                        >
+                          {{ ("Security" | translate) | capitalizeFirst }}
+                        </span>
+                      } @else {
+                        <span
+                          class="notification-type-pill"
+                          [class.birthday]="n.iconType === 'birthday'"
+                        >
+                          @if (n.iconType === "birthday") {
+                            {{ ("Birthday" | translate) | capitalizeFirst }}
+                          } @else if (n.categoryLabel?.trim()) {
+                            {{ n.categoryLabel.trim() | capitalizeFirst }}
+                          } @else {
+                            {{ ("News" | translate) | capitalizeFirst }}
+                          }
+                        </span>
+                      }
+                    </div>
+                  </div>
+                </button>
+                @if (!last) {
+                  <mat-divider
+                    class="notification-settings-row-divider"
+                  ></mat-divider>
+                }
+              }
+            </div>
+          }
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
+
+<!-- <mat-card *ngIf="!loading" class="mat-mdc-card mdc-card cardWithShadow mb-20">
   <mat-card-content class="mat-mdc-card-content">
-    <h3 class="f-s-20 f-w-400 m-b-20">{{ 'Timezone' | translate }}</h3>
+    <h3 class="f-s-20 f-w-400 m-b-20">{{ "Timezone" | translate }}</h3>
     <mat-form-field appearance="outline" class="w-100">
-      <mat-label>{{ 'Timezone' | translate }}</mat-label>
+      <mat-label>{{ "Timezone" | translate }}</mat-label>
       <mat-select [(ngModel)]="timezone" (selectionChange)="onTimezoneChange()">
-        <mat-option *ngFor="let tz of timezones" [value]="tz">{{ tz }}</mat-option>
+        <mat-option *ngFor="let tz of timezones" [value]="tz">{{
+          tz
+        }}</mat-option>
       </mat-select>
     </mat-form-field>
   </mat-card-content>
-</mat-card>
-
-<mat-card *ngIf="!loading" class="mat-mdc-card mdc-card cardWithShadow mb-20">
-  <mat-card-content class="mat-mdc-card-content">
-<h3 class="f-s-20 f-w-400 m-b-20">{{ 'Email notifications' | translate }}</h3>
-<div class="p-l-30">
-    <div class="d-flex justify-space-between align-items-center m-b-20">
-        <div><h3 class="f-s-16 f-w-700 m-b-0 d-block">{{ 'News and updates' | translate }}</h3> 
-            <p class="f-s-14  m-b-0 m-t-0 d-block">{{ 'News about product and feature updates' | translate }}</p></div>
-        <div><mat-slide-toggle [(ngModel)]="toggleStatus" (change)="onToggleChange()" labelPosition="before"></mat-slide-toggle></div>
-    </div>
-   <div class="d-flex justify-space-between align-items-center">
-        <div><h3 class="f-s-16 f-w-700 m-b-0 d-block">{{ 'Clients’ birthdays' | translate }}</h3> 
-            <p class="f-s-14  m-b-0 m-t-0 d-block">{{ 'Reminders on your clients’ birthdays' | translate }}</p></div>
-        <div><mat-slide-toggle [(ngModel)]="toggleStatus1" (change)="onToggleChange()" labelPosition="before"></mat-slide-toggle></div>
-    </div>
-  
-</div>
-  </mat-card-content>
-</mat-card>
-
-
-<mat-card *ngIf="!loading" class="mat-mdc-card mdc-card cardWithShadow mb-20">
-  <mat-card-content class="mat-mdc-card-content">
-<h3 class="f-s-20 f-w-400 m-b-20">{{ 'Push notifications' | translate }}</h3>
-<div class="p-l-30">
-    <div class="d-flex justify-space-between align-items-center m-b-20">
-        <div><h3 class="f-s-16 f-w-700 m-b-0 d-block">{{ 'Enable push notifications' | translate }}</h3>
-            <p class="f-s-14 m-b-0 m-t-0 d-block">{{ 'Enable browser push notifications' | translate }}</p></div>
-        <div><mat-slide-toggle [(ngModel)]="pushEnabled" (change)="onPushToggleChange()" labelPosition="before"></mat-slide-toggle></div>
-    </div>
-    <div class="d-flex justify-space-between align-items-center m-b-20">
-        <div><h3 class="f-s-16 f-w-700 m-b-0 d-block">{{ 'News and updates' | translate }}</h3> 
-            <p class="f-s-14  m-b-0 m-t-0 d-block">{{ 'News about product and feature updates' | translate }}</p></div>
-        <div><mat-slide-toggle [(ngModel)]="toggleStatus2" (change)="onToggleChange()" labelPosition="before"></mat-slide-toggle></div>
-    </div>
-   <div class="d-flex justify-space-between align-items-center">
-        <div><h3 class="f-s-16 f-w-700 m-b-0 d-block">{{ 'Clients’ birthdays' | translate }}</h3> 
-            <p class="f-s-14  m-b-0 m-t-0 d-block">{{ 'Reminders on your clients’ birthdays' | translate }}</p></div>
-        <div><mat-slide-toggle [(ngModel)]="toggleStatus3" (change)="onToggleChange()" labelPosition="before"></mat-slide-toggle></div>
-    </div>
-</div>
-  </mat-card-content>
-</mat-card>
+</mat-card> -->

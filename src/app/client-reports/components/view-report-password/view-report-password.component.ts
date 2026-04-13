@@ -6,7 +6,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-view-report-password',
@@ -31,11 +31,11 @@ export class ViewReportPasswordComponent {
   @Input() password = '';
   @Input() isLoaderVisible = false;
 
-  constructor(private toastr: ToastrService) { }
+  constructor(private toastr: ToastrService, private translate: TranslateService) { }
 
   onSubmit() {
     if (!this.password.trim()) {
-      this.toastr.error('Please enter a password', 'Error!');
+      this.toastr.error(this.translate.instant('ERROR.ENTER_PASSWORD'), this.translate.instant('LABEL.ERROR'));
       return;
     }
     

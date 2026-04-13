@@ -1,33 +1,47 @@
-.dialog-form {
+/* Select + custom chevron — aligned with add-event-dialog */
+:host .select-option .mat-mdc-select-trigger {
+  border: 1px solid rgba(0, 0, 0, 0.23);
+  border-radius: 4px;
+  padding: 8px 12px;
+  min-height: 40px;
+  box-sizing: border-box;
+  width: 100%;
   display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding-top: 8px;
+  align-items: center;
 }
 
-.full-width { width: 100%; }
-
-.dialog-btn {
-  height: 40px;
-  padding: 0 24px;
-  border-radius: 12px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  font-family: "Ubuntu", serif;
-  border: none;
+:host .select-option .mat-mdc-select {
+  width: 100%;
 }
 
-.dialog-btn-cancel {
-  background: #fff;
-  color: #64748b;
-  border: 1px solid #e2e8f0;
-  &:hover { background: #f8fafc; }
+:host
+  .select-option
+  .mat-mdc-select.ng-invalid.ng-touched
+  .mat-mdc-select-trigger,
+:host
+  .select-option
+  .mat-mdc-select.ng-invalid.ng-dirty
+  .mat-mdc-select-trigger {
+  border-color: #d32f2f !important;
 }
 
-.dialog-btn-save {
-  background: #6366f1;
-  color: #fff;
-  &:hover { background: #4f46e5; }
-  &:disabled { opacity: 0.5; cursor: not-allowed; }
+:host .select-option .mat-mdc-select.cdk-focused .mat-mdc-select-trigger {
+  outline: 2px solid rgba(211, 47, 47, 0.2);
+  outline-offset: 1px;
+}
+
+.event-dialog-content {
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  &.mat-mdc-dialog-content {
+    margin-top: 24px;
+    padding: 0px !important;
+  }
 }

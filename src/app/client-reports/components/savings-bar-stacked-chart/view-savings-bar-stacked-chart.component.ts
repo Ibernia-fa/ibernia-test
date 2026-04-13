@@ -1,10 +1,16 @@
-import { Component, ElementRef, Input, OnChanges, OnDestroy, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, ElementRef, inject, Input, OnChanges, OnDestroy, SimpleChanges, ViewChild } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
+import { formatLifetimePlanSeriesDisplayName } from 'src/app/shared/utils/lifetime-plan-series-display';
+import { ensureUniqueSavingsChartSeriesColors } from 'src/app/shared/utils/unique-savings-chart-series-colors';
 import { MatCardModule } from '@angular/material/card';
 import { TablerIconsModule } from 'angular-tabler-icons';
 import { NgApexchartsModule } from 'ng-apexcharts';
 import moment from 'moment';
 import { ChartSeries, Series, TimelineEvent } from '../../models/charts-series.model';
+import { translateTimelineEventDisplayName } from 'src/app/shared/utils/timeline-event-display-name';
 import { Client } from 'src/app/clients/models/client';
+import { getProjectionColumnAgeLabel } from 'src/app/shared/utils/client-age-at-reference';
+import { sliceChartSeriesToInclusiveYearRange } from 'src/app/shared/utils/chart-series-year-range';
 
 @Component({
   selector: 'app-view-savings-bar-stacked-chart',
@@ -17,12 +23,17 @@ import { Client } from 'src/app/clients/models/client';
   styleUrl: './view-savings-bar-stacked-chart.component.scss'
 })
 export class ViewSavingsBarStackedChartComponent implements OnChanges, OnDestroy {
+  private translate = inject(TranslateService);
+
   @ViewChild("chart", { read: ElementRef }) chartElRef: ElementRef<HTMLDivElement>;
   @Input() report: ChartSeries;
   @Input() forecastStartDate: Date;
   @Input() forecastEndDate: Date;
   @Input() client: Client;
+  @Input() planDuration?: number;
   @Input() cashFlowName: string;
+  @Input() chartViewStartYear: number | null = null;
+  @Input() chartViewEndYear: number | null = null;
 
   isFullscreen: any;
   public chartOptions: any;
@@ -35,6 +46,7 @@ export class ViewSavingsBarStackedChartComponent implements OnChanges, OnDestroy
   }> = [];
   private _postRenderTimer: any = null;
   private _tooltipRetryTimer: any = null;
+  private seriesColorsForTooltip: Series[] = [];
 
   constructor() {
     this.chartOptions = {
@@ -86,7 +98,8 @@ export class ViewSavingsBarStackedChartComponent implements OnChanges, OnDestroy
             .map((seriesName: string, i: number) => {
               const value = series[i]?.[dataPointIndex];
               if (value === undefined || (typeof value === 'number' && value === 0)) return '';
-              const originalSeries = comp.report?.series?.find((s: Series) => s.name === seriesName);
+              // Index must match series order — duplicate pot names break find-by-name.
+              const originalSeries = comp.seriesColorsForTooltip[i] as Series | undefined;
               const color = (originalSeries?.color && originalSeries.color !== 'transparent') ? originalSeries.color : w.globals.colors[i];
               const displayValue = typeof value === 'number'
                 ? comp.formatCurrency(value)
@@ -117,7 +130,7 @@ export class ViewSavingsBarStackedChartComponent implements OnChanges, OnDestroy
           options: {
             legend: {
               position: "bottom",
-              offsetX: -10,
+              offsetX: 0,
               offsetY: 0,
             },
           },
@@ -143,7 +156,7 @@ export class ViewSavingsBarStackedChartComponent implements OnChanges, OnDestroy
       },
       legend: {
         position: "top",
-        offsetX: 100,
+        offsetX: 128,
         fillColors: ['#4CAF50', '#8BC34A', '#FF5722', '#FF5700']
       },
       fill: {
@@ -174,14 +187,28 @@ export class ViewSavingsBarStackedChartComponent implements OnChanges, OnDestroy
     return { ...report, categories, series, timelineEvents };
   }
 
+  private applyOptionalViewYearSlice(
+    report: ChartSeries | null | undefined,
+  ): ChartSeries | null | undefined {
+    if (!report?.categories?.length) return report;
+    const a = Number(this.chartViewStartYear);
+    const b = Number(this.chartViewEndYear);
+    if (!Number.isFinite(a) || !Number.isFinite(b)) return report;
+    return sliceChartSeriesToInclusiveYearRange(report, a, b);
+  }
+
+  private getProcessedReport(): ChartSeries | null | undefined {
+    return this.applyOptionalViewYearSlice(this.trimReportToEndYear(this.report));
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
-    const report = this.trimReportToEndYear(this.report);
+    const report = this.getProcessedReport();
 
-    if (changes['report'] && report?.series?.length) {
-      const seriesList = report.series;
+    if ((changes['report'] || changes['client']) && report?.series?.length) {
+      const seriesForChart = ensureUniqueSavingsChartSeriesColors(report.series);
+      this.seriesColorsForTooltip = seriesForChart;
 
-      // dynamically build fillColors array based on series names (match advisor)
-      const fillColors = seriesList.map((s: Series) =>
+      const fillColors = seriesForChart.map((s: Series) =>
         s.name === 'Current Account (Negative)' || s.name === 'Emergency Expense' ? 'transparent' : s.color
       );
       this.chartOptions.legend = {
@@ -202,7 +229,15 @@ export class ViewSavingsBarStackedChartComponent implements OnChanges, OnDestroy
 
       this.events = report.timelineEvents ?? [];
       this.chartOptions.annotations = { points: this.buildEventAnnotations(this.events) };
-      this.chartOptions.series = report.series.map((s) => ({ ...s, tack: 'stack1' }));
+      this.chartOptions.series = seriesForChart.map((s) => ({
+        ...s,
+        name: formatLifetimePlanSeriesDisplayName(s, this.client, this.translate),
+        color:
+          s.name === 'Current Account (Negative)' || s.name === 'Emergency Expense'
+            ? 'transparent'
+            : s.color,
+        tack: 'stack1',
+      }));
 
       if (this.events.length === 0) {
         this.cleanupHtmlTooltips();
@@ -298,7 +333,7 @@ export class ViewSavingsBarStackedChartComponent implements OnChanges, OnDestroy
           customTooltip: `
             <div class="event-tooltip ${event.iconUrl}">
               <img src="/assets/images/svgs/${event.iconUrl}.svg" alt="${event.iconUrl}" />
-              <span>${event.name}</span>
+              <span>${translateTimelineEventDisplayName(this.translate, event.name)}</span>
             </div>`
         });
       });
@@ -379,30 +414,37 @@ export class ViewSavingsBarStackedChartComponent implements OnChanges, OnDestroy
     return fullscreenOverlay ?? document.body;
   }
 
+  /** Marker fill — timeline accent (matches .vis-item chip styling in _customizer.scss) */
   private readonly ICON_COLORS: Record<string, string> = {
-    'birth-icon': '#feb63d',
-    'retirement-age-icon': '#ff8f6b',
-    'inheritance-icon': '#00d492',
-    'wedding-icon': '#7b3dfe',
-    'state-pension-icon': '#516ce8',
-    'home-icon': '#016aa2',
-    'travel-icon': '#363f72',
-    'car-icon': '#b93814',
-    'education-icon': '#3538cd',
-    'new-business-icon': '#b42318',
-    'boat-icon': '#047a48'
+    'birth-icon': '#fe9614',
+    'retirement-age-icon': '#3088ed',
+    'partner-retirement-age-icon': '#fe9614',
+    'mortality-icon': '#1c1c1c',
+    'inheritance-icon': '#1c1c1c',
+    'wedding-icon': '#6155f5',
+    'state-pension-icon': '#1c1c1c',
+    'home-icon': '#ff2d55',
+    'travel-icon': '#0088ff',
+    'car-icon': '#ac7f5e',
+    'education-icon': '#00c8b3',
+    'new-business-icon': '#34c759',
+    'boat-icon': '#ff7504',
+    'custom-icon': '#0088ff',
   };
 
   private calculateDotColor(iconUrl: string): string {
     return this.ICON_COLORS[iconUrl] ?? '#8388ff';
   }
 
-  private getDisplayAgeForYear(year: number, firstCategoryYear: number | null, lastCategoryYear: number | null): number | '' {
+  private getDisplayAgeForYear(
+    year: number,
+    _firstCategoryYear: number | null,
+    _lastCategoryYear: number | null,
+  ): number | '' {
     if (!Number.isFinite(year)) {
       return '';
     }
 
-    // If report already sends age values instead of calendar years, keep them as-is.
     if (year < 1000) {
       return year;
     }
@@ -412,26 +454,13 @@ export class ViewSavingsBarStackedChartComponent implements OnChanges, OnDestroy
       return '';
     }
 
-    // First year: age at forecast start (e.g. 45 if projection starts before they turn 46).
-    if (
-      firstCategoryYear != null &&
-      year === firstCategoryYear &&
-      this.forecastStartDate
-    ) {
-      return this.calculateAgeAtDate(this.forecastStartDate, birthDate);
-    }
-    // Age at start of year (Jan 1) to match timeline chart convention
-    return this.calculateAgeAtDate(new Date(year, 0, 1), birthDate);
-  }
-
-  private calculateAgeAtDate(referenceDate: Date, birthDate: Date): number {
-    const date = new Date(referenceDate);
-    let age = date.getFullYear() - birthDate.getFullYear();
-    const hasBirthdayPassed =
-      date.getMonth() > birthDate.getMonth() ||
-      (date.getMonth() === birthDate.getMonth() && date.getDate() >= birthDate.getDate());
-    if (!hasBirthdayPassed) age--;
-    return age;
+    const age = getProjectionColumnAgeLabel(
+      birthDate,
+      year,
+      this.forecastStartDate ?? undefined,
+      this.planDuration,
+    );
+    return Number.isNaN(age) ? '' : age;
   }
 
   private getClientBirthDate(): Date | null {

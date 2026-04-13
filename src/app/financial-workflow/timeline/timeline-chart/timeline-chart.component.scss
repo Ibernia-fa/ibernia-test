@@ -5,7 +5,8 @@
   border-radius: 12px;
   border: 1px solid #0000001a !important;
   padding-left: 64px;
-  padding-right: 16px;
+  /* Extra room so last x-axis tick labels are not clipped (vis centers labels on ticks). */
+  padding-right: 40px;
   .card-main-wrapper {
     span.f-s-16 {
       line-height: 18px;
@@ -164,7 +165,8 @@
   box-sizing: border-box;
 }
 
-::ng-deep .timeline-event-chip.retirement-age-chip {
+::ng-deep .timeline-event-chip.retirement-age-chip,
+::ng-deep .timeline-event-chip.partner-retirement-age-chip {
   padding: 1px 24px 1px 8px;
   font-size: 12px;
   width: 230.358px;
@@ -172,7 +174,8 @@
   max-width: 230.358px;
 }
 
-::ng-deep .timeline-event-chip.retirement-age-chip .icon {
+::ng-deep .timeline-event-chip.retirement-age-chip .icon,
+::ng-deep .timeline-event-chip.partner-retirement-age-chip .icon {
   width: 16px;
   height: 16px;
 }
@@ -277,7 +280,7 @@
   min-width: 40px;
   line-height: 100%;
   font-weight: 500;
-  gap: 6px;
+  // gap: 6px;
 
   p {
     margin: 0;
@@ -285,7 +288,32 @@
     color: #4043af;
   }
 
-  span {
+  /* Dual-axis age initials: full name on hover without reflow (overlay). */
+  .timeline-age-label--hover-expand {
+    position: relative;
+  }
+
+  .timeline-age-label__expanded {
+    position: absolute;
+    left: 0;
+    top: 0;
+    white-space: nowrap;
+    pointer-events: none;
+    visibility: hidden;
+    opacity: 0;
+    z-index: 2;
+  }
+
+  .timeline-age-label--hover-expand:hover .timeline-age-label__compact {
+    visibility: hidden;
+  }
+
+  .timeline-age-label--hover-expand:hover .timeline-age-label__expanded {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  .timeline-year-label {
     margin: 0;
     color: #5a596e;
     line-height: 100%;
@@ -298,6 +326,27 @@
 
 .timeline-container {
   flex: 1;
+}
+
+/*
+ * vis-timeline default CSS (node_modules/vis-timeline/styles/vis-timeline-graph2d.css) sets:
+ *   .vis-timeline { overflow: hidden; }
+ *   .vis-time-axis { overflow: hidden; }
+ *   .vis-time-axis .vis-text { overflow: hidden; }
+ * The last minor tick sits at the right edge of the window; each label is wider than a tick, so the
+ * right half of the text extends past the timeline box and gets clipped. Hover highlight (larger
+ * font in .vis-text.vis-minor.highlighted) makes this worse. Allow overflow for our chart only.
+ */
+::ng-deep .timeline-container .vis-timeline {
+  overflow: visible;
+}
+
+::ng-deep .timeline-container .vis-time-axis {
+  overflow: visible;
+}
+
+::ng-deep .timeline-container .vis-time-axis .vis-text {
+  overflow: visible;
 }
 
 .timeline-tooltip {
@@ -336,7 +385,7 @@
 
 .vis-text.vis-minor.highlighted p {
   font-size: 21px !important;
-  font-weight: 500;
+  font-weight: bold;
   color: #333;
 }
 
@@ -346,8 +395,28 @@
   cursor: default !important;
 }
 
+::ng-deep .connector-lines-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
 // Disable vis-item pointer events during external chip drag
 // so that drops land on the timeline background, not on existing items
 ::ng-deep .external-dragging .vis-item {
   pointer-events: none !important;
+}
+
+.timeline-client-age {
+  margin-top: 2px !important;
+}
+.timeline-partner-age {
+  margin-top: 5px !important;
+}
+.ibr-timeline-year-label {
+  margin-top: 6px !important;
 }

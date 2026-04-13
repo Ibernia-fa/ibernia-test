@@ -9,18 +9,26 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { NgIf } from '@angular/common';
-import { ImageCropDialogComponent } from '../account-preferences/image-crop-dialog/image-crop-dialog.component';
+import {
+  ImageCropDialogComponent,
+  ImageCropDialogResult,
+} from '../account-preferences/image-crop-dialog/image-crop-dialog.component';
+import type { ImageTransform } from 'ngx-image-cropper';
 import {
   isAllowedFileType,
   isWithinSizeLimit,
   fileToDataUrl,
   getImageDimensions,
   resizeImageToMin,
+  compressForBackground,
   compressImage,
   compressForProfilePayload,
+  ensureBackgroundDataUrlWithinLimit,
+  dataUrlToBlob,
   BACKGROUND_MIN_WIDTH,
   BACKGROUND_MIN_HEIGHT,
 } from 'src/app/shared/utils/image-upload.utils';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-branding',
@@ -32,6 +40,8 @@ import {
 export class BrandingComponent implements OnInit {
   profileImage: string | null = null;   // Data URL preview
   backgroundImage: string | null = null;   // Data URL preview
+  private logoCropSource: string | null = null;
+  private logoCropTransform: ImageTransform | null = null;
   private initialProfileImage: string | null = null;
   private initialBackgroundImage: string | null = null;
   hasChanges = false;
@@ -55,16 +65,54 @@ export class BrandingComponent implements OnInit {
     const userId = user?.sub;
     if (!userId) return;
 
+    // Session + BehaviorSubject so previews render before GET /profiles completes (matches logo in header/sidebar).
+    this.orgProfiles.hydrateBrandingLogoFromSession(userId);
+    this.orgProfiles.hydrateBackgroundFromSession(userId);
+    const logoCached = this.orgProfiles.getBrandingLogoValue();
+    const bgCached = this.orgProfiles.getBackgroundImageValue();
+    if (logoCached?.trim()) {
+      this.profileImage = ensureDataUrl(logoCached);
+      this.logoCropSource = this.profileImage;
+    }
+    if (bgCached?.trim()) {
+      this.backgroundImage = ensureDataUrl(bgCached);
+    }
+
+    // Dirty-check baseline must match what we show from cache; otherwise clearing before GET completes
+    // leaves both current and initial null and Save stays disabled.
+    this.initialProfileImage = this.profileImage;
+    this.initialBackgroundImage = this.backgroundImage;
+    this.hasChanges = false;
+
+    const formSnapshotProfile = this.profileImage;
+    const formSnapshotBg = this.backgroundImage;
+
     this.isLoading = true;
     this.orgProfiles.getProfile(userId).subscribe({
       next: (p) => {
-        console.log(p);
-        this.profileImage = ensureDataUrl(p?.profilePhotoUrl ?? null);
-        this.backgroundImage = ensureDataUrl(p?.backgroundPhotoUrl ?? null);
-        this.initialProfileImage = this.profileImage;
-        this.initialBackgroundImage = this.backgroundImage;
-        this.hasChanges = false;
+        const serverProfile = ensureDataUrl(p?.profilePhotoUrl ?? null);
+        const serverBg = ensureDataUrl(p?.backgroundPhotoUrl ?? null);
+
+        const userEditedWhileLoading =
+          normalizeBrandingImageRef(this.profileImage) !==
+            normalizeBrandingImageRef(formSnapshotProfile) ||
+          normalizeBrandingImageRef(this.backgroundImage) !==
+            normalizeBrandingImageRef(formSnapshotBg);
+
+        this.initialProfileImage = serverProfile;
+        this.initialBackgroundImage = serverBg;
+
+        if (!userEditedWhileLoading) {
+          this.profileImage = serverProfile;
+          this.logoCropSource = this.profileImage;
+          this.logoCropTransform = null;
+          this.backgroundImage = serverBg;
+          this.orgProfiles.setBrandingLogo(this.profileImage || null, userId);
+          this.orgProfiles.setBackgroundImage(this.backgroundImage || null, userId);
+        }
+
         this.isLoading = false;
+        this.updateHasChanges();
       },
       error: (err) => {
         console.error(err);
@@ -94,17 +142,19 @@ export class BrandingComponent implements OnInit {
       let dataUrl = await fileToDataUrl(file);
       if (imageType === 'profile') {
         dataUrl = await compressImage(dataUrl);
+        this.logoCropSource = dataUrl;
+        this.logoCropTransform = null;
         this.openCropDialog(dataUrl);
       } else {
         const dims = await getImageDimensions(dataUrl);
         if (dims.width >= BACKGROUND_MIN_WIDTH && dims.height >= BACKGROUND_MIN_HEIGHT) {
-          dataUrl = await compressImage(dataUrl);
+          dataUrl = await compressForBackground(dataUrl);
           this.backgroundImage = dataUrl;
           this.updateHasChanges();
         } else {
           try {
             const resized = await resizeImageToMin(dataUrl, BACKGROUND_MIN_WIDTH, BACKGROUND_MIN_HEIGHT);
-            this.backgroundImage = await compressImage(resized);
+            this.backgroundImage = await compressForBackground(resized);
             this.updateHasChanges();
             this.toastr.info(this.translate.instant('Image resized to meet minimum size.'));
           } catch {
@@ -131,21 +181,22 @@ export class BrandingComponent implements OnInit {
       data: {
         imageBase64,
         cropType: 'company' as const,
-        title: 'Crop company logo',
+        title: this.translate.instant('Crop company logo'),
+        initialTransform: this.logoCropTransform ?? undefined,
       },
     });
 
-    dialogRef.afterClosed().subscribe(async (result: string | null) => {
-      if (result) {
+    dialogRef.afterClosed().subscribe(async (result: ImageCropDialogResult | null) => {
+      if (result?.croppedBase64) {
+        this.logoCropTransform = result.transform;
         try {
-          this.profileImage = await compressForProfilePayload(result);
+          this.profileImage = await compressForProfilePayload(result.croppedBase64);
           this.updateHasChanges();
         } catch {
-          this.profileImage = result;
+          this.profileImage = result.croppedBase64;
           this.updateHasChanges();
         }
       } else {
-        // User cancelled - ensure loader is hidden (no image stored)
         this.isUploading = false;
       }
     });
@@ -154,8 +205,9 @@ export class BrandingComponent implements OnInit {
   cropImage(event: Event): void {
     event.stopPropagation();
     event.preventDefault();
-    if (!this.profileImage) return;
-    this.openCropDialog(this.profileImage);
+    const src = this.logoCropSource ?? this.profileImage;
+    if (!src) return;
+    this.openCropDialog(src);
   }
 
   clearImage(e: Event, type: 'profile' | 'background') {
@@ -163,45 +215,101 @@ export class BrandingComponent implements OnInit {
     e.preventDefault();
     if (type === 'profile') {
       this.profileImage = null;
+      this.logoCropSource = null;
+      this.logoCropTransform = null;
     } else if (type === 'background') {
       this.backgroundImage = null;
     }
     this.updateHasChanges();
   }
 
-  save() {
+  async save() {
     const userId = this.auth.getUserProfile()?.sub;
     if (!userId) {
-      this.toastr.error('No user id found. Please sign in again', 'Error!');
+      this.toastr.error(this.translate.instant('ERROR.NO_USER_SIGN_IN'), this.translate.instant('LABEL.ERROR'));
       return;
     }
 
-    this.isSaving = true;
-    this.orgProfiles
-      .saveProfile({ userId, profilePhotoUrl: this.profileImage || "", backgroundPhotoUrl: this.backgroundImage || "" })
-      .subscribe({
-        next: () => {
-          this.orgProfiles.setBrandingLogo(this.profileImage || null);
-          this.orgProfiles.setBackgroundImage(this.backgroundImage || null);
+    const logoChanged =
+      normalizeBrandingImageRef(this.profileImage) !==
+      normalizeBrandingImageRef(this.initialProfileImage);
+    const bgChanged =
+      normalizeBrandingImageRef(this.backgroundImage) !==
+      normalizeBrandingImageRef(this.initialBackgroundImage);
 
-          this.toastr.success('Image saved', 'Success!');
-          this.initialProfileImage = this.profileImage;
-          this.initialBackgroundImage = this.backgroundImage;
-          this.hasChanges = false;
-          this.isSaving = false;
-        },
-        error: (err) => {
-          console.error(err);
-          this.toastr.error('Failed to save image', 'Error!');
-          this.isSaving = false;
-        },
-      });
+    if (!logoChanged && !bgChanged) {
+      return;
+    }
+
+    if (bgChanged && this.backgroundImage) {
+      try {
+        const shrunk = await ensureBackgroundDataUrlWithinLimit(this.backgroundImage);
+        if (shrunk !== this.backgroundImage) {
+          this.backgroundImage = shrunk;
+        }
+      } catch (e) {
+        console.error('Background shrink before save failed', e);
+      }
+    }
+
+    this.isSaving = true;
+    try {
+      const requests: Array<ReturnType<typeof firstValueFrom>> = [];
+      if (logoChanged) {
+        if (this.profileImage) {
+          requests.push(
+            firstValueFrom(
+              this.orgProfiles.postOrganizationImage('logo', dataUrlToBlob(this.profileImage), false),
+            ),
+          );
+        } else {
+          requests.push(
+            firstValueFrom(this.orgProfiles.postOrganizationImage('logo', null, true)),
+          );
+        }
+      }
+      if (bgChanged) {
+        if (this.backgroundImage) {
+          requests.push(
+            firstValueFrom(
+              this.orgProfiles.postOrganizationImage(
+                'background',
+                dataUrlToBlob(this.backgroundImage),
+                false,
+              ),
+            ),
+          );
+        } else {
+          requests.push(
+            firstValueFrom(this.orgProfiles.postOrganizationImage('background', null, true)),
+          );
+        }
+      }
+      if (requests.length > 0) {
+        await Promise.all(requests);
+      }
+
+      this.orgProfiles.setBrandingLogo(this.profileImage || null, userId);
+      this.orgProfiles.setBackgroundImage(this.backgroundImage || null, userId);
+
+      this.toastr.success(this.translate.instant('TOAST.IMAGE_SAVED'), this.translate.instant('LABEL.SUCCESS'));
+      this.initialProfileImage = this.profileImage;
+      this.initialBackgroundImage = this.backgroundImage;
+      this.hasChanges = false;
+    } catch (err) {
+      console.error(err);
+      this.toastr.error(this.translate.instant('TOAST.FAILED_SAVE_IMAGE'), this.translate.instant('LABEL.ERROR'));
+    } finally {
+      this.isSaving = false;
+    }
   }
 
   private updateHasChanges() {
     this.hasChanges =
-      this.profileImage !== this.initialProfileImage ||
-      this.backgroundImage !== this.initialBackgroundImage;
+      normalizeBrandingImageRef(this.profileImage) !==
+        normalizeBrandingImageRef(this.initialProfileImage) ||
+      normalizeBrandingImageRef(this.backgroundImage) !==
+        normalizeBrandingImageRef(this.initialBackgroundImage);
   }
 }
 
@@ -209,4 +317,10 @@ export class BrandingComponent implements OnInit {
 function ensureDataUrl(s: string | null): string | null {
   if (!s) return null;
   return s.startsWith('data:') ? s : `data:image/jpeg;base64,${s}`;
+}
+
+/** Treat null/empty as equivalent so clear vs "" matches server and dirty state is correct. */
+function normalizeBrandingImageRef(s: string | null | undefined): string | null {
+  if (s == null || String(s).trim() === '') return null;
+  return s;
 }

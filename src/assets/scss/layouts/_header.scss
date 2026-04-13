@@ -169,22 +169,29 @@ html .topbar {
   .sub-menu {
     position: absolute;
     top: 65px;
-    right: 16px;
-    background-color: #fff;
-    border: 1px solid #e7e7eb;
+    right: 12px;
+    background-color: #ffffff !important;
+    border: 1px solid #c8c4d833;
+    box-shadow: 0px 32px 64px -12px #191c1d1f;
+    backdrop-filter: blur(75px);
+    -webkit-backdrop-filter: blur(75px);
+    border-radius: 12px !important;
+    overflow: hidden;
+    // background-color: #fff;
+    // border: 1px solid #e7e7eb;
     border-top: 0px;
-    min-width: 220px;
+    min-width: 190px;
     list-style: none;
     padding: 0px;
     margin: 0px;
     padding: 0px;
-    border-radius: 0px 0px 4px 4px;
+    // border-radius: 0px 0px 4px 4px;
     display: none;
 
     flex-direction: column;
     li {
-      padding: 8px 12px;
-      border-radius: 4px;
+      padding: 10px 16px;
+      border-radius: 0px;
       min-height: 38px;
       display: flex;
       align-items: center;
@@ -194,8 +201,8 @@ html .topbar {
       font-family: "Ubuntu", serif;
       transition: all 0.3s linear;
       width: 100%;
-      background: #fff;
-      color: #787889;
+      // background: #fff;
+      color: #1c1c1c;
       font-size: 14px;
       font-weight: 400;
       line-height: normal;
@@ -264,24 +271,30 @@ html .topbar {
 .sidebar-visible .top-navigation-bar {
   margin-left: 273px;
   width: calc(100% - 273px);
-  transition:
-    margin-left 0.3s ease,
-    width 0.3s ease;
+  // transition:
+  //   margin-left 0.3s ease,
+  //   width 0.3s ease;
+  transition-duration: 400ms;
+  transition-timing-function: cubic-bezier(0.25, 0.8, 0.25, 1);
+  transition-property: transform, margin-left, width;
 }
 .sidebar-visible.sidebar-collapsed .top-navigation-bar {
   margin-left: 88px;
   width: calc(100% - 88px);
-  transition:
-    margin-left 0.3s ease,
-    width 0.3s ease;
+  // transition:
+  //   margin-left 0.3s ease,
+  //   width 0.3s ease;
+  transition-duration: 400ms;
+  transition-timing-function: cubic-bezier(0.25, 0.8, 0.25, 1);
+  transition-property: transform, margin-left, width;
 }
 
 // Header breadcrumb (Home icon > Client name > Plan name)
 .header-breadcrumb {
-  position: absolute;
-  left: 24px;
-  top: 50%;
-  transform: translateY(-50%);
+  // position: absolute;
+  // left: 24px;
+  // top: 50%;
+  // transform: translateY(-50%);
   margin: 0;
   gap: 4px;
   font-size: 16px;
@@ -334,18 +347,21 @@ html .topbar {
     position: absolute;
     top: -2px;
     right: -2px;
-    min-width: 18px;
+    // min-width: 18px;
+    width: 18px;
     height: 18px;
-    padding: 0 5px;
-    font-size: 11px;
+    font-family: "Ubuntu", serif;
+    // padding: 0 4px;
+    padding: 0px;
+    font-size: 10px;
     font-weight: 600;
-    line-height: 18px;
+    line-height: 16px;
     text-align: center;
     color: #fff;
-    background: #dc2626;
-    border-radius: 9px;
-    border: 2px solid #fff;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+    background: #ff383c;
+    border-radius: 999px;
+    border: 1px solid #fff;
+    // box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
   }
 }
 
@@ -367,6 +383,7 @@ html .topbar {
   // Global styles.scss applies `button span { text-transform: lowercase }`, which inherits into menu rows.
   .mat-mdc-menu-item.notification-item {
     text-transform: none !important;
+    background-color: white !important;
 
     .mdc-list-item__primary-text,
     .mat-mdc-menu-item-text,
@@ -381,59 +398,65 @@ html .topbar {
     .notification-item-title,
     .notification-item-preview,
     .notification-item-meta,
-    .notification-type-pill {
+    .notification-type-pill,
+    .notification-new-label {
       text-transform: none !important;
     }
   }
 }
 
 .notification-menu-shell {
-  display: flex;
-  flex-direction: column;
-  width: 400px;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  width: 440px;
   max-width: 100%;
-  height: 440px;
-  max-height: min(440px, 70vh);
+  height: 520px;
+  max-height: min(520px, 70vh);
 }
 
 // Notification dropdown (bell icon)
 .notification-dropdown {
+  background-color: #ffffffbf !important;
+  border: 1px solid #c8c4d833;
+  box-shadow: 0px 32px 64px -12px #191c1d1f;
+  backdrop-filter: blur(24px);
+  border-radius: 12px !important;
+  margin-top: 12px;
   .notification-dropdown-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
     padding: 14px 18px;
-    border-bottom: 1px solid rgba(15, 23, 42, 0.08);
-    flex-shrink: 0;
   }
 
   .notification-menu-title {
-    font-size: 1rem;
+    font-size: 20px;
     font-weight: 700;
-    letter-spacing: -0.02em;
-    color: #0f172a;
+    line-height: 28px;
+    letter-spacing: -0.5px;
+    color: #191c1d;
   }
 
   .notification-filter-toggle {
     display: inline-flex;
     align-items: center;
+    width: 100%;
     gap: 4px;
-    padding: 3px;
-    border-radius: 10px;
-    background: #f1f5f9;
+    padding: 4px;
+    border-radius: 8px;
+    background: #dddddd;
   }
 
   .notification-filter-btn {
     border: none;
     background: transparent;
-    color: #64748b;
-    font-size: 12px;
+    color: #464555;
+    font-size: 14px;
     font-weight: 600;
     padding: 6px 12px;
-    border-radius: 8px;
+    border-radius: 6px;
+    font-family: "Ubuntu", serif;
+    flex: 1;
     cursor: pointer;
-    line-height: 1.2;
+    line-height: 18px;
     transition:
       background 0.15s ease,
       color 0.15s ease;
@@ -444,7 +467,7 @@ html .topbar {
 
     &.is-active {
       background: #fff;
-      color: #0f172a;
+      color: #4043af;
       box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
     }
   }
@@ -470,13 +493,16 @@ html .topbar {
   }
 
   .notification-item {
+    position: relative;
     min-height: 88px;
     padding: 14px 18px !important;
     text-align: left;
+    margin-bottom: 8px;
     cursor: pointer;
+    background-color: white;
     transition: background 0.15s ease;
     &:hover {
-      background: rgba(15, 23, 42, 0.04);
+      background: #fafafa !important;
     }
 
     .notification-avatar {
@@ -489,63 +515,119 @@ html .topbar {
         background: #fdf2f8;
         color: #db2777;
       }
-    }
+      &.notification-type-security {
+        background: #fef2f2;
+      }
 
-    .notification-message-icon {
-      width: 22px;
-      height: 22px;
+      .notification-row-type-icon {
+        width: 28px;
+        height: 28px;
+        object-fit: contain;
+        display: block;
+        flex-shrink: 0;
+      }
+      &.rounded-circle {
+        border-radius: 12px !important;
+      }
     }
 
     .notification-item-title {
-      font-size: 14px;
+      font-size: 16px;
+      font-weight: 500;
+      color: #1c1c1c;
+    }
+
+    // Same lavender pill as default category badge (“Read”-style background in dropdown).
+    .notification-new-label {
+      display: inline-flex;
+      align-items: center;
+      padding: 0px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      height: 22px;
       font-weight: 700;
-      color: #0f172a;
+      line-height: unset;
+      color: #fff;
+      background: #ff383c;
+      // display: inline-flex;
+      // align-items: center;
+      // padding: 2px 10px;
+      // border-radius: 999px;
+      // font-size: 10px;
+      // height: 16px;
+      // font-weight: 700;
+      // line-height: 1;
+      // color: #fff;
+      // background: #dc2626;
     }
 
     .notification-item-preview {
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 400;
-      color: #64748b;
-      line-height: 1.45;
+      color: #787889;
+      line-height: 20px;
+      margin: 2px 0 6px 0 !important;
     }
 
     .notification-item-meta {
-      font-size: 11px;
-      color: #94a3b8;
+      font-size: 14px;
+      font-weight: 400;
+      color: #787889;
+      line-height: 20px;
     }
 
     .notification-type-pill {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      padding: 2px 10px;
+      padding: 0px 12px;
       border-radius: 999px;
-      font-size: 11px;
-      font-weight: 500;
-      border: 1px solid #e2e8f0;
-      color: #64748b;
-      &::before {
-        content: "";
-        width: 6px;
-        height: 6px;
-        border-radius: 50%;
-        background: #94a3b8;
+      font-size: 12px;
+      height: 22px;
+      font-weight: 700;
+      line-height: unset;
+      // display: inline-flex;
+      // align-items: center;
+      // gap: 6px;
+      // padding: 2px 10px;
+      // border-radius: 999px;
+      // font-size: 10px;
+      // height: 16px;
+      // font-weight: 700;
+      background-color: #3824c71a;
+      color: #4043af;
+
+      &.notification-type-security {
+        background-color: rgb(255 130 130 / 14%);
+        color: #ff4444;
       }
-      &.birthday::before {
-        background: #e91e63;
+
+      &.birthday {
+        background-color: #fdf2f8;
+        color: #db2777;
+        &::before {
+          content: "";
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          flex-shrink: 0;
+          background: #a855f7;
+        }
       }
     }
 
     .notification-status-dot {
-      width: 8px;
-      height: 8px;
-      min-width: 8px;
-      border-radius: 50%;
-      background: #e2e8f0;
+      position: absolute;
+      left: 2px;
+      height: 32px;
+      width: 4px;
+      top: 50%;
+      border-radius: 999px;
+      transform: translateY(-50%);
+      background: white;
       flex-shrink: 0;
       &.unread {
-        background: #16a34a;
-        box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.2);
+        background: #4043af;
+        // box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.2);
       }
     }
 
@@ -562,6 +644,12 @@ html .topbar {
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
+
+    .new-notification-time {
+      font-size: 10px;
+      color: #464555;
+      font-weight: 500;
+    }
   }
 
   .notification-dropdown-footer {
@@ -569,20 +657,25 @@ html .topbar {
     align-items: center;
     justify-content: space-between;
     gap: 10px;
-    padding: 12px 16px;
-    border-top: 1px solid rgba(15, 23, 42, 0.08);
+    padding: 16px;
+    // border-top: 1px solid rgba(15, 23, 42, 0.08);
     flex-shrink: 0;
-    background: #fafafa;
+    background: #ffffff;
 
     .mark-all-read-btn,
     .view-all-btn {
       flex: 1;
       font-weight: 600;
-      font-size: 13px;
+      font-size: 14px;
       border-radius: 10px !important;
       padding: 0 12px;
       min-height: 40px;
-      border-width: 1.5px !important;
+      border-width: 1px !important;
+      background-color: #4043af !important;
+      color: white !important;
+      box-shadow:
+        0px 4px 6px -4px #4231cf33,
+        0px 10px 15px -3px #4231cf33;
     }
 
     .mark-all-read-btn {
@@ -604,11 +697,53 @@ html .topbar {
 
     .view-all-btn {
       border-color: rgba(79, 70, 229, 0.45) !important;
-      color: #4f46e5 !important;
+      // color: #4f46e5 !important;
       text-decoration: none;
       display: inline-flex;
       align-items: center;
       justify-content: center;
     }
+  }
+}
+
+// Shared: header dropdown + settings /notifications page
+.notification-search {
+  input {
+    width: 100%;
+    background-color: white;
+    border: 1px solid #c8c4d833;
+    color: #6b7280;
+    border-radius: 8px;
+    min-height: 36px;
+    outline: none;
+    padding: 0 16px 0 36px;
+    font-size: 14px;
+    font-weight: 400;
+    font-family: "Ubuntu", serif;
+    line-height: 16px;
+    &:focus {
+      border: 1px solid #4043af;
+    }
+  }
+  .notification-search-icon {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 14px;
+    pointer-events: none;
+  }
+}
+
+.new-mark-all-read-btn {
+  color: #4043af;
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 16px;
+  background-color: transparent !important;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  &:hover {
+    opacity: 0.8;
   }
 }

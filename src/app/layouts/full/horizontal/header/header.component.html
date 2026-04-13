@@ -73,19 +73,19 @@
                 class="d-flex align-items-center  f-s-16 f-w-500"
               >
                 <i-tabler name="help" class="icon-20 m-r-8"></i-tabler
-                >Frequently Asked Questions
+                >{{ 'LABEL.FAQ' | translate }}
               </span>
               <a
                 [routerLink]="['/theme-pages/faq']"
                 mat-flat-button
                 color="primary"
-                >Check</a
+                >{{ 'LABEL.CHECK' | translate }}</a
               >
             </div>
           </div>
           <div class="col-sm-4">
             <div class="p-x-16 p-y-32">
-              <h4 class="f-s-18 f-w-600  m-b-16">Quick Links</h4>
+              <h4 class="f-s-18 f-w-600  m-b-16">{{ 'Quick Links' | translate }}</h4>
               @for(quicklink of quicklinks; track quicklink.title) {
               <div class="text-hover-primary">
                 <a
@@ -99,9 +99,9 @@
           </div>
         </div>
       </mat-menu>
-      <a mat-button [routerLink]="['/apps/chat']">Chat</a>
-      <a mat-button [routerLink]="['/apps/calendar']">Calendar</a>
-      <a mat-button [routerLink]="['/apps/email/inbox']">Email</a>
+      <a mat-button [routerLink]="['/apps/chat']">{{ 'Chat' | translate }}</a>
+      <a mat-button [routerLink]="['/apps/calendar']">{{ 'Calendar' | translate }}</a>
+      <a mat-button [routerLink]="['/apps/email/inbox']">{{ 'Email' | translate }}</a>
     </div>
 
     <span class="flex-1-auto"></span>
@@ -169,10 +169,10 @@
       class="topbar-dd cardWithShadow"
     >
       <div class="d-flex align-items-center p-x-32 p-y-16">
-        <h6 class="f-s-16 f-w-600 m-0 ">Notifications</h6>
+        <h6 class="f-s-16 f-w-600 m-0 ">{{ 'Notifications' | translate }}</h6>
         <span class="m-l-auto">
           <span class="bg-primary text-white p-x-8 p-y-4 f-w-500 rounded f-s-12"
-            >5 new</span
+            >{{ '5 new' | translate }}</span
           >
         </span>
       </div>
@@ -192,7 +192,7 @@
 
       <div class="p-y-12 p-x-32">
         <button mat-stroked-button color="primary" class="w-100">
-          See all notifications
+          {{ 'See all notifications' | translate }}
         </button>
       </div>
     </mat-menu>
@@ -217,7 +217,7 @@
       class="topbar-dd cardWithShadow"
     >
       <div class="p-x-32 p-y-16">
-        <h6 class="f-s-16 f-w-600 m-0 ">User Profile</h6>
+        <h6 class="f-s-16 f-w-600 m-0 ">{{ 'LABEL.USER_PROFILE' | translate }}</h6>
 
         <div class="d-flex align-items-center p-b-24 b-b-1 m-t-16">
           <img
@@ -230,7 +230,7 @@
             <span class="f-s-14 d-block m-b-4">Designer</span>
             <span class="d-flex align-items-center">
               <i-tabler name="mail" class="icon-15 m-r-4"></i-tabler>
-              info&#64;modernize.com
+              hello&#64;ibernia.it
             </span>
           </div>
         </div>
@@ -271,7 +271,7 @@
                 Unlimited <br />
                 Access
               </h5>
-              <button mat-flat-button color="primary">Upgrade</button>
+              <button mat-flat-button color="primary">{{ 'Upgrade' | translate }}</button>
             </div>
             <div class="m-l-auto">
               <img
@@ -290,7 +290,7 @@
           mat-stroked-button
           color="primary"
           class="w-100"
-          >Logout</a
+          >{{ 'Logout' | translate }}</a
         >
       </div>
     </mat-menu>

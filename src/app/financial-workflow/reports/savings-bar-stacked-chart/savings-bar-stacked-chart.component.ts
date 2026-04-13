@@ -1,4 +1,5 @@
 import {
+  AfterViewInit,
   Component,
   ViewChild,
   Input,
@@ -7,14 +8,26 @@ import {
   SimpleChanges,
   ElementRef,
   NgZone,
+  DestroyRef,
   inject,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { TranslateService } from '@ngx-translate/core';
+import { formatLifetimePlanSeriesDisplayName } from 'src/app/shared/utils/lifetime-plan-series-display';
 import { MatCardModule } from '@angular/material/card';
 import { TablerIconsModule } from 'angular-tabler-icons';
 import { ChartComponent, NgApexchartsModule } from 'ng-apexcharts';
-import { ChartSeries, TimelineEvent } from '../models/charts-series.model';
+import {
+  ChartSeries,
+  Series,
+  TimelineEvent,
+} from '../models/charts-series.model';
+import { ensureUniqueSavingsChartSeriesColors } from 'src/app/shared/utils/unique-savings-chart-series-colors';
+import { translateTimelineEventDisplayName } from 'src/app/shared/utils/timeline-event-display-name';
 import { Client } from 'src/app/clients/models/client';
 import moment from 'moment';
+import { getProjectionColumnAgeLabel } from 'src/app/shared/utils/client-age-at-reference';
+import { sliceChartSeriesToInclusiveYearRange } from 'src/app/shared/utils/chart-series-year-range';
 
 @Component({
   selector: 'app-savings-bar-stacked-chart',
@@ -22,7 +35,9 @@ import moment from 'moment';
   templateUrl: './savings-bar-stacked-chart.component.html',
   styleUrl: './savings-bar-stacked-chart.component.scss',
 })
-export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
+export class SavingsBarStackedChartComponent
+  implements AfterViewInit, OnChanges, OnDestroy
+{
   @ViewChild('chart', { read: ElementRef })
   chartElRef: ElementRef<HTMLDivElement>;
   @ViewChild(ChartComponent) apxChartComponent: ChartComponent | undefined;
@@ -30,11 +45,16 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
   @Input() forecastStartDate: Date;
   @Input() forecastEndDate: Date;
   @Input() client: Client;
+  /** Cashflow plan end age (e.g. 90); aligns last bar label year with birthYear + planDuration. */
+  @Input() planDuration?: number;
   @Input() cashFlowName: string;
   @Input() chartHeight: number = 500;
   @Input() emergencyIconUrl?: string;
   /** When true, enables smooth bar morphing animation on data updates (dynamicAnimation). */
   @Input() animateUpdates: boolean = false;
+  /** Optional inclusive calendar-year window (after end-year trim). Null = full trimmed range. */
+  @Input() chartViewStartYear: number | null = null;
+  @Input() chartViewEndYear: number | null = null;
   isFullscreen: any;
 
   private readonly EVENT_DOT_SPACING = 20;
@@ -54,7 +74,6 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
   private emergencyExpenseBandEl: HTMLElement | null = null;
   private eventLabelElements: HTMLElement[] = [];
   private yAxisLabelEl: HTMLElement | null = null;
-  private xAxisLabelEl: HTMLElement | null = null;
   private shortfallDataPointIndex: number = -1;
   private emergencyExpenseDataPointIndex: number = -1;
   /** Tracks whether the chart has been rendered at least once (used to skip full re-inits on subsequent series updates). */
@@ -63,13 +82,35 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
   private previousCategoriesKey = '';
   /** Annotation data decoupled from chartOptions to avoid triggering ng-apexcharts change detection. */
   private currentAnnotationPoints: any[] = [];
+  /**
+   * Scenario Lab (`animateUpdates`): report changes skip `chartOptions.annotations` so Apex can
+   * use `updateSeries` only. We must clear and re-add point annotations after each report swap
+   * (Before/After) or tooltips keep stale `customTooltip` HTML / wrong marker alignment.
+   */
+  private _pointAnnotationsNeedResync = false;
   /** Cached flag for use inside ApexCharts event callbacks. */
   private _hideEmergencyOverlays = false;
   /** Debounce handle for postRenderSetup. */
   private _postRenderTimer: any = null;
+  /** Series colours after client-side de-dupe (legend + shared tooltip must match bars). */
+  private seriesColorsForTooltip: Series[] = [];
+
+  /** Observes wrapper size (e.g. sidebar open/close); Apex only watches its direct parent. */
+  private chartResizeObserver: ResizeObserver | null = null;
+  private chartLayoutDebounceTimer: ReturnType<typeof setTimeout> | null = null;
 
   private getCurrencyAxisTitle(): string {
     return this.client?.clientDetails?.preferredCurrency ?? '';
+  }
+
+  /** X-axis label: "Age", or "Age {main first name}" when the plan has a partner. */
+  private getXAxisTitleText(): string {
+    const ageWord = this.translate.instant('Age');
+    if (!this.client?.partnerDetail) {
+      return ageWord;
+    }
+    const first = this.client.clientDetails?.firstName?.trim() ?? '';
+    return first ? `${ageWord} ${first}` : ageWord;
   }
 
   /** Trims report to only include years up to forecastEndDate (projection end year). */
@@ -78,11 +119,15 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
   ): ChartSeries | null | undefined {
     if (!report?.categories?.length || !this.forecastEndDate) return report;
     const endYear = moment(this.forecastEndDate).year();
+    if (!Number.isFinite(endYear)) return report;
     const indicesToKeep: number[] = [];
     report.categories.forEach((cat, i) => {
       const y = Number(cat);
       if (Number.isFinite(y) && y <= endYear) indicesToKeep.push(i);
     });
+    // If nothing matches (e.g. categories start after forecast end year, or bad dates),
+    // do not strip — otherwise series keep `name` but `data: []` and Apex renders blank.
+    if (indicesToKeep.length === 0) return report;
     if (indicesToKeep.length === report.categories.length) return report;
     const categories = indicesToKeep.map((i) => report.categories[i]);
     const series = report.series.map((s) => ({
@@ -95,7 +140,28 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
     return { ...report, categories, series, timelineEvents };
   }
 
+  private applyOptionalViewYearSlice(
+    report: ChartSeries | null | undefined,
+  ): ChartSeries | null | undefined {
+    if (!report?.categories?.length) return report;
+    // Do not use Number(null) — it is 0 and would slice to [0,0], wiping all categories (simulation modal).
+    if (this.chartViewStartYear == null || this.chartViewEndYear == null) {
+      return report;
+    }
+    const a = Number(this.chartViewStartYear);
+    const b = Number(this.chartViewEndYear);
+    if (!Number.isFinite(a) || !Number.isFinite(b)) return report;
+    return sliceChartSeriesToInclusiveYearRange(report, a, b);
+  }
+
+  /** Report after end-year trim and optional chart year window. */
+  private getProcessedReport(): ChartSeries | null | undefined {
+    return this.applyOptionalViewYearSlice(this.trimReportToEndYear(this.report));
+  }
+
   private ngZone = inject(NgZone);
+  private translate = inject(TranslateService);
+  private readonly destroyRef = inject(DestroyRef);
 
   constructor() {
     this.chartOptions = {
@@ -110,7 +176,7 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
           enabled: false,
           dynamicAnimation: {
             enabled: true,
-            speed: 450,
+            speed: 1500,
           },
           animateGradually: { enabled: false },
         },
@@ -166,17 +232,16 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
 
           const bodyRows = w.globals.seriesNames
             .map((seriesName: string, i: number) => {
-              if (seriesName === 'Emergency Expense') return '';
+              const rawName = this.seriesColorsForTooltip[i]?.name;
+              if (rawName === 'Emergency Expense') return '';
               const value = series[i]?.[dataPointIndex];
               if (
                 value === undefined ||
                 (typeof value === 'number' && value === 0)
               )
                 return '';
-              // Use the original series color (before transparent override) so tooltip dots are always visible
-              const originalSeries = this.report?.series?.find(
-                (s) => s.name === seriesName,
-              );
+              // Index must match series order — duplicate pot names (e.g. two "Investment") break find-by-name.
+              const originalSeries = this.seriesColorsForTooltip[i];
               const color =
                 originalSeries?.color && originalSeries.color !== 'transparent'
                   ? originalSeries.color
@@ -195,10 +260,12 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
             .filter(Boolean)
             .join('');
 
+          const ageLbl = this.translate.instant('Age');
+          const yearLbl = this.translate.instant('Year');
           return `
       <div class="savings-tooltip">
         <div class="savings-tooltip__header">
-          <div>Age: ${age} </div>  <div> Year: ${xValue}</div> 
+          <div>${ageLbl}: ${age} </div>  <div> ${yearLbl}: ${xValue}</div> 
         </div>
         ${bodyRows}
       </div>
@@ -211,7 +278,7 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
           options: {
             legend: {
               position: 'bottom',
-              offsetX: -10,
+              offsetX: 0,
               offsetY: 0,
               onItemClick: {
                 toggleDataSeries: false,
@@ -249,7 +316,7 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
       legend: {
         position: 'top',
         horizontalAlign: 'center',
-        offsetX: 0,
+        offsetX: 28,
         fillColors: ['#4CAF50', '#8BC34A', '#FF5722', '#FF5700'],
         showForZeroSeries: false,
       },
@@ -266,9 +333,74 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
       },
       annotations: { points: [] },
     };
+
+    this.translate.onLangChange
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.onChartTranslationsChanged());
+  }
+
+  ngAfterViewInit(): void {
+    this.setupChartResizeObserver();
+  }
+
+  /**
+   * Fires when ng-apexcharts finishes creating the instance (report may load after view init).
+   */
+  onApexChartReady(): void {
+    this.ngZone.runOutsideAngular(() => this.flushApexChartWidthAfterLayout());
+  }
+
+  /**
+   * Re-layout ApexCharts when the host width changes without a window resize
+   * (common with CSS layout / sidebar transitions).
+   */
+  private setupChartResizeObserver(): void {
+    if (typeof ResizeObserver === 'undefined') {
+      return;
+    }
+    const el = this.chartElRef?.nativeElement;
+    if (!el) {
+      return;
+    }
+    this.chartResizeObserver?.disconnect();
+    this.chartResizeObserver = new ResizeObserver(() => {
+      if (this.chartLayoutDebounceTimer !== null) {
+        clearTimeout(this.chartLayoutDebounceTimer);
+      }
+      this.chartLayoutDebounceTimer = setTimeout(() => {
+        this.chartLayoutDebounceTimer = null;
+        this.ngZone.runOutsideAngular(() =>
+          this.flushApexChartWidthAfterLayout(),
+        );
+      }, 150);
+    });
+    this.chartResizeObserver.observe(el);
+  }
+
+  /**
+   * Apex often keeps the initial pixel width; `update()` does not reliably
+   * re-read % width when only the flex layout changes. Set an explicit width
+   * from the wrapper after layout (double rAF avoids stale measurements).
+   */
+  private flushApexChartWidthAfterLayout(): void {
+    const apx = this.apxChartComponent;
+    const host = this.chartElRef?.nativeElement;
+    if (!apx || !host) {
+      return;
+    }
+    const apply = () => {
+      const width = Math.floor(host.getBoundingClientRect().width);
+      if (width < 32) {
+        return;
+      }
+      void apx.updateOptions({ chart: { width } }, false, false, false);
+    };
+    requestAnimationFrame(() => requestAnimationFrame(apply));
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    /** Only used to skip eager `updateSeries` on first paint (emergency sim uses animateUpdates). */
+    const chartWasAlreadyInitialized = this.chartInitialized;
     const hideEmergencyOverlays = this.emergencyIconUrl === 'none';
     this._hideEmergencyOverlays = hideEmergencyOverlays;
 
@@ -297,19 +429,23 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
       };
     }
 
-    const report = this.trimReportToEndYear(this.report);
+    const report = this.getProcessedReport();
     if (!report?.series?.length) {
+      this.seriesColorsForTooltip = [];
       if (changes['client'] && this.client) {
-      this.chartOptions.yaxis = {
-        title: { text: '' },
-        labels: {
-          formatter: (value: any) =>
-            value != null ? Number(value).toLocaleString() : '',
-        },
-      };
+        this.chartOptions.yaxis = {
+          title: { text: '' },
+          labels: {
+            formatter: (value: any) =>
+              value != null ? Number(value).toLocaleString() : '',
+          },
+        };
       }
       return;
     }
+
+    const seriesForChart = ensureUniqueSavingsChartSeriesColors(report.series);
+    this.seriesColorsForTooltip = seriesForChart;
 
     if (changes['report']) {
       this.cleanupHtmlTooltips();
@@ -327,37 +463,29 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
         ? []
         : this.buildEmergencyExpenseAnnotation(report);
 
+      const points = this.buildEventAnnotations(this.events);
+      this.currentAnnotationPoints = points;
+
       // Only rebuild legend and annotations when NOT in animated-update mode (or on first render).
       // Re-assigning these inputs triggers ng-apexcharts updateOptions → full re-render.
       if (!this.animateUpdates || !this.chartInitialized) {
-        const seriesList = report.series;
-
-        // dynamically build fillColors array based on series names
-        const fillColors = seriesList.map((s, i) => {
-          if (
-            s.name === 'Current Account (Negative)' ||
-            s.name === 'Emergency Expense'
-          ) {
-            return 'transparent';
-          }
-          return s.color;
-        });
-
-        // legends formatter to hide specific series names
+        // legends formatter to hide specific series names (marker colours set below for every update)
         this.chartOptions.legend = {
           ...this.chartOptions.legend,
 
-          formatter: (seriesName: string) => {
+          formatter: (seriesName: string, opts?: { seriesIndex?: number }) => {
+            const idx = opts?.seriesIndex;
+            const raw =
+              typeof idx === 'number'
+                ? this.seriesColorsForTooltip[idx]?.name
+                : undefined;
             if (
-              seriesName === 'Current Account (Negative)' ||
-              seriesName === 'Emergency Expense'
+              raw === 'Current Account (Negative)' ||
+              raw === 'Emergency Expense'
             ) {
               return '';
             }
             return seriesName;
-          },
-          markers: {
-            fillColors: fillColors,
           },
           onItemClick: {
             toggleDataSeries: true,
@@ -367,12 +495,13 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
           },
         };
 
-        const points = this.buildEventAnnotations(this.events);
-        this.currentAnnotationPoints = points;
         this.chartOptions.annotations = {
           points,
           xaxis: [...emergencyXAxis, ...emergencyExpenseXAxis],
         };
+      } else if (this.chartInitialized) {
+        // Scenario Lab: `updateSeries` path — Apex keeps old point markers; resync after render.
+        this._pointAnnotationsNeedResync = true;
       }
 
       // Tooltip attachment and emergency overlays are now handled reliably by
@@ -441,9 +570,9 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
 
       this.chartOptions.xaxis = {
         type: 'category',
-        categories, // keep years for data mapping; display as age via formatter
+        categories,
         tickAmount,
-        title: { text: '' },
+        title: { text: this.getXAxisTitleText() },
         axisBorder: {
           show: true,
           color: '#0000001a', // change to whatever color you want
@@ -472,6 +601,12 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
             value != null ? Number(value).toLocaleString() : '',
         },
       };
+      if (this.chartOptions.xaxis) {
+        this.chartOptions.xaxis = {
+          ...this.chartOptions.xaxis,
+          title: { text: this.getXAxisTitleText() },
+        };
+      }
       const birthYear = this.client?.clientDetails?.birthDate
         ? moment(this.client.clientDetails.birthDate).year()
         : null;
@@ -483,6 +618,7 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
           : null;
         this.chartOptions.xaxis = {
           ...this.chartOptions.xaxis,
+          title: { text: this.getXAxisTitleText() },
           labels: {
             ...this.chartOptions.xaxis.labels,
             formatter: (value: string) => {
@@ -499,16 +635,38 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
       }
     }
 
+    const legendFillColors = seriesForChart.map((s) =>
+      s.name === 'Current Account (Negative)' || s.name === 'Emergency Expense'
+        ? 'transparent'
+        : s.color,
+    );
+    const prevFillColors: string[] | undefined =
+      this.chartOptions.legend?.markers?.fillColors;
+    const colorsChanged =
+      !prevFillColors ||
+      prevFillColors.length !== legendFillColors.length ||
+      prevFillColors.some((c: string, i: number) => c !== legendFillColors[i]);
+    if (colorsChanged) {
+      this.chartOptions.legend = {
+        ...this.chartOptions.legend,
+        markers: {
+          ...(this.chartOptions.legend?.markers ?? {}),
+          fillColors: legendFillColors,
+        },
+      };
+    }
+
     // final series assignment
-    const mappedSeries = report.series.map((s, idx) => ({
+    const mappedSeries = seriesForChart.map((s, idx) => ({
       ...s,
+      name: formatLifetimePlanSeriesDisplayName(s, this.client, this.translate),
       color:
         s.name === 'Current Account (Negative)' ||
         s.name === 'Emergency Expense'
           ? 'transparent'
           : s.color,
       tack: 'stack1',
-      order: s.name === 'Emergency Expense' ? report.series.length : idx,
+      order: s.name === 'Emergency Expense' ? seriesForChart.length : idx,
       fill: {
         opacity: 1,
       },
@@ -526,29 +684,32 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
         },
       },
     }));
-    this.chartOptions.series = mappedSeries;
-
-    // ng-apexcharts v19 uses signal inputs + asapScheduler for hydration.
-    // When only [series] changes, it calls updateSeries() but this can silently
-    // fail if the chart's internal state is stale. Directly calling updateSeries
-    // on the ApexCharts instance as a fallback guarantees the bars re-render.
-    if (this.animateUpdates && changes['report'] && this.chartInitialized) {
+    if (this.animateUpdates && chartWasAlreadyInitialized && changes['report']) {
+      // Bypass ng-apexcharts entirely: do NOT assign chartOptions.series
+      // (a new reference there triggers updateOptions → full chart rebuild).
+      // Instead call updateSeries() directly for smooth bar morphing.
       this.ngZone.runOutsideAngular(() => {
         setTimeout(() => {
           this.apxChartComponent?.updateSeries(mappedSeries, true);
         }, 0);
       });
+    } else {
+      this.chartOptions.series = mappedSeries;
     }
   }
 
   ngOnDestroy(): void {
+    if (this.chartLayoutDebounceTimer !== null) {
+      clearTimeout(this.chartLayoutDebounceTimer);
+    }
+    this.chartResizeObserver?.disconnect();
+    this.chartResizeObserver = null;
     clearTimeout(this._postRenderTimer);
     clearTimeout(this._tooltipRetryTimer);
     this.cleanupHtmlTooltips();
     this.cleanupEmergencyElements();
     this.cleanupEventLabels();
     this.cleanupYAxisLabel();
-    this.cleanupXAxisLabel();
   }
 
   private cleanupEmergencyElements(): void {
@@ -611,8 +772,7 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
     label.className = 'y-axis-top-label';
     chartHost.appendChild(label);
 
-    const labelTop =
-      legendRect.top - hostRect.top + legendRect.height / 2 - 7;
+    const labelTop = legendRect.top - hostRect.top + legendRect.height / 2 - 7;
 
     let labelLeft = 10;
     if (yAxisTexts) {
@@ -627,62 +787,6 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
     label.style.zIndex = '5';
 
     this.yAxisLabelEl = label;
-  }
-
-  private cleanupXAxisLabel(): void {
-    if (this.xAxisLabelEl) {
-      this.xAxisLabelEl.remove();
-      this.xAxisLabelEl = null;
-    }
-  }
-
-  /**
-   * Creates an HTML label for the x-axis "Age" title and positions it
-   * near the origin (bottom-left of the plot area), aligned with the
-   * x-axis tick labels row but to the left of the first number.
-   */
-  private positionXAxisLabel(): void {
-    this.cleanupXAxisLabel();
-
-    const chartHost = this.chartElRef?.nativeElement;
-    if (!chartHost) return;
-
-    const gridEl = chartHost.querySelector<SVGElement>('.apexcharts-grid');
-    const xAxisTexts = chartHost.querySelector<SVGGElement>(
-      '.apexcharts-xaxis-texts-g',
-    );
-    if (!gridEl) return;
-
-    const hostRect = chartHost.getBoundingClientRect();
-    const gridRect = gridEl.getBoundingClientRect();
-
-    if (getComputedStyle(chartHost).position === 'static') {
-      chartHost.style.position = 'relative';
-    }
-
-    const label = document.createElement('div');
-    label.textContent = 'Age';
-    label.className = 'x-axis-origin-label';
-    chartHost.appendChild(label);
-
-    const labelLeft = gridRect.left - hostRect.left;
-
-    const firstXTick = xAxisTexts?.querySelector<SVGTextElement>(
-      '.apexcharts-xaxis-label',
-    );
-    let labelTop = gridRect.bottom - hostRect.top + 8;
-    if (firstXTick) {
-      const tickRect = firstXTick.getBoundingClientRect();
-      labelTop = tickRect.bottom - hostRect.top + 4;
-    }
-
-    label.style.position = 'absolute';
-    label.style.top = `${labelTop}px`;
-    label.style.left = `${labelLeft}px`;
-    label.style.pointerEvents = 'none';
-    label.style.zIndex = '5';
-
-    this.xAxisLabelEl = label;
   }
 
   buildEventAnnotations(events: TimelineEvent[]) {
@@ -713,8 +817,9 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
           label: { text: '' },
           customTooltip: `
             <div class="event-tooltip ${event.iconUrl}">
+              <span style="display:none">${event.name}</span>
               <img src="/assets/images/svgs/${event.iconUrl}.svg" alt="${event.iconUrl}" />
-              <span>${event.name}</span>
+              <span>${translateTimelineEventDisplayName(this.translate, event.name)}</span>
             </div>`,
         });
       });
@@ -780,7 +885,10 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
 
         // Create label element with FIXED positioning (not clipped by chart overflow)
         const label = document.createElement('div');
-        label.textContent = event.name;
+        label.textContent = translateTimelineEventDisplayName(
+          this.translate,
+          event.name,
+        );
         label.className = 'event-label';
         label.style.position = 'fixed';
         label.style.pointerEvents = 'none';
@@ -1001,6 +1109,61 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
   }
 
   /**
+   * Clears Apex annotations and reapplies point markers (and x-axis annotations) from
+   * `currentAnnotationPoints`, using the trimmed report for emergency index calculation.
+   */
+  private applyPointAnnotationResync(chartContext: any): void {
+    const report = this.getProcessedReport();
+    if (!report) {
+      return;
+    }
+
+    chartContext.clearAnnotations();
+
+    if (!this._hideEmergencyOverlays) {
+      const emergencyXAxis = this.buildEmergencyAnnotation(report);
+      const emergencyExpenseXAxis = this.buildEmergencyExpenseAnnotation(report);
+      [...emergencyXAxis, ...emergencyExpenseXAxis].forEach((a) =>
+        chartContext.addXaxisAnnotation(a, false),
+      );
+    }
+
+    this.currentAnnotationPoints.forEach((a) =>
+      chartContext.addPointAnnotation(a, false),
+    );
+  }
+
+  /** Rebuild event annotation strings when the UI language changes (Scenario Lab animated chart). */
+  private onChartTranslationsChanged(): void {
+    if (!this.chartInitialized) {
+      return;
+    }
+    const report = this.getProcessedReport();
+    if (!report?.series?.length) {
+      return;
+    }
+
+    this.events = report.timelineEvents ?? [];
+    this.currentAnnotationPoints = this.buildEventAnnotations(this.events);
+
+    if (!this.animateUpdates) {
+      return;
+    }
+
+    this._pointAnnotationsNeedResync = true;
+    this.ngZone.runOutsideAngular(() => {
+      setTimeout(() => {
+        const comp = this.apxChartComponent;
+        const series = this.chartOptions?.series;
+        if (!comp?.chart || !series?.length) {
+          return;
+        }
+        this.ngZone.run(() => comp.updateSeries(series, true));
+      }, 0);
+    });
+  }
+
+  /**
    * Called by ApexCharts `mounted` (after initial render / full rebuild) and
    * `updated` (after updateSeries animation completes). Only active when
    * animateUpdates=true (Scenario Lab). Rebuilds annotation markers that
@@ -1015,29 +1178,35 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
       // For animated updates (Scenario Lab), updateSeries destroys annotation markers.
       // Re-add them via the chart API when missing.
       if (this.animateUpdates) {
-        const markers = chartHost.querySelectorAll<SVGElement>(
-          '.apexcharts-point-annotation-marker',
-        );
+        if (this._pointAnnotationsNeedResync) {
+          this.applyPointAnnotationResync(chartContext);
+          this._pointAnnotationsNeedResync = false;
+        } else {
+          const markers = chartHost.querySelectorAll<SVGElement>(
+            '.apexcharts-point-annotation-marker',
+          );
 
-        if ((!markers || markers.length === 0) && this.events.length > 0) {
-          const points = this.buildEventAnnotations(this.events);
-          this.currentAnnotationPoints = points;
-          points.forEach((a) => chartContext.addPointAnnotation(a, false));
+          if ((!markers || markers.length === 0) && this.events.length > 0) {
+            const points = this.buildEventAnnotations(this.events);
+            this.currentAnnotationPoints = points;
+            points.forEach((a) => chartContext.addPointAnnotation(a, false));
 
-          if (!this._hideEmergencyOverlays) {
-            const emergencyXAxis = this.buildEmergencyAnnotation(this.report);
-            const emergencyExpenseXAxis = this.buildEmergencyExpenseAnnotation(
-              this.report,
-            );
-            [...emergencyXAxis, ...emergencyExpenseXAxis].forEach((a) =>
-              chartContext.addXaxisAnnotation(a, false),
-            );
+            if (!this._hideEmergencyOverlays) {
+              const trimmed = this.getProcessedReport();
+              if (trimmed) {
+                const emergencyXAxis = this.buildEmergencyAnnotation(trimmed);
+                const emergencyExpenseXAxis =
+                  this.buildEmergencyExpenseAnnotation(trimmed);
+                [...emergencyXAxis, ...emergencyExpenseXAxis].forEach((a) =>
+                  chartContext.addXaxisAnnotation(a, false),
+                );
+              }
+            }
           }
         }
       }
 
       this.positionYAxisLabel();
-      this.positionXAxisLabel();
 
       this.cleanupHtmlTooltips();
       if (this.events.length > 0) {
@@ -1157,18 +1326,22 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
     this.tooltipElements = [];
   }
 
+  /** Marker fill — timeline accent (matches .vis-item *::after / chip text in _customizer.scss) */
   private readonly ICON_COLORS: Record<string, string> = {
-    'birth-icon': '#feb63d',
-    'retirement-age-icon': '#ff8f6b',
-    'inheritance-icon': '#00d492',
-    'wedding-icon': '#7b3dfe',
-    'state-pension-icon': '#516ce8',
-    'home-icon': '#016aa2',
-    'travel-icon': '#363f72',
-    'car-icon': '#b93814',
-    'education-icon': '#3538cd',
-    'new-business-icon': '#b42318',
-    'boat-icon': '#047a48',
+    'birth-icon': '#fe9614',
+    'retirement-age-icon': '#3088ed',
+    'partner-retirement-age-icon': '#fe9614',
+    'mortality-icon': '#1c1c1c',
+    'inheritance-icon': '#1c1c1c',
+    'wedding-icon': '#6155f5',
+    'state-pension-icon': '#1c1c1c',
+    'home-icon': '#ff2d55',
+    'travel-icon': '#0088ff',
+    'car-icon': '#ac7f5e',
+    'education-icon': '#00c8b3',
+    'new-business-icon': '#34c759',
+    'boat-icon': '#ff7504',
+    'custom-icon': '#8388ff',
   };
 
   calculateDotColor(iconUrl: string): string {
@@ -1197,38 +1370,20 @@ export class SavingsBarStackedChartComponent implements OnChanges, OnDestroy {
 
   private getDisplayAgeForYear(
     year: number,
-    firstCategoryYear: number | null,
-    lastCategoryYear: number | null,
+    _firstCategoryYear: number | null,
+    _lastCategoryYear: number | null,
   ): number | '' {
     const birthDate = this.getClientBirthDate();
     if (!birthDate || !Number.isFinite(year)) {
       return '';
     }
-    // First year: age at forecast start (e.g. 45 if projection starts before they turn 46).
-    if (
-      firstCategoryYear != null &&
-      year === firstCategoryYear &&
-      this.forecastStartDate
-    ) {
-      return this.calculateAgeAtDate(this.forecastStartDate, birthDate);
-    }
-    // Age at start of year (Jan 1) to match timeline chart convention
-    return this.calculateAgeAtDate(new Date(year, 0, 1), birthDate);
-  }
-
-  private calculateAgeAtDate(referenceDate: Date, birthDate: Date): number {
-    const date = new Date(referenceDate);
-    let age = date.getFullYear() - birthDate.getFullYear();
-    const hasBirthdayPassed =
-      date.getMonth() > birthDate.getMonth() ||
-      (date.getMonth() === birthDate.getMonth() &&
-        date.getDate() >= birthDate.getDate());
-
-    if (!hasBirthdayPassed) {
-      age--;
-    }
-
-    return age;
+    const age = getProjectionColumnAgeLabel(
+      birthDate,
+      year,
+      this.forecastStartDate ?? undefined,
+      this.planDuration,
+    );
+    return Number.isNaN(age) ? '' : age;
   }
 
   private getClientBirthDate(): Date | null {

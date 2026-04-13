@@ -39,10 +39,20 @@ import {
 import { catchError, filter } from 'rxjs';
 import { TablerIconsModule } from 'angular-tabler-icons';
 import { CommonModule } from '@angular/common';
-import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateEscalationDescriptionPipe } from 'src/app/core/pipes/translate-escalation-description.pipe';
+import { getAmountCycleLabel } from 'src/app/shared/utils/amount-cycle-label';
+import { resolveEscalationMatch } from 'src/app/shared/utils/escalation-rate-utils';
+import {
+  getCashflowDialogEndCalendarYear,
+  getCompletedYearsAgeAtDate,
+  getPersistedAgeForCalendarYear,
+  getProjectionColumnAgeLabel,
+} from 'src/app/shared/utils/client-age-at-reference';
+import { calendarYearOrEventRefValidator } from 'src/app/shared/utils/calendar-year-or-event-ref.validator';
+
 @Component({
   selector: 'app-add-new-pot',
   imports: [
@@ -60,9 +70,9 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
     MatSliderModule,
     TablerIconsModule,
     MatCheckboxModule,
-    ThousandSeparatorPipe,
     ThousandSeparatorInputDirective,
     TranslateModule,
+    TranslateEscalationDescriptionPipe,
   ],
   templateUrl: './add-new-pot.component.html',
   styleUrl: './add-new-pot.component.scss',
@@ -98,8 +108,12 @@ export class AddNewPotComponent {
   existingSavingPots: any[] = [];
   showNameEdit: boolean = false;
   hasPartner: boolean = false;
+  fromNetWorth: boolean = false;
   clientFirstName: string = '';
   partnerFirstName: string = '';
+  /** Full display label for ownership radio (first + last); falls back to firstName. */
+  clientDisplayName: string = '';
+  partnerDisplayName: string = '';
   SavingPotOwnership = SavingPotOwnership;
   savingPotValues = [
     {
@@ -120,8 +134,14 @@ export class AddNewPotComponent {
   ];
   forecastEndDateYear: any;
   forecastStartDateYear: any;
+  /** Inclusive last calendar year in this dialog’s year dropdowns (plan end, not API+1). */
+  dialogEndCalendarYear: number;
   isCashPotEditMode: boolean;
   userReturnRate: any = 3.5;
+  /** Mat slider thumb binding (must be defined — template uses [value]). */
+  sliderReturnRate = 0;
+  /** Return rate text field next to slider (numeric part only; % is separate in UI). */
+  returnRateText = '0';
   loggedInUserPreferences: any;
   comissionTypes = [
     { label: 'Amount', value: ComissionType.Amount },
@@ -154,26 +174,31 @@ export class AddNewPotComponent {
     this.eventsList = data.eventsList;
     this.existingSavingPots = data.existingSavingPots || [];  // Get existing pots for smart defaults
     this.hasPartner = data.hasPartner ?? false;
+    this.fromNetWorth = data.fromNetWorth ?? false;
     this.scenarioMode = data.scenarioMode ?? false;
     this.clientFirstName = data.clientFirstName ?? '';
     this.partnerFirstName = data.partnerFirstName ?? '';
+    this.clientDisplayName = (
+      data.clientDisplayName ??
+      data.clientFirstName ??
+      ''
+    ).trim();
+    this.partnerDisplayName = (
+      data.partnerDisplayName ??
+      data.partnerFirstName ??
+      ''
+    ).trim();
     this.clientBirthYear = moment(data.clientBirthDate).year();
     this.userReturnRate = data.returnRate;
     const birthDate = new Date(data.clientBirthDate);
-    const forecastStart = new Date(data.forecastStartDateYear, 0, 1);
-    let age = forecastStart.getFullYear() - birthDate.getFullYear();
-    const monthDiff = forecastStart.getMonth() - birthDate.getMonth();
-    const dayDiff = forecastStart.getDate() - birthDate.getDate();
+    const forecastStart = data.forecastStartDate
+      ? new Date(data.forecastStartDate)
+      : new Date(data.forecastStartDateYear, 0, 1);
     const prefType = this.loggedInUserPreferences?.comissionType;
     this.loggedInUserComissionType = prefType === ComissionType.None || prefType == null
       ? undefined
       : this.comissionTypes.find(x => x.value === prefType)?.label.toLowerCase();
-    if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
-      age--;
-    }
-
-    this.clientAge = age
-    if(data.forecastStartDateYear - this.clientBirthYear > this.clientAge) this.clientBirthYear =  this.clientBirthYear+1
+    this.clientAge = getCompletedYearsAgeAtDate(birthDate, forecastStart);
 
     // Extract retirement age from events if available
     const retirementEvent = this.eventsList?.find((e: any) => 
@@ -181,8 +206,11 @@ export class AddNewPotComponent {
       e.name?.toLowerCase().includes('pensione')
     );
     if (retirementEvent) {
-      this.retirementAgeValue = retirementEvent.start.age;  // Store the age (e.g., 64)
-      this.retirementAge = retirementEvent.start.age + this.clientBirthYear;  // Store the year
+      this.retirementAgeValue = retirementEvent.start.age;
+      const ry = Number(retirementEvent.start?.year);
+      this.retirementAge = Number.isFinite(ry)
+        ? ry
+        : this.retirementAgeValue + this.clientBirthYear;
     }
 
     this.clientPreferredCurrency = data.clientPreferredCurrency;
@@ -191,6 +219,17 @@ export class AddNewPotComponent {
     this.selectedPot = data.event
     this.forecastStartDateYear = data.forecastStartDateYear;
     this.forecastEndDateYear = data.forecastEndDateYear;
+    const resolvedDialogEnd = getCashflowDialogEndCalendarYear(
+      data.clientBirthDate,
+      data.planDuration,
+      data.forecastEndDateYear,
+    );
+    this.dialogEndCalendarYear = Number.isFinite(resolvedDialogEnd)
+      ? resolvedDialogEnd
+      : Number(data.forecastEndDateYear);
+    if (!Number.isFinite(this.dialogEndCalendarYear)) {
+      this.dialogEndCalendarYear = data.forecastStartDateYear;
+    }
 
     // Determine if this is a Cash pot edit mode EARLY (before form creation)
     if (this.isEditWorkflow) {
@@ -202,7 +241,7 @@ export class AddNewPotComponent {
       this.editDialogTitle = `Edit ${this.selectedPot.name}`;
     }
 
-    const endYear = data.forecastEndDateYear + 1;
+    const endYear = this.dialogEndCalendarYear;
     const iterations = endYear - data.forecastStartDateYear + 1;
 
     for (let index = 0; index < iterations; index++) {
@@ -224,11 +263,11 @@ export class AddNewPotComponent {
       currency: [this.clientPreferredCurrency, Validators.required],
       amount: [0, [Validators.required, this.minPositiveValue()]],
       customName: [''],  // For Custom pots
-      returnRate: [this.userReturnRate],
+      returnRate: [this.normalizeReturnRate(this.userReturnRate)],
       // lockPot: [true],
       lockPot: [defaultType === 'Pension fund'],  // Auto-check for Pension fund only
-      start: [data.forecastStartDateYear, Validators.required],
-      end: [data.forecastEndDateYear-1, Validators.required],
+      start: [data.forecastStartDateYear, [calendarYearOrEventRefValidator()]],
+      end: [this.dialogEndCalendarYear, [calendarYearOrEventRefValidator()]],
       // Commissions always start unchecked - user must manually enable
       commissions: [false],
       commissionType: [this.loggedInUserComissionType ?? ''],
@@ -244,7 +283,8 @@ export class AddNewPotComponent {
       contributionAmount: [0],
       contributionFrequency: [1],  // Monthly (1) by default
       contributionStartDate: [data.forecastStartDateYear],  // This year
-      contributionEndDate: [this.retirementAge],  // Retirement year
+      // No default — user must choose contribution end (validators + API enforce).
+      contributionEndDate: [null as number | null],
       ownership: [SavingPotOwnership.Joint]
     });
 
@@ -256,6 +296,9 @@ export class AddNewPotComponent {
 
     this.savingsForm.get('returnRate')?.valueChanges.subscribe((value) => {
       this.formattedReturnRate = this.formatWithPercentage(value);
+      const n = typeof value === 'number' ? value : Number(value);
+      this.sliderReturnRate = Number.isFinite(n) ? Math.max(0, Math.min(10, this.round2(n))) : 0;
+      this.syncReturnRateTextFromForm();
     });
 
     // Keep the local amount property in sync with the form control
@@ -279,6 +322,8 @@ export class AddNewPotComponent {
     }
 
     this.syncOwnershipForSelectedType();
+    this.syncReturnRateTextFromForm();
+    this.syncSliderReturnRateFromForm();
   }
 
 
@@ -315,7 +360,7 @@ export class AddNewPotComponent {
 onAmountBlur(e: Event) {
   const c = this.savingsForm.get('amount')!;
   const rawValue = (e.target as HTMLInputElement).value;
-  const num = parseFormattedNumber(rawValue);
+  const num = parseFormattedNumber(rawValue, this.translate.currentLang);
   c.setValue(num, { emitEvent: false }); // model stays numeric
 
   const locale = this.translate.currentLang === 'it' ? 'it-IT' : 'en-US';
@@ -365,8 +410,11 @@ onAmountBlur(e: Event) {
       { emitEvent: false }
     );
     this.savingsForm.get('lockPot')?.patchValue(this.selectedPot.hasPotLocked, { emitEvent: false });
-    this.savingsForm.get('start')?.patchValue(this.selectedPot.lockedFrom?.year ?? this.forecastStartDateYear, { emitEvent: false });
-    this.savingsForm.get('end')?.patchValue(this.selectedPot.lockedTill?.year ?? (this.forecastEndDateYear - 1), { emitEvent: false });
+    this.savingsForm.get('start')?.patchValue(this.selectedPot.lockedFrom?.year || this.forecastStartDateYear, { emitEvent: false });
+    this.savingsForm.get('end')?.patchValue(
+      this.selectedPot.lockedTill?.year || this.dialogEndCalendarYear,
+      { emitEvent: false },
+    );
     
     // Patch Pension fund specific fields if applicable
     if (this.selectedPot.name === 'Pension fund') {
@@ -395,18 +443,13 @@ onAmountBlur(e: Event) {
       this.savingsForm.get('commissionPercentage')?.patchValue(this.selectedPot.comission.percentage?.amount, { emitEvent: false });
     }
 
-    const matchedEscalation =
-      this.escalationRates.find(
-        x =>
-          x.value === this.selectedPot.comission.escalationRate?.value &&
-          x.description === this.selectedPot.comission.escalationRate?.description
-      ) ??
-      this.escalationRates.find(
-        x => x.value === this.selectedPot.comission.escalationRate?.value
-      );
+    const matchedEscalation = resolveEscalationMatch(
+      this.escalationRates,
+      this.selectedPot.comission.escalationRate,
+    );
 
     if (matchedEscalation) {
-      this.savingsForm.get('escalationRate')?.patchValue(matchedEscalation.value, { emitEvent: false });
+      this.savingsForm.get('escalationRate')?.patchValue(matchedEscalation.description, { emitEvent: false });
       this.selectedEscalationDescription = matchedEscalation.description;
     } else if (
       this.selectedPot.comission.escalationRate &&
@@ -417,7 +460,7 @@ onAmountBlur(e: Event) {
         description: 'Increases at custom rate',
         value: this.selectedPot?.comission?.escalationRate?.value,
       });
-      this.savingsForm.get('escalationRate')?.patchValue(this.selectedPot.comission.escalationRate.value, { emitEvent: false });
+      this.savingsForm.get('escalationRate')?.patchValue('Increases at custom rate', { emitEvent: false });
       this.savingsForm.get('customEscalationRate')?.patchValue(this.selectedPot.comission.escalationRate.value, { emitEvent: false });
       this.selectedEscalationDescription = 'Increases at custom rate';
 
@@ -426,8 +469,19 @@ onAmountBlur(e: Event) {
       customControl?.updateValueAndValidity({ emitEvent: false });
     }
 
+    // Sync lock-pot validators: clear start/end validators when pot is not locked
+    const isLocked = this.savingsForm.get('lockPot')?.value;
+    if (!isLocked) {
+      this.savingsForm.get('start')?.clearValidators();
+      this.savingsForm.get('start')?.updateValueAndValidity({ emitEvent: false });
+      this.savingsForm.get('end')?.clearValidators();
+      this.savingsForm.get('end')?.updateValueAndValidity({ emitEvent: false });
+    }
+
     // Force form to recalculate validity after all patches are applied
     this.savingsForm.updateValueAndValidity();
+    this.syncReturnRateTextFromForm();
+    this.syncSliderReturnRateFromForm();
   }
 
   ngOnInit() {
@@ -630,6 +684,9 @@ onAmountBlur(e: Event) {
     // Auto-tick lockPot for Pension fund, untick for other types
     if (name === 'Pension fund') {
       this.savingsForm.get('lockPot')?.setValue(true);
+      if (!this.isEditWorkflow) {
+        this.savingsForm.get('contributionEndDate')?.reset(null, { emitEvent: false });
+      }
     } else {
       this.savingsForm.get('lockPot')?.setValue(false);
     }
@@ -649,8 +706,8 @@ onAmountBlur(e: Event) {
     if (potType === 'Pension fund') {
       // Make Pension fund fields required
       contributionAmountControl?.setValidators([Validators.required, this.minPositiveValue()]);
-      contributionStartControl?.setValidators([Validators.required]);
-      contributionEndControl?.setValidators([Validators.required]);
+      contributionStartControl?.setValidators([calendarYearOrEventRefValidator()]);
+      contributionEndControl?.setValidators([calendarYearOrEventRefValidator()]);
       
       // Do NOT auto-check commissions - user must manually enable it
     } else {
@@ -694,19 +751,19 @@ onAmountBlur(e: Event) {
 
   isLockPotChanged(event: any) {
     if (event) {
-      this.savingsForm.get('start')?.setValidators(Validators.required);
+      this.savingsForm.get('start')?.setValidators([calendarYearOrEventRefValidator()]);
       this.savingsForm.get('start')?.updateValueAndValidity();
-      this.savingsForm.get('end')?.setValidators(Validators.required);
+      this.savingsForm.get('end')?.setValidators([calendarYearOrEventRefValidator()]);
       this.savingsForm.get('end')?.updateValueAndValidity();
 
       this.savingsForm.get('end')?.patchValue(this.eventsList[0].start.year > 0 ? this.eventsList[0].start.year : this.forecastStartDateYear)
     } else {
-      this.savingsForm.get('start')?.removeValidators(Validators.required);
+      this.savingsForm.get('start')?.clearValidators();
       this.savingsForm.get('start')?.updateValueAndValidity();
-      this.savingsForm.get('end')?.removeValidators(Validators.required);
+      this.savingsForm.get('end')?.clearValidators();
       this.savingsForm.get('end')?.updateValueAndValidity();
 
-      this.savingsForm.get('end')?.patchValue(this.forecastEndDateYear)
+      this.savingsForm.get('end')?.patchValue(this.dialogEndCalendarYear);
     }
   }
 
@@ -728,7 +785,7 @@ onAmountBlur(e: Event) {
           this.savingsForm.get('commissionCycle')?.setValidators(Validators.required);
           this.savingsForm.get('commissionCycle')?.setValue(this.loggedInUserPreferences?.comissionCycle ?? this.cycles[2].id, { emitEvent: false });
           this.savingsForm.get('escalationRate')?.setValidators(Validators.required);
-          this.savingsForm.get('escalationRate')?.setValue(this.escalationRates[1].value, { emitEvent: false });
+          this.savingsForm.get('escalationRate')?.setValue(this.escalationRates[1]?.description ?? '', { emitEvent: false });
           if (this.loggedInUserPreferences?.comissionAmount) {
             this.savingsForm.get('commissionAmount')?.setValue(this.loggedInUserPreferences.comissionAmount, { emitEvent: false });
           }
@@ -772,48 +829,27 @@ onAmountBlur(e: Event) {
   //   }
   // }
 
-get isCustomEscalationSelected(): boolean {
-  const selectedValue = this.savingsForm.get('escalationRate')?.value;
-
-
-  // Find exact match by both value and description
-  return this.escalationRates.some(e =>
-    e.value === selectedValue && e.description === 'Increases at custom rate'
-  );
-}
-
-  get isOneOff(): boolean {
-    // const selectedValue = this.savingsForm.get('escalationRate')?.value;
-    return this.cycles.find(cycle => cycle.id === this.savingsForm.get('commissionCycle')?.value)?.description === 'One-off';
+  get isCustomEscalationSelected(): boolean {
+    return this.savingsForm.get('escalationRate')?.value === 'Increases at custom rate';
   }
 
 
+  onEscalationRateChange(event: MatSelectChange): void {
+    const description = (event.value as string) ?? null;
 
+    this.selectedEscalationDescription = description;
 
-onEscalationRateChange(event: MatSelectChange): void {
-  const selectedOption = event.source.selected;
+    const customControl = this.savingsForm.get('customEscalationRate');
 
-  let description: string | null = null;
+    if (description === 'Increases at custom rate') {
+      customControl?.setValidators([Validators.required, Validators.min(0)]);
+    } else {
+      customControl?.clearValidators();
+      customControl?.setValue(null); // Optionally reset field
+    }
 
-  if (Array.isArray(selectedOption)) {
-    description = selectedOption[0]?.viewValue ?? null;
-  } else {
-    description = selectedOption?.viewValue ?? null;
+    customControl?.updateValueAndValidity();
   }
-
-  this.selectedEscalationDescription = description;
-
-  const customControl = this.savingsForm.get('customEscalationRate');
-
-  if (description === 'Increases at custom rate') {
-    customControl?.setValidators([Validators.required, Validators.min(0)]);
-  } else {
-    customControl?.clearValidators();
-    customControl?.setValue(null); // Optionally reset field
-  }
-
-  customControl?.updateValueAndValidity();
-}
 
   onInputChange(event: any, controlName: string) {
     let value = event.target.value.replace('%', '').trim();
@@ -841,20 +877,85 @@ onEscalationRateChange(event: MatSelectChange): void {
   }
 
   onAmountInput(rawValue: string) {
-    const value = parseFormattedNumber(rawValue ?? '');
+    const value = parseFormattedNumber(rawValue ?? '', this.translate.currentLang);
     this.savingsForm.get('amount')?.setValue(value, { emitEvent: true });
     this.amount = value;
   }
-  formatWithPercentage(value: number | string): string {
-    return value !== null && value !== '' ? `${value}%` : '0%';
+  formatWithPercentage(value: number | string | null | undefined): string {
+    if (value === null || value === undefined || value === '') return '0%';
+    const n = typeof value === 'number' ? value : Number(value);
+    if (!Number.isFinite(n)) return '0%';
+    return `${this.round2(n)}%`;
+  }
+
+  private normalizeReturnRate(v: unknown): number {
+    const n = typeof v === 'number' ? v : Number(v);
+    return Number.isFinite(n) ? this.round2(n) : 3.5;
+  }
+
+  private syncReturnRateTextFromForm(): void {
+    const raw = this.savingsForm.get('returnRate')?.value;
+    const n = typeof raw === 'number' ? raw : Number(raw);
+    const val = Number.isFinite(n) ? this.round2(n) : 0;
+    this.returnRateText = this.formatReturnRateInputLabel(val);
+  }
+
+  private syncSliderReturnRateFromForm(): void {
+    const raw = this.savingsForm.get('returnRate')?.value;
+    const n = typeof raw === 'number' ? raw : Number(raw);
+    this.sliderReturnRate = Number.isFinite(n) ? Math.max(0, Math.min(10, this.round2(n))) : 0;
+  }
+
+  /** Human-readable percent for the side input (no % suffix). */
+  private formatReturnRateInputLabel(n: number): string {
+    if (!Number.isFinite(n)) return '0';
+    const r = this.round2(n);
+    if (Math.abs(r - Math.round(r)) < 1e-9) return String(Math.round(r));
+    return String(r);
+  }
+
+  /** mat-select may bind year as number or string; both must count for Save guards. */
+  private parseCalendarYearFromControl(raw: unknown): number {
+    if (typeof raw === 'number' && Number.isFinite(raw)) {
+      return raw;
+    }
+    if (typeof raw === 'string' && raw.trim() !== '') {
+      const n = Number(raw);
+      if (Number.isFinite(n)) {
+        return n;
+      }
+    }
+    return 0;
+  }
+
+  /**
+   * Save stays off until the form is valid and (for pension fund) a contribution end calendar year is chosen.
+   */
+  get isSaveDisabled(): boolean {
+    if (this.savingsForm.invalid) {
+      return true;
+    }
+    if (this.fromNetWorth) {
+      return false;
+    }
+    if (this.savingsForm.get('name')?.value !== 'Pension fund') {
+      return false;
+    }
+    const raw = this.savingsForm.get('contributionEndDate')?.value;
+    return this.parseCalendarYearFromControl(raw) <= 0;
   }
 
   saveCashflow(): void {
     this.savingsForm.markAllAsTouched();
-    const isCustomEscalation = this.selectedEscalationDescription === 'Increases at custom rate';
+    const selectedEscDesc = this.savingsForm.get('escalationRate')?.value as string;
+    const isCustomEscalation = selectedEscDesc === 'Increases at custom rate';
     const selectedEscalationRateValue = isCustomEscalation
       ? this.savingsForm.get('customEscalationRate')?.value
-      : this.savingsForm.get('escalationRate')?.value;
+      : this.escalationRates.find((x) => x.description === selectedEscDesc)?.value;
+    const picked =
+      !isCustomEscalation
+        ? this.escalationRates.find((x) => x.description === selectedEscDesc)
+        : undefined;
  const rr = this.round2(this.savingsForm.get('returnRate')?.value ?? 0);
   const real = this.savingsForm.get('name')?.value !== 'Cash'
     ? this.round2(rr - this.inflationRate)
@@ -868,6 +969,22 @@ onEscalationRateChange(event: MatSelectChange): void {
         this.savingsForm.markAllAsTouched();
         return;
       }
+    }
+
+    const potName = this.savingsForm.get('name')?.value;
+    const isPensionFundPot = potName === 'Pension fund';
+    const contribAmt = Number(this.savingsForm.get('contributionAmount')?.value ?? 0);
+    const contribEndRaw = this.savingsForm.get('contributionEndDate')?.value;
+    const contribEndYear = this.parseCalendarYearFromControl(contribEndRaw);
+    if (
+      isPensionFundPot &&
+      contribAmt > 0 &&
+      contribEndYear <= 0
+    ) {
+      const endCtrl = this.savingsForm.get('contributionEndDate');
+      endCtrl?.setErrors({ ...(endCtrl.errors ?? {}), required: true });
+      endCtrl?.markAsTouched();
+      return;
     }
 
     if (this.savingsForm.valid) {
@@ -925,9 +1042,11 @@ onEscalationRateChange(event: MatSelectChange): void {
           },
   escalationRate:
   selectedEscalationRateValue !== null && selectedEscalationRateValue !== ''
-    ? this.escalationRates.find(x => x.value === selectedEscalationRateValue) ??
+    ? picked ??
       {
-        description: this.selectedEscalationDescription ?? selectedEscalationRateValue,
+        description: isCustomEscalation
+          ? 'Increases at custom rate'
+          : this.selectedEscalationDescription ?? selectedEscDesc,
         value: selectedEscalationRateValue
       }
     : {
@@ -952,7 +1071,13 @@ onEscalationRateChange(event: MatSelectChange): void {
         start: {
           age:
             this.forecastStartDateYear != null
-              ? this.forecastStartDateYear - this.clientBirthYear
+              ? getPersistedAgeForCalendarYear(
+                  this.data.clientBirthDate,
+                  this.forecastStartDateYear,
+                  this.data.forecastStartDate,
+                  this.data.planDuration,
+                  this.dialogEndCalendarYear,
+                )
               : 0,
           year:
             this.forecastStartDateYear != null
@@ -963,7 +1088,13 @@ onEscalationRateChange(event: MatSelectChange): void {
           age:
             isPotLocked && this.savingsForm.get('start')?.value !== null &&
             this.savingsForm.get('start')?.value !== ''
-              ? this.savingsForm.get('start')?.value - this.clientBirthYear
+              ? getPersistedAgeForCalendarYear(
+                  this.data.clientBirthDate,
+                  this.savingsForm.get('start')?.value,
+                  this.data.forecastStartDate,
+                  this.data.planDuration,
+                  this.dialogEndCalendarYear,
+                )
               : 0,
           year:
             isPotLocked &&  this.savingsForm.get('start')?.value !== null &&
@@ -975,7 +1106,13 @@ onEscalationRateChange(event: MatSelectChange): void {
           age:
              isPotLocked && this.savingsForm.get('end')?.value !== null &&
             this.savingsForm.get('end')?.value !== ''
-              ? this.savingsForm.get('end')?.value - this.clientBirthYear
+              ? getPersistedAgeForCalendarYear(
+                  this.data.clientBirthDate,
+                  this.savingsForm.get('end')?.value,
+                  this.data.forecastStartDate,
+                  this.data.planDuration,
+                  this.dialogEndCalendarYear,
+                )
               : 0,
           year:
              isPotLocked && this.savingsForm.get('end')?.value !== null &&
@@ -985,13 +1122,18 @@ onEscalationRateChange(event: MatSelectChange): void {
         },
         end: {
           age:
-            this.forecastEndDateYear != null
-              ? this.forecastEndDateYear - this.clientBirthYear
+            Number.isFinite(this.dialogEndCalendarYear)
+              ? getPersistedAgeForCalendarYear(
+                  this.data.clientBirthDate,
+                  this.dialogEndCalendarYear,
+                  this.data.forecastStartDate,
+                  this.data.planDuration,
+                  this.dialogEndCalendarYear,
+                )
               : 0,
-          year:
-            this.forecastEndDateYear != null
-              ? this.forecastEndDateYear
-              : 0,
+          year: Number.isFinite(this.dialogEndCalendarYear)
+            ? this.dialogEndCalendarYear
+            : 0,
         },
         // returnRate: this.savingsForm.get('name')?.value !== 'Cash' ? this.savingsForm.get('returnRate')?.value : 0,
           returnRate: this.savingsForm.get('name')?.value !== 'Cash' ? rr : 0,
@@ -1015,13 +1157,25 @@ onEscalationRateChange(event: MatSelectChange): void {
         contributionStartDate: this.savingsForm.get('name')?.value === 'Pension fund'
           ? {
               year: this.savingsForm.get('contributionStartDate')?.value,
-              age: (this.savingsForm.get('contributionStartDate')?.value || 0) - this.clientBirthYear
+              age: getPersistedAgeForCalendarYear(
+                this.data.clientBirthDate,
+                this.savingsForm.get('contributionStartDate')?.value,
+                this.data.forecastStartDate,
+                this.data.planDuration,
+                this.dialogEndCalendarYear,
+              ),
             }
           : null,
         contributionEndDate: this.savingsForm.get('name')?.value === 'Pension fund'
           ? {
               year: this.savingsForm.get('contributionEndDate')?.value,
-              age: (this.savingsForm.get('contributionEndDate')?.value || 0) - this.clientBirthYear
+              age: getPersistedAgeForCalendarYear(
+                this.data.clientBirthDate,
+                this.savingsForm.get('contributionEndDate')?.value,
+                this.data.forecastStartDate,
+                this.data.planDuration,
+                this.dialogEndCalendarYear,
+              ),
             }
           : null,
         retirementAge: this.savingsForm.get('name')?.value === 'Pension fund'
@@ -1099,7 +1253,7 @@ onEscalationRateChange(event: MatSelectChange): void {
         ?.setValidators(Validators.required);
       this.savingsForm
         .get('escalationRate')
-        ?.setValue(this.escalationRates[1].value, { emitEvent: false });
+        ?.setValue(this.escalationRates[1]?.description ?? '', { emitEvent: false });
 
       this.savingsForm.get('commissionCurrency')?.updateValueAndValidity({ emitEvent: false });
       this.savingsForm.get('commissionAmount')?.updateValueAndValidity({ emitEvent: false });
@@ -1152,7 +1306,7 @@ onEscalationRateChange(event: MatSelectChange): void {
         ?.setValidators(Validators.required);
       this.savingsForm
         .get('escalationRate')
-        ?.setValue(this.escalationRates[1].value, { emitEvent: false });
+        ?.setValue(this.escalationRates[1]?.description ?? '', { emitEvent: false });
 
       this.savingsForm.get('commissionCurrency')?.updateValueAndValidity({ emitEvent: false });
       this.savingsForm.get('commissionAmount')?.updateValueAndValidity({ emitEvent: false });
@@ -1204,7 +1358,7 @@ onEscalationRateChange(event: MatSelectChange): void {
         ?.setValidators(Validators.required);
       this.savingsForm
         .get('escalationRate')
-        ?.setValue(this.escalationRates[1].value, { emitEvent: false });
+        ?.setValue(this.escalationRates[1]?.description ?? '', { emitEvent: false });
 
       this.savingsForm.get('commissionCurrency')?.updateValueAndValidity({ emitEvent: false });
       this.savingsForm.get('commissionAmount')?.updateValueAndValidity({ emitEvent: false });
@@ -1257,6 +1411,23 @@ onEscalationRateChange(event: MatSelectChange): void {
 
 }
 
+  onReturnRateTextInput(event: Event): void {
+    const el = event.target as HTMLInputElement;
+    this.returnRateText = el.value.replace('%', '').trim();
+    const normalized = this.returnRateText.replace(',', '.');
+    if (normalized === '' || normalized === '-' || normalized === '.') return;
+    if (/^-?\d+\.$/.test(normalized)) return;
+    const num = parseFloat(normalized);
+    if (Number.isNaN(num)) return;
+    this.savingsForm.get('returnRate')?.setValue(this.round2(num), { emitEvent: true });
+  }
+
+  
+
+  onReturnRateBlur(): void {
+    this.syncReturnRateTextFromForm();
+  }
+
 // onSliderChange(val: number) {
 //   // coerce to number and push into the form control
 //   const num = Number(val);
@@ -1303,6 +1474,21 @@ getLockEndEvents(): any[] {
 getLockEndYears(): number[] {
   const startYear = this.getLockStartYear();
   return (this.years ?? []).filter((y) => y >= startYear);
+}
+
+  getAgeForYear(year: number): number {
+    const a = getProjectionColumnAgeLabel(
+      this.data.clientBirthDate,
+      Number(year),
+      this.data.forecastStartDate,
+      this.data.planDuration,
+      this.dialogEndCalendarYear,
+    );
+    return Number.isNaN(a) ? 0 : a;
+  }
+
+getCycleLabel(cycle: Cycle): string {
+  return getAmountCycleLabel(cycle, this.translate);
 }
 
 }

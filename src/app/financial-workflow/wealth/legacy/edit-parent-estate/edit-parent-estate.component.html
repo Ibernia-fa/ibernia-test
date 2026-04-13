@@ -1,20 +1,82 @@
-<h2 mat-dialog-title>{{sideLabel}} – Joint Net Worth</h2>
+<div class="d-flex flex-column">
+  <div class="dialog-header">
+    <h2 class="dialog-title text-center">
+      {{
+        'LEGACY.PARENTS_NET_WORTH_MODAL_TITLE'
+          | translate : parentsModalTitleParams
+      }}
+    </h2>
+    <button
+      type="button"
+      mat-icon-button
+      disableRipple
+      class="dialog-close-btn"
+      mat-dialog-close
+      [attr.aria-label]="'LEGACY.CLOSE_DIALOG' | translate"
+      (click)="onCancel()"
+    >
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
 
-<mat-dialog-content>
-  <form [formGroup]="form" class="dialog-form">
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Joint net worth ({{data.currency | currencySymbol}})</mat-label>
-      <input matInput
-             [value]="form.value.jointNetWorth | number:'1.0-0'"
-             (input)="onAmountInput($event)"
-             thousandSeparatorInput />
-    </mat-form-field>
-  </form>
-</mat-dialog-content>
+  <mat-dialog-content class="event-dialog-content">
+    <form [formGroup]="form" class="d-flex flex-column gap-16">
+      <div class="d-flex flex-column gap-8 net-fields">
+        <mat-label
+          class="f-s-16 f-w-500 d-block ibr-black"
+          style="line-height: 16px"
+          >{{ 'Joint net worth' | translate }}</mat-label
+        >
+        <div class="net-field d-flex align-items-center">
+          <!-- Currency Display -->
+          <div class="left hide-arrow">
+            <div class="sortby-edit-profile currency-display">
+              {{ data.currency | currencySymbol }}
+            </div>
+          </div>
+          <!-- End Currency Display -->
 
-<mat-dialog-actions align="end">
-  <button class="dialog-btn dialog-btn-cancel" (click)="onCancel()">Cancel</button>
-  <button class="dialog-btn dialog-btn-save" [disabled]="form.invalid || isSaving" (click)="onSave()">
-    Save
-  </button>
-</mat-dialog-actions>
+          <!-- Amount Field -->
+          <div class="w-100 form-field">
+            <input
+              matInput
+              style="border-radius: 0px 4px 4px 0px"
+              formControlName="jointNetWorth"
+              thousandSeparatorInput
+            />
+          </div>
+          <!-- End Amount Field -->
+        </div>
+      </div>
+    </form>
+
+    <p class="net-worth-helper-note">
+      {{
+        'This inheritance is linked to the Income section. Any changes made here will be reflected there as well.'
+          | translate
+      }}
+    </p>
+  </mat-dialog-content>
+
+  <div class="row justify-content-end gap-16 modal-action p-t-24">
+    <div>
+      <button
+        type="button"
+        (click)="onCancel()"
+        class="button-icon-outline w-100 d-block"
+      >
+        <span class="f-s-16">{{ 'Cancel' | translate }}</span>
+      </button>
+    </div>
+    <div>
+      <button
+        type="button"
+        (click)="onSave()"
+        [disabled]="form.invalid || isSaving"
+        class="button-icon w-100 d-block"
+      >
+        <span class="f-s-16">{{ 'Save' | translate }}</span>
+      </button>
+    </div>
+  </div>
+</div>

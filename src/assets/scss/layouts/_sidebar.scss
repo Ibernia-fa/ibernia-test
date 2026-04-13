@@ -12,9 +12,14 @@
   display: flex;
   flex-direction: column;
   background-color: #1c1c1c;
-  border-right: 1px solid #1c1c1c;
+  border-right: none;
   border-radius: 12px !important;
   transform: none !important;
+}
+
+/* Fixed footer band: viewport bottom margin + bar height + gap above bar (matches footer.component) */
+.layout-with-footer .mat-drawer.sidebarNav {
+  bottom: calc(16px + 65px + 16px);
 }
 
 /* Sidebar header: logo + toggle */
@@ -22,24 +27,120 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 12px 0px 12px;
-  height: 70px;
+  padding: 12px 12px 6px 12px;
+  height: 71px;
   // min-height: 65px;
   flex-shrink: 0;
   // border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-// .sidebar-logo-link {
-//   display: flex;
-//   align-items: center;
-//   text-decoration: none;
-// }
+/* Text logo stays in DOM; only CSS toggles with collapse so the image is not recreated/re-decoded. */
+.sidebar-ibernia-text-logo {
+  max-width: 105px;
+  height: auto;
+  flex-shrink: 0;
+}
+
+.sidebar-ibernia-text-logo--collapsed {
+  display: none;
+}
+
+.sidebar-logo-link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  min-height: 48px;
+  /* Stable width in header row so absolute overlay’s inset matches immediately */
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Custom org logo sits above static fallbacks (same slot); removing custom reveals defaults instantly. */
+.sidebar-custom-brand-layer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  box-sizing: border-box;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.sidebarNav-mini .sidebar-custom-brand-layer {
+  justify-content: center;
+}
+
+.sidebar-custom-brand-layer app-branding {
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* Hide static fallbacks while custom logo layer is shown (they stay mounted for instant restore). */
+.sidebar-logo-link--custom .sidebar-static-logos {
+  opacity: 0;
+  visibility: hidden;
+}
 
 .sidebar-default-logo {
   // max-width: 120px;
   width: 100%;
   max-width: 160px;
   height: auto;
+}
+
+/* Default logos: both <img> nodes stay in DOM; toggle only CSS (avoids reload/decode delay). */
+.sidebar-static-logos {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-height: 48px;
+}
+
+.sidebar-static-logo-slot {
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: none !important;
+  /* Visually hidden but still decoded in the background */
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  white-space: nowrap;
+  border: 0;
+}
+
+.sidebar-static-logo-slot--active {
+  opacity: 1;
+  pointer-events: auto;
+  position: relative;
+  left: auto;
+  top: auto;
+  transform: none;
+  clip: auto;
+  clip-path: none;
+  width: auto;
+  height: auto;
+  margin: 0;
+  overflow: visible;
+  white-space: normal;
+}
+
+.sidebarNav-mini .sidebar-static-logos {
+  justify-content: center;
 }
 
 .sidebar-toggle-btn {
@@ -146,9 +247,9 @@
 
     .sidebar-header {
       padding: 12px 12px 6px 12px;
-      flex-direction: column;
-      justify-content: center;
-      gap: 8px;
+      // flex-direction: column;
+      // justify-content: center;
+      // gap: 8px;
 
       .sidebar-logo-link {
         display: flex;
@@ -462,9 +563,23 @@
         }
       }
     }
+    &.ibr-new-setting-icon img {
+      mix-blend-mode: plus-lighter;
+    }
   }
   // }
 }
+
+.settings-sidebar {
+  .sidebar-list.preimum-nav .mat-mdc-list-item span {
+    font-size: 14px;
+  }
+
+  .cashflow-modal span {
+    font-size: 14px;
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Make "premium" (lower) sidebar items match `cashflow-modal.activeMenu`
 // so all nav items look consistent when active.
@@ -575,13 +690,13 @@
 .nav-left {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   flex: 1;
 }
 
 .menu-label {
-  font-size: 7px !important;
-  line-height: 8px !important;
+  font-size: 10px !important;
+  line-height: 12px !important;
   background-color: #ff383c;
   color: white;
   border-radius: 50px;

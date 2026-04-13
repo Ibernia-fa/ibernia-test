@@ -1,8 +1,8 @@
 <div class="d-flex gap-24 flex-column">
   <mat-card class="cardWithShadow">
     <mat-card-content>
-      <h4 class="page-title f-w-500 f-s-30">AI Chat</h4>
-      <p class="text-muted m-t-8">Ask follow-up questions about this cashflow plan. The AI uses the same plan data as recommendations.</p>
+      <h4 class="page-title f-w-500 f-s-30">{{ 'AI Chat' | translate }}</h4>
+      <p class="text-muted m-t-8">{{ 'Ask follow-up questions about this cashflow plan. The AI uses the same plan data and your guidelines.' | translate }}</p>
     </mat-card-content>
   </mat-card>
 
@@ -14,7 +14,7 @@
             New conversation
           </button>
           <ng-container *ngIf="conversations.length > 0">
-            <span class="text-muted">Conversations:</span>
+            <span class="text-muted">{{ 'Conversations:' | translate }}</span>
             <button
               *ngFor="let c of conversations"
               mat-stroked-button
@@ -30,90 +30,123 @@
         </ng-container>
 
         <ng-container *ngIf="conversationId">
-          <div class="chat-messages border rounded p-16" style="min-height: 200px; max-height: 400px; overflow-y: auto;">
-            <ng-container *ngIf="loading">
-              <mat-spinner diameter="32"></mat-spinner>
+          <div
+            class="chat-messages agent-chat-messages border rounded"
+            [class.agent-chat-messages--thread]="messages.length > 0"
+          >
+            <ng-container *ngIf="loading && messages.length === 0">
+              <div class="agent-chat-state agent-chat-state--center" aria-busy="true">
+                <mat-spinner diameter="36"></mat-spinner>
+              </div>
             </ng-container>
-            <ng-container *ngIf="!loading && messages.length === 0">
-              <p class="text-muted">No messages yet. Type below to start.</p>
+
+            <ng-container *ngIf="!loading && messages.length === 0 && !sending">
+              <div class="agent-chat-state agent-chat-state--center">
+                <div class="agent-chat-empty-inner">
+                  <h2 class="agent-chat-empty-title">
+                    <ng-container *ngIf="advisorFirstName; else greetingGeneric">
+                      {{ 'AGENT_CHAT.EMPTY_TITLE_NAMED' | translate: { name: advisorFirstName } }}
+                    </ng-container>
+                    <ng-template #greetingGeneric>{{ 'AGENT_CHAT.EMPTY_TITLE_GENERIC' | translate }}</ng-template>
+                  </h2>
+                  <p class="agent-chat-empty-subtitle m-t-0 m-b-0">
+                    {{ 'AGENT_CHAT.EMPTY_SUBTITLE' | translate }}
+                  </p>
+                </div>
+              </div>
             </ng-container>
-            <div *ngFor="let m of messages" class="m-b-12" [class.text-end]="m.role === 'User'">
-              <span class="fw-500">{{ m.role }}:</span>
-              <div [class.bg-light]="m.role === 'Assistant'" class="p-8 rounded message-bubble" [class.d-inline-block]="m.role === 'User'">
-                <ng-container *ngIf="m.role === 'User'">{{ m.content }}</ng-container>
-                <ng-container *ngIf="m.role === 'Assistant'">
-                  <ng-container *ngIf="getMessageDisplay(m.content) as disp">
-                    <div *ngIf="disp.type === 'text'" class="message-text">{{ disp.text }}</div>
-                    <ul *ngIf="disp.type === 'list'" class="message-list">
-                      <li *ngFor="let item of disp.list">{{ formatListItem(item) }}</li>
-                    </ul>
-                    <div *ngIf="disp.type === 'table'" class="message-table-wrapper">
-                      <table class="message-table">
-                        <thead>
-                          <tr>
-                            <th *ngFor="let h of disp.tableHeaders">{{ h }}</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr *ngFor="let row of disp.tableRows">
-                            <td *ngFor="let cell of row">{{ cell }}</td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                    <div *ngIf="disp.type === 'sections'" class="message-sections">
-                      <div *ngFor="let section of disp.sections" class="message-section">
-                        <div class="message-section-title">{{ section.title }}</div>
-                        <ul *ngIf="section.list && !section.tableHeaders" class="message-list">
-                          <li *ngFor="let item of section.list">{{ formatListItem(item) }}</li>
-                        </ul>
-                        <div *ngIf="section.tableHeaders" class="message-table-wrapper">
-                          <table class="message-table">
-                            <thead>
-                              <tr>
-                                <th *ngFor="let h of section.tableHeaders">{{ h }}</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              <tr *ngFor="let row of section.tableRows">
-                                <td *ngFor="let cell of row">{{ cell }}</td>
-                              </tr>
-                            </tbody>
-                          </table>
+
+            <div *ngIf="messages.length > 0" class="agent-chat-thread p-16">
+              <div *ngFor="let m of messages" class="m-b-12" [class.text-end]="m.role === 'User'">
+                <span class="fw-500">{{ m.role }}:</span>
+                <div [class.bg-light]="m.role === 'Assistant'" class="p-8 rounded message-bubble" [class.d-inline-block]="m.role === 'User'">
+                  <ng-container *ngIf="m.role === 'User'">{{ m.content }}</ng-container>
+                  <ng-container *ngIf="m.role === 'Assistant'">
+                    <ng-container *ngIf="getMessageDisplay(m.content) as disp">
+                      <div *ngIf="disp.type === 'text'" class="message-text">{{ disp.text }}</div>
+                      <ul *ngIf="disp.type === 'list'" class="message-list">
+                        <li *ngFor="let item of disp.list">{{ formatListItem(item) }}</li>
+                      </ul>
+                      <div *ngIf="disp.type === 'table'" class="message-table-wrapper">
+                        <table class="message-table">
+                          <thead>
+                            <tr>
+                              <th *ngFor="let h of disp.tableHeaders">{{ h }}</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr *ngFor="let row of disp.tableRows">
+                              <td *ngFor="let cell of row">{{ cell }}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div *ngIf="disp.type === 'sections'" class="message-sections">
+                        <div *ngFor="let section of disp.sections" class="message-section">
+                          <div class="message-section-title">{{ section.title }}</div>
+                          <ul *ngIf="section.list && !section.tableHeaders" class="message-list">
+                            <li *ngFor="let item of section.list">{{ formatListItem(item) }}</li>
+                          </ul>
+                          <div *ngIf="section.tableHeaders" class="message-table-wrapper">
+                            <table class="message-table">
+                              <thead>
+                                <tr>
+                                  <th *ngFor="let h of section.tableHeaders">{{ h }}</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr *ngFor="let row of section.tableRows">
+                                  <td *ngFor="let cell of row">{{ cell }}</td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    </ng-container>
                   </ng-container>
-                </ng-container>
+                </div>
               </div>
-            </div>
-            <!-- Processing indicator when waiting for AI reply -->
-            <div *ngIf="sending" class="m-b-12">
-              <span class="fw-500">Assistant:</span>
-              <div class="p-8 rounded bg-light d-inline-flex align-items-center gap-8">
-                <mat-spinner diameter="24"></mat-spinner>
-                <span class="text-muted">Thinking...</span>
+              <!-- Processing indicator when waiting for AI reply -->
+              <div *ngIf="sending" class="m-b-12">
+                <span class="fw-500">{{ 'Assistant:' | translate }}</span>
+                <div class="p-8 rounded bg-light d-inline-flex align-items-center gap-8">
+                  <mat-spinner diameter="24"></mat-spinner>
+                  <span class="text-muted">{{ 'Thinking...' | translate }}</span>
+                </div>
               </div>
             </div>
           </div>
 
-          <div class="d-flex gap-8 align-items-center">
-            <mat-form-field appearance="outline" class="flex-grow-1">
-              <mat-label>Your message</mat-label>
-              <input matInput [(ngModel)]="inputText" (keydown.enter)="$event.preventDefault(); send()" placeholder="e.g. Why did you suggest that?" />
+          <div class="agent-chat-input-row d-flex gap-12 align-items-end">
+            <mat-form-field appearance="outline" class="flex-grow-1 agent-chat-input-field" subscriptSizing="dynamic">
+              <mat-label>{{ 'Your message' | translate }}</mat-label>
+              <input
+                matInput
+                [(ngModel)]="inputText"
+                (keydown.enter)="$event.preventDefault(); send()"
+                [placeholder]="'AGENT_CHAT.INPUT_PLACEHOLDER' | translate"
+              />
             </mat-form-field>
-            <button mat-flat-button color="primary" (click)="send()" [disabled]="sending || !inputText?.trim()">
-              <span *ngIf="sending" class="d-inline-flex align-items-center gap-4">
+            <button
+              mat-flat-button
+              color="primary"
+              class="agent-chat-send"
+              type="button"
+              (click)="send()"
+              [disabled]="sending || !inputText?.trim()"
+            >
+              <span *ngIf="sending" class="d-inline-flex align-items-center gap-8">
                 <mat-spinner diameter="18" style="display: inline-block;"></mat-spinner>
-                Sending...
+                {{ 'Sending...' | translate }}
               </span>
-              <span *ngIf="!sending">Send</span>
+              <span *ngIf="!sending">{{ 'Send' | translate }}</span>
             </button>
           </div>
         </ng-container>
 
         <ng-container *ngIf="!conversationId && conversations.length === 0 && !sending">
-          <p class="text-muted">Start a conversation to ask questions about this plan.</p>
+          <p class="text-muted">{{ 'Start a conversation to ask questions about this plan.' | translate }}</p>
         </ng-container>
       </div>
     </mat-card-content>

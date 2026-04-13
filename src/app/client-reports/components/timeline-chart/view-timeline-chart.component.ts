@@ -25,6 +25,10 @@ import { SettingsHttpService } from '../../../financial-workflow/settings/servic
 import { TimelineHttpService } from '../../../financial-workflow/timeline/services/timeline-http.service';
 import { catchError, combineLatest, filter, map, take, tap } from 'rxjs';
 import { TranslateModule } from '@ngx-translate/core';
+import {
+  getCompletedYearsAgeAtDate,
+  getProjectionColumnAgeLabel,
+} from 'src/app/shared/utils/client-age-at-reference';
  
 @Component({
   selector: 'app-view-timeline-chart',
@@ -58,6 +62,7 @@ export class ViewTimelineChartComponent implements OnInit {
   @Input() client: Client;
   @Input() title: string = 'Timeline';
   @Input() showOnReports: boolean = false;
+  @Input() planDuration?: number;
   @Output() updateTimelines: EventEmitter<boolean>;
   @ViewChild('timelineContainer', { static: true })
   timelineContainer!: ElementRef;
@@ -269,11 +274,11 @@ export class ViewTimelineChartComponent implements OnInit {
         if (!isOneOff && hasRealEnd) {
           return {
             id: event.id,
-            content: this.getContent(event.name, event.iconUrl),
+            content: this.getContentForEvent(event),
             start: new Date(startYear, 0, 1),
             end: new Date(event.end!.year, 0, 1),
             type: 'range',
-            className: event.iconUrl,
+            className: this.getTimelineVisClassName(event),
             editable: {
               updateTime: false,
               remove: false,
@@ -284,10 +289,10 @@ export class ViewTimelineChartComponent implements OnInit {
           const calculatedWidth = Math.floor(0.5 * event.name.length + 5);
           return {
             id: event.id,
-            content: this.getContent(event.name, event.iconUrl),
+            content: this.getContentForEvent(event),
             start: new Date(startYear, 0, 1),
             end: new Date(startYear + calculatedWidth, 0, 1),
-            className: event.iconUrl,
+            className: this.getTimelineVisClassName(event),
             editable: {
               updateTime: false,
               remove: false,
@@ -363,17 +368,17 @@ export class ViewTimelineChartComponent implements OnInit {
 
   private getTimelineLabelAge(
     year: number,
-    forecastStartYear: number,
+    _forecastStartYear: number,
     forecastStartDate: Date,
     birthDate: Date,
-    birthYear: number
+    _birthYear: number
   ): number {
-    // First label should reflect the actual current age at forecast start.
-    if (year === forecastStartYear) {
-      return this.calculateAgeForTimeline(forecastStartDate, birthDate);
-    }
-
-    return year - birthYear;
+    return getProjectionColumnAgeLabel(
+      birthDate,
+      year,
+      forecastStartDate,
+      this.planDuration,
+    );
   }
 
   currentZoomPercentage = 0.1;
@@ -392,9 +397,38 @@ export class ViewTimelineChartComponent implements OnInit {
     }
   }
 
-  private getContent(title: string, img: string): string {
-  return `
-    <div class="timeline-event-chip with-padding">
+  private isPartnerRetirementEvent(event: ClientEvent): boolean {
+    return !!(
+      event?.name?.toLowerCase().startsWith('retirement age') &&
+      event.isPartnerEvent
+    );
+  }
+
+  private getTimelineEventIconBase(event: ClientEvent): string {
+    if (this.isPartnerRetirementEvent(event)) {
+      return 'partner-retirement-age-icon';
+    }
+    return event.iconUrl;
+  }
+
+  private getTimelineVisClassName(event: ClientEvent): string {
+    if (this.isPartnerRetirementEvent(event)) {
+      return 'partner-retirement-age-icon';
+    }
+    return event.iconUrl;
+  }
+
+  private getContentForEvent(event: ClientEvent): string {
+    const title = event.name ?? '';
+    const img = this.getTimelineEventIconBase(event);
+    const extraClass =
+      event.name?.toLowerCase().startsWith('retirement age')
+        ? this.isPartnerRetirementEvent(event)
+          ? ' partner-retirement-age-chip'
+          : ' retirement-age-chip'
+        : '';
+    return `
+    <div class="timeline-event-chip with-padding${extraClass}">
       <div class="event-left">
         <img src="/assets/images/svgs/${img}.svg" class="icon" />
         <span class="label">${title}</span>
@@ -402,34 +436,6 @@ export class ViewTimelineChartComponent implements OnInit {
     </div>`;
   }
   private calculateAge(dateOfBirth: Date): number {
-  const today = new Date();
-  let age = today.getFullYear() - dateOfBirth.getFullYear();
-  const birthMonth = dateOfBirth.getMonth();
-  const birthDay = dateOfBirth.getDate();
-
-  // If birthday hasn't occurred yet this year, subtract one from age
-  const hasBirthdayPassedThisYear =
-    today.getMonth() > birthMonth ||
-    (today.getMonth() === birthMonth && today.getDate() >= birthDay);
-
-  if (!hasBirthdayPassedThisYear) {
-    age--;
+    return getCompletedYearsAgeAtDate(dateOfBirth, new Date());
   }
-
-  return age;
-}
-
-private calculateAgeForTimeline = (date: Date, dateOfBirth: Date): number => {
-  let age = date.getFullYear() - dateOfBirth.getFullYear();
-
-  const hasBirthdayPassed =
-    date.getMonth() > dateOfBirth.getMonth() ||
-    (date.getMonth() === dateOfBirth.getMonth() && date.getDate() >= dateOfBirth.getDate());
-
-  if (!hasBirthdayPassed) {
-    age--;
-  }
-
-  return age;
-}
 }

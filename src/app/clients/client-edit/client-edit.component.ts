@@ -35,10 +35,12 @@ import {
 } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { AuthService } from 'src/app/auth/services/auth.service';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Store } from '@ngrx/store';
 import * as ClientActions from 'src/app/store/client/client.actions';
+import { getCompletedYearsAgeAtDate } from 'src/app/shared/utils/client-age-at-reference';
 
 export const DMY_FORMATS = {
   parse: { dateInput: 'DD/MM/YYYY' },
@@ -92,6 +94,7 @@ class DmyDateAdapter extends NativeDateAdapter {
     MatDialogModule,
     MatIconModule,
     MatDividerModule,
+    MatTooltipModule,
     TranslateModule,
   ],
   providers: [
@@ -116,6 +119,8 @@ export class ClientEditComponent {
   clientForm: FormGroup;
   clientId: string;
   showPartner: boolean = false;
+  /** True when the API returned a partner with a first name (cannot remove from this screen). */
+  hasPersistedPartner = false;
   allCountries = allCountries;
   selectedClientCountryISO = CountryISO.UnitedStates;
   selectedPartnerCountryISO = CountryISO.UnitedStates;
@@ -135,6 +140,7 @@ export class ClientEditComponent {
     private toastr: ToastrService,
     private authService: AuthService,
     private store: Store,
+    private translate: TranslateService,
     private dialogRef: MatDialogRef<ClientEditComponent>,
     @Inject(MAT_DIALOG_DATA) public dialogData: { clientId: string },
   ) {
@@ -212,7 +218,7 @@ export class ClientEditComponent {
         const clientBirthDate = new Date(res.clientDetails.birthDate);
         this.clientForm.controls['dob'].patchValue(clientBirthDate);
         this.clientDobDisplay = normalizeToDMY(clientBirthDate);
-        this.age = calculateAge(clientBirthDate);
+        this.age = getCompletedYearsAgeAtDate(clientBirthDate, new Date());
 
         
 
@@ -240,13 +246,17 @@ export class ClientEditComponent {
         this.clientForm.controls['notes'].patchValue(res?.notes);
 
         if (res.partnerDetail?.firstName) {
+          this.hasPersistedPartner = true;
           this.togglePartnerSection(true);
           var partnerFormGroup = this.clientForm.get('partner') as FormGroup
 
           const partnerBirthDate = new Date(res.partnerDetail.birthDate);
           partnerFormGroup.controls['dob'].patchValue(partnerBirthDate);
           this.partnerDobDisplay = normalizeToDMY(partnerBirthDate);
-          this.partnerAge = calculateAge(partnerBirthDate);
+          this.partnerAge = getCompletedYearsAgeAtDate(
+            partnerBirthDate,
+            new Date(),
+          );
 
           
 
@@ -270,13 +280,8 @@ export class ClientEditComponent {
   }
 
   onPartnerCheckboxClick() {
-    if (this.showPartner) {
-      const confirmed = window.confirm(
-        'Removing a partner will affect any Joint or Partner-owned saving pots. ' +
-        'You will need to manually delete those pots afterwards.\n\n' +
-        'Do you want to continue?'
-      );
-      if (!confirmed) return;
+    if (this.hasPersistedPartner) {
+      return;
     }
     this.togglePartnerSection(!this.showPartner);
   }
@@ -305,7 +310,7 @@ export class ClientEditComponent {
       // const partnerDob = partnerGroup.get('dob')?.value;
       // if (partnerDob instanceof Date) {
       //   this.partnerDobDisplay = normalizeToDMY(partnerDob);
-      //   this.partnerAge = calculateAge(partnerDob);
+      //   this.partnerAge = getCompletedYearsAgeAtDate(partnerDob);
 
       //   setTimeout(() => {
       //     const allInputs = document.querySelectorAll('input[matDatepicker]');
@@ -356,7 +361,7 @@ export class ClientEditComponent {
           phone: this.clientForm.controls['phone'].value?.e164Number,
           inflationRate: round2(this.clientForm.controls['inflationRate'].value),
         },
-        partnerDetail: this.showPartner ? {
+        partnerDetail: this.showPartner || this.hasPersistedPartner ? {
           firstName: partnerGroup.controls['firstName']?.value,
           lastName: partnerGroup.controls['lastName']?.value,
           birthDate: this.fixDate(partnerGroup.controls['dob']?.value),
@@ -381,12 +386,12 @@ export class ClientEditComponent {
           filter((res) => !!res),
           map(() => {
             this.store.dispatch(ClientActions.selectClient({ client }));
-            this.toastr.success('Client updated successfully', 'Success!');
+            this.toastr.success(this.translate.instant('TOAST.CLIENT_UPDATED'), this.translate.instant('LABEL.SUCCESS'));
             this.dialogRef.close({ action: 'updated', client });
           }),
           catchError((err) => {
             console.error(err);
-            this.toastr.error('An error occured while saving client', 'Error!');
+            this.toastr.error(this.translate.instant('TOAST.ERROR_SAVING_CLIENT'), this.translate.instant('LABEL.ERROR'));
             throw err;
           })
         )
@@ -630,7 +635,7 @@ export class ClientEditComponent {
           input.value = normalized;
         }
       }, 0);
-      this.age = calculateAge(value);
+      this.age = getCompletedYearsAgeAtDate(value, new Date());
       control?.updateValueAndValidity({ emitEvent: false });
       return;
     }
@@ -680,7 +685,7 @@ export class ClientEditComponent {
           partnerInput.value = normalized;
         }
       }, 0);
-      this.partnerAge = calculateAge(value);
+      this.partnerAge = getCompletedYearsAgeAtDate(value, new Date());
       control?.updateValueAndValidity({ emitEvent: false });
       return;
     }
@@ -743,7 +748,7 @@ export class ClientEditComponent {
       return;
     }
     const formatted = normalizeToDMY(value);
-    this.age = calculateAge(value);
+    this.age = getCompletedYearsAgeAtDate(value, new Date());
     this.clientDobDisplay = formatted;
 
     this.clientForm.get('dob')?.setValue(value, { emitEvent: false });
@@ -767,7 +772,7 @@ export class ClientEditComponent {
       return;
     }
     const formatted = normalizeToDMY(value);
-    this.partnerAge = calculateAge(value);
+    this.partnerAge = getCompletedYearsAgeAtDate(value, new Date());
     this.partnerDobDisplay = formatted;
     const partnerGroup = this.clientForm.get('partner') as FormGroup;
     partnerGroup.get('dob')?.setValue(value, { emitEvent: false });
@@ -925,23 +930,13 @@ function parseDMYFromDigits(
   return { ok: true, date, age, normalized: normalizeToDMY(date) };
 }
 
-function calculateAge(date: Date): number {
-  const today = new Date();
-  let age = today.getFullYear() - date.getFullYear();
-  const hadBirthdayThisYear =
-    today.getMonth() > date.getMonth() ||
-    (today.getMonth() === date.getMonth() && today.getDate() >= date.getDate());
-  if (!hadBirthdayThisYear) age -= 1;
-  return age;
-}
-
 function dobValidator(
   ctrl: FormControl<string | Date | null>
 ): ValidationErrors | null {
   const raw = ctrl.value;
 
   if (raw instanceof Date) {
-    const age = calculateAge(raw);
+    const age = getCompletedYearsAgeAtDate(raw, new Date());
     if (age < 0) return { dob: 'Date cannot be in the future' };
     if (age > MAX_AGE) return { dob: `Age must be ≤ ${MAX_AGE}` };
     return null;

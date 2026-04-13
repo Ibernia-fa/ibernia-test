@@ -1,13 +1,17 @@
-import { Component, Inject } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, DestroyRef, Inject, inject } from '@angular/core';
+import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { CommonModule } from '@angular/common';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatRadioModule } from '@angular/material/radio';
 import { MatSelectModule } from '@angular/material/select';
 import { ToastrService } from 'ngx-toastr';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 import { allCountries } from 'src/app/clients/models/country';
-import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
 
@@ -28,6 +32,12 @@ export interface AddAssetDialogData {
   partnerFirstName?: string;
 }
 
+function trimmedRequired(control: AbstractControl): ValidationErrors | null {
+  const v = control.value;
+  const s = typeof v === 'string' ? v.trim() : '';
+  return s ? null : { required: true };
+}
+
 @Component({
   selector: 'app-add-asset',
   standalone: true,
@@ -35,15 +45,20 @@ export interface AddAssetDialogData {
     CommonModule,
     ReactiveFormsModule,
     MatDialogModule,
+    MatButtonModule,
+    MatIconModule,
     MatInputModule,
+    MatRadioModule,
     MatSelectModule,
-    ThousandSeparatorPipe,
-    ThousandSeparatorInputDirective
+    ThousandSeparatorInputDirective,
+    TranslateModule,
   ],
   templateUrl: './add-asset.component.html',
   styleUrl: './add-asset.component.scss',
 })
 export class AddAssetComponent {
+  private readonly destroyRef = inject(DestroyRef);
+
   form: FormGroup;
   isEditMode: boolean;
   isSaving = false;
@@ -63,7 +78,8 @@ export class AddAssetComponent {
     private dialogRef: MatDialogRef<AddAssetComponent>,
     @Inject(MAT_DIALOG_DATA) public data: AddAssetDialogData,
     private wealthHttp: WealthHttpService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private translate: TranslateService,
   ) {
     this.isEditMode = data.mode === 'edit';
     this.hasPartner = data.hasPartner ?? false;
@@ -87,35 +103,44 @@ export class AddAssetComponent {
     this.form = this.fb.group({
       category: [categoryValue, Validators.required],
       name: [this.isEditMode ? (data.asset!.name || '') : ''],
-      description: [this.isEditMode ? data.asset!.description : '', Validators.required],
       value: [this.isEditMode ? data.asset!.value : null, [Validators.required, Validators.min(0)]],
       ownership: [ownershipValue],
       currencySymbol: [data.clientPreferredCurrency || 'EUR']
     });
 
-    this.updateNameValidation(categoryValue);
+    this.form
+      .get('category')
+      ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.syncNameValidators());
+    this.syncNameValidators();
   }
 
-  get isOtherCategory(): boolean {
-    return this.form.get('category')?.value === AssetCategory.Other;
+  get assetNameLabelKey(): string {
+    return this.form.get('category')?.value === AssetCategory.Other ? 'Name' : 'WEALTH.NAME_OPTIONAL';
   }
 
-  onCategoryChange(): void {
-    const cat = this.form.get('category')?.value;
-    this.updateNameValidation(cat);
-    if (cat !== AssetCategory.Other) {
-      this.form.patchValue({ name: '' });
-    }
-  }
-
-  private updateNameValidation(category: AssetCategory): void {
-    const nameControl = this.form.get('name');
-    if (category === AssetCategory.Other) {
-      nameControl?.setValidators(Validators.required);
+  private syncNameValidators(): void {
+    const nameCtrl = this.form.get('name');
+    if (this.form.get('category')?.value === AssetCategory.Other) {
+      nameCtrl?.setValidators([trimmedRequired]);
     } else {
-      nameControl?.clearValidators();
+      nameCtrl?.clearValidators();
     }
-    nameControl?.updateValueAndValidity();
+    nameCtrl?.updateValueAndValidity({ emitEvent: false });
+  }
+
+  /** i18n key for contextual name placeholder by selected asset category */
+  get assetNamePlaceholderKey(): string {
+    const cat = this.form.get('category')?.value as AssetCategory;
+    switch (cat) {
+      case AssetCategory.PersonalProperty:
+        return 'WEALTH.NAME_PLACEHOLDER_ASSET_PERSONAL_PROPERTY';
+      case AssetCategory.Other:
+        return 'WEALTH.NAME_PLACEHOLDER_ASSET_OTHER';
+      case AssetCategory.RealEstate:
+      default:
+        return 'WEALTH.NAME_PLACEHOLDER_ASSET_REAL_ESTATE';
+    }
   }
 
   onAmountInput(rawValue: string): void {
@@ -123,7 +148,7 @@ export class AddAssetComponent {
       this.form.get('value')?.setValue('', { emitEvent: true });
       return;
     }
-    const value = parseFormattedNumber(rawValue);
+    const value = parseFormattedNumber(rawValue, this.translate.currentLang);
     this.form.get('value')?.setValue(value, { emitEvent: true });
   }
 
@@ -132,13 +157,14 @@ export class AddAssetComponent {
     this.isSaving = true;
 
     const formValue = this.form.value;
+    const trimmedName = typeof formValue.name === 'string' ? formValue.name.trim() : '';
+    const nameOrNull = trimmedName ? trimmedName : null;
 
     if (this.isEditMode) {
       const request = {
         id: this.data.asset!.id,
         category: formValue.category,
-        name: formValue.name || null,
-        description: formValue.description,
+        name: nameOrNull,
         value: formValue.value,
         ownership: this.hasPartner ? formValue.ownership : 0
       };
@@ -155,8 +181,7 @@ export class AddAssetComponent {
     } else {
       const request = {
         category: formValue.category,
-        name: formValue.name || null,
-        description: formValue.description,
+        name: nameOrNull,
         value: formValue.value,
         ownership: this.hasPartner ? formValue.ownership : 0
       };

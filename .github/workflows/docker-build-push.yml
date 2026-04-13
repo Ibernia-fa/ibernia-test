@@ -144,6 +144,33 @@ jobs:
 
             docker image prune -f
 
+      # Optional: purge Cloudflare edge cache for dev so same-name assets never linger at the edge.
+      # Set secrets: CLOUDFLARE_ZONE_ID, CLOUDFLARE_API_TOKEN (Cache Purge permission).
+      - name: Purge Cloudflare cache (dev hostname only)
+        if: success() && steps.vars.outputs.env == 'dev'
+        continue-on-error: true
+        env:
+          CF_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "${CF_ZONE_ID:-}" ] || [ -z "${CF_TOKEN:-}" ]; then
+            echo "CLOUDFLARE_ZONE_ID / CLOUDFLARE_API_TOKEN not set — skipping Cloudflare purge (optional)."
+            exit 0
+          fi
+          RESP="$(curl -sS -w '\n%{http_code}' -X POST \
+            "https://api.cloudflare.com/client/v4/zones/${CF_ZONE_ID}/purge_cache" \
+            -H "Authorization: Bearer ${CF_TOKEN}" \
+            -H "Content-Type: application/json" \
+            -d '{"hosts":["dev.ibernia.it"]}')"
+          HTTP_BODY="$(echo "$RESP" | sed '$d')"
+          HTTP_CODE="$(echo "$RESP" | tail -n1)"
+          echo "$HTTP_BODY"
+          if [ "$HTTP_CODE" != "200" ] || ! echo "$HTTP_BODY" | grep -q '"success":true'; then
+            echo "::warning::Cloudflare dev purge failed or returned unexpected body (HTTP ${HTTP_CODE}). Deploy completed; purge manually if needed."
+            exit 1
+          fi
+
       - name: Notify ibernia-portal-tests repo (repository_dispatch)
         if: success()
         env:

@@ -21,7 +21,11 @@ import { MatInputModule } from '@angular/material/input';
 import { MatDialog } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { NgIf } from '@angular/common';
-import { ImageCropDialogComponent } from './image-crop-dialog/image-crop-dialog.component';
+import {
+  ImageCropDialogComponent,
+  ImageCropDialogResult,
+} from './image-crop-dialog/image-crop-dialog.component';
+import type { ImageTransform } from 'ngx-image-cropper';
 import { TranslateService } from '@ngx-translate/core';
 import {
   isAllowedFileType,
@@ -58,6 +62,9 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
   private profileSnapshot: { firstName: string; lastName: string; bio: string; profilePhotoUrl: string } | null = null;
   user: any;
   profileImagePreview: string | null = null;
+  /** Uncropped source for the crop dialog; preview/payload use the cropped bitmap. */
+  private profileCropSource: string | null = null;
+  private profileCropTransform: ImageTransform | null = null;
   private objectUrlToRevoke: string | null = null;
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
   form = this.fb.nonNullable.group({
@@ -113,6 +120,8 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
       .subscribe((res: HttpResponse<UserProfileDto | null>) => {
         if (res.status === 204) {
           this.userprofile = { id: undefined, userId: this.user?.sub, preferences: DEFAULT_PREFERENCES } as UserProfileDto;
+          this.profileCropSource = null;
+          this.profileCropTransform = null;
           this.updateSnapshots();
           this.cdr.markForCheck();
           return;
@@ -130,6 +139,8 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
           });
 
           this.profileImagePreview = ensureDataUrl(p.profilePhotoUrl);
+          this.profileCropSource = this.profileImagePreview;
+          this.profileCropTransform = null;
 
           this.updateSnapshots();
           this.cdr.markForCheck();
@@ -302,6 +313,8 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
     try {
       let dataUrl = await fileToDataUrl(file);
       dataUrl = await compressImage(dataUrl);
+      this.profileCropSource = dataUrl;
+      this.profileCropTransform = null;
       this.openCropDialog(dataUrl);
     } catch (e) {
       console.error('Failed to read image', e);
@@ -320,21 +333,25 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
       width: '600px',
       maxWidth: '95vw',
       panelClass: 'image-crop-dialog',
-      data: { imageBase64, cropType: 'profile' as const },
+      data: {
+        imageBase64,
+        cropType: 'profile' as const,
+        initialTransform: this.profileCropTransform ?? undefined,
+      },
     });
 
-    dialogRef.afterClosed().subscribe(async (result: string | null) => {
-      if (result) {
+    dialogRef.afterClosed().subscribe(async (result: ImageCropDialogResult | null) => {
+      if (result?.croppedBase64) {
+        this.profileCropTransform = result.transform;
         try {
-          const compressed = await compressForProfilePayload(result);
+          const compressed = await compressForProfilePayload(result.croppedBase64);
           this.profileImagePreview = compressed;
           this.form.get('profilePhotoUrl')?.setValue(compressed);
         } catch {
-          this.profileImagePreview = result;
-          this.form.get('profilePhotoUrl')?.setValue(result);
+          this.profileImagePreview = result.croppedBase64;
+          this.form.get('profilePhotoUrl')?.setValue(result.croppedBase64);
         }
       } else {
-        // User cancelled - ensure loader is hidden (no image stored)
         this.isUploadingProfile = false;
       }
       this.cdr.markForCheck();
@@ -344,8 +361,9 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
   cropImage(event?: Event): void {
     event?.stopPropagation();
     event?.preventDefault();
-    if (!this.profileImagePreview) return;
-    this.openCropDialog(this.profileImagePreview);
+    const src = this.profileCropSource ?? this.profileImagePreview;
+    if (!src) return;
+    this.openCropDialog(src);
   }
 
 
@@ -367,7 +385,7 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
     this.submitted = true;
     if (this.form.invalid) {
       this.form.markAllAsTouched();
-      this.toastr.error('Please fix the highlighted fields', 'Error!');
+      this.toastr.error(this.translate.instant('ERROR.FIX_FIELDS'), this.translate.instant('LABEL.ERROR'));
       return;
     }
     this.isSavingProfile = true;
@@ -375,8 +393,8 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
       .pipe(
         takeUntil(this.destroy$),
         catchError((err) => {
-          const msg = err?.error?.message ?? 'Failed to save profile';
-          this.toastr.error(msg, 'Error!');
+          const msg = err?.error?.message ?? this.translate.instant('ERROR.FAILED_SAVE_PROFILE');
+          this.toastr.error(msg, this.translate.instant('LABEL.ERROR'));
           return EMPTY;
         }),
         finalize(() => {
@@ -386,9 +404,10 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
       )
       .subscribe(() => {
         this.updateSnapshots();
-        this.toastr.success('Profile saved', 'Success!');
+        this.toastr.success(this.translate.instant('TOAST.PROFILE_SAVED'), this.translate.instant('LABEL.SUCCESS'));
         const payload = this.buildPayload();
         this.userprofile = { ...(this.userprofile ?? { preferences: DEFAULT_PREFERENCES }), ...payload };
+        this.profileImagePreview = ensureDataUrl(payload.profilePhotoUrl ?? null);
         this.api.setUserData(this.userprofile);
         this.api.notifyProfileChanged();
         this.cdr.markForCheck();
@@ -413,6 +432,8 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
     event.stopPropagation();
     event.preventDefault();
     this.profileImagePreview = null;
+    this.profileCropSource = null;
+    this.profileCropTransform = null;
     this.form.get('profilePhotoUrl')?.setValue('');
     // also clear the native input here (important for the "2nd pick" case)
     if (this.fileInput?.nativeElement) {
@@ -433,6 +454,8 @@ const DEFAULT_PREFERENCES = {
   comissionAmount: null as number | null,
   currency: 'EUR',
   country: '',
+  mortgageInterestRate: 3.5,
+  loanInterestRate: 8,
 };
 function blankToNull(s?: string | null): string | null {
   return s && s.trim().length ? s.trim() : null;

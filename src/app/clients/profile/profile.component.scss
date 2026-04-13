@@ -1,3 +1,6 @@
+.profile-container {
+  padding: 16px 0;
+}
 .profile-container .mat-mdc-card.mdc-card {
   background-color: #ffffffb2 !important;
   backdrop-filter: blur(75px);
@@ -9,6 +12,11 @@
     font-size: 16px;
     line-height: 18px;
     color: #5a596e;
+  }
+  .button-icon {
+    span {
+      align-self: flex-end;
+    }
   }
 }
 

@@ -9,19 +9,21 @@ export enum FamilyRole {
   PartnerMother = 5,
   ClientSibling = 6,
   PartnerSibling = 7,
-  Child = 8
+  Child = 8,
+  Other = 9
 }
 
 export const FAMILY_ROLE_LABELS: Record<number, string> = {
   [FamilyRole.Client]: 'Client',
   [FamilyRole.Partner]: 'Partner',
-  [FamilyRole.ClientFather]: "Client's Father",
-  [FamilyRole.ClientMother]: "Client's Mother",
-  [FamilyRole.PartnerFather]: "Partner's Father",
-  [FamilyRole.PartnerMother]: "Partner's Mother",
-  [FamilyRole.ClientSibling]: "Client's Sibling",
-  [FamilyRole.PartnerSibling]: "Partner's Sibling",
-  [FamilyRole.Child]: 'Child'
+  [FamilyRole.ClientFather]: 'Father',
+  [FamilyRole.ClientMother]: 'Mother',
+  [FamilyRole.PartnerFather]: "Partner's father",
+  [FamilyRole.PartnerMother]: "Partner's mother",
+  [FamilyRole.ClientSibling]: 'Sibling',
+  [FamilyRole.PartnerSibling]: "Partner's sibling",
+  [FamilyRole.Child]: 'Child',
+  [FamilyRole.Other]: 'Other'
 };
 
 export enum ScenarioType {
@@ -101,6 +103,7 @@ export interface BeneficiaryRuleModel {
   scenario: string;
   recipients: BeneficiaryRecipientModel[];
   totalPercentage: number;
+  isDefault: boolean;
 }
 
 export interface BeneficiaryRecipientModel {

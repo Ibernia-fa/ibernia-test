@@ -2,6 +2,8 @@
 
 html.dark-theme {
   color-scheme: dark;
+  /** Secondary helper text; aligns with muted labels on dark surfaces. */
+  --ib-text-secondary-muted: rgba(255, 255, 255, 0.65);
   --mat-sys-background: #141a21;
   --mat-sys-on-background: rgba(255, 255, 255, 0.9);
   --mat-sys-on-primary: #fff;

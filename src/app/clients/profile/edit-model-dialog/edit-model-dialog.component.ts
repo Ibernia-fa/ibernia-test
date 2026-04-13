@@ -19,11 +19,15 @@ import { Cashflow } from '../../models/cashflow';
 import { EMPTY, catchError, filter, map, switchMap, take } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Client } from '../../models/client';
 import { ReportsHttpService } from 'src/app/financial-workflow/reports/services/reports-http.service';
 import { TimelineHttpService } from 'src/app/financial-workflow/timeline/services/timeline-http.service';
 import { MaterialModule } from "src/app/material.module";
+import {
+  getCompletedYearsAgeAtDate,
+  getPlanEndDate,
+} from 'src/app/shared/utils/client-age-at-reference';
 
 @Component({
   selector: 'app-edit-model-dialog',
@@ -57,12 +61,14 @@ export class EditModelDialogComponent {
     private timelineHttpService: TimelineHttpService,
     private toaster: ToastrService,
     private router: Router,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private translate: TranslateService,
   ) {
     const birthDateValue =
       this.cashflow?.clientBirthDate ?? this.clientData?.clientDetails?.birthDate;
     this.birthDate = birthDateValue ? new Date(birthDateValue) : new Date();
-    this.minAge = this.calculateAge(this.birthDate);
+    const computedMin = getCompletedYearsAgeAtDate(this.birthDate, new Date());
+    this.minAge = Number.isFinite(computedMin) ? computedMin : 0;
     this.initForm();
   }
 
@@ -79,6 +85,7 @@ export class EditModelDialogComponent {
       ],
       description: [this.cashflow.description],
     });
+    this.form.get('planDuration')?.disable({ emitEvent: false });
     this.form.updateValueAndValidity();
   }
 
@@ -123,10 +130,17 @@ export class EditModelDialogComponent {
             return res;
           }),
           catchError((err) => {
-            if (err.error)
-              this.toaster.error(err.error);
-            else
-              this.toaster.error('An error occurred while updating plan');
+            const title = this.translate.instant('LABEL.ERROR');
+            const fallback = this.translate.instant('ERROR.PLAN_UPDATE_FAILED');
+            let msg = fallback;
+            if (typeof err?.error === 'string' && err.error.trim()) {
+              msg = err.error;
+            } else if (typeof err?.error?.message === 'string' && err.error.message.trim()) {
+              msg = err.error.message;
+            } else if (typeof err?.message === 'string' && err.message.trim()) {
+              msg = err.message;
+            }
+            this.toaster.error(msg, title);
             this.isLoading = false;
             console.error('An error occurred while updating cashflow', err);
             throw err;
@@ -135,7 +149,10 @@ export class EditModelDialogComponent {
         .subscribe((res) => {
           this.isLoading = false;
           console.log(res);
-          this.toaster.success('Plan Updated Successfully');
+          this.toaster.success(
+            this.translate.instant('TOAST.PLAN_UPDATED_SUCCESSFULLY'),
+            this.translate.instant('LABEL.SUCCESS'),
+          );
           this.refreshReportForecastEndDate(res);
           this.dialogRef.close();
           // this.router.navigate([`cashflows/${res.id}/timeline`]);
@@ -195,16 +212,14 @@ export class EditModelDialogComponent {
     birthDate: Date,
     existingEndDate?: Date
   ): Date {
-    const birthYear = birthDate.getFullYear();
-    const endYear = birthYear + planDuration;
-
-    if (existingEndDate && !Number.isNaN(existingEndDate.getTime())) {
-      const nextEnd = new Date(existingEndDate);
-      nextEnd.setFullYear(endYear);
-      return nextEnd;
+    const canonical = getPlanEndDate(birthDate, planDuration);
+    if (canonical) {
+      return canonical;
     }
-
-    return new Date(endYear, 1);
+    if (existingEndDate && !Number.isNaN(existingEndDate.getTime())) {
+      return existingEndDate;
+    }
+    return new Date(birthDate.getFullYear() + planDuration, 1);
   }
 
   private toIsoString(value: Date | string): string {
@@ -233,17 +248,4 @@ export class EditModelDialogComponent {
     return Math.round((n + Number.EPSILON) * 10) / 10;
   }
 
-  private calculateAge(birthDate: Date): number {
-    if (Number.isNaN(birthDate.getTime())) {
-      return 0;
-    }
-    const today = new Date();
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const m = today.getMonth() - birthDate.getMonth();
-
-    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
-    }
-    return age;
-  }
 }

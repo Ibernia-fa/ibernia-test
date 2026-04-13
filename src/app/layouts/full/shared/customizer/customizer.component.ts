@@ -11,6 +11,7 @@ import { TablerIconsModule } from 'angular-tabler-icons';
 import { MaterialModule } from 'src/app/material.module';
 import { FormsModule } from '@angular/forms';
 import { NgScrollbarModule } from 'ngx-scrollbar';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-customizer',
@@ -19,6 +20,7 @@ import { NgScrollbarModule } from 'ngx-scrollbar';
         MaterialModule,
         FormsModule,
         NgScrollbarModule,
+        TranslateModule,
     ],
     templateUrl: './customizer.component.html',
     styleUrls: ['./customizer.component.scss'],

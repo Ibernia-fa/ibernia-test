@@ -16,7 +16,6 @@ import { CoreService } from 'src/app/services/core.service';
 import { AppSettings } from 'src/app/config';
 import { filter } from 'rxjs/operators';
 import { NavigationEnd, Router } from '@angular/router';
-import { navItems, navItemslower } from './vertical/sidebar/sidebar-data';
 import { NavService } from '../../services/nav.service';
 import { AppNavItemComponent } from './vertical/sidebar/nav-item/nav-item.component';
 import { RouterModule } from '@angular/router';
@@ -49,6 +48,7 @@ import { Client } from 'src/app/clients/models/client';
 import { TranslateModule } from '@ngx-translate/core';
 import { OrganizationProfilesService } from 'src/app/settings/services/organization.profiles.service';
 import { AuthService } from 'src/app/auth/services/auth.service';
+import { FooterComponent } from './vertical/footer/footer.component';
 
 const MOBILE_VIEW = 'screen and (max-width: 768px)';
 const TABLET_VIEW = 'screen and (min-width: 769px) and (max-width: 1024px)';
@@ -89,22 +89,38 @@ interface quicklinks {
     MatListModule,
     MatDialogModule,
     TranslateModule,
+    FooterComponent,
   ],
   templateUrl: './full.component.html',
   styleUrls: [],
   encapsulation: ViewEncapsulation.None,
 })
 export class FullComponent implements OnInit, OnDestroy {
-  navItems = navItems;
-  navItemslower = navItemslower;
+  navItems = mainNavItems;
+  navItemslower = mainLower;
   isSettings = false;
   isCashflowRoute = false;
+
+  /** Hidden on cashflows and questionnaire (same rules as former AppComponent.showFooter). */
+  showFooter = true;
+
+  /**
+   * While on `/settings/*`, the sidebar is forced expanded (labels visible).
+   * On exit, we restore the collapsed state from before entering Settings.
+   */
+  private inSettingsRoute = false;
+  private preSettingsSidenavCollapsed: boolean | null = null;
+
   @ViewChild('leftsidenav')
   public sidenav: MatSidenav;
   resView = false;
   @ViewChild('content', { static: true }) content!: MatSidenavContent;
-  //get options from service
-  options = this.settings.getOptions();
+
+  /** Always read from CoreService so layout state matches after setOptions (avoids stale ref after toggle in prod). */
+  get options(): AppSettings {
+    return this.settings.getOptions();
+  }
+
   private layoutChangesSubscription = Subscription.EMPTY;
   private isMobileScreen = false;
   private isContentWidthFixed = true;
@@ -126,6 +142,12 @@ export class FullComponent implements OnInit, OnDestroy {
 
   get isTablet(): boolean {
     return this.resView;
+  }
+
+  /** User-uploaded org background — disable frosted overlay so the photo stays sharp. */
+  get usesCustomBackground(): boolean {
+    const s = this.backgroundImage?.trim();
+    return !!s;
   }
 
   // for mobile app sidebar
@@ -245,24 +267,38 @@ export class FullComponent implements OnInit, OnDestroy {
     this.client$ = this.store.select(selectedClient);
 
     this.htmlElement = document.querySelector('html')!;
+    this.syncSidebarForSettingsRoute(this.normalizePath(this.router.url));
+
     this.layoutChangesSubscription = this.breakpointObserver
       .observe([MOBILE_VIEW, TABLET_VIEW, MONITOR_VIEW, BELOWMONITOR])
       .subscribe((state) => {
-        // SidenavOpened must be reset true when layout changes
-        this.options.sidenavOpened = true;
-        this.isMobileScreen = state.breakpoints[BELOWMONITOR];
-        if (this.options.sidenavCollapsed == false) {
-          this.options.sidenavCollapsed = state.breakpoints[TABLET_VIEW];
+        const o = this.settings.getOptions();
+        let sidenavCollapsed = o.sidenavCollapsed;
+        // On `/settings/*`, skip tablet auto-collapse so entry expand isn't undone;
+        // user toggle still updates `o.sidenavCollapsed` directly.
+        if (!this.inSettingsRoute && o.sidenavCollapsed === false) {
+          sidenavCollapsed = state.breakpoints[TABLET_VIEW];
         }
+        this.settings.setOptions(
+          {
+            sidenavOpened: true,
+            sidenavCollapsed,
+          },
+          false,
+        );
+        this.isMobileScreen = state.breakpoints[BELOWMONITOR];
         this.isContentWidthFixed = state.breakpoints[MONITOR_VIEW];
         this.resView = state.breakpoints[BELOWMONITOR];
       });
 
     // Initialize project theme with options
-    this.receiveOptions(this.options);
+    this.receiveOptions(this.settings.getOptions());
 
     // Set initial route state (for direct load/refresh on cashflow routes)
-    this.isCashflowRoute = this.router.url.startsWith('/cashflows');
+    const bootPath = this.normalizePath(this.router.url);
+    this.isCashflowRoute = bootPath.startsWith('/cashflows');
+    this.showFooter =
+      !this.isCashflowRoute && !bootPath.startsWith('/questionnaire/');
 
     // This is for scroll to top
     // this.router.events
@@ -282,6 +318,7 @@ export class FullComponent implements OnInit, OnDestroy {
       .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe((e: NavigationEnd) => {
         const currentRoute = e.urlAfterRedirects;
+        const path = this.normalizePath(currentRoute);
 
         // keep your existing hideSidebar logic
         this.hideSidebar = this.options.sidebarHiddenOnRoutes.some((x) =>
@@ -289,29 +326,84 @@ export class FullComponent implements OnInit, OnDestroy {
         );
 
         // NEW: detect settings
-        this.isSettings = currentRoute.startsWith('/settings');
+        this.isSettings = path.startsWith('/settings');
 
         // Detect cashflow routes (footer is hidden, so no bottom padding needed)
-        this.isCashflowRoute = currentRoute.startsWith('/cashflows');
+        this.isCashflowRoute = path.startsWith('/cashflows');
+        this.showFooter =
+          !this.isCashflowRoute && !path.startsWith('/questionnaire/');
 
         // swap menu sources
         if (this.isSettings) {
           this.navItems = settingsNavItems;
-          const allLower = settingsLowerNavItems ?? [];
-          this.navItemslower = allLower.filter((item) => item.displayName !== 'Admin Notifications');
-          Promise.all([
-            this.Authservice.hasRole('Administrator'),
-            this.Authservice.hasRole('IberniaIdentityAdminAdministrator')
-          ]).then(([admin, idAdmin]) => {
-            this.navItemslower = (admin || idAdmin) ? allLower : allLower.filter((item) => item.displayName !== 'Admin Notifications');
-          }); // or [] if you don’t have a lower list
+          this.applySettingsLowerNav();
         } else {
           this.navItems = mainNavItems;
           this.navItemslower = mainLower;
         }
 
+        this.syncSidebarForSettingsRoute(path);
+
         this.content?.scrollTo({ top: 0 });
       });
+
+    const uid = this.Authservice.getUserProfile()?.sub;
+    if (uid) {
+      this.organizationProfiles.hydrateBrandingLogoFromSession(uid);
+      this.organizationProfiles.hydrateBackgroundFromSession(uid);
+    }
+
+    const initialPath = this.normalizePath(this.router.url);
+    if (initialPath.startsWith('/settings')) {
+      this.isSettings = true;
+      this.navItems = settingsNavItems;
+      this.applySettingsLowerNav();
+    }
+  }
+
+  private normalizePath(url: string): string {
+    return url.split('?')[0].split('#')[0];
+  }
+
+  /**
+   * Expands the sidebar on any `/settings/*` route; restores the previous
+   * collapsed preference when navigating away.
+   */
+  private syncSidebarForSettingsRoute(path: string): void {
+    const nowSettings = path.startsWith('/settings');
+
+    if (nowSettings && !this.inSettingsRoute) {
+      this.preSettingsSidenavCollapsed =
+        this.settings.getOptions().sidenavCollapsed;
+      this.settings.setOptions({ sidenavCollapsed: false }, false);
+    } else if (!nowSettings && this.inSettingsRoute) {
+      if (this.preSettingsSidenavCollapsed !== null) {
+        this.settings.setOptions({
+          sidenavCollapsed: this.preSettingsSidenavCollapsed,
+        });
+        this.preSettingsSidenavCollapsed = null;
+      }
+    }
+
+    this.inSettingsRoute = nowSettings;
+  }
+
+  /** Admin Notifications + Identity Admin: visible only to Administrator / IberniaIdentityAdminAdministrator. */
+  private applySettingsLowerNav(): void {
+    const allLower = settingsLowerNavItems ?? [];
+    this.navItemslower = allLower.filter(
+      (item) =>
+        item.displayName !== 'Admin Notifications' &&
+        item.displayName !== 'Identity Admin',
+    );
+    Promise.all([
+      this.Authservice.hasRole('Administrator'),
+      this.Authservice.hasRole('IberniaIdentityAdminAdministrator'),
+    ]).then(([admin, idAdmin]) => {
+      if (admin || idAdmin) {
+        this.navItemslower = allLower;
+      }
+    });
   }
 
   ngOnInit(): void {
@@ -331,12 +423,16 @@ export class FullComponent implements OnInit, OnDestroy {
 
   toggleCollapsed() {
     this.isContentWidthFixed = false;
-    this.options.sidenavCollapsed = !this.options.sidenavCollapsed;
+    const o = this.settings.getOptions();
+    this.settings.setOptions({ sidenavCollapsed: !o.sidenavCollapsed });
     this.resetCollapsedState();
   }
 
   resetCollapsedState(timer = 400) {
-    setTimeout(() => this.settings.setOptions(this.options), timer);
+    setTimeout(() => {
+      const o = this.settings.getOptions();
+      this.settings.setOptions({ ...o });
+    }, timer);
   }
 
   onSidenavClosedStart() {
@@ -345,8 +441,7 @@ export class FullComponent implements OnInit, OnDestroy {
 
   onSidenavOpenedChange(isOpened: boolean) {
     this.isCollapsedWidthFixed = !this.isOver;
-    this.options.sidenavOpened = isOpened;
-    this.settings.setOptions(this.options);
+    this.settings.setOptions({ sidenavOpened: isOpened });
   }
 
   receiveOptions(options: AppSettings): void {
@@ -405,6 +500,13 @@ export class FullComponent implements OnInit, OnDestroy {
             p?.backgroundPhotoUrl ?? null,
           );
           this.backgroundImageReady = true;
+          const uid = this.Authservice.getUserProfile()?.sub;
+          if (uid) {
+            this.organizationProfiles.setBackgroundImage(
+              this.backgroundImage,
+              uid,
+            );
+          }
         },
         error: (err) => {
           console.error(err);

@@ -41,8 +41,9 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { SettingsService } from 'src/app/default-preferance/services/default-preferance.http.service';
 import { AuthService } from 'src/app/auth/services/auth.service';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MY_DATE_FORMATS } from 'src/app/shared/utils/custom-date-formatter';
+import { getCompletedYearsAgeAtDate } from 'src/app/shared/utils/client-age-at-reference';
 
 class DmyDateAdapter extends NativeDateAdapter {
   override parse(value: any): Date | null {
@@ -126,6 +127,7 @@ export class ClientAddComponent {
     private router: Router,
     private settingsService: SettingsService,
     private authService: AuthService,
+    private translate: TranslateService,
     private dialogRef: MatDialogRef<ClientAddComponent>,
     @Optional() @Inject(MAT_DIALOG_DATA) public data: any,
   ) {
@@ -364,13 +366,13 @@ export class ClientAddComponent {
       .pipe(
         filter((res) => !!res),
         map((res) => {
-          this.toastr.success('Client created successfully', 'Success!');
+          this.toastr.success(this.translate.instant('TOAST.CLIENT_CREATED'), this.translate.instant('LABEL.SUCCESS'));
           this.isLoading = false;
           this.dialogRef.close({ action: 'added', client: res });
         }),
         catchError((err) => {
           console.error(err);
-          this.toastr.error('An error occured while saving client', 'Error!');
+          this.toastr.error(this.translate.instant('TOAST.ERROR_SAVING_CLIENT'), this.translate.instant('LABEL.ERROR'));
           this.isLoading = false;
           throw err;
         }),
@@ -416,13 +418,13 @@ export class ClientAddComponent {
       .pipe(
         filter((res) => !!res),
         map((res) => {
-          this.toastr.success('Client created successfully', 'Success!');
+          this.toastr.success(this.translate.instant('TOAST.CLIENT_CREATED'), this.translate.instant('LABEL.SUCCESS'));
           this.isLoading = false;
           this.openNewModelDialog(res, res.id);
         }),
         catchError((err) => {
           console.error(err);
-          this.toastr.error('An error occured while saving client', 'Error!');
+          this.toastr.error(this.translate.instant('TOAST.ERROR_SAVING_CLIENT'), this.translate.instant('LABEL.ERROR'));
           this.isLoading = false;
           throw err;
         }),
@@ -665,7 +667,7 @@ export class ClientAddComponent {
           input.value = normalized;
         }
       }, 0);
-      this.age = calculateAge(value);
+      this.age = getCompletedYearsAgeAtDate(value, new Date());
       control?.updateValueAndValidity({ emitEvent: false });
       return;
     }
@@ -715,7 +717,7 @@ export class ClientAddComponent {
           partnerInput.value = normalized;
         }
       }, 0);
-      this.partnerAge = calculateAge(value);
+      this.partnerAge = getCompletedYearsAgeAtDate(value, new Date());
       control?.updateValueAndValidity({ emitEvent: false });
       return;
     }
@@ -778,7 +780,7 @@ export class ClientAddComponent {
       return;
     }
     const formatted = normalizeToDMY(value);
-    this.age = calculateAge(value);
+    this.age = getCompletedYearsAgeAtDate(value, new Date());
     this.clientDobDisplay = formatted;
 
     this.clientForm.get('dob')?.setValue(value, { emitEvent: false });
@@ -802,7 +804,7 @@ export class ClientAddComponent {
       return;
     }
     const formatted = normalizeToDMY(value);
-    this.partnerAge = calculateAge(value);
+    this.partnerAge = getCompletedYearsAgeAtDate(value, new Date());
     const partnerGroup = this.clientForm.get('partner') as FormGroup;
     partnerGroup.get('dob')?.setValue(formatted, { emitEvent: false });
     setTimeout(() => {
@@ -899,23 +901,13 @@ function parseDMYFromDigits(
   return { ok: true, date, age, normalized: normalizeToDMY(date) };
 }
 
-function calculateAge(date: Date): number {
-  const today = new Date();
-  let age = today.getFullYear() - date.getFullYear();
-  const hadBirthdayThisYear =
-    today.getMonth() > date.getMonth() ||
-    (today.getMonth() === date.getMonth() && today.getDate() >= date.getDate());
-  if (!hadBirthdayThisYear) age -= 1;
-  return age;
-}
-
 function dobValidator(
   ctrl: FormControl<string | Date | null>,
 ): ValidationErrors | null {
   const raw = ctrl.value;
 
   if (raw instanceof Date) {
-    const age = calculateAge(raw);
+    const age = getCompletedYearsAgeAtDate(raw, new Date());
     if (age < 0) return { dob: 'Date cannot be in the future' };
     if (age > MAX_AGE) return { dob: `Age must be ≤ ${MAX_AGE}` };
     return null;

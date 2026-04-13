@@ -1,11 +1,13 @@
 import {
   Component,
+  DestroyRef,
   Inject,
   Optional,
   ViewChild,
   AfterViewInit,
   OnInit,
   OnDestroy,
+  inject,
 } from '@angular/core';
 import {
   MatTableDataSource,
@@ -59,7 +61,8 @@ import { DefaultPreferanceModule } from 'src/app/default-preferance/default-pref
 import { SettingsService } from 'src/app/default-preferance/services/default-preferance.http.service';
 import { DefaultPreferanceComponent } from 'src/app/default-preferance/default-preferance/default-preferance.component';
 import { AuthService } from 'src/app/auth/services/auth.service';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-client-list',
@@ -180,14 +183,19 @@ export class ClientListComponent implements OnInit, AfterViewInit, OnDestroy {
   /** Current local date for display; updated every minute with the greeting. */
   currentDate = new Date();
 
+  /** Angular `DatePipe` locale: matches active UI language so weekday/month names localize. */
+  dateLocale: string;
+
+  private readonly destroyRef = inject(DestroyRef);
+
   private greetingInterval: ReturnType<typeof setInterval> | null = null;
 
-  /** Returns greeting phrase based on user's local hour. */
+  /** Returns greeting translation key based on user's local hour. */
   private getGreetingForLocalTime(): string {
     const hour = new Date().getHours();
-    if (hour >= 5 && hour < 12) return 'Good morning';
-    if (hour >= 12 && hour < 18) return 'Good afternoon';
-    return 'Good evening';
+    if (hour >= 5 && hour < 12) return 'GREETING.MORNING';
+    if (hour >= 12 && hour < 18) return 'GREETING.AFTERNOON';
+    return 'GREETING.EVENING';
   }
 
   /** Display name for the advisor in the page title. Uses API profile first, then OIDC claims; reads auth on each access so it updates when user loads late (same browser, intermittent missing name). */
@@ -211,7 +219,19 @@ export class ClientListComponent implements OnInit, AfterViewInit, OnDestroy {
     private toastr: ToastrService,
     private settingsService: SettingsService,
     private Authservice: AuthService,
-  ) {}
+    private translate: TranslateService,
+  ) {
+    this.dateLocale = this.localeFromLang(this.translate.currentLang);
+    this.translate.onLangChange
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((e) => {
+        this.dateLocale = this.localeFromLang(e.lang);
+      });
+  }
+
+  private localeFromLang(lang: string | undefined): string {
+    return lang?.toLowerCase().startsWith('it') ? 'it' : 'en';
+  }
 
   ngOnInit() {
     this.user = this.Authservice.getUserProfile();
@@ -236,7 +256,8 @@ export class ClientListComponent implements OnInit, AfterViewInit, OnDestroy {
         if (res.status === 204) {
           // preferences missing → open dialog
           const ref = this.dialog.open(DefaultPreferanceComponent, {
-            width: '1265px',
+            width: '560px',
+            maxWidth: '92vw',
             disableClose: true,
             autoFocus: false,
             data: { mode: 'onboarding' },
@@ -307,7 +328,7 @@ export class ClientListComponent implements OnInit, AfterViewInit, OnDestroy {
 
   timeAgo(value: Date | string | number) {
     console.log(value);
-    if (!value) return 'Invalid date';
+    if (!value) return this.translate.instant('LABEL.INVALID_DATE');
 
     const date = new Date(value);
     const now = new Date();
@@ -318,13 +339,13 @@ export class ClientListComponent implements OnInit, AfterViewInit, OnDestroy {
     const diffInDays = Math.floor(diffInHours / 24);
 
     if (diffInSeconds < 60) {
-      return `${diffInSeconds} seconds ago`;
+      return this.translate.instant('TIME.SECONDS_AGO', { value: diffInSeconds });
     } else if (diffInMinutes < 60) {
-      return `${diffInMinutes} minutes ago`;
+      return this.translate.instant('TIME.MINUTES_AGO', { value: diffInMinutes });
     } else if (diffInHours < 24) {
-      return `${diffInHours} hours ago`;
+      return this.translate.instant('TIME.HOURS_AGO', { value: diffInHours });
     } else {
-      return `${diffInDays} days ago`;
+      return this.translate.instant('TIME.DAYS_AGO', { value: diffInDays });
     }
   }
 
@@ -391,7 +412,7 @@ export class ClientListComponent implements OnInit, AfterViewInit, OnDestroy {
 
   openDialog(action: string, obj: any): void {
     obj.action = action;
-    obj.text = 'Are you sure you want to delete this client?';
+    obj.text = this.translate.instant('CONFIRM.DELETE_CLIENT');
     const dialogRef = this.dialog.open(DialogComponent, {
       data: obj,
       width: '460px',
@@ -472,12 +493,12 @@ export class ClientListComponent implements OnInit, AfterViewInit, OnDestroy {
       .deleteClient(client.id)
       .pipe(
         map((res) => {
-          this.toastr.success('Client deleted successfully', 'Success!');
+          this.toastr.success(this.translate.instant('TOAST.CLIENT_DELETED'), this.translate.instant('LABEL.SUCCESS'));
           this.getClients(this.user.sub);
         }),
         catchError((err) => {
           console.error(err);
-          this.toastr.error('An error occured while saving client', 'Error!');
+          this.toastr.error(this.translate.instant('TOAST.ERROR_SAVING_CLIENT'), this.translate.instant('LABEL.ERROR'));
           throw err;
         }),
       )

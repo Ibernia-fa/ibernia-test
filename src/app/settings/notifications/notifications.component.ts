@@ -1,20 +1,26 @@
-import { Component, OnInit } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MatCard, MatCardContent } from '@angular/material/card';
 import { MatSlideToggle } from '@angular/material/slide-toggle';
 import { MatSelectModule } from '@angular/material/select';
-import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { NavItemService } from 'src/app/layouts/full/nav-item.service';
 import { NotificationPreferencesService, NotificationPreference } from './notification-preferences.service';
 import { WebPushService } from './web-push.service';
 import { MyNotificationsService, UserNotificationItem } from 'src/app/core/services/my-notifications.service';
-import { TablerIconsModule } from 'angular-tabler-icons';
+import { NotificationNewLabelGraceService } from 'src/app/core/services/notification-new-label-grace.service';
+import {
+  MFA_REMINDER_NOTIFICATION_ID,
+  prependMfaReminderNotification,
+} from 'src/app/core/mfa-reminder-notification';
+import { notificationMatchesSearchQuery } from 'src/app/core/notification-search';
+import { CapitalizeFirstPipe } from 'src/app/core/pipes/capitalize-first.pipe';
+import { AuthService } from 'src/app/auth/services/auth.service';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-notifications',
@@ -26,16 +32,15 @@ import { TablerIconsModule } from 'angular-tabler-icons';
     MatCardContent,
     MatSlideToggle,
     MatSelectModule,
-    MatFormFieldModule,
     MatButtonModule,
     MatDividerModule,
-    TablerIconsModule,
-    FormsModule
+    FormsModule,
+    CapitalizeFirstPipe,
   ],
   templateUrl: './notifications.component.html',
   styleUrl: './notifications.component.scss'
 })
-export class NotificationsComponent implements OnInit {
+export class NotificationsComponent implements OnInit, OnDestroy {
   toggleStatus = true;   // Email News
   toggleStatus1 = true;  // Email Birthdays
   toggleStatus2 = true;  // Push News
@@ -48,24 +53,48 @@ export class NotificationsComponent implements OnInit {
 
   notifications: UserNotificationItem[] = [];
   notificationsLoading = false;
-  unreadCount = 0;
+  notificationSearchQuery = '';
+  readonly mfaReminderId = MFA_REMINDER_NOTIFICATION_ID;
+  /** One bulk read-all per page visit (component instance). */
+  private bulkMarkAllReadRequested = false;
+  private readonly destroy$ = new Subject<void>();
+
+  get filteredNotifications(): UserNotificationItem[] {
+    const q = this.notificationSearchQuery.trim().toLowerCase();
+    if (!q) return this.notifications;
+    return this.notifications.filter((n) =>
+      notificationMatchesSearchQuery(n, q, this.translate)
+    );
+  }
+
+  shouldShowNewLabel(n: UserNotificationItem): boolean {
+    return this.newLabelGrace.shouldShowNewLabel(n.id, n.isRead);
+  }
+
+  private scheduleNewLabelGraceRefresh(): void {
+    setTimeout(() => this.cdr.markForCheck(), this.newLabelGrace.graceMs);
+  }
 
   constructor(
     private navItemService: NavItemService,
     private prefsService: NotificationPreferencesService,
     private webPushService: WebPushService,
     private myNotifications: MyNotificationsService,
-    private router: Router
+    private newLabelGrace: NotificationNewLabelGraceService,
+    private cdr: ChangeDetectorRef,
+    private router: Router,
+    private authService: AuthService,
+    private translate: TranslateService
   ) {
     this.navItemService.currentRouteName = 'Notifications';
-    this.myNotifications.listsChanged$
-      .pipe(takeUntilDestroyed())
-      .subscribe(() => this.loadNotifications());
   }
 
   ngOnInit(): void {
     this.loadPreferences();
     this.loadNotifications();
+    this.myNotifications.notificationFeedStale
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => this.loadNotifications());
     if (typeof Intl !== 'undefined' && Intl.supportedValuesOf) {
       try {
         this.timezones = ['UTC', ...Intl.supportedValuesOf('timeZone').filter(t => t.startsWith('Europe/') || t.startsWith('America/')).slice(0, 20)];
@@ -73,6 +102,11 @@ export class NotificationsComponent implements OnInit {
         // fallback to curated list
       }
     }
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   loadPreferences(): void {
@@ -136,35 +170,71 @@ export class NotificationsComponent implements OnInit {
     this.notificationsLoading = true;
     this.myNotifications.getList().subscribe({
       next: (list) => {
-        this.notifications = list;
+        this.notifications = prependMfaReminderNotification(
+          list,
+          this.authService.getUserProfile() as Record<string, unknown> | null,
+          this.translate.currentLang || undefined
+        );
         this.notificationsLoading = false;
+        if (!this.bulkMarkAllReadRequested) {
+          this.bulkMarkAllReadRequested = true;
+          this.markAllReadExceptSecurityOnPage();
+        }
       },
       error: () => (this.notificationsLoading = false)
     });
-    this.myNotifications.getUnreadCount().subscribe({
-      next: (c) => (this.unreadCount = c)
+  }
+
+  /** Marks every server-backed notification read; synthetic MFA row stays unread (not on API). */
+  private markAllReadExceptSecurityOnPage(): void {
+    const unreadIds = this.notifications
+      .filter(
+        (n) => n.id !== MFA_REMINDER_NOTIFICATION_ID && !n.isRead
+      )
+      .map((n) => n.id);
+    this.myNotifications.markAllAsRead().subscribe({
+      next: () => {
+        for (const n of this.notifications) {
+          if (n.id !== MFA_REMINDER_NOTIFICATION_ID) {
+            n.isRead = true;
+          }
+        }
+        for (const id of unreadIds) {
+          this.newLabelGrace.recordMarkedRead(id);
+        }
+        if (unreadIds.length) {
+          this.scheduleNewLabelGraceRefresh();
+          this.cdr.markForCheck();
+        }
+      },
+      error: () => {},
     });
   }
 
   onNotificationClick(n: UserNotificationItem): void {
+    if (n.id === MFA_REMINDER_NOTIFICATION_ID) {
+      if (n.deepLink?.startsWith('http')) {
+        window.open(n.deepLink, '_blank', 'noopener,noreferrer');
+      }
+      return;
+    }
     if (!n.isRead) {
       this.myNotifications.markAsRead(n.id).subscribe({
         next: () => {
           n.isRead = true;
-          this.unreadCount = Math.max(0, this.unreadCount - 1);
-        }
+          this.newLabelGrace.recordMarkedRead(n.id);
+          this.scheduleNewLabelGraceRefresh();
+          this.cdr.markForCheck();
+        },
       });
     }
     if (n.deepLink) {
-      this.router.navigateByUrl(n.deepLink);
+      if (n.deepLink.startsWith('http')) {
+        window.open(n.deepLink, '_blank', 'noopener,noreferrer');
+      } else {
+        this.router.navigateByUrl(n.deepLink);
+      }
     }
   }
 
-  onMarkAllAsRead(): void {
-    this.myNotifications.markAllAsRead().subscribe({
-      next: () => {
-        this.unreadCount = 0;
-      },
-    });
-  }
 }

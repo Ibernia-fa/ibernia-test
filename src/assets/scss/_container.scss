@@ -24,12 +24,20 @@ body {
   padding-top: 66px;
   padding-bottom: 66px;
 
+  /* Reserve space for fixed full-width footer (16 + 65 + 16) so content scrolls above it */
+  .layout-with-footer & {
+    // padding-bottom: calc(16px + 65px + 16px);
+    padding-bottom: calc(16px + 65px);
+  }
+
   &.no-footer-padding {
     padding-bottom: 0;
   }
   // height: calc(100dvh - 60px);
   height: calc(100dvh - 0px);
+  overscroll-behavior-y: none;
   background-color: #fafafa !important;
+  /* Frosted veil over default asset only — backdrop-filter blurs custom uploads into a color wash */
   &::after {
     content: "";
     position: absolute;
@@ -40,6 +48,13 @@ body {
     background: #ffffff12;
     backdrop-filter: blur(150.60000610351562px);
     z-index: -1;
+    pointer-events: none;
+  }
+
+  &.custom-branded-background {
+    &::after {
+      display: none;
+    }
   }
 }
 // .app-container {
@@ -59,7 +74,9 @@ body {
 }
 
 .pageWrapper {
-  padding: 32px 16px 32px 16px;
+  padding: 16px;
+  // height: 100%;
+  // padding: 32px 16px 32px 16px;
   // padding-top: calc($header-height + 24px);
   // min-height: calc(100vh - 70px);
   // top: calc(100vh - $header-height);

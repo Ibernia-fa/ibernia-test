@@ -9,7 +9,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { provideNativeDateAdapter } from '@angular/material/core';
-import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 import { allCountries } from 'src/app/clients/models/country';
 import { Cycle, EscalationRate } from '../../timeline/models/financial-timeline';
@@ -19,8 +18,24 @@ import { FinancialViewModel } from '../model/income-expense';
 import { extractEventId, resolveYear } from 'src/app/shared/utils/event-date-utils';
 import { catchError, filter, finalize } from 'rxjs';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
+import { TranslateIncomeExpenseLabelPipe } from 'src/app/core/pipes/translate-income-expense-label.pipe';
+import { TranslateEscalationDescriptionPipe } from 'src/app/core/pipes/translate-escalation-description.pipe';
+import { getAmountCycleLabel } from 'src/app/shared/utils/amount-cycle-label';
+import { resolveEscalationMatch } from 'src/app/shared/utils/escalation-rate-utils';
 import { CommonModule } from '@angular/common';
+import { translateTimelineEventDisplayName } from 'src/app/shared/utils/timeline-event-display-name';
+import {
+  getCompletedYearsAgeAtDate,
+  getPersistedAgeForCalendarYear,
+  getProjectionColumnAgeLabel,
+} from 'src/app/shared/utils/client-age-at-reference';
+import { calendarYearOrEventRefValidator } from 'src/app/shared/utils/calendar-year-or-event-ref.validator';
+import {
+  recurringEndYearNotSelected,
+  resolveCycleDescriptionForRecurringEndGuard,
+} from 'src/app/shared/utils/recurring-end-save-guard';
 
 @Component({
   selector: 'app-add-expense',
@@ -37,9 +52,10 @@ import { CommonModule } from '@angular/common';
     MatSliderModule,
     ReactiveFormsModule,
     CommonModule,
-    ThousandSeparatorPipe,
     ThousandSeparatorInputDirective,
-    TranslateModule
+    TranslateModule,
+    TranslateIncomeExpenseLabelPipe,
+    TranslateEscalationDescriptionPipe,
   ],
   providers: [provideNativeDateAdapter()],
   templateUrl: './add-expense.component.html',
@@ -49,12 +65,11 @@ export class AddExpenseComponent {
   @ViewChild('amountInput') amountInput?: ElementRef<HTMLInputElement>;
 
   onAmountInput(rawValue: string) {
-    const { parseFormattedNumber } = require('src/app/shared/utils/number-utils');
     if (!rawValue || rawValue.trim() === '') {
       this.expenseForm.get('amount')?.setValue('');
       return;
     }
-    const value = parseFormattedNumber(rawValue);
+    const value = parseFormattedNumber(rawValue, this.translate.currentLang);
     this.expenseForm.get('amount')?.setValue(value);
   }
 
@@ -88,7 +103,8 @@ export class AddExpenseComponent {
     private dialogRef: MatDialogRef<AddExpenseComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private fb: FormBuilder,
-    private incomeExpenseHttpService: IncomeExpensesHttpService
+    private incomeExpenseHttpService: IncomeExpensesHttpService,
+    private translate: TranslateService,
   ) {
     this.expenseTypes = data.expenseType;
     this.eventsList = data.eventsList ?? [];
@@ -96,18 +112,10 @@ export class AddExpenseComponent {
     this.escalationRates = data.escalataionRates;
     this.clientBirthYear = moment(data.clientBirthDate).year();
     const birthDate = new Date(data.clientBirthDate);
-    const forecastStart = new Date(data.forecastStartDateYear, 0, 1);
-    let age = forecastStart.getFullYear() - birthDate.getFullYear();
-    const monthDiff = forecastStart.getMonth() - birthDate.getMonth();
-    const dayDiff = forecastStart.getDate() - birthDate.getDate();
-
-    if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
-      age--;
-    }
-
-    this.clientAge = age;
-    if (data.forecastStartDateYear - this.clientBirthYear > this.clientAge) this.clientBirthYear = this.clientBirthYear + 1
-
+    const forecastStart = data.forecastStartDate
+      ? new Date(data.forecastStartDate)
+      : new Date(data.forecastStartDateYear, 0, 1);
+    this.clientAge = getCompletedYearsAgeAtDate(birthDate, forecastStart);
 
     this.clientPreferredCurrency = data.clientPreferredCurrency;
     this.cashflowId = data.cashflowId;
@@ -134,9 +142,9 @@ export class AddExpenseComponent {
       currencySymbol: [this.clientPreferredCurrency, [Validators.required]],
       amount: ['', [Validators.required, this.greaterThanZero()]],
       cycle: [this.cycles[1].id, Validators.required],
-      start: ['', Validators.required],
+      start: [''],
       end: [''],
-      escalationRate: [this.escalationRates[0].value, Validators.required],
+      escalationRate: [this.escalationRates[0]?.description ?? '', Validators.required],
       customEscalationRate: ['']
     });
     this.expenseForm.get('currencySymbol')?.disable();
@@ -169,14 +177,32 @@ export class AddExpenseComponent {
       if (this.selectedExpense.startEventId) {
         this.expenseForm.get('start')?.patchValue('event:' + this.selectedExpense.startEventId);
       } else {
-        this.expenseForm.get('start')?.patchValue(this.selectedExpense.start?.year);
+        const sy = Number(this.selectedExpense.start?.year);
+        const startNum = Number.isFinite(sy) && sy > 0 ? sy : null;
+        if (startNum) this.ensureYearInSelectableYears(startNum);
+        this.expenseForm.get('start')?.patchValue(startNum);
       }
       if (this.selectedExpense.endEventId) {
         this.expenseForm.get('end')?.patchValue('event:' + this.selectedExpense.endEventId);
       } else {
-        this.expenseForm.get('end')?.patchValue(this.selectedExpense.end?.year);
+        let rawEnd = this.selectedExpense.end?.year;
+        if (
+          (rawEnd === null || rawEnd === undefined) &&
+          this.selectedExpense.isDefault &&
+          (this.selectedExpense.description === 'Living costs' ||
+            this.selectedExpense.description === 'Housing')
+        ) {
+          rawEnd = this.getDefaultEndPlanYear();
+        }
+        const ey = Number(rawEnd);
+        const endNum = Number.isFinite(ey) && ey > 0 ? ey : null;
+        if (endNum) this.ensureYearInSelectableYears(endNum);
+        this.expenseForm.get('end')?.patchValue(endNum);
       }
-      const matchedEscalation = this.escalationRates.find(x => x.value === this.selectedExpense.escalationRate?.value);
+      const matchedEscalation = resolveEscalationMatch(
+        this.escalationRates,
+        this.selectedExpense.escalationRate,
+      );
 
       const cycleId = this.selectedExpense.amount.cycle?.id;
       const cycle = this.cycles.find(x => x.id === cycleId);
@@ -186,7 +212,7 @@ export class AddExpenseComponent {
       }
 
       if (matchedEscalation) {
-        this.expenseForm.get('escalationRate')?.patchValue(matchedEscalation.value);
+        this.expenseForm.get('escalationRate')?.patchValue(matchedEscalation.description);
         this.selectedEscalationDescription = matchedEscalation.description;
       } else if (
         this.selectedExpense.escalationRate &&
@@ -201,7 +227,7 @@ export class AddExpenseComponent {
           value: this.selectedExpense.escalationRate.value
         });
 
-        this.expenseForm.get('escalationRate')?.patchValue(this.selectedExpense.escalationRate.value);
+        this.expenseForm.get('escalationRate')?.patchValue('Increases at custom rate');
         this.expenseForm.get('customEscalationRate')?.patchValue(this.selectedExpense.escalationRate.value);
         this.selectedEscalationDescription = 'Increases at custom rate';
 
@@ -262,14 +288,20 @@ export class AddExpenseComponent {
     const isOneOff = this.cycles.find(cycle => cycle.id === event)?.description === 'One-off';
 
     this.showStartEnd = !isOneOff;
+    const startCtrl = this.expenseForm.get('start');
+    const endCtrl = this.expenseForm.get('end');
 
     if (!this.showStartEnd) {
-      this.expenseForm.controls['end'].clearValidators();
-      this.expenseForm.controls['end'].updateValueAndValidity();
+      endCtrl?.clearValidators();
+      endCtrl?.updateValueAndValidity();
+      startCtrl?.setValidators([calendarYearOrEventRefValidator()]);
+      startCtrl?.updateValueAndValidity();
     }
     else {
-      this.expenseForm.controls['end'].addValidators(Validators.required);
-      this.expenseForm.controls['end'].updateValueAndValidity();
+      endCtrl?.setValidators([calendarYearOrEventRefValidator()]);
+      endCtrl?.updateValueAndValidity();
+      startCtrl?.setValidators([calendarYearOrEventRefValidator()]);
+      startCtrl?.updateValueAndValidity();
     }
 
     const escalationControl = this.expenseForm.get('escalationRate');
@@ -283,20 +315,55 @@ export class AddExpenseComponent {
     escalationControl?.updateValueAndValidity();
   }
 
+  getCycleLabel(cycle: Cycle): string {
+    return getAmountCycleLabel(cycle, this.translate);
+  }
+
+  getTimelineEventLabel(rawName: string): string {
+    return translateTimelineEventDisplayName(this.translate, rawName);
+  }
+
+  get isExpenseSaveButtonDisabled(): boolean {
+    if (this.isSaving) {
+      return true;
+    }
+    if (this.isEditWorkflow && !this.hasFormChanges()) {
+      return true;
+    }
+    if (this.expenseForm.invalid) {
+      return true;
+    }
+    if (this.showStartEnd) {
+      const endRaw = this.expenseForm.get('end')?.value;
+      if (!extractEventId(endRaw) && resolveYear(endRaw, this.eventsList) <= 0) {
+        return true;
+      }
+    }
+    const cycleId = this.expenseForm.get('cycle')?.value;
+    const desc = resolveCycleDescriptionForRecurringEndGuard(this.cycles, cycleId);
+    return recurringEndYearNotSelected(
+      desc,
+      this.expenseForm.get('end')?.value,
+      this.eventsList,
+    );
+  }
+
   addExpense(): void {
     if (this.isSaving) return;
+    if (this.isExpenseSaveButtonDisabled) return;
     this.expenseForm.markAllAsTouched();
     this.expenseForm.markAsDirty();
 
     if (this.expenseForm.valid) {
       this.isSaving = true;
-      const isCustomEscalation = this.selectedEscalationDescription === 'Increases at custom rate';
+      const selectedEscDesc = this.expenseForm.get('escalationRate')?.value as string;
+      const isCustomEscalation = selectedEscDesc === 'Increases at custom rate';
       const escalationRateValue = isCustomEscalation
         ? this.expenseForm.get('customEscalationRate')?.value
-        : this.expenseForm.get('escalationRate')?.value;
-      const matchedRate = this.escalationRates.find(
-        (x) => x.value === escalationRateValue
-      );
+        : this.escalationRates.find((x) => x.description === selectedEscDesc)?.value;
+      const matchedRate = isCustomEscalation
+        ? undefined
+        : this.escalationRates.find((x) => x.description === selectedEscDesc);
 
       const startVal = this.expenseForm.get('start')?.value;
       const endVal = this.expenseForm.get('end')?.value;
@@ -320,18 +387,36 @@ export class AddExpenseComponent {
           },
         },
         start: {
-          age: startYear ? startYear - this.clientBirthYear : 0,
+          age: startYear
+            ? getPersistedAgeForCalendarYear(
+                this.data.clientBirthDate,
+                startYear,
+                this.data.forecastStartDate,
+                this.data.planDuration,
+                this.forecastEndYear,
+              )
+            : 0,
           year: startYear || 0,
         },
         end: {
-          age: endYear ? endYear - this.clientBirthYear : 0,
+          age: endYear
+            ? getPersistedAgeForCalendarYear(
+                this.data.clientBirthDate,
+                endYear,
+                this.data.forecastStartDate,
+                this.data.planDuration,
+                this.forecastEndYear,
+              )
+            : 0,
           year: endYear || 0,
         },
         startEventId,
         endEventId,
         escalationRate: escalationRateValue !== null && escalationRateValue !== ''
           ? matchedRate ?? {
-            description: this.selectedEscalationDescription ?? '', // Use actual description
+            description: isCustomEscalation
+              ? 'Increases at custom rate'
+              : selectedEscDesc ?? '',
             value: escalationRateValue
           }
           : {
@@ -387,24 +472,11 @@ export class AddExpenseComponent {
   }
 
   get isCustomEscalationSelected(): boolean {
-    const selectedValue = this.expenseForm.get('escalationRate')?.value;
-
-    // Find exact match by both value and description
-    return this.escalationRates.some(e =>
-      e.value === selectedValue && e.description === 'Increases at custom rate'
-    );
+    return this.expenseForm.get('escalationRate')?.value === 'Increases at custom rate';
   }
 
   onEscalationRateChange(event: MatSelectChange): void {
-    const selectedOption = event.source.selected;
-
-    let description: string | null = null;
-
-    if (Array.isArray(selectedOption)) {
-      description = selectedOption[0]?.viewValue ?? null;
-    } else {
-      description = selectedOption?.viewValue ?? null;
-    }
+    const description = (event.value as string) ?? '';
 
     this.selectedEscalationDescription = description;
 
@@ -589,7 +661,7 @@ export class AddExpenseComponent {
       case 'Living costs':
       case 'Housing':
         startCtrl.setValue(this.currentYear);
-        endCtrl.setValue(this.forecastEndYear);
+        endCtrl.setValue(this.getDefaultEndPlanYear());
         break;
 
       default:
@@ -603,7 +675,14 @@ export class AddExpenseComponent {
   }
 
   getAgeForYear(year: number): number {
-    return Number(year) - this.clientBirthYear;
+    const a = getProjectionColumnAgeLabel(
+      this.data.clientBirthDate,
+      Number(year),
+      this.data.forecastStartDate,
+      this.data.planDuration,
+      this.forecastEndYear,
+    );
+    return Number.isNaN(a) ? 0 : a;
   }
 
   getStartYear(): number {
@@ -620,6 +699,14 @@ export class AddExpenseComponent {
     return (this.years ?? []).filter((y) => y >= startYear);
   }
 
+  private ensureYearInSelectableYears(year: number): void {
+    if (!Number.isFinite(year)) return;
+    if (!this.years.includes(year)) {
+      this.years.push(year);
+      this.years.sort((a, b) => a - b);
+    }
+  }
+
   private resolvePlanEndYear(data: any): number {
     const planEndYear = Number(data?.planEndYear);
     if (Number.isFinite(planEndYear) && planEndYear > 0) {
@@ -630,6 +717,15 @@ export class AddExpenseComponent {
       return fallback;
     }
     return new Date().getFullYear();
+  }
+
+  /** Final calendar year in the plan horizon — same as the last year option in start/end dropdowns. */
+  private getDefaultEndPlanYear(): number {
+    const ys = this.years;
+    if (ys.length > 0) {
+      return ys[ys.length - 1];
+    }
+    return this.forecastEndYear;
   }
 
   hasFormChanges(): boolean {

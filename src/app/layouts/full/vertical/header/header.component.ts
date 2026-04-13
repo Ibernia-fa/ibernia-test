@@ -7,6 +7,8 @@ import {
   OnInit,
   OnDestroy,
   ChangeDetectorRef,
+  ViewChild,
+  ElementRef,
 } from '@angular/core';
 import { CoreService } from 'src/app/services/core.service';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -33,7 +35,7 @@ import {
   clearUserDisplayCache,
 } from 'src/app/default-preferance/services/default-preferance.http.service';
 import { HttpResponse } from '@angular/common/http';
-import { takeUntil, catchError, of, finalize, Subject, Subscription, filter } from 'rxjs';
+import { takeUntil, catchError, of, finalize, Subject, Subscription, filter, map, distinctUntilChanged } from 'rxjs';
 import { OrganizationProfilesService } from 'src/app/settings/services/organization.profiles.service';
 import { Store } from '@ngrx/store';
 import { Client } from 'src/app/clients/models/client';
@@ -43,6 +45,15 @@ import { LanguageService } from 'src/app/core/language.service';
 import { LanguageLoaderService } from '../../language-loader.service';
 import { BrandingComponent } from '../sidebar/branding.component';
 import { MyNotificationsService, UserNotificationItem } from 'src/app/core/services/my-notifications.service';
+import { NotificationNewLabelGraceService } from 'src/app/core/services/notification-new-label-grace.service';
+import {
+  MFA_REMINDER_NOTIFICATION_ID,
+  prependMfaReminderNotification,
+  userNeedsMfaReminder,
+} from 'src/app/core/mfa-reminder-notification';
+import { notificationMatchesSearchQuery } from 'src/app/core/notification-search';
+import { CapitalizeFirstPipe } from 'src/app/core/pipes/capitalize-first.pipe';
+import { formatClientPersonDisplayName } from 'src/app/shared/utils/person-display-name';
 
 interface notifications {
   id: number;
@@ -90,7 +101,9 @@ type LanguageCode = 'en' | 'it';
         MatMenuModule,
         MatBadgeModule,
         MatDividerModule,
-        TranslateModule
+        TranslateModule,
+        FormsModule,
+        CapitalizeFirstPipe,
     ],
     templateUrl: './header.component.html',
     encapsulation: ViewEncapsulation.None
@@ -168,8 +181,38 @@ showFiller = false;
   unreadCount = 0;
   notificationFilter: 'all' | 'unread' = 'all';
   notificationsLoading = false;
+  notificationSearchQuery = '';
   private lastNotificationsFetchAt = 0;
   private readonly NOTIFICATIONS_CACHE_MS = 60000; // 1 min
+  /** Matches MyNotificationsService feeds revision last applied to userNotifications. */
+  private headerNotificationsFeedsRevision = -1;
+
+  readonly mfaReminderId = MFA_REMINDER_NOTIFICATION_ID;
+
+  @ViewChild('notificationListScroll') notificationListScroll?: ElementRef<HTMLElement>;
+
+  private notificationsMenuOpen = false;
+  private notificationVisibilityIo: IntersectionObserver | null = null;
+  /** While scrollTop is 0, at most this many non-security unread rows may be auto-marked via visibility. */
+  private initialVisibilityMarksRemaining = 2;
+  private allowUnlimitedVisibilityOnScroll = false;
+  private readonly visibilityMarkInFlight = new Set<string>();
+
+  get filteredUserNotifications(): UserNotificationItem[] {
+    const q = this.notificationSearchQuery.trim().toLowerCase();
+    if (!q) return this.userNotifications;
+    return this.userNotifications.filter((n) =>
+      notificationMatchesSearchQuery(n, q, this.translate)
+    );
+  }
+
+  shouldShowNewLabel(n: UserNotificationItem): boolean {
+    return this.newLabelGrace.shouldShowNewLabel(n.id, n.isRead);
+  }
+
+  private scheduleNewLabelGraceRefresh(): void {
+    setTimeout(() => this.cdr.markForCheck(), this.newLabelGrace.graceMs);
+  }
 
   constructor(
     private settings: CoreService,
@@ -184,11 +227,15 @@ showFiller = false;
     private languageService: LanguageService,
     private languageLoader: LanguageLoaderService,
     private myNotifications: MyNotificationsService,
+    private newLabelGrace: NotificationNewLabelGraceService,
     private cdr: ChangeDetectorRef
   ) {
     translate.setDefaultLang('en');
     this.user = this.Authservice.getUserProfile();
     this.hydratedDisplay = this.user?.sub ? readUserDisplayCache(this.user.sub) : null;
+    if (this.user?.sub) {
+      this.organizationProfiles.hydrateBrandingLogoFromSession(this.user.sub);
+    }
 
     this.loadProfile();
     
@@ -198,20 +245,12 @@ showFiller = false;
 
     this.settingsService.userData$
       .pipe(takeUntil(this.destroy$))
-      .subscribe(() => this.cdr.markForCheck());
-
-    this.myNotifications.listsChanged$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(() => {
-        this.lastNotificationsFetchAt = 0;
-        this.myNotifications.getList(this.notificationFilter).subscribe({
-          next: (list) => {
-            this.userNotifications = list;
-            this.cdr.markForCheck();
-          },
-          error: () => this.cdr.markForCheck(),
-        });
-        this.loadUnreadCount();
+      .subscribe((data) => {
+        if (!data) return;
+        const raw = data.profilePhotoUrl;
+        const trimmed = raw != null ? String(raw).trim() : '';
+        this.profileImagePreview = trimmed ? this.ensureDataUrl(raw ?? null) : null;
+        this.cdr.markForCheck();
       });
 
     this.store.select(selectedClient)
@@ -314,24 +353,60 @@ showFiller = false;
 
 
     ngOnInit() {
-      this.loadUnreadCount();
-      // branding logo
+      this.myNotifications.serverUnreadCount
+        .pipe(
+          takeUntil(this.destroy$),
+          map((c) => this.adjustUnreadForMfa(c)),
+          distinctUntilChanged()
+        )
+        .subscribe((n) => {
+          this.unreadCount = n;
+          this.cdr.markForCheck();
+        });
+      this.myNotifications.notificationFeedStale
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(() => {
+          this.lastNotificationsFetchAt = 0;
+          if (this.notificationsMenuOpen) {
+            this.notificationsLoading = this.userNotifications.length === 0;
+            this.myNotifications.getList(this.notificationFilter).subscribe({
+              next: (list) => {
+                this.userNotifications = this.mergeNotificationsList(list);
+                this.notificationsLoading = false;
+                this.lastNotificationsFetchAt = Date.now();
+                this.headerNotificationsFeedsRevision =
+                  this.myNotifications.getFeedsRevision();
+                this.scheduleNotificationVisibilitySetup();
+                this.cdr.markForCheck();
+              },
+              error: () => {
+                this.notificationsLoading = false;
+                this.cdr.markForCheck();
+              },
+            });
+          }
+          this.cdr.markForCheck();
+        });
+      this.myNotifications.startUnreadPolling();
+      this.brandingLogo = this.ensureDataUrl(
+        this.organizationProfiles.getBrandingLogoValue(),
+      );
+      this.isBrandLogoLoaded = true;
+
       this.organizationProfiles.getProfile(this.user.sub).subscribe({
         next: (p) => {
           const logo = this.ensureDataUrl(p?.profilePhotoUrl ?? null);
           this.brandingLogo = logo;
-          this.isBrandLogoLoaded = true;
-          this.organizationProfiles.setBrandingLogo(logo);
+          this.organizationProfiles.setBrandingLogo(logo, this.user.sub);
         },
         error: (err) => {
           console.error(err);
-          this.isBrandLogoLoaded = true;
         },
       });
 
       this.sub = this.organizationProfiles.brandingLogo$.subscribe((url) => {
-      this.brandingLogo = this.ensureDataUrl(url);
-    });
+        this.brandingLogo = this.ensureDataUrl(url);
+      });
     }
 
     ensureDataUrl(s: string | null): string | null {
@@ -340,6 +415,7 @@ showFiller = false;
     }
 
     ngOnDestroy(): void {
+      this.myNotifications.stopUnreadPolling();
       this.destroy$.next();
       this.destroy$.complete();
       this.sub?.unsubscribe();
@@ -406,13 +482,8 @@ get userInitials(): string {
             this.setOtherLanguage();
             this.languageService.setFromApi(p.preferences?.language as LanguageCode);
             this.settingsService.setUserData(res.body);
+            // profileImagePreview is synced from userData$ (including cleared photo)
 
-  
-            // show backend avatar if present (local preview only)
-            if (p.profilePhotoUrl) {
-              this.profileImagePreview = p.profilePhotoUrl;
-            }
-  
             // re-apply validators in case type changed
           }
         });
@@ -424,7 +495,10 @@ get userInitials(): string {
         }
         this.Authservice.logout();
     }
-  options = this.settings.getOptions();
+
+  get options(): AppSettings {
+    return this.settings.getOptions();
+  }
 
   openDialog() {
     const dialogRef = this.dialog.open(AppSearchDialogComponent);
@@ -435,7 +509,7 @@ get userInitials(): string {
   }
 
   private emitOptions() {
-    this.optionsChange.emit(this.options);
+    this.optionsChange.emit(this.settings.getOptions());
   }
 
     get clientFullName(): string {
@@ -449,33 +523,180 @@ get userInitials(): string {
     return 'Client'; // Fallback text
   }
 
+  /**
+   * Cashflow header breadcrumb middle segment: full client name, or
+   * "FirstName and FirstName" / "Nome e Nome" when a partner exists on the client.
+   */
+  get cashflowBreadcrumbClientLabel(): string {
+    const client = this.currentClient;
+    if (!client?.partnerDetail) {
+      return this.clientFullName;
+    }
+    const mainFirst = formatClientPersonDisplayName(client.clientDetails);
+    const partnerFirst = formatClientPersonDisplayName(client.partnerDetail);
+    if (mainFirst && partnerFirst) {
+      const conjunction = this.languageService.current === 'it' ? 'e' : 'and';
+      return `${mainFirst} ${conjunction} ${partnerFirst}`;
+    }
+    if (mainFirst || partnerFirst) {
+      return mainFirst || partnerFirst;
+    }
+    return this.clientFullName;
+  }
+
   setlightDark(theme: string) {
-    this.options.theme = theme;
+    this.settings.setOptions({ theme });
     this.emitOptions();
   }
 
-  loadUnreadCount(): void {
-    this.myNotifications.getUnreadCount().subscribe({
-      next: (c) => (this.unreadCount = c),
-      error: () => {}
+  onBellMenuOpened(): void {
+    this.notificationsMenuOpen = true;
+    this.resetNotificationModalVisibilityState();
+    this.onNotificationMenuOpened();
+  }
+
+  onBellMenuClosed(): void {
+    this.notificationsMenuOpen = false;
+    this.teardownNotificationVisibilityObserver();
+    this.visibilityMarkInFlight.clear();
+  }
+
+  onNotificationListScroll(event: Event): void {
+    const el = event.target as HTMLElement;
+    if (el.scrollTop > 2) {
+      this.allowUnlimitedVisibilityOnScroll = true;
+    }
+  }
+
+  onNotificationSearchQueryChange(): void {
+    if (!this.notificationsMenuOpen) return;
+    this.rebindNotificationVisibilityObserver();
+  }
+
+  private resetNotificationModalVisibilityState(): void {
+    this.initialVisibilityMarksRemaining = 2;
+    this.allowUnlimitedVisibilityOnScroll = false;
+    this.visibilityMarkInFlight.clear();
+    this.teardownNotificationVisibilityObserver();
+  }
+
+  private rebindNotificationVisibilityObserver(): void {
+    this.initialVisibilityMarksRemaining = 2;
+    this.allowUnlimitedVisibilityOnScroll = false;
+    this.visibilityMarkInFlight.clear();
+    this.teardownNotificationVisibilityObserver();
+    this.scheduleNotificationVisibilitySetup();
+  }
+
+  private scheduleNotificationVisibilitySetup(): void {
+    setTimeout(() => this.setupNotificationVisibilityObserver(), 0);
+    setTimeout(() => this.setupNotificationVisibilityObserver(), 100);
+  }
+
+  private teardownNotificationVisibilityObserver(): void {
+    this.notificationVisibilityIo?.disconnect();
+    this.notificationVisibilityIo = null;
+  }
+
+  private setupNotificationVisibilityObserver(): void {
+    this.teardownNotificationVisibilityObserver();
+    if (!this.notificationsMenuOpen || this.notificationsLoading) return;
+    let root: HTMLElement | undefined = this.notificationListScroll?.nativeElement;
+    if (!root && typeof document !== 'undefined') {
+      root =
+        (document.querySelector(
+          '.notification-menu-panel .notification-list-scroll'
+        ) as HTMLElement | null) ?? undefined;
+    }
+    if (!root) return;
+    const buttons = root.querySelectorAll<HTMLElement>('.notification-item[data-notification-id]');
+    if (!buttons.length) return;
+
+    const minRatio = 0.35;
+    this.notificationVisibilityIo = new IntersectionObserver(
+      (entries) => {
+        const visible = entries.filter(
+          (e) => e.isIntersecting && e.intersectionRatio >= minRatio
+        );
+        visible.sort((a, b) => {
+          const aId = a.target.getAttribute('data-notification-id') ?? '';
+          const bId = b.target.getAttribute('data-notification-id') ?? '';
+          const ia = this.filteredUserNotifications.findIndex((x) => x.id === aId);
+          const ib = this.filteredUserNotifications.findIndex((x) => x.id === bId);
+          return (ia === -1 ? 9999 : ia) - (ib === -1 ? 9999 : ib);
+        });
+        for (const entry of visible) {
+          const id = entry.target.getAttribute('data-notification-id');
+          if (!id || id === MFA_REMINDER_NOTIFICATION_ID) continue;
+          const n = this.filteredUserNotifications.find((x) => x.id === id);
+          if (!n || n.isRead) continue;
+          if (this.visibilityMarkInFlight.has(n.id)) continue;
+          const canSpendBudget =
+            this.allowUnlimitedVisibilityOnScroll || this.initialVisibilityMarksRemaining > 0;
+          if (!canSpendBudget) continue;
+          if (!this.allowUnlimitedVisibilityOnScroll) {
+            this.initialVisibilityMarksRemaining--;
+          }
+          this.markNotificationReadIfEligible(n);
+        }
+        this.cdr.markForCheck();
+      },
+      { root, rootMargin: '0px', threshold: [0, minRatio, 0.6, 1] }
+    );
+
+    buttons.forEach((el) => this.notificationVisibilityIo!.observe(el));
+  }
+
+  private markNotificationReadIfEligible(n: UserNotificationItem): void {
+    if (n.id === MFA_REMINDER_NOTIFICATION_ID || n.isRead) return;
+    if (this.visibilityMarkInFlight.has(n.id)) return;
+    this.visibilityMarkInFlight.add(n.id);
+    this.myNotifications.markAsRead(n.id).subscribe({
+      next: () => {
+        n.isRead = true;
+        this.newLabelGrace.recordMarkedRead(n.id);
+        this.scheduleNewLabelGraceRefresh();
+        this.visibilityMarkInFlight.delete(n.id);
+        this.cdr.markForCheck();
+      },
+      error: () => this.visibilityMarkInFlight.delete(n.id),
     });
   }
 
+  private mergeNotificationsList(list: UserNotificationItem[]): UserNotificationItem[] {
+    return prependMfaReminderNotification(
+      list,
+      this.Authservice.getUserProfile() as Record<string, unknown> | null,
+      this.translate.currentLang || undefined
+    );
+  }
+
+  private adjustUnreadForMfa(serverCount: number): number {
+    const profile = this.Authservice.getUserProfile() as Record<string, unknown> | null;
+    return userNeedsMfaReminder(profile) ? serverCount + 1 : serverCount;
+  }
+
   onNotificationMenuOpened(): void {
+    this.notificationSearchQuery = '';
     const now = Date.now();
     const hasCache = this.userNotifications.length > 0;
     const cacheFresh = now - this.lastNotificationsFetchAt < this.NOTIFICATIONS_CACHE_MS;
+    const serviceRev = this.myNotifications.getFeedsRevision();
+    const cacheMatchesFeeds = this.headerNotificationsFeedsRevision === serviceRev;
 
-    if (hasCache && cacheFresh) {
-      return; // Use cache, no API call
+    if (hasCache && cacheFresh && cacheMatchesFeeds) {
+      this.scheduleNotificationVisibilitySetup();
+      return;
     }
 
     this.notificationsLoading = !hasCache; // Only show loading if no cache
     this.myNotifications.getList(this.notificationFilter).subscribe({
       next: (list) => {
-        this.userNotifications = list;
+        this.userNotifications = this.mergeNotificationsList(list);
         this.notificationsLoading = false;
         this.lastNotificationsFetchAt = Date.now();
+        this.headerNotificationsFeedsRevision = this.myNotifications.getFeedsRevision();
+        this.scheduleNotificationVisibilitySetup();
       },
       error: () => (this.notificationsLoading = false)
     });
@@ -485,14 +706,19 @@ get userInitials(): string {
     event?.stopPropagation();
     if (this.notificationFilter === filter) return;
     this.notificationFilter = filter;
+    this.notificationSearchQuery = '';
     this.notificationsLoading = true;
     this.lastNotificationsFetchAt = 0;
     this.myNotifications.getList(filter).subscribe({
       next: (list) => {
-        this.userNotifications = list;
+        this.userNotifications = this.mergeNotificationsList(list);
         this.notificationsLoading = false;
         this.lastNotificationsFetchAt = Date.now();
+        this.headerNotificationsFeedsRevision = this.myNotifications.getFeedsRevision();
         this.cdr.markForCheck();
+        if (this.notificationsMenuOpen) {
+          this.rebindNotificationVisibilityObserver();
+        }
       },
       error: () => {
         this.notificationsLoading = false;
@@ -502,26 +728,22 @@ get userInitials(): string {
   }
 
   onNotificationClick(n: UserNotificationItem): void {
+    if (n.id === MFA_REMINDER_NOTIFICATION_ID) {
+      if (n.deepLink?.startsWith('http')) {
+        window.open(n.deepLink, '_blank', 'noopener,noreferrer');
+      }
+      return;
+    }
     if (!n.isRead) {
-      this.myNotifications.markAsRead(n.id).subscribe({
-        next: () => {
-          n.isRead = true;
-          this.unreadCount = Math.max(0, this.unreadCount - 1);
-        }
-      });
+      this.markNotificationReadIfEligible(n);
     }
     if (n.deepLink) {
-      this.router.navigateByUrl(n.deepLink);
+      if (n.deepLink.startsWith('http')) {
+        window.open(n.deepLink, '_blank', 'noopener,noreferrer');
+      } else {
+        this.router.navigateByUrl(n.deepLink);
+      }
     }
-  }
-
-  onMarkAllAsRead(event?: Event): void {
-    event?.stopPropagation();
-    this.myNotifications.markAllAsRead().subscribe({
-      next: () => {
-        this.unreadCount = 0;
-      },
-    });
   }
 
   changeLanguage(lang: any): void {
@@ -699,6 +921,7 @@ get userInitials(): string {
     MatDividerModule,
     MatDialogModule,
     MatToolbarModule,
+    TranslateModule,
   ],
   templateUrl: 'search-dialog.component.html',
 })

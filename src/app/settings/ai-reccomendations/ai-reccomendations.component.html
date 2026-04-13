@@ -1,49 +1,122 @@
+<mat-card class="ibr-new-dashboad-card m-l-16 m-t-16">
+  <mat-card-content class="ai-rec-page">
+    <div class="ai-rec-titles d-flex flex-column gap-10">
+      <h3 class="ibr-new-heading">{{ "AI Recommendations" | translate }}</h3>
+      <p class="ibr-new-subheading m-b-0">
+        {{ "Fine-tune your AI assistant" | translate }}
+      </p>
+    </div>
 
+    <div class="ai-rec-tabs">
+      <mat-tab-group
+        class="ai-rec-tab-group"
+        mat-stretch-tabs="false"
+        [disableRipple]="true"
+      >
+      <!-- Tab 1: Advisor Guidelines -->
+      <mat-tab [label]="'LABEL.MY_GUIDELINES' | translate">
+        <div class="tab-body">
+          @if (isGuidelinesLoading) {
+            <div class="d-flex justify-content-center p-24">
+              <mat-spinner diameter="40"></mat-spinner>
+            </div>
+          } @else {
+            <div class="d-flex flex-column gap-16">
+              <p class="description">
+                {{
+                  "Customize how your AI gives advice, from tone and risk levels to approved products and compliance rules, so every client recommendation aligns with your firm's policies."
+                    | translate
+                }}
+              </p>
+              <div class="description f-s-14">
+                <strong>
+                  {{ "Talk to an Ibernia AI expert" | translate }}
+                </strong>
+                <span>
+                  {{ "to set this up effectively for your organization." | translate }}
+                </span>
+              </div>
 
+              <div class="ai-rec-textarea-field">
+                <mat-form-field appearance="outline" class="w-100">
+                  <textarea
+                    matInput
+                    [placeholder]="'PLACEHOLDER.COMPANY_CONTEXT' | translate"
+                    [(ngModel)]="advisorGuidelines"
+                    maxlength="10000"
+                    rows="6"
+                  >
+                  </textarea>
+                  <mat-hint align="end"
+                    >{{ advisorGuidelines?.length || 0 }} / 10000</mat-hint
+                  >
+                </mat-form-field>
+              </div>
 
-<mat-card class="mat-mdc-card mdc-card cardWithShadow mb-20">
-  <mat-card-content class="mat-mdc-card-content">
-    <div class="d-flex align-items-center main-header-content gap-10">
-      <div class="icon-wrapper d-flex align-items-center justify-content-center">
-<img width="24" src="../../../assets/images/shapes/ai-filled.svg" alt="">
-      </div>
-      <!-- <div class="header-icon">
-        <img width="56" src="../../../assets/images/shapes/small-icon-7.svg" alt="">
-      </div> -->
-      <div class="d-flex flex-column justify-content-between gap-4">
-        <h4 class="page-title f-w-500">{{ 'AI Recommendations' | translate }}</h4>
-        <span class="sub-title">{{ 'Fine-tune your AI assistant' | translate }}</span>
-      </div>
+              <div class="d-flex justify-content-end ai-rec-save-btn">
+                <button
+                  type="button"
+                  class="button-icon"
+                  [disabled]="!hasGuidelinesChanges || isGuidelinesSaving"
+                  (click)="saveAdvisorGuidelines()"
+                >
+                  <span class="f-s-16">{{ "Save" | translate }}</span>
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      </mat-tab>
+
+      <!-- Tab 2: System Prompt (admin only) -->
+      @if (isAdmin) {
+        <mat-tab [label]="'LABEL.SYSTEM_PROMPT_ADMIN' | translate">
+          <div class="tab-body">
+            @if (isPromptLoading) {
+              <div class="d-flex justify-content-center p-24">
+                <mat-spinner diameter="40"></mat-spinner>
+              </div>
+            } @else {
+              <div class="d-flex flex-column gap-16">
+                <p class="description">
+                  {{
+                    "This is the global system prompt sent to the AI for all advisors. Only administrators can edit this."
+                      | translate
+                  }}
+                </p>
+
+                <div class="ai-rec-textarea-field">
+                  <mat-form-field appearance="outline" class="w-100">
+                    <textarea
+                      matInput
+                      [placeholder]="'PLACEHOLDER.SYSTEM_PROMPT' | translate"
+                      [(ngModel)]="promptContent"
+                      maxlength="20000"
+                      rows="16"
+                    >
+                    </textarea>
+                    <mat-hint align="end"
+                      >{{ promptContent?.length || 0 }} / 20000</mat-hint
+                    >
+                  </mat-form-field>
+                </div>
+
+                <div class="d-flex justify-content-end ai-rec-save-btn">
+                  <button
+                    type="button"
+                    class="button-icon"
+                    [disabled]="!hasPromptChanges || isPromptSaving"
+                    (click)="saveSystemPrompt()"
+                  >
+                    <span class="f-s-16">{{ "Save" | translate }}</span>
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        </mat-tab>
+      }
+      </mat-tab-group>
     </div>
   </mat-card-content>
-</mat-card>
-
-
-<mat-card class="mat-mdc-card mdc-card cardWithShadow mb-20">
-  <mat-card-content class="mat-mdc-card-content">
-<div *ngIf="selectedPlan === 'enterprise'" class="enterprise-context-section">
-
-  <p class="description f-s-14 m-t-0 m-b-10">
-    {{ 'Customize how your AI gives advice, from tone and risk levels to approved products and compliance rules, so every client recommendation aligns with your firm’s policies.' | translate }}
-    
-   
-  </p>
-  <div class="m-b-5 f-s-14"><strong>{{ 'Talk to an Ibernia AI expert' | translate }}</strong> {{ 'to set this up effectively for your organization.' | translate }}</div>
-  <mat-form-field appearance="outline" class="full-width textarea-wrapper w-100">
-    <textarea
-      matInput
-      placeholder="Your company context"
-      [(ngModel)]="companyContext"
-      maxlength="10000"
-      rows="3">
-    </textarea>
-    <mat-hint >{{ companyContext?.length || 0 }} / 10000</mat-hint>
-  </mat-form-field>
-<div class="d-flex justify-space-end">
-    <button  color="primary" class="button-icon"><span>{{ 'Save' | translate }}</span></button>
-</div>
-
-  
-</div>
-</mat-card-content>
 </mat-card>

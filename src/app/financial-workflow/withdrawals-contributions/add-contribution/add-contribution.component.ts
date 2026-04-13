@@ -37,15 +37,29 @@ import {
   SavingPotsModel,
 } from '../../saving-pots/models/saving-pots.model';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { getAmountCycleLabel } from 'src/app/shared/utils/amount-cycle-label';
 import {
   extractEventId,
   resolveYear,
 } from 'src/app/shared/utils/event-date-utils';
 import { MaterialModule } from 'src/app/material.module';
+import { Client } from 'src/app/clients/models/client';
+import { formatSavingPotSelectLabel } from 'src/app/shared/utils/saving-pot-select-label';
+import { translateTimelineEventDisplayName } from 'src/app/shared/utils/timeline-event-display-name';
+import {
+  getCompletedYearsAgeAtDate,
+  getPersistedAgeForCalendarYear,
+  getProjectionColumnAgeLabel,
+  getCashflowDialogEndCalendarYear,
+} from 'src/app/shared/utils/client-age-at-reference';
+import { calendarYearOrEventRefValidator } from 'src/app/shared/utils/calendar-year-or-event-ref.validator';
+import {
+  recurringEndYearNotSelected,
+  resolveCycleDescriptionForRecurringEndGuard,
+} from 'src/app/shared/utils/recurring-end-save-guard';
 
 @Component({
   selector: 'app-add-contribution',
@@ -62,7 +76,6 @@ import { MaterialModule } from 'src/app/material.module';
     MatSliderModule,
     ReactiveFormsModule,
     MatCheckboxModule,
-    ThousandSeparatorPipe,
     ThousandSeparatorInputDirective,
     TranslateModule,
     MaterialModule,
@@ -95,12 +108,15 @@ export class AddContributionComponent {
   clientSavings: ClientSaving[] = []; // <-- bound in template
   private cashPot?: ClientSaving;
   currentYear: number = new Date().getFullYear();
+  selectedClient: Client | null = null;
+  dialogEndCalendarYear = 0;
 
   constructor(
     private dialogRef: MatDialogRef<AddContributionComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private fb: FormBuilder,
     private withdrawalsContributionsHttpService: WithdrawalsContributionsHttpService,
+    private translate: TranslateService,
   ) {
     this.eventsList = data.eventsList ?? [];
     this.cycles = data.amountCycles;
@@ -108,21 +124,17 @@ export class AddContributionComponent {
     this.clientBirthYear = moment(data.clientBirthDate).year();
 
     const birthDate = new Date(data.clientBirthDate);
-    const forecastStart = new Date(data.forecastStartDateYear, 0, 1);
-    let age = forecastStart.getFullYear() - birthDate.getFullYear();
-    const monthDiff = forecastStart.getMonth() - birthDate.getMonth();
-    const dayDiff = forecastStart.getDate() - birthDate.getDate();
-    if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) age--;
-    this.clientAge = age;
-    if (data.forecastStartDateYear - this.clientBirthYear > this.clientAge) {
-      this.clientBirthYear = this.clientBirthYear + 1;
-    }
+    const forecastStart = data.forecastStartDate
+      ? new Date(data.forecastStartDate)
+      : new Date(data.forecastStartDateYear, 0, 1);
+    this.clientAge = getCompletedYearsAgeAtDate(birthDate, forecastStart);
 
     this.clientPreferredCurrency = data.clientPreferredCurrency;
     this.cashflowId = data.cashflowId;
     this.isEditWorkflow = data.isEditWorkflow;
     this.selectedContribution = data.selectedContribution;
     this.savingPots = data.savingPots;
+    this.selectedClient = data.selectedClient ?? null;
     this.existingContributions = data.existingContributions ?? [];
 
     // keep originals and find Cash pot
@@ -131,7 +143,18 @@ export class AddContributionComponent {
       (s) => (s.name ?? '').toLowerCase() === 'cash',
     );
 
-    const endYear = data.forecastEndDateYear + 1;
+    const resolvedEndYear = getCashflowDialogEndCalendarYear(
+      data.clientBirthDate,
+      data.planDuration,
+      data.forecastEndDateYear,
+    );
+    let endYear = Number.isFinite(resolvedEndYear)
+      ? resolvedEndYear
+      : Number(data.forecastEndDateYear);
+    if (!Number.isFinite(endYear)) {
+      endYear = data.forecastStartDateYear;
+    }
+    this.dialogEndCalendarYear = endYear;
     const iterations = endYear - data.forecastStartDateYear + 1;
 
     for (let i = 0; i < iterations; i++) {
@@ -173,17 +196,21 @@ export class AddContributionComponent {
       const hasCommInit = pctInit > 0;
 
       // hydrate core fields
+      const startVal = this.selectedContribution.startEventId
+        ? 'event:' + this.selectedContribution.startEventId
+        : (() => { const n = Number(this.selectedContribution.start?.year); return Number.isFinite(n) && n > 0 ? n : null; })();
+      const endVal = this.selectedContribution.endEventId
+        ? 'event:' + this.selectedContribution.endEventId
+        : (() => { const n = Number(this.selectedContribution.end?.year); return Number.isFinite(n) && n > 0 ? n : null; })();
+      if (typeof startVal === 'number') this.ensureYearInSelectableYears(startVal);
+      if (typeof endVal === 'number') this.ensureYearInSelectableYears(endVal);
       this.contributionForm.patchValue({
         contributionType: this.selectedContribution?.contributionType ?? 1,
         currencySymbol: this.clientPreferredCurrency,
         amount: this.selectedContribution.amount.amount,
         cycle: this.selectedContribution.amount.cycle?.id,
-        start: this.selectedContribution.startEventId
-          ? 'event:' + this.selectedContribution.startEventId
-          : this.selectedContribution.start.year,
-        end: this.selectedContribution.endEventId
-          ? 'event:' + this.selectedContribution.endEventId
-          : this.selectedContribution.end.year,
+        start: startVal,
+        end: endVal,
         commissions: hasCommInit,
         commissionPercentage: pctInit,
       });
@@ -288,8 +315,9 @@ export class AddContributionComponent {
     }
   }
 
+  /** i18n key — use with `| translate` in template (sentence case in EN/IT). */
   get dialogTitle(): string {
-    return this.isEditWorkflow ? 'Edit Contribution' : 'Add Contribution';
+    return this.isEditWorkflow ? 'Edit contribution' : 'Add contribution';
   }
 
   // === UI helpers ===
@@ -320,12 +348,19 @@ export class AddContributionComponent {
       'One-off';
     this.showStartEnd = !isOneOff;
 
+    const startCtrl = this.contributionForm.get('start');
+    const endCtrl = this.contributionForm.get('end');
+
     if (!this.showStartEnd) {
-      this.contributionForm.controls['end'].clearValidators();
-      this.contributionForm.controls['end'].updateValueAndValidity();
+      endCtrl?.clearValidators();
+      endCtrl?.updateValueAndValidity();
+      startCtrl?.setValidators([Validators.required]);
+      startCtrl?.updateValueAndValidity();
     } else {
-      this.contributionForm.controls['end'].addValidators(Validators.required);
-      this.contributionForm.controls['end'].updateValueAndValidity();
+      endCtrl?.setValidators([calendarYearOrEventRefValidator()]);
+      endCtrl?.updateValueAndValidity();
+      startCtrl?.setValidators([calendarYearOrEventRefValidator()]);
+      startCtrl?.updateValueAndValidity();
     }
 
     const escalationControl = this.contributionForm.get('escalationRate');
@@ -336,6 +371,33 @@ export class AddContributionComponent {
       escalationControl?.setValidators(Validators.required);
     }
     escalationControl?.updateValueAndValidity();
+  }
+
+  getCycleLabel(cycle: Cycle): string {
+    return getAmountCycleLabel(cycle, this.translate);
+  }
+
+  getTimelineEventLabel(rawName: string): string {
+    return translateTimelineEventDisplayName(this.translate, rawName);
+  }
+
+  get isContributionSaveButtonDisabled(): boolean {
+    if (this.contributionForm.invalid) {
+      return true;
+    }
+    if (this.showStartEnd) {
+      const endRaw = this.contributionForm.get('end')?.value;
+      if (!extractEventId(endRaw) && resolveYear(endRaw, this.eventsList) <= 0) {
+        return true;
+      }
+    }
+    const cycleId = this.contributionForm.get('cycle')?.value;
+    const desc = resolveCycleDescriptionForRecurringEndGuard(this.cycles, cycleId);
+    return recurringEndYearNotSelected(
+      desc,
+      this.contributionForm.get('end')?.value,
+      this.eventsList,
+    );
   }
 
   isCommissionsChanged(enabled: boolean) {
@@ -353,7 +415,7 @@ export class AddContributionComponent {
   }
 
   onAmountInput(rawValue: string) {
-    const value = parseFormattedNumber(rawValue);
+    const value = parseFormattedNumber(rawValue, this.translate.currentLang);
     this.contributionForm.get('amount')?.setValue(value, { emitEvent: true });
   }
 
@@ -415,6 +477,14 @@ export class AddContributionComponent {
     }
   }
 
+  getSavingPotSelectLabel(saving: ClientSaving): string {
+    return formatSavingPotSelectLabel(
+      { name: saving.name, ownership: saving.ownership },
+      this.selectedClient,
+      this.translate,
+    );
+  }
+
   //   private applySavingPotFilter(): void {
   //   // Show everything, no filtering based on type
   //   const all = this.allClientSavings ?? [];
@@ -428,6 +498,7 @@ export class AddContributionComponent {
   // }
 
   addIncome(): void {
+    if (this.isContributionSaveButtonDisabled) return;
     this.contributionForm.markAllAsTouched();
     this.contributionForm.markAsDirty();
     if (!this.contributionForm.valid) {
@@ -510,11 +581,27 @@ export class AddContributionComponent {
         },
       },
       start: {
-        age: startYear ? startYear - this.clientBirthYear : 0,
+        age: startYear
+          ? getPersistedAgeForCalendarYear(
+              this.data.clientBirthDate,
+              startYear,
+              this.data.forecastStartDate,
+              this.data.planDuration,
+              this.dialogEndCalendarYear,
+            )
+          : 0,
         year: startYear || 0,
       },
       end: {
-        age: endYear ? endYear - this.clientBirthYear : 0,
+        age: endYear
+          ? getPersistedAgeForCalendarYear(
+              this.data.clientBirthDate,
+              endYear,
+              this.data.forecastStartDate,
+              this.data.planDuration,
+              this.dialogEndCalendarYear,
+            )
+          : 0,
         year: endYear || 0,
       },
       startEventId,
@@ -612,11 +699,27 @@ export class AddContributionComponent {
         },
       },
       start: {
-        age: startYear ? startYear - this.clientBirthYear : 0,
+        age: startYear
+          ? getPersistedAgeForCalendarYear(
+              this.data.clientBirthDate,
+              startYear,
+              this.data.forecastStartDate,
+              this.data.planDuration,
+              this.dialogEndCalendarYear,
+            )
+          : 0,
         year: startYear || 0,
       },
       end: {
-        age: endYear ? endYear - this.clientBirthYear : 0,
+        age: endYear
+          ? getPersistedAgeForCalendarYear(
+              this.data.clientBirthDate,
+              endYear,
+              this.data.forecastStartDate,
+              this.data.planDuration,
+              this.dialogEndCalendarYear,
+            )
+          : 0,
         year: endYear || 0,
       },
       startEventId,
@@ -703,16 +806,11 @@ export class AddContributionComponent {
   }
 
   onEscalationRateChange(event: MatSelectChange): void {
-    const selectedOption = event.source.selected;
-    let description: string | null = null;
+    const val = event.value;
+    const rate = this.escalationRates.find((e) => e.value === val);
+    const description = rate?.description ?? null;
 
-    if (Array.isArray(selectedOption)) {
-      description = selectedOption[0]?.viewValue ?? null;
-    } else {
-      description = selectedOption?.viewValue ?? null;
-    }
-
-    this.selectedEscalationDescription = description;
+    this.selectedEscalationDescription = description ?? '';
 
     const customControl = this.contributionForm.get('customEscalationRate');
     if (description === 'Increases at custom rate') {
@@ -853,7 +951,14 @@ export class AddContributionComponent {
   }
 
   getAgeForYear(year: number): number {
-    return Number(year) - this.clientBirthYear;
+    const a = getProjectionColumnAgeLabel(
+      this.data.clientBirthDate,
+      Number(year),
+      this.data.forecastStartDate,
+      this.data.planDuration,
+      this.dialogEndCalendarYear,
+    );
+    return Number.isNaN(a) ? 0 : a;
   }
 
   getStartYear(): number {
@@ -873,5 +978,13 @@ export class AddContributionComponent {
   getEndYears(): number[] {
     const startYear = this.getStartYear();
     return (this.years ?? []).filter((y) => y >= startYear);
+  }
+
+  private ensureYearInSelectableYears(year: number): void {
+    if (!Number.isFinite(year)) return;
+    if (!this.years.includes(year)) {
+      this.years.push(year);
+      this.years.sort((a, b) => a - b);
+    }
   }
 }

@@ -1,78 +1,270 @@
-<div *ngIf="!isLoading; else loadingTpl">
-
+<div class="d-flex flex-column gap-16" *ngIf="!isLoading; else loadingTpl">
   <!-- Header row -->
-  <mat-card class="cardWithShadow">
-    <mat-card-content style="padding: 28px 24px !important;">
+  <mat-card class="ibr-new-dashboad-card">
+    <mat-card-content>
       <div class="d-flex align-items-center justify-content-between">
-        <div>
-          <h2 class="section-title">Family Tree</h2>
-          <p class="section-subtitle">Visualize how your wealth flows to each generation</p>
+        <div class="d-flex flex-column gap-10">
+          <h3 class="ibr-new-heading">{{ "Family Tree" | translate }}</h3>
+          <p class="ibr-new-subheading legacy-family-tree-intro">
+            {{ "LEGACY.FAMILY_TREE_SUBTITLE_LINE1" | translate }}
+            {{ "LEGACY.FAMILY_TREE_SUBTITLE_LINE2" | translate }}
+          </p>
         </div>
+        <!-- <div>
+          <h2 class="section-title">{{ 'Family Tree' | translate }}</h2>
+          <p class="section-subtitle">
+            Build your family tree and click on each member to<br />
+            visualize how wealth flows across generations
+          </p>
+        </div> -->
         <div class="d-flex gap-12">
-          <button class="action-btn action-btn-outline" (click)="onOpenBeneficiaryRules()">
-            Beneficiary rules
+          <!-- class="action-btn action-btn-outline" -->
+          <button
+            class="button-icon-outline"
+            (click)="onOpenBeneficiaryRules()"
+          >
+            <span class="f-s-16 f-w-500">
+              {{ "Beneficiary rules" | translate }}</span
+            >
           </button>
-          <button class="action-btn action-btn-primary" (click)="onAddMember()">
-            Add member +
+
+          <button (click)="onAddMember()" type="button" class="button-icon">
+            <span class="f-s-16 f-w-500"> {{ "Add member" | translate }}</span>
+            <img src="assets/images/svgs/add-icon.svg" alt="add-icon" />
           </button>
         </div>
       </div>
 
       <!-- Family Tree -->
-      <div class="family-tree" *ngIf="dashboard">
+      <div class="family-tree" *ngIf="dashboard" #familyTree>
+        <!-- ═══ OTHER MEMBERS (standalone, no connectors, left of client) ═══ -->
+        <div class="other-members" *ngIf="otherMembers.length > 0">
+          <div class="tree-node other-node" *ngFor="let other of otherMembers">
+            <div class="node-avatar avatar-other">
+              <mat-icon>
+                <svg
+                  width="30"
+                  height="30"
+                  viewBox="0 0 30 30"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M25 26.25V23.75C25 22.4239 24.4732 21.1521 23.5355 20.2145C22.5979 19.2768 21.3261 18.75 20 18.75H10C8.67392 18.75 7.40215 19.2768 6.46447 20.2145C5.52678 21.1521 5 22.4239 5 23.75V26.25"
+                    stroke="white"
+                    stroke-width="2.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M15 13.75C17.7614 13.75 20 11.5114 20 8.75C20 5.98858 17.7614 3.75 15 3.75C12.2386 3.75 10 5.98858 10 8.75C10 11.5114 12.2386 13.75 15 13.75Z"
+                    stroke="white"
+                    stroke-width="2.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </mat-icon>
+            </div>
+            <span class="node-name"
+              >{{ other.firstName }} {{ other.lastName }}</span
+            >
+            <ng-container *ngIf="getMemberInheritance(other.id) as inh">
+              <span class="inheritance-amount">
+                <span class="estate-currency">{{
+                  currency | currencySymbol
+                }}</span
+                >{{ inh.netReceived | number: "1.0-0" }}
+              </span>
+            </ng-container>
+            <button class="node-remove" (click)="onRemoveMember(other)">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+        </div>
 
         <!-- ═══ MAIN BODY: two branches + couple link ═══ -->
-        <div class="tree-body">
-
+        <div class="tree-body" [class.has-partner]="hasPartner" #treeBody>
           <!-- ── CLIENT BRANCH ── -->
-          <div class="family-branch">
-
+          <div
+            class="family-branch"
+            [class.family-branch--flex-grow]="familyBranchUseFlexGrow"
+          >
             <!-- Client parents couple -->
-            <div class="branch-parents" *ngIf="clientParents.length > 0">
-              <div class="couple-pair">
-                <ng-container *ngFor="let parent of clientParents; let i = index">
-                  <div class="tree-node" [class.deceased]="isDeceased(parent.id)"
-                       (click)="onClickClientParent()">
-                    <div class="node-avatar" [ngClass]="'avatar-' + parent.role.toLowerCase()">
-                      <mat-icon>person</mat-icon>
+            <div
+              class="branch-parents"
+              *ngIf="clientParents.length > 0"
+              #clientBranchParents
+            >
+              <div class="couple-pair" #clientParentsPair>
+                <ng-container
+                  *ngFor="let parent of clientParents; let i = index"
+                >
+                  <div
+                    class="tree-node"
+                    [class.deceased]="isDeceased(parent.id)"
+                    (click)="onClickParentMember(parent)"
+                  >
+                    <div class="node-inner">
+                      <div
+                        class="node-avatar"
+                        [ngClass]="'avatar-' + parent.role.toLowerCase()"
+                      >
+                        <mat-icon>
+                          <svg
+                            width="30"
+                            height="30"
+                            viewBox="0 0 30 30"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M25 26.25V23.75C25 22.4239 24.4732 21.1521 23.5355 20.2145C22.5979 19.2768 21.3261 18.75 20 18.75H10C8.67392 18.75 7.40215 19.2768 6.46447 20.2145C5.52678 21.1521 5 22.4239 5 23.75V26.25"
+                              stroke="white"
+                              stroke-width="2.5"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            />
+                            <path
+                              d="M15 13.75C17.7614 13.75 20 11.5114 20 8.75C20 5.98858 17.7614 3.75 15 3.75C12.2386 3.75 10 5.98858 10 8.75C10 11.5114 12.2386 13.75 15 13.75Z"
+                              stroke="white"
+                              stroke-width="2.5"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            />
+                          </svg>
+                        </mat-icon>
+                      </div>
+                      <span class="node-name"
+                        >{{ parent.firstName }} {{ parent.lastName }}</span
+                      >
+                      <button
+                        class="node-remove"
+                        (click)="
+                          onRemoveMember(parent); $event.stopPropagation()
+                        "
+                      >
+                        <mat-icon>close</mat-icon>
+                      </button>
                     </div>
-                    <span class="node-name">{{parent.firstName}} {{parent.lastName}}</span>
-                    <button class="node-remove" (click)="onRemoveMember(parent); $event.stopPropagation()">
-                      <mat-icon>close</mat-icon>
-                    </button>
                   </div>
-                  <div class="pair-heart" *ngIf="i === 0 && clientParents.length > 1">
+                  <div
+                    class="pair-heart"
+                    *ngIf="i === 0 && clientParents.length > 1"
+                  >
                     <div class="line-h"></div>
-                    <mat-icon class="heart-sm">favorite</mat-icon>
+                    <div class="new-heart-icon-sm">
+                      <img
+                        src="../../../../assets/images/svgs/new-legacy-heart-icon-sm.svg"
+                        alt="new-legacy-heart-icon-sm"
+                      />
+                    </div>
                     <div class="line-h"></div>
                   </div>
                 </ng-container>
+                <div
+                  class="parents-line"
+                  *ngIf="clientParents.length > 1"
+                  #clientParentsLine
+                ></div>
               </div>
-              <div class="parent-estate" (click)="onEditParentEstate('client')">
-                <span class="estate-currency">{{currency | currencySymbol}}</span>{{dashboard.parentEstates.clientParentsNetWorth | number:'1.0-0'}}
+              <div
+                class="parent-estate client-estate"
+                (click)="onEditParentEstate('client')"
+              >
+                <div class="d-flex align-items-center">
+                  <span class="estate-currency">{{
+                    currency | currencySymbol
+                  }}</span
+                  >{{
+                    dashboard.parentEstates.clientParentsNetWorth
+                      | number: "1.0-0"
+                  }}
+                </div>
                 <mat-icon class="edit-sm">edit</mat-icon>
               </div>
+              <div
+                class="heart-estate-vline"
+                *ngIf="clientParents.length > 1"
+                #clientHeartEstateLine
+              ></div>
             </div>
 
             <!-- Vertical drop from parents -->
             <div class="branch-vline" *ngIf="clientParents.length > 0"></div>
+
+            <!-- Tax node for client-parents-die scenario -->
+            <ng-container *ngIf="showTaxOnClientBranch">
+              <div class="tax-node" (click)="onOpenTaxSettings()">
+                <div class="tax-icon-circle">
+                  <!-- <mat-icon>account_balance</mat-icon> -->
+                  <img
+                    src="../../../../assets/images/svgs/new-legacy-tax-icon.svg"
+                    alt="new-legacy-tax-icon"
+                  />
+                </div>
+                <div class="tax-badge">
+                  <span>{{ "Tax" | translate }}</span>
+                </div>
+                <span class="tax-amount">
+                  <span class="estate-currency">{{
+                    currency | currencySymbol
+                  }}</span
+                  >{{ scenarioResult!.totalTax | number: "1.0-0" }}
+                </span>
+              </div>
+              <div class="branch-vline"></div>
+            </ng-container>
 
             <!-- Leaf nodes: [siblings..., client] -->
             <div class="branch-leaves" [class.has-bracket]="showClientBranch">
               <div class="leaf" *ngFor="let sib of clientSiblings">
                 <div class="leaf-drop" *ngIf="showClientBranch"></div>
                 <ng-container *ngIf="getMemberInheritance(sib.id) as inh">
-                  <span class="inheritance-pct-badge">{{inh.percentage | number:'1.0-0'}}%</span>
+                  <span class="inheritance-pct-badge"
+                    >{{ inh.percentage | number: "1.0-0" }}%</span
+                  >
                   <div class="leaf-drop-short"></div>
                 </ng-container>
-                <div class="tree-node sibling-node" [class.deceased]="isDeceased(sib.id)">
+                <div
+                  class="tree-node sibling-node"
+                  [class.deceased]="isDeceased(sib.id)"
+                >
                   <div class="node-avatar avatar-clientsibling">
-                    <mat-icon>person</mat-icon>
+                    <mat-icon>
+                      <svg
+                        width="30"
+                        height="30"
+                        viewBox="0 0 30 30"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M25 26.25V23.75C25 22.4239 24.4732 21.1521 23.5355 20.2145C22.5979 19.2768 21.3261 18.75 20 18.75H10C8.67392 18.75 7.40215 19.2768 6.46447 20.2145C5.52678 21.1521 5 22.4239 5 23.75V26.25"
+                          stroke="white"
+                          stroke-width="2.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                        <path
+                          d="M15 13.75C17.7614 13.75 20 11.5114 20 8.75C20 5.98858 17.7614 3.75 15 3.75C12.2386 3.75 10 5.98858 10 8.75C10 11.5114 12.2386 13.75 15 13.75Z"
+                          stroke="white"
+                          stroke-width="2.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                    </mat-icon>
                   </div>
-                  <span class="node-name">{{sib.firstName}} {{sib.lastName}}</span>
+                  <span class="node-name"
+                    >{{ sib.firstName }} {{ sib.lastName }}</span
+                  >
                   <ng-container *ngIf="getMemberInheritance(sib.id) as inh">
                     <span class="inheritance-amount">
-                      <span class="estate-currency">{{currency | currencySymbol}}</span>{{inh.netReceived | number:'1.0-0'}}
+                      <span class="estate-currency">{{
+                        currency | currencySymbol
+                      }}</span
+                      >{{ inh.netReceived | number: "1.0-0" }}
                     </span>
                   </ng-container>
                   <button class="node-remove" (click)="onRemoveMember(sib)">
@@ -81,26 +273,78 @@
                 </div>
               </div>
 
-              <div class="leaf">
+              <div class="leaf main-leaf">
                 <div class="leaf-drop" *ngIf="showClientBranch"></div>
-                <div class="tree-node main-node" *ngIf="clientMember as cm"
-                     [class.deceased]="isDeceased(cm.id)"
-                     (click)="onClickClient()">
-                  <div class="node-avatar avatar-client">
-                    <mat-icon>person</mat-icon>
+                <ng-container
+                  *ngIf="getMemberInheritance(clientMember?.id) as inh"
+                >
+                  <ng-container *ngIf="!isOnlyPartnerDeceased">
+                    <span class="inheritance-pct-badge"
+                      >{{ inh.percentage | number: "1.0-0" }}%</span
+                    >
+                    <div class="leaf-drop-short"></div>
+                  </ng-container>
+                </ng-container>
+                <div
+                  class="tree-node main-node"
+                  *ngIf="clientMember as cm"
+                  [class.deceased]="isDeceased(cm.id)"
+                  (click)="onClickClient()"
+                  #clientMainNode
+                >
+                  <div class="node-avatar avatar-client" #clientAvatar>
+                    <mat-icon>
+                      <svg
+                        width="40"
+                        height="40"
+                        viewBox="0 0 40 40"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M33.3334 35V31.6667C33.3334 29.8986 32.631 28.2029 31.3808 26.9526C30.1305 25.7024 28.4349 25 26.6667 25H13.3334C11.5653 25 9.86961 25.7024 8.61937 26.9526C7.36913 28.2029 6.66675 29.8986 6.66675 31.6667V35"
+                          stroke="white"
+                          stroke-width="3.33333"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                        <path
+                          d="M19.9999 18.3333C23.6818 18.3333 26.6666 15.3486 26.6666 11.6667C26.6666 7.98477 23.6818 5 19.9999 5C16.318 5 13.3333 7.98477 13.3333 11.6667C13.3333 15.3486 16.318 18.3333 19.9999 18.3333Z"
+                          stroke="white"
+                          stroke-width="3.33333"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                    </mat-icon>
                   </div>
-                  <span class="node-name" [class.strikethrough]="isDeceased(cm.id)">
-                    {{cm.firstName}} {{cm.lastName}}
+                  <span
+                    class="node-name"
+                    [class.strikethrough]="isDeceased(cm.id)"
+                  >
+                    {{ cm.firstName }} {{ cm.lastName }}
                   </span>
-                  <span class="node-amount" *ngIf="!getMemberInheritance(cm.id)">
-                    <span class="estate-currency">{{currency | currencySymbol}}</span>{{dashboard!.clientNetWorth | number:'1.0-0'}}
+                  <span
+                    class="node-amount"
+                    *ngIf="!getMemberInheritance(cm.id)"
+                  >
+                    <span class="estate-currency">{{
+                      currency | currencySymbol
+                    }}</span
+                    >{{ dashboard!.clientNetWorth | number: "1.0-0" }}
                   </span>
                   <ng-container *ngIf="getMemberInheritance(cm.id) as inh">
                     <span class="inheritance-detail">
-                      {{currency | currencySymbol}}{{inh.originalAmount | number:'1.0-0'}} + {{currency | currencySymbol}}{{inh.netReceived | number:'1.0-0'}}
+                      {{ currency | currencySymbol
+                      }}{{ inh.originalAmount | number: "1.0-0" }} +
+                      {{ currency | currencySymbol
+                      }}{{ inh.netReceived | number: "1.0-0" }}
                     </span>
                     <span class="inheritance-total">
-                      <span class="estate-currency">{{currency | currencySymbol}}</span>{{inh.finalTotal | number:'1.0-0'}}
+                      <span class="estate-currency">{{
+                        currency | currencySymbol
+                      }}</span
+                      >{{ inh.finalTotal | number: "1.0-0" }}
                     </span>
                   </ng-container>
                 </div>
@@ -109,70 +353,302 @@
           </div>
 
           <!-- ── COUPLE CONNECTOR (heart always shown) ── -->
-          <div class="couple-link" *ngIf="hasPartner">
+          <div
+            class="couple-link"
+            *ngIf="hasPartner"
+            [class.couple-link--spread]="isOnlyClientDeceased || isOnlyPartnerDeceased"
+            #coupleLink
+          >
             <div class="line-h link-line"></div>
-            <mat-icon class="heart-lg" (click)="onClickCouple()">favorite</mat-icon>
+
+            <!-- Case 1: Client deceased only – tax between client & heart -->
+            <div
+              class="couple-tax-node"
+              *ngIf="isOnlyClientDeceased && showTaxOnCoupleLink"
+              (click)="onOpenTaxSettings()"
+            >
+              <div class="tax-icon-circle">
+                <img
+                  src="../../../../assets/images/svgs/new-legacy-tax-icon.svg"
+                  alt="new-legacy-tax-icon"
+                />
+              </div>
+              <div class="tax-badge">
+                <span>{{ "Tax" | translate }}</span>
+              </div>
+              <span class="tax-amount">
+                <span class="estate-currency">{{
+                  currency | currencySymbol
+                }}</span
+                >{{ scenarioResult!.totalTax | number: "1.0-0" }}
+              </span>
+            </div>
+
+            <!-- Case 2: Partner deceased only – badge between client & heart -->
+            <ng-container *ngIf="isOnlyPartnerDeceased">
+              <ng-container
+                *ngIf="getMemberInheritance(clientMember?.id) as inh"
+              >
+                <span class="inheritance-pct-badge couple-pct-badge"
+                  >{{ inh.percentage | number: "1.0-0" }}%</span
+                >
+              </ng-container>
+            </ng-container>
+
+            <button
+              type="button"
+              (click)="onClickCouple()"
+              class="new-heart-icon"
+            >
+              <img
+                src="../../../../assets/images/svgs/new-legacy-heart-icon.svg"
+                alt="new-legacy-heart-icon"
+              />
+            </button>
+
+            <!-- Case 1: Client deceased only – badge between heart & partner -->
+            <ng-container *ngIf="isOnlyClientDeceased">
+              <ng-container
+                *ngIf="getMemberInheritance(partnerMember?.id) as inh"
+              >
+                <span class="inheritance-pct-badge couple-pct-badge"
+                  >{{ inh.percentage | number: "1.0-0" }}%</span
+                >
+              </ng-container>
+            </ng-container>
+
+            <!-- Case 2: Partner deceased only – tax between heart & partner -->
+            <div
+              class="couple-tax-node"
+              *ngIf="isOnlyPartnerDeceased && showTaxOnCoupleLink"
+              (click)="onOpenTaxSettings()"
+            >
+              <div class="tax-icon-circle">
+                <img
+                  src="../../../../assets/images/svgs/new-legacy-tax-icon.svg"
+                  alt="new-legacy-tax-icon"
+                />
+              </div>
+              <div class="tax-badge">
+                <span>{{ "Tax" | translate }}</span>
+              </div>
+              <span class="tax-amount">
+                <span class="estate-currency">{{
+                  currency | currencySymbol
+                }}</span
+                >{{ scenarioResult!.totalTax | number: "1.0-0" }}
+              </span>
+            </div>
+
             <div class="line-h link-line"></div>
           </div>
 
           <!-- ── PARTNER BRANCH ── -->
-          <div class="family-branch" *ngIf="hasPartner">
-
+          <div
+            class="family-branch"
+            *ngIf="hasPartner"
+            [class.family-branch--flex-grow]="familyBranchUseFlexGrow"
+          >
             <!-- Partner parents couple -->
-            <div class="branch-parents" *ngIf="partnerParents.length > 0">
-              <div class="couple-pair">
-                <ng-container *ngFor="let parent of partnerParents; let i = index">
-                  <div class="tree-node" [class.deceased]="isDeceased(parent.id)"
-                       (click)="onClickPartnerParent()">
-                    <div class="node-avatar" [ngClass]="'avatar-' + parent.role.toLowerCase()">
-                      <mat-icon>person</mat-icon>
+            <div
+              class="branch-parents"
+              *ngIf="partnerParents.length > 0"
+              #partnerBranchParents
+            >
+              <div class="couple-pair" #partnerParentsPair>
+                <ng-container
+                  *ngFor="let parent of partnerParents; let i = index"
+                >
+                  <div
+                    class="tree-node"
+                    [class.deceased]="isDeceased(parent.id)"
+                    (click)="onClickParentMember(parent)"
+                  >
+                    <div class="node-inner">
+                      <div
+                        class="node-avatar"
+                        [ngClass]="'avatar-' + parent.role.toLowerCase()"
+                      >
+                        <mat-icon>
+                          <svg
+                            width="30"
+                            height="30"
+                            viewBox="0 0 30 30"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M25 26.25V23.75C25 22.4239 24.4732 21.1521 23.5355 20.2145C22.5979 19.2768 21.3261 18.75 20 18.75H10C8.67392 18.75 7.40215 19.2768 6.46447 20.2145C5.52678 21.1521 5 22.4239 5 23.75V26.25"
+                              stroke="white"
+                              stroke-width="2.5"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            />
+                            <path
+                              d="M15 13.75C17.7614 13.75 20 11.5114 20 8.75C20 5.98858 17.7614 3.75 15 3.75C12.2386 3.75 10 5.98858 10 8.75C10 11.5114 12.2386 13.75 15 13.75Z"
+                              stroke="white"
+                              stroke-width="2.5"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            />
+                          </svg>
+                        </mat-icon>
+                      </div>
+                      <span class="node-name"
+                        >{{ parent.firstName }} {{ parent.lastName }}</span
+                      >
+                      <button
+                        class="node-remove"
+                        (click)="
+                          onRemoveMember(parent); $event.stopPropagation()
+                        "
+                      >
+                        <mat-icon>close</mat-icon>
+                      </button>
                     </div>
-                    <span class="node-name">{{parent.firstName}} {{parent.lastName}}</span>
-                    <button class="node-remove" (click)="onRemoveMember(parent); $event.stopPropagation()">
-                      <mat-icon>close</mat-icon>
-                    </button>
                   </div>
-                  <div class="pair-heart" *ngIf="i === 0 && partnerParents.length > 1">
+                  <div
+                    class="pair-heart"
+                    *ngIf="i === 0 && partnerParents.length > 1"
+                  >
                     <div class="line-h"></div>
-                    <mat-icon class="heart-sm">favorite</mat-icon>
+                    <div class="new-heart-icon-sm">
+                      <img
+                        src="../../../../assets/images/svgs/new-legacy-heart-icon-sm.svg"
+                        alt="new-legacy-heart-icon-sm"
+                      />
+                    </div>
                     <div class="line-h"></div>
                   </div>
                 </ng-container>
+                <div
+                  class="parents-line"
+                  *ngIf="partnerParents.length > 1"
+                  #partnerParentsLine
+                ></div>
               </div>
-              <div class="parent-estate" (click)="onEditParentEstate('partner')">
-                <span class="estate-currency">{{currency | currencySymbol}}</span>{{dashboard.parentEstates.partnerParentsNetWorth | number:'1.0-0'}}
+              <div
+                class="parent-estate partner-estate"
+                (click)="onEditParentEstate('partner')"
+              >
+                <div class="d-flex align-items-center">
+                  <span class="estate-currency">{{
+                    currency | currencySymbol
+                  }}</span
+                  >{{
+                    dashboard.parentEstates.partnerParentsNetWorth
+                      | number: "1.0-0"
+                  }}
+                </div>
                 <mat-icon class="edit-sm">edit</mat-icon>
               </div>
+              <div
+                class="heart-estate-vline"
+                *ngIf="partnerParents.length > 1"
+                #partnerHeartEstateLine
+              ></div>
             </div>
 
             <!-- Vertical drop from parents -->
             <div class="branch-vline" *ngIf="partnerParents.length > 0"></div>
 
+            <!-- Tax node for partner-parents-die scenario -->
+            <ng-container *ngIf="showTaxOnPartnerBranch">
+              <div class="tax-node" (click)="onOpenTaxSettings()">
+                <div class="tax-icon-circle">
+                  <!-- <mat-icon>account_balance</mat-icon> -->
+                  <img
+                    src="../../../../assets/images/svgs/new-legacy-tax-icon.svg"
+                    alt="new-legacy-tax-icon"
+                  />
+                </div>
+                <div class="tax-badge">
+                  <span>{{ "Tax" | translate }}</span>
+                </div>
+                <span class="tax-amount">
+                  <span class="estate-currency">{{
+                    currency | currencySymbol
+                  }}</span
+                  >{{ scenarioResult!.totalTax | number: "1.0-0" }}
+                </span>
+              </div>
+              <div class="branch-vline"></div>
+            </ng-container>
+
             <!-- Leaf nodes: [partner, siblings...] -->
             <div class="branch-leaves" [class.has-bracket]="showPartnerBranch">
-              <div class="leaf">
+              <div class="leaf main-leaf">
                 <div class="leaf-drop" *ngIf="showPartnerBranch"></div>
-                <div class="tree-node main-node" *ngIf="partnerMember as pm"
-                     [class.deceased]="isDeceased(pm.id)"
-                     (click)="onClickPartner()">
-                  <ng-container *ngIf="getMemberInheritance(pm.id) as inh">
-                    <span class="inheritance-pct" *ngIf="inh.percentage < 100">{{inh.percentage}}%</span>
+                <ng-container
+                  *ngIf="getMemberInheritance(partnerMember?.id) as inh"
+                >
+                  <ng-container *ngIf="!isOnlyClientDeceased">
+                    <span class="inheritance-pct-badge"
+                      >{{ inh.percentage | number: "1.0-0" }}%</span
+                    >
+                    <div class="leaf-drop-short"></div>
                   </ng-container>
-                  <div class="node-avatar avatar-partner">
-                    <mat-icon>person</mat-icon>
+                </ng-container>
+                <div
+                  class="tree-node main-node"
+                  *ngIf="partnerMember as pm"
+                  [class.deceased]="isDeceased(pm.id)"
+                  (click)="onClickPartner()"
+                  #partnerMainNode
+                >
+                  <div class="node-avatar avatar-partner" #partnerAvatar>
+                    <mat-icon>
+                      <svg
+                        width="40"
+                        height="40"
+                        viewBox="0 0 40 40"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M33.3334 35V31.6667C33.3334 29.8986 32.631 28.2029 31.3808 26.9526C30.1305 25.7024 28.4349 25 26.6667 25H13.3334C11.5653 25 9.86961 25.7024 8.61937 26.9526C7.36913 28.2029 6.66675 29.8986 6.66675 31.6667V35"
+                          stroke="white"
+                          stroke-width="3.33333"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                        <path
+                          d="M19.9999 18.3333C23.6818 18.3333 26.6666 15.3486 26.6666 11.6667C26.6666 7.98477 23.6818 5 19.9999 5C16.318 5 13.3333 7.98477 13.3333 11.6667C13.3333 15.3486 16.318 18.3333 19.9999 18.3333Z"
+                          stroke="white"
+                          stroke-width="3.33333"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                    </mat-icon>
                   </div>
-                  <span class="node-name" [class.strikethrough]="isDeceased(pm.id)">
-                    {{pm.firstName}} {{pm.lastName}}
+                  <span
+                    class="node-name"
+                    [class.strikethrough]="isDeceased(pm.id)"
+                  >
+                    {{ pm.firstName }} {{ pm.lastName }}
                   </span>
-                  <span class="node-amount partner-amount" *ngIf="!getMemberInheritance(pm.id)">
-                    <span class="estate-currency">{{currency | currencySymbol}}</span>{{dashboard!.partnerNetWorth | number:'1.0-0'}}
+                  <span
+                    class="node-amount partner-amount"
+                    *ngIf="!getMemberInheritance(pm.id)"
+                  >
+                    <span class="estate-currency">{{
+                      currency | currencySymbol
+                    }}</span
+                    >{{ dashboard!.partnerNetWorth | number: "1.0-0" }}
                   </span>
                   <ng-container *ngIf="getMemberInheritance(pm.id) as inh">
                     <span class="inheritance-detail">
-                      {{currency | currencySymbol}}{{inh.originalAmount | number:'1.0-0'}} + {{currency | currencySymbol}}{{inh.netReceived | number:'1.0-0'}}
+                      {{ currency | currencySymbol
+                      }}{{ inh.originalAmount | number: "1.0-0" }} +
+                      {{ currency | currencySymbol
+                      }}{{ inh.netReceived | number: "1.0-0" }}
                     </span>
                     <span class="inheritance-total">
-                      <span class="estate-currency">{{currency | currencySymbol}}</span>{{inh.finalTotal | number:'1.0-0'}}
+                      <span class="estate-currency">{{
+                        currency | currencySymbol
+                      }}</span
+                      >{{ inh.finalTotal | number: "1.0-0" }}
                     </span>
                   </ng-container>
                 </div>
@@ -181,17 +657,50 @@
               <div class="leaf" *ngFor="let sib of partnerSiblings">
                 <div class="leaf-drop" *ngIf="showPartnerBranch"></div>
                 <ng-container *ngIf="getMemberInheritance(sib.id) as inh">
-                  <span class="inheritance-pct-badge">{{inh.percentage | number:'1.0-0'}}%</span>
+                  <span class="inheritance-pct-badge"
+                    >{{ inh.percentage | number: "1.0-0" }}%</span
+                  >
                   <div class="leaf-drop-short"></div>
                 </ng-container>
-                <div class="tree-node sibling-node" [class.deceased]="isDeceased(sib.id)">
+                <div
+                  class="tree-node sibling-node"
+                  [class.deceased]="isDeceased(sib.id)"
+                >
                   <div class="node-avatar avatar-partnersibling">
-                    <mat-icon>person</mat-icon>
+                    <mat-icon>
+                      <svg
+                        width="30"
+                        height="30"
+                        viewBox="0 0 30 30"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M25 26.25V23.75C25 22.4239 24.4732 21.1521 23.5355 20.2145C22.5979 19.2768 21.3261 18.75 20 18.75H10C8.67392 18.75 7.40215 19.2768 6.46447 20.2145C5.52678 21.1521 5 22.4239 5 23.75V26.25"
+                          stroke="white"
+                          stroke-width="2.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                        <path
+                          d="M15 13.75C17.7614 13.75 20 11.5114 20 8.75C20 5.98858 17.7614 3.75 15 3.75C12.2386 3.75 10 5.98858 10 8.75C10 11.5114 12.2386 13.75 15 13.75Z"
+                          stroke="white"
+                          stroke-width="2.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                    </mat-icon>
                   </div>
-                  <span class="node-name">{{sib.firstName}} {{sib.lastName}}</span>
+                  <span class="node-name"
+                    >{{ sib.firstName }} {{ sib.lastName }}</span
+                  >
                   <ng-container *ngIf="getMemberInheritance(sib.id) as inh">
                     <span class="inheritance-amount">
-                      <span class="estate-currency">{{currency | currencySymbol}}</span>{{inh.netReceived | number:'1.0-0'}}
+                      <span class="estate-currency">{{
+                        currency | currencySymbol
+                      }}</span
+                      >{{ inh.netReceived | number: "1.0-0" }}
                     </span>
                   </ng-container>
                   <button class="node-remove" (click)="onRemoveMember(sib)">
@@ -201,42 +710,99 @@
               </div>
             </div>
           </div>
-
+          <div class="couple-line" *ngIf="hasPartner" #coupleLine></div>
         </div>
 
         <!-- ═══ CHILDREN / FLOW SECTION ═══ -->
-        <div class="children-section" *ngIf="children.length > 0">
+        <div
+          class="heart-children-vline"
+          *ngIf="hasPartner && children.length > 0"
+          #heartChildrenLine
+        ></div>
+        <div
+          class="children-section"
+          *ngIf="children.length > 0"
+          #childrenSection
+        >
           <div class="child-vline"></div>
 
-          <!-- Tax node on the flow path -->
-          <div class="tax-node" *ngIf="scenarioResult && scenarioResult.totalTax > 0"
-               (click)="onOpenTaxSettings()">
+          <!-- Tax node on the flow path (only for client/partner death scenarios) -->
+          <div
+            class="tax-node"
+            *ngIf="showTaxOnChildrenSection"
+            (click)="onOpenTaxSettings()"
+          >
             <div class="tax-icon-circle">
-              <mat-icon>account_balance</mat-icon>
+              <!-- <mat-icon>account_balance</mat-icon> -->
+              <img
+                src="../../../../assets/images/svgs/new-legacy-tax-icon.svg"
+                alt="new-legacy-tax-icon"
+              />
             </div>
-            <div class="tax-badge">Tax</div>
+            <div class="tax-badge">
+              <span>{{ "Tax" | translate }}</span>
+            </div>
             <span class="tax-amount">
-              <span class="estate-currency">{{currency | currencySymbol}}</span>{{scenarioResult.totalTax | number:'1.0-0'}}
+              <span class="estate-currency">{{
+                currency | currencySymbol
+              }}</span
+              >{{ scenarioResult!.totalTax | number: "1.0-0" }}
             </span>
           </div>
-          <div class="child-vline" *ngIf="scenarioResult && scenarioResult.totalTax > 0"></div>
+          <div class="child-vline" *ngIf="showTaxOnChildrenSection"></div>
 
           <!-- Children bracket + nodes -->
-          <div class="children-leaves" [class.has-bracket]="children.length > 1">
+          <div
+            class="children-leaves"
+            [class.has-bracket]="children.length > 1"
+          >
             <div class="leaf" *ngFor="let child of children">
               <div class="leaf-drop"></div>
               <ng-container *ngIf="getMemberInheritance(child.id) as inh">
-                <span class="inheritance-pct-badge">{{inh.percentage | number:'1.0-0'}}%</span>
+                <span class="inheritance-pct-badge"
+                  >{{ inh.percentage | number: "1.0-0" }}%</span
+                >
                 <div class="leaf-drop-short"></div>
               </ng-container>
-              <div class="tree-node child-node" [class.deceased]="isDeceased(child.id)">
+              <div
+                class="tree-node child-node"
+                [class.deceased]="isDeceased(child.id)"
+              >
                 <div class="node-avatar avatar-child">
-                  <mat-icon>person</mat-icon>
+                  <mat-icon>
+                    <svg
+                      width="30"
+                      height="30"
+                      viewBox="0 0 30 30"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M25 26.25V23.75C25 22.4239 24.4732 21.1521 23.5355 20.2145C22.5979 19.2768 21.3261 18.75 20 18.75H10C8.67392 18.75 7.40215 19.2768 6.46447 20.2145C5.52678 21.1521 5 22.4239 5 23.75V26.25"
+                        stroke="white"
+                        stroke-width="2.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                      <path
+                        d="M15 13.75C17.7614 13.75 20 11.5114 20 8.75C20 5.98858 17.7614 3.75 15 3.75C12.2386 3.75 10 5.98858 10 8.75C10 11.5114 12.2386 13.75 15 13.75Z"
+                        stroke="white"
+                        stroke-width="2.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  </mat-icon>
                 </div>
-                <span class="node-name">{{child.firstName}} {{child.lastName}}</span>
+                <span class="node-name"
+                  >{{ child.firstName }} {{ child.lastName }}</span
+                >
                 <ng-container *ngIf="getMemberInheritance(child.id) as inh">
                   <span class="inheritance-total child-total">
-                    <span class="estate-currency">{{currency | currencySymbol}}</span>{{inh.finalTotal | number:'1.0-0'}}
+                    <span class="estate-currency">{{
+                      currency | currencySymbol
+                    }}</span
+                    >{{ inh.netReceived | number: "1.0-0" }}
                   </span>
                 </ng-container>
                 <button class="node-remove" (click)="onRemoveMember(child)">
@@ -246,22 +812,32 @@
             </div>
           </div>
         </div>
-
       </div>
     </mat-card-content>
   </mat-card>
 
   <!-- Tax settings quick view -->
-  <mat-card class="cardWithShadow" *ngIf="dashboard?.taxSettings as ts">
-    <mat-card-content style="padding: 20px 24px !important;">
+  <mat-card class="ibr-new-dashboad-card" *ngIf="dashboard?.taxSettings as ts">
+    <mat-card-content>
       <div class="d-flex align-items-center justify-content-between">
-        <div class="d-flex gap-24 align-items-center">
-          <span class="tax-label">Partner tax: <strong>{{ts.partnerTaxRate}}%</strong></span>
-          <span class="tax-label">Child tax: <strong>{{ts.childTaxRate}}%</strong></span>
-          <span class="tax-label">Sibling tax: <strong>{{ts.siblingTaxRate}}%</strong></span>
+        <div
+          class="d-flex flex-wrap gap-24 align-items-center tax-settings-legend"
+        >
+          <div class="legend-item">
+            <span class="legend-label">{{ "Partner tax" | translate }}:</span>
+            <span class="legend-value">{{ ts.partnerTaxRate }}%</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-label">{{ "Child tax" | translate }}:</span>
+            <span class="legend-value">{{ ts.childTaxRate }}%</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-label">{{ "Sibling tax" | translate }}:</span>
+            <span class="legend-value">{{ ts.siblingTaxRate }}%</span>
+          </div>
         </div>
-        <button class="action-btn action-btn-outline action-btn-sm" (click)="onOpenTaxSettings()">
-          Edit tax settings
+        <button class="button-icon-outline" (click)="onOpenTaxSettings()">
+          <span class="f-s-16 f-w-500">{{ "Tax settings" | translate }}</span>
         </button>
       </div>
     </mat-card-content>

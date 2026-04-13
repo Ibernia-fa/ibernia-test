@@ -1,0 +1,20 @@
+<div class="comparison-line-chart" #chart>
+  @if (report?.series && compareReport?.series) {
+  <apx-chart
+    [series]="chartOptions.series"
+    [chart]="chartOptions.chart"
+    [xaxis]="chartOptions.xaxis"
+    [yaxis]="chartOptions.yaxis"
+    [stroke]="chartOptions.stroke"
+    [colors]="chartOptions.colors"
+    [tooltip]="chartOptions.tooltip"
+    [legend]="chartOptions.legend"
+    [grid]="chartOptions.grid"
+    [dataLabels]="chartOptions.dataLabels"
+    [markers]="chartOptions.markers"
+    [fill]="chartOptions.fill"
+    (chartReady)="onApexChartReady()"
+  >
+  </apx-chart>
+  }
+</div>

@@ -1,1 +1,212 @@
-// Admin notifications component styles
+:host {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.admin-notifications-page {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  margin: 16px 0 0;
+  padding: 0 16px 24px;
+}
+
+.admin-notifications-page-title {
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: #1c1c1c;
+}
+
+.admin-notifications-subtitle {
+  font-size: 15px;
+  line-height: 1.45;
+  color: #5a596e;
+  max-width: 640px;
+}
+
+.admin-notifications-section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1c1c1c;
+}
+
+.admin-notifications-create-link {
+  text-decoration: none;
+}
+
+.admin-notifications-loading-inner {
+  padding: 48px 24px;
+  text-align: center;
+}
+
+.admin-notifications-loading-text {
+  font-size: 15px;
+  color: #5a596e;
+}
+
+.admin-notifications-error-inner {
+  padding: 32px 24px;
+  text-align: center;
+}
+
+.admin-notifications-error-text {
+  font-size: 15px;
+  color: #5a596e;
+  max-width: 420px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.admin-notifications-retry-btn {
+  min-width: 120px;
+}
+
+.admin-notifications-table-wrap {
+  overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid rgba(200, 196, 216, 0.45);
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.admin-notifications-cell-muted {
+  text-transform: capitalize;
+  color: #464555;
+  font-size: 14px;
+}
+
+.admin-notifications-cell-date {
+  font-size: 13px;
+  color: #64748b;
+  white-space: nowrap;
+}
+
+.admin-notifications-actions-col {
+  width: 1%;
+  white-space: nowrap;
+  text-align: right !important;
+}
+
+.admin-notifications-actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.admin-notifications-icon-btn {
+  color: #4043af !important;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  &:hover {
+    background-color: rgba(64, 67, 175, 0.08) !important;
+  }
+}
+
+.admin-notifications-icon-btn--danger {
+  color: #b91c1c !important;
+
+  &:hover {
+    background-color: rgba(185, 28, 28, 0.08) !important;
+  }
+}
+
+.admin-notifications-empty-row .mat-mdc-cell {
+  text-align: center;
+  padding: 32px 16px !important;
+  color: #94a3b8;
+  font-size: 14px;
+}
+
+// Status pills (replaces mat-chip for consistent purple-theme styling)
+.admin-status-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.admin-status-pill.status-draft {
+  background: rgba(245, 158, 11, 0.16);
+  color: #b45309;
+}
+
+.admin-status-pill.status-scheduled {
+  background: rgba(64, 67, 175, 0.14);
+  color: #4043af;
+}
+
+.admin-status-pill.status-sent {
+  background: rgba(34, 197, 94, 0.16);
+  color: #15803d;
+}
+
+.admin-status-pill.status-partial {
+  background: rgba(245, 158, 11, 0.18);
+  color: #b45309;
+}
+
+.admin-status-pill.status-processing {
+  background: rgba(100, 116, 139, 0.16);
+  color: #475569;
+}
+
+.admin-status-pill.status-failed {
+  background: rgba(239, 68, 68, 0.14);
+  color: #b91c1c;
+}
+
+.admin-status-pill.status-default {
+  background: rgba(100, 116, 139, 0.14);
+  color: #475569;
+}
+
+:host ::ng-deep {
+  .admin-notifications-table {
+    background: transparent;
+
+    .mat-mdc-header-row {
+      background: #f8f9fc;
+    }
+
+    .mat-mdc-header-cell {
+      font-weight: 600;
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #64748b;
+      border-bottom: 1px solid #e2e8f0 !important;
+      padding: 14px 16px !important;
+    }
+
+    .mat-mdc-cell {
+      border-bottom: 1px solid #f1f5f9 !important;
+      padding: 14px 16px !important;
+      vertical-align: middle;
+    }
+
+    .mat-mdc-row {
+      transition: background-color 0.15s ease;
+    }
+
+    .mat-mdc-row:hover .mat-mdc-cell {
+      background-color: #f5f7ff;
+    }
+
+    .mat-mdc-row:last-child .mat-mdc-cell {
+      border-bottom: none !important;
+    }
+  }
+}

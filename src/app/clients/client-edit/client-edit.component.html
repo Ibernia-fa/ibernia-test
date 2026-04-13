@@ -57,7 +57,7 @@
           matInput
           [matDatepicker]="picker"
           formControlName="dob"
-          placeholder="DD/MM/YYYY"
+          [placeholder]="'DD/MM/YYYY' | translate"
           inputmode="numeric"
           autocomplete="bday"
           (input)="onDobTyping(dobInput)"
@@ -134,7 +134,7 @@
       >
       <input
         matInput
-        placeholder="email@somedomain.com"
+        [placeholder]="'PLACEHOLDER.EMAIL_EXAMPLE' | translate"
         formControlName="email"
       />
       @if (clientForm.get("email")?.hasError("email")) {
@@ -227,13 +227,20 @@
     <!-- Partner checkbox -->
     <div class="full-width">
       <section class="example-section">
-        <mat-checkbox
-          class="example-margin"
-          id="partner-section"
-          [checked]="showPartner"
-          (click)="onPartnerCheckboxClick()"
-          >{{ "Add a partner or spouse" | translate }}</mat-checkbox
+        <div
+          [matTooltip]="hasPersistedPartner ? ('A saved partner cannot be removed' | translate) : ''"
+          matTooltipPosition="above"
         >
+          <mat-checkbox
+            class="example-margin"
+            [class.partner-checkbox-disabled]="hasPersistedPartner"
+            id="partner-section"
+            [checked]="showPartner"
+            [disabled]="hasPersistedPartner"
+            (click)="onPartnerCheckboxClick()"
+            >{{ "Add a partner or spouse" | translate }}</mat-checkbox
+          >
+        </div>
       </section>
     </div>
 
@@ -292,7 +299,7 @@
               matInput
               [matDatepicker]="partnerPicker"
               formControlName="dob"
-              placeholder="DD/MM/YYYY"
+              [placeholder]="'DD/MM/YYYY' | translate"
               inputmode="numeric"
               autocomplete="bday"
               (input)="onPartnerDobTyping(dobPartnerInput)"
@@ -373,7 +380,7 @@
           >
           <input
             matInput
-            placeholder="email@somedomain.com"
+            [placeholder]="'PLACEHOLDER.EMAIL_EXAMPLE' | translate"
             formControlName="email"
           />
           @if (clientForm.get("partner.email")?.hasError("email")) {

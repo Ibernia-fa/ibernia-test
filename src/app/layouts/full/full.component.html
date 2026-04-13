@@ -7,6 +7,7 @@
     !resView &&
     !hideSidebar
   "
+  [class.layout-with-footer]="showFooter"
 >
   <ng-container>
     <mat-sidenav-container
@@ -30,6 +31,7 @@
         'sidebarNav-horizontal': options.horizontal,
         cardBorder: options.cardBorder,
         'no-footer-padding': isCashflowRoute,
+        'custom-branded-background': usesCustomBackground,
       }"
       class="sidenavContainer"
     >
@@ -59,9 +61,11 @@
               [showToggle]="isOver"
               [sidenavCollapsed]="options.sidenavCollapsed"
             ></app-sidebar>
-            <div class="scrollable-content">
+            <div class="scrollable-content" [class.settings-sidebar]="isSettings">
               <ng-scrollbar class="position-relative" style="height: 100%">
-                <mat-nav-list class="sidebar-list">
+                <mat-nav-list
+                  class="sidebar-list preimum-nav ibr-new-setting-icon"
+                >
                   @for (item of navItems; track item) {
                     <app-nav-item
                       [class.nav-divider]="!isSettings"
@@ -84,12 +88,16 @@
                 }
               </mat-nav-list> -->
                 <mat-nav-list
-                  class="sidebar-list {{ !isSettings ? 'preimum-nav' : '' }}"
+                  class="sidebar-list {{
+                    !isSettings
+                      ? 'preimum-nav'
+                      : 'preimum-nav ibr-new-setting-icon'
+                  }}"
                 >
                   @for (item of navItemslower; let i = $index; track item) {
                     <app-nav-item
                       [item]="item"
-                      [showLabel]="i >= navItemslower.length - 3"
+                      [showLabel]="i >= navItemslower.length - 2"
                       label="BETA"
                     >
                     </app-nav-item>
@@ -103,7 +111,7 @@
                   <div class="p-12 rounded d-flex flex-column gap-12">
                     <a
                       (click)="openShareModal()"
-                      class="cashflow-modal d-flex align-items-center gap-12"
+                      class="cashflow-modal d-flex align-items-center gap-10"
                     >
                       <!-- <img
                         src="assets/images/svgs/share-android-solid.svg"
@@ -182,7 +190,12 @@
           id="resView"
           class="sidebarNav"
         >
-          <app-sidebar> </app-sidebar>
+          <app-sidebar
+            [showToggle]="isOver"
+            [sidenavCollapsed]="options.sidenavCollapsed"
+            (toggleMobileNav)="sidenav.toggle()"
+            (toggleCollapsed)="toggleCollapsed()"
+          ></app-sidebar>
           <ng-scrollbar class="position-relative" style="height: 100%">
             <mat-nav-list class="sidebar-list">
               @for (item of navItems; track item) {
@@ -274,7 +287,7 @@
         <div
           class="p-x-16 p-y-20 d-flex align-items-center justify-content-between"
         >
-          <h3 class="f-s-21 f-w-600">Settings</h3>
+          <h3 class="f-s-21 f-w-600">{{ 'Settings' | translate }}</h3>
           <button
             class="d-lg-none"
             mat-button
@@ -290,6 +303,9 @@
         ></app-customizer>
       </mat-sidenav>
     </mat-sidenav-container>
+    @if (showFooter) {
+      <app-footer></app-footer>
+    }
   </ng-container>
 
   <!-- ------------------------------------------------------------------
@@ -329,7 +345,7 @@
       <mat-accordion>
         <mat-expansion-panel class="shadow-none">
           <mat-expansion-panel-header>
-            <mat-panel-title class="f-s-16 f-w-500"> Apps </mat-panel-title>
+            <mat-panel-title class="f-s-16 f-w-500"> {{ 'Apps' | translate }} </mat-panel-title>
           </mat-expansion-panel-header>
           <div>
             <div class="row">
@@ -358,7 +374,7 @@
                 </div>
               }
             </div>
-            <h4 class="f-s-18 f-w-600 m-b-16">Quick Links</h4>
+            <h4 class="f-s-18 f-w-600 m-b-16">{{ 'Quick Links' | translate }}</h4>
             @for (quicklink of quicklinks; track quicklink.title) {
               <div class="text-hover-primary">
                 <a
@@ -377,19 +393,19 @@
           [routerLink]="['/apps/calendar']"
           class="d-flex align-items-center text-decoration-none f-s-14 p-y-16 gap-8"
         >
-          <span class="f-s-15 f-w-500 m-l-8">Calendar</span>
+          <span class="f-s-15 f-w-500 m-l-8">{{ 'Calendar' | translate }}</span>
         </a>
         <a
           [routerLink]="['/apps/chat']"
           class="d-flex align-items-center text-decoration-none f-s-14 p-y-16"
         >
-          <span class="f-s-15 f-w-500 m-l-8">Chat</span>
+          <span class="f-s-15 f-w-500 m-l-8">{{ 'Chat' | translate }}</span>
         </a>
         <a
           [routerLink]="['/apps/email/inbox']"
           class="d-flex align-items-center text-decoration-none f-s-14 p-y-16 gap-8"
         >
-          <span class="f-s-15 f-w-500 m-l-8">Email</span>
+          <span class="f-s-15 f-w-500 m-l-8">{{ 'Email' | translate }}</span>
         </a>
       </div>
     </div>

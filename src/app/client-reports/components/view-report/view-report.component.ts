@@ -22,9 +22,19 @@ import {
 } from '@angular/animations';
 import { TablerIconsModule } from 'angular-tabler-icons';
 import { MaterialModule } from 'src/app/material.module';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateIncomeExpenseLabelPipe } from 'src/app/core/pipes/translate-income-expense-label.pipe';
+import { IncomeDisplayLabelContext } from 'src/app/shared/utils/income-display-label';
 import { ClientEmergency, EmergenciesLookupData } from '../../models/financial-series.model';
 import { ChartSeries } from 'src/app/financial-workflow/reports/models/charts-series.model';
+import {
+  getPlanEndCalendarYear,
+  getProjectionColumnAgeLabel,
+} from 'src/app/shared/utils/client-age-at-reference';
+import {
+  getReportYearBounds,
+  parseReportCategoryYears,
+} from 'src/app/shared/utils/chart-series-year-range';
 
 @Component({
   selector: 'app-view-report',
@@ -47,7 +57,8 @@ import { ChartSeries } from 'src/app/financial-workflow/reports/models/charts-se
     MatRippleModule,
     TablerIconsModule,
     MaterialModule,
-    TranslateModule
+    TranslateModule,
+    TranslateIncomeExpenseLabelPipe,
   ],
    animations: [
     trigger('indicatorRotate', [
@@ -67,7 +78,10 @@ export class ViewReportComponent implements OnChanges {
   @Input() financialSeries: any;
   /** Cached effective end date. Set when financialSeries changes to avoid change-detection loops. */
   effectiveReportEndDate: Date | null = null;
-  
+  chartViewStartYear: number | null = null;
+  chartViewEndYear: number | null = null;
+  chartYearOptions: number[] = [];
+
   get clientBirthDate() {
     return this.financialSeries?.client.clientDetails.birthDate;
   }
@@ -96,6 +110,15 @@ export class ViewReportComponent implements OnChanges {
     return `${this.financialSeries?.client.clientDetails?.firstName} ${this.financialSeries?.client.clientDetails?.lastName}`;
   }
 
+  get incomeDisplayLabelContext(): IncomeDisplayLabelContext {
+    const c = this.financialSeries?.client;
+    return {
+      hasPartner: !!c?.partnerDetail,
+      clientFirstName: c?.clientDetails?.firstName ?? '',
+      partnerFirstName: c?.partnerDetail?.firstName ?? '',
+    };
+  }
+
   get advisorName () {
     return this.financialSeries?.client?.financialAdvisor?.advisorName;
   }
@@ -103,6 +126,7 @@ export class ViewReportComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['financialSeries']) {
       this.effectiveReportEndDate = this.computeEffectiveReportEndDate();
+      this.syncChartYearRangeFromReport();
     }
   }
 
@@ -117,10 +141,60 @@ export class ViewReportComponent implements OnChanges {
     if (!Number.isFinite(planDuration) || planDuration <= 0) {
       return timeline.forecastEndtDate ? new Date(timeline.forecastEndtDate) : null;
     }
-    const planEndYear = birthDate.getFullYear() + planDuration;
+    const planEndYear = getPlanEndCalendarYear(this.clientBirthDate, cf.planDuration);
+    if (planEndYear == null) {
+      return timeline.forecastEndtDate ? new Date(timeline.forecastEndtDate) : null;
+    }
     const forecastStartYear = new Date(timeline.forecastStartDate).getFullYear();
     const effectiveYear = Math.max(forecastStartYear, planEndYear);
     return new Date(Date.UTC(effectiveYear, 11, 31, 12, 0, 0));
+  }
+
+  private syncChartYearRangeFromReport(): void {
+    const bounds = getReportYearBounds(this.report?.categories);
+    if (!bounds) {
+      this.chartYearOptions = [];
+      this.chartViewStartYear = null;
+      this.chartViewEndYear = null;
+      return;
+    }
+    this.chartYearOptions = parseReportCategoryYears(this.report.categories);
+    if (
+      this.chartViewStartYear == null ||
+      this.chartViewStartYear < bounds.min ||
+      this.chartViewStartYear > bounds.max
+    ) {
+      this.chartViewStartYear = bounds.min;
+    }
+    if (
+      this.chartViewEndYear == null ||
+      this.chartViewEndYear < bounds.min ||
+      this.chartViewEndYear > bounds.max
+    ) {
+      this.chartViewEndYear = bounds.max;
+    }
+    if (
+      this.chartViewStartYear != null &&
+      this.chartViewEndYear != null &&
+      this.chartViewStartYear > this.chartViewEndYear
+    ) {
+      this.chartViewStartYear = bounds.min;
+      this.chartViewEndYear = bounds.max;
+    }
+  }
+
+  onChartStartYearChange(year: number): void {
+    this.chartViewStartYear = year;
+    if (this.chartViewEndYear != null && year > this.chartViewEndYear) {
+      this.chartViewEndYear = year;
+    }
+  }
+
+  onChartEndYearChange(year: number): void {
+    this.chartViewEndYear = year;
+    if (this.chartViewStartYear != null && year < this.chartViewStartYear) {
+      this.chartViewStartYear = year;
+    }
   }
 
   get emergencies(): ClientEmergency[] {
@@ -161,8 +235,16 @@ export class ViewReportComponent implements OnChanges {
     const birthDate = this.client?.clientDetails?.birthDate;
     if (!birthDate || !Number.isFinite(year)) return { hasShortfall: true, firstShortfallAge: null };
 
-    const birthYear = new Date(birthDate).getFullYear();
-    return { hasShortfall: true, firstShortfallAge: year - birthYear };
+    const age = getProjectionColumnAgeLabel(
+      birthDate,
+      year,
+      this.financialTimeline?.forecastStartDate,
+      this.cashflow?.planDuration,
+    );
+    return {
+      hasShortfall: true,
+      firstShortfallAge: Number.isNaN(age) ? null : age,
+    };
   }
 
   private readonly defaultIcon = 'shield.svg';
@@ -190,7 +272,7 @@ export class ViewReportComponent implements OnChanges {
   section: string = 'lifetimePlan';
   displayedColumns: string[] = ['position', 'name'];
   
-  constructor() { }
+  constructor(private translate: TranslateService) { }
 
   ngOnInit(): void {
     if (this.financialSeries) {
@@ -243,7 +325,11 @@ export class ViewReportComponent implements OnChanges {
 
   getCoverageAdequacyLabel(id: number | null): string {
     if (id == null) return '-';
-    return this.emergenciesLookupData?.coverageAdequacies?.find(c => c.id === id)?.description ?? 'Unknown';
+    const raw =
+      this.emergenciesLookupData?.coverageAdequacies?.find((c) => c.id === id)
+        ?.description ?? 'Unknown';
+    const t = this.translate.instant(raw);
+    return t && t !== raw ? t : raw;
   }
 
   calculateAnnualCost(e: ClientEmergency): number {

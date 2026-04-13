@@ -3,6 +3,7 @@ import { UserManager, User, UserManagerSettings } from 'oidc-client';
 // import { Constants } from '../constants';
 import { Subject } from 'rxjs';
 import { environment } from 'src/environments/environment';
+import { AUTH_RETURN_URL_KEY } from '../auth.constants';
 
 @Injectable({
   providedIn: 'root'
@@ -11,11 +12,21 @@ export class AuthService {
   private _userManager: UserManager;
   private _user: User | any;
   private _loginChangedSubject = new Subject<boolean>();
+  private _loginRedirectInProgress = false;
 
   public loginChanged = this._loginChangedSubject.asObservable();
 
+  /** Canonical portal origin for redirect URIs (avoids wrong host behind proxies / PWA). */
+  private portalOrigin(): string {
+    const configured = environment.appUrl?.trim();
+    if (configured) {
+      return configured.replace(/\/$/, '');
+    }
+    return typeof window !== 'undefined' ? window.location.origin : '';
+  }
+
   private get idpSettings(): UserManagerSettings {
-    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    const origin = this.portalOrigin();
     const redirectUri = origin + '/signin-oidc';
     const postLogoutUri = origin + '/signout-callback-oidc';
     return {
@@ -44,6 +55,28 @@ export class AuthService {
     return this._userManager.signinRedirect();
   }
 
+  /**
+   * Clears local OIDC state and starts sign-in. Used when the access token is missing or expired,
+   * or when the API returns 401. Coalesces concurrent calls. Preserves return URL like AuthGuard.
+   */
+  public redirectToLogin = (): void => {
+    if (this._loginRedirectInProgress || typeof window === 'undefined') {
+      return;
+    }
+    this._loginRedirectInProgress = true;
+    const path =
+      window.location.pathname + window.location.search + window.location.hash;
+    if (
+      path &&
+      path !== '/' &&
+      !path.startsWith('/signin-oidc') &&
+      !path.startsWith('/signout-callback-oidc')
+    ) {
+      sessionStorage.setItem(AUTH_RETURN_URL_KEY, path);
+    }
+    void this.clearLocalOidcSession().then(() => this.login());
+  };
+
   public isAuthenticated = (): Promise<boolean> => {
     return this._userManager.getUser()
       .then((user: User | null) => {
@@ -66,7 +99,7 @@ export class AuthService {
   }
 
   public logout = () => {
-    const postLogoutRedirectUri = window.location.origin + '/signout-callback-oidc';
+    const postLogoutRedirectUri = this.portalOrigin() + '/signout-callback-oidc';
     console.info('[Auth] Logout:', {
       post_logout_redirect_uri: postLogoutRedirectUri,
       window_origin: window.location.origin,
@@ -85,6 +118,13 @@ export class AuthService {
   public finishLogout = () => {
     this._user = null;
     return this._userManager.signoutRedirectCallback();
+  }
+
+  /** Clears OIDC storage when the user did not complete a normal endsession redirect (e.g. logged out on STS only). */
+  public clearLocalOidcSession = (): Promise<void> => {
+    this._user = null;
+    this._loginChangedSubject.next(false);
+    return this._userManager.removeUser();
   }
 
   public getUserProfile = (): User | any => {

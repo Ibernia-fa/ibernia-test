@@ -2,7 +2,12 @@
   <div class="d-flex flex-column">
     <div class="dialog-header">
       <div class="d-flex align-items-center justify-content-center gap-4">
-        <h3 class="dialog-title text-center">{{ incomeTitle }}</h3>
+        <h3 class="dialog-title text-center">
+          {{
+            incomeTitle
+              | translateIncomeExpenseLabel : incomeDisplayLabelContext
+          }}
+        </h3>
         <ng-container *ngIf="isEditWorkflow && isNameEditable">
           <img
             src="assets/images/svgs/drop-down-edit-2-line.svg"
@@ -29,7 +34,7 @@
       <div [formGroup]="incomeForm" class="d-flex flex-column gap-16">
         @if (!isEditWorkflow) {
           <div class="d-flex flex-column gap-8">
-            <div class="d-flex gap-8 align-items-center">
+            <div class="d-flex gap-4 align-items-center">
               <mat-label
                 class="f-s-16 f-w-500 d-block ibr-black"
                 style="line-height: 16px"
@@ -52,6 +57,8 @@
                     @for (incomeType of incomeTypes; track incomeType) {
                       <mat-option [value]="incomeType">{{
                         incomeType
+                          | translateIncomeExpenseLabel
+                            : incomeDisplayLabelContext
                       }}</mat-option>
                     }
                   </mat-select>
@@ -96,7 +103,7 @@
             <input
               matInput
               formControlName="description"
-              placeholder="e.g. Salary"
+              [placeholder]="'PLACEHOLDER.DIVIDEND' | translate"
             />
 
             @if (
@@ -175,44 +182,55 @@
                   type="text"
                   formControlName="amount"
                   #amountInput
-                  [value]="incomeForm.get('amount')?.value | thousandSeparator"
                   thousandSeparatorInput
                   (input)="onAmountInput($event.target.value)"
                   placeholder="0"
                 />
               </div>
-              <div class="right position-relative">
-                <mat-select
-                  (valueChange)="onCycleValueChange($event)"
-                  formControlName="cycle"
-                  class="sortby-edit-profile"
-                  hideSingleSelectionIndicator
-                >
-                  @for (cycle of cycles; let i = $index; track cycle) {
-                    <mat-option [value]="cycle.id">{{
-                      cycle.description
-                    }}</mat-option>
-                  }
-                </mat-select>
-                <span class="custom-arrow">
-                  <svg
-                    width="12"
-                    height="7"
-                    viewBox="0 0 12 7"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
+              @if (isInheritance) {
+                <div class="right position-relative inheritance-cycle-static">
+                  <span class="inheritance-cycle-label">{{ 'One-off' | translate }}</span>
+                </div>
+              } @else {
+                <div class="right position-relative">
+                  <mat-select
+                    (valueChange)="onCycleValueChange($event)"
+                    formControlName="cycle"
+                    class="sortby-edit-profile"
+                    hideSingleSelectionIndicator
                   >
-                    <path
-                      d="M1 1L6 6L11 1"
-                      stroke="#2B3942"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                  </svg>
-                </span>
-              </div>
+                    @for (cycle of cycles; let i = $index; track cycle) {
+                      <mat-option [value]="cycle.id">{{
+                        getCycleLabel(cycle)
+                      }}</mat-option>
+                    }
+                  </mat-select>
+                  <span class="custom-arrow">
+                    <svg
+                      width="12"
+                      height="7"
+                      viewBox="0 0 12 7"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M1 1L6 6L11 1"
+                        stroke="#2B3942"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  </span>
+                </div>
+              }
             </div>
+            @if (statePensionSalaryPctHint !== null) {
+              <span class="state-pension-salary-pct-hint">{{
+                "INCOME_EXPENSE.STATE_PENSION_PCT_OF_SALARY"
+                  | translate : { pct: statePensionSalaryPctHint }
+              }}</span>
+            }
             @if (
               incomeForm.get("amount")?.touched &&
               (incomeForm.get("amount")?.hasError("required") ||
@@ -226,10 +244,7 @@
         </div>
 
         <!-- Bonus -->
-        @if (
-          incomeForm.get("description")?.value === "Salary" ||
-          incomeForm.get("description")?.value === "Salary (Partner)"
-        ) {
+        @if (isFormSalaryForBonus()) {
           <div class="d-flex flex-column gap-4 net-fields">
             <div class="d-flex flex-column gap-8">
               <mat-checkbox class="example-margin" formControlName="addBonus">
@@ -270,9 +285,6 @@
                     type="text"
                     formControlName="bonusAmount"
                     #bonusAmountInput
-                    [value]="
-                      incomeForm.get('bonusAmount')?.value | thousandSeparator
-                    "
                     thousandSeparatorInput
                     (input)="onBonusAmountInput($event.target.value)"
                     placeholder="0"
@@ -286,7 +298,7 @@
                   >
                     @for (cycle of cycles; let i = $index; track cycle) {
                       <mat-option [value]="cycle.id">{{
-                        cycle.description
+                        getCycleLabel(cycle)
                       }}</mat-option>
                     }
                   </mat-select>
@@ -328,7 +340,7 @@
                   <mat-label
                     class="f-s-16 f-w-500 ibr-black d-block"
                     style="line-height: 16px"
-                    >Bonus date</mat-label
+                    >{{ 'Bonus date' | translate }}</mat-label
                   >
                   <img
                     width="18"
@@ -392,12 +404,15 @@
 
         <div class="start-end">
           <div class="d-flex flex-column gap-8">
-            <div class="d-flex gap-8 align-items-center">
-              <mat-label class="f-s-16 f-w-500 ibr-black d-block">
+            <div class="d-flex gap-4 align-items-center">
+              <mat-label
+                class="f-s-16 f-w-500 ibr-black d-block"
+                style="line-height: 16px !important"
+              >
                 @if (showStartEnd) {
-                  Start & end
+                  {{ 'Start & end' | translate }}
                 } @else {
-                  Date
+                  {{ 'Date' | translate }}
                 }
               </mat-label>
               <img
@@ -419,12 +434,12 @@
                     >
                       @if (isEditWorkflow || eventsList?.length > 0) {
                         <mat-option [value]="currentYear"
-                          >This year ({{ currentYear }})</mat-option
+                          >{{ 'LABEL.THIS_YEAR' | translate }} ({{ currentYear }})</mat-option
                         >
                       }
                       @for (event of eventsList; track event) {
                         <mat-option [value]="'event:' + event.id"
-                          >{{ event.name }} ({{
+                          >{{ getTimelineEventLabel(event.name) }} ({{
                             getAgeForYear(event.start.year)
                           }})</mat-option
                         >
@@ -456,7 +471,8 @@
                   </div>
                   @if (
                     incomeForm.get("start")?.touched &&
-                    incomeForm.get("start")?.hasError("required")
+                    (incomeForm.get("start")?.hasError("required") ||
+                      incomeForm.get("start")?.hasError("invalidYear"))
                   ) {
                     <span class="field-error d-block">{{
                       "Required" | translate
@@ -482,7 +498,7 @@
                       >
                         @for (event of getEndEvents(); track event.id) {
                           <mat-option [value]="'event:' + event.id"
-                            >{{ event.name }} ({{
+                            >{{ getTimelineEventLabel(event.name) }} ({{
                               getAgeForYear(event.start.year)
                             }})</mat-option
                           >
@@ -514,7 +530,8 @@
                     </div>
                     @if (
                       incomeForm.get("end")?.touched &&
-                      incomeForm.get("end")?.hasError("required")
+                      (incomeForm.get("end")?.hasError("required") ||
+                        incomeForm.get("end")?.hasError("invalidYear"))
                     ) {
                       <span class="field-error d-block">{{
                         "Required" | translate
@@ -525,7 +542,7 @@
                       incomeForm.get("end")?.hasError("endBeforeStart")
                     ) {
                       <span class="field-error d-block"
-                        >End year cannot be before start year</span
+                        >{{ 'End year cannot be before start year' | translate }}</span
                       >
                     }
                   </div>
@@ -540,6 +557,7 @@
             <mat-checkbox
               class="example-margin"
               formControlName="investThisAmount"
+              (change)="onInvestThisAmountChange($event)"
             >
               {{ "Invest this amount" | translate }}
             </mat-checkbox>
@@ -564,7 +582,7 @@
                   >
                     @for (saving of clientSavings; track saving) {
                       <mat-option [value]="saving.id">{{
-                        saving.name
+                        getSavingPotSelectLabel(saving)
                       }}</mat-option>
                     }
                   </mat-select>
@@ -704,8 +722,8 @@
                 "
               >
                 <mat-label
-                  class="f-s-16 f-w-500 ibr-black d-flex gap-8 align-items-center"
-                  >Escalation rate
+                  class="f-s-16 f-w-500 ibr-black d-flex gap-4 align-items-center"
+                  >{{ "Escalation rate" | translate }}
                   <img
                     width="18"
                     src="assets/images/svgs/help-circle-icon.svg"
@@ -723,8 +741,9 @@
                         escalationRate of escalationRates;
                         track escalationRate
                       ) {
-                        <mat-option [value]="escalationRate.value">{{
+                        <mat-option [value]="escalationRate.description">{{
                           escalationRate.description
+                            | translateEscalationDescription
                         }}</mat-option>
                       }
                     </mat-select>
@@ -763,7 +782,7 @@
                   class="d-flex flex-column gap-8 escalation-field escalation-custom"
                 >
                   <mat-label class="f-s-16 f-w-500 ibr-black d-block"
-                    >Custom escalation rate</mat-label
+                    >{{ 'Custom escalation rate' | translate }}</mat-label
                   >
                   <div class="w-100 form-field custom-rate-input">
                     <input
@@ -838,17 +857,13 @@
         <button
           (click)="addIncome()"
           type="button"
-          [disabled]="
-            isSaving ||
-            incomeForm.invalid ||
-            (isEditWorkflow && !hasFormChanges())
-          "
+          [disabled]="isIncomeSaveButtonDisabled"
           class="button-icon w-100 d-block"
         >
           @if (isSaving) {
-            <span class="f-s-16">Saving...</span>
+            <span class="f-s-16">{{ 'Saving...' | translate }}</span>
           } @else {
-            <span class="f-s-16">Save</span>
+            <span class="f-s-16">{{ 'Save' | translate }}</span>
           }
         </button>
       </div>

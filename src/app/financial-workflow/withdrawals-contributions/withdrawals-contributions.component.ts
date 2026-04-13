@@ -33,7 +33,7 @@ import { CurrencySymbolPipe } from 'src/app/pipe/currency-symbol.pipe';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { IncomeExpensesHttpService } from '../income-expenses/services/income-expenses-http.service';
 import {
   FinancialViewModel,
@@ -95,6 +95,7 @@ export class WithdrawalsContributionsComponent {
     private settingHttpService: SettingsHttpService,
     private timelineHttpService: TimelineHttpService,
     private toastr: ToastrService,
+    private translate: TranslateService,
   ) {
     this.getData();
   }
@@ -170,8 +171,8 @@ export class WithdrawalsContributionsComponent {
         this.savingsPots.clientSavings[0].name.toLowerCase() === 'cash')
     ) {
       this.toastr.error(
-        'Before adding this, please create a new Saving Pot',
-        'Error!',
+        this.translate.instant('FLOWS.CREATE_SAVING_POT_FIRST'),
+        this.translate.instant('LABEL.ERROR'),
         { timeOut: 5000 },
       );
     } else {
@@ -190,7 +191,10 @@ export class WithdrawalsContributionsComponent {
           cashflowId: this.selectedCashflow?.id,
           forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
           forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
+          forecastStartDate: this.timeline.forecastStartDate,
+          planDuration: this.selectedCashflow?.planDuration,
           savingPots: this.savingsPots,
+          selectedClient: this.selectedClient,
           existingContributions:
             this.contributionWithdrawal?.contributions ?? [],
         },
@@ -211,8 +215,8 @@ export class WithdrawalsContributionsComponent {
         this.savingsPots.clientSavings[0].name.toLowerCase() === 'cash')
     ) {
       this.toastr.error(
-        'Before adding this, please create a new Saving Pot',
-        'Error!',
+        this.translate.instant('FLOWS.CREATE_SAVING_POT_FIRST'),
+        this.translate.instant('LABEL.ERROR'),
         { timeOut: 5000 },
       );
     } else {
@@ -231,7 +235,10 @@ export class WithdrawalsContributionsComponent {
           cashflowId: this.selectedCashflow?.id,
           forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
           forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
+          forecastStartDate: this.timeline.forecastStartDate,
+          planDuration: this.selectedCashflow?.planDuration,
           savingPots: this.savingsPots,
+          selectedClient: this.selectedClient,
           existingWithdrawals: this.contributionWithdrawal?.withdrawals ?? [],
         },
       });
@@ -267,7 +274,10 @@ export class WithdrawalsContributionsComponent {
         isEditWorkflow: true,
         forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
         forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
+        forecastStartDate: this.timeline.forecastStartDate,
+        planDuration: this.selectedCashflow?.planDuration,
         savingPots: this.savingsPots,
+        selectedClient: this.selectedClient,
         existingContributions: this.contributionWithdrawal?.contributions ?? [],
       },
     });
@@ -297,7 +307,10 @@ export class WithdrawalsContributionsComponent {
         isEditWorkflow: true,
         forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
         forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
+        forecastStartDate: this.timeline.forecastStartDate,
+        planDuration: this.selectedCashflow?.planDuration,
         savingPots: this.savingsPots,
+        selectedClient: this.selectedClient,
         existingWithdrawals: this.contributionWithdrawal?.withdrawals ?? [],
       },
     });
@@ -379,24 +392,48 @@ export class WithdrawalsContributionsComponent {
   ): string {
     const currentDescription = (item?.description ?? '').toString().trim();
     const potId = (item?.associatedSavingPotId ?? '').toString();
-    const potName = this.savingPotNameById[potId];
-    const prefix =
-      type === 'contribution' ? 'Contribution to' : 'Withdrawal from';
+    const potNameRaw = potId ? this.savingPotNameById[potId] : '';
+    const localizedPotName = potNameRaw
+      ? this.translate.instant(potNameRaw)
+      : '';
 
-    if (!potName) {
+    /** Canonical English phrases persisted by the app / API; localized at display time. */
+    if (type === 'contribution') {
+      const inheritanceMatch =
+        /^Inheritance contribution to (.+)$/i.exec(currentDescription);
+      if (inheritanceMatch) {
+        const potLabel =
+          localizedPotName ||
+          this.translate.instant(inheritanceMatch[1].trim());
+        return this.translate.instant(
+          'FLOWS.DISPLAY.INHERITANCE_CONTRIBUTION_TO_POT',
+          { pot: potLabel },
+        );
+      }
+    }
+
+    const prefixEn =
+      type === 'contribution' ? 'Contribution to' : 'Withdrawal from';
+    const templateKey =
+      type === 'contribution'
+        ? 'FLOWS.DISPLAY.CONTRIBUTION_TO_POT'
+        : 'FLOWS.DISPLAY.WITHDRAWAL_FROM_POT';
+
+    if (!potNameRaw) {
       return currentDescription;
     }
 
     const isAutoGenerated =
       currentDescription === '' ||
-      currentDescription === prefix ||
-      currentDescription.startsWith(`${prefix} `);
+      currentDescription === prefixEn ||
+      currentDescription.startsWith(`${prefixEn} `) ||
+      currentDescription === `${prefixEn} ${potNameRaw}`;
 
     if (!isAutoGenerated) {
       return currentDescription;
     }
 
-    return `${prefix} ${potName}`;
+    return this.translate.instant(templateKey, { pot: localizedPotName });
   }
 
   private rebuildSavingPotNameMap(): void {
@@ -416,13 +453,13 @@ export class WithdrawalsContributionsComponent {
     const activeIncomes = (this.incomeExpense?.incomes ?? []).filter(
       (item) =>
         this.isIncludedIncome(item) &&
-        this.isHappeningInYear(item, currentYear),
+        this.isIncludedInAnnualTotal(item, currentYear),
     );
 
     const activeExpenses = (this.incomeExpense?.expenses ?? []).filter(
       (item) =>
         this.isIncludedExpense(item) &&
-        this.isHappeningInYear(item, currentYear),
+        this.isIncludedInAnnualTotal(item, currentYear),
     );
 
     const totalIncome = activeIncomes.reduce(
@@ -458,29 +495,25 @@ export class WithdrawalsContributionsComponent {
     );
   }
 
-  private isHappeningInYear(item: FinancialViewModel, year: number): boolean {
-    const desc = (item?.description ?? '').toLowerCase();
-    const isStatePension =
-      desc === 'state pension' || desc === 'state pension (partner)';
-
-    // Include State pension (client & partner) in total like Salary & Inheritance, regardless of start year
-    if (isStatePension) return true;
-
-    const startYear = Number(item?.start?.year ?? 0);
-    const endYearRaw = Number(item?.end?.year ?? 0);
-    const hasEnd = endYearRaw > 0;
+  /**
+   * One-off / every year: only when start year equals the target year.
+   * Other recurring: start on or before that year, and on or before end year when end is set (aligned with API).
+   */
+  private isIncludedInAnnualTotal(item: FinancialViewModel, year: number): boolean {
     const cycleDescription = (item?.amount?.cycle?.description ?? '')
       .toString()
       .toLowerCase();
     const isOneOff = cycleDescription === 'one-off';
+    const isYearly =
+      cycleDescription === 'every year' || cycleDescription === 'yearly';
+    const startYear = Number(item?.start?.year ?? 0);
+    const endYearRaw = Number(item?.end?.year ?? 0);
+    const hasEnd = endYearRaw > 0;
 
-    // If no start year is set, treat the item as currently active
-    if (!startYear) return !isOneOff;
-    if (isOneOff) {
+    if (isOneOff || isYearly) {
       return startYear === year;
     }
-
-    if (year < startYear) return false;
+    if (startYear && year < startYear) return false;
     if (hasEnd && year > endYearRaw) return false;
     return true;
   }
@@ -491,9 +524,18 @@ export class WithdrawalsContributionsComponent {
       .toString()
       .toLowerCase();
 
-    let yearlyAmount = cycleDescription.includes('month')
-      ? baseAmount * 12
-      : baseAmount;
+    let yearlyAmount: number;
+    if (cycleDescription.includes('month')) {
+      yearlyAmount = baseAmount * 12;
+    } else if (
+      cycleDescription === 'every year' ||
+      cycleDescription === 'yearly'
+    ) {
+      const sy = Number(item?.start?.year ?? 0);
+      yearlyAmount = sy === year ? baseAmount : 0;
+    } else {
+      yearlyAmount = baseAmount;
+    }
 
     if (item?.bonus?.enabled && Number(item?.bonus?.amount?.amount ?? 0) > 0) {
       const bonusCycleDesc = (
@@ -510,6 +552,12 @@ export class WithdrawalsContributionsComponent {
         const bonusAmount = Number(item.bonus.amount.amount ?? 0);
         if (bonusCycleDesc.includes('month')) {
           yearlyAmount += bonusAmount * 12;
+        } else if (
+          bonusCycleDesc === 'every year' ||
+          bonusCycleDesc === 'yearly'
+        ) {
+          const sy = Number(item?.start?.year ?? 0);
+          if (sy === year) yearlyAmount += bonusAmount;
         } else {
           yearlyAmount += bonusAmount;
         }

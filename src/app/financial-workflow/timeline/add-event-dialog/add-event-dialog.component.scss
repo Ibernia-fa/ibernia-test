@@ -1,3 +1,9 @@
+/* Custom goal name — matInput + OnPush: ensure native placeholder is visible */
+:host .custom-goal-name-input::placeholder {
+  color: #b7b6c2;
+  opacity: 1;
+}
+
 .bold-icon {
   height: 22px;
   width: 22px;
@@ -315,4 +321,10 @@
       }
     }
   }
+}
+
+.resale-wrapper {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(2, 1fr);
 }

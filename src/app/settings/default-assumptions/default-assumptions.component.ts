@@ -13,7 +13,7 @@ import {
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { allCountries } from 'src/app/clients/models/country';
 import { NavItemService } from 'src/app/layouts/full/nav-item.service';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -64,12 +64,7 @@ export class DefaultAssumptionsComponent implements OnInit, OnDestroy {
   private preferencesSnapshot: Record<string, unknown> | null = null;
   private loadedProfile: UserProfileDto | null = null;
 
-  comissionTypes = [
-    { label: 'None', value: ComissionType.None },
-    { label: 'Percentage', value: ComissionType.Percentage },
-    { label: 'Fixed Amount', value: ComissionType.Amount },
-    { label: 'Both', value: ComissionType.Both },
-  ];
+  comissionTypes: { label: string; value: ComissionType }[] = [];
 
   user: any;
   @ViewChild('commissionAmountInput') commissionAmountInput?: ElementRef<HTMLInputElement>;
@@ -79,11 +74,17 @@ export class DefaultAssumptionsComponent implements OnInit, OnDestroy {
       inflationRate: [2.5 as number, [Validators.required, Validators.min(0), Validators.max(100)]],
       investmentReturn: [6 as number, [Validators.required, Validators.min(0), Validators.max(100)]],
       pensionFundReturn: [4 as number, [Validators.required, Validators.min(0), Validators.max(100)]],
+      pensionReplacementRate: [50 as number, [Validators.required, Validators.min(0), Validators.max(100)]],
       comissionType: [ComissionType.None as ComissionType, [Validators.required]],
       comissionPercentage: [1 as number | null],
       comissionAmount: [null as number | null],
       currency: ['EUR', [Validators.required]],
       country: ['' as string],
+      mortgageInterestRate: [3.5 as number, [Validators.required, Validators.min(0), Validators.max(100)]],
+      loanInterestRate: [8 as number, [Validators.required, Validators.min(0), Validators.max(100)]],
+      partnerInheritanceTaxRate: [4 as number, [Validators.required, Validators.min(0), Validators.max(100)]],
+      childInheritanceTaxRate: [4 as number, [Validators.required, Validators.min(0), Validators.max(100)]],
+      siblingInheritanceTaxRate: [6 as number, [Validators.required, Validators.min(0), Validators.max(100)]],
     }),
   });
 
@@ -93,12 +94,19 @@ export class DefaultAssumptionsComponent implements OnInit, OnDestroy {
     private auth: AuthService,
     private cdr: ChangeDetectorRef,
     private navItemService: NavItemService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private translate: TranslateService
   ) {
     this.navItemService.currentRouteName = 'Default Assumptions';
   }
 
   ngOnInit(): void {
+    this.comissionTypes = [
+      { label: this.translate.instant('LABEL.NONE'), value: ComissionType.None },
+      { label: this.translate.instant('Percentage'), value: ComissionType.Percentage },
+      { label: this.translate.instant('Fixed Amount'), value: ComissionType.Amount },
+      { label: this.translate.instant('Both'), value: ComissionType.Both },
+    ];
     this.user = this.auth.getUserProfile();
 
     this.form.controls.preferences.controls.comissionType.valueChanges
@@ -145,11 +153,17 @@ export class DefaultAssumptionsComponent implements OnInit, OnDestroy {
               inflationRate: p.preferences?.inflationRate ?? 2.5,
               investmentReturn: p.preferences?.investmentReturn ?? 6,
               pensionFundReturn: p.preferences?.pensionFundReturn ?? 4,
+              pensionReplacementRate: p.preferences?.pensionReplacementRate ?? 50,
               comissionType: (p.preferences?.comissionType as ComissionType) ?? ComissionType.None,
               comissionPercentage: p.preferences?.comissionPercentage ?? null,
               comissionAmount: p.preferences?.comissionAmount ?? null,
               currency: p.preferences?.currency ?? 'EUR',
               country: p.preferences?.country ?? '',
+              mortgageInterestRate: p.preferences?.mortgageInterestRate ?? 3.5,
+              loanInterestRate: p.preferences?.loanInterestRate ?? 8,
+              partnerInheritanceTaxRate: p.preferences?.partnerInheritanceTaxRate ?? 4,
+              childInheritanceTaxRate: p.preferences?.childInheritanceTaxRate ?? 4,
+              siblingInheritanceTaxRate: p.preferences?.siblingInheritanceTaxRate ?? 6,
             },
           });
 
@@ -229,11 +243,17 @@ export class DefaultAssumptionsComponent implements OnInit, OnDestroy {
       prefs.inflationRate !== snap['inflationRate'] ||
       prefs.investmentReturn !== snap['investmentReturn'] ||
       prefs.pensionFundReturn !== snap['pensionFundReturn'] ||
+      prefs.pensionReplacementRate !== snap['pensionReplacementRate'] ||
       prefs.comissionType !== snap['comissionType'] ||
       prefs.comissionPercentage !== snap['comissionPercentage'] ||
       prefs.comissionAmount !== snap['comissionAmount'] ||
       prefs.currency !== snap['currency'] ||
-      (prefs.country ?? '') !== (snap['country'] ?? '')
+      (prefs.country ?? '') !== (snap['country'] ?? '') ||
+      prefs.mortgageInterestRate !== snap['mortgageInterestRate'] ||
+      prefs.loanInterestRate !== snap['loanInterestRate'] ||
+      prefs.partnerInheritanceTaxRate !== snap['partnerInheritanceTaxRate'] ||
+      prefs.childInheritanceTaxRate !== snap['childInheritanceTaxRate'] ||
+      prefs.siblingInheritanceTaxRate !== snap['siblingInheritanceTaxRate']
     );
   }
 
@@ -262,6 +282,7 @@ export class DefaultAssumptionsComponent implements OnInit, OnDestroy {
         inflationRate: round2(raw.preferences.inflationRate),
         investmentReturn: round2(raw.preferences.investmentReturn),
         pensionFundReturn: round2(raw.preferences.pensionFundReturn),
+        pensionReplacementRate: round2(raw.preferences.pensionReplacementRate),
         comissionType: raw.preferences.comissionType,
         comissionPercentage:
           raw.preferences.comissionType === ComissionType.Amount ||
@@ -275,6 +296,11 @@ export class DefaultAssumptionsComponent implements OnInit, OnDestroy {
             : intOrNull(raw.preferences.comissionAmount),
         currency: raw.preferences.currency,
         country: blankToNull(raw.preferences.country),
+        mortgageInterestRate: round2(raw.preferences.mortgageInterestRate),
+        loanInterestRate: round2(raw.preferences.loanInterestRate),
+        partnerInheritanceTaxRate: round2(raw.preferences.partnerInheritanceTaxRate),
+        childInheritanceTaxRate: round2(raw.preferences.childInheritanceTaxRate),
+        siblingInheritanceTaxRate: round2(raw.preferences.siblingInheritanceTaxRate),
       },
     };
   }
@@ -283,7 +309,7 @@ export class DefaultAssumptionsComponent implements OnInit, OnDestroy {
     this.submitted = true;
     if (this.form.invalid) {
       this.form.markAllAsTouched();
-      this.toastr.error('Please fix the highlighted fields', 'Error!');
+      this.toastr.error(this.translate.instant('ERROR.FIX_FIELDS'), this.translate.instant('LABEL.ERROR'));
       return;
     }
     this.isSavingPreferences = true;
@@ -292,8 +318,8 @@ export class DefaultAssumptionsComponent implements OnInit, OnDestroy {
       .pipe(
         takeUntil(this.destroy$),
         catchError((err) => {
-          const msg = err?.error?.message ?? 'Failed to save preferences';
-          this.toastr.error(msg, 'Error!');
+          const msg = err?.error?.message ?? this.translate.instant('ERROR.FAILED_SAVE_PREFERENCES');
+          this.toastr.error(msg, this.translate.instant('LABEL.ERROR'));
           return EMPTY;
         }),
         finalize(() => {
@@ -304,7 +330,7 @@ export class DefaultAssumptionsComponent implements OnInit, OnDestroy {
       .subscribe(() => {
         this.updateSnapshots();
         this.loadedProfile = { ...this.loadedProfile!, preferences: this.form.getRawValue().preferences };
-        this.toastr.success('Preferences saved', 'Success!');
+        this.toastr.success(this.translate.instant('TOAST.PREFERENCES_SAVED'), this.translate.instant('LABEL.SUCCESS'));
         this.api.notifyProfileChanged();
         this.cdr.markForCheck();
       });
@@ -316,7 +342,7 @@ export class DefaultAssumptionsComponent implements OnInit, OnDestroy {
   }
 
   onCommissionAmountInput(rawValue: string) {
-    const value = parseFormattedNumber(rawValue);
+    const value = parseFormattedNumber(rawValue, this.translate.currentLang);
     this.form.controls.preferences.controls.comissionAmount.setValue(value, { emitEvent: false });
     const el = this.commissionAmountInput?.nativeElement;
     if (!el) return;

@@ -1,369 +1,315 @@
 <div class="mortgage-calculator">
-  <div class="d-flex items-center justify-content-between m-b-16">
-    <div class="calculator-header d-flex align-items-center gap-8">
-      <!-- <img src="assets/images/svgs/cashflow-moneys-icon.svg" alt="calculator" width="20" /> -->
-      <h4 class="f-w-700">
-        {{ "Mortgage or loan calculator" | translate }}
-      </h4>
-      <img
-        src="assets/images/svgs/help-circle-icon.svg"
-        alt="help"
-        width="16"
-        matTooltip="{{
-          config?.notes ||
-            ('Calculate your monthly payment based on property price, down payment, interest rate and loan term.'
-              | translate)
-        }}"
-      />
-    </div>
-    <button type="button" class="close-mortgage-calculator">
-      <svg
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          d="M18 6L6 18"
-          stroke="#787889"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        />
-        <path
-          d="M6 6L18 18"
-          stroke="#787889"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        />
-      </svg>
-    </button>
-  </div>
-
-  <div
-    [formGroup]="mortgageForm"
-    class="calculator-body d-flex flex-column gap-16"
-  >
-    @if (hasResidencyTiers) {
-      <div class="d-flex flex-column gap-6">
-        <mat-label class="f-s-16 f-w-500 d-block ibr-black calc-label">{{
-          "Residency status" | translate
-        }}</mat-label>
-        <div class="select-option">
-          <mat-select
-            formControlName="residencyType"
-            hideSingleSelectionIndicator
-          >
-            @for (tier of residencyTiers; track tier.value) {
-              <mat-option [value]="tier.value">{{
-                tier.label | translate
-              }}</mat-option>
-            }
-          </mat-select>
-        </div>
-      </div>
-    }
-
-    <!-- Row 1: Property price + Down payment -->
-    <div class="row calc-row">
-      <div class="col-6">
+  @if (!result) {
+    <div
+      [formGroup]="mortgageForm"
+      class="calculator-body d-flex flex-column gap-16"
+    >
+      @if (hasResidencyTiers) {
         <div class="d-flex flex-column gap-6">
           <mat-label class="f-s-16 f-w-500 d-block ibr-black calc-label">{{
-            "Property price" | translate
+            "Residency status" | translate
           }}</mat-label>
-          <div class="calc-input-row">
-            <span class="calc-currency">{{ currencySymbol }}</span>
-            <input
-              matInput
-              type="text"
-              inputmode="decimal"
-              formControlName="propertyPrice"
-              thousandSeparatorInput
-              placeholder="0"
-              class="calc-input"
-              (input)="onPropertyPriceInput()"
-            />
-          </div>
-          @if (
-            mortgageForm.get("propertyPrice")?.touched &&
-            mortgageForm.get("propertyPrice")?.hasError("required")
-          ) {
-            <span class="field-error d-block">{{
-              "Required" | translate
-            }}</span>
-          }
-          @if (highValueWarning) {
-            <span class="calc-warning d-block">{{ highValueWarning }}</span>
-          }
-        </div>
-      </div>
-      <div class="col-6">
-        <div class="d-flex flex-column gap-6">
-          <mat-label class="f-s-16 f-w-500 d-block ibr-black calc-label">{{
-            "Down payment" | translate
-          }}</mat-label>
-          <div class="calc-input-row">
-            <!-- @if (downPaymentMode === "currency") {
-              <span class="calc-currency">{{ currencySymbol }}</span>
-            } -->
-            <input
-              matInput
-              type="text"
-              inputmode="decimal"
-              formControlName="downPaymentValue"
-              thousandSeparatorInput
-              placeholder="0"
-              class="calc-input"
-            />
-            <div class="down-payment-toggle">
-              <label
-                class="dp-radio"
-                [class.active]="downPaymentMode === 'currency'"
-                (click)="toggleDownPaymentMode('currency')"
-              >
-                <span class="dp-radio-circle"></span>
-                <span>{{ currencySymbol }}</span>
-              </label>
-              <label
-                class="dp-radio"
-                [class.active]="downPaymentMode === 'percent'"
-                (click)="toggleDownPaymentMode('percent')"
-              >
-                <span class="dp-radio-circle"></span>
-                <span>%</span>
-              </label>
-            </div>
-          </div>
-          @if (
-            mortgageForm.get("downPaymentValue")?.touched &&
-            mortgageForm.get("downPaymentValue")?.hasError("min")
-          ) {
-            <span class="field-error d-block">{{
-              "Value must be 0 or greater" | translate
-            }}</span>
-          }
-          @if (
-            mortgageForm.get("downPaymentValue")?.touched &&
-            mortgageForm.get("downPaymentValue")?.hasError("max")
-          ) {
-            <span class="field-error d-block">
-              @if (downPaymentMode === "percent") {
-                Max 100%
-              } @else {
-                {{ "Cannot exceed property price" | translate }}
-              }
-            </span>
-          }
-        </div>
-      </div>
-    </div>
-
-    <!-- Row 2: Interest rate + Loan term -->
-    <div class="row calc-row">
-      <div class="col-6">
-        <div class="d-flex flex-column gap-6">
-          <mat-label class="f-s-16 f-w-500 d-block ibr-black calc-label"
-            >{{ "Interest rate" | translate }} (% p.a.)</mat-label
-          >
-          <div class="calc-input-row">
-            <input
-              matInput
-              type="number"
-              step="0.01"
-              formControlName="interestRate"
-              placeholder="5.0"
-              class="calc-input"
-            />
-            <span class="calc-suffix">
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M15.8337 4.16602L4.16699 15.8327"
-                  stroke="#48475D"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M5.41634 7.50065C6.56693 7.50065 7.49967 6.56791 7.49967 5.41732C7.49967 4.26672 6.56693 3.33398 5.41634 3.33398C4.26575 3.33398 3.33301 4.26672 3.33301 5.41732C3.33301 6.56791 4.26575 7.50065 5.41634 7.50065Z"
-                  stroke="#48475D"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M14.5833 16.6667C15.7339 16.6667 16.6667 15.7339 16.6667 14.5833C16.6667 13.4327 15.7339 12.5 14.5833 12.5C13.4327 12.5 12.5 13.4327 12.5 14.5833C12.5 15.7339 13.4327 16.6667 14.5833 16.6667Z"
-                  stroke="#48475D"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
-            </span>
-          </div>
-          @if (
-            mortgageForm.get("interestRate")?.touched &&
-            mortgageForm.get("interestRate")?.hasError("required")
-          ) {
-            <span class="field-error d-block">{{
-              "Required" | translate
-            }}</span>
-          }
-        </div>
-      </div>
-      <div class="col-6">
-        <div class="d-flex flex-column gap-6">
-          <mat-label class="f-s-16 f-w-500 d-block ibr-black calc-label">{{
-            "Loan term" | translate
-          }}</mat-label>
-          <div class="select-option position-relative">
+          <div class="select-option">
             <mat-select
-              formControlName="loanTermYears"
+              formControlName="residencyType"
               hideSingleSelectionIndicator
             >
-              @for (term of loanTermOptions; track term) {
-                <mat-option [value]="term"
-                  >{{ term }} {{ "years" | translate }}</mat-option
-                >
+              @for (tier of residencyTiers; track tier.value) {
+                <mat-option [value]="tier.value">{{
+                  tier.label | translate
+                }}</mat-option>
               }
             </mat-select>
-            <span class="custom-arrow">
-              <svg
-                width="12"
-                height="7"
-                viewBox="0 0 12 7"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M1 1L6 6L11 1"
-                  stroke="#2B3942"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
-            </span>
+          </div>
+        </div>
+      }
+
+      <!-- Row 1: Property price + Down payment -->
+      <div class="row calc-row">
+        <div class="col-6">
+          <div class="d-flex flex-column gap-6">
+            <mat-label class="f-s-16 f-w-500 d-block ibr-black calc-label">{{
+              priceLabel | translate
+            }}</mat-label>
+            <div class="calc-input-row">
+              <span class="calc-currency">{{ currencySymbol }}</span>
+              <input
+                matInput
+                type="text"
+                inputmode="decimal"
+                formControlName="propertyPrice"
+                thousandSeparatorInput
+                placeholder="0"
+                class="calc-input"
+                (input)="onPropertyPriceInput()"
+              />
+            </div>
+            @if (
+              mortgageForm.get("propertyPrice")?.touched &&
+              mortgageForm.get("propertyPrice")?.hasError("required")
+            ) {
+              <span class="field-error d-block">{{
+                "Required" | translate
+              }}</span>
+            }
+            @if (highValueWarning) {
+              <span class="calc-warning d-block">{{ highValueWarning }}</span>
+            }
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="d-flex flex-column gap-6">
+            <mat-label class="f-s-16 f-w-500 d-block ibr-black calc-label">{{
+              "Down payment" | translate
+            }}</mat-label>
+            <div class="calc-input-row">
+              <input
+                matInput
+                type="text"
+                inputmode="decimal"
+                formControlName="downPaymentValue"
+                thousandSeparatorInput
+                placeholder="0"
+                class="calc-input"
+              />
+              <div class="down-payment-toggle">
+                <label
+                  class="dp-radio"
+                  [class.active]="downPaymentMode === 'currency'"
+                  (click)="toggleDownPaymentMode('currency')"
+                >
+                  <span class="dp-radio-circle"></span>
+                  <span>{{ currencySymbol }}</span>
+                </label>
+                <label
+                  class="dp-radio"
+                  [class.active]="downPaymentMode === 'percent'"
+                  (click)="toggleDownPaymentMode('percent')"
+                >
+                  <span class="dp-radio-circle"></span>
+                  <span>%</span>
+                </label>
+              </div>
+            </div>
+            @if (
+              mortgageForm.get("downPaymentValue")?.touched &&
+              mortgageForm.get("downPaymentValue")?.hasError("min")
+            ) {
+              <span class="field-error d-block">{{
+                "Value must be 0 or greater" | translate
+              }}</span>
+            }
+            @if (
+              mortgageForm.get("downPaymentValue")?.touched &&
+              mortgageForm.get("downPaymentValue")?.hasError("max")
+            ) {
+              <span class="field-error d-block">
+                @if (downPaymentMode === "percent") {
+                  Max 100%
+                } @else {
+                  {{ "Cannot exceed property price" | translate }}
+                }
+              </span>
+            }
           </div>
         </div>
       </div>
-    </div>
 
-    <div class="calc-disclaimer">
-      {{
-        "Calculations shown are indicative. Verify with your bank for exact terms."
-          | translate
-      }}
-    </div>
-
-    <button
-      (click)="onCalculate()"
-      class="calc-btn calc-btn-secondary"
-      type="button"
-    >
-      <span>Calculate</span>
-    </button>
-
-    @if (result) {
-      <div class="calc-results">
-        <div class="calc-result-grid">
-          <div class="calc-result-item highlight d-flex flex-column gap-12">
-            <span class="calc-result-label">{{
-              "Total monthly payment" | translate
-            }}</span>
-            <span class="calc-result-value primary"
-              >{{ currencySymbol
-              }}{{ result.monthlyEMI | thousandSeparator }}</span
-            >
-          </div>
-          <div class="calc-result-item">
-            <span class="calc-result-label">{{
-              "Down payment" | translate
-            }}</span>
-            <span class="calc-result-value"
-              >{{ currencySymbol
-              }}{{ result.downPaymentAmount | thousandSeparator }}</span
-            >
-          </div>
-          <div class="calc-result-item">
-            <span class="calc-result-label text-right">{{
-              "Loan amount" | translate
-            }}</span>
-            <span class="calc-result-value text-right"
-              >{{ currencySymbol
-              }}{{ result.loanAmount | thousandSeparator }}</span
-            >
-          </div>
-          <div class="calc-result-item">
-            <span class="calc-result-label">{{
-              "Total interest" | translate
-            }}</span>
-            <span class="calc-result-value"
-              >{{ currencySymbol
-              }}{{ result.totalInterest | thousandSeparator }}</span
-            >
-          </div>
-          <div class="calc-result-item">
-            <span class="calc-result-label text-right">{{
-              "Total payable" | translate
-            }}</span>
-            <span class="calc-result-value text-right"
-              >{{ currencySymbol
-              }}{{ result.totalPayable | thousandSeparator }}</span
-            >
+      <!-- Row 2: Interest rate + Loan term -->
+      <div class="row calc-row">
+        <div class="col-6">
+          <div class="d-flex flex-column gap-6">
+            <mat-label class="f-s-16 f-w-500 d-block ibr-black calc-label">{{
+              "Interest rate" | translate
+            }}</mat-label>
+            <div class="calc-input-row">
+              <input
+                matInput
+                type="number"
+                step="0.01"
+                formControlName="interestRate"
+                placeholder="5.0"
+                class="calc-input"
+              />
+              <span class="calc-suffix">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M15.8337 4.16602L4.16699 15.8327"
+                    stroke="#48475D"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M5.41634 7.50065C6.56693 7.50065 7.49967 6.56791 7.49967 5.41732C7.49967 4.26672 6.56693 3.33398 5.41634 3.33398C4.26575 3.33398 3.33301 4.26672 3.33301 5.41732C3.33301 6.56791 4.26575 7.50065 5.41634 7.50065Z"
+                    stroke="#48475D"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M14.5833 16.6667C15.7339 16.6667 16.6667 15.7339 16.6667 14.5833C16.6667 13.4327 15.7339 12.5 14.5833 12.5C13.4327 12.5 12.5 13.4327 12.5 14.5833C12.5 15.7339 13.4327 16.6667 14.5833 16.6667Z"
+                    stroke="#48475D"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </span>
+            </div>
+            @if (
+              mortgageForm.get("interestRate")?.touched &&
+              mortgageForm.get("interestRate")?.hasError("required")
+            ) {
+              <span class="field-error d-block">{{
+                "Required" | translate
+              }}</span>
+            }
           </div>
         </div>
+        <div class="col-6">
+          <div class="d-flex flex-column gap-6">
+            <mat-label class="f-s-16 f-w-500 d-block ibr-black calc-label">{{
+              "Loan term" | translate
+            }}</mat-label>
+            <div class="select-option position-relative">
+              <mat-select
+                formControlName="loanTermYears"
+                hideSingleSelectionIndicator
+              >
+                @for (term of loanTermOptions; track term) {
+                  <mat-option [value]="term"
+                    >{{ term }} {{ "years" | translate }}</mat-option
+                  >
+                }
+              </mat-select>
+              <span class="custom-arrow">
+                <svg
+                  width="12"
+                  height="7"
+                  viewBox="0 0 12 7"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M1 1L6 6L11 1"
+                    stroke="#2B3942"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
 
-        <div class="apply-btn-group">
-          <button type="button" class="back-btn">
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M19 12L5 12"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-              <path
-                d="M12 19L5 12L12 5"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-            </svg>
-          </button>
+      <div class="calc-disclaimer">
+        {{
+          "Calculations shown are indicative. Verify with your bank for exact terms."
+            | translate
+        }}
+      </div>
 
-          <button
-            (click)="onApply()"
-            class="calc-btn calc-btn-primary"
-            type="button"
+      <button
+        (click)="onCalculate()"
+        class="calc-btn calc-btn-secondary"
+        type="button"
+      >
+        <span>{{ 'Calculate' | translate }}</span>
+      </button>
+    </div>
+  } @else {
+    <div class="calc-results">
+      <div class="calc-result-grid">
+        <div class="calc-result-item highlight d-flex flex-column gap-12">
+          <span class="calc-result-label">{{
+            "Total monthly payment" | translate
+          }}</span>
+          <span class="calc-result-value primary"
+            >{{ currencySymbol
+            }}{{ result.monthlyEMI | thousandSeparator }}</span
           >
-            <span>Apply</span>
-          </button>
         </div>
+        <div class="calc-result-item">
+          <span class="calc-result-label">{{
+            "Down payment" | translate
+          }}</span>
+          <span class="calc-result-value"
+            >{{ currencySymbol
+            }}{{ result.downPaymentAmount | thousandSeparator }}</span
+          >
+        </div>
+        <div class="calc-result-item">
+          <span class="calc-result-label text-right">{{
+            "Loan amount" | translate
+          }}</span>
+          <span class="calc-result-value text-right"
+            >{{ currencySymbol
+            }}{{ result.loanAmount | thousandSeparator }}</span
+          >
+        </div>
+        <div class="calc-result-item">
+          <span class="calc-result-label">{{
+            "Total interest" | translate
+          }}</span>
+          <span class="calc-result-value"
+            >{{ currencySymbol
+            }}{{ result.totalInterest | thousandSeparator }}</span
+          >
+        </div>
+        <div class="calc-result-item">
+          <span class="calc-result-label text-right">{{
+            "Total payable" | translate
+          }}</span>
+          <span class="calc-result-value text-right"
+            >{{ currencySymbol
+            }}{{ result.totalPayable | thousandSeparator }}</span
+          >
+        </div>
+      </div>
 
-        <!-- <button
+      <div class="apply-btn-group">
+        <button type="button" class="back-btn" (click)="onBack()">
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M19 12L5 12"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M12 19L5 12L12 5"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </button>
+
+        <button
           (click)="onApply()"
           class="calc-btn calc-btn-primary"
           type="button"
         >
-          <span>Apply</span>
-        </button> -->
+          <span>{{ 'Apply' | translate }}</span>
+        </button>
       </div>
-    }
-  </div>
+    </div>
+  }
 </div>

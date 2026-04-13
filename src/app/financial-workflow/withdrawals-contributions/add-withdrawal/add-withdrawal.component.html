@@ -4,7 +4,7 @@
     <!-- Modal Header  -->
     <div class="dialog-header">
       <h2 class="dialog-title text-center">
-        {{ dialogTitle }}
+        {{ dialogTitle | translate }}
       </h2>
       <button
         type="button"
@@ -26,9 +26,9 @@
       <div [formGroup]="withdrawalForm" class="d-flex flex-column gap-16">
         <div class="start-end">
           <div class="d-flex flex-column gap-8">
-            <div class="d-flex gap-8 align-items-center">
+            <div class="d-flex gap-4 align-items-center">
               <mat-label class="f-s-16 f-w-500 ibr-black d-block"
-                >Withdraw from saving pot</mat-label
+                >{{ 'Withdraw from saving pot' | translate }}</mat-label
               >
               <img
                 width="18"
@@ -49,7 +49,7 @@
                     >
                       @for (saving of savingPots.clientSavings; track saving) {
                         <mat-option [value]="saving.id">{{
-                          saving.name
+                          getSavingPotSelectLabel(saving)
                         }}</mat-option>
                       }
                     </mat-select>
@@ -108,9 +108,6 @@
                   type="text"
                   formControlName="amount"
                   #amountInput
-                  [value]="
-                    withdrawalForm.get('amount')?.value | thousandSeparator
-                  "
                   thousandSeparatorInput
                   (input)="onAmountInput($event.target.value)"
                   placeholder="0"
@@ -126,7 +123,7 @@
                 >
                   @for (cycle of cycles; track cycle) {
                     <mat-option [value]="cycle.id">{{
-                      cycle.description
+                      getCycleLabel(cycle)
                     }}</mat-option>
                   }
                 </mat-select>
@@ -155,15 +152,15 @@
         <!-- Start/End -->
         <div class="start-end">
           <div class="d-flex flex-column gap-8">
-            <div class="d-flex gap-8 align-items-center">
+            <div class="d-flex gap-4 align-items-center">
               <mat-label
-                class="f-s-16 f-w-400 ibr-black d-block"
+                class="f-s-16 f-w-500 ibr-black d-block"
                 style="line-height: 16px"
               >
                 @if (showStartEnd) {
-                  Start & end
+                  {{ 'Start & end' | translate }}
                 } @else {
-                  Date
+                  {{ 'Date' | translate }}
                 }
               </mat-label>
               <img
@@ -185,20 +182,20 @@
                     >
                       @if (isEditWorkflow || eventsList?.length > 0) {
                         <mat-option [value]="currentYear"
-                          >This year ({{ currentYear }})</mat-option
+                          >{{ 'LABEL.THIS_YEAR' | translate }} ({{ currentYear }})</mat-option
                         >
                       }
                       @for (event of eventsList; track event) {
                         <mat-option [value]="'event:' + event.id"
-                          >{{ event.name }} ({{
+                          >{{ getTimelineEventLabel(event.name) }} ({{
                             getAgeForYear(event.start.year)
                           }})</mat-option
                         >
                       }
                       <hr />
-                      @for (year of years; let i = $index; track year) {
+                      @for (year of years; track year) {
                         <mat-option [value]="year"
-                          >{{ year }} ({{ clientAge + i }})</mat-option
+                          >{{ year }} ({{ getAgeForYear(year) }})</mat-option
                         >
                       }
                     </mat-select>
@@ -252,12 +249,12 @@
                           currentYear >= getStartYear()
                         ) {
                           <mat-option [value]="currentYear"
-                            >This year ({{ currentYear }})</mat-option
+                            >{{ 'LABEL.THIS_YEAR' | translate }} ({{ currentYear }})</mat-option
                           >
                         }
                         @for (event of getEndEvents(); track event.id) {
                           <mat-option [value]="'event:' + event.id"
-                            >{{ event.name }} ({{
+                            >{{ getTimelineEventLabel(event.name) }} ({{
                               getAgeForYear(event.start.year)
                             }})</mat-option
                           >
@@ -301,7 +298,7 @@
                       withdrawalForm.get("end")?.hasError("endBeforeStart")
                     ) {
                       <span class="field-error d-block"
-                        >End year cannot be before start year</span
+                        >{{ 'End year cannot be before start year' | translate }}</span
                       >
                     }
                   </div>
@@ -314,13 +311,15 @@
         <!-- @if(showStartEnd) {
         <div class="w-100 form-field gap-20">
           <div class="w-100 form-field gap-8 ">
-            <mat-label class="f-s-16 f-w-400 d-flex gap-8 align-items-center">Escalation rate <img width="18"
+            <mat-label class="f-s-16 f-w-400 d-flex gap-8 align-items-center">{{ 'Escalation rate' | translate }} <img width="18"
                 src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" /></mat-label>
             <div class="w-100 form-field">
               <div class="select-option">
                 <mat-select formControlName="escalationRate" (selectionChange)="onEscalationRateChange($event)">
                   @for (escalationRate of escalationRates; track escalationRate) {
-                  <mat-option [value]="escalationRate.value">{{ escalationRate.description }}</mat-option>
+                  <mat-option [value]="escalationRate.value">{{
+                  escalationRate.description | translateEscalationDescription
+                }}</mat-option>
                   }
                 </mat-select>
               </div>
@@ -335,7 +334,7 @@
 
           @if(selectedEscalationDescription === 'Increases at custom rate') {
           <div class="w-100 form-field gap-8">
-            <mat-label class="f-s-16 d-block">Custom escalation rate</mat-label>
+            <mat-label class="f-s-16 d-block">{{ 'Custom escalation rate' | translate }}</mat-label>
             <mat-form-field appearance="outline" class="w-full w-100 percentage-icon">
               <span matSuffix>%</span>
               <input matInput type="number" formControlName="customEscalationRate" placeholder="0" />
@@ -366,11 +365,11 @@
         <button
           (click)="addExpense()"
           type="button"
-          [disabled]="withdrawalForm.invalid"
+          [disabled]="isWithdrawalSaveButtonDisabled"
           class="button-icon w-100 d-block"
         >
           <!-- <span class="f-s-16">{{isEditWorkflow ? 'Save' : 'Add'}} Withdrawal</span> -->
-          <span class="f-s-16">Save</span>
+          <span class="f-s-16">{{ 'Save' | translate }}</span>
         </button>
       </div>
     </div>

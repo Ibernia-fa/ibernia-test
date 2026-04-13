@@ -116,7 +116,7 @@
           <div class="status-label">
             <span class="label-text">{{ "Profile picture" | translate }}</span>
             <span class="label-status">{{
-              (hasProfilePicture ? "Added" : "Not added") | translate
+              hasProfilePicture ? ('Added' | translate) : ('Not added' | translate)
             }}</span>
           </div>
         </div>
@@ -175,7 +175,7 @@
           <div class="status-label">
             <span class="label-text">{{ "Bio" | translate }}</span>
             <span class="label-status">{{
-              (hasBio ? "Added" : "Not added") | translate
+              hasBio ? ('Added' | translate) : ('Not added' | translate)
             }}</span>
           </div>
         </div>

@@ -76,18 +76,18 @@
             id="mobile"
             name="mobile"
             [(ngModel)]="local_data.Mobile"
-            placeholder="Mobile"
+            placeholder="{{ 'LABEL.MOBILE' | translate }}"
           />
         </mat-form-field>
       </div>
       <div class="col-lg-4">
-        <mat-label class="f-s-14 f-w-600 m-b-8 d-block"
-          >Date of Birth</mat-label
-        >
+        <mat-label class="f-s-14 f-w-600 m-b-8 d-block">{{
+          'LABEL.DATE_OF_BIRTH' | translate
+        }}</mat-label>
         <mat-form-field appearance="outline" class="w-100">
           <input
             type="date"
-            placeholder="Date of Birth"
+            placeholder="{{ 'LABEL.DATE_OF_BIRTH' | translate }}"
             matInput
             required
             id="doj"
@@ -97,7 +97,9 @@
         </mat-form-field>
       </div>
       <div class="col-lg-4">
-        <mat-label class="f-s-14 f-w-600 m-b-8 d-block">Salary</mat-label>
+        <mat-label class="f-s-14 f-w-600 m-b-8 d-block">{{
+          'LABEL.SALARY' | translate
+        }}</mat-label>
         <mat-form-field appearance="outline" class="w-100">
           <input
             type="text"
@@ -106,7 +108,7 @@
             id="salary"
             name="salary"
             [(ngModel)]="local_data.Salary"
-            placeholder="Salary"
+            placeholder="{{ 'LABEL.SALARY' | translate }}"
           />
         </mat-form-field>
       </div>
@@ -145,7 +147,9 @@
   </div>
   } @else {
   <p>
-    Sure to delete <span class="f-w-600">{{ local_data.Name }}</span> ?
+    {{ 'CONFIRM.DELETE_ITEM_PREFIX' | translate }}
+    <span class="f-w-600">{{ local_data.Name }}</span>
+    {{ 'CONFIRM.DELETE_ITEM_SUFFIX' | translate }}
   </p>
   }
 </div>

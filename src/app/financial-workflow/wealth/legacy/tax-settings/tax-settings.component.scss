@@ -1,33 +1,30 @@
-.dialog-form {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding-top: 8px;
+/* Commission-style percentage suffix — matches add-contribution */
+:host .form-field.position-relative input {
+  padding-right: 32px;
 }
 
-.full-width { width: 100%; }
-
-.dialog-btn {
-  height: 40px;
-  padding: 0 24px;
-  border-radius: 12px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  font-family: "Ubuntu", serif;
-  border: none;
+.custom-rate-suffix {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  width: 18px;
+  height: 18px;
 }
 
-.dialog-btn-cancel {
-  background: #fff;
-  color: #64748b;
-  border: 1px solid #e2e8f0;
-  &:hover { background: #f8fafc; }
-}
+.event-dialog-content {
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 
-.dialog-btn-save {
-  background: #6366f1;
-  color: #fff;
-  &:hover { background: #4f46e5; }
-  &:disabled { opacity: 0.5; cursor: not-allowed; }
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  &.mat-mdc-dialog-content {
+    margin-top: 24px;
+    padding: 0px !important;
+  }
 }

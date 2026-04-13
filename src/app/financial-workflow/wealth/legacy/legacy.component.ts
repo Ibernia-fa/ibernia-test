@@ -1,4 +1,19 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import {
+  AfterViewChecked,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  HostListener,
+  Input,
+  NgZone,
+  OnDestroy,
+  OnInit,
+  OnChanges,
+  Renderer2,
+  SimpleChanges,
+  ViewChild,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -6,6 +21,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialog } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
+import { TranslateModule } from '@ngx-translate/core';
 import { CurrencySymbolPipe } from 'src/app/pipe/currency-symbol.pipe';
 import { Client, Details } from 'src/app/clients/models/client';
 import { LegacyHttpService } from './services/legacy-http.service';
@@ -15,12 +31,14 @@ import {
   ScenarioResultModel,
   ScenarioType,
   FamilyRole,
-  FAMILY_ROLE_LABELS
+  FAMILY_ROLE_LABELS,
 } from './models/legacy.model';
 import { AddMemberComponent } from './add-member/add-member.component';
 import { BeneficiaryRulesComponent } from './beneficiary-rules/beneficiary-rules.component';
 import { TaxSettingsComponent } from './tax-settings/tax-settings.component';
 import { EditParentEstateComponent } from './edit-parent-estate/edit-parent-estate.component';
+import { SettingsService } from 'src/app/default-preferance/services/default-preferance.http.service';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-legacy',
@@ -31,16 +49,38 @@ import { EditParentEstateComponent } from './edit-parent-estate/edit-parent-esta
     MatIconModule,
     MatMenuModule,
     MatProgressSpinnerModule,
-    CurrencySymbolPipe
+    CurrencySymbolPipe,
+    TranslateModule,
   ],
   templateUrl: './legacy.component.html',
   styleUrl: './legacy.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class LegacyComponent implements OnInit, OnChanges {
+export class LegacyComponent
+  implements OnInit, OnChanges, AfterViewChecked, OnDestroy
+{
   @Input() cashflowId!: string;
   @Input() clientData: Details | null = null;
   @Input() selectedClient: Client | null = null;
+
+  @ViewChild('treeBody') treeBodyRef?: ElementRef<HTMLElement>;
+  @ViewChild('clientAvatar') clientAvatarRef?: ElementRef<HTMLElement>;
+  @ViewChild('partnerAvatar') partnerAvatarRef?: ElementRef<HTMLElement>;
+  @ViewChild('coupleLine') coupleLineRef?: ElementRef<HTMLElement>;
+  @ViewChild('coupleLink') coupleLinkRef?: ElementRef<HTMLElement>;
+  @ViewChild('clientMainNode') clientMainNodeRef?: ElementRef<HTMLElement>;
+  @ViewChild('partnerMainNode') partnerMainNodeRef?: ElementRef<HTMLElement>;
+  @ViewChild('clientParentsPair') clientParentsPairRef?: ElementRef<HTMLElement>;
+  @ViewChild('partnerParentsPair') partnerParentsPairRef?: ElementRef<HTMLElement>;
+  @ViewChild('clientParentsLine') clientParentsLineRef?: ElementRef<HTMLElement>;
+  @ViewChild('partnerParentsLine') partnerParentsLineRef?: ElementRef<HTMLElement>;
+  @ViewChild('clientBranchParents') clientBranchParentsRef?: ElementRef<HTMLElement>;
+  @ViewChild('partnerBranchParents') partnerBranchParentsRef?: ElementRef<HTMLElement>;
+  @ViewChild('clientHeartEstateLine') clientHeartEstateLineRef?: ElementRef<HTMLElement>;
+  @ViewChild('partnerHeartEstateLine') partnerHeartEstateLineRef?: ElementRef<HTMLElement>;
+  @ViewChild('familyTree') familyTreeRef?: ElementRef<HTMLElement>;
+  @ViewChild('childrenSection') childrenSectionRef?: ElementRef<HTMLElement>;
+  @ViewChild('heartChildrenLine') heartChildrenLineRef?: ElementRef<HTMLElement>;
 
   isLoading = false;
   dashboard: LegacyDashboardModel | null = null;
@@ -48,15 +88,50 @@ export class LegacyComponent implements OnInit, OnChanges {
   scenarioResult: ScenarioResultModel | null = null;
   markedDeceased = new Set<string>();
 
+  private rafId: number | null = null;
+  private mutationObs?: MutationObserver;
+  private resizeObs?: ResizeObserver;
+  private observedElement?: HTMLElement;
+  private readonly destroy$ = new Subject<void>();
+
   constructor(
     private legacyHttp: LegacyHttpService,
     private toastr: ToastrService,
     private dialog: MatDialog,
     private cdr: ChangeDetectorRef,
+    private renderer: Renderer2,
+    private ngZone: NgZone,
+    private settingsService: SettingsService,
   ) {}
 
   ngOnInit(): void {
     this.loadDashboard();
+    this.settingsService.profileChanged$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        if (this.cashflowId) {
+          this.clearScenario();
+          this.loadDashboard();
+        }
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+    this.mutationObs?.disconnect();
+    this.resizeObs?.disconnect();
+    if (this.rafId !== null) cancelAnimationFrame(this.rafId);
+  }
+
+  ngAfterViewChecked(): void {
+    this.ensureTreeObserver();
+    this.scheduleLineUpdate();
+  }
+
+  @HostListener('window:resize')
+  onResize(): void {
+    this.scheduleLineUpdate();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -68,37 +143,71 @@ export class LegacyComponent implements OnInit, OnChanges {
   // ── Tree Layout Helpers ────────────────────────────────────────
 
   get clientMember(): FamilyMemberModel | undefined {
-    return this.dashboard?.familyMembers.find(m => m.role === 'Client');
+    return this.dashboard?.familyMembers.find((m) => m.role === 'Client');
   }
 
   get partnerMember(): FamilyMemberModel | undefined {
-    return this.dashboard?.familyMembers.find(m => m.role === 'Partner');
+    return this.dashboard?.familyMembers.find((m) => m.role === 'Partner');
   }
 
   get clientParents(): FamilyMemberModel[] {
-    return this.dashboard?.familyMembers.filter(m =>
-      m.role === 'ClientFather' || m.role === 'ClientMother') ?? [];
+    return (
+      this.dashboard?.familyMembers.filter(
+        (m) => m.role === 'ClientFather' || m.role === 'ClientMother',
+      ) ?? []
+    );
   }
 
   get partnerParents(): FamilyMemberModel[] {
-    return this.dashboard?.familyMembers.filter(m =>
-      m.role === 'PartnerFather' || m.role === 'PartnerMother') ?? [];
+    return (
+      this.dashboard?.familyMembers.filter(
+        (m) => m.role === 'PartnerFather' || m.role === 'PartnerMother',
+      ) ?? []
+    );
   }
 
   get clientSiblings(): FamilyMemberModel[] {
-    return this.dashboard?.familyMembers.filter(m => m.role === 'ClientSibling') ?? [];
+    return (
+      this.dashboard?.familyMembers.filter((m) => m.role === 'ClientSibling') ??
+      []
+    );
   }
 
   get partnerSiblings(): FamilyMemberModel[] {
-    return this.dashboard?.familyMembers.filter(m => m.role === 'PartnerSibling') ?? [];
+    return (
+      this.dashboard?.familyMembers.filter(
+        (m) => m.role === 'PartnerSibling',
+      ) ?? []
+    );
   }
 
   get children(): FamilyMemberModel[] {
-    return this.dashboard?.familyMembers.filter(m => m.role === 'Child') ?? [];
+    return (
+      this.dashboard?.familyMembers.filter((m) => m.role === 'Child') ?? []
+    );
+  }
+
+  get otherMembers(): FamilyMemberModel[] {
+    return (
+      this.dashboard?.familyMembers.filter((m) => m.role === 'Other') ?? []
+    );
   }
 
   get hasPartner(): boolean {
     return this.dashboard?.hasPartner ?? false;
+  }
+
+  get familyBranchUseFlexGrow(): boolean {
+    if (!this.dashboard) return true;
+    if (!this.hasPartner) return true;
+    const hasExtraMembers =
+      this.clientParents.length > 0 ||
+      this.partnerParents.length > 0 ||
+      this.clientSiblings.length > 0 ||
+      this.partnerSiblings.length > 0 ||
+      this.children.length > 0 ||
+      this.otherMembers.length > 0;
+    return hasExtraMembers;
   }
 
   get showClientBranch(): boolean {
@@ -113,6 +222,47 @@ export class LegacyComponent implements OnInit, OnChanges {
     return this.clientData?.preferredCurrency ?? 'USD';
   }
 
+  get showTaxOnClientBranch(): boolean {
+    return (
+      this.activeScenario === ScenarioType.ClientParentsDie &&
+      !!this.scenarioResult &&
+      this.scenarioResult.totalTax > 0
+    );
+  }
+
+  get showTaxOnPartnerBranch(): boolean {
+    return (
+      this.activeScenario === ScenarioType.PartnerParentsDie &&
+      !!this.scenarioResult &&
+      this.scenarioResult.totalTax > 0
+    );
+  }
+
+  get showTaxOnChildrenSection(): boolean {
+    return (
+      this.activeScenario === ScenarioType.BothDie &&
+      !!this.scenarioResult &&
+      this.scenarioResult.totalTax > 0
+    );
+  }
+
+  get isOnlyClientDeceased(): boolean {
+    return this.activeScenario === ScenarioType.ClientDies;
+  }
+
+  get isOnlyPartnerDeceased(): boolean {
+    return this.activeScenario === ScenarioType.PartnerDies;
+  }
+
+  get showTaxOnCoupleLink(): boolean {
+    return (
+      (this.activeScenario === ScenarioType.ClientDies ||
+        this.activeScenario === ScenarioType.PartnerDies) &&
+      !!this.scenarioResult &&
+      this.scenarioResult.totalTax > 0
+    );
+  }
+
   // ── Scenario Helpers ───────────────────────────────────────────
 
   isDeceased(memberId: string): boolean {
@@ -120,7 +270,9 @@ export class LegacyComponent implements OnInit, OnChanges {
   }
 
   getMemberInheritance(memberId: string) {
-    return this.scenarioResult?.beneficiaryShares?.find(s => s.memberId === memberId);
+    return this.scenarioResult?.beneficiaryShares?.find(
+      (s) => s.memberId === memberId,
+    );
   }
 
   getMemberBaseAmount(member: FamilyMemberModel): number {
@@ -148,67 +300,171 @@ export class LegacyComponent implements OnInit, OnChanges {
         this.toastr.error('Failed to load legacy data', 'Error');
         this.isLoading = false;
         this.cdr.markForCheck();
-      }
+      },
     });
   }
 
   selectScenario(scenario: ScenarioType): void {
     const ids = this.getScenarioMemberIds(scenario);
-    const allAlreadyMarked = ids.length > 0 && ids.every(id => this.markedDeceased.has(id));
+    const allAlreadyMarked =
+      ids.length > 0 && ids.every((id) => this.markedDeceased.has(id));
 
     if (allAlreadyMarked) {
-      ids.forEach(id => this.markedDeceased.delete(id));
-      if (this.markedDeceased.size === 0) {
+      ids.forEach((id) => this.markedDeceased.delete(id));
+
+      const remainingScenario = this.resolveScenarioFromDeceased();
+
+      if (remainingScenario) {
+        this.activeScenario = remainingScenario;
+        this.legacyHttp
+          .simulateScenario(this.cashflowId, remainingScenario)
+          .subscribe({
+            next: (result) => {
+              this.scenarioResult = result;
+              this.cdr.markForCheck();
+            },
+            error: (err) => {
+              this.toastr.error(
+                err?.error?.message || 'Failed to simulate scenario',
+                'Error',
+              );
+              this.activeScenario = null;
+              this.scenarioResult = null;
+              this.markedDeceased.clear();
+              this.cdr.markForCheck();
+            },
+          });
+      } else {
         this.activeScenario = null;
         this.scenarioResult = null;
+        this.cdr.markForCheck();
       }
-      this.cdr.markForCheck();
       return;
     }
 
-    ids.forEach(id => this.markedDeceased.add(id));
-    this.activeScenario = scenario;
-    this.legacyHttp.simulateScenario(this.cashflowId, scenario).subscribe({
-      next: (result) => {
-        this.scenarioResult = result;
-        this.cdr.markForCheck();
-      },
-      error: (err) => {
-        this.toastr.error(err?.error?.message || 'Failed to simulate scenario', 'Error');
-        ids.forEach(id => this.markedDeceased.delete(id));
-        if (this.markedDeceased.size === 0) {
-          this.activeScenario = null;
-          this.scenarioResult = null;
-        }
-        this.cdr.markForCheck();
-      }
-    });
+    ids.forEach((id) => this.markedDeceased.add(id));
+
+    const effectiveScenario = this.resolveScenarioFromDeceased() ?? scenario;
+
+    this.activeScenario = effectiveScenario;
+    this.legacyHttp
+      .simulateScenario(this.cashflowId, effectiveScenario)
+      .subscribe({
+        next: (result) => {
+          this.scenarioResult = result;
+          this.cdr.markForCheck();
+        },
+        error: (err) => {
+          this.toastr.error(
+            err?.error?.message || 'Failed to simulate scenario',
+            'Error',
+          );
+          ids.forEach((id) => this.markedDeceased.delete(id));
+          if (this.markedDeceased.size === 0) {
+            this.activeScenario = null;
+            this.scenarioResult = null;
+          }
+          this.cdr.markForCheck();
+        },
+      });
+  }
+
+  private resolveScenarioFromDeceased(): ScenarioType | null {
+    if (this.markedDeceased.size === 0) return null;
+
+    const clientId = this.clientMember?.id;
+    const partnerId = this.partnerMember?.id;
+    const clientDead = !!clientId && this.markedDeceased.has(clientId);
+    const partnerDead = !!partnerId && this.markedDeceased.has(partnerId);
+
+    if (clientDead && partnerDead) return ScenarioType.BothDie;
+    if (clientDead) return ScenarioType.ClientDies;
+    if (partnerDead) return ScenarioType.PartnerDies;
+
+    const allClientParentsDead =
+      this.clientParents.length > 0 &&
+      this.clientParents.every((p) => this.markedDeceased.has(p.id));
+    if (allClientParentsDead) return ScenarioType.ClientParentsDie;
+
+    const allPartnerParentsDead =
+      this.partnerParents.length > 0 &&
+      this.partnerParents.every((p) => this.markedDeceased.has(p.id));
+    if (allPartnerParentsDead) return ScenarioType.PartnerParentsDie;
+
+    return null;
   }
 
   private getScenarioMemberIds(scenario: ScenarioType): string[] {
     const members = this.dashboard?.familyMembers ?? [];
     switch (scenario) {
       case ScenarioType.ClientDies:
-        return members.filter(m => m.role === 'Client').map(m => m.id);
+        return members.filter((m) => m.role === 'Client').map((m) => m.id);
       case ScenarioType.PartnerDies:
-        return members.filter(m => m.role === 'Partner').map(m => m.id);
+        return members.filter((m) => m.role === 'Partner').map((m) => m.id);
       case ScenarioType.BothDie:
-        return members.filter(m => m.role === 'Client' || m.role === 'Partner').map(m => m.id);
+        return members
+          .filter((m) => m.role === 'Client' || m.role === 'Partner')
+          .map((m) => m.id);
       case ScenarioType.ClientParentsDie:
-        return members.filter(m => m.role === 'ClientFather' || m.role === 'ClientMother').map(m => m.id);
+        return members
+          .filter((m) => m.role === 'ClientFather' || m.role === 'ClientMother')
+          .map((m) => m.id);
       case ScenarioType.PartnerParentsDie:
-        return members.filter(m => m.role === 'PartnerFather' || m.role === 'PartnerMother').map(m => m.id);
+        return members
+          .filter(
+            (m) => m.role === 'PartnerFather' || m.role === 'PartnerMother',
+          )
+          .map((m) => m.id);
       default:
         return [];
     }
   }
 
-  onClickClientParent(): void {
-    this.selectScenario(ScenarioType.ClientParentsDie);
-  }
+  onClickParentMember(member: FamilyMemberModel): void {
+    const memberId = member.id;
 
-  onClickPartnerParent(): void {
-    this.selectScenario(ScenarioType.PartnerParentsDie);
+    if (this.markedDeceased.has(memberId)) {
+      this.markedDeceased.delete(memberId);
+    } else {
+      this.markedDeceased.add(memberId);
+    }
+
+    const isClientSide =
+      member.role === 'ClientFather' || member.role === 'ClientMother';
+    const scenario = isClientSide
+      ? ScenarioType.ClientParentsDie
+      : ScenarioType.PartnerParentsDie;
+    const parentMembers = isClientSide
+      ? this.clientParents
+      : this.partnerParents;
+
+    const allParentsDead =
+      parentMembers.length > 0 &&
+      parentMembers.every((p) => this.markedDeceased.has(p.id));
+
+    if (allParentsDead) {
+      this.activeScenario = scenario;
+      this.legacyHttp.simulateScenario(this.cashflowId, scenario).subscribe({
+        next: (result) => {
+          this.scenarioResult = result;
+          this.cdr.markForCheck();
+        },
+        error: (err) => {
+          this.toastr.error(
+            err?.error?.message || 'Failed to simulate scenario',
+            'Error',
+          );
+          parentMembers.forEach((p) => this.markedDeceased.delete(p.id));
+          this.activeScenario = null;
+          this.scenarioResult = null;
+          this.cdr.markForCheck();
+        },
+      });
+    } else {
+      this.activeScenario = null;
+      this.scenarioResult = null;
+      this.cdr.markForCheck();
+    }
   }
 
   onClickClient(): void {
@@ -225,16 +481,18 @@ export class LegacyComponent implements OnInit, OnChanges {
 
   onAddMember(): void {
     const dialogRef = this.dialog.open(AddMemberComponent, {
-      width: '450px',
+      width: '612px',
       disableClose: true,
       data: {
         cashflowId: this.cashflowId,
         hasPartner: this.hasPartner,
-        existingMembers: this.dashboard?.familyMembers ?? []
-      }
+        existingMembers: this.dashboard?.familyMembers ?? [],
+        clientFirstName: this.clientMember?.firstName ?? '',
+        partnerFirstName: this.partnerMember?.firstName ?? '',
+      },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result?.dashboard) {
         this.dashboard = result.dashboard;
         this.clearScenario();
@@ -249,27 +507,40 @@ export class LegacyComponent implements OnInit, OnChanges {
         this.clearScenario();
         this.toastr.success('Member removed', 'Success');
       },
-      error: () => this.toastr.error('Failed to remove member', 'Error')
+      error: () => this.toastr.error('Failed to remove member', 'Error'),
     });
   }
 
   onEditParentEstate(side: 'client' | 'partner'): void {
-    const current = side === 'client'
-      ? this.dashboard?.parentEstates?.clientParentsNetWorth ?? 0
-      : this.dashboard?.parentEstates?.partnerParentsNetWorth ?? 0;
+    const current =
+      side === 'client'
+        ? (this.dashboard?.parentEstates?.clientParentsNetWorth ?? 0)
+        : (this.dashboard?.parentEstates?.partnerParentsNetWorth ?? 0);
+
+    const personFirstName = (
+      side === 'client'
+        ? (this.clientMember?.firstName ||
+            this.selectedClient?.clientDetails?.firstName ||
+            this.clientData?.firstName ||
+            '')
+        : (this.partnerMember?.firstName ||
+            this.selectedClient?.partnerDetail?.firstName ||
+            '')
+    ).trim();
 
     const dialogRef = this.dialog.open(EditParentEstateComponent, {
-      width: '400px',
+      width: '612px',
       disableClose: true,
       data: {
         cashflowId: this.cashflowId,
         side,
         currentValue: current,
-        currency: this.currency
-      }
+        currency: this.currency,
+        personFirstName,
+      },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result?.dashboard) {
         this.dashboard = result.dashboard;
         this.clearScenario();
@@ -279,15 +550,15 @@ export class LegacyComponent implements OnInit, OnChanges {
 
   onOpenBeneficiaryRules(): void {
     const dialogRef = this.dialog.open(BeneficiaryRulesComponent, {
-      width: '600px',
+      width: '612px',
       disableClose: true,
       data: {
         cashflowId: this.cashflowId,
-        dashboard: this.dashboard
-      }
+        dashboard: this.dashboard,
+      },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result?.dashboard) {
         this.dashboard = result.dashboard;
         this.clearScenario();
@@ -297,20 +568,271 @@ export class LegacyComponent implements OnInit, OnChanges {
 
   onOpenTaxSettings(): void {
     const dialogRef = this.dialog.open(TaxSettingsComponent, {
-      width: '450px',
+      width: '612px',
       disableClose: true,
       data: {
         cashflowId: this.cashflowId,
-        taxSettings: this.dashboard?.taxSettings
-      }
+        taxSettings: this.dashboard?.taxSettings,
+      },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result?.dashboard) {
         this.dashboard = result.dashboard;
         this.clearScenario();
       }
     });
+  }
+
+  private ensureTreeObserver(): void {
+    const familyEl = this.familyTreeRef?.nativeElement;
+    if (!familyEl || familyEl === this.observedElement) return;
+
+    this.mutationObs?.disconnect();
+    this.resizeObs?.disconnect();
+    this.observedElement = familyEl;
+
+    this.ngZone.runOutsideAngular(() => {
+      this.mutationObs = new MutationObserver(() =>
+        this.scheduleLineUpdate(),
+      );
+      this.mutationObs.observe(familyEl, {
+        childList: true,
+        subtree: true,
+      });
+
+      this.resizeObs = new ResizeObserver(() =>
+        this.scheduleLineUpdate(),
+      );
+      this.resizeObs.observe(familyEl);
+    });
+  }
+
+  private scheduleLineUpdate(): void {
+    if (this.rafId !== null) cancelAnimationFrame(this.rafId);
+    this.rafId = requestAnimationFrame(() => {
+      this.rafId = null;
+      this.updateCoupleLine();
+      this.updateParentPairLine(
+        this.clientParentsPairRef,
+        this.clientParentsLineRef,
+      );
+      this.updateParentPairLine(
+        this.partnerParentsPairRef,
+        this.partnerParentsLineRef,
+      );
+      this.updateHeartEstateLine(
+        this.clientBranchParentsRef,
+        this.clientHeartEstateLineRef,
+      );
+      this.updateHeartEstateLine(
+        this.partnerBranchParentsRef,
+        this.partnerHeartEstateLineRef,
+      );
+      this.updateHeartChildrenLine();
+    });
+  }
+
+  private updateCoupleLine(): void {
+    if (
+      !this.treeBodyRef?.nativeElement ||
+      !this.clientAvatarRef?.nativeElement ||
+      !this.partnerAvatarRef?.nativeElement ||
+      !this.coupleLineRef?.nativeElement
+    ) {
+      return;
+    }
+
+    const clientNode = this.clientMainNodeRef?.nativeElement;
+    const partnerNode = this.partnerMainNodeRef?.nativeElement;
+    if (clientNode && partnerNode) {
+      this.renderer.removeStyle(clientNode, 'min-height');
+      this.renderer.removeStyle(partnerNode, 'min-height');
+
+      const maxH = Math.max(
+        clientNode.offsetHeight,
+        partnerNode.offsetHeight,
+      );
+      this.renderer.setStyle(clientNode, 'min-height', `${maxH}px`);
+      this.renderer.setStyle(partnerNode, 'min-height', `${maxH}px`);
+    }
+
+    const treeRect =
+      this.treeBodyRef.nativeElement.getBoundingClientRect();
+    const clientRect =
+      this.clientAvatarRef.nativeElement.getBoundingClientRect();
+    const partnerRect =
+      this.partnerAvatarRef.nativeElement.getBoundingClientRect();
+
+    const clientCenterY =
+      clientRect.top + clientRect.height / 2 - treeRect.top;
+    const partnerCenterY =
+      partnerRect.top + partnerRect.height / 2 - treeRect.top;
+    const lineY = (clientCenterY + partnerCenterY) / 2;
+
+    const clientRight = clientRect.right - treeRect.left;
+    const partnerLeft = partnerRect.left - treeRect.left;
+
+    const line = this.coupleLineRef.nativeElement;
+    this.renderer.setStyle(line, 'top', `${lineY}px`);
+    this.renderer.setStyle(line, 'left', `${clientRight}px`);
+    this.renderer.setStyle(
+      line,
+      'width',
+      `${partnerLeft - clientRight}px`,
+    );
+
+    if (this.coupleLinkRef?.nativeElement) {
+      const linkHeight =
+        this.coupleLinkRef.nativeElement.offsetHeight;
+      const marginBottom = Math.max(
+        0,
+        treeRect.height - lineY - linkHeight / 2,
+      );
+      this.renderer.setStyle(
+        this.coupleLinkRef.nativeElement,
+        'margin-bottom',
+        `${marginBottom}px`,
+      );
+    }
+  }
+
+  private updateParentPairLine(
+    pairRef: ElementRef<HTMLElement> | undefined,
+    lineRef: ElementRef<HTMLElement> | undefined,
+  ): void {
+    if (!pairRef?.nativeElement || !lineRef?.nativeElement) return;
+
+    const pairEl = pairRef.nativeElement;
+    const avatars = pairEl.querySelectorAll('.node-avatar');
+    if (avatars.length < 2) return;
+
+    const first = avatars[0] as HTMLElement;
+    const last = avatars[avatars.length - 1] as HTMLElement;
+    const pairRect = pairEl.getBoundingClientRect();
+    const firstRect = first.getBoundingClientRect();
+    const lastRect = last.getBoundingClientRect();
+
+    const firstCenterY =
+      firstRect.top + firstRect.height / 2 - pairRect.top;
+    const lastCenterY =
+      lastRect.top + lastRect.height / 2 - pairRect.top;
+    const lineY = (firstCenterY + lastCenterY) / 2;
+
+    const lineLeft = firstRect.right - pairRect.left;
+    const lineWidth = lastRect.left - pairRect.left - lineLeft;
+
+    const line = lineRef.nativeElement;
+    this.renderer.setStyle(line, 'top', `${lineY}px`);
+    this.renderer.setStyle(line, 'left', `${lineLeft}px`);
+    this.renderer.setStyle(line, 'width', `${lineWidth}px`);
+
+    const heart = pairEl.querySelector('.pair-heart') as HTMLElement;
+    if (heart) {
+      this.renderer.setStyle(heart, 'padding-top', '0');
+      const heartH = heart.offsetHeight;
+      this.renderer.setStyle(
+        heart,
+        'margin-top',
+        `${lineY - heartH / 2}px`,
+      );
+    }
+  }
+
+  private updateHeartEstateLine(
+    branchParentsRef: ElementRef<HTMLElement> | undefined,
+    lineRef: ElementRef<HTMLElement> | undefined,
+  ): void {
+    if (!branchParentsRef?.nativeElement || !lineRef?.nativeElement) return;
+
+    const container = branchParentsRef.nativeElement;
+    const heart = container.querySelector(
+      '.new-heart-icon-sm',
+    ) as HTMLElement;
+    const estate = container.querySelector(
+      '.parent-estate',
+    ) as HTMLElement;
+    if (!heart || !estate) return;
+
+    const containerRect = container.getBoundingClientRect();
+    const heartRect = heart.getBoundingClientRect();
+    const estateRect = estate.getBoundingClientRect();
+
+    const heartCenterX =
+      heartRect.left + heartRect.width / 2 - containerRect.left;
+    const top = heartRect.bottom - containerRect.top;
+    const bottom = estateRect.top - containerRect.top;
+
+    const line = lineRef.nativeElement;
+    this.renderer.setStyle(line, 'left', `${heartCenterX}px`);
+    this.renderer.setStyle(line, 'top', `${top}px`);
+    this.renderer.setStyle(
+      line,
+      'height',
+      `${Math.max(0, bottom - top)}px`,
+    );
+  }
+
+  private updateHeartChildrenLine(): void {
+    if (
+      !this.coupleLinkRef?.nativeElement &&
+      this.childrenSectionRef?.nativeElement
+    ) {
+      this.renderer.removeStyle(
+        this.childrenSectionRef.nativeElement,
+        'transform',
+      );
+    }
+
+    if (
+      !this.familyTreeRef?.nativeElement ||
+      !this.coupleLinkRef?.nativeElement ||
+      !this.childrenSectionRef?.nativeElement ||
+      !this.heartChildrenLineRef?.nativeElement
+    ) {
+      return;
+    }
+
+    const heart = this.coupleLinkRef.nativeElement.querySelector(
+      '.new-heart-icon',
+    ) as HTMLElement;
+    if (!heart) return;
+
+    const familyEl = this.familyTreeRef.nativeElement;
+    const familyRect = familyEl.getBoundingClientRect();
+    const bTop = familyEl.clientTop;
+    const bLeft = familyEl.clientLeft;
+    const heartRect = heart.getBoundingClientRect();
+
+    const heartCenterX =
+      heartRect.left + heartRect.width / 2 - familyRect.left - bLeft;
+    const heartBottom = heartRect.bottom - familyRect.top - bTop;
+
+    const familyCenterX = familyEl.clientWidth / 2;
+    const offset = heartCenterX - familyCenterX;
+    this.renderer.setStyle(
+      this.childrenSectionRef.nativeElement,
+      'transform',
+      `translateX(${offset}px)`,
+    );
+
+    const childVline =
+      this.childrenSectionRef.nativeElement.querySelector(
+        '.child-vline',
+      ) as HTMLElement;
+    if (!childVline) return;
+
+    const vlineRect = childVline.getBoundingClientRect();
+    const vlineTop = vlineRect.top - familyRect.top - bTop;
+
+    const line = this.heartChildrenLineRef.nativeElement;
+    this.renderer.setStyle(line, 'left', `${heartCenterX}px`);
+    this.renderer.setStyle(line, 'top', `${heartBottom}px`);
+    this.renderer.setStyle(
+      line,
+      'height',
+      `${Math.max(0, vlineTop - heartBottom + 1)}px`,
+    );
   }
 
   private clearScenario(): void {

@@ -1,5 +1,7 @@
 html.light-theme {
   color-scheme: light;
+  /** Secondary helper text (e.g. Scenario Lab “Edited:”, “Before:”, slider values). */
+  --ib-text-secondary-muted: #787889;
   --mat-sys-corner-small: 7px;
   --mat-sys-background: #ededed;
   --mat-sys-surface-bright: #f2f6fa;

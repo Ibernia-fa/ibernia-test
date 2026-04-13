@@ -27,6 +27,7 @@ import {
   ClientSaving,
   SavingPotsModel as SavingPots,
   SavingPotOwnership,
+  SavingPotType,
 } from './models/saving-pots.model';
 import { Cashflow } from 'src/app/clients/models/cashflow';
 import { TimelineHttpService } from '../timeline/services/timeline-http.service';
@@ -48,8 +49,9 @@ import { CurrencySymbolPipe } from 'src/app/pipe/currency-symbol.pipe';
 import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { SettingsService } from 'src/app/default-preferance/services/default-preferance.http.service';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { patchInflationRateDescription } from 'src/app/shared/utils/escalation-rate-utils';
+import { formatClientPersonDisplayName } from 'src/app/shared/utils/person-display-name';
 import { MaterialModule } from 'src/app/material.module';
 @Component({
   selector: 'app-saving-pots',
@@ -122,6 +124,7 @@ export class SavingPotsComponent implements OnInit {
     private financialWorkflowService: FinancialWorkflowService,
     private Authservice: AuthService,
     private settingsService: SettingsService,
+    private translate: TranslateService,
   ) {
     this.user = this.Authservice.getUserProfile();
     this.settingsService.userData$
@@ -264,24 +267,22 @@ export class SavingPotsComponent implements OnInit {
   //   );
   // }
 
-  drop(event: CdkDragDrop<any>) {
+  drop(event: CdkDragDrop<ClientSaving[]>) {
     const list = this.savingPots?.clientSavings ?? [];
     if (!list.length) return;
 
-    // Don’t let anything be dropped at index 0
-    if (event.currentIndex === 0) {
-      return;
-    }
+    const cashCount = list.filter((s) => this.isCashName(s?.name)).length;
+    const nonCashCount = list.length - cashCount;
+    if (nonCashCount <= 0) return;
 
-    // Don’t let the first item (Cash) be moved at all (defense in depth)
-    if (event.previousIndex === 0) {
-      return;
-    }
+    if (event.previousIndex === event.currentIndex) return;
 
-    moveItemInArray(list, event.previousIndex, event.currentIndex);
+    const prevFull = cashCount + event.previousIndex;
+    const currFull = cashCount + event.currentIndex;
+
+    moveItemInArray(list, prevFull, currFull);
     this.savingPots.clientSavings = [...list];
 
-    // Recompute order numbers and persist (you already have this)
     this.updateOrderNumbers();
   }
 
@@ -423,6 +424,8 @@ export class SavingPotsComponent implements OnInit {
           this.selectedClient?.clientDetails.preferredCurrency,
         forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
         forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
+        forecastStartDate: this.timeline.forecastStartDate,
+        planDuration: this.selectedCashflow?.planDuration,
         cashflowId: this.selectedCashflow?.id,
         isEditWorkflow: true,
         event: event,
@@ -430,6 +433,12 @@ export class SavingPotsComponent implements OnInit {
         hasPartner: !!this.selectedClient?.partnerDetail,
         clientFirstName: this.selectedClient?.clientDetails?.firstName ?? '',
         partnerFirstName: this.selectedClient?.partnerDetail?.firstName ?? '',
+        clientDisplayName: formatClientPersonDisplayName(
+          this.selectedClient?.clientDetails,
+        ),
+        partnerDisplayName: formatClientPersonDisplayName(
+          this.selectedClient?.partnerDetail,
+        ),
       },
     });
 
@@ -510,12 +519,20 @@ export class SavingPotsComponent implements OnInit {
           this.selectedClient?.clientDetails.preferredCurrency,
         forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
         forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
+        forecastStartDate: this.timeline.forecastStartDate,
+        planDuration: this.selectedCashflow?.planDuration,
         cashflowId: this.selectedCashflow?.id,
         isEditWorkflow: false,
         existingSavingPots: this.savingPots?.clientSavings || [],
         hasPartner: !!this.selectedClient?.partnerDetail,
         clientFirstName: this.selectedClient?.clientDetails?.firstName ?? '',
         partnerFirstName: this.selectedClient?.partnerDetail?.firstName ?? '',
+        clientDisplayName: formatClientPersonDisplayName(
+          this.selectedClient?.clientDetails,
+        ),
+        partnerDisplayName: formatClientPersonDisplayName(
+          this.selectedClient?.partnerDetail,
+        ),
       },
     });
 
@@ -549,6 +566,46 @@ export class SavingPotsComponent implements OnInit {
     return (n ?? '').trim().toLowerCase() === 'cash';
   }
 
+  /** Public for template: identify cash saving pots (name "Cash"). */
+  isCashPot(saving: ClientSaving | undefined | null): boolean {
+    return this.isCashName(saving?.name);
+  }
+
+  get cashSavingPots(): ClientSaving[] {
+    return (this.savingPots?.clientSavings ?? []).filter((s) =>
+      this.isCashName(s?.name),
+    );
+  }
+
+  get nonCashSavingPots(): ClientSaving[] {
+    return (this.savingPots?.clientSavings ?? []).filter(
+      (s) => !this.isCashName(s?.name),
+    );
+  }
+
+  getCashPotsGridModifier(): Record<string, boolean> {
+    const n = this.cashSavingPots.length;
+    return {
+      'cash-saving-pots-grid': true,
+      'cash-saving-pots-grid--cols-1': n <= 1,
+      'cash-saving-pots-grid--cols-2': n === 2,
+      'cash-saving-pots-grid--cols-3': n >= 3,
+    };
+  }
+
+  /** Full `clientSavings` index for the non-cash row at `localIndex`. */
+  fullIndexForNonCash(localIndex: number): number {
+    return this.cashSavingPots.length + localIndex;
+  }
+
+  dragColumnForNonCashPot(localIndex: number): 'handle' | 'spacer' {
+    return this.fullIndexForNonCash(localIndex) > 0 ? 'handle' : 'spacer';
+  }
+
+  trackSavingPot(index: number, saving: ClientSaving): string {
+    return saving.id ?? `idx-${index}`;
+  }
+
   private ensureCashFirst(): void {
     const list = this.savingPots?.clientSavings;
     if (!list || !list.length) return;
@@ -565,15 +622,39 @@ export class SavingPotsComponent implements OnInit {
     return rounded % 1 === 0 ? rounded.toFixed(0) : rounded.toString();
   }
 
+  /** Cash pots show 0% in the UI; hide the badge to reduce clutter (display-only). */
+  shouldShowReturnRateBadge(saving: ClientSaving): boolean {
+    return saving.type !== SavingPotType.Cash;
+  }
+
+  /** Ownership line under chart: Joint (translated) or client/partner display names. */
+  getOwnershipBadgeCaption(saving: ClientSaving): string {
+    const o = saving.ownership ?? SavingPotOwnership.Joint;
+    if (o === SavingPotOwnership.Joint) {
+      return this.translate.instant('Joint');
+    }
+    if (o === SavingPotOwnership.Person1) {
+      const n = formatClientPersonDisplayName(this.selectedClient?.clientDetails);
+      return n || this.translate.instant('Client');
+    }
+    const n = formatClientPersonDisplayName(this.selectedClient?.partnerDetail);
+    return n || this.translate.instant('Partner');
+  }
+
   getOwnershipLabel(saving: ClientSaving): string {
+    return this.getOwnershipBadgeCaption(saving);
+  }
+
+  /** CSS modifier for `.ibr-chart-tag` background and text colour. */
+  getOwnershipBadgeModifierClass(saving: ClientSaving): string {
     const ownership = saving.ownership ?? SavingPotOwnership.Joint;
     switch (ownership) {
       case SavingPotOwnership.Person1:
-        return this.selectedClient?.clientDetails?.firstName ?? 'Person 1';
+        return 'ownership-client';
       case SavingPotOwnership.Person2:
-        return this.selectedClient?.partnerDetail?.firstName ?? 'Person 2';
+        return 'ownership-partner';
       default:
-        return 'Joint';
+        return 'ownership-joint';
     }
   }
 

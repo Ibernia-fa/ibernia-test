@@ -73,7 +73,7 @@
   align-items: center;
   justify-content: space-between;
   h3 {
-    font-size: 16px;
+    font-size: 20px;
     line-height: 100%;
     font-weight: 500;
     color: #1c1c1c;
@@ -90,6 +90,7 @@
   display: flex;
   align-items: flex-start;
   gap: 24px;
+  margin-top: 16px;
 }
 
 .assumptions-form {
@@ -97,25 +98,24 @@
   min-width: 0;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px 18px;
+  gap: 24px 16px;
 }
 
 .assumption-panel {
-  background: #f6f7f9;
-  border: 1px solid #ececf0;
-  border-radius: 10px;
-  padding: 14px;
+  // background: #f6f7f9;
+  // border-radius: 10px;
+  // padding: 14px;
   display: flex;
   flex-direction: column;
   gap: 8px;
   min-width: 0;
-  min-height: 94px;
+  // min-height: 94px;
 }
 
 .bottom-assumptions-row {
   grid-column: 1 / -1;
   display: flex;
-  gap: 18px;
+  gap: 24px;
 
   > .assumption-panel {
     flex: 1 1 0;
@@ -127,21 +127,22 @@
   display: grid;
   grid-template-rows: auto auto auto;
   align-content: start;
-  gap: 6px;
+  gap: 4px;
 }
 
 .inflation-header {
-  min-height: 32px;
+  // min-height: 32px;
   display: flex;
   align-items: center;
-  padding-right: 6px;
+  // padding-right: 6px;
 }
 
 .assumption-label {
-  font-size: 15px;
-  font-weight: 600;
-  color: rgba(0, 0, 0, 0.62);
+  font-size: 16px;
+  font-weight: 500;
+  color: #1c1c1c;
   white-space: nowrap;
+  line-height: 100%;
 }
 
 // ── Slider + value input row ──────────────────────────────────────────────
@@ -156,22 +157,26 @@
 }
 
 .value-input-box {
-  display: flex;
-  align-items: stretch;
-  border: 1px solid rgba(0, 0, 0, 0.23);
-  border-radius: 6px;
+  // display: flex;
+  // align-items: stretch;
+  border: 1px solid #0000001a;
+  border-radius: 8px;
   overflow: hidden;
-  height: 38px;
-  min-width: 68px;
+  // height: 32px;
+  width: 90px;
   flex-shrink: 0;
+  background-color: white;
+  position: relative;
 
   .value-input {
-    width: 42px;
+    // width: 42px;
     border: none;
     outline: none;
-    padding: 0 4px;
-    font-size: 13px;
-    text-align: center;
+    padding: 8px 0px 8px 12px;
+    font-size: 14px;
+    color: var(--ib-text-secondary-muted);
+    font-family: "Ubuntu", serif;
+    // text-align: center;
     background: transparent;
     -moz-appearance: textfield;
     &::-webkit-outer-spin-button,
@@ -181,31 +186,49 @@
   }
 
   .pct-badge {
-    background: rgba(0, 0, 0, 0.05);
-    padding: 0 8px;
-    font-size: 12px;
+    // background: rgba(0, 0, 0, 0.05);
+    // padding: 0 8px;
+    // font-size: 12px;
+    // display: flex;
+    // align-items: center;
+    // border-left: 1px solid rgba(0, 0, 0, 0.1);
+    // color: rgba(0, 0, 0, 0.55);
+    // flex-shrink: 0;
+    background-color: white;
+    height: 100%;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    right: 0px;
+    padding: 0px 12px 0 0;
     display: flex;
     align-items: center;
-    border-left: 1px solid rgba(0, 0, 0, 0.1);
-    color: rgba(0, 0, 0, 0.55);
-    flex-shrink: 0;
-  }
-}
+    justify-content: center;
 
-// ── Age badge ──────────────────────────────────────────────────────────────
-.age-badge {
-  padding: 0 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    svg path {
+      stroke: var(--ib-text-secondary-muted);
+    }
+  }
+
+  // Narrow centered field for ages (no suffix icon; fits up to 100)
+  &--retirement-age {
+    width: 60px;
+
+    .value-input {
+      width: 100%;
+      box-sizing: border-box;
+      text-align: center;
+      padding: 8px 4px;
+    }
+  }
 }
 
 // ── Before label ───────────────────────────────────────────────────────────
 .before-label {
-  font-size: 12px;
-  font-weight: 500;
-  color: rgba(0, 0, 0, 0.45);
-  margin-top: 2px;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--ib-text-secondary-muted);
+  line-height: 1.25;
 }
 
 // ── Category panels (Goals, Saving pots, Incomes, Expenses) ───────────────
@@ -217,16 +240,45 @@
   font-size: 13px;
   font-weight: 500;
   width: 100%;
-  padding: 8px 10px;
-  border: 1px solid #d8dbe3;
+  border: 1px solid #0000001a;
   border-radius: 8px;
-  background: #fff;
+  background: #ffffff;
   min-height: 38px;
 
   ::ng-deep .mat-mdc-select-trigger {
-    font-size: 13px;
+    font-size: 14px;
     min-height: 16px;
+    padding: 8px 12px;
+    .mat-mdc-select-placeholder {
+      font-weight: 400 !important;
+      color: #a6abb2;
+    }
+    .mat-mdc-select-arrow-wrapper {
+      display: none !important;
+    }
+    .mat-mdc-select-value-text {
+      font-size: 14px;
+      line-height: 100%;
+      font-weight: 400;
+      color: #5a596e;
+    }
   }
+}
+
+// Wraps only the select + chevron so `top: 50%` on `.custom-icon` is not affected
+// by the edited-chips block below (which was shifting the arrow downward).
+.category-dropdown-trigger-wrap {
+  width: 100%;
+}
+
+.custom-icon {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none; /* so clicks go to select */
+  display: flex;
+  align-items: center;
 }
 
 .category-option {
@@ -242,31 +294,49 @@
 }
 
 // ── Edited chips ──────────────────────────────────────────────────────────
+.edited-chips-block {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  margin-top: 4px;
+}
+
+.edited-prefix {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--ib-text-secondary-muted);
+  line-height: 1.25;
+  flex-shrink: 0;
+}
+
 .edited-chips {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  margin-top: 2px;
+  margin-top: 0;
+  min-width: 0;
 }
 
 .edited-chip {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 2px 6px 2px 8px;
+  padding: 3px 6px 3px 10px;
   border-radius: 12px;
   background: rgba(81, 108, 232, 0.1);
-  color: rgba(0, 0, 0, 0.6);
-  font-size: 11px;
+  color: rgba(0, 0, 0, 0.65);
+  font-size: 14px;
   font-weight: 500;
+  line-height: 1.25;
   white-space: nowrap;
 
   .chip-remove {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 16px;
-    height: 16px;
+    width: 18px;
+    height: 18px;
     padding: 0;
     border: none;
     border-radius: 50%;
@@ -279,9 +349,9 @@
     opacity: 0;
 
     mat-icon {
-      font-size: 12px;
-      width: 12px;
-      height: 12px;
+      font-size: 14px;
+      width: 14px;
+      height: 14px;
     }
 
     &:hover {
@@ -299,6 +369,7 @@
 .assumptions-actions {
   display: flex;
   flex-direction: row;
+  justify-content: flex-end;
   gap: 16px;
   flex-shrink: 0;
   // margin-top: 80px;
@@ -416,4 +487,66 @@
   border: 1px solid #0000001a;
   padding: 24px;
   margin-top: 20px;
+  overflow: hidden;
+}
+
+.chart-component-wrapper {
+  animation: chartFadeIn 0.4s ease both;
+}
+
+@keyframes chartFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+// ── Mat-slider custom styling ────────────────────────────────────────────
+:host ::ng-deep .slider-flex {
+  &.mat-mdc-slider {
+    height: 46px !important;
+    margin: 0 !important;
+  }
+  .mdc-slider__track {
+    height: 12px !important;
+    border-radius: 6px;
+  }
+
+  .mdc-slider__track--inactive {
+    background-color: white !important;
+    opacity: 1 !important;
+    height: 12px !important;
+    border-radius: 6px;
+    border: 1px solid #0000001a;
+  }
+
+  .mdc-slider__track--active {
+    height: 12px !important;
+    border-radius: 6px;
+  }
+
+  .mdc-slider__track--active_fill {
+    background-color: #4043af !important;
+    border-color: #4043af !important;
+    border-radius: 6px;
+  }
+
+  .mdc-slider__thumb-knob {
+    background-color: #4043af !important;
+    border: 2px solid white !important;
+    box-shadow: 2px 2px 2px 1px #0000001a !important;
+  }
+
+  .mdc-slider__thumb--focused .mdc-slider__thumb-knob,
+  .mdc-slider__thumb:hover .mdc-slider__thumb-knob {
+    background-color: #4043af !important;
+    border-color: white !important;
+  }
+
+  .mdc-slider__thumb {
+    height: 46px;
+    width: 46px;
+  }
+
+  .mat-mdc-slider-visual-thumb .mat-ripple {
+    display: none;
+  }
 }

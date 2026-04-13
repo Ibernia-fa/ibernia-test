@@ -124,7 +124,7 @@
                         </mat-card>
                         <app-view-timeline-chart title="Timeline" [showOnReports]="true"
                             [financialTimeline]="financialTimeline" [clientBirthDate]="clientBirthDate"
-                            [client]="client">
+                            [client]="client" [planDuration]="cashflow?.planDuration">
                         </app-view-timeline-chart>
                     </div>
                     <!-- end goals & events  -->
@@ -205,7 +205,7 @@
                                                             <div class="d-flex align-items-center gap-8">
                                                                 <img [src]="'assets/images/svgs/' + saving.iconUrl +'.svg'"
                                                                     alt="cashflow-moneys-icon" />
-                                                                <h3 class="card-title">{{saving.name}}
+                                                                <h3 class="card-title">{{ saving.name | translate }}
                                                                 </h3>
                                                             </div>
                                                             <div class="d-flex align-items-center gap-10">
@@ -405,7 +405,11 @@
                                                         </th>
                                                         <td mat-cell *matCellDef="let element"
                                                             class="p-x-24 f-s-14 p-l-0 column-client">
-                                                            {{element.description}} </td>
+                                                            {{
+                                                              element.description
+                                                                | translateIncomeExpenseLabel
+                                                                  : incomeDisplayLabelContext
+                                                            }} </td>
                                                     </ng-container>
                                                     <ng-container matColumnDef="name">
                                                         <th mat-header-cell *matHeaderCellDef
@@ -416,7 +420,7 @@
                                                             class="p-x-24 f-s-14 p-l-0 column-net-amount">
                                                             {{client?.clientDetails?.preferredCurrency |
                                                             currencySymbol}}{{element.amount.amount |
-                                                            thousandSeparator}}/{{element.amount.cycle.description}}
+                                                            thousandSeparator}}/{{element.amount.cycle.description | translate}}
                                                         </td>
                                                     </ng-container>
                                                     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
@@ -445,7 +449,11 @@
                                                         </th>
                                                         <td mat-cell *matCellDef="let element"
                                                             class="p-x-24 f-s-14 p-l-0 column-client">
-                                                            {{element.description}} </td>
+                                                            {{
+                                                              element.description
+                                                                | translateIncomeExpenseLabel
+                                                                  : incomeDisplayLabelContext
+                                                            }} </td>
                                                     </ng-container>
 
                                                     <ng-container matColumnDef="name">
@@ -457,7 +465,7 @@
                                                             class="p-x-24 f-s-14 p-l-0 column-net-amount">
                                                             {{client?.clientDetails?.preferredCurrency |
                                                             currencySymbol}}{{element.amount.amount |
-                                                            thousandSeparator}}/{{element.amount.cycle.description}}
+                                                            thousandSeparator}}/{{element.amount.cycle.description | translate}}
                                                         </td>
                                                     </ng-container>
 
@@ -524,7 +532,11 @@
                                                         </th>
                                                         <td mat-cell *matCellDef="let element"
                                                             class="p-x-24 f-s-14 p-l-0 column-client">
-                                                            {{element.description}} </td>
+                                                            {{
+                                                              element.description
+                                                                | translateIncomeExpenseLabel
+                                                                  : incomeDisplayLabelContext
+                                                            }} </td>
                                                     </ng-container>
                                                     <ng-container matColumnDef="name">
                                                         <th mat-header-cell *matHeaderCellDef
@@ -535,7 +547,7 @@
                                                             class="p-x-24 f-s-14 p-l-0 column-net-amount">
                                                             {{client?.clientDetails?.preferredCurrency |
                                                             currencySymbol}}{{element.amount.amount |
-                                                            thousandSeparator}}/{{element.amount.cycle.description}}
+                                                            thousandSeparator}}/{{element.amount.cycle.description | translate}}
                                                         </td>
                                                     </ng-container>
                                                     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
@@ -563,7 +575,11 @@
                                                         </th>
                                                         <td mat-cell *matCellDef="let element"
                                                             class="p-x-24 f-s-14 p-l-0 column-client">
-                                                            {{element.description}} </td>
+                                                            {{
+                                                              element.description
+                                                                | translateIncomeExpenseLabel
+                                                                  : incomeDisplayLabelContext
+                                                            }} </td>
                                                     </ng-container>
                                                     <ng-container matColumnDef="name">
                                                         <th mat-header-cell *matHeaderCellDef
@@ -574,7 +590,7 @@
                                                             class="p-x-24 f-s-14 p-l-0 column-net-amount">
                                                             {{client?.clientDetails?.preferredCurrency |
                                                             currencySymbol}}{{element.amount.amount |
-                                                            thousandSeparator}}/{{element.amount.cycle.description}}
+                                                            thousandSeparator}}/{{element.amount.cycle.description | translate}}
                                                         </td>
                                                     </ng-container>
                                                     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
@@ -636,11 +652,37 @@
                                         </div>
                                     </ng-template>
                                 </div>
+                                <div
+                                    class="chart-year-range d-flex align-items-center flex-wrap gap-16 m-b-16"
+                                    *ngIf="chartYearOptions.length > 0"
+                                >
+                                    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                        <mat-label>{{ 'Chart from year' | translate }}</mat-label>
+                                        <mat-select
+                                            [value]="chartViewStartYear"
+                                            (selectionChange)="onChartStartYearChange($event.value)"
+                                        >
+                                            <mat-option *ngFor="let y of chartYearOptions" [value]="y">{{ y }}</mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                        <mat-label>{{ 'Chart to year' | translate }}</mat-label>
+                                        <mat-select
+                                            [value]="chartViewEndYear"
+                                            (selectionChange)="onChartEndYearChange($event.value)"
+                                        >
+                                            <mat-option *ngFor="let y of chartYearOptions" [value]="y">{{ y }}</mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                </div>
                                 <div class="d-flex flex-column gap-32">
                                     <app-view-savings-bar-stacked-chart [report]="report" [client]="client"
                                         [forecastStartDate]="financialTimeline.forecastStartDate"
                                         [forecastEndDate]="effectiveReportEndDate ?? financialTimeline?.forecastEndtDate ?? null"
-                                        [cashFlowName]="cashflow?.name">
+                                        [planDuration]="cashflow?.planDuration"
+                                        [cashFlowName]="cashflow?.name"
+                                        [chartViewStartYear]="chartViewStartYear"
+                                        [chartViewEndYear]="chartViewEndYear">
                                     </app-view-savings-bar-stacked-chart>
                                 </div>
                             </mat-card-content>
@@ -776,7 +818,7 @@
                                                     <div class="label">{{ 'Status' | translate }}</div>
                                                     <div class="f-w-500 f-s-14"
                                                         [ngClass]="{ 'text-danger': e.willStatus !== 1, 'will-done-text': e.willStatus === 1 }">
-                                                        {{e.willStatus === 1 ? 'Done' : 'Not done'}}
+                                                        {{e.willStatus === 1 ? ('Done' | translate) : ('Not done' | translate)}}
                                                     </div>
                                                 </div>
                                             </ng-container>

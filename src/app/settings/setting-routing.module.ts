@@ -5,7 +5,6 @@ import { BrandingComponent } from './branding/branding.component';
 import { NotificationsComponent } from './notifications/notifications.component';
 import { AdminGuard } from './admin-notifications/admin-guard.service';
 import { AdminNotificationsContainerComponent } from './admin-notifications/admin-notifications-container.component';
-import { SecurityComponent } from './security/security.component';
 import { PlanBillingComponent } from './plan-billing/plan-billing.component';
 import { AccountPreferencesComponent } from './account-preferences/account-preferences.component';
 import { HelpAndContactComponent } from './help-and-contact/help-and-contact.component';
@@ -23,9 +22,6 @@ const routes: Routes = [
   { path: 'plan-billing', loadComponent: () =>
     import('./plan-billing/plan-billing.component')
       .then(m => m.PlanBillingComponent), data: { showSidebar: true } },
-  { path: 'security', loadComponent: () =>
-    import('./security/security.component')
-      .then(m => m.SecurityComponent), data: { showSidebar: true } },
   { path: 'notifications', loadComponent: () =>
     import('./notifications/notifications.component')
       .then(m => m.NotificationsComponent), data: { showSidebar: true } },

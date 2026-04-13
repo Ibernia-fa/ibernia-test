@@ -98,12 +98,12 @@
     font-weight: 400;
   }
 }
-.slider-wrapper {
-  // margin-top: -15px;
-  .mat-mdc-slider {
-    margin: 0 !important;
-  }
-}
+// .slider-wrapper {
+//   // margin-top: -15px;
+//   .mat-mdc-slider {
+//     margin: 0 !important;
+//   }
+// }
 
 .custom-body {
   padding: 4px !important;
@@ -155,6 +155,16 @@
   margin-top: -2px;
 }
 
+.net-worth-helper-note {
+  font-size: 13px;
+  line-height: 18px;
+  color: #6b7280;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin: 4px 0 0;
+}
+
 .commission-percentage-inline {
   display: flex;
   align-items: stretch;
@@ -165,4 +175,11 @@
     min-width: 0;
     flex: 1 1 0;
   }
+}
+
+/* Tall saving-pot dialog: cap content height and pad bottom so fields stay scrollable / not clipped */
+.event-dialog-content.mat-mdc-dialog-content {
+  max-height: min(78vh, 760px);
+  padding-bottom: 28px !important;
+  box-sizing: border-box;
 }

@@ -2,12 +2,14 @@ import { Component, Inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
+import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatInputModule } from '@angular/material/input';
 import { ToastrService } from 'ngx-toastr';
+import { TranslateModule } from '@ngx-translate/core';
 import { LegacyHttpService } from '../services/legacy-http.service';
 import {
   LegacyDashboardModel,
@@ -30,9 +32,16 @@ interface RecipientRow {
   selector: 'app-beneficiary-rules',
   standalone: true,
   imports: [
-    CommonModule, FormsModule, MatDialogModule,
-    MatFormFieldModule, MatSelectModule, MatIconModule,
-    MatSliderModule, MatInputModule
+    CommonModule,
+    FormsModule,
+    MatDialogModule,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatIconModule,
+    MatSliderModule,
+    MatInputModule,
+    TranslateModule,
   ],
   templateUrl: './beneficiary-rules.component.html',
   styleUrl: './beneficiary-rules.component.scss'
@@ -73,6 +82,21 @@ export class BeneficiaryRulesComponent {
   get eligibleMembers(): FamilyMemberModel[] {
     if (!this.activeScenario) return [];
     return this.getEligibleMembers(this.activeScenario.type);
+  }
+
+  get canAddRecipient(): boolean {
+    const selectedIds = new Set(this.recipients.map(r => r.memberId).filter(id => !!id));
+    return this.eligibleMembers.some(m => !selectedIds.has(m.id));
+  }
+
+  getAvailableMembersForRow(rowIndex: number): FamilyMemberModel[] {
+    const selectedInOtherRows = new Set(
+      this.recipients
+        .filter((_, i) => i !== rowIndex)
+        .map(r => r.memberId)
+        .filter(id => !!id)
+    );
+    return this.eligibleMembers.filter(m => !selectedInOtherRows.has(m.id));
   }
 
   private buildScenarioTabs(): void {

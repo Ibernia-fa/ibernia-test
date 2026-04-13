@@ -3,8 +3,7 @@ import { CanActivate, Router, ActivatedRouteSnapshot, RouterStateSnapshot } from
 import { AuthService } from './auth/services/auth.service';
 import { Observable, from } from 'rxjs';
 import { tap } from 'rxjs/operators';
-
-const AUTH_RETURN_URL_KEY = 'auth_return_url';
+import { AUTH_RETURN_URL_KEY } from './auth/auth.constants';
 
 @Injectable({
   providedIn: 'root'
@@ -28,4 +27,4 @@ export class AuthGuard implements CanActivate {
   }
 }
 
-export { AUTH_RETURN_URL_KEY };
+export { AUTH_RETURN_URL_KEY } from './auth/auth.constants';

@@ -95,6 +95,10 @@
     font-size: 20px;
     line-height: 100%;
     font-weight: 700;
+    span {
+      font-size: 16px;
+      font-weight: 500;
+    }
   }
 }
 
@@ -122,6 +126,7 @@
 
 .dragable-card {
   overflow: hidden;
+  min-height: 91px !important;
   position: relative;
   flex: 1;
   padding: 24px;
@@ -245,5 +250,12 @@
     width: 1px;
     align-self: stretch;
     background-color: #d9d9d9;
+  }
+
+  // Anchor matTooltip to the full expense tile width so the overlay centers above this row only.
+  .insurance-expense-tooltip-host {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
   }
 }

@@ -1,13 +1,17 @@
-import { Component, Inject } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, DestroyRef, Inject, inject } from '@angular/core';
+import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { CommonModule } from '@angular/common';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatRadioModule } from '@angular/material/radio';
 import { MatSelectModule } from '@angular/material/select';
 import { ToastrService } from 'ngx-toastr';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 import { allCountries } from 'src/app/clients/models/country';
-import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
 
@@ -18,10 +22,44 @@ export interface AddLiabilityDialogData {
   mode: 'add' | 'edit';
   cashflowId: string;
   liability?: WealthLiabilityModel;
+  /** Existing liabilities on the dashboard (add mode) — used to preselect the first unused category. */
+  existingLiabilities?: WealthLiabilityModel[];
   clientPreferredCurrency?: string;
   hasPartner?: boolean;
   clientFirstName?: string;
   partnerFirstName?: string;
+}
+
+/** Order matches the dropdown and backend `AllowedLiabilityTypes`. */
+export const LIABILITY_CATEGORY_ORDER = [
+  'Mortgage',
+  'Loan',
+  'Credit Card',
+  'Student Loan',
+  'Other',
+] as const;
+
+export function pickDefaultLiabilityCategory(
+  existing: Pick<WealthLiabilityModel, 'type'>[],
+): string {
+  const used = new Set(
+    existing
+      .map((l) => l.type?.trim())
+      .filter((t): t is string => !!t)
+      .map((t) => t.toLowerCase()),
+  );
+  for (const type of LIABILITY_CATEGORY_ORDER) {
+    if (!used.has(type.toLowerCase())) {
+      return type;
+    }
+  }
+  return 'Other';
+}
+
+function trimmedRequired(control: AbstractControl): ValidationErrors | null {
+  const v = control.value;
+  const s = typeof v === 'string' ? v.trim() : '';
+  return s ? null : { required: true };
 }
 
 @Component({
@@ -31,28 +69,27 @@ export interface AddLiabilityDialogData {
     CommonModule,
     ReactiveFormsModule,
     MatDialogModule,
+    MatButtonModule,
+    MatIconModule,
     MatInputModule,
+    MatRadioModule,
     MatSelectModule,
-    ThousandSeparatorPipe,
-    ThousandSeparatorInputDirective
+    ThousandSeparatorInputDirective,
+    TranslateModule,
   ],
   templateUrl: './add-liability.component.html',
   styleUrl: './add-liability.component.scss',
 })
 export class AddLiabilityComponent {
+  private readonly destroyRef = inject(DestroyRef);
+
   form: FormGroup;
   isEditMode: boolean;
   isSaving = false;
   countries = allCountries;
   hasPartner: boolean;
 
-  liabilityTypes = [
-    'Mortgage',
-    'Loan',
-    'Credit Card',
-    'Student Loan',
-    'Other'
-  ];
+  liabilityTypes = [...LIABILITY_CATEGORY_ORDER];
 
   ownershipOptions: { value: number; label: string }[] = [];
 
@@ -61,7 +98,8 @@ export class AddLiabilityComponent {
     private dialogRef: MatDialogRef<AddLiabilityComponent>,
     @Inject(MAT_DIALOG_DATA) public data: AddLiabilityDialogData,
     private wealthHttp: WealthHttpService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private translate: TranslateService,
   ) {
     this.isEditMode = data.mode === 'edit';
     this.hasPartner = data.hasPartner ?? false;
@@ -78,40 +116,56 @@ export class AddLiabilityComponent {
       ? this.getOwnershipValue(data.liability!.ownership)
       : 0;
 
+    const initialType = this.isEditMode
+      ? data.liability!.type
+      : pickDefaultLiabilityCategory(data.existingLiabilities ?? []);
+
     this.form = this.fb.group({
-      type: [this.isEditMode ? data.liability!.type : '', Validators.required],
+      type: [initialType, Validators.required],
       name: [this.isEditMode ? (data.liability!.name || '') : ''],
-      description: [this.isEditMode ? data.liability!.description : '', Validators.required],
       outstanding: [this.isEditMode ? data.liability!.outstanding : null, [Validators.required, Validators.min(0)]],
       ownership: [ownershipValue],
       currencySymbol: [data.clientPreferredCurrency || 'EUR']
     });
 
-    if (this.isEditMode) {
-      this.updateNameValidation(data.liability!.type);
-    }
+    this.form
+      .get('type')
+      ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.syncNameValidators());
+    this.syncNameValidators();
   }
 
-  get isOtherType(): boolean {
-    return this.form.get('type')?.value === 'Other';
+  get liabilityNameLabelKey(): string {
+    return this.form.get('type')?.value === 'Other' ? 'Name' : 'WEALTH.NAME_OPTIONAL';
   }
 
-  onTypeChange(): void {
-    const type = this.form.get('type')?.value;
-    this.updateNameValidation(type);
-    if (type !== 'Other') {
-      this.form.patchValue({ name: '' });
-    }
-  }
-
-  private updateNameValidation(type: string): void {
-    const nameControl = this.form.get('name');
-    if (type === 'Other') {
-      nameControl?.setValidators(Validators.required);
+  private syncNameValidators(): void {
+    const nameCtrl = this.form.get('name');
+    if (this.form.get('type')?.value === 'Other') {
+      nameCtrl?.setValidators([trimmedRequired]);
     } else {
-      nameControl?.clearValidators();
+      nameCtrl?.clearValidators();
     }
-    nameControl?.updateValueAndValidity();
+    nameCtrl?.updateValueAndValidity({ emitEvent: false });
+  }
+
+  /** i18n key for contextual name placeholder by selected liability category */
+  get liabilityNamePlaceholderKey(): string {
+    const type = this.form.get('type')?.value as string;
+    switch (type) {
+      case 'Mortgage':
+        return 'WEALTH.NAME_PLACEHOLDER_LIABILITY_MORTGAGE';
+      case 'Loan':
+        return 'WEALTH.NAME_PLACEHOLDER_LIABILITY_LOAN';
+      case 'Credit Card':
+        return 'WEALTH.NAME_PLACEHOLDER_LIABILITY_CREDIT_CARD';
+      case 'Student Loan':
+        return 'WEALTH.NAME_PLACEHOLDER_LIABILITY_STUDENT_LOAN';
+      case 'Other':
+        return 'WEALTH.NAME_PLACEHOLDER_LIABILITY_OTHER';
+      default:
+        return 'WEALTH.NAME_PLACEHOLDER_LIABILITY_PENDING';
+    }
   }
 
   onAmountInput(rawValue: string): void {
@@ -119,7 +173,7 @@ export class AddLiabilityComponent {
       this.form.get('outstanding')?.setValue('', { emitEvent: true });
       return;
     }
-    const value = parseFormattedNumber(rawValue);
+    const value = parseFormattedNumber(rawValue, this.translate.currentLang);
     this.form.get('outstanding')?.setValue(value, { emitEvent: true });
   }
 
@@ -128,13 +182,14 @@ export class AddLiabilityComponent {
     this.isSaving = true;
 
     const formValue = this.form.value;
+    const trimmedName = typeof formValue.name === 'string' ? formValue.name.trim() : '';
+    const nameOrNull = trimmedName ? trimmedName : null;
 
     if (this.isEditMode) {
       const request = {
         id: this.data.liability!.id,
         type: formValue.type,
-        name: formValue.name || null,
-        description: formValue.description,
+        name: nameOrNull,
         outstanding: formValue.outstanding,
         ownership: this.hasPartner ? formValue.ownership : 0
       };
@@ -151,8 +206,7 @@ export class AddLiabilityComponent {
     } else {
       const request = {
         type: formValue.type,
-        name: formValue.name || null,
-        description: formValue.description,
+        name: nameOrNull,
         outstanding: formValue.outstanding,
         ownership: this.hasPartner ? formValue.ownership : 0
       };

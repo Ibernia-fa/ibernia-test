@@ -18,11 +18,25 @@ import { FundsViewModel } from '../model/withdrawals-contributions';
 import { catchError, filter } from 'rxjs';
 import { ClientSaving, ComissionType, SavingPotsModel } from '../../saving-pots/models/saving-pots.model';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { getAmountCycleLabel } from 'src/app/shared/utils/amount-cycle-label';
 import { extractEventId, resolveYear } from 'src/app/shared/utils/event-date-utils';
+import { Client } from 'src/app/clients/models/client';
+import { formatSavingPotSelectLabel } from 'src/app/shared/utils/saving-pot-select-label';
+import { translateTimelineEventDisplayName } from 'src/app/shared/utils/timeline-event-display-name';
+import {
+  getCashflowDialogEndCalendarYear,
+  getCompletedYearsAgeAtDate,
+  getPersistedAgeForCalendarYear,
+  getProjectionColumnAgeLabel,
+} from 'src/app/shared/utils/client-age-at-reference';
+import { calendarYearOrEventRefValidator } from 'src/app/shared/utils/calendar-year-or-event-ref.validator';
+import {
+  recurringEndYearNotSelected,
+  resolveCycleDescriptionForRecurringEndGuard,
+} from 'src/app/shared/utils/recurring-end-save-guard';
 
 @Component({
   selector: 'app-add-withdrawal',
@@ -39,9 +53,8 @@ import { extractEventId, resolveYear } from 'src/app/shared/utils/event-date-uti
     MatSliderModule,
     ReactiveFormsModule,
     MatCheckboxModule,
-    ThousandSeparatorPipe,
     ThousandSeparatorInputDirective,
-    TranslateModule
+    TranslateModule,
   ],
   providers: [provideNativeDateAdapter()],
   templateUrl: './add-withdrawal.component.html',
@@ -66,35 +79,32 @@ export class AddWithdrawalComponent {
   selectedEscalationDescription: string;
   existingWithdrawals: FundsViewModel[] = [];
   currentYear: number = new Date().getFullYear();
+  selectedClient: Client | null = null;
+  dialogEndCalendarYear = 0;
 
   constructor(
     private dialogRef: MatDialogRef<AddWithdrawalComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private fb: FormBuilder,
-    private withdrawalsContributionsHttpService: WithdrawalsContributionsHttpService
+    private withdrawalsContributionsHttpService: WithdrawalsContributionsHttpService,
+    private translate: TranslateService,
   ) {
     this.eventsList = data.eventsList ?? [];
     this.cycles = data.amountCycles;
     this.escalationRates = data.escalataionRates;
     this.clientBirthYear = moment(data.clientBirthDate).year();
     const birthDate = new Date(data.clientBirthDate);
-    const forecastStart = new Date(data.forecastStartDateYear, 0, 1);
-    let age = forecastStart.getFullYear() - birthDate.getFullYear();
-    const monthDiff = forecastStart.getMonth() - birthDate.getMonth();
-    const dayDiff = forecastStart.getDate() - birthDate.getDate();
-
-    if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
-      age--;
-    }
-
-    this.clientAge = age
-    if (data.forecastStartDateYear - this.clientBirthYear > this.clientAge) this.clientBirthYear = this.clientBirthYear + 1
+    const forecastStart = data.forecastStartDate
+      ? new Date(data.forecastStartDate)
+      : new Date(data.forecastStartDateYear, 0, 1);
+    this.clientAge = getCompletedYearsAgeAtDate(birthDate, forecastStart);
 
     this.clientPreferredCurrency = data.clientPreferredCurrency;
     this.cashflowId = data.cashflowId;
     this.isEditWorkflow = data.isEditWorkflow;
     this.selectedWithdrawal = data.selectedWithdrawal;
     this.savingPots = data.savingPots;
+    this.selectedClient = data.selectedClient ?? null;
     this.existingWithdrawals = data.existingWithdrawals ?? [];
 
     const availableSavings = (this.savingPots?.clientSavings ?? []).filter(
@@ -104,7 +114,18 @@ export class AddWithdrawalComponent {
     );
     this.savingPots.clientSavings = availableSavings;
     
-    const endYear = data.forecastEndDateYear + 1;
+    const resolvedEndYear = getCashflowDialogEndCalendarYear(
+      data.clientBirthDate,
+      data.planDuration,
+      data.forecastEndDateYear,
+    );
+    let endYear = Number.isFinite(resolvedEndYear)
+      ? resolvedEndYear
+      : Number(data.forecastEndDateYear);
+    if (!Number.isFinite(endYear)) {
+      endYear = data.forecastStartDateYear;
+    }
+    this.dialogEndCalendarYear = endYear;
     const iterations = endYear - data.forecastStartDateYear + 1;
 
     for (let index = 0; index < iterations; index++) {
@@ -154,12 +175,18 @@ export class AddWithdrawalComponent {
       if (this.selectedWithdrawal.startEventId) {
         this.withdrawalForm.get('start')?.patchValue('event:' + this.selectedWithdrawal.startEventId);
       } else {
-        this.withdrawalForm.get('start')?.patchValue(this.selectedWithdrawal.start.year);
+        const sy = Number(this.selectedWithdrawal.start?.year);
+        const startNum = Number.isFinite(sy) && sy > 0 ? sy : null;
+        if (startNum) this.ensureYearInSelectableYears(startNum);
+        this.withdrawalForm.get('start')?.patchValue(startNum);
       }
       if (this.selectedWithdrawal.endEventId) {
         this.withdrawalForm.get('end')?.patchValue('event:' + this.selectedWithdrawal.endEventId);
       } else {
-        this.withdrawalForm.get('end')?.patchValue(this.selectedWithdrawal.end.year);
+        const ey = Number(this.selectedWithdrawal.end?.year);
+        const endNum = Number.isFinite(ey) && ey > 0 ? ey : null;
+        if (endNum) this.ensureYearInSelectableYears(endNum);
+        this.withdrawalForm.get('end')?.patchValue(endNum);
       }
 
       const matchedEscalation = this.escalationRates.find(x => x.value === this.selectedWithdrawal?.escalationRate?.value);
@@ -194,12 +221,21 @@ export class AddWithdrawalComponent {
 
   }
 
+  /** i18n key — use with `| translate` in template (sentence case in EN/IT). */
   get dialogTitle(): string {
-    return this.isEditWorkflow ? 'Edit Withdrawal' : 'Add Withdrawal';
+    return this.isEditWorkflow ? 'Edit withdrawal' : 'Add withdrawal';
+  }
+
+  getSavingPotSelectLabel(saving: ClientSaving): string {
+    return formatSavingPotSelectLabel(
+      { name: saving.name, ownership: saving.ownership },
+      this.selectedClient,
+      this.translate,
+    );
   }
 
   onAmountInput(rawValue: string) {
-    const value = parseFormattedNumber(rawValue);
+    const value = parseFormattedNumber(rawValue, this.translate.currentLang);
     this.withdrawalForm.get('amount')?.setValue(value, { emitEvent: true });
   }
 
@@ -208,16 +244,22 @@ export class AddWithdrawalComponent {
   }
 
   onCycleValueChange(event: any) {
-    console.log({ event });
     const isOneOff = this.cycles.find(cycle => cycle.id === event)?.description === 'One-off';
     this.showStartEnd = !isOneOff;
 
+    const startCtrl = this.withdrawalForm.get('start');
+    const endCtrl = this.withdrawalForm.get('end');
+
     if (!this.showStartEnd) {
-      this.withdrawalForm.controls['end'].clearValidators();
-      this.withdrawalForm.controls['end'].updateValueAndValidity();
+      endCtrl?.clearValidators();
+      endCtrl?.updateValueAndValidity();
+      startCtrl?.setValidators([Validators.required]);
+      startCtrl?.updateValueAndValidity();
     } else {
-      this.withdrawalForm.controls['end'].addValidators(Validators.required);
-      this.withdrawalForm.controls['end'].updateValueAndValidity();
+      endCtrl?.setValidators([calendarYearOrEventRefValidator()]);
+      endCtrl?.updateValueAndValidity();
+      startCtrl?.setValidators([calendarYearOrEventRefValidator()]);
+      startCtrl?.updateValueAndValidity();
     }
 
     const escalationControl = this.withdrawalForm.get('escalationRate');
@@ -230,7 +272,35 @@ export class AddWithdrawalComponent {
     escalationControl?.updateValueAndValidity();
   }
 
+  getCycleLabel(cycle: Cycle): string {
+    return getAmountCycleLabel(cycle, this.translate);
+  }
+
+  getTimelineEventLabel(rawName: string): string {
+    return translateTimelineEventDisplayName(this.translate, rawName);
+  }
+
+  get isWithdrawalSaveButtonDisabled(): boolean {
+    if (this.withdrawalForm.invalid) {
+      return true;
+    }
+    if (this.showStartEnd) {
+      const endRaw = this.withdrawalForm.get('end')?.value;
+      if (!extractEventId(endRaw) && resolveYear(endRaw, this.eventsList) <= 0) {
+        return true;
+      }
+    }
+    const cycleId = this.withdrawalForm.get('cycle')?.value;
+    const desc = resolveCycleDescriptionForRecurringEndGuard(this.cycles, cycleId);
+    return recurringEndYearNotSelected(
+      desc,
+      this.withdrawalForm.get('end')?.value,
+      this.eventsList,
+    );
+  }
+
   addExpense(): void {
+    if (this.isWithdrawalSaveButtonDisabled) return;
     this.withdrawalForm.markAllAsTouched();
     this.withdrawalForm.markAsDirty();
     if (this.withdrawalForm.valid) {
@@ -252,7 +322,6 @@ export class AddWithdrawalComponent {
 
       const neutralCommissionEscRate: EscalationRate = { description: '', value: '0' };
 
-      console.log('Form Submitted', this.withdrawalForm.value);
       const isCustomEscalation =
         this.selectedEscalationDescription === 'Increases at custom rate';
       const escalationRateValue = isCustomEscalation
@@ -284,11 +353,27 @@ export class AddWithdrawalComponent {
           },
         },
         start: {
-          age: startYear ? startYear - this.clientBirthYear : 0,
+          age: startYear
+            ? getPersistedAgeForCalendarYear(
+                this.data.clientBirthDate,
+                startYear,
+                this.data.forecastStartDate,
+                this.data.planDuration,
+                this.dialogEndCalendarYear,
+              )
+            : 0,
           year: startYear || 0,
         },
         end: {
-          age: endYear ? endYear - this.clientBirthYear : 0,
+          age: endYear
+            ? getPersistedAgeForCalendarYear(
+                this.data.clientBirthDate,
+                endYear,
+                this.data.forecastStartDate,
+                this.data.planDuration,
+                this.dialogEndCalendarYear,
+              )
+            : 0,
           year: endYear || 0,
         },
         startEventId,
@@ -350,8 +435,6 @@ export class AddWithdrawalComponent {
           });
         });
       // Handle form submission logic
-    } else {
-      console.log('Form is invalid');
     }
   }
 
@@ -382,17 +465,11 @@ export class AddWithdrawalComponent {
   }
 
   onEscalationRateChange(event: MatSelectChange): void {
-    const selectedOption = event.source.selected;
+    const val = event.value;
+    const rate = this.escalationRates.find((e) => e.value === val);
+    const description = rate?.description ?? null;
 
-    let description: string | null = null;
-
-    if (Array.isArray(selectedOption)) {
-      description = selectedOption[0]?.viewValue ?? null;
-    } else {
-      description = selectedOption?.viewValue ?? null;
-    }
-
-    this.selectedEscalationDescription = description;
+    this.selectedEscalationDescription = description ?? '';
 
     const customControl = this.withdrawalForm.get('customEscalationRate');
 
@@ -496,7 +573,14 @@ export class AddWithdrawalComponent {
   }
 
   getAgeForYear(year: number): number {
-    return Number(year) - this.clientBirthYear;
+    const a = getProjectionColumnAgeLabel(
+      this.data.clientBirthDate,
+      Number(year),
+      this.data.forecastStartDate,
+      this.data.planDuration,
+      this.dialogEndCalendarYear,
+    );
+    return Number.isNaN(a) ? 0 : a;
   }
 
   getStartYear(): number {
@@ -511,5 +595,13 @@ export class AddWithdrawalComponent {
   getEndYears(): number[] {
     const startYear = this.getStartYear();
     return (this.years ?? []).filter((y) => y >= startYear);
+  }
+
+  private ensureYearInSelectableYears(year: number): void {
+    if (!Number.isFinite(year)) return;
+    if (!this.years.includes(year)) {
+      this.years.push(year);
+      this.years.sort((a, b) => a - b);
+    }
   }
 }

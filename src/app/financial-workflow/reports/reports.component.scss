@@ -548,11 +548,79 @@ tr.example-detail-row {
   padding: 16px;
 
   .ibr-insights-title {
-    font-size: 16px;
+    font-size: 20px;
     font-weight: 500;
     color: #1c1c1c;
     line-height: 100%;
     margin: 0 0 16px 0;
+  }
+
+  .ibr-insights-loading {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 0;
+    color: #787889;
+    font-size: 14px;
+  }
+
+  // Match .ibr-lifetime-header > p (lifetime chart subtitle)
+  .ibr-insights-empty-hint {
+    font-size: 16px;
+    line-height: 100%;
+    font-weight: 400;
+    color: #5a596e;
+    margin: 8px 0 0;
+  }
+
+  .ibr-insights-skeleton {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .ibr-insight-skeleton-card {
+    padding: 10px 14px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .skeleton-line {
+    position: relative;
+    overflow: hidden;
+    background: #e3e5ed;
+    border-radius: 999px;
+    height: 12px;
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      transform: translateX(-100%);
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.7),
+        transparent
+      );
+      animation: insight-skeleton-shimmer 1.2s infinite;
+    }
+  }
+
+  .skeleton-title {
+    width: 40%;
+    margin-bottom: 4px;
+  }
+
+  .skeleton-body {
+    width: 90%;
+  }
+
+  .skeleton-body-short {
+    width: 70%;
   }
 }
 
@@ -560,6 +628,7 @@ tr.example-detail-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
+  animation: insight-fade-in 0.2s ease;
 }
 
 .ibr-insight-card {
@@ -584,10 +653,10 @@ tr.example-detail-row {
   .ibr-insight-content {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 6px;
 
     h4 {
-      font-size: 14px;
+      font-size: 16px;
       font-weight: 500;
       color: #1c1c1c;
       margin: 0;
@@ -599,11 +668,33 @@ tr.example-detail-row {
     // }
 
     p {
-      font-size: 12px;
+      font-size: 16px;
       font-weight: 400;
       color: #787889;
       margin: 0;
-      line-height: 16px;
+      line-height: 20px;
     }
   }
+}
+
+@keyframes insight-skeleton-shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes insight-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.ibr-lifetime-graphs {
+  overflow: hidden;
 }

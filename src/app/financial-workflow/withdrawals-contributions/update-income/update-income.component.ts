@@ -13,10 +13,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { provideNativeDateAdapter } from '@angular/material/core';
-import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-update-income',
@@ -31,7 +30,6 @@ import { TranslateModule } from '@ngx-translate/core';
     MatSelectModule,
     MatDatepickerModule,
     MatSliderModule,
-    ThousandSeparatorPipe,
     ThousandSeparatorInputDirective,
     TranslateModule
   ],
@@ -44,15 +42,19 @@ export class UpdateIncomeComponent {
 
   constructor(
     private dialogRef: MatDialogRef<UpdateIncomeComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any
+    @Inject(MAT_DIALOG_DATA) public data: any,
+    private translate: TranslateService,
   ) {
     const rate = Number(data?.inflationRate ?? 0);
     const formatted = Number.isInteger(rate) ? `${rate}.0` : `${rate}`;
-    this.inflationRateLabel = `Increases at same rate as inflation (${formatted}%)`;
+    this.inflationRateLabel = this.translate.instant(
+      'ESCALATION.MATCH_INFLATION',
+      { rate: formatted },
+    );
   }
 
   onAmountInput(rawValue: string) {
-    const value = parseFormattedNumber(rawValue);
+    const value = parseFormattedNumber(rawValue, this.translate.currentLang);
     try {
       (this as any)['incomeForm']?.get('amount')?.setValue(value, { emitEvent: true });
     } catch (e) {}

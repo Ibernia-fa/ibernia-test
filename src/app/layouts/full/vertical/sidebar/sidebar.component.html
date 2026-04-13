@@ -1,42 +1,85 @@
 <!-- Sidebar header: logo + toggle (toggle only when expanded; when collapsed, toggle is in header) -->
 <div class="sidebar-header">
-  <div class="sidebar-logo-link">
-    <!-- COLLAPSED: show mini icon -->
-    <ng-container *ngIf="sidenavCollapsed; else expandedLogo">
-      <a
+  
+  <!-- <div
+    class="sidebar-logo-link"
+    [class.sidebar-logo-link--custom]="!!brandingLogo"
+  > -->
+  <!-- Defaults stay mounted; custom logo overlays when set (avoids blank flash on remove). -->
+  @if (!brandingLogo) {
+    <a href="/" class="d-flex align-items-center gap-5">
+      <img
+        [src]="staticCollapsedLogoSrc"
+        alt="Ibernia logo"
+        loading="eager"
+        fetchpriority="high"
+        decoding="sync"
+      />
+      <img
+        class="sidebar-ibernia-text-logo"
+        [class.sidebar-ibernia-text-logo--collapsed]="sidenavCollapsed"
+        src="../../../../../assets/images/logos/ibernia-text-logo.png"
+        alt="Ibernia text logo"
+        loading="eager"
+        fetchpriority="high"
+        decoding="sync"
+        [attr.aria-hidden]="sidenavCollapsed ? true : null"
+      />
+    </a>
+  }
+  <!-- <div class="sidebar-static-logos">
+  <a
         href="/"
-        style="
-          max-width: 48px !important;
-          width: 48px !important;
-          height: 48px !important;
-        "
+        class="sidebar-static-logo-slot sidebar-static-logo-slot--expanded"
+        [class.sidebar-static-logo-slot--active]="!sidenavCollapsed"
+        [attr.aria-hidden]="sidenavCollapsed || null"
+        [attr.tabindex]="sidenavCollapsed ? -1 : null"
       >
         <img
-          src="./assets/images/logos/sidebar-mini-fallback-icon.svg"
-          alt="mini logo"
-          class="sidebar-mini-logo"
+          [src]="staticExpandedLogoSrc"
+          alt="Ibernia"
+          class="sidebar-default-logo"
+          loading="eager"
+          fetchpriority="high"
+          decoding="sync"
         />
       </a>
-    </ng-container>
-
-    <!-- EXPANDED: show brand logo -->
-    <ng-template #expandedLogo>
-      <ng-container *ngIf="isBrandLogoLoaded; else fallbackLogo">
-        <app-branding [profileImage]="brandingLogo"></app-branding>
-      </ng-container>
-
-      <ng-template #fallbackLogo>
-        <a href="/">
-          <img
-            src="./assets/images/logos/sidebar-fallback-logo.svg"
-            alt="logo"
-            class="sidebar-default-logo"
-          />
-        </a>
-      </ng-template>
-    </ng-template>
-  </div>
-  @if (showToggle) {
+  <a
+        href="/"
+        class="sidebar-static-logo-slot sidebar-static-logo-slot--collapsed"
+        [class.sidebar-static-logo-slot--active]="sidenavCollapsed"
+        [attr.aria-hidden]="!sidenavCollapsed || null"
+        [attr.tabindex]="!sidenavCollapsed ? -1 : null"
+      >
+        <img
+          [src]="staticCollapsedLogoSrc"
+          alt="Ibernia"
+          class="sidebar-mini-logo"
+          width="48"
+          height="48"
+          loading="eager"
+          fetchpriority="high"
+          decoding="sync"
+        />
+      </a>
+  </div> -->
+  @if (brandingLogo) {
+    @if (sidenavCollapsed) {
+      <a href="/" class="d-flex align-items-center gap-5">
+        <img
+          [src]="staticCollapsedLogoSrc"
+          alt="Ibernia logo"
+          loading="eager"
+          fetchpriority="high"
+          decoding="sync"
+        />
+      </a>
+    } @else {
+      <app-branding [profileImage]="brandingLogo"></app-branding>
+    }
+  }
+  <!-- </div> -->
+  @if (showToggle && !isSettings) {
     <button
       mat-icon-button
       (click)="toggleMobileNav.emit()"
@@ -45,7 +88,7 @@
     >
       <i-tabler name="x" class="icon-20 d-flex"></i-tabler>
     </button>
-  } @else if (!sidenavCollapsed) {
+  } @else if (!sidenavCollapsed && !isSettings) {
     <button
       (click)="toggleCollapsed.emit()"
       class="sidebar-toggle-btn"

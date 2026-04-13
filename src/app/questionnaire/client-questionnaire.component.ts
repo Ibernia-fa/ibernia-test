@@ -1,4 +1,11 @@
-import { Component, OnInit, ViewChild, ElementRef, HostListener } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+  ElementRef,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -11,7 +18,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ToastrService } from 'ngx-toastr';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import {
   QuestionnaireHttpService,
   QuestionModel,
@@ -42,7 +49,7 @@ import { allCountries } from '../clients/models/country';
     style: 'display: block; min-height: 100vh; min-height: 100dvh;',
   },
 })
-export class ClientQuestionnaireComponent implements OnInit {
+export class ClientQuestionnaireComponent implements OnInit, OnDestroy {
   token = '';
   clientName = '';
   advisorId = '';
@@ -56,9 +63,9 @@ export class ClientQuestionnaireComponent implements OnInit {
   introFadingOut = false;
   isSubmitting = false;
   submitted = false;
-  showBubbles = false;
+  /** After smooth scroll to success, blocks scrolling back to prior sections. */
+  private successViewLocked = false;
   errorMessage = '';
-  bubbleCount = Array.from({ length: 30 });
 
   private dataReady = false;
   private minTimeElapsed = false;
@@ -74,13 +81,47 @@ export class ClientQuestionnaireComponent implements OnInit {
 
   @ViewChild('snapContainer') snapContainer!: ElementRef<HTMLDivElement>;
 
+  /** Temporary debug panel — activate with ?debug=1 URL param. Remove after iOS fix is confirmed. */
+  debugMode = false;
+  debugState = {
+    scrollTop: 0,
+    containerHeight: 0,
+    touchStarts: 0,
+    touchMoves: 0,
+    touchEnds: 0,
+    lastDelta: 0,
+    lastDir: 0,
+    preventedCount: 0,
+    lastStep: '',
+    lastStepResult: '',
+    idxBeforeRecalc: -1,
+    idxAfterRecalc: -1,
+    touchTarget: '',
+    stepCount: 0,
+    scrollOverrideCount: 0,
+  };
+
   constructor(
     private route: ActivatedRoute,
     private questionnaireHttpService: QuestionnaireHttpService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private cdr: ChangeDetectorRef,
+    private translate: TranslateService,
   ) {}
 
+  ngOnDestroy(): void {
+    document.removeEventListener('keydown', this.onDocumentKeydownCapture, { capture: true });
+    if (this.wheelIdleTimer != null) {
+      clearTimeout(this.wheelIdleTimer);
+      this.wheelIdleTimer = null;
+    }
+  }
+
   ngOnInit(): void {
+    this.route.queryParams.subscribe((qp) => {
+      this.debugMode = qp['debug'] === '1';
+    });
+
     setTimeout(() => {
       this.minTimeElapsed = true;
       this.dismissIntroIfReady();
@@ -142,6 +183,65 @@ export class ClientQuestionnaireComponent implements OnInit {
 
   /* ─── Scroll tracking & progress ─── */
 
+  private touchStartY = 0;
+  private touchLastY = 0;
+  private touchCumulativeDeltaY = 0;
+  private touchMoveCount = 0;
+  private touchStartTarget: HTMLElement | null = null;
+  private inputFocusLocked = false;
+  private inputFocusLockTimer: ReturnType<typeof setTimeout> | null = null;
+  private programmaticScroll = false;
+  /**
+   * One section change per wheel *burst*: trackpads emit many wheel events in one flick. A fixed ms gap
+   * still allows N steps in a long gesture; instead, consume one step per burst and reset after wheel
+   * goes quiet briefly.
+   */
+  private wheelBurstConsumed = false;
+  private wheelIdleTimer: ReturnType<typeof setTimeout> | null = null;
+  /** Quiet period after last wheel before a new burst can advance a section; keep > inter-packet noise, low enough to feel instant. */
+  private readonly WHEEL_BURST_IDLE_MS = 90;
+  /**
+   * While a burst is consumed, only "strong" wheel deltas prolong the idle deadline; weak tail packets
+   * would otherwise keep resetting the idle timer for seconds. Tune above typical decay, below new-flick peaks.
+   */
+  private readonly WHEEL_BURST_EXTEND_MIN_NORM = 36;
+  /**
+   * After burst idle, ignore section steps from medium deltas still in the same momentum tail until
+   * this window ends or a clearly new flick (|norm| >= STRONG_MIN) occurs.
+   */
+  private readonly WHEEL_POST_BURST_GATE_MS = 900;
+  private readonly WHEEL_POST_BURST_STRONG_MIN = 48;
+  private wheelPostBurstGateUntil = 0;
+
+  /** Capture-phase: run before browser applies arrow-key scroll to .snap-container / section-inner. */
+  private readonly onDocumentKeydownCapture = (event: KeyboardEvent): void => {
+    if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return;
+    if (this.showIntro || this.errorMessage) return;
+    if (this.submitted) {
+      event.preventDefault();
+      return;
+    }
+    if (this.keyboardArrowTargetNeedsDefault(event)) return;
+
+    event.preventDefault();
+    if (event.repeat) return;
+    this.tryStep(event.key === 'ArrowDown' ? 1 : -1);
+  };
+
+  get totalSections(): number {
+    const staticSections = this.advisorBio ? 5 : 4;
+    return this.questions.length + staticSections + (this.submitted ? 1 : 0);
+  }
+
+  /** First snap-section index that maps to `questions[0]`. */
+  get firstQuestionSectionIndex(): number {
+    return this.advisorBio ? 4 : 3;
+  }
+
+  get submitSectionIndex(): number {
+    return this.firstQuestionSectionIndex + this.questions.length;
+  }
+
   onScroll(): void {
     const el = this.snapContainer?.nativeElement;
     if (!el) return;
@@ -149,18 +249,31 @@ export class ClientQuestionnaireComponent implements OnInit {
     const sectionHeight = el.clientHeight;
     const maxScroll = el.scrollHeight - sectionHeight;
 
+    if (this.submitted && this.successViewLocked && maxScroll > 0 && el.scrollTop < maxScroll - 2) {
+      el.scrollTop = maxScroll;
+      return;
+    }
+
     if (maxScroll > 0) {
-      this.currentIndex = Math.round(el.scrollTop / sectionHeight);
+      const newIndex = Math.round(el.scrollTop / sectionHeight);
+
+      // While an input was recently focused the browser may natively scroll
+      // the container (keyboard show/hide, Safari autocomplete fill, dvh
+      // resize).  Block only browser-initiated scrolls; allow programmatic
+      // ones from scrollToSection() so intentional swipes still work.
+      if (this.inputFocusLocked && !this.programmaticScroll && newIndex !== this.currentIndex) {
+        el.scrollTop = this.currentIndex * sectionHeight;
+        return;
+      }
+
+      this.currentIndex = newIndex;
       this.progressPercent = (el.scrollTop / maxScroll) * 100;
     }
-  }
 
-  private isScrolling = false;
-  private touchStartY = 0;
-
-  get totalSections(): number {
-    const staticSections = this.advisorBio ? 5 : 4;
-    return this.questions.length + staticSections + (this.submitted ? 1 : 0);
+    if (this.debugMode) {
+      this.debugState.scrollTop = Math.round(el.scrollTop);
+      this.debugState.containerHeight = Math.round(el.clientHeight);
+    }
   }
 
   get isLastSection(): boolean {
@@ -171,66 +284,407 @@ export class ClientQuestionnaireComponent implements OnInit {
 
   onSwipeUpClick(): void {
     if (this.currentIndex === 0) {
-      this.scrollToSection(1);
+      this.tryStep(1);
     } else {
-      this.scrollToSection(this.currentIndex - 1);
+      this.tryStep(-1);
     }
   }
 
-  scrollToSection(index: number): void {
+  /** Snap to section index instantly (full viewport per section). */
+  private scrollToSection(index: number): void {
     const el = this.snapContainer?.nativeElement;
-    if (!el || this.isScrolling) return;
+    if (!el) return;
 
-    const clamped = Math.max(0, Math.min(index, this.totalSections - 1));
+    this.programmaticScroll = true;
+
+    const last = this.totalSections - 1;
+    const clamped = this.submitted ? last : Math.max(0, Math.min(index, last));
     const targetTop = el.clientHeight * clamped;
+    el.scrollTop = targetTop;
+    this.onScroll();
 
-    this.isScrolling = true;
-    el.style.scrollSnapType = 'none';
-    el.scrollTo({ top: targetTop, behavior: 'smooth' });
-
-    let settled = false;
-    const settle = () => {
-      if (settled) return;
-      settled = true;
-      el.style.scrollSnapType = '';
-      this.isScrolling = false;
-      this.onScroll();
-    };
-
-    setTimeout(settle, 800);
-
-    const checkDone = () => {
-      if (settled) return;
-      if (Math.abs(el.scrollTop - targetTop) < 2) {
-        settle();
-      } else {
-        requestAnimationFrame(checkDone);
+    // iOS can override a programmatic scrollTop when its compositor is still
+    // processing a touch gesture (momentum/settle). Re-apply on the next two
+    // animation frames to guarantee the position sticks.
+    let retries = 2;
+    const enforce = () => {
+      if (retries-- <= 0) { this.programmaticScroll = false; return; }
+      if (Math.abs(el.scrollTop - targetTop) > 2) {
+        el.scrollTop = targetTop;
+        this.onScroll();
+        if (this.debugMode) {
+          this.debugState.scrollOverrideCount++;
+          this.cdr.detectChanges();
+        }
       }
+      requestAnimationFrame(enforce);
     };
-    requestAnimationFrame(checkDone);
+    requestAnimationFrame(enforce);
+  }
+
+  /**
+   * Move one section in the given direction. Returns true if the view actually changed.
+   */
+  tryStep(direction: 1 | -1): boolean {
+    if (this.showIntro || this.errorMessage) return false;
+
+    if (this.submitted) {
+      if (!this.successViewLocked) return false;
+      if (direction < 0) return false;
+      return false;
+    }
+
+    const el = this.snapContainer?.nativeElement;
+    if (!el) return false;
+
+    const oldIdx = this.currentIndex;
+    const sectionHeight = el.clientHeight;
+    if (sectionHeight > 0) {
+      this.currentIndex = Math.round(el.scrollTop / sectionHeight);
+    }
+
+    if (this.debugMode) {
+      this.debugState.idxBeforeRecalc = oldIdx;
+      this.debugState.idxAfterRecalc = this.currentIndex;
+    }
+
+    const last = this.totalSections - 1;
+    let target = this.currentIndex + direction;
+    target = Math.max(0, Math.min(target, last));
+    if (target === this.currentIndex) {
+      if (this.debugMode) {
+        this.debugState.lastStep = `dir=${direction} cur=${this.currentIndex} tgt=${target}`;
+        this.debugState.lastStepResult = 'NOOP(same)';
+        this.cdr.detectChanges();
+      }
+      return false;
+    }
+
+    if (direction > 0) {
+      if (this.currentIndex >= this.submitSectionIndex) {
+        if (this.debugMode) {
+          this.debugState.lastStep = `dir=${direction} cur=${this.currentIndex} tgt=${target}`;
+          this.debugState.lastStepResult = 'BLOCK(submit)';
+          this.cdr.detectChanges();
+        }
+        return false;
+      }
+      if (!this.canLeaveSection(this.currentIndex)) {
+        this.toastr.warning(
+          this.translate.instant('Please answer this question before continuing.'),
+        );
+        if (this.debugMode) {
+          this.debugState.lastStep = `dir=${direction} cur=${this.currentIndex} tgt=${target}`;
+          this.debugState.lastStepResult = 'BLOCK(unanswered)';
+          this.cdr.detectChanges();
+        }
+        return false;
+      }
+    }
+
+    if (this.debugMode) {
+      this.debugState.stepCount++;
+      this.debugState.lastStep = `dir=${direction} cur=${this.currentIndex} tgt=${target}`;
+      this.debugState.lastStepResult = 'OK';
+      this.cdr.detectChanges();
+    }
+
+    this.scrollToSection(target);
+    return true;
+  }
+
+  private canLeaveSection(sectionIndex: number): boolean {
+    if (sectionIndex < this.firstQuestionSectionIndex) {
+      return true;
+    }
+    if (sectionIndex >= this.submitSectionIndex) {
+      return true;
+    }
+    const qi = sectionIndex - this.firstQuestionSectionIndex;
+    const q = this.questions[qi];
+    return q ? this.isQuestionAnswered(q) : true;
+  }
+
+  private isQuestionAnswered(q: QuestionModel): boolean {
+    switch (q.type) {
+      case 'ImportantPeople':
+      case 'FinancialPlanningImprovement':
+        return true;
+      case 'Goals': {
+        const selected = (this.responses[`goals_${q.id}`] as string[]) || [];
+        if (selected.length === 0) return false;
+        if (selected.includes('Other')) {
+          return !!this.othersByQuestion[`goals_${q.id}`]?.trim();
+        }
+        return true;
+      }
+      case 'AreasOfWorry': {
+        const selected = (this.responses[`worry_${q.id}`] as string[]) || [];
+        if (selected.length === 0) return false;
+        if (selected.includes('Other')) {
+          return !!this.othersByQuestion[`worry_${q.id}`]?.trim();
+        }
+        return true;
+      }
+      case 'InvestableAssets':
+      case 'InvestmentApproach':
+        return !!this.getSingleSelect(q.id)?.trim();
+      default:
+        return true;
+    }
+  }
+
+  private normalizeWheelDeltaY(e: WheelEvent): number {
+    let y = e.deltaY;
+    if (e.deltaMode === WheelEvent.DOM_DELTA_LINE) {
+      y *= 16;
+    } else if (e.deltaMode === WheelEvent.DOM_DELTA_PAGE) {
+      const el = this.snapContainer?.nativeElement;
+      y *= el?.clientHeight ?? 400;
+    }
+    return y;
+  }
+
+  private findScrollableAncestor(el: HTMLElement | null, stopAt: HTMLElement): HTMLElement | null {
+    let node: HTMLElement | null = el;
+    while (node && node !== stopAt) {
+      const style = getComputedStyle(node);
+      const oy = style.overflowY;
+      const scrollable =
+        (oy === 'auto' || oy === 'scroll') && node.scrollHeight > node.clientHeight + 1;
+      if (scrollable) return node;
+      node = node.parentElement;
+    }
+    return null;
+  }
+
+  /** Let the browser scroll inner overflow (e.g. long question card) before changing sections. */
+  private shouldDelegateWheelToInnerScroll(e: WheelEvent): boolean {
+    const container = this.snapContainer?.nativeElement;
+    if (!container) return false;
+    const scrollable = this.findScrollableAncestor(e.target as HTMLElement, container);
+    if (!scrollable) return false;
+    const delta = this.normalizeWheelDeltaY(e);
+    const max = scrollable.scrollHeight - scrollable.clientHeight;
+    if (delta > 0 && scrollable.scrollTop < max - 1) return true;
+    if (delta < 0 && scrollable.scrollTop > 1) return true;
+    return false;
+  }
+
+  private scheduleWheelBurstEnd(): void {
+    if (this.wheelIdleTimer != null) {
+      clearTimeout(this.wheelIdleTimer);
+    }
+    this.wheelIdleTimer = setTimeout(() => {
+      this.wheelIdleTimer = null;
+      const wasConsumed = this.wheelBurstConsumed;
+      this.wheelBurstConsumed = false;
+      if (wasConsumed) {
+        this.wheelPostBurstGateUntil = Date.now() + this.WHEEL_POST_BURST_GATE_MS;
+      }
+    }, this.WHEEL_BURST_IDLE_MS);
+  }
+
+  /** Reschedule burst-idle timer only when the packet should extend the "same gesture" window. */
+  private maybeRescheduleWheelBurstEnd(absNorm: number): void {
+    const inPostGate = Date.now() < this.wheelPostBurstGateUntil;
+    const strongEnough = absNorm >= this.WHEEL_BURST_EXTEND_MIN_NORM;
+    const shouldSchedule =
+      (this.wheelBurstConsumed && strongEnough) ||
+      (!this.wheelBurstConsumed && (!inPostGate || strongEnough));
+    if (shouldSchedule) {
+      this.scheduleWheelBurstEnd();
+    }
+  }
+
+  private onSnapWheel(e: WheelEvent): void {
+    const container = this.snapContainer?.nativeElement;
+    if (!container) return;
+
+    if (this.showIntro || this.errorMessage) return;
+
+    if (this.submitted) {
+      e.preventDefault();
+      return;
+    }
+
+    const delegate = this.shouldDelegateWheelToInnerScroll(e);
+    const norm = this.normalizeWheelDeltaY(e);
+
+    if (delegate) {
+      return;
+    }
+
+    e.preventDefault();
+    this.maybeRescheduleWheelBurstEnd(Math.abs(norm));
+
+    if (this.wheelBurstConsumed) {
+      return;
+    }
+
+    if (Math.abs(norm) < 10) {
+      return;
+    }
+
+    const now = Date.now();
+    if (now < this.wheelPostBurstGateUntil && Math.abs(norm) < this.WHEEL_POST_BURST_STRONG_MIN) {
+      return;
+    }
+
+    this.wheelBurstConsumed = true;
+    const dir = norm > 0 ? 1 : -1;
+    this.tryStep(dir);
   }
 
   private setupTouchScrolling(): void {
     const el = this.snapContainer?.nativeElement;
     if (!el) return;
 
-    el.addEventListener('touchstart', (e: TouchEvent) => {
+    // Listen on the wrapper (parent of snap-container) so touches on fixed
+    // overlays like .swipe-up-hint and .progress-track are also captured.
+    const wrapper = el.closest('.questionnaire-wrapper') as HTMLElement || el;
+
+    // Track input focus with a flag that survives the blur→scroll timing gap.
+    // Safari can blur the input BEFORE the autocomplete-triggered scroll fires,
+    // so checking document.activeElement in onScroll is unreliable.
+    el.addEventListener('focusin', (e: FocusEvent) => {
+      const t = e.target as HTMLElement;
+      if (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'MAT-SELECT') {
+        if (this.inputFocusLockTimer) { clearTimeout(this.inputFocusLockTimer); this.inputFocusLockTimer = null; }
+        this.inputFocusLocked = true;
+      }
+    });
+    el.addEventListener('focusout', () => {
+      if (this.inputFocusLockTimer) clearTimeout(this.inputFocusLockTimer);
+      this.inputFocusLockTimer = setTimeout(() => { this.inputFocusLocked = false; }, 600);
+    });
+
+    wrapper.addEventListener('touchstart', (e: TouchEvent) => {
       this.touchStartY = e.touches[0].clientY;
+      this.touchLastY = this.touchStartY;
+      this.touchCumulativeDeltaY = 0;
+      this.touchMoveCount = 0;
+      this.touchStartTarget = e.target as HTMLElement;
+      if (this.debugMode) {
+        this.debugState.touchStarts++;
+        const t = e.target as HTMLElement;
+        this.debugState.touchTarget = `${t.tagName}.${Array.from(t.classList).join('.')}`.substring(0, 30);
+      }
     }, { passive: true });
 
-    el.addEventListener('touchmove', (e: TouchEvent) => {
+    wrapper.addEventListener('touchmove', (e: TouchEvent) => {
+      const currentY = e.touches[0].clientY;
+      this.touchCumulativeDeltaY += this.touchLastY - currentY;
+      this.touchLastY = currentY;
+      this.touchMoveCount++;
       if (!this.isInsideScrollableChild(e.target as HTMLElement)) {
         e.preventDefault();
+        if (this.debugMode) { this.debugState.preventedCount++; }
+      }
+      if (this.debugMode) {
+        this.debugState.touchMoves++;
       }
     }, { passive: false });
 
-    el.addEventListener('touchend', (e: TouchEvent) => {
-      if (this.isScrolling) return;
-      const deltaY = this.touchStartY - e.changedTouches[0].clientY;
-      if (Math.abs(deltaY) > 40) {
-        this.scrollToSection(this.currentIndex + (deltaY > 0 ? 1 : -1));
+    wrapper.addEventListener('touchend', (e: TouchEvent) => {
+      if (this.debugMode) {
+        this.debugState.touchEnds++;
       }
+      if (this.showIntro || this.errorMessage) return;
+      if (this.submitted && !this.successViewLocked) return;
+
+      const endpointDelta = this.touchStartY - e.changedTouches[0].clientY;
+      const deltaY = this.touchMoveCount > 0 ? this.touchCumulativeDeltaY : endpointDelta;
+
+      // When there's no real drag (few/no touchmove events) but the endpoint
+      // delta is large, iOS autocomplete or keyboard events can fabricate a
+      // phantom "swipe". Skip section change for tap-like gestures on inputs.
+      if (this.touchMoveCount <= 2 && this.touchStartTarget && this.isInsideScrollableChild(this.touchStartTarget)) return;
+      if (this.debugMode) {
+        this.debugState.lastDelta = Math.round(deltaY);
+        this.debugState.lastDir = deltaY > 0 ? 1 : deltaY < 0 ? -1 : 0;
+        this.cdr.detectChanges();
+      }
+      if (Math.abs(deltaY) <= 40) return;
+
+      const dir = deltaY > 0 ? 1 : -1;
+      this.tryStep(dir);
     }, { passive: true });
+
+    el.addEventListener('wheel', (e: WheelEvent) => this.onSnapWheel(e), {
+      passive: false,
+      capture: true,
+    });
+
+    document.addEventListener('keydown', this.onDocumentKeydownCapture, { capture: true });
+  }
+
+  /**
+   * When true, ArrowUp/Down keep browser/Material default (inputs, select panels, overlays).
+   * Uses activeElement: keydown.target is often document.body (not inside #snapContainer), which
+   * incorrectly skipped preventDefault and caused line-by-line scrolling.
+   */
+  private keyboardArrowTargetNeedsDefault(event: KeyboardEvent): boolean {
+    const root = this.snapContainer?.nativeElement;
+    if (!root) return true;
+
+    const rawTarget = event.target as HTMLElement | null;
+    const ae = document.activeElement as HTMLElement | null;
+
+    if (
+      rawTarget?.closest?.('.cdk-overlay-container') ||
+      ae?.closest?.('.cdk-overlay-container')
+    ) {
+      return true;
+    }
+
+    let node: HTMLElement | null = null;
+    if (ae && root.contains(ae)) {
+      node = ae;
+    } else if (rawTarget && root.contains(rawTarget)) {
+      node = rawTarget;
+    } else if (
+      rawTarget === document.body ||
+      rawTarget === document.documentElement ||
+      ae === document.body ||
+      ae === document.documentElement
+    ) {
+      // Clicks on non-focusable UI leave focus on body; arrows should still do section steps.
+      return false;
+    } else {
+      return true;
+    }
+
+    const tag = node.tagName;
+    if (tag === 'TEXTAREA' || tag === 'SELECT') return true;
+    if (tag === 'INPUT') {
+      const type = (node as HTMLInputElement).type?.toLowerCase() ?? '';
+      // Text-like fields need arrow keys for caret; radio/checkbox must NOT opt into default —
+      // otherwise focus stays on the chip/option after click and ArrowUp/Down scroll .section-inner
+      // pixel-by-pixel instead of changing section.
+      if (
+        type === 'text' ||
+        type === 'search' ||
+        type === 'email' ||
+        type === 'url' ||
+        type === 'tel' ||
+        type === 'number'
+      ) {
+        return true;
+      }
+    }
+    if (tag === 'MAT-SELECT' || tag === 'MAT-OPTION') return true;
+
+    if (node.isContentEditable) return true;
+
+    let walk: HTMLElement | null = node;
+    while (walk) {
+      if (walk.classList.contains('important-people')) return true;
+      if (walk.classList.contains('chip-list-scrollable')) return true;
+      walk = walk.parentElement;
+    }
+
+    return false;
   }
 
   private isInsideScrollableChild(target: HTMLElement): boolean {
@@ -247,30 +701,38 @@ export class ClientQuestionnaireComponent implements OnInit {
     return false;
   }
 
-  @HostListener('window:keydown', ['$event'])
-  onKeydown(event: KeyboardEvent): void {
-    if (this.submitted || this.showIntro || this.errorMessage) return;
-
-    const tag = (event.target as HTMLElement)?.tagName;
-    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
-
-    if (event.key === 'ArrowDown') {
-      event.preventDefault();
-      this.scrollToSection(this.currentIndex + 1);
-    } else if (event.key === 'ArrowUp') {
-      event.preventDefault();
-      this.scrollToSection(this.currentIndex - 1);
-    }
-  }
-
   /* ─── ImportantPeople helpers ─── */
 
   addImportantPerson(): void {
+    const snapEl = this.snapContainer?.nativeElement;
+    const savedTop = snapEl?.scrollTop ?? 0;
+
     this.importantPeople.push({ name: '', relationship: '' });
+    this.cdr.detectChanges();
+
+    // Restore snap position (browser auto-scrolls new inputs into view,
+    // which cascades through .section-inner and .snap-container).
+    if (snapEl && Math.abs(snapEl.scrollTop - savedTop) > 2) {
+      snapEl.scrollTop = savedTop;
+    }
+
+    // Scroll the .important-people list to the bottom to show the new row.
+    const list = snapEl?.querySelector('.important-people') as HTMLElement;
+    if (list) {
+      list.scrollTop = list.scrollHeight;
+    }
   }
 
   removeImportantPerson(index: number): void {
+    const snapEl = this.snapContainer?.nativeElement;
+    const savedTop = snapEl?.scrollTop ?? 0;
+
     this.importantPeople.splice(index, 1);
+    this.cdr.detectChanges();
+
+    if (snapEl && Math.abs(snapEl.scrollTop - savedTop) > 2) {
+      snapEl.scrollTop = savedTop;
+    }
   }
 
   getImportantPeopleValue(): { name: string; relationship: string }[] {
@@ -400,14 +862,19 @@ export class ClientQuestionnaireComponent implements OnInit {
   }
 
   onSubmit(): void {
+    if (this.isSubmitting || this.submitted) {
+      return;
+    }
     this.isSubmitting = true;
+    this.cdr.detectChanges();
+
     const payload = { responses: this.buildSubmitPayload() };
 
     this.questionnaireHttpService.submit(this.token, payload).subscribe({
       next: () => {
         this.isSubmitting = false;
         this.submitted = true;
-        this.showBubbles = true;
+        this.successViewLocked = false;
 
         setTimeout(() => {
           const el = this.snapContainer?.nativeElement;
@@ -417,7 +884,16 @@ export class ClientQuestionnaireComponent implements OnInit {
           this.progressPercent = 100;
         }, 50);
 
-        setTimeout(() => { this.showBubbles = false; }, 3000);
+        setTimeout(() => {
+          this.successViewLocked = true;
+          const el = this.snapContainer?.nativeElement;
+          if (el) {
+            const maxScroll = el.scrollHeight - el.clientHeight;
+            if (maxScroll > 0 && el.scrollTop < maxScroll - 2) {
+              el.scrollTop = maxScroll;
+            }
+          }
+        }, 900);
       },
       error: (err) => {
         this.isSubmitting = false;

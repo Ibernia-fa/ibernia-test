@@ -12,7 +12,7 @@ export interface WealthAssetModel {
   id: string;
   category: string;
   name?: string;
-  description: string;
+  description?: string;
   value: number;
   ownership: string;
   isFromSavingPots: boolean;
@@ -22,7 +22,7 @@ export interface WealthLiabilityModel {
   id: string;
   type: string;
   name?: string;
-  description: string;
+  description?: string;
   outstanding: number;
   ownership: string;
 }
@@ -59,7 +59,6 @@ export interface PerPersonBreakdown {
 export interface AddWealthAssetRequest {
   category: number;
   name?: string;
-  description: string;
   value: number;
   ownership: number;
 }
@@ -68,7 +67,6 @@ export interface UpdateWealthAssetRequest {
   id: string;
   category: number;
   name?: string;
-  description: string;
   value: number;
   ownership: number;
 }
@@ -76,7 +74,6 @@ export interface UpdateWealthAssetRequest {
 export interface AddWealthLiabilityRequest {
   type: string;
   name?: string;
-  description: string;
   outstanding: number;
   ownership: number;
 }
@@ -85,7 +82,6 @@ export interface UpdateWealthLiabilityRequest {
   id: string;
   type: string;
   name?: string;
-  description: string;
   outstanding: number;
   ownership: number;
 }

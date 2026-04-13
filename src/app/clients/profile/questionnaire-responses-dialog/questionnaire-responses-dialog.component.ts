@@ -8,7 +8,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { CommonModule, DatePipe } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Client } from '../../models/client';
 import {
   GetClientQuestionnaireResponse,
@@ -40,6 +40,7 @@ export class QuestionnaireResponsesDialogComponent {
   constructor(
     private dialogRef: MatDialogRef<QuestionnaireResponsesDialogComponent>,
     private dialog: MatDialog,
+    private translate: TranslateService,
     @Inject(MAT_DIALOG_DATA) public data: QuestionnaireResponsesDialogData,
   ) {}
 
@@ -96,6 +97,7 @@ export class QuestionnaireResponsesDialogComponent {
       const selected = obj['selected'] as string[] | undefined;
       const others = obj['others'] as string | undefined;
       const parts = selected ? [...selected] : [];
+      // Keep a stable token for icon lookups; localize at render time.
       if (others) parts.push(`Other: ${others}`);
       return parts.join(', ') || '-';
     }
@@ -117,7 +119,9 @@ export class QuestionnaireResponsesDialogComponent {
       return chips.map((c) => ({ value: c }));
     const icons = item.optionIcons;
     return chips.map((chip) => {
-      const key = chip.startsWith('Other:') ? 'Other' : chip;
+      const otherPrefix = `${this.translate.instant('Other')}:`;
+      const key =
+        chip.startsWith('Other:') || chip.startsWith(otherPrefix) ? 'Other' : chip;
       const iconUrl = icons?.[key];
       return { value: chip, iconUrl };
     });
@@ -135,5 +139,27 @@ export class QuestionnaireResponsesDialogComponent {
     if (type === 'InvestableAssets') return 'Investable assets';
     if (type === 'InvestmentApproach') return 'Investment approach';
     return type;
+  }
+
+  localizeChipValue(raw: string): string {
+    const s = (raw ?? '').toString();
+    if (!s) return s;
+
+    if (s.startsWith('Other:')) {
+      const rest = s.replace(/^Other:\s*/i, '');
+      return `${this.translate.instant('Other')}: ${rest}`;
+    }
+
+    const t = this.translate.instant(s);
+    return t && t !== s ? t : s;
+  }
+
+  localizePersonalChip(raw: string): string {
+    const s = (raw ?? '').toString();
+    const m = s.match(/^(.*)\(([^)]+)\)\s*$/);
+    if (!m) return this.localizeChipValue(s);
+    const prefix = m[1].trimEnd();
+    const rel = m[2].trim();
+    return `${prefix}(${this.localizeChipValue(rel)})`;
   }
 }

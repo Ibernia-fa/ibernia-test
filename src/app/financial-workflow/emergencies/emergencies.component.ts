@@ -39,6 +39,7 @@ import {
 import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { CommonModule } from '@angular/common';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Client, Details } from 'src/app/clients/models/client';
@@ -83,6 +84,7 @@ import { MaterialModule } from 'src/app/material.module';
     MatProgressSpinnerModule,
     CurrencySymbolPipe,
     MaterialModule,
+    TranslateModule,
   ],
   templateUrl: './emergencies.component.html',
   styleUrl: './emergencies.component.scss',
@@ -149,6 +151,7 @@ export class EmergenciesComponent implements OnInit {
     private emergenciesHttp: EmergenciesHttpService,
     private clientHttpService: ClientHttpService,
     private toastr: ToastrService,
+    private translate: TranslateService,
     private dialog: MatDialog,
     private navItemService: NavItemService,
     private store: Store,
@@ -160,6 +163,29 @@ export class EmergenciesComponent implements OnInit {
     private incomeExpensesHttpService: IncomeExpensesHttpService,
   ) {
     this.navItemService.currentRouteName = 'Risk & Insurance';
+  }
+
+  getEmergencyLabel(e: Emergency): string {
+    const raw = (e?.name || this.getTypeName(e?.type)).toString().trim();
+    if (!raw) return '';
+
+    const normalized = raw.toLowerCase();
+    const key =
+      normalized === 'home'
+        ? 'EMERGENCIES.TYPE_HOME'
+        : normalized === 'life'
+          ? 'EMERGENCIES.TYPE_LIFE'
+          : normalized === 'disability'
+            ? 'EMERGENCIES.TYPE_DISABILITY'
+            : normalized === 'health'
+              ? 'EMERGENCIES.TYPE_HEALTH'
+              : normalized === 'natural hazards'
+                ? 'EMERGENCIES.TYPE_NATURAL_HAZARDS'
+                : normalized === 'will'
+                  ? 'EMERGENCIES.TYPE_WILL'
+                  : null;
+
+    return key ? this.translate.instant(key) : raw;
   }
 
   ngOnInit(): void {
@@ -348,7 +374,7 @@ export class EmergenciesComponent implements OnInit {
   onAddClick() {
     this.dialog
       .open(AddEmergenciesComponent, {
-        width: '700px',
+        width: '612px',
         disableClose: true,
         data: {
           emergencyTypes: this.emergencyTypes,
@@ -396,9 +422,10 @@ export class EmergenciesComponent implements OnInit {
 
   getCoverageAdequacyLabel(id: number | null): string {
     if (id == null) return '-';
-    return (
-      this.coverageAdequacies.find((c) => c.id === id)?.description ?? 'Unknown'
-    );
+    const raw =
+      this.coverageAdequacies.find((c) => c.id === id)?.description ?? 'Unknown';
+    const t = this.translate.instant(raw);
+    return t && t !== raw ? t : raw;
   }
 
   getWillStatusLabel(id: number | null): string {
@@ -450,6 +477,23 @@ export class EmergenciesComponent implements OnInit {
     } else {
       return 'ibernia-dark-green';
     }
+  }
+
+  getProgressBarStyles(score: number | null): Record<string, string> {
+    const pct = score != null ? Math.min(Math.max(score, 0), 100) : 0;
+    let color: string;
+
+    if (score == null || score < 50) {
+      color = '#ff383c';
+    } else if (score < 75) {
+      color = '#E1B025cc';
+    } else if (score < 89) {
+      color = '#09AC65cc';
+    } else {
+      color = '#166A41cc';
+    }
+
+    return { width: `${pct}%`, 'background-color': color };
   }
 
   getCardCssClass(e: Emergency): string {
@@ -527,7 +571,7 @@ export class EmergenciesComponent implements OnInit {
       this.defaultEmergencyIds.has(emergency.id) ||
       this.defaultEmergencyNames.has(emergency.name);
     const dialogRef = this.dialog.open(AddEmergenciesComponent, {
-      width: '700px',
+      width: '612px',
       disableClose: true,
       data: {
         mode: 'edit',
@@ -566,7 +610,7 @@ export class EmergenciesComponent implements OnInit {
       },
       error: (err) => {
         console.error(err);
-        this.toastr.error('Failed to hide emergency', 'Error');
+        this.toastr.error(this.translate.instant('ERROR.FAILED_HIDE_EMERGENCY'), this.translate.instant('LABEL.ERROR'));
         e.isHidden = !e.isHidden;
       },
     });
@@ -592,7 +636,7 @@ export class EmergenciesComponent implements OnInit {
       },
       error: (err) => {
         console.error(err);
-        this.toastr.error('Failed to show hidden emergencies', 'Error');
+        this.toastr.error(this.translate.instant('ERROR.FAILED_SHOW_EMERGENCIES'), this.translate.instant('LABEL.ERROR'));
       },
     });
   }
@@ -629,8 +673,56 @@ export class EmergenciesComponent implements OnInit {
     return this.emergencies?.some((e) => e.isHidden) ?? false;
   }
 
+  /**
+   * Display sort rank: 0 Excellent, 1 Good, 2 Basic, 3 Not covered / Not done.
+   * Will: Done (willStatus === 1) → Excellent; otherwise → Not covered.
+   */
+  private getProtectionDisplaySortRank(e: Emergency): number {
+    if (e.type === 2) {
+      return e.willStatus === 1 ? 0 : 3;
+    }
+    if (e.type === 1) {
+      if (e.policyStatus === 2) {
+        return 3;
+      }
+      switch (e.coverageAdequacy) {
+        case 3:
+          return 0;
+        case 2:
+          return 1;
+        case 1:
+          return 2;
+        default:
+          return 3;
+      }
+    }
+    if (e.policyStatus === 2) {
+      return 3;
+    }
+    switch (e.coverageAdequacy) {
+      case 3:
+        return 0;
+      case 2:
+        return 1;
+      case 1:
+        return 2;
+      default:
+        return 3;
+    }
+  }
+
   get filteredEmergencies(): Emergency[] {
-    return this.emergencies.filter((e) => !e.isHidden);
+    const visible = this.emergencies.filter((e) => !e.isHidden);
+    const indexById = new Map<string, number>();
+    this.emergencies.forEach((em, i) => indexById.set(em.id, i));
+    return [...visible].sort((a, b) => {
+      const ra = this.getProtectionDisplaySortRank(a);
+      const rb = this.getProtectionDisplaySortRank(b);
+      if (ra !== rb) {
+        return ra - rb;
+      }
+      return (indexById.get(a.id) ?? 0) - (indexById.get(b.id) ?? 0);
+    });
   }
 
   getSimulateData() {
@@ -688,7 +780,7 @@ export class EmergenciesComponent implements OnInit {
       ) ?? null;
 
     const dialogRef = this.dialog.open(SimulateEmergencyComponent, {
-      width: '700px',
+      width: '612px',
       disableClose: true,
       data: {
         client: this.selectedClient,
@@ -707,6 +799,7 @@ export class EmergenciesComponent implements OnInit {
         forecastStartDate: this.timeline.forecastStartDate,
         forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
         forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
+        planDuration: this.selectedCashflow?.planDuration,
       },
     });
 

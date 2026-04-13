@@ -15,7 +15,7 @@
                     +{{ currency | currencySymbol
                     }}{{
                       currentYearIncomeSummary.totalIncome | thousandSeparator
-                    }}
+                    }}<span>/{{ "INCOME_EXPENSE.FREQUENCY.YEAR" | translate }}</span>
                   </h3>
                 </div>
 
@@ -75,8 +75,9 @@
                     <div class="d-flex flex-column gap-6">
                       <h3 class="card-title">
                         {{
-                          displayItem.displayTitle ??
-                            displayItem.income.description
+                          displayItem.income.description
+                            | translateIncomeExpenseLabel
+                              : incomeDisplayLabelContext
                         }}
                       </h3>
 
@@ -99,24 +100,23 @@
                               }}
                               <span class="card-title"
                                 >/{{
-                                  getCycle(
+                                  getCycleLabelKey(
                                     displayItem.income.amount.cycle?.description
-                                  )
+                                  ) | translate
                                 }}</span
                               >
                             </h3>
                           }
                         </div>
                         @if (
-                          (displayItem.income.description === "Salary" ||
-                            displayItem.income.description ===
-                              "Salary (Partner)") &&
-                          hasBonusAmount(displayItem.income)
+                          isSalaryIncomeForBonus(
+                            displayItem.income.description
+                          ) && hasBonusAmount(displayItem.income)
                         ) {
                           <div class="items-divider"></div>
                           <div class="d-flex flex-col gap-10 bonus-list">
                             <div class="d-flex align-items-center tile-bonus">
-                              <span class="card-title">Bonus:</span>
+                              <span class="card-title">{{ 'Bonus:' | translate }}</span>
                               <h3
                                 class="paragraph-text d-flex align-items-baseline"
                               >
@@ -129,10 +129,10 @@
                                 }}
                                 <span class="card-title"
                                   >/{{
-                                    getCycle(
+                                    getCycleLabelKey(
                                       displayItem.income.bonus.amount.cycle
                                         ?.description
-                                    )
+                                    ) | translate
                                   }}</span
                                 >
                               </h3>
@@ -308,7 +308,11 @@
                     }
                     <div class="d-flex flex-column gap-6">
                       <h3 class="card-title">
-                        {{ income.description }}
+                        {{
+                          income.description
+                            | translateIncomeExpenseLabel
+                              : incomeDisplayLabelContext
+                        }}
                       </h3>
 
                       <h3 class="paragraph-text d-flex align-items-baseline">
@@ -316,7 +320,9 @@
                         }}{{ income.amount.amount | thousandSeparator }}
                         <span class="card-title"
                           >/{{
-                            getCycle(income.amount.cycle?.description)
+                            getCycleLabelKey(
+                              income.amount.cycle?.description
+                            ) | translate
                           }}</span
                         >
                       </h3>
@@ -480,7 +486,7 @@
                     -{{ currency | currencySymbol
                     }}{{
                       currentYearIncomeSummary.totalExpenses | thousandSeparator
-                    }}
+                    }}<span>/{{ "INCOME_EXPENSE.FREQUENCY.YEAR" | translate }}</span>
                   </h3>
                 </div>
 
@@ -540,7 +546,7 @@
                     }
                     <div class="d-flex flex-column gap-6">
                       <h3 class="card-title">
-                        {{ expense.description }}
+                        {{ expense.description | translateIncomeExpenseLabel }}
                       </h3>
 
                       <div class="d-flex flex-wrap gap-12 align-items-stretch">
@@ -558,7 +564,9 @@
                               }}{{ expense.amount.amount | thousandSeparator }}
                               <span class="card-title"
                                 >/{{
-                                  getCycle(expense.amount.cycle?.description)
+                                  getCycleLabelKey(
+                                    expense.amount.cycle?.description
+                                  ) | translate
                                 }}</span
                               >
                             </h3>
@@ -705,11 +713,29 @@
             </mat-card-content>
           }
 
-          @for (expense of expenses; track trackByExpenseId; let i = $index) {
-            <mat-card-content class="income-items">
+          @for (
+            expense of expensesOrderedForDisplay;
+            track trackByExpenseId;
+            let i = $index
+          ) {
+            <mat-card-content
+              class="income-items"
+              [class.insurance-expense-tooltip-host]="
+                expense.description === 'Insurance'
+              "
+              [appInsuranceExpenseTooltip]="
+                expense.description === 'Insurance'
+                  ? ('INCOME_EXPENSE.INSURANCE_CARD_TOOLTIP' | translate)
+                  : ''
+              "
+            >
               <div
-                class="dragable-card d-flex align-items-center justify-content-between cursor-pointer"
-                (click)="updateExpenseClicked(expense)"
+                class="dragable-card d-flex align-items-center justify-content-between"
+                [class.cursor-pointer]="expense.description !== 'Insurance'"
+                (click)="
+                  expense.description !== 'Insurance' &&
+                    updateExpenseClicked(expense)
+                "
               >
                 <div class="stats-main-wrapper">
                   <div class="d-flex align-items-start gap-10">
@@ -731,7 +757,7 @@
 
                     <div class="d-flex flex-column gap-6">
                       <h3 class="card-title">
-                        {{ expense.description }}
+                        {{ expense.description | translateIncomeExpenseLabel }}
                       </h3>
 
                       <h3 class="paragraph-text d-flex align-items-baseline">
@@ -739,7 +765,9 @@
                         }}{{ expense.amount.amount | thousandSeparator }}
                         <span class="card-title"
                           >/{{
-                            getCycle(expense.amount.cycle?.description)
+                            getCycleLabelKey(
+                              expense.amount.cycle?.description
+                            ) | translate
                           }}</span
                         >
                       </h3>

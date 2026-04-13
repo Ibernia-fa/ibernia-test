@@ -178,12 +178,12 @@ html .customizerNav {
   width: 1px !important;
 }
 .vis-time-axis .vis-grid.vis-major {
-  border-width: 2px;
+  border-width: 1px !important;
   border-color: black !important;
   display: none;
 }
 .vis-time-axis .vis-grid.vis-minor {
-  border-width: 2px;
+  border-width: 1px !important;
   border-color: pink;
 }
 .vis-time-axis .vis-grid.vis-minor {
@@ -211,6 +211,14 @@ html .customizerNav {
 .vis-item.retirement-age-icon.vis-selected {
   background-color: #c6e1ff;
   color: #3088ed;
+  border: none !important;
+  font-weight: 500;
+  width: auto !important;
+}
+.vis-item.partner-retirement-age-icon,
+.vis-item.partner-retirement-age-icon.vis-selected {
+  background-color: #ffebcb;
+  color: #fe9614;
   border: none !important;
   font-weight: 500;
   width: auto !important;
@@ -326,65 +334,10 @@ html .customizerNav {
 .vis-item.custom-icon,
 .vis-item.custom-icon.vis-selected {
   background-color: #cee9ff;
-  color: #0088ff;
+  color: #8388ff;
   border: none !important;
   font-weight: 500;
   width: auto !important;
-}
-
-// Vertical connector lines from event chips down to the year/age axis.
-// Each line color matches the event type's accent color.
-// The lines are clipped at the axis boundary by .vis-panel.vis-center overflow:hidden.
-.vis-item.birth-icon::after,
-.vis-item.wedding-icon::after,
-.vis-item.home-icon::after,
-.vis-item.travel-icon::after,
-.vis-item.car-icon::after,
-.vis-item.education-icon::after,
-.vis-item.new-business-icon::after,
-.vis-item.boat-icon::after,
-.vis-item.retirement-age-icon::after,
-.vis-item.custom-icon::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  top: 100%;
-  width: 1.5px;
-  height: 500px;
-  // pointer-events: none;
-  z-index: -1;
-}
-
-.vis-item.birth-icon::after {
-  background-color: #fe9614;
-}
-.vis-item.wedding-icon::after {
-  background-color: #6155f5;
-}
-.vis-item.home-icon::after {
-  background-color: #ff2d55;
-}
-.vis-item.travel-icon::after {
-  background-color: #0088ff;
-}
-.vis-item.car-icon::after {
-  background-color: #ac7f5e;
-}
-.vis-item.education-icon::after {
-  background-color: #00c8b3;
-}
-.vis-item.new-business-icon::after {
-  background-color: #34c759;
-}
-.vis-item.boat-icon::after {
-  background-color: #ff7504;
-}
-.vis-item.retirement-age-icon::after {
-  background-color: #0088ff;
-}
-.vis-item.custom-icon::after {
-  background-color: #0088ff;
 }
 
 .vis-item .vis-delete {
@@ -405,6 +358,7 @@ html .customizerNav {
 }
 .vis-item.birth-icon.vis-selected .vis-item-content,
 .vis-item.retirement-age-icon.vis-selected .vis-item-content,
+.vis-item.partner-retirement-age-icon.vis-selected .vis-item-content,
 .vis-item.home-icon.vis-selected .vis-item-content,
 .vis-item.car-icon.vis-selected .vis-item-content,
 .vis-item.new-business-icon.vis-selected .vis-item-content,
@@ -428,7 +382,7 @@ html .customizerNav {
 
 .vis-custom-time.dragOver,
 .vis-custom-time.hoverLine {
-  height: 77% !important;
+  height: 70.6% !important;
   top: 8px !important;
   background-color: #4043af !important;
   width: 1px !important;
@@ -513,11 +467,11 @@ html .customizerNav {
   min-width: 140px !important;
 }
 
-.sortby-edit-profile {
-  width: auto !important;
-  min-width: 156px !important;
-  padding: 8px 16px !important;
-}
+// .sortby-edit-profile {
+//   width: auto !important;
+//   min-width: 156px !important;
+//   padding: 8px 16px !important;
+// }
 
 // Modal Styles
 .modal-header {
@@ -592,7 +546,7 @@ html .customizerNav {
   }
   .mdc-slider__track--inactive {
     height: 8px !important;
-    background-color: #f5f5f5 !important;
+    background-color: #d0d0d0 !important;
   }
   .mdc-slider__track--active {
     height: 8px !important;
@@ -614,7 +568,8 @@ html .customizerNav {
     height: 46px !important;
   }
   .mdc-slider__thumb-knob {
-    background-color: #ffffff !important;
+    // background-color: #ffffff !important;
+    background-color: #4043af !important;
     border-color: #ffffff !important;
     border: 1px solid #e3e7fb !important;
     box-shadow:
@@ -622,6 +577,8 @@ html .customizerNav {
       0px 2.63px 3.88px 0px #00000004,
       0px 6.33px 9.35px 0px #00000005,
       0px 21px 31px 0px #00000008;
+
+    // box-shadow: 2px 2px 2px 1px #0000001a;
   }
   .mat-ripple {
     display: none !important;

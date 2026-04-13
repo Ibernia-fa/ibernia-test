@@ -1,4 +1,7 @@
-<div *ngIf="!isLoading; else loadingTpl" class="d-flex gap-16 flex-column">
+<div
+  *ngIf="!isLoading; else loadingTpl"
+  class="d-flex gap-16 flex-column m-t-16"
+>
   <!-- <mat-card class="mat-mdc-card mdc-card cardWithShadow">
     <mat-card-content class="mat-mdc-card-content">
       <div class="d-flex align-items-center justify-content-between w-100 gap-16 flex-wrap">
@@ -7,7 +10,7 @@
             <img width="25" src="../../../assets/images/svgs/danger-square-icon-active.svg" alt="">
           </div>
           <div class="d-flex flex-column justify-content-between gap-4">
-            <h4 class="page-title f-w-500">Risk & Insurance</h4>
+            <h4 class="page-title f-w-500">{{ 'Risk & Insurance' | translate }}</h4>
           </div>
         </div>
       </div>
@@ -18,10 +21,20 @@
     <mat-card-content>
       <div class="statistics-grid" *ngIf="stats as s">
         <div class="d-flex flex-column gap-8">
-          <h3 class="ibr-card-title">Protection score</h3>
+          <h3 class="ibr-card-title protection-score-title">
+            {{ "Protection score" | translate }}
+          </h3>
           <div class="gauge-wrapper">
             <div class="gauge-background">
-              <div class="gauge-progress" style="width: 50%"></div>
+              <div
+                class="gauge-progress"
+                [ngStyle]="
+                  getProgressBarStyles(
+                    computedProtectionScore ??
+                      s.emergenciesStats?.protectionScore
+                  )
+                "
+              ></div>
             </div>
             <h3
               class="gauge-text"
@@ -58,7 +71,9 @@
                       stroke-linejoin="round"
                     />
                   </svg>
-                  <h3 class="ibr-card-title">Total coverage:</h3>
+                  <h3 class="ibr-card-title">
+                    {{ "Total coverage" | translate }}:
+                  </h3>
                 </div>
                 <h3 class="saving-title-new">
                   <span>{{
@@ -79,43 +94,32 @@
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
                   >
-                    <path
-                      d="M11.6663 1.66797H4.99967C4.55765 1.66797 4.13372 1.84356 3.82116 2.15612C3.5086 2.46868 3.33301 2.89261 3.33301 3.33464V16.668C3.33301 17.11 3.5086 17.5339 3.82116 17.8465C4.13372 18.159 4.55765 18.3346 4.99967 18.3346H14.9997C15.4417 18.3346 15.8656 18.159 16.1782 17.8465C16.4907 17.5339 16.6663 17.11 16.6663 16.668V6.66797L11.6663 1.66797Z"
-                      stroke="#5A596E"
-                      stroke-width="1.2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                    <path
-                      d="M11.667 1.66797V6.66797H16.667"
-                      stroke="#5A596E"
-                      stroke-width="1.2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                    <path
-                      d="M13.3337 10.832H6.66699"
-                      stroke="#5A596E"
-                      stroke-width="1.2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                    <path
-                      d="M13.3337 14.168H6.66699"
-                      stroke="#5A596E"
-                      stroke-width="1.2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                    <path
-                      d="M8.33317 7.5H7.49984H6.6665"
-                      stroke="#5A596E"
-                      stroke-width="1.2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
+                    <g clip-path="url(#clip0_4448_513)">
+                      <path
+                        d="M18.3334 9.23355V10.0002C18.3324 11.7972 17.7505 13.5458 16.6745 14.9851C15.5986 16.4244 14.0862 17.4773 12.3629 17.9868C10.6396 18.4963 8.7978 18.4351 7.11214 17.8124C5.42648 17.1896 3.98729 16.0386 3.00922 14.5311C2.03114 13.0236 1.56657 11.2403 1.68481 9.44714C1.80305 7.65402 2.49775 5.94715 3.66531 4.58111C4.83288 3.21506 6.41074 2.26303 8.16357 1.867C9.91641 1.47097 11.7503 1.65216 13.3918 2.38355"
+                        stroke="#5A596E"
+                        stroke-width="1.7"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                      <path
+                        d="M18.3333 3.33398L10 11.6757L7.5 9.17565"
+                        stroke="#5A596E"
+                        stroke-width="1.7"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </g>
+                    <defs>
+                      <clipPath id="clip0_4448_513">
+                        <rect width="20" height="20" fill="white" />
+                      </clipPath>
+                    </defs>
                   </svg>
-                  <h3 class="ibr-card-title">Total annual cost:</h3>
+
+                  <h3 class="ibr-card-title">
+                    {{ "Total annual cost" | translate }}:
+                  </h3>
                 </div>
                 <h3 class="saving-title-new">
                   <span>{{
@@ -128,7 +132,7 @@
           </div>
 
           <button (click)="onAddClick()" type="button" class="button-icon">
-            <span class="f-w-500 f-s-16">Add new</span>
+            <span class="f-w-500 f-s-16">{{ "Add new" | translate }}</span>
             <img src="assets/images/svgs/add-icon.svg" alt="add-icon" />
           </button>
         </div>
@@ -282,7 +286,7 @@
                 <!-- <div [ngClass]="getDotClass(e)"></div> -->
                 <img width="18" [src]="getIconName(e)" alt="" />
                 <span class="ibr-new-card-title">
-                  {{ e.name || getTypeName(e.type) }}
+                  {{ getEmergencyLabel(e) }}
                 </span>
               </div>
 
@@ -368,7 +372,7 @@
                         </defs>
                       </svg>
                     </mat-icon>
-                    <span>Edit</span>
+                    <span>{{ "Edit" | translate }}</span>
                   </button>
 
                   <button
@@ -398,7 +402,7 @@
                         <path d="m2 2 20 20" />
                       </svg>
                     </mat-icon>
-                    <span>Hide</span>
+                    <span>{{ "Hide" | translate }}</span>
                   </button>
                 </mat-menu>
               </div>
@@ -438,14 +442,7 @@
                         xmlns="http://www.w3.org/2000/svg"
                       >
                         <path
-                          d="M22 11.0799V11.9999C21.9988 14.1563 21.3005 16.2545 20.0093 17.9817C18.7182 19.7088 16.9033 20.9723 14.8354 21.5838C12.7674 22.1952 10.5573 22.1218 8.53447 21.3744C6.51168 20.6271 4.78465 19.246 3.61096 17.4369C2.43727 15.6279 1.87979 13.4879 2.02168 11.3362C2.16356 9.18443 2.99721 7.13619 4.39828 5.49694C5.79935 3.85768 7.69279 2.71525 9.79619 2.24001C11.8996 1.76477 14.1003 1.9822 16.07 2.85986"
-                          stroke="#5A596E"
-                          stroke-width="2"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        />
-                        <path
-                          d="M22 4L12 14.01L9 11.01"
+                          d="M12 22C12 22 20 18 20 12V5L12 2L4 5V12C4 18 12 22 12 22Z"
                           stroke="#5A596E"
                           stroke-width="2"
                           stroke-linecap="round"
@@ -454,7 +451,7 @@
                       </svg>
 
                       <div class="inner-information d-flex flex-column gap-2">
-                        <div class="label">Coverage</div>
+                        <div class="label">{{ "Coverage" | translate }}</div>
                         <div class="sub-label">
                           <span>{{
                             clientData?.preferredCurrency | currencySymbol
@@ -473,14 +470,14 @@
                         xmlns="http://www.w3.org/2000/svg"
                       >
                         <path
-                          d="M12 1V23"
+                          d="M22 11.0799V11.9999C21.9988 14.1563 21.3005 16.2545 20.0093 17.9817C18.7182 19.7088 16.9033 20.9723 14.8354 21.5838C12.7674 22.1952 10.5573 22.1218 8.53447 21.3744C6.51168 20.6271 4.78465 19.246 3.61096 17.4369C2.43727 15.6279 1.87979 13.4879 2.02168 11.3362C2.16356 9.18443 2.99721 7.13619 4.39828 5.49694C5.79935 3.85768 7.69279 2.71525 9.79619 2.24001C11.8996 1.76477 14.1003 1.9822 16.07 2.85986"
                           stroke="#5A596E"
                           stroke-width="2"
                           stroke-linecap="round"
                           stroke-linejoin="round"
                         />
                         <path
-                          d="M17 5H9.5C8.57174 5 7.6815 5.36875 7.02513 6.02513C6.36875 6.6815 6 7.57174 6 8.5C6 9.42826 6.36875 10.3185 7.02513 10.9749C7.6815 11.6313 8.57174 12 9.5 12H14.5C15.4283 12 16.3185 12.3687 16.9749 13.0251C17.6313 13.6815 18 14.5717 18 15.5C18 16.4283 17.6313 17.3185 16.9749 17.9749C16.3185 18.6313 15.4283 19 14.5 19H6"
+                          d="M22 4L12 14.01L9 11.01"
                           stroke="#5A596E"
                           stroke-width="2"
                           stroke-linecap="round"
@@ -489,7 +486,7 @@
                       </svg>
 
                       <div class="inner-information d-flex flex-column gap-2">
-                        <div class="label">Annual cost</div>
+                        <div class="label">{{ "Annual cost" | translate }}</div>
                         <div class="sub-label">
                           <span>{{
                             clientData?.preferredCurrency | currencySymbol
@@ -503,7 +500,9 @@
                 <div class="status-container">
                   <div class="d-flex align-items-center justify-content-center">
                     <div class="d-flex align-items-center gap-2 tag">
-                      <span class="label-tag">Adequacy:</span>
+                      <span class="label-tag"
+                        >{{ "Adequacy" | translate }}:</span
+                      >
                       <span
                         class="dynamic-color"
                         [ngClass]="getAdequacyClass(e)"
@@ -537,7 +536,7 @@
                     <div
                       class="inner-information text-center d-flex flex-column gap-4"
                     >
-                      <div class="label">Status</div>
+                      <div class="label">{{ "Status" | translate }}</div>
                       <div
                         class="not-cover-label"
                         [ngClass]="{
@@ -545,7 +544,7 @@
                           'text-success': e.policyStatus === 1,
                         }"
                       >
-                        Not covered
+                        {{ "Not covered" | translate }}
                       </div>
                     </div>
                   </div>
@@ -560,7 +559,7 @@
                     class="simulate-button"
                     (click)="simulateEmergency(e); $event.stopPropagation()"
                   >
-                    Simulate
+                    {{ "Simulate" | translate }}
                   </button>
                 </div>
               </ng-template>
@@ -573,7 +572,7 @@
                   <div
                     class="inner-information text-center d-flex flex-column gap-4"
                   >
-                    <div class="label">Status</div>
+                    <div class="label">{{ "Status" | translate }}</div>
                     <div
                       class="not-cover-label"
                       [ngClass]="{
@@ -581,7 +580,11 @@
                         'will-done-text': e.willStatus === 1,
                       }"
                     >
-                      {{ e.willStatus === 1 ? "Done" : "Not done" }}
+                      {{
+                        e.willStatus === 1
+                          ? ("Done" | translate)
+                          : ("Not done" | translate)
+                      }}
                     </div>
                   </div>
                 </div>
@@ -593,7 +596,7 @@
 
       <div *ngIf="!isLoading && emergencies.length === 0">
         <p class="text-muted text-center my-4">
-          No protection items added yet. Click <b>Add new</b> to get started.
+          {{ "No protection items available." | translate }}
         </p>
       </div>
       <div
@@ -608,7 +611,7 @@
           class="button-icon-outline"
           (click)="showHiddenEmergencies()"
         >
-          <span>Show hidden</span>
+          <span>{{ "Show hidden" | translate }}</span>
         </button>
       </div>
     </mat-card-content>

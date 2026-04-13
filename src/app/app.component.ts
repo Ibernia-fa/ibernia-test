@@ -1,15 +1,14 @@
 import { Component } from '@angular/core';
-import { Router, RouterOutlet } from '@angular/router';
-import { FooterComponent } from './layouts/full/vertical/footer/footer.component';
+import { RouterOutlet } from '@angular/router';
 import { LanguageLoaderService } from './layouts/full/language-loader.service';
-import { BrowserModule } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-root',
     imports: [RouterOutlet,
-      FooterComponent,
-      CommonModule
+      CommonModule,
+      TranslateModule
     ],
     templateUrl: './app.component.html'
 })
@@ -19,18 +18,5 @@ export class AppComponent {
 
   constructor(
     private languageLoader: LanguageLoaderService,
-    private router: Router,
   ) {}
-
-  get isQuestionnaireRoute(): boolean {
-    return this.router.url.startsWith('/questionnaire/');
-  }
-
-  get isCashflowRoute(): boolean {
-    return this.router.url.startsWith('/cashflows');
-  }
-
-  get showFooter(): boolean {
-    return !this.isQuestionnaireRoute && !this.isCashflowRoute;
-  }
 }

@@ -1,0 +1,79 @@
+<div class="d-flex gap-16 flex-column m-t-16 school-container">
+  <mat-card class="ibr-new-dashboad-card">
+    <mat-card-content>
+      <div class="d-flex flex-column gap-10 m-b-16">
+        <h3 class="ibr-new-heading">{{ 'School' | translate }}</h3>
+        <p class="ibr-new-subheading">
+          Clear guides for everyday financial concepts
+        </p>
+      </div>
+
+      <ng-container *ngIf="!hasActiveModule; else moduleViewer">
+        <div class="school-grid">
+          <button
+            type="button"
+            class="school-tile"
+            *ngFor="let module of modules"
+            (click)="openModule(module.id)"
+          >
+            <div class="tile-header">
+              <h4 class="tile-title">{{ module.title }}</h4>
+              <span class="tile-chevron">›</span>
+            </div>
+            <p class="tile-subtitle">
+              {{ module.subtitle }}
+            </p>
+          </button>
+        </div>
+      </ng-container>
+
+      <ng-template #moduleViewer>
+        <div class="module-header">
+          <button
+            type="button"
+            class="back-button"
+            (click)="closeModule()"
+          >
+            ‹ All modules
+          </button>
+          <div class="module-titles" *ngIf="activeModule as m">
+            <h3 class="module-title">{{ m.title }}</h3>
+            <p class="module-subtitle">
+              {{ m.subtitle }}
+            </p>
+          </div>
+          <div class="slide-counter" *ngIf="totalSlides">
+            {{ activeSlideIndex + 1 }} of {{ totalSlides }}
+          </div>
+        </div>
+
+        <div class="module-body" *ngIf="currentSlide as slide">
+          <h4 class="slide-title">{{ slide.title }}</h4>
+          <p class="slide-body">
+            {{ slide.body }}
+          </p>
+        </div>
+
+        <div class="module-footer">
+          <button
+            type="button"
+            class="nav-button nav-button-secondary"
+            (click)="previousSlide()"
+            [disabled]="activeSlideIndex === 0"
+          >
+            Previous
+          </button>
+          <button
+            type="button"
+            class="nav-button"
+            (click)="nextSlide()"
+            [disabled]="activeSlideIndex >= totalSlides - 1"
+          >
+            Next
+          </button>
+        </div>
+      </ng-template>
+    </mat-card-content>
+  </mat-card>
+</div>
+

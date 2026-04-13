@@ -1,15 +1,16 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, LOCALE_ID, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { CommonModule, formatNumber } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatButtonModule } from '@angular/material/button';
+import { MatTableModule } from '@angular/material/table';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialog } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
 import { Store } from '@ngrx/store';
 import { of, switchMap, tap, catchError, filter, forkJoin } from 'rxjs';
-import { DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import moment from 'moment';
 
@@ -25,11 +26,13 @@ import { AuthService } from 'src/app/auth/services/auth.service';
 import { SettingsService } from 'src/app/default-preferance/services/default-preferance.http.service';
 import { AddNewPotComponent } from '../saving-pots/add-new-pot/add-new-pot.component';
 import { patchInflationRateDescription } from 'src/app/shared/utils/escalation-rate-utils';
+import { formatClientPersonDisplayName } from 'src/app/shared/utils/person-display-name';
 import { WealthHttpService } from './services/wealth-http.service';
 import { WealthDashboardModel, WealthAssetModel, WealthLiabilityModel } from './models/wealth.model';
 import { AddAssetComponent } from './add-asset/add-asset.component';
 import { AddLiabilityComponent } from './add-liability/add-liability.component';
 import { LegacyComponent } from './legacy/legacy.component';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-wealth',
@@ -39,9 +42,12 @@ import { LegacyComponent } from './legacy/legacy.component';
     MatCardModule,
     MatIconModule,
     MatMenuModule,
+    MatButtonModule,
+    MatTableModule,
     MatProgressSpinnerModule,
     CurrencySymbolPipe,
-    LegacyComponent
+    LegacyComponent,
+    TranslateModule,
   ],
   templateUrl: './wealth.component.html',
   styleUrl: './wealth.component.scss',
@@ -49,6 +55,7 @@ import { LegacyComponent } from './legacy/legacy.component';
 })
 export class WealthComponent implements OnInit {
   private destroyRef = inject(DestroyRef);
+  private readonly locale = inject(LOCALE_ID);
 
   activeTab: 'networth' | 'legacy' = 'networth';
   cashflowId!: string;
@@ -74,12 +81,25 @@ export class WealthComponent implements OnInit {
     private navItemService: NavItemService,
     private store: Store,
     private cdr: ChangeDetectorRef,
+    private translate: TranslateService,
   ) {
     this.navItemService.currentRouteName = 'Wealth & Inheritance';
   }
 
   get hasPartner(): boolean {
     return this.dashboard?.hasPartner ?? false;
+  }
+
+  get displayedAssetColumns(): string[] {
+    return this.hasPartner
+      ? ['category', 'ownership', 'value', 'action']
+      : ['category', 'value', 'action'];
+  }
+
+  get displayedLiabilityColumns(): string[] {
+    return this.hasPartner
+      ? ['category', 'ownership', 'value', 'action']
+      : ['category', 'value', 'action'];
   }
 
   get clientFirstName(): string {
@@ -91,6 +111,9 @@ export class WealthComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.translate.onLangChange
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.cdr.markForCheck());
     this.load();
   }
 
@@ -176,7 +199,7 @@ export class WealthComponent implements OnInit {
 
   onAddAsset(): void {
     const dialogRef = this.dialog.open(AddAssetComponent, {
-      width: '500px',
+      width: '612px',
       disableClose: true,
       data: {
         mode: 'add',
@@ -203,7 +226,7 @@ export class WealthComponent implements OnInit {
     }
 
     const dialogRef = this.dialog.open(AddAssetComponent, {
-      width: '500px',
+      width: '612px',
       disableClose: true,
       data: {
         mode: 'edit',
@@ -266,7 +289,7 @@ export class WealthComponent implements OnInit {
         });
 
         const dialogRef = this.dialog.open(AddNewPotComponent, {
-          width: '700px',
+          width: '612px',
           disableClose: true,
           data: {
             returnRate,
@@ -279,13 +302,21 @@ export class WealthComponent implements OnInit {
             clientPreferredCurrency: this.selectedClient?.clientDetails?.preferredCurrency,
             forecastEndDateYear: moment(timeline?.forecastEndtDate).year(),
             forecastStartDateYear: moment(timeline?.forecastStartDate).year(),
+            forecastStartDate: timeline?.forecastStartDate,
             cashflowId: this.cashflowId,
             isEditWorkflow: true,
             event: pot,
             existingSavingPots: savingPots?.clientSavings || [],
             hasPartner: this.hasPartner,
             clientFirstName: this.clientFirstName,
-            partnerFirstName: this.partnerFirstName
+            partnerFirstName: this.partnerFirstName,
+            clientDisplayName: formatClientPersonDisplayName(
+              this.selectedClient?.clientDetails,
+            ),
+            partnerDisplayName: formatClientPersonDisplayName(
+              this.selectedClient?.partnerDetail,
+            ),
+            fromNetWorth: true
           }
         });
 
@@ -303,11 +334,12 @@ export class WealthComponent implements OnInit {
 
   onAddLiability(): void {
     const dialogRef = this.dialog.open(AddLiabilityComponent, {
-      width: '500px',
+      width: '612px',
       disableClose: true,
       data: {
         mode: 'add',
         cashflowId: this.cashflowId,
+        existingLiabilities: this.dashboard?.liabilities ?? [],
         clientPreferredCurrency: this.clientData?.preferredCurrency,
         hasPartner: this.hasPartner,
         clientFirstName: this.clientFirstName,
@@ -325,7 +357,7 @@ export class WealthComponent implements OnInit {
 
   onEditLiability(liability: WealthLiabilityModel): void {
     const dialogRef = this.dialog.open(AddLiabilityComponent, {
-      width: '500px',
+      width: '612px',
       disableClose: true,
       data: {
         mode: 'edit',
@@ -359,9 +391,23 @@ export class WealthComponent implements OnInit {
   }
 
   getOwnershipLabel(ownership: string): string {
-    if (!ownership || ownership === 'Joint') return 'Joint';
-    if (ownership === 'Client') return this.clientFirstName || 'Client';
-    if (ownership === 'Partner') return this.partnerFirstName || 'Partner';
+    if (!ownership || ownership === 'Joint') {
+      return this.translate.instant('Joint');
+    }
+    if (ownership === 'Client') {
+      return (
+        formatClientPersonDisplayName(this.selectedClient?.clientDetails) ||
+        this.clientFirstName ||
+        this.translate.instant('Client')
+      );
+    }
+    if (ownership === 'Partner') {
+      return (
+        formatClientPersonDisplayName(this.selectedClient?.partnerDetail) ||
+        this.partnerFirstName ||
+        this.translate.instant('Partner')
+      );
+    }
     return ownership;
   }
 
@@ -371,6 +417,54 @@ export class WealthComponent implements OnInit {
       case 'Partner': return 'ownership-partner';
       default: return 'ownership-joint';
     }
+  }
+
+  /** Assets table Description column: saving-pot name via same keys as Saving Pots (`name | translate`); else manual name; else category. */
+  getAssetSummaryLabel(asset: WealthAssetModel): string {
+    if (asset.isFromSavingPots) {
+      const fromPot = asset.description?.trim() || asset.name?.trim();
+      if (fromPot) {
+        return this.translate.instant(fromPot);
+      }
+      return this.translate.instant(asset.category);
+    }
+    const custom = asset.name?.trim();
+    if (custom) {
+      return custom;
+    }
+    return this.translate.instant(asset.category);
+  }
+
+  /** Summary table: custom name when set; otherwise translated liability type. */
+  getLiabilitySummaryLabel(liability: WealthLiabilityModel): string {
+    const custom = liability.name?.trim();
+    if (custom) {
+      return custom;
+    }
+    return this.translate.instant(liability.type);
+  }
+
+  /**
+   * Compact amount for per-person net worth chips: K from 1k, M from 1M; otherwise same as number pipe.
+   */
+  formatPerPersonNetWorthDisplay(value: number | null | undefined): string {
+    if (value == null || Number.isNaN(value)) {
+      return formatNumber(0, this.locale, '1.0-0');
+    }
+    const sign = value < 0 ? '-' : '';
+    const abs = Math.abs(value);
+    if (abs >= 1_000_000) {
+      return sign + this.compactScaledSuffix(abs / 1_000_000, 'M');
+    }
+    if (abs >= 1_000) {
+      return sign + this.compactScaledSuffix(abs / 1_000, 'K');
+    }
+    return sign + formatNumber(Math.round(abs), this.locale, '1.0-0');
+  }
+
+  private compactScaledSuffix(scaled: number, suffix: string): string {
+    const s = scaled.toFixed(1);
+    return s.replace(/\.0$/, '') + suffix;
   }
 
   private refreshDashboard(): void {

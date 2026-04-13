@@ -1,0 +1,38 @@
+:host {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+.comparison-line-chart {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 500px;
+}
+
+:host ::ng-deep apx-chart {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+.apexcharts-tooltip .savings-tooltip__body {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+
+  &:not(:last-child) {
+    margin-bottom: 4px;
+  }
+}
+
+.apexcharts-tooltip .savings-tooltip__label {
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+}
+
+.apexcharts-tooltip .savings-tooltip__value {
+  font-weight: 700;
+}

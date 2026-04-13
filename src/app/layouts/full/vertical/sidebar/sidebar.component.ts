@@ -10,7 +10,7 @@ import {
 import { Subject } from 'rxjs';
 import { NavigationEnd, Router } from '@angular/router';
 import { TablerIconsModule } from 'angular-tabler-icons';
-import { filter, startWith, takeUntil, take } from 'rxjs';
+import { filter, startWith, takeUntil } from 'rxjs';
 import { BrandingComponent } from './branding.component';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
@@ -39,14 +39,23 @@ export class SidebarComponent implements OnInit, OnDestroy {
   @Output() toggleCollapsed = new EventEmitter<void>();
 
   isSettings = false;
+  /** Organization-uploaded logo; when null, sidebar uses static SVG fallbacks. */
   brandingLogo: string | null = null;
-  isBrandLogoLoaded = false;
+
+  /**
+   * Stable asset URLs for default sidebar logos. Both images stay mounted; only CSS
+   * visibility toggles with the sidebar so the browser does not reload on collapse/expand.
+   */
+  readonly staticExpandedLogoSrc =
+    'assets/images/logos/sidebar-fallback-logo.svg';
+  readonly staticCollapsedLogoSrc =
+    'assets/images/logos/sidebar-mini-fallback-icon.svg';
 
   ngOnInit(): void {
     this.router.events
       .pipe(
         filter((e) => e instanceof NavigationEnd),
-        startWith(null)
+        startWith(null),
       )
       .subscribe(() => {
         const url = this.router.url.split('?')[0];
@@ -55,16 +64,12 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
     const userId = this.authService.getUserProfile()?.sub;
     if (userId) {
-      // Use cached logo immediately if available (e.g. from header or previous load)
-      this.organizationProfiles.brandingLogo$
-        .pipe(take(1))
-        .subscribe((url) => {
-          const cached = this.ensureDataUrl(url);
-          if (cached) {
-            this.brandingLogo = cached;
-            this.isBrandLogoLoaded = true;
-          }
-        });
+      const immediate = this.ensureDataUrl(
+        this.organizationProfiles.getBrandingLogoValue(),
+      );
+      if (immediate) {
+        this.brandingLogo = immediate;
+      }
 
       this.organizationProfiles
         .getProfile(userId)
@@ -73,24 +78,17 @@ export class SidebarComponent implements OnInit, OnDestroy {
           next: (p) => {
             const logo = this.ensureDataUrl(p?.profilePhotoUrl ?? null);
             this.brandingLogo = logo;
-            this.isBrandLogoLoaded = true;
-            this.organizationProfiles.setBrandingLogo(logo);
+            this.organizationProfiles.setBrandingLogo(logo, userId);
           },
-          error: () => {
-            this.isBrandLogoLoaded = true;
-          },
+          error: () => {},
         });
+
       this.organizationProfiles.brandingLogo$
         .pipe(takeUntil(this.destroy$))
         .subscribe((url) => {
           const logo = this.ensureDataUrl(url);
-          if (logo) {
-            this.brandingLogo = logo;
-            this.isBrandLogoLoaded = true;
-          }
+          this.brandingLogo = logo;
         });
-    } else {
-      this.isBrandLogoLoaded = true;
     }
   }
 

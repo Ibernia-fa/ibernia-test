@@ -1,240 +1,560 @@
-@if(!isSimulationCompleted) {
-<div class="w-100">
-  <div class="d-flex flex-column gap-32">
-    <div class="d-flex align-items-center justify-content-between gap-10 modal-header">
-      <h3 style="text-transform: none;">Simulation - {{emergency.name}}</h3>
-      <button (click)="closeDialog()" type="button">
-        <img src="assets/images/svgs/close-line-cion.svg" alt="close-line-cion" />
-      </button>
-    </div>
-    <mat-dialog-content>
-      <div [formGroup]="simulateEmergencyForm" class="d-flex flex-column gap-20">
-        <div class="d-flex flex-column gap-4 net-fields">
-          <div class="d-flex flex-column gap-8">
-            <mat-label class="f-s-16 d-block" style="line-height: 18px">Emergency cost</mat-label>
-            <div class="net-field d-flex align-items-center">
-              <div class="left hide-arrow">
-                <mat-select formControlName="currencySymbol" class="sortby-edit-profile" hideSingleSelectionIndicator>
-                  @for (country of countries; track country) {
-                  @if(country.currencySymbol) {
-                  <mat-option [value]="country.currencySymbol">{{ country.currencySymbol }}</mat-option>
+@if (!isSimulationCompleted) {
+  <div class="w-100">
+    <div class="d-flex flex-column">
+      <!-- Header -->
+      <div class="dialog-header">
+        <h2 class="dialog-title text-center" style="text-transform: none">
+          {{
+            "EMERGENCIES.SIMULATION_TITLE"
+              | translate
+                : {
+                    name: getEmergencyLabel(emergency),
                   }
-                  }
-                </mat-select>
-              </div>
-              <div class="w-100 form-field">
-                <input matInput type="text" formControlName="amount" #amountInput placeholder="0"
-                  [value]="simulateEmergencyForm.get('amount')?.value | thousandSeparator" thousandSeparatorInput
-                  (input)="onAmountInput($event.target.value)" />
-              </div>
-              <div class="right">
-                <mat-select (valueChange)="onCycleValueChange($event)" value="Select" formControlName="cycle"
-                  class="sortby-edit-profile" hideSingleSelectionIndicator>
-                  @for (cycle of amountCycles; track cycle) {
-                  <mat-option [value]="cycle.id">{{ cycle.description }}</mat-option>
-                  }
-                </mat-select>
-              </div>
-            </div>
-          </div>
-        </div>
+          }}
+        </h2>
+        <button
+          type="button"
+          mat-icon-button
+          disableRipple
+          class="dialog-close-btn"
+          mat-dialog-close
+          aria-label="Close dialog"
+          (click)="closeDialog()"
+        >
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
 
-        <div class="start-end">
-          <div class="d-flex flex-column gap-12">
-            <div class="d-flex gap-8 align-items-center">
-              <mat-label class="f-s-16 f-w-400 d-block">@if(showStartEnd) {Start & end} @else {Date}</mat-label>
-              <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
-            </div>
-            <div class="row justify-content-between align-items-start flex-nowrap">
-              <div [className]="showStartEnd ? 'col-6' : 'w-100'">
-                <div class="w-100 form-field">
-                  <div class="select-option">
-                    <mat-select value="Select" formControlName="start" hideSingleSelectionIndicator>
-                      @if(eventsList.length > 0)
-                        {
-                          <mat-option [value]="currentYear">This year ({{ currentYear }})</mat-option>
-                          <hr>
-                        }
-                      @for (event of eventsList; track event) {
-                      <mat-option [value]="event.start.year">{{ event.name }} ({{ event.start.age }})</mat-option>
+      <mat-dialog-content class="event-dialog-content">
+        <div
+          [formGroup]="simulateEmergencyForm"
+          class="d-flex flex-column gap-16"
+        >
+          <div class="d-flex flex-column gap-4 net-fields">
+            <div class="d-flex flex-column gap-8">
+              <mat-label
+                class="f-s-16 f-w-500 ibr-black d-flex align-items-center"
+                >{{ "Emergency cost" | translate }}</mat-label
+              >
+              <div class="net-field d-flex align-items-center">
+                <div class="left hide-arrow">
+                  <mat-select
+                    formControlName="currencySymbol"
+                    class="sortby-edit-profile"
+                    hideSingleSelectionIndicator
+                  >
+                    @for (country of countries; track country) {
+                      @if (country.currencySymbol) {
+                        <mat-option [value]="country.currencySymbol">{{
+                          country.currencySymbol
+                        }}</mat-option>
                       }
-                      <hr>
-                      @for (year of years; let i=$index; track year) {
-                      <mat-option [value]="year">{{ year }} ({{ clientAge + i }})</mat-option>
-                      }
-                    </mat-select>
-                  </div>
-                  @if(simulateEmergencyForm.get('start')?.touched &&
-                  simulateEmergencyForm.get('start')?.hasError('required')) {
-                  <span class="field-error d-block">Required</span>
-                  }
-                </div>
-              </div>
-
-              @if(showStartEnd) {
-              <div class="d-flex justify-content-start align-items-start">
-                <img src="assets/images/svgs/chevron-right-date-icon.svg" alt="chevron-right-date-icon" />
-              </div>
-
-              <div class="col-6">
-                <div class="w-100 form-field">
-                  <div class="select-option">
-                    <mat-select value="Select" formControlName="end" hideSingleSelectionIndicator>
-                      @for (event of getEndEvents(); track event.id) {
-                      <mat-option [value]="event.start.year">{{ event.name }} ({{ event.start.age }})</mat-option>
-                      }
-                      <hr>
-                      @for (year of getEndYears(); track year) {
-                      <mat-option [value]="year">{{ year }} ({{ year - clientBirthYear }})</mat-option>
-                      }
-                    </mat-select>
-                  </div>
-                  @if(simulateEmergencyForm.get('end')?.touched &&
-                  simulateEmergencyForm.get('end')?.hasError('required')) {
-                  <span class="field-error d-block">Required</span>
-                  }
-                  @if(simulateEmergencyForm.get('end')?.touched &&
-                  simulateEmergencyForm.get('end')?.hasError('endBeforeStart')) {
-                  <span class="field-error d-block">End year cannot be before start year</span>
-                  }
-                </div>
-              </div>
-              }
-            </div>
-          </div>
-        </div>
-
-        @if(showStartEnd) {
-        <div class="w-100 d-flex flex-column gap-20">
-          <div class="escalation-inline">
-            <div class="d-flex flex-column gap-8 escalation-field"
-              [class.escalation-full]="selectedEscalationDescription !== 'Increases at custom rate'">
-              <mat-label class="f-s-16 f-w-400 d-flex gap-8 align-items-center">Escalation rate
-                <img width="18" src="assets/images/svgs/help-circle-icon.svg" alt="help-circle-icon" />
-              </mat-label>
-              <div class="w-100 form-field">
-                <div class="select-option">
-                  <mat-select formControlName="escalationRate" (selectionChange)="onEscalationRateChange($event)">
-                    @for (escalationRate of escalationRates; track escalationRate) {
-                    <mat-option [value]="escalationRate.value">{{ escalationRate.description }}</mat-option>
                     }
                   </mat-select>
                 </div>
-                @if(simulateEmergencyForm.get('escalationRate')?.touched &&
-                simulateEmergencyForm.get('escalationRate')?.hasError('required')) {
-                <span class="field-error d-block">Required</span>
+                <div class="w-100 form-field">
+                  <input
+                    matInput
+                    type="text"
+                    formControlName="amount"
+                    #amountInput
+                    placeholder="0"
+                    thousandSeparatorInput
+                    (input)="onAmountInput($event.target.value)"
+                  />
+                </div>
+                <div class="right custom-select">
+                  <mat-select
+                    (valueChange)="onCycleValueChange($event)"
+                    value="Select"
+                    formControlName="cycle"
+                    class="sortby-edit-profile"
+                    hideSingleSelectionIndicator
+                  >
+                    @for (cycle of amountCycles; track cycle) {
+                      <mat-option [value]="cycle.id">{{
+                        getCycleLabel(cycle)
+                      }}</mat-option>
+                    }
+                  </mat-select>
+                  <span class="custom-arrow">
+                    <svg
+                      width="12"
+                      height="7"
+                      viewBox="0 0 12 7"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M1 1L6 6L11 1"
+                        stroke="#2B3942"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="start-end">
+            <div class="d-flex flex-column gap-8">
+              <mat-label
+                class="f-s-16 f-w-500 ibr-black d-flex align-items-center"
+                style="line-height: 16px !important"
+              >
+                @if (showStartEnd) {
+                  {{ "Start & end" | translate }}
+                } @else {
+                  {{ "Date" | translate }}
+                }
+                <img
+                  src="assets/images/svgs/help-circle-icon.svg"
+                  alt="help"
+                  width="18"
+                  class="m-l-4"
+                />
+              </mat-label>
+              <div
+                class="row justify-content-between align-items-start flex-nowrap"
+              >
+                <div [className]="showStartEnd ? 'col-6' : 'w-100'">
+                  <div class="w-100 form-field">
+                    <div class="select-option position-relative">
+                      <mat-select
+                        value="Select"
+                        formControlName="start"
+                        hideSingleSelectionIndicator
+                      >
+                        @if (eventsList.length > 0) {
+                          <mat-option [value]="currentYear"
+                            >{{ "LABEL.THIS_YEAR" | translate }} ({{
+                              currentYear
+                            }})</mat-option
+                          >
+                          <hr />
+                        }
+                        @for (event of eventsList; track event) {
+                          <mat-option [value]="event.start.year"
+                            >{{ getTimelineEventLabel(event.name) }} ({{
+                              event.start.age
+                            }})</mat-option
+                          >
+                        }
+                        <hr />
+                        @for (year of years; track year) {
+                          <mat-option [value]="year"
+                            >{{ year }} ({{ getAgeForYear(year) }})</mat-option
+                          >
+                        }
+                      </mat-select>
+                      <span class="custom-arrow">
+                        <svg
+                          width="12"
+                          height="7"
+                          viewBox="0 0 12 7"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M1 1L6 6L11 1"
+                            stroke="#2B3942"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                        </svg>
+                      </span>
+                    </div>
+                    @if (
+                      simulateEmergencyForm.get("start")?.touched &&
+                      simulateEmergencyForm.get("start")?.hasError("required")
+                    ) {
+                      <span class="field-error d-block">{{
+                        "Required" | translate
+                      }}</span>
+                    }
+                  </div>
+                </div>
+
+                @if (showStartEnd) {
+                  <div class="d-flex justify-content-start align-items-start">
+                    <img
+                      src="assets/images/svgs/chevron-right-date-icon.svg"
+                      alt="chevron-right-date-icon"
+                    />
+                  </div>
+
+                  <div class="col-6">
+                    <div class="w-100 form-field">
+                      <div class="select-option position-relative">
+                        <mat-select
+                          value="Select"
+                          formControlName="end"
+                          hideSingleSelectionIndicator
+                        >
+                          @for (event of getEndEvents(); track event.id) {
+                            <mat-option [value]="event.start.year"
+                              >{{ getTimelineEventLabel(event.name) }} ({{
+                                event.start.age
+                              }})</mat-option
+                            >
+                          }
+                          <hr />
+                          @for (year of getEndYears(); track year) {
+                            <mat-option [value]="year"
+                              >{{ year }} ({{
+                                getAgeForYear(year)
+                              }})</mat-option
+                            >
+                          }
+                        </mat-select>
+                        <span class="custom-arrow">
+                          <svg
+                            width="12"
+                            height="7"
+                            viewBox="0 0 12 7"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M1 1L6 6L11 1"
+                              stroke="#2B3942"
+                              stroke-width="2"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            />
+                          </svg>
+                        </span>
+                      </div>
+                      @if (
+                        simulateEmergencyForm.get("end")?.touched &&
+                        simulateEmergencyForm.get("end")?.hasError("required")
+                      ) {
+                        <span class="field-error d-block">{{
+                          "Required" | translate
+                        }}</span>
+                      }
+                      @if (
+                        simulateEmergencyForm.get("end")?.touched &&
+                        simulateEmergencyForm
+                          .get("end")
+                          ?.hasError("endBeforeStart")
+                      ) {
+                        <span class="field-error d-block">{{
+                          "End year cannot be before start year" | translate
+                        }}</span>
+                      }
+                    </div>
+                  </div>
                 }
               </div>
             </div>
+          </div>
 
-            @if(selectedEscalationDescription === 'Increases at custom rate') {
-            <div class="d-flex flex-column gap-8 escalation-field escalation-custom">
-              <mat-label class="f-s-16 d-block">Custom escalation rate</mat-label>
-              <div class="w-100 form-field custom-rate-input">
-                <input matInput type="number" formControlName="customEscalationRate" placeholder="0" />
-                <img class="custom-rate-suffix" src="assets/images/shapes/percentage.svg" alt="percentage" />
+          @if (showStartEnd) {
+            <div class="w-100 d-flex flex-column gap-16">
+              <div class="escalation-inline">
+                <div
+                  class="d-flex flex-column gap-8 escalation-field"
+                  [class.escalation-full]="
+                    selectedEscalationDescription !== 'Increases at custom rate'
+                  "
+                >
+                  <mat-label
+                    class="f-s-16 f-w-500 ibr-black d-flex align-items-center"
+                    style="line-height: 16px !important"
+                  >
+                    {{ "Escalation rate" | translate }}
+                    <img
+                      src="assets/images/svgs/help-circle-icon.svg"
+                      alt="help"
+                      width="18"
+                      class="m-l-4"
+                    />
+                  </mat-label>
+
+                  <div class="position-relative">
+                    <div class="w-100 form-field">
+                      <div class="select-option position-relative">
+                        <mat-select
+                          formControlName="escalationRate"
+                          (selectionChange)="onEscalationRateChange($event)"
+                        >
+                          @for (
+                            escalationRate of escalationRates;
+                            track escalationRate
+                          ) {
+                            <mat-option [value]="escalationRate.description">{{
+                              escalationRate.description
+                                | translateEscalationDescription
+                            }}</mat-option>
+                          }
+                        </mat-select>
+                        <span class="custom-arrow">
+                          <svg
+                            width="12"
+                            height="7"
+                            viewBox="0 0 12 7"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M1 1L6 6L11 1"
+                              stroke="#2B3942"
+                              stroke-width="2"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            />
+                          </svg>
+                        </span>
+                      </div>
+                      @if (
+                        simulateEmergencyForm.get("escalationRate")?.touched &&
+                        simulateEmergencyForm
+                          .get("escalationRate")
+                          ?.hasError("required")
+                      ) {
+                        <span class="field-error d-block">{{
+                          "Required" | translate
+                        }}</span>
+                      }
+                    </div>
+                  </div>
+                </div>
+
+                @if (
+                  selectedEscalationDescription === "Increases at custom rate"
+                ) {
+                  <div
+                    class="d-flex flex-column gap-8 escalation-field escalation-custom"
+                  >
+                    <mat-label
+                      class="f-s-16 f-w-500 ibr-black d-block"
+                      style="line-height: 18px"
+                      >{{ "Custom escalation rate" | translate }}</mat-label
+                    >
+                    <div class="w-100 form-field custom-rate-input">
+                      <input
+                        matInput
+                        type="number"
+                        formControlName="customEscalationRate"
+                        placeholder="0"
+                      />
+                      <div class="custom-rate-suffix">
+                        <svg
+                          width="20"
+                          height="20"
+                          viewBox="0 0 20 20"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M15.8337 4.16602L4.16699 15.8327"
+                            stroke="#48475D"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                          <path
+                            d="M5.41634 7.50065C6.56693 7.50065 7.49967 6.56791 7.49967 5.41732C7.49967 4.26672 6.56693 3.33398 5.41634 3.33398C4.26575 3.33398 3.33301 4.26672 3.33301 5.41732C3.33301 6.56791 4.26575 7.50065 5.41634 7.50065Z"
+                            stroke="#48475D"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                          <path
+                            d="M14.5833 16.6667C15.7339 16.6667 16.6667 15.7339 16.6667 14.5833C16.6667 13.4327 15.7339 12.5 14.5833 12.5C13.4327 12.5 12.5 13.4327 12.5 14.5833C12.5 15.7339 13.4327 16.6667 14.5833 16.6667Z"
+                            stroke="#48475D"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                        </svg>
+                      </div>
+                    </div>
+                    @if (
+                      simulateEmergencyForm.get("customEscalationRate")
+                        ?.touched &&
+                      simulateEmergencyForm
+                        .get("customEscalationRate")
+                        ?.hasError("required")
+                    ) {
+                      <span class="field-error d-block">{{
+                        "Required" | translate
+                      }}</span>
+                    }
+                  </div>
+                }
               </div>
-              @if(simulateEmergencyForm.get('customEscalationRate')?.touched &&
-              simulateEmergencyForm.get('customEscalationRate')?.hasError('required')) {
-              <span class="field-error d-block">required</span>
+            </div>
+          }
+
+          <section class="example-section">
+            <mat-checkbox
+              type="checkbox"
+              class="example-margin"
+              formControlName="stopIncome"
+            >
+              {{ "EMERGENCIES.STOP_INCOME" | translate }}
+            </mat-checkbox>
+            @if (
+              simulateEmergencyForm.get("stopIncome")?.touched &&
+              simulateEmergencyForm.get("stopIncome")?.hasError("required")
+            ) {
+              <span class="field-error d-block">{{
+                "Required" | translate
+              }}</span>
+            }
+          </section>
+
+          @if (simulateEmergencyForm.get("stopIncome")?.value) {
+            <div class="w-100 form-field gap-8">
+              <mat-label
+                class="f-s-16 f-w-500 ibr-black d-block"
+                style="line-height: 16px"
+                >{{ "Income" | translate }}</mat-label
+              >
+
+              <div class="select-option position-relative">
+                <mat-select formControlName="stoppedIncomeId" placeholder="">
+                  @for (income of incomes; track income.id) {
+                    <mat-option [value]="income.id">
+                      {{
+                        income.description
+                          | translateIncomeExpenseLabel
+                            : incomeDisplayLabelContext
+                      }}
+                    </mat-option>
+                  }
+                </mat-select>
+                <span class="custom-arrow">
+                  <svg
+                    width="12"
+                    height="7"
+                    viewBox="0 0 12 7"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M1 1L6 6L11 1"
+                      stroke="#2B3942"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </span>
+              </div>
+
+              @if (
+                simulateEmergencyForm.get("stoppedIncomeId")?.touched &&
+                simulateEmergencyForm
+                  .get("stoppedIncomeId")
+                  ?.hasError("required")
+              ) {
+                <span class="field-error d-block">{{
+                  "Required" | translate
+                }}</span>
               }
             </div>
+          }
+        </div>
+      </mat-dialog-content>
+
+      <div class="row justify-content-end gap-16 modal-action p-t-24">
+        <div>
+          <button
+            (click)="closeDialog()"
+            class="button-icon-outline w-100 d-block"
+          >
+            <span class="f-s-16">{{ "Cancel" | translate }}</span>
+          </button>
+        </div>
+        <div>
+          <button
+            (click)="simulateEmergency()"
+            type="button"
+            [disabled]="simulateEmergencyForm.invalid || isSimulating"
+            class="button-icon w-100 d-block"
+          >
+            @if (isSimulating) {
+              <span class="f-s-16">{{ "Simulating..." | translate }}</span>
+            } @else {
+              <span class="f-s-16">{{ "Simulate" | translate }}</span>
             }
-          </div>
+          </button>
         </div>
-        }
-
-        <div class="w-100 form-field gap-8" style="margin-top:-4px;">
-          <mat-checkbox formControlName="stopIncome">
-            Stop income
-          </mat-checkbox>
-          @if(simulateEmergencyForm.get('stopIncome')?.touched &&
-          simulateEmergencyForm.get('stopIncome')?.hasError('required')) {
-          <span class="field-error d-block">required</span>
-          }
-        </div>
-
-        @if(simulateEmergencyForm.get('stopIncome')?.value) {
-        <div class="w-100 form-field gap-8" style="margin-top:-4px;">
-          <mat-label class="f-s-16 d-block">Income</mat-label>
-
-          <div class="select-option">
-            <mat-select formControlName="stoppedIncomeId" placeholder="">
-              @for (income of incomes; track income.id) {
-              <mat-option [value]="income.id">
-                {{ income.description }}
-              </mat-option>
-              }
-            </mat-select>
-          </div>
-
-          @if(
-          simulateEmergencyForm.get('stoppedIncomeId')?.touched &&
-          simulateEmergencyForm.get('stoppedIncomeId')?.hasError('required')
-          ) {
-          <span class="field-error d-block">Required</span>
-          }
-        </div>
-        }
-
-      </div>
-    </mat-dialog-content>
-
-    <div class="row justify-content-between modal-action">
-      <div class="col-5">
-        <button (click)="closeDialog()" class="button-icon-outline w-100 d-block">
-          <span class="f-s-16">Cancel</span>
-        </button>
-      </div>
-      <div class="col-5">
-        <button (click)="simulateEmergency()" type="button" [disabled]="simulateEmergencyForm.invalid || isSimulating"
-          class="button-icon w-100 d-block">
-          @if (isSimulating) {
-          <span class="f-s-16">Simulating...</span>
-          } @else {
-          <span class="f-s-16">Simulate</span>
-          }
-        </button>
       </div>
     </div>
   </div>
-</div>
 }
 
-@if(isSimulationCompleted && simulationResult) {
-<div class="w-100">
-  <div class="d-flex flex-column gap-32">
-    <div class="d-flex align-items-center justify-content-between gap-10 modal-header">
-      <h3 style="text-transform: none;">Simulation - {{emergency.name}}</h3>
-      <button (click)="closeDialog()" type="button">
-        <img src="assets/images/svgs/close-line-cion.svg" alt="close-line-cion" />
-      </button>
-    </div>
-
-    <mat-dialog-content class="graph-dialog-content">
-      <div class="graph-tabs d-flex gap-12 mb-20">
-        <button class="tab-btn" [class.active]="activeTab === 'baseline'" (click)="switchToTab('baseline')">
-          Before
-        </button>
-
-        <button class="tab-btn" [class.active]="activeTab === 'simulated'" (click)="switchToTab('simulated')">
-          After
+@if (isSimulationCompleted && simulationResult) {
+  <div class="w-100 d-flex flex-column h-100">
+    <div class="d-flex flex-column flex-fill" style="min-height: 0">
+      <!-- Header -->
+      <div class="dialog-header">
+        <h2 class="dialog-title text-center" style="text-transform: none">
+          {{
+            "EMERGENCIES.SIMULATION_TITLE"
+              | translate
+                : {
+                    name: getEmergencyLabel(emergency),
+                  }
+          }}
+        </h2>
+        <button
+          type="button"
+          mat-icon-button
+          disableRipple
+          class="dialog-close-btn"
+          mat-dialog-close
+          aria-label="Close dialog"
+          (click)="closeDialog()"
+        >
+          <mat-icon>close</mat-icon>
         </button>
       </div>
 
-      @if(displayedReport) {
-      <app-savings-bar-stacked-chart 
-        [report]="displayedReport"
-        [client]="client"
-        [forecastStartDate]="forecastStartDate"
-        [forecastEndDate]="forecastEndDate"
-        [chartHeight]="420"
-        [emergencyIconUrl]="activeTab === 'simulated' ? emergency?.iconUrl : undefined"
-        [animateUpdates]="true"
-        cashFlowName="">
-      </app-savings-bar-stacked-chart>
-      }
-    </mat-dialog-content>
+      <mat-dialog-content class="graph-dialog-content">
+        <div class="graph-tabs d-flex align-items-center">
+          <button
+            class="tab-btn"
+            [class.active]="activeTab === 'baseline'"
+            (click)="switchToTab('baseline')"
+          >
+            {{ "Before" | translate }}
+          </button>
+
+          <button
+            class="tab-btn"
+            [class.active]="activeTab === 'simulated'"
+            (click)="switchToTab('simulated')"
+          >
+            {{ "After" | translate }}
+          </button>
+        </div>
+
+        @if (displayedReport) {
+          <app-savings-bar-stacked-chart
+            [report]="displayedReport"
+            [client]="client"
+            [forecastStartDate]="forecastStartDate"
+            [forecastEndDate]="forecastEndDate"
+            [planDuration]="cashflow?.planDuration"
+            [chartHeight]="simulationChartHeight"
+            [emergencyIconUrl]="
+              activeTab === 'simulated' ? emergency?.iconUrl : 'none'
+            "
+            [animateUpdates]="true"
+            cashFlowName=""
+          >
+          </app-savings-bar-stacked-chart>
+        }
+      </mat-dialog-content>
+    </div>
   </div>
-</div>
 }

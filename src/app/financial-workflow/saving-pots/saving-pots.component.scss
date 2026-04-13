@@ -1,10 +1,18 @@
+.saving-pot-header {
+  min-height: 107px;
+}
 .stats-main-wrapper {
+  min-width: 0;
+
   .saving-title {
     font-size: 20px;
     line-height: 24px;
     font-weight: 700;
     color: #1c1c1c;
     font-family: "Ubuntu", serif;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    word-break: break-word;
   }
   .badge {
     border-radius: 999px;
@@ -30,11 +38,13 @@
     font-size: 16px;
     line-height: 18px;
     color: #5a596e;
+    min-width: 0;
+    overflow-wrap: anywhere;
   }
   .card-saving-title {
     font-weight: 700;
-    font-size: 40px;
-    line-height: 100%;
+    font-size: 24px;
+    line-height: 29px;
     color: #1c1c1c;
   }
 }
@@ -85,6 +95,73 @@
     color: #5a596e;
   }
 }
+
+.saving-pots-list-boundary {
+  width: 100%;
+}
+
+// Cash pots grid: responsive only (logic unchanged in TS/HTML).
+// < 1024px: single column (stack).
+// 1024px–1439px: 1 col (count 1), 2 cols (count 2), or first row full + 2 cols (count 3+).
+// ≥ 1440px: 1 / 2 / 3 equal columns by count.
+.cash-saving-pots-grid {
+  display: grid;
+  gap: 14px;
+  width: 100%;
+  grid-template-columns: minmax(0, 1fr);
+
+  &--cols-1 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  // Below 1024px: stack 2- and 3+ item groups as one column
+  &--cols-2,
+  &--cols-3 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  &--cols-3 .cash-saving-pot-cell:first-child {
+    grid-column: auto;
+  }
+
+  @media (min-width: 1024px) {
+    &--cols-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    &--cols-3 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+
+      .cash-saving-pot-cell:first-child {
+        grid-column: 1 / -1;
+      }
+    }
+  }
+
+  @media (min-width: 1440px) {
+    &--cols-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+
+      .cash-saving-pot-cell:first-child {
+        grid-column: auto;
+      }
+    }
+  }
+}
+
+.shrink-0{
+  flex-shrink: 0;
+}
+
+.cash-saving-pot-cell {
+  min-width: 0;
+
+  .dragable-card {
+    width: 100%;
+    padding: 16px 24px 16px 16px;
+    // overflow: auto;
+  }
+}
 .vote-btns {
   button {
     outline: none;
@@ -113,10 +190,20 @@
   overflow: hidden;
   position: relative;
   flex: 1;
+  min-width: 0;
   padding: 16px 24px;
   border-radius: 10px;
   background-color: #f7fbff;
   border: 1px solid #0000001a;
+
+  .saving-pot-card-main {
+    min-width: 0;
+  }
+
+  .saving-pot-value-row {
+    min-width: 0;
+  }
+
   .stats-main-wrapper {
     .saving-title {
       font-family: "Ubuntu";
@@ -354,17 +441,27 @@
     }
   }
   .ibr-chart-tag {
-    background-color: #ffebcb;
     border-radius: 9999px;
-    // height: 30px;
     text-align: center;
     padding: 10px 10px;
-    color: #fe9614;
     font-size: 14px;
     line-height: 16px;
     font-weight: 400;
     span {
       font-weight: 500;
+    }
+
+    &.ownership-joint {
+      background-color: #c9fcdc;
+      color: #00ba3e;
+    }
+    &.ownership-client {
+      background-color: #c6e1ff;
+      color: #3088ed;
+    }
+    &.ownership-partner {
+      background-color: #ffebcb;
+      color: #fe9614;
     }
   }
 }

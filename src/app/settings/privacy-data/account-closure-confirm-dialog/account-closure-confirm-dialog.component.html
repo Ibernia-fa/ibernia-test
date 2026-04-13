@@ -1,0 +1,48 @@
+<div class="d-flex flex-column">
+  <div class="dialog-header">
+    <h2 class="dialog-title text-center">{{ 'Account closure' | translate }}</h2>
+    <button
+      type="button"
+      mat-icon-button
+      disableRipple
+      class="dialog-close-btn"
+      aria-label="Close dialog"
+      (click)="close()"
+    >
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content class="event-dialog-content">
+    <p class="confirm-text">
+      Are you sure you want to close your account? This will start the data
+      deletion process.
+    </p>
+    <p class="closure-warning-dialog">
+      Please ensure you have exported any records needed for your own regulatory
+      record-keeping obligations before proceeding. This action cannot be easily
+      reversed.
+    </p>
+  </mat-dialog-content>
+
+  <div class="row justify-content-end gap-16 modal-action p-t-24">
+    <div>
+      <button
+        type="button"
+        (click)="close()"
+        class="button-icon-outline w-100 d-block"
+      >
+        <span class="f-s-16">{{ 'Cancel' | translate }}</span>
+      </button>
+    </div>
+    <div>
+      <button
+        type="button"
+        (click)="confirm()"
+        class="button-icon-destructive w-100 d-block"
+      >
+        <span class="f-s-16">{{ 'Delete the account' | translate }}</span>
+      </button>
+    </div>
+  </div>
+</div>

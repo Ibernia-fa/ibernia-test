@@ -1,0 +1,32 @@
+<div class="d-flex flex-column">
+  <div class="dialog-header">
+    <h2 class="dialog-title text-center">
+      {{ (data.title || "Mortgage calculator") | translate }}
+    </h2>
+    <button
+      type="button"
+      mat-icon-button
+      disableRipple
+      class="dialog-close-btn"
+      aria-label="Close dialog"
+      (click)="closeDialog()"
+    >
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content class="calculator-dialog-content">
+    <app-mortgage-calculator
+      [clientCountryCode]="data.clientCountryCode"
+      [currencySymbol]="data.currencySymbol"
+      [calculatorKind]="data.calculatorKind"
+      [priceLabel]="data.priceLabel || 'Property price'"
+      [advisorDefaultInterestRate]="data.advisorDefaultInterestRate"
+      [defaultLoanTermYears]="data.defaultLoanTermYears"
+      [initialState]="data.initialState"
+      (stateChanged)="onCalculatorStateChanged($event)"
+      (calculated)="onApply($event)"
+    >
+    </app-mortgage-calculator>
+  </mat-dialog-content>
+</div>

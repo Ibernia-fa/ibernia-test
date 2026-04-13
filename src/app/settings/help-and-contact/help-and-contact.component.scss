@@ -1,0 +1,23 @@
+.pricing-container {
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 16px 0 0 16px;
+}
+.helper-wrapper {
+  background-color: #ffffffb2;
+  border: 1px solid #0000001a;
+  // backdrop-filter: blur(50px);
+  border-radius: 12px;
+  padding: 20px;
+  p {
+    line-height: 24px !important;
+  }
+}
+
+.accordion-wrapper {
+  ::ng-deep .mat-accordion .mat-expansion-panel {
+    background-color: #ffffffb2 !important;
+  }
+}
