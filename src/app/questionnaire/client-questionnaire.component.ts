@@ -252,7 +252,23 @@ export class ClientQuestionnaireComponent implements OnInit, OnDestroy {
     }
 
     if (maxScroll > 0) {
-      this.currentIndex = Math.round(el.scrollTop / sectionHeight);
+      const newIndex = Math.round(el.scrollTop / sectionHeight);
+
+      // While an input/select is focused, the browser may natively scroll the
+      // container (keyboard show/hide, autocomplete fill, dvh resize).  Lock
+      // the section so the user isn't yanked away mid-interaction.
+      const ae = document.activeElement as HTMLElement | null;
+      if (
+        ae &&
+        newIndex !== this.currentIndex &&
+        (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA' ||
+         ae.tagName === 'MAT-SELECT' || ae.closest?.('.important-people'))
+      ) {
+        el.scrollTop = this.currentIndex * sectionHeight;
+        return;
+      }
+
+      this.currentIndex = newIndex;
       this.progressPercent = (el.scrollTop / maxScroll) * 100;
     }
 
