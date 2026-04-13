@@ -188,6 +188,8 @@ export class ClientQuestionnaireComponent implements OnInit, OnDestroy {
   private touchCumulativeDeltaY = 0;
   private touchMoveCount = 0;
   private touchStartTarget: HTMLElement | null = null;
+  private inputFocusLocked = false;
+  private inputFocusLockTimer: ReturnType<typeof setTimeout> | null = null;
   /**
    * One section change per wheel *burst*: trackpads emit many wheel events in one flick. A fixed ms gap
    * still allows N steps in a long gesture; instead, consume one step per burst and reset after wheel
@@ -254,16 +256,11 @@ export class ClientQuestionnaireComponent implements OnInit, OnDestroy {
     if (maxScroll > 0) {
       const newIndex = Math.round(el.scrollTop / sectionHeight);
 
-      // While an input/select is focused, the browser may natively scroll the
-      // container (keyboard show/hide, autocomplete fill, dvh resize).  Lock
-      // the section so the user isn't yanked away mid-interaction.
-      const ae = document.activeElement as HTMLElement | null;
-      if (
-        ae &&
-        newIndex !== this.currentIndex &&
-        (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA' ||
-         ae.tagName === 'MAT-SELECT' || ae.closest?.('.important-people'))
-      ) {
+      // While an input was recently focused the browser may natively scroll
+      // the container (keyboard show/hide, Safari autocomplete fill, dvh
+      // resize).  The flag stays true for 600 ms after blur so it covers
+      // the gap where Safari blurs the input before the scroll fires.
+      if (this.inputFocusLocked && newIndex !== this.currentIndex) {
         el.scrollTop = this.currentIndex * sectionHeight;
         return;
       }
@@ -543,6 +540,21 @@ export class ClientQuestionnaireComponent implements OnInit, OnDestroy {
     // Listen on the wrapper (parent of snap-container) so touches on fixed
     // overlays like .swipe-up-hint and .progress-track are also captured.
     const wrapper = el.closest('.questionnaire-wrapper') as HTMLElement || el;
+
+    // Track input focus with a flag that survives the blur→scroll timing gap.
+    // Safari can blur the input BEFORE the autocomplete-triggered scroll fires,
+    // so checking document.activeElement in onScroll is unreliable.
+    el.addEventListener('focusin', (e: FocusEvent) => {
+      const t = e.target as HTMLElement;
+      if (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'MAT-SELECT') {
+        if (this.inputFocusLockTimer) { clearTimeout(this.inputFocusLockTimer); this.inputFocusLockTimer = null; }
+        this.inputFocusLocked = true;
+      }
+    });
+    el.addEventListener('focusout', () => {
+      if (this.inputFocusLockTimer) clearTimeout(this.inputFocusLockTimer);
+      this.inputFocusLockTimer = setTimeout(() => { this.inputFocusLocked = false; }, 600);
+    });
 
     wrapper.addEventListener('touchstart', (e: TouchEvent) => {
       this.touchStartY = e.touches[0].clientY;
