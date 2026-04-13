@@ -62,10 +62,7 @@ import {
   getPlanEndCalendarYear,
   getProjectionColumnAgeLabel,
 } from 'src/app/shared/utils/client-age-at-reference';
-import {
-  getReportYearBounds,
-  parseReportCategoryYears,
-} from 'src/app/shared/utils/chart-series-year-range';
+import { getReportYearBounds } from 'src/app/shared/utils/chart-series-year-range';
 import { RecommendationItem } from '../ai-recommendations/models/ai-recommendations.model';
 
 export interface PeriodicElement {
@@ -228,10 +225,9 @@ export class ReportsComponent {
   insightsLimitExceeded = false;
   insightsLoadAttempted = false;
   private insightsLoadedForCashflow: string | null = null;
-  /** Inclusive calendar-year window for lifetime / compare charts (dropdowns). */
+  /** Inclusive calendar-year window for lifetime / compare charts and fullscreen. */
   chartViewStartYear: number | null = null;
   chartViewEndYear: number | null = null;
-  chartYearOptions: number[] = [];
   readonly insightIconMap: Record<string, { color: string; bg: string }> = {
     flag_red:    { color: '#FF383C', bg: '#fff3f3' },
     flag_orange: { color: '#FF8D28', bg: '#fff8f0' },
@@ -540,12 +536,10 @@ export class ReportsComponent {
         : this.report?.categories;
     const bounds = getReportYearBounds(categories);
     if (!bounds) {
-      this.chartYearOptions = [];
       this.chartViewStartYear = null;
       this.chartViewEndYear = null;
       return;
     }
-    this.chartYearOptions = parseReportCategoryYears(categories);
     if (
       this.chartViewStartYear == null ||
       this.chartViewStartYear < bounds.min ||
@@ -567,20 +561,6 @@ export class ReportsComponent {
     ) {
       this.chartViewStartYear = bounds.min;
       this.chartViewEndYear = bounds.max;
-    }
-  }
-
-  onChartStartYearChange(year: number): void {
-    this.chartViewStartYear = year;
-    if (this.chartViewEndYear != null && year > this.chartViewEndYear) {
-      this.chartViewEndYear = year;
-    }
-  }
-
-  onChartEndYearChange(year: number): void {
-    this.chartViewEndYear = year;
-    if (this.chartViewStartYear != null && year < this.chartViewStartYear) {
-      this.chartViewStartYear = year;
     }
   }
 
