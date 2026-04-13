@@ -737,6 +737,7 @@
   "INCOME_EXPENSE.FREQUENCY.YEAR": "year",
   "INCOME_EXPENSE.FREQUENCY.ONE_OFF": "One-off",
   "INCOME_EXPENSE.INSURANCE_CARD_TOOLTIP": "This is the total of all insurance costs entered in the Protection module. You can edit it there.",
+  "INCOME_EXPENSE.PENSION_FUND_INCOME_TOOLTIP": "This income is automatically generated from your Pension Fund saving pot. Its value is calculated based on that pot, and you can edit the assumptions in Savings.",
   "INCOME_EXPENSE.STATE_PENSION_PCT_OF_SALARY": "{{pct}}% of salary",
   "SAVINGS_POT.REAL_RETURN_HINT": "Real return: {{real}}% (net of {{inflation}}% inflation)",
   "SCHOOL.INFLATION_TITLE": "Inflation",

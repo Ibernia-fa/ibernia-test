@@ -685,6 +685,7 @@
                   id="lock-pot"
                   (change)="isLockPotChanged(savingsForm.get('lockPot')?.value)"
                   formControlName="lockPot"
+                  [disabled]="savingsForm.get('name')?.value === 'Pension fund'"
                 >
                   {{
                     "Lock this pot from automatically covering an income shortfall"
