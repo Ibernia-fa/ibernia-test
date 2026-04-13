@@ -771,7 +771,8 @@ export class AddEventDialogComponent {
                 this.dialogEndCalendarYear,
               ),
         },
-        end: this.isInheritanceOneOff ? null // for inheritance one-off event
+        end: this.eventForm.get('cycle')?.value === 'One-off'
+          ? null
           : {
             year: this.eventForm.get('end')?.value,
             age: getPersistedAgeForCalendarYear(
@@ -869,16 +870,18 @@ export class AddEventDialogComponent {
           this.dialogEndCalendarYear,
         ),
       },
-      end: {
-        year: this.eventForm.get('end')?.value,
-        age: getPersistedAgeForCalendarYear(
-          this.data.clientBirthDate,
-          this.eventForm.get('end')?.value,
-          this.data.forecastStartDate,
-          this.data.planDuration,
-          this.dialogEndCalendarYear,
-        ),
-      },
+      end: this.eventForm.get('cycle')?.value === 'One-off'
+        ? null
+        : {
+          year: this.eventForm.get('end')?.value,
+          age: getPersistedAgeForCalendarYear(
+            this.data.clientBirthDate,
+            this.eventForm.get('end')?.value,
+            this.data.forecastStartDate,
+            this.data.planDuration,
+            this.dialogEndCalendarYear,
+          ),
+        },
       escalationRate:
         selectedEscalationRateValue !== null && selectedEscalationRateValue !== ''
           ? picked ?? {
