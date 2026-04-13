@@ -1092,10 +1092,10 @@ export class SavingsBarStackedChartComponent
     chartHost.appendChild(band);
 
     // ── icon sits fully ABOVE the band top edge ─────────────────────────
-    const iconSize = 18; // px — matches font-size
+    const iconSize = 24; // px — slightly larger than legacy 18px marker
     const iconTop = Math.max(2, plotTop - iconSize - 2);
     const icon = document.createElement('div');
-    icon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FF4560" width="${iconSize}" height="${iconSize}"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>`;
+    icon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="${iconSize}" height="${iconSize}" viewBox="0 0 100 100"><path d="M 44 18 Q 50 8, 56 18 L 86 72 Q 92 82, 82 88 L 18 88 Q 8 82, 14 72 Z" fill="#E8384F"/><rect x="46" y="36" width="8" height="26" rx="4" ry="4" fill="white"/><circle cx="50" cy="74" r="5" fill="white"/></svg>`;
     icon.style.position = 'absolute';
     icon.style.pointerEvents = 'none';
     icon.style.zIndex = '11';

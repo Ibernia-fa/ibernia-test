@@ -464,7 +464,6 @@ export class SimulateEmergencyComponent implements OnDestroy {
 
             this.baselineResult = res.baseline;
             const simulated = res.simulated;
-            simulated.timelineEvents = [];
 
             const emergencyAmount = this.simulateEmergencyForm.get('amount')?.value;
             const selectedYear = this.simulateEmergencyForm.get('start')?.value;

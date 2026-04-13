@@ -419,8 +419,9 @@ export class AddEmergenciesComponent {
     }
   }
 
+  /** Delete only when editing an existing custom emergency; "Add new" has no `emergency` yet → Cancel. */
   get isDeleteEnabled(): boolean {
-    return !this.isDefaultEmergency;
+    return !!this.data?.emergency && !this.isDefaultEmergency;
   }
 
   getCycleLabel(cycle: { id: string; description: string }): string {

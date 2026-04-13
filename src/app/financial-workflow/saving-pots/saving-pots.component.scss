@@ -223,6 +223,13 @@
       pointer-events: none;
     }
   }
+
+  // Above .lock-overlay so the ⋯ menu stays usable when a pot is locked
+  .saving-pot-card-menu-wrap {
+    position: relative;
+    z-index: 2;
+  }
+
   // Lock Overlay
   .lock-overlay {
     position: absolute;
