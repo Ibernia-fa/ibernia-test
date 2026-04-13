@@ -165,7 +165,8 @@
 // }
 table {
   width: 100%;
-  border-collapse: collapse; /* Ensures consistent spacing between cells */
+  border-collapse: collapse;
+  table-layout: fixed;
 }
 
 .table-wrapper {
@@ -189,25 +190,25 @@ table {
     background: #ffffff !important;
     height: 50px !important;
   }
+  .column-client,
+  .column-net-amount,
+  .column-start-end {
+    padding: 10px 24px !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
   .column-client {
     width: 30%;
-    min-width: 180px;
-    padding: 10px 24px !important;
   }
   .column-net-amount {
     width: 28%;
-    min-width: 160px;
-    padding: 10px 24px !important;
   }
   .column-start-end {
     width: 32%;
-    min-width: 180px;
-    padding: 10px 24px !important;
   }
   .column-action {
     width: 10%;
-    min-width: 48px;
-    max-width: 64px;
     padding: 10px 8px !important;
   }
   .mat-mdc-row {
