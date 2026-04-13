@@ -144,6 +144,10 @@ export class SavingsBarStackedChartComponent
     report: ChartSeries | null | undefined,
   ): ChartSeries | null | undefined {
     if (!report?.categories?.length) return report;
+    // Do not use Number(null) — it is 0 and would slice to [0,0], wiping all categories (simulation modal).
+    if (this.chartViewStartYear == null || this.chartViewEndYear == null) {
+      return report;
+    }
     const a = Number(this.chartViewStartYear);
     const b = Number(this.chartViewEndYear);
     if (!Number.isFinite(a) || !Number.isFinite(b)) return report;
