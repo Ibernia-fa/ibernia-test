@@ -636,13 +636,21 @@ export class SavingsBarStackedChartComponent
         ? 'transparent'
         : s.color,
     );
-    this.chartOptions.legend = {
-      ...this.chartOptions.legend,
-      markers: {
-        ...(this.chartOptions.legend?.markers ?? {}),
-        fillColors: legendFillColors,
-      },
-    };
+    const prevFillColors: string[] | undefined =
+      this.chartOptions.legend?.markers?.fillColors;
+    const colorsChanged =
+      !prevFillColors ||
+      prevFillColors.length !== legendFillColors.length ||
+      prevFillColors.some((c: string, i: number) => c !== legendFillColors[i]);
+    if (colorsChanged) {
+      this.chartOptions.legend = {
+        ...this.chartOptions.legend,
+        markers: {
+          ...(this.chartOptions.legend?.markers ?? {}),
+          fillColors: legendFillColors,
+        },
+      };
+    }
 
     // final series assignment
     const mappedSeries = seriesForChart.map((s, idx) => ({
