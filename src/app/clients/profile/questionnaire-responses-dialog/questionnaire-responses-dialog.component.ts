@@ -162,4 +162,14 @@ export class QuestionnaireResponsesDialogComponent {
     const rel = m[2].trim();
     return `${prefix}(${this.localizeChipValue(rel)})`;
   }
+
+  parsePersonalChip(raw: string): { name: string; relationship: string } {
+    const s = (raw ?? '').toString();
+    const m = s.match(/^(.*)\(([^)]+)\)\s*$/);
+    if (!m) return { name: this.localizeChipValue(s), relationship: '' };
+    return {
+      name: m[1].trimEnd(),
+      relationship: this.localizeChipValue(m[2].trim()),
+    };
+  }
 }
