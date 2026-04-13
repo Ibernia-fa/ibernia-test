@@ -136,7 +136,7 @@
             <div class="w-100 form-field">
               <div class="select-option">
                 <mat-select formControlName="escalationRate" value="Select">
-                  <mat-option value="2.5%">{{ inflationRateLabel }}</mat-option>
+                  <mat-option value="2.5%">{{ 'ESCALATION.MATCH_INFLATION' | translate:{ rate: formattedInflationRate } }}</mat-option>
                   <mat-option value="0%">{{ "Doesn't increase with inflation" | translate }}</mat-option>
                 </mat-select>
               </div>
