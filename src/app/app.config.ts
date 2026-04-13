@@ -50,7 +50,6 @@ import { ClientEffects } from './store/client/client.effects';
 import { CashflowEffects } from './store/cashflow/cashflow.effects';
 import { clientReducer } from './store/client/client.reducer';
 import { cashflowReducer } from './store/cashflow/cashflow.reducer';
-import { provideServiceWorker } from '@angular/service-worker';
 
 
 export const appConfig: ApplicationConfig = {
@@ -93,9 +92,6 @@ export const appConfig: ApplicationConfig = {
     })),
     provideStore({client: clientReducer, cashflow: cashflowReducer}),
     provideEffects(FinancialAdvisorEffects, ClientEffects, CashflowEffects),
-    provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() }), provideServiceWorker('ngsw-worker.js', {
-            enabled: !isDevMode(),
-            registrationStrategy: 'registerWhenStable:30000'
-          })
+    provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() })
 ],
 };

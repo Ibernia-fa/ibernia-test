@@ -1436,14 +1436,29 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
     return !!event?.name?.toLowerCase?.().startsWith('retirement age');
   }
 
-  private getRetirementYearForBirthDate(birthDate: Date | null): number | null {
+  /**
+   * Calendar year for nominal retirement: birth year + statutory retirement age (64 / 67 IT).
+   * Matches lifetime plan axis (age shown for year Y is Y − birth year). Avoids using
+   * “completed age at forecast start”, which shifted the event by one when the birthday
+   * had not yet occurred in the current year.
+   */
+  private getRetirementYearForBirthDate(
+    birthDate: Date | null,
+    isPartner: boolean,
+  ): number | null {
     if (!birthDate) return null;
-    const forecastStartDate = new Date(
-      this.financialTimeline.forecastStartDate,
-    );
-    const forecastStartYear = moment(forecastStartDate).year();
-    const baseAge = getCompletedYearsAgeAtDate(birthDate, forecastStartDate);
-    return forecastStartYear + (this.getDefaultRetirementAge() - baseAge);
+    const birth = new Date(birthDate);
+    if (Number.isNaN(birth.getTime())) return null;
+    return birth.getFullYear() + this.getDefaultRetirementAgeForPerson(isPartner);
+  }
+
+  private getDefaultRetirementAgeForPerson(isPartner: boolean): number {
+    const primary = this.client?.clientDetails;
+    const partner = this.client?.partnerDetail;
+    const raw = (isPartner ? partner?.country || primary?.country : primary?.country)
+      ?.trim()
+      .toLowerCase();
+    return raw === 'italy' || raw === 'it' ? 67 : 64;
   }
 
   private getRetirementDependencyKey(): string {
@@ -1475,19 +1490,21 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
 
     const primaryYear = this.getRetirementYearForBirthDate(
       new Date(this.clientBirthDate),
+      false,
     );
     const partnerYear = this.getRetirementYearForBirthDate(
       this.partnerBirthDate,
+      true,
     );
-
-    const retirementAge = this.getDefaultRetirementAge();
 
     this.financialTimeline.clientEvents =
       this.financialTimeline.clientEvents.map((event) => {
         if (!this.isRetirementEvent(event)) return event;
 
-        const targetYear = event.isPartnerEvent ? partnerYear : primaryYear;
+        const isPartnerEv = !!event.isPartnerEvent;
+        const targetYear = isPartnerEv ? partnerYear : primaryYear;
         if (!targetYear) return event;
+        const retirementAge = this.getDefaultRetirementAgeForPerson(isPartnerEv);
 
         return {
           ...event,
