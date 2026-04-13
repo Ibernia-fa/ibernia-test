@@ -187,6 +187,7 @@ export class ClientQuestionnaireComponent implements OnInit, OnDestroy {
   private touchLastY = 0;
   private touchCumulativeDeltaY = 0;
   private touchMoveCount = 0;
+  private touchStartTarget: HTMLElement | null = null;
   /**
    * One section change per wheel *burst*: trackpads emit many wheel events in one flick. A fixed ms gap
    * still allows N steps in a long gesture; instead, consume one step per burst and reset after wheel
@@ -532,6 +533,7 @@ export class ClientQuestionnaireComponent implements OnInit, OnDestroy {
       this.touchLastY = this.touchStartY;
       this.touchCumulativeDeltaY = 0;
       this.touchMoveCount = 0;
+      this.touchStartTarget = e.target as HTMLElement;
       if (this.debugMode) {
         this.debugState.touchStarts++;
         const t = e.target as HTMLElement;
@@ -562,6 +564,11 @@ export class ClientQuestionnaireComponent implements OnInit, OnDestroy {
 
       const endpointDelta = this.touchStartY - e.changedTouches[0].clientY;
       const deltaY = this.touchMoveCount > 0 ? this.touchCumulativeDeltaY : endpointDelta;
+
+      // When there's no real drag (few/no touchmove events) but the endpoint
+      // delta is large, iOS autocomplete or keyboard events can fabricate a
+      // phantom "swipe". Skip section change for tap-like gestures on inputs.
+      if (this.touchMoveCount <= 2 && this.touchStartTarget && this.isInsideScrollableChild(this.touchStartTarget)) return;
       if (this.debugMode) {
         this.debugState.lastDelta = Math.round(deltaY);
         this.debugState.lastDir = deltaY > 0 ? 1 : deltaY < 0 ? -1 : 0;
