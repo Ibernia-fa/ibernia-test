@@ -353,47 +353,43 @@
           </div>
 
           <!-- ── COUPLE CONNECTOR (heart always shown) ── -->
-          <div
-            class="couple-link"
-            *ngIf="hasPartner"
-            [class.couple-link--spread]="isOnlyClientDeceased || isOnlyPartnerDeceased"
-            #coupleLink
-          >
-            <div class="line-h link-line"></div>
-
-            <!-- Case 1: Client deceased only – tax between client & heart -->
-            <div
-              class="couple-tax-node"
-              *ngIf="isOnlyClientDeceased && showTaxOnCoupleLink"
-              (click)="onOpenTaxSettings()"
-            >
-              <div class="tax-icon-circle">
-                <img
-                  src="../../../../assets/images/svgs/new-legacy-tax-icon.svg"
-                  alt="new-legacy-tax-icon"
-                />
-              </div>
-              <div class="tax-badge">
-                <span>{{ "Tax" | translate }}</span>
-              </div>
-              <span class="tax-amount">
-                <span class="estate-currency">{{
-                  currency | currencySymbol
-                }}</span
-                >{{ scenarioResult!.totalTax | number: "1.0-0" }}
-              </span>
-            </div>
-
-            <!-- Case 2: Partner deceased only – badge between client & heart -->
-            <ng-container *ngIf="isOnlyPartnerDeceased">
-              <ng-container
-                *ngIf="getMemberInheritance(clientMember?.id) as inh"
+          <div class="couple-link" *ngIf="hasPartner" #coupleLink>
+            <!-- Left segment (client side) – flex:1 keeps heart centered -->
+            <div class="couple-link-segment couple-link-segment--left">
+              <!-- Client deceased: tax on client side -->
+              <div
+                class="couple-tax-node"
+                *ngIf="isOnlyClientDeceased && showTaxOnCoupleLink"
+                (click)="onOpenTaxSettings()"
               >
-                <span class="inheritance-pct-badge couple-pct-badge"
-                  >{{ inh.percentage | number: "1.0-0" }}%</span
+                <div class="tax-icon-circle">
+                  <img
+                    src="../../../../assets/images/svgs/new-legacy-tax-icon.svg"
+                    alt="new-legacy-tax-icon"
+                  />
+                </div>
+                <div class="tax-badge">
+                  <span>{{ "Tax" | translate }}</span>
+                </div>
+                <span class="tax-amount">
+                  <span class="estate-currency">{{
+                    currency | currencySymbol
+                  }}</span
+                  >{{ scenarioResult!.totalTax | number: "1.0-0" }}
+                </span>
+              </div>
+
+              <!-- Partner deceased: badge on client side -->
+              <ng-container *ngIf="isOnlyPartnerDeceased">
+                <ng-container
+                  *ngIf="getMemberInheritance(clientMember?.id) as inh"
                 >
+                  <span class="inheritance-pct-badge couple-pct-badge"
+                    >{{ inh.percentage | number: "1.0-0" }}%</span
+                  >
+                </ng-container>
               </ng-container>
-            </ng-container>
+            </div>
 
             <button
               type="button"
@@ -406,41 +402,42 @@
               />
             </button>
 
-            <!-- Case 1: Client deceased only – badge between heart & partner -->
-            <ng-container *ngIf="isOnlyClientDeceased">
-              <ng-container
-                *ngIf="getMemberInheritance(partnerMember?.id) as inh"
-              >
-                <span class="inheritance-pct-badge couple-pct-badge"
-                  >{{ inh.percentage | number: "1.0-0" }}%</span
+            <!-- Right segment (partner side) – flex:1 keeps heart centered -->
+            <div class="couple-link-segment couple-link-segment--right">
+              <!-- Client deceased: badge on partner side -->
+              <ng-container *ngIf="isOnlyClientDeceased">
+                <ng-container
+                  *ngIf="getMemberInheritance(partnerMember?.id) as inh"
                 >
+                  <span class="inheritance-pct-badge couple-pct-badge"
+                    >{{ inh.percentage | number: "1.0-0" }}%</span
+                  >
+                </ng-container>
               </ng-container>
-            </ng-container>
 
-            <!-- Case 2: Partner deceased only – tax between heart & partner -->
-            <div
-              class="couple-tax-node"
-              *ngIf="isOnlyPartnerDeceased && showTaxOnCoupleLink"
-              (click)="onOpenTaxSettings()"
-            >
-              <div class="tax-icon-circle">
-                <img
-                  src="../../../../assets/images/svgs/new-legacy-tax-icon.svg"
-                  alt="new-legacy-tax-icon"
-                />
+              <!-- Partner deceased: tax on partner side -->
+              <div
+                class="couple-tax-node"
+                *ngIf="isOnlyPartnerDeceased && showTaxOnCoupleLink"
+                (click)="onOpenTaxSettings()"
+              >
+                <div class="tax-icon-circle">
+                  <img
+                    src="../../../../assets/images/svgs/new-legacy-tax-icon.svg"
+                    alt="new-legacy-tax-icon"
+                  />
+                </div>
+                <div class="tax-badge">
+                  <span>{{ "Tax" | translate }}</span>
+                </div>
+                <span class="tax-amount">
+                  <span class="estate-currency">{{
+                    currency | currencySymbol
+                  }}</span
+                  >{{ scenarioResult!.totalTax | number: "1.0-0" }}
+                </span>
               </div>
-              <div class="tax-badge">
-                <span>{{ "Tax" | translate }}</span>
-              </div>
-              <span class="tax-amount">
-                <span class="estate-currency">{{
-                  currency | currencySymbol
-                }}</span
-                >{{ scenarioResult!.totalTax | number: "1.0-0" }}
-              </span>
             </div>
-
-            <div class="line-h link-line"></div>
           </div>
 
           <!-- ── PARTNER BRANCH ── -->

@@ -657,6 +657,10 @@ export class LegacyComponent
       this.renderer.setStyle(partnerNode, 'min-height', `${maxH}px`);
     }
 
+    if (this.coupleLinkRef?.nativeElement) {
+      this.renderer.removeStyle(this.coupleLinkRef.nativeElement, 'margin-bottom');
+    }
+
     const treeRect =
       this.treeBodyRef.nativeElement.getBoundingClientRect();
     const clientRect =
