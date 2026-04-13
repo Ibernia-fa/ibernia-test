@@ -526,17 +526,49 @@ export class SimulateEmergencyComponent implements OnDestroy {
     const baseline = this.baselineResult;
     const simulated = this.simulationResult;
 
+    // Unify categories so both reports share the same x-axis
+    // (prevents full chart rebuild when switching tabs).
+    const allCategoriesSet = new Set<string>([
+      ...baseline.categories.map(String),
+      ...simulated.categories.map(String),
+    ]);
+    const unifiedCategories = Array.from(allCategoriesSet).sort(
+      (a, b) => Number(a) - Number(b),
+    );
+
+    const padReport = (report: typeof baseline, oldCategories: string[]) => {
+      const insertionMap = unifiedCategories.map((c) => oldCategories.indexOf(c));
+      report.series.forEach((s: any) => {
+        s.data = insertionMap.map((idx) => (idx >= 0 ? s.data[idx] : 0));
+      });
+      report.categories = [...unifiedCategories];
+    };
+
+    if (baseline.categories.join(',') !== unifiedCategories.join(',')) {
+      padReport(baseline, baseline.categories.map(String));
+    }
+    if (simulated.categories.join(',') !== unifiedCategories.join(',')) {
+      padReport(simulated, simulated.categories.map(String));
+    }
+
+    // Unify series names so both reports have the same stacked structure.
     const allNames: string[] = [];
     [...simulated.series, ...baseline.series].forEach((s: any) => {
       if (!allNames.includes(s.name)) allNames.push(s.name);
     });
 
-    const categoryCount = baseline.categories.length;
+    const categoryCount = unifiedCategories.length;
     allNames.forEach(name => {
       if (!baseline.series.find((s: any) => s.name === name)) {
         const ref = simulated.series.find((s: any) => s.name === name);
         if (ref) {
           baseline.series.push({ ...ref, data: new Array(categoryCount).fill(0) });
+        }
+      }
+      if (!simulated.series.find((s: any) => s.name === name)) {
+        const ref = baseline.series.find((s: any) => s.name === name);
+        if (ref) {
+          simulated.series.push({ ...ref, data: new Array(categoryCount).fill(0) });
         }
       }
     });
