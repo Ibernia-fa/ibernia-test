@@ -1269,10 +1269,12 @@ export class AddIncomeComponent {
     } else if (incomeType === 'Inheritance' || incomeType === 'Inheritance (Partner)') {
       const isPartner = isPartnerInheritanceApiDescription(incomeType);
       this.applyBirthDateContextForSalaryPerson(isPartner);
+      const inheritanceYear = this.getDefaultInheritanceStartYear();
+      this.ensureYearInSelectableYears(inheritanceYear);
       if (!this.isEditWorkflow) {
-        startCtrl.reset();
-        endCtrl.reset();
+        startCtrl.setValue(inheritanceYear);
       }
+      endCtrl.setValue(inheritanceYear);
     } else {
       if (!this.isEditWorkflow) {
         startCtrl.reset();
