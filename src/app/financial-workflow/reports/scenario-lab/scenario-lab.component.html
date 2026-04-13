@@ -99,6 +99,7 @@
         <div class="simulation-graph-container">
           <div
             class="chart-component-wrapper"
+            [class.chart-fading]="chartFading"
             *ngIf="displayedReport && client && financialTimeline"
           >
             <div
