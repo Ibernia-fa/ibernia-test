@@ -31,9 +31,13 @@ export class TranslateEscalationDescriptionPipe implements PipeTransform {
     );
     if (m) {
       const rateNum = m[1].replace(/%$/, '');
-      return this.translate.instant('ESCALATION.MATCH_INFLATION', {
+      const translated = this.translate.instant('ESCALATION.MATCH_INFLATION', {
         rate: rateNum,
       });
+      if (translated === 'ESCALATION.MATCH_INFLATION') {
+        return d;
+      }
+      return translated;
     }
 
     return d;

@@ -40,7 +40,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
   styleUrl: './update-income.component.scss',
 })
 export class UpdateIncomeComponent {
-  inflationRateLabel: string;
+  formattedInflationRate: string;
   incomeForm = this.fb.group({
     name: ['' as string, [Validators.required]],
     currency: ['£' as string],
@@ -58,11 +58,7 @@ export class UpdateIncomeComponent {
     private fb: FormBuilder,
   ) {
     const rate = Number(data?.inflationRate ?? 0);
-    const formatted = Number.isInteger(rate) ? `${rate}.0` : `${rate}`;
-    this.inflationRateLabel = this.translate.instant(
-      'ESCALATION.MATCH_INFLATION',
-      { rate: formatted },
-    );
+    this.formattedInflationRate = Number.isInteger(rate) ? `${rate}.0` : `${rate}`;
 
     // Best-effort initialization (this component previously relied on [value] bindings).
     const selected = data?.selectedIncome;

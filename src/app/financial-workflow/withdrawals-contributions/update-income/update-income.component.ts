@@ -38,7 +38,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
   styleUrl: './update-income.component.scss',
 })
 export class UpdateIncomeComponent {
-  inflationRateLabel: string;
+  formattedInflationRate: string;
 
   constructor(
     private dialogRef: MatDialogRef<UpdateIncomeComponent>,
@@ -46,11 +46,7 @@ export class UpdateIncomeComponent {
     private translate: TranslateService,
   ) {
     const rate = Number(data?.inflationRate ?? 0);
-    const formatted = Number.isInteger(rate) ? `${rate}.0` : `${rate}`;
-    this.inflationRateLabel = this.translate.instant(
-      'ESCALATION.MATCH_INFLATION',
-      { rate: formatted },
-    );
+    this.formattedInflationRate = Number.isInteger(rate) ? `${rate}.0` : `${rate}`;
   }
 
   onAmountInput(rawValue: string) {
