@@ -680,18 +680,17 @@ export class SavingsBarStackedChartComponent
         },
       },
     }));
-    this.chartOptions.series = mappedSeries;
-
-    // ng-apexcharts v19 uses signal inputs + asapScheduler for hydration.
-    // When only [series] changes, it calls updateSeries() but this can silently
-    // fail if the chart's internal state is stale. Directly calling updateSeries
-    // on the ApexCharts instance as a fallback guarantees the bars re-render.
-    if (this.animateUpdates && changes['report'] && chartWasAlreadyInitialized) {
+    if (this.animateUpdates && chartWasAlreadyInitialized && changes['report']) {
+      // Bypass ng-apexcharts entirely: do NOT assign chartOptions.series
+      // (a new reference there triggers updateOptions → full chart rebuild).
+      // Instead call updateSeries() directly for smooth bar morphing.
       this.ngZone.runOutsideAngular(() => {
         setTimeout(() => {
           this.apxChartComponent?.updateSeries(mappedSeries, true);
         }, 0);
       });
+    } else {
+      this.chartOptions.series = mappedSeries;
     }
   }
 
