@@ -459,7 +459,9 @@ export class ClientListComponent implements OnInit, AfterViewInit, OnDestroy {
       if (result?.action === 'added') {
         this.router.navigate(['/clients/' + result.client.id + '/profile']);
       } else if (result?.action === 'addedWithPlan') {
-        // navigation handled inside client-add via AddModelDialogComponent
+        // Client is already persisted; if user cancelled the plan dialog they stay here — reload list.
+        // If they started a plan, navigation leaves the page; refresh is harmless.
+        this.getClients(this.user.sub);
       }
     });
   }

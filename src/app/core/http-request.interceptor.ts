@@ -24,6 +24,7 @@ export function httpRequestInterceptor(
   return token$.pipe(
     switchMap((token) => {
       if (!token && !isPublicNoAuthRequest(req.url)) {
+        // No next() call here, so httpAuthErrorInterceptor does not run; start re-auth explicitly.
         auth.redirectToLogin();
         return throwError(
           () =>
@@ -31,7 +32,7 @@ export function httpRequestInterceptor(
               status: 401,
               statusText: 'Unauthorized',
               url: req.url,
-            })
+            }),
         );
       }
       if (!token) {
