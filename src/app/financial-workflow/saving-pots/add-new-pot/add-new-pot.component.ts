@@ -80,6 +80,8 @@ import { extractEventId, resolveYear } from 'src/app/shared/utils/event-date-uti
 })
 export class AddNewPotComponent {
   @ViewChild('amountInput') amountInput?: ElementRef<HTMLInputElement>;
+  @ViewChild('contributionAmountInput')
+  contributionAmountInput?: ElementRef<HTMLInputElement>;
   @ViewChild('renameInputRef') renameInputRef?: ElementRef<HTMLInputElement>;
   savingsForm: FormGroup;
   years: number[] = [];
@@ -381,6 +383,20 @@ onAmountBlur(e: Event) {
   (e.target as HTMLInputElement).value = num.toLocaleString(locale);
 }
 
+  onContributionAmountInput(rawValue: string) {
+    const value = parseFormattedNumber(rawValue ?? '', this.translate.currentLang);
+    this.savingsForm.get('contributionAmount')?.setValue(value, { emitEvent: true });
+  }
+
+  onContributionAmountBlur(e: Event) {
+    const c = this.savingsForm.get('contributionAmount')!;
+    const rawValue = (e.target as HTMLInputElement).value;
+    const num = parseFormattedNumber(rawValue, this.translate.currentLang);
+    c.setValue(num, { emitEvent: false });
+
+    const locale = this.translate.currentLang === 'it' ? 'it-IT' : 'en-US';
+    (e.target as HTMLInputElement).value = num.toLocaleString(locale);
+  }
 
   patchFormValues() {
     this.isAddComissionChecked = this.selectedPot?.hasCommission;
@@ -439,6 +455,13 @@ onAmountBlur(e: Event) {
     if (this.selectedPot.name === 'Pension fund') {
       this.savingsForm.get('contributionAmount')?.patchValue(this.selectedPot.contributionAmount, { emitEvent: false });
       this.savingsForm.get('contributionFrequency')?.patchValue(this.selectedPot.contributionFrequency, { emitEvent: false });
+      const contribVal = this.savingsForm.get('contributionAmount')?.value;
+      setTimeout(() => {
+        const el = this.contributionAmountInput?.nativeElement;
+        if (!el || contribVal === null || contribVal === undefined) return;
+        el.value = Number(contribVal).toLocaleString('en-US');
+        el.dispatchEvent(new Event('blur'));
+      });
 
       const contribStartVal = this.selectedPot.contributionStartEventId
         ? 'event:' + this.selectedPot.contributionStartEventId

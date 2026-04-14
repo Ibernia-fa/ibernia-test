@@ -217,7 +217,12 @@ export class SavingPotsComponent implements OnInit {
           this.isLoaderVisible = false;
         }),
       )
-      .subscribe();
+      .subscribe({
+        error: (err) => {
+          this.isLoaderVisible = false;
+          console.error('[SavingPots] getData failed:', err);
+        },
+      });
   }
 
   ngOnInit(): void {
