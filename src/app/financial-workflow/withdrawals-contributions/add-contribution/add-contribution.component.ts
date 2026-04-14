@@ -56,6 +56,7 @@ import {
   getCashflowDialogEndCalendarYear,
 } from 'src/app/shared/utils/client-age-at-reference';
 import { calendarYearOrEventRefValidator } from 'src/app/shared/utils/calendar-year-or-event-ref.validator';
+import { getStartEndDurationLabel } from 'src/app/shared/utils/start-end-duration-label';
 import {
   recurringEndYearNotSelected,
   resolveCycleDescriptionForRecurringEndGuard,
@@ -379,6 +380,16 @@ export class AddContributionComponent {
 
   getTimelineEventLabel(rawName: string): string {
     return translateTimelineEventDisplayName(this.translate, rawName);
+  }
+
+  get startEndDurationHint(): string | null {
+    if (!this.showStartEnd) return null;
+    return getStartEndDurationLabel(
+      this.contributionForm.get('start')?.value,
+      this.contributionForm.get('end')?.value,
+      this.eventsList,
+      this.translate,
+    );
   }
 
   get isContributionSaveButtonDisabled(): boolean {

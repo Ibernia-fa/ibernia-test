@@ -37,6 +37,7 @@ import {
   getProjectionColumnAgeLabel,
 } from 'src/app/shared/utils/client-age-at-reference';
 import { resolveEscalationMatch } from 'src/app/shared/utils/escalation-rate-utils';
+import { getStartEndDurationLabel } from 'src/app/shared/utils/start-end-duration-label';
 
 @Component({
   selector: 'simulate-emergency',
@@ -275,6 +276,16 @@ export class SimulateEmergencyComponent implements OnDestroy {
       (i) => (i?.description ?? '').toString().trim().toLowerCase() === 'salary' && i?.id
     );
     return salaries.length > 0 ? salaries[0] : null;
+  }
+
+  get startEndDurationHint(): string | null {
+    if (!this.showStartEnd) return null;
+    return getStartEndDurationLabel(
+      this.simulateEmergencyForm.get('start')?.value,
+      this.simulateEmergencyForm.get('end')?.value,
+      this.eventsList,
+      this.translate,
+    );
   }
 
   onCycleValueChange(event: any) {

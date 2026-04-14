@@ -17,6 +17,7 @@ import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { getStartEndDurationLabel } from 'src/app/shared/utils/start-end-duration-label';
 
 @Component({
   selector: 'app-update-income',
@@ -76,6 +77,15 @@ export class UpdateIncomeComponent {
         { emitEvent: false },
       );
     }
+  }
+
+  get startEndDurationHint(): string | null {
+    return getStartEndDurationLabel(
+      this.incomeForm.get('start')?.value,
+      this.incomeForm.get('end')?.value,
+      [],
+      this.translate,
+    );
   }
 
   onAmountInput(rawValue: string) {
