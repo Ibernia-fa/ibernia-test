@@ -1,5 +1,7 @@
 import {
   Component,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
   DestroyRef,
   Inject,
   Optional,
@@ -110,6 +112,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   ],
   templateUrl: './client-list.component.html',
   styleUrl: './client-list.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   animations: [
     trigger('detailExpand', [
       state('collapsed', style({ height: '0px', minHeight: '0' })),
@@ -220,12 +223,14 @@ export class ClientListComponent implements OnInit, AfterViewInit, OnDestroy {
     private settingsService: SettingsService,
     private Authservice: AuthService,
     private translate: TranslateService,
+    private cdr: ChangeDetectorRef,
   ) {
     this.dateLocale = this.localeFromLang(this.translate.currentLang);
     this.translate.onLangChange
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((e) => {
         this.dateLocale = this.localeFromLang(e.lang);
+        this.cdr.markForCheck();
       });
   }
 
@@ -240,6 +245,7 @@ export class ClientListComponent implements OnInit, AfterViewInit, OnDestroy {
     this.greetingInterval = setInterval(() => {
       this.currentDate = new Date();
       this.currentGreeting = this.getGreetingForLocalTime();
+      this.cdr.markForCheck();
     }, 60_000);
   }
 
@@ -272,6 +278,7 @@ export class ClientListComponent implements OnInit, AfterViewInit, OnDestroy {
         if (res.ok && res.body?.firstName != null) {
           this.advisorNameFromApi = (res.body.firstName ?? '').trim() || null;
         }
+        this.cdr.markForCheck();
       },
       error: (err) => {
         console.error('Error fetching user profile', err);
@@ -327,7 +334,6 @@ export class ClientListComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   timeAgo(value: Date | string | number) {
-    console.log(value);
     if (!value) return this.translate.instant('LABEL.INVALID_DATE');
 
     const date = new Date(value);
@@ -382,6 +388,7 @@ export class ClientListComponent implements OnInit, AfterViewInit, OnDestroy {
         this.clients = clients;
         this.dataSource.paginator = this.paginator;
         this.dataSource.sort = this.sort;
+        this.cdr.markForCheck();
       });
   }
 
@@ -401,6 +408,7 @@ export class ClientListComponent implements OnInit, AfterViewInit, OnDestroy {
             this.clients = clients;
             this.dataSource.paginator = this.paginator;
             this.dataSource.sort = this.sort;
+            this.cdr.markForCheck();
           }),
         )
         .subscribe();
