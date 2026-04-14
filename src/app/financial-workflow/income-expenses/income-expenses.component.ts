@@ -287,7 +287,12 @@ export class IncomeExpensesComponent {
           this.isLoaderVisible = false;
         }),
       )
-      .subscribe();
+      .subscribe({
+        error: (err) => {
+          this.isLoaderVisible = false;
+          console.error('[IncomeExpenses] getData failed:', err);
+        },
+      });
   }
 
   newIncomeClicked() {

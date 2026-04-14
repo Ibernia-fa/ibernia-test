@@ -770,7 +770,11 @@ export class EmergenciesComponent implements OnInit {
           },
         ),
       )
-      .subscribe();
+      .subscribe({
+        error: (err) => {
+          console.error('[Emergencies] getSimulateData failed:', err);
+        },
+      });
   }
 
   simulateEmergency(emergency: Emergency) {

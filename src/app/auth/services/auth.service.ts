@@ -27,15 +27,16 @@ export class AuthService {
 
   private get idpSettings(): UserManagerSettings {
     const origin = this.portalOrigin();
-    const redirectUri = origin + '/signin-oidc';
-    const postLogoutUri = origin + '/signout-callback-oidc';
     return {
       authority: environment.authority,
       client_id: environment.authClientId,
-      redirect_uri: redirectUri,
+      redirect_uri: origin + '/signin-oidc',
       scope: 'openid email profile roles ibernia_api',
-      response_type: "code",
-      post_logout_redirect_uri: postLogoutUri
+      response_type: 'code',
+      post_logout_redirect_uri: origin + '/signout-callback-oidc',
+      automaticSilentRenew: true,
+      silent_redirect_uri: origin + '/silent-renew.html',
+      accessTokenExpiringNotificationTimeInSeconds: 60,
     }
   }
 
