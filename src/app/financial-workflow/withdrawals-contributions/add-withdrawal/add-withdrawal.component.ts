@@ -37,6 +37,7 @@ import {
   recurringEndYearNotSelected,
   resolveCycleDescriptionForRecurringEndGuard,
 } from 'src/app/shared/utils/recurring-end-save-guard';
+import { getStartEndDurationLabel } from 'src/app/shared/utils/start-end-duration-label';
 
 @Component({
   selector: 'app-add-withdrawal',
@@ -278,6 +279,16 @@ export class AddWithdrawalComponent {
 
   getTimelineEventLabel(rawName: string): string {
     return translateTimelineEventDisplayName(this.translate, rawName);
+  }
+
+  get startEndDurationHint(): string | null {
+    if (!this.showStartEnd) return null;
+    return getStartEndDurationLabel(
+      this.withdrawalForm.get('start')?.value,
+      this.withdrawalForm.get('end')?.value,
+      this.eventsList,
+      this.translate,
+    );
   }
 
   get isWithdrawalSaveButtonDisabled(): boolean {

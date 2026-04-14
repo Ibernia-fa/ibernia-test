@@ -1015,5 +1015,7 @@
   "Medical expenses": "Medical expenses",
   "Damage to others": "Damage to others",
   "Natural disasters": "Natural disasters",
-  "None of the above": "None of the above"
+  "None of the above": "None of the above",
+  "DURATION.LENGTH_YEAR": "Length: {{count}} year",
+  "DURATION.LENGTH_YEARS": "Length: {{count}} years"
 }

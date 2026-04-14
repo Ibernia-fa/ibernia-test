@@ -766,6 +766,9 @@
                     "End date is required" | translate
                   }}</span>
                 }
+                @if (contributionDurationHint) {
+                  <span class="start-end-duration-hint">{{ contributionDurationHint }}</span>
+                }
               </div>
             </div>
           </div>
@@ -947,6 +950,9 @@
                         </div>
                       </div>
                     </div>
+                    @if (lockDurationHint) {
+                      <span class="start-end-duration-hint">{{ lockDurationHint }}</span>
+                    }
                   </div>
                 </div>
               }

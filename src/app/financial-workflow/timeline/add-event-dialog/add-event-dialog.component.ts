@@ -43,6 +43,7 @@ import {
   financingMonthlyEndYearNotSelected,
   recurringEndYearNotSelected,
 } from 'src/app/shared/utils/recurring-end-save-guard';
+import { getStartEndDurationLabel } from 'src/app/shared/utils/start-end-duration-label';
 
 @Component({
   selector: 'app-add-event-dialog',
@@ -980,6 +981,25 @@ export class AddEventDialogComponent {
 
   cycles: string[] = ['One-off', 'Every month', 'Every year'];
   currencySymbols: string[] = ['$', '£', '€'];
+
+  get startEndDurationHint(): string | null {
+    if (this.eventForm.get('cycle')?.value === 'One-off') return null;
+    return getStartEndDurationLabel(
+      this.eventForm.get('start')?.value,
+      this.eventForm.get('end')?.value,
+      this.eventsList,
+      this.translate,
+    );
+  }
+
+  get monthlyStartEndDurationHint(): string | null {
+    return getStartEndDurationLabel(
+      this.eventForm.get('monthlyStart')?.value,
+      this.eventForm.get('monthlyEnd')?.value,
+      this.eventsList,
+      this.translate,
+    );
+  }
 
   events: string[] = ['$', '£', '€'];
 

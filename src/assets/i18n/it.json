@@ -1015,5 +1015,7 @@
   "Medical expenses": "Spese mediche",
   "Damage to others": "Danni a terzi",
   "Natural disasters": "Disastri naturali",
-  "None of the above": "Nessuna delle precedenti"
+  "None of the above": "Nessuna delle precedenti",
+  "DURATION.LENGTH_YEAR": "Durata: {{count}} anno",
+  "DURATION.LENGTH_YEARS": "Durata: {{count}} anni"
 }

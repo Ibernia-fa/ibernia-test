@@ -61,6 +61,7 @@ import {
   recurringEndYearNotSelected,
   resolveCycleDescriptionForRecurringEndGuard,
 } from 'src/app/shared/utils/recurring-end-save-guard';
+import { getStartEndDurationLabel } from 'src/app/shared/utils/start-end-duration-label';
 
 @Component({
   selector: 'app-add-income',
@@ -906,6 +907,16 @@ export class AddIncomeComponent {
       clientFirstName: this.clientFirstName,
       partnerFirstName: this.partnerFirstName,
     };
+  }
+
+  get startEndDurationHint(): string | null {
+    if (!this.showStartEnd) return null;
+    return getStartEndDurationLabel(
+      this.incomeForm.get('start')?.value,
+      this.incomeForm.get('end')?.value,
+      this.eventsList,
+      this.translate,
+    );
   }
 
   /** Whole percent of salary (annualized); null when not applicable or data is insufficient. */

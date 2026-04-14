@@ -53,6 +53,7 @@ import {
 } from 'src/app/shared/utils/client-age-at-reference';
 import { calendarYearOrEventRefValidator } from 'src/app/shared/utils/calendar-year-or-event-ref.validator';
 import { extractEventId, resolveYear } from 'src/app/shared/utils/event-date-utils';
+import { getStartEndDurationLabel } from 'src/app/shared/utils/start-end-duration-label';
 
 @Component({
   selector: 'app-add-new-pot',
@@ -1050,6 +1051,24 @@ onAmountBlur(e: Event) {
   /**
    * Save stays off until the form is valid and (for pension fund) a contribution end calendar year is chosen.
    */
+  get contributionDurationHint(): string | null {
+    return getStartEndDurationLabel(
+      this.savingsForm.get('contributionStartDate')?.value,
+      this.savingsForm.get('contributionEndDate')?.value,
+      this.eventsList,
+      this.translate,
+    );
+  }
+
+  get lockDurationHint(): string | null {
+    return getStartEndDurationLabel(
+      this.savingsForm.get('start')?.value,
+      this.savingsForm.get('end')?.value,
+      this.eventsList,
+      this.translate,
+    );
+  }
+
   get isSaveDisabled(): boolean {
     if (this.savingsForm.invalid) {
       return true;
