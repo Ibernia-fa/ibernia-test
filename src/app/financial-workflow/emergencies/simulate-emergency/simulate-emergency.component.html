@@ -400,6 +400,7 @@
               type="checkbox"
               class="example-margin"
               formControlName="stopIncome"
+              (change)="onStopIncomeUserToggled($event)"
             >
               {{ "EMERGENCIES.STOP_INCOME" | translate }}
             </mat-checkbox>
@@ -422,7 +423,11 @@
               >
 
               <div class="select-option position-relative">
-                <mat-select formControlName="stoppedIncomeId" placeholder="">
+                <mat-select
+                  #stoppedIncomeSelect
+                  formControlName="stoppedIncomeId"
+                  placeholder=""
+                >
                   @for (income of incomes; track income.id) {
                     <mat-option [value]="income.id">
                       {{
