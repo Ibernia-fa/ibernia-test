@@ -183,3 +183,13 @@
   padding-bottom: 28px !important;
   box-sizing: border-box;
 }
+
+.pension-lock-pot-disabled {
+  opacity: 0.5;
+  pointer-events: none;
+  cursor: default;
+
+  * {
+    cursor: default !important;
+  }
+}

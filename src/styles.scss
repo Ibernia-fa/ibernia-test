@@ -1031,6 +1031,16 @@ body .custom-html-tooltip,
     width: 18px !important;
     height: 18px !important;
   }
+
+  &.mat-mdc-checkbox-disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    cursor: default;
+
+    .mat-internal-form-field .mdc-label {
+      cursor: default;
+    }
+  }
 }
 
 .dialog-close-btn .mat-mdc-button-persistent-ripple {

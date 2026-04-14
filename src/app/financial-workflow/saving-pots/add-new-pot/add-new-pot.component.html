@@ -450,12 +450,17 @@
                   </div>
                   <!-- End Currency Selector  -->
 
-                  <!-- Amount Field  -->
+                  <!-- Amount Field (same localized grouping as Starting pot value) -->
                   <div class="w-100 form-field">
                     <input
                       matInput
-                      type="number"
+                      type="text"
+                      style="border-radius: 0px 4px 4px 0px"
                       formControlName="contributionAmount"
+                      #contributionAmountInput
+                      thousandSeparatorInput
+                      (input)="onContributionAmountInput($event.target.value)"
+                      (blur)="onContributionAmountBlur($event)"
                     />
                   </div>
                   <!-- End Amount Field  -->
@@ -772,7 +777,12 @@
           <div class="d-flex flex-column gap-16">
             @if (savingsForm.get("name")?.value !== "Cash") {
               <!-- Lock Pot Checkbox -->
-              <section class="example-section">
+              <section
+                class="example-section"
+                [class.pension-lock-pot-disabled]="
+                  savingsForm.get('name')?.value === 'Pension fund'
+                "
+              >
                 <mat-checkbox
                   class="example-margin"
                   type="checkbox"

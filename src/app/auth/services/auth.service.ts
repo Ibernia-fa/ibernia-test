@@ -32,7 +32,7 @@ export class AuthService {
     return {
       authority: environment.authority,
       client_id: environment.authClientId,
-      redirect_uri: redirectUri,
+      redirect_uri: origin + '/signin-oidc',
       scope: 'openid email profile roles ibernia_api',
       response_type: "code",
       post_logout_redirect_uri: postLogoutUri,
