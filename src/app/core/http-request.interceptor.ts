@@ -24,6 +24,7 @@ export function httpRequestInterceptor(
   return token$.pipe(
     switchMap((token) => {
       if (!token && !isPublicNoAuthRequest(req.url)) {
+        auth.redirectToLogin();
         return throwError(
           () =>
             new HttpErrorResponse({

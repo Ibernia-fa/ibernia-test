@@ -165,7 +165,12 @@ export class WithdrawalsContributionsComponent {
           },
         ),
       )
-      .subscribe();
+      .subscribe({
+        error: (err) => {
+          this.isLoaderVisible = false;
+          console.error('[WithdrawalsContributions] getData failed:', err);
+        },
+      });
   }
 
   newContributionClicked() {
