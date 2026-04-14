@@ -6,7 +6,7 @@
         <div class="ibr-lifetime-plan-header">
           <div class="d-flex flex-column gap-8 ibr-lifetime-header">
             <div class="d-flex align-items-center gap-4">
-              <button type="button" (click)="onBack()" class="back-btn">
+              <!-- <button type="button" (click)="onBack()" class="back-btn">
                 <svg
                   width="24"
                   height="24"
@@ -29,7 +29,7 @@
                     stroke-linejoin="round"
                   />
                 </svg>
-              </button>
+              </button> -->
               <h3>
                 {{ "Scenario Lab" | translate }}
               </h3>
@@ -41,6 +41,7 @@
             </p>
           </div>
           <!-- Before / After tabs (space reserved; visible after first simulation) -->
+          <div class="d-flex align-items-center gap-12">
           <div class="ibr-scenario-tabs-btns">
             <div
               class="graph-tabs d-flex align-items-center"
@@ -61,6 +62,8 @@
                 {{ "After" | translate }}
               </button>
             </div>
+          </div>
+          <button type="button" (click)="onBack()" class="button-icon"><span>Exit</span></button>
           </div>
         </div>
         <!-- <div

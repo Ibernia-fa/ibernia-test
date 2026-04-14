@@ -1,14 +1,228 @@
 <div class="d-flex gap-16 flex-column m-t-16 school-container">
   <mat-card class="ibr-new-dashboad-card">
     <mat-card-content>
-      <div class="d-flex flex-column gap-10 m-b-16">
-        <h3 class="ibr-new-heading">{{ 'School' | translate }}</h3>
+      <div class="d-flex flex-column gap-12">
+        <h3 class="ibr-new-heading">{{ "School Heading" | translate }}</h3>
         <p class="ibr-new-subheading">
-          Clear guides for everyday financial concepts
+          Explore our curated collection of interactive topics. Click on any
+          tile below to start your learning journey and master new skills.
         </p>
       </div>
 
-      <ng-container *ngIf="!hasActiveModule; else moduleViewer">
+      <!-- New Layout  -->
+      <div class="ibr-school-card-container">
+        <!-- Using Masonry wrapper instead of Grid -->
+        <div class="card-masonry">
+          <!-- Card 1 -->
+          <article class="card">
+            <div class="card__image-container">
+              <img
+                src="../../../assets/images/blog/school-module-1.jpg"
+                alt="Finance"
+                class="card__image"
+              />
+            </div>
+            <div class="card__content">
+              <h3 class="card__title">What is inflation, really?</h3>
+              <a href="#" class="card__link">
+                Start Learning
+                <svg
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M17 8l4 4m0 0l-4 4m4-4H3"
+                  ></path>
+                </svg>
+              </a>
+            </div>
+          </article>
+
+          <!-- Card 2 -->
+          <article class="card">
+            <div class="card__image-container">
+              <img
+                src="../../../assets/images/blog/school-module-4.jpg"
+                alt="Markets"
+                class="card__image"
+              />
+            </div>
+            <div class="card__content">
+              <h3 class="card__title">
+                Why time in the market matters more than timing the market?
+              </h3>
+              <a href="#" class="card__link">
+                Start Learning
+                <svg
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M17 8l4 4m0 0l-4 4m4-4H3"
+                  ></path>
+                </svg>
+              </a>
+            </div>
+          </article>
+
+          <!-- Card 3 -->
+          <article class="card">
+            <div class="card__image-container">
+              <img
+                src="../../../assets/images/blog/school-module-2.jpg"
+                alt="Calculation"
+                class="card__image"
+              />
+            </div>
+            <div class="card__content">
+              <div class="card__header">
+                <span class="badge badge--pink">Coming Soon</span>
+              </div>
+              <h3 class="card__title">
+                Why is compound interest referred to as the 8th "world wonder"?
+              </h3>
+              <a href="#" class="card__link">
+                Start Learning
+                <svg
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M17 8l4 4m0 0l-4 4m4-4H3"
+                  ></path>
+                </svg>
+              </a>
+            </div>
+          </article>
+          <!-- Card 4 -->
+          <article class="card">
+            <div class="card__image-container">
+              <img
+                src="../../../assets/images/blog/school-module-3.jpg"
+                alt="Cash"
+                class="card__image"
+              />
+            </div>
+            <div class="card__content">
+              <h3 class="card__title">How much cash is too much cash?</h3>
+              <a href="#" class="card__link">
+                Start Learning
+                <svg
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M17 8l4 4m0 0l-4 4m4-4H3"
+                  ></path>
+                </svg>
+              </a>
+            </div>
+          </article>
+
+          <!-- Card 5 -->
+          <article class="card">
+            <div class="card__image-container">
+              <img
+                src="../../assets/images/blog/school-module-5.jpg"
+                alt="Discussion"
+                class="card__image"
+              />
+            </div>
+            <div class="card__content">
+              <div class="card__header">
+                <span class="badge badge--purple">Soft Skills</span>
+                <div class="card__time">
+                  <svg
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                    ></path>
+                  </svg>
+                  45 mins
+                </div>
+              </div>
+              <h3 class="card__title">What is the cost of waiting?</h3>
+              <a href="#" class="card__link">
+                Start Learning
+                <svg
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M17 8l4 4m0 0l-4 4m4-4H3"
+                  ></path>
+                </svg>
+              </a>
+            </div>
+          </article>
+          <!-- Card 6 -->
+          <article class="card">
+            <div class="card__image-container">
+              <img
+                src="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&q=80&w=600"
+                alt="Discussion"
+                class="card__image"
+              />
+            </div>
+            <div class="card__content">
+              <h3 class="card__title">
+                Why having a plan matters more than chasing the best investment
+              </h3>
+              <a href="#" class="card__link">
+                Start Learning
+                <svg
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M17 8l4 4m0 0l-4 4m4-4H3"
+                  ></path>
+                </svg>
+              </a>
+            </div>
+          </article>
+        </div>
+      </div>
+      <!-- End New Layout  -->
+
+      <!-- <ng-container *ngIf="!hasActiveModule; else moduleViewer">
         <div class="school-grid">
           <button
             type="button"
@@ -25,15 +239,11 @@
             </p>
           </button>
         </div>
-      </ng-container>
+      </ng-container> -->
 
-      <ng-template #moduleViewer>
+      <!-- <ng-template #moduleViewer>
         <div class="module-header">
-          <button
-            type="button"
-            class="back-button"
-            (click)="closeModule()"
-          >
+          <button type="button" class="back-button" (click)="closeModule()">
             ‹ All modules
           </button>
           <div class="module-titles" *ngIf="activeModule as m">
@@ -72,8 +282,7 @@
             Next
           </button>
         </div>
-      </ng-template>
+      </ng-template> -->
     </mat-card-content>
   </mat-card>
 </div>
-

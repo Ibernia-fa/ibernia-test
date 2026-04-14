@@ -51,7 +51,7 @@
     @let personalItems = getSectionResponses("Personal");
     @if (personalItems.length > 0) {
       <div class="section">
-        <h3 class="section-heading">{{ 'Personal' | translate }}</h3>
+        <h3 class="section-heading">{{ 'Family Heading' | translate }}</h3>
         <div class="section-content">
           <div class="personal-grid-wrapper">
             @for (item of personalItems; track item.questionId) {
