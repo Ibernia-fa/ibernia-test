@@ -1,14 +1,22 @@
-import { Component, ElementRef, Inject, OnDestroy, ViewChild } from '@angular/core';
+import {
+  afterNextRender,
+  Component,
+  ElementRef,
+  Inject,
+  Injector,
+  OnDestroy,
+  ViewChild,
+} from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatSelectChange, MatSelectModule } from '@angular/material/select';
+import { MatSelect, MatSelectChange, MatSelectModule } from '@angular/material/select';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 import moment from 'moment';
@@ -66,9 +74,23 @@ import { getStartEndDurationLabel } from 'src/app/shared/utils/start-end-duratio
 })
 export class SimulateEmergencyComponent implements OnDestroy {
   @ViewChild('amountInput') amountInput?: ElementRef<HTMLInputElement>;
+  @ViewChild('stoppedIncomeSelect') stoppedIncomeSelect?: MatSelect;
   onAmountInput(rawValue: string) {
     const value = parseFormattedNumber(rawValue, this.translate.currentLang);
     this.simulateEmergencyForm.get('amount')?.setValue(value);
+  }
+
+  /** Fires only on user interaction, not on programmatic `setValue` (load / life-insurance defaults). */
+  onStopIncomeUserToggled(event: MatCheckboxChange): void {
+    if (!event.checked) {
+      return;
+    }
+    afterNextRender(
+      () => {
+        this.stoppedIncomeSelect?.open();
+      },
+      { injector: this.injector },
+    );
   }
 
   simulateEmergencyForm: FormGroup;
@@ -135,6 +157,7 @@ export class SimulateEmergencyComponent implements OnDestroy {
     private emergenciesHttpService: EmergenciesHttpService,
     private toastr: ToastrService,
     private translate: TranslateService,
+    private injector: Injector,
   ) {
     this.client = data.client;
     this.cashflow = data.cashflow;
