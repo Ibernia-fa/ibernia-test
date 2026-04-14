@@ -698,6 +698,23 @@ export class LegacyComponent
         'margin-bottom',
         `${marginBottom}px`,
       );
+
+      const treeRect2 =
+        this.treeBodyRef.nativeElement.getBoundingClientRect();
+      const clientRect2 =
+        this.clientAvatarRef.nativeElement.getBoundingClientRect();
+      const partnerRect2 =
+        this.partnerAvatarRef.nativeElement.getBoundingClientRect();
+
+      const lineY2 =
+        (clientRect2.top + clientRect2.height / 2 - treeRect2.top +
+         (partnerRect2.top + partnerRect2.height / 2 - treeRect2.top)) / 2;
+      const clientRight2 = clientRect2.right - treeRect2.left;
+      const partnerLeft2 = partnerRect2.left - treeRect2.left;
+
+      this.renderer.setStyle(line, 'top', `${lineY2}px`);
+      this.renderer.setStyle(line, 'left', `${clientRight2}px`);
+      this.renderer.setStyle(line, 'width', `${partnerLeft2 - clientRight2}px`);
     }
   }
 
