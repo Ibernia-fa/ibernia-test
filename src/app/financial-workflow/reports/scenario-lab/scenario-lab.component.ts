@@ -940,6 +940,14 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
   }
 
   private isInheritanceIncomeForChartMarker(i: FinancialViewModel): boolean {
+    const amt = i.amount?.amount;
+    if (
+      amt == null ||
+      !Number.isFinite(Number(amt)) ||
+      Number(amt) <= 0
+    ) {
+      return false;
+    }
     const icon = (i.icon ?? '').trim().toLowerCase();
     if (icon === 'inheritance') return true;
     const d = i.description ?? '';
