@@ -675,6 +675,18 @@ export class SimulateEmergencyComponent implements OnDestroy {
       }, { emitEvent: false });
     }
 
+    const amountCtrl = this.simulateEmergencyForm.get('amount');
+    const incomeCtrl = this.simulateEmergencyForm.get('stoppedIncomeId');
+    if (expense.stopIncome) {
+      amountCtrl?.setValidators([Validators.required, Validators.min(0)]);
+      incomeCtrl?.setValidators([Validators.required]);
+    } else {
+      amountCtrl?.setValidators([Validators.required, Validators.min(1)]);
+      incomeCtrl?.clearValidators();
+    }
+    amountCtrl?.updateValueAndValidity({ emitEvent: false });
+    incomeCtrl?.updateValueAndValidity({ emitEvent: false });
+
     this.simulateEmergencyForm.updateValueAndValidity();
 
     // Ensure patched amount displays with thousand separators immediately
