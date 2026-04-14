@@ -36,7 +36,7 @@ export class AuthService {
       post_logout_redirect_uri: origin + '/signout-callback-oidc',
       automaticSilentRenew: true,
       silent_redirect_uri: origin + '/silent-renew.html',
-      accessTokenExpiringNotificationTimeInSeconds: 60,
+      accessTokenExpiringNotificationTime: 60,
     }
   }
 
