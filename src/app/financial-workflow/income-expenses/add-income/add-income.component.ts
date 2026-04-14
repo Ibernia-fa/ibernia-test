@@ -384,7 +384,8 @@ export class AddIncomeComponent {
         isClientStatePensionApiDescription(sd) ||
         isPartnerStatePensionApiDescription(sd) ||
         sd === 'Rental income' ||
-        sd === 'Inheritance')
+        isClientInheritanceApiDescription(sd) ||
+        isPartnerInheritanceApiDescription(sd))
     ) {
       this.onIncomeTypeChange(this.selectedIncome!.description);
     }
@@ -594,8 +595,10 @@ export class AddIncomeComponent {
         this.updateSalaryRetirementDefaults(false);
       } else if (isPartnerStatePensionApiDescription(descSubmit)) {
         this.updateSalaryRetirementDefaults(true);
-      } else if (descSubmit === 'Inheritance') {
+      } else if (isClientInheritanceApiDescription(descSubmit)) {
         this.applyBirthDateContextForSalaryPerson(false);
+      } else if (isPartnerInheritanceApiDescription(descSubmit)) {
+        this.applyBirthDateContextForSalaryPerson(true);
       }
 
       const isSalary = isSalaryTypeForBonus(
@@ -1303,9 +1306,10 @@ export class AddIncomeComponent {
   }
 
   /**
-   * Default one-off year for new Inheritance income (main client only):
-   * under 60 → calendar year when client turns 65; 60+ → five years after plan reference year.
-   * If birth date is missing/invalid, fall back to reference year + 5.
+   * Default one-off year for new Inheritance (client or partner row).
+   * Call after `applyBirthDateContextForSalaryPerson` so `clientBirthYear` / `clientAge`
+   * match the relevant person at forecast start.
+   * Rule: default age60; if person is already 60+ at forecast start, default age = current age + 5.
    */
   private getDefaultInheritanceStartYear(): number {
     const forecastStartYear = Number(this.data?.forecastStartDateYear);
@@ -1314,28 +1318,19 @@ export class AddIncomeComponent {
         ? forecastStartYear
         : this.currentYear;
 
-    const clientBd = this.data?.clientBirthDate;
-    if (!clientBd || !moment(clientBd).isValid()) {
+    const birthYear = this.clientBirthYear;
+    const ageAtForecastStart = this.clientAge;
+    if (
+      !Number.isFinite(birthYear) ||
+      birthYear <= 0 ||
+      !Number.isFinite(ageAtForecastStart)
+    ) {
       return refYear + 5;
     }
 
-    let birthYear = moment(clientBd).year();
-    const birthDate = new Date(clientBd);
-    const forecastStart = new Date(refYear, 0, 1);
-    let age = forecastStart.getFullYear() - birthDate.getFullYear();
-    const monthDiff = forecastStart.getMonth() - birthDate.getMonth();
-    const dayDiff = forecastStart.getDate() - birthDate.getDate();
-    if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
-      age--;
-    }
-    if (refYear - birthYear > age) {
-      birthYear = birthYear + 1;
-    }
-
-    if (age < 60) {
-      return birthYear + 65;
-    }
-    return refYear + 5;
+    const targetAge =
+      ageAtForecastStart >= 60 ? ageAtForecastStart + 5 : 60;
+    return birthYear + targetAge;
   }
 
   /** Ensures the mat-select can bind and display the computed default year. */
@@ -1445,8 +1440,11 @@ export class AddIncomeComponent {
       this.selectedIncome?.description ??
       '') as string;
 
-    if (desc === 'Inheritance') {
+    if (isClientInheritanceApiDescription(desc)) {
       return this.data.clientBirthDate;
+    }
+    if (isPartnerInheritanceApiDescription(desc)) {
+      return this.data.partnerBirthDate ?? this.data.clientBirthDate;
     }
 
     if (this.showPersonSelector && this.combinedEdit) {
@@ -1476,7 +1474,9 @@ export class AddIncomeComponent {
       this.updateSalaryRetirementDefaults(true);
     } else if (isClientStatePensionApiDescription(desc)) {
       this.updateSalaryRetirementDefaults(false);
-    } else if (desc === 'Inheritance') {
+    } else if (isPartnerInheritanceApiDescription(desc)) {
+      this.applyBirthDateContextForSalaryPerson(true);
+    } else if (isClientInheritanceApiDescription(desc)) {
       this.applyBirthDateContextForSalaryPerson(false);
     }
   }

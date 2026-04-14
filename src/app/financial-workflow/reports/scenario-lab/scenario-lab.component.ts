@@ -95,6 +95,7 @@ import {
   getReportYearBounds,
   parseReportCategoryYears,
 } from 'src/app/shared/utils/chart-series-year-range';
+import { resolveIncomeMarkerCalendarYear } from 'src/app/shared/utils/event-date-utils';
 
 @Component({
   selector: 'app-scenario-lab',
@@ -950,14 +951,15 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
 
   private buildInheritanceTimelineEventsFromIncomes(): TimelineEvent[] {
     const incomes = this.incomeExpenseData?.incomes ?? [];
+    const clientEvents = this.financialTimeline?.clientEvents ?? [];
     const out: TimelineEvent[] = [];
     for (const i of incomes) {
       if (!this.isInheritanceIncomeForChartMarker(i)) continue;
-      const y = i.start?.year;
-      if (y == null || !Number.isFinite(Number(y)) || Number(y) <= 0) continue;
+      const y = resolveIncomeMarkerCalendarYear(i, clientEvents);
+      if (y == null) continue;
       out.push({
         name: i.description ?? 'Inheritance',
-        startYear: Number(y),
+        startYear: y,
         iconUrl: 'inheritance-green',
       });
     }
