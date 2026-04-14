@@ -28,6 +28,7 @@ import { Client } from 'src/app/clients/models/client';
 import moment from 'moment';
 import { getProjectionColumnAgeLabel } from 'src/app/shared/utils/client-age-at-reference';
 import { sliceChartSeriesToInclusiveYearRange } from 'src/app/shared/utils/chart-series-year-range';
+import { IncomeDisplayLabelContext } from 'src/app/shared/utils/income-display-label';
 
 @Component({
   selector: 'app-savings-bar-stacked-chart',
@@ -101,6 +102,16 @@ export class SavingsBarStackedChartComponent
 
   private getCurrencyAxisTitle(): string {
     return this.client?.clientDetails?.preferredCurrency ?? '';
+  }
+
+  /** Matches income list naming for inheritance markers on joint / couple plans. */
+  private getIncomeLabelContextForChart(): IncomeDisplayLabelContext | null {
+    if (!this.client) return null;
+    return {
+      hasPartner: !!this.client.partnerDetail,
+      clientFirstName: this.client.clientDetails?.firstName ?? '',
+      partnerFirstName: this.client.partnerDetail?.firstName ?? '',
+    };
   }
 
   /** X-axis label: "Age", or "Age {main first name}" when the plan has a partner. */
@@ -819,7 +830,7 @@ export class SavingsBarStackedChartComponent
             <div class="event-tooltip ${event.iconUrl}">
               <span style="display:none">${event.name}</span>
               <img src="/assets/images/svgs/${event.iconUrl}.svg" alt="${event.iconUrl}" />
-              <span>${translateTimelineEventDisplayName(this.translate, event.name)}</span>
+              <span>${translateTimelineEventDisplayName(this.translate, event.name, this.getIncomeLabelContextForChart())}</span>
             </div>`,
         });
       });
@@ -888,6 +899,7 @@ export class SavingsBarStackedChartComponent
         label.textContent = translateTimelineEventDisplayName(
           this.translate,
           event.name,
+          this.getIncomeLabelContextForChart(),
         );
         label.className = 'event-label';
         label.style.position = 'fixed';
@@ -1333,6 +1345,8 @@ export class SavingsBarStackedChartComponent
     'partner-retirement-age-icon': '#fe9614',
     'mortality-icon': '#1c1c1c',
     'inheritance-icon': '#1c1c1c',
+    /** Income-section inheritance marker (Goals-style inheritance-icon stays black for timeline chips). */
+    'inheritance-green': '#34c759',
     'wedding-icon': '#6155f5',
     'state-pension-icon': '#1c1c1c',
     'home-icon': '#ff2d55',

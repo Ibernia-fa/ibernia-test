@@ -61,7 +61,7 @@ import {
   FinancialViewModel,
   IncomeExpense,
 } from '../../income-expenses/model/income-expense';
-import { ChartSeries } from '../models/charts-series.model';
+import { ChartSeries, TimelineEvent } from '../models/charts-series.model';
 import { SavingsBarStackedChartComponent } from '../savings-bar-stacked-chart/savings-bar-stacked-chart.component';
 import { ToastrService } from 'ngx-toastr';
 import { ScenarioNameDialogComponent } from './scenario-name-dialog/scenario-name-dialog.component';
@@ -78,6 +78,8 @@ import { TranslateIncomeExpenseLabelPipe } from 'src/app/core/pipes/translate-in
 import { translateTimelineEventDisplayName } from 'src/app/shared/utils/timeline-event-display-name';
 import {
   IncomeDisplayLabelContext,
+  isClientInheritanceApiDescription,
+  isPartnerInheritanceApiDescription,
   isPartnerSalaryApiDescription,
   isPartnerStatePensionApiDescription,
 } from 'src/app/shared/utils/income-display-label';
@@ -904,15 +906,78 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
   }
 
   private injectTimelineEvents(report: ChartSeries): void {
-    if (report.timelineEvents?.length) return;
-    const events = this.financialTimeline?.clientEvents ?? [];
-    report.timelineEvents = events
-      .filter((e) => !e.isPlaceHolder)
-      .map((e) => ({
-        name: e.name,
-        startYear: e.start.year,
-        iconUrl: e.iconUrl,
-      }));
+    const inheritanceFromIncome = this.buildInheritanceTimelineEventsFromIncomes();
+
+    if (!report.timelineEvents?.length) {
+      const events = (this.financialTimeline?.clientEvents ?? [])
+        .filter((e) => !e.isPlaceHolder && !this.isSupersededInheritanceGoalEvent(e))
+        .map((e) => ({
+          name: e.name,
+          startYear: e.start.year,
+          iconUrl: e.iconUrl,
+        }));
+      report.timelineEvents = [...events, ...inheritanceFromIncome];
+      return;
+    }
+
+    report.timelineEvents = this.mergeInheritanceChartMarkers(
+      report.timelineEvents,
+      inheritanceFromIncome,
+    );
+  }
+
+  /**
+   * Goals-styled inheritance events are not chart markers once Income inheritance exists;
+   * aligns with API timeline marker rules.
+   */
+  private isSupersededInheritanceGoalEvent(e: ClientEvent): boolean {
+    const name = (e.name ?? '').trim();
+    return (
+      isClientInheritanceApiDescription(name) ||
+      isPartnerInheritanceApiDescription(name)
+    );
+  }
+
+  private isInheritanceIncomeForChartMarker(i: FinancialViewModel): boolean {
+    const icon = (i.icon ?? '').trim().toLowerCase();
+    if (icon === 'inheritance') return true;
+    const d = i.description ?? '';
+    return (
+      isClientInheritanceApiDescription(d) ||
+      isPartnerInheritanceApiDescription(d)
+    );
+  }
+
+  private buildInheritanceTimelineEventsFromIncomes(): TimelineEvent[] {
+    const incomes = this.incomeExpenseData?.incomes ?? [];
+    const out: TimelineEvent[] = [];
+    for (const i of incomes) {
+      if (!this.isInheritanceIncomeForChartMarker(i)) continue;
+      const y = i.start?.year;
+      if (y == null || !Number.isFinite(Number(y)) || Number(y) <= 0) continue;
+      out.push({
+        name: i.description ?? 'Inheritance',
+        startYear: Number(y),
+        iconUrl: 'inheritance-green',
+      });
+    }
+    return out;
+  }
+
+  private mergeInheritanceChartMarkers(
+    existing: TimelineEvent[],
+    inheritance: TimelineEvent[],
+  ): TimelineEvent[] {
+    if (!inheritance.length) return existing;
+    const keys = new Set(
+      existing
+        .filter((e) => e.iconUrl === 'inheritance-green')
+        .map((e) => `${e.startYear}|${e.name}`),
+    );
+    const extra = inheritance.filter(
+      (e) => !keys.has(`${e.startYear}|${e.name}`),
+    );
+    return extra.length ? [...existing, ...extra] : existing;
   }
 
   onBack(): void {
