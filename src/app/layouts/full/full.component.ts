@@ -39,7 +39,6 @@ import {
   settingsLowerNavItems,
 } from './vertical/sidebar/settings-nav-config';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { ShareReportComponent } from 'src/app/financial-workflow/share-report/share-report.component';
 
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
@@ -130,7 +129,7 @@ export class FullComponent implements OnInit, OnDestroy {
   backgroundImage: string | null = null;
   backgroundImageReady = false;
   readonly defaultBackgroundImage =
-    'assets/images/backgrounds/background-img.png';
+    'assets/images/backgrounds/background-img.jpg';
   private destroy$ = new Subject<void>();
 
   client$: Observable<Client | null>;
@@ -475,16 +474,17 @@ export class FullComponent implements OnInit, OnDestroy {
     this.router.navigate(['/settings/plan-billing']);
   }
 
-  openShareModal() {
+  async openShareModal() {
+    const { ShareReportComponent } = await import(
+      'src/app/financial-workflow/share-report/share-report.component'
+    );
     const dialogRef = this.dialog.open(ShareReportComponent, {
       width: '612px',
       disableClose: true,
       data: {},
     });
 
-    dialogRef.afterClosed().subscribe((result: any) => {
-      console.log('Dialog closed with result:', result);
-    });
+    dialogRef.afterClosed().subscribe(() => {});
   }
 
   private loadBackgroundImage(): void {
