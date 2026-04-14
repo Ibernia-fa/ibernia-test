@@ -74,7 +74,9 @@ $line-w: 2px;
   border: 1px solid #0000001a;
   min-height: 220px;
 
-  &:not(:has(.branch-parents, .children-section, .sibling-node, .other-members)) {
+  &:not(
+    :has(.branch-parents, .children-section, .sibling-node, .other-members)
+  ) {
     min-height: max(220px, calc(100vh - 400px));
   }
   overflow-x: auto;
@@ -111,7 +113,10 @@ $line-w: 2px;
   position: relative;
 }
 
-.family-tree:not(:has(.branch-parents, .children-section, .sibling-node, .other-members)) .tree-body {
+.family-tree:not(
+    :has(.branch-parents, .children-section, .sibling-node, .other-members)
+  )
+  .tree-body {
   max-width: 820px;
   margin-inline: auto;
 }
@@ -269,8 +274,20 @@ $line-w: 2px;
   background: $line-color;
 }
 
+.leaf:has(.sibling-node) > .leaf-drop-short {
+  height: 24px;
+}
+
 .leaf:not(.main-leaf) > .leaf-drop {
   height: 78px;
+}
+
+.leaf:has(.sibling-node):has(.inheritance-pct-badge) > .leaf-drop {
+  height: 64px;
+}
+
+.children-leaves > .leaf > .leaf-drop {
+  height: 64px;
 }
 
 .main-leaf {
@@ -342,7 +359,9 @@ $line-w: 2px;
   }
 }
 
-.family-tree:not(:has(.branch-parents, .children-section, .sibling-node, .other-members)) {
+.family-tree:not(
+  :has(.branch-parents, .children-section, .sibling-node, .other-members)
+) {
   .couple-link-segment--left:has(.couple-tax-node) {
     justify-content: center;
   }
@@ -379,7 +398,7 @@ $line-w: 2px;
 
 .child-vline {
   width: $line-w;
-  height: 44px;
+  height: 32px;
   background: $line-color;
 }
 
