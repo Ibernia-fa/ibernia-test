@@ -45,3 +45,42 @@
     padding: 0px !important;
   }
 }
+
+.partner-fields-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  width: 100%;
+}
+
+.legacy-add-member-partner .form-field {
+  display: flex;
+  flex-direction: column;
+
+  input[matInput] {
+    width: 100%;
+    background-color: #f5f5f5;
+    border: 1px solid transparent;
+    outline: none;
+    color: #787889;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+
+  .ibr-black {
+    color: #1c1c1c;
+  }
+}
+
+.date-picker-position {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+@media (max-width: 520px) {
+  .partner-fields-grid {
+    grid-template-columns: 1fr;
+  }
+}

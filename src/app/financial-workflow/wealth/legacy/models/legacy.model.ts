@@ -62,6 +62,10 @@ export interface AddFamilyMemberRequest {
   firstName: string;
   lastName: string;
   role: FamilyRole;
+  /** Required when adding a partner (role === Partner). */
+  birthDate?: Date | string;
+  /** Required when adding a partner (role === Partner). */
+  email?: string;
 }
 
 export interface UpdateFamilyMemberRequest {
