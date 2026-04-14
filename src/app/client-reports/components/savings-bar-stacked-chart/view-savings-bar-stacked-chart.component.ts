@@ -11,6 +11,7 @@ import { translateTimelineEventDisplayName } from 'src/app/shared/utils/timeline
 import { Client } from 'src/app/clients/models/client';
 import { getProjectionColumnAgeLabel } from 'src/app/shared/utils/client-age-at-reference';
 import { sliceChartSeriesToInclusiveYearRange } from 'src/app/shared/utils/chart-series-year-range';
+import { IncomeDisplayLabelContext } from 'src/app/shared/utils/income-display-label';
 
 @Component({
   selector: 'app-view-savings-bar-stacked-chart',
@@ -24,6 +25,15 @@ import { sliceChartSeriesToInclusiveYearRange } from 'src/app/shared/utils/chart
 })
 export class ViewSavingsBarStackedChartComponent implements OnChanges, OnDestroy {
   private translate = inject(TranslateService);
+
+  private getIncomeLabelContextForChart(): IncomeDisplayLabelContext | null {
+    if (!this.client) return null;
+    return {
+      hasPartner: !!this.client.partnerDetail,
+      clientFirstName: this.client.clientDetails?.firstName ?? '',
+      partnerFirstName: this.client.partnerDetail?.firstName ?? '',
+    };
+  }
 
   @ViewChild("chart", { read: ElementRef }) chartElRef: ElementRef<HTMLDivElement>;
   @Input() report: ChartSeries;
@@ -333,7 +343,7 @@ export class ViewSavingsBarStackedChartComponent implements OnChanges, OnDestroy
           customTooltip: `
             <div class="event-tooltip ${event.iconUrl}">
               <img src="/assets/images/svgs/${event.iconUrl}.svg" alt="${event.iconUrl}" />
-              <span>${translateTimelineEventDisplayName(this.translate, event.name)}</span>
+              <span>${translateTimelineEventDisplayName(this.translate, event.name, this.getIncomeLabelContextForChart())}</span>
             </div>`
         });
       });
@@ -421,6 +431,7 @@ export class ViewSavingsBarStackedChartComponent implements OnChanges, OnDestroy
     'partner-retirement-age-icon': '#fe9614',
     'mortality-icon': '#1c1c1c',
     'inheritance-icon': '#1c1c1c',
+    'inheritance-green': '#34c759',
     'wedding-icon': '#6155f5',
     'state-pension-icon': '#1c1c1c',
     'home-icon': '#ff2d55',
