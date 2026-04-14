@@ -116,7 +116,11 @@
         </div>
         <div class="d-flex flex-column gap-8 net-fields">
           <mat-label class="f-s-16 f-w-500 d-flex ibr-black align-items-center"
-            >{{ "Net amount" | translate }}
+            >@if (isInheritanceOneOff) {
+              {{ 'INHERITANCE.AMOUNT_BEFORE_TAX' | translate }}
+            } @else {
+              {{ "Net amount" | translate }}
+            }
             <img
               src="assets/images/svgs/help-circle-icon.svg"
               alt="help"

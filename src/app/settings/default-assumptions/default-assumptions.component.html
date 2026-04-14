@@ -1094,6 +1094,135 @@
                   </mat-error>
                 </mat-form-field>
               </div>
+
+              <div class="settings-form-field">
+                <mat-label
+                  class="f-s-16 f-w-500 ibr-black d-flex align-items-center"
+                >
+                  {{ "Partner tax threshold" | translate }}
+                  <img
+                    src="assets/images/svgs/ibr-new-info.svg"
+                    alt="help"
+                    width="18"
+                    class="m-l-4"
+                    [matTooltip]="'TOOLTIP.PARTNER_TAX_THRESHOLD' | translate"
+                  />
+                </mat-label>
+                <mat-form-field
+                  appearance="outline"
+                  class="w-100 settings-custom-input"
+                  subscriptSizing="dynamic"
+                >
+                  <span matPrefix class="settings-currency-prefix">{{ p.currency?.value || '' }}</span>
+                  <input
+                    matInput
+                    type="text"
+                    formControlName="partnerInheritanceTaxThreshold"
+                    #partnerInheritanceTaxThresholdInput
+                    thousandSeparatorInput
+                    (input)="
+                      onInheritanceThresholdInput(
+                        'partnerInheritanceTaxThreshold',
+                        $event.target?.value ?? ''
+                      )
+                    "
+                    (focus)="formatInheritanceThresholdOnFocus('partnerInheritanceTaxThreshold', $event)"
+                    placeholder="{{ 'Enter amount' | translate }}"
+                  />
+                  <mat-error *ngIf="p.partnerInheritanceTaxThreshold.hasError('required')">
+                    {{ "Required" | translate }}
+                  </mat-error>
+                  <mat-error *ngIf="p.partnerInheritanceTaxThreshold.hasError('min')">
+                    {{ "Must be" | translate }} ≥ 0
+                  </mat-error>
+                </mat-form-field>
+              </div>
+
+              <div class="settings-form-field">
+                <mat-label
+                  class="f-s-16 f-w-500 ibr-black d-flex align-items-center"
+                >
+                  {{ "Child tax threshold" | translate }}
+                  <img
+                    src="assets/images/svgs/ibr-new-info.svg"
+                    alt="help"
+                    width="18"
+                    class="m-l-4"
+                    [matTooltip]="'TOOLTIP.CHILD_TAX_THRESHOLD' | translate"
+                  />
+                </mat-label>
+                <mat-form-field
+                  appearance="outline"
+                  class="w-100 settings-custom-input"
+                  subscriptSizing="dynamic"
+                >
+                  <span matPrefix class="settings-currency-prefix">{{ p.currency?.value || '' }}</span>
+                  <input
+                    matInput
+                    type="text"
+                    formControlName="childInheritanceTaxThreshold"
+                    #childInheritanceTaxThresholdInput
+                    thousandSeparatorInput
+                    (input)="
+                      onInheritanceThresholdInput(
+                        'childInheritanceTaxThreshold',
+                        $event.target?.value ?? ''
+                      )
+                    "
+                    (focus)="formatInheritanceThresholdOnFocus('childInheritanceTaxThreshold', $event)"
+                    placeholder="{{ 'Enter amount' | translate }}"
+                  />
+                  <mat-error *ngIf="p.childInheritanceTaxThreshold.hasError('required')">
+                    {{ "Required" | translate }}
+                  </mat-error>
+                  <mat-error *ngIf="p.childInheritanceTaxThreshold.hasError('min')">
+                    {{ "Must be" | translate }} ≥ 0
+                  </mat-error>
+                </mat-form-field>
+              </div>
+
+              <div class="settings-form-field">
+                <mat-label
+                  class="f-s-16 f-w-500 ibr-black d-flex align-items-center"
+                >
+                  {{ "Sibling tax threshold" | translate }}
+                  <img
+                    src="assets/images/svgs/ibr-new-info.svg"
+                    alt="help"
+                    width="18"
+                    class="m-l-4"
+                    [matTooltip]="'TOOLTIP.SIBLING_TAX_THRESHOLD' | translate"
+                  />
+                </mat-label>
+                <mat-form-field
+                  appearance="outline"
+                  class="w-100 settings-custom-input"
+                  subscriptSizing="dynamic"
+                >
+                  <span matPrefix class="settings-currency-prefix">{{ p.currency?.value || '' }}</span>
+                  <input
+                    matInput
+                    type="text"
+                    formControlName="siblingInheritanceTaxThreshold"
+                    #siblingInheritanceTaxThresholdInput
+                    thousandSeparatorInput
+                    (input)="
+                      onInheritanceThresholdInput(
+                        'siblingInheritanceTaxThreshold',
+                        $event.target?.value ?? ''
+                      )
+                    "
+                    (focus)="formatInheritanceThresholdOnFocus('siblingInheritanceTaxThreshold', $event)"
+                    placeholder="{{ 'Enter amount' | translate }}"
+                  />
+                  <mat-error *ngIf="p.siblingInheritanceTaxThreshold.hasError('required')">
+                    {{ "Required" | translate }}
+                  </mat-error>
+                  <mat-error *ngIf="p.siblingInheritanceTaxThreshold.hasError('min')">
+                    {{ "Must be" | translate }} ≥ 0
+                  </mat-error>
+                </mat-form-field>
+              </div>
             </div>
           </div>
         </div>

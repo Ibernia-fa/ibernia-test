@@ -88,12 +88,18 @@ export interface TaxSettingsModel {
   partnerTaxRate: number;
   childTaxRate: number;
   siblingTaxRate: number;
+  partnerTaxThreshold: number;
+  childTaxThreshold: number;
+  siblingTaxThreshold: number;
 }
 
 export interface UpdateTaxSettingsRequest {
   partnerTaxRate: number;
   childTaxRate: number;
   siblingTaxRate: number;
+  partnerTaxThreshold: number;
+  childTaxThreshold: number;
+  siblingTaxThreshold: number;
 }
 
 // ── Beneficiary Rules ────────────────────────────────────────────

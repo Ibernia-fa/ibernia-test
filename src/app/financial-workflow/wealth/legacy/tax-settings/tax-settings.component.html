@@ -150,6 +150,60 @@
           </div>
         </div>
       </div>
+
+      <div class="d-flex flex-column gap-8">
+        <mat-label class="f-s-16 f-w-500 d-block ibr-black"
+          >{{ 'LEGACY.PARTNER_TAX_THRESHOLD' | translate }}</mat-label
+        >
+        <div class="w-100 form-field position-relative d-flex align-items-center gap-8">
+          <span class="f-s-14 ibr-black">{{ currencySymbol }}</span>
+          <input
+            matInput
+            class="flex-grow-1"
+            type="number"
+            formControlName="partnerTaxThreshold"
+            placeholder="0"
+            min="0"
+            step="1000"
+          />
+        </div>
+      </div>
+
+      <div class="d-flex flex-column gap-8">
+        <mat-label class="f-s-16 f-w-500 d-block ibr-black"
+          >{{ 'LEGACY.CHILD_TAX_THRESHOLD' | translate }}</mat-label
+        >
+        <div class="w-100 form-field position-relative d-flex align-items-center gap-8">
+          <span class="f-s-14 ibr-black">{{ currencySymbol }}</span>
+          <input
+            matInput
+            class="flex-grow-1"
+            type="number"
+            formControlName="childTaxThreshold"
+            placeholder="0"
+            min="0"
+            step="1000"
+          />
+        </div>
+      </div>
+
+      <div class="d-flex flex-column gap-8">
+        <mat-label class="f-s-16 f-w-500 d-block ibr-black"
+          >{{ 'LEGACY.SIBLING_TAX_THRESHOLD' | translate }}</mat-label
+        >
+        <div class="w-100 form-field position-relative d-flex align-items-center gap-8">
+          <span class="f-s-14 ibr-black">{{ currencySymbol }}</span>
+          <input
+            matInput
+            class="flex-grow-1"
+            type="number"
+            formControlName="siblingTaxThreshold"
+            placeholder="0"
+            min="0"
+            step="1000"
+          />
+        </div>
+      </div>
     </form>
   </mat-dialog-content>
 
