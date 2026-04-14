@@ -11,7 +11,7 @@
       <div class="d-flex flex-column gap-16">
         <div class="d-flex gap-16 flex-wrap align-items-center">
           <button mat-flat-button color="primary" (click)="startNewConversation()" [disabled]="sending">
-            New conversation
+            {{ "AGENT_CHAT.NEW_CONVERSATION" | translate }}
           </button>
           <ng-container *ngIf="conversations.length > 0">
             <span class="text-muted">{{ 'Conversations:' | translate }}</span>
