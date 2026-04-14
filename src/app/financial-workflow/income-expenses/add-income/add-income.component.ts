@@ -62,6 +62,10 @@ import {
   resolveCycleDescriptionForRecurringEndGuard,
 } from 'src/app/shared/utils/recurring-end-save-guard';
 import { getStartEndDurationLabel } from 'src/app/shared/utils/start-end-duration-label';
+import {
+  calculateInheritanceNetFromGross,
+  DEFAULT_INHERITANCE_TAX_THRESHOLD,
+} from 'src/app/shared/utils/inheritance-tax.utils';
 
 @Component({
   selector: 'app-add-income',
@@ -253,7 +257,9 @@ export class AddIncomeComponent {
         this.incomeForm.get('description')?.disable();
       }
       this.incomeForm.get('currencySymbol')?.patchValue(this.clientPreferredCurrency);
-      const amountVal = this.selectedIncome.amount?.amount;
+      const displayInheritanceGross =
+        this.selectedIncome.inheritanceGrossAmount ?? this.selectedIncome.amount?.amount;
+      const amountVal = displayInheritanceGross;
       this.incomeForm.get('amount')?.patchValue(amountVal === 0 || amountVal === null || amountVal === undefined ? '' : amountVal);
 
       // thousand comma seperator (skip when amount is 0 to avoid showing error by default)
@@ -463,10 +469,12 @@ export class AddIncomeComponent {
   }
 
   private loadIncomeIntoForm(income: FinancialViewModel): void {
+    const displayAmount =
+      income.inheritanceGrossAmount ?? income.amount?.amount;
     this.incomeForm.patchValue({
       description: income.description,
       incomeType: income.description,
-      amount: income.amount?.amount === 0 ? '' : income.amount?.amount,
+      amount: displayAmount === 0 ? '' : displayAmount,
       cycle: income.amount?.cycle?.id ?? this.cycles[1]?.id,
       start: income.startEventId ? 'event:' + income.startEventId : income.start?.year,
       end: income.endEventId ? 'event:' + income.endEventId : income.end?.year,
@@ -621,11 +629,21 @@ export class AddIncomeComponent {
       const startEventId = extractEventId(startVal);
       const endEventId = extractEventId(endVal);
 
+      const rawGross = this.incomeForm.get('amount')?.value;
+      const grossFromForm =
+        rawGross === '' || rawGross === null || rawGross === undefined
+          ? 0
+          : Number(rawGross);
+      const { planAmount, inheritanceGross } = this.resolveInheritancePlanAmountAndGross(
+        descSubmit,
+        grossFromForm,
+      );
+
       var income: FinancialViewModel = {
         id: this.isEditWorkflow && this.selectedIncome ? this.selectedIncome.id : null,
         description: this.incomeForm.get('description')?.value,
         amount: {
-          amount: this.incomeForm.get('amount')?.value,
+          amount: planAmount,
           currencySymbol: this.incomeForm.get('currencySymbol')?.value,
           cycle: {
             id: this.incomeForm.get('cycle')?.value ?? '',
@@ -712,6 +730,10 @@ export class AddIncomeComponent {
           : null
       };
 
+      if (inheritanceGross !== undefined) {
+        income.inheritanceGrossAmount = inheritanceGross;
+      }
+
       if (this.scenarioMode) {
         this.dialogRef.close({
           status: 'Success',
@@ -762,7 +784,7 @@ export class AddIncomeComponent {
             if (investChecked) {
               const targetPotId = this.incomeForm.get('inheritanceTargetPotId')?.value;
               const percent = this.incomeForm.get('inheritancePercentToInvest')?.value ?? 80;
-              const incomeAmount = this.incomeForm.get('amount')?.value ?? 0;
+              const incomeAmount = Number(income.amount?.amount ?? 0);
               const investedAmount = incomeAmount * (percent / 100);
               if (!targetPotId || investedAmount <= 0) {
                 return of(incomeExpense);
@@ -1710,6 +1732,11 @@ export class AddIncomeComponent {
     return this.getIsDefaultInheritance();
   }
 
+  /** Show helper when the new gross → net model applies (not pre-migration rows). */
+  get showInheritanceTaxCashflowHint(): boolean {
+    return this.isInheritance && !this.isLegacyInheritanceRow();
+  }
+
   /** Invest this amount checkbox only for default Inheritance type, not Custom with name "Inheritance" */
   private getIsDefaultInheritance(): boolean {
     const incomeType = this.incomeForm.get('incomeType')?.value;
@@ -1747,6 +1774,39 @@ export class AddIncomeComponent {
 
   get isInvestThisAmountChecked(): boolean {
     return !!this.incomeForm.get('investThisAmount')?.value;
+  }
+
+  /** Rows created before gross storage keep plan income in {@link FinancialViewModel.amount} only. */
+  private isLegacyInheritanceRow(): boolean {
+    if (!this.isEditWorkflow || !this.selectedIncome) {
+      return false;
+    }
+    const d = this.selectedIncome.description;
+    if (!isClientInheritanceApiDescription(d) && !isPartnerInheritanceApiDescription(d)) {
+      return false;
+    }
+    return this.selectedIncome.inheritanceGrossAmount == null;
+  }
+
+  private resolveInheritancePlanAmountAndGross(
+    desc: string,
+    grossFromForm: number,
+  ): { planAmount: number; inheritanceGross: number | undefined } {
+    const isInheritance =
+      isClientInheritanceApiDescription(desc) || isPartnerInheritanceApiDescription(desc);
+    if (!isInheritance) {
+      return { planAmount: grossFromForm, inheritanceGross: undefined };
+    }
+    if (this.isLegacyInheritanceRow()) {
+      return { planAmount: grossFromForm, inheritanceGross: undefined };
+    }
+    const prefs = this.settingsService.currentUserData?.preferences;
+    const net = calculateInheritanceNetFromGross(
+      grossFromForm,
+      prefs?.childInheritanceTaxThreshold ?? DEFAULT_INHERITANCE_TAX_THRESHOLD,
+      prefs?.childInheritanceTaxRate ?? 0,
+    );
+    return { planAmount: net, inheritanceGross: grossFromForm };
   }
 
   private greaterThanZero(): ValidatorFn {

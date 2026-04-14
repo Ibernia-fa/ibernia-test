@@ -82,4 +82,5 @@ export interface FinancialRecordLineItem {
   parentId: string;
   isCash: boolean | false;
   isFinance: boolean | false;
+  inheritanceGrossAmount?: number | null;
 }

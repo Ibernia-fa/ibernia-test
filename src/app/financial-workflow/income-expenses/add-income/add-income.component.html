@@ -158,7 +158,11 @@
             <mat-label
               class="f-s-16 f-w-500 ibr-black d-block"
               style="line-height: 16px"
-              >{{ "Net amount" | translate }}</mat-label
+              >@if (isInheritance) {
+                {{ 'INHERITANCE.AMOUNT_BEFORE_TAX' | translate }}
+              } @else {
+                {{ "Net amount" | translate }}
+              }</mat-label
             >
             <div class="net-field d-flex align-items-center">
               <div class="left hide-arrow">
@@ -225,6 +229,11 @@
                 </div>
               }
             </div>
+            @if (showInheritanceTaxCashflowHint) {
+              <span class="inheritance-post-tax-hint f-s-13">{{
+                'INHERITANCE.PLAN_USES_POST_TAX_HINT' | translate
+              }}</span>
+            }
             @if (statePensionSalaryPctHint !== null) {
               <span class="state-pension-salary-pct-hint">{{
                 "INCOME_EXPENSE.STATE_PENSION_PCT_OF_SALARY"

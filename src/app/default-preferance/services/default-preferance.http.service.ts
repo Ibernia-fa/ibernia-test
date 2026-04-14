@@ -25,6 +25,10 @@ export interface PreferencesDto {
   partnerInheritanceTaxRate?: number | null;
   childInheritanceTaxRate?: number | null;
   siblingInheritanceTaxRate?: number | null;
+  /** Per-beneficiary exemption (plan currency); tax applies only above this amount. */
+  partnerInheritanceTaxThreshold?: number | null;
+  childInheritanceTaxThreshold?: number | null;
+  siblingInheritanceTaxThreshold?: number | null;
 }
 
 export interface UserProfileDto {
