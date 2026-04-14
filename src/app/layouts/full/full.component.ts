@@ -129,7 +129,7 @@ export class FullComponent implements OnInit, OnDestroy {
   backgroundImage: string | null = null;
   backgroundImageReady = false;
   readonly defaultBackgroundImage =
-    'assets/images/backgrounds/background-img.png';
+    'assets/images/backgrounds/background-img.jpg';
   private destroy$ = new Subject<void>();
 
   client$: Observable<Client | null>;
