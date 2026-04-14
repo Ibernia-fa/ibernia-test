@@ -79,9 +79,9 @@
           <div class="section-inner purple-scrollbar">
             <mat-card class="question-card">
               <mat-card-content>
-                <h3 class="question-text">{{ q.text }}</h3>
+                <h3 class="question-text">{{ q.text | translate }}</h3>
                 @if (q.subtitle) {
-                  <p class="question-subtitle">{{ q.subtitle }}</p>
+                  <p class="question-subtitle">{{ q.subtitle | translate }}</p>
                 }
 
                 @if (q.type === 'ImportantPeople') {
@@ -104,7 +104,7 @@
                             placeholder="{{ 'Relationship' | translate }}"
                           >
                             @for (opt of q.options; track opt.value) {
-                              <mat-option [value]="opt.value">{{ opt.value }}</mat-option>
+                              <mat-option [value]="opt.value">{{ opt.value | translate }}</mat-option>
                             }
                           </mat-select>
                           <button type="button" class="btn-remove" (click)="removeImportantPerson($index)">×</button>
@@ -128,7 +128,7 @@
                           @if (opt.iconUrl) {
                             <img [src]="'/assets/images/questionnaire/' + opt.iconUrl + '.svg'" [alt]="opt.value" class="option-icon" />
                           }
-                          {{ opt.value }}
+                          {{ opt.value | translate }}
                         </span>
                       </label>
                     }
@@ -152,7 +152,7 @@
                           [checked]="getSingleSelect(q.id) === opt.value"
                           (change)="setSingleSelect(q.id, opt.value)"
                         />
-                        <span>{{ formatAssetOption(opt.value) }}</span>
+                        <span>{{ formatAssetOption(opt.value | translate) }}</span>
                       </label>
                     }
                   </div>
@@ -167,7 +167,7 @@
                           [checked]="getSingleSelect(q.id) === opt.value"
                           (change)="setSingleSelect(q.id, opt.value)"
                         />
-                        <span>{{ opt.value }}</span>
+                        <span>{{ opt.value | translate }}</span>
                       </label>
                     }
                   </div>
@@ -184,7 +184,7 @@
                           @if (opt.iconUrl) {
                             <img [src]="'/assets/images/questionnaire/' + opt.iconUrl + '.svg'" [alt]="opt.value" class="option-icon" />
                           }
-                          {{ opt.value }}
+                          {{ opt.value | translate }}
                         </span>
                       </label>
                     }
