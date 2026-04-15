@@ -53,6 +53,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { patchInflationRateDescription } from 'src/app/shared/utils/escalation-rate-utils';
 import { formatClientPersonDisplayName } from 'src/app/shared/utils/person-display-name';
 import { MaterialModule } from 'src/app/material.module';
+import { WithdrawalsContributionsComponent } from '../withdrawals-contributions/withdrawals-contributions.component';
 @Component({
   selector: 'app-saving-pots',
   imports: [
@@ -72,6 +73,7 @@ import { MaterialModule } from 'src/app/material.module';
     ThousandSeparatorPipe,
     TranslateModule,
     MaterialModule,
+    WithdrawalsContributionsComponent,
   ],
 
   templateUrl: './saving-pots.component.html',
@@ -140,6 +142,16 @@ export class SavingPotsComponent implements OnInit {
         this.pensionFundReturnRate = p.pensionFundReturn;
       });
     this.getData();
+  }
+
+  showFlowsOverlay = false;
+
+  openFlows(): void {
+    this.showFlowsOverlay = true;
+  }
+
+  closeFlows(): void {
+    this.showFlowsOverlay = false;
   }
 
   SavingPotOwnership = SavingPotOwnership;
