@@ -61,6 +61,7 @@ export function patchInflationRateDescription(
         : `${inflationRate}`;
       return {
         ...rate,
+        value: String(inflationRate),
         description: `Increases at same rate as inflation (${formatted}%)`,
       };
     }
