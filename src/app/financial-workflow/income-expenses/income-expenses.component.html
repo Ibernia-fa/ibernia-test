@@ -51,8 +51,7 @@
               >
                 <div class="stats-main-wrapper">
                   <div class="d-flex align-items-start gap-10">
-                    @if (displayItem.income.amount.amount == 0) {
-                      <!-- height="32px;" -->
+                    @if (getIncomeDisplayAmount(displayItem.income) == 0) {
                       <img
                         [src]="
                           '/assets/images/svgs/' +
@@ -62,7 +61,6 @@
                         alt="income-icon"
                       />
                     } @else {
-                      <!-- height="32px;" -->
                       <img
                         [src]="
                           '/assets/images/svgs/' +
@@ -83,7 +81,7 @@
 
                       <div class="d-flex flex-wrap gap-12 align-items-stretch">
                         <div>
-                          @if (displayItem.income.amount.amount == 0) {
+                          @if (getIncomeDisplayAmount(displayItem.income) == 0) {
                             <span class="paragraph-text">{{
                               "Set amount" | translate
                             }}</span>
@@ -95,7 +93,7 @@
                                 displayItem.income.amount.currencySymbol
                                   | currencySymbol
                               }}{{
-                                displayItem.income.amount.amount
+                                getIncomeDisplayAmount(displayItem.income)
                                   | thousandSeparator
                               }}
                               <span class="card-title"

@@ -1744,11 +1744,6 @@ export class AddIncomeComponent {
     return this.getIsDefaultInheritance();
   }
 
-  /** Show helper when the new gross → net model applies (not pre-migration rows). */
-  get showInheritanceTaxCashflowHint(): boolean {
-    return this.isInheritance && !this.isLegacyInheritanceRow();
-  }
-
   /** Invest this amount checkbox only for default Inheritance type, not Custom with name "Inheritance" */
   private getIsDefaultInheritance(): boolean {
     const incomeType = this.incomeForm.get('incomeType')?.value;
@@ -1788,18 +1783,6 @@ export class AddIncomeComponent {
     return !!this.incomeForm.get('investThisAmount')?.value;
   }
 
-  /** Rows created before gross storage keep plan income in {@link FinancialViewModel.amount} only. */
-  private isLegacyInheritanceRow(): boolean {
-    if (!this.isEditWorkflow || !this.selectedIncome) {
-      return false;
-    }
-    const d = this.selectedIncome.description;
-    if (!isClientInheritanceApiDescription(d) && !isPartnerInheritanceApiDescription(d)) {
-      return false;
-    }
-    return this.selectedIncome.inheritanceGrossAmount == null;
-  }
-
   private resolveInheritancePlanAmountAndGross(
     desc: string,
     grossFromForm: number,
@@ -1807,9 +1790,6 @@ export class AddIncomeComponent {
     const isInheritance =
       isClientInheritanceApiDescription(desc) || isPartnerInheritanceApiDescription(desc);
     if (!isInheritance) {
-      return { planAmount: grossFromForm, inheritanceGross: undefined };
-    }
-    if (this.isLegacyInheritanceRow()) {
       return { planAmount: grossFromForm, inheritanceGross: undefined };
     }
     const prefs = this.settingsService.currentUserData?.preferences;

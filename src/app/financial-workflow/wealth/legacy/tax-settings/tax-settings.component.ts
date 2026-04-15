@@ -77,7 +77,6 @@ export class TaxSettingsComponent {
     this.legacyHttp.updateTaxSettings(this.data.cashflowId, this.form.value).subscribe({
       next: (dashboard) => {
         this.toastr.success('Tax settings updated', 'Success');
-        this.settingsService.notifyProfileChanged();
         this.dialogRef.close({ dashboard });
       },
       error: (err) => {
