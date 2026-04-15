@@ -335,7 +335,7 @@
 
             @let realReturnPct =
               (savingsForm.get("returnRate")?.value || 0) - inflationRate;
-            <span class="return-rate">{{
+            <span class="field-hint">{{
               "SAVINGS_POT.REAL_RETURN_HINT"
                 | translate
                   : {
@@ -527,7 +527,7 @@
 
               @let realReturnPct =
                 (savingsForm.get("returnRate")?.value || 0) - inflationRate;
-              <span class="return-rate">{{
+              <span class="field-hint">{{
                 "SAVINGS_POT.REAL_RETURN_HINT"
                   | translate
                     : {
@@ -690,7 +690,7 @@
                   }}</span>
                 }
                 @if (contributionDurationHint) {
-                  <span class="start-end-duration-hint">{{ contributionDurationHint }}</span>
+                  <span class="field-hint">{{ contributionDurationHint }}</span>
                 }
               </div>
             </div>
@@ -874,7 +874,7 @@
                       </div>
                     </div>
                     @if (lockDurationHint) {
-                      <span class="start-end-duration-hint">{{ lockDurationHint }}</span>
+                      <span class="field-hint">{{ lockDurationHint }}</span>
                     }
                   </div>
                 </div>
@@ -1373,12 +1373,12 @@
         }
 
         @if (fromNetWorth) {
-          <p class="net-worth-helper-note">
+          <span class="field-hint">
             {{
               "This asset is linked to the Savings section. Any changes made here will be reflected there as well."
                 | translate
             }}
-          </p>
+          </span>
         }
       </div>
     </mat-dialog-content>

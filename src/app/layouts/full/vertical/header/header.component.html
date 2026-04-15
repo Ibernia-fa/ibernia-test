@@ -111,6 +111,94 @@
       </nav>
     </ng-container>
 
+    <!-- Settings contextual breadcrumb -->
+    <ng-container *ngIf="isSettingsRoute && settingsBreadcrumbContext">
+      <nav
+        class="header-breadcrumb d-flex align-items-center"
+        aria-label="Breadcrumb"
+      >
+        <a
+          [routerLink]="['/clients']"
+          class="breadcrumb-link d-flex align-items-center text-decoration-none"
+        >
+          {{ 'Home' | translate }}
+        </a>
+
+        <ng-container
+          *ngIf="settingsBreadcrumbContext.type === 'client' || settingsBreadcrumbContext.type === 'plan'"
+        >
+          <svg
+            width="12"
+            height="7"
+            viewBox="0 0 12 7"
+            fill="none"
+            class="breadcrumb-chevron"
+            style="transform: rotate(-90deg)"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M1 1L6 6L11 1"
+              stroke="#48475D"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          <a
+            [routerLink]="settingsBreadcrumbContext.clientLink"
+            class="breadcrumb-link d-flex align-items-center text-decoration-none"
+          >
+            {{ settingsBreadcrumbContext.clientLabel }}
+          </a>
+        </ng-container>
+
+        <ng-container *ngIf="settingsBreadcrumbContext.type === 'plan'">
+          <svg
+            width="12"
+            height="7"
+            viewBox="0 0 12 7"
+            fill="none"
+            class="breadcrumb-chevron"
+            style="transform: rotate(-90deg)"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M1 1L6 6L11 1"
+              stroke="#48475D"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          <a
+            [routerLink]="settingsBreadcrumbContext.planLink"
+            class="breadcrumb-link d-flex align-items-center text-decoration-none"
+          >
+            {{ settingsBreadcrumbContext.planName }}
+          </a>
+        </ng-container>
+
+        <svg
+          width="12"
+          height="7"
+          viewBox="0 0 12 7"
+          fill="none"
+          class="breadcrumb-chevron"
+          style="transform: rotate(-90deg)"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M1 1L6 6L11 1"
+            stroke="#1C1C1C"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+        <span class="breadcrumb-current f-w-500">{{ 'Settings' | translate }}</span>
+      </nav>
+    </ng-container>
+
     <!-- </div> -->
     <!-- @if (!hideSidebarToggle) {
       @if(showToggle) {

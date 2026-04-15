@@ -44,14 +44,6 @@
   }
 }
 
-.start-end-duration-hint {
-  color: #787889;
-  font-size: 14px;
-  line-height: 16px;
-  font-weight: 400;
-  display: inline-block;
-}
-
 .save-action-btn .save-btn-inner {
   display: inline-flex;
   align-items: center;
@@ -79,13 +71,6 @@
 }
 .slider-wrapper {
   flex: 1;
-}
-.return-rate {
-  color: #787889;
-  font-size: 14px;
-  line-height: 16px;
-  display: inline-block;
-  // margin-bottom: 12px;
 }
 .checkbox-box {
   display: flex;
@@ -172,16 +157,6 @@
   height: 22px;
   width: 22px;
   margin-top: -2px;
-}
-
-.net-worth-helper-note {
-  font-size: 13px;
-  line-height: 18px;
-  color: #6b7280;
-  background-color: #f8f9fa;
-  border-radius: 8px;
-  padding: 12px 14px;
-  margin: 4px 0 0;
 }
 
 .commission-percentage-inline {

@@ -255,7 +255,7 @@
                 }
               </div>
               @if (startEndDurationHint) {
-                <span class="start-end-duration-hint">{{ startEndDurationHint }}</span>
+                <span class="field-hint">{{ startEndDurationHint }}</span>
               }
             </div>
           </div>
@@ -408,11 +408,6 @@
             >
               {{ "EMERGENCIES.STOP_INCOME" | translate }}
             </mat-checkbox>
-            @if (stoppableIncomes.length === 0) {
-              <p class="f-s-14 m-0 m-t-4" style="color: #6b7280">
-                {{ "EMERGENCIES.NO_POSITIVE_INCOME_FOR_STOP" | translate }}
-              </p>
-            }
             @if (
               simulateEmergencyForm.get("stopIncome")?.touched &&
               simulateEmergencyForm.get("stopIncome")?.hasError("required")
