@@ -51,6 +51,11 @@ export class SavingsBarStackedChartComponent
   @Input() cashFlowName: string;
   @Input() chartHeight: number = 500;
   @Input() emergencyIconUrl?: string;
+  /**
+   * When the Emergency Expense series is all zeros (e.g. cost 0), still highlight this calendar year column.
+   * Used by emergency simulation so the year band matches the form even with no visible expense bar.
+   */
+  @Input() emergencyHighlightYear: number | null = null;
   /** When true, enables smooth bar morphing animation on data updates (dynamicAnimation). */
   @Input() animateUpdates: boolean = false;
   /** Optional inclusive calendar-year window (after end-year trim). Null = full trimmed range. */
@@ -458,7 +463,7 @@ export class SavingsBarStackedChartComponent
     const seriesForChart = ensureUniqueSavingsChartSeriesColors(report.series);
     this.seriesColorsForTooltip = seriesForChart;
 
-    if (changes['report']) {
+    if (changes['report'] || changes['emergencyHighlightYear']) {
       this.cleanupHtmlTooltips();
       this.cleanupEmergencyElements();
       this.cleanupEventLabels();
@@ -967,7 +972,15 @@ export class SavingsBarStackedChartComponent
     );
     if (!emergencySeries) return [];
 
-    const index = emergencySeries.data.findIndex((v: number) => v > 0);
+    let index = emergencySeries.data.findIndex((v: number) => v > 0);
+    if (index < 0 && this.emergencyHighlightYear != null) {
+      const y = Number(this.emergencyHighlightYear);
+      if (Number.isFinite(y)) {
+        index = report.categories.findIndex(
+          (c) => Number(c) === y || String(c) === String(y),
+        );
+      }
+    }
     if (index < 0) return [];
 
     this.emergencyExpenseDataPointIndex = index;

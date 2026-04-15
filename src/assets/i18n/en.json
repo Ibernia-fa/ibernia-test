@@ -947,6 +947,7 @@
   "CYCLE.EVERY_YEAR": "Every year",
   "EMERGENCIES.SIMULATION_TITLE": "Simulation - {{name}}",
   "EMERGENCIES.STOP_INCOME": "Stop income",
+  "EMERGENCIES.NO_POSITIVE_INCOME_FOR_STOP": "There are no incomes with an amount greater than 0. Add amounts on the Income page to use Stop income.",
   "EMERGENCIES.TYPE_HOME": "Home",
   "EMERGENCIES.TYPE_LIFE": "Life",
   "EMERGENCIES.TYPE_DISABILITY": "Disability",

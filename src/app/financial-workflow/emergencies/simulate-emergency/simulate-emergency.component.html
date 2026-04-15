@@ -403,10 +403,16 @@
               type="checkbox"
               class="example-margin"
               formControlName="stopIncome"
+              [disabled]="stoppableIncomes.length === 0"
               (change)="onStopIncomeUserToggled($event)"
             >
               {{ "EMERGENCIES.STOP_INCOME" | translate }}
             </mat-checkbox>
+            @if (stoppableIncomes.length === 0) {
+              <p class="f-s-14 m-0 m-t-4" style="color: #6b7280">
+                {{ "EMERGENCIES.NO_POSITIVE_INCOME_FOR_STOP" | translate }}
+              </p>
+            }
             @if (
               simulateEmergencyForm.get("stopIncome")?.touched &&
               simulateEmergencyForm.get("stopIncome")?.hasError("required")
@@ -417,7 +423,10 @@
             }
           </section>
 
-          @if (simulateEmergencyForm.get("stopIncome")?.value) {
+          @if (
+            simulateEmergencyForm.get("stopIncome")?.value &&
+            stoppableIncomes.length > 0
+          ) {
             <div class="w-100 form-field gap-8">
               <mat-label
                 class="f-s-16 f-w-500 ibr-black d-block"
@@ -431,7 +440,7 @@
                   formControlName="stoppedIncomeId"
                   placeholder=""
                 >
-                  @for (income of incomes; track income.id) {
+                  @for (income of stoppableIncomes; track income.id) {
                     <mat-option [value]="income.id">
                       {{
                         income.description
@@ -557,6 +566,7 @@
             [forecastEndDate]="forecastEndDate"
             [planDuration]="cashflow?.planDuration"
             [chartHeight]="simulationChartHeight"
+            [emergencyHighlightYear]="completedEmergencyHighlightYear"
             [emergencyIconUrl]="
               activeTab === 'simulated' ? emergency?.iconUrl : 'none'
             "

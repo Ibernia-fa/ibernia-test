@@ -142,6 +142,8 @@ export class SimulateEmergencyComponent implements OnDestroy {
     timelineEvents: any[];
   } | null = null;
   simulationChartHeight: number = 420;
+  /** Start year of the last completed simulation; drives chart column highlight when emergency cost is 0. */
+  completedEmergencyHighlightYear: number | null = null;
 
   get incomeDisplayLabelContext(): IncomeDisplayLabelContext {
     const c = this.client;
@@ -150,6 +152,13 @@ export class SimulateEmergencyComponent implements OnDestroy {
       clientFirstName: c?.clientDetails?.firstName ?? '',
       partnerFirstName: c?.partnerDetail?.firstName ?? '',
     };
+  }
+
+  /** Incomes that can be stopped: positive amount only. */
+  get stoppableIncomes(): FinancialViewModel[] {
+    return (this.incomes ?? []).filter(
+      (i) => Number(i?.amount?.amount ?? 0) > 0,
+    );
   }
 
   constructor(
@@ -277,6 +286,9 @@ export class SimulateEmergencyComponent implements OnDestroy {
   }
 
   private applyLifeInsuranceDefaults(): void {
+    if (this.stoppableIncomes.length === 0) {
+      return;
+    }
     const mainClientSalary = this.getMainClientSalary();
     const stopIncomeCtrl = this.simulateEmergencyForm.get('stopIncome');
     const stoppedIncomeCtrl = this.simulateEmergencyForm.get('stoppedIncomeId');
@@ -297,7 +309,7 @@ export class SimulateEmergencyComponent implements OnDestroy {
   }
 
   private getMainClientSalary(): FinancialViewModel | null {
-    const salaries = (this.incomes ?? []).filter(
+    const salaries = this.stoppableIncomes.filter(
       (i) => (i?.description ?? '').toString().trim().toLowerCase() === 'salary' && i?.id
     );
     return salaries.length > 0 ? salaries[0] : null;
@@ -544,6 +556,11 @@ export class SimulateEmergencyComponent implements OnDestroy {
 
             this.activeTab = 'simulated';
             this.displayedReport = this.simulationResult;
+            const startVal = this.simulateEmergencyForm.get('start')?.value;
+            this.completedEmergencyHighlightYear =
+              typeof startVal === 'number' && Number.isFinite(startVal)
+                ? startVal
+                : null;
           },
           error: (err: any) => {
             this.isSimulating = false;
@@ -739,6 +756,28 @@ export class SimulateEmergencyComponent implements OnDestroy {
     }
     amountCtrl?.updateValueAndValidity({ emitEvent: false });
     incomeCtrl?.updateValueAndValidity({ emitEvent: false });
+
+    const stopOn = this.simulateEmergencyForm.get('stopIncome')?.value;
+    const sid = this.simulateEmergencyForm.get('stoppedIncomeId')?.value;
+    if (stopOn && this.stoppableIncomes.length === 0) {
+      this.simulateEmergencyForm.patchValue(
+        { stopIncome: false, stoppedIncomeId: null },
+        { emitEvent: false },
+      );
+      amountCtrl?.setValidators([Validators.required, Validators.min(1)]);
+      incomeCtrl?.clearValidators();
+      amountCtrl?.updateValueAndValidity({ emitEvent: false });
+      incomeCtrl?.updateValueAndValidity({ emitEvent: false });
+    } else if (
+      stopOn &&
+      sid &&
+      !this.stoppableIncomes.some((i) => i.id === sid)
+    ) {
+      this.simulateEmergencyForm.patchValue(
+        { stoppedIncomeId: null },
+        { emitEvent: false },
+      );
+    }
 
     this.simulateEmergencyForm.updateValueAndValidity();
 
