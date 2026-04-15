@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewContainerRef } from '@angular/core';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { AddNewPotComponent } from './add-new-pot/add-new-pot.component';
 import { MatCardModule } from '@angular/material/card';
@@ -53,7 +53,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { patchInflationRateDescription } from 'src/app/shared/utils/escalation-rate-utils';
 import { formatClientPersonDisplayName } from 'src/app/shared/utils/person-display-name';
 import { MaterialModule } from 'src/app/material.module';
-import { WithdrawalsContributionsComponent } from '../withdrawals-contributions/withdrawals-contributions.component';
+import { FlowsDialogComponent } from './flows-dialog/flows-dialog.component';
 @Component({
   selector: 'app-saving-pots',
   imports: [
@@ -73,7 +73,6 @@ import { WithdrawalsContributionsComponent } from '../withdrawals-contributions/
     ThousandSeparatorPipe,
     TranslateModule,
     MaterialModule,
-    WithdrawalsContributionsComponent,
   ],
 
   templateUrl: './saving-pots.component.html',
@@ -128,6 +127,7 @@ export class SavingPotsComponent implements OnInit {
     private Authservice: AuthService,
     private settingsService: SettingsService,
     private translate: TranslateService,
+    private viewContainerRef: ViewContainerRef,
   ) {
     this.user = this.Authservice.getUserProfile();
     this.settingsService.userData$
@@ -144,14 +144,14 @@ export class SavingPotsComponent implements OnInit {
     this.getData();
   }
 
-  showFlowsOverlay = false;
-
   openFlows(): void {
-    this.showFlowsOverlay = true;
-  }
-
-  closeFlows(): void {
-    this.showFlowsOverlay = false;
+    this.dialog.open(FlowsDialogComponent, {
+      width: '90vw',
+      maxWidth: '1100px',
+      disableClose: false,
+      panelClass: 'flows-dialog-panel',
+      viewContainerRef: this.viewContainerRef,
+    });
   }
 
   SavingPotOwnership = SavingPotOwnership;

@@ -677,26 +677,4 @@
     </div>
   }
 
-  @if (showFlowsOverlay) {
-    <div class="flows-overlay-backdrop" (click)="closeFlows()"></div>
-    <div class="flows-overlay-container">
-      <div class="flows-overlay-header">
-        <h2 class="flows-overlay-title">{{ "Flows" | translate }}</h2>
-        <button
-          type="button"
-          class="flows-overlay-close-btn"
-          aria-label="Close"
-          (click)="closeFlows()"
-        >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M18 6L6 18" stroke="#5A596E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M6 6L18 18" stroke="#5A596E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
-      </div>
-      <div class="flows-overlay-content">
-        <app-withdrawals-contributions></app-withdrawals-contributions>
-      </div>
-    </div>
-  }
 </div>
