@@ -93,8 +93,10 @@ export class AddNewPotComponent {
   clientPreferredCurrency: string;
   clientBirthYear: number;
   clientAge: number;
-  retirementAge: number = 65;  // The year when retiring
-  retirementAgeValue: number = 65;  // The age at retirement
+  /** Calendar year of the active ownership’s retirement timeline event (API field; not “age”). */
+  retirementAge: number = 65;
+  /** Projection age at that retirement year (for labels / defaults). */
+  retirementAgeValue: number = 65;
   cycles: Cycle[];
   escalationRates: EscalationRate[];
   eventsList: any;
@@ -1635,7 +1637,12 @@ private round2(n: number): number {
 
 getContributionStartYear(): number {
   const val = this.savingsForm.get('contributionStartDate')?.value;
-  return typeof val === 'number' && Number.isFinite(val) ? val : this.forecastStartDateYear;
+  const resolved = resolveYear(val, this.eventsList);
+  if (resolved > 0) {
+    return resolved;
+  }
+  const fallback = Number(this.forecastStartDateYear);
+  return Number.isFinite(fallback) ? fallback : 0;
 }
 
 getContributionEndEvents(): any[] {
