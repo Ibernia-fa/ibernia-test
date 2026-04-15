@@ -698,10 +698,11 @@
         }
         <!-- End Pension fund specific fields -->
 
-        <!-- Lock Pot and Commissions Section (hidden in Net Worth) -->
-        @if (!fromNetWorth) {
+        <!-- Lock Pot and Commissions Section (hidden in Net Worth and for Cash) -->
+        @if (
+          !fromNetWorth && savingsForm.get("name")?.value !== "Cash"
+        ) {
           <div class="d-flex flex-column gap-16">
-            @if (savingsForm.get("name")?.value !== "Cash") {
               <!-- Lock Pot Checkbox -->
               <section
                 class="example-section"
@@ -1368,7 +1369,6 @@
                   }
                 </div>
               }
-            }
           </div>
         }
 
