@@ -1,0 +1,19 @@
+.flows-dialog {
+  position: relative;
+}
+
+.flows-dialog-content {
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  &.mat-mdc-dialog-content {
+    margin-top: 16px;
+    padding: 0 !important;
+  }
+}
