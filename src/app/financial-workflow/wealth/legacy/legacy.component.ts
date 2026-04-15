@@ -758,41 +758,47 @@ export class LegacyComponent
 
   private updateHeartChildrenLine(): void {
     if (
-      !this.coupleLinkRef?.nativeElement &&
-      this.childrenSectionRef?.nativeElement
-    ) {
-      this.renderer.removeStyle(
-        this.childrenSectionRef.nativeElement,
-        'transform',
-      );
-    }
-
-    if (
       !this.familyTreeRef?.nativeElement ||
-      !this.coupleLinkRef?.nativeElement ||
       !this.childrenSectionRef?.nativeElement ||
       !this.heartChildrenLineRef?.nativeElement
     ) {
       return;
     }
 
-    const heart = this.coupleLinkRef.nativeElement.querySelector(
-      '.new-heart-icon',
-    ) as HTMLElement;
-    if (!heart) return;
-
     const familyEl = this.familyTreeRef.nativeElement;
     const familyRect = familyEl.getBoundingClientRect();
     const bTop = familyEl.clientTop;
     const bLeft = familyEl.clientLeft;
-    const heartRect = heart.getBoundingClientRect();
 
-    const heartCenterX =
-      heartRect.left + heartRect.width / 2 - familyRect.left - bLeft;
-    const heartBottom = heartRect.bottom - familyRect.top - bTop;
+    let anchorCenterX: number;
+    let anchorBottom: number;
+
+    if (this.coupleLinkRef?.nativeElement) {
+      const heart = this.coupleLinkRef.nativeElement.querySelector(
+        '.new-heart-icon',
+      ) as HTMLElement;
+      if (!heart) return;
+
+      const heartRect = heart.getBoundingClientRect();
+      anchorCenterX =
+        heartRect.left + heartRect.width / 2 - familyRect.left - bLeft;
+      anchorBottom = heartRect.bottom - familyRect.top - bTop;
+    } else if (this.clientMainNodeRef?.nativeElement) {
+      const nodeRect =
+        this.clientMainNodeRef.nativeElement.getBoundingClientRect();
+      anchorCenterX =
+        nodeRect.left + nodeRect.width / 2 - familyRect.left - bLeft;
+      anchorBottom = nodeRect.bottom - familyRect.top - bTop;
+    } else {
+      this.renderer.removeStyle(
+        this.childrenSectionRef.nativeElement,
+        'transform',
+      );
+      return;
+    }
 
     const familyCenterX = familyEl.clientWidth / 2;
-    const offset = heartCenterX - familyCenterX;
+    const offset = anchorCenterX - familyCenterX;
     this.renderer.setStyle(
       this.childrenSectionRef.nativeElement,
       'transform',
@@ -809,12 +815,12 @@ export class LegacyComponent
     const vlineTop = vlineRect.top - familyRect.top - bTop;
 
     const line = this.heartChildrenLineRef.nativeElement;
-    this.renderer.setStyle(line, 'left', `${heartCenterX}px`);
-    this.renderer.setStyle(line, 'top', `${heartBottom}px`);
+    this.renderer.setStyle(line, 'left', `${anchorCenterX}px`);
+    this.renderer.setStyle(line, 'top', `${anchorBottom}px`);
     this.renderer.setStyle(
       line,
       'height',
-      `${Math.max(0, vlineTop - heartBottom + 1)}px`,
+      `${Math.max(0, vlineTop - anchorBottom + 1)}px`,
     );
   }
 

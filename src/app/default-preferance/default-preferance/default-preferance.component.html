@@ -1,101 +1,113 @@
-<div class="add-client-wrapper">
-  <div class="add-client-content-wrapper">
-
 <form [formGroup]="form" (ngSubmit)="submit()">
+  <div class="dialog-header">
+    <h2 class="dialog-title">
+      {{ 'Your account preferences' | translate }}
+    </h2>
+  </div>
 
-    <h1 class="f-s-30 f-w-500 m-0 m-b-30 p-b-15">{{ 'Your account preferences' | translate }}</h1>
-  <div class="container" formGroupName="preferences">
+  <mat-dialog-content class="dialog-content">
+    <div formGroupName="preferences">
+      <div class="dialog-form-grid">
 
-    <div class="preferences-onboarding-grid">
-      <div class="preferences-field">
-        <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Country' | translate }}
-
+        <div class="form-field">
+          <mat-label class="f-s-16 f-w-500 m-b-4 d-flex align-items-center ibr-black">
+            {{ 'Country' | translate }}
             <img src="assets/images/svgs/help-circle-icon.svg"
-             alt="help-circle-icon"
-              width="18"
-             class="m-l-4 cursor-pointer"
-             [matTooltip]="'TOOLTIP.DEFAULT_CURRENCY' | translate">
-
-        </mat-label>
-        <mat-form-field appearance="outline" class="w-full w-100">
-          <mat-select formControlName="country" [placeholder]="'Select country' | translate"
-                      (valueChange)="clientCountryValueChange($event)">
-            @for (country of countries; track country) {
-              @if (country.currencySymbol) {
-                <mat-option [value]="country.countryName">{{ country.countryName }}</mat-option>
+                 alt="help-circle-icon"
+                 width="18"
+                 class="m-l-4 cursor-pointer"
+                 [matTooltip]="'TOOLTIP.DEFAULT_CURRENCY' | translate">
+          </mat-label>
+          <div class="select-option custom-select">
+            <mat-select formControlName="country" [placeholder]="'Select country' | translate"
+                        (valueChange)="clientCountryValueChange($event)">
+              @for (country of countries; track country) {
+                @if (country.currencySymbol) {
+                  <mat-option [value]="country.countryName">{{ country.countryName }}</mat-option>
+                }
               }
-            }
-          </mat-select>
-                    <mat-error *ngIf="p.country.hasError('required')">{{'Required' | translate}}</mat-error>
-        </mat-form-field>
-      </div>
-
-      <div class="preferences-field">
-        <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Currency' | translate }}
-         <img src="assets/images/svgs/help-circle-icon.svg"
-             alt="help-circle-icon"
-              width="18"
-             class="m-l-4 cursor-pointer"
-             [matTooltip]="'TOOLTIP.DEFAULT_CURRENCY' | translate">
-
-        </mat-label>
-
-        <mat-form-field appearance="outline" class="w-full w-100">
-          <mat-select formControlName="currency"  hideSingleSelectionIndicator>
-            @for (country of countries; track country) {
-              @if (country.currencySymbol) {
-                <mat-option [value]="country.currencySymbol">{{ country.currencySymbol }}</mat-option>
-              }
-            }
-          </mat-select>
-          <mat-error *ngIf="p.currency.invalid">{{'Required' | translate}}</mat-error>
-        </mat-form-field>
-      </div>
-
-      <div class="preferences-field">
-        <mat-label class="f-s-16 f-w-400 m-b-8 d-flex align-items-center">{{ 'Language' | translate }}
-          <img src="assets/images/svgs/help-circle-icon.svg"
-               alt="help-circle-icon"
-               width="18"
-               class="m-l-4 cursor-pointer"
-               [matTooltip]="'TOOLTIP.LANGUAGE' | translate">
-        </mat-label>
-        <mat-form-field appearance="outline" class="w-full w-100">
-          <mat-select formControlName="language" (selectionChange)="onLanguageChange($event.value)">
-            @for (lang of languages; track lang.value) {
-              <mat-option [value]="lang.value">{{ lang.label }}</mat-option>
-            }
-          </mat-select>
-          <mat-error *ngIf="p.language.invalid">{{'Required' | translate}}</mat-error>
-        </mat-form-field>
-      </div>
-    </div>
-
-      <!-- Footer: stacked hint then CTA so spacing matches other Ibernia modals -->
-   <div class="row preferences-onboarding-footer">
-    <div class="col-12">
-      <div class="preferences-onboarding-actions">
-        <section class="preferences-onboarding-hint">
-          <p class="d-flex align-items-center m-0">
-            <img src="assets/images/svgs/Info-icon.svg" alt="" class="m-r-5">
-            {{ 'PREFERENCES.CHANGE_LATER_HINT' | translate }}
-          </p>
-        </section>
-        <div class="preferences-onboarding-cta">
-          <button type="submit" class="button-icon">
-            <span *ngIf="!isSaving">{{ 'Finish and go to your dashboard' | translate }}</span>
-            <span *ngIf="isSaving">{{ 'Saving…' | translate }}</span>
-          </button>
+            </mat-select>
+            <span class="custom-arrow">
+              <svg width="12" height="7" viewBox="0 0 12 7" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1 1L6 6L11 1" stroke="#2B3942" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+          </div>
+          @if (p.country.touched && p.country.hasError('required')) {
+            <span class="field-error d-block">{{'Required' | translate}}</span>
+          }
         </div>
+
+        <div class="form-field">
+          <mat-label class="f-s-16 f-w-500 m-b-4 d-flex align-items-center ibr-black">
+            {{ 'Currency' | translate }}
+            <img src="assets/images/svgs/help-circle-icon.svg"
+                 alt="help-circle-icon"
+                 width="18"
+                 class="m-l-4 cursor-pointer"
+                 [matTooltip]="'TOOLTIP.DEFAULT_CURRENCY' | translate">
+          </mat-label>
+          <div class="select-option custom-select">
+            <mat-select formControlName="currency" hideSingleSelectionIndicator>
+              @for (country of countries; track country) {
+                @if (country.currencySymbol) {
+                  <mat-option [value]="country.currencySymbol">{{ country.currencySymbol }}</mat-option>
+                }
+              }
+            </mat-select>
+            <span class="custom-arrow">
+              <svg width="12" height="7" viewBox="0 0 12 7" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1 1L6 6L11 1" stroke="#2B3942" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+          </div>
+          @if (p.currency.touched && p.currency.invalid) {
+            <span class="field-error d-block">{{'Required' | translate}}</span>
+          }
+        </div>
+
+        <div class="form-field">
+          <mat-label class="f-s-16 f-w-500 m-b-4 d-flex align-items-center ibr-black">
+            {{ 'Language' | translate }}
+            <img src="assets/images/svgs/help-circle-icon.svg"
+                 alt="help-circle-icon"
+                 width="18"
+                 class="m-l-4 cursor-pointer"
+                 [matTooltip]="'TOOLTIP.LANGUAGE' | translate">
+          </mat-label>
+          <div class="select-option custom-select">
+            <mat-select formControlName="language" (selectionChange)="onLanguageChange($event.value)">
+              @for (lang of languages; track lang.value) {
+                <mat-option [value]="lang.value">{{ lang.label }}</mat-option>
+              }
+            </mat-select>
+            <span class="custom-arrow">
+              <svg width="12" height="7" viewBox="0 0 12 7" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1 1L6 6L11 1" stroke="#2B3942" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+          </div>
+          @if (p.language.touched && p.language.invalid) {
+            <span class="field-error d-block">{{'Required' | translate}}</span>
+          }
+        </div>
+
       </div>
     </div>
-   </div>
-  </div>
+  </mat-dialog-content>
 
-
-
+  <mat-dialog-actions class="dialog-actions">
+    <section class="preferences-onboarding-hint">
+      <p class="d-flex align-items-center m-0">
+        <img src="assets/images/svgs/Info-icon.svg" alt="" class="m-r-5">
+        {{ 'PREFERENCES.CHANGE_LATER_HINT' | translate }}
+      </p>
+    </section>
+    <div class="preferences-onboarding-cta">
+      <button type="submit" class="button-icon">
+        <span *ngIf="!isSaving">{{ 'Finish and go to your dashboard' | translate }}</span>
+        <span *ngIf="isSaving">{{ 'Saving…' | translate }}</span>
+      </button>
+    </div>
+  </mat-dialog-actions>
 </form>
-  </div>
-
-</div>
-

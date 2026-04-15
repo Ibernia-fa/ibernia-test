@@ -180,6 +180,9 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
   private boundDocumentDrop: ((e: DragEvent) => void) | null = null;
   private lastValidDragTime: Date | null = null; // Store last valid drag position from onDragOver
   private lastRetirementDependencyKey: string | null = null;
+  private connectorRenderPending = false;
+  private resizeObserver: ResizeObserver | null = null;
+  private resizeRedrawTimer: any = null;
 
   constructor(
     private dialog: MatDialog,
@@ -237,6 +240,9 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
 
   ngOnDestroy() {
     this.removeDocumentDropListener();
+    this.resizeObserver?.disconnect();
+    this.resizeObserver = null;
+    clearTimeout(this.resizeRedrawTimer);
   }
 
   ngAfterViewInit() {
@@ -768,6 +774,14 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
           this.updateEventByDoubleClick(clientEvent);
       }
     });
+
+    this.resizeObserver = new ResizeObserver(() => {
+      clearTimeout(this.resizeRedrawTimer);
+      this.resizeRedrawTimer = setTimeout(() => {
+        this.drawConnectorLines();
+      }, 50);
+    });
+    this.resizeObserver.observe(this.timelineContainer.nativeElement);
   }
 
   private adjustItemZIndex(): void {
@@ -799,6 +813,15 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
   };
 
   private renderConnectorLines(): void {
+    if (this.connectorRenderPending) return;
+    this.connectorRenderPending = true;
+    requestAnimationFrame(() => {
+      this.connectorRenderPending = false;
+      this.drawConnectorLines();
+    });
+  }
+
+  private drawConnectorLines(): void {
     const container = this.timelineContainer?.nativeElement;
     if (!container) return;
 
@@ -819,24 +842,29 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
 
     const centerRect = centerPanel.getBoundingClientRect();
     const items = Array.from(
-      container.querySelectorAll('.vis-item'),
+      centerPanel.querySelectorAll('.vis-item'),
     ) as HTMLElement[];
+
+    const drawnPositions = new Set<string>();
 
     items.forEach((item) => {
       const itemRect = item.getBoundingClientRect();
-      const lineLeft = itemRect.left - centerRect.left + 1;
-      const lineTop = itemRect.bottom - centerRect.top - 12;
-      const lineHeight = centerRect.height - lineTop - 4;
+      const lineLeft = Math.round(itemRect.left - centerRect.left + 1);
+      const lineTop = Math.round(itemRect.bottom - centerRect.top - 12);
+      const lineHeight = Math.round(centerRect.height - lineTop - 4);
       if (lineHeight <= 0) return;
+
+      const posKey = `${lineLeft}_${lineTop}`;
+      if (drawnPositions.has(posKey)) return;
+      drawnPositions.add(posKey);
 
       const line = document.createElement('div');
       line.className = 'connector-line';
       line.style.position = 'absolute';
       line.style.left = `${lineLeft}px`;
       line.style.top = `${lineTop}px`;
-      line.style.width = '1px';
       line.style.height = `${lineHeight}px`;
-      line.style.backgroundColor = this.getConnectorLineColor(item);
+      line.style.borderLeft = `1px solid ${this.getConnectorLineColor(item)}`;
       linesLayer.appendChild(line);
     });
   }

@@ -211,7 +211,7 @@
 }
 
 .satisfaction-icon {
-  background-color: #516CE847;
+  background-color: #516ce847;
   height: 28px;
   width: 28px;
   border-radius: 6px;
@@ -220,7 +220,7 @@
   justify-content: center;
 }
 .finance-icon {
-  background-color: #34C75942;
+  background-color: #34c75942;
   height: 28px;
   width: 28px;
   border-radius: 6px;
@@ -229,7 +229,7 @@
   justify-content: center;
 }
 .investment-approach-icon {
-  background-color: #FE961424;
+  background-color: #fe961424;
   height: 28px;
   width: 28px;
   border-radius: 6px;
@@ -260,7 +260,7 @@
   font-weight: 400;
 }
 .item-text {
-  .team-relation{
+  .team-relation {
     font-size: 16px;
   }
   .values {
@@ -276,4 +276,14 @@
   font-size: 16px;
   line-height: 20px;
   margin-top: 4px;
+}
+
+.protection-priorities-section .chip {
+  background: #ff383c2b;
+  color: #ff383c;
+
+  .chip-icon {
+    filter: invert(38%) sepia(98%) saturate(3028%) hue-rotate(337deg)
+      brightness(103%) contrast(106%);
+  }
 }
