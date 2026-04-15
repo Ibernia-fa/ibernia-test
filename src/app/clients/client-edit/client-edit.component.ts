@@ -20,10 +20,11 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
 import { ClientHttpService } from '../services/client-http.service';
-import { catchError, filter, map } from 'rxjs';
+import { catchError, filter, finalize, map, tap } from 'rxjs';
 import { Client } from '../models/client';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { allCountries } from '../models/country';
 import { CountryISO } from 'ngx-intl-tel-input';
@@ -91,6 +92,7 @@ class DmyDateAdapter extends NativeDateAdapter {
     ToastrModule,
     MatSelectModule,
     MatButtonModule,
+    MatProgressSpinnerModule,
     MatDialogModule,
     MatIconModule,
     MatDividerModule,
@@ -133,6 +135,7 @@ export class ClientEditComponent {
   private isPastingPartner: boolean = false;
   clientDobDisplay: string = '';
   partnerDobDisplay: string = '';
+  isSaving = false;
 
   constructor(
     private fb: FormBuilder,
@@ -208,7 +211,11 @@ export class ClientEditComponent {
   }
 
   get isSaveDisabled(): boolean {
-    return this.isFormInvalid || !this.clientForm.dirty;
+    return (
+      this.isSaving ||
+      this.isFormInvalid ||
+      !this.clientForm.dirty
+    );
   }
 
   getClient() {
@@ -344,6 +351,9 @@ export class ClientEditComponent {
   }
 
   onSubmit() {
+    if (this.isSaving) {
+      return;
+    }
     this.clientForm.markAllAsTouched();
     this.clientForm.markAsDirty();
     if (!this.isFormInvalid) {
@@ -380,22 +390,36 @@ export class ClientEditComponent {
         lastUpdated: new Date(),
         notes: this.clientForm.controls['notes'].value,
       };
+      this.isSaving = true;
       this.clientHttpService
         .updateClient(client)
         .pipe(
           filter((res) => !!res),
-          map(() => {
+          tap(() => {
             this.store.dispatch(ClientActions.selectClient({ client }));
-            this.toastr.success(this.translate.instant('TOAST.CLIENT_UPDATED'), this.translate.instant('LABEL.SUCCESS'));
+            this.toastr.success(
+              this.translate.instant('TOAST.CLIENT_UPDATED'),
+              this.translate.instant('LABEL.SUCCESS'),
+            );
             this.dialogRef.close({ action: 'updated', client });
           }),
           catchError((err) => {
             console.error(err);
-            this.toastr.error(this.translate.instant('TOAST.ERROR_SAVING_CLIENT'), this.translate.instant('LABEL.ERROR'));
+            this.toastr.error(
+              this.translate.instant('TOAST.ERROR_SAVING_CLIENT'),
+              this.translate.instant('LABEL.ERROR'),
+            );
             throw err;
-          })
+          }),
+          finalize(() => {
+            this.isSaving = false;
+          }),
         )
-        .subscribe();
+        .subscribe({
+          error: () => {
+            // isSaving cleared in finalize
+          },
+        });
     } else {
       console.error('Form is invalid');
     }

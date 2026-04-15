@@ -18,6 +18,7 @@ import {
   EMPTY,
   groupBy,
   mergeMap,
+  take,
 } from 'rxjs';
 import { NavItemService } from 'src/app/layouts/full/nav-item.service';
 import { EmergenciesHttpService as EmergenciesHttpService } from './services/emergencies-http.service';
@@ -765,7 +766,7 @@ export class EmergenciesComponent implements OnInit {
             );
             this.timeline = timeline;
             this.eventsList = this.timeline?.clientEvents.sort(
-              (a, b) => a.start.age - b.start.age,
+              (a, b) => (a.start?.year ?? 0) - (b.start?.year ?? 0),
             );
           },
         ),
@@ -783,49 +784,68 @@ export class EmergenciesComponent implements OnInit {
         (x) => x.emergencyId == emergency.id,
       ) ?? null;
 
-    const dialogRef = this.dialog.open(SimulateEmergencyComponent, {
-      width: '612px',
-      disableClose: true,
-      data: {
-        client: this.selectedClient,
-        cashflow: this.selectedCashflow,
-        clientPreferredCurrency: this.clientData?.preferredCurrency,
-        clientBirthDate: this.clientData?.birthDate,
-        emergency,
-        emergencyExpense,
-        amountCycles: this.amountCyclesAll,
-        escalationRates: this.escalationRates,
-        eventsList: this.timeline.clientEvents.sort(
-          (a, b) => a.start.age - b.start.age,
-        ),
-        incomes: this.incomeExpense?.incomes,
-        forecastEndDate: this.timeline.forecastEndtDate,
-        forecastStartDate: this.timeline.forecastStartDate,
-        forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
-        forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
-        planDuration: this.selectedCashflow?.planDuration,
-      },
-    });
-
-    dialogRef
-      .afterClosed()
-      .subscribe((updatedExpense: SimulateEmergencyModel | null) => {
-        if (!updatedExpense) return;
-
-        if (this.stats != null) {
-          this.stats.emergencyExpenses ??= [];
-
-          const index =
-            this.stats?.emergencyExpenses.findIndex(
-              (x) => x.emergencyId === updatedExpense.emergencyId,
-            ) ?? -1;
-
-          if (index > -1) {
-            this.stats.emergencyExpenses[index] = updatedExpense;
-          } else {
-            this.stats?.emergencyExpenses.push(updatedExpense);
-          }
+    this.timelineHttpService
+      .getTimelineWithLinkedFinancialRecordsByCashflowId(this.cashflowId)
+      .pipe(
+        take(1),
+        takeUntilDestroyed(this.destroyRef),
+        catchError(() => of(null)),
+      )
+      .subscribe((response) => {
+        if (response) {
+          this.timeline = response.timeline;
+          this.eventsList = this.timeline?.clientEvents.sort(
+            (a, b) => (a.start?.year ?? 0) - (b.start?.year ?? 0),
+          );
         }
+        if (!this.timeline) return;
+
+        const dialogRef = this.dialog.open(SimulateEmergencyComponent, {
+          width: '612px',
+          disableClose: true,
+          data: {
+            client: this.selectedClient,
+            cashflow: this.selectedCashflow,
+            clientPreferredCurrency: this.clientData?.preferredCurrency,
+            clientBirthDate: this.clientData?.birthDate,
+            emergency,
+            emergencyExpense,
+            amountCycles: this.amountCyclesAll,
+            escalationRates: this.escalationRates,
+            timeline: this.timeline,
+            eventsList: (this.timeline?.clientEvents ?? []).sort(
+              (a, b) => (a.start?.year ?? 0) - (b.start?.year ?? 0),
+            ),
+            incomes: this.incomeExpense?.incomes,
+            forecastEndDate: this.timeline.forecastEndtDate,
+            forecastStartDate: this.timeline.forecastStartDate,
+            forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
+            forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
+            planDuration: this.selectedCashflow?.planDuration,
+          },
+        });
+
+        dialogRef
+          .afterClosed()
+          .subscribe((updatedExpense: SimulateEmergencyModel | null) => {
+            if (!updatedExpense) return;
+
+            if (this.stats != null) {
+              this.stats.emergencyExpenses ??= [];
+
+              const index =
+                this.stats?.emergencyExpenses.findIndex(
+                  (x) => x.emergencyId === updatedExpense.emergencyId,
+                ) ?? -1;
+
+              if (index > -1) {
+                this.stats.emergencyExpenses[index] = updatedExpense;
+              } else {
+                this.stats?.emergencyExpenses.push(updatedExpense);
+              }
+            }
+            this.cdr.markForCheck();
+          });
       });
   }
 

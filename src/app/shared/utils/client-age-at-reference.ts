@@ -183,3 +183,50 @@ export function getPersistedAgeForCalendarYear(
   );
   return Number.isNaN(a) ? 0 : a;
 }
+
+/**
+ * Age shown for a timeline {@link ClientEvent} at its stored calendar year — same as
+ * {@link getProjectionColumnAgeLabel} / the lifetime-plan axis (not Jan-1 completed age).
+ */
+export function getProjectionAgeForClientEvent(
+  event:
+    | {
+        start?: { year?: number; age?: number } | null;
+        isPartnerEvent?: boolean;
+      }
+    | null
+    | undefined,
+  options: {
+    clientBirthDate: Date | string | null | undefined;
+    partnerBirthDate?: Date | string | null | undefined;
+    forecastStartDate?: Date | string | null;
+    planDuration?: number | null;
+    projectionInclusiveEndYear?: number | null;
+  },
+): number {
+  const y = Number(event?.start?.year);
+  if (!event?.start || !Number.isFinite(y) || y <= 0) {
+    const a = Number(event?.start?.age ?? 0);
+    return Number.isFinite(a) ? a : 0;
+  }
+  const birth =
+    event.isPartnerEvent && options.partnerBirthDate != null
+      ? options.partnerBirthDate
+      : options.clientBirthDate;
+  if (birth == null) {
+    const a = Number(event.start.age ?? 0);
+    return Number.isFinite(a) ? a : 0;
+  }
+  const label = getProjectionColumnAgeLabel(
+    birth,
+    y,
+    options.forecastStartDate,
+    options.planDuration,
+    options.projectionInclusiveEndYear,
+  );
+  if (Number.isNaN(label)) {
+    const a = Number(event.start.age ?? 0);
+    return Number.isFinite(a) ? a : 0;
+  }
+  return label;
+}

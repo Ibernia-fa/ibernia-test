@@ -14,8 +14,9 @@ import { ClientEvent, Cycle, EscalationRate, EventIncomeType, FinancialRecordLin
 import { AbstractControl, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 import { Timeline } from 'vis-timeline';
 import { TimelineHttpService } from '../services/timeline-http.service';
-import { catchError, filter } from 'rxjs';
+import { catchError, EMPTY, filter, finalize } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import moment from 'moment';
 import { allCountries } from 'src/app/clients/models/country';
 import { AgeCalculatorPipe } from 'src/app/pipe/age-calculator.pipe';
@@ -44,6 +45,7 @@ import {
   recurringEndYearNotSelected,
 } from 'src/app/shared/utils/recurring-end-save-guard';
 import { getStartEndDurationLabel } from 'src/app/shared/utils/start-end-duration-label';
+import { extractEventId, resolveYear } from 'src/app/shared/utils/event-date-utils';
 
 @Component({
   selector: 'app-add-event-dialog',
@@ -63,6 +65,7 @@ import { getStartEndDurationLabel } from 'src/app/shared/utils/start-end-duratio
     ThousandSeparatorInputDirective,
     TranslateModule,
     MatCheckboxModule,
+    MatProgressSpinnerModule,
     TranslateEscalationDescriptionPipe,
   ],
   providers: [provideNativeDateAdapter(),
@@ -245,7 +248,7 @@ export class AddEventDialogComponent {
     this.clientAge = getCompletedYearsAgeAtDate(birthDate, forecastStart);
 
     this.eventsList = data.eventsList;
-    this.eventsList?.sort((a: any, b: any) => a.age - b.age);
+    this.eventsList?.sort((a: any, b: any) => (a.year ?? 0) - (b.year ?? 0));
     this.isEditWorkflow = data.isEditWorkflow;
     this.patchEvent = data.patchEvent
     this.clientPreferredCurrency = data.clientPreferredCurrency
@@ -388,7 +391,7 @@ export class AddEventDialogComponent {
           cycle: [defaultCycle, [Validators.required]],
           ageDate: [moment(this.dropTime).year(), Validators.required],
           start: [moment(this.dropTime).year(), Validators.required],
-          end: [null as number | null],
+          end: [null as number | string | null],
           escalationRate: [this.escalationRates[0]?.description ?? '', Validators.required],
           customEscalationRate: ['']
         });
@@ -439,10 +442,10 @@ export class AddEventDialogComponent {
           downPayment: [0],
           monthlyPayment: [0, Validators.min(0)],
           monthlyStart: [moment(this.dropTime).year()],
-          monthlyEnd: [null as number | null],
+          monthlyEnd: [null as number | string | null],
           cycle: ['One-off', [Validators.required]],
           start: [null, Validators.required],
-          end: [null as number | null],
+          end: [null as number | string | null],
           escalationRate: [this.escalationRates[0]?.description ?? ''],
           customEscalationRate: [''],
         });
@@ -508,7 +511,11 @@ export class AddEventDialogComponent {
         this.eventForm.controls['cycle'].patchValue(this.patchEvent?.netAmount.cycle?.description);
         this.eventForm.controls['ageDate'].patchValue(this.patchEvent?.start.year);
         this.eventForm.controls['start'].patchValue(this.patchEvent?.start.year);
-        this.eventForm.controls['end'].patchValue(this.patchEvent?.end?.year);
+        this.eventForm.controls['end'].patchValue(
+          this.patchEvent?.endEventId
+            ? 'event:' + this.patchEvent.endEventId
+            : this.patchEvent?.end?.year ?? null,
+        );
         this.eventForm.controls['escalationRate'].patchValue(this.patchEvent?.escalationRate?.description);
         this.handleEscalationRatePatch(this.patchEvent?.escalationRate?.description, this.patchEvent?.escalationRate?.value);
         break;
@@ -542,12 +549,18 @@ export class AddEventDialogComponent {
           monthlyRec?.start?.year ?? null
         );
         this.eventForm.controls['monthlyEnd'].patchValue(
-          monthlyRec?.end?.year ?? null
+          monthlyRec?.endEventId
+            ? 'event:' + monthlyRec.endEventId
+            : monthlyRec?.end?.year ?? null
         );
         this.eventForm.controls['cycle'].patchValue(
           this.patchEvent?.netAmount.cycle?.description
         );
-        this.eventForm.controls['end'].patchValue(this.patchEvent?.end?.year);
+        this.eventForm.controls['end'].patchValue(
+          this.patchEvent?.endEventId
+            ? 'event:' + this.patchEvent.endEventId
+            : this.patchEvent?.end?.year ?? null,
+        );
         this.applyCustomPaymentValidators(
           isCustomFinancing ? 'Financing' : 'Cash'
         );
@@ -698,6 +711,7 @@ export class AddEventDialogComponent {
     }
 
     this.saveClicked = true;
+    this.cdr.markForCheck();
 
       // inheritance
       let escalataionRatesToSubmit = null;
@@ -740,6 +754,9 @@ export class AddEventDialogComponent {
         finalName = this.eventForm.get('name')?.value;
       }
 
+      const { end: recurringEnd, endEventId } =
+        this.buildRecurringEndFromEndControl();
+
       const clientEvent: ClientEvent = {
         id: this.isEditWorkflow ? this.patchEvent?.id ?? "" : "",
         name: finalName,
@@ -772,18 +789,8 @@ export class AddEventDialogComponent {
                 this.dialogEndCalendarYear,
               ),
         },
-        end: this.eventForm.get('cycle')?.value === 'One-off'
-          ? null
-          : {
-            year: this.eventForm.get('end')?.value,
-            age: getPersistedAgeForCalendarYear(
-              this.data.clientBirthDate,
-              this.eventForm.get('end')?.value,
-              this.data.forecastStartDate,
-              this.data.planDuration,
-              this.dialogEndCalendarYear,
-            ),
-          },
+        end: recurringEnd,
+        endEventId,
         escalationRate: escalataionRatesToSubmit,
         type: this.isIncomeEvent ? EventIncomeType.Income : EventIncomeType.Expense,
         iconUrl: this.patchEvent.iconUrl,
@@ -801,20 +808,24 @@ export class AddEventDialogComponent {
         return;
       }
 
-      this.timelineHttpService.addEvent(clientEvent, this.cashflowId)
+      this.timelineHttpService
+        .addEvent(clientEvent, this.cashflowId)
         .pipe(
-          filter(res => !!res),
-          catchError(err => {
-            this.saveClicked = false;
+          filter((res) => !!res),
+          catchError((err) => {
             console.error(err);
-            throw err;
-          })
-        ).subscribe(res => {
-          this.saveClicked = false;
+            return EMPTY;
+          }),
+          finalize(() => {
+            this.saveClicked = false;
+            this.cdr.markForCheck();
+          }),
+        )
+        .subscribe(() => {
           this.dialogRef.close({
-            status: 'Success'
+            status: 'Success',
           });
-        })
+        });
   }
 
   onCustomEventSubmit() {
@@ -836,6 +847,7 @@ export class AddEventDialogComponent {
     }
 
     this.saveClicked = true;
+    this.cdr.markForCheck();
 
     const selectedEscDesc = this.eventForm.get('escalationRate')?.value as string;
     const isCustomEscalation = selectedEscDesc === 'Increases at custom rate';
@@ -846,6 +858,9 @@ export class AddEventDialogComponent {
       !isCustomEscalation
         ? this.escalationRates.find((x) => x.description === selectedEscDesc)
         : undefined;
+
+    const { end: customRecurringEnd, endEventId: customEndEventId } =
+      this.buildRecurringEndFromEndControl();
 
     const clientEvent: ClientEvent = {
       id: this.isEditWorkflow ? this.patchEvent?.id ?? '' : '',
@@ -871,18 +886,8 @@ export class AddEventDialogComponent {
           this.dialogEndCalendarYear,
         ),
       },
-      end: this.eventForm.get('cycle')?.value === 'One-off'
-        ? null
-        : {
-          year: this.eventForm.get('end')?.value,
-          age: getPersistedAgeForCalendarYear(
-            this.data.clientBirthDate,
-            this.eventForm.get('end')?.value,
-            this.data.forecastStartDate,
-            this.data.planDuration,
-            this.dialogEndCalendarYear,
-          ),
-        },
+      end: customRecurringEnd,
+      endEventId: customEndEventId,
       escalationRate:
         selectedEscalationRateValue !== null && selectedEscalationRateValue !== ''
           ? picked ?? {
@@ -939,6 +944,7 @@ export class AddEventDialogComponent {
     }
 
     this.saveClicked = true;
+    this.cdr.markForCheck();
     const flags = { isCash: false, isFinance: true };
     const events: ClientEvent[] = [];
     events.push(
@@ -968,13 +974,15 @@ export class AddEventDialogComponent {
       .pipe(
         filter((res) => !!res),
         catchError((err) => {
-          this.saveClicked = false;
           console.error(err);
-          throw err;
-        })
+          return EMPTY;
+        }),
+        finalize(() => {
+          this.saveClicked = false;
+          this.cdr.markForCheck();
+        }),
       )
       .subscribe(() => {
-        this.saveClicked = false;
         this.dialogRef.close({ status: 'Success' });
       });
   }
@@ -1048,6 +1056,7 @@ export class AddEventDialogComponent {
     if (this.eventForm.get('paymentType')?.value === 'Financing') {
       return financingMonthlyEndYearNotSelected(
         this.eventForm.get('monthlyEnd')?.value,
+        this.eventsList,
       );
     }
     return false;
@@ -1061,6 +1070,7 @@ export class AddEventDialogComponent {
     if (this.eventForm.get('paymentType')?.value === 'Financing') {
       return financingMonthlyEndYearNotSelected(
         this.eventForm.get('monthlyEnd')?.value,
+        this.eventsList,
       );
     }
     const cycle = this.eventForm.get('cycle')?.value as string | undefined;
@@ -1071,11 +1081,38 @@ export class AddEventDialogComponent {
     );
   }
 
+  private buildRecurringEndFromEndControl(): {
+    end: { year: number; age: number } | null;
+    endEventId: string | null;
+  } {
+    const cycle = this.eventForm.get('cycle')?.value;
+    if (cycle === 'One-off') {
+      return { end: null, endEventId: null };
+    }
+    const endRaw = this.eventForm.get('end')?.value;
+    const endYearResolved = resolveYear(endRaw, this.eventsList);
+    const endEventId = extractEventId(endRaw);
+    return {
+      end: {
+        year: endYearResolved,
+        age: getPersistedAgeForCalendarYear(
+          this.data.clientBirthDate,
+          endYearResolved,
+          this.data.forecastStartDate,
+          this.data.planDuration,
+          this.dialogEndCalendarYear,
+        ),
+      },
+      endEventId: endEventId ?? null,
+    };
+  }
+
   private endOnOrAfterStartValidator(): ValidatorFn {
     return (group: AbstractControl) => {
       const cycle = group.get('cycle')?.value as string | null;
       const start = group.get('start')?.value as number | null;
-      const end = group.get('end')?.value as number | null;
+      const endRaw = group.get('end')?.value as number | string | null;
+      const end = resolveYear(endRaw, this.eventsList);
       const endCtrl = group.get('end');
 
       if (!endCtrl) return null;
@@ -1085,10 +1122,10 @@ export class AddEventDialogComponent {
       // validate only when cycle is not One-off and both years are positive
       const shouldValidate =
         !!cycle && cycle !== 'One-off' &&
-        start != null && end != null &&
-        Number(start) > 0 && Number(end) > 0;
+        start != null && endRaw != null && endRaw !== '' &&
+        Number(start) > 0 && end > 0;
 
-      if (shouldValidate && end < start) {
+      if (shouldValidate && end < Number(start)) {
         endCtrl.setErrors({ ...(existing ?? {}), endBeforeStart: true });
       } else if (existing && 'endBeforeStart' in existing) {
         const { endBeforeStart, ...rest } = existing;
@@ -1102,7 +1139,8 @@ export class AddEventDialogComponent {
   private endOnOrAfterStartMonthlyValidator(): ValidatorFn {
     return (group: AbstractControl) => {
       const start = group.get('monthlyStart')?.value as number | null;
-      const end = group.get('monthlyEnd')?.value as number | null;
+      const endRaw = group.get('monthlyEnd')?.value;
+      const end = resolveYear(endRaw, this.eventsList);
       const endCtrl = group.get('monthlyEnd');
 
       if (!endCtrl) return null;
@@ -1110,10 +1148,13 @@ export class AddEventDialogComponent {
       const existing = endCtrl.errors ?? null;
 
       const shouldValidate =
-        start != null && end != null &&
-        Number(start) > 0 && Number(end) > 0;
+        start != null &&
+        endRaw != null &&
+        endRaw !== '' &&
+        Number(start) > 0 &&
+        end > 0;
 
-      if (shouldValidate && end < start) {
+      if (shouldValidate && end < Number(start)) {
         endCtrl.setErrors({ ...(existing ?? {}), endBeforeStart: true });
       } else if (existing && 'endBeforeStart' in existing) {
         const { endBeforeStart, ...rest } = existing;
@@ -1158,6 +1199,7 @@ export class AddEventDialogComponent {
     if (this.isFinancingEventSaveButtonDisabled) return;
 
     this.saveClicked = true;
+    this.cdr.markForCheck();
     const paymentType = this.eventForm.get('paymentType')?.value;
     const cashFlags =
       paymentType === 'Cash'
@@ -1205,19 +1247,22 @@ export class AddEventDialogComponent {
       return;
     }
 
-    this.timelineHttpService.addFinancingEvents(events, this.cashflowId)
+    this.timelineHttpService
+      .addFinancingEvents(events, this.cashflowId)
       .pipe(
-        filter(res => !!res),
-        catchError(err => {
-          this.saveClicked = false;
-
+        filter((res) => !!res),
+        catchError((err) => {
           console.error(err);
-          throw err;
-        })
-      ).subscribe(res => {
-        this.saveClicked = false;
+          return EMPTY;
+        }),
+        finalize(() => {
+          this.saveClicked = false;
+          this.cdr.markForCheck();
+        }),
+      )
+      .subscribe(() => {
         this.dialogRef.close({
-          status: 'Success'
+          status: 'Success',
         });
       });
   }
@@ -1573,7 +1618,7 @@ export class AddEventDialogComponent {
   private buildMonthlyExpense(
     amount: number,
     startYear: number,
-    endYear: number,
+    endValue: number | string | null | undefined,
     flags?: { isCash: boolean; isFinance: boolean }
   ): ClientEvent {
     let finalName = this.patchEvent?.name ?? 'Asset';
@@ -1593,6 +1638,9 @@ export class AddEventDialogComponent {
 
     const isCash = flags?.isCash ?? this.isCashEvent;
     const isFinance = flags?.isFinance ?? !this.isCashEvent;
+
+    const endYear = resolveYear(endValue, this.eventsList);
+    const endEventId = extractEventId(endValue);
 
     const event = this.createBaseEvent(
       id,
@@ -1616,6 +1664,7 @@ export class AddEventDialogComponent {
         this.dialogEndCalendarYear,
       ),
     };
+    event.endEventId = endEventId ?? null;
 
     return event;
   }
@@ -1665,13 +1714,17 @@ export class AddEventDialogComponent {
 
     const paymentType = this.eventForm.get('paymentType')?.value;
     const startYear = this.eventForm.get('start')?.value;
-    const endYearMonthlyPayment = this.eventForm.get('monthlyEnd')?.value;
+    const endYearMonthlyPayment = resolveYear(
+      this.eventForm.get('monthlyEnd')?.value,
+      this.eventsList,
+    );
     const eventName = this.patchEvent?.name;
 
     let resaleYear: number | null = null;
 
     if (paymentType === 'Financing') {
-      resaleYear = endYearMonthlyPayment ?? null;
+      resaleYear =
+        endYearMonthlyPayment > 0 ? endYearMonthlyPayment : null;
     } else {
       if (eventName === 'Car') {
         resaleYear = startYear + 5;
@@ -1703,7 +1756,9 @@ export class AddEventDialogComponent {
 
       monthlyPayment: monthly?.amount?.amount ?? 0,
       monthlyStart: monthly?.start?.year ?? null,
-      monthlyEnd: monthly?.end?.year ?? null,
+      monthlyEnd: monthly?.endEventId
+        ? 'event:' + monthly.endEventId
+        : monthly?.end?.year ?? null,
 
       hasResale: !!resale,
       resaleDate: resale?.start?.year ?? null,
@@ -1783,6 +1838,23 @@ export class AddEventDialogComponent {
   getEndEvents(): any[] {
     const startYear = this.getStartYear();
     return (this.eventsList ?? []).filter((e: any) => (e?.year ?? 0) >= startYear);
+  }
+
+  /**
+   * Stable key for @for over timeline events in end dropdowns.
+   * Do not use `event.id ?? event.name + event.year` inline in templates — it can produce
+   * broken compiler output (ReferenceError in generated track function).
+   */
+  trackEndEventRow(event: {
+    id?: string | null;
+    name?: string | null;
+    year?: number | null;
+  }): string {
+    const id = event?.id;
+    if (id != null && String(id).length > 0) {
+      return `id:${id}`;
+    }
+    return `f:${event?.name ?? ''}:${event?.year ?? ''}`;
   }
 
   getEndYears(): number[] {

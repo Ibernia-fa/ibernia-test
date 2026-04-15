@@ -52,6 +52,17 @@
   display: inline-block;
 }
 
+.save-action-btn .save-btn-inner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 22px;
+}
+
+.save-action-btn mat-spinner {
+  --mdc-circular-progress-active-indicator-color: currentColor;
+}
+
 .start-end {
   .row {
     margin: 0 !important;

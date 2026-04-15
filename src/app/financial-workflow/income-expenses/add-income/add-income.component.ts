@@ -54,6 +54,7 @@ import {
 import {
   getCompletedYearsAgeAtDate,
   getPersistedAgeForCalendarYear,
+  getProjectionAgeForClientEvent,
   getProjectionColumnAgeLabel,
 } from 'src/app/shared/utils/client-age-at-reference';
 import { calendarYearOrEventRefValidator } from 'src/app/shared/utils/calendar-year-or-event-ref.validator';
@@ -1403,6 +1404,17 @@ export class AddIncomeComponent {
       this.forecastEndYear,
     );
     return Number.isNaN(a) ? 0 : a;
+  }
+
+  /** Age for a timeline event row (uses event person, not current income type). */
+  displayAgeForTimelineEvent(event: any): number {
+    return getProjectionAgeForClientEvent(event, {
+      clientBirthDate: this.data.clientBirthDate,
+      partnerBirthDate: this.data.partnerBirthDate,
+      forecastStartDate: this.data.forecastStartDate,
+      planDuration: this.data.planDuration,
+      projectionInclusiveEndYear: this.forecastEndYear,
+    });
   }
 
   getStartYear(): number {

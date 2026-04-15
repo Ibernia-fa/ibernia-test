@@ -29,6 +29,7 @@ import { translateTimelineEventDisplayName } from 'src/app/shared/utils/timeline
 import {
   getCompletedYearsAgeAtDate,
   getPersistedAgeForCalendarYear,
+  getProjectionAgeForClientEvent,
   getProjectionColumnAgeLabel,
 } from 'src/app/shared/utils/client-age-at-reference';
 import { calendarYearOrEventRefValidator } from 'src/app/shared/utils/calendar-year-or-event-ref.validator';
@@ -694,6 +695,16 @@ export class AddExpenseComponent {
       this.forecastEndYear,
     );
     return Number.isNaN(a) ? 0 : a;
+  }
+
+  displayAgeForTimelineEvent(event: any): number {
+    return getProjectionAgeForClientEvent(event, {
+      clientBirthDate: this.data.clientBirthDate,
+      partnerBirthDate: this.data.partnerBirthDate,
+      forecastStartDate: this.data.forecastStartDate,
+      planDuration: this.data.planDuration,
+      projectionInclusiveEndYear: this.forecastEndYear,
+    });
   }
 
   getStartYear(): number {
