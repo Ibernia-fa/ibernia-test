@@ -24,6 +24,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { QuestionnaireHttpService } from '../../services/questionnaire-http.service';
 import { SettingsService } from 'src/app/default-preferance/services/default-preferance.http.service';
 import { MaterialModule } from 'src/app/material.module';
+import { LanguageCode, LanguageService } from 'src/app/core/language.service';
 
 export interface QuestionnaireItem {
   id: string;
@@ -67,6 +68,7 @@ export class QuestionnaireDialogComponent implements OnInit, OnDestroy {
     private translate: TranslateService,
     private questionnaireHttpService: QuestionnaireHttpService,
     private settingsService: SettingsService,
+    private languageService: LanguageService,
     @Inject(MAT_DIALOG_DATA) public data: { client: Client },
   ) {
     this.clientName =
@@ -119,6 +121,13 @@ export class QuestionnaireDialogComponent implements OnInit, OnDestroy {
     this.dialogRef.close();
   }
 
+  /** Preserves advisor UI language for the public questionnaire (no logged-in session on that route). */
+  private withQuestionnaireLocale(shareableUrl: string): string {
+    const lang: LanguageCode = this.languageService.current === 'it' ? 'it' : 'en';
+    const sep = shareableUrl.includes('?') ? '&' : '?';
+    return `${shareableUrl}${sep}lang=${lang}`;
+  }
+
   onCopyLink(): void {
     const selectedIds = this.questions
       .filter((q) => q.selected)
@@ -143,15 +152,16 @@ export class QuestionnaireDialogComponent implements OnInit, OnDestroy {
       })
       .subscribe({
         next: (response) => {
+          const url = this.withQuestionnaireLocale(response.shareableUrl);
           navigator.clipboard
-            .writeText(response.shareableUrl)
+            .writeText(url)
             .then(() => {
               this.toastr.success(this.translate.instant('TOAST.LINK_COPIED'));
               this.dialogRef.close();
             })
             .catch(() => {
               this.toastr.info(
-                this.translate.instant('TOAST.LINK_CREATED') + ' ' + response.shareableUrl,
+                this.translate.instant('TOAST.LINK_CREATED') + ' ' + url,
               );
               this.dialogRef.close();
             });
