@@ -752,6 +752,18 @@ export class IncomeExpensesComponent {
     return true;
   }
 
+  getIncomeDisplayAmount(income: FinancialViewModel): number {
+    if (
+      (isClientInheritanceApiDescription(income.description) ||
+        isPartnerInheritanceApiDescription(income.description)) &&
+      income.inheritanceGrossAmount != null &&
+      income.inheritanceGrossAmount > 0
+    ) {
+      return income.inheritanceGrossAmount;
+    }
+    return income.amount?.amount ?? 0;
+  }
+
   hasBonusAmount(item: FinancialViewModel): boolean {
     return Number(item?.bonus?.amount?.amount ?? 0) > 0;
   }
