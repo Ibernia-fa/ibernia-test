@@ -28,3 +28,10 @@ export function calculateInheritanceNetFromGross(
 }
 
 export const DEFAULT_INHERITANCE_TAX_THRESHOLD = 1_000_000;
+
+export const DEFAULT_CHILD_TAX_RATE = 4;
+export const DEFAULT_CHILD_TAX_THRESHOLD = 1_000_000;
+export const DEFAULT_PARTNER_TAX_RATE = 4;
+export const DEFAULT_PARTNER_TAX_THRESHOLD = 1_000_000;
+export const DEFAULT_SIBLING_TAX_RATE = 6;
+export const DEFAULT_SIBLING_TAX_THRESHOLD = 100_000;

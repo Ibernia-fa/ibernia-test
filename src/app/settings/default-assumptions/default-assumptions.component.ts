@@ -93,7 +93,7 @@ export class DefaultAssumptionsComponent implements OnInit, OnDestroy {
       siblingInheritanceTaxRate: [6 as number, [Validators.required, Validators.min(0), Validators.max(100)]],
       partnerInheritanceTaxThreshold: [1_000_000 as number, [Validators.required, Validators.min(0)]],
       childInheritanceTaxThreshold: [1_000_000 as number, [Validators.required, Validators.min(0)]],
-      siblingInheritanceTaxThreshold: [1_000_000 as number, [Validators.required, Validators.min(0)]],
+      siblingInheritanceTaxThreshold: [100_000 as number, [Validators.required, Validators.min(0)]],
     }),
   });
 
@@ -175,7 +175,7 @@ export class DefaultAssumptionsComponent implements OnInit, OnDestroy {
               siblingInheritanceTaxRate: p.preferences?.siblingInheritanceTaxRate ?? 6,
               partnerInheritanceTaxThreshold: p.preferences?.partnerInheritanceTaxThreshold ?? 1_000_000,
               childInheritanceTaxThreshold: p.preferences?.childInheritanceTaxThreshold ?? 1_000_000,
-              siblingInheritanceTaxThreshold: p.preferences?.siblingInheritanceTaxThreshold ?? 1_000_000,
+              siblingInheritanceTaxThreshold: p.preferences?.siblingInheritanceTaxThreshold ?? 100_000,
             },
           });
 
