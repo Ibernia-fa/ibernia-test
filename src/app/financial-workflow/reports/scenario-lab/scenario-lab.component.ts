@@ -477,7 +477,8 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
       this.client.clientDetails?.inflationRate ??
       2.5;
 
-    this.baselineInflationRate = Number(inflation) || 2.5;
+    const inflationNum = Number(inflation);
+    this.baselineInflationRate = Number.isFinite(inflationNum) ? inflationNum : 2.5;
     this.clientFirstName = this.client.clientDetails?.firstName ?? '';
     this.partnerFirstName = this.client.partnerDetail?.firstName ?? '';
 
