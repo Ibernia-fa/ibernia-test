@@ -7,7 +7,7 @@ import {
   ElementRef,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Params } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -25,6 +25,7 @@ import {
   QuestionnaireResponseItem,
 } from '../clients/services/questionnaire-http.service';
 import { allCountries } from '../clients/models/country';
+import { LanguageCode, LanguageService } from '../core/language.service';
 
 @Component({
   selector: 'app-client-questionnaire',
@@ -107,6 +108,7 @@ export class ClientQuestionnaireComponent implements OnInit, OnDestroy {
     private toastr: ToastrService,
     private cdr: ChangeDetectorRef,
     private translate: TranslateService,
+    private languageService: LanguageService,
   ) {}
 
   ngOnDestroy(): void {
@@ -118,8 +120,11 @@ export class ClientQuestionnaireComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.applyQuestionnaireLocale(this.route.snapshot.queryParams);
+
     this.route.queryParams.subscribe((qp) => {
       this.debugMode = qp['debug'] === '1';
+      this.applyQuestionnaireLocale(qp);
     });
 
     setTimeout(() => {
@@ -137,6 +142,18 @@ export class ClientQuestionnaireComponent implements OnInit, OnDestroy {
         this.dismissIntroIfReady();
       }
     });
+  }
+
+  /**
+   * Public questionnaire has no auth; sync ngx-translate with the `lang` query set when the advisor copied the link.
+   */
+  private applyQuestionnaireLocale(qp: Params): void {
+    const raw = qp['lang'] ?? qp['locale'];
+    const lang: LanguageCode =
+      raw === 'it' || (typeof raw === 'string' && raw.toLowerCase().startsWith('it'))
+        ? 'it'
+        : 'en';
+    this.languageService.use(lang);
   }
 
   loadQuestionnaire(): void {
