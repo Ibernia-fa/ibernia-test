@@ -46,6 +46,7 @@ import {
 } from 'src/app/shared/utils/recurring-end-save-guard';
 import { getStartEndDurationLabel } from 'src/app/shared/utils/start-end-duration-label';
 import { extractEventId, resolveYear } from 'src/app/shared/utils/event-date-utils';
+import { capitalizeFirstLetter } from 'src/app/shared/utils/capitalize-first-letter';
 
 @Component({
   selector: 'app-add-event-dialog',
@@ -754,6 +755,10 @@ export class AddEventDialogComponent {
         finalName = this.eventForm.get('name')?.value;
       }
 
+      if (!this.isEditWorkflow) {
+        finalName = capitalizeFirstLetter(finalName);
+      }
+
       const { end: recurringEnd, endEventId } =
         this.buildRecurringEndFromEndControl();
 
@@ -862,9 +867,13 @@ export class AddEventDialogComponent {
     const { end: customRecurringEnd, endEventId: customEndEventId } =
       this.buildRecurringEndFromEndControl();
 
+    const customName = this.isEditWorkflow
+      ? this.eventForm.get('name')?.value
+      : capitalizeFirstLetter(this.eventForm.get('name')?.value);
+
     const clientEvent: ClientEvent = {
       id: this.isEditWorkflow ? this.patchEvent?.id ?? '' : '',
-      name: this.eventForm.get('name')?.value,
+      name: customName,
       netAmount: {
         cycle: {
           id:
@@ -1597,6 +1606,10 @@ export class AddEventDialogComponent {
       finalName = this.eventForm.get('name')?.value;
     }
 
+    if (!this.isEditWorkflow) {
+      finalName = capitalizeFirstLetter(finalName);
+    }
+
     const id = this.isEditWorkflow ? this.patchEvent?.id ?? "" : "";
 
     const isCash = flags?.isCash ?? this.isCashEvent;
@@ -1631,6 +1644,10 @@ export class AddEventDialogComponent {
     if (this.eventForm.get('name')?.value !== this.patchEvent?.name
       && this.eventForm.get('name')?.value !== finalName) {
       finalName = this.eventForm.get('name')?.value;
+    }
+
+    if (!this.isEditWorkflow) {
+      finalName = capitalizeFirstLetter(finalName);
     }
 
     const monthly = this.financialRecords?.find(x => x.description?.includes("Monthly payment"));
@@ -1680,6 +1697,10 @@ export class AddEventDialogComponent {
     if (this.eventForm.get('name')?.value !== this.patchEvent?.name
       && this.eventForm.get('name')?.value !== finalName) {
       finalName = this.eventForm.get('name')?.value;
+    }
+
+    if (!this.isEditWorkflow) {
+      finalName = capitalizeFirstLetter(finalName);
     }
 
     const resale = this.financialRecords?.find(x => x.description?.includes("Resale"));

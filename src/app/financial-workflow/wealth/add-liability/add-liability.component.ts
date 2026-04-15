@@ -15,6 +15,7 @@ import { allCountries } from 'src/app/clients/models/country';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
 
+import { capitalizeFirstLetter } from 'src/app/shared/utils/capitalize-first-letter';
 import { WealthHttpService } from '../services/wealth-http.service';
 import { WealthLiabilityModel } from '../models/wealth.model';
 
@@ -183,7 +184,9 @@ export class AddLiabilityComponent {
 
     const formValue = this.form.value;
     const trimmedName = typeof formValue.name === 'string' ? formValue.name.trim() : '';
-    const nameOrNull = trimmedName ? trimmedName : null;
+    const nameOrNull = trimmedName
+      ? (this.isEditMode ? trimmedName : capitalizeFirstLetter(trimmedName))
+      : null;
 
     if (this.isEditMode) {
       const request = {

@@ -26,6 +26,7 @@ import {
 } from '../clients/services/questionnaire-http.service';
 import { allCountries } from '../clients/models/country';
 import { LanguageCode, LanguageService } from '../core/language.service';
+import { capitalizeFirstLetter } from '../shared/utils/capitalize-first-letter';
 
 @Component({
   selector: 'app-client-questionnaire',
@@ -753,7 +754,9 @@ export class ClientQuestionnaireComponent implements OnInit, OnDestroy {
   }
 
   getImportantPeopleValue(): { name: string; relationship: string }[] {
-    return this.importantPeople.filter((p) => p.name?.trim());
+    return this.importantPeople
+      .filter((p) => p.name?.trim())
+      .map((p) => ({ ...p, name: capitalizeFirstLetter(p.name.trim()) }));
   }
 
   /* ─── Goals helpers ─── */

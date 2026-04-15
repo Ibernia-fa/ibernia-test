@@ -68,6 +68,7 @@ import {
   DEFAULT_CHILD_TAX_RATE,
   DEFAULT_CHILD_TAX_THRESHOLD,
 } from 'src/app/shared/utils/inheritance-tax.utils';
+import { capitalizeFirstLetter } from 'src/app/shared/utils/capitalize-first-letter';
 
 @Component({
   selector: 'app-add-income',
@@ -641,9 +642,12 @@ export class AddIncomeComponent {
         grossFromForm,
       );
 
+      const rawDescription = this.incomeForm.get('description')?.value;
+      const finalDescription = this.isEditWorkflow ? rawDescription : capitalizeFirstLetter(rawDescription);
+
       var income: FinancialViewModel = {
         id: this.isEditWorkflow && this.selectedIncome ? this.selectedIncome.id : null,
-        description: this.incomeForm.get('description')?.value,
+        description: finalDescription,
         amount: {
           amount: planAmount,
           currencySymbol: this.incomeForm.get('currencySymbol')?.value,

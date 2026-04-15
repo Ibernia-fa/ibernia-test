@@ -6,6 +6,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { capitalizeFirstLetter } from 'src/app/shared/utils/capitalize-first-letter';
 
 export interface ScenarioNameDialogData {
   defaultName: string;
@@ -109,6 +110,7 @@ export class ScenarioNameDialogComponent {
   }
 
   submit(): void {
-    this.dialogRef.close(this.planName?.trim() || undefined);
+    const trimmed = this.planName?.trim() || undefined;
+    this.dialogRef.close(trimmed ? capitalizeFirstLetter(trimmed) : trimmed);
   }
 }
