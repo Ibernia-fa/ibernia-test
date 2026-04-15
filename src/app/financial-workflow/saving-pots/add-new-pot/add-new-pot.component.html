@@ -650,17 +650,9 @@
                           }
                           <hr />
                           @for (year of years; track year) {
-                            @if (year === retirementAge) {
-                              <mat-option [value]="year"
-                                >{{ "Retirement age" | translate }} ({{
-                                  retirementAgeValue
-                                }})</mat-option
-                              >
-                            } @else {
-                              <mat-option [value]="year"
-                                >{{ year }} ({{ getAgeForYear(year) }})</mat-option
-                              >
-                            }
+                            <mat-option [value]="year"
+                              >{{ year }} ({{ getAgeForYear(year) }})</mat-option
+                            >
                           }
                         </mat-select>
                         <span class="custom-arrow">
@@ -713,19 +705,11 @@
                           }
                           <hr />
                           @for (year of getContributionEndYears(); track year) {
-                            @if (year === retirementAge) {
-                              <mat-option [value]="year"
-                                >{{ "Retirement age" | translate }} ({{
-                                  retirementAgeValue
-                                }})</mat-option
-                              >
-                            } @else {
-                              <mat-option [value]="year"
-                                >{{ year }} ({{
-                                  getAgeForYear(year)
-                                }})</mat-option
-                              >
-                            }
+                            <mat-option [value]="year"
+                              >{{ year }} ({{
+                                getAgeForYear(year)
+                              }})</mat-option
+                            >
                           }
                         </mat-select>
                         <span class="custom-arrow">
