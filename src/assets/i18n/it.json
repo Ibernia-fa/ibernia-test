@@ -950,6 +950,7 @@
   "CYCLE.EVERY_YEAR": "Ogni anno",
   "EMERGENCIES.SIMULATION_TITLE": "Simulazione - {{name}}",
   "EMERGENCIES.STOP_INCOME": "Interrompi reddito",
+  "EMERGENCIES.NO_POSITIVE_INCOME_FOR_STOP": "Non ci sono redditi con importo maggiore di 0. Aggiungi importi nella pagina Redditi per usare Interrompi reddito.",
   "EMERGENCIES.TYPE_HOME": "Casa",
   "EMERGENCIES.TYPE_LIFE": "Vita",
   "EMERGENCIES.TYPE_DISABILITY": "Invalidità",
