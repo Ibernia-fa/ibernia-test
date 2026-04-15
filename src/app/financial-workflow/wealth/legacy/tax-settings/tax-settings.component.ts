@@ -16,6 +16,7 @@ import {
   DEFAULT_PARTNER_TAX_THRESHOLD,
   DEFAULT_SIBLING_TAX_THRESHOLD,
 } from 'src/app/shared/utils/inheritance-tax.utils';
+import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 
 @Component({
   selector: 'app-tax-settings',
@@ -29,6 +30,7 @@ import {
     MatInputModule,
     MatIconModule,
     TranslateModule,
+    ThousandSeparatorInputDirective,
   ],
   templateUrl: './tax-settings.component.html',
   styleUrl: './tax-settings.component.scss'
