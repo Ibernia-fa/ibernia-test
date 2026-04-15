@@ -190,7 +190,7 @@ export class WithdrawalsContributionsComponent {
         disableClose: true,
         data: {
           eventsList: this.timeline.clientEvents.sort(
-            (a, b) => a.start.age - b.start.age,
+            (a, b) => (a.start?.year ?? 0) - (b.start?.year ?? 0),
           ),
           amountCycles: this.amountCycles,
           escalataionRates: this.escalationRates,
@@ -235,7 +235,7 @@ export class WithdrawalsContributionsComponent {
         data: {
           amountCycles: this.amountCycles,
           eventsList: this.timeline.clientEvents.sort(
-            (a, b) => a.start.age - b.start.age,
+            (a, b) => (a.start?.year ?? 0) - (b.start?.year ?? 0),
           ),
           escalataionRates: this.escalationRates,
           clientBirthDate: this.selectedClient?.clientDetails.birthDate,
@@ -287,7 +287,7 @@ export class WithdrawalsContributionsComponent {
       data: {
         amountCycles: this.amountCycles,
         eventsList: this.timeline.clientEvents.sort(
-          (a, b) => a.start.age - b.start.age,
+          (a, b) => (a.start?.year ?? 0) - (b.start?.year ?? 0),
         ),
         escalataionRates: this.escalationRates,
         clientBirthDate: this.selectedClient?.clientDetails.birthDate,
@@ -327,7 +327,7 @@ export class WithdrawalsContributionsComponent {
       data: {
         amountCycles: this.amountCycles,
         eventsList: this.timeline.clientEvents.sort(
-          (a, b) => a.start.age - b.start.age,
+          (a, b) => (a.start?.year ?? 0) - (b.start?.year ?? 0),
         ),
         escalataionRates: this.escalationRates,
         clientBirthDate: this.selectedClient?.clientDetails.birthDate,

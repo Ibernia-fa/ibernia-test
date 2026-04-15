@@ -32,6 +32,7 @@
         class="dialog-close-btn"
         mat-dialog-close
         aria-label="Close dialog"
+        [disabled]="isSaving"
         (click)="closeDialog()"
       >
         <mat-icon>close</mat-icon>
@@ -643,7 +644,7 @@
                           @for (event of eventsList; track event) {
                             <mat-option [value]="'event:' + event.id"
                               >{{ event.name }} ({{
-                                event.start.age
+                                displayAgeForTimelineEvent(event)
                               }})</mat-option
                             >
                           }
@@ -706,7 +707,7 @@
                           ) {
                             <mat-option [value]="'event:' + event.id"
                               >{{ event.name }} ({{
-                                event.start.age
+                                displayAgeForTimelineEvent(event)
                               }})</mat-option
                             >
                           }
@@ -835,7 +836,7 @@
                               @for (event of eventsList; track event) {
                                 <mat-option [value]="'event:' + event.id"
                                   >{{ event.name }} ({{
-                                    event.start.age
+                                    displayAgeForTimelineEvent(event)
                                   }})</mat-option
                                 >
                               }
@@ -899,7 +900,7 @@
                               ) {
                                 <mat-option [value]="'event:' + event.id"
                                   >{{ event.name }} ({{
-                                    event.start.age
+                                    displayAgeForTimelineEvent(event)
                                   }})</mat-option
                                 >
                               }
@@ -1466,6 +1467,8 @@
       <div>
         <button
           (click)="closeDialog()"
+          type="button"
+          [disabled]="isSaving"
           class="button-icon-outline w-100 d-block"
         >
           <span class="f-s-16">{{ "Cancel" | translate }}</span>
@@ -1476,9 +1479,15 @@
           (click)="saveCashflow()"
           type="button"
           [disabled]="isSaveDisabled"
-          class="button-icon w-100 d-block"
+          class="button-icon w-100 d-block save-action-btn"
         >
-          <span class="f-s-16">{{ "Save" | translate }}</span>
+          <span class="save-btn-inner">
+            @if (isSaving) {
+              <mat-spinner diameter="22" mode="indeterminate" />
+            } @else {
+              <span class="f-s-16">{{ "Save" | translate }}</span>
+            }
+          </span>
         </button>
       </div>
     </div>

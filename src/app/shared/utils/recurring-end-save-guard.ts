@@ -39,11 +39,14 @@ export function recurringEndYearNotSelected(
   return y <= 0;
 }
 
-/** Financing / custom financing: monthly payment period end year (numeric mat-select). */
-export function financingMonthlyEndYearNotSelected(monthlyEndRaw: unknown): boolean {
-  const y =
-    typeof monthlyEndRaw === 'number' && Number.isFinite(monthlyEndRaw)
-      ? monthlyEndRaw
-      : 0;
+/** Financing / custom financing: monthly payment end — calendar year or `event:…` reference. */
+export function financingMonthlyEndYearNotSelected(
+  monthlyEndRaw: unknown,
+  eventsList?: any[] | null | undefined,
+): boolean {
+  if (extractEventId(monthlyEndRaw)) {
+    return false;
+  }
+  const y = resolveYear(monthlyEndRaw, eventsList);
   return y <= 0;
 }

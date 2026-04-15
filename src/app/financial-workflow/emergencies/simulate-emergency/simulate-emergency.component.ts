@@ -42,10 +42,12 @@ import {
   getCashflowDialogEndCalendarYear,
   getCompletedYearsAgeAtDate,
   getPersistedAgeForCalendarYear,
+  getProjectionAgeForClientEvent,
   getProjectionColumnAgeLabel,
 } from 'src/app/shared/utils/client-age-at-reference';
 import { resolveEscalationMatch } from 'src/app/shared/utils/escalation-rate-utils';
 import { getStartEndDurationLabel } from 'src/app/shared/utils/start-end-duration-label';
+import { extractEventId, resolveYear } from 'src/app/shared/utils/event-date-utils';
 
 @Component({
   selector: 'simulate-emergency',
@@ -102,7 +104,7 @@ export class SimulateEmergencyComponent implements OnDestroy {
   amountCycles: Cycle[];
   escalationRates: EscalationRate[];
   selectedEscalationDescription: string;
-  timeline: FinancialTimeline;
+  timeline: FinancialTimeline | undefined;
   clientPreferredCurrency: string;
   eventsList: any;
   incomes: FinancialViewModel[];
@@ -311,6 +313,16 @@ export class SimulateEmergencyComponent implements OnDestroy {
     );
   }
 
+  displayAgeForTimelineEvent(event: any): number {
+    return getProjectionAgeForClientEvent(event, {
+      clientBirthDate: this.clientBirthDate,
+      partnerBirthDate: this.client?.partnerDetail?.birthDate,
+      forecastStartDate: this.forecastStartDate,
+      planDuration: this.cashflow?.planDuration,
+      projectionInclusiveEndYear: this.dialogEndCalendarYear,
+    });
+  }
+
   onCycleValueChange(event: any) {
     const selectedCycle = this.amountCycles.find(cycle => cycle.id === event);
     const isOneOff = selectedCycle?.description === 'One-off';
@@ -421,6 +433,12 @@ export class SimulateEmergencyComponent implements OnDestroy {
       }
       const rawAmount = this.simulateEmergencyForm.get('amount')?.value;
 
+      const endRaw = this.simulateEmergencyForm.get('end')?.value;
+      const endYearResolved =
+        endRaw !== null && endRaw !== ''
+          ? resolveYear(endRaw, this.eventsList)
+          : 0;
+      const endEventId = extractEventId(endRaw);
 
       var simulateEmergency: SimulateEmergencyModel = {
         id: this.existingEmergencyId,
@@ -456,22 +474,21 @@ export class SimulateEmergencyComponent implements OnDestroy {
         },
         end: {
           age:
-            this.simulateEmergencyForm.get('end')?.value !== null &&
-              this.simulateEmergencyForm.get('end')?.value !== ''
+            endRaw !== null && endRaw !== ''
               ? getPersistedAgeForCalendarYear(
                   this.clientBirthDate,
-                  this.simulateEmergencyForm.get('end')?.value,
+                  endYearResolved,
                   this.forecastStartDate,
                   this.data.cashflow?.planDuration,
                   this.dialogEndCalendarYear,
                 )
               : 0,
           year:
-            this.simulateEmergencyForm.get('end')?.value !== null &&
-              this.simulateEmergencyForm.get('end')?.value !== ''
-              ? this.simulateEmergencyForm.get('end')?.value
+            endRaw !== null && endRaw !== ''
+              ? endYearResolved
               : 0,
         },
+        endEventId: endEventId ?? null,
         escalationRate: escalationRateValue !== null && escalationRateValue !== ''
           ? escalationRateModel
           : {
@@ -618,14 +635,21 @@ export class SimulateEmergencyComponent implements OnDestroy {
   private endOnOrAfterStartValidator(): ValidatorFn {
     return (group: AbstractControl) => {
       const start = group.get('start')?.value;
-      const end = group.get('end')?.value;
+      const endRaw = group.get('end')?.value;
+      const end = resolveYear(endRaw, this.eventsList);
       const endCtrl = group.get('end');
 
       // Only validate when both are present (or when end is present)
       if (endCtrl) {
         const existing = endCtrl.errors ?? null;
 
-        if (start != null && start !== '' && end != null && end !== '' && end < start) {
+        if (
+          start != null &&
+          start !== '' &&
+          endRaw != null &&
+          endRaw !== '' &&
+          end < Number(start)
+        ) {
           // attach/merge the error onto the END control
           endCtrl.setErrors({ ...(existing ?? {}), endBeforeStart: true });
         } else {
@@ -666,7 +690,10 @@ export class SimulateEmergencyComponent implements OnDestroy {
         cycle: cycleId,
         amount,
         start: expense.start?.year ?? null,
-        end: expense.end?.year ?? null,
+        end:
+          expense.endEventId
+            ? 'event:' + expense.endEventId
+            : expense.end?.year ?? null,
         escalationRate: 'Increases at custom rate',
         customEscalationRate: expense.escalationRate.value,
         stopIncome: expense.stopIncome ?? false
@@ -682,7 +709,10 @@ export class SimulateEmergencyComponent implements OnDestroy {
         cycle: cycleId,
         amount,
         start: expense.start?.year ?? null,
-        end: expense.end?.year ?? null,
+        end:
+          expense.endEventId
+            ? 'event:' + expense.endEventId
+            : expense.end?.year ?? null,
         escalationRate: matchedEscalation?.description ?? this.escalationRates[0]?.description ?? '',
         stopIncome: expense.stopIncome ?? false
       }, { emitEvent: false });
@@ -735,6 +765,20 @@ export class SimulateEmergencyComponent implements OnDestroy {
   getEndYears(): number[] {
     const startYear = this.getStartYear();
     return (this.years ?? []).filter((y) => y >= startYear);
+  }
+
+  /** Stable @for track key for timeline event options in end dropdown. */
+  trackEndEventRow(event: {
+    id?: string | null;
+    name?: string | null;
+    start?: { year?: number | null };
+  }): string {
+    const id = event?.id;
+    if (id != null && String(id).length > 0) {
+      return `id:${id}`;
+    }
+    const y = event?.start?.year ?? '';
+    return `f:${event?.name ?? ''}:${y}`;
   }
 
   getAgeForYear(year: number): number {

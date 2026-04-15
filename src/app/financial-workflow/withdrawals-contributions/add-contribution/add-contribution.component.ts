@@ -10,6 +10,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectChange, MatSelectModule } from '@angular/material/select';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatButtonModule } from '@angular/material/button';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCardModule } from '@angular/material/card';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { provideNativeDateAdapter } from '@angular/material/core';
@@ -30,7 +31,7 @@ import {
 import moment from 'moment';
 import { FundsViewModel } from '../model/withdrawals-contributions';
 import { WithdrawalsContributionsHttpService } from '../services/withdrawals-contributions-http.service';
-import { catchError, concatMap, filter } from 'rxjs';
+import { catchError, concatMap, filter, finalize } from 'rxjs';
 import {
   ClientSaving,
   ComissionType,
@@ -52,6 +53,7 @@ import { translateTimelineEventDisplayName } from 'src/app/shared/utils/timeline
 import {
   getCompletedYearsAgeAtDate,
   getPersistedAgeForCalendarYear,
+  getProjectionAgeForClientEvent,
   getProjectionColumnAgeLabel,
   getCashflowDialogEndCalendarYear,
 } from 'src/app/shared/utils/client-age-at-reference';
@@ -77,6 +79,7 @@ import {
     MatSliderModule,
     ReactiveFormsModule,
     MatCheckboxModule,
+    MatProgressSpinnerModule,
     ThousandSeparatorInputDirective,
     TranslateModule,
     MaterialModule,
@@ -111,6 +114,7 @@ export class AddContributionComponent {
   currentYear: number = new Date().getFullYear();
   selectedClient: Client | null = null;
   dialogEndCalendarYear = 0;
+  isSaving = false;
 
   constructor(
     private dialogRef: MatDialogRef<AddContributionComponent>,
@@ -393,6 +397,9 @@ export class AddContributionComponent {
   }
 
   get isContributionSaveButtonDisabled(): boolean {
+    if (this.isSaving) {
+      return true;
+    }
     if (this.contributionForm.invalid) {
       return true;
     }
@@ -509,6 +516,9 @@ export class AddContributionComponent {
   // }
 
   addIncome(): void {
+    if (this.isSaving) {
+      return;
+    }
     if (this.isContributionSaveButtonDisabled) return;
     this.contributionForm.markAllAsTouched();
     this.contributionForm.markAsDirty();
@@ -664,6 +674,7 @@ export class AddContributionComponent {
       );
     }
 
+    this.isSaving = true;
     action$
       .pipe(
         filter((res) => !!res),
@@ -671,12 +682,20 @@ export class AddContributionComponent {
           console.error(err);
           throw err;
         }),
+        finalize(() => {
+          this.isSaving = false;
+        }),
       )
-      .subscribe((res) => {
-        this.dialogRef.close({
-          status: 'Success',
-          contributionWithdrawal: res,
-        });
+      .subscribe({
+        next: (res) => {
+          this.dialogRef.close({
+            status: 'Success',
+            contributionWithdrawal: res,
+          });
+        },
+        error: () => {
+          // isSaving cleared in finalize
+        },
       });
   }
 
@@ -771,6 +790,7 @@ export class AddContributionComponent {
       contributionType: 2,
     };
 
+    this.isSaving = true;
     this.withdrawalsContributionsHttpService
       .addContributions(this.cashflowId, contributionCash)
       .pipe(
@@ -785,12 +805,20 @@ export class AddContributionComponent {
           console.error(err);
           throw err;
         }),
+        finalize(() => {
+          this.isSaving = false;
+        }),
       )
-      .subscribe((res) => {
-        this.dialogRef.close({
-          status: 'Success',
-          contributionWithdrawal: res,
-        });
+      .subscribe({
+        next: (res) => {
+          this.dialogRef.close({
+            status: 'Success',
+            contributionWithdrawal: res,
+          });
+        },
+        error: () => {
+          // isSaving cleared in finalize
+        },
       });
   }
 
@@ -970,6 +998,17 @@ export class AddContributionComponent {
       this.dialogEndCalendarYear,
     );
     return Number.isNaN(a) ? 0 : a;
+  }
+
+  displayAgeForTimelineEvent(event: any): number {
+    return getProjectionAgeForClientEvent(event, {
+      clientBirthDate: this.data.clientBirthDate,
+      partnerBirthDate:
+        this.data.partnerBirthDate ?? this.selectedClient?.partnerDetail?.birthDate,
+      forecastStartDate: this.data.forecastStartDate,
+      planDuration: this.data.planDuration,
+      projectionInclusiveEndYear: this.dialogEndCalendarYear,
+    });
   }
 
   getStartYear(): number {

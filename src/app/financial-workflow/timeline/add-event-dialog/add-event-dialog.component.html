@@ -355,9 +355,12 @@
                         >
                           @for (
                             event of getEndEvents();
-                            track event.name + event.year
+                            track trackEndEventRow(event)
                           ) {
-                            <mat-option [value]="event.year"
+                            <mat-option
+                              [value]="
+                                event.id ? 'event:' + event.id : event.year
+                              "
                               >{{ getTimelineEventLabel(event.name) }} ({{ event.age }})</mat-option
                             >
                           }
@@ -571,6 +574,8 @@
       <div>
         <button
           (click)="closeDialog()"
+          type="button"
+          [disabled]="saveClicked"
           class="button-icon-outline w-100 d-block"
         >
           <span class="f-s-16">{{ "Cancel" | translate }}</span>
@@ -580,10 +585,16 @@
         <button
           (click)="onSystemEventSubmit()"
           type="button"
-          [disabled]="isSystemEventSaveButtonDisabled"
-          class="button-icon w-100 d-block"
+          [disabled]="isSystemEventSaveButtonDisabled || saveClicked"
+          class="button-icon w-100 d-block save-action-btn"
         >
-          <span class="f-s-16">{{ "Save" | translate }}</span>
+          <span class="save-btn-inner">
+            @if (saveClicked) {
+              <mat-spinner diameter="22" mode="indeterminate" />
+            } @else {
+              <span class="f-s-16">{{ "Save" | translate }}</span>
+            }
+          </span>
         </button>
       </div>
     </div>
@@ -1087,10 +1098,15 @@
                       >
                         @for (
                           event of getFinancingEndEvents();
-                          track event.name + event.year
+                          track trackEndEventRow(event)
                         ) {
-                          <mat-option [value]="event.year"
-                            >{{ getTimelineEventLabel(event.name) }} ({{ event.age }})</mat-option
+                          <mat-option
+                            [value]="
+                              event.id ? 'event:' + event.id : event.year
+                            "
+                            >{{ getTimelineEventLabel(event.name) }} ({{
+                              event.age
+                            }})</mat-option
                           >
                         }
                         @if (
@@ -1304,6 +1320,8 @@
       <div>
         <button
           (click)="closeDialog()"
+          type="button"
+          [disabled]="saveClicked"
           class="button-icon-outline w-100 d-block"
         >
           <span class="f-s-16">{{ "Cancel" | translate }}</span>
@@ -1313,10 +1331,16 @@
         <button
           (click)="onFinancingEventSubmit()"
           type="button"
-          [disabled]="isFinancingEventSaveButtonDisabled"
-          class="button-icon w-100 d-block"
+          [disabled]="isFinancingEventSaveButtonDisabled || saveClicked"
+          class="button-icon w-100 d-block save-action-btn"
         >
-          <span class="f-s-16">{{ "Save" | translate }}</span>
+          <span class="save-btn-inner">
+            @if (saveClicked) {
+              <mat-spinner diameter="22" mode="indeterminate" />
+            } @else {
+              <span class="f-s-16">{{ "Save" | translate }}</span>
+            }
+          </span>
         </button>
       </div>
     </div>
@@ -1632,9 +1656,12 @@
                         >
                           @for (
                             event of getEndEvents();
-                            track event.name + event.year
+                            track trackEndEventRow(event)
                           ) {
-                            <mat-option [value]="event.year"
+                            <mat-option
+                              [value]="
+                                event.id ? 'event:' + event.id : event.year
+                              "
                               >{{ getTimelineEventLabel(event.name) }} ({{ event.age }})</mat-option
                             >
                           }
@@ -2181,10 +2208,15 @@
                       >
                         @for (
                           event of getFinancingEndEvents();
-                          track event.name + event.year
+                          track trackEndEventRow(event)
                         ) {
-                          <mat-option [value]="event.year"
-                            >{{ getTimelineEventLabel(event.name) }} ({{ event.age }})</mat-option
+                          <mat-option
+                            [value]="
+                              event.id ? 'event:' + event.id : event.year
+                            "
+                            >{{ getTimelineEventLabel(event.name) }} ({{
+                              event.age
+                            }})</mat-option
                           >
                         }
                         @if (
@@ -2259,6 +2291,8 @@
         <div>
           <button
             (click)="closeDialog()"
+            type="button"
+            [disabled]="saveClicked"
             class="button-icon-outline w-100 d-block"
           >
             <span class="f-s-16">{{ "Cancel" | translate }}</span>
@@ -2268,10 +2302,16 @@
           <button
             (click)="onCustomEventSubmit()"
             type="button"
-            [disabled]="isCustomEventSaveButtonDisabled"
-            class="button-icon w-100 d-block"
+            [disabled]="isCustomEventSaveButtonDisabled || saveClicked"
+            class="button-icon w-100 d-block save-action-btn"
           >
-            <span class="f-s-16">{{ "Save" | translate }}</span>
+            <span class="save-btn-inner">
+              @if (saveClicked) {
+                <mat-spinner diameter="22" mode="indeterminate" />
+              } @else {
+                <span class="f-s-16">{{ "Save" | translate }}</span>
+              }
+            </span>
           </button>
         </div>
       </div>

@@ -425,9 +425,10 @@ export class SavingPotsComponent implements OnInit {
         amountCycles: this.amountCycles,
         escalataionRates: this.escalationRates,
         eventsList: [...this.timeline.clientEvents].sort(
-          (a, b) => a.start.age - b.start.age,
+          (a, b) => (a.start?.year ?? 0) - (b.start?.year ?? 0),
         ),
         clientBirthDate: this.selectedClient?.clientDetails.birthDate,
+        partnerBirthDate: this.selectedClient?.partnerDetail?.birthDate,
         clientPreferredCurrency:
           this.selectedClient?.clientDetails.preferredCurrency,
         forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
@@ -521,9 +522,10 @@ export class SavingPotsComponent implements OnInit {
         amountCycles: this.amountCycles,
         escalataionRates: this.escalationRates,
         eventsList: this.timeline.clientEvents.sort(
-          (a, b) => a.start.age - b.start.age,
+          (a, b) => (a.start?.year ?? 0) - (b.start?.year ?? 0),
         ),
         clientBirthDate: this.selectedClient?.clientDetails.birthDate,
+        partnerBirthDate: this.selectedClient?.partnerDetail?.birthDate,
         clientPreferredCurrency:
           this.selectedClient?.clientDetails.preferredCurrency,
         forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),

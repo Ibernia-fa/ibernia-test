@@ -300,8 +300,12 @@ export class WealthComponent implements OnInit {
             loggedInUserPreferences: userPreferences,
             amountCycles,
             escalataionRates: escalationRates,
-            eventsList: [...(timeline?.clientEvents ?? [])].sort((a: any, b: any) => a.start.age - b.start.age),
+            eventsList: [...(timeline?.clientEvents ?? [])].sort(
+              (a: any, b: any) =>
+                (a.start?.year ?? 0) - (b.start?.year ?? 0),
+            ),
             clientBirthDate: this.selectedClient?.clientDetails?.birthDate,
+            partnerBirthDate: this.selectedClient?.partnerDetail?.birthDate,
             clientPreferredCurrency: this.selectedClient?.clientDetails?.preferredCurrency,
             forecastEndDateYear: moment(timeline?.forecastEndtDate).year(),
             forecastStartDateYear: moment(timeline?.forecastStartDate).year(),
