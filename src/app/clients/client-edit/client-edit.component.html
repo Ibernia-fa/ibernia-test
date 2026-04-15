@@ -4,11 +4,13 @@
     {{ "Edit client" | translate }}
   </h2>
   <button
+    type="button"
     mat-icon-button
     disableRipple
     class="dialog-close-btn"
     mat-dialog-close
     aria-label="Close dialog"
+    [disabled]="isSaving"
   >
     <mat-icon>close</mat-icon>
   </button>
@@ -406,11 +408,17 @@
 <mat-dialog-actions align="end" class="dialog-actions">
   <!-- <button mat-button mat-dialog-close>{{ "Cancel" | translate }}</button> -->
   <button
-    class="button-icon"
+    class="button-icon save-action-btn"
     type="button"
     [disabled]="isSaveDisabled"
     (click)="onSubmit()"
   >
-    <span>{{ "Save" | translate }}</span>
+    <span class="save-btn-inner">
+      @if (isSaving) {
+        <mat-spinner diameter="22" mode="indeterminate" />
+      } @else {
+        <span>{{ "Save" | translate }}</span>
+      }
+    </span>
   </button>
 </mat-dialog-actions>

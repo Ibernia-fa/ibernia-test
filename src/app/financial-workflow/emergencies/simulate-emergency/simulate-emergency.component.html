@@ -139,7 +139,7 @@
                         @for (event of eventsList; track event) {
                           <mat-option [value]="event.start.year"
                             >{{ getTimelineEventLabel(event.name) }} ({{
-                              event.start.age
+                              displayAgeForTimelineEvent(event)
                             }})</mat-option
                           >
                         }
@@ -195,10 +195,13 @@
                           formControlName="end"
                           hideSingleSelectionIndicator
                         >
-                          @for (event of getEndEvents(); track event.id) {
-                            <mat-option [value]="event.start.year"
+                          @for (event of getEndEvents(); track trackEndEventRow(event)) {
+                            <mat-option
+                              [value]="
+                                event.id ? 'event:' + event.id : event.start.year
+                              "
                               >{{ getTimelineEventLabel(event.name) }} ({{
-                                event.start.age
+                                displayAgeForTimelineEvent(event)
                               }})</mat-option
                             >
                           }

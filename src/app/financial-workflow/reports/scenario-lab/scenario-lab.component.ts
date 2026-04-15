@@ -89,13 +89,17 @@ import {
   getCompletedYearsAgeAtDate,
   getPersistedAgeForCalendarYear,
   getPlanEndCalendarYear,
+  getProjectionAgeForClientEvent,
   getProjectionColumnAgeLabel,
 } from 'src/app/shared/utils/client-age-at-reference';
 import {
   getReportYearBounds,
   parseReportCategoryYears,
 } from 'src/app/shared/utils/chart-series-year-range';
-import { resolveIncomeMarkerCalendarYear } from 'src/app/shared/utils/event-date-utils';
+import {
+  resolveClientEventEndCalendarYear,
+  resolveIncomeMarkerCalendarYear,
+} from 'src/app/shared/utils/event-date-utils';
 
 @Component({
   selector: 'app-scenario-lab',
@@ -401,7 +405,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
   private populateCategoryItems(): void {
     this.goalItems = (this.financialTimeline?.clientEvents ?? [])
       .filter((e) => !e.isPlaceHolder)
-      .sort((a, b) => a.start.age - b.start.age);
+      .sort((a, b) => (a.start?.year ?? 0) - (b.start?.year ?? 0));
 
     this.savingPotItems = this.savingPots?.clientSavings ?? [];
 
@@ -484,9 +488,27 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
         !e.isPartnerEvent,
     );
 
+    let projectionEndYear = getCashflowDialogEndCalendarYear(
+      this.client.clientDetails.birthDate,
+      this.cashflow.planDuration,
+      moment(this.financialTimeline.forecastEndtDate).year(),
+    );
+    if (!Number.isFinite(projectionEndYear)) {
+      projectionEndYear = moment(this.financialTimeline.forecastEndtDate).year();
+    }
+
     this.hasRetirementAge = !!mainRetirementEvent;
     if (mainRetirementEvent) {
-      this.baselineRetirementAge = mainRetirementEvent.start.age;
+      this.baselineRetirementAge = getProjectionAgeForClientEvent(
+        mainRetirementEvent,
+        {
+          clientBirthDate: this.client.clientDetails.birthDate,
+          partnerBirthDate: this.client.partnerDetail?.birthDate,
+          forecastStartDate: this.financialTimeline.forecastStartDate,
+          planDuration: this.cashflow.planDuration,
+          projectionInclusiveEndYear: projectionEndYear,
+        },
+      );
       this.minRetirementAge = Math.max(
         18,
         getCompletedYearsAgeAtDate(
@@ -506,7 +528,16 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
     this.hasPartnerRetirementAge =
       !!partnerRetirementEvent && !!this.client.partnerDetail;
     if (this.hasPartnerRetirementAge && this.client.partnerDetail) {
-      this.baselinePartnerRetirementAge = partnerRetirementEvent!.start.age;
+      this.baselinePartnerRetirementAge = getProjectionAgeForClientEvent(
+        partnerRetirementEvent,
+        {
+          clientBirthDate: this.client.clientDetails.birthDate,
+          partnerBirthDate: this.client.partnerDetail.birthDate,
+          forecastStartDate: this.financialTimeline.forecastStartDate,
+          planDuration: this.cashflow.planDuration,
+          projectionInclusiveEndYear: projectionEndYear,
+        },
+      );
       this.minPartnerRetirementAge = Math.max(
         18,
         getCompletedYearsAgeAtDate(
@@ -687,12 +718,50 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
     for (const g of this.editedGoals) {
       const item = g.item;
       if (Array.isArray(item)) {
-        out.push(...item);
+        out.push(...item.map((e) => this.applyResolvedEndToClientEvent(e)));
       } else if (item) {
-        out.push(item);
+        out.push(this.applyResolvedEndToClientEvent(item));
       }
     }
     return out;
+  }
+
+  /**
+   * Scenario edits snapshot goal `end` at save time; when the end is tied to another
+   * timeline event, re-resolve year/age from the live timeline before calling the API.
+   */
+  private applyResolvedEndToClientEvent(ev: ClientEvent): ClientEvent {
+    if (!this.financialTimeline || !this.client) return ev;
+    const y = resolveClientEventEndCalendarYear(
+      ev,
+      this.financialTimeline.clientEvents,
+    );
+    if (y == null) return ev;
+
+    const forecastEndY = moment(
+      this.financialTimeline.forecastEndtDate,
+    ).year();
+    const dialogEnd = getCashflowDialogEndCalendarYear(
+      this.client.clientDetails.birthDate,
+      this.cashflow?.planDuration,
+      forecastEndY,
+    );
+    const birth =
+      ev.isPartnerEvent && this.client.partnerDetail?.birthDate
+        ? this.client.partnerDetail.birthDate
+        : this.client.clientDetails.birthDate;
+    const age = getPersistedAgeForCalendarYear(
+      birth,
+      y,
+      this.financialTimeline.forecastStartDate,
+      this.cashflow?.planDuration,
+      Number.isFinite(dialogEnd) ? dialogEnd : forecastEndY,
+    );
+    const nextAge = Number.isNaN(age) ? ev.end?.age ?? 0 : age;
+    if (!ev.end) {
+      return { ...ev, end: { year: y, age: nextAge } };
+    }
+    return { ...ev, end: { ...ev.end, year: y, age: nextAge } };
   }
 
   /** Income + expense lines for timeline dialogs (ids for Home / financing monthly + resale rows). */
@@ -1067,6 +1136,8 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
               ? this.client.partnerDetail.birthDate
               : this.client!.clientDetails.birthDate;
           return {
+            id: e.id,
+            isPartnerEvent: e.isPartnerEvent,
             name: e.name,
             year: e.start.year,
             age: getPersistedAgeForCalendarYear(
@@ -1125,9 +1196,10 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
         amountCycles: this.amountCycles,
         escalataionRates: this.escalationRates,
         eventsList: [...this.financialTimeline.clientEvents].sort(
-          (a, b) => a.start.age - b.start.age,
+          (a, b) => (a.start?.year ?? 0) - (b.start?.year ?? 0),
         ),
         clientBirthDate: this.client.clientDetails.birthDate,
+        partnerBirthDate: this.client.partnerDetail?.birthDate,
         clientPreferredCurrency: this.client.clientDetails.preferredCurrency,
         forecastEndDateYear: moment(
           this.financialTimeline.forecastEndtDate,
@@ -1187,7 +1259,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
         amountCycles: this.amountCycles,
         escalataionRates: this.escalationRates,
         eventsList: [...this.financialTimeline.clientEvents].sort(
-          (a, b) => a.start.age - b.start.age,
+          (a, b) => (a.start?.year ?? 0) - (b.start?.year ?? 0),
         ),
         clientBirthDate: this.client.clientDetails.birthDate,
         partnerBirthDate: this.client.partnerDetail?.birthDate,
@@ -1250,9 +1322,10 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
         amountCycles: this.amountCycles,
         escalataionRates: this.escalationRates,
         eventsList: [...this.financialTimeline.clientEvents].sort(
-          (a, b) => a.start.age - b.start.age,
+          (a, b) => (a.start?.year ?? 0) - (b.start?.year ?? 0),
         ),
         clientBirthDate: this.client.clientDetails.birthDate,
+        partnerBirthDate: this.client.partnerDetail?.birthDate,
         clientPreferredCurrency: this.client.clientDetails.preferredCurrency,
         cashflowId: this.cashflowId,
         selectedExpense: expense,
