@@ -153,13 +153,9 @@
               </div>
               <mat-datepicker #legacyPartnerPicker></mat-datepicker>
             </div>
-            <div class="d-flex flex-column gap-1 m-t-4">
-              @if (partnerAge !== null) {
-                <span class="f-s-12 f-w-500" style="line-height: 14px"
-                  >Age: {{ partnerAge }}</span
-                >
-              }
-            </div>
+            @if (partnerAge !== null) {
+              <span class="field-hint">Age: {{ partnerAge }}</span>
+            }
             @if (
               form.get('partner.dob')?.touched &&
               form.get('partner.dob')?.hasError('required')

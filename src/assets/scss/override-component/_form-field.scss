@@ -71,6 +71,14 @@ html {
   line-height: 16px !important;
   font-weight: 400 !important;
 }
+.field-hint {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 14px;
+  color: #48475d;
+  display: block;
+  margin: 4px 0 0;
+}
 .date-picker-position {
   position: absolute;
   top: 50%;

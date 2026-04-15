@@ -471,9 +471,9 @@ export class EmergenciesComponent implements OnInit {
   getProtectionScoreCssClass(score: number | null): string {
     if (score == null || score < 50) {
       return 'ibernia-red';
-    } else if (score < 75) {
+    } else if (score < 70) {
       return 'ibernia-orange';
-    } else if (score < 89) {
+    } else if (score < 90) {
       return 'ibernia-light-green';
     } else {
       return 'ibernia-dark-green';
@@ -486,9 +486,9 @@ export class EmergenciesComponent implements OnInit {
 
     if (score == null || score < 50) {
       color = '#ff383c';
-    } else if (score < 75) {
+    } else if (score < 70) {
       color = '#E1B025cc';
-    } else if (score < 89) {
+    } else if (score < 90) {
       color = '#09AC65cc';
     } else {
       color = '#166A41cc';
