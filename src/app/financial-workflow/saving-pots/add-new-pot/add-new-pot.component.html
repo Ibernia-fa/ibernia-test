@@ -8,11 +8,7 @@
     <div class="dialog-header">
       <h2 class="dialog-title text-center">
         @if (isEditWorkflow) {
-          @if (savingsForm.get("name")?.value === "Custom") {
-            {{ displayPotName }}
-          } @else {
-            {{ displayPotName | translate }}
-          }
+          {{ displayPotName | translate }}
           @if (canEditName) {
             <img
               src="assets/images/svgs/drop-down-edit-2-line.svg"
@@ -57,13 +53,7 @@
                 (selectionChange)="onNameValueChange($event.value)"
               >
                 <mat-select-trigger>
-                  @if (savingsForm.get("name")?.value === "Custom") {
-                    {{
-                      savingsForm.get("customName")?.value?.trim()
-                        ? savingsForm.get("customName")?.value
-                        : ("Custom" | translate)
-                    }}
-                  } @else if (savingsForm.get("name")?.value) {
+                  @if (savingsForm.get("name")?.value) {
                     {{ savingsForm.get("name")?.value | translate }}
                   }
                 </mat-select-trigger>
@@ -87,42 +77,6 @@
                   }
                 }
 
-                <mat-option [value]="'Custom'">
-                  <div class="d-flex align-items-center gap-8">
-                    <div style="height: 18px; width: 18px">
-                      <svg
-                        height="20"
-                        width="20"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke-width="1.5"
-                        stroke="#5A596E"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                        />
-                      </svg>
-                    </div>
-
-                    <!-- <img
-                      src="/assets/images/svgs/custom-option-icon.svg"
-                      alt="custom-event"
-                      height="20"
-                      width="20"
-                    /> -->
-                    <span
-                      style="
-                        margin-top: 2.5px;
-                        display: block;
-                        line-height: unset;
-                      "
-                      >{{ "Custom" | translate }}</span
-                    >
-                  </div>
-                </mat-option>
               </mat-select>
               <span class="custom-arrow">
                 <svg
@@ -156,36 +110,20 @@
           </div>
         }
         @if (
-          savingsForm.get("name")?.value === "Custom" &&
-          savingsForm.get("customName") &&
+          savingsForm.get("name")?.value !== "Cash" &&
           (!isEditWorkflow || showNameEdit)
         ) {
           <div class="w-100 form-field gap-8">
             <mat-label
               class="f-s-16 f-w-500 d-block ibr-black"
               style="line-height: 16px"
-              >{{ "Name" | translate }}</mat-label
+              >{{ "SAVINGS_POT.NAME_OPTIONAL" | translate }}</mat-label
             >
-            @if (savingsForm.get("customName")) {
-              <input matInput formControlName="customName" />
-            } @else {
-              <input matInput [placeholder]="'Enter name' | translate" />
-            }
-            @if (
-              savingsForm.get("customName")?.touched &&
-              savingsForm.get("customName")?.hasError("required")
-            ) {
-              <span class="field-error d-block">{{
-                "Required" | translate
-              }}</span>
-            }
-            @if (
-              savingsForm.get("customName")?.hasError("cashNameNotAllowed")
-            ) {
-              <span class="field-error d-block">{{
-                "A Cash pot already exists" | translate
-              }}</span>
-            }
+            <input
+              matInput
+              formControlName="customName"
+              [placeholder]="namePlaceholderKey | translate"
+            />
           </div>
         }
         <!--End  Name Field  -->

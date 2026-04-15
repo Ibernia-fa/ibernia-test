@@ -268,7 +268,7 @@ export class AddNewPotComponent {
       name: [defaultType, Validators.required],
       currency: [this.clientPreferredCurrency, Validators.required],
       amount: [0, [Validators.required, this.minPositiveValue()]],
-      customName: [''],  // For Custom pots
+      customName: [''],
       returnRate: [defaultReturnRate],
       // lockPot: [true],
       lockPot: [defaultType === 'Pension fund'],  // Auto-check for Pension fund only
@@ -332,7 +332,7 @@ export class AddNewPotComponent {
         this.savingsForm.get('name')?.disable({ emitEvent: false });
         this.selectedNameIconUrl = 'cashflow-moneys-icon';
       }
-      if (this.selectedPot?.name === 'Pension fund') {
+      if (this.savingsForm.get('name')?.value === 'Pension fund') {
         const ownership =
           this.savingsForm.get('ownership')?.value ?? SavingPotOwnership.Joint;
         this.syncRetirementFieldsForOwnership(ownership);
@@ -403,26 +403,23 @@ onAmountBlur(e: Event) {
 
   patchFormValues() {
     this.isAddComissionChecked = this.selectedPot?.hasCommission;
-    var savingPotValue = this.savingPotValues.find(x => x.name === this.selectedPot.name);
-        if(savingPotValue) {
-      this.savingsForm.get('name')?.patchValue(savingPotValue.name)
+    const matchedPreset = this.savingPotValues.find(x => x.name === this.selectedPot.name);
+    if (matchedPreset) {
+      this.savingsForm.get('name')?.patchValue(matchedPreset.name, { emitEvent: false });
+      this.savingsForm.get('customName')?.patchValue('', { emitEvent: false });
+    } else {
+      const typeToPreset: Record<number, string> = {
+        [SavingPotType.Investment]: 'Investment',
+        [SavingPotType.PensionFund]: 'Pension fund',
+        [SavingPotType.Other]: 'Investment',
+      };
+      const typeName = typeToPreset[this.selectedPot.type] || 'Investment';
+      this.savingsForm.get('name')?.patchValue(typeName, { emitEvent: false });
+      this.savingsForm.get('customName')?.patchValue(this.selectedPot.name, { emitEvent: false });
     }
-    else {
-      this.savingsForm.get('name')?.patchValue('Custom');
-      this.onNameValueChange('Custom');
-      this.savingsForm.get('customName')?.patchValue(this.selectedPot.name);
-    }
-    // --- Type (name) ---
     if (this.isCashPotEditMode) {
-      // Keep it Cash, do not touch customName control
-      const savingPotValue = this.savingPotValues.find(x => x.name === this.selectedPot.name);
-      if (savingPotValue) {
-        this.savingsForm.get('name')?.patchValue(savingPotValue.name, { emitEvent: false });
-      } else {
-        this.savingsForm.get('name')?.patchValue('Custom', { emitEvent: false });
-        this.onNameValueChange('Custom'); // will add customName control
-        this.savingsForm.get('customName')?.patchValue(this.selectedPot.name, { emitEvent: false });
-      }
+      this.savingsForm.get('name')?.patchValue('Cash', { emitEvent: false });
+      this.savingsForm.get('customName')?.patchValue('', { emitEvent: false });
     }
 
     // --- The rest of fields (unchanged behavior) ---
@@ -442,7 +439,7 @@ onAmountBlur(e: Event) {
       this.round2(this.selectedPot.returnRate),
       { emitEvent: false }
     );
-    const isPensionFundEdit = this.selectedPot.name === 'Pension fund';
+    const isPensionFundEdit = this.selectedPot.type === SavingPotType.PensionFund || this.savingsForm.get('name')?.value === 'Pension fund';
     this.savingsForm.get('lockPot')?.patchValue(isPensionFundEdit ? true : this.selectedPot.hasPotLocked, { emitEvent: false });
 
     const lockStartVal = this.selectedPot.startEventId
@@ -455,7 +452,7 @@ onAmountBlur(e: Event) {
     this.savingsForm.get('end')?.patchValue(lockEndVal, { emitEvent: false });
     
     // Patch Pension fund specific fields if applicable
-    if (this.selectedPot.name === 'Pension fund') {
+    if (isPensionFundEdit) {
       this.savingsForm.get('contributionAmount')?.patchValue(this.selectedPot.contributionAmount, { emitEvent: false });
       this.savingsForm.get('contributionFrequency')?.patchValue(this.selectedPot.contributionFrequency, { emitEvent: false });
       const contribVal = this.savingsForm.get('contributionAmount')?.value;
@@ -603,7 +600,7 @@ onAmountBlur(e: Event) {
 
     // Case 4: Multiple types already exist
     if (existingTypes.size >= 3) {
-      return 'Custom';
+      return 'Investment';
     }
 
     // Case 1: Only Cash exists
@@ -692,22 +689,23 @@ onAmountBlur(e: Event) {
 
   get displayPotName(): string {
     if (!this.savingsForm) return '';
-    const name = (this.savingsForm.get('name')?.value ?? '').toString();
-
-    if (name === 'Custom') {
-      const customName = (this.savingsForm.get('customName')?.value ?? '').toString().trim();
-      return customName || this.selectedPot?.name || 'Custom';
-    }
-
-    return name || this.selectedPot?.name || '';
+    const typeName = (this.savingsForm.get('name')?.value ?? '').toString();
+    const customName = (this.savingsForm.get('customName')?.value ?? '').toString().trim();
+    return customName || typeName || this.selectedPot?.name || '';
   }
 
   get canEditName(): boolean {
-    return this.isEditWorkflow && this.savingsForm?.get('name')?.value === 'Custom';
+    return this.isEditWorkflow && this.savingsForm?.get('name')?.value !== 'Cash';
   }
 
   toggleNameEdit(): void {
     this.showNameEdit = !this.showNameEdit;
+  }
+
+  get namePlaceholderKey(): string {
+    return this.savingsForm.get('name')?.value === 'Pension fund'
+      ? 'SAVINGS_POT.NAME_PLACEHOLDER_PENSION'
+      : 'SAVINGS_POT.NAME_PLACEHOLDER_INVESTMENT';
   }
 
   /** Number of existing pots with name "Cash". */
@@ -809,22 +807,12 @@ onAmountBlur(e: Event) {
     this.renamedCustomName = '';  // Reset renamed value when type changes
     this.isRenamingEntry = false;  // Reset rename mode
     
-    if (name === 'Custom') {
-      this.savingsForm.setControl(
-        'customName',
-        new FormControl('', [Validators.required, this.noCashNameValidator()])
-      );
-      this.savingsForm.updateValueAndValidity();
-      this.selectedNameIconUrl = 'custom-option-icon'
-    } else {
-      this.savingsForm.removeControl('customName');
-      this.savingsForm.updateValueAndValidity();
+    this.savingsForm.get('customName')?.setValue('', { emitEvent: false });
 
-      const cusEvent = this.savingPotValues.find(
-        (customEvent) => customEvent.name === name
-      );
-      this.selectedNameIconUrl = cusEvent?.iconUrl ?? '';
-    }
+    const cusEvent = this.savingPotValues.find(
+      (customEvent) => customEvent.name === name
+    );
+    this.selectedNameIconUrl = cusEvent?.iconUrl ?? '';
     
     // Switch return rate default based on pot type
     if (!this.isEditWorkflow) {
@@ -1126,14 +1114,6 @@ onAmountBlur(e: Event) {
       return true;
     }
     const potName = this.savingsForm.get('name')?.value;
-    if (potName === 'Custom') {
-      const cn = (this.savingsForm.get('customName')?.value ?? '')
-        .toString()
-        .trim();
-      if (!cn) {
-        return true;
-      }
-    }
     if (this.fromNetWorth) {
       return false;
     }
@@ -1193,9 +1173,8 @@ onAmountBlur(e: Event) {
     if (this.savingsForm.valid) {
       var clientSaving: ClientSaving = {
         id: this.isEditWorkflow ? this.selectedPot.id : null,
-        name: this.savingsForm.get('name')?.value !== 'Custom'
-        ? this.savingsForm.get('name')?.value
-        : this.savingsForm.get('customName')?.value,
+        name: (this.savingsForm.get('customName')?.value ?? '').trim()
+          || this.savingsForm.get('name')?.value,
         isGrowing: false,
         nominalValue: 0,
         realValue: 0,
@@ -1266,11 +1245,9 @@ onAmountBlur(e: Event) {
         hasCommission: this.savingsForm.get('commissions')?.value,
         orderNumber: this.isEditWorkflow ? this.selectedPot.orderNumber : 0,
         hasPotLocked: isPotLocked,
-        iconUrl: this.savingsForm.get('name')?.value !== 'Custom'
-          ? this.savingPotValues.find(
+        iconUrl: this.savingPotValues.find(
             (x) => this.savingsForm.get('name')?.value === x.name
-          )?.iconUrl ?? 'cashflow-moneys-icon'
-          : 'custom-option-icon',
+          )?.iconUrl ?? 'cashflow-investment-icon',
         start: {
           age:
             this.forecastStartDateYear != null
@@ -1329,12 +1306,11 @@ onAmountBlur(e: Event) {
         // returnRate: this.savingsForm.get('name')?.value !== 'Cash' ? this.savingsForm.get('returnRate')?.value : 0,
           returnRate: this.savingsForm.get('name')?.value !== 'Cash' ? rr : 0,
         type:
-        this.savingsForm.get('name')?.value === 'Cash' ||
-        this.savingsForm.get('customName')?.value === 'Cash'
+        this.savingsForm.get('name')?.value === 'Cash'
           ? SavingPotType.Cash
           : this.savingPotValues.find(
               (x) => this.savingsForm.get('name')?.value === x.name
-            )?.type ?? SavingPotType.Other,
+            )?.type ?? SavingPotType.Investment,
         // realReturn: this.savingsForm.get('name')?.value !== 'Cash' ?
         //   this.savingsForm.get('returnRate')?.value - this.inflationRate : 0,
         realReturn: real,
