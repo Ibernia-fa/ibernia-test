@@ -65,7 +65,8 @@ import {
 import { getStartEndDurationLabel } from 'src/app/shared/utils/start-end-duration-label';
 import {
   calculateInheritanceNetFromGross,
-  DEFAULT_INHERITANCE_TAX_THRESHOLD,
+  DEFAULT_CHILD_TAX_RATE,
+  DEFAULT_CHILD_TAX_THRESHOLD,
 } from 'src/app/shared/utils/inheritance-tax.utils';
 
 @Component({
@@ -1795,8 +1796,8 @@ export class AddIncomeComponent {
     const prefs = this.settingsService.currentUserData?.preferences;
     const net = calculateInheritanceNetFromGross(
       grossFromForm,
-      prefs?.childInheritanceTaxThreshold ?? DEFAULT_INHERITANCE_TAX_THRESHOLD,
-      prefs?.childInheritanceTaxRate ?? 0,
+      prefs?.childInheritanceTaxThreshold ?? DEFAULT_CHILD_TAX_THRESHOLD,
+      prefs?.childInheritanceTaxRate ?? DEFAULT_CHILD_TAX_RATE,
     );
     return { planAmount: net, inheritanceGross: grossFromForm };
   }
