@@ -38,6 +38,7 @@ import {
   resolveCycleDescriptionForRecurringEndGuard,
 } from 'src/app/shared/utils/recurring-end-save-guard';
 import { getStartEndDurationLabel } from 'src/app/shared/utils/start-end-duration-label';
+import { capitalizeFirstLetter } from 'src/app/shared/utils/capitalize-first-letter';
 
 @Component({
   selector: 'app-add-expense',
@@ -384,9 +385,12 @@ export class AddExpenseComponent {
       const startEventId = extractEventId(startVal);
       const endEventId = extractEventId(endVal);
 
+      const rawExpenseDesc = this.expenseForm.get('description')?.value;
+      const finalExpenseDesc = this.isEditWorkflow ? rawExpenseDesc : capitalizeFirstLetter(rawExpenseDesc);
+
       var expense: FinancialViewModel = {
         id: this.isEditWorkflow ? this.selectedExpense.id : null,
-        description: this.expenseForm.get('description')?.value,
+        description: finalExpenseDesc,
         amount: {
           amount: this.expenseForm.get('amount')?.value,
           currencySymbol: this.expenseForm.get('currencySymbol')?.value,

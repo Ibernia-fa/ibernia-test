@@ -39,6 +39,7 @@ import {
   onlyDigits,
   parseDMYFromDigits,
 } from 'src/app/shared/utils/client-dob-helpers';
+import { capitalizeFirstLetter } from 'src/app/shared/utils/capitalize-first-letter';
 
 interface RoleOption {
   value: FamilyRole;
@@ -388,8 +389,8 @@ export class AddMemberComponent implements AfterViewInit, OnDestroy {
       }
 
       this.legacyHttp.addFamilyMember(this.data.cashflowId, {
-        firstName: (pg.get('firstName')!.value ?? '').trim(),
-        lastName: (pg.get('lastName')!.value ?? '').trim(),
+        firstName: capitalizeFirstLetter((pg.get('firstName')!.value ?? '').trim()),
+        lastName: capitalizeFirstLetter((pg.get('lastName')!.value ?? '').trim()),
         birthDate: this.fixDate(dob),
         email: (pg.get('email')!.value ?? '').trim(),
         role,
@@ -412,7 +413,7 @@ export class AddMemberComponent implements AfterViewInit, OnDestroy {
       return;
     }
 
-    const name = (this.form.get('name')!.value ?? '').trim();
+    const name = capitalizeFirstLetter((this.form.get('name')!.value ?? '').trim());
 
     this.legacyHttp.addFamilyMember(this.data.cashflowId, {
       firstName: name,

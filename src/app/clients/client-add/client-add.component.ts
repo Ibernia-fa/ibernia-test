@@ -44,6 +44,7 @@ import { AuthService } from 'src/app/auth/services/auth.service';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MY_DATE_FORMATS } from 'src/app/shared/utils/custom-date-formatter';
 import { getCompletedYearsAgeAtDate } from 'src/app/shared/utils/client-age-at-reference';
+import { capitalizeFirstLetter } from 'src/app/shared/utils/capitalize-first-letter';
 
 class DmyDateAdapter extends NativeDateAdapter {
   override parse(value: any): Date | null {
@@ -322,8 +323,8 @@ export class ClientAddComponent {
         email: this.clientForm.controls['email'].value,
         gender: this.clientForm.controls['gender'].value,
         country: this.clientForm.controls['country'].value,
-        firstName: this.clientForm.controls['firstName'].value,
-        lastName: this.clientForm.controls['lastName'].value,
+        firstName: capitalizeFirstLetter(this.clientForm.controls['firstName'].value),
+        lastName: capitalizeFirstLetter(this.clientForm.controls['lastName'].value),
 
         phone: this.clientForm.controls['phone'].value?.e164Number,
         preferredCurrency: this.clientForm.controls['currency'].value,
@@ -335,8 +336,8 @@ export class ClientAddComponent {
             email: partnerGroup.controls['email']?.value,
             gender: partnerGroup.controls['gender']?.value,
             country: this.clientForm.controls['country']?.value,
-            firstName: partnerGroup.controls['firstName']?.value,
-            lastName: partnerGroup.controls['lastName']?.value,
+            firstName: capitalizeFirstLetter(partnerGroup.controls['firstName']?.value),
+            lastName: capitalizeFirstLetter(partnerGroup.controls['lastName']?.value),
             phone: partnerGroup.controls['phone']?.value?.e164Number,
             preferredCurrency: partnerGroup.controls['currency']?.value,
           }

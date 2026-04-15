@@ -398,25 +398,26 @@
             </div>
           }
 
-          <section class="example-section">
-            <mat-checkbox
-              type="checkbox"
-              class="example-margin"
-              formControlName="stopIncome"
-              [disabled]="stoppableIncomes.length === 0"
-              (change)="onStopIncomeUserToggled($event)"
-            >
-              {{ "EMERGENCIES.STOP_INCOME" | translate }}
-            </mat-checkbox>
-            @if (
-              simulateEmergencyForm.get("stopIncome")?.touched &&
-              simulateEmergencyForm.get("stopIncome")?.hasError("required")
-            ) {
-              <span class="field-error d-block">{{
-                "Required" | translate
-              }}</span>
-            }
-          </section>
+          @if (stoppableIncomes.length > 0) {
+            <section class="example-section">
+              <mat-checkbox
+                type="checkbox"
+                class="example-margin"
+                formControlName="stopIncome"
+                (change)="onStopIncomeUserToggled($event)"
+              >
+                {{ "EMERGENCIES.STOP_INCOME" | translate }}
+              </mat-checkbox>
+              @if (
+                simulateEmergencyForm.get("stopIncome")?.touched &&
+                simulateEmergencyForm.get("stopIncome")?.hasError("required")
+              ) {
+                <span class="field-error d-block">{{
+                  "Required" | translate
+                }}</span>
+              }
+            </section>
+          }
 
           @if (
             simulateEmergencyForm.get("stopIncome")?.value &&

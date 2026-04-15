@@ -79,6 +79,27 @@ html {
   display: block;
   margin: 4px 0 0;
 }
+
+/*
+ * Keep hint-to-field spacing at 8px regardless of parent flex gap.
+ * Reference: .form-field (gap 4px) + margin 4px = 8px total.
+ * For larger gap containers the margin shrinks so the sum stays 8px.
+ */
+.gap-8 > .field-hint {
+  margin-top: 0;
+}
+.gap-12 > .field-hint {
+  margin-top: -4px;
+}
+.gap-16 > .field-hint {
+  margin-top: -8px;
+}
+.gap-20 > .field-hint {
+  margin-top: -12px;
+}
+.gap-24 > .field-hint {
+  margin-top: -16px;
+}
 .date-picker-position {
   position: absolute;
   top: 50%;

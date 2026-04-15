@@ -30,6 +30,7 @@ import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-sep
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MaterialModule } from 'src/app/material.module';
 import { getAmountCycleLabel } from 'src/app/shared/utils/amount-cycle-label';
+import { capitalizeFirstLetter } from 'src/app/shared/utils/capitalize-first-letter';
 import { finalize } from 'rxjs';
 
 export interface AddEmergencyDialogData {
@@ -260,7 +261,7 @@ export class AddEmergenciesComponent {
       coverage,
       coverageAdequacy,
       willStatus: type === 2 ? form.willStatus : 1,
-      name: form.name,
+      name: this.data.mode === 'edit' ? form.name : capitalizeFirstLetter(form.name),
       iconUrl: this.resolveIconUrl(type),
       isHidden,
       client: this.data.client ?? { id: '', name: '' },

@@ -56,6 +56,7 @@ import {
 import { calendarYearOrEventRefValidator } from 'src/app/shared/utils/calendar-year-or-event-ref.validator';
 import { extractEventId, resolveYear } from 'src/app/shared/utils/event-date-utils';
 import { getStartEndDurationLabel } from 'src/app/shared/utils/start-end-duration-label';
+import { capitalizeFirstLetter } from 'src/app/shared/utils/capitalize-first-letter';
 
 @Component({
   selector: 'app-add-new-pot',
@@ -1173,10 +1174,13 @@ onAmountBlur(e: Event) {
     }
 
     if (this.savingsForm.valid) {
+      const customNameTrimmed = (this.savingsForm.get('customName')?.value ?? '').trim();
+      const resolvedPotName = customNameTrimmed || this.savingsForm.get('name')?.value;
+      const finalPotName = this.isEditWorkflow ? resolvedPotName : (customNameTrimmed ? capitalizeFirstLetter(resolvedPotName) : resolvedPotName);
+
       var clientSaving: ClientSaving = {
         id: this.isEditWorkflow ? this.selectedPot.id : null,
-        name: (this.savingsForm.get('customName')?.value ?? '').trim()
-          || this.savingsForm.get('name')?.value,
+        name: finalPotName,
         isGrowing: false,
         nominalValue: 0,
         realValue: 0,
