@@ -111,7 +111,7 @@
 
 // Custom Dialog Field Style
 .net-fields {
-  span {
+  span:not(.field-hint):not(.field-error) {
     line-height: 16px;
     color: #48475d;
     font-size: 14px;
