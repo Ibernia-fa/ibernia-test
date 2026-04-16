@@ -196,7 +196,22 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   getTimelineChipLabel(event: ClientEvent): string {
-    return translateTimelineEventDisplayName(this.translate, event?.name ?? '');
+    const rawName = (event?.name ?? '').trim();
+
+    if (rawName.toLowerCase().startsWith('retirement age')) {
+      const personName = event.isPartnerEvent
+        ? this.client?.partnerDetail?.firstName?.trim()
+        : this.client?.clientDetails?.firstName?.trim();
+
+      if (this.hasPartner) {
+        const composite = personName ? `Retirement age ${personName}` : 'Retirement age';
+        return translateTimelineEventDisplayName(this.translate, composite);
+      }
+
+      return translateTimelineEventDisplayName(this.translate, 'Retirement age');
+    }
+
+    return translateTimelineEventDisplayName(this.translate, rawName);
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -1397,15 +1412,17 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
   private getEventTitleForDisplay(event: ClientEvent): string {
     const rawTitle = (event?.name ?? '').trim();
 
-    // When "Retirement age" appears on the timeline for joint accounts, the saved event name
-    // is often just "Retirement age" with `isPartnerEvent`. In that case, derive the display
-    // label using the person's name, then localize via the shared helper.
-    if (rawTitle.toLowerCase().startsWith('retirement age') && this.hasPartner) {
+    if (rawTitle.toLowerCase().startsWith('retirement age')) {
       const personName = event.isPartnerEvent
         ? this.client?.partnerDetail?.firstName?.trim()
         : this.client?.clientDetails?.firstName?.trim();
-      const composite = personName ? `Retirement age ${personName}` : 'Retirement age';
-      return translateTimelineEventDisplayName(this.translate, composite);
+
+      if (this.hasPartner) {
+        const composite = personName ? `Retirement age ${personName}` : 'Retirement age';
+        return translateTimelineEventDisplayName(this.translate, composite);
+      }
+
+      return translateTimelineEventDisplayName(this.translate, 'Retirement age');
     }
 
     return translateTimelineEventDisplayName(this.translate, rawTitle);

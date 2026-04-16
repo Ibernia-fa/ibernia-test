@@ -187,7 +187,7 @@
                                 width="18"
                                 class="category-option-icon"
                               />
-                              {{ editedGoalChipLabel(goal.name) }}
+                              {{ editedGoalChipLabel(goal.name, goal) }}
                             </span>
                           </mat-option>
                         }
@@ -218,7 +218,7 @@
                           <div class="edited-chips">
                             @for (entry of editedGoals; track entry.name) {
                               <span class="edited-chip">
-                                {{ editedGoalChipLabel(entry.name) }}
+                                {{ editedGoalChipLabel(entry.name, firstEvent(entry.item)) }}
                                 <button
                                   class="chip-remove"
                                   (click)="removeEditedItem('goals', entry.name)"

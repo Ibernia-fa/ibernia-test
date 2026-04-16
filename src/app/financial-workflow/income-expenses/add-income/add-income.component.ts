@@ -298,6 +298,8 @@ export class AddIncomeComponent {
         this.incomeForm.get('end')?.patchValue(endNum);
       }
 
+      this.hydrateDefaultIncomeStartEndIfMissing();
+
       const matchedEscalation = resolveEscalationMatch(
         this.escalationRates,
         this.selectedIncome!.escalationRate,
@@ -510,16 +512,24 @@ export class AddIncomeComponent {
     const isSalary = isSalaryTypeForBonus(clientDesc);
     this.updateSalaryRetirementDefaults(true);
     const partnerRetirementEvent = this.findRetirementAgeEventForPerson(true);
-    const defaultEnd =
-      isSalary && partnerRetirementEvent?.id
+    let defaultStart: string | number = this.currentYear;
+    let defaultEnd: string | number = this.retirementYear;
+    if (isSalary) {
+      defaultEnd = partnerRetirementEvent?.id
         ? 'event:' + partnerRetirementEvent.id
         : this.retirementYear;
+    } else {
+      defaultStart = partnerRetirementEvent?.id
+        ? 'event:' + partnerRetirementEvent.id
+        : this.retirementYear;
+      defaultEnd = this.forecastEndYear;
+    }
     this.incomeForm.patchValue({
       description: baseType,
       incomeType: baseType,
       amount: '',
       cycle: this.cycles[1]?.id,
-      start: this.currentYear,
+      start: defaultStart,
       end: defaultEnd,
       addBonus: false,
       bonusAmount: 0,
@@ -1306,7 +1316,10 @@ export class AddIncomeComponent {
     ) {
       const isPartnerPension = isPartnerStatePensionApiDescription(incomeType);
       this.updateSalaryRetirementDefaults(isPartnerPension);
-      startCtrl.setValue(this.retirementYear);
+      const retirementEvt = this.findRetirementAgeEventForPerson(isPartnerPension);
+      startCtrl.setValue(
+        retirementEvt?.id ? 'event:' + retirementEvt.id : this.retirementYear,
+      );
       endCtrl.setValue(this.forecastEndYear);
     } else if (incomeType === 'Inheritance' || incomeType === 'Inheritance (Partner)') {
       const isPartner = isPartnerInheritanceApiDescription(incomeType);
@@ -1546,6 +1559,45 @@ export class AddIncomeComponent {
     this.retirementEventYear = Number.isFinite(y) && y > 0 ? y : null;
     this.retirementYear =
       this.retirementEventYear ?? this.clientBirthYear + this.retirementAge;
+  }
+
+  /**
+   * When editing a default income whose start/end was not persisted (or was
+   * cleared), re-apply the expected defaults so the selects are never blank.
+   */
+  private hydrateDefaultIncomeStartEndIfMissing(): void {
+    if (!this.isEditWorkflow || !this.selectedIncome) return;
+
+    const desc = this.selectedIncome.description ?? '';
+    const startCtrl = this.incomeForm.get('start');
+    const endCtrl = this.incomeForm.get('end');
+    const startEmpty = startCtrl?.value == null || startCtrl.value === '';
+    const endEmpty = endCtrl?.value == null || endCtrl.value === '';
+    if (!startEmpty && !endEmpty) return;
+
+    const isSalary = isClientSalaryApiDescription(desc) || isPartnerSalaryApiDescription(desc);
+    const isPension = isClientStatePensionApiDescription(desc) || isPartnerStatePensionApiDescription(desc);
+    if (!isSalary && !isPension) return;
+
+    const isPartner = isPartnerSalaryApiDescription(desc) || isPartnerStatePensionApiDescription(desc);
+    this.updateSalaryRetirementDefaults(isPartner);
+    const retirementEvt = this.findRetirementAgeEventForPerson(isPartner);
+
+    if (isSalary) {
+      if (startEmpty) startCtrl!.patchValue(this.currentYear);
+      if (endEmpty) {
+        endCtrl!.patchValue(
+          retirementEvt?.id ? 'event:' + retirementEvt.id : this.retirementYear,
+        );
+      }
+    } else {
+      if (startEmpty) {
+        startCtrl!.patchValue(
+          retirementEvt?.id ? 'event:' + retirementEvt.id : this.retirementYear,
+        );
+      }
+      if (endEmpty) endCtrl!.patchValue(this.forecastEndYear);
+    }
   }
 
   private setupBonusControlHandlers(): void {

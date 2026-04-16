@@ -312,6 +312,7 @@ export class DefaultAssumptionsComponent implements OnInit, OnDestroy {
             : intOrNull(raw.preferences.comissionAmount),
         currency: raw.preferences.currency,
         country: blankToNull(raw.preferences.country),
+        language: profile?.preferences?.language ?? this.translate.currentLang,
         mortgageInterestRate: round2(raw.preferences.mortgageInterestRate),
         loanInterestRate: round2(raw.preferences.loanInterestRate),
         partnerInheritanceTaxRate: round2(raw.preferences.partnerInheritanceTaxRate),
