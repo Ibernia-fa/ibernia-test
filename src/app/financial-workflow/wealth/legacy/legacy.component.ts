@@ -39,6 +39,8 @@ import { TaxSettingsComponent } from './tax-settings/tax-settings.component';
 import { EditParentEstateComponent } from './edit-parent-estate/edit-parent-estate.component';
 import { SettingsService } from 'src/app/default-preferance/services/default-preferance.http.service';
 import { Subject, takeUntil } from 'rxjs';
+import { Store } from '@ngrx/store';
+import * as ClientActions from 'src/app/store/client/client.actions';
 
 @Component({
   selector: 'app-legacy',
@@ -102,6 +104,7 @@ export class LegacyComponent
     private renderer: Renderer2,
     private ngZone: NgZone,
     private settingsService: SettingsService,
+    private store: Store,
   ) {}
 
   ngOnInit(): void {
@@ -442,6 +445,8 @@ export class LegacyComponent
   }
 
   onAddMember(): void {
+    const hadPartner = this.hasPartner;
+
     const dialogRef = this.dialog.open(AddMemberComponent, {
       width: '612px',
       disableClose: true,
@@ -458,6 +463,14 @@ export class LegacyComponent
       if (result?.dashboard) {
         this.dashboard = result.dashboard;
         this.clearScenario();
+
+        const partnerJustAdded = !hadPartner && (result.dashboard as LegacyDashboardModel).hasPartner;
+        if (partnerJustAdded) {
+          const clientId = (result.dashboard as LegacyDashboardModel).client?.id;
+          if (clientId) {
+            this.store.dispatch(ClientActions.loadClient({ clientId }));
+          }
+        }
       }
     });
   }

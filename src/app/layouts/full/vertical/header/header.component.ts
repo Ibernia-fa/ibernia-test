@@ -561,9 +561,11 @@ get userInitials(): string {
             if (!p?.userId) return;
             this.userId = p.userId;
             const language = p.preferences?.language;
-            this.currentLanguage = language === 'it' ? 'it' : 'en';
-            this.setOtherLanguage();
-            this.languageService.setFromApi(p.preferences?.language as LanguageCode);
+            if (language) {
+              this.currentLanguage = language === 'it' ? 'it' : 'en';
+              this.setOtherLanguage();
+              this.languageService.setFromApi(language);
+            }
             this.settingsService.setUserData(res.body);
             // profileImagePreview is synced from userData$ (including cleared photo)
 

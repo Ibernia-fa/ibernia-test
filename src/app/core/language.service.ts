@@ -15,7 +15,8 @@ export class LanguageService {
     this.translate.setDefaultLang('en');
   }
 
-  setFromApi(language: string): void {
+  setFromApi(language: string | undefined | null): void {
+    if (!language) return;
     const lang: LanguageCode = language === 'it' ? 'it' : 'en';
     this.use(lang);
   }

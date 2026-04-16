@@ -1076,8 +1076,19 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
   }
 
   /** Localized label for edited-goal chips (e.g. composite retirement names from the API). */
-  editedGoalChipLabel(name: string): string {
+  editedGoalChipLabel(name: string, event?: ClientEvent): string {
+    if (name?.toLowerCase().startsWith('retirement age') && this.hasPartner) {
+      const personName = event?.isPartnerEvent
+        ? this.client?.partnerDetail?.firstName?.trim()
+        : this.client?.clientDetails?.firstName?.trim();
+      const composite = personName ? `Retirement age ${personName}` : 'Retirement age';
+      return translateTimelineEventDisplayName(this.translate, composite);
+    }
     return translateTimelineEventDisplayName(this.translate, name);
+  }
+
+  firstEvent(item: ClientEvent | ClientEvent[]): ClientEvent | undefined {
+    return Array.isArray(item) ? item[0] : item;
   }
 
   // ── Category editor methods ─────────────────────────────────────────────

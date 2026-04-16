@@ -287,6 +287,8 @@ export class SimulateEmergencyComponent implements OnInit, OnDestroy {
       this.populateForm(this.emergencyExpense);
     } else if (this.isLifeInsurance(this.emergency)) {
       this.applyLifeInsuranceDefaults();
+    } else if (this.isDisability(this.emergency)) {
+      this.applyDisabilityDefaults();
     }
   }
 
@@ -316,6 +318,12 @@ export class SimulateEmergencyComponent implements OnInit, OnDestroy {
     return name.includes('life') || name.includes('vita'); // English + Italian
   }
 
+  private isDisability(emergency: Emergency): boolean {
+    if (!emergency || emergency.type !== 1) return false;
+    const name = (emergency.name ?? '').toString().trim().toLowerCase();
+    return name.includes('disability') || name.includes('disabilità') || name.includes('invalidità');
+  }
+
   private applyLifeInsuranceDefaults(): void {
     if (this.stoppableIncomes.length === 0) {
       return;
@@ -337,6 +345,48 @@ export class SimulateEmergencyComponent implements OnInit, OnDestroy {
     }
     amountControl?.updateValueAndValidity();
     incomeControl?.updateValueAndValidity();
+  }
+
+  private applyDisabilityDefaults(): void {
+    const amountControl = this.simulateEmergencyForm.get('amount');
+    const incomeControl = this.simulateEmergencyForm.get('stoppedIncomeId');
+
+    if (!amountControl?.value) {
+      amountControl?.setValue(0, { emitEvent: false });
+    }
+
+    const monthlyCycle = this.amountCycles.find(
+      (c) => (c.description ?? '').toLowerCase() === 'every month',
+    );
+    if (monthlyCycle) {
+      this.simulateEmergencyForm.get('cycle')?.setValue(monthlyCycle.id, { emitEvent: false });
+      this.onCycleValueChange(monthlyCycle.id);
+    }
+
+    this.simulateEmergencyForm.get('end')?.setValue(this.dialogEndCalendarYear, { emitEvent: false });
+
+    const inflationRate = this.escalationRates.find(
+      (r) => (r.description ?? '').toLowerCase().includes('same rate as inflation'),
+    );
+    if (inflationRate) {
+      this.simulateEmergencyForm.get('escalationRate')?.setValue(inflationRate.description, { emitEvent: false });
+      this.selectedEscalationDescription = inflationRate.description;
+    }
+
+    if (this.stoppableIncomes.length > 0) {
+      const stopIncomeCtrl = this.simulateEmergencyForm.get('stopIncome');
+      stopIncomeCtrl?.setValue(true, { emitEvent: true });
+
+      const mainClientSalary = this.getMainClientSalary();
+      if (mainClientSalary?.id) {
+        incomeControl?.setValue(mainClientSalary.id, { emitEvent: false });
+      }
+
+      amountControl?.setValidators([Validators.required, Validators.min(0)]);
+      incomeControl?.setValidators([Validators.required]);
+      amountControl?.updateValueAndValidity();
+      incomeControl?.updateValueAndValidity();
+    }
   }
 
   private getMainClientSalary(): FinancialViewModel | null {
