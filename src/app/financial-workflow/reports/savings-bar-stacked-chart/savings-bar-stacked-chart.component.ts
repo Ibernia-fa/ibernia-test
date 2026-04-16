@@ -1091,7 +1091,6 @@ export class SavingsBarStackedChartComponent
     const allSeries = chartHost.querySelectorAll(
       '.apexcharts-bar-series .apexcharts-series',
     );
-    if (!allSeries.length) return;
 
     const hostRect = chartHost.getBoundingClientRect();
     const gridEl = chartHost.querySelector<SVGElement>('.apexcharts-grid');
@@ -1099,39 +1098,51 @@ export class SavingsBarStackedChartComponent
     const processed = this.getProcessedReport();
     const catCount = processed?.categories?.length ?? 0;
 
+    const gridIndexOk =
+      catCount > 0 &&
+      dataPointIndex >= 0 &&
+      dataPointIndex < catCount &&
+      !!gridRect;
+
     // Locate bar center-X and width at the target column
     let barCenterX = 0;
     let barWidth = 30;
     let foundBar = false;
 
-    allSeries.forEach((seriesGroup: Element) => {
-      if (foundBar) return;
-      const bars = seriesGroup.querySelectorAll<SVGPathElement>(
-        'path.apexcharts-bar-area',
-      );
-      const bar = bars[dataPointIndex];
-      if (!bar) return;
-      const rect = bar.getBoundingClientRect();
-      if (rect.width === 0) return;
-      barCenterX = rect.left + rect.width / 2;
-      // During Apex morph animation, width can be a fraction of a pixel; keep the band readable.
-      barWidth = Math.max(rect.width, 22);
-      foundBar = true;
-    });
-
-    // Emergency cost 0 on an early year often leaves no visible bar paths (all stacks ~0),
-    // so every path reports width 0 and the overlay was skipped — fall back to grid column geometry.
-    if (
-      !foundBar &&
-      gridRect &&
-      catCount > 0 &&
-      dataPointIndex >= 0 &&
-      dataPointIndex < catCount
-    ) {
-      const cell = gridRect.width / catCount;
-      barCenterX = gridRect.left + (dataPointIndex + 0.5) * cell;
+    // Animated contexts (emergency simulate, Scenario Lab): bar paths morph for ~1s — DOM
+    // measurements flicker. Grid column math is stable from the first frame, so show the
+    // highlight immediately without waiting for animationEnd.
+    if (this.animateUpdates && gridIndexOk) {
+      const cell = gridRect!.width / catCount;
+      barCenterX = gridRect!.left + (dataPointIndex + 0.5) * cell;
       barWidth = Math.max(22, cell * 0.65);
       foundBar = true;
+    } else {
+      if (!allSeries.length) return;
+
+      allSeries.forEach((seriesGroup: Element) => {
+        if (foundBar) return;
+        const bars = seriesGroup.querySelectorAll<SVGPathElement>(
+          'path.apexcharts-bar-area',
+        );
+        const bar = bars[dataPointIndex];
+        if (!bar) return;
+        const rect = bar.getBoundingClientRect();
+        if (rect.width === 0) return;
+        barCenterX = rect.left + rect.width / 2;
+        // During Apex morph animation, width can be a fraction of a pixel; keep the band readable.
+        barWidth = Math.max(rect.width, 22);
+        foundBar = true;
+      });
+
+      // Emergency cost 0 on an early year often leaves no visible bar paths (all stacks ~0),
+      // so every path reports width 0 and the overlay was skipped — fall back to grid column geometry.
+      if (!foundBar && gridIndexOk) {
+        const cell = gridRect!.width / catCount;
+        barCenterX = gridRect!.left + (dataPointIndex + 0.5) * cell;
+        barWidth = Math.max(22, cell * 0.65);
+        foundBar = true;
+      }
     }
 
     if (!foundBar) return;
