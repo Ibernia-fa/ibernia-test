@@ -218,7 +218,6 @@ export class AddEmergenciesComponent {
     const nowIso = new Date().toISOString();
     const type = existing?.type ?? 1;
     const isHidden = existing?.isHidden ?? false;
-    const emergencyType = type == 2 ? this.translate.instant('Will') : this.translate.instant('Insurance');
     const isWill = type === 2;
     const isUncovered = form.policyStatus === this.NOT_COVERED_STATUS_ID;
     const fallbackCoverageAdequacy =
@@ -299,9 +298,11 @@ export class AddEmergenciesComponent {
           next: (res: Emergency) => {
             console.log('Data received for update: ', res);
             this.toastr.success(
-              this.translate.instant('TOAST.UPDATED_SUCCESSFULLY', {
-                type: emergencyType,
-              }),
+              this.translate.instant(
+                isWill
+                  ? 'TOAST.WILL_UPDATED_SUCCESSFULLY'
+                  : 'TOAST.INSURANCE_UPDATED_SUCCESSFULLY',
+              ),
               this.translate.instant('LABEL.SUCCESS'),
             );
             this.dialogRef.close({ status: 'Success', emergency: res });
@@ -327,9 +328,11 @@ export class AddEmergenciesComponent {
           next: (res: Emergency) => {
             console.log('Data received for create: ', res);
             this.toastr.success(
-              this.translate.instant('TOAST.ADDED_SUCCESSFULLY', {
-                type: emergencyType,
-              }),
+              this.translate.instant(
+                isWill
+                  ? 'TOAST.WILL_ADDED_SUCCESSFULLY'
+                  : 'TOAST.INSURANCE_ADDED_SUCCESSFULLY',
+              ),
               this.translate.instant('LABEL.SUCCESS'),
             );
             this.dialogRef.close({ status: 'Success', emergency: res });

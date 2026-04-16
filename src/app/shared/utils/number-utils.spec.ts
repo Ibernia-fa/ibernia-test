@@ -2,7 +2,7 @@ import {
   formatAppDisplayNumber,
   parseFormattedNumber,
   localeFromAppLanguage,
-  APP_DISPLAY_NUMBER_FORMAT,
+  APP_INPUT_NUMBER_FORMAT,
 } from './number-utils';
 
 // ─── helpers ────────────────────────────────────────────────────────────────
@@ -16,7 +16,7 @@ function directiveFormatNumber(raw: string, lang: string): string {
   const intFmt = isNaN(intNum)
     ? ints
     : intNum.toLocaleString(locale, {
-        ...APP_DISPLAY_NUMBER_FORMAT,
+        ...APP_INPUT_NUMBER_FORMAT,
         maximumFractionDigits: 0,
         minimumFractionDigits: 0,
       });

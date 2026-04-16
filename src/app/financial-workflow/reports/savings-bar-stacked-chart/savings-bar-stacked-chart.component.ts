@@ -459,7 +459,7 @@ export class SavingsBarStackedChartComponent
           title: { text: '' },
           labels: {
             formatter: (value: any) =>
-              value != null ? Number(value).toLocaleString() : '',
+              value != null ? Number(value).toLocaleString(undefined, { maximumFractionDigits: 0 }) : '',
           },
         };
       }
@@ -620,7 +620,7 @@ export class SavingsBarStackedChartComponent
         title: { text: '' },
         labels: {
           formatter: (value: any) =>
-            value != null ? Number(value).toLocaleString() : '',
+            value != null ? Number(value).toLocaleString(undefined, { maximumFractionDigits: 0 }) : '',
         },
       };
       if (this.chartOptions.xaxis) {
@@ -1436,7 +1436,7 @@ export class SavingsBarStackedChartComponent
     }
     const code = this.client?.clientDetails?.preferredCurrency;
     if (!code || code.length !== 3) {
-      return value.toLocaleString();
+      return value.toLocaleString(undefined, { maximumFractionDigits: 0 });
     }
     try {
       return new Intl.NumberFormat(undefined, {
@@ -1446,7 +1446,7 @@ export class SavingsBarStackedChartComponent
         maximumFractionDigits: 0,
       }).format(value);
     } catch {
-      return value.toLocaleString();
+      return value.toLocaleString(undefined, { maximumFractionDigits: 0 });
     }
   }
 
