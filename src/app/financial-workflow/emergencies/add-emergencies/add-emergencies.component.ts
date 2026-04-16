@@ -218,7 +218,7 @@ export class AddEmergenciesComponent {
     const nowIso = new Date().toISOString();
     const type = existing?.type ?? 1;
     const isHidden = existing?.isHidden ?? false;
-    const emergencyType = type == 2 ? 'Will' : 'Insurance';
+    const emergencyType = type == 2 ? this.translate.instant('Will') : this.translate.instant('Insurance');
     const isWill = type === 2;
     const isUncovered = form.policyStatus === this.NOT_COVERED_STATUS_ID;
     const fallbackCoverageAdequacy =
