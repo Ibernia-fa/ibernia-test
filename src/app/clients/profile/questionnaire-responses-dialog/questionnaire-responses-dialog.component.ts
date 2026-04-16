@@ -128,8 +128,9 @@ export class QuestionnaireResponsesDialogComponent {
   }
 
   formatAssetChip(chip: string): string {
-    if (!this.responseCurrencySymbol) return chip;
-    return chip.replace(
+    const localized = this.localizeChipValue(chip);
+    if (!this.responseCurrencySymbol) return localized;
+    return localized.replace(
       /\d[\d,]*(\.\d+)?/g,
       (match) => `${this.responseCurrencySymbol}${match}`,
     );
