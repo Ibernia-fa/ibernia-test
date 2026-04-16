@@ -235,7 +235,7 @@ export class ComparisonLineChartComponent
     const fmtCurrency = (value: number): string => {
       if (!Number.isFinite(value)) return String(value ?? '');
       if (!currencyCode || currencyCode.length !== 3)
-        return value.toLocaleString();
+        return value.toLocaleString(undefined, { maximumFractionDigits: 0 });
       try {
         return new Intl.NumberFormat(undefined, {
           style: 'currency',
@@ -244,7 +244,7 @@ export class ComparisonLineChartComponent
           maximumFractionDigits: 0,
         }).format(value);
       } catch {
-        return value.toLocaleString();
+        return value.toLocaleString(undefined, { maximumFractionDigits: 0 });
       }
     };
 

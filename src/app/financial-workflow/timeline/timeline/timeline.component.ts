@@ -63,6 +63,7 @@ export class TimelineComponent implements OnDestroy {
   selectedCashflow: Cashflow | null;
   enableForecastEdit = false;
   destroyed$: BehaviorSubject<boolean>;
+  private previousHasPartner: boolean | undefined;
 
   constructor(
     private timelineHttpService: TimelineHttpService,
@@ -115,6 +116,14 @@ export class TimelineComponent implements OnDestroy {
         map(([res, client]) => {
           if (client) {
             this.isLoaderVisible = false;
+
+            const hasPartner = !!client.partnerDetail;
+            if (this.previousHasPartner !== undefined && hasPartner !== this.previousHasPartner) {
+              this.previousHasPartner = hasPartner;
+              this.updateTimelinesEmittedEvent();
+              return;
+            }
+            this.previousHasPartner = hasPartner;
 
             const timeline = res.timeline;
             const financialRecords = res.financialRecords;

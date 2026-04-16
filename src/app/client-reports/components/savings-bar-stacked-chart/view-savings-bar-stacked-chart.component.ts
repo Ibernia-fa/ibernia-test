@@ -292,7 +292,7 @@ export class ViewSavingsBarStackedChartComponent implements OnChanges, OnDestroy
         },
         labels: {
           formatter: (value: any) => {
-            return value?.toLocaleString();
+            return value != null ? Number(value).toLocaleString(undefined, { maximumFractionDigits: 0 }) : '';
           }
         }
       }
@@ -488,7 +488,7 @@ export class ViewSavingsBarStackedChartComponent implements OnChanges, OnDestroy
     }
     const code = this.client?.clientDetails?.preferredCurrency;
     if (!code || code.length !== 3) {
-      return value.toLocaleString();
+      return value.toLocaleString(undefined, { maximumFractionDigits: 0 });
     }
     try {
       return new Intl.NumberFormat(undefined, {
@@ -498,7 +498,7 @@ export class ViewSavingsBarStackedChartComponent implements OnChanges, OnDestroy
         maximumFractionDigits: 0,
       }).format(value);
     } catch {
-      return value.toLocaleString();
+      return value.toLocaleString(undefined, { maximumFractionDigits: 0 });
     }
   }
 }

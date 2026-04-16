@@ -10,6 +10,13 @@ export function localeFromAppLanguage(lang: string | undefined): string {
 /** `useGrouping: 'always'` is valid in modern runtimes but not yet in ES2022 typings. */
 export const APP_DISPLAY_NUMBER_FORMAT = {
   minimumFractionDigits: 0,
+  maximumFractionDigits: 0,
+  useGrouping: 'always',
+} as unknown as Intl.NumberFormatOptions;
+
+/** Input fields keep up to 2 decimals so users can type precise amounts. */
+export const APP_INPUT_NUMBER_FORMAT = {
+  minimumFractionDigits: 0,
   maximumFractionDigits: 2,
   useGrouping: 'always',
 } as unknown as Intl.NumberFormatOptions;

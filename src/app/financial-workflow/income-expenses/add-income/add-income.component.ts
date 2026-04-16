@@ -1469,6 +1469,14 @@ export class AddIncomeComponent {
 
   private findRetirementAgeEventForPerson(isPartner: boolean): any | null {
     const events = this.eventsList ?? [];
+    const expectedIcon = isPartner
+      ? 'partner-retirement-age-icon'
+      : 'retirement-age-icon';
+    const byIcon = events.find(
+      (e: any) =>
+        e?.iconUrl === expectedIcon && !!e?.isPartnerEvent === isPartner,
+    );
+    if (byIcon) return byIcon;
     return (
       events.find(
         (e: any) =>
@@ -1562,8 +1570,9 @@ export class AddIncomeComponent {
   }
 
   /**
-   * When editing a default income whose start/end was not persisted (or was
-   * cleared), re-apply the expected defaults so the selects are never blank.
+   * When editing a default income whose start/end was not persisted, cleared,
+   * or references a deleted event, re-apply the expected defaults so the
+   * selects are never blank.
    */
   private hydrateDefaultIncomeStartEndIfMissing(): void {
     if (!this.isEditWorkflow || !this.selectedIncome) return;
@@ -1571,9 +1580,9 @@ export class AddIncomeComponent {
     const desc = this.selectedIncome.description ?? '';
     const startCtrl = this.incomeForm.get('start');
     const endCtrl = this.incomeForm.get('end');
-    const startEmpty = startCtrl?.value == null || startCtrl.value === '';
-    const endEmpty = endCtrl?.value == null || endCtrl.value === '';
-    if (!startEmpty && !endEmpty) return;
+    const startStale = this.isFormDateMissingOrStale(startCtrl?.value);
+    const endStale = this.isFormDateMissingOrStale(endCtrl?.value);
+    if (!startStale && !endStale) return;
 
     const isSalary = isClientSalaryApiDescription(desc) || isPartnerSalaryApiDescription(desc);
     const isPension = isClientStatePensionApiDescription(desc) || isPartnerStatePensionApiDescription(desc);
@@ -1584,20 +1593,36 @@ export class AddIncomeComponent {
     const retirementEvt = this.findRetirementAgeEventForPerson(isPartner);
 
     if (isSalary) {
-      if (startEmpty) startCtrl!.patchValue(this.currentYear);
-      if (endEmpty) {
+      if (startStale) startCtrl!.patchValue(this.currentYear);
+      if (endStale) {
         endCtrl!.patchValue(
           retirementEvt?.id ? 'event:' + retirementEvt.id : this.retirementYear,
         );
       }
     } else {
-      if (startEmpty) {
+      if (startStale) {
         startCtrl!.patchValue(
           retirementEvt?.id ? 'event:' + retirementEvt.id : this.retirementYear,
         );
       }
-      if (endEmpty) endCtrl!.patchValue(this.forecastEndYear);
+      if (endStale) endCtrl!.patchValue(this.forecastEndYear);
     }
+  }
+
+  /**
+   * A form date value is "missing or stale" when:
+   * - null / empty string
+   * - an event reference whose ID no longer exists in the events list
+   * - a non-positive or non-finite number
+   */
+  private isFormDateMissingOrStale(value: any): boolean {
+    if (value == null || value === '') return true;
+    const eventId = extractEventId(value);
+    if (eventId) {
+      return !(this.eventsList ?? []).some((e: any) => e?.id === eventId);
+    }
+    const year = Number(value);
+    return !Number.isFinite(year) || year <= 0;
   }
 
   private setupBonusControlHandlers(): void {
