@@ -1,12 +1,17 @@
 import {
   afterNextRender,
   Component,
+  DestroyRef,
   ElementRef,
+  inject,
   Inject,
   Injector,
   OnDestroy,
+  OnInit,
   ViewChild,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { catchError, of, take } from 'rxjs';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -48,6 +53,7 @@ import {
 import { resolveEscalationMatch } from 'src/app/shared/utils/escalation-rate-utils';
 import { getStartEndDurationLabel } from 'src/app/shared/utils/start-end-duration-label';
 import { extractEventId, resolveYear } from 'src/app/shared/utils/event-date-utils';
+import { TimelineHttpService } from '../../timeline/services/timeline-http.service';
 
 @Component({
   selector: 'simulate-emergency',
@@ -74,7 +80,9 @@ import { extractEventId, resolveYear } from 'src/app/shared/utils/event-date-uti
   templateUrl: './simulate-emergency.component.html',
   styleUrl: './simulate-emergency.component.scss',
 })
-export class SimulateEmergencyComponent implements OnDestroy {
+export class SimulateEmergencyComponent implements OnInit, OnDestroy {
+  private readonly destroyRef = inject(DestroyRef);
+
   @ViewChild('amountInput') amountInput?: ElementRef<HTMLInputElement>;
   @ViewChild('stoppedIncomeSelect') stoppedIncomeSelect?: MatSelect;
   onAmountInput(rawValue: string) {
@@ -166,6 +174,7 @@ export class SimulateEmergencyComponent implements OnDestroy {
     @Inject(MAT_DIALOG_DATA) public data: any,
     private fb: FormBuilder,
     private emergenciesHttpService: EmergenciesHttpService,
+    private timelineHttpService: TimelineHttpService,
     private toastr: ToastrService,
     private translate: TranslateService,
     private injector: Injector,
@@ -235,8 +244,9 @@ export class SimulateEmergencyComponent implements OnDestroy {
     if (stopIncomeInitial) { // allow 0 or more
       amountControl?.setValidators([Validators.required, Validators.min(0)]);
       incomeControl?.setValidators([Validators.required]);
-    } else { // must be > 0
-      amountControl?.setValidators([Validators.required, Validators.min(1)]);
+    } else {
+      // Allow 0: user can simulate “no expense” but still see the emergency year on the chart.
+      amountControl?.setValidators([Validators.required, Validators.min(0)]);
       incomeControl?.clearValidators();
       incomeControl?.setValue(null);
     }
@@ -254,11 +264,12 @@ export class SimulateEmergencyComponent implements OnDestroy {
             amountControl?.setValue(0, { emitEvent: false });
           }
         } else {
-          amountControl?.setValidators([Validators.required, Validators.min(1)]);
+          amountControl?.setValidators([Validators.required, Validators.min(0)]);
           incomeControl?.clearValidators();
           incomeControl?.setValue(null);
 
-          if (!amountControl?.value) {
+          const v = amountControl?.value;
+          if (v === null || v === undefined || v === '') {
             amountControl?.setValue(null, { emitEvent: false });
           }
         }
@@ -277,6 +288,26 @@ export class SimulateEmergencyComponent implements OnDestroy {
     } else if (this.isLifeInsurance(this.emergency)) {
       this.applyLifeInsuranceDefaults();
     }
+  }
+
+  ngOnInit(): void {
+    const cfId = this.cashflow?.id;
+    if (!cfId) return;
+
+    this.timelineHttpService
+      .getTimelineWithLinkedFinancialRecordsByCashflowId(cfId)
+      .pipe(
+        take(1),
+        takeUntilDestroyed(this.destroyRef),
+        catchError(() => of(null)),
+      )
+      .subscribe((response) => {
+        if (!response?.timeline) return;
+        this.timeline = response.timeline;
+        this.eventsList = (this.timeline?.clientEvents ?? []).sort(
+          (a, b) => (a.start?.year ?? 0) - (b.start?.year ?? 0),
+        );
+      });
   }
 
   private isLifeInsurance(emergency: Emergency): boolean {
@@ -557,10 +588,11 @@ export class SimulateEmergencyComponent implements OnDestroy {
             this.activeTab = 'simulated';
             this.displayedReport = this.simulationResult;
             const startVal = this.simulateEmergencyForm.get('start')?.value;
-            this.completedEmergencyHighlightYear =
-              typeof startVal === 'number' && Number.isFinite(startVal)
-                ? startVal
-                : null;
+            const y =
+              startVal === null || startVal === undefined || startVal === ''
+                ? NaN
+                : Number(startVal);
+            this.completedEmergencyHighlightYear = Number.isFinite(y) ? y : null;
           },
           error: (err: any) => {
             this.isSimulating = false;
@@ -751,7 +783,7 @@ export class SimulateEmergencyComponent implements OnDestroy {
       amountCtrl?.setValidators([Validators.required, Validators.min(0)]);
       incomeCtrl?.setValidators([Validators.required]);
     } else {
-      amountCtrl?.setValidators([Validators.required, Validators.min(1)]);
+      amountCtrl?.setValidators([Validators.required, Validators.min(0)]);
       incomeCtrl?.clearValidators();
     }
     amountCtrl?.updateValueAndValidity({ emitEvent: false });
@@ -764,7 +796,7 @@ export class SimulateEmergencyComponent implements OnDestroy {
         { stopIncome: false, stoppedIncomeId: null },
         { emitEvent: false },
       );
-      amountCtrl?.setValidators([Validators.required, Validators.min(1)]);
+      amountCtrl?.setValidators([Validators.required, Validators.min(0)]);
       incomeCtrl?.clearValidators();
       amountCtrl?.updateValueAndValidity({ emitEvent: false });
       incomeCtrl?.updateValueAndValidity({ emitEvent: false });
@@ -832,8 +864,10 @@ export class SimulateEmergencyComponent implements OnDestroy {
   }
 
   private buildEmergencySeries(report: any, year: string, amount: number): any {
-    const emergencyData: number[] = report.categories.map((category: string) =>
-      category === year ? amount : 0
+    const y = String(year);
+    const emergencyData: number[] = report.categories.map(
+      (category: string | number) =>
+        String(category) === y ? amount : 0,
     );
 
     return {

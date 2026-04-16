@@ -784,6 +784,62 @@ export class EmergenciesComponent implements OnInit {
         (x) => x.emergencyId == emergency.id,
       ) ?? null;
 
+    const openDialog = (timeline: FinancialTimeline) => {
+      const dialogRef = this.dialog.open(SimulateEmergencyComponent, {
+        width: '612px',
+        disableClose: true,
+        data: {
+          client: this.selectedClient,
+          cashflow: this.selectedCashflow,
+          clientPreferredCurrency: this.clientData?.preferredCurrency,
+          clientBirthDate: this.clientData?.birthDate,
+          emergency,
+          emergencyExpense,
+          amountCycles: this.amountCyclesAll,
+          escalationRates: this.escalationRates,
+          timeline,
+          eventsList: (timeline?.clientEvents ?? []).sort(
+            (a, b) => (a.start?.year ?? 0) - (b.start?.year ?? 0),
+          ),
+          incomes: this.incomeExpense?.incomes,
+          forecastEndDate: timeline.forecastEndtDate,
+          forecastStartDate: timeline.forecastStartDate,
+          forecastEndDateYear: moment(timeline.forecastEndtDate).year(),
+          forecastStartDateYear: moment(timeline.forecastStartDate).year(),
+          planDuration: this.selectedCashflow?.planDuration,
+        },
+      });
+
+      dialogRef
+        .afterClosed()
+        .subscribe((updatedExpense: SimulateEmergencyModel | null) => {
+          if (!updatedExpense) return;
+
+          if (this.stats != null) {
+            this.stats.emergencyExpenses ??= [];
+
+            const index =
+              this.stats?.emergencyExpenses.findIndex(
+                (x) => x.emergencyId === updatedExpense.emergencyId,
+              ) ?? -1;
+
+            if (index > -1) {
+              this.stats.emergencyExpenses[index] = updatedExpense;
+            } else {
+              this.stats?.emergencyExpenses.push(updatedExpense);
+            }
+          }
+          this.cdr.markForCheck();
+        });
+    };
+
+    // Open immediately when the page already has a timeline (avoids waiting on HTTP).
+    // The dialog refreshes linked financing events in its own ngOnInit.
+    if (this.timeline) {
+      openDialog(this.timeline);
+      return;
+    }
+
     this.timelineHttpService
       .getTimelineWithLinkedFinancialRecordsByCashflowId(this.cashflowId)
       .pipe(
@@ -799,53 +855,7 @@ export class EmergenciesComponent implements OnInit {
           );
         }
         if (!this.timeline) return;
-
-        const dialogRef = this.dialog.open(SimulateEmergencyComponent, {
-          width: '612px',
-          disableClose: true,
-          data: {
-            client: this.selectedClient,
-            cashflow: this.selectedCashflow,
-            clientPreferredCurrency: this.clientData?.preferredCurrency,
-            clientBirthDate: this.clientData?.birthDate,
-            emergency,
-            emergencyExpense,
-            amountCycles: this.amountCyclesAll,
-            escalationRates: this.escalationRates,
-            timeline: this.timeline,
-            eventsList: (this.timeline?.clientEvents ?? []).sort(
-              (a, b) => (a.start?.year ?? 0) - (b.start?.year ?? 0),
-            ),
-            incomes: this.incomeExpense?.incomes,
-            forecastEndDate: this.timeline.forecastEndtDate,
-            forecastStartDate: this.timeline.forecastStartDate,
-            forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
-            forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
-            planDuration: this.selectedCashflow?.planDuration,
-          },
-        });
-
-        dialogRef
-          .afterClosed()
-          .subscribe((updatedExpense: SimulateEmergencyModel | null) => {
-            if (!updatedExpense) return;
-
-            if (this.stats != null) {
-              this.stats.emergencyExpenses ??= [];
-
-              const index =
-                this.stats?.emergencyExpenses.findIndex(
-                  (x) => x.emergencyId === updatedExpense.emergencyId,
-                ) ?? -1;
-
-              if (index > -1) {
-                this.stats.emergencyExpenses[index] = updatedExpense;
-              } else {
-                this.stats?.emergencyExpenses.push(updatedExpense);
-              }
-            }
-            this.cdr.markForCheck();
-          });
+        openDialog(this.timeline);
       });
   }
 

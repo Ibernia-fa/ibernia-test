@@ -218,6 +218,12 @@ export class SavingsBarStackedChartComponent
           dataPointSelection: () => undefined,
           mounted: (chartContext: any) => this.postRenderSetup(chartContext),
           updated: (chartContext: any) => this.postRenderSetup(chartContext),
+          /**
+           * After `updateSeries` (Before/After tab), `updated` runs while bar morph is still in progress,
+           * so DOM bar width is tiny and the simulation year band looked like a hairline. Re-run
+           * overlays when dynamic animation finishes so measurements match final bar geometry.
+           */
+          animationEnd: (chartContext: any) => this.postRenderSetup(chartContext),
         },
         selection: {
           enabled: false,
@@ -979,6 +985,26 @@ export class SavingsBarStackedChartComponent
         index = report.categories.findIndex(
           (c) => Number(c) === y || String(c) === String(y),
         );
+        // Plan columns may start after the selected calendar year, or labels may not match exactly.
+        if (index < 0 && report.categories.length > 0) {
+          const numericCats = report.categories.map((c) => Number(c));
+          let best = -1;
+          for (let i = 0; i < numericCats.length; i++) {
+            if (Number.isFinite(numericCats[i]) && numericCats[i] >= y) {
+              best = i;
+              break;
+            }
+          }
+          if (best < 0) {
+            for (let i = numericCats.length - 1; i >= 0; i--) {
+              if (Number.isFinite(numericCats[i]) && numericCats[i] <= y) {
+                best = i;
+                break;
+              }
+            }
+          }
+          index = best >= 0 ? best : 0;
+        }
       }
     }
     if (index < 0) return [];
@@ -1067,6 +1093,12 @@ export class SavingsBarStackedChartComponent
     );
     if (!allSeries.length) return;
 
+    const hostRect = chartHost.getBoundingClientRect();
+    const gridEl = chartHost.querySelector<SVGElement>('.apexcharts-grid');
+    const gridRect = gridEl?.getBoundingClientRect();
+    const processed = this.getProcessedReport();
+    const catCount = processed?.categories?.length ?? 0;
+
     // Locate bar center-X and width at the target column
     let barCenterX = 0;
     let barWidth = 30;
@@ -1082,13 +1114,27 @@ export class SavingsBarStackedChartComponent
       const rect = bar.getBoundingClientRect();
       if (rect.width === 0) return;
       barCenterX = rect.left + rect.width / 2;
-      barWidth = rect.width;
+      // During Apex morph animation, width can be a fraction of a pixel; keep the band readable.
+      barWidth = Math.max(rect.width, 22);
       foundBar = true;
     });
 
-    if (!foundBar) return;
+    // Emergency cost 0 on an early year often leaves no visible bar paths (all stacks ~0),
+    // so every path reports width 0 and the overlay was skipped — fall back to grid column geometry.
+    if (
+      !foundBar &&
+      gridRect &&
+      catCount > 0 &&
+      dataPointIndex >= 0 &&
+      dataPointIndex < catCount
+    ) {
+      const cell = gridRect.width / catCount;
+      barCenterX = gridRect.left + (dataPointIndex + 0.5) * cell;
+      barWidth = Math.max(22, cell * 0.65);
+      foundBar = true;
+    }
 
-    const hostRect = chartHost.getBoundingClientRect();
+    if (!foundBar) return;
 
     // Ensure host is a positioning context
     if (getComputedStyle(chartHost).position === 'static') {
@@ -1096,8 +1142,6 @@ export class SavingsBarStackedChartComponent
     }
 
     // Use the grid rect for exact plot-area bounds (excludes axis labels)
-    const gridEl = chartHost.querySelector<SVGElement>('.apexcharts-grid');
-    const gridRect = gridEl?.getBoundingClientRect();
     const plotTop = gridRect ? gridRect.top - hostRect.top : 10;
     const plotBottom = gridRect
       ? gridRect.bottom - hostRect.top
