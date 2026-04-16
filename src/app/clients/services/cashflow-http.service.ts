@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { ReportScenarioPayload } from 'src/app/financial-workflow/reports/services/reports-http.service';
 import { Cashflow } from '../models/cashflow';
 
 @Injectable({
@@ -48,4 +49,6 @@ export interface CreateFromScenarioRequest {
   PlanUntilDate?: string;
   SavingPotId?: string | null;
   ReturnRateOverride?: number | null;
+  /** Same payload as Scenario Lab chart / POST .../scenario — persisted onto the new plan when supported by the API. */
+  ScenarioSnapshot?: ReportScenarioPayload;
 }
