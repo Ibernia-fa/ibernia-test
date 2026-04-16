@@ -83,6 +83,8 @@ export class LegacyComponent
   @ViewChild('familyTree') familyTreeRef?: ElementRef<HTMLElement>;
   @ViewChild('childrenSection') childrenSectionRef?: ElementRef<HTMLElement>;
   @ViewChild('heartChildrenLine') heartChildrenLineRef?: ElementRef<HTMLElement>;
+  @ViewChild('clientBranch') clientBranchRef?: ElementRef<HTMLElement>;
+  @ViewChild('partnerBranch') partnerBranchRef?: ElementRef<HTMLElement>;
 
   isLoading = false;
   dashboard: LegacyDashboardModel | null = null;
@@ -587,6 +589,7 @@ export class LegacyComponent
     if (this.rafId !== null) cancelAnimationFrame(this.rafId);
     this.rafId = requestAnimationFrame(() => {
       this.rafId = null;
+      this.balanceBranches();
       this.updateCoupleLine();
       this.updateParentPairLine(
         this.clientParentsPairRef,
@@ -742,25 +745,27 @@ export class LegacyComponent
     if (!branchParentsRef?.nativeElement || !lineRef?.nativeElement) return;
 
     const container = branchParentsRef.nativeElement;
-    const heart = container.querySelector(
-      '.new-heart-icon-sm',
-    ) as HTMLElement;
     const estate = container.querySelector(
       '.parent-estate',
     ) as HTMLElement;
-    if (!heart || !estate) return;
+    if (!estate) return;
+
+    const heart = container.querySelector('.new-heart-icon-sm') as HTMLElement;
+    const anchor = (heart ??
+      container.querySelector('.couple-pair .tree-node')) as HTMLElement;
+    if (!anchor) return;
 
     const containerRect = container.getBoundingClientRect();
-    const heartRect = heart.getBoundingClientRect();
+    const anchorRect = anchor.getBoundingClientRect();
     const estateRect = estate.getBoundingClientRect();
 
-    const heartCenterX =
-      heartRect.left + heartRect.width / 2 - containerRect.left;
-    const top = heartRect.bottom - containerRect.top;
+    const anchorCenterX =
+      anchorRect.left + anchorRect.width / 2 - containerRect.left;
+    const top = anchorRect.bottom - containerRect.top;
     const bottom = estateRect.top - containerRect.top;
 
     const line = lineRef.nativeElement;
-    this.renderer.setStyle(line, 'left', `${heartCenterX}px`);
+    this.renderer.setStyle(line, 'left', `${anchorCenterX}px`);
     this.renderer.setStyle(line, 'top', `${top}px`);
     this.renderer.setStyle(
       line,
@@ -835,6 +840,30 @@ export class LegacyComponent
       'height',
       `${Math.max(0, vlineTop - anchorBottom + 1)}px`,
     );
+  }
+
+  private balanceBranches(): void {
+    const clientPair = this.clientParentsPairRef?.nativeElement;
+    const partnerPair = this.partnerParentsPairRef?.nativeElement;
+    const clientBranch = this.clientBranchRef?.nativeElement;
+    const partnerBranch = this.partnerBranchRef?.nativeElement;
+
+    if (clientPair) this.renderer.removeStyle(clientPair, 'margin-bottom');
+    if (partnerPair) this.renderer.removeStyle(partnerPair, 'margin-bottom');
+
+    if (!clientPair || !partnerPair || !clientBranch || !partnerBranch) return;
+
+    const clientHeight = clientBranch.offsetHeight;
+    const partnerHeight = partnerBranch.offsetHeight;
+    const diff = Math.abs(clientHeight - partnerHeight);
+
+    if (diff < 1) return;
+
+    if (clientHeight > partnerHeight) {
+      this.renderer.setStyle(partnerPair, 'margin-bottom', `${diff}px`);
+    } else {
+      this.renderer.setStyle(clientPair, 'margin-bottom', `${diff}px`);
+    }
   }
 
   private clearScenario(): void {

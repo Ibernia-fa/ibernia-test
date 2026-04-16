@@ -2,7 +2,9 @@
   <!-- Header row -->
   <mat-card class="ibr-new-dashboad-card">
     <mat-card-content>
-      <div class="d-flex align-items-center justify-content-between">
+      <div
+        class="d-flex align-items-center justify-content-between gap-16 flex-wrap"
+      >
         <div class="d-flex flex-column gap-10">
           <h3 class="ibr-new-heading">{{ "Family Tree" | translate }}</h3>
           <p class="ibr-new-subheading legacy-family-tree-intro">
@@ -10,13 +12,7 @@
             {{ "LEGACY.FAMILY_TREE_SUBTITLE_LINE2" | translate }}
           </p>
         </div>
-        <!-- <div>
-          <h2 class="section-title">{{ 'Family Tree' | translate }}</h2>
-          <p class="section-subtitle">
-            Build your family tree and click on each member to<br />
-            visualize how wealth flows across generations
-          </p>
-        </div> -->
+
         <div class="d-flex gap-12">
           <button class="button-icon-outline" (click)="onOpenTaxSettings()">
             <span class="f-s-16 f-w-500">{{ "Tax settings" | translate }}</span>
@@ -92,6 +88,7 @@
           <div
             class="family-branch"
             [class.family-branch--flex-grow]="familyBranchUseFlexGrow"
+            #clientBranch
           >
             <!-- Client parents couple -->
             <div
@@ -186,11 +183,7 @@
                 </div>
                 <mat-icon class="edit-sm">edit</mat-icon>
               </div>
-              <div
-                class="heart-estate-vline"
-                *ngIf="clientParents.length > 1"
-                #clientHeartEstateLine
-              ></div>
+              <div class="heart-estate-vline" #clientHeartEstateLine></div>
             </div>
 
             <!-- Vertical drop from parents -->
@@ -325,7 +318,7 @@
                     class="node-name"
                     [class.strikethrough]="isDeceased(cm.id)"
                   >
-                    {{ cm.firstName }} {{ cm.lastName }}
+                    {{ cm.firstName }}<br />{{ cm.lastName }}
                   </span>
                   <span
                     class="node-amount"
@@ -448,6 +441,7 @@
             class="family-branch"
             *ngIf="hasPartner"
             [class.family-branch--flex-grow]="familyBranchUseFlexGrow"
+            #partnerBranch
           >
             <!-- Partner parents couple -->
             <div
@@ -542,11 +536,7 @@
                 </div>
                 <mat-icon class="edit-sm">edit</mat-icon>
               </div>
-              <div
-                class="heart-estate-vline"
-                *ngIf="partnerParents.length > 1"
-                #partnerHeartEstateLine
-              ></div>
+              <div class="heart-estate-vline" #partnerHeartEstateLine></div>
             </div>
 
             <!-- Vertical drop from parents -->
@@ -626,7 +616,7 @@
                     class="node-name"
                     [class.strikethrough]="isDeceased(pm.id)"
                   >
-                    {{ pm.firstName }} {{ pm.lastName }}
+                    {{ pm.firstName }}<br />{{ pm.lastName }}
                   </span>
                   <span
                     class="node-amount partner-amount"
