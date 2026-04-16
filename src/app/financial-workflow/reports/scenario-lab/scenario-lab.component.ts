@@ -1443,22 +1443,18 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
       });
       dialogRef.afterClosed().subscribe((newName: string | undefined) => {
         if (!newName?.trim()) return;
-        const birthYear = new Date(
-          this.client!.clientDetails.birthDate,
-        ).getFullYear();
-        const retirementAge =
-          Number(this.scenarioForm.get('retirementAge')?.value) || 65;
-        const planUntilDate = new Date(
-          birthYear + retirementAge,
-          11,
-          31,
-        ).toISOString();
+        const scenarioSnapshot = this.buildScenarioPayload();
+        if (!scenarioSnapshot) {
+          this.toastr.error(
+            this.translate.instant('ERROR.FAILED_LOAD_SCENARIO_LAB'),
+            this.translate.instant('LABEL.ERROR'),
+          );
+          return;
+        }
         const request = {
           SourceCashflowId: this.cashflowId,
           NewPlanName: newName.trim(),
-          InflationRate:
-            Number(this.scenarioForm.get('inflationRate')?.value) ?? undefined,
-          PlanUntilDate: planUntilDate,
+          ScenarioSnapshot: scenarioSnapshot,
         };
         this.isLoaderVisible = true;
         this.cashflowHttpService
