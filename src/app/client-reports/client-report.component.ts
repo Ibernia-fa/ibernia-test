@@ -6,10 +6,12 @@ import { ToastrService } from 'ngx-toastr';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ViewReportHttpService } from './services/view-report-http.service';
 import { ViewReportPasswordComponent } from './components/view-report-password/view-report-password.component';
 import { ViewReportComponent } from './components/view-report/view-report.component';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { getTranslations } from '@/lib/translations';
 
 @Component({
   selector: 'app-client-report',
@@ -39,6 +41,12 @@ export class ClientReportComponent {
   lifetimePlanName: string;
   advisorName: string;
 
+  /** i18n key paths from {@link getTranslations}; strings resolved with TranslateService. */
+  protected readonly welcomeModalKeys = getTranslations('en').clientReport.welcomeModal;
+
+  welcomeBodyPrimaryHtml: SafeHtml = '';
+  welcomeBodyDisclaimerHtml: SafeHtml = '';
+
   consumerQuestion = '';
   consumerAnswer: string | null = null;
   consumerError: string | null = null;
@@ -53,6 +61,7 @@ export class ClientReportComponent {
     private activatedRoute: ActivatedRoute,
     private toastr: ToastrService,
     private translate: TranslateService,
+    private sanitizer: DomSanitizer,
   ) { }
 
   ngOnInit(): void {
@@ -131,6 +140,8 @@ export class ClientReportComponent {
         this.lifetimePlanName = this.financialSeries?.cashflow?.name;
         this.advisorName = this.financialSeries?.client?.financialAdvisor?.advisorName;
 
+        this.prepareWelcomeModalContent();
+
         // show welcome popup
           if(this.lifetimePlanName && this.advisorName){
             this.dialog.open(this.welcomeDialog, {
@@ -165,6 +176,28 @@ export class ClientReportComponent {
   onContinue(): void {
     this.isAuthenticated = true;
     this.isLoaderVisible = false;
+  }
+
+  private prepareWelcomeModalContent(): void {
+    const first = (this.advisorName?.trim().split(/\s+/)[0] ?? '').trim();
+    const advisorBold = `<strong>${this.escapeHtml(first)}</strong>`;
+    const params = { advisorBold };
+    const keys = this.welcomeModalKeys;
+    this.welcomeBodyPrimaryHtml = this.sanitizer.bypassSecurityTrustHtml(
+      this.translate.instant(keys.bodyPrimary, params)
+    );
+    this.welcomeBodyDisclaimerHtml = this.sanitizer.bypassSecurityTrustHtml(
+      this.translate.instant(keys.bodyDisclaimer, params)
+    );
+  }
+
+  private escapeHtml(text: string): string {
+    return text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
   }
 
   onConsumerAsk(): void {

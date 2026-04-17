@@ -1,7 +1,7 @@
 <div class="learn-inflation w-100 h-100 d-flex flex-column" [attr.data-view]="view()">
   <!-- Header -->
   <div class="learn-inflation__header">
-    @if (view() === 'causes') {
+    @if (view() !== 'impact') {
       <button
         type="button"
         mat-icon-button
@@ -87,6 +87,10 @@
                 }}
               </span>
             </div>
+
+            <p class="impact-supporting-copy">
+              {{ "LEARN_INFLATION.SUPPORTING_COPY" | translate }}
+            </p>
           </aside>
 
           <!-- RIGHT: chart -->
@@ -112,30 +116,54 @@
         </div>
 
         <div class="learn-inflation__footer">
-          <button
-            type="button"
-            class="learn-inflation__cta"
-            (click)="goToCauses()"
-          >
-            <span>{{ "LEARN_INFLATION.WHAT_CAUSES_BTN" | translate }}</span>
-            <svg
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-              aria-hidden="true"
+          <div class="learn-inflation__cta-group">
+            <button
+              type="button"
+              class="learn-inflation__cta"
+              (click)="goToCauses()"
             >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M17 8l4 4m0 0l-4 4m4-4H3"
-              ></path>
-            </svg>
-          </button>
+              <span>{{ "LEARN_INFLATION.WHAT_CAUSES_BTN" | translate }}</span>
+              <svg
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M17 8l4 4m0 0l-4 4m4-4H3"
+                ></path>
+              </svg>
+            </button>
+
+            <button
+              type="button"
+              class="learn-inflation__cta"
+              (click)="goToCountries()"
+            >
+              <span>{{ "LEARN_INFLATION.COUNTRIES_BTN" | translate }}</span>
+              <svg
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M17 8l4 4m0 0l-4 4m4-4H3"
+                ></path>
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
-    } @else {
+    } @else if (view() === 'causes') {
       <div class="learn-inflation__page learn-inflation__page--causes">
         <header class="causes-header">
           <h1 class="causes-header__title">
@@ -226,6 +254,85 @@
             </article>
           }
         </div>
+      </div>
+    } @else {
+      <div class="learn-inflation__page learn-inflation__page--countries">
+        <header class="countries-header">
+          <h1 class="countries-header__title">
+            {{ "LEARN_INFLATION.COUNTRIES_TITLE" | translate }}
+          </h1>
+          <p class="countries-header__intro">
+            {{ "LEARN_INFLATION.COUNTRIES_INTRO" | translate }}
+          </p>
+        </header>
+
+        <section class="countries-chart-wrap">
+          <div class="countries-chart">
+            <apx-chart
+              [series]="countriesChartOptions().series"
+              [chart]="countriesChartOptions().chart"
+              [xaxis]="countriesChartOptions().xaxis"
+              [yaxis]="countriesChartOptions().yaxis"
+              [stroke]="countriesChartOptions().stroke"
+              [colors]="countriesChartOptions().colors"
+              [tooltip]="countriesChartOptions().tooltip"
+              [legend]="countriesChartOptions().legend"
+              [grid]="countriesChartOptions().grid"
+              [dataLabels]="countriesChartOptions().dataLabels"
+              [markers]="countriesChartOptions().markers"
+            ></apx-chart>
+          </div>
+          <p class="countries-footnote">
+            {{ "LEARN_INFLATION.COUNTRIES_FOOTNOTE" | translate }}
+          </p>
+        </section>
+
+        <section class="countries-latest" aria-labelledby="countries-latest-title">
+          <h2 id="countries-latest-title" class="countries-latest__title">
+            {{ "LEARN_INFLATION.COUNTRIES_LATEST_TITLE" | translate }}
+          </h2>
+          <div class="countries-latest__row">
+            @for (rate of latestCountryRates; track rate.countryKey) {
+              <div class="latest-pill">
+                <span
+                  class="latest-pill__dot"
+                  [style.background]="rate.color"
+                  aria-hidden="true"
+                ></span>
+                <div class="latest-pill__content">
+                  <span class="latest-pill__country">
+                    {{ rate.countryKey | translate }}
+                  </span>
+                  <span class="latest-pill__period">
+                    {{ rate.periodKey | translate }}
+                  </span>
+                </div>
+                <span class="latest-pill__value">
+                  {{ formatPercent(rate.value) }}
+                </span>
+              </div>
+            }
+          </div>
+        </section>
+
+        <footer class="countries-sources">
+          <span class="countries-sources__label">
+            {{ "LEARN_INFLATION.SOURCES_LABEL" | translate }}:
+          </span>
+          @for (source of countrySources; track source.url; let last = $last) {
+            <a
+              class="countries-sources__link"
+              [href]="source.url"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {{ source.label }}
+            </a>
+            @if (!last) {
+              <span class="countries-sources__sep" aria-hidden="true">·</span>
+            }
+          }
+        </footer>
       </div>
     }
   </mat-dialog-content>

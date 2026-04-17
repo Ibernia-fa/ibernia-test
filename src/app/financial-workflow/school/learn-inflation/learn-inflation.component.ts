@@ -35,7 +35,7 @@ export interface LearnInflationDialogData {
   currencyCode?: string;
 }
 
-export type LearnInflationView = 'impact' | 'causes';
+export type LearnInflationView = 'impact' | 'causes' | 'countries';
 
 export interface InflationCause {
   iconKey: 'demand' | 'cost' | 'builtIn';
@@ -43,9 +43,77 @@ export interface InflationCause {
   descriptionKey: string;
 }
 
+export interface CountryInflationLatest {
+  countryKey: string;
+  value: number;
+  periodKey: string;
+  color: string;
+}
+
+export interface CountrySource {
+  labelKey?: string;
+  label?: string;
+  url: string;
+}
+
 const YEAR_POINTS = [0, 5, 10, 15, 20];
 const ACCENT = '#4043af';
 const ACCENT_SOFT = '#516ce8';
+
+/** Refined Ibernia palette for the cross-country chart. */
+const COUNTRY_COLORS = {
+  eu: '#4043af',
+  unitedStates: '#2a2f7a',
+  japan: '#9aa3c7',
+  china: '#7d8fd8',
+} as const;
+
+const INFLATION_ACROSS_COUNTRIES_DATA = {
+  eu: [
+    { year: 2016, value: 0.2 },
+    { year: 2017, value: 1.7 },
+    { year: 2018, value: 1.9 },
+    { year: 2019, value: 1.5 },
+    { year: 2020, value: 0.7 },
+    { year: 2021, value: 2.9 },
+    { year: 2022, value: 9.2 },
+    { year: 2023, value: 6.4 },
+    { year: 2024, value: 2.6 },
+  ],
+  japan: [
+    { year: 2016, value: -0.1 },
+    { year: 2017, value: 0.5 },
+    { year: 2018, value: 1.0 },
+    { year: 2019, value: 0.5 },
+    { year: 2020, value: 0.0 },
+    { year: 2021, value: -0.3 },
+    { year: 2022, value: 2.5 },
+    { year: 2023, value: 3.3 },
+    { year: 2024, value: 2.7 },
+  ],
+  unitedStates: [
+    { year: 2016, value: 1.3 },
+    { year: 2017, value: 2.1 },
+    { year: 2018, value: 2.4 },
+    { year: 2019, value: 1.8 },
+    { year: 2020, value: 1.2 },
+    { year: 2021, value: 4.7 },
+    { year: 2022, value: 8.0 },
+    { year: 2023, value: 4.1 },
+    { year: 2024, value: 3.0 },
+  ],
+  china: [
+    { year: 2016, value: 2.0 },
+    { year: 2017, value: 1.6 },
+    { year: 2018, value: 2.1 },
+    { year: 2019, value: 2.9 },
+    { year: 2020, value: 2.5 },
+    { year: 2021, value: 0.9 },
+    { year: 2022, value: 2.0 },
+    { year: 2023, value: 0.2 },
+    { year: 2024, value: 0.2 },
+  ],
+} as const;
 
 @Component({
   selector: 'app-learn-inflation',
@@ -81,6 +149,54 @@ export class LearnInflationComponent implements OnInit {
 
   /** Which page of the educational modal is visible. */
   readonly view = signal<LearnInflationView>('impact');
+
+  readonly latestCountryRates: CountryInflationLatest[] = [
+    {
+      countryKey: 'LEARN_INFLATION.COUNTRY_EU',
+      value: 2.8,
+      periodKey: 'LEARN_INFLATION.LATEST_EU_PERIOD',
+      color: COUNTRY_COLORS.eu,
+    },
+    {
+      countryKey: 'LEARN_INFLATION.COUNTRY_US',
+      value: 3.3,
+      periodKey: 'LEARN_INFLATION.LATEST_US_PERIOD',
+      color: COUNTRY_COLORS.unitedStates,
+    },
+    {
+      countryKey: 'LEARN_INFLATION.COUNTRY_JAPAN',
+      value: 1.3,
+      periodKey: 'LEARN_INFLATION.LATEST_JAPAN_PERIOD',
+      color: COUNTRY_COLORS.japan,
+    },
+    {
+      countryKey: 'LEARN_INFLATION.COUNTRY_CHINA',
+      value: 1.0,
+      periodKey: 'LEARN_INFLATION.LATEST_CHINA_PERIOD',
+      color: COUNTRY_COLORS.china,
+    },
+  ];
+
+  readonly countrySources: CountrySource[] = [
+    {
+      label: 'Eurostat',
+      url: 'https://ec.europa.eu/eurostat/statistics-explained/SEPDF/cache/4176.pdf',
+    },
+    {
+      label: 'Eurostat data',
+      url: 'https://ec.europa.eu/eurostat/statistics-explained/images/3/38/Consumer_prices_-_inflation_2015-2024%282025-03-12%29.xlsx',
+    },
+    {
+      label: 'Euro indicators',
+      url: 'https://ec.europa.eu/eurostat/news/euro-indicators',
+    },
+    {
+      label: 'OECD',
+      url: 'https://www.oecd.org/en/data/indicators/inflation-cpi.html',
+    },
+  ];
+
+  readonly countriesChartOptions = computed(() => this.buildCountriesChartOptions());
 
   readonly causes: InflationCause[] = [
     {
@@ -187,8 +303,18 @@ export class LearnInflationComponent implements OnInit {
     this.view.set('causes');
   }
 
+  goToCountries(): void {
+    this.view.set('countries');
+  }
+
   backToImpact(): void {
     this.view.set('impact');
+  }
+
+  formatPercent(value: number): string {
+    const decimal = this.translate.currentLang === 'it' ? ',' : '.';
+    const rounded = Math.round(value * 10) / 10;
+    return `${rounded.toFixed(1).replace('.', decimal)}%`;
   }
 
   formatAmount(value: number): string {
@@ -330,6 +456,122 @@ export class LearnInflationComponent implements OnInit {
               },
             ]
           : [],
+      },
+    };
+  }
+
+  private buildCountriesChartOptions(): any {
+    const data = INFLATION_ACROSS_COUNTRIES_DATA;
+    const categories = data.eu.map((p) => String(p.year));
+    const round1 = (v: number) => Math.round(v * 10) / 10;
+
+    const series = [
+      {
+        name: this.translate.instant('LEARN_INFLATION.COUNTRY_EU'),
+        data: data.eu.map((p) => round1(p.value)),
+      },
+      {
+        name: this.translate.instant('LEARN_INFLATION.COUNTRY_US'),
+        data: data.unitedStates.map((p) => round1(p.value)),
+      },
+      {
+        name: this.translate.instant('LEARN_INFLATION.COUNTRY_JAPAN'),
+        data: data.japan.map((p) => round1(p.value)),
+      },
+      {
+        name: this.translate.instant('LEARN_INFLATION.COUNTRY_CHINA'),
+        data: data.china.map((p) => round1(p.value)),
+      },
+    ];
+
+    const colors = [
+      COUNTRY_COLORS.eu,
+      COUNTRY_COLORS.unitedStates,
+      COUNTRY_COLORS.japan,
+      COUNTRY_COLORS.china,
+    ];
+
+    const decimal = this.translate.currentLang === 'it' ? ',' : '.';
+
+    return {
+      series,
+      chart: {
+        type: 'line',
+        height: '100%',
+        fontFamily: 'Ubuntu, sans-serif',
+        toolbar: { show: false },
+        zoom: { enabled: false },
+        animations: { enabled: true, easing: 'easeinout', speed: 600 },
+        parentHeightOffset: 0,
+      },
+      colors,
+      stroke: {
+        width: 2.5,
+        curve: 'smooth',
+        lineCap: 'round',
+      },
+      dataLabels: { enabled: false },
+      markers: {
+        size: 0,
+        strokeWidth: 0,
+        hover: { size: 5 },
+      },
+      grid: {
+        borderColor: '#eef0f6',
+        strokeDashArray: 4,
+        xaxis: { lines: { show: false } },
+        yaxis: { lines: { show: true } },
+        padding: { left: 8, right: 24, top: 8, bottom: 0 },
+      },
+      xaxis: {
+        type: 'category',
+        categories,
+        axisBorder: { show: false },
+        axisTicks: { show: false },
+        labels: {
+          style: {
+            colors: '#5a596e',
+            fontSize: '12px',
+            fontFamily: 'Ubuntu, sans-serif',
+          },
+        },
+      },
+      yaxis: {
+        labels: {
+          style: {
+            colors: '#5a596e',
+            fontSize: '12px',
+            fontFamily: 'Ubuntu, sans-serif',
+          },
+          formatter: (value: number) =>
+            `${(Math.round(value * 10) / 10).toFixed(1).replace('.', decimal)}%`,
+        },
+      },
+      legend: {
+        show: true,
+        position: 'top',
+        horizontalAlign: 'right',
+        fontFamily: 'Ubuntu, sans-serif',
+        fontSize: '13px',
+        fontWeight: 500,
+        labels: { colors: '#5a596e' },
+        markers: {
+          width: 10,
+          height: 10,
+          radius: 10,
+          offsetX: -2,
+        },
+        itemMargin: { horizontal: 12, vertical: 0 },
+      },
+      tooltip: {
+        theme: 'light',
+        shared: true,
+        intersect: false,
+        x: { show: true },
+        y: {
+          formatter: (value: number) =>
+            `${(Math.round(value * 10) / 10).toFixed(1).replace('.', decimal)}%`,
+        },
       },
     };
   }
