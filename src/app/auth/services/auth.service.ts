@@ -57,6 +57,11 @@ export class AuthService {
     return this._userManager.signinRedirect();
   }
 
+  /** Forces the IdP to show the login form even if a session exists (prompt=login). */
+  public forceLogin = () => {
+    return this._userManager.signinRedirect({ prompt: 'login' });
+  }
+
   /**
    * Clears local OIDC state and starts sign-in. Used when the access token is missing or expired,
    * or when the API returns 401. Coalesces concurrent calls. Preserves return URL like AuthGuard.
