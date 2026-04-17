@@ -455,6 +455,7 @@ export class ClientListComponent implements OnInit, AfterViewInit, OnDestroy {
       width: '612px',
       maxHeight: '90vh',
       disableClose: true,
+      autoFocus: false,
     });
     dialogRef.afterClosed().subscribe((result: any) => {
       if (result?.action === 'added') {

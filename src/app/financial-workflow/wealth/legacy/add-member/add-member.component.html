@@ -69,7 +69,7 @@
               class="f-s-16 f-w-500 m-b-4 d-flex align-items-center ibr-black"
               >{{ 'Partner first name' | translate }}</mat-label
             >
-            <input matInput formControlName="firstName" />
+            <input matInput formControlName="firstName" appAutoFocus autoFocusSelect />
             @if (
               form.get('partner.firstName')?.touched &&
               form.get('partner.firstName')?.hasError('required')
@@ -197,7 +197,7 @@
             style="line-height: 16px"
             >{{ 'Name' | translate }}</mat-label
           >
-          <input matInput formControlName="name" />
+          <input matInput formControlName="name" appAutoFocus autoFocusSelect />
         </div>
       }
     </form>

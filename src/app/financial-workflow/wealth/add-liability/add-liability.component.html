@@ -74,6 +74,8 @@
             matInput
             formControlName="name"
             [placeholder]="liabilityNamePlaceholderKey | translate"
+            [appAutoFocus]="!isEditMode"
+            autoFocusSelect
           />
           @if (
             form.get("name")?.touched && form.get("name")?.hasError("required")

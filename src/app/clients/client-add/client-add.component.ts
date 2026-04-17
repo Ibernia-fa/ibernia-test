@@ -19,6 +19,7 @@ import {
 } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { AutoFocusDirective } from 'src/app/directives/auto-focus.directive';
 import { ClientHttpService } from '../services/client-http.service';
 import { Client } from '../models/client';
 import { catchError, filter, map } from 'rxjs';
@@ -88,6 +89,7 @@ class DmyDateAdapter extends NativeDateAdapter {
     MatCheckboxModule,
     MatIconModule,
     MatDividerModule,
+    AutoFocusDirective,
     TranslateModule,
   ],
   providers: [

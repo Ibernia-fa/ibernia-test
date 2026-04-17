@@ -17,6 +17,7 @@ import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/materia
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { AutoFocusDirective } from 'src/app/directives/auto-focus.directive';
 import { MatSelect, MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
 import {
@@ -98,6 +99,7 @@ class AddMemberDmyDateAdapter extends NativeDateAdapter {
     MatSelectModule,
     MatIconModule,
     MatDatepickerModule,
+    AutoFocusDirective,
     TranslateModule,
   ],
   providers: [

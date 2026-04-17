@@ -21,6 +21,7 @@ import { ClientSaving, ComissionType, SavingPotsModel } from '../../saving-pots/
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
+import { AutoFocusDirective } from 'src/app/directives/auto-focus.directive';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { getAmountCycleLabel } from 'src/app/shared/utils/amount-cycle-label';
 import { extractEventId, resolveYear } from 'src/app/shared/utils/event-date-utils';
@@ -58,6 +59,7 @@ import { getStartEndDurationLabel } from 'src/app/shared/utils/start-end-duratio
     MatCheckboxModule,
     MatProgressSpinnerModule,
     ThousandSeparatorInputDirective,
+    AutoFocusDirective,
     TranslateModule,
   ],
   providers: [provideNativeDateAdapter()],

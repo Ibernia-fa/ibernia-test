@@ -426,6 +426,7 @@ export class SavingPotsComponent implements OnInit {
     const dialogRef = this.dialog.open(AddNewPotComponent, {
       width: '612px',
       disableClose: true,
+      autoFocus: false,
       data: {
         returnRate: this.userRerturnRate,
         pensionFundReturnRate: this.pensionFundReturnRate,
@@ -523,6 +524,7 @@ export class SavingPotsComponent implements OnInit {
     const dialogRef = this.dialog.open(AddNewPotComponent, {
       width: '612px',
       disableClose: true,
+      autoFocus: false,
       data: {
         returnRate: this.userRerturnRate,
         pensionFundReturnRate: this.pensionFundReturnRate,

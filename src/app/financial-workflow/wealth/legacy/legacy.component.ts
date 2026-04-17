@@ -452,6 +452,7 @@ export class LegacyComponent
     const dialogRef = this.dialog.open(AddMemberComponent, {
       width: '612px',
       disableClose: true,
+      autoFocus: false,
       data: {
         cashflowId: this.cashflowId,
         hasPartner: this.hasPartner,

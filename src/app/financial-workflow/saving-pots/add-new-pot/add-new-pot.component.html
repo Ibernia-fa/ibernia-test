@@ -123,6 +123,8 @@
               matInput
               formControlName="customName"
               [placeholder]="namePlaceholderKey | translate"
+              appAutoFocus
+              autoFocusSelect
             />
           </div>
         }
@@ -213,6 +215,8 @@
                 thousandSeparatorInput
                 (input)="onAmountInput($event.target.value)"
                 (blur)="onAmountBlur($event)"
+                [appAutoFocus]="!isEditWorkflow && isCashTypeSelected"
+                autoFocusSelect
               />
             </div>
             <!-- End Price Field  -->

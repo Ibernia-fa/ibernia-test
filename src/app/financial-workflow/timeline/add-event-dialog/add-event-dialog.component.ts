@@ -22,6 +22,7 @@ import { allCountries } from 'src/app/clients/models/country';
 import { AgeCalculatorPipe } from 'src/app/pipe/age-calculator.pipe';
 import { CommonModule } from '@angular/common';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
+import { AutoFocusDirective } from 'src/app/directives/auto-focus.directive';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { TranslateEscalationDescriptionPipe } from 'src/app/core/pipes/translate-escalation-description.pipe';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -64,6 +65,7 @@ import { capitalizeFirstLetter } from 'src/app/shared/utils/capitalize-first-let
     MatTooltipModule,
     CommonModule,
     ThousandSeparatorInputDirective,
+    AutoFocusDirective,
     TranslateModule,
     MatCheckboxModule,
     MatProgressSpinnerModule,

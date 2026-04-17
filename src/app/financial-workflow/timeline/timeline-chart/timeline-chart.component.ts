@@ -532,6 +532,7 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
     const dialogRef = this.dialog.open(AddEventDialogComponent, {
       width: '612px',
       disableClose: true,
+      autoFocus: false,
       data: {
         eventType: dropEventType,
         amountCycles: this.amountCycles,
@@ -1243,6 +1244,7 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
     const dialogRef = this.dialog.open(AddEventDialogComponent, {
       width: '700px',
       disableClose: true,
+      autoFocus: false,
       data: {
         amountCycles: this.amountCycles,
         eventType: eventType,
@@ -1286,6 +1288,7 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
     const dialogRef = this.dialog.open(AddEventDialogComponent, {
       width: '612px',
       disableClose: true,
+      autoFocus: false,
       data: {
         eventType: EventType.CUSTOM,
         amountCycles: this.amountCycles,

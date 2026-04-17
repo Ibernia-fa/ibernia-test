@@ -1,0 +1,121 @@
+<div class="learn-inflation w-100 h-100 d-flex flex-column">
+  <!-- Header -->
+  <div class="dialog-header">
+    <h2 class="dialog-title text-center" style="text-transform: none">
+      {{ "LEARN_INFLATION.TITLE" | translate }}
+    </h2>
+    <button
+      type="button"
+      mat-icon-button
+      disableRipple
+      class="dialog-close-btn"
+      mat-dialog-close
+      aria-label="Close dialog"
+      (click)="closeDialog()"
+    >
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <p class="learn-inflation__subtitle">
+    {{ "LEARN_INFLATION.SUBTITLE" | translate }}
+  </p>
+
+  <mat-dialog-content class="learn-inflation__content">
+    <div class="learn-inflation__layout">
+      <!-- LEFT: explanation + summary -->
+      <aside class="learn-inflation__side">
+        <p class="learn-inflation__explanation">
+          {{ "LEARN_INFLATION.EXPLANATION" | translate }}
+        </p>
+
+        <div class="learn-inflation__summary">
+          <div class="summary-card">
+            <span class="summary-card__label">
+              {{ "LEARN_INFLATION.INITIAL_AMOUNT" | translate }}
+            </span>
+            <div class="summary-card__value">
+              <span class="summary-card__currency">{{ currencySymbol }}</span>
+              <span>{{ formatAmount(startingAmount()) }}</span>
+            </div>
+            <span class="summary-card__hint">
+              {{ "LEARN_INFLATION.TODAY" | translate }}
+            </span>
+          </div>
+
+          <div class="summary-card summary-card--accent">
+            <span class="summary-card__label">
+              {{ "LEARN_INFLATION.VALUE_AFTER_20Y" | translate }}
+            </span>
+            <div class="summary-card__value">
+              <span class="summary-card__currency">{{ currencySymbol }}</span>
+              <span>{{ formatAmount(endValue()) }}</span>
+            </div>
+            <span class="summary-card__hint">
+              {{
+                "LEARN_INFLATION.LOSS_NOTE"
+                  | translate: { percent: (lossPercent() | number: "1.0-1") }
+              }}
+            </span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- RIGHT: chart + inputs -->
+      <section class="learn-inflation__main">
+        <div class="learn-inflation__chart">
+          <apx-chart
+            [series]="chartOptions().series"
+            [chart]="chartOptions().chart"
+            [xaxis]="chartOptions().xaxis"
+            [yaxis]="chartOptions().yaxis"
+            [stroke]="chartOptions().stroke"
+            [colors]="chartOptions().colors"
+            [tooltip]="chartOptions().tooltip"
+            [legend]="chartOptions().legend"
+            [grid]="chartOptions().grid"
+            [dataLabels]="chartOptions().dataLabels"
+            [markers]="chartOptions().markers"
+            [fill]="chartOptions().fill"
+            [annotations]="chartOptions().annotations"
+          ></apx-chart>
+        </div>
+
+        <div class="learn-inflation__controls">
+          <div class="control">
+            <label class="control__label">
+              {{ "LEARN_INFLATION.STARTING_AMOUNT" | translate }}
+            </label>
+            <div class="control__field control__field--currency">
+              <span class="control__prefix">{{ currencySymbol }}</span>
+              <input
+                type="text"
+                inputmode="decimal"
+                placeholder="0"
+                thousandSeparatorInput
+                [formControl]="startingAmountControl"
+              />
+            </div>
+          </div>
+
+          <div class="control">
+            <label class="control__label">
+              {{ "LEARN_INFLATION.INFLATION" | translate }}
+            </label>
+            <div class="control__field control__field--percent">
+              <input
+                type="text"
+                inputmode="decimal"
+                placeholder="0"
+                [value]="inflationText()"
+                (input)="onInflationInput($any($event.target).value)"
+                (blur)="onInflationBlur()"
+              />
+              <span class="control__suffix">%</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </mat-dialog-content>
+</div>

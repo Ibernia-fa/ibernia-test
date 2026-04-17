@@ -44,6 +44,8 @@
               matInput
               formControlName="name"
               [placeholder]="'PLACEHOLDER.MEDICAL_COVER' | translate"
+              appAutoFocus
+              autoFocusSelect
             />
 
             @if (
@@ -158,6 +160,8 @@
                       formControlName="insuranceAmount"
                       placeholder="0"
                       thousandSeparatorInput
+                      [appAutoFocus]="!showNameInput"
+                      autoFocusSelect
                     />
                   </div>
 

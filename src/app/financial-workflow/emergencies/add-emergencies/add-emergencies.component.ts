@@ -27,6 +27,7 @@ import {
 import { EmergenciesHttpService } from '../services/emergencies-http.service';
 import { allCountries } from 'src/app/clients/models/country';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
+import { AutoFocusDirective } from 'src/app/directives/auto-focus.directive';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MaterialModule } from 'src/app/material.module';
 import { getAmountCycleLabel } from 'src/app/shared/utils/amount-cycle-label';
@@ -61,6 +62,7 @@ export interface AddEmergencyDialogData {
     MatButtonModule,
     MatCheckboxModule,
     ThousandSeparatorInputDirective,
+    AutoFocusDirective,
     MatButtonToggleModule,
     MaterialModule,
     TranslateModule,

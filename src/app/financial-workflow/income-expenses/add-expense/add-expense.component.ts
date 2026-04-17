@@ -18,6 +18,7 @@ import { FinancialViewModel } from '../model/income-expense';
 import { extractEventId, resolveYear } from 'src/app/shared/utils/event-date-utils';
 import { catchError, filter, finalize } from 'rxjs';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
+import { AutoFocusDirective } from 'src/app/directives/auto-focus.directive';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
 import { TranslateIncomeExpenseLabelPipe } from 'src/app/core/pipes/translate-income-expense-label.pipe';
@@ -56,6 +57,7 @@ import { capitalizeFirstLetter } from 'src/app/shared/utils/capitalize-first-let
     ReactiveFormsModule,
     CommonModule,
     ThousandSeparatorInputDirective,
+    AutoFocusDirective,
     TranslateModule,
     TranslateIncomeExpenseLabelPipe,
     TranslateEscalationDescriptionPipe,

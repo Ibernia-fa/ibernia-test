@@ -188,6 +188,7 @@ export class WithdrawalsContributionsComponent {
       const dialogRef = this.dialog.open(AddContributionComponent, {
         width: '612px',
         disableClose: true,
+        autoFocus: false,
         data: {
           eventsList: this.timeline.clientEvents.sort(
             (a, b) => (a.start?.year ?? 0) - (b.start?.year ?? 0),
@@ -232,6 +233,7 @@ export class WithdrawalsContributionsComponent {
       const dialogRef = this.dialog.open(AddWithdrawalComponent, {
         width: '612px',
         disableClose: true,
+        autoFocus: false,
         data: {
           amountCycles: this.amountCycles,
           eventsList: this.timeline.clientEvents.sort(
@@ -284,6 +286,7 @@ export class WithdrawalsContributionsComponent {
     const dialogRef = this.dialog.open(AddContributionComponent, {
       width: '612px',
       disableClose: true,
+      autoFocus: false,
       data: {
         amountCycles: this.amountCycles,
         eventsList: this.timeline.clientEvents.sort(
@@ -324,6 +327,7 @@ export class WithdrawalsContributionsComponent {
     const dialogRef = this.dialog.open(AddWithdrawalComponent, {
       width: '612px',
       disableClose: true,
+      autoFocus: false,
       data: {
         amountCycles: this.amountCycles,
         eventsList: this.timeline.clientEvents.sort(
