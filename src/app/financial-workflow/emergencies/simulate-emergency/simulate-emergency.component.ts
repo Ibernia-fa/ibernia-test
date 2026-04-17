@@ -24,6 +24,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
+import { AutoFocusDirective } from 'src/app/directives/auto-focus.directive';
 import moment from 'moment';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
@@ -71,6 +72,7 @@ import { TimelineHttpService } from '../../timeline/services/timeline-http.servi
     MatSliderModule,
     ReactiveFormsModule,
     ThousandSeparatorInputDirective,
+    AutoFocusDirective,
     SavingsBarStackedChartComponent,
     TranslateModule,
     TranslateIncomeExpenseLabelPipe,

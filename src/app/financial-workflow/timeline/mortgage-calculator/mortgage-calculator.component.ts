@@ -17,6 +17,7 @@ import { CommonModule } from '@angular/common';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { formatAppDisplayNumber } from 'src/app/shared/utils/number-utils';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
+import { AutoFocusDirective } from 'src/app/directives/auto-focus.directive';
 import { ThousandSeparatorPipe } from 'src/app/pipe/thousand-separator.pipe';
 import {
   MortgageCalculation,
@@ -58,6 +59,7 @@ export interface MortgageCalculatorState {
     MatTooltipModule,
     TranslateModule,
     ThousandSeparatorInputDirective,
+    AutoFocusDirective,
     ThousandSeparatorPipe,
   ],
   templateUrl: './mortgage-calculator.component.html',

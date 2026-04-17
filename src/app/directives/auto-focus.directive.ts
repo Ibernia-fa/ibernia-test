@@ -48,9 +48,10 @@ export class AutoFocusDirective implements AfterViewInit, OnChanges, OnDestroy {
 
   /**
    * Delay (ms) before attempting focus. The default leaves enough time for
-   * MatDialog's own `autoFocus` and conditional `@if` blocks to settle.
+   * MatDialog's open animation (~225ms) and conditional `@if` blocks to settle
+   * before we move focus, otherwise the browser may scroll/restyle around us.
    */
-  @Input() autoFocusDelay = 80;
+  @Input() autoFocusDelay = 200;
 
   private hasFocusedOnce = false;
   private pendingTimer: ReturnType<typeof setTimeout> | null = null;
@@ -156,12 +157,32 @@ export class AutoFocusDirective implements AfterViewInit, OnChanges, OnDestroy {
     if (active.classList.contains('mat-mdc-dialog-container')) return true;
     if (active.classList.contains('cdk-overlay-pane')) return true;
     if (active.classList.contains('cdk-overlay-container')) return true;
-    // If focus currently sits inside the same dialog/overlay as our target,
-    // assume MatDialog's autoFocus put it there — safe to override.
+
     const dialog = target.closest(
       '.mat-mdc-dialog-container, .cdk-dialog-container, .cdk-overlay-pane',
     );
-    if (dialog && dialog.contains(active)) return true;
-    return false;
+
+    // If our target lives in a dialog/overlay and the current focus is OUTSIDE
+    // that overlay (typically the trigger button that opened the dialog), it's
+    // safe — and expected — to move focus into the freshly opened dialog.
+    if (dialog && !dialog.contains(active)) return true;
+
+    // Focus currently sits inside the same dialog → assume MatDialog's default
+    // autoFocus put it there (or another control we just rendered) and the user
+    // hasn't typed yet, so it's safe to override.
+    if (dialog && dialog.contains(active)) {
+      const tag = active.tagName;
+      const isTextEntry =
+        (tag === 'INPUT' || tag === 'TEXTAREA') &&
+        !!(active as HTMLInputElement).value;
+      // Don't yank focus out of a field the user has already started filling.
+      return !isTextEntry;
+    }
+
+    // Target is not inside a dialog (inline form). Only steal from non-form
+    // controls (e.g. buttons) so we never interrupt typing in another input.
+    const tag = active.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return false;
+    return true;
   }
 }
