@@ -5,6 +5,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
+import { Observable } from 'rxjs';
 import { map, switchMap, take } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -15,8 +16,10 @@ import { SavingsPotsHttpService } from '../saving-pots/services/savings-pots-htt
 import {
   ClientSaving,
   SavingPotType,
+  SavingPotsModel,
 } from '../saving-pots/models/saving-pots.model';
 import { LearnInflationComponent } from './learn-inflation/learn-inflation.component';
+import { LearnCompoundInterestComponent } from './learn-compound-interest/learn-compound-interest.component';
 
 interface SchoolSlide {
   title: string;
@@ -52,6 +55,7 @@ export class SchoolComponent {
   activeModule: SchoolModule | null = null;
   activeSlideIndex = 0;
   isOpeningInflation = false;
+  isOpeningCompound = false;
 
   private readonly dialog = inject(MatDialog);
   private readonly activatedRoute = inject(ActivatedRoute);
@@ -185,28 +189,8 @@ export class SchoolComponent {
     if (this.isOpeningInflation) return;
     this.isOpeningInflation = true;
 
-    const params$ = this.activatedRoute.parent?.params ?? this.activatedRoute.params;
-
-    params$
-      .pipe(
-        take(1),
-        switchMap((params) =>
-          this.financialWorkflowService.loadClientCashflowMetadata(params).pipe(take(1)),
-        ),
-        switchMap(([client, cashflow]) =>
-          this.savingsPotsHttpService
-            .getAllSavingsPots((cashflow as Cashflow).id)
-            .pipe(
-              take(1),
-              map((pots) => ({
-                client: client as Client,
-                cashflow: cashflow as Cashflow,
-                pots,
-              })),
-            ),
-        ),
-        takeUntilDestroyed(this.destroyRef),
-      )
+    this.fetchLessonPlanContext$()
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: ({ client, cashflow, pots }) => {
           const startingAmount = this.computeTotalCashSavings(pots?.clientSavings ?? []);
@@ -232,6 +216,65 @@ export class SchoolComponent {
       });
   }
 
+  /**
+   * Compound growth lesson: same cash-savings and inflation defaults as inflation;
+   * return rate is handled inside the dialog (5% each time it opens).
+   */
+  openCompoundInterestLesson(): void {
+    if (this.isOpeningCompound) return;
+    this.isOpeningCompound = true;
+
+    this.fetchLessonPlanContext$()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: ({ client, cashflow, pots }) => {
+          const startingAmount = this.computeTotalCashSavings(pots?.clientSavings ?? []);
+          const inflationRate =
+            cashflow?.inflationRate ??
+            client?.clientDetails?.inflationRate ??
+            DEFAULT_INFLATION_FALLBACK;
+
+          this.openCompoundDialog({
+            startingAmount: startingAmount > 0 ? startingAmount : DEFAULT_AMOUNT_FALLBACK,
+            inflationRate,
+            currencyCode: client?.clientDetails?.preferredCurrency,
+          });
+          this.isOpeningCompound = false;
+        },
+        error: () => {
+          this.openCompoundDialog({
+            startingAmount: DEFAULT_AMOUNT_FALLBACK,
+            inflationRate: DEFAULT_INFLATION_FALLBACK,
+          });
+          this.isOpeningCompound = false;
+        },
+      });
+  }
+
+  private fetchLessonPlanContext$(): Observable<{
+    client: Client;
+    cashflow: Cashflow;
+    pots: SavingPotsModel;
+  }> {
+    const params$ = this.activatedRoute.parent?.params ?? this.activatedRoute.params;
+    return params$.pipe(
+      take(1),
+      switchMap((params) =>
+        this.financialWorkflowService.loadClientCashflowMetadata(params).pipe(take(1)),
+      ),
+      switchMap(([client, cashflow]) =>
+        this.savingsPotsHttpService.getAllSavingsPots((cashflow as Cashflow).id).pipe(
+          take(1),
+          map((pots) => ({
+            client: client as Client,
+            cashflow: cashflow as Cashflow,
+            pots,
+          })),
+        ),
+      ),
+    );
+  }
+
   private computeTotalCashSavings(savings: ClientSaving[]): number {
     return savings
       .filter((s) => s.type === SavingPotType.Cash)
@@ -244,6 +287,22 @@ export class SchoolComponent {
     currencyCode?: string;
   }): void {
     this.dialog.open(LearnInflationComponent, {
+      width: '92vw',
+      maxWidth: '92vw',
+      height: '88vh',
+      panelClass: 'learn-inflation-dialog-panel',
+      autoFocus: false,
+      restoreFocus: false,
+      data,
+    });
+  }
+
+  private openCompoundDialog(data: {
+    startingAmount: number;
+    inflationRate: number;
+    currencyCode?: string;
+  }): void {
+    this.dialog.open(LearnCompoundInterestComponent, {
       width: '92vw',
       maxWidth: '92vw',
       height: '88vh',

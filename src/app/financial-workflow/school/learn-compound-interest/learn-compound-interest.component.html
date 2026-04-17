@@ -1,0 +1,269 @@
+<div
+  class="learn-compound w-100 h-100 d-flex flex-column"
+  [attr.data-view]="view()"
+>
+  <div class="learn-compound__header">
+    @if (view() !== 'growth') {
+      <button
+        type="button"
+        mat-icon-button
+        disableRipple
+        class="learn-compound__back-btn"
+        [attr.aria-label]="'LEARN_COMPOUND.BACK' | translate"
+        (click)="backToGrowth()"
+      >
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+    }
+
+    <button
+      type="button"
+      mat-icon-button
+      disableRipple
+      class="dialog-close-btn"
+      mat-dialog-close
+      [attr.aria-label]="'LEARN_COMPOUND.CLOSE' | translate"
+      (click)="closeDialog()"
+    >
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content class="learn-compound__content">
+    @if (view() === 'growth') {
+      <div class="learn-compound__page learn-compound__page--growth">
+        <header class="learn-compound__intro">
+          <h1 class="learn-compound__title">
+            {{ "LEARN_COMPOUND.HERO_TITLE" | translate }}
+          </h1>
+          <p class="learn-compound__subtitle">
+            {{ "LEARN_COMPOUND.HERO_SUBTITLE" | translate }}
+          </p>
+          <p class="learn-compound__context-hint">
+            {{ "LEARN_COMPOUND.CONTEXT_HINT" | translate }}
+          </p>
+        </header>
+
+        <div class="learn-compound__layout">
+          <aside class="learn-compound__side">
+            <div class="impact-card">
+              <span class="impact-card__label">
+                {{ "LEARN_COMPOUND.STARTING_AMOUNT" | translate }}
+              </span>
+              <div class="impact-card__value">
+                <span class="impact-card__currency">{{ currencySymbol }}</span>
+                <input
+                  type="text"
+                  inputmode="decimal"
+                  placeholder="0"
+                  thousandSeparatorInput
+                  [formControl]="startingAmountControl"
+                  class="impact-card__input"
+                />
+              </div>
+            </div>
+
+            <div class="impact-card">
+              <span class="impact-card__label">
+                {{ "LEARN_COMPOUND.RETURN_RATE" | translate }}
+              </span>
+              <div class="impact-card__value">
+                <input
+                  type="text"
+                  inputmode="decimal"
+                  placeholder="0"
+                  [value]="returnText()"
+                  (input)="onReturnInput($any($event.target).value)"
+                  (blur)="onReturnBlur()"
+                  class="impact-card__input"
+                />
+                <span class="impact-card__suffix">%</span>
+              </div>
+            </div>
+
+            <div class="impact-card">
+              <span class="impact-card__label">
+                {{ "LEARN_COMPOUND.INFLATION_RATE" | translate }}
+              </span>
+              <div class="impact-card__value">
+                <input
+                  type="text"
+                  inputmode="decimal"
+                  placeholder="0"
+                  [value]="inflationText()"
+                  (input)="onInflationInput($any($event.target).value)"
+                  (blur)="onInflationBlur()"
+                  class="impact-card__input"
+                />
+                <span class="impact-card__suffix">%</span>
+              </div>
+            </div>
+
+            <div class="summary-grid">
+              <div class="summary-tile">
+                <span class="summary-tile__label">
+                  {{ "LEARN_COMPOUND.SUMMARY_START" | translate }}
+                </span>
+                <span class="summary-tile__value">
+                  @if (currencySymbol) {
+                    <span class="summary-tile__curr">{{ currencySymbol }}</span>
+                  }
+                  {{ formatAmount(startingAmount()) }}
+                </span>
+              </div>
+              <div class="summary-tile">
+                <span class="summary-tile__label">
+                  {{ "LEARN_COMPOUND.SUMMARY_NOMINAL_20" | translate }}
+                </span>
+                <span class="summary-tile__value summary-tile__value--accent">
+                  @if (currencySymbol) {
+                    <span class="summary-tile__curr">{{ currencySymbol }}</span>
+                  }
+                  {{ formatAmount(valueAfter20Nominal()) }}
+                </span>
+              </div>
+              <div class="summary-tile">
+                <span class="summary-tile__label">
+                  {{ "LEARN_COMPOUND.SUMMARY_REAL_20" | translate }}
+                </span>
+                <span class="summary-tile__value">
+                  @if (currencySymbol) {
+                    <span class="summary-tile__curr">{{ currencySymbol }}</span>
+                  }
+                  {{ formatAmount(valueAfter20Real()) }}
+                </span>
+              </div>
+              <div class="summary-tile summary-tile--highlight">
+                <span class="summary-tile__label">
+                  {{ "LEARN_COMPOUND.SUMMARY_GROWTH" | translate }}
+                </span>
+                <span class="summary-tile__value summary-tile__value--multiple">
+                  @if (startingAmount() > 0) {
+                    {{
+                      "LEARN_COMPOUND.GROWTH_MULTIPLE"
+                        | translate
+                          : {
+                              multiple: growthMultipleLabel(),
+                              years: horizonYears,
+                            }
+                    }}
+                  } @else {
+                    —
+                  }
+                </span>
+              </div>
+            </div>
+
+            <p class="impact-supporting-copy">
+              {{ "LEARN_COMPOUND.SUPPORTING_COPY" | translate }}
+            </p>
+            <p class="impact-supporting-copy impact-supporting-copy--small">
+              {{ "LEARN_COMPOUND.INFLATION_NOTE" | translate }}
+            </p>
+          </aside>
+
+          <section class="learn-compound__main">
+            <div class="learn-compound__chart">
+              <apx-chart
+                [series]="chartOptions().series"
+                [chart]="chartOptions().chart"
+                [xaxis]="chartOptions().xaxis"
+                [yaxis]="chartOptions().yaxis"
+                [stroke]="chartOptions().stroke"
+                [colors]="chartOptions().colors"
+                [tooltip]="chartOptions().tooltip"
+                [legend]="chartOptions().legend"
+                [grid]="chartOptions().grid"
+                [dataLabels]="chartOptions().dataLabels"
+                [markers]="chartOptions().markers"
+                [annotations]="chartOptions().annotations"
+              ></apx-chart>
+            </div>
+          </section>
+        </div>
+
+        <div class="learn-compound__footer">
+          <button type="button" class="learn-compound__cta" (click)="goToSimpleVsCompound()">
+            <span>{{ "LEARN_COMPOUND.SIMPLE_VS_COMPOUND_BTN" | translate }}</span>
+            <svg
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M17 8l4 4m0 0l-4 4m4-4H3"
+              ></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    } @else {
+      <div class="learn-compound__page learn-compound__page--compare">
+        <header class="compare-header">
+          <h1 class="compare-header__title">
+            {{ "LEARN_COMPOUND.COMPARE_TITLE" | translate }}
+          </h1>
+          <p class="compare-header__intro">
+            {{ "LEARN_COMPOUND.COMPARE_SUBTITLE" | translate }}
+          </p>
+        </header>
+
+        <div class="compare-grid">
+          <article class="compare-card">
+            <h3 class="compare-card__title">
+              {{ "LEARN_COMPOUND.CARD_SIMPLE_TITLE" | translate }}
+            </h3>
+            <p class="compare-card__line">
+              {{ "LEARN_COMPOUND.CARD_SIMPLE_LINE1" | translate }}
+            </p>
+            <p class="compare-card__line compare-card__line--muted">
+              {{ "LEARN_COMPOUND.CARD_SIMPLE_LINE2" | translate }}
+            </p>
+          </article>
+          <article class="compare-card">
+            <h3 class="compare-card__title">
+              {{ "LEARN_COMPOUND.CARD_COMPOUND_TITLE" | translate }}
+            </h3>
+            <p class="compare-card__line">
+              {{ "LEARN_COMPOUND.CARD_COMPOUND_LINE1" | translate }}
+            </p>
+            <p class="compare-card__line compare-card__line--muted">
+              {{ "LEARN_COMPOUND.CARD_COMPOUND_LINE2" | translate }}
+            </p>
+          </article>
+          <article class="compare-card">
+            <h3 class="compare-card__title">
+              {{ "LEARN_COMPOUND.CARD_GAP_TITLE" | translate }}
+            </h3>
+            <p class="compare-card__line">
+              {{ "LEARN_COMPOUND.CARD_GAP_LINE1" | translate }}
+            </p>
+          </article>
+        </div>
+
+        <p class="compare-tagline">
+          {{ "LEARN_COMPOUND.COMPARE_TAGLINE" | translate }}
+        </p>
+
+        <section class="compare-proof" aria-labelledby="compare-proof-title">
+          <h2 id="compare-proof-title" class="compare-proof__title">
+            {{ "LEARN_COMPOUND.PROOF_TITLE" | translate }}
+          </h2>
+          <p class="compare-proof__setup">
+            {{ "LEARN_COMPOUND.PROOF_SETUP" | translate }}
+          </p>
+          <ul class="compare-proof__list">
+            <li>{{ "LEARN_COMPOUND.PROOF_LINE_SIMPLE" | translate }}</li>
+            <li>{{ "LEARN_COMPOUND.PROOF_LINE_COMPOUND" | translate }}</li>
+            <li>{{ "LEARN_COMPOUND.PROOF_LINE_GAP" | translate }}</li>
+          </ul>
+        </section>
+      </div>
+    }
+  </mat-dialog-content>
+</div>
