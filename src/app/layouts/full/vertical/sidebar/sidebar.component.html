@@ -17,13 +17,13 @@
       />
       <img
         class="sidebar-ibernia-text-logo"
-        [class.sidebar-ibernia-text-logo--collapsed]="sidenavCollapsed"
+        [class.sidebar-ibernia-text-logo--collapsed]="hideIberniaTextWordmark"
         src="../../../../../assets/images/logos/ibernia-text-logo.png"
         alt="Ibernia text logo"
         loading="eager"
         fetchpriority="high"
         decoding="sync"
-        [attr.aria-hidden]="sidenavCollapsed ? true : null"
+        [attr.aria-hidden]="hideIberniaTextWordmark ? true : null"
       />
     </a>
   }
@@ -64,7 +64,7 @@
       </a>
   </div> -->
   @if (brandingLogo) {
-    @if (sidenavCollapsed) {
+    @if (useMiniBrandingSlot) {
       <a href="/" class="d-flex align-items-center gap-5">
         <img
           [src]="staticCollapsedLogoSrc"
@@ -83,10 +83,25 @@
     <button
       mat-icon-button
       (click)="toggleMobileNav.emit()"
-      class="sidebar-toggle-btn"
+      class="sidebar-toggle-btn sidebar-close-toggle"
       aria-label="Close menu"
     >
-      <i-tabler name="x" class="icon-20 d-flex"></i-tabler>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        class="sidebar-close-icon"
+        aria-hidden="true"
+      >
+        <path d="M18 6 6 18" />
+        <path d="m6 6 12 12" />
+      </svg>
     </button>
   } @else if (!sidenavCollapsed && !isSettings) {
     <button

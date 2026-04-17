@@ -9,7 +9,6 @@ import {
 } from '@angular/core';
 import { Subject } from 'rxjs';
 import { NavigationEnd, Router } from '@angular/router';
-import { TablerIconsModule } from 'angular-tabler-icons';
 import { filter, startWith, takeUntil } from 'rxjs';
 import { BrandingComponent } from './branding.component';
 import { CommonModule } from '@angular/common';
@@ -20,7 +19,6 @@ import { OrganizationProfilesService } from 'src/app/settings/services/organizat
 @Component({
   selector: 'app-sidebar',
   imports: [
-    TablerIconsModule,
     BrandingComponent,
     CommonModule,
     MatButtonModule,
@@ -35,7 +33,19 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   @Input() showToggle = true;
   @Input() sidenavCollapsed = false;
+  /** When true (max-width 1023px, `over` sidenav), always show Ibernia wordmark + full branding. */
+  @Input() overlayLayout = false;
   @Output() toggleMobileNav = new EventEmitter<void>();
+
+  /** Hide default text logo only when docked-mini collapsed, not in overlay layout. */
+  get hideIberniaTextWordmark(): boolean {
+    return this.sidenavCollapsed && !this.overlayLayout;
+  }
+
+  /** Mini branding slot only when collapsed on desktop docked sidebar. */
+  get useMiniBrandingSlot(): boolean {
+    return !!this.brandingLogo && this.sidenavCollapsed && !this.overlayLayout;
+  }
   @Output() toggleCollapsed = new EventEmitter<void>();
 
   isSettings = false;
