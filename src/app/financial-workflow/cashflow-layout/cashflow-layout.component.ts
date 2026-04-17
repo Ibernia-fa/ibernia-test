@@ -11,6 +11,7 @@ const NAV_ROUTES = ['timeline', 'finances', 'income', 'withdrawal', 'reports'];
   standalone: true,
   imports: [CommonModule, RouterOutlet, CashflowNavComponent, MatCardModule],
   templateUrl: './cashflow-layout.component.html',
+  styleUrl: './cashflow-layout.component.scss',
 })
 export class CashflowLayoutComponent {
   constructor(private router: Router) {}

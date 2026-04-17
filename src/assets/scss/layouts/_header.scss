@@ -259,6 +259,33 @@ html .topbar {
 // Expand sidebar toggle - shown in header when sidebar is collapsed
 .header-expand-toggle {
   flex-shrink: 0;
+
+  &.mat-mdc-icon-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 0;
+
+    i-tabler {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 0;
+    }
+
+    i-tabler svg {
+      display: block;
+    }
+
+    .header-menu-icon {
+      display: block;
+      flex-shrink: 0;
+      width: 24px;
+      height: 24px;
+      margin: 0;
+      pointer-events: none;
+    }
+  }
 }
 
 .header-toggle-icon {
@@ -278,6 +305,12 @@ html .topbar {
   transition-timing-function: cubic-bezier(0.25, 0.8, 0.25, 1);
   transition-property: transform, margin-left, width;
 }
+
+/* Below 1024px the sidenav is `over` mode; keep header full-width so it does not sit under the drawer. */
+.sidebar-visible.sidebar-overlay-mode .top-navigation-bar {
+  margin-left: 0;
+  width: 100%;
+}
 .sidebar-visible.sidebar-collapsed .top-navigation-bar {
   margin-left: 88px;
   width: calc(100% - 88px);
@@ -287,6 +320,11 @@ html .topbar {
   transition-duration: 400ms;
   transition-timing-function: cubic-bezier(0.25, 0.8, 0.25, 1);
   transition-property: transform, margin-left, width;
+}
+
+.sidebar-visible.sidebar-overlay-mode.sidebar-collapsed .top-navigation-bar {
+  margin-left: 0;
+  width: 100%;
 }
 
 // Header breadcrumb (Home icon > Client name > Plan name)

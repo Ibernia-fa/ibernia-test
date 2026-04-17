@@ -110,6 +110,8 @@ type LanguageCode = 'en' | 'it';
 })
 export class HeaderComponent implements OnInit, OnDestroy {
   @Input() showToggle = true;
+  /** When true, show menu icon to open the sidenav in overlay layout (max-width 1023px). */
+  @Input() showHamburgerNav = false;
   @Input() hideSidebarToggle = false;
   @Input() toggleChecked = false;
   @Output() toggleMobileNav = new EventEmitter<void>();
