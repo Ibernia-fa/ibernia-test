@@ -38,6 +38,7 @@ export class AuthService {
       post_logout_redirect_uri: postLogoutUri,
       automaticSilentRenew: true,
       silent_redirect_uri: `${origin}/silent-renew-oidc`,
+      clockSkew: 600,
     };
   }
 
