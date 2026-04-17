@@ -35,6 +35,14 @@ export interface LearnInflationDialogData {
   currencyCode?: string;
 }
 
+export type LearnInflationView = 'impact' | 'causes';
+
+export interface InflationCause {
+  iconKey: 'demand' | 'cost' | 'builtIn';
+  titleKey: string;
+  descriptionKey: string;
+}
+
 const YEAR_POINTS = [0, 5, 10, 15, 20];
 const ACCENT = '#4043af';
 const ACCENT_SOFT = '#516ce8';
@@ -70,6 +78,27 @@ export class LearnInflationComponent implements OnInit {
 
   /** Locale-formatted text shown inside the inflation input. */
   readonly inflationText = signal<string>('');
+
+  /** Which page of the educational modal is visible. */
+  readonly view = signal<LearnInflationView>('impact');
+
+  readonly causes: InflationCause[] = [
+    {
+      iconKey: 'demand',
+      titleKey: 'LEARN_INFLATION.CAUSE_DEMAND_TITLE',
+      descriptionKey: 'LEARN_INFLATION.CAUSE_DEMAND_DESC',
+    },
+    {
+      iconKey: 'cost',
+      titleKey: 'LEARN_INFLATION.CAUSE_COST_TITLE',
+      descriptionKey: 'LEARN_INFLATION.CAUSE_COST_DESC',
+    },
+    {
+      iconKey: 'builtIn',
+      titleKey: 'LEARN_INFLATION.CAUSE_BUILTIN_TITLE',
+      descriptionKey: 'LEARN_INFLATION.CAUSE_BUILTIN_DESC',
+    },
+  ];
 
   readonly realValues: Signal<number[]> = computed(() => {
     const start = this.startingAmount() || 0;
@@ -152,6 +181,14 @@ export class LearnInflationComponent implements OnInit {
 
   closeDialog(): void {
     this.dialogRef.close();
+  }
+
+  goToCauses(): void {
+    this.view.set('causes');
+  }
+
+  backToImpact(): void {
+    this.view.set('impact');
   }
 
   formatAmount(value: number): string {

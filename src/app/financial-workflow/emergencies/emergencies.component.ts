@@ -790,6 +790,7 @@ export class EmergenciesComponent implements OnInit {
       const dialogRef = this.dialog.open(SimulateEmergencyComponent, {
         width: '612px',
         disableClose: true,
+        autoFocus: false,
         data: {
           client: this.selectedClient,
           cashflow: this.selectedCashflow,

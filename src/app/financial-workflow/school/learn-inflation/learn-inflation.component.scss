@@ -10,24 +10,93 @@ $ibernia-bg-soft: #f5f7ff;
   color: $ibernia-ink;
   min-height: 0;
   overflow: hidden;
+  position: relative;
 }
 
-.learn-inflation__subtitle {
-  margin: 8px 0 0;
-  text-align: center;
-  font-size: 15px;
+/* ----- Top header (close + optional back) ----- */
+.learn-inflation__header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 0;
+  z-index: 5;
+  pointer-events: none;
+
+  > * {
+    pointer-events: auto;
+  }
+}
+
+.learn-inflation__back-btn {
+  position: absolute !important;
+  top: 8px;
+  left: 8px;
+  background: transparent !important;
+  border: none;
+  box-shadow: none;
+  cursor: pointer;
   color: $ibernia-mute;
-  font-weight: 400;
+
+  &:focus,
+  &:focus-visible,
+  &:active {
+    outline: none;
+    background: transparent;
+  }
+
+  &:hover {
+    color: $ibernia-blue;
+  }
 }
 
 .learn-inflation__content {
   padding-right: 0 !important;
-  margin-top: 24px !important;
+  margin-top: 0 !important;
   flex: 1 1 auto;
   min-height: 0;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+}
+
+/* ----- Page wrappers (impact / causes) ----- */
+.learn-inflation__page {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  animation: learnInflationFadeIn 320ms ease;
+}
+
+@keyframes learnInflationFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================================
+   PAGE 1 — Inflation impact
+   ============================================================ */
+
+.learn-inflation__page--impact {
+  gap: 24px;
+}
+
+.learn-inflation__hero {
+  margin: 8px 56px 0;
+  font-size: 32px;
+  line-height: 1.18;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  color: $ibernia-ink;
+  text-align: left;
+  max-width: 880px;
 }
 
 .learn-inflation__layout {
@@ -42,25 +111,12 @@ $ibernia-bg-soft: #f5f7ff;
 .learn-inflation__side {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 14px;
   min-width: 0;
 }
 
-.learn-inflation__explanation {
-  margin: 0;
-  font-size: 18px;
-  line-height: 1.5;
-  font-weight: 500;
-  color: $ibernia-ink;
-}
-
-.learn-inflation__summary {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.summary-card {
+/* ----- Editable / output cards ----- */
+.impact-card {
   border: 1px solid $ibernia-line;
   border-radius: 14px;
   padding: 18px 20px;
@@ -69,6 +125,11 @@ $ibernia-bg-soft: #f5f7ff;
   flex-direction: column;
   gap: 6px;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  &:focus-within {
+    border-color: $ibernia-blue;
+    box-shadow: 0 0 0 3px rgba(64, 67, 175, 0.12);
+  }
 
   &__label {
     font-size: 13px;
@@ -82,7 +143,7 @@ $ibernia-bg-soft: #f5f7ff;
     display: flex;
     align-items: baseline;
     gap: 6px;
-    font-size: 32px;
+    font-size: 30px;
     font-weight: 700;
     line-height: 1.1;
     color: $ibernia-ink;
@@ -95,29 +156,60 @@ $ibernia-bg-soft: #f5f7ff;
     color: $ibernia-mute;
   }
 
+  &__readout {
+    font: inherit;
+    color: inherit;
+  }
+
+  &__suffix {
+    font-size: 22px;
+    font-weight: 600;
+    color: $ibernia-mute;
+  }
+
   &__hint {
     font-size: 13px;
     color: $ibernia-mute;
+  }
+
+  &__input {
+    flex: 1 1 auto;
+    border: none;
+    outline: none;
+    background: transparent;
+    font: inherit;
+    color: inherit;
+    width: 100%;
+    min-width: 0;
+    padding: 0;
+    font-variant-numeric: tabular-nums;
+
+    &::placeholder {
+      color: #c0c0cc;
+      font-weight: 600;
+    }
   }
 
   &--accent {
     background: linear-gradient(135deg, rgba(64, 67, 175, 0.08), rgba(81, 108, 232, 0.04));
     border-color: rgba(64, 67, 175, 0.18);
 
-    .summary-card__value {
+    .impact-card__value,
+    .impact-card__readout {
       color: $ibernia-blue;
     }
 
-    .summary-card__currency {
+    .impact-card__currency {
       color: rgba(64, 67, 175, 0.7);
     }
   }
 }
 
+/* ----- Right side: chart ----- */
 .learn-inflation__main {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 18px;
   min-width: 0;
   min-height: 0;
 }
@@ -137,85 +229,213 @@ $ibernia-bg-soft: #f5f7ff;
   }
 }
 
-.learn-inflation__controls {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 220px);
-  gap: 16px;
+/* ----- Bottom CTA row ----- */
+.learn-inflation__footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
   flex-shrink: 0;
 }
 
-.control {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  min-width: 0;
-}
-
-.control__label {
-  font-size: 14px;
-  font-weight: 500;
-  color: $ibernia-ink;
-  line-height: 1;
-}
-
-.control__field {
-  display: flex;
+.learn-inflation__cta {
+  display: inline-flex;
   align-items: center;
-  border: 1px solid $ibernia-line;
+  gap: 10px;
+  height: 44px;
+  padding: 0 18px;
   border-radius: 10px;
+  border: 1px solid $ibernia-line;
   background: #ffffff;
-  padding: 0 14px;
-  height: 48px;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  color: $ibernia-ink;
+  font-family: "Ubuntu", sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease,
+    box-shadow 0.2s ease, transform 0.15s ease;
 
-  &:focus-within {
-    border-color: $ibernia-blue;
-    box-shadow: 0 0 0 3px rgba(64, 67, 175, 0.12);
+  svg {
+    width: 16px;
+    height: 16px;
+    transition: transform 0.2s ease;
   }
 
-  input {
-    flex: 1 1 auto;
-    border: none;
-    outline: none;
-    background: transparent;
-    font-family: "Ubuntu", sans-serif;
-    font-size: 18px;
-    font-weight: 600;
-    color: $ibernia-ink;
-    width: 100%;
-    min-width: 0;
-    padding: 0;
-    font-variant-numeric: tabular-nums;
+  &:hover {
+    background: $ibernia-blue;
+    border-color: $ibernia-blue;
+    color: #ffffff;
+    box-shadow: 0 8px 18px rgba(64, 67, 175, 0.18);
 
-    &::placeholder {
-      color: #b6b6c2;
-      font-weight: 500;
+    svg {
+      transform: translateX(3px);
     }
   }
+
+  &:focus-visible {
+    outline: 2px solid $ibernia-blue;
+    outline-offset: 3px;
+  }
 }
 
-.control__prefix,
-.control__suffix {
-  font-size: 16px;
-  font-weight: 600;
-  color: $ibernia-mute;
-  flex-shrink: 0;
-  user-select: none;
+/* ============================================================
+   PAGE 2 — What causes inflation?
+   ============================================================ */
+
+.learn-inflation__page--causes {
+  gap: 28px;
+  padding-top: 8px;
 }
 
-.control__prefix {
-  margin-right: 8px;
+.causes-header {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0 56px 0 56px;
+
+  &__title {
+    margin: 0;
+    font-size: 32px;
+    line-height: 1.18;
+    font-weight: 700;
+    letter-spacing: -0.4px;
+    color: $ibernia-ink;
+  }
+
+  &__intro {
+    margin: 0;
+    font-size: 16px;
+    color: $ibernia-mute;
+    font-weight: 400;
+  }
 }
 
-.control__suffix {
-  margin-left: 8px;
+.causes-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  flex: 1 1 auto;
+  min-height: 0;
+  align-items: stretch;
 }
 
-// Responsive: stack on tighter widths
+.cause-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid $ibernia-line;
+  border-radius: 16px;
+  background: #ffffff;
+  overflow: hidden;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+
+  &:hover {
+    border-color: rgba(64, 67, 175, 0.32);
+    box-shadow: 0 14px 32px rgba(64, 67, 175, 0.12);
+    transform: translateY(-2px);
+  }
+
+  &__hero {
+    height: 168px;
+    background: linear-gradient(135deg, #4043af 0%, #516ce8 100%);
+    display: grid;
+    place-items: center;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+      content: "";
+      position: absolute;
+      inset: -45% -30% auto auto;
+      width: 240px;
+      height: 240px;
+      background: radial-gradient(
+        circle,
+        rgba(255, 255, 255, 0.22) 0%,
+        rgba(255, 255, 255, 0) 60%
+      );
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      inset: auto auto -30% -25%;
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(
+        circle,
+        rgba(255, 255, 255, 0.14) 0%,
+        rgba(255, 255, 255, 0) 60%
+      );
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    &[data-icon="cost"] {
+      background: linear-gradient(135deg, #4f55c0 0%, #6f8aff 100%);
+    }
+
+    &[data-icon="builtIn"] {
+      background: linear-gradient(135deg, #3a3d8e 0%, #5d72d4 100%);
+    }
+  }
+
+  &__icon {
+    position: relative;
+    z-index: 1;
+    width: 72px;
+    height: 72px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.18);
+    display: grid;
+    place-items: center;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+
+    svg {
+      width: 36px;
+      height: 36px;
+      stroke: #ffffff;
+      fill: none;
+    }
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 22px 22px 24px;
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: $ibernia-ink;
+    letter-spacing: -0.2px;
+  }
+
+  &__desc {
+    margin: 0;
+    font-size: 14.5px;
+    line-height: 1.55;
+    color: $ibernia-mute;
+  }
+}
+
+/* ============================================================
+   Responsiveness
+   ============================================================ */
+
 @media (max-width: 1024px) {
+  .learn-inflation__hero {
+    margin: 8px 16px 0;
+    font-size: 26px;
+  }
+
   .learn-inflation__layout {
     grid-template-columns: 1fr;
-    gap: 24px;
+    gap: 20px;
   }
 
   .learn-inflation__side {
@@ -226,31 +446,50 @@ $ibernia-bg-soft: #f5f7ff;
     order: 1;
   }
 
-  .summary-card__value {
-    font-size: 28px;
+  .impact-card__value {
+    font-size: 26px;
+  }
+
+  .causes-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .causes-header {
+    padding: 0 16px;
+
+    &__title {
+      font-size: 26px;
+    }
   }
 }
 
 @media (max-width: 600px) {
-  .learn-inflation__controls {
-    grid-template-columns: 1fr;
+  .learn-inflation__hero {
+    font-size: 22px;
   }
 
   .learn-inflation__chart {
     min-height: 240px;
-    padding: 12px 6px 4px;
   }
 
-  .summary-card {
+  .impact-card {
     padding: 14px 16px;
   }
 
-  .summary-card__value {
-    font-size: 24px;
+  .impact-card__value {
+    font-size: 22px;
+  }
+
+  .learn-inflation__cta {
+    width: 100%;
+    justify-content: center;
   }
 }
 
-// Make the dialog surface itself flex-fill so the content stretches
+/* ============================================================
+   Dialog surface tweaks
+   ============================================================ */
 :host ::ng-deep .mdc-dialog__surface {
   display: flex;
   flex-direction: column;
