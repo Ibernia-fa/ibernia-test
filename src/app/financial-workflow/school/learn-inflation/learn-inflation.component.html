@@ -1,9 +1,19 @@
-<div class="learn-inflation w-100 h-100 d-flex flex-column">
+<div class="learn-inflation w-100 h-100 d-flex flex-column" [attr.data-view]="view()">
   <!-- Header -->
-  <div class="dialog-header">
-    <h2 class="dialog-title text-center" style="text-transform: none">
-      {{ "LEARN_INFLATION.TITLE" | translate }}
-    </h2>
+  <div class="learn-inflation__header">
+    @if (view() === 'causes') {
+      <button
+        type="button"
+        mat-icon-button
+        disableRipple
+        class="learn-inflation__back-btn"
+        aria-label="Back"
+        (click)="backToImpact()"
+      >
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+    }
+
     <button
       type="button"
       mat-icon-button
@@ -17,105 +27,206 @@
     </button>
   </div>
 
-  <p class="learn-inflation__subtitle">
-    {{ "LEARN_INFLATION.SUBTITLE" | translate }}
-  </p>
-
   <mat-dialog-content class="learn-inflation__content">
-    <div class="learn-inflation__layout">
-      <!-- LEFT: explanation + summary -->
-      <aside class="learn-inflation__side">
-        <p class="learn-inflation__explanation">
-          {{ "LEARN_INFLATION.EXPLANATION" | translate }}
-        </p>
+    @if (view() === 'impact') {
+      <div class="learn-inflation__page learn-inflation__page--impact">
+        <h1 class="learn-inflation__hero">
+          {{ "LEARN_INFLATION.HERO" | translate }}
+        </h1>
 
-        <div class="learn-inflation__summary">
-          <div class="summary-card">
-            <span class="summary-card__label">
-              {{ "LEARN_INFLATION.INITIAL_AMOUNT" | translate }}
-            </span>
-            <div class="summary-card__value">
-              <span class="summary-card__currency">{{ currencySymbol }}</span>
-              <span>{{ formatAmount(startingAmount()) }}</span>
+        <div class="learn-inflation__layout">
+          <!-- LEFT: editable input cards + output -->
+          <aside class="learn-inflation__side">
+            <div class="impact-card">
+              <span class="impact-card__label">
+                {{ "LEARN_INFLATION.INITIAL_AMOUNT" | translate }}
+              </span>
+              <div class="impact-card__value">
+                <span class="impact-card__currency">{{ currencySymbol }}</span>
+                <input
+                  type="text"
+                  inputmode="decimal"
+                  placeholder="0"
+                  thousandSeparatorInput
+                  [formControl]="startingAmountControl"
+                  class="impact-card__input"
+                />
+              </div>
             </div>
-            <span class="summary-card__hint">
-              {{ "LEARN_INFLATION.TODAY" | translate }}
-            </span>
-          </div>
 
-          <div class="summary-card summary-card--accent">
-            <span class="summary-card__label">
-              {{ "LEARN_INFLATION.VALUE_AFTER_20Y" | translate }}
-            </span>
-            <div class="summary-card__value">
-              <span class="summary-card__currency">{{ currencySymbol }}</span>
-              <span>{{ formatAmount(endValue()) }}</span>
+            <div class="impact-card">
+              <span class="impact-card__label">
+                {{ "LEARN_INFLATION.INFLATION_PCT" | translate }}
+              </span>
+              <div class="impact-card__value">
+                <input
+                  type="text"
+                  inputmode="decimal"
+                  placeholder="0"
+                  [value]="inflationText()"
+                  (input)="onInflationInput($any($event.target).value)"
+                  (blur)="onInflationBlur()"
+                  class="impact-card__input"
+                />
+                <span class="impact-card__suffix">%</span>
+              </div>
             </div>
-            <span class="summary-card__hint">
-              {{
-                "LEARN_INFLATION.LOSS_NOTE"
-                  | translate: { percent: (lossPercent() | number: "1.0-1") }
-              }}
-            </span>
-          </div>
+
+            <div class="impact-card impact-card--accent">
+              <span class="impact-card__label">
+                {{ "LEARN_INFLATION.VALUE_AFTER_20Y" | translate }}
+              </span>
+              <div class="impact-card__value">
+                <span class="impact-card__currency">{{ currencySymbol }}</span>
+                <span class="impact-card__readout">{{ formatAmount(endValue()) }}</span>
+              </div>
+              <span class="impact-card__hint">
+                {{
+                  "LEARN_INFLATION.LOSS_NOTE"
+                    | translate: { percent: (lossPercent() | number: "1.0-1") }
+                }}
+              </span>
+            </div>
+          </aside>
+
+          <!-- RIGHT: chart -->
+          <section class="learn-inflation__main">
+            <div class="learn-inflation__chart">
+              <apx-chart
+                [series]="chartOptions().series"
+                [chart]="chartOptions().chart"
+                [xaxis]="chartOptions().xaxis"
+                [yaxis]="chartOptions().yaxis"
+                [stroke]="chartOptions().stroke"
+                [colors]="chartOptions().colors"
+                [tooltip]="chartOptions().tooltip"
+                [legend]="chartOptions().legend"
+                [grid]="chartOptions().grid"
+                [dataLabels]="chartOptions().dataLabels"
+                [markers]="chartOptions().markers"
+                [fill]="chartOptions().fill"
+                [annotations]="chartOptions().annotations"
+              ></apx-chart>
+            </div>
+          </section>
         </div>
-      </aside>
 
-      <!-- RIGHT: chart + inputs -->
-      <section class="learn-inflation__main">
-        <div class="learn-inflation__chart">
-          <apx-chart
-            [series]="chartOptions().series"
-            [chart]="chartOptions().chart"
-            [xaxis]="chartOptions().xaxis"
-            [yaxis]="chartOptions().yaxis"
-            [stroke]="chartOptions().stroke"
-            [colors]="chartOptions().colors"
-            [tooltip]="chartOptions().tooltip"
-            [legend]="chartOptions().legend"
-            [grid]="chartOptions().grid"
-            [dataLabels]="chartOptions().dataLabels"
-            [markers]="chartOptions().markers"
-            [fill]="chartOptions().fill"
-            [annotations]="chartOptions().annotations"
-          ></apx-chart>
+        <div class="learn-inflation__footer">
+          <button
+            type="button"
+            class="learn-inflation__cta"
+            (click)="goToCauses()"
+          >
+            <span>{{ "LEARN_INFLATION.WHAT_CAUSES_BTN" | translate }}</span>
+            <svg
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M17 8l4 4m0 0l-4 4m4-4H3"
+              ></path>
+            </svg>
+          </button>
         </div>
+      </div>
+    } @else {
+      <div class="learn-inflation__page learn-inflation__page--causes">
+        <header class="causes-header">
+          <h1 class="causes-header__title">
+            {{ "LEARN_INFLATION.CAUSES_TITLE" | translate }}
+          </h1>
+          <p class="causes-header__intro">
+            {{ "LEARN_INFLATION.CAUSES_INTRO" | translate }}
+          </p>
+        </header>
 
-        <div class="learn-inflation__controls">
-          <div class="control">
-            <label class="control__label">
-              {{ "LEARN_INFLATION.STARTING_AMOUNT" | translate }}
-            </label>
-            <div class="control__field control__field--currency">
-              <span class="control__prefix">{{ currencySymbol }}</span>
-              <input
-                type="text"
-                inputmode="decimal"
-                placeholder="0"
-                thousandSeparatorInput
-                [formControl]="startingAmountControl"
-              />
-            </div>
-          </div>
-
-          <div class="control">
-            <label class="control__label">
-              {{ "LEARN_INFLATION.INFLATION" | translate }}
-            </label>
-            <div class="control__field control__field--percent">
-              <input
-                type="text"
-                inputmode="decimal"
-                placeholder="0"
-                [value]="inflationText()"
-                (input)="onInflationInput($any($event.target).value)"
-                (blur)="onInflationBlur()"
-              />
-              <span class="control__suffix">%</span>
-            </div>
-          </div>
+        <div class="causes-grid">
+          @for (cause of causes; track cause.iconKey) {
+            <article class="cause-card">
+              <div class="cause-card__hero" [attr.data-icon]="cause.iconKey">
+                <div class="cause-card__icon">
+                  @switch (cause.iconKey) {
+                    @case ('demand') {
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="1.8"
+                          d="M3 17l6-6 4 4 8-8"
+                        />
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="1.8"
+                          d="M14 7h7v7"
+                        />
+                      </svg>
+                    }
+                    @case ('cost') {
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="1.8"
+                          d="M3 8l9-4 9 4-9 4-9-4z"
+                        />
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="1.8"
+                          d="M3 12l9 4 9-4M3 16l9 4 9-4"
+                        />
+                      </svg>
+                    }
+                    @case ('builtIn') {
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="1.8"
+                          d="M4 12a8 8 0 0114-5.3L20 9"
+                        />
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="1.8"
+                          d="M20 4v5h-5"
+                        />
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="1.8"
+                          d="M20 12a8 8 0 01-14 5.3L4 15"
+                        />
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="1.8"
+                          d="M4 20v-5h5"
+                        />
+                      </svg>
+                    }
+                  }
+                </div>
+              </div>
+              <div class="cause-card__body">
+                <h3 class="cause-card__title">
+                  {{ cause.titleKey | translate }}
+                </h3>
+                <p class="cause-card__desc">
+                  {{ cause.descriptionKey | translate }}
+                </p>
+              </div>
+            </article>
+          }
         </div>
-      </section>
-    </div>
+      </div>
+    }
   </mat-dialog-content>
 </div>
