@@ -4,7 +4,8 @@
   background-color: white !important;
   border-radius: 12px;
   border: 1px solid #0000001a !important;
-  padding-left: 64px;
+  /* Room for .timeline-labels (absolute) + hover highlight margin-left without overlapping Age/Year. */
+  padding-left: 80px;
   /* Extra room so last x-axis tick labels are not clipped (vis centers labels on ticks). */
   padding-right: 40px;
   .card-main-wrapper {
