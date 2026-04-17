@@ -69,6 +69,8 @@
             matInput
             formControlName="name"
             [placeholder]="assetNamePlaceholderKey | translate"
+            [appAutoFocus]="!isEditMode"
+            autoFocusSelect
           />
           @if (
             form.get("name")?.touched && form.get("name")?.hasError("required")

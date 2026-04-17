@@ -65,7 +65,7 @@
             style="line-height: 16px"
             >{{ 'Name' | translate }}</mat-label
           >
-          <input matInput formControlName="name" />
+          <input matInput formControlName="name" appAutoFocus autoFocusSelect />
           @if (
             eventForm.get("name")?.touched &&
             eventForm.get("name")?.hasError("required")
@@ -156,6 +156,8 @@
                 #amountInput
                 thousandSeparatorInput
                 placeholder="0"
+                [appAutoFocus]="!showNameEdit"
+                autoFocusSelect
               />
             </div>
             <div class="right custom-select">
@@ -664,7 +666,7 @@
             style="line-height: 16px"
             >{{ 'Name' | translate }}</mat-label
           >
-          <input matInput formControlName="name" />
+          <input matInput formControlName="name" appAutoFocus autoFocusSelect />
           @if (
             eventForm.get("name")?.touched &&
             eventForm.get("name")?.hasError("required")
@@ -867,6 +869,8 @@
                 #amountInput
                 thousandSeparatorInput
                 placeholder="0"
+                [appAutoFocus]="!showNameEdit"
+                autoFocusSelect
               />
             </div>
             <div class="right hide-arrow custom-select">
@@ -1305,6 +1309,8 @@
                         #resalePrice
                         thousandSeparatorInput
                         placeholder="0"
+                        appAutoFocus
+                        autoFocusSelect
                       />
                     </div>
                   </div>
@@ -1426,6 +1432,8 @@
               formControlName="name"
               class="custom-goal-name-input"
               [placeholder]="customGoalNamePlaceholderText"
+              appAutoFocus
+              autoFocusSelect
             />
             @if (
               eventForm.get("name")?.touched &&
@@ -1509,6 +1517,8 @@
                   #amountInput
                   thousandSeparatorInput
                   placeholder="0"
+                  [appAutoFocus]="isEditWorkflow && !showNameEdit"
+                  autoFocusSelect
                 />
               </div>
               <div class="right custom-select">
@@ -1985,6 +1995,8 @@
                 #amountInput
                 thousandSeparatorInput
                 placeholder="0"
+                [appAutoFocus]="isEditWorkflow && !showNameEdit"
+                autoFocusSelect
               />
             </div>
             <div class="right hide-arrow custom-select">

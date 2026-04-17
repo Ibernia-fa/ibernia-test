@@ -21,7 +21,7 @@
         class="f-s-16 f-w-500 m-b-4 d-flex align-items-center ibr-black"
         >{{ "Client first name" | translate }}</mat-label
       >
-      <input matInput formControlName="firstName" />
+      <input matInput formControlName="firstName" appAutoFocus autoFocusSelect />
       @if (
         clientForm.get("firstName")?.touched &&
         clientForm.get("firstName")?.hasError("required")

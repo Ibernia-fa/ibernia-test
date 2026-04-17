@@ -377,6 +377,7 @@ export class EmergenciesComponent implements OnInit {
       .open(AddEmergenciesComponent, {
         width: '612px',
         disableClose: true,
+        autoFocus: false,
         data: {
           emergencyTypes: this.emergencyTypes,
           policyStatuses: this.policyStatuses,
@@ -574,6 +575,7 @@ export class EmergenciesComponent implements OnInit {
     const dialogRef = this.dialog.open(AddEmergenciesComponent, {
       width: '612px',
       disableClose: true,
+      autoFocus: false,
       data: {
         mode: 'edit',
         emergency,

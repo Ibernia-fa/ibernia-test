@@ -168,6 +168,7 @@ export class FinancialWorkflowDashboardComponent implements OnInit {
     const dialogRef = this.dialog.open(AddEventDialogComponent, {
       width: '600px',
       disableClose: true,
+      autoFocus: false,
       data: {
         client: {},
       },

@@ -1,0 +1,261 @@
+$ibernia-blue: #4043af;
+$ibernia-blue-soft: #516ce8;
+$ibernia-ink: #1c1c1c;
+$ibernia-mute: #5a596e;
+$ibernia-line: #e5e5ec;
+$ibernia-bg-soft: #f5f7ff;
+
+.learn-inflation {
+  font-family: "Ubuntu", sans-serif;
+  color: $ibernia-ink;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.learn-inflation__subtitle {
+  margin: 8px 0 0;
+  text-align: center;
+  font-size: 15px;
+  color: $ibernia-mute;
+  font-weight: 400;
+}
+
+.learn-inflation__content {
+  padding-right: 0 !important;
+  margin-top: 24px !important;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.learn-inflation__layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 360px) 1fr;
+  gap: 32px;
+  flex: 1 1 auto;
+  min-height: 0;
+  align-items: stretch;
+}
+
+.learn-inflation__side {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  min-width: 0;
+}
+
+.learn-inflation__explanation {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.5;
+  font-weight: 500;
+  color: $ibernia-ink;
+}
+
+.learn-inflation__summary {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.summary-card {
+  border: 1px solid $ibernia-line;
+  border-radius: 14px;
+  padding: 18px 20px;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  &__label {
+    font-size: 13px;
+    font-weight: 500;
+    color: $ibernia-mute;
+    letter-spacing: 0.2px;
+    text-transform: uppercase;
+  }
+
+  &__value {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1.1;
+    color: $ibernia-ink;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__currency {
+    font-size: 18px;
+    font-weight: 600;
+    color: $ibernia-mute;
+  }
+
+  &__hint {
+    font-size: 13px;
+    color: $ibernia-mute;
+  }
+
+  &--accent {
+    background: linear-gradient(135deg, rgba(64, 67, 175, 0.08), rgba(81, 108, 232, 0.04));
+    border-color: rgba(64, 67, 175, 0.18);
+
+    .summary-card__value {
+      color: $ibernia-blue;
+    }
+
+    .summary-card__currency {
+      color: rgba(64, 67, 175, 0.7);
+    }
+  }
+}
+
+.learn-inflation__main {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  min-width: 0;
+  min-height: 0;
+}
+
+.learn-inflation__chart {
+  flex: 1 1 auto;
+  min-height: 280px;
+  border: 1px solid $ibernia-line;
+  border-radius: 16px;
+  background: #ffffff;
+  position: relative;
+
+  apx-chart {
+    position: absolute;
+    inset: 12px 12px 4px 4px;
+    display: block;
+  }
+}
+
+.learn-inflation__controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 220px);
+  gap: 16px;
+  flex-shrink: 0;
+}
+
+.control {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.control__label {
+  font-size: 14px;
+  font-weight: 500;
+  color: $ibernia-ink;
+  line-height: 1;
+}
+
+.control__field {
+  display: flex;
+  align-items: center;
+  border: 1px solid $ibernia-line;
+  border-radius: 10px;
+  background: #ffffff;
+  padding: 0 14px;
+  height: 48px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  &:focus-within {
+    border-color: $ibernia-blue;
+    box-shadow: 0 0 0 3px rgba(64, 67, 175, 0.12);
+  }
+
+  input {
+    flex: 1 1 auto;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: "Ubuntu", sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: $ibernia-ink;
+    width: 100%;
+    min-width: 0;
+    padding: 0;
+    font-variant-numeric: tabular-nums;
+
+    &::placeholder {
+      color: #b6b6c2;
+      font-weight: 500;
+    }
+  }
+}
+
+.control__prefix,
+.control__suffix {
+  font-size: 16px;
+  font-weight: 600;
+  color: $ibernia-mute;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.control__prefix {
+  margin-right: 8px;
+}
+
+.control__suffix {
+  margin-left: 8px;
+}
+
+// Responsive: stack on tighter widths
+@media (max-width: 1024px) {
+  .learn-inflation__layout {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .learn-inflation__side {
+    order: 2;
+  }
+
+  .learn-inflation__main {
+    order: 1;
+  }
+
+  .summary-card__value {
+    font-size: 28px;
+  }
+}
+
+@media (max-width: 600px) {
+  .learn-inflation__controls {
+    grid-template-columns: 1fr;
+  }
+
+  .learn-inflation__chart {
+    min-height: 240px;
+    padding: 12px 6px 4px;
+  }
+
+  .summary-card {
+    padding: 14px 16px;
+  }
+
+  .summary-card__value {
+    font-size: 24px;
+  }
+}
+
+// Make the dialog surface itself flex-fill so the content stretches
+:host ::ng-deep .mdc-dialog__surface {
+  display: flex;
+  flex-direction: column;
+}
+
+:host ::ng-deep .learn-inflation__content.mat-mdc-dialog-content {
+  max-height: none;
+}

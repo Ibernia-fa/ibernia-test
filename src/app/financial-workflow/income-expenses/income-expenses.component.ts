@@ -301,6 +301,7 @@ export class IncomeExpensesComponent {
     const dialogRef = this.dialog.open(AddIncomeComponent, {
       width: '612px',
       disableClose: true,
+      autoFocus: false,
       data: {
         amountCycles: this.amountCycles,
         eventsList: this.timeline.clientEvents.sort(
@@ -341,6 +342,7 @@ export class IncomeExpensesComponent {
     const dialogRef = this.dialog.open(AddExpenseComponent, {
       width: '612px',
       disableClose: true,
+      autoFocus: false,
       data: {
         amountCycles: this.amountCycles,
         escalataionRates: this.escalationRates,
@@ -374,6 +376,7 @@ export class IncomeExpensesComponent {
     const dialogRef = this.dialog.open(AddIncomeComponent, {
       width: '612px',
       disableClose: true,
+      autoFocus: false,
       data: {
         amountCycles: this.amountCycles,
         eventsList: this.timeline.clientEvents.sort(
@@ -418,6 +421,7 @@ export class IncomeExpensesComponent {
     const dialogRef = this.dialog.open(AddExpenseComponent, {
       width: '612px',
       disableClose: true,
+      autoFocus: false,
       data: {
         amountCycles: this.amountCycles,
         eventsList: this.timeline.clientEvents.sort(

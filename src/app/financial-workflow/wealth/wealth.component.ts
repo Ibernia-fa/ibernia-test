@@ -201,6 +201,7 @@ export class WealthComponent implements OnInit {
     const dialogRef = this.dialog.open(AddAssetComponent, {
       width: '612px',
       disableClose: true,
+      autoFocus: false,
       data: {
         mode: 'add',
         cashflowId: this.cashflowId,
@@ -228,6 +229,7 @@ export class WealthComponent implements OnInit {
     const dialogRef = this.dialog.open(AddAssetComponent, {
       width: '612px',
       disableClose: true,
+      autoFocus: false,
       data: {
         mode: 'edit',
         cashflowId: this.cashflowId,
@@ -293,6 +295,7 @@ export class WealthComponent implements OnInit {
         const dialogRef = this.dialog.open(AddNewPotComponent, {
           width: '612px',
           disableClose: true,
+          autoFocus: false,
           data: {
             returnRate,
             pensionFundReturnRate,
@@ -343,6 +346,7 @@ export class WealthComponent implements OnInit {
     const dialogRef = this.dialog.open(AddLiabilityComponent, {
       width: '612px',
       disableClose: true,
+      autoFocus: false,
       data: {
         mode: 'add',
         cashflowId: this.cashflowId,
@@ -366,6 +370,7 @@ export class WealthComponent implements OnInit {
     const dialogRef = this.dialog.open(AddLiabilityComponent, {
       width: '612px',
       disableClose: true,
+      autoFocus: false,
       data: {
         mode: 'edit',
         cashflowId: this.cashflowId,

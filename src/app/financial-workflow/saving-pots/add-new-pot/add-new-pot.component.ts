@@ -42,6 +42,7 @@ import { TablerIconsModule } from 'angular-tabler-icons';
 import { CommonModule } from '@angular/common';
 import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
+import { AutoFocusDirective } from 'src/app/directives/auto-focus.directive';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { TranslateEscalationDescriptionPipe } from 'src/app/core/pipes/translate-escalation-description.pipe';
 import { getAmountCycleLabel } from 'src/app/shared/utils/amount-cycle-label';
@@ -77,6 +78,7 @@ import { capitalizeFirstLetter } from 'src/app/shared/utils/capitalize-first-let
     TablerIconsModule,
     MatCheckboxModule,
     ThousandSeparatorInputDirective,
+    AutoFocusDirective,
     TranslateModule,
     TranslateEscalationDescriptionPipe,
   ],

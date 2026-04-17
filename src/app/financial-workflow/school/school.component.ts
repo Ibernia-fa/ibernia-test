@@ -1,8 +1,22 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { ActivatedRoute } from '@angular/router';
+import { map, switchMap, take } from 'rxjs/operators';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+
+import { Cashflow } from 'src/app/clients/models/cashflow';
+import { Client } from 'src/app/clients/models/client';
+import { FinancialWorkflowService } from '../services/financial-workflow.service';
+import { SavingsPotsHttpService } from '../saving-pots/services/savings-pots-http.service';
+import {
+  ClientSaving,
+  SavingPotType,
+} from '../saving-pots/models/saving-pots.model';
+import { LearnInflationComponent } from './learn-inflation/learn-inflation.component';
 
 interface SchoolSlide {
   title: string;
@@ -16,10 +30,19 @@ interface SchoolModule {
   slides: SchoolSlide[];
 }
 
+const DEFAULT_INFLATION_FALLBACK = 2.5;
+const DEFAULT_AMOUNT_FALLBACK = 100000;
+
 @Component({
   selector: 'app-school',
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatButtonModule, TranslateModule],
+  imports: [
+    CommonModule,
+    MatCardModule,
+    MatButtonModule,
+    MatDialogModule,
+    TranslateModule,
+  ],
   templateUrl: './school.component.html',
   styleUrl: './school.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -27,6 +50,14 @@ interface SchoolModule {
 export class SchoolComponent {
   modules: SchoolModule[] = [];
   activeModule: SchoolModule | null = null;
+  activeSlideIndex = 0;
+  isOpeningInflation = false;
+
+  private readonly dialog = inject(MatDialog);
+  private readonly activatedRoute = inject(ActivatedRoute);
+  private readonly financialWorkflowService = inject(FinancialWorkflowService);
+  private readonly savingsPotsHttpService = inject(SavingsPotsHttpService);
+  private readonly destroyRef = inject(DestroyRef);
 
   constructor(private translate: TranslateService) {
     this.modules = [
@@ -104,7 +135,6 @@ export class SchoolComponent {
       },
     ];
   }
-  activeSlideIndex = 0;
 
   get hasActiveModule(): boolean {
     return !!this.activeModule;
@@ -143,5 +173,84 @@ export class SchoolComponent {
       this.activeSlideIndex -= 1;
     }
   }
-}
 
+  /**
+   * Opens the Inflation educational slide. Prefills:
+   * - default inflation = current plan's `cashflow.inflationRate`
+   *   (falls back to client default, then 2.5%)
+   * - default starting amount = sum of all Cash savings across main client,
+   *   partner and joint ownership (falls back to a sensible value)
+   */
+  openInflationLesson(): void {
+    if (this.isOpeningInflation) return;
+    this.isOpeningInflation = true;
+
+    const params$ = this.activatedRoute.parent?.params ?? this.activatedRoute.params;
+
+    params$
+      .pipe(
+        take(1),
+        switchMap((params) =>
+          this.financialWorkflowService.loadClientCashflowMetadata(params).pipe(take(1)),
+        ),
+        switchMap(([client, cashflow]) =>
+          this.savingsPotsHttpService
+            .getAllSavingsPots((cashflow as Cashflow).id)
+            .pipe(
+              take(1),
+              map((pots) => ({
+                client: client as Client,
+                cashflow: cashflow as Cashflow,
+                pots,
+              })),
+            ),
+        ),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: ({ client, cashflow, pots }) => {
+          const startingAmount = this.computeTotalCashSavings(pots?.clientSavings ?? []);
+          const inflationRate =
+            cashflow?.inflationRate ??
+            client?.clientDetails?.inflationRate ??
+            DEFAULT_INFLATION_FALLBACK;
+
+          this.openInflationDialog({
+            startingAmount: startingAmount > 0 ? startingAmount : DEFAULT_AMOUNT_FALLBACK,
+            inflationRate,
+            currencyCode: client?.clientDetails?.preferredCurrency,
+          });
+          this.isOpeningInflation = false;
+        },
+        error: () => {
+          this.openInflationDialog({
+            startingAmount: DEFAULT_AMOUNT_FALLBACK,
+            inflationRate: DEFAULT_INFLATION_FALLBACK,
+          });
+          this.isOpeningInflation = false;
+        },
+      });
+  }
+
+  private computeTotalCashSavings(savings: ClientSaving[]): number {
+    return savings
+      .filter((s) => s.type === SavingPotType.Cash)
+      .reduce((acc, s) => acc + (s.startingPotValue?.amount ?? 0), 0);
+  }
+
+  private openInflationDialog(data: {
+    startingAmount: number;
+    inflationRate: number;
+    currencyCode?: string;
+  }): void {
+    this.dialog.open(LearnInflationComponent, {
+      width: '92vw',
+      maxWidth: '92vw',
+      height: '88vh',
+      panelClass: 'learn-inflation-dialog-panel',
+      autoFocus: false,
+      restoreFocus: false,
+      data,
+    });
+  }
+}

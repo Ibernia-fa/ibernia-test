@@ -1125,6 +1125,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
     const dialogRef = this.dialog.open(AddEventDialogComponent, {
       width: '612px',
       disableClose: true,
+      autoFocus: false,
       data: {
         amountCycles: this.amountCycles,
         eventType,
@@ -1197,6 +1198,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
     const dialogRef = this.dialog.open(AddNewPotComponent, {
       width: '612px',
       disableClose: true,
+      autoFocus: false,
       data: {
         returnRate: this.userReturnRate,
         pensionFundReturnRate: this.pensionFundReturnRate,
@@ -1267,6 +1269,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
     const dialogRef = this.dialog.open(AddIncomeComponent, {
       width: '612px',
       disableClose: true,
+      autoFocus: false,
       data: {
         amountCycles: this.amountCycles,
         escalataionRates: this.escalationRates,
@@ -1330,6 +1333,7 @@ export class ScenarioLabComponent implements OnInit, OnDestroy {
     const dialogRef = this.dialog.open(AddExpenseComponent, {
       width: '612px',
       disableClose: true,
+      autoFocus: false,
       data: {
         amountCycles: this.amountCycles,
         escalataionRates: this.escalationRates,
