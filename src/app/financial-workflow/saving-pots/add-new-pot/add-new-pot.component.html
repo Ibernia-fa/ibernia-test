@@ -215,7 +215,7 @@
                 thousandSeparatorInput
                 (input)="onAmountInput($event.target.value)"
                 (blur)="onAmountBlur($event)"
-                [appAutoFocus]="!isEditWorkflow && isCashTypeSelected"
+                [appAutoFocus]="isCashTypeSelected"
                 autoFocusSelect
               />
             </div>
