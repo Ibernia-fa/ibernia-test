@@ -43,7 +43,6 @@ const HORIZON_YEARS = 20;
 const DEFAULT_RETURN_RATE = 5;
 
 const ACCENT = '#4043af';
-const ACCENT_SOFT = '#516ce8';
 const SERIES_MUTE = '#9aa3c7';
 
 @Component({
@@ -59,7 +58,6 @@ const SERIES_MUTE = '#9aa3c7';
     NgApexchartsModule,
     TranslateModule,
     ThousandSeparatorInputDirective,
-    CurrencySymbolPipe,
   ],
   templateUrl: './learn-compound-interest.component.html',
   styleUrl: './learn-compound-interest.component.scss',
@@ -103,6 +101,12 @@ export class LearnCompoundInterestComponent implements OnInit {
   readonly valueAfter20Real = computed(() => {
     const s = this.realSeries();
     return s[s.length - 1] ?? 0;
+  });
+
+  /** Nominal gain over the horizon (excludes starting principal). */
+  readonly growthEarnedNominal = computed(() => {
+    const start = this.startingAmount() || 0;
+    return Math.max(0, this.valueAfter20Nominal() - start);
   });
 
   readonly growthMultiple = computed(() => {
@@ -278,7 +282,7 @@ export class LearnCompoundInterestComponent implements OnInit {
         strokeDashArray: 4,
         xaxis: { lines: { show: false } },
         yaxis: { lines: { show: true } },
-        padding: { left: 8, right: 24, top: 8, bottom: 0 },
+        padding: { left: 4, right: 12, top: 4, bottom: 4 },
       },
       xaxis: {
         type: 'category',
@@ -308,17 +312,18 @@ export class LearnCompoundInterestComponent implements OnInit {
         show: true,
         position: 'top',
         horizontalAlign: 'left',
+        offsetY: -4,
         fontFamily: 'Ubuntu, sans-serif',
-        fontSize: '13px',
-        fontWeight: 500,
+        fontSize: '12px',
+        fontWeight: 600,
         labels: { colors: '#5a596e' },
         markers: {
-          width: 10,
-          height: 10,
-          radius: 10,
+          width: 8,
+          height: 8,
+          radius: 8,
           offsetX: -2,
         },
-        itemMargin: { horizontal: 16, vertical: 0 },
+        itemMargin: { horizontal: 14, vertical: 2 },
       },
       tooltip: {
         theme: 'light',
@@ -327,33 +332,6 @@ export class LearnCompoundInterestComponent implements OnInit {
         y: {
           formatter: (value: number) => formatCurrency(value),
         },
-      },
-      annotations: {
-        points: [
-          {
-            x: categories[categories.length - 1],
-            y: Math.round(nominal[nominal.length - 1]),
-            marker: {
-              size: 5,
-              fillColor: ACCENT_SOFT,
-              strokeColor: '#ffffff',
-              strokeWidth: 2,
-              radius: 5,
-            },
-            label: {
-              borderColor: 'transparent',
-              offsetY: -10,
-              style: {
-                background: ACCENT,
-                color: '#ffffff',
-                fontSize: '11px',
-                fontFamily: 'Ubuntu, sans-serif',
-                padding: { left: 8, right: 8, top: 4, bottom: 4 },
-              },
-              text: formatCurrency(nominal[nominal.length - 1]),
-            },
-          },
-        ],
       },
     };
   }
