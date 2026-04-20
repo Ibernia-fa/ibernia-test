@@ -58,7 +58,6 @@ export interface CountrySource {
 
 const YEAR_POINTS = [0, 5, 10, 15, 20];
 const ACCENT = '#4043af';
-const ACCENT_SOFT = '#516ce8';
 
 /** Refined Ibernia palette for the cross-country chart. */
 const COUNTRY_COLORS = {
@@ -427,35 +426,6 @@ export class LearnInflationComponent implements OnInit {
               this.translate.instant('LEARN_INFLATION.TOOLTIP_LABEL'),
           },
         },
-      },
-      annotations: {
-        points: data.length
-          ? [
-              {
-                x: categories[categories.length - 1],
-                y: Math.round(data[data.length - 1]),
-                marker: {
-                  size: 6,
-                  fillColor: ACCENT_SOFT,
-                  strokeColor: '#ffffff',
-                  strokeWidth: 3,
-                  radius: 6,
-                },
-                label: {
-                  borderColor: 'transparent',
-                  offsetY: -12,
-                  style: {
-                    background: ACCENT,
-                    color: '#ffffff',
-                    fontSize: '12px',
-                    fontFamily: 'Ubuntu, sans-serif',
-                    padding: { left: 10, right: 10, top: 6, bottom: 6 },
-                  },
-                  text: formatCurrency(data[data.length - 1]),
-                },
-              },
-            ]
-          : [],
       },
     };
   }
