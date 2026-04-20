@@ -1,0 +1,107 @@
+<div class="learn-rb w-100 h-100 d-flex flex-column">
+  <div class="learn-rb__header">
+    <button
+      type="button"
+      mat-icon-button
+      disableRipple
+      class="dialog-close-btn"
+      mat-dialog-close
+      [attr.aria-label]="'LEARN_RENT_OR_BUY.CLOSE' | translate"
+    >
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content class="learn-rb__content">
+    <div class="learn-rb__layout">
+      <aside class="learn-rb__side">
+        <div class="impact-card">
+          <span class="impact-card__label">{{ "LEARN_RENT_OR_BUY.HOME_PRICE" | translate }}</span>
+          <div class="impact-card__value">
+            <span class="impact-card__currency">{{ currencySymbol }}</span>
+            <input
+              type="text"
+              inputmode="decimal"
+              placeholder="0"
+              thousandSeparatorInput
+              [formControl]="homePriceControl"
+              class="impact-card__input"
+            />
+          </div>
+        </div>
+
+        <div class="impact-card">
+          <span class="impact-card__label">{{ "LEARN_RENT_OR_BUY.DOWN_PAYMENT" | translate }}</span>
+          <div class="impact-card__value impact-card__value--rate-pair">
+            <input
+              type="text"
+              inputmode="decimal"
+              placeholder="0"
+              [value]="downPaymentText()"
+              (input)="onDownPaymentInput($any($event.target).value)"
+              (blur)="onDownPaymentBlur()"
+              class="impact-card__input"
+            />
+            <span class="impact-card__suffix">%</span>
+          </div>
+        </div>
+
+        <div class="impact-card">
+          <span class="impact-card__label">{{ "LEARN_RENT_OR_BUY.MONTHLY_RENT" | translate }}</span>
+          <div class="impact-card__value">
+            <span class="impact-card__currency">{{ currencySymbol }}</span>
+            <input
+              type="text"
+              inputmode="decimal"
+              placeholder="0"
+              thousandSeparatorInput
+              [formControl]="monthlyRentControl"
+              class="impact-card__input"
+            />
+          </div>
+        </div>
+
+        <button type="button" class="learn-rb__more-link" (click)="openAssumptions()">
+          {{ "LEARN_RENT_OR_BUY.MORE_ASSUMPTIONS" | translate }}
+        </button>
+      </aside>
+
+      <section class="learn-rb__main">
+        <h1 class="learn-rb__title">{{ "LEARN_RENT_OR_BUY.TITLE" | translate }}</h1>
+        <p class="learn-rb__explainer">
+          {{ "LEARN_RENT_OR_BUY.EXPLAINER" | translate }}
+        </p>
+
+        @if (simulation()) {
+          <div class="learn-rb__takeaway">
+            <p class="learn-rb__takeaway-lead">{{ takeawayHeadline() }}</p>
+            <p class="learn-rb__takeaway-support">{{ takeawaySupport() }}</p>
+          </div>
+        } @else {
+          <div class="learn-rb__takeaway learn-rb__takeaway--muted">
+            <p class="learn-rb__takeaway-lead">{{ "LEARN_RENT_OR_BUY.EMPTY_STATE" | translate }}</p>
+          </div>
+        }
+
+        <div class="learn-rb__chart">
+          <apx-chart
+            [series]="chartOptions().series"
+            [chart]="chartOptions().chart"
+            [xaxis]="chartOptions().xaxis"
+            [yaxis]="chartOptions().yaxis"
+            [colors]="chartOptions().colors"
+            [tooltip]="chartOptions().tooltip"
+            [legend]="chartOptions().legend"
+            [grid]="chartOptions().grid"
+            [dataLabels]="chartOptions().dataLabels"
+            [stroke]="chartOptions().stroke"
+            [markers]="chartOptions().markers"
+            [annotations]="chartOptions().annotations"
+          ></apx-chart>
+        </div>
+
+        <p class="learn-rb__footnote">{{ "LEARN_RENT_OR_BUY.FOOTNOTE" | translate }}</p>
+      </section>
+    </div>
+  </mat-dialog-content>
+</div>

@@ -67,12 +67,7 @@
                 role="img"
                 [attr.aria-label]="'LEARN_CASH_BUFFER.RANGE_ARIA' | translate"
               >
-                <div
-                  class="buffer-months__zones"
-                  [style.grid-template-columns]="
-                    zoneLowWidthPct() + '% ' + zoneMidWidthPct() + '% ' + zoneHighWidthPct() + '%'
-                  "
-                >
+                <div class="buffer-months__zones buffer-months__zones--benchmark">
                   <span class="buffer-months__zone-label buffer-months__zone-label--low">
                     {{ "LEARN_CASH_BUFFER.ZONE_LOW" | translate }}
                   </span>
@@ -83,25 +78,41 @@
                     {{ "LEARN_CASH_BUFFER.ZONE_HIGH" | translate }}
                   </span>
                 </div>
-                <div class="buffer-months__track-wrap">
-                  <div class="buffer-months__track">
-                    <div class="buffer-months__seg buffer-months__seg--low" [style.width.%]="zoneLowWidthPct()"></div>
-                    <div class="buffer-months__seg buffer-months__seg--mid" [style.width.%]="zoneMidWidthPct()"></div>
-                    <div class="buffer-months__seg buffer-months__seg--high" [style.width.%]="zoneHighWidthPct()"></div>
+                <div class="buffer-months__benchmark-wrap">
+                  <div class="buffer-months__benchmark-line" aria-hidden="true">
+                    <div class="buffer-months__benchmark-seg buffer-months__benchmark-seg--low">
+                      <span class="buffer-months__benchmark-stroke buffer-months__benchmark-stroke--low"></span>
+                    </div>
+                    <div class="buffer-months__benchmark-seg buffer-months__benchmark-seg--mid">
+                      <span class="buffer-months__benchmark-band"></span>
+                      <span class="buffer-months__benchmark-stroke buffer-months__benchmark-stroke--mid"></span>
+                    </div>
+                    <div class="buffer-months__benchmark-seg buffer-months__benchmark-seg--high">
+                      <span class="buffer-months__benchmark-stroke buffer-months__benchmark-stroke--high"></span>
+                    </div>
                   </div>
                   @if (markerPercent() !== null) {
                     <div
                       class="buffer-months__marker"
                       [style.left.%]="markerPercent()!"
                       [attr.title]="formatMonthsDisplay(bufferMonths())"
-                    ></div>
+                    >
+                      <span class="buffer-months__marker-stem"></span>
+                      <span class="buffer-months__marker-cap"></span>
+                    </div>
                   }
                 </div>
-                <div class="buffer-months__scale">
-                  <span>0</span>
-                  <span>{{ "LEARN_CASH_BUFFER.SCALE_3" | translate }}</span>
-                  <span>{{ "LEARN_CASH_BUFFER.SCALE_12" | translate }}</span>
-                  <span>{{ formatAxisMonths(displayMaxMonths()) }}</span>
+                <div class="buffer-months__scale buffer-months__scale--benchmark">
+                  <div class="buffer-months__scale-split buffer-months__scale-split--low">
+                    <span>0</span>
+                    <span>{{ "LEARN_CASH_BUFFER.SCALE_3" | translate }}</span>
+                  </div>
+                  <div class="buffer-months__scale-split buffer-months__scale-split--mid">
+                    <span>{{ "LEARN_CASH_BUFFER.SCALE_12" | translate }}</span>
+                  </div>
+                  <div class="buffer-months__scale-split buffer-months__scale-split--high">
+                    <span>{{ formatAxisMonths(benchmarkVisualMaxMonths) }}</span>
+                  </div>
                 </div>
               </div>
             </div>

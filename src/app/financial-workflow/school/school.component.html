@@ -246,7 +246,53 @@
             </div>
           </article>
 
-          <!-- Column 3 row 2 — Why having a plan matters (coming soon) -->
+          <!-- Column 3 row 2 — Rent or Buy -->
+          <article
+            class="card card--interactive"
+            role="button"
+            tabindex="0"
+            (click)="openRentOrBuyLesson()"
+            (keydown.enter)="openRentOrBuyLesson()"
+            (keydown.space)="$event.preventDefault(); openRentOrBuyLesson()"
+          >
+            <div class="card__image-container">
+              <img
+                src="../../../assets/images/blog/school-module-3.png"
+                alt=""
+                class="card__image"
+              />
+            </div>
+            <div class="card__content">
+              <div class="card__header">
+                <span class="badge badge--purple">{{
+                  "SCHOOL.AVAILABLE" | translate
+                }}</span>
+              </div>
+              <h3 class="card__title">{{ "SCHOOL.CARD_RENT_OR_BUY_TITLE" | translate }}</h3>
+              <button
+                type="button"
+                class="card__link card__link--active"
+                (click)="$event.stopPropagation(); openRentOrBuyLesson()"
+              >
+                {{ "SCHOOL.START_LEARNING" | translate }}
+                <svg
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M17 8l4 4m0 0l-4 4m4-4H3"
+                  ></path>
+                </svg>
+              </button>
+            </div>
+          </article>
+
+          <!-- Column 3 row 3 — Why having a plan matters (coming soon) -->
           <article class="card">
             <div class="card__image-container">
               <img
