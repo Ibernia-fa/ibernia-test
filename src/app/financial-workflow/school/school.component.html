@@ -58,42 +58,7 @@
             </div>
           </article>
 
-          <!-- Card 2 -->
-          <article class="card">
-            <div class="card__image-container">
-              <img
-                src="../../../assets/images/blog/school-module-2.png"
-                alt="Markets"
-                class="card__image"
-              />
-            </div>
-            <div class="card__content">
-              <div class="card__header">
-                <span class="badge badge--pink">{{ "SCHOOL.COMING_SOON" | translate }}</span>
-              </div>
-              <h3 class="card__title">
-                {{ "SCHOOL.CARD_2_TITLE" | translate }}
-              </h3>
-              <span class="card__link card__link--disabled">
-                {{ "SCHOOL.START_LEARNING" | translate }}
-                <svg
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M17 8l4 4m0 0l-4 4m4-4H3"
-                  ></path>
-                </svg>
-              </span>
-            </div>
-          </article>
-
-          <!-- Card 3 -->
+          <!-- Card 2 — Compound interest -->
           <article
             class="card card--interactive"
             role="button"
@@ -140,41 +105,16 @@
               </button>
             </div>
           </article>
-          <!-- Card 4 -->
-          <article class="card">
-            <div class="card__image-container">
-              <img
-                src="../../../assets/images/blog/school-module-4.png"
-                alt="Cash"
-                class="card__image"
-              />
-            </div>
-            <div class="card__content">
-              <div class="card__header">
-                <span class="badge badge--pink">{{ "SCHOOL.COMING_SOON" | translate }}</span>
-              </div>
-              <h3 class="card__title">{{ "SCHOOL.CARD_4_TITLE" | translate }}</h3>
-              <span class="card__link card__link--disabled">
-                {{ "SCHOOL.START_LEARNING" | translate }}
-                <svg
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M17 8l4 4m0 0l-4 4m4-4H3"
-                  ></path>
-                </svg>
-              </span>
-            </div>
-          </article>
 
-          <!-- Card 5 -->
-          <article class="card">
+          <!-- Card 3 — Cost of waiting -->
+          <article
+            class="card card--interactive"
+            role="button"
+            tabindex="0"
+            (click)="openCostOfWaitingLesson()"
+            (keydown.enter)="openCostOfWaitingLesson()"
+            (keydown.space)="$event.preventDefault(); openCostOfWaitingLesson()"
+          >
             <div class="card__image-container">
               <img
                 src="../../../assets/images/blog/school-module-5.png"
@@ -184,9 +124,50 @@
             </div>
             <div class="card__content">
               <div class="card__header">
-                <span class="badge badge--pink">{{ "SCHOOL.COMING_SOON" | translate }}</span>
+                <span class="badge badge--purple">{{
+                  "SCHOOL.AVAILABLE" | translate
+                }}</span>
               </div>
               <h3 class="card__title">{{ "SCHOOL.CARD_5_TITLE" | translate }}</h3>
+              <button
+                type="button"
+                class="card__link card__link--active"
+                (click)="$event.stopPropagation(); openCostOfWaitingLesson()"
+              >
+                {{ "SCHOOL.START_LEARNING" | translate }}
+                <svg
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M17 8l4 4m0 0l-4 4m4-4H3"
+                  ></path>
+                </svg>
+              </button>
+            </div>
+          </article>
+
+          <!-- Card 4 — Time in the market (coming soon) -->
+          <article class="card">
+            <div class="card__image-container">
+              <img
+                src="../../../assets/images/blog/school-module-2.png"
+                alt="Markets"
+                class="card__image"
+              />
+            </div>
+            <div class="card__content">
+              <div class="card__header">
+                <span class="badge badge--pink">{{ "SCHOOL.COMING_SOON" | translate }}</span>
+              </div>
+              <h3 class="card__title">
+                {{ "SCHOOL.CARD_2_TITLE" | translate }}
+              </h3>
               <span class="card__link card__link--disabled">
                 {{ "SCHOOL.START_LEARNING" | translate }}
                 <svg
@@ -205,6 +186,52 @@
               </span>
             </div>
           </article>
+          <!-- Card 4 — Cash buffer -->
+          <article
+            class="card card--interactive"
+            role="button"
+            tabindex="0"
+            (click)="openCashBufferLesson()"
+            (keydown.enter)="openCashBufferLesson()"
+            (keydown.space)="$event.preventDefault(); openCashBufferLesson()"
+          >
+            <div class="card__image-container">
+              <img
+                src="../../../assets/images/blog/school-module-4.png"
+                alt="Cash"
+                class="card__image"
+              />
+            </div>
+            <div class="card__content">
+              <div class="card__header">
+                <span class="badge badge--purple">{{
+                  "SCHOOL.AVAILABLE" | translate
+                }}</span>
+              </div>
+              <h3 class="card__title">{{ "SCHOOL.CARD_4_TITLE" | translate }}</h3>
+              <button
+                type="button"
+                class="card__link card__link--active"
+                (click)="$event.stopPropagation(); openCashBufferLesson()"
+              >
+                {{ "SCHOOL.START_LEARNING" | translate }}
+                <svg
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M17 8l4 4m0 0l-4 4m4-4H3"
+                  ></path>
+                </svg>
+              </button>
+            </div>
+          </article>
+
           <!-- Card 6 -->
           <article class="card">
             <div class="card__image-container">

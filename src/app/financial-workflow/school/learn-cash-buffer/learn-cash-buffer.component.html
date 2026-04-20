@@ -1,0 +1,177 @@
+<div class="learn-cash-buffer w-100 h-100 d-flex flex-column">
+  <div class="learn-cash-buffer__header">
+    <button
+      type="button"
+      mat-icon-button
+      disableRipple
+      class="dialog-close-btn"
+      mat-dialog-close
+      [attr.aria-label]="'LEARN_CASH_BUFFER.CLOSE' | translate"
+      (click)="closeDialog()"
+    >
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content class="learn-cash-buffer__content">
+    <div class="learn-cash-buffer__page">
+      <h1 class="learn-cash-buffer__hero">
+        {{ "LEARN_CASH_BUFFER.HERO" | translate }}
+      </h1>
+
+      <div class="learn-cash-buffer__layout">
+        <aside class="learn-cash-buffer__side">
+          <div class="impact-card">
+            <span class="impact-card__label">
+              {{ "LEARN_CASH_BUFFER.CASH_LABEL" | translate }}
+            </span>
+            <div class="impact-card__value">
+              <span class="impact-card__currency">{{ currencySymbol }}</span>
+              <input
+                type="text"
+                inputmode="decimal"
+                placeholder="0"
+                thousandSeparatorInput
+                [formControl]="cashControl"
+                class="impact-card__input"
+              />
+            </div>
+          </div>
+
+          <div class="impact-card">
+            <span class="impact-card__label">
+              {{ "LEARN_CASH_BUFFER.EXPENSES_LABEL" | translate }}
+            </span>
+            <div class="impact-card__value">
+              <span class="impact-card__currency">{{ currencySymbol }}</span>
+              <input
+                type="text"
+                inputmode="decimal"
+                placeholder="0"
+                thousandSeparatorInput
+                [formControl]="expensesControl"
+                class="impact-card__input"
+              />
+              <span class="impact-card__suffix impact-card__suffix--small">
+                {{ "LEARN_CASH_BUFFER.PER_MONTH" | translate }}
+              </span>
+            </div>
+          </div>
+
+          <p class="learn-cash-buffer__plan-note">
+            {{ "LEARN_CASH_BUFFER.PLAN_NOTE" | translate }}
+          </p>
+
+          <article class="lesson-card">
+            <h3 class="lesson-card__title">{{ "LEARN_CASH_BUFFER.CARD_LOW_TITLE" | translate }}</h3>
+            <p class="lesson-card__text">{{ "LEARN_CASH_BUFFER.CARD_LOW_BODY" | translate }}</p>
+          </article>
+
+          <article class="lesson-card">
+            <h3 class="lesson-card__title">{{ "LEARN_CASH_BUFFER.CARD_OK_TITLE" | translate }}</h3>
+            <p class="lesson-card__text">{{ "LEARN_CASH_BUFFER.CARD_OK_BODY" | translate }}</p>
+          </article>
+
+          <article class="lesson-card">
+            <h3 class="lesson-card__title">{{ "LEARN_CASH_BUFFER.CARD_HIGH_TITLE" | translate }}</h3>
+            <p class="lesson-card__text">{{ "LEARN_CASH_BUFFER.CARD_HIGH_BODY" | translate }}</p>
+          </article>
+        </aside>
+
+        <section class="learn-cash-buffer__main">
+          <div class="buffer-range" role="img" [attr.aria-label]="'LEARN_CASH_BUFFER.RANGE_ARIA' | translate">
+            <div class="buffer-range__track">
+              <div class="buffer-range__seg buffer-range__seg--low" [style.width.%]="zoneLowWidthPct()"></div>
+              <div class="buffer-range__seg buffer-range__seg--mid" [style.width.%]="zoneMidWidthPct()"></div>
+              <div class="buffer-range__seg buffer-range__seg--high" [style.width.%]="zoneHighWidthPct()"></div>
+              <div
+                class="buffer-range__marker"
+                [style.left.%]="markerPercent()"
+                [attr.title]="formatAmount(cash())"
+              ></div>
+            </div>
+            <div class="buffer-range__scale">
+              <span>0</span>
+              <span>{{ formatAmount(buffer3()) }}</span>
+              <span>{{ formatAmount(buffer12()) }}</span>
+              <span>{{ formatAmount(chartMax()) }}</span>
+            </div>
+          </div>
+
+          <div class="learn-cash-buffer__chart">
+            <apx-chart
+              [series]="chartOptions().series"
+              [chart]="chartOptions().chart"
+              [xaxis]="chartOptions().xaxis"
+              [yaxis]="chartOptions().yaxis"
+              [colors]="chartOptions().colors"
+              [tooltip]="chartOptions().tooltip"
+              [legend]="chartOptions().legend"
+              [grid]="chartOptions().grid"
+              [dataLabels]="chartOptions().dataLabels"
+              [plotOptions]="chartOptions().plotOptions"
+            ></apx-chart>
+          </div>
+
+          @switch (interpretation()) {
+            @case ('below') {
+              <p class="learn-cash-buffer__interpret">
+                {{ "LEARN_CASH_BUFFER.INTERP_BELOW" | translate }}
+              </p>
+            }
+            @case ('within') {
+              <p class="learn-cash-buffer__interpret">
+                {{ "LEARN_CASH_BUFFER.INTERP_WITHIN" | translate }}
+              </p>
+            }
+            @case ('above') {
+              <p class="learn-cash-buffer__interpret">
+                {{ "LEARN_CASH_BUFFER.INTERP_ABOVE" | translate }}
+              </p>
+              <p class="learn-cash-buffer__interpret-nuance">
+                {{ "LEARN_CASH_BUFFER.INTERP_ABOVE_NUANCE" | translate }}
+              </p>
+            }
+            @default {
+              <p class="learn-cash-buffer__interpret learn-cash-buffer__interpret--muted">
+                {{ "LEARN_CASH_BUFFER.INTERP_NEUTRAL" | translate }}
+              </p>
+            }
+          }
+
+          <div class="learn-cash-buffer__metrics" role="list">
+            <div class="metric-pill" role="listitem">
+              <span class="metric-pill__label">{{ "LEARN_CASH_BUFFER.METRIC_CASH" | translate }}</span>
+              <span class="metric-pill__value"
+                >{{ currencySymbol }} {{ formatAmount(cash()) }}</span
+              >
+            </div>
+            <div class="metric-pill" role="listitem">
+              <span class="metric-pill__label">{{ "LEARN_CASH_BUFFER.METRIC_3" | translate }}</span>
+              <span class="metric-pill__value"
+                >{{ currencySymbol }} {{ formatAmount(buffer3()) }}</span
+              >
+            </div>
+            <div class="metric-pill" role="listitem">
+              <span class="metric-pill__label">{{ "LEARN_CASH_BUFFER.METRIC_6" | translate }}</span>
+              <span class="metric-pill__value"
+                >{{ currencySymbol }} {{ formatAmount(buffer6()) }}</span
+              >
+            </div>
+            <div class="metric-pill" role="listitem">
+              <span class="metric-pill__label">{{ "LEARN_CASH_BUFFER.METRIC_12" | translate }}</span>
+              <span class="metric-pill__value"
+                >{{ currencySymbol }} {{ formatAmount(buffer12()) }}</span
+              >
+            </div>
+          </div>
+
+          <div class="learn-cash-buffer__why">
+            <h2 class="learn-cash-buffer__why-title">{{ "LEARN_CASH_BUFFER.WHY_TITLE" | translate }}</h2>
+            <p class="learn-cash-buffer__why-body">{{ "LEARN_CASH_BUFFER.WHY_BODY" | translate }}</p>
+          </div>
+        </section>
+      </div>
+    </div>
+  </mat-dialog-content>
+</div>

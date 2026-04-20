@@ -5,8 +5,8 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
-import { Observable } from 'rxjs';
-import { map, switchMap, take } from 'rxjs/operators';
+import { Observable, combineLatest, of } from 'rxjs';
+import { catchError, map, switchMap, take } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { Cashflow } from 'src/app/clients/models/cashflow';
@@ -20,6 +20,10 @@ import {
 } from '../saving-pots/models/saving-pots.model';
 import { LearnInflationComponent } from './learn-inflation/learn-inflation.component';
 import { LearnCompoundInterestComponent } from './learn-compound-interest/learn-compound-interest.component';
+import { LearnCostOfWaitingComponent } from './learn-cost-of-waiting/learn-cost-of-waiting.component';
+import { LearnCashBufferComponent } from './learn-cash-buffer/learn-cash-buffer.component';
+import { IncomeExpensesHttpService } from '../income-expenses/services/income-expenses-http.service';
+import { FinancialViewModel, IncomeExpense } from '../income-expenses/model/income-expense';
 
 interface SchoolSlide {
   title: string;
@@ -35,6 +39,7 @@ interface SchoolModule {
 
 const DEFAULT_INFLATION_FALLBACK = 2.5;
 const DEFAULT_AMOUNT_FALLBACK = 100000;
+const DEFAULT_MONTHLY_EXPENSES_FALLBACK = 3000;
 
 @Component({
   selector: 'app-school',
@@ -56,11 +61,14 @@ export class SchoolComponent {
   activeSlideIndex = 0;
   isOpeningInflation = false;
   isOpeningCompound = false;
+  isOpeningCostOfWaiting = false;
+  isOpeningCashBuffer = false;
 
   private readonly dialog = inject(MatDialog);
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly financialWorkflowService = inject(FinancialWorkflowService);
   private readonly savingsPotsHttpService = inject(SavingsPotsHttpService);
+  private readonly incomeExpensesHttpService = inject(IncomeExpensesHttpService);
   private readonly destroyRef = inject(DestroyRef);
 
   constructor(private translate: TranslateService) {
@@ -251,6 +259,106 @@ export class SchoolComponent {
       });
   }
 
+  /**
+   * Opportunity cost of delaying investment: same cash-savings prefill and plan inflation
+   * as the other School lessons (inflation toggle uses plan inflation when enabled).
+   */
+  /**
+   * Cash buffer lesson: prefills cash savings pots and recurring monthly expenses
+   * from Money In & Out (one-off expense lines excluded).
+   */
+  openCashBufferLesson(): void {
+    if (this.isOpeningCashBuffer) return;
+    this.isOpeningCashBuffer = true;
+
+    this.fetchCashBufferLessonContext$()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: ({ client, pots, incomeExpense }) => {
+          const fromPots = this.computeTotalCashSavings(pots?.clientSavings ?? []);
+          const recurring = this.computeMonthlyRecurringExpenses(
+            incomeExpense?.expenses,
+          );
+
+          this.openCashBufferDialog({
+            currentCash:
+              fromPots > 0 ? fromPots : DEFAULT_AMOUNT_FALLBACK,
+            monthlyRecurringExpenses:
+              recurring > 0 ? recurring : DEFAULT_MONTHLY_EXPENSES_FALLBACK,
+            currencyCode: client?.clientDetails?.preferredCurrency,
+          });
+          this.isOpeningCashBuffer = false;
+        },
+        error: () => {
+          this.openCashBufferDialog({
+            currentCash: DEFAULT_AMOUNT_FALLBACK,
+            monthlyRecurringExpenses: DEFAULT_MONTHLY_EXPENSES_FALLBACK,
+          });
+          this.isOpeningCashBuffer = false;
+        },
+      });
+  }
+
+  openCostOfWaitingLesson(): void {
+    if (this.isOpeningCostOfWaiting) return;
+    this.isOpeningCostOfWaiting = true;
+
+    this.fetchLessonPlanContext$()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: ({ client, cashflow, pots }) => {
+          const startingAmount = this.computeTotalCashSavings(pots?.clientSavings ?? []);
+          const inflationRate =
+            cashflow?.inflationRate ??
+            client?.clientDetails?.inflationRate ??
+            DEFAULT_INFLATION_FALLBACK;
+
+          this.openCostOfWaitingDialog({
+            startingAmount: startingAmount > 0 ? startingAmount : DEFAULT_AMOUNT_FALLBACK,
+            inflationRate,
+            currencyCode: client?.clientDetails?.preferredCurrency,
+          });
+          this.isOpeningCostOfWaiting = false;
+        },
+        error: () => {
+          this.openCostOfWaitingDialog({
+            startingAmount: DEFAULT_AMOUNT_FALLBACK,
+            inflationRate: DEFAULT_INFLATION_FALLBACK,
+          });
+          this.isOpeningCostOfWaiting = false;
+        },
+      });
+  }
+
+  private fetchCashBufferLessonContext$(): Observable<{
+    client: Client;
+    pots: SavingPotsModel;
+    incomeExpense: IncomeExpense | null;
+  }> {
+    const params$ = this.activatedRoute.parent?.params ?? this.activatedRoute.params;
+    return params$.pipe(
+      take(1),
+      switchMap((params) =>
+        this.financialWorkflowService.loadClientCashflowMetadata(params).pipe(take(1)),
+      ),
+      switchMap(([client, cashflow]) =>
+        combineLatest([
+          this.savingsPotsHttpService.getAllSavingsPots((cashflow as Cashflow).id),
+          this.incomeExpensesHttpService
+            .getAllIncomeExpenses((cashflow as Cashflow).id)
+            .pipe(catchError(() => of(null))),
+        ]).pipe(
+          take(1),
+          map(([pots, incomeExpense]) => ({
+            client: client as Client,
+            pots: pots as SavingPotsModel,
+            incomeExpense: incomeExpense as IncomeExpense | null,
+          })),
+        ),
+      ),
+    );
+  }
+
   private fetchLessonPlanContext$(): Observable<{
     client: Client;
     cashflow: Cashflow;
@@ -281,6 +389,28 @@ export class SchoolComponent {
       .reduce((acc, s) => acc + (s.startingPotValue?.amount ?? 0), 0);
   }
 
+  /** Sum recurring expenses as an approximate monthly total; excludes one-off lines. */
+  private computeMonthlyRecurringExpenses(
+    expenses: FinancialViewModel[] | undefined,
+  ): number {
+    if (!expenses?.length) return 0;
+    let total = 0;
+    for (const e of expenses) {
+      const cycle = e.amount?.cycle?.description ?? '';
+      if (cycle === 'One-off') continue;
+      const amt = e.amount?.amount ?? 0;
+      if (amt <= 0) continue;
+      if (cycle === 'Every month' || cycle === 'Monthly') {
+        total += amt;
+      } else if (cycle === 'Every year' || cycle === 'Yearly') {
+        total += amt / 12;
+      } else {
+        total += amt;
+      }
+    }
+    return total;
+  }
+
   private openInflationDialog(data: {
     startingAmount: number;
     inflationRate: number;
@@ -303,6 +433,38 @@ export class SchoolComponent {
     currencyCode?: string;
   }): void {
     this.dialog.open(LearnCompoundInterestComponent, {
+      width: '92vw',
+      maxWidth: '92vw',
+      height: '88vh',
+      panelClass: 'learn-inflation-dialog-panel',
+      autoFocus: false,
+      restoreFocus: false,
+      data,
+    });
+  }
+
+  private openCostOfWaitingDialog(data: {
+    startingAmount: number;
+    inflationRate: number;
+    currencyCode?: string;
+  }): void {
+    this.dialog.open(LearnCostOfWaitingComponent, {
+      width: '92vw',
+      maxWidth: '92vw',
+      height: '88vh',
+      panelClass: 'learn-inflation-dialog-panel',
+      autoFocus: false,
+      restoreFocus: false,
+      data,
+    });
+  }
+
+  private openCashBufferDialog(data: {
+    currentCash: number;
+    monthlyRecurringExpenses: number;
+    currencyCode?: string;
+  }): void {
+    this.dialog.open(LearnCashBufferComponent, {
       width: '92vw',
       maxWidth: '92vw',
       height: '88vh',

@@ -1,0 +1,149 @@
+<div class="learn-cost-waiting w-100 h-100 d-flex flex-column">
+  <div class="learn-cost-waiting__header">
+    <button
+      type="button"
+      mat-icon-button
+      disableRipple
+      class="dialog-close-btn"
+      mat-dialog-close
+      [attr.aria-label]="'LEARN_COST_WAITING.CLOSE' | translate"
+    >
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content class="learn-cost-waiting__content">
+    <div class="learn-cost-waiting__page learn-cost-waiting__page--main">
+      <h1 class="learn-cost-waiting__hero">
+        {{ "LEARN_COST_WAITING.HERO_TITLE" | translate }}
+      </h1>
+
+      <div class="learn-cost-waiting__layout">
+        <aside class="learn-cost-waiting__side">
+          <div class="impact-card">
+            <span class="impact-card__label">
+              {{ "LEARN_COST_WAITING.AMOUNT" | translate }}
+            </span>
+            <div class="impact-card__value">
+              <span class="impact-card__currency">{{ currencySymbol }}</span>
+              <input
+                type="text"
+                inputmode="decimal"
+                placeholder="0"
+                thousandSeparatorInput
+                [formControl]="startingAmountControl"
+                class="impact-card__input"
+              />
+            </div>
+          </div>
+
+          <div class="cost-waiting-inputs__pair">
+            <div class="impact-card">
+              <span class="impact-card__label">
+                {{ "LEARN_COST_WAITING.EXPECTED_RETURN" | translate }}
+              </span>
+              <div class="impact-card__value impact-card__value--rate-pair">
+                <input
+                  type="text"
+                  inputmode="decimal"
+                  placeholder="0"
+                  [value]="returnText()"
+                  (input)="onReturnInput($any($event.target).value)"
+                  (blur)="onReturnBlur()"
+                  class="impact-card__input"
+                />
+                <span class="impact-card__suffix">%</span>
+              </div>
+            </div>
+
+            <div class="impact-card">
+              <span class="impact-card__label">
+                {{ "LEARN_COST_WAITING.TIME_HORIZON" | translate }}
+              </span>
+              <div class="impact-card__value impact-card__value--rate-pair">
+                <input
+                  type="text"
+                  inputmode="numeric"
+                  placeholder="0"
+                  [value]="horizonText()"
+                  (input)="onHorizonInput($any($event.target).value)"
+                  (blur)="onHorizonBlur()"
+                  class="impact-card__input"
+                />
+                <span class="impact-card__suffix suffix-years">{{
+                  "LEARN_COST_WAITING.YEARS_SUFFIX" | translate
+                }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="cost-waiting-inflation-toggle">
+            <mat-slide-toggle
+              [checked]="showInflationAdjusted()"
+              (change)="onInflationAdjustedToggle($event.checked)"
+              color="primary"
+            >
+              <span class="cost-waiting-inflation-toggle__label">{{
+                "LEARN_COST_WAITING.INFLATION_ADJUSTED" | translate
+              }}</span>
+            </mat-slide-toggle>
+          </div>
+
+          <div class="impact-card impact-card--accent">
+            <span class="impact-card__label">
+              {{ "LEARN_COST_WAITING.ACTIVE_SCENARIO" | translate }}
+            </span>
+            @if (startingAmount() > 0) {
+              <p class="cost-waiting-summary-line cost-waiting-summary-line--primary">
+                {{
+                  "LEARN_COST_WAITING.SUMMARY_PRIMARY"
+                    | translate
+                      : {
+                          months: activeScenario().months,
+                          amount: formatCurrencyFull(activeScenario().cost),
+                          years: horizonYears(),
+                        }
+                }}
+              </p>
+              <span class="impact-card__hint">
+                {{
+                  "LEARN_COST_WAITING.SUMMARY_SECONDARY"
+                    | translate: { percent: formatPercentOneDecimal(activeScenario().pct) }
+                }}
+              </span>
+            } @else {
+              <p class="cost-waiting-summary-line cost-waiting-summary-line--muted">
+                {{ "LEARN_COST_WAITING.SUMMARY_EMPTY" | translate }}
+              </p>
+            }
+          </div>
+
+          <p class="impact-supporting-copy">
+            {{ "LEARN_COST_WAITING.SUPPORTING_COPY" | translate }}
+          </p>
+        </aside>
+
+        <section class="learn-cost-waiting__main">
+          <div class="learn-cost-waiting__chart">
+            <apx-chart
+              [series]="chartOptions().series"
+              [chart]="chartOptions().chart"
+              [xaxis]="chartOptions().xaxis"
+              [yaxis]="chartOptions().yaxis"
+              [colors]="chartOptions().colors"
+              [tooltip]="chartOptions().tooltip"
+              [legend]="chartOptions().legend"
+              [grid]="chartOptions().grid"
+              [dataLabels]="chartOptions().dataLabels"
+              [plotOptions]="chartOptions().plotOptions"
+              [states]="chartOptions().states"
+            ></apx-chart>
+          </div>
+          <p class="chart-takeaway">
+            {{ "LEARN_COST_WAITING.TAKEAWAY" | translate }}
+          </p>
+        </section>
+      </div>
+    </div>
+  </mat-dialog-content>
+</div>
