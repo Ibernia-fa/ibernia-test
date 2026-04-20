@@ -13,94 +13,323 @@
   </div>
 
   <mat-dialog-content class="learn-rb__content">
-    <div class="learn-rb__layout">
-      <aside class="learn-rb__side">
-        <div class="impact-card">
-          <span class="impact-card__label">{{ "LEARN_RENT_OR_BUY.HOME_PRICE" | translate }}</span>
-          <div class="impact-card__value">
-            <span class="impact-card__currency">{{ currencySymbol }}</span>
-            <input
-              type="text"
-              inputmode="decimal"
-              placeholder="0"
-              thousandSeparatorInput
-              [formControl]="homePriceControl"
-              class="impact-card__input"
-            />
-          </div>
-        </div>
-
-        <div class="impact-card">
-          <span class="impact-card__label">{{ "LEARN_RENT_OR_BUY.DOWN_PAYMENT" | translate }}</span>
-          <div class="impact-card__value impact-card__value--rate-pair">
-            <input
-              type="text"
-              inputmode="decimal"
-              placeholder="0"
-              [value]="downPaymentText()"
-              (input)="onDownPaymentInput($any($event.target).value)"
-              (blur)="onDownPaymentBlur()"
-              class="impact-card__input"
-            />
-            <span class="impact-card__suffix">%</span>
-          </div>
-        </div>
-
-        <div class="impact-card">
-          <span class="impact-card__label">{{ "LEARN_RENT_OR_BUY.MONTHLY_RENT" | translate }}</span>
-          <div class="impact-card__value">
-            <span class="impact-card__currency">{{ currencySymbol }}</span>
-            <input
-              type="text"
-              inputmode="decimal"
-              placeholder="0"
-              thousandSeparatorInput
-              [formControl]="monthlyRentControl"
-              class="impact-card__input"
-            />
-          </div>
-        </div>
-
-        <button type="button" class="learn-rb__more-link" (click)="openAssumptions()">
-          {{ "LEARN_RENT_OR_BUY.MORE_ASSUMPTIONS" | translate }}
+    @if (!bannerDismissed()) {
+      <div class="learn-rb__banner" role="status">
+        <mat-icon class="learn-rb__banner-icon">info</mat-icon>
+        <p class="learn-rb__banner-text">
+          {{ "LEARN_RENT_OR_BUY.BANNER" | translate }}
+        </p>
+        <button
+          type="button"
+          class="learn-rb__banner-dismiss"
+          (click)="dismissBanner()"
+          [attr.aria-label]="'LEARN_RENT_OR_BUY.DISMISS' | translate"
+        >
+          <mat-icon>close</mat-icon>
         </button>
+      </div>
+    }
+
+    <div class="learn-rb__layout">
+      <!-- ======================= LEFT: INPUTS ======================= -->
+      <aside class="learn-rb__inputs">
+        <h1 class="learn-rb__title">{{ "LEARN_RENT_OR_BUY.TITLE" | translate }}</h1>
+        <p class="learn-rb__subtitle">{{ "LEARN_RENT_OR_BUY.SUBTITLE" | translate }}</p>
+
+        <div class="rb-grid">
+          <!-- 1. Home price -->
+          <div class="rb-field">
+            <label class="rb-field__label">
+              {{ "LEARN_RENT_OR_BUY.FIELD_HOME_PRICE" | translate }}
+              <mat-icon class="rb-field__hint" [matTooltip]="'LEARN_RENT_OR_BUY.TIP_HOME_PRICE' | translate">help_outline</mat-icon>
+            </label>
+            <div class="rb-field__control rb-field__control--currency">
+              <span class="rb-field__prefix">{{ currencySymbol }}</span>
+              <input
+                type="text"
+                inputmode="decimal"
+                class="rb-field__input"
+                [value]="homePriceText()"
+                (input)="onHomePriceInput($any($event.target).value)"
+                (blur)="onHomePriceBlur()"
+                placeholder="0"
+              />
+            </div>
+          </div>
+
+          <!-- 2. Down payment with toggle -->
+          <div class="rb-field">
+            <label class="rb-field__label">
+              {{ "LEARN_RENT_OR_BUY.FIELD_DOWN_PAYMENT" | translate }}
+              <mat-icon class="rb-field__hint" [matTooltip]="'LEARN_RENT_OR_BUY.TIP_DOWN_PAYMENT' | translate">help_outline</mat-icon>
+            </label>
+            <div class="rb-field__control rb-field__control--combo">
+              @if (downPaymentMode() === 'amount') {
+                <span class="rb-field__prefix">{{ currencySymbol }}</span>
+              }
+              <input
+                type="text"
+                inputmode="decimal"
+                class="rb-field__input"
+                [value]="downPaymentText()"
+                (input)="onDownPaymentInput($any($event.target).value)"
+                (blur)="onDownPaymentBlur()"
+                placeholder="0"
+              />
+              @if (downPaymentMode() === 'pct') {
+                <span class="rb-field__suffix">%</span>
+              }
+              <mat-button-toggle-group
+                class="rb-toggle"
+                [value]="downPaymentMode()"
+                (change)="onDownPaymentModeChange($any($event).value)"
+                hideSingleSelectionIndicator
+              >
+                <mat-button-toggle value="pct">%</mat-button-toggle>
+                <mat-button-toggle value="amount">{{ currencySymbol || '$' }}</mat-button-toggle>
+              </mat-button-toggle-group>
+            </div>
+          </div>
+
+          <!-- 3. Mortgage interest rate -->
+          <div class="rb-field">
+            <label class="rb-field__label">
+              {{ "LEARN_RENT_OR_BUY.FIELD_MORTGAGE_RATE" | translate }}
+              <mat-icon class="rb-field__hint" [matTooltip]="'LEARN_RENT_OR_BUY.TIP_MORTGAGE_RATE' | translate">help_outline</mat-icon>
+            </label>
+            <div class="rb-field__control">
+              <input
+                type="text"
+                inputmode="decimal"
+                class="rb-field__input"
+                [value]="mortgageRateText()"
+                (input)="onMortgageRateInput($any($event.target).value)"
+                (blur)="onMortgageRateBlur()"
+              />
+              <span class="rb-field__suffix">%</span>
+            </div>
+          </div>
+
+          <!-- 4. Mortgage term -->
+          <div class="rb-field">
+            <label class="rb-field__label">
+              {{ "LEARN_RENT_OR_BUY.FIELD_MORTGAGE_TERM" | translate }}
+              <mat-icon class="rb-field__hint" [matTooltip]="'LEARN_RENT_OR_BUY.TIP_MORTGAGE_TERM' | translate">help_outline</mat-icon>
+            </label>
+            <div class="rb-field__control">
+              <input
+                type="text"
+                inputmode="numeric"
+                class="rb-field__input"
+                [value]="mortgageTermText()"
+                (input)="onMortgageTermInput($any($event.target).value)"
+                (blur)="onMortgageTermBlur()"
+              />
+              <span class="rb-field__suffix">{{ "LEARN_RENT_OR_BUY.UNIT_YEARS" | translate }}</span>
+            </div>
+          </div>
+
+          <!-- 5. Monthly rent -->
+          <div class="rb-field">
+            <label class="rb-field__label">
+              {{ "LEARN_RENT_OR_BUY.FIELD_MONTHLY_RENT" | translate }}
+              <mat-icon class="rb-field__hint" [matTooltip]="'LEARN_RENT_OR_BUY.TIP_MONTHLY_RENT' | translate">help_outline</mat-icon>
+            </label>
+            <div class="rb-field__control rb-field__control--currency">
+              <span class="rb-field__prefix">{{ currencySymbol }}</span>
+              <input
+                type="text"
+                inputmode="decimal"
+                class="rb-field__input"
+                [value]="monthlyRentText()"
+                (input)="onMonthlyRentInput($any($event.target).value)"
+                (blur)="onMonthlyRentBlur()"
+                placeholder="0"
+              />
+            </div>
+          </div>
+
+          <!-- 6. Time horizon -->
+          <div class="rb-field">
+            <label class="rb-field__label">
+              {{ "LEARN_RENT_OR_BUY.FIELD_HORIZON" | translate }}
+              <mat-icon class="rb-field__hint" [matTooltip]="'LEARN_RENT_OR_BUY.TIP_HORIZON' | translate">help_outline</mat-icon>
+            </label>
+            <div class="rb-field__control">
+              <input
+                type="text"
+                inputmode="numeric"
+                class="rb-field__input"
+                [value]="horizonText()"
+                (input)="onHorizonInput($any($event.target).value)"
+                (blur)="onHorizonBlur()"
+              />
+              <span class="rb-field__suffix">{{ "LEARN_RENT_OR_BUY.UNIT_YEARS" | translate }}</span>
+            </div>
+          </div>
+
+          <!-- 7. Home appreciation -->
+          <div class="rb-field">
+            <label class="rb-field__label">
+              {{ "LEARN_RENT_OR_BUY.FIELD_HOME_APPRECIATION" | translate }}
+              <mat-icon class="rb-field__hint" [matTooltip]="'LEARN_RENT_OR_BUY.TIP_HOME_APPRECIATION' | translate">help_outline</mat-icon>
+            </label>
+            <div class="rb-field__control">
+              <input
+                type="text"
+                inputmode="decimal"
+                class="rb-field__input"
+                [value]="homeAppreciationText()"
+                (input)="onHomeAppreciationInput($any($event.target).value)"
+                (blur)="onHomeAppreciationBlur()"
+              />
+              <span class="rb-field__suffix">%</span>
+            </div>
+          </div>
+
+          <!-- 8. Investment return -->
+          <div class="rb-field">
+            <label class="rb-field__label">
+              {{ "LEARN_RENT_OR_BUY.FIELD_INVESTMENT_RETURN" | translate }}
+              <mat-icon class="rb-field__hint" [matTooltip]="'LEARN_RENT_OR_BUY.TIP_INVESTMENT_RETURN' | translate">help_outline</mat-icon>
+            </label>
+            <div class="rb-field__control">
+              <input
+                type="text"
+                inputmode="decimal"
+                class="rb-field__input"
+                [value]="investmentReturnText()"
+                (input)="onInvestmentReturnInput($any($event.target).value)"
+                (blur)="onInvestmentReturnBlur()"
+              />
+              <span class="rb-field__suffix">%</span>
+            </div>
+          </div>
+
+          <!-- 9. Inflation -->
+          <div class="rb-field">
+            <label class="rb-field__label">
+              {{ "LEARN_RENT_OR_BUY.FIELD_INFLATION" | translate }}
+              <mat-icon class="rb-field__hint" [matTooltip]="'LEARN_RENT_OR_BUY.TIP_INFLATION' | translate">help_outline</mat-icon>
+            </label>
+            <div class="rb-field__control">
+              <input
+                type="text"
+                inputmode="decimal"
+                class="rb-field__input"
+                [value]="inflationText()"
+                (input)="onInflationInput($any($event.target).value)"
+                (blur)="onInflationBlur()"
+              />
+              <span class="rb-field__suffix">%</span>
+            </div>
+          </div>
+
+          <!-- 10. Ownership costs -->
+          <div class="rb-field">
+            <label class="rb-field__label">
+              {{ "LEARN_RENT_OR_BUY.FIELD_OWNERSHIP_COSTS" | translate }}
+              <mat-icon class="rb-field__hint" [matTooltip]="'LEARN_RENT_OR_BUY.TIP_OWNERSHIP_COSTS' | translate">help_outline</mat-icon>
+            </label>
+            <div class="rb-field__control">
+              <input
+                type="text"
+                inputmode="decimal"
+                class="rb-field__input"
+                [value]="ownershipCostsText()"
+                (input)="onOwnershipCostsInput($any($event.target).value)"
+                (blur)="onOwnershipCostsBlur()"
+              />
+              <span class="rb-field__suffix">%</span>
+            </div>
+          </div>
+
+          <!-- 11. Round trip transaction costs -->
+          <div class="rb-field">
+            <label class="rb-field__label">
+              {{ "LEARN_RENT_OR_BUY.FIELD_ROUND_TRIP_COSTS" | translate }}
+              <mat-icon class="rb-field__hint" [matTooltip]="'LEARN_RENT_OR_BUY.TIP_ROUND_TRIP_COSTS' | translate">help_outline</mat-icon>
+            </label>
+            <div class="rb-field__control">
+              <input
+                type="text"
+                inputmode="decimal"
+                class="rb-field__input"
+                [value]="roundTripCostsText()"
+                (input)="onRoundTripCostsInput($any($event.target).value)"
+                (blur)="onRoundTripCostsBlur()"
+              />
+              <span class="rb-field__suffix">%</span>
+            </div>
+          </div>
+        </div>
       </aside>
 
-      <section class="learn-rb__main">
-        <h1 class="learn-rb__title">{{ "LEARN_RENT_OR_BUY.TITLE" | translate }}</h1>
-        <p class="learn-rb__explainer">
-          {{ "LEARN_RENT_OR_BUY.EXPLAINER" | translate }}
-        </p>
-
-        @if (simulation()) {
-          <div class="learn-rb__takeaway">
-            <p class="learn-rb__takeaway-lead">{{ takeawayHeadline() }}</p>
-            <p class="learn-rb__takeaway-support">{{ takeawaySupport() }}</p>
+      <!-- ======================= RIGHT: RESULTS ======================= -->
+      <section class="learn-rb__results">
+        <div class="rb-summary">
+          <div class="rb-summary__card rb-summary__card--buy">
+            <span class="rb-summary__label">{{ "LEARN_RENT_OR_BUY.SUMMARY_BUY_LABEL" | translate }}</span>
+            <span class="rb-summary__value">
+              @if (engineOutput()) {
+                {{ formatCurrency(engineOutput()!.terminalBuy) }}
+              } @else {
+                —
+              }
+            </span>
           </div>
-        } @else {
-          <div class="learn-rb__takeaway learn-rb__takeaway--muted">
-            <p class="learn-rb__takeaway-lead">{{ "LEARN_RENT_OR_BUY.EMPTY_STATE" | translate }}</p>
+          <div class="rb-summary__card rb-summary__card--rent">
+            <span class="rb-summary__label">{{ "LEARN_RENT_OR_BUY.SUMMARY_RENT_LABEL" | translate }}</span>
+            <span class="rb-summary__value">
+              @if (engineOutput()) {
+                {{ formatCurrency(engineOutput()!.terminalRent) }}
+              } @else {
+                —
+              }
+            </span>
           </div>
-        }
-
-        <div class="learn-rb__chart">
-          <apx-chart
-            [series]="chartOptions().series"
-            [chart]="chartOptions().chart"
-            [xaxis]="chartOptions().xaxis"
-            [yaxis]="chartOptions().yaxis"
-            [colors]="chartOptions().colors"
-            [tooltip]="chartOptions().tooltip"
-            [legend]="chartOptions().legend"
-            [grid]="chartOptions().grid"
-            [dataLabels]="chartOptions().dataLabels"
-            [stroke]="chartOptions().stroke"
-            [markers]="chartOptions().markers"
-            [annotations]="chartOptions().annotations"
-          ></apx-chart>
+          <div
+            class="rb-summary__card rb-summary__card--net"
+            [class.rb-summary__card--net-positive]="(netResult() ?? 0) > 0"
+            [class.rb-summary__card--net-negative]="(netResult() ?? 0) < 0"
+          >
+            <span class="rb-summary__label">{{ "LEARN_RENT_OR_BUY.SUMMARY_NET_LABEL" | translate }}</span>
+            <span class="rb-summary__value">
+              @if (netResult() !== null) {
+                {{ (netResult()! >= 0 ? '+' : '−') }} {{ formatCurrency(((netResult() ?? 0) >= 0 ? netResult()! : -netResult()!)) }}
+              } @else {
+                —
+              }
+            </span>
+          </div>
         </div>
 
-        <p class="learn-rb__footnote">{{ "LEARN_RENT_OR_BUY.FOOTNOTE" | translate }}</p>
+        <div class="learn-rb__chart">
+          @if (engineOutput()) {
+            <apx-chart
+              [series]="chartOptions().series"
+              [chart]="chartOptions().chart"
+              [xaxis]="chartOptions().xaxis"
+              [yaxis]="chartOptions().yaxis"
+              [colors]="chartOptions().colors"
+              [tooltip]="chartOptions().tooltip"
+              [legend]="chartOptions().legend"
+              [grid]="chartOptions().grid"
+              [dataLabels]="chartOptions().dataLabels"
+              [stroke]="chartOptions().stroke"
+              [markers]="chartOptions().markers"
+            ></apx-chart>
+          } @else {
+            <div class="learn-rb__chart-empty">
+              <mat-icon>show_chart</mat-icon>
+              <p>{{ "LEARN_RENT_OR_BUY.EMPTY_STATE" | translate }}</p>
+            </div>
+          }
+        </div>
+
+        @if (engineOutput()) {
+          <p class="learn-rb__summary-sentence">{{ summarySentence() }}</p>
+        }
       </section>
     </div>
   </mat-dialog-content>

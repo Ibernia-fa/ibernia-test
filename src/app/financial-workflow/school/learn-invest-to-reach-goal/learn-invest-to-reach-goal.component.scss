@@ -269,11 +269,58 @@ $ibernia-line: #e5e5ec;
     display: block;
   }
 
+  &--age-axis apx-chart {
+    inset: 10px 10px 22px 4px;
+  }
+
   &--empty {
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 24px;
+  }
+}
+
+.invest-goal-age-axis {
+  position: absolute;
+  left: 4px;
+  right: 10px;
+  bottom: 2px;
+  height: 18px;
+  pointer-events: none;
+  z-index: 1;
+  font-family: "Ubuntu", sans-serif;
+  font-size: 12px;
+  line-height: 1.2;
+  font-weight: 400;
+  color: rgba(90, 89, 110, 0.72);
+  letter-spacing: 0.01em;
+
+  &__tick {
+    position: absolute;
+    top: 0;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    max-width: 22%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
+
+    &--first {
+      transform: translateX(0);
+      text-align: left;
+    }
+
+    &--last {
+      transform: translateX(-100%);
+      text-align: right;
+    }
+
+    &--first.invest-goal-age-axis__tick--last {
+      left: 50% !important;
+      transform: translateX(-50%);
+      text-align: center;
+    }
   }
 }
 

@@ -46,9 +46,6 @@ interface SchoolModule {
 const DEFAULT_INFLATION_FALLBACK = 2.5;
 const DEFAULT_AMOUNT_FALLBACK = 100000;
 const DEFAULT_MONTHLY_EXPENSES_FALLBACK = 3000;
-const DEFAULT_HOME_PRICE_FALLBACK = 420_000;
-const DEFAULT_RENT_MONTHLY_FALLBACK = 1_800;
-
 @Component({
   selector: 'app-school',
   standalone: true,
@@ -352,59 +349,19 @@ export class SchoolComponent {
     this.fetchRentOrBuyLessonContext$()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: ({ client, cashflow, wealth, incomeExpense }) => {
-          const inflation =
-            cashflow?.inflationRate ??
-            client?.clientDetails?.inflationRate ??
-            DEFAULT_INFLATION_FALLBACK;
+        next: ({ client, wealth, incomeExpense }) => {
           const mainHome = this.inferMainResidenceValue(wealth?.assets);
-          const homePrice = mainHome ?? DEFAULT_HOME_PRICE_FALLBACK;
           const rentGuess = this.inferHousingRentMonthly(incomeExpense?.expenses);
-          const monthlyRent = rentGuess ?? DEFAULT_RENT_MONTHLY_FALLBACK;
-          const insuranceYearly = Math.round(Math.max(400, homePrice * 0.0025));
 
           this.openRentOrBuyDialog({
-            homePrice,
-            downPaymentPct: 20,
-            monthlyRent,
-            mortgageRatePct: 4,
-            mortgageTermYears: 25,
-            horizonYears: 10,
-            homePriceGrowthPct: 2,
-            rentGrowthPct: inflation,
-            investmentReturnPct: 5,
-            closingCostsPct: 3,
-            propertyTaxPct: 1,
-            homeInsuranceYearly: insuranceYearly,
-            maintenancePctYearly: 1,
-            hoaMonthly: 0,
-            sellingCostsPct: 5,
-            renterInsuranceMonthly: 15,
-            generalInflationPct: inflation,
+            homePrice: mainHome,
+            monthlyRent: rentGuess,
             currencyCode: client?.clientDetails?.preferredCurrency,
           });
           this.isOpeningRentOrBuy = false;
         },
         error: () => {
-          this.openRentOrBuyDialog({
-            homePrice: DEFAULT_HOME_PRICE_FALLBACK,
-            downPaymentPct: 20,
-            monthlyRent: DEFAULT_RENT_MONTHLY_FALLBACK,
-            mortgageRatePct: 4,
-            mortgageTermYears: 25,
-            horizonYears: 10,
-            homePriceGrowthPct: 2,
-            rentGrowthPct: DEFAULT_INFLATION_FALLBACK,
-            investmentReturnPct: 5,
-            closingCostsPct: 3,
-            propertyTaxPct: 1,
-            homeInsuranceYearly: Math.round(Math.max(400, DEFAULT_HOME_PRICE_FALLBACK * 0.0025)),
-            maintenancePctYearly: 1,
-            hoaMonthly: 0,
-            sellingCostsPct: 5,
-            renterInsuranceMonthly: 15,
-            generalInflationPct: DEFAULT_INFLATION_FALLBACK,
-          });
+          this.openRentOrBuyDialog({});
           this.isOpeningRentOrBuy = false;
         },
       });

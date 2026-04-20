@@ -10,36 +10,50 @@ import {
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import {
   MAT_DIALOG_DATA,
-  MatDialog,
   MatDialogModule,
   MatDialogRef,
 } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { NgApexchartsModule } from 'ng-apexcharts';
+import { Subject } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 
-import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 import { CurrencySymbolPipe } from 'src/app/pipe/currency-symbol.pipe';
 import {
   formatAppDisplayNumber,
   parseFormattedNumber,
 } from 'src/app/shared/utils/number-utils';
 
-import { LearnRentOrBuyAssumptionsDialogComponent } from './learn-rent-or-buy-assumptions-dialog.component';
-import { simulateRentOrBuy } from './rent-or-buy-simulation';
-import type {
-  LearnRentOrBuyAssumptionValues,
-  LearnRentOrBuyDialogData,
-} from './learn-rent-or-buy.types';
+import { runRentVsBuyEngine, type RentVsBuyEngineOutput } from './rent-vs-buy-engine';
+import type { LearnRentOrBuyDialogData } from './learn-rent-or-buy.types';
 
-const ACCENT = '#4043af';
-const SERIES_MUTE = '#9aa3c7';
-const DEFAULT_DOWN_PCT = 20;
-const SECURITY_DEPOSIT_MONTHS = 1;
+const COLOR_BUY = '#5E79F6';
+const COLOR_RENT = '#4043AF';
+
+const DEFAULTS = {
+  downPaymentPct: 20,
+  mortgageRatePct: 4,
+  mortgageTermYears: 25,
+  horizonYears: 10,
+  homeAppreciationPct: 3,
+  investmentReturnPct: 6,
+  inflationPct: 2,
+  ownershipCostsPct: 2,
+  roundTripCostsPct: 8,
+};
+
+const MAX_HORIZON_YEARS = 40;
+const MIN_TERM_YEARS = 1;
+const DEBOUNCE_MS = 300;
+
+type DownPaymentMode = 'pct' | 'amount';
 
 @Component({
   selector: 'app-learn-rent-or-buy',
@@ -47,222 +61,174 @@ const SECURITY_DEPOSIT_MONTHS = 1;
   imports: [
     CommonModule,
     FormsModule,
-    ReactiveFormsModule,
     MatButtonModule,
+    MatButtonToggleModule,
     MatDialogModule,
     MatIconModule,
+    MatTooltipModule,
     NgApexchartsModule,
     TranslateModule,
-    ThousandSeparatorInputDirective,
   ],
   templateUrl: './learn-rent-or-buy.component.html',
   styleUrl: './learn-rent-or-buy.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LearnRentOrBuyComponent implements OnInit {
-  readonly currencyCode: string;
-
-  readonly homePriceControl = new FormControl<number | null>(0);
-  readonly monthlyRentControl = new FormControl<number | null>(0);
-
-  readonly homePrice = signal(0);
-  readonly monthlyRent = signal(0);
-  readonly downPaymentPct = signal(DEFAULT_DOWN_PCT);
-  readonly downPaymentText = signal('');
-
-  readonly mortgageRate = signal(4);
-  readonly mortgageTermYears = signal(25);
-  readonly horizonYears = signal(10);
-  readonly homePriceGrowth = signal(2);
-  readonly rentGrowth = signal(2);
-  readonly investmentReturn = signal(5);
-  readonly closingCostsPct = signal(3);
-  readonly propertyTaxPct = signal(1);
-  readonly homeInsuranceYearly = signal(0);
-  readonly maintenancePctYearly = signal(1);
-  readonly hoaMonthly = signal(0);
-  readonly sellingCostsPct = signal(5);
-  readonly renterInsuranceMonthly = signal(15);
-  readonly generalInflation = signal(2);
-
   readonly dialogRef = inject(MatDialogRef<LearnRentOrBuyComponent>);
-  private readonly matDialog = inject(MatDialog);
   private readonly translate = inject(TranslateService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly currencySymbolPipe = new CurrencySymbolPipe();
 
-  readonly simulation = computed(() => {
-    const price = this.homePrice() || 0;
-    const rent = this.monthlyRent() || 0;
-    if (price <= 0 || rent <= 0) {
+  readonly currencyCode: string;
+
+  // 1. Home price
+  readonly homePrice = signal<number | null>(null);
+  readonly homePriceText = signal('');
+
+  // 2. Down payment (toggle pct / amount)
+  readonly downPaymentMode = signal<DownPaymentMode>('pct');
+  readonly downPaymentPct = signal<number>(DEFAULTS.downPaymentPct);
+  readonly downPaymentAmount = signal<number>(0);
+  readonly downPaymentText = signal<string>('');
+
+  // 3. Mortgage interest rate
+  readonly mortgageRatePct = signal<number>(DEFAULTS.mortgageRatePct);
+  readonly mortgageRateText = signal<string>('');
+
+  // 4. Mortgage term
+  readonly mortgageTermYears = signal<number>(DEFAULTS.mortgageTermYears);
+  readonly mortgageTermText = signal<string>('');
+
+  // 5. Monthly rent
+  readonly monthlyRent = signal<number | null>(null);
+  readonly monthlyRentText = signal('');
+
+  // 6. Time horizon
+  readonly horizonYears = signal<number>(DEFAULTS.horizonYears);
+  readonly horizonText = signal<string>('');
+
+  // 7. Home appreciation
+  readonly homeAppreciationPct = signal<number>(DEFAULTS.homeAppreciationPct);
+  readonly homeAppreciationText = signal<string>('');
+
+  // 8. Investment return
+  readonly investmentReturnPct = signal<number>(DEFAULTS.investmentReturnPct);
+  readonly investmentReturnText = signal<string>('');
+
+  // 9. Inflation
+  readonly inflationPct = signal<number>(DEFAULTS.inflationPct);
+  readonly inflationText = signal<string>('');
+
+  // 10. Ownership costs
+  readonly ownershipCostsPct = signal<number>(DEFAULTS.ownershipCostsPct);
+  readonly ownershipCostsText = signal<string>('');
+
+  // 11. Round trip transaction costs
+  readonly roundTripCostsPct = signal<number>(DEFAULTS.roundTripCostsPct);
+  readonly roundTripCostsText = signal<string>('');
+
+  readonly bannerDismissed = signal<boolean>(LearnRentOrBuyComponent.bannerDismissedSession);
+
+  /** Triggered on every input change; debounced to drive engine recomputation. */
+  private readonly inputsChanged$ = new Subject<void>();
+
+  /**
+   * Counter that bumps after debounce; computed engine output reads this so it
+   * recalculates only when the debounced trigger fires (live updates within 300ms).
+   */
+  private readonly engineTick = signal<number>(0);
+
+  /** Latest engine output; null when required inputs are missing. */
+  readonly engineOutput = computed<RentVsBuyEngineOutput | null>(() => {
+    this.engineTick();
+    const homePrice = this.homePrice();
+    const monthlyRent = this.monthlyRent();
+    if (!homePrice || homePrice <= 0 || !monthlyRent || monthlyRent <= 0) {
       return null;
     }
-    return simulateRentOrBuy({
-      homePrice: price,
-      downPaymentPct: this.downPaymentPct(),
-      monthlyRent: rent,
-      mortgageRatePct: this.mortgageRate(),
+    return runRentVsBuyEngine({
+      homePrice,
+      downPaymentAmount: this.effectiveDownPaymentAmount(),
+      mortgageRatePct: this.mortgageRatePct(),
       mortgageTermYears: this.mortgageTermYears(),
+      monthlyRent,
       horizonYears: this.horizonYears(),
-      homePriceGrowthPct: this.homePriceGrowth(),
-      rentGrowthPct: this.rentGrowth(),
-      investmentReturnPct: this.investmentReturn(),
-      closingCostsPct: this.closingCostsPct(),
-      propertyTaxPct: this.propertyTaxPct(),
-      homeInsuranceYearly: this.homeInsuranceYearly(),
-      maintenancePctYearly: this.maintenancePctYearly(),
-      hoaMonthly: this.hoaMonthly(),
-      sellingCostsPct: this.sellingCostsPct(),
-      renterInsuranceMonthly: this.renterInsuranceMonthly(),
-      generalInflationPct: this.generalInflation(),
-      securityDepositMonths: SECURITY_DEPOSIT_MONTHS,
+      homeAppreciationPct: this.homeAppreciationPct(),
+      investmentReturnPct: this.investmentReturnPct(),
+      inflationPct: this.inflationPct(),
+      ownershipCostsPct: this.ownershipCostsPct(),
+      roundTripCostsPct: this.roundTripCostsPct(),
     });
   });
 
-  readonly takeawayHeadline = computed(() => {
-    const sim = this.simulation();
-    if (!sim) return '';
-    const H = sim.years[sim.years.length - 1] ?? this.horizonYears();
-    const buyBetter = sim.finalBuy >= sim.finalRent;
-    const be = sim.breakEvenYear;
-    const kind = sim.breakEvenKind;
-
-    if (buyBetter && kind === 'buy' && be !== null && be > 0 && be <= H) {
-      return this.translate.instant('LEARN_RENT_OR_BUY.TAKEAWAY_CROSSOVER_BUY', { years: be });
-    }
-    if (!buyBetter && kind === 'rent' && be !== null && be > 0 && be <= H) {
-      return this.translate.instant('LEARN_RENT_OR_BUY.TAKEAWAY_CROSSOVER_RENT', { years: be });
-    }
-    if (buyBetter) {
-      return this.translate.instant('LEARN_RENT_OR_BUY.TAKEAWAY_HORIZON_BUY', { years: H });
-    }
-    return this.translate.instant('LEARN_RENT_OR_BUY.TAKEAWAY_HORIZON_RENT', { years: H });
+  readonly netResult = computed<number | null>(() => {
+    const out = this.engineOutput();
+    return out ? out.terminalBuy - out.terminalRent : null;
   });
 
-  readonly takeawaySupport = computed(() => {
-    const sim = this.simulation();
-    if (!sim) return '';
-    const diff = Math.abs(sim.finalBuy - sim.finalRent);
-    if (diff < 1) {
-      return this.translate.instant('LEARN_RENT_OR_BUY.SUPPORT_TIE');
+  readonly summarySentence = computed<string>(() => {
+    const out = this.engineOutput();
+    if (!out) return '';
+    const horizon = this.horizonYears();
+    const net = out.terminalBuy - out.terminalRent;
+    const absAmount = this.formatCurrency(Math.abs(net));
+    const breakeven = out.breakevenYear;
+
+    if (net > 0) {
+      return this.translate.instant('LEARN_RENT_OR_BUY.SUMMARY_BUY_WINS', {
+        years: horizon,
+        amount: absAmount,
+        breakeven,
+      });
     }
-    const months = Math.max(1, Math.round(this.horizonYears() * 12));
-    const perMonth = diff / months;
-    const full = this.formatCurrencyFull(diff);
-    const month = this.formatCurrencyFull(perMonth);
-    if (this.horizonYears() >= 1) {
-      return this.translate.instant('LEARN_RENT_OR_BUY.SUPPORT_MONTHLY', { amount: month });
+    if (net < 0 && breakeven === null) {
+      return this.translate.instant('LEARN_RENT_OR_BUY.SUMMARY_RENT_WINS_FOREVER');
     }
-    return this.translate.instant('LEARN_RENT_OR_BUY.SUPPORT_FULL_PERIOD', { amount: full });
+    return this.translate.instant('LEARN_RENT_OR_BUY.SUMMARY_RENT_WINS', {
+      years: horizon,
+      amount: absAmount,
+    });
   });
 
   readonly chartOptions = computed(() => this.buildChartOptions());
 
-  constructor(@Inject(MAT_DIALOG_DATA) data: LearnRentOrBuyDialogData) {
-    this.currencyCode = data?.currencyCode ?? '';
+  /** Session-level (not persisted across page reload). */
+  private static bannerDismissedSession = false;
 
-    const price = Number.isFinite(data?.homePrice) ? Math.max(0, data.homePrice) : 0;
-    const rent = Number.isFinite(data?.monthlyRent) ? Math.max(0, data.monthlyRent) : 0;
-    const down = Number.isFinite(data?.downPaymentPct)
-      ? Math.max(0, Math.min(100, data.downPaymentPct))
-      : DEFAULT_DOWN_PCT;
+  constructor(@Inject(MAT_DIALOG_DATA) data: LearnRentOrBuyDialogData | null) {
+    this.currencyCode = (data?.currencyCode ?? '').toString();
 
-    this.homePrice.set(price);
-    this.monthlyRent.set(rent);
-    this.downPaymentPct.set(down);
-    this.downPaymentText.set(this.formatRateForLocale(down));
+    if (data?.homePrice && data.homePrice > 0) {
+      this.homePrice.set(Math.round(data.homePrice));
+    }
+    if (data?.monthlyRent && data.monthlyRent > 0) {
+      this.monthlyRent.set(Math.round(data.monthlyRent));
+    }
 
-    this.mortgageRate.set(data.mortgageRatePct ?? 4);
-    this.mortgageTermYears.set(Math.max(1, data.mortgageTermYears ?? 25));
-    this.horizonYears.set(Math.max(1, data.horizonYears ?? 10));
-    this.homePriceGrowth.set(data.homePriceGrowthPct ?? 2);
-    this.rentGrowth.set(data.rentGrowthPct ?? 2);
-    this.investmentReturn.set(data.investmentReturnPct ?? 5);
-    this.closingCostsPct.set(data.closingCostsPct ?? 3);
-    this.propertyTaxPct.set(data.propertyTaxPct ?? 1);
-    this.homeInsuranceYearly.set(Math.max(0, data.homeInsuranceYearly ?? 0));
-    this.maintenancePctYearly.set(data.maintenancePctYearly ?? 1);
-    this.hoaMonthly.set(Math.max(0, data.hoaMonthly ?? 0));
-    this.sellingCostsPct.set(data.sellingCostsPct ?? 5);
-    this.renterInsuranceMonthly.set(Math.max(0, data.renterInsuranceMonthly ?? 15));
-    this.generalInflation.set(data.generalInflationPct ?? 2);
-
-    this.homePriceControl.setValue(price || null, { emitEvent: false });
-    this.monthlyRentControl.setValue(rent || null, { emitEvent: false });
+    this.refreshAllText();
   }
 
   ngOnInit(): void {
-    this.homePriceControl.valueChanges
+    this.inputsChanged$
+      .pipe(debounceTime(DEBOUNCE_MS), takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.engineTick.update((v) => v + 1));
+
+    this.translate.onLangChange
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((value) => {
-        const parsed =
-          typeof value === 'number'
-            ? value
-            : parseFormattedNumber(value as unknown as string, this.translate.currentLang);
-        this.homePrice.set(Math.max(0, parsed || 0));
-      });
+      .subscribe(() => this.refreshAllText());
 
-    this.monthlyRentControl.valueChanges
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((value) => {
-        const parsed =
-          typeof value === 'number'
-            ? value
-            : parseFormattedNumber(value as unknown as string, this.translate.currentLang);
-        this.monthlyRent.set(Math.max(0, parsed || 0));
-      });
-
-    this.translate.onLangChange.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
-      this.downPaymentText.set(this.formatRateForLocale(this.downPaymentPct()));
-    });
+    // First computation with the initial values (no debounce).
+    this.engineTick.update((v) => v + 1);
   }
 
-  openAssumptions(): void {
-    const ref = this.matDialog.open(LearnRentOrBuyAssumptionsDialogComponent, {
-      width: 'min(560px, 94vw)',
-      maxWidth: '94vw',
-      autoFocus: false,
-      restoreFocus: false,
-      panelClass: 'learn-rent-or-buy-assumptions-dialog-panel',
-      data: {
-        ...this.assumptionSnapshot(),
-        currencyCode: this.currencyCode,
-      },
-    });
+  // ---------- Banner ----------
 
-    ref.afterClosed().subscribe((patch: LearnRentOrBuyAssumptionValues | undefined) => {
-      if (!patch) return;
-      this.mortgageRate.set(patch.mortgageRatePct);
-      this.mortgageTermYears.set(patch.mortgageTermYears);
-      this.horizonYears.set(patch.horizonYears);
-      this.homePriceGrowth.set(patch.homePriceGrowthPct);
-      this.rentGrowth.set(patch.rentGrowthPct);
-      this.investmentReturn.set(patch.investmentReturnPct);
-      this.closingCostsPct.set(patch.closingCostsPct);
-      this.propertyTaxPct.set(patch.propertyTaxPct);
-      this.homeInsuranceYearly.set(patch.homeInsuranceYearly);
-      this.maintenancePctYearly.set(patch.maintenancePctYearly);
-      this.hoaMonthly.set(patch.hoaMonthly);
-      this.sellingCostsPct.set(patch.sellingCostsPct);
-      this.renterInsuranceMonthly.set(patch.renterInsuranceMonthly);
-      this.generalInflation.set(patch.generalInflationPct);
-    });
+  dismissBanner(): void {
+    this.bannerDismissed.set(true);
+    LearnRentOrBuyComponent.bannerDismissedSession = true;
   }
 
-  onDownPaymentInput(raw: string): void {
-    const cleaned = (raw ?? '').replace('%', '').trim();
-    this.downPaymentText.set(cleaned);
-    if (cleaned === '' || cleaned === '-' || cleaned === '.' || cleaned === ',') {
-      this.downPaymentPct.set(0);
-      return;
-    }
-    const value = parseFormattedNumber(cleaned, this.translate.currentLang);
-    this.downPaymentPct.set(Math.max(0, Math.min(100, value)));
-  }
-
-  onDownPaymentBlur(): void {
-    this.downPaymentText.set(this.formatRateForLocale(this.downPaymentPct()));
-  }
+  // ---------- Helpers ----------
 
   get currencySymbol(): string {
     return this.currencyCode
@@ -270,85 +236,222 @@ export class LearnRentOrBuyComponent implements OnInit {
       : '';
   }
 
-  formatCurrencyFull(value: number): string {
+  formatCurrency(value: number): string {
     const formatted = formatAppDisplayNumber(this.translate.currentLang, Math.round(value));
     const symbol = this.currencySymbol;
     return symbol ? `${symbol} ${formatted}` : formatted;
   }
 
-  private assumptionSnapshot(): LearnRentOrBuyAssumptionValues {
-    return {
-      mortgageRatePct: this.mortgageRate(),
-      mortgageTermYears: this.mortgageTermYears(),
-      horizonYears: this.horizonYears(),
-      homePriceGrowthPct: this.homePriceGrowth(),
-      rentGrowthPct: this.rentGrowth(),
-      investmentReturnPct: this.investmentReturn(),
-      closingCostsPct: this.closingCostsPct(),
-      propertyTaxPct: this.propertyTaxPct(),
-      homeInsuranceYearly: this.homeInsuranceYearly(),
-      maintenancePctYearly: this.maintenancePctYearly(),
-      hoaMonthly: this.hoaMonthly(),
-      sellingCostsPct: this.sellingCostsPct(),
-      renterInsuranceMonthly: this.renterInsuranceMonthly(),
-      generalInflationPct: this.generalInflation(),
-    };
+  private effectiveDownPaymentAmount(): number {
+    const home = this.homePrice() ?? 0;
+    if (this.downPaymentMode() === 'pct') {
+      return Math.max(0, Math.min(home, (home * this.downPaymentPct()) / 100));
+    }
+    return Math.max(0, Math.min(home, this.downPaymentAmount()));
   }
 
-  private formatRateForLocale(value: number): string {
+  private bumpInputs(): void {
+    this.inputsChanged$.next();
+  }
+
+  private refreshAllText(): void {
+    const home = this.homePrice();
+    const rent = this.monthlyRent();
+    this.homePriceText.set(home != null ? this.formatInteger(home) : '');
+    this.monthlyRentText.set(rent != null ? this.formatInteger(rent) : '');
+    this.refreshDownPaymentText();
+    this.mortgageRateText.set(this.formatDecimal(this.mortgageRatePct(), 1));
+    this.mortgageTermText.set(this.formatInteger(this.mortgageTermYears()));
+    this.horizonText.set(this.formatInteger(this.horizonYears()));
+    this.homeAppreciationText.set(this.formatDecimal(this.homeAppreciationPct(), 1));
+    this.investmentReturnText.set(this.formatDecimal(this.investmentReturnPct(), 1));
+    this.inflationText.set(this.formatDecimal(this.inflationPct(), 1));
+    this.ownershipCostsText.set(this.formatDecimal(this.ownershipCostsPct(), 1));
+    this.roundTripCostsText.set(this.formatDecimal(this.roundTripCostsPct(), 1));
+  }
+
+  private refreshDownPaymentText(): void {
+    if (this.downPaymentMode() === 'pct') {
+      this.downPaymentText.set(this.formatDecimal(this.downPaymentPct(), 1));
+    } else {
+      this.downPaymentText.set(this.formatInteger(this.downPaymentAmount()));
+    }
+  }
+
+  private formatInteger(value: number): string {
+    if (!Number.isFinite(value)) return '';
+    return formatAppDisplayNumber(this.translate.currentLang, Math.round(value));
+  }
+
+  private formatDecimal(value: number, digits: number): string {
     if (!Number.isFinite(value)) return '';
     const decimal = this.translate.currentLang === 'it' ? ',' : '.';
-    const rounded = Math.round(value * 10) / 10;
-    const text = Number.isInteger(rounded) ? rounded.toFixed(1) : String(rounded);
-    return text.replace('.', decimal);
+    const rounded = Math.round(value * 10 ** digits) / 10 ** digits;
+    return rounded.toFixed(digits).replace('.', decimal);
   }
 
-  private buildChartOptions(): any {
-    const sim = this.simulation();
-    if (!sim) {
-      return this.emptyChartOptions();
+  private parseLocaleNumber(raw: string): number {
+    const cleaned = (raw ?? '').toString().replace('%', '').trim();
+    if (cleaned === '' || cleaned === '-' || cleaned === '.' || cleaned === ',') return 0;
+    return parseFormattedNumber(cleaned, this.translate.currentLang);
+  }
+
+  // ---------- Field handlers ----------
+  // Each input uses (input) for live updates and (blur) to reformat the visible text.
+
+  onHomePriceInput(raw: string): void {
+    this.homePriceText.set(raw);
+    const value = this.parseLocaleNumber(raw);
+    this.homePrice.set(value > 0 ? value : null);
+    this.bumpInputs();
+  }
+
+  onHomePriceBlur(): void {
+    const v = this.homePrice();
+    this.homePriceText.set(v != null ? this.formatInteger(v) : '');
+  }
+
+  onDownPaymentModeChange(mode: DownPaymentMode): void {
+    if (mode === this.downPaymentMode()) return;
+    const home = this.homePrice() ?? 0;
+    if (mode === 'amount' && home > 0) {
+      this.downPaymentAmount.set(Math.round((home * this.downPaymentPct()) / 100));
+    } else if (mode === 'pct' && home > 0) {
+      this.downPaymentPct.set(
+        Math.max(0, Math.min(100, (this.downPaymentAmount() / home) * 100)),
+      );
     }
+    this.downPaymentMode.set(mode);
+    this.refreshDownPaymentText();
+    this.bumpInputs();
+  }
 
-    const rentName = this.translate.instant('LEARN_RENT_OR_BUY.SERIES_RENT');
+  onDownPaymentInput(raw: string): void {
+    this.downPaymentText.set(raw);
+    const value = this.parseLocaleNumber(raw);
+    if (this.downPaymentMode() === 'pct') {
+      this.downPaymentPct.set(Math.max(0, Math.min(100, value)));
+    } else {
+      const cap = this.homePrice() ?? Number.POSITIVE_INFINITY;
+      this.downPaymentAmount.set(Math.max(0, Math.min(cap, value)));
+    }
+    this.bumpInputs();
+  }
+
+  onDownPaymentBlur(): void {
+    this.refreshDownPaymentText();
+  }
+
+  onMortgageRateInput(raw: string): void {
+    this.mortgageRateText.set(raw);
+    const value = this.parseLocaleNumber(raw);
+    this.mortgageRatePct.set(Math.max(0, Math.min(100, value)));
+    this.bumpInputs();
+  }
+
+  onMortgageRateBlur(): void {
+    this.mortgageRateText.set(this.formatDecimal(this.mortgageRatePct(), 1));
+  }
+
+  onMortgageTermInput(raw: string): void {
+    this.mortgageTermText.set(raw);
+    const value = Math.round(this.parseLocaleNumber(raw));
+    this.mortgageTermYears.set(Math.max(MIN_TERM_YEARS, Math.min(60, value || MIN_TERM_YEARS)));
+    this.bumpInputs();
+  }
+
+  onMortgageTermBlur(): void {
+    this.mortgageTermText.set(this.formatInteger(this.mortgageTermYears()));
+  }
+
+  onMonthlyRentInput(raw: string): void {
+    this.monthlyRentText.set(raw);
+    const value = this.parseLocaleNumber(raw);
+    this.monthlyRent.set(value > 0 ? value : null);
+    this.bumpInputs();
+  }
+
+  onMonthlyRentBlur(): void {
+    const v = this.monthlyRent();
+    this.monthlyRentText.set(v != null ? this.formatInteger(v) : '');
+  }
+
+  onHorizonInput(raw: string): void {
+    this.horizonText.set(raw);
+    const value = Math.round(this.parseLocaleNumber(raw));
+    this.horizonYears.set(Math.max(1, Math.min(MAX_HORIZON_YEARS, value || 1)));
+    this.bumpInputs();
+  }
+
+  onHorizonBlur(): void {
+    this.horizonText.set(this.formatInteger(this.horizonYears()));
+  }
+
+  onHomeAppreciationInput(raw: string): void {
+    this.homeAppreciationText.set(raw);
+    this.homeAppreciationPct.set(this.parseLocaleNumber(raw));
+    this.bumpInputs();
+  }
+
+  onHomeAppreciationBlur(): void {
+    this.homeAppreciationText.set(this.formatDecimal(this.homeAppreciationPct(), 1));
+  }
+
+  onInvestmentReturnInput(raw: string): void {
+    this.investmentReturnText.set(raw);
+    this.investmentReturnPct.set(this.parseLocaleNumber(raw));
+    this.bumpInputs();
+  }
+
+  onInvestmentReturnBlur(): void {
+    this.investmentReturnText.set(this.formatDecimal(this.investmentReturnPct(), 1));
+  }
+
+  onInflationInput(raw: string): void {
+    this.inflationText.set(raw);
+    this.inflationPct.set(this.parseLocaleNumber(raw));
+    this.bumpInputs();
+  }
+
+  onInflationBlur(): void {
+    this.inflationText.set(this.formatDecimal(this.inflationPct(), 1));
+  }
+
+  onOwnershipCostsInput(raw: string): void {
+    this.ownershipCostsText.set(raw);
+    this.ownershipCostsPct.set(Math.max(0, this.parseLocaleNumber(raw)));
+    this.bumpInputs();
+  }
+
+  onOwnershipCostsBlur(): void {
+    this.ownershipCostsText.set(this.formatDecimal(this.ownershipCostsPct(), 1));
+  }
+
+  onRoundTripCostsInput(raw: string): void {
+    this.roundTripCostsText.set(raw);
+    this.roundTripCostsPct.set(Math.max(0, this.parseLocaleNumber(raw)));
+    this.bumpInputs();
+  }
+
+  onRoundTripCostsBlur(): void {
+    this.roundTripCostsText.set(this.formatDecimal(this.roundTripCostsPct(), 1));
+  }
+
+  // ---------- Chart ----------
+
+  private buildChartOptions(): any {
+    const out = this.engineOutput();
+    if (!out) return this.emptyChartOptions();
+
     const buyName = this.translate.instant('LEARN_RENT_OR_BUY.SERIES_BUY');
+    const rentName = this.translate.instant('LEARN_RENT_OR_BUY.SERIES_RENT');
     const yearPrefix = this.translate.instant('LEARN_INFLATION.AXIS_YEAR_PREFIX');
-    const xLabels = sim.years.map((y) => `${yearPrefix}${y}`);
-
-    const formatCurrency = (value: number): string => {
-      const formatted = formatAppDisplayNumber(this.translate.currentLang, Math.round(value));
-      const symbol = this.currencySymbol;
-      return symbol ? `${symbol} ${formatted}` : formatted;
-    };
-
-    const be = sim.breakEvenYear;
-    const annotations =
-      be !== null && be >= 0 && sim.years.includes(be)
-        ? {
-            xaxis: [
-              {
-                x: `${yearPrefix}${be}`,
-                borderColor: '#d8dbe8',
-                strokeDashArray: 4,
-                label: {
-                  borderColor: '#d8dbe8',
-                  style: {
-                    color: '#5a596e',
-                    background: '#ffffff',
-                    fontSize: '11px',
-                    fontWeight: 600,
-                    fontFamily: 'Ubuntu, sans-serif',
-                  },
-                  text: this.translate.instant('LEARN_RENT_OR_BUY.BREAK_EVEN'),
-                },
-              },
-            ],
-          }
-        : {};
+    const xLabels = out.buySeries.map((p) => `${yearPrefix}${p.year}`);
 
     return {
       series: [
-        { name: rentName, data: sim.rentWealth },
-        { name: buyName, data: sim.buyWealth },
+        { name: buyName, data: out.buySeries.map((p) => Math.round(p.wealth)) },
+        { name: rentName, data: out.rentSeries.map((p) => Math.round(p.wealth)) },
       ],
       chart: {
         type: 'line',
@@ -356,22 +459,14 @@ export class LearnRentOrBuyComponent implements OnInit {
         fontFamily: 'Ubuntu, sans-serif',
         toolbar: { show: false },
         zoom: { enabled: false },
-        animations: { enabled: true, easing: 'easeinout', speed: 550 },
+        animations: { enabled: true, easing: 'easeinout', speed: 400 },
         parentHeightOffset: 0,
       },
-      annotations,
-      colors: [SERIES_MUTE, ACCENT],
-      stroke: {
-        width: [2.2, 3.2],
-        curve: 'smooth',
-        dashArray: [6, 0],
-      },
+      colors: [COLOR_BUY, COLOR_RENT],
+      stroke: { width: 3, curve: 'smooth' },
       markers: {
-        size: [0, 4],
-        colors: ['#ffffff', '#ffffff'],
-        strokeColors: [SERIES_MUTE, ACCENT],
-        strokeWidth: [0, 2],
-        hover: { sizeOffset: 2 },
+        size: 0,
+        hover: { sizeOffset: 4 },
       },
       dataLabels: { enabled: false },
       grid: {
@@ -432,21 +527,14 @@ export class LearnRentOrBuyComponent implements OnInit {
         fontSize: '12px',
         fontWeight: 600,
         labels: { colors: '#5a596e' },
-        markers: {
-          width: 8,
-          height: 8,
-          radius: 8,
-          offsetX: -2,
-        },
+        markers: { width: 8, height: 8, radius: 8, offsetX: -2 },
         itemMargin: { horizontal: 14, vertical: 2 },
       },
       tooltip: {
         theme: 'light',
         shared: true,
         intersect: false,
-        y: {
-          formatter: (value: number) => formatCurrency(value),
-        },
+        y: { formatter: (value: number) => this.formatCurrency(value) },
       },
     };
   }
@@ -462,9 +550,8 @@ export class LearnRentOrBuyComponent implements OnInit {
         zoom: { enabled: false },
         parentHeightOffset: 0,
       },
-      annotations: {},
-      colors: [SERIES_MUTE, ACCENT],
-      stroke: { width: [2, 2], curve: 'smooth' },
+      colors: [COLOR_BUY, COLOR_RENT],
+      stroke: { width: 3, curve: 'smooth' },
       markers: { size: 0 },
       dataLabels: { enabled: false },
       grid: {
