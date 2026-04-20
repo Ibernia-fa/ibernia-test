@@ -89,6 +89,26 @@
             </mat-slide-toggle>
           </div>
 
+          @if (showInflationAdjusted()) {
+            <div class="impact-card">
+              <span class="impact-card__label">
+                {{ "LEARN_COST_WAITING.INFLATION_RATE" | translate }}
+              </span>
+              <div class="impact-card__value impact-card__value--rate-pair">
+                <input
+                  type="text"
+                  inputmode="decimal"
+                  placeholder="0"
+                  [value]="inflationText()"
+                  (input)="onInflationInput($any($event.target).value)"
+                  (blur)="onInflationBlur()"
+                  class="impact-card__input"
+                />
+                <span class="impact-card__suffix">%</span>
+              </div>
+            </div>
+          }
+
           <div class="impact-card impact-card--accent">
             @if (startingAmount() > 0) {
               <p class="cost-waiting-summary-lead">
