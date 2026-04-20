@@ -104,7 +104,9 @@
                             placeholder="{{ 'Relationship' | translate }}"
                           >
                             @for (opt of q.options; track opt.value) {
-                              <mat-option [value]="opt.value">{{ opt.value | translate }}</mat-option>
+                              <mat-option [value]="opt.value">{{
+                                importantPeopleRelationshipLabel(opt.value)
+                              }}</mat-option>
                             }
                           </mat-select>
                           <button type="button" class="btn-remove" (click)="removeImportantPerson($index)">×</button>

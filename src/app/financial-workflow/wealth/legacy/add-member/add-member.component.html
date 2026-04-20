@@ -16,48 +16,50 @@
 
   <mat-dialog-content class="event-dialog-content">
     <form [formGroup]="form" class="d-flex flex-column gap-16">
-      <div class="w-100 form-field gap-8">
-        <mat-label
-          class="f-s-16 f-w-500 d-block ibr-black"
-          style="line-height: 16px"
-          >{{ 'Relationship' | translate }}</mat-label
-        >
-        <div class="position-relative">
-          <div class="w-100 form-field">
-            <div class="select-option position-relative">
-              <mat-select
-                #roleSelect
-                formControlName="role"
-                class="sortby-edit-profile"
-                hideSingleSelectionIndicator
-              >
-                @for (opt of roleOptions; track opt.value) {
-                  <mat-option [value]="opt.value">{{
-                    opt.labelKey | translate : opt.labelParams
-                  }}</mat-option>
-                }
-              </mat-select>
-              <span class="custom-arrow">
-                <svg
-                  width="12"
-                  height="7"
-                  viewBox="0 0 12 7"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
+      @if (showRelationshipSelect) {
+        <div class="w-100 form-field gap-8">
+          <mat-label
+            class="f-s-16 f-w-500 d-block ibr-black"
+            style="line-height: 16px"
+            >{{ 'Relationship' | translate }}</mat-label
+          >
+          <div class="position-relative">
+            <div class="w-100 form-field">
+              <div class="select-option position-relative">
+                <mat-select
+                  #roleSelect
+                  formControlName="role"
+                  class="sortby-edit-profile"
+                  hideSingleSelectionIndicator
                 >
-                  <path
-                    d="M1 1L6 6L11 1"
-                    stroke="#2B3942"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  />
-                </svg>
-              </span>
+                  @for (opt of roleOptions; track opt.value) {
+                    <mat-option [value]="opt.value">{{
+                      opt.labelKey | translate : opt.labelParams
+                    }}</mat-option>
+                  }
+                </mat-select>
+                <span class="custom-arrow">
+                  <svg
+                    width="12"
+                    height="7"
+                    viewBox="0 0 12 7"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M1 1L6 6L11 1"
+                      stroke="#2B3942"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      }
 
       @if (isPartnerRole) {
         <div

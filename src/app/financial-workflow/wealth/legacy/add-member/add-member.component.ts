@@ -134,6 +134,8 @@ export class AddMemberComponent implements AfterViewInit, OnDestroy {
       existingMembers: FamilyMemberModel[];
       clientFirstName: string;
       partnerFirstName: string;
+      /** Existing tree-only partner row: hide relationship, save via complete-partner-profile API. */
+      completePlaceholderPartnerMemberId?: string;
     }
   ) {
     this.form = this.fb.group({
@@ -153,9 +155,31 @@ export class AddMemberComponent implements AfterViewInit, OnDestroy {
       startWith(this.form.get('role')!.value),
       takeUntil(this.destroy$),
     ).subscribe((role) => this.applyRoleMode(role as FamilyRole | null));
+
+    const completeId = this.data.completePlaceholderPartnerMemberId;
+    if (completeId) {
+      const pm = this.data.existingMembers.find(
+        (m) => m.id === completeId && m.role === 'Partner',
+      );
+      this.form.patchValue({ role: FamilyRole.Partner });
+      if (pm) {
+        const pg = this.form.get('partner') as FormGroup;
+        pg.patchValue({
+          firstName: (pm.firstName ?? '').trim(),
+          lastName: (pm.lastName ?? '').trim(),
+        });
+      }
+    }
+  }
+
+  get showRelationshipSelect(): boolean {
+    return !this.data.completePlaceholderPartnerMemberId;
   }
 
   ngAfterViewInit(): void {
+    if (!this.showRelationshipSelect) {
+      return;
+    }
     this.rolePanelOpenTimer = setTimeout(() => {
       this.rolePanelOpenTimer = null;
       this.roleSelect?.open();
@@ -390,13 +414,28 @@ export class AddMemberComponent implements AfterViewInit, OnDestroy {
         return;
       }
 
-      this.legacyHttp.addFamilyMember(this.data.cashflowId, {
-        firstName: capitalizeFirstLetter((pg.get('firstName')!.value ?? '').trim()),
-        lastName: capitalizeFirstLetter((pg.get('lastName')!.value ?? '').trim()),
-        birthDate: this.fixDate(dob),
-        email: (pg.get('email')!.value ?? '').trim(),
-        role,
-      }).subscribe({
+      const firstName = capitalizeFirstLetter((pg.get('firstName')!.value ?? '').trim());
+      const lastName = capitalizeFirstLetter((pg.get('lastName')!.value ?? '').trim());
+      const email = (pg.get('email')!.value ?? '').trim();
+      const completeId = this.data.completePlaceholderPartnerMemberId;
+
+      const req$ = completeId
+        ? this.legacyHttp.completePartnerProfile(this.data.cashflowId, {
+            memberId: completeId,
+            firstName,
+            lastName,
+            birthDate: this.fixDate(dob),
+            email,
+          })
+        : this.legacyHttp.addFamilyMember(this.data.cashflowId, {
+            firstName,
+            lastName,
+            birthDate: this.fixDate(dob),
+            email,
+            role,
+          });
+
+      req$.subscribe({
         next: (dashboard) => {
           this.toastr.success(
             this.translate.instant('LEGACY.MEMBER_ADDED'),
@@ -410,7 +449,7 @@ export class AddMemberComponent implements AfterViewInit, OnDestroy {
             this.translate.instant('Error'),
           );
           this.isSaving = false;
-        }
+        },
       });
       return;
     }
