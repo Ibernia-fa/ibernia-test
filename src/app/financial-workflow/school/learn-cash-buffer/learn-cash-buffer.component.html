@@ -113,15 +113,24 @@
             ></apx-chart>
           </div>
 
+          <h2 class="learn-cash-buffer__interpret-title">
+            {{ "LEARN_CASH_BUFFER.INTERP_TITLE" | translate }}
+          </h2>
           @switch (interpretation()) {
             @case ('below') {
               <p class="learn-cash-buffer__interpret">
                 {{ "LEARN_CASH_BUFFER.INTERP_BELOW" | translate }}
               </p>
+              <p class="learn-cash-buffer__interpret-nuance">
+                {{ "LEARN_CASH_BUFFER.INTERP_ABOVE_NUANCE" | translate }}
+              </p>
             }
             @case ('within') {
               <p class="learn-cash-buffer__interpret">
                 {{ "LEARN_CASH_BUFFER.INTERP_WITHIN" | translate }}
+              </p>
+              <p class="learn-cash-buffer__interpret-nuance">
+                {{ "LEARN_CASH_BUFFER.INTERP_ABOVE_NUANCE" | translate }}
               </p>
             }
             @case ('above') {
