@@ -125,6 +125,14 @@ export class LearnInvestToReachGoalComponent implements OnInit {
 
   readonly hasClientAge = computed(() => Number.isFinite(this.currentAge));
 
+  /** Positive finite age only; used for the secondary age axis (not hasClientAge). */
+  readonly showSecondaryAgeAxis = computed(
+    () =>
+      this.horizonValid() &&
+      Number.isFinite(this.currentAge) &&
+      this.currentAge > 0,
+  );
+
   readonly yearsToInvest = computed(() => {
     const end = this.goalAge();
     const start = this.currentAge;
@@ -175,6 +183,32 @@ export class LearnInvestToReachGoalComponent implements OnInit {
   });
 
   readonly chartOptions = computed(() => this.buildChartOptions());
+
+  /**
+   * Age ticks aligned to the same year indices as the primary Year axis (every 5 years),
+   * plus a terminal tick at the goal age when the horizon is not a multiple of 5.
+   */
+  readonly secondaryAgeAxisTicks = computed(() => {
+    if (!this.showSecondaryAgeAxis()) return [] as { yearIndex: number; label: string }[];
+    const years = this.yearsToInvest();
+    if (years <= 0) return [];
+    const startAge = Math.trunc(this.currentAge);
+    const goal = Math.trunc(this.goalAge());
+    const prefix = this.translate.instant('LEARN_INVEST_GOAL.AXIS_AGE_PREFIX');
+    const indices = new Set<number>();
+    for (let i = 0; i <= years; i += 5) {
+      indices.add(i);
+    }
+    if (years % 5 !== 0) {
+      indices.add(years);
+    }
+    return [...indices]
+      .sort((a, b) => a - b)
+      .map((yearIndex) => ({
+        yearIndex,
+        label: `${prefix}${yearIndex === years ? goal : startAge + yearIndex}`,
+      }));
+  });
 
   constructor(
     public dialogRef: MatDialogRef<LearnInvestToReachGoalComponent>,

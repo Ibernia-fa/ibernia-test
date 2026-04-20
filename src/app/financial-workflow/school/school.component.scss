@@ -23,20 +23,40 @@
   margin: 0 auto;
 }
 
-.card-masonry {
-  column-count: 1;
-  column-gap: 24px;
+/** School tiles: 3×2 + centered solo row on large screens; stacks on small. */
+.card-grid {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: 1fr;
+}
+
+.card-grid .card {
+  margin-bottom: 0;
+  break-inside: auto;
 }
 
 @media (min-width: 640px) {
-  .card-masonry {
-    column-count: 2;
+  .card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .card-grid__solo {
+    grid-column: 1 / -1;
+    width: min(100%, 420px);
+    justify-self: center;
   }
 }
 
 @media (min-width: 1024px) {
-  .card-masonry {
-    column-count: 3;
+  .card-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  /** Same width as one column (two 24px gutters across three tracks). */
+  .card-grid__solo {
+    grid-column: 1 / -1;
+    width: min(100%, calc((100% - 48px) / 3));
+    justify-self: center;
   }
 }
 

@@ -141,7 +141,10 @@
 
         <section class="learn-invest-goal__main">
           @if (horizonValid() && (goalAmount() || 0) > 0) {
-            <div class="learn-invest-goal__chart">
+            <div
+              class="learn-invest-goal__chart"
+              [class.learn-invest-goal__chart--age-axis]="showSecondaryAgeAxis()"
+            >
               <apx-chart
                 [series]="chartOptions().series"
                 [chart]="chartOptions().chart"
@@ -156,6 +159,22 @@
                 [markers]="chartOptions().markers"
                 [annotations]="chartOptions().annotations"
               ></apx-chart>
+              @if (showSecondaryAgeAxis()) {
+                <div class="invest-goal-age-axis" aria-hidden="true">
+                  @for (tick of secondaryAgeAxisTicks(); track tick.yearIndex) {
+                    <span
+                      class="invest-goal-age-axis__tick"
+                      [class.invest-goal-age-axis__tick--first]="tick.yearIndex === 0"
+                      [class.invest-goal-age-axis__tick--last]="
+                        tick.yearIndex === yearsToInvest()
+                      "
+                      [style.left.%]="(tick.yearIndex / yearsToInvest()) * 100"
+                    >
+                      {{ tick.label }}
+                    </span>
+                  }
+                </div>
+              }
             </div>
             @if (hasClientAge() && horizonValid()) {
               <p class="impact-supporting-copy invest-goal-chart-footnote">
