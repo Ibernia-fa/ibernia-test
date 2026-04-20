@@ -1,0 +1,233 @@
+<h2 mat-dialog-title class="assumptions-dialog__title">
+  {{ "LEARN_RENT_OR_BUY.ASSUMPTIONS_TITLE" | translate }}
+</h2>
+
+<mat-dialog-content class="assumptions-dialog__content">
+  <p class="assumptions-dialog__intro">
+    {{ "LEARN_RENT_OR_BUY.ASSUMPTIONS_INTRO" | translate }}
+  </p>
+
+  <section class="assumption-block">
+    <h3 class="assumption-block__heading">{{ "LEARN_RENT_OR_BUY.GROUP_MORTGAGE" | translate }}</h3>
+    <div class="assumption-grid">
+      <div class="impact-field">
+        <span class="impact-field__label">{{ "LEARN_RENT_OR_BUY.MORTGAGE_RATE" | translate }}</span>
+        <div class="impact-field__value">
+          <input
+            type="text"
+            inputmode="decimal"
+            class="impact-field__input"
+            [value]="mortgageRateText()"
+            (input)="onMortgageInterestInput($any($event.target).value)"
+            (blur)="onMortgageInterestBlur()"
+          />
+          <span class="impact-field__suffix">%</span>
+        </div>
+      </div>
+      <div class="impact-field">
+        <span class="impact-field__label">{{ "LEARN_RENT_OR_BUY.MORTGAGE_TERM" | translate }}</span>
+        <div class="impact-field__value">
+          <input
+            type="text"
+            inputmode="numeric"
+            class="impact-field__input"
+            [value]="mortgageTermText()"
+            (input)="onMortgageTermInput($any($event.target).value)"
+            (blur)="onMortgageTermBlur()"
+          />
+        </div>
+      </div>
+      <div class="impact-field">
+        <span class="impact-field__label">{{ "LEARN_RENT_OR_BUY.TIME_HORIZON" | translate }}</span>
+        <div class="impact-field__value">
+          <input
+            type="text"
+            inputmode="numeric"
+            class="impact-field__input"
+            [value]="horizonText()"
+            (input)="onHorizonInput($any($event.target).value)"
+            (blur)="onHorizonBlur()"
+          />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="assumption-block">
+    <h3 class="assumption-block__heading">{{ "LEARN_RENT_OR_BUY.GROUP_GROWTH" | translate }}</h3>
+    <div class="assumption-grid">
+      <div class="impact-field">
+        <span class="impact-field__label">{{ "LEARN_RENT_OR_BUY.HOME_GROWTH" | translate }}</span>
+        <div class="impact-field__value">
+          <input
+            type="text"
+            inputmode="decimal"
+            class="impact-field__input"
+            [value]="homeGrowthText()"
+            (input)="onHomeGrowthInput($any($event.target).value)"
+            (blur)="onHomeGrowthBlur()"
+          />
+          <span class="impact-field__suffix">%</span>
+        </div>
+      </div>
+      <div class="impact-field">
+        <span class="impact-field__label">{{ "LEARN_RENT_OR_BUY.RENT_GROWTH" | translate }}</span>
+        <div class="impact-field__value">
+          <input
+            type="text"
+            inputmode="decimal"
+            class="impact-field__input"
+            [value]="rentGrowthText()"
+            (input)="onRentGrowthInput($any($event.target).value)"
+            (blur)="onRentGrowthBlur()"
+          />
+          <span class="impact-field__suffix">%</span>
+        </div>
+      </div>
+      <div class="impact-field">
+        <span class="impact-field__label">{{ "LEARN_RENT_OR_BUY.INVEST_RETURN" | translate }}</span>
+        <div class="impact-field__value">
+          <input
+            type="text"
+            inputmode="decimal"
+            class="impact-field__input"
+            [value]="investReturnText()"
+            (input)="onInvestReturnInput($any($event.target).value)"
+            (blur)="onInvestReturnBlur()"
+          />
+          <span class="impact-field__suffix">%</span>
+        </div>
+      </div>
+      <div class="impact-field">
+        <span class="impact-field__label">{{ "LEARN_RENT_OR_BUY.GENERAL_INFLATION" | translate }}</span>
+        <div class="impact-field__value">
+          <input
+            type="text"
+            inputmode="decimal"
+            class="impact-field__input"
+            [value]="inflationText()"
+            (input)="onInflationInput($any($event.target).value)"
+            (blur)="onInflationBlur()"
+          />
+          <span class="impact-field__suffix">%</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="assumption-block">
+    <h3 class="assumption-block__heading">{{ "LEARN_RENT_OR_BUY.GROUP_OWNERSHIP" | translate }}</h3>
+    <div class="assumption-grid">
+      <div class="impact-field">
+        <span class="impact-field__label">{{ "LEARN_RENT_OR_BUY.CLOSING_COSTS" | translate }}</span>
+        <div class="impact-field__value">
+          <input
+            type="text"
+            inputmode="decimal"
+            class="impact-field__input"
+            [value]="closingText()"
+            (input)="onClosingInput($any($event.target).value)"
+            (blur)="onClosingBlur()"
+          />
+          <span class="impact-field__suffix">%</span>
+        </div>
+      </div>
+      <div class="impact-field">
+        <span class="impact-field__label">{{ "LEARN_RENT_OR_BUY.PROPERTY_TAX" | translate }}</span>
+        <div class="impact-field__value">
+          <input
+            type="text"
+            inputmode="decimal"
+            class="impact-field__input"
+            [value]="propertyTaxText()"
+            (input)="onPropertyTaxInput($any($event.target).value)"
+            (blur)="onPropertyTaxBlur()"
+          />
+          <span class="impact-field__suffix">%</span>
+        </div>
+      </div>
+      <div class="impact-field impact-field--wide">
+        <span class="impact-field__label">{{ "LEARN_RENT_OR_BUY.HOME_INSURANCE_YEARLY" | translate }}</span>
+        <div class="impact-field__value">
+          <input
+            type="text"
+            inputmode="decimal"
+            class="impact-field__input"
+            [value]="insuranceYearlyText()"
+            (input)="onInsuranceYearlyInput($any($event.target).value)"
+            (blur)="onInsuranceYearlyBlur()"
+          />
+        </div>
+      </div>
+      <div class="impact-field">
+        <span class="impact-field__label">{{ "LEARN_RENT_OR_BUY.MAINTENANCE_PCT" | translate }}</span>
+        <div class="impact-field__value">
+          <input
+            type="text"
+            inputmode="decimal"
+            class="impact-field__input"
+            [value]="maintenanceText()"
+            (input)="onMaintenanceInput($any($event.target).value)"
+            (blur)="onMaintenanceBlur()"
+          />
+          <span class="impact-field__suffix">%</span>
+        </div>
+      </div>
+      <div class="impact-field">
+        <span class="impact-field__label">{{ "LEARN_RENT_OR_BUY.HOA_MONTHLY" | translate }}</span>
+        <div class="impact-field__value">
+          <input
+            type="text"
+            inputmode="decimal"
+            class="impact-field__input"
+            [value]="hoaText()"
+            (input)="onHoaInput($any($event.target).value)"
+            (blur)="onHoaBlur()"
+          />
+        </div>
+      </div>
+      <div class="impact-field">
+        <span class="impact-field__label">{{ "LEARN_RENT_OR_BUY.SELLING_COSTS" | translate }}</span>
+        <div class="impact-field__value">
+          <input
+            type="text"
+            inputmode="decimal"
+            class="impact-field__input"
+            [value]="sellingText()"
+            (input)="onSellingInput($any($event.target).value)"
+            (blur)="onSellingBlur()"
+          />
+          <span class="impact-field__suffix">%</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="assumption-block">
+    <h3 class="assumption-block__heading">{{ "LEARN_RENT_OR_BUY.GROUP_RENTING" | translate }}</h3>
+    <div class="assumption-grid">
+      <div class="impact-field">
+        <span class="impact-field__label">{{ "LEARN_RENT_OR_BUY.RENTER_INSURANCE" | translate }}</span>
+        <div class="impact-field__value">
+          <input
+            type="text"
+            inputmode="decimal"
+            class="impact-field__input"
+            [value]="renterInsText()"
+            (input)="onRenterInsInput($any($event.target).value)"
+            (blur)="onRenterInsBlur()"
+          />
+        </div>
+      </div>
+    </div>
+  </section>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="assumptions-dialog__actions">
+  <button type="button" mat-button (click)="cancel()">
+    {{ "LEARN_RENT_OR_BUY.CANCEL" | translate }}
+  </button>
+  <button type="button" mat-flat-button color="primary" (click)="apply()">
+    {{ "LEARN_RENT_OR_BUY.APPLY" | translate }}
+  </button>
+</mat-dialog-actions>

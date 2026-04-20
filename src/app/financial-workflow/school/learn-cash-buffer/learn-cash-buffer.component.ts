@@ -67,39 +67,19 @@ export class LearnCashBufferComponent implements OnInit {
     return this.cash() / m;
   });
 
+  /** Fixed visual scale for the benchmark graph only (0–24 months); does not affect numeric results. */
+  readonly benchmarkVisualMaxMonths = 24;
+
   /**
-   * Upper bound of the months axis so the marker stays inside the track
-   * while leaving a small margin past the user's position.
+   * Marker position on the fixed 0–24 month axis (capped at 24 for display).
+   * Actual months remain in `bufferMonths()` for copy and badges.
    */
-  readonly displayMaxMonths = computed(() => {
-    const bm = this.bufferMonths();
-    if (bm === null) return 15;
-    return Math.max(15, bm * 1.08 + 0.5, 12.01);
-  });
-
-  readonly zoneLowWidthPct = computed(() => {
-    const max = this.displayMaxMonths();
-    if (max <= 0) return 0;
-    return Math.min(100, (3 / max) * 100);
-  });
-
-  readonly zoneMidWidthPct = computed(() => {
-    const max = this.displayMaxMonths();
-    if (max <= 0) return 0;
-    return Math.min(100, (9 / max) * 100);
-  });
-
-  readonly zoneHighWidthPct = computed(() => {
-    const a = this.zoneLowWidthPct();
-    const b = this.zoneMidWidthPct();
-    return Math.max(0, 100 - a - b);
-  });
-
   readonly markerPercent = computed(() => {
     const bm = this.bufferMonths();
-    const max = this.displayMaxMonths();
-    if (bm === null || max <= 0) return null;
-    return Math.min(100, Math.max(0, (bm / max) * 100));
+    if (bm === null) return null;
+    const max = this.benchmarkVisualMaxMonths;
+    const clamped = Math.min(Math.max(0, bm), max);
+    return (clamped / max) * 100;
   });
 
   readonly interpretation: Signal<CashBufferInterpretation> = computed(() => {

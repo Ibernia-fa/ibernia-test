@@ -23,9 +23,13 @@ import { LearnCompoundInterestComponent } from './learn-compound-interest/learn-
 import { LearnCostOfWaitingComponent } from './learn-cost-of-waiting/learn-cost-of-waiting.component';
 import { LearnCashBufferComponent } from './learn-cash-buffer/learn-cash-buffer.component';
 import { LearnInvestToReachGoalComponent } from './learn-invest-to-reach-goal/learn-invest-to-reach-goal.component';
+import { LearnRentOrBuyComponent } from './learn-rent-or-buy/learn-rent-or-buy.component';
+import type { LearnRentOrBuyDialogData } from './learn-rent-or-buy/learn-rent-or-buy.types';
 import { IncomeExpensesHttpService } from '../income-expenses/services/income-expenses-http.service';
 import { FinancialViewModel, IncomeExpense } from '../income-expenses/model/income-expense';
 import { getCompletedYearsAgeAtDate } from 'src/app/shared/utils/client-age-at-reference';
+import { WealthHttpService } from '../wealth/services/wealth-http.service';
+import { WealthAssetModel, WealthDashboardModel } from '../wealth/models/wealth.model';
 
 interface SchoolSlide {
   title: string;
@@ -42,6 +46,8 @@ interface SchoolModule {
 const DEFAULT_INFLATION_FALLBACK = 2.5;
 const DEFAULT_AMOUNT_FALLBACK = 100000;
 const DEFAULT_MONTHLY_EXPENSES_FALLBACK = 3000;
+const DEFAULT_HOME_PRICE_FALLBACK = 420_000;
+const DEFAULT_RENT_MONTHLY_FALLBACK = 1_800;
 
 @Component({
   selector: 'app-school',
@@ -66,12 +72,14 @@ export class SchoolComponent {
   isOpeningCostOfWaiting = false;
   isOpeningCashBuffer = false;
   isOpeningInvestToReachGoal = false;
+  isOpeningRentOrBuy = false;
 
   private readonly dialog = inject(MatDialog);
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly financialWorkflowService = inject(FinancialWorkflowService);
   private readonly savingsPotsHttpService = inject(SavingsPotsHttpService);
   private readonly incomeExpensesHttpService = inject(IncomeExpensesHttpService);
+  private readonly wealthHttpService = inject(WealthHttpService);
   private readonly destroyRef = inject(DestroyRef);
 
   constructor(private translate: TranslateService) {
@@ -337,6 +345,71 @@ export class SchoolComponent {
    * Monthly savings needed to reach a goal by a target age; optional real (inflation) view
    * like other School lessons. Age from plan birth date; inflation from cashflow when toggled on.
    */
+  openRentOrBuyLesson(): void {
+    if (this.isOpeningRentOrBuy) return;
+    this.isOpeningRentOrBuy = true;
+
+    this.fetchRentOrBuyLessonContext$()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: ({ client, cashflow, wealth, incomeExpense }) => {
+          const inflation =
+            cashflow?.inflationRate ??
+            client?.clientDetails?.inflationRate ??
+            DEFAULT_INFLATION_FALLBACK;
+          const mainHome = this.inferMainResidenceValue(wealth?.assets);
+          const homePrice = mainHome ?? DEFAULT_HOME_PRICE_FALLBACK;
+          const rentGuess = this.inferHousingRentMonthly(incomeExpense?.expenses);
+          const monthlyRent = rentGuess ?? DEFAULT_RENT_MONTHLY_FALLBACK;
+          const insuranceYearly = Math.round(Math.max(400, homePrice * 0.0025));
+
+          this.openRentOrBuyDialog({
+            homePrice,
+            downPaymentPct: 20,
+            monthlyRent,
+            mortgageRatePct: 4,
+            mortgageTermYears: 25,
+            horizonYears: 10,
+            homePriceGrowthPct: 2,
+            rentGrowthPct: inflation,
+            investmentReturnPct: 5,
+            closingCostsPct: 3,
+            propertyTaxPct: 1,
+            homeInsuranceYearly: insuranceYearly,
+            maintenancePctYearly: 1,
+            hoaMonthly: 0,
+            sellingCostsPct: 5,
+            renterInsuranceMonthly: 15,
+            generalInflationPct: inflation,
+            currencyCode: client?.clientDetails?.preferredCurrency,
+          });
+          this.isOpeningRentOrBuy = false;
+        },
+        error: () => {
+          this.openRentOrBuyDialog({
+            homePrice: DEFAULT_HOME_PRICE_FALLBACK,
+            downPaymentPct: 20,
+            monthlyRent: DEFAULT_RENT_MONTHLY_FALLBACK,
+            mortgageRatePct: 4,
+            mortgageTermYears: 25,
+            horizonYears: 10,
+            homePriceGrowthPct: 2,
+            rentGrowthPct: DEFAULT_INFLATION_FALLBACK,
+            investmentReturnPct: 5,
+            closingCostsPct: 3,
+            propertyTaxPct: 1,
+            homeInsuranceYearly: Math.round(Math.max(400, DEFAULT_HOME_PRICE_FALLBACK * 0.0025)),
+            maintenancePctYearly: 1,
+            hoaMonthly: 0,
+            sellingCostsPct: 5,
+            renterInsuranceMonthly: 15,
+            generalInflationPct: DEFAULT_INFLATION_FALLBACK,
+          });
+          this.isOpeningRentOrBuy = false;
+        },
+      });
+  }
+
   openInvestToReachGoalLesson(): void {
     if (this.isOpeningInvestToReachGoal) return;
     this.isOpeningInvestToReachGoal = true;
@@ -400,6 +473,39 @@ export class SchoolComponent {
     );
   }
 
+  private fetchRentOrBuyLessonContext$(): Observable<{
+    client: Client;
+    cashflow: Cashflow;
+    wealth: WealthDashboardModel | null;
+    incomeExpense: IncomeExpense | null;
+  }> {
+    const params$ = this.activatedRoute.parent?.params ?? this.activatedRoute.params;
+    return params$.pipe(
+      take(1),
+      switchMap((params) =>
+        this.financialWorkflowService.loadClientCashflowMetadata(params).pipe(take(1)),
+      ),
+      switchMap(([client, cashflow]) =>
+        combineLatest([
+          this.wealthHttpService
+            .getDashboard((cashflow as Cashflow).id)
+            .pipe(catchError(() => of(null))),
+          this.incomeExpensesHttpService
+            .getAllIncomeExpenses((cashflow as Cashflow).id)
+            .pipe(catchError(() => of(null))),
+        ]).pipe(
+          take(1),
+          map(([wealth, incomeExpense]) => ({
+            client: client as Client,
+            cashflow: cashflow as Cashflow,
+            wealth,
+            incomeExpense: incomeExpense as IncomeExpense | null,
+          })),
+        ),
+      ),
+    );
+  }
+
   private fetchLessonPlanContext$(): Observable<{
     client: Client;
     cashflow: Cashflow;
@@ -431,6 +537,47 @@ export class SchoolComponent {
   }
 
   /** Sum recurring expenses as an approximate monthly total; excludes one-off lines. */
+  private inferMainResidenceValue(assets: WealthAssetModel[] | undefined): number | null {
+    if (!assets?.length) return null;
+    const realEstate = assets.filter((a) => (a.category || '').toLowerCase().includes('real'));
+    if (!realEstate.length) return null;
+    const ranked = realEstate
+      .map((a) => {
+        const label = `${a.name ?? ''} ${a.description ?? ''}`.toLowerCase();
+        const score =
+          (/primary|main|residence|principal|owner-occupied|home|abitazione/.test(label) ? 2 : 0) +
+          (/house|flat|apartment|villa|condo|loft/.test(label) ? 1 : 0);
+        return { a, score };
+      })
+      .sort((x, y) => y.score - x.score || y.a.value - x.a.value);
+    const top = ranked[0]?.a.value ?? 0;
+    return top > 0 ? top : null;
+  }
+
+  /** Best-effort monthly rent from Housing / rent-like expense lines. */
+  private inferHousingRentMonthly(expenses: FinancialViewModel[] | undefined): number | null {
+    if (!expenses?.length) return null;
+    let total = 0;
+    let found = false;
+    for (const e of expenses) {
+      const desc = (e.description || '').trim();
+      if (desc !== 'Housing' && !/rent|affitto|locazione/i.test(desc)) continue;
+      const cycle = e.amount?.cycle?.description ?? '';
+      if (cycle === 'One-off') continue;
+      const amt = e.amount?.amount ?? 0;
+      if (amt <= 0) continue;
+      found = true;
+      if (cycle === 'Every month' || cycle === 'Monthly') {
+        total += amt;
+      } else if (cycle === 'Every year' || cycle === 'Yearly') {
+        total += amt / 12;
+      } else {
+        total += amt;
+      }
+    }
+    return found && total > 0 ? total : null;
+  }
+
   private computeMonthlyRecurringExpenses(
     expenses: FinancialViewModel[] | undefined,
   ): number {
@@ -506,6 +653,18 @@ export class SchoolComponent {
     currencyCode?: string;
   }): void {
     this.dialog.open(LearnCashBufferComponent, {
+      width: '92vw',
+      maxWidth: '92vw',
+      height: '88vh',
+      panelClass: 'learn-inflation-dialog-panel',
+      autoFocus: false,
+      restoreFocus: false,
+      data,
+    });
+  }
+
+  private openRentOrBuyDialog(data: LearnRentOrBuyDialogData): void {
+    this.dialog.open(LearnRentOrBuyComponent, {
       width: '92vw',
       maxWidth: '92vw',
       height: '88vh',
