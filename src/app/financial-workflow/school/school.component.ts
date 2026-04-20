@@ -349,19 +349,26 @@ export class SchoolComponent {
     this.fetchRentOrBuyLessonContext$()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: ({ client, wealth, incomeExpense }) => {
+        next: ({ client, cashflow, wealth, incomeExpense }) => {
           const mainHome = this.inferMainResidenceValue(wealth?.assets);
           const rentGuess = this.inferHousingRentMonthly(incomeExpense?.expenses);
+          const inflationRate =
+            cashflow?.inflationRate ??
+            client?.clientDetails?.inflationRate ??
+            DEFAULT_INFLATION_FALLBACK;
 
           this.openRentOrBuyDialog({
             homePrice: mainHome,
             monthlyRent: rentGuess,
+            inflationPct: inflationRate,
             currencyCode: client?.clientDetails?.preferredCurrency,
           });
           this.isOpeningRentOrBuy = false;
         },
         error: () => {
-          this.openRentOrBuyDialog({});
+          this.openRentOrBuyDialog({
+            inflationPct: DEFAULT_INFLATION_FALLBACK,
+          });
           this.isOpeningRentOrBuy = false;
         },
       });

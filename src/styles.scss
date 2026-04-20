@@ -1271,3 +1271,48 @@ app-branding {
   background-position: center !important;
   background-repeat: no-repeat !important;
 }
+
+/* ============================================================
+   School modules: shared bottom informational notice.
+   Used across Inflation, Compound interest, Cost of waiting,
+   Cash buffer, Invest to reach goal, and Rent vs Buy tiles to
+   remind the user that School outputs are educational
+   projections, not exact predictions.
+   ============================================================ */
+.school-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  margin: 4px 56px 12px;
+  border: 1px solid rgba(64, 67, 175, 0.18);
+  border-radius: 12px;
+  background: #f5f7ff;
+  color: #5a596e;
+  font-family: "Ubuntu", sans-serif;
+  font-size: 12.5px;
+  line-height: 1.55;
+  font-weight: 400;
+  letter-spacing: 0.1px;
+  flex-shrink: 0;
+
+  &__icon {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    font-size: 18px;
+    margin-top: 1px;
+    color: #4043af;
+  }
+
+  &__text {
+    margin: 0;
+    flex: 1 1 auto;
+  }
+}
+
+@media (max-width: 1024px) {
+  .school-notice {
+    margin: 4px 16px 12px;
+  }
+}

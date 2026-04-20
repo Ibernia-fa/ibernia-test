@@ -1,0 +1,142 @@
+$ibernia-blue: #4043af;
+$ibernia-ink: #1c1c1c;
+$ibernia-mute: #5a596e;
+$ibernia-line: #e5e5ec;
+$ibernia-bg-soft: #f7f8fc;
+
+.rb-assumptions {
+  font-family: "Ubuntu", sans-serif;
+  color: $ibernia-ink;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 4px 4px 0 4px;
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 22px;
+    line-height: 1.2;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    color: $ibernia-ink;
+  }
+
+  &__close {
+    color: $ibernia-mute;
+  }
+
+  &__intro {
+    margin: 6px 4px 16px 4px;
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: $ibernia-mute;
+  }
+
+  &__content {
+    padding: 0 4px !important;
+    overflow: visible !important;
+    max-height: none !important;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px 18px;
+  }
+
+  &__actions {
+    padding: 16px 4px 4px 4px !important;
+    margin: 12px 0 0 0 !important;
+    border-top: 1px solid $ibernia-line;
+    display: flex;
+    gap: 10px;
+  }
+
+  &__btn {
+    min-width: 96px;
+    border-radius: 10px !important;
+    font-weight: 600 !important;
+    height: 40px !important;
+  }
+}
+
+.rb-assum-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  &__label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: $ibernia-mute;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  &__hint {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+    color: #b6b9c9;
+    cursor: help;
+  }
+
+  &__control {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid $ibernia-line;
+    border-radius: 12px;
+    padding: 10px 14px;
+    background: #ffffff;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease;
+
+    &:focus-within {
+      border-color: $ibernia-blue;
+      box-shadow: 0 0 0 3px rgba(64, 67, 175, 0.12);
+    }
+  }
+
+  &__input {
+    flex: 1 1 auto;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 600;
+    color: $ibernia-ink;
+    width: 100%;
+    min-width: 0;
+    padding: 0;
+    font-variant-numeric: tabular-nums;
+
+    &::placeholder {
+      color: #c0c0cc;
+      font-weight: 600;
+    }
+  }
+
+  &__suffix {
+    font-size: 14px;
+    font-weight: 600;
+    color: $ibernia-mute;
+    flex-shrink: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .rb-assumptions__grid {
+    grid-template-columns: 1fr;
+  }
+}

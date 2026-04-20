@@ -1,0 +1,145 @@
+<div class="rb-assumptions">
+  <div class="rb-assumptions__header">
+    <h2 class="rb-assumptions__title">{{ "LEARN_RENT_OR_BUY.ASSUMPTIONS_TITLE" | translate }}</h2>
+    <button
+      type="button"
+      mat-icon-button
+      class="rb-assumptions__close"
+      (click)="cancel()"
+      [attr.aria-label]="'LEARN_RENT_OR_BUY.CLOSE' | translate"
+    >
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <p class="rb-assumptions__intro">
+    {{ "LEARN_RENT_OR_BUY.ASSUMPTIONS_INTRO" | translate }}
+  </p>
+
+  <mat-dialog-content class="rb-assumptions__content">
+    <div class="rb-assumptions__grid">
+      <!-- Mortgage rate -->
+      <div class="rb-assum-field">
+        <label class="rb-assum-field__label">
+          {{ "LEARN_RENT_OR_BUY.FIELD_MORTGAGE_RATE" | translate }}
+          <mat-icon class="rb-assum-field__hint" [matTooltip]="'LEARN_RENT_OR_BUY.TIP_MORTGAGE_RATE' | translate">help_outline</mat-icon>
+        </label>
+        <div class="rb-assum-field__control">
+          <input
+            type="text"
+            inputmode="decimal"
+            class="rb-assum-field__input"
+            [value]="mortgageRateText()"
+            (input)="onMortgageRateInput($any($event.target).value)"
+            (blur)="onMortgageRateBlur()"
+          />
+          <span class="rb-assum-field__suffix">%</span>
+        </div>
+      </div>
+
+      <!-- Home appreciation -->
+      <div class="rb-assum-field">
+        <label class="rb-assum-field__label">
+          {{ "LEARN_RENT_OR_BUY.FIELD_HOME_APPRECIATION" | translate }}
+          <mat-icon class="rb-assum-field__hint" [matTooltip]="'LEARN_RENT_OR_BUY.TIP_HOME_APPRECIATION' | translate">help_outline</mat-icon>
+        </label>
+        <div class="rb-assum-field__control">
+          <input
+            type="text"
+            inputmode="decimal"
+            class="rb-assum-field__input"
+            [value]="homeAppreciationText()"
+            (input)="onHomeAppreciationInput($any($event.target).value)"
+            (blur)="onHomeAppreciationBlur()"
+          />
+          <span class="rb-assum-field__suffix">%</span>
+        </div>
+      </div>
+
+      <!-- Investment return -->
+      <div class="rb-assum-field">
+        <label class="rb-assum-field__label">
+          {{ "LEARN_RENT_OR_BUY.FIELD_INVESTMENT_RETURN" | translate }}
+          <mat-icon class="rb-assum-field__hint" [matTooltip]="'LEARN_RENT_OR_BUY.TIP_INVESTMENT_RETURN' | translate">help_outline</mat-icon>
+        </label>
+        <div class="rb-assum-field__control">
+          <input
+            type="text"
+            inputmode="decimal"
+            class="rb-assum-field__input"
+            [value]="investmentReturnText()"
+            (input)="onInvestmentReturnInput($any($event.target).value)"
+            (blur)="onInvestmentReturnBlur()"
+          />
+          <span class="rb-assum-field__suffix">%</span>
+        </div>
+      </div>
+
+      <!-- Inflation -->
+      <div class="rb-assum-field">
+        <label class="rb-assum-field__label">
+          {{ "LEARN_RENT_OR_BUY.FIELD_INFLATION" | translate }}
+          <mat-icon class="rb-assum-field__hint" [matTooltip]="'LEARN_RENT_OR_BUY.TIP_INFLATION' | translate">help_outline</mat-icon>
+        </label>
+        <div class="rb-assum-field__control">
+          <input
+            type="text"
+            inputmode="decimal"
+            class="rb-assum-field__input"
+            [value]="inflationText()"
+            (input)="onInflationInput($any($event.target).value)"
+            (blur)="onInflationBlur()"
+          />
+          <span class="rb-assum-field__suffix">%</span>
+        </div>
+      </div>
+
+      <!-- Ownership costs -->
+      <div class="rb-assum-field">
+        <label class="rb-assum-field__label">
+          {{ "LEARN_RENT_OR_BUY.FIELD_OWNERSHIP_COSTS" | translate }}
+          <mat-icon class="rb-assum-field__hint" [matTooltip]="'LEARN_RENT_OR_BUY.TIP_OWNERSHIP_COSTS' | translate">help_outline</mat-icon>
+        </label>
+        <div class="rb-assum-field__control">
+          <input
+            type="text"
+            inputmode="decimal"
+            class="rb-assum-field__input"
+            [value]="ownershipCostsText()"
+            (input)="onOwnershipCostsInput($any($event.target).value)"
+            (blur)="onOwnershipCostsBlur()"
+          />
+          <span class="rb-assum-field__suffix">%</span>
+        </div>
+      </div>
+
+      <!-- Round trip costs -->
+      <div class="rb-assum-field">
+        <label class="rb-assum-field__label">
+          {{ "LEARN_RENT_OR_BUY.FIELD_ROUND_TRIP_COSTS" | translate }}
+          <mat-icon class="rb-assum-field__hint" [matTooltip]="'LEARN_RENT_OR_BUY.TIP_ROUND_TRIP_COSTS' | translate">help_outline</mat-icon>
+        </label>
+        <div class="rb-assum-field__control">
+          <input
+            type="text"
+            inputmode="decimal"
+            class="rb-assum-field__input"
+            [value]="roundTripCostsText()"
+            (input)="onRoundTripCostsInput($any($event.target).value)"
+            (blur)="onRoundTripCostsBlur()"
+          />
+          <span class="rb-assum-field__suffix">%</span>
+        </div>
+      </div>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="rb-assumptions__actions" align="end">
+    <button type="button" mat-button class="rb-assumptions__btn" (click)="cancel()">
+      {{ "LEARN_RENT_OR_BUY.CANCEL" | translate }}
+    </button>
+    <button type="button" mat-flat-button color="primary" class="rb-assumptions__btn rb-assumptions__btn--primary" (click)="apply()">
+      {{ "LEARN_RENT_OR_BUY.APPLY" | translate }}
+    </button>
+  </mat-dialog-actions>
+</div>

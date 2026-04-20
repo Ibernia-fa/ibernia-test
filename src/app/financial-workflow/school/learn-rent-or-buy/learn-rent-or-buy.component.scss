@@ -1,10 +1,9 @@
-$rb-primary: #4043af;
-$rb-buy: #5e79f6;
-$rb-rent: #4043af;
-$rb-ink: #1c1c1c;
-$rb-mute: #5a596e;
-$rb-line: #e5e5ec;
-$rb-soft-bg: #f5f6fb;
+$ibernia-blue: #4043af;
+$ibernia-blue-soft: #5e79f6;
+$ibernia-ink: #1c1c1c;
+$ibernia-mute: #5a596e;
+$ibernia-line: #e5e5ec;
+$ibernia-bg-soft: #f5f7ff;
 
 :host {
   display: flex;
@@ -16,7 +15,7 @@ $rb-soft-bg: #f5f6fb;
 
 .learn-rb {
   font-family: "Ubuntu", sans-serif;
-  color: $rb-ink;
+  color: $ibernia-ink;
   min-height: 0;
   flex: 1 1 auto;
   display: flex;
@@ -25,12 +24,14 @@ $rb-soft-bg: #f5f6fb;
   position: relative;
 }
 
+/* Top right close button */
 .learn-rb__header {
   position: absolute;
   top: 0;
+  left: 0;
   right: 0;
-  z-index: 5;
   height: 0;
+  z-index: 5;
   pointer-events: none;
 
   > * {
@@ -45,150 +46,104 @@ $rb-soft-bg: #f5f6fb;
   min-height: 0;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-  gap: 12px;
-}
-
-// ---------- Banner ----------
-.learn-rb__banner {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 10px 12px;
-  border: 1px solid #d8def0;
-  border-radius: 12px;
-  background: #f0f3ff;
-  color: #2f329e;
-  font-size: 13px;
-  line-height: 1.45;
-  margin: 0 48px 0 0;
-
-  &-icon {
-    font-size: 18px;
-    width: 18px;
-    height: 18px;
-    margin-top: 2px;
-  }
-
-  &-text {
-    flex: 1 1 auto;
-    margin: 0;
-    font-weight: 500;
-  }
-
-  &-dismiss {
-    border: none;
-    background: transparent;
-    color: inherit;
-    cursor: pointer;
-    padding: 0;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0.7;
-    transition: opacity 150ms ease;
-
-    &:hover { opacity: 1; }
-
-    mat-icon {
-      font-size: 18px;
-      width: 18px;
-      height: 18px;
-    }
-  }
-}
-
-// ---------- Layout ----------
-.learn-rb__layout {
-  display: grid;
-  grid-template-columns: minmax(320px, 380px) 1fr;
-  gap: 28px;
-  flex: 1 1 auto;
-  min-height: 0;
-  align-items: stretch;
+  gap: 22px;
+  overflow-y: auto;
   animation: learnRbFadeIn 320ms ease;
 }
 
 @keyframes learnRbFadeIn {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.learn-rb__inputs {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  min-width: 0;
-  min-height: 0;
-  overflow-y: auto;
-  padding: 4px 4px 8px 0;
-}
-
-.learn-rb__title {
-  margin: 0;
-  font-size: 24px;
-  line-height: 1.15;
+/* ----- Hero title (matches Inflation/Compound) ----- */
+.learn-rb__hero {
+  margin: 8px 56px 0;
+  font-size: 30px;
+  line-height: 1.18;
   font-weight: 700;
-  letter-spacing: -0.3px;
-  color: $rb-ink;
+  letter-spacing: -0.4px;
+  color: $ibernia-ink;
+  text-align: left;
+  max-width: 920px;
 }
 
-.learn-rb__subtitle {
-  margin: 0 0 4px 0;
-  font-size: 13px;
-  line-height: 1.45;
-  color: $rb-mute;
-}
-
-// ---------- Inputs ----------
-.rb-grid {
+/* ----- Two-column layout ----- */
+.learn-rb__layout {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 10px;
+  grid-template-columns: minmax(280px, 360px) 1fr;
+  gap: 32px;
+  align-items: stretch;
+  padding: 0 56px 0 56px;
 }
 
-.rb-field {
+/* ----- Left side ----- */
+.learn-rb__side {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 12px;
+  min-width: 0;
+}
+
+/* ----- impact-card (matches Inflation) ----- */
+.impact-card {
+  border: 1px solid $ibernia-line;
+  border-radius: 14px;
+  padding: 16px 18px;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  &:focus-within {
+    border-color: $ibernia-blue;
+    box-shadow: 0 0 0 3px rgba(64, 67, 175, 0.12);
+  }
+
+  &__label-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
 
   &__label {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
     font-size: 12px;
     font-weight: 600;
-    color: $rb-mute;
-    letter-spacing: 0.06em;
+    color: $ibernia-mute;
+    letter-spacing: 0.18px;
     text-transform: uppercase;
   }
 
-  &__hint {
-    font-size: 14px;
-    width: 14px;
-    height: 14px;
-    color: #b6b9c9;
-    cursor: help;
+  &__value {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1.1;
+    color: $ibernia-ink;
+    font-variant-numeric: tabular-nums;
   }
 
-  &__control {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    border: 1px solid $rb-line;
-    border-radius: 12px;
-    padding: 8px 12px;
-    background: #ffffff;
-    transition: border-color 0.18s ease, box-shadow 0.18s ease;
+  &__currency {
+    font-size: 17px;
+    font-weight: 600;
+    color: $ibernia-mute;
+  }
 
-    &:focus-within {
-      border-color: $rb-primary;
-      box-shadow: 0 0 0 3px rgba(64, 67, 175, 0.12);
-    }
-
-    &--combo {
-      gap: 8px;
-    }
+  &__suffix {
+    font-size: 17px;
+    font-weight: 600;
+    color: $ibernia-mute;
+    flex-shrink: 0;
   }
 
   &__input {
@@ -196,10 +151,8 @@ $rb-soft-bg: #f5f6fb;
     border: none;
     outline: none;
     background: transparent;
-    font-family: inherit;
-    font-size: 15px;
-    font-weight: 600;
-    color: $rb-ink;
+    font: inherit;
+    color: inherit;
     width: 100%;
     min-width: 0;
     padding: 0;
@@ -210,49 +163,76 @@ $rb-soft-bg: #f5f6fb;
       font-weight: 600;
     }
   }
-
-  &__prefix,
-  &__suffix {
-    font-size: 13px;
-    font-weight: 600;
-    color: $rb-mute;
-    flex-shrink: 0;
-  }
 }
 
-// down payment toggle inside the field
+/* down-payment % / amount toggle */
 .rb-toggle {
   border-radius: 8px;
-  height: 28px;
+  height: 26px;
   flex-shrink: 0;
+  border: 1px solid $ibernia-line;
 
   ::ng-deep .mat-button-toggle {
-    background: $rb-soft-bg;
-    color: $rb-mute;
+    background: #ffffff;
+    color: $ibernia-mute;
     font-weight: 600;
-    font-size: 12px;
+    font-size: 11px;
+    border-color: transparent;
 
     .mat-button-toggle-label-content {
-      line-height: 26px;
-      padding: 0 10px;
+      line-height: 24px;
+      padding: 0 8px;
     }
   }
 
   ::ng-deep .mat-button-toggle-checked {
-    background: $rb-primary;
+    background: $ibernia-blue;
     color: #ffffff;
   }
 }
 
-// ---------- Right side: results ----------
-.learn-rb__results {
+/* "More assumptions" trigger */
+.learn-rb__more {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px dashed rgba(64, 67, 175, 0.35);
+  background: $ibernia-bg-soft;
+  color: $ibernia-blue;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+
+  &:hover {
+    background: rgba(64, 67, 175, 0.08);
+    border-color: $ibernia-blue;
+  }
+
+  &:focus-visible {
+    outline: 2px solid rgba(64, 67, 175, 0.4);
+    outline-offset: 2px;
+  }
+}
+
+/* ----- Right side: results ----- */
+.learn-rb__main {
   display: flex;
   flex-direction: column;
   gap: 14px;
   min-width: 0;
   min-height: 0;
-  overflow: hidden;
-  padding: 4px 48px 0 0;
 }
 
 .rb-summary {
@@ -267,7 +247,7 @@ $rb-soft-bg: #f5f6fb;
   gap: 6px;
   padding: 14px 16px;
   border-radius: 14px;
-  border: 1px solid $rb-line;
+  border: 1px solid $ibernia-line;
   background: #ffffff;
 
   &--buy {
@@ -289,7 +269,7 @@ $rb-soft-bg: #f5f6fb;
 .rb-summary__label {
   font-size: 11px;
   font-weight: 600;
-  color: $rb-mute;
+  color: $ibernia-mute;
   text-transform: uppercase;
   letter-spacing: 0.1em;
 }
@@ -297,22 +277,22 @@ $rb-soft-bg: #f5f6fb;
 .rb-summary__value {
   font-size: 20px;
   font-weight: 700;
-  color: $rb-ink;
+  color: $ibernia-ink;
   line-height: 1.15;
   font-variant-numeric: tabular-nums;
 }
 
 .learn-rb__chart {
   flex: 1 1 auto;
-  min-height: 240px;
-  border: 1px solid $rb-line;
+  min-height: 280px;
+  border: 1px solid $ibernia-line;
   border-radius: 16px;
   background: #ffffff;
   position: relative;
 
   apx-chart {
     position: absolute;
-    inset: 8px 8px 4px 4px;
+    inset: 12px 12px 4px 4px;
     display: block;
   }
 }
@@ -334,47 +314,53 @@ $rb-soft-bg: #f5f6fb;
     height: 36px;
   }
 
-  p {
-    margin: 0;
-  }
+  p { margin: 0; }
 }
 
 .learn-rb__summary-sentence {
   margin: 0;
   font-size: 14px;
   line-height: 1.5;
-  color: $rb-ink;
+  color: $ibernia-ink;
   font-weight: 500;
   padding: 10px 14px;
   border-left: 3px solid rgba(94, 121, 246, 0.45);
-  background: $rb-soft-bg;
+  background: $ibernia-bg-soft;
   border-radius: 0 10px 10px 0;
 }
 
-// ---------- Responsive ----------
+/* Bottom educational notice now uses the shared `.school-notice`
+   block defined globally in `src/styles.scss`. */
+
+/* ----- Responsive ----- */
 @media (max-width: 1024px) {
+  .learn-rb__hero {
+    margin: 8px 16px 0;
+    font-size: 24px;
+  }
+
   .learn-rb__layout {
     grid-template-columns: 1fr;
-    gap: 16px;
-    overflow-y: auto;
+    gap: 20px;
+    padding: 0 16px;
   }
 
-  .learn-rb__inputs {
-    overflow: visible;
+  .learn-rb__side {
+    order: 2;
   }
 
-  .learn-rb__results {
-    padding-right: 16px;
+  .learn-rb__main {
+    order: 1;
+  }
+
+  .impact-card__value {
+    font-size: 22px;
   }
 
   .learn-rb__chart {
     min-height: 240px;
     height: 280px;
     flex: 0 0 auto;
-  }
-
-  .learn-rb__banner {
-    margin-right: 16px;
   }
 }
 
@@ -383,7 +369,8 @@ $rb-soft-bg: #f5f6fb;
     grid-template-columns: 1fr;
   }
 
-  .learn-rb__title { font-size: 20px; }
+  .learn-rb__hero { font-size: 22px; }
+  .impact-card { padding: 14px 16px; }
 }
 
 :host ::ng-deep .mdc-dialog__surface {

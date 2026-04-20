@@ -15,6 +15,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import {
   MAT_DIALOG_DATA,
+  MatDialog,
   MatDialogModule,
   MatDialogRef,
 } from '@angular/material/dialog';
@@ -31,8 +32,12 @@ import {
   parseFormattedNumber,
 } from 'src/app/shared/utils/number-utils';
 
+import { LearnRentOrBuyAssumptionsDialogComponent } from './learn-rent-or-buy-assumptions-dialog.component';
 import { runRentVsBuyEngine, type RentVsBuyEngineOutput } from './rent-vs-buy-engine';
-import type { LearnRentOrBuyDialogData } from './learn-rent-or-buy.types';
+import type {
+  LearnRentOrBuyAssumptions,
+  LearnRentOrBuyDialogData,
+} from './learn-rent-or-buy.types';
 
 const COLOR_BUY = '#5E79F6';
 const COLOR_RENT = '#4043AF';
@@ -77,68 +82,44 @@ export class LearnRentOrBuyComponent implements OnInit {
   readonly dialogRef = inject(MatDialogRef<LearnRentOrBuyComponent>);
   private readonly translate = inject(TranslateService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly matDialog = inject(MatDialog);
   private readonly currencySymbolPipe = new CurrencySymbolPipe();
 
   readonly currencyCode: string;
 
-  // 1. Home price
+  // -------- Core inputs (always visible) --------
+
   readonly homePrice = signal<number | null>(null);
   readonly homePriceText = signal('');
 
-  // 2. Down payment (toggle pct / amount)
   readonly downPaymentMode = signal<DownPaymentMode>('pct');
   readonly downPaymentPct = signal<number>(DEFAULTS.downPaymentPct);
   readonly downPaymentAmount = signal<number>(0);
   readonly downPaymentText = signal<string>('');
 
-  // 3. Mortgage interest rate
-  readonly mortgageRatePct = signal<number>(DEFAULTS.mortgageRatePct);
-  readonly mortgageRateText = signal<string>('');
-
-  // 4. Mortgage term
   readonly mortgageTermYears = signal<number>(DEFAULTS.mortgageTermYears);
   readonly mortgageTermText = signal<string>('');
 
-  // 5. Monthly rent
   readonly monthlyRent = signal<number | null>(null);
   readonly monthlyRentText = signal('');
 
-  // 6. Time horizon
   readonly horizonYears = signal<number>(DEFAULTS.horizonYears);
   readonly horizonText = signal<string>('');
 
-  // 7. Home appreciation
+  // -------- Advanced assumptions (modal) --------
+
+  readonly mortgageRatePct = signal<number>(DEFAULTS.mortgageRatePct);
   readonly homeAppreciationPct = signal<number>(DEFAULTS.homeAppreciationPct);
-  readonly homeAppreciationText = signal<string>('');
-
-  // 8. Investment return
   readonly investmentReturnPct = signal<number>(DEFAULTS.investmentReturnPct);
-  readonly investmentReturnText = signal<string>('');
-
-  // 9. Inflation
   readonly inflationPct = signal<number>(DEFAULTS.inflationPct);
-  readonly inflationText = signal<string>('');
-
-  // 10. Ownership costs
   readonly ownershipCostsPct = signal<number>(DEFAULTS.ownershipCostsPct);
-  readonly ownershipCostsText = signal<string>('');
-
-  // 11. Round trip transaction costs
   readonly roundTripCostsPct = signal<number>(DEFAULTS.roundTripCostsPct);
-  readonly roundTripCostsText = signal<string>('');
 
-  readonly bannerDismissed = signal<boolean>(LearnRentOrBuyComponent.bannerDismissedSession);
+  // -------- Engine wiring --------
 
-  /** Triggered on every input change; debounced to drive engine recomputation. */
   private readonly inputsChanged$ = new Subject<void>();
-
-  /**
-   * Counter that bumps after debounce; computed engine output reads this so it
-   * recalculates only when the debounced trigger fires (live updates within 300ms).
-   */
   private readonly engineTick = signal<number>(0);
 
-  /** Latest engine output; null when required inputs are missing. */
   readonly engineOutput = computed<RentVsBuyEngineOutput | null>(() => {
     this.engineTick();
     const homePrice = this.homePrice();
@@ -192,9 +173,6 @@ export class LearnRentOrBuyComponent implements OnInit {
 
   readonly chartOptions = computed(() => this.buildChartOptions());
 
-  /** Session-level (not persisted across page reload). */
-  private static bannerDismissedSession = false;
-
   constructor(@Inject(MAT_DIALOG_DATA) data: LearnRentOrBuyDialogData | null) {
     this.currencyCode = (data?.currencyCode ?? '').toString();
 
@@ -203,6 +181,9 @@ export class LearnRentOrBuyComponent implements OnInit {
     }
     if (data?.monthlyRent && data.monthlyRent > 0) {
       this.monthlyRent.set(Math.round(data.monthlyRent));
+    }
+    if (data?.inflationPct != null && Number.isFinite(data.inflationPct)) {
+      this.inflationPct.set(Math.max(0, data.inflationPct));
     }
 
     this.refreshAllText();
@@ -217,18 +198,45 @@ export class LearnRentOrBuyComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.refreshAllText());
 
-    // First computation with the initial values (no debounce).
     this.engineTick.update((v) => v + 1);
   }
 
-  // ---------- Banner ----------
+  // -------- Banner --------
+  // (banner now lives at the bottom of the module; no dismiss control needed)
 
-  dismissBanner(): void {
-    this.bannerDismissed.set(true);
-    LearnRentOrBuyComponent.bannerDismissedSession = true;
+  // -------- More assumptions modal --------
+
+  openAssumptions(): void {
+    const ref = this.matDialog.open(LearnRentOrBuyAssumptionsDialogComponent, {
+      width: 'min(640px, 92vw)',
+      maxWidth: '92vw',
+      autoFocus: false,
+      restoreFocus: true,
+      panelClass: 'rb-assumptions-dialog-panel',
+      data: {
+        mortgageRatePct: this.mortgageRatePct(),
+        homeAppreciationPct: this.homeAppreciationPct(),
+        investmentReturnPct: this.investmentReturnPct(),
+        inflationPct: this.inflationPct(),
+        ownershipCostsPct: this.ownershipCostsPct(),
+        roundTripCostsPct: this.roundTripCostsPct(),
+        currencyCode: this.currencyCode,
+      },
+    });
+
+    ref.afterClosed().subscribe((result: LearnRentOrBuyAssumptions | undefined) => {
+      if (!result) return;
+      this.mortgageRatePct.set(result.mortgageRatePct);
+      this.homeAppreciationPct.set(result.homeAppreciationPct);
+      this.investmentReturnPct.set(result.investmentReturnPct);
+      this.inflationPct.set(result.inflationPct);
+      this.ownershipCostsPct.set(result.ownershipCostsPct);
+      this.roundTripCostsPct.set(result.roundTripCostsPct);
+      this.engineTick.update((v) => v + 1);
+    });
   }
 
-  // ---------- Helpers ----------
+  // -------- Helpers --------
 
   get currencySymbol(): string {
     return this.currencyCode
@@ -260,14 +268,8 @@ export class LearnRentOrBuyComponent implements OnInit {
     this.homePriceText.set(home != null ? this.formatInteger(home) : '');
     this.monthlyRentText.set(rent != null ? this.formatInteger(rent) : '');
     this.refreshDownPaymentText();
-    this.mortgageRateText.set(this.formatDecimal(this.mortgageRatePct(), 1));
     this.mortgageTermText.set(this.formatInteger(this.mortgageTermYears()));
     this.horizonText.set(this.formatInteger(this.horizonYears()));
-    this.homeAppreciationText.set(this.formatDecimal(this.homeAppreciationPct(), 1));
-    this.investmentReturnText.set(this.formatDecimal(this.investmentReturnPct(), 1));
-    this.inflationText.set(this.formatDecimal(this.inflationPct(), 1));
-    this.ownershipCostsText.set(this.formatDecimal(this.ownershipCostsPct(), 1));
-    this.roundTripCostsText.set(this.formatDecimal(this.roundTripCostsPct(), 1));
   }
 
   private refreshDownPaymentText(): void {
@@ -296,8 +298,7 @@ export class LearnRentOrBuyComponent implements OnInit {
     return parseFormattedNumber(cleaned, this.translate.currentLang);
   }
 
-  // ---------- Field handlers ----------
-  // Each input uses (input) for live updates and (blur) to reformat the visible text.
+  // -------- Field handlers --------
 
   onHomePriceInput(raw: string): void {
     this.homePriceText.set(raw);
@@ -305,7 +306,6 @@ export class LearnRentOrBuyComponent implements OnInit {
     this.homePrice.set(value > 0 ? value : null);
     this.bumpInputs();
   }
-
   onHomePriceBlur(): void {
     const v = this.homePrice();
     this.homePriceText.set(v != null ? this.formatInteger(v) : '');
@@ -337,20 +337,8 @@ export class LearnRentOrBuyComponent implements OnInit {
     }
     this.bumpInputs();
   }
-
   onDownPaymentBlur(): void {
     this.refreshDownPaymentText();
-  }
-
-  onMortgageRateInput(raw: string): void {
-    this.mortgageRateText.set(raw);
-    const value = this.parseLocaleNumber(raw);
-    this.mortgageRatePct.set(Math.max(0, Math.min(100, value)));
-    this.bumpInputs();
-  }
-
-  onMortgageRateBlur(): void {
-    this.mortgageRateText.set(this.formatDecimal(this.mortgageRatePct(), 1));
   }
 
   onMortgageTermInput(raw: string): void {
@@ -359,7 +347,6 @@ export class LearnRentOrBuyComponent implements OnInit {
     this.mortgageTermYears.set(Math.max(MIN_TERM_YEARS, Math.min(60, value || MIN_TERM_YEARS)));
     this.bumpInputs();
   }
-
   onMortgageTermBlur(): void {
     this.mortgageTermText.set(this.formatInteger(this.mortgageTermYears()));
   }
@@ -370,7 +357,6 @@ export class LearnRentOrBuyComponent implements OnInit {
     this.monthlyRent.set(value > 0 ? value : null);
     this.bumpInputs();
   }
-
   onMonthlyRentBlur(): void {
     const v = this.monthlyRent();
     this.monthlyRentText.set(v != null ? this.formatInteger(v) : '');
@@ -382,62 +368,11 @@ export class LearnRentOrBuyComponent implements OnInit {
     this.horizonYears.set(Math.max(1, Math.min(MAX_HORIZON_YEARS, value || 1)));
     this.bumpInputs();
   }
-
   onHorizonBlur(): void {
     this.horizonText.set(this.formatInteger(this.horizonYears()));
   }
 
-  onHomeAppreciationInput(raw: string): void {
-    this.homeAppreciationText.set(raw);
-    this.homeAppreciationPct.set(this.parseLocaleNumber(raw));
-    this.bumpInputs();
-  }
-
-  onHomeAppreciationBlur(): void {
-    this.homeAppreciationText.set(this.formatDecimal(this.homeAppreciationPct(), 1));
-  }
-
-  onInvestmentReturnInput(raw: string): void {
-    this.investmentReturnText.set(raw);
-    this.investmentReturnPct.set(this.parseLocaleNumber(raw));
-    this.bumpInputs();
-  }
-
-  onInvestmentReturnBlur(): void {
-    this.investmentReturnText.set(this.formatDecimal(this.investmentReturnPct(), 1));
-  }
-
-  onInflationInput(raw: string): void {
-    this.inflationText.set(raw);
-    this.inflationPct.set(this.parseLocaleNumber(raw));
-    this.bumpInputs();
-  }
-
-  onInflationBlur(): void {
-    this.inflationText.set(this.formatDecimal(this.inflationPct(), 1));
-  }
-
-  onOwnershipCostsInput(raw: string): void {
-    this.ownershipCostsText.set(raw);
-    this.ownershipCostsPct.set(Math.max(0, this.parseLocaleNumber(raw)));
-    this.bumpInputs();
-  }
-
-  onOwnershipCostsBlur(): void {
-    this.ownershipCostsText.set(this.formatDecimal(this.ownershipCostsPct(), 1));
-  }
-
-  onRoundTripCostsInput(raw: string): void {
-    this.roundTripCostsText.set(raw);
-    this.roundTripCostsPct.set(Math.max(0, this.parseLocaleNumber(raw)));
-    this.bumpInputs();
-  }
-
-  onRoundTripCostsBlur(): void {
-    this.roundTripCostsText.set(this.formatDecimal(this.roundTripCostsPct(), 1));
-  }
-
-  // ---------- Chart ----------
+  // -------- Chart --------
 
   private buildChartOptions(): any {
     const out = this.engineOutput();
@@ -464,10 +399,7 @@ export class LearnRentOrBuyComponent implements OnInit {
       },
       colors: [COLOR_BUY, COLOR_RENT],
       stroke: { width: 3, curve: 'smooth' },
-      markers: {
-        size: 0,
-        hover: { sizeOffset: 4 },
-      },
+      markers: { size: 0, hover: { sizeOffset: 4 } },
       dataLabels: { enabled: false },
       grid: {
         borderColor: '#eef0f6',
