@@ -90,27 +90,16 @@
           </div>
 
           <div class="impact-card impact-card--accent">
-            <span class="impact-card__label">
-              {{ "LEARN_COST_WAITING.ACTIVE_SCENARIO" | translate }}
-            </span>
             @if (startingAmount() > 0) {
-              <p class="cost-waiting-summary-line cost-waiting-summary-line--primary">
+              <p class="cost-waiting-summary-lead">
                 {{
-                  "LEARN_COST_WAITING.SUMMARY_PRIMARY"
-                    | translate
-                      : {
-                          months: activeScenario().months,
-                          amount: formatCurrencyFull(activeScenario().cost),
-                          years: horizonYears(),
-                        }
+                  "LEARN_COST_WAITING.SUMMARY_HOVER_LEAD"
+                    | translate: { delay: delayDurationLabel(activeScenario().months) }
                 }}
               </p>
-              <span class="impact-card__hint">
-                {{
-                  "LEARN_COST_WAITING.SUMMARY_SECONDARY"
-                    | translate: { percent: formatPercentOneDecimal(activeScenario().pct) }
-                }}
-              </span>
+              <p class="cost-waiting-summary-amount">
+                {{ formatCurrencyFull(activeScenario().cost) }}
+              </p>
             } @else {
               <p class="cost-waiting-summary-line cost-waiting-summary-line--muted">
                 {{ "LEARN_COST_WAITING.SUMMARY_EMPTY" | translate }}
@@ -137,11 +126,9 @@
               [dataLabels]="chartOptions().dataLabels"
               [plotOptions]="chartOptions().plotOptions"
               [states]="chartOptions().states"
+              (chartReady)="onCostChartReady()"
             ></apx-chart>
           </div>
-          <p class="chart-takeaway">
-            {{ "LEARN_COST_WAITING.TAKEAWAY" | translate }}
-          </p>
         </section>
       </div>
     </div>

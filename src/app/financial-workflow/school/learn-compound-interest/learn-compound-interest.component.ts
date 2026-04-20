@@ -84,6 +84,13 @@ export class LearnCompoundInterestComponent implements OnInit {
     return YEAR_POINTS.map((y) => start * Math.pow(1 + r, y));
   });
 
+  /** Simple interest on principal only: P × (1 + r × years). */
+  readonly simpleInterestSeries: Signal<number[]> = computed(() => {
+    const start = this.startingAmount() || 0;
+    const r = (this.returnRate() || 0) / 100;
+    return YEAR_POINTS.map((y) => start * (1 + r * y));
+  });
+
   readonly realSeries: Signal<number[]> = computed(() => {
     const nominal = this.nominalSeries();
     const inf = (this.inflationRate() || 0) / 100;
@@ -96,6 +103,17 @@ export class LearnCompoundInterestComponent implements OnInit {
   readonly valueAfter20Nominal = computed(() => {
     const s = this.nominalSeries();
     return s[s.length - 1] ?? 0;
+  });
+
+  readonly valueAfterHorizonSimple = computed(() => {
+    const start = this.startingAmount() || 0;
+    const r = (this.returnRate() || 0) / 100;
+    return start * (1 + r * HORIZON_YEARS);
+  });
+
+  readonly compoundingVsSimpleGap = computed(() => {
+    if (!(this.startingAmount() > 0)) return 0;
+    return Math.max(0, this.valueAfter20Nominal() - this.valueAfterHorizonSimple());
   });
 
   readonly valueAfter20Real = computed(() => {
@@ -127,6 +145,8 @@ export class LearnCompoundInterestComponent implements OnInit {
   });
 
   readonly chartOptions = computed(() => this.buildChartOptions());
+
+  readonly compareChartOptions = computed(() => this.buildCompareChartOptions());
 
   private readonly translate = inject(TranslateService);
   private readonly destroyRef = inject(DestroyRef);
@@ -274,6 +294,108 @@ export class LearnCompoundInterestComponent implements OnInit {
         colors: ['#ffffff', SERIES_MUTE],
         strokeColors: [ACCENT, SERIES_MUTE],
         strokeWidth: [2, 0],
+        hover: { sizeOffset: 2 },
+      },
+      dataLabels: { enabled: false },
+      grid: {
+        borderColor: '#eef0f6',
+        strokeDashArray: 4,
+        xaxis: { lines: { show: false } },
+        yaxis: { lines: { show: true } },
+        padding: { left: 4, right: 12, top: 4, bottom: 4 },
+      },
+      xaxis: {
+        type: 'category',
+        categories,
+        axisBorder: { show: false },
+        axisTicks: { show: false },
+        labels: {
+          style: {
+            colors: '#5a596e',
+            fontSize: '13px',
+            fontFamily: 'Ubuntu, sans-serif',
+          },
+        },
+      },
+      yaxis: {
+        labels: {
+          style: {
+            colors: '#5a596e',
+            fontSize: '12px',
+            fontFamily: 'Ubuntu, sans-serif',
+          },
+          formatter: (value: number) =>
+            formatAppDisplayNumber(this.translate.currentLang, Math.round(value)),
+        },
+      },
+      legend: {
+        show: true,
+        position: 'top',
+        horizontalAlign: 'left',
+        offsetY: -4,
+        fontFamily: 'Ubuntu, sans-serif',
+        fontSize: '12px',
+        fontWeight: 600,
+        labels: { colors: '#5a596e' },
+        markers: {
+          width: 8,
+          height: 8,
+          radius: 8,
+          offsetX: -2,
+        },
+        itemMargin: { horizontal: 14, vertical: 2 },
+      },
+      tooltip: {
+        theme: 'light',
+        shared: true,
+        intersect: false,
+        y: {
+          formatter: (value: number) => formatCurrency(value),
+        },
+      },
+    };
+  }
+
+  private buildCompareChartOptions(): any {
+    const simple = this.simpleInterestSeries();
+    const compound = this.nominalSeries();
+    const yearPrefix = this.translate.instant('LEARN_INFLATION.AXIS_YEAR_PREFIX');
+    const categories = YEAR_POINTS.map((y) => `${yearPrefix}${y}`);
+
+    const formatCurrency = (value: number): string => {
+      const formatted = formatAppDisplayNumber(this.translate.currentLang, Math.round(value));
+      const symbol = this.currencySymbol;
+      return symbol ? `${symbol} ${formatted}` : formatted;
+    };
+
+    const simpleName = this.translate.instant('LEARN_COMPOUND.COMPARE_SERIES_SIMPLE');
+    const compoundName = this.translate.instant('LEARN_COMPOUND.COMPARE_SERIES_COMPOUND');
+
+    return {
+      series: [
+        { name: simpleName, data: simple.map((v) => Math.round(v)) },
+        { name: compoundName, data: compound.map((v) => Math.round(v)) },
+      ],
+      chart: {
+        type: 'line',
+        height: '100%',
+        fontFamily: 'Ubuntu, sans-serif',
+        toolbar: { show: false },
+        zoom: { enabled: false },
+        animations: { enabled: true, easing: 'easeinout', speed: 550 },
+        parentHeightOffset: 0,
+      },
+      colors: [SERIES_MUTE, ACCENT],
+      stroke: {
+        width: [2.2, 3.2],
+        curve: 'smooth',
+        dashArray: [6, 0],
+      },
+      markers: {
+        size: [0, 4],
+        colors: ['#ffffff', '#ffffff'],
+        strokeColors: [SERIES_MUTE, ACCENT],
+        strokeWidth: [0, 2],
         hover: { sizeOffset: 2 },
       },
       dataLabels: { enabled: false },
