@@ -10,6 +10,25 @@ export interface LearnRentOrBuyDialogData {
   homePrice?: number | null;
   /** Inferred equivalent monthly rent, in the user's currency. Optional. */
   monthlyRent?: number | null;
+  /** Plan-level inflation rate (in percent) used to prefill rent growth. Optional. */
+  inflationPct?: number | null;
   /** ISO 4217 currency code of the user's preferred currency. Optional. */
+  currencyCode?: string;
+}
+
+/**
+ * Snapshot of every "advanced" assumption the user can adjust in the
+ * "More assumptions" modal. Mirrors the engine's optional inputs.
+ */
+export interface LearnRentOrBuyAssumptions {
+  mortgageRatePct: number;
+  homeAppreciationPct: number;
+  investmentReturnPct: number;
+  inflationPct: number;
+  ownershipCostsPct: number;
+  roundTripCostsPct: number;
+}
+
+export interface LearnRentOrBuyAssumptionsDialogData extends LearnRentOrBuyAssumptions {
   currencyCode?: string;
 }
