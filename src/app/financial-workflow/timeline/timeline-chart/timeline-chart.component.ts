@@ -199,19 +199,32 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
     const rawName = (event?.name ?? '').trim();
 
     if (rawName.toLowerCase().startsWith('retirement age')) {
-      const personName = event.isPartnerEvent
-        ? this.client?.partnerDetail?.firstName?.trim()
-        : this.client?.clientDetails?.firstName?.trim();
-
-      if (this.hasPartner) {
-        const composite = personName ? `Retirement age ${personName}` : 'Retirement age';
-        return translateTimelineEventDisplayName(this.translate, composite);
-      }
-
-      return translateTimelineEventDisplayName(this.translate, 'Retirement age');
+      return this.resolveRetirementLabelForDisplay(event);
     }
 
     return translateTimelineEventDisplayName(this.translate, rawName);
+  }
+
+  private resolveRetirementLabelForDisplay(event: ClientEvent): string {
+    const rawTitle = (event?.name ?? '').trim();
+
+    if (this.hasPartner) {
+      const personName = event.isPartnerEvent
+        ? this.client?.partnerDetail?.firstName?.trim()
+        : this.client?.clientDetails?.firstName?.trim();
+      if (personName) {
+        return translateTimelineEventDisplayName(
+          this.translate,
+          `Retirement age ${personName}`,
+        );
+      }
+    }
+
+    const rest = rawTitle.replace(/^retirement age\s*/i, '').trim();
+    if (rest.length > 0) {
+      return translateTimelineEventDisplayName(this.translate, rawTitle);
+    }
+    return translateTimelineEventDisplayName(this.translate, 'Retirement age');
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -234,6 +247,7 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
       }
       // Re-sync retirement chip visibility based on updated clientEvents
       this.syncRetirementChipVisibility();
+      this.cdr.markForCheck();
     }
   }
 
@@ -1416,16 +1430,7 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
     const rawTitle = (event?.name ?? '').trim();
 
     if (rawTitle.toLowerCase().startsWith('retirement age')) {
-      const personName = event.isPartnerEvent
-        ? this.client?.partnerDetail?.firstName?.trim()
-        : this.client?.clientDetails?.firstName?.trim();
-
-      if (this.hasPartner) {
-        const composite = personName ? `Retirement age ${personName}` : 'Retirement age';
-        return translateTimelineEventDisplayName(this.translate, composite);
-      }
-
-      return translateTimelineEventDisplayName(this.translate, 'Retirement age');
+      return this.resolveRetirementLabelForDisplay(event);
     }
 
     return translateTimelineEventDisplayName(this.translate, rawTitle);
@@ -1457,26 +1462,7 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
       return translateTimelineEventDisplayName(this.translate, raw);
     }
 
-    if (!this.hasPartner) {
-      return translateTimelineEventDisplayName(this.translate, 'Retirement age');
-    }
-
-    // Only add names when both primary + partner retirement events exist in the plan.
-    const hasPrimary = this.financialTimeline.clientEvents.some(
-      (e) => e.name?.toLowerCase().startsWith('retirement age') && !e.isPartnerEvent,
-    );
-    const hasPartnerEv = this.financialTimeline.clientEvents.some(
-      (e) => e.name?.toLowerCase().startsWith('retirement age') && !!e.isPartnerEvent,
-    );
-    if (!hasPrimary || !hasPartnerEv) {
-      return translateTimelineEventDisplayName(this.translate, 'Retirement age');
-    }
-
-    const personName = clientEvent.isPartnerEvent
-      ? this.client?.partnerDetail?.firstName?.trim()
-      : this.client?.clientDetails?.firstName?.trim();
-    const composite = personName ? `Retirement age ${personName}` : 'Retirement age';
-    return translateTimelineEventDisplayName(this.translate, composite);
+    return this.resolveRetirementLabelForDisplay(clientEvent);
   }
 
   private isEventInVisibleRange(event: any): boolean {
