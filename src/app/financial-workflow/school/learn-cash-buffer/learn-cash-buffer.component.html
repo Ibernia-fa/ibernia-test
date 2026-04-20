@@ -58,127 +58,94 @@
             </div>
           </div>
 
-          <p class="learn-cash-buffer__plan-note">
-            {{ "LEARN_CASH_BUFFER.PLAN_NOTE" | translate }}
-          </p>
-
-          <article class="lesson-card">
-            <h3 class="lesson-card__title">{{ "LEARN_CASH_BUFFER.CARD_LOW_TITLE" | translate }}</h3>
-            <p class="lesson-card__text">{{ "LEARN_CASH_BUFFER.CARD_LOW_BODY" | translate }}</p>
-          </article>
-
-          <article class="lesson-card">
-            <h3 class="lesson-card__title">{{ "LEARN_CASH_BUFFER.CARD_OK_TITLE" | translate }}</h3>
-            <p class="lesson-card__text">{{ "LEARN_CASH_BUFFER.CARD_OK_BODY" | translate }}</p>
-          </article>
-
-          <article class="lesson-card">
-            <h3 class="lesson-card__title">{{ "LEARN_CASH_BUFFER.CARD_HIGH_TITLE" | translate }}</h3>
-            <p class="lesson-card__text">{{ "LEARN_CASH_BUFFER.CARD_HIGH_BODY" | translate }}</p>
-          </article>
+          @if (bufferMonths() !== null) {
+            <p class="learn-cash-buffer__derived">
+              <span class="learn-cash-buffer__derived-label">{{ "LEARN_CASH_BUFFER.DERIVED_LABEL" | translate }}</span>
+              <span class="learn-cash-buffer__derived-value">
+                {{ formatMonthsDisplay(bufferMonths()) }}
+                {{ bufferMonthWordKey(bufferMonths()) | translate }}
+                {{ "LEARN_CASH_BUFFER.DERIVED_TAIL" | translate }}
+              </span>
+            </p>
+          }
         </aside>
 
         <section class="learn-cash-buffer__main">
-          <div class="buffer-range" role="img" [attr.aria-label]="'LEARN_CASH_BUFFER.RANGE_ARIA' | translate">
-            <div class="buffer-range__track">
-              <div class="buffer-range__seg buffer-range__seg--low" [style.width.%]="zoneLowWidthPct()"></div>
-              <div class="buffer-range__seg buffer-range__seg--mid" [style.width.%]="zoneMidWidthPct()"></div>
-              <div class="buffer-range__seg buffer-range__seg--high" [style.width.%]="zoneHighWidthPct()"></div>
-              <div
-                class="buffer-range__marker"
-                [style.left.%]="markerPercent()"
-                [attr.title]="formatAmount(cash())"
-              ></div>
+          <div
+            class="buffer-months"
+            role="img"
+            [attr.aria-label]="'LEARN_CASH_BUFFER.RANGE_ARIA' | translate"
+          >
+            <div
+              class="buffer-months__zones"
+              [style.grid-template-columns]="
+                zoneLowWidthPct() + '% ' + zoneMidWidthPct() + '% ' + zoneHighWidthPct() + '%'
+              "
+            >
+              <span class="buffer-months__zone-label buffer-months__zone-label--low">
+                {{ "LEARN_CASH_BUFFER.ZONE_LOW" | translate }}
+              </span>
+              <span class="buffer-months__zone-label buffer-months__zone-label--mid">
+                {{ "LEARN_CASH_BUFFER.ZONE_MID" | translate }}
+              </span>
+              <span class="buffer-months__zone-label buffer-months__zone-label--high">
+                {{ "LEARN_CASH_BUFFER.ZONE_HIGH" | translate }}
+              </span>
             </div>
-            <div class="buffer-range__scale">
+            <div class="buffer-months__track-wrap">
+              <div class="buffer-months__track">
+                <div class="buffer-months__seg buffer-months__seg--low" [style.width.%]="zoneLowWidthPct()"></div>
+                <div class="buffer-months__seg buffer-months__seg--mid" [style.width.%]="zoneMidWidthPct()"></div>
+                <div class="buffer-months__seg buffer-months__seg--high" [style.width.%]="zoneHighWidthPct()"></div>
+              </div>
+              @if (markerPercent() !== null) {
+                <div
+                  class="buffer-months__marker"
+                  [style.left.%]="markerPercent()!"
+                  [attr.title]="formatMonthsDisplay(bufferMonths())"
+                ></div>
+              }
+            </div>
+            <div class="buffer-months__scale">
               <span>0</span>
-              <span>{{ formatAmount(buffer3()) }}</span>
-              <span>{{ formatAmount(buffer12()) }}</span>
-              <span>{{ formatAmount(chartMax()) }}</span>
+              <span>{{ "LEARN_CASH_BUFFER.SCALE_3" | translate }}</span>
+              <span>{{ "LEARN_CASH_BUFFER.SCALE_12" | translate }}</span>
+              <span>{{ formatAxisMonths(displayMaxMonths()) }}</span>
             </div>
           </div>
 
-          <div class="learn-cash-buffer__chart">
-            <apx-chart
-              [series]="chartOptions().series"
-              [chart]="chartOptions().chart"
-              [xaxis]="chartOptions().xaxis"
-              [yaxis]="chartOptions().yaxis"
-              [colors]="chartOptions().colors"
-              [tooltip]="chartOptions().tooltip"
-              [legend]="chartOptions().legend"
-              [grid]="chartOptions().grid"
-              [dataLabels]="chartOptions().dataLabels"
-              [plotOptions]="chartOptions().plotOptions"
-            ></apx-chart>
-          </div>
+          @if (bufferMonths() !== null) {
+            <div class="cb-result">
+              <div class="cb-result__figure">
+                <span class="cb-result__value">{{ formatMonthsDisplay(bufferMonths()) }}</span>
+                <span class="cb-result__suffix">{{ bufferMonthWordKey(bufferMonths()) | translate }}</span>
+              </div>
+              <p class="cb-result__sub">{{ "LEARN_CASH_BUFFER.RESULT_SUB" | translate }}</p>
 
-          <h2 class="learn-cash-buffer__interpret-title">
-            {{ "LEARN_CASH_BUFFER.INTERP_TITLE" | translate }}
-          </h2>
-          @switch (interpretation()) {
-            @case ('below') {
-              <p class="learn-cash-buffer__interpret">
-                {{ "LEARN_CASH_BUFFER.INTERP_BELOW" | translate }}
-              </p>
-              <p class="learn-cash-buffer__interpret-nuance">
-                {{ "LEARN_CASH_BUFFER.INTERP_ABOVE_NUANCE" | translate }}
-              </p>
-            }
-            @case ('within') {
-              <p class="learn-cash-buffer__interpret">
-                {{ "LEARN_CASH_BUFFER.INTERP_WITHIN" | translate }}
-              </p>
-              <p class="learn-cash-buffer__interpret-nuance">
-                {{ "LEARN_CASH_BUFFER.INTERP_ABOVE_NUANCE" | translate }}
-              </p>
-            }
-            @case ('above') {
-              <p class="learn-cash-buffer__interpret">
-                {{ "LEARN_CASH_BUFFER.INTERP_ABOVE" | translate }}
-              </p>
-              <p class="learn-cash-buffer__interpret-nuance">
-                {{ "LEARN_CASH_BUFFER.INTERP_ABOVE_NUANCE" | translate }}
-              </p>
-            }
-            @default {
-              <p class="learn-cash-buffer__interpret learn-cash-buffer__interpret--muted">
-                {{ "LEARN_CASH_BUFFER.INTERP_NEUTRAL" | translate }}
-              </p>
-            }
+              @switch (interpretation()) {
+                @case ('below') {
+                  <span class="cb-result__badge cb-result__badge--low">{{ "LEARN_CASH_BUFFER.DIAG_LOW" | translate }}</span>
+                  <p class="cb-result__diagnostic">{{ "LEARN_CASH_BUFFER.COPY_LOW" | translate }}</p>
+                }
+                @case ('within') {
+                  <span class="cb-result__badge cb-result__badge--ok">{{ "LEARN_CASH_BUFFER.DIAG_OK" | translate }}</span>
+                  <p class="cb-result__diagnostic">{{ "LEARN_CASH_BUFFER.COPY_OK" | translate }}</p>
+                }
+                @case ('above') {
+                  <span class="cb-result__badge cb-result__badge--high">{{ "LEARN_CASH_BUFFER.DIAG_HIGH" | translate }}</span>
+                  <p class="cb-result__diagnostic">{{ "LEARN_CASH_BUFFER.COPY_HIGH" | translate }}</p>
+                }
+              }
+
+              <p class="cb-result__practical">{{ "LEARN_CASH_BUFFER.PRACTICAL" | translate }}</p>
+              <p class="cb-result__nuance">{{ "LEARN_CASH_BUFFER.NUANCE" | translate }}</p>
+            </div>
+          } @else {
+            <div class="cb-result cb-result--neutral">
+              <p class="cb-result__neutral">{{ "LEARN_CASH_BUFFER.COPY_NEUTRAL" | translate }}</p>
+              <p class="cb-result__nuance">{{ "LEARN_CASH_BUFFER.NUANCE" | translate }}</p>
+            </div>
           }
-
-          <div class="learn-cash-buffer__metrics" role="list">
-            <div class="metric-pill" role="listitem">
-              <span class="metric-pill__label">{{ "LEARN_CASH_BUFFER.METRIC_CASH" | translate }}</span>
-              <span class="metric-pill__value"
-                >{{ currencySymbol }} {{ formatAmount(cash()) }}</span
-              >
-            </div>
-            <div class="metric-pill" role="listitem">
-              <span class="metric-pill__label">{{ "LEARN_CASH_BUFFER.METRIC_3" | translate }}</span>
-              <span class="metric-pill__value"
-                >{{ currencySymbol }} {{ formatAmount(buffer3()) }}</span
-              >
-            </div>
-            <div class="metric-pill" role="listitem">
-              <span class="metric-pill__label">{{ "LEARN_CASH_BUFFER.METRIC_6" | translate }}</span>
-              <span class="metric-pill__value"
-                >{{ currencySymbol }} {{ formatAmount(buffer6()) }}</span
-              >
-            </div>
-            <div class="metric-pill" role="listitem">
-              <span class="metric-pill__label">{{ "LEARN_CASH_BUFFER.METRIC_12" | translate }}</span>
-              <span class="metric-pill__value"
-                >{{ currencySymbol }} {{ formatAmount(buffer12()) }}</span
-              >
-            </div>
-          </div>
-
-          <div class="learn-cash-buffer__why">
-            <h2 class="learn-cash-buffer__why-title">{{ "LEARN_CASH_BUFFER.WHY_TITLE" | translate }}</h2>
-            <p class="learn-cash-buffer__why-body">{{ "LEARN_CASH_BUFFER.WHY_BODY" | translate }}</p>
-          </div>
         </section>
       </div>
     </div>

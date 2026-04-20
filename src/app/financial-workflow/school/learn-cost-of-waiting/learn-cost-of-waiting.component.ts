@@ -78,18 +78,19 @@ export class LearnCostOfWaitingComponent implements OnInit {
   @ViewChild(ChartComponent) private chartRef?: ChartComponent;
 
   readonly currencyCode: string;
-  readonly monthDelays = MONTH_DELAYS;
 
   readonly startingAmountControl = new FormControl<number | null>(0);
 
   readonly startingAmount = signal<number>(0);
   readonly returnRate = signal<number>(DEFAULT_RETURN_RATE);
   readonly horizonYears = signal<number>(DEFAULT_HORIZON_YEARS);
-  readonly planInflationRate = signal<number>(0);
+  /** Annual inflation assumption used for inflation-adjusted (real) missed value. */
+  readonly inflationRate = signal<number>(0);
   readonly showInflationAdjusted = signal<boolean>(false);
 
   readonly returnText = signal<string>('');
   readonly horizonText = signal<string>('');
+  readonly inflationText = signal<string>('');
 
   readonly selectedBarIndex = signal<number>(DEFAULT_SELECTED_INDEX);
   readonly hoverBarIndex = signal<number | null>(null);
@@ -98,6 +99,9 @@ export class LearnCostOfWaitingComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
   private readonly ngZone = inject(NgZone);
   private readonly currencySymbolPipe = new CurrencySymbolPipe();
+
+  /** Plan inflation from cashflow (dialog data); used when enabling inflation-adjusted mode. */
+  private readonly baselinePlanInflation: number;
 
   readonly fvIfInvestedNow: Signal<number> = computed(() => {
     const p = this.startingAmount() || 0;
@@ -110,7 +114,7 @@ export class LearnCostOfWaitingComponent implements OnInit {
     const p = this.startingAmount() || 0;
     const r = (this.returnRate() || 0) / 100;
     const horizon = Math.max(0, this.horizonYears() || 0);
-    const inf = (this.planInflationRate() || 0) / 100;
+    const inf = (this.inflationRate() || 0) / 100;
     const fvNow = fvAtHorizon(p, r, horizon);
     const deflator =
       inf > -1 && horizon > 0 ? Math.pow(1 + inf, horizon) : 1;
@@ -167,13 +171,16 @@ export class LearnCostOfWaitingComponent implements OnInit {
       ? Math.max(0, Math.min(100, Number(data.inflationRate)))
       : 2.5;
 
+    this.baselinePlanInflation = initialInflation;
+
     this.startingAmount.set(initialStart);
-    this.planInflationRate.set(initialInflation);
+    this.inflationRate.set(initialInflation);
     this.returnRate.set(DEFAULT_RETURN_RATE);
     this.horizonYears.set(DEFAULT_HORIZON_YEARS);
 
     this.returnText.set(this.formatRateForLocale(DEFAULT_RETURN_RATE));
     this.horizonText.set(String(DEFAULT_HORIZON_YEARS));
+    this.inflationText.set(this.formatRateForLocale(initialInflation));
     this.startingAmountControl.setValue(initialStart, { emitEvent: false });
   }
 
@@ -197,6 +204,7 @@ export class LearnCostOfWaitingComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         this.returnText.set(this.formatRateForLocale(this.returnRate()));
+        this.inflationText.set(this.formatRateForLocale(this.inflationRate()));
         this.syncHorizonTextFromSignal();
       });
   }
@@ -227,6 +235,18 @@ export class LearnCostOfWaitingComponent implements OnInit {
 
   onInflationAdjustedToggle(checked: boolean): void {
     this.showInflationAdjusted.set(checked);
+    if (checked) {
+      this.inflationRate.set(this.baselinePlanInflation);
+      this.inflationText.set(this.formatRateForLocale(this.baselinePlanInflation));
+    }
+  }
+
+  onInflationInput(rawValue: string): void {
+    this.applyRateInput(rawValue, this.inflationText, (v) => this.inflationRate.set(v));
+  }
+
+  onInflationBlur(): void {
+    this.inflationText.set(this.formatRateForLocale(this.inflationRate()));
   }
 
   closeDialog(): void {
@@ -262,20 +282,6 @@ export class LearnCostOfWaitingComponent implements OnInit {
       return this.translate.instant('LEARN_COST_WAITING.DELAY_DURATION_ONE');
     }
     return this.translate.instant('LEARN_COST_WAITING.DELAY_DURATION_MANY', { months });
-  }
-
-  delayCategoryKey(months: number): string {
-    const map: Record<number, string> = {
-      1: 'LEARN_COST_WAITING.WAIT_1',
-      2: 'LEARN_COST_WAITING.WAIT_2',
-      3: 'LEARN_COST_WAITING.WAIT_3',
-      6: 'LEARN_COST_WAITING.WAIT_6',
-      9: 'LEARN_COST_WAITING.WAIT_9',
-      12: 'LEARN_COST_WAITING.WAIT_12',
-      18: 'LEARN_COST_WAITING.WAIT_18',
-      24: 'LEARN_COST_WAITING.WAIT_24',
-    };
-    return map[months] ?? 'LEARN_COST_WAITING.WAIT_12';
   }
 
   private syncHorizonTextFromSignal(): void {
@@ -317,9 +323,7 @@ export class LearnCostOfWaitingComponent implements OnInit {
     const values = this.chartSeriesValues();
     const selectedIdx = this.selectedBarIndex();
     const colors = values.map((_, i) => (i === selectedIdx ? ACCENT : BAR_MUTE));
-    const categories = MONTH_DELAYS.map((m) =>
-      this.translate.instant(this.delayCategoryKey(m)),
-    );
+    const categories = MONTH_DELAYS.map((m) => String(m));
 
     const formatCurrency = (value: number): string => {
       const formatted = formatAppDisplayNumber(this.translate.currentLang, Math.round(value));
