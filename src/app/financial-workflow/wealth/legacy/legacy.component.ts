@@ -19,9 +19,10 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialog } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { CurrencySymbolPipe } from 'src/app/pipe/currency-symbol.pipe';
 import { Client, Details } from 'src/app/clients/models/client';
 import { LegacyHttpService } from './services/legacy-http.service';
@@ -51,6 +52,7 @@ import * as ClientActions from 'src/app/store/client/client.actions';
     MatIconModule,
     MatMenuModule,
     MatProgressSpinnerModule,
+    MatTooltipModule,
     CurrencySymbolPipe,
     TranslateModule,
   ],
@@ -107,6 +109,7 @@ export class LegacyComponent
     private ngZone: NgZone,
     private settingsService: SettingsService,
     private store: Store,
+    private translate: TranslateService,
   ) {}
 
   ngOnInit(): void {
@@ -202,9 +205,23 @@ export class LegacyComponent
     return this.dashboard?.hasPartner ?? false;
   }
 
+  /** Includes tree-only (questionnaire) partner before client profile is completed. */
+  get treeHasPartner(): boolean {
+    return this.hasPartner || !!this.partnerMember;
+  }
+
+  /**
+   * Questionnaire can add partner-branch relatives while the plan is still single-client
+   * (placeholder partner only). Those members cannot be removed or used in partner scenarios
+   * until the formal partner profile exists.
+   */
+  get partnerSideRelativesLocked(): boolean {
+    return this.treeHasPartner && !this.hasPartner;
+  }
+
   get familyBranchUseFlexGrow(): boolean {
     if (!this.dashboard) return true;
-    if (!this.hasPartner) return true;
+    if (!this.treeHasPartner) return true;
     const hasExtraMembers =
       this.clientParents.length > 0 ||
       this.partnerParents.length > 0 ||
@@ -425,9 +442,20 @@ export class LegacyComponent
     }
   }
 
+  isPartnerSideRelative(member: FamilyMemberModel): boolean {
+    return (
+      member.role === 'PartnerFather' ||
+      member.role === 'PartnerMother' ||
+      member.role === 'PartnerSibling'
+    );
+  }
+
   onClickParentMember(member: FamilyMemberModel): void {
     const isClientSide =
       member.role === 'ClientFather' || member.role === 'ClientMother';
+    if (!isClientSide && this.partnerSideRelativesLocked) {
+      return;
+    }
     const scenario = isClientSide
       ? ScenarioType.ClientParentsDie
       : ScenarioType.PartnerParentsDie;
@@ -439,11 +467,52 @@ export class LegacyComponent
   }
 
   onClickPartner(): void {
+    if (!this.hasPartner) {
+      this.onOpenCompletePartnerProfile();
+      return;
+    }
     this.selectScenario(ScenarioType.PartnerDies);
   }
 
   onClickCouple(): void {
+    if (!this.hasPartner) {
+      this.toastr.warning(
+        this.translate.instant('LEGACY.COMPLETE_PARTNER_FOR_JOINT_SCENARIOS'),
+      );
+      return;
+    }
     this.selectScenario(ScenarioType.BothDie);
+  }
+
+  onOpenCompletePartnerProfile(event?: Event): void {
+    event?.stopPropagation();
+    const pm = this.partnerMember;
+    if (!pm || this.hasPartner) return;
+    const dialogRef = this.dialog.open(AddMemberComponent, {
+      width: '612px',
+      disableClose: true,
+      autoFocus: false,
+      data: {
+        cashflowId: this.cashflowId,
+        hasPartner: this.treeHasPartner,
+        existingMembers: this.dashboard?.familyMembers ?? [],
+        clientFirstName: this.clientMember?.firstName ?? '',
+        partnerFirstName: pm.firstName ?? '',
+        completePlaceholderPartnerMemberId: pm.id,
+      },
+    });
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result?.dashboard) {
+        this.dashboard = result.dashboard;
+        this.clearScenario();
+        const clientId =
+          (result.dashboard as LegacyDashboardModel).client?.id ??
+          this.selectedClient?.id;
+        if (clientId) {
+          this.store.dispatch(ClientActions.loadClient({ clientId }));
+        }
+      }
+    });
   }
 
   onAddMember(): void {
@@ -455,7 +524,7 @@ export class LegacyComponent
       autoFocus: false,
       data: {
         cashflowId: this.cashflowId,
-        hasPartner: this.hasPartner,
+        hasPartner: this.treeHasPartner,
         existingMembers: this.dashboard?.familyMembers ?? [],
         clientFirstName: this.clientMember?.firstName ?? '',
         partnerFirstName: this.partnerMember?.firstName ?? '',
@@ -479,6 +548,9 @@ export class LegacyComponent
   }
 
   onRemoveMember(member: FamilyMemberModel): void {
+    if (this.partnerSideRelativesLocked && this.isPartnerSideRelative(member)) {
+      return;
+    }
     this.legacyHttp.removeFamilyMember(this.cashflowId, member.id).subscribe({
       next: (dashboard) => {
         this.dashboard = dashboard;
@@ -487,6 +559,11 @@ export class LegacyComponent
       },
       error: () => this.toastr.error('Failed to remove member', 'Error'),
     });
+  }
+
+  onEditPartnerParentsEstate(): void {
+    if (this.partnerSideRelativesLocked) return;
+    this.onEditParentEstate('partner');
   }
 
   onEditParentEstate(side: 'client' | 'partner'): void {

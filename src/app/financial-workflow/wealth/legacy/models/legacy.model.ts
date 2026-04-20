@@ -56,6 +56,7 @@ export interface FamilyMemberModel {
   firstName: string;
   lastName: string;
   role: string;
+  isPlaceholder?: boolean;
 }
 
 export interface AddFamilyMemberRequest {
@@ -72,6 +73,14 @@ export interface UpdateFamilyMemberRequest {
   id: string;
   firstName: string;
   lastName: string;
+}
+
+export interface CompletePartnerProfileRequest {
+  memberId: string;
+  firstName: string;
+  lastName: string;
+  birthDate: Date | string;
+  email: string;
 }
 
 // ── Parent Estates ───────────────────────────────────────────────

@@ -83,7 +83,7 @@
         </div>
 
         <!-- ═══ MAIN BODY: two branches + couple link ═══ -->
-        <div class="tree-body" [class.has-partner]="hasPartner" #treeBody>
+        <div class="tree-body" [class.has-partner]="treeHasPartner" #treeBody>
           <!-- ── CLIENT BRANCH ── -->
           <div
             class="family-branch"
@@ -349,7 +349,7 @@
           </div>
 
           <!-- ── COUPLE CONNECTOR (heart always shown) ── -->
-          <div class="couple-link" *ngIf="hasPartner" #coupleLink>
+          <div class="couple-link" *ngIf="treeHasPartner" #coupleLink>
             <!-- Left segment (client side) – flex:1 keeps heart centered -->
             <div class="couple-link-segment couple-link-segment--left">
               <!-- Client deceased: tax on client side -->
@@ -439,7 +439,7 @@
           <!-- ── PARTNER BRANCH ── -->
           <div
             class="family-branch"
-            *ngIf="hasPartner"
+            *ngIf="treeHasPartner"
             [class.family-branch--flex-grow]="familyBranchUseFlexGrow"
             #partnerBranch
           >
@@ -456,6 +456,11 @@
                   <div
                     class="tree-node"
                     [class.deceased]="isDeceased(parent.id)"
+                    [class.partner-side-locked]="partnerSideRelativesLocked"
+                    [matTooltip]="
+                      'LEGACY.PARTNER_SIDE_LOCKED_SOLO_TOOLTIP' | translate
+                    "
+                    [matTooltipDisabled]="!partnerSideRelativesLocked"
                     (click)="onClickParentMember(parent)"
                   >
                     <div class="node-inner">
@@ -491,14 +496,20 @@
                       <span class="node-name"
                         >{{ parent.firstName }} {{ parent.lastName }}</span
                       >
-                      <button
-                        class="node-remove"
-                        (click)="
-                          onRemoveMember(parent); $event.stopPropagation()
-                        "
+                      <span
+                        class="node-remove-tooltip-host"
+                        *ngIf="!partnerSideRelativesLocked"
                       >
-                        <mat-icon>close</mat-icon>
-                      </button>
+                        <button
+                          type="button"
+                          class="node-remove"
+                          (click)="
+                            onRemoveMember(parent); $event.stopPropagation()
+                          "
+                        >
+                          <mat-icon>close</mat-icon>
+                        </button>
+                      </span>
                     </div>
                   </div>
                   <div
@@ -523,7 +534,12 @@
               </div>
               <div
                 class="parent-estate partner-estate"
-                (click)="onEditParentEstate('partner')"
+                [class.partner-estate--locked]="partnerSideRelativesLocked"
+                [matTooltip]="
+                  'LEGACY.PARTNER_SIDE_LOCKED_SOLO_TOOLTIP' | translate
+                "
+                [matTooltipDisabled]="!partnerSideRelativesLocked"
+                (click)="onEditPartnerParentsEstate()"
               >
                 <div class="d-flex align-items-center">
                   <span class="estate-currency">{{
@@ -583,6 +599,11 @@
                   class="tree-node main-node"
                   *ngIf="partnerMember as pm"
                   [class.deceased]="isDeceased(pm.id)"
+                  [attr.aria-label]="
+                    !hasPartner && partnerMember
+                      ? ('Complete partner profile' | translate)
+                      : null
+                  "
                   (click)="onClickPartner()"
                   #partnerMainNode
                 >
@@ -655,6 +676,11 @@
                 <div
                   class="tree-node sibling-node"
                   [class.deceased]="isDeceased(sib.id)"
+                  [class.partner-side-locked]="partnerSideRelativesLocked"
+                  [matTooltip]="
+                    'LEGACY.PARTNER_SIDE_LOCKED_SOLO_TOOLTIP' | translate
+                  "
+                  [matTooltipDisabled]="!partnerSideRelativesLocked"
                 >
                   <div class="node-avatar avatar-partnersibling">
                     <mat-icon>
@@ -693,14 +719,23 @@
                       >{{ inh.netReceived | number: "1.0-0" }}
                     </span>
                   </ng-container>
-                  <button class="node-remove" (click)="onRemoveMember(sib)">
-                    <mat-icon>close</mat-icon>
-                  </button>
+                  <span
+                    class="node-remove-tooltip-host"
+                    *ngIf="!partnerSideRelativesLocked"
+                  >
+                    <button
+                      type="button"
+                      class="node-remove"
+                      (click)="onRemoveMember(sib)"
+                    >
+                      <mat-icon>close</mat-icon>
+                    </button>
+                  </span>
                 </div>
               </div>
             </div>
           </div>
-          <div class="couple-line" *ngIf="hasPartner" #coupleLine></div>
+          <div class="couple-line" *ngIf="treeHasPartner" #coupleLine></div>
         </div>
 
         <!-- ═══ CHILDREN / FLOW SECTION ═══ -->

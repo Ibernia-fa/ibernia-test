@@ -145,7 +145,7 @@ $line-w: 2px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 100%;
+  // width: 100%;
   position: relative;
 }
 
@@ -221,6 +221,16 @@ $line-w: 2px;
   &.partner-estate {
     color: #ee6700;
   }
+
+  &.partner-estate--locked {
+    cursor: not-allowed;
+    opacity: 0.72;
+
+    .edit-sm {
+      display: none !important;
+    }
+  }
+
   display: flex;
   align-items: center;
   gap: 4px;
@@ -455,6 +465,14 @@ $line-w: 2px;
   &.deceased {
     opacity: 0.45;
   }
+
+  &.partner-side-locked {
+    cursor: not-allowed;
+
+    .node-inner {
+      cursor: not-allowed;
+    }
+  }
 }
 
 .main-node {
@@ -591,6 +609,17 @@ $line-w: 2px;
   color: #fe9614;
 }
 
+.node-remove-tooltip-host {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  line-height: 0;
+
+  .node-remove {
+    position: static;
+  }
+}
+
 .node-remove {
   position: absolute;
   top: -4px;
@@ -610,6 +639,36 @@ $line-w: 2px;
     width: 12px;
     height: 12px;
     color: #dc2626;
+  }
+  .tree-node:hover & {
+    display: flex;
+  }
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+  }
+}
+
+.node-edit {
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #e0f2fe;
+  border: none;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  z-index: 2;
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    color: #0369a1;
   }
   .tree-node:hover & {
     display: flex;

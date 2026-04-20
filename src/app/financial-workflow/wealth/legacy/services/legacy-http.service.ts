@@ -5,6 +5,7 @@ import {
   LegacyDashboardModel,
   AddFamilyMemberRequest,
   UpdateFamilyMemberRequest,
+  CompletePartnerProfileRequest,
   UpdateParentEstateRequest,
   UpdateTaxSettingsRequest,
   SaveBeneficiaryRuleRequest,
@@ -28,6 +29,16 @@ export class LegacyHttpService {
 
   updateFamilyMember(cashflowId: string, request: UpdateFamilyMemberRequest): Observable<LegacyDashboardModel> {
     return this.http.put<LegacyDashboardModel>(`${this.baseUrl}/${cashflowId}/members`, request);
+  }
+
+  completePartnerProfile(
+    cashflowId: string,
+    request: CompletePartnerProfileRequest,
+  ): Observable<LegacyDashboardModel> {
+    return this.http.post<LegacyDashboardModel>(
+      `${this.baseUrl}/${cashflowId}/members/complete-partner-profile`,
+      request,
+    );
   }
 
   removeFamilyMember(cashflowId: string, memberId: string): Observable<LegacyDashboardModel> {

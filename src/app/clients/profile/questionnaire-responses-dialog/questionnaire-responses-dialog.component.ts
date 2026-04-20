@@ -15,6 +15,11 @@ import {
   QuestionnaireResponseItem,
 } from '../../services/questionnaire-http.service';
 import { QuestionnaireDialogComponent } from '../questionnaire-dialog/questionnaire-dialog.component';
+import {
+  normalizeQuestionnaireRelationship,
+  questionnaireRelationshipLabelKey,
+  questionnaireRelationshipLabelParams,
+} from 'src/app/shared/family-tree/family-relationships';
 
 export interface QuestionnaireResponsesDialogData {
   questionnaireResponses: GetClientQuestionnaireResponse;
@@ -79,6 +84,20 @@ export class QuestionnaireResponsesDialogComponent {
     );
   }
 
+  formatImportantPersonLine(row: { name: string; relationship: string }): string {
+    const canonical = normalizeQuestionnaireRelationship(row.relationship);
+    const key = questionnaireRelationshipLabelKey(canonical);
+    const clientFirst = this.data.client?.clientDetails?.firstName || '';
+    const partnerFirst = this.data.client?.partnerDetail?.firstName || '';
+    const params = questionnaireRelationshipLabelParams(
+      canonical,
+      clientFirst,
+      partnerFirst,
+    );
+    const rel = params ? this.translate.instant(key, params) : this.translate.instant(key);
+    return `${row.name} (${rel})`;
+  }
+
   formatResponseValue(item: QuestionnaireResponseItem): string {
     const v = item.value;
     if (v == null) return '-';
@@ -87,7 +106,7 @@ export class QuestionnaireResponsesDialogComponent {
       return v
         .map((x) =>
           typeof x === 'object' && x && 'name' in x && 'relationship' in x
-            ? `${(x as { name: string }).name} (${(x as { relationship: string }).relationship})`
+            ? this.formatImportantPersonLine(x as { name: string; relationship: string })
             : String(x),
         )
         .join(', ');
