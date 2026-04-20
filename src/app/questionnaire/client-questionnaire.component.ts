@@ -27,6 +27,11 @@ import {
 import { allCountries } from '../clients/models/country';
 import { LanguageCode, LanguageService } from '../core/language.service';
 import { capitalizeFirstLetter } from '../shared/utils/capitalize-first-letter';
+import {
+  normalizeQuestionnaireRelationship,
+  questionnaireRelationshipLabelKey,
+  questionnaireRelationshipLabelParams,
+} from '../shared/family-tree/family-relationships';
 
 @Component({
   selector: 'app-client-questionnaire',
@@ -756,7 +761,18 @@ export class ClientQuestionnaireComponent implements OnInit, OnDestroy {
   getImportantPeopleValue(): { name: string; relationship: string }[] {
     return this.importantPeople
       .filter((p) => p.name?.trim())
-      .map((p) => ({ ...p, name: capitalizeFirstLetter(p.name.trim()) }));
+      .map((p) => ({
+        name: capitalizeFirstLetter(p.name.trim()),
+        relationship: normalizeQuestionnaireRelationship(p.relationship || ''),
+      }));
+  }
+
+  importantPeopleRelationshipLabel(optionValue: string): string {
+    const canonical = normalizeQuestionnaireRelationship(optionValue || '');
+    const key = questionnaireRelationshipLabelKey(canonical);
+    const clientFirst = this.clientName?.split(/\s+/)[0] || '';
+    const params = questionnaireRelationshipLabelParams(canonical, clientFirst, '');
+    return params ? this.translate.instant(key, params) : this.translate.instant(key);
   }
 
   /* ─── Goals helpers ─── */
