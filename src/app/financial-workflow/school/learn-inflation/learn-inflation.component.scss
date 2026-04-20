@@ -170,6 +170,37 @@ $ibernia-bg-soft: #f5f7ff;
   &__hint {
     font-size: 13px;
     color: $ibernia-mute;
+    line-height: 1.45;
+
+    &--loss {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 2px;
+      margin-top: 2px;
+    }
+  }
+
+  &__hint-line {
+    display: block;
+
+    &--euro {
+      font-weight: 500;
+      color: $ibernia-mute;
+    }
+  }
+
+  &__loss-amount {
+    margin-left: 4px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: #c62828;
+  }
+
+  &__loss-currency {
+    font-weight: 700;
+    color: inherit;
+    margin-right: 4px;
   }
 
   &__input {
@@ -511,78 +542,6 @@ $ibernia-bg-soft: #f5f7ff;
   padding: 0 4px;
 }
 
-.countries-latest {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 0 56px;
-
-  &__title {
-    margin: 0;
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 0.3px;
-    text-transform: uppercase;
-    color: $ibernia-mute;
-  }
-
-  &__row {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 12px;
-  }
-}
-
-.latest-pill {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
-  border: 1px solid $ibernia-line;
-  border-radius: 12px;
-  background: #ffffff;
-  min-width: 0;
-
-  &__dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-
-  &__content {
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-    flex: 1 1 auto;
-  }
-
-  &__country {
-    font-size: 13px;
-    font-weight: 600;
-    color: $ibernia-ink;
-    line-height: 1.2;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  &__period {
-    font-size: 11px;
-    color: $ibernia-mute;
-    line-height: 1.3;
-    margin-top: 2px;
-  }
-
-  &__value {
-    font-size: 16px;
-    font-weight: 700;
-    color: $ibernia-ink;
-    font-variant-numeric: tabular-nums;
-    margin-left: auto;
-  }
-}
-
 .countries-sources {
   display: flex;
   align-items: center;
@@ -669,14 +628,9 @@ $ibernia-bg-soft: #f5f7ff;
   }
 
   .countries-chart-wrap,
-  .countries-latest,
   .countries-sources {
     padding-left: 16px;
     padding-right: 16px;
-  }
-
-  .countries-latest__row {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -708,9 +662,6 @@ $ibernia-bg-soft: #f5f7ff;
     gap: 10px;
   }
 
-  .countries-latest__row {
-    grid-template-columns: 1fr;
-  }
 }
 
 /* ============================================================
@@ -723,4 +674,16 @@ $ibernia-bg-soft: #f5f7ff;
 
 :host ::ng-deep .learn-inflation__content.mat-mdc-dialog-content {
   max-height: none;
+}
+
+/* ApexCharts legend uses overflow:auto; avoid the stray scrollbar beside the legend. */
+:host ::ng-deep .countries-chart .apexcharts-legend {
+  overflow: visible !important;
+  scrollbar-width: none;
+}
+
+:host ::ng-deep .countries-chart .apexcharts-legend::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
 }

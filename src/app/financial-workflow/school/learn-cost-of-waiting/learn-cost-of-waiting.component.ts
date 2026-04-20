@@ -7,11 +7,13 @@ import {
   NgZone,
   OnInit,
   Signal,
+  ViewChild,
   WritableSignal,
   computed,
   inject,
   signal,
 } from '@angular/core';
+import { ChartComponent } from 'ng-apexcharts';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -73,6 +75,8 @@ function fvAtHorizon(principal: number, annualRate: number, years: number): numb
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LearnCostOfWaitingComponent implements OnInit {
+  @ViewChild(ChartComponent) private chartRef?: ChartComponent;
+
   readonly currencyCode: string;
   readonly monthDelays = MONTH_DELAYS;
 
@@ -173,6 +177,11 @@ export class LearnCostOfWaitingComponent implements OnInit {
     this.startingAmountControl.setValue(initialStart, { emitEvent: false });
   }
 
+  /** Apex is created asynchronously; re-sync highlight whenever a new chart instance exists. */
+  onCostChartReady(): void {
+    queueMicrotask(() => this.applyBarHighlightColors());
+  }
+
   ngOnInit(): void {
     this.startingAmountControl.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -247,6 +256,14 @@ export class LearnCostOfWaitingComponent implements OnInit {
       : '';
   }
 
+  /** Short delay phrase for the dynamic summary (e.g. "6 months" / "1 month"). */
+  delayDurationLabel(months: number): string {
+    if (months === 1) {
+      return this.translate.instant('LEARN_COST_WAITING.DELAY_DURATION_ONE');
+    }
+    return this.translate.instant('LEARN_COST_WAITING.DELAY_DURATION_MANY', { months });
+  }
+
   delayCategoryKey(months: number): string {
     const map: Record<number, string> = {
       1: 'LEARN_COST_WAITING.WAIT_1',
@@ -288,10 +305,18 @@ export class LearnCostOfWaitingComponent implements OnInit {
     return text.replace('.', decimal);
   }
 
+  private applyBarHighlightColors(): void {
+    const chartCmp = this.chartRef;
+    if (!chartCmp) return;
+    const idx = this.hoverBarIndex() ?? this.selectedBarIndex();
+    const colors = MONTH_DELAYS.map((_, i) => (i === idx ? ACCENT : BAR_MUTE));
+    void chartCmp.updateOptions({ colors }, false, false, false);
+  }
+
   private buildChartOptions(): any {
     const values = this.chartSeriesValues();
-    const activeIdx = this.activeBarIndex();
-    const colors = values.map((_, i) => (i === activeIdx ? ACCENT : BAR_MUTE));
+    const selectedIdx = this.selectedBarIndex();
+    const colors = values.map((_, i) => (i === selectedIdx ? ACCENT : BAR_MUTE));
     const categories = MONTH_DELAYS.map((m) =>
       this.translate.instant(this.delayCategoryKey(m)),
     );
@@ -323,13 +348,22 @@ export class LearnCostOfWaitingComponent implements OnInit {
         selection: { enabled: true, type: 'dataPoint' },
         events: {
           dataPointMouseEnter: (_event: unknown, _chartCtx: unknown, opts: { dataPointIndex: number }) => {
-            zone.run(() => hoverBarIndex.set(opts.dataPointIndex));
+            zone.run(() => {
+              hoverBarIndex.set(opts.dataPointIndex);
+              queueMicrotask(() => this.applyBarHighlightColors());
+            });
           },
           dataPointMouseLeave: () => {
-            zone.run(() => hoverBarIndex.set(null));
+            zone.run(() => {
+              hoverBarIndex.set(null);
+              queueMicrotask(() => this.applyBarHighlightColors());
+            });
           },
           dataPointSelection: (_event: unknown, _chartCtx: unknown, opts: { dataPointIndex: number }) => {
-            zone.run(() => selectedBarIndex.set(opts.dataPointIndex));
+            zone.run(() => {
+              selectedBarIndex.set(opts.dataPointIndex);
+              queueMicrotask(() => this.applyBarHighlightColors());
+            });
           },
         },
       },

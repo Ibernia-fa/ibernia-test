@@ -80,11 +80,22 @@
                 <span class="impact-card__currency">{{ currencySymbol }}</span>
                 <span class="impact-card__readout">{{ formatAmount(endValue()) }}</span>
               </div>
-              <span class="impact-card__hint">
-                {{
-                  "LEARN_INFLATION.LOSS_NOTE"
-                    | translate: { percent: (lossPercent() | number: "1.0-1") }
-                }}
+              <span class="impact-card__hint impact-card__hint--loss">
+                <span class="impact-card__hint-line">
+                  {{
+                    "LEARN_INFLATION.LOSS_NOTE"
+                      | translate: { percent: (lossPercent() | number: "1.0-1") }
+                  }}
+                </span>
+                @if (lossAmount() > 0) {
+                  <span class="impact-card__hint-line impact-card__hint-line--euro">
+                    {{ "LEARN_INFLATION.LOSS_NOTE_OR" | translate }}
+                    <span class="impact-card__loss-amount">
+                      <span class="impact-card__loss-currency">{{ currencySymbol }}</span>
+                      {{ formatAmount(lossAmount()) }}
+                    </span>
+                  </span>
+                }
               </span>
             </div>
 
@@ -284,34 +295,6 @@
           <p class="countries-footnote">
             {{ "LEARN_INFLATION.COUNTRIES_FOOTNOTE" | translate }}
           </p>
-        </section>
-
-        <section class="countries-latest" aria-labelledby="countries-latest-title">
-          <h2 id="countries-latest-title" class="countries-latest__title">
-            {{ "LEARN_INFLATION.COUNTRIES_LATEST_TITLE" | translate }}
-          </h2>
-          <div class="countries-latest__row">
-            @for (rate of latestCountryRates; track rate.countryKey) {
-              <div class="latest-pill">
-                <span
-                  class="latest-pill__dot"
-                  [style.background]="rate.color"
-                  aria-hidden="true"
-                ></span>
-                <div class="latest-pill__content">
-                  <span class="latest-pill__country">
-                    {{ rate.countryKey | translate }}
-                  </span>
-                  <span class="latest-pill__period">
-                    {{ rate.periodKey | translate }}
-                  </span>
-                </div>
-                <span class="latest-pill__value">
-                  {{ formatPercent(rate.value) }}
-                </span>
-              </div>
-            }
-          </div>
         </section>
 
         <footer class="countries-sources">

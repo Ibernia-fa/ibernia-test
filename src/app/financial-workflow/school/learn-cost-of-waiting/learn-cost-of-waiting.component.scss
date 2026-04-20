@@ -201,11 +201,25 @@ $ibernia-line: #e5e5ec;
   &--accent {
     background: linear-gradient(135deg, rgba(64, 67, 175, 0.08), rgba(81, 108, 232, 0.04));
     border-color: rgba(64, 67, 175, 0.18);
-
-    .cost-waiting-summary-line--primary {
-      color: $ibernia-blue;
-    }
   }
+}
+
+.cost-waiting-summary-lead {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: $ibernia-blue;
+}
+
+.cost-waiting-summary-amount {
+  margin: 8px 0 0;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: $ibernia-ink;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.3px;
 }
 
 .suffix-years {
@@ -246,7 +260,7 @@ $ibernia-line: #e5e5ec;
 .learn-cost-waiting__main {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 0;
   min-width: 0;
   min-height: 0;
 }
@@ -264,18 +278,6 @@ $ibernia-line: #e5e5ec;
     inset: 10px 10px 4px 4px;
     display: block;
   }
-}
-
-.chart-takeaway {
-  margin: 0;
-  font-size: 13px;
-  line-height: 1.5;
-  color: $ibernia-mute;
-  font-weight: 400;
-  letter-spacing: 0.1px;
-  border-left: 2px solid rgba(64, 67, 175, 0.18);
-  padding: 4px 0 4px 12px;
-  flex-shrink: 0;
 }
 
 @media (max-width: 1024px) {
@@ -327,6 +329,10 @@ $ibernia-line: #e5e5ec;
     &--rate-pair {
       font-size: 22px;
     }
+  }
+
+  .cost-waiting-summary-amount {
+    font-size: 26px;
   }
 }
 

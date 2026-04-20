@@ -145,9 +145,6 @@
               </div>
             </div>
 
-            <p class="impact-supporting-copy">
-              {{ "LEARN_COMPOUND.INSIGHT" | translate }}
-            </p>
             <p class="impact-supporting-copy impact-supporting-copy--accent">
               {{ "LEARN_COMPOUND.SUMMARY_CLOSER" | translate }}
             </p>
@@ -195,66 +192,129 @@
         </div>
       </div>
     } @else {
-      <div class="learn-compound__page learn-compound__page--compare">
-        <header class="compare-header">
-          <h1 class="compare-header__title">
-            {{ "LEARN_COMPOUND.COMPARE_TITLE" | translate }}
-          </h1>
-          <p class="compare-header__intro">
-            {{ "LEARN_COMPOUND.COMPARE_SUBTITLE" | translate }}
-          </p>
-        </header>
+      <div class="learn-compound__page learn-compound__page--growth learn-compound__page--compare-chart">
+        <h1 class="learn-compound__hero">
+          {{ "LEARN_COMPOUND.COMPARE_TITLE" | translate }}
+        </h1>
 
-        <div class="compare-grid">
-          <article class="compare-card">
-            <h3 class="compare-card__title">
-              {{ "LEARN_COMPOUND.CARD_SIMPLE_TITLE" | translate }}
-            </h3>
-            <p class="compare-card__line">
-              {{ "LEARN_COMPOUND.CARD_SIMPLE_LINE1" | translate }}
+        <div class="learn-compound__layout">
+          <aside class="learn-compound__side">
+            <div class="impact-card">
+              <span class="impact-card__label">
+                {{ "LEARN_COMPOUND.STARTING_AMOUNT" | translate }}
+              </span>
+              <div class="impact-card__value">
+                <span class="impact-card__currency">{{ currencySymbol }}</span>
+                <input
+                  type="text"
+                  inputmode="decimal"
+                  placeholder="0"
+                  thousandSeparatorInput
+                  [formControl]="startingAmountControl"
+                  class="impact-card__input"
+                />
+              </div>
+            </div>
+
+            <div class="impact-card">
+              <span class="impact-card__label">
+                {{ "LEARN_COMPOUND.RETURN_RATE" | translate }}
+              </span>
+              <div class="impact-card__value impact-card__value--rate-pair">
+                <input
+                  type="text"
+                  inputmode="decimal"
+                  placeholder="0"
+                  [value]="returnText()"
+                  (input)="onReturnInput($any($event.target).value)"
+                  (blur)="onReturnBlur()"
+                  class="impact-card__input"
+                />
+                <span class="impact-card__suffix">%</span>
+              </div>
+            </div>
+
+            <div class="impact-card impact-card--accent">
+              <div class="compound-summary__grid">
+                <div class="compound-summary__cell">
+                  <span class="impact-card__label">
+                    {{
+                      "LEARN_COMPOUND.COMPARE_SUMMARY_SIMPLE"
+                        | translate: { years: horizonYears }
+                    }}
+                  </span>
+                  <div
+                    class="impact-card__value compound-summary__metric-value compound-summary__metric-value--muted"
+                  >
+                    <span class="impact-card__currency">{{ currencySymbol }}</span>
+                    <span>
+                      @if (startingAmount() > 0) {
+                        {{ formatAmount(valueAfterHorizonSimple()) }}
+                      } @else {
+                        —
+                      }
+                    </span>
+                  </div>
+                </div>
+                <div class="compound-summary__cell">
+                  <span class="impact-card__label">
+                    {{
+                      "LEARN_COMPOUND.COMPARE_SUMMARY_COMPOUND"
+                        | translate: { years: horizonYears }
+                    }}
+                  </span>
+                  <div class="impact-card__value compound-summary__metric-value compound-summary__metric-value--accent">
+                    <span class="impact-card__currency">{{ currencySymbol }}</span>
+                    <span>
+                      @if (startingAmount() > 0) {
+                        {{ formatAmount(valueAfter20Nominal()) }}
+                      } @else {
+                        —
+                      }
+                    </span>
+                  </div>
+                </div>
+                <div class="compound-summary__cell compound-summary__cell--span">
+                  <span class="impact-card__label">
+                    {{ "LEARN_COMPOUND.COMPARE_SUMMARY_GAP" | translate }}
+                  </span>
+                  <div class="impact-card__value compound-summary__metric-value compound-summary__metric-value--accent">
+                    <span class="impact-card__currency">{{ currencySymbol }}</span>
+                    <span>
+                      @if (startingAmount() > 0) {
+                        {{ formatAmount(compoundingVsSimpleGap()) }}
+                      } @else {
+                        —
+                      }
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <p class="impact-supporting-copy impact-supporting-copy--accent impact-supporting-copy--compare">
+              {{ "LEARN_COMPOUND.COMPARE_INSIGHT" | translate }}
             </p>
-            <p class="compare-card__line compare-card__line--muted">
-              {{ "LEARN_COMPOUND.CARD_SIMPLE_LINE2" | translate }}
-            </p>
-          </article>
-          <article class="compare-card">
-            <h3 class="compare-card__title">
-              {{ "LEARN_COMPOUND.CARD_COMPOUND_TITLE" | translate }}
-            </h3>
-            <p class="compare-card__line">
-              {{ "LEARN_COMPOUND.CARD_COMPOUND_LINE1" | translate }}
-            </p>
-            <p class="compare-card__line compare-card__line--muted">
-              {{ "LEARN_COMPOUND.CARD_COMPOUND_LINE2" | translate }}
-            </p>
-          </article>
-          <article class="compare-card">
-            <h3 class="compare-card__title">
-              {{ "LEARN_COMPOUND.CARD_GAP_TITLE" | translate }}
-            </h3>
-            <p class="compare-card__line">
-              {{ "LEARN_COMPOUND.CARD_GAP_LINE1" | translate }}
-            </p>
-          </article>
+          </aside>
+
+          <section class="learn-compound__main">
+            <div class="learn-compound__chart">
+              <apx-chart
+                [series]="compareChartOptions().series"
+                [chart]="compareChartOptions().chart"
+                [xaxis]="compareChartOptions().xaxis"
+                [yaxis]="compareChartOptions().yaxis"
+                [stroke]="compareChartOptions().stroke"
+                [colors]="compareChartOptions().colors"
+                [tooltip]="compareChartOptions().tooltip"
+                [legend]="compareChartOptions().legend"
+                [grid]="compareChartOptions().grid"
+                [dataLabels]="compareChartOptions().dataLabels"
+                [markers]="compareChartOptions().markers"
+              ></apx-chart>
+            </div>
+          </section>
         </div>
-
-        <p class="compare-tagline">
-          {{ "LEARN_COMPOUND.COMPARE_TAGLINE" | translate }}
-        </p>
-
-        <section class="compare-proof" aria-labelledby="compare-proof-title">
-          <h2 id="compare-proof-title" class="compare-proof__title">
-            {{ "LEARN_COMPOUND.PROOF_TITLE" | translate }}
-          </h2>
-          <p class="compare-proof__setup">
-            {{ "LEARN_COMPOUND.PROOF_SETUP" | translate }}
-          </p>
-          <ul class="compare-proof__list">
-            <li>{{ "LEARN_COMPOUND.PROOF_LINE_SIMPLE" | translate }}</li>
-            <li>{{ "LEARN_COMPOUND.PROOF_LINE_COMPOUND" | translate }}</li>
-            <li>{{ "LEARN_COMPOUND.PROOF_LINE_GAP" | translate }}</li>
-          </ul>
-        </section>
       </div>
     }
   </mat-dialog-content>

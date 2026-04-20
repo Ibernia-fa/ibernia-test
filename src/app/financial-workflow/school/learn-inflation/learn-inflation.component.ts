@@ -43,13 +43,6 @@ export interface InflationCause {
   descriptionKey: string;
 }
 
-export interface CountryInflationLatest {
-  countryKey: string;
-  value: number;
-  periodKey: string;
-  color: string;
-}
-
 export interface CountrySource {
   labelKey?: string;
   label?: string;
@@ -59,12 +52,12 @@ export interface CountrySource {
 const YEAR_POINTS = [0, 5, 10, 15, 20];
 const ACCENT = '#4043af';
 
-/** Refined Ibernia palette for the cross-country chart. */
+/** Distinct, premium palette for the cross-country chart (strong contrast on light backgrounds). */
 const COUNTRY_COLORS = {
   eu: '#4043af',
-  unitedStates: '#2a2f7a',
-  japan: '#9aa3c7',
-  china: '#7d8fd8',
+  unitedStates: '#c2410c',
+  japan: '#0d9488',
+  china: '#7c3aed',
 } as const;
 
 const INFLATION_ACROSS_COUNTRIES_DATA = {
@@ -127,7 +120,6 @@ const INFLATION_ACROSS_COUNTRIES_DATA = {
     NgApexchartsModule,
     TranslateModule,
     ThousandSeparatorInputDirective,
-    CurrencySymbolPipe,
   ],
   templateUrl: './learn-inflation.component.html',
   styleUrl: './learn-inflation.component.scss',
@@ -148,33 +140,6 @@ export class LearnInflationComponent implements OnInit {
 
   /** Which page of the educational modal is visible. */
   readonly view = signal<LearnInflationView>('impact');
-
-  readonly latestCountryRates: CountryInflationLatest[] = [
-    {
-      countryKey: 'LEARN_INFLATION.COUNTRY_EU',
-      value: 2.8,
-      periodKey: 'LEARN_INFLATION.LATEST_EU_PERIOD',
-      color: COUNTRY_COLORS.eu,
-    },
-    {
-      countryKey: 'LEARN_INFLATION.COUNTRY_US',
-      value: 3.3,
-      periodKey: 'LEARN_INFLATION.LATEST_US_PERIOD',
-      color: COUNTRY_COLORS.unitedStates,
-    },
-    {
-      countryKey: 'LEARN_INFLATION.COUNTRY_JAPAN',
-      value: 1.3,
-      periodKey: 'LEARN_INFLATION.LATEST_JAPAN_PERIOD',
-      color: COUNTRY_COLORS.japan,
-    },
-    {
-      countryKey: 'LEARN_INFLATION.COUNTRY_CHINA',
-      value: 1.0,
-      periodKey: 'LEARN_INFLATION.LATEST_CHINA_PERIOD',
-      color: COUNTRY_COLORS.china,
-    },
-  ];
 
   readonly countrySources: CountrySource[] = [
     {
@@ -234,6 +199,13 @@ export class LearnInflationComponent implements OnInit {
     if (start <= 0) return 0;
     const end = this.endValue();
     return Math.max(0, ((start - end) / start) * 100);
+  });
+
+  /** Nominal purchasing power lost vs today (initial − real value after 20y). */
+  readonly lossAmount = computed(() => {
+    const start = this.startingAmount() || 0;
+    const end = this.endValue();
+    return Math.max(0, start - end);
   });
 
   readonly chartOptions = computed(() => this.buildChartOptions());
@@ -308,12 +280,6 @@ export class LearnInflationComponent implements OnInit {
 
   backToImpact(): void {
     this.view.set('impact');
-  }
-
-  formatPercent(value: number): string {
-    const decimal = this.translate.currentLang === 'it' ? ',' : '.';
-    const rounded = Math.round(value * 10) / 10;
-    return `${rounded.toFixed(1).replace('.', decimal)}%`;
   }
 
   formatAmount(value: number): string {
@@ -476,7 +442,7 @@ export class LearnInflationComponent implements OnInit {
       },
       colors,
       stroke: {
-        width: 2.5,
+        width: 2.75,
         curve: 'smooth',
         lineCap: 'round',
       },
