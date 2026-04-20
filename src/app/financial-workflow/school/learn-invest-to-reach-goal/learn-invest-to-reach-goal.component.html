@@ -1,0 +1,182 @@
+<div class="learn-invest-goal w-100 h-100 d-flex flex-column">
+  <div class="learn-invest-goal__header">
+    <button
+      type="button"
+      mat-icon-button
+      disableRipple
+      class="dialog-close-btn"
+      mat-dialog-close
+      [attr.aria-label]="'LEARN_INVEST_GOAL.CLOSE' | translate"
+    >
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content class="learn-invest-goal__content">
+    <div class="learn-invest-goal__page">
+      <h1 class="learn-invest-goal__hero">
+        {{ "LEARN_INVEST_GOAL.HERO_TITLE" | translate }}
+      </h1>
+
+      <div class="learn-invest-goal__layout">
+        <aside class="learn-invest-goal__side">
+          <div class="impact-card">
+            <span class="impact-card__label">
+              {{ "LEARN_INVEST_GOAL.GOAL_AMOUNT" | translate }}
+            </span>
+            <div class="impact-card__value">
+              <span class="impact-card__currency">{{ currencySymbol }}</span>
+              <input
+                type="text"
+                inputmode="decimal"
+                placeholder="0"
+                thousandSeparatorInput
+                [formControl]="goalAmountControl"
+                class="impact-card__input"
+              />
+            </div>
+          </div>
+
+          <div class="invest-goal-inputs__pair">
+            <div class="impact-card">
+              <span class="impact-card__label">
+                {{ "LEARN_INVEST_GOAL.GOAL_AGE" | translate }}
+              </span>
+              <div class="impact-card__value impact-card__value--rate-pair">
+                <input
+                  type="text"
+                  inputmode="numeric"
+                  placeholder="0"
+                  [value]="goalAgeText()"
+                  (input)="onGoalAgeInput($any($event.target).value)"
+                  (blur)="onGoalAgeBlur()"
+                  class="impact-card__input"
+                />
+              </div>
+            </div>
+
+            <div class="impact-card">
+              <span class="impact-card__label">
+                {{ "LEARN_INVEST_GOAL.RETURN_RATE" | translate }}
+              </span>
+              <div class="impact-card__value impact-card__value--rate-pair">
+                <input
+                  type="text"
+                  inputmode="decimal"
+                  placeholder="0"
+                  [value]="returnText()"
+                  (input)="onReturnInput($any($event.target).value)"
+                  (blur)="onReturnBlur()"
+                  class="impact-card__input"
+                />
+                <span class="impact-card__suffix">%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="invest-goal-real-toggle">
+            <mat-slide-toggle
+              [checked]="showRealValue()"
+              (change)="onShowRealToggle($event.checked)"
+              color="primary"
+            >
+              <span class="invest-goal-real-toggle__label">{{
+                "LEARN_INVEST_GOAL.SHOW_REAL_VALUE" | translate
+              }}</span>
+            </mat-slide-toggle>
+          </div>
+
+          @if (showRealValue()) {
+            <div class="impact-card">
+              <span class="impact-card__label">
+                {{ "LEARN_INVEST_GOAL.INFLATION_RATE" | translate }}
+              </span>
+              <div class="impact-card__value impact-card__value--rate-pair">
+                <input
+                  type="text"
+                  inputmode="decimal"
+                  placeholder="0"
+                  [value]="inflationText()"
+                  (input)="onInflationInput($any($event.target).value)"
+                  (blur)="onInflationBlur()"
+                  class="impact-card__input"
+                />
+                <span class="impact-card__suffix">%</span>
+              </div>
+            </div>
+          }
+
+          <div class="impact-card impact-card--accent invest-goal-result">
+            @if (!hasClientAge()) {
+              <p class="invest-goal-result__muted">
+                {{ "LEARN_INVEST_GOAL.MISSING_AGE" | translate }}
+              </p>
+            } @else if (!horizonValid()) {
+              <p class="invest-goal-result__muted">
+                {{
+                  "LEARN_INVEST_GOAL.INVALID_HORIZON"
+                    | translate: { currentAge: currentAge }
+                }}
+              </p>
+            } @else if ((goalAmount() || 0) <= 0) {
+              <p class="invest-goal-result__muted">
+                {{ "LEARN_INVEST_GOAL.EMPTY_GOAL" | translate }}
+              </p>
+            } @else {
+              <p class="invest-goal-result__lead">
+                {{ "LEARN_INVEST_GOAL.RESULT" | translate: { amount: formatCurrencyFull(monthlyPayment()) } }}
+              </p>
+              @if (showRealValue()) {
+                <p class="invest-goal-result__note">
+                  {{ "LEARN_INVEST_GOAL.REAL_GOAL_NOTE" | translate }}
+                </p>
+              } @else {
+                <p class="invest-goal-result__note invest-goal-result__note--subtle">
+                  {{ "LEARN_INVEST_GOAL.NOMINAL_GOAL_NOTE" | translate }}
+                </p>
+              }
+            }
+          </div>
+        </aside>
+
+        <section class="learn-invest-goal__main">
+          @if (horizonValid() && (goalAmount() || 0) > 0) {
+            <div class="learn-invest-goal__chart">
+              <apx-chart
+                [series]="chartOptions().series"
+                [chart]="chartOptions().chart"
+                [xaxis]="chartOptions().xaxis"
+                [yaxis]="chartOptions().yaxis"
+                [stroke]="chartOptions().stroke"
+                [colors]="chartOptions().colors"
+                [tooltip]="chartOptions().tooltip"
+                [legend]="chartOptions().legend"
+                [grid]="chartOptions().grid"
+                [dataLabels]="chartOptions().dataLabels"
+                [markers]="chartOptions().markers"
+                [annotations]="chartOptions().annotations"
+              ></apx-chart>
+            </div>
+            @if (hasClientAge() && horizonValid()) {
+              <p class="impact-supporting-copy invest-goal-chart-footnote">
+                {{ "LEARN_INVEST_GOAL.SUPPORTING_INSIGHT" | translate }}
+              </p>
+            }
+          } @else {
+            <div class="learn-invest-goal__chart learn-invest-goal__chart--empty">
+              <p class="learn-invest-goal__empty-copy">
+                @if (!hasClientAge()) {
+                  {{ "LEARN_INVEST_GOAL.CHART_PLACEHOLDER_AGE" | translate }}
+                } @else if (!horizonValid()) {
+                  {{ "LEARN_INVEST_GOAL.CHART_PLACEHOLDER_HORIZON" | translate }}
+                } @else {
+                  {{ "LEARN_INVEST_GOAL.CHART_PLACEHOLDER_GOAL" | translate }}
+                }
+              </p>
+            </div>
+          }
+        </section>
+      </div>
+    </div>
+  </mat-dialog-content>
+</div>

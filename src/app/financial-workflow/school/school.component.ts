@@ -22,8 +22,10 @@ import { LearnInflationComponent } from './learn-inflation/learn-inflation.compo
 import { LearnCompoundInterestComponent } from './learn-compound-interest/learn-compound-interest.component';
 import { LearnCostOfWaitingComponent } from './learn-cost-of-waiting/learn-cost-of-waiting.component';
 import { LearnCashBufferComponent } from './learn-cash-buffer/learn-cash-buffer.component';
+import { LearnInvestToReachGoalComponent } from './learn-invest-to-reach-goal/learn-invest-to-reach-goal.component';
 import { IncomeExpensesHttpService } from '../income-expenses/services/income-expenses-http.service';
 import { FinancialViewModel, IncomeExpense } from '../income-expenses/model/income-expense';
+import { getCompletedYearsAgeAtDate } from 'src/app/shared/utils/client-age-at-reference';
 
 interface SchoolSlide {
   title: string;
@@ -63,6 +65,7 @@ export class SchoolComponent {
   isOpeningCompound = false;
   isOpeningCostOfWaiting = false;
   isOpeningCashBuffer = false;
+  isOpeningInvestToReachGoal = false;
 
   private readonly dialog = inject(MatDialog);
   private readonly activatedRoute = inject(ActivatedRoute);
@@ -330,6 +333,44 @@ export class SchoolComponent {
       });
   }
 
+  /**
+   * Monthly savings needed to reach a goal by a target age; optional real (inflation) view
+   * like other School lessons. Age from plan birth date; inflation from cashflow when toggled on.
+   */
+  openInvestToReachGoalLesson(): void {
+    if (this.isOpeningInvestToReachGoal) return;
+    this.isOpeningInvestToReachGoal = true;
+
+    this.fetchLessonPlanContext$()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: ({ client, cashflow }) => {
+          const birthForAge = cashflow?.clientBirthDate ?? client?.clientDetails?.birthDate;
+          const currentAge = birthForAge
+            ? getCompletedYearsAgeAtDate(birthForAge, new Date())
+            : NaN;
+          const inflationRate =
+            cashflow?.inflationRate ??
+            client?.clientDetails?.inflationRate ??
+            DEFAULT_INFLATION_FALLBACK;
+
+          this.openInvestToReachGoalDialog({
+            currentAge,
+            inflationRate,
+            currencyCode: client?.clientDetails?.preferredCurrency,
+          });
+          this.isOpeningInvestToReachGoal = false;
+        },
+        error: () => {
+          this.openInvestToReachGoalDialog({
+            currentAge: NaN,
+            inflationRate: DEFAULT_INFLATION_FALLBACK,
+          });
+          this.isOpeningInvestToReachGoal = false;
+        },
+      });
+  }
+
   private fetchCashBufferLessonContext$(): Observable<{
     client: Client;
     pots: SavingPotsModel;
@@ -465,6 +506,22 @@ export class SchoolComponent {
     currencyCode?: string;
   }): void {
     this.dialog.open(LearnCashBufferComponent, {
+      width: '92vw',
+      maxWidth: '92vw',
+      height: '88vh',
+      panelClass: 'learn-inflation-dialog-panel',
+      autoFocus: false,
+      restoreFocus: false,
+      data,
+    });
+  }
+
+  private openInvestToReachGoalDialog(data: {
+    currentAge: number;
+    inflationRate: number;
+    currencyCode?: string;
+  }): void {
+    this.dialog.open(LearnInvestToReachGoalComponent, {
       width: '92vw',
       maxWidth: '92vw',
       height: '88vh',
