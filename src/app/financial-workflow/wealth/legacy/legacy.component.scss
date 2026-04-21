@@ -145,7 +145,7 @@ $line-w: 2px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  // width: 100%;
+  width: 100%;
   position: relative;
 }
 
@@ -513,7 +513,8 @@ $line-w: 2px;
 }
 
 .heart-estate-vline,
-.heart-children-vline {
+.heart-children-vline,
+.estate-branch-vline {
   position: absolute;
   width: $line-w;
   background: $line-color;
