@@ -26,6 +26,7 @@ import { NgApexchartsModule } from 'ng-apexcharts';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 
+import { AutoFitTitleDirective } from 'src/app/directives/auto-fit-title.directive';
 import { CurrencySymbolPipe } from 'src/app/pipe/currency-symbol.pipe';
 import {
   formatAppDisplayNumber,
@@ -73,6 +74,7 @@ type DownPaymentMode = 'pct' | 'amount';
     MatTooltipModule,
     NgApexchartsModule,
     TranslateModule,
+    AutoFitTitleDirective,
   ],
   templateUrl: './learn-rent-or-buy.component.html',
   styleUrl: './learn-rent-or-buy.component.scss',

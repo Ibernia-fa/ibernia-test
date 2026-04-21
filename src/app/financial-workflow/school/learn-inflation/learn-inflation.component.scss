@@ -94,13 +94,13 @@ $impact-gutter: 56px;
 
 .learn-inflation__hero {
   margin: 0;
-  font-size: 24px;
-  line-height: 1.25;
+  font-size: 26px;
+  line-height: 1.2;
   font-weight: 700;
   letter-spacing: -0.4px;
   color: $ibernia-ink;
   text-align: left;
-  max-width: 880px;
+  max-width: 100%;
   padding-right: 48px; /* keep clear of close icon */
 }
 
@@ -212,6 +212,17 @@ $impact-gutter: 56px;
     white-space: nowrap;
   }
 
+  &__note {
+    margin: 10px 0 0;
+    padding-top: 10px;
+    border-top: 1px solid rgba(64, 67, 175, 0.12);
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: $ibernia-mute;
+    font-weight: 400;
+    letter-spacing: 0.1px;
+  }
+
   &__input {
     flex: 1 1 auto;
     border: none;
@@ -295,17 +306,6 @@ $impact-gutter: 56px;
   }
 }
 
-/* ----- Supporting educational copy under value-after-20y card ----- */
-.impact-supporting-copy {
-  margin: auto 4px 0; /* margin-top:auto pushes copy to bottom of side column */
-  font-size: 12.5px;
-  line-height: 1.5;
-  color: $ibernia-mute;
-  font-weight: 400;
-  letter-spacing: 0.1px;
-  border-left: 2px solid rgba(64, 67, 175, 0.22);
-  padding: 4px 0 4px 12px;
-}
 
 /* ----- Bottom CTA row ----- */
 .learn-inflation__footer {
@@ -364,13 +364,29 @@ $impact-gutter: 56px;
   }
 }
 
-/* ----- Override shared school-notice spacing inside this slide ----- */
+/* ----- Override shared school-notice spacing + icon alignment ----- */
 .learn-inflation__page--impact .school-notice {
   margin: 6px 0 0;
   width: 100%;
   max-width: none;
   align-self: stretch;
+  align-items: center;
   justify-content: center;
+  gap: 12px;
+  padding: 12px 18px;
+
+  .school-notice__icon {
+    align-self: center;
+    width: 18px;
+    height: 18px;
+    font-size: 18px;
+    line-height: 1;
+    overflow: visible;
+  }
+
+  .school-notice__text {
+    align-self: center;
+  }
 }
 
 /* ============================================================
@@ -379,7 +395,8 @@ $impact-gutter: 56px;
 
 .learn-inflation__page--causes {
   gap: 24px;
-  padding-top: 8px;
+  padding: 24px 0;
+  justify-content: center;
 }
 
 .causes-header {
@@ -387,6 +404,7 @@ $impact-gutter: 56px;
   flex-direction: column;
   gap: 8px;
   padding: 0 56px 0 56px;
+  flex: 0 0 auto;
 
   &__title {
     margin: 0;
@@ -403,7 +421,7 @@ $impact-gutter: 56px;
     line-height: 1.55;
     color: $ibernia-mute;
     font-weight: 400;
-    max-width: 720px;
+    max-width: 100%;
   }
 }
 
@@ -411,7 +429,7 @@ $impact-gutter: 56px;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 22px;
-  flex: 0 1 auto;
+  flex: 1 1 auto;
   min-height: 0;
   align-items: stretch;
   padding: 0 56px;
@@ -442,10 +460,10 @@ $impact-gutter: 56px;
 
   &__hero {
     position: relative;
-    height: 172px;
+    height: 188px;
     display: grid;
     place-items: center;
-    padding: 18px 24px;
+    padding: 20px 24px;
     overflow: hidden;
     background:
       radial-gradient(
@@ -516,8 +534,8 @@ $impact-gutter: 56px;
   &__body {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    padding: 22px 24px 24px;
+    gap: 14px;
+    padding: 26px 26px 28px;
     flex: 1 1 auto;
   }
 
@@ -530,21 +548,21 @@ $impact-gutter: 56px;
   }
 
   &__desc {
-    margin: 0;
+    margin: 0 0 8px;
     font-size: 14px;
-    line-height: 1.55;
+    line-height: 1.6;
     color: $ibernia-mute;
   }
 
   &__example {
     margin: auto 0 0;
-    padding: 12px 14px;
+    padding: 14px 16px;
     border-radius: 12px;
     background: linear-gradient(135deg, rgba(64, 67, 175, 0.05), rgba(81, 108, 232, 0.03));
     border: 1px solid rgba(64, 67, 175, 0.08);
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 6px;
   }
 
   &__example-label {
@@ -557,7 +575,7 @@ $impact-gutter: 56px;
 
   &__example-text {
     font-size: 13.5px;
-    line-height: 1.5;
+    line-height: 1.55;
     color: $ibernia-ink;
     font-weight: 400;
   }
@@ -593,7 +611,7 @@ $impact-gutter: 56px;
     line-height: 1.55;
     color: $ibernia-mute;
     font-weight: 400;
-    max-width: 880px;
+    max-width: 100%;
   }
 }
 
@@ -720,7 +738,12 @@ $impact-gutter: 56px;
   }
 
   .cause-card__hero {
-    height: 188px;
+    height: 200px;
+  }
+
+  .cause-card__body {
+    gap: 16px;
+    padding: 24px 22px 26px;
   }
 
   .cause-card__image {

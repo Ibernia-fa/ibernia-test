@@ -23,6 +23,7 @@ import { MatSlideToggle } from '@angular/material/slide-toggle';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { NgApexchartsModule } from 'ng-apexcharts';
 
+import { AutoFitTitleDirective } from 'src/app/directives/auto-fit-title.directive';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 import { CurrencySymbolPipe } from 'src/app/pipe/currency-symbol.pipe';
 import {
@@ -96,6 +97,7 @@ function monthlyPaymentForFv(
     NgApexchartsModule,
     TranslateModule,
     ThousandSeparatorInputDirective,
+    AutoFitTitleDirective,
   ],
   templateUrl: './learn-invest-to-reach-goal.component.html',
   styleUrl: './learn-invest-to-reach-goal.component.scss',
