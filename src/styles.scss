@@ -658,6 +658,38 @@ button:not(.mat-mdc-menu-item):not(.mat-menu-item):not(.submit-btn) {
     color: #1c1c1c !important;
     font-variant-numeric: tabular-nums;
     margin-left: 0 !important;
+    white-space: nowrap;
+  }
+
+  /* Wide variant — used when the series label is long enough that the
+     label + value pair would otherwise truncate (e.g. the invest-to-reach
+     "Purchasing power (today's money)" series). Keeps the full value
+     readable on desktop and tablet without breaking the design system. */
+  &.ibr-school-tooltip--wide {
+    min-width: 240px;
+    max-width: 440px;
+
+    .apexcharts-tooltip-y-group,
+    .apexcharts-tooltip-goals-group,
+    .apexcharts-tooltip-z-group {
+      flex-wrap: wrap;
+      row-gap: 2px;
+    }
+
+    .apexcharts-tooltip-text-y-label,
+    .apexcharts-tooltip-text-goals-label,
+    .apexcharts-tooltip-text-z-label {
+      flex: 1 1 100%;
+      min-width: 0;
+    }
+
+    .apexcharts-tooltip-text-y-value,
+    .apexcharts-tooltip-text-goals-value,
+    .apexcharts-tooltip-text-z-value {
+      flex: 1 1 100%;
+      font-size: 15px !important;
+      letter-spacing: -0.1px;
+    }
   }
 }
 
@@ -1491,5 +1523,33 @@ app-branding {
      page wrappers fully control where the title row sits. */
   .mat-mdc-dialog-content {
     padding-top: 0 !important;
+  }
+}
+
+/* ============================================================
+   "More assumptions" secondary dialog (Rent vs Buy)
+   ------------------------------------------------------------
+   Ensures the surface stays inside the viewport and lets the field
+   list scroll independently while the title row + actions stay
+   pinned. Required for desktop and tablet usability.
+   ============================================================ */
+.rb-assumptions-dialog-panel {
+  .mdc-dialog__surface {
+    display: flex;
+    flex-direction: column;
+    max-height: 85vh;
+    padding: 20px 22px;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .mat-mdc-dialog-content {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-height: none !important;
+  }
+
+  .mat-mdc-dialog-actions {
+    min-height: 0;
   }
 }

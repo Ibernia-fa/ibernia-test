@@ -25,6 +25,7 @@ import { LearnCashBufferComponent } from './learn-cash-buffer/learn-cash-buffer.
 import { LearnInvestToReachGoalComponent } from './learn-invest-to-reach-goal/learn-invest-to-reach-goal.component';
 import { LearnRentOrBuyComponent } from './learn-rent-or-buy/learn-rent-or-buy.component';
 import type { LearnRentOrBuyDialogData } from './learn-rent-or-buy/learn-rent-or-buy.types';
+import { LearnTimeInMarketComponent } from './learn-time-in-market/learn-time-in-market.component';
 import { IncomeExpensesHttpService } from '../income-expenses/services/income-expenses-http.service';
 import { FinancialViewModel, IncomeExpense } from '../income-expenses/model/income-expense';
 import { getCompletedYearsAgeAtDate } from 'src/app/shared/utils/client-age-at-reference';
@@ -70,6 +71,7 @@ export class SchoolComponent {
   isOpeningCashBuffer = false;
   isOpeningInvestToReachGoal = false;
   isOpeningRentOrBuy = false;
+  isOpeningTimeInMarket = false;
 
   private readonly dialog = inject(MatDialog);
   private readonly activatedRoute = inject(ActivatedRoute);
@@ -653,5 +655,24 @@ export class SchoolComponent {
       restoreFocus: false,
       data,
     });
+  }
+
+  /**
+   * Time-in-the-market lesson: a static, illustrative slide that
+   * walks through major historical drawdowns and their recoveries.
+   * No plan inputs are required — the dialog opens immediately.
+   */
+  openTimeInMarketLesson(): void {
+    if (this.isOpeningTimeInMarket) return;
+    this.isOpeningTimeInMarket = true;
+    this.dialog.open(LearnTimeInMarketComponent, {
+      width: '92vw',
+      maxWidth: '92vw',
+      height: '88vh',
+      panelClass: 'learn-inflation-dialog-panel',
+      autoFocus: false,
+      restoreFocus: false,
+    });
+    this.isOpeningTimeInMarket = false;
   }
 }

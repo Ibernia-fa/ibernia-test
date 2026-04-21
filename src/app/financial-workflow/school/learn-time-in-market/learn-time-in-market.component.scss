@@ -1,0 +1,449 @@
+$ibernia-blue: #4043af;
+$ibernia-blue-soft: #516ce8;
+$ibernia-ink: #1c1c1c;
+$ibernia-mute: #5a596e;
+$ibernia-line: #e5e5ec;
+$ibernia-bg-soft: #f5f7ff;
+$ibernia-pos: #1f8a4c;
+$ibernia-neg: #c62828;
+
+.learn-tim {
+  font-family: "Ubuntu", sans-serif;
+  color: $ibernia-ink;
+  min-height: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ----- Top header (close button) ----- */
+.learn-tim__header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 0;
+  z-index: 5;
+  pointer-events: none;
+
+  > * {
+    pointer-events: auto;
+  }
+}
+
+.learn-tim__content {
+  padding-right: 0 !important;
+  margin-top: 0 !important;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.learn-tim__page {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 14px 56px 16px;
+  animation: timFadeIn 320ms ease;
+  overflow: hidden;
+}
+
+@keyframes timFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.learn-tim__hero {
+  margin: 0;
+  font-size: 26px;
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  color: $ibernia-ink;
+  text-align: left;
+  max-width: 100%;
+  padding-right: 48px;
+  flex: 0 0 auto;
+}
+
+/* ----- Chart hero ----- */
+.learn-tim__chart-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.learn-tim__chart {
+  flex: 1 1 auto;
+  min-height: 240px;
+  border: 1px solid $ibernia-line;
+  border-radius: 16px;
+  background:
+    radial-gradient(120% 80% at 50% 0%, rgba(64, 67, 175, 0.04) 0%, rgba(64, 67, 175, 0) 60%),
+    #ffffff;
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    0 1px 0 rgba(20, 22, 48, 0.02),
+    0 10px 28px rgba(64, 67, 175, 0.05);
+
+  apx-chart {
+    position: absolute;
+    inset: 12px 18px 6px 6px;
+    display: block;
+  }
+}
+
+.learn-tim__chart-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+  padding: 0 4px;
+}
+
+.learn-tim__series-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: $ibernia-mute;
+  letter-spacing: 0.1px;
+}
+
+.learn-tim__series-dot {
+  width: 16px;
+  height: 3px;
+  border-radius: 2px;
+  background: $ibernia-blue;
+  display: inline-block;
+}
+
+.learn-tim__chart-note {
+  font-size: 12px;
+  color: $ibernia-mute;
+  font-style: italic;
+  font-weight: 400;
+}
+
+/* ----- Summary card ----- */
+.learn-tim__summary {
+  position: relative;
+  border: 1px solid rgba(64, 67, 175, 0.18);
+  border-radius: 16px;
+  background:
+    linear-gradient(135deg, rgba(64, 67, 175, 0.05), rgba(81, 108, 232, 0.02));
+  padding: 18px 22px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 0 0 auto;
+  box-shadow:
+    0 1px 0 rgba(20, 22, 48, 0.02),
+    0 8px 22px rgba(64, 67, 175, 0.06);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.learn-tim__summary-head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.learn-tim__summary-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: $ibernia-blue;
+  background: rgba(64, 67, 175, 0.08);
+  border: 1px solid rgba(64, 67, 175, 0.18);
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+.learn-tim__summary-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: $ibernia-ink;
+  letter-spacing: -0.2px;
+  line-height: 1.3;
+}
+
+.learn-tim__metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px 24px;
+  padding: 4px 0 4px;
+  border-top: 1px solid rgba(64, 67, 175, 0.12);
+  border-bottom: 1px solid rgba(64, 67, 175, 0.12);
+  padding-top: 14px;
+  padding-bottom: 14px;
+}
+
+.learn-tim__metric {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.learn-tim__metric-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: $ibernia-mute;
+}
+
+.learn-tim__metric-value {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: $ibernia-ink;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.3px;
+
+  &--pos {
+    color: $ibernia-pos;
+  }
+
+  &--neg {
+    color: $ibernia-neg;
+  }
+
+  &--accent {
+    color: #b3540e;
+  }
+}
+
+.learn-tim__narrative {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: $ibernia-mute;
+  font-weight: 400;
+  letter-spacing: 0.05px;
+  max-width: 100%;
+}
+
+.learn-tim__nested-note {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: $ibernia-mute;
+  font-style: italic;
+  background: rgba(64, 67, 175, 0.05);
+  border: 1px solid rgba(64, 67, 175, 0.12);
+  padding: 6px 10px;
+  border-radius: 8px;
+  align-self: flex-start;
+}
+
+.learn-tim__nested-note-icon {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+  color: $ibernia-blue;
+}
+
+/* ----- Event tiles ----- */
+.learn-tim__events {
+  flex: 0 0 auto;
+}
+
+.learn-tim__events-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.event-tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+  padding: 12px 14px 14px;
+  border-radius: 12px;
+  border: 1px solid $ibernia-line;
+  background: #ffffff;
+  cursor: pointer;
+  font-family: "Ubuntu", sans-serif;
+  color: $ibernia-ink;
+  transition:
+    border-color 0.18s ease,
+    background 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.18s ease;
+
+  &:hover,
+  &--hovered {
+    border-color: rgba(64, 67, 175, 0.3);
+    box-shadow: 0 6px 14px rgba(64, 67, 175, 0.08);
+    transform: translateY(-1px);
+  }
+
+  &:focus-visible {
+    outline: 2px solid $ibernia-blue;
+    outline-offset: 2px;
+  }
+
+  &--active {
+    border-color: rgba(64, 67, 175, 0.5);
+    background:
+      linear-gradient(135deg, rgba(64, 67, 175, 0.08), rgba(81, 108, 232, 0.04));
+    box-shadow:
+      0 1px 0 rgba(20, 22, 48, 0.02),
+      0 8px 18px rgba(64, 67, 175, 0.12);
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: 10px;
+      bottom: 10px;
+      left: 0;
+      width: 3px;
+      border-radius: 0 3px 3px 0;
+      background: linear-gradient(180deg, $ibernia-blue, $ibernia-blue-soft);
+    }
+  }
+
+  &__range {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: $ibernia-mute;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__name {
+    font-size: 13.5px;
+    font-weight: 600;
+    line-height: 1.3;
+    color: $ibernia-ink;
+    /* Allow up to 2 lines for longer names. */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
+    min-height: 2.6em;
+  }
+
+  &__drawdown {
+    margin-top: 2px;
+    font-size: 18px;
+    font-weight: 700;
+    color: $ibernia-neg;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.2px;
+  }
+}
+
+/* ----- Footer notice override (consistent gap with other slides) ----- */
+.learn-tim__page .school-notice {
+  margin: 4px 0 0;
+  width: 100%;
+  max-width: none;
+  align-self: stretch;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 10px 16px;
+
+  .school-notice__icon {
+    align-self: center;
+    width: 18px;
+    height: 18px;
+    font-size: 18px;
+    line-height: 1;
+    overflow: visible;
+  }
+
+  .school-notice__text {
+    align-self: center;
+    text-align: center;
+  }
+}
+
+/* ============================================================
+   Responsiveness — desktop & tablet only (per spec)
+   ============================================================ */
+@media (max-width: 1180px) {
+  .learn-tim__events-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 1024px) {
+  .learn-tim__page {
+    padding: 14px 20px 14px;
+    gap: 12px;
+  }
+
+  .learn-tim__hero {
+    font-size: 22px;
+    padding-right: 40px;
+  }
+
+  .learn-tim__metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px 18px;
+  }
+
+  .learn-tim__metric-value {
+    font-size: 20px;
+  }
+
+  .learn-tim__events-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .event-tile__name {
+    font-size: 13px;
+  }
+}
+
+/* ============================================================
+   Apex annotations — refine styling for trough marker.
+   ============================================================ */
+:host ::ng-deep .apexcharts-canvas .apexcharts-point-annotations .tim-trough-marker {
+  filter: drop-shadow(0 2px 6px rgba(198, 40, 40, 0.35));
+}
+
+:host ::ng-deep .apexcharts-canvas .apexcharts-xaxis-annotations rect {
+  rx: 0;
+}
+
+/* ============================================================
+   Dialog surface tweaks
+   ============================================================ */
+:host ::ng-deep .mdc-dialog__surface {
+  display: flex;
+  flex-direction: column;
+}
+
+:host ::ng-deep .learn-tim__content.mat-mdc-dialog-content {
+  max-height: none;
+}

@@ -366,6 +366,9 @@ export class LearnCompoundInterestComponent implements OnInit {
     };
   }
 
+  /* Tooltip note: keep the on-chart series order unchanged but use
+     `inverseOrder: true` so the hover card always reads
+     "Compound interest" first and "Simple interest" second. */
   private buildCompareChartOptions(): any {
     const simple = this.simpleInterestSeries();
     const compound = this.nominalSeries();
@@ -468,6 +471,7 @@ export class LearnCompoundInterestComponent implements OnInit {
         shared: true,
         intersect: false,
         followCursor: false,
+        inverseOrder: true,
         x: { show: true },
         y: {
           formatter: (value: number) => formatCurrency(value),

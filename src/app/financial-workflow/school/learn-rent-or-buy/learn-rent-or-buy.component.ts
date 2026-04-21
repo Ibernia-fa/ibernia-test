@@ -12,7 +12,6 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import {
   MAT_DIALOG_DATA,
   MatDialog,
@@ -68,7 +67,6 @@ type DownPaymentMode = 'pct' | 'amount';
     CommonModule,
     FormsModule,
     MatButtonModule,
-    MatButtonToggleModule,
     MatDialogModule,
     MatIconModule,
     MatTooltipModule,
@@ -149,6 +147,16 @@ export class LearnRentOrBuyComponent implements OnInit {
     return out ? out.terminalBuy - out.terminalRent : null;
   });
 
+  /**
+   * Side that comes out ahead at the chosen horizon. Used to give the two
+   * top-right summary tiles a positive (winner) / muted (loser) treatment.
+   */
+  readonly winnerSide = computed<'buy' | 'rent' | null>(() => {
+    const net = this.netResult();
+    if (net === null || !Number.isFinite(net) || net === 0) return null;
+    return net > 0 ? 'buy' : 'rent';
+  });
+
   readonly summarySentence = computed<string>(() => {
     const out = this.engineOutput();
     if (!out) return '';
@@ -212,6 +220,7 @@ export class LearnRentOrBuyComponent implements OnInit {
     const ref = this.matDialog.open(LearnRentOrBuyAssumptionsDialogComponent, {
       width: 'min(640px, 92vw)',
       maxWidth: '92vw',
+      maxHeight: '85vh',
       autoFocus: false,
       restoreFocus: true,
       panelClass: 'rb-assumptions-dialog-panel',
@@ -409,22 +418,13 @@ export class LearnRentOrBuyComponent implements OnInit {
         strokeDashArray: 4,
         xaxis: { lines: { show: false } },
         yaxis: { lines: { show: true } },
-        padding: { left: 4, right: 12, top: 4, bottom: 4 },
+        padding: { left: 8, right: 24, top: 8, bottom: 0 },
       },
       xaxis: {
         type: 'category',
         categories: xLabels,
         axisBorder: { show: false },
         axisTicks: { show: false },
-        title: {
-          text: this.translate.instant('LEARN_RENT_OR_BUY.AXIS_X'),
-          style: {
-            color: '#5a596e',
-            fontSize: '12px',
-            fontWeight: 600,
-            fontFamily: 'Ubuntu, sans-serif',
-          },
-        },
         labels: {
           style: {
             colors: '#5a596e',
@@ -434,15 +434,6 @@ export class LearnRentOrBuyComponent implements OnInit {
         },
       },
       yaxis: {
-        title: {
-          text: this.translate.instant('LEARN_RENT_OR_BUY.AXIS_Y'),
-          style: {
-            color: '#5a596e',
-            fontSize: '12px',
-            fontWeight: 600,
-            fontFamily: 'Ubuntu, sans-serif',
-          },
-        },
         labels: {
           style: {
             colors: '#5a596e',
