@@ -82,6 +82,10 @@ export class LegacyComponent
   @ViewChild('partnerBranchParents') partnerBranchParentsRef?: ElementRef<HTMLElement>;
   @ViewChild('clientHeartEstateLine') clientHeartEstateLineRef?: ElementRef<HTMLElement>;
   @ViewChild('partnerHeartEstateLine') partnerHeartEstateLineRef?: ElementRef<HTMLElement>;
+  @ViewChild('clientBranchVline') clientBranchVlineRef?: ElementRef<HTMLElement>;
+  @ViewChild('partnerBranchVline') partnerBranchVlineRef?: ElementRef<HTMLElement>;
+  @ViewChild('clientEstateBranchLine') clientEstateBranchLineRef?: ElementRef<HTMLElement>;
+  @ViewChild('partnerEstateBranchLine') partnerEstateBranchLineRef?: ElementRef<HTMLElement>;
   @ViewChild('familyTree') familyTreeRef?: ElementRef<HTMLElement>;
   @ViewChild('childrenSection') childrenSectionRef?: ElementRef<HTMLElement>;
   @ViewChild('heartChildrenLine') heartChildrenLineRef?: ElementRef<HTMLElement>;
@@ -685,6 +689,16 @@ export class LegacyComponent
         this.partnerBranchParentsRef,
         this.partnerHeartEstateLineRef,
       );
+      this.updateEstateBranchLine(
+        this.clientBranchParentsRef,
+        this.clientBranchVlineRef,
+        this.clientEstateBranchLineRef,
+      );
+      this.updateEstateBranchLine(
+        this.partnerBranchParentsRef,
+        this.partnerBranchVlineRef,
+        this.partnerEstateBranchLineRef,
+      );
       this.updateHeartChildrenLine();
     });
   }
@@ -921,15 +935,15 @@ export class LegacyComponent
   }
 
   private balanceBranches(): void {
-    const clientPair = this.clientParentsPairRef?.nativeElement;
-    const partnerPair = this.partnerParentsPairRef?.nativeElement;
+    const clientVline = this.clientBranchVlineRef?.nativeElement;
+    const partnerVline = this.partnerBranchVlineRef?.nativeElement;
     const clientBranch = this.clientBranchRef?.nativeElement;
     const partnerBranch = this.partnerBranchRef?.nativeElement;
 
-    if (clientPair) this.renderer.removeStyle(clientPair, 'margin-bottom');
-    if (partnerPair) this.renderer.removeStyle(partnerPair, 'margin-bottom');
+    if (clientVline) this.renderer.removeStyle(clientVline, 'margin-top');
+    if (partnerVline) this.renderer.removeStyle(partnerVline, 'margin-top');
 
-    if (!clientPair || !partnerPair || !clientBranch || !partnerBranch) return;
+    if (!clientVline || !partnerVline || !clientBranch || !partnerBranch) return;
 
     const clientHeight = clientBranch.offsetHeight;
     const partnerHeight = partnerBranch.offsetHeight;
@@ -938,10 +952,43 @@ export class LegacyComponent
     if (diff < 1) return;
 
     if (clientHeight > partnerHeight) {
-      this.renderer.setStyle(partnerPair, 'margin-bottom', `${diff}px`);
-    } else {
-      this.renderer.setStyle(clientPair, 'margin-bottom', `${diff}px`);
+      this.renderer.setStyle(partnerVline, 'margin-top', `${diff}px`);
+      return;
     }
+    this.renderer.setStyle(clientVline, 'margin-top', `${diff}px`);
+  }
+
+  private updateEstateBranchLine(
+    branchParentsRef: ElementRef<HTMLElement> | undefined,
+    branchVlineRef: ElementRef<HTMLElement> | undefined,
+    lineRef: ElementRef<HTMLElement> | undefined,
+  ): void {
+    if (
+      !this.treeBodyRef?.nativeElement ||
+      !branchParentsRef?.nativeElement ||
+      !branchVlineRef?.nativeElement ||
+      !lineRef?.nativeElement
+    ) {
+      return;
+    }
+
+    const estate = branchParentsRef.nativeElement.querySelector(
+      '.parent-estate',
+    ) as HTMLElement;
+    if (!estate) return;
+
+    const treeRect = this.treeBodyRef.nativeElement.getBoundingClientRect();
+    const estateRect = estate.getBoundingClientRect();
+    const vlineRect = branchVlineRef.nativeElement.getBoundingClientRect();
+
+    const centerX = estateRect.left + estateRect.width / 2 - treeRect.left;
+    const top = estateRect.bottom - treeRect.top;
+    const bottom = vlineRect.top - treeRect.top;
+
+    const line = lineRef.nativeElement;
+    this.renderer.setStyle(line, 'left', `${centerX}px`);
+    this.renderer.setStyle(line, 'top', `${top}px`);
+    this.renderer.setStyle(line, 'height', `${Math.max(0, bottom - top)}px`);
   }
 
   private clearScenario(): void {

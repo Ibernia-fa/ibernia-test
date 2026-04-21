@@ -187,7 +187,11 @@
             </div>
 
             <!-- Vertical drop from parents -->
-            <div class="branch-vline" *ngIf="clientParents.length > 0"></div>
+            <div
+              class="branch-vline"
+              *ngIf="clientParents.length > 0"
+              #clientBranchVline
+            ></div>
 
             <!-- Tax node for client-parents-die scenario -->
             <ng-container *ngIf="showTaxOnClientBranch">
@@ -556,7 +560,11 @@
             </div>
 
             <!-- Vertical drop from parents -->
-            <div class="branch-vline" *ngIf="partnerParents.length > 0"></div>
+            <div
+              class="branch-vline"
+              *ngIf="partnerParents.length > 0"
+              #partnerBranchVline
+            ></div>
 
             <!-- Tax node for partner-parents-die scenario -->
             <ng-container *ngIf="showTaxOnPartnerBranch">
@@ -736,6 +744,16 @@
             </div>
           </div>
           <div class="couple-line" *ngIf="treeHasPartner" #coupleLine></div>
+          <div
+            class="estate-branch-vline"
+            *ngIf="clientParents.length > 0"
+            #clientEstateBranchLine
+          ></div>
+          <div
+            class="estate-branch-vline"
+            *ngIf="partnerParents.length > 0"
+            #partnerEstateBranchLine
+          ></div>
         </div>
 
         <!-- ═══ CHILDREN / FLOW SECTION ═══ -->
