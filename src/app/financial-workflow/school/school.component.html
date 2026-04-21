@@ -3,12 +3,12 @@
     <mat-card-content>
       <div class="d-flex flex-column gap-12">
         <h3 class="ibr-new-heading">{{ "School Heading" | translate }}</h3>
-        <p class="ibr-new-subheading">
+        <p class="ibr-new-subheading school-page-subtitle">
           {{ "SCHOOL.PAGE_SUBTITLE" | translate }}
         </p>
       </div>
 
-      <!-- New Layout: 3×2 grid + centered seventh tile (see .card-grid) -->
+      <!-- School tiles: CSS grid fills rows left → center → right (see .card-grid) -->
       <div class="ibr-school-card-container">
         <div class="card-grid">
           <!-- Row 1 — Inflation -->
@@ -280,9 +280,9 @@
             </div>
           </article>
 
-          <!-- Row 3 — Rent or Buy (single, centered) -->
+          <!-- Row 3 — Rent or Buy (next in sequence: first column) -->
           <article
-            class="card card--interactive card-grid__solo"
+            class="card card--interactive"
             role="button"
             tabindex="0"
             (click)="openRentOrBuyLesson()"

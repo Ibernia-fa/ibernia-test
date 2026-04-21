@@ -76,9 +76,10 @@
               <span class="impact-card__label">
                 {{ "LEARN_INFLATION.VALUE_AFTER_20Y" | translate }}
               </span>
-              <div class="impact-card__value">
-                <span class="impact-card__currency">{{ currencySymbol }}</span>
-                <span class="impact-card__readout">{{ formatAmount(endValue()) }}</span>
+              <div class="impact-card__value impact-card__value--tight">
+                <span class="impact-card__currency">{{ currencySymbol }}</span><span
+                  class="impact-card__readout"
+                  >{{ formatAmount(endValue()) }}</span>
               </div>
               <span class="impact-card__hint impact-card__hint--loss">
                 <span class="impact-card__hint-line">
@@ -90,10 +91,8 @@
                 @if (lossAmount() > 0) {
                   <span class="impact-card__hint-line impact-card__hint-line--euro">
                     {{ "LEARN_INFLATION.LOSS_NOTE_OR" | translate }}
-                    <span class="impact-card__loss-amount">
-                      <span class="impact-card__loss-currency">{{ currencySymbol }}</span>
-                      {{ formatAmount(lossAmount()) }}
-                    </span>
+                    <span class="impact-card__loss-amount"
+                      >{{ currencySymbol }}{{ formatAmount(lossAmount()) }}</span>
                   </span>
                 }
               </span>

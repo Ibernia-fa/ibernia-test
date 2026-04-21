@@ -1445,128 +1445,7 @@
             }
           </div>
 
-          <div class="d-flex flex-column gap-8 tab">
-            <mat-label class="f-s-16 f-w-500 ibr-black d-flex align-items-center"
-              >{{ "Payment method" | translate }}
-              <img
-                src="assets/images/svgs/help-circle-icon.svg"
-                alt="help"
-                width="18"
-                class="m-l-4"
-                matTooltip="{{ 'ADD_EVENT.EVENT_TYPE_TOOLTIP' | translate }}"
-              />
-            </mat-label>
-            <div class="down-payment-toggle">
-              <label
-                class="dp-radio"
-                [class.active]="isCustomCashEvent"
-                (click)="onCustomCashControlClicked(true)"
-              >
-                <span class="dp-radio-circle"></span>
-                <span>{{ "Cash" | translate }}</span>
-              </label>
-              <label
-                class="dp-radio"
-                [class.active]="!isCustomCashEvent"
-                (click)="onCustomCashControlClicked(false)"
-              >
-                <span class="dp-radio-circle"></span>
-                <span>{{ "Financing" | translate }}</span>
-              </label>
-            </div>
-          </div>
-
           @if (isCustomCashEvent) {
-          <div class="d-flex flex-column gap-8 net-fields">
-            <mat-label
-              class="f-s-16 f-w-500 d-flex align-items-center ibr-black"
-              style="line-height: 16px !important"
-              >{{ "Net amount" | translate }}
-              <img
-                src="assets/images/svgs/help-circle-icon.svg"
-                alt="help"
-                width="18"
-                class="m-l-4"
-                matTooltip="{{ 'ADD_EVENT.ENTER_AMOUNT_TOOLTIP' | translate }}"
-              />
-            </mat-label>
-
-            <div class="net-field d-flex align-items-center">
-              <div class="left hide-arrow">
-                <mat-select
-                  value="Â£"
-                  formControlName="currency"
-                  class="sortby-edit-profile"
-                  hideSingleSelectionIndicator
-                >
-                  @for (country of countries; track country) {
-                    @if (country.currencySymbol) {
-                      <mat-option [value]="country.currencySymbol">{{
-                        country.currencySymbol
-                      }}</mat-option>
-                    }
-                  }
-                </mat-select>
-              </div>
-              <div class="w-100 form-field">
-                <input
-                  matInput
-                  type="text"
-                  inputmode="decimal"
-                  formControlName="amount"
-                  #amountInput
-                  thousandSeparatorInput
-                  placeholder="0"
-                  [appAutoFocus]="isEditWorkflow && !showNameEdit"
-                  autoFocusSelect
-                />
-              </div>
-              <div class="right custom-select">
-                <mat-select
-                  (valueChange)="onCycleValueChange($event)"
-                  value="Select"
-                  formControlName="cycle"
-                  class="sortby-edit-profile"
-                  hideSingleSelectionIndicator
-                >
-                  @for (cycle of cycles; track cycle) {
-                    <mat-option [value]="cycle">{{ cycle | translate }}</mat-option>
-                  }
-                </mat-select>
-
-                <span class="custom-arrow">
-                  <svg
-                    width="12"
-                    height="7"
-                    viewBox="0 0 12 7"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M1 1L6 6L11 1"
-                      stroke="#2B3942"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                  </svg>
-                </span>
-              </div>
-            </div>
-            @if (
-              (eventForm.get("cycle")?.touched &&
-                eventForm.get("cycle")?.hasError("required")) ||
-              (eventForm.get("amount")?.touched &&
-                eventForm.get("amount")?.hasError("required")) ||
-              (eventForm.get("currency")?.touched &&
-                eventForm.get("currency")?.hasError("required"))
-            ) {
-              <span class="field-error d-block">{{
-                "Required" | translate
-              }}</span>
-            }
-          </div>
-
           <div class="start-end">
             <div class="d-flex flex-column gap-8">
               <mat-label
@@ -1734,6 +1613,184 @@
                 <span class="field-hint">{{ startEndDurationHint }}</span>
               }
             </div>
+          </div>
+          } @else {
+        <div class="w-100 form-field gap-8">
+          <div class="d-flex gap-4 align-items-center">
+            <mat-label class="f-s-16 f-w-500 ibr-black d-block">{{
+              "Date" | translate
+            }}</mat-label>
+            <img
+              width="18"
+              src="assets/images/svgs/help-circle-icon.svg"
+              alt="help-circle-icon"
+            />
+          </div>
+          <div class="position-relative">
+            <div class="w-100 form-field">
+              <div class="select-option position-relative">
+                <mat-select
+                  value="Select"
+                  formControlName="start"
+                  hideSingleSelectionIndicator
+                >
+                  @for (year of years; track year) {
+                    <mat-option [value]="year"
+                      >{{ year }} ({{ getAgeForYear(year) }})</mat-option
+                    >
+                  }
+                </mat-select>
+                <span class="custom-arrow">
+                  <svg
+                    width="12"
+                    height="7"
+                    viewBox="0 0 12 7"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M1 1L6 6L11 1"
+                      stroke="#2B3942"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </span>
+              </div>
+              @if (
+                eventForm.get("start")?.touched &&
+                eventForm.get("start")?.hasError("required")
+              ) {
+                <span class="field-error d-block">{{
+                  "Required" | translate
+                }}</span>
+              }
+            </div>
+          </div>
+        </div>
+          }
+
+          <div class="d-flex flex-column gap-8 tab">
+            <mat-label class="f-s-16 f-w-500 ibr-black d-flex align-items-center"
+              >{{ "Payment method" | translate }}
+              <img
+                src="assets/images/svgs/help-circle-icon.svg"
+                alt="help"
+                width="18"
+                class="m-l-4"
+                matTooltip="{{ 'ADD_EVENT.EVENT_TYPE_TOOLTIP' | translate }}"
+              />
+            </mat-label>
+            <div class="down-payment-toggle">
+              <label
+                class="dp-radio"
+                [class.active]="isCustomCashEvent"
+                (click)="onCustomCashControlClicked(true)"
+              >
+                <span class="dp-radio-circle"></span>
+                <span>{{ "Cash" | translate }}</span>
+              </label>
+              <label
+                class="dp-radio"
+                [class.active]="!isCustomCashEvent"
+                (click)="onCustomCashControlClicked(false)"
+              >
+                <span class="dp-radio-circle"></span>
+                <span>{{ "Financing" | translate }}</span>
+              </label>
+            </div>
+          </div>
+
+          @if (isCustomCashEvent) {
+          <div class="d-flex flex-column gap-8 net-fields">
+            <mat-label
+              class="f-s-16 f-w-500 d-flex align-items-center ibr-black"
+              style="line-height: 16px !important"
+              >{{ "Net amount" | translate }}
+              <img
+                src="assets/images/svgs/help-circle-icon.svg"
+                alt="help"
+                width="18"
+                class="m-l-4"
+                matTooltip="{{ 'ADD_EVENT.ENTER_AMOUNT_TOOLTIP' | translate }}"
+              />
+            </mat-label>
+
+            <div class="net-field d-flex align-items-center">
+              <div class="left hide-arrow">
+                <mat-select
+                  value="Â£"
+                  formControlName="currency"
+                  class="sortby-edit-profile"
+                  hideSingleSelectionIndicator
+                >
+                  @for (country of countries; track country) {
+                    @if (country.currencySymbol) {
+                      <mat-option [value]="country.currencySymbol">{{
+                        country.currencySymbol
+                      }}</mat-option>
+                    }
+                  }
+                </mat-select>
+              </div>
+              <div class="w-100 form-field">
+                <input
+                  matInput
+                  type="text"
+                  inputmode="decimal"
+                  formControlName="amount"
+                  #amountInput
+                  thousandSeparatorInput
+                  placeholder="0"
+                  [appAutoFocus]="isEditWorkflow && !showNameEdit"
+                  autoFocusSelect
+                />
+              </div>
+              <div class="right custom-select">
+                <mat-select
+                  (valueChange)="onCycleValueChange($event)"
+                  value="Select"
+                  formControlName="cycle"
+                  class="sortby-edit-profile"
+                  hideSingleSelectionIndicator
+                >
+                  @for (cycle of cycles; track cycle) {
+                    <mat-option [value]="cycle">{{ cycle | translate }}</mat-option>
+                  }
+                </mat-select>
+
+                <span class="custom-arrow">
+                  <svg
+                    width="12"
+                    height="7"
+                    viewBox="0 0 12 7"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M1 1L6 6L11 1"
+                      stroke="#2B3942"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </span>
+              </div>
+            </div>
+            @if (
+              (eventForm.get("cycle")?.touched &&
+                eventForm.get("cycle")?.hasError("required")) ||
+              (eventForm.get("amount")?.touched &&
+                eventForm.get("amount")?.hasError("required")) ||
+              (eventForm.get("currency")?.touched &&
+                eventForm.get("currency")?.hasError("required"))
+            ) {
+              <span class="field-error d-block">{{
+                "Required" | translate
+              }}</span>
+            }
           </div>
 
           @if (eventForm.get("cycle")?.value !== "One-off") {
@@ -2042,61 +2099,6 @@
               "Required" | translate
             }}</span>
           }
-        </div>
-
-        <div class="w-100 form-field gap-8">
-          <div class="d-flex gap-4 align-items-center">
-            <mat-label class="f-s-16 f-w-500 ibr-black d-block">{{
-              "Date" | translate
-            }}</mat-label>
-            <img
-              width="18"
-              src="assets/images/svgs/help-circle-icon.svg"
-              alt="help-circle-icon"
-            />
-          </div>
-          <div class="position-relative">
-            <div class="w-100 form-field">
-              <div class="select-option position-relative">
-                <mat-select
-                  value="Select"
-                  formControlName="start"
-                  hideSingleSelectionIndicator
-                >
-                  @for (year of years; track year) {
-                    <mat-option [value]="year"
-                      >{{ year }} ({{ getAgeForYear(year) }})</mat-option
-                    >
-                  }
-                </mat-select>
-                <span class="custom-arrow">
-                  <svg
-                    width="12"
-                    height="7"
-                    viewBox="0 0 12 7"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M1 1L6 6L11 1"
-                      stroke="#2B3942"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                  </svg>
-                </span>
-              </div>
-              @if (
-                eventForm.get("start")?.touched &&
-                eventForm.get("start")?.hasError("required")
-              ) {
-                <span class="field-error d-block">{{
-                  "Required" | translate
-                }}</span>
-              }
-            </div>
-          </div>
         </div>
 
           <div class="d-flex flex-column gap-8 net-fields">
