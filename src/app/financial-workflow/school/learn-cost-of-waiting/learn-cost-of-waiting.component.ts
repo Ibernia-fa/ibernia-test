@@ -349,6 +349,7 @@ export class LearnCostOfWaitingComponent implements OnInit {
         zoom: { enabled: false },
         animations: { enabled: true, easing: 'easeinout', speed: 500 },
         parentHeightOffset: 0,
+        cssClass: 'ibr-school-chart',
         selection: { enabled: true, type: 'dataPoint' },
         events: {
           dataPointMouseEnter: (_event: unknown, _chartCtx: unknown, opts: { dataPointIndex: number }) => {
@@ -441,6 +442,8 @@ export class LearnCostOfWaitingComponent implements OnInit {
       legend: { show: false },
       tooltip: {
         theme: 'light',
+        cssClass: 'ibr-school-tooltip',
+        style: { fontSize: '14px', fontFamily: 'Ubuntu, sans-serif' },
         y: {
           formatter: (value: number, opts?: { dataPointIndex?: number }) => {
             const idx = opts?.dataPointIndex ?? 0;

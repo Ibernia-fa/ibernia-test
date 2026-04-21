@@ -282,6 +282,7 @@ export class LearnCompoundInterestComponent implements OnInit {
         zoom: { enabled: false },
         animations: { enabled: true, easing: 'easeinout', speed: 550 },
         parentHeightOffset: 0,
+        cssClass: 'ibr-school-chart',
       },
       colors: [ACCENT, SERIES_MUTE],
       stroke: {
@@ -347,6 +348,8 @@ export class LearnCompoundInterestComponent implements OnInit {
       },
       tooltip: {
         theme: 'light',
+        cssClass: 'ibr-school-tooltip',
+        style: { fontSize: '14px', fontFamily: 'Ubuntu, sans-serif' },
         shared: true,
         intersect: false,
         y: {
@@ -384,6 +387,7 @@ export class LearnCompoundInterestComponent implements OnInit {
         zoom: { enabled: false },
         animations: { enabled: true, easing: 'easeinout', speed: 550 },
         parentHeightOffset: 0,
+        cssClass: 'ibr-school-chart',
       },
       colors: [SERIES_MUTE, ACCENT],
       stroke: {
@@ -449,6 +453,8 @@ export class LearnCompoundInterestComponent implements OnInit {
       },
       tooltip: {
         theme: 'light',
+        cssClass: 'ibr-school-tooltip',
+        style: { fontSize: '14px', fontFamily: 'Ubuntu, sans-serif' },
         shared: true,
         intersect: false,
         y: {
