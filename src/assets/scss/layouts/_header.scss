@@ -56,12 +56,14 @@ html .topbar {
 
 // New Styles
 .top-navigation-bar {
-  position: fixed;
+  // position: fixed;
+  position: sticky;
   top: 1rem;
   left: 0;
   z-index: 9;
   width: 100%;
-  padding: 16px 16px !important;
+  // padding: 16px 16px !important;
+  padding: 0 !important;
   background-color: transparent !important;
   // border-bottom: 1px solid #e7e7eb;
   // height: $header-height;
@@ -180,7 +182,7 @@ html .topbar {
     // background-color: #fff;
     // border: 1px solid #e7e7eb;
     border-top: 0px;
-    min-width: 190px;
+    min-width: 164px;
     list-style: none;
     padding: 0px;
     margin: 0px;
@@ -296,8 +298,10 @@ html .topbar {
 
 // Header margin and width when sidebar is visible - keeps bell/avatar within viewport
 .sidebar-visible .top-navigation-bar {
-  margin-left: 273px;
-  width: calc(100% - 273px);
+  // margin-left: 273px;
+  // width: calc(100% - 273px);
+  margin-left: 16px;
+  width: calc(100% - 16px);
   // transition:
   //   margin-left 0.3s ease,
   //   width 0.3s ease;
@@ -312,8 +316,10 @@ html .topbar {
   width: 100%;
 }
 .sidebar-visible.sidebar-collapsed .top-navigation-bar {
-  margin-left: 88px;
-  width: calc(100% - 88px);
+  // margin-left: 88px;
+  // width: calc(100% - 88px);
+  margin-left: 16px;
+  width: calc(100% - 16px);
   // transition:
   //   margin-left 0.3s ease,
   //   width 0.3s ease;
