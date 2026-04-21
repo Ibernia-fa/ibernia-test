@@ -32,7 +32,7 @@
   <mat-dialog-content class="learn-compound__content">
     @if (view() === 'growth') {
       <div class="learn-compound__page learn-compound__page--growth">
-        <h1 class="learn-compound__hero">
+        <h1 class="learn-compound__hero" appAutoFitTitle>
           {{ "LEARN_COMPOUND.HERO_TITLE" | translate }}
         </h1>
 
@@ -200,7 +200,7 @@
       </div>
     } @else {
       <div class="learn-compound__page learn-compound__page--growth learn-compound__page--compare-chart">
-        <h1 class="learn-compound__hero">
+        <h1 class="learn-compound__hero" appAutoFitTitle>
           {{ "LEARN_COMPOUND.COMPARE_TITLE" | translate }}
         </h1>
 

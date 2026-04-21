@@ -20,6 +20,7 @@ import {
 import { MatIconModule } from '@angular/material/icon';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
+import { AutoFitTitleDirective } from 'src/app/directives/auto-fit-title.directive';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 import { CurrencySymbolPipe } from 'src/app/pipe/currency-symbol.pipe';
 import {
@@ -46,6 +47,7 @@ export type CashBufferInterpretation = 'below' | 'within' | 'above' | 'neutral';
     MatIconModule,
     TranslateModule,
     ThousandSeparatorInputDirective,
+    AutoFitTitleDirective,
   ],
   templateUrl: './learn-cash-buffer.component.html',
   styleUrl: './learn-cash-buffer.component.scss',

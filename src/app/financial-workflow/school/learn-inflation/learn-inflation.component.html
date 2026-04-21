@@ -30,7 +30,7 @@
   <mat-dialog-content class="learn-inflation__content">
     @if (view() === 'impact') {
       <div class="learn-inflation__page learn-inflation__page--impact">
-        <h1 class="learn-inflation__hero">
+        <h1 class="learn-inflation__hero" appAutoFitTitle>
           {{ "LEARN_INFLATION.HERO" | translate }}
         </h1>
 
@@ -96,11 +96,10 @@
                   </span>
                 }
               </span>
+              <p class="impact-card__note">
+                {{ "LEARN_INFLATION.SUPPORTING_COPY" | translate }}
+              </p>
             </div>
-
-            <p class="impact-supporting-copy">
-              {{ "LEARN_INFLATION.SUPPORTING_COPY" | translate }}
-            </p>
           </aside>
 
           <!-- RIGHT: chart -->
@@ -182,10 +181,10 @@
     } @else if (view() === 'causes') {
       <div class="learn-inflation__page learn-inflation__page--causes">
         <header class="causes-header">
-          <h1 class="causes-header__title">
+          <h1 class="causes-header__title" appAutoFitTitle>
             {{ "LEARN_INFLATION.CAUSES_TITLE" | translate }}
           </h1>
-          <p class="causes-header__intro">
+          <p class="causes-header__intro" appFitSubtitle>
             {{ "LEARN_INFLATION.CAUSES_INTRO" | translate }}
           </p>
         </header>
@@ -227,10 +226,10 @@
     } @else {
       <div class="learn-inflation__page learn-inflation__page--countries">
         <header class="countries-header">
-          <h1 class="countries-header__title">
+          <h1 class="countries-header__title" appAutoFitTitle>
             {{ "LEARN_INFLATION.COUNTRIES_TITLE" | translate }}
           </h1>
-          <p class="countries-header__intro">
+          <p class="countries-header__intro" appFitSubtitle>
             {{ "LEARN_INFLATION.COUNTRIES_INTRO" | translate }}
           </p>
         </header>

@@ -22,6 +22,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { NgApexchartsModule } from 'ng-apexcharts';
 
+import { AutoFitTitleDirective } from 'src/app/directives/auto-fit-title.directive';
+import { FitSubtitleDirective } from 'src/app/directives/fit-subtitle.directive';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 import { CurrencySymbolPipe } from 'src/app/pipe/currency-symbol.pipe';
 import {
@@ -123,6 +125,8 @@ const INFLATION_ACROSS_COUNTRIES_DATA = {
     NgApexchartsModule,
     TranslateModule,
     ThousandSeparatorInputDirective,
+    AutoFitTitleDirective,
+    FitSubtitleDirective,
   ],
   templateUrl: './learn-inflation.component.html',
   styleUrl: './learn-inflation.component.scss',

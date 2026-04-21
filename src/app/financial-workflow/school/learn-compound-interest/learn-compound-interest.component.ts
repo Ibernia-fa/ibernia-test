@@ -23,6 +23,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { NgApexchartsModule } from 'ng-apexcharts';
 
+import { AutoFitTitleDirective } from 'src/app/directives/auto-fit-title.directive';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
 import { CurrencySymbolPipe } from 'src/app/pipe/currency-symbol.pipe';
 import {
@@ -58,6 +59,7 @@ const SERIES_MUTE = '#9aa3c7';
     NgApexchartsModule,
     TranslateModule,
     ThousandSeparatorInputDirective,
+    AutoFitTitleDirective,
   ],
   templateUrl: './learn-compound-interest.component.html',
   styleUrl: './learn-compound-interest.component.scss',
