@@ -127,14 +127,6 @@ export class LearnInvestToReachGoalComponent implements OnInit {
 
   readonly hasClientAge = computed(() => Number.isFinite(this.currentAge));
 
-  /** Positive finite age only; used for the secondary age axis (not hasClientAge). */
-  readonly showSecondaryAgeAxis = computed(
-    () =>
-      this.horizonValid() &&
-      Number.isFinite(this.currentAge) &&
-      this.currentAge > 0,
-  );
-
   readonly yearsToInvest = computed(() => {
     const end = this.goalAge();
     const start = this.currentAge;
@@ -185,32 +177,6 @@ export class LearnInvestToReachGoalComponent implements OnInit {
   });
 
   readonly chartOptions = computed(() => this.buildChartOptions());
-
-  /**
-   * Age ticks aligned to the same year indices as the primary Year axis (every 5 years),
-   * plus a terminal tick at the goal age when the horizon is not a multiple of 5.
-   */
-  readonly secondaryAgeAxisTicks = computed(() => {
-    if (!this.showSecondaryAgeAxis()) return [] as { yearIndex: number; label: string }[];
-    const years = this.yearsToInvest();
-    if (years <= 0) return [];
-    const startAge = Math.trunc(this.currentAge);
-    const goal = Math.trunc(this.goalAge());
-    const prefix = this.translate.instant('LEARN_INVEST_GOAL.AXIS_AGE_PREFIX');
-    const indices = new Set<number>();
-    for (let i = 0; i <= years; i += 5) {
-      indices.add(i);
-    }
-    if (years % 5 !== 0) {
-      indices.add(years);
-    }
-    return [...indices]
-      .sort((a, b) => a - b)
-      .map((yearIndex) => ({
-        yearIndex,
-        label: `${prefix}${yearIndex === years ? goal : startAge + yearIndex}`,
-      }));
-  });
 
   constructor(
     public dialogRef: MatDialogRef<LearnInvestToReachGoalComponent>,
@@ -368,18 +334,6 @@ export class LearnInvestToReachGoalComponent implements OnInit {
               borderColor: GOAL_LINE,
               strokeDashArray: 6,
               borderWidth: 2,
-              label: {
-                borderColor: GOAL_LINE,
-                style: {
-                  color: '#ffffff',
-                  background: GOAL_LINE,
-                  fontSize: '11px',
-                  fontWeight: 600,
-                  fontFamily: 'Ubuntu, sans-serif',
-                },
-                text: this.translate.instant('LEARN_INVEST_GOAL.GOAL_LABEL'),
-                offsetY: -6,
-              },
             },
           ]
         : [];
@@ -398,11 +352,13 @@ export class LearnInvestToReachGoalComponent implements OnInit {
       },
       colors: [ACCENT],
       stroke: {
-        width: 3.2,
+        width: 3,
         curve: 'smooth',
+        lineCap: 'round',
       },
       markers: {
         size: 0,
+        strokeWidth: 0,
         hover: { size: 5 },
       },
       dataLabels: { enabled: false },
@@ -411,7 +367,7 @@ export class LearnInvestToReachGoalComponent implements OnInit {
         strokeDashArray: 4,
         xaxis: { lines: { show: false } },
         yaxis: { lines: { show: true } },
-        padding: { left: 4, right: 12, top: 8, bottom: 4 },
+        padding: { left: 8, right: 24, top: 8, bottom: 0 },
       },
       annotations: {
         yaxis: annotationsY,
@@ -446,27 +402,12 @@ export class LearnInvestToReachGoalComponent implements OnInit {
             formatAppDisplayNumber(this.translate.currentLang, Math.round(value)),
         },
       },
-      legend: {
-        show: true,
-        position: 'top',
-        horizontalAlign: 'left',
-        offsetY: -4,
-        fontFamily: 'Ubuntu, sans-serif',
-        fontSize: '12px',
-        fontWeight: 600,
-        labels: { colors: '#5a596e' },
-        markers: {
-          width: 8,
-          height: 8,
-          radius: 8,
-          offsetX: -2,
-        },
-        itemMargin: { horizontal: 14, vertical: 2 },
-      },
+      legend: { show: false },
       tooltip: {
         theme: 'light',
         cssClass: 'ibr-school-tooltip',
         style: { fontSize: '14px', fontFamily: 'Ubuntu, sans-serif' },
+        marker: { show: false },
         x: {
           formatter: (_val: unknown, opts?: { dataPointIndex?: number }) => {
             const idx = opts?.dataPointIndex ?? 0;
@@ -475,6 +416,9 @@ export class LearnInvestToReachGoalComponent implements OnInit {
         },
         y: {
           formatter: (value: number) => formatCurrency(value),
+          title: {
+            formatter: () => seriesName,
+          },
         },
       },
     };

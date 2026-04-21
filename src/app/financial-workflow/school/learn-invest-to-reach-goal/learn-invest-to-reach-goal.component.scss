@@ -1,7 +1,9 @@
 $ibernia-blue: #4043af;
+$ibernia-blue-soft: #516ce8;
 $ibernia-ink: #1c1c1c;
 $ibernia-mute: #5a596e;
 $ibernia-line: #e5e5ec;
+$ibernia-bg-soft: #f5f7ff;
 
 :host {
   display: flex;
@@ -22,6 +24,7 @@ $ibernia-line: #e5e5ec;
   position: relative;
 }
 
+/* ----- Top header (close btn) ----- */
 .learn-invest-goal__header {
   position: absolute;
   top: 0;
@@ -51,8 +54,6 @@ $ibernia-line: #e5e5ec;
   min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  overflow: hidden;
   animation: learnInvestGoalFadeIn 320ms ease;
 }
 
@@ -67,44 +68,73 @@ $ibernia-line: #e5e5ec;
   }
 }
 
-.learn-invest-goal__hero {
+/* ============================================================
+   PAGE — Invest to reach goal (aligned with learn-inflation impact)
+   ============================================================ */
+
+$invest-goal-gutter: 56px;
+
+.learn-invest-goal__page--main {
+  gap: 14px;
+  overflow: hidden;
   /* Shared School header rule: title row top = 14px (matches close btn). */
-  margin: 14px 56px 0;
-  font-size: 30px;
-  line-height: 1.18;
+  padding: 14px $invest-goal-gutter 16px;
+}
+
+.learn-invest-goal__hero {
+  margin: 0;
+  font-size: 26px;
+  line-height: 1.2;
   font-weight: 700;
   letter-spacing: -0.4px;
   color: $ibernia-ink;
   text-align: left;
   max-width: 100%;
+  padding-right: 48px; /* keep clear of close icon */
 }
 
 .learn-invest-goal__layout {
   display: grid;
-  grid-template-columns: minmax(280px, 360px) 1fr;
-  gap: 32px;
+  grid-template-columns: minmax(280px, 340px) 1fr;
+  gap: 24px;
   flex: 1 1 auto;
   min-height: 0;
   align-items: stretch;
+  overflow: hidden;
 }
 
 .learn-invest-goal__side {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
   min-width: 0;
   min-height: 0;
-  overflow: hidden;
 }
 
+/* ----- Two-column row for input cards ----- */
 .invest-goal-inputs__pair {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: 10px;
+}
+
+/* ----- Real-value toggle row (toggle + optional inflation card) ----- */
+.invest-goal-toggle-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  align-items: stretch;
+
+  &--paired {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 .invest-goal-real-toggle {
-  padding: 2px 2px 0;
+  display: flex;
+  align-items: center;
+  padding: 4px 4px 4px 2px;
+  min-height: 100%;
 
   &__label {
     font-size: 13px;
@@ -121,14 +151,18 @@ $ibernia-line: #e5e5ec;
   }
 }
 
+/* ----- Editable / output cards (mirrors learn-inflation .impact-card) ----- */
 .impact-card {
+  position: relative;
   border: 1px solid $ibernia-line;
   border-radius: 14px;
-  padding: 16px 18px;
+  padding: 14px 18px;
   background: #ffffff;
   display: flex;
   flex-direction: column;
   gap: 6px;
+  flex: 0 0 auto;
+  box-shadow: 0 1px 0 rgba(20, 22, 48, 0.02);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 
   &:focus-within {
@@ -137,10 +171,10 @@ $ibernia-line: #e5e5ec;
   }
 
   &__label {
-    font-size: 13px;
-    font-weight: 500;
+    font-size: 11px;
+    font-weight: 600;
     color: $ibernia-mute;
-    letter-spacing: 0.2px;
+    letter-spacing: 0.6px;
     text-transform: uppercase;
   }
 
@@ -148,25 +182,35 @@ $ibernia-line: #e5e5ec;
     display: flex;
     align-items: baseline;
     gap: 6px;
-    font-size: 28px;
+    font-size: 26px;
     font-weight: 700;
     line-height: 1.1;
     color: $ibernia-ink;
     font-variant-numeric: tabular-nums;
 
     &--rate-pair {
-      font-size: 24px;
+      font-size: 22px;
+    }
+
+    &--tight {
+      gap: 2px;
     }
   }
 
   &__currency {
-    font-size: 17px;
+    font-size: 16px;
     font-weight: 600;
     color: $ibernia-mute;
   }
 
+  &__readout {
+    font: inherit;
+    color: inherit;
+    word-break: break-word;
+  }
+
   &__suffix {
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 600;
     color: $ibernia-mute;
     flex-shrink: 0;
@@ -190,88 +234,100 @@ $ibernia-line: #e5e5ec;
     }
   }
 
+  &__note {
+    margin: 10px 0 0;
+    padding-top: 10px;
+    border-top: 1px solid rgba(64, 67, 175, 0.12);
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: $ibernia-mute;
+    font-weight: 400;
+    letter-spacing: 0.1px;
+  }
+
   &--accent {
-    background: linear-gradient(135deg, rgba(64, 67, 175, 0.08), rgba(81, 108, 232, 0.04));
-    border-color: rgba(64, 67, 175, 0.18);
+    padding: 16px 18px 18px;
+    background:
+      linear-gradient(135deg, rgba(64, 67, 175, 0.09), rgba(81, 108, 232, 0.035));
+    border-color: rgba(64, 67, 175, 0.22);
+    box-shadow:
+      0 1px 0 rgba(20, 22, 48, 0.02),
+      0 8px 22px rgba(64, 67, 175, 0.07);
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: 12px;
+      bottom: 12px;
+      left: 0;
+      width: 3px;
+      border-radius: 0 3px 3px 0;
+      background: linear-gradient(180deg, $ibernia-blue, $ibernia-blue-soft);
+    }
+
+    .impact-card__value,
+    .impact-card__readout {
+      color: $ibernia-blue;
+      font-size: 28px;
+      letter-spacing: -0.3px;
+    }
+
+    .impact-card__currency {
+      color: rgba(64, 67, 175, 0.7);
+      font-size: 18px;
+    }
   }
 }
 
+/* ----- Result card extras ----- */
 .invest-goal-result {
-  flex-shrink: 0;
-
-  &__lead {
-    margin: 0;
-    font-size: 20px;
-    font-weight: 700;
-    line-height: 1.28;
-    color: $ibernia-blue;
-    font-variant-numeric: tabular-nums;
-    word-break: break-word;
-  }
-
-  &__note {
-    margin: 8px 0 0;
-    font-size: 13px;
-    font-weight: 500;
-    line-height: 1.45;
-    color: $ibernia-mute;
-
-    &--subtle {
-      font-weight: 400;
-      color: rgba(90, 89, 110, 0.92);
-    }
-  }
-
   &__muted {
     margin: 0;
     font-size: 14px;
     font-weight: 500;
-    line-height: 1.45;
+    line-height: 1.5;
     color: $ibernia-mute;
+  }
+
+  &__sub {
+    margin-top: 4px;
+    font-size: 13px;
+    line-height: 1.5;
+    font-weight: 500;
+    color: rgba(90, 89, 110, 0.92);
+    letter-spacing: 0.1px;
   }
 }
 
-.impact-supporting-copy {
-  margin: 0;
-  font-size: 13px;
-  line-height: 1.45;
-  color: $ibernia-mute;
-  font-weight: 400;
-  letter-spacing: 0.1px;
-  border-left: 2px solid rgba(64, 67, 175, 0.18);
-  padding: 2px 0 2px 12px;
-}
-
-.invest-goal-chart-footnote {
-  flex-shrink: 0;
-  margin-top: 10px;
-  max-width: 560px;
-}
-
+/* ----- Right side: chart ----- */
 .learn-invest-goal__main {
   display: flex;
   flex-direction: column;
-  gap: 0;
+  gap: 12px;
   min-width: 0;
   min-height: 0;
+  overflow: hidden;
 }
 
 .learn-invest-goal__chart {
   flex: 1 1 auto;
-  min-height: 260px;
+  min-height: 240px;
+  height: 100%;
   border: 1px solid $ibernia-line;
   border-radius: 16px;
-  background: #ffffff;
+  background:
+    radial-gradient(120% 80% at 50% 0%, rgba(64, 67, 175, 0.035) 0%, rgba(64, 67, 175, 0) 60%),
+    #ffffff;
   position: relative;
+  overflow: hidden;
+  box-shadow:
+    0 1px 0 rgba(20, 22, 48, 0.02),
+    0 10px 28px rgba(64, 67, 175, 0.05);
 
   apx-chart {
     position: absolute;
-    inset: 10px 10px 4px 4px;
+    inset: 14px 18px 8px 6px;
     display: block;
-  }
-
-  &--age-axis apx-chart {
-    inset: 10px 10px 22px 4px;
   }
 
   &--empty {
@@ -279,49 +335,8 @@ $ibernia-line: #e5e5ec;
     align-items: center;
     justify-content: center;
     padding: 24px;
-  }
-}
-
-.invest-goal-age-axis {
-  position: absolute;
-  left: 4px;
-  right: 10px;
-  bottom: 2px;
-  height: 18px;
-  pointer-events: none;
-  z-index: 1;
-  font-family: "Ubuntu", sans-serif;
-  font-size: 12px;
-  line-height: 1.2;
-  font-weight: 400;
-  color: rgba(90, 89, 110, 0.72);
-  letter-spacing: 0.01em;
-
-  &__tick {
-    position: absolute;
-    top: 0;
-    transform: translateX(-50%);
-    white-space: nowrap;
-    max-width: 22%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    text-align: center;
-
-    &--first {
-      transform: translateX(0);
-      text-align: left;
-    }
-
-    &--last {
-      transform: translateX(-100%);
-      text-align: right;
-    }
-
-    &--first.invest-goal-age-axis__tick--last {
-      left: 50% !important;
-      transform: translateX(-50%);
-      text-align: center;
-    }
+    background: #ffffff;
+    box-shadow: 0 1px 0 rgba(20, 22, 48, 0.02);
   }
 }
 
@@ -334,16 +349,50 @@ $ibernia-line: #e5e5ec;
   color: $ibernia-mute;
 }
 
+/* ----- Bottom disclaimer (matches inflation/compound/cost-of-waiting) ----- */
+.learn-invest-goal__page--main .school-notice {
+  margin: 6px 0 0;
+  width: 100%;
+  max-width: none;
+  align-self: stretch;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 12px 18px;
+
+  .school-notice__icon {
+    align-self: center;
+    width: 18px;
+    height: 18px;
+    font-size: 18px;
+    line-height: 1;
+    overflow: visible;
+  }
+
+  .school-notice__text {
+    align-self: center;
+  }
+}
+
+/* ============================================================
+   Responsiveness
+   ============================================================ */
+
 @media (max-width: 1024px) {
+  .learn-invest-goal__page--main {
+    /* Keep the shared 14px header top on tablet, just tighten the side gutter. */
+    padding: 14px 20px 14px;
+  }
+
   .learn-invest-goal__hero {
-    /* Shared School header rule: keep title row top at 14px on tablet too. */
-    margin: 14px 16px 0;
+    margin: 0;
     font-size: 22px;
+    padding-right: 40px;
   }
 
   .learn-invest-goal__layout {
     grid-template-columns: 1fr;
-    gap: 18px;
+    gap: 16px;
     overflow-y: auto;
     min-height: 0;
   }
@@ -355,22 +404,32 @@ $ibernia-line: #e5e5ec;
 
   .learn-invest-goal__main {
     order: 1;
-    min-height: 220px;
+    min-height: 240px;
   }
 
   .learn-invest-goal__chart {
-    min-height: 220px;
-    height: 240px;
+    min-height: 240px;
+    height: 260px;
     flex: 0 0 auto;
+  }
+
+  .impact-card__value {
+    font-size: 24px;
+  }
+
+  .impact-card--accent .impact-card__value,
+  .impact-card--accent .impact-card__readout {
+    font-size: 26px;
   }
 }
 
 @media (max-width: 600px) {
   .learn-invest-goal__hero {
-    font-size: 19px;
+    font-size: 20px;
   }
 
-  .invest-goal-inputs__pair {
+  .invest-goal-inputs__pair,
+  .invest-goal-toggle-row--paired {
     grid-template-columns: 1fr;
   }
 
@@ -379,22 +438,25 @@ $ibernia-line: #e5e5ec;
   }
 
   .impact-card__value {
-    font-size: 24px;
+    font-size: 22px;
 
     &--rate-pair {
-      font-size: 22px;
+      font-size: 20px;
     }
   }
 
-  .invest-goal-result__lead {
-    font-size: 18px;
+  .impact-card--accent .impact-card__value,
+  .impact-card--accent .impact-card__readout {
+    font-size: 24px;
   }
 }
 
+/* ============================================================
+   Dialog surface tweaks
+   ============================================================ */
 :host ::ng-deep .mdc-dialog__surface {
   display: flex;
   flex-direction: column;
-  max-height: 88vh;
 }
 
 :host ::ng-deep .learn-invest-goal__content.mat-mdc-dialog-content {
