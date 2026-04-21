@@ -69,7 +69,8 @@ $benchmark-orange: #d49252;
 }
 
 .learn-cash-buffer__hero {
-  margin: 8px 56px 0;
+  /* Shared School header rule: title row top = 14px (matches close btn). */
+  margin: 14px 56px 0;
   font-size: 30px;
   line-height: 1.18;
   font-weight: 700;
@@ -512,7 +513,8 @@ $benchmark-orange: #d49252;
 
 @media (max-width: 1024px) {
   .learn-cash-buffer__hero {
-    margin: 8px 16px 0;
+    /* Shared School header rule: keep title row top at 14px on tablet too. */
+    margin: 14px 16px 0;
     font-size: 24px;
   }
 

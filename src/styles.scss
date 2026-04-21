@@ -1461,3 +1461,35 @@ app-branding {
     margin: 4px auto 12px;
   }
 }
+
+/* ============================================================
+   School Slide Header — shared top alignment system
+   ------------------------------------------------------------
+   All School learning dialogs (panelClass: "learn-inflation-dialog-panel")
+   share the same fixed top header so the back button, the title and
+   the close button always sit on the same row across slides.
+
+   Anchors:
+     - back / close buttons: top 14px, side inset 14px
+     - title row top edge:   14px from the modal content top
+     - subtitle gap:         8px below the title
+     - horizontal gutter:    56px (so titles never collide with the
+                             back / close icons)
+
+   Per-slide files only set their hero font-size (auto-shrunk by
+   AutoFitTitleDirective). They MUST NOT change the top offset or the
+   page padding-top values defined here.
+   ============================================================ */
+.learn-inflation-dialog-panel {
+  /* Force the close button into the shared header row. */
+  .dialog-close-btn {
+    top: 14px !important;
+    right: 14px !important;
+  }
+
+  /* Remove any default mat-dialog-content top padding so the school
+     page wrappers fully control where the title row sits. */
+  .mat-mdc-dialog-content {
+    padding-top: 0 !important;
+  }
+}

@@ -64,7 +64,8 @@ $ibernia-bg-soft: #f5f7ff;
 
 /* ----- Hero title (matches Inflation/Compound) ----- */
 .learn-rb__hero {
-  margin: 8px 56px 0;
+  /* Shared School header rule: title row top = 14px (matches close btn). */
+  margin: 14px 56px 0;
   font-size: 30px;
   line-height: 1.18;
   font-weight: 700;
@@ -335,7 +336,8 @@ $ibernia-bg-soft: #f5f7ff;
 /* ----- Responsive ----- */
 @media (max-width: 1024px) {
   .learn-rb__hero {
-    margin: 8px 16px 0;
+    /* Shared School header rule: keep title row top at 14px on tablet too. */
+    margin: 14px 16px 0;
     font-size: 24px;
   }
 
