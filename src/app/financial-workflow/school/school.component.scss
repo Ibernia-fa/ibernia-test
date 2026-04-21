@@ -10,9 +10,22 @@
 
     .ibr-new-subheading {
       margin: 0 auto;
-      max-width: 602px;
       line-height: 20px;
       font-size: 16px;
+    }
+
+    /** School page subtitle: wider on desktop (one line when it fits); balanced wrap on smaller widths. */
+    .school-page-subtitle {
+      max-width: min(100%, 36rem);
+      text-wrap: balance;
+
+      @media (min-width: 1024px) {
+        max-width: min(100%, 58rem);
+      }
+
+      @media (min-width: 1280px) {
+        max-width: min(100%, 64rem);
+      }
     }
   }
 }
@@ -23,11 +36,12 @@
   margin: 0 auto;
 }
 
-/** School tiles: 3×2 + centered solo row on large screens; stacks on small. */
+/** School tiles: row-major fill (left → center → right); stacks on small screens. */
 .card-grid {
   display: grid;
   gap: 24px;
   grid-template-columns: 1fr;
+  grid-auto-flow: row;
 }
 
 .card-grid .card {
@@ -39,24 +53,11 @@
   .card-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-
-  .card-grid__solo {
-    grid-column: 1 / -1;
-    width: min(100%, 420px);
-    justify-self: center;
-  }
 }
 
 @media (min-width: 1024px) {
   .card-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  /** Same width as one column (two 24px gutters across three tracks). */
-  .card-grid__solo {
-    grid-column: 1 / -1;
-    width: min(100%, calc((100% - 48px) / 3));
-    justify-self: center;
   }
 }
 
