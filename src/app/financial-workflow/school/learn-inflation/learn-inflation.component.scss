@@ -84,26 +84,30 @@ $ibernia-bg-soft: #f5f7ff;
    PAGE 1 — Inflation impact
    ============================================================ */
 
+$impact-gutter: 56px;
+
 .learn-inflation__page--impact {
-  gap: 16px;
+  gap: 14px;
   overflow: hidden;
+  padding: 8px $impact-gutter 16px;
 }
 
 .learn-inflation__hero {
-  margin: 4px 56px 0;
-  font-size: 26px;
-  line-height: 1.2;
+  margin: 0;
+  font-size: 24px;
+  line-height: 1.25;
   font-weight: 700;
   letter-spacing: -0.4px;
   color: $ibernia-ink;
   text-align: left;
   max-width: 880px;
+  padding-right: 48px; /* keep clear of close icon */
 }
 
 .learn-inflation__layout {
   display: grid;
-  grid-template-columns: minmax(280px, 360px) 1fr;
-  gap: 28px;
+  grid-template-columns: minmax(280px, 340px) 1fr;
+  gap: 24px;
   flex: 1 1 auto;
   min-height: 0;
   align-items: stretch;
@@ -120,13 +124,16 @@ $ibernia-bg-soft: #f5f7ff;
 
 /* ----- Editable / output cards ----- */
 .impact-card {
+  position: relative;
   border: 1px solid $ibernia-line;
   border-radius: 14px;
-  padding: 12px 18px;
+  padding: 14px 18px;
   background: #ffffff;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
+  flex: 0 0 auto;
+  box-shadow: 0 1px 0 rgba(20, 22, 48, 0.02);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 
   &:focus-within {
@@ -135,10 +142,10 @@ $ibernia-bg-soft: #f5f7ff;
   }
 
   &__label {
-    font-size: 13px;
-    font-weight: 500;
+    font-size: 11px;
+    font-weight: 600;
     color: $ibernia-mute;
-    letter-spacing: 0.2px;
+    letter-spacing: 0.6px;
     text-transform: uppercase;
   }
 
@@ -184,7 +191,7 @@ $ibernia-bg-soft: #f5f7ff;
       flex-direction: column;
       align-items: flex-start;
       gap: 2px;
-      margin-top: 2px;
+      margin-top: 4px;
     }
   }
 
@@ -224,16 +231,34 @@ $ibernia-bg-soft: #f5f7ff;
   }
 
   &--accent {
-    background: linear-gradient(135deg, rgba(64, 67, 175, 0.08), rgba(81, 108, 232, 0.04));
-    border-color: rgba(64, 67, 175, 0.18);
+    padding: 16px 18px 18px;
+    background:
+      linear-gradient(135deg, rgba(64, 67, 175, 0.09), rgba(81, 108, 232, 0.035));
+    border-color: rgba(64, 67, 175, 0.22);
+    box-shadow:
+      0 1px 0 rgba(20, 22, 48, 0.02),
+      0 8px 22px rgba(64, 67, 175, 0.07);
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: 12px;
+      bottom: 12px;
+      left: 0;
+      width: 3px;
+      border-radius: 0 3px 3px 0;
+      background: linear-gradient(180deg, $ibernia-blue, $ibernia-blue-soft);
+    }
 
     .impact-card__value,
     .impact-card__readout {
       color: $ibernia-blue;
+      font-size: 30px;
     }
 
     .impact-card__currency {
       color: rgba(64, 67, 175, 0.7);
+      font-size: 18px;
     }
   }
 }
@@ -242,7 +267,7 @@ $ibernia-bg-soft: #f5f7ff;
 .learn-inflation__main {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 12px;
   min-width: 0;
   min-height: 0;
   overflow: hidden;
@@ -250,32 +275,36 @@ $ibernia-bg-soft: #f5f7ff;
 
 .learn-inflation__chart {
   flex: 1 1 auto;
-  min-height: 0;
+  min-height: 240px;
   height: 100%;
-  max-height: clamp(220px, 38vh, 360px);
   border: 1px solid $ibernia-line;
   border-radius: 16px;
-  background: #ffffff;
+  background:
+    radial-gradient(120% 80% at 50% 0%, rgba(64, 67, 175, 0.035) 0%, rgba(64, 67, 175, 0) 60%),
+    #ffffff;
   position: relative;
   overflow: hidden;
+  box-shadow:
+    0 1px 0 rgba(20, 22, 48, 0.02),
+    0 10px 28px rgba(64, 67, 175, 0.05);
 
   apx-chart {
     position: absolute;
-    inset: 8px 12px 4px 4px;
+    inset: 14px 18px 8px 6px;
     display: block;
   }
 }
 
 /* ----- Supporting educational copy under value-after-20y card ----- */
 .impact-supporting-copy {
-  margin: 2px 4px 0;
+  margin: auto 4px 0; /* margin-top:auto pushes copy to bottom of side column */
   font-size: 12.5px;
-  line-height: 1.45;
+  line-height: 1.5;
   color: $ibernia-mute;
   font-weight: 400;
   letter-spacing: 0.1px;
-  border-left: 2px solid rgba(64, 67, 175, 0.18);
-  padding: 2px 0 2px 12px;
+  border-left: 2px solid rgba(64, 67, 175, 0.22);
+  padding: 4px 0 4px 12px;
 }
 
 /* ----- Bottom CTA row ----- */
@@ -284,12 +313,13 @@ $ibernia-bg-soft: #f5f7ff;
   justify-content: flex-end;
   align-items: center;
   flex-shrink: 0;
+  margin-top: 2px;
 }
 
 .learn-inflation__cta-group {
   display: inline-flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   flex-wrap: wrap;
   justify-content: flex-end;
 }
@@ -298,14 +328,14 @@ $ibernia-bg-soft: #f5f7ff;
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  height: 40px;
+  height: 38px;
   padding: 0 16px;
   border-radius: 10px;
   border: 1px solid $ibernia-line;
   background: #ffffff;
   color: $ibernia-ink;
   font-family: "Ubuntu", sans-serif;
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease,
@@ -332,6 +362,15 @@ $ibernia-bg-soft: #f5f7ff;
     outline: 2px solid $ibernia-blue;
     outline-offset: 3px;
   }
+}
+
+/* ----- Override shared school-notice spacing inside this slide ----- */
+.learn-inflation__page--impact .school-notice {
+  margin: 6px 0 0;
+  width: 100%;
+  max-width: none;
+  align-self: stretch;
+  justify-content: center;
 }
 
 /* ============================================================
@@ -634,14 +673,19 @@ $ibernia-bg-soft: #f5f7ff;
    ============================================================ */
 
 @media (max-width: 1024px) {
+  .learn-inflation__page--impact {
+    padding: 8px 20px 14px;
+  }
+
   .learn-inflation__hero {
-    margin: 8px 16px 0;
-    font-size: 26px;
+    margin: 0;
+    font-size: 22px;
+    padding-right: 40px;
   }
 
   .learn-inflation__layout {
     grid-template-columns: 1fr;
-    gap: 20px;
+    gap: 16px;
   }
 
   .learn-inflation__side {
@@ -653,6 +697,11 @@ $ibernia-bg-soft: #f5f7ff;
   }
 
   .impact-card__value {
+    font-size: 24px;
+  }
+
+  .impact-card--accent .impact-card__value,
+  .impact-card--accent .impact-card__readout {
     font-size: 26px;
   }
 
