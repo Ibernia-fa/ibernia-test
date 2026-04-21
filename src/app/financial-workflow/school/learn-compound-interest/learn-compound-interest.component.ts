@@ -305,13 +305,16 @@ export class LearnCompoundInterestComponent implements OnInit {
         strokeDashArray: 4,
         xaxis: { lines: { show: false } },
         yaxis: { lines: { show: true } },
-        padding: { left: 4, right: 12, top: 4, bottom: 4 },
+        padding: { left: 8, right: 24, top: 8, bottom: 0 },
       },
       xaxis: {
         type: 'category',
         categories,
+        tickPlacement: 'on',
         axisBorder: { show: false },
         axisTicks: { show: false },
+        crosshairs: { show: true, stroke: { color: 'rgba(64, 67, 175, 0.18)', width: 1, dashArray: 0 } },
+        tooltip: { enabled: false },
         labels: {
           style: {
             colors: '#5a596e',
@@ -354,6 +357,8 @@ export class LearnCompoundInterestComponent implements OnInit {
         style: { fontSize: '14px', fontFamily: 'Ubuntu, sans-serif' },
         shared: true,
         intersect: false,
+        followCursor: false,
+        x: { show: true },
         y: {
           formatter: (value: number) => formatCurrency(value),
         },
@@ -410,13 +415,16 @@ export class LearnCompoundInterestComponent implements OnInit {
         strokeDashArray: 4,
         xaxis: { lines: { show: false } },
         yaxis: { lines: { show: true } },
-        padding: { left: 4, right: 12, top: 4, bottom: 4 },
+        padding: { left: 8, right: 24, top: 8, bottom: 0 },
       },
       xaxis: {
         type: 'category',
         categories,
+        tickPlacement: 'on',
         axisBorder: { show: false },
         axisTicks: { show: false },
+        crosshairs: { show: true, stroke: { color: 'rgba(64, 67, 175, 0.18)', width: 1, dashArray: 0 } },
+        tooltip: { enabled: false },
         labels: {
           style: {
             colors: '#5a596e',
@@ -459,6 +467,8 @@ export class LearnCompoundInterestComponent implements OnInit {
         style: { fontSize: '14px', fontFamily: 'Ubuntu, sans-serif' },
         shared: true,
         intersect: false,
+        followCursor: false,
+        x: { show: true },
         y: {
           formatter: (value: number) => formatCurrency(value),
         },

@@ -13,7 +13,7 @@
   </div>
 
   <mat-dialog-content class="learn-invest-goal__content">
-    <div class="learn-invest-goal__page">
+    <div class="learn-invest-goal__page learn-invest-goal__page--main">
       <h1 class="learn-invest-goal__hero" appAutoFitTitle>
         {{ "LEARN_INVEST_GOAL.HERO_TITLE" | translate }}
       </h1>
@@ -74,37 +74,42 @@
             </div>
           </div>
 
-          <div class="invest-goal-real-toggle">
-            <mat-slide-toggle
-              [checked]="showRealValue()"
-              (change)="onShowRealToggle($event.checked)"
-              color="primary"
-            >
-              <span class="invest-goal-real-toggle__label">{{
-                "LEARN_INVEST_GOAL.SHOW_REAL_VALUE" | translate
-              }}</span>
-            </mat-slide-toggle>
-          </div>
-
-          @if (showRealValue()) {
-            <div class="impact-card">
-              <span class="impact-card__label">
-                {{ "LEARN_INVEST_GOAL.INFLATION_RATE" | translate }}
-              </span>
-              <div class="impact-card__value impact-card__value--rate-pair">
-                <input
-                  type="text"
-                  inputmode="decimal"
-                  placeholder="0"
-                  [value]="inflationText()"
-                  (input)="onInflationInput($any($event.target).value)"
-                  (blur)="onInflationBlur()"
-                  class="impact-card__input"
-                />
-                <span class="impact-card__suffix">%</span>
-              </div>
+          <div
+            class="invest-goal-toggle-row"
+            [class.invest-goal-toggle-row--paired]="showRealValue()"
+          >
+            <div class="invest-goal-real-toggle">
+              <mat-slide-toggle
+                [checked]="showRealValue()"
+                (change)="onShowRealToggle($event.checked)"
+                color="primary"
+              >
+                <span class="invest-goal-real-toggle__label">{{
+                  "LEARN_INVEST_GOAL.SHOW_REAL_VALUE" | translate
+                }}</span>
+              </mat-slide-toggle>
             </div>
-          }
+
+            @if (showRealValue()) {
+              <div class="impact-card">
+                <span class="impact-card__label">
+                  {{ "LEARN_INVEST_GOAL.INFLATION_RATE" | translate }}
+                </span>
+                <div class="impact-card__value impact-card__value--rate-pair">
+                  <input
+                    type="text"
+                    inputmode="decimal"
+                    placeholder="0"
+                    [value]="inflationText()"
+                    (input)="onInflationInput($any($event.target).value)"
+                    (blur)="onInflationBlur()"
+                    class="impact-card__input"
+                  />
+                  <span class="impact-card__suffix">%</span>
+                </div>
+              </div>
+            }
+          </div>
 
           <div class="impact-card impact-card--accent invest-goal-result">
             @if (!hasClientAge()) {
@@ -123,28 +128,31 @@
                 {{ "LEARN_INVEST_GOAL.EMPTY_GOAL" | translate }}
               </p>
             } @else {
-              <p class="invest-goal-result__lead">
-                {{ "LEARN_INVEST_GOAL.RESULT" | translate: { amount: formatCurrencyFull(monthlyPayment()) } }}
-              </p>
-              @if (showRealValue()) {
-                <p class="invest-goal-result__note">
+              <span class="impact-card__label">
+                {{ "LEARN_INVEST_GOAL.RESULT_LABEL" | translate }}
+              </span>
+              <div class="impact-card__value impact-card__value--tight">
+                <span class="impact-card__readout">{{
+                  formatCurrencyFull(monthlyPayment())
+                }}</span>
+              </div>
+              <span class="invest-goal-result__sub">
+                @if (showRealValue()) {
                   {{ "LEARN_INVEST_GOAL.REAL_GOAL_NOTE" | translate }}
-                </p>
-              } @else {
-                <p class="invest-goal-result__note invest-goal-result__note--subtle">
+                } @else {
                   {{ "LEARN_INVEST_GOAL.NOMINAL_GOAL_NOTE" | translate }}
-                </p>
-              }
+                }
+              </span>
+              <p class="impact-card__note">
+                {{ "LEARN_INVEST_GOAL.SUPPORTING_INSIGHT" | translate }}
+              </p>
             }
           </div>
         </aside>
 
         <section class="learn-invest-goal__main">
           @if (horizonValid() && (goalAmount() || 0) > 0) {
-            <div
-              class="learn-invest-goal__chart"
-              [class.learn-invest-goal__chart--age-axis]="showSecondaryAgeAxis()"
-            >
+            <div class="learn-invest-goal__chart">
               <apx-chart
                 [series]="chartOptions().series"
                 [chart]="chartOptions().chart"
@@ -159,28 +167,7 @@
                 [markers]="chartOptions().markers"
                 [annotations]="chartOptions().annotations"
               ></apx-chart>
-              @if (showSecondaryAgeAxis()) {
-                <div class="invest-goal-age-axis" aria-hidden="true">
-                  @for (tick of secondaryAgeAxisTicks(); track tick.yearIndex) {
-                    <span
-                      class="invest-goal-age-axis__tick"
-                      [class.invest-goal-age-axis__tick--first]="tick.yearIndex === 0"
-                      [class.invest-goal-age-axis__tick--last]="
-                        tick.yearIndex === yearsToInvest()
-                      "
-                      [style.left.%]="(tick.yearIndex / yearsToInvest()) * 100"
-                    >
-                      {{ tick.label }}
-                    </span>
-                  }
-                </div>
-              }
             </div>
-            @if (hasClientAge() && horizonValid()) {
-              <p class="impact-supporting-copy invest-goal-chart-footnote">
-                {{ "LEARN_INVEST_GOAL.SUPPORTING_INSIGHT" | translate }}
-              </p>
-            }
           } @else {
             <div class="learn-invest-goal__chart learn-invest-goal__chart--empty">
               <p class="learn-invest-goal__empty-copy">
