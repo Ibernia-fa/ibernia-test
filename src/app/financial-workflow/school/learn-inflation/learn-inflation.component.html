@@ -194,70 +194,15 @@
           @for (cause of causes; track cause.iconKey) {
             <article class="cause-card">
               <div class="cause-card__hero" [attr.data-icon]="cause.iconKey">
-                <div class="cause-card__icon">
-                  @switch (cause.iconKey) {
-                    @case ('demand') {
-                      <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="1.8"
-                          d="M3 17l6-6 4 4 8-8"
-                        />
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="1.8"
-                          d="M14 7h7v7"
-                        />
-                      </svg>
-                    }
-                    @case ('cost') {
-                      <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="1.8"
-                          d="M3 8l9-4 9 4-9 4-9-4z"
-                        />
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="1.8"
-                          d="M3 12l9 4 9-4M3 16l9 4 9-4"
-                        />
-                      </svg>
-                    }
-                    @case ('builtIn') {
-                      <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="1.8"
-                          d="M4 12a8 8 0 0114-5.3L20 9"
-                        />
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="1.8"
-                          d="M20 4v5h-5"
-                        />
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="1.8"
-                          d="M20 12a8 8 0 01-14 5.3L4 15"
-                        />
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="1.8"
-                          d="M4 20v-5h5"
-                        />
-                      </svg>
-                    }
-                  }
-                </div>
+                <img
+                  class="cause-card__image"
+                  [attr.data-icon]="cause.iconKey"
+                  [src]="cause.imageSrc"
+                  [alt]="cause.imageAlt | translate"
+                  loading="lazy"
+                  decoding="async"
+                  draggable="false"
+                />
               </div>
               <div class="cause-card__body">
                 <h3 class="cause-card__title">
@@ -265,6 +210,14 @@
                 </h3>
                 <p class="cause-card__desc">
                   {{ cause.descriptionKey | translate }}
+                </p>
+                <p class="cause-card__example">
+                  <span class="cause-card__example-label">
+                    {{ "LEARN_INFLATION.CAUSE_EXAMPLE_LABEL" | translate }}
+                  </span>
+                  <span class="cause-card__example-text">
+                    {{ cause.exampleKey | translate }}
+                  </span>
                 </p>
               </div>
             </article>

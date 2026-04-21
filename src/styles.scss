@@ -557,6 +557,143 @@ button:not(.mat-mdc-menu-item):not(.mat-menu-item):not(.submit-btn) {
   border: 1px solid #e7e7eb !important;
 }
 
+/* ============================================================
+   School: premium graph tooltip (shared design system)
+   Applied to every chart in the School section through
+   `tooltip.cssClass = 'ibr-school-tooltip'` and
+   `chart.cssClass = 'ibr-school-chart'`. Keep this as the single
+   source of truth for all School tooltip styling.
+   ============================================================ */
+.apexcharts-tooltip.ibr-school-tooltip {
+  background: #ffffff !important;
+  color: #1c1c1c !important;
+  border: 1px solid rgba(64, 67, 175, 0.1) !important;
+  border-radius: 14px !important;
+  box-shadow:
+    0 1px 3px rgba(20, 22, 48, 0.06),
+    0 18px 40px rgba(28, 31, 80, 0.14) !important;
+  padding: 0 !important;
+  font-family: "Ubuntu", sans-serif !important;
+  font-size: 14px !important;
+  line-height: 1.45 !important;
+  min-width: 200px;
+  max-width: 320px;
+  overflow: hidden !important;
+  backdrop-filter: saturate(140%);
+  transition:
+    opacity 120ms ease,
+    transform 120ms ease;
+
+  /* Header band: secondary label like "Year 5" */
+  .apexcharts-tooltip-title {
+    background: transparent !important;
+    border: 0 !important;
+    border-bottom: 1px solid rgba(28, 31, 80, 0.06) !important;
+    margin: 0 !important;
+    padding: 12px 18px 10px !important;
+    font-family: "Ubuntu", sans-serif !important;
+    font-size: 12.5px !important;
+    font-weight: 500 !important;
+    color: #5a596e !important;
+    letter-spacing: 0.2px !important;
+    text-transform: none !important;
+  }
+
+  /* Body row: marker + label + value */
+  .apexcharts-tooltip-series-group {
+    padding: 12px 18px !important;
+    margin: 0 !important;
+    align-items: center !important;
+    background: transparent !important;
+
+    &.apexcharts-active {
+      display: flex !important;
+    }
+
+    & + .apexcharts-tooltip-series-group.apexcharts-active {
+      padding-top: 6px !important;
+    }
+
+    &:last-child.apexcharts-active {
+      padding-bottom: 14px !important;
+    }
+  }
+
+  .apexcharts-tooltip-marker {
+    width: 10px !important;
+    height: 10px !important;
+    margin-right: 10px !important;
+    border-radius: 50% !important;
+    flex-shrink: 0;
+  }
+
+  .apexcharts-tooltip-text {
+    font-family: "Ubuntu", sans-serif !important;
+    font-size: 14.5px !important;
+    line-height: 1.45 !important;
+    color: #1c1c1c !important;
+  }
+
+  .apexcharts-tooltip-y-group,
+  .apexcharts-tooltip-goals-group,
+  .apexcharts-tooltip-z-group {
+    padding: 0 !important;
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+  }
+
+  .apexcharts-tooltip-text-y-label,
+  .apexcharts-tooltip-text-goals-label,
+  .apexcharts-tooltip-text-z-label {
+    font-weight: 500 !important;
+    color: #5a596e !important;
+    margin-right: 0 !important;
+  }
+
+  .apexcharts-tooltip-text-y-value,
+  .apexcharts-tooltip-text-goals-value,
+  .apexcharts-tooltip-text-z-value {
+    font-weight: 700 !important;
+    color: #1c1c1c !important;
+    font-variant-numeric: tabular-nums;
+    margin-left: 0 !important;
+  }
+}
+
+/* X-axis anchor badge (e.g. the small "Year 5" pill below the chart). */
+.apexcharts-canvas.ibr-school-chart .apexcharts-xaxistooltip,
+.apexcharts-canvas.ibr-school-chart .apexcharts-yaxistooltip {
+  background: #ffffff !important;
+  color: #1c1c1c !important;
+  border: 1px solid rgba(64, 67, 175, 0.12) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 6px 18px rgba(28, 31, 80, 0.1) !important;
+  padding: 6px 12px !important;
+  font-family: "Ubuntu", sans-serif !important;
+  font-size: 12.5px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.2px !important;
+}
+
+.apexcharts-canvas.ibr-school-chart .apexcharts-xaxistooltip-bottom::before {
+  border-bottom-color: rgba(64, 67, 175, 0.16) !important;
+}
+.apexcharts-canvas.ibr-school-chart .apexcharts-xaxistooltip-bottom::after {
+  border-bottom-color: #ffffff !important;
+}
+.apexcharts-canvas.ibr-school-chart .apexcharts-xaxistooltip-top::before {
+  border-top-color: rgba(64, 67, 175, 0.16) !important;
+}
+.apexcharts-canvas.ibr-school-chart .apexcharts-xaxistooltip-top::after {
+  border-top-color: #ffffff !important;
+}
+
+/* Hover marker on the data point: slightly more refined ring. */
+.apexcharts-canvas.ibr-school-chart .apexcharts-marker {
+  filter: drop-shadow(0 2px 4px rgba(28, 31, 80, 0.18));
+}
+
 .savings-tooltip {
   background: rgba(255, 255, 255, 0.96);
   min-width: 170px;

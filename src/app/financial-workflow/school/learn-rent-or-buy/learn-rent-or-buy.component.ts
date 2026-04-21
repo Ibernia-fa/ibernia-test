@@ -396,6 +396,7 @@ export class LearnRentOrBuyComponent implements OnInit {
         zoom: { enabled: false },
         animations: { enabled: true, easing: 'easeinout', speed: 400 },
         parentHeightOffset: 0,
+        cssClass: 'ibr-school-chart',
       },
       colors: [COLOR_BUY, COLOR_RENT],
       stroke: { width: 3, curve: 'smooth' },
@@ -464,6 +465,8 @@ export class LearnRentOrBuyComponent implements OnInit {
       },
       tooltip: {
         theme: 'light',
+        cssClass: 'ibr-school-tooltip',
+        style: { fontSize: '14px', fontFamily: 'Ubuntu, sans-serif' },
         shared: true,
         intersect: false,
         y: { formatter: (value: number) => this.formatCurrency(value) },

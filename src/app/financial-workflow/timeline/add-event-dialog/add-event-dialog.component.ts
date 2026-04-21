@@ -378,11 +378,18 @@ export class AddEventDialogComponent {
 
     // make travel one off (there could be multiple travel events with rename functionality,
     //  consider while changing iconUrl until there is some proper solution to this)
-    if (this.selectedEventType == EventType.SYSTEM
+    const isTravelEvent = this.selectedEventType == EventType.SYSTEM
       && (this.patchEvent?.name.startsWith("Travel") ||
-        this.patchEvent?.iconUrl == "travel-icon")) {
+        this.patchEvent?.iconUrl == "travel-icon");
+    if (isTravelEvent) {
       defaultCycle = 'Every year';
     }
+
+    // Prefill Travel end year to 5 years before the plan ends (only on creation,
+    // never on edit, so we don't overwrite a value the user has already chosen).
+    const defaultSystemEnd: number | null = isTravelEvent && !this.isEditWorkflow
+      ? this.computeDefaultTravelEndYear(moment(this.dropTime).year())
+      : null;
 
     switch (this.selectedEventType) {
       case EventType.SYSTEM:
@@ -394,7 +401,7 @@ export class AddEventDialogComponent {
           cycle: [defaultCycle, [Validators.required]],
           ageDate: [moment(this.dropTime).year(), Validators.required],
           start: [moment(this.dropTime).year(), Validators.required],
-          end: [null as number | string | null],
+          end: [defaultSystemEnd as number | string | null],
           escalationRate: [this.escalationRates[0]?.description ?? '', Validators.required],
           customEscalationRate: ['']
         });
@@ -1187,6 +1194,24 @@ export class AddEventDialogComponent {
       c => c.countryName.toLowerCase() === countryNameOrCode.toLowerCase()
     );
     return match?.countryCode ?? '';
+  }
+
+  /**
+   * Default end year for a newly created Travel event: 5 years before the plan
+   * ends, based on the plan's actual configured end (not a hardcoded age).
+   * Falls back to the plan's last year if "plan end − 5" would be earlier than
+   * the Travel start year.
+   */
+  private computeDefaultTravelEndYear(startYear: number): number | null {
+    const planEndYear = this.dialogEndCalendarYear;
+    if (!Number.isFinite(planEndYear) || planEndYear <= 0) {
+      return null;
+    }
+    const candidate = planEndYear - 5;
+    if (Number.isFinite(startYear) && candidate < startYear) {
+      return planEndYear;
+    }
+    return candidate;
   }
 
   private getNextEventName(baseName: string): string {

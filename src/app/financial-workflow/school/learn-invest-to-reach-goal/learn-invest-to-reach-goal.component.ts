@@ -392,6 +392,7 @@ export class LearnInvestToReachGoalComponent implements OnInit {
         zoom: { enabled: false },
         animations: { enabled: true, easing: 'easeinout', speed: 520 },
         parentHeightOffset: 0,
+        cssClass: 'ibr-school-chart',
       },
       colors: [ACCENT],
       stroke: {
@@ -462,6 +463,8 @@ export class LearnInvestToReachGoalComponent implements OnInit {
       },
       tooltip: {
         theme: 'light',
+        cssClass: 'ibr-school-tooltip',
+        style: { fontSize: '14px', fontFamily: 'Ubuntu, sans-serif' },
         x: {
           formatter: (_val: unknown, opts?: { dataPointIndex?: number }) => {
             const idx = opts?.dataPointIndex ?? 0;

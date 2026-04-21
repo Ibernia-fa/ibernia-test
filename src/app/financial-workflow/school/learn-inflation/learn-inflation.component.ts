@@ -41,6 +41,9 @@ export interface InflationCause {
   iconKey: 'demand' | 'cost' | 'builtIn';
   titleKey: string;
   descriptionKey: string;
+  exampleKey: string;
+  imageSrc: string;
+  imageAlt: string;
 }
 
 export interface CountrySource {
@@ -167,16 +170,25 @@ export class LearnInflationComponent implements OnInit {
       iconKey: 'demand',
       titleKey: 'LEARN_INFLATION.CAUSE_DEMAND_TITLE',
       descriptionKey: 'LEARN_INFLATION.CAUSE_DEMAND_DESC',
+      exampleKey: 'LEARN_INFLATION.CAUSE_DEMAND_EXAMPLE',
+      imageSrc: 'assets/images/learn-inflation/demand-pull.png',
+      imageAlt: 'LEARN_INFLATION.CAUSE_DEMAND_IMG_ALT',
     },
     {
       iconKey: 'cost',
       titleKey: 'LEARN_INFLATION.CAUSE_COST_TITLE',
       descriptionKey: 'LEARN_INFLATION.CAUSE_COST_DESC',
+      exampleKey: 'LEARN_INFLATION.CAUSE_COST_EXAMPLE',
+      imageSrc: 'assets/images/learn-inflation/cost-push.png',
+      imageAlt: 'LEARN_INFLATION.CAUSE_COST_IMG_ALT',
     },
     {
       iconKey: 'builtIn',
       titleKey: 'LEARN_INFLATION.CAUSE_BUILTIN_TITLE',
       descriptionKey: 'LEARN_INFLATION.CAUSE_BUILTIN_DESC',
+      exampleKey: 'LEARN_INFLATION.CAUSE_BUILTIN_EXAMPLE',
+      imageSrc: 'assets/images/learn-inflation/built-in.png',
+      imageAlt: 'LEARN_INFLATION.CAUSE_BUILTIN_IMG_ALT',
     },
   ];
 
@@ -325,6 +337,7 @@ export class LearnInflationComponent implements OnInit {
         zoom: { enabled: false },
         animations: { enabled: true, easing: 'easeinout', speed: 600 },
         parentHeightOffset: 0,
+        cssClass: 'ibr-school-chart',
       },
       colors: [ACCENT],
       stroke: { width: 3, curve: 'smooth' },
@@ -383,6 +396,8 @@ export class LearnInflationComponent implements OnInit {
       legend: { show: false },
       tooltip: {
         theme: 'light',
+        cssClass: 'ibr-school-tooltip',
+        style: { fontSize: '14px', fontFamily: 'Ubuntu, sans-serif' },
         marker: { show: false },
         x: { show: true },
         y: {
@@ -439,6 +454,7 @@ export class LearnInflationComponent implements OnInit {
         zoom: { enabled: false },
         animations: { enabled: true, easing: 'easeinout', speed: 600 },
         parentHeightOffset: 0,
+        cssClass: 'ibr-school-chart',
       },
       colors,
       stroke: {
@@ -501,6 +517,8 @@ export class LearnInflationComponent implements OnInit {
       },
       tooltip: {
         theme: 'light',
+        cssClass: 'ibr-school-tooltip',
+        style: { fontSize: '14px', fontFamily: 'Ubuntu, sans-serif' },
         shared: true,
         intersect: false,
         x: { show: true },
