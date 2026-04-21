@@ -115,9 +115,12 @@ $impact-gutter: 56px;
   min-height: 0;
 }
 
+/* Hero on top, supporting insight below: use a 1fr / auto grid so
+   the benchmark visual always takes ~half of the available space and
+   the insight card stays compact. */
 .learn-cash-buffer__main {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
   gap: 14px;
   min-width: 0;
   min-height: 0;
@@ -160,27 +163,23 @@ $impact-gutter: 56px;
     line-height: 1.1;
     color: $ibernia-ink;
     font-variant-numeric: tabular-nums;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    min-width: 0;
   }
 
   &__currency {
     font-size: 16px;
     font-weight: 600;
     color: $ibernia-mute;
+    flex-shrink: 0;
   }
 
   &__suffix {
     font-size: 18px;
     font-weight: 600;
     color: $ibernia-mute;
-
-    &--small {
-      font-size: 12px;
-      font-weight: 600;
-      text-transform: lowercase;
-      letter-spacing: 0.2px;
-      margin-left: 4px;
-    }
+    flex-shrink: 0;
   }
 
   &__input {
@@ -203,7 +202,7 @@ $impact-gutter: 56px;
 
   /* Premium accent treatment, identical to the inflation slide. */
   &--accent {
-    padding: 22px 24px 24px;
+    padding: 14px 18px 16px;
     background:
       linear-gradient(135deg, rgba(64, 67, 175, 0.09), rgba(81, 108, 232, 0.035));
     border-color: rgba(64, 67, 175, 0.22);
@@ -214,8 +213,8 @@ $impact-gutter: 56px;
     &::before {
       content: "";
       position: absolute;
-      top: 14px;
-      bottom: 14px;
+      top: 12px;
+      bottom: 12px;
       left: 0;
       width: 3px;
       border-radius: 0 3px 3px 0;
@@ -225,36 +224,36 @@ $impact-gutter: 56px;
 }
 
 /* ============================================================
-   Right column: simplified benchmark graph
+   Right column: simplified benchmark graph (hero element)
    ============================================================ */
 .learn-cash-buffer__viz {
-  flex: 0 0 auto;
+  display: flex;
   width: 100%;
+  min-height: 0;
 }
 
 .buffer-months {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  max-width: 560px;
-  margin: 0 auto;
+  gap: 18px;
   width: 100%;
-  padding: 22px 26px 18px;
+  padding: 32px 40px 26px;
   border: 1px solid $ibernia-line;
   border-radius: 16px;
   background:
-    radial-gradient(120% 80% at 50% 0%, rgba(64, 67, 175, 0.035) 0%, rgba(64, 67, 175, 0) 60%),
+    radial-gradient(120% 80% at 50% 0%, rgba(64, 67, 175, 0.045) 0%, rgba(64, 67, 175, 0) 60%),
     #ffffff;
   box-shadow:
     0 1px 0 rgba(20, 22, 48, 0.02),
     0 10px 28px rgba(64, 67, 175, 0.05);
   justify-content: center;
+  flex: 1 1 auto;
 }
 
 .buffer-months__benchmark-wrap {
   position: relative;
   width: 100%;
-  padding: 8px 0 14px;
+  padding: 12px 0 18px;
   overflow: visible;
 }
 
@@ -262,7 +261,7 @@ $impact-gutter: 56px;
   display: flex;
   width: 100%;
   align-items: center;
-  min-height: 32px;
+  min-height: 44px;
 }
 
 .buffer-months__benchmark-seg {
@@ -290,8 +289,8 @@ $impact-gutter: 56px;
   left: 5%;
   right: 5%;
   top: 50%;
-  height: 22px;
-  margin-top: -11px;
+  height: 30px;
+  margin-top: -15px;
   border-radius: 999px;
   background: linear-gradient(
     180deg,
@@ -307,8 +306,8 @@ $impact-gutter: 56px;
   z-index: 1;
   display: block;
   width: 100%;
-  height: 2px;
-  border-radius: 1px;
+  height: 3px;
+  border-radius: 1.5px;
   pointer-events: none;
 
   &--low {
@@ -342,7 +341,7 @@ $impact-gutter: 56px;
 .buffer-months__marker {
   position: absolute;
   left: 0;
-  bottom: 18px;
+  bottom: 22px;
   width: 0;
   z-index: 2;
   pointer-events: none;
@@ -353,18 +352,18 @@ $impact-gutter: 56px;
 }
 
 .buffer-months__marker-cap {
-  width: 11px;
-  height: 11px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
   background: $ibernia-blue;
   border: 2px solid #ffffff;
-  box-shadow: 0 1px 3px rgba(28, 28, 28, 0.12);
+  box-shadow: 0 2px 6px rgba(28, 28, 28, 0.16);
   flex-shrink: 0;
 }
 
 .buffer-months__marker-stem {
   width: 2px;
-  height: 14px;
+  height: 18px;
   margin-top: -1px;
   border-radius: 1px;
   background: $ibernia-blue;
@@ -377,8 +376,8 @@ $impact-gutter: 56px;
 .buffer-months__scale {
   position: relative;
   width: 100%;
-  height: 16px;
-  font-size: 11.5px;
+  height: 18px;
+  font-size: 12.5px;
   font-weight: 600;
   color: $ibernia-mute;
   font-variant-numeric: tabular-nums;
@@ -415,67 +414,70 @@ $impact-gutter: 56px;
    as the inflation slide; main result is centered).
    ============================================================ */
 .learn-cash-buffer__insight {
-  flex: 1 1 auto;
+  flex: 0 0 auto;
   min-height: 0;
-  align-items: center;
-  justify-content: center;
+  align-items: stretch;
+  justify-content: flex-start;
 }
 
 .cb-result {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: auto 1fr;
   align-items: center;
-  text-align: center;
-  gap: 10px;
+  column-gap: 18px;
+  row-gap: 4px;
   width: 100%;
-  max-width: 520px;
-  margin: 0 auto;
+  text-align: left;
 
   &--neutral {
-    gap: 6px;
+    grid-template-columns: 1fr;
+    text-align: center;
   }
 }
 
 .cb-result__figure {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
   align-items: baseline;
-  gap: 6px 10px;
+  gap: 6px;
   line-height: 1;
+  grid-row: 1 / span 2;
+  white-space: nowrap;
 }
 
 .cb-result__value {
-  font-size: clamp(44px, 6vw, 56px);
+  font-size: clamp(32px, 4vw, 42px);
   font-weight: 700;
-  letter-spacing: -1.2px;
+  letter-spacing: -0.8px;
   color: $ibernia-blue;
   font-variant-numeric: tabular-nums;
 }
 
 .cb-result__suffix {
-  font-size: 21px;
+  font-size: 16px;
   font-weight: 700;
   color: $ibernia-ink;
-  letter-spacing: -0.3px;
+  letter-spacing: -0.2px;
 }
 
 .cb-result__sub {
-  margin: -2px 0 0;
-  font-size: 14px;
+  margin: 0;
+  font-size: 13px;
   font-weight: 500;
   color: $ibernia-mute;
   line-height: 1.4;
+  grid-column: 2;
 }
 
 .cb-result__badge {
   display: inline-block;
-  margin-top: 6px;
-  padding: 7px 14px;
+  justify-self: start;
+  margin: 2px 0 0;
+  padding: 5px 12px;
   border-radius: 999px;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.02em;
+  grid-column: 2;
 
   &--low {
     background: rgba(200, 90, 110, 0.12);
@@ -495,11 +497,11 @@ $impact-gutter: 56px;
 
 .cb-result__practical {
   margin: 4px 0 0;
-  font-size: 13.5px;
-  line-height: 1.55;
+  font-size: 12.5px;
+  line-height: 1.5;
   font-weight: 400;
   color: $ibernia-mute;
-  max-width: 480px;
+  grid-column: 1 / -1;
 }
 
 .cb-result__neutral {
@@ -570,8 +572,14 @@ $impact-gutter: 56px;
   }
 
   .buffer-months {
-    max-width: none;
-    padding: 20px 22px 16px;
+    padding: 24px 22px 18px;
+  }
+
+  .learn-cash-buffer__main {
+    /* On tablet the layout stacks under the side aside, so keep the
+       visual hero room first and let content grow naturally. */
+    grid-template-rows: minmax(220px, auto) auto;
+    min-height: 320px;
   }
 }
 
@@ -589,11 +597,25 @@ $impact-gutter: 56px;
   }
 
   .buffer-months__scale {
-    font-size: 10.5px;
+    font-size: 11px;
+  }
+
+  .cb-result {
+    grid-template-columns: 1fr;
+    text-align: left;
+  }
+
+  .cb-result__figure {
+    grid-row: auto;
+  }
+
+  .cb-result__sub,
+  .cb-result__badge {
+    grid-column: 1;
   }
 
   .cb-result__value {
-    font-size: 42px;
+    font-size: 32px;
   }
 }
 

@@ -245,8 +245,15 @@
             </div>
           </article>
 
-          <!-- Row 2 — Time in the market vs timing (coming soon) -->
-          <article class="card">
+          <!-- Row 2 — Time in the market vs timing -->
+          <article
+            class="card card--interactive"
+            role="button"
+            tabindex="0"
+            (click)="openTimeInMarketLesson()"
+            (keydown.enter)="openTimeInMarketLesson()"
+            (keydown.space)="$event.preventDefault(); openTimeInMarketLesson()"
+          >
             <div class="card__image-container">
               <img
                 src="../../../assets/images/blog/school-module-6.png"
@@ -256,12 +263,18 @@
             </div>
             <div class="card__content">
               <div class="card__header">
-                <span class="badge badge--pink">{{ "SCHOOL.COMING_SOON" | translate }}</span>
+                <span class="badge badge--purple">{{
+                  "SCHOOL.AVAILABLE" | translate
+                }}</span>
               </div>
               <h3 class="card__title">
                 {{ "SCHOOL.CARD_2_TITLE" | translate }}
               </h3>
-              <span class="card__link card__link--disabled">
+              <button
+                type="button"
+                class="card__link card__link--active"
+                (click)="$event.stopPropagation(); openTimeInMarketLesson()"
+              >
                 {{ "SCHOOL.START_LEARNING" | translate }}
                 <svg
                   fill="none"
@@ -276,7 +289,7 @@
                     d="M17 8l4 4m0 0l-4 4m4-4H3"
                   ></path>
                 </svg>
-              </span>
+              </button>
             </div>
           </article>
 

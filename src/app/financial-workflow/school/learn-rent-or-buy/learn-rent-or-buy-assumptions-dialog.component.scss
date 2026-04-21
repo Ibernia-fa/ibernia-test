@@ -4,19 +4,32 @@ $ibernia-mute: #5a596e;
 $ibernia-line: #e5e5ec;
 $ibernia-bg-soft: #f7f8fc;
 
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: 100%;
+}
+
 .rb-assumptions {
   font-family: "Ubuntu", sans-serif;
   color: $ibernia-ink;
   display: flex;
   flex-direction: column;
   min-width: 0;
+  min-height: 0;
+  flex: 1 1 auto;
+  max-height: 100%;
+  overflow: hidden;
 
   &__header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    padding: 4px 4px 0 4px;
+    padding: 4px 4px 12px 4px;
+    flex: 0 0 auto;
   }
 
   &__title {
@@ -32,17 +45,15 @@ $ibernia-bg-soft: #f7f8fc;
     color: $ibernia-mute;
   }
 
-  &__intro {
-    margin: 6px 4px 16px 4px;
-    font-size: 13.5px;
-    line-height: 1.55;
-    color: $ibernia-mute;
-  }
-
+  /* Scrollable list of fields. */
   &__content {
-    padding: 0 4px !important;
-    overflow: visible !important;
+    padding: 4px 4px !important;
+    margin: 0 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
     max-height: none !important;
+    min-height: 0;
+    flex: 1 1 auto;
   }
 
   &__grid {
@@ -52,11 +63,12 @@ $ibernia-bg-soft: #f7f8fc;
   }
 
   &__actions {
-    padding: 16px 4px 4px 4px !important;
+    padding: 14px 4px 4px 4px !important;
     margin: 12px 0 0 0 !important;
     border-top: 1px solid $ibernia-line;
     display: flex;
     gap: 10px;
+    flex: 0 0 auto;
   }
 
   &__btn {
@@ -71,6 +83,7 @@ $ibernia-bg-soft: #f7f8fc;
   display: flex;
   flex-direction: column;
   gap: 6px;
+  min-width: 0;
 
   &__label {
     display: inline-flex;

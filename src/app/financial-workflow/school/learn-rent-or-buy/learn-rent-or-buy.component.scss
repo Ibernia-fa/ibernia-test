@@ -5,6 +5,14 @@ $ibernia-mute: #5a596e;
 $ibernia-line: #e5e5ec;
 $ibernia-bg-soft: #f5f7ff;
 
+/* Winner / loser palette — kept elegant and consistent with Ibernia. */
+$ibernia-win: #1f7a4d;
+$ibernia-win-bg: rgba(31, 122, 77, 0.06);
+$ibernia-win-border: rgba(31, 122, 77, 0.32);
+$ibernia-lose: #c0392b;
+$ibernia-lose-bg: rgba(192, 57, 43, 0.045);
+$ibernia-lose-border: rgba(192, 57, 43, 0.28);
+
 :host {
   display: flex;
   flex-direction: column;
@@ -24,7 +32,7 @@ $ibernia-bg-soft: #f5f7ff;
   position: relative;
 }
 
-/* Top right close button */
+/* Top right close button — positioned by shared school dialog rule. */
 .learn-rb__header {
   position: absolute;
   top: 0;
@@ -46,9 +54,27 @@ $ibernia-bg-soft: #f5f7ff;
   min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 22px;
-  overflow-y: auto;
+  overflow: hidden;
+}
+
+/* ============================================================
+   Page wrapper — matches inflation impact page structure
+   ============================================================ */
+$impact-gutter: 56px;
+
+.learn-rb__page {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
   animation: learnRbFadeIn 320ms ease;
+}
+
+.learn-rb__page--impact {
+  /* Shared School header rule: title row top = 14px (matches close btn). */
+  padding: 14px $impact-gutter 16px;
+  gap: 14px;
+  overflow: hidden;
 }
 
 @keyframes learnRbFadeIn {
@@ -62,65 +88,100 @@ $ibernia-bg-soft: #f5f7ff;
   }
 }
 
-/* ----- Hero title (matches Inflation/Compound) ----- */
+/* Hero title — never truncated, always one line on desktop. */
 .learn-rb__hero {
-  /* Shared School header rule: title row top = 14px (matches close btn). */
-  margin: 14px 56px 0;
-  font-size: 30px;
-  line-height: 1.18;
+  margin: 0;
+  font-size: 26px;
+  line-height: 1.2;
   font-weight: 700;
   letter-spacing: -0.4px;
   color: $ibernia-ink;
   text-align: left;
   max-width: 100%;
+  padding-right: 48px; /* keep clear of close icon */
+  flex: 0 0 auto;
 }
 
-/* ----- Two-column layout ----- */
+/* ============================================================
+   Two-column layout — left inputs, right results
+   ============================================================ */
 .learn-rb__layout {
   display: grid;
-  grid-template-columns: minmax(280px, 360px) 1fr;
-  gap: 32px;
+  grid-template-columns: minmax(280px, 340px) 1fr;
+  gap: 24px;
+  flex: 1 1 auto;
+  min-height: 0;
   align-items: stretch;
-  padding: 0 56px 0 56px;
+  overflow: hidden;
 }
 
 /* ----- Left side ----- */
 .learn-rb__side {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
   min-width: 0;
+  min-height: 0;
 }
 
-/* ----- impact-card (matches Inflation) ----- */
+/* Compact pair (Down payment + Mortgage term) */
+.learn-rb__side-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 10px;
+}
+
+/* ============================================================
+   impact-card — matches inflation tile system
+   ============================================================ */
 .impact-card {
+  position: relative;
   border: 1px solid $ibernia-line;
   border-radius: 14px;
-  padding: 16px 18px;
+  padding: 14px 18px;
   background: #ffffff;
   display: flex;
   flex-direction: column;
   gap: 6px;
+  flex: 0 0 auto;
+  box-shadow: 0 1px 0 rgba(20, 22, 48, 0.02);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  min-width: 0;
 
   &:focus-within {
     border-color: $ibernia-blue;
     box-shadow: 0 0 0 3px rgba(64, 67, 175, 0.12);
   }
 
+  &--compact {
+    padding: 12px 14px;
+    gap: 4px;
+
+    .impact-card__value {
+      font-size: 22px;
+    }
+
+    .impact-card__currency,
+    .impact-card__suffix {
+      font-size: 14px;
+    }
+  }
+
   &__label-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
+    gap: 8px;
+    min-height: 22px;
   }
 
   &__label {
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 600;
     color: $ibernia-mute;
-    letter-spacing: 0.18px;
+    letter-spacing: 0.6px;
     text-transform: uppercase;
+    line-height: 1.2;
   }
 
   &__value {
@@ -132,16 +193,18 @@ $ibernia-bg-soft: #f5f7ff;
     line-height: 1.1;
     color: $ibernia-ink;
     font-variant-numeric: tabular-nums;
+    min-width: 0;
   }
 
   &__currency {
-    font-size: 17px;
+    font-size: 16px;
     font-weight: 600;
     color: $ibernia-mute;
+    flex-shrink: 0;
   }
 
   &__suffix {
-    font-size: 17px;
+    font-size: 16px;
     font-weight: 600;
     color: $ibernia-mute;
     flex-shrink: 0;
@@ -166,33 +229,60 @@ $ibernia-bg-soft: #f5f7ff;
   }
 }
 
-/* down-payment % / amount toggle */
+/* ============================================================
+   Down-payment % / amount segmented toggle
+   ============================================================ */
 .rb-toggle {
+  display: inline-flex;
+  align-items: stretch;
+  height: 24px;
+  padding: 2px;
   border-radius: 8px;
-  height: 26px;
-  flex-shrink: 0;
+  background: #f1f2f7;
   border: 1px solid $ibernia-line;
+  flex-shrink: 0;
+  gap: 0;
+}
 
-  ::ng-deep .mat-button-toggle {
-    background: #ffffff;
-    color: $ibernia-mute;
-    font-weight: 600;
-    font-size: 11px;
-    border-color: transparent;
+.rb-toggle__btn {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: $ibernia-mute;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  padding: 0 10px;
+  min-width: 26px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.18s ease, color 0.18s ease,
+    box-shadow 0.18s ease;
 
-    .mat-button-toggle-label-content {
-      line-height: 24px;
-      padding: 0 8px;
-    }
+  &:hover:not(.rb-toggle__btn--active) {
+    color: $ibernia-ink;
   }
 
-  ::ng-deep .mat-button-toggle-checked {
-    background: $ibernia-blue;
-    color: #ffffff;
+  &--active {
+    background: #ffffff;
+    color: $ibernia-blue;
+    box-shadow: 0 1px 2px rgba(20, 22, 48, 0.08);
+  }
+
+  &:focus-visible {
+    outline: 2px solid rgba(64, 67, 175, 0.35);
+    outline-offset: 1px;
   }
 }
 
-/* "More assumptions" trigger */
+/* ============================================================
+   "More assumptions" trigger
+   ============================================================ */
 .learn-rb__more {
   align-self: flex-start;
   display: inline-flex;
@@ -227,43 +317,59 @@ $ibernia-bg-soft: #f5f7ff;
   }
 }
 
-/* ----- Right side: results ----- */
+/* ============================================================
+   Right side — results
+   ============================================================ */
 .learn-rb__main {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
   min-width: 0;
   min-height: 0;
+  overflow: hidden;
 }
 
 .rb-summary {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
+  flex: 0 0 auto;
 }
 
 .rb-summary__card {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   padding: 14px 16px;
   border-radius: 14px;
   border: 1px solid $ibernia-line;
   background: #ffffff;
+  transition: border-color 0.2s ease, background 0.2s ease,
+    box-shadow 0.2s ease;
+  box-shadow: 0 1px 0 rgba(20, 22, 48, 0.02);
 
-  &--buy {
-    border-color: rgba(94, 121, 246, 0.32);
-    background: linear-gradient(180deg, #ffffff 0%, #f4f7ff 100%);
+  /* Winner: positive treatment (elegant green) */
+  &--winner {
+    border-color: $ibernia-win-border;
+    background: linear-gradient(180deg, #ffffff 0%, $ibernia-win-bg 100%);
+    box-shadow:
+      0 1px 0 rgba(20, 22, 48, 0.02),
+      0 8px 22px rgba(31, 122, 77, 0.08);
+
+    .rb-summary__value {
+      color: $ibernia-win;
+    }
   }
-  &--rent {
-    border-color: rgba(64, 67, 175, 0.32);
-    background: linear-gradient(180deg, #ffffff 0%, #f3f4fb 100%);
-  }
-  &--net-positive {
-    border-color: rgba(94, 121, 246, 0.45);
-  }
-  &--net-negative {
-    border-color: rgba(64, 67, 175, 0.45);
+
+  /* Loser: muted, slightly desaturated red treatment */
+  &--loser {
+    border-color: $ibernia-lose-border;
+    background: linear-gradient(180deg, #ffffff 0%, $ibernia-lose-bg 100%);
+
+    .rb-summary__value {
+      color: $ibernia-lose;
+      opacity: 0.92;
+    }
   }
 }
 
@@ -272,28 +378,35 @@ $ibernia-bg-soft: #f5f7ff;
   font-weight: 600;
   color: $ibernia-mute;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.06em;
 }
 
 .rb-summary__value {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 700;
   color: $ibernia-ink;
   line-height: 1.15;
   font-variant-numeric: tabular-nums;
 }
 
+/* ----- Chart ----- */
 .learn-rb__chart {
   flex: 1 1 auto;
-  min-height: 280px;
+  min-height: 240px;
   border: 1px solid $ibernia-line;
   border-radius: 16px;
-  background: #ffffff;
+  background:
+    radial-gradient(120% 80% at 50% 0%, rgba(64, 67, 175, 0.035) 0%, rgba(64, 67, 175, 0) 60%),
+    #ffffff;
   position: relative;
+  overflow: hidden;
+  box-shadow:
+    0 1px 0 rgba(20, 22, 48, 0.02),
+    0 10px 28px rgba(64, 67, 175, 0.05);
 
   apx-chart {
     position: absolute;
-    inset: 12px 12px 4px 4px;
+    inset: 14px 18px 8px 6px;
     display: block;
   }
 }
@@ -320,7 +433,7 @@ $ibernia-bg-soft: #f5f7ff;
 
 .learn-rb__summary-sentence {
   margin: 0;
-  font-size: 14px;
+  font-size: 13.5px;
   line-height: 1.5;
   color: $ibernia-ink;
   font-weight: 500;
@@ -328,23 +441,61 @@ $ibernia-bg-soft: #f5f7ff;
   border-left: 3px solid rgba(94, 121, 246, 0.45);
   background: $ibernia-bg-soft;
   border-radius: 0 10px 10px 0;
+  flex: 0 0 auto;
 }
 
-/* Bottom educational notice now uses the shared `.school-notice`
-   block defined globally in `src/styles.scss`. */
+/* ============================================================
+   Shared school-notice spacing — matches inflation
+   ============================================================ */
+.learn-rb__page--impact .school-notice {
+  margin: 4px 0 0;
+  width: 100%;
+  max-width: none;
+  align-self: stretch;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 12px 18px;
+  flex: 0 0 auto;
 
-/* ----- Responsive ----- */
+  .school-notice__icon {
+    align-self: center;
+    width: 18px;
+    height: 18px;
+    font-size: 18px;
+    line-height: 1;
+    overflow: visible;
+  }
+
+  .school-notice__text {
+    align-self: center;
+  }
+}
+
+/* ============================================================
+   Responsive (desktop + tablet only)
+   ============================================================ */
 @media (max-width: 1024px) {
+  .learn-rb__page--impact {
+    /* Keep the shared 14px header top on tablet, just tighten the side gutter. */
+    padding: 14px 20px 14px;
+    gap: 12px;
+    overflow: visible;
+  }
+
+  .learn-rb__content {
+    overflow-y: auto;
+  }
+
   .learn-rb__hero {
-    /* Shared School header rule: keep title row top at 14px on tablet too. */
-    margin: 14px 16px 0;
-    font-size: 24px;
+    font-size: 22px;
+    padding-right: 40px;
   }
 
   .learn-rb__layout {
     grid-template-columns: 1fr;
-    gap: 20px;
-    padding: 0 16px;
+    gap: 16px;
+    overflow: visible;
   }
 
   .learn-rb__side {
@@ -353,28 +504,23 @@ $ibernia-bg-soft: #f5f7ff;
 
   .learn-rb__main {
     order: 1;
-  }
-
-  .impact-card__value {
-    font-size: 22px;
+    overflow: visible;
   }
 
   .learn-rb__chart {
-    min-height: 240px;
+    min-height: 260px;
     height: 280px;
     flex: 0 0 auto;
   }
-}
 
-@media (max-width: 640px) {
-  .rb-summary {
-    grid-template-columns: 1fr;
+  .impact-card__value {
+    font-size: 24px;
   }
-
-  .learn-rb__hero { font-size: 22px; }
-  .impact-card { padding: 14px 16px; }
 }
 
+/* ============================================================
+   Dialog surface tweaks
+   ============================================================ */
 :host ::ng-deep .mdc-dialog__surface {
   display: flex;
   flex-direction: column;

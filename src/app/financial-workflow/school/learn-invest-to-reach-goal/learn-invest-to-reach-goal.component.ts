@@ -405,7 +405,7 @@ export class LearnInvestToReachGoalComponent implements OnInit {
       legend: { show: false },
       tooltip: {
         theme: 'light',
-        cssClass: 'ibr-school-tooltip',
+        cssClass: 'ibr-school-tooltip ibr-school-tooltip--wide',
         style: { fontSize: '14px', fontFamily: 'Ubuntu, sans-serif' },
         marker: { show: false },
         x: {
@@ -417,7 +417,7 @@ export class LearnInvestToReachGoalComponent implements OnInit {
         y: {
           formatter: (value: number) => formatCurrency(value),
           title: {
-            formatter: () => seriesName,
+            formatter: () => `${seriesName}:`,
           },
         },
       },
