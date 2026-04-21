@@ -208,7 +208,8 @@ tr.example-detail-row {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 16px 0;
+  // padding: 16px 0;
+  padding: 16px 0 0 0;
 }
 .client-search-wrapper .mat-mdc-card.mdc-card {
   background-color: #ffffffb2 !important;
