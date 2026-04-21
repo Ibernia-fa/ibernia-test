@@ -30,8 +30,8 @@ $ibernia-bg-soft: #f5f7ff;
 
 .learn-inflation__back-btn {
   position: absolute !important;
-  top: 8px;
-  left: 8px;
+  top: 14px;
+  left: 14px;
   background: transparent !important;
   border: none;
   box-shadow: none;
@@ -89,7 +89,8 @@ $impact-gutter: 56px;
 .learn-inflation__page--impact {
   gap: 14px;
   overflow: hidden;
-  padding: 8px $impact-gutter 16px;
+  /* Shared School header rule: title row top = 14px (matches back/close btns). */
+  padding: 14px $impact-gutter 16px;
 }
 
 .learn-inflation__hero {
@@ -395,15 +396,16 @@ $impact-gutter: 56px;
 
 .learn-inflation__page--causes {
   gap: 24px;
-  padding: 24px 0;
-  justify-content: center;
+  /* Shared School header rule: title row top = 14px. */
+  padding: 14px 0 24px;
 }
 
 .causes-header {
   display: flex;
   flex-direction: column;
+  /* Shared School header rule: subtitle gap = 8px below the title. */
   gap: 8px;
-  padding: 0 56px 0 56px;
+  padding: 0 56px;
   flex: 0 0 auto;
 
   &__title {
@@ -587,14 +589,16 @@ $impact-gutter: 56px;
 
 .learn-inflation__page--countries {
   gap: 18px;
-  padding-top: 8px;
+  /* Shared School header rule: title row top = 14px. */
+  padding-top: 14px;
 }
 
 .countries-header {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 0 56px 0 56px;
+  /* Shared School header rule: subtitle gap = 8px below the title. */
+  gap: 8px;
+  padding: 0 56px;
 
   &__title {
     margin: 0;
@@ -692,7 +696,8 @@ $impact-gutter: 56px;
 
 @media (max-width: 1024px) {
   .learn-inflation__page--impact {
-    padding: 8px 20px 14px;
+    /* Keep the shared 14px header top on tablet, just tighten the side gutter. */
+    padding: 14px 20px 14px;
   }
 
   .learn-inflation__hero {

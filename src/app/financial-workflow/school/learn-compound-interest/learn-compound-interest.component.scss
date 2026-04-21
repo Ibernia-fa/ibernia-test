@@ -38,8 +38,8 @@ $ibernia-line: #e5e5ec;
 
 .learn-compound__back-btn {
   position: absolute !important;
-  top: 8px;
-  left: 8px;
+  top: 14px;
+  left: 14px;
   background: transparent !important;
   border: none;
   box-shadow: none;
@@ -94,7 +94,8 @@ $ibernia-line: #e5e5ec;
 }
 
 .learn-compound__hero {
-  margin: 8px 56px 0;
+  /* Shared School header rule: title row top = 14px (matches back/close btns). */
+  margin: 14px 56px 0;
   font-size: 32px;
   line-height: 1.18;
   font-weight: 700;
@@ -363,7 +364,8 @@ $ibernia-line: #e5e5ec;
 
 @media (max-width: 1024px) {
   .learn-compound__hero {
-    margin: 8px 16px 0;
+    /* Shared School header rule: keep title row top at 14px on tablet too. */
+    margin: 14px 16px 0;
     font-size: 26px;
   }
 
