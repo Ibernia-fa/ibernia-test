@@ -8,7 +8,17 @@
         </p>
       </div>
 
-      <!-- School tiles: CSS grid fills rows left → center → right (see .card-grid) -->
+      <!--
+        School tiles: CSS grid fills rows left → center → right (see .card-grid).
+
+        SCHOOL CARD TITLE CONVENTION (single source of truth — i18n strings):
+          • Sentence case only — capitalize the first word and proper nouns.
+          • If the title is phrased as a question, it MUST end with "?".
+          • Apply the same rule across every language whose English source
+            is a question (e.g. en + it for the cards rendered below).
+          • Do NOT format titles in the template — keep the canonical text
+            in src/assets/i18n/<lang>.json under the SCHOOL.CARD_*_TITLE keys.
+      -->
       <div class="ibr-school-card-container">
         <div class="card-grid">
           <!-- Row 1 — Inflation -->

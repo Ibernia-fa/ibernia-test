@@ -36,6 +36,14 @@ $ibernia-bg-soft: #f7f8fc;
     position: relative;
     padding: 0 40px 16px;
     flex: 0 0 auto;
+
+    /* Re-anchor the shared `.dialog-close-btn` (top: 16px in `_dialog.scss`)
+       so the 40px mat-icon-button's visual center sits on the same horizontal
+       line as the 24px title text. Scoped to this modal only — the close
+       button's own size, styling, and behavior are untouched. */
+    .dialog-close-btn {
+      top: -4px;
+    }
   }
 
   /* Reset legacy 22px / 700 title — the canonical `.dialog-title` is 24/600. */

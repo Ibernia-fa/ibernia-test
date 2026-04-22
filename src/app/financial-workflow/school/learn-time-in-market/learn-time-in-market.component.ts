@@ -15,6 +15,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { NgApexchartsModule } from 'ng-apexcharts';
 
 import { AutoFitTitleDirective } from 'src/app/directives/auto-fit-title.directive';
+import { formatAppDisplayNumber } from 'src/app/shared/utils/number-utils';
 
 const ACCENT = '#4043af';
 const ACCENT_SOFT = '#516ce8';
@@ -437,16 +438,15 @@ export class LearnTimeInMarketComponent {
   readonly chartTooltip = computed(() => {
     this.langTick();
     const seriesName = this.translate.instant('LEARN_TIM.SERIES_NAME');
+    const lang = this.translate.currentLang;
     return {
       theme: 'light',
       cssClass: 'ibr-school-tooltip',
       style: { fontSize: '13px', fontFamily: 'Ubuntu, sans-serif' },
-      x: { format: 'MMM yyyy' },
+      x: { format: 'yyyy' },
       y: {
         formatter: (value: number) =>
-          value >= 1000
-            ? `${(Math.round(value * 10) / 10).toFixed(1)}`
-            : `${(Math.round(value * 100) / 100).toFixed(2)}`,
+          formatAppDisplayNumber(lang, Math.round(value)),
         title: { formatter: () => seriesName },
       },
       marker: { show: false },
@@ -515,46 +515,46 @@ export class LearnTimeInMarketComponent {
       format: 'yyyy',
     },
     tickAmount: 10,
-  };
-
-  readonly chartYaxis = {
-    logarithmic: true,
-    logBase: 10,
-    tickAmount: 4,
-    labels: {
-      style: {
-        colors: '#5a596e',
-        fontSize: '12px',
-        fontFamily: 'Ubuntu, sans-serif',
-      },
-      formatter: (value: number) => {
-        if (!Number.isFinite(value)) return '';
-        if (value >= 1000) return `${Math.round(value / 100) / 10}k`;
-        if (value >= 100) return `${Math.round(value)}`;
-        return `${Math.round(value * 10) / 10}`;
+    /* The floating axis label that appears under the chart on hover
+       must also show year-only — never months — to keep the chart
+       communicating time at year granularity. */
+    tooltip: {
+      enabled: true,
+      formatter: (val: number) => {
+        const ms = typeof val === 'number' ? val : Number(val);
+        if (!Number.isFinite(ms)) return '';
+        return new Date(ms).getFullYear().toString();
       },
     },
   };
 
-  /* Legend rendered INSIDE the chart at top center, matching the
-     other School charts (compound interest, rent-or-buy, inflation). */
-  readonly chartLegend = {
-    show: true,
-    position: 'top',
-    horizontalAlign: 'center',
-    offsetY: -4,
-    fontFamily: 'Ubuntu, sans-serif',
-    fontSize: '12px',
-    fontWeight: 600,
-    labels: { colors: '#5a596e' },
-    markers: {
-      width: 14,
-      height: 3,
-      radius: 2,
-      offsetY: -2,
-    },
-    itemMargin: { horizontal: 12, vertical: 0 },
-  };
+  readonly chartYaxis = computed(() => {
+    this.langTick();
+    const lang = this.translate.currentLang;
+    return {
+      logarithmic: true,
+      logBase: 10,
+      tickAmount: 4,
+      labels: {
+        style: {
+          colors: '#5a596e',
+          fontSize: '12px',
+          fontFamily: 'Ubuntu, sans-serif',
+        },
+        formatter: (value: number) => {
+          if (!Number.isFinite(value)) return '';
+          return formatAppDisplayNumber(lang, Math.round(value));
+        },
+      },
+    };
+  });
+
+  /* The legend / source identification is now rendered as a custom
+     header ABOVE the chart frame (see template). It clearly shows
+     "DJIA · S&P 500" together with the logarithmic-scale source note
+     so users immediately understand what the line represents. The
+     built-in Apex legend is therefore disabled to avoid duplication. */
+  readonly chartLegend = { show: false };
 
   /** Annotations — the only chart input that updates on hover/select. */
   readonly chartAnnotations = computed(() => {

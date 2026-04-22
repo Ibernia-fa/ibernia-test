@@ -93,6 +93,9 @@
             <div
               class="bm-chart"
               role="img"
+              [style.--bm-pos-3]="pos3Percent() + '%'"
+              [style.--bm-pos-12]="pos12Percent() + '%'"
+              [style.--bm-pos-24]="pos24Percent() + '%'"
               [attr.aria-label]="'LEARN_CASH_BUFFER.RANGE_ARIA' | translate"
             >
               <!-- Zone headers, centered above each segment of the scale -->
@@ -123,9 +126,11 @@
                 </div>
               </div>
 
-              <!-- Track + ticks share the same width and a small reserved
-                   right-side area so the marker callout stays inside the
-                   card when the user value exceeds 24 months. -->
+              <!-- Track + ticks share the same dynamic width. The axis
+                   keeps the 0–24 months framework anchored as the
+                   standard reference, and extends gracefully in 6-month
+                   increments when the user value exceeds 24 so the
+                   marker stays on the line. -->
               <div class="bm-chart__track-wrap">
                 <div class="bm-chart__track" aria-hidden="true">
                   <!-- Subtle vertical guides at 3 and 12 months -->
@@ -143,7 +148,6 @@
                   @if (markerPercent() !== null) {
                     <div
                       class="bm-chart__marker"
-                      [class.bm-chart__marker--clamped]="markerClamped()"
                       [attr.data-align]="markerCalloutAlignment()"
                       [style.left.%]="markerPercent()!"
                       [attr.title]="formatMonthsDisplay(bufferMonths())"
@@ -164,11 +168,28 @@
                 </div>
 
                 <div class="bm-chart__ticks" aria-hidden="true">
-                  <span class="bm-chart__tick bm-chart__tick--0">0</span>
-                  <span class="bm-chart__tick bm-chart__tick--3">3</span>
-                  <span class="bm-chart__tick bm-chart__tick--6">6</span>
-                  <span class="bm-chart__tick bm-chart__tick--12">12</span>
-                  <span class="bm-chart__tick bm-chart__tick--24">24</span>
+                  <span class="bm-chart__tick bm-chart__tick--0">
+                    <span class="bm-chart__tick-connector"></span>
+                    <span class="bm-chart__tick-label">0</span>
+                  </span>
+                  <span class="bm-chart__tick bm-chart__tick--3">
+                    <span class="bm-chart__tick-connector"></span>
+                    <span class="bm-chart__tick-label">3</span>
+                  </span>
+                  <span class="bm-chart__tick bm-chart__tick--12">
+                    <span class="bm-chart__tick-connector"></span>
+                    <span class="bm-chart__tick-label">12</span>
+                  </span>
+                  <span class="bm-chart__tick bm-chart__tick--24">
+                    <span class="bm-chart__tick-connector"></span>
+                    <span class="bm-chart__tick-label">24</span>
+                  </span>
+                  @if (extendedMaxLabel() !== null) {
+                    <span class="bm-chart__tick bm-chart__tick--max">
+                      <span class="bm-chart__tick-connector"></span>
+                      <span class="bm-chart__tick-label">{{ extendedMaxLabel() }}</span>
+                    </span>
+                  }
                 </div>
 
                 <span class="bm-chart__axis-title">
