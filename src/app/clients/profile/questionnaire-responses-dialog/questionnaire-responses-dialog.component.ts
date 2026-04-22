@@ -114,10 +114,14 @@ export class QuestionnaireResponsesDialogComponent {
     if (typeof v === 'object') {
       const obj = v as Record<string, unknown>;
       const selected = obj['selected'] as string[] | undefined;
-      const others = obj['others'] as string | undefined;
+      const others = (obj['others'] as string | undefined)?.trim();
       const parts = selected ? [...selected] : [];
-      // Keep a stable token for icon lookups; localize at render time.
-      if (others) parts.push(`Other: ${others}`);
+      // Avoid listing bare "Other" and "Other: …" when free text is present; icon key still resolves via "Other:" prefix in getResponseChipsWithIcons.
+      if (others) {
+        const withoutBareOther = parts.filter((p) => p !== 'Other');
+        withoutBareOther.push(`Other: ${others}`);
+        return withoutBareOther.join(', ') || '-';
+      }
       return parts.join(', ') || '-';
     }
     return String(v);
