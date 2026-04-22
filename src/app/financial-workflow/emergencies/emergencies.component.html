@@ -538,6 +538,7 @@
                     >
                       <div class="label">{{ "Status" | translate }}</div>
                       <div class="status-edit-row">
+                        <span class="edit-hint-slot" aria-hidden="true"></span>
                         <span
                           class="not-cover-label"
                           [ngClass]="{
@@ -547,12 +548,13 @@
                         >
                           {{ "Not covered" | translate }}
                         </span>
-                        <img
-                          class="edit-hint-icon"
-                          src="assets/images/svgs/pen-icon.svg"
-                          alt=""
-                          aria-hidden="true"
-                        />
+                        <span class="edit-hint-slot" aria-hidden="true">
+                          <img
+                            class="edit-hint-icon"
+                            src="assets/images/svgs/pen-icon.svg"
+                            alt=""
+                          />
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -581,10 +583,12 @@
                     class="inner-information text-center d-flex flex-column gap-4"
                   >
                     <div class="label">{{ "Status" | translate }}</div>
-                    <div
-                      class="status-edit-row"
-                      [class.is-incomplete]="e.willStatus !== 1"
-                    >
+                    <div class="status-edit-row">
+                      <span
+                        *ngIf="e.willStatus !== 1"
+                        class="edit-hint-slot"
+                        aria-hidden="true"
+                      ></span>
                       <span
                         class="not-cover-label"
                         [ngClass]="{
@@ -598,13 +602,17 @@
                             : ("Not done" | translate)
                         }}
                       </span>
-                      <img
+                      <span
                         *ngIf="e.willStatus !== 1"
-                        class="edit-hint-icon"
-                        src="assets/images/svgs/pen-icon.svg"
-                        alt=""
+                        class="edit-hint-slot"
                         aria-hidden="true"
-                      />
+                      >
+                        <img
+                          class="edit-hint-icon"
+                          src="assets/images/svgs/pen-icon.svg"
+                          alt=""
+                        />
+                      </span>
                     </div>
                   </div>
                 </div>
