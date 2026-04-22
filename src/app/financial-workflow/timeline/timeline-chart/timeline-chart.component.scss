@@ -382,13 +382,9 @@
   font-size: 12px;
 }
 
-/*
- * Hover-only: shift the highlighted x-axis label (white box from TS) 16px left.
- * Use margin-left — not transform — on .vis-text so we never override vis-timeline’s own
- * transform used to place each year along the axis.
- */
+
 ::ng-deep .timeline-container .vis-time-axis .vis-text.vis-minor.highlighted {
-  margin-left: -20px;
+  margin-left: 0;
 }
 
 .vis-text.vis-minor.highlighted {
