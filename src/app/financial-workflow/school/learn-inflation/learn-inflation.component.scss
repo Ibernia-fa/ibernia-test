@@ -475,44 +475,13 @@ $impact-gutter: 56px;
     place-items: center;
     padding: 20px 24px;
     overflow: hidden;
-    background:
-      radial-gradient(
-        120% 100% at 50% 0%,
-        rgba(64, 67, 175, 0.06) 0%,
-        rgba(64, 67, 175, 0) 60%
-      ),
-      linear-gradient(180deg, #ffffff 0%, #f7f8ff 100%);
+    /**
+     * Hero fill matches the off-white background of the 3D cause illustrations
+     * (#f6f5fa) so the square asset blends into the rectangular hero area and
+     * reads as one continuous block — no "image pasted on a tinted card" feel.
+     */
+    background: #f6f5fa;
     border-bottom: 1px solid rgba(64, 67, 175, 0.07);
-
-    &::before {
-      content: "";
-      position: absolute;
-      inset: -55% -25% auto auto;
-      width: 260px;
-      height: 260px;
-      background: radial-gradient(
-        circle,
-        rgba(81, 108, 232, 0.10) 0%,
-        rgba(81, 108, 232, 0) 65%
-      );
-      border-radius: 50%;
-      pointer-events: none;
-    }
-
-    &::after {
-      content: "";
-      position: absolute;
-      inset: auto auto -50% -25%;
-      width: 220px;
-      height: 220px;
-      background: radial-gradient(
-        circle,
-        rgba(64, 67, 175, 0.07) 0%,
-        rgba(64, 67, 175, 0) 65%
-      );
-      border-radius: 50%;
-      pointer-events: none;
-    }
   }
 
   &__image {
