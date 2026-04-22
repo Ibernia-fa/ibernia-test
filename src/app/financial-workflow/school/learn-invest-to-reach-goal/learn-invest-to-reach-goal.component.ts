@@ -362,7 +362,9 @@ export class LearnInvestToReachGoalComponent implements OnInit {
       markers: {
         size: 0,
         strokeWidth: 0,
-        hover: { size: 5 },
+        colors: ['#ffffff'],
+        strokeColors: ACCENT,
+        hover: { size: 5, sizeOffset: 0 },
       },
       dataLabels: { enabled: false },
       grid: {
@@ -381,6 +383,18 @@ export class LearnInvestToReachGoalComponent implements OnInit {
         axisBorder: { show: false },
         axisTicks: { show: false },
         tickPlacement: 'on',
+        /* Match the other School line charts: a soft vertical crosshair
+           highlights the hovered year, and we suppress the default floating
+           year label so only the styled tooltip card communicates values. */
+        crosshairs: {
+          show: true,
+          stroke: {
+            color: 'rgba(64, 67, 175, 0.18)',
+            width: 1,
+            dashArray: 0,
+          },
+        },
+        tooltip: { enabled: false },
         labels: {
           style: {
             colors: '#5a596e',
@@ -407,11 +421,19 @@ export class LearnInvestToReachGoalComponent implements OnInit {
       },
       legend: { show: false },
       tooltip: {
+        enabled: true,
         theme: 'light',
         cssClass: 'ibr-school-tooltip ibr-school-tooltip--wide',
         style: { fontSize: '14px', fontFamily: 'Ubuntu, sans-serif' },
+        /* Shared + non-intersect mirrors the compound-interest / inflation
+           charts so hovering anywhere along a year reliably surfaces the
+           value, not only directly over the (invisible) data marker. */
+        shared: true,
+        intersect: false,
+        followCursor: false,
         marker: { show: false },
         x: {
+          show: true,
           formatter: (_val: unknown, opts?: { dataPointIndex?: number }) => {
             const idx = opts?.dataPointIndex ?? 0;
             return `${yearPrefix}${idx}`;

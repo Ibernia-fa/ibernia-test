@@ -182,6 +182,11 @@ $invest-goal-gutter: 56px;
     color: $ibernia-mute;
     letter-spacing: 0.6px;
     text-transform: uppercase;
+    /* Honor explicit line breaks (\n) in translations so we can keep the
+       paired input tiles vertically aligned in locales whose label naturally
+       fits on a single line (e.g. Italian "Età\nobiettivo" matching the
+       two-line "Rendimento atteso"). Locales without a "\n" wrap as before. */
+    white-space: pre-line;
   }
 
   &__value {

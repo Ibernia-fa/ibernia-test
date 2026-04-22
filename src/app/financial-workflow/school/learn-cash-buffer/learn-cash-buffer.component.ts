@@ -69,34 +69,55 @@ export class LearnCashBufferComponent implements OnInit {
     return this.cash() / m;
   });
 
-  /** Fixed visual scale for the benchmark graph only (0–24 months); does not affect numeric results. */
-  readonly benchmarkVisualMaxMonths = 24;
+  /**
+   * Baseline visual scale for the benchmark chart. The chart always anchors
+   * 24 months as the standard reference, but extends gracefully in 6-month
+   * increments when the user value exceeds it so the marker always sits on
+   * the line itself. The 0–24 framework remains visible at all times.
+   */
+  readonly benchmarkBaselineMaxMonths = 24;
+
+  /**
+   * Effective visual maximum for the chart axis. Defaults to the baseline
+   * (24). When the buffer exceeds 24 months the axis is extended in 6-month
+   * steps with at least 1 month of headroom past the marker so the dot stays
+   * on the line and the callout has breathing room.
+   */
+  readonly visualMaxMonths = computed(() => {
+    const bm = this.bufferMonths();
+    const base = this.benchmarkBaselineMaxMonths;
+    if (bm === null || bm <= base) return base;
+    return Math.max(base, Math.ceil((bm + 1) / 6) * 6);
+  });
+
+  /** True when the chart has been extended past the baseline 24 months. */
+  readonly axisExtended = computed(() => this.visualMaxMonths() > this.benchmarkBaselineMaxMonths);
+
+  /** Extra tick label shown only when the axis has been extended. */
+  readonly extendedMaxLabel = computed(() => (this.axisExtended() ? this.visualMaxMonths() : null));
 
   /**
    * Visual position of the marker on the rendered scale, expressed as a
-   * percentage of the chart track width. Values 0–100 map directly to 0–24
-   * months. When the real buffer exceeds 24 months, the marker is parked
-   * inside a small reserved area just past the 24 tick (around 102%) so the
-   * "You are here" callout stays fully visible inside the card.
+   * percentage of the chart track width. With the dynamic axis the marker
+   * is always on the line: at 100% the dot sits exactly on the rightmost
+   * tick.
    */
   readonly markerPercent = computed(() => {
     const bm = this.bufferMonths();
     if (bm === null) return null;
-    const max = this.benchmarkVisualMaxMonths;
-    if (bm > max) return 102;
+    const max = this.visualMaxMonths();
     return (Math.max(0, bm) / max) * 100;
   });
 
-  /** True when the real value exceeds the visual max (marker is parked in the reserved area). */
-  readonly markerClamped = computed(() => {
-    const bm = this.bufferMonths();
-    return bm !== null && bm > this.benchmarkVisualMaxMonths;
-  });
+  /** Position percentages for the fixed reference ticks (0, 3, 12, 24). */
+  readonly pos3Percent = computed(() => (3 / this.visualMaxMonths()) * 100);
+  readonly pos12Percent = computed(() => (12 / this.visualMaxMonths()) * 100);
+  readonly pos24Percent = computed(() => (24 / this.visualMaxMonths()) * 100);
 
   /**
    * Horizontal alignment for the marker callout so it stays inside the card
    * at both ends of the scale (left-aligned near 0, right-aligned near the
-   * clamped end, centered everywhere else).
+   * far end, centered everywhere else).
    */
   readonly markerCalloutAlignment = computed<'start' | 'center' | 'end'>(() => {
     const p = this.markerPercent();

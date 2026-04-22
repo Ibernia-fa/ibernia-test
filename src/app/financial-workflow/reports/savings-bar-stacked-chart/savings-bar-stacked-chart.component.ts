@@ -188,11 +188,15 @@ export class SavingsBarStackedChartComponent
         stacked: true,
         animations: {
           // Keep disabled by default to preserve existing report-page behavior.
-          // Scenario Lab passes `animateUpdates=true`, which turns this on in ngOnChanges.
+          // Scenario Lab + Simulation modal pass `animateUpdates=true`, which turns this on
+          // in ngOnChanges. Tuned for a calm, premium Before/After morph: short duration with
+          // a smooth easeout curve (no overshoot, no bounce).
           enabled: false,
+          easing: 'easeout',
+          speed: 220,
           dynamicAnimation: {
             enabled: true,
-            speed: 1500,
+            speed: 220,
           },
           animateGradually: { enabled: false },
         },

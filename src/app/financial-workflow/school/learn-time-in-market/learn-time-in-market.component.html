@@ -58,12 +58,23 @@
         <!-- RIGHT: chart on top, dedicated detail card below -->
         <section class="learn-tim__main">
           <div class="learn-tim__chart-wrap">
+            <header class="learn-tim__chart-head">
+              <span class="learn-tim__chart-legend" aria-hidden="true">
+                <span class="learn-tim__chart-legend-swatch"></span>
+                <span class="learn-tim__chart-legend-label">
+                  {{ "LEARN_TIM.SERIES_LEGEND" | translate }}
+                </span>
+              </span>
+              <span class="learn-tim__chart-sub">
+                {{ "LEARN_TIM.AXIS_NOTE" | translate }}
+              </span>
+            </header>
             <div class="learn-tim__chart">
               <apx-chart
                 [series]="chartSeries()"
                 [chart]="chartConfig"
                 [xaxis]="chartXaxis"
-                [yaxis]="chartYaxis"
+                [yaxis]="chartYaxis()"
                 [stroke]="chartStroke"
                 [colors]="chartColors"
                 [tooltip]="chartTooltip()"
@@ -74,11 +85,6 @@
                 [fill]="chartFill"
                 [annotations]="chartAnnotations()"
               ></apx-chart>
-            </div>
-            <div class="learn-tim__chart-meta">
-              <span class="learn-tim__chart-note">
-                {{ "LEARN_TIM.AXIS_NOTE" | translate }}
-              </span>
             </div>
           </div>
 

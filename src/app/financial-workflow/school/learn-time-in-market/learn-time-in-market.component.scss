@@ -155,20 +155,26 @@ $tim-gutter: 56px;
   padding: 0 2px 0 0;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  /* Slightly more breathing room between tiles so the list scans like
+     a deliberate navigator, not a dense menu. */
+  gap: 8px;
 }
 
-/* ----- Compact event tile ----- */
+/* ----- Event tile -----
+   Sized a touch larger than a "compact list row": more vertical
+   padding, slightly heavier typography, and a touch more weight on
+   the drawdown number — all while staying scannable enough that
+   scrolling the column still feels natural. */
 .event-tile {
   position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: 12px;
   text-align: left;
   width: 100%;
-  padding: 9px 14px 10px 14px;
-  border-radius: 10px;
+  padding: 12px 16px 13px 16px;
+  border-radius: 12px;
   border: 1px solid $ibernia-line;
   background: #ffffff;
   cursor: pointer;
@@ -177,7 +183,8 @@ $tim-gutter: 56px;
   transition:
     border-color 0.18s ease,
     background 0.18s ease,
-    box-shadow 0.18s ease;
+    box-shadow 0.18s ease,
+    transform 0.18s ease;
 
   &:focus-visible {
     outline: 2px solid $ibernia-blue;
@@ -198,13 +205,13 @@ $tim-gutter: 56px;
       );
     box-shadow:
       0 1px 0 rgba(20, 22, 48, 0.02),
-      0 6px 14px rgba(64, 67, 175, 0.1);
+      0 8px 18px rgba(64, 67, 175, 0.12);
 
     &::before {
       content: "";
       position: absolute;
-      top: 8px;
-      bottom: 8px;
+      top: 10px;
+      bottom: 10px;
       left: 0;
       width: 3px;
       border-radius: 0 3px 3px 0;
@@ -215,13 +222,13 @@ $tim-gutter: 56px;
   &__main {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 3px;
     min-width: 0;
     flex: 1 1 auto;
   }
 
   &__range {
-    font-size: 10.5px;
+    font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.6px;
     color: $ibernia-mute;
@@ -231,9 +238,9 @@ $tim-gutter: 56px;
   }
 
   &__name {
-    font-size: 13px;
+    font-size: 13.5px;
     font-weight: 600;
-    line-height: 1.25;
+    line-height: 1.3;
     color: $ibernia-ink;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -244,7 +251,7 @@ $tim-gutter: 56px;
   }
 
   &__drawdown {
-    font-size: 14.5px;
+    font-size: 15.5px;
     font-weight: 700;
     color: $ibernia-neg;
     font-variant-numeric: tabular-nums;
@@ -267,16 +274,8 @@ $tim-gutter: 56px;
 .learn-tim__chart-wrap {
   display: flex;
   flex-direction: column;
-  gap: 6px;
   flex: 1 1 auto;
   min-height: 0;
-}
-
-.learn-tim__chart {
-  flex: 1 1 auto;
-  /* Floor low so the detail card and disclaimer below always have
-     room; the chart is the elastic element on this slide. */
-  min-height: 220px;
   border: 1px solid $ibernia-line;
   border-radius: 16px;
   background:
@@ -286,36 +285,75 @@ $tim-gutter: 56px;
       rgba(64, 67, 175, 0) 60%
     ),
     #ffffff;
-  position: relative;
   overflow: hidden;
   box-shadow:
     0 1px 0 rgba(20, 22, 48, 0.02),
     0 10px 28px rgba(64, 67, 175, 0.05);
-
-  apx-chart {
-    position: absolute;
-    /* Reserve a little extra room at the top so the in-chart legend
-       sits cleanly above the line and never collides with axis
-       labels or the trough marker. */
-    inset: 18px 18px 6px 6px;
-    display: block;
-  }
 }
 
-.learn-tim__chart-meta {
+/* ----- Chart header / built-in subtitle -----
+   Sits at the top of the chart card. Left side identifies the
+   composite line (DJIA · S&P 500) with a small color swatch; right
+   side gives the source / scale note that used to live below the
+   graph. Acts as a small chart subtitle, secondary to the slide
+   title but clearly attached to the graph. */
+.learn-tim__chart-head {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
+  gap: 16px;
   flex-shrink: 0;
-  padding: 0 4px;
+  padding: 12px 18px 10px;
+  border-bottom: 1px solid rgba(64, 67, 175, 0.08);
 }
 
-.learn-tim__chart-note {
+.learn-tim__chart-legend {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.learn-tim__chart-legend-swatch {
+  display: inline-block;
+  width: 18px;
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, $ibernia-blue, $ibernia-blue-soft);
+}
+
+.learn-tim__chart-legend-label {
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  color: $ibernia-ink;
+}
+
+.learn-tim__chart-sub {
   font-size: 11.5px;
   color: $ibernia-mute;
   font-style: italic;
   font-weight: 400;
   text-align: right;
+  line-height: 1.3;
+  min-width: 0;
+}
+
+.learn-tim__chart {
+  flex: 1 1 auto;
+  /* Floor low so the detail card and disclaimer below always have
+     room; the chart is the elastic element on this slide. */
+  min-height: 220px;
+  position: relative;
+  overflow: hidden;
+
+  apx-chart {
+    position: absolute;
+    /* The header above already provides the legend / source note,
+       so the chart frame can use a tighter top inset. */
+    inset: 8px 18px 6px 6px;
+    display: block;
+  }
 }
 
 /* ----- Detail card (below the chart) ----- */
@@ -493,8 +531,25 @@ $tim-gutter: 56px;
     gap: 12px 18px;
   }
 
+  .event-tile {
+    padding: 11px 14px 12px 14px;
+  }
+
   .event-tile__name {
-    font-size: 12.5px;
+    font-size: 13px;
+  }
+
+  .event-tile__drawdown {
+    font-size: 14.5px;
+  }
+
+  .learn-tim__chart-head {
+    padding: 10px 14px 8px;
+    gap: 12px;
+  }
+
+  .learn-tim__chart-sub {
+    font-size: 11px;
   }
 }
 
@@ -513,23 +568,26 @@ $tim-gutter: 56px;
   rx: 0;
 }
 
-/* In-chart legend: keep it visible (no clipped scrollbar) and
-   visually consistent with the other School charts. */
-:host ::ng-deep .learn-tim__chart .apexcharts-legend {
-  overflow: visible !important;
-  scrollbar-width: none;
-  padding: 0 !important;
-}
-
-:host ::ng-deep .learn-tim__chart .apexcharts-legend::-webkit-scrollbar {
-  display: none;
-  width: 0;
-  height: 0;
-}
-
-:host ::ng-deep .learn-tim__chart .apexcharts-legend-text {
-  color: $ibernia-mute !important;
+/* The chart's own legend / subtitle is rendered as a custom HTML
+   header above the chart frame, so the built-in Apex legend is
+   disabled. The xaxis floating tooltip (year-only label that
+   appears under the cursor on hover) is restyled to match the
+   premium tooltip look used elsewhere in School. */
+:host ::ng-deep .learn-tim__chart .apexcharts-xaxistooltip {
+  background: #ffffff !important;
+  border: 1px solid rgba(64, 67, 175, 0.18) !important;
+  color: $ibernia-ink !important;
   font-family: "Ubuntu", sans-serif !important;
+  font-size: 11.5px !important;
+  font-weight: 600 !important;
+  border-radius: 6px !important;
+  padding: 2px 8px !important;
+  box-shadow: 0 4px 12px rgba(64, 67, 175, 0.12) !important;
+
+  &::before,
+  &::after {
+    border-bottom-color: rgba(64, 67, 175, 0.18) !important;
+  }
 }
 
 /* ============================================================
