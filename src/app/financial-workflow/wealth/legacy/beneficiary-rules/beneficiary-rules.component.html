@@ -1,4 +1,4 @@
-<div class="d-flex flex-column">
+<div class="beneficiary-rules-root d-flex flex-column">
   <div class="dialog-header">
     <h2 class="dialog-title text-center">{{ 'Beneficiary rules' | translate }}</h2>
     <button
@@ -6,6 +6,7 @@
       mat-icon-button
       disableRipple
       class="dialog-close-btn"
+      [disabled]="isSaving"
       [attr.aria-label]="'LEGACY.CLOSE_DIALOG' | translate"
       (click)="onClose()"
     >
@@ -84,7 +85,9 @@
         <span class="f-s-16">{{
           canAddRecipient
             ? ("Add recipient" | translate)
-            : ("All eligible beneficiaries added" | translate)
+            : showAdjustPercentagesHint
+              ? ("LEGACY.BENEFICIARY_RULES_ADJUST_TO_100" | translate)
+              : ("All eligible beneficiaries added" | translate)
         }}</span>
       </button>
 
@@ -141,10 +144,27 @@
           </div>
         </div>
 
-        <div class="d-flex align-items-center gap-24 pct-row">
+        <div
+          class="d-flex align-items-center gap-24 pct-row"
+          [class.pct-row--single-recipient-hint]="!canEditPercentSplit"
+          [matTooltip]="'LEGACY.BENEFICIARY_RULES_SINGLE_RECIPIENT_PCT_HINT' | translate"
+          [matTooltipDisabled]="canEditPercentSplit"
+          matTooltipPosition="above"
+          [matTooltipShowDelay]="200"
+        >
           <div class="slider-customizer slider-wrapper pct-slider-wrap">
-            <mat-slider class="w-100" min="0" max="100" step="1">
-              <input matSliderThumb [(ngModel)]="row.percentage" />
+            <mat-slider
+              class="w-100"
+              min="0"
+              max="100"
+              step="1"
+              [disabled]="!canEditPercentSplit"
+            >
+              <input
+                matSliderThumb
+                [(ngModel)]="row.percentage"
+                (ngModelChange)="onRecipientPercentageChange(i)"
+              />
             </mat-slider>
           </div>
           <div class="percentage-field">
@@ -153,6 +173,8 @@
                 matInput
                 type="number"
                 [(ngModel)]="row.percentage"
+                (ngModelChange)="onRecipientPercentageChange(i)"
+                [disabled]="!canEditPercentSplit"
                 min="0"
                 max="100"
                 placeholder="0"
@@ -213,6 +235,7 @@
       <button
         type="button"
         (click)="onClose()"
+        [disabled]="isSaving"
         class="button-icon-outline w-100 d-block"
       >
         <span class="f-s-16">{{ 'Cancel' | translate }}</span>
@@ -229,4 +252,17 @@
       </button>
     </div>
   </div>
+
+  @if (isSaving) {
+    <div
+      class="beneficiary-rules-save-overlay"
+      role="status"
+      aria-live="polite"
+    >
+      <mat-spinner diameter="44" />
+      <span class="beneficiary-rules-save-overlay-label">{{
+        "LEGACY.BENEFICIARY_RULES_SAVING" | translate
+      }}</span>
+    </div>
+  }
 </div>

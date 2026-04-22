@@ -33,6 +33,7 @@ import {
   ScenarioType,
   FamilyRole,
   FAMILY_ROLE_LABELS,
+  BeneficiaryRuleModel,
 } from './models/legacy.model';
 import { AddMemberComponent } from './add-member/add-member.component';
 import { BeneficiaryRulesComponent } from './beneficiary-rules/beneficiary-rules.component';
@@ -97,6 +98,8 @@ export class LegacyComponent
   activeScenario: ScenarioType | null = null;
   scenarioResult: ScenarioResultModel | null = null;
   markedDeceased = new Set<string>();
+  /** Collapsible summary: collapsed shows title + hint only. */
+  beneficiaryRulesSummaryExpanded = false;
 
   private rafId: number | null = null;
   private mutationObs?: MutationObserver;
@@ -197,6 +200,57 @@ export class LegacyComponent
     return (
       this.dashboard?.familyMembers.filter((m) => m.role === 'Child') ?? []
     );
+  }
+
+  /** Saved (non-default) beneficiary rules shown in the Family Tree summary. */
+  get customBeneficiaryRules(): BeneficiaryRuleModel[] {
+    return this.dashboard?.beneficiaryRules?.filter((r) => !r.isDefault) ?? [];
+  }
+
+  get customBeneficiaryRuleCount(): number {
+    return this.customBeneficiaryRules.length;
+  }
+
+  beneficiaryScenarioLabel(scenario: string): string {
+    const clientName =
+      this.clientMember?.firstName ??
+      this.translate.instant('LEGACY.PARENTS_NET_WORTH_MODAL_NAME_FALLBACK_CLIENT');
+    const partnerName =
+      this.partnerMember?.firstName ??
+      this.translate.instant('LEGACY.PARENTS_NET_WORTH_MODAL_NAME_FALLBACK_PARTNER');
+    switch (scenario) {
+      case 'ClientDies':
+        return this.translate.instant('LEGACY.BENEFICIARY_SCENARIO_CLIENT_DIES', {
+          name: clientName,
+        });
+      case 'PartnerDies':
+        return this.translate.instant('LEGACY.BENEFICIARY_SCENARIO_PARTNER_DIES', {
+          name: partnerName,
+        });
+      case 'BothDie':
+        return this.translate.instant('LEGACY.BENEFICIARY_SCENARIO_BOTH_DIE');
+      case 'ClientParentsDie':
+        return this.translate.instant('LEGACY.BENEFICIARY_SCENARIO_CLIENT_PARENTS_DIE', {
+          name: clientName,
+        });
+      case 'PartnerParentsDie':
+        return this.translate.instant('LEGACY.BENEFICIARY_SCENARIO_PARTNER_PARENTS_DIE', {
+          name: partnerName,
+        });
+      default:
+        return scenario;
+    }
+  }
+
+  formatBeneficiaryRuleRecipients(rule: BeneficiaryRuleModel): string {
+    return rule.recipients
+      .map((r) => `${r.memberName} (${Math.round(r.percentage)}%)`)
+      .join(', ');
+  }
+
+  toggleBeneficiaryRulesSummary(): void {
+    this.beneficiaryRulesSummaryExpanded = !this.beneficiaryRulesSummaryExpanded;
+    this.cdr.markForCheck();
   }
 
   get otherMembers(): FamilyMemberModel[] {
@@ -611,6 +665,7 @@ export class LegacyComponent
     const dialogRef = this.dialog.open(BeneficiaryRulesComponent, {
       width: '612px',
       disableClose: true,
+      exitAnimationDuration: '0ms',
       data: {
         cashflowId: this.cashflowId,
         dashboard: this.dashboard,

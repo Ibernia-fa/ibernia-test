@@ -19,11 +19,21 @@
           </button>
           <!-- class="action-btn action-btn-outline" -->
           <button
-            class="button-icon-outline"
+            type="button"
+            class="button-icon-outline beneficiary-rules-header-btn"
             (click)="onOpenBeneficiaryRules()"
           >
-            <span class="f-s-16 f-w-500">
-              {{ "Beneficiary rules" | translate }}</span
+            <span class="f-s-16 f-w-500">{{
+              "Beneficiary rules" | translate
+            }}</span>
+            <span
+              *ngIf="customBeneficiaryRuleCount > 0"
+              class="beneficiary-rules-count-badge"
+              [matTooltip]="
+                'LEGACY.BENEFICIARY_RULES_BADGE_TOOLTIP' | translate
+                  : { count: customBeneficiaryRuleCount }
+              "
+              >{{ customBeneficiaryRuleCount }}</span
             >
           </button>
 
@@ -31,6 +41,65 @@
             <span class="f-s-16 f-w-500"> {{ "Add member" | translate }}</span>
             <img src="assets/images/svgs/add-icon.svg" alt="add-icon" />
           </button>
+        </div>
+      </div>
+
+      <div
+        class="beneficiary-rules-summary"
+        *ngIf="dashboard && customBeneficiaryRules.length > 0"
+      >
+        <button
+          type="button"
+          class="beneficiary-rules-summary-toggle"
+          [class.beneficiary-rules-summary-toggle--expanded]="
+            beneficiaryRulesSummaryExpanded
+          "
+          (click)="toggleBeneficiaryRulesSummary()"
+          [attr.aria-expanded]="beneficiaryRulesSummaryExpanded"
+        >
+          <div class="beneficiary-rules-summary-title-row">
+            <mat-icon class="beneficiary-rules-summary-icon">rule</mat-icon>
+            <span class="beneficiary-rules-summary-title">{{
+              "LEGACY.BENEFICIARY_RULES_SAVED_SUMMARY_TITLE" | translate
+            }}</span>
+          </div>
+          <p class="beneficiary-rules-summary-hint">
+            {{ "LEGACY.BENEFICIARY_RULES_SAVED_SUMMARY_HINT" | translate }}
+          </p>
+        </button>
+        <div
+          class="beneficiary-rules-summary-expand"
+          [class.beneficiary-rules-summary-expand--open]="
+            beneficiaryRulesSummaryExpanded
+          "
+        >
+          <div
+            class="beneficiary-rules-summary-expand-inner"
+            [attr.aria-hidden]="!beneficiaryRulesSummaryExpanded"
+          >
+            <div class="beneficiary-rules-summary-body">
+              <ul class="beneficiary-rules-summary-list">
+                <li
+                  class="beneficiary-rules-summary-item"
+                  *ngFor="let rule of customBeneficiaryRules"
+                >
+                  <span class="rule-scenario-label">{{
+                    beneficiaryScenarioLabel(rule.scenario)
+                  }}</span>
+                  <span class="rule-recipients-line">{{
+                    formatBeneficiaryRuleRecipients(rule)
+                  }}</span>
+                </li>
+              </ul>
+              <button
+                type="button"
+                class="beneficiary-rules-summary-edit"
+                (click)="onOpenBeneficiaryRules()"
+              >
+                {{ "LEGACY.BENEFICIARY_RULES_SAVED_SUMMARY_EDIT" | translate }}
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
