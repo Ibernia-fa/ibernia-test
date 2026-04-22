@@ -259,6 +259,8 @@ html .customizerNav {
 }
 .vis-panel.vis-bottom {
   padding: 24px 0 24px 0 !important;
+  border: none !important;
+  left: -19px !important;
 }
 
 .vis-item.wedding-icon,
@@ -592,6 +594,3 @@ html .customizerNav {
 // .vis-timeline {
 //   overflow: visible !important;
 // }
-.vis-panel.vis-bottom {
-  border: none !important;
-}
