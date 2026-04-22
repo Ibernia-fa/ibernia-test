@@ -350,7 +350,7 @@ export class FullComponent implements OnInit, OnDestroy {
           this.applySettingsLowerNav();
         } else {
           this.navItems = mainNavItems;
-          this.navItemslower = mainLower;
+          this.applyMainLowerNav();
         }
 
         this.syncSidebarForSettingsRoute(path);
@@ -369,6 +369,8 @@ export class FullComponent implements OnInit, OnDestroy {
       this.isSettings = true;
       this.navItems = settingsNavItems;
       this.applySettingsLowerNav();
+    } else {
+      this.applyMainLowerNav();
     }
   }
 
@@ -399,11 +401,27 @@ export class FullComponent implements OnInit, OnDestroy {
     this.inSettingsRoute = nowSettings;
   }
 
-  /** Admin Notifications + Identity Admin: visible only to Administrator / IberniaIdentityAdminAdministrator. */
+  private applyMainLowerNav(): void {
+    const allLower = mainLower ?? [];
+    this.navItemslower = allLower.filter(
+      (item) => item.displayName !== 'AI Chat',
+    );
+    Promise.all([
+      this.Authservice.hasRole('Administrator'),
+      this.Authservice.hasRole('IberniaIdentityAdminAdministrator'),
+    ]).then(([admin, idAdmin]) => {
+      if (admin || idAdmin) {
+        this.navItemslower = allLower;
+      }
+    });
+  }
+
+  /** AI Recommendations + Admin Notifications + Identity Admin: visible only to Administrator / IberniaIdentityAdminAdministrator. */
   private applySettingsLowerNav(): void {
     const allLower = settingsLowerNavItems ?? [];
     this.navItemslower = allLower.filter(
       (item) =>
+        item.displayName !== 'AI Recommendations' &&
         item.displayName !== 'Admin Notifications' &&
         item.displayName !== 'Identity Admin',
     );
