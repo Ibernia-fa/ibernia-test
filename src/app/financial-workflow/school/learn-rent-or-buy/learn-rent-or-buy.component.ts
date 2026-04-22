@@ -258,7 +258,10 @@ export class LearnRentOrBuyComponent implements OnInit {
   formatCurrency(value: number): string {
     const formatted = formatAppDisplayNumber(this.translate.currentLang, Math.round(value));
     const symbol = this.currencySymbol;
-    return symbol ? `${symbol} ${formatted}` : formatted;
+    /* School display rule: read-only currency renders as "€64,729" with no space
+       between the symbol and the value. Inputs intentionally keep the spaced
+       layout via flex-gap on .impact-card__value. */
+    return symbol ? `${symbol}${formatted}` : formatted;
   }
 
   private effectiveDownPaymentAmount(): number {
@@ -447,7 +450,7 @@ export class LearnRentOrBuyComponent implements OnInit {
       legend: {
         show: true,
         position: 'top',
-        horizontalAlign: 'left',
+        horizontalAlign: 'center',
         offsetY: -4,
         fontFamily: 'Ubuntu, sans-serif',
         fontSize: '12px',

@@ -1383,7 +1383,11 @@ export class AddEventDialogComponent {
     const startYear = this.eventForm.get('start')?.value
       ?? this.eventForm.get('monthlyStart')?.value
       ?? this.data.forecastStartDateYear;
-    const endYear = startYear + output.loanTermYears;
+    // End year is inclusive across the app (duration label, plan horizon, and
+    // backend `IsActiveInYear`). A 25-year term starting in 2036 must therefore
+    // end in 2060 to produce 25 × 12 = 300 instalments — matching what
+    // `calculateMortgage` amortises.
+    const endYear = startYear + output.loanTermYears - 1;
     this.eventForm.patchValue({
       monthlyStart: startYear,
       monthlyEnd: endYear,
@@ -1419,7 +1423,10 @@ export class AddEventDialogComponent {
     );
     const startYear =
       this.eventForm.get('start')?.value ?? this.data.forecastStartDateYear;
-    const endYear = startYear + output.loanTermYears;
+    // End year is inclusive (see `onMortgageApplied`): subtract 1 so that a
+    // 25-year loan starting in 2036 ends in 2060, yielding 300 monthly
+    // instalments instead of 312.
+    const endYear = startYear + output.loanTermYears - 1;
     this.eventForm.patchValue(
       {
         monthlyStart: startYear,

@@ -57,13 +57,18 @@ $ibernia-bg-soft: #f5f7ff;
   min-height: 0;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  /* School layout rule: dialog body scrolls as a final safety net so cards,
+     insight tiles, disclaimers and CTAs are never clipped on smaller heights. */
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 /* ----- Page wrappers (impact / causes) ----- */
 .learn-inflation__page {
   flex: 1 1 auto;
-  min-height: 0;
+  /* Use min-height: auto so the page never shrinks below its content's
+     intrinsic size; if the modal is too short, the dialog body scrolls
+     instead of clipping the side cards/footer/notice silently. */
   display: flex;
   flex-direction: column;
   animation: learnInflationFadeIn 320ms ease;
@@ -88,7 +93,6 @@ $impact-gutter: 56px;
 
 .learn-inflation__page--impact {
   gap: 14px;
-  overflow: hidden;
   /* Shared School header rule: title row top = 14px (matches back/close btns). */
   padding: 14px $impact-gutter 16px;
 }
@@ -110,9 +114,11 @@ $impact-gutter: 56px;
   grid-template-columns: minmax(280px, 340px) 1fr;
   gap: 24px;
   flex: 1 1 auto;
-  min-height: 0;
+  /* Both columns still align at the top; the row track sizes to whichever
+     column has more content so the side cards are never clipped on short
+     modals. With min-height: auto, the layout pushes the page taller (and
+     ultimately scrolls the dialog body) rather than truncating content. */
   align-items: stretch;
-  overflow: hidden;
 }
 
 .learn-inflation__side {
@@ -287,7 +293,9 @@ $impact-gutter: 56px;
 
 .learn-inflation__chart {
   flex: 1 1 auto;
-  min-height: 240px;
+  /* Lower floor: the graph yields vertical space first so insight tiles,
+     disclaimers, and CTAs on the side keep full visibility on short heights. */
+  min-height: 200px;
   height: 100%;
   border: 1px solid $ibernia-line;
   border-radius: 16px;

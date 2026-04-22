@@ -411,18 +411,175 @@ export class LearnTimeInMarketComponent {
     return CRISIS_EVENTS.find((e) => e.id === id) ?? CRISIS_EVENTS[0];
   });
 
-  readonly chartOptions = computed(() => this.buildChartOptions());
+  /** Bumped when language changes so translated bindings recompute. */
+  private readonly langTick = signal(0);
 
   private readonly translate = inject(TranslateService);
   private readonly destroyRef = inject(DestroyRef);
 
+  /* ------------------------------------------------------------------
+   * Chart bindings — split into stable parts (recomputed only on
+   * language change) and a single annotations binding (recomputed on
+   * hover / select). This keeps ApexCharts from rebuilding the line
+   * series, axes, or viewport while the user browses events; only the
+   * subtle highlight overlay updates.
+   * ------------------------------------------------------------------ */
+
+  readonly chartSeries = computed(() => {
+    this.langTick();
+    return [
+      {
+        name: this.translate.instant('LEARN_TIM.SERIES_NAME'),
+        data: COMPOSITE_INDEX_SERIES.map((p) => ({
+          x: new Date(p.date).getTime(),
+          y: p.value,
+        })),
+      },
+    ];
+  });
+
+  readonly chartTooltip = computed(() => {
+    this.langTick();
+    const seriesName = this.translate.instant('LEARN_TIM.SERIES_NAME');
+    return {
+      theme: 'light',
+      cssClass: 'ibr-school-tooltip',
+      style: { fontSize: '13px', fontFamily: 'Ubuntu, sans-serif' },
+      x: { format: 'MMM yyyy' },
+      y: {
+        formatter: (value: number) =>
+          value >= 1000
+            ? `${(Math.round(value * 10) / 10).toFixed(1)}`
+            : `${(Math.round(value * 100) / 100).toFixed(2)}`,
+        title: { formatter: () => seriesName },
+      },
+      marker: { show: false },
+    };
+  });
+
+  readonly chartConfig = {
+    type: 'area',
+    height: '100%',
+    fontFamily: 'Ubuntu, sans-serif',
+    toolbar: { show: false },
+    zoom: { enabled: false },
+    /* Disable animations: hovering through the tile list updates only
+       the annotations layer, and we want the line / axes to stay
+       perfectly still — no fade-in, no transition jumps. */
+    animations: { enabled: false },
+    parentHeightOffset: 0,
+    cssClass: 'ibr-school-chart',
+  };
+
+  readonly chartColors = [ACCENT];
+
+  readonly chartStroke = { width: 2.25, curve: 'smooth', lineCap: 'round' };
+
+  readonly chartFill = {
+    type: 'gradient',
+    gradient: {
+      shadeIntensity: 1,
+      opacityFrom: 0.22,
+      opacityTo: 0.02,
+      stops: [0, 90, 100],
+      colorStops: [
+        { offset: 0, color: ACCENT, opacity: 0.22 },
+        { offset: 100, color: ACCENT_SOFT, opacity: 0.02 },
+      ],
+    },
+  };
+
+  readonly chartMarkers = {
+    size: 0,
+    strokeWidth: 0,
+    hover: { size: 4 },
+  };
+
+  readonly chartDataLabels = { enabled: false };
+
+  readonly chartGrid = {
+    borderColor: '#eef0f6',
+    strokeDashArray: 4,
+    xaxis: { lines: { show: false } },
+    yaxis: { lines: { show: true } },
+    padding: { left: 8, right: 24, top: 8, bottom: 0 },
+  };
+
+  readonly chartXaxis = {
+    type: 'datetime',
+    axisBorder: { show: false },
+    axisTicks: { show: false },
+    labels: {
+      style: {
+        colors: '#5a596e',
+        fontSize: '12px',
+        fontFamily: 'Ubuntu, sans-serif',
+      },
+      datetimeUTC: false,
+      format: 'yyyy',
+    },
+    tickAmount: 10,
+  };
+
+  readonly chartYaxis = {
+    logarithmic: true,
+    logBase: 10,
+    tickAmount: 4,
+    labels: {
+      style: {
+        colors: '#5a596e',
+        fontSize: '12px',
+        fontFamily: 'Ubuntu, sans-serif',
+      },
+      formatter: (value: number) => {
+        if (!Number.isFinite(value)) return '';
+        if (value >= 1000) return `${Math.round(value / 100) / 10}k`;
+        if (value >= 100) return `${Math.round(value)}`;
+        return `${Math.round(value * 10) / 10}`;
+      },
+    },
+  };
+
+  readonly chartLegend = { show: false };
+
+  /** Annotations — the only chart input that updates on hover/select. */
+  readonly chartAnnotations = computed(() => {
+    const event = this.activeEvent();
+    const peakMs = new Date(event.peakDate).getTime();
+    const troughMs = new Date(event.troughDate).getTime();
+
+    return {
+      xaxis: [
+        {
+          x: peakMs,
+          x2: troughMs,
+          fillColor: ACCENT,
+          opacity: 0.12,
+          borderColor: 'transparent',
+          strokeDashArray: 0,
+        },
+      ],
+      points: [
+        {
+          x: troughMs,
+          y: event.troughValue,
+          marker: {
+            size: 6,
+            fillColor: '#ffffff',
+            strokeColor: TROUGH_RED,
+            strokeWidth: 2.5,
+            radius: 12,
+            cssClass: 'tim-trough-marker',
+          },
+        },
+      ],
+    };
+  });
+
   constructor(public dialogRef: MatDialogRef<LearnTimeInMarketComponent>) {
     this.translate.onLangChange
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => {
-        // Trigger recompute of chart options for new locale.
-        this.hoveredEventId.set(this.hoveredEventId());
-      });
+      .subscribe(() => this.langTick.update((n) => n + 1));
   }
 
   closeDialog(): void {
@@ -457,167 +614,5 @@ export class LearnTimeInMarketComponent {
     if (value > 0) return 'pos';
     if (value < 0) return 'neg';
     return 'neu';
-  }
-
-  /* ------------------------------------------------------------------
-   * Chart construction
-   * ------------------------------------------------------------------ */
-  private buildChartOptions(): any {
-    const series = [
-      {
-        name: this.translate.instant('LEARN_TIM.SERIES_NAME'),
-        data: COMPOSITE_INDEX_SERIES.map((p) => ({
-          x: new Date(p.date).getTime(),
-          y: p.value,
-        })),
-      },
-    ];
-
-    const event = this.activeEvent();
-    const peakMs = new Date(event.peakDate).getTime();
-    const troughMs = new Date(event.troughDate).getTime();
-
-    const annotations = {
-      xaxis: [
-        {
-          x: peakMs,
-          x2: troughMs,
-          fillColor: ACCENT,
-          opacity: 0.1,
-          borderColor: 'transparent',
-          strokeDashArray: 0,
-        },
-        {
-          x: troughMs,
-          borderColor: 'rgba(64, 67, 175, 0.5)',
-          strokeDashArray: 4,
-          borderWidth: 1.25,
-        },
-      ],
-      points: [
-        {
-          x: troughMs,
-          y: event.troughValue,
-          marker: {
-            size: 7,
-            fillColor: '#ffffff',
-            strokeColor: TROUGH_RED,
-            strokeWidth: 2.5,
-            radius: 12,
-            cssClass: 'tim-trough-marker',
-          },
-          label: {
-            text: this.translate.instant('LEARN_TIM.LOW_LABEL'),
-            offsetY: 28,
-            borderRadius: 8,
-            borderColor: TROUGH_RED,
-            borderWidth: 1,
-            style: {
-              background: '#ffffff',
-              color: TROUGH_RED,
-              fontFamily: 'Ubuntu, sans-serif',
-              fontWeight: 600,
-              fontSize: '11px',
-              padding: { left: 8, right: 8, top: 4, bottom: 4 },
-            },
-          },
-        },
-      ],
-    };
-
-    return {
-      series,
-      chart: {
-        type: 'area',
-        height: '100%',
-        fontFamily: 'Ubuntu, sans-serif',
-        toolbar: { show: false },
-        zoom: { enabled: false },
-        animations: { enabled: true, easing: 'easeinout', speed: 500 },
-        parentHeightOffset: 0,
-        cssClass: 'ibr-school-chart',
-      },
-      colors: [ACCENT],
-      stroke: { width: 2.25, curve: 'smooth', lineCap: 'round' },
-      fill: {
-        type: 'gradient',
-        gradient: {
-          shadeIntensity: 1,
-          opacityFrom: 0.22,
-          opacityTo: 0.02,
-          stops: [0, 90, 100],
-          colorStops: [
-            { offset: 0, color: ACCENT, opacity: 0.22 },
-            { offset: 100, color: ACCENT_SOFT, opacity: 0.02 },
-          ],
-        },
-      },
-      markers: {
-        size: 0,
-        strokeWidth: 0,
-        hover: { size: 4 },
-      },
-      dataLabels: { enabled: false },
-      grid: {
-        borderColor: '#eef0f6',
-        strokeDashArray: 4,
-        xaxis: { lines: { show: false } },
-        yaxis: { lines: { show: true } },
-        padding: { left: 8, right: 24, top: 8, bottom: 0 },
-      },
-      xaxis: {
-        type: 'datetime',
-        axisBorder: { show: false },
-        axisTicks: { show: false },
-        labels: {
-          style: {
-            colors: '#5a596e',
-            fontSize: '12px',
-            fontFamily: 'Ubuntu, sans-serif',
-          },
-          datetimeUTC: false,
-          format: 'yyyy',
-        },
-        tickAmount: 10,
-      },
-      yaxis: {
-        logarithmic: true,
-        logBase: 10,
-        tickAmount: 4,
-        labels: {
-          style: {
-            colors: '#5a596e',
-            fontSize: '12px',
-            fontFamily: 'Ubuntu, sans-serif',
-          },
-          formatter: (value: number) => {
-            if (!Number.isFinite(value)) return '';
-            if (value >= 1000) return `${Math.round(value / 100) / 10}k`;
-            if (value >= 100) return `${Math.round(value)}`;
-            return `${Math.round(value * 10) / 10}`;
-          },
-        },
-      },
-      legend: { show: false },
-      tooltip: {
-        theme: 'light',
-        cssClass: 'ibr-school-tooltip',
-        style: { fontSize: '13px', fontFamily: 'Ubuntu, sans-serif' },
-        x: {
-          format: 'MMM yyyy',
-        },
-        y: {
-          formatter: (value: number) =>
-            value >= 1000
-              ? `${(Math.round(value * 10) / 10).toFixed(1)}`
-              : `${(Math.round(value * 100) / 100).toFixed(2)}`,
-          title: {
-            formatter: () => this.translate.instant('LEARN_TIM.SERIES_NAME'),
-          },
-        },
-        marker: { show: false },
-      },
-      annotations,
-    };
   }
 }

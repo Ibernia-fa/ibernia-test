@@ -260,21 +260,23 @@ export class LearnCompoundInterestComponent implements OnInit {
     const nominal = this.nominalSeries();
     const real = this.realSeries();
     const yearPrefix = this.translate.instant('LEARN_INFLATION.AXIS_YEAR_PREFIX');
-    const categories = YEAR_POINTS.map((y) => `${yearPrefix}${y}`);
 
     const formatCurrency = (value: number): string => {
       const formatted = formatAppDisplayNumber(this.translate.currentLang, Math.round(value));
       const symbol = this.currencySymbol;
-      return symbol ? `${symbol} ${formatted}` : formatted;
+      return symbol ? `${symbol}${formatted}` : formatted;
     };
 
     const nominalName = this.translate.instant('LEARN_COMPOUND.SERIES_NOMINAL');
     const realName = this.translate.instant('LEARN_COMPOUND.SERIES_REAL');
 
+    const toPoints = (values: number[]) =>
+      YEAR_POINTS.map((year, i) => ({ x: year, y: Math.round(values[i] ?? 0) }));
+
     return {
       series: [
-        { name: nominalName, data: nominal.map((v) => Math.round(v)) },
-        { name: realName, data: real.map((v) => Math.round(v)) },
+        { name: nominalName, data: toPoints(nominal) },
+        { name: realName, data: toPoints(real) },
       ],
       chart: {
         type: 'line',
@@ -308,9 +310,11 @@ export class LearnCompoundInterestComponent implements OnInit {
         padding: { left: 8, right: 24, top: 8, bottom: 0 },
       },
       xaxis: {
-        type: 'category',
-        categories,
-        tickPlacement: 'on',
+        type: 'numeric',
+        min: -1,
+        max: HORIZON_YEARS + 1,
+        tickAmount: HORIZON_YEARS + 2,
+        decimalsInFloat: 0,
         axisBorder: { show: false },
         axisTicks: { show: false },
         crosshairs: { show: true, stroke: { color: 'rgba(64, 67, 175, 0.18)', width: 1, dashArray: 0 } },
@@ -320,6 +324,13 @@ export class LearnCompoundInterestComponent implements OnInit {
             colors: '#5a596e',
             fontSize: '13px',
             fontFamily: 'Ubuntu, sans-serif',
+          },
+          formatter: (val: string | number) => {
+            const n = Math.round(Number(val));
+            if (!Number.isFinite(n) || n < 0 || n > HORIZON_YEARS || n % 5 !== 0) {
+              return '';
+            }
+            return `${yearPrefix}${n}`;
           },
         },
       },
@@ -337,7 +348,7 @@ export class LearnCompoundInterestComponent implements OnInit {
       legend: {
         show: true,
         position: 'top',
-        horizontalAlign: 'left',
+        horizontalAlign: 'center',
         offsetY: -4,
         fontFamily: 'Ubuntu, sans-serif',
         fontSize: '12px',
@@ -358,7 +369,13 @@ export class LearnCompoundInterestComponent implements OnInit {
         shared: true,
         intersect: false,
         followCursor: false,
-        x: { show: true },
+        x: {
+          show: true,
+          formatter: (val: string | number) => {
+            const n = Math.round(Number(val));
+            return `${yearPrefix}${n}`;
+          },
+        },
         y: {
           formatter: (value: number) => formatCurrency(value),
         },
@@ -373,21 +390,23 @@ export class LearnCompoundInterestComponent implements OnInit {
     const simple = this.simpleInterestSeries();
     const compound = this.nominalSeries();
     const yearPrefix = this.translate.instant('LEARN_INFLATION.AXIS_YEAR_PREFIX');
-    const categories = YEAR_POINTS.map((y) => `${yearPrefix}${y}`);
 
     const formatCurrency = (value: number): string => {
       const formatted = formatAppDisplayNumber(this.translate.currentLang, Math.round(value));
       const symbol = this.currencySymbol;
-      return symbol ? `${symbol} ${formatted}` : formatted;
+      return symbol ? `${symbol}${formatted}` : formatted;
     };
 
     const simpleName = this.translate.instant('LEARN_COMPOUND.COMPARE_SERIES_SIMPLE');
     const compoundName = this.translate.instant('LEARN_COMPOUND.COMPARE_SERIES_COMPOUND');
 
+    const toPoints = (values: number[]) =>
+      YEAR_POINTS.map((year, i) => ({ x: year, y: Math.round(values[i] ?? 0) }));
+
     return {
       series: [
-        { name: simpleName, data: simple.map((v) => Math.round(v)) },
-        { name: compoundName, data: compound.map((v) => Math.round(v)) },
+        { name: simpleName, data: toPoints(simple) },
+        { name: compoundName, data: toPoints(compound) },
       ],
       chart: {
         type: 'line',
@@ -421,9 +440,11 @@ export class LearnCompoundInterestComponent implements OnInit {
         padding: { left: 8, right: 24, top: 8, bottom: 0 },
       },
       xaxis: {
-        type: 'category',
-        categories,
-        tickPlacement: 'on',
+        type: 'numeric',
+        min: -1,
+        max: HORIZON_YEARS + 1,
+        tickAmount: HORIZON_YEARS + 2,
+        decimalsInFloat: 0,
         axisBorder: { show: false },
         axisTicks: { show: false },
         crosshairs: { show: true, stroke: { color: 'rgba(64, 67, 175, 0.18)', width: 1, dashArray: 0 } },
@@ -433,6 +454,13 @@ export class LearnCompoundInterestComponent implements OnInit {
             colors: '#5a596e',
             fontSize: '13px',
             fontFamily: 'Ubuntu, sans-serif',
+          },
+          formatter: (val: string | number) => {
+            const n = Math.round(Number(val));
+            if (!Number.isFinite(n) || n < 0 || n > HORIZON_YEARS || n % 5 !== 0) {
+              return '';
+            }
+            return `${yearPrefix}${n}`;
           },
         },
       },
@@ -450,7 +478,7 @@ export class LearnCompoundInterestComponent implements OnInit {
       legend: {
         show: true,
         position: 'top',
-        horizontalAlign: 'left',
+        horizontalAlign: 'center',
         offsetY: -4,
         fontFamily: 'Ubuntu, sans-serif',
         fontSize: '12px',
@@ -472,7 +500,13 @@ export class LearnCompoundInterestComponent implements OnInit {
         intersect: false,
         followCursor: false,
         inverseOrder: true,
-        x: { show: true },
+        x: {
+          show: true,
+          formatter: (val: string | number) => {
+            const n = Math.round(Number(val));
+            return `${yearPrefix}${n}`;
+          },
+        },
         y: {
           formatter: (value: number) => formatCurrency(value),
         },
