@@ -95,24 +95,28 @@
 }
 
 /**
- * School tile imagery
- * --------------------
- * The school illustrations are square 3D renders on a clean white background.
- * To keep the row visually cohesive we:
- *   • lock every container to the same landscape aspect ratio,
- *   • use `object-fit: contain` so nothing is cropped or stretched,
- *   • paint the container white so the asset's background blends seamlessly,
- *   • give the artwork a small inset so subjects breathe at all breakpoints.
+ * School tile imagery — editorial two-block composition
+ * -----------------------------------------------------
+ * Every tile is split into two cohesive blocks: a top visual area and a
+ * bottom content area. The top section is painted with the exact same light
+ * grey (#f3f3f5) used as the background of the 3D-rendered illustrations,
+ * so the artwork dissolves into the section instead of looking like a square
+ * card pasted on top of another card.
+ *
+ *   • locked aspect ratio → identical top-section height across all tiles,
+ *   • `object-fit: contain` → no cropping, no stretching of subjects,
+ *   • matching background color → image and container read as one block,
+ *   • no padding / no inner border → removes the "floating square" effect,
+ *   • soft contrast (grey ↔ white) provides separation without a hard rule.
  */
 .card__image-container {
   width: 100%;
-  aspect-ratio: 1.6 / 1;
+  aspect-ratio: 3 / 2;
   overflow: hidden;
-  background-color: #ffffff;
+  background-color: #f3f3f5;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 12px;
 }
 
 .card__image {
