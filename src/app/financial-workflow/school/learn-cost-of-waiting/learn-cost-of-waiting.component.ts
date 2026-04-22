@@ -263,7 +263,10 @@ export class LearnCostOfWaitingComponent implements OnInit {
   formatCurrencyFull(value: number): string {
     const formatted = this.formatAmount(value);
     const symbol = this.currencySymbol;
-    return symbol ? `${symbol} ${formatted}` : formatted;
+    /* School display rule: read-only currency renders as "€64,729" with no
+       space between the symbol and the value. Inputs intentionally keep the
+       spaced layout via flex-gap on .impact-card__value. */
+    return symbol ? `${symbol}${formatted}` : formatted;
   }
 
   formatPercentOneDecimal(value: number): string {
@@ -330,7 +333,7 @@ export class LearnCostOfWaitingComponent implements OnInit {
     const formatCurrency = (value: number): string => {
       const formatted = formatAppDisplayNumber(this.translate.currentLang, Math.round(value));
       const symbol = this.currencySymbol;
-      return symbol ? `${symbol} ${formatted}` : formatted;
+      return symbol ? `${symbol}${formatted}` : formatted;
     };
 
     const seriesName = this.translate.instant('LEARN_COST_WAITING.SERIES_NAME');

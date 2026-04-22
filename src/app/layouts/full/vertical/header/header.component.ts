@@ -54,6 +54,7 @@ import {
 import { notificationMatchesSearchQuery } from 'src/app/core/notification-search';
 import { CapitalizeFirstPipe } from 'src/app/core/pipes/capitalize-first.pipe';
 import { formatClientPersonDisplayName } from 'src/app/shared/utils/person-display-name';
+import { HOME_BREADCRUMB_LABEL } from 'src/app/shared/utils/breadcrumb-constants';
 
 interface notifications {
   id: number;
@@ -109,6 +110,11 @@ type LanguageCode = 'en' | 'it';
     encapsulation: ViewEncapsulation.None
 })
 export class HeaderComponent implements OnInit, OnDestroy {
+  /**
+   * Always-English label for the root breadcrumb item. Intentionally not
+   * routed through i18n so the first crumb stays "Home" in every locale.
+   */
+  readonly HOME_BREADCRUMB_LABEL = HOME_BREADCRUMB_LABEL;
   @Input() showToggle = true;
   /** When true, show menu icon to open the sidenav in overlay layout (max-width 1023px). */
   @Input() showHamburgerNav = false;

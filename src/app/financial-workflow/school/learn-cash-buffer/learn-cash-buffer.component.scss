@@ -48,13 +48,18 @@ $benchmark-orange: #d49252;
   min-height: 0;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  /* School layout rule: dialog body scrolls as a final safety net so cards,
+     insight tiles, disclaimers and CTAs are never clipped on smaller heights. */
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 /* ----- Page wrapper ----- */
 .learn-cash-buffer__page {
   flex: 1 1 auto;
-  min-height: 0;
+  /* Use min-height: auto so the page never shrinks below its content's
+     intrinsic size; if the modal is too short, the dialog body scrolls
+     instead of clipping the side cards/footer/notice silently. */
   display: flex;
   flex-direction: column;
   animation: learnCashFadeIn 320ms ease;
@@ -80,7 +85,6 @@ $impact-gutter: 56px;
 
 .learn-cash-buffer__page--impact {
   gap: 14px;
-  overflow: hidden;
   /* Shared School header rule: title row top = 14px (matches close btn). */
   padding: 14px $impact-gutter 16px;
 }
@@ -102,9 +106,11 @@ $impact-gutter: 56px;
   grid-template-columns: minmax(280px, 340px) 1fr;
   gap: 24px;
   flex: 1 1 auto;
-  min-height: 0;
+  /* Both columns still align at the top; the row track sizes to whichever
+     column has more content so the side cards are never clipped on short
+     modals. With min-height: auto, the layout pushes the page taller (and
+     ultimately scrolls the dialog body) rather than truncating content. */
   align-items: stretch;
-  overflow: hidden;
 }
 
 .learn-cash-buffer__side {
@@ -115,13 +121,11 @@ $impact-gutter: 56px;
   min-height: 0;
 }
 
-/* Hero on top, supporting insight below: use a 1fr / auto grid so
-   the benchmark visual always takes ~half of the available space and
-   the insight card stays compact. */
+/* Right column: the benchmark chart fills the available height so the
+   layout stays balanced with the stacked left column (inputs + insight). */
 .learn-cash-buffer__main {
-  display: grid;
-  grid-template-rows: minmax(0, 1fr) auto;
-  gap: 14px;
+  display: flex;
+  flex-direction: column;
   min-width: 0;
   min-height: 0;
   overflow: hidden;
@@ -230,6 +234,7 @@ $impact-gutter: 56px;
   display: flex;
   width: 100%;
   min-height: 0;
+  flex: 1 1 auto;
 }
 
 .buffer-months {
@@ -370,9 +375,17 @@ $impact-gutter: 56px;
   opacity: 0.92;
 }
 
-/* Single, numeric scale beneath the bar. The ticks sit at the
-   0 / 3 / 12 / 24 month positions on the same 24-month axis used
-   by the bar segments (3 + 9 + 12 = 24). */
+/* Axis block: numeric tick markers above the axis title.
+   Ticks sit at the 0 / 3 / 12 / 24 month positions on the same
+   24-month axis used by the bar segments (3 + 9 + 12 = 24). */
+.buffer-months__axis {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
 .buffer-months__scale {
   position: relative;
   width: 100%;
@@ -409,28 +422,36 @@ $impact-gutter: 56px;
   }
 }
 
+.buffer-months__axis-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: $ibernia-mute;
+}
+
 /* ============================================================
-   Right column: insight card (uses the same accent-card family
-   as the inflation slide; main result is centered).
+   Insight card (stacked under the inputs in the left column;
+   uses the same accent-card family as the inflation slide).
    ============================================================ */
 .learn-cash-buffer__insight {
   flex: 0 0 auto;
   min-height: 0;
   align-items: stretch;
   justify-content: flex-start;
+  margin-top: 4px;
 }
 
 .cb-result {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  align-items: center;
-  column-gap: 18px;
-  row-gap: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
   width: 100%;
   text-align: left;
 
   &--neutral {
-    grid-template-columns: 1fr;
+    align-items: stretch;
     text-align: center;
   }
 }
@@ -440,7 +461,6 @@ $impact-gutter: 56px;
   align-items: baseline;
   gap: 6px;
   line-height: 1;
-  grid-row: 1 / span 2;
   white-space: nowrap;
 }
 
@@ -465,19 +485,16 @@ $impact-gutter: 56px;
   font-weight: 500;
   color: $ibernia-mute;
   line-height: 1.4;
-  grid-column: 2;
 }
 
 .cb-result__badge {
   display: inline-block;
-  justify-self: start;
   margin: 2px 0 0;
   padding: 5px 12px;
   border-radius: 999px;
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.02em;
-  grid-column: 2;
 
   &--low {
     background: rgba(200, 90, 110, 0.12);
@@ -501,7 +518,6 @@ $impact-gutter: 56px;
   line-height: 1.5;
   font-weight: 400;
   color: $ibernia-mute;
-  grid-column: 1 / -1;
 }
 
 .cb-result__neutral {
@@ -576,10 +592,9 @@ $impact-gutter: 56px;
   }
 
   .learn-cash-buffer__main {
-    /* On tablet the layout stacks under the side aside, so keep the
-       visual hero room first and let content grow naturally. */
-    grid-template-rows: minmax(220px, auto) auto;
-    min-height: 320px;
+    /* On tablet the chart sits above the inputs, so reserve enough
+       room for the bar + axis to keep the visual reading clearly. */
+    min-height: 240px;
   }
 }
 
@@ -598,20 +613,6 @@ $impact-gutter: 56px;
 
   .buffer-months__scale {
     font-size: 11px;
-  }
-
-  .cb-result {
-    grid-template-columns: 1fr;
-    text-align: left;
-  }
-
-  .cb-result__figure {
-    grid-row: auto;
-  }
-
-  .cb-result__sub,
-  .cb-result__badge {
-    grid-column: 1;
   }
 
   .cb-result__value {

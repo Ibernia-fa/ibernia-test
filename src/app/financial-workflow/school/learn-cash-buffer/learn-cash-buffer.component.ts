@@ -160,10 +160,6 @@ export class LearnCashBufferComponent implements OnInit {
     }).format(rounded);
   }
 
-  formatAxisMonths(value: number): string {
-    return formatAppDisplayNumber(this.translate.currentLang, Math.round(value * 10) / 10);
-  }
-
   /** i18n key for "month" vs "months" from a rounded buffer value. */
   bufferMonthWordKey(months: number | null): string {
     if (months === null || !Number.isFinite(months)) {

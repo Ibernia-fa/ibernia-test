@@ -323,7 +323,7 @@ export class LearnInflationComponent implements OnInit {
     const formatCurrency = (value: number): string => {
       const formatted = formatAppDisplayNumber(this.translate.currentLang, value || 0);
       const symbol = this.currencySymbol;
-      return symbol ? `${symbol} ${formatted}` : formatted;
+      return symbol ? `${symbol}${formatted}` : formatted;
     };
 
     return {
@@ -506,7 +506,7 @@ export class LearnInflationComponent implements OnInit {
       legend: {
         show: true,
         position: 'top',
-        horizontalAlign: 'right',
+        horizontalAlign: 'center',
         fontFamily: 'Ubuntu, sans-serif',
         fontSize: '13px',
         fontWeight: 500,

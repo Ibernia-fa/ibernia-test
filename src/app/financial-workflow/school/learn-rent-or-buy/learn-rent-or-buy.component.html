@@ -149,11 +149,22 @@
             </div>
           </div>
 
-          <!-- More assumptions trigger -->
-          <button type="button" class="learn-rb__more" (click)="openAssumptions()">
-            <mat-icon>tune</mat-icon>
-            <span>{{ "LEARN_RENT_OR_BUY.MORE_ASSUMPTIONS" | translate }}</span>
-          </button>
+          <!-- Key insight tile (matches Inflation/Compound accent pattern) -->
+          <div class="impact-card impact-card--accent learn-rb__insight">
+            <span class="impact-card__label">
+              {{ "LEARN_RENT_OR_BUY.INSIGHT_LABEL" | translate }}
+            </span>
+            @if (engineOutput()) {
+              <p
+                class="learn-rb__insight-text"
+                [innerHTML]="summarySentence()"
+              ></p>
+            } @else {
+              <p class="learn-rb__insight-text learn-rb__insight-text--muted">
+                {{ "LEARN_RENT_OR_BUY.EMPTY_STATE" | translate }}
+              </p>
+            }
+          </div>
         </aside>
 
         <!-- ======================= RIGHT: RESULTS ======================= -->
@@ -219,11 +230,21 @@
             }
           </div>
 
-          <!-- Adaptive plain-English summary -->
-          @if (engineOutput()) {
-            <p class="learn-rb__summary-sentence">{{ summarySentence() }}</p>
-          }
         </section>
+      </div>
+
+      <!-- Bottom action: more assumptions (matches inflation footer pattern) -->
+      <div class="learn-rb__footer">
+        <div class="learn-rb__cta-group">
+          <button
+            type="button"
+            class="learn-rb__more"
+            (click)="openAssumptions()"
+          >
+            <mat-icon>tune</mat-icon>
+            <span>{{ "LEARN_RENT_OR_BUY.MORE_ASSUMPTIONS" | translate }}</span>
+          </button>
+        </div>
       </div>
 
       <!-- Educational notice (shared School bottom notice) -->
