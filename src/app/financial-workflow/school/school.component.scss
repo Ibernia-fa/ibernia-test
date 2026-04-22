@@ -94,22 +94,38 @@
   }
 }
 
+/**
+ * School tile imagery
+ * --------------------
+ * The school illustrations are square 3D renders on a clean white background.
+ * To keep the row visually cohesive we:
+ *   • lock every container to the same landscape aspect ratio,
+ *   • use `object-fit: contain` so nothing is cropped or stretched,
+ *   • paint the container white so the asset's background blends seamlessly,
+ *   • give the artwork a small inset so subjects breathe at all breakpoints.
+ */
 .card__image-container {
   width: 100%;
+  aspect-ratio: 1.6 / 1;
   overflow: hidden;
+  background-color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
 }
 
 .card__image {
   width: 100%;
-  height: auto;
+  height: 100%;
   display: block;
-  object-fit: cover;
-  aspect-ratio: 1.6 / 1;
+  object-fit: contain;
+  object-position: center;
   transition: transform 0.4s ease;
 }
 
 .card:hover .card__image {
-  transform: scale(1.06);
+  transform: scale(1.04);
 }
 
 .card__content {
