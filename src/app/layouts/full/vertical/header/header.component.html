@@ -9,157 +9,118 @@
       <app-branding [profileImage]="brandingLogo"></app-branding>
       <!-- </div> -->
     }
-    @if (!hideSidebarToggle && showHamburgerNav) {
-      <button
-        mat-icon-button
-        type="button"
-        (click)="toggleMobileNav.emit()"
-        class="header-expand-toggle m-r-4"
-        [attr.aria-label]="options.sidenavOpened ? 'Close menu' : 'Open menu'"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          class="header-menu-icon"
-          aria-hidden="true"
+    <div class="d-flex align-items-center">
+      @if (!hideSidebarToggle && showHamburgerNav) {
+        <button
+          mat-icon-button
+          type="button"
+          (click)="toggleMobileNav.emit()"
+          class="header-expand-toggle m-r-4"
+          [attr.aria-label]="options.sidenavOpened ? 'Close menu' : 'Open menu'"
         >
-          <path d="M4 5h16" />
-          <path d="M4 12h16" />
-          <path d="M4 19h16" />
-        </svg>
-      </button>
-    }
-    <!-- Expand sidebar toggle - outside sidebar when collapsed (desktop only) -->
-    @if (!hideSidebarToggle && showToggle && options.sidenavCollapsed) {
-      <button
-        mat-icon-button
-        (click)="toggleCollapsed.emit()"
-        class="header-expand-toggle m-r-8"
-        aria-label="Expand sidebar"
-      >
-        <svg
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          style="transform: rotate(-180deg)"
-          xmlns="http://www.w3.org/2000/svg"
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="header-menu-icon"
+            aria-hidden="true"
+          >
+            <path d="M4 5h16" />
+            <path d="M4 12h16" />
+            <path d="M4 19h16" />
+          </svg>
+        </button>
+      }
+      <!-- Expand sidebar toggle - outside sidebar when collapsed (desktop only) -->
+      @if (!hideSidebarToggle && showToggle && options.sidenavCollapsed) {
+        <button
+          mat-icon-button
+          (click)="toggleCollapsed.emit()"
+          class="header-expand-toggle m-r-8"
+          aria-label="Expand sidebar"
         >
-          <path
-            d="M14.97 22.75H8.96997C3.53997 22.75 1.21997 20.43 1.21997 15V9C1.21997 3.57 3.53997 1.25 8.96997 1.25H14.97C20.4 1.25 22.72 3.57 22.72 9V15C22.72 20.43 20.41 22.75 14.97 22.75ZM8.96997 2.75C4.35997 2.75 2.71997 4.39 2.71997 9V15C2.71997 19.61 4.35997 21.25 8.96997 21.25H14.97C19.58 21.25 21.22 19.61 21.22 15V9C21.22 4.39 19.58 2.75 14.97 2.75H8.96997Z"
-            fill="#9EA0A2"
-          />
-          <path
-            d="M7.96997 22.75C7.55997 22.75 7.21997 22.41 7.21997 22V2C7.21997 1.59 7.55997 1.25 7.96997 1.25C8.37997 1.25 8.71997 1.59 8.71997 2V22C8.71997 22.41 8.38997 22.75 7.96997 22.75ZM14.97 15.31C14.78 15.31 14.59 15.24 14.44 15.09L11.88 12.53C11.7405 12.3889 11.6623 12.1984 11.6623 12C11.6623 11.8016 11.7405 11.6111 11.88 11.47L14.44 8.91C14.73 8.62 15.21 8.62 15.5 8.91C15.79 9.2 15.79 9.68 15.5 9.97L13.48 12L15.51 14.03C15.8 14.32 15.8 14.8 15.51 15.09C15.36 15.24 15.17 15.31 14.97 15.31Z"
-            fill="#9EA0A2"
-          />
-        </svg>
-      </button>
-    }
-    <!-- --------------------------------------------------------------- -->
-    <!-- Desktop Menu - Logo moved to sidebar -->
-    <ng-container
-      *ngIf="
-        isCashflowRoute && clientProfileLink && cashflowBreadcrumbClientLabel
-      "
-    >
-      <nav
-        class="header-breadcrumb d-flex align-items-center"
-        aria-label="Breadcrumb"
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            style="transform: rotate(-180deg)"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M14.97 22.75H8.96997C3.53997 22.75 1.21997 20.43 1.21997 15V9C1.21997 3.57 3.53997 1.25 8.96997 1.25H14.97C20.4 1.25 22.72 3.57 22.72 9V15C22.72 20.43 20.41 22.75 14.97 22.75ZM8.96997 2.75C4.35997 2.75 2.71997 4.39 2.71997 9V15C2.71997 19.61 4.35997 21.25 8.96997 21.25H14.97C19.58 21.25 21.22 19.61 21.22 15V9C21.22 4.39 19.58 2.75 14.97 2.75H8.96997Z"
+              fill="#9EA0A2"
+            />
+            <path
+              d="M7.96997 22.75C7.55997 22.75 7.21997 22.41 7.21997 22V2C7.21997 1.59 7.55997 1.25 7.96997 1.25C8.37997 1.25 8.71997 1.59 8.71997 2V22C8.71997 22.41 8.38997 22.75 7.96997 22.75ZM14.97 15.31C14.78 15.31 14.59 15.24 14.44 15.09L11.88 12.53C11.7405 12.3889 11.6623 12.1984 11.6623 12C11.6623 11.8016 11.7405 11.6111 11.88 11.47L14.44 8.91C14.73 8.62 15.21 8.62 15.5 8.91C15.79 9.2 15.79 9.68 15.5 9.97L13.48 12L15.51 14.03C15.8 14.32 15.8 14.8 15.51 15.09C15.36 15.24 15.17 15.31 14.97 15.31Z"
+              fill="#9EA0A2"
+            />
+          </svg>
+        </button>
+      }
+      <!-- --------------------------------------------------------------- -->
+      <!-- Desktop Menu - Logo moved to sidebar -->
+      <ng-container
+        *ngIf="
+          isCashflowRoute && clientProfileLink && cashflowBreadcrumbClientLabel
+        "
       >
-        <!-- <a
+        <nav
+          class="header-breadcrumb d-flex align-items-center"
+          aria-label="Breadcrumb"
+        >
+          <!-- <a
           [routerLink]="['/clients']"
           class="breadcrumb-link d-flex align-items-center text-decoration-none"
           matTooltip="Home"
         > -->
-        <a
-          [routerLink]="['/clients']"
-          class="breadcrumb-link d-flex align-items-center text-decoration-none"
-        >
-          <!-- <i-tabler name="home" class="breadcrumb-home-icon"></i-tabler> -->
-          Home
-        </a>
-        <!-- <span class="breadcrumb-chevron" aria-hidden="true">></span> -->
-        <svg
-          width="12"
-          height="7"
-          viewBox="0 0 12 7"
-          fill="none"
-          class="breadcrumb-chevron"
-          style="transform: rotate(-90deg)"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M1 1L6 6L11 1"
-            stroke="#48475D"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
-        </svg>
-        <!-- <a
+          <a
+            [routerLink]="['/clients']"
+            class="breadcrumb-link d-flex align-items-center text-decoration-none"
+          >
+            <!-- <i-tabler name="home" class="breadcrumb-home-icon"></i-tabler> -->
+            Home
+          </a>
+          <!-- <span class="breadcrumb-chevron" aria-hidden="true">></span> -->
+          <svg
+            width="12"
+            height="7"
+            viewBox="0 0 12 7"
+            fill="none"
+            class="breadcrumb-chevron"
+            style="transform: rotate(-90deg)"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M1 1L6 6L11 1"
+              stroke="#48475D"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          <!-- <a
           [routerLink]="clientProfileLink"
           class="breadcrumb-link d-flex align-items-center text-decoration-none"
           matTooltip="Go to client page"
         > -->
-        <a
-          [routerLink]="clientProfileLink"
-          class="breadcrumb-link d-flex align-items-center text-decoration-none"
-        >
-          {{ cashflowBreadcrumbClientLabel }}
-        </a>
-        <!-- <span
+          <a
+            [routerLink]="clientProfileLink"
+            class="breadcrumb-link d-flex align-items-center text-decoration-none"
+          >
+            {{ cashflowBreadcrumbClientLabel }}
+          </a>
+          <!-- <span
           class="breadcrumb-chevron breadcrumb-current f-w-500"
           aria-hidden="true"
           >></span
         > -->
-        <svg
-          width="12"
-          height="7"
-          viewBox="0 0 12 7"
-          fill="none"
-          class="breadcrumb-chevron"
-          style="transform: rotate(-90deg)"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M1 1L6 6L11 1"
-            stroke="#1C1C1C"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
-        </svg>
-        <span class="breadcrumb-current f-w-500">{{ planName || "Plan" }}</span>
-      </nav>
-    </ng-container>
-
-    <!-- Settings contextual breadcrumb -->
-    <ng-container *ngIf="isSettingsRoute && settingsBreadcrumbContext">
-      <nav
-        class="header-breadcrumb d-flex align-items-center"
-        aria-label="Breadcrumb"
-      >
-        <a
-          [routerLink]="['/clients']"
-          class="breadcrumb-link d-flex align-items-center text-decoration-none"
-        >
-          {{ "Home" | translate }}
-        </a>
-
-        <ng-container
-          *ngIf="
-            settingsBreadcrumbContext.type === 'client' ||
-            settingsBreadcrumbContext.type === 'plan'
-          "
-        >
           <svg
             width="12"
             height="7"
@@ -171,21 +132,88 @@
           >
             <path
               d="M1 1L6 6L11 1"
-              stroke="#48475D"
+              stroke="#1C1C1C"
               stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
             />
           </svg>
+          <span class="breadcrumb-current f-w-500">{{
+            planName || "Plan"
+          }}</span>
+        </nav>
+      </ng-container>
+
+      <!-- Settings contextual breadcrumb -->
+      <ng-container *ngIf="isSettingsRoute && settingsBreadcrumbContext">
+        <nav
+          class="header-breadcrumb d-flex align-items-center"
+          aria-label="Breadcrumb"
+        >
           <a
-            [routerLink]="settingsBreadcrumbContext.clientLink"
+            [routerLink]="['/clients']"
             class="breadcrumb-link d-flex align-items-center text-decoration-none"
           >
-            {{ settingsBreadcrumbContext.clientLabel }}
+            {{ "Home" | translate }}
           </a>
-        </ng-container>
 
-        <ng-container *ngIf="settingsBreadcrumbContext.type === 'plan'">
+          <ng-container
+            *ngIf="
+              settingsBreadcrumbContext.type === 'client' ||
+              settingsBreadcrumbContext.type === 'plan'
+            "
+          >
+            <svg
+              width="12"
+              height="7"
+              viewBox="0 0 12 7"
+              fill="none"
+              class="breadcrumb-chevron"
+              style="transform: rotate(-90deg)"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M1 1L6 6L11 1"
+                stroke="#48475D"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+            <a
+              [routerLink]="settingsBreadcrumbContext.clientLink"
+              class="breadcrumb-link d-flex align-items-center text-decoration-none"
+            >
+              {{ settingsBreadcrumbContext.clientLabel }}
+            </a>
+          </ng-container>
+
+          <ng-container *ngIf="settingsBreadcrumbContext.type === 'plan'">
+            <svg
+              width="12"
+              height="7"
+              viewBox="0 0 12 7"
+              fill="none"
+              class="breadcrumb-chevron"
+              style="transform: rotate(-90deg)"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M1 1L6 6L11 1"
+                stroke="#48475D"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+            <a
+              [routerLink]="settingsBreadcrumbContext.planLink"
+              class="breadcrumb-link d-flex align-items-center text-decoration-none"
+            >
+              {{ settingsBreadcrumbContext.planName }}
+            </a>
+          </ng-container>
+
           <svg
             width="12"
             height="7"
@@ -197,42 +225,18 @@
           >
             <path
               d="M1 1L6 6L11 1"
-              stroke="#48475D"
+              stroke="#1C1C1C"
               stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
             />
           </svg>
-          <a
-            [routerLink]="settingsBreadcrumbContext.planLink"
-            class="breadcrumb-link d-flex align-items-center text-decoration-none"
-          >
-            {{ settingsBreadcrumbContext.planName }}
-          </a>
-        </ng-container>
-
-        <svg
-          width="12"
-          height="7"
-          viewBox="0 0 12 7"
-          fill="none"
-          class="breadcrumb-chevron"
-          style="transform: rotate(-90deg)"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M1 1L6 6L11 1"
-            stroke="#1C1C1C"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
-        </svg>
-        <span class="breadcrumb-current f-w-500">{{
-          "Settings" | translate
-        }}</span>
-      </nav>
-    </ng-container>
+          <span class="breadcrumb-current f-w-500">{{
+            "Settings" | translate
+          }}</span>
+        </nav>
+      </ng-container>
+    </div>
 
     <!-- </div> -->
     <!-- @if (!hideSidebarToggle) {
