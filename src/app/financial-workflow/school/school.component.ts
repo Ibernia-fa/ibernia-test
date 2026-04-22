@@ -24,13 +24,22 @@ import { LearnCostOfWaitingComponent } from './learn-cost-of-waiting/learn-cost-
 import { LearnCashBufferComponent } from './learn-cash-buffer/learn-cash-buffer.component';
 import { LearnInvestToReachGoalComponent } from './learn-invest-to-reach-goal/learn-invest-to-reach-goal.component';
 import { LearnRentOrBuyComponent } from './learn-rent-or-buy/learn-rent-or-buy.component';
-import type { LearnRentOrBuyDialogData } from './learn-rent-or-buy/learn-rent-or-buy.types';
+import type {
+  HomeEventPrefill,
+  LearnRentOrBuyDialogData,
+} from './learn-rent-or-buy/learn-rent-or-buy.types';
 import { LearnTimeInMarketComponent } from './learn-time-in-market/learn-time-in-market.component';
 import { IncomeExpensesHttpService } from '../income-expenses/services/income-expenses-http.service';
 import { FinancialViewModel, IncomeExpense } from '../income-expenses/model/income-expense';
 import { getCompletedYearsAgeAtDate } from 'src/app/shared/utils/client-age-at-reference';
 import { WealthHttpService } from '../wealth/services/wealth-http.service';
 import { WealthAssetModel, WealthDashboardModel } from '../wealth/models/wealth.model';
+import { SettingsService } from '../../default-preferance/services/default-preferance.http.service';
+import { TimelineHttpService } from '../timeline/services/timeline-http.service';
+import type {
+  ClientEvent,
+  FinancialRecordLineItem,
+} from '../timeline/models/financial-timeline';
 
 interface SchoolSlide {
   title: string;
@@ -79,6 +88,8 @@ export class SchoolComponent {
   private readonly savingsPotsHttpService = inject(SavingsPotsHttpService);
   private readonly incomeExpensesHttpService = inject(IncomeExpensesHttpService);
   private readonly wealthHttpService = inject(WealthHttpService);
+  private readonly settingsService = inject(SettingsService);
+  private readonly timelineHttpService = inject(TimelineHttpService);
   private readonly destroyRef = inject(DestroyRef);
 
   constructor(private translate: TranslateService) {
@@ -351,18 +362,31 @@ export class SchoolComponent {
     this.fetchRentOrBuyLessonContext$()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: ({ client, cashflow, wealth, incomeExpense }) => {
+        next: ({ client, cashflow, wealth, incomeExpense, homeEvent }) => {
           const mainHome = this.inferMainResidenceValue(wealth?.assets);
           const rentGuess = this.inferHousingRentMonthly(incomeExpense?.expenses);
+
+          /* Source priority for shared rates:
+               1. User's Default Assumptions (UserProfile.preferences)
+               2. Plan-level inflation (cashflow / client) — kept for parity
+                  with the existing inflation lesson behaviour.
+             The component's static fallbacks act as the final backstop. */
+          const prefs = this.settingsService.currentUserData?.preferences;
           const inflationRate =
+            prefs?.inflationRate ??
             cashflow?.inflationRate ??
             client?.clientDetails?.inflationRate ??
             DEFAULT_INFLATION_FALLBACK;
+          const investmentReturn = prefs?.investmentReturn ?? null;
+          const mortgageRate = prefs?.mortgageInterestRate ?? null;
 
           this.openRentOrBuyDialog({
             homePrice: mainHome,
             monthlyRent: rentGuess,
             inflationPct: inflationRate,
+            investmentReturnPct: investmentReturn,
+            mortgageRatePct: mortgageRate,
+            fromHomeEvent: homeEvent,
             currencyCode: client?.clientDetails?.preferredCurrency,
           });
           this.isOpeningRentOrBuy = false;
@@ -444,6 +468,7 @@ export class SchoolComponent {
     cashflow: Cashflow;
     wealth: WealthDashboardModel | null;
     incomeExpense: IncomeExpense | null;
+    homeEvent: HomeEventPrefill | null;
   }> {
     const params$ = this.activatedRoute.parent?.params ?? this.activatedRoute.params;
     return params$.pipe(
@@ -459,13 +484,25 @@ export class SchoolComponent {
           this.incomeExpensesHttpService
             .getAllIncomeExpenses((cashflow as Cashflow).id)
             .pipe(catchError(() => of(null))),
+          /* Financing-aware timeline gives us both the parent Home event
+             (one-off price / down payment) and the linked monthly payment
+             record we use to derive the mortgage term. We swallow errors
+             so a missing/empty timeline simply yields a null Home event
+             and the calculator falls back to Default Assumptions. */
+          this.timelineHttpService
+            .getTimelineWithLinkedFinancialRecordsByCashflowId((cashflow as Cashflow).id)
+            .pipe(catchError(() => of(null))),
         ]).pipe(
           take(1),
-          map(([wealth, incomeExpense]) => ({
+          map(([wealth, incomeExpense, timelineResp]) => ({
             client: client as Client,
             cashflow: cashflow as Cashflow,
             wealth,
             incomeExpense: incomeExpense as IncomeExpense | null,
+            homeEvent: this.extractHomeEventPrefill(
+              timelineResp?.timeline?.clientEvents ?? [],
+              timelineResp?.financialRecords ?? [],
+            ),
           })),
         ),
       ),
@@ -542,6 +579,71 @@ export class SchoolComponent {
       }
     }
     return found && total > 0 ? total : null;
+  }
+
+  /**
+   * Picks the first parent "Home" event from the plan timeline and returns a
+   * `HomeEventPrefill` snapshot the Rent vs Buy calculator can consume.
+   *
+   * Rules (mirrors how the timeline persists Home events):
+   *   - The parent event is the one-off expense whose `name` starts with "Home"
+   *     and whose `isParent === true`. Linked records (`Home – Monthly payment`,
+   *     `Home – Resale`) are excluded by the `isParent` check.
+   *   - Cash purchase: `event.netAmount.amount` IS the property price.
+   *     We force 100% down payment and a 0-year mortgage so the engine treats
+   *     the loan as zero (no fake financing assumptions).
+   *   - Financing: `event.netAmount.amount` is the down payment. The mortgage
+   *     term is reconstructed from the linked Monthly payment record's start
+   *     and end years (inclusive — see `onMortgageApplied` in the timeline
+   *     add-event dialog). The mortgage rate is not persisted on the event so
+   *     the calculator falls through to Default Assumptions for it.
+   *
+   * Returns `null` when no Home parent event is present.
+   */
+  private extractHomeEventPrefill(
+    clientEvents: ClientEvent[],
+    financialRecords: FinancialRecordLineItem[],
+  ): HomeEventPrefill | null {
+    if (!clientEvents?.length) return null;
+
+    const homeParent = clientEvents.find(
+      (e) => !!e?.name?.startsWith('Home') && e.isParent === true,
+    );
+    if (!homeParent) return null;
+
+    if (homeParent.isCash === true) {
+      const price = homeParent.netAmount?.amount ?? null;
+      return {
+        paymentMode: 'cash',
+        propertyPrice: price && price > 0 ? Math.round(price) : null,
+        downPaymentPct: 100,
+        mortgageTermYears: 0,
+      };
+    }
+
+    const downPaymentAmount = homeParent.netAmount?.amount ?? null;
+    const monthly = financialRecords.find(
+      (r) =>
+        r?.parentId === homeParent.id &&
+        !!r?.description?.includes('– Monthly payment'),
+    );
+    const startYear = monthly?.start?.year;
+    const endYear = monthly?.end?.year ?? null;
+    const termYears =
+      startYear != null && endYear != null && endYear >= startYear
+        ? endYear - startYear + 1
+        : null;
+
+    return {
+      paymentMode: 'finance',
+      propertyPrice: null,
+      downPaymentAmount:
+        downPaymentAmount && downPaymentAmount > 0
+          ? Math.round(downPaymentAmount)
+          : null,
+      mortgageRatePct: null,
+      mortgageTermYears: termYears && termYears > 0 ? termYears : null,
+    };
   }
 
   private computeMonthlyRecurringExpenses(

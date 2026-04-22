@@ -270,13 +270,19 @@ export class LearnCompoundInterestComponent implements OnInit {
     const nominalName = this.translate.instant('LEARN_COMPOUND.SERIES_NOMINAL');
     const realName = this.translate.instant('LEARN_COMPOUND.SERIES_REAL');
 
-    const toPoints = (values: number[]) =>
-      YEAR_POINTS.map((year, i) => ({ x: year, y: Math.round(values[i] ?? 0) }));
+    /* Use a category axis with one entry per `YEAR_POINTS` value so the
+       crosshair, active marker and shared tooltip all snap to the same
+       discrete tick. A numeric axis with sparse `{x, y}` points caused
+       the first data point's vertical line to render at the next tick
+       (Year 5) while the tooltip text still read Year 0. */
+    const categories = YEAR_POINTS.map((year) => `${yearPrefix}${year}`);
+    const toData = (values: number[]) =>
+      YEAR_POINTS.map((_year, i) => Math.round(values[i] ?? 0));
 
     return {
       series: [
-        { name: nominalName, data: toPoints(nominal) },
-        { name: realName, data: toPoints(real) },
+        { name: nominalName, data: toData(nominal) },
+        { name: realName, data: toData(real) },
       ],
       chart: {
         type: 'line',
@@ -310,11 +316,8 @@ export class LearnCompoundInterestComponent implements OnInit {
         padding: { left: 8, right: 24, top: 8, bottom: 0 },
       },
       xaxis: {
-        type: 'numeric',
-        min: -1,
-        max: HORIZON_YEARS + 1,
-        tickAmount: HORIZON_YEARS + 2,
-        decimalsInFloat: 0,
+        type: 'category',
+        categories,
         axisBorder: { show: false },
         axisTicks: { show: false },
         crosshairs: { show: true, stroke: { color: 'rgba(64, 67, 175, 0.18)', width: 1, dashArray: 0 } },
@@ -324,13 +327,6 @@ export class LearnCompoundInterestComponent implements OnInit {
             colors: '#5a596e',
             fontSize: '13px',
             fontFamily: 'Ubuntu, sans-serif',
-          },
-          formatter: (val: string | number) => {
-            const n = Math.round(Number(val));
-            if (!Number.isFinite(n) || n < 0 || n > HORIZON_YEARS || n % 5 !== 0) {
-              return '';
-            }
-            return `${yearPrefix}${n}`;
           },
         },
       },
@@ -369,13 +365,7 @@ export class LearnCompoundInterestComponent implements OnInit {
         shared: true,
         intersect: false,
         followCursor: false,
-        x: {
-          show: true,
-          formatter: (val: string | number) => {
-            const n = Math.round(Number(val));
-            return `${yearPrefix}${n}`;
-          },
-        },
+        x: { show: true },
         y: {
           formatter: (value: number) => formatCurrency(value),
         },
@@ -400,13 +390,17 @@ export class LearnCompoundInterestComponent implements OnInit {
     const simpleName = this.translate.instant('LEARN_COMPOUND.COMPARE_SERIES_SIMPLE');
     const compoundName = this.translate.instant('LEARN_COMPOUND.COMPARE_SERIES_COMPOUND');
 
-    const toPoints = (values: number[]) =>
-      YEAR_POINTS.map((year, i) => ({ x: year, y: Math.round(values[i] ?? 0) }));
+    /* See `buildChartOptions` — category xaxis keeps the crosshair,
+       active marker and shared tooltip aligned on the same tick,
+       including the first data point (Year 0). */
+    const categories = YEAR_POINTS.map((year) => `${yearPrefix}${year}`);
+    const toData = (values: number[]) =>
+      YEAR_POINTS.map((_year, i) => Math.round(values[i] ?? 0));
 
     return {
       series: [
-        { name: simpleName, data: toPoints(simple) },
-        { name: compoundName, data: toPoints(compound) },
+        { name: simpleName, data: toData(simple) },
+        { name: compoundName, data: toData(compound) },
       ],
       chart: {
         type: 'line',
@@ -440,11 +434,8 @@ export class LearnCompoundInterestComponent implements OnInit {
         padding: { left: 8, right: 24, top: 8, bottom: 0 },
       },
       xaxis: {
-        type: 'numeric',
-        min: -1,
-        max: HORIZON_YEARS + 1,
-        tickAmount: HORIZON_YEARS + 2,
-        decimalsInFloat: 0,
+        type: 'category',
+        categories,
         axisBorder: { show: false },
         axisTicks: { show: false },
         crosshairs: { show: true, stroke: { color: 'rgba(64, 67, 175, 0.18)', width: 1, dashArray: 0 } },
@@ -454,13 +445,6 @@ export class LearnCompoundInterestComponent implements OnInit {
             colors: '#5a596e',
             fontSize: '13px',
             fontFamily: 'Ubuntu, sans-serif',
-          },
-          formatter: (val: string | number) => {
-            const n = Math.round(Number(val));
-            if (!Number.isFinite(n) || n < 0 || n > HORIZON_YEARS || n % 5 !== 0) {
-              return '';
-            }
-            return `${yearPrefix}${n}`;
           },
         },
       },
@@ -500,13 +484,7 @@ export class LearnCompoundInterestComponent implements OnInit {
         intersect: false,
         followCursor: false,
         inverseOrder: true,
-        x: {
-          show: true,
-          formatter: (val: string | number) => {
-            const n = Math.round(Number(val));
-            return `${yearPrefix}${n}`;
-          },
-        },
+        x: { show: true },
         y: {
           formatter: (value: number) => formatCurrency(value),
         },

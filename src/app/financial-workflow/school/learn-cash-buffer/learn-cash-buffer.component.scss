@@ -228,7 +228,7 @@ $impact-gutter: 56px;
 }
 
 /* ============================================================
-   Right column: simplified benchmark graph (hero element)
+   Right column: richer benchmark graph (hero element)
    ============================================================ */
 .learn-cash-buffer__viz {
   display: flex;
@@ -237,12 +237,29 @@ $impact-gutter: 56px;
   flex: 1 1 auto;
 }
 
-.buffer-months {
+/* Tick / band positions on the 0–24 visual scale.
+   The track is sized so 24 sits at 100% of the track width, while a small
+   reserved buffer on the right of the card keeps the marker callout fully
+   visible whenever the user value goes past 24. */
+$bm-pos-3: 12.5%;   //  3 / 24
+$bm-pos-6: 25%;     //  6 / 24
+$bm-pos-12: 50%;    // 12 / 24
+$bm-pos-24: 100%;   // 24 / 24
+$bm-track-right-buffer: 56px;
+/* Vertical anchor of the line inside the track. All line elements
+   (band, guides, segments, marker cap) share this y-position so the
+   line stays a single straight horizontal element with predictable
+   geometry. The callout hangs below it via a fixed offset. */
+$bm-line-y: 20px;
+$bm-callout-offset: 32px;
+
+.bm-chart {
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 28px;
   width: 100%;
-  padding: 32px 40px 26px;
+  padding: 28px 36px 24px;
   border: 1px solid $ibernia-line;
   border-radius: 16px;
   background:
@@ -255,67 +272,123 @@ $impact-gutter: 56px;
   flex: 1 1 auto;
 }
 
-.buffer-months__benchmark-wrap {
+/* ---------- Zone headers above the scale ---------- */
+.bm-chart__zones {
+  /* Same proportional grid as the line segments: 3 / 9 / 12 of 24. */
+  display: grid;
+  grid-template-columns: 3fr 9fr 12fr;
+  width: calc(100% - #{$bm-track-right-buffer});
+  align-items: start;
+  gap: 12px;
+}
+
+.bm-chart__zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 4px;
+  padding: 0 4px;
+  min-width: 0;
+}
+
+.bm-chart__zone-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: -0.1px;
+  line-height: 1.25;
+}
+
+.bm-chart__zone-sub {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.35;
+  color: $ibernia-mute;
+  max-width: 22ch;
+}
+
+.bm-chart__zone--low .bm-chart__zone-title {
+  color: $benchmark-red;
+}
+
+.bm-chart__zone--mid .bm-chart__zone-title {
+  color: $ibernia-blue;
+}
+
+.bm-chart__zone--high .bm-chart__zone-title {
+  color: $benchmark-orange;
+}
+
+/* ---------- Track + ticks + axis title ---------- */
+.bm-chart__track-wrap {
   position: relative;
   width: 100%;
-  padding: 12px 0 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  /* Reserve space on the right edge so a clamped marker callout
+     (when user value > 24 months) stays fully inside the card. */
+  padding-right: $bm-track-right-buffer;
+}
+
+.bm-chart__track {
+  position: relative;
+  width: 100%;
+  /* Reserve enough vertical room for the line at the top and the
+     marker callout hanging below, so the next sibling (.bm-chart__ticks)
+     never collides with the callout. */
+  height: 108px;
   overflow: visible;
 }
 
-.buffer-months__benchmark-line {
-  display: flex;
-  width: 100%;
-  align-items: center;
-  min-height: 44px;
-}
-
-.buffer-months__benchmark-seg {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 0;
-  position: relative;
-
-  &--low {
-    flex: 3 0 0;
-  }
-
-  &--mid {
-    flex: 9 0 0;
-  }
-
-  &--high {
-    flex: 12 0 0;
-  }
-}
-
-.buffer-months__benchmark-band {
+/* Subtle vertical guides at 3 and 12 — kept very light. */
+.bm-chart__guide {
   position: absolute;
-  left: 5%;
-  right: 5%;
-  top: 50%;
-  height: 30px;
-  margin-top: -15px;
+  top: $bm-line-y - 14px;
+  height: 28px;
+  width: 1px;
+  background: rgba(64, 67, 175, 0.16);
+  pointer-events: none;
+
+  &--3 {
+    left: $bm-pos-3;
+  }
+
+  &--12 {
+    left: $bm-pos-12;
+  }
+}
+
+/* Soft pill highlighting the healthy 3–12 range. Stable: never
+   resizes based on the user value. */
+.bm-chart__band {
+  position: absolute;
+  left: $bm-pos-3;
+  width: $bm-pos-12 - $bm-pos-3;
+  top: $bm-line-y - 14px;
+  height: 28px;
   border-radius: 999px;
   background: linear-gradient(
     180deg,
-    rgba(64, 67, 175, 0.11) 0%,
+    rgba(64, 67, 175, 0.12) 0%,
     rgba(64, 67, 175, 0.07) 100%
   );
   border: 1px solid rgba(64, 67, 175, 0.1);
   pointer-events: none;
 }
 
-.buffer-months__benchmark-stroke {
-  position: relative;
-  z-index: 1;
-  display: block;
-  width: 100%;
+/* Coloured horizontal line, split into three zones. */
+.bm-chart__line {
+  position: absolute;
+  top: $bm-line-y - 1.5px;
   height: 3px;
   border-radius: 1.5px;
   pointer-events: none;
+  z-index: 1;
 
   &--low {
+    left: 0;
+    width: $bm-pos-3;
     background: linear-gradient(
       90deg,
       rgba($benchmark-red, 0.92) 0%,
@@ -325,15 +398,19 @@ $impact-gutter: 56px;
   }
 
   &--mid {
+    left: $bm-pos-3;
+    width: $bm-pos-12 - $bm-pos-3;
     background: linear-gradient(
       90deg,
-      rgba(64, 67, 175, 0.45) 0%,
-      rgba(64, 67, 175, 0.38) 50%,
-      rgba(64, 67, 175, 0.45) 100%
+      rgba(64, 67, 175, 0.5) 0%,
+      rgba(64, 67, 175, 0.4) 50%,
+      rgba(64, 67, 175, 0.5) 100%
     );
   }
 
   &--high {
+    left: $bm-pos-12;
+    width: $bm-pos-24 - $bm-pos-12;
     background: linear-gradient(
       90deg,
       rgba($benchmark-orange, 0.82) 0%,
@@ -343,86 +420,144 @@ $impact-gutter: 56px;
   }
 }
 
-.buffer-months__marker {
+/* ---------- User-position marker ---------- */
+/* The marker is a 0×0 anchor positioned by `left: X%`. Its children
+   (cap, stem, callout) are absolutely positioned relative to that
+   anchor so geometry stays predictable regardless of width. */
+.bm-chart__marker {
   position: absolute;
-  left: 0;
-  bottom: 22px;
+  top: 0;
+  height: 100%;
   width: 0;
-  z-index: 2;
+  z-index: 3;
   pointer-events: none;
-  display: flex;
-  flex-direction: column-reverse;
-  align-items: center;
-  transform: translateX(-50%);
 }
 
-.buffer-months__marker-cap {
+.bm-chart__marker-cap {
   width: 14px;
   height: 14px;
   border-radius: 50%;
   background: $ibernia-blue;
   border: 2px solid #ffffff;
-  box-shadow: 0 2px 6px rgba(28, 28, 28, 0.16);
-  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(28, 28, 28, 0.18);
+  position: absolute;
+  top: $bm-line-y;
+  left: 0;
+  transform: translate(-50%, -50%);
+  z-index: 2;
 }
 
-.buffer-months__marker-stem {
+.bm-chart__marker-stem {
+  position: absolute;
+  top: $bm-line-y + 4px;
+  left: 0;
   width: 2px;
-  height: 18px;
-  margin-top: -1px;
+  height: $bm-callout-offset - 4px;
+  transform: translateX(-50%);
   border-radius: 1px;
   background: $ibernia-blue;
-  opacity: 0.92;
+  opacity: 0.85;
 }
 
-/* Axis block: numeric tick markers above the axis title.
-   Ticks sit at the 0 / 3 / 12 / 24 month positions on the same
-   24-month axis used by the bar segments (3 + 9 + 12 = 24). */
-.buffer-months__axis {
+.bm-chart__callout {
+  position: absolute;
+  top: $bm-line-y + $bm-callout-offset;
+  left: 0;
+  transform: translateX(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  width: 100%;
+  gap: 2px;
+  padding: 7px 12px;
+  min-width: 88px;
+  border-radius: 12px;
+  background: #ffffff;
+  border: 1px solid rgba(64, 67, 175, 0.18);
+  box-shadow:
+    0 2px 0 rgba(20, 22, 48, 0.03),
+    0 8px 18px rgba(64, 67, 175, 0.12);
+  white-space: nowrap;
 }
 
-.buffer-months__scale {
+.bm-chart__callout-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  color: $ibernia-mute;
+  text-transform: none;
+}
+
+.bm-chart__callout-value {
+  font-size: 13px;
+  font-weight: 500;
+  color: $ibernia-ink;
+  font-variant-numeric: tabular-nums;
+
+  strong {
+    font-size: 17px;
+    font-weight: 700;
+    color: $ibernia-blue;
+    margin-right: 3px;
+  }
+}
+
+/* Edge-aware alignment so the callout never overflows the card. */
+.bm-chart__marker[data-align="start"] .bm-chart__callout {
+  left: 0;
+  right: auto;
+  transform: translateX(-12px);
+}
+
+.bm-chart__marker[data-align="end"] .bm-chart__callout {
+  left: auto;
+  right: 0;
+  transform: translateX(12px);
+}
+
+/* ---------- Axis ticks ---------- */
+.bm-chart__ticks {
   position: relative;
   width: 100%;
   height: 18px;
+  margin-top: 0;
   font-size: 12.5px;
   font-weight: 600;
   color: $ibernia-mute;
   font-variant-numeric: tabular-nums;
 }
 
-.buffer-months__scale-tick {
+.bm-chart__tick {
   position: absolute;
   top: 0;
   transform: translateX(-50%);
   white-space: nowrap;
 
-  &--start {
+  &--0 {
     left: 0;
-    transform: none;
   }
 
   &--3 {
-    left: 12.5%;
+    left: $bm-pos-3;
+  }
+
+  &--6 {
+    left: $bm-pos-6;
   }
 
   &--12 {
-    left: 50%;
+    left: $bm-pos-12;
   }
 
-  &--end {
-    right: 0;
-    left: auto;
-    transform: none;
+  &--24 {
+    left: $bm-pos-24;
   }
 }
 
-.buffer-months__axis-title {
+.bm-chart__axis-title {
+  display: block;
+  margin-top: 10px;
+  width: 100%;
+  text-align: center;
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.6px;
@@ -587,14 +722,23 @@ $impact-gutter: 56px;
     font-size: 24px;
   }
 
-  .buffer-months {
-    padding: 24px 22px 18px;
+  .bm-chart {
+    padding: 22px 22px 18px;
+    gap: 22px;
+  }
+
+  .bm-chart__zone-title {
+    font-size: 12.5px;
+  }
+
+  .bm-chart__zone-sub {
+    font-size: 11.5px;
   }
 
   .learn-cash-buffer__main {
     /* On tablet the chart sits above the inputs, so reserve enough
-       room for the bar + axis to keep the visual reading clearly. */
-    min-height: 240px;
+       room for the zones, line, ticks and callout to remain readable. */
+    min-height: 280px;
   }
 }
 
@@ -611,7 +755,24 @@ $impact-gutter: 56px;
     font-size: 22px;
   }
 
-  .buffer-months__scale {
+  .bm-chart {
+    padding: 20px 18px 16px;
+    gap: 18px;
+  }
+
+  .bm-chart__zones {
+    gap: 8px;
+  }
+
+  .bm-chart__zone-title {
+    font-size: 12px;
+  }
+
+  .bm-chart__zone-sub {
+    font-size: 11px;
+  }
+
+  .bm-chart__ticks {
     font-size: 11px;
   }
 

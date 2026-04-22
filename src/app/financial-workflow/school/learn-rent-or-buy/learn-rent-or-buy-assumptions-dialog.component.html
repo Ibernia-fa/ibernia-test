@@ -1,10 +1,13 @@
 <div class="rb-assumptions">
-  <div class="rb-assumptions__header">
-    <h2 class="rb-assumptions__title">{{ "LEARN_RENT_OR_BUY.ASSUMPTIONS_TITLE" | translate }}</h2>
+  <div class="dialog-header rb-assumptions__header">
+    <h2 class="dialog-title text-center rb-assumptions__title">
+      {{ "LEARN_RENT_OR_BUY.ASSUMPTIONS_TITLE" | translate }}
+    </h2>
     <button
       type="button"
       mat-icon-button
-      class="rb-assumptions__close"
+      disableRipple
+      class="dialog-close-btn"
       (click)="cancel()"
       [attr.aria-label]="'LEARN_RENT_OR_BUY.CLOSE' | translate"
     >
@@ -130,12 +133,30 @@
     </div>
   </mat-dialog-content>
 
-  <mat-dialog-actions class="rb-assumptions__actions" align="end">
-    <button type="button" mat-button class="rb-assumptions__btn" (click)="cancel()">
-      {{ "LEARN_RENT_OR_BUY.CANCEL" | translate }}
-    </button>
-    <button type="button" mat-flat-button color="primary" class="rb-assumptions__btn rb-assumptions__btn--primary" (click)="apply()">
-      {{ "LEARN_RENT_OR_BUY.APPLY" | translate }}
-    </button>
-  </mat-dialog-actions>
+  <!--
+    Footer follows the platform `modal-action` pattern (see Tax settings,
+    Default assumptions). `.button-icon-outline` + `.button-icon` give us the
+    canonical Ibernia secondary/primary pair, and there is no `border-top` so
+    the divider line above the buttons is removed by design.
+  -->
+  <div class="row justify-content-end gap-16 modal-action rb-assumptions__actions p-t-24">
+    <div>
+      <button
+        type="button"
+        class="button-icon-outline w-100 d-block"
+        (click)="cancel()"
+      >
+        <span class="f-s-16">{{ "LEARN_RENT_OR_BUY.CANCEL" | translate }}</span>
+      </button>
+    </div>
+    <div>
+      <button
+        type="button"
+        class="button-icon w-100 d-block"
+        (click)="apply()"
+      >
+        <span class="f-s-16">{{ "LEARN_RENT_OR_BUY.APPLY" | translate }}</span>
+      </button>
+    </div>
+  </div>
 </div>

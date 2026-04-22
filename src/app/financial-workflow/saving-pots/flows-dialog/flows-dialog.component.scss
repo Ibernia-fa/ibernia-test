@@ -25,11 +25,13 @@
   font-weight: 600;
   color: #ffffff;
   letter-spacing: 0.2px;
-  /* Strong, layered shadow keeps the title readable across the full width
-     of the colourful header band, even on the lighter mid-tone area. */
+  /* Layered halo keeps the white title readable on the soft pastel
+     ambient background (the modal no longer has a vivid header band,
+     so contrast comes entirely from the text-shadow). */
   text-shadow:
-    0 1px 2px rgba(28, 28, 28, 0.45),
-    0 0 12px rgba(28, 28, 28, 0.25);
+    0 1px 2px rgba(28, 28, 28, 0.55),
+    0 2px 6px rgba(28, 28, 28, 0.4),
+    0 0 18px rgba(64, 67, 175, 0.45);
 }
 
 .flows-dialog__close {
@@ -45,7 +47,9 @@
 
   .mat-icon {
     color: #ffffff;
-    filter: drop-shadow(0 1px 2px rgba(28, 28, 28, 0.4));
+    filter:
+      drop-shadow(0 1px 2px rgba(28, 28, 28, 0.55))
+      drop-shadow(0 0 6px rgba(28, 28, 28, 0.35));
   }
 
   &:focus,

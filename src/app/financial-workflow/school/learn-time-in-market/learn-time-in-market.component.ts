@@ -396,15 +396,11 @@ const CRISIS_EVENTS: CrisisEvent[] = [
 export class LearnTimeInMarketComponent {
   readonly events = CRISIS_EVENTS;
 
-  /** Tile that has been clicked / locked. */
-  readonly selectedEventId = signal<string>(CRISIS_EVENTS[0].id);
-  /** Tile currently hovered (transient highlight, no lock). */
-  readonly hoveredEventId = signal<string | null>(null);
-
-  /** Effective active event = hovered (transient) ?? selected (locked). */
-  readonly activeEventId = computed(
-    () => this.hoveredEventId() ?? this.selectedEventId(),
-  );
+  /* Single active event id — the left list behaves as a hover-driven
+     navigator on desktop (hover === click), with click/tap and focus
+     providing the touch and keyboard equivalents. There is no
+     separate "hovered vs selected" state. */
+  readonly activeEventId = signal<string>(CRISIS_EVENTS[0].id);
 
   readonly activeEvent = computed<CrisisEvent>(() => {
     const id = this.activeEventId();
@@ -540,7 +536,25 @@ export class LearnTimeInMarketComponent {
     },
   };
 
-  readonly chartLegend = { show: false };
+  /* Legend rendered INSIDE the chart at top center, matching the
+     other School charts (compound interest, rent-or-buy, inflation). */
+  readonly chartLegend = {
+    show: true,
+    position: 'top',
+    horizontalAlign: 'center',
+    offsetY: -4,
+    fontFamily: 'Ubuntu, sans-serif',
+    fontSize: '12px',
+    fontWeight: 600,
+    labels: { colors: '#5a596e' },
+    markers: {
+      width: 14,
+      height: 3,
+      radius: 2,
+      offsetY: -2,
+    },
+    itemMargin: { horizontal: 12, vertical: 0 },
+  };
 
   /** Annotations — the only chart input that updates on hover/select. */
   readonly chartAnnotations = computed(() => {
@@ -586,16 +600,13 @@ export class LearnTimeInMarketComponent {
     this.dialogRef.close();
   }
 
-  onTileEnter(id: string): void {
-    this.hoveredEventId.set(id);
-  }
-
-  onTileLeave(): void {
-    this.hoveredEventId.set(null);
-  }
-
-  onTileSelect(id: string): void {
-    this.selectedEventId.set(id);
+  /** Hover, focus, click and tap all funnel into the same setter so
+      desktop hover and click behave identically. Mouse leave is a
+      no-op: the last activated tile stays highlighted. */
+  setActiveEvent(id: string): void {
+    if (this.activeEventId() !== id) {
+      this.activeEventId.set(id);
+    }
   }
 
   trackById(_index: number, event: CrisisEvent): string {

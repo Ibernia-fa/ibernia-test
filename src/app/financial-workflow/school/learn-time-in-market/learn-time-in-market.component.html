@@ -33,14 +33,11 @@
                   <button
                     type="button"
                     class="event-tile"
-                    [class.event-tile--active]="event.id === selectedEventId()"
-                    [class.event-tile--hovered]="event.id === hoveredEventId()"
-                    (mouseenter)="onTileEnter(event.id)"
-                    (focus)="onTileEnter(event.id)"
-                    (mouseleave)="onTileLeave()"
-                    (blur)="onTileLeave()"
-                    (click)="onTileSelect(event.id)"
-                    [attr.aria-pressed]="event.id === selectedEventId()"
+                    [class.event-tile--active]="event.id === activeEventId()"
+                    (mouseenter)="setActiveEvent(event.id)"
+                    (focus)="setActiveEvent(event.id)"
+                    (click)="setActiveEvent(event.id)"
+                    [attr.aria-pressed]="event.id === activeEventId()"
                   >
                     <span class="event-tile__main">
                       <span class="event-tile__range">{{ event.rangeLabel }}</span>
@@ -79,10 +76,6 @@
               ></apx-chart>
             </div>
             <div class="learn-tim__chart-meta">
-              <span class="learn-tim__series-pill">
-                <span class="learn-tim__series-dot" aria-hidden="true"></span>
-                {{ "LEARN_TIM.SERIES_NAME" | translate }}
-              </span>
               <span class="learn-tim__chart-note">
                 {{ "LEARN_TIM.AXIS_NOTE" | translate }}
               </span>
@@ -161,15 +154,6 @@
             <p class="learn-tim__narrative">
               {{ activeEvent().narrativeKey | translate }}
             </p>
-
-            @if (activeEvent().isNested) {
-              <p class="learn-tim__nested-note">
-                <mat-icon class="learn-tim__nested-note-icon" aria-hidden="true">
-                  info
-                </mat-icon>
-                {{ "LEARN_TIM.NESTED_NOTE" | translate }}
-              </p>
-            }
           </article>
         </section>
       </div>

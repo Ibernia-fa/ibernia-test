@@ -35,6 +35,7 @@ import {
 import { LearnRentOrBuyAssumptionsDialogComponent } from './learn-rent-or-buy-assumptions-dialog.component';
 import { runRentVsBuyEngine, type RentVsBuyEngineOutput } from './rent-vs-buy-engine';
 import type {
+  HomeEventPrefill,
   LearnRentOrBuyAssumptions,
   LearnRentOrBuyDialogData,
 } from './learn-rent-or-buy.types';
@@ -42,20 +43,27 @@ import type {
 const COLOR_BUY = '#5E79F6';
 const COLOR_RENT = '#4043AF';
 
+/**
+ * Static fallback defaults used when no value can be sourced from a Home event
+ * or from the user's Default Assumptions. These mirror the spec defaults for
+ * the Rent vs Buy lesson.
+ */
 const DEFAULTS = {
+  homePrice: 600_000,
+  monthlyRent: 2_300,
   downPaymentPct: 20,
-  mortgageRatePct: 4,
+  mortgageRatePct: 3.5,
   mortgageTermYears: 25,
   horizonYears: 10,
   homeAppreciationPct: 3,
   investmentReturnPct: 6,
-  inflationPct: 2,
+  inflationPct: 2.5,
   ownershipCostsPct: 2,
   roundTripCostsPct: 8,
 };
 
 const MAX_HORIZON_YEARS = 40;
-const MIN_TERM_YEARS = 1;
+const MIN_TERM_YEARS = 0;
 const DEBOUNCE_MS = 300;
 
 type DownPaymentMode = 'pct' | 'amount';
@@ -89,7 +97,7 @@ export class LearnRentOrBuyComponent implements OnInit {
 
   // -------- Core inputs (always visible) --------
 
-  readonly homePrice = signal<number | null>(null);
+  readonly homePrice = signal<number | null>(DEFAULTS.homePrice);
   readonly homePriceText = signal('');
 
   readonly downPaymentMode = signal<DownPaymentMode>('pct');
@@ -100,7 +108,7 @@ export class LearnRentOrBuyComponent implements OnInit {
   readonly mortgageTermYears = signal<number>(DEFAULTS.mortgageTermYears);
   readonly mortgageTermText = signal<string>('');
 
-  readonly monthlyRent = signal<number | null>(null);
+  readonly monthlyRent = signal<number | null>(DEFAULTS.monthlyRent);
   readonly monthlyRentText = signal('');
 
   readonly horizonYears = signal<number>(DEFAULTS.horizonYears);
@@ -185,18 +193,107 @@ export class LearnRentOrBuyComponent implements OnInit {
 
   constructor(@Inject(MAT_DIALOG_DATA) data: LearnRentOrBuyDialogData | null) {
     this.currencyCode = (data?.currencyCode ?? '').toString();
+    this.applyPrefill(data ?? null);
+    this.refreshAllText();
+  }
 
-    if (data?.homePrice && data.homePrice > 0) {
-      this.homePrice.set(Math.round(data.homePrice));
-    }
-    if (data?.monthlyRent && data.monthlyRent > 0) {
-      this.monthlyRent.set(Math.round(data.monthlyRent));
-    }
+  /**
+   * Applies the prefill priority chain documented on `LearnRentOrBuyDialogData`:
+   *   1. Home event in the current plan (cash vs financing)
+   *   2. User Default Assumptions for shared rates
+   *   3. Static fallback defaults already set as signal initializers
+   *
+   * Each branch is intentionally additive: a value that is not provided by a
+   * higher-precedence source falls through to the next one without clobbering
+   * the calculator's editable signals with `null`.
+   */
+  private applyPrefill(data: LearnRentOrBuyDialogData | null): void {
+    /* 2 → Default Assumptions (shared rates only). Apply first so the Home
+       event branch (1) can override the mortgage rate when persisted. */
     if (data?.inflationPct != null && Number.isFinite(data.inflationPct)) {
       this.inflationPct.set(Math.max(0, data.inflationPct));
     }
+    if (
+      data?.investmentReturnPct != null &&
+      Number.isFinite(data.investmentReturnPct)
+    ) {
+      this.investmentReturnPct.set(Math.max(0, data.investmentReturnPct));
+    }
+    if (
+      data?.mortgageRatePct != null &&
+      Number.isFinite(data.mortgageRatePct)
+    ) {
+      this.mortgageRatePct.set(Math.max(0, data.mortgageRatePct));
+    }
 
-    this.refreshAllText();
+    /* 0 → loose context inferred elsewhere (wealth/expenses) keeps working as
+       a soft fallback for the home price / rent guess. It only beats the static
+       defaults; a Home event below will win. */
+    if (data?.homePrice != null && data.homePrice > 0) {
+      this.homePrice.set(Math.round(data.homePrice));
+    }
+    if (data?.monthlyRent != null && data.monthlyRent > 0) {
+      this.monthlyRent.set(Math.round(data.monthlyRent));
+    }
+
+    /* 1 → Home event (highest precedence for property/financing fields). */
+    const event = data?.fromHomeEvent ?? null;
+    if (event) {
+      this.applyHomeEventPrefill(event);
+    }
+  }
+
+  /**
+   * Mirrors the user's intent on the Home event:
+   *   - Cash purchase  → 100% down payment, 0-year mortgage, no fake financing.
+   *   - Financing      → use whatever is persisted on the event (price, down
+   *                      payment, rate, term); anything missing falls through
+   *                      to the values already set by Default Assumptions /
+   *                      static defaults.
+   */
+  private applyHomeEventPrefill(event: HomeEventPrefill): void {
+    if (event.propertyPrice != null && event.propertyPrice > 0) {
+      this.homePrice.set(Math.round(event.propertyPrice));
+    }
+
+    if (event.paymentMode === 'cash') {
+      this.downPaymentMode.set('pct');
+      this.downPaymentPct.set(100);
+      this.mortgageTermYears.set(0);
+      return;
+    }
+
+    if (
+      event.downPaymentPct != null &&
+      Number.isFinite(event.downPaymentPct) &&
+      event.downPaymentPct > 0
+    ) {
+      this.downPaymentMode.set('pct');
+      this.downPaymentPct.set(Math.max(0, Math.min(100, event.downPaymentPct)));
+    } else if (
+      event.downPaymentAmount != null &&
+      Number.isFinite(event.downPaymentAmount) &&
+      event.downPaymentAmount > 0
+    ) {
+      this.downPaymentMode.set('amount');
+      this.downPaymentAmount.set(Math.round(event.downPaymentAmount));
+    }
+
+    if (
+      event.mortgageRatePct != null &&
+      Number.isFinite(event.mortgageRatePct) &&
+      event.mortgageRatePct >= 0
+    ) {
+      this.mortgageRatePct.set(event.mortgageRatePct);
+    }
+
+    if (
+      event.mortgageTermYears != null &&
+      Number.isFinite(event.mortgageTermYears) &&
+      event.mortgageTermYears > 0
+    ) {
+      this.mortgageTermYears.set(Math.round(event.mortgageTermYears));
+    }
   }
 
   ngOnInit(): void {
@@ -357,8 +454,14 @@ export class LearnRentOrBuyComponent implements OnInit {
 
   onMortgageTermInput(raw: string): void {
     this.mortgageTermText.set(raw);
+    /* `MIN_TERM_YEARS = 0` lets cash purchases (or a Home cash event) display
+       a 0-year mortgage without the input snapping back to 1. The engine will
+       still compute a zero mortgage payment when the loan amount is 0. */
     const value = Math.round(this.parseLocaleNumber(raw));
-    this.mortgageTermYears.set(Math.max(MIN_TERM_YEARS, Math.min(60, value || MIN_TERM_YEARS)));
+    const clamped = Number.isFinite(value)
+      ? Math.max(MIN_TERM_YEARS, Math.min(60, value))
+      : MIN_TERM_YEARS;
+    this.mortgageTermYears.set(clamped);
     this.bumpInputs();
   }
   onMortgageTermBlur(): void {
@@ -421,7 +524,10 @@ export class LearnRentOrBuyComponent implements OnInit {
         strokeDashArray: 4,
         xaxis: { lines: { show: false } },
         yaxis: { lines: { show: true } },
-        padding: { left: 8, right: 24, top: 8, bottom: 0 },
+        /* Extra right padding (≈ half a category step) keeps the final x-axis
+           label and the rightmost tooltip fully inside the chart container at
+           any horizon. Pairs with the `apx-chart` right inset in the SCSS. */
+        padding: { left: 8, right: 48, top: 8, bottom: 0 },
       },
       xaxis: {
         type: 'category',
@@ -429,6 +535,10 @@ export class LearnRentOrBuyComponent implements OnInit {
         axisBorder: { show: false },
         axisTicks: { show: false },
         labels: {
+          /* `hideOverlappingLabels: false` + `trim: false` prevent ApexCharts
+             from silently dropping the last label when room is tight. */
+          hideOverlappingLabels: false,
+          trim: false,
           style: {
             colors: '#5a596e',
             fontSize: '12px',
@@ -465,6 +575,12 @@ export class LearnRentOrBuyComponent implements OnInit {
         style: { fontSize: '14px', fontFamily: 'Ubuntu, sans-serif' },
         shared: true,
         intersect: false,
+        /* `inverseOrder` is purely cosmetic; what actually fixes the right-edge
+           clipping is the extra grid padding above plus the `overflow: visible`
+           on the chart wrapper in the SCSS — together they let ApexCharts flip
+           the tooltip to the left of the cursor on the final years without it
+           being cut off by the rounded chart container. */
+        inverseOrder: false,
         y: { formatter: (value: number) => this.formatCurrency(value) },
       },
     };

@@ -73,15 +73,37 @@ export class LearnCashBufferComponent implements OnInit {
   readonly benchmarkVisualMaxMonths = 24;
 
   /**
-   * Marker position on the fixed 0–24 month axis (capped at 24 for display).
-   * Actual months remain in `bufferMonths()` for copy and badges.
+   * Visual position of the marker on the rendered scale, expressed as a
+   * percentage of the chart track width. Values 0–100 map directly to 0–24
+   * months. When the real buffer exceeds 24 months, the marker is parked
+   * inside a small reserved area just past the 24 tick (around 102%) so the
+   * "You are here" callout stays fully visible inside the card.
    */
   readonly markerPercent = computed(() => {
     const bm = this.bufferMonths();
     if (bm === null) return null;
     const max = this.benchmarkVisualMaxMonths;
-    const clamped = Math.min(Math.max(0, bm), max);
-    return (clamped / max) * 100;
+    if (bm > max) return 102;
+    return (Math.max(0, bm) / max) * 100;
+  });
+
+  /** True when the real value exceeds the visual max (marker is parked in the reserved area). */
+  readonly markerClamped = computed(() => {
+    const bm = this.bufferMonths();
+    return bm !== null && bm > this.benchmarkVisualMaxMonths;
+  });
+
+  /**
+   * Horizontal alignment for the marker callout so it stays inside the card
+   * at both ends of the scale (left-aligned near 0, right-aligned near the
+   * clamped end, centered everywhere else).
+   */
+  readonly markerCalloutAlignment = computed<'start' | 'center' | 'end'>(() => {
+    const p = this.markerPercent();
+    if (p === null) return 'center';
+    if (p <= 8) return 'start';
+    if (p >= 92) return 'end';
+    return 'center';
   });
 
   readonly interpretation: Signal<CashBufferInterpretation> = computed(() => {
