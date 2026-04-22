@@ -1430,12 +1430,12 @@ body .custom-html-tooltip,
 
 app-branding {
   flex: 1;
-  margin-top: 8px;
+  // margin-top: 8px;
 }
 
 .flows-dialog-panel .mat-mdc-dialog-surface {
   background-color: #fafafa !important;
-  background-image: url('assets/images/backgrounds/background-img.jpg') !important;
+  background-image: url("assets/images/backgrounds/background-img.jpg") !important;
   background-size: cover !important;
   background-position: center !important;
   background-repeat: no-repeat !important;

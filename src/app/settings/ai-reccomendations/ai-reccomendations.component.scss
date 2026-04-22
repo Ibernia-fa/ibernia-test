@@ -155,7 +155,6 @@
   }
 }
 
-
 .description {
   font-size: 16px;
   line-height: 24px;
@@ -226,6 +225,13 @@
   }
 }
 
-.ai-rec-save-btn button{
+.ai-rec-save-btn button {
   min-width: 135px !important;
+}
+
+.ibr-new-dashboad-card.m-l-16.m-t-16 {
+  margin-left: 16px;
+  @media (max-width: 1023px) {
+    margin-left: 0px !important;
+  }
 }

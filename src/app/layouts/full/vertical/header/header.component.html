@@ -1,5 +1,6 @@
 <!-- <mat-toolbar class="topbar"> -->
-<mat-toolbar class="top-navigation-bar">
+<!-- <mat-toolbar class="top-navigation-bar"> -->
+<div class="top-navigation-bar">
   <div class="ibr-new-header">
     <!-- --------------------------------------------------------------- -->
     <!-- Logo in header when sidebar is hidden (client list, profile, etc.) -->
@@ -14,9 +15,7 @@
         type="button"
         (click)="toggleMobileNav.emit()"
         class="header-expand-toggle m-r-4"
-        [attr.aria-label]="
-          options.sidenavOpened ? 'Close menu' : 'Open menu'
-        "
+        [attr.aria-label]="options.sidenavOpened ? 'Close menu' : 'Open menu'"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -67,7 +66,9 @@
     <!-- --------------------------------------------------------------- -->
     <!-- Desktop Menu - Logo moved to sidebar -->
     <ng-container
-      *ngIf="isCashflowRoute && clientProfileLink && cashflowBreadcrumbClientLabel"
+      *ngIf="
+        isCashflowRoute && clientProfileLink && cashflowBreadcrumbClientLabel
+      "
     >
       <nav
         class="header-breadcrumb d-flex align-items-center"
@@ -150,11 +151,14 @@
           [routerLink]="['/clients']"
           class="breadcrumb-link d-flex align-items-center text-decoration-none"
         >
-          {{ 'Home' | translate }}
+          {{ "Home" | translate }}
         </a>
 
         <ng-container
-          *ngIf="settingsBreadcrumbContext.type === 'client' || settingsBreadcrumbContext.type === 'plan'"
+          *ngIf="
+            settingsBreadcrumbContext.type === 'client' ||
+            settingsBreadcrumbContext.type === 'plan'
+          "
         >
           <svg
             width="12"
@@ -224,7 +228,9 @@
             stroke-linejoin="round"
           />
         </svg>
-        <span class="breadcrumb-current f-w-500">{{ 'Settings' | translate }}</span>
+        <span class="breadcrumb-current f-w-500">{{
+          "Settings" | translate
+        }}</span>
       </nav>
     </ng-container>
 
@@ -345,7 +351,7 @@
     <a mat-button [routerLink]="['/apps/email/inbox']">Email</a>
   </div> -->
 
-    <span class="flex-1-auto"></span>
+    <!-- <span class="flex-1-auto"></span> -->
 
     <!-- Mobile Menu -->
     <!-- <button
@@ -936,4 +942,4 @@
     </ng-scrollbar>
   </mat-menu> -->
   </div>
-</mat-toolbar>
+</div>
