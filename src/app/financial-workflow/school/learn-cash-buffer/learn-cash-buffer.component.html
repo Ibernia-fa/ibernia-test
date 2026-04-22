@@ -91,44 +91,88 @@
         <section class="learn-cash-buffer__main">
           <div class="learn-cash-buffer__viz">
             <div
-              class="buffer-months"
+              class="bm-chart"
               role="img"
               [attr.aria-label]="'LEARN_CASH_BUFFER.RANGE_ARIA' | translate"
             >
-              <div class="buffer-months__benchmark-wrap">
-                <div class="buffer-months__benchmark-line" aria-hidden="true">
-                  <div class="buffer-months__benchmark-seg buffer-months__benchmark-seg--low">
-                    <span class="buffer-months__benchmark-stroke buffer-months__benchmark-stroke--low"></span>
-                  </div>
-                  <div class="buffer-months__benchmark-seg buffer-months__benchmark-seg--mid">
-                    <span class="buffer-months__benchmark-band"></span>
-                    <span class="buffer-months__benchmark-stroke buffer-months__benchmark-stroke--mid"></span>
-                  </div>
-                  <div class="buffer-months__benchmark-seg buffer-months__benchmark-seg--high">
-                    <span class="buffer-months__benchmark-stroke buffer-months__benchmark-stroke--high"></span>
-                  </div>
+              <!-- Zone headers, centered above each segment of the scale -->
+              <div class="bm-chart__zones" aria-hidden="true">
+                <div class="bm-chart__zone bm-chart__zone--low">
+                  <span class="bm-chart__zone-title">
+                    {{ "LEARN_CASH_BUFFER.ZONE_LOW_TITLE" | translate }}
+                  </span>
+                  <span class="bm-chart__zone-sub">
+                    {{ "LEARN_CASH_BUFFER.ZONE_LOW_SUB" | translate }}
+                  </span>
                 </div>
-                @if (markerPercent() !== null) {
-                  <div
-                    class="buffer-months__marker"
-                    [style.left.%]="markerPercent()!"
-                    [attr.title]="formatMonthsDisplay(bufferMonths())"
-                  >
-                    <span class="buffer-months__marker-stem"></span>
-                    <span class="buffer-months__marker-cap"></span>
-                  </div>
-                }
+                <div class="bm-chart__zone bm-chart__zone--mid">
+                  <span class="bm-chart__zone-title">
+                    {{ "LEARN_CASH_BUFFER.ZONE_MID_TITLE" | translate }}
+                  </span>
+                  <span class="bm-chart__zone-sub">
+                    {{ "LEARN_CASH_BUFFER.ZONE_MID_SUB" | translate }}
+                  </span>
+                </div>
+                <div class="bm-chart__zone bm-chart__zone--high">
+                  <span class="bm-chart__zone-title">
+                    {{ "LEARN_CASH_BUFFER.ZONE_HIGH_TITLE" | translate }}
+                  </span>
+                  <span class="bm-chart__zone-sub">
+                    {{ "LEARN_CASH_BUFFER.ZONE_HIGH_SUB" | translate }}
+                  </span>
+                </div>
               </div>
 
-              <div class="buffer-months__axis" aria-hidden="true">
-                <div class="buffer-months__scale buffer-months__scale--benchmark">
-                  <span class="buffer-months__scale-tick buffer-months__scale-tick--start">0</span>
-                  <span class="buffer-months__scale-tick buffer-months__scale-tick--3">3</span>
-                  <span class="buffer-months__scale-tick buffer-months__scale-tick--12">12</span>
-                  <span class="buffer-months__scale-tick buffer-months__scale-tick--end">24</span>
+              <!-- Track + ticks share the same width and a small reserved
+                   right-side area so the marker callout stays inside the
+                   card when the user value exceeds 24 months. -->
+              <div class="bm-chart__track-wrap">
+                <div class="bm-chart__track" aria-hidden="true">
+                  <!-- Subtle vertical guides at 3 and 12 months -->
+                  <span class="bm-chart__guide bm-chart__guide--3"></span>
+                  <span class="bm-chart__guide bm-chart__guide--12"></span>
+
+                  <!-- Healthy range pill, fixed between 3 and 12 -->
+                  <span class="bm-chart__band"></span>
+
+                  <!-- Coloured line segments -->
+                  <span class="bm-chart__line bm-chart__line--low"></span>
+                  <span class="bm-chart__line bm-chart__line--mid"></span>
+                  <span class="bm-chart__line bm-chart__line--high"></span>
+
+                  @if (markerPercent() !== null) {
+                    <div
+                      class="bm-chart__marker"
+                      [class.bm-chart__marker--clamped]="markerClamped()"
+                      [attr.data-align]="markerCalloutAlignment()"
+                      [style.left.%]="markerPercent()!"
+                      [attr.title]="formatMonthsDisplay(bufferMonths())"
+                    >
+                      <span class="bm-chart__marker-stem"></span>
+                      <span class="bm-chart__marker-cap"></span>
+                      <div class="bm-chart__callout">
+                        <span class="bm-chart__callout-label">
+                          {{ "LEARN_CASH_BUFFER.YOU_ARE_HERE" | translate }}
+                        </span>
+                        <span class="bm-chart__callout-value">
+                          <strong>{{ formatMonthsDisplay(bufferMonths()) }}</strong>
+                          {{ bufferMonthWordKey(bufferMonths()) | translate }}
+                        </span>
+                      </div>
+                    </div>
+                  }
                 </div>
-                <span class="buffer-months__axis-title">
-                  {{ "LEARN_CASH_BUFFER.AXIS_MONTHS" | translate }}
+
+                <div class="bm-chart__ticks" aria-hidden="true">
+                  <span class="bm-chart__tick bm-chart__tick--0">0</span>
+                  <span class="bm-chart__tick bm-chart__tick--3">3</span>
+                  <span class="bm-chart__tick bm-chart__tick--6">6</span>
+                  <span class="bm-chart__tick bm-chart__tick--12">12</span>
+                  <span class="bm-chart__tick bm-chart__tick--24">24</span>
+                </div>
+
+                <span class="bm-chart__axis-title">
+                  {{ "LEARN_CASH_BUFFER.AXIS_MONTHS_OF_EXPENSES" | translate }}
                 </span>
               </div>
             </div>

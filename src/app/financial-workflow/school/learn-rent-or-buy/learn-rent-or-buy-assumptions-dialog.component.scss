@@ -12,6 +12,11 @@ $ibernia-bg-soft: #f7f8fc;
   max-height: 100%;
 }
 
+/* Surface tweaks: align this dialog with the canonical Ibernia modal shell
+   (`Add income`, `Tax settings`, `Mortgage calculator`). The shared overrides
+   in `_dialog.scss` already centre the title and apply the absolute close
+   button via `.dialog-header` / `.dialog-title` / `.dialog-close-btn` — we
+   only adjust spacing and remove any divider line above the actions row. */
 .rb-assumptions {
   font-family: "Ubuntu", sans-serif;
   color: $ibernia-ink;
@@ -23,26 +28,19 @@ $ibernia-bg-soft: #f7f8fc;
   max-height: 100%;
   overflow: hidden;
 
+  /* Header uses the shared `.dialog-header` rule for centering + close button
+     reservation. We only need a relative anchor so `.dialog-close-btn` (which
+     is `position: absolute`) lands inside the dialog surface, plus a touch of
+     bottom breathing room before the field grid. */
   &__header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 4px 4px 12px 4px;
+    position: relative;
+    padding: 0 40px 16px;
     flex: 0 0 auto;
   }
 
+  /* Reset legacy 22px / 700 title — the canonical `.dialog-title` is 24/600. */
   &__title {
     margin: 0;
-    font-size: 22px;
-    line-height: 1.2;
-    font-weight: 700;
-    letter-spacing: -0.3px;
-    color: $ibernia-ink;
-  }
-
-  &__close {
-    color: $ibernia-mute;
   }
 
   /* Scrollable list of fields. */
@@ -62,20 +60,12 @@ $ibernia-bg-soft: #f7f8fc;
     gap: 14px 18px;
   }
 
+  /* No `border-top`: the previous divider line above the buttons is removed
+     intentionally to match the rest of Ibernia's modals (Default assumptions,
+     Tax settings). Spacing alone separates the actions from the field grid. */
   &__actions {
-    padding: 14px 4px 4px 4px !important;
-    margin: 12px 0 0 0 !important;
-    border-top: 1px solid $ibernia-line;
-    display: flex;
-    gap: 10px;
+    margin: 12px 0 0 0;
     flex: 0 0 auto;
-  }
-
-  &__btn {
-    min-width: 96px;
-    border-radius: 10px !important;
-    font-weight: 600 !important;
-    height: 40px !important;
   }
 }
 
@@ -148,6 +138,10 @@ $ibernia-bg-soft: #f7f8fc;
   }
 }
 
+/* The dialog surface sets `padding: 24px`; the global `modal-action` button
+   sizing rule (`min-width: 135px`) already gives the Cancel/Save pair the
+   correct presence so we don't redeclare it here. We only drop a small,
+   responsive single-column adjustment for narrow viewports. */
 @media (max-width: 600px) {
   .rb-assumptions__grid {
     grid-template-columns: 1fr;

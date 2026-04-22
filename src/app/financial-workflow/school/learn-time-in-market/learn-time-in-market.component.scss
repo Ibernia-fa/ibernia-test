@@ -179,18 +179,15 @@ $tim-gutter: 56px;
     background 0.18s ease,
     box-shadow 0.18s ease;
 
-  &:hover,
-  &--hovered {
-    border-color: rgba(64, 67, 175, 0.32);
-    background: rgba(64, 67, 175, 0.025);
-    box-shadow: 0 4px 10px rgba(64, 67, 175, 0.06);
-  }
-
   &:focus-visible {
     outline: 2px solid $ibernia-blue;
     outline-offset: 2px;
   }
 
+  /* Hover and active share a single highlight treatment — the left
+     list behaves as a hover-driven navigator, so there is no
+     visible difference between hovered and clicked tiles. */
+  &:hover,
   &--active {
     border-color: rgba(64, 67, 175, 0.5);
     background:
@@ -297,7 +294,10 @@ $tim-gutter: 56px;
 
   apx-chart {
     position: absolute;
-    inset: 12px 18px 6px 6px;
+    /* Reserve a little extra room at the top so the in-chart legend
+       sits cleanly above the line and never collides with axis
+       labels or the trough marker. */
+    inset: 18px 18px 6px 6px;
     display: block;
   }
 }
@@ -305,29 +305,9 @@ $tim-gutter: 56px;
 .learn-tim__chart-meta {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  flex-wrap: wrap;
+  justify-content: flex-end;
   flex-shrink: 0;
   padding: 0 4px;
-}
-
-.learn-tim__series-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 12.5px;
-  font-weight: 600;
-  color: $ibernia-mute;
-  letter-spacing: 0.1px;
-}
-
-.learn-tim__series-dot {
-  width: 16px;
-  height: 3px;
-  border-radius: 2px;
-  background: $ibernia-blue;
-  display: inline-block;
 }
 
 .learn-tim__chart-note {
@@ -335,6 +315,7 @@ $tim-gutter: 56px;
   color: $ibernia-mute;
   font-style: italic;
   font-weight: 400;
+  text-align: right;
 }
 
 /* ----- Detail card (below the chart) ----- */
@@ -450,28 +431,6 @@ $tim-gutter: 56px;
   overflow: hidden;
 }
 
-.learn-tim__nested-note {
-  margin: 0;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11.5px;
-  color: $ibernia-mute;
-  font-style: italic;
-  background: rgba(64, 67, 175, 0.05);
-  border: 1px solid rgba(64, 67, 175, 0.12);
-  padding: 5px 10px;
-  border-radius: 8px;
-  align-self: flex-start;
-}
-
-.learn-tim__nested-note-icon {
-  font-size: 14px;
-  width: 14px;
-  height: 14px;
-  color: $ibernia-blue;
-}
-
 /* ----- Footer notice override (consistent gap with other slides) ----- */
 .learn-tim__page .school-notice {
   margin: 2px 0 0;
@@ -552,6 +511,25 @@ $tim-gutter: 56px;
 
 :host ::ng-deep .apexcharts-canvas .apexcharts-xaxis-annotations rect {
   rx: 0;
+}
+
+/* In-chart legend: keep it visible (no clipped scrollbar) and
+   visually consistent with the other School charts. */
+:host ::ng-deep .learn-tim__chart .apexcharts-legend {
+  overflow: visible !important;
+  scrollbar-width: none;
+  padding: 0 !important;
+}
+
+:host ::ng-deep .learn-tim__chart .apexcharts-legend::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+:host ::ng-deep .learn-tim__chart .apexcharts-legend-text {
+  color: $ibernia-mute !important;
+  font-family: "Ubuntu", sans-serif !important;
 }
 
 /* ============================================================

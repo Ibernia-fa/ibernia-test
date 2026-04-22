@@ -1433,36 +1433,29 @@ app-branding {
   // margin-top: 8px;
 }
 
-/* Flows dialog surface: matches the frosted glass treatment used across
-   Ibernia (translucent white veil + heavy backdrop blur, same logic as the
-   `cardWithShadow` / new-dashboard cards). The branded background image
-   stays visible across the top so the white "Flows" title reads naturally
-   against a richer band, then a soft white veil takes over for the body
-   so the inner cards sit on a calm frosted backdrop rather than a vivid
-   full-bleed graphic. */
+/* Flows dialog surface: mirrors the soft ambient background used by the
+   main page container (`.sidenavContainer` in `_container.scss`).
+   The branded background image is layered underneath a near-uniform
+   translucent white veil and softened by a heavy backdrop blur, so the
+   modal reads as a calm pastel wash rather than a vivid abstract
+   composition. No sharp colour bands or hard-edged shapes — just a
+   subtle diffused colour that lets the inner cards stay the focus. */
 .flows-dialog-panel .mat-mdc-dialog-surface {
   position: relative;
   overflow: hidden !important;
   padding: 16px 24px 24px !important;
   background-color: #fafafa !important;
   background-image: linear-gradient(
-      to bottom,
-      rgba(255, 255, 255, 0) 0,
-      rgba(255, 255, 255, 0) 72px,
-      rgba(255, 255, 255, 0.62) 132px,
-      rgba(255, 255, 255, 0.62) 100%
+      rgba(255, 255, 255, 0.72),
+      rgba(255, 255, 255, 0.72)
     ),
     url("assets/images/backgrounds/background-img.jpg") !important;
-  background-size:
-    100% 100%,
-    cover !important;
-  background-position:
-    center,
-    center !important;
-  background-repeat: no-repeat, no-repeat !important;
-  -webkit-backdrop-filter: blur(75px);
-  backdrop-filter: blur(75px);
-  border: 1px solid rgba(255, 255, 255, 0.45);
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  -webkit-backdrop-filter: blur(150px);
+  backdrop-filter: blur(150px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
 }
 
 /* ============================================================
