@@ -36,7 +36,7 @@ const routes: Routes = [
   { path: 'help', loadComponent: () =>
     import('./help-and-contact/help-and-contact.component')
       .then(m => m.HelpAndContactComponent), data: { showSidebar: true } },
-  { path: 'ai-reccomendations', loadComponent: () =>
+  { path: 'ai-reccomendations', canActivate: [AdminGuard], loadComponent: () =>
     import('./ai-reccomendations/ai-reccomendations.component')
       .then(m => m.AiReccomendationsComponent), data: { showSidebar: true } },
   { path: 'privacy-data', loadComponent: () =>
