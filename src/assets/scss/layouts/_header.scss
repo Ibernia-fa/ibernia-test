@@ -68,10 +68,10 @@ html .topbar {
   // border-bottom: 1px solid #e7e7eb;
   // height: $header-height;
   height: 65px !important;
-  @media (max-width: 640px) {
-    padding: 16px 16px !important;
-    height: 64px !important;
-  }
+  // @media (max-width: 640px) {
+  //   padding: 16px 16px !important;
+  //   height: 64px !important;
+  // }
   .ibr-new-header {
     border-radius: 12px;
     display: flex;
@@ -85,9 +85,9 @@ html .topbar {
 }
 .nav-btns {
   gap: 14px;
-  @media (max-width: 640px) {
-    gap: 0 !important;
-  }
+  // @media (max-width: 640px) {
+  //   gap: 0 !important;
+  // }
   .ibr-profile-seperator {
     height: 34px;
     background: #0000001a;
