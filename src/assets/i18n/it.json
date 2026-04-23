@@ -194,6 +194,8 @@
   "No notifications": "Nessuna notifica",
   "Title": "Titolo",
   "Message": "Messaggio",
+  "Title Italian optional": "Titolo (italiano, opzionale)",
+  "Message Italian optional": "Messaggio (italiano, opzionale)",
   "Notification label": "Etichetta notifica",
   "Shown next to the date for advisors (e.g. News, Update)": "Mostrata accanto alla data per i consulenti (es. Novità, Aggiornamento)",
   "All users": "Tutti gli utenti",
