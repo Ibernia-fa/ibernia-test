@@ -111,6 +111,7 @@ export class ShareReportComponent {
       expiryDays: this.reportForm.value.expiry,
       requestBy: this.client?.financialAdvisor?.advisorId ?? '',
       sendEmail: false,
+      locale: this.translate.currentLang || 'en',
     };
 
     this.isCopying = true;
@@ -175,6 +176,7 @@ export class ShareReportComponent {
       expiryDays: this.reportForm.value.expiry,
       requestBy: this.client?.financialAdvisor?.advisorId ?? '',
       sendEmail: true,
+      locale: this.translate.currentLang || 'en',
     };
 
     this.isLoaderVisible = true;

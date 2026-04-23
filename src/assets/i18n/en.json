@@ -196,6 +196,8 @@
   "Actions": "Actions",
   "Title": "Title",
   "Message": "Message",
+  "Title Italian optional": "Title (Italian, optional)",
+  "Message Italian optional": "Message (Italian, optional)",
   "Notification label": "Notification label",
   "Shown next to the date for advisors (e.g. News, Update)": "Shown next to the date for advisors (e.g. News, Update)",
   "All users": "All users",

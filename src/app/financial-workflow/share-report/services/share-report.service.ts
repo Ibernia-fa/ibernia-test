@@ -8,6 +8,8 @@ export interface ClientReportRequest {
   requestBy: string;
   /** When false, creates credentials without sending email. Omit or true to send as before. */
   sendEmail?: boolean;
+  /** E.g. it — used for the language of the client report email. */
+  locale?: string;
 }
 
 export interface ClientReportShareResponse {
