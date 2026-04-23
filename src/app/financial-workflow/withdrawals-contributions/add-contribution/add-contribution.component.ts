@@ -882,31 +882,26 @@ export class AddContributionComponent {
 
     const endControl = this.contributionForm.get('end');
     const retirementEvent = this.getRetirementEvent();
-    if (!endControl || !retirementEvent) return;
+    if (!endControl || !retirementEvent?.id) return;
 
-    const retirementYear = retirementEvent?.start?.year;
-    if (
-      retirementYear === null ||
-      retirementYear === undefined ||
-      retirementYear === ''
-    )
-      return;
     if (
       endControl.value === null ||
       endControl.value === undefined ||
       endControl.value === ''
     ) {
-      endControl.setValue(retirementYear);
+      endControl.setValue('event:' + retirementEvent.id);
     }
   }
 
   private getRetirementEvent(): any | null {
     const events = this.eventsList ?? [];
     return (
-      events.find(
-        (event: any) =>
-          (event?.name ?? '').toString().toLowerCase() === 'retirement age',
-      ) ?? null
+      events.find((event: any) => {
+        const name = (event?.name ?? '').toString().trim().toLowerCase();
+        const isRetirementName =
+          name.startsWith('retirement age') || name.includes('pensione');
+        return isRetirementName && !event?.isPartnerEvent;
+      }) ?? null
     );
   }
 

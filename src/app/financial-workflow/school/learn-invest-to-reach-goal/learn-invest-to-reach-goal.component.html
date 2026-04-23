@@ -129,7 +129,17 @@
               </p>
             } @else {
               <span class="impact-card__label">
-                {{ "LEARN_INVEST_GOAL.RESULT_LABEL" | translate }}
+                @if (yearsToInvest() === 1) {
+                  {{
+                    "LEARN_INVEST_GOAL.RESULT_LABEL_SINGULAR"
+                      | translate: { years: yearsToInvest() }
+                  }}
+                } @else {
+                  {{
+                    "LEARN_INVEST_GOAL.RESULT_LABEL_PLURAL"
+                      | translate: { years: yearsToInvest() }
+                  }}
+                }
               </span>
               <div class="impact-card__value impact-card__value--tight">
                 <span class="impact-card__readout">{{

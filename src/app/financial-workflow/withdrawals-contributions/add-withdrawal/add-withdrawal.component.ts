@@ -531,23 +531,24 @@ export class AddWithdrawalComponent {
     }
 
     const retirementEvent = this.getRetirementEvent();
-    if (!retirementEvent) return;
+    if (!retirementEvent?.id) return;
 
     const startControl = this.withdrawalForm.get('start');
-    const retirementYear = retirementEvent?.start?.year;
-    if (startControl && retirementYear !== null && retirementYear !== undefined && retirementYear !== '') {
-      if (startControl.value === null || startControl.value === undefined || startControl.value === '') {
-        startControl.setValue(retirementYear);
-      }
+    if (startControl && (startControl.value === null || startControl.value === undefined || startControl.value === '')) {
+      startControl.setValue('event:' + retirementEvent.id);
     }
   }
 
   private getRetirementEvent(): any | null {
     const events = this.eventsList ?? [];
-    return events.find(
-      (event: any) =>
-        (event?.name ?? '').toString().toLowerCase() === 'retirement age'
-    ) ?? null;
+    return (
+      events.find((event: any) => {
+        const name = (event?.name ?? '').toString().trim().toLowerCase();
+        const isRetirementName =
+          name.startsWith('retirement age') || name.includes('pensione');
+        return isRetirementName && !event?.isPartnerEvent;
+      }) ?? null
+    );
   }
 
   private setDefaultSavingPot(): void {
