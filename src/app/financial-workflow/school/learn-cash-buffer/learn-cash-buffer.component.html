@@ -99,20 +99,19 @@
               [attr.aria-label]="'LEARN_CASH_BUFFER.RANGE_ARIA' | translate"
             >
               <!-- Plot area: tick column | vertical track | zone descriptions column.
-                   The scale runs bottom-to-top: 0 → 3 → 12 → 24 → above 24.
-                   All position math reuses the existing percentage signals; only
-                   the visual orientation changes. -->
+                   The scale is FIXED and categorical (4 equal sections):
+                   0–3, 3–12, 12–24 and 24+ months. Section heights never
+                   change with the user's value; values above 24 are
+                   clamped to a single position inside the 24+ band. -->
               <div class="bm-chart__plot">
                 <!-- Tick labels on the left side of the vertical track -->
                 <div class="bm-chart__ticks" aria-hidden="true">
-                  @if (extendedMaxLabel() !== null) {
-                    <span class="bm-chart__tick bm-chart__tick--max">
-                      <span class="bm-chart__tick-label">
-                        {{ "LEARN_CASH_BUFFER.AXIS_ABOVE_24" | translate }}
-                      </span>
-                      <span class="bm-chart__tick-connector"></span>
+                  <span class="bm-chart__tick bm-chart__tick--max">
+                    <span class="bm-chart__tick-label">
+                      {{ "LEARN_CASH_BUFFER.AXIS_ABOVE_24" | translate }}
                     </span>
-                  }
+                    <span class="bm-chart__tick-connector"></span>
+                  </span>
                   <span class="bm-chart__tick bm-chart__tick--24">
                     <span class="bm-chart__tick-label">24</span>
                     <span class="bm-chart__tick-connector"></span>
@@ -134,22 +133,25 @@
                 <!-- Vertical coloured track -->
                 <div class="bm-chart__track-wrap">
                   <div class="bm-chart__track" aria-hidden="true">
-                    <!-- Subtle horizontal guides at 3 and 12 months -->
+                    <!-- Subtle horizontal guides at 3, 12 and 24 months -->
                     <span class="bm-chart__guide bm-chart__guide--3"></span>
                     <span class="bm-chart__guide bm-chart__guide--12"></span>
+                    <span class="bm-chart__guide bm-chart__guide--24"></span>
 
                     <!-- Healthy range pill, fixed between 3 and 12 -->
                     <span class="bm-chart__band"></span>
 
-                    <!-- Coloured vertical line segments -->
+                    <!-- Coloured vertical line segments (one per fixed section) -->
                     <span class="bm-chart__line bm-chart__line--low"></span>
                     <span class="bm-chart__line bm-chart__line--mid"></span>
                     <span class="bm-chart__line bm-chart__line--high"></span>
+                    <span class="bm-chart__line bm-chart__line--excess"></span>
 
                     @if (markerPercent() !== null) {
                       <div
                         class="bm-chart__marker"
                         [attr.data-align]="markerCalloutAlignment()"
+                        [attr.data-excess]="isExcessive() ? 'true' : null"
                         [style.bottom.%]="markerPercent()!"
                         [attr.title]="formatMonthsDisplay(bufferMonths())"
                       >
@@ -171,6 +173,14 @@
 
                 <!-- Zone headers, vertically aligned with their colour bands -->
                 <div class="bm-chart__zones" aria-hidden="true">
+                  <div class="bm-chart__zone bm-chart__zone--excess">
+                    <span class="bm-chart__zone-title">
+                      {{ "LEARN_CASH_BUFFER.ZONE_EXCESS_TITLE" | translate }}
+                    </span>
+                    <span class="bm-chart__zone-sub">
+                      {{ "LEARN_CASH_BUFFER.ZONE_EXCESS_SUB" | translate }}
+                    </span>
+                  </div>
                   <div class="bm-chart__zone bm-chart__zone--high">
                     <span class="bm-chart__zone-title">
                       {{ "LEARN_CASH_BUFFER.ZONE_HIGH_TITLE" | translate }}

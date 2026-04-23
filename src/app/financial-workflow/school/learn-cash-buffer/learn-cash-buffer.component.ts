@@ -70,49 +70,48 @@ export class LearnCashBufferComponent implements OnInit {
   });
 
   /**
-   * Baseline visual scale for the benchmark chart. The chart always anchors
-   * 24 months as the standard reference, but extends gracefully in 6-month
-   * increments when the user value exceeds it so the marker always sits on
-   * the line itself. The 0–24 framework remains visible at all times.
+   * Fixed categorical scale: the chart is split into four constant
+   * sections (0–3, 3–12, 12–24, 24+), each occupying the same share of
+   * the visual track. Plotted positions never resize based on the user's
+   * value, so categories are read consistently regardless of the result.
+   *
+   * Within a section the marker interpolates linearly between its
+   * boundaries; any value above 24 months is clamped to a single
+   * rendered position inside the 24+ band. The underlying month count
+   * stays available for labels, badges and tooltip text.
    */
-  readonly benchmarkBaselineMaxMonths = 24;
-
-  /**
-   * Effective visual maximum for the chart axis. Defaults to the baseline
-   * (24). When the buffer exceeds 24 months the axis is extended in 6-month
-   * steps with at least 1 month of headroom past the marker so the dot stays
-   * on the line and the callout has breathing room.
-   */
-  readonly visualMaxMonths = computed(() => {
-    const bm = this.bufferMonths();
-    const base = this.benchmarkBaselineMaxMonths;
-    if (bm === null || bm <= base) return base;
-    return Math.max(base, Math.ceil((bm + 1) / 6) * 6);
-  });
-
-  /** True when the chart has been extended past the baseline 24 months. */
-  readonly axisExtended = computed(() => this.visualMaxMonths() > this.benchmarkBaselineMaxMonths);
-
-  /** Extra tick label shown only when the axis has been extended. */
-  readonly extendedMaxLabel = computed(() => (this.axisExtended() ? this.visualMaxMonths() : null));
-
-  /**
-   * Visual position of the marker on the rendered scale, expressed as a
-   * percentage of the chart track width. With the dynamic axis the marker
-   * is always on the line: at 100% the dot sits exactly on the rightmost
-   * tick.
-   */
-  readonly markerPercent = computed(() => {
-    const bm = this.bufferMonths();
-    if (bm === null) return null;
-    const max = this.visualMaxMonths();
-    return (Math.max(0, bm) / max) * 100;
-  });
+  private readonly POS_3 = 25;
+  private readonly POS_12 = 50;
+  private readonly POS_24 = 75;
+  /** Clamped marker position for any buffer above 24 months (centered in the 24+ band). */
+  private readonly POS_EXCESS = 87.5;
 
   /** Position percentages for the fixed reference ticks (0, 3, 12, 24). */
-  readonly pos3Percent = computed(() => (3 / this.visualMaxMonths()) * 100);
-  readonly pos12Percent = computed(() => (12 / this.visualMaxMonths()) * 100);
-  readonly pos24Percent = computed(() => (24 / this.visualMaxMonths()) * 100);
+  readonly pos3Percent = computed(() => this.POS_3);
+  readonly pos12Percent = computed(() => this.POS_12);
+  readonly pos24Percent = computed(() => this.POS_24);
+
+  /**
+   * Visual position of the marker on the fixed categorical scale, in %
+   * from the bottom of the track. Values above 24 all map to the same
+   * coordinate so 33 months and 100 months render at the exact same
+   * spot inside the 24+ band.
+   */
+  readonly markerPercent = computed((): number | null => {
+    const bm = this.bufferMonths();
+    if (bm === null) return null;
+    if (bm <= 0) return 0;
+    if (bm <= 3) return (bm / 3) * this.POS_3;
+    if (bm <= 12) return this.POS_3 + ((bm - 3) / 9) * (this.POS_12 - this.POS_3);
+    if (bm <= 24) return this.POS_12 + ((bm - 12) / 12) * (this.POS_24 - this.POS_12);
+    return this.POS_EXCESS;
+  });
+
+  /** True when the buffer falls inside the 24+ band (excess cash treatment). */
+  readonly isExcessive = computed(() => {
+    const bm = this.bufferMonths();
+    return bm !== null && bm > 24;
+  });
 
   /**
    * Horizontal alignment for the marker callout so it stays inside the card

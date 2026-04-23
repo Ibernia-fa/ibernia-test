@@ -528,6 +528,12 @@ export class SimulateEmergencyComponent implements OnInit, OnDestroy {
       }
       const rawAmount = this.simulateEmergencyForm.get('amount')?.value;
 
+      const startRaw = this.simulateEmergencyForm.get('start')?.value;
+      const startYearResolved =
+        startRaw !== null && startRaw !== ''
+          ? resolveYear(startRaw, this.eventsList)
+          : 0;
+
       const endRaw = this.simulateEmergencyForm.get('end')?.value;
       const endYearResolved =
         endRaw !== null && endRaw !== ''
@@ -551,20 +557,18 @@ export class SimulateEmergencyComponent implements OnInit, OnDestroy {
         },
         start: {
           age:
-            this.simulateEmergencyForm.get('start')?.value !== null &&
-              this.simulateEmergencyForm.get('start')?.value !== ''
+            startRaw !== null && startRaw !== ''
               ? getPersistedAgeForCalendarYear(
                   this.clientBirthDate,
-                  this.simulateEmergencyForm.get('start')?.value,
+                  startYearResolved,
                   this.forecastStartDate,
                   this.data.cashflow?.planDuration,
                   this.dialogEndCalendarYear,
                 )
               : 0,
           year:
-            this.simulateEmergencyForm.get('start')?.value !== null &&
-              this.simulateEmergencyForm.get('start')?.value !== ''
-              ? this.simulateEmergencyForm.get('start')?.value
+            startRaw !== null && startRaw !== ''
+              ? startYearResolved
               : 0,
         },
         end: {
@@ -612,10 +616,9 @@ export class SimulateEmergencyComponent implements OnInit, OnDestroy {
             const simulated = res.simulated;
 
             const emergencyAmount = this.simulateEmergencyForm.get('amount')?.value;
-            const selectedYear = this.simulateEmergencyForm.get('start')?.value;
             const emergencySeries = this.buildEmergencySeries(
               simulated,
-              selectedYear?.toString() ?? '',
+              startYearResolved ? startYearResolved.toString() : '',
               emergencyAmount);
 
             if (!this.baselineResult || !this.baselineResult.series) return;
@@ -639,12 +642,10 @@ export class SimulateEmergencyComponent implements OnInit, OnDestroy {
 
             this.activeTab = 'simulated';
             this.displayedReport = this.simulationResult;
-            const startVal = this.simulateEmergencyForm.get('start')?.value;
-            const y =
-              startVal === null || startVal === undefined || startVal === ''
-                ? NaN
-                : Number(startVal);
-            this.completedEmergencyHighlightYear = Number.isFinite(y) ? y : null;
+            this.completedEmergencyHighlightYear =
+              Number.isFinite(startYearResolved) && startYearResolved > 0
+                ? startYearResolved
+                : null;
           },
           error: (err: any) => {
             this.isSimulating = false;
@@ -735,7 +736,8 @@ export class SimulateEmergencyComponent implements OnInit, OnDestroy {
 
   private endOnOrAfterStartValidator(): ValidatorFn {
     return (group: AbstractControl) => {
-      const start = group.get('start')?.value;
+      const startRaw = group.get('start')?.value;
+      const start = resolveYear(startRaw, this.eventsList);
       const endRaw = group.get('end')?.value;
       const end = resolveYear(endRaw, this.eventsList);
       const endCtrl = group.get('end');
@@ -745,11 +747,11 @@ export class SimulateEmergencyComponent implements OnInit, OnDestroy {
         const existing = endCtrl.errors ?? null;
 
         if (
-          start != null &&
-          start !== '' &&
+          startRaw != null &&
+          startRaw !== '' &&
           endRaw != null &&
           endRaw !== '' &&
-          end < Number(start)
+          end < start
         ) {
           // attach/merge the error onto the END control
           endCtrl.setErrors({ ...(existing ?? {}), endBeforeStart: true });
@@ -877,7 +879,10 @@ export class SimulateEmergencyComponent implements OnInit, OnDestroy {
 
   getStartYear(): number {
     const val = this.simulateEmergencyForm.get('start')?.value;
-    return typeof val === 'number' && Number.isFinite(val) ? val : this.forecastStartDateYear;
+    const resolved = resolveYear(val, this.eventsList);
+    return Number.isFinite(resolved) && resolved > 0
+      ? resolved
+      : this.forecastStartDateYear;
   }
 
   getEndEvents(): any[] {

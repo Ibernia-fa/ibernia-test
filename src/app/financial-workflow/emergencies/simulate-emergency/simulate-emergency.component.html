@@ -139,7 +139,10 @@
                           <hr />
                         }
                         @for (event of eventsList; track event) {
-                          <mat-option [value]="event.start.year"
+                          <mat-option
+                            [value]="
+                              event.id ? 'event:' + event.id : event.start.year
+                            "
                             >{{ getTimelineEventLabel(event.name) }} ({{
                               displayAgeForTimelineEvent(event)
                             }})</mat-option

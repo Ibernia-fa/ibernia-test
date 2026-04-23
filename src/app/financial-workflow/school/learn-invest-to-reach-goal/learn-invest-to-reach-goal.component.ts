@@ -359,12 +359,16 @@ export class LearnInvestToReachGoalComponent implements OnInit {
         curve: 'smooth',
         lineCap: 'round',
       },
+      /* Markers stay invisible at rest (clean line) but a soft accent dot
+         appears on hover so the user gets premium feedback at the data
+         point being read by the tooltip. Stroke width must be > 0 so the
+         hover ring renders correctly in ApexCharts. */
       markers: {
         size: 0,
-        strokeWidth: 0,
+        strokeWidth: 2,
         colors: ['#ffffff'],
         strokeColors: ACCENT,
-        hover: { size: 5, sizeOffset: 0 },
+        hover: { size: 6, sizeOffset: 2 },
       },
       dataLabels: { enabled: false },
       grid: {
@@ -431,7 +435,9 @@ export class LearnInvestToReachGoalComponent implements OnInit {
         shared: true,
         intersect: false,
         followCursor: false,
-        marker: { show: false },
+        /* Show the small accent dot inside the tooltip card so the value
+           is clearly tied to the hovered point on the line. */
+        marker: { show: true },
         x: {
           show: true,
           formatter: (_val: unknown, opts?: { dataPointIndex?: number }) => {
