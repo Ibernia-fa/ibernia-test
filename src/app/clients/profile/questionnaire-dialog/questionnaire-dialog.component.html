@@ -257,7 +257,7 @@
                 <!-- <img src="assets/images/svgs/drag-icon.svg" alt="drag" /> -->
               </button>
               <div class="question-text-wrapper">
-                <span class="question-text f-s-16">{{ question.text }}</span>
+                <span class="question-text f-s-16">{{ question.text | translate }}</span>
                 <!-- @if (question.subtitle) {
               <span class="question-subtitle f-s-12">{{ question.subtitle }}</span>
             } -->
@@ -278,21 +278,38 @@
   <!-- End Modal Body -->
 
   <!-- Modal Action Buttons -->
-  <div class="d-flex justify-content-end gap-16 modal-action">
-    <button (click)="closeDialog()" class="button-icon-outline d-block">
+  <div class="d-flex justify-content-end gap-16 modal-action flex-wrap">
+    <button
+      (click)="closeDialog()"
+      class="button-icon-outline d-block"
+      [disabled]="isCopying || isSending || isLoaderVisible"
+    >
       <span class="f-s-16">{{ "Close" | translate }}</span>
     </button>
 
     <button
       (click)="onCopyLink()"
       type="button"
-      class="button-icon d-block"
-      [disabled]="isCopying || isLoaderVisible"
+      class="button-icon-outline d-block"
+      [disabled]="isCopying || isSending || isLoaderVisible"
     >
       @if (isCopying) {
         <mat-spinner diameter="20"></mat-spinner>
       } @else {
         <span class="f-s-16">{{ "Copy questionnaire link" | translate }}</span>
+      }
+    </button>
+
+    <button
+      (click)="onSendByEmail()"
+      type="button"
+      class="button-icon d-block"
+      [disabled]="isCopying || isSending || isLoaderVisible"
+    >
+      @if (isSending) {
+        <mat-spinner diameter="20"></mat-spinner>
+      } @else {
+        <span class="f-s-16">{{ "Send" | translate }}</span>
       }
     </button>
   </div>

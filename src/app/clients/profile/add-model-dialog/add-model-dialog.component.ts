@@ -19,6 +19,7 @@ import * as ClientActions from 'src/app/store/client/client.actions';
 import { ClientHttpService } from '../../services/client-http.service';
 import { MaterialModule } from "src/app/material.module";
 import { getCompletedYearsAgeAtDate } from 'src/app/shared/utils/client-age-at-reference';
+import { capitalizeFirstLetter } from 'src/app/shared/utils/capitalize-first-letter';
 
 @Component({
   selector: 'app-add-model-dialog',
@@ -68,6 +69,9 @@ export class AddModelDialogComponent {
   }
 
   initForm() {
+    const clientInflation = Number(this.clientData?.clientDetails?.inflationRate);
+    const defaultInflation = Number.isFinite(clientInflation) ? clientInflation : 2.5;
+
     this.form = this.fb.group({
       name: ['', Validators.required],
       planDuration: [
@@ -75,7 +79,7 @@ export class AddModelDialogComponent {
         [Validators.required, Validators.min(this.minAge), Validators.max(100)]
       ],
       inflationRate: [
-        2.5,
+        defaultInflation,
         [Validators.required, Validators.min(0), Validators.max(1000)]
       ],
       description: ['']
@@ -101,7 +105,7 @@ export class AddModelDialogComponent {
       const cashflow: Cashflow = {
         id: '',
         description: this.form.get('description')?.value,
-        name: this.form.get('name')?.value,
+        name: capitalizeFirstLetter(this.form.get('name')?.value),
         planDuration: this.form.get('planDuration')?.value,
         inflationRate: this.form.get('inflationRate')?.value,
         clientBirthDate: this.birthDate,

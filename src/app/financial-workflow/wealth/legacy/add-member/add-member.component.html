@@ -16,57 +16,192 @@
 
   <mat-dialog-content class="event-dialog-content">
     <form [formGroup]="form" class="d-flex flex-column gap-16">
-      <div class="w-100 form-field gap-8">
-        <mat-label
-          class="f-s-16 f-w-500 d-block ibr-black"
-          style="line-height: 16px"
-          >{{ 'Relationship' | translate }}</mat-label
-        >
-        <div class="position-relative">
-          <div class="w-100 form-field">
-            <div class="select-option position-relative">
-              <mat-select
-                #roleSelect
-                formControlName="role"
-                class="sortby-edit-profile"
-                hideSingleSelectionIndicator
-              >
-                @for (opt of roleOptions; track opt.value) {
-                  <mat-option [value]="opt.value">{{
-                    opt.labelKey | translate : opt.labelParams
-                  }}</mat-option>
-                }
-              </mat-select>
-              <span class="custom-arrow">
-                <svg
-                  width="12"
-                  height="7"
-                  viewBox="0 0 12 7"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
+      @if (showRelationshipSelect) {
+        <div class="w-100 form-field gap-8">
+          <mat-label
+            class="f-s-16 f-w-500 d-block ibr-black"
+            style="line-height: 16px"
+            >{{ 'Relationship' | translate }}</mat-label
+          >
+          <div class="position-relative">
+            <div class="w-100 form-field">
+              <div class="select-option position-relative">
+                <mat-select
+                  #roleSelect
+                  formControlName="role"
+                  class="sortby-edit-profile"
+                  hideSingleSelectionIndicator
                 >
-                  <path
-                    d="M1 1L6 6L11 1"
-                    stroke="#2B3942"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  />
-                </svg>
-              </span>
+                  @for (opt of roleOptions; track opt.value) {
+                    <mat-option [value]="opt.value">{{
+                      opt.labelKey | translate : opt.labelParams
+                    }}</mat-option>
+                  }
+                </mat-select>
+                <span class="custom-arrow">
+                  <svg
+                    width="12"
+                    height="7"
+                    viewBox="0 0 12 7"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M1 1L6 6L11 1"
+                      stroke="#2B3942"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      }
 
-      <div class="w-100 form-field gap-8">
-        <mat-label
-          class="f-s-16 f-w-500 d-block ibr-black"
-          style="line-height: 16px"
-          >{{ 'Name' | translate }}</mat-label
+      @if (isPartnerRole) {
+        <div
+          class="legacy-add-member-partner partner-fields-grid"
+          formGroupName="partner"
         >
-        <input matInput formControlName="name" />
-      </div>
+          <div class="form-field">
+            <mat-label
+              class="f-s-16 f-w-500 m-b-4 d-flex align-items-center ibr-black"
+              >{{ 'Partner first name' | translate }}</mat-label
+            >
+            <input matInput formControlName="firstName" appAutoFocus autoFocusSelect />
+            @if (
+              form.get('partner.firstName')?.touched &&
+              form.get('partner.firstName')?.hasError('required')
+            ) {
+              <span class="field-error d-block">{{ 'Required' | translate }}</span>
+            }
+          </div>
+
+          <div class="form-field">
+            <mat-label
+              class="f-s-16 f-w-500 m-b-4 d-flex align-items-center ibr-black"
+              >{{ 'Partner last name' | translate }}</mat-label
+            >
+            <input matInput formControlName="lastName" />
+            @if (
+              form.get('partner.lastName')?.touched &&
+              form.get('partner.lastName')?.hasError('required')
+            ) {
+              <span class="field-error d-block">{{ 'Required' | translate }}</span>
+            }
+          </div>
+
+          <div class="form-field">
+            <mat-label
+              class="f-s-16 f-w-500 m-b-4 d-flex align-items-center ibr-black"
+              >{{ 'Date of birth' | translate }}</mat-label
+            >
+            <div class="position-relative">
+              <input
+                matInput
+                #partnerDobInput
+                [matDatepicker]="legacyPartnerPicker"
+                formControlName="dob"
+                [placeholder]="'DD/MM/YYYY' | translate"
+                inputmode="numeric"
+                autocomplete="bday"
+                (input)="onPartnerDobTyping(partnerDobInput)"
+                (dateChange)="onPartnerCalendarChange($event.value)"
+              />
+              <div class="date-picker-position">
+                <mat-datepicker-toggle matIconSuffix [for]="legacyPartnerPicker">
+                  <mat-icon matDatepickerToggleIcon>
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 20 20"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M15.8333 3.33301H4.16667C3.24619 3.33301 2.5 4.0792 2.5 4.99967V16.6663C2.5 17.5868 3.24619 18.333 4.16667 18.333H15.8333C16.7538 18.333 17.5 17.5868 17.5 16.6663V4.99967C17.5 4.0792 16.7538 3.33301 15.8333 3.33301Z"
+                        stroke="#2B3942"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                      <path
+                        d="M13.3335 1.66699V5.00033"
+                        stroke="#2B3942"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                      <path
+                        d="M6.6665 1.66699V5.00033"
+                        stroke="#2B3942"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                      <path
+                        d="M2.5 8.33301H17.5"
+                        stroke="#2B3942"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  </mat-icon>
+                </mat-datepicker-toggle>
+              </div>
+              <mat-datepicker #legacyPartnerPicker></mat-datepicker>
+            </div>
+            @if (partnerAge !== null) {
+              <span class="field-hint">Age: {{ partnerAge }}</span>
+            }
+            @if (
+              form.get('partner.dob')?.touched &&
+              form.get('partner.dob')?.hasError('required')
+            ) {
+              <span class="field-error d-block">{{ 'Required' | translate }}</span>
+            }
+            @if (form.get('partner.dob')?.touched && partnerDobError) {
+              <span class="field-error d-block">{{ partnerDobError | translate }}</span>
+            }
+          </div>
+
+          <div class="form-field">
+            <mat-label
+              class="f-s-16 f-w-500 m-b-4 d-flex align-items-center ibr-black"
+              >{{ 'Email' | translate }}</mat-label
+            >
+            <input
+              matInput
+              [placeholder]="'PLACEHOLDER.EMAIL_EXAMPLE' | translate"
+              formControlName="email"
+            />
+            @if (form.get('partner.email')?.hasError('email')) {
+              <span class="field-error d-block">{{
+                'Invalid Email Address' | translate
+              }}</span>
+            }
+            @if (
+              form.get('partner.email')?.touched &&
+              form.get('partner.email')?.hasError('required')
+            ) {
+              <span class="field-error d-block">{{ 'Required' | translate }}</span>
+            }
+          </div>
+        </div>
+      } @else {
+        <div class="w-100 form-field gap-8">
+          <mat-label
+            class="f-s-16 f-w-500 d-block ibr-black"
+            style="line-height: 16px"
+            >{{ 'Name' | translate }}</mat-label
+          >
+          <input matInput formControlName="name" appAutoFocus autoFocusSelect />
+        </div>
+      }
     </form>
   </mat-dialog-content>
 

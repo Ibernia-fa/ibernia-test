@@ -7,7 +7,7 @@
           <div class="cashflow-saving-wrapper">
             <div class="row align-items-center flex-wrap">
               <!-- stats  -->
-              <div class="col-10">
+              <div class="col-8">
                 <div class="row justify-content-between">
                   <!-- Saving Section  -->
                   <div class="col-5">
@@ -135,9 +135,27 @@
               </div>
               <!-- End stats  -->
 
-              <!-- button  -->
-              <div class="col-2">
-                <div class="d-flex align-items-center justify-content-end">
+              <!-- buttons  -->
+              <div class="col-4">
+                <div class="d-flex align-items-center justify-content-end gap-12">
+                  <button
+                    (click)="openFlows()"
+                    type="button"
+                    class="button-icon-outline"
+                  >
+                    <svg
+                      width="15"
+                      height="17"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path d="M19 5L5 19" stroke="#4043AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M6.5 9C7.88071 9 9 7.88071 9 6.5C9 5.11929 7.88071 4 6.5 4C5.11929 4 4 5.11929 4 6.5C4 7.88071 5.11929 9 6.5 9Z" stroke="#4043AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M17.5 20C18.8807 20 20 18.8807 20 17.5C20 16.1193 18.8807 15 17.5 15C16.1193 15 15 16.1193 15 17.5C15 18.8807 16.1193 20 17.5 20Z" stroke="#4043AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span>{{ "Flows" | translate }}</span>
+                  </button>
                   <button
                     (click)="newEventClicked()"
                     type="button"
@@ -148,7 +166,7 @@
                   </button>
                 </div>
               </div>
-              <!-- button  -->
+              <!-- buttons  -->
             </div>
           </div>
         </mat-card-content>
@@ -326,7 +344,7 @@
                         }
                       </div>
                       <!-- End Chart  -->
-                      <div>
+                      <div class="saving-pot-card-menu-wrap">
                         <button
                           mat-icon-button
                           [matMenuTriggerFor]="beforeMenu"
@@ -658,4 +676,5 @@
       <mat-spinner></mat-spinner>
     </div>
   }
+
 </div>

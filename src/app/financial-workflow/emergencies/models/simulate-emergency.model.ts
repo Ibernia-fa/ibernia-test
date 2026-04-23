@@ -8,6 +8,8 @@ export interface SimulateEmergencyModel {
     amount: NetAmount;
     start: AgeYear;
     end: AgeYear;
+    /** When set, end year follows this timeline event (e.g. retirement). */
+    endEventId?: string | null;
     escalationRate: EscalationRate | null; 
     stopIncome: boolean,
     stoppedIncomeId: string | null,

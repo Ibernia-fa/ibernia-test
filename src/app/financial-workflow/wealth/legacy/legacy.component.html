@@ -2,7 +2,9 @@
   <!-- Header row -->
   <mat-card class="ibr-new-dashboad-card">
     <mat-card-content>
-      <div class="d-flex align-items-center justify-content-between">
+      <div
+        class="d-flex align-items-center justify-content-between gap-16 flex-wrap"
+      >
         <div class="d-flex flex-column gap-10">
           <h3 class="ibr-new-heading">{{ "Family Tree" | translate }}</h3>
           <p class="ibr-new-subheading legacy-family-tree-intro">
@@ -10,21 +12,28 @@
             {{ "LEGACY.FAMILY_TREE_SUBTITLE_LINE2" | translate }}
           </p>
         </div>
-        <!-- <div>
-          <h2 class="section-title">{{ 'Family Tree' | translate }}</h2>
-          <p class="section-subtitle">
-            Build your family tree and click on each member to<br />
-            visualize how wealth flows across generations
-          </p>
-        </div> -->
+
         <div class="d-flex gap-12">
+          <button class="button-icon-outline" (click)="onOpenTaxSettings()">
+            <span class="f-s-16 f-w-500">{{ "Tax settings" | translate }}</span>
+          </button>
           <!-- class="action-btn action-btn-outline" -->
           <button
-            class="button-icon-outline"
+            type="button"
+            class="button-icon-outline beneficiary-rules-header-btn"
             (click)="onOpenBeneficiaryRules()"
           >
-            <span class="f-s-16 f-w-500">
-              {{ "Beneficiary rules" | translate }}</span
+            <span class="f-s-16 f-w-500">{{
+              "Beneficiary rules" | translate
+            }}</span>
+            <span
+              *ngIf="customBeneficiaryRuleCount > 0"
+              class="beneficiary-rules-count-badge"
+              [matTooltip]="
+                'LEGACY.BENEFICIARY_RULES_BADGE_TOOLTIP' | translate
+                  : { count: customBeneficiaryRuleCount }
+              "
+              >{{ customBeneficiaryRuleCount }}</span
             >
           </button>
 
@@ -32,6 +41,65 @@
             <span class="f-s-16 f-w-500"> {{ "Add member" | translate }}</span>
             <img src="assets/images/svgs/add-icon.svg" alt="add-icon" />
           </button>
+        </div>
+      </div>
+
+      <div
+        class="beneficiary-rules-summary"
+        *ngIf="dashboard && customBeneficiaryRules.length > 0"
+      >
+        <button
+          type="button"
+          class="beneficiary-rules-summary-toggle"
+          [class.beneficiary-rules-summary-toggle--expanded]="
+            beneficiaryRulesSummaryExpanded
+          "
+          (click)="toggleBeneficiaryRulesSummary()"
+          [attr.aria-expanded]="beneficiaryRulesSummaryExpanded"
+        >
+          <div class="beneficiary-rules-summary-title-row">
+            <mat-icon class="beneficiary-rules-summary-icon">rule</mat-icon>
+            <span class="beneficiary-rules-summary-title">{{
+              "LEGACY.BENEFICIARY_RULES_SAVED_SUMMARY_TITLE" | translate
+            }}</span>
+          </div>
+          <p class="beneficiary-rules-summary-hint">
+            {{ "LEGACY.BENEFICIARY_RULES_SAVED_SUMMARY_HINT" | translate }}
+          </p>
+        </button>
+        <div
+          class="beneficiary-rules-summary-expand"
+          [class.beneficiary-rules-summary-expand--open]="
+            beneficiaryRulesSummaryExpanded
+          "
+        >
+          <div
+            class="beneficiary-rules-summary-expand-inner"
+            [attr.aria-hidden]="!beneficiaryRulesSummaryExpanded"
+          >
+            <div class="beneficiary-rules-summary-body">
+              <ul class="beneficiary-rules-summary-list">
+                <li
+                  class="beneficiary-rules-summary-item"
+                  *ngFor="let rule of customBeneficiaryRules"
+                >
+                  <span class="rule-scenario-label">{{
+                    beneficiaryScenarioLabel(rule.scenario)
+                  }}</span>
+                  <span class="rule-recipients-line">{{
+                    formatBeneficiaryRuleRecipients(rule)
+                  }}</span>
+                </li>
+              </ul>
+              <button
+                type="button"
+                class="beneficiary-rules-summary-edit"
+                (click)="onOpenBeneficiaryRules()"
+              >
+                {{ "LEGACY.BENEFICIARY_RULES_SAVED_SUMMARY_EDIT" | translate }}
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -84,11 +152,12 @@
         </div>
 
         <!-- ═══ MAIN BODY: two branches + couple link ═══ -->
-        <div class="tree-body" [class.has-partner]="hasPartner" #treeBody>
+        <div class="tree-body" [class.has-partner]="treeHasPartner" #treeBody>
           <!-- ── CLIENT BRANCH ── -->
           <div
             class="family-branch"
             [class.family-branch--flex-grow]="familyBranchUseFlexGrow"
+            #clientBranch
           >
             <!-- Client parents couple -->
             <div
@@ -183,15 +252,15 @@
                 </div>
                 <mat-icon class="edit-sm">edit</mat-icon>
               </div>
-              <div
-                class="heart-estate-vline"
-                *ngIf="clientParents.length > 1"
-                #clientHeartEstateLine
-              ></div>
+              <div class="heart-estate-vline" #clientHeartEstateLine></div>
             </div>
 
             <!-- Vertical drop from parents -->
-            <div class="branch-vline" *ngIf="clientParents.length > 0"></div>
+            <div
+              class="branch-vline"
+              *ngIf="clientParents.length > 0"
+              #clientBranchVline
+            ></div>
 
             <!-- Tax node for client-parents-die scenario -->
             <ng-container *ngIf="showTaxOnClientBranch">
@@ -322,7 +391,7 @@
                     class="node-name"
                     [class.strikethrough]="isDeceased(cm.id)"
                   >
-                    {{ cm.firstName }} {{ cm.lastName }}
+                    {{ cm.firstName }}<br />{{ cm.lastName }}
                   </span>
                   <span
                     class="node-amount"
@@ -353,47 +422,43 @@
           </div>
 
           <!-- ── COUPLE CONNECTOR (heart always shown) ── -->
-          <div
-            class="couple-link"
-            *ngIf="hasPartner"
-            [class.couple-link--spread]="isOnlyClientDeceased || isOnlyPartnerDeceased"
-            #coupleLink
-          >
-            <div class="line-h link-line"></div>
-
-            <!-- Case 1: Client deceased only – tax between client & heart -->
-            <div
-              class="couple-tax-node"
-              *ngIf="isOnlyClientDeceased && showTaxOnCoupleLink"
-              (click)="onOpenTaxSettings()"
-            >
-              <div class="tax-icon-circle">
-                <img
-                  src="../../../../assets/images/svgs/new-legacy-tax-icon.svg"
-                  alt="new-legacy-tax-icon"
-                />
-              </div>
-              <div class="tax-badge">
-                <span>{{ "Tax" | translate }}</span>
-              </div>
-              <span class="tax-amount">
-                <span class="estate-currency">{{
-                  currency | currencySymbol
-                }}</span
-                >{{ scenarioResult!.totalTax | number: "1.0-0" }}
-              </span>
-            </div>
-
-            <!-- Case 2: Partner deceased only – badge between client & heart -->
-            <ng-container *ngIf="isOnlyPartnerDeceased">
-              <ng-container
-                *ngIf="getMemberInheritance(clientMember?.id) as inh"
+          <div class="couple-link" *ngIf="treeHasPartner" #coupleLink>
+            <!-- Left segment (client side) – flex:1 keeps heart centered -->
+            <div class="couple-link-segment couple-link-segment--left">
+              <!-- Client deceased: tax on client side -->
+              <div
+                class="couple-tax-node"
+                *ngIf="isOnlyClientDeceased && showTaxOnCoupleLink"
+                (click)="onOpenTaxSettings()"
               >
-                <span class="inheritance-pct-badge couple-pct-badge"
-                  >{{ inh.percentage | number: "1.0-0" }}%</span
+                <div class="tax-icon-circle">
+                  <img
+                    src="../../../../assets/images/svgs/new-legacy-tax-icon.svg"
+                    alt="new-legacy-tax-icon"
+                  />
+                </div>
+                <div class="tax-badge">
+                  <span>{{ "Tax" | translate }}</span>
+                </div>
+                <span class="tax-amount">
+                  <span class="estate-currency">{{
+                    currency | currencySymbol
+                  }}</span
+                  >{{ scenarioResult!.totalTax | number: "1.0-0" }}
+                </span>
+              </div>
+
+              <!-- Partner deceased: badge on client side -->
+              <ng-container *ngIf="isOnlyPartnerDeceased">
+                <ng-container
+                  *ngIf="getMemberInheritance(clientMember?.id) as inh"
                 >
+                  <span class="inheritance-pct-badge couple-pct-badge"
+                    >{{ inh.percentage | number: "1.0-0" }}%</span
+                  >
+                </ng-container>
               </ng-container>
-            </ng-container>
+            </div>
 
             <button
               type="button"
@@ -406,48 +471,50 @@
               />
             </button>
 
-            <!-- Case 1: Client deceased only – badge between heart & partner -->
-            <ng-container *ngIf="isOnlyClientDeceased">
-              <ng-container
-                *ngIf="getMemberInheritance(partnerMember?.id) as inh"
-              >
-                <span class="inheritance-pct-badge couple-pct-badge"
-                  >{{ inh.percentage | number: "1.0-0" }}%</span
+            <!-- Right segment (partner side) – flex:1 keeps heart centered -->
+            <div class="couple-link-segment couple-link-segment--right">
+              <!-- Client deceased: badge on partner side -->
+              <ng-container *ngIf="isOnlyClientDeceased">
+                <ng-container
+                  *ngIf="getMemberInheritance(partnerMember?.id) as inh"
                 >
+                  <span class="inheritance-pct-badge couple-pct-badge"
+                    >{{ inh.percentage | number: "1.0-0" }}%</span
+                  >
+                </ng-container>
               </ng-container>
-            </ng-container>
 
-            <!-- Case 2: Partner deceased only – tax between heart & partner -->
-            <div
-              class="couple-tax-node"
-              *ngIf="isOnlyPartnerDeceased && showTaxOnCoupleLink"
-              (click)="onOpenTaxSettings()"
-            >
-              <div class="tax-icon-circle">
-                <img
-                  src="../../../../assets/images/svgs/new-legacy-tax-icon.svg"
-                  alt="new-legacy-tax-icon"
-                />
+              <!-- Partner deceased: tax on partner side -->
+              <div
+                class="couple-tax-node"
+                *ngIf="isOnlyPartnerDeceased && showTaxOnCoupleLink"
+                (click)="onOpenTaxSettings()"
+              >
+                <div class="tax-icon-circle">
+                  <img
+                    src="../../../../assets/images/svgs/new-legacy-tax-icon.svg"
+                    alt="new-legacy-tax-icon"
+                  />
+                </div>
+                <div class="tax-badge">
+                  <span>{{ "Tax" | translate }}</span>
+                </div>
+                <span class="tax-amount">
+                  <span class="estate-currency">{{
+                    currency | currencySymbol
+                  }}</span
+                  >{{ scenarioResult!.totalTax | number: "1.0-0" }}
+                </span>
               </div>
-              <div class="tax-badge">
-                <span>{{ "Tax" | translate }}</span>
-              </div>
-              <span class="tax-amount">
-                <span class="estate-currency">{{
-                  currency | currencySymbol
-                }}</span
-                >{{ scenarioResult!.totalTax | number: "1.0-0" }}
-              </span>
             </div>
-
-            <div class="line-h link-line"></div>
           </div>
 
           <!-- ── PARTNER BRANCH ── -->
           <div
             class="family-branch"
-            *ngIf="hasPartner"
+            *ngIf="treeHasPartner"
             [class.family-branch--flex-grow]="familyBranchUseFlexGrow"
+            #partnerBranch
           >
             <!-- Partner parents couple -->
             <div
@@ -462,6 +529,11 @@
                   <div
                     class="tree-node"
                     [class.deceased]="isDeceased(parent.id)"
+                    [class.partner-side-locked]="partnerSideRelativesLocked"
+                    [matTooltip]="
+                      'LEGACY.PARTNER_SIDE_LOCKED_SOLO_TOOLTIP' | translate
+                    "
+                    [matTooltipDisabled]="!partnerSideRelativesLocked"
                     (click)="onClickParentMember(parent)"
                   >
                     <div class="node-inner">
@@ -497,14 +569,20 @@
                       <span class="node-name"
                         >{{ parent.firstName }} {{ parent.lastName }}</span
                       >
-                      <button
-                        class="node-remove"
-                        (click)="
-                          onRemoveMember(parent); $event.stopPropagation()
-                        "
+                      <span
+                        class="node-remove-tooltip-host"
+                        *ngIf="!partnerSideRelativesLocked"
                       >
-                        <mat-icon>close</mat-icon>
-                      </button>
+                        <button
+                          type="button"
+                          class="node-remove"
+                          (click)="
+                            onRemoveMember(parent); $event.stopPropagation()
+                          "
+                        >
+                          <mat-icon>close</mat-icon>
+                        </button>
+                      </span>
                     </div>
                   </div>
                   <div
@@ -529,7 +607,12 @@
               </div>
               <div
                 class="parent-estate partner-estate"
-                (click)="onEditParentEstate('partner')"
+                [class.partner-estate--locked]="partnerSideRelativesLocked"
+                [matTooltip]="
+                  'LEGACY.PARTNER_SIDE_LOCKED_SOLO_TOOLTIP' | translate
+                "
+                [matTooltipDisabled]="!partnerSideRelativesLocked"
+                (click)="onEditPartnerParentsEstate()"
               >
                 <div class="d-flex align-items-center">
                   <span class="estate-currency">{{
@@ -542,15 +625,15 @@
                 </div>
                 <mat-icon class="edit-sm">edit</mat-icon>
               </div>
-              <div
-                class="heart-estate-vline"
-                *ngIf="partnerParents.length > 1"
-                #partnerHeartEstateLine
-              ></div>
+              <div class="heart-estate-vline" #partnerHeartEstateLine></div>
             </div>
 
             <!-- Vertical drop from parents -->
-            <div class="branch-vline" *ngIf="partnerParents.length > 0"></div>
+            <div
+              class="branch-vline"
+              *ngIf="partnerParents.length > 0"
+              #partnerBranchVline
+            ></div>
 
             <!-- Tax node for partner-parents-die scenario -->
             <ng-container *ngIf="showTaxOnPartnerBranch">
@@ -593,6 +676,11 @@
                   class="tree-node main-node"
                   *ngIf="partnerMember as pm"
                   [class.deceased]="isDeceased(pm.id)"
+                  [attr.aria-label]="
+                    !hasPartner && partnerMember
+                      ? ('Complete partner profile' | translate)
+                      : null
+                  "
                   (click)="onClickPartner()"
                   #partnerMainNode
                 >
@@ -626,7 +714,7 @@
                     class="node-name"
                     [class.strikethrough]="isDeceased(pm.id)"
                   >
-                    {{ pm.firstName }} {{ pm.lastName }}
+                    {{ pm.firstName }}<br />{{ pm.lastName }}
                   </span>
                   <span
                     class="node-amount partner-amount"
@@ -665,6 +753,11 @@
                 <div
                   class="tree-node sibling-node"
                   [class.deceased]="isDeceased(sib.id)"
+                  [class.partner-side-locked]="partnerSideRelativesLocked"
+                  [matTooltip]="
+                    'LEGACY.PARTNER_SIDE_LOCKED_SOLO_TOOLTIP' | translate
+                  "
+                  [matTooltipDisabled]="!partnerSideRelativesLocked"
                 >
                   <div class="node-avatar avatar-partnersibling">
                     <mat-icon>
@@ -703,20 +796,39 @@
                       >{{ inh.netReceived | number: "1.0-0" }}
                     </span>
                   </ng-container>
-                  <button class="node-remove" (click)="onRemoveMember(sib)">
-                    <mat-icon>close</mat-icon>
-                  </button>
+                  <span
+                    class="node-remove-tooltip-host"
+                    *ngIf="!partnerSideRelativesLocked"
+                  >
+                    <button
+                      type="button"
+                      class="node-remove"
+                      (click)="onRemoveMember(sib)"
+                    >
+                      <mat-icon>close</mat-icon>
+                    </button>
+                  </span>
                 </div>
               </div>
             </div>
           </div>
-          <div class="couple-line" *ngIf="hasPartner" #coupleLine></div>
+          <div class="couple-line" *ngIf="treeHasPartner" #coupleLine></div>
+          <div
+            class="estate-branch-vline"
+            *ngIf="clientParents.length > 0"
+            #clientEstateBranchLine
+          ></div>
+          <div
+            class="estate-branch-vline"
+            *ngIf="partnerParents.length > 0"
+            #partnerEstateBranchLine
+          ></div>
         </div>
 
         <!-- ═══ CHILDREN / FLOW SECTION ═══ -->
         <div
           class="heart-children-vline"
-          *ngIf="hasPartner && children.length > 0"
+          *ngIf="children.length > 0"
           #heartChildrenLine
         ></div>
         <div
@@ -817,7 +929,7 @@
   </mat-card>
 
   <!-- Tax settings quick view -->
-  <mat-card class="ibr-new-dashboad-card" *ngIf="dashboard?.taxSettings as ts">
+  <!-- <mat-card class="ibr-new-dashboad-card" *ngIf="dashboard?.taxSettings as ts">
     <mat-card-content>
       <div class="d-flex align-items-center justify-content-between">
         <div
@@ -841,7 +953,7 @@
         </button>
       </div>
     </mat-card-content>
-  </mat-card>
+  </mat-card> -->
 </div>
 
 <ng-template #loadingTpl>

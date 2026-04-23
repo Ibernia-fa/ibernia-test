@@ -1,0 +1,7 @@
+.cashflow-layout-root {
+  margin-left: 16px;
+
+  @media (max-width: 1023px) {
+    margin-left: 0;
+  }
+}

@@ -16,14 +16,15 @@
             <div class="d-flex flex-column gap-32">
                 <mat-dialog-content>
                     <div class="d-flex flex-column gap-20">
-                        <h2>{{ 'Welcome to your Lifetime Plan,' | translate }} <strong>{{lifetimePlanName}}</strong></h2>
-                        <p>{{ 'This view was created by' | translate }} <strong>{{advisorName}}</strong> {{ 'to help you understand how your finances may evolve over time: clear, simple, and personalized for you.' | translate }}</p>
+                        <h2>{{ welcomeModalKeys.title | translate }}</h2>
+                        <p [innerHTML]="welcomeBodyPrimaryHtml"></p>
+                        <p class="text-muted" [innerHTML]="welcomeBodyDisclaimerHtml"></p>
                     </div>
                 </mat-dialog-content>
 
                 <div class="row justify-content-between modal-action">
                     <button type="button" class="button-icon w-100 d-block" (click)="onContinue()" mat-dialog-close>
-                        <span class="f-s-16">{{ 'Continue' | translate }}</span>
+                        <span class="f-s-16">{{ welcomeModalKeys.cta | translate }}</span>
                     </button>
                 </div>
             </div>

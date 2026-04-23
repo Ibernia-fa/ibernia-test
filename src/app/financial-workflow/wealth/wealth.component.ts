@@ -201,6 +201,7 @@ export class WealthComponent implements OnInit {
     const dialogRef = this.dialog.open(AddAssetComponent, {
       width: '612px',
       disableClose: true,
+      autoFocus: false,
       data: {
         mode: 'add',
         cashflowId: this.cashflowId,
@@ -228,6 +229,7 @@ export class WealthComponent implements OnInit {
     const dialogRef = this.dialog.open(AddAssetComponent, {
       width: '612px',
       disableClose: true,
+      autoFocus: false,
       data: {
         mode: 'edit',
         cashflowId: this.cashflowId,
@@ -281,24 +283,32 @@ export class WealthComponent implements OnInit {
 
         let userPreferences: any = null;
         let returnRate = 3.5;
+        let pensionFundReturnRate = 4;
         this.settingsService.userData$.pipe(
           filter((v): v is NonNullable<typeof v> => v != null),
         ).subscribe(data => {
           userPreferences = data.preferences;
           returnRate = data.preferences?.investmentReturn ?? 3.5;
+          pensionFundReturnRate = data.preferences?.pensionFundReturn ?? 4;
         });
 
         const dialogRef = this.dialog.open(AddNewPotComponent, {
           width: '612px',
           disableClose: true,
+          autoFocus: false,
           data: {
             returnRate,
+            pensionFundReturnRate,
             inflationRate: this.selectedClient?.clientDetails?.inflationRate ?? 0,
             loggedInUserPreferences: userPreferences,
             amountCycles,
             escalataionRates: escalationRates,
-            eventsList: [...(timeline?.clientEvents ?? [])].sort((a: any, b: any) => a.start.age - b.start.age),
+            eventsList: [...(timeline?.clientEvents ?? [])].sort(
+              (a: any, b: any) =>
+                (a.start?.year ?? 0) - (b.start?.year ?? 0),
+            ),
             clientBirthDate: this.selectedClient?.clientDetails?.birthDate,
+            partnerBirthDate: this.selectedClient?.partnerDetail?.birthDate,
             clientPreferredCurrency: this.selectedClient?.clientDetails?.preferredCurrency,
             forecastEndDateYear: moment(timeline?.forecastEndtDate).year(),
             forecastStartDateYear: moment(timeline?.forecastStartDate).year(),
@@ -336,6 +346,7 @@ export class WealthComponent implements OnInit {
     const dialogRef = this.dialog.open(AddLiabilityComponent, {
       width: '612px',
       disableClose: true,
+      autoFocus: false,
       data: {
         mode: 'add',
         cashflowId: this.cashflowId,
@@ -359,6 +370,7 @@ export class WealthComponent implements OnInit {
     const dialogRef = this.dialog.open(AddLiabilityComponent, {
       width: '612px',
       disableClose: true,
+      autoFocus: false,
       data: {
         mode: 'edit',
         cashflowId: this.cashflowId,

@@ -1,0 +1,162 @@
+<div class="rb-assumptions">
+  <div class="dialog-header rb-assumptions__header">
+    <h2 class="dialog-title text-center rb-assumptions__title">
+      {{ "LEARN_RENT_OR_BUY.ASSUMPTIONS_TITLE" | translate }}
+    </h2>
+    <button
+      type="button"
+      mat-icon-button
+      disableRipple
+      class="dialog-close-btn"
+      (click)="cancel()"
+      [attr.aria-label]="'LEARN_RENT_OR_BUY.CLOSE' | translate"
+    >
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content class="rb-assumptions__content">
+    <div class="rb-assumptions__grid">
+      <!-- Mortgage rate -->
+      <div class="rb-assum-field">
+        <label class="rb-assum-field__label">
+          {{ "LEARN_RENT_OR_BUY.FIELD_MORTGAGE_RATE" | translate }}
+          <mat-icon class="rb-assum-field__hint" [matTooltip]="'LEARN_RENT_OR_BUY.TIP_MORTGAGE_RATE' | translate">help_outline</mat-icon>
+        </label>
+        <div class="rb-assum-field__control">
+          <input
+            type="text"
+            inputmode="decimal"
+            class="rb-assum-field__input"
+            [value]="mortgageRateText()"
+            (input)="onMortgageRateInput($any($event.target).value)"
+            (blur)="onMortgageRateBlur()"
+          />
+          <span class="rb-assum-field__suffix">%</span>
+        </div>
+      </div>
+
+      <!-- Home appreciation -->
+      <div class="rb-assum-field">
+        <label class="rb-assum-field__label">
+          {{ "LEARN_RENT_OR_BUY.FIELD_HOME_APPRECIATION" | translate }}
+          <mat-icon class="rb-assum-field__hint" [matTooltip]="'LEARN_RENT_OR_BUY.TIP_HOME_APPRECIATION' | translate">help_outline</mat-icon>
+        </label>
+        <div class="rb-assum-field__control">
+          <input
+            type="text"
+            inputmode="decimal"
+            class="rb-assum-field__input"
+            [value]="homeAppreciationText()"
+            (input)="onHomeAppreciationInput($any($event.target).value)"
+            (blur)="onHomeAppreciationBlur()"
+          />
+          <span class="rb-assum-field__suffix">%</span>
+        </div>
+      </div>
+
+      <!-- Investment return -->
+      <div class="rb-assum-field">
+        <label class="rb-assum-field__label">
+          {{ "LEARN_RENT_OR_BUY.FIELD_INVESTMENT_RETURN" | translate }}
+          <mat-icon class="rb-assum-field__hint" [matTooltip]="'LEARN_RENT_OR_BUY.TIP_INVESTMENT_RETURN' | translate">help_outline</mat-icon>
+        </label>
+        <div class="rb-assum-field__control">
+          <input
+            type="text"
+            inputmode="decimal"
+            class="rb-assum-field__input"
+            [value]="investmentReturnText()"
+            (input)="onInvestmentReturnInput($any($event.target).value)"
+            (blur)="onInvestmentReturnBlur()"
+          />
+          <span class="rb-assum-field__suffix">%</span>
+        </div>
+      </div>
+
+      <!-- Inflation -->
+      <div class="rb-assum-field">
+        <label class="rb-assum-field__label">
+          {{ "LEARN_RENT_OR_BUY.FIELD_INFLATION" | translate }}
+          <mat-icon class="rb-assum-field__hint" [matTooltip]="'LEARN_RENT_OR_BUY.TIP_INFLATION' | translate">help_outline</mat-icon>
+        </label>
+        <div class="rb-assum-field__control">
+          <input
+            type="text"
+            inputmode="decimal"
+            class="rb-assum-field__input"
+            [value]="inflationText()"
+            (input)="onInflationInput($any($event.target).value)"
+            (blur)="onInflationBlur()"
+          />
+          <span class="rb-assum-field__suffix">%</span>
+        </div>
+      </div>
+
+      <!-- Ownership costs -->
+      <div class="rb-assum-field">
+        <label class="rb-assum-field__label">
+          {{ "LEARN_RENT_OR_BUY.FIELD_OWNERSHIP_COSTS" | translate }}
+          <mat-icon class="rb-assum-field__hint" [matTooltip]="'LEARN_RENT_OR_BUY.TIP_OWNERSHIP_COSTS' | translate">help_outline</mat-icon>
+        </label>
+        <div class="rb-assum-field__control">
+          <input
+            type="text"
+            inputmode="decimal"
+            class="rb-assum-field__input"
+            [value]="ownershipCostsText()"
+            (input)="onOwnershipCostsInput($any($event.target).value)"
+            (blur)="onOwnershipCostsBlur()"
+          />
+          <span class="rb-assum-field__suffix">%</span>
+        </div>
+      </div>
+
+      <!-- Round trip costs -->
+      <div class="rb-assum-field">
+        <label class="rb-assum-field__label">
+          {{ "LEARN_RENT_OR_BUY.FIELD_ROUND_TRIP_COSTS" | translate }}
+          <mat-icon class="rb-assum-field__hint" [matTooltip]="'LEARN_RENT_OR_BUY.TIP_ROUND_TRIP_COSTS' | translate">help_outline</mat-icon>
+        </label>
+        <div class="rb-assum-field__control">
+          <input
+            type="text"
+            inputmode="decimal"
+            class="rb-assum-field__input"
+            [value]="roundTripCostsText()"
+            (input)="onRoundTripCostsInput($any($event.target).value)"
+            (blur)="onRoundTripCostsBlur()"
+          />
+          <span class="rb-assum-field__suffix">%</span>
+        </div>
+      </div>
+    </div>
+  </mat-dialog-content>
+
+  <!--
+    Footer follows the platform `modal-action` pattern (see Tax settings,
+    Default assumptions). `.button-icon-outline` + `.button-icon` give us the
+    canonical Ibernia secondary/primary pair, and there is no `border-top` so
+    the divider line above the buttons is removed by design.
+  -->
+  <div class="row justify-content-end gap-16 modal-action rb-assumptions__actions p-t-24">
+    <div>
+      <button
+        type="button"
+        class="button-icon-outline w-100 d-block"
+        (click)="cancel()"
+      >
+        <span class="f-s-16">{{ "LEARN_RENT_OR_BUY.CANCEL" | translate }}</span>
+      </button>
+    </div>
+    <div>
+      <button
+        type="button"
+        class="button-icon w-100 d-block"
+        (click)="apply()"
+      >
+        <span class="f-s-16">{{ "LEARN_RENT_OR_BUY.APPLY" | translate }}</span>
+      </button>
+    </div>
+  </div>
+</div>

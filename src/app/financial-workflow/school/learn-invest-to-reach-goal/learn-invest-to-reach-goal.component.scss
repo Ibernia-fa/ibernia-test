@@ -1,0 +1,477 @@
+$ibernia-blue: #4043af;
+$ibernia-blue-soft: #516ce8;
+$ibernia-ink: #1c1c1c;
+$ibernia-mute: #5a596e;
+$ibernia-line: #e5e5ec;
+$ibernia-bg-soft: #f5f7ff;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: 100%;
+}
+
+.learn-invest-goal {
+  font-family: "Ubuntu", sans-serif;
+  color: $ibernia-ink;
+  min-height: 0;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ----- Top header (close btn) ----- */
+.learn-invest-goal__header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 0;
+  z-index: 5;
+  pointer-events: none;
+
+  > * {
+    pointer-events: auto;
+  }
+}
+
+.learn-invest-goal__content {
+  padding-right: 0 !important;
+  margin-top: 0 !important;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  /* School layout rule: dialog body scrolls as a final safety net so cards,
+     insight tiles, disclaimers and CTAs are never clipped on smaller heights. */
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.learn-invest-goal__page {
+  flex: 1 1 auto;
+  /* Use min-height: auto so the page never shrinks below its content's
+     intrinsic size; if the modal is too short, the dialog body scrolls
+     instead of clipping the side cards/footer/notice silently. */
+  display: flex;
+  flex-direction: column;
+  animation: learnInvestGoalFadeIn 320ms ease;
+}
+
+@keyframes learnInvestGoalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================================
+   PAGE — Invest to reach goal (aligned with learn-inflation impact)
+   ============================================================ */
+
+$invest-goal-gutter: 56px;
+
+.learn-invest-goal__page--main {
+  gap: 14px;
+  /* Shared School header rule: title row top = 14px (matches close btn). */
+  padding: 14px $invest-goal-gutter 16px;
+}
+
+.learn-invest-goal__hero {
+  margin: 0;
+  font-size: 26px;
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  color: $ibernia-ink;
+  text-align: left;
+  max-width: 100%;
+  padding-right: 48px; /* keep clear of close icon */
+}
+
+.learn-invest-goal__layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 340px) 1fr;
+  gap: 24px;
+  flex: 1 1 auto;
+  /* Both columns still align at the top; the row track sizes to whichever
+     column has more content so the side cards are never clipped on short
+     modals. With min-height: auto, the layout pushes the page taller (and
+     ultimately scrolls the dialog body) rather than truncating content. */
+  align-items: stretch;
+}
+
+.learn-invest-goal__side {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  min-height: 0;
+}
+
+/* ----- Two-column row for input cards ----- */
+.invest-goal-inputs__pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+/* ----- Real-value toggle row (toggle + optional inflation card) ----- */
+.invest-goal-toggle-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  align-items: stretch;
+
+  &--paired {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.invest-goal-real-toggle {
+  display: flex;
+  align-items: center;
+  padding: 4px 4px 4px 2px;
+  min-height: 100%;
+
+  &__label {
+    font-size: 13px;
+    font-weight: 500;
+    color: $ibernia-mute;
+  }
+
+  ::ng-deep .mdc-switch {
+    transform: scale(0.92);
+  }
+
+  ::ng-deep .mat-mdc-slide-toggle .mdc-label {
+    padding-left: 6px;
+  }
+}
+
+/* ----- Editable / output cards (mirrors learn-inflation .impact-card) ----- */
+.impact-card {
+  position: relative;
+  border: 1px solid $ibernia-line;
+  border-radius: 14px;
+  padding: 14px 18px;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 0 0 auto;
+  box-shadow: 0 1px 0 rgba(20, 22, 48, 0.02);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  &:focus-within {
+    border-color: $ibernia-blue;
+    box-shadow: 0 0 0 3px rgba(64, 67, 175, 0.12);
+  }
+
+  &__label {
+    font-size: 11px;
+    font-weight: 600;
+    color: $ibernia-mute;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    /* Honor explicit line breaks (\n) in translations so we can keep the
+       paired input tiles vertically aligned in locales whose label naturally
+       fits on a single line (e.g. Italian "Età\nobiettivo" matching the
+       two-line "Rendimento atteso"). Locales without a "\n" wrap as before. */
+    white-space: pre-line;
+  }
+
+  &__value {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1.1;
+    color: $ibernia-ink;
+    font-variant-numeric: tabular-nums;
+
+    &--rate-pair {
+      font-size: 22px;
+    }
+
+    &--tight {
+      gap: 2px;
+    }
+  }
+
+  &__currency {
+    font-size: 16px;
+    font-weight: 600;
+    color: $ibernia-mute;
+  }
+
+  &__readout {
+    font: inherit;
+    color: inherit;
+    word-break: break-word;
+  }
+
+  &__suffix {
+    font-size: 20px;
+    font-weight: 600;
+    color: $ibernia-mute;
+    flex-shrink: 0;
+  }
+
+  &__input {
+    flex: 1 1 auto;
+    border: none;
+    outline: none;
+    background: transparent;
+    font: inherit;
+    color: inherit;
+    width: 100%;
+    min-width: 0;
+    padding: 0;
+    font-variant-numeric: tabular-nums;
+
+    &::placeholder {
+      color: #c0c0cc;
+      font-weight: 600;
+    }
+  }
+
+  &__note {
+    margin: 10px 0 0;
+    padding-top: 10px;
+    border-top: 1px solid rgba(64, 67, 175, 0.12);
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: $ibernia-mute;
+    font-weight: 400;
+    letter-spacing: 0.1px;
+  }
+
+  &--accent {
+    padding: 16px 18px 18px;
+    background:
+      linear-gradient(135deg, rgba(64, 67, 175, 0.09), rgba(81, 108, 232, 0.035));
+    border-color: rgba(64, 67, 175, 0.22);
+    box-shadow:
+      0 1px 0 rgba(20, 22, 48, 0.02),
+      0 8px 22px rgba(64, 67, 175, 0.07);
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: 12px;
+      bottom: 12px;
+      left: 0;
+      width: 3px;
+      border-radius: 0 3px 3px 0;
+      background: linear-gradient(180deg, $ibernia-blue, $ibernia-blue-soft);
+    }
+
+    .impact-card__value,
+    .impact-card__readout {
+      color: $ibernia-blue;
+      font-size: 28px;
+      letter-spacing: -0.3px;
+    }
+
+    .impact-card__currency {
+      color: rgba(64, 67, 175, 0.7);
+      font-size: 18px;
+    }
+  }
+}
+
+/* ----- Result card extras ----- */
+.invest-goal-result {
+  &__muted {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.5;
+    color: $ibernia-mute;
+  }
+
+  &__sub {
+    margin-top: 4px;
+    font-size: 13px;
+    line-height: 1.5;
+    font-weight: 500;
+    color: rgba(90, 89, 110, 0.92);
+    letter-spacing: 0.1px;
+  }
+}
+
+/* ----- Right side: chart ----- */
+.learn-invest-goal__main {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.learn-invest-goal__chart {
+  flex: 1 1 auto;
+  /* Lower floor: the graph yields vertical space first so insight tiles,
+     disclaimers, and CTAs on the side keep full visibility on short heights. */
+  min-height: 200px;
+  height: 100%;
+  border: 1px solid $ibernia-line;
+  border-radius: 16px;
+  background:
+    radial-gradient(120% 80% at 50% 0%, rgba(64, 67, 175, 0.035) 0%, rgba(64, 67, 175, 0) 60%),
+    #ffffff;
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    0 1px 0 rgba(20, 22, 48, 0.02),
+    0 10px 28px rgba(64, 67, 175, 0.05);
+
+  apx-chart {
+    position: absolute;
+    inset: 14px 18px 8px 6px;
+    display: block;
+  }
+
+  &--empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: #ffffff;
+    box-shadow: 0 1px 0 rgba(20, 22, 48, 0.02);
+  }
+}
+
+.learn-invest-goal__empty-copy {
+  margin: 0;
+  max-width: 360px;
+  text-align: center;
+  font-size: 14px;
+  line-height: 1.5;
+  color: $ibernia-mute;
+}
+
+/* ----- Bottom disclaimer (matches inflation/compound/cost-of-waiting) ----- */
+.learn-invest-goal__page--main .school-notice {
+  margin: 6px 0 0;
+  width: 100%;
+  max-width: none;
+  align-self: stretch;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 12px 18px;
+
+  .school-notice__icon {
+    align-self: center;
+    width: 18px;
+    height: 18px;
+    font-size: 18px;
+    line-height: 1;
+    overflow: visible;
+  }
+
+  .school-notice__text {
+    align-self: center;
+  }
+}
+
+/* ============================================================
+   Responsiveness
+   ============================================================ */
+
+@media (max-width: 1024px) {
+  .learn-invest-goal__page--main {
+    /* Keep the shared 14px header top on tablet, just tighten the side gutter. */
+    padding: 14px 20px 14px;
+  }
+
+  .learn-invest-goal__hero {
+    margin: 0;
+    font-size: 22px;
+    padding-right: 40px;
+  }
+
+  .learn-invest-goal__layout {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    overflow-y: auto;
+    min-height: 0;
+  }
+
+  .learn-invest-goal__side {
+    order: 2;
+    overflow: visible;
+  }
+
+  .learn-invest-goal__main {
+    order: 1;
+    min-height: 240px;
+  }
+
+  .learn-invest-goal__chart {
+    min-height: 240px;
+    height: 260px;
+    flex: 0 0 auto;
+  }
+
+  .impact-card__value {
+    font-size: 24px;
+  }
+
+  .impact-card--accent .impact-card__value,
+  .impact-card--accent .impact-card__readout {
+    font-size: 26px;
+  }
+}
+
+@media (max-width: 600px) {
+  .learn-invest-goal__hero {
+    font-size: 20px;
+  }
+
+  .invest-goal-inputs__pair,
+  .invest-goal-toggle-row--paired {
+    grid-template-columns: 1fr;
+  }
+
+  .impact-card {
+    padding: 14px 16px;
+  }
+
+  .impact-card__value {
+    font-size: 22px;
+
+    &--rate-pair {
+      font-size: 20px;
+    }
+  }
+
+  .impact-card--accent .impact-card__value,
+  .impact-card--accent .impact-card__readout {
+    font-size: 24px;
+  }
+}
+
+/* ============================================================
+   Dialog surface tweaks
+   ============================================================ */
+:host ::ng-deep .mdc-dialog__surface {
+  display: flex;
+  flex-direction: column;
+}
+
+:host ::ng-deep .learn-invest-goal__content.mat-mdc-dialog-content {
+  max-height: none;
+}

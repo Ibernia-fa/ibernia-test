@@ -51,39 +51,46 @@
     @let personalItems = getSectionResponses("Personal");
     @if (personalItems.length > 0) {
       <div class="section">
-        <h3 class="section-heading">{{ 'Personal' | translate }}</h3>
+        <h3 class="section-heading">{{ "Family Heading" | translate }}</h3>
         <div class="section-content">
           <div class="personal-grid-wrapper">
             @for (item of personalItems; track item.questionId) {
               @for (chip of getResponseChips(item); track chip) {
                 <div class="personal-item">
-                  <span class="item-icon person-icon"
-                    ><svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
+                  <span class="item-icon person-icon">
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 18 18"
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
                     >
                       <path
-                        d="M12 12C14.2091 12 16 10.2091 16 8C16 5.79086 14.2091 4 12 4C9.79086 4 8 5.79086 8 8C8 10.2091 9.79086 12 12 12Z"
-                        stroke="#1976d2"
-                        stroke-width="2"
+                        d="M15 15.75V14.25C15 13.4544 14.6839 12.6913 14.1213 12.1287C13.5587 11.5661 12.7956 11.25 12 11.25H6C5.20435 11.25 4.44129 11.5661 3.87868 12.1287C3.31607 12.6913 3 13.4544 3 14.25V15.75"
+                        stroke="#DEB511"
+                        stroke-width="1.5"
                         stroke-linecap="round"
                         stroke-linejoin="round"
                       />
                       <path
-                        d="M20 21C20 16.5817 16.4183 13 12 13C7.58172 13 4 16.5817 4 21"
-                        stroke="#1976d2"
-                        stroke-width="2"
+                        d="M9 8.25C10.6569 8.25 12 6.90685 12 5.25C12 3.59315 10.6569 2.25 9 2.25C7.34315 2.25 6 3.59315 6 5.25C6 6.90685 7.34315 8.25 9 8.25Z"
+                        stroke="#DEB511"
+                        stroke-width="1.5"
                         stroke-linecap="round"
                         stroke-linejoin="round"
                       />
                     </svg>
                   </span>
-                  <span class="item-text team-relation">{{
-                    localizePersonalChip(chip)
-                  }}</span>
+                  <span class="item-text">
+                    <span class="person-name">{{
+                      parsePersonalChip(chip).name
+                    }}</span>
+                    @if (parsePersonalChip(chip).relationship) {
+                      <span class="person-relationship"
+                        >({{ parsePersonalChip(chip).relationship }})</span
+                      >
+                    }
+                  </span>
                 </div>
               }
             }
@@ -98,7 +105,7 @@
       @let financeItems = getSectionResponses("Finance");
       @if (financeItems.length > 0) {
         <div class="section">
-          <h3 class="section-heading">{{ 'Finance' | translate }}</h3>
+          <h3 class="section-heading">{{ "Finance" | translate }}</h3>
           <div class="section-content">
             <div class="finace-grid-wrapper">
               @for (item of financeItems; track item.questionId) {
@@ -114,14 +121,14 @@
                       >
                         <path
                           d="M9 0.75V17.25"
-                          stroke="#1C1C1C"
+                          stroke="#09AC65"
                           stroke-width="1.5"
                           stroke-linecap="round"
                           stroke-linejoin="round"
                         />
                         <path
                           d="M12.75 3.75H7.125C6.42881 3.75 5.76113 4.02656 5.26884 4.51884C4.77656 5.01113 4.5 5.67881 4.5 6.375C4.5 7.07119 4.77656 7.73887 5.26884 8.23116C5.76113 8.72344 6.42881 9 7.125 9H10.875C11.5712 9 12.2389 9.27656 12.7312 9.76884C13.2234 10.2611 13.5 10.9288 13.5 11.625C13.5 12.3212 13.2234 12.9889 12.7312 13.4812C12.2389 13.9734 11.5712 14.25 10.875 14.25H4.5"
-                          stroke="#1C1C1C"
+                          stroke="#09AC65"
                           stroke-width="1.5"
                           stroke-linecap="round"
                           stroke-linejoin="round"
@@ -140,7 +147,7 @@
                         <g clip-path="url(#clip0_3206_586)">
                           <path
                             d="M17.5834 11.0028L14.1145 9.00001L17.5834 6.99727C17.7125 6.92265 17.8068 6.7998 17.8454 6.65571C17.884 6.51162 17.8638 6.3581 17.7893 6.22889L15.7946 2.77405C15.6393 2.50504 15.2953 2.41282 15.0263 2.56818L11.5575 4.57092V0.56543C11.5575 0.254789 11.3056 0.00292969 10.995 0.00292969H7.00553C6.69489 0.00292969 6.44303 0.254789 6.44303 0.56543V4.57092L2.9742 2.56814C2.70511 2.41282 2.36114 2.505 2.20582 2.77402L0.211128 6.22889C0.136543 6.35809 0.116335 6.51163 0.15495 6.65572C0.193566 6.79982 0.287842 6.92268 0.417039 6.99727L3.88587 9.00001L0.417003 11.0027C0.353026 11.0397 0.296951 11.0888 0.25198 11.1474C0.207008 11.206 0.174022 11.2729 0.154904 11.3443C0.135787 11.4156 0.130912 11.4901 0.140559 11.5633C0.150206 11.6365 0.174186 11.7072 0.211128 11.7711L2.20579 15.226C2.36111 15.495 2.70511 15.5872 2.97416 15.4318L6.443 13.4291V17.4346C6.443 17.7452 6.69485 17.9971 7.0055 17.9971H10.9949C11.3055 17.9971 11.5574 17.7452 11.5574 17.4346V13.4291L15.0261 15.4319C15.2952 15.5872 15.6392 15.495 15.7945 15.226L17.7893 11.7711C17.8638 11.6419 17.8841 11.4884 17.8454 11.3443C17.8068 11.2002 17.7126 11.0774 17.5834 11.0028ZM15.1016 14.1763L11.2761 11.9677C11.1906 11.9184 11.0936 11.8924 10.9949 11.8924C10.8962 11.8924 10.7992 11.9184 10.7136 11.9677C10.6281 12.0171 10.5571 12.0881 10.5078 12.1736C10.4584 12.2591 10.4324 12.3561 10.4324 12.4549V16.8721H7.56803V12.4549C7.56803 12.3561 7.54204 12.2591 7.49266 12.1736C7.44329 12.0881 7.37228 12.0171 7.28677 11.9677C7.20126 11.9184 7.10427 11.8924 7.00553 11.8924C6.90679 11.8924 6.80979 11.9184 6.72428 11.9677L2.89882 14.1764L1.46666 11.6958L5.29212 9.48717C5.37762 9.4378 5.44863 9.36679 5.49799 9.28128C5.54736 9.19578 5.57335 9.09878 5.57335 9.00005C5.57335 8.90131 5.54736 8.80432 5.49799 8.71881C5.44863 8.6333 5.37762 8.56229 5.29212 8.51292L1.46666 6.30423L2.89882 3.82364L6.72428 6.0323C6.80979 6.08167 6.90679 6.10766 7.00553 6.10766C7.10427 6.10766 7.20126 6.08167 7.28677 6.0323C7.37228 5.98293 7.44329 5.91193 7.49266 5.82642C7.54204 5.74091 7.56803 5.64391 7.56803 5.54517V1.12793H10.4324V5.54517C10.4324 5.64391 10.4584 5.74091 10.5078 5.82642C10.5571 5.91193 10.6281 5.98293 10.7136 6.0323C10.7992 6.08167 10.8962 6.10766 10.9949 6.10766C11.0936 6.10766 11.1906 6.08167 11.2761 6.0323L15.1016 3.82368L16.5337 6.30423L12.7083 8.51289C12.6228 8.56226 12.5518 8.63327 12.5024 8.71877C12.453 8.80428 12.427 8.90128 12.427 9.00001C12.427 9.09875 12.453 9.19574 12.5024 9.28125C12.5518 9.36676 12.6228 9.43776 12.7083 9.48714L16.5337 11.6958L15.1016 14.1763Z"
-                            fill="#1C1C1C"
+                            fill="#FE9614"
                           />
                         </g>
                         <defs>
@@ -175,7 +182,9 @@
       @let satisfactionItems = getSectionResponses("Current satisfaction");
       @if (satisfactionItems.length > 0) {
         <div class="section">
-          <h3 class="section-heading">{{ 'Current satisfaction' | translate }}</h3>
+          <h3 class="section-heading">
+            {{ "Current satisfaction" | translate }}
+          </h3>
           <div class="section-content">
             @for (item of satisfactionItems; track item.questionId) {
               <div class="satisfaction-item">
@@ -187,38 +196,38 @@
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
                   >
-                    <g clip-path="url(#clip0_3206_595)">
+                    <g clip-path="url(#clip0_4473_443)">
                       <path
                         d="M9 16.5C13.1421 16.5 16.5 13.1421 16.5 9C16.5 4.85786 13.1421 1.5 9 1.5C4.85786 1.5 1.5 4.85786 1.5 9C1.5 13.1421 4.85786 16.5 9 16.5Z"
-                        stroke="#1C1C1C"
+                        stroke="#516CE8"
                         stroke-width="1.5"
                         stroke-linecap="round"
                         stroke-linejoin="round"
                       />
                       <path
                         d="M6 10.5C6 10.5 7.125 12 9 12C10.875 12 12 10.5 12 10.5"
-                        stroke="#1C1C1C"
+                        stroke="#516CE8"
                         stroke-width="1.5"
                         stroke-linecap="round"
                         stroke-linejoin="round"
                       />
                       <path
                         d="M6.75 6.75H6.7575"
-                        stroke="#1C1C1C"
+                        stroke="#516CE8"
                         stroke-width="1.5"
                         stroke-linecap="round"
                         stroke-linejoin="round"
                       />
                       <path
                         d="M11.25 6.75H11.2575"
-                        stroke="#1C1C1C"
+                        stroke="#516CE8"
                         stroke-width="1.5"
                         stroke-linecap="round"
                         stroke-linejoin="round"
                       />
                     </g>
                     <defs>
-                      <clipPath id="clip0_3206_595">
+                      <clipPath id="clip0_4473_443">
                         <rect width="18" height="18" fill="white" />
                       </clipPath>
                     </defs>
@@ -238,7 +247,7 @@
     @let goalsItems = getSectionResponses("Goals");
     @if (goalsItems.length > 0) {
       <div class="section">
-        <h3 class="section-heading">{{ 'Goals' | translate }}</h3>
+        <h3 class="section-heading">{{ "Goals" | translate }}</h3>
         <div class="section-content">
           <div class="chips-row">
             @for (item of goalsItems; track item.questionId) {
@@ -265,8 +274,10 @@
     <!-- PROTECTION PRIORITIES -->
     @let protectionItems = getSectionResponses("Protection priorities");
     @if (protectionItems.length > 0) {
-      <div class="section">
-        <h3 class="section-heading">{{ 'Protection priorities' | translate }}</h3>
+      <div class="section protection-priorities-section">
+        <h3 class="section-heading">
+          {{ "Protection priorities" | translate }}
+        </h3>
         <div class="section-content">
           <div class="chips-row">
             @for (item of protectionItems; track item.questionId) {

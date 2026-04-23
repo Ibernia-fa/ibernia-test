@@ -158,7 +158,11 @@
             <mat-label
               class="f-s-16 f-w-500 ibr-black d-block"
               style="line-height: 16px"
-              >{{ "Net amount" | translate }}</mat-label
+              >@if (isInheritance) {
+                {{ 'INHERITANCE.AMOUNT_BEFORE_TAX' | translate }}
+              } @else {
+                {{ "Net amount" | translate }}
+              }</mat-label
             >
             <div class="net-field d-flex align-items-center">
               <div class="left hide-arrow">
@@ -185,6 +189,8 @@
                   thousandSeparatorInput
                   (input)="onAmountInput($event.target.value)"
                   placeholder="0"
+                  appAutoFocus
+                  autoFocusSelect
                 />
               </div>
               @if (isInheritance) {
@@ -226,7 +232,7 @@
               }
             </div>
             @if (statePensionSalaryPctHint !== null) {
-              <span class="state-pension-salary-pct-hint">{{
+              <span class="field-hint">{{
                 "INCOME_EXPENSE.STATE_PENSION_PCT_OF_SALARY"
                   | translate : { pct: statePensionSalaryPctHint }
               }}</span>
@@ -440,7 +446,7 @@
                       @for (event of eventsList; track event) {
                         <mat-option [value]="'event:' + event.id"
                           >{{ getTimelineEventLabel(event.name) }} ({{
-                            getAgeForYear(event.start.year)
+                            displayAgeForTimelineEvent(event)
                           }})</mat-option
                         >
                       }
@@ -499,7 +505,7 @@
                         @for (event of getEndEvents(); track event.id) {
                           <mat-option [value]="'event:' + event.id"
                             >{{ getTimelineEventLabel(event.name) }} ({{
-                              getAgeForYear(event.start.year)
+                              displayAgeForTimelineEvent(event)
                             }})</mat-option
                           >
                         }
@@ -549,6 +555,9 @@
                 </div>
               }
             </div>
+            @if (startEndDurationHint) {
+              <span class="field-hint">{{ startEndDurationHint }}</span>
+            }
           </div>
         </div>
 

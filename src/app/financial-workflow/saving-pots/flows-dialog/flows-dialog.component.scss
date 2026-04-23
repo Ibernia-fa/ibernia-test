@@ -1,0 +1,81 @@
+.flows-dialog {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Dedicated header row: title centered, close button aligned to the right.
+   Sits above the first content card with comfortable breathing room so it
+   never overlaps the cards underneath. */
+.flows-dialog__header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 4px 56px 12px;
+  margin-bottom: 8px;
+}
+
+.flows-dialog__title {
+  margin: 0;
+  text-align: center;
+  font-size: 22px;
+  line-height: 28px;
+  font-weight: 600;
+  color: #ffffff;
+  letter-spacing: 0.2px;
+  /* Layered halo keeps the white title readable on the soft pastel
+     ambient background (the modal no longer has a vivid header band,
+     so contrast comes entirely from the text-shadow). */
+  text-shadow:
+    0 1px 2px rgba(28, 28, 28, 0.55),
+    0 2px 6px rgba(28, 28, 28, 0.4),
+    0 0 18px rgba(64, 67, 175, 0.45);
+}
+
+.flows-dialog__close {
+  position: absolute !important;
+  top: 50%;
+  right: 4px;
+  transform: translateY(-50%);
+  background: transparent !important;
+  border: none;
+  box-shadow: none;
+  cursor: pointer;
+  color: #ffffff !important;
+
+  .mat-icon {
+    color: #ffffff;
+    filter:
+      drop-shadow(0 1px 2px rgba(28, 28, 28, 0.55))
+      drop-shadow(0 0 6px rgba(28, 28, 28, 0.35));
+  }
+
+  &:focus,
+  &:focus-visible,
+  &:active {
+    outline: none;
+    background: transparent !important;
+  }
+
+  &:hover {
+    opacity: 0.85;
+  }
+}
+
+.flows-dialog-content {
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  &.mat-mdc-dialog-content {
+    margin-top: 0;
+    padding: 0 !important;
+  }
+}

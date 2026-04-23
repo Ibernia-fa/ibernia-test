@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewContainerRef } from '@angular/core';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { AddNewPotComponent } from './add-new-pot/add-new-pot.component';
 import { MatCardModule } from '@angular/material/card';
@@ -53,6 +53,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { patchInflationRateDescription } from 'src/app/shared/utils/escalation-rate-utils';
 import { formatClientPersonDisplayName } from 'src/app/shared/utils/person-display-name';
 import { MaterialModule } from 'src/app/material.module';
+import { FlowsDialogComponent } from './flows-dialog/flows-dialog.component';
 @Component({
   selector: 'app-saving-pots',
   imports: [
@@ -112,6 +113,7 @@ import { MaterialModule } from 'src/app/material.module';
 export class SavingPotsComponent implements OnInit {
   user: any;
   userRerturnRate: any;
+  pensionFundReturnRate: any;
   loggedInUserPreferences: any;
   private destroy$ = new Subject<void>();
 
@@ -125,6 +127,7 @@ export class SavingPotsComponent implements OnInit {
     private Authservice: AuthService,
     private settingsService: SettingsService,
     private translate: TranslateService,
+    private viewContainerRef: ViewContainerRef,
   ) {
     this.user = this.Authservice.getUserProfile();
     this.settingsService.userData$
@@ -136,8 +139,19 @@ export class SavingPotsComponent implements OnInit {
         const p = data.preferences;
         this.loggedInUserPreferences = p;
         this.userRerturnRate = p.investmentReturn;
+        this.pensionFundReturnRate = p.pensionFundReturn;
       });
     this.getData();
+  }
+
+  openFlows(): void {
+    this.dialog.open(FlowsDialogComponent, {
+      width: '90vw',
+      maxWidth: '1100px',
+      disableClose: false,
+      panelClass: 'flows-dialog-panel',
+      viewContainerRef: this.viewContainerRef,
+    });
   }
 
   SavingPotOwnership = SavingPotOwnership;
@@ -215,7 +229,12 @@ export class SavingPotsComponent implements OnInit {
           this.isLoaderVisible = false;
         }),
       )
-      .subscribe();
+      .subscribe({
+        error: (err) => {
+          this.isLoaderVisible = false;
+          console.error('[SavingPots] getData failed:', err);
+        },
+      });
   }
 
   ngOnInit(): void {
@@ -407,8 +426,10 @@ export class SavingPotsComponent implements OnInit {
     const dialogRef = this.dialog.open(AddNewPotComponent, {
       width: '612px',
       disableClose: true,
+      autoFocus: false,
       data: {
         returnRate: this.userRerturnRate,
+        pensionFundReturnRate: this.pensionFundReturnRate,
         inflationRate:
           this.selectedCashflow?.inflationRate ??
           this.selectedClient?.clientDetails?.inflationRate ??
@@ -417,9 +438,10 @@ export class SavingPotsComponent implements OnInit {
         amountCycles: this.amountCycles,
         escalataionRates: this.escalationRates,
         eventsList: [...this.timeline.clientEvents].sort(
-          (a, b) => a.start.age - b.start.age,
+          (a, b) => (a.start?.year ?? 0) - (b.start?.year ?? 0),
         ),
         clientBirthDate: this.selectedClient?.clientDetails.birthDate,
+        partnerBirthDate: this.selectedClient?.partnerDetail?.birthDate,
         clientPreferredCurrency:
           this.selectedClient?.clientDetails.preferredCurrency,
         forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
@@ -502,8 +524,10 @@ export class SavingPotsComponent implements OnInit {
     const dialogRef = this.dialog.open(AddNewPotComponent, {
       width: '612px',
       disableClose: true,
+      autoFocus: false,
       data: {
         returnRate: this.userRerturnRate,
+        pensionFundReturnRate: this.pensionFundReturnRate,
         inflationRate:
           this.selectedCashflow?.inflationRate ??
           this.selectedClient?.clientDetails?.inflationRate ??
@@ -512,9 +536,10 @@ export class SavingPotsComponent implements OnInit {
         amountCycles: this.amountCycles,
         escalataionRates: this.escalationRates,
         eventsList: this.timeline.clientEvents.sort(
-          (a, b) => a.start.age - b.start.age,
+          (a, b) => (a.start?.year ?? 0) - (b.start?.year ?? 0),
         ),
         clientBirthDate: this.selectedClient?.clientDetails.birthDate,
+        partnerBirthDate: this.selectedClient?.partnerDetail?.birthDate,
         clientPreferredCurrency:
           this.selectedClient?.clientDetails.preferredCurrency,
         forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),

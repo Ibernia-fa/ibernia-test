@@ -1,0 +1,619 @@
+$ibernia-blue: #4043af;
+$ibernia-blue-soft: #5e79f6;
+$ibernia-ink: #1c1c1c;
+$ibernia-mute: #5a596e;
+$ibernia-line: #e5e5ec;
+$ibernia-bg-soft: #f5f7ff;
+
+/* Winner / loser palette — kept elegant and consistent with Ibernia. */
+$ibernia-win: #1f7a4d;
+$ibernia-win-bg: rgba(31, 122, 77, 0.06);
+$ibernia-win-border: rgba(31, 122, 77, 0.32);
+$ibernia-lose: #c0392b;
+$ibernia-lose-bg: rgba(192, 57, 43, 0.045);
+$ibernia-lose-border: rgba(192, 57, 43, 0.28);
+
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: 100%;
+}
+
+.learn-rb {
+  font-family: "Ubuntu", sans-serif;
+  color: $ibernia-ink;
+  min-height: 0;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Top right close button — positioned by shared school dialog rule. */
+.learn-rb__header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 0;
+  z-index: 5;
+  pointer-events: none;
+
+  > * {
+    pointer-events: auto;
+  }
+}
+
+.learn-rb__content {
+  padding-right: 0 !important;
+  margin-top: 0 !important;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  /* School layout rule: dialog body scrolls as a final safety net so cards,
+     insight tiles, disclaimers and CTAs are never clipped on smaller heights. */
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+/* ============================================================
+   Page wrapper — matches inflation impact page structure
+   ============================================================ */
+$impact-gutter: 56px;
+
+.learn-rb__page {
+  flex: 1 1 auto;
+  /* Use min-height: auto so the page never shrinks below its content's
+     intrinsic size; if the modal is too short, the dialog body scrolls
+     instead of clipping the side cards/footer/notice silently. */
+  display: flex;
+  flex-direction: column;
+  animation: learnRbFadeIn 320ms ease;
+}
+
+.learn-rb__page--impact {
+  /* Shared School header rule: title row top = 14px (matches close btn). */
+  padding: 14px $impact-gutter 16px;
+  gap: 14px;
+}
+
+@keyframes learnRbFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Hero title — never truncated, always one line on desktop. */
+.learn-rb__hero {
+  margin: 0;
+  font-size: 26px;
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  color: $ibernia-ink;
+  text-align: left;
+  max-width: 100%;
+  padding-right: 48px; /* keep clear of close icon */
+  flex: 0 0 auto;
+}
+
+/* ============================================================
+   Two-column layout — left inputs, right results
+   ============================================================ */
+.learn-rb__layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 340px) 1fr;
+  gap: 24px;
+  flex: 1 1 auto;
+  /* Both columns still align at the top; the row track sizes to whichever
+     column has more content so the side cards are never clipped on short
+     modals. With min-height: auto, the layout pushes the page taller (and
+     ultimately scrolls the dialog body) rather than truncating content. */
+  align-items: stretch;
+}
+
+/* ----- Left side ----- */
+.learn-rb__side {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  min-height: 0;
+}
+
+/* Compact pair (Down payment + Mortgage term) */
+.learn-rb__side-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 10px;
+}
+
+/* ============================================================
+   impact-card — matches inflation tile system
+   ============================================================ */
+.impact-card {
+  position: relative;
+  border: 1px solid $ibernia-line;
+  border-radius: 14px;
+  padding: 14px 18px;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 0 0 auto;
+  box-shadow: 0 1px 0 rgba(20, 22, 48, 0.02);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  min-width: 0;
+
+  &:focus-within {
+    border-color: $ibernia-blue;
+    box-shadow: 0 0 0 3px rgba(64, 67, 175, 0.12);
+  }
+
+  &--compact {
+    padding: 12px 14px;
+    gap: 4px;
+
+    .impact-card__value {
+      font-size: 22px;
+    }
+
+    .impact-card__currency,
+    .impact-card__suffix {
+      font-size: 14px;
+    }
+  }
+
+  &__label-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-height: 22px;
+  }
+
+  &__label {
+    font-size: 11px;
+    font-weight: 600;
+    color: $ibernia-mute;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    line-height: 1.2;
+  }
+
+  &__value {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1.1;
+    color: $ibernia-ink;
+    font-variant-numeric: tabular-nums;
+    min-width: 0;
+  }
+
+  &__currency {
+    font-size: 16px;
+    font-weight: 600;
+    color: $ibernia-mute;
+    flex-shrink: 0;
+  }
+
+  &__suffix {
+    font-size: 16px;
+    font-weight: 600;
+    color: $ibernia-mute;
+    flex-shrink: 0;
+  }
+
+  &__input {
+    flex: 1 1 auto;
+    border: none;
+    outline: none;
+    background: transparent;
+    font: inherit;
+    color: inherit;
+    width: 100%;
+    min-width: 0;
+    padding: 0;
+    font-variant-numeric: tabular-nums;
+
+    &::placeholder {
+      color: #c0c0cc;
+      font-weight: 600;
+    }
+  }
+}
+
+/* ============================================================
+   Down-payment % / amount segmented toggle
+   ============================================================ */
+.rb-toggle {
+  display: inline-flex;
+  align-items: stretch;
+  height: 24px;
+  padding: 2px;
+  border-radius: 8px;
+  background: #f1f2f7;
+  border: 1px solid $ibernia-line;
+  flex-shrink: 0;
+  gap: 0;
+}
+
+.rb-toggle__btn {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: $ibernia-mute;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  padding: 0 10px;
+  min-width: 26px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.18s ease, color 0.18s ease,
+    box-shadow 0.18s ease;
+
+  &:hover:not(.rb-toggle__btn--active) {
+    color: $ibernia-ink;
+  }
+
+  &--active {
+    background: #ffffff;
+    color: $ibernia-blue;
+    box-shadow: 0 1px 2px rgba(20, 22, 48, 0.08);
+  }
+
+  &:focus-visible {
+    outline: 2px solid rgba(64, 67, 175, 0.35);
+    outline-offset: 1px;
+  }
+}
+
+/* ============================================================
+   Insight accent tile (mirrors learn-inflation .impact-card--accent)
+   ============================================================ */
+.impact-card--accent {
+  padding: 16px 18px 18px;
+  background: linear-gradient(
+    135deg,
+    rgba(64, 67, 175, 0.09),
+    rgba(81, 108, 232, 0.035)
+  );
+  border-color: rgba(64, 67, 175, 0.22);
+  box-shadow:
+    0 1px 0 rgba(20, 22, 48, 0.02),
+    0 8px 22px rgba(64, 67, 175, 0.07);
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 12px;
+    bottom: 12px;
+    left: 0;
+    width: 3px;
+    border-radius: 0 3px 3px 0;
+    background: linear-gradient(180deg, $ibernia-blue, $ibernia-blue-soft);
+  }
+}
+
+.learn-rb__insight {
+  /* Sits directly under the input tiles, mirroring the Inflation/Compound
+     accent tile position (no auto-pushing to bottom — matches the rest of
+     the School section). */
+  gap: 10px;
+}
+
+.learn-rb__insight-text {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: $ibernia-ink;
+  font-weight: 400;
+  letter-spacing: 0.05px;
+
+  &--muted {
+    color: $ibernia-mute;
+    font-style: italic;
+  }
+}
+
+/* Subtle, premium emphasis — used for words like "buying" / "renting" / "year x". */
+:host ::ng-deep .rb-insight__strong {
+  color: $ibernia-blue;
+  font-weight: 700;
+  letter-spacing: 0.1px;
+}
+
+/* Slightly stronger treatment for the headline figure inside the sentence. */
+:host ::ng-deep .rb-insight__amount {
+  color: $ibernia-blue;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* ============================================================
+   "More assumptions" bottom action (placed under the chart,
+   mirrors learn-inflation__footer / learn-inflation__cta pattern)
+   ============================================================ */
+.learn-rb__footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.learn-rb__cta-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.learn-rb__more {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 38px;
+  padding: 0 16px;
+  border-radius: 10px;
+  border: 1px solid $ibernia-line;
+  background: #ffffff;
+  color: $ibernia-ink;
+  font-family: "Ubuntu", sans-serif;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease,
+    box-shadow 0.2s ease, transform 0.15s ease;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+
+  &:hover {
+    background: $ibernia-blue;
+    border-color: $ibernia-blue;
+    color: #ffffff;
+    box-shadow: 0 8px 18px rgba(64, 67, 175, 0.18);
+  }
+
+  &:focus-visible {
+    outline: 2px solid $ibernia-blue;
+    outline-offset: 3px;
+  }
+}
+
+/* ============================================================
+   Right side — results
+   ============================================================ */
+.learn-rb__main {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  min-height: 0;
+  /* `overflow: visible` so ApexCharts tooltips on the rightmost data points
+     can spill outside the chart card without being clipped by this column. */
+  overflow: visible;
+}
+
+.rb-summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  flex: 0 0 auto;
+}
+
+.rb-summary__card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid $ibernia-line;
+  background: #ffffff;
+  transition: border-color 0.2s ease, background 0.2s ease,
+    box-shadow 0.2s ease;
+  box-shadow: 0 1px 0 rgba(20, 22, 48, 0.02);
+
+  /* Winner: positive treatment (elegant green) */
+  &--winner {
+    border-color: $ibernia-win-border;
+    background: linear-gradient(180deg, #ffffff 0%, $ibernia-win-bg 100%);
+    box-shadow:
+      0 1px 0 rgba(20, 22, 48, 0.02),
+      0 8px 22px rgba(31, 122, 77, 0.08);
+
+    .rb-summary__value {
+      color: $ibernia-win;
+    }
+  }
+
+  /* Loser: muted, slightly desaturated red treatment */
+  &--loser {
+    border-color: $ibernia-lose-border;
+    background: linear-gradient(180deg, #ffffff 0%, $ibernia-lose-bg 100%);
+
+    .rb-summary__value {
+      color: $ibernia-lose;
+      opacity: 0.92;
+    }
+  }
+}
+
+.rb-summary__label {
+  font-size: 11px;
+  font-weight: 600;
+  color: $ibernia-mute;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.rb-summary__value {
+  font-size: 22px;
+  font-weight: 700;
+  color: $ibernia-ink;
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ----- Chart ----- */
+.learn-rb__chart {
+  flex: 1 1 auto;
+  /* Lower floor: the graph yields vertical space first so insight tiles,
+     disclaimers, and CTAs on the side keep full visibility on short heights. */
+  min-height: 200px;
+  border: 1px solid $ibernia-line;
+  border-radius: 16px;
+  background:
+    radial-gradient(120% 80% at 50% 0%, rgba(64, 67, 175, 0.035) 0%, rgba(64, 67, 175, 0) 60%),
+    #ffffff;
+  position: relative;
+  /* `overflow: visible` lets ApexCharts render the rightmost x-axis label and
+     the hover tooltip slightly beyond the rounded container, so neither is
+     ever clipped at any horizon (10y, 25y, …). The radial gradient fills the
+     card visually so the rounded corners still read as a contained surface. */
+  overflow: visible;
+  box-shadow:
+    0 1px 0 rgba(20, 22, 48, 0.02),
+    0 10px 28px rgba(64, 67, 175, 0.05);
+
+  apx-chart {
+    position: absolute;
+    /* Right inset enlarged (was 18px) so the plot area stops a healthy
+       distance from the card edge; combined with `grid.padding.right` in the
+       chart options, the final "Year N" label fits comfortably inside the
+       rounded card. */
+    inset: 14px 28px 8px 6px;
+    display: block;
+  }
+}
+
+.learn-rb__chart-empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: #b6b9c9;
+  font-size: 13px;
+
+  mat-icon {
+    font-size: 36px;
+    width: 36px;
+    height: 36px;
+  }
+
+  p { margin: 0; }
+}
+
+/* ============================================================
+   Shared school-notice spacing — matches inflation
+   ============================================================ */
+.learn-rb__page--impact .school-notice {
+  margin: 4px 0 0;
+  width: 100%;
+  max-width: none;
+  align-self: stretch;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 12px 18px;
+  flex: 0 0 auto;
+
+  .school-notice__icon {
+    align-self: center;
+    width: 18px;
+    height: 18px;
+    font-size: 18px;
+    line-height: 1;
+    overflow: visible;
+  }
+
+  .school-notice__text {
+    align-self: center;
+  }
+}
+
+/* ============================================================
+   Responsive (desktop + tablet only)
+   ============================================================ */
+@media (max-width: 1024px) {
+  .learn-rb__page--impact {
+    /* Keep the shared 14px header top on tablet, just tighten the side gutter. */
+    padding: 14px 20px 14px;
+    gap: 12px;
+    overflow: visible;
+  }
+
+  .learn-rb__content {
+    overflow-y: auto;
+  }
+
+  .learn-rb__hero {
+    font-size: 22px;
+    padding-right: 40px;
+  }
+
+  .learn-rb__layout {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    overflow: visible;
+  }
+
+  .learn-rb__side {
+    order: 2;
+  }
+
+  .learn-rb__main {
+    order: 1;
+    overflow: visible;
+  }
+
+  .learn-rb__chart {
+    min-height: 260px;
+    height: 280px;
+    flex: 0 0 auto;
+  }
+
+  .impact-card__value {
+    font-size: 24px;
+  }
+}
+
+/* ============================================================
+   Dialog surface tweaks
+   ============================================================ */
+:host ::ng-deep .mdc-dialog__surface {
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+}
+
+:host ::ng-deep .learn-rb__content.mat-mdc-dialog-content {
+  max-height: none;
+}

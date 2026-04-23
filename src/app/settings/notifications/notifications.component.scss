@@ -33,6 +33,9 @@
   flex-direction: column;
   gap: 16px;
   margin: 16px 0 0 16px;
+  @media (max-width: 1023px) {
+    margin: 16px 0 0 0;
+  }
 }
 
 // Mirrors `layouts/_header.scss` → `.notification-dropdown` list (fonts, colors, spacing).
@@ -63,7 +66,8 @@
   // Global styles.scss applies `button span { text-transform: lowercase }`, which inherits into rows.
   button.notification-item.notification-center-item {
     text-transform: none !important;
-    background-color: white !important;
+    background-color: #ffffffb2 !important;
+    border-radius: 12px !important;
 
     span {
       text-transform: none !important;
@@ -89,8 +93,9 @@
     text-align: left;
     margin-bottom: 0;
     cursor: pointer;
-    background-color: white;
+    background-color: #ffffffb2;
     border: none;
+    border-radius: 12px;
     display: block;
     width: 100%;
     transition: background 0.15s ease;

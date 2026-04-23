@@ -21,7 +21,7 @@
         class="f-s-16 f-w-500 m-b-4 d-flex align-items-center ibr-black"
         >{{ "Client first name" | translate }}</mat-label
       >
-      <input matInput formControlName="firstName" />
+      <input matInput formControlName="firstName" appAutoFocus autoFocusSelect />
       @if (
         clientForm.get("firstName")?.touched &&
         clientForm.get("firstName")?.hasError("required")
@@ -107,13 +107,9 @@
         </div>
         <mat-datepicker #picker></mat-datepicker>
       </div>
-      <div class="d-flex flex-column gap-1 m-t-4">
-        @if (age !== null) {
-          <span class="f-s-12 f-w-500" style="line-height: 14px"
-            >Age: {{ age }}</span
-          >
-        }
-      </div>
+      @if (age !== null) {
+        <span class="field-hint">Age: {{ age }}</span>
+      }
       @if (
         clientForm.get("dob")?.touched &&
         clientForm.get("dob")?.hasError("required")
@@ -339,13 +335,9 @@
             </div>
             <mat-datepicker #partnerPicker></mat-datepicker>
           </div>
-          <div class="d-flex flex-column gap-1 m-t-4">
-            @if (partnerAge !== null) {
-              <span class="f-s-12 f-w-500" style="line-height: 14px"
-                >Age: {{ partnerAge }}</span
-              >
-            }
-          </div>
+          @if (partnerAge !== null) {
+            <span class="field-hint">Age: {{ partnerAge }}</span>
+          }
           @if (
             clientForm.get("partner.dob")?.touched &&
             clientForm.get("partner.dob")?.hasError("required")

@@ -1,161 +1,342 @@
 .school-container {
-  .ibr-new-heading {
-    margin: 0;
-  }
+  .d-flex.flex-column.gap-12 {
+    margin-bottom: 24px;
+    text-align: center;
+    .ibr-new-heading {
+      font-size: 30px;
+      font-weight: 700;
+      line-height: 100%;
+    }
 
-  .ibr-new-subheading {
-    margin: 0;
-    max-width: 520px;
+    .ibr-new-subheading {
+      margin: 0 auto;
+      line-height: 20px;
+      font-size: 16px;
+    }
+
+    /** School page subtitle: wider on desktop (one line when it fits); balanced wrap on smaller widths. */
+    .school-page-subtitle {
+      max-width: min(100%, 36rem);
+      text-wrap: balance;
+
+      @media (min-width: 1024px) {
+        max-width: min(100%, 58rem);
+      }
+
+      @media (min-width: 1280px) {
+        max-width: min(100%, 64rem);
+      }
+    }
   }
 }
 
-.school-grid {
+.ibr-school-card-container {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+/** School tiles: row-major fill (left → center → right); stacks on small screens. */
+.card-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 16px;
+  gap: 24px;
+  grid-template-columns: 1fr;
+  grid-auto-flow: row;
 }
 
-.school-tile {
-  border: 1px solid #0000001a;
+.card-grid .card {
+  margin-bottom: 0;
+  break-inside: auto;
+}
+
+@media (min-width: 640px) {
+  .card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .card-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.card {
+  background: #ffffff;
   border-radius: 16px;
-  padding: 16px 18px;
-  background: #ffffffb2;
-  text-align: left;
-  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out,
+    border-color 0.2s ease-in-out;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease,
-    transform 0.15s ease;
+  height: 100%;
+  margin-bottom: 24px;
+  break-inside: avoid;
+  border: 1px solid #e5e5e5;
 
-  .tile-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-  }
-
-  .tile-title {
-    font-size: 16px;
-    font-weight: 600;
-    margin: 0;
-    color: #1c1c1c;
-  }
-
-  .tile-subtitle {
-    margin: 0;
-    font-size: 14px;
-    color: #5a596e;
-  }
-
-  .tile-chevron {
-    font-size: 18px;
-    color: #4043af;
+  &:last-child {
+    margin-bottom: 0;
   }
 }
 
-.school-tile:hover {
-  background: #f5f7ff;
-  border-color: #4043af40;
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.05);
-  transform: translateY(-1px);
+.card--interactive {
+  cursor: pointer;
+
+  &:hover {
+    border-color: rgba(64, 67, 175, 0.35);
+    box-shadow: 0 12px 28px rgba(64, 67, 175, 0.1);
+    transform: translateY(-2px);
+  }
+
+  &:focus-visible {
+    outline: 2px solid #4043af;
+    outline-offset: 3px;
+  }
 }
 
-.school-tile:focus-visible {
-  outline: 2px solid #4043af;
-  outline-offset: 2px;
-}
-
-.module-header {
+/**
+ * School tile imagery — editorial two-block composition
+ * -----------------------------------------------------
+ * Every tile is split into two cohesive blocks: a top visual area and a
+ * bottom content area. The top section is painted with the exact same light
+ * grey (#f3f3f5) used as the background of the 3D-rendered illustrations,
+ * so the artwork dissolves into the section instead of looking like a square
+ * card pasted on top of another card.
+ *
+ *   • locked aspect ratio → identical top-section height across all tiles,
+ *   • `object-fit: contain` → no cropping, no stretching of subjects,
+ *   • matching background color → image and container read as one block,
+ *   • no padding / no inner border → removes the "floating square" effect,
+ *   • soft contrast (grey ↔ white) provides separation without a hard rule.
+ */
+.card__image-container {
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
+  background-color: #f3f3f5;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 24px;
-  flex-wrap: wrap;
+  justify-content: center;
 }
 
-.back-button {
-  border: none;
-  background: transparent;
-  color: #4043af;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  padding: 4px 0;
+.card__image {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  object-position: center;
+  transition: transform 0.4s ease;
 }
 
-.module-titles {
-  flex: 1 1 auto;
-  min-width: 220px;
-
-  .module-title {
-    margin: 0;
-    font-size: 20px;
-    font-weight: 600;
-    color: #1c1c1c;
-  }
-
-  .module-subtitle {
-    margin: 4px 0 0 0;
-    font-size: 14px;
-    color: #5a596e;
-  }
+.card:hover .card__image {
+  transform: scale(1.04);
 }
 
-.slide-counter {
-  font-size: 14px;
-  color: #5a596e;
-  white-space: nowrap;
-}
-
-.module-body {
-  border-radius: 16px;
-  background: #ffffffb2;
-  padding: 24px;
-  margin-bottom: 20px;
-
-  .slide-title {
-    margin: 0 0 8px 0;
-    font-size: 18px;
-    font-weight: 600;
-    color: #1c1c1c;
-  }
-
-  .slide-body {
-    margin: 0;
-    font-size: 14px;
-    line-height: 1.5;
-    color: #5a596e;
-  }
-}
-
-.module-footer {
+.card__content {
+  padding: 20px;
   display: flex;
-  justify-content: flex-end;
+  flex-direction: column;
+  flex: 1 1 auto;
+}
+
+/* Title */
+.card__title {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: #1c1c1c;
+  margin: 0 0 12px 0;
+}
+
+/* Link */
+.card__link {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  margin-top: auto;
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 16px;
+  transition: gap 0.2s;
   gap: 8px;
 }
 
-.nav-button {
+.card__link:hover {
+  gap: 12px;
+  text-decoration: underline;
+}
+
+.card__link svg {
+  width: 16px;
+  height: 16px;
+}
+
+button.card__link {
+  background: none;
   border: none;
-  border-radius: 6px;
-  padding: 10px 18px;
+  padding: 0;
   cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  min-height: 40px;
-  color: #ffffff;
-  background-color: #4043af;
+  font-family: inherit;
 }
 
-.nav-button-secondary {
-  background-color: #ffffff;
+.card__link--active {
   color: #4043af;
-  border: 1px solid #4043af33;
+
+  &:hover {
+    color: #2f329e;
+  }
 }
 
-.nav-button:disabled {
-  opacity: 0.5;
-  cursor: default;
-}
+// .school-grid {
+//   display: grid;
+//   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+//   gap: 16px;
+// }
 
+// .school-tile {
+//   border: 1px solid #0000001a;
+//   border-radius: 16px;
+//   padding: 16px 18px;
+//   background: #ffffffb2;
+//   text-align: left;
+//   cursor: pointer;
+//   display: flex;
+//   flex-direction: column;
+//   gap: 8px;
+//   transition:
+//     background 0.15s ease,
+//     border-color 0.15s ease,
+//     box-shadow 0.15s ease,
+//     transform 0.15s ease;
+
+//   .tile-header {
+//     display: flex;
+//     align-items: center;
+//     justify-content: space-between;
+//     gap: 8px;
+//   }
+
+//   .tile-title {
+//     font-size: 16px;
+//     font-weight: 600;
+//     margin: 0;
+//     color: #1c1c1c;
+//   }
+
+//   .tile-subtitle {
+//     margin: 0;
+//     font-size: 14px;
+//     color: #5a596e;
+//   }
+
+//   .tile-chevron {
+//     font-size: 18px;
+//     color: #4043af;
+//   }
+// }
+
+// .school-tile:hover {
+//   background: #f5f7ff;
+//   border-color: #4043af40;
+//   box-shadow: 0 8px 18px rgba(0, 0, 0, 0.05);
+//   transform: translateY(-1px);
+// }
+
+// .school-tile:focus-visible {
+//   outline: 2px solid #4043af;
+//   outline-offset: 2px;
+// }
+
+// .module-header {
+//   display: flex;
+//   align-items: center;
+//   justify-content: space-between;
+//   gap: 16px;
+//   margin-bottom: 24px;
+//   flex-wrap: wrap;
+// }
+
+// .back-button {
+//   border: none;
+//   background: transparent;
+//   color: #4043af;
+//   font-size: 14px;
+//   font-weight: 500;
+//   cursor: pointer;
+//   padding: 4px 0;
+// }
+
+// .module-titles {
+//   flex: 1 1 auto;
+//   min-width: 220px;
+
+//   .module-title {
+//     margin: 0;
+//     font-size: 20px;
+//     font-weight: 600;
+//     color: #1c1c1c;
+//   }
+
+//   .module-subtitle {
+//     margin: 4px 0 0 0;
+//     font-size: 14px;
+//     color: #5a596e;
+//   }
+// }
+
+// .slide-counter {
+//   font-size: 14px;
+//   color: #5a596e;
+//   white-space: nowrap;
+// }
+
+// .module-body {
+//   border-radius: 16px;
+//   background: #ffffffb2;
+//   padding: 24px;
+//   margin-bottom: 20px;
+
+//   .slide-title {
+//     margin: 0 0 8px 0;
+//     font-size: 18px;
+//     font-weight: 600;
+//     color: #1c1c1c;
+//   }
+
+//   .slide-body {
+//     margin: 0;
+//     font-size: 14px;
+//     line-height: 1.5;
+//     color: #5a596e;
+//   }
+// }
+
+// .module-footer {
+//   display: flex;
+//   justify-content: flex-end;
+//   gap: 8px;
+// }
+
+// .nav-button {
+//   border: none;
+//   border-radius: 6px;
+//   padding: 10px 18px;
+//   cursor: pointer;
+//   font-size: 14px;
+//   font-weight: 500;
+//   min-height: 40px;
+//   color: #ffffff;
+//   background-color: #4043af;
+// }
+
+// .nav-button-secondary {
+//   background-color: #ffffff;
+//   color: #4043af;
+//   border: 1px solid #4043af33;
+// }
+
+// .nav-button:disabled {
+//   opacity: 0.5;
+//   cursor: default;
+// }

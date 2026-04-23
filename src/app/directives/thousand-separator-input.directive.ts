@@ -10,6 +10,7 @@ import { NgControl } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import {
   APP_DISPLAY_NUMBER_FORMAT,
+  APP_INPUT_NUMBER_FORMAT,
   localeFromAppLanguage,
   parseFormattedNumber,
 } from 'src/app/shared/utils/number-utils';
@@ -127,7 +128,7 @@ export class ThousandSeparatorInputDirective implements OnInit {
 
     this.el.nativeElement.value = new Intl.NumberFormat(
       localeFromAppLanguage(this.translate.currentLang),
-      APP_DISPLAY_NUMBER_FORMAT,
+      APP_INPUT_NUMBER_FORMAT,
     ).format(value);
   }
 

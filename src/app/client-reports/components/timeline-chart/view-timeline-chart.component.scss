@@ -233,6 +233,10 @@
   overflow: visible;
 }
 
+::ng-deep .timeline-container .vis-time-axis .vis-text.vis-minor.highlighted {
+  margin-left: 0;
+}
+
 .timeline-tooltip {
   position: fixed;
   background: rgba(0, 76, 153, 0.95);

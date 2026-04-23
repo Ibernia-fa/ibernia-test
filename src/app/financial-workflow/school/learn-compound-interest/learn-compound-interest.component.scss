@@ -1,0 +1,525 @@
+$ibernia-blue: #4043af;
+$ibernia-blue-soft: #516ce8;
+$ibernia-ink: #1c1c1c;
+$ibernia-mute: #5a596e;
+$ibernia-line: #e5e5ec;
+$ibernia-bg-soft: #f5f7ff;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: 100%;
+}
+
+.learn-compound {
+  font-family: "Ubuntu", sans-serif;
+  color: $ibernia-ink;
+  min-height: 0;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ----- Top header (close + optional back) ----- */
+.learn-compound__header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 0;
+  z-index: 5;
+  pointer-events: none;
+
+  > * {
+    pointer-events: auto;
+  }
+}
+
+.learn-compound__back-btn {
+  position: absolute !important;
+  top: 14px;
+  left: 14px;
+  background: transparent !important;
+  border: none;
+  box-shadow: none;
+  cursor: pointer;
+  color: $ibernia-mute;
+
+  &:focus,
+  &:focus-visible,
+  &:active {
+    outline: none;
+    background: transparent;
+  }
+
+  &:hover {
+    color: $ibernia-blue;
+  }
+}
+
+.learn-compound__content {
+  padding-right: 0 !important;
+  margin-top: 0 !important;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  /* School layout rule: dialog body scrolls as a final safety net so cards,
+     insight tiles, disclaimers and CTAs are never clipped on smaller heights. */
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.learn-compound__page {
+  flex: 1 1 auto;
+  /* Use min-height: auto so the page never shrinks below its content's
+     intrinsic size; if the modal is too short, the dialog body scrolls
+     instead of clipping the side cards/footer/notice silently. */
+  display: flex;
+  flex-direction: column;
+  animation: learnCompoundFadeIn 320ms ease;
+}
+
+@keyframes learnCompoundFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================================
+   PAGE — Compound growth (aligned with learn-inflation impact)
+   ============================================================ */
+
+$compound-gutter: 56px;
+
+.learn-compound__page--growth {
+  gap: 14px;
+  /* Shared School header rule: title row top = 14px (matches back/close btns). */
+  padding: 14px $compound-gutter 16px;
+}
+
+.learn-compound__hero {
+  margin: 0;
+  font-size: 26px;
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  color: $ibernia-ink;
+  text-align: left;
+  max-width: 100%;
+  padding-right: 48px; /* keep clear of close icon */
+}
+
+.learn-compound__layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 340px) 1fr;
+  gap: 24px;
+  flex: 1 1 auto;
+  /* Both columns still align at the top; the row track sizes to whichever
+     column has more content so the side cards are never clipped on short
+     modals. With min-height: auto, the layout pushes the page taller (and
+     ultimately scrolls the dialog body) rather than truncating content. */
+  align-items: stretch;
+}
+
+.learn-compound__side {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  min-height: 0;
+}
+
+.compound-inputs__rates {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+/* ----- Editable / output cards (mirrors learn-inflation .impact-card) ----- */
+.impact-card {
+  position: relative;
+  border: 1px solid $ibernia-line;
+  border-radius: 14px;
+  padding: 14px 18px;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 0 0 auto;
+  box-shadow: 0 1px 0 rgba(20, 22, 48, 0.02);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  &:focus-within {
+    border-color: $ibernia-blue;
+    box-shadow: 0 0 0 3px rgba(64, 67, 175, 0.12);
+  }
+
+  &__label {
+    font-size: 11px;
+    font-weight: 600;
+    color: $ibernia-mute;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+  }
+
+  &__value {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1.1;
+    color: $ibernia-ink;
+    font-variant-numeric: tabular-nums;
+
+    &--rate-pair {
+      font-size: 22px;
+    }
+  }
+
+  &__currency {
+    font-size: 16px;
+    font-weight: 600;
+    color: $ibernia-mute;
+  }
+
+  &__suffix {
+    font-size: 20px;
+    font-weight: 600;
+    color: $ibernia-mute;
+  }
+
+  &__hint {
+    font-size: 12.5px;
+    color: $ibernia-mute;
+    line-height: 1.45;
+  }
+
+  &__note {
+    margin: 10px 0 0;
+    padding-top: 10px;
+    border-top: 1px solid rgba(64, 67, 175, 0.12);
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: $ibernia-mute;
+    font-weight: 400;
+    letter-spacing: 0.1px;
+  }
+
+  &__input {
+    flex: 1 1 auto;
+    border: none;
+    outline: none;
+    background: transparent;
+    font: inherit;
+    color: inherit;
+    width: 100%;
+    min-width: 0;
+    padding: 0;
+    font-variant-numeric: tabular-nums;
+
+    &::placeholder {
+      color: #c0c0cc;
+      font-weight: 600;
+    }
+  }
+
+  &--accent {
+    padding: 16px 18px 18px;
+    background:
+      linear-gradient(135deg, rgba(64, 67, 175, 0.09), rgba(81, 108, 232, 0.035));
+    border-color: rgba(64, 67, 175, 0.22);
+    box-shadow:
+      0 1px 0 rgba(20, 22, 48, 0.02),
+      0 8px 22px rgba(64, 67, 175, 0.07);
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: 12px;
+      bottom: 12px;
+      left: 0;
+      width: 3px;
+      border-radius: 0 3px 3px 0;
+      background: linear-gradient(180deg, $ibernia-blue, $ibernia-blue-soft);
+    }
+
+    .impact-card__value:not(.compound-summary__metric-value--muted),
+    .impact-card__readout {
+      color: $ibernia-blue;
+    }
+
+    .impact-card__currency {
+      color: rgba(64, 67, 175, 0.7);
+    }
+  }
+}
+
+/* ----- Summary grid inside the accent card ----- */
+.compound-summary__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 14px;
+}
+
+.compound-summary__cell {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  &--span {
+    grid-column: 1 / -1;
+    padding-top: 8px;
+    margin-top: 4px;
+    border-top: 1px solid rgba(64, 67, 175, 0.12);
+  }
+}
+
+.compound-summary__label--stacked {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  line-height: 1.2;
+}
+
+.compound-summary__label-line {
+  display: block;
+}
+
+.compound-summary__metric-value {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.12;
+  font-variant-numeric: tabular-nums;
+  word-break: break-word;
+  /* School display rule: read-only currency renders tight ("€64,729") so the
+     symbol sits flush against the number; inputs keep the spaced layout. */
+  gap: 2px;
+
+  &--accent {
+    color: $ibernia-blue;
+  }
+
+  &--muted {
+    color: $ibernia-ink;
+
+    .impact-card__currency {
+      color: $ibernia-mute;
+    }
+  }
+}
+
+/* ----- Right side: chart ----- */
+.learn-compound__main {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.learn-compound__chart {
+  flex: 1 1 auto;
+  /* Lower floor: the graph yields vertical space first so insight tiles,
+     disclaimers, and CTAs on the side keep full visibility on short heights. */
+  min-height: 200px;
+  height: 100%;
+  border: 1px solid $ibernia-line;
+  border-radius: 16px;
+  background:
+    radial-gradient(120% 80% at 50% 0%, rgba(64, 67, 175, 0.035) 0%, rgba(64, 67, 175, 0) 60%),
+    #ffffff;
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    0 1px 0 rgba(20, 22, 48, 0.02),
+    0 10px 28px rgba(64, 67, 175, 0.05);
+
+  apx-chart {
+    position: absolute;
+    inset: 14px 18px 8px 6px;
+    display: block;
+  }
+}
+
+/* ----- Bottom CTA row ----- */
+.learn-compound__footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.learn-compound__cta-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.learn-compound__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 38px;
+  padding: 0 16px;
+  border-radius: 10px;
+  border: 1px solid $ibernia-line;
+  background: #ffffff;
+  color: $ibernia-ink;
+  font-family: "Ubuntu", sans-serif;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease,
+    box-shadow 0.2s ease, transform 0.15s ease;
+
+  svg {
+    width: 16px;
+    height: 16px;
+    transition: transform 0.2s ease;
+  }
+
+  &:hover {
+    background: $ibernia-blue;
+    border-color: $ibernia-blue;
+    color: #ffffff;
+    box-shadow: 0 8px 18px rgba(64, 67, 175, 0.18);
+
+    svg {
+      transform: translateX(3px);
+    }
+  }
+
+  &:focus-visible {
+    outline: 2px solid $ibernia-blue;
+    outline-offset: 3px;
+  }
+}
+
+/* ----- Override shared school-notice spacing + icon alignment ----- */
+.learn-compound__page--growth .school-notice {
+  margin: 6px 0 0;
+  width: 100%;
+  max-width: none;
+  align-self: stretch;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 12px 18px;
+
+  .school-notice__icon {
+    align-self: center;
+    width: 18px;
+    height: 18px;
+    font-size: 18px;
+    line-height: 1;
+    overflow: visible;
+  }
+
+  .school-notice__text {
+    align-self: center;
+  }
+}
+
+/* ============================================================
+   Responsiveness
+   ============================================================ */
+
+@media (max-width: 1024px) {
+  .learn-compound__page--growth {
+    /* Keep the shared 14px header top on tablet, just tighten the side gutter. */
+    padding: 14px 20px 14px;
+  }
+
+  .learn-compound__hero {
+    margin: 0;
+    font-size: 22px;
+    padding-right: 40px;
+  }
+
+  .learn-compound__layout {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .learn-compound__side {
+    order: 2;
+  }
+
+  .learn-compound__main {
+    order: 1;
+    min-height: 240px;
+  }
+
+  .learn-compound__chart {
+    min-height: 240px;
+  }
+
+  .impact-card__value {
+    font-size: 24px;
+  }
+
+  .impact-card--accent .compound-summary__metric-value {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 600px) {
+  .learn-compound__hero {
+    font-size: 20px;
+  }
+
+  .learn-compound__chart {
+    min-height: 220px;
+  }
+
+  .compound-inputs__rates {
+    grid-template-columns: 1fr;
+  }
+
+  .impact-card {
+    padding: 14px 16px;
+  }
+
+  .impact-card__value {
+    font-size: 22px;
+  }
+
+  .learn-compound__cta {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .learn-compound__cta-group {
+    width: 100%;
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
+/* ============================================================
+   Dialog surface tweaks
+   ============================================================ */
+:host ::ng-deep .mdc-dialog__surface {
+  display: flex;
+  flex-direction: column;
+}
+
+:host ::ng-deep .learn-compound__content.mat-mdc-dialog-content {
+  max-height: none;
+}

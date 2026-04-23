@@ -139,10 +139,6 @@ export class FullComponent implements OnInit, OnDestroy {
     return this.isMobileScreen;
   }
 
-  get isTablet(): boolean {
-    return this.resView;
-  }
-
   /** User-uploaded org background — disable frosted overlay so the photo stays sharp. */
   get usesCustomBackground(): boolean {
     const s = this.backgroundImage?.trim();
@@ -272,22 +268,38 @@ export class FullComponent implements OnInit, OnDestroy {
       .observe([MOBILE_VIEW, TABLET_VIEW, MONITOR_VIEW, BELOWMONITOR])
       .subscribe((state) => {
         const o = this.settings.getOptions();
+        const prevBelowMonitor = this.resView;
+        const belowMonitor = state.breakpoints[BELOWMONITOR];
+
+        let sidenavOpened = o.sidenavOpened;
+        if (belowMonitor && !prevBelowMonitor) {
+          sidenavOpened = false;
+        } else if (!belowMonitor && prevBelowMonitor) {
+          sidenavOpened = true;
+        }
+
         let sidenavCollapsed = o.sidenavCollapsed;
         // On `/settings/*`, skip tablet auto-collapse so entry expand isn't undone;
         // user toggle still updates `o.sidenavCollapsed` directly.
-        if (!this.inSettingsRoute && o.sidenavCollapsed === false) {
+        // Below 1024px the nav is `over` mode (not mini-docked); do not apply TABLET_VIEW
+        // collapse here — it would hide the Ibernia wordmark via `sidenavCollapsed`.
+        if (
+          !this.inSettingsRoute &&
+          o.sidenavCollapsed === false &&
+          !belowMonitor
+        ) {
           sidenavCollapsed = state.breakpoints[TABLET_VIEW];
         }
         this.settings.setOptions(
           {
-            sidenavOpened: true,
+            sidenavOpened,
             sidenavCollapsed,
           },
           false,
         );
-        this.isMobileScreen = state.breakpoints[BELOWMONITOR];
+        this.isMobileScreen = state.breakpoints[MOBILE_VIEW];
         this.isContentWidthFixed = state.breakpoints[MONITOR_VIEW];
-        this.resView = state.breakpoints[BELOWMONITOR];
+        this.resView = belowMonitor;
       });
 
     // Initialize project theme with options
@@ -338,7 +350,7 @@ export class FullComponent implements OnInit, OnDestroy {
           this.applySettingsLowerNav();
         } else {
           this.navItems = mainNavItems;
-          this.navItemslower = mainLower;
+          this.applyMainLowerNav();
         }
 
         this.syncSidebarForSettingsRoute(path);
@@ -357,6 +369,8 @@ export class FullComponent implements OnInit, OnDestroy {
       this.isSettings = true;
       this.navItems = settingsNavItems;
       this.applySettingsLowerNav();
+    } else {
+      this.applyMainLowerNav();
     }
   }
 
@@ -387,11 +401,27 @@ export class FullComponent implements OnInit, OnDestroy {
     this.inSettingsRoute = nowSettings;
   }
 
-  /** Admin Notifications + Identity Admin: visible only to Administrator / IberniaIdentityAdminAdministrator. */
+  private applyMainLowerNav(): void {
+    const allLower = mainLower ?? [];
+    this.navItemslower = allLower.filter(
+      (item) => item.displayName !== 'AI Chat',
+    );
+    Promise.all([
+      this.Authservice.hasRole('Administrator'),
+      this.Authservice.hasRole('IberniaIdentityAdminAdministrator'),
+    ]).then(([admin, idAdmin]) => {
+      if (admin || idAdmin) {
+        this.navItemslower = allLower;
+      }
+    });
+  }
+
+  /** AI Recommendations + Admin Notifications + Identity Admin: visible only to Administrator / IberniaIdentityAdminAdministrator. */
   private applySettingsLowerNav(): void {
     const allLower = settingsLowerNavItems ?? [];
     this.navItemslower = allLower.filter(
       (item) =>
+        item.displayName !== 'AI Recommendations' &&
         item.displayName !== 'Admin Notifications' &&
         item.displayName !== 'Identity Admin',
     );

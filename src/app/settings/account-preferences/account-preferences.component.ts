@@ -369,6 +369,7 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
 
   private buildPayload(): UserProfileDto {
     const raw = this.form.getRawValue();
+    const prefs = this.userprofile?.preferences ?? DEFAULT_PREFERENCES;
     return {
       id: this.userprofile?.id,
       userId: this.user?.sub,
@@ -377,7 +378,10 @@ export class AccountPreferencesComponent implements OnInit, OnDestroy {
       lastName: raw.lastName?.trim() || this.user?.lastName,
       email: raw.email?.trim() || this.user?.email,
       bio: blankToNull(raw.bio),
-      preferences: this.userprofile?.preferences ?? DEFAULT_PREFERENCES,
+      preferences: {
+        ...prefs,
+        language: prefs.language ?? this.translate.currentLang,
+      },
     };
   }
 

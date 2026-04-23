@@ -56,18 +56,31 @@ export interface FamilyMemberModel {
   firstName: string;
   lastName: string;
   role: string;
+  isPlaceholder?: boolean;
 }
 
 export interface AddFamilyMemberRequest {
   firstName: string;
   lastName: string;
   role: FamilyRole;
+  /** Required when adding a partner (role === Partner). */
+  birthDate?: Date | string;
+  /** Required when adding a partner (role === Partner). */
+  email?: string;
 }
 
 export interface UpdateFamilyMemberRequest {
   id: string;
   firstName: string;
   lastName: string;
+}
+
+export interface CompletePartnerProfileRequest {
+  memberId: string;
+  firstName: string;
+  lastName: string;
+  birthDate: Date | string;
+  email: string;
 }
 
 // ── Parent Estates ───────────────────────────────────────────────
@@ -88,12 +101,18 @@ export interface TaxSettingsModel {
   partnerTaxRate: number;
   childTaxRate: number;
   siblingTaxRate: number;
+  partnerTaxThreshold: number;
+  childTaxThreshold: number;
+  siblingTaxThreshold: number;
 }
 
 export interface UpdateTaxSettingsRequest {
   partnerTaxRate: number;
   childTaxRate: number;
   siblingTaxRate: number;
+  partnerTaxThreshold: number;
+  childTaxThreshold: number;
+  siblingTaxThreshold: number;
 }
 
 // ── Beneficiary Rules ────────────────────────────────────────────

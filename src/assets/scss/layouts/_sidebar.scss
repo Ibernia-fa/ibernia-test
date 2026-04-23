@@ -1,7 +1,8 @@
 @use "../variables" as *;
 
 .mat-drawer.sidebarNav {
-  width: 257px;
+  // width: 257px;
+  width: 263px;
   flex-shrink: 0;
   transition: swift-ease-out(width);
   position: fixed;
@@ -14,7 +15,10 @@
   background-color: #1c1c1c;
   border-right: none;
   border-radius: 12px !important;
-  transform: none !important;
+  /* Allow Material to translate the drawer off-screen in `over` mode (<1024px). */
+  @media (min-width: 1024px) {
+    transform: none !important;
+  }
 }
 
 /* Fixed footer band: viewport bottom margin + bar height + gap above bar (matches footer.component) */
@@ -158,6 +162,26 @@
   justify-content: center;
   &:hover {
     background-color: #78788949;
+  }
+}
+
+/* Overlay close (X) — matches sidebar collapse icon gray, centered in MDC icon button */
+.sidebar-close-toggle.mat-mdc-icon-button {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+  color: #9ea0a2;
+  --mdc-icon-button-icon-color: #9ea0a2;
+  --mat-icon-button-icon-color: #9ea0a2;
+
+  .sidebar-close-icon {
+    display: block;
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    margin: 0;
+    pointer-events: none;
   }
 }
 

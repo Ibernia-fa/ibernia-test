@@ -66,16 +66,25 @@ export const routes: Routes = [
     ],
   },
   {
-    path: '**',
-    redirectTo: 'authentication/error',
+    path: 'signin-oidc',
+    loadChildren: () => import('./auth/auth.module').then((m) => m.AuthModule),
   },
-  { path: 'signin-oidc', loadChildren: () => import('./auth/auth.module').then(m => m.AuthModule) },
-
+  {
+    path: 'silent-renew-oidc',
+    loadComponent: () =>
+      import('./auth/components/silent-renew-oidc/silent-renew-oidc.component').then(
+        (m) => m.SilentRenewOidcComponent,
+      ),
+  },
   {
     path: 'signout-callback-oidc',
     loadComponent: () =>
       import('./auth/components/signout-callback/signout-callback.component').then(
         (m) => m.SignoutCallbackComponent
       ),
+  },
+  {
+    path: '**',
+    redirectTo: 'authentication/error',
   },
 ];

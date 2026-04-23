@@ -10,6 +10,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectChange, MatSelectModule } from '@angular/material/select';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatButtonModule } from '@angular/material/button';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCardModule } from '@angular/material/card';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { provideNativeDateAdapter } from '@angular/material/core';
@@ -30,7 +31,7 @@ import {
 import moment from 'moment';
 import { FundsViewModel } from '../model/withdrawals-contributions';
 import { WithdrawalsContributionsHttpService } from '../services/withdrawals-contributions-http.service';
-import { catchError, concatMap, filter } from 'rxjs';
+import { catchError, concatMap, filter, finalize } from 'rxjs';
 import {
   ClientSaving,
   ComissionType,
@@ -39,6 +40,7 @@ import {
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
+import { AutoFocusDirective } from 'src/app/directives/auto-focus.directive';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { getAmountCycleLabel } from 'src/app/shared/utils/amount-cycle-label';
 import {
@@ -52,10 +54,12 @@ import { translateTimelineEventDisplayName } from 'src/app/shared/utils/timeline
 import {
   getCompletedYearsAgeAtDate,
   getPersistedAgeForCalendarYear,
+  getProjectionAgeForClientEvent,
   getProjectionColumnAgeLabel,
   getCashflowDialogEndCalendarYear,
 } from 'src/app/shared/utils/client-age-at-reference';
 import { calendarYearOrEventRefValidator } from 'src/app/shared/utils/calendar-year-or-event-ref.validator';
+import { getStartEndDurationLabel } from 'src/app/shared/utils/start-end-duration-label';
 import {
   recurringEndYearNotSelected,
   resolveCycleDescriptionForRecurringEndGuard,
@@ -76,7 +80,9 @@ import {
     MatSliderModule,
     ReactiveFormsModule,
     MatCheckboxModule,
+    MatProgressSpinnerModule,
     ThousandSeparatorInputDirective,
+    AutoFocusDirective,
     TranslateModule,
     MaterialModule,
   ],
@@ -110,6 +116,7 @@ export class AddContributionComponent {
   currentYear: number = new Date().getFullYear();
   selectedClient: Client | null = null;
   dialogEndCalendarYear = 0;
+  isSaving = false;
 
   constructor(
     private dialogRef: MatDialogRef<AddContributionComponent>,
@@ -381,7 +388,20 @@ export class AddContributionComponent {
     return translateTimelineEventDisplayName(this.translate, rawName);
   }
 
+  get startEndDurationHint(): string | null {
+    if (!this.showStartEnd) return null;
+    return getStartEndDurationLabel(
+      this.contributionForm.get('start')?.value,
+      this.contributionForm.get('end')?.value,
+      this.eventsList,
+      this.translate,
+    );
+  }
+
   get isContributionSaveButtonDisabled(): boolean {
+    if (this.isSaving) {
+      return true;
+    }
     if (this.contributionForm.invalid) {
       return true;
     }
@@ -498,6 +518,9 @@ export class AddContributionComponent {
   // }
 
   addIncome(): void {
+    if (this.isSaving) {
+      return;
+    }
     if (this.isContributionSaveButtonDisabled) return;
     this.contributionForm.markAllAsTouched();
     this.contributionForm.markAsDirty();
@@ -653,6 +676,7 @@ export class AddContributionComponent {
       );
     }
 
+    this.isSaving = true;
     action$
       .pipe(
         filter((res) => !!res),
@@ -660,12 +684,20 @@ export class AddContributionComponent {
           console.error(err);
           throw err;
         }),
+        finalize(() => {
+          this.isSaving = false;
+        }),
       )
-      .subscribe((res) => {
-        this.dialogRef.close({
-          status: 'Success',
-          contributionWithdrawal: res,
-        });
+      .subscribe({
+        next: (res) => {
+          this.dialogRef.close({
+            status: 'Success',
+            contributionWithdrawal: res,
+          });
+        },
+        error: () => {
+          // isSaving cleared in finalize
+        },
       });
   }
 
@@ -760,6 +792,7 @@ export class AddContributionComponent {
       contributionType: 2,
     };
 
+    this.isSaving = true;
     this.withdrawalsContributionsHttpService
       .addContributions(this.cashflowId, contributionCash)
       .pipe(
@@ -774,12 +807,20 @@ export class AddContributionComponent {
           console.error(err);
           throw err;
         }),
+        finalize(() => {
+          this.isSaving = false;
+        }),
       )
-      .subscribe((res) => {
-        this.dialogRef.close({
-          status: 'Success',
-          contributionWithdrawal: res,
-        });
+      .subscribe({
+        next: (res) => {
+          this.dialogRef.close({
+            status: 'Success',
+            contributionWithdrawal: res,
+          });
+        },
+        error: () => {
+          // isSaving cleared in finalize
+        },
       });
   }
 
@@ -841,31 +882,26 @@ export class AddContributionComponent {
 
     const endControl = this.contributionForm.get('end');
     const retirementEvent = this.getRetirementEvent();
-    if (!endControl || !retirementEvent) return;
+    if (!endControl || !retirementEvent?.id) return;
 
-    const retirementYear = retirementEvent?.start?.year;
-    if (
-      retirementYear === null ||
-      retirementYear === undefined ||
-      retirementYear === ''
-    )
-      return;
     if (
       endControl.value === null ||
       endControl.value === undefined ||
       endControl.value === ''
     ) {
-      endControl.setValue(retirementYear);
+      endControl.setValue('event:' + retirementEvent.id);
     }
   }
 
   private getRetirementEvent(): any | null {
     const events = this.eventsList ?? [];
     return (
-      events.find(
-        (event: any) =>
-          (event?.name ?? '').toString().toLowerCase() === 'retirement age',
-      ) ?? null
+      events.find((event: any) => {
+        const name = (event?.name ?? '').toString().trim().toLowerCase();
+        const isRetirementName =
+          name.startsWith('retirement age') || name.includes('pensione');
+        return isRetirementName && !event?.isPartnerEvent;
+      }) ?? null
     );
   }
 
@@ -959,6 +995,17 @@ export class AddContributionComponent {
       this.dialogEndCalendarYear,
     );
     return Number.isNaN(a) ? 0 : a;
+  }
+
+  displayAgeForTimelineEvent(event: any): number {
+    return getProjectionAgeForClientEvent(event, {
+      clientBirthDate: this.data.clientBirthDate,
+      partnerBirthDate:
+        this.data.partnerBirthDate ?? this.selectedClient?.partnerDetail?.birthDate,
+      forecastStartDate: this.data.forecastStartDate,
+      planDuration: this.data.planDuration,
+      projectionInclusiveEndYear: this.dialogEndCalendarYear,
+    });
   }
 
   getStartYear(): number {

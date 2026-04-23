@@ -56,20 +56,22 @@ html .topbar {
 
 // New Styles
 .top-navigation-bar {
-  position: fixed;
+  // position: fixed;
+  position: sticky;
   top: 1rem;
   left: 0;
   z-index: 9;
   width: 100%;
-  padding: 16px 16px !important;
+  // padding: 16px 16px !important;
+  padding: 0 !important;
   background-color: transparent !important;
   // border-bottom: 1px solid #e7e7eb;
   // height: $header-height;
   height: 65px !important;
-  @media (max-width: 640px) {
-    padding: 16px 16px !important;
-    height: 64px !important;
-  }
+  // @media (max-width: 640px) {
+  //   padding: 16px 16px !important;
+  //   height: 64px !important;
+  // }
   .ibr-new-header {
     border-radius: 12px;
     display: flex;
@@ -83,9 +85,9 @@ html .topbar {
 }
 .nav-btns {
   gap: 14px;
-  @media (max-width: 640px) {
-    gap: 0 !important;
-  }
+  // @media (max-width: 640px) {
+  //   gap: 0 !important;
+  // }
   .ibr-profile-seperator {
     height: 34px;
     background: #0000001a;
@@ -180,7 +182,7 @@ html .topbar {
     // background-color: #fff;
     // border: 1px solid #e7e7eb;
     border-top: 0px;
-    min-width: 190px;
+    min-width: 164px;
     list-style: none;
     padding: 0px;
     margin: 0px;
@@ -259,6 +261,33 @@ html .topbar {
 // Expand sidebar toggle - shown in header when sidebar is collapsed
 .header-expand-toggle {
   flex-shrink: 0;
+
+  &.mat-mdc-icon-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 0;
+
+    i-tabler {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 0;
+    }
+
+    i-tabler svg {
+      display: block;
+    }
+
+    .header-menu-icon {
+      display: block;
+      flex-shrink: 0;
+      width: 24px;
+      height: 24px;
+      margin: 0;
+      pointer-events: none;
+    }
+  }
 }
 
 .header-toggle-icon {
@@ -269,8 +298,10 @@ html .topbar {
 
 // Header margin and width when sidebar is visible - keeps bell/avatar within viewport
 .sidebar-visible .top-navigation-bar {
-  margin-left: 273px;
-  width: calc(100% - 273px);
+  // margin-left: 273px;
+  // width: calc(100% - 273px);
+  margin-left: 16px;
+  width: calc(100% - 16px);
   // transition:
   //   margin-left 0.3s ease,
   //   width 0.3s ease;
@@ -278,15 +309,28 @@ html .topbar {
   transition-timing-function: cubic-bezier(0.25, 0.8, 0.25, 1);
   transition-property: transform, margin-left, width;
 }
+
+/* Below 1024px the sidenav is `over` mode; keep header full-width so it does not sit under the drawer. */
+.sidebar-visible.sidebar-overlay-mode .top-navigation-bar {
+  margin-left: 0;
+  width: 100%;
+}
 .sidebar-visible.sidebar-collapsed .top-navigation-bar {
-  margin-left: 88px;
-  width: calc(100% - 88px);
+  // margin-left: 88px;
+  // width: calc(100% - 88px);
+  margin-left: 16px;
+  width: calc(100% - 16px);
   // transition:
   //   margin-left 0.3s ease,
   //   width 0.3s ease;
   transition-duration: 400ms;
   transition-timing-function: cubic-bezier(0.25, 0.8, 0.25, 1);
   transition-property: transform, margin-left, width;
+}
+
+.sidebar-visible.sidebar-overlay-mode.sidebar-collapsed .top-navigation-bar {
+  margin-left: 0;
+  width: 100%;
 }
 
 // Header breadcrumb (Home icon > Client name > Plan name)

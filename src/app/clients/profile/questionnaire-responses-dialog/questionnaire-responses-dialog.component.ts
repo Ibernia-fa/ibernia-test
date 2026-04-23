@@ -15,6 +15,11 @@ import {
   QuestionnaireResponseItem,
 } from '../../services/questionnaire-http.service';
 import { QuestionnaireDialogComponent } from '../questionnaire-dialog/questionnaire-dialog.component';
+import {
+  normalizeQuestionnaireRelationship,
+  questionnaireRelationshipLabelKey,
+  questionnaireRelationshipLabelParams,
+} from 'src/app/shared/family-tree/family-relationships';
 
 export interface QuestionnaireResponsesDialogData {
   questionnaireResponses: GetClientQuestionnaireResponse;
@@ -79,6 +84,20 @@ export class QuestionnaireResponsesDialogComponent {
     );
   }
 
+  formatImportantPersonLine(row: { name: string; relationship: string }): string {
+    const canonical = normalizeQuestionnaireRelationship(row.relationship);
+    const key = questionnaireRelationshipLabelKey(canonical);
+    const clientFirst = this.data.client?.clientDetails?.firstName || '';
+    const partnerFirst = this.data.client?.partnerDetail?.firstName || '';
+    const params = questionnaireRelationshipLabelParams(
+      canonical,
+      clientFirst,
+      partnerFirst,
+    );
+    const rel = params ? this.translate.instant(key, params) : this.translate.instant(key);
+    return `${row.name} (${rel})`;
+  }
+
   formatResponseValue(item: QuestionnaireResponseItem): string {
     const v = item.value;
     if (v == null) return '-';
@@ -87,7 +106,7 @@ export class QuestionnaireResponsesDialogComponent {
       return v
         .map((x) =>
           typeof x === 'object' && x && 'name' in x && 'relationship' in x
-            ? `${(x as { name: string }).name} (${(x as { relationship: string }).relationship})`
+            ? this.formatImportantPersonLine(x as { name: string; relationship: string })
             : String(x),
         )
         .join(', ');
@@ -95,10 +114,14 @@ export class QuestionnaireResponsesDialogComponent {
     if (typeof v === 'object') {
       const obj = v as Record<string, unknown>;
       const selected = obj['selected'] as string[] | undefined;
-      const others = obj['others'] as string | undefined;
+      const others = (obj['others'] as string | undefined)?.trim();
       const parts = selected ? [...selected] : [];
-      // Keep a stable token for icon lookups; localize at render time.
-      if (others) parts.push(`Other: ${others}`);
+      // Avoid listing bare "Other" and "Other: …" when free text is present; icon key still resolves via "Other:" prefix in getResponseChipsWithIcons.
+      if (others) {
+        const withoutBareOther = parts.filter((p) => p !== 'Other');
+        withoutBareOther.push(`Other: ${others}`);
+        return withoutBareOther.join(', ') || '-';
+      }
       return parts.join(', ') || '-';
     }
     return String(v);
@@ -128,8 +151,9 @@ export class QuestionnaireResponsesDialogComponent {
   }
 
   formatAssetChip(chip: string): string {
-    if (!this.responseCurrencySymbol) return chip;
-    return chip.replace(
+    const localized = this.localizeChipValue(chip);
+    if (!this.responseCurrencySymbol) return localized;
+    return localized.replace(
       /\d[\d,]*(\.\d+)?/g,
       (match) => `${this.responseCurrencySymbol}${match}`,
     );
@@ -161,5 +185,15 @@ export class QuestionnaireResponsesDialogComponent {
     const prefix = m[1].trimEnd();
     const rel = m[2].trim();
     return `${prefix}(${this.localizeChipValue(rel)})`;
+  }
+
+  parsePersonalChip(raw: string): { name: string; relationship: string } {
+    const s = (raw ?? '').toString();
+    const m = s.match(/^(.*)\(([^)]+)\)\s*$/);
+    if (!m) return { name: this.localizeChipValue(s), relationship: '' };
+    return {
+      name: m[1].trimEnd(),
+      relationship: this.localizeChipValue(m[2].trim()),
+    };
   }
 }

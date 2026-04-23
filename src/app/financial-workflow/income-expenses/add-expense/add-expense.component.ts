@@ -18,6 +18,7 @@ import { FinancialViewModel } from '../model/income-expense';
 import { extractEventId, resolveYear } from 'src/app/shared/utils/event-date-utils';
 import { catchError, filter, finalize } from 'rxjs';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
+import { AutoFocusDirective } from 'src/app/directives/auto-focus.directive';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
 import { TranslateIncomeExpenseLabelPipe } from 'src/app/core/pipes/translate-income-expense-label.pipe';
@@ -29,6 +30,7 @@ import { translateTimelineEventDisplayName } from 'src/app/shared/utils/timeline
 import {
   getCompletedYearsAgeAtDate,
   getPersistedAgeForCalendarYear,
+  getProjectionAgeForClientEvent,
   getProjectionColumnAgeLabel,
 } from 'src/app/shared/utils/client-age-at-reference';
 import { calendarYearOrEventRefValidator } from 'src/app/shared/utils/calendar-year-or-event-ref.validator';
@@ -36,6 +38,8 @@ import {
   recurringEndYearNotSelected,
   resolveCycleDescriptionForRecurringEndGuard,
 } from 'src/app/shared/utils/recurring-end-save-guard';
+import { getStartEndDurationLabel } from 'src/app/shared/utils/start-end-duration-label';
+import { capitalizeFirstLetter } from 'src/app/shared/utils/capitalize-first-letter';
 
 @Component({
   selector: 'app-add-expense',
@@ -53,6 +57,7 @@ import {
     ReactiveFormsModule,
     CommonModule,
     ThousandSeparatorInputDirective,
+    AutoFocusDirective,
     TranslateModule,
     TranslateIncomeExpenseLabelPipe,
     TranslateEscalationDescriptionPipe,
@@ -323,6 +328,16 @@ export class AddExpenseComponent {
     return translateTimelineEventDisplayName(this.translate, rawName);
   }
 
+  get startEndDurationHint(): string | null {
+    if (!this.showStartEnd) return null;
+    return getStartEndDurationLabel(
+      this.expenseForm.get('start')?.value,
+      this.expenseForm.get('end')?.value,
+      this.eventsList,
+      this.translate,
+    );
+  }
+
   get isExpenseSaveButtonDisabled(): boolean {
     if (this.isSaving) {
       return true;
@@ -372,9 +387,12 @@ export class AddExpenseComponent {
       const startEventId = extractEventId(startVal);
       const endEventId = extractEventId(endVal);
 
+      const rawExpenseDesc = this.expenseForm.get('description')?.value;
+      const finalExpenseDesc = this.isEditWorkflow ? rawExpenseDesc : capitalizeFirstLetter(rawExpenseDesc);
+
       var expense: FinancialViewModel = {
         id: this.isEditWorkflow ? this.selectedExpense.id : null,
-        description: this.expenseForm.get('description')?.value,
+        description: finalExpenseDesc,
         amount: {
           amount: this.expenseForm.get('amount')?.value,
           currencySymbol: this.expenseForm.get('currencySymbol')?.value,
@@ -683,6 +701,16 @@ export class AddExpenseComponent {
       this.forecastEndYear,
     );
     return Number.isNaN(a) ? 0 : a;
+  }
+
+  displayAgeForTimelineEvent(event: any): number {
+    return getProjectionAgeForClientEvent(event, {
+      clientBirthDate: this.data.clientBirthDate,
+      partnerBirthDate: this.data.partnerBirthDate,
+      forecastStartDate: this.data.forecastStartDate,
+      planDuration: this.data.planDuration,
+      projectionInclusiveEndYear: this.forecastEndYear,
+    });
   }
 
   getStartYear(): number {

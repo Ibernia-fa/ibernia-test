@@ -100,6 +100,35 @@
         color: #1c1c1c;
         font-weight: 500;
       }
+
+      .status-edit-row {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        align-self: center;
+        gap: 8px;
+
+        .edit-hint-slot {
+          width: 18px;
+          height: 18px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          flex: 0 0 auto;
+        }
+
+        .edit-hint-icon {
+          width: 16px;
+          height: 16px;
+          display: block;
+          opacity: 0;
+          transform: translateX(-4px);
+          transition:
+            opacity 240ms cubic-bezier(0.22, 0.61, 0.36, 1),
+            transform 240ms cubic-bezier(0.22, 0.61, 0.36, 1);
+          pointer-events: none;
+        }
+      }
     }
 
     .simulate-button {
@@ -116,6 +145,23 @@
         border: 1px solid #0000001a;
       }
     }
+
+    &:hover .info-container .status-edit-row .edit-hint-icon,
+    &:focus-visible .info-container .status-edit-row .edit-hint-icon {
+      opacity: 0.75;
+      transform: translateX(0);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .protection-center
+    .summary-card
+    .info-container
+    .status-edit-row
+    .edit-hint-icon {
+    transition: opacity 120ms linear;
+    transform: translateX(0);
   }
 }
 
@@ -150,7 +196,7 @@
 }
 
 .will-done-text {
-  color: #166A41;
+  color: #166a41;
 }
 
 .card-header {
@@ -170,7 +216,7 @@
 }
 
 .basic-header-card {
-  background-color: #E1B025cc;
+  background-color: #e1b025cc;
   backdrop-filter: blur(75px);
 }
 .basic-card {
@@ -180,7 +226,7 @@
 }
 
 .good-header-card {
-  background-color: #09AC65cc;
+  background-color: #09ac65cc;
   backdrop-filter: blur(75px);
 }
 .good-card {
@@ -190,7 +236,7 @@
 }
 
 .excellent-header-card {
-  background-color: #166A41cc;
+  background-color: #166a41cc;
   backdrop-filter: blur(75px);
 }
 .excellent-card {
@@ -254,15 +300,15 @@
 }
 
 .ibernia-orange {
-  color: #E1B025cc !important;
+  color: #e1b025cc !important;
 }
 
 .ibernia-light-green {
-  color: #09AC65cc !important;
+  color: #09ac65cc !important;
 }
 
 .ibernia-dark-green {
-  color: #166A41cc !important;
+  color: #166a41cc !important;
 }
 
 // New style
@@ -335,6 +381,7 @@
 .statistics-right-section {
   border-left: 1px solid #0000001a;
   padding: 8px 0 8px 16px;
+  margin-left: 16px;
 }
 
 // Protection Section

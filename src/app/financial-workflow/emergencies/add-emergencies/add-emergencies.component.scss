@@ -39,6 +39,17 @@
   margin-top: -2px;
 }
 
+.save-action-btn .save-btn-inner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 22px;
+}
+
+.save-action-btn mat-spinner {
+  --mdc-circular-progress-active-indicator-color: currentColor;
+}
+
 .down-payment-toggle {
   display: flex;
   align-items: center;

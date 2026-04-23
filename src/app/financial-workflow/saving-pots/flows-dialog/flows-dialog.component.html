@@ -1,0 +1,22 @@
+<div class="flows-dialog">
+  <div class="flows-dialog__header">
+    <h2 class="flows-dialog__title" style="text-transform: none">
+      {{ "Flows" | translate }}
+    </h2>
+    <button
+      type="button"
+      mat-icon-button
+      disableRipple
+      class="flows-dialog__close"
+      mat-dialog-close
+      aria-label="Close dialog"
+      (click)="closeDialog()"
+    >
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content class="flows-dialog-content">
+    <app-withdrawals-contributions></app-withdrawals-contributions>
+  </mat-dialog-content>
+</div>

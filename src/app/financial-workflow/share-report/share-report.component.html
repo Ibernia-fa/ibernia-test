@@ -2,8 +2,7 @@
   <div class="d-flex flex-column">
     <div class="dialog-header">
       <h2 class="dialog-title text-center">
-        {{ "Share with" | translate }}
-        <span style="text-transform: capitalize">{{ clientName }}</span>
+        {{ "SHARE_REPORT.TITLE" | translate : { clientName: clientName } }}
       </h2>
       <button
         type="button"
@@ -20,27 +19,22 @@
 
     <mat-dialog-content class="event-dialog-content">
       <div class="d-flex flex-column gap-16" [formGroup]="reportForm">
-        <div class="w-100 form-field gap-8">
+        <div class="w-100 form-field d-flex flex-column gap-16">
           <p class="info-text">
-            {{
-              "Send a secure, view-only version of this plan to your client at this address:"
-                | translate
-            }}
+            {{ "SHARE_REPORT.BODY_LINE1" | translate }}<br /><br />
+            {{ "SHARE_REPORT.BODY_LINE2_PREFIX" | translate }}
             <span style="color: #516ce8">{{ clientEmail }}</span>
-            <br />
-            {{
-              "They’ll receive an email with a unique access link and password."
-                | translate
-            }}
-            <br /><br />
-            {{ "This link will automatically expire in:" | translate }}
+          </p>
+
+          <p class="info-text">
+            {{ "SHARE_REPORT.EXPIRY_LABEL" | translate }}
           </p>
 
           <div class="d-flex flex-column gap-8">
             <mat-label
               class="f-s-16 f-w-500 d-block ibr-black"
               style="line-height: 16px"
-              >{{ "Select days" | translate }}</mat-label
+              >{{ "SHARE_REPORT.DURATION_LABEL" | translate }}</mat-label
             >
             <div class="w-100 form-field">
               <div class="select-option position-relative">
@@ -74,13 +68,6 @@
             </div>
           </div>
 
-          <p>
-            {{
-              "Note: the AI Recommendations section will not be visible to your client."
-                | translate
-            }}
-          </p>
-
           @if (
             reportForm.get("expiry")?.touched &&
             reportForm.get("expiry")?.hasError("required")
@@ -93,29 +80,42 @@
       </div>
     </mat-dialog-content>
 
-    <div class="row justify-content-end gap-16 modal-action p-t-24">
+    <div class="d-flex justify-content-end gap-16 modal-action p-t-24 flex-wrap">
       <div>
         <button
           (click)="closeDialog()"
           class="button-icon-outline w-100 d-block"
+          [disabled]="isLoaderVisible || isCopying"
         >
           <span class="f-s-16">{{ "Close" | translate }}</span>
         </button>
       </div>
       <div>
         <button
+          (click)="copyLinkAndPassword()"
+          type="button"
+          [disabled]="reportForm.invalid || isLoaderVisible || isCopying"
+          class="button-icon-outline w-100 d-block"
+        >
+          @if (isCopying) {
+            <mat-spinner diameter="20"></mat-spinner>
+          } @else {
+            <span class="f-s-16">{{ "Copy link and password" | translate }}</span>
+          }
+        </button>
+      </div>
+      <div>
+        <button
           (click)="shareReport()"
           type="button"
-          [disabled]="reportForm.invalid || isLoaderVisible"
+          [disabled]="reportForm.invalid || isLoaderVisible || isCopying"
           class="button-icon w-100 d-block"
         >
-          <span class="f-s-16">
-            {{
-              isLoaderVisible
-                ? ("Sending..." | translate)
-                : ("Send" | translate)
-            }}
-          </span>
+          @if (isLoaderVisible) {
+            <mat-spinner diameter="20"></mat-spinner>
+          } @else {
+            <span class="f-s-16">{{ "Send" | translate }}</span>
+          }
         </button>
       </div>
     </div>

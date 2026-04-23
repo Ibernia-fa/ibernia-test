@@ -58,14 +58,6 @@ body {
   pointer-events: none;
 }
 
-.hint {
-  margin: 0px;
-  position: relative;
-  top: -13px;
-  font-size: 14px;
-  color: #979797;
-}
-
 .mb-20 {
   margin-bottom: 20px;
 }
@@ -565,6 +557,175 @@ button:not(.mat-mdc-menu-item):not(.mat-menu-item):not(.submit-btn) {
   border: 1px solid #e7e7eb !important;
 }
 
+/* ============================================================
+   School: premium graph tooltip (shared design system)
+   Applied to every chart in the School section through
+   `tooltip.cssClass = 'ibr-school-tooltip'` and
+   `chart.cssClass = 'ibr-school-chart'`. Keep this as the single
+   source of truth for all School tooltip styling.
+   ============================================================ */
+.apexcharts-tooltip.ibr-school-tooltip {
+  background: #ffffff !important;
+  color: #1c1c1c !important;
+  border: 1px solid rgba(64, 67, 175, 0.1) !important;
+  border-radius: 14px !important;
+  box-shadow:
+    0 1px 3px rgba(20, 22, 48, 0.06),
+    0 18px 40px rgba(28, 31, 80, 0.14) !important;
+  padding: 0 !important;
+  font-family: "Ubuntu", sans-serif !important;
+  font-size: 14px !important;
+  line-height: 1.45 !important;
+  min-width: 200px;
+  max-width: 320px;
+  overflow: hidden !important;
+  backdrop-filter: saturate(140%);
+  transition:
+    opacity 120ms ease,
+    transform 120ms ease;
+
+  /* Header band: secondary label like "Year 5" */
+  .apexcharts-tooltip-title {
+    background: transparent !important;
+    border: 0 !important;
+    border-bottom: 1px solid rgba(28, 31, 80, 0.06) !important;
+    margin: 0 !important;
+    padding: 12px 18px 10px !important;
+    font-family: "Ubuntu", sans-serif !important;
+    font-size: 12.5px !important;
+    font-weight: 500 !important;
+    color: #5a596e !important;
+    letter-spacing: 0.2px !important;
+    text-transform: none !important;
+  }
+
+  /* Body row: marker + label + value */
+  .apexcharts-tooltip-series-group {
+    padding: 12px 18px !important;
+    margin: 0 !important;
+    align-items: center !important;
+    background: transparent !important;
+
+    &.apexcharts-active {
+      display: flex !important;
+    }
+
+    & + .apexcharts-tooltip-series-group.apexcharts-active {
+      padding-top: 6px !important;
+    }
+
+    &:last-child.apexcharts-active {
+      padding-bottom: 14px !important;
+    }
+  }
+
+  .apexcharts-tooltip-marker {
+    width: 10px !important;
+    height: 10px !important;
+    margin-right: 10px !important;
+    border-radius: 50% !important;
+    flex-shrink: 0;
+  }
+
+  .apexcharts-tooltip-text {
+    font-family: "Ubuntu", sans-serif !important;
+    font-size: 14.5px !important;
+    line-height: 1.45 !important;
+    color: #1c1c1c !important;
+  }
+
+  .apexcharts-tooltip-y-group,
+  .apexcharts-tooltip-goals-group,
+  .apexcharts-tooltip-z-group {
+    padding: 0 !important;
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+  }
+
+  .apexcharts-tooltip-text-y-label,
+  .apexcharts-tooltip-text-goals-label,
+  .apexcharts-tooltip-text-z-label {
+    font-weight: 500 !important;
+    color: #5a596e !important;
+    margin-right: 0 !important;
+  }
+
+  .apexcharts-tooltip-text-y-value,
+  .apexcharts-tooltip-text-goals-value,
+  .apexcharts-tooltip-text-z-value {
+    font-weight: 700 !important;
+    color: #1c1c1c !important;
+    font-variant-numeric: tabular-nums;
+    margin-left: 0 !important;
+    white-space: nowrap;
+  }
+
+  /* Wide variant — used when the series label is long enough that the
+     label + value pair would otherwise truncate (e.g. the invest-to-reach
+     "Purchasing power (today's money)" series). Keeps the full value
+     readable on desktop and tablet without breaking the design system. */
+  &.ibr-school-tooltip--wide {
+    min-width: 240px;
+    max-width: 440px;
+
+    .apexcharts-tooltip-y-group,
+    .apexcharts-tooltip-goals-group,
+    .apexcharts-tooltip-z-group {
+      flex-wrap: wrap;
+      row-gap: 2px;
+    }
+
+    .apexcharts-tooltip-text-y-label,
+    .apexcharts-tooltip-text-goals-label,
+    .apexcharts-tooltip-text-z-label {
+      flex: 1 1 100%;
+      min-width: 0;
+    }
+
+    .apexcharts-tooltip-text-y-value,
+    .apexcharts-tooltip-text-goals-value,
+    .apexcharts-tooltip-text-z-value {
+      flex: 1 1 100%;
+      font-size: 15px !important;
+      letter-spacing: -0.1px;
+    }
+  }
+}
+
+/* X-axis anchor badge (e.g. the small "Year 5" pill below the chart). */
+.apexcharts-canvas.ibr-school-chart .apexcharts-xaxistooltip,
+.apexcharts-canvas.ibr-school-chart .apexcharts-yaxistooltip {
+  background: #ffffff !important;
+  color: #1c1c1c !important;
+  border: 1px solid rgba(64, 67, 175, 0.12) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 6px 18px rgba(28, 31, 80, 0.1) !important;
+  padding: 6px 12px !important;
+  font-family: "Ubuntu", sans-serif !important;
+  font-size: 12.5px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.2px !important;
+}
+
+.apexcharts-canvas.ibr-school-chart .apexcharts-xaxistooltip-bottom::before {
+  border-bottom-color: rgba(64, 67, 175, 0.16) !important;
+}
+.apexcharts-canvas.ibr-school-chart .apexcharts-xaxistooltip-bottom::after {
+  border-bottom-color: #ffffff !important;
+}
+.apexcharts-canvas.ibr-school-chart .apexcharts-xaxistooltip-top::before {
+  border-top-color: rgba(64, 67, 175, 0.16) !important;
+}
+.apexcharts-canvas.ibr-school-chart .apexcharts-xaxistooltip-top::after {
+  border-top-color: #ffffff !important;
+}
+
+/* Hover marker on the data point: slightly more refined ring. */
+.apexcharts-canvas.ibr-school-chart .apexcharts-marker {
+  filter: drop-shadow(0 2px 4px rgba(28, 31, 80, 0.18));
+}
+
 .savings-tooltip {
   background: rgba(255, 255, 255, 0.96);
   min-width: 170px;
@@ -931,6 +1092,12 @@ body .custom-html-tooltip,
   color: #34c759;
 }
 
+.event-tooltip.inheritance-green {
+  background-color: #ddffe5 !important;
+  border: none;
+  color: #34c759;
+}
+
 .event-tooltip.boat-icon {
   background-color: #ffe2d5 !important;
   border: none;
@@ -1024,6 +1191,16 @@ body .custom-html-tooltip,
   .mat-mdc-checkbox-touch-target {
     width: 18px !important;
     height: 18px !important;
+  }
+
+  &.mat-mdc-checkbox-disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    cursor: default;
+
+    .mat-internal-form-field .mdc-label {
+      cursor: default;
+    }
   }
 }
 
@@ -1253,5 +1430,144 @@ body .custom-html-tooltip,
 
 app-branding {
   flex: 1;
-  margin-top: 8px;
+  // margin-top: 8px;
+}
+
+/* Flows dialog surface: same frosted-glass language used across the rest
+   of the product (translucent panels + `backdrop-filter: blur(...)`).
+   The surface is intentionally NOT given its own background image: it
+   stays translucent so `backdrop-filter` samples the real page behind
+   the modal — the colourful ambient wallpaper of `.sidenavContainer`
+   diffused through the existing `cdk-overlay-dark-backdrop`. This
+   keeps the modal physically embedded in the page (no "pasted white
+   sheet" feel) while the soft dark tint and saturation boost give it
+   the muted, premium tone used by the surrounding UI. The inner
+   `.ibr-new-dashboad-card` panels (white at 70% opacity) then read as
+   bright, focused cards floating on this glass — the same relationship
+   they have with the page background. */
+.flows-dialog-panel .mat-mdc-dialog-surface {
+  position: relative;
+  overflow: hidden !important;
+  padding: 16px 24px 24px !important;
+  background: rgba(28, 28, 36, 0.18) !important;
+  background-image: none !important;
+  -webkit-backdrop-filter: blur(60px) saturate(140%);
+  backdrop-filter: blur(60px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 24px 60px rgba(20, 20, 35, 0.35) !important;
+}
+
+/* ============================================================
+   School modules: shared bottom informational notice.
+   Used across Inflation, Compound interest, Cost of waiting,
+   Cash buffer, Invest to reach goal, and Rent vs Buy tiles to
+   remind the user that School outputs are educational
+   projections, not exact predictions.
+   ============================================================ */
+.school-notice {
+  display: flex;
+  align-items: center;
+  align-self: center;
+  gap: 10px;
+  padding: 10px 16px;
+  margin: 4px auto 12px;
+  width: fit-content;
+  max-width: calc(100% - 112px);
+  border: 1px solid rgba(64, 67, 175, 0.18);
+  border-radius: 12px;
+  background: #f5f7ff;
+  color: #5a596e;
+  font-family: "Ubuntu", sans-serif;
+  font-size: 12.5px;
+  line-height: 1.55;
+  font-weight: 400;
+  letter-spacing: 0.1px;
+  flex-shrink: 0;
+  text-align: left;
+
+  &__icon {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    font-size: 18px;
+    line-height: 18px;
+    color: #4043af;
+  }
+
+  &__text {
+    margin: 0;
+    flex: 0 1 auto;
+  }
+}
+
+@media (max-width: 1024px) {
+  .school-notice {
+    max-width: calc(100% - 32px);
+    margin: 4px auto 12px;
+  }
+}
+
+/* ============================================================
+   School Slide Header — shared top alignment system
+   ------------------------------------------------------------
+   All School learning dialogs (panelClass: "learn-inflation-dialog-panel")
+   share the same fixed top header so the back button, the title and
+   the close button always sit on the same row across slides.
+
+   Anchors:
+     - back / close buttons: top 14px, side inset 14px
+     - title row top edge:   14px from the modal content top
+     - subtitle gap:         8px below the title
+     - horizontal gutter:    56px (so titles never collide with the
+                             back / close icons)
+
+   Per-slide files only set their hero font-size (auto-shrunk by
+   AutoFitTitleDirective). They MUST NOT change the top offset or the
+   page padding-top values defined here.
+   ============================================================ */
+.learn-inflation-dialog-panel {
+  /* Force the close button into the shared header row. */
+  .dialog-close-btn {
+    top: 14px !important;
+    right: 14px !important;
+  }
+
+  /* Remove any default mat-dialog-content top padding so the school
+     page wrappers fully control where the title row sits. */
+  .mat-mdc-dialog-content {
+    padding-top: 0 !important;
+  }
+}
+
+/* ============================================================
+   "More assumptions" secondary dialog (Rent vs Buy)
+   ------------------------------------------------------------
+   Ensures the surface stays inside the viewport and lets the field
+   list scroll independently while the title row + actions stay
+   pinned. Required for desktop and tablet usability.
+   ============================================================ */
+.rb-assumptions-dialog-panel {
+  .mdc-dialog__surface {
+    display: flex;
+    flex-direction: column;
+    max-height: 85vh;
+    padding: 20px 22px;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .mat-mdc-dialog-content {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-height: none !important;
+  }
+
+  .mat-mdc-dialog-actions {
+    min-height: 0;
+  }
 }

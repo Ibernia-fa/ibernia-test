@@ -287,7 +287,12 @@ export class IncomeExpensesComponent {
           this.isLoaderVisible = false;
         }),
       )
-      .subscribe();
+      .subscribe({
+        error: (err) => {
+          this.isLoaderVisible = false;
+          console.error('[IncomeExpenses] getData failed:', err);
+        },
+      });
   }
 
   newIncomeClicked() {
@@ -296,10 +301,11 @@ export class IncomeExpensesComponent {
     const dialogRef = this.dialog.open(AddIncomeComponent, {
       width: '612px',
       disableClose: true,
+      autoFocus: false,
       data: {
         amountCycles: this.amountCycles,
         eventsList: this.timeline.clientEvents.sort(
-          (a, b) => a.start.age - b.start.age,
+          (a, b) => (a.start?.year ?? 0) - (b.start?.year ?? 0),
         ),
         escalataionRates: this.escalationRates,
         incomes: this.incomeExpense?.incomes,
@@ -336,14 +342,16 @@ export class IncomeExpensesComponent {
     const dialogRef = this.dialog.open(AddExpenseComponent, {
       width: '612px',
       disableClose: true,
+      autoFocus: false,
       data: {
         amountCycles: this.amountCycles,
         escalataionRates: this.escalationRates,
         eventsList: this.timeline.clientEvents.sort(
-          (a, b) => a.start.age - b.start.age,
+          (a, b) => (a.start?.year ?? 0) - (b.start?.year ?? 0),
         ),
         expenses: this.incomeExpense?.expenses,
         clientBirthDate: this.selectedClient?.clientDetails.birthDate,
+        partnerBirthDate: this.selectedClient?.partnerDetail?.birthDate,
         clientPreferredCurrency:
           this.selectedClient?.clientDetails.preferredCurrency,
         cashflowId: this.selectedCashflow?.id,
@@ -368,10 +376,11 @@ export class IncomeExpensesComponent {
     const dialogRef = this.dialog.open(AddIncomeComponent, {
       width: '612px',
       disableClose: true,
+      autoFocus: false,
       data: {
         amountCycles: this.amountCycles,
         eventsList: this.timeline.clientEvents.sort(
-          (a, b) => a.start.age - b.start.age,
+          (a, b) => (a.start?.year ?? 0) - (b.start?.year ?? 0),
         ),
         escalataionRates: this.escalationRates,
         clientBirthDate: this.selectedClient?.clientDetails.birthDate,
@@ -412,13 +421,15 @@ export class IncomeExpensesComponent {
     const dialogRef = this.dialog.open(AddExpenseComponent, {
       width: '612px',
       disableClose: true,
+      autoFocus: false,
       data: {
         amountCycles: this.amountCycles,
         eventsList: this.timeline.clientEvents.sort(
-          (a, b) => a.start.age - b.start.age,
+          (a, b) => (a.start?.year ?? 0) - (b.start?.year ?? 0),
         ),
         escalataionRates: this.escalationRates,
         clientBirthDate: this.selectedClient?.clientDetails.birthDate,
+        partnerBirthDate: this.selectedClient?.partnerDetail?.birthDate,
         clientPreferredCurrency:
           this.selectedClient?.clientDetails.preferredCurrency,
         cashflowId: this.selectedCashflow?.id,
@@ -745,6 +756,18 @@ export class IncomeExpensesComponent {
     if (name == 'Insurance') return false;
 
     return true;
+  }
+
+  getIncomeDisplayAmount(income: FinancialViewModel): number {
+    if (
+      (isClientInheritanceApiDescription(income.description) ||
+        isPartnerInheritanceApiDescription(income.description)) &&
+      income.inheritanceGrossAmount != null &&
+      income.inheritanceGrossAmount > 0
+    ) {
+      return income.inheritanceGrossAmount;
+    }
+    return income.amount?.amount ?? 0;
   }
 
   hasBonusAmount(item: FinancialViewModel): boolean {

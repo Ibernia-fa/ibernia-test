@@ -1,0 +1,175 @@
+<div class="learn-tim w-100 h-100 d-flex flex-column">
+  <!-- Header -->
+  <div class="learn-tim__header">
+    <button
+      type="button"
+      mat-icon-button
+      disableRipple
+      class="dialog-close-btn"
+      mat-dialog-close
+      aria-label="Close dialog"
+      (click)="closeDialog()"
+    >
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content class="learn-tim__content">
+    <div class="learn-tim__page">
+      <h1 class="learn-tim__hero" appAutoFitTitle>
+        {{ "LEARN_TIM.HERO" | translate }}
+      </h1>
+
+      <div class="learn-tim__layout">
+        <!-- LEFT: scrollable list of compact event tiles -->
+        <aside
+          class="learn-tim__events"
+          aria-label="Historical market events"
+        >
+          <div class="learn-tim__events-scroll">
+            <ul class="learn-tim__events-list" role="list">
+              @for (event of events; track trackById($index, event)) {
+                <li>
+                  <button
+                    type="button"
+                    class="event-tile"
+                    [class.event-tile--active]="event.id === activeEventId()"
+                    (mouseenter)="setActiveEvent(event.id)"
+                    (focus)="setActiveEvent(event.id)"
+                    (click)="setActiveEvent(event.id)"
+                    [attr.aria-pressed]="event.id === activeEventId()"
+                  >
+                    <span class="event-tile__main">
+                      <span class="event-tile__range">{{ event.rangeLabel }}</span>
+                      <span class="event-tile__name">{{
+                        event.nameKey | translate
+                      }}</span>
+                    </span>
+                    <span class="event-tile__drawdown">
+                      {{ formatPercent(event.drawdownPct) }}
+                    </span>
+                  </button>
+                </li>
+              }
+            </ul>
+          </div>
+        </aside>
+
+        <!-- RIGHT: chart on top, dedicated detail card below -->
+        <section class="learn-tim__main">
+          <div class="learn-tim__chart-wrap">
+            <header class="learn-tim__chart-head">
+              <span class="learn-tim__chart-legend" aria-hidden="true">
+                <span class="learn-tim__chart-legend-swatch"></span>
+                <span class="learn-tim__chart-legend-label">
+                  {{ "LEARN_TIM.SERIES_LEGEND" | translate }}
+                </span>
+              </span>
+              <span class="learn-tim__chart-sub">
+                {{ "LEARN_TIM.AXIS_NOTE" | translate }}
+              </span>
+            </header>
+            <div class="learn-tim__chart">
+              <apx-chart
+                [series]="chartSeries()"
+                [chart]="chartConfig"
+                [xaxis]="chartXaxis"
+                [yaxis]="chartYaxis()"
+                [stroke]="chartStroke"
+                [colors]="chartColors"
+                [tooltip]="chartTooltip()"
+                [legend]="chartLegend"
+                [grid]="chartGrid"
+                [dataLabels]="chartDataLabels"
+                [markers]="chartMarkers"
+                [fill]="chartFill"
+                [annotations]="chartAnnotations()"
+              ></apx-chart>
+            </div>
+          </div>
+
+          <article
+            class="learn-tim__detail"
+            [attr.data-event-id]="activeEvent().id"
+          >
+            <header class="learn-tim__detail-head">
+              <span class="learn-tim__detail-eyebrow">
+                {{ activeEvent().rangeLabel }}
+              </span>
+              <h2 class="learn-tim__detail-title">
+                {{ activeEvent().nameKey | translate }}
+              </h2>
+            </header>
+
+            <div class="learn-tim__metrics">
+              <div class="learn-tim__metric">
+                <span class="learn-tim__metric-label">
+                  {{ "LEARN_TIM.METRIC_DRAWDOWN" | translate }}
+                </span>
+                <span class="learn-tim__metric-value learn-tim__metric-value--neg">
+                  {{ formatPercent(activeEvent().drawdownPct) }}
+                </span>
+              </div>
+
+              <div class="learn-tim__metric">
+                <span class="learn-tim__metric-label">
+                  {{ "LEARN_TIM.METRIC_RECOVERY" | translate }}
+                </span>
+                <span
+                  class="learn-tim__metric-value learn-tim__metric-value--accent"
+                >
+                  {{ activeEvent().recoveryLabelKey | translate }}
+                </span>
+              </div>
+
+              <div class="learn-tim__metric">
+                <span class="learn-tim__metric-label">
+                  {{ "LEARN_TIM.METRIC_YEAR_1" | translate }}
+                </span>
+                <span
+                  class="learn-tim__metric-value"
+                  [class.learn-tim__metric-value--pos]="
+                    returnTone(activeEvent().year1ReturnPct) === 'pos'
+                  "
+                  [class.learn-tim__metric-value--neg]="
+                    returnTone(activeEvent().year1ReturnPct) === 'neg'
+                  "
+                >
+                  {{ formatPercent(activeEvent().year1ReturnPct) }}
+                </span>
+              </div>
+
+              <div class="learn-tim__metric">
+                <span class="learn-tim__metric-label">
+                  {{ "LEARN_TIM.METRIC_YEAR_3" | translate }}
+                </span>
+                <span
+                  class="learn-tim__metric-value"
+                  [class.learn-tim__metric-value--pos]="
+                    returnTone(activeEvent().year3ReturnPct) === 'pos'
+                  "
+                  [class.learn-tim__metric-value--neg]="
+                    returnTone(activeEvent().year3ReturnPct) === 'neg'
+                  "
+                >
+                  {{ formatPercent(activeEvent().year3ReturnPct) }}
+                </span>
+              </div>
+            </div>
+
+            <p class="learn-tim__narrative">
+              {{ activeEvent().narrativeKey | translate }}
+            </p>
+          </article>
+        </section>
+      </div>
+
+      <aside class="school-notice" role="note">
+        <mat-icon class="school-notice__icon" aria-hidden="true">info</mat-icon>
+        <p class="school-notice__text">
+          {{ "LEARN_TIM.FOOTER_NOTICE" | translate }}
+        </p>
+      </aside>
+    </div>
+  </mat-dialog-content>
+</div>

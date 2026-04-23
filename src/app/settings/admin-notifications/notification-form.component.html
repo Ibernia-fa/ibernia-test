@@ -212,6 +212,52 @@
               appearance="outline"
               class="notification-form-field notification-form-field-grow"
             >
+              <mat-label>{{
+                "Title Italian optional" | translate
+              }}</mat-label>
+              <input matInput formControlName="titleIt" />
+            </mat-form-field>
+          </div>
+
+          <mat-form-field
+            appearance="outline"
+            class="w-100 notification-form-field notification-message-field textarea-wrapper"
+            subscriptSizing="dynamic"
+          >
+            <mat-label>{{
+              "Message Italian optional" | translate
+            }}</mat-label>
+            <textarea
+              matInput
+              formControlName="bodyIt"
+              cdkTextareaAutosize
+              cdkAutosizeMinRows="3"
+              cdkAutosizeMaxRows="120"
+            ></textarea>
+            <mat-hint
+              align="end"
+              [class.notification-message-word-hint-over]="
+                messageWordCountIt > maxMessageWords
+              "
+              >{{ messageWordCountIt }}/{{ maxMessageWords }}</mat-hint
+            >
+            @if (
+              form.get("bodyIt")?.invalid &&
+              (form.get("bodyIt")?.dirty || form.get("bodyIt")?.touched)
+            ) {
+              <mat-error>
+                @if (form.get("bodyIt")?.hasError("maxWords")) {
+                  {{ "Message is limited to 500 words" | translate }}
+                }
+              </mat-error>
+            }
+          </mat-form-field>
+
+          <div class="notification-form-row d-flex flex-wrap gap-16">
+            <mat-form-field
+              appearance="outline"
+              class="notification-form-field notification-form-field-grow"
+            >
               <mat-label>{{ "Deep link (optional)" | translate }}</mat-label>
               <input matInput formControlName="deepLink" placeholder="/" />
             </mat-form-field>

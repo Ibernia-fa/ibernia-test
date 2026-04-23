@@ -1,0 +1,227 @@
+<div class="learn-cash-buffer w-100 h-100 d-flex flex-column">
+  <div class="learn-cash-buffer__header">
+    <button
+      type="button"
+      mat-icon-button
+      disableRipple
+      class="dialog-close-btn"
+      mat-dialog-close
+      [attr.aria-label]="'LEARN_CASH_BUFFER.CLOSE' | translate"
+      (click)="closeDialog()"
+    >
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content class="learn-cash-buffer__content">
+    <div class="learn-cash-buffer__page learn-cash-buffer__page--impact">
+      <h1 class="learn-cash-buffer__hero" appAutoFitTitle>
+        {{ "LEARN_CASH_BUFFER.HERO" | translate }}
+      </h1>
+
+      <div class="learn-cash-buffer__layout">
+        <!-- LEFT: editable input cards + insight tile -->
+        <aside class="learn-cash-buffer__side">
+          <div class="impact-card">
+            <span class="impact-card__label">
+              {{ "LEARN_CASH_BUFFER.CASH_LABEL" | translate }}
+            </span>
+            <div class="impact-card__value">
+              <span class="impact-card__currency">{{ currencySymbol }}</span>
+              <input
+                type="text"
+                inputmode="decimal"
+                placeholder="0"
+                thousandSeparatorInput
+                [formControl]="cashControl"
+                class="impact-card__input"
+              />
+            </div>
+          </div>
+
+          <div class="impact-card">
+            <span class="impact-card__label">
+              {{ "LEARN_CASH_BUFFER.EXPENSES_LABEL" | translate }}
+            </span>
+            <div class="impact-card__value">
+              <span class="impact-card__currency">{{ currencySymbol }}</span>
+              <input
+                type="text"
+                inputmode="decimal"
+                placeholder="0"
+                thousandSeparatorInput
+                [formControl]="expensesControl"
+                class="impact-card__input"
+              />
+            </div>
+          </div>
+
+          <div class="impact-card impact-card--accent learn-cash-buffer__insight">
+            @if (bufferMonths() !== null) {
+              <div class="cb-result">
+                <div class="cb-result__figure">
+                  <span class="cb-result__value">{{ formatMonthsDisplay(bufferMonths()) }}</span>
+                  <span class="cb-result__suffix">{{ bufferMonthWordKey(bufferMonths()) | translate }}</span>
+                </div>
+                <p class="cb-result__sub">{{ "LEARN_CASH_BUFFER.RESULT_SUB" | translate }}</p>
+
+                @switch (interpretation()) {
+                  @case ('below') {
+                    <span class="cb-result__badge cb-result__badge--low">{{ "LEARN_CASH_BUFFER.DIAG_LOW" | translate }}</span>
+                  }
+                  @case ('within') {
+                    <span class="cb-result__badge cb-result__badge--ok">{{ "LEARN_CASH_BUFFER.DIAG_OK" | translate }}</span>
+                  }
+                  @case ('above') {
+                    <span class="cb-result__badge cb-result__badge--high">{{ "LEARN_CASH_BUFFER.DIAG_HIGH" | translate }}</span>
+                  }
+                }
+
+                <p class="cb-result__practical">{{ "LEARN_CASH_BUFFER.PRACTICAL" | translate }}</p>
+              </div>
+            } @else {
+              <div class="cb-result cb-result--neutral">
+                <p class="cb-result__neutral">{{ "LEARN_CASH_BUFFER.COPY_NEUTRAL" | translate }}</p>
+              </div>
+            }
+          </div>
+        </aside>
+
+        <!-- RIGHT: chart (vertical orientation) -->
+        <section class="learn-cash-buffer__main">
+          <div class="learn-cash-buffer__viz">
+            <div
+              class="bm-chart bm-chart--vertical"
+              role="img"
+              [style.--bm-pos-3]="pos3Percent() + '%'"
+              [style.--bm-pos-12]="pos12Percent() + '%'"
+              [style.--bm-pos-24]="pos24Percent() + '%'"
+              [attr.aria-label]="'LEARN_CASH_BUFFER.RANGE_ARIA' | translate"
+            >
+              <!-- Plot area: tick column | vertical track | zone descriptions column.
+                   The scale is FIXED and categorical (4 equal sections):
+                   0–3, 3–12, 12–24 and 24+ months. Section heights never
+                   change with the user's value; values above 24 are
+                   clamped to a single position inside the 24+ band. -->
+              <div class="bm-chart__plot">
+                <!-- Tick labels on the left side of the vertical track -->
+                <div class="bm-chart__ticks" aria-hidden="true">
+                  <span class="bm-chart__tick bm-chart__tick--max">
+                    <span class="bm-chart__tick-label">
+                      {{ "LEARN_CASH_BUFFER.AXIS_ABOVE_24" | translate }}
+                    </span>
+                    <span class="bm-chart__tick-connector"></span>
+                  </span>
+                  <span class="bm-chart__tick bm-chart__tick--24">
+                    <span class="bm-chart__tick-label">24</span>
+                    <span class="bm-chart__tick-connector"></span>
+                  </span>
+                  <span class="bm-chart__tick bm-chart__tick--12">
+                    <span class="bm-chart__tick-label">12</span>
+                    <span class="bm-chart__tick-connector"></span>
+                  </span>
+                  <span class="bm-chart__tick bm-chart__tick--3">
+                    <span class="bm-chart__tick-label">3</span>
+                    <span class="bm-chart__tick-connector"></span>
+                  </span>
+                  <span class="bm-chart__tick bm-chart__tick--0">
+                    <span class="bm-chart__tick-label">0</span>
+                    <span class="bm-chart__tick-connector"></span>
+                  </span>
+                </div>
+
+                <!-- Vertical coloured track -->
+                <div class="bm-chart__track-wrap">
+                  <div class="bm-chart__track" aria-hidden="true">
+                    <!-- Subtle horizontal guides at 3, 12 and 24 months -->
+                    <span class="bm-chart__guide bm-chart__guide--3"></span>
+                    <span class="bm-chart__guide bm-chart__guide--12"></span>
+                    <span class="bm-chart__guide bm-chart__guide--24"></span>
+
+                    <!-- Healthy range pill, fixed between 3 and 12 -->
+                    <span class="bm-chart__band"></span>
+
+                    <!-- Coloured vertical line segments (one per fixed section) -->
+                    <span class="bm-chart__line bm-chart__line--low"></span>
+                    <span class="bm-chart__line bm-chart__line--mid"></span>
+                    <span class="bm-chart__line bm-chart__line--high"></span>
+                    <span class="bm-chart__line bm-chart__line--excess"></span>
+
+                    @if (markerPercent() !== null) {
+                      <div
+                        class="bm-chart__marker"
+                        [attr.data-align]="markerCalloutAlignment()"
+                        [attr.data-excess]="isExcessive() ? 'true' : null"
+                        [style.bottom.%]="markerPercent()!"
+                        [attr.title]="formatMonthsDisplay(bufferMonths())"
+                      >
+                        <span class="bm-chart__marker-stem"></span>
+                        <span class="bm-chart__marker-cap"></span>
+                        <div class="bm-chart__callout">
+                          <span class="bm-chart__callout-label">
+                            {{ "LEARN_CASH_BUFFER.YOU_ARE_HERE" | translate }}
+                          </span>
+                          <span class="bm-chart__callout-value">
+                            <strong>{{ formatMonthsDisplay(bufferMonths()) }}</strong>
+                            {{ bufferMonthWordKey(bufferMonths()) | translate }}
+                          </span>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                </div>
+
+                <!-- Zone headers, vertically aligned with their colour bands -->
+                <div class="bm-chart__zones" aria-hidden="true">
+                  <div class="bm-chart__zone bm-chart__zone--excess">
+                    <span class="bm-chart__zone-title">
+                      {{ "LEARN_CASH_BUFFER.ZONE_EXCESS_TITLE" | translate }}
+                    </span>
+                    <span class="bm-chart__zone-sub">
+                      {{ "LEARN_CASH_BUFFER.ZONE_EXCESS_SUB" | translate }}
+                    </span>
+                  </div>
+                  <div class="bm-chart__zone bm-chart__zone--high">
+                    <span class="bm-chart__zone-title">
+                      {{ "LEARN_CASH_BUFFER.ZONE_HIGH_TITLE" | translate }}
+                    </span>
+                    <span class="bm-chart__zone-sub">
+                      {{ "LEARN_CASH_BUFFER.ZONE_HIGH_SUB" | translate }}
+                    </span>
+                  </div>
+                  <div class="bm-chart__zone bm-chart__zone--mid">
+                    <span class="bm-chart__zone-title">
+                      {{ "LEARN_CASH_BUFFER.ZONE_MID_TITLE" | translate }}
+                    </span>
+                    <span class="bm-chart__zone-sub">
+                      {{ "LEARN_CASH_BUFFER.ZONE_MID_SUB" | translate }}
+                    </span>
+                  </div>
+                  <div class="bm-chart__zone bm-chart__zone--low">
+                    <span class="bm-chart__zone-title">
+                      {{ "LEARN_CASH_BUFFER.ZONE_LOW_TITLE" | translate }}
+                    </span>
+                    <span class="bm-chart__zone-sub">
+                      {{ "LEARN_CASH_BUFFER.ZONE_LOW_SUB" | translate }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <span class="bm-chart__axis-title">
+                {{ "LEARN_CASH_BUFFER.AXIS_MONTHS_OF_EXPENSES" | translate }}
+              </span>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <aside class="school-notice" role="note">
+        <mat-icon class="school-notice__icon" aria-hidden="true">info</mat-icon>
+        <p class="school-notice__text">
+          {{ "LEARN_CASH_BUFFER.FOOTER_NOTICE" | translate }}
+        </p>
+      </aside>
+    </div>
+  </mat-dialog-content>
+</div>

@@ -1,4 +1,16 @@
-/* Commission-style percentage suffix — matches add-contribution */
+.tax-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.tax-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 :host .form-field.position-relative input {
   padding-right: 32px;
 }
@@ -11,6 +23,26 @@
   pointer-events: none;
   width: 18px;
   height: 18px;
+}
+
+.threshold-field {
+  display: flex;
+  align-items: center;
+}
+
+.threshold-currency-prefix {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  color: #2b3942;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.threshold-input {
+  padding-left: 52px !important;
 }
 
 .event-dialog-content {

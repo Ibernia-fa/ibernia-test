@@ -31,6 +31,8 @@ export interface FinancialViewModel {
     investThisAmount?: boolean;
     inheritanceTargetPotId?: string | null;
     inheritancePercentToInvest?: number;
+    /** Gross before inheritance tax; when absent, {@link amount} is the legacy plan income (no automatic tax). */
+    inheritanceGrossAmount?: number | null;
     linkedContributionId?: string | null;
 }
 

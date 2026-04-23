@@ -21,8 +21,8 @@ body {
   height: 100%;
 }
 .sidenavContainer {
-  padding-top: 66px;
-  padding-bottom: 66px;
+  // padding-top: 66px;
+  padding-bottom: 0;
 
   /* Reserve space for fixed full-width footer (16 + 65 + 16) so content scrolls above it */
   .layout-with-footer & {

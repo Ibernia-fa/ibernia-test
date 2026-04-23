@@ -4,11 +4,13 @@
     {{ "Edit client" | translate }}
   </h2>
   <button
+    type="button"
     mat-icon-button
     disableRipple
     class="dialog-close-btn"
     mat-dialog-close
     aria-label="Close dialog"
+    [disabled]="isSaving"
   >
     <mat-icon>close</mat-icon>
   </button>
@@ -108,13 +110,9 @@
         </div>
         <mat-datepicker #picker></mat-datepicker>
       </div>
-      <div class="d-flex flex-column gap-1 m-t-4">
-        @if (age !== null) {
-          <span class="f-s-12 f-w-500" style="line-height: 14px"
-            >Age: {{ age }}</span
-          >
-        }
-      </div>
+      @if (age !== null) {
+        <span class="field-hint">Age: {{ age }}</span>
+      }
       @if (
         clientForm.get("dob")?.touched &&
         clientForm.get("dob")?.hasError("required")
@@ -350,13 +348,9 @@
             </div>
             <mat-datepicker #partnerPicker></mat-datepicker>
           </div>
-          <div class="d-flex flex-column gap-1 m-t-4">
-            @if (partnerAge !== null) {
-              <span class="f-s-12 f-w-500" style="line-height: 14px"
-                >Age: {{ partnerAge }}</span
-              >
-            }
-          </div>
+          @if (partnerAge !== null) {
+            <span class="field-hint">Age: {{ partnerAge }}</span>
+          }
           @if (
             clientForm.get("partner.dob")?.touched &&
             clientForm.get("partner.dob")?.hasError("required")
@@ -406,11 +400,17 @@
 <mat-dialog-actions align="end" class="dialog-actions">
   <!-- <button mat-button mat-dialog-close>{{ "Cancel" | translate }}</button> -->
   <button
-    class="button-icon"
+    class="button-icon save-action-btn"
     type="button"
     [disabled]="isSaveDisabled"
     (click)="onSubmit()"
   >
-    <span>{{ "Save" | translate }}</span>
+    <span class="save-btn-inner">
+      @if (isSaving) {
+        <mat-spinner diameter="22" mode="indeterminate" />
+      } @else {
+        <span>{{ "Save" | translate }}</span>
+      }
+    </span>
   </button>
 </mat-dialog-actions>

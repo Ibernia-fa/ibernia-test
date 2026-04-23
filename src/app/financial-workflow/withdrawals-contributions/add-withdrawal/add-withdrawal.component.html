@@ -13,6 +13,7 @@
         class="dialog-close-btn"
         mat-dialog-close
         aria-label="Close dialog"
+        [disabled]="isSaving"
         (click)="closeDialog()"
       >
         <mat-icon>close</mat-icon>
@@ -111,6 +112,8 @@
                   thousandSeparatorInput
                   (input)="onAmountInput($event.target.value)"
                   placeholder="0"
+                  appAutoFocus
+                  autoFocusSelect
                 />
               </div>
               <div class="right position-relative">
@@ -188,7 +191,7 @@
                       @for (event of eventsList; track event) {
                         <mat-option [value]="'event:' + event.id"
                           >{{ getTimelineEventLabel(event.name) }} ({{
-                            getAgeForYear(event.start.year)
+                            displayAgeForTimelineEvent(event)
                           }})</mat-option
                         >
                       }
@@ -255,7 +258,7 @@
                         @for (event of getEndEvents(); track event.id) {
                           <mat-option [value]="'event:' + event.id"
                             >{{ getTimelineEventLabel(event.name) }} ({{
-                              getAgeForYear(event.start.year)
+                              displayAgeForTimelineEvent(event)
                             }})</mat-option
                           >
                         }
@@ -305,6 +308,9 @@
                 </div>
               }
             </div>
+            @if (startEndDurationHint) {
+              <span class="field-hint">{{ startEndDurationHint }}</span>
+            }
           </div>
         </div>
 
@@ -356,6 +362,8 @@
       <div>
         <button
           (click)="closeDialog()"
+          type="button"
+          [disabled]="isSaving"
           class="button-icon-outline w-100 d-block"
         >
           <span class="f-s-16">{{ "Cancel" | translate }}</span>
@@ -366,10 +374,15 @@
           (click)="addExpense()"
           type="button"
           [disabled]="isWithdrawalSaveButtonDisabled"
-          class="button-icon w-100 d-block"
+          class="button-icon w-100 d-block save-action-btn"
         >
-          <!-- <span class="f-s-16">{{isEditWorkflow ? 'Save' : 'Add'}} Withdrawal</span> -->
-          <span class="f-s-16">{{ 'Save' | translate }}</span>
+          <span class="save-btn-inner">
+            @if (isSaving) {
+              <mat-spinner diameter="22" mode="indeterminate" />
+            } @else {
+              <span class="f-s-16">{{ 'Save' | translate }}</span>
+            }
+          </span>
         </button>
       </div>
     </div>

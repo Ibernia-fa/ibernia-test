@@ -6,6 +6,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectChange, MatSelectModule } from '@angular/material/select';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatButtonModule } from '@angular/material/button';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCardModule } from '@angular/material/card';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { provideNativeDateAdapter } from '@angular/material/core';
@@ -15,11 +16,12 @@ import { Cycle, EscalationRate } from '../../timeline/models/financial-timeline'
 import { WithdrawalsContributionsHttpService } from '../services/withdrawals-contributions-http.service';
 import moment from 'moment';
 import { FundsViewModel } from '../model/withdrawals-contributions';
-import { catchError, filter } from 'rxjs';
+import { catchError, filter, finalize } from 'rxjs';
 import { ClientSaving, ComissionType, SavingPotsModel } from '../../saving-pots/models/saving-pots.model';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
+import { AutoFocusDirective } from 'src/app/directives/auto-focus.directive';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { getAmountCycleLabel } from 'src/app/shared/utils/amount-cycle-label';
 import { extractEventId, resolveYear } from 'src/app/shared/utils/event-date-utils';
@@ -30,6 +32,7 @@ import {
   getCashflowDialogEndCalendarYear,
   getCompletedYearsAgeAtDate,
   getPersistedAgeForCalendarYear,
+  getProjectionAgeForClientEvent,
   getProjectionColumnAgeLabel,
 } from 'src/app/shared/utils/client-age-at-reference';
 import { calendarYearOrEventRefValidator } from 'src/app/shared/utils/calendar-year-or-event-ref.validator';
@@ -37,6 +40,7 @@ import {
   recurringEndYearNotSelected,
   resolveCycleDescriptionForRecurringEndGuard,
 } from 'src/app/shared/utils/recurring-end-save-guard';
+import { getStartEndDurationLabel } from 'src/app/shared/utils/start-end-duration-label';
 
 @Component({
   selector: 'app-add-withdrawal',
@@ -53,7 +57,9 @@ import {
     MatSliderModule,
     ReactiveFormsModule,
     MatCheckboxModule,
+    MatProgressSpinnerModule,
     ThousandSeparatorInputDirective,
+    AutoFocusDirective,
     TranslateModule,
   ],
   providers: [provideNativeDateAdapter()],
@@ -81,6 +87,7 @@ export class AddWithdrawalComponent {
   currentYear: number = new Date().getFullYear();
   selectedClient: Client | null = null;
   dialogEndCalendarYear = 0;
+  isSaving = false;
 
   constructor(
     private dialogRef: MatDialogRef<AddWithdrawalComponent>,
@@ -280,7 +287,20 @@ export class AddWithdrawalComponent {
     return translateTimelineEventDisplayName(this.translate, rawName);
   }
 
+  get startEndDurationHint(): string | null {
+    if (!this.showStartEnd) return null;
+    return getStartEndDurationLabel(
+      this.withdrawalForm.get('start')?.value,
+      this.withdrawalForm.get('end')?.value,
+      this.eventsList,
+      this.translate,
+    );
+  }
+
   get isWithdrawalSaveButtonDisabled(): boolean {
+    if (this.isSaving) {
+      return true;
+    }
     if (this.withdrawalForm.invalid) {
       return true;
     }
@@ -300,6 +320,9 @@ export class AddWithdrawalComponent {
   }
 
   addExpense(): void {
+    if (this.isSaving) {
+      return;
+    }
     if (this.isWithdrawalSaveButtonDisabled) return;
     this.withdrawalForm.markAllAsTouched();
     this.withdrawalForm.markAsDirty();
@@ -420,19 +443,28 @@ export class AddWithdrawalComponent {
           withdrawal
         );
 
+      this.isSaving = true;
       action$
         .pipe(
           filter((res) => !!res),
           catchError((err) => {
             console.error(err);
             throw err;
-          })
+          }),
+          finalize(() => {
+            this.isSaving = false;
+          }),
         )
-        .subscribe((res) => {
-          this.dialogRef.close({
-            status: 'Success',
-            contributionWithdrawal: res,
-          });
+        .subscribe({
+          next: (res) => {
+            this.dialogRef.close({
+              status: 'Success',
+              contributionWithdrawal: res,
+            });
+          },
+          error: () => {
+            // isSaving cleared in finalize
+          },
         });
       // Handle form submission logic
     }
@@ -499,23 +531,24 @@ export class AddWithdrawalComponent {
     }
 
     const retirementEvent = this.getRetirementEvent();
-    if (!retirementEvent) return;
+    if (!retirementEvent?.id) return;
 
     const startControl = this.withdrawalForm.get('start');
-    const retirementYear = retirementEvent?.start?.year;
-    if (startControl && retirementYear !== null && retirementYear !== undefined && retirementYear !== '') {
-      if (startControl.value === null || startControl.value === undefined || startControl.value === '') {
-        startControl.setValue(retirementYear);
-      }
+    if (startControl && (startControl.value === null || startControl.value === undefined || startControl.value === '')) {
+      startControl.setValue('event:' + retirementEvent.id);
     }
   }
 
   private getRetirementEvent(): any | null {
     const events = this.eventsList ?? [];
-    return events.find(
-      (event: any) =>
-        (event?.name ?? '').toString().toLowerCase() === 'retirement age'
-    ) ?? null;
+    return (
+      events.find((event: any) => {
+        const name = (event?.name ?? '').toString().trim().toLowerCase();
+        const isRetirementName =
+          name.startsWith('retirement age') || name.includes('pensione');
+        return isRetirementName && !event?.isPartnerEvent;
+      }) ?? null
+    );
   }
 
   private setDefaultSavingPot(): void {
@@ -581,6 +614,17 @@ export class AddWithdrawalComponent {
       this.dialogEndCalendarYear,
     );
     return Number.isNaN(a) ? 0 : a;
+  }
+
+  displayAgeForTimelineEvent(event: any): number {
+    return getProjectionAgeForClientEvent(event, {
+      clientBirthDate: this.data.clientBirthDate,
+      partnerBirthDate:
+        this.data.partnerBirthDate ?? this.selectedClient?.partnerDetail?.birthDate,
+      forecastStartDate: this.data.forecastStartDate,
+      planDuration: this.data.planDuration,
+      projectionInclusiveEndYear: this.dialogEndCalendarYear,
+    });
   }
 
   getStartYear(): number {

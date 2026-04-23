@@ -8,11 +8,7 @@
     <div class="dialog-header">
       <h2 class="dialog-title text-center">
         @if (isEditWorkflow) {
-          @if (savingsForm.get("name")?.value === "Custom") {
-            {{ displayPotName }}
-          } @else {
-            {{ displayPotName | translate }}
-          }
+          {{ displayPotName | translate }}
           @if (canEditName) {
             <img
               src="assets/images/svgs/drop-down-edit-2-line.svg"
@@ -32,6 +28,7 @@
         class="dialog-close-btn"
         mat-dialog-close
         aria-label="Close dialog"
+        [disabled]="isSaving"
         (click)="closeDialog()"
       >
         <mat-icon>close</mat-icon>
@@ -56,13 +53,7 @@
                 (selectionChange)="onNameValueChange($event.value)"
               >
                 <mat-select-trigger>
-                  @if (savingsForm.get("name")?.value === "Custom") {
-                    {{
-                      savingsForm.get("customName")?.value?.trim()
-                        ? savingsForm.get("customName")?.value
-                        : ("Custom" | translate)
-                    }}
-                  } @else if (savingsForm.get("name")?.value) {
+                  @if (savingsForm.get("name")?.value) {
                     {{ savingsForm.get("name")?.value | translate }}
                   }
                 </mat-select-trigger>
@@ -86,42 +77,6 @@
                   }
                 }
 
-                <mat-option [value]="'Custom'">
-                  <div class="d-flex align-items-center gap-8">
-                    <div style="height: 18px; width: 18px">
-                      <svg
-                        height="20"
-                        width="20"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke-width="1.5"
-                        stroke="#5A596E"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                        />
-                      </svg>
-                    </div>
-
-                    <!-- <img
-                      src="/assets/images/svgs/custom-option-icon.svg"
-                      alt="custom-event"
-                      height="20"
-                      width="20"
-                    /> -->
-                    <span
-                      style="
-                        margin-top: 2.5px;
-                        display: block;
-                        line-height: unset;
-                      "
-                      >{{ "Custom" | translate }}</span
-                    >
-                  </div>
-                </mat-option>
               </mat-select>
               <span class="custom-arrow">
                 <svg
@@ -155,36 +110,22 @@
           </div>
         }
         @if (
-          savingsForm.get("name")?.value === "Custom" &&
-          savingsForm.get("customName") &&
+          savingsForm.get("name")?.value !== "Cash" &&
           (!isEditWorkflow || showNameEdit)
         ) {
           <div class="w-100 form-field gap-8">
             <mat-label
               class="f-s-16 f-w-500 d-block ibr-black"
               style="line-height: 16px"
-              >{{ "Name" | translate }}</mat-label
+              >{{ "SAVINGS_POT.NAME_OPTIONAL" | translate }}</mat-label
             >
-            @if (savingsForm.get("customName")) {
-              <input matInput formControlName="customName" />
-            } @else {
-              <input matInput [placeholder]="'Enter name' | translate" />
-            }
-            @if (
-              savingsForm.get("customName")?.touched &&
-              savingsForm.get("customName")?.hasError("required")
-            ) {
-              <span class="field-error d-block">{{
-                "Required" | translate
-              }}</span>
-            }
-            @if (
-              savingsForm.get("customName")?.hasError("cashNameNotAllowed")
-            ) {
-              <span class="field-error d-block">{{
-                "A Cash pot already exists" | translate
-              }}</span>
-            }
+            <input
+              matInput
+              formControlName="customName"
+              [placeholder]="namePlaceholderKey | translate"
+              appAutoFocus
+              autoFocusSelect
+            />
           </div>
         }
         <!--End  Name Field  -->
@@ -274,6 +215,8 @@
                 thousandSeparatorInput
                 (input)="onAmountInput($event.target.value)"
                 (blur)="onAmountBlur($event)"
+                [appAutoFocus]="isCashTypeSelected"
+                autoFocusSelect
               />
             </div>
             <!-- End Price Field  -->
@@ -302,7 +245,7 @@
         </div>
         <!-- End Starting pot value Field  -->
 
-        <!-- Slider Section - Return Rate (NOT for Cash or Pension fund, hidden in Net Worth) -->
+        <!-- Slider Section - Return Rate (NOT for Cash, hidden in Net Worth) -->
         @if (
           !fromNetWorth &&
           savingsForm.get("name")?.value !== "Cash" &&
@@ -396,7 +339,7 @@
 
             @let realReturnPct =
               (savingsForm.get("returnRate")?.value || 0) - inflationRate;
-            <span class="return-rate">{{
+            <span class="field-hint">{{
               "SAVINGS_POT.REAL_RETURN_HINT"
                 | translate
                   : {
@@ -450,12 +393,17 @@
                   </div>
                   <!-- End Currency Selector  -->
 
-                  <!-- Amount Field  -->
+                  <!-- Amount Field (same localized grouping as Starting pot value) -->
                   <div class="w-100 form-field">
                     <input
                       matInput
-                      type="number"
+                      type="text"
+                      style="border-radius: 0px 4px 4px 0px"
                       formControlName="contributionAmount"
+                      #contributionAmountInput
+                      thousandSeparatorInput
+                      (input)="onContributionAmountInput($event.target.value)"
+                      (blur)="onContributionAmountBlur($event)"
                     />
                   </div>
                   <!-- End Amount Field  -->
@@ -509,6 +457,100 @@
               }
             </div>
 
+            <!-- Return Rate Slider (same design as Investment pot) -->
+            <div class="d-flex flex-column gap-4">
+              <div class="d-flex gap-4 align-items-center">
+                <mat-label
+                  class="f-s-16 f-w-500 d-block ibr-black"
+                  line-height:
+                  16px
+                  >{{ "Return rate" | translate }}</mat-label
+                >
+                <img
+                  width="18"
+                  src="assets/images/svgs/help-circle-icon.svg"
+                  alt="help-circle-icon"
+                />
+              </div>
+
+              <div class="d-flex align-items-center gap-24">
+                <div class="slider-customizer slider-wrapper">
+                  <mat-slider class="w-100" [min]="0" [max]="10" [step]="0.5">
+                    <input
+                      matSliderThumb
+                      [value]="sliderReturnRate"
+                      (input)="onSliderInput($event)"
+                    />
+                  </mat-slider>
+                </div>
+
+                <div class="percentage-field">
+                  <div class="w-100 form-field custom-rate-input">
+                    <input
+                      matInput
+                      type="text"
+                      inputmode="text"
+                      [value]="returnRateText"
+                      (input)="onReturnRateTextInput($event)"
+                      (blur)="onReturnRateBlur()"
+                    />
+                    <div class="custom-rate-suffix">
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 20 20"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M15.8337 4.16602L4.16699 15.8327"
+                          stroke="#48475D"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                        <path
+                          d="M5.41634 7.50065C6.56693 7.50065 7.49967 6.56791 7.49967 5.41732C7.49967 4.26672 6.56693 3.33398 5.41634 3.33398C4.26575 3.33398 3.33301 4.26672 3.33301 5.41732C3.33301 6.56791 4.26575 7.50065 5.41634 7.50065Z"
+                          stroke="#48475D"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                        <path
+                          d="M14.5833 16.6667C15.7339 16.6667 16.6667 15.7339 16.6667 14.5833C16.6667 13.4327 15.7339 12.5 14.5833 12.5C13.4327 12.5 12.5 13.4327 12.5 14.5833C12.5 15.7339 13.4327 16.6667 14.5833 16.6667Z"
+                          stroke="#48475D"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              @let realReturnPct =
+                (savingsForm.get("returnRate")?.value || 0) - inflationRate;
+              <span class="field-hint">{{
+                "SAVINGS_POT.REAL_RETURN_HINT"
+                  | translate
+                    : {
+                        real: realReturnPct | number: "1.2-2",
+                        inflation: inflationRate | number: "1.2-2",
+                      }
+              }}</span>
+
+              @if (
+                savingsForm.get("returnRate")?.touched &&
+                savingsForm.get("returnRate")?.hasError("required")
+              ) {
+                <span class="field-error d-block">{{
+                  "Required" | translate
+                }}</span>
+              }
+            </div>
+            <!-- End Return Rate Slider -->
+
             <!-- Start & End Date -->
             <div class="start-end">
               <div class="d-flex flex-column gap-8">
@@ -542,25 +584,17 @@
                             <hr />
                           }
                           @for (event of eventsList; track event) {
-                            <mat-option [value]="event.start.year"
+                            <mat-option [value]="'event:' + event.id"
                               >{{ event.name }} ({{
-                                event.start.age
+                                displayAgeForTimelineEvent(event)
                               }})</mat-option
                             >
                           }
                           <hr />
                           @for (year of years; track year) {
-                            @if (year === retirementAge) {
-                              <mat-option [value]="year"
-                                >{{ "Retirement age" | translate }} ({{
-                                  retirementAgeValue
-                                }})</mat-option
-                              >
-                            } @else {
-                              <mat-option [value]="year"
-                                >{{ year }} ({{ getAgeForYear(year) }})</mat-option
-                              >
-                            }
+                            <mat-option [value]="year"
+                              >{{ year }} ({{ getAgeForYear(year) }})</mat-option
+                            >
                           }
                         </mat-select>
                         <span class="custom-arrow">
@@ -605,27 +639,19 @@
                             event of getContributionEndEvents();
                             track event.id
                           ) {
-                            <mat-option [value]="event.start.year"
+                            <mat-option [value]="'event:' + event.id"
                               >{{ event.name }} ({{
-                                event.start.age
+                                displayAgeForTimelineEvent(event)
                               }})</mat-option
                             >
                           }
                           <hr />
                           @for (year of getContributionEndYears(); track year) {
-                            @if (year === retirementAge) {
-                              <mat-option [value]="year"
-                                >{{ "Retirement age" | translate }} ({{
-                                  retirementAgeValue
-                                }})</mat-option
-                              >
-                            } @else {
-                              <mat-option [value]="year"
-                                >{{ year }} ({{
-                                  getAgeForYear(year)
-                                }})</mat-option
-                              >
-                            }
+                            <mat-option [value]="year"
+                              >{{ year }} ({{
+                                getAgeForYear(year)
+                              }})</mat-option
+                            >
                           }
                         </mat-select>
                         <span class="custom-arrow">
@@ -667,18 +693,27 @@
                     "End date is required" | translate
                   }}</span>
                 }
+                @if (contributionDurationHint) {
+                  <span class="field-hint">{{ contributionDurationHint }}</span>
+                }
               </div>
             </div>
           </div>
         }
         <!-- End Pension fund specific fields -->
 
-        <!-- Lock Pot and Commissions Section (hidden in Net Worth) -->
-        @if (!fromNetWorth) {
+        <!-- Lock Pot and Commissions Section (hidden in Net Worth and for Cash) -->
+        @if (
+          !fromNetWorth && savingsForm.get("name")?.value !== "Cash"
+        ) {
           <div class="d-flex flex-column gap-16">
-            @if (savingsForm.get("name")?.value !== "Cash") {
               <!-- Lock Pot Checkbox -->
-              <section class="example-section">
+              <section
+                class="example-section"
+                [class.pension-lock-pot-disabled]="
+                  savingsForm.get('name')?.value === 'Pension fund'
+                "
+              >
                 <mat-checkbox
                   class="example-margin"
                   type="checkbox"
@@ -726,9 +761,9 @@
                                 <hr />
                               }
                               @for (event of eventsList; track event) {
-                                <mat-option [value]="event.start.year"
+                                <mat-option [value]="'event:' + event.id"
                                   >{{ event.name }} ({{
-                                    event.start.age
+                                    displayAgeForTimelineEvent(event)
                                   }})</mat-option
                                 >
                               }
@@ -790,9 +825,9 @@
                                 event of getLockEndEvents();
                                 track event.id
                               ) {
-                                <mat-option [value]="event.start.year"
+                                <mat-option [value]="'event:' + event.id"
                                   >{{ event.name }} ({{
-                                    event.start.age
+                                    displayAgeForTimelineEvent(event)
                                   }})</mat-option
                                 >
                               }
@@ -843,6 +878,9 @@
                         </div>
                       </div>
                     </div>
+                    @if (lockDurationHint) {
+                      <span class="field-hint">{{ lockDurationHint }}</span>
+                    }
                   </div>
                 </div>
               }
@@ -1335,17 +1373,16 @@
                   }
                 </div>
               }
-            }
           </div>
         }
 
         @if (fromNetWorth) {
-          <p class="net-worth-helper-note">
+          <span class="field-hint">
             {{
               "This asset is linked to the Savings section. Any changes made here will be reflected there as well."
                 | translate
             }}
-          </p>
+          </span>
         }
       </div>
     </mat-dialog-content>
@@ -1356,6 +1393,8 @@
       <div>
         <button
           (click)="closeDialog()"
+          type="button"
+          [disabled]="isSaving"
           class="button-icon-outline w-100 d-block"
         >
           <span class="f-s-16">{{ "Cancel" | translate }}</span>
@@ -1366,9 +1405,15 @@
           (click)="saveCashflow()"
           type="button"
           [disabled]="isSaveDisabled"
-          class="button-icon w-100 d-block"
+          class="button-icon w-100 d-block save-action-btn"
         >
-          <span class="f-s-16">{{ "Save" | translate }}</span>
+          <span class="save-btn-inner">
+            @if (isSaving) {
+              <mat-spinner diameter="22" mode="indeterminate" />
+            } @else {
+              <span class="f-s-16">{{ "Save" | translate }}</span>
+            }
+          </span>
         </button>
       </div>
     </div>

@@ -4,7 +4,8 @@
   background-color: white !important;
   border-radius: 12px;
   border: 1px solid #0000001a !important;
-  padding-left: 64px;
+  /* Room for .timeline-labels (absolute) + hover highlight margin-left without overlapping Age/Year. */
+  padding-left: 94px;
   /* Extra room so last x-axis tick labels are not clipped (vis centers labels on ticks). */
   padding-right: 40px;
   .card-main-wrapper {
@@ -349,6 +350,15 @@
   overflow: visible;
 }
 
+::ng-deep .timeline-container .vis-time-axis .vis-grid.vis-vertical {
+  border-left-width: 1px !important;
+  border-left-style: solid !important;
+  border-right: none !important;
+  border-top: none !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
+}
+
 .timeline-tooltip {
   position: fixed;
   background: rgba(0, 76, 153, 0.95);
@@ -372,6 +382,11 @@
   font-size: 12px;
 }
 
+
+::ng-deep .timeline-container .vis-time-axis .vis-text.vis-minor.highlighted {
+  margin-left: 0;
+}
+
 .vis-text.vis-minor.highlighted {
   background-color: #66b2ff;
   border-radius: 4px;
@@ -389,10 +404,19 @@
   color: #333;
 }
 
-::ng-deep .vis-custom-time.hoverLine,
-::ng-deep .vis-custom-time.dragOver {
+::ng-deep .timeline-container .vis-custom-time.hoverLine,
+::ng-deep .timeline-container .vis-custom-time.dragOver {
   pointer-events: none !important;
   cursor: default !important;
+  width: 0 !important;
+  background: none !important;
+  border: none !important;
+  border-left: 1px solid #4043af !important;
+  box-shadow: none !important;
+
+  > .vis-custom-time-marker {
+    display: none !important;
+  }
 }
 
 ::ng-deep .connector-lines-layer {
@@ -403,6 +427,12 @@
   height: 100%;
   pointer-events: none;
   z-index: 0;
+
+  .connector-line {
+    width: 0 !important;
+    background: none !important;
+    box-sizing: border-box;
+  }
 }
 
 // Disable vis-item pointer events during external chip drag

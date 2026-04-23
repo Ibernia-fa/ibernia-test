@@ -1,0 +1,814 @@
+$ibernia-blue: #4043af;
+$ibernia-blue-soft: #516ce8;
+$ibernia-ink: #1c1c1c;
+$ibernia-mute: #5a596e;
+$ibernia-line: #e5e5ec;
+$ibernia-bg-soft: #f5f7ff;
+
+.learn-inflation {
+  font-family: "Ubuntu", sans-serif;
+  color: $ibernia-ink;
+  min-height: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ----- Top header (close + optional back) ----- */
+.learn-inflation__header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 0;
+  z-index: 5;
+  pointer-events: none;
+
+  > * {
+    pointer-events: auto;
+  }
+}
+
+.learn-inflation__back-btn {
+  position: absolute !important;
+  top: 14px;
+  left: 14px;
+  background: transparent !important;
+  border: none;
+  box-shadow: none;
+  cursor: pointer;
+  color: $ibernia-mute;
+
+  &:focus,
+  &:focus-visible,
+  &:active {
+    outline: none;
+    background: transparent;
+  }
+
+  &:hover {
+    color: $ibernia-blue;
+  }
+}
+
+.learn-inflation__content {
+  padding-right: 0 !important;
+  margin-top: 0 !important;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  /* School layout rule: dialog body scrolls as a final safety net so cards,
+     insight tiles, disclaimers and CTAs are never clipped on smaller heights. */
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+/* ----- Page wrappers (impact / causes) ----- */
+.learn-inflation__page {
+  flex: 1 1 auto;
+  /* Use min-height: auto so the page never shrinks below its content's
+     intrinsic size; if the modal is too short, the dialog body scrolls
+     instead of clipping the side cards/footer/notice silently. */
+  display: flex;
+  flex-direction: column;
+  animation: learnInflationFadeIn 320ms ease;
+}
+
+@keyframes learnInflationFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================================
+   PAGE 1 — Inflation impact
+   ============================================================ */
+
+$impact-gutter: 56px;
+
+.learn-inflation__page--impact {
+  gap: 14px;
+  /* Shared School header rule: title row top = 14px (matches back/close btns). */
+  padding: 14px $impact-gutter 16px;
+}
+
+.learn-inflation__hero {
+  margin: 0;
+  font-size: 26px;
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  color: $ibernia-ink;
+  text-align: left;
+  max-width: 100%;
+  padding-right: 48px; /* keep clear of close icon */
+}
+
+.learn-inflation__layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 340px) 1fr;
+  gap: 24px;
+  flex: 1 1 auto;
+  /* Both columns still align at the top; the row track sizes to whichever
+     column has more content so the side cards are never clipped on short
+     modals. With min-height: auto, the layout pushes the page taller (and
+     ultimately scrolls the dialog body) rather than truncating content. */
+  align-items: stretch;
+}
+
+.learn-inflation__side {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  min-height: 0;
+}
+
+/* ----- Editable / output cards ----- */
+.impact-card {
+  position: relative;
+  border: 1px solid $ibernia-line;
+  border-radius: 14px;
+  padding: 14px 18px;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 0 0 auto;
+  box-shadow: 0 1px 0 rgba(20, 22, 48, 0.02);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  &:focus-within {
+    border-color: $ibernia-blue;
+    box-shadow: 0 0 0 3px rgba(64, 67, 175, 0.12);
+  }
+
+  &__label {
+    font-size: 11px;
+    font-weight: 600;
+    color: $ibernia-mute;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+  }
+
+  &__value {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1.1;
+    color: $ibernia-ink;
+    font-variant-numeric: tabular-nums;
+
+    &--tight {
+      gap: 2px;
+    }
+  }
+
+  &__currency {
+    font-size: 16px;
+    font-weight: 600;
+    color: $ibernia-mute;
+  }
+
+  &__readout {
+    font: inherit;
+    color: inherit;
+  }
+
+  &__suffix {
+    font-size: 22px;
+    font-weight: 600;
+    color: $ibernia-mute;
+  }
+
+  &__hint {
+    font-size: 13px;
+    color: $ibernia-mute;
+    line-height: 1.45;
+
+    &--loss {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 2px;
+      margin-top: 4px;
+    }
+  }
+
+  &__hint-line {
+    display: block;
+
+    &--euro {
+      font-weight: 500;
+      color: $ibernia-mute;
+    }
+  }
+
+  &__loss-amount {
+    margin-left: 4px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: #c62828;
+    white-space: nowrap;
+  }
+
+  &__note {
+    margin: 10px 0 0;
+    padding-top: 10px;
+    border-top: 1px solid rgba(64, 67, 175, 0.12);
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: $ibernia-mute;
+    font-weight: 400;
+    letter-spacing: 0.1px;
+  }
+
+  &__input {
+    flex: 1 1 auto;
+    border: none;
+    outline: none;
+    background: transparent;
+    font: inherit;
+    color: inherit;
+    width: 100%;
+    min-width: 0;
+    padding: 0;
+    font-variant-numeric: tabular-nums;
+
+    &::placeholder {
+      color: #c0c0cc;
+      font-weight: 600;
+    }
+  }
+
+  &--accent {
+    padding: 16px 18px 18px;
+    background:
+      linear-gradient(135deg, rgba(64, 67, 175, 0.09), rgba(81, 108, 232, 0.035));
+    border-color: rgba(64, 67, 175, 0.22);
+    box-shadow:
+      0 1px 0 rgba(20, 22, 48, 0.02),
+      0 8px 22px rgba(64, 67, 175, 0.07);
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: 12px;
+      bottom: 12px;
+      left: 0;
+      width: 3px;
+      border-radius: 0 3px 3px 0;
+      background: linear-gradient(180deg, $ibernia-blue, $ibernia-blue-soft);
+    }
+
+    .impact-card__value,
+    .impact-card__readout {
+      color: $ibernia-blue;
+      font-size: 30px;
+    }
+
+    .impact-card__currency {
+      color: rgba(64, 67, 175, 0.7);
+      font-size: 18px;
+    }
+  }
+}
+
+/* ----- Right side: chart ----- */
+.learn-inflation__main {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.learn-inflation__chart {
+  flex: 1 1 auto;
+  /* Lower floor: the graph yields vertical space first so insight tiles,
+     disclaimers, and CTAs on the side keep full visibility on short heights. */
+  min-height: 200px;
+  height: 100%;
+  border: 1px solid $ibernia-line;
+  border-radius: 16px;
+  background:
+    radial-gradient(120% 80% at 50% 0%, rgba(64, 67, 175, 0.035) 0%, rgba(64, 67, 175, 0) 60%),
+    #ffffff;
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    0 1px 0 rgba(20, 22, 48, 0.02),
+    0 10px 28px rgba(64, 67, 175, 0.05);
+
+  apx-chart {
+    position: absolute;
+    inset: 14px 18px 8px 6px;
+    display: block;
+  }
+}
+
+
+/* ----- Bottom CTA row ----- */
+.learn-inflation__footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.learn-inflation__cta-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.learn-inflation__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 38px;
+  padding: 0 16px;
+  border-radius: 10px;
+  border: 1px solid $ibernia-line;
+  background: #ffffff;
+  color: $ibernia-ink;
+  font-family: "Ubuntu", sans-serif;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease,
+    box-shadow 0.2s ease, transform 0.15s ease;
+
+  svg {
+    width: 16px;
+    height: 16px;
+    transition: transform 0.2s ease;
+  }
+
+  &:hover {
+    background: $ibernia-blue;
+    border-color: $ibernia-blue;
+    color: #ffffff;
+    box-shadow: 0 8px 18px rgba(64, 67, 175, 0.18);
+
+    svg {
+      transform: translateX(3px);
+    }
+  }
+
+  &:focus-visible {
+    outline: 2px solid $ibernia-blue;
+    outline-offset: 3px;
+  }
+}
+
+/* ----- Override shared school-notice spacing + icon alignment ----- */
+.learn-inflation__page--impact .school-notice {
+  margin: 6px 0 0;
+  width: 100%;
+  max-width: none;
+  align-self: stretch;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 12px 18px;
+
+  .school-notice__icon {
+    align-self: center;
+    width: 18px;
+    height: 18px;
+    font-size: 18px;
+    line-height: 1;
+    overflow: visible;
+  }
+
+  .school-notice__text {
+    align-self: center;
+  }
+}
+
+/* ============================================================
+   PAGE 2 — What causes inflation?
+   ============================================================ */
+
+.learn-inflation__page--causes {
+  gap: 24px;
+  /* Shared School header rule: title row top = 14px. */
+  padding: 14px 0 24px;
+}
+
+.causes-header {
+  display: flex;
+  flex-direction: column;
+  /* Shared School header rule: subtitle gap = 8px below the title. */
+  gap: 8px;
+  padding: 0 56px;
+  flex: 0 0 auto;
+
+  &__title {
+    margin: 0;
+    font-size: 30px;
+    line-height: 1.18;
+    font-weight: 700;
+    letter-spacing: -0.4px;
+    color: $ibernia-ink;
+  }
+
+  &__intro {
+    margin: 0;
+    font-size: 15.5px;
+    line-height: 1.55;
+    color: $ibernia-mute;
+    font-weight: 400;
+    max-width: 100%;
+  }
+}
+
+.causes-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+  flex: 1 1 auto;
+  min-height: 0;
+  align-items: stretch;
+  padding: 0 56px;
+}
+
+.cause-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(64, 67, 175, 0.10);
+  border-radius: 18px;
+  background: #ffffff;
+  overflow: hidden;
+  box-shadow:
+    0 1px 2px rgba(20, 22, 48, 0.04),
+    0 6px 18px rgba(64, 67, 175, 0.06);
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    transform 0.25s ease;
+
+  &:hover {
+    border-color: rgba(64, 67, 175, 0.22);
+    box-shadow:
+      0 1px 2px rgba(20, 22, 48, 0.05),
+      0 18px 36px rgba(64, 67, 175, 0.14);
+    transform: translateY(-3px);
+  }
+
+  &__hero {
+    position: relative;
+    height: 188px;
+    display: grid;
+    place-items: center;
+    padding: 20px 24px;
+    overflow: hidden;
+    /**
+     * Hero fill matches the off-white background of the 3D cause illustrations
+     * (#f6f5fa) so the square asset blends into the rectangular hero area and
+     * reads as one continuous block — no "image pasted on a tinted card" feel.
+     */
+    background: #f6f5fa;
+    border-bottom: 1px solid rgba(64, 67, 175, 0.07);
+  }
+
+  &__image {
+    position: relative;
+    z-index: 1;
+    display: block;
+    max-width: 100%;
+    max-height: 132px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    -webkit-user-drag: none;
+    user-select: none;
+    image-rendering: -webkit-optimize-contrast;
+
+    &[data-icon="demand"] {
+      max-height: 130px;
+    }
+
+    &[data-icon="cost"] {
+      max-height: 138px;
+    }
+
+    &[data-icon="builtIn"] {
+      max-height: 134px;
+    }
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 26px 26px 28px;
+    flex: 1 1 auto;
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 19px;
+    font-weight: 700;
+    color: $ibernia-ink;
+    letter-spacing: -0.2px;
+  }
+
+  &__desc {
+    margin: 0 0 8px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: $ibernia-mute;
+  }
+
+  &__example {
+    margin: auto 0 0;
+    padding: 14px 16px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(64, 67, 175, 0.05), rgba(81, 108, 232, 0.03));
+    border: 1px solid rgba(64, 67, 175, 0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  &__example-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    color: $ibernia-blue;
+  }
+
+  &__example-text {
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: $ibernia-ink;
+    font-weight: 400;
+  }
+}
+
+/* ============================================================
+   PAGE 3 — Inflation across countries
+   ============================================================ */
+
+.learn-inflation__page--countries {
+  gap: 18px;
+  /* Shared School header rule: title row top = 14px. */
+  padding-top: 14px;
+}
+
+.countries-header {
+  display: flex;
+  flex-direction: column;
+  /* Shared School header rule: subtitle gap = 8px below the title. */
+  gap: 8px;
+  padding: 0 56px;
+
+  &__title {
+    margin: 0;
+    font-size: 28px;
+    line-height: 1.2;
+    font-weight: 700;
+    letter-spacing: -0.4px;
+    color: $ibernia-ink;
+  }
+
+  &__intro {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.55;
+    color: $ibernia-mute;
+    font-weight: 400;
+    max-width: 100%;
+  }
+}
+
+.countries-chart-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 0 56px;
+}
+
+.countries-chart {
+  flex: 1 1 auto;
+  min-height: 280px;
+  border: 1px solid $ibernia-line;
+  border-radius: 16px;
+  background: #ffffff;
+  position: relative;
+  padding: 12px 8px 0 0;
+
+  apx-chart {
+    position: absolute;
+    inset: 12px 12px 4px 4px;
+    display: block;
+  }
+}
+
+.countries-footnote {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: $ibernia-mute;
+  font-style: italic;
+  padding: 0 4px;
+}
+
+.countries-sources {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 0 56px 4px;
+  font-size: 12px;
+  color: $ibernia-mute;
+
+  &__label {
+    font-weight: 500;
+  }
+
+  &__link {
+    color: $ibernia-mute;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(64, 67, 175, 0.25);
+    transition: color 0.2s ease, border-color 0.2s ease;
+
+    &:hover,
+    &:focus-visible {
+      color: $ibernia-blue;
+      border-bottom-color: $ibernia-blue;
+    }
+
+    &:focus-visible {
+      outline: 2px solid rgba(64, 67, 175, 0.35);
+      outline-offset: 2px;
+      border-radius: 2px;
+    }
+  }
+
+  &__sep {
+    color: rgba(90, 89, 110, 0.45);
+  }
+}
+
+/* ============================================================
+   Responsiveness
+   ============================================================ */
+
+@media (max-width: 1024px) {
+  .learn-inflation__page--impact {
+    /* Keep the shared 14px header top on tablet, just tighten the side gutter. */
+    padding: 14px 20px 14px;
+  }
+
+  .learn-inflation__hero {
+    margin: 0;
+    font-size: 22px;
+    padding-right: 40px;
+  }
+
+  .learn-inflation__layout {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .learn-inflation__side {
+    order: 2;
+  }
+
+  .learn-inflation__main {
+    order: 1;
+  }
+
+  .impact-card__value {
+    font-size: 24px;
+  }
+
+  .impact-card--accent .impact-card__value,
+  .impact-card--accent .impact-card__readout {
+    font-size: 26px;
+  }
+
+  .causes-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 0 16px;
+  }
+
+  .causes-header {
+    padding: 0 16px;
+
+    &__title {
+      font-size: 26px;
+    }
+  }
+
+  .cause-card__hero {
+    height: 200px;
+  }
+
+  .cause-card__body {
+    gap: 16px;
+    padding: 24px 22px 26px;
+  }
+
+  .cause-card__image {
+    max-height: 152px;
+
+    &[data-icon="demand"] {
+      max-height: 150px;
+    }
+
+    &[data-icon="cost"] {
+      max-height: 158px;
+    }
+
+    &[data-icon="builtIn"] {
+      max-height: 154px;
+    }
+  }
+
+  .countries-header {
+    padding: 0 16px;
+
+    &__title {
+      font-size: 24px;
+    }
+  }
+
+  .countries-chart-wrap,
+  .countries-sources {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}
+
+@media (max-width: 600px) {
+  .learn-inflation__hero {
+    font-size: 22px;
+  }
+
+  .learn-inflation__chart {
+    min-height: 240px;
+  }
+
+  .impact-card {
+    padding: 14px 16px;
+  }
+
+  .impact-card__value {
+    font-size: 22px;
+  }
+
+  .learn-inflation__cta {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .learn-inflation__cta-group {
+    width: 100%;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+}
+
+/* ============================================================
+   Dialog surface tweaks
+   ============================================================ */
+:host ::ng-deep .mdc-dialog__surface {
+  display: flex;
+  flex-direction: column;
+}
+
+:host ::ng-deep .learn-inflation__content.mat-mdc-dialog-content {
+  max-height: none;
+}
+
+/* ApexCharts legend uses overflow:auto; avoid the stray scrollbar beside the legend. */
+:host ::ng-deep .countries-chart .apexcharts-legend {
+  overflow: visible !important;
+  scrollbar-width: none;
+}
+
+:host ::ng-deep .countries-chart .apexcharts-legend::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}

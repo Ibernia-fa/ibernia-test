@@ -18,6 +18,7 @@ import {
   EMPTY,
   groupBy,
   mergeMap,
+  take,
 } from 'rxjs';
 import { NavItemService } from 'src/app/layouts/full/nav-item.service';
 import { EmergenciesHttpService as EmergenciesHttpService } from './services/emergencies-http.service';
@@ -376,6 +377,7 @@ export class EmergenciesComponent implements OnInit {
       .open(AddEmergenciesComponent, {
         width: '612px',
         disableClose: true,
+        autoFocus: false,
         data: {
           emergencyTypes: this.emergencyTypes,
           policyStatuses: this.policyStatuses,
@@ -470,9 +472,9 @@ export class EmergenciesComponent implements OnInit {
   getProtectionScoreCssClass(score: number | null): string {
     if (score == null || score < 50) {
       return 'ibernia-red';
-    } else if (score < 75) {
+    } else if (score < 70) {
       return 'ibernia-orange';
-    } else if (score < 89) {
+    } else if (score < 90) {
       return 'ibernia-light-green';
     } else {
       return 'ibernia-dark-green';
@@ -485,9 +487,9 @@ export class EmergenciesComponent implements OnInit {
 
     if (score == null || score < 50) {
       color = '#ff383c';
-    } else if (score < 75) {
+    } else if (score < 70) {
       color = '#E1B025cc';
-    } else if (score < 89) {
+    } else if (score < 90) {
       color = '#09AC65cc';
     } else {
       color = '#166A41cc';
@@ -573,6 +575,7 @@ export class EmergenciesComponent implements OnInit {
     const dialogRef = this.dialog.open(AddEmergenciesComponent, {
       width: '612px',
       disableClose: true,
+      autoFocus: false,
       data: {
         mode: 'edit',
         emergency,
@@ -765,12 +768,16 @@ export class EmergenciesComponent implements OnInit {
             );
             this.timeline = timeline;
             this.eventsList = this.timeline?.clientEvents.sort(
-              (a, b) => a.start.age - b.start.age,
+              (a, b) => (a.start?.year ?? 0) - (b.start?.year ?? 0),
             );
           },
         ),
       )
-      .subscribe();
+      .subscribe({
+        error: (err) => {
+          console.error('[Emergencies] getSimulateData failed:', err);
+        },
+      });
   }
 
   simulateEmergency(emergency: Emergency) {
@@ -779,49 +786,79 @@ export class EmergenciesComponent implements OnInit {
         (x) => x.emergencyId == emergency.id,
       ) ?? null;
 
-    const dialogRef = this.dialog.open(SimulateEmergencyComponent, {
-      width: '612px',
-      disableClose: true,
-      data: {
-        client: this.selectedClient,
-        cashflow: this.selectedCashflow,
-        clientPreferredCurrency: this.clientData?.preferredCurrency,
-        clientBirthDate: this.clientData?.birthDate,
-        emergency,
-        emergencyExpense,
-        amountCycles: this.amountCyclesAll,
-        escalationRates: this.escalationRates,
-        eventsList: this.timeline.clientEvents.sort(
-          (a, b) => a.start.age - b.start.age,
-        ),
-        incomes: this.incomeExpense?.incomes,
-        forecastEndDate: this.timeline.forecastEndtDate,
-        forecastStartDate: this.timeline.forecastStartDate,
-        forecastEndDateYear: moment(this.timeline.forecastEndtDate).year(),
-        forecastStartDateYear: moment(this.timeline.forecastStartDate).year(),
-        planDuration: this.selectedCashflow?.planDuration,
-      },
-    });
+    const openDialog = (timeline: FinancialTimeline) => {
+      const dialogRef = this.dialog.open(SimulateEmergencyComponent, {
+        width: '612px',
+        disableClose: true,
+        autoFocus: false,
+        data: {
+          client: this.selectedClient,
+          cashflow: this.selectedCashflow,
+          clientPreferredCurrency: this.clientData?.preferredCurrency,
+          clientBirthDate: this.clientData?.birthDate,
+          emergency,
+          emergencyExpense,
+          amountCycles: this.amountCyclesAll,
+          escalationRates: this.escalationRates,
+          timeline,
+          eventsList: (timeline?.clientEvents ?? []).sort(
+            (a, b) => (a.start?.year ?? 0) - (b.start?.year ?? 0),
+          ),
+          incomes: this.incomeExpense?.incomes,
+          forecastEndDate: timeline.forecastEndtDate,
+          forecastStartDate: timeline.forecastStartDate,
+          forecastEndDateYear: moment(timeline.forecastEndtDate).year(),
+          forecastStartDateYear: moment(timeline.forecastStartDate).year(),
+          planDuration: this.selectedCashflow?.planDuration,
+        },
+      });
 
-    dialogRef
-      .afterClosed()
-      .subscribe((updatedExpense: SimulateEmergencyModel | null) => {
-        if (!updatedExpense) return;
+      dialogRef
+        .afterClosed()
+        .subscribe((updatedExpense: SimulateEmergencyModel | null) => {
+          if (!updatedExpense) return;
 
-        if (this.stats != null) {
-          this.stats.emergencyExpenses ??= [];
+          if (this.stats != null) {
+            this.stats.emergencyExpenses ??= [];
 
-          const index =
-            this.stats?.emergencyExpenses.findIndex(
-              (x) => x.emergencyId === updatedExpense.emergencyId,
-            ) ?? -1;
+            const index =
+              this.stats?.emergencyExpenses.findIndex(
+                (x) => x.emergencyId === updatedExpense.emergencyId,
+              ) ?? -1;
 
-          if (index > -1) {
-            this.stats.emergencyExpenses[index] = updatedExpense;
-          } else {
-            this.stats?.emergencyExpenses.push(updatedExpense);
+            if (index > -1) {
+              this.stats.emergencyExpenses[index] = updatedExpense;
+            } else {
+              this.stats?.emergencyExpenses.push(updatedExpense);
+            }
           }
+          this.cdr.markForCheck();
+        });
+    };
+
+    // Open immediately when the page already has a timeline (avoids waiting on HTTP).
+    // The dialog refreshes linked financing events in its own ngOnInit.
+    if (this.timeline) {
+      openDialog(this.timeline);
+      return;
+    }
+
+    this.timelineHttpService
+      .getTimelineWithLinkedFinancialRecordsByCashflowId(this.cashflowId)
+      .pipe(
+        take(1),
+        takeUntilDestroyed(this.destroyRef),
+        catchError(() => of(null)),
+      )
+      .subscribe((response) => {
+        if (response) {
+          this.timeline = response.timeline;
+          this.eventsList = this.timeline?.clientEvents.sort(
+            (a, b) => (a.start?.year ?? 0) - (b.start?.year ?? 0),
+          );
         }
+        if (!this.timeline) return;
+        openDialog(this.timeline);
       });
   }
 

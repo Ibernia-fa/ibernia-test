@@ -1,6 +1,7 @@
 <span
   [dir]="options.dir!"
   [class.sidebar-visible]="!hideSidebar && !options.horizontal"
+  [class.sidebar-overlay-mode]="resView && !hideSidebar && !options.horizontal"
   [class.sidebar-collapsed]="
     options.sidenavCollapsed &&
     options.navPos !== 'top' &&
@@ -30,7 +31,7 @@
           options.sidenavCollapsed && options.navPos !== 'top' && !resView,
         'sidebarNav-horizontal': options.horizontal,
         cardBorder: options.cardBorder,
-        'no-footer-padding': isCashflowRoute,
+        'no-footer-padding': !showFooter,
         'custom-branded-background': usesCustomBackground,
       }"
       class="sidenavContainer"
@@ -43,12 +44,13 @@
         <mat-sidenav
           #leftsidenav
           id="horizontalOptionFalse"
-          [mode]="isOver ? 'over' : 'side'"
+          [mode]="resView ? 'over' : 'side'"
           [opened]="
-            options.navPos === 'side' &&
-            options.sidenavOpened &&
-            !isOver &&
-            !resView
+            resView
+              ? options.sidenavOpened
+              : options.navPos === 'side' &&
+                options.sidenavOpened &&
+                !isOver
           "
           (openedChange)="onSidenavOpenedChange($event)"
           (closedStart)="onSidenavClosedStart()"
@@ -58,7 +60,8 @@
             <app-sidebar
               (toggleMobileNav)="sidenav.toggle()"
               (toggleCollapsed)="toggleCollapsed()"
-              [showToggle]="isOver"
+              [showToggle]="resView"
+              [overlayLayout]="resView"
               [sidenavCollapsed]="options.sidenavCollapsed"
             ></app-sidebar>
             <div class="scrollable-content" [class.settings-sidebar]="isSettings">
@@ -178,63 +181,6 @@
       }
 
       <!-- ============================================================== -->
-      <!-- horizontal Sidebar -->
-      <!-- ============================================================== -->
-      @if (resView && !hideSidebar) {
-        <mat-sidenav
-          #leftsidenav
-          [mode]="'over'"
-          [opened]="options.sidenavOpened && !isTablet"
-          (openedChange)="onSidenavOpenedChange($event)"
-          (closedStart)="onSidenavClosedStart()"
-          id="resView"
-          class="sidebarNav"
-        >
-          <app-sidebar
-            [showToggle]="isOver"
-            [sidenavCollapsed]="options.sidenavCollapsed"
-            (toggleMobileNav)="sidenav.toggle()"
-            (toggleCollapsed)="toggleCollapsed()"
-          ></app-sidebar>
-          <ng-scrollbar class="position-relative" style="height: 100%">
-            <mat-nav-list class="sidebar-list">
-              @for (item of navItems; track item) {
-                <app-nav-item [item]="item" (notify)="sidenav.toggle()">
-                </app-nav-item>
-              }
-            </mat-nav-list>
-          </ng-scrollbar>
-          <div class="p-24 m-t-auto profile-bar">
-            <div
-              class="bg-light-secondary d-flex align-items-center rounded p-16"
-            >
-              <img
-                src="/assets/images/profile/user-1.jpg"
-                class="rounded-circle"
-                width="40"
-              />
-              <div class="m-l-16">
-                <h4 class="f-w-600">Mathew</h4>
-                <span class="f-s-12">Designer</span>
-              </div>
-              <div class="m-l-auto">
-                <a
-                  mat-icon-button
-                  [routerLink]="['/authentication/login']"
-                  class="d-flex justify-content-center"
-                >
-                  <i-tabler
-                    name="power"
-                    class="text-primary icon-18 d-flex"
-                  ></i-tabler>
-                </a>
-              </div>
-            </div>
-          </div>
-        </mat-sidenav>
-      }
-
-      <!-- ============================================================== -->
       <!-- Main Content -->
       <!-- ============================================================== -->
       <mat-sidenav-content class="contentWrapper" #content>
@@ -264,7 +210,8 @@
         >
           <app-header
             [hideSidebarToggle]="hideSidebar"
-            [showToggle]="!isOver"
+            [showToggle]="!resView"
+            [showHamburgerNav]="resView && !hideSidebar"
             (toggleCollapsed)="toggleCollapsed()"
             (toggleMobileNav)="sidenav.toggle()"
             (toggleMobileFilterNav)="filterNavRight.toggle()"

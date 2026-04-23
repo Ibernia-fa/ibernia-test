@@ -19,6 +19,8 @@ export interface CreateQuestionnaireLinkRequest {
   clientId: string;
   advisorId: string;
   questionIds: string[];
+  /** Appended as ?lang= on the public questionnaire URL (e.g. en, it). */
+  locale?: string;
 }
 
 export interface CreateQuestionnaireLinkResponse {
@@ -75,6 +77,13 @@ export class QuestionnaireHttpService {
   createLink(request: CreateQuestionnaireLinkRequest) {
     return this.httpClient.post<CreateQuestionnaireLinkResponse>(
       `${this.BASE_URL}/create`,
+      { ...request, questionIds: request.questionIds }
+    );
+  }
+
+  sendToClient(request: CreateQuestionnaireLinkRequest) {
+    return this.httpClient.post<CreateQuestionnaireLinkResponse>(
+      `${this.BASE_URL}/send-to-client`,
       { ...request, questionIds: request.questionIds }
     );
   }

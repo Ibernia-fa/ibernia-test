@@ -24,7 +24,7 @@ export const navItemslower: NavItem[] = [
     iconName: '/assets/images/svgs/book-solid.svg',
     iconOutline: '/assets/images/svgs/book-solid.svg',
     route: '/cashflows/{cashflowId}/school',
-    nonNavigable: true,
+    // nonNavigable: true,
   },
   {
     displayName: 'AI Chat',

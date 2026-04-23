@@ -54,6 +54,7 @@ import {
 import { notificationMatchesSearchQuery } from 'src/app/core/notification-search';
 import { CapitalizeFirstPipe } from 'src/app/core/pipes/capitalize-first.pipe';
 import { formatClientPersonDisplayName } from 'src/app/shared/utils/person-display-name';
+import { HOME_BREADCRUMB_LABEL } from 'src/app/shared/utils/breadcrumb-constants';
 
 interface notifications {
   id: number;
@@ -109,7 +110,14 @@ type LanguageCode = 'en' | 'it';
     encapsulation: ViewEncapsulation.None
 })
 export class HeaderComponent implements OnInit, OnDestroy {
+  /**
+   * Always-English label for the root breadcrumb item. Intentionally not
+   * routed through i18n so the first crumb stays "Home" in every locale.
+   */
+  readonly HOME_BREADCRUMB_LABEL = HOME_BREADCRUMB_LABEL;
   @Input() showToggle = true;
+  /** When true, show menu icon to open the sidenav in overlay layout (max-width 1023px). */
+  @Input() showHamburgerNav = false;
   @Input() hideSidebarToggle = false;
   @Input() toggleChecked = false;
   @Output() toggleMobileNav = new EventEmitter<void>();
@@ -123,6 +131,15 @@ showFiller = false;
   settingsPageName = ''; // Current settings section for breadcrumb
   clientProfileLink = ''; // Add this for the link
   planName = ''; // Current cashflow/plan name for breadcrumb
+  private previousUrl = '';
+  private currentCashflowId = '';
+  settingsBreadcrumbContext: {
+    type: 'home' | 'client' | 'plan';
+    clientLabel?: string;
+    clientLink?: string;
+    planName?: string;
+    planLink?: string;
+  } | null = null;
   public selectedLanguage: any = {
     language: 'English',
     code: 'en',
@@ -274,16 +291,26 @@ showFiller = false;
       .pipe(takeUntil(this.destroy$))
       .subscribe(cashflow => {
         this.planName = cashflow?.name ?? '';
+        this.currentCashflowId = cashflow?.id ?? '';
       });
 
 
-          this.router.events
+    this.previousUrl = this.router.url;
+    if (/^\/settings/.test(this.router.url)) {
+      this.isSettingsRoute = true;
+      this.restoreSettingsContext();
+    }
+
+    this.router.events
       .pipe(
         filter(event => event instanceof NavigationEnd),
         takeUntil(this.destroy$)
       )
-      .subscribe((event: NavigationEnd) => {
+      .subscribe(() => {
+        const wasSettingsRoute = this.isSettingsRoute;
         this.checkIfCashflowRoute();
+        this.handleSettingsNavContext(wasSettingsRoute);
+        this.previousUrl = this.router.url;
       });
   }
 
@@ -332,6 +359,70 @@ showFiller = false;
     if (this.isCashflowRoute) {
       this.buildClientProfileLink();
     }
+  }
+
+  private static readonly SETTINGS_CONTEXT_KEY = 'ibernia_settings_nav_context';
+
+  private handleSettingsNavContext(wasSettingsRoute: boolean): void {
+    const currentUrl = this.router.url;
+    this.isSettingsRoute = /^\/settings/.test(currentUrl);
+
+    if (this.isSettingsRoute && !wasSettingsRoute) {
+      this.captureSettingsContext();
+    } else if (this.isSettingsRoute && !this.settingsBreadcrumbContext) {
+      this.restoreSettingsContext();
+    } else if (!this.isSettingsRoute && wasSettingsRoute) {
+      this.clearSettingsContext();
+    }
+  }
+
+  private captureSettingsContext(): void {
+    let context: NonNullable<HeaderComponent['settingsBreadcrumbContext']>;
+
+    if (/^\/cashflows\//.test(this.previousUrl) && this.currentClient && this.planName) {
+      const clientLink = this.currentClient.id ? `/clients/${this.currentClient.id}/profile` : '';
+      context = {
+        type: 'plan',
+        clientLabel: this.cashflowBreadcrumbClientLabel,
+        clientLink,
+        planName: this.planName,
+        planLink: this.currentCashflowId ? `/cashflows/${this.currentCashflowId}/timeline` : '',
+      };
+    } else if (/^\/clients\/[^\/]+/.test(this.previousUrl) && this.currentClient) {
+      const clientLink = this.currentClient.id ? `/clients/${this.currentClient.id}/profile` : '';
+      context = {
+        type: 'client',
+        clientLabel: this.cashflowBreadcrumbClientLabel,
+        clientLink,
+      };
+    } else {
+      context = { type: 'home' };
+    }
+
+    this.settingsBreadcrumbContext = context;
+    try {
+      sessionStorage.setItem(HeaderComponent.SETTINGS_CONTEXT_KEY, JSON.stringify(context));
+    } catch { /* storage quota – breadcrumb won't survive refresh */ }
+  }
+
+  private restoreSettingsContext(): void {
+    try {
+      const raw = sessionStorage.getItem(HeaderComponent.SETTINGS_CONTEXT_KEY);
+      if (raw) {
+        this.settingsBreadcrumbContext = JSON.parse(raw);
+      } else {
+        this.settingsBreadcrumbContext = { type: 'home' };
+      }
+    } catch {
+      this.settingsBreadcrumbContext = { type: 'home' };
+    }
+  }
+
+  private clearSettingsContext(): void {
+    this.settingsBreadcrumbContext = null;
+    try {
+      sessionStorage.removeItem(HeaderComponent.SETTINGS_CONTEXT_KEY);
+    } catch { /* ignored */ }
   }
 
   private static readonly SETTINGS_PAGE_LABELS: Record<string, string> = {
@@ -478,9 +569,11 @@ get userInitials(): string {
             if (!p?.userId) return;
             this.userId = p.userId;
             const language = p.preferences?.language;
-            this.currentLanguage = language === 'it' ? 'it' : 'en';
-            this.setOtherLanguage();
-            this.languageService.setFromApi(p.preferences?.language as LanguageCode);
+            if (language) {
+              this.currentLanguage = language === 'it' ? 'it' : 'en';
+              this.setOtherLanguage();
+              this.languageService.setFromApi(language);
+            }
             this.settingsService.setUserData(res.body);
             // profileImagePreview is synced from userData$ (including cleared photo)
 

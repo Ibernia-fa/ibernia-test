@@ -1,0 +1,1001 @@
+$ibernia-blue: #4043af;
+$ibernia-blue-soft: #516ce8;
+$ibernia-ink: #1c1c1c;
+$ibernia-mute: #5a596e;
+$ibernia-line: #e5e5ec;
+$ibernia-bg-soft: #f5f7ff;
+$benchmark-red: #c45a5a;
+$benchmark-orange: #d49252;
+/* Mid zone is rendered in a true purple to match the spec (red / purple /
+   orange triad). Kept separate from $ibernia-blue so the marker, callout
+   and brand accents stay on-brand. */
+$benchmark-purple: #7b5cd6;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: 100%;
+}
+
+.learn-cash-buffer {
+  font-family: "Ubuntu", sans-serif;
+  color: $ibernia-ink;
+  min-height: 0;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ----- Top header (close btn) ----- */
+.learn-cash-buffer__header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 0;
+  z-index: 5;
+  pointer-events: none;
+
+  > * {
+    pointer-events: auto;
+  }
+}
+
+.learn-cash-buffer__content {
+  padding-right: 0 !important;
+  margin-top: 0 !important;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  /* School layout rule: dialog body scrolls as a final safety net so cards,
+     insight tiles, disclaimers and CTAs are never clipped on smaller heights. */
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+/* ----- Page wrapper ----- */
+.learn-cash-buffer__page {
+  flex: 1 1 auto;
+  /* Use min-height: auto so the page never shrinks below its content's
+     intrinsic size; if the modal is too short, the dialog body scrolls
+     instead of clipping the side cards/footer/notice silently. */
+  display: flex;
+  flex-direction: column;
+  animation: learnCashFadeIn 320ms ease;
+}
+
+@keyframes learnCashFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================================
+   PAGE — Cash buffer impact
+   (mirrors `.learn-inflation__page--impact` design system)
+   ============================================================ */
+
+$impact-gutter: 56px;
+
+.learn-cash-buffer__page--impact {
+  gap: 14px;
+  /* Shared School header rule: title row top = 14px (matches close btn). */
+  padding: 14px $impact-gutter 16px;
+}
+
+.learn-cash-buffer__hero {
+  margin: 0;
+  font-size: 26px;
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  color: $ibernia-ink;
+  text-align: left;
+  max-width: 100%;
+  padding-right: 48px; /* keep clear of close icon */
+}
+
+.learn-cash-buffer__layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 340px) 1fr;
+  gap: 24px;
+  flex: 1 1 auto;
+  /* Both columns still align at the top; the row track sizes to whichever
+     column has more content so the side cards are never clipped on short
+     modals. With min-height: auto, the layout pushes the page taller (and
+     ultimately scrolls the dialog body) rather than truncating content. */
+  align-items: stretch;
+}
+
+.learn-cash-buffer__side {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  min-height: 0;
+}
+
+/* Right column: the benchmark chart fills the available height so the
+   layout stays balanced with the stacked left column (inputs + insight). */
+.learn-cash-buffer__main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ----- Editable input cards (shared with inflation slide) ----- */
+.impact-card {
+  position: relative;
+  border: 1px solid $ibernia-line;
+  border-radius: 14px;
+  padding: 14px 18px;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 0 0 auto;
+  box-shadow: 0 1px 0 rgba(20, 22, 48, 0.02);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  &:focus-within {
+    border-color: $ibernia-blue;
+    box-shadow: 0 0 0 3px rgba(64, 67, 175, 0.12);
+  }
+
+  &__label {
+    font-size: 11px;
+    font-weight: 600;
+    color: $ibernia-mute;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+  }
+
+  &__value {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1.1;
+    color: $ibernia-ink;
+    font-variant-numeric: tabular-nums;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    min-width: 0;
+  }
+
+  &__currency {
+    font-size: 16px;
+    font-weight: 600;
+    color: $ibernia-mute;
+    flex-shrink: 0;
+  }
+
+  &__suffix {
+    font-size: 18px;
+    font-weight: 600;
+    color: $ibernia-mute;
+    flex-shrink: 0;
+  }
+
+  &__input {
+    flex: 1 1 auto;
+    border: none;
+    outline: none;
+    background: transparent;
+    font: inherit;
+    color: inherit;
+    width: 100%;
+    min-width: 0;
+    padding: 0;
+    font-variant-numeric: tabular-nums;
+
+    &::placeholder {
+      color: #c0c0cc;
+      font-weight: 600;
+    }
+  }
+
+  /* Premium accent treatment, identical to the inflation slide. */
+  &--accent {
+    padding: 14px 18px 16px;
+    background:
+      linear-gradient(135deg, rgba(64, 67, 175, 0.09), rgba(81, 108, 232, 0.035));
+    border-color: rgba(64, 67, 175, 0.22);
+    box-shadow:
+      0 1px 0 rgba(20, 22, 48, 0.02),
+      0 8px 22px rgba(64, 67, 175, 0.07);
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: 12px;
+      bottom: 12px;
+      left: 0;
+      width: 3px;
+      border-radius: 0 3px 3px 0;
+      background: linear-gradient(180deg, $ibernia-blue, $ibernia-blue-soft);
+    }
+  }
+}
+
+/* ============================================================
+   Right column: richer benchmark graph (hero element)
+   Vertical orientation: scale runs bottom → top
+   (0 → 3 → 12 → 24 → above 24). All position math reuses the
+   percentage signals computed in the component (--bm-pos-3,
+   --bm-pos-12, --bm-pos-24) so thresholds and meaning are
+   identical to the previous horizontal version.
+   ============================================================ */
+.learn-cash-buffer__viz {
+  display: flex;
+  width: 100%;
+  min-height: 0;
+  flex: 1 1 auto;
+  /* Center the chart card horizontally inside the right column so the
+     composition no longer crowds the left edge of the dialog. */
+  justify-content: center;
+}
+
+/* Tick / band positions on the visual scale.
+   The chart now uses a FIXED categorical scale split into four equal
+   sections (0–3, 3–12, 12–24, 24+) so each colour band is always 25%
+   of the track height regardless of the user's value. Positions are
+   bound at runtime via CSS custom properties on `.bm-chart`; the
+   defaults below match the categorical layout exactly. */
+$bm-pos-3-default: 25%;     // bottom of the 3–12 section
+$bm-pos-12-default: 50%;    // bottom of the 12–24 section
+$bm-pos-24-default: 75%;    // bottom of the 24+ section
+
+/* Geometry shared across line, band, guides and marker. The line itself
+   sits at the horizontal center of the track column; everything else is
+   anchored to the same vertical axis so the chart reads as a single
+   continuous bar. */
+$bm-line-thickness: 8px;
+$bm-band-width: 36px;
+$bm-callout-offset: 22px; /* horizontal distance between marker cap and callout */
+$bm-track-min-height: 360px;
+
+.bm-chart {
+  --bm-pos-3: #{$bm-pos-3-default};
+  --bm-pos-12: #{$bm-pos-12-default};
+  --bm-pos-24: #{$bm-pos-24-default};
+  /* Horizontal space reserved on the zones column for the marker
+     callout (which floats to the right of the track). Tightened so
+     the chart composition feels centered inside its card instead of
+     leaving a wide empty band on the right. */
+  --bm-callout-rail: 124px;
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+  /* Cap the chart card width so the 3-column composition (ticks,
+     track, zones) reads as a single centered block within the right
+     layout column instead of stretching to fill it. The card itself is
+     centered horizontally via `align-self` on `.learn-cash-buffer__viz`. */
+  max-width: 620px;
+  padding: 22px 28px 18px;
+  border: 1px solid $ibernia-line;
+  border-radius: 16px;
+  background:
+    radial-gradient(120% 80% at 50% 0%, rgba(64, 67, 175, 0.045) 0%, rgba(64, 67, 175, 0) 60%),
+    #ffffff;
+  box-shadow:
+    0 1px 0 rgba(20, 22, 48, 0.02),
+    0 10px 28px rgba(64, 67, 175, 0.05);
+  justify-content: stretch;
+  flex: 1 1 auto;
+}
+
+/* ---------- Plot area: ticks | track | zones ----------
+   The three columns share the same height so tick labels align with the
+   track positions and zone labels sit centered inside their colour band.
+   Columns size to their content and the whole grid is centered inside
+   the chart card so left/right whitespace stays balanced. */
+.bm-chart__plot {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto auto auto;
+  justify-content: center;
+  align-items: stretch;
+  gap: 18px;
+  width: 100%;
+  flex: 1 1 auto;
+  min-height: $bm-track-min-height;
+}
+
+/* ---------- Vertical track ---------- */
+.bm-chart__track-wrap {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  width: $bm-band-width;
+  height: 100%;
+}
+
+.bm-chart__track {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* Subtle horizontal guides at 3, 12 and 24 — kept very light. */
+.bm-chart__guide {
+  position: absolute;
+  left: 50%;
+  width: $bm-band-width;
+  height: 1px;
+  transform: translateX(-50%);
+  background: rgba(64, 67, 175, 0.16);
+  pointer-events: none;
+
+  &--3 {
+    bottom: var(--bm-pos-3);
+  }
+
+  &--12 {
+    bottom: var(--bm-pos-12);
+  }
+
+  &--24 {
+    bottom: var(--bm-pos-24);
+    /* Slightly stronger to mark the start of the 24+ excess band. */
+    background: rgba($benchmark-red, 0.32);
+  }
+}
+
+/* Soft pill highlighting the healthy 3–12 range, drawn vertically
+   behind the line so the band reads as the safe corridor. */
+.bm-chart__band {
+  position: absolute;
+  left: 50%;
+  width: $bm-band-width;
+  bottom: var(--bm-pos-3);
+  height: calc(var(--bm-pos-12) - var(--bm-pos-3));
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: linear-gradient(
+    180deg,
+    rgba($benchmark-purple, 0.16) 0%,
+    rgba($benchmark-purple, 0.08) 100%
+  );
+  border: 1px solid rgba($benchmark-purple, 0.18);
+  pointer-events: none;
+  transition: bottom 320ms cubic-bezier(0.2, 0.7, 0.2, 1),
+    height 320ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+/* Coloured vertical line, split into the four fixed sections. The
+   25 %/25 %/25 %/25 % heights never change with the user value. */
+.bm-chart__line {
+  position: absolute;
+  left: 50%;
+  width: $bm-line-thickness;
+  border-radius: $bm-line-thickness * 0.5;
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 1;
+
+  &--low {
+    bottom: 0;
+    height: var(--bm-pos-3);
+    background: linear-gradient(
+      0deg,
+      rgba($benchmark-red, 0.95) 0%,
+      rgba($benchmark-red, 0.82) 100%
+    );
+    border-radius: 0 0 $bm-line-thickness * 0.5 $bm-line-thickness * 0.5;
+  }
+
+  &--mid {
+    bottom: var(--bm-pos-3);
+    height: calc(var(--bm-pos-12) - var(--bm-pos-3));
+    background: linear-gradient(
+      0deg,
+      rgba($benchmark-purple, 0.85) 0%,
+      rgba($benchmark-purple, 0.7) 50%,
+      rgba($benchmark-purple, 0.85) 100%
+    );
+  }
+
+  &--high {
+    bottom: var(--bm-pos-12);
+    height: calc(var(--bm-pos-24) - var(--bm-pos-12));
+    background: linear-gradient(
+      0deg,
+      rgba($benchmark-orange, 0.78) 0%,
+      rgba($benchmark-orange, 0.92) 100%
+    );
+  }
+
+  /* 24+ excess band: rendered red because cash beyond ~24 months of
+     expenses sits well past the healthy buffer corridor. */
+  &--excess {
+    bottom: var(--bm-pos-24);
+    height: calc(100% - var(--bm-pos-24));
+    background: linear-gradient(
+      0deg,
+      rgba($benchmark-red, 0.85) 0%,
+      rgba($benchmark-red, 0.95) 100%
+    );
+    border-radius: $bm-line-thickness * 0.5 $bm-line-thickness * 0.5 0 0;
+  }
+}
+
+/* ---------- User-position marker ----------
+   Zero-sized anchor centered on the vertical track at `bottom: X%`.
+   Cap sits on the line; the stem extends to the RIGHT into the
+   "callout rail" reserved on the zones column (via padding-left on
+   `.bm-chart__zones`), so the callout floats next to the marker
+   without ever covering the zone descriptions. */
+.bm-chart__marker {
+  position: absolute;
+  left: 50%;
+  width: 0;
+  height: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.bm-chart__marker-cap {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: $ibernia-blue;
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 6px rgba(28, 28, 28, 0.18);
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+.bm-chart__marker-stem {
+  position: absolute;
+  top: 0;
+  left: 9px;
+  width: $bm-callout-offset - 6px;
+  height: 2px;
+  transform: translateY(-50%);
+  border-radius: 1px;
+  background: $ibernia-blue;
+  opacity: 0.85;
+}
+
+.bm-chart__callout {
+  position: absolute;
+  top: 0;
+  left: calc(#{$bm-callout-offset} + 9px);
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 9px 14px;
+  min-width: 132px;
+  border-radius: 12px;
+  background: #ffffff;
+  border: 1px solid rgba(64, 67, 175, 0.18);
+  box-shadow:
+    0 2px 0 rgba(20, 22, 48, 0.03),
+    0 8px 18px rgba(64, 67, 175, 0.12);
+  white-space: nowrap;
+}
+
+/* Excess (>24 months) marker treatment: cap, stem, callout border and
+   value all switch to the red excess colour so the user can see at a
+   glance that they have plotted into the unhealthy 24+ band. */
+.bm-chart__marker[data-excess="true"] {
+  .bm-chart__marker-cap {
+    background: $benchmark-red;
+    box-shadow: 0 2px 6px rgba(196, 90, 90, 0.35);
+  }
+
+  .bm-chart__marker-stem {
+    background: $benchmark-red;
+  }
+
+  .bm-chart__callout {
+    border-color: rgba($benchmark-red, 0.32);
+    box-shadow:
+      0 2px 0 rgba(20, 22, 48, 0.03),
+      0 8px 18px rgba(196, 90, 90, 0.18);
+  }
+
+  .bm-chart__callout-value strong {
+    color: $benchmark-red;
+  }
+}
+
+.bm-chart__callout-label {
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  color: $ibernia-mute;
+  text-transform: none;
+}
+
+.bm-chart__callout-value {
+  font-size: 15px;
+  font-weight: 500;
+  color: $ibernia-ink;
+  font-variant-numeric: tabular-nums;
+
+  strong {
+    font-size: 22px;
+    font-weight: 700;
+    color: $ibernia-blue;
+    margin-right: 4px;
+  }
+}
+
+/* Edge-aware vertical alignment so the callout never overflows the
+   chart at the top or bottom of the scale. The stem stays anchored
+   at the marker line; only the callout shifts. */
+.bm-chart__marker[data-align="start"] .bm-chart__callout {
+  /* Marker near the bottom: pin the callout's BOTTOM to the marker so
+     it extends upward, away from the bottom edge. */
+  transform: translateY(-100%);
+}
+
+.bm-chart__marker[data-align="end"] .bm-chart__callout {
+  /* Marker near the top: pin the callout's TOP to the marker so it
+     extends downward, away from the top edge. */
+  transform: translateY(0);
+}
+
+/* ---------- Tick labels (left column) ---------- */
+$bm-tick-connector-width: 12px;
+
+.bm-chart__ticks {
+  position: relative;
+  height: 100%;
+  min-width: 28px;
+  font-variant-numeric: tabular-nums;
+}
+
+.bm-chart__tick {
+  position: absolute;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transform: translateY(50%);
+  white-space: nowrap;
+  transition: bottom 320ms cubic-bezier(0.2, 0.7, 0.2, 1);
+
+  &--0 { bottom: 0; }
+  &--3 { bottom: var(--bm-pos-3); }
+  &--12 { bottom: var(--bm-pos-12); }
+  &--24 { bottom: var(--bm-pos-24); }
+  &--max { bottom: 100%; }
+}
+
+.bm-chart__tick-connector {
+  display: block;
+  width: $bm-tick-connector-width;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    rgba(64, 67, 175, 0.05) 0%,
+    rgba(64, 67, 175, 0.28) 100%
+  );
+}
+
+.bm-chart__tick-label {
+  display: block;
+  font-size: 17px;
+  font-weight: 600;
+  color: $ibernia-ink;
+  line-height: 1;
+}
+
+/* The "24+" tick is the upper boundary of the fixed excess band.
+   It uses the red accent so it reads consistently with the 24+ zone. */
+.bm-chart__tick--max .bm-chart__tick-connector {
+  background: linear-gradient(
+    90deg,
+    rgba($benchmark-red, 0.06) 0%,
+    rgba($benchmark-red, 0.45) 100%
+  );
+}
+
+.bm-chart__tick--max .bm-chart__tick-label {
+  color: $benchmark-red;
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  text-transform: lowercase;
+}
+
+/* ---------- Zone descriptions (right column) ----------
+   Each zone is absolutely positioned so it sits centered inside its
+   colour band, matching the vertical extent of the corresponding line
+   segment. The left padding reserves a "callout rail" so the marker
+   callout (which floats out of the track to the right) never covers
+   zone titles. */
+.bm-chart__zones {
+  position: relative;
+  height: 100%;
+  min-width: 0;
+  padding-left: var(--bm-callout-rail);
+}
+
+.bm-chart__zone {
+  position: absolute;
+  left: var(--bm-callout-rail);
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  padding: 4px 4px 4px 0;
+  text-align: left;
+
+  &--low {
+    bottom: 0;
+    height: var(--bm-pos-3);
+  }
+
+  &--mid {
+    bottom: var(--bm-pos-3);
+    height: calc(var(--bm-pos-12) - var(--bm-pos-3));
+  }
+
+  &--high {
+    bottom: var(--bm-pos-12);
+    height: calc(var(--bm-pos-24) - var(--bm-pos-12));
+  }
+
+  &--excess {
+    bottom: var(--bm-pos-24);
+    height: calc(100% - var(--bm-pos-24));
+  }
+}
+
+.bm-chart__zone-title {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.1px;
+  line-height: 1.25;
+}
+
+.bm-chart__zone-sub {
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 1.35;
+  color: $ibernia-mute;
+  max-width: 28ch;
+}
+
+.bm-chart__zone--low .bm-chart__zone-title {
+  color: $benchmark-red;
+}
+
+.bm-chart__zone--mid .bm-chart__zone-title {
+  color: $benchmark-purple;
+}
+
+.bm-chart__zone--high .bm-chart__zone-title {
+  color: $benchmark-orange;
+}
+
+.bm-chart__zone--excess .bm-chart__zone-title {
+  color: $benchmark-red;
+}
+
+/* ---------- Axis title ---------- */
+.bm-chart__axis-title {
+  display: block;
+  margin-top: 4px;
+  width: 100%;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: $ibernia-ink;
+}
+
+/* ============================================================
+   Insight card (stacked under the inputs in the left column;
+   uses the same accent-card family as the inflation slide).
+   ============================================================ */
+.learn-cash-buffer__insight {
+  flex: 0 0 auto;
+  min-height: 0;
+  align-items: stretch;
+  justify-content: flex-start;
+  margin-top: 4px;
+}
+
+.cb-result {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  width: 100%;
+  text-align: left;
+
+  &--neutral {
+    align-items: stretch;
+    text-align: center;
+  }
+}
+
+.cb-result__figure {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.cb-result__value {
+  font-size: clamp(32px, 4vw, 42px);
+  font-weight: 700;
+  letter-spacing: -0.8px;
+  color: $ibernia-blue;
+  font-variant-numeric: tabular-nums;
+}
+
+.cb-result__suffix {
+  font-size: 16px;
+  font-weight: 700;
+  color: $ibernia-ink;
+  letter-spacing: -0.2px;
+}
+
+.cb-result__sub {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: $ibernia-mute;
+  line-height: 1.4;
+}
+
+.cb-result__badge {
+  display: inline-block;
+  margin: 2px 0 0;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+
+  &--low {
+    background: rgba(200, 90, 110, 0.12);
+    color: #8b3a48;
+  }
+
+  &--ok {
+    background: rgba(64, 67, 175, 0.12);
+    color: $ibernia-blue;
+  }
+
+  &--high {
+    background: rgba(180, 140, 60, 0.15);
+    color: #7a5a1e;
+  }
+}
+
+.cb-result__practical {
+  margin: 4px 0 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  font-weight: 400;
+  color: $ibernia-mute;
+}
+
+.cb-result__neutral {
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 1.5;
+  font-weight: 500;
+  color: $ibernia-mute;
+  max-width: 460px;
+}
+
+/* ----- Override shared school-notice spacing to match inflation slide ----- */
+.learn-cash-buffer__page--impact .school-notice {
+  margin: 6px 0 0;
+  width: 100%;
+  max-width: none;
+  align-self: stretch;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 12px 18px;
+
+  .school-notice__icon {
+    align-self: center;
+    width: 18px;
+    height: 18px;
+    font-size: 18px;
+    line-height: 1;
+    overflow: visible;
+  }
+
+  .school-notice__text {
+    align-self: center;
+  }
+}
+
+/* ============================================================
+   Responsiveness
+   ============================================================ */
+
+@media (max-width: 1024px) {
+  .learn-cash-buffer__page--impact {
+    /* Keep the shared 14px header top on tablet, just tighten the side gutter. */
+    padding: 14px 20px 14px;
+  }
+
+  .learn-cash-buffer__hero {
+    margin: 0;
+    font-size: 22px;
+    padding-right: 40px;
+  }
+
+  .learn-cash-buffer__layout {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .learn-cash-buffer__side {
+    order: 2;
+  }
+
+  .learn-cash-buffer__main {
+    order: 1;
+  }
+
+  .impact-card__value {
+    font-size: 24px;
+  }
+
+  .bm-chart {
+    padding: 20px 20px 16px;
+    gap: 12px;
+  }
+
+  .bm-chart__plot {
+    gap: 14px;
+    min-height: 320px;
+  }
+
+  .bm-chart__zone-title {
+    font-size: 15px;
+  }
+
+  .bm-chart__zone-sub {
+    font-size: 13px;
+  }
+
+  .bm-chart__tick-label {
+    font-size: 15px;
+  }
+
+  .bm-chart__callout-label {
+    font-size: 12px;
+  }
+
+  .bm-chart__callout-value {
+    font-size: 14px;
+
+    strong {
+      font-size: 19px;
+    }
+  }
+
+  .learn-cash-buffer__main {
+    /* On tablet the chart sits above the inputs, so reserve enough
+       room for the zones, vertical track, ticks and callout to remain
+       readable. */
+    min-height: 360px;
+  }
+}
+
+@media (max-width: 600px) {
+  .learn-cash-buffer__hero {
+    font-size: 22px;
+  }
+
+  .impact-card {
+    padding: 14px 16px;
+  }
+
+  .impact-card__value {
+    font-size: 22px;
+  }
+
+  .bm-chart {
+    padding: 18px 16px 14px;
+    gap: 12px;
+    --bm-callout-rail: 96px;
+    max-width: none;
+  }
+
+  .bm-chart__plot {
+    gap: 10px;
+    min-height: 300px;
+  }
+
+  .bm-chart__track-wrap {
+    width: 28px;
+  }
+
+  .bm-chart__band,
+  .bm-chart__guide {
+    width: 28px;
+  }
+
+  .bm-chart__zone-title {
+    font-size: 13.5px;
+    white-space: normal;
+  }
+
+  .bm-chart__zone-sub {
+    font-size: 12px;
+  }
+
+  .bm-chart__tick-label {
+    font-size: 13.5px;
+  }
+
+  .bm-chart__callout {
+    min-width: 110px;
+    padding: 7px 11px;
+  }
+
+  .bm-chart__callout-label {
+    font-size: 11px;
+  }
+
+  .bm-chart__callout-value {
+    font-size: 13px;
+
+    strong {
+      font-size: 17px;
+    }
+  }
+
+  .bm-chart__axis-title {
+    font-size: 11px;
+    letter-spacing: 0.6px;
+  }
+
+  .cb-result__value {
+    font-size: 32px;
+  }
+}
+
+/* ============================================================
+   Dialog surface tweaks
+   ============================================================ */
+:host ::ng-deep .mdc-dialog__surface {
+  display: flex;
+  flex-direction: column;
+  max-height: 88vh;
+}
+
+:host ::ng-deep .learn-cash-buffer__content.mat-mdc-dialog-content {
+  max-height: none;
+}

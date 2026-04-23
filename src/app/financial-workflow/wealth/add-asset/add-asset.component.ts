@@ -13,8 +13,10 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 import { allCountries } from 'src/app/clients/models/country';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
+import { AutoFocusDirective } from 'src/app/directives/auto-focus.directive';
 import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
 
+import { capitalizeFirstLetter } from 'src/app/shared/utils/capitalize-first-letter';
 import { WealthHttpService } from '../services/wealth-http.service';
 import {
   WealthAssetModel,
@@ -51,6 +53,7 @@ function trimmedRequired(control: AbstractControl): ValidationErrors | null {
     MatRadioModule,
     MatSelectModule,
     ThousandSeparatorInputDirective,
+    AutoFocusDirective,
     TranslateModule,
   ],
   templateUrl: './add-asset.component.html',
@@ -158,7 +161,9 @@ export class AddAssetComponent {
 
     const formValue = this.form.value;
     const trimmedName = typeof formValue.name === 'string' ? formValue.name.trim() : '';
-    const nameOrNull = trimmedName ? trimmedName : null;
+    const nameOrNull = trimmedName
+      ? (this.isEditMode ? trimmedName : capitalizeFirstLetter(trimmedName))
+      : null;
 
     if (this.isEditMode) {
       const request = {

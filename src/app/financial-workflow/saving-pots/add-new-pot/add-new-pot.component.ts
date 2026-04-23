@@ -22,6 +22,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule, MatSelectChange } from '@angular/material/select';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatSliderModule } from '@angular/material/slider';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { allCountries } from 'src/app/clients/models/country';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import {
@@ -36,11 +37,12 @@ import {
   SavingPotOwnership,
   SavingPotType,
 } from '../models/saving-pots.model';
-import { catchError, filter } from 'rxjs';
+import { catchError, filter, finalize } from 'rxjs';
 import { TablerIconsModule } from 'angular-tabler-icons';
 import { CommonModule } from '@angular/common';
 import { parseFormattedNumber } from 'src/app/shared/utils/number-utils';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
+import { AutoFocusDirective } from 'src/app/directives/auto-focus.directive';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { TranslateEscalationDescriptionPipe } from 'src/app/core/pipes/translate-escalation-description.pipe';
 import { getAmountCycleLabel } from 'src/app/shared/utils/amount-cycle-label';
@@ -49,9 +51,13 @@ import {
   getCashflowDialogEndCalendarYear,
   getCompletedYearsAgeAtDate,
   getPersistedAgeForCalendarYear,
+  getProjectionAgeForClientEvent,
   getProjectionColumnAgeLabel,
 } from 'src/app/shared/utils/client-age-at-reference';
 import { calendarYearOrEventRefValidator } from 'src/app/shared/utils/calendar-year-or-event-ref.validator';
+import { extractEventId, resolveYear } from 'src/app/shared/utils/event-date-utils';
+import { getStartEndDurationLabel } from 'src/app/shared/utils/start-end-duration-label';
+import { capitalizeFirstLetter } from 'src/app/shared/utils/capitalize-first-letter';
 
 @Component({
   selector: 'app-add-new-pot',
@@ -68,9 +74,11 @@ import { calendarYearOrEventRefValidator } from 'src/app/shared/utils/calendar-y
     MatDatepickerModule,
     ReactiveFormsModule,
     MatSliderModule,
+    MatProgressSpinnerModule,
     TablerIconsModule,
     MatCheckboxModule,
     ThousandSeparatorInputDirective,
+    AutoFocusDirective,
     TranslateModule,
     TranslateEscalationDescriptionPipe,
   ],
@@ -79,6 +87,8 @@ import { calendarYearOrEventRefValidator } from 'src/app/shared/utils/calendar-y
 })
 export class AddNewPotComponent {
   @ViewChild('amountInput') amountInput?: ElementRef<HTMLInputElement>;
+  @ViewChild('contributionAmountInput')
+  contributionAmountInput?: ElementRef<HTMLInputElement>;
   @ViewChild('renameInputRef') renameInputRef?: ElementRef<HTMLInputElement>;
   savingsForm: FormGroup;
   years: number[] = [];
@@ -86,8 +96,10 @@ export class AddNewPotComponent {
   clientPreferredCurrency: string;
   clientBirthYear: number;
   clientAge: number;
-  retirementAge: number = 65;  // The year when retiring
-  retirementAgeValue: number = 65;  // The age at retirement
+  /** Calendar year of the active ownership’s retirement timeline event (API field; not “age”). */
+  retirementAge: number = 65;
+  /** Projection age at that retirement year (for labels / defaults). */
+  retirementAgeValue: number = 65;
   cycles: Cycle[];
   escalationRates: EscalationRate[];
   eventsList: any;
@@ -138,6 +150,7 @@ export class AddNewPotComponent {
   dialogEndCalendarYear: number;
   isCashPotEditMode: boolean;
   userReturnRate: any = 3.5;
+  pensionFundReturnRate: any = 4;
   /** Mat slider thumb binding (must be defined — template uses [value]). */
   sliderReturnRate = 0;
   /** Return rate text field next to slider (numeric part only; % is separate in UI). */
@@ -158,6 +171,9 @@ export class AddNewPotComponent {
     SavingPotOwnership.Person1,
     SavingPotOwnership.Person2
   ];
+  private contributionEndManuallyOverridden = false;
+  /** True while the save HTTP request is in flight (disables actions + shows spinner). */
+  isSaving = false;
 
   constructor(
     private dialogRef: MatDialogRef<AddNewPotComponent>,
@@ -190,6 +206,7 @@ export class AddNewPotComponent {
     ).trim();
     this.clientBirthYear = moment(data.clientBirthDate).year();
     this.userReturnRate = data.returnRate;
+    this.pensionFundReturnRate = data.pensionFundReturnRate ?? 4;
     const birthDate = new Date(data.clientBirthDate);
     const forecastStart = data.forecastStartDate
       ? new Date(data.forecastStartDate)
@@ -199,19 +216,6 @@ export class AddNewPotComponent {
       ? undefined
       : this.comissionTypes.find(x => x.value === prefType)?.label.toLowerCase();
     this.clientAge = getCompletedYearsAgeAtDate(birthDate, forecastStart);
-
-    // Extract retirement age from events if available
-    const retirementEvent = this.eventsList?.find((e: any) => 
-      e.name?.toLowerCase().includes('retirement') || 
-      e.name?.toLowerCase().includes('pensione')
-    );
-    if (retirementEvent) {
-      this.retirementAgeValue = retirementEvent.start.age;
-      const ry = Number(retirementEvent.start?.year);
-      this.retirementAge = Number.isFinite(ry)
-        ? ry
-        : this.retirementAgeValue + this.clientBirthYear;
-    }
 
     this.clientPreferredCurrency = data.clientPreferredCurrency;
     this.cashflowId = data.cashflowId;
@@ -230,6 +234,9 @@ export class AddNewPotComponent {
     if (!Number.isFinite(this.dialogEndCalendarYear)) {
       this.dialogEndCalendarYear = data.forecastStartDateYear;
     }
+
+    /** Joint: main client retirement for dropdown highlight; aligns with timeline axis ages. */
+    this.applyRetirementLabelsFromEvent(this.findRetirementEventForPerson(false));
 
     // Determine if this is a Cash pot edit mode EARLY (before form creation)
     if (this.isEditWorkflow) {
@@ -258,12 +265,16 @@ export class AddNewPotComponent {
       defaultType = this.selectedPot?.name || 'Investment';
     }
 
+    const defaultReturnRate = defaultType === 'Pension fund'
+      ? this.normalizeReturnRate(this.pensionFundReturnRate)
+      : this.normalizeReturnRate(this.userReturnRate);
+
     this.savingsForm = this.fb.group({
       name: [defaultType, Validators.required],
       currency: [this.clientPreferredCurrency, Validators.required],
       amount: [0, [Validators.required, this.minPositiveValue()]],
-      customName: [''],  // For Custom pots
-      returnRate: [this.normalizeReturnRate(this.userReturnRate)],
+      customName: [''],
+      returnRate: [defaultReturnRate],
       // lockPot: [true],
       lockPot: [defaultType === 'Pension fund'],  // Auto-check for Pension fund only
       start: [data.forecastStartDateYear, [calendarYearOrEventRefValidator()]],
@@ -282,9 +293,8 @@ export class AddNewPotComponent {
       // Pension fund specific fields
       contributionAmount: [0],
       contributionFrequency: [1],  // Monthly (1) by default
-      contributionStartDate: [data.forecastStartDateYear],  // This year
-      // No default — user must choose contribution end (validators + API enforce).
-      contributionEndDate: [null as number | null],
+      contributionStartDate: [data.forecastStartDateYear, [calendarYearOrEventRefValidator()]],
+      contributionEndDate: [null as number | string | null, [calendarYearOrEventRefValidator()]],
       ownership: [SavingPotOwnership.Joint]
     });
 
@@ -310,7 +320,15 @@ export class AddNewPotComponent {
     
     // Set up initial validators for Pension fund fields if default type is Pension fund
     this.updatePensionFundValidators(defaultType);
-    
+
+    if (!this.isEditWorkflow && defaultType === 'Pension fund') {
+      const ownership = this.savingsForm.get('ownership')?.value ?? SavingPotOwnership.Joint;
+      this.syncRetirementFieldsForOwnership(ownership);
+      this.savingsForm
+        .get('contributionEndDate')
+        ?.setValue(this.getDefaultContributionEndFormValue(ownership), { emitEvent: false });
+    }
+
     if(this.isEditWorkflow) {
       this.patchFormValues();
       if (this.isCashPotEditMode) {
@@ -319,9 +337,15 @@ export class AddNewPotComponent {
         this.savingsForm.get('name')?.disable({ emitEvent: false });
         this.selectedNameIconUrl = 'cashflow-moneys-icon';
       }
+      if (this.savingsForm.get('name')?.value === 'Pension fund') {
+        const ownership =
+          this.savingsForm.get('ownership')?.value ?? SavingPotOwnership.Joint;
+        this.syncRetirementFieldsForOwnership(ownership);
+      }
     }
 
     this.syncOwnershipForSelectedType();
+    this.syncLockPotForPensionFund();
     this.syncReturnRateTextFromForm();
     this.syncSliderReturnRateFromForm();
   }
@@ -367,29 +391,40 @@ onAmountBlur(e: Event) {
   (e.target as HTMLInputElement).value = num.toLocaleString(locale);
 }
 
+  onContributionAmountInput(rawValue: string) {
+    const value = parseFormattedNumber(rawValue ?? '', this.translate.currentLang);
+    this.savingsForm.get('contributionAmount')?.setValue(value, { emitEvent: true });
+  }
+
+  onContributionAmountBlur(e: Event) {
+    const c = this.savingsForm.get('contributionAmount')!;
+    const rawValue = (e.target as HTMLInputElement).value;
+    const num = parseFormattedNumber(rawValue, this.translate.currentLang);
+    c.setValue(num, { emitEvent: false });
+
+    const locale = this.translate.currentLang === 'it' ? 'it-IT' : 'en-US';
+    (e.target as HTMLInputElement).value = num.toLocaleString(locale);
+  }
 
   patchFormValues() {
     this.isAddComissionChecked = this.selectedPot?.hasCommission;
-    var savingPotValue = this.savingPotValues.find(x => x.name === this.selectedPot.name);
-        if(savingPotValue) {
-      this.savingsForm.get('name')?.patchValue(savingPotValue.name)
+    const matchedPreset = this.savingPotValues.find(x => x.name === this.selectedPot.name);
+    if (matchedPreset) {
+      this.savingsForm.get('name')?.patchValue(matchedPreset.name, { emitEvent: false });
+      this.savingsForm.get('customName')?.patchValue('', { emitEvent: false });
+    } else {
+      const typeToPreset: Record<number, string> = {
+        [SavingPotType.Investment]: 'Investment',
+        [SavingPotType.PensionFund]: 'Pension fund',
+        [SavingPotType.Other]: 'Investment',
+      };
+      const typeName = typeToPreset[this.selectedPot.type] || 'Investment';
+      this.savingsForm.get('name')?.patchValue(typeName, { emitEvent: false });
+      this.savingsForm.get('customName')?.patchValue(this.selectedPot.name, { emitEvent: false });
     }
-    else {
-      this.savingsForm.get('name')?.patchValue('Custom');
-      this.onNameValueChange('Custom');
-      this.savingsForm.get('customName')?.patchValue(this.selectedPot.name);
-    }
-    // --- Type (name) ---
     if (this.isCashPotEditMode) {
-      // Keep it Cash, do not touch customName control
-      const savingPotValue = this.savingPotValues.find(x => x.name === this.selectedPot.name);
-      if (savingPotValue) {
-        this.savingsForm.get('name')?.patchValue(savingPotValue.name, { emitEvent: false });
-      } else {
-        this.savingsForm.get('name')?.patchValue('Custom', { emitEvent: false });
-        this.onNameValueChange('Custom'); // will add customName control
-        this.savingsForm.get('customName')?.patchValue(this.selectedPot.name, { emitEvent: false });
-      }
+      this.savingsForm.get('name')?.patchValue('Cash', { emitEvent: false });
+      this.savingsForm.get('customName')?.patchValue('', { emitEvent: false });
     }
 
     // --- The rest of fields (unchanged behavior) ---
@@ -409,19 +444,38 @@ onAmountBlur(e: Event) {
       this.round2(this.selectedPot.returnRate),
       { emitEvent: false }
     );
-    this.savingsForm.get('lockPot')?.patchValue(this.selectedPot.hasPotLocked, { emitEvent: false });
-    this.savingsForm.get('start')?.patchValue(this.selectedPot.lockedFrom?.year || this.forecastStartDateYear, { emitEvent: false });
-    this.savingsForm.get('end')?.patchValue(
-      this.selectedPot.lockedTill?.year || this.dialogEndCalendarYear,
-      { emitEvent: false },
-    );
+    const isPensionFundEdit = this.selectedPot.type === SavingPotType.PensionFund || this.savingsForm.get('name')?.value === 'Pension fund';
+    this.savingsForm.get('lockPot')?.patchValue(isPensionFundEdit ? true : this.selectedPot.hasPotLocked, { emitEvent: false });
+
+    const lockStartVal = this.selectedPot.startEventId
+      ? 'event:' + this.selectedPot.startEventId
+      : (this.selectedPot.lockedFrom?.year || this.forecastStartDateYear);
+    const lockEndVal = this.selectedPot.endEventId
+      ? 'event:' + this.selectedPot.endEventId
+      : (this.selectedPot.lockedTill?.year || this.dialogEndCalendarYear);
+    this.savingsForm.get('start')?.patchValue(lockStartVal, { emitEvent: false });
+    this.savingsForm.get('end')?.patchValue(lockEndVal, { emitEvent: false });
     
     // Patch Pension fund specific fields if applicable
-    if (this.selectedPot.name === 'Pension fund') {
+    if (isPensionFundEdit) {
       this.savingsForm.get('contributionAmount')?.patchValue(this.selectedPot.contributionAmount, { emitEvent: false });
       this.savingsForm.get('contributionFrequency')?.patchValue(this.selectedPot.contributionFrequency, { emitEvent: false });
-      this.savingsForm.get('contributionStartDate')?.patchValue(this.selectedPot.contributionStartDate?.year, { emitEvent: false });
-      this.savingsForm.get('contributionEndDate')?.patchValue(this.selectedPot.contributionEndDate?.year, { emitEvent: false });
+      const contribVal = this.savingsForm.get('contributionAmount')?.value;
+      setTimeout(() => {
+        const el = this.contributionAmountInput?.nativeElement;
+        if (!el || contribVal === null || contribVal === undefined) return;
+        el.value = Number(contribVal).toLocaleString('en-US');
+        el.dispatchEvent(new Event('blur'));
+      });
+
+      const contribStartVal = this.selectedPot.contributionStartEventId
+        ? 'event:' + this.selectedPot.contributionStartEventId
+        : this.selectedPot.contributionStartDate?.year ?? null;
+      const contribEndVal = this.selectedPot.contributionEndEventId
+        ? 'event:' + this.selectedPot.contributionEndEventId
+        : this.selectedPot.contributionEndDate?.year ?? null;
+      this.savingsForm.get('contributionStartDate')?.patchValue(contribStartVal, { emitEvent: false });
+      this.savingsForm.get('contributionEndDate')?.patchValue(contribEndVal, { emitEvent: false });
     }
     
     this.savingsForm.get('ownership')?.patchValue(this.selectedPot.ownership ?? SavingPotOwnership.Joint, { emitEvent: false });
@@ -497,6 +551,22 @@ onAmountBlur(e: Event) {
         }
       }, 0);
     });
+
+    this.savingsForm.get('contributionEndDate')?.valueChanges.subscribe(() => {
+      this.contributionEndManuallyOverridden = true;
+    });
+
+    this.savingsForm.get('ownership')?.valueChanges.subscribe((ownership: SavingPotOwnership) => {
+      if (
+        this.savingsForm.get('name')?.value === 'Pension fund' &&
+        !this.contributionEndManuallyOverridden
+      ) {
+        this.syncRetirementFieldsForOwnership(ownership);
+        this.savingsForm
+          .get('contributionEndDate')
+          ?.setValue(this.getDefaultContributionEndFormValue(ownership), { emitEvent: false });
+      }
+    });
   }
 
   private clearCommissionTypeValidators(): void {
@@ -535,7 +605,7 @@ onAmountBlur(e: Event) {
 
     // Case 4: Multiple types already exist
     if (existingTypes.size >= 3) {
-      return 'Custom';
+      return 'Investment';
     }
 
     // Case 1: Only Cash exists
@@ -557,28 +627,90 @@ onAmountBlur(e: Event) {
     return 'Investment';
   }
   
+  private findRetirementEventForPerson(isPartner: boolean): any | null {
+    const events = this.eventsList ?? [];
+    return (
+      events.find((e: any) => {
+        const n = (e?.name ?? '').toString().trim().toLowerCase();
+        const isRetirementName =
+          n.startsWith('retirement age') || n.includes('pensione');
+        return isRetirementName && !!e?.isPartnerEvent === isPartner;
+      }) ?? null
+    );
+  }
+
+  private applyRetirementLabelsFromEvent(retirementEvent: any | null): void {
+    if (!retirementEvent) return;
+    const ry = Number(retirementEvent.start?.year);
+    if (!Number.isFinite(ry) || ry <= 0) return;
+    this.retirementAge = ry;
+    this.retirementAgeValue = getProjectionAgeForClientEvent(retirementEvent, {
+      clientBirthDate: this.data.clientBirthDate,
+      partnerBirthDate: this.data.partnerBirthDate,
+      forecastStartDate: this.data.forecastStartDate,
+      planDuration: this.data.planDuration,
+      projectionInclusiveEndYear: this.dialogEndCalendarYear,
+    });
+  }
+
+  private getDefaultContributionEndFormValue(
+    ownership: SavingPotOwnership,
+  ): number | string | null {
+    const isPartner = ownership === SavingPotOwnership.Person2;
+    const ev = this.findRetirementEventForPerson(isPartner);
+    if (ev?.id) {
+      return 'event:' + ev.id;
+    }
+    const y = Number(ev?.start?.year);
+    return Number.isFinite(y) && y > 0 ? y : this.getRetirementYearForOwnership(ownership);
+  }
+
+  private syncRetirementFieldsForOwnership(ownership: SavingPotOwnership): void {
+    const isPartner = ownership === SavingPotOwnership.Person2;
+    this.applyRetirementLabelsFromEvent(this.findRetirementEventForPerson(isPartner));
+  }
+
+  /** Age label for a timeline event; matches projection axis (not raw stored age). */
+  displayAgeForTimelineEvent(event: any): number {
+    return getProjectionAgeForClientEvent(event, {
+      clientBirthDate: this.data.clientBirthDate,
+      partnerBirthDate: this.data.partnerBirthDate,
+      forecastStartDate: this.data.forecastStartDate,
+      planDuration: this.data.planDuration,
+      projectionInclusiveEndYear: this.dialogEndCalendarYear,
+    });
+  }
+
+  private getRetirementYearForOwnership(ownership: SavingPotOwnership): number | null {
+    const isPartner = ownership === SavingPotOwnership.Person2;
+    const event = this.findRetirementEventForPerson(isPartner);
+    const year = Number(event?.start?.year);
+    return Number.isFinite(year) && year > 0 ? year : null;
+  }
+
   closeDialog(): void {
     this.dialogRef.close();
   }
 
   get displayPotName(): string {
     if (!this.savingsForm) return '';
-    const name = (this.savingsForm.get('name')?.value ?? '').toString();
-
-    if (name === 'Custom') {
-      const customName = (this.savingsForm.get('customName')?.value ?? '').toString().trim();
-      return customName || this.selectedPot?.name || 'Custom';
-    }
-
-    return name || this.selectedPot?.name || '';
+    const typeName = (this.savingsForm.get('name')?.value ?? '').toString();
+    const customName = (this.savingsForm.get('customName')?.value ?? '').toString().trim();
+    return customName || typeName || this.selectedPot?.name || '';
   }
 
   get canEditName(): boolean {
-    return this.isEditWorkflow && this.savingsForm?.get('name')?.value === 'Custom';
+    return this.isEditWorkflow && this.savingsForm?.get('name')?.value !== 'Cash';
   }
 
   toggleNameEdit(): void {
     this.showNameEdit = !this.showNameEdit;
+  }
+
+  get namePlaceholderKey(): string {
+    return this.savingsForm.get('name')?.value === 'Pension fund'
+      ? 'SAVINGS_POT.NAME_PLACEHOLDER_PENSION'
+      : 'SAVINGS_POT.NAME_PLACEHOLDER_INVESTMENT';
   }
 
   /** Number of existing pots with name "Cash". */
@@ -659,38 +791,64 @@ onAmountBlur(e: Event) {
     }
   }
 
+  /**
+   * Pension funds must always be locked. Call after any change that
+   * affects pot type or lock state to keep UI + model in sync.
+   */
+  private syncLockPotForPensionFund(): void {
+    const lockPotCtrl = this.savingsForm.get('lockPot');
+    if (!lockPotCtrl) return;
+
+    if (this.savingsForm.get('name')?.value === 'Pension fund') {
+      lockPotCtrl.setValue(true, { emitEvent: false });
+      lockPotCtrl.disable({ emitEvent: false });
+    } else {
+      lockPotCtrl.enable({ emitEvent: false });
+    }
+  }
+
   onNameValueChange(name: any) {
     this.selectedName = name;
     this.renamedCustomName = '';  // Reset renamed value when type changes
     this.isRenamingEntry = false;  // Reset rename mode
     
-    if (name === 'Custom') {
-      this.savingsForm.setControl(
-        'customName',
-        new FormControl('', [Validators.required, this.noCashNameValidator()])
-      );
-      this.savingsForm.updateValueAndValidity();
-      this.selectedNameIconUrl = 'custom-option-icon'
-    } else {
-      this.savingsForm.removeControl('customName');
-      this.savingsForm.updateValueAndValidity();
+    this.savingsForm.get('customName')?.setValue('', { emitEvent: false });
 
-      const cusEvent = this.savingPotValues.find(
-        (customEvent) => customEvent.name === name
-      );
-      this.selectedNameIconUrl = cusEvent?.iconUrl ?? '';
-    }
+    const cusEvent = this.savingPotValues.find(
+      (customEvent) => customEvent.name === name
+    );
+    this.selectedNameIconUrl = cusEvent?.iconUrl ?? '';
     
+    // Switch return rate default based on pot type
+    if (!this.isEditWorkflow) {
+      if (name === 'Pension fund') {
+        this.savingsForm.get('returnRate')?.setValue(
+          this.normalizeReturnRate(this.pensionFundReturnRate),
+          { emitEvent: true }
+        );
+      } else if (name !== 'Cash') {
+        this.savingsForm.get('returnRate')?.setValue(
+          this.normalizeReturnRate(this.userReturnRate),
+          { emitEvent: true }
+        );
+      }
+    }
+
     // Auto-tick lockPot for Pension fund, untick for other types
     if (name === 'Pension fund') {
-      this.savingsForm.get('lockPot')?.setValue(true);
       if (!this.isEditWorkflow) {
-        this.savingsForm.get('contributionEndDate')?.reset(null, { emitEvent: false });
+        this.contributionEndManuallyOverridden = false;
+        const ownership = this.savingsForm.get('ownership')?.value ?? SavingPotOwnership.Joint;
+        this.syncRetirementFieldsForOwnership(ownership);
+        this.savingsForm
+          .get('contributionEndDate')
+          ?.setValue(this.getDefaultContributionEndFormValue(ownership), { emitEvent: false });
       }
     } else {
       this.savingsForm.get('lockPot')?.setValue(false);
     }
 
+    this.syncLockPotForPensionFund();
     // Update Pension fund field validators based on type
     this.updatePensionFundValidators(name);
     this.syncOwnershipForSelectedType();
@@ -750,6 +908,10 @@ onAmountBlur(e: Event) {
   }
 
   isLockPotChanged(event: any) {
+    if (this.savingsForm.get('name')?.value === 'Pension fund') {
+      this.savingsForm.get('lockPot')?.setValue(true, { emitEvent: false });
+      return;
+    }
     if (event) {
       this.savingsForm.get('start')?.setValidators([calendarYearOrEventRefValidator()]);
       this.savingsForm.get('start')?.updateValueAndValidity();
@@ -931,21 +1093,46 @@ onAmountBlur(e: Event) {
   /**
    * Save stays off until the form is valid and (for pension fund) a contribution end calendar year is chosen.
    */
+  get contributionDurationHint(): string | null {
+    return getStartEndDurationLabel(
+      this.savingsForm.get('contributionStartDate')?.value,
+      this.savingsForm.get('contributionEndDate')?.value,
+      this.eventsList,
+      this.translate,
+    );
+  }
+
+  get lockDurationHint(): string | null {
+    return getStartEndDurationLabel(
+      this.savingsForm.get('start')?.value,
+      this.savingsForm.get('end')?.value,
+      this.eventsList,
+      this.translate,
+    );
+  }
+
   get isSaveDisabled(): boolean {
+    if (this.isSaving) {
+      return true;
+    }
     if (this.savingsForm.invalid) {
       return true;
     }
+    const potName = this.savingsForm.get('name')?.value;
     if (this.fromNetWorth) {
       return false;
     }
-    if (this.savingsForm.get('name')?.value !== 'Pension fund') {
+    if (potName !== 'Pension fund') {
       return false;
     }
     const raw = this.savingsForm.get('contributionEndDate')?.value;
-    return this.parseCalendarYearFromControl(raw) <= 0;
+    return resolveYear(raw, this.eventsList) <= 0;
   }
 
   saveCashflow(): void {
+    if (this.isSaving) {
+      return;
+    }
     this.savingsForm.markAllAsTouched();
     const selectedEscDesc = this.savingsForm.get('escalationRate')?.value as string;
     const isCustomEscalation = selectedEscDesc === 'Increases at custom rate';
@@ -960,7 +1147,8 @@ onAmountBlur(e: Event) {
   const real = this.savingsForm.get('name')?.value !== 'Cash'
     ? this.round2(rr - this.inflationRate)
     : 0;
-    const isPotLocked = this.savingsForm.get('lockPot')?.value;
+    const isPensionFund = this.savingsForm.get('name')?.value === 'Pension fund';
+    const isPotLocked = isPensionFund ? true : this.savingsForm.get('lockPot')?.value;
     if (this.isCashTypeSelected) {
       const selectedOwnership =
         (this.savingsForm.get('ownership')?.value ?? SavingPotOwnership.Joint) as SavingPotOwnership;
@@ -975,7 +1163,7 @@ onAmountBlur(e: Event) {
     const isPensionFundPot = potName === 'Pension fund';
     const contribAmt = Number(this.savingsForm.get('contributionAmount')?.value ?? 0);
     const contribEndRaw = this.savingsForm.get('contributionEndDate')?.value;
-    const contribEndYear = this.parseCalendarYearFromControl(contribEndRaw);
+    const contribEndYear = resolveYear(contribEndRaw, this.eventsList);
     if (
       isPensionFundPot &&
       contribAmt > 0 &&
@@ -988,11 +1176,13 @@ onAmountBlur(e: Event) {
     }
 
     if (this.savingsForm.valid) {
+      const customNameTrimmed = (this.savingsForm.get('customName')?.value ?? '').trim();
+      const resolvedPotName = customNameTrimmed || this.savingsForm.get('name')?.value;
+      const finalPotName = this.isEditWorkflow ? resolvedPotName : (customNameTrimmed ? capitalizeFirstLetter(resolvedPotName) : resolvedPotName);
+
       var clientSaving: ClientSaving = {
         id: this.isEditWorkflow ? this.selectedPot.id : null,
-        name: this.savingsForm.get('name')?.value !== 'Custom'
-        ? this.savingsForm.get('name')?.value
-        : this.savingsForm.get('customName')?.value,
+        name: finalPotName,
         isGrowing: false,
         nominalValue: 0,
         realValue: 0,
@@ -1062,12 +1252,10 @@ onAmountBlur(e: Event) {
         },
         hasCommission: this.savingsForm.get('commissions')?.value,
         orderNumber: this.isEditWorkflow ? this.selectedPot.orderNumber : 0,
-        hasPotLocked: this.savingsForm.get('lockPot')?.value,
-        iconUrl: this.savingsForm.get('name')?.value !== 'Custom'
-          ? this.savingPotValues.find(
+        hasPotLocked: isPotLocked,
+        iconUrl: this.savingPotValues.find(
             (x) => this.savingsForm.get('name')?.value === x.name
-          )?.iconUrl ?? 'cashflow-moneys-icon'
-          : 'custom-option-icon',
+          )?.iconUrl ?? 'cashflow-investment-icon',
         start: {
           age:
             this.forecastStartDateYear != null
@@ -1084,42 +1272,30 @@ onAmountBlur(e: Event) {
               ? this.forecastStartDateYear
               : 0,
         },
-        lockedFrom: {
-          age:
-            isPotLocked && this.savingsForm.get('start')?.value !== null &&
-            this.savingsForm.get('start')?.value !== ''
-              ? getPersistedAgeForCalendarYear(
-                  this.data.clientBirthDate,
-                  this.savingsForm.get('start')?.value,
-                  this.data.forecastStartDate,
-                  this.data.planDuration,
-                  this.dialogEndCalendarYear,
-                )
-              : 0,
-          year:
-            isPotLocked &&  this.savingsForm.get('start')?.value !== null &&
-            this.savingsForm.get('start')?.value !== ''
-              ? this.savingsForm.get('start')?.value
-              : 0,
-        },
-        lockedTill: {
-          age:
-             isPotLocked && this.savingsForm.get('end')?.value !== null &&
-            this.savingsForm.get('end')?.value !== ''
-              ? getPersistedAgeForCalendarYear(
-                  this.data.clientBirthDate,
-                  this.savingsForm.get('end')?.value,
-                  this.data.forecastStartDate,
-                  this.data.planDuration,
-                  this.dialogEndCalendarYear,
-                )
-              : 0,
-          year:
-             isPotLocked && this.savingsForm.get('end')?.value !== null &&
-            this.savingsForm.get('end')?.value !== ''
-              ? this.savingsForm.get('end')?.value
-              : 0,
-        },
+        lockedFrom: (() => {
+          const raw = this.savingsForm.get('start')?.value;
+          const yr = isPotLocked && raw != null && raw !== ''
+            ? resolveYear(raw, this.eventsList) : 0;
+          return {
+            age: yr > 0 ? getPersistedAgeForCalendarYear(
+              this.data.clientBirthDate, yr,
+              this.data.forecastStartDate, this.data.planDuration,
+              this.dialogEndCalendarYear) : 0,
+            year: yr,
+          };
+        })(),
+        lockedTill: (() => {
+          const raw = this.savingsForm.get('end')?.value;
+          const yr = isPotLocked && raw != null && raw !== ''
+            ? resolveYear(raw, this.eventsList) : 0;
+          return {
+            age: yr > 0 ? getPersistedAgeForCalendarYear(
+              this.data.clientBirthDate, yr,
+              this.data.forecastStartDate, this.data.planDuration,
+              this.dialogEndCalendarYear) : 0,
+            year: yr,
+          };
+        })(),
         end: {
           age:
             Number.isFinite(this.dialogEndCalendarYear)
@@ -1138,12 +1314,11 @@ onAmountBlur(e: Event) {
         // returnRate: this.savingsForm.get('name')?.value !== 'Cash' ? this.savingsForm.get('returnRate')?.value : 0,
           returnRate: this.savingsForm.get('name')?.value !== 'Cash' ? rr : 0,
         type:
-        this.savingsForm.get('name')?.value === 'Cash' ||
-        this.savingsForm.get('customName')?.value === 'Cash'
+        this.savingsForm.get('name')?.value === 'Cash'
           ? SavingPotType.Cash
           : this.savingPotValues.find(
               (x) => this.savingsForm.get('name')?.value === x.name
-            )?.type ?? SavingPotType.Other,
+            )?.type ?? SavingPotType.Investment,
         // realReturn: this.savingsForm.get('name')?.value !== 'Cash' ?
         //   this.savingsForm.get('returnRate')?.value - this.inflationRate : 0,
         realReturn: real,
@@ -1155,31 +1330,41 @@ onAmountBlur(e: Event) {
           ? this.savingsForm.get('contributionFrequency')?.value
           : null,
         contributionStartDate: this.savingsForm.get('name')?.value === 'Pension fund'
-          ? {
-              year: this.savingsForm.get('contributionStartDate')?.value,
-              age: getPersistedAgeForCalendarYear(
-                this.data.clientBirthDate,
-                this.savingsForm.get('contributionStartDate')?.value,
-                this.data.forecastStartDate,
-                this.data.planDuration,
-                this.dialogEndCalendarYear,
-              ),
-            }
+          ? (() => {
+              const raw = this.savingsForm.get('contributionStartDate')?.value;
+              const yr = resolveYear(raw, this.eventsList);
+              return {
+                year: yr,
+                age: yr > 0 ? getPersistedAgeForCalendarYear(
+                  this.data.clientBirthDate, yr,
+                  this.data.forecastStartDate, this.data.planDuration,
+                  this.dialogEndCalendarYear) : 0,
+              };
+            })()
           : null,
         contributionEndDate: this.savingsForm.get('name')?.value === 'Pension fund'
-          ? {
-              year: this.savingsForm.get('contributionEndDate')?.value,
-              age: getPersistedAgeForCalendarYear(
-                this.data.clientBirthDate,
-                this.savingsForm.get('contributionEndDate')?.value,
-                this.data.forecastStartDate,
-                this.data.planDuration,
-                this.dialogEndCalendarYear,
-              ),
-            }
+          ? (() => {
+              const raw = this.savingsForm.get('contributionEndDate')?.value;
+              const yr = resolveYear(raw, this.eventsList);
+              return {
+                year: yr,
+                age: yr > 0 ? getPersistedAgeForCalendarYear(
+                  this.data.clientBirthDate, yr,
+                  this.data.forecastStartDate, this.data.planDuration,
+                  this.dialogEndCalendarYear) : 0,
+              };
+            })()
           : null,
         retirementAge: this.savingsForm.get('name')?.value === 'Pension fund'
           ? this.retirementAge
+          : null,
+        startEventId: extractEventId(this.savingsForm.get('start')?.value),
+        endEventId: extractEventId(this.savingsForm.get('end')?.value),
+        contributionStartEventId: this.savingsForm.get('name')?.value === 'Pension fund'
+          ? extractEventId(this.savingsForm.get('contributionStartDate')?.value)
+          : null,
+        contributionEndEventId: this.savingsForm.get('name')?.value === 'Pension fund'
+          ? extractEventId(this.savingsForm.get('contributionEndDate')?.value)
           : null,
         ownership: this.hasPartner ? (this.savingsForm.get('ownership')?.value ?? SavingPotOwnership.Joint) : SavingPotOwnership.Joint
       };
@@ -1191,10 +1376,11 @@ onAmountBlur(e: Event) {
         });
         return;
       }
-      const function$ = !this.isEditWorkflow ? this.savingPotsHttpService
-      .addNewSavingPot(this.cashflowId, clientSaving) :
-      this.savingPotsHttpService
-        .addNewSavingPot(this.cashflowId, clientSaving)
+      this.isSaving = true;
+      const function$ = this.savingPotsHttpService.addNewSavingPot(
+        this.cashflowId,
+        clientSaving,
+      );
 
       function$
         .pipe(
@@ -1202,13 +1388,21 @@ onAmountBlur(e: Event) {
           catchError((err) => {
             console.error(err);
             throw err;
-          })
+          }),
+          finalize(() => {
+            this.isSaving = false;
+          }),
         )
-        .subscribe((res) => {
-          this.dialogRef.close({
-            status: 'Success',
-            savingPot: res,
-          });
+        .subscribe({
+          next: (res) => {
+            this.dialogRef.close({
+              status: 'Success',
+              savingPot: res,
+            });
+          },
+          error: () => {
+            // isSaving cleared in finalize
+          },
         });
     }
   }
@@ -1379,15 +1573,16 @@ onAmountBlur(e: Event) {
 
       private endOnOrAfterStartValidator(): ValidatorFn {
       return (group: AbstractControl) => {
-        const start = group.get('start')?.value;
-        const end   = group.get('end')?.value;
+        const startRaw = group.get('start')?.value;
+        const endRaw   = group.get('end')?.value;
         const endCtrl = group.get('end');
-    
-        // Only validate when both are present (or when end is present)
+        const start = resolveYear(startRaw, this.eventsList);
+        const end   = resolveYear(endRaw, this.eventsList);
+
         if (endCtrl) {
           const existing = endCtrl.errors ?? null;
     
-          if (start != null && start !== '' && end != null && end !== '' && end < start) {
+          if (start > 0 && end > 0 && end < start) {
             // attach/merge the error onto the END control
             endCtrl.setErrors({ ...(existing ?? {}), endBeforeStart: true });
           } else {
@@ -1448,7 +1643,12 @@ private round2(n: number): number {
 
 getContributionStartYear(): number {
   const val = this.savingsForm.get('contributionStartDate')?.value;
-  return typeof val === 'number' && Number.isFinite(val) ? val : this.forecastStartDateYear;
+  const resolved = resolveYear(val, this.eventsList);
+  if (resolved > 0) {
+    return resolved;
+  }
+  const fallback = Number(this.forecastStartDateYear);
+  return Number.isFinite(fallback) ? fallback : 0;
 }
 
 getContributionEndEvents(): any[] {
@@ -1477,8 +1677,14 @@ getLockEndYears(): number[] {
 }
 
   getAgeForYear(year: number): number {
+    const ownership =
+      this.savingsForm?.get('ownership')?.value ?? SavingPotOwnership.Joint;
+    const birth =
+      ownership === SavingPotOwnership.Person2 && this.data.partnerBirthDate
+        ? this.data.partnerBirthDate
+        : this.data.clientBirthDate;
     const a = getProjectionColumnAgeLabel(
-      this.data.clientBirthDate,
+      birth,
       Number(year),
       this.data.forecastStartDate,
       this.data.planDuration,

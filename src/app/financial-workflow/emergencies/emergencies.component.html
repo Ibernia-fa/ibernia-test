@@ -537,14 +537,24 @@
                       class="inner-information text-center d-flex flex-column gap-4"
                     >
                       <div class="label">{{ "Status" | translate }}</div>
-                      <div
-                        class="not-cover-label"
-                        [ngClass]="{
-                          'text-danger': e.policyStatus !== 1,
-                          'text-success': e.policyStatus === 1,
-                        }"
-                      >
-                        {{ "Not covered" | translate }}
+                      <div class="status-edit-row">
+                        <span class="edit-hint-slot" aria-hidden="true"></span>
+                        <span
+                          class="not-cover-label"
+                          [ngClass]="{
+                            'text-danger': e.policyStatus !== 1,
+                            'text-success': e.policyStatus === 1,
+                          }"
+                        >
+                          {{ "Not covered" | translate }}
+                        </span>
+                        <span class="edit-hint-slot" aria-hidden="true">
+                          <img
+                            class="edit-hint-icon"
+                            src="assets/images/svgs/pen-icon.svg"
+                            alt=""
+                          />
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -573,18 +583,36 @@
                     class="inner-information text-center d-flex flex-column gap-4"
                   >
                     <div class="label">{{ "Status" | translate }}</div>
-                    <div
-                      class="not-cover-label"
-                      [ngClass]="{
-                        'text-danger': e.willStatus !== 1,
-                        'will-done-text': e.willStatus === 1,
-                      }"
-                    >
-                      {{
-                        e.willStatus === 1
-                          ? ("Done" | translate)
-                          : ("Not done" | translate)
-                      }}
+                    <div class="status-edit-row">
+                      <span
+                        *ngIf="e.willStatus !== 1"
+                        class="edit-hint-slot"
+                        aria-hidden="true"
+                      ></span>
+                      <span
+                        class="not-cover-label"
+                        [ngClass]="{
+                          'text-danger': e.willStatus !== 1,
+                          'will-done-text': e.willStatus === 1,
+                        }"
+                      >
+                        {{
+                          e.willStatus === 1
+                            ? ("Done" | translate)
+                            : ("Not done" | translate)
+                        }}
+                      </span>
+                      <span
+                        *ngIf="e.willStatus !== 1"
+                        class="edit-hint-slot"
+                        aria-hidden="true"
+                      >
+                        <img
+                          class="edit-hint-icon"
+                          src="assets/images/svgs/pen-icon.svg"
+                          alt=""
+                        />
+                      </span>
                     </div>
                   </div>
                 </div>

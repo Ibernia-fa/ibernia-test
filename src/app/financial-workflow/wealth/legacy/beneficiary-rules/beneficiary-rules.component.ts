@@ -8,6 +8,8 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatInputModule } from '@angular/material/input';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ToastrService } from 'ngx-toastr';
 import { TranslateModule } from '@ngx-translate/core';
 import { LegacyHttpService } from '../services/legacy-http.service';
@@ -41,6 +43,8 @@ interface RecipientRow {
     MatIconModule,
     MatSliderModule,
     MatInputModule,
+    MatTooltipModule,
+    MatProgressSpinnerModule,
     TranslateModule,
   ],
   templateUrl: './beneficiary-rules.component.html',
@@ -71,12 +75,37 @@ export class BeneficiaryRulesComponent {
     return this.data.dashboard?.familyMembers ?? [];
   }
 
+  /** Coerce slider/input model values to numbers (ngModel can yield strings). */
+  private parsePct(value: unknown): number {
+    if (value === null || value === undefined || value === '') {
+      return 0;
+    }
+    const n = Number(value);
+    return Number.isFinite(n) ? n : 0;
+  }
+
   get totalPercentage(): number {
-    return this.recipients.reduce((sum, r) => sum + (r.percentage || 0), 0);
+    return this.recipients.reduce((sum, r) => sum + this.parsePct(r.percentage), 0);
   }
 
   get isValid(): boolean {
-    return this.recipients.length > 0 && Math.abs(this.totalPercentage - 100) < 0.01;
+    if (this.recipients.length === 0) {
+      return false;
+    }
+    if (!this.recipients.every(r => !!r.memberId?.trim())) {
+      return false;
+    }
+    return Math.abs(this.totalPercentage - 100) < 0.01;
+  }
+
+  /** True when every eligible member already has a row but allocations do not total 100%. */
+  get showAdjustPercentagesHint(): boolean {
+    return !this.canAddRecipient && !this.isValid && this.recipients.length > 0;
+  }
+
+  /** Only one beneficiary → they always receive 100%; no split to edit. */
+  get canEditPercentSplit(): boolean {
+    return this.recipients.length > 1;
   }
 
   get eligibleMembers(): FamilyMemberModel[] {
@@ -135,6 +164,9 @@ export class BeneficiaryRulesComponent {
         memberId: r.memberId,
         percentage: r.percentage
       }));
+      if (this.recipients.length === 1) {
+        this.recipients[0].percentage = 100;
+      }
     } else {
       this.recipients = [];
     }
@@ -142,10 +174,73 @@ export class BeneficiaryRulesComponent {
 
   addRecipient(): void {
     this.recipients.push({ memberId: '', percentage: 0 });
+    this.rebalancePercentagesAfterRowCountChange();
   }
 
   removeRecipient(index: number): void {
     this.recipients.splice(index, 1);
+    this.rebalancePercentagesAfterRowCountChange();
+  }
+
+  /**
+   * Keeps the total at 100% when the user moves a slider or edits a % field.
+   * Leading rows (all but the last) are edited freely within [0,100]; the last row absorbs the remainder.
+   * Editing the last row adjusts the second-to-last row instead.
+   */
+  onRecipientPercentageChange(changedIndex: number): void {
+    const n = this.recipients.length;
+    if (n === 0) {
+      return;
+    }
+    if (n === 1) {
+      this.recipients[0].percentage = 100;
+      return;
+    }
+
+    const clampPct = (x: unknown) => {
+      const v = Math.round(this.parsePct(x));
+      return Math.max(0, Math.min(100, v));
+    };
+
+    if (changedIndex === n - 1) {
+      const sumBeforePrev = this.recipients
+        .slice(0, n - 2)
+        .reduce((s, r) => s + clampPct(r.percentage), 0);
+      let lastVal = clampPct(this.recipients[n - 1].percentage);
+      const maxLast = Math.max(0, 100 - sumBeforePrev);
+      lastVal = Math.min(lastVal, maxLast);
+      this.recipients[n - 1].percentage = lastVal;
+      this.recipients[n - 2].percentage = 100 - sumBeforePrev - lastVal;
+    } else {
+      const othersSum = this.recipients
+        .slice(0, n - 1)
+        .filter((_, i) => i !== changedIndex)
+        .reduce((s, r) => s + clampPct(r.percentage), 0);
+      const maxVal = Math.max(0, 100 - othersSum);
+      let v = clampPct(this.recipients[changedIndex].percentage);
+      v = Math.min(v, maxVal);
+      this.recipients[changedIndex].percentage = v;
+      const sumFirst = this.recipients
+        .slice(0, n - 1)
+        .reduce((s, r) => s + clampPct(r.percentage), 0);
+      this.recipients[n - 1].percentage = 100 - sumFirst;
+    }
+  }
+
+  /** After add/remove row, keep a valid 100% split without wiping member picks. */
+  private rebalancePercentagesAfterRowCountChange(): void {
+    const n = this.recipients.length;
+    if (n === 0) {
+      return;
+    }
+    if (n === 1) {
+      this.recipients[0].percentage = 100;
+      return;
+    }
+    const sumFirst = this.recipients
+      .slice(0, n - 1)
+      .reduce((s, r) => s + Math.round(this.parsePct(r.percentage)), 0);
+    this.recipients[n - 1].percentage = Math.max(0, Math.min(100, 100 - sumFirst));
   }
 
   getMemberName(memberId: string): string {
@@ -161,14 +256,15 @@ export class BeneficiaryRulesComponent {
       scenario: this.activeScenario.type,
       recipients: this.recipients.map(r => ({
         memberId: r.memberId,
-        percentage: r.percentage
+        percentage: this.parsePct(r.percentage)
       }))
     }).subscribe({
       next: (dashboard) => {
         this.data.dashboard = dashboard;
         this.toastr.success('Beneficiary rule saved', 'Success');
-        this.isSaving = false;
-        this.selectScenario(this.activeScenario!);
+        // Close while overlay is still shown; exit animation is disabled on open so
+        // the user lands on Legacy without a visible dialog dismiss.
+        this.dialogRef.close({ dashboard: this.data.dashboard });
       },
       error: (err) => {
         this.toastr.error(err?.error?.message || 'Failed to save rule', 'Error');

@@ -27,9 +27,12 @@ import {
 import { EmergenciesHttpService } from '../services/emergencies-http.service';
 import { allCountries } from 'src/app/clients/models/country';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
+import { AutoFocusDirective } from 'src/app/directives/auto-focus.directive';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MaterialModule } from 'src/app/material.module';
 import { getAmountCycleLabel } from 'src/app/shared/utils/amount-cycle-label';
+import { capitalizeFirstLetter } from 'src/app/shared/utils/capitalize-first-letter';
+import { finalize } from 'rxjs';
 
 export interface AddEmergencyDialogData {
   mode: 'add' | 'edit';
@@ -59,6 +62,7 @@ export interface AddEmergencyDialogData {
     MatButtonModule,
     MatCheckboxModule,
     ThousandSeparatorInputDirective,
+    AutoFocusDirective,
     MatButtonToggleModule,
     MaterialModule,
     TranslateModule,
@@ -165,6 +169,10 @@ export class AddEmergenciesComponent {
     this.dialogRef.close();
   }
 
+  get isEmergencySaveButtonDisabled(): boolean {
+    return this.isSaving || this.form.invalid;
+  }
+
   get displayEmergencyName(): string {
     return (this.form?.get('name')?.value ?? '').toString();
   }
@@ -198,17 +206,20 @@ export class AddEmergenciesComponent {
   }
 
   onSave(): void {
+    if (this.isSaving) {
+      return;
+    }
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
 
+    this.isSaving = true;
     const form = this.form.getRawValue();
     const existing = this.data.emergency;
     const nowIso = new Date().toISOString();
     const type = existing?.type ?? 1;
     const isHidden = existing?.isHidden ?? false;
-    const emergencyType = type == 2 ? 'Will' : 'Insurance';
     const isWill = type === 2;
     const isUncovered = form.policyStatus === this.NOT_COVERED_STATUS_ID;
     const fallbackCoverageAdequacy =
@@ -251,7 +262,7 @@ export class AddEmergenciesComponent {
       coverage,
       coverageAdequacy,
       willStatus: type === 2 ? form.willStatus : 1,
-      name: form.name,
+      name: this.data.mode === 'edit' ? form.name : capitalizeFirstLetter(form.name),
       iconUrl: this.resolveIconUrl(type),
       isHidden,
       client: this.data.client ?? { id: '', name: '' },
@@ -278,33 +289,64 @@ export class AddEmergenciesComponent {
         updatedAt: nowIso,
       };
 
-      this.emergenciesHttp.updateEmergency(updatePayload).subscribe({
-        next: (res: Emergency) => {
-          console.log('Data received for update: ', res);
-          this.toastr.success(
-            this.translate.instant('TOAST.UPDATED_SUCCESSFULLY', { type: emergencyType }),
-            this.translate.instant('LABEL.SUCCESS'),
-          );
-          this.dialogRef.close({ status: 'Success', emergency: res });
-        },
-        error: (err) => {
-          console.error(err);
-          this.toastr.error(this.translate.instant('ERROR.FAILED_UPDATE_COVER'), this.translate.instant('LABEL.ERROR'));
-        },
-      });
+      this.emergenciesHttp
+        .updateEmergency(updatePayload)
+        .pipe(
+          finalize(() => {
+            this.isSaving = false;
+          }),
+        )
+        .subscribe({
+          next: (res: Emergency) => {
+            console.log('Data received for update: ', res);
+            this.toastr.success(
+              this.translate.instant(
+                isWill
+                  ? 'TOAST.WILL_UPDATED_SUCCESSFULLY'
+                  : 'TOAST.INSURANCE_UPDATED_SUCCESSFULLY',
+              ),
+              this.translate.instant('LABEL.SUCCESS'),
+            );
+            this.dialogRef.close({ status: 'Success', emergency: res });
+          },
+          error: (err) => {
+            console.error(err);
+            this.toastr.error(
+              this.translate.instant('ERROR.FAILED_UPDATE_COVER'),
+              this.translate.instant('LABEL.ERROR'),
+            );
+          },
+        });
     } else {
       // CREATE
-      this.emergenciesHttp.createEmergency(createPayload).subscribe({
-        next: (res: Emergency) => {
-          console.log('Data received for create: ', res);
-          this.toastr.success(this.translate.instant('TOAST.ADDED_SUCCESSFULLY', { type: emergencyType }), this.translate.instant('LABEL.SUCCESS'));
-          this.dialogRef.close({ status: 'Success', emergency: res });
-        },
-        error: (err) => {
-          console.error(err);
-          this.toastr.error(this.translate.instant('ERROR.FAILED_ADD_COVER'), this.translate.instant('LABEL.ERROR'));
-        },
-      });
+      this.emergenciesHttp
+        .createEmergency(createPayload)
+        .pipe(
+          finalize(() => {
+            this.isSaving = false;
+          }),
+        )
+        .subscribe({
+          next: (res: Emergency) => {
+            console.log('Data received for create: ', res);
+            this.toastr.success(
+              this.translate.instant(
+                isWill
+                  ? 'TOAST.WILL_ADDED_SUCCESSFULLY'
+                  : 'TOAST.INSURANCE_ADDED_SUCCESSFULLY',
+              ),
+              this.translate.instant('LABEL.SUCCESS'),
+            );
+            this.dialogRef.close({ status: 'Success', emergency: res });
+          },
+          error: (err) => {
+            console.error(err);
+            this.toastr.error(
+              this.translate.instant('ERROR.FAILED_ADD_COVER'),
+              this.translate.instant('LABEL.ERROR'),
+            );
+          },
+        });
     }
   }
 
@@ -399,28 +441,46 @@ export class AddEmergenciesComponent {
   }
 
   onDelete(): void {
+    if (this.isSaving) {
+      return;
+    }
     if (this.isDeleteEnabled) {
       const emergencyId = this.data?.emergency?.id;
 
       if (emergencyId) {
-        this.emergenciesHttp.deleteEmergency(emergencyId).subscribe({
-          next: () => {
-            this.toastr.success(this.translate.instant('TOAST.COVERAGE_DELETED'), this.translate.instant('LABEL.SUCCESS'));
-            this.dialogRef.close({ deleted: true });
-          },
-          error: (err) => {
-            console.error(err);
-            this.toastr.error(this.translate.instant('ERROR.FAILED_DELETE_COVERAGE'), this.translate.instant('LABEL.ERROR'));
-          },
-        });
+        this.isSaving = true;
+        this.emergenciesHttp
+          .deleteEmergency(emergencyId)
+          .pipe(
+            finalize(() => {
+              this.isSaving = false;
+            }),
+          )
+          .subscribe({
+            next: () => {
+              this.toastr.success(
+                this.translate.instant('TOAST.COVERAGE_DELETED'),
+                this.translate.instant('LABEL.SUCCESS'),
+              );
+              this.dialogRef.close({ deleted: true });
+            },
+            error: (err) => {
+              console.error(err);
+              this.toastr.error(
+                this.translate.instant('ERROR.FAILED_DELETE_COVERAGE'),
+                this.translate.instant('LABEL.ERROR'),
+              );
+            },
+          });
       } else {
         console.log('failed to delete emergency, id: ' + emergencyId);
       }
     }
   }
 
+  /** Delete only when editing an existing custom emergency; "Add new" has no `emergency` yet → Cancel. */
   get isDeleteEnabled(): boolean {
-    return !this.isDefaultEmergency;
+    return !!this.data?.emergency && !this.isDefaultEmergency;
   }
 
   getCycleLabel(cycle: { id: string; description: string }): string {

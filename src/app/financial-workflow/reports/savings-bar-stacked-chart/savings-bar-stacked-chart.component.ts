@@ -28,6 +28,7 @@ import { Client } from 'src/app/clients/models/client';
 import moment from 'moment';
 import { getProjectionColumnAgeLabel } from 'src/app/shared/utils/client-age-at-reference';
 import { sliceChartSeriesToInclusiveYearRange } from 'src/app/shared/utils/chart-series-year-range';
+import { IncomeDisplayLabelContext } from 'src/app/shared/utils/income-display-label';
 
 @Component({
   selector: 'app-savings-bar-stacked-chart',
@@ -50,6 +51,11 @@ export class SavingsBarStackedChartComponent
   @Input() cashFlowName: string;
   @Input() chartHeight: number = 500;
   @Input() emergencyIconUrl?: string;
+  /**
+   * When the Emergency Expense series is all zeros (e.g. cost 0), still highlight this calendar year column.
+   * Used by emergency simulation so the year band matches the form even with no visible expense bar.
+   */
+  @Input() emergencyHighlightYear: number | null = null;
   /** When true, enables smooth bar morphing animation on data updates (dynamicAnimation). */
   @Input() animateUpdates: boolean = false;
   /** Optional inclusive calendar-year window (after end-year trim). Null = full trimmed range. */
@@ -101,6 +107,16 @@ export class SavingsBarStackedChartComponent
 
   private getCurrencyAxisTitle(): string {
     return this.client?.clientDetails?.preferredCurrency ?? '';
+  }
+
+  /** Matches income list naming for inheritance markers on joint / couple plans. */
+  private getIncomeLabelContextForChart(): IncomeDisplayLabelContext | null {
+    if (!this.client) return null;
+    return {
+      hasPartner: !!this.client.partnerDetail,
+      clientFirstName: this.client.clientDetails?.firstName ?? '',
+      partnerFirstName: this.client.partnerDetail?.firstName ?? '',
+    };
   }
 
   /** X-axis label: "Age", or "Age {main first name}" when the plan has a partner. */
@@ -172,11 +188,15 @@ export class SavingsBarStackedChartComponent
         stacked: true,
         animations: {
           // Keep disabled by default to preserve existing report-page behavior.
-          // Scenario Lab passes `animateUpdates=true`, which turns this on in ngOnChanges.
+          // Scenario Lab + Simulation modal pass `animateUpdates=true`, which turns this on
+          // in ngOnChanges. Tuned for a calm, premium Before/After morph: short duration with
+          // a smooth easeout curve (no overshoot, no bounce).
           enabled: false,
+          easing: 'easeout',
+          speed: 220,
           dynamicAnimation: {
             enabled: true,
-            speed: 1500,
+            speed: 220,
           },
           animateGradually: { enabled: false },
         },
@@ -202,6 +222,12 @@ export class SavingsBarStackedChartComponent
           dataPointSelection: () => undefined,
           mounted: (chartContext: any) => this.postRenderSetup(chartContext),
           updated: (chartContext: any) => this.postRenderSetup(chartContext),
+          /**
+           * After `updateSeries` (Before/After tab), `updated` runs while bar morph is still in progress,
+           * so DOM bar width is tiny and the simulation year band looked like a hairline. Re-run
+           * overlays when dynamic animation finishes so measurements match final bar geometry.
+           */
+          animationEnd: (chartContext: any) => this.postRenderSetup(chartContext),
         },
         selection: {
           enabled: false,
@@ -437,7 +463,7 @@ export class SavingsBarStackedChartComponent
           title: { text: '' },
           labels: {
             formatter: (value: any) =>
-              value != null ? Number(value).toLocaleString() : '',
+              value != null ? Number(value).toLocaleString(undefined, { maximumFractionDigits: 0 }) : '',
           },
         };
       }
@@ -447,7 +473,7 @@ export class SavingsBarStackedChartComponent
     const seriesForChart = ensureUniqueSavingsChartSeriesColors(report.series);
     this.seriesColorsForTooltip = seriesForChart;
 
-    if (changes['report']) {
+    if (changes['report'] || changes['emergencyHighlightYear']) {
       this.cleanupHtmlTooltips();
       this.cleanupEmergencyElements();
       this.cleanupEventLabels();
@@ -598,7 +624,7 @@ export class SavingsBarStackedChartComponent
         title: { text: '' },
         labels: {
           formatter: (value: any) =>
-            value != null ? Number(value).toLocaleString() : '',
+            value != null ? Number(value).toLocaleString(undefined, { maximumFractionDigits: 0 }) : '',
         },
       };
       if (this.chartOptions.xaxis) {
@@ -819,7 +845,7 @@ export class SavingsBarStackedChartComponent
             <div class="event-tooltip ${event.iconUrl}">
               <span style="display:none">${event.name}</span>
               <img src="/assets/images/svgs/${event.iconUrl}.svg" alt="${event.iconUrl}" />
-              <span>${translateTimelineEventDisplayName(this.translate, event.name)}</span>
+              <span>${translateTimelineEventDisplayName(this.translate, event.name, this.getIncomeLabelContextForChart())}</span>
             </div>`,
         });
       });
@@ -888,6 +914,7 @@ export class SavingsBarStackedChartComponent
         label.textContent = translateTimelineEventDisplayName(
           this.translate,
           event.name,
+          this.getIncomeLabelContextForChart(),
         );
         label.className = 'event-label';
         label.style.position = 'fixed';
@@ -955,7 +982,35 @@ export class SavingsBarStackedChartComponent
     );
     if (!emergencySeries) return [];
 
-    const index = emergencySeries.data.findIndex((v: number) => v > 0);
+    let index = emergencySeries.data.findIndex((v: number) => v > 0);
+    if (index < 0 && this.emergencyHighlightYear != null) {
+      const y = Number(this.emergencyHighlightYear);
+      if (Number.isFinite(y)) {
+        index = report.categories.findIndex(
+          (c) => Number(c) === y || String(c) === String(y),
+        );
+        // Plan columns may start after the selected calendar year, or labels may not match exactly.
+        if (index < 0 && report.categories.length > 0) {
+          const numericCats = report.categories.map((c) => Number(c));
+          let best = -1;
+          for (let i = 0; i < numericCats.length; i++) {
+            if (Number.isFinite(numericCats[i]) && numericCats[i] >= y) {
+              best = i;
+              break;
+            }
+          }
+          if (best < 0) {
+            for (let i = numericCats.length - 1; i >= 0; i--) {
+              if (Number.isFinite(numericCats[i]) && numericCats[i] <= y) {
+                best = i;
+                break;
+              }
+            }
+          }
+          index = best >= 0 ? best : 0;
+        }
+      }
+    }
     if (index < 0) return [];
 
     this.emergencyExpenseDataPointIndex = index;
@@ -1040,30 +1095,61 @@ export class SavingsBarStackedChartComponent
     const allSeries = chartHost.querySelectorAll(
       '.apexcharts-bar-series .apexcharts-series',
     );
-    if (!allSeries.length) return;
+
+    const hostRect = chartHost.getBoundingClientRect();
+    const gridEl = chartHost.querySelector<SVGElement>('.apexcharts-grid');
+    const gridRect = gridEl?.getBoundingClientRect();
+    const processed = this.getProcessedReport();
+    const catCount = processed?.categories?.length ?? 0;
+
+    const gridIndexOk =
+      catCount > 0 &&
+      dataPointIndex >= 0 &&
+      dataPointIndex < catCount &&
+      !!gridRect;
 
     // Locate bar center-X and width at the target column
     let barCenterX = 0;
     let barWidth = 30;
     let foundBar = false;
 
-    allSeries.forEach((seriesGroup: Element) => {
-      if (foundBar) return;
-      const bars = seriesGroup.querySelectorAll<SVGPathElement>(
-        'path.apexcharts-bar-area',
-      );
-      const bar = bars[dataPointIndex];
-      if (!bar) return;
-      const rect = bar.getBoundingClientRect();
-      if (rect.width === 0) return;
-      barCenterX = rect.left + rect.width / 2;
-      barWidth = rect.width;
+    // Animated contexts (emergency simulate, Scenario Lab): bar paths morph for ~1s — DOM
+    // measurements flicker. Grid column math is stable from the first frame, so show the
+    // highlight immediately without waiting for animationEnd.
+    if (this.animateUpdates && gridIndexOk) {
+      const cell = gridRect!.width / catCount;
+      barCenterX = gridRect!.left + (dataPointIndex + 0.5) * cell;
+      barWidth = Math.max(22, cell * 0.65);
       foundBar = true;
-    });
+    } else {
+      if (!allSeries.length) return;
+
+      allSeries.forEach((seriesGroup: Element) => {
+        if (foundBar) return;
+        const bars = seriesGroup.querySelectorAll<SVGPathElement>(
+          'path.apexcharts-bar-area',
+        );
+        const bar = bars[dataPointIndex];
+        if (!bar) return;
+        const rect = bar.getBoundingClientRect();
+        if (rect.width === 0) return;
+        barCenterX = rect.left + rect.width / 2;
+        // During Apex morph animation, width can be a fraction of a pixel; keep the band readable.
+        barWidth = Math.max(rect.width, 22);
+        foundBar = true;
+      });
+
+      // Emergency cost 0 on an early year often leaves no visible bar paths (all stacks ~0),
+      // so every path reports width 0 and the overlay was skipped — fall back to grid column geometry.
+      if (!foundBar && gridIndexOk) {
+        const cell = gridRect!.width / catCount;
+        barCenterX = gridRect!.left + (dataPointIndex + 0.5) * cell;
+        barWidth = Math.max(22, cell * 0.65);
+        foundBar = true;
+      }
+    }
 
     if (!foundBar) return;
-
-    const hostRect = chartHost.getBoundingClientRect();
 
     // Ensure host is a positioning context
     if (getComputedStyle(chartHost).position === 'static') {
@@ -1071,8 +1157,6 @@ export class SavingsBarStackedChartComponent
     }
 
     // Use the grid rect for exact plot-area bounds (excludes axis labels)
-    const gridEl = chartHost.querySelector<SVGElement>('.apexcharts-grid');
-    const gridRect = gridEl?.getBoundingClientRect();
     const plotTop = gridRect ? gridRect.top - hostRect.top : 10;
     const plotBottom = gridRect
       ? gridRect.bottom - hostRect.top
@@ -1092,10 +1176,10 @@ export class SavingsBarStackedChartComponent
     chartHost.appendChild(band);
 
     // ── icon sits fully ABOVE the band top edge ─────────────────────────
-    const iconSize = 18; // px — matches font-size
+    const iconSize = 24; // px — slightly larger than legacy 18px marker
     const iconTop = Math.max(2, plotTop - iconSize - 2);
     const icon = document.createElement('div');
-    icon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FF4560" width="${iconSize}" height="${iconSize}"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>`;
+    icon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="${iconSize}" height="${iconSize}" viewBox="0 0 100 100"><path d="M 44 18 Q 50 8, 56 18 L 86 72 Q 92 82, 82 88 L 18 88 Q 8 82, 14 72 Z" fill="#E8384F"/><rect x="46" y="36" width="8" height="26" rx="4" ry="4" fill="white"/><circle cx="50" cy="74" r="5" fill="white"/></svg>`;
     icon.style.position = 'absolute';
     icon.style.pointerEvents = 'none';
     icon.style.zIndex = '11';
@@ -1333,6 +1417,8 @@ export class SavingsBarStackedChartComponent
     'partner-retirement-age-icon': '#fe9614',
     'mortality-icon': '#1c1c1c',
     'inheritance-icon': '#1c1c1c',
+    /** Income-section inheritance marker (Goals-style inheritance-icon stays black for timeline chips). */
+    'inheritance-green': '#34c759',
     'wedding-icon': '#6155f5',
     'state-pension-icon': '#1c1c1c',
     'home-icon': '#ff2d55',
@@ -1354,7 +1440,7 @@ export class SavingsBarStackedChartComponent
     }
     const code = this.client?.clientDetails?.preferredCurrency;
     if (!code || code.length !== 3) {
-      return value.toLocaleString();
+      return value.toLocaleString(undefined, { maximumFractionDigits: 0 });
     }
     try {
       return new Intl.NumberFormat(undefined, {
@@ -1364,7 +1450,7 @@ export class SavingsBarStackedChartComponent
         maximumFractionDigits: 0,
       }).format(value);
     } catch {
-      return value.toLocaleString();
+      return value.toLocaleString(undefined, { maximumFractionDigits: 0 });
     }
   }
 

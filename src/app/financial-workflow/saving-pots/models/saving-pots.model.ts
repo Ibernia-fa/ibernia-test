@@ -53,6 +53,10 @@ export interface ClientSaving {
   contributionStartDate?: AgeYear | null;
   contributionEndDate?: AgeYear | null;
   retirementAge?: number | null;
+  startEventId?: string | null;
+  endEventId?: string | null;
+  contributionStartEventId?: string | null;
+  contributionEndEventId?: string | null;
   ownership?: SavingPotOwnership;
 }
 

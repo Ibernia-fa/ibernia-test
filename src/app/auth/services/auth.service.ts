@@ -32,11 +32,14 @@ export class AuthService {
     return {
       authority: environment.authority,
       client_id: environment.authClientId,
-      redirect_uri: redirectUri,
+      redirect_uri: origin + '/signin-oidc',
       scope: 'openid email profile roles ibernia_api',
       response_type: "code",
-      post_logout_redirect_uri: postLogoutUri
-    }
+      post_logout_redirect_uri: postLogoutUri,
+      automaticSilentRenew: true,
+      silent_redirect_uri: `${origin}/silent-renew-oidc`,
+      clockSkew: 600,
+    };
   }
 
   constructor() {
@@ -53,6 +56,11 @@ export class AuthService {
 
   public login = () => {
     return this._userManager.signinRedirect();
+  }
+
+  /** Forces the IdP to show the login form even if a session exists (prompt=login). */
+  public forceLogin = () => {
+    return this._userManager.signinRedirect({ prompt: 'login' });
   }
 
   /**
@@ -74,7 +82,31 @@ export class AuthService {
     ) {
       sessionStorage.setItem(AUTH_RETURN_URL_KEY, path);
     }
-    void this.clearLocalOidcSession().then(() => this.login());
+    void this.clearLocalOidcSession()
+      .then(() => this._userManager.signinRedirect())
+      .catch((err: unknown) => {
+        console.error('[Auth] redirectToLogin failed', err);
+        this._loginRedirectInProgress = false;
+      });
+  };
+
+  /** Silent renew iframe callback (oidc-client automaticSilentRenew). */
+  public finishSilentRenew = (): Promise<User | void> => {
+    const href =
+      typeof window !== 'undefined' ? window.location.href : undefined;
+    return this._userManager
+      .signinSilentCallback(href)
+      .then((user) => {
+        if (user && this.checkUser(user)) {
+          this._user = user;
+          this._loginChangedSubject.next(true);
+        }
+        return user;
+      })
+      .catch((err: unknown) => {
+        console.warn('[Auth] silent renew callback failed', err);
+        return undefined;
+      });
   };
 
   public isAuthenticated = (): Promise<boolean> => {
@@ -91,12 +123,18 @@ export class AuthService {
   }
 
   public finishLogin = (): Promise<User> => {
-    return this._userManager.signinRedirectCallback()
+    return this._userManager
+      .signinRedirectCallback()
       .then((user: User) => {
+        this._loginRedirectInProgress = false;
         this._loginChangedSubject.next(this.checkUser(user));
         return user;
       })
-  }
+      .catch((err: unknown) => {
+        this._loginRedirectInProgress = false;
+        throw err;
+      });
+  };
 
   public logout = () => {
     const postLogoutRedirectUri = this.portalOrigin() + '/signout-callback-oidc';
@@ -117,8 +155,9 @@ export class AuthService {
 
   public finishLogout = () => {
     this._user = null;
+    this._loginRedirectInProgress = false;
     return this._userManager.signoutRedirectCallback();
-  }
+  };
 
   /** Clears OIDC storage when the user did not complete a normal endsession redirect (e.g. logged out on STS only). */
   public clearLocalOidcSession = (): Promise<void> => {

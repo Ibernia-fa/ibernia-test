@@ -85,6 +85,8 @@ export class NotificationFormComponent implements OnInit, OnDestroy {
     this.form = this.fb.group({
       title: ['', Validators.required],
       body: ['', [Validators.required, maxWordsValidator(MAX_MESSAGE_WORDS)]],
+      titleIt: [''],
+      bodyIt: ['', [maxWordsValidator(MAX_MESSAGE_WORDS)]],
       categoryLabel: ['', trimmedRequired],
       channel: ['both'],
       audienceType: ['all'],
@@ -154,6 +156,10 @@ export class NotificationFormComponent implements OnInit, OnDestroy {
     return countWords(this.form.get('body')?.value);
   }
 
+  get messageWordCountIt(): number {
+    return countWords(this.form.get('bodyIt')?.value);
+  }
+
   submit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -169,6 +175,10 @@ export class NotificationFormComponent implements OnInit, OnDestroy {
       body: v.body ?? '',
       categoryLabel: labelTrim
     };
+    const titleIt = (v.titleIt ?? '').trim();
+    const bodyIt = (v.bodyIt ?? '').trim();
+    if (titleIt) templateData['titleIt'] = titleIt;
+    if (bodyIt) templateData['bodyIt'] = bodyIt;
     const req: CreateNotificationRequest = {
       type: 'admin',
       templateKey: 'admin_announcement',

@@ -262,8 +262,9 @@ export class ClientListComponent implements OnInit, AfterViewInit, OnDestroy {
         if (res.status === 204) {
           // preferences missing → open dialog
           const ref = this.dialog.open(DefaultPreferanceComponent, {
-            width: '560px',
+            width: '612px',
             maxWidth: '92vw',
+            maxHeight: '90vh',
             disableClose: true,
             autoFocus: false,
             data: { mode: 'onboarding' },
@@ -454,12 +455,15 @@ export class ClientListComponent implements OnInit, AfterViewInit, OnDestroy {
       width: '612px',
       maxHeight: '90vh',
       disableClose: true,
+      autoFocus: false,
     });
     dialogRef.afterClosed().subscribe((result: any) => {
       if (result?.action === 'added') {
         this.router.navigate(['/clients/' + result.client.id + '/profile']);
       } else if (result?.action === 'addedWithPlan') {
-        // navigation handled inside client-add via AddModelDialogComponent
+        // Client is already persisted; if user cancelled the plan dialog they stay here — reload list.
+        // If they started a plan, navigation leaves the page; refresh is harmless.
+        this.getClients(this.user.sub);
       }
     });
   }

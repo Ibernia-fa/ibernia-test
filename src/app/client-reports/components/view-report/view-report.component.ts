@@ -318,8 +318,8 @@ export class ViewReportComponent implements OnChanges {
 
   getProtectionScoreCssClass(score: number | null | undefined): string {
     if (score == null || score < 50) return 'ibernia-red';
-    if (score < 75) return 'ibernia-orange';
-    if (score < 89) return 'ibernia-light-green';
+    if (score < 70) return 'ibernia-orange';
+    if (score < 90) return 'ibernia-light-green';
     return 'ibernia-dark-green';
   }
 

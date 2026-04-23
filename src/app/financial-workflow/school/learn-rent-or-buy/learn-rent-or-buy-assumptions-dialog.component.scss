@@ -1,0 +1,157 @@
+$ibernia-blue: #4043af;
+$ibernia-ink: #1c1c1c;
+$ibernia-mute: #5a596e;
+$ibernia-line: #e5e5ec;
+$ibernia-bg-soft: #f7f8fc;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: 100%;
+}
+
+/* Surface tweaks: align this dialog with the canonical Ibernia modal shell
+   (`Add income`, `Tax settings`, `Mortgage calculator`). The shared overrides
+   in `_dialog.scss` already centre the title and apply the absolute close
+   button via `.dialog-header` / `.dialog-title` / `.dialog-close-btn` — we
+   only adjust spacing and remove any divider line above the actions row. */
+.rb-assumptions {
+  font-family: "Ubuntu", sans-serif;
+  color: $ibernia-ink;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  flex: 1 1 auto;
+  max-height: 100%;
+  overflow: hidden;
+
+  /* Header uses the shared `.dialog-header` rule for centering + close button
+     reservation. We only need a relative anchor so `.dialog-close-btn` (which
+     is `position: absolute`) lands inside the dialog surface, plus a touch of
+     bottom breathing room before the field grid. */
+  &__header {
+    position: relative;
+    padding: 0 40px 16px;
+    flex: 0 0 auto;
+
+    /* Re-anchor the shared `.dialog-close-btn` (top: 16px in `_dialog.scss`)
+       so the 40px mat-icon-button's visual center sits on the same horizontal
+       line as the 24px title text. Scoped to this modal only — the close
+       button's own size, styling, and behavior are untouched. */
+    .dialog-close-btn {
+      top: -4px;
+    }
+  }
+
+  /* Reset legacy 22px / 700 title — the canonical `.dialog-title` is 24/600. */
+  &__title {
+    margin: 0;
+  }
+
+  /* Scrollable list of fields. */
+  &__content {
+    padding: 4px 4px !important;
+    margin: 0 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    max-height: none !important;
+    min-height: 0;
+    flex: 1 1 auto;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px 18px;
+  }
+
+  /* No `border-top`: the previous divider line above the buttons is removed
+     intentionally to match the rest of Ibernia's modals (Default assumptions,
+     Tax settings). Spacing alone separates the actions from the field grid. */
+  &__actions {
+    margin: 12px 0 0 0;
+    flex: 0 0 auto;
+  }
+}
+
+.rb-assum-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+
+  &__label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: $ibernia-mute;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  &__hint {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+    color: #b6b9c9;
+    cursor: help;
+  }
+
+  &__control {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid $ibernia-line;
+    border-radius: 12px;
+    padding: 10px 14px;
+    background: #ffffff;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease;
+
+    &:focus-within {
+      border-color: $ibernia-blue;
+      box-shadow: 0 0 0 3px rgba(64, 67, 175, 0.12);
+    }
+  }
+
+  &__input {
+    flex: 1 1 auto;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 600;
+    color: $ibernia-ink;
+    width: 100%;
+    min-width: 0;
+    padding: 0;
+    font-variant-numeric: tabular-nums;
+
+    &::placeholder {
+      color: #c0c0cc;
+      font-weight: 600;
+    }
+  }
+
+  &__suffix {
+    font-size: 14px;
+    font-weight: 600;
+    color: $ibernia-mute;
+    flex-shrink: 0;
+  }
+}
+
+/* The dialog surface sets `padding: 24px`; the global `modal-action` button
+   sizing rule (`min-width: 135px`) already gives the Cancel/Save pair the
+   correct presence so we don't redeclare it here. We only drop a small,
+   responsive single-column adjustment for narrow viewports. */
+@media (max-width: 600px) {
+  .rb-assumptions__grid {
+    grid-template-columns: 1fr;
+  }
+}

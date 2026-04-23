@@ -61,6 +61,8 @@
                     placeholder="0"
                     thousandSeparatorInput
                     (input)="onAmountInput($event.target.value)"
+                    appAutoFocus
+                    autoFocusSelect
                   />
                 </div>
                 <div class="right custom-select">
@@ -137,9 +139,12 @@
                           <hr />
                         }
                         @for (event of eventsList; track event) {
-                          <mat-option [value]="event.start.year"
+                          <mat-option
+                            [value]="
+                              event.id ? 'event:' + event.id : event.start.year
+                            "
                             >{{ getTimelineEventLabel(event.name) }} ({{
-                              event.start.age
+                              displayAgeForTimelineEvent(event)
                             }})</mat-option
                           >
                         }
@@ -195,10 +200,13 @@
                           formControlName="end"
                           hideSingleSelectionIndicator
                         >
-                          @for (event of getEndEvents(); track event.id) {
-                            <mat-option [value]="event.start.year"
+                          @for (event of getEndEvents(); track trackEndEventRow(event)) {
+                            <mat-option
+                              [value]="
+                                event.id ? 'event:' + event.id : event.start.year
+                              "
                               >{{ getTimelineEventLabel(event.name) }} ({{
-                                event.start.age
+                                displayAgeForTimelineEvent(event)
                               }})</mat-option
                             >
                           }
@@ -251,6 +259,9 @@
                   </div>
                 }
               </div>
+              @if (startEndDurationHint) {
+                <span class="field-hint">{{ startEndDurationHint }}</span>
+              }
             </div>
           </div>
 
@@ -392,25 +403,31 @@
             </div>
           }
 
-          <section class="example-section">
-            <mat-checkbox
-              type="checkbox"
-              class="example-margin"
-              formControlName="stopIncome"
-            >
-              {{ "EMERGENCIES.STOP_INCOME" | translate }}
-            </mat-checkbox>
-            @if (
-              simulateEmergencyForm.get("stopIncome")?.touched &&
-              simulateEmergencyForm.get("stopIncome")?.hasError("required")
-            ) {
-              <span class="field-error d-block">{{
-                "Required" | translate
-              }}</span>
-            }
-          </section>
+          @if (stoppableIncomes.length > 0) {
+            <section class="example-section">
+              <mat-checkbox
+                type="checkbox"
+                class="example-margin"
+                formControlName="stopIncome"
+                (change)="onStopIncomeUserToggled($event)"
+              >
+                {{ "EMERGENCIES.STOP_INCOME" | translate }}
+              </mat-checkbox>
+              @if (
+                simulateEmergencyForm.get("stopIncome")?.touched &&
+                simulateEmergencyForm.get("stopIncome")?.hasError("required")
+              ) {
+                <span class="field-error d-block">{{
+                  "Required" | translate
+                }}</span>
+              }
+            </section>
+          }
 
-          @if (simulateEmergencyForm.get("stopIncome")?.value) {
+          @if (
+            simulateEmergencyForm.get("stopIncome")?.value &&
+            stoppableIncomes.length > 0
+          ) {
             <div class="w-100 form-field gap-8">
               <mat-label
                 class="f-s-16 f-w-500 ibr-black d-block"
@@ -419,8 +436,12 @@
               >
 
               <div class="select-option position-relative">
-                <mat-select formControlName="stoppedIncomeId" placeholder="">
-                  @for (income of incomes; track income.id) {
+                <mat-select
+                  #stoppedIncomeSelect
+                  formControlName="stoppedIncomeId"
+                  placeholder=""
+                >
+                  @for (income of stoppableIncomes; track income.id) {
                     <mat-option [value]="income.id">
                       {{
                         income.description
@@ -546,6 +567,7 @@
             [forecastEndDate]="forecastEndDate"
             [planDuration]="cashflow?.planDuration"
             [chartHeight]="simulationChartHeight"
+            [emergencyHighlightYear]="completedEmergencyHighlightYear"
             [emergencyIconUrl]="
               activeTab === 'simulated' ? emergency?.iconUrl : 'none'
             "

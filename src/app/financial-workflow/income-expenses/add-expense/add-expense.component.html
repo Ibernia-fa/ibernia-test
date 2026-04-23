@@ -141,6 +141,8 @@
                   thousandSeparatorInput
                   (input)="onAmountInput($event.target.value)"
                   placeholder="0"
+                  appAutoFocus
+                  autoFocusSelect
                 />
               </div>
               <div class="right position-relative">
@@ -226,7 +228,7 @@
                       @for (event of eventsList; track event) {
                         <mat-option [value]="'event:' + event.id"
                           >{{ getTimelineEventLabel(event.name) }} ({{
-                            getAgeForYear(event.start.year)
+                            displayAgeForTimelineEvent(event)
                           }})</mat-option
                         >
                       }
@@ -286,7 +288,7 @@
                         @for (event of getEndEvents(); track event.id) {
                           <mat-option [value]="'event:' + event.id"
                             >{{ getTimelineEventLabel(event.name) }} ({{
-                              getAgeForYear(event.start.year)
+                              displayAgeForTimelineEvent(event)
                             }})</mat-option
                           >
                         }
@@ -336,6 +338,9 @@
                 </div>
               }
             </div>
+            @if (startEndDurationHint) {
+              <span class="field-hint">{{ startEndDurationHint }}</span>
+            }
           </div>
         </div>
 

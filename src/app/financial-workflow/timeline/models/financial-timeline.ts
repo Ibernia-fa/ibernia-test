@@ -37,6 +37,10 @@ export interface ClientEvent {
   isFinance: boolean | false;
   isParent: boolean | false;
   isPartnerEvent?: boolean;
+  /** Mirrors expense/income line item link to a timeline event for start. */
+  startEventId?: string | null;
+  /** Mirrors expense/income line item link to a timeline event for end. */
+  endEventId?: string | null;
 }
 
 export interface NetAmount {
@@ -82,4 +86,7 @@ export interface FinancialRecordLineItem {
   parentId: string;
   isCash: boolean | false;
   isFinance: boolean | false;
+  inheritanceGrossAmount?: number | null;
+  startEventId?: string | null;
+  endEventId?: string | null;
 }

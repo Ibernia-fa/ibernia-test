@@ -1,11 +1,18 @@
-import { Component, Inject, OnInit} from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import {
+  MAT_DIALOG_DATA,
+  MatDialog,
+  MatDialogModule,
+  MatDialogRef,
+} from '@angular/material/dialog';
+import { ShareReportCredentialsDialogComponent } from './share-report-credentials-dialog/share-report-credentials-dialog.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { switchMap, tap } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
@@ -13,7 +20,8 @@ import { Client } from 'src/app/clients/models/client';
 import { Cashflow } from 'src/app/clients/models/cashflow';
 import { FinancialWorkflowService } from '../services/financial-workflow.service';
 import { ShareReportHttpService, ClientReportRequest } from './services/share-report.service';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-share-report',
@@ -24,6 +32,7 @@ import { TranslateModule } from '@ngx-translate/core';
     MatSelectModule,
     MatIconModule,
     MatButtonModule,
+    MatProgressSpinnerModule,
     ReactiveFormsModule,
     TranslateModule
   ],
@@ -41,13 +50,16 @@ export class ShareReportComponent {
   clientId: string;
   cashflowId: string;
   isLoaderVisible = false;
-  
+  isCopying = false;
+
   constructor(
     private dialogRef: MatDialogRef<ShareReportComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private fb: FormBuilder,
     private activatedRoute: ActivatedRoute,
     private toastr: ToastrService,
+    private translate: TranslateService,
+    private matDialog: MatDialog,
     private financialWorkflowService: FinancialWorkflowService,
     private shareReportHttpService: ShareReportHttpService) 
   { 
@@ -87,9 +99,9 @@ export class ShareReportComponent {
     this.dialogRef.close();
   }
 
-  shareReport(): void {
+  copyLinkAndPassword(): void {
     if (!this.reportForm.valid || !this.clientId || !this.cashflowId) {
-      this.toastr.error('Missing required data to share the report', 'Error!');
+      this.toastr.error(this.translate.instant('ERROR.SHARE_REPORT_MISSING_DATA'));
       return;
     }
 
@@ -97,7 +109,74 @@ export class ShareReportComponent {
       clientId: this.clientId,
       cashflowId: this.cashflowId,
       expiryDays: this.reportForm.value.expiry,
-      requestBy: this.client?.financialAdvisor?.advisorId ?? ''
+      requestBy: this.client?.financialAdvisor?.advisorId ?? '',
+      sendEmail: false,
+      locale: this.translate.currentLang || 'en',
+    };
+
+    this.isCopying = true;
+    this.shareReportHttpService.addClientReport(payload).subscribe({
+      next: (response) => {
+        this.isCopying = false;
+        if (!response?.success || !response.shareableUrl?.trim() || !response.password?.trim()) {
+          this.toastr.error(this.translate.instant('ERROR.SHARE_REPORT_COPY_FAILED'));
+          return;
+        }
+        const link = response.shareableUrl.trim();
+        const password = response.password.trim();
+        const text = this.translate.instant('SHARE.COPY_PLAN_ACCESS_BODY', {
+          link,
+          password,
+        });
+        const openCredentialsDialog = () => {
+          this.matDialog.open(ShareReportCredentialsDialogComponent, {
+            width: '520px',
+            maxWidth: '95vw',
+            data: { shareableUrl: link, password, fullCopyText: text },
+            autoFocus: false,
+          });
+        };
+        navigator.clipboard
+          .writeText(text)
+          .then(() => {
+            this.toastr.success(
+              this.translate.instant('TOAST.COPIED_TO_CLIPBOARD'),
+            );
+            openCredentialsDialog();
+          })
+          .catch(() => {
+            this.toastr.info(
+              this.translate.instant('TOAST.LINK_CREATED') + ' ' + text,
+            );
+            openCredentialsDialog();
+          });
+      },
+      error: (error: HttpErrorResponse) => {
+        this.isCopying = false;
+        console.error('Error:', error);
+        this.toastr.error(this.mapShareErrorMessage(error));
+      },
+    });
+  }
+
+  shareReport(): void {
+    if (!this.reportForm.valid || !this.clientId || !this.cashflowId) {
+      this.toastr.error(this.translate.instant('ERROR.SHARE_REPORT_MISSING_DATA'));
+      return;
+    }
+
+    if (!this.clientEmail?.trim()) {
+      this.toastr.error(this.translate.instant('ERROR.NO_CLIENT_EMAIL'));
+      return;
+    }
+
+    const payload: ClientReportRequest = {
+      clientId: this.clientId,
+      cashflowId: this.cashflowId,
+      expiryDays: this.reportForm.value.expiry,
+      requestBy: this.client?.financialAdvisor?.advisorId ?? '',
+      sendEmail: true,
+      locale: this.translate.currentLang || 'en',
     };
 
     this.isLoaderVisible = true;
@@ -105,17 +184,51 @@ export class ShareReportComponent {
     this.shareReportHttpService.addClientReport(payload).subscribe({
       next: (response) => {
         this.isLoaderVisible = false;
-        this.toastr.success(
-          `Link and password successfully sent to ${this.clientName || 'client'}`
-        );
+        if (!response?.success) {
+          this.toastr.error(this.translate.instant('ERROR.SHARE_REPORT_FAILED'));
+          return;
+        }
+        const name = this.clientName?.trim() || this.translate.instant('SHARE.CLIENT_FALLBACK_NAME');
+        this.toastr.success(this.translate.instant('TOAST.PLAN_SHARE_EMAIL_SENT', { name }));
         this.dialogRef.close(true);
       },
-      error: (error) => {
+      error: (error: HttpErrorResponse) => {
         this.isLoaderVisible = false;
         console.error('Error:', error);
-        this.toastr.error('Failed to share the report. Please try again', 'Error!');
+        this.toastr.error(this.mapShareErrorMessage(error));
       },
     });
+  }
+
+  private mapShareErrorMessage(error: HttpErrorResponse): string {
+    const raw = this.parseErrorBody(error);
+    if (raw === 'NO_CLIENT_EMAIL') {
+      return this.translate.instant('ERROR.NO_CLIENT_EMAIL');
+    }
+    if (raw === 'EMAIL_SEND_FAILED' || raw === 'CREATE_FAILED') {
+      return this.translate.instant('ERROR.SHARE_REPORT_FAILED');
+    }
+    return this.translate.instant('ERROR.SHARE_REPORT_FAILED');
+  }
+
+  private parseErrorBody(error: HttpErrorResponse): string {
+    const body = error?.error;
+    if (typeof body === 'string') {
+      const trimmed = body.trim();
+      if (trimmed.startsWith('{')) {
+        try {
+          const parsed = JSON.parse(trimmed) as { detail?: string };
+          return parsed?.detail?.trim() ?? '';
+        } catch {
+          return trimmed;
+        }
+      }
+      return trimmed.replace(/^"|"$/g, '');
+    }
+    if (body && typeof body === 'object' && 'detail' in body) {
+      return String((body as { detail?: string }).detail ?? '').trim();
+    }
+    return '';
   }
 }
 

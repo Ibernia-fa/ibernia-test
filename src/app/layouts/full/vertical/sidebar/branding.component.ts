@@ -22,17 +22,35 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
       *ngIf="profileImage && sanitizedImage"
       [src]="sanitizedImage"
       alt="Company logo"
-      class="brand-layer"
+      class="brand-layer brand-logo--custom"
       loading="eager"
       decoding="sync"
     />
   </a>`,
   styles: [
     `
+      .branding-link {
+        max-width: 160px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+      }
+      .branding-link:focus-visible {
+        outline: none;
+        border: none;
+      }
       .brand-layer {
         width: 100%;
-        max-width: 160px;
-        height: 52px;
+        max-width: 154px;
+        height: auto;
+        // height: 52px;
+        // object-fit: cover;
+        // object-position: center;
+      }
+      .brand-layer.brand-logo--custom {
+        width: 100%;
+        max-width: 154px;
+        height: 48px;
         object-fit: cover;
         object-position: center;
       }

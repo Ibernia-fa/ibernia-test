@@ -1,8 +1,45 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { ActivatedRoute } from '@angular/router';
+import { Observable, combineLatest, of } from 'rxjs';
+import { catchError, map, switchMap, take } from 'rxjs/operators';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+
+import { Cashflow } from 'src/app/clients/models/cashflow';
+import { Client } from 'src/app/clients/models/client';
+import { FinancialWorkflowService } from '../services/financial-workflow.service';
+import { SavingsPotsHttpService } from '../saving-pots/services/savings-pots-http.service';
+import {
+  ClientSaving,
+  SavingPotType,
+  SavingPotsModel,
+} from '../saving-pots/models/saving-pots.model';
+import { LearnInflationComponent } from './learn-inflation/learn-inflation.component';
+import { LearnCompoundInterestComponent } from './learn-compound-interest/learn-compound-interest.component';
+import { LearnCostOfWaitingComponent } from './learn-cost-of-waiting/learn-cost-of-waiting.component';
+import { LearnCashBufferComponent } from './learn-cash-buffer/learn-cash-buffer.component';
+import { LearnInvestToReachGoalComponent } from './learn-invest-to-reach-goal/learn-invest-to-reach-goal.component';
+import { LearnRentOrBuyComponent } from './learn-rent-or-buy/learn-rent-or-buy.component';
+import type {
+  HomeEventPrefill,
+  LearnRentOrBuyDialogData,
+} from './learn-rent-or-buy/learn-rent-or-buy.types';
+import { LearnTimeInMarketComponent } from './learn-time-in-market/learn-time-in-market.component';
+import { IncomeExpensesHttpService } from '../income-expenses/services/income-expenses-http.service';
+import { FinancialViewModel, IncomeExpense } from '../income-expenses/model/income-expense';
+import { getCompletedYearsAgeAtDate } from 'src/app/shared/utils/client-age-at-reference';
+import { WealthHttpService } from '../wealth/services/wealth-http.service';
+import { WealthAssetModel, WealthDashboardModel } from '../wealth/models/wealth.model';
+import { SettingsService } from '../../default-preferance/services/default-preferance.http.service';
+import { TimelineHttpService } from '../timeline/services/timeline-http.service';
+import type {
+  ClientEvent,
+  FinancialRecordLineItem,
+} from '../timeline/models/financial-timeline';
 
 interface SchoolSlide {
   title: string;
@@ -16,10 +53,19 @@ interface SchoolModule {
   slides: SchoolSlide[];
 }
 
+const DEFAULT_INFLATION_FALLBACK = 2.5;
+const DEFAULT_AMOUNT_FALLBACK = 100000;
+const DEFAULT_MONTHLY_EXPENSES_FALLBACK = 3000;
 @Component({
   selector: 'app-school',
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatButtonModule, TranslateModule],
+  imports: [
+    CommonModule,
+    MatCardModule,
+    MatButtonModule,
+    MatDialogModule,
+    TranslateModule,
+  ],
   templateUrl: './school.component.html',
   styleUrl: './school.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -27,6 +73,24 @@ interface SchoolModule {
 export class SchoolComponent {
   modules: SchoolModule[] = [];
   activeModule: SchoolModule | null = null;
+  activeSlideIndex = 0;
+  isOpeningInflation = false;
+  isOpeningCompound = false;
+  isOpeningCostOfWaiting = false;
+  isOpeningCashBuffer = false;
+  isOpeningInvestToReachGoal = false;
+  isOpeningRentOrBuy = false;
+  isOpeningTimeInMarket = false;
+
+  private readonly dialog = inject(MatDialog);
+  private readonly activatedRoute = inject(ActivatedRoute);
+  private readonly financialWorkflowService = inject(FinancialWorkflowService);
+  private readonly savingsPotsHttpService = inject(SavingsPotsHttpService);
+  private readonly incomeExpensesHttpService = inject(IncomeExpensesHttpService);
+  private readonly wealthHttpService = inject(WealthHttpService);
+  private readonly settingsService = inject(SettingsService);
+  private readonly timelineHttpService = inject(TimelineHttpService);
+  private readonly destroyRef = inject(DestroyRef);
 
   constructor(private translate: TranslateService) {
     this.modules = [
@@ -104,7 +168,6 @@ export class SchoolComponent {
       },
     ];
   }
-  activeSlideIndex = 0;
 
   get hasActiveModule(): boolean {
     return !!this.activeModule;
@@ -143,5 +206,575 @@ export class SchoolComponent {
       this.activeSlideIndex -= 1;
     }
   }
-}
 
+  /**
+   * Opens the Inflation educational slide. Prefills:
+   * - default inflation = current plan's `cashflow.inflationRate`
+   *   (falls back to client default, then 2.5%)
+   * - default starting amount = sum of all Cash savings across main client,
+   *   partner and joint ownership (falls back to a sensible value)
+   */
+  openInflationLesson(): void {
+    if (this.isOpeningInflation) return;
+    this.isOpeningInflation = true;
+
+    this.fetchLessonPlanContext$()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: ({ client, cashflow, pots }) => {
+          const startingAmount = this.computeTotalCashSavings(pots?.clientSavings ?? []);
+          const inflationRate =
+            cashflow?.inflationRate ??
+            client?.clientDetails?.inflationRate ??
+            DEFAULT_INFLATION_FALLBACK;
+
+          this.openInflationDialog({
+            startingAmount: startingAmount > 0 ? startingAmount : DEFAULT_AMOUNT_FALLBACK,
+            inflationRate,
+            currencyCode: client?.clientDetails?.preferredCurrency,
+          });
+          this.isOpeningInflation = false;
+        },
+        error: () => {
+          this.openInflationDialog({
+            startingAmount: DEFAULT_AMOUNT_FALLBACK,
+            inflationRate: DEFAULT_INFLATION_FALLBACK,
+          });
+          this.isOpeningInflation = false;
+        },
+      });
+  }
+
+  /**
+   * Compound growth lesson: same cash-savings and inflation defaults as inflation;
+   * return rate is handled inside the dialog (5% each time it opens).
+   */
+  openCompoundInterestLesson(): void {
+    if (this.isOpeningCompound) return;
+    this.isOpeningCompound = true;
+
+    this.fetchLessonPlanContext$()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: ({ client, cashflow, pots }) => {
+          const startingAmount = this.computeTotalCashSavings(pots?.clientSavings ?? []);
+          const inflationRate =
+            cashflow?.inflationRate ??
+            client?.clientDetails?.inflationRate ??
+            DEFAULT_INFLATION_FALLBACK;
+
+          this.openCompoundDialog({
+            startingAmount: startingAmount > 0 ? startingAmount : DEFAULT_AMOUNT_FALLBACK,
+            inflationRate,
+            currencyCode: client?.clientDetails?.preferredCurrency,
+          });
+          this.isOpeningCompound = false;
+        },
+        error: () => {
+          this.openCompoundDialog({
+            startingAmount: DEFAULT_AMOUNT_FALLBACK,
+            inflationRate: DEFAULT_INFLATION_FALLBACK,
+          });
+          this.isOpeningCompound = false;
+        },
+      });
+  }
+
+  /**
+   * Opportunity cost of delaying investment: same cash-savings prefill and plan inflation
+   * as the other School lessons (inflation toggle uses plan inflation when enabled).
+   */
+  /**
+   * Cash buffer lesson: prefills cash savings pots and recurring monthly expenses
+   * from Money In & Out (one-off expense lines excluded).
+   */
+  openCashBufferLesson(): void {
+    if (this.isOpeningCashBuffer) return;
+    this.isOpeningCashBuffer = true;
+
+    this.fetchCashBufferLessonContext$()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: ({ client, pots, incomeExpense }) => {
+          const fromPots = this.computeTotalCashSavings(pots?.clientSavings ?? []);
+          const recurring = this.computeMonthlyRecurringExpenses(
+            incomeExpense?.expenses,
+          );
+
+          this.openCashBufferDialog({
+            currentCash:
+              fromPots > 0 ? fromPots : DEFAULT_AMOUNT_FALLBACK,
+            monthlyRecurringExpenses:
+              recurring > 0 ? recurring : DEFAULT_MONTHLY_EXPENSES_FALLBACK,
+            currencyCode: client?.clientDetails?.preferredCurrency,
+          });
+          this.isOpeningCashBuffer = false;
+        },
+        error: () => {
+          this.openCashBufferDialog({
+            currentCash: DEFAULT_AMOUNT_FALLBACK,
+            monthlyRecurringExpenses: DEFAULT_MONTHLY_EXPENSES_FALLBACK,
+          });
+          this.isOpeningCashBuffer = false;
+        },
+      });
+  }
+
+  openCostOfWaitingLesson(): void {
+    if (this.isOpeningCostOfWaiting) return;
+    this.isOpeningCostOfWaiting = true;
+
+    this.fetchLessonPlanContext$()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: ({ client, cashflow, pots }) => {
+          const startingAmount = this.computeTotalCashSavings(pots?.clientSavings ?? []);
+          const inflationRate =
+            cashflow?.inflationRate ??
+            client?.clientDetails?.inflationRate ??
+            DEFAULT_INFLATION_FALLBACK;
+
+          this.openCostOfWaitingDialog({
+            startingAmount: startingAmount > 0 ? startingAmount : DEFAULT_AMOUNT_FALLBACK,
+            inflationRate,
+            currencyCode: client?.clientDetails?.preferredCurrency,
+          });
+          this.isOpeningCostOfWaiting = false;
+        },
+        error: () => {
+          this.openCostOfWaitingDialog({
+            startingAmount: DEFAULT_AMOUNT_FALLBACK,
+            inflationRate: DEFAULT_INFLATION_FALLBACK,
+          });
+          this.isOpeningCostOfWaiting = false;
+        },
+      });
+  }
+
+  /**
+   * Monthly savings needed to reach a goal by a target age; optional real (inflation) view
+   * like other School lessons. Age from plan birth date; inflation from cashflow when toggled on.
+   */
+  openRentOrBuyLesson(): void {
+    if (this.isOpeningRentOrBuy) return;
+    this.isOpeningRentOrBuy = true;
+
+    this.fetchRentOrBuyLessonContext$()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: ({ client, cashflow, wealth, incomeExpense, homeEvent }) => {
+          const mainHome = this.inferMainResidenceValue(wealth?.assets);
+          const rentGuess = this.inferHousingRentMonthly(incomeExpense?.expenses);
+
+          /* Source priority for shared rates:
+               1. User's Default Assumptions (UserProfile.preferences)
+               2. Plan-level inflation (cashflow / client) — kept for parity
+                  with the existing inflation lesson behaviour.
+             The component's static fallbacks act as the final backstop. */
+          const prefs = this.settingsService.currentUserData?.preferences;
+          const inflationRate =
+            prefs?.inflationRate ??
+            cashflow?.inflationRate ??
+            client?.clientDetails?.inflationRate ??
+            DEFAULT_INFLATION_FALLBACK;
+          const investmentReturn = prefs?.investmentReturn ?? null;
+          const mortgageRate = prefs?.mortgageInterestRate ?? null;
+
+          this.openRentOrBuyDialog({
+            homePrice: mainHome,
+            monthlyRent: rentGuess,
+            inflationPct: inflationRate,
+            investmentReturnPct: investmentReturn,
+            mortgageRatePct: mortgageRate,
+            fromHomeEvent: homeEvent,
+            currencyCode: client?.clientDetails?.preferredCurrency,
+          });
+          this.isOpeningRentOrBuy = false;
+        },
+        error: () => {
+          this.openRentOrBuyDialog({
+            inflationPct: DEFAULT_INFLATION_FALLBACK,
+          });
+          this.isOpeningRentOrBuy = false;
+        },
+      });
+  }
+
+  openInvestToReachGoalLesson(): void {
+    if (this.isOpeningInvestToReachGoal) return;
+    this.isOpeningInvestToReachGoal = true;
+
+    this.fetchLessonPlanContext$()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: ({ client, cashflow }) => {
+          const birthForAge = cashflow?.clientBirthDate ?? client?.clientDetails?.birthDate;
+          const currentAge = birthForAge
+            ? getCompletedYearsAgeAtDate(birthForAge, new Date())
+            : NaN;
+          const inflationRate =
+            cashflow?.inflationRate ??
+            client?.clientDetails?.inflationRate ??
+            DEFAULT_INFLATION_FALLBACK;
+
+          this.openInvestToReachGoalDialog({
+            currentAge,
+            inflationRate,
+            currencyCode: client?.clientDetails?.preferredCurrency,
+          });
+          this.isOpeningInvestToReachGoal = false;
+        },
+        error: () => {
+          this.openInvestToReachGoalDialog({
+            currentAge: NaN,
+            inflationRate: DEFAULT_INFLATION_FALLBACK,
+          });
+          this.isOpeningInvestToReachGoal = false;
+        },
+      });
+  }
+
+  private fetchCashBufferLessonContext$(): Observable<{
+    client: Client;
+    pots: SavingPotsModel;
+    incomeExpense: IncomeExpense | null;
+  }> {
+    const params$ = this.activatedRoute.parent?.params ?? this.activatedRoute.params;
+    return params$.pipe(
+      take(1),
+      switchMap((params) =>
+        this.financialWorkflowService.loadClientCashflowMetadata(params).pipe(take(1)),
+      ),
+      switchMap(([client, cashflow]) =>
+        combineLatest([
+          this.savingsPotsHttpService.getAllSavingsPots((cashflow as Cashflow).id),
+          this.incomeExpensesHttpService
+            .getAllIncomeExpenses((cashflow as Cashflow).id)
+            .pipe(catchError(() => of(null))),
+        ]).pipe(
+          take(1),
+          map(([pots, incomeExpense]) => ({
+            client: client as Client,
+            pots: pots as SavingPotsModel,
+            incomeExpense: incomeExpense as IncomeExpense | null,
+          })),
+        ),
+      ),
+    );
+  }
+
+  private fetchRentOrBuyLessonContext$(): Observable<{
+    client: Client;
+    cashflow: Cashflow;
+    wealth: WealthDashboardModel | null;
+    incomeExpense: IncomeExpense | null;
+    homeEvent: HomeEventPrefill | null;
+  }> {
+    const params$ = this.activatedRoute.parent?.params ?? this.activatedRoute.params;
+    return params$.pipe(
+      take(1),
+      switchMap((params) =>
+        this.financialWorkflowService.loadClientCashflowMetadata(params).pipe(take(1)),
+      ),
+      switchMap(([client, cashflow]) =>
+        combineLatest([
+          this.wealthHttpService
+            .getDashboard((cashflow as Cashflow).id)
+            .pipe(catchError(() => of(null))),
+          this.incomeExpensesHttpService
+            .getAllIncomeExpenses((cashflow as Cashflow).id)
+            .pipe(catchError(() => of(null))),
+          /* Financing-aware timeline gives us both the parent Home event
+             (one-off price / down payment) and the linked monthly payment
+             record we use to derive the mortgage term. We swallow errors
+             so a missing/empty timeline simply yields a null Home event
+             and the calculator falls back to Default Assumptions. */
+          this.timelineHttpService
+            .getTimelineWithLinkedFinancialRecordsByCashflowId((cashflow as Cashflow).id)
+            .pipe(catchError(() => of(null))),
+        ]).pipe(
+          take(1),
+          map(([wealth, incomeExpense, timelineResp]) => ({
+            client: client as Client,
+            cashflow: cashflow as Cashflow,
+            wealth,
+            incomeExpense: incomeExpense as IncomeExpense | null,
+            homeEvent: this.extractHomeEventPrefill(
+              timelineResp?.timeline?.clientEvents ?? [],
+              timelineResp?.financialRecords ?? [],
+            ),
+          })),
+        ),
+      ),
+    );
+  }
+
+  private fetchLessonPlanContext$(): Observable<{
+    client: Client;
+    cashflow: Cashflow;
+    pots: SavingPotsModel;
+  }> {
+    const params$ = this.activatedRoute.parent?.params ?? this.activatedRoute.params;
+    return params$.pipe(
+      take(1),
+      switchMap((params) =>
+        this.financialWorkflowService.loadClientCashflowMetadata(params).pipe(take(1)),
+      ),
+      switchMap(([client, cashflow]) =>
+        this.savingsPotsHttpService.getAllSavingsPots((cashflow as Cashflow).id).pipe(
+          take(1),
+          map((pots) => ({
+            client: client as Client,
+            cashflow: cashflow as Cashflow,
+            pots,
+          })),
+        ),
+      ),
+    );
+  }
+
+  private computeTotalCashSavings(savings: ClientSaving[]): number {
+    return savings
+      .filter((s) => s.type === SavingPotType.Cash)
+      .reduce((acc, s) => acc + (s.startingPotValue?.amount ?? 0), 0);
+  }
+
+  /** Sum recurring expenses as an approximate monthly total; excludes one-off lines. */
+  private inferMainResidenceValue(assets: WealthAssetModel[] | undefined): number | null {
+    if (!assets?.length) return null;
+    const realEstate = assets.filter((a) => (a.category || '').toLowerCase().includes('real'));
+    if (!realEstate.length) return null;
+    const ranked = realEstate
+      .map((a) => {
+        const label = `${a.name ?? ''} ${a.description ?? ''}`.toLowerCase();
+        const score =
+          (/primary|main|residence|principal|owner-occupied|home|abitazione/.test(label) ? 2 : 0) +
+          (/house|flat|apartment|villa|condo|loft/.test(label) ? 1 : 0);
+        return { a, score };
+      })
+      .sort((x, y) => y.score - x.score || y.a.value - x.a.value);
+    const top = ranked[0]?.a.value ?? 0;
+    return top > 0 ? top : null;
+  }
+
+  /** Best-effort monthly rent from Housing / rent-like expense lines. */
+  private inferHousingRentMonthly(expenses: FinancialViewModel[] | undefined): number | null {
+    if (!expenses?.length) return null;
+    let total = 0;
+    let found = false;
+    for (const e of expenses) {
+      const desc = (e.description || '').trim();
+      if (desc !== 'Housing' && !/rent|affitto|locazione/i.test(desc)) continue;
+      const cycle = e.amount?.cycle?.description ?? '';
+      if (cycle === 'One-off') continue;
+      const amt = e.amount?.amount ?? 0;
+      if (amt <= 0) continue;
+      found = true;
+      if (cycle === 'Every month' || cycle === 'Monthly') {
+        total += amt;
+      } else if (cycle === 'Every year' || cycle === 'Yearly') {
+        total += amt / 12;
+      } else {
+        total += amt;
+      }
+    }
+    return found && total > 0 ? total : null;
+  }
+
+  /**
+   * Picks the first parent "Home" event from the plan timeline and returns a
+   * `HomeEventPrefill` snapshot the Rent vs Buy calculator can consume.
+   *
+   * Rules (mirrors how the timeline persists Home events):
+   *   - The parent event is the one-off expense whose `name` starts with "Home"
+   *     and whose `isParent === true`. Linked records (`Home – Monthly payment`,
+   *     `Home – Resale`) are excluded by the `isParent` check.
+   *   - Cash purchase: `event.netAmount.amount` IS the property price.
+   *     We force 100% down payment and a 0-year mortgage so the engine treats
+   *     the loan as zero (no fake financing assumptions).
+   *   - Financing: `event.netAmount.amount` is the down payment. The mortgage
+   *     term is reconstructed from the linked Monthly payment record's start
+   *     and end years (inclusive — see `onMortgageApplied` in the timeline
+   *     add-event dialog). The mortgage rate is not persisted on the event so
+   *     the calculator falls through to Default Assumptions for it.
+   *
+   * Returns `null` when no Home parent event is present.
+   */
+  private extractHomeEventPrefill(
+    clientEvents: ClientEvent[],
+    financialRecords: FinancialRecordLineItem[],
+  ): HomeEventPrefill | null {
+    if (!clientEvents?.length) return null;
+
+    const homeParent = clientEvents.find(
+      (e) => !!e?.name?.startsWith('Home') && e.isParent === true,
+    );
+    if (!homeParent) return null;
+
+    if (homeParent.isCash === true) {
+      const price = homeParent.netAmount?.amount ?? null;
+      return {
+        paymentMode: 'cash',
+        propertyPrice: price && price > 0 ? Math.round(price) : null,
+        downPaymentPct: 100,
+        mortgageTermYears: 0,
+      };
+    }
+
+    const downPaymentAmount = homeParent.netAmount?.amount ?? null;
+    const monthly = financialRecords.find(
+      (r) =>
+        r?.parentId === homeParent.id &&
+        !!r?.description?.includes('– Monthly payment'),
+    );
+    const startYear = monthly?.start?.year;
+    const endYear = monthly?.end?.year ?? null;
+    const termYears =
+      startYear != null && endYear != null && endYear >= startYear
+        ? endYear - startYear + 1
+        : null;
+
+    return {
+      paymentMode: 'finance',
+      propertyPrice: null,
+      downPaymentAmount:
+        downPaymentAmount && downPaymentAmount > 0
+          ? Math.round(downPaymentAmount)
+          : null,
+      mortgageRatePct: null,
+      mortgageTermYears: termYears && termYears > 0 ? termYears : null,
+    };
+  }
+
+  private computeMonthlyRecurringExpenses(
+    expenses: FinancialViewModel[] | undefined,
+  ): number {
+    if (!expenses?.length) return 0;
+    let total = 0;
+    for (const e of expenses) {
+      const cycle = e.amount?.cycle?.description ?? '';
+      if (cycle === 'One-off') continue;
+      const amt = e.amount?.amount ?? 0;
+      if (amt <= 0) continue;
+      if (cycle === 'Every month' || cycle === 'Monthly') {
+        total += amt;
+      } else if (cycle === 'Every year' || cycle === 'Yearly') {
+        total += amt / 12;
+      } else {
+        total += amt;
+      }
+    }
+    return total;
+  }
+
+  private openInflationDialog(data: {
+    startingAmount: number;
+    inflationRate: number;
+    currencyCode?: string;
+  }): void {
+    this.dialog.open(LearnInflationComponent, {
+      width: '92vw',
+      maxWidth: '92vw',
+      height: '88vh',
+      panelClass: 'learn-inflation-dialog-panel',
+      autoFocus: false,
+      restoreFocus: false,
+      data,
+    });
+  }
+
+  private openCompoundDialog(data: {
+    startingAmount: number;
+    inflationRate: number;
+    currencyCode?: string;
+  }): void {
+    this.dialog.open(LearnCompoundInterestComponent, {
+      width: '92vw',
+      maxWidth: '92vw',
+      height: '88vh',
+      panelClass: 'learn-inflation-dialog-panel',
+      autoFocus: false,
+      restoreFocus: false,
+      data,
+    });
+  }
+
+  private openCostOfWaitingDialog(data: {
+    startingAmount: number;
+    inflationRate: number;
+    currencyCode?: string;
+  }): void {
+    this.dialog.open(LearnCostOfWaitingComponent, {
+      width: '92vw',
+      maxWidth: '92vw',
+      height: '88vh',
+      panelClass: 'learn-inflation-dialog-panel',
+      autoFocus: false,
+      restoreFocus: false,
+      data,
+    });
+  }
+
+  private openCashBufferDialog(data: {
+    currentCash: number;
+    monthlyRecurringExpenses: number;
+    currencyCode?: string;
+  }): void {
+    this.dialog.open(LearnCashBufferComponent, {
+      width: '92vw',
+      maxWidth: '92vw',
+      height: '88vh',
+      panelClass: 'learn-inflation-dialog-panel',
+      autoFocus: false,
+      restoreFocus: false,
+      data,
+    });
+  }
+
+  private openRentOrBuyDialog(data: LearnRentOrBuyDialogData): void {
+    this.dialog.open(LearnRentOrBuyComponent, {
+      width: '92vw',
+      maxWidth: '92vw',
+      height: '88vh',
+      panelClass: 'learn-inflation-dialog-panel',
+      autoFocus: false,
+      restoreFocus: false,
+      data,
+    });
+  }
+
+  private openInvestToReachGoalDialog(data: {
+    currentAge: number;
+    inflationRate: number;
+    currencyCode?: string;
+  }): void {
+    this.dialog.open(LearnInvestToReachGoalComponent, {
+      width: '92vw',
+      maxWidth: '92vw',
+      height: '88vh',
+      panelClass: 'learn-inflation-dialog-panel',
+      autoFocus: false,
+      restoreFocus: false,
+      data,
+    });
+  }
+
+  /**
+   * Time-in-the-market lesson: a static, illustrative slide that
+   * walks through major historical drawdowns and their recoveries.
+   * No plan inputs are required — the dialog opens immediately.
+   */
+  openTimeInMarketLesson(): void {
+    if (this.isOpeningTimeInMarket) return;
+    this.isOpeningTimeInMarket = true;
+    this.dialog.open(LearnTimeInMarketComponent, {
+      width: '92vw',
+      maxWidth: '92vw',
+      height: '88vh',
+      panelClass: 'learn-inflation-dialog-panel',
+      autoFocus: false,
+      restoreFocus: false,
+    });
+    this.isOpeningTimeInMarket = false;
+  }
+}

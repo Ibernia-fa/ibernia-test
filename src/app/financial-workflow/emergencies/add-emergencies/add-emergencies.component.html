@@ -24,6 +24,7 @@
         class="dialog-close-btn"
         mat-dialog-close
         aria-label="Close dialog"
+        [disabled]="isSaving"
         (click)="closeDialog()"
       >
         <mat-icon>close</mat-icon>
@@ -43,6 +44,8 @@
               matInput
               formControlName="name"
               [placeholder]="'PLACEHOLDER.MEDICAL_COVER' | translate"
+              appAutoFocus
+              autoFocusSelect
             />
 
             @if (
@@ -157,6 +160,8 @@
                       formControlName="insuranceAmount"
                       placeholder="0"
                       thousandSeparatorInput
+                      [appAutoFocus]="!showNameInput"
+                      autoFocusSelect
                     />
                   </div>
 
@@ -288,6 +293,7 @@
           <button
             type="button"
             class="button-icon-outline w-100 d-block"
+            [disabled]="isSaving"
             (click)="onDelete()"
           >
             <span class="f-s-16">{{ 'Delete' | translate }}</span>
@@ -297,6 +303,7 @@
           <button
             type="button"
             class="button-icon-outline w-100 d-block"
+            [disabled]="isSaving"
             (click)="closeDialog()"
           >
             <span class="f-s-16">{{ "Cancel" | translate }}</span>
@@ -306,10 +313,17 @@
       <div>
         <button
           type="button"
-          class="button-icon w-100 d-block"
+          class="button-icon w-100 d-block save-action-btn"
+          [disabled]="isEmergencySaveButtonDisabled"
           (click)="onSave()"
         >
-          <span class="f-s-16">{{ 'Save' | translate }}</span>
+          <span class="save-btn-inner">
+            @if (isSaving) {
+              <mat-spinner diameter="22" mode="indeterminate" />
+            } @else {
+              <span class="f-s-16">{{ 'Save' | translate }}</span>
+            }
+          </span>
         </button>
       </div>
     </div>

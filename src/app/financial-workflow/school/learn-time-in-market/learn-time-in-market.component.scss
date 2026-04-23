@@ -1,0 +1,603 @@
+$ibernia-blue: #4043af;
+$ibernia-blue-soft: #516ce8;
+$ibernia-ink: #1c1c1c;
+$ibernia-mute: #5a596e;
+$ibernia-line: #e5e5ec;
+$ibernia-bg-soft: #f5f7ff;
+$ibernia-pos: #1f8a4c;
+$ibernia-neg: #c62828;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: 100%;
+}
+
+.learn-tim {
+  font-family: "Ubuntu", sans-serif;
+  color: $ibernia-ink;
+  min-height: 0;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ----- Top header (close button) ----- */
+.learn-tim__header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 0;
+  z-index: 5;
+  pointer-events: none;
+
+  > * {
+    pointer-events: auto;
+  }
+}
+
+.learn-tim__content {
+  padding-right: 0 !important;
+  margin-top: 0 !important;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  /* The slide is sized to fit inside the modal; only the left event
+     list is internally scrollable. The dialog body is allowed to
+     scroll only as a final safety net on very small viewports. */
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+$tim-gutter: 56px;
+
+.learn-tim__page {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  /* Shared School header rule: title row top = 14px; horizontal
+     gutter = 56px so titles never collide with the close icon. */
+  padding: 14px $tim-gutter 16px;
+  animation: timFadeIn 320ms ease;
+}
+
+@keyframes timFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.learn-tim__hero {
+  margin: 0;
+  font-size: 26px;
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  color: $ibernia-ink;
+  text-align: left;
+  max-width: 100%;
+  padding-right: 48px; /* keep clear of close icon */
+  flex: 0 0 auto;
+}
+
+/* ============================================================
+   Two-column layout
+   ------------------------------------------------------------
+   Left  = scrollable list of event tiles (only this scrolls)
+   Right = static chart on top + dedicated detail card below
+   ============================================================ */
+.learn-tim__layout {
+  display: grid;
+  grid-template-columns: minmax(240px, 300px) 1fr;
+  gap: 20px;
+  flex: 1 1 auto;
+  min-height: 0;
+  align-items: stretch;
+}
+
+/* ----- LEFT: scrollable event list ----- */
+.learn-tim__events {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.learn-tim__events-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  /* Internal scroll lives ONLY here — this is the single school slide
+     where the left column itself can scroll inside its container. */
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 6px; /* breathing room for the scrollbar track */
+
+  /* Clean, intentional scrollbar — never browser-default chunky. */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(64, 67, 175, 0.28) transparent;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(64, 67, 175, 0.22);
+    border-radius: 999px;
+    transition: background 0.2s ease;
+  }
+
+  &:hover::-webkit-scrollbar-thumb,
+  &:focus-within::-webkit-scrollbar-thumb {
+    background: rgba(64, 67, 175, 0.42);
+  }
+}
+
+.learn-tim__events-list {
+  list-style: none;
+  margin: 0;
+  padding: 0 2px 0 0;
+  display: flex;
+  flex-direction: column;
+  /* Slightly more breathing room between tiles so the list scans like
+     a deliberate navigator, not a dense menu. */
+  gap: 8px;
+}
+
+/* ----- Event tile -----
+   Sized a touch larger than a "compact list row": more vertical
+   padding, slightly heavier typography, and a touch more weight on
+   the drawdown number — all while staying scannable enough that
+   scrolling the column still feels natural. */
+.event-tile {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  text-align: left;
+  width: 100%;
+  padding: 12px 16px 13px 16px;
+  border-radius: 12px;
+  border: 1px solid $ibernia-line;
+  background: #ffffff;
+  cursor: pointer;
+  font-family: "Ubuntu", sans-serif;
+  color: $ibernia-ink;
+  transition:
+    border-color 0.18s ease,
+    background 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.18s ease;
+
+  &:focus-visible {
+    outline: 2px solid $ibernia-blue;
+    outline-offset: 2px;
+  }
+
+  /* Hover and active share a single highlight treatment — the left
+     list behaves as a hover-driven navigator, so there is no
+     visible difference between hovered and clicked tiles. */
+  &:hover,
+  &--active {
+    border-color: rgba(64, 67, 175, 0.5);
+    background:
+      linear-gradient(
+        135deg,
+        rgba(64, 67, 175, 0.08),
+        rgba(81, 108, 232, 0.04)
+      );
+    box-shadow:
+      0 1px 0 rgba(20, 22, 48, 0.02),
+      0 8px 18px rgba(64, 67, 175, 0.12);
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: 10px;
+      bottom: 10px;
+      left: 0;
+      width: 3px;
+      border-radius: 0 3px 3px 0;
+      background: linear-gradient(180deg, $ibernia-blue, $ibernia-blue-soft);
+    }
+  }
+
+  &__main {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  &__range {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    color: $ibernia-mute;
+    font-variant-numeric: tabular-nums;
+    text-transform: uppercase;
+    line-height: 1.1;
+  }
+
+  &__name {
+    font-size: 13.5px;
+    font-weight: 600;
+    line-height: 1.3;
+    color: $ibernia-ink;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+  }
+
+  &__drawdown {
+    font-size: 15.5px;
+    font-weight: 700;
+    color: $ibernia-neg;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.2px;
+    flex-shrink: 0;
+  }
+}
+
+/* ============================================================
+   RIGHT: chart on top + detail card below
+   ============================================================ */
+.learn-tim__main {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+  min-height: 0;
+}
+
+.learn-tim__chart-wrap {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  border: 1px solid $ibernia-line;
+  border-radius: 16px;
+  background:
+    radial-gradient(
+      120% 80% at 50% 0%,
+      rgba(64, 67, 175, 0.04) 0%,
+      rgba(64, 67, 175, 0) 60%
+    ),
+    #ffffff;
+  overflow: hidden;
+  box-shadow:
+    0 1px 0 rgba(20, 22, 48, 0.02),
+    0 10px 28px rgba(64, 67, 175, 0.05);
+}
+
+/* ----- Chart header / built-in subtitle -----
+   Sits at the top of the chart card. Left side identifies the
+   composite line (DJIA · S&P 500) with a small color swatch; right
+   side gives the source / scale note that used to live below the
+   graph. Acts as a small chart subtitle, secondary to the slide
+   title but clearly attached to the graph. */
+.learn-tim__chart-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-shrink: 0;
+  padding: 12px 18px 10px;
+  border-bottom: 1px solid rgba(64, 67, 175, 0.08);
+}
+
+.learn-tim__chart-legend {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.learn-tim__chart-legend-swatch {
+  display: inline-block;
+  width: 18px;
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, $ibernia-blue, $ibernia-blue-soft);
+}
+
+.learn-tim__chart-legend-label {
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  color: $ibernia-ink;
+}
+
+.learn-tim__chart-sub {
+  font-size: 11.5px;
+  color: $ibernia-mute;
+  font-style: italic;
+  font-weight: 400;
+  text-align: right;
+  line-height: 1.3;
+  min-width: 0;
+}
+
+.learn-tim__chart {
+  flex: 1 1 auto;
+  /* Floor low so the detail card and disclaimer below always have
+     room; the chart is the elastic element on this slide. */
+  min-height: 220px;
+  position: relative;
+  overflow: hidden;
+
+  apx-chart {
+    position: absolute;
+    /* The header above already provides the legend / source note,
+       so the chart frame can use a tighter top inset. */
+    inset: 8px 18px 6px 6px;
+    display: block;
+  }
+}
+
+/* ----- Detail card (below the chart) ----- */
+.learn-tim__detail {
+  position: relative;
+  border: 1px solid rgba(64, 67, 175, 0.18);
+  border-radius: 16px;
+  background:
+    linear-gradient(
+      135deg,
+      rgba(64, 67, 175, 0.05),
+      rgba(81, 108, 232, 0.02)
+    );
+  padding: 14px 18px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 0 0 auto;
+  box-shadow:
+    0 1px 0 rgba(20, 22, 48, 0.02),
+    0 8px 22px rgba(64, 67, 175, 0.06);
+}
+
+.learn-tim__detail-head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.learn-tim__detail-eyebrow {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: $ibernia-blue;
+  background: rgba(64, 67, 175, 0.08);
+  border: 1px solid rgba(64, 67, 175, 0.18);
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+.learn-tim__detail-title {
+  margin: 0;
+  font-size: 16.5px;
+  font-weight: 700;
+  color: $ibernia-ink;
+  letter-spacing: -0.2px;
+  line-height: 1.3;
+}
+
+.learn-tim__metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px 22px;
+  padding: 10px 0;
+  border-top: 1px solid rgba(64, 67, 175, 0.12);
+  border-bottom: 1px solid rgba(64, 67, 175, 0.12);
+}
+
+.learn-tim__metric {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.learn-tim__metric-label {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: $ibernia-mute;
+}
+
+.learn-tim__metric-value {
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: $ibernia-ink;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.3px;
+
+  &--pos {
+    color: $ibernia-pos;
+  }
+
+  &--neg {
+    color: $ibernia-neg;
+  }
+
+  &--accent {
+    color: #b3540e;
+  }
+}
+
+.learn-tim__narrative {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: $ibernia-mute;
+  font-weight: 400;
+  letter-spacing: 0.05px;
+  max-width: 100%;
+  /* Clamp very long narratives so the disclaimer below the slide is
+     always fully visible without growing the dialog. */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+  overflow: hidden;
+}
+
+/* ----- Footer notice override (consistent gap with other slides) ----- */
+.learn-tim__page .school-notice {
+  margin: 2px 0 0;
+  width: 100%;
+  max-width: none;
+  align-self: stretch;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 10px 16px;
+  flex: 0 0 auto;
+
+  .school-notice__icon {
+    align-self: center;
+    width: 18px;
+    height: 18px;
+    font-size: 18px;
+    line-height: 1;
+    overflow: visible;
+  }
+
+  .school-notice__text {
+    align-self: center;
+    text-align: center;
+  }
+}
+
+/* ============================================================
+   Responsiveness — desktop & tablet only (per spec)
+   ============================================================ */
+@media (max-width: 1180px) {
+  .learn-tim__layout {
+    grid-template-columns: minmax(220px, 260px) 1fr;
+    gap: 16px;
+  }
+
+  .learn-tim__metric-value {
+    font-size: 17px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .learn-tim__page {
+    padding: 14px 20px 14px;
+    gap: 12px;
+  }
+
+  .learn-tim__hero {
+    font-size: 22px;
+    padding-right: 40px;
+  }
+
+  .learn-tim__layout {
+    grid-template-columns: minmax(200px, 240px) 1fr;
+    gap: 14px;
+  }
+
+  .learn-tim__metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px 18px;
+  }
+
+  .event-tile {
+    padding: 11px 14px 12px 14px;
+  }
+
+  .event-tile__name {
+    font-size: 13px;
+  }
+
+  .event-tile__drawdown {
+    font-size: 14.5px;
+  }
+
+  .learn-tim__chart-head {
+    padding: 10px 14px 8px;
+    gap: 12px;
+  }
+
+  .learn-tim__chart-sub {
+    font-size: 11px;
+  }
+}
+
+/* ============================================================
+   Apex annotations — refine styling for trough marker.
+   ============================================================ */
+:host
+  ::ng-deep
+  .apexcharts-canvas
+  .apexcharts-point-annotations
+  .tim-trough-marker {
+  filter: drop-shadow(0 2px 6px rgba(198, 40, 40, 0.35));
+}
+
+:host ::ng-deep .apexcharts-canvas .apexcharts-xaxis-annotations rect {
+  rx: 0;
+}
+
+/* The chart's own legend / subtitle is rendered as a custom HTML
+   header above the chart frame, so the built-in Apex legend is
+   disabled. The xaxis floating tooltip (year-only label that
+   appears under the cursor on hover) is restyled to match the
+   premium tooltip look used elsewhere in School. */
+:host ::ng-deep .learn-tim__chart .apexcharts-xaxistooltip {
+  background: #ffffff !important;
+  border: 1px solid rgba(64, 67, 175, 0.18) !important;
+  color: $ibernia-ink !important;
+  font-family: "Ubuntu", sans-serif !important;
+  font-size: 11.5px !important;
+  font-weight: 600 !important;
+  border-radius: 6px !important;
+  padding: 2px 8px !important;
+  box-shadow: 0 4px 12px rgba(64, 67, 175, 0.12) !important;
+
+  &::before,
+  &::after {
+    border-bottom-color: rgba(64, 67, 175, 0.18) !important;
+  }
+}
+
+/* ============================================================
+   Dialog surface tweaks
+   ============================================================ */
+:host ::ng-deep .mdc-dialog__surface {
+  display: flex;
+  flex-direction: column;
+}
+
+:host ::ng-deep .learn-tim__content.mat-mdc-dialog-content {
+  max-height: none;
+}

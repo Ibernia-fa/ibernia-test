@@ -68,6 +68,12 @@ export class DefaultAssumptionsComponent implements OnInit, OnDestroy {
 
   user: any;
   @ViewChild('commissionAmountInput') commissionAmountInput?: ElementRef<HTMLInputElement>;
+  @ViewChild('partnerInheritanceTaxThresholdInput')
+  partnerInheritanceTaxThresholdInput?: ElementRef<HTMLInputElement>;
+  @ViewChild('childInheritanceTaxThresholdInput')
+  childInheritanceTaxThresholdInput?: ElementRef<HTMLInputElement>;
+  @ViewChild('siblingInheritanceTaxThresholdInput')
+  siblingInheritanceTaxThresholdInput?: ElementRef<HTMLInputElement>;
 
   form = this.fb.nonNullable.group({
     preferences: this.fb.nonNullable.group({
@@ -85,6 +91,9 @@ export class DefaultAssumptionsComponent implements OnInit, OnDestroy {
       partnerInheritanceTaxRate: [4 as number, [Validators.required, Validators.min(0), Validators.max(100)]],
       childInheritanceTaxRate: [4 as number, [Validators.required, Validators.min(0), Validators.max(100)]],
       siblingInheritanceTaxRate: [6 as number, [Validators.required, Validators.min(0), Validators.max(100)]],
+      partnerInheritanceTaxThreshold: [1_000_000 as number, [Validators.required, Validators.min(0)]],
+      childInheritanceTaxThreshold: [1_000_000 as number, [Validators.required, Validators.min(0)]],
+      siblingInheritanceTaxThreshold: [100_000 as number, [Validators.required, Validators.min(0)]],
     }),
   });
 
@@ -164,6 +173,9 @@ export class DefaultAssumptionsComponent implements OnInit, OnDestroy {
               partnerInheritanceTaxRate: p.preferences?.partnerInheritanceTaxRate ?? 4,
               childInheritanceTaxRate: p.preferences?.childInheritanceTaxRate ?? 4,
               siblingInheritanceTaxRate: p.preferences?.siblingInheritanceTaxRate ?? 6,
+              partnerInheritanceTaxThreshold: p.preferences?.partnerInheritanceTaxThreshold ?? 1_000_000,
+              childInheritanceTaxThreshold: p.preferences?.childInheritanceTaxThreshold ?? 1_000_000,
+              siblingInheritanceTaxThreshold: p.preferences?.siblingInheritanceTaxThreshold ?? 100_000,
             },
           });
 
@@ -181,6 +193,7 @@ export class DefaultAssumptionsComponent implements OnInit, OnDestroy {
             if (!el || amount === null || amount === undefined) return;
             el.value = Number(amount).toLocaleString('en-US');
             el.dispatchEvent(new Event('blur'));
+            this.formatLoadedInheritanceThresholdInputs();
           });
 
           this.updateSnapshots();
@@ -253,7 +266,10 @@ export class DefaultAssumptionsComponent implements OnInit, OnDestroy {
       prefs.loanInterestRate !== snap['loanInterestRate'] ||
       prefs.partnerInheritanceTaxRate !== snap['partnerInheritanceTaxRate'] ||
       prefs.childInheritanceTaxRate !== snap['childInheritanceTaxRate'] ||
-      prefs.siblingInheritanceTaxRate !== snap['siblingInheritanceTaxRate']
+      prefs.siblingInheritanceTaxRate !== snap['siblingInheritanceTaxRate'] ||
+      prefs.partnerInheritanceTaxThreshold !== snap['partnerInheritanceTaxThreshold'] ||
+      prefs.childInheritanceTaxThreshold !== snap['childInheritanceTaxThreshold'] ||
+      prefs.siblingInheritanceTaxThreshold !== snap['siblingInheritanceTaxThreshold']
     );
   }
 
@@ -296,11 +312,15 @@ export class DefaultAssumptionsComponent implements OnInit, OnDestroy {
             : intOrNull(raw.preferences.comissionAmount),
         currency: raw.preferences.currency,
         country: blankToNull(raw.preferences.country),
+        language: profile?.preferences?.language ?? this.translate.currentLang,
         mortgageInterestRate: round2(raw.preferences.mortgageInterestRate),
         loanInterestRate: round2(raw.preferences.loanInterestRate),
         partnerInheritanceTaxRate: round2(raw.preferences.partnerInheritanceTaxRate),
         childInheritanceTaxRate: round2(raw.preferences.childInheritanceTaxRate),
         siblingInheritanceTaxRate: round2(raw.preferences.siblingInheritanceTaxRate),
+        partnerInheritanceTaxThreshold: round2(raw.preferences.partnerInheritanceTaxThreshold),
+        childInheritanceTaxThreshold: round2(raw.preferences.childInheritanceTaxThreshold),
+        siblingInheritanceTaxThreshold: round2(raw.preferences.siblingInheritanceTaxThreshold),
       },
     };
   }
@@ -358,6 +378,54 @@ export class DefaultAssumptionsComponent implements OnInit, OnDestroy {
     const amount = this.form.controls.preferences.controls.comissionAmount.value;
     if (!input || amount === null || amount === undefined) return;
     input.value = Number(amount).toLocaleString('en-US');
+  }
+
+  onInheritanceThresholdInput(
+    control: 'partnerInheritanceTaxThreshold' | 'childInheritanceTaxThreshold' | 'siblingInheritanceTaxThreshold',
+    rawValue: string,
+  ) {
+    const value = parseFormattedNumber(rawValue, this.translate.currentLang);
+    this.form.controls.preferences.controls[control].setValue(value, { emitEvent: false });
+    const refMap: Record<string, ElementRef<HTMLInputElement> | undefined> = {
+      partnerInheritanceTaxThreshold: this.partnerInheritanceTaxThresholdInput,
+      childInheritanceTaxThreshold: this.childInheritanceTaxThresholdInput,
+      siblingInheritanceTaxThreshold: this.siblingInheritanceTaxThresholdInput,
+    };
+    const el = refMap[control]?.nativeElement;
+    if (!el) return;
+    if (value === null || value === undefined || Number.isNaN(value)) {
+      el.value = '';
+      return;
+    }
+    el.value = Number(value).toLocaleString('en-US');
+  }
+
+  formatInheritanceThresholdOnFocus(
+    control: 'partnerInheritanceTaxThreshold' | 'childInheritanceTaxThreshold' | 'siblingInheritanceTaxThreshold',
+    event: Event,
+  ) {
+    const input = event.target as HTMLInputElement | null;
+    const amount = this.form.controls.preferences.controls[control].value;
+    if (!input || amount === null || amount === undefined) return;
+    input.value = Number(amount).toLocaleString('en-US');
+  }
+
+  private formatLoadedInheritanceThresholdInputs(): void {
+    const pairs: Array<{
+      control: 'partnerInheritanceTaxThreshold' | 'childInheritanceTaxThreshold' | 'siblingInheritanceTaxThreshold';
+      el?: ElementRef<HTMLInputElement>;
+    }> = [
+      { control: 'partnerInheritanceTaxThreshold', el: this.partnerInheritanceTaxThresholdInput },
+      { control: 'childInheritanceTaxThreshold', el: this.childInheritanceTaxThresholdInput },
+      { control: 'siblingInheritanceTaxThreshold', el: this.siblingInheritanceTaxThresholdInput },
+    ];
+    for (const { control, el } of pairs) {
+      const v = this.form.controls.preferences.controls[control].value;
+      const native = el?.nativeElement;
+      if (!native || v === null || v === undefined) continue;
+      native.value = Number(v).toLocaleString('en-US');
+      native.dispatchEvent(new Event('blur'));
+    }
   }
 }
 

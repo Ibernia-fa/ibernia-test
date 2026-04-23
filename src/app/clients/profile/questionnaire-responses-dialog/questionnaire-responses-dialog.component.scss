@@ -132,9 +132,11 @@
 // }
 
 .personal-grid-wrapper {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 8px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  column-gap: 64px;
+  row-gap: 12px;
 }
 .finace-grid-wrapper {
   display: flex;
@@ -150,6 +152,16 @@
   gap: 8px;
   font-size: 14px;
   color: #48475d;
+}
+
+.personal-item {
+  .item-text {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    line-height: 100%;
+    gap: 8px;
+  }
 }
 
 .satisfaction-item {
@@ -184,10 +196,11 @@
   gap: 6px;
   padding: 5px 12px;
   background: #d8eaff;
-  border-radius: 50px;
+  border-radius: 6px;
   font-size: 14px;
   line-height: 20px;
   color: #3088ed;
+  font-weight: 500;
 
   .chip-icon {
     width: 16px;
@@ -198,36 +211,58 @@
 }
 
 .satisfaction-icon {
-  background-color: #ffd868;
+  background-color: #516ce847;
   height: 28px;
   width: 28px;
-  border-radius: 4px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .finance-icon {
-  background-color: #b7d5af;
+  background-color: #34c75942;
   height: 28px;
   width: 28px;
-  border-radius: 4px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .investment-approach-icon {
-  background-color: #f9af6d;
+  background-color: #fe961424;
   height: 28px;
   width: 28px;
-  border-radius: 4px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .person-icon {
-  background-color: #d8eaff;
+  background-color: #deb51130;
   height: 28px;
   width: 28px;
-  border-radius: 4px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-.team-relation {
+.person-name {
+  color: #1c1c1c;
+  font-size: 16px;
+  line-height: 18px;
+  font-weight: 500;
+}
+
+.person-relationship {
   color: #5a596e;
   font-size: 16px;
   line-height: 18px;
   font-weight: 400;
 }
 .item-text {
+  .team-relation {
+    font-size: 16px;
+  }
   .values {
     color: #1c1c1c;
     font-weight: 500;
@@ -241,4 +276,14 @@
   font-size: 16px;
   line-height: 20px;
   margin-top: 4px;
+}
+
+.protection-priorities-section .chip {
+  background: #ff383c2b;
+  color: #ff383c;
+
+  .chip-icon {
+    filter: invert(38%) sepia(98%) saturate(3028%) hue-rotate(337deg)
+      brightness(103%) contrast(106%);
+  }
 }

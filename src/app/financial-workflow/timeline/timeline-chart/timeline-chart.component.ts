@@ -60,13 +60,13 @@ import { SettingsHttpService } from '../../settings/services/settings-http.servi
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { patchInflationRateDescription } from 'src/app/shared/utils/escalation-rate-utils';
 import {
-  getAgeInCalendarYear,
   getCompletedYearsAgeAtDate,
   getPlanEndCalendarYear,
   getProjectionColumnAgeLabel,
 } from 'src/app/shared/utils/client-age-at-reference';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { translateTimelineEventDisplayName } from 'src/app/shared/utils/timeline-event-display-name';
+import { resolveClientEventEndCalendarYear } from 'src/app/shared/utils/event-date-utils';
 
 @Component({
   selector: 'app-timeline-chart',
@@ -180,6 +180,9 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
   private boundDocumentDrop: ((e: DragEvent) => void) | null = null;
   private lastValidDragTime: Date | null = null; // Store last valid drag position from onDragOver
   private lastRetirementDependencyKey: string | null = null;
+  private connectorRenderPending = false;
+  private resizeObserver: ResizeObserver | null = null;
+  private resizeRedrawTimer: any = null;
 
   constructor(
     private dialog: MatDialog,
@@ -193,7 +196,35 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   getTimelineChipLabel(event: ClientEvent): string {
-    return translateTimelineEventDisplayName(this.translate, event?.name ?? '');
+    const rawName = (event?.name ?? '').trim();
+
+    if (rawName.toLowerCase().startsWith('retirement age')) {
+      return this.resolveRetirementLabelForDisplay(event);
+    }
+
+    return translateTimelineEventDisplayName(this.translate, rawName);
+  }
+
+  private resolveRetirementLabelForDisplay(event: ClientEvent): string {
+    const rawTitle = (event?.name ?? '').trim();
+
+    if (this.hasPartner) {
+      const personName = event.isPartnerEvent
+        ? this.client?.partnerDetail?.firstName?.trim()
+        : this.client?.clientDetails?.firstName?.trim();
+      if (personName) {
+        return translateTimelineEventDisplayName(
+          this.translate,
+          `Retirement age ${personName}`,
+        );
+      }
+    }
+
+    const rest = rawTitle.replace(/^retirement age\s*/i, '').trim();
+    if (rest.length > 0) {
+      return translateTimelineEventDisplayName(this.translate, rawTitle);
+    }
+    return translateTimelineEventDisplayName(this.translate, 'Retirement age');
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -216,6 +247,7 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
       }
       // Re-sync retirement chip visibility based on updated clientEvents
       this.syncRetirementChipVisibility();
+      this.cdr.markForCheck();
     }
   }
 
@@ -237,6 +269,9 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
 
   ngOnDestroy() {
     this.removeDocumentDropListener();
+    this.resizeObserver?.disconnect();
+    this.resizeObserver = null;
+    clearTimeout(this.resizeRedrawTimer);
   }
 
   ngAfterViewInit() {
@@ -449,13 +484,11 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
         clientEvent.isPartnerEvent = true;
       }
 
-      const birthDate =
-        isPartnerRetirement && this.partnerBirthDate
-          ? this.partnerBirthDate
-          : this.clientBirthDate;
-
       const dropYear = moment(dropTime).year();
-      const dropAge = getAgeInCalendarYear(birthDate, dropYear);
+      const dropAge = this.getAgeAtYearForEvent(
+        { isPartnerEvent: isPartnerRetirement } as ClientEvent,
+        dropYear,
+      );
       clientEvent.start = {
         year: dropYear,
         age: Number.isNaN(dropAge) ? 0 : dropAge,
@@ -513,6 +546,7 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
     const dialogRef = this.dialog.open(AddEventDialogComponent, {
       width: '612px',
       disableClose: true,
+      autoFocus: false,
       data: {
         eventType: dropEventType,
         amountCycles: this.amountCycles,
@@ -536,6 +570,8 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
         patchEvent: this.draggedEvent,
         dropTime: new Date(moment(dropTime).year(), 0),
         eventsList: this.financialTimeline.clientEvents.map((event) => ({
+          id: event.id,
+          isPartnerEvent: event.isPartnerEvent,
           name: this.getEventDisplayNameForList(event),
           year: event.start.year,
           age: this.getAgeAtYearForEvent(event, event.start.year),
@@ -711,10 +747,9 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
     return this.snapToNearestYear(new Date(ms));
   }
 
+  /** Align to Jan 1 of the calendar year under the cursor (matches axis columns; avoids mid-year ambiguity). */
   private snapToNearestYear(date: Date): Date {
-    const year = date.getFullYear();
-    const midYear = new Date(year, 6, 1); // July 1st as midpoint
-    return date < midYear ? new Date(year, 0, 1) : new Date(year + 1, 0, 1);
+    return new Date(date.getFullYear(), 0, 1);
   }
 
   /**
@@ -769,6 +804,14 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
           this.updateEventByDoubleClick(clientEvent);
       }
     });
+
+    this.resizeObserver = new ResizeObserver(() => {
+      clearTimeout(this.resizeRedrawTimer);
+      this.resizeRedrawTimer = setTimeout(() => {
+        this.drawConnectorLines();
+      }, 50);
+    });
+    this.resizeObserver.observe(this.timelineContainer.nativeElement);
   }
 
   private adjustItemZIndex(): void {
@@ -800,6 +843,15 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
   };
 
   private renderConnectorLines(): void {
+    if (this.connectorRenderPending) return;
+    this.connectorRenderPending = true;
+    requestAnimationFrame(() => {
+      this.connectorRenderPending = false;
+      this.drawConnectorLines();
+    });
+  }
+
+  private drawConnectorLines(): void {
     const container = this.timelineContainer?.nativeElement;
     if (!container) return;
 
@@ -820,24 +872,29 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
 
     const centerRect = centerPanel.getBoundingClientRect();
     const items = Array.from(
-      container.querySelectorAll('.vis-item'),
+      centerPanel.querySelectorAll('.vis-item'),
     ) as HTMLElement[];
+
+    const drawnPositions = new Set<string>();
 
     items.forEach((item) => {
       const itemRect = item.getBoundingClientRect();
-      const lineLeft = itemRect.left - centerRect.left + 1;
-      const lineTop = itemRect.bottom - centerRect.top - 12;
-      const lineHeight = centerRect.height - lineTop - 4;
+      const lineLeft = Math.round(itemRect.left - centerRect.left + 1);
+      const lineTop = Math.round(itemRect.bottom - centerRect.top - 12);
+      const lineHeight = Math.round(centerRect.height - lineTop - 4);
       if (lineHeight <= 0) return;
+
+      const posKey = `${lineLeft}_${lineTop}`;
+      if (drawnPositions.has(posKey)) return;
+      drawnPositions.add(posKey);
 
       const line = document.createElement('div');
       line.className = 'connector-line';
       line.style.position = 'absolute';
       line.style.left = `${lineLeft}px`;
       line.style.top = `${lineTop}px`;
-      line.style.width = '1px';
       line.style.height = `${lineHeight}px`;
-      line.style.backgroundColor = this.getConnectorLineColor(item);
+      line.style.borderLeft = `1px solid ${this.getConnectorLineColor(item)}`;
       linesLayer.appendChild(line);
     });
   }
@@ -883,21 +940,26 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
       })
       .map((event, index) => {
         const startYear = event.start.year;
+        const resolvedEndYear = resolveClientEventEndCalendarYear(
+          event,
+          this.financialTimeline.clientEvents,
+        );
         const hasRealEnd =
-          event.end && event.end.year && event.end.year > startYear;
+          resolvedEndYear != null && resolvedEndYear > startYear;
         const isOneOff = event.isOneOff;
         const forecastEndYear = timelineEndYear;
 
         const eventId = event.id || `placeholder-${event.name}-${index}`;
+        const isRetirementAgeEvent = this.isRetirementEvent(event);
 
         // Estimate the pixel width needed to display icon + event name + padding
         // Icon ~20px, padding ~24px, text ~9px per character (bold 14px font)
         const estimatedTextPx = 20 + 28 + event.name.length * 9;
         // Minimum years to fit the text (always at least 1)
-        const minYearsForText = Math.max(
-          1,
-          Math.ceil(estimatedTextPx / pxPerYear),
-        );
+        // Retirement must stay one calendar column wide so the marker matches a single age/year.
+        const minYearsForText = isRetirementAgeEvent
+          ? 1
+          : Math.max(1, Math.ceil(estimatedTextPx / pxPerYear));
 
         let minContainerWidth = minYearsForText;
 
@@ -905,7 +967,7 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
 
         if (!isOneOff && hasRealEnd) {
           const realDuration =
-            Math.min(event.end!.year, forecastEndYear + 1) - startYear;
+            Math.min(resolvedEndYear!, forecastEndYear + 1) - startYear;
           const visualWidth = Math.min(
             Math.max(realDuration, minContainerWidth),
             maxAvailableWidth,
@@ -1025,13 +1087,7 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
       onMoving: (item, callback) => {
         this.handleEventMoving(item, callback);
       },
-      snap: (date: Date) => {
-        const year = date.getFullYear();
-        const midYear = new Date(year, 6, 1); // July 1st
-        const nextYearStart = new Date(year + 1, 0, 1);
-        const currentYearStart = new Date(year, 0, 1);
-        return date < midYear ? currentYearStart : nextYearStart;
-      },
+      snap: (date: Date) => new Date(date.getFullYear(), 0, 1),
     };
   }
 
@@ -1133,12 +1189,18 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
       return;
     }
 
-    const birthForAge =
-      existing.isPartnerEvent && this.partnerBirthDate
-        ? this.partnerBirthDate
-        : this.clientBirthDate;
+    const startAge = this.getAgeAtYearForEvent(existing, newStartYear);
+    const resolvedLinkedEndYear = existing.endEventId
+      ? resolveClientEventEndCalendarYear(
+          existing,
+          this.financialTimeline.clientEvents,
+        )
+      : null;
+    const keepEndEventId =
+      !!existing.endEventId &&
+      resolvedLinkedEndYear != null &&
+      newEndYear === resolvedLinkedEndYear;
 
-    const startAge = getAgeInCalendarYear(birthForAge, newStartYear);
     const updated = {
       ...existing,
       start: {
@@ -1147,12 +1209,13 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
       },
       end: (() => {
         if (!existing.end || !existing.end.year) return existing.end;
-        const endAge = getAgeInCalendarYear(birthForAge, newEndYear);
+        const endAge = this.getAgeAtYearForEvent(existing, newEndYear);
         return {
           year: newEndYear,
           age: Number.isNaN(endAge) ? 0 : endAge,
         };
       })(),
+      endEventId: keepEndEventId ? existing.endEventId : null,
     };
 
     const idx = this.financialTimeline.clientEvents.indexOf(existing);
@@ -1195,6 +1258,7 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
     const dialogRef = this.dialog.open(AddEventDialogComponent, {
       width: '700px',
       disableClose: true,
+      autoFocus: false,
       data: {
         amountCycles: this.amountCycles,
         eventType: eventType,
@@ -1215,6 +1279,8 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
         forecastStartDate: new Date(this.financialTimeline.forecastStartDate),
         planDuration: this.planDuration,
         eventsList: this.financialTimeline.clientEvents.map((event) => ({
+          id: event.id,
+          isPartnerEvent: event.isPartnerEvent,
           name: this.getEventDisplayNameForList(event),
           year: event.start.year,
           age: this.getAgeAtYearForEvent(event, event.start.year),
@@ -1236,6 +1302,7 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
     const dialogRef = this.dialog.open(AddEventDialogComponent, {
       width: '612px',
       disableClose: true,
+      autoFocus: false,
       data: {
         eventType: EventType.CUSTOM,
         amountCycles: this.amountCycles,
@@ -1255,6 +1322,8 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
         forecastStartDate: new Date(this.financialTimeline.forecastStartDate),
         planDuration: this.planDuration,
         eventsList: this.financialTimeline.clientEvents.map((event) => ({
+          id: event.id,
+          isPartnerEvent: event.isPartnerEvent,
           name: this.getEventDisplayNameForList(event),
           year: event.start.year,
           age: this.getAgeAtYearForEvent(event, event.start.year),
@@ -1360,15 +1429,8 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
   private getEventTitleForDisplay(event: ClientEvent): string {
     const rawTitle = (event?.name ?? '').trim();
 
-    // When "Retirement age" appears on the timeline for joint accounts, the saved event name
-    // is often just "Retirement age" with `isPartnerEvent`. In that case, derive the display
-    // label using the person's name, then localize via the shared helper.
-    if (rawTitle.toLowerCase().startsWith('retirement age') && this.hasPartner) {
-      const personName = event.isPartnerEvent
-        ? this.client?.partnerDetail?.firstName?.trim()
-        : this.client?.clientDetails?.firstName?.trim();
-      const composite = personName ? `Retirement age ${personName}` : 'Retirement age';
-      return translateTimelineEventDisplayName(this.translate, composite);
+    if (rawTitle.toLowerCase().startsWith('retirement age')) {
+      return this.resolveRetirementLabelForDisplay(event);
     }
 
     return translateTimelineEventDisplayName(this.translate, rawTitle);
@@ -1400,26 +1462,7 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
       return translateTimelineEventDisplayName(this.translate, raw);
     }
 
-    if (!this.hasPartner) {
-      return translateTimelineEventDisplayName(this.translate, 'Retirement age');
-    }
-
-    // Only add names when both primary + partner retirement events exist in the plan.
-    const hasPrimary = this.financialTimeline.clientEvents.some(
-      (e) => e.name?.toLowerCase().startsWith('retirement age') && !e.isPartnerEvent,
-    );
-    const hasPartnerEv = this.financialTimeline.clientEvents.some(
-      (e) => e.name?.toLowerCase().startsWith('retirement age') && !!e.isPartnerEvent,
-    );
-    if (!hasPrimary || !hasPartnerEv) {
-      return translateTimelineEventDisplayName(this.translate, 'Retirement age');
-    }
-
-    const personName = clientEvent.isPartnerEvent
-      ? this.client?.partnerDetail?.firstName?.trim()
-      : this.client?.clientDetails?.firstName?.trim();
-    const composite = personName ? `Retirement age ${personName}` : 'Retirement age';
-    return translateTimelineEventDisplayName(this.translate, composite);
+    return this.resolveRetirementLabelForDisplay(clientEvent);
   }
 
   private isEventInVisibleRange(event: any): boolean {
@@ -1504,14 +1547,14 @@ export class TimelineChartComponent implements OnInit, OnChanges, OnDestroy {
         const isPartnerEv = !!event.isPartnerEvent;
         const targetYear = isPartnerEv ? partnerYear : primaryYear;
         if (!targetYear) return event;
-        const retirementAge = this.getDefaultRetirementAgeForPerson(isPartnerEv);
+        const retirementAge = this.getAgeAtYearForEvent(event, targetYear);
 
         return {
           ...event,
           start: {
             ...event.start,
             year: targetYear,
-            age: retirementAge,
+            age: Number.isNaN(retirementAge) ? event.start.age : retirementAge,
           },
         };
       });

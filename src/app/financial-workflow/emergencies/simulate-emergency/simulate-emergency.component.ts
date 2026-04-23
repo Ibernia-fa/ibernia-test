@@ -1,16 +1,30 @@
-import { Component, ElementRef, Inject, OnDestroy, ViewChild } from '@angular/core';
+import {
+  afterNextRender,
+  Component,
+  DestroyRef,
+  ElementRef,
+  inject,
+  Inject,
+  Injector,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { catchError, of, take } from 'rxjs';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatSelectChange, MatSelectModule } from '@angular/material/select';
+import { MatSelect, MatSelectChange, MatSelectModule } from '@angular/material/select';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { ThousandSeparatorInputDirective } from 'src/app/directives/thousand-separator-input.directive';
+import { AutoFocusDirective } from 'src/app/directives/auto-focus.directive';
 import moment from 'moment';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
@@ -34,9 +48,13 @@ import {
   getCashflowDialogEndCalendarYear,
   getCompletedYearsAgeAtDate,
   getPersistedAgeForCalendarYear,
+  getProjectionAgeForClientEvent,
   getProjectionColumnAgeLabel,
 } from 'src/app/shared/utils/client-age-at-reference';
 import { resolveEscalationMatch } from 'src/app/shared/utils/escalation-rate-utils';
+import { getStartEndDurationLabel } from 'src/app/shared/utils/start-end-duration-label';
+import { extractEventId, resolveYear } from 'src/app/shared/utils/event-date-utils';
+import { TimelineHttpService } from '../../timeline/services/timeline-http.service';
 
 @Component({
   selector: 'simulate-emergency',
@@ -54,6 +72,7 @@ import { resolveEscalationMatch } from 'src/app/shared/utils/escalation-rate-uti
     MatSliderModule,
     ReactiveFormsModule,
     ThousandSeparatorInputDirective,
+    AutoFocusDirective,
     SavingsBarStackedChartComponent,
     TranslateModule,
     TranslateIncomeExpenseLabelPipe,
@@ -63,11 +82,27 @@ import { resolveEscalationMatch } from 'src/app/shared/utils/escalation-rate-uti
   templateUrl: './simulate-emergency.component.html',
   styleUrl: './simulate-emergency.component.scss',
 })
-export class SimulateEmergencyComponent implements OnDestroy {
+export class SimulateEmergencyComponent implements OnInit, OnDestroy {
+  private readonly destroyRef = inject(DestroyRef);
+
   @ViewChild('amountInput') amountInput?: ElementRef<HTMLInputElement>;
+  @ViewChild('stoppedIncomeSelect') stoppedIncomeSelect?: MatSelect;
   onAmountInput(rawValue: string) {
     const value = parseFormattedNumber(rawValue, this.translate.currentLang);
     this.simulateEmergencyForm.get('amount')?.setValue(value);
+  }
+
+  /** Fires only on user interaction, not on programmatic `setValue` (load / life-insurance defaults). */
+  onStopIncomeUserToggled(event: MatCheckboxChange): void {
+    if (!event.checked) {
+      return;
+    }
+    afterNextRender(
+      () => {
+        this.stoppedIncomeSelect?.open();
+      },
+      { injector: this.injector },
+    );
   }
 
   simulateEmergencyForm: FormGroup;
@@ -79,7 +114,7 @@ export class SimulateEmergencyComponent implements OnDestroy {
   amountCycles: Cycle[];
   escalationRates: EscalationRate[];
   selectedEscalationDescription: string;
-  timeline: FinancialTimeline;
+  timeline: FinancialTimeline | undefined;
   clientPreferredCurrency: string;
   eventsList: any;
   incomes: FinancialViewModel[];
@@ -117,6 +152,8 @@ export class SimulateEmergencyComponent implements OnDestroy {
     timelineEvents: any[];
   } | null = null;
   simulationChartHeight: number = 420;
+  /** Start year of the last completed simulation; drives chart column highlight when emergency cost is 0. */
+  completedEmergencyHighlightYear: number | null = null;
 
   get incomeDisplayLabelContext(): IncomeDisplayLabelContext {
     const c = this.client;
@@ -127,13 +164,22 @@ export class SimulateEmergencyComponent implements OnDestroy {
     };
   }
 
+  /** Incomes that can be stopped: positive amount only. */
+  get stoppableIncomes(): FinancialViewModel[] {
+    return (this.incomes ?? []).filter(
+      (i) => Number(i?.amount?.amount ?? 0) > 0,
+    );
+  }
+
   constructor(
     private dialogRef: MatDialogRef<SimulateEmergencyComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private fb: FormBuilder,
     private emergenciesHttpService: EmergenciesHttpService,
+    private timelineHttpService: TimelineHttpService,
     private toastr: ToastrService,
     private translate: TranslateService,
+    private injector: Injector,
   ) {
     this.client = data.client;
     this.cashflow = data.cashflow;
@@ -200,8 +246,9 @@ export class SimulateEmergencyComponent implements OnDestroy {
     if (stopIncomeInitial) { // allow 0 or more
       amountControl?.setValidators([Validators.required, Validators.min(0)]);
       incomeControl?.setValidators([Validators.required]);
-    } else { // must be > 0
-      amountControl?.setValidators([Validators.required, Validators.min(1)]);
+    } else {
+      // Allow 0: user can simulate “no expense” but still see the emergency year on the chart.
+      amountControl?.setValidators([Validators.required, Validators.min(0)]);
       incomeControl?.clearValidators();
       incomeControl?.setValue(null);
     }
@@ -219,11 +266,12 @@ export class SimulateEmergencyComponent implements OnDestroy {
             amountControl?.setValue(0, { emitEvent: false });
           }
         } else {
-          amountControl?.setValidators([Validators.required, Validators.min(1)]);
+          amountControl?.setValidators([Validators.required, Validators.min(0)]);
           incomeControl?.clearValidators();
           incomeControl?.setValue(null);
 
-          if (!amountControl?.value) {
+          const v = amountControl?.value;
+          if (v === null || v === undefined || v === '') {
             amountControl?.setValue(null, { emitEvent: false });
           }
         }
@@ -241,7 +289,29 @@ export class SimulateEmergencyComponent implements OnDestroy {
       this.populateForm(this.emergencyExpense);
     } else if (this.isLifeInsurance(this.emergency)) {
       this.applyLifeInsuranceDefaults();
+    } else if (this.isDisability(this.emergency)) {
+      this.applyDisabilityDefaults();
     }
+  }
+
+  ngOnInit(): void {
+    const cfId = this.cashflow?.id;
+    if (!cfId) return;
+
+    this.timelineHttpService
+      .getTimelineWithLinkedFinancialRecordsByCashflowId(cfId)
+      .pipe(
+        take(1),
+        takeUntilDestroyed(this.destroyRef),
+        catchError(() => of(null)),
+      )
+      .subscribe((response) => {
+        if (!response?.timeline) return;
+        this.timeline = response.timeline;
+        this.eventsList = (this.timeline?.clientEvents ?? []).sort(
+          (a, b) => (a.start?.year ?? 0) - (b.start?.year ?? 0),
+        );
+      });
   }
 
   private isLifeInsurance(emergency: Emergency): boolean {
@@ -250,7 +320,16 @@ export class SimulateEmergencyComponent implements OnDestroy {
     return name.includes('life') || name.includes('vita'); // English + Italian
   }
 
+  private isDisability(emergency: Emergency): boolean {
+    if (!emergency || emergency.type !== 1) return false;
+    const name = (emergency.name ?? '').toString().trim().toLowerCase();
+    return name.includes('disability') || name.includes('disabilità') || name.includes('invalidità');
+  }
+
   private applyLifeInsuranceDefaults(): void {
+    if (this.stoppableIncomes.length === 0) {
+      return;
+    }
     const mainClientSalary = this.getMainClientSalary();
     const stopIncomeCtrl = this.simulateEmergencyForm.get('stopIncome');
     const stoppedIncomeCtrl = this.simulateEmergencyForm.get('stoppedIncomeId');
@@ -270,11 +349,73 @@ export class SimulateEmergencyComponent implements OnDestroy {
     incomeControl?.updateValueAndValidity();
   }
 
+  private applyDisabilityDefaults(): void {
+    const amountControl = this.simulateEmergencyForm.get('amount');
+    const incomeControl = this.simulateEmergencyForm.get('stoppedIncomeId');
+
+    if (!amountControl?.value) {
+      amountControl?.setValue(0, { emitEvent: false });
+    }
+
+    const monthlyCycle = this.amountCycles.find(
+      (c) => (c.description ?? '').toLowerCase() === 'every month',
+    );
+    if (monthlyCycle) {
+      this.simulateEmergencyForm.get('cycle')?.setValue(monthlyCycle.id, { emitEvent: false });
+      this.onCycleValueChange(monthlyCycle.id);
+    }
+
+    this.simulateEmergencyForm.get('end')?.setValue(this.dialogEndCalendarYear, { emitEvent: false });
+
+    const inflationRate = this.escalationRates.find(
+      (r) => (r.description ?? '').toLowerCase().includes('same rate as inflation'),
+    );
+    if (inflationRate) {
+      this.simulateEmergencyForm.get('escalationRate')?.setValue(inflationRate.description, { emitEvent: false });
+      this.selectedEscalationDescription = inflationRate.description;
+    }
+
+    if (this.stoppableIncomes.length > 0) {
+      const stopIncomeCtrl = this.simulateEmergencyForm.get('stopIncome');
+      stopIncomeCtrl?.setValue(true, { emitEvent: true });
+
+      const mainClientSalary = this.getMainClientSalary();
+      if (mainClientSalary?.id) {
+        incomeControl?.setValue(mainClientSalary.id, { emitEvent: false });
+      }
+
+      amountControl?.setValidators([Validators.required, Validators.min(0)]);
+      incomeControl?.setValidators([Validators.required]);
+      amountControl?.updateValueAndValidity();
+      incomeControl?.updateValueAndValidity();
+    }
+  }
+
   private getMainClientSalary(): FinancialViewModel | null {
-    const salaries = (this.incomes ?? []).filter(
+    const salaries = this.stoppableIncomes.filter(
       (i) => (i?.description ?? '').toString().trim().toLowerCase() === 'salary' && i?.id
     );
     return salaries.length > 0 ? salaries[0] : null;
+  }
+
+  get startEndDurationHint(): string | null {
+    if (!this.showStartEnd) return null;
+    return getStartEndDurationLabel(
+      this.simulateEmergencyForm.get('start')?.value,
+      this.simulateEmergencyForm.get('end')?.value,
+      this.eventsList,
+      this.translate,
+    );
+  }
+
+  displayAgeForTimelineEvent(event: any): number {
+    return getProjectionAgeForClientEvent(event, {
+      clientBirthDate: this.clientBirthDate,
+      partnerBirthDate: this.client?.partnerDetail?.birthDate,
+      forecastStartDate: this.forecastStartDate,
+      planDuration: this.cashflow?.planDuration,
+      projectionInclusiveEndYear: this.dialogEndCalendarYear,
+    });
   }
 
   onCycleValueChange(event: any) {
@@ -387,6 +528,18 @@ export class SimulateEmergencyComponent implements OnDestroy {
       }
       const rawAmount = this.simulateEmergencyForm.get('amount')?.value;
 
+      const startRaw = this.simulateEmergencyForm.get('start')?.value;
+      const startYearResolved =
+        startRaw !== null && startRaw !== ''
+          ? resolveYear(startRaw, this.eventsList)
+          : 0;
+
+      const endRaw = this.simulateEmergencyForm.get('end')?.value;
+      const endYearResolved =
+        endRaw !== null && endRaw !== ''
+          ? resolveYear(endRaw, this.eventsList)
+          : 0;
+      const endEventId = extractEventId(endRaw);
 
       var simulateEmergency: SimulateEmergencyModel = {
         id: this.existingEmergencyId,
@@ -404,40 +557,37 @@ export class SimulateEmergencyComponent implements OnDestroy {
         },
         start: {
           age:
-            this.simulateEmergencyForm.get('start')?.value !== null &&
-              this.simulateEmergencyForm.get('start')?.value !== ''
+            startRaw !== null && startRaw !== ''
               ? getPersistedAgeForCalendarYear(
                   this.clientBirthDate,
-                  this.simulateEmergencyForm.get('start')?.value,
+                  startYearResolved,
                   this.forecastStartDate,
                   this.data.cashflow?.planDuration,
                   this.dialogEndCalendarYear,
                 )
               : 0,
           year:
-            this.simulateEmergencyForm.get('start')?.value !== null &&
-              this.simulateEmergencyForm.get('start')?.value !== ''
-              ? this.simulateEmergencyForm.get('start')?.value
+            startRaw !== null && startRaw !== ''
+              ? startYearResolved
               : 0,
         },
         end: {
           age:
-            this.simulateEmergencyForm.get('end')?.value !== null &&
-              this.simulateEmergencyForm.get('end')?.value !== ''
+            endRaw !== null && endRaw !== ''
               ? getPersistedAgeForCalendarYear(
                   this.clientBirthDate,
-                  this.simulateEmergencyForm.get('end')?.value,
+                  endYearResolved,
                   this.forecastStartDate,
                   this.data.cashflow?.planDuration,
                   this.dialogEndCalendarYear,
                 )
               : 0,
           year:
-            this.simulateEmergencyForm.get('end')?.value !== null &&
-              this.simulateEmergencyForm.get('end')?.value !== ''
-              ? this.simulateEmergencyForm.get('end')?.value
+            endRaw !== null && endRaw !== ''
+              ? endYearResolved
               : 0,
         },
+        endEventId: endEventId ?? null,
         escalationRate: escalationRateValue !== null && escalationRateValue !== ''
           ? escalationRateModel
           : {
@@ -464,13 +614,11 @@ export class SimulateEmergencyComponent implements OnDestroy {
 
             this.baselineResult = res.baseline;
             const simulated = res.simulated;
-            simulated.timelineEvents = [];
 
             const emergencyAmount = this.simulateEmergencyForm.get('amount')?.value;
-            const selectedYear = this.simulateEmergencyForm.get('start')?.value;
             const emergencySeries = this.buildEmergencySeries(
               simulated,
-              selectedYear?.toString() ?? '',
+              startYearResolved ? startYearResolved.toString() : '',
               emergencyAmount);
 
             if (!this.baselineResult || !this.baselineResult.series) return;
@@ -494,6 +642,10 @@ export class SimulateEmergencyComponent implements OnDestroy {
 
             this.activeTab = 'simulated';
             this.displayedReport = this.simulationResult;
+            this.completedEmergencyHighlightYear =
+              Number.isFinite(startYearResolved) && startYearResolved > 0
+                ? startYearResolved
+                : null;
           },
           error: (err: any) => {
             this.isSimulating = false;
@@ -584,15 +736,23 @@ export class SimulateEmergencyComponent implements OnDestroy {
 
   private endOnOrAfterStartValidator(): ValidatorFn {
     return (group: AbstractControl) => {
-      const start = group.get('start')?.value;
-      const end = group.get('end')?.value;
+      const startRaw = group.get('start')?.value;
+      const start = resolveYear(startRaw, this.eventsList);
+      const endRaw = group.get('end')?.value;
+      const end = resolveYear(endRaw, this.eventsList);
       const endCtrl = group.get('end');
 
       // Only validate when both are present (or when end is present)
       if (endCtrl) {
         const existing = endCtrl.errors ?? null;
 
-        if (start != null && start !== '' && end != null && end !== '' && end < start) {
+        if (
+          startRaw != null &&
+          startRaw !== '' &&
+          endRaw != null &&
+          endRaw !== '' &&
+          end < start
+        ) {
           // attach/merge the error onto the END control
           endCtrl.setErrors({ ...(existing ?? {}), endBeforeStart: true });
         } else {
@@ -633,7 +793,10 @@ export class SimulateEmergencyComponent implements OnDestroy {
         cycle: cycleId,
         amount,
         start: expense.start?.year ?? null,
-        end: expense.end?.year ?? null,
+        end:
+          expense.endEventId
+            ? 'event:' + expense.endEventId
+            : expense.end?.year ?? null,
         escalationRate: 'Increases at custom rate',
         customEscalationRate: expense.escalationRate.value,
         stopIncome: expense.stopIncome ?? false
@@ -649,7 +812,10 @@ export class SimulateEmergencyComponent implements OnDestroy {
         cycle: cycleId,
         amount,
         start: expense.start?.year ?? null,
-        end: expense.end?.year ?? null,
+        end:
+          expense.endEventId
+            ? 'event:' + expense.endEventId
+            : expense.end?.year ?? null,
         escalationRate: matchedEscalation?.description ?? this.escalationRates[0]?.description ?? '',
         stopIncome: expense.stopIncome ?? false
       }, { emitEvent: false });
@@ -663,6 +829,40 @@ export class SimulateEmergencyComponent implements OnDestroy {
       this.simulateEmergencyForm.patchValue({
         stoppedIncomeId: expense.stoppedIncomeId ?? null
       }, { emitEvent: false });
+    }
+
+    const amountCtrl = this.simulateEmergencyForm.get('amount');
+    const incomeCtrl = this.simulateEmergencyForm.get('stoppedIncomeId');
+    if (expense.stopIncome) {
+      amountCtrl?.setValidators([Validators.required, Validators.min(0)]);
+      incomeCtrl?.setValidators([Validators.required]);
+    } else {
+      amountCtrl?.setValidators([Validators.required, Validators.min(0)]);
+      incomeCtrl?.clearValidators();
+    }
+    amountCtrl?.updateValueAndValidity({ emitEvent: false });
+    incomeCtrl?.updateValueAndValidity({ emitEvent: false });
+
+    const stopOn = this.simulateEmergencyForm.get('stopIncome')?.value;
+    const sid = this.simulateEmergencyForm.get('stoppedIncomeId')?.value;
+    if (stopOn && this.stoppableIncomes.length === 0) {
+      this.simulateEmergencyForm.patchValue(
+        { stopIncome: false, stoppedIncomeId: null },
+        { emitEvent: false },
+      );
+      amountCtrl?.setValidators([Validators.required, Validators.min(0)]);
+      incomeCtrl?.clearValidators();
+      amountCtrl?.updateValueAndValidity({ emitEvent: false });
+      incomeCtrl?.updateValueAndValidity({ emitEvent: false });
+    } else if (
+      stopOn &&
+      sid &&
+      !this.stoppableIncomes.some((i) => i.id === sid)
+    ) {
+      this.simulateEmergencyForm.patchValue(
+        { stoppedIncomeId: null },
+        { emitEvent: false },
+      );
     }
 
     this.simulateEmergencyForm.updateValueAndValidity();
@@ -679,7 +879,10 @@ export class SimulateEmergencyComponent implements OnDestroy {
 
   getStartYear(): number {
     const val = this.simulateEmergencyForm.get('start')?.value;
-    return typeof val === 'number' && Number.isFinite(val) ? val : this.forecastStartDateYear;
+    const resolved = resolveYear(val, this.eventsList);
+    return Number.isFinite(resolved) && resolved > 0
+      ? resolved
+      : this.forecastStartDateYear;
   }
 
   getEndEvents(): any[] {
@@ -690,6 +893,20 @@ export class SimulateEmergencyComponent implements OnDestroy {
   getEndYears(): number[] {
     const startYear = this.getStartYear();
     return (this.years ?? []).filter((y) => y >= startYear);
+  }
+
+  /** Stable @for track key for timeline event options in end dropdown. */
+  trackEndEventRow(event: {
+    id?: string | null;
+    name?: string | null;
+    start?: { year?: number | null };
+  }): string {
+    const id = event?.id;
+    if (id != null && String(id).length > 0) {
+      return `id:${id}`;
+    }
+    const y = event?.start?.year ?? '';
+    return `f:${event?.name ?? ''}:${y}`;
   }
 
   getAgeForYear(year: number): number {
@@ -704,8 +921,10 @@ export class SimulateEmergencyComponent implements OnDestroy {
   }
 
   private buildEmergencySeries(report: any, year: string, amount: number): any {
-    const emergencyData: number[] = report.categories.map((category: string) =>
-      category === year ? amount : 0
+    const y = String(year);
+    const emergencyData: number[] = report.categories.map(
+      (category: string | number) =>
+        String(category) === y ? amount : 0,
     );
 
     return {
