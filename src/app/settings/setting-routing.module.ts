@@ -1,15 +1,8 @@
 // settings/settings-routing.module.ts
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { BrandingComponent } from './branding/branding.component';
-import { NotificationsComponent } from './notifications/notifications.component';
 import { AdminGuard } from './admin-notifications/admin-guard.service';
 import { AdminNotificationsContainerComponent } from './admin-notifications/admin-notifications-container.component';
-import { PlanBillingComponent } from './plan-billing/plan-billing.component';
-import { AccountPreferencesComponent } from './account-preferences/account-preferences.component';
-import { HelpAndContactComponent } from './help-and-contact/help-and-contact.component';
-import { AiReccomendationsComponent } from './ai-reccomendations/ai-reccomendations.component';
-
 
 const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'account-preferences' },

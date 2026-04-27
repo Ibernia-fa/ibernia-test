@@ -1,136 +1,141 @@
 <div class="pricing-container">
-  <!-- Heading  -->
   <mat-card class="ibr-new-dashboad-card">
     <mat-card-content>
-      <!-- Heading  -->
       <div class="d-flex flex-column gap-10 m-b-16">
-        <h3 class="ibr-new-heading">{{ "Plans & Billing" | translate }}</h3>
+        <h3 class="ibr-new-heading">
+          {{ "Plans & Billing" | translate }}
+        </h3>
         <p class="ibr-new-subheading">
           {{ "Choose the plan that suits you" | translate }}
         </p>
       </div>
-      <!-- End Heading  -->
 
-      <div class="d-flex flex-column gap-16">
-        <!-- Essential Plan -->
-        <div class="ibr-payment-details">
-          <div class="d-flex flex-column gap-10">
-            <h3 class="ibr-new-heading">{{ "Essential" | translate }}</h3>
+      @if (loading()) {
+        <div class="d-flex justify-content-center p-24">
+          <mat-spinner diameter="40" />
+        </div>
+      } @else if (billingUnavailable()) {
+        <p class="ibr-new-subheading" role="alert">
+          {{ "ERROR.BILLING_UNAVAILABLE" | translate }}
+        </p>
+      } @else {
+        @if (subscription(); as sub) {
+          @if (hasActiveSubscription()) {
+            <div class="ibr-payment-details m-b-16">
+              <h4 class="ibr-new-heading m-b-8">
+                {{ "BILLING.CURRENT_PLAN" | translate }}
+              </h4>
+              <p class="ibr-new-subheading m-b-4">
+                <strong>{{ "BILLING.STATUS" | translate }}:</strong>
+                {{ sub.status }}
+              </p>
+              @if (sub.currentPeriodEndUtc) {
+                <p class="ibr-new-subheading m-b-4">
+                  <strong>{{
+                    "BILLING.CURRENT_PERIOD_END" | translate
+                  }}:</strong>
+                  {{ sub.currentPeriodEndUtc | date: "mediumDate" }}
+                </p>
+              }
+              @if (sub.activatedModules?.length) {
+                <p class="ibr-new-subheading m-b-8">
+                  <strong>{{ "BILLING.MODULES" | translate }}:</strong>
+                  {{ sub.activatedModules.join(", ") }}
+                </p>
+              }
+              <button
+                mat-stroked-button
+                type="button"
+                color="primary"
+                class="button-icon"
+                [disabled]="portalLoading()"
+                (click)="openCustomerPortal()"
+              >
+                <span>{{
+                  "BILLING.MANAGE_SUBSCRIPTION" | translate
+                }}</span>
+              </button>
+            </div>
+          }
+        }
+
+        <div class="d-flex flex-column gap-16">
+          @for (plan of plans(); track plan.priceId) {
+            <div class="ibr-payment-details">
+              <div class="d-flex flex-column gap-10">
+                <h3 class="ibr-new-heading">{{ plan.productName }}</h3>
+                @if (plan.tier) {
+                  <p class="ibr-new-subheading text-muted f-s-12">
+                    {{ plan.tier }}
+                  </p>
+                }
+                @if (plan.description) {
+                  <p class="ibr-new-subheading">
+                    {{ plan.description }}
+                  </p>
+                }
+                <p class="plan-price">
+                  <strong
+                    >{{ formatPrice(plan) }} /
+                    {{ billingInterval(plan) }}</strong
+                  >
+                </p>
+                @if (plan.modules?.length) {
+                  <div class="features-grid">
+                    @for (m of plan.modules; track m) {
+                      <div>
+                        <img
+                          src="assets/images/shapes/tick.svg"
+                          width="14"
+                          height="14"
+                          alt=""
+                        />
+                        {{ m }}
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+              <div class="d-flex justify-space-end m-t-16">
+                <button
+                  mat-stroked-button
+                  type="button"
+                  color="primary"
+                  class="button-icon"
+                  [disabled]="
+                    checkoutPriceId() === plan.priceId || hasActiveSubscription()
+                  "
+                  (click)="subscribeToPlan(plan)"
+                >
+                  <span>
+                    @if (checkoutPriceId() === plan.priceId) {
+                      {{ "BILLING.OPENING_CHECKOUT" | translate }}
+                    } @else if (hasActiveSubscription()) {
+                      {{ "BILLING.SUBSCRIBED" | translate }}
+                    } @else {
+                      {{ "BILLING.SUBSCRIBE" | translate }}
+                    }
+                  </span>
+                </button>
+              </div>
+            </div>
+          }
+
+          @if (!plans().length && !billingUnavailable()) {
             <p class="ibr-new-subheading">
-              {{
-                "The core planning tools: Cashflow Modeller, Client Onboarding & Data Capture Forms, Client Profile, and more"
-                  | translate
-              }}
+              {{ "BILLING.NO_PLANS" | translate }}
             </p>
-            <p class="plan-price">
-              <strong>{{ "€69 / month" | translate }}</strong>
-              {{ "per advisor + VAT" | translate }}
-            </p>
-          </div>
-
-          <div class="features-grid">
-            <div>
-              <img
-                width=""
-                src="../../../assets/images/shapes/tick.svg"
-                width="14"
-                alt=""
-              />
-              {{ "Cashflow Modeller" | translate }}
-            </div>
-            <div>
-              <img
-                width=""
-                src="../../../assets/images/shapes/tick.svg"
-                width="14"
-                alt=""
-              />
-              {{ "Models Comparison" | translate }}
-            </div>
-            <div>
-              <img
-                width=""
-                src="../../../assets/images/shapes/tick.svg"
-                width="14"
-                alt=""
-              />
-              {{ "Goal Planning" | translate }}
-            </div>
-
-            <div>
-              <img
-                width=""
-                src="../../../assets/images/shapes/tick.svg"
-                width="14"
-                alt=""
-              />
-              {{ "Client Profile" | translate }}
-            </div>
-          </div>
+          }
         </div>
 
-        <!-- Premium Plan -->
-        <div class="ibr-payment-details">
-          <div class="d-flex flex-column gap-10">
-            <h3 class="ibr-new-heading">{{ "Premium" | translate }}</h3>
-            <p class="ibr-new-subheading">
-              {{
-                "Everything in essential, plus our AI-powered recommendations and firm branding"
-                  | translate
-              }}
-            </p>
-            <p class="plan-price">
-              <strong>{{ "€99 / month" | translate }}</strong>
-              {{ "per advisor + VAT" | translate }}
-            </p>
-          </div>
-
-          <div class="features-grid">
-            <div>
-              <img
-                width=""
-                src="../../../assets/images/shapes/tick.svg"
-                width="14"
-                alt=""
-              />
-              {{ "Everything in Essential" | translate }}
-            </div>
-            <div>
-              <img
-                width=""
-                src="../../../assets/images/shapes/tick.svg"
-                width="14"
-                alt=""
-              />
-              <strong>{{ "AI Recommendations" | translate }}</strong>
-            </div>
-
-            <div>
-              <img
-                width=""
-                src="../../../assets/images/shapes/tick.svg"
-                width="14"
-                alt=""
-              />
-              <strong>{{ "Emergency Buffer & Insurance" | translate }}</strong>
-            </div>
-            <div>
-              <img
-                width=""
-                src="../../../assets/images/shapes/tick.svg"
-                width="14"
-                alt=""
-              />
-              <strong>{{ "Custom Branding" | translate }}</strong>
-            </div>
-          </div>
-        </div>
-
-        <!-- Enterprise Plan -->
-        <div class="ibr-payment-details">
-          <div class="d-flex justify-content-between gap-10">
+        <div class="ibr-payment-details m-t-24">
+          <div
+            class="d-flex flex-column flex-md-row justify-content-between gap-10"
+          >
             <div class="d-flex flex-column gap-10">
-              <h3 class="ibr-new-heading">{{ "Enterprise" | translate }}</h3>
+              <h3 class="ibr-new-heading">
+                {{ "Enterprise" | translate }}
+              </h3>
               <p class="ibr-new-subheading">
                 {{
                   "For teams that need bespoke AI and data connectivity"
@@ -138,34 +143,37 @@
                 }}
               </p>
             </div>
-            <button class="button-icon">
+            <a
+              class="button-icon text-decoration-none"
+              [routerLink]="['/settings/help']"
+            >
               <span>{{ "Contact us" | translate }}</span>
-            </button>
+            </a>
           </div>
           <div class="features-grid">
             <div>
               <img
-                width=""
-                src="../../../assets/images/shapes/tick.svg"
+                src="assets/images/shapes/tick.svg"
                 width="14"
+                height="14"
                 alt=""
               />
               {{ "Everything in Premium" | translate }}
             </div>
             <div>
               <img
-                width=""
-                src="../../../assets/images/shapes/tick.svg"
+                src="assets/images/shapes/tick.svg"
                 width="14"
+                height="14"
                 alt=""
               />
               <strong>{{ "Custom AI Recommendations" | translate }}</strong>
             </div>
             <div>
               <img
-                width=""
-                src="../../../assets/images/shapes/tick.svg"
+                src="assets/images/shapes/tick.svg"
                 width="14"
+                height="14"
                 alt=""
               />
               <strong>{{
@@ -174,22 +182,16 @@
             </div>
             <div>
               <img
-                width=""
-                src="../../../assets/images/shapes/tick.svg"
+                src="assets/images/shapes/tick.svg"
                 width="14"
+                height="14"
                 alt=""
               />
               <strong>{{ "Priority Support & SLA" | translate }}</strong>
             </div>
           </div>
         </div>
-
-        <div class="d-flex justify-space-end">
-          <button color="primary" class="button-icon">
-            <span> {{ "Change plan" | translate }}</span>
-          </button>
-        </div>
-      </div>
+      }
     </mat-card-content>
   </mat-card>
 </div>
