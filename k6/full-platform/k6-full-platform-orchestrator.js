@@ -15,6 +15,10 @@
  * **Phase A volume SLO (opt-in):** **`VOLUME_SLO=1`** **`VOLUME_SLO_PROFILE=write`** optional **`VOLUME_SLO_FILE`**
  * **`VOLUME_SLO_GATE=1`**. Writes **`reports/phase-a/{RunId}/slo-summary.json`** via handleSummary.
  *
+ * **Pre-run cleanup (write):** before creating clients, deletes prior k6 clients/plans when
+ * **`FULL_PLATFORM_PRE_RUN_CLEANUP=1`** (default on for write profile / skip-teardown). Fixed-advisor
+ * Phase A sets **`FULL_PLATFORM_PRE_RUN_CLEANUP_ALL=1`** to remove every client on the advisor.
+ *
  * @example PowerShell
  * cd $env:USERPROFILE\source\repos\load-testing-k6
  * k6 run k6/full-platform/k6-full-platform-orchestrator.js `
@@ -43,6 +47,10 @@ import {
   executeFullPlatformSequence,
   probeModulesAccess,
 } from '../../lib/k6-full-platform-phases.js';
+import {
+  isPreRunCleanupDeleteAllClients,
+  isPreRunCleanupEnabled,
+} from '../../lib/k6-load-cleanup.js';
 import { metricCount } from '../cashflows-income/common-income-screen.js';
 import {
   attachPhaseASloToSummary,
@@ -83,6 +91,8 @@ const skipTeardown = ['1', 'true', 'yes'].includes(
   (__ENV.FULL_PLATFORM_SKIP_TEARDOWN || '').trim().toLowerCase(),
 );
 const skipDelete = skipCleanup || skipTeardown;
+const preRunCleanup = isPreRunCleanupEnabled();
+const preRunCleanupDeleteAll = isPreRunCleanupDeleteAllClients();
 const appendLifecycle = ['1', 'true', 'yes'].includes(
   (__ENV.FULL_PLATFORM_APPEND_LIFECYCLE_EXPORT || '').trim().toLowerCase(),
 );
@@ -178,7 +188,8 @@ export function setup() {
       `[${SCRIPT_TAG}] VOLUME_SLO=1 profile=${slo.profileOverride || 'auto/write'} gate=${slo.gateEnabled} ` +
         `scenario=${slo.scenarioName || 'default'} runId=${slo.runId || FP_RUN_TAG} config=${slo.configPath} ` +
         `clientsPerAdvisor=${counts.clientsPerAdvisor} plansPerClient=${counts.plansPerClient} ` +
-        `manifest=${isPhaseAManifestExportEnabled()} skipTeardown=${skipDelete}`,
+        `manifest=${isPhaseAManifestExportEnabled()} skipTeardown=${skipDelete} ` +
+        `preRunCleanup=${preRunCleanup} preRunCleanupAll=${preRunCleanupDeleteAll}`,
     );
   }
   if (!htmlSignupFirst) {
@@ -540,6 +551,8 @@ export default function () {
     domain: CLIENT_DOMAIN,
     skipCleanup: skipDelete,
     skipTeardown: skipDelete,
+    preRunCleanup,
+    preRunCleanupDeleteAll,
   });
 
   emitPhaseAManifestShardMarker();

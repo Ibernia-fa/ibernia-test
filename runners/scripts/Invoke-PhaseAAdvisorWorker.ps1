@@ -79,6 +79,10 @@ if ($ExportManifest) { $k6Args += @('-e', 'PHASE_A_EXPORT_MANIFEST=1') }
 if ($SkipTeardown) {
   $k6Args += @('-e', 'FULL_PLATFORM_SKIP_TEARDOWN=1', '-e', 'FULL_PLATFORM_SKIP_CLEANUP=1')
 }
+$k6Args += @('-e', 'FULL_PLATFORM_PRE_RUN_CLEANUP=1')
+if ($UseFixedAdvisors) {
+  $k6Args += @('-e', 'FULL_PLATFORM_PRE_RUN_CLEANUP_ALL=1')
+}
 if ($ClientsPerAdvisor) {
   $k6Args += @(
     '-e', "PHASE_A_CLIENTS_PER_ADVISOR=$ClientsPerAdvisor",

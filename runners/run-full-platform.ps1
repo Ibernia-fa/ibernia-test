@@ -61,6 +61,7 @@ try {
     '-e', 'USE_USER_POOL=1',
     '-e', "POOL_SLICE_FILE=$slicePath",
     '-e', 'SIGNUP_ROPC_CLIENT_ID=k6-load-test-client',
+    '-e', 'FULL_PLATFORM_PRE_RUN_CLEANUP=1',
     '-e', "VUS=$Vus",
     '-e', "DURATION=$Duration",
     '-e', "LOAD_MODE=$LoadMode"

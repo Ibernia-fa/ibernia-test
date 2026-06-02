@@ -1,0 +1,958 @@
+{
+  "reportType": "phase-a-slo-fleet",
+  "generatedAt": "2026-06-02T14:08:49.655Z",
+  "runTag": "S1-write-realistic-v3",
+  "shardCount": 20,
+  "shards": [
+    {
+      "reportType": "volume-slo-summary",
+      "generatedAt": "2026-06-02T14:07:04.147Z",
+      "configVersion": 1,
+      "defaultProfile": "write",
+      "gates": null,
+      "profilesUsed": [],
+      "endpoints": [],
+      "steps": [],
+      "rates": {
+        "endpointViolationRate": null,
+        "stepViolationRate": null,
+        "hardMaxViolationRate": null
+      },
+      "totals": {
+        "endpointSamples": 0,
+        "stepSamples": 0,
+        "endpointViolations": 0,
+        "stepViolations": 0,
+        "hardMaxViolations": 0
+      },
+      "enabled": true,
+      "runId": "S1-write-realistic-v3",
+      "scenario": "phase-a-write-default",
+      "scenarioProfile": "write",
+      "phase": "A",
+      "integration": "k6-full-platform-orchestrator",
+      "sloProfile": "write",
+      "script": "k6-full-platform-orchestrator",
+      "loadMode": "vus",
+      "htmlSignup": false,
+      "phaseARunTag": "S1-write-realistic-v3",
+      "phaseA": {
+        "steps": [],
+        "metrics": [
+          "journey_create_client_duration",
+          "journey_create_base_plan_duration",
+          "journey_create_timeline_events_duration",
+          "journey_add_income_expenses_duration",
+          "journey_add_saving_pots_duration",
+          "journey_add_contributions_withdrawals_duration",
+          "journey_calculate_projection_duration",
+          "journey_full_plan_build_duration"
+        ]
+      },
+      "shardId": "advisor-00"
+    },
+    {
+      "reportType": "volume-slo-summary",
+      "generatedAt": "2026-06-02T14:07:13.748Z",
+      "configVersion": 1,
+      "defaultProfile": "write",
+      "gates": null,
+      "profilesUsed": [],
+      "endpoints": [],
+      "steps": [],
+      "rates": {
+        "endpointViolationRate": null,
+        "stepViolationRate": null,
+        "hardMaxViolationRate": null
+      },
+      "totals": {
+        "endpointSamples": 0,
+        "stepSamples": 0,
+        "endpointViolations": 0,
+        "stepViolations": 0,
+        "hardMaxViolations": 0
+      },
+      "enabled": true,
+      "runId": "S1-write-realistic-v3",
+      "scenario": "phase-a-write-default",
+      "scenarioProfile": "write",
+      "phase": "A",
+      "integration": "k6-full-platform-orchestrator",
+      "sloProfile": "write",
+      "script": "k6-full-platform-orchestrator",
+      "loadMode": "vus",
+      "htmlSignup": false,
+      "phaseARunTag": "S1-write-realistic-v3",
+      "phaseA": {
+        "steps": [],
+        "metrics": [
+          "journey_create_client_duration",
+          "journey_create_base_plan_duration",
+          "journey_create_timeline_events_duration",
+          "journey_add_income_expenses_duration",
+          "journey_add_saving_pots_duration",
+          "journey_add_contributions_withdrawals_duration",
+          "journey_calculate_projection_duration",
+          "journey_full_plan_build_duration"
+        ]
+      },
+      "shardId": "advisor-01"
+    },
+    {
+      "reportType": "volume-slo-summary",
+      "generatedAt": "2026-06-02T14:08:26.218Z",
+      "configVersion": 1,
+      "defaultProfile": "write",
+      "gates": null,
+      "profilesUsed": [],
+      "endpoints": [],
+      "steps": [],
+      "rates": {
+        "endpointViolationRate": null,
+        "stepViolationRate": null,
+        "hardMaxViolationRate": null
+      },
+      "totals": {
+        "endpointSamples": 0,
+        "stepSamples": 0,
+        "endpointViolations": 0,
+        "stepViolations": 0,
+        "hardMaxViolations": 0
+      },
+      "enabled": true,
+      "runId": "S1-write-realistic-v3",
+      "scenario": "phase-a-write-default",
+      "scenarioProfile": "write",
+      "phase": "A",
+      "integration": "k6-full-platform-orchestrator",
+      "sloProfile": "write",
+      "script": "k6-full-platform-orchestrator",
+      "loadMode": "vus",
+      "htmlSignup": false,
+      "phaseARunTag": "S1-write-realistic-v3",
+      "phaseA": {
+        "steps": [],
+        "metrics": [
+          "journey_create_client_duration",
+          "journey_create_base_plan_duration",
+          "journey_create_timeline_events_duration",
+          "journey_add_income_expenses_duration",
+          "journey_add_saving_pots_duration",
+          "journey_add_contributions_withdrawals_duration",
+          "journey_calculate_projection_duration",
+          "journey_full_plan_build_duration"
+        ]
+      },
+      "shardId": "advisor-02"
+    },
+    {
+      "reportType": "volume-slo-summary",
+      "generatedAt": "2026-06-02T14:08:29.646Z",
+      "configVersion": 1,
+      "defaultProfile": "write",
+      "gates": null,
+      "profilesUsed": [],
+      "endpoints": [],
+      "steps": [],
+      "rates": {
+        "endpointViolationRate": null,
+        "stepViolationRate": null,
+        "hardMaxViolationRate": null
+      },
+      "totals": {
+        "endpointSamples": 0,
+        "stepSamples": 0,
+        "endpointViolations": 0,
+        "stepViolations": 0,
+        "hardMaxViolations": 0
+      },
+      "enabled": true,
+      "runId": "S1-write-realistic-v3",
+      "scenario": "phase-a-write-default",
+      "scenarioProfile": "write",
+      "phase": "A",
+      "integration": "k6-full-platform-orchestrator",
+      "sloProfile": "write",
+      "script": "k6-full-platform-orchestrator",
+      "loadMode": "vus",
+      "htmlSignup": false,
+      "phaseARunTag": "S1-write-realistic-v3",
+      "phaseA": {
+        "steps": [],
+        "metrics": [
+          "journey_create_client_duration",
+          "journey_create_base_plan_duration",
+          "journey_create_timeline_events_duration",
+          "journey_add_income_expenses_duration",
+          "journey_add_saving_pots_duration",
+          "journey_add_contributions_withdrawals_duration",
+          "journey_calculate_projection_duration",
+          "journey_full_plan_build_duration"
+        ]
+      },
+      "shardId": "advisor-03"
+    },
+    {
+      "reportType": "volume-slo-summary",
+      "generatedAt": "2026-06-02T14:08:32.581Z",
+      "configVersion": 1,
+      "defaultProfile": "write",
+      "gates": null,
+      "profilesUsed": [],
+      "endpoints": [],
+      "steps": [],
+      "rates": {
+        "endpointViolationRate": null,
+        "stepViolationRate": null,
+        "hardMaxViolationRate": null
+      },
+      "totals": {
+        "endpointSamples": 0,
+        "stepSamples": 0,
+        "endpointViolations": 0,
+        "stepViolations": 0,
+        "hardMaxViolations": 0
+      },
+      "enabled": true,
+      "runId": "S1-write-realistic-v3",
+      "scenario": "phase-a-write-default",
+      "scenarioProfile": "write",
+      "phase": "A",
+      "integration": "k6-full-platform-orchestrator",
+      "sloProfile": "write",
+      "script": "k6-full-platform-orchestrator",
+      "loadMode": "vus",
+      "htmlSignup": false,
+      "phaseARunTag": "S1-write-realistic-v3",
+      "phaseA": {
+        "steps": [],
+        "metrics": [
+          "journey_create_client_duration",
+          "journey_create_base_plan_duration",
+          "journey_create_timeline_events_duration",
+          "journey_add_income_expenses_duration",
+          "journey_add_saving_pots_duration",
+          "journey_add_contributions_withdrawals_duration",
+          "journey_calculate_projection_duration",
+          "journey_full_plan_build_duration"
+        ]
+      },
+      "shardId": "advisor-04"
+    },
+    {
+      "reportType": "volume-slo-summary",
+      "generatedAt": "2026-06-02T14:08:29.599Z",
+      "configVersion": 1,
+      "defaultProfile": "write",
+      "gates": null,
+      "profilesUsed": [],
+      "endpoints": [],
+      "steps": [],
+      "rates": {
+        "endpointViolationRate": null,
+        "stepViolationRate": null,
+        "hardMaxViolationRate": null
+      },
+      "totals": {
+        "endpointSamples": 0,
+        "stepSamples": 0,
+        "endpointViolations": 0,
+        "stepViolations": 0,
+        "hardMaxViolations": 0
+      },
+      "enabled": true,
+      "runId": "S1-write-realistic-v3",
+      "scenario": "phase-a-write-default",
+      "scenarioProfile": "write",
+      "phase": "A",
+      "integration": "k6-full-platform-orchestrator",
+      "sloProfile": "write",
+      "script": "k6-full-platform-orchestrator",
+      "loadMode": "vus",
+      "htmlSignup": false,
+      "phaseARunTag": "S1-write-realistic-v3",
+      "phaseA": {
+        "steps": [],
+        "metrics": [
+          "journey_create_client_duration",
+          "journey_create_base_plan_duration",
+          "journey_create_timeline_events_duration",
+          "journey_add_income_expenses_duration",
+          "journey_add_saving_pots_duration",
+          "journey_add_contributions_withdrawals_duration",
+          "journey_calculate_projection_duration",
+          "journey_full_plan_build_duration"
+        ]
+      },
+      "shardId": "advisor-05"
+    },
+    {
+      "reportType": "volume-slo-summary",
+      "generatedAt": "2026-06-02T14:08:29.052Z",
+      "configVersion": 1,
+      "defaultProfile": "write",
+      "gates": null,
+      "profilesUsed": [],
+      "endpoints": [],
+      "steps": [],
+      "rates": {
+        "endpointViolationRate": null,
+        "stepViolationRate": null,
+        "hardMaxViolationRate": null
+      },
+      "totals": {
+        "endpointSamples": 0,
+        "stepSamples": 0,
+        "endpointViolations": 0,
+        "stepViolations": 0,
+        "hardMaxViolations": 0
+      },
+      "enabled": true,
+      "runId": "S1-write-realistic-v3",
+      "scenario": "phase-a-write-default",
+      "scenarioProfile": "write",
+      "phase": "A",
+      "integration": "k6-full-platform-orchestrator",
+      "sloProfile": "write",
+      "script": "k6-full-platform-orchestrator",
+      "loadMode": "vus",
+      "htmlSignup": false,
+      "phaseARunTag": "S1-write-realistic-v3",
+      "phaseA": {
+        "steps": [],
+        "metrics": [
+          "journey_create_client_duration",
+          "journey_create_base_plan_duration",
+          "journey_create_timeline_events_duration",
+          "journey_add_income_expenses_duration",
+          "journey_add_saving_pots_duration",
+          "journey_add_contributions_withdrawals_duration",
+          "journey_calculate_projection_duration",
+          "journey_full_plan_build_duration"
+        ]
+      },
+      "shardId": "advisor-06"
+    },
+    {
+      "reportType": "volume-slo-summary",
+      "generatedAt": "2026-06-02T14:08:29.676Z",
+      "configVersion": 1,
+      "defaultProfile": "write",
+      "gates": null,
+      "profilesUsed": [],
+      "endpoints": [],
+      "steps": [],
+      "rates": {
+        "endpointViolationRate": null,
+        "stepViolationRate": null,
+        "hardMaxViolationRate": null
+      },
+      "totals": {
+        "endpointSamples": 0,
+        "stepSamples": 0,
+        "endpointViolations": 0,
+        "stepViolations": 0,
+        "hardMaxViolations": 0
+      },
+      "enabled": true,
+      "runId": "S1-write-realistic-v3",
+      "scenario": "phase-a-write-default",
+      "scenarioProfile": "write",
+      "phase": "A",
+      "integration": "k6-full-platform-orchestrator",
+      "sloProfile": "write",
+      "script": "k6-full-platform-orchestrator",
+      "loadMode": "vus",
+      "htmlSignup": false,
+      "phaseARunTag": "S1-write-realistic-v3",
+      "phaseA": {
+        "steps": [],
+        "metrics": [
+          "journey_create_client_duration",
+          "journey_create_base_plan_duration",
+          "journey_create_timeline_events_duration",
+          "journey_add_income_expenses_duration",
+          "journey_add_saving_pots_duration",
+          "journey_add_contributions_withdrawals_duration",
+          "journey_calculate_projection_duration",
+          "journey_full_plan_build_duration"
+        ]
+      },
+      "shardId": "advisor-07"
+    },
+    {
+      "reportType": "volume-slo-summary",
+      "generatedAt": "2026-06-02T14:08:26.242Z",
+      "configVersion": 1,
+      "defaultProfile": "write",
+      "gates": null,
+      "profilesUsed": [],
+      "endpoints": [],
+      "steps": [],
+      "rates": {
+        "endpointViolationRate": null,
+        "stepViolationRate": null,
+        "hardMaxViolationRate": null
+      },
+      "totals": {
+        "endpointSamples": 0,
+        "stepSamples": 0,
+        "endpointViolations": 0,
+        "stepViolations": 0,
+        "hardMaxViolations": 0
+      },
+      "enabled": true,
+      "runId": "S1-write-realistic-v3",
+      "scenario": "phase-a-write-default",
+      "scenarioProfile": "write",
+      "phase": "A",
+      "integration": "k6-full-platform-orchestrator",
+      "sloProfile": "write",
+      "script": "k6-full-platform-orchestrator",
+      "loadMode": "vus",
+      "htmlSignup": false,
+      "phaseARunTag": "S1-write-realistic-v3",
+      "phaseA": {
+        "steps": [],
+        "metrics": [
+          "journey_create_client_duration",
+          "journey_create_base_plan_duration",
+          "journey_create_timeline_events_duration",
+          "journey_add_income_expenses_duration",
+          "journey_add_saving_pots_duration",
+          "journey_add_contributions_withdrawals_duration",
+          "journey_calculate_projection_duration",
+          "journey_full_plan_build_duration"
+        ]
+      },
+      "shardId": "advisor-08"
+    },
+    {
+      "reportType": "volume-slo-summary",
+      "generatedAt": "2026-06-02T14:08:29.091Z",
+      "configVersion": 1,
+      "defaultProfile": "write",
+      "gates": null,
+      "profilesUsed": [],
+      "endpoints": [],
+      "steps": [],
+      "rates": {
+        "endpointViolationRate": null,
+        "stepViolationRate": null,
+        "hardMaxViolationRate": null
+      },
+      "totals": {
+        "endpointSamples": 0,
+        "stepSamples": 0,
+        "endpointViolations": 0,
+        "stepViolations": 0,
+        "hardMaxViolations": 0
+      },
+      "enabled": true,
+      "runId": "S1-write-realistic-v3",
+      "scenario": "phase-a-write-default",
+      "scenarioProfile": "write",
+      "phase": "A",
+      "integration": "k6-full-platform-orchestrator",
+      "sloProfile": "write",
+      "script": "k6-full-platform-orchestrator",
+      "loadMode": "vus",
+      "htmlSignup": false,
+      "phaseARunTag": "S1-write-realistic-v3",
+      "phaseA": {
+        "steps": [],
+        "metrics": [
+          "journey_create_client_duration",
+          "journey_create_base_plan_duration",
+          "journey_create_timeline_events_duration",
+          "journey_add_income_expenses_duration",
+          "journey_add_saving_pots_duration",
+          "journey_add_contributions_withdrawals_duration",
+          "journey_calculate_projection_duration",
+          "journey_full_plan_build_duration"
+        ]
+      },
+      "shardId": "advisor-09"
+    },
+    {
+      "reportType": "volume-slo-summary",
+      "generatedAt": "2026-06-02T14:08:26.230Z",
+      "configVersion": 1,
+      "defaultProfile": "write",
+      "gates": null,
+      "profilesUsed": [],
+      "endpoints": [],
+      "steps": [],
+      "rates": {
+        "endpointViolationRate": null,
+        "stepViolationRate": null,
+        "hardMaxViolationRate": null
+      },
+      "totals": {
+        "endpointSamples": 0,
+        "stepSamples": 0,
+        "endpointViolations": 0,
+        "stepViolations": 0,
+        "hardMaxViolations": 0
+      },
+      "enabled": true,
+      "runId": "S1-write-realistic-v3",
+      "scenario": "phase-a-write-default",
+      "scenarioProfile": "write",
+      "phase": "A",
+      "integration": "k6-full-platform-orchestrator",
+      "sloProfile": "write",
+      "script": "k6-full-platform-orchestrator",
+      "loadMode": "vus",
+      "htmlSignup": false,
+      "phaseARunTag": "S1-write-realistic-v3",
+      "phaseA": {
+        "steps": [],
+        "metrics": [
+          "journey_create_client_duration",
+          "journey_create_base_plan_duration",
+          "journey_create_timeline_events_duration",
+          "journey_add_income_expenses_duration",
+          "journey_add_saving_pots_duration",
+          "journey_add_contributions_withdrawals_duration",
+          "journey_calculate_projection_duration",
+          "journey_full_plan_build_duration"
+        ]
+      },
+      "shardId": "advisor-10"
+    },
+    {
+      "reportType": "volume-slo-summary",
+      "generatedAt": "2026-06-02T14:08:27.619Z",
+      "configVersion": 1,
+      "defaultProfile": "write",
+      "gates": null,
+      "profilesUsed": [],
+      "endpoints": [],
+      "steps": [],
+      "rates": {
+        "endpointViolationRate": null,
+        "stepViolationRate": null,
+        "hardMaxViolationRate": null
+      },
+      "totals": {
+        "endpointSamples": 0,
+        "stepSamples": 0,
+        "endpointViolations": 0,
+        "stepViolations": 0,
+        "hardMaxViolations": 0
+      },
+      "enabled": true,
+      "runId": "S1-write-realistic-v3",
+      "scenario": "phase-a-write-default",
+      "scenarioProfile": "write",
+      "phase": "A",
+      "integration": "k6-full-platform-orchestrator",
+      "sloProfile": "write",
+      "script": "k6-full-platform-orchestrator",
+      "loadMode": "vus",
+      "htmlSignup": false,
+      "phaseARunTag": "S1-write-realistic-v3",
+      "phaseA": {
+        "steps": [],
+        "metrics": [
+          "journey_create_client_duration",
+          "journey_create_base_plan_duration",
+          "journey_create_timeline_events_duration",
+          "journey_add_income_expenses_duration",
+          "journey_add_saving_pots_duration",
+          "journey_add_contributions_withdrawals_duration",
+          "journey_calculate_projection_duration",
+          "journey_full_plan_build_duration"
+        ]
+      },
+      "shardId": "advisor-11"
+    },
+    {
+      "reportType": "volume-slo-summary",
+      "generatedAt": "2026-06-02T14:08:31.888Z",
+      "configVersion": 1,
+      "defaultProfile": "write",
+      "gates": null,
+      "profilesUsed": [],
+      "endpoints": [],
+      "steps": [],
+      "rates": {
+        "endpointViolationRate": null,
+        "stepViolationRate": null,
+        "hardMaxViolationRate": null
+      },
+      "totals": {
+        "endpointSamples": 0,
+        "stepSamples": 0,
+        "endpointViolations": 0,
+        "stepViolations": 0,
+        "hardMaxViolations": 0
+      },
+      "enabled": true,
+      "runId": "S1-write-realistic-v3",
+      "scenario": "phase-a-write-default",
+      "scenarioProfile": "write",
+      "phase": "A",
+      "integration": "k6-full-platform-orchestrator",
+      "sloProfile": "write",
+      "script": "k6-full-platform-orchestrator",
+      "loadMode": "vus",
+      "htmlSignup": false,
+      "phaseARunTag": "S1-write-realistic-v3",
+      "phaseA": {
+        "steps": [],
+        "metrics": [
+          "journey_create_client_duration",
+          "journey_create_base_plan_duration",
+          "journey_create_timeline_events_duration",
+          "journey_add_income_expenses_duration",
+          "journey_add_saving_pots_duration",
+          "journey_add_contributions_withdrawals_duration",
+          "journey_calculate_projection_duration",
+          "journey_full_plan_build_duration"
+        ]
+      },
+      "shardId": "advisor-12"
+    },
+    {
+      "reportType": "volume-slo-summary",
+      "generatedAt": "2026-06-02T14:08:29.065Z",
+      "configVersion": 1,
+      "defaultProfile": "write",
+      "gates": null,
+      "profilesUsed": [],
+      "endpoints": [],
+      "steps": [],
+      "rates": {
+        "endpointViolationRate": null,
+        "stepViolationRate": null,
+        "hardMaxViolationRate": null
+      },
+      "totals": {
+        "endpointSamples": 0,
+        "stepSamples": 0,
+        "endpointViolations": 0,
+        "stepViolations": 0,
+        "hardMaxViolations": 0
+      },
+      "enabled": true,
+      "runId": "S1-write-realistic-v3",
+      "scenario": "phase-a-write-default",
+      "scenarioProfile": "write",
+      "phase": "A",
+      "integration": "k6-full-platform-orchestrator",
+      "sloProfile": "write",
+      "script": "k6-full-platform-orchestrator",
+      "loadMode": "vus",
+      "htmlSignup": false,
+      "phaseARunTag": "S1-write-realistic-v3",
+      "phaseA": {
+        "steps": [],
+        "metrics": [
+          "journey_create_client_duration",
+          "journey_create_base_plan_duration",
+          "journey_create_timeline_events_duration",
+          "journey_add_income_expenses_duration",
+          "journey_add_saving_pots_duration",
+          "journey_add_contributions_withdrawals_duration",
+          "journey_calculate_projection_duration",
+          "journey_full_plan_build_duration"
+        ]
+      },
+      "shardId": "advisor-13"
+    },
+    {
+      "reportType": "volume-slo-summary",
+      "generatedAt": "2026-06-02T14:08:29.660Z",
+      "configVersion": 1,
+      "defaultProfile": "write",
+      "gates": null,
+      "profilesUsed": [],
+      "endpoints": [],
+      "steps": [],
+      "rates": {
+        "endpointViolationRate": null,
+        "stepViolationRate": null,
+        "hardMaxViolationRate": null
+      },
+      "totals": {
+        "endpointSamples": 0,
+        "stepSamples": 0,
+        "endpointViolations": 0,
+        "stepViolations": 0,
+        "hardMaxViolations": 0
+      },
+      "enabled": true,
+      "runId": "S1-write-realistic-v3",
+      "scenario": "phase-a-write-default",
+      "scenarioProfile": "write",
+      "phase": "A",
+      "integration": "k6-full-platform-orchestrator",
+      "sloProfile": "write",
+      "script": "k6-full-platform-orchestrator",
+      "loadMode": "vus",
+      "htmlSignup": false,
+      "phaseARunTag": "S1-write-realistic-v3",
+      "phaseA": {
+        "steps": [],
+        "metrics": [
+          "journey_create_client_duration",
+          "journey_create_base_plan_duration",
+          "journey_create_timeline_events_duration",
+          "journey_add_income_expenses_duration",
+          "journey_add_saving_pots_duration",
+          "journey_add_contributions_withdrawals_duration",
+          "journey_calculate_projection_duration",
+          "journey_full_plan_build_duration"
+        ]
+      },
+      "shardId": "advisor-14"
+    },
+    {
+      "reportType": "volume-slo-summary",
+      "generatedAt": "2026-06-02T14:08:29.051Z",
+      "configVersion": 1,
+      "defaultProfile": "write",
+      "gates": null,
+      "profilesUsed": [],
+      "endpoints": [],
+      "steps": [],
+      "rates": {
+        "endpointViolationRate": null,
+        "stepViolationRate": null,
+        "hardMaxViolationRate": null
+      },
+      "totals": {
+        "endpointSamples": 0,
+        "stepSamples": 0,
+        "endpointViolations": 0,
+        "stepViolations": 0,
+        "hardMaxViolations": 0
+      },
+      "enabled": true,
+      "runId": "S1-write-realistic-v3",
+      "scenario": "phase-a-write-default",
+      "scenarioProfile": "write",
+      "phase": "A",
+      "integration": "k6-full-platform-orchestrator",
+      "sloProfile": "write",
+      "script": "k6-full-platform-orchestrator",
+      "loadMode": "vus",
+      "htmlSignup": false,
+      "phaseARunTag": "S1-write-realistic-v3",
+      "phaseA": {
+        "steps": [],
+        "metrics": [
+          "journey_create_client_duration",
+          "journey_create_base_plan_duration",
+          "journey_create_timeline_events_duration",
+          "journey_add_income_expenses_duration",
+          "journey_add_saving_pots_duration",
+          "journey_add_contributions_withdrawals_duration",
+          "journey_calculate_projection_duration",
+          "journey_full_plan_build_duration"
+        ]
+      },
+      "shardId": "advisor-15"
+    },
+    {
+      "reportType": "volume-slo-summary",
+      "generatedAt": "2026-06-02T14:08:27.610Z",
+      "configVersion": 1,
+      "defaultProfile": "write",
+      "gates": null,
+      "profilesUsed": [],
+      "endpoints": [],
+      "steps": [],
+      "rates": {
+        "endpointViolationRate": null,
+        "stepViolationRate": null,
+        "hardMaxViolationRate": null
+      },
+      "totals": {
+        "endpointSamples": 0,
+        "stepSamples": 0,
+        "endpointViolations": 0,
+        "stepViolations": 0,
+        "hardMaxViolations": 0
+      },
+      "enabled": true,
+      "runId": "S1-write-realistic-v3",
+      "scenario": "phase-a-write-default",
+      "scenarioProfile": "write",
+      "phase": "A",
+      "integration": "k6-full-platform-orchestrator",
+      "sloProfile": "write",
+      "script": "k6-full-platform-orchestrator",
+      "loadMode": "vus",
+      "htmlSignup": false,
+      "phaseARunTag": "S1-write-realistic-v3",
+      "phaseA": {
+        "steps": [],
+        "metrics": [
+          "journey_create_client_duration",
+          "journey_create_base_plan_duration",
+          "journey_create_timeline_events_duration",
+          "journey_add_income_expenses_duration",
+          "journey_add_saving_pots_duration",
+          "journey_add_contributions_withdrawals_duration",
+          "journey_calculate_projection_duration",
+          "journey_full_plan_build_duration"
+        ]
+      },
+      "shardId": "advisor-16"
+    },
+    {
+      "reportType": "volume-slo-summary",
+      "generatedAt": "2026-06-02T14:08:25.219Z",
+      "configVersion": 1,
+      "defaultProfile": "write",
+      "gates": null,
+      "profilesUsed": [],
+      "endpoints": [],
+      "steps": [],
+      "rates": {
+        "endpointViolationRate": null,
+        "stepViolationRate": null,
+        "hardMaxViolationRate": null
+      },
+      "totals": {
+        "endpointSamples": 0,
+        "stepSamples": 0,
+        "endpointViolations": 0,
+        "stepViolations": 0,
+        "hardMaxViolations": 0
+      },
+      "enabled": true,
+      "runId": "S1-write-realistic-v3",
+      "scenario": "phase-a-write-default",
+      "scenarioProfile": "write",
+      "phase": "A",
+      "integration": "k6-full-platform-orchestrator",
+      "sloProfile": "write",
+      "script": "k6-full-platform-orchestrator",
+      "loadMode": "vus",
+      "htmlSignup": false,
+      "phaseARunTag": "S1-write-realistic-v3",
+      "phaseA": {
+        "steps": [],
+        "metrics": [
+          "journey_create_client_duration",
+          "journey_create_base_plan_duration",
+          "journey_create_timeline_events_duration",
+          "journey_add_income_expenses_duration",
+          "journey_add_saving_pots_duration",
+          "journey_add_contributions_withdrawals_duration",
+          "journey_calculate_projection_duration",
+          "journey_full_plan_build_duration"
+        ]
+      },
+      "shardId": "advisor-17"
+    },
+    {
+      "reportType": "volume-slo-summary",
+      "generatedAt": "2026-06-02T14:08:32.025Z",
+      "configVersion": 1,
+      "defaultProfile": "write",
+      "gates": null,
+      "profilesUsed": [],
+      "endpoints": [],
+      "steps": [],
+      "rates": {
+        "endpointViolationRate": null,
+        "stepViolationRate": null,
+        "hardMaxViolationRate": null
+      },
+      "totals": {
+        "endpointSamples": 0,
+        "stepSamples": 0,
+        "endpointViolations": 0,
+        "stepViolations": 0,
+        "hardMaxViolations": 0
+      },
+      "enabled": true,
+      "runId": "S1-write-realistic-v3",
+      "scenario": "phase-a-write-default",
+      "scenarioProfile": "write",
+      "phase": "A",
+      "integration": "k6-full-platform-orchestrator",
+      "sloProfile": "write",
+      "script": "k6-full-platform-orchestrator",
+      "loadMode": "vus",
+      "htmlSignup": false,
+      "phaseARunTag": "S1-write-realistic-v3",
+      "phaseA": {
+        "steps": [],
+        "metrics": [
+          "journey_create_client_duration",
+          "journey_create_base_plan_duration",
+          "journey_create_timeline_events_duration",
+          "journey_add_income_expenses_duration",
+          "journey_add_saving_pots_duration",
+          "journey_add_contributions_withdrawals_duration",
+          "journey_calculate_projection_duration",
+          "journey_full_plan_build_duration"
+        ]
+      },
+      "shardId": "advisor-18"
+    },
+    {
+      "reportType": "volume-slo-summary",
+      "generatedAt": "2026-06-02T14:08:46.529Z",
+      "configVersion": 1,
+      "defaultProfile": "write",
+      "gates": null,
+      "profilesUsed": [],
+      "endpoints": [],
+      "steps": [],
+      "rates": {
+        "endpointViolationRate": null,
+        "stepViolationRate": null,
+        "hardMaxViolationRate": null
+      },
+      "totals": {
+        "endpointSamples": 0,
+        "stepSamples": 0,
+        "endpointViolations": 0,
+        "stepViolations": 0,
+        "hardMaxViolations": 0
+      },
+      "enabled": true,
+      "runId": "S1-write-realistic-v3",
+      "scenario": "phase-a-write-default",
+      "scenarioProfile": "write",
+      "phase": "A",
+      "integration": "k6-full-platform-orchestrator",
+      "sloProfile": "write",
+      "script": "k6-full-platform-orchestrator",
+      "loadMode": "vus",
+      "htmlSignup": false,
+      "phaseARunTag": "S1-write-realistic-v3",
+      "phaseA": {
+        "steps": [],
+        "metrics": [
+          "journey_create_client_duration",
+          "journey_create_base_plan_duration",
+          "journey_create_timeline_events_duration",
+          "journey_add_income_expenses_duration",
+          "journey_add_saving_pots_duration",
+          "journey_add_contributions_withdrawals_duration",
+          "journey_calculate_projection_duration",
+          "journey_full_plan_build_duration"
+        ]
+      },
+      "shardId": "advisor-19"
+    }
+  ],
+  "fleet": {
+    "gatePassed": 0,
+    "gateFailed": 0
+  },
+  "validation": {
+    "expectedShards": 20,
+    "actualShards": 20,
+    "shardCountOk": true,
+    "passed": true
+  }
+}

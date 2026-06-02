@@ -1,0 +1,26 @@
+{
+  "reportType": "phase-a-manifest-shard",
+  "runTag": "S1-write-realistic-v3",
+  "shardId": "advisor-11",
+  "advisorSub": "7c279937-b833-46df-8519-c70329933419",
+  "advisorEmail": "User12@gmail.com",
+  "vu": 1,
+  "iteration": 0,
+  "clients": [
+    {
+      "clientId": "6a1ee3b9901fc6abfbffa24c",
+      "uniqueTag": "fp1_g0_1780409264818",
+      "cashflows": [
+        {
+          "cashflowId": "6a1ee3bb901fc6abfbffa2d8",
+          "planName": "Long-term retirement plan"
+        }
+      ]
+    }
+  ],
+  "counts": {
+    "clients": 1,
+    "plans": 1
+  },
+  "generatedAt": "2026-06-02T14:08:27.565Z"
+}
