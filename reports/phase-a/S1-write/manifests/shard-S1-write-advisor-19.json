@@ -8,12 +8,12 @@
   "iteration": 0,
   "clients": [
     {
-      "clientId": "6a1ef846901fc6abfb0083d9",
-      "uniqueTag": "fp1_g0_1780414531857",
+      "clientId": "6a1f00d2901fc6abfb00bf74",
+      "uniqueTag": "fp1_g0_1780416719640",
       "cashflows": [
         {
-          "cashflowId": "6a1ef84a901fc6abfb008542",
-          "planName": "Pre-retirement transition plan"
+          "cashflowId": "6a1f00d7901fc6abfb00c0e2",
+          "planName": "Long-term retirement plan"
         }
       ]
     }
@@ -22,5 +22,5 @@
     "clients": 1,
     "plans": 1
   },
-  "generatedAt": "2026-06-02T15:36:14.667Z"
+  "generatedAt": "2026-06-02T16:12:47.547Z"
 }

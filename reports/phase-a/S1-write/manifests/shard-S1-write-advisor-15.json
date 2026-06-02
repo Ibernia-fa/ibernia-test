@@ -8,12 +8,12 @@
   "iteration": 0,
   "clients": [
     {
-      "clientId": "6a1ef78a901fc6abfb0067c0",
-      "uniqueTag": "fp1_g0_1780414343936",
+      "clientId": "6a1f00d2901fc6abfb00bf70",
+      "uniqueTag": "fp1_g0_1780416719343",
       "cashflows": [
         {
-          "cashflowId": "6a1ef78e901fc6abfb0068fd",
-          "planName": "Business owner succession plan"
+          "cashflowId": "6a1f00d7901fc6abfb00c10c",
+          "planName": "Long-term retirement plan"
         }
       ]
     }
@@ -22,5 +22,5 @@
     "clients": 1,
     "plans": 1
   },
-  "generatedAt": "2026-06-02T15:33:07.285Z"
+  "generatedAt": "2026-06-02T16:12:46.501Z"
 }

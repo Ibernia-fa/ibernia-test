@@ -10,13 +10,16 @@ import {
   buildRealisticClientKeywords,
   buildRealisticContributionLineItemParams,
   buildRealisticCashflowBody,
+  buildRealisticDefaultMoneyInOutAmounts,
   buildRealisticExpenseLineItemParams,
   buildRealisticIncomeLine,
   buildRealisticIncomeLineItemParams,
   buildRealisticWealthAsset,
   buildRealisticWithdrawalLineItemParams,
+  countConfiguredDefaultMoneyInOutLines,
   countFinancialLines,
   countFundTransactions,
+  findFinancialLineByDescription,
   isTimelineSeedExcludedEvent,
   pickTimelineEventsFromDefaults,
   planTitleForPersona,
@@ -28,6 +31,8 @@ import {
   countTimelineClientEvents,
   TIMELINE_GOAL_MAX_AGE,
   TIMELINE_GOAL_MIN_AGE,
+  VOLUME_MONEY_IN_OUT_EXPENSE_COUNT,
+  VOLUME_MONEY_IN_OUT_INCOME_COUNT,
   VOLUME_TIMELINE_CHIP_COUNT,
 } from '../lib/k6-volume-realistic-data.js';
 
@@ -106,32 +111,39 @@ test('applyRealisticClientProfile patches camelCase GET model (API PUT shape)', 
   assert.equal(model.notes, buildRealisticClientKeywords(persona));
 });
 
-test('income and expense line params use occupation, marker, and multi-line sets', () => {
+test('default Money In & Out amounts target plan-default UI rows', () => {
   const persona = VOLUME_CLIENT_PERSONAS[1];
-  const tag = 'fp1_g0_42';
-  const marker = volumeSeedMarker(tag, 0);
-  const incomeParams = buildRealisticIncomeLineItemParams({
-    persona,
-    birthYear: persona.birthYear,
-    planIndex: 0,
-    clientTag: tag,
-  });
-  const expenseParams = buildRealisticExpenseLineItemParams({
-    persona,
-    birthYear: persona.birthYear,
-    planIndex: 0,
-    clientTag: tag,
-  });
-  assert.equal(incomeParams.length, 2);
-  assert.equal(expenseParams.length, 2);
-  assert.match(incomeParams[0].description, /Primary salary/);
-  assert.match(incomeParams[0].description, new RegExp(marker.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
-  assert.match(expenseParams[0].description, /Household/);
-  assert.ok(incomeParams[0].amount >= 3000);
-  assert.ok(expenseParams[0].amount >= 1500);
+  const amounts = buildRealisticDefaultMoneyInOutAmounts({ persona, planIndex: 0 });
+  assert.equal(amounts.incomes.length, VOLUME_MONEY_IN_OUT_INCOME_COUNT);
+  assert.equal(amounts.expenses.length, VOLUME_MONEY_IN_OUT_EXPENSE_COUNT);
+  assert.equal(amounts.incomes[0].description, 'Salary');
+  assert.equal(amounts.incomes[1].description, 'State pension');
+  assert.equal(amounts.incomes[2].description, 'Inheritance');
+  assert.equal(amounts.expenses[0].description, 'Living costs');
+  assert.equal(amounts.expenses[1].description, 'Housing');
+  assert.ok(amounts.incomes[0].amount >= 3000);
+  assert.ok(amounts.expenses[0].amount >= 400);
+  assert.ok(amounts.expenses[1].amount >= 600);
 
-  const income = buildRealisticIncomeLine({ persona, birthYear: persona.birthYear, planIndex: 0, clientTag: tag });
-  assert.match(income.description, /Primary salary/);
+  const financialRecord = {
+    incomes: [
+      { description: 'Salary', amount: { amount: 0 } },
+      { description: 'State pension', amount: { amount: 0 } },
+      { description: 'Inheritance', amount: { amount: 0 } },
+    ],
+    expenses: [
+      { description: 'Living costs', amount: { amount: 0 } },
+      { description: 'Housing', amount: { amount: 0 } },
+    ],
+  };
+  assert.ok(findFinancialLineByDescription(financialRecord, 'incomes', 'Salary'));
+  assert.equal(countConfiguredDefaultMoneyInOutLines(financialRecord, amounts), 0);
+  financialRecord.incomes[0].amount.amount = amounts.incomes[0].amount;
+  financialRecord.expenses[1].amount.amount = amounts.expenses[1].amount;
+  assert.equal(countConfiguredDefaultMoneyInOutLines(financialRecord, amounts), 2);
+
+  const income = buildRealisticIncomeLine({ persona, birthYear: persona.birthYear, planIndex: 0, clientTag: 'tag' });
+  assert.equal(income.description, 'Salary');
 });
 
 test('wealth payloads embed volume marker for dashboard resolve', () => {

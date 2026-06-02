@@ -8,12 +8,12 @@
   "iteration": 0,
   "clients": [
     {
-      "clientId": "6a1ef844901fc6abfb00837b",
-      "uniqueTag": "fp1_g0_1780414530828",
+      "clientId": "6a1f00d0901fc6abfb00bf0b",
+      "uniqueTag": "fp1_g0_1780416718278",
       "cashflows": [
         {
-          "cashflowId": "6a1ef847901fc6abfb0083f4",
-          "planName": "Mid-life financial review"
+          "cashflowId": "6a1f00d3901fc6abfb00bf95",
+          "planName": "Pre-retirement transition plan"
         }
       ]
     }
@@ -22,5 +22,5 @@
     "clients": 1,
     "plans": 1
   },
-  "generatedAt": "2026-06-02T15:36:09.616Z"
+  "generatedAt": "2026-06-02T16:12:47.602Z"
 }

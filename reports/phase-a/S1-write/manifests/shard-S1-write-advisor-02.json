@@ -1,18 +1,26 @@
 {
   "reportType": "phase-a-manifest-shard",
-  "generatedAt": "2026-06-02T15:33:09.618Z",
   "runTag": "S1-write",
   "shardId": "advisor-02",
-  "scenario": "S1",
-  "runId": "S1-write",
-  "advisorIndex": null,
-  "advisorSub": "",
-  "advisorEmail": "",
-  "vu": null,
-  "iteration": null,
-  "clients": [],
-  "counts": {
-      "clients": 0,
-      "plans": 0
+  "advisorSub": "bd8fa8d8-cff6-4663-adf0-a6a30e58a53f",
+  "advisorEmail": "User03@gmail.com",
+  "vu": 1,
+  "iteration": 0,
+  "clients": [
+    {
+      "clientId": "6a1f00d1901fc6abfb00bf4a",
+      "uniqueTag": "fp1_g0_1780416719163",
+      "cashflows": [
+        {
+          "cashflowId": "6a1f00d5901fc6abfb00c035",
+          "planName": "Flexible career plan"
+        }
+      ]
     }
+  ],
+  "counts": {
+    "clients": 1,
+    "plans": 1
+  },
+  "generatedAt": "2026-06-02T16:12:45.415Z"
 }

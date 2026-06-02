@@ -1,6 +1,6 @@
 {
   "reportType": "volume-signoff-shard",
-  "generatedAt": "2026-06-02T15:36:17.526Z",
+  "generatedAt": "2026-06-02T16:12:49.752Z",
   "phase": "A",
   "profile": "write",
   "runTag": "S1-write",
@@ -15,10 +15,10 @@
       "optional": false,
       "budgetMs": 4000,
       "maxMs": null,
-      "actualMs": 3000,
+      "actualMs": 2000,
       "actualLabel": "max (retro)",
       "over": false,
-      "marginMs": 1000,
+      "marginMs": 2000,
       "overHardMax": null,
       "note": null
     },
@@ -28,10 +28,10 @@
       "optional": false,
       "budgetMs": 5000,
       "maxMs": null,
-      "actualMs": 2000,
+      "actualMs": 3000,
       "actualLabel": "max (retro)",
       "over": false,
-      "marginMs": 3000,
+      "marginMs": 2000,
       "overHardMax": null,
       "note": null
     },
@@ -41,10 +41,10 @@
       "optional": false,
       "budgetMs": 3000,
       "maxMs": 8000,
-      "actualMs": 977.6,
+      "actualMs": 264.8,
       "actualLabel": "max (retro)",
       "over": false,
-      "marginMs": 2022,
+      "marginMs": 2735,
       "overHardMax": false,
       "note": null
     },
@@ -54,10 +54,10 @@
       "optional": false,
       "budgetMs": 4000,
       "maxMs": 15000,
-      "actualMs": 4962.1,
+      "actualMs": 5923.7,
       "actualLabel": "max (retro)",
       "over": true,
-      "marginMs": -962,
+      "marginMs": -1924,
       "overHardMax": false,
       "note": null
     },
@@ -67,10 +67,10 @@
       "optional": false,
       "budgetMs": 3000,
       "maxMs": 9000,
-      "actualMs": 407.6,
+      "actualMs": 1023.9,
       "actualLabel": "max (retro)",
       "over": false,
-      "marginMs": 2592,
+      "marginMs": 1976,
       "overHardMax": false,
       "note": "write profile: no explicit budget — uses defaultBudgetMs (3000) via resolveEndpointBudget"
     },
@@ -94,7 +94,7 @@
     "underBudget": 5,
     "overBudget": 1,
     "failedShard": true,
-    "worstMarginMs": 1000,
-    "worstOverMs": 962
+    "worstMarginMs": 1976,
+    "worstOverMs": 1924
   }
 }

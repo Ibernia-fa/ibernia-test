@@ -1,6 +1,6 @@
 {
   "reportType": "volume-signoff-shard",
-  "generatedAt": "2026-06-02T15:36:18.250Z",
+  "generatedAt": "2026-06-02T16:12:47.896Z",
   "phase": "A",
   "profile": "write",
   "runTag": "S1-write",
@@ -28,10 +28,10 @@
       "optional": false,
       "budgetMs": 5000,
       "maxMs": null,
-      "actualMs": 2000,
+      "actualMs": 3000,
       "actualLabel": "max (retro)",
       "over": false,
-      "marginMs": 3000,
+      "marginMs": 2000,
       "overHardMax": null,
       "note": null
     },
@@ -41,10 +41,10 @@
       "optional": false,
       "budgetMs": 3000,
       "maxMs": 8000,
-      "actualMs": 971.4,
+      "actualMs": 939.6,
       "actualLabel": "max (retro)",
       "over": false,
-      "marginMs": 2029,
+      "marginMs": 2060,
       "overHardMax": false,
       "note": null
     },
@@ -54,10 +54,10 @@
       "optional": false,
       "budgetMs": 4000,
       "maxMs": 15000,
-      "actualMs": 4975,
+      "actualMs": 4996.1,
       "actualLabel": "max (retro)",
       "over": true,
-      "marginMs": -975,
+      "marginMs": -996,
       "overHardMax": false,
       "note": null
     },
@@ -67,10 +67,10 @@
       "optional": false,
       "budgetMs": 3000,
       "maxMs": 9000,
-      "actualMs": 845.1,
+      "actualMs": 979.6,
       "actualLabel": "max (retro)",
       "over": false,
-      "marginMs": 2155,
+      "marginMs": 2020,
       "overHardMax": false,
       "note": "write profile: no explicit budget — uses defaultBudgetMs (3000) via resolveEndpointBudget"
     },
@@ -95,6 +95,6 @@
     "overBudget": 1,
     "failedShard": true,
     "worstMarginMs": 1000,
-    "worstOverMs": 975
+    "worstOverMs": 996
   }
 }

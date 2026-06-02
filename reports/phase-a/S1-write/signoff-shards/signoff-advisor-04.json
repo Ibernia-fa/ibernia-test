@@ -1,6 +1,6 @@
 {
   "reportType": "volume-signoff-shard",
-  "generatedAt": "2026-06-02T15:36:19.415Z",
+  "generatedAt": "2026-06-02T16:12:49.716Z",
   "phase": "A",
   "profile": "write",
   "runTag": "S1-write",
@@ -41,10 +41,10 @@
       "optional": false,
       "budgetMs": 3000,
       "maxMs": 8000,
-      "actualMs": 1004,
+      "actualMs": 1008.9,
       "actualLabel": "max (retro)",
       "over": false,
-      "marginMs": 1996,
+      "marginMs": 1991,
       "overHardMax": false,
       "note": null
     },
@@ -54,10 +54,10 @@
       "optional": false,
       "budgetMs": 4000,
       "maxMs": 15000,
-      "actualMs": 5952.1,
+      "actualMs": 5063,
       "actualLabel": "max (retro)",
       "over": true,
-      "marginMs": -1952,
+      "marginMs": -1063,
       "overHardMax": false,
       "note": null
     },
@@ -67,10 +67,10 @@
       "optional": false,
       "budgetMs": 3000,
       "maxMs": 9000,
-      "actualMs": 408,
+      "actualMs": 1014.8,
       "actualLabel": "max (retro)",
       "over": false,
-      "marginMs": 2592,
+      "marginMs": 1985,
       "overHardMax": false,
       "note": "write profile: no explicit budget — uses defaultBudgetMs (3000) via resolveEndpointBudget"
     },
@@ -95,6 +95,6 @@
     "overBudget": 1,
     "failedShard": true,
     "worstMarginMs": 1000,
-    "worstOverMs": 1952
+    "worstOverMs": 1063
   }
 }

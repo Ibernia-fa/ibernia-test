@@ -1,5 +1,5 @@
 # Phase A volume summary — S1-write
-Generated: 2026-06-02T15:36:23.328Z
+Generated: 2026-06-02T16:12:56.073Z
 ## Scenario
 | Field | Value |
 |-------|-------|

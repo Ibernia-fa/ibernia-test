@@ -8,12 +8,12 @@
   "iteration": 0,
   "clients": [
     {
-      "clientId": "6a1ef78b901fc6abfb006808",
-      "uniqueTag": "fp1_g0_1780414344014",
+      "clientId": "6a1f00d2901fc6abfb00bf78",
+      "uniqueTag": "fp1_g0_1780416719538",
       "cashflows": [
         {
-          "cashflowId": "6a1ef78f901fc6abfb006931",
-          "planName": "Family security plan"
+          "cashflowId": "6a1f00d7901fc6abfb00c0e4",
+          "planName": "Long-term retirement plan"
         }
       ]
     }
@@ -22,5 +22,5 @@
     "clients": 1,
     "plans": 1
   },
-  "generatedAt": "2026-06-02T15:33:07.285Z"
+  "generatedAt": "2026-06-02T16:12:46.504Z"
 }

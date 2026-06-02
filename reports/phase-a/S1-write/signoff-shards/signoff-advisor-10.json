@@ -1,6 +1,6 @@
 {
   "reportType": "volume-signoff-shard",
-  "generatedAt": "2026-06-02T15:36:19.515Z",
+  "generatedAt": "2026-06-02T16:12:51.410Z",
   "phase": "A",
   "profile": "write",
   "runTag": "S1-write",
@@ -15,10 +15,10 @@
       "optional": false,
       "budgetMs": 4000,
       "maxMs": null,
-      "actualMs": 2000,
+      "actualMs": 4000,
       "actualLabel": "max (retro)",
       "over": false,
-      "marginMs": 2000,
+      "marginMs": 0,
       "overHardMax": null,
       "note": null
     },
@@ -28,10 +28,10 @@
       "optional": false,
       "budgetMs": 5000,
       "maxMs": null,
-      "actualMs": 2000,
+      "actualMs": 3000,
       "actualLabel": "max (retro)",
       "over": false,
-      "marginMs": 3000,
+      "marginMs": 2000,
       "overHardMax": null,
       "note": null
     },
@@ -41,10 +41,10 @@
       "optional": false,
       "budgetMs": 3000,
       "maxMs": 8000,
-      "actualMs": 1013.4,
+      "actualMs": 1904.2,
       "actualLabel": "max (retro)",
       "over": false,
-      "marginMs": 1987,
+      "marginMs": 1096,
       "overHardMax": false,
       "note": null
     },
@@ -54,10 +54,10 @@
       "optional": false,
       "budgetMs": 4000,
       "maxMs": 15000,
-      "actualMs": 5926.3,
+      "actualMs": 5015.7,
       "actualLabel": "max (retro)",
       "over": true,
-      "marginMs": -1926,
+      "marginMs": -1016,
       "overHardMax": false,
       "note": null
     },
@@ -67,10 +67,10 @@
       "optional": false,
       "budgetMs": 3000,
       "maxMs": 9000,
-      "actualMs": 558.4,
+      "actualMs": 882.8,
       "actualLabel": "max (retro)",
       "over": false,
-      "marginMs": 2442,
+      "marginMs": 2117,
       "overHardMax": false,
       "note": "write profile: no explicit budget — uses defaultBudgetMs (3000) via resolveEndpointBudget"
     },
@@ -94,7 +94,7 @@
     "underBudget": 5,
     "overBudget": 1,
     "failedShard": true,
-    "worstMarginMs": 1987,
-    "worstOverMs": 1926
+    "worstMarginMs": 0,
+    "worstOverMs": 1016
   }
 }

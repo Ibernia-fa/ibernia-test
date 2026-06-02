@@ -8,12 +8,12 @@
   "iteration": 0,
   "clients": [
     {
-      "clientId": "6a1ef78b901fc6abfb006806",
-      "uniqueTag": "fp1_g0_1780414344069",
+      "clientId": "6a1f00d0901fc6abfb00bef3",
+      "uniqueTag": "fp1_g0_1780416718593",
       "cashflows": [
         {
-          "cashflowId": "6a1ef78f901fc6abfb00692d",
-          "planName": "Family security plan"
+          "cashflowId": "6a1f00d2901fc6abfb00bf6d",
+          "planName": "Early career wealth plan"
         }
       ]
     }
@@ -22,5 +22,5 @@
     "clients": 1,
     "plans": 1
   },
-  "generatedAt": "2026-06-02T15:33:08.215Z"
+  "generatedAt": "2026-06-02T16:12:42.554Z"
 }

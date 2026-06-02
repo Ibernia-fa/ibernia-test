@@ -10,9 +10,9 @@
     "expectedClients":  20,
     "expectedPlans":  20,
     "manifestProfileFile":  "data/scenarios/profile_20u_1c_1p.json",
-    "runElapsedSec":  112.9,
+    "runElapsedSec":  122,
     "manifestCollected":  400,
-    "sloCollected":  263,
+    "sloCollected":  400,
     "advisorRuns":  [
                         {
                             "advisorKey":  "advisor-00",
