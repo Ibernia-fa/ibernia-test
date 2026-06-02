@@ -8,12 +8,12 @@
   "iteration": 0,
   "clients": [
     {
-      "clientId": "6a1f00d2901fc6abfb00bf70",
-      "uniqueTag": "fp1_g0_1780416719343",
+      "clientId": "6a1f0f12901fc6abfb012f5e",
+      "uniqueTag": "fp1_g0_1780420367374",
       "cashflows": [
         {
-          "cashflowId": "6a1f00d7901fc6abfb00c10c",
-          "planName": "Long-term retirement plan"
+          "cashflowId": "6a1f0f17901fc6abfb013138",
+          "planName": "Early career wealth plan"
         }
       ]
     }
@@ -22,5 +22,5 @@
     "clients": 1,
     "plans": 1
   },
-  "generatedAt": "2026-06-02T16:12:46.501Z"
+  "generatedAt": "2026-06-02T17:13:38.830Z"
 }

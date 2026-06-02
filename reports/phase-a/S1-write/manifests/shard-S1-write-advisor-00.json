@@ -8,12 +8,12 @@
   "iteration": 0,
   "clients": [
     {
-      "clientId": "6a1f0093901fc6abfb00bbb9",
-      "uniqueTag": "fp1_g0_1780416657154",
+      "clientId": "6a1f0ed6901fc6abfb012a8e",
+      "uniqueTag": "fp1_g0_1780420307927",
       "cashflows": [
         {
-          "cashflowId": "6a1f0094901fc6abfb00bbc3",
-          "planName": "Business owner succession plan"
+          "cashflowId": "6a1f0ed7901fc6abfb012a98",
+          "planName": "Early career wealth plan"
         }
       ]
     }
@@ -22,5 +22,5 @@
     "clients": 1,
     "plans": 1
   },
-  "generatedAt": "2026-06-02T16:11:13.098Z"
+  "generatedAt": "2026-06-02T17:12:06.383Z"
 }

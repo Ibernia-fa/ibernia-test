@@ -1,18 +1,26 @@
 {
   "reportType": "phase-a-manifest-shard",
-  "generatedAt": "2026-06-02T16:12:48.980Z",
   "runTag": "S1-write",
   "shardId": "advisor-11",
-  "scenario": "S1",
-  "runId": "S1-write",
-  "advisorIndex": null,
-  "advisorSub": "",
-  "advisorEmail": "",
-  "vu": null,
-  "iteration": null,
-  "clients": [],
-  "counts": {
-      "clients": 0,
-      "plans": 0
+  "advisorSub": "7c279937-b833-46df-8519-c70329933419",
+  "advisorEmail": "User12@gmail.com",
+  "vu": 1,
+  "iteration": 0,
+  "clients": [
+    {
+      "clientId": "6a1f0f11901fc6abfb012f07",
+      "uniqueTag": "fp1_g0_1780420366951",
+      "cashflows": [
+        {
+          "cashflowId": "6a1f0f14901fc6abfb012fac",
+          "planName": "Long-term retirement plan"
+        }
+      ]
     }
+  ],
+  "counts": {
+    "clients": 1,
+    "plans": 1
+  },
+  "generatedAt": "2026-06-02T17:13:37.661Z"
 }

@@ -1,12 +1,12 @@
 {
   "reportType": "volume-signoff-shard",
-  "generatedAt": "2026-06-02T16:12:49.696Z",
+  "generatedAt": "2026-06-02T17:13:42.421Z",
   "phase": "A",
   "profile": "write",
   "runTag": "S1-write",
   "shardId": "advisor-08",
   "advisorEmail": "User09@gmail.com",
-  "k6ExitCode": 99,
+  "k6ExitCode": 0,
   "source": "retro-k6-log",
   "rows": [
     {
@@ -28,10 +28,10 @@
       "optional": false,
       "budgetMs": 5000,
       "maxMs": null,
-      "actualMs": 4000,
+      "actualMs": 3000,
       "actualLabel": "max (retro)",
       "over": false,
-      "marginMs": 1000,
+      "marginMs": 2000,
       "overHardMax": null,
       "note": null
     },
@@ -41,10 +41,10 @@
       "optional": false,
       "budgetMs": 3000,
       "maxMs": 8000,
-      "actualMs": 296.2,
+      "actualMs": 1002.8,
       "actualLabel": "max (retro)",
       "over": false,
-      "marginMs": 2704,
+      "marginMs": 1997,
       "overHardMax": false,
       "note": null
     },
@@ -54,10 +54,10 @@
       "optional": false,
       "budgetMs": 4000,
       "maxMs": 15000,
-      "actualMs": 3935.4,
+      "actualMs": 5076.7,
       "actualLabel": "max (retro)",
-      "over": false,
-      "marginMs": 65,
+      "over": true,
+      "marginMs": -1077,
       "overHardMax": false,
       "note": null
     },
@@ -67,10 +67,10 @@
       "optional": false,
       "budgetMs": 3000,
       "maxMs": 9000,
-      "actualMs": 1069.4,
+      "actualMs": 588.6,
       "actualLabel": "max (retro)",
       "over": false,
-      "marginMs": 1931,
+      "marginMs": 2411,
       "overHardMax": false,
       "note": "write profile: no explicit budget — uses defaultBudgetMs (3000) via resolveEndpointBudget"
     },
@@ -91,10 +91,10 @@
   "summary": {
     "totalRows": 6,
     "rowsWithActual": 6,
-    "underBudget": 6,
-    "overBudget": 0,
-    "failedShard": false,
-    "worstMarginMs": 65,
-    "worstOverMs": null
+    "underBudget": 5,
+    "overBudget": 1,
+    "failedShard": true,
+    "worstMarginMs": 1997,
+    "worstOverMs": 1077
   }
 }

@@ -8,12 +8,12 @@
   "iteration": 0,
   "clients": [
     {
-      "clientId": "6a1f00d0901fc6abfb00bf0b",
-      "uniqueTag": "fp1_g0_1780416718278",
+      "clientId": "6a1f0f11901fc6abfb012f12",
+      "uniqueTag": "fp1_g0_1780420367057",
       "cashflows": [
         {
-          "cashflowId": "6a1f00d3901fc6abfb00bf95",
-          "planName": "Pre-retirement transition plan"
+          "cashflowId": "6a1f0f15901fc6abfb013020",
+          "planName": "Flexible career plan"
         }
       ]
     }
@@ -22,5 +22,5 @@
     "clients": 1,
     "plans": 1
   },
-  "generatedAt": "2026-06-02T16:12:47.602Z"
+  "generatedAt": "2026-06-02T17:13:40.570Z"
 }

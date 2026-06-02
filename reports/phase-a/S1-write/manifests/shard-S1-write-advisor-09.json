@@ -8,11 +8,11 @@
   "iteration": 0,
   "clients": [
     {
-      "clientId": "6a1f00d2901fc6abfb00bf6b",
-      "uniqueTag": "fp1_g0_1780416719361",
+      "clientId": "6a1f0f11901fc6abfb012f29",
+      "uniqueTag": "fp1_g0_1780420367486",
       "cashflows": [
         {
-          "cashflowId": "6a1f00d5901fc6abfb00c033",
+          "cashflowId": "6a1f0f15901fc6abfb01301c",
           "planName": "Flexible career plan"
         }
       ]
@@ -22,5 +22,5 @@
     "clients": 1,
     "plans": 1
   },
-  "generatedAt": "2026-06-02T16:12:47.531Z"
+  "generatedAt": "2026-06-02T17:13:37.449Z"
 }

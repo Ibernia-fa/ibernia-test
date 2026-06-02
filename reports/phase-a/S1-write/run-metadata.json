@@ -10,7 +10,7 @@
     "expectedClients":  20,
     "expectedPlans":  20,
     "manifestProfileFile":  "data/scenarios/profile_20u_1c_1p.json",
-    "runElapsedSec":  122,
+    "runElapsedSec":  122.7,
     "manifestCollected":  400,
     "sloCollected":  400,
     "advisorRuns":  [
@@ -20,7 +20,7 @@
                             "advisorEmail":  "User01@gmail.com",
                             "userMode":  "fixed",
                             "poolSliceFile":  "C:\\Users\\gulle\\source\\repos\\load-testing-k6\\data\\scenarios\\user-slices-fixed-dev\\slice-advisor-00.json",
-                            "exitCode":  99,
+                            "exitCode":  0,
                             "jobState":  "Completed",
                             "jobFailed":  false
                         },
@@ -30,7 +30,7 @@
                             "advisorEmail":  "User02@gmail.com",
                             "userMode":  "fixed",
                             "poolSliceFile":  "C:\\Users\\gulle\\source\\repos\\load-testing-k6\\data\\scenarios\\user-slices-fixed-dev\\slice-advisor-01.json",
-                            "exitCode":  99,
+                            "exitCode":  0,
                             "jobState":  "Completed",
                             "jobFailed":  false
                         },
@@ -40,7 +40,7 @@
                             "advisorEmail":  "User03@gmail.com",
                             "userMode":  "fixed",
                             "poolSliceFile":  "C:\\Users\\gulle\\source\\repos\\load-testing-k6\\data\\scenarios\\user-slices-fixed-dev\\slice-advisor-02.json",
-                            "exitCode":  99,
+                            "exitCode":  0,
                             "jobState":  "Completed",
                             "jobFailed":  false
                         },
@@ -50,7 +50,7 @@
                             "advisorEmail":  "User04@gmail.com",
                             "userMode":  "fixed",
                             "poolSliceFile":  "C:\\Users\\gulle\\source\\repos\\load-testing-k6\\data\\scenarios\\user-slices-fixed-dev\\slice-advisor-03.json",
-                            "exitCode":  99,
+                            "exitCode":  0,
                             "jobState":  "Completed",
                             "jobFailed":  false
                         },
@@ -60,7 +60,7 @@
                             "advisorEmail":  "User05@gmail.com",
                             "userMode":  "fixed",
                             "poolSliceFile":  "C:\\Users\\gulle\\source\\repos\\load-testing-k6\\data\\scenarios\\user-slices-fixed-dev\\slice-advisor-04.json",
-                            "exitCode":  99,
+                            "exitCode":  0,
                             "jobState":  "Completed",
                             "jobFailed":  false
                         },
@@ -70,7 +70,7 @@
                             "advisorEmail":  "User06@gmail.com",
                             "userMode":  "fixed",
                             "poolSliceFile":  "C:\\Users\\gulle\\source\\repos\\load-testing-k6\\data\\scenarios\\user-slices-fixed-dev\\slice-advisor-05.json",
-                            "exitCode":  99,
+                            "exitCode":  0,
                             "jobState":  "Completed",
                             "jobFailed":  false
                         },
@@ -80,7 +80,7 @@
                             "advisorEmail":  "User07@gmail.com",
                             "userMode":  "fixed",
                             "poolSliceFile":  "C:\\Users\\gulle\\source\\repos\\load-testing-k6\\data\\scenarios\\user-slices-fixed-dev\\slice-advisor-06.json",
-                            "exitCode":  99,
+                            "exitCode":  0,
                             "jobState":  "Completed",
                             "jobFailed":  false
                         },
@@ -90,7 +90,7 @@
                             "advisorEmail":  "User08@gmail.com",
                             "userMode":  "fixed",
                             "poolSliceFile":  "C:\\Users\\gulle\\source\\repos\\load-testing-k6\\data\\scenarios\\user-slices-fixed-dev\\slice-advisor-07.json",
-                            "exitCode":  99,
+                            "exitCode":  0,
                             "jobState":  "Completed",
                             "jobFailed":  false
                         },
@@ -100,7 +100,7 @@
                             "advisorEmail":  "User09@gmail.com",
                             "userMode":  "fixed",
                             "poolSliceFile":  "C:\\Users\\gulle\\source\\repos\\load-testing-k6\\data\\scenarios\\user-slices-fixed-dev\\slice-advisor-08.json",
-                            "exitCode":  99,
+                            "exitCode":  0,
                             "jobState":  "Completed",
                             "jobFailed":  false
                         },
@@ -110,7 +110,7 @@
                             "advisorEmail":  "User10@gmail.com",
                             "userMode":  "fixed",
                             "poolSliceFile":  "C:\\Users\\gulle\\source\\repos\\load-testing-k6\\data\\scenarios\\user-slices-fixed-dev\\slice-advisor-09.json",
-                            "exitCode":  99,
+                            "exitCode":  0,
                             "jobState":  "Completed",
                             "jobFailed":  false
                         },
@@ -120,7 +120,7 @@
                             "advisorEmail":  "User11@gmail.com",
                             "userMode":  "fixed",
                             "poolSliceFile":  "C:\\Users\\gulle\\source\\repos\\load-testing-k6\\data\\scenarios\\user-slices-fixed-dev\\slice-advisor-10.json",
-                            "exitCode":  99,
+                            "exitCode":  0,
                             "jobState":  "Completed",
                             "jobFailed":  false
                         },
@@ -130,7 +130,7 @@
                             "advisorEmail":  "User12@gmail.com",
                             "userMode":  "fixed",
                             "poolSliceFile":  "C:\\Users\\gulle\\source\\repos\\load-testing-k6\\data\\scenarios\\user-slices-fixed-dev\\slice-advisor-11.json",
-                            "exitCode":  99,
+                            "exitCode":  0,
                             "jobState":  "Completed",
                             "jobFailed":  false
                         },
@@ -140,7 +140,7 @@
                             "advisorEmail":  "User13@gmail.com",
                             "userMode":  "fixed",
                             "poolSliceFile":  "C:\\Users\\gulle\\source\\repos\\load-testing-k6\\data\\scenarios\\user-slices-fixed-dev\\slice-advisor-12.json",
-                            "exitCode":  99,
+                            "exitCode":  0,
                             "jobState":  "Completed",
                             "jobFailed":  false
                         },
@@ -150,7 +150,7 @@
                             "advisorEmail":  "User14@gmail.com",
                             "userMode":  "fixed",
                             "poolSliceFile":  "C:\\Users\\gulle\\source\\repos\\load-testing-k6\\data\\scenarios\\user-slices-fixed-dev\\slice-advisor-13.json",
-                            "exitCode":  99,
+                            "exitCode":  0,
                             "jobState":  "Completed",
                             "jobFailed":  false
                         },
@@ -160,7 +160,7 @@
                             "advisorEmail":  "User15@gmail.com",
                             "userMode":  "fixed",
                             "poolSliceFile":  "C:\\Users\\gulle\\source\\repos\\load-testing-k6\\data\\scenarios\\user-slices-fixed-dev\\slice-advisor-14.json",
-                            "exitCode":  99,
+                            "exitCode":  0,
                             "jobState":  "Completed",
                             "jobFailed":  false
                         },
@@ -170,7 +170,7 @@
                             "advisorEmail":  "User16@gmail.com",
                             "userMode":  "fixed",
                             "poolSliceFile":  "C:\\Users\\gulle\\source\\repos\\load-testing-k6\\data\\scenarios\\user-slices-fixed-dev\\slice-advisor-15.json",
-                            "exitCode":  99,
+                            "exitCode":  0,
                             "jobState":  "Completed",
                             "jobFailed":  false
                         },
@@ -180,7 +180,7 @@
                             "advisorEmail":  "User17@gmail.com",
                             "userMode":  "fixed",
                             "poolSliceFile":  "C:\\Users\\gulle\\source\\repos\\load-testing-k6\\data\\scenarios\\user-slices-fixed-dev\\slice-advisor-16.json",
-                            "exitCode":  99,
+                            "exitCode":  0,
                             "jobState":  "Completed",
                             "jobFailed":  false
                         },
@@ -190,7 +190,7 @@
                             "advisorEmail":  "User18@gmail.com",
                             "userMode":  "fixed",
                             "poolSliceFile":  "C:\\Users\\gulle\\source\\repos\\load-testing-k6\\data\\scenarios\\user-slices-fixed-dev\\slice-advisor-17.json",
-                            "exitCode":  99,
+                            "exitCode":  0,
                             "jobState":  "Completed",
                             "jobFailed":  false
                         },
@@ -200,7 +200,7 @@
                             "advisorEmail":  "User19@gmail.com",
                             "userMode":  "fixed",
                             "poolSliceFile":  "C:\\Users\\gulle\\source\\repos\\load-testing-k6\\data\\scenarios\\user-slices-fixed-dev\\slice-advisor-18.json",
-                            "exitCode":  99,
+                            "exitCode":  0,
                             "jobState":  "Completed",
                             "jobFailed":  false
                         },
@@ -210,12 +210,12 @@
                             "advisorEmail":  "User20@gmail.com",
                             "userMode":  "fixed",
                             "poolSliceFile":  "C:\\Users\\gulle\\source\\repos\\load-testing-k6\\data\\scenarios\\user-slices-fixed-dev\\slice-advisor-19.json",
-                            "exitCode":  99,
+                            "exitCode":  0,
                             "jobState":  "Completed",
                             "jobFailed":  false
                         }
                     ],
     "failedJobs":  [
-                       "manifest-merge"
+
                    ]
 }

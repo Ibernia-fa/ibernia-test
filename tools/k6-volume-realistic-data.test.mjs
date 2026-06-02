@@ -14,12 +14,18 @@ import {
   buildRealisticExpenseLineItemParams,
   buildRealisticIncomeLine,
   buildRealisticIncomeLineItemParams,
+  buildRealisticSavingPotPayload,
+  buildRealisticCashPotAmount,
   buildRealisticWealthAsset,
   buildRealisticWithdrawalLineItemParams,
+  cashSavingPotWithUpdatedAmount,
+  countClientSavings,
   countConfiguredDefaultMoneyInOutLines,
   countFinancialLines,
   countFundTransactions,
+  findDefaultCashSavingPot,
   findFinancialLineByDescription,
+  findSavingPotIdByNameSubstring,
   isTimelineSeedExcludedEvent,
   pickTimelineEventsFromDefaults,
   planTitleForPersona,
@@ -33,6 +39,7 @@ import {
   TIMELINE_GOAL_MIN_AGE,
   VOLUME_MONEY_IN_OUT_EXPENSE_COUNT,
   VOLUME_MONEY_IN_OUT_INCOME_COUNT,
+  VOLUME_SAVING_POTS_COUNT,
   VOLUME_TIMELINE_CHIP_COUNT,
 } from '../lib/k6-volume-realistic-data.js';
 
@@ -180,6 +187,84 @@ test('contribution and withdrawal fund params include markers and realistic amou
   assert.ok(contributions[0].amount >= 300);
   assert.match(withdrawals[0].description, /drawdown/i);
   assert.ok(withdrawals[1].amount >= 10000);
+});
+
+test('buildRealisticSavingPotPayload creates two distinct non-cash pots', () => {
+  const persona = VOLUME_CLIENT_PERSONAS[1];
+  const pot0 = buildRealisticSavingPotPayload({
+    persona,
+    planIndex: 0,
+    clientTag: 'fp1_g0_88',
+    birthYear: persona.birthYear,
+    presetIndex: 0,
+  });
+  const pot1 = buildRealisticSavingPotPayload({
+    persona,
+    planIndex: 0,
+    clientTag: 'fp1_g0_88',
+    birthYear: persona.birthYear,
+    presetIndex: 1,
+  });
+  assert.equal(VOLUME_SAVING_POTS_COUNT, 2);
+  assert.equal(pot0.type, 2);
+  assert.equal(pot1.type, 4);
+  assert.ok(pot0.startingPotValue.amount >= 42000);
+  assert.ok(pot1.startingPotValue.amount >= 8500);
+  assert.notEqual(pot0.name, pot1.name);
+  assert.doesNotMatch(pot0.name, /\[vol-/);
+  assert.doesNotMatch(pot1.name, /\[vol-/);
+});
+
+test('countClientSavings and findSavingPotIdByNameSubstring', () => {
+  const model = {
+    totalSavings: 50500,
+    clientSavings: [
+      { id: 'cash-1', name: 'Cash', type: 1, startingPotValue: { amount: 8500 } },
+      { id: 'inv-1', name: 'Investment portfolio — Giulia', type: 2 },
+      { id: 'oth-1', name: 'Other savings — Giulia', type: 4 },
+    ],
+  };
+  const counts = countClientSavings(model);
+  assert.equal(counts.totalPots, 3);
+  assert.equal(counts.nonCashPots, 2);
+  assert.equal(counts.totalSavings, 50500);
+  assert.equal(counts.cashAmount, 8500);
+  assert.equal(findSavingPotIdByNameSubstring(model, 'Investment portfolio'), 'inv-1');
+  assert.equal(findSavingPotIdByNameSubstring(model, 'missing'), null);
+});
+
+test('findDefaultCashSavingPot and cashSavingPotWithUpdatedAmount', () => {
+  const model = {
+    clientSavings: [
+      {
+        id: 'cash-1',
+        name: 'Cash',
+        type: 1,
+        startingPotValue: { amount: 0, currencySymbol: '€', cycle: { id: '', description: '' } },
+      },
+    ],
+  };
+  const persona = VOLUME_CLIENT_PERSONAS[0];
+  const cashRow = findDefaultCashSavingPot(model);
+  assert.ok(cashRow);
+  const amount = buildRealisticCashPotAmount({ persona, planIndex: 0, clientTag: 'fp1_g0_1' });
+  assert.ok(amount >= 5000);
+  const putBody = cashSavingPotWithUpdatedAmount(cashRow, amount);
+  assert.equal(putBody.id, 'cash-1');
+  assert.equal(putBody.startingPotValue.amount, amount);
+});
+
+test('contribution params link both flows to savingPotIds array', () => {
+  const persona = VOLUME_CLIENT_PERSONAS[0];
+  const contributions = buildRealisticContributionLineItemParams({
+    persona,
+    birthYear: persona.birthYear,
+    planIndex: 0,
+    clientTag: 'fp1_g0_77',
+    savingPotIds: ['pot-a', 'pot-b'],
+  });
+  assert.equal(contributions[0].associatedSavingPotId, 'pot-a');
+  assert.equal(contributions[1].associatedSavingPotId, 'pot-b');
 });
 
 test('countFundTransactions reads contributions and withdrawals', () => {

@@ -1,5 +1,5 @@
 # Phase A volume summary — S1-write
-Generated: 2026-06-02T16:12:56.073Z
+Generated: 2026-06-02T17:13:47.038Z
 ## Scenario
 | Field | Value |
 |-------|-------|
@@ -12,10 +12,10 @@ Generated: 2026-06-02T16:12:56.073Z
 ## Data gates
 | Gate | Expected | Actual | Result |
 |------|----------|--------|--------|
-| Clients | 20 | 13 | FAIL |
-| Plans | 20 | 13 | FAIL |
+| Clients | 20 | 20 | PASS |
+| Plans | 20 | 20 | PASS |
 | Shards | 20 | 20 | PASS |
-| Manifest validation | — | — | FAIL |
+| Manifest validation | — | — | PASS |
 ## SLO gates
 - Fleet SLO gate: **PASS**
 ## Failed advisor jobs

@@ -1,12 +1,12 @@
 {
   "reportType": "volume-signoff-shard",
-  "generatedAt": "2026-06-02T16:12:51.410Z",
+  "generatedAt": "2026-06-02T17:13:38.610Z",
   "phase": "A",
   "profile": "write",
   "runTag": "S1-write",
   "shardId": "advisor-10",
   "advisorEmail": "User11@gmail.com",
-  "k6ExitCode": 99,
+  "k6ExitCode": 0,
   "source": "retro-k6-log",
   "rows": [
     {
@@ -15,10 +15,10 @@
       "optional": false,
       "budgetMs": 4000,
       "maxMs": null,
-      "actualMs": 4000,
+      "actualMs": 2000,
       "actualLabel": "max (retro)",
       "over": false,
-      "marginMs": 0,
+      "marginMs": 2000,
       "overHardMax": null,
       "note": null
     },
@@ -41,10 +41,10 @@
       "optional": false,
       "budgetMs": 3000,
       "maxMs": 8000,
-      "actualMs": 1904.2,
+      "actualMs": 1013.6,
       "actualLabel": "max (retro)",
       "over": false,
-      "marginMs": 1096,
+      "marginMs": 1986,
       "overHardMax": false,
       "note": null
     },
@@ -54,10 +54,10 @@
       "optional": false,
       "budgetMs": 4000,
       "maxMs": 15000,
-      "actualMs": 5015.7,
+      "actualMs": 5040.5,
       "actualLabel": "max (retro)",
       "over": true,
-      "marginMs": -1016,
+      "marginMs": -1041,
       "overHardMax": false,
       "note": null
     },
@@ -67,10 +67,10 @@
       "optional": false,
       "budgetMs": 3000,
       "maxMs": 9000,
-      "actualMs": 882.8,
+      "actualMs": 1003.7,
       "actualLabel": "max (retro)",
       "over": false,
-      "marginMs": 2117,
+      "marginMs": 1996,
       "overHardMax": false,
       "note": "write profile: no explicit budget — uses defaultBudgetMs (3000) via resolveEndpointBudget"
     },
@@ -94,7 +94,7 @@
     "underBudget": 5,
     "overBudget": 1,
     "failedShard": true,
-    "worstMarginMs": 0,
-    "worstOverMs": 1016
+    "worstMarginMs": 1986,
+    "worstOverMs": 1041
   }
 }
