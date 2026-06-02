@@ -1,0 +1,100 @@
+{
+  "reportType": "volume-signoff-shard",
+  "generatedAt": "2026-06-02T11:41:40.462Z",
+  "phase": "B",
+  "profile": "read",
+  "runTag": "S1-write-20260602-1505-read-v2",
+  "shardId": "advisor-18",
+  "advisorEmail": "User19@gmail.com",
+  "k6ExitCode": 0,
+  "source": "retro-k6-log",
+  "rows": [
+    {
+      "metric": "journey_dashboard_load_duration",
+      "kind": "step",
+      "optional": false,
+      "budgetMs": 2500,
+      "maxMs": null,
+      "actualMs": 752.6,
+      "actualLabel": "max (retro)",
+      "over": false,
+      "marginMs": 1747,
+      "overHardMax": null,
+      "note": null
+    },
+    {
+      "metric": "full_journey_duration",
+      "kind": "step",
+      "optional": false,
+      "budgetMs": 15000,
+      "maxMs": null,
+      "actualMs": 15773,
+      "actualLabel": "max (retro)",
+      "over": true,
+      "marginMs": -773,
+      "overHardMax": null,
+      "note": null
+    },
+    {
+      "metric": "GET /api/v1/Clients/{advisorId}/all",
+      "kind": "http",
+      "optional": false,
+      "budgetMs": 2500,
+      "maxMs": 5000,
+      "actualMs": 752.6,
+      "actualLabel": "max (retro)",
+      "over": false,
+      "marginMs": 1747,
+      "overHardMax": false,
+      "note": null
+    },
+    {
+      "metric": "GET /api/v1/client/{clientId}/cashflows",
+      "kind": "http",
+      "optional": false,
+      "budgetMs": 2500,
+      "maxMs": 4000,
+      "actualMs": 672.9,
+      "actualLabel": "max (retro)",
+      "over": false,
+      "marginMs": 1827,
+      "overHardMax": false,
+      "note": null
+    },
+    {
+      "metric": "GET /api/v1/cashflows/{cashflowId}",
+      "kind": "http",
+      "optional": false,
+      "budgetMs": 3000,
+      "maxMs": 4000,
+      "actualMs": 2300.5,
+      "actualLabel": "max (retro)",
+      "over": false,
+      "marginMs": 700,
+      "overHardMax": false,
+      "note": null
+    },
+    {
+      "metric": "GET /api/v1/Reports/{cashflowId}",
+      "kind": "http",
+      "optional": false,
+      "budgetMs": 5000,
+      "maxMs": 15000,
+      "actualMs": 5367.2,
+      "actualLabel": "max (retro)",
+      "over": true,
+      "marginMs": -367,
+      "overHardMax": false,
+      "note": null
+    }
+  ],
+  "summary": {
+    "totalRows": 6,
+    "rowsWithActual": 6,
+    "underBudget": 4,
+    "overBudget": 2,
+    "failedShard": true,
+    "worstMarginMs": 700,
+    "worstOverMs": 773
+  }
+}

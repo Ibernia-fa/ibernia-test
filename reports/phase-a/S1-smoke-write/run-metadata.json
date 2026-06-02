@@ -1,0 +1,41 @@
+{
+    "reportType":  "phase-a-run-metadata",
+    "runTag":  "S1-smoke-write",
+    "volumeScenario":  "S1",
+    "userMode":  "fixed",
+    "advisors":  2,
+    "concurrency":  2,
+    "clientsPerAdvisor":  1,
+    "plansPerClient":  1,
+    "expectedClients":  2,
+    "expectedPlans":  2,
+    "manifestProfileFile":  "data/scenarios/profile_20u_1c_1p.json",
+    "runElapsedSec":  10.8,
+    "manifestCollected":  4,
+    "sloCollected":  4,
+    "advisorRuns":  [
+                        {
+                            "advisorKey":  "advisor-00",
+                            "shardId":  "advisor-00",
+                            "advisorEmail":  "User01@gmail.com",
+                            "userMode":  "fixed",
+                            "poolSliceFile":  "C:\\Users\\gulle\\source\\repos\\load-testing-k6\\data\\scenarios\\user-slices-S1-smoke-write\\slice-advisor-00.json",
+                            "exitCode":  0,
+                            "jobState":  "Completed",
+                            "jobFailed":  false
+                        },
+                        {
+                            "advisorKey":  "advisor-01",
+                            "shardId":  "advisor-01",
+                            "advisorEmail":  "User02@gmail.com",
+                            "userMode":  "fixed",
+                            "poolSliceFile":  "C:\\Users\\gulle\\source\\repos\\load-testing-k6\\data\\scenarios\\user-slices-S1-smoke-write\\slice-advisor-01.json",
+                            "exitCode":  0,
+                            "jobState":  "Completed",
+                            "jobFailed":  false
+                        }
+                    ],
+    "failedJobs":  [
+
+                   ]
+}

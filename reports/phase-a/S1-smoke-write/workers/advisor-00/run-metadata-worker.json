@@ -1,0 +1,16 @@
+{
+    "reportType":  "phase-a-worker-metadata",
+    "runTag":  "S1-smoke-write",
+    "advisorKey":  "advisor-00",
+    "shardId":  "advisor-00",
+    "advisorEmail":  "User01@gmail.com",
+    "userMode":  "fixed",
+    "poolSliceFile":  "C:\\Users\\gulle\\source\\repos\\load-testing-k6\\data\\scenarios\\user-slices-S1-smoke-write\\slice-advisor-00.json",
+    "volumeScenario":  "S1",
+    "volumeSloGate":  true,
+    "startTime":  "2026-06-02T10:00:23.7227008Z",
+    "endTime":  "2026-06-02T10:00:31.4788292Z",
+    "elapsedSec":  7.8,
+    "exitCode":  0,
+    "k6LogFile":  "C:\\Users\\gulle\\source\\repos\\load-testing-k6\\reports\\phase-a\\S1-smoke-write\\logs\\advisor-00\\k6.log"
+}

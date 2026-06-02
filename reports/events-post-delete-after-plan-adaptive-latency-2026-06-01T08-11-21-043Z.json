@@ -1,0 +1,25 @@
+{
+  "reportType": "adaptive-api-latency",
+  "generatedAt": "2026-06-01T08:11:21.044Z",
+  "script": "events-post-delete-after-plan",
+  "environment": "dev-non-production",
+  "config": {
+    "maxAcceptableMs": 500,
+    "windowSize": 100,
+    "slowPercent": 20,
+    "stopOnDegradation": false
+  },
+  "session": {
+    "configuredVus": 1,
+    "activeVusAtEnd": 0,
+    "completedIterations": 1,
+    "testDurationMs": 53118.4401,
+    "poolRunId": null,
+    "leasedUserCount": null,
+    "adaptiveAbort": null
+  },
+  "degradation": {
+    "detected": false
+  },
+  "apis": []
+}

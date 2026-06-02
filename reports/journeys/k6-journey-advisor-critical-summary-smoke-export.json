@@ -1,0 +1,329 @@
+{
+    "root_group": {
+        "groups": {
+            "teardown": {
+                "checks": {
+                    "Login: ROPC HTTP 200": {
+                        "name": "Login: ROPC HTTP 200",
+                        "path": "::teardown::Login: ROPC HTTP 200",
+                        "id": "19eb4e762dc21bb016f8d6e9c0a4508a",
+                        "passes": 3,
+                        "fails": 0
+                    },
+                    "Login: ROPC body has access_token": {
+                        "name": "Login: ROPC body has access_token",
+                        "path": "::teardown::Login: ROPC body has access_token",
+                        "id": "cbc93001d7a4261edd73207faa9e4d04",
+                        "passes": 3,
+                        "fails": 0
+                    },
+                    "Login: ROPC user id resolved (JWT or identity map)": {
+                        "name": "Login: ROPC user id resolved (JWT or identity map)",
+                        "path": "::teardown::Login: ROPC user id resolved (JWT or identity map)",
+                        "id": "f62a2e723fad74e2f8750a245e6bbfa0",
+                        "passes": 3,
+                        "fails": 0
+                    }
+                },
+                "name": "teardown",
+                "path": "::teardown",
+                "id": "a8a9942382e8ffe2e56ef29e664b8229",
+                "groups": {}
+            }
+        },
+        "checks": {
+            "Login: ROPC HTTP 200": {
+                "passes": 21,
+                "fails": 0,
+                "name": "Login: ROPC HTTP 200",
+                "path": "::Login: ROPC HTTP 200",
+                "id": "3de925d9b61d80de357a54bee8dcbe23"
+            },
+            "Login: ROPC body has access_token": {
+                "name": "Login: ROPC body has access_token",
+                "path": "::Login: ROPC body has access_token",
+                "id": "a7d3bdf5d3a425646d5fdbe9067c0538",
+                "passes": 21,
+                "fails": 0
+            },
+            "Login: ROPC user id resolved (JWT or identity map)": {
+                "name": "Login: ROPC user id resolved (JWT or identity map)",
+                "path": "::Login: ROPC user id resolved (JWT or identity map)",
+                "id": "fedc9312ba543d8162a75e7ca9a11443",
+                "passes": 21,
+                "fails": 0
+            },
+            "journey: dashboard list 200 array": {
+                "id": "0f478e5307d6dec57703c9c7c0c85f5e",
+                "passes": 18,
+                "fails": 0,
+                "name": "journey: dashboard list 200 array",
+                "path": "::journey: dashboard list 200 array"
+            },
+            "journey: open client id matches": {
+                "name": "journey: open client id matches",
+                "path": "::journey: open client id matches",
+                "id": "6a2e082a61bdd91175d8740a43aabade",
+                "passes": 17,
+                "fails": 0
+            },
+            "journey: GET cashflow 200": {
+                "fails": 0,
+                "name": "journey: GET cashflow 200",
+                "path": "::journey: GET cashflow 200",
+                "id": "32315607f48b5a59cccfdc1223c46f5d",
+                "passes": 17
+            },
+            "journey: GET timelines 200": {
+                "id": "e15283212a16c07f9a729c649763e064",
+                "passes": 17,
+                "fails": 0,
+                "name": "journey: GET timelines 200",
+                "path": "::journey: GET timelines 200"
+            },
+            "journey: GET financial 200": {
+                "passes": 17,
+                "fails": 0,
+                "name": "journey: GET financial 200",
+                "path": "::journey: GET financial 200",
+                "id": "be70de2e0844c8a3df18171e0521f1ed"
+            },
+            "journey: GET income-expense/financial 200": {
+                "name": "journey: GET income-expense/financial 200",
+                "path": "::journey: GET income-expense/financial 200",
+                "id": "e7c482772d992e8949f07a92c06ec3b2",
+                "passes": 17,
+                "fails": 0
+            },
+            "journey: GET Reports 200/204": {
+                "id": "6f4f9926f956451d19098b22d788d1b6",
+                "passes": 17,
+                "fails": 0,
+                "name": "journey: GET Reports 200/204",
+                "path": "::journey: GET Reports 200/204"
+            },
+            "journey: GET Events/default ok": {
+                "fails": 0,
+                "name": "journey: GET Events/default ok",
+                "path": "::journey: GET Events/default ok",
+                "id": "8be1b13d5a597b55c73c2337648d5c65",
+                "passes": 17
+            },
+            "journey: GET Events/custom 200": {
+                "fails": 0,
+                "name": "journey: GET Events/custom 200",
+                "path": "::journey: GET Events/custom 200",
+                "id": "ce5064d5d0ab595bc49ce969453a47b7",
+                "passes": 17
+            }
+        },
+        "name": "",
+        "path": "",
+        "id": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "metrics": {
+        "journey_dashboard_payload_bytes": {
+            "p(90)": 1190494,
+            "p(95)": 1190494,
+            "avg": 419841.22222222225,
+            "min": 127098,
+            "med": 296397,
+            "max": 1190494
+        },
+        "iteration_duration": {
+            "max": 27414.2205,
+            "p(90)": 23196.64252,
+            "p(95)": 24300.391699999996,
+            "avg": 16201.988000000001,
+            "min": 10122.9562,
+            "med": 16332.779
+        },
+        "journey_dashboard_load_duration": {
+            "med": 5155.5,
+            "max": 16991,
+            "p(90)": 14508.6,
+            "p(95)": 15370.049999999997,
+            "avg": 6575.055555555556,
+            "min": 1677,
+            "thresholds": {
+                "p(95)<2500": true,
+                "p(99)<5000": true
+            }
+        },
+        "http_req_duration{expected_response:true}": {
+            "med": 491.35704999999996,
+            "max": 16943.3368,
+            "p(90)": 1882.86835,
+            "p(95)": 4946.900525,
+            "avg": 1126.5164897959178,
+            "min": 244.1
+        },
+        "vus": {
+            "value": 0,
+            "min": 0,
+            "max": 3
+        },
+        "http_reqs": {
+            "count": 196,
+            "rate": 1.6499660984580482
+        },
+        "http_req_tls_handshaking": {
+            "avg": 8.05884948979592,
+            "min": 0,
+            "med": 0,
+            "max": 238.9199,
+            "p(90)": 0,
+            "p(95)": 0
+        },
+        "http_req_blocked": {
+            "min": 0,
+            "med": 0,
+            "max": 1299.7109,
+            "p(90)": 0,
+            "p(95)": 0,
+            "avg": 23.695735204081632
+        },
+        "checks": {
+            "passes": 226,
+            "fails": 0,
+            "value": 1
+        },
+        "business_failure_rate": {
+            "passes": 0,
+            "fails": 70,
+            "thresholds": {
+                "rate<0.02": false
+            },
+            "value": 0
+        },
+        "journey_login_duration": {
+            "p(95)": 718.3999999999995,
+            "avg": 518.1666666666666,
+            "min": 411,
+            "med": 466,
+            "max": 1021,
+            "p(90)": 590.1000000000001,
+            "thresholds": {
+                "p(95)<1500": false,
+                "p(99)<3000": false
+            }
+        },
+        "journey_dashboard_clients_returned": {
+            "max": 1463,
+            "p(90)": 1463,
+            "p(95)": 1463,
+            "avg": 513.5555555555555,
+            "min": 160,
+            "med": 352
+        },
+        "iterations": {
+            "rate": 0.14310930445809603,
+            "count": 17
+        },
+        "journey_cashflow_load_duration": {
+            "avg": 924.5294117647059,
+            "min": 549,
+            "med": 714,
+            "max": 2479,
+            "p(90)": 1616.0000000000002,
+            "p(95)": 2002.1999999999996,
+            "thresholds": {
+                "p(99)<6000": false,
+                "p(95)<3000": false
+            }
+        },
+        "user_lag_rate": {
+            "passes": 12,
+            "fails": 58,
+            "thresholds": {
+                "rate<0.05": true
+            },
+            "value": 0.17142857142857143
+        },
+        "http_req_failed": {
+            "passes": 0,
+            "fails": 196,
+            "thresholds": {
+                "rate<0.01": false
+            },
+            "value": 0
+        },
+        "http_req_duration": {
+            "med": 491.35704999999996,
+            "max": 16943.3368,
+            "p(90)": 1882.86835,
+            "p(95)": 4946.900525,
+            "avg": 1126.5164897959178,
+            "min": 244.1
+        },
+        "journey_open_client_duration": {
+            "p(90)": 315.6,
+            "p(95)": 370.9999999999999,
+            "avg": 293.1764705882353,
+            "min": 263,
+            "med": 280,
+            "max": 475,
+            "thresholds": {
+                "p(95)<2000": false,
+                "p(99)<4000": false
+            }
+        },
+        "data_sent": {
+            "rate": 700.2506631022236,
+            "count": 83183
+        },
+        "data_received": {
+            "count": 9634200,
+            "rate": 81102.56829471698
+        },
+        "vus_max": {
+            "value": 3,
+            "min": 3,
+            "max": 3
+        },
+        "http_req_connecting": {
+            "avg": 11.207424489795919,
+            "min": 0,
+            "med": 0,
+            "max": 1146.574,
+            "p(90)": 0,
+            "p(95)": 0
+        },
+        "http_req_sending": {
+            "avg": 0.7855091836734697,
+            "min": 0,
+            "med": 0.6491,
+            "max": 4.869,
+            "p(90)": 1.6096,
+            "p(95)": 2.1962
+        },
+        "http_req_waiting": {
+            "p(95)": 969.1014250000001,
+            "avg": 511.71021020408136,
+            "min": 242.9607,
+            "med": 405.74620000000004,
+            "max": 6176.0228,
+            "p(90)": 744.9463499999999
+        },
+        "http_req_receiving": {
+            "avg": 614.0207704081636,
+            "min": 0,
+            "med": 11.3503,
+            "max": 16375.726,
+            "p(90)": 1342.89835,
+            "p(95)": 3792.8659749999997
+        },
+        "auth_failure_rate": {
+            "passes": 0,
+            "fails": 18,
+            "thresholds": {
+                "rate<0.01": false
+            },
+            "value": 0
+        }
+    },
+    "setup_data": {
+        "base": "https://dev-api.ibernia.it",
+        "runTag": "r1780312027201"
+    }
+}

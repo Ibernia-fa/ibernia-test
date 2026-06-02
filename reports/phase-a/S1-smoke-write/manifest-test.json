@@ -1,0 +1,73 @@
+{
+  "reportType": "phase-a-manifest",
+  "generatedAt": "2026-06-02T09:37:47.277Z",
+  "runTag": "S1-smoke-write",
+  "scenario": "S1",
+  "phaseBScenario": "phase-b-read-default",
+  "manifestProfileFile": "data/scenarios/profile_20u_1c_1p.json",
+  "shardCount": 2,
+  "advisors": [
+    {
+      "shardId": "advisor-00",
+      "advisorSub": "",
+      "advisorEmail": "",
+      "vu": null,
+      "iteration": null,
+      "clients": [],
+      "counts": {
+        "clients": 0,
+        "plans": 0
+      },
+      "generatedAt": "2026-06-02T09:34:53.314Z"
+    },
+    {
+      "shardId": "advisor-01",
+      "advisorSub": "",
+      "advisorEmail": "",
+      "vu": null,
+      "iteration": null,
+      "clients": [],
+      "counts": {
+        "clients": 0,
+        "plans": 0
+      },
+      "generatedAt": "2026-06-02T09:34:53.432Z"
+    }
+  ],
+  "totals": {
+    "clients": 0,
+    "plans": 0
+  },
+  "validation": {
+    "scenario": {
+      "scenarioName": "S1",
+      "profile": "write",
+      "readOnly": false,
+      "advisors": 2,
+      "clientsPerAdvisor": 1,
+      "plansPerClient": 1,
+      "iterations": 1,
+      "manifestProfileFile": "data/scenarios/profile_20u_1c_1p.json",
+      "phaseBScenario": "phase-b-read-default",
+      "sloOverridesFile": null,
+      "source": {
+        "advisors": "cli",
+        "clientsPerAdvisor": "scenario",
+        "plansPerClient": "scenario"
+      }
+    },
+    "iterations": 1,
+    "expectedClients": 2,
+    "expectedPlans": 2,
+    "expectedShards": 2,
+    "actualClients": 0,
+    "actualPlans": 0,
+    "actualShards": 2,
+    "clientCountOk": false,
+    "planCountOk": false,
+    "shardCountOk": true,
+    "duplicateAdvisorOk": true,
+    "duplicateAdvisorSubs": [],
+    "passed": false
+  }
+}

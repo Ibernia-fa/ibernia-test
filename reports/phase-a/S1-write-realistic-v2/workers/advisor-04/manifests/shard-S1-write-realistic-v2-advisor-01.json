@@ -1,0 +1,26 @@
+{
+  "reportType": "phase-a-manifest-shard",
+  "runTag": "S1-write-realistic-v2",
+  "shardId": "advisor-01",
+  "advisorSub": "10066169-5ecd-4b9f-8300-457596f14e66",
+  "advisorEmail": "User02@gmail.com",
+  "vu": 1,
+  "iteration": 0,
+  "clients": [
+    {
+      "clientId": "6a1ecd6d221185e8396cdce7",
+      "uniqueTag": "fp1_g0_1780403564390",
+      "cashflows": [
+        {
+          "cashflowId": "6a1ecd6e221185e8396cdcf1",
+          "planName": "Pre-retirement transition plan"
+        }
+      ]
+    }
+  ],
+  "counts": {
+    "clients": 1,
+    "plans": 1
+  },
+  "generatedAt": "2026-06-02T12:32:55.385Z"
+}

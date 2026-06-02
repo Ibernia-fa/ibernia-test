@@ -1,0 +1,415 @@
+/**
+ * Unit tests for lib/volume-slo-core.js (Node built-in test runner).
+ *
+ * Run: node --test tools/volume-slo.test.mjs
+ */
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import test from 'node:test';
+import {
+  parseVolumeSloConfig,
+  parseVolumeScenariosConfig,
+  applyScenarioToSloConfig,
+  resolveVolumeScenario,
+  profileForHttpMethod,
+  normalizeEndpointPath,
+  resolveEndpointBudget,
+  resolveEndpointHardMax,
+  resolveStepBudget,
+  calculateP95,
+  calculateViolationRate,
+  summarizeSamples,
+  createVolumeSloStore,
+  recordEndpointSample,
+  recordStepSample,
+  buildVolumeSloSummary,
+  endpointBudgetKey,
+  evaluateVolumeSloGate,
+} from '../lib/volume-slo-core.js';
+import {
+  mergePhaseAManifestShards,
+  parseManifestShard,
+  selectManifestTargetForVu,
+  flattenManifestTargets,
+  resolveManifestShardId,
+  advisorSubShardId,
+  buildManifestShardFromK6SummaryMetrics,
+} from '../lib/volume-manifest-core.js';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const configPath = join(__dirname, '..', 'config', 'volume-api-slo.json');
+const scenariosPath = join(__dirname, '..', 'config', 'volume-scenarios.json');
+const repoConfig = parseVolumeSloConfig(JSON.parse(readFileSync(configPath, 'utf8')));
+const repoScenarios = parseVolumeScenariosConfig(JSON.parse(readFileSync(scenariosPath, 'utf8')));
+
+test('parseVolumeSloConfig loads repo config with read and write profiles', () => {
+  assert.equal(repoConfig.version, 1);
+  assert.equal(repoConfig.defaultProfile, 'read');
+  assert.ok(repoConfig.profiles.read.defaultBudgetMs > 0);
+  assert.ok(repoConfig.profiles.write.defaultBudgetMs > 0);
+  assert.equal(
+    repoConfig.profiles.read.endpointBudgetMs['GET /api/v1/Clients/{advisorId}/all'],
+    2500,
+  );
+});
+
+test('profileForHttpMethod maps GET to read and POST to write', () => {
+  assert.equal(profileForHttpMethod('GET'), 'read');
+  assert.equal(profileForHttpMethod('HEAD'), 'read');
+  assert.equal(profileForHttpMethod('POST'), 'write');
+  assert.equal(profileForHttpMethod('PUT'), 'write');
+});
+
+test('normalizeEndpointPath replaces ids with placeholders', () => {
+  assert.equal(
+    normalizeEndpointPath('https://dev-api.ibernia.it/api/v1/Clients/507f1f77bcf86cd799439011'),
+    '/api/v1/Clients/{id}',
+  );
+  assert.equal(
+    normalizeEndpointPath('/api/v1/cashflows/550e8400-e29b-41d4-a716-446655440000/timelines'),
+    '/api/v1/cashflows/{id}/timelines',
+  );
+});
+
+test('resolveEndpointBudget uses read profile for GET clients all', () => {
+  const r = resolveEndpointBudget(
+    repoConfig,
+    'read',
+    'GET',
+    '/api/v1/Clients/fa1b2c3d4e5f678901234567/all',
+  );
+  assert.equal(r.profile, 'read');
+  assert.equal(r.budgetMs, 2500);
+  assert.equal(r.key, 'GET /api/v1/Clients/{id}/all');
+});
+
+test('resolveEndpointBudget falls back to profile defaultBudgetMs', () => {
+  const r = resolveEndpointBudget(repoConfig, 'read', 'GET', '/api/v1/unknown/route');
+  assert.equal(r.budgetMs, repoConfig.profiles.read.defaultBudgetMs);
+});
+
+test('resolveStepBudget returns write step budgets', () => {
+  const r = resolveStepBudget(repoConfig, 'write', 'cashflow_recalculate');
+  assert.equal(r.profile, 'write');
+  assert.equal(r.budgetMs, 5000);
+  assert.equal(r.step, 'cashflow_recalculate');
+});
+
+test('calculateP95 and calculateViolationRate', () => {
+  const samples = [100, 200, 300, 400, 500, 600, 700, 800, 900, 2000];
+  assert.equal(calculateP95(samples), 2000);
+  const viol = calculateViolationRate(samples, 500);
+  assert.equal(viol.count, 10);
+  assert.equal(viol.violations, 5);
+  assert.equal(viol.violationRate, 0.5);
+});
+
+test('summarizeSamples computes distribution stats', () => {
+  const s = summarizeSamples([10, 20, 30, 40, 50]);
+  assert.equal(s.count, 5);
+  assert.equal(s.minMs, 10);
+  assert.equal(s.maxMs, 50);
+  assert.equal(s.avgMs, 30);
+  assert.equal(s.p95Ms, 50);
+});
+
+test('recordEndpointSample aggregates violations in store', () => {
+  const store = createVolumeSloStore();
+  recordEndpointSample(store, repoConfig, {
+    method: 'GET',
+    endpoint: '/api/v1/Clients/{advisorId}/all',
+    durationMs: 2000,
+    profile: 'read',
+  });
+  recordEndpointSample(store, repoConfig, {
+    method: 'GET',
+    endpoint: '/api/v1/Clients/{advisorId}/all',
+    durationMs: 4000,
+    profile: 'read',
+  });
+  const key = `read\0${endpointBudgetKey('GET', '/api/v1/Clients/{advisorId}/all')}`;
+  const bucket = store.endpoints[key];
+  assert.equal(bucket.durations.length, 2);
+  assert.equal(bucket.violations, 1);
+  assert.ok(store.profilesUsed.read);
+});
+
+test('recordStepSample tracks step durations', () => {
+  const store = createVolumeSloStore();
+  recordStepSample(store, repoConfig, {
+    step: 'dashboard_load',
+    durationMs: 3000,
+    profile: 'read',
+  });
+  assert.equal(Object.keys(store.steps).length, 1);
+  const row = Object.values(store.steps)[0];
+  assert.equal(row.step, 'dashboard_load');
+  assert.equal(row.violations, 1);
+});
+
+test('buildVolumeSloSummary produces endpoint and step rows with passFail', () => {
+  const store = createVolumeSloStore();
+  recordEndpointSample(store, repoConfig, {
+    method: 'GET',
+    endpoint: '/api/v1/Clients/{id}',
+    durationMs: 1500,
+    profile: 'read',
+  });
+  recordEndpointSample(store, repoConfig, {
+    method: 'GET',
+    endpoint: '/api/v1/Clients/{id}',
+    durationMs: 1800,
+    profile: 'read',
+  });
+  recordStepSample(store, repoConfig, {
+    step: 'open_client',
+    durationMs: 1900,
+    profile: 'read',
+  });
+  const summary = buildVolumeSloSummary(store, repoConfig, { runId: 'test-run' });
+  assert.equal(summary.reportType, 'volume-slo-summary');
+  assert.equal(summary.runId, 'test-run');
+  assert.equal(summary.endpoints.length, 1);
+  assert.equal(summary.endpoints[0].passFail, 'pass');
+  assert.equal(summary.steps.length, 1);
+  assert.equal(summary.steps[0].step, 'open_client');
+  assert.ok(summary.rates.endpointViolationRate != null);
+});
+
+test('evaluateVolumeSloGate fails when phase A step p95 exceeds budget', () => {
+  const store = createVolumeSloStore();
+  for (let i = 0; i < 10; i++) {
+    recordStepSample(store, repoConfig, {
+      step: 'journey_create_client_duration',
+      durationMs: i < 9 ? 1000 : 9000,
+      profile: 'write',
+    });
+  }
+  const summary = buildVolumeSloSummary(store, repoConfig);
+  const gate = evaluateVolumeSloGate(summary, {
+    phaseASteps: ['journey_create_client_duration'],
+    maxStepViolationRate: 0.05,
+  });
+  assert.equal(gate.enabled, true);
+  assert.equal(gate.passed, false);
+  assert.ok(gate.failedSteps.includes('journey_create_client_duration'));
+});
+
+test('parseVolumeSloConfig includes Phase A write step budgets', () => {
+  assert.equal(repoConfig.profiles.write.stepBudgetMs.journey_full_plan_build_duration, 30000);
+});
+
+test('parseVolumeScenariosConfig loads phase-a and phase-b scenarios', () => {
+  assert.equal(repoScenarios.version, 1);
+  assert.ok(repoScenarios.scenarios['phase-a-write-volume']);
+  assert.ok(repoScenarios.scenarios['phase-b-read-default']);
+});
+
+test('applyScenarioToSloConfig merges volume scenario overrides', () => {
+  const { scenario } = resolveVolumeScenario(repoScenarios, 'phase-a-write-volume');
+  const merged = applyScenarioToSloConfig(repoConfig, scenario);
+  assert.equal(merged.defaultProfile, 'write');
+  assert.equal(merged.profiles.write.endpointBudgetMs['POST /api/v1/Clients'], 3500);
+  assert.equal(merged.profiles.write.stepBudgetMs.journey_full_plan_build_duration, 45000);
+});
+
+test('mergePhaseAManifestShards validates expected counts', () => {
+  const shard = parseManifestShard({
+    reportType: 'phase-a-manifest-shard',
+    runTag: 't1',
+    advisorSub: 'adv-1',
+    clients: [{ clientId: 'c1', uniqueTag: 'tag1', cashflows: [{ cashflowId: 'cf1' }] }],
+    counts: { clients: 1, plans: 1 },
+  });
+  const merged = mergePhaseAManifestShards([shard], { runTag: 't1', expectedClients: 1, expectedPlans: 1 });
+  assert.equal(merged.reportType, 'phase-a-manifest');
+  assert.equal(merged.validation.passed, true);
+  const target = selectManifestTargetForVu(merged, 1);
+  assert.equal(target.clientId, 'c1');
+  assert.equal(target.cashflowId, 'cf1');
+});
+
+test('resolveManifestShardId prefers env then advisorSub hash', () => {
+  assert.equal(resolveManifestShardId({ envShardId: 'advisor-02' }), 'advisor-02');
+  const fromSub = resolveManifestShardId({ advisorSub: 'sub-abc-123' });
+  assert.equal(fromSub, advisorSubShardId('sub-abc-123'));
+  assert.equal(resolveManifestShardId({ vu: 3, iteration: 1 }), 'vu-3-iter-1');
+});
+
+test('mergePhaseAManifestShards detects duplicate advisorSub across shards', () => {
+  const shardA = parseManifestShard({
+    runTag: 't1',
+    shardId: 'shard-a',
+    advisorSub: 'same-advisor',
+    clients: [{ clientId: 'c1', cashflows: [{ cashflowId: 'cf1' }] }],
+  });
+  const shardB = parseManifestShard({
+    runTag: 't1',
+    shardId: 'shard-b',
+    advisorSub: 'same-advisor',
+    clients: [{ clientId: 'c2', cashflows: [{ cashflowId: 'cf2' }] }],
+  });
+  const merged = mergePhaseAManifestShards([shardA, shardB], { expectedShards: 2 });
+  assert.equal(merged.validation.duplicateAdvisorOk, false);
+  assert.equal(merged.validation.passed, false);
+  assert.equal(merged.validation.duplicateAdvisorSubs.length, 1);
+});
+
+test('flattenManifestTargets covers all clients and plans', () => {
+  const manifest = mergePhaseAManifestShards([
+    parseManifestShard({
+      runTag: 't2',
+      shardId: 's1',
+      advisorSub: 'adv-1',
+      clients: [
+        {
+          clientId: 'c1',
+          cashflows: [{ cashflowId: 'cf1' }, { cashflowId: 'cf2' }],
+        },
+        {
+          clientId: 'c2',
+          cashflows: [{ cashflowId: 'cf3' }],
+        },
+      ],
+    }),
+  ]);
+  const targets = flattenManifestTargets(manifest);
+  assert.equal(targets.length, 3);
+  assert.equal(selectManifestTargetForVu(manifest, 1).cashflowId, 'cf1');
+  assert.equal(selectManifestTargetForVu(manifest, 2).cashflowId, 'cf2');
+  assert.equal(selectManifestTargetForVu(manifest, 3).cashflowId, 'cf3');
+  assert.equal(selectManifestTargetForVu(manifest, 4).cashflowId, 'cf1');
+});
+
+test('mergePhaseAManifestShards excludes error stub rows from counts', () => {
+  const shard = parseManifestShard({
+    runTag: 't3',
+    advisorSub: 'adv-1',
+    clients: [
+      { clientId: '', uniqueTag: 'fail1', cashflows: [], error: 'client_create_failed' },
+      { clientId: 'c1', uniqueTag: 'ok1', cashflows: [{ cashflowId: 'cf1' }] },
+    ],
+  });
+  const merged = mergePhaseAManifestShards([shard], { expectedClients: 1, expectedPlans: 1 });
+  assert.equal(merged.totals.clients, 1);
+  assert.equal(merged.totals.plans, 1);
+  assert.equal(merged.validation.passed, true);
+});
+
+test('evaluateVolumeSloGate fails on endpoint violation rate', () => {
+  const store = createVolumeSloStore();
+  for (let i = 0; i < 10; i++) {
+    recordEndpointSample(store, repoConfig, {
+      method: 'GET',
+      endpoint: '/api/v1/Clients/{id}',
+      durationMs: i < 6 ? 1500 : 5000,
+      profile: 'read',
+    });
+  }
+  const summary = buildVolumeSloSummary(store, repoConfig);
+  const gate = evaluateVolumeSloGate(summary, { maxEndpointViolationRate: 0.05 });
+  assert.equal(gate.passed, false);
+  assert.equal(gate.endpointViolationRateFailed, true);
+});
+
+test('evaluateVolumeSloGate strict endpoint p95 mode', () => {
+  const store = createVolumeSloStore();
+  recordEndpointSample(store, repoConfig, {
+    method: 'GET',
+    endpoint: '/api/v1/Clients/{id}',
+    durationMs: 5000,
+    profile: 'read',
+  });
+  recordEndpointSample(store, repoConfig, {
+    method: 'GET',
+    endpoint: '/api/v1/Clients/{id}',
+    durationMs: 1500,
+    profile: 'read',
+  });
+  const summary = buildVolumeSloSummary(store, repoConfig);
+  const gate = evaluateVolumeSloGate(summary, {
+    failOnEndpointP95: true,
+    maxEndpointViolationRate: 1,
+    maxStepViolationRate: 1,
+  });
+  assert.equal(gate.passed, false);
+  assert.ok(gate.failedEndpoints.length > 0);
+});
+
+test('volume scenario expected count formula', () => {
+  const { scenario } = resolveVolumeScenario(repoScenarios, 'phase-a-write-volume');
+  const advisors = 20;
+  const iterations = 1;
+  const expectedClients = advisors * scenario.clientsPerAdvisor * iterations;
+  const expectedPlans =
+    advisors * scenario.clientsPerAdvisor * scenario.plansPerClient * iterations;
+  assert.equal(expectedClients, 60);
+  assert.equal(expectedPlans, 120);
+});
+
+test('resolveEndpointHardMax uses explicit endpointMaxMs', () => {
+  const hard = resolveEndpointHardMax(
+    repoConfig,
+    'read',
+    'GET',
+    '/api/v1/Clients/fa1/all',
+  );
+  assert.ok(hard.hardMaxMs >= hard.budgetMs || hard.hardMaxMs > 0);
+});
+
+test('recordEndpointSample tracks hardViolations', () => {
+  const store = createVolumeSloStore();
+  const hardMax = resolveEndpointHardMax(
+    repoConfig,
+    'read',
+    'GET',
+    '/api/v1/Clients/advisor1/all',
+  );
+  const { hardViolated } = recordEndpointSample(store, repoConfig, {
+    method: 'GET',
+    endpoint: '/api/v1/Clients/advisor1/all',
+    durationMs: hardMax.hardMaxMs + 1000,
+    profile: 'read',
+  });
+  assert.equal(hardViolated, true);
+  const summary = buildVolumeSloSummary(store, repoConfig);
+  assert.ok(summary.totals.hardMaxViolations >= 1);
+});
+
+test('S1 scenario resolves 20 advisors and profile path', () => {
+  const { name, scenario } = resolveVolumeScenario(repoScenarios, 'S1');
+  assert.equal(name, 'S1');
+  assert.equal(scenario.advisors, 20);
+  assert.equal(scenario.manifestProfileFile, 'data/scenarios/profile_20u_1c_1p.json');
+});
+
+test('buildManifestShardFromK6SummaryMetrics rebuilds shard from tagged counters', () => {
+  const data = {
+    metrics: {
+      'phase_a_manifest_shard{shard_id:advisor-00,advisor_sub:sub1,advisor_email:User01@gmail.com,run_tag:smoke,scenario:S1}':
+        { values: { count: 1 } },
+      'phase_a_manifest_plan{shard_id:advisor-00,client_id:clientA,cashflow_id:cf1,unique_tag:tag1,plan_name:Plan1}':
+        { values: { count: 1 } },
+      'phase_a_manifest_plan{shard_id:advisor-00,client_id:clientA,cashflow_id:cf2,unique_tag:tag1,plan_name:Plan2}':
+        { values: { count: 1 } },
+    },
+  };
+  const shard = buildManifestShardFromK6SummaryMetrics(data);
+  assert.ok(shard);
+  assert.equal(shard.shardId, 'advisor-00');
+  assert.equal(shard.advisorEmail, 'User01@gmail.com');
+  assert.equal(shard.counts.clients, 1);
+  assert.equal(shard.counts.plans, 2);
+  assert.equal(shard.clients[0].clientId, 'clientA');
+  assert.equal(shard.clients[0].cashflows.length, 2);
+
+  const merged = mergePhaseAManifestShards([shard], {
+    runTag: 'smoke',
+    expectedClients: 1,
+    expectedPlans: 2,
+    expectedShards: 1,
+  });
+  assert.equal(merged.validation.passed, true);
+});

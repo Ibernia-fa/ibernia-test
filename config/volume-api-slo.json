@@ -1,0 +1,113 @@
+{
+  "version": 1,
+  "defaultProfile": "read",
+  "fallbackBudgetMs": 3000,
+  "hardMaxMultiplier": 2.5,
+  "gates": {
+    "maxEndpointP95ViolationRate": 0.05,
+    "maxStepP95ViolationRate": 0.05,
+    "maxSingleRequestOverMaxMsRate": 0.01
+  },
+  "profiles": {
+    "read": {
+      "description": "GET-heavy advisor and client read paths (list, open, plan load)",
+      "defaultBudgetMs": 2500,
+      "endpointBudgetMs": {
+        "GET /connect/token": 1500,
+        "GET /api/v1/Clients/{advisorId}/all": 2500,
+        "GET /api/v1/Clients/{id}": 2000,
+        "GET /api/v1/Clients/{advisorId}/search": 2500,
+        "GET /api/v1/Clients/by-cashflow/{cashflowId}": 2000,
+        "GET /api/v1/client/{clientId}/cashflows": 2500,
+        "GET /api/v1/cashflows/{cashflowId}": 3000,
+        "GET /api/v1/cashflows/{cashflowId}/timelines": 3000,
+        "GET /api/v1/cashflows/{cashflowId}/timelines/financing": 3000,
+        "GET /api/v1/cashflows/{cashflowId}/financial": 3000,
+        "GET /api/v1/cashflows/{cashflowId}/income-expense/financial": 3000,
+        "GET /api/v1/cashflows/{cashflowId}/funds": 3000,
+        "GET /api/v1/Events/default": 2000,
+        "GET /api/v1/Events/custom": 2000,
+        "GET /api/v1/Reports/{cashflowId}": 5000,
+        "GET /api/v1/wealth/{cashflowId}": 3000
+      },
+      "endpointMaxMs": {
+        "GET /api/v1/Clients/{advisorId}/all": 5000,
+        "GET /api/v1/Clients/{id}": 4000,
+        "GET /api/v1/client/{clientId}/cashflows": 4000,
+        "GET /api/v1/cashflows/{cashflowId}": 4000,
+        "GET /api/v1/cashflows/{cashflowId}/timelines": 5000,
+        "GET /api/v1/Reports/{cashflowId}": 15000
+      },
+      "stepBudgetMs": {
+        "login": 1500,
+        "dashboard_load": 2500,
+        "open_client": 2000,
+        "cashflow_load": 3000,
+        "client_plan_view": 4000,
+        "journey_login_duration": 1500,
+        "journey_dashboard_load_duration": 2500,
+        "journey_open_client_duration": 2000,
+        "journey_client_plans_load_duration": 2000,
+        "journey_open_plan_duration": 2000,
+        "journey_timeline_load_duration": 2500,
+        "journey_income_expenses_load_duration": 2500,
+        "journey_saving_pots_load_duration": 3000,
+        "journey_projection_load_duration": 6000,
+        "journey_cashflow_load_duration": 3000,
+        "full_journey_duration": 15000
+      }
+    },
+    "write": {
+      "description": "POST/PUT/PATCH/DELETE mutation paths (create, update, recalc triggers)",
+      "defaultBudgetMs": 3000,
+      "endpointBudgetMs": {
+        "POST /connect/token": 2000,
+        "POST /api/v1/Clients": 3000,
+        "PUT /api/v1/Clients": 2500,
+        "DELETE /api/v1/Clients/{id}": 2500,
+        "POST /api/v1/cashflows": 4000,
+        "DELETE /api/v1/cashflows/{cashflowId}": 3000,
+        "POST /api/v1/cashflows/{cashflowId}/financial/income": 2500,
+        "PUT /api/v1/cashflows/{cashflowId}/financial/income": 2500,
+        "DELETE /api/v1/cashflows/{cashflowId}/financial/income": 2500,
+        "POST /api/v1/cashflows/{cashflowId}/financial/expense": 2500,
+        "PUT /api/v1/cashflows/{cashflowId}/financial/expense": 2500,
+        "DELETE /api/v1/cashflows/{cashflowId}/financial/expense": 2500,
+        "GET /api/v1/cashflows/{cashflowId}/financial": 3000,
+        "GET /api/v1/cashflows/{cashflowId}/funds": 3000,
+        "POST /api/v1/cashflows/{cashflowId}/funds/contributions": 2500,
+        "POST /api/v1/cashflows/{cashflowId}/funds/withdrawals": 2500,
+        "POST /api/v1/cashflows/{cashflowId}/timelines/events": 3500,
+        "POST /api/v1/Events/custom": 3000,
+        "POST /api/v1/Reports/{cashflowId}": 5000,
+        "POST /api/v1/Reports/{cashflowId}/scenario": 5000,
+        "POST /api/v1/wealth/{cashflowId}/assets": 3000,
+        "PUT /api/v1/wealth/{cashflowId}/assets": 3000,
+        "DELETE /api/v1/wealth/{cashflowId}/assets/{assetId}": 2500,
+        "POST /api/v1/wealth/{cashflowId}/liabilities": 3000,
+        "PUT /api/v1/wealth/{cashflowId}/liabilities": 3000,
+        "DELETE /api/v1/wealth/{cashflowId}/liabilities/{liabilityId}": 2500
+      },
+      "endpointMaxMs": {
+        "POST /api/v1/Clients": 8000,
+        "POST /api/v1/cashflows": 15000,
+        "POST /api/v1/Reports/{cashflowId}": 20000
+      },
+      "stepBudgetMs": {
+        "login": 1500,
+        "save_assumption": 2000,
+        "cashflow_recalculate": 5000,
+        "save_changes": 2500,
+        "share_client_view": 3000,
+        "journey_create_client_duration": 4000,
+        "journey_create_base_plan_duration": 5000,
+        "journey_create_timeline_events_duration": 8000,
+        "journey_add_income_expenses_duration": 3500,
+        "journey_add_saving_pots_duration": 3000,
+        "journey_add_contributions_withdrawals_duration": 3000,
+        "journey_calculate_projection_duration": 5000,
+        "journey_full_plan_build_duration": 45000
+      }
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "reportType": "phase-a-manifest-shard",
+  "generatedAt": "2026-06-02T12:33:44.112Z",
+  "runTag": "S1-write-realistic-v2",
+  "shardId": "advisor-04",
+  "scenario": "S1",
+  "runId": "S1-write-realistic-v2",
+  "advisorIndex": null,
+  "advisorSub": "",
+  "advisorEmail": "",
+  "vu": null,
+  "iteration": null,
+  "clients": [],
+  "counts": {
+      "clients": 0,
+      "plans": 0
+    }
+}

@@ -1,0 +1,25 @@
+{
+  "reportType": "adaptive-api-latency",
+  "generatedAt": "2026-06-01T07:45:15.322Z",
+  "script": "clients",
+  "environment": "dev-non-production",
+  "config": {
+    "maxAcceptableMs": 500,
+    "windowSize": 100,
+    "slowPercent": 20,
+    "stopOnDegradation": false
+  },
+  "session": {
+    "configuredVus": 1,
+    "activeVusAtEnd": 1,
+    "completedIterations": 1,
+    "testDurationMs": 4996.9481,
+    "poolRunId": null,
+    "leasedUserCount": null,
+    "adaptiveAbort": null
+  },
+  "degradation": {
+    "detected": false
+  },
+  "apis": []
+}

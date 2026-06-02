@@ -1,0 +1,125 @@
+{
+  "version": 1,
+  "defaultScenario": "phase-a-write-default",
+  "scenarios": {
+    "S1": {
+      "description": "Volume S1 — 20 advisors × 1 client × 1 plan (20 clients, 20 plans)",
+      "profile": "write",
+      "advisors": 20,
+      "clientsPerAdvisor": 1,
+      "plansPerClient": 1,
+      "manifestProfileFile": "data/scenarios/profile_20u_1c_1p.json",
+      "phaseBScenario": "phase-b-read-default",
+      "endpointBudgetOverrides": {},
+      "stepBudgetOverrides": {}
+    },
+    "S2": {
+      "description": "Volume S2 — 20 advisors × 5 clients × 2 plans (100 clients, 200 plans)",
+      "profile": "write",
+      "advisors": 20,
+      "clientsPerAdvisor": 5,
+      "plansPerClient": 2,
+      "manifestProfileFile": "data/scenarios/profile_20u_5c_2p.json",
+      "phaseBScenario": "phase-b-read-default",
+      "endpointBudgetOverrides": {},
+      "stepBudgetOverrides": {}
+    },
+    "S3": {
+      "description": "Volume S3 — 20 advisors × 10 clients × 4 plans (200 clients, 800 plans)",
+      "profile": "write",
+      "advisors": 20,
+      "clientsPerAdvisor": 10,
+      "plansPerClient": 4,
+      "manifestProfileFile": "data/scenarios/profile_20u_10c_4p.json",
+      "phaseBScenario": "phase-b-read-default",
+      "endpointBudgetOverrides": {},
+      "stepBudgetOverrides": {}
+    },
+    "S4": {
+      "description": "Volume S4 — 20 advisors × 20 clients × 8 plans (400 clients, 3,200 plans)",
+      "profile": "write",
+      "advisors": 20,
+      "clientsPerAdvisor": 20,
+      "plansPerClient": 8,
+      "manifestProfileFile": "data/scenarios/profile_20u_20c_8p.json",
+      "phaseBScenario": "phase-b-read-default",
+      "endpointBudgetOverrides": {},
+      "stepBudgetOverrides": {}
+    },
+    "S5": {
+      "description": "Volume S5 — 20 advisors × 30 clients × 8 plans (600 clients, 4,800 plans)",
+      "profile": "write",
+      "advisors": 20,
+      "clientsPerAdvisor": 30,
+      "plansPerClient": 8,
+      "manifestProfileFile": "data/scenarios/profile_20u_30c_8p.json",
+      "phaseBScenario": "phase-b-read-S5",
+      "sloOverridesFile": "config/volume-api-slo.overrides-S5.json",
+      "endpointBudgetOverrides": {
+        "GET /api/v1/Clients/{advisorId}/all": 3500
+      },
+      "stepBudgetOverrides": {
+        "journey_dashboard_load_duration": 3500,
+        "full_journey_duration": 20000
+      }
+    },
+    "phase-a-write-default": {
+      "description": "Phase A — single client + single plan per advisor iteration (write profile)",
+      "profile": "write",
+      "advisors": 5,
+      "clientsPerAdvisor": 1,
+      "plansPerClient": 1,
+      "manifestProfileFile": "data/scenarios/profile_20u_1c_1p.json",
+      "phaseBScenario": "phase-b-read-default",
+      "endpointBudgetOverrides": {},
+      "stepBudgetOverrides": {}
+    },
+    "phase-a-write-volume": {
+      "description": "Phase A — multi client/plan volume seed (write profile)",
+      "profile": "write",
+      "advisors": 5,
+      "clientsPerAdvisor": 3,
+      "plansPerClient": 2,
+      "manifestProfileFile": "data/scenarios/profile_20u_5c_2p.json",
+      "phaseBScenario": "phase-b-read-default",
+      "endpointBudgetOverrides": {
+        "POST /api/v1/Clients": 3500,
+        "POST /api/v1/cashflows": 4500
+      },
+      "stepBudgetOverrides": {
+        "journey_full_plan_build_duration": 45000
+      }
+    },
+    "phase-b-read-default": {
+      "description": "Phase B — advisor read journey against manifest clients (read profile)",
+      "profile": "read",
+      "readOnly": true,
+      "endpointBudgetOverrides": {},
+      "stepBudgetOverrides": {
+        "journey_login_duration": 1500,
+        "journey_dashboard_load_duration": 2500,
+        "journey_open_client_duration": 2000,
+        "journey_client_plans_load_duration": 2000,
+        "journey_open_plan_duration": 2000,
+        "journey_timeline_load_duration": 2500,
+        "journey_income_expenses_load_duration": 2500,
+        "journey_saving_pots_load_duration": 3000,
+        "journey_projection_load_duration": 6000,
+        "journey_cashflow_load_duration": 3000,
+        "full_journey_duration": 15000
+      }
+    },
+    "phase-b-read-S5": {
+      "description": "Phase B read profile with relaxed dashboard budget for S5 payload size",
+      "profile": "read",
+      "readOnly": true,
+      "endpointBudgetOverrides": {
+        "GET /api/v1/Clients/{advisorId}/all": 3500
+      },
+      "stepBudgetOverrides": {
+        "journey_dashboard_load_duration": 3500,
+        "full_journey_duration": 20000
+      }
+    }
+  }
+}

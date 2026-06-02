@@ -1,0 +1,26 @@
+{
+  "reportType": "phase-a-manifest-shard",
+  "runTag": "S1-write-realistic-v2",
+  "shardId": "advisor-08",
+  "advisorSub": "9c790737-0701-4517-9a7e-7ccec87a7f2d",
+  "advisorEmail": "User09@gmail.com",
+  "vu": 1,
+  "iteration": 0,
+  "clients": [
+    {
+      "clientId": "6a1ecd84221185e8396cde83",
+      "uniqueTag": "fp1_g0_1780403587609",
+      "cashflows": [
+        {
+          "cashflowId": "6a1ecd87221185e8396ce016",
+          "planName": "Early career wealth plan"
+        }
+      ]
+    }
+  ],
+  "counts": {
+    "clients": 1,
+    "plans": 1
+  },
+  "generatedAt": "2026-06-02T12:33:43.073Z"
+}

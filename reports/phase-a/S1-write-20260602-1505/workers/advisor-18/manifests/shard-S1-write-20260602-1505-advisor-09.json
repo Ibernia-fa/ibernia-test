@@ -1,0 +1,26 @@
+{
+  "reportType": "phase-a-manifest-shard",
+  "runTag": "S1-write-20260602-1505",
+  "shardId": "advisor-09",
+  "advisorSub": "9ddca8ce-c37a-4a77-8405-a787970e27b4",
+  "advisorEmail": "User10@gmail.com",
+  "vu": 1,
+  "iteration": 0,
+  "clients": [
+    {
+      "clientId": "6a1eab23221185e8396afc57",
+      "uniqueTag": "fp1_g0_1780394787322",
+      "cashflows": [
+        {
+          "cashflowId": "6a1eab2c221185e8396b0061",
+          "planName": "FP-fp1_g0_1780394787322"
+        }
+      ]
+    }
+  ],
+  "counts": {
+    "clients": 1,
+    "plans": 1
+  },
+  "generatedAt": "2026-06-02T10:06:42.861Z"
+}

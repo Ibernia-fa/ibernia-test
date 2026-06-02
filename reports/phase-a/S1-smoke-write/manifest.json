@@ -1,0 +1,95 @@
+{
+  "reportType": "phase-a-manifest",
+  "generatedAt": "2026-06-02T10:00:33.324Z",
+  "runTag": "S1-smoke-write",
+  "scenario": "S1",
+  "phaseBScenario": "phase-b-read-default",
+  "manifestProfileFile": "data/scenarios/profile_20u_1c_1p.json",
+  "shardCount": 2,
+  "advisors": [
+    {
+      "shardId": "advisor-00",
+      "advisorSub": "a0cc6646-8253-4fab-b539-387c5d5a5335",
+      "advisorEmail": "User01@gmail.com",
+      "vu": 1,
+      "iteration": 0,
+      "clients": [
+        {
+          "clientId": "6a1ea9ba221185e8396af7fe",
+          "uniqueTag": "fp1_g0_1780394425670",
+          "cashflows": [
+            {
+              "cashflowId": "6a1ea9bb221185e8396af808",
+              "planName": "FP-fp1_g0_1780394425670"
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "clients": 1,
+        "plans": 1
+      },
+      "generatedAt": "2026-06-02T10:00:30.491Z"
+    },
+    {
+      "shardId": "advisor-01",
+      "advisorSub": "10066169-5ecd-4b9f-8300-457596f14e66",
+      "advisorEmail": "User02@gmail.com",
+      "vu": 1,
+      "iteration": 0,
+      "clients": [
+        {
+          "clientId": "6a1ea9bb221185e8396af83f",
+          "uniqueTag": "fp1_g0_1780394427155",
+          "cashflows": [
+            {
+              "cashflowId": "6a1ea9bc221185e8396af859",
+              "planName": "FP-fp1_g0_1780394427155"
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "clients": 1,
+        "plans": 1
+      },
+      "generatedAt": "2026-06-02T10:00:32.037Z"
+    }
+  ],
+  "totals": {
+    "clients": 2,
+    "plans": 2
+  },
+  "validation": {
+    "scenario": {
+      "scenarioName": "S1",
+      "profile": "write",
+      "readOnly": false,
+      "advisors": 2,
+      "clientsPerAdvisor": 1,
+      "plansPerClient": 1,
+      "iterations": 1,
+      "manifestProfileFile": "data/scenarios/profile_20u_1c_1p.json",
+      "phaseBScenario": "phase-b-read-default",
+      "sloOverridesFile": null,
+      "source": {
+        "advisors": "cli",
+        "clientsPerAdvisor": "scenario",
+        "plansPerClient": "scenario"
+      }
+    },
+    "iterations": 1,
+    "expectedClients": 2,
+    "expectedPlans": 2,
+    "expectedShards": 2,
+    "actualClients": 2,
+    "actualPlans": 2,
+    "actualShards": 2,
+    "clientCountOk": true,
+    "planCountOk": true,
+    "shardCountOk": true,
+    "duplicateAdvisorOk": true,
+    "duplicateAdvisorSubs": [],
+    "passed": true
+  }
+}

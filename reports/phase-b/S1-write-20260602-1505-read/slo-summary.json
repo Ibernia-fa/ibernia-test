@@ -1,0 +1,53 @@
+{
+  "reportType": "volume-slo-summary",
+  "generatedAt": "2026-06-02T11:16:32.022Z",
+  "configVersion": 1,
+  "defaultProfile": "read",
+  "gates": null,
+  "profilesUsed": [],
+  "endpoints": [],
+  "steps": [],
+  "rates": {
+          "endpointViolationRate": null,
+          "stepViolationRate": null,
+          "hardMaxViolationRate": null
+        },
+  "totals": {
+          "endpointSamples": 0,
+          "stepSamples": 0,
+          "endpointViolations": 0,
+          "stepViolations": 0,
+          "hardMaxViolations": 0
+        },
+  "enabled": true,
+  "runId": "S1-write-20260602-1505-read",
+  "scenario": "phase-b-read-default",
+  "scenarioProfile": "read",
+  "phase": "B",
+  "integration": "k6-journey-advisor-critical",
+  "sloProfile": "read",
+  "readOnly": true,
+  "manifestDriven": true,
+  "userLagRate": 0,
+  "scenarioMetadata": {
+          "scenario": "phase-b-read-default",
+          "phaseBScenario": null,
+          "profile": "read"
+        },
+  "gate": {
+          "enabled": true,
+          "passed": true,
+          "failedSteps": [],
+          "failedEndpoints": [],
+          "stepViolationRate": null,
+          "endpointViolationRate": null,
+          "hardMaxViolationRate": null,
+          "maxStepViolationRate": 0.05,
+          "maxEndpointViolationRate": 0.05,
+          "maxSingleRequestOverMaxMsRate": 0.01,
+          "stepViolationRateFailed": false,
+          "endpointViolationRateFailed": false,
+          "hardMaxViolationRateFailed": false,
+          "violationRateFailed": false
+        }
+}

@@ -1,0 +1,16 @@
+{
+  "name": "@ibernia/load-test-pool-cli",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SQLite user pool for Ibernia k6 load tests (non-production)",
+  "type": "module",
+  "bin": {
+    "pool-cli": "./bin/pool-cli.js"
+  },
+  "scripts": {
+    "pool-cli": "node ./bin/pool-cli.js"
+  },
+  "engines": {
+    "node": ">=22.5.0"
+  }
+}

@@ -1,0 +1,16 @@
+{
+    "reportType":  "phase-a-worker-metadata",
+    "runTag":  "S1-write-realistic-20260602-1727",
+    "advisorKey":  "advisor-00",
+    "shardId":  "advisor-00",
+    "advisorEmail":  "User01@gmail.com",
+    "userMode":  "fixed",
+    "poolSliceFile":  "C:\\Users\\gulle\\source\\repos\\load-testing-k6\\data\\scenarios\\user-slices-S1-write-realistic-20260602-1727\\slice-advisor-00.json",
+    "volumeScenario":  "S1",
+    "volumeSloGate":  true,
+    "startTime":  "2026-06-02T12:27:26.0015829Z",
+    "endTime":  "2026-06-02T12:27:39.5864525Z",
+    "elapsedSec":  13.6,
+    "exitCode":  99,
+    "k6LogFile":  "C:\\Users\\gulle\\source\\repos\\load-testing-k6\\reports\\phase-a\\S1-write-realistic-20260602-1727\\logs\\advisor-00\\k6.log"
+}

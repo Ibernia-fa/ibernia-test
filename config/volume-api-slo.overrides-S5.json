@@ -1,0 +1,17 @@
+{
+  "description": "Optional S5 read overrides — merge via VOLUME_SLO_OVERRIDES_FILE for large GET …/all payloads",
+  "profiles": {
+    "read": {
+      "endpointBudgetMs": {
+        "GET /api/v1/Clients/{advisorId}/all": 3500
+      },
+      "endpointMaxMs": {
+        "GET /api/v1/Clients/{advisorId}/all": 8000
+      },
+      "stepBudgetMs": {
+        "journey_dashboard_load_duration": 3500,
+        "full_journey_duration": 20000
+      }
+    }
+  }
+}

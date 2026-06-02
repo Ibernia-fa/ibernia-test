@@ -1,0 +1,64 @@
+{
+  "reportType": "consolidated-api-performance",
+  "generatedAt": "2026-05-20T12:00:00.000Z",
+  "runId": "allmod-20260520-120000",
+  "environment": "dev-non-production",
+  "thresholdMs": 100,
+  "modulesIncluded": ["clients", "timeline", "events-custom", "wealth"],
+  "summary": {
+    "totalApiKeys": 12,
+    "totalSamples": 48,
+    "totalCalls": 48,
+    "totalFailures": 0,
+    "totalSuccessful": 48,
+    "apisExceedingThresholdMs": 3,
+    "slowestApi": {
+      "module": "reports",
+      "method": "GET",
+      "endpoint": "/api/v1/Reports/forecast",
+      "maxMs": 512,
+      "avgMs": 401,
+      "p95Ms": 498,
+      "totalCalls": 4,
+      "failures": 0,
+      "slowCount": 4
+    },
+    "overallAvgMs": 156.2
+  },
+  "slowApis": [
+    {
+      "module": "reports",
+      "method": "GET",
+      "endpoint": "/api/v1/Reports/forecast",
+      "maxMs": 512,
+      "avgMs": 401,
+      "p95Ms": 498,
+      "totalCalls": 4,
+      "failures": 0,
+      "slowCount": 4
+    },
+    {
+      "module": "events-custom",
+      "method": "POST",
+      "endpoint": "/api/v1/Events/custom",
+      "maxMs": 188,
+      "avgMs": 142,
+      "p95Ms": 180,
+      "totalCalls": 8,
+      "failures": 0,
+      "slowCount": 6
+    },
+    {
+      "module": "clients",
+      "method": "GET",
+      "endpoint": "/api/v1/Clients/all",
+      "maxMs": 142,
+      "avgMs": 118,
+      "p95Ms": 138,
+      "totalCalls": 2,
+      "failures": 0,
+      "slowCount": 2
+    }
+  ],
+  "apis": []
+}

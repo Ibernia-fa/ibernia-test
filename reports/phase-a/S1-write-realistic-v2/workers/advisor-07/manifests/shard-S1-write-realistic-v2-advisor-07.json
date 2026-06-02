@@ -1,0 +1,26 @@
+{
+  "reportType": "phase-a-manifest-shard",
+  "runTag": "S1-write-realistic-v2",
+  "shardId": "advisor-07",
+  "advisorSub": "886a217d-9441-4c0d-8167-b8a780e9287b",
+  "advisorEmail": "User08@gmail.com",
+  "vu": 1,
+  "iteration": 0,
+  "clients": [
+    {
+      "clientId": "6a1ecd83221185e8396cde49",
+      "uniqueTag": "fp1_g0_1780403587011",
+      "cashflows": [
+        {
+          "cashflowId": "6a1ecd85221185e8396cdf13",
+          "planName": "Mid-life financial review"
+        }
+      ]
+    }
+  ],
+  "counts": {
+    "clients": 1,
+    "plans": 1
+  },
+  "generatedAt": "2026-06-02T12:33:43.119Z"
+}

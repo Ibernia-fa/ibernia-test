@@ -1,0 +1,102 @@
+[
+  {
+    "email": "User01@gmail.com",
+    "password": "User@01!",
+    "advisorId": ""
+  },
+  {
+    "email": "User02@gmail.com",
+    "password": "User@02!",
+    "advisorId": ""
+  },
+  {
+    "email": "User03@gmail.com",
+    "password": "User@03!",
+    "advisorId": ""
+  },
+  {
+    "email": "User04@gmail.com",
+    "password": "User@04!",
+    "advisorId": ""
+  },
+  {
+    "email": "User05@gmail.com",
+    "password": "User@05!",
+    "advisorId": ""
+  },
+  {
+    "email": "User06@gmail.com",
+    "password": "User@06!",
+    "advisorId": ""
+  },
+  {
+    "email": "User07@gmail.com",
+    "password": "User@07!",
+    "advisorId": ""
+  },
+  {
+    "email": "User08@gmail.com",
+    "password": "User@08!",
+    "advisorId": ""
+  },
+  {
+    "email": "User09@gmail.com",
+    "password": "User@09!",
+    "advisorId": ""
+  },
+  {
+    "email": "User10@gmail.com",
+    "password": "User@10!",
+    "advisorId": ""
+  },
+  {
+    "email": "User11@gmail.com",
+    "password": "User@11!",
+    "advisorId": ""
+  },
+  {
+    "email": "User12@gmail.com",
+    "password": "User@12!",
+    "advisorId": ""
+  },
+  {
+    "email": "User13@gmail.com",
+    "password": "User@13!",
+    "advisorId": ""
+  },
+  {
+    "email": "User14@gmail.com",
+    "password": "User@14!",
+    "advisorId": ""
+  },
+  {
+    "email": "User15@gmail.com",
+    "password": "User@15!",
+    "advisorId": ""
+  },
+  {
+    "email": "User16@gmail.com",
+    "password": "User@16!",
+    "advisorId": ""
+  },
+  {
+    "email": "User17@gmail.com",
+    "password": "User@17!",
+    "advisorId": ""
+  },
+  {
+    "email": "User18@gmail.com",
+    "password": "User@18!",
+    "advisorId": ""
+  },
+  {
+    "email": "User19@gmail.com",
+    "password": "User@19!",
+    "advisorId": ""
+  },
+  {
+    "email": "User20@gmail.com",
+    "password": "User@20!",
+    "advisorId": ""
+  }
+]

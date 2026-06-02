@@ -1,0 +1,527 @@
+{
+  "reportType": "phase-a-manifest",
+  "generatedAt": "2026-06-02T10:06:50.842Z",
+  "runTag": "S1-write-20260602-1505",
+  "scenario": "S1",
+  "phaseBScenario": "phase-b-read-default",
+  "manifestProfileFile": "data/scenarios/profile_20u_1c_1p.json",
+  "shardCount": 20,
+  "advisors": [
+    {
+      "shardId": "advisor-00",
+      "advisorSub": "a0cc6646-8253-4fab-b539-387c5d5a5335",
+      "advisorEmail": "User01@gmail.com",
+      "vu": 1,
+      "iteration": 0,
+      "clients": [
+        {
+          "clientId": "6a1eaaee221185e8396afa3f",
+          "uniqueTag": "fp1_g0_1780394734011",
+          "cashflows": [
+            {
+              "cashflowId": "6a1eaaf0221185e8396afa49",
+              "planName": "FP-fp1_g0_1780394734011"
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "clients": 1,
+        "plans": 1
+      },
+      "generatedAt": "2026-06-02T10:05:39.331Z"
+    },
+    {
+      "shardId": "advisor-01",
+      "advisorSub": "10066169-5ecd-4b9f-8300-457596f14e66",
+      "advisorEmail": "User02@gmail.com",
+      "vu": 1,
+      "iteration": 0,
+      "clients": [
+        {
+          "clientId": "6a1eaaf1221185e8396afa8f",
+          "uniqueTag": "fp1_g0_1780394736674",
+          "cashflows": [
+            {
+              "cashflowId": "6a1eaaf2221185e8396afac0",
+              "planName": "FP-fp1_g0_1780394736674"
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "clients": 1,
+        "plans": 1
+      },
+      "generatedAt": "2026-06-02T10:05:41.589Z"
+    },
+    {
+      "shardId": "advisor-02",
+      "advisorSub": "bd8fa8d8-cff6-4663-adf0-a6a30e58a53f",
+      "advisorEmail": "User03@gmail.com",
+      "vu": 1,
+      "iteration": 0,
+      "clients": [
+        {
+          "clientId": "6a1eab1a221185e8396afb86",
+          "uniqueTag": "fp1_g0_1780394777305",
+          "cashflows": [
+            {
+              "cashflowId": "6a1eab1a221185e8396afb90",
+              "planName": "FP-fp1_g0_1780394777305"
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "clients": 1,
+        "plans": 1
+      },
+      "generatedAt": "2026-06-02T10:06:22.141Z"
+    },
+    {
+      "shardId": "advisor-03",
+      "advisorSub": "299dee43-c979-4b77-bd7d-4f17641db132",
+      "advisorEmail": "User04@gmail.com",
+      "vu": 1,
+      "iteration": 0,
+      "clients": [
+        {
+          "clientId": "6a1eab23221185e8396afc37",
+          "uniqueTag": "fp1_g0_1780394786781",
+          "cashflows": [
+            {
+              "cashflowId": "6a1eab25221185e8396afd25",
+              "planName": "FP-fp1_g0_1780394786781"
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "clients": 1,
+        "plans": 1
+      },
+      "generatedAt": "2026-06-02T10:06:41.352Z"
+    },
+    {
+      "shardId": "advisor-04",
+      "advisorSub": "2b9a7110-ef78-484d-a588-490f261bc699",
+      "advisorEmail": "User05@gmail.com",
+      "vu": 1,
+      "iteration": 0,
+      "clients": [
+        {
+          "clientId": "6a1eab24221185e8396afc71",
+          "uniqueTag": "fp1_g0_1780394787294",
+          "cashflows": [
+            {
+              "cashflowId": "6a1eab27221185e8396afdb8",
+              "planName": "FP-fp1_g0_1780394787294"
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "clients": 1,
+        "plans": 1
+      },
+      "generatedAt": "2026-06-02T10:06:42.653Z"
+    },
+    {
+      "shardId": "advisor-05",
+      "advisorSub": "43f0ec86-a91c-48cb-907e-3e046da61b3d",
+      "advisorEmail": "User06@gmail.com",
+      "vu": 1,
+      "iteration": 0,
+      "clients": [
+        {
+          "clientId": "6a1eab23221185e8396afc4c",
+          "uniqueTag": "fp1_g0_1780394787072",
+          "cashflows": [
+            {
+              "cashflowId": "6a1eab27221185e8396afda3",
+              "planName": "FP-fp1_g0_1780394787072"
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "clients": 1,
+        "plans": 1
+      },
+      "generatedAt": "2026-06-02T10:06:42.372Z"
+    },
+    {
+      "shardId": "advisor-06",
+      "advisorSub": "1c7fd134-25a6-4291-bb9a-04a09da3f9e9",
+      "advisorEmail": "User07@gmail.com",
+      "vu": 1,
+      "iteration": 0,
+      "clients": [
+        {
+          "clientId": "6a1eab23221185e8396afc28",
+          "uniqueTag": "fp1_g0_1780394786285",
+          "cashflows": [
+            {
+              "cashflowId": "6a1eab24221185e8396afc86",
+              "planName": "FP-fp1_g0_1780394786285"
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "clients": 1,
+        "plans": 1
+      },
+      "generatedAt": "2026-06-02T10:06:38.327Z"
+    },
+    {
+      "shardId": "advisor-07",
+      "advisorSub": "886a217d-9441-4c0d-8167-b8a780e9287b",
+      "advisorEmail": "User08@gmail.com",
+      "vu": 1,
+      "iteration": 0,
+      "clients": [
+        {
+          "clientId": "6a1eab23221185e8396afc35",
+          "uniqueTag": "fp1_g0_1780394786608",
+          "cashflows": [
+            {
+              "cashflowId": "6a1eab25221185e8396afce6",
+              "planName": "FP-fp1_g0_1780394786608"
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "clients": 1,
+        "plans": 1
+      },
+      "generatedAt": "2026-06-02T10:06:42.336Z"
+    },
+    {
+      "shardId": "advisor-08",
+      "advisorSub": "9c790737-0701-4517-9a7e-7ccec87a7f2d",
+      "advisorEmail": "User09@gmail.com",
+      "vu": 1,
+      "iteration": 0,
+      "clients": [
+        {
+          "clientId": "6a1eab24221185e8396afc73",
+          "uniqueTag": "fp1_g0_1780394787145",
+          "cashflows": [
+            {
+              "cashflowId": "6a1eab27221185e8396afda9",
+              "planName": "FP-fp1_g0_1780394787145"
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "clients": 1,
+        "plans": 1
+      },
+      "generatedAt": "2026-06-02T10:06:42.665Z"
+    },
+    {
+      "shardId": "advisor-09",
+      "advisorSub": "9ddca8ce-c37a-4a77-8405-a787970e27b4",
+      "advisorEmail": "User10@gmail.com",
+      "vu": 1,
+      "iteration": 0,
+      "clients": [
+        {
+          "clientId": "6a1eab23221185e8396afc57",
+          "uniqueTag": "fp1_g0_1780394787322",
+          "cashflows": [
+            {
+              "cashflowId": "6a1eab2c221185e8396b0061",
+              "planName": "FP-fp1_g0_1780394787322"
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "clients": 1,
+        "plans": 1
+      },
+      "generatedAt": "2026-06-02T10:06:42.861Z"
+    },
+    {
+      "shardId": "advisor-10",
+      "advisorSub": "c05ec07d-4b13-4152-b817-e9b58fd98e1b",
+      "advisorEmail": "User11@gmail.com",
+      "vu": 1,
+      "iteration": 0,
+      "clients": [
+        {
+          "clientId": "6a1eab23221185e8396afc3b",
+          "uniqueTag": "fp1_g0_1780394787005",
+          "cashflows": [
+            {
+              "cashflowId": "6a1eab27221185e8396afdc2",
+              "planName": "FP-fp1_g0_1780394787005"
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "clients": 1,
+        "plans": 1
+      },
+      "generatedAt": "2026-06-02T10:06:42.328Z"
+    },
+    {
+      "shardId": "advisor-11",
+      "advisorSub": "7c279937-b833-46df-8519-c70329933419",
+      "advisorEmail": "User12@gmail.com",
+      "vu": 1,
+      "iteration": 0,
+      "clients": [
+        {
+          "clientId": "6a1eab23221185e8396afc2b",
+          "uniqueTag": "fp1_g0_1780394786428",
+          "cashflows": [
+            {
+              "cashflowId": "6a1eab24221185e8396afc88",
+              "planName": "FP-fp1_g0_1780394786428"
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "clients": 1,
+        "plans": 1
+      },
+      "generatedAt": "2026-06-02T10:06:38.351Z"
+    },
+    {
+      "shardId": "advisor-12",
+      "advisorSub": "4ca6b3b2-8e5c-460e-9f34-7d5c5cbba014",
+      "advisorEmail": "User13@gmail.com",
+      "vu": 1,
+      "iteration": 0,
+      "clients": [
+        {
+          "clientId": "6a1eab23221185e8396afc3e",
+          "uniqueTag": "fp1_g0_1780394787071",
+          "cashflows": [
+            {
+              "cashflowId": "6a1eab27221185e8396afda6",
+              "planName": "FP-fp1_g0_1780394787071"
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "clients": 1,
+        "plans": 1
+      },
+      "generatedAt": "2026-06-02T10:06:47.895Z"
+    },
+    {
+      "shardId": "advisor-13",
+      "advisorSub": "55f48d17-4864-48a2-8d39-62386f58b805",
+      "advisorEmail": "User14@gmail.com",
+      "vu": 1,
+      "iteration": 0,
+      "clients": [
+        {
+          "clientId": "6a1eab23221185e8396afc44",
+          "uniqueTag": "fp1_g0_1780394787029",
+          "cashflows": [
+            {
+              "cashflowId": "6a1eab28221185e8396afe49",
+              "planName": "FP-fp1_g0_1780394787029"
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "clients": 1,
+        "plans": 1
+      },
+      "generatedAt": "2026-06-02T10:06:42.653Z"
+    },
+    {
+      "shardId": "advisor-14",
+      "advisorSub": "e72826bc-4308-4a45-ace0-5be830b8c7d3",
+      "advisorEmail": "User15@gmail.com",
+      "vu": 1,
+      "iteration": 0,
+      "clients": [
+        {
+          "clientId": "6a1eab23221185e8396afc2e",
+          "uniqueTag": "fp1_g0_1780394786481",
+          "cashflows": [
+            {
+              "cashflowId": "6a1eab25221185e8396afce4",
+              "planName": "FP-fp1_g0_1780394786481"
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "clients": 1,
+        "plans": 1
+      },
+      "generatedAt": "2026-06-02T10:06:46.789Z"
+    },
+    {
+      "shardId": "advisor-15",
+      "advisorSub": "15b535cc-9756-4383-9beb-3ee755f102c0",
+      "advisorEmail": "User16@gmail.com",
+      "vu": 1,
+      "iteration": 0,
+      "clients": [
+        {
+          "clientId": "6a1eab24221185e8396afc6d",
+          "uniqueTag": "fp1_g0_1780394787200",
+          "cashflows": [
+            {
+              "cashflowId": "6a1eab27221185e8396afdba",
+              "planName": "FP-fp1_g0_1780394787200"
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "clients": 1,
+        "plans": 1
+      },
+      "generatedAt": "2026-06-02T10:06:42.303Z"
+    },
+    {
+      "shardId": "advisor-16",
+      "advisorSub": "fc51bc25-540a-44ed-bd48-acfc87a293d5",
+      "advisorEmail": "User17@gmail.com",
+      "vu": 1,
+      "iteration": 0,
+      "clients": [
+        {
+          "clientId": "6a1eab23221185e8396afc55",
+          "uniqueTag": "fp1_g0_1780394787277",
+          "cashflows": [
+            {
+              "cashflowId": "6a1eab2f221185e8396b02a6",
+              "planName": "FP-fp1_g0_1780394787277"
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "clients": 1,
+        "plans": 1
+      },
+      "generatedAt": "2026-06-02T10:06:44.795Z"
+    },
+    {
+      "shardId": "advisor-17",
+      "advisorSub": "b1a2337a-412f-42db-a750-f1ba14cb05fa",
+      "advisorEmail": "User18@gmail.com",
+      "vu": 1,
+      "iteration": 0,
+      "clients": [
+        {
+          "clientId": "6a1eab23221185e8396afc53",
+          "uniqueTag": "fp1_g0_1780394787201",
+          "cashflows": [
+            {
+              "cashflowId": "6a1eab27221185e8396afdc7",
+              "planName": "FP-fp1_g0_1780394787201"
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "clients": 1,
+        "plans": 1
+      },
+      "generatedAt": "2026-06-02T10:06:42.612Z"
+    },
+    {
+      "shardId": "advisor-18",
+      "advisorSub": "a6d7e691-ce76-48ec-8c44-e9bdb65b13f2",
+      "advisorEmail": "User19@gmail.com",
+      "vu": 1,
+      "iteration": 0,
+      "clients": [
+        {
+          "clientId": "6a1eab23221185e8396afc40",
+          "uniqueTag": "fp1_g0_1780394786837",
+          "cashflows": [
+            {
+              "cashflowId": "6a1eab27221185e8396afdc5",
+              "planName": "FP-fp1_g0_1780394786837"
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "clients": 1,
+        "plans": 1
+      },
+      "generatedAt": "2026-06-02T10:06:42.668Z"
+    },
+    {
+      "shardId": "advisor-19",
+      "advisorSub": "8966f0dd-4d47-445e-abae-4d01ffb37434",
+      "advisorEmail": "User20@gmail.com",
+      "vu": 1,
+      "iteration": 0,
+      "clients": [
+        {
+          "clientId": "6a1eab23221185e8396afc47",
+          "uniqueTag": "fp1_g0_1780394786965",
+          "cashflows": [
+            {
+              "cashflowId": "6a1eab25221185e8396afcdd",
+              "planName": "FP-fp1_g0_1780394786965"
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "clients": 1,
+        "plans": 1
+      },
+      "generatedAt": "2026-06-02T10:06:41.322Z"
+    }
+  ],
+  "totals": {
+    "clients": 20,
+    "plans": 20
+  },
+  "validation": {
+    "scenario": {
+      "scenarioName": "S1",
+      "profile": "write",
+      "readOnly": false,
+      "advisors": 20,
+      "clientsPerAdvisor": 1,
+      "plansPerClient": 1,
+      "iterations": 1,
+      "manifestProfileFile": "data/scenarios/profile_20u_1c_1p.json",
+      "phaseBScenario": "phase-b-read-default",
+      "sloOverridesFile": null,
+      "source": {
+        "advisors": "scenario",
+        "clientsPerAdvisor": "scenario",
+        "plansPerClient": "scenario"
+      }
+    },
+    "iterations": 1,
+    "expectedClients": 20,
+    "expectedPlans": 20,
+    "expectedShards": 20,
+    "actualClients": 20,
+    "actualPlans": 20,
+    "actualShards": 20,
+    "clientCountOk": true,
+    "planCountOk": true,
+    "shardCountOk": true,
+    "duplicateAdvisorOk": true,
+    "duplicateAdvisorSubs": [],
+    "passed": true
+  }
+}

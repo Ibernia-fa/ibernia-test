@@ -1,0 +1,135 @@
+{
+  "reportType": "k6-journey-summary",
+  "generatedAt": "2026-06-01T11:09:06.005Z",
+  "testRunDurationMs": 118790.3195,
+  "vusMax": 3,
+  "rates": {
+    "user_lag_rate": 0.17142857142857143,
+    "business_failure_rate": 0,
+    "auth_failure_rate": 0
+  },
+  "http_req_failed": 0,
+  "journeys": {
+    "journey_login_duration": {
+      "avg": 518.1666666666666,
+      "min": 411,
+      "max": 1021,
+      "med": 466,
+      "p90": 590.1000000000001,
+      "p95": 718.3999999999995,
+      "p99": null,
+      "count": null,
+      "lagBudgetMs": 1500,
+      "passFail": "pass"
+    },
+    "journey_dashboard_load_duration": {
+      "avg": 6575.055555555556,
+      "min": 1677,
+      "max": 16991,
+      "med": 5155.5,
+      "p90": 14508.6,
+      "p95": 15370.049999999997,
+      "p99": null,
+      "count": null,
+      "lagBudgetMs": 2500,
+      "passFail": "fail"
+    },
+    "journey_open_client_duration": {
+      "avg": 293.1764705882353,
+      "min": 263,
+      "max": 475,
+      "med": 280,
+      "p90": 315.6,
+      "p95": 370.9999999999999,
+      "p99": null,
+      "count": null,
+      "lagBudgetMs": 2000,
+      "passFail": "pass"
+    },
+    "journey_cashflow_load_duration": {
+      "avg": 924.5294117647059,
+      "min": 549,
+      "max": 2479,
+      "med": 714,
+      "p90": 1616.0000000000002,
+      "p95": 2002.1999999999996,
+      "p99": null,
+      "count": null,
+      "lagBudgetMs": 3000,
+      "passFail": "pass"
+    }
+  },
+  "journeyThresholdRows": [
+    {
+      "metric": "journey_login_duration",
+      "avg": 518.1666666666666,
+      "p90": 590.1000000000001,
+      "p95": 718.3999999999995,
+      "p99": null,
+      "max": 1021,
+      "budgetMs": 1500,
+      "passFail": "pass"
+    },
+    {
+      "metric": "journey_dashboard_load_duration",
+      "avg": 6575.055555555556,
+      "p90": 14508.6,
+      "p95": 15370.049999999997,
+      "p99": null,
+      "max": 16991,
+      "budgetMs": 2500,
+      "passFail": "fail"
+    },
+    {
+      "metric": "journey_open_client_duration",
+      "avg": 293.1764705882353,
+      "p90": 315.6,
+      "p95": 370.9999999999999,
+      "p99": null,
+      "max": 475,
+      "budgetMs": 2000,
+      "passFail": "pass"
+    },
+    {
+      "metric": "journey_cashflow_load_duration",
+      "avg": 924.5294117647059,
+      "p90": 1616.0000000000002,
+      "p95": 2002.1999999999996,
+      "p99": null,
+      "max": 2479,
+      "budgetMs": 3000,
+      "passFail": "pass"
+    },
+    {
+      "metric": "user_lag_rate",
+      "avg": 0.17142857142857143,
+      "p90": null,
+      "p95": null,
+      "p99": null,
+      "max": null,
+      "budgetMs": null,
+      "budgetRate": 0.05,
+      "passFail": "fail"
+    }
+  ],
+  "correlationHeaders": [
+    "X-Correlation-Id",
+    "X-Journey",
+    "X-VU",
+    "X-Iteration"
+  ],
+  "endpoints": [],
+  "dashboardMeta": {
+      "samples": 0,
+      "clientsReturned": {
+        "min": null,
+        "max": null,
+        "avg": null
+      },
+      "responseBytes": {
+        "min": null,
+        "max": null,
+        "avg": null
+      }
+    }
+}

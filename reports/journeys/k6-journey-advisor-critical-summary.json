@@ -1,0 +1,381 @@
+{
+  "reportType": "k6-journey-summary",
+  "generatedAt": "2026-06-02T11:39:16.848Z",
+  "testRunDurationMs": 610023.8618,
+  "vusMax": 20,
+  "rates": {
+    "user_lag_rate": 0.00809138505473584,
+    "business_failure_rate": 0,
+    "auth_failure_rate": 0
+  },
+  "http_req_failed": 0,
+  "journeys": {
+    "journey_login_duration": {
+      "avg": 540.2309299895506,
+      "min": 393,
+      "max": 1375,
+      "med": 521,
+      "p90": 627,
+      "p95": 679.1999999999999,
+      "p99": null,
+      "count": null,
+      "lagBudgetMs": 1500,
+      "passFail": "pass"
+    },
+    "journey_dashboard_load_duration": {
+      "avg": 359.92267502612333,
+      "min": 251,
+      "max": 1393,
+      "med": 294,
+      "p90": 577.1999999999998,
+      "p95": 754.9999999999997,
+      "p99": null,
+      "count": null,
+      "lagBudgetMs": 2500,
+      "passFail": "pass"
+    },
+    "journey_open_client_duration": {
+      "avg": 352.7398119122257,
+      "min": 252,
+      "max": 1872,
+      "med": 291,
+      "p90": 551.5999999999998,
+      "p95": 749.7999999999997,
+      "p99": null,
+      "count": null,
+      "lagBudgetMs": 2000,
+      "passFail": "pass"
+    },
+    "journey_client_plans_load_duration": {
+      "avg": 349.69874476987445,
+      "min": 254,
+      "max": 1214,
+      "med": 291,
+      "p90": 534,
+      "p95": 732.5,
+      "p99": null,
+      "count": null,
+      "lagBudgetMs": 2000,
+      "passFail": "pass"
+    },
+    "journey_open_plan_duration": {
+      "avg": 407.154335010482,
+      "min": 248.5178,
+      "max": 3928.5206,
+      "med": 314.66650000000004,
+      "p90": 660.9672,
+      "p95": 847.4994049999995,
+      "p99": null,
+      "count": null,
+      "lagBudgetMs": 2000,
+      "passFail": "pass"
+    },
+    "journey_timeline_load_duration": {
+      "avg": 474.43696226415136,
+      "min": 260.2737,
+      "max": 3497.943,
+      "med": 386.79544999999996,
+      "p90": 781.6115100000003,
+      "p95": 990.9508949999994,
+      "p99": null,
+      "count": null,
+      "lagBudgetMs": 2500,
+      "passFail": "pass"
+    },
+    "journey_income_expenses_load_duration": {
+      "avg": 652.4989053459117,
+      "min": 343.55,
+      "max": 6109.1175,
+      "med": 512.883,
+      "p90": 1060.62861,
+      "p95": 1220.164485,
+      "p99": null,
+      "count": null,
+      "lagBudgetMs": 2500,
+      "passFail": "pass"
+    },
+    "journey_saving_pots_load_duration": {
+      "avg": 539.9733711740056,
+      "min": 277.3308,
+      "max": 5679.2189,
+      "med": 427.70725,
+      "p90": 888.4502000000001,
+      "p95": 1084.2900249999998,
+      "p99": null,
+      "count": null,
+      "lagBudgetMs": 3000,
+      "passFail": "pass"
+    },
+    "journey_projection_load_duration": {
+      "avg": 869.0984678197063,
+      "min": 484.7252,
+      "max": 5749.2672,
+      "med": 642.7283,
+      "p90": 1395.02085,
+      "p95": 1891.7778949999977,
+      "p99": null,
+      "count": null,
+      "lagBudgetMs": 6000,
+      "passFail": "pass"
+    },
+    "journey_cashflow_load_duration": {
+      "avg": 1045.4004192872117,
+      "min": 534,
+      "max": 8915,
+      "med": 817.5,
+      "p90": 1626.4,
+      "p95": 1970.4999999999973,
+      "p99": null,
+      "count": null,
+      "lagBudgetMs": 3000,
+      "passFail": "pass"
+    },
+    "full_journey_duration": {
+      "avg": 12652.793501048218,
+      "min": 7673,
+      "max": 22320,
+      "med": 12557.5,
+      "p90": 14353.1,
+      "p95": 15048.4,
+      "p99": null,
+      "count": null,
+      "lagBudgetMs": 15000,
+      "passFail": "fail"
+    },
+    "dashboard_response_size": {
+      "avg": 844.6844305120168,
+      "min": 529,
+      "max": 4223,
+      "med": 530,
+      "p90": 530,
+      "p95": 3379.7999999999283,
+      "p99": null,
+      "count": null,
+      "lagBudgetMs": 2500,
+      "passFail": "fail"
+    },
+    "client_plans_response_size": {
+      "avg": 609.8023012552301,
+      "min": 609,
+      "max": 610,
+      "med": 610,
+      "p90": 610,
+      "p95": 610,
+      "p99": null,
+      "count": null,
+      "lagBudgetMs": 2500,
+      "passFail": "pass"
+    },
+    "cashflow_response_size": {
+      "avg": 567.8018867924528,
+      "min": 567,
+      "max": 568,
+      "med": 568,
+      "p90": 568,
+      "p95": 568,
+      "p99": null,
+      "count": null,
+      "lagBudgetMs": 2500,
+      "passFail": "pass"
+    },
+    "projection_response_size": {
+      "avg": 493,
+      "min": 493,
+      "max": 493,
+      "med": 493,
+      "p90": 493,
+      "p95": 493,
+      "p99": null,
+      "count": null,
+      "lagBudgetMs": 2500,
+      "passFail": "pass"
+    }
+  },
+  "journeyThresholdRows": [
+    {
+      "metric": "journey_login_duration",
+      "avg": 540.2309299895506,
+      "p90": 627,
+      "p95": 679.1999999999999,
+      "p99": null,
+      "max": 1375,
+      "budgetMs": 1500,
+      "passFail": "pass"
+    },
+    {
+      "metric": "journey_dashboard_load_duration",
+      "avg": 359.92267502612333,
+      "p90": 577.1999999999998,
+      "p95": 754.9999999999997,
+      "p99": null,
+      "max": 1393,
+      "budgetMs": 2500,
+      "passFail": "pass"
+    },
+    {
+      "metric": "journey_open_client_duration",
+      "avg": 352.7398119122257,
+      "p90": 551.5999999999998,
+      "p95": 749.7999999999997,
+      "p99": null,
+      "max": 1872,
+      "budgetMs": 2000,
+      "passFail": "pass"
+    },
+    {
+      "metric": "journey_client_plans_load_duration",
+      "avg": 349.69874476987445,
+      "p90": 534,
+      "p95": 732.5,
+      "p99": null,
+      "max": 1214,
+      "budgetMs": 2000,
+      "passFail": "pass"
+    },
+    {
+      "metric": "journey_open_plan_duration",
+      "avg": 407.154335010482,
+      "p90": 660.9672,
+      "p95": 847.4994049999995,
+      "p99": null,
+      "max": 3928.5206,
+      "budgetMs": 2000,
+      "passFail": "pass"
+    },
+    {
+      "metric": "journey_timeline_load_duration",
+      "avg": 474.43696226415136,
+      "p90": 781.6115100000003,
+      "p95": 990.9508949999994,
+      "p99": null,
+      "max": 3497.943,
+      "budgetMs": 2500,
+      "passFail": "pass"
+    },
+    {
+      "metric": "journey_income_expenses_load_duration",
+      "avg": 652.4989053459117,
+      "p90": 1060.62861,
+      "p95": 1220.164485,
+      "p99": null,
+      "max": 6109.1175,
+      "budgetMs": 2500,
+      "passFail": "pass"
+    },
+    {
+      "metric": "journey_saving_pots_load_duration",
+      "avg": 539.9733711740056,
+      "p90": 888.4502000000001,
+      "p95": 1084.2900249999998,
+      "p99": null,
+      "max": 5679.2189,
+      "budgetMs": 3000,
+      "passFail": "pass"
+    },
+    {
+      "metric": "journey_projection_load_duration",
+      "avg": 869.0984678197063,
+      "p90": 1395.02085,
+      "p95": 1891.7778949999977,
+      "p99": null,
+      "max": 5749.2672,
+      "budgetMs": 6000,
+      "passFail": "pass"
+    },
+    {
+      "metric": "journey_cashflow_load_duration",
+      "avg": 1045.4004192872117,
+      "p90": 1626.4,
+      "p95": 1970.4999999999973,
+      "p99": null,
+      "max": 8915,
+      "budgetMs": 3000,
+      "passFail": "pass"
+    },
+    {
+      "metric": "full_journey_duration",
+      "avg": 12652.793501048218,
+      "p90": 14353.1,
+      "p95": 15048.4,
+      "p99": null,
+      "max": 22320,
+      "budgetMs": 15000,
+      "passFail": "fail"
+    },
+    {
+      "metric": "dashboard_response_size",
+      "avg": 844.6844305120168,
+      "p90": 530,
+      "p95": 3379.7999999999283,
+      "p99": null,
+      "max": 4223,
+      "budgetMs": 2500,
+      "passFail": "fail"
+    },
+    {
+      "metric": "client_plans_response_size",
+      "avg": 609.8023012552301,
+      "p90": 610,
+      "p95": 610,
+      "p99": null,
+      "max": 610,
+      "budgetMs": 2500,
+      "passFail": "pass"
+    },
+    {
+      "metric": "cashflow_response_size",
+      "avg": 567.8018867924528,
+      "p90": 568,
+      "p95": 568,
+      "p99": null,
+      "max": 568,
+      "budgetMs": 2500,
+      "passFail": "pass"
+    },
+    {
+      "metric": "projection_response_size",
+      "avg": 493,
+      "p90": 493,
+      "p95": 493,
+      "p99": null,
+      "max": 493,
+      "budgetMs": 2500,
+      "passFail": "pass"
+    },
+    {
+      "metric": "user_lag_rate",
+      "avg": 0.00809138505473584,
+      "p90": null,
+      "p95": null,
+      "p99": null,
+      "max": null,
+      "budgetMs": null,
+      "budgetRate": 0.05,
+      "passFail": "pass"
+    }
+  ],
+  "correlationHeaders": [
+    "X-Correlation-Id",
+    "X-Journey",
+    "X-VU",
+    "X-Iteration"
+  ],
+  "endpoints": [],
+  "dashboardMeta": {
+      "samples": 0,
+      "clientsReturned": {
+        "min": null,
+        "max": null,
+        "avg": null
+      },
+      "responseBytes": {
+        "min": null,
+        "max": null,
+        "avg": null
+      }
+    },
+  "phase": "B",
+  "readOnly": true,
+  "manifestDriven": true,
+  "phaseBRunTag": "S1-write-20260602-1505-read-v2"
+}

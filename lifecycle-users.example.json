@@ -1,0 +1,15 @@
+[
+  {
+    "email": "User01@gmail.com",
+    "password": "User@01!",
+    "advisorId": "PASTE-IDENTITY-USER-GUID-FROM-ADMIN",
+    "identityUserId": "same-as-advisorId-if-you-use-it",
+    "token": "optional-paste-JWT-from-portal-three-segments",
+    "createdAt": "2026-05-14T10:00:00Z"
+  },
+  {
+    "email": "User02@gmail.com",
+    "password": "User@02!",
+    "advisorId": "PASTE-IDENTITY-USER-GUID-FROM-ADMIN"
+  }
+]

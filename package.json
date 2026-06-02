@@ -1,0 +1,9 @@
+{
+  "name": "load-testing-k6",
+  "private": true,
+  "type": "module",
+  "description": "Ibernia k6 load tests (dev only)",
+  "devDependencies": {
+    "md-to-pdf": "^5.2.4"
+  }
+}

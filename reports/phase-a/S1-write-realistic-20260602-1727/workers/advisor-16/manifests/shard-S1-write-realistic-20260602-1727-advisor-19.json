@@ -1,0 +1,26 @@
+{
+  "reportType": "phase-a-manifest-shard",
+  "runTag": "S1-write-realistic-20260602-1727",
+  "shardId": "advisor-19",
+  "advisorSub": "8966f0dd-4d47-445e-abae-4d01ffb37434",
+  "advisorEmail": "User20@gmail.com",
+  "vu": 1,
+  "iteration": 0,
+  "clients": [
+    {
+      "clientId": "6a1ecc69221185e8396cc4b8",
+      "uniqueTag": "fp1_g0_1780403304777",
+      "cashflows": [
+        {
+          "cashflowId": "6a1ecc6a221185e8396cc55c",
+          "planName": "Family security plan"
+        }
+      ]
+    }
+  ],
+  "counts": {
+    "clients": 1,
+    "plans": 1
+  },
+  "generatedAt": "2026-06-02T12:29:00.245Z"
+}
